@@ -54,6 +54,11 @@ namespace Extract.ExtractDebugData
             public string ExceptionOutputFile;
 
             /// <summary>
+            /// Specifies whether only unique values should be output.
+            /// </summary>
+            public bool OutputOnlyUniqueValues;
+
+            /// <summary>
             /// Initializes a new <see cref="Settings"/> instance.
             /// </summary>
             /// <param name="args">The command-line arguments the application was launched with.
@@ -75,6 +80,10 @@ namespace Extract.ExtractDebugData
                     else if (arg.Equals("/a", StringComparison.OrdinalIgnoreCase))
                     {
                         Append = true;
+                    }
+                    else if (arg.Equals("/q", StringComparison.OrdinalIgnoreCase))
+                    {
+                        OutputOnlyUniqueValues = true;
                     }
                     else if (arg.Equals("/u", StringComparison.OrdinalIgnoreCase))
                     {
@@ -187,9 +196,27 @@ namespace Extract.ExtractDebugData
 
             try
             {
-                // If appending to the results of an existing file, first load the existing results.
-                List<string> results = new List<string>();
+                List<string> results = null;
+                Dictionary<string, bool> uniqueResults = null;
                 List<string> unselectedExceptions = new List<string>();
+
+                if (settings.OutputOnlyUniqueValues)
+                {
+                    uniqueResults = new Dictionary<string, bool>();
+
+                    if (File.Exists(settings.OutputFile))
+                    {
+                        string[] existingValues = File.ReadAllLines(settings.OutputFile);
+                        foreach (string value in existingValues)
+                        {
+                            uniqueResults[value] = true;
+                        }
+                    }
+                }
+                else
+                {
+                    results = new List<string>();
+                }
 
                 // Process each UEX file.
                 int fileIndex = 1;
@@ -254,8 +281,24 @@ namespace Extract.ExtractDebugData
                         int dataItemCount = tempResults.Count;
                         if (dataItemCount > 0)
                         {
-                            results.AddRange(tempResults);
-                            resultCount += dataItemCount;
+                            if (settings.OutputOnlyUniqueValues)
+                            {
+                                foreach (string value in tempResults)
+                                {
+                                    if (!uniqueResults.ContainsKey(value))
+                                    {
+                                        uniqueResults[value] = true;
+                                        resultCount++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                results.AddRange(tempResults);
+                                resultCount += dataItemCount;
+                            }
+
+                            
                             Console.Write("\rFound " + resultCount.ToString(CultureInfo.CurrentCulture)
                                 + " items...");
                         }
@@ -286,22 +329,27 @@ namespace Extract.ExtractDebugData
                     Console.WriteLine();
                 }
 
-                if (settings.Append)
+                using (StreamWriter outputFile = settings.Append
+                    ? File.AppendText(settings.OutputFile)
+                    : File.CreateText(settings.OutputFile))
                 {
-                    File.AppendAllLines(settings.OutputFile, results.ToArray());
-                    if (settings.OutputUnselectedExceptions)
+                    foreach (string value in settings.OutputOnlyUniqueValues
+                        ? (IEnumerable<string>)uniqueResults.Keys : results)
                     {
-                        File.AppendAllLines(settings.ExceptionOutputFile,
-                            unselectedExceptions.ToArray());
+                        outputFile.WriteLine(value);
                     }
                 }
-                else
+
+                if (settings.OutputUnselectedExceptions)
                 {
-                    File.WriteAllLines(settings.OutputFile, results.ToArray());
-                    if (settings.OutputUnselectedExceptions)
+                    using (StreamWriter exceptionOutputFile = settings.Append
+                        ? File.AppendText(settings.ExceptionOutputFile)
+                        : File.CreateText(settings.ExceptionOutputFile))
                     {
-                        File.WriteAllLines(settings.ExceptionOutputFile,
-                            unselectedExceptions.ToArray());
+                        foreach (string exception in unselectedExceptions)
+                        {
+                            exceptionOutputFile.WriteLine(exception);
+                        }
                     }
                 }
 
@@ -327,13 +375,16 @@ namespace Extract.ExtractDebugData
             Console.WriteLine("Usage:");
             Console.WriteLine("------------");
             Console.WriteLine("ExtractDebugData.exe {UEXFile|FolderName} [/r] ExtractSpecsFileName");
-            Console.WriteLine("OutputFileName [/a] [/u]");
+            Console.WriteLine("OutputFileName [/a] [/q] [/u]");
             Console.WriteLine();
             Console.WriteLine("UEXFile: The UEX file from which to extract data");
             Console.WriteLine();
             Console.WriteLine("FolderName: A folder containing the UEX files from which to extract data.");
             Console.WriteLine();
             Console.WriteLine("/r: Process folder recursively. Only valid when FolderName is specified");
+            Console.WriteLine();
+            Console.WriteLine("/q: Only output unique values. If used in conjunction with /a, values ");
+            Console.WriteLine("that already exist in the specified output file will not be written.");
             Console.WriteLine();
             Console.WriteLine("/u: Outputs to [OutputFileName].Unselected.uex exceptions in which ");
             Console.WriteLine("no debug data was selected and either the top-level exception or");
