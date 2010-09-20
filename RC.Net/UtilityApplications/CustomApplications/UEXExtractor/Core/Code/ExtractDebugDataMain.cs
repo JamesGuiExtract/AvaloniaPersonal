@@ -152,6 +152,7 @@ namespace Extract.ExtractDebugData
         {
             Settings settings = null;
             ExtractExceptionQuery query = null;
+            TemporaryFile tempUexFileCopy = null;
 
             try
             {
@@ -205,6 +206,21 @@ namespace Extract.ExtractDebugData
                     statusMessage.Append("\"");
                     Console.WriteLine(statusMessage);
 
+                    // Don't open directly any exception file named "ExtractException.uex" to
+                    // prevent the possibility of access issues with the active exception log.
+                    string workingFilePath;
+                    if (Path.GetFileName(uexFilePath).Equals(
+                        "ExtractException.uex", StringComparison.OrdinalIgnoreCase))
+                    {
+                        tempUexFileCopy = new TemporaryFile(".uex");
+                        File.Copy(uexFilePath, tempUexFileCopy.FileName, true);
+                        workingFilePath = tempUexFileCopy.FileName;
+                    }
+                    else
+                    {
+                        workingFilePath = uexFilePath;
+                    }
+
                     // Iterate through all exceptions in the file, collecting the query results
                     // along the way.
                     int resultCount = 0;
@@ -215,11 +231,11 @@ namespace Extract.ExtractDebugData
                         // For efficiency, if we are going to be writing exceptions out to file,
                         // rather than use the "Log" function on the exception COM object, just
                         // write the corresponding line from the source uex file.
-                        exceptionFileLines = File.ReadAllLines(uexFilePath);
+                        exceptionFileLines = File.ReadAllLines(workingFilePath);
                     }
 
                     IEnumerable<ExtractException> fileExceptions =
-                        ExtractException.LoadAllFromFile("ELI30580", uexFilePath, true);
+                        ExtractException.LoadAllFromFile("ELI30580", workingFilePath, true);
                     Console.Write("\rFound 0 items...");
                     
                     foreach (ExtractException ee in fileExceptions)
@@ -261,6 +277,12 @@ namespace Extract.ExtractDebugData
                         lineNumber++;
                     }
 
+                    if (tempUexFileCopy != null)
+                    {
+                        tempUexFileCopy.Dispose();
+                        tempUexFileCopy = null;
+                    }
+
                     Console.WriteLine();
                 }
 
@@ -287,6 +309,11 @@ namespace Extract.ExtractDebugData
             }
             catch (Exception ex)
             {
+                if (tempUexFileCopy != null)
+                {
+                    tempUexFileCopy.Dispose();
+                }
+
                 ExtractException.Log("ELI30588", ex);
                 Console.WriteLine(ex.Message);
             }
@@ -323,6 +350,8 @@ namespace Extract.ExtractDebugData
             Console.WriteLine("Parameter 5: Regex matching the name of any debug data item whose value ");
             Console.WriteLine("should be extracted, or blank to match any debug data item for an inclusion,");
             Console.WriteLine("or nothing for an exclusion.");
+            Console.WriteLine("Parameter 6: (optional) Regex the debug data value should match to be");
+            Console.WriteLine("considered a match.");
             Console.WriteLine();
             Console.WriteLine("OutputFileName: The name of the file to which the results should be written.");
             Console.WriteLine();

@@ -13,6 +13,11 @@ namespace Extract
     public class ExtractExceptionQuery
     {
         /// <summary>
+        /// Indicates whether the query could not be defined based on the provided specification.
+        /// </summary>
+        bool _isNull;
+
+        /// <summary>
         /// Indicates whether this instance includes or excludes matching exceptions.
         /// </summary>
         bool _inclusionQuery;
@@ -82,13 +87,24 @@ namespace Extract
 
                 string[] fields = null;
 
-                // All exclusion queries (which are to be and'd) are to be processed first so that
-                // the spec file is order-independent.
                 for (int i = 0; i < specifications.Count; i++)
                 {
-                    if (specifications[i].StartsWith("E", StringComparison.OrdinalIgnoreCase))
+                    string specificationLine = specifications[i];
+
+                    // Ignore comment lines or blank lines
+                    if (specificationLine.StartsWith("//", StringComparison.OrdinalIgnoreCase) ||
+                        specificationLine.Trim().Length == 0)
                     {
-                        fields = specifications[i].Split(',');
+                        specifications.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+
+                    // All exclusion queries (which are to be and'd) are to be processed first so that
+                    // the spec file is order-independent.
+                    if (specificationLine.StartsWith("E", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fields = specificationLine.Split(',');
                         specifications.RemoveAt(i);
                         break;
                     }
@@ -96,6 +112,13 @@ namespace Extract
 
                 if (fields == null)
                 {
+                    // If there are no valid specification lines, define this query as null.
+                    if (specifications.Count == 0)
+                    {
+                        _isNull = true;
+                        return;
+                    }
+
                     fields = specifications[0].Split(',');
                     specifications.RemoveAt(0);
                 }
@@ -109,8 +132,8 @@ namespace Extract
                 // Parameter 4: Name of debug data item whose value should be extracted, or blank
                 //              to match any debug data item for an inclusion, or nothing for an
                 //              exclusion.
-                // Parameter 5: (future) Regex the debug data value should match to be considered a match.
-                if (fields.Length != 5)
+                // Parameter 5: (optional) Regex the debug data value should match to be considered a match.
+                if (fields.Length < 5 || fields.Length > 6)
                 {
                     ExtractException ee = new ExtractException("ELI30596",
                         "Invalid number of fields in query specification line.");
@@ -178,15 +201,19 @@ namespace Extract
                 // If there are sub-queries specified, create them.
                 if (specifications.Count > 0)
                 {
-                    // In this format, inclusion queries are to be or'd while exclusion queries are
-                    // to be and'd.
-                    if (_inclusionQuery)
+                    ExtractExceptionQuery nextQuery = new ExtractExceptionQuery(specifications);
+                    if (!nextQuery._isNull)
                     {
-                        _orQuery = new ExtractExceptionQuery(specifications);
-                    }
-                    else
-                    {
-                        _andQuery = new ExtractExceptionQuery(specifications);                        
+                        // In this format, inclusion queries are to be or'd while exclusion queries are
+                        // to be and'd.
+                        if (_inclusionQuery)
+                        {
+                            _orQuery = nextQuery;
+                        }
+                        else
+                        {
+                            _andQuery = nextQuery;
+                        }
                     }
                 }
             }
@@ -406,7 +433,7 @@ namespace Extract
                         {
                             // If a value filter has been specifed, does the value match?
                             if (string.IsNullOrEmpty(debugDataItem.Value) ||
-                                Regex.IsMatch(entry.Value.ToString(), debugDataItem.Key,
+                                Regex.IsMatch(entry.Value.ToString(), debugDataItem.Value,
                                     RegexOptions.IgnoreCase))
 
                             {
