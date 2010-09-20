@@ -85,11 +85,12 @@ namespace Extract
                 ExtractException.Assert("ELI30597", "Missing query specifications.",
                     specifications != null && specifications.Count > 0);
 
+                string specificationLine = "";
                 string[] fields = null;
 
                 for (int i = 0; i < specifications.Count; i++)
                 {
-                    string specificationLine = specifications[i];
+                    specificationLine = specifications[i];
 
                     // Ignore comment lines or blank lines
                     if (specificationLine.StartsWith("//", StringComparison.OrdinalIgnoreCase) ||
@@ -120,6 +121,7 @@ namespace Extract
                     }
 
                     fields = specifications[0].Split(',');
+                    specificationLine = specifications[0];
                     specifications.RemoveAt(0);
                 }
 
@@ -132,12 +134,12 @@ namespace Extract
                 // Parameter 4: Name of debug data item whose value should be extracted, or blank
                 //              to match any debug data item for an inclusion, or nothing for an
                 //              exclusion.
-                // Parameter 5: (optional) Regex the debug data value should match to be considered a match.
-                if (fields.Length < 5 || fields.Length > 6)
+                // Parameter 5: Regex the debug data value should match to be considered a match.
+                if (fields.Length != 6)
                 {
                     ExtractException ee = new ExtractException("ELI30596",
                         "Invalid number of fields in query specification line.");
-                    ee.AddDebugData("Specification", specifications[0], false);
+                    ee.AddDebugData("Specification", specificationLine, false);
                     throw ee;
                 }
 

@@ -327,7 +327,7 @@ namespace Extract.ExtractDebugData
             Console.WriteLine("Usage:");
             Console.WriteLine("------------");
             Console.WriteLine("ExtractDebugData.exe {UEXFile|FolderName} [/r] ExtractSpecsFileName");
-            Console.WriteLine("OutputFileName [/a]");
+            Console.WriteLine("OutputFileName [/a] [/u]");
             Console.WriteLine();
             Console.WriteLine("UEXFile: The UEX file from which to extract data");
             Console.WriteLine();
@@ -340,7 +340,7 @@ namespace Extract.ExtractDebugData
             Console.WriteLine("one of its inner exceptions were not excluded.");
             Console.WriteLine();
             Console.WriteLine("ExtractSpecsFileName: The file containing the query specification.");
-            Console.WriteLine("Each comma delimited line has 5 parameters:");
+            Console.WriteLine("Each comma delimited line has 6 parameters:");
             Console.WriteLine("Parameter 1: \"I\" for include, or \"E\" for exclude.");
             Console.WriteLine("Parameter 2: \"T\" for top level exception, \"I\" for inner exception,");
             Console.WriteLine("blank for either type of exception.");
@@ -348,10 +348,9 @@ namespace Extract.ExtractDebugData
             Console.WriteLine("Parameter 4: Regex that should match the exception's text, or blank to match ");
             Console.WriteLine("any exception's text.");
             Console.WriteLine("Parameter 5: Regex matching the name of any debug data item whose value ");
-            Console.WriteLine("should be extracted, or blank to match any debug data item for an inclusion,");
-            Console.WriteLine("or nothing for an exclusion.");
-            Console.WriteLine("Parameter 6: (optional) Regex the debug data value should match to be");
-            Console.WriteLine("considered a match.");
+            Console.WriteLine("should be extracted, or blank to match any debug data item.");
+            Console.WriteLine("Parameter 6: Regex matching the value of any debug data item whose value ");
+            Console.WriteLine("should be extracted, or blank to match any debug data item.");
             Console.WriteLine();
             Console.WriteLine("OutputFileName: The name of the file to which the results should be written.");
             Console.WriteLine();
