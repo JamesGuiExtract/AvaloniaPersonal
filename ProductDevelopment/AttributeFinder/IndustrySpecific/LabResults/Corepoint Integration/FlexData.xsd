@@ -349,14 +349,14 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="Comment" minOccurs="1">
+                    <xs:element name="OriginalName" minOccurs="0">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="FullText" type="xs:string" />
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="OriginalName" minOccurs="0">
+                    <xs:element name="Comment" minOccurs="1">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="FullText" type="xs:string" />
