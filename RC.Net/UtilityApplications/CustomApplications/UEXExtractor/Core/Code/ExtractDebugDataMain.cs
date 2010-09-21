@@ -43,15 +43,26 @@ namespace Extract.ExtractDebugData
             public string OutputFile;
 
             /// <summary>
-            /// Specifies whether unselected exceptions should be output.
+            /// Specifies whether selected exceptions should be output.
             /// </summary>
-            public bool OutputUnselectedExceptions;
+            public bool OutputSelectedExceptions;
 
             /// <summary>
-            /// The uex file that should be written to if selected or unselected exceptions are to
-            /// be written to disk.
+            /// Specifies whether unreferenced exceptions should be output.
             /// </summary>
-            public string ExceptionOutputFile;
+            public bool OutputUnreferencedExceptions;
+
+            /// <summary>
+            /// The uex file that should be written to if selected exceptions are to be written to
+            /// disk.
+            /// </summary>
+            public string SelectedExceptionOutputFile;
+
+            /// <summary>
+            /// The uex file that should be written to if unreferenced exceptions are to be written
+            /// to disk.
+            /// </summary>
+            public string UnreferencedExceptionOutputFile;
 
             /// <summary>
             /// Specifies whether only unique values should be output.
@@ -85,9 +96,13 @@ namespace Extract.ExtractDebugData
                     {
                         OutputOnlyUniqueValues = true;
                     }
+                    else if (arg.Equals("/s", StringComparison.OrdinalIgnoreCase))
+                    {
+                        OutputSelectedExceptions = true;
+                    }
                     else if (arg.Equals("/u", StringComparison.OrdinalIgnoreCase))
                     {
-                        OutputUnselectedExceptions = true;
+                        OutputUnreferencedExceptions = true;
                     }
                     else if (string.IsNullOrEmpty(uexPath))
                     {
@@ -116,15 +131,23 @@ namespace Extract.ExtractDebugData
                 ExtractException.Assert("ELI30582", 
                     "No UEX files were found at the specified path.", UexFiles.Count > 0);
 
-                if (OutputUnselectedExceptions)
+                if (OutputSelectedExceptions || OutputSelectedExceptions)
                 {
                     // GetFullPathWithoutExtension will get a path relative to the application, not
                     // the working directory-- ensure we get a path relative to the current working
                     // directory.
                     string outputFile = FileSystemMethods.GetAbsolutePath(OutputFile,
                         Environment.CurrentDirectory);
-                    ExceptionOutputFile = FileSystemMethods.GetFullPathWithoutExtension(outputFile);
-                    ExceptionOutputFile += ".Unselected.uex";
+                    outputFile = FileSystemMethods.GetFullPathWithoutExtension(outputFile);
+
+                    if (OutputSelectedExceptions)
+                    {
+                        SelectedExceptionOutputFile = outputFile + ".Selected.uex";
+                    }
+                    if (OutputUnreferencedExceptions)
+                    {
+                        UnreferencedExceptionOutputFile = outputFile + ".Unreferenced.uex";
+                    }
                 }
             }
 
@@ -203,8 +226,11 @@ namespace Extract.ExtractDebugData
                 // value is what will actually be written to file.
                 Dictionary<string, string> uniqueResults = null;
 
+                // The exceptions that were selected by the query.
+                List<string> selectedExceptions = new List<string>();
+
                 // The exceptions that were not selected by the query
-                List<string> unselectedExceptions = new List<string>();
+                List<string> unreferencedExceptions = new List<string>();
 
                 if (settings.OutputOnlyUniqueValues)
                 {
@@ -261,7 +287,7 @@ namespace Extract.ExtractDebugData
                     int resultCount = 0;
                     int lineNumber = 0;
                     string[] exceptionFileLines = null;
-                    if (settings.OutputUnselectedExceptions)
+                    if (settings.OutputUnreferencedExceptions)
                     {
                         // For efficiency, if we are going to be writing exceptions out to file,
                         // rather than use the "Log" function on the exception COM object, just
@@ -313,7 +339,13 @@ namespace Extract.ExtractDebugData
                                 + " items...");
                         }
 
-                        // If writing "unselected" exceptions, write out any exception where both
+                        // Write the exception out as a selected exception if applicable.
+                        if (settings.OutputSelectedExceptions && dataItemCount > 0)
+                        {
+                            selectedExceptions.Add(exceptionFileLines[lineNumber]);
+                        }
+
+                        // If writing "unreferenced" exceptions, write out any exception where both
                         // the following conditions are true:
                         // (1)  No debug data item contained within the original UEX line (which
                         //      could represent a hierarchy of exceptions when displayed) was
@@ -321,10 +353,10 @@ namespace Extract.ExtractDebugData
                         // (2)  Either the top level exception associated with the original UEX line
                         //      or one of the inner exceptions associated with the original UEX line
                         //      was not excluded according to the specs.
-                        if (settings.OutputUnselectedExceptions && 
+                        if (settings.OutputUnreferencedExceptions && 
                             dataItemCount == 0 && !query.GetIsEntirelyExcluded(ee))
                         {
-                            unselectedExceptions.Add(exceptionFileLines[lineNumber]);
+                            unreferencedExceptions.Add(exceptionFileLines[lineNumber]);
                         }
 
                         lineNumber++;
@@ -364,13 +396,26 @@ namespace Extract.ExtractDebugData
                     }
                 }
 
-                if (settings.OutputUnselectedExceptions)
+                if (settings.OutputSelectedExceptions)
                 {
                     using (StreamWriter exceptionOutputFile = settings.Append
-                        ? File.AppendText(settings.ExceptionOutputFile)
-                        : File.CreateText(settings.ExceptionOutputFile))
+                        ? File.AppendText(settings.SelectedExceptionOutputFile)
+                        : File.CreateText(settings.SelectedExceptionOutputFile))
                     {
-                        foreach (string exception in unselectedExceptions)
+                        foreach (string exception in selectedExceptions)
+                        {
+                            exceptionOutputFile.WriteLine(exception);
+                        }
+                    }
+                }
+
+                if (settings.OutputUnreferencedExceptions)
+                {
+                    using (StreamWriter exceptionOutputFile = settings.Append
+                        ? File.AppendText(settings.UnreferencedExceptionOutputFile)
+                        : File.CreateText(settings.UnreferencedExceptionOutputFile))
+                    {
+                        foreach (string exception in unreferencedExceptions)
                         {
                             exceptionOutputFile.WriteLine(exception);
                         }
@@ -399,7 +444,7 @@ namespace Extract.ExtractDebugData
             Console.WriteLine("Usage:");
             Console.WriteLine("------------");
             Console.WriteLine("ExtractDebugData.exe {UEXFile|FolderName} [/r] ExtractSpecsFileName");
-            Console.WriteLine("OutputFileName [/a] [/q] [/u]");
+            Console.WriteLine("OutputFileName [/a] [/q] [/s] [/u]");
             Console.WriteLine();
             Console.WriteLine("UEXFile: The UEX file from which to extract data");
             Console.WriteLine();
@@ -410,7 +455,11 @@ namespace Extract.ExtractDebugData
             Console.WriteLine("/q: Only output unique values. If used in conjunction with /a, values ");
             Console.WriteLine("that already exist in the specified output file will not be written.");
             Console.WriteLine();
-            Console.WriteLine("/u: Outputs to [OutputFileName].Unselected.uex exceptions in which ");
+            Console.WriteLine("/s: Outputs to [OutputFileName].Selected.uex exceptions which either");
+            Console.WriteLine("matches the specification or which contains an inner exception that");
+            Console.WriteLine("matches the specification.");
+            Console.WriteLine();
+            Console.WriteLine("/u: Outputs to [OutputFileName].Unreferenced.uex exceptions in which ");
             Console.WriteLine("no debug data was selected and either the top-level exception or");
             Console.WriteLine("one of its inner exceptions were not excluded.");
             Console.WriteLine();
