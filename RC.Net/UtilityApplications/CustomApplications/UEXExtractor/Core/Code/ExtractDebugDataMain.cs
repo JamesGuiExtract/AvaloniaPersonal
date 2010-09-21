@@ -196,20 +196,28 @@ namespace Extract.ExtractDebugData
 
             try
             {
+                // For non-unique results
                 List<string> results = null;
-                Dictionary<string, bool> uniqueResults = null;
+
+                // For unique results. The key is upper case for case-insensitive comparison, the 
+                // value is what will actually be written to file.
+                Dictionary<string, string> uniqueResults = null;
+
+                // The exceptions that were not selected by the query
                 List<string> unselectedExceptions = new List<string>();
 
                 if (settings.OutputOnlyUniqueValues)
                 {
-                    uniqueResults = new Dictionary<string, bool>();
+                    uniqueResults = new Dictionary<string, string>();
 
-                    if (File.Exists(settings.OutputFile))
+                    if (settings.Append && File.Exists(settings.OutputFile))
                     {
                         string[] existingValues = File.ReadAllLines(settings.OutputFile);
                         foreach (string value in existingValues)
                         {
-                            uniqueResults[value] = true;
+                            // Set value to null to indicate it doesn't need to be re-written to
+                            // the output file.
+                            uniqueResults[value.ToUpper(CultureInfo.CurrentCulture)] = null;
                         }
                     }
                 }
@@ -285,9 +293,11 @@ namespace Extract.ExtractDebugData
                             {
                                 foreach (string value in tempResults)
                                 {
-                                    if (!uniqueResults.ContainsKey(value))
+                                    // Check case-insensitively for value alreay in results.
+                                    string upperValue = value.ToUpper(CultureInfo.CurrentCulture);
+                                    if (!uniqueResults.ContainsKey(upperValue))
                                     {
-                                        uniqueResults[value] = true;
+                                        uniqueResults[upperValue] = value;
                                         resultCount++;
                                     }
                                 }
@@ -333,10 +343,24 @@ namespace Extract.ExtractDebugData
                     ? File.AppendText(settings.OutputFile)
                     : File.CreateText(settings.OutputFile))
                 {
-                    foreach (string value in settings.OutputOnlyUniqueValues
-                        ? (IEnumerable<string>)uniqueResults.Keys : results)
+                    if (settings.OutputOnlyUniqueValues)
                     {
-                        outputFile.WriteLine(value);
+                        foreach (string value in uniqueResults.Values)
+                        {
+                            // Only output new values found, not any values that previously existed
+                            // in the output file.
+                            if (!string.IsNullOrEmpty(value))
+                            {
+                                outputFile.WriteLine(value);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (string value in results)
+                        {
+                            outputFile.WriteLine(value);
+                        }
                     }
                 }
 
