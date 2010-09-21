@@ -301,7 +301,11 @@ namespace Extract
             // fails to match an exclusion query.
             bool include = GetIsMatch(ee, generation) == _inclusionQuery;
 
-            if (include)
+            // TODO: In the long run, I don't think the limitation that only inclusion queries can
+            // output is one that needs to be there. But the current spec format makes it otherwise
+            // difficult to distinguish the query from the desired data. For now, only output
+            // from exclusion queries.
+            if (include && _inclusionQuery)
             {
                 // Add debug data if requested.
                 if (strings != null)

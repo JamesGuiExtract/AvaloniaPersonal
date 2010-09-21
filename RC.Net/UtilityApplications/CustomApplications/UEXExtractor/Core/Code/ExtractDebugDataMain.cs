@@ -184,7 +184,6 @@ namespace Extract.ExtractDebugData
         {
             Settings settings = null;
             ExtractExceptionQuery query = null;
-            TemporaryFile tempUexFileCopy = null;
 
             try
             {
@@ -217,6 +216,15 @@ namespace Extract.ExtractDebugData
                 return;
             }
 
+            // Temporary copy of the source uex file.
+            TemporaryFile tempUexFileCopy = null;
+
+            // File to write exceptions that were selected by the query.
+            StreamWriter selectedExceptionOutputFile = null;
+
+            // File to write exceptions that were not referenced by the query.
+            StreamWriter unreferencedExceptionOutputFile = null;
+
             try
             {
                 // For non-unique results
@@ -225,12 +233,6 @@ namespace Extract.ExtractDebugData
                 // For unique results. The key is upper case for case-insensitive comparison, the 
                 // value is what will actually be written to file.
                 Dictionary<string, string> uniqueResults = null;
-
-                // The exceptions that were selected by the query.
-                List<string> selectedExceptions = new List<string>();
-
-                // The exceptions that were not selected by the query
-                List<string> unreferencedExceptions = new List<string>();
 
                 if (settings.OutputOnlyUniqueValues)
                 {
@@ -250,6 +252,20 @@ namespace Extract.ExtractDebugData
                 else
                 {
                     results = new List<string>();
+                }
+
+                if (settings.OutputSelectedExceptions)
+                {
+                    selectedExceptionOutputFile = settings.Append
+                        ? File.AppendText(settings.SelectedExceptionOutputFile)
+                        : File.CreateText(settings.SelectedExceptionOutputFile);
+                }
+
+                if (settings.OutputUnreferencedExceptions)
+                {
+                    unreferencedExceptionOutputFile = settings.Append
+                        ? File.AppendText(settings.UnreferencedExceptionOutputFile)
+                        : File.CreateText(settings.UnreferencedExceptionOutputFile);
                 }
 
                 // Process each UEX file.
@@ -298,7 +314,7 @@ namespace Extract.ExtractDebugData
                     IEnumerable<ExtractException> fileExceptions =
                         ExtractException.LoadAllFromFile("ELI30580", workingFilePath, true);
                     Console.Write("\rFound 0 items...");
-                    
+
                     foreach (ExtractException ee in fileExceptions)
                     {
                         if (ee.EliCode.Equals("ELI30603", StringComparison.Ordinal))
@@ -334,7 +350,7 @@ namespace Extract.ExtractDebugData
                                 resultCount += dataItemCount;
                             }
 
-                            
+
                             Console.Write("\rFound " + resultCount.ToString(CultureInfo.CurrentCulture)
                                 + " items...");
                         }
@@ -342,7 +358,7 @@ namespace Extract.ExtractDebugData
                         // Write the exception out as a selected exception if applicable.
                         if (settings.OutputSelectedExceptions && dataItemCount > 0)
                         {
-                            selectedExceptions.Add(exceptionFileLines[lineNumber]);
+                            selectedExceptionOutputFile.WriteLine(exceptionFileLines[lineNumber]);
                         }
 
                         // If writing "unreferenced" exceptions, write out any exception where both
@@ -353,10 +369,10 @@ namespace Extract.ExtractDebugData
                         // (2)  Either the top level exception associated with the original UEX line
                         //      or one of the inner exceptions associated with the original UEX line
                         //      was not excluded according to the specs.
-                        if (settings.OutputUnreferencedExceptions && 
+                        if (settings.OutputUnreferencedExceptions &&
                             dataItemCount == 0 && !query.GetIsEntirelyExcluded(ee))
                         {
-                            unreferencedExceptions.Add(exceptionFileLines[lineNumber]);
+                            unreferencedExceptionOutputFile.WriteLine(exceptionFileLines[lineNumber]);
                         }
 
                         lineNumber++;
@@ -396,43 +412,59 @@ namespace Extract.ExtractDebugData
                     }
                 }
 
-                if (settings.OutputSelectedExceptions)
-                {
-                    using (StreamWriter exceptionOutputFile = settings.Append
-                        ? File.AppendText(settings.SelectedExceptionOutputFile)
-                        : File.CreateText(settings.SelectedExceptionOutputFile))
-                    {
-                        foreach (string exception in selectedExceptions)
-                        {
-                            exceptionOutputFile.WriteLine(exception);
-                        }
-                    }
-                }
-
-                if (settings.OutputUnreferencedExceptions)
-                {
-                    using (StreamWriter exceptionOutputFile = settings.Append
-                        ? File.AppendText(settings.UnreferencedExceptionOutputFile)
-                        : File.CreateText(settings.UnreferencedExceptionOutputFile))
-                    {
-                        foreach (string exception in unreferencedExceptions)
-                        {
-                            exceptionOutputFile.WriteLine(exception);
-                        }
-                    }
-                }
-
                 Console.WriteLine("Complete.");
             }
             catch (Exception ex)
+            {
+                ExtractException.Log("ELI30588", ex);
+                Console.WriteLine(ex.Message);
+            }
+            finally
             {
                 if (tempUexFileCopy != null)
                 {
                     tempUexFileCopy.Dispose();
                 }
 
-                ExtractException.Log("ELI30588", ex);
-                Console.WriteLine(ex.Message);
+                if (selectedExceptionOutputFile != null)
+                {
+                    selectedExceptionOutputFile.Dispose();
+
+                    // If the file is zero size, delete it since empty uex files are not valid.
+                    try
+                    {
+                        FileInfo fileInfo = new FileInfo(settings.SelectedExceptionOutputFile);
+                        if (fileInfo.Length == 0)
+                        {
+                            fileInfo.Delete();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException.Log("ELI30611", ex);
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+
+                if (unreferencedExceptionOutputFile != null)
+                {
+                    unreferencedExceptionOutputFile.Dispose();
+
+                    // If the file is zero size, delete it since empty uex files are not valid.
+                    try
+                    {
+                        FileInfo fileInfo = new FileInfo(settings.UnreferencedExceptionOutputFile);
+                        if (fileInfo.Length == 0)
+                        {
+                            fileInfo.Delete();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException.Log("ELI30612", ex);
+                        Console.WriteLine(ex.Message);
+                    }
+                }
             }
         }
 
