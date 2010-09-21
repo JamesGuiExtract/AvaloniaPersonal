@@ -105,8 +105,7 @@ m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
 m_nUPIID(0),
-m_bFAMRegistered(false),
-m_bUsePreNormalized(true)
+m_bFAMRegistered(false)
 {
 	try
 	{
@@ -126,17 +125,6 @@ m_bUsePreNormalized(true)
 		m_strMachineName = getComputerName();
 		m_strFAMUserName = getCurrentUserName();
 		m_lDBLockTimeout = m_regFPCfgMgr.getDBLockTimeout();
-		m_bUsePreNormalized = m_regFPCfgMgr.getUsePreNormalized();
-
-		// Set the expected schema version based on the UsePreNormalized flag
-		if (m_bUsePreNormalized)
-		{
-			m_lExpectedSchemaVersion = ms_lFAMDBSchemaVersion;
-		}
-		else
-		{
-			m_lExpectedSchemaVersion = ms_lFAMDBNormalizedSchemaVersion;
-		}
 
 		// If PDF support is licensed initialize support
 		// NOTE: no exception is thrown or logged if PDF support is not licensed.
@@ -196,13 +184,6 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction, long* pnID)
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			DefineNewAction2(strAction, pnID);
-			return S_OK;
-		}
-
 		string strActionName = asString(strAction);
 
 		// Validate the new action name
@@ -218,9 +199,6 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction, long* pnID)
 
 		// Get the connection for the thread and save it locally.
 		ipConnection = getDBConnection();
-
-		// Lock the database for this instance
-		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
@@ -246,13 +224,6 @@ STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			DeleteAction2(strAction);
-			return S_OK;
-		}
-
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		
@@ -272,35 +243,22 @@ STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		// Create a pointer to a recordset
-		_RecordsetPtr ipActionSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI30357", ipActionSet != NULL);
-
-		// Open the Action table
-		ipActionSet->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-			adLockOptimistic, adCmdTableDirect);
+		// Get the action ID and update the strActionName to stored value
+		long nActionID = getActionID(ipConnection, strActionName);
+		
+		// Make sure processing is not active of this action
+		assertProcessingNotActiveForAction(ipConnection, nActionID);
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		// Setup find criteria to find the action to delete
-		string strFind = "ASCName = '" + asString(strAction) + "'";
+		// Delete the action
+		string strDeleteActionQuery = "DELETE FROM Action WHERE ASCName = '" + asString(strAction) + "'";
+		executeCmdQuery(ipConnection, strDeleteActionQuery);
 
-		// Search for the action to delete
-		ipActionSet->Find(strFind.c_str(), 0, adSearchForward);
+		// Commit this transaction
+		tg.CommitTrans();
 
-		// if action was found
-		if (ipActionSet->adoEOF == VARIANT_FALSE)
-		{
-			// Get the action name from the database
-			strActionName = getStringField(ipActionSet->Fields, "ASCName");
-
-			// Delete the record 
-			ipActionSet->Delete(adAffectCurrent);
-
-			// Commit the change to the database
-			tg.CommitTrans();
-		}
 		END_CONNECTION_RETRY(ipConnection, "ELI30358");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13527");
@@ -324,9 +282,6 @@ STDMETHODIMP CFileProcessingDB::GetActions(IStrToStrMap * * pmapActionNameToID)
 		
 		// Get the connection for the thread and save it locally.
 		ipConnection = getDBConnection();
-
-		// Lock the database for this instance
-		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
@@ -356,14 +311,6 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			AddFile2(strFile, strAction, ePriority, bForceStatusChange, bFileModified, 
-				eNewStatus, pbAlreadyExists, pPrevStatus, ppFileRecord);
-			return S_OK;
-		}
-
 		// Check License
 		validateLicense();
 
@@ -652,13 +599,6 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			RemoveFile2(strFile, strAction);
-			return S_OK;
-		}
-
 		// Check License
 		validateLicense();
 
@@ -918,14 +858,6 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			GetFileStatus2(nFileID, strAction, vbAttemptRevertIfLocked, pStatus);
-			return S_OK;
-		}
-
-
 		// Check License
 		validateLicense();
 
@@ -1013,14 +945,6 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			SearchAndModifyFileStatus2( nWhereActionID,  eWhereStatus, nToActionID, eToStatus,
-				bstrSkippedFromUserName, nFromActionID, pnNumRecordsModified);
-			return S_OK;
-		}
-
 		// Check License
 		validateLicense();
 
@@ -1142,13 +1066,6 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			SetStatusForAllFiles2(strAction, eStatus);
-			return S_OK;
-		}
-
 		// Check License
 		validateLicense();
 
@@ -1296,14 +1213,6 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			GetFilesToProcess2(strAction, nMaxFiles, bGetSkippedFiles, bstrSkippedForUserName,
-				pvecFileRecords);
-			return S_OK;
-		}
-
 		static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
 
 		// Check License
@@ -1388,13 +1297,6 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			RemoveFolder2(strFolder, strAction);
-			return S_OK;
-		}
-
 		// Check License
 		validateLicense();
 
@@ -1564,13 +1466,6 @@ STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionNa
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			RenameAction2(nActionID, strNewActionName);
-			return S_OK;
-		}
-
 		validateLicense();
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
@@ -1586,6 +1481,9 @@ STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionNa
 
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
+
+		// Make sure processing is not active of this action
+		assertProcessingNotActiveForAction(ipConnection, nActionID);
 
 		// Convert action names to string
 		string strOld = getActionName(ipConnection, nActionID);
@@ -2685,14 +2583,6 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			ModifyActionStatusForQuery2(bstrQueryFrom, bstrToAction, eaStatus, bstrFromAction,
-				pRandomCondition, pnNumRecordsModified);
-			return S_OK;
-		}
-
 		// Check that an action name and a FROM clause have been passed in
 		string strQueryFrom = asString(bstrQueryFrom);
 		ASSERT_ARGUMENT("ELI30380", !strQueryFrom.empty());
@@ -3687,14 +3577,6 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			SetStatusForFilesWithTags2(pvecTagNames, vbAndOperation, nToActionID, 
-				eaNewStatus, nFromActionID);
-			return S_OK;
-		}
-
 		validateLicense();
 
 		IVariantVectorPtr ipVecTagNames(pvecTagNames);
@@ -3910,7 +3792,7 @@ STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnReco
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27686");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RegisterProcessingFAM()
+STDMETHODIMP CFileProcessingDB::RegisterProcessingFAM(long lActionID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -3920,7 +3802,10 @@ STDMETHODIMP CFileProcessingDB::RegisterProcessingFAM()
 
 		// This creates a record in the ProcessingFAM table and the LastPingTime
 		// is set to the current time by default.
-		m_nUPIID = getKeyID(getDBConnection(), "ProcessingFAM", "UPI", m_strUPI);
+		executeCmdQuery(getDBConnection(), "INSERT INTO ProcessingFAM (UPI, ActionID) "
+			"VALUES ('" + m_strUPI + "', " + asString(lActionID) + ")");
+		// get the new records ID to return
+		m_nUPIID = getLastTableID(getDBConnection(), "ProcessingFAM");
 
 		m_eventStopPingThread.reset();
 		m_eventPingThreadExited.reset();
@@ -5323,13 +5208,6 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToProcessing(long nFileId, long nAc
 
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			SetFileStatusToProcessing2(nFileId, nActionID);
-			return S_OK;
-		}
-
 		validateLicense();
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY

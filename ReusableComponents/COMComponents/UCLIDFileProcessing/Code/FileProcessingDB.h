@@ -184,7 +184,7 @@ public:
 	STDMETHOD(GetUserCounterNamesAndValues)(IStrToStrMap** ppmapUserCounters);
 	STDMETHOD(IsUserCounterValid)(BSTR bstrCounterName, VARIANT_BOOL* pbCounterValid);
 	STDMETHOD(OffsetUserCounter)(BSTR bstrCounterName, LONGLONG llOffsetValue, LONGLONG* pllNewValue);
-	STDMETHOD(RegisterProcessingFAM)();
+	STDMETHOD(RegisterProcessingFAM)(long lActionID);
 	STDMETHOD(UnregisterProcessingFAM)();
 	STDMETHOD(RecordFAMSessionStart)(BSTR bstrFPSFileName);
 	STDMETHOD(RecordFAMSessionStop)();
@@ -209,13 +209,6 @@ public:
 private:
 	// Current schema version for the non normailized DB
 	static const long ms_lFAMDBSchemaVersion;
-
-	// Current schema version for the normalized DB
-	static const long ms_lFAMDBNormalizedSchemaVersion;
-
-	// Expected schema version  - this is set based on the
-	// value of the UsePreNormalized setting in registry
-	long m_lExpectedSchemaVersion;
 
 	class SetFileActionData
 	{
@@ -352,6 +345,16 @@ private:
 	// Methods
 	//-------------------------------------------------------------------------------------------------
 	
+	// PROMISE: Throws an exception if processing is active on the action.
+	// NOTE: If Auto revert is enabled the files will be reverted in a transaction, so this
+	//		 must be called outside of an active transaction.
+	void assertProcessingNotActiveForAction(_ConnectionPtr ipConnection, const long &lActionID);
+
+	// PROMISE: Throws an exception if processing is active on any action.
+	// NOTE: If Auto revert is enabled the files will be reverted in a transaction, so this
+	//		 must be called outside of an active transaction.
+	void assertProcessingNotActiveForAnyAction();
+
 	// PROMISE: returns a pointer to a new FileRecord object filled from ipFields
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecordFromFields(const FieldsPtr& ipFields,
 		bool bGetPriority = true);
@@ -703,74 +706,6 @@ private:
 	_RecordsetPtr getFileActionStatusSet(_ConnectionPtr& ipConnection, long nFileID, long nActionID);
 
 	void validateLicense();
-
-	// This variable is used to indicate if  pre normalized database code should be used.
-	// This will be set to a value from a registry key
-	bool m_bUsePreNormalized;
-
-	// Methods used to keep the pre normalizaton of the Action - FAMTable 
-	// These methods will be removed when the normalization code has been completed and tested
-
-	// Interface functions for prenormalized Action
-	void DefineNewAction2(BSTR strAction, long* pnID);
-	void DeleteAction2(BSTR strAction);
-	void AddFile2(BSTR strFile,  BSTR strAction, EFilePriority ePriority,
-										VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
-										EActionStatus eNewStatus, VARIANT_BOOL * pbAlreadyExists,
-										EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord);
-	void RemoveFile2(BSTR strFile, BSTR strAction);
-	void GetFileStatus2(long nFileID,  BSTR strAction,
-									VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus);
-	void SearchAndModifyFileStatus2(long nWhereActionID,  EActionStatus eWhereStatus,  
-														  long nToActionID, EActionStatus eToStatus,
-														  BSTR bstrSkippedFromUserName, 
-														  long nFromActionID, long * pnNumRecordsModified);
-	void SetStatusForAllFiles2(BSTR strAction,  EActionStatus eStatus);
-	void GetFilesToProcess2(BSTR strAction,  long nMaxFiles, 
-												  VARIANT_BOOL bGetSkippedFiles,
-												  BSTR bstrSkippedForUserName,
-												  IIUnknownVector * * pvecFileRecords);
-	void RemoveFolder2(BSTR strFolder, BSTR strAction);
-	void RenameAction2(long nActionID, BSTR strNewActionName);
-
-	void ModifyActionStatusForQuery2(BSTR bstrQueryFrom, BSTR bstrToAction,
-														   EActionStatus eaStatus, BSTR bstrFromAction,
-														   IRandomMathCondition* pRandomCondition,
-														   long* pnNumRecordsModified);
-	void SetStatusForFilesWithTags2(IVariantVector *pvecTagNames,
-														  VARIANT_BOOL vbAndOperation,
-														  long nToActionID,
-														  EActionStatus eaNewStatus,
-														  long nFromActionID);
-	void SetFileStatusToProcessing2(long nFileId, long nActionID);
-
-	// Private prenormalized functions
-	void setFileActionState2(_ConnectionPtr ipConnection,
-										   const vector<SetFileActionData>& vecSetData,
-										   string strAction, const string& strState);
-	EActionStatus setFileActionState2(_ConnectionPtr ipConnection, long nFileID, 
-													string strAction, const string& strState,
-													const string& strException,
-													long nActionID, bool bLockDB,
-													bool bRemovePreviousSkipped,
-													const string& strFASTComment);
-	void addASTransFromSelect2(_ConnectionPtr ipConnection,
-											  const string &strAction, long nActionID,
-											  const string &strToState, const string &strException,
-											  const string &strComment, const string &strWhereClause, 
-											  const string &strTopClause);
-	void reCalculateStats2(_ConnectionPtr ipConnection, long nActionID);
-	void addTables2(bool bAddUserTables);
-	void copyActionStatus2(const _ConnectionPtr& ipConnection, const string& strFrom, 
-										 string strTo, bool bAddTransRecords, long nToActionID);
-	void addActionColumn2(const _ConnectionPtr& ipConnection, const string& strAction);
-	void removeActionColumn2(const _ConnectionPtr& ipConnection, const string& strAction);
-	void getExpectedTables2(std::vector<string>& vecTables);
-	IIUnknownVectorPtr setFilesToProcessing2(const _ConnectionPtr &ipConnection,
-														   const string& strSelectSQL,
-														   long nActionID);
-	long addActionToRecordset2(_ConnectionPtr ipConnection, _RecordsetPtr ipRecordset, 
-		const string &strAction);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

@@ -1191,12 +1191,15 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 
 		m_bProcessingSingleFile = true;
 
+		// Get the action id
+		long lActionID = ipFileRecord->ActionID;
+
 		// Register this processing FAM for auto revert
-		getFPMDB()->RegisterProcessingFAM();
+		getFPMDB()->RegisterProcessingFAM(lActionID);
 
 		// Get the current action status-- allow an attempt to auto-revert locked files if the file
 		// is in the processing state.
-		string strActionName = getFPMDB()->GetActionName(ipFileRecord->ActionID);
+		string strActionName = getFPMDB()->GetActionName(lActionID);
 		UCLID_FILEPROCESSINGLib::EActionStatus easCurrent =
 			getFPMDB()->GetFileStatus(ipFileRecord->FileID, strActionName.c_str(), VARIANT_TRUE);
 
@@ -2185,8 +2188,11 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 				AfxBeginThread(fileProcessingThreadsWatcherThread, this);
 			}
 
+			// Get the Action ID
+			long lActionID = getActionID(m_strAction);
+
 			// Set action ID to the record manager
-			m_pRecordMgr->setActionID(getActionID(m_strAction));
+			m_pRecordMgr->setActionID(lActionID);
 
 			// Signal Not Paused event so that processing will continue
 			m_eventPause.reset();
@@ -2259,7 +2265,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 			m_bProcessing = true;
 
 			// Register this processing FAM for auto revert
-			m_pDB->RegisterProcessingFAM();
+			m_pDB->RegisterProcessingFAM(lActionID);
 			
 			if (!bDontStartThreads)
 			{

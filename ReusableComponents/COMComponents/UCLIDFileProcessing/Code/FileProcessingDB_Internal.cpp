@@ -30,8 +30,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 23;
-const long CFileProcessingDB::ms_lFAMDBNormalizedSchemaVersion = 100;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 101;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -129,13 +128,6 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 {
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			setFileActionState2(ipConnection, vecSetData, strAction, strState);
-			return;
-		}
-
 		// Get the ActionID
 		long nActionID = getActionID(ipConnection, strAction);
 		string strActionID = asString(nActionID);
@@ -254,13 +246,6 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 													bool bRemovePreviousSkipped,
 													const string& strFASTComment)
 {
-	// Execute the pre normalized code if indicated
-	if (m_bUsePreNormalized)
-	{
-		return setFileActionState2( ipConnection,  nFileID, strAction, strState, strException,
-			nActionID, bLockDB,	bRemovePreviousSkipped, strFASTComment);
-	}	
-
 	INIT_EXCEPTION_AND_TRACING("MLI03279");
 
 	auto_ptr<LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>> apDBlg;
@@ -767,11 +752,6 @@ long CFileProcessingDB::addActionToRecordset(_ConnectionPtr ipConnection,
 {
 	try
 	{
-		if (m_bUsePreNormalized)
-		{
-			return addActionToRecordset2(ipConnection, ipRecordset, strAction);
-		}
-
 		// Add a new record
 		ipRecordset->AddNew();
 
@@ -797,14 +777,6 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 {
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			addASTransFromSelect2(ipConnection, strAction, nActionID, strToState, strException,
-											  strComment, strWhereClause, strTopClause);
-			return;
-		}
-
 		if (!m_bUpdateFASTTable)
 		{
 			return;
@@ -959,13 +931,6 @@ void CFileProcessingDB::validateLicense()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActionID)
 {
-	// Execute the pre normalized code if indicated
-	if (m_bUsePreNormalized)
-	{
-		reCalculateStats2(ipConnection, nActionID);
-		return;
-	}
-
 	// Get the name of the action for the ID
 	string strActionName = getActionName(ipConnection, nActionID);	
 
@@ -1134,13 +1099,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 {
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			addTables2(bAddUserTables);
-			return;
-		}
-
 		vector<string> vecQueries;
 
 		// Add the user tables if necessary
@@ -1222,6 +1180,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
+		vecQueries.push_back(gstrADD_ACTION_PROCESSINGFAM_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1275,7 +1234,7 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		{
 			// Add the schema version to the DBInfo table
 			string strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrFAMDB_SCHEMA_VERSION +
-				"', '" + asString(m_lExpectedSchemaVersion) + "')";
+				"', '" + asString(ms_lFAMDBSchemaVersion) + "')";
 			vecQueries.push_back(strSQL);
 
 			// Add Command Timeout setting
@@ -1374,13 +1333,6 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 {
 	try
 	{
-		// Execute the pre normalized code if indicated
-		if (m_bUsePreNormalized)
-		{
-			copyActionStatus2(ipConnection, strFrom, strTo, bAddTransRecords, nToActionID);
-			return;
-		}	
-
 		// Temporary string for from action strin since getActionID cannot use const string
 		// TODO: This can be removed and the const string& strFrom changed to non const ref
 		string strTmpFrom = strFrom;
@@ -1442,14 +1394,6 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addActionColumn(const _ConnectionPtr& ipConnection, const string& strAction)
 {
-	// Execute the pre normalized code if indicated
-	if (m_bUsePreNormalized)
-	{
-		addActionColumn2(ipConnection, strAction);
-		return;
-	}	
-
-
 	UCLIDException ue("ELI30514", "Adding Action Column is obsolete.");
 	ue.addDebugInfo("Action", strAction);
 	throw ue;
@@ -1458,14 +1402,6 @@ void CFileProcessingDB::addActionColumn(const _ConnectionPtr& ipConnection, cons
 void CFileProcessingDB::removeActionColumn(const _ConnectionPtr& ipConnection,
 										   const string& strAction)
 {
-	// Execute the pre normalized code if indicated
-	if (m_bUsePreNormalized)
-	{
-		removeActionColumn2(ipConnection, strAction);
-		return;
-	}
-
-
 	UCLIDException ue("ELI30515", "Removing Action Column is obsolete.");
 	ue.addDebugInfo("Action", strAction);
 	throw ue;
@@ -1810,14 +1746,14 @@ void CFileProcessingDB::validateDBSchemaVersion()
 {
 	// Get the Schema Version from the database
 	int iDBSchemaVersion = getDBSchemaVersion();
-	if (iDBSchemaVersion != m_lExpectedSchemaVersion)
+	if (iDBSchemaVersion != ms_lFAMDBSchemaVersion)
 	{
 		// Update the current connection status string
 		m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
 
 		UCLIDException ue("ELI14380", "DB Schema version does not match.");
 		ue.addDebugInfo("SchemaVer in Database", iDBSchemaVersion);
-		ue.addDebugInfo("SchemaVer expected", m_lExpectedSchemaVersion);
+		ue.addDebugInfo("SchemaVer expected", ms_lFAMDBSchemaVersion);
 		throw ue;
 	}
 }
@@ -2232,13 +2168,6 @@ void CFileProcessingDB::initializeIfBlankDB()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 {
-	// Execute the pre normalized code if indicated
-	if (m_bUsePreNormalized)
-	{
-		getExpectedTables2(vecTables);
-		return;
-	}
-
 	// Add Tables
 	vecTables.push_back(gstrACTION);
 	vecTables.push_back(gstrACTION_STATE);
@@ -2329,8 +2258,8 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 
 			_lastCodePos = "10";
 
-			ipDBInfoSet->Open("DBInfo", _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-				adLockOptimistic, adCmdTable); 
+			ipDBInfoSet->Open("DBInfo", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+				adLockReadOnly, adCmdTable); 
 
 			_lastCodePos = "20";
 
@@ -2441,8 +2370,8 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 									// a transaction in the outer scope.  A transaction cannot be created for
 									// this here because there will most likely be a transaction in the
 									// outer scope.
-									setStringField(ipFields, "Value", strNewValue);
-									ipDBInfoSet->Update();
+									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue + 
+										"' WHERE DBInfo.Name = '" + strValue + "'");
 								}
 								CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
 
@@ -2793,6 +2722,9 @@ void CFileProcessingDB::clear(bool retainUserValues)
 	{
 		CSingleLock lock(&m_mutex, TRUE);
 
+		// Make sure processing is not active
+		assertProcessingNotActiveForAnyAction();
+
 		// Begin a transaction
 		TransactionGuard tg(getDBConnection());
 
@@ -3102,7 +3034,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 	try
 	{
 		// Setup Setting Query
-		string strSQL = "SELECT FileID, ActionID, UPI, StatusBeforeLock, ASCName " 
+		string strSQL = "SELECT FileID, Action.ID as ActionID, UPI, StatusBeforeLock, ASCName " 
 			" FROM LockedFile INNER JOIN ProcessingFAM ON LockedFile.UPIID = ProcessingFAM.ID"
 			" INNER JOIN Action ON LockedFile.ActionID = Action.ID"
 			" WHERE LockedFile.UPIID = " + asString(nUPIID);
@@ -3486,12 +3418,6 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 														   const string& strSelectSQL,
 														   long nActionID)
 {
-	// Execute the pre normalized code if indicated
-	if (m_bUsePreNormalized)
-	{
-		return setFilesToProcessing2(ipConnection, strSelectSQL, nActionID);
-	}	
-	
 	try
 	{
 		try
@@ -3686,4 +3612,83 @@ _RecordsetPtr CFileProcessingDB::getFileActionStatusSet(_ConnectionPtr& ipConnec
 		return ipFileActionStatus;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30536")
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::assertProcessingNotActiveForAction(_ConnectionPtr ipConnection, const long &lActionID)
+{
+	// If Auto revert is enabled then run the revert method before checking for in processing file
+	if (m_bAutoRevertLockedFiles)
+	{
+		// Begin a transaction for the revert 
+		TransactionGuard tgRevert(ipConnection);
+
+		revertTimedOutProcessingFAMs(ipConnection);
+
+		tgRevert.CommitTrans();
+	}
+
+	string strActionID = asString(lActionID);
+
+	// Check for active processing for the action
+	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI30360", ipProcessingSet != NULL);
+
+	// Open recordset with ProcessingFAM records that show processing on the action
+	string strSQL = "SELECT UPI FROM ProcessingFAM WHERE ActionID = " + strActionID;
+	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+		adLockReadOnly, adCmdText);
+
+	// if there are any records in ipProcessingSet there is active processing.
+	if (!asCppBool(ipProcessingSet->adoEOF))
+	{
+		// Since processing is occuring need to throw an exception.
+		UCLIDException ue("ELI30547", "Processing is active for this action.");
+		ue.addDebugInfo("ActionID",strActionID);
+		FieldsPtr ipFields = ipProcessingSet->Fields;
+		if (ipFields != NULL)
+		{
+			string strUPI = getStringField(ipFields, "UPI");
+			ue.addDebugInfo("First UPI", strUPI.c_str());
+		}
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::assertProcessingNotActiveForAnyAction()
+{
+	_ConnectionPtr ipConnection = getDBConnection();
+
+	// If Auto revert is enabled then run the revert method before checking for in processing file
+	if (m_bAutoRevertLockedFiles)
+	{
+		// Begin a transaction for the revert 
+		TransactionGuard tgRevert(ipConnection);
+
+		revertTimedOutProcessingFAMs(ipConnection);
+
+		tgRevert.CommitTrans();
+	}
+
+	// Check for active processing 
+	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI30609", ipProcessingSet != NULL);
+
+	// Open recordset with ProcessingFAM records that show processing on the action
+	string strSQL = "SELECT UPI FROM ProcessingFAM";
+	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+		adLockReadOnly, adCmdText);
+
+	// if there are any records in ipProcessingSet there is active processing.
+	if (!asCppBool(ipProcessingSet->adoEOF))
+	{
+		// Since processing is occuring need to throw an exception.
+		UCLIDException ue("ELI30608", "Database has active processing.");
+		FieldsPtr ipFields = ipProcessingSet->Fields;
+		if (ipFields != NULL)
+		{
+			string strUPI = getStringField(ipFields, "UPI");
+			ue.addDebugInfo("First UPI", strUPI.c_str());
+		}
+		throw ue;
+	}
 }

@@ -1156,12 +1156,14 @@ bool CStringPatternMatcher::findNextInstanceOfLiteralIgnoreMWS(
 			// word immediately follows the last whitespace char.
 			
 			int iNextTokenExpectedStartPos = nFirstTokenEndPos + 1;
+			int nSizeOfTextString = m_strText.length();
 			for (int i = 1; i < nNumTokens; i++)
 			{
 				// forward the position of the next expected token
 				// by ignoring any whitespace since the end of the last
 				// found token
-				while (isWhitespaceChar(m_strText[iNextTokenExpectedStartPos]))
+				while (iNextTokenExpectedStartPos < nSizeOfTextString  && 
+					isWhitespaceChar(m_strText[iNextTokenExpectedStartPos]))
 				{
 					iNextTokenExpectedStartPos++;
 				}

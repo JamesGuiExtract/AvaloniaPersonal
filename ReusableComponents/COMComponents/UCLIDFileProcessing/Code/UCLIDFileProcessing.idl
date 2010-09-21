@@ -993,8 +993,8 @@ library UCLID_FILEPROCESSINGLib
 		// Methods related to auto-resetting of files stuck in processing
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To add a new record to the ProcessingFAM table with the current processes UPI
-		//			and start a thread to update the LastPingTime at a regular interval.
-		[id(79), helpstring("method RegisterProcessingFAM")] HRESULT RegisterProcessingFAM();
+		//			and ActionID, and start a thread to update the LastPingTime at a regular interval.
+		[id(79), helpstring("method RegisterProcessingFAM")] HRESULT RegisterProcessingFAM([in] long lActionID);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To remove the record for in the ProcessingFAM table and stop the thread updating
 		//			the LastPingTime

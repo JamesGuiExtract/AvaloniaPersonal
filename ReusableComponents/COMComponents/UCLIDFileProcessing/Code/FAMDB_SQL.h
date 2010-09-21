@@ -123,7 +123,8 @@ static const string gstrCREATE_FAM_FILE_TAG_TABLE = "CREATE TABLE [FileTag] ("
 	"[TagID] [int] NOT NULL)";
 
 static const string gstrCREATE_PROCESSING_FAM_TABLE = 
-	"CREATE TABLE [ProcessingFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ProcessingFAM] PRIMARY KEY CLUSTERED,"
+	"CREATE TABLE [ProcessingFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ProcessingFAM] PRIMARY KEY CLUSTERED, "
+	"[ActionID] [int] NOT NULL, "
 	"[UPI] [nvarchar](450), "
 	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ProcessingFAM_LastPingTime]  DEFAULT (GETDATE()))";
 
@@ -356,6 +357,14 @@ static const string gstrADD_LOCKED_FILE_PROCESSINGFAM_FK =
 	"REFERENCES [dbo].[ProcessingFAM] ([ID])"
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
+
+// Do not want ON UPDATE CASCADE or ON DELETE CASCADE because if
+// there are records in the ProcessingFAM table there is a FAM processing or Records that need
+// to be reverted.
+static const string gstrADD_ACTION_PROCESSINGFAM_FK =
+	"ALTER TABLE [dbo].[ProcessingFAM]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_ProcessingFAM_Action] FOREIGN KEY([ActionID])"
+	"REFERENCES [dbo].[Action] ([ID])";
 
 static const string gstrADD_FAM_SESSION_MACHINE_FK =
 	"ALTER TABLE [dbo].[FAMSession] "
