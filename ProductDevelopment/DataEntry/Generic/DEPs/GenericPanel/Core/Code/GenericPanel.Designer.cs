@@ -127,6 +127,7 @@ namespace Extract.DataEntry.DEP.Generic
             // 
             // _label1
             // 
+            this._label1.AutoSize = true;
             this._label1.Location = new System.Drawing.Point(3, 0);
             this._label1.Name = "_label1";
             this._label1.Size = new System.Drawing.Size(41, 13);
@@ -168,6 +169,7 @@ namespace Extract.DataEntry.DEP.Generic
             // 
             // _label3
             // 
+            this._label3.AutoSize = true;
             this._label3.Location = new System.Drawing.Point(3, 78);
             this._label3.Name = "_label3";
             this._label3.Size = new System.Drawing.Size(41, 13);
@@ -188,6 +190,7 @@ namespace Extract.DataEntry.DEP.Generic
             // 
             // _label4
             // 
+            this._label4.AutoSize = true;
             this._label4.Location = new System.Drawing.Point(3, 117);
             this._label4.Name = "_label4";
             this._label4.Size = new System.Drawing.Size(41, 13);
