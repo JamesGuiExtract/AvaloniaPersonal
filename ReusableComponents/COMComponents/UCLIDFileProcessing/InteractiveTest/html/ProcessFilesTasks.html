@@ -973,6 +973,22 @@
             <li><b>[FlexIDSCore #3745]</b> Confirm that the <b>Use cleaned image</b> check box is
             disabled in the property page if <b>Do not OCR any of the pages</b> is selected.
             <li>Confirm that settings are persistent.
+        <p>
+            <li>Get the .fps file at 
+            <b>D:\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing\InteractiveTest\TestFiles\ExecuteRulesConfigurationTest.fps</b>.
+            Note that it is configured to connect to the local Demo_IDShield database. Confirm 
+            that:
+            <ul>
+                <li>The first Execute rules task is configured to <b>Use previously saved OCR 
+                results</b>, <b>OCR all pages of the image</b>, and <b>use a cleaned image if
+                available</b>.</li>
+                <li>The second Execute rules task is configured to <b>Use previously saved OCR
+                results</b>, <b>OCR all pages of the image</b>, <b>Save OCR results</b>, and <b>use
+                a cleaned image if available</b>.</li>
+                <li>The third Execute rules task is configured to <b>Use previously saved OCR
+                results</b>, <b>OCR pages 1-2</b>, <b>Save OCR results</b>, and <b>use a cleaned
+                image if available</b>.</li>
+            </ul></li>
 <p>
             <li>Confirm that an image OCRs before rules are executed if <b>Use previously saved OCR 
             results if available</b> is unchecked and <b>Do not OCR any of the pages</b> is not 

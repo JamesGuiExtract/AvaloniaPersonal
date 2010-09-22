@@ -515,6 +515,44 @@
 <br />
 
 <!-- *********************************************** -->
+
+<li><h2>RedactFromXML</h2>
+<ul>
+    <li><u>Functionality</u>
+    <ul>
+        <LI>Verify some images, making additions and changes to the found redactions.</li>
+        <li>Create the metadata XML files after verification is complete.</li>
+        <li>Confirm that the <b>RedactFromXml</b> application creates proper redacted images
+        <ul>
+            <li>Check redaction placement</li>
+            <li>Confirm that deleted redactions are not applied</li>
+            <li>Check that disabled redactions are not applied</li>
+            <li>Check proper redaction color</li>
+            <li>Check redaction text and exemption codes</li>
+            <li>Check annotation settings</li>
+        </ul></li>
+        <li>Confirm that <b>RedactFromXml</b> command-line parameters can override the 
+        annotation settings in the VOA file.
+        <ul>
+            <li><b>/a</b> - for apply as annotations</li>
+            <li><b>/r</b> - for retain existing annotations</li>
+        </ul></li>
+    </ul></li>
+    <li><u>Old Versions</u> - see .\Testing\PVCS_Testing\FlexIDSCore\3975
+    <ul>
+        <li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 1</b> metadata.</li>
+        <li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 2</b> metadata.</li>
+        <li>Confirm that <b>RedactFromXml</b> works properly for <b>Version 3</b> metadata.</li>
+    </ul></li>
+    <p>
+    <li><u>Miscellaneous</u>
+    <ul>
+        <LI><b>[FlexIDSCore #4032]</b> Confirm that <b>Redact From XML</b> outputs redaction 
+        text.</li>
+    </ul></li>
+</ul></li>
+
+<!-- *********************************************** -->
 <li><h2>Other</h2>
 <ul>
    	<li><b>[LegacyRC #4419]</b> Create and run a multiple-thread FPS file that OCRs documents.  

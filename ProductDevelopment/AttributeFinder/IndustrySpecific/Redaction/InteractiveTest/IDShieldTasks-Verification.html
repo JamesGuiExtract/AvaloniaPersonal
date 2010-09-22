@@ -1031,15 +1031,21 @@
             <li>Confirm that the dialog cannot be maximized.</li>
             <li>Confirm that it can be resized.</li>
             <li>Confirm that it has a minimum size.</li>
-            <li>Confirm that a list of expressions can be imported or exported from a .txt file
-            using the <b>Import...</b> and <b>Export...</b> buttons.</li>
+            <li>Confirm that a list of expressions can be imported to or exported from a .txt 
+            file using the <b>Import...</b> and <b>Export...</b> buttons.</li>
+            <li>Confirm that a confirmation dialog is provided if attempting to overwrite a file
+            using the <b>Export...</b> feature.</li>
             <li>Confirm that the <b>Export...</b> button is disabled if there is no text in the 
             text box.</li>
             <li>Confirm that if the current image has no associated .uss file, a reasonable error
             is displayed.</li>
+            <li>Confirm that the same error is displayed regardless of which method is used to
+            open the Find or redact dialog.</li>
             <li>Confirm that searches find text as expected.</li>
             <li>Confirm that case sensitivity works as expected.</li>
             <li>Confirm that regular expression searching works as expected.</li>
+            <li>Confirm that a help link label next to the <b>Treat as regular expressions</b>
+            checkbox is provided.</li>
             <li>Enter a search term that will return multiple matches.
             <ul>
                 <li>Confirm that table at the bottom contains a <b>Results</b> column and a 
@@ -1066,11 +1072,37 @@
                 </ul></li>
                 <li>Confirm that the status bar now indicates which of the new redactions is 
                 currently being viewed.</li>
+                <li>Confirm that the redacted items have been added to the data grid as manual
+                redactions and that the text of the redactions matches what was returned by the
+                search.</li>
                 <li>Press the <b>Reset search</b> button.</li>
                 <li>Confirm that the search controls (text box, etc.) are all re-enabled.</li>
                 <li>Press the <b>Redact all</b> button again without editing the search.</li>
                 <li>Confirm that no duplicate redactions are added.</li>
             </ul></li>
+        <p>
+            <li>Close the dialog and reopen it.</li>
+            <li>Confirm that the search term(s) is retained.</li>
+            <li>Stop processing and close the FAM.</li>
+            <li>Reopen the FAM, restart processing, and reopen the Find or redact dialog.</li>
+            <li>Confirm that the search term(s) is <b>not</b> retained.</li>
+        <p>
+            <li>Confirm that the scroll bars appear as needed in the edit box.</li>
+        </ul></li>
+    <p>
+        <li><b>Support for Multiple Monitors</b>
+        <ul>
+            <li>Confirm that the <b>Data window</b> and the <b>Image window</b> can be docked 
+            separately and displayed on separate monitors.</li>
+            <li>Confirm that docked window position is persistent.</li>
+            <li>Confirm that undocked window position is persistent.</li>
+            <li>Confirm that a maximized window on a separate monitor persists across 
+            verification sessions.</li>
+            <li>Exercise changing monitor orientation between verification sessions. Confirm 
+            that appropriate behavior is seen.</li>
+            <li>Confirm that removing the second monitor between verification sessions is 
+            supported by having the user interface display the windows on the single 
+            monitor.</li>
         </ul></li>
     <p>
         <li>Exercise verification using:
@@ -1612,10 +1644,28 @@
             <li>Confirm that the state of all redactions changes appropriately.</li>
         </ul></li>
     <p>
+        <li><b>[FlexIDSCore #4283]</b> Error with Find or redact
+        <!-- fixed v 8.1.0.46 -->
+        <ul>
+            <li>Open the Find or redact text dialog in ID Shield verification.</li>
+            <li>Enter a search that will cause an exception (e.g., a single backslash with 
+            regex search enabled).</li>
+            <li>Hit the Find next button.</li>
+            <li>Dismiss the error.</li>
+            <li>Confirm that the search term edit box is enabled.</li>
+        </ul></li>
+    <p>
+        <LI><b>[LegacyRC #5717]</b> Alt as an input event
+        <!-- fixed v 8.0.0.29 -->
+        <ul>
+            <li>Confirm that <b>ALT</b> keys are now handled as input events.</li>
+        </ul></li>
+    <p>
         <LI><b>[LegacyRC #5734]</b> PDF Processing
         <!-- 8.0.0.37 -->
         <ul>
-            <li>Confirm that PDF images can be simultaneously queued and verified.</li>
+            <li>Confirm that PDF images can be simultaneously queued and verified when processing
+            multi-threaded.</li>
         </ul></li>
     </ul></li>
 </ul>
