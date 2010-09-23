@@ -271,7 +271,13 @@ bool UpdateVersionInfoInTmpFile(const string& sSrcFileName, const string& sTmpFi
 					{
 						break;
 					}
-					if ( (sInBuf.find(_T(" FILEVERSION "))) != string::npos)	// must preceede FILEVER in logic sequence
+
+					// Make sure it is not a comment line
+					if (sInBuf.find("//") == 0)
+					{
+						sOutBuf = sInBuf;
+					}
+					else if ( (sInBuf.find(_T(" FILEVERSION "))) != string::npos)	// must preceede FILEVER in logic sequence
 					{
 						sOutBuf = _T(" FILEVERSION ") + sFILEVER;
 					}
