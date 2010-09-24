@@ -3616,6 +3616,12 @@ _RecordsetPtr CFileProcessingDB::getFileActionStatusSet(_ConnectionPtr& ipConnec
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::assertProcessingNotActiveForAction(_ConnectionPtr ipConnection, const long &lActionID)
 {
+	// If the ProcessingFAM table does not exist nothing is processing so return
+	if (!doesTableExist(ipConnection, gstrPROCESSING_FAM))
+	{
+		return;
+	}
+
 	// If Auto revert is enabled then run the revert method before checking for in processing file
 	if (m_bAutoRevertLockedFiles)
 	{
@@ -3657,6 +3663,12 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(_ConnectionPtr ipConn
 void CFileProcessingDB::assertProcessingNotActiveForAnyAction()
 {
 	_ConnectionPtr ipConnection = getDBConnection();
+
+	// If the ProcessingFAM table does not exist nothing is processing so return
+	if (!doesTableExist(ipConnection, gstrPROCESSING_FAM))
+	{
+		return;
+	}
 
 	// If Auto revert is enabled then run the revert method before checking for in processing file
 	if (m_bAutoRevertLockedFiles)
