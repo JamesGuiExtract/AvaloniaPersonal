@@ -7,7 +7,6 @@
 			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
 			<Class>Extract.SharePoint.Redaction.IdShieldFileListener</Class>
 			<SequenceNumber>10000</SequenceNumber>
-			<Synchronization>Synchronous</Synchronization>
 		</Receiver>
 		<Receiver>
 			<Name>IdShieldFileListenerItemUpdated</Name>
@@ -15,7 +14,13 @@
 			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
 			<Class>Extract.SharePoint.Redaction.IdShieldFileListener</Class>
 			<SequenceNumber>10000</SequenceNumber>
-			<Synchronization>Synchronous</Synchronization>
+		</Receiver>
+		<Receiver>
+			<Name>IdShieldFileListenerItemDeleted</Name>
+			<Type>ItemDeleted</Type>
+			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+			<Class>Extract.SharePoint.Redaction.IdShieldFileListener</Class>
+			<SequenceNumber>10000</SequenceNumber>
 		</Receiver>
 
 	</Receivers>

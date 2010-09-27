@@ -99,21 +99,8 @@ namespace Extract.SharePoint.Redaction.Layouts
                 SPUtility.ValidateFormDigest();
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
-                    if (settings != null)
-                    {
-                        IdShieldFolderSettingsCollection siteSettings
-                            = FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
-                        SiteFolderSettingsCollection folderSettings;
-                        Guid siteId = new Guid(hiddenSiteId.Value);
-                        if (siteSettings.TryGetValue(siteId, out folderSettings))
-                        {
-                            watchRemoved = folderSettings.Remove(textFolder.Text);
-                            settings.FolderSettings =
-                                FolderProcessingSettings.SerializeFolderSettings(siteSettings);
-                            settings.Update();
-                        }
-                    }
+                    watchRemoved = IdShieldSettings.RemoveFolderWatching(textFolder.Text,
+                        new Guid(hiddenSiteId.Value));
                 });
 
                 StringBuilder sb = new StringBuilder("<script type=\"text/javascript\">");

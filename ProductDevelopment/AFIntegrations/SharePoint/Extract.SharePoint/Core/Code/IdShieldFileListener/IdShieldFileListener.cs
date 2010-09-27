@@ -73,6 +73,7 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// An item was added.
         /// </summary>
+        /// <param name="properties">The properties associated with the item event.</param>
         public override void ItemAdded(SPItemEventProperties properties)
         {
             try
@@ -89,6 +90,7 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// An item was updated.
         /// </summary>
+        /// <param name="properties">The properties associated with the item event.</param>
         public override void ItemUpdated(SPItemEventProperties properties)
         {
             try
@@ -102,9 +104,58 @@ namespace Extract.SharePoint.Redaction
             }
         }
 
+        /// <summary>
+        /// An item was deleted
+        /// </summary>
+        /// <param name="properties">The properties associated with the item event.</param>
+        public override void ItemDeleted(SPItemEventProperties properties)
+        {
+            try
+            {
+                base.ItemDeleted(properties);
+                HandleSharePointItemDeleted(properties);
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, "ELI30613");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Methods
+
+        /// <summary>
+        /// Handles the ItemDeleted event.
+        /// </summary>
+        /// <param name="properties">The item properties associated with the
+        /// ItemDeleted event.</param>
+        static void HandleSharePointItemDeleted(SPItemEventProperties properties)
+        {
+            string folder = null;
+            try
+            {
+                // Get the possible folder name
+                folder = properties.BeforeUrl;
+                if (!folder.StartsWith("/", StringComparison.Ordinal))
+                {
+                    folder = "/" + folder;
+                }
+
+                // Attempt to remove the folder watching (this call does nothing if the
+                // folder is not currently being watched).
+                IdShieldSettings.RemoveFolderWatching(folder, properties.Web.Site.ID);
+            }
+            catch (Exception ex)
+            {
+                if (!string.IsNullOrEmpty(folder))
+                {
+                    ex.Data.Add("Folder Name", folder);
+                }
+
+                throw;
+            }
+        }
 
         /// <summary>
         /// Handles the file event, checking the current settings and exports any files

@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 
+// Using statements to make dealing with folder settings more readable
+using SiteFolderSettingsCollection =
+System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
+using IdShieldFolderSettingsCollection =
+System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
+
 namespace Extract.SharePoint.Redaction
 {
 
@@ -126,6 +132,39 @@ namespace Extract.SharePoint.Redaction
         }
 
         /// <summary>
+        /// Removes the watching for particular folder within a specified site ID.
+        /// </summary>
+        /// <param name="folder">The folder to stop watching.</param>
+        /// <param name="siteId">The site ID for the folder.</param>
+        /// <returns><see langword="true"/> if watching was removed and
+        /// <see langword="false"/> otherwise.</returns>
+        internal static bool RemoveFolderWatching(string folder, Guid siteId)
+        {
+            bool watchRemoved = false;
+            IdShieldSettings settings = GetIdShieldSettings(false);
+            if (settings != null)
+            {
+                IdShieldFolderSettingsCollection siteSettings
+                    = FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
+                SiteFolderSettingsCollection folderSettings;
+                if (siteSettings.TryGetValue(siteId, out folderSettings))
+                {
+                    watchRemoved = folderSettings.Remove(folder);
+
+                    // Only update settings if folder was removed from settings
+                    if (watchRemoved)
+                    {
+                        settings.FolderSettings =
+                            FolderProcessingSettings.SerializeFolderSettings(siteSettings);
+                        settings.Update();
+                    }
+                }
+            }
+
+            return watchRemoved;
+        }
+
+        /// <summary>
         /// Adds the unique file id to the list of files that were seen in the
         /// file added event but were 0 bytes.
         /// </summary>
@@ -225,11 +264,11 @@ namespace Extract.SharePoint.Redaction
             }
 
             // Search for the item id
-            int index =_activeSiteIds.BinarySearch(siteId);
+            int index = _activeSiteIds.BinarySearch(siteId);
             if (index < 0)
             {
                 // The item was not found, insert it in the proper sorted location
-               _activeSiteIds.Insert(~index, siteId);
+                _activeSiteIds.Insert(~index, siteId);
             }
         }
 
