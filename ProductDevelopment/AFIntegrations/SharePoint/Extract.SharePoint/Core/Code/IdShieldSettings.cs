@@ -1,4 +1,5 @@
-﻿using Microsoft.SharePoint.Administration;
+﻿using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -195,32 +196,77 @@ namespace Extract.SharePoint.Redaction
         /// <param name="oldFolder">The original folder.</param>
         /// <param name="newFolder">The renamed folder.</param>
         /// <param name="siteId">The site ID for the renamed folder.</param>
+        [SuppressMessage("ExtractRules", "ES0002:MethodsShouldContainValidEliCodes")]
         internal static void UpdateSettingsForRenamedFolder(string oldFolder,
             string newFolder, Guid siteId)
         {
-            IdShieldSettings settings = GetIdShieldSettings(false);
-            if (settings != null)
+            try
             {
-                IdShieldFolderSettingsCollection siteSettings
-                    = FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
-                SiteFolderSettingsCollection siteFolderSettings;
-                if (siteSettings.TryGetValue(siteId, out siteFolderSettings))
+                IdShieldSettings settings = GetIdShieldSettings(false);
+                if (settings != null)
                 {
-                    FolderProcessingSettings folderSettings = null;;
-                    if (siteFolderSettings.TryGetValue(oldFolder, out folderSettings))
+                    IdShieldFolderSettingsCollection siteSettings
+                        = FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
+                    SiteFolderSettingsCollection siteFolderSettings;
+                    if (siteSettings.TryGetValue(siteId, out siteFolderSettings))
                     {
-                        // Remove the old folder
-                        siteFolderSettings.Remove(oldFolder);
+                        bool updated = false;
+                        List<string> foldersToUpdate = new List<string>();
+                        string oldFolderPath = oldFolder + "/";
+                        string newFolderPath = newFolder + "/";
 
-                        // Add the settings back with the new folder name
-                        siteFolderSettings.Add(newFolder, folderSettings);
+                        // Search through the list of folders being watched and find any
+                        // subfolders that have watch settings
+                        foreach (string path in siteFolderSettings.Keys)
+                        {
+                            if (path.StartsWith(oldFolderPath, StringComparison.Ordinal))
+                            {
+                                foldersToUpdate.Add(path);
+                            }
+                        }
 
-                        // Reserialize the settings
-                        settings.FolderSettings =
-                            FolderProcessingSettings.SerializeFolderSettings(siteSettings);
-                        settings.Update();
+                        // Check for settings on the old folder name
+                        FolderProcessingSettings folderSettings = null;
+                        if (siteFolderSettings.TryGetValue(oldFolder, out folderSettings))
+                        {
+                            // Remove the old folder
+                            siteFolderSettings.Remove(oldFolder);
+
+                            // Add the settings back with the new folder name
+                            siteFolderSettings.Add(newFolder, folderSettings);
+                            updated = true;
+                        }
+
+                        // Loop through the subfolders updating settings to the new folder name
+                        updated |= foldersToUpdate.Count > 0;
+                        foreach (string key in foldersToUpdate)
+                        {
+                            string newKey = key.Replace(oldFolderPath, newFolderPath);
+                            folderSettings = siteFolderSettings[key];
+                            siteFolderSettings.Remove(key);
+                            siteFolderSettings.Add(newKey, folderSettings);
+                        }
+
+                        if (updated)
+                        {
+                            // Reserialize the settings
+                            settings.FolderSettings =
+                                FolderProcessingSettings.SerializeFolderSettings(siteSettings);
+                            settings.Update();
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                SPException ee = new SPException(
+                    "Unable to update watch settings for folder rename", ex);
+                ee.Data.Add("ELICode", "ELI30615");
+                ee.Data.Add("Original Folder Path", oldFolder);
+                ee.Data.Add("New Folder Path", newFolder);
+                ee.Data.Add("Site ID", siteId.ToString());
+
+                throw ee;
             }
         }
 
