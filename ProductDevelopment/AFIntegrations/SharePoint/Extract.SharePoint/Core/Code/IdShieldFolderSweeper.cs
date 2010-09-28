@@ -428,7 +428,11 @@ namespace Extract.SharePoint.Redaction
             if (rootList == null)
             {
                 web.AllowUnsafeUpdates = true;
-                web.Lists.Add(folderName, "Redacted Documents", SPListTemplateType.DocumentLibrary);
+                Guid listId = web.Lists.Add(folderName, "Redacted Documents",
+                    SPListTemplateType.DocumentLibrary);
+                SPList list = web.Lists[listId];
+                list.OnQuickLaunch = true;
+                list.Update();
                 web.Update();
                 web.AllowUnsafeUpdates = false;
             }

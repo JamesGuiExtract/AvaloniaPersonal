@@ -100,7 +100,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     watchRemoved = IdShieldSettings.RemoveFolderWatching(textFolder.Text,
-                        new Guid(hiddenSiteId.Value));
+                        new Guid(hiddenSiteId.Value), false);
                 });
 
                 StringBuilder sb = new StringBuilder("<script type=\"text/javascript\">");

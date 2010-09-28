@@ -22,6 +22,12 @@
 			<Class>Extract.SharePoint.Redaction.IdShieldFileListener</Class>
 			<SequenceNumber>10000</SequenceNumber>
 		</Receiver>
-
+		<Receiver>
+			<Name>IdShieldFileListenerItemUpdating</Name>
+			<Type>ItemUpdating</Type>
+			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+			<Class>Extract.SharePoint.Redaction.IdShieldFileListener</Class>
+			<SequenceNumber>10000</SequenceNumber>
+		</Receiver>
 	</Receivers>
 </Elements>

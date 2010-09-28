@@ -136,9 +136,11 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         /// <param name="folder">The folder to stop watching.</param>
         /// <param name="siteId">The site ID for the folder.</param>
+        /// <param name="recurse">If <see langword="true"/> then will remove any folder
+        /// watching settings for subfolders as well.</param>
         /// <returns><see langword="true"/> if watching was removed and
         /// <see langword="false"/> otherwise.</returns>
-        internal static bool RemoveFolderWatching(string folder, Guid siteId)
+        internal static bool RemoveFolderWatching(string folder, Guid siteId, bool recurse)
         {
             bool watchRemoved = false;
             IdShieldSettings settings = GetIdShieldSettings(false);
@@ -150,6 +152,28 @@ namespace Extract.SharePoint.Redaction
                 if (siteSettings.TryGetValue(siteId, out folderSettings))
                 {
                     watchRemoved = folderSettings.Remove(folder);
+                    if (recurse)
+                    {
+                        // Since a folder is being removed, need to iterate the list of
+                        // all watched folders and ensure we remove the watching for
+                        // all subfolders (as these will be deleted when the parent
+                        // folder is deleted)
+                        string folderPath = folder + "/";
+                        List<string> foldersToRemove = new List<string>();
+                        foreach (string watchFolder in folderSettings.Keys)
+                        {
+                            if (watchFolder.StartsWith(folderPath, StringComparison.Ordinal))
+                            {
+                                foldersToRemove.Add(watchFolder);
+                            }
+                        }
+
+                        watchRemoved |= foldersToRemove.Count > 0;
+                        foreach (string folderToRemove in foldersToRemove)
+                        {
+                            folderSettings.Remove(folderToRemove);
+                        }
+                    }
 
                     // Only update settings if folder was removed from settings
                     if (watchRemoved)
@@ -162,6 +186,42 @@ namespace Extract.SharePoint.Redaction
             }
 
             return watchRemoved;
+        }
+
+        /// <summary>
+        /// Handles updating folder watching settings when a watched folder has been
+        /// renamed.
+        /// </summary>
+        /// <param name="oldFolder">The original folder.</param>
+        /// <param name="newFolder">The renamed folder.</param>
+        /// <param name="siteId">The site ID for the renamed folder.</param>
+        internal static void UpdateSettingsForRenamedFolder(string oldFolder,
+            string newFolder, Guid siteId)
+        {
+            IdShieldSettings settings = GetIdShieldSettings(false);
+            if (settings != null)
+            {
+                IdShieldFolderSettingsCollection siteSettings
+                    = FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
+                SiteFolderSettingsCollection siteFolderSettings;
+                if (siteSettings.TryGetValue(siteId, out siteFolderSettings))
+                {
+                    FolderProcessingSettings folderSettings = null;;
+                    if (siteFolderSettings.TryGetValue(oldFolder, out folderSettings))
+                    {
+                        // Remove the old folder
+                        siteFolderSettings.Remove(oldFolder);
+
+                        // Add the settings back with the new folder name
+                        siteFolderSettings.Add(newFolder, folderSettings);
+
+                        // Reserialize the settings
+                        settings.FolderSettings =
+                            FolderProcessingSettings.SerializeFolderSettings(siteSettings);
+                        settings.Update();
+                    }
+                }
+            }
         }
 
         /// <summary>

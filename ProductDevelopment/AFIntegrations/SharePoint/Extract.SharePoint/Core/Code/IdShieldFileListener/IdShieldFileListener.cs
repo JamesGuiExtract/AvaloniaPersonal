@@ -121,6 +121,47 @@ namespace Extract.SharePoint.Redaction
             }
         }
 
+        /// <summary>
+        /// An item is updating.
+        /// </summary>
+        /// <param name="properties">The properties associated with the item event.</param>
+        public override void ItemUpdating(SPItemEventProperties properties)
+        {
+            base.ItemUpdating(properties);
+            try
+            {
+                if (properties.Cancel)
+                {
+                    return;
+                }
+
+                SPListItem item = properties.ListItem;
+                if (item != null && item.FileSystemObjectType == SPFileSystemObjectType.Folder)
+                {
+                    // Get the old and new folder values
+                    string oldFolder = properties.BeforeUrl;
+                    string newFolder = properties.AfterUrl;
+                    if (!oldFolder.StartsWith("/", StringComparison.Ordinal))
+                    {
+                        oldFolder = "/" + oldFolder;
+                    }
+                    if (!newFolder.StartsWith("/", StringComparison.Ordinal))
+                    {
+                        newFolder = "/" + newFolder;
+                    }
+
+                    // Update the settings
+                    IdShieldSettings.UpdateSettingsForRenamedFolder(oldFolder, newFolder,
+                        item.Web.Site.ID);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, "ELI30614");
+            }
+
+        }
+
         #endregion Event Handlers
 
         #region Methods
@@ -144,7 +185,7 @@ namespace Extract.SharePoint.Redaction
 
                 // Attempt to remove the folder watching (this call does nothing if the
                 // folder is not currently being watched).
-                IdShieldSettings.RemoveFolderWatching(folder, properties.Web.Site.ID);
+                IdShieldSettings.RemoveFolderWatching(folder, properties.Web.Site.ID, true);
             }
             catch (Exception ex)
             {
