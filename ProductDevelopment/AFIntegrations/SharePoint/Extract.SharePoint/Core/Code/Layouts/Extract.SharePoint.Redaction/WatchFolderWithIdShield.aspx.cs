@@ -133,9 +133,9 @@ namespace Extract.SharePoint.Redaction.Layouts
                                 0 : 1;
                             break;
 
-                        case IdShieldOutputLocation.CustomOutputLocation:
-                            radioCustomOutput.Checked = true;
-                            textCustomOut.Text = temp.OutputLocationString;
+                        case IdShieldOutputLocation.MirrorDocumentLibrary:
+                            radioMirrorLibrary.Checked = true;
+                            textMirrorOut.Text = temp.OutputLocationString;
                             break;
                     }
                 }
@@ -213,8 +213,8 @@ namespace Extract.SharePoint.Redaction.Layouts
                         locationString = textPreSuffix.Text;
                         break;
 
-                    case IdShieldOutputLocation.CustomOutputLocation:
-                        locationString = textCustomOut.Text;
+                    case IdShieldOutputLocation.MirrorDocumentLibrary:
+                        locationString = textMirrorOut.Text;
                         break;
                 }
 
@@ -283,7 +283,7 @@ namespace Extract.SharePoint.Redaction.Layouts
             ToggleParallel(radioParallel.Checked);
             ToggleSubfolder(radioSubfolder.Checked);
             ToggleSameFolder(radioSameFolder.Checked);
-            ToggleCustom(radioCustomOutput.Checked);
+            ToggleMirrorLocation(radioMirrorLibrary.Checked);
         }
 
         /// <summary>
@@ -340,16 +340,16 @@ namespace Extract.SharePoint.Redaction.Layouts
 
         /// <summary>
         /// Handles enabling/disabling the text control associated
-        /// with the custom folder folder setting.
+        /// with the mirrored document library folder setting.
         /// </summary>
         /// <param name="enabled">Whether to enable/disable the controls.</param>
-        void ToggleCustom(bool enabled)
+        void ToggleMirrorLocation(bool enabled)
         {
-            textCustomOut.Enabled = enabled;
+            textMirrorOut.Enabled = enabled;
             if (enabled)
             {
                 hiddenOutputLocation.Value =
-                    IdShieldOutputLocation.CustomOutputLocation.ToString("G");
+                    IdShieldOutputLocation.MirrorDocumentLibrary.ToString("G");
             }
         }
 

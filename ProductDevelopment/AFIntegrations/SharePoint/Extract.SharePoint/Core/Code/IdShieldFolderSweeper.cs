@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 // Using statements to make dealing with folder settings more readable
 using SiteFolderSettingsCollection =
@@ -32,6 +33,11 @@ namespace Extract.SharePoint.Redaction
         const string _DESCRIPTION = "This timer object will sweep the configured local "
             + "working folder, searching for processed files and will then push the "
             + "processed files back into the SharePoint site.";
+
+        /// <summary>
+        /// Regular expression used to find the root document library name in a folder path.
+        /// </summary>
+        const string _FIND_ROOT_LIBRARY_REGEX = @"(?<=\A/)[^/]+(?=/)";
 
         #endregion Constants
 
@@ -262,7 +268,7 @@ namespace Extract.SharePoint.Redaction
                                     destinationFileName.LastIndexOf("/", StringComparison.Ordinal));
 
                                 // Create the destination folder if necessary
-                                EnsureDestinationFolderExists(web, destFolder);
+                                EnsureDestinationFolderExists(site, destFolder);
 
                                 string destinationUrl = web.Url + destinationFileName;
                                 filesToAdd.Add(destinationUrl, redactedFile);
@@ -374,35 +380,51 @@ namespace Extract.SharePoint.Redaction
         /// Attempts to open the destination folder and if it doesn't exist will attempt
         /// to create it.
         /// </summary>
-        /// <param name="web">The SP web to create the folder on.</param>
+        /// <param name="site">The SP site to create the folder on.</param>
         /// <param name="destFolder">The web relative path to the destination folder.</param>
-        static void EnsureDestinationFolderExists(SPWeb web, string destFolder)
+        static void EnsureDestinationFolderExists(SPSite site, string destFolder)
         {
             string url = string.Empty;
             try
             {
-                url = web.Url + destFolder;
-                SPFolder folder = web.GetFolder(url);
+                SPFolder folder = null;
+                using (SPWeb web = site.OpenWeb())
+                {
+                    url = web.Url + destFolder;
+                    folder = web.GetFolder(url);
+                }
                 if (!folder.Exists)
                 {
                     string[] folders = destFolder.Split(new char[] { '/' },
                         StringSplitOptions.RemoveEmptyEntries);
                     string rootFolder = folders[0];
-                    SPList list = GetDocumentList(web, rootFolder);
-                    for (int i = 1; i < folders.Length; i++)
+                    EnsureRootListExists(site, rootFolder);
+                    using (SPWeb web = site.OpenWeb())
                     {
-                        string tempFolder = folders[i];
-                        string newRootFolder = rootFolder + "/"
-                            + tempFolder;
-                        if (!web.GetFolder(newRootFolder).Exists)
+                        SPList list = GetDocumentList(web, rootFolder);
+                        web.AllowUnsafeUpdates = true;
+                        try
                         {
-                            SPListItem item = list.AddItem(rootFolder,
-                                SPFileSystemObjectType.Folder, tempFolder);
-                            item.Update();
+                            for (int i = 1; i < folders.Length; i++)
+                            {
+                                string tempFolder = folders[i];
+                                string newRootFolder = rootFolder + "/"
+                                    + tempFolder;
+                                if (!web.GetFolder(newRootFolder).Exists)
+                                {
+                                    SPListItem item = list.AddItem(rootFolder,
+                                        SPFileSystemObjectType.Folder, tempFolder);
+                                    item.Update();
+                                }
+                                rootFolder = newRootFolder;
+                            }
+                            web.Update();
                         }
-                        rootFolder = newRootFolder;
+                        finally
+                        {
+                            web.AllowUnsafeUpdates = false;
+                        }
                     }
-                    web.Update();
                 }
             }
             catch (Exception ex)
@@ -418,6 +440,8 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// Gets the root list from the SharePoint web (will create the list
         /// if it does not exist).
+        /// <para><b>Note:</b></para>
+        /// Do not call this method unless you have first called <see cref="EnsureRootListExists"/>
         /// </summary>
         /// <param name="web">The web to get the list from.</param>
         /// <param name="folderName">The folder name to find/create.</param>
@@ -425,20 +449,31 @@ namespace Extract.SharePoint.Redaction
         static SPList GetDocumentList(SPWeb web, string folderName)
         {
             SPList rootList = web.Lists.TryGetList(folderName);
-            if (rootList == null)
-            {
-                web.AllowUnsafeUpdates = true;
-                Guid listId = web.Lists.Add(folderName, "Redacted Documents",
-                    SPListTemplateType.DocumentLibrary);
-                SPList list = web.Lists[listId];
-                list.OnQuickLaunch = true;
-                list.Update();
-                web.Update();
-                web.AllowUnsafeUpdates = false;
-            }
-
-            rootList = web.Lists[folderName];
             return rootList;
+        }
+
+        /// <summary>
+        /// Ensures the root specified list exists and if it does not exist will create it.
+        /// </summary>
+        /// <param name="site">The site to create the list on if needed.</param>
+        /// <param name="folderName">The root list name.</param>
+        static void EnsureRootListExists(SPSite site, string folderName)
+        {
+            using (SPWeb web = site.OpenWeb())
+            {
+                SPList rootList = web.Lists.TryGetList(folderName);
+                if (rootList == null)
+                {
+                    web.AllowUnsafeUpdates = true;
+                    Guid listId = web.Lists.Add(folderName, "Redacted Documents",
+                        SPListTemplateType.DocumentLibrary);
+                    SPList list = web.Lists[listId];
+                    list.OnQuickLaunch = true;
+                    list.Update();
+                    web.Update();
+                    web.AllowUnsafeUpdates = false;
+                }
+            }
         }
 
         /// <summary>
@@ -527,12 +562,16 @@ namespace Extract.SharePoint.Redaction
                             }
                             break;
 
-                        case IdShieldOutputLocation.CustomOutputLocation:
-                            destination.Append(settings.OutputLocationString);
-                            if (!settings.OutputLocationString.EndsWith("/", StringComparison.Ordinal))
-                            {
-                                destination.Append("/");
-                            }
+                        case IdShieldOutputLocation.MirrorDocumentLibrary:
+                            // Append the closing slash to the folder
+                            string dest = folder + "/";
+
+                            // Find the root document library from the folder string
+                            Match match = Regex.Match(dest, _FIND_ROOT_LIBRARY_REGEX);
+
+                            // Set destination to parallel location in specified library
+                            destination.Append(dest.Replace(match.Value,
+                                settings.OutputLocationString));
                             destination.Append(fileName);
                             break;
                     }

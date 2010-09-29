@@ -220,22 +220,22 @@ namespace Extract.SharePoint.Redaction.Layouts {
         protected global::System.Web.UI.WebControls.TextBox textPreSuffix;
         
         /// <summary>
-        /// radioCustomOutput control.
+        /// radioMirrorLibrary control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButton radioCustomOutput;
+        protected global::System.Web.UI.WebControls.RadioButton radioMirrorLibrary;
         
         /// <summary>
-        /// textCustomOut control.
+        /// textMirrorOut control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox textCustomOut;
+        protected global::System.Web.UI.WebControls.TextBox textMirrorOut;
         
         /// <summary>
         /// panelButtons control.

@@ -19,20 +19,10 @@
 
     public void CheckOutputOptions(object source, ServerValidateEventArgs e)
     {
-        if (radioCustomOutput.Checked)
-        {
-            e.IsValid = !string.IsNullOrEmpty(textCustomOut.Text);
-            return;
-        }
-
         System.Collections.Generic.List<char> invalidCharacters =
             new System.Collections.Generic.List<char>();
         invalidCharacters.AddRange(new char[] { '"', '#', '%', '&', '*', ':', '<', '>', '?',
-                '{', '|', '}', '~'});
-        if (!radioCustomOutput.Checked)
-        {
-            invalidCharacters.AddRange(new char[] { '\\', '/' });
-        }
+                '{', '|', '}', '~', '\\', '/'});
         
         string text = string.Empty;
         if (radioSubfolder.Checked)
@@ -47,10 +37,11 @@
         {
             text = textParallel.Text;
         }
-        else if (radioCustomOutput.Checked)
+        else if (radioMirrorLibrary.Checked)
         {
-            text = textCustomOut.Text;
+            text = textMirrorOut.Text;
         }
+        text = text.Trim();
 
         // Check for invalid characters in the folder name
         e.IsValid = !string.IsNullOrEmpty(text)
@@ -200,14 +191,15 @@
             </tr>
             <tr>
                 <td>
-                    <asp:RadioButton ID="radioCustomOutput" runat="server" GroupName="RadioOutputPath"
-                        Text="Use custom output location" ForeColor="Black" OnCheckedChanged="RadioButtonChanged"
+                <asp:RadioButton ID="radioMirrorLibrary" runat="server" GroupName="RadioOutputPath"
+                        Text="Use identical folder structure in document library named"
+                        ForeColor="Black" OnCheckedChanged="RadioButtonChanged"
                         AutoPostBack="true" />
                 </td>
             </tr>
             <tr>
                 <td>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:TextBox ID="textCustomOut" runat="server" Width="415" />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:TextBox ID="textMirrorOut" runat="server" Width="415" />
                 </td>
             </tr>
             <tr>

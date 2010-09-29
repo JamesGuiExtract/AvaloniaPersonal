@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
@@ -17,6 +18,11 @@ namespace Extract.ExceptionService
         #region Constants
 
         /// <summary>
+        /// The tag used to preface each piece of the split exception
+        /// </summary>
+        static readonly string _EXCEPTION_PIECE_TAG = "String_";
+
+        /// <summary>
         /// Constant for the endpoint of the TCP/IP channel for the service.
         /// </summary>
         public static readonly string WcfTcpEndPoint = "TcpESExceptionLogger";
@@ -24,8 +30,11 @@ namespace Extract.ExceptionService
         /// <summary>
         /// Current version of the exception logger data class.
         /// Version 2: Added ELI code value
+        /// Version 3: The exception data is now split into a collection of strings
+        /// that are 8000 characters or less when it is serialized so that the
+        /// data does not exceed the default XML serializer length limits.
         /// </summary>
-        readonly static int _CURRENT_VERSION = 2;
+        readonly static int _CURRENT_VERSION = 3;
 
         #endregion Constants
 
@@ -86,9 +95,22 @@ namespace Extract.ExceptionService
                 ex.Data["MaxVersion"] = _CURRENT_VERSION;
                 throw ex;
             }
-
-            string data = info.GetString("ExceptionString");
-            _data = DeserializeExceptionFromHexString(data);
+            if (version < 3)
+            {
+                string data = info.GetString("ExceptionString");
+                _data = DeserializeExceptionFromHexString(data);
+            }
+            else
+            {
+                int count = info.GetInt32("StringCount");
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < count; i++)
+                {
+                    sb.Append(info.GetString(_EXCEPTION_PIECE_TAG
+                        + i.ToString(CultureInfo.InvariantCulture)));
+                }
+                _data = DeserializeExceptionFromHexString(sb.ToString());
+            }
 
             if (version > 1)
             {
@@ -109,13 +131,25 @@ namespace Extract.ExceptionService
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("CurrentVersion", _CURRENT_VERSION);
-            info.AddValue("ExceptionString", SerializeExceptionToHexString(_data));
+
+            // Serialize to a list of strings
+            List<string> strings = SerializeExceptionToHexStrings(_data);
+
+            // Store the count of string pieces that make up the serialized exception
+            info.AddValue("StringCount", strings.Count);
+            for (int i = 0; i < strings.Count; i++)
+            {
+                // Add each piece
+                info.AddValue(_EXCEPTION_PIECE_TAG
+                    + i.ToString(CultureInfo.InvariantCulture), strings[i]);
+            }
             info.AddValue("EliCode", _eliCode);
         }
 
         #endregion
 
         #region Methods
+
         /// <summary>
         /// Converts an array of <see cref="byte"/> into a <see cref="string"/> of hex characters.
         /// </summary>
@@ -146,19 +180,31 @@ namespace Extract.ExceptionService
         /// Serializes an exception using a the binary formatter into a string of hex characters.
         /// </summary>
         /// <param name="e">The exception to be serialized.</param>
-        /// <returns>A hex string representing the binary formatted version of the exception.
+        /// <returns>A collection of hex strings that when combined represent
+        /// the binary formatted version of the exception.
         /// </returns>
-        static string SerializeExceptionToHexString(Exception e)
+        static List<string> SerializeExceptionToHexStrings(Exception e)
         {
+            List<string> strings = new List<string>();
             using (MemoryStream stream = new MemoryStream())
             {
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(stream, e);
 
+                // Need to split the string at 8000 character increments due to 
+                // XML serializer length limitations.
                 string hexException = ConvertBytesToHexString(stream.ToArray());
+                while (hexException.Length > 8000)
+                {
+                    strings.Add(hexException.Substring(0, 8000));
+                    hexException = hexException.Remove(0, 8000);
+                }
 
-                return hexException;
+                // Add the remaining string to the list
+                strings.Add(hexException);
             }
+
+            return strings;
         }
 
         /// <summary>

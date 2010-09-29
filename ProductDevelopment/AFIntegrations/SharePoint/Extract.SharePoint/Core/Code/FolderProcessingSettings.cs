@@ -23,7 +23,7 @@ namespace Extract.SharePoint
         Subfolder = 2,
         PrefixFilename = 3,
         SuffixFilename = 4,
-        CustomOutputLocation = 5
+        MirrorDocumentLibrary = 5
     }
 
     /// <summary>
