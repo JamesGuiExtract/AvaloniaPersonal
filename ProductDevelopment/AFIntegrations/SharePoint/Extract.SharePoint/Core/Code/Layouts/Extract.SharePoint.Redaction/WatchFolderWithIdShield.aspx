@@ -20,9 +20,9 @@
     public void CheckOutputOptions(object source, ServerValidateEventArgs e)
     {
         System.Collections.Generic.List<char> invalidCharacters =
-            new System.Collections.Generic.List<char>();
-        invalidCharacters.AddRange(new char[] { '"', '#', '%', '&', '*', ':', '<', '>', '?',
-                '{', '|', '}', '~', '\\', '/'});
+            new System.Collections.Generic.List<char>(new char[] { '"', '#', '%', '&', '*', ':',
+                '<', '>', '?', '{', '|', '}', '~', '\\', '/', '!', '@', '$', '^', '(', ')', '-',
+                '+', '=', '[', ']', ',', '.', '\'', '`'});
         
         string text = string.Empty;
         if (radioSubfolder.Checked)

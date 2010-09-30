@@ -94,7 +94,7 @@ namespace Extract.SharePoint.Redaction.Features
         {
             try
             {
-                //IdShieldSettings.RemoveIdShieldSettings();
+                IdShieldSettings.RemoveIdShieldSettings();
                 base.FeatureUninstalling(properties);
             }
             catch (Exception ex)

@@ -323,26 +323,14 @@ namespace Extract.SharePoint.Redaction
         static bool IgnoreFile(SPSite site, string fullFileUrl)
         {
             bool result = false;
-            SPWeb web = site.RootWeb;
-            SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
+            SPList list = site.RootWeb.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
             if (list != null)
             {
                 SPQuery q = new SPQuery();
                 q.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>"
                     + fullFileUrl + "</Value></Eq></Where>";
                 SPListItemCollection items = list.GetItems(q);
-                if (items != null && items.Count > 0)
-                {
-                    result = true;
-                    for (int i = 0; i < items.Count; i++)
-                    {
-                        SPListItem item = items[i];
-                        item.Delete();
-                    }
-
-                    list.Update();
-                    web.Update();
-                }
+                result = items != null && items.Count > 0;
             }
 
             return result;

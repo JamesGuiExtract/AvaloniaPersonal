@@ -217,6 +217,7 @@ namespace Extract.SharePoint.Redaction.Layouts
                         locationString = textMirrorOut.Text;
                         break;
                 }
+                locationString = locationString.Trim();
 
                 FolderProcessingSettings currentFolderSettings = new FolderProcessingSettings(
                     textCurrentFolderName.Text, textFileExtension.Text, checkRecursively.Checked,

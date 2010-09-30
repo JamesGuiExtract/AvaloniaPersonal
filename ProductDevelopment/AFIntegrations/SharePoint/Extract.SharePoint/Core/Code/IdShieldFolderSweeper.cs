@@ -282,8 +282,9 @@ namespace Extract.SharePoint.Redaction
                     }
                 }
 
-                UploadFilesToSharePoint(filesToAdd, site.Url);
+                UploadFilesToSharePoint(filesToAdd, site.ID);
                 CleanupLocalFiles(filesToClean, workingFolder);
+                RemoveFilesToIgnore(filesToAdd.Keys, site.ID);
             }
             catch (Exception ex2)
             {
@@ -296,14 +297,14 @@ namespace Extract.SharePoint.Redaction
         /// Will upload the collection of site urls and local redacted files into SharePoint.
         /// </summary>
         /// <param name="filesToAdd">Collection of site urls to local redacted files.</param>
-        /// <param name="url">The url of the site to upload the files to.</param>
-        static void UploadFilesToSharePoint(Dictionary<string, string> filesToAdd, string url)
+        /// <param name="siteId">The guid of the site to upload the files to.</param>
+        static void UploadFilesToSharePoint(Dictionary<string, string> filesToAdd, Guid siteId)
         {
             // Add the list of files to ignore
-            AddFilesToIgnore(filesToAdd.Keys, url);
+            AddFilesToIgnore(filesToAdd.Keys, siteId);
 
             // Upload the redacted file into SharePoint
-            using (SPSite tempSite = new SPSite(url))
+            using (SPSite tempSite = new SPSite(siteId))
             using (SPWeb tempWeb = tempSite.OpenWeb())
             {
                 foreach (KeyValuePair<string, string> pair in filesToAdd)
@@ -604,10 +605,10 @@ namespace Extract.SharePoint.Redaction
         /// are seen in the add event handler.
         /// </summary>
         /// <param name="fileUrls">The file urls to add to the list.</param>
-        /// <param name="siteUrl">The url for the site containing the hidden list.</param>
-        static void AddFilesToIgnore(IEnumerable<string> fileUrls, string siteUrl)
+        /// <param name="siteId">The guid for the site containing the hidden list.</param>
+        static void AddFilesToIgnore(IEnumerable<string> fileUrls, Guid siteId)
         {
-            using (SPSite tempSite = new SPSite(siteUrl))
+            using (SPSite tempSite = new SPSite(siteId))
             {
                 SPWeb web = tempSite.RootWeb;
                 if (web != null)
@@ -624,6 +625,60 @@ namespace Extract.SharePoint.Redaction
 
                         list.Update();
                     }
+                    web.Update();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove the list of files that have now been uploaded from the list
+        /// of files to ignore.
+        /// </summary>
+        /// <param name="fileUrls">The collection of file urls to remove from
+        /// the list.</param>
+        /// <param name="siteId">The guid for the site containing the list of
+        /// files to ignore.</param>
+        static void RemoveFilesToIgnore(Dictionary<string, string>.KeyCollection fileUrls,
+            Guid siteId)
+        {
+            if (fileUrls.Count < 1)
+            {
+                return;
+            }
+
+            using (SPSite tempSite = new SPSite(siteId))
+            {
+                SPWeb web = tempSite.RootWeb;
+                if (web != null)
+                {
+                    SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
+                    if (list != null)
+                    {
+                        // Build the CAML query to get the items for each file from the list
+                        StringBuilder queryString = new StringBuilder(
+                            "<Where><In><FieldRef Name='Title'/><Values>");
+                        foreach (string fileUrl in fileUrls)
+                        {
+                            queryString.Append("<Value Type='Text'>");
+                            queryString.Append(fileUrl);
+                            queryString.Append("</Value>");
+                        }
+                        queryString.Append("</Values></In></Where>");
+
+                        // Get the collection of files from the list and delete each one
+                        SPQuery query = new SPQuery();
+                        query.Query = queryString.ToString();
+                        SPListItemCollection items = list.GetItems(query);
+                        for(int i=items.Count - 1; i >= 0; i--)
+                        {
+                            items[i].Delete();
+                        }
+
+                        // Update the list
+                        list.Update();
+                    }
+
+                    // Update the web object
                     web.Update();
                 }
             }
