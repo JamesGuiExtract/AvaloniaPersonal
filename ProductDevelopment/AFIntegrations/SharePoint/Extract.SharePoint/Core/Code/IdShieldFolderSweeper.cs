@@ -245,10 +245,22 @@ namespace Extract.SharePoint.Redaction
                             // Build path to redacted file
                             string redactedFile = Path.Combine(directory, fileWithoutExtension)
                                 + ".redacted";
+                            if (!File.Exists(redactedFile))
+                            {
+                                string[] redactedFiles = Directory.GetFiles(directory,
+                                    Path.GetFileNameWithoutExtension(fileWithoutExtension)
+                                    + ".*.redacted");
+                                if (redactedFiles.Length == 1)
+                                {
+                                    redactedFile = redactedFiles[0];
+                                }
+                            }
 
                             // Build the destination file name
                             string destinationFileName = GetDestinationFileName(fileName,
-                                workingFolder + "\\", folderSettings);
+                                workingFolder + "\\",
+                                Path.GetExtension(Path.GetFileNameWithoutExtension(redactedFile)),
+                                folderSettings);
 
                             // Ensure the redacted file exists and the destination
                             // file name is not null or empty
@@ -483,19 +495,25 @@ namespace Extract.SharePoint.Redaction
         /// <param name="fullPath">The full path to the .processed file.</param>
         /// <param name="folderSettings">The settings collection to use to
         /// build the destination file name.</param>
+        /// <param name="redactedExtension">The extension of the redacted file.</param>
         /// <param name="watchPath">The watch folder that is being monitored for
         /// processed documents.</param>
         /// <returns>The destination for the file within the SP document library.</returns>
         static string GetDestinationFileName(string fullPath, string watchPath,
-            SortedDictionary<string, FolderProcessingSettings> folderSettings)
+            string redactedExtension, SiteFolderSettingsCollection folderSettings)
         {
             StringBuilder destination = new StringBuilder();
-            string path = fullPath;
             string fileName = Path.GetFileNameWithoutExtension(fullPath);
-            string folder = Path.GetDirectoryName(path);
+            string folder = Path.GetDirectoryName(fullPath);
             string folderUpOne = Path.GetDirectoryName(folder) + "\\";
             string topFolder = folder.Replace(folderUpOne, "");
             folder = folder.Replace(watchPath, "/").Replace("\\", "/");
+
+            if (!Path.GetExtension(fileName).Equals(
+                redactedExtension, StringComparison.OrdinalIgnoreCase))
+            {
+                fileName = Path.GetFileNameWithoutExtension(fileName) + redactedExtension;
+            }
 
             // Find the folder settings
             foreach (KeyValuePair<string, FolderProcessingSettings> pair in folderSettings)
