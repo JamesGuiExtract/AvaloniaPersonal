@@ -319,14 +319,14 @@ namespace Extract.SharePoint.Redaction
             using (SPSite tempSite = new SPSite(siteId))
             using (SPWeb tempWeb = tempSite.OpenWeb())
             {
+                SPFileCollection spFiles = tempWeb.Files;
                 foreach (KeyValuePair<string, string> pair in filesToAdd)
                 {
                     try
                     {
                         // Read the redacted file from the disk
                         byte[] bytes = File.ReadAllBytes(pair.Value);
-
-                        tempWeb.Files.Add(pair.Key, bytes, true);
+                        spFiles.Add(pair.Key, bytes, true); 
                     }
                     catch (Exception ex)
                     {
@@ -400,13 +400,14 @@ namespace Extract.SharePoint.Redaction
             string url = string.Empty;
             try
             {
-                SPFolder folder = null;
+                bool folderExists = true;
                 using (SPWeb web = site.OpenWeb())
                 {
                     url = web.Url + destFolder;
-                    folder = web.GetFolder(url);
+                    SPFolder folder = web.GetFolder(url);
+                    folderExists = folder.Exists;
                 }
-                if (!folder.Exists)
+                if (!folderExists)
                 {
                     string[] folders = destFolder.Split(new char[] { '/' },
                         StringSplitOptions.RemoveEmptyEntries);

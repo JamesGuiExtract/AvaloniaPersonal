@@ -23,28 +23,32 @@
             new System.Collections.Generic.List<char>(new char[] { '"', '#', '%', '&', '*', ':',
                 '<', '>', '?', '{', '|', '}', '~', '\\', '/', '!', '@', '$', '^', '(', ')', '-',
                 '+', '=', '[', ']', ',', '.', '\'', '`'});
-        
+
+        bool valid = true;
         string text = string.Empty;
         if (radioSubfolder.Checked)
         {
-            text = textSubfolder.Text;
+            text = textSubfolder.Text.Trim();
         }
         else if (radioSameFolder.Checked)
         {
-            text = textPreSuffix.Text;
+            text = textPreSuffix.Text.Trim();
         }
         else if (radioParallel.Checked)
         {
-            text = textParallel.Text;
+            text = textParallel.Text.Trim();
         }
         else if (radioMirrorLibrary.Checked)
         {
-            text = textMirrorOut.Text;
+            // Mirrored library location cannot be named Sites nor can it start
+            // with a leading underscore [FIDSI #183 & #202]
+            text = textMirrorOut.Text.Trim();
+            valid = !text.Equals("sites", StringComparison.OrdinalIgnoreCase)
+                && !text.StartsWith("_", StringComparison.Ordinal);
         }
-        text = text.Trim();
 
         // Check for invalid characters in the folder name
-        e.IsValid = !string.IsNullOrEmpty(text)
+        e.IsValid = valid && !string.IsNullOrEmpty(text)
             && !text.StartsWith(".", StringComparison.Ordinal)
             && !text.EndsWith(".", StringComparison.Ordinal)
             && text.IndexOfAny(invalidCharacters.ToArray()) == -1

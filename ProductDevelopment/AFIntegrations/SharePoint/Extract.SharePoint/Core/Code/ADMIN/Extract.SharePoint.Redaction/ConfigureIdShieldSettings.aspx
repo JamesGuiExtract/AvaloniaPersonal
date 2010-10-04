@@ -52,6 +52,36 @@
 </table>
 </asp:Panel>
 <br />
+<asp:Panel ID="panelWatchedFolders" runat="server" GroupingText="ID Shield watched folders"
+    ForeColor="Black">
+    <table>
+        <tr>
+            <td>
+                <asp:DropDownList ID="dropWatchedSites" runat="server" AutoPostBack="true"
+                    OnSelectedIndexChanged="HandleWatchedSitesChanged" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <asp:ListBox ID="listWatchedFolders" runat="server" Width="450" 
+                    AutoPostBack="true" OnSelectedIndexChanged="HandleWatchListSelectionChanged" /> 
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <asp:Button ID="buttonRemoveWatching" runat="server" Text="Remove Watching"
+                    OnClick="HandleRemoveWatching" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <asp:TextBox ID="textWatchFolderSettings" runat="server" TextMode="multiline"
+                    Width="450" rows="6"/>
+            </td>
+        </tr>
+    </table>
+</asp:Panel>
+<br />
 <asp:Panel ID="panelButtons" runat="server" HorizontalAlign="Right">
     <asp:Button ID="buttonOk" runat="server" Text="OK" OnClick="HandleOkButtonClick" />
     <asp:Button ID="buttonCancel" runat="server" Text="Cancel" OnClick="HandleCancelButtonClick" />

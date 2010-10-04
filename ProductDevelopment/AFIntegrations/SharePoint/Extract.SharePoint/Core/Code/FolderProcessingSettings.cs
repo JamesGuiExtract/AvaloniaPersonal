@@ -1,9 +1,11 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
+﻿using Microsoft.SharePoint;
+using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 
 // Using statements to make dealing with folder settings more readable
 using SiteFolderSettingsCollection =
@@ -36,7 +38,9 @@ namespace Extract.SharePoint
 
         FileAdded = 0x1,
 
-        FileModified = 0x2
+        FileModified = 0x2,
+
+        FileAddAndModify = FileAdded | FileModified
     }
 
     /// <summary>
@@ -372,6 +376,69 @@ namespace Extract.SharePoint
             }
 
             return new SiteFolderSettingsCollection();
+        }
+
+        /// <summary>
+        /// Computes a human readable string version of the folder settings.
+        /// </summary>
+        /// <returns>A human readable stringized version of the folder settings.</returns>
+        internal string ComputeHumanReadableSettingString()
+        {
+            StringBuilder sb = new StringBuilder();
+            if (_recurse)
+            {
+                sb.Append("Recursively watching ");
+            }
+            else
+            {
+                sb.Append("Watching ");
+            }
+            sb.AppendLine("folder for files with extensions: ");
+            sb.AppendLine(_fileExtensions);
+            sb.Append("Watching for ");
+            if (_eventType == FileEventType.FileAddAndModify)
+            {
+                sb.AppendLine("added and modified events");
+            }
+            else if (_eventType == FileEventType.FileAdded)
+            {
+                sb.AppendLine("added events");
+            }
+            else if (_eventType == FileEventType.FileModified)
+            {
+                sb.AppendLine("modified events");
+            }
+
+            sb.Append("Output files to ");
+            switch (_outputLocation)
+            {
+                case IdShieldOutputLocation.PrefixFilename:
+                    sb.Append("the same folder with a file name prefixed with: ");
+                    break;
+
+                case IdShieldOutputLocation.SuffixFilename:
+                    sb.Append("the same folder with a file name suffixed with: ");
+                    break;
+
+                case IdShieldOutputLocation.ParallelFolderPrefix:
+                    sb.Append("a parallel folder of the same name prefixed with: ");
+                    break;
+
+                case IdShieldOutputLocation.ParallelFolderSuffix:
+                    sb.Append("a parallel folder of the same name suffixed with: ");
+                    break;
+
+                case IdShieldOutputLocation.Subfolder:
+                    sb.Append("a sub folder with the name: ");
+                    break;
+
+                case IdShieldOutputLocation.MirrorDocumentLibrary:
+                    sb.Append("a mirrored document library called: ");
+                    break;
+            }
+            sb.AppendLine(_outputLocationString);
+
+            return sb.ToString();
         }
 
         #endregion Methods
