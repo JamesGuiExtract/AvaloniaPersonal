@@ -58,6 +58,24 @@ namespace Extract.SharePoint.Redaction.Layouts {
         protected global::System.Web.UI.WebControls.TextBox textExceptionIpAddress;
         
         /// <summary>
+        /// buttonOk control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button buttonOk;
+        
+        /// <summary>
+        /// buttonCancel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button buttonCancel;
+        
+        /// <summary>
         /// panelWatchedFolders control.
         /// </summary>
         /// <remarks>
@@ -101,32 +119,5 @@ namespace Extract.SharePoint.Redaction.Layouts {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox textWatchFolderSettings;
-        
-        /// <summary>
-        /// panelButtons control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel panelButtons;
-        
-        /// <summary>
-        /// buttonOk control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button buttonOk;
-        
-        /// <summary>
-        /// buttonCancel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button buttonCancel;
     }
 }

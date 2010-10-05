@@ -49,6 +49,12 @@
                 ErrorMessage="Must be blank or valid ip address specification." />
         </td>
     </tr>
+    <tr>
+        <td align="right">
+            <asp:Button ID="buttonOk" runat="server" Text="OK" OnClick="HandleOkButtonClick" />
+            <asp:Button ID="buttonCancel" runat="server" Text="Cancel" OnClick="HandleCancelButtonClick" />
+        </td>
+    </tr>
 </table>
 </asp:Panel>
 <br />
@@ -58,7 +64,7 @@
         <tr>
             <td>
                 <asp:DropDownList ID="dropWatchedSites" runat="server" AutoPostBack="true"
-                    OnSelectedIndexChanged="HandleWatchedSitesChanged" />
+                    OnSelectedIndexChanged="HandleWatchedSitesChanged" Width="450"/>
             </td>
         </tr>
         <tr>
@@ -68,7 +74,7 @@
             </td>
         </tr>
         <tr>
-            <td>
+            <td align="right">
                 <asp:Button ID="buttonRemoveWatching" runat="server" Text="Remove Watching"
                     OnClick="HandleRemoveWatching" />
             </td>
@@ -76,16 +82,12 @@
         <tr>
             <td>
                 <asp:TextBox ID="textWatchFolderSettings" runat="server" TextMode="multiline"
-                    Width="450" rows="6"/>
+                    Width="450" rows="6" ReadOnly="true" />
             </td>
         </tr>
     </table>
 </asp:Panel>
 <br />
-<asp:Panel ID="panelButtons" runat="server" HorizontalAlign="Right">
-    <asp:Button ID="buttonOk" runat="server" Text="OK" OnClick="HandleOkButtonClick" />
-    <asp:Button ID="buttonCancel" runat="server" Text="Cancel" OnClick="HandleCancelButtonClick" />
-</asp:Panel>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
