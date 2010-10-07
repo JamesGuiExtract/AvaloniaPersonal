@@ -19,35 +19,46 @@ namespace Extract.SharePoint.Redaction.Features
         /// <param name="properties">The properties for the feature being activated.</param>
         public override void FeatureActivated(SPFeatureReceiverProperties properties)
         {
+            SPSite site = null;
             try
             {
-                SPSite site = properties.Feature.Parent as SPSite;
+                site = properties.Feature.Parent as SPSite;
                 if (site != null)
                 {
                     IdShieldSettings.AddActiveFeatureSiteId(site.ID);
 
-                    // Add hidden list to site (if it does not exist)
-                    SPWeb web = site.RootWeb;
-                    SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
-                    if (list == null)
+                    using (SPSite tempSite = new SPSite(site.ID))
+                    using (SPWeb web = tempSite.RootWeb)
                     {
-                        web.AllowUnsafeUpdates = true;
-                        Guid listId = web.Lists.Add(IdShieldHelper._HIDDEN_LIST_NAME, "",
-                            SPListTemplateType.GenericList);
-                        web.Update();
-                        list = web.Lists[listId];
-                        if (list != null)
+                        // Add hidden list to site (if it does not exist)
+                        SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
+                        if (list == null)
                         {
-                            list.Hidden = true;
-                            list.Update();
+                            web.AllowUnsafeUpdates = true;
+                            Guid listId = web.Lists.Add(IdShieldHelper._HIDDEN_LIST_NAME, "",
+                                SPListTemplateType.GenericList);
+                            web.Update();
+                            list = web.Lists[listId];
+                            if (list != null)
+                            {
+                                list.Hidden = true;
+                                list.Update();
+                            }
+                            web.AllowUnsafeUpdates = false;
                         }
-                        web.AllowUnsafeUpdates = false;
                     }
                 }
             }
             catch (Exception ex)
             {
                 IdShieldHelper.LogException(ex, ErrorCategoryId.Feature, "ELI30591");
+            }
+            finally
+            {
+                if (site != null)
+                {
+                    site.Dispose();
+                }
             }
 
             base.FeatureActivated(properties);
@@ -59,28 +70,39 @@ namespace Extract.SharePoint.Redaction.Features
         /// <param name="properties">The properties for the feature being deactivated.</param>
         public override void FeatureDeactivating(SPFeatureReceiverProperties properties)
         {
+            SPSite site = null;
             try
             {
-                SPSite site = properties.Feature.Parent as SPSite;
+                site = properties.Feature.Parent as SPSite;
                 if (site != null)
                 {
                     IdShieldSettings.RemoveActiveFeatureSiteId(site.ID);
 
                     // Remove the hidden list if it exists
-                    SPWeb web = site.RootWeb;
-                    SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
-                    if (list != null)
+                    using (SPSite tempSite = new SPSite(site.ID))
+                    using (SPWeb web = tempSite.RootWeb)
                     {
-                        web.AllowUnsafeUpdates = true;
-                        web.Lists.Delete(list.ID);
-                        web.Update();
-                        web.AllowUnsafeUpdates = false;
+                        SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
+                        if (list != null)
+                        {
+                            web.AllowUnsafeUpdates = true;
+                            list.Delete();
+                            web.Update();
+                            web.AllowUnsafeUpdates = false;
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 IdShieldHelper.LogException(ex, ErrorCategoryId.Feature, "ELI30592");
+            }
+            finally
+            {
+                if (site != null)
+                {
+                    site.Dispose();
+                }
             }
 
             base.FeatureDeactivating(properties);

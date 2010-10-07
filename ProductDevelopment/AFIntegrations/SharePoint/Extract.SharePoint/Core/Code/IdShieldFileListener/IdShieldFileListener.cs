@@ -49,25 +49,6 @@ namespace Extract.SharePoint.Redaction
 
         #endregion Fields
 
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="IdShieldFileListener"/> class.
-        /// </summary>
-        public IdShieldFileListener()
-            : base()
-        {
-            try
-            {
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, "ELI30567");
-            }
-        }
-
-        #endregion Constructors
-
         #region Event Handlers
 
         /// <summary>
@@ -78,13 +59,14 @@ namespace Extract.SharePoint.Redaction
         {
             try
             {
-                base.ItemAdded(properties);
                 HandleSharePointFileEvent(properties, FileEventType.FileAdded);
             }
             catch (Exception ex)
             {
                 LogException(ex, "ELI30568");
             }
+
+            base.ItemAdded(properties);
         }
 
         /// <summary>
@@ -95,13 +77,14 @@ namespace Extract.SharePoint.Redaction
         {
             try
             {
-                base.ItemUpdated(properties);
                 HandleSharePointFileEvent(properties, FileEventType.FileModified);
             }
             catch (Exception ex)
             {
                 LogException(ex, "ELI30569");
             }
+
+            base.ItemUpdated(properties);
         }
 
         /// <summary>
@@ -112,13 +95,14 @@ namespace Extract.SharePoint.Redaction
         {
             try
             {
-                base.ItemDeleted(properties);
                 HandleSharePointItemDeleted(properties);
             }
             catch (Exception ex)
             {
                 LogException(ex, "ELI30613");
             }
+
+            base.ItemDeleted(properties);
         }
 
         /// <summary>
@@ -127,7 +111,6 @@ namespace Extract.SharePoint.Redaction
         /// <param name="properties">The properties associated with the item event.</param>
         public override void ItemUpdating(SPItemEventProperties properties)
         {
-            base.ItemUpdating(properties);
             try
             {
                 if (properties.Cancel)
@@ -152,7 +135,7 @@ namespace Extract.SharePoint.Redaction
 
                     // Update the settings
                     IdShieldSettings.UpdateSettingsForRenamedFolder(oldFolder, newFolder,
-                        item.Web.Site.ID);
+                        properties.SiteId);
                 }
             }
             catch (Exception ex)
@@ -160,6 +143,7 @@ namespace Extract.SharePoint.Redaction
                 LogException(ex, "ELI30614");
             }
 
+            base.ItemUpdating(properties);
         }
 
         #endregion Event Handlers
@@ -208,6 +192,7 @@ namespace Extract.SharePoint.Redaction
             FileEventType eventType)
         {
             SPSite site = null;
+            string fileName = string.Empty;
             try
             {
                 // Get the item and check that it is a file item
@@ -226,7 +211,7 @@ namespace Extract.SharePoint.Redaction
                 string fullFileUrl = site.Url + "/" + item.File.Url;
 
                 // Check if this file should be ignored
-                if (IgnoreFile(site, fullFileUrl))
+                if (IgnoreFile(site.ID, fullFileUrl))
                 {
                     return;
                 }
@@ -235,9 +220,10 @@ namespace Extract.SharePoint.Redaction
                 if (!string.IsNullOrEmpty(_outputFolder))
                 {
                     // Get the folder name for the item
-                    string folder = item.File.Url;
+                    string folder = item.Url;
+                    fileName = item.Name;
                     folder = (folder[0] != '/' ?
-                        folder.Insert(0, "/") : folder).Replace("/" + item.File.Name, "");
+                        folder.Insert(0, "/") : folder).Replace("/" + fileName, "");
 
                     // Attempt to get the settings for the folder
                     foreach (KeyValuePair<string, FolderProcessingSettings> pair in _folderSettings)
@@ -250,37 +236,46 @@ namespace Extract.SharePoint.Redaction
                         // 2. This folder is being watched
                         // 3. The file matches the watch pattern
                         if ((eventType == FileEventType.FileModified
-                                && _zeroByteFiles.Contains(item.File.UniqueId))
+                                && _zeroByteFiles.Contains(item.UniqueId))
                             || ((pair.Value.EventTypes & eventType) != 0
                                 && IsFolderBeingWatched(folder, pair.Key, pair.Value.RecurseSubfolders)
-                                && pair.Value.DoesFileMatchPattern(item.File.Name)
+                                && pair.Value.DoesFileMatchPattern(fileName)
                             ))
                         {
-                            byte[] bytes = item.File.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
-                            if (bytes.Length == 0 && eventType == FileEventType.FileAdded)
+                            using (SPSite tempSite = new SPSite(properties.SiteId))
+                            using (SPWeb web = tempSite.OpenWeb(item.Web.ID))
                             {
-                                // Add this file ID to a list of pending ID's to be
-                                // handled in the update method
-                                IdShieldSettings.AddZeroByteFileId(item.File.UniqueId);
-                            }
-                            else if (bytes.Length > 0)
-                            {
-                                // get the folder name without the leading '/' and
-                                // convert all other '/' to '\'
-                                folder = folder.Substring(1).Replace('/', '\\');
-                                string outputFolder = Path.Combine(_outputFolder, folder);
-                                if (!Directory.Exists(outputFolder))
+                                SPList list = web.Lists[item.ParentList.ID];
+                                SPListItem fileItem = list.GetItemByUniqueId(item.UniqueId);
+
+
+
+                                byte[] bytes = fileItem.File.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
+                                if (bytes.Length == 0 && eventType == FileEventType.FileAdded)
                                 {
-                                    Directory.CreateDirectory(outputFolder);
+                                    // Add this file ID to a list of pending ID's to be
+                                    // handled in the update method
+                                    IdShieldSettings.AddZeroByteFileId(fileItem.File.UniqueId);
                                 }
-
-                                // Write the file to the processing folder
-                                string fileName = Path.Combine(outputFolder, item.File.Name);
-                                File.WriteAllBytes(fileName, bytes);
-
-                                if (_zeroByteFiles.Contains(item.File.UniqueId))
+                                else if (bytes.Length > 0)
                                 {
-                                    IdShieldSettings.RemoveZeroByteFileId(item.File.UniqueId);
+                                    // get the folder name without the leading '/' and
+                                    // convert all other '/' to '\'
+                                    folder = folder.Substring(1).Replace('/', '\\');
+                                    string outputFolder = Path.Combine(_outputFolder, folder);
+                                    if (!Directory.Exists(outputFolder))
+                                    {
+                                        Directory.CreateDirectory(outputFolder);
+                                    }
+
+                                    // Write the file to the processing folder
+                                    string outFileName = Path.Combine(outputFolder, fileItem.File.Name);
+                                    File.WriteAllBytes(outFileName, bytes);
+
+                                    if (_zeroByteFiles.Contains(fileItem.File.UniqueId))
+                                    {
+                                        IdShieldSettings.RemoveZeroByteFileId(fileItem.File.UniqueId);
+                                    }
                                 }
                             }
 
@@ -293,20 +288,25 @@ namespace Extract.SharePoint.Redaction
             }
             catch (Exception ex)
             {
+                SPException ee = new SPException("Unable to handle SharePoint file event.", ex);
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    ee.Data["File To Handle"] = fileName;
+                }
                 if (site != null)
                 {
                     try
                     {
                         // Attempt to add additional site debug data [FIDSI #189]
-                        ex.Data["Current Site Url"] = site.ServerRelativeUrl;
-                        ex.Data["Current Site Id"] = site.ID.ToString();
+                        ee.Data["Current Site Url"] = site.ServerRelativeUrl;
+                        ee.Data["Current Site Id"] = site.ID.ToString();
                     }
                     catch
                     {
                     }
                 }
 
-                throw;
+                throw ee;
             }
         }
 
@@ -315,25 +315,30 @@ namespace Extract.SharePoint.Redaction
         /// list this method will return <see langword="true"/>, it also has the side
         /// effect that the item will be removed from the ignore list.
         /// </summary>
-        /// <param name="site">The site containing the list of files to ignore.</param>
+        /// <param name="siteId">The unique ID for the site containing the list of
+        /// files to ignore.</param>
         /// <param name="fullFileUrl">The full URL to the file (this is the value
         /// that will be in the hidden list if the file should be ignored).</param>
         /// <returns><see langword="true"/> if the file should be ignored and
         /// <see langword="false"/> otherwise.</returns>
-        static bool IgnoreFile(SPSite site, string fullFileUrl)
+        static bool IgnoreFile(Guid siteId, string fullFileUrl)
         {
             bool result = false;
-            SPList list = site.RootWeb.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
-            if (list != null)
+            using (SPSite site = new SPSite(siteId))
+            using (SPWeb web = site.RootWeb)
             {
-                SPQuery q = new SPQuery();
-                q.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>"
-                    + fullFileUrl + "</Value></Eq></Where>";
-                SPListItemCollection items = list.GetItems(q);
-                result = items != null && items.Count > 0;
-            }
+                SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
+                if (list != null)
+                {
+                    SPQuery q = new SPQuery();
+                    q.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>"
+                        + fullFileUrl + "</Value></Eq></Where>";
+                    SPListItemCollection items = list.GetItems(q);
+                    result = items != null && items.Count > 0;
+                }
 
-            return result;
+                return result;
+            }
         }
 
         /// <summary>

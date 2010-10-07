@@ -118,7 +118,7 @@ namespace Extract.SharePoint.Redaction
                 {
                     if (_activeSites.Contains(site.ID))
                     {
-                        SearchAndHandleExistingFiles(site);
+                        SearchAndHandleExistingFiles(site.ID, site.ServerRelativeUrl);
                     }
                 }
 
@@ -134,7 +134,9 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// Searches for existing processed files and calls the file handler on them.
         /// </summary>
-        void SearchAndHandleExistingFiles(SPSite site)
+        /// <param name="siteId">The unique ID for the site being handled.</param>
+        /// <param name="siteUrl">The server relative URL for the site.</param>
+        void SearchAndHandleExistingFiles(Guid siteId, string siteUrl)
         {
             // If there is no working folder, just return
             if (string.IsNullOrEmpty(_localWorkingFolder))
@@ -142,7 +144,7 @@ namespace Extract.SharePoint.Redaction
                 return;
             }
 
-            string path = Path.Combine(_localWorkingFolder, site.ID.ToString());
+            string path = Path.Combine(_localWorkingFolder, siteId.ToString());
 
             // Ensure the path exists
             if (!Directory.Exists(path))
@@ -154,12 +156,12 @@ namespace Extract.SharePoint.Redaction
             string[] fileNames = Directory.GetFiles(path,
                 "*.failed", SearchOption.AllDirectories);
 
-            HandleFailedFiles(fileNames, path, site.ServerRelativeUrl);
+            HandleFailedFiles(fileNames, path, siteUrl);
 
             fileNames = Directory.GetFiles(path,
                 "*.processed", SearchOption.AllDirectories);
 
-            HandleProcessedFiles(fileNames, path, site);
+            HandleProcessedFiles(fileNames, path, siteId);
         }
 
         /// <summary>
@@ -211,14 +213,14 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         /// <param name="fileNames">The processed files to handle.</param>
         /// <param name="workingFolder">The path to the local working folder.</param>
-        /// <param name="site">The current site to push redacted files into.</param>
-        void HandleProcessedFiles(string[] fileNames, string workingFolder, SPSite site)
+        /// <param name="siteId">The unique ID for the site to push redacted files into.</param>
+        void HandleProcessedFiles(string[] fileNames, string workingFolder, Guid siteId)
         {
             try
             {
                 // Get the folder settings
                 SiteFolderSettingsCollection folderSettings;
-                if (!_folderSettings.TryGetValue(site.ID, out folderSettings))
+                if (!_folderSettings.TryGetValue(siteId, out folderSettings))
                 {
                     return;
                 }
@@ -226,7 +228,8 @@ namespace Extract.SharePoint.Redaction
                 // Build collection of the files to add and the folders/files to clean after adding
                 Dictionary<string, string> filesToAdd = new Dictionary<string, string>();
                 Dictionary<string, List<string>> filesToClean = new Dictionary<string, List<string>>();
-                using (SPWeb web = site.OpenWeb())
+                using(SPSite site = new SPSite(siteId))
+                using (SPWeb web = site.RootWeb)
                 {
                     foreach (string fileName in fileNames)
                     {
@@ -294,9 +297,9 @@ namespace Extract.SharePoint.Redaction
                     }
                 }
 
-                UploadFilesToSharePoint(filesToAdd, site.ID);
+                UploadFilesToSharePoint(filesToAdd, siteId);
                 CleanupLocalFiles(filesToClean, workingFolder);
-                RemoveFilesToIgnore(filesToAdd.Keys, site.ID);
+                RemoveFilesToIgnore(filesToAdd.Keys, siteId);
             }
             catch (Exception ex2)
             {
@@ -317,7 +320,7 @@ namespace Extract.SharePoint.Redaction
 
             // Upload the redacted file into SharePoint
             using (SPSite tempSite = new SPSite(siteId))
-            using (SPWeb tempWeb = tempSite.OpenWeb())
+            using (SPWeb tempWeb = tempSite.RootWeb)
             {
                 SPFileCollection spFiles = tempWeb.Files;
                 foreach (KeyValuePair<string, string> pair in filesToAdd)
@@ -401,7 +404,7 @@ namespace Extract.SharePoint.Redaction
             try
             {
                 bool folderExists = true;
-                using (SPWeb web = site.OpenWeb())
+                using (SPWeb web = site.RootWeb)
                 {
                     url = web.Url + destFolder;
                     SPFolder folder = web.GetFolder(url);
@@ -413,7 +416,7 @@ namespace Extract.SharePoint.Redaction
                         StringSplitOptions.RemoveEmptyEntries);
                     string rootFolder = folders[0];
                     EnsureRootListExists(site, rootFolder);
-                    using (SPWeb web = site.OpenWeb())
+                    using (SPWeb web = site.RootWeb)
                     {
                         SPList list = GetDocumentList(web, rootFolder);
                         web.AllowUnsafeUpdates = true;
@@ -473,7 +476,7 @@ namespace Extract.SharePoint.Redaction
         /// <param name="folderName">The root list name.</param>
         static void EnsureRootListExists(SPSite site, string folderName)
         {
-            using (SPWeb web = site.OpenWeb())
+            using (SPWeb web = site.RootWeb)
             {
                 SPList rootList = web.Lists.TryGetList(folderName);
                 if (rootList == null)
@@ -628,8 +631,8 @@ namespace Extract.SharePoint.Redaction
         static void AddFilesToIgnore(IEnumerable<string> fileUrls, Guid siteId)
         {
             using (SPSite tempSite = new SPSite(siteId))
+            using (SPWeb web = tempSite.RootWeb)
             {
-                SPWeb web = tempSite.RootWeb;
                 if (web != null)
                 {
                     SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
@@ -666,8 +669,8 @@ namespace Extract.SharePoint.Redaction
             }
 
             using (SPSite tempSite = new SPSite(siteId))
+            using (SPWeb web = tempSite.RootWeb)
             {
-                SPWeb web = tempSite.RootWeb;
                 if (web != null)
                 {
                     SPList list = web.Lists.TryGetList(IdShieldHelper._HIDDEN_LIST_NAME);
