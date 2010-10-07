@@ -18,6 +18,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DataEntryApplicationForm));
             this._splitContainer = new System.Windows.Forms.SplitContainer();
+            this._documentTypePanel = new System.Windows.Forms.Panel();
+            this._documentTypeLabel = new System.Windows.Forms.Label();
+            this._documentTypeComboBox = new System.Windows.Forms.ComboBox();
             this._scrollPanel = new Extract.DataEntry.Utilities.DataEntryApplication.DataEntryScrollPanel();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
@@ -118,16 +121,52 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _splitContainer.Panel1
             // 
+            this._splitContainer.Panel1.Controls.Add(this._documentTypePanel);
             this._splitContainer.Panel1.Controls.Add(this._scrollPanel);
             // 
             // _splitContainer.Panel2
             // 
             this._splitContainer.Panel2.Controls.Add(this._imageViewer);
             this._splitContainer.Size = new System.Drawing.Size(989, 506);
-            this._splitContainer.SplitterDistance = 88;
+            this._splitContainer.SplitterDistance = 184;
             this._splitContainer.SplitterWidth = 3;
             this._splitContainer.TabIndex = 0;
             this._splitContainer.TabStop = false;
+            // 
+            // _documentTypePanel
+            // 
+            this._documentTypePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._documentTypePanel.BackColor = System.Drawing.SystemColors.InactiveCaptionText;
+            this._documentTypePanel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this._documentTypePanel.Controls.Add(this._documentTypeLabel);
+            this._documentTypePanel.Controls.Add(this._documentTypeComboBox);
+            this._documentTypePanel.Location = new System.Drawing.Point(0, 0);
+            this._documentTypePanel.Name = "_documentTypePanel";
+            this._documentTypePanel.Size = new System.Drawing.Size(184, 40);
+            this._documentTypePanel.TabIndex = 0;
+            // 
+            // _documentTypeLabel
+            // 
+            this._documentTypeLabel.AutoSize = true;
+            this._documentTypeLabel.Location = new System.Drawing.Point(3, 13);
+            this._documentTypeLabel.Name = "_documentTypeLabel";
+            this._documentTypeLabel.Size = new System.Drawing.Size(83, 13);
+            this._documentTypeLabel.TabIndex = 0;
+            this._documentTypeLabel.Text = "Document Type";
+            // 
+            // _documentTypeComboBox
+            // 
+            this._documentTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._documentTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._documentTypeComboBox.Enabled = false;
+            this._documentTypeComboBox.Location = new System.Drawing.Point(92, 9);
+            this._documentTypeComboBox.MaxDropDownItems = 25;
+            this._documentTypeComboBox.Name = "_documentTypeComboBox";
+            this._documentTypeComboBox.Size = new System.Drawing.Size(83, 21);
+            this._documentTypeComboBox.Sorted = true;
+            this._documentTypeComboBox.TabIndex = 1;
             // 
             // _scrollPanel
             // 
@@ -135,17 +174,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._scrollPanel.AutoScroll = true;
-            this._scrollPanel.Location = new System.Drawing.Point(0, 0);
+            this._scrollPanel.Location = new System.Drawing.Point(0, 46);
             this._scrollPanel.Name = "_scrollPanel";
-            this._scrollPanel.Size = new System.Drawing.Size(85, 503);
+            this._scrollPanel.Size = new System.Drawing.Size(181, 457);
             this._scrollPanel.TabIndex = 0;
             // 
             // _imageViewer
             // 
             this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
+            this._imageViewer.MinimumAngularHighlightHeight = 1;
             this._imageViewer.Name = "_imageViewer";
-            this._imageViewer.Size = new System.Drawing.Size(898, 506);
+            this._imageViewer.Size = new System.Drawing.Size(802, 506);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
             // 
@@ -877,6 +917,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._splitContainer.Panel1.ResumeLayout(false);
             this._splitContainer.Panel2.ResumeLayout(false);
             this._splitContainer.ResumeLayout(false);
+            this._documentTypePanel.ResumeLayout(false);
+            this._documentTypePanel.PerformLayout();
             this._toolStripContainer.TopToolStripPanel.ResumeLayout(false);
             this._toolStripContainer.TopToolStripPanel.PerformLayout();
             this._toolStripContainer.ResumeLayout(false);
@@ -977,6 +1019,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.ToolStrip _miscImageToolStrip;
         private System.Windows.Forms.ToolStripButton _toggleShowAllHighlightsButton;
         private Extract.FileActionManager.Forms.TagFileToolStripButton _tagFileToolStripButton;
+        private System.Windows.Forms.Label _documentTypeLabel;
+        private System.Windows.Forms.ComboBox _documentTypeComboBox;
+        private System.Windows.Forms.Panel _documentTypePanel;
     }
 }
 

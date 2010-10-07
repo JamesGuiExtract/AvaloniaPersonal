@@ -207,6 +207,7 @@
     <Compile Include="DataEntryComboBoxCell.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
+    <Compile Include="IDataEntryApplication.cs" />
     <Compile Include="IDataEntryTableCell.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>

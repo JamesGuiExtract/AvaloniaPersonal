@@ -13,6 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -21,6 +22,7 @@ using UCLID_COMUTILSLib;
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 using ESpatialStringMode = UCLID_RASTERANDOCRMGMTLib.ESpatialStringMode;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+
 
 namespace Extract.DataEntry
 {
@@ -76,33 +78,6 @@ namespace Extract.DataEntry
         /// Require all data to meet validation requirements before saving.
         /// </summary>
         Disallow = 3
-    }
-
-    /// <summary>
-    /// Specifies how the image viewer zoom/view is adjusted when new fields are selected.
-    /// </summary>
-    public enum AutoZoomMode
-    {
-        /// <summary>
-        /// If the selected object is not completely visible, the image will be scrolled to place
-        /// the center of the object in the center of the screen, but the zoom level will not be
-        /// changed (either in or out).
-        /// </summary>
-        NoZoom = 0,
-
-        /// <summary>
-        /// If the selected object is not completely visible, the image will be scrolled. If the
-        /// selected object cannot be fit at the current zoom level, the zoom level will be
-        /// expanded. For items that can be fit, zoom will be returned as close as possible to the
-        /// last manually set zoom level while still displaying the entire selected object.
-        /// </summary>
-        ZoomOutIfNecessary = 1,
-
-        /// <summary>
-        /// Zoom and position will be automatically centered around the current selection with a
-        /// user-specified amount of page context displayed around the object.
-        /// </summary>
-        AutoZoom = 2
     }
 
     #endregion Enums
@@ -243,6 +218,11 @@ namespace Extract.DataEntry
         #region Fields
 
         /// <summary>
+        /// The source of application-wide settings and events.
+        /// </summary>
+        IDataEntryApplication _dataEntryApp;
+
+        /// <summary>
         /// The image viewer with which to display documents.
         /// </summary>
         ImageViewer _imageViewer;
@@ -291,8 +271,8 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// A dictionary to keep track of the currently displayed highlights. (NOTE: this collection
-        /// represents the highlights that would be displayed if _showingAllHighlights is false. If
-        /// _showingAllHighlights is true, though all attribute highlights will be displayed this
+        /// represents the highlights that would be displayed if ShowAllHighlights is false. If
+        /// ShowAllHighlights is true, though all attribute highlights will be displayed this
         /// collection will only contain the "active" highlights.
         /// </summary>
         Dictionary<IAttribute, bool> _displayedAttributeHighlights =
@@ -343,10 +323,10 @@ namespace Extract.DataEntry
         readonly List<IDataEntryControl> _rootLevelControls = new List<IDataEntryControl>();
 
         /// <summary>
-        /// A flag used to indicate that the current document image is changing so that highlight
+        /// A flag used to indicate that the current document data is changing so that highlight
         /// drawing can be suspended while all the controls refresh their spatial information.
         /// </summary>
-        bool _changingImage;
+        bool _changingData;
 
         /// <summary>
         /// The current "active" data entry.  This is the last data entry control to have received
@@ -442,13 +422,6 @@ namespace Extract.DataEntry
         bool _dirty;
 
         /// <summary>
-        /// Indicates whether all highlights are currently being displayed (true) or if only the
-        /// highlights that relate to the selection in the DEP are being displayed (false).
-        /// </summary>
-        bool _showingAllHighlights;
-
-
-        /// <summary>
         /// Specifies whether the data entry controls and image viewer are currently being
         /// prevented from updating.
         /// </summary>
@@ -489,11 +462,6 @@ namespace Extract.DataEntry
         /// in _highlightColors.
         /// </summary>
         Color _defaultHighlightColor = Color.LightGreen;
-
-        /// <summary>
-        /// The title of the current DataEntry application.
-        /// </summary>
-        string _applicationTitle;
 
         /// <summary>
         /// A list of names of DataEntry controls that should remain disabled at all times.
@@ -553,18 +521,6 @@ namespace Extract.DataEntry
         Control _commentControl;
 
         /// <summary>
-        /// Specifies how the image viewer zoom/view is adjusted when new fields are selected.
-        /// </summary>
-        AutoZoomMode _autoZoomMode;
-
-        /// <summary>
-        /// The page space (context) that should be shown around an object selected when AutoZoom
-        /// mode is active. 0 indicates no context space should be shown around the current
-        /// selection where 1 indicates the maximum context space should be shown.
-        /// </summary>
-        double _autoZoomContext;
-
-        /// <summary>
         /// The size of the visible image region (in image coordinates) the last time the user
         /// manually adjusted zoom.
         /// </summary>
@@ -602,12 +558,6 @@ namespace Extract.DataEntry
         /// Indicates whether DrawHighlights is currently being processed.
         /// </summary>
         bool _drawingHighlights;
-
-        /// <summary>
-        /// Indicates whether tabbing should allow groups (rows) of attributes to be selected at a
-        /// time for controls in which group tabbing is enabled.
-        /// </summary>
-        bool _allowTabbingByGroup = true;
 
         /// <summary>
         /// Indicates whether the last navigation (selection change) that occured was done via the
@@ -721,6 +671,24 @@ namespace Extract.DataEntry
         #region Properties
 
         /// <summary>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IDataEntryApplication DataEntryApplication
+        {
+            get
+            {
+                return _dataEntryApp;
+            }
+
+            set
+            {
+                _dataEntryApp = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether the data has been modified since the last load or save operation.
         /// </summary>
         /// <value><see langword="true"/> if the data has been modified since the last load or
@@ -737,69 +705,6 @@ namespace Extract.DataEntry
             set
             {
                 _dirty = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether highlights for all data mapped to an <see cref="IDataEntryControl"/>
-        /// should be displayed in the <see cref="ImageViewer"/> or whether only highlights relating
-        /// to the currently selected fields should be displayed.
-        /// </summary>
-        /// <value><see langword="true"/> if highlights for all data mapped to an
-        /// <see cref="IDataEntryControl"/> is to be displayed or <see langword="false"/> if only
-        /// the highlights relating to the currently selected fields should be displayed.</value>
-        /// <returns><see langword="true"/> if highlights for all data mapped to an
-        /// <see cref="IDataEntryControl"/> are being displayed or <see langword="false"/> if only
-        /// the highlights relating to the currently selected fields are being displayed.</returns>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool ShowAllHighlights
-        {
-            get
-            {
-                return _showingAllHighlights;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _showingAllHighlights)
-                    {
-                        _showingAllHighlights = value;
-
-                        // Show or hide all highlights as appropriate.
-                        foreach (IAttribute attribute in _attributeHighlights.Keys)
-                        {
-                            // If _showAllHighlights is being set to true, show the highlight
-                            // (unless it is an indirect hint).
-                            if (value)
-                            {
-                                if (AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect)
-                                {
-                                    ShowAttributeHighlights(attribute, true);
-                                }
-                            }
-                            // Hide all other attributes as long as they are not part of the active
-                            // selection.
-                            else if (!_displayedAttributeHighlights.ContainsKey(attribute))
-                            {
-                                ShowAttributeHighlights(attribute, false);
-                            }
-                        }
-
-                        DrawHighlights(false);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI25120", ex);
-                }
-                finally
-                {
-                    // Ensure window updates and image viewer zooming are unlocked.
-                    LockControlUpdates(false);
-                }
             }
         }
 
@@ -1078,50 +983,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets or sets the title of the current DataEntry application.
-        /// </summary>
-        /// <value>The title of the current DataEntry application.</value>
-        /// <returns>The title of the current DataEntry application.</returns>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string ApplicationTitle
-        {
-            get
-            {
-                return _applicationTitle;
-            }
-
-            set
-            {
-                _applicationTitle = value;
-            }
-        }
-
-        /// <summary>
-        /// The comment associated with the DEP.
-        /// <para><b>NOTE:</b></para>
-        /// This property should be overriden if the verification task needs to support comments
-        /// so that the Comment property is associated with the control in which comments are
-        /// entered.
-        /// </summary>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public virtual string Comment
-        {
-            get
-            {
-                return (_commentControl == null) ? "" : _commentControl.Text;
-            }
-
-            set
-            {
-                if (_commentControl != null)
-                {
-                    _commentControl.Text = value;
-                }
-            }
-        }
-
-        /// <summary>
         /// Specifies the database connection to be used in data validation or auto-update queries.
         /// </summary>
         /// <value>The <see cref="DbConnection"/> to be used. (Can be <see langword="null"/> if one
@@ -1161,71 +1022,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Specifies how the <see cref="ImageViewer"/> zoom/view is adjusted when new fields are
-        /// selected.
-        /// </summary>
-        /// <value>An <see cref="AutoZoomMode"/> value specifying how the <see cref="ImageViewer"/>
-        /// zoom/view should be adjusted when new fields are selected.</value>
-        /// <returns>An <see cref="AutoZoomMode"/> value specifying how the <see cref="ImageViewer"/>
-        /// zoom/view is adjusted when new fields are selected.</returns>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public AutoZoomMode AutoZoomMode
-        {
-            get
-            {
-                return _autoZoomMode;
-            }
-
-            set
-            {
-                _autoZoomMode = value;
-            }
-        }
-
-        /// <summary>
-        /// The page space (context) that should be shown around an object selected when AutoZoom
-        /// mode is active. 0 indicates no context space should be shown around the current
-        /// selection where 1 indicates the maximum context space should be shown.
-        /// </summary>
-        /// <value>The page space (context) that should be shown around an object.</value>
-        /// <returns>The page space (context) that will be shown around an object.</returns>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public double AutoZoomContext
-        {
-            get
-            {
-                return _autoZoomContext;
-            }
-
-            set
-            {
-                _autoZoomContext = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether tabbing should allow groups (rows) of attributes to be selected a
-        /// a time for controls in which group tabbing is enabled.
-        /// </summary>
-        /// <value><see langword="true"/> if tabbing should allow a group (row) to be selected at a
-        /// for controls in which group tabbing is enabled.</value>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool AllowTabbingByGroup
-        {
-            get
-            {
-                return _allowTabbingByGroup;
-            }
-
-            set
-            {
-                _allowTabbingByGroup = value;
-            }
-        }
-
-        /// <summary>
         /// Gets the <see cref="IAttribute"/>s output from the most recent call to
         /// <see cref="SaveData"/>.
         /// </summary>
@@ -1257,7 +1053,19 @@ namespace Extract.DataEntry
         {
             get
             {
-                return (_changingImage || ControlUpdateReferenceCount > 0);
+                return (_changingData || ControlUpdateReferenceCount > 0);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s that represents
+        /// the currently loaded data.
+        /// </summary>
+        public IUnknownVector Attributes
+        {
+            get
+            {
+                return _attributes;
             }
         }
 
@@ -1300,7 +1108,6 @@ namespace Extract.DataEntry
                     // Unregister from previously subscribed-to events
                     if (_imageViewer != null)
                     {
-                        _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                         _imageViewer.CursorToolChanged -= HandleCursorToolChanged;
                         _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                         _imageViewer.PreviewKeyDown -= HandleImageViewerPreviewKeyDown;
@@ -1319,7 +1126,6 @@ namespace Extract.DataEntry
                     // Check if an image viewer was specified
                     if (_imageViewer != null)
                     {
-                        _imageViewer.ImageFileChanged += HandleImageFileChanged;
                         _imageViewer.CursorToolChanged += HandleCursorToolChanged;
                         _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                         _imageViewer.PreviewKeyDown += HandleImageViewerPreviewKeyDown;
@@ -1446,76 +1252,214 @@ namespace Extract.DataEntry
         #region Methods
 
         /// <summary>
-        /// Selects and activates the next unviewed <see cref="IAttribute"/>.
+        /// Loads the provided data in the <see cref="IDataEntryControl"/>s.
         /// </summary>
-        public void GoToNextUnviewed()
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
+        /// that represent the document's data.</param>
+        public void LoadData(IUnknownVector attributes)
         {
             try
             {
-                // The shortcut keys will remain enabled for this option; ignore the command if
-                // there is no document loaded.
-                if (!_imageViewer.IsImageAvailable)
-                {
-                    return;
-                }
-
                 using (new TemporaryWaitCursor())
                 {
-                    // Attempt to find and propagate the next unviewed attribute
-                    if (GetNextUnviewedAttribute() == null)
+                    // De-activate any existing control that is active to prevent problems with
+                    // last selected control remaining active when the next document is loaded.
+                    if (_activeDataControl != null)
                     {
-                        MessageBox.Show(this, "There are no unviewed items.", _applicationTitle,
-                            MessageBoxButtons.OK, MessageBoxIcon.Information,
-                            MessageBoxDefaultButton.Button1, 0);
-
-                        // If we failed to find any unviewed attributes, make sure 
-                        // _unviewedAttributeCount is zero and raise the UnviewedItemsFound event to 
-                        // indicate no unviewed items are available.
-                        _unviewedAttributeCount = 0;
-                        OnUnviewedItemsFound(false);
+                        _activeDataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
+                        _activeDataControl = null;
                     }
+
+                    // Prevent updates to the controls during the attribute propagation
+                    // that will occur as data is loaded.
+                    LockControlUpdates(true);
+
+                    // Ensure the data in the contols is cleared prior to loading any new data.
+                    ClearData();
+
+                    // Set flag to indicate that a document change is in progress so that highlights
+                    // are not redrawn as the spatial info of the controls are updated. Set this
+                    // after the call to ClearData (which will independently set and clear
+                    // _changingData)
+                    _changingData = true;
+
+                    // While data is loading, disable validation triggers. Unlike auto-update
+                    // triggers that need to be processed while data is loading, validation triggers
+                    // can wait until the data is loaded to prevent validation triggers from firing
+                    // more often than they have to.
+                    AttributeStatusInfo.EnableValidationTriggers(false);
+
+                    bool imageIsAvailable = _imageViewer.IsImageAvailable;
+
+                    if (imageIsAvailable)
+                    {
+                        // Calculate the size the error icon for invalid data should be on each
+                        // page and create a SpatialPageInfo entry for each page.
+                        for (int page = 1; page <= _imageViewer.PageCount; page++)
+                        {
+                            SetImageViewerPageNumber(page);
+
+                            _errorIconSizes[page] = new Size(
+                                (int)(_ERROR_ICON_SIZE * _imageViewer.ImageDpiX),
+                                (int)(_ERROR_ICON_SIZE * _imageViewer.ImageDpiY));
+                        }
+                        SetImageViewerPageNumber(1);
+
+                        // [DataEntry:693]
+                        // The attributes need to be released with FinalReleaseComObject to prevent
+                        // handle leaks.
+                        if (_mostRecentlySaveAttributes != null)
+                        {
+                            AttributeStatusInfo.ReleaseAttributes(_mostRecentlySaveAttributes);
+                            _mostRecentlySaveAttributes = null;
+                        }
+
+                        // If an image was loaded, look for and attempt to load corresponding data.
+                        _attributes = attributes;
+
+                        // Notify AttributeStatusInfo of the new attribute hierarchy
+                        AttributeStatusInfo.ResetData(_imageViewer.ImageFile, _attributes, _dbConnection);
+
+                        // Enable or disable swiping as appropriate.
+                        bool swipingEnabled = _activeDataControl != null &&
+                                              _activeDataControl.SupportsSwiping;
+
+                        OnSwipingStateChanged(new SwipingStateChangedEventArgs(swipingEnabled));
+
+                        // Populate all root level data with the retrieved data.
+                        foreach (IDataEntryControl dataControl in _rootLevelControls)
+                        {
+                            dataControl.SetAttributes(_attributes);
+                        }
+
+                        if (_commentControl != null)
+                        {
+                            _commentControl.Text = _dataEntryApp.DatabaseComment;
+                        }
+                    }
+
+                    // Mark any root-level attributes as propagated if they were not mapped to a 
+                    // control.
+                    int attributeCount = _attributes.Size();
+                    for (int i = 0; i < attributeCount; i++)
+                    {
+                        IAttribute attribute = (IAttribute)_attributes.At(i);
+                        if (AttributeStatusInfo.GetStatusInfo(attribute).OwningControl == null)
+                        {
+                            AttributeStatusInfo.MarkAsPropagated(attribute, true, true);
+                        }
+                    }
+
+                    // Enable/Disable all data controls per imageIsAvailable
+                    foreach (IDataEntryControl dataControl in _dataControls)
+                    {
+                        // Remove activate status from the active control.
+                        if (!imageIsAvailable && dataControl == _activeDataControl)
+                        {
+                            dataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
+                        }
+
+                        // Set the enabled status of every data control depending on the 
+                        // availability of data.
+                        Control control = (Control)dataControl;
+
+                        control.Enabled = imageIsAvailable && !dataControl.Disabled;
+                    }
+
+                    // Enable/Disable all non-data controls per imageIsAvailable
+                    foreach (Control control in _nonDataControls)
+                    {
+                        control.Enabled = imageIsAvailable;
+                    }
+
+                    // For as long as unpropagated attributes are found, propagate them and their 
+                    // subattributes so that all attributes that can be are mapped into controls.
+                    // This enables the entire attribute tree to be navigated forward and backward 
+                    // for all types of AttributeStatusInfo scans).
+                    Stack<IAttribute> unpropagatedAttributeGenealogy = new Stack<IAttribute>();
+                    while (!AttributeStatusInfo.HasBeenPropagated(_attributes, null,
+                        unpropagatedAttributeGenealogy))
+                    {
+                        PropagateAttributes(unpropagatedAttributeGenealogy, false, false);
+                        unpropagatedAttributeGenealogy.Clear();
+                    }
+
+                    // [DataEntry:166]
+                    // Re-propagate the attributes that were originally propagated.
+                    foreach (IDataEntryControl dataEntryControl in _rootLevelControls)
+                    {
+                        dataEntryControl.PropagateAttribute(null, false, false);
+                    }
+
+                    // After all the data is loaded, re-enable validation triggers.
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        AttributeStatusInfo.EnableValidationTriggers(true);
+                    }
+
+                    // Count the number of unviewed attributes in the newly loaded data.
+                    _unviewedAttributeCount = CountUnviewedItems();
+                    OnUnviewedItemsFound(_unviewedAttributeCount != 0);
+
+                    // Count the number of invalid attributes in the newly loaded data.
+                    _invalidAttributeCount = CountInvalidItems();
+                    OnInvalidItemsFound(_invalidAttributeCount != 0);
+
+                    // Create highlights for all attributes as long as a document is loaded.
+                    if (imageIsAvailable)
+                    {
+                        CreateAllAttributeHighlights(_attributes);
+                    }
+
+                    if (ControlUpdateReferenceCount != 0)
+                    {
+                        ExtractException ee = new ExtractException("ELI30028",
+                            "Application trace: Control update reference count non-zero");
+                        ee.Log();
+                    }
+                    // Set the _controlUpdateReferenceCount field rather than the property to avoid the
+                    // possibility of an UpdateEnded event until the document has finished loading.
+                    _controlUpdateReferenceCount = 0;
+                    _refreshActiveControlHighlights = false;
+                    _dirty = false;
+
+                    _changingData = false;
+
+                    DrawHighlights(true);
+
+                    // [DataEntry:432]
+                    // Some tasks (such as selecting the first control), must take place after the
+                    // ImageFileChanged event is complete. Use BeginInvoke to schedule
+                    // FinalizeDocumentLoad at the end of the current message queue.
+                    BeginInvoke(new ParameterlessDelegate(FinalizeDocumentLoad));
                 }
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI24645", ex);
-            }
-        }
-
-        /// <summary>
-        /// Selects and activates the next <see cref="IAttribute"/> whose data currently fails
-        /// validation.
-        /// </summary>
-        public void GoToNextInvalid()
-        {
-            try
-            {
-                // The shortcut keys will remain enabled for this option; ignore the command if
-                // there is no document loaded.
-                if (!_imageViewer.IsImageAvailable)
+                try
                 {
-                    return;
+                    // If any problem was encountered loading the data, clear the data again
+                    // to ensure the controls are in a useable state.
+                    ClearData();
+                }
+                catch (Exception ex2)
+                {
+                    ExtractException.Log("ELI24013", ex2);
                 }
 
-                using (new TemporaryWaitCursor())
-                {
-                    if (GetNextInvalidAttribute(true) == null)
-                    {
-                        MessageBox.Show(this, "There are no invalid items.", _applicationTitle,
-                            MessageBoxButtons.OK, MessageBoxIcon.Information,
-                            MessageBoxDefaultButton.Button1, 0);
+                // Ensure that the _changingData flag does not remain set.
+                _changingData = false;
 
-                        // If we failed to find any attributes with invalid data, make sure 
-                        // _invalidAttributeCount is zero and raise the InvalidItemsFound event to 
-                        // indicate no invalid items remain.
-                        _invalidAttributeCount = 0;
-                        OnInvalidItemsFound(false);
-                    }
+                ExtractException ee = new ExtractException("ELI23919", "Failed to load data!", ex);
+                if (_imageViewer.IsImageAvailable)
+                {
+                    ee.AddDebugData("FileName", _imageViewer.ImageFile, false);
                 }
+                ee.Display();
             }
-            catch (Exception ex)
+            finally
             {
-                ExtractException.Display("ELI24646", ex);
+                LockControlUpdates(false);
             }
         }
 
@@ -1579,6 +1523,80 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Selects and activates the next unviewed <see cref="IAttribute"/>.
+        /// </summary>
+        public void GoToNextUnviewed()
+        {
+            try
+            {
+                // The shortcut keys will remain enabled for this option; ignore the command if
+                // there is no document loaded.
+                if (!_imageViewer.IsImageAvailable)
+                {
+                    return;
+                }
+
+                using (new TemporaryWaitCursor())
+                {
+                    // Attempt to find and propagate the next unviewed attribute
+                    if (GetNextUnviewedAttribute() == null)
+                    {
+                        MessageBox.Show(this, "There are no unviewed items.", 
+                            _dataEntryApp.ApplicationTitle, MessageBoxButtons.OK,
+                            MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+
+                        // If we failed to find any unviewed attributes, make sure 
+                        // _unviewedAttributeCount is zero and raise the UnviewedItemsFound event to 
+                        // indicate no unviewed items are available.
+                        _unviewedAttributeCount = 0;
+                        OnUnviewedItemsFound(false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI24645", ex);
+            }
+        }
+
+        /// <summary>
+        /// Selects and activates the next <see cref="IAttribute"/> whose data currently fails
+        /// validation.
+        /// </summary>
+        public void GoToNextInvalid()
+        {
+            try
+            {
+                // The shortcut keys will remain enabled for this option; ignore the command if
+                // there is no document loaded.
+                if (!_imageViewer.IsImageAvailable)
+                {
+                    return;
+                }
+
+                using (new TemporaryWaitCursor())
+                {
+                    if (GetNextInvalidAttribute(true) == null)
+                    {
+                        MessageBox.Show(this, "There are no invalid items.", 
+                            _dataEntryApp.ApplicationTitle, MessageBoxButtons.OK,
+                            MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+
+                        // If we failed to find any attributes with invalid data, make sure 
+                        // _invalidAttributeCount is zero and raise the InvalidItemsFound event to 
+                        // indicate no invalid items remain.
+                        _invalidAttributeCount = 0;
+                        OnInvalidItemsFound(false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI24646", ex);
+            }
+        }
+
+        /// <summary>
         /// Toggles whether or not tooltip(s) for the active <see cref="IAttribute"/> are currently
         /// visible.
         /// </summary>
@@ -1618,7 +1636,7 @@ namespace Extract.DataEntry
 
                     // The error icons for selected attributes will re-display automatically,
                     // but if all highlights are showing, need to re-display all error icons.
-                    if (_showingAllHighlights)
+                    if (_dataEntryApp.ShowAllHighlights)
                     {
                         ShowAllErrorIcons(true);
                     }
@@ -1743,6 +1761,10 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Set flag to indicate that a document change is in progress so that highlights
+                // are not redrawn as the spatial info of the controls are updated.
+                _changingData = true;
+
                 // Clear any existing data in the controls. Do this before clearing any of the
                 // host's fields to avoid any possibility that clearing the controls triggers
                 // attributes to be added to already cleared fields.
@@ -1801,6 +1823,8 @@ namespace Extract.DataEntry
                 _hoverAttribute = null;
                 _displayedAttributeHighlights.Clear();
                 _attributeHighlights.Clear();
+                _newlyAddedAttributes.Clear();
+                _highlightAttributes.Clear();
 
                 // AttributeStatusInfo cannot persist any data from one document to the next as it can
                 // cause COM threading exceptions in FAM mode. Unload its data now.
@@ -1808,8 +1832,6 @@ namespace Extract.DataEntry
 
                 if (_attributes != null)
                 {
-                    AttributeStatusInfo.ReleaseAttributes(_attributes);
-
                     // Clear any existing attributes.
                     _attributes = new IUnknownVectorClass();
                 }
@@ -1818,7 +1840,11 @@ namespace Extract.DataEntry
                 // Since the data associated with the currently selected control has been cleared,
                 // set _activeDataControl to null so that the next control focus change is processed
                 // re-initializes the current selection even if the same control is still selected.
-                _activeDataControl = null;
+                if (_activeDataControl != null)
+                {
+                    _activeDataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
+                    _activeDataControl = null;
+                }
 
                 _selectedAttributesWithAcceptedHighlights = 0;
                 _selectedAttributesWithUnacceptedHighlights = 0;
@@ -1850,6 +1876,10 @@ namespace Extract.DataEntry
             {
                 throw ExtractException.AsExtractException("ELI25976", ex);
             }
+            finally
+            {
+                _changingData = false;
+            }
         }
 
         #endregion Methods
@@ -1880,11 +1910,6 @@ namespace Extract.DataEntry
         public event EventHandler<ItemSelectionChangedEventArgs> ItemSelectionChanged;
 
         /// <summary>
-        /// Raised when data associated with an image is loaded from disk.
-        /// </summary>
-        public event EventHandler<AttributesEventArgs> DataLoaded;
-
-        /// <summary>
         /// Indicates that the <see cref="IMessageFilter.PreFilterMessage"/> method has
         /// handled the <see cref="Message"/> and will return true.
         /// </summary>
@@ -1913,15 +1938,11 @@ namespace Extract.DataEntry
                 // Call the base OnLoad method
                 base.OnLoad(e);
 
-                // So that PreMessageFilter is called
-                Application.AddMessageFilter(this);
+                ExtractException.Assert("ELI30678", "Application data not initialized.",
+                    _dataEntryApp != null);
 
                 ExtractException.Assert("ELI25377", "Highlight colors not initialized!",
                     _highlightColors != null && _highlightColors.Length > 0);
-
-                AttributeStatusInfo.AttributeInitialized += HandleAttributeInitialized;
-                AttributeStatusInfo.ViewedStateChanged += HandleViewedStateChanged;
-                AttributeStatusInfo.ValidationStateChanged += HandleValidationStateChanged;
 
                 // Loop through all contained controls looking for controls that implement the 
                 // IDataEntryControl interface.  Registers events necessary to facilitate
@@ -1931,11 +1952,52 @@ namespace Extract.DataEntry
                 // Create and initialize smart tag support for all text controls.
                 InitializeSmartTagManager();
 
+                _dataEntryApp.ShowAllHighlightsChanged += HandleShowAllHighlightsChanged;
+
                 _isLoaded = true;
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI23679", ex);
+                ee.AddDebugData("Event Arguments", e, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.ParentChanged"/> event.
+        /// Overridden to handle the case that this panel was either added to or removed from the
+        /// application's DEP pane.
+        /// </summary>
+        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        protected override void OnParentChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnParentChanged(e);
+
+                if (Parent == null)
+                {
+                    // Don't allow PreFilterMessage to be called when the DEP is not loaded.
+                    Application.RemoveMessageFilter(this);
+
+                    AttributeStatusInfo.AttributeInitialized -= HandleAttributeInitialized;
+                    AttributeStatusInfo.ViewedStateChanged -= HandleViewedStateChanged;
+                    AttributeStatusInfo.ValidationStateChanged -= HandleValidationStateChanged;
+                }
+                else
+                {
+                    // So that PreFilterMessage is called
+                    Application.AddMessageFilter(this);
+
+                    AttributeStatusInfo.AttributeInitialized += HandleAttributeInitialized;
+                    AttributeStatusInfo.ViewedStateChanged += HandleViewedStateChanged;
+                    AttributeStatusInfo.ValidationStateChanged += HandleValidationStateChanged;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI30625", ex);
                 ee.AddDebugData("Event Arguments", e, false);
                 throw ee;
             }
@@ -2036,218 +2098,6 @@ namespace Extract.DataEntry
         #endregion Overrides
 
         #region Event Handlers
-
-        /// <summary>
-        /// Handles the case that a new document has been opened or that a document has been closed
-        /// by updating the <see cref="IDataEntryControl"/>s with any new document's associated 
-        /// data. (in the form of an <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s)
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">A <see cref="ImageFileChangedEventArgs"/> that contains the event data.
-        /// </param>
-        void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
-        {
-            // Set flag to indicate that a document change is in progress so that highlights
-            // are not redrawn as the spatial info of the controls are updated.
-            _changingImage = true;
-
-            try
-            {
-                using (new TemporaryWaitCursor())
-                {
-                    // De-activate any existing control that is active to prevent problems with
-                    // last selected control remaining active when the next document is loaded.
-                    if (_activeDataControl != null)
-                    {
-                        _activeDataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
-                        _activeDataControl = null;
-                    }
-
-                    // Prevent updates to the controls during the attribute propagation
-                    // that will occur as data is loaded.
-                    LockControlUpdates(true);
-
-                    // Ensure the data in the contols is cleared prior to loading any new data.
-                    ClearData();
-
-                    // While data is loading, disable validation triggers. Unlike auto-update
-                    // triggers that need to be processed while data is loading, validation triggers
-                    // can wait until the data is loaded to prevent validation triggers from firing
-                    // more often than they have to.
-                    AttributeStatusInfo.EnableValidationTriggers(false);
-
-                    bool imageIsAvailable = _imageViewer.IsImageAvailable;
-
-                    if (imageIsAvailable)
-                    {
-                        // Calculate the size the error icon for invalid data should be on each
-                        // page and create a SpatialPageInfo entry for each page.
-                        for (int page = 1; page <= _imageViewer.PageCount; page++)
-                        {
-                            SetImageViewerPageNumber(page);
-
-                            _errorIconSizes[page] = new Size(
-                                (int)(_ERROR_ICON_SIZE * _imageViewer.ImageDpiX),
-                                (int)(_ERROR_ICON_SIZE * _imageViewer.ImageDpiY));
-                        }
-                        SetImageViewerPageNumber(1);
-
-                        // [DataEntry:693]
-                        // The attributes need to be released with FinalReleaseComObject to prevent
-                        // handle leaks.
-                        if (_mostRecentlySaveAttributes != null)
-                        {
-                            AttributeStatusInfo.ReleaseAttributes(_mostRecentlySaveAttributes);
-                            _mostRecentlySaveAttributes = null;
-                        }
-
-                        // If an image was loaded, look for and attempt to load corresponding data.
-                        string dataFilename = e.FileName + ".voa";
-
-                        if (File.Exists(dataFilename))
-                        {
-                            _attributes.LoadFrom(e.FileName + ".voa", false);
-                        }
-
-                        OnDataLoaded(_attributes);
-
-                        // Notify AttributeStatusInfo of the new attribute hierarchy
-                        AttributeStatusInfo.ResetData(e.FileName, _attributes, _dbConnection);
-
-                        // Enable or disable swiping as appropriate.
-                        bool swipingEnabled = _activeDataControl != null &&
-                                              _activeDataControl.SupportsSwiping;
-
-                        OnSwipingStateChanged(new SwipingStateChangedEventArgs(swipingEnabled));
-
-                        // Populate all root level data with the retrieved data.
-                        foreach (IDataEntryControl dataControl in _rootLevelControls)
-                        {
-                            dataControl.SetAttributes(_attributes);
-                        }
-                    }
-
-                    // Mark any root-level attributes as propagated if they were not mapped to a 
-                    // control.
-                    int attributeCount = _attributes.Size();
-                    for (int i = 0; i < attributeCount; i++)
-                    {
-                        IAttribute attribute = (IAttribute)_attributes.At(i);
-                        if (AttributeStatusInfo.GetStatusInfo(attribute).OwningControl == null)
-                        {
-                            AttributeStatusInfo.MarkAsPropagated(attribute, true, true);
-                        }
-                    }
-
-                    // Enable/Disable all data controls per imageIsAvailable
-                    foreach (IDataEntryControl dataControl in _dataControls)
-                    {
-                        // Remove activate status from the active control.
-                        if (!imageIsAvailable && dataControl == _activeDataControl)
-                        {
-                            dataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
-                        }
-
-                        // Set the enabled status of every data control depending on the 
-                        // availability of data.
-                        Control control = (Control)dataControl;
-
-                        control.Enabled = imageIsAvailable && !dataControl.Disabled;
-                    }
-
-                    // Enable/Disable all non-data controls per imageIsAvailable
-                    foreach (Control control in _nonDataControls)
-                    {
-                        control.Enabled = imageIsAvailable;
-                    }
-
-                    // For as long as unpropagated attributes are found, propagate them and their 
-                    // subattributes so that all attributes that can be are mapped into controls.
-                    // This enables the entire attribute tree to be navigated forward and backward 
-                    // for all types of AttributeStatusInfo scans).
-                    Stack<IAttribute> unpropagatedAttributeGenealogy = new Stack<IAttribute>();
-                    while (!AttributeStatusInfo.HasBeenPropagated(_attributes, null,
-                        unpropagatedAttributeGenealogy))
-                    {
-                        PropagateAttributes(unpropagatedAttributeGenealogy, false, false);
-                        unpropagatedAttributeGenealogy.Clear();
-                    }
-
-                    // [DataEntry:166]
-                    // Re-propagate the attributes that were originally propagated.
-                    foreach (IDataEntryControl dataEntryControl in _rootLevelControls)
-                    {
-                        dataEntryControl.PropagateAttribute(null, false, false);
-                    }
-
-                    // After all the data is loaded, re-enable validation triggers.
-                    if (_imageViewer.IsImageAvailable)
-                    {
-                        AttributeStatusInfo.EnableValidationTriggers(true);
-                    }
-
-                    // Count the number of unviewed attributes in the newly loaded data.
-                    _unviewedAttributeCount = CountUnviewedItems();
-                    OnUnviewedItemsFound(_unviewedAttributeCount != 0);
-
-                    // Count the number of invalid attributes in the newly loaded data.
-                    _invalidAttributeCount = CountInvalidItems();
-                    OnInvalidItemsFound(_invalidAttributeCount != 0);
-
-                    // Create highlights for all attributes as long as a document is loaded.
-                    if (imageIsAvailable)
-                    {
-                        CreateAllAttributeHighlights(_attributes);
-                    }
-
-                    if (ControlUpdateReferenceCount != 0)
-                    {
-                        ExtractException ee = new ExtractException("ELI30028",
-                            "Application trace: Control update reference count non-zero");
-                        ee.Log();
-                    }
-                    // Set the _controlUpdateReferenceCount field rather than the property to avoid the
-                    // possibility of an UpdateEnded event until the document has finished loading.
-                    _controlUpdateReferenceCount = 0;
-                    _refreshActiveControlHighlights = false;
-                    _dirty = false;
-
-                    _changingImage = false;
-
-                    DrawHighlights(true);
-
-                    // [DataEntry:432]
-                    // Some tasks (such as selecting the first control), must take place after the
-                    // ImageFileChanged event is complete. Use BeginInvoke to schedule
-                    // FinalizeDocumentLoad at the end of the current message queue.
-                    BeginInvoke(new ParameterlessDelegate(FinalizeDocumentLoad));
-                }
-            }
-            catch (Exception ex)
-            {
-                try
-                {
-                    // If any problem was encountered loading the data, clear the data again
-                    // to ensure the controls are in a useable state.
-                    ClearData();
-                }
-                catch (Exception ex2)
-                {
-                    ExtractException.Log("ELI24013", ex2);
-                }
-
-                // Ensure that the _changingImage flag does not remain set.
-                _changingImage = false;
-
-                ExtractException ee = new ExtractException("ELI23919", "Failed to load data!", ex);
-                ee.AddDebugData("FileName", e.FileName, false);
-                ee.Display();
-            }
-            finally
-            {
-                LockControlUpdates(false);
-            }
-        }
 
         /// <summary>
         /// Handles a new cursor tool being selected so that we can keep track of the most recently
@@ -2360,7 +2210,7 @@ namespace Extract.DataEntry
 
                 // If a refresh of the highlights is needed and the control is going out of focus,
                 // refresh the highlights now.
-                if (_refreshActiveControlHighlights && !_changingImage)
+                if (_refreshActiveControlHighlights && !_changingData)
                 {
                     RefreshActiveControlHighlights();
                 }
@@ -2419,7 +2269,7 @@ namespace Extract.DataEntry
 
                     // The error icons for selected attributes will re-display automatically,
                     // but if all highlights are showing, need to re-display all error icons.
-                    if (_showingAllHighlights)
+                    if (_dataEntryApp.ShowAllHighlights)
                     {
                         ShowAllErrorIcons(true);
                     }
@@ -2502,7 +2352,7 @@ namespace Extract.DataEntry
 
                     // The error icons for selected attributes will re-display automatically,
                     // but if all highlights are showing, need to re-display all error icons.
-                    if (_showingAllHighlights)
+                    if (_dataEntryApp.ShowAllHighlights)
                     {
                         ShowAllErrorIcons(true);
                     }
@@ -2513,7 +2363,7 @@ namespace Extract.DataEntry
 
                 // If this is the active control and the image page is not in the process of being
                 // changed, redraw all highlights.
-                if (!_changingImage && dataControl == _activeDataControl)
+                if (!_changingData && dataControl == _activeDataControl)
                 {
                     DrawHighlights(true);
                 }
@@ -2594,14 +2444,18 @@ namespace Extract.DataEntry
                 // that the new attribute's value ends with that it has been pasted.
                 // NOTE: Don't call Clipboard.ContainsText separately... that seems to lead to
                 // "Clipboard operation did not succeed" exceptions in this case.
-                if (e.AutoUpdatedAttributes.Count == 0 &&
-                    AttributeStatusInfo.GetOwningControl(e.Attribute).ClearClipboardOnPaste)
+                if (e.AutoUpdatedAttributes.Count == 0)
                 {
-                    string text = Clipboard.GetText();
-
-                    if (e.Attribute.Value.String.EndsWith(text, StringComparison.Ordinal))
+                    IDataEntryControl owningControl =
+                        AttributeStatusInfo.GetOwningControl(e.Attribute);
+                    if (owningControl != null && owningControl.ClearClipboardOnPaste)
                     {
-                        Clipboard.Clear();
+                        string text = Clipboard.GetText();
+
+                        if (e.Attribute.Value.String.EndsWith(text, StringComparison.Ordinal))
+                        {
+                            Clipboard.Clear();
+                        }
                     }
                 }
 
@@ -2622,7 +2476,7 @@ namespace Extract.DataEntry
 
                     // Update the highlights as long as image is not currently loading or a swipe
                     // is not currently in progress.
-                    if (!_changingImage && !_processingSwipe)
+                    if (!_changingData && !_processingSwipe)
                     {
                         DrawHighlights(false);
                     }
@@ -2633,7 +2487,7 @@ namespace Extract.DataEntry
                 // [DataEntry:329]
                 // Don't accept the text value if the value modification is happening as a
                 // result of a swipe.
-                if (!_changingImage && _activeDataControl != null && !_processingSwipe
+                if (!_changingData && _activeDataControl != null && !_processingSwipe
                     && e.AcceptSpatialInfo)
                 {
                     List<IAttribute> activeAttributes;
@@ -2933,7 +2787,7 @@ namespace Extract.DataEntry
 
                 // Keep track of newly created attributes so that empty ones can be marked as
                 // viewed.
-                if (!_changingImage)
+                if (!_changingData)
                 {
                     _newlyAddedAttributes.Add(e.Attribute);
                 }
@@ -2996,7 +2850,7 @@ namespace Extract.DataEntry
                 // Add an image viewer error icon if the data is now invalid.
                 else
                 {
-                    CreateAttributeErrorIcon(e.Attribute, _showingAllHighlights);
+                    CreateAttributeErrorIcon(e.Attribute, _dataEntryApp.ShowAllHighlights);
                 }
 
                 DrawHighlights(false);
@@ -3201,6 +3055,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                _dataEntryApp.DatabaseComment = _commentControl.Text;
+
                 OnDataChanged();
             }
             catch (Exception ex)
@@ -3341,6 +3197,44 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI29143", ex);
                 ee.AddDebugData("Event Data", e, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the value of <see cref="IDataEntryApplication.ShowAllHighlights"/>
+        /// has changed.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        void HandleShowAllHighlightsChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // Show or hide all highlights as appropriate.
+                foreach (IAttribute attribute in _attributeHighlights.Keys)
+                {
+                    // If _showAllHighlights is being set to true, show the highlight
+                    // (unless it is an indirect hint).
+                    if (_dataEntryApp.ShowAllHighlights)
+                    {
+                        if (AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect)
+                        {
+                            ShowAttributeHighlights(attribute, true);
+                        }
+                    }
+                    // Hide all other attributes as long as they are not part of the active
+                    // selection.
+                    else if (!_displayedAttributeHighlights.ContainsKey(attribute))
+                    {
+                        ShowAttributeHighlights(attribute, false);
+                    }
+                }
+
+                DrawHighlights(false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30676", ex);
             }
         }
 
@@ -3747,11 +3641,11 @@ namespace Extract.DataEntry
             AttributeStatusInfo.EndEdit();
 
             Stack<IAttribute> nextTabStopGenealogy = null;
-            bool selectGroup = _allowTabbingByGroup;
+            bool selectGroup = _dataEntryApp.AllowTabbingByGroup;
 
-            if (_allowTabbingByGroup)
+            if (_dataEntryApp.AllowTabbingByGroup)
             {
-                // If _allowTabbingByGroup and a group is currently selected,
+                // If _dataEntryApp.AllowTabbingByGroup and a group is currently selected,
                 // use GetNextTabGroupAttribute to search for the next attribute
                 // group (rather than tab stop attribute) in controls that support
                 // attribute groups. (tab stops will be found in controls that
@@ -3924,18 +3818,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Raises the <see cref="DataLoaded"/> event.
-        /// </summary>
-        /// <param name="attributes">The <see cref="IAttribute"/>s that were loaded.</param>
-        void OnDataLoaded(IUnknownVector attributes)
-        {
-            if (DataLoaded != null)
-            {
-                DataLoaded(this, new AttributesEventArgs(attributes));
-            }
-        }
-
-        /// <summary>
         /// Renders the <see cref="CompositeHighlightLayerObject"/>s associated with the 
         /// <see cref="IDataEntryControl"/>s. 
         /// </summary>
@@ -3950,7 +3832,7 @@ namespace Extract.DataEntry
                 // To avoid unnecessary drawing, wait until we are done loading a document or a
                 // control is done with an update before attempting to display any layer objects.
                 // Also, ensure against resursive calls.
-                if (_changingImage || _drawingHighlights || ControlUpdateReferenceCount > 0)
+                if (_changingData || _drawingHighlights || ControlUpdateReferenceCount > 0)
                 {
                     return;
                 }
@@ -4159,9 +4041,9 @@ namespace Extract.DataEntry
                 // visible anymore.
                 foreach (IAttribute attribute in _displayedAttributeHighlights.Keys)
                 {
-                    if (_showingAllHighlights)
+                    if (_dataEntryApp.ShowAllHighlights)
                     {
-                        // If _showingAllHighlights, only indirect hints need to be hidden.
+                        // If ShowAllHighlights, only indirect hints need to be hidden.
                         if (AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
                         {
                             ShowAttributeHighlights(attribute, false);
@@ -4305,7 +4187,7 @@ namespace Extract.DataEntry
                 int xPadAmount = 3;
                 int yPadAmount = 3;
 
-                if (_autoZoomMode == AutoZoomMode.NoZoom)
+                if (_dataEntryApp.AutoZoomMode == AutoZoomMode.NoZoom)
                 {
                     // If the selected object is already completely visible, there is nothing to do.
                     if (currentViewRegion.Contains(newViewRegion))
@@ -4330,7 +4212,7 @@ namespace Extract.DataEntry
                     newViewRegion = currentViewRegion;
                     newViewRegion.Offset(xOffset, yOffset);
                 }
-                else if (_autoZoomMode == AutoZoomMode.ZoomOutIfNecessary)
+                else if (_dataEntryApp.AutoZoomMode == AutoZoomMode.ZoomOutIfNecessary)
                 {
                     // Determine the amount the current view must be resized to get back to the last
                     // manual zoom level.
@@ -4375,7 +4257,7 @@ namespace Extract.DataEntry
                         }
                     }
                 }
-                else // _autoZoomMode == AutoZoomMode.AutoZoom
+                else // _dataEntryApp.AutoZoomMode == AutoZoomMode.AutoZoom
                 {
                     // Determine the maximum amount of context space that can be added based on a
                     // percentage of the smaller dimension.
@@ -4384,9 +4266,9 @@ namespace Extract.DataEntry
                     int maxPadAmount = (int)(smallerDimension * _AUTO_ZOOM_MAX_CONTEXT) / 2;
 
                     // If using auto-zoom, translate the zoomContext percentage into a value that
-                    // grows exponentially from 0 to 1 so that the more _autoZoomContext approaches
-                    // 1, the text pixels are being padded.
-                    double padFactor = Math.Pow(_autoZoomContext, 2);
+                    // grows exponentially from 0 to 1 so that the more _dataEntryApp.AutoZoomContext
+                    // approaches 1, the text pixels are being padded.
+                    double padFactor = Math.Pow(_dataEntryApp.AutoZoomContext, 2);
 
                     // Calculate the pad amounts as a fraction of the maxPadAmount specified determined
                     // using padFactor.
@@ -4789,7 +4671,7 @@ namespace Extract.DataEntry
         /// _unviewedAttributeCount <see langword="false"/> to decrement it.</param>
         void UpdateUnviewedCount(bool increment)
         {
-            if (_changingImage)
+            if (_changingData)
             {
                 return;
             }
@@ -4843,7 +4725,7 @@ namespace Extract.DataEntry
         /// _invalidAttributeCount <see langword="false"/> to decrement it.</param>
         void UpdateInvalidCount(bool increment)
         {
-            if (_changingImage)
+            if (_changingData)
             {
                 return;
             }
@@ -5871,9 +5753,9 @@ namespace Extract.DataEntry
                     "Unable to show highlight for unmapped attribute!", owningControl != null);
 
                 // Determine whether the highlight should be visible be default based on
-                // _showingAllHighlights and whether the highlight is associated with an indirect
+                // ShowAllHighlights and whether the highlight is associated with an indirect
                 // hint.
-                bool makeVisible = _showingAllHighlights;
+                bool makeVisible = _dataEntryApp.ShowAllHighlights;
                 if (makeVisible)
                 {
                     if (AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
@@ -5910,9 +5792,9 @@ namespace Extract.DataEntry
                     bool makeVisible = false;
                     
                     // Determines whether the highlights should default as visible based on
-                    // _showingAllHighlights, how many attributes are selected, and whether the
+                    // ShowAllHighlights, how many attributes are selected, and whether the
                     // spatial info represents an indirect hint.
-                    if (_showingAllHighlights)
+                    if (_dataEntryApp.ShowAllHighlights)
                     {
                         if (_controlAttributes[_activeDataControl].Count == 1 &&
                             _controlAttributes[_activeDataControl][0] == attribute)
@@ -6378,6 +6260,8 @@ namespace Extract.DataEntry
                 OnItemSelectionChanged();
 
                 OnUpdateEnded(new EventArgs());
+
+                _dirty = false;
             }
             catch (Exception ex)
             {

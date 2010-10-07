@@ -615,6 +615,11 @@ namespace Extract.DataEntry
                     validationTrigger.Dispose();
                 }
                 _validationTriggers.Clear();
+
+                if (_attributes != null)
+                {
+                    AttributeStatusInfo.ReleaseAttributes(_attributes);
+                }
             }
             catch (Exception ex)
             {
@@ -2553,6 +2558,11 @@ namespace Extract.DataEntry
         /// FinalReleaseComObject on each. This needs to be done due to the assignment of
         /// <see cref="AttributeStatusInfo"/> objects as the DataObject member of an attribute.
         /// (If this is not done, handles are leaked).
+        /// <b><para>Important:</para></b>
+        /// Call DeleteAttribute rather than ReleaseAttributes for any attributes removed while the
+        /// DEP is current loaded or in the process of being loaded. DeleteAttribute will raise
+        /// proper events to remove references to the Attribute, but if ReleaseAttributes is used,
+        /// those reference may remain.
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> containing the
         /// <see cref="IAttribute"/>s that need to be freed.

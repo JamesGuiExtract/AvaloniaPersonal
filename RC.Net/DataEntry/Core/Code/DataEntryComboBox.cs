@@ -170,6 +170,11 @@ namespace Extract.DataEntry
         /// </summary>
         bool _autoCompleteUpdatePending;
 
+        /// <summary>
+        /// Indicates whether the items in the combo box are currently being updated.
+        /// </summary>
+        bool _updatingComboBoxItems;
+
         #endregion Fields
 
         #region Delegates
@@ -580,8 +585,10 @@ namespace Extract.DataEntry
             {
                 base.OnTextChanged(e);
 
-                // Only apply data if the combo box is currently mapped.
-                if (_attribute != null)
+                // Only apply data if the combo box is currently mapped and we 
+                if (_attribute != null &&
+                    (!_updatingComboBoxItems || 
+                        !string.IsNullOrEmpty(Text) || string.IsNullOrEmpty(_originalValue)))
                 {
                     AttributeStatusInfo.SetValue(_attribute, Text, true, false);
                 }
@@ -603,7 +610,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                base.OnSelectedItemChanged(e);
+                base.OnSelectedIndexChanged(e);
 
                 // Only apply data if the combo box is currently mapped.
                 if (_attribute != null)
@@ -744,7 +751,10 @@ namespace Extract.DataEntry
                         {
                             _originalValue = value;
                         }
-                        else
+                        // Don't clear the original value if we are currently updating the combo box
+                        // items since the update will require the current value to be cleared and
+                        // then reset.
+                        else if (!_updatingComboBoxItems)
                         {
                             _originalValue = null;
                         }
@@ -1553,48 +1563,68 @@ namespace Extract.DataEntry
         /// </summary>
         void UpdateComboBoxItemsDirect()
         {
-            // If the host reports that an update is in progress, delay updating the auto-complete
-            // list since the update may otherwise result in the auto-complete list being changed
-            // multiple times before the update is over.
-            if (DataEntryControlHost != null && DataEntryControlHost.UpdateInProgress)
+            try
             {
-                if (!_autoCompleteUpdatePending)
+                _updatingComboBoxItems = true;
+
+                // If the host reports that an update is in progress, delay updating the auto-complete
+                // list since the update may otherwise result in the auto-complete list being changed
+                // multiple times before the update is over.
+                if (DataEntryControlHost != null && DataEntryControlHost.UpdateInProgress)
                 {
-                    _autoCompleteUpdatePending = true;
-                    DataEntryControlHost.UpdateEnded += HandleDataEntryControlHostUpdateEnded;
+                    if (!_autoCompleteUpdatePending)
+                    {
+                        _autoCompleteUpdatePending = true;
+                        DataEntryControlHost.UpdateEnded += HandleDataEntryControlHostUpdateEnded;
+                    }
+
+                    return;
+                }
+                else if (_autoCompleteUpdatePending)
+                {
+                    DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
+                    _autoCompleteUpdatePending = false;
                 }
 
-                return;
+                // Get updated values for the auto-complete fields if an update is required.
+                AutoCompleteMode autoCompleteMode = AutoCompleteMode;
+                AutoCompleteSource autoCompleteSource = AutoCompleteSource;
+                AutoCompleteStringCollection autoCompleteCollection = AutoCompleteCustomSource;
+                string[] autoCompleteValues;
+                if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
+                        ref autoCompleteSource, ref autoCompleteCollection, out autoCompleteValues))
+                {
+                    if (DropDownStyle != ComboBoxStyle.DropDownList)
+                    {
+                        AutoCompleteMode = autoCompleteMode;
+                        AutoCompleteSource = autoCompleteSource;
+                        AutoCompleteCustomSource = autoCompleteCollection;
+                    }
+                    // [DataEntry:906]
+                    // If the comboBox is configured as a DropDownList and there is already a value in
+                    // in the comboBox, restore it once we are done updating the list items.
+                    else if (string.IsNullOrEmpty(_originalValue) && !string.IsNullOrEmpty(Text))
+                    {
+                        _originalValue = Text;
+                    }
+
+                    Items.Clear();
+                    Items.AddRange(autoCompleteValues);
+
+                    // Restore the original value
+                    if (!string.IsNullOrEmpty(_originalValue) && Items.Contains(_originalValue))
+                    {
+                        Text = _originalValue;
+                    }
+                }
             }
-            else if (_autoCompleteUpdatePending)
+            catch (Exception ex)
             {
-                DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
-                _autoCompleteUpdatePending = false;
+                ExtractException.AsExtractException("ELI30629", ex);
             }
-
-            // Get updated values for the auto-complete fields if an update is required.
-            AutoCompleteMode autoCompleteMode = AutoCompleteMode;
-            AutoCompleteSource autoCompleteSource = AutoCompleteSource;
-            AutoCompleteStringCollection autoCompleteCollection = AutoCompleteCustomSource;
-            string[] autoCompleteValues;
-            if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
-                    ref autoCompleteSource, ref autoCompleteCollection, out autoCompleteValues))
+            finally
             {
-                if (DropDownStyle != ComboBoxStyle.DropDownList)
-                {
-                    AutoCompleteMode = autoCompleteMode;
-                    AutoCompleteSource = autoCompleteSource;
-                    AutoCompleteCustomSource = autoCompleteCollection;
-                }
-
-                Items.Clear();
-                Items.AddRange(autoCompleteValues);
-
-                // Restore the original value
-                if (!string.IsNullOrEmpty(_originalValue) && Items.Contains(_originalValue))
-                {
-                    Text = _originalValue;
-                }
+                _updatingComboBoxItems = false;
             }
         }
 

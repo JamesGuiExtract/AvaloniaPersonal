@@ -184,6 +184,38 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Gets or sets <see cref="ShortcutHandler"/> to be called when one of the specified
+        /// keyboard combinations is used.
+        /// </summary>
+        public ShortcutHandler ShortcutHandler
+        {
+            get
+            {
+                return _shortcutHandler;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_shortcutHandler != value)
+                    {
+                        _shortcutHandler = value;
+
+                        if (_enabled || _shortcutsAlwaysEnabled)
+                        {
+                            EnableShortcuts(true);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI30679", ex);
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Private Members

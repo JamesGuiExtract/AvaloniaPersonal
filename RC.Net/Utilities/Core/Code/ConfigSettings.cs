@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization.Configuration;
+using System.Xml.XPath;
 
 namespace Extract.Utilities
 {
@@ -123,6 +124,27 @@ namespace Extract.Utilities
         /// should be created if there is no config file at the specified location,
         /// <see langword="false"/> if an error should occur if the file is missing.</param>
         public ConfigSettings(string configFileName, bool dynamic, bool createIfMissing)
+            : this(configFileName, null, dynamic, createIfMissing)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new ConfigSettings instance.
+        /// </summary>
+        /// <param name="configFileName">The config file to use as a source for the settings.
+        /// </param>
+        /// <param name="defaultConfigFileName">If not <see langword="null"/>, settings not present
+        /// in <paramref name="configFileName"/> may be provided defaults from this config file.
+        /// </param>
+        /// <param name="dynamic">If <see langword="true"/>, properties will be saved to disk as 
+        /// soon as they are modified and re-freshed from disk as necessary every time the Settings 
+        /// property is accessed. If <see langword="false"/> the propeties will only be saved to 
+        /// disk on-demand and will never be refreshed from disk.</param>
+        /// <param name="createIfMissing"><see langword="true"/> if a new config file instance
+        /// should be created if there is no config file at the specified location,
+        /// <see langword="false"/> if an error should occur if the file is missing.</param>
+        public ConfigSettings(string configFileName, string defaultConfigFileName, bool dynamic,
+            bool createIfMissing)
         {
             try
             {
@@ -154,6 +176,21 @@ namespace Extract.Utilities
                             ee.AddDebugData("Filename", configFileName, false);
                             throw ee;
                         }
+                    }
+
+                    // If a separate config file has been specified to provide overridable defaults,
+                    // initialize those defaults before loading the primary config file.
+                    if (!string.IsNullOrEmpty(defaultConfigFileName))
+                    {
+                        // Open the config file
+                        _configFileMap.ExeConfigFilename = defaultConfigFileName;
+                        _config = ConfigurationManager.OpenMappedExeConfiguration(
+                            _configFileMap, ConfigurationUserLevel.None);
+
+                        // Load the settings (_OBJECT_SETTINGS_GROUP settings will be read at the time
+                        // ApplyObjectSettings is called).
+                        LoadSectionInformation(_APPLICATION_SETTINGS_GROUP);
+                        LoadSectionInformation(_USER_SETTINGS_GROUP);
                     }
 
                     // Open the config file
@@ -244,6 +281,40 @@ namespace Extract.Utilities
             {
                 ExtractException ee = new ExtractException("ELI28803",
                     "Failed to apply config file settings!", ex);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Gets the XML associated with the specified section.
+        /// </summary>
+        /// <param name="sectionName">The name of the section to get.</param>
+        /// <returns>An <see cref="IXPathNavigable"/> initialized to the specified section or
+        /// <see langword="null"/> if the section could not be found.</returns>
+        public IXPathNavigable GetSectionXml(string sectionName)
+        {
+            try
+            {
+                 // Locate the objectSettings group
+                DefaultSection section = (DefaultSection)_config.Sections[sectionName];
+
+                // Assuming we found an appropriate section, retrieve the XML 
+                if (section != null)
+                {
+                    XmlDocument xmlDocument = new XmlDocument();
+                    xmlDocument.InnerXml = section.SectionInformation.GetRawXml();
+                    return xmlDocument.FirstChild as IXPathNavigable;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI30546",
+                    "Failed to load configuration section.", ex);
+                ee.AddDebugData("Section", sectionName, false);
                 throw ee;
             }
         }
