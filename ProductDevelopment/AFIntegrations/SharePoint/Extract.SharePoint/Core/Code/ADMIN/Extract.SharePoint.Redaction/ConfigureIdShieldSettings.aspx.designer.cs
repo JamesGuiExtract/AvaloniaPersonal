@@ -58,22 +58,13 @@ namespace Extract.SharePoint.Redaction.Layouts {
         protected global::System.Web.UI.WebControls.TextBox textExceptionIpAddress;
         
         /// <summary>
-        /// buttonOk control.
+        /// buttonSave control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button buttonOk;
-        
-        /// <summary>
-        /// buttonCancel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button buttonCancel;
+        protected global::System.Web.UI.WebControls.Button buttonSave;
         
         /// <summary>
         /// panelWatchedFolders control.

@@ -51,8 +51,7 @@
     </tr>
     <tr>
         <td align="right">
-            <asp:Button ID="buttonOk" runat="server" Text="OK" OnClick="HandleOkButtonClick" />
-            <asp:Button ID="buttonCancel" runat="server" Text="Cancel" OnClick="HandleCancelButtonClick" />
+            <asp:Button ID="buttonSave" runat="server" Text="Save" OnClick="HandleSaveButtonClick" />
         </td>
     </tr>
 </table>

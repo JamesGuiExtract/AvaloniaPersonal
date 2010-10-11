@@ -181,7 +181,7 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        protected void HandleOkButtonClick(object sender, EventArgs e)
+        protected void HandleSaveButtonClick(object sender, EventArgs e)
         {
             if (!IsValid)
             {
@@ -201,6 +201,8 @@ namespace Extract.SharePoint.Redaction.Layouts
                 settings.LocalWorkingFolder = folder;
                 settings.ExceptionServiceIPAddress = textExceptionIpAddress.Text.Trim();
                 settings.Update();
+
+                DisplaySettingsUpdatedMessage();
             }
             catch (Exception ex)
             {
@@ -208,24 +210,6 @@ namespace Extract.SharePoint.Redaction.Layouts
                     "ELI30553");
                 throw;
             }
-
-            // Redirect back to the application management page
-            // This method raises a thread aborted exception (by design) and so should not
-            // be wrapped in a try catch
-            SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Default, this.Context);
-        }
-
-        /// <summary>
-        /// Handles the cancel button click from the configuration page
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        protected void HandleCancelButtonClick(object sender, EventArgs e)
-        {
-            // Redirect back to the application management page
-            // This method raises a thread aborted exception (by design) and so should not
-            // be wrapped in a try catch
-            SPUtility.Redirect("/applications.aspx", SPRedirectFlags.Default, this.Context);
         }
 
         /// <summary>
@@ -263,6 +247,24 @@ namespace Extract.SharePoint.Redaction.Layouts
                 {
                     listWatchedFolders.Items.Add(key);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Displays the "Settings updated" message to the user when the save
+        /// button is clicked.
+        /// </summary>
+        protected void DisplaySettingsUpdatedMessage()
+        {
+            string csname = "PopupScript";
+            Type cstype = GetType();
+
+            ClientScriptManager cs = Page.ClientScript;
+
+            if (!cs.IsStartupScriptRegistered(cstype, csname))
+            {
+                string text = "alert('Settings updated.');";
+                cs.RegisterStartupScript(cstype, csname, text, true);
             }
         }
     }

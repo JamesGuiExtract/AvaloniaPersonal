@@ -33,9 +33,9 @@ namespace Extract.SharePoint.Redaction
         string _folderSettingsSerializationString = string.Empty;
 
         /// <summary>
-        /// The output folder that files should be written to for processing
+        /// The working folder that files should be written to for processing
         /// </summary>
-        string _outputFolder = string.Empty;
+        string _workingFolder = string.Empty;
 
         /// <summary>
         /// Collection of zero byte files from the add event
@@ -217,7 +217,7 @@ namespace Extract.SharePoint.Redaction
                 }
 
                 // Check for an output folder (if none is configured then do nothing)
-                if (!string.IsNullOrEmpty(_outputFolder))
+                if (!string.IsNullOrEmpty(_workingFolder))
                 {
                     // Get the folder name for the item
                     string folder = item.Url;
@@ -262,7 +262,7 @@ namespace Extract.SharePoint.Redaction
                                     // get the folder name without the leading '/' and
                                     // convert all other '/' to '\'
                                     folder = folder.Substring(1).Replace('/', '\\');
-                                    string outputFolder = Path.Combine(_outputFolder, folder);
+                                    string outputFolder = Path.Combine(_workingFolder, folder);
                                     if (!Directory.Exists(outputFolder))
                                     {
                                         Directory.CreateDirectory(outputFolder);
@@ -366,7 +366,7 @@ namespace Extract.SharePoint.Redaction
                 IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
                 if (settings == null)
                 {
-                    _outputFolder = string.Empty;
+                    _workingFolder = string.Empty;
                     _folderSettings = null;
                     _folderSettingsSerializationString = string.Empty;
                     return;
@@ -382,7 +382,23 @@ namespace Extract.SharePoint.Redaction
 
                 if (!string.IsNullOrEmpty(settings.LocalWorkingFolder))
                 {
-                    _outputFolder = Path.Combine(settings.LocalWorkingFolder, siteId.ToString());
+                    using (SPSite site = new SPSite(siteId))
+                    {
+                        // Get the site title and remove any invalid path characters
+                        // from it
+                        string rootWebTitle = site.RootWeb.Title;
+                        char[] invalid = Path.GetInvalidPathChars();
+                        int index = rootWebTitle.IndexOfAny(invalid, 0);
+                        while (index != -1)
+                        {
+                            rootWebTitle = rootWebTitle.Remove(index);
+                            index = rootWebTitle.IndexOfAny(invalid, 0);
+                        }
+
+                        // Working folder is root <WorkingFolder>/<SiteTitle>_<SiteGuid>
+                        _workingFolder = Path.Combine(settings.LocalWorkingFolder,
+                            rootWebTitle + "_" + siteId.ToString());
+                    }
                 }
 
                 _zeroByteFiles = new HashSet<Guid>(settings.AddedZeroByteFiles);

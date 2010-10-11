@@ -53,13 +53,6 @@ namespace Extract.SharePoint.Redaction.Features
             {
                 IdShieldHelper.LogException(ex, ErrorCategoryId.Feature, "ELI30591");
             }
-            finally
-            {
-                if (site != null)
-                {
-                    site.Dispose();
-                }
-            }
 
             base.FeatureActivated(properties);
         }
@@ -96,13 +89,6 @@ namespace Extract.SharePoint.Redaction.Features
             catch (Exception ex)
             {
                 IdShieldHelper.LogException(ex, ErrorCategoryId.Feature, "ELI30592");
-            }
-            finally
-            {
-                if (site != null)
-                {
-                    site.Dispose();
-                }
             }
 
             base.FeatureDeactivating(properties);
