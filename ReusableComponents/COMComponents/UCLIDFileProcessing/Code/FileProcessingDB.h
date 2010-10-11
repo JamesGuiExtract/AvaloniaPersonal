@@ -706,6 +706,98 @@ private:
 	_RecordsetPtr getFileActionStatusSet(_ConnectionPtr& ipConnection, long nFileID, long nActionID);
 
 	void validateLicense();
+
+	// Internal implementation methods
+	bool DefineNewAction_Internal(bool bDBLocked, BSTR strAction, long* pnID);
+	bool DeleteAction_Internal(bool bDBLocked, BSTR strAction);
+	bool GetActions_Internal(bool bDBLocked, IStrToStrMap * * pmapActionNameToID);
+	bool AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR strAction, EFilePriority ePriority,
+		VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
+		EActionStatus eNewStatus, VARIANT_BOOL * pbAlreadyExists,
+		EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord);
+	bool RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR strAction);
+	bool NotifyFileProcessed_Internal(bool bDBLocked, long nFileID,  BSTR strAction);
+	bool NotifyFileFailed_Internal(bool bDBLocked, long nFileID,  BSTR strAction,  BSTR strException);
+	bool SetFileStatusToPending_Internal(bool bDBLocked, long nFileID,  BSTR strAction);
+	bool SetFileStatusToUnattempted_Internal(bool bDBLocked, long nFileID,  BSTR strAction);
+	bool SetFileStatusToSkipped_Internal(bool bDBLocked, long nFileID, BSTR strAction,
+		VARIANT_BOOL bRemovePreviousSkipped);
+	bool GetFileStatus_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
+		VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus);
+	bool SearchAndModifyFileStatus_Internal(bool bDBLocked,  
+		long nWhereActionID,  EActionStatus eWhereStatus,  long nToActionID, EActionStatus eToStatus,
+		BSTR bstrSkippedFromUserName, long nFromActionID, long * pnNumRecordsModified);
+	bool SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAction,  EActionStatus eStatus);
+	bool SetStatusForFile_Internal(bool bDBLocked, long nID,  BSTR strAction,  EActionStatus eStatus,  
+		EActionStatus * poldStatus);
+	bool GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
+		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
+	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
+	bool GetStats_Internal(bool bDBLocked, long nActionID, IActionStatistics* *pStats);
+	bool CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction);
+	bool RenameAction_Internal(bool bDBLocked, long nActionID, BSTR strNewActionName);
+	bool Clear_Internal(bool bDBLocked, VARIANT_BOOL vbRetainUserValues);
+	bool ExportFileList_Internal(bool bDBLocked, BSTR strQuery, BSTR strOutputFileName,
+		IRandomMathCondition* pRandomCondition, long *pnNumRecordsOutput);
+	bool GetActionID_Internal(bool bDBLocked, BSTR bstrActionName, long* pnActionID); 
+	bool SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, BSTR bstrSettingValue, 
+		VARIANT_BOOL vbSetIfExists);
+	bool GetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, BSTR* pbstrSettingValue);
+	bool GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery, _Recordset** ppVal);
+	bool GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, long *pnFileID);
+	bool GetActionName_Internal(bool bDBLocked, long nActionID, BSTR *pbstrActionName);
+	bool NotifyFileSkipped_Internal(bool bDBLocked, long nFileID, long nActionID);
+	bool SetFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID, BSTR bstrComment);
+	bool GetFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID, 
+		BSTR* pbstrComment);
+	bool ClearFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID);
+	bool ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR bstrQueryFrom, 
+		BSTR bstrToAction, EActionStatus eaStatus, BSTR bstrFromAction, 
+		IRandomMathCondition* pRandomCondition, long* pnNumRecordsModified);
+	bool GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags);
+	bool GetTagNames_Internal(bool bDBLocked, IVariantVector **ppTagNames);
+	bool HasTags_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal);
+	bool TagFile_Internal(bool bDBLocked, long nFileID, BSTR bstrTagName);
+	bool UntagFile_Internal(bool bDBLocked, long nFileID, BSTR bstrTagName);
+	bool ToggleTagOnFile_Internal(bool bDBLocked, long nFileID, BSTR bstrTagName);
+	bool AddTag_Internal(bool bDBLocked, BSTR bstrTagName, BSTR bstrTagDescription);
+	bool DeleteTag_Internal(bool bDBLocked, BSTR bstrTagName);
+	bool ModifyTag_Internal(bool bDBLocked, BSTR bstrOldTagName, BSTR bstrNewTagName,
+		BSTR bstrNewTagDescription);
+	bool GetFilesWithTags_Internal(bool bDBLocked, IVariantVector* pvecTagNames,
+		VARIANT_BOOL vbAndOperation, IVariantVector** ppvecFileIDs);
+	bool GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVariantVector** ppvecTagNames);
+	bool AllowDynamicTagCreation_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal);
+	bool SetStatusForFilesWithTags_Internal(bool bDBLocked, IVariantVector *pvecTagNames,
+		VARIANT_BOOL vbAndOperation, long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
+	bool ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQuery, long* pnRecordsAffected);
+	bool UnregisterProcessingFAM_Internal(bool bDBLocked);
+	bool SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSelectQuery, EFilePriority eNewPriority,
+		IRandomMathCondition *pRandomCondition, long *pnNumRecordsModified);
+	bool AddUserCounter_Internal(bool bDBLocked, BSTR bstrCounterName, LONGLONG llInitialValue);
+	bool RemoveUserCounter_Internal(bool bDBLocked, BSTR bstrCounterName);
+	bool RenameUserCounter_Internal(bool bDBLocked, BSTR bstrCounterName, BSTR bstrNewCounterName);
+	bool SetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCounterName, LONGLONG llNewValue);
+	bool GetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCounterName, LONGLONG *pllValue);
+	bool GetUserCounterNames_Internal(bool bDBLocked, IVariantVector** ppvecNames);
+	bool GetUserCounterNamesAndValues_Internal(bool bDBLocked, IStrToStrMap** ppmapUserCounters);
+	bool IsUserCounterValid_Internal(bool bDBLocked, BSTR bstrCounterName, VARIANT_BOOL* pbCounterValid);
+	bool OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCounterName, LONGLONG llOffsetValue,
+		LONGLONG* pllNewValue);
+	bool RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName);
+	bool RecordFAMSessionStop_Internal(bool bDBLocked);
+	bool RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeStamp, long nActionID,
+		long nEventCount, long nProcessID);
+	bool GetLoginUsers_Internal(bool bDBLocked, IStrToStrMap**  ppUsers);
+	bool AddLoginUser_Internal(bool bDBLocked, BSTR bstrUserName);
+	bool RemoveLoginUser_Internal(bool bDBLocked, BSTR bstrUserName);
+	bool RenameLoginUser_Internal(bool bDBLocked, BSTR bstrUserNameToRename, BSTR bstrNewUserName);
+	bool ClearLoginUserPassword_Internal(bool bDBLocked, BSTR bstrUserName);
+	bool GetAutoCreateActions_Internal(bool bDBLocked, VARIANT_BOOL* pvbValue);
+	bool AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActionName, long* plId);
+	bool GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BSTR bstrActionName,
+		IFileRecord** ppFileRecord);
+	bool SetFileStatusToProcessing_Internal(bool bDBLocked, long nFileId, long nActionID);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

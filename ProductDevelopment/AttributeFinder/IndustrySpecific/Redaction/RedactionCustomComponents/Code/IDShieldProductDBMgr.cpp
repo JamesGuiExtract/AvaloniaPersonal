@@ -215,86 +215,24 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_RESOURCE_ALLOCATION("ELI19096", m_ipFAMDB != NULL); 
-
-		// Validate IDShield Schema
-		validateIDShieldSchemaVersion();
-
-		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-		_ConnectionPtr ipConnection = NULL;
-
-		BEGIN_ADO_CONNECTION_RETRY();
-
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
-		// Lock the database
-		LockGuard<IFileProcessingDBPtr> lg(m_ipFAMDB);
-
-		long nUserID = getKeyID(ipConnection, "FAMUser", "UserName", getCurrentUserName());
-		long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
-		
-		// Get the file ID as a string
-		string strFileId = asString(lFileID);
-		string strVerified = vbVerified == VARIANT_TRUE ? "1" : "0";
-
-		// -------------------------------------------
-		// Need to get the current TotalDuration value
-		// -------------------------------------------
-		double dTotalDuration = lDuration;
-		string strSql = "SELECT TOP 1 [TotalDuration] FROM IDShieldData WHERE [FileID] = "
-			+ strFileId + " AND [Verified] = " + strVerified + " ORDER BY [ID] DESC";
-
-		// Create a pointer to a recordset
-		_RecordsetPtr ipSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI28069", ipSet != NULL );
-
-		// Open the recordset
-		ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenStatic, adLockReadOnly, adCmdText );
-
-		// If there is an entry, then get the total duration from it
-		if (ipSet->adoEOF == VARIANT_FALSE)
+		if (!AddIDShieldData_Internal(false, lFileID, vbVerified, lDuration, lNumHCDataFound, 
+			lNumMCDataFound,	lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
+			lTotalManualRedactions))
 		{
-			// Get the total duration from the datbase
-			dTotalDuration += getDoubleField(ipSet->Fields, "TotalDuration");
+			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipThis;
+			ipThis = this;
+			ASSERT_RESOURCE_ALLOCATION("ELI30712", ipThis != NULL);
+			
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(ipThis);
+			
+			AddIDShieldData_Internal(true, lFileID, vbVerified, lDuration, lNumHCDataFound, 
+				lNumMCDataFound,	lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
+				lTotalManualRedactions);
 		}
-
-		// Build insert SQL query 
-		string strInsertSQL = gstrINSERT_IDSHIELD_DATA_RCD + "(" + strFileId
-			+ ", " + strVerified + ", " + asString(nUserID) + ", "
-			+ asString(nMachineID) + ", GETDATE(), " + asString(lDuration)
-			+ ", " + asString(dTotalDuration) + ", " + asString(lNumHCDataFound) + ", "
-			+ asString(lNumMCDataFound) + ", " + asString(lNumLCDataFound) + ", "
-			+ asString(lNumCluesDataFound) + ", " + asString(lTotalRedactions) + ", "
-			+ asString(lTotalManualRedactions) + ")";
-
-		// Create a transaction guard
-		TransactionGuard tg(ipConnection);
-
-		// If not storing previous history need to delete it
-		if (!m_bStoreIDShieldProcessingHistory)
-		{
-			string strDeleteQuery = gstrDELETE_PREVIOUS_STATUS_FOR_FILEID;
-			replaceVariable(strDeleteQuery, "<FileID>", strFileId);
-			replaceVariable(strDeleteQuery, "<Verified>", strVerified);
-
-			// Delete previous records with the fileID
-			executeCmdQuery(ipConnection, strDeleteQuery);
-		}
-
-		// Insert the record
-		executeCmdQuery(ipConnection, strInsertSQL);
-
-		// Commit the transactions
-		tg.CommitTrans();
-
-		END_ADO_CONNECTION_RETRY(
-			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29858");
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19037");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CIDShieldProductDBMgr::put_FAMDB(IFileProcessingDB* newVal)
@@ -381,9 +319,6 @@ STDMETHODIMP CIDShieldProductDBMgr::GetFileID(BSTR bstrFileName, long* plFileID)
 
 		// Get the connection for the thread and save it locally.
 		ipConnection = getDBConnection();
-
-		// lock the database
-		LockGuard<IFileProcessingDBPtr> lg(m_ipFAMDB);
 
 		// query the database for the file ID
 		*plFileID = getKeyID(ipConnection, "FAMFile", "FileName", asString(bstrFileName), 
@@ -476,5 +411,100 @@ void CIDShieldProductDBMgr::validateIDShieldSchemaVersion()
 		ue.addDebugInfo("Database Version", strValue);
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileID, VARIANT_BOOL vbVerified, 
+		double lDuration, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound, 
+		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions)
+{
+	try
+	{
+		try
+		{
+			ASSERT_RESOURCE_ALLOCATION("ELI19096", m_ipFAMDB != NULL); 
+
+			// Validate IDShield Schema
+			validateIDShieldSchemaVersion();
+
+			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+			_ConnectionPtr ipConnection = NULL;
+
+			BEGIN_ADO_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			long nUserID = getKeyID(ipConnection, "FAMUser", "UserName", getCurrentUserName());
+			long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
+
+			// Get the file ID as a string
+			string strFileId = asString(lFileID);
+			string strVerified = vbVerified == VARIANT_TRUE ? "1" : "0";
+
+			// -------------------------------------------
+			// Need to get the current TotalDuration value
+			// -------------------------------------------
+			double dTotalDuration = lDuration;
+			string strSql = "SELECT TOP 1 [TotalDuration] FROM IDShieldData WHERE [FileID] = "
+				+ strFileId + " AND [Verified] = " + strVerified + " ORDER BY [ID] DESC";
+
+			// Create a pointer to a recordset
+			_RecordsetPtr ipSet( __uuidof( Recordset ));
+			ASSERT_RESOURCE_ALLOCATION("ELI28069", ipSet != NULL );
+
+			// Open the recordset
+			ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
+				adOpenStatic, adLockReadOnly, adCmdText );
+
+			// If there is an entry, then get the total duration from it
+			if (ipSet->adoEOF == VARIANT_FALSE)
+			{
+				// Get the total duration from the datbase
+				dTotalDuration += getDoubleField(ipSet->Fields, "TotalDuration");
+			}
+
+			// Build insert SQL query 
+			string strInsertSQL = gstrINSERT_IDSHIELD_DATA_RCD + "(" + strFileId
+				+ ", " + strVerified + ", " + asString(nUserID) + ", "
+				+ asString(nMachineID) + ", GETDATE(), " + asString(lDuration)
+				+ ", " + asString(dTotalDuration) + ", " + asString(lNumHCDataFound) + ", "
+				+ asString(lNumMCDataFound) + ", " + asString(lNumLCDataFound) + ", "
+				+ asString(lNumCluesDataFound) + ", " + asString(lTotalRedactions) + ", "
+				+ asString(lTotalManualRedactions) + ")";
+
+			// Create a transaction guard
+			TransactionGuard tg(ipConnection);
+
+			// If not storing previous history need to delete it
+			if (!m_bStoreIDShieldProcessingHistory)
+			{
+				string strDeleteQuery = gstrDELETE_PREVIOUS_STATUS_FOR_FILEID;
+				replaceVariable(strDeleteQuery, "<FileID>", strFileId);
+				replaceVariable(strDeleteQuery, "<Verified>", strVerified);
+
+				// Delete previous records with the fileID
+				executeCmdQuery(ipConnection, strDeleteQuery);
+			}
+
+			// Insert the record
+			executeCmdQuery(ipConnection, strInsertSQL);
+
+			// Commit the transactions
+			tg.CommitTrans();
+
+			END_ADO_CONNECTION_RETRY(
+				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29858");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30710");
+	}
+	catch(UCLIDException ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
 }
 //-------------------------------------------------------------------------------------------------

@@ -103,6 +103,11 @@ private:
 	void validateIDShieldSchemaVersion();
 
 	void validateLicense();
+
+	// Internal versions of external methods that may require database locking
+	bool AddIDShieldData_Internal(bool bDBLocked, long lFileID, VARIANT_BOOL vbVerified, double lDuration, 
+		long lNumHCDataFound, long lNumMCDataFound,	long lNumLCDataFound, long lNumCluesDataFound, 
+		long lTotalRedactions, long lTotalManualRedactions);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(IDShieldProductDBMgr), CIDShieldProductDBMgr)

@@ -245,79 +245,13 @@ STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nAction
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI29051", plInstanceID != NULL);
-
-		// Validate data entry schema
-		validateDataEntrySchemaVersion();
-
-		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-		_ConnectionPtr ipConnection = NULL;
-
-		BEGIN_ADO_CONNECTION_RETRY();
-
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
-		// Lock the database
-		LockGuard<IFileProcessingDBPtr> lg(m_ipFAMDB);
-
-		// Get the file ID as a string
-		string strFileId = asString(lFileID);
-
-		long nUserID = getKeyID(ipConnection, "FAMUser", "UserName", getCurrentUserName());
-		long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
-		
-		// -------------------------------------------
-		// Need to get the current TotalDuration value
-		// -------------------------------------------
-		double dTotalDuration = lDuration;
-		string strSql = "SELECT TOP 1 [TotalDuration] FROM [DataEntryData] WHERE [FileID] = "
-			+ strFileId + " ORDER BY [ID] DESC";
-
-		// Create a pointer to a recordset
-		_RecordsetPtr ipSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI29009", ipSet != NULL );
-
-		// Open the recordset
-		ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenStatic, adLockReadOnly, adCmdText );
-
-		// If there is an entry, then get the total duration from it
-		if (ipSet->adoEOF == VARIANT_FALSE)
+		if (!AddDataEntryData_Internal(false, lFileID, nActionID, lDuration, plInstanceID))
 		{
-			// Get the total duration from the datbase
-			dTotalDuration += getDoubleField(ipSet->Fields, "TotalDuration");
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+			AddDataEntryData_Internal(true, lFileID, nActionID, lDuration, plInstanceID);
 		}
-
-		// Build insert SQL query 
-		string strInsertSQL = gstrINSERT_DATAENTRY_DATA_RCD + "(" + strFileId
-			+ ", " + asString(nUserID) + ", " + asString(nActionID) + ", "
-			+ asString(nMachineID) + ", GETDATE(), " + asString(lDuration) + ", "
-			+ asString(dTotalDuration) + ")";
-
-		// Create a transaction guard
-		TransactionGuard tg(ipConnection);
-
-		// If not storing previous history need to delete it
-		if (!m_bStoreDataEntryProcessingHistory)
-		{
-			string strDeleteQuery = gstrDELETE_PREVIOUS_STATUS_FOR_FILEID;
-			replaceVariable(strDeleteQuery, "<FileID>", strFileId);
-
-			// Delete previous records with the fileID
-			executeCmdQuery(ipConnection, strDeleteQuery);
-		}
-
-		// Insert the record
-		executeCmdQuery(ipConnection, strInsertSQL);
-
-		*plInstanceID = getLastTableID(ipConnection, "DataEntryData");
-
-		// Commit the transactions
-		tg.CommitTrans();
-
-		END_ADO_CONNECTION_RETRY(
-			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29837");
 	
 		return S_OK;
 	}
@@ -353,123 +287,13 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 	try
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-		ASSERT_ARGUMENT("ELI29052", plInstanceToken != NULL);
-
-		IIUnknownVectorPtr ipAttributes(pAttributes);
-
-		// -1 instance token indicates the counts are "OnLoad" counts and that a new instance
-		// token needs to be returned.
-		bool bOnLoad = (*plInstanceToken == -1);
-		if (bOnLoad)
-		{
-			*plInstanceToken = m_lNextInstanceToken++;
-		}
 		
-		// Create or find the set of queries to record counts for the specified hierarchy of
-		// attributes.
-		vector<string>& strQueries = m_mapVecCounterValueInsertionQueries[*plInstanceToken];
-
-		// If there is nothing to record, return now.
-		if ((bOnLoad && ipAttributes == NULL) ||
-			(!bOnLoad && ipAttributes == NULL && strQueries.empty()))
+		if (!RecordCounterValues_Internal(false, plInstanceToken, lDataEntryDataInstanceID, pAttributes))
 		{
-			return S_OK;
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			RecordCounterValues_Internal(true, plInstanceToken,	lDataEntryDataInstanceID, pAttributes);
 		}
-
-		// If counts are for "OnSave", update any existing "OnLoad" queries with the specified
-		// DataEntryData instance ID.
-		if (!bOnLoad)
-		{
-			string strInstanceID = asString(lDataEntryDataInstanceID);
-
-			for (size_t i = 0; i < strQueries.size(); i++)
-			{
-				string strQuery = strQueries[i];
-				replaceVariable(strQuery, "<InstanceID>", strInstanceID);
-				strQueries[i] = strQuery;
-			}
-		}
-
-		// Validate data entry schema
-		validateDataEntrySchemaVersion();
-
-		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-		_ConnectionPtr ipConnection = NULL;
-
-		BEGIN_ADO_CONNECTION_RETRY();
-
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
-		// Lock the database
-		LockGuard<IFileProcessingDBPtr> lg(m_ipFAMDB);
-
-		// Cache the result of areCountersEnabled;
-		static bool countersAreEnabled = areCountersEnabled();
-		if (!countersAreEnabled)
-		{
-			throw UCLIDException("ELI29053", "Data entry counters are not currently enabled.");
-		}
-
-		if (ipAttributes != NULL)
-		{
-			// Query to find all counters a value needs to be recorded for.
-			string strSql = "SELECT [ID], [AttributeQuery] FROM [DataEntryCounterDefinition] WHERE " +
-				string(bOnLoad ? "[RecordOnLoad]" : "RecordOnSave") + " = 1";
-
-			// Create a pointer to a recordset
-			_RecordsetPtr ipRecordSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI29054", ipRecordSet != NULL);
-
-			// Open the recordset
-			ipRecordSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
-				adOpenForwardOnly, adLockReadOnly, adCmdText);
-
-			while (ipRecordSet->adoEOF == VARIANT_FALSE)
-			{
-				FieldsPtr ipFields(ipRecordSet->Fields);
-				ASSERT_RESOURCE_ALLOCATION("ELI29066", ipFields != NULL);
-
-				// Get the counter ID and query used to count qualifying attributes
-				long lCounterID = getLongField(ipFields, "ID");
-				string strQuery = getStringField(ipFields, "AttributeQuery");
-				
-				// Query for all matching attributes
-				IIUnknownVectorPtr matchingAttributes = 
-					 getAFUtility()->QueryAttributes(ipAttributes, strQuery.c_str(), false);
-				ASSERT_RESOURCE_ALLOCATION("ELI29055", matchingAttributes != NULL);
-
-				// Insert a query that to record the counts into the vector of queries for the
-				// current data entry instance.
-				strQueries.push_back(gstrINSERT_DATAENTRY_COUNTER_VALUE + "(" +
-					(bOnLoad ? "<InstanceID>" : asString(lDataEntryDataInstanceID)) + ", " +
-					asString(lCounterID) + ", " + (bOnLoad ? "'L'" : "'S'") + ", " +
-					asString(matchingAttributes->Size()) + ")");
-
-				ipRecordSet->MoveNext();
-			}
-		}
-
-		// If this is call is for "OnSave" so that we now have a data entry instance ID, record the
-		// counts.
-		if (!bOnLoad && !strQueries.empty())
-		{
-			// Create a transaction guard
-			TransactionGuard tg(ipConnection);
-
-			executeVectorOfSQL(ipConnection, strQueries);
-
-			// Commit the transactions
-			tg.CommitTrans();
-
-			// Now that the counts have been recorded, clear the queries from the map.
-			m_mapVecCounterValueInsertionQueries.erase(
-				m_mapVecCounterValueInsertionQueries.find(*plInstanceToken));
-		}
-
-		END_ADO_CONNECTION_RETRY(
-			ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29838");
 
 		return S_OK;
 	}
@@ -580,4 +404,238 @@ IAFUtilityPtr CDataEntryProductDBMgr::getAFUtility()
 	}
 	
 	return m_ipAFUtility;
+}
+UCLID_DATAENTRYCUSTOMCOMPONENTSLib::IDataEntryProductDBMgrPtr CDataEntryProductDBMgr::getThisAsCOMPtr()
+{
+	UCLID_DATAENTRYCUSTOMCOMPONENTSLib::IDataEntryProductDBMgrPtr ipThis;
+	ipThis = this;
+	ASSERT_RESOURCE_ALLOCATION("ELI30713", ipThis != NULL);
+	return this;
+}
+//-------------------------------------------------------------------------------------------------
+// Internal versions of Interface methods
+//-------------------------------------------------------------------------------------------------
+bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFileID, long nActionID,
+													  double lDuration, long* plInstanceID)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI29051", plInstanceID != NULL);
+
+			// Validate data entry schema
+			validateDataEntrySchemaVersion();
+
+			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+			_ConnectionPtr ipConnection = NULL;
+
+			BEGIN_ADO_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Get the file ID as a string
+			string strFileId = asString(lFileID);
+
+			long nUserID = getKeyID(ipConnection, "FAMUser", "UserName", getCurrentUserName());
+			long nMachineID = getKeyID(ipConnection, "Machine", "MachineName", getComputerName());
+
+			// -------------------------------------------
+			// Need to get the current TotalDuration value
+			// -------------------------------------------
+			double dTotalDuration = lDuration;
+			string strSql = "SELECT TOP 1 [TotalDuration] FROM [DataEntryData] WHERE [FileID] = "
+				+ strFileId + " ORDER BY [ID] DESC";
+
+			// Create a pointer to a recordset
+			_RecordsetPtr ipSet( __uuidof( Recordset ));
+			ASSERT_RESOURCE_ALLOCATION("ELI29009", ipSet != NULL );
+
+			// Open the recordset
+			ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
+				adOpenStatic, adLockReadOnly, adCmdText );
+
+			// If there is an entry, then get the total duration from it
+			if (ipSet->adoEOF == VARIANT_FALSE)
+			{
+				// Get the total duration from the datbase
+				dTotalDuration += getDoubleField(ipSet->Fields, "TotalDuration");
+			}
+
+			// Build insert SQL query 
+			string strInsertSQL = gstrINSERT_DATAENTRY_DATA_RCD + "(" + strFileId
+				+ ", " + asString(nUserID) + ", " + asString(nActionID) + ", "
+				+ asString(nMachineID) + ", GETDATE(), " + asString(lDuration) + ", "
+				+ asString(dTotalDuration) + ")";
+
+			// Create a transaction guard
+			TransactionGuard tg(ipConnection);
+
+			// If not storing previous history need to delete it
+			if (!m_bStoreDataEntryProcessingHistory)
+			{
+				string strDeleteQuery = gstrDELETE_PREVIOUS_STATUS_FOR_FILEID;
+				replaceVariable(strDeleteQuery, "<FileID>", strFileId);
+
+				// Delete previous records with the fileID
+				executeCmdQuery(ipConnection, strDeleteQuery);
+			}
+
+			// Insert the record
+			executeCmdQuery(ipConnection, strInsertSQL);
+
+			*plInstanceID = getLastTableID(ipConnection, "DataEntryData");
+
+			// Commit the transactions
+			tg.CommitTrans();
+
+			END_ADO_CONNECTION_RETRY(
+				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29837");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30714");
+	}
+	catch(UCLIDException ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* plInstanceToken,
+									long lDataEntryDataInstanceID, IIUnknownVector* pAttributes)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI29052", plInstanceToken != NULL);
+
+			IIUnknownVectorPtr ipAttributes(pAttributes);
+
+			// -1 instance token indicates the counts are "OnLoad" counts and that a new instance
+			// token needs to be returned.
+			bool bOnLoad = (*plInstanceToken == -1);
+			if (bOnLoad)
+			{
+				*plInstanceToken = m_lNextInstanceToken++;
+			}
+
+			// Create or find the set of queries to record counts for the specified hierarchy of
+			// attributes.
+			vector<string>& strQueries = m_mapVecCounterValueInsertionQueries[*plInstanceToken];
+
+			// If there is nothing to record, return now.
+			if ((bOnLoad && ipAttributes == NULL) ||
+				(!bOnLoad && ipAttributes == NULL && strQueries.empty()))
+			{
+				return S_OK;
+			}
+
+			// If counts are for "OnSave", update any existing "OnLoad" queries with the specified
+			// DataEntryData instance ID.
+			if (!bOnLoad)
+			{
+				string strInstanceID = asString(lDataEntryDataInstanceID);
+
+				for (size_t i = 0; i < strQueries.size(); i++)
+				{
+					string strQuery = strQueries[i];
+					replaceVariable(strQuery, "<InstanceID>", strInstanceID);
+					strQueries[i] = strQuery;
+				}
+			}
+
+			// Validate data entry schema
+			validateDataEntrySchemaVersion();
+
+			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
+			_ConnectionPtr ipConnection = NULL;
+
+			BEGIN_ADO_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Cache the result of areCountersEnabled;
+			static bool countersAreEnabled = areCountersEnabled();
+			if (!countersAreEnabled)
+			{
+				throw UCLIDException("ELI29053", "Data entry counters are not currently enabled.");
+			}
+
+			if (ipAttributes != NULL)
+			{
+				// Query to find all counters a value needs to be recorded for.
+				string strSql = "SELECT [ID], [AttributeQuery] FROM [DataEntryCounterDefinition] WHERE " +
+					string(bOnLoad ? "[RecordOnLoad]" : "RecordOnSave") + " = 1";
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipRecordSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI29054", ipRecordSet != NULL);
+
+				// Open the recordset
+				ipRecordSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
+					adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+				while (ipRecordSet->adoEOF == VARIANT_FALSE)
+				{
+					FieldsPtr ipFields(ipRecordSet->Fields);
+					ASSERT_RESOURCE_ALLOCATION("ELI29066", ipFields != NULL);
+
+					// Get the counter ID and query used to count qualifying attributes
+					long lCounterID = getLongField(ipFields, "ID");
+					string strQuery = getStringField(ipFields, "AttributeQuery");
+
+					// Query for all matching attributes
+					IIUnknownVectorPtr matchingAttributes = 
+						getAFUtility()->QueryAttributes(ipAttributes, strQuery.c_str(), false);
+					ASSERT_RESOURCE_ALLOCATION("ELI29055", matchingAttributes != NULL);
+
+					// Insert a query that to record the counts into the vector of queries for the
+					// current data entry instance.
+					strQueries.push_back(gstrINSERT_DATAENTRY_COUNTER_VALUE + "(" +
+						(bOnLoad ? "<InstanceID>" : asString(lDataEntryDataInstanceID)) + ", " +
+						asString(lCounterID) + ", " + (bOnLoad ? "'L'" : "'S'") + ", " +
+						asString(matchingAttributes->Size()) + ")");
+
+					ipRecordSet->MoveNext();
+				}
+			}
+
+			// If this is call is for "OnSave" so that we now have a data entry instance ID, record the
+			// counts.
+			if (!bOnLoad && !strQueries.empty())
+			{
+				// Create a transaction guard
+				TransactionGuard tg(ipConnection);
+
+				executeVectorOfSQL(ipConnection, strQueries);
+
+				// Commit the transactions
+				tg.CommitTrans();
+
+				// Now that the counts have been recorded, clear the queries from the map.
+				m_mapVecCounterValueInsertionQueries.erase(
+					m_mapVecCounterValueInsertionQueries.find(*plInstanceToken));
+			}
+
+			END_ADO_CONNECTION_RETRY(
+				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29838");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30715");
+	}
+	catch(UCLIDException ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
 }

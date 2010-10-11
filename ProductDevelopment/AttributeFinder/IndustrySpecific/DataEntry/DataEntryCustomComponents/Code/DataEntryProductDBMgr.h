@@ -120,6 +120,14 @@ private:
 	IAFUtilityPtr getAFUtility();
 
 	void validateLicense();
+
+	UCLID_DATAENTRYCUSTOMCOMPONENTSLib::IDataEntryProductDBMgrPtr CDataEntryProductDBMgr::getThisAsCOMPtr();
+
+	// Internal versions of external methods that may require database locking
+	bool AddDataEntryData_Internal(bool bDBLocked, long lFileID, long nActionID,
+		double lDuration, long* plInstanceID);
+	bool RecordCounterValues_Internal(bool bDBLocked, long* plInstanceToken,
+		long lDataEntryDataInstanceID, IIUnknownVector* pAttributes);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(DataEntryProductDBMgr), CDataEntryProductDBMgr)

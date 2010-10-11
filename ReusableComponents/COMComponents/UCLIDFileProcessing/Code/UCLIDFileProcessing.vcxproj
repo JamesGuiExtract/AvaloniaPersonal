@@ -176,6 +176,7 @@
     <ClCompile Include="FAMDBUtils.cpp" />
     <ClCompile Include="FAMTagManager.cpp" />
     <ClCompile Include="FileProcessingDB.cpp" />
+    <ClCompile Include="FileProcessingDB_COM_Internal.cpp" />
     <ClCompile Include="FileProcessingDB_Internal.cpp" />
     <ClCompile Include="FileProcessingDlg.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
