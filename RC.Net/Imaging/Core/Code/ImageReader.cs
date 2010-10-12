@@ -1,11 +1,13 @@
-using System;
-using System.Drawing;
-using System.IO;
 using Extract.Imaging.Utilities;
 using Extract.Licensing;
+using Extract.Utilities;
 using Leadtools;
 using Leadtools.Codecs;
 using Leadtools.ImageProcessing;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 
 namespace Extract.Imaging
 {
@@ -62,6 +64,11 @@ namespace Extract.Imaging
         /// The command used to modify PDF files back to 1 bit per pixel after loading
         /// </summary>
         ColorResolutionCommand _bitonalConversionCommand;
+
+        /// <summary>
+        /// Image pages that have been cached for this reader.
+        /// </summary>
+        Dictionary<int, RasterImage> _loadedImages = new Dictionary<int, RasterImage>();
 
         #endregion Fields
 
@@ -157,6 +164,48 @@ namespace Extract.Imaging
         #region Methods
 
         /// <summary>
+        /// Loads a page into the image cache.
+        /// </summary>
+        /// <param name="pageNumber">The page to load.</param>
+        public void CachePage(int pageNumber)
+        {
+            RasterImage image = null;
+
+            try
+            {
+                using (new PdfLock(_isPdf))
+                {
+                    if (!_loadedImages.TryGetValue(pageNumber, out image))
+                    {
+                        image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
+                            pageNumber, pageNumber);
+
+                        // If loading PDF as bitonal and this file is a PDF, set bits per pixel to 1
+                        if (_loadPdfAsBitonal && _isPdf)
+                        {
+                            ConvertToBitonalImage(image);
+                        }
+
+                        _loadedImages[pageNumber] = image;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (image != null)
+                {
+                    image.Dispose();
+                }
+
+                ExtractException ee = new ExtractException("ELI30720",
+                    "Unable to read page.", ex);
+                ee.AddDebugData("File name", _fileName, false);
+                ee.AddDebugData("Page number", pageNumber, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Creates a <see cref="RasterImage"/> for the specified page.
         /// </summary>
         /// <param name="pageNumber">The 1-based page number to read.</param>
@@ -165,18 +214,26 @@ namespace Extract.Imaging
         {
             try
             {
-                using (new PdfLock(_isPdf))
+                RasterImage image;
+                if (_loadedImages.TryGetValue(pageNumber, out image))
                 {
-                    RasterImage image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
-                        pageNumber, pageNumber);
-
-                    // If loading PDF as bitonal and this file is a PDF, set bits per pixel to 1
-                    if (_loadPdfAsBitonal && _isPdf)
+                    return image.Clone();
+                }
+                else
+                {
+                    using (new PdfLock(_isPdf))
                     {
-                        ConvertToBitonalImage(image);
-                    }
+                        image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
+                            pageNumber, pageNumber);
 
-                    return image;
+                        // If loading PDF as bitonal and this file is a PDF, set bits per pixel to 1
+                        if (_loadPdfAsBitonal && _isPdf)
+                        {
+                            ConvertToBitonalImage(image);
+                        }
+
+                        return image;
+                    }
                 }
             }
             catch (Exception ex)
@@ -371,6 +428,7 @@ namespace Extract.Imaging
             if (disposing)
             {
                 // Dispose of managed objects
+                CollectionMethods.ClearAndDispose(_loadedImages);
                 if (_codecs != null)
                 {
                     _codecs.Dispose();

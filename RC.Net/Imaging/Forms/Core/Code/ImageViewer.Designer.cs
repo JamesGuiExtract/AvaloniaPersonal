@@ -55,9 +55,13 @@ namespace Extract.Imaging.Forms
                 }
                 if (_reader != null)
                 {
-                    _reader.Dispose();
+                    if (!_cachedReaders.ContainsValue(_reader))
+                    {
+                        _reader.Dispose();
+                    }
                     _reader = null;
                 }
+                Extract.Utilities.CollectionMethods.ClearAndDispose(_cachedReaders);
                 if (_codecs != null)
                 {
                     _codecs.Dispose();

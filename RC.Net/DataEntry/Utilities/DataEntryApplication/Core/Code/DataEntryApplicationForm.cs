@@ -801,6 +801,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
         }
 
+        /// <summary>
+        /// A thread-safe method that allows loading of data prior to the <see cref="Open"/> call
+        /// so as to reduce the time the <see cref="Open"/> call takes once it is called.
+        /// </summary>
+        /// <param name="fileName">The filename of the document for which to prefetch data.</param>
+        /// <param name="fileID">The ID of the file being prefetched.</param>
+        /// <param name="actionID">The ID of the action being prefetched.</param>
+        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
+        public void Prefetch(string fileName, int fileID, int actionID, FAMTagManager tagManager,
+            FileProcessingDB fileProcessingDB)
+        {
+            // TODO: Add prefetching code to improve load performance.
+        }
+
         #endregion Methods
 
         #region Overrides

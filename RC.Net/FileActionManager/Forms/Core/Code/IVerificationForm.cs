@@ -87,5 +87,26 @@ namespace Extract.FileActionManager.Forms
         /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
         void Open(string fileName, int fileID, int actionID, FAMTagManager tagManager,
             FileProcessingDB fileProcessingDB);
+
+        /// <summary>
+        /// A thread-safe method that allows loading of data prior to the <see cref="Open"/> call
+        /// so as to reduce the time the <see cref="Open"/> call takes once it is called.
+        /// <para><b>Note</b></para>
+        /// It can be assumed that once Prefetch is called for a document, <see cref="Open"/> will
+        /// be called unless the processing is stopped. 
+        /// <para><b>Note</b></para>
+        /// It will be up to each implementation of IVerificationForm to determine whether a
+        /// separate thread should be used to do the prefetch or whether it should not attempt to
+        /// enter the lock section until prefetch is complete. If prefetch is done synchronously,
+        /// that could allow another document to "jump ahead" of a document that spent a long time
+        /// in prefetch.
+        /// </summary>
+        /// <param name="fileName">The filename of the document for which to prefetch data.</param>
+        /// <param name="fileID">The ID of the file being prefetched.</param>
+        /// <param name="actionID">The ID of the action being prefetched.</param>
+        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
+        void Prefetch(string fileName, int fileID, int actionID, FAMTagManager tagManager,
+            FileProcessingDB fileProcessingDB);
     }
 }

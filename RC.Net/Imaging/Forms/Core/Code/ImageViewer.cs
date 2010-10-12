@@ -425,6 +425,18 @@ namespace Extract.Imaging.Forms
         /// </summary>
         int _minimumAngularHighlightHeight = LayerObject.MinSize.Height;
 
+        /// <summary>
+        /// Indicates whether document images should be cached rather than loaded/unloaded on
+        /// open/close.
+        /// </summary>
+        bool _cacheImages;
+
+        /// <summary>
+        /// The currently cached <see cref="ImageReader"/>s.
+        /// </summary>
+        Dictionary<string, ImageReader> _cachedReaders =
+            new Dictionary<string, ImageReader>(StringComparer.OrdinalIgnoreCase);
+
         #endregion Fields
 
         #region Image Viewer Events
@@ -1970,6 +1982,30 @@ namespace Extract.Imaging.Forms
             get
             {
                 return _trackingData != null;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether <see cref="ImageReader"/>s for documents should be cached rather
+        /// than loaded/unloaded on open/close.
+        /// <para><b>Note</b></para>
+        /// It is important to ensure <see cref="UnloadImage"/> is called for every image for which
+        /// either <see cref="OpenImage"/> or <see cref="CacheImage"/> is called when
+        /// <see cref="CacheImages"/> is <see langword="true"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if <see cref="ImageReader"/>s should be cached in memory,
+        /// <see langword="false"/> if they should be created/disposed as the images are opened and
+        /// closed.</value>
+        public bool CacheImages
+        {
+            get
+            {
+                return _cacheImages;
+            }
+
+            set
+            {
+                _cacheImages = value;
             }
         }
 

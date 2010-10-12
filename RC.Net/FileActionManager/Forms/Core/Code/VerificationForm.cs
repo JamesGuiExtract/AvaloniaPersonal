@@ -264,47 +264,68 @@ namespace Extract.FileActionManager.Forms
                 return EFileProcessingResult.kProcessingCancelled;
             }
 
+            bool haveLock = false;
             EFileProcessingResult fileProcessingResult;
 
-            lock (_lock)
+            try
             {
-                try
+                // Attempt to get the lock for the verification UI thread, but don't block at this
+                // point if its not available.
+                haveLock = Monitor.TryEnter(_lock);
+                if (!haveLock)
                 {
-                    if (this.Canceled)
-                    {
-                        return EFileProcessingResult.kProcessingCancelled;
-                    }
+                    // While waiting for the verification UI thread, prefetch data so that
+                    // MainForm.Open call on this thread will have less work to do and execute
+                    // faster.
+                    MainForm.Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB);
 
-                    // Ensure the verification form has been properly initialized.
-                    EnsureInitialization();
-
-                    // Open the file
-                    MainForm.Open(fileName, fileID, actionID, tagManager, fileProcessingDB);
-
-                    // Wait until the document is either saved or the verification form is closed.
-                    WaitForEvent(_fileCompletedEvent);
-
-                    if (this.Canceled)
-                    {
-                        return EFileProcessingResult.kProcessingCancelled;
-                    }
-
-                    // The file processing result needs to be noted before exiting the locked block,
-                    // but we need to exit the lock block before returning so that Sleep is called
-                    // to prevent one or more files from becoming stuck on other threads.
-                    fileProcessingResult = _fileProcessingResult;
+                    // Now request the lock for the verification UI thread again, but this time
+                    // block until it is available.
+                    Monitor.Enter(_lock);
+                    haveLock = true;
                 }
-                catch (Exception ex)
+
+                if (this.Canceled)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI23970", ex);
-                    ee.AddDebugData("Filename", fileName, false);
-                    throw ee;
-                } 
+                    return EFileProcessingResult.kProcessingCancelled;
+                }
+
+                // Ensure the verification form has been properly initialized.
+                EnsureInitialization();
+
+                // Open the file
+                MainForm.Open(fileName, fileID, actionID, tagManager, fileProcessingDB);
+
+                // Wait until the document is either saved or the verification form is closed.
+                WaitForEvent(_fileCompletedEvent);
+
+                if (this.Canceled)
+                {
+                    return EFileProcessingResult.kProcessingCancelled;
+                }
+
+                // The file processing result needs to be noted before exiting the locked block,
+                // but we need to exit the lock block before returning so that Sleep is called
+                // to prevent one or more files from becoming stuck on other threads.
+                fileProcessingResult = _fileProcessingResult;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI23970", ex);
+                ee.AddDebugData("Filename", fileName, false);
+                throw ee;
+            }
+            finally
+            {
+                if (haveLock)
+                {
+                    Monitor.Exit(_lock);
+                }
             }
 
-            // Sleep to allow other threads waiting on the _lock to proceed, otherwise
-            // this thread is likely to re-enter a _lock section before windows gives any
-            // waiting threads an opportunity to proceed.
+            // Sleep to allow other threads waiting on the _lock to proceed, otherwise when running
+            // multiple threads on a single-threaded machine this thread is likely to re-enter the
+            // _lock section before Windows gives the waiting thread(s) an opportunity to proceed.
             Thread.Sleep(0);
 
             return fileProcessingResult;

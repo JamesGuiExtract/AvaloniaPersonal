@@ -246,8 +246,17 @@ namespace Extract.Imaging.Forms
                         // Reset the valid annotations flag
                         _validAnnotations = true;
 
-                        // Initialize reader
-                        _reader = Codecs.CreateReader(fileName);
+                        // Look for a reader that has already been cached for this file before
+                        // creating a new one.
+                        if (!_cachedReaders.TryGetValue(fileName, out _reader))
+                        {
+                            // Initialize reader
+                            _reader = Codecs.CreateReader(fileName);
+                            if (_cacheImages)
+                            {
+                                _cachedReaders[fileName] = _reader;
+                            }
+                        }
 
                         // Get the page count
                         _pageCount = _reader.PageCount;
@@ -288,6 +297,11 @@ namespace Extract.Imaging.Forms
                         {
                             _reader.Dispose();
                             _reader = null;
+                        }
+
+                        if (_cachedReaders.ContainsKey(fileName))
+                        {
+                            _cachedReaders.Remove(fileName);
                         }
 
                         throw ExtractException.AsExtractException("ELI23376", ex);
@@ -351,6 +365,65 @@ namespace Extract.Imaging.Forms
                     // The event was not handled, go ahead and throw the exception.
                     throw ee2;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Creates a reader and loads the first page of the specified image file.
+        /// </summary>
+        /// <param name="fileName">The name of the file to cache.</param>
+        public void CacheImage(string fileName)
+        {
+            ImageReader imageReader = null;
+
+            try
+            {
+                ExtractException.Assert("ELI30718", "Image caching is disabled.",
+                    _cacheImages);
+
+                if (!_cachedReaders.ContainsKey(fileName))
+                {
+                    imageReader = Codecs.CreateReader(fileName);
+                    imageReader.CachePage(1);
+                    _cachedReaders[fileName] = imageReader;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (imageReader != null)
+                {
+                    imageReader.Dispose();
+                }
+
+                throw ExtractException.AsExtractException("ELI30719", ex);
+            }
+        }
+
+        /// <summary>
+        /// Releases the cache for the specified document.
+        /// <para><b>Note</b></para>
+        /// When image caching is enabled, this method must be called for each document loaded as the
+        /// images will not be automatically unloaded and will otherwise accumulate in memory.
+        /// </summary>
+        /// <param name="fileName">The name of the file to remove from the cache.</param>
+        public void UnloadImage(string fileName)
+        {
+            try
+            {
+                ImageReader imageReader;
+                if (_cachedReaders.TryGetValue(fileName, out imageReader))
+                {
+                    if (imageReader == _reader)
+                    {
+                        _reader = null;
+                    }
+                    imageReader.Dispose();
+                    _cachedReaders.Remove(fileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30721", ex);
             }
         }
 
@@ -421,12 +494,13 @@ namespace Extract.Imaging.Forms
                     // Set Image to null
                     base.Image = null;
 
-                    // Dispose of the image reader
-                    if (_reader != null)
+                    // Dispose of the image reader if image caching is not enabled.
+                    if (!_cacheImages && _reader != null)
                     {
                         _reader.Dispose();
-                        _reader = null;
                     }
+
+                    _reader = null;
 
                     // Set image file name to empty string
                     _imageFile = "";

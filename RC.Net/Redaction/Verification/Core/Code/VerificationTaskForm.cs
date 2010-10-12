@@ -229,6 +229,10 @@ namespace Extract.Redaction.Verification
                     _redactionGridView.AddRedactionType("");
                 }
 
+                // [FlexIDSCore:4442]
+                // For prefetching purposes, allow the ImageViewer will cache images.
+                _imageViewer.CacheImages = true;
+                
                 _imageViewer.DefaultRedactionFillColor = _iniSettings.OutputRedactionColor;
 
                 VerificationOptions options = VerificationOptions.ReadFrom(_iniSettings);
@@ -636,6 +640,8 @@ namespace Extract.Redaction.Verification
                 // If the max document history was reached, drop the first item
                 if (_history.Count == _history.Capacity)
                 {
+                    _imageViewer.UnloadImage(_history[0].DisplayImage);
+
                     _history.RemoveAt(0);
                     _historyIndex--;
                 }
@@ -1306,6 +1312,7 @@ namespace Extract.Redaction.Verification
                     // Remove the bad image
                     if (IsInHistory)
                     {
+                        _imageViewer.UnloadImage(_history[_historyIndex].DisplayImage);
                         _history.RemoveAt(_historyIndex);
                     }
 
@@ -2300,6 +2307,28 @@ namespace Extract.Redaction.Verification
                     "Unable to open file for verification.", ex);
                 ee.AddDebugData("File name", fileName, false);
                 _invoker.HandleException(ee);
+            }
+        }
+
+        /// <summary>
+        /// A thread-safe method that allows loading of data prior to the <see cref="Open"/> call
+        /// so as to reduce the time the <see cref="Open"/> call takes once it is called.
+        /// </summary>
+        /// <param name="fileName">The filename of the document for which to prefetch data.</param>
+        /// <param name="fileID">The ID of the file being prefetched.</param>
+        /// <param name="actionID">The ID of the action being prefetched.</param>
+        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
+        public void Prefetch(string fileName, int fileID, int actionID, FAMTagManager tagManager,
+            FileProcessingDB fileProcessingDB)
+        {
+            try
+            {
+                _imageViewer.CacheImage(fileName);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30717", ex);
             }
         }
 
