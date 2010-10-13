@@ -1660,6 +1660,10 @@ namespace Extract.Redaction.Verification
                 // Exemption codes
                 _imageViewer.Shortcuts[Keys.E] = SelectPromptForExemptionCode;
                 _imageViewer.Shortcuts[Keys.E | Keys.Control] = SelectApplyLastExemptionCode;
+
+                // ThumbnailViewer is shown/hidden
+                _thumbnailDockableWindow.DockSituationChanged +=
+                    ThumbnailDockableWindowDockSituationChanged;
             }
             catch (Exception ex)
             {
@@ -2254,6 +2258,26 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="ThumbnailDockableWindow.DockSituationChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ThumbnailDockableWindow.DockSituationChanged"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ThumbnailDockableWindow.DockSituationChanged"/> event.</param>
+        void ThumbnailDockableWindowDockSituationChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // Don't keep loading thumbnails if _thumbnailDockableWindow is closed.
+                _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30742", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region IVerificationForm Members
@@ -2298,6 +2322,11 @@ namespace Extract.Redaction.Verification
 
                 // Create the saved memento
                 _savedMemento = CreateSavedMemento(fullPath, fileID, actionID, pathTags);
+
+                // If the thumbnail viewer is not visible when a document is opened, don't load the
+                // thumbnails. (They will get loaded if the thumbnail window is opened at a later
+                // time).
+                _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen;
 
                 _imageViewer.OpenImage(_savedMemento.DisplayImage, false);
             }

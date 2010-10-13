@@ -42,6 +42,16 @@ namespace Extract.Imaging.Forms
         /// </summary>
         ThumbnailWorker _worker;
 
+        /// <summary>
+        /// Indicates whether the thumbnail viewer should load thumbnails.
+        /// </summary>
+        bool _active = true;
+
+        /// <summary>
+        /// The current pagenumber of the <see cref="ImageViewer"/>
+        /// </summary>
+        int _currentPage;
+
         #endregion Fields
 
         #region Constructors
@@ -65,6 +75,58 @@ namespace Extract.Imaging.Forms
 
         #endregion Constructors
 
+        #region Properties
+
+        /// <summary>
+        /// Indicates whether the thumbnail viewer should load thumbnails.
+        /// </summary>
+        /// <value><see langword="true"/> if the thumbnails should be loaded;
+        /// <see langword="false"/> otherwise.</value>
+        public bool Active
+        {
+            get
+            {
+                return _active;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _active)
+                    {
+                        _active = value;
+
+                        if (_active && _imageViewer.IsImageAvailable)
+                        {
+                            // If _imageList hasn't been initialized, do it now.
+                            if (_imageList == null || _imageList.Items.Count == 0)
+                            {
+                                LoadDefaultThumbnails();
+                            }
+
+                            // Kick off or un-pause a worker thread.
+                            StartThumbnailWorker();
+
+                            // Ensure the proper thumbnail is selected after re-activating.
+                            SelectPage(_currentPage);
+                        }
+                        else if (!_active && _worker != null && _worker.IsRunning)
+                        {
+                            // If deactivated, keep the worker thread around, but pause it.
+                            PauseThumbnailWorker();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI30743", ex);
+                }
+            }
+        }
+
+        #endregion Properties
+
         #region Methods
 
         /// <summary>
@@ -84,13 +146,13 @@ namespace Extract.Imaging.Forms
         /// Populates the image list with default loading image for each page and triggers the 
         /// worker thread to load page thumnails for the currently open image.
         /// </summary>
-        void PopulateImageList()
+        void UpdateImageList()
         {
             _imageList.BeginUpdate();
 
             Clear();
 
-            if (_imageViewer.IsImageAvailable)
+            if (Active && _imageViewer.IsImageAvailable)
             {
                 LoadDefaultThumbnails();
 
@@ -159,11 +221,31 @@ namespace Extract.Imaging.Forms
         /// </summary>
         void StartThumbnailWorker()
         {
-            _worker = new ThumbnailWorker(_imageViewer.ImageFile, _imageList.ItemImageSize);
+            if (_worker == null)
+            {
+                _worker = new ThumbnailWorker(_imageViewer.ImageFile, _imageList.ItemImageSize);
 
-            _worker.BeginLoading();
+                _worker.BeginLoading();
+            }
+            else
+            {
+                _worker.Paused = false;
+            }
 
             _timer.Start();
+        }
+
+        /// <summary>
+        /// Pauses the worker thread if it exists.
+        /// </summary>
+        void PauseThumbnailWorker()
+        {
+            _timer.Stop();
+
+            if (_worker != null && _worker.IsRunning)
+            {
+                _worker.Paused = true;
+            }
         }
 
         /// <summary>
@@ -243,6 +325,28 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Selects the thumbnail representing the specified image page.
+        /// </summary>
+        /// <param name="pageNumber">The page number to select.</param>
+        void SelectPage(int pageNumber)
+        {
+            // Select the thumbnail corresponding to this page
+            RasterImageListItem item = _imageList.Items[pageNumber - 1];
+            if (!item.Selected)
+            {
+                // Ensure the item to select is visible
+                _imageList.EnsureVisible(pageNumber - 1);
+
+                // Clear the current selection
+                ClearSelection();
+
+                // Select this item
+                item.Selected = true;
+                item.Invalidate();
+            }
+        }
+
         #endregion Methods
 
         #region Event Handlers
@@ -258,7 +362,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                PopulateImageList();
+                UpdateImageList();
             }
             catch (Exception ex)
             {
@@ -277,19 +381,13 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                // Select the thumbnail corresponding to this page
-                RasterImageListItem item = _imageList.Items[e.PageNumber - 1];
-                if (!item.Selected)
+                // Keep track of the current page, even if the thumbnail viewer isn't currently
+                // active. That way the proper page can be selected if it is re-activated.
+                _currentPage = e.PageNumber;
+
+                if (Active)
                 {
-                    // Ensure the item to select is visible
-                    _imageList.EnsureVisible(e.PageNumber - 1);
-
-                    // Clear the current selection
-                    ClearSelection();
-
-                    // Select this item
-                    item.Selected = true;
-                    item.Invalidate();
+                    SelectPage(_currentPage);
                 }
             }
             catch (Exception ex)
@@ -309,7 +407,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                if (_imageViewer.IsImageAvailable)
+                if (Active && _imageViewer.IsImageAvailable)
                 {
                     // Go to the page of the first selected item.
                     // Only one page can be selected at a time.

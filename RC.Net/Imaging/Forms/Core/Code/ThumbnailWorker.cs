@@ -77,16 +77,14 @@ namespace Extract.Imaging.Forms
         bool _running;
 
         /// <summary>
-        /// <see langword="true"/> if loading thumbnails has been signaled to stop;
-        /// <see langword="false"/> if loading thumbanils has not been signaled to stop.
+        /// Raised when the worker is un-paused. When paused, this event is reset.
         /// </summary>
-        volatile bool _cancelling;
+        EventWaitHandle _unPausedEvent = new ManualResetEvent(true);
 
         /// <summary>
-        /// <see langword="true"/> if loading thumbnails has been cancelled; 
-        /// <see langword="false"/> if loading thumbnails has not been cancelled.
+        /// Raised when the worker is cancelled.
         /// </summary>
-        bool _cancelled;
+        EventWaitHandle _cancelledEvent = new ManualResetEvent(false);
 
         /// <summary>
         /// Protects access to shared resources.
@@ -119,15 +117,48 @@ namespace Extract.Imaging.Forms
         #region Properties
 
         /// <summary>
-        /// Gets whether the <see cref="ThumbnailWorker"/> is loading thumbnails.
+        /// Gets whether the <see cref="ThumbnailWorker"/> is in the process of loading thumbnails.
+        /// (The process may or may not be paused).
         /// </summary>
-        /// <value><see langword="true"/> if the <see cref="ThumbnailWorker"/> is loading 
-        /// thumbnails; <see langword="false"/> if it is not loading thumbnails.</value>
+        /// <value><see langword="true"/> if the <see cref="ThumbnailWorker"/> is in the process of 
+        /// loading thumbnails; <see langword="false"/> if it is not loading thumbnails.</value>
         public bool IsRunning
         {
             get
             {
                 return _running;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the worker's processing is paused.
+        /// </summary>
+        /// <value><see langword="true"/> if processing is paused, <see langword="false"/>
+        /// otherwise.</value>
+        public bool Paused
+        {
+            get
+            {
+                return !_unPausedEvent.WaitOne(0);
+            }
+
+            set
+            {
+                try
+                {
+                    if (value)
+                    {
+                        _unPausedEvent.Reset();
+                    }
+                    else
+                    {
+                        _unPausedEvent.Set();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI30744", ex);
+                }
             }
         }
 
@@ -146,10 +177,10 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Signal the worker to stop
-                _cancelling = true;
+                _cancelledEvent.Set();
 
                 // Wait up to the specified time out for the worker to stop
-                if (_running && !_cancelled)
+                if (IsRunning)
                 {
                     int remaining = timeout;
                     while (remaining > _TIMEOUT_INTERVAL)
@@ -157,7 +188,7 @@ namespace Extract.Imaging.Forms
                         Thread.Sleep(_TIMEOUT_INTERVAL);
                         remaining -= _TIMEOUT_INTERVAL;
 
-                        if (_cancelled)
+                        if (!IsRunning)
                         {
                             return;
                         }
@@ -168,7 +199,7 @@ namespace Extract.Imaging.Forms
                         Thread.Sleep(remaining);
                     }
 
-                    if (!_cancelled)
+                    if (IsRunning)
                     {
                         _thread.Abort();
                         throw new ExtractException("ELI27934",
@@ -247,7 +278,10 @@ namespace Extract.Imaging.Forms
         /// </returns>
         int GetNextPageToLoad()
         {
-            if (_cancelling)
+            // Wait here if processing is paused but not cancelled.
+            WaitHandle.WaitAny(new WaitHandle[] { _unPausedEvent, _cancelledEvent });
+
+            if (_cancelledEvent.WaitOne(0))
             {
                 return -1;
             }
@@ -308,7 +342,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                _cancelled = false;
+                _cancelledEvent.Reset();
+                _unPausedEvent.Set();
                 _running = true;
 
                 // Iterate through each unloaded thumbnail
@@ -324,22 +359,14 @@ namespace Extract.Imaging.Forms
 
                     page = GetNextPageToLoad();
                 }
-
-                if (_cancelling)
-                {
-                    // The loading has been cancelled
-                    _cancelled = true;
-                }
             }
             catch (Exception ex)
             {
-                _cancelled = true;
                 ExtractException.Display("ELI27937", ex);
             }
             finally
             {
                 _running = false;
-                _cancelling = false;
             }
         }
 
@@ -397,6 +424,16 @@ namespace Extract.Imaging.Forms
                 {
                     _codecs.Dispose();
                     _codecs = null;
+                }
+                if (_unPausedEvent != null)
+                {
+                    _unPausedEvent.Dispose();
+                    _unPausedEvent = null;
+                }
+                if (_cancelledEvent != null)
+                {
+                    _cancelledEvent.Dispose();
+                    _cancelledEvent = null;
                 }
             }
 
