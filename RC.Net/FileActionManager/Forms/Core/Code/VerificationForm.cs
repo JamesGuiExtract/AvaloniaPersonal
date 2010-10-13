@@ -78,6 +78,11 @@ namespace Extract.FileActionManager.Forms
         EventWaitHandle _closedEvent = new ManualResetEvent(false);
 
         /// <summary>
+        /// An event indicating when a file has finished loading.
+        /// </summary>
+        EventWaitHandle _fileLoadedEvent = new ManualResetEvent(false);
+
+        /// <summary>
         /// If <see langword="true"/>, the <see cref="_form"/> is in the process of being closed. 
         /// <see cref="ShowDocument"/> should not be called when in this state and any call to 
         /// <see cref="ShowForm"/> needs to wait for the previous form to finish closing.
@@ -274,6 +279,11 @@ namespace Extract.FileActionManager.Forms
                 haveLock = Monitor.TryEnter(_lock);
                 if (!haveLock)
                 {
+                    // Wait until the UI thread has finished loading its document before
+                    // pre-fetcthing. Even with multiple cores, disk I/O from the prefectch can
+                    // cause the UI thread to load slower.
+                    _fileLoadedEvent.WaitOne();
+
                     // While waiting for the verification UI thread, prefetch data so that
                     // MainForm.Open call on this thread will have less work to do and execute
                     // faster.
@@ -285,6 +295,8 @@ namespace Extract.FileActionManager.Forms
                     haveLock = true;
                 }
 
+                _fileLoadedEvent.Reset();
+
                 if (this.Canceled)
                 {
                     return EFileProcessingResult.kProcessingCancelled;
@@ -295,6 +307,8 @@ namespace Extract.FileActionManager.Forms
 
                 // Open the file
                 MainForm.Open(fileName, fileID, actionID, tagManager, fileProcessingDB);
+
+                _fileLoadedEvent.Set();
 
                 // Wait until the document is either saved or the verification form is closed.
                 WaitForEvent(_fileCompletedEvent);
@@ -311,6 +325,9 @@ namespace Extract.FileActionManager.Forms
             }
             catch (Exception ex)
             {
+                // Ensure that _fileLoadedEvent gets set so that prefetch threads don't hang.
+                _fileLoadedEvent.Set();
+
                 ExtractException ee = ExtractException.AsExtractException("ELI23970", ex);
                 ee.AddDebugData("Filename", fileName, false);
                 throw ee;
@@ -422,28 +439,33 @@ namespace Extract.FileActionManager.Forms
                 // Close the event handles
                 if (_initializedEvent != null)
                 {
-                    _initializedEvent.Close();
+                    _initializedEvent.Dispose();
                     _initializedEvent = null;
                 }
                 if (_fileCompletedEvent != null)
                 {
-                    _fileCompletedEvent.Close();
+                    _fileCompletedEvent.Dispose();
                     _fileCompletedEvent = null;
                 }
                 if (_canceledEvent != null)
                 {
-                    _canceledEvent.Close();
+                    _canceledEvent.Dispose();
                     _canceledEvent = null;
                 }
                 if (_exceptionThrownEvent != null)
                 {
-                    _exceptionThrownEvent.Close();
+                    _exceptionThrownEvent.Dispose();
                     _exceptionThrownEvent = null;
                 }
                 if (_closedEvent != null)
                 {
-                    _closedEvent.Close();
+                    _closedEvent.Dispose();
                     _closedEvent = null;
+                }
+                if (_fileLoadedEvent != null)
+                {
+                    _fileLoadedEvent.Dispose();
+                    _fileLoadedEvent = null;
                 }
             }
 

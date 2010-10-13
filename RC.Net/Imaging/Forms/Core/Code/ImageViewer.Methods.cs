@@ -246,17 +246,8 @@ namespace Extract.Imaging.Forms
                         // Reset the valid annotations flag
                         _validAnnotations = true;
 
-                        // Look for a reader that has already been cached for this file before
-                        // creating a new one.
-                        if (!_cachedReaders.TryGetValue(fileName, out _reader))
-                        {
-                            // Initialize reader
-                            _reader = Codecs.CreateReader(fileName);
-                            if (_cacheImages)
-                            {
-                                _cachedReaders[fileName] = _reader;
-                            }
-                        }
+                        // Initialize the reader
+                        _reader = ImageReaderCache.GetReader(fileName, Codecs, _cacheImages);
 
                         // Get the page count
                         _pageCount = _reader.PageCount;
@@ -299,10 +290,7 @@ namespace Extract.Imaging.Forms
                             _reader = null;
                         }
 
-                        if (_cachedReaders.ContainsKey(fileName))
-                        {
-                            _cachedReaders.Remove(fileName);
-                        }
+                        ImageReaderCache.RemoveReader(fileName);
 
                         throw ExtractException.AsExtractException("ELI23376", ex);
                     }
@@ -374,27 +362,15 @@ namespace Extract.Imaging.Forms
         /// <param name="fileName">The name of the file to cache.</param>
         public void CacheImage(string fileName)
         {
-            ImageReader imageReader = null;
-
             try
             {
                 ExtractException.Assert("ELI30718", "Image caching is disabled.",
                     _cacheImages);
 
-                if (!_cachedReaders.ContainsKey(fileName))
-                {
-                    imageReader = Codecs.CreateReader(fileName);
-                    imageReader.CachePage(1);
-                    _cachedReaders[fileName] = imageReader;
-                }
+                ImageReaderCache.CacheReader(fileName, Codecs);
             }
             catch (Exception ex)
             {
-                if (imageReader != null)
-                {
-                    imageReader.Dispose();
-                }
-
                 throw ExtractException.AsExtractException("ELI30719", ex);
             }
         }
@@ -410,15 +386,12 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                ImageReader imageReader;
-                if (_cachedReaders.TryGetValue(fileName, out imageReader))
+                // By passing in _reader as the second argument, you are asking the RemoveReader if
+                // it was disposed of as part of the call. AFAIK, this situation shouldn't occur,
+                // but just in case it does, remove this reference.
+                if (ImageReaderCache.RemoveReader(fileName, _reader))
                 {
-                    if (imageReader == _reader)
-                    {
-                        _reader = null;
-                    }
-                    imageReader.Dispose();
-                    _cachedReaders.Remove(fileName);
+                    _reader = null;
                 }
             }
             catch (Exception ex)

@@ -431,12 +431,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _cacheImages;
 
-        /// <summary>
-        /// The currently cached <see cref="ImageReader"/>s.
-        /// </summary>
-        Dictionary<string, ImageReader> _cachedReaders =
-            new Dictionary<string, ImageReader>(StringComparer.OrdinalIgnoreCase);
-
         #endregion Fields
 
         #region Image Viewer Events

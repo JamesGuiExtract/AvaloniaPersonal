@@ -223,6 +223,10 @@
     <Compile Include="FitMode.cs" />
     <Compile Include="FittingData.cs" />
     <Compile Include="ImageLayerObject.cs" />
+    <Compile Include="ImageViewer.ImageReaderCache.cs">
+	  <DependentUpon>ImageViewer.cs</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ImageViewerCursors.cs" />
     <Compile Include="LayerObjectsCollectionEventArguments.cs" />
     <Compile Include="Controls\HighlightToolStripSplitButton.cs">

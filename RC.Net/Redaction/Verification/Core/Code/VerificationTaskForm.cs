@@ -2259,12 +2259,12 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the <see cref="ThumbnailDockableWindow.DockSituationChanged"/> event.
+        /// Handles the <see cref="DockControl.DockSituationChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="ThumbnailDockableWindow.DockSituationChanged"/> event.</param>
+        /// <see cref="DockControl.DockSituationChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="ThumbnailDockableWindow.DockSituationChanged"/> event.</param>
+        /// <see cref="DockControl.DockSituationChanged"/> event.</param>
         void ThumbnailDockableWindowDockSituationChanged(object sender, EventArgs e)
         {
             try
