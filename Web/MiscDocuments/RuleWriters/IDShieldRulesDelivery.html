@@ -1,195 +1,202 @@
 <HTML>
-	<HEAD>
-		<TITLE>ID Shield Rules Delivery Checklist</TITLE>
-		<style type="text/css">
-		
-			tr{
-				content-align: top;
-			}
-			
-			td{
-				border-width: 1px;
-				border-color: #000000;
-				border-style: Solid;
-				border-right-width: 1px;
-				padding-top: 5px;
-				padding-bottom: 5px;
-				padding-right: 10px;			
-				padding-left: 10px;
-			}
-			
-		</style>
-	</HEAD>
-	<BODY>
-		<h1>ID Shield Rules Delivery Checklist</h1>
-		<hr>
-		<p>
-			Date: _____________________________<br>
-		</p>
-		<p>
-			Customer: _________________________<br>
-		</p>
-		<p>
-			Partner: ___________________________<br>
-		</p>
-		<hr>
-		<p>
-			<table style="border-collapse: collapse">
-				<tr>
-					<td style="width: 80%">
-						<p style="font-weight: bold;">
-							Task
-						</p>
-					</td>
-					<td style="width: 20%;">
-						<p style="font-weight: bold;">
-							Comments
-						</p>
-					</td>
-				</tr>
-				<tr>
-					<td style="width: 80%">
-						<p>
-							<u>Add rules to SourceGear Vault</u>
-							<ol START=1>
-								<li><img src="..\CheckDash.JPG"> Ensure that all rules related <b>.rsd</b> and <b>.dat</b> files have been checked into SourceGear Vault under the <i>Rules</i> sub-folder of the main project folder.</li>
-								<li><img src="..\CheckDash.JPG"> Ensure that all testing related <b>.tcl</b> and <b>.dat</b> files have been checked into SourceGear Vault under the <i>TestingFiles</i> sub-folder of the main project folder.</li>
-							</ol>
-						<p>
-					</td>
-					<td style="width: 20%">
-					</td>
-				</tr>
-					<td style="width: 80%;">
-						<u>Add keys and counters to Master.rsd</u>
-							<ol START=3>
-								<li><img src="..\CheckDash.JPG"> Check out <b>Master.rsd</b>:
-									<ol>
-										<p>
-											<li><img src="..\CheckDash.JPG"> Set the appropriate counter.</li>
-											<li><img src="..\CheckDash.JPG"> Set the appropriate USB key numbers.</li>
-											<li><img src="..\CheckDash.JPG"> Make sure the file is NOT internal.</li>
-											<li><img src="..\CheckDash.JPG"> Add VOA or XML output handlers as required by the SOW.</li>
-										</p>
-									</ol>
-								</li>
-								<li><img src="..\CheckDash.JPG">Check in <b>Master.rsd</b>.
-							</ol>
-					</td>
-					<td style="width: 20%">
-					</td>
-				</tr>
-				<tr>
-					<td style="width: 80%;">
-						<u>Quality check all .rsd files</u>
-						<ol START=5>
-							<li><img src="..\CheckDash.JPG"> Confirm all references are to <b>.etf</b> files and NOT <b>.rsd</b> or <b>.dat</b> files.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that all files, except <b>Master.rsd</b>, are internal use only.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that <b>Master.rsd</b> is the only file that has keys or counters.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that <b>Master.rsd</b> is the only file with a document classifier.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that <b>Master.rsd</b> is the only file that is creating <b>.voa</b> or <b>.xml</b> files.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that there are no incorrect references or missing files.</li>
-							<li><img src="..\CheckDash.JPG"> Check to see if any rules objects have been accidentally turned off.  Rules that are turned off on purpose should be well labeled to avoid future confusion.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that the proper counter and USB key numbers are set in <b>Master.rsd</b> and that <b>Master.rsd</b> is NOT internal use only.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that the proper types of output files are being created by <b>Master.rsd</b>.</li>
-							<li><img src="..\CheckDash.JPG"> In SourceGear Vault, label the <i>Rules</i> sub-folder with the date, using the format <i>YYYY-MM-DD</i>.</li>
-						</ol>
-					</td>
-					<td style="width: 20%">
-					</td>
-				</tr>
-				<tr>
-					<td style="width: 80%">
-						<u>Create delivery test</u>
-						<ol START=15>
-							<li><img src="..\CheckDash.JPG"> Confirm that rule writers have added appropriate examples to the <i>Images</i> folder of the delivery test.</li>
-							<li><img src="..\CheckDash.JPG"> Create a <i>Rules</i> folder and <b>.tcl</b> and <b>.dat</b> files for the delivery test if not already present.</li>
-							<li><img src="..\CheckDash.JPG"> Create an <i>EAV</i> folder and make an <b>.eav</b> file for each image in the delivery test.</li>
-							<li><img src="..\CheckDash.JPG"> Perform a "first pass" run of the delivery test using the <i>YYYY-MM-DD</i> labeled rules.</li>
-							<li><img src="..\CheckDash.JPG"> Look for and report any usual or undesirable behavior including:
-								<ol>
-									<li><img src="..\CheckDash.JPG">Unexpected errors in the exception log.</li>
-									<li><img src="..\CheckDash.JPG">Missed data or clues that should obviously be caught.</li>
-									<li><img src="..\CheckDash.JPG">False positives that could easily be fixed.</li>
-									<li><img src="..\CheckDash.JPG">Unnecessary double redactions.</li>
-								</ol>
-							</li>
-						</ol>
-					</td>
-					<td style="width: 20%">
-					</td>
-				</tr>
-				<tr>
-					<td style="width: 80%">
-						<u>Create delivery</u>
-						<ol START=20>
-							<li><img src="..\CheckDash.JPG"> Create a <i>YYYY-MM-DD</i> sub-folder under the <i>Deliveries</i> folder.</li>
-							<li><img src="..\CheckDash.JPG"> Get the rules from the <i>YYYY-MM-DD</i> label in SourceGear Vault and place them in the <i>YYYY-MM-DD</i> folder.</li>
-							<li><img src="..\CheckDash.JPG"> Encrypt all <b>.rsd</b> and <b>.dat</b> files.</li>
-							<li><img src="..\CheckDash.JPG"> Delete the unencrypted files.</li>
-							<li><img src="..\CheckDash.JPG"> Create a <b>readme.txt</b> file <u>retaining the history</u> of previous deliveries that includes the following information:
-								<ol>
-									<li><img src="..\CheckDash.JPG">Date of the delivery.</li>
-									<li><img src="..\CheckDash.JPG">Fields the rules are redacting.</li>
-									<li><img src="..\CheckDash.JPG">Version, patch, and FKBUpdate used by the rules.</li>
-									<li><img src="..\CheckDash.JPG">Counter.</li>
-									<li><img src="..\CheckDash.JPG">USB keys.</li>
-									<li><img src="..\CheckDash.JPG">Types of files output by the rules.</li>
-								</ol>
-							</li>
-							<li><img src="..\CheckDash.JPG"> Build a <b>.zip</b> file in  the <i>YYYY-MM-DD</i> folder and name it with the format<br> <i>YYYY-MM-DD &ltProject Name&gt Redaction.zip</i></li>
-						</ol>
-					<td style="width: 20%">
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<u>Execute delivery test</u>
-						<ol START=27>
-							<li><img src="..\CheckDash.JPG"> Ghost a test machine and install the current public build.</li>
-							<li><img src="..\CheckDash.JPG"> Install the current patch, if appropriate.</li>
-							<li><img src="..\CheckDash.JPG"> Install the current FKBUpdate, if needed.</li>
-							<li><img src="..\CheckDash.JPG"> Copy the delivery test folder to the ghosted machine.</li>
-							<li><img src="..\CheckDash.JPG"> Copy the rules from the <b>.zip</b> file.</li>
-							<li><img src="..\CheckDash.JPG"> Execute the delivery test.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that all items in the delivery test pass.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that their are no unexpected errors in the exception log.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that the proper output files are created.</li>
-						</ol>
-					</td>
-					<td style="width: 20%">
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<u>Run final capture rate test</u>
-						<ol START=36>
-							<li><img src="..\CheckDash.JPG"> Prepare the LogProcessStats utility to monitor the final capture rate test.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that the only <b>license file</b> in use matches the customer-deployed license file. Testing will require a <b>Disable USB Key Serial Numbers</b> license.</li>
-							<li><img src="..\CheckDash.JPG"> Run the final capture rate test using the rules from the <b>.zip</b> file. </li>
-							<li><img src="..\CheckDash.JPG"> Look at the results from the LogProcessStats utility and confirm that neither memory leaks nor resource leaks are present.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that their are no unexpected errors in the exception log.</li>
-							<li><img src="..\CheckDash.JPG"> Record the results of the final capture test in the statistics spreadsheet and include the delivery date in the comments section.</li>
-						</ol>
-					</td>
-					<td style="width: 20%">
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<u>Send delivery</u>
-						<ol START=41>
-							<li><img src="..\CheckDash.JPG"> Add an external statistics spreadsheet into the <i>YYYY-MM-DD</i> folder.  The templates for the external spreadsheets are located in SourceGear Vault under: <b>$\Engineering\Web\MiscDocuments\RuleWriters</b>.  For hybrid projects, use <b>IDShieldStatisticsTemplateExternal (Hybrid).xls</b>.  For all other projects, use <b>IDShieldStatisticsTemplateExternal (Classic).xls</b>.</li>
-							<li><img src="..\CheckDash.JPG"> Fill in the spreadsheet, using the statistics from the final capture rate test.</li>
-							<li><img src="..\CheckDash.JPG"> Place the spreadsheet inside of the <b>.zip</b> file.</li>
-							<li><img src="..\CheckDash.JPG"> Create an appropriate e-mail and attach the <b>.zip</b> file.  Be sure to mention which workflow the customer should use in the e-mail.</li>
-							<li><img src="..\CheckDash.JPG"> Send the e-mail to all support personnel, Wayne, and Arvind.</li>
-						</ol>
-					</td>
-					<td style="width: 20%">
-					</td>
-				</tr>
-			</table>
-		</p>
-	</BODY>
+    <HEAD>
+        <TITLE>ID Shield Rules Delivery Checklist</TITLE>
+        <style type="text/css">
+        
+            tr{
+                content-align: top;
+            }
+            
+            td{
+                border-width: 1px;
+                border-color: #000000;
+                border-style: Solid;
+                border-right-width: 1px;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                padding-right: 10px;            
+                padding-left: 10px;
+            }
+            
+        </style>
+    </HEAD>
+    <BODY>
+        <h1>ID Shield Rules Delivery Checklist</h1>
+        <hr>
+        <p>
+            Date: _____________________________<br>
+        </p>
+        <p>
+            Customer: _________________________<br>
+        </p>
+        <p>
+            Partner: ___________________________<br>
+        </p>
+        <hr>
+        <p>
+            <table style="border-collapse: collapse">
+                <tr>
+                    <td style="width: 80%">
+                        <p style="font-weight: bold;">
+                            Task
+                        </p>
+                    </td>
+                    <td style="width: 20%;">
+                        <p style="font-weight: bold;">
+                            Comments
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 80%">
+                        <p>
+                            <u>Add rules to SourceGear Vault</u>
+                            <ol START=1>
+                                <li><img src="..\CheckDash.JPG"> Ensure that all rules related <b>.rsd</b> and <b>.dat</b> files have been checked into SourceGear Vault under the <i>Rules</i> sub-folder of the main project folder.</li>
+                                <li><img src="..\CheckDash.JPG"> Ensure that all testing related <b>.tcl</b> and <b>.dat</b> files have been checked into SourceGear Vault under the <i>TestingFiles</i> sub-folder of the main project folder.</li>
+                            </ol>
+                        <p>
+                    </td>
+                    <td style="width: 20%">
+                    </td>
+                </tr>
+                    <td style="width: 80%;">
+                        <u>Add keys and counters to Master.rsd</u>
+                            <ol START=3>
+                                <li><img src="..\CheckDash.JPG"> Check out <b>Master.rsd</b>:
+                                    <ol>
+                                        <p>
+                                            <li><img src="..\CheckDash.JPG"> Set the appropriate counter.</li>
+                                            <li><img src="..\CheckDash.JPG"> Set the appropriate USB key numbers.</li>
+                                            <li><img src="..\CheckDash.JPG"> Make sure the file is NOT internal.</li>
+                                            <li><img src="..\CheckDash.JPG"> Add VOA or XML output handlers as required by the SOW.</li>
+                                        </p>
+                                    </ol>
+                                </li>
+                                <li><img src="..\CheckDash.JPG">Check in <b>Master.rsd</b>.
+                            </ol>
+                    </td>
+                    <td style="width: 20%">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 80%;">
+                        <u>Quality check all .rsd files</u>
+                        <ol START=5>
+                            <li><img src="..\CheckDash.JPG"> Confirm all references are to <b>.etf</b> files and NOT <b>.rsd</b> or <b>.dat</b> files.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that all files, except <b>Master.rsd</b>, are internal use only.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that the proper counter and USB key numbers are set in <b>Master.rsd</b> and that <b>Master.rsd</b> is NOT internal use only.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that <b>Master.rsd</b> is the only file that has keys or counters.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that the proper types of output files are being created by <b>Master.rsd</b>.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that <b>Master.rsd</b> is the only file that is creating <b>.voa</b> or <b>.xml</b> files.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that there are no superfluous document classifiers.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that there are no incorrect references or missing files.</li>
+                            <li><img src="..\CheckDash.JPG"> Check to see if any rules objects have been accidentally turned off.  Rules that are turned off on purpose should be well labeled to avoid future confusion.</li>
+                            <li><img src="..\CheckDash.JPG"> In SourceGear Vault, label the <i>Rules</i> sub-folder with the date, using the format <i>YYYY-MM-DD</i>.</li>
+                        </ol>
+                    </td>
+                    <td style="width: 20%">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 80%">
+                        <u>Create delivery test</u>
+                        <ol START=15>
+                            <li><img src="..\CheckDash.JPG"> Confirm that rule writers have added appropriate examples to the <i>Images</i> folder of the delivery test.</li>
+                            <li><img src="..\CheckDash.JPG"> Create a <i>Rules</i> folder and <b>.tcl</b> and <b>.dat</b> files for the delivery test if not already present.</li>
+                            <li><img src="..\CheckDash.JPG"> Create an <i>EAV</i> folder and make an <b>.eav</b> file for each image in the delivery test.</li>
+                            <li><img src="..\CheckDash.JPG"> Perform a "first pass" run of the delivery test using the <i>YYYY-MM-DD</i> labeled rules.</li>
+                            <li><img src="..\CheckDash.JPG"> Look for and report any usual or undesirable behavior including:
+                                <ol>
+                                    <li><img src="..\CheckDash.JPG">Unexpected errors in the exception log.</li>
+                                    <li><img src="..\CheckDash.JPG">Missed data or clues that should obviously be caught.</li>
+                                    <li><img src="..\CheckDash.JPG">False positives that could easily be fixed.</li>
+                                    <li><img src="..\CheckDash.JPG">Unnecessary double redactions.</li>
+                                </ol>
+                            </li>
+                        </ol>
+                    </td>
+                    <td style="width: 20%">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 80%">
+                        <u>Create delivery</u>
+                        <ol START=20>
+                            <li><img src="..\CheckDash.JPG"> Create a <i>YYYY-MM-DD</i> sub-folder under the <i>Deliveries</i> folder.</li>
+                            <li><img src="..\CheckDash.JPG"> Get the rules from the <i>YYYY-MM-DD</i> label in SourceGear Vault and place them in the <i>YYYY-MM-DD</i> folder.</li>
+                            <li><img src="..\CheckDash.JPG"> Encrypt all <b>.rsd</b> and <b>.dat</b> files.</li>
+                            <li><img src="..\CheckDash.JPG"> Delete the unencrypted files.</li>
+                            <li><img src="..\CheckDash.JPG"> Create a <b>readme.txt</b> file, <u>retaining the history</u> of previous deliveries that includes the following information:
+                                <ol>
+                                    <li><img src="..\CheckDash.JPG">Date of the delivery.</li>
+                                    <li><img src="..\CheckDash.JPG">Fields the rules are redacting.</li>
+                                    <li><img src="..\CheckDash.JPG">Version, patch, and FKBUpdate used by the rules.</li>
+                                    <li><img src="..\CheckDash.JPG">Counter.</li>
+                                    <li><img src="..\CheckDash.JPG">USB keys.</li>
+                                    <li><img src="..\CheckDash.JPG">Types of files output by the rules.</li>
+                                </ol>
+                            </li>
+                            <li><img src="..\CheckDash.JPG"> Build a <b>.zip</b> file in  the <i>YYYY-MM-DD</i> folder and name it with the format<br> <i>YYYY-MM-DD &ltProject Name&gt Redaction.zip</i></li>
+                        </ol>
+                    <td style="width: 20%">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <u>Execute delivery test</u>
+                        <ol START=27>
+                            <li><img src="..\CheckDash.JPG"> "Clean" a test machine (either uninstall Extract software and remove the
+                            <b>Extract Systems</b> program files folder or restore from a Ghost/Clonezilla image)
+                            <li><img src="..\CheckDash.JPG"> Install the appropriate version of ID Shield and the RDT.</li>
+                            <li><img src="..\CheckDash.JPG"> Install any appropriate patches.</li>
+                            <li><img src="..\CheckDash.JPG"> Install the appropriate FKBUpdate.</li>
+                            <li><img src="..\CheckDash.JPG"> Copy the delivery test folder to the test machine.</li>
+                            <li><img src="..\CheckDash.JPG"> Copy the rules from the <b>.zip</b> file.</li>
+                            <li><img src="..\CheckDash.JPG"> Execute the delivery test.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that all items in the delivery test pass.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that their are no unexpected errors in the exception log.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that the proper output files are created.</li>
+                        </ol>
+                    </td>
+                    <td style="width: 20%">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <u>Run final capture rate test</u>
+                        <ol START=36>
+                            <li><img src="..\CheckDash.JPG"> Prepare the LogProcessStats utility to monitor the final capture rate test.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that the only <b>license file</b> in use matches the customer-deployed license file. Testing will require a <b>Disable USB Key Serial Numbers</b> license.</li>
+                            <li><img src="..\CheckDash.JPG"> Run the final capture rate test using the rules from the <b>.zip</b> file. </li>
+                            <li><img src="..\CheckDash.JPG"> Look at the results from the LogProcessStats utility and confirm that neither memory leaks nor resource leaks are present.</li>
+                            <li><img src="..\CheckDash.JPG"> Confirm that their are no unexpected errors in the exception log.</li>
+                            <li><img src="..\CheckDash.JPG"> Record the results of the final capture test in the statistics spreadsheet and include the delivery date in the comments section.</li>
+                        </ol>
+                    </td>
+                    <td style="width: 20%">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <u>Send delivery</u>
+                        <ol START=41>
+                            <li><img src="..\CheckDash.JPG"> Add an external statistics spreadsheet into the <i>YYYY-MM-DD</i> folder.
+                            The templates for the external spreadsheets are located in SourceGear Vault under:
+                            <b>$\Engineering\Web\MiscDocuments\RuleWriters</b>.  For hybrid projects, use
+                            <b>IDShieldStatisticsTemplateExternal (Hybrid).xls</b>.  For fully automated projects, use
+                            <b>IDShieldStatisticsTemplateExternal (Automated).xls</b>.  For standard verification projects use
+                            <b>IDShieldStatisticsTemplateExternal (Verified).xls</b>.</li>
+                            <li><img src="..\CheckDash.JPG"> Fill in the spreadsheet, using the statistics from the final capture rate test.</li>
+                            <li><img src="..\CheckDash.JPG"> Place the spreadsheet inside of the <b>.zip</b> file.</li>
+                            <li><img src="..\CheckDash.JPG"> Create an appropriate e-mail and attach the <b>.zip</b> file.</li>
+                            <li><img src="..\CheckDash.JPG"> Send the e-mail to all support personnel and Arvind.</li>
+                        </ol>
+                    </td>
+                    <td style="width: 20%">
+                    </td>
+                </tr>
+            </table>
+        </p>
+    </BODY>
 </HTML>
