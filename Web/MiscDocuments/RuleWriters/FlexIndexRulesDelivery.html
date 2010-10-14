@@ -86,11 +86,11 @@
 							<li><img src="..\CheckDash.JPG"> Confirm all references are to <b>.etf</b> files and NOT <b>.rsd</b> or <b>.dat</b> files.</li>
 							<li><img src="..\CheckDash.JPG"> Confirm that all files, except <b>Master.rsd</b>, are internal use only.</li>
 							<li><img src="..\CheckDash.JPG"> Confirm that <b>Master.rsd</b> is the only file that has keys or counters.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that <b>Master.rsd</b> is the only file with a document classifier.</li>
+							<li><img src="..\CheckDash.JPG"> Confirm that the proper counter and USB key numbers are set in <b>Master.rsd</b> and that <b>Master.rsd</b> is NOT internal use only.</li>
+							<li><img src="..\CheckDash.JPG"> Confirm that there are no superfluous document classifiers.</li>
 							<li><img src="..\CheckDash.JPG"> Confirm that <b>Master.rsd</b> is the only file that is creating <b>.voa</b> or <b>.xml</b> files.</li>
 							<li><img src="..\CheckDash.JPG"> Confirm that there are no incorrect references or missing files.</li>
 							<li><img src="..\CheckDash.JPG"> Check to see if any rules objects have been accidentally turned off.  Rules that are turned off on purpose should be well labeled to avoid future confusion.</li>
-							<li><img src="..\CheckDash.JPG"> Confirm that the proper counter and USB key numbers are set in <b>Master.rsd</b> and that <b>Master.rsd</b> is NOT internal use only.</li>
 							<li><img src="..\CheckDash.JPG"> Confirm that the proper types of output files are being created by <b>Master.rsd</b>.</li>
 							<li><img src="..\CheckDash.JPG"> In SourceGear Vault, label the <i>Rules</i> sub-folder with the date, using the format <i>YYYY-MM-DD</i>.</li>
 						</ol>
@@ -145,10 +145,12 @@
 					<td>
 						<u>Execute delivery test</u>
 						<ol START=27>
-							<li><img src="..\CheckDash.JPG"> Ghost a test machine and install the current public build.</li>
-							<li><img src="..\CheckDash.JPG"> Install the current patch, if appropriate.</li>
-							<li><img src="..\CheckDash.JPG"> Install the current FKBUpdate, if needed.</li>
-							<li><img src="..\CheckDash.JPG"> Copy the delivery test folder to the ghosted machine.</li>
+                            <li><img src="..\CheckDash.JPG"> "Clean" a test machine (either uninstall Extract software and remove the
+                            <b>Extract Systems</b> program files folder or restore from a Ghost/Clonezilla image)
+                            <li><img src="..\CheckDash.JPG"> Install the appropriate version of Flex Index and the RDT.</li>
+                            <li><img src="..\CheckDash.JPG"> Install any appropriate patches.</li>
+                            <li><img src="..\CheckDash.JPG"> Install the appropriate FKBUpdate.</li>
+							<li><img src="..\CheckDash.JPG"> Copy the delivery test folder to the test machine.</li>
 							<li><img src="..\CheckDash.JPG"> Copy the rules from the <b>.zip</b> file.</li>
 							<li><img src="..\CheckDash.JPG"> Execute the delivery test.</li>
 							<li><img src="..\CheckDash.JPG"> Confirm that all items in the delivery test pass.</li>
@@ -182,7 +184,7 @@
 							<li><img src="..\CheckDash.JPG"> Fill in the spreadsheet, using the statistics from the final capture rate test.</li>
 							<li><img src="..\CheckDash.JPG"> Place the spreadsheet inside of the <b>.zip</b> file.</li>
 							<li><img src="..\CheckDash.JPG"> Create an appropriate e-mail and attach the <b>.zip</b> file.</li>
-							<li><img src="..\CheckDash.JPG"> Send the e-mail to all support personnel, Wayne, and Arvind.</li>
+							<li><img src="..\CheckDash.JPG"> Send the e-mail to all support personnel and Arvind.</li>
 						</ol>
 					</td>
 					<td style="width: 20%">
