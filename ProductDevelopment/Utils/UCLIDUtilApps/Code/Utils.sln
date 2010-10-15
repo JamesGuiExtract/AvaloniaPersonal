@@ -150,12 +150,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Interop", "..\..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractDebugData", "..\..\..\..\RC.Net\UtilityApplications\CustomApplications\UEXExtractor\Core\Code\ExtractDebugData.csproj", "{457DF429-E7EB-47EE-99FA-DD7ACC2A9ACF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFDRSService", "..\..\..\..\RC.Net\UtilityApplications\Services\ESFDRSService\Core\Code\ESFDRSService.csproj", "{073E13BB-ACD7-4818-84C9-FFBB3832B45E}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 71
+		ProjectCount = 72
 		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj
 		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcxproj
@@ -227,6 +229,7 @@ Global
 		ProjectRelativeDiskPath69 = ..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcxproj
 		ProjectRelativeDiskPath70 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
 		ProjectRelativeDiskPath71 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\UEXExtractor\Core\Code\ExtractDebugData.csproj
+		ProjectRelativeDiskPath72 = ..\..\..\..\RC.Net\UtilityApplications\Services\ESFDRSService\Core\Code\ESFDRSService.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1091,6 +1094,18 @@ Global
 		{457DF429-E7EB-47EE-99FA-DD7ACC2A9ACF}.Release|Win32.ActiveCfg = Release|x86
 		{457DF429-E7EB-47EE-99FA-DD7ACC2A9ACF}.Release|x86.ActiveCfg = Release|x86
 		{457DF429-E7EB-47EE-99FA-DD7ACC2A9ACF}.Release|x86.Build.0 = Release|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Debug|Win32.ActiveCfg = Debug|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Debug|x86.ActiveCfg = Debug|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Debug|x86.Build.0 = Debug|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Release|Any CPU.ActiveCfg = Release|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Release|Mixed Platforms.Build.0 = Release|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Release|Win32.ActiveCfg = Release|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Release|x86.ActiveCfg = Release|x86
+		{073E13BB-ACD7-4818-84C9-FFBB3832B45E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
