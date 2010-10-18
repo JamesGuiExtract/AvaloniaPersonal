@@ -8,7 +8,7 @@ START CopyNumberedFiles.exe ".\Images\1.tif" ".\Source" 50ms -h4
 START CopyNumberedFiles.exe ".\Images\2.tif" ".\Source" 50ms -h4
 
 REM Execute command-line for desired test
-START ProcessFiles.exe FilterIDShieldDataFile.fps /s
+START ProcessFiles.exe MemoryLeak_1.fps /s
 
 REM Start Logging Statistics to numbered subfolder
 LogProcessStats ProcessFiles 5s .\Stats\Test_1 /el
