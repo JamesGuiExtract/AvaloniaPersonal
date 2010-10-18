@@ -2,9 +2,11 @@ ECHO OFF
 
 REM First param = the folder to copy images from
 SET source=%1
+Set source=%source:""="%
 
 REM Second param = the folder to copy images to
 SET dest=%2
+Set dest=%dest:""="%
 
 REM Third param = the frequency in which the full set from source will
 REM be copied to dest
