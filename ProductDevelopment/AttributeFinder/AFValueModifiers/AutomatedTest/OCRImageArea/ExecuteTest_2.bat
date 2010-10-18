@@ -1,11 +1,12 @@
-REM Clean Source folder
-call Clean.bat
+:: Clean Source folder
+if exist "%testpath%\Source\" (
+del /q "%testpath%\Source\*.*"
+) else (
+md "%testpath%\Source"
+)
 
-REM Supply Numbered Files for 4 hours
-START CopyNumberedFiles "0001pg3.tif" ".\Source" 8s -h4
+:: Wait a few seconds
+"%ccdir%\sleep" 10s
 
-REM Execute command-line for desired test
-START ProcessFiles.exe MemoryLeak_2.fps /s
-
-REM Start Logging Statistics to numbered subfolder
-LogProcessStats ProcessFiles SSOCR2 5s .\Stats\Test_2 /el
+:: Supply Numbered Files for hours specified in runtest.bat
+start "CopyNumberedFiles" "%ccdir%\CopyNumberedFiles.exe" "%testpath%\0001pg3.tif" "%testpath%\Source" 8s -h%processingtime%
