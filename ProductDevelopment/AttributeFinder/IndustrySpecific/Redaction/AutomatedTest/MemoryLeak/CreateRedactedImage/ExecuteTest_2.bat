@@ -6,7 +6,7 @@ START CopyNumberedFiles.exe "Image1.tif.voa" ".\Source" 1s -h4
 START CopyNumberedFiles.exe "Image1.tif" ".\Source" 1s -h4
 
 REM Execute command-line for desired test
-START ProcessFiles.exe CreateRedactedImage2.fps /s
+START ProcessFiles.exe MemoryLeak_2.fps /s
 
 REM Start Logging Statistics to numbered subfolder
 LogProcessStats ProcessFiles 5s .\Stats\Test_2 /el
