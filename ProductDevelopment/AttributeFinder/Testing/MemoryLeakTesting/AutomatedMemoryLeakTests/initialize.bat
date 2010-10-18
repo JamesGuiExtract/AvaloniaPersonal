@@ -25,7 +25,7 @@ set logdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\
 
 :: replace service db
 echo.Replacing Fam Service DB...
-copy "%cd%\*.sdf" "%ccdir%\ESFAMService.sdf"
+for %%i in ("%cd%\*.sdf") do copy "%%i" "%ccdir%\ESFAMService.sdf"
 
 :: update .fps file paths for 64-bit systems
 if defined programfiles(x86) "%ccdir%\sqlcompactexporter" "%ccdir%\ESFAMService.sdf" "update fpsfile set filename=replace(filename,'Program Files\','Program Files (x86)\')" ""
