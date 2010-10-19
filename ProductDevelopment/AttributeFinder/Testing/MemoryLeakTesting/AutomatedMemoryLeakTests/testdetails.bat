@@ -5,7 +5,7 @@
 set td=%workdir%\testdetails.txt
 
 :: Get OS
-if defined %ProgramFiles(x86)% (
+if defined ProgramFiles(x86) (
 set bits=64
 ) else (
 set bits=32
