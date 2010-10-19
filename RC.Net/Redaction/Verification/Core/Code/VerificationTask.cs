@@ -28,8 +28,14 @@ namespace Extract.Redaction.Verification
         /// Current task version.
         /// <para>Version 3</para>
         /// Added enable input event tracking setting.
+        /// <para>Version 4</para>
+        /// Added action status settings.
+        /// <para>Version 5</para>
+        /// Added backdrop image settings.
+        /// <para>Version 6</para>
+        /// Added full screen mode setting.
         /// </summary>
-        const int _CURRENT_VERSION = 5;
+        const int _CURRENT_VERSION = 6;
         
         #endregion Constants
 

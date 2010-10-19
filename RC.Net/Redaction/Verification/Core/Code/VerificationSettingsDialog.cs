@@ -97,9 +97,10 @@ namespace Extract.Redaction.Verification
             string backdropImage = _backdropImageTextBox.Text;
             SetFileActionStatusSettings action = GetActionStatusSettings();
             bool enableInputTracking = _enableInputEventTrackingCheckBox.Checked;
+            bool launchInFullScreenMode = _launchFullScreenCheckBox.Checked;
 
-            return new VerificationSettings(general, feedback, dataFile, useBackdropImage, 
-                backdropImage, action, enableInputTracking);
+            return new VerificationSettings(general, feedback, dataFile, useBackdropImage,
+                backdropImage, action, enableInputTracking, launchInFullScreenMode);
         }
 
         /// <summary>
@@ -319,6 +320,9 @@ namespace Extract.Redaction.Verification
                 
                 // Input tracking
                 _enableInputEventTrackingCheckBox.Checked = _settings.EnableInputTracking;
+
+                // Full screen mode
+                _launchFullScreenCheckBox.Checked = _settings.LaunchInFullScreenMode;
 
                 // Update the UI
                 UpdateControls();

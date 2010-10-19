@@ -60,6 +60,7 @@ namespace Extract.Redaction.Verification
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._dataFileControl = new Extract.Redaction.DataFileControl();
+            this._launchFullScreenCheckBox = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox2 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
@@ -71,6 +72,7 @@ namespace Extract.Redaction.Verification
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(this._launchFullScreenCheckBox);
             groupBox1.Controls.Add(this._enableInputEventTrackingCheckBox);
             groupBox1.Controls.Add(this._feedbackSettingsButton);
             groupBox1.Controls.Add(this._collectFeedbackCheckBox);
@@ -79,7 +81,7 @@ namespace Extract.Redaction.Verification
             groupBox1.Controls.Add(this._verifyAllPagesCheckBox);
             groupBox1.Location = new System.Drawing.Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(369, 138);
+            groupBox1.Size = new System.Drawing.Size(369, 163);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "General";
@@ -152,7 +154,7 @@ namespace Extract.Redaction.Verification
             groupBox2.Controls.Add(this._actionStatusComboBox);
             groupBox2.Controls.Add(this._actionNameComboBox);
             groupBox2.Controls.Add(this._fileActionCheckBox);
-            groupBox2.Location = new System.Drawing.Point(12, 305);
+            groupBox2.Location = new System.Drawing.Point(11, 330);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new System.Drawing.Size(369, 78);
             groupBox2.TabIndex = 3;
@@ -220,7 +222,7 @@ namespace Extract.Redaction.Verification
             groupBox3.Controls.Add(this._backdropImageBrowseButton);
             groupBox3.Controls.Add(this._backdropImageTextBox);
             groupBox3.Controls.Add(this._backdropImageCheckBox);
-            groupBox3.Location = new System.Drawing.Point(12, 223);
+            groupBox3.Location = new System.Drawing.Point(11, 248);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new System.Drawing.Size(369, 76);
             groupBox3.TabIndex = 2;
@@ -274,7 +276,7 @@ namespace Extract.Redaction.Verification
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(306, 394);
+            this._cancelButton.Location = new System.Drawing.Point(305, 418);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 5;
@@ -284,7 +286,7 @@ namespace Extract.Redaction.Verification
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(225, 394);
+            this._okButton.Location = new System.Drawing.Point(224, 418);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 4;
@@ -294,10 +296,20 @@ namespace Extract.Redaction.Verification
             // 
             // _dataFileControl
             // 
-            this._dataFileControl.Location = new System.Drawing.Point(12, 156);
+            this._dataFileControl.Location = new System.Drawing.Point(11, 181);
             this._dataFileControl.Name = "_dataFileControl";
             this._dataFileControl.Size = new System.Drawing.Size(369, 60);
             this._dataFileControl.TabIndex = 1;
+            // 
+            // _launchFullScreenCheckBox
+            // 
+            this._launchFullScreenCheckBox.AutoSize = true;
+            this._launchFullScreenCheckBox.Location = new System.Drawing.Point(7, 139);
+            this._launchFullScreenCheckBox.Name = "_launchFullScreenCheckBox";
+            this._launchFullScreenCheckBox.Size = new System.Drawing.Size(236, 17);
+            this._launchFullScreenCheckBox.TabIndex = 6;
+            this._launchFullScreenCheckBox.Text = "Open verification window in full screen mode";
+            this._launchFullScreenCheckBox.UseVisualStyleBackColor = true;
             // 
             // VerificationSettingsDialog
             // 
@@ -305,7 +317,7 @@ namespace Extract.Redaction.Verification
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(392, 429);
+            this.ClientSize = new System.Drawing.Size(392, 453);
             this.Controls.Add(groupBox3);
             this.Controls.Add(groupBox2);
             this.Controls.Add(this._dataFileControl);
@@ -348,5 +360,6 @@ namespace Extract.Redaction.Verification
         private Extract.Utilities.Forms.PathTagsButton _backdropImagePathTagsButton;
         private Extract.Utilities.Forms.BrowseButton _backdropImageBrowseButton;
         private System.Windows.Forms.TextBox _backdropImageTextBox;
+        private System.Windows.Forms.CheckBox _launchFullScreenCheckBox;
     }
 }

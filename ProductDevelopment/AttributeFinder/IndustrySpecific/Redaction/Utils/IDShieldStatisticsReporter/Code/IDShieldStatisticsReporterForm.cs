@@ -65,6 +65,11 @@ namespace Extract.IDShieldStatisticsReporter
         static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
             FileSystemMethods.ApplicationDataPath, "ID Shield", "StatisticsReporterForm.xml");
 
+        /// <summary>
+        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// </summary>
+        static readonly string _MUTEX_STRING = "186DAD15-746F-411F-AE2E-12C241D6989F";
+
         #endregion Constants
 
         #region Fields 
@@ -128,6 +133,11 @@ namespace Extract.IDShieldStatisticsReporter
         /// </summary>
         readonly IDShieldTesterClass _idShieldTester = new IDShieldTesterClass();
 
+        /// <summary>
+        /// Saves/restores window state info and provides full screen mode.
+        /// </summary>
+        FormStateManager _formStateManager;
+
         #endregion Fields
 
         #region Constructors
@@ -169,23 +179,9 @@ namespace Extract.IDShieldStatisticsReporter
 
                 _idShieldTester.SetResultLogger(this);
 
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-                {
-                    // Load memento if it exists
-                    if (File.Exists(_FORM_PERSISTENCE_FILE))
-                    {
-                        // Load the XML
-                        XmlDocument document = new XmlDocument();
-                        document.Load(_FORM_PERSISTENCE_FILE);
-
-                        // Convert the XML to the memento
-                        XmlElement element = (XmlElement)document.FirstChild;
-                        FormMemento memento = FormMemento.FromXmlElement(element);
-
-                        // Restore the saved state
-                        memento.Restore(this);
-                    }
-                }
+                // Loads/save UI state properties
+                _formStateManager =
+                    new FormStateManager(this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, null, false);
 
                 // Set the form Icon to the IDShieldTester Icon
                 Icon = Resources.IDShieldTester;
@@ -306,42 +302,6 @@ namespace Extract.IDShieldStatisticsReporter
             catch (Exception ex)
             {
                 ExtractException.Display("ELI28656", ex);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="Form.FormClosing"/> event.
-        /// </summary>
-        /// <param name="e">A <see cref="FormClosingEventArgs"/> that contains the event data.
-        /// </param>
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            try
-            {
-                base.OnFormClosing(e);
-
-                // Persist the form window position and size [FIDSC #4016]
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-                {
-                    // Get the pertinent information
-                    FormMemento memento = new FormMemento(this);
-
-                    // Convert the memento to XML
-                    XmlDocument document = new XmlDocument();
-                    XmlElement element = memento.ToXmlElement(document);
-                    document.AppendChild(element);
-
-                    // Create the directory for the file if necessary
-                    string directory = Path.GetDirectoryName(_FORM_PERSISTENCE_FILE);
-                    Directory.CreateDirectory(directory);
-
-                    // Save the XML
-                    document.Save(_FORM_PERSISTENCE_FILE);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI29668", ex);
             }
         }
 

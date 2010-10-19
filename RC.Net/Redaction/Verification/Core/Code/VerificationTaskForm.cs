@@ -74,6 +74,11 @@ namespace Extract.Redaction.Verification
         static readonly string _VERIFICATION_SUB_KEY = 
             @"Software\Extract Systems\AttributeFinder\IndustrySpecific\Redaction\RedactionCustomComponents\IDShield";
 
+        /// <summary>
+        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// </summary>
+        static readonly string _MUTEX_STRING = "13D6A5A4-1E1E-4815-9B81-9A77E4FF4997";
+
         #endregion Constants
 
         #region Fields
@@ -180,6 +185,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         readonly ControlInvoker _invoker;
 
+        /// <summary>
+        /// Saves/restores window state info and provides full screen mode.
+        /// </summary>
+        VerificationTaskForm.FormStateManager _formStateManager;
+
         #endregion Fields
 
         #region Events
@@ -252,6 +262,9 @@ namespace Extract.Redaction.Verification
                     HandleImageViewerSelectionLayerObjectDeleted;
 
                 _invoker = new ControlInvoker(this);
+
+                _formStateManager = new VerificationTaskForm.FormStateManager(
+                    this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, _sandDockManager);
             }
             catch (Exception ex)
             {
@@ -1524,65 +1537,17 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Saves the state of the user interface.
+        /// Toggles full screen mode.
         /// </summary>
-        void SaveState()
-        {
-            // Get the pertinent information
-            FormMemento formMemento = new FormMemento(this);
-            _sandDockManager.SaveLayout();
-            ToolStripManager.SaveSettings(this);
-            int splitterDistance = _dataWindowSplitContainer.SplitterDistance;
-
-            // Create a memento to represent the state
-            VerificationTaskFormMemento memento = 
-                new VerificationTaskFormMemento(formMemento, splitterDistance);
-
-            // Convert the memento to XML
-            XmlDocument document = new XmlDocument();
-            XmlElement element = memento.ToXmlElement(document);
-            document.AppendChild(element);
-
-            // Create the directory for the file if necessary
-            string directory = Path.GetDirectoryName(_FORM_PERSISTENCE_FILE);
-            Directory.CreateDirectory(directory);
-
-            // Save the XML
-            document.Save(_FORM_PERSISTENCE_FILE);
-        }
-
-        /// <summary>
-        /// Loads the previously saved state of the user interface.
-        /// </summary>
-        void LoadState()
+        void ToggleFullScreen()
         {
             try
             {
-                // Load memento if it exists
-                if (File.Exists(_FORM_PERSISTENCE_FILE))
-                {
-                    // Load the XML
-                    XmlDocument document = new XmlDocument();
-                    document.Load(_FORM_PERSISTENCE_FILE);
-
-                    // Convert the XML to the memento
-                    XmlElement element = (XmlElement)document.FirstChild;
-                    VerificationTaskFormMemento memento =
-                        VerificationTaskFormMemento.FromXmlElement(element);
-
-                    // Restore the saved state
-                    memento.FormMemento.Restore(this);
-                    _sandDockManager.LoadLayout();
-                    ToolStripManager.LoadSettings(this);
-                    _dataWindowSplitContainer.SplitterDistance = memento.SplitterDistance;
-                }
+                _formStateManager.FullScreen = !_formStateManager.FullScreen;
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI28984",
-                    "Unable to load previous verification setting state.", ex);
-                ee.AddDebugData("Invalid XML file", _FORM_PERSISTENCE_FILE, false);
-                ee.Log();
+                ExtractException.Display("ELI30764", ex);
             }
         }
 
@@ -1611,16 +1576,13 @@ namespace Extract.Redaction.Verification
         /// event.</param>
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
-
             try
             {
+                // Establish image viewer connections prior to calling base.OnLoad which will
+                // potentially remove some IImageViewerControls.
                 _imageViewer.EstablishConnections(this);
 
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-                {
-                    LoadState();
-                }
+                base.OnLoad(e);
 
                 // Set the dockable window that the thumbnail toolstrip button controls
                 _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
@@ -1661,9 +1623,17 @@ namespace Extract.Redaction.Verification
                 _imageViewer.Shortcuts[Keys.E] = SelectPromptForExemptionCode;
                 _imageViewer.Shortcuts[Keys.E | Keys.Control] = SelectApplyLastExemptionCode;
 
+                // Full screen mode.
+                _imageViewer.Shortcuts[Keys.F11] = ToggleFullScreen;
+
                 // ThumbnailViewer is shown/hidden
                 _thumbnailDockableWindow.DockSituationChanged +=
                     ThumbnailDockableWindowDockSituationChanged;
+
+                if (_settings.LaunchInFullScreenMode)
+                {
+                    _formStateManager.FullScreen = true;
+                }
             }
             catch (Exception ex)
             {
@@ -1699,11 +1669,6 @@ namespace Extract.Redaction.Verification
                 }
 
                 CommitComment();
-
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-                {
-                    SaveState();
-                }
             }
             catch (Exception ex)
             {

@@ -12,7 +12,7 @@ using System.IO;
 namespace Extract.Imaging
 {
     /// <summary>
-    /// Represents a reader that can read image files.
+    /// A thread-safe reader that can read image files.
     /// </summary>
     public sealed class ImageReader : IDisposable
     {
@@ -69,6 +69,11 @@ namespace Extract.Imaging
         /// Image pages that have been cached for this reader.
         /// </summary>
         Dictionary<int, RasterImage> _loadedImages = new Dictionary<int, RasterImage>();
+
+        /// <summary>
+        /// Mutex used to synchronize access to the <see cref="ImageReader"/>.
+        /// </summary>
+        object _lock = new object();
 
         #endregion Fields
 
@@ -173,6 +178,7 @@ namespace Extract.Imaging
 
             try
             {
+                lock (_lock)
                 using (new PdfLock(_isPdf))
                 {
                     if (!_loadedImages.TryGetValue(pageNumber, out image))
@@ -214,25 +220,29 @@ namespace Extract.Imaging
         {
             try
             {
-                RasterImage image;
-                if (_loadedImages.TryGetValue(pageNumber, out image))
+                lock (_lock)
                 {
-                    return image.Clone();
-                }
-                else
-                {
-                    using (new PdfLock(_isPdf))
+                    RasterImage image;
+                    if (_loadedImages.TryGetValue(pageNumber, out image))
                     {
-                        image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
-                            pageNumber, pageNumber);
-
-                        // If loading PDF as bitonal and this file is a PDF, set bits per pixel to 1
-                        if (_loadPdfAsBitonal && _isPdf)
+                        return image.Clone();
+                    }
+                    else
+                    {
+                        using (new PdfLock(_isPdf))
                         {
-                            ConvertToBitonalImage(image);
-                        }
+                            image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
+                                pageNumber, pageNumber);
 
-                        return image;
+                            // If loading PDF as bitonal and this file is a PDF, set bits per pixel
+                            // to 1
+                            if (_loadPdfAsBitonal && _isPdf)
+                            {
+                                ConvertToBitonalImage(image);
+                            }
+
+                            return image;
+                        }
                     }
                 }
             }
@@ -279,6 +289,7 @@ namespace Extract.Imaging
         {
             try
             {
+                lock (_lock)
                 using (new PdfLock(_isPdf))
                 {
                     // Get the dimensions of this page.
@@ -343,6 +354,7 @@ namespace Extract.Imaging
         ImagePageProperties GetPageProperties(int pageNumber)
         {
             // TODO: Cache image info?
+            lock (_lock)
             using (CodecsImageInfo info = _codecs.GetInformation(_stream, false, pageNumber))
             {
                 return new ImagePageProperties(info);
@@ -358,8 +370,11 @@ namespace Extract.Imaging
         {
             try
             {
-                return _isPdf ? null : 
-                    _codecs.ReadTag(_fileName, pageNumber, RasterTagMetadata.AnnotationTiff);
+                lock (_lock)
+                {
+                    return _isPdf ? null :
+                        _codecs.ReadTag(_fileName, pageNumber, RasterTagMetadata.AnnotationTiff);
+                }
             }
             catch (Exception ex)
             {
@@ -381,6 +396,7 @@ namespace Extract.Imaging
             RasterImage image = null;
             try
             {
+                lock(_lock)
                 using (new PdfLock(_isPdf))
                 {
                     image = _codecs.Load(_stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 

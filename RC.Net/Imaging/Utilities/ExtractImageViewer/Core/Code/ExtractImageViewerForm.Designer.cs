@@ -41,6 +41,11 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 ChannelServices.UnregisterChannel(_ipcChannel);
                 _ipcChannel = null;
             }
+            if (_formStateManager != null)
+            {
+                _formStateManager.Dispose();
+                _formStateManager = null;
+            }
 
             // Collapsed or hidden dockable windows must be disposed explicitly [FIDSC #4246]
             // TODO: Can be removed when Divelements corrects this in the next release (3.0.7+)
@@ -48,12 +53,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             {
                 _thumbnailDockableWindow.Dispose();
                 _thumbnailDockableWindow = null;
-            }
-
-            if (_layoutMutex != null)
-            {
-                _layoutMutex.Close();
-                _layoutMutex = null;
             }
 
             base.Dispose(disposing);

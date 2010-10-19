@@ -145,16 +145,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         List<LayerObject> _tempHighlights = new List<LayerObject>();
 
         /// <summary>
-        /// Flag to indicate whether a tool strip was hidden when a script was processed.
-        /// If it is <see langword="true"/> then the toolstrips will not be persisted
-        /// when the form closes.
+        /// Saves/restores window state info and provides full screen mode.
         /// </summary>
-        bool _buttonOrMenuHidden;
-
-        /// <summary>
-        /// Mutex used to serialize persistance of control and form layout.
-        /// </summary>
-        Mutex _layoutMutex = new Mutex(false, _MUTEX_STRING);
+        ExtractImageViewerForm.FormStateManager _formStateManager;
 
         /// <summary>
         /// Used to invoke methods on this control.
@@ -314,6 +307,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     _ipcChannel = new IpcChannel(
                         BuildExtractImageViewerUri(SystemMethods.GetCurrentProcessId()));
                     ChannelServices.RegisterChannel(_ipcChannel, true);
+                    
+                    // Only persist UI state info if this is not a sub-image handler.
+                    _formStateManager = new ExtractImageViewerForm.FormStateManager(
+                        this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, _sandDockManager);
                 }
 
                 // Set whether the image search form should be opened
@@ -364,23 +361,37 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
+                // Establish image viewer connections prior to calling base.OnLoad which will
+                // potentially remove some IImageViewerControls.
+                _imageViewer.EstablishConnections(this);
+
                 // Call the base class
                 base.OnLoad(e);
 
-                // Establish connections with all controls on this form.
-                _imageViewer.EstablishConnections(this);
-
-                // If not design time, load the saved state of the extract image viewer
+                // 10/19/2010 SNK
+                // I'm unsure if it is necessary to center the form and load the ToolStrip and
+                // SandDock UI state when a sub-image handler is opened, but since that is what
+                // happened before the introduction of the FormStateManager class, I  want to ensure
+                // this checkin isn't changing behavior.
                 if (LicenseManager.UsageMode != LicenseUsageMode.Designtime
-                    && !_resetLayout)
+                    && !_resetLayout && _subImageHandler && File.Exists(_FORM_PERSISTENCE_FILE))
                 {
-                    LoadState();
+                    // Subimage handler, start in center of parent
+                    if (Owner != null)
+                    {
+                        StartPosition = FormStartPosition.Manual;
+                        FormsMethods.CenterFormInForm(this, Owner);
+                    }
+
+                    FormsMethods.ToolStripManagerLoadHelper(_toolStripContainer);
+                    _sandDockManager.LoadLayout();
                 }
-                else if (_resetLayout)
+
+                if (_resetLayout)
                 {
                     // Persist the default state so that sub image viewers load properly
                     // [DNRCAU #495]
-                    SaveState();
+                    _formStateManager.SaveState();
                 }
 
                 // Remove the thumbnail viewer button and the thumbnail window
@@ -441,30 +452,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             catch (Exception ex)
             {
                 ExtractException.Display("ELI30123", ex);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="Form.FormClosing"/> event.
-        /// </summary>
-        /// <param name="e">The data associated with the event.</param>
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            try
-            {
-                // If not design time and not a subimage viewer,
-                // save the extract image viewer state
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime
-                    && !_subImageHandler)
-                {
-                    SaveState();
-                }
-
-                base.OnClosing(e);
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI30130", ex);
             }
         }
 
@@ -939,17 +926,14 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                             throw new ExtractException("ELI30185", "HideButtons is missing argument.");
                         }
 
-                        // Indicate that a button or menu was hidden
-                        _buttonOrMenuHidden = true;
-
                         // Hide the specified buttons
                         ScriptHideButtons(line[1].Trim());
+
+                        // Only save the toolstrip settings if a toolstrip was not hidden.
+                        _formStateManager.ManageToolStrips = false;
                     }
                     else if (command.Equals("HideMenu", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Indicate that a button or menu was hidden
-                        _buttonOrMenuHidden = true;
-
                         // Hide the menu strip
                         _menuStrip.Visible = false;
                     }
@@ -1386,105 +1370,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 ExtractException ee = ExtractException.AsExtractException("ELI30184", ex);
                 ee.AddDebugData("Argument", argument, false);
                 throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Loads the previously saved state of the user interface.
-        /// </summary>
-        void LoadState()
-        {
-            try
-            {
-                // Synchronize access to persistance data [DNRCAU #???]
-                _layoutMutex.WaitOne();
-
-                // Load memento if it exists
-                if (File.Exists(_FORM_PERSISTENCE_FILE))
-                {
-                    // Only restore the form to its last location if it is not a subimage handler
-                    if (!_subImageHandler)
-                    {
-                        // Load the XML
-                        XmlDocument document = new XmlDocument();
-                        document.Load(_FORM_PERSISTENCE_FILE);
-
-                        // Convert the XML to the memento
-                        XmlElement element = (XmlElement)document.FirstChild;
-                        FormMemento memento = FormMemento.FromXmlElement(element);
-
-                        // Restore the saved state
-                        memento.Restore(this);
-                    }
-                    else
-                    {
-                        // Subimage handler, start in center of parent
-                        if (Owner != null)
-                        {
-                            StartPosition = FormStartPosition.Manual;
-                            FormsMethods.CenterFormInForm(this, Owner);
-                        }
-                    }
-
-                    FormsMethods.ToolStripManagerLoadHelper(_toolStripContainer);
-                    _sandDockManager.LoadLayout();
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI30163",
-                    "Unable to load previous extract image viewer setting state.", ex);
-                ee.AddDebugData("Invalid XML file", _FORM_PERSISTENCE_FILE, false);
-                ee.Log();
-            }
-            finally
-            {
-                _layoutMutex.ReleaseMutex();
-            }
-        }
-
-        /// <summary>
-        /// Saves the state of the user interface.
-        /// </summary>
-        void SaveState()
-        {
-            try
-            {
-                // Synchronize access to persistance data [DNRCAU #???]
-                _layoutMutex.WaitOne();
-
-                // Get the pertinent information
-                FormMemento memento = new FormMemento(this);
-                _sandDockManager.SaveLayout();
-
-                // Only save the toolstrip settings if a toolstrip was not hidden
-                if (!_buttonOrMenuHidden)
-                {
-                    ToolStripManager.SaveSettings(this);
-                }
-
-                // Convert the memento to XML
-                XmlDocument document = new XmlDocument();
-                XmlElement element = memento.ToXmlElement(document);
-                document.AppendChild(element);
-
-                // Create the directory for the file if necessary
-                string directory = Path.GetDirectoryName(_FORM_PERSISTENCE_FILE);
-                Directory.CreateDirectory(directory);
-
-                // Save the XML
-                document.Save(_FORM_PERSISTENCE_FILE);
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI30164",
-                    "Unable to persist extract image viewer state settings.", ex);
-                ee.AddDebugData("XML File Name", _FORM_PERSISTENCE_FILE, false);
-                ee.Log();
-            }
-            finally
-            {
-                _layoutMutex.ReleaseMutex();
             }
         }
 

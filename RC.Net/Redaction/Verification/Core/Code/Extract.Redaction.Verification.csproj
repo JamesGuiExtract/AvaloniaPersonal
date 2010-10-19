@@ -210,7 +210,10 @@
     <Compile Include="VerificationTaskForm.Designer.cs">
       <DependentUpon>VerificationTaskForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="VerificationTaskFormMemento.cs" />
+    <Compile Include="VerificationTaskForm.FormStateManager.cs">
+      <DependentUpon>VerificationTaskForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">

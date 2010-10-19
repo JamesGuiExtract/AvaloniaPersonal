@@ -67,6 +67,10 @@
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SandDock, Version=3.0.3.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -123,7 +127,7 @@
     </Compile>
     <Compile Include="CustomizableMessageBoxManager.cs" />
     <Compile Include="CustomizableMessageBoxResult.cs" />
-    <Compile Include="FormMemento.cs" />
+    <Compile Include="FormStateManager.cs" />
     <Compile Include="FormsMethods.cs" />
     <Compile Include="ProgressStatusDialog.cs" />
     <Compile Include="ProgressStatusDialogForm.cs">
@@ -134,7 +138,6 @@
     </Compile>
     <Compile Include="SystemCommand.cs" />
     <Compile Include="UserHelpMethods.cs" />
-    <Compile Include="IControlMemento.cs" />
     <Compile Include="Inputbox.cs" />
     <Compile Include="InputBoxForm.cs">
       <SubType>Form</SubType>

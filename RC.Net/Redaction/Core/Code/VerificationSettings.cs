@@ -47,6 +47,11 @@ namespace Extract.Redaction
         /// </summary>
         readonly bool _enableInputTracking;
 
+        /// <summary>
+        /// Indicates whether to lauch the verification UI in full screen mode.
+        /// </summary>
+        readonly bool _launchInFullScreenMode;
+
         #endregion Fields
 
         #region Constructors
@@ -55,7 +60,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
         public VerificationSettings() 
-            : this(null, null, null, false, null, null, false)
+            : this(null, null, null, false, null, null, false, false)
         {
 
         }
@@ -66,7 +71,8 @@ namespace Extract.Redaction
         /// </summary>
         public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback, 
             string inputFile, bool useBackdropImage, string backdropImage, 
-            SetFileActionStatusSettings actionStatus, bool enableInputTracking)
+            SetFileActionStatusSettings actionStatus, bool enableInputTracking,
+            bool launchInFullScreenMode)
         {
             _generalSettings = general ?? new GeneralVerificationSettings();
             _feedbackSettings = feedback ?? new FeedbackSettings();
@@ -75,6 +81,7 @@ namespace Extract.Redaction
             _backdropImage = backdropImage;
             _actionStatusSettings = actionStatus ?? new SetFileActionStatusSettings();
             _enableInputTracking = enableInputTracking;
+            _launchInFullScreenMode = launchInFullScreenMode;
         }
 
         #endregion Constructors
@@ -172,6 +179,21 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether to lauch the verification UI in full screen mode.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to lauch the verification UI in full screen mode; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool LaunchInFullScreenMode
+        {
+            get
+            {
+                return _launchInFullScreenMode;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -195,6 +217,7 @@ namespace Extract.Redaction
                 string backdropImage = null;
                 SetFileActionStatusSettings actionStatusSettings = null;
                 bool enableInputTracking = false;
+                bool launchInFullScreenMode = false;
 
                 if (reader.Version < 2)
                 {
@@ -215,9 +238,14 @@ namespace Extract.Redaction
                     useBackdropImage = reader.ReadBoolean();
                     backdropImage = reader.ReadString();
                 }
+                if (reader.Version >= 6)
+                {
+                    launchInFullScreenMode = reader.ReadBoolean();
+                }
 
-                return new VerificationSettings(general, feedback, inputFile, useBackdropImage, 
-                    backdropImage, actionStatusSettings, enableInputTracking);
+                return new VerificationSettings(general, feedback, inputFile, useBackdropImage,
+                    backdropImage, actionStatusSettings, enableInputTracking,
+                    launchInFullScreenMode);
             }
             catch (Exception ex)
             {
@@ -243,6 +271,7 @@ namespace Extract.Redaction
                 _actionStatusSettings.WriteTo(writer);
                 writer.Write(_useBackdropImage);
                 writer.Write(_backdropImage);
+                writer.Write(_launchInFullScreenMode);
             }
             catch (Exception ex)
             {

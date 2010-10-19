@@ -13,10 +13,23 @@ namespace Extract.IDShieldStatisticsReporter
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                // Release managed resources
+                if (components != null)
+                {
+                    components.Dispose();
+                    components = null;
+                }
+                if (_formStateManager != null)
+                {
+                    _formStateManager.Dispose();
+                    _formStateManager = null;
+                }
             }
+
+            // Release unmanaged resources
+
             base.Dispose(disposing);
         }
 
