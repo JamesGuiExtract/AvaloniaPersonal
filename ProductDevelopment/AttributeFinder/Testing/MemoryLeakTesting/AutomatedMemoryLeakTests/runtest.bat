@@ -72,7 +72,13 @@ net stop ESFamService
 :: -----------------------------------------------------------------------------
 
 :: email summary report
+:: DOES NOT WORK IN CURRENT INTERNAL BUILD (8.1.0.82)
 "%ccdir%\ReportViewer.exe" (local) MEMORY_LEAK "Summary of Actions and Associated Document Counts" /mailto %recipients% /subject "%testobject% - %testname% has completed"
+
+:: email testdetails.bat
+call "%cd%\testdetails.bat"
+"%ccdir%\EmailFile.exe" /subject "%testobject% - %testname% testdetails.txt" "%workdir%\testdetails.txt" %recipients%
+del "%workdir%\testdetails.txt"
 
 :: wait another minute
 "%ccdir%\sleep" 1m
