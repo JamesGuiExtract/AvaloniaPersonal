@@ -11,9 +11,10 @@ set bits=64
 set bits=32
 )
 
-systeminfo | find "OS Name" > %cd%\os.txt
-for /F "usebackq delims=: tokens=2" %%i in (%cd%\os.txt) do set vers=%%i
+systeminfo | find "OS Name" > "%cd%\os.txt"
+for /F "usebackq delims=: tokens=2" %%i in ("%cd%\os.txt") do set vers=%%i
 for /f "tokens=* delims= " %%a in ("%vers%") do set vers=%%a
+del "%cd%\os.txt"
 
 :: Get build number
 set vbs="%temp%\filever.vbs"
