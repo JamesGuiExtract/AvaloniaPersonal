@@ -246,7 +246,8 @@ namespace Extract.Utilities
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI30808", _OBJECT_NAME);
                 controllers = ServiceController.GetServices(machineName);
-                var service = controllers.FirstOrDefault(s => s.ServiceName == serviceName);
+                var service = controllers.FirstOrDefault(s =>
+                    s.ServiceName.Equals(serviceName, StringComparison.OrdinalIgnoreCase));
                 return service != null;
             }
             catch (Exception ex)
