@@ -264,7 +264,8 @@ namespace Extract.Redaction.Verification
                 _invoker = new ControlInvoker(this);
 
                 _formStateManager = new VerificationTaskForm.FormStateManager(
-                    this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, _sandDockManager);
+                    this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, _sandDockManager,
+                    "Exit full screen (F11)");
             }
             catch (Exception ex)
             {

@@ -69,6 +69,11 @@ namespace Extract.Utilities.Forms
         int _updatingStateReferenceCount;
 
         /// <summary>
+        /// A tab to indicate to users how to exit full screen mode.
+        /// </summary>
+        AutoHideScreenTab _fullScreenTab;
+
+        /// <summary>
         /// Mutex used to serialize persistance of control and form layout.
         /// </summary>
         Mutex _layoutMutex;
@@ -89,8 +94,11 @@ namespace Extract.Utilities.Forms
         /// info will be persisted.</param>
         /// <param name="manageToolStrips">If <see langword="true"/>, the form's
         /// <see cref="ToolStrip"/> will be persisted.</param>
+        /// <param name="fullScreenTabText">If not <see langword="null"/>, an
+        /// <see cref="AutoHideScreenTab"/> will be displayed with the provided text that, if
+        /// clicked, will exit full screen mode.</param>
         public FormStateManager(Form form, string persistenceFileName, string mutexName,
-            SandDockManager sandDockManager, bool manageToolStrips)
+            SandDockManager sandDockManager, bool manageToolStrips, string fullScreenTabText)
         {
             try
             {
@@ -105,6 +113,12 @@ namespace Extract.Utilities.Forms
                 _form.FormClosing += HandleFormClosing;
                 _form.LocationChanged += HandleFormStateChanged;
                 _form.SizeChanged += HandleFormStateChanged;
+
+                if (!string.IsNullOrEmpty(fullScreenTabText))
+                {
+                    _fullScreenTab = new AutoHideScreenTab(fullScreenTabText);
+                    _fullScreenTab.LabelClicked += HandleFullScreenTabLabelClicked;
+                }
             }
             catch (Exception ex)
             {
@@ -157,8 +171,6 @@ namespace Extract.Utilities.Forms
                     if (value != _fullScreen)
                     {
                         SetFullScreen(value);
-
-                        _fullScreen = value;
                     }
                 }
                 catch (Exception ex)
@@ -450,14 +462,26 @@ namespace Extract.Utilities.Forms
                     _form.FormBorderStyle = FormBorderStyle.None;
                     _form.Bounds = Screen.FromControl(_form).Bounds;
                     _form.TopMost = true;
+
+                    if (_fullScreenTab != null)
+                    {
+                        _fullScreenTab.Show(_form);
+                    }
                 }
                 else
                 {
+                    if (_fullScreenTab != null)
+                    {
+                        _fullScreenTab.Hide();
+                    }
+
                     _form.TopMost = false;
-                    _form.Bounds = _bounds;
                     _form.FormBorderStyle = FormBorderStyle.Sizable;
+                    _form.Bounds = _bounds;
                     _form.WindowState = _state;
                 }
+
+                _fullScreen = showFullScreen;
             }
             catch (Exception ex)
             {
@@ -499,6 +523,12 @@ namespace Extract.Utilities.Forms
                 {
                     _layoutMutex.Dispose();
                     _layoutMutex = null;
+                }
+
+                if (_fullScreenTab != null)
+                {
+                    _fullScreenTab.Dispose();
+                    _fullScreenTab = null;
                 }
             }
 
@@ -577,6 +607,24 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 ExtractException.Display("ELI30763", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles <see cref="AutoHideScreenTab.LabelClicked"/> for the full screen tab.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleFullScreenTabLabelClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                SetFullScreen(false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30819", ex);
             }
         }
 

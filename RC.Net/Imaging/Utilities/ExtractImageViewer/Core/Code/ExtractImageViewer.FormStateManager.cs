@@ -42,7 +42,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             /// info will be persisted.</param>
             public FormStateManager(ExtractImageViewerForm imageViewerForm,
                 string persistenceFileName, string mutexString, SandDockManager sandDockManager)
-                : base(imageViewerForm, persistenceFileName, mutexString, sandDockManager, true)
+                : base(imageViewerForm, persistenceFileName, mutexString, sandDockManager, true, null)
             {
                 try
                 {

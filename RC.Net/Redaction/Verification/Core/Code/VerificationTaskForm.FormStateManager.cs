@@ -48,9 +48,14 @@ namespace Extract.Redaction.Verification
             /// control and form layout.</param>
             /// <param name="sandDockManager">If specified, this <see cref="SandDockManager"/>'s
             /// state info will be persisted.</param>
+            /// <param name="fullScreenTabText">If not <see langword="null"/>, an
+            /// <see cref="AutoHideScreenTab"/> will be displayed with the provided text that, if
+            /// clicked, will exit full screen mode.</param>
             public FormStateManager(VerificationTaskForm verificationForm,
-                string persistenceFileName, string mutexName, SandDockManager sandDockManager)
-                : base(verificationForm, persistenceFileName, mutexName, sandDockManager, true)
+                string persistenceFileName, string mutexName, SandDockManager sandDockManager,
+                string fullScreenTabText)
+                : base(verificationForm, persistenceFileName, mutexName, sandDockManager, true,
+                    fullScreenTabText)
             {
                 try
                 {
