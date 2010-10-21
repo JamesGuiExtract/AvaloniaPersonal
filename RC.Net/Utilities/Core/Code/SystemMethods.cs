@@ -1,11 +1,11 @@
-using Extract;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Management;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.ServiceProcess;
+using Extract.Licensing;
 
 namespace Extract.Utilities
 {
@@ -14,6 +14,15 @@ namespace Extract.Utilities
     /// </summary>
     public static class SystemMethods
     {
+        #region Constants
+
+        /// <summary>
+        /// Object name used in licensing calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(SystemMethods).ToString();
+
+        #endregion Constants
+
         /// <summary>
         /// Enumerates all <see cref="ManagementObject"/>s of the specified class.
         /// </summary>
@@ -208,6 +217,51 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI30190", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the service exists or not.
+        /// </summary>
+        /// <param name="serviceName">Name of the service.</param>
+        /// <returns><see langword="true"/> if the service exists on the local machine and
+        /// <see langword="false"/> if it does not.</returns>
+        public static bool CheckServiceExists(string serviceName)
+        {
+            return CheckServiceExists(serviceName, ".");
+        }
+
+        /// <summary>
+        /// Checks whether the service exists or not.
+        /// </summary>
+        /// <param name="serviceName">Name of the service.</param>
+        /// <param name="machineName">Name of the machine.</param>
+        /// <returns><see langword="true"/> if the service exists on the machine and
+        /// <see langword="false"/> if it does not.</returns>
+        public static bool CheckServiceExists(string serviceName, string machineName)
+        {
+            ServiceController[] controllers = null;
+            try
+            {
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI30808", _OBJECT_NAME);
+                controllers = ServiceController.GetServices(machineName);
+                var service = controllers.FirstOrDefault(s => s.ServiceName == serviceName);
+                return service != null;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30807", ex);
+            }
+            finally
+            {
+                if (controllers != null)
+                {
+                    foreach (var controller in controllers)
+                    {
+                        controller.Dispose();
+                    }
+                }
             }
         }
     }
