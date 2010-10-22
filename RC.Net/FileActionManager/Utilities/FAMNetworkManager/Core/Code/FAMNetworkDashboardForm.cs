@@ -1,14 +1,18 @@
-﻿using Extract.Utilities;
+﻿using Extract.SQLCDBEditor;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using System.Drawing;
 
 namespace Extract.FileActionManager.Utilities
 {
@@ -39,6 +43,22 @@ namespace Extract.FileActionManager.Utilities
             /// Button should control both services.
             /// </summary>
             Both = 0x1 | 0x2
+        }
+
+        /// <summary>
+        /// Enumeration for referring to the grid columns.
+        /// </summary>
+        enum GridColumns
+        {
+            MachineName = 0,
+
+            GroupName = 1,
+
+            FAMService = 2,
+
+            FDRSService = 3,
+
+            CPUUsage = 4
         }
 
         #endregion Internal use enum
@@ -137,7 +157,15 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         const string _FILE_FILTER = "FAM Network Manager (*.fnm)|*.fnm|All Files (*.*)|*.*||";
 
+        /// <summary>
+        /// Default file extension for the open/save file dialog
+        /// </summary>
         const string _DEFAULT_FILE_EXT = "fnm";
+
+        /// <summary>
+        /// Constant string used to indicate that data is refreshing
+        /// </summary>
+        const string _REFRESHING = "Refreshing";
 
         /// <summary>
         /// Sleep time for the service status update thread.
@@ -245,6 +273,8 @@ namespace Extract.FileActionManager.Utilities
                     LoadSettings(_fileToOpen);
                     _fileToOpen = string.Empty;
                 }
+
+                RefreshData(false);
             }
             catch (Exception ex)
             {
@@ -264,7 +294,7 @@ namespace Extract.FileActionManager.Utilities
                 using (OpenFileDialog open = new OpenFileDialog())
                 {
                     open.Filter = _FILE_FILTER;
-                    open.DefaultExt = "fnm";
+                    open.DefaultExt = _DEFAULT_FILE_EXT;
                     open.AddExtension = true;
                     open.CheckFileExists = true;
                     open.ValidateNames = true;
@@ -292,7 +322,7 @@ namespace Extract.FileActionManager.Utilities
                 using (SaveFileDialog save = new SaveFileDialog())
                 {
                     save.Filter = _FILE_FILTER;
-                    save.DefaultExt = "fnm";
+                    save.DefaultExt = _DEFAULT_FILE_EXT;
                     save.AddExtension = true;
                     save.CheckPathExists = true;
                     save.OverwritePrompt = true;
@@ -343,9 +373,9 @@ namespace Extract.FileActionManager.Utilities
                                 throw ee;
                             }
 
-                            row.CreateCells(_machineListGridView);
-                            row.Cells[0].Value = controller.MachineName;
-                            row.Cells[1].Value = controller.GroupName;
+                            row.CreateCells(_machineListGridView,
+                                new object[] { controller.MachineName, controller.GroupName,
+                                _REFRESHING, _REFRESHING, _REFRESHING});
                             _machineListGridView.Rows.Add(row);
 
                             Thread thread = new Thread(() =>
@@ -368,6 +398,8 @@ namespace Extract.FileActionManager.Utilities
                             );
                             thread.SetApartmentState(ApartmentState.MTA);
                             thread.Start();
+
+                            UpdateGroupFilterList();
                         }
                     }
                 }
@@ -474,8 +506,57 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        [SuppressMessage("Microsoft.Globalization", "CA1302:DoNotHardcodeLocaleSpecificStrings",
+            MessageId = "Program Files")]
+        [SuppressMessage("Microsoft.Globalization", "CA1302:DoNotHardcodeLocaleSpecificStrings",
+            MessageId = "Program Files (x86)")]
         void HandleEditServiceDatabaseButtonClick(object sender, EventArgs e)
         {
+            try
+            {
+                if (_machineListGridView.SelectedRows.Count > 1)
+                {
+                    MessageBox.Show("Cannot modify more than a single machine database at a time",
+                        "Cannot Modify Multiple Databases", MessageBoxButtons.OK,
+                        MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                    return;
+                }
+
+                // Compute the name of the file
+                StringBuilder dbFile = new StringBuilder();
+                dbFile.Append(@"\\");
+                dbFile.Append(_machineListGridView.SelectedRows[0].Cells[(int)GridColumns.MachineName].Value);
+                dbFile.Append(@"\c$\Program Files\Extract Systems\CommonComponents\ESFAMService.sdf");
+                if (!File.Exists(dbFile.ToString()))
+                {
+                    dbFile.Replace("Program Files", "Program Files (x86)");
+                    if (!File.Exists(dbFile.ToString()))
+                    {
+                        MessageBox.Show("Cannot find service database file to modify."
+                            + Environment.NewLine + dbFile.ToString(), "Cannot Find File",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error,
+                            MessageBoxDefaultButton.Button1, 0);
+                        return;
+                    }
+                }
+
+                using (TemporaryFile tempDb = new TemporaryFile(".sdf"))
+                {
+                    File.Copy(dbFile.ToString(), tempDb.FileName, true);
+                    using (SQLCDBEditorForm editor = new SQLCDBEditorForm(tempDb.FileName, false))
+                    {
+                        editor.ShowDialog();
+                        if (editor.FileSaved)
+                        {
+                            File.Copy(tempDb.FileName, dbFile.ToString(), true);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30832", ex);
+            }
         }
 
         /// <summary>
@@ -544,14 +625,10 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void HandleMachineGridViewSelectionChanged(object sender, EventArgs e)
         {
-            if (_machineListGridView.SelectedRows.Count > 0)
-            {
-                _removeMachineToolStripButton.Enabled = true;
-            }
-            else
-            {
-                _removeMachineToolStripButton.Enabled = false;
-            }
+            int count = _machineListGridView.SelectedRows.Count;
+            _removeMachineToolStripButton.Enabled = count > 0;
+            _modifyServiceDatabaseToolStripButton.Enabled = count == 1;
+            _editGroupToolStripButton.Enabled = count > 0;
         }
 
         /// <summary>
@@ -581,6 +658,40 @@ namespace Extract.FileActionManager.Utilities
                 ExtractException.Display("ELI30786", ex);
             }
         }
+
+        /// <summary>
+        /// Handles the filter groups selected index changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleFilterGroupsSelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                string selectedGroup = _groupFilterComboBox.Text;
+                if (string.IsNullOrEmpty(selectedGroup))
+                {
+                    // All rows should be visible
+                    foreach (DataGridViewRow row in _machineListGridView.Rows)
+                    {
+                        row.Visible = true;
+                    }
+                }
+                else
+                {
+                    foreach (DataGridViewRow row in _machineListGridView.Rows)
+                    {
+                        string temp = row.Cells[(int)GridColumns.GroupName].Value.ToString();
+                        row.Visible = selectedGroup.Equals(temp, StringComparison.Ordinal);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30837", ex);
+            }
+        }
+
 
         /// <summary>
         /// Handles the exit menu item click.
@@ -613,9 +724,10 @@ namespace Extract.FileActionManager.Utilities
                 return;
             }
 
-            row.Cells[2].Value = data.FamServiceStatus;
-            row.Cells[3].Value = data.FdrsServiceStatus;
-            row.Cells[4].Value = data.CpuPercentage.ToString("F1", CultureInfo.CurrentCulture) + " %";
+            row.Cells[(int)GridColumns.FAMService].Value = data.FamServiceStatus;
+            row.Cells[(int)GridColumns.FDRSService].Value = data.FdrsServiceStatus;
+            row.Cells[(int)GridColumns.CPUUsage].Value =
+                data.CpuPercentage.ToString("F1", CultureInfo.CurrentCulture) + " %";
         }
 
         /// <summary>
@@ -626,10 +738,14 @@ namespace Extract.FileActionManager.Utilities
             // Clear all cells
             foreach (DataGridViewRow row in _machineListGridView.Rows)
             {
-                row.Cells[2].Value = string.Empty;
-                row.Cells[3].Value = string.Empty;
-                row.Cells[4].Value = string.Empty;
-                row.ErrorText = string.Empty;
+                if (row.Visible)
+                {
+                    for (int i = 2; i < 4; i++)
+                    {
+                        row.Cells[i].Value = _REFRESHING;
+                    }
+                    row.ErrorText = string.Empty;
+                }
             }
 
             if (autoUpdate)
@@ -698,10 +814,10 @@ namespace Extract.FileActionManager.Utilities
                     ServiceMachineController controller = null;
                     try
                     {
-                        // If the row is still in the collection, get its controller,
+                        // If the row is still in the collection and visible, get its controller,
                         // refresh the data and update the row
-                        if (!_endRefreshThread.WaitOne(0) &&
-                            _rowsAndControllers.TryGetValue(row, out controller))
+                        if (!_endRefreshThread.WaitOne(0) && row.Visible
+                            && _rowsAndControllers.TryGetValue(row, out controller))
                         {
                             var data = controller.RefreshData();
                             RefreshRowData(row, data);
@@ -796,6 +912,8 @@ namespace Extract.FileActionManager.Utilities
                             }
                             _machineListGridView.Rows.Add(row);
                         }
+
+                        UpdateGroupFilterList();
                     }
                 }
             }
@@ -876,14 +994,14 @@ namespace Extract.FileActionManager.Utilities
                     {
                         if (_rowsAndControllers.TryGetValue(row, out controller))
                         {
-                                if (famService)
-                                {
-                                    controller.ControlFamService(startService);
-                                }
-                                if (fdrsService)
-                                {
-                                    controller.ControlFdrsService(startService);
-                                }
+                            if (famService)
+                            {
+                                controller.ControlFamService(startService);
+                            }
+                            if (fdrsService)
+                            {
+                                controller.ControlFdrsService(startService);
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -902,6 +1020,27 @@ namespace Extract.FileActionManager.Utilities
                     }
                 }
             );
+        }
+
+        /// <summary>
+        /// Updates the group filter list.
+        /// </summary>
+        void UpdateGroupFilterList()
+        {
+            string currentSelection = _groupFilterComboBox.SelectedText;
+            _groupFilterComboBox.Items.Clear();
+            foreach (string group in BuildGroupList())
+            {
+                _groupFilterComboBox.Items.Add(group);
+            }
+
+            if (_groupFilterComboBox.FindStringExact(string.Empty) == -1)
+            {
+                _groupFilterComboBox.Items.Insert(0, string.Empty);
+            }
+
+            int index = _groupFilterComboBox.FindStringExact(currentSelection);
+            _groupFilterComboBox.SelectedIndex = index != -1 ? index : 0;
         }
 
         #endregion Methods

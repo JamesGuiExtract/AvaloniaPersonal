@@ -52,12 +52,10 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-            System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FAMNetworkDashboardForm));
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._machineListGridView = new System.Windows.Forms.DataGridView();
             this.MachineColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -85,7 +83,6 @@
             this._autoRefreshDataToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._refreshDataToolStripButton = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this._toolStripContainer.ContentPanel.SuspendLayout();
             this._toolStripContainer.TopToolStripPanel.SuspendLayout();
@@ -100,11 +97,6 @@
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
             toolStripSeparator1.Size = new System.Drawing.Size(6, 39);
-            // 
-            // toolStripSeparator2
-            // 
-            toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new System.Drawing.Size(6, 39);
             // 
             // toolStripSeparator3
             // 
@@ -256,7 +248,7 @@
             // _aboutFamNetworkManagerMenuItem
             // 
             this._aboutFamNetworkManagerMenuItem.Name = "_aboutFamNetworkManagerMenuItem";
-            this._aboutFamNetworkManagerMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._aboutFamNetworkManagerMenuItem.Size = new System.Drawing.Size(126, 22);
             this._aboutFamNetworkManagerMenuItem.Text = "&About...";
             this._aboutFamNetworkManagerMenuItem.Click += new System.EventHandler(this.HandleAboutFamNetworkManagerMenuItem);
             // 
@@ -271,11 +263,10 @@
             this._addMachineToolStripButton,
             this._removeMachineToolStripButton,
             this._editGroupToolStripButton,
-            this._groupFilterComboBox,
-            toolStripSeparator2});
+            this._groupFilterComboBox});
             this._manageGridToolStrip.Location = new System.Drawing.Point(3, 24);
             this._manageGridToolStrip.Name = "_manageGridToolStrip";
-            this._manageGridToolStrip.Size = new System.Drawing.Size(456, 39);
+            this._manageGridToolStrip.Size = new System.Drawing.Size(481, 39);
             this._manageGridToolStrip.TabIndex = 1;
             // 
             // _openFileToolStripButton
@@ -322,7 +313,7 @@
             // _editGroupToolStripButton
             // 
             this._editGroupToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._editGroupToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_editGroupToolStripButton.Image")));
+            this._editGroupToolStripButton.Image = global::Extract.FileActionManager.Utilities.Properties.Resources.EditGroupButton;
             this._editGroupToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._editGroupToolStripButton.Name = "_editGroupToolStripButton";
             this._editGroupToolStripButton.Size = new System.Drawing.Size(36, 36);
@@ -331,8 +322,10 @@
             // 
             // _groupFilterComboBox
             // 
+            this._groupFilterComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._groupFilterComboBox.Name = "_groupFilterComboBox";
             this._groupFilterComboBox.Size = new System.Drawing.Size(250, 39);
+            this._groupFilterComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleFilterGroupsSelectedIndexChanged);
             // 
             // _updateToolStrip
             // 
@@ -348,7 +341,7 @@
             this._refreshDataToolStripButton});
             this._updateToolStrip.Location = new System.Drawing.Point(3, 63);
             this._updateToolStrip.Name = "_updateToolStrip";
-            this._updateToolStrip.Size = new System.Drawing.Size(331, 39);
+            this._updateToolStrip.Size = new System.Drawing.Size(300, 39);
             this._updateToolStrip.TabIndex = 2;
             // 
             // _startServiceToolStripButton

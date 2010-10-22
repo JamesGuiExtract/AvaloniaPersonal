@@ -188,12 +188,19 @@
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Code\SQLCDBEditor.csproj">
+      <Project>{4A3328DB-8492-467C-9EC9-D84EE38432EA}</Project>
+      <Name>SQLCDBEditor</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\FamNetworkManager.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\FamNetworkManagerLogo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EditGroupButton.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

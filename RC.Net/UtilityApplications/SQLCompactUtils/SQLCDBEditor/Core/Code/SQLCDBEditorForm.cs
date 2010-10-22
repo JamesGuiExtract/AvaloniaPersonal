@@ -1,16 +1,11 @@
-using Extract;
+using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
-using Extract.Licensing;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Data.Sql;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.SQLCDBEditor
@@ -38,7 +33,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// File name of the currently opened database.
         /// </summary>
-        String _databaseFileName = "";
+        String _databaseFileName = string.Empty;
 
         /// <summary>
         /// Opened connection to the current database.
@@ -70,7 +65,17 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         BindingSource bindingSource = new BindingSource();
 
-		#endregion Fields
+        /// <summary>
+        /// Indicates whether this is running as a standalone app or as a dialog.
+        /// </summary>
+        bool _standAlone;
+
+        /// <summary>
+        /// Indicates whether the file that was open has been saved.
+        /// </summary>
+        bool _fileSaved;
+
+        #endregion Fields
 
         #region Constructors 
         
@@ -78,23 +83,40 @@ namespace Extract.SQLCDBEditor
         /// Initializes the SQLCDBEditorForm
         /// </summary>
         public SQLCDBEditorForm()
+            : this(null, true)
         {
-            InitializeComponent();
-            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                "ELI29537", _OBJECT_NAME);
         }
-        
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SQLCDBEditorForm"/> class.
+        /// </summary>
+        /// <param name="databaseFileName">Name of the database file.</param>
+        public SQLCDBEditorForm(string databaseFileName)
+            : this(databaseFileName, true)
+        {
+        }
+
         /// <summary>
         /// Initializes the SQLCDBEditorForm and allows specification of a database file to open
         /// after loading.
         /// </summary>
         /// <param name="databaseFileName">Name of the database file to load.</param>
-        public SQLCDBEditorForm(string databaseFileName)
+        /// <param name="standAlone">Whether the form is being used as a standalone application
+        /// or is being used as a dialog box.</param>
+        public SQLCDBEditorForm(string databaseFileName, bool standAlone)
         {
-            InitializeComponent();
-            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                "ELI29538", _OBJECT_NAME);
-            _databaseFileName = databaseFileName;
+            try
+            {
+                InitializeComponent();
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI29538", _OBJECT_NAME);
+                _databaseFileName = databaseFileName;
+                _standAlone = standAlone;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30830", ex);
+            }
         }
 
         #endregion Constructors
@@ -123,6 +145,13 @@ namespace Extract.SQLCDBEditor
                     OpenDatabase(_databaseFileName);
                 }
 
+                if (!_standAlone)
+                {
+                    closeToolStripMenuItem.Visible = false;
+                    openToolStripButton.Visible = false;
+                    openToolStripMenuItem.Visible = false;
+                }
+
                 EnableCommands();
             }
             catch (Exception ex)
@@ -147,21 +176,21 @@ namespace Extract.SQLCDBEditor
                 // Check for unsaved changes.
                 if (CheckForSaveAndConfirm())
                 {
-					// User canceled
-					e.Cancel = true;
+                    // User canceled
+                    e.Cancel = true;
                     return;
                 }
-				CloseDatabase();
+                CloseDatabase();
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI29526", ex);
 
-				if (MessageBox.Show("Do you wish to exit without saving?", "Close", MessageBoxButtons.YesNo,
-					 MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0) != DialogResult.Yes)
-				{
-					e.Cancel = true;
-				}
+                if (MessageBox.Show("Do you wish to exit without saving?", "Close", MessageBoxButtons.YesNo,
+                     MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0) != DialogResult.Yes)
+                {
+                    e.Cancel = true;
+                }
             }
         }
 
@@ -182,15 +211,17 @@ namespace Extract.SQLCDBEditor
                 }
 
                 // Setup OpenFileDialog to get the database to open
-                OpenFileDialog openDatabaseFile = new OpenFileDialog();
-                openDatabaseFile.DefaultExt = "sdf";
-                openDatabaseFile.Filter = "Database files (*.sdf)|*.sdf|All files (*.*)|*.*";
-
-                // Get the database to open
-                if (openDatabaseFile.ShowDialog() == DialogResult.OK)
+                using (OpenFileDialog openDatabaseFile = new OpenFileDialog())
                 {
-                    // Open the selected database.
-                    OpenDatabase(openDatabaseFile.FileName);
+                    openDatabaseFile.DefaultExt = "sdf";
+                    openDatabaseFile.Filter = "Database files (*.sdf)|*.sdf|All files (*.*)|*.*";
+
+                    // Get the database to open
+                    if (openDatabaseFile.ShowDialog() == DialogResult.OK)
+                    {
+                        // Open the selected database.
+                        OpenDatabase(openDatabaseFile.FileName);
+                    }
                 }
             }
             catch (Exception ex)
@@ -224,14 +255,14 @@ namespace Extract.SQLCDBEditor
         /// <param name="e">The event data associated with the event.</param>
         void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			try
-			{
-				Close();
-			}
-			catch (Exception ex)
-			{
-				ExtractException.Display("ELI29626", ex);
-			}
+            try
+            {
+                Close();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI29626", ex);
+            }
         }
 
         /// <summary>
@@ -248,7 +279,7 @@ namespace Extract.SQLCDBEditor
                     // Operation was canceled by user when saving.
                     return;
                 }
-				CloseDatabase();
+                CloseDatabase();
             }
             catch (Exception ex)
             {
@@ -389,98 +420,98 @@ namespace Extract.SQLCDBEditor
             // Check if the table to be loaded has been loaded before
             if (!String.IsNullOrEmpty(tableName))
             {
-				if (!_dictionaryOfTables.TryGetValue(tableName, out table))
-				{
-					// Table has not been loaded before so load it
-					table = new DataTable();
+                if (!_dictionaryOfTables.TryGetValue(tableName, out table))
+                {
+                    // Table has not been loaded before so load it
+                    table = new DataTable();
 
-					// Setup dataAdapter to get the data
-					SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter("SELECT * FROM " + tableName, _connection);
+                    // Setup dataAdapter to get the data
+                    SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter("SELECT * FROM " + tableName, _connection);
 
-					// Setup of the commands for Select, Update, and Delete
-					SqlCeCommandBuilder commandBuilder = new SqlCeCommandBuilder(dataAdapter);
+                    // Setup of the commands for Select, Update, and Delete
+                    SqlCeCommandBuilder commandBuilder = new SqlCeCommandBuilder(dataAdapter);
 
-					// Fill the table with the data from the dataAdapter
-					dataAdapter.Fill(table);
+                    // Fill the table with the data from the dataAdapter
+                    dataAdapter.Fill(table);
 
-					// Fill the schema for the table for the database
-					dataAdapter.FillSchema(table, SchemaType.Source);
+                    // Fill the schema for the table for the database
+                    dataAdapter.FillSchema(table, SchemaType.Source);
 
-					// Check for auto increment fields and default column values
-					foreach (DataColumn c in table.Columns)
-					{
-						// Get the information for the current column
-						using (SqlCeCommand sqlcmd = new SqlCeCommand(
-							"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
-							tableName + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
-						{
-							using (SqlCeResultSet columnsResult = 
-								sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
-							{
-								int colPos;
+                    // Check for auto increment fields and default column values
+                    foreach (DataColumn c in table.Columns)
+                    {
+                        // Get the information for the current column
+                        using (SqlCeCommand sqlcmd = new SqlCeCommand(
+                            "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
+                            tableName + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
+                        {
+                            using (SqlCeResultSet columnsResult = 
+                                sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
+                            {
+                                int colPos;
 
-								// Get the first record in the result set - should only be one
-								if (columnsResult.ReadFirst())
-								{
-									// If the column is an auto increment column set the seed value to next
-									// auto increment value for the column
-									if (c.AutoIncrement)
-									{
-										// Get the position of the AUTOINC_NEXT field
-										colPos = columnsResult.GetOrdinal("AUTOINC_NEXT");
+                                // Get the first record in the result set - should only be one
+                                if (columnsResult.ReadFirst())
+                                {
+                                    // If the column is an auto increment column set the seed value to next
+                                    // auto increment value for the column
+                                    if (c.AutoIncrement)
+                                    {
+                                        // Get the position of the AUTOINC_NEXT field
+                                        colPos = columnsResult.GetOrdinal("AUTOINC_NEXT");
 
-										// Set the seed to the value in the AUTOINC_NEXT field
-										c.AutoIncrementSeed = (long)columnsResult.GetValue(colPos);
-									}
+                                        // Set the seed to the value in the AUTOINC_NEXT field
+                                        c.AutoIncrementSeed = (long)columnsResult.GetValue(colPos);
+                                    }
 
-									// Set the default for a column if one is defined
-									colPos = columnsResult.GetOrdinal("COLUMN_HASDEFAULT");
-									if (columnsResult.GetBoolean(colPos))
-									{
-										// Set the default value for the column
-										colPos = columnsResult.GetOrdinal("COLUMN_DEFAULT");
-										c.DefaultValue = columnsResult.GetValue(colPos);
-									}
-								}
-							}
-						}
-					}
+                                    // Set the default for a column if one is defined
+                                    colPos = columnsResult.GetOrdinal("COLUMN_HASDEFAULT");
+                                    if (columnsResult.GetBoolean(colPos))
+                                    {
+                                        // Set the default value for the column
+                                        colPos = columnsResult.GetOrdinal("COLUMN_DEFAULT");
+                                        c.DefaultValue = columnsResult.GetValue(colPos);
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-					// Add the new adapter to the list of adapters
-					_dictionaryOfAdapters.Add(tableName, dataAdapter);
+                    // Add the new adapter to the list of adapters
+                    _dictionaryOfAdapters.Add(tableName, dataAdapter);
 
-					// Add the new table to the list of tables
-	               _dictionaryOfTables.Add(tableName, table);
-				}
+                    // Add the new table to the list of tables
+                   _dictionaryOfTables.Add(tableName, table);
+                }
 
-				// Check for unique constraints
-				bool _hasUniqueContraint = false;
-				foreach (Constraint c in table.Constraints)
-				{
-					// Check if current constraint is unique					
-					if (c is UniqueConstraint)
-					{
-						// set Flag to true;
-						_hasUniqueContraint = true;
-						break;
-					}
-				}
+                // Check for unique constraints
+                bool _hasUniqueContraint = false;
+                foreach (Constraint c in table.Constraints)
+                {
+                    // Check if current constraint is unique					
+                    if (c is UniqueConstraint)
+                    {
+                        // set Flag to true;
+                        _hasUniqueContraint = true;
+                        break;
+                    }
+                }
 
-				// Set the ReadOnly and AllowUserToAddRows so that if no unique constraint
-				// the grid cannot be modified and rows cannot be added
-				dataGridView.ReadOnly = !_hasUniqueContraint;
-				dataGridView.AllowUserToAddRows = _hasUniqueContraint;
+                // Set the ReadOnly and AllowUserToAddRows so that if no unique constraint
+                // the grid cannot be modified and rows cannot be added
+                dataGridView.ReadOnly = !_hasUniqueContraint;
+                dataGridView.AllowUserToAddRows = _hasUniqueContraint;
             }
-			else
+            else
             {
                // If the table has not been created create an empty table
                 table = new DataTable();
             }
             // Set the bindingSoure dataSource to the table
             bindingSource.DataSource = table;
-			
-			// Reset the current cell
-			dataGridView.CurrentCell = null;
+            
+            // Reset the current cell
+            dataGridView.CurrentCell = null;
         }
 
         /// <summary>
@@ -495,60 +526,60 @@ namespace Extract.SQLCDBEditor
             // Remove the handler for the SelectedValueChanged event while loading the list box
             listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
 
-			try
-			{
-				// If dictionary of tables already exist clear the values it contains.
-				if (_dictionaryOfTables != null)
-				{
-					CollectionMethods.ClearAndDispose(_dictionaryOfTables);
-				}
+            try
+            {
+                // If dictionary of tables already exist clear the values it contains.
+                if (_dictionaryOfTables != null)
+                {
+                    CollectionMethods.ClearAndDispose(_dictionaryOfTables);
+                }
 
-				// Create a new dictionary of Tables
-				_dictionaryOfTables = new Dictionary<string, DataTable>();
+                // Create a new dictionary of Tables
+                _dictionaryOfTables = new Dictionary<string, DataTable>();
 
-				// If dictionary of Adapters already exists clear the values it contains
-				if (_dictionaryOfAdapters != null)
-				{
-					CollectionMethods.ClearAndDispose(_dictionaryOfAdapters);
-				}
+                // If dictionary of Adapters already exists clear the values it contains
+                if (_dictionaryOfAdapters != null)
+                {
+                    CollectionMethods.ClearAndDispose(_dictionaryOfAdapters);
+                }
 
-				// Create a new dictionary of adapters
-				_dictionaryOfAdapters = new Dictionary<string, SqlCeDataAdapter>();
+                // Create a new dictionary of adapters
+                _dictionaryOfAdapters = new Dictionary<string, SqlCeDataAdapter>();
 
-				// Create a new DataTable for the table names in this database
-				DataTable tableNameTable = new DataTable();
+                // Create a new DataTable for the table names in this database
+                DataTable tableNameTable = new DataTable();
 
-				// Create adapter for the list of tables.
-				SqlCeDataAdapter tableListDataAdapter =
-					new SqlCeDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", _connection);
+                // Create adapter for the list of tables.
+                SqlCeDataAdapter tableListDataAdapter =
+                    new SqlCeDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", _connection);
 
-				// Create the commands for the tableListDataAdapter 
-				SqlCeCommandBuilder commandBuilder = new SqlCeCommandBuilder(tableListDataAdapter);
+                // Create the commands for the tableListDataAdapter 
+                SqlCeCommandBuilder commandBuilder = new SqlCeCommandBuilder(tableListDataAdapter);
 
-				// Fill the tableNameTable with data from the adapter
-				tableListDataAdapter.Fill(tableNameTable);
+                // Fill the tableNameTable with data from the adapter
+                tableListDataAdapter.Fill(tableNameTable);
 
-				// Set the member to display from the table
-				listBoxTables.DisplayMember = "TABLE_NAME";
+                // Set the member to display from the table
+                listBoxTables.DisplayMember = "TABLE_NAME";
 
-				// Set the listbox datasource to the tableNameTable
-				listBoxTables.DataSource = tableNameTable;
+                // Set the listbox datasource to the tableNameTable
+                listBoxTables.DataSource = tableNameTable;
 
-				// Reset the _dirty flag
-				_dirty = false;
+                // Reset the _dirty flag
+                _dirty = false;
 
-				// Update menu and tool strip
-				EnableCommands();
-			}
-			catch (Exception ex)
-			{
-				throw new ExtractException("ELI29627", "Unable to load tables.", ex);
-			}
-			finally
-			{
-				// Activate the SelectedValueChanged event handler
-				listBoxTables.SelectedValueChanged += ListBoxTables_SelectedValueChanged;
-			}
+                // Update menu and tool strip
+                EnableCommands();
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI29627", "Unable to load tables.", ex);
+            }
+            finally
+            {
+                // Activate the SelectedValueChanged event handler
+                listBoxTables.SelectedValueChanged += ListBoxTables_SelectedValueChanged;
+            }
         }
 
         /// <summary>
@@ -565,13 +596,13 @@ namespace Extract.SQLCDBEditor
             // Display wait cursor while saving the changes
             using (new TemporaryWaitCursor())
             {
-				// Check for an edit in progress on the current row in the datagrid
-				if (dataGridView.IsCurrentRowDirty)
-				{
-					// Change the current cell to get the changes to the current cell saved to 
-					// the datasource
-					dataGridView.CurrentCell = null;
-				}
+                // Check for an edit in progress on the current row in the datagrid
+                if (dataGridView.IsCurrentRowDirty)
+                {
+                    // Change the current cell to get the changes to the current cell saved to 
+                    // the datasource
+                    dataGridView.CurrentCell = null;
+                }
 
                 // Begin a transaction so all or non of the changes are commited
                 SqlCeTransaction transaction = _connection.BeginTransaction();
@@ -604,13 +635,15 @@ namespace Extract.SQLCDBEditor
                     // Update menu and tool strip
                     EnableCommands();
 
-					// Open database to refresh the tables.
-					OpenDatabase(_databaseFileName);
+                    // Open database to refresh the tables.
+                    OpenDatabase(_databaseFileName);
 
                     // Display message that save was successful.
                     MessageBox.Show("Database was saved successfully.", "Database save",
                         MessageBoxButtons.OK, MessageBoxIcon.Information,
                         MessageBoxDefaultButton.Button1, 0);
+
+                    _fileSaved = true;
                 }
                 catch (Exception ex)
                 {
@@ -634,16 +667,16 @@ namespace Extract.SQLCDBEditor
         /// <param name="databaseToOpen">SQL CE Database file to open.</param>
         void OpenDatabase(string databaseToOpen)
         {
-			// If same database is open need to save the current table
-			string currentlyOpenTable = "";
-			if (databaseToOpen == _databaseFileName)
-			{
-				// reopening the current database.
-				currentlyOpenTable = listBoxTables.Text;
-			}
+            // If same database is open need to save the current table
+            string currentlyOpenTable = "";
+            if (databaseToOpen == _databaseFileName)
+            {
+                // reopening the current database.
+                currentlyOpenTable = listBoxTables.Text;
+            }
 
-			// Close the database
-			CloseDatabase();
+            // Close the database
+            CloseDatabase();
 
             // Set the _databaseFileName
             _databaseFileName = databaseToOpen;
@@ -657,16 +690,18 @@ namespace Extract.SQLCDBEditor
             // Load the table names into the listBox
             LoadTableNames();
 
-			// If this database was previously open reopen the same table
-			if (!string.IsNullOrEmpty(currentlyOpenTable))
-			{
-				listBoxTables.SelectedIndex = listBoxTables.FindStringExact(currentlyOpenTable);
-			}
+            // If this database was previously open reopen the same table
+            if (!string.IsNullOrEmpty(currentlyOpenTable))
+            {
+                listBoxTables.SelectedIndex = listBoxTables.FindStringExact(currentlyOpenTable);
+            }
 
-			// Load the currently selected table into the dataGridView
-			LoadTable(listBoxTables.Text);
+            // Load the currently selected table into the dataGridView
+            LoadTable(listBoxTables.Text);
 
             SetWindowTitle();
+
+            _fileSaved = false;
         }
 
         /// <summary>
@@ -728,70 +763,88 @@ namespace Extract.SQLCDBEditor
             saveToolStripMenuItem.Enabled = _dirty;
         }
 
-		/// <summary>
-		/// Method closes the database
-		/// </summary>
-		void CloseDatabase()
-		{
-			// Remove the handler for the SelectedValueChanged event.
-			listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
+        /// <summary>
+        /// Method closes the database
+        /// </summary>
+        void CloseDatabase()
+        {
+            // Remove the handler for the SelectedValueChanged event.
+            listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
 
-			// Clear the listbox
-			IDisposable d = (IDisposable)listBoxTables.DataSource;
-			if (d != null)
-			{
-				d.Dispose();
-			}
-			listBoxTables.DataSource = null;
+            // Clear the listbox
+            IDisposable d = (IDisposable)listBoxTables.DataSource;
+            if (d != null)
+            {
+                d.Dispose();
+            }
+            listBoxTables.DataSource = null;
 
-			// Clear the data grid binding source
-			d = (IDisposable)bindingSource.DataSource;
-			if (d != null)
-			{
-				d.Dispose();
-			}
-			bindingSource.DataSource = null;
+            // Clear the data grid binding source
+            d = (IDisposable)bindingSource.DataSource;
+            if (d != null)
+            {
+                d.Dispose();
+            }
+            bindingSource.DataSource = null;
 
 
-			// Clear dictionary of adapters
-			if (_dictionaryOfAdapters != null)
-			{
-				CollectionMethods.ClearAndDispose(_dictionaryOfAdapters);
-				_dictionaryOfAdapters = null;
-			}
+            // Clear dictionary of adapters
+            if (_dictionaryOfAdapters != null)
+            {
+                CollectionMethods.ClearAndDispose(_dictionaryOfAdapters);
+                _dictionaryOfAdapters = null;
+            }
 
-			// Clear dictionary of tables
-			if (_dictionaryOfTables != null)
-			{
-				CollectionMethods.ClearAndDispose(_dictionaryOfTables);
-				_dictionaryOfTables = null;
-			}
+            // Clear dictionary of tables
+            if (_dictionaryOfTables != null)
+            {
+                CollectionMethods.ClearAndDispose(_dictionaryOfTables);
+                _dictionaryOfTables = null;
+            }
 
-			// Clear database file name
-			_databaseFileName = "";
+            // Clear database file name
+            _databaseFileName = "";
 
-			// Clear Dirty Flag
-			_dirty = false;
+            // Clear Dirty Flag
+            _dirty = false;
 
-			// Update menu and tool strip
-			EnableCommands();
+            // Update menu and tool strip
+            EnableCommands();
 
-			// Close an open connection
-			if (_connection != null)
-			{
-				// Close the connection
-				_connection.Close();
+            // Close an open connection
+            if (_connection != null)
+            {
+                // Close the connection
+                _connection.Close();
 
-				// Dispose of the connection
-				_connection.Dispose();
+                // Dispose of the connection
+                _connection.Dispose();
 
-				// Set to null
-				_connection = null;
-			}
+                // Set to null
+                _connection = null;
+            }
 
-			SetWindowTitle();
-		}
+            SetWindowTitle();
+        }
 
         #endregion Private Methods
+
+        #region Properties
+
+        /// <summary>
+        /// Gets a value indicating whether the open file has been saved.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the open file has been saved; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool FileSaved
+        {
+            get
+            {
+                return _fileSaved;
+            }
+        }
+
+        #endregion Properties
     }
 }

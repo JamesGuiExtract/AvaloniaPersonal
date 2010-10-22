@@ -74,6 +74,13 @@ namespace Extract.FileActionManager.Utilities.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap EditGroupButton {
+            get {
+                object obj = ResourceManager.GetObject("EditGroupButton", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Icon FamNetworkManager {
             get {
                 object obj = ResourceManager.GetObject("FamNetworkManager", resourceCulture);
