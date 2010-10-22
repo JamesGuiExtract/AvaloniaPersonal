@@ -1990,6 +1990,7 @@ namespace Extract.Imaging.Forms
         /// <value><see langword="true"/> if <see cref="ImageReader"/>s should be cached in memory,
         /// <see langword="false"/> if they should be created/disposed as the images are opened and
         /// closed.</value>
+        [DefaultValue(false)]
         public bool CacheImages
         {
             get

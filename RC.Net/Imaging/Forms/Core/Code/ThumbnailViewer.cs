@@ -82,6 +82,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <value><see langword="true"/> if the thumbnails should be loaded;
         /// <see langword="false"/> otherwise.</value>
+        [DefaultValue(true)]
         public bool Active
         {
             get

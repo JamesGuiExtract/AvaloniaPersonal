@@ -266,6 +266,7 @@ namespace Extract.Redaction.Verification
                 _formStateManager = new VerificationTaskForm.FormStateManager(
                     this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, _sandDockManager,
                     "Exit full screen (F11)");
+                _formStateManager.FullScreenChanged += HandleFullScreenModeChanged;
             }
             catch (Exception ex)
             {
@@ -1627,14 +1628,11 @@ namespace Extract.Redaction.Verification
                 // Full screen mode.
                 _imageViewer.Shortcuts[Keys.F11] = ToggleFullScreen;
 
-                // ThumbnailViewer is shown/hidden
-                _thumbnailDockableWindow.DockSituationChanged +=
-                    ThumbnailDockableWindowDockSituationChanged;
-
                 if (_settings.LaunchInFullScreenMode)
                 {
                     _formStateManager.FullScreen = true;
                 }
+                _fullScreenToolStripMenuItem.Checked = _formStateManager.FullScreen;
             }
             catch (Exception ex)
             {
@@ -2231,7 +2229,7 @@ namespace Extract.Redaction.Verification
         /// <see cref="DockControl.DockSituationChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="DockControl.DockSituationChanged"/> event.</param>
-        void ThumbnailDockableWindowDockSituationChanged(object sender, EventArgs e)
+        void HandleThumbnailDockableWindowDockSituationChanged(object sender, EventArgs e)
         {
             try
             {
@@ -2240,7 +2238,44 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI30742", ex);
+                ExtractException.Display("ELI30742", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the full screen tool strip menu item click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleFullScreenToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                ToggleFullScreen();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30831", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the full screen mode being enabled or disabled by the
+        /// <see cref="FormStateManager"/>
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleFullScreenModeChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _fullScreenToolStripMenuItem.Checked = _formStateManager.FullScreen;
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30833", ex);
             }
         }
 

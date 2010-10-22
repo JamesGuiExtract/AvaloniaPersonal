@@ -128,6 +128,15 @@ namespace Extract.Utilities.Forms
 
         #endregion Constructors
 
+        #region Events
+
+        /// <summary>
+        /// Raised when the <see cref="FullScreen"/> property is changed.
+        /// </summary>
+        public event EventHandler<EventArgs> FullScreenChanged;
+
+        #endregion Events
+
         #region Properties
 
         /// <summary>
@@ -461,7 +470,7 @@ namespace Extract.Utilities.Forms
                     _form.WindowState = FormWindowState.Normal;
                     _form.FormBorderStyle = FormBorderStyle.None;
                     _form.Bounds = Screen.FromControl(_form).Bounds;
-                    _form.TopMost = true;
+                    _form.Activated += HandleFormActivated;
 
                     if (_fullScreenTab != null)
                     {
@@ -475,13 +484,15 @@ namespace Extract.Utilities.Forms
                         _fullScreenTab.Hide();
                     }
 
-                    _form.TopMost = false;
+                    _form.Activated -= HandleFormActivated;
                     _form.FormBorderStyle = FormBorderStyle.Sizable;
                     _form.Bounds = _bounds;
                     _form.WindowState = _state;
                 }
 
                 _fullScreen = showFullScreen;
+
+                OnFullScreenChanged();
             }
             catch (Exception ex)
             {
@@ -540,6 +551,27 @@ namespace Extract.Utilities.Forms
         #region Event handlers
 
         /// <summary>
+        /// Handles the case that the managed <see cref="Form"/> is activated
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleFormActivated(object sender, EventArgs e)
+        {
+            try
+            {
+                // To force the form to display on top of the taskbar, make it TopMost. But
+                // immediately remove the TopMost property so that the user is able to alt-tab to
+                // other applicatons and have the managed form fall to the background.
+                _form.TopMost = true;
+                _form.TopMost = false;
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30771", ex);
+            }
+        }
+
+        /// <summary>
         /// Handles the form closing.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -556,7 +588,7 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ExtractException.AsExtractException("ELI30771", ex);
+                ExtractException.Display("ELI30771", ex);
             }
         }
 
@@ -577,7 +609,7 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ExtractException.AsExtractException("ELI30772", ex);
+                ExtractException.Display("ELI30772", ex);
             }
         }
 
@@ -671,6 +703,17 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28962", ex);
+            }
+        }
+        
+        /// <summary>
+        /// Raises the <see cref="FullScreenChanged"/> event.
+        /// </summary>
+        void OnFullScreenChanged()
+        {
+            if (FullScreenChanged != null)
+            {
+                FullScreenChanged(this, new EventArgs());
             }
         }
 

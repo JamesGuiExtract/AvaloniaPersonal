@@ -120,7 +120,36 @@ namespace Extract.Redaction.Verification
             this._editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._discardChangesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._findOrRedactToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._fitToPageToolStripMenuItem = new Extract.Imaging.Forms.FitToPageToolStripMenuItem();
+            this._fitToWidthToolStripMenuItem = new Extract.Imaging.Forms.FitToWidthToolStripMenuItem();
+            this._toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this._zoomInToolStripMenuItem = new Extract.Imaging.Forms.ZoomInToolStripMenuItem();
+            this._zoomOutToolStripMenuItem = new Extract.Imaging.Forms.ZoomOutToolStripMenuItem();
+            this._toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this._zoomPreviousToolStripMenuItem = new Extract.Imaging.Forms.ZoomPreviousToolStripMenuItem();
+            this._zoomNextToolStripMenuItem = new Extract.Imaging.Forms.ZoomNextToolStripMenuItem();
+            this._rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._rotateCounterclockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripMenuItem();
+            this._rotateClockwiseToolStripMenuItem = new Extract.Imaging.Forms.RotateClockwiseToolStripMenuItem();
+            this._gotoPageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._firstPageToolStripMenuItem = new Extract.Imaging.Forms.FirstPageToolStripMenuItem();
+            this._previousPageToolStripMenuItem = new Extract.Imaging.Forms.PreviousPageToolStripMenuItem();
+            this._toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this._pageNavigationToolStripMenuItem = new Extract.Imaging.Forms.PageNavigationToolStripMenuItem();
+            this._toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this._nextPageToolStripMenuItem = new Extract.Imaging.Forms.NextPageToolStripMenuItem();
+            this._lastPageToolStripMenuItem = new Extract.Imaging.Forms.LastPageToolStripMenuItem();
+            this.toolStripSeparator13 = new System.Windows.Forms.ToolStripSeparator();
+            this._fullScreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._zoomWindowToolStripMenuItem = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
+            this._panToolStripMenuItem = new Extract.Imaging.Forms.PanToolStripMenuItem();
+            this._selectLayerObjectToolStripMenuItem = new Extract.Imaging.Forms.SelectLayerObjectToolStripMenuItem();
+            this._angularRedactionToolStripMenuItem = new Extract.Imaging.Forms.AngularRedactionToolStripMenuItem();
+            this._rectangularRedactionToolStripMenuItem = new Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem();
+            this._toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this._optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._idShieldHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -366,6 +395,7 @@ namespace Extract.Redaction.Verification
             this._menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._fileToolStripMenuItem,
             this._editToolStripMenuItem,
+            this._viewToolStripMenuItem,
             this._toolsToolStripMenuItem,
             this._helpToolStripMenuItem});
             this._menuStrip.Location = new System.Drawing.Point(0, 0);
@@ -480,18 +510,293 @@ namespace Extract.Redaction.Verification
             this._findOrRedactToolStripMenuItem.Text = "Find or redact...";
             this._findOrRedactToolStripMenuItem.Click += new System.EventHandler(this.HandleFindOrRedactToolStripMenuItemClick);
             // 
+            // _viewToolStripMenuItem
+            // 
+            this._viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._zoomToolStripMenuItem,
+            this._rotateToolStripMenuItem,
+            this._gotoPageToolStripMenuItem,
+            this.toolStripSeparator13,
+            this._fullScreenToolStripMenuItem});
+            this._viewToolStripMenuItem.Name = "_viewToolStripMenuItem";
+            this._viewToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
+            this._viewToolStripMenuItem.Text = "&View";
+            // 
+            // _zoomToolStripMenuItem
+            // 
+            this._zoomToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._fitToPageToolStripMenuItem,
+            this._fitToWidthToolStripMenuItem,
+            this._toolStripSeparator3,
+            this._zoomInToolStripMenuItem,
+            this._zoomOutToolStripMenuItem,
+            this._toolStripSeparator4,
+            this._zoomPreviousToolStripMenuItem,
+            this._zoomNextToolStripMenuItem});
+            this._zoomToolStripMenuItem.Name = "_zoomToolStripMenuItem";
+            this._zoomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._zoomToolStripMenuItem.Text = "&Zoom";
+            // 
+            // _fitToPageToolStripMenuItem
+            // 
+            this._fitToPageToolStripMenuItem.Enabled = false;
+            this._fitToPageToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_fitToPageToolStripMenuItem.Image")));
+            this._fitToPageToolStripMenuItem.ImageViewer = null;
+            this._fitToPageToolStripMenuItem.Name = "_fitToPageToolStripMenuItem";
+            this._fitToPageToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._fitToPageToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._fitToPageToolStripMenuItem.Text = "Fit to &page";
+            // 
+            // _fitToWidthToolStripMenuItem
+            // 
+            this._fitToWidthToolStripMenuItem.Enabled = false;
+            this._fitToWidthToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_fitToWidthToolStripMenuItem.Image")));
+            this._fitToWidthToolStripMenuItem.ImageViewer = null;
+            this._fitToWidthToolStripMenuItem.Name = "_fitToWidthToolStripMenuItem";
+            this._fitToWidthToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._fitToWidthToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._fitToWidthToolStripMenuItem.Text = "Fit to &width";
+            // 
+            // _toolStripSeparator3
+            // 
+            this._toolStripSeparator3.Name = "_toolStripSeparator3";
+            this._toolStripSeparator3.Size = new System.Drawing.Size(152, 6);
+            // 
+            // _zoomInToolStripMenuItem
+            // 
+            this._zoomInToolStripMenuItem.Enabled = false;
+            this._zoomInToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_zoomInToolStripMenuItem.Image")));
+            this._zoomInToolStripMenuItem.ImageViewer = null;
+            this._zoomInToolStripMenuItem.Name = "_zoomInToolStripMenuItem";
+            this._zoomInToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._zoomInToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._zoomInToolStripMenuItem.Text = "Zoom in";
+            // 
+            // _zoomOutToolStripMenuItem
+            // 
+            this._zoomOutToolStripMenuItem.Enabled = false;
+            this._zoomOutToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_zoomOutToolStripMenuItem.Image")));
+            this._zoomOutToolStripMenuItem.ImageViewer = null;
+            this._zoomOutToolStripMenuItem.Name = "_zoomOutToolStripMenuItem";
+            this._zoomOutToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._zoomOutToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._zoomOutToolStripMenuItem.Text = "Zoom out";
+            // 
+            // _toolStripSeparator4
+            // 
+            this._toolStripSeparator4.Name = "_toolStripSeparator4";
+            this._toolStripSeparator4.Size = new System.Drawing.Size(152, 6);
+            // 
+            // _zoomPreviousToolStripMenuItem
+            // 
+            this._zoomPreviousToolStripMenuItem.Enabled = false;
+            this._zoomPreviousToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_zoomPreviousToolStripMenuItem.Image")));
+            this._zoomPreviousToolStripMenuItem.ImageViewer = null;
+            this._zoomPreviousToolStripMenuItem.Name = "_zoomPreviousToolStripMenuItem";
+            this._zoomPreviousToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._zoomPreviousToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._zoomPreviousToolStripMenuItem.Text = "Zoom previous";
+            // 
+            // _zoomNextToolStripMenuItem
+            // 
+            this._zoomNextToolStripMenuItem.Enabled = false;
+            this._zoomNextToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_zoomNextToolStripMenuItem.Image")));
+            this._zoomNextToolStripMenuItem.ImageViewer = null;
+            this._zoomNextToolStripMenuItem.Name = "_zoomNextToolStripMenuItem";
+            this._zoomNextToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._zoomNextToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this._zoomNextToolStripMenuItem.Text = "Zoom next";
+            // 
+            // _rotateToolStripMenuItem
+            // 
+            this._rotateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._rotateCounterclockwiseToolStripMenuItem,
+            this._rotateClockwiseToolStripMenuItem});
+            this._rotateToolStripMenuItem.Name = "_rotateToolStripMenuItem";
+            this._rotateToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._rotateToolStripMenuItem.Text = "&Rotate";
+            // 
+            // _rotateCounterclockwiseToolStripMenuItem
+            // 
+            this._rotateCounterclockwiseToolStripMenuItem.Enabled = false;
+            this._rotateCounterclockwiseToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_rotateCounterclockwiseToolStripMenuItem.Image")));
+            this._rotateCounterclockwiseToolStripMenuItem.ImageViewer = null;
+            this._rotateCounterclockwiseToolStripMenuItem.Name = "_rotateCounterclockwiseToolStripMenuItem";
+            this._rotateCounterclockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._rotateCounterclockwiseToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this._rotateCounterclockwiseToolStripMenuItem.Text = "Rotate counterclockwise";
+            // 
+            // _rotateClockwiseToolStripMenuItem
+            // 
+            this._rotateClockwiseToolStripMenuItem.Enabled = false;
+            this._rotateClockwiseToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_rotateClockwiseToolStripMenuItem.Image")));
+            this._rotateClockwiseToolStripMenuItem.ImageViewer = null;
+            this._rotateClockwiseToolStripMenuItem.Name = "_rotateClockwiseToolStripMenuItem";
+            this._rotateClockwiseToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._rotateClockwiseToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this._rotateClockwiseToolStripMenuItem.Text = "Rotate clockwise";
+            // 
+            // _gotoPageToolStripMenuItem
+            // 
+            this._gotoPageToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._firstPageToolStripMenuItem,
+            this._previousPageToolStripMenuItem,
+            this._toolStripSeparator5,
+            this._pageNavigationToolStripMenuItem,
+            this._toolStripSeparator6,
+            this._nextPageToolStripMenuItem,
+            this._lastPageToolStripMenuItem});
+            this._gotoPageToolStripMenuItem.Name = "_gotoPageToolStripMenuItem";
+            this._gotoPageToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._gotoPageToolStripMenuItem.Text = "&Goto page";
+            // 
+            // _firstPageToolStripMenuItem
+            // 
+            this._firstPageToolStripMenuItem.Enabled = false;
+            this._firstPageToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_firstPageToolStripMenuItem.Image")));
+            this._firstPageToolStripMenuItem.ImageViewer = null;
+            this._firstPageToolStripMenuItem.Name = "_firstPageToolStripMenuItem";
+            this._firstPageToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._firstPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._firstPageToolStripMenuItem.Text = "First page";
+            // 
+            // _previousPageToolStripMenuItem
+            // 
+            this._previousPageToolStripMenuItem.Enabled = false;
+            this._previousPageToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_previousPageToolStripMenuItem.Image")));
+            this._previousPageToolStripMenuItem.ImageViewer = null;
+            this._previousPageToolStripMenuItem.Name = "_previousPageToolStripMenuItem";
+            this._previousPageToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._previousPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._previousPageToolStripMenuItem.Text = "Previous page";
+            // 
+            // _toolStripSeparator5
+            // 
+            this._toolStripSeparator5.Name = "_toolStripSeparator5";
+            this._toolStripSeparator5.Size = new System.Drawing.Size(157, 6);
+            // 
+            // _pageNavigationToolStripMenuItem
+            // 
+            this._pageNavigationToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this._pageNavigationToolStripMenuItem.Enabled = false;
+            this._pageNavigationToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_pageNavigationToolStripMenuItem.Image")));
+            this._pageNavigationToolStripMenuItem.ImageViewer = null;
+            this._pageNavigationToolStripMenuItem.Name = "_pageNavigationToolStripMenuItem";
+            this._pageNavigationToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._pageNavigationToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._pageNavigationToolStripMenuItem.Text = "Page n&umber...";
+            // 
+            // _toolStripSeparator6
+            // 
+            this._toolStripSeparator6.Name = "_toolStripSeparator6";
+            this._toolStripSeparator6.Size = new System.Drawing.Size(157, 6);
+            // 
+            // _nextPageToolStripMenuItem
+            // 
+            this._nextPageToolStripMenuItem.Enabled = false;
+            this._nextPageToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_nextPageToolStripMenuItem.Image")));
+            this._nextPageToolStripMenuItem.ImageViewer = null;
+            this._nextPageToolStripMenuItem.Name = "_nextPageToolStripMenuItem";
+            this._nextPageToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._nextPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._nextPageToolStripMenuItem.Text = "Next page";
+            // 
+            // _lastPageToolStripMenuItem
+            // 
+            this._lastPageToolStripMenuItem.Enabled = false;
+            this._lastPageToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_lastPageToolStripMenuItem.Image")));
+            this._lastPageToolStripMenuItem.ImageViewer = null;
+            this._lastPageToolStripMenuItem.Name = "_lastPageToolStripMenuItem";
+            this._lastPageToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._lastPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this._lastPageToolStripMenuItem.Text = "Last page";
+            // 
+            // toolStripSeparator13
+            // 
+            this.toolStripSeparator13.Name = "toolStripSeparator13";
+            this.toolStripSeparator13.Size = new System.Drawing.Size(149, 6);
+            // 
+            // _fullScreenToolStripMenuItem
+            // 
+            this._fullScreenToolStripMenuItem.Name = "_fullScreenToolStripMenuItem";
+            this._fullScreenToolStripMenuItem.ShortcutKeyDisplayString = "F11";
+            this._fullScreenToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._fullScreenToolStripMenuItem.Text = "&Full screen";
+            this._fullScreenToolStripMenuItem.Click += new System.EventHandler(this.HandleFullScreenToolStripMenuItemClick);
+            // 
             // _toolsToolStripMenuItem
             // 
             this._toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._zoomWindowToolStripMenuItem,
+            this._panToolStripMenuItem,
+            this._selectLayerObjectToolStripMenuItem,
+            this._angularRedactionToolStripMenuItem,
+            this._rectangularRedactionToolStripMenuItem,
+            this._toolStripSeparator8,
             this._optionsToolStripMenuItem});
             this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
             this._toolsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this._toolsToolStripMenuItem.Text = "Tools";
             // 
+            // _zoomWindowToolStripMenuItem
+            // 
+            this._zoomWindowToolStripMenuItem.Enabled = false;
+            this._zoomWindowToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_zoomWindowToolStripMenuItem.Image")));
+            this._zoomWindowToolStripMenuItem.ImageViewer = null;
+            this._zoomWindowToolStripMenuItem.Name = "_zoomWindowToolStripMenuItem";
+            this._zoomWindowToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._zoomWindowToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._zoomWindowToolStripMenuItem.Text = "&Zoom window";
+            // 
+            // _panToolStripMenuItem
+            // 
+            this._panToolStripMenuItem.Enabled = false;
+            this._panToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_panToolStripMenuItem.Image")));
+            this._panToolStripMenuItem.ImageViewer = null;
+            this._panToolStripMenuItem.Name = "_panToolStripMenuItem";
+            this._panToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._panToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._panToolStripMenuItem.Text = "P&an";
+            // 
+            // _selectLayerObjectToolStripMenuItem
+            // 
+            this._selectLayerObjectToolStripMenuItem.Enabled = false;
+            this._selectLayerObjectToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_selectLayerObjectToolStripMenuItem.Image")));
+            this._selectLayerObjectToolStripMenuItem.ImageViewer = null;
+            this._selectLayerObjectToolStripMenuItem.Name = "_selectLayerObjectToolStripMenuItem";
+            this._selectLayerObjectToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._selectLayerObjectToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._selectLayerObjectToolStripMenuItem.Text = "Select redactions and other objects";
+            // 
+            // _angularRedactionToolStripMenuItem
+            // 
+            this._angularRedactionToolStripMenuItem.Enabled = false;
+            this._angularRedactionToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_angularRedactionToolStripMenuItem.Image")));
+            this._angularRedactionToolStripMenuItem.ImageViewer = null;
+            this._angularRedactionToolStripMenuItem.Name = "_angularRedactionToolStripMenuItem";
+            this._angularRedactionToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._angularRedactionToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._angularRedactionToolStripMenuItem.Text = "A&ngular redaction";
+            // 
+            // _rectangularRedactionToolStripMenuItem
+            // 
+            this._rectangularRedactionToolStripMenuItem.Enabled = false;
+            this._rectangularRedactionToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_rectangularRedactionToolStripMenuItem.Image")));
+            this._rectangularRedactionToolStripMenuItem.ImageViewer = null;
+            this._rectangularRedactionToolStripMenuItem.Name = "_rectangularRedactionToolStripMenuItem";
+            this._rectangularRedactionToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._rectangularRedactionToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._rectangularRedactionToolStripMenuItem.Text = "&Rectangular redaction";
+            // 
+            // _toolStripSeparator8
+            // 
+            this._toolStripSeparator8.Name = "_toolStripSeparator8";
+            this._toolStripSeparator8.Size = new System.Drawing.Size(252, 6);
+            // 
             // _optionsToolStripMenuItem
             // 
             this._optionsToolStripMenuItem.Name = "_optionsToolStripMenuItem";
-            this._optionsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this._optionsToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
             this._optionsToolStripMenuItem.Text = "Options...";
             this._optionsToolStripMenuItem.Click += new System.EventHandler(this.HandleOptionsToolStripMenuItemClick);
             // 
@@ -1143,6 +1448,7 @@ namespace Extract.Redaction.Verification
             this._thumbnailDockableWindow.Size = new System.Drawing.Size(200, 878);
             this._thumbnailDockableWindow.TabIndex = 0;
             this._thumbnailDockableWindow.Text = "Page thumbnails";
+            this._thumbnailDockableWindow.DockSituationChanged += new System.EventHandler(this.HandleThumbnailDockableWindowDockSituationChanged);
             // 
             // _thumbnailViewer
             // 
@@ -1297,5 +1603,34 @@ namespace Extract.Redaction.Verification
         private Extract.Imaging.Forms.AngularRedactionToolStripMenuItem angularRedactionToolStripMenuItem1;
         private Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem rectangularRedactionToolStripMenuItem1;
         private Extract.Imaging.Forms.BlockFitSelectionToolStripMenuItem blockFitSelectionToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem _viewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _zoomToolStripMenuItem;
+        private Imaging.Forms.FitToPageToolStripMenuItem _fitToPageToolStripMenuItem;
+        private Imaging.Forms.FitToWidthToolStripMenuItem _fitToWidthToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator _toolStripSeparator3;
+        private Imaging.Forms.ZoomInToolStripMenuItem _zoomInToolStripMenuItem;
+        private Imaging.Forms.ZoomOutToolStripMenuItem _zoomOutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator _toolStripSeparator4;
+        private Imaging.Forms.ZoomPreviousToolStripMenuItem _zoomPreviousToolStripMenuItem;
+        private Imaging.Forms.ZoomNextToolStripMenuItem _zoomNextToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _rotateToolStripMenuItem;
+        private Imaging.Forms.RotateCounterclockwiseToolStripMenuItem _rotateCounterclockwiseToolStripMenuItem;
+        private Imaging.Forms.RotateClockwiseToolStripMenuItem _rotateClockwiseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _gotoPageToolStripMenuItem;
+        private Imaging.Forms.FirstPageToolStripMenuItem _firstPageToolStripMenuItem;
+        private Imaging.Forms.PreviousPageToolStripMenuItem _previousPageToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator _toolStripSeparator5;
+        private Imaging.Forms.PageNavigationToolStripMenuItem _pageNavigationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator _toolStripSeparator6;
+        private Imaging.Forms.NextPageToolStripMenuItem _nextPageToolStripMenuItem;
+        private Imaging.Forms.LastPageToolStripMenuItem _lastPageToolStripMenuItem;
+        private Imaging.Forms.ZoomWindowToolStripMenuItem _zoomWindowToolStripMenuItem;
+        private Imaging.Forms.PanToolStripMenuItem _panToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator _toolStripSeparator8;
+        private Imaging.Forms.SelectLayerObjectToolStripMenuItem _selectLayerObjectToolStripMenuItem;
+        private Imaging.Forms.AngularRedactionToolStripMenuItem _angularRedactionToolStripMenuItem;
+        private Imaging.Forms.RectangularRedactionToolStripMenuItem _rectangularRedactionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator13;
+        private System.Windows.Forms.ToolStripMenuItem _fullScreenToolStripMenuItem;
     }
 }

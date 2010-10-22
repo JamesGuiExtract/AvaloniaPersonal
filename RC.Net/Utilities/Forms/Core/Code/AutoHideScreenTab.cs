@@ -293,12 +293,6 @@ namespace Extract.Utilities.Forms
                 if (_animationTimer.Interval != _ANIMATION_INTERVAL)
                 {
                     _animationTimer.Interval = _ANIMATION_INTERVAL;
-
-                    // The owning form should get focus back after the tab has been displayed.
-                    if (Owner != null)
-                    {
-                        Owner.Activate();
-                    }
                 }
 
                 // Determine whether the tab should be open or closed based on the mouse position.
@@ -309,8 +303,8 @@ namespace Extract.Utilities.Forms
                 // transparent portion of the form or the label as "within" the form. Polling
                 // provides the desired behavior and at 50ms doesn't have any discernable
                 // performance impact.
-                bool isMouseHovering = Bounds.Contains(Control.MousePosition);
-                if (!isMouseHovering && _isMouseHovering && Owner != null)
+                bool isMouseHovering = IsActive && Bounds.Contains(Control.MousePosition);
+                if (!isMouseHovering && _isMouseHovering && Owner != null && IsActive)
                 {
                     // If the mouse is no longer hovering, automatically pass focus back to the
                     // owning form.
@@ -466,6 +460,21 @@ namespace Extract.Utilities.Forms
             }      
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the tab should open in response to the mouse hovering
+        /// at the top of the screen.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the tab should open; otherwise, <see langword="false"/>.
+        /// </value>
+        protected bool IsActive
+        {
+            get
+            {
+                return (Owner == null || Form.ActiveForm == Owner || Form.ActiveForm == this);
+            }
+        }
+
         #endregion Protected members
 
         #region Private members
@@ -507,6 +516,15 @@ namespace Extract.Utilities.Forms
             // Whenever the tab is re-initialized, keep it open for the _INITIAL_DISPLAY_TIME.
             _animationTimer.Interval = _INITIAL_DISPLAY_TIME;
             _animationTimer.Start();
+
+            // The owning form should get focus back after the tab has been displayed. Activate the
+            // form ansynchronously via the message queue since InitializePosition is run as part
+            // of a sequence of events that activates the form and therefore would nullify a
+            // synchronous call to Owner.Activate.
+            if (Owner != null && IsActive)
+            {
+                BeginInvoke((MethodInvoker)(() => { Owner.Activate(); }));
+            }
         }
 
         /// <summary>
