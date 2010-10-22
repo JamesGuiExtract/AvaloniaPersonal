@@ -84,6 +84,8 @@ namespace Extract.Utilities.Forms
             
         /// <summary>
         /// Initializes a new instance of the <see cref="FormStateManager"/> class.
+        /// <para><b>Note</b></para>
+        /// <see cref="FormStateManager"/> should not be created or used in design time.
         /// </summary>
         /// <param name="form">The <see cref="Form"/> whose state is to be managed.</param>
         /// <param name="persistenceFileName">The name of the file to which form properties will be
@@ -97,11 +99,15 @@ namespace Extract.Utilities.Forms
         /// <param name="fullScreenTabText">If not <see langword="null"/>, an
         /// <see cref="AutoHideScreenTab"/> will be displayed with the provided text that, if
         /// clicked, will exit full screen mode.</param>
+        /// <throws><see cref="ExtractException"/> if instantiated at design-time.</throws>
         public FormStateManager(Form form, string persistenceFileName, string mutexName,
             SandDockManager sandDockManager, bool manageToolStrips, string fullScreenTabText)
         {
             try
             {
+                ExtractException.Assert("ELI30836", "FormStateManager should not be used at design time.",
+                    LicenseManager.UsageMode != LicenseUsageMode.Designtime);
+
                 _form = form;
                 _persistenceFileName = persistenceFileName;
                 _layoutMutex = new Mutex(false, mutexName);
@@ -317,8 +323,9 @@ namespace Extract.Utilities.Forms
                 else
                 {
                     // The form is off-screen, move it on screen
-                    _form.Location = Point.Empty;
+                    _form.Location = Screen.PrimaryScreen.Bounds.Location;
                     _form.Size = _bounds.Size;
+                    _bounds = _form.Bounds;
                 }
 
                 _form.WindowState = _state;
@@ -581,10 +588,7 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-                {
-                    SaveState();
-                }
+                SaveState();
             }
             catch (Exception ex)
             {
@@ -602,10 +606,7 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-                {
-                    RestoreSavedState();
-                }
+                RestoreSavedState();
             }
             catch (Exception ex)
             {

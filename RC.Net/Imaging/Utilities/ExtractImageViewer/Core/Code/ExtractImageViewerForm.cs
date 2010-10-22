@@ -307,10 +307,13 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     _ipcChannel = new IpcChannel(
                         BuildExtractImageViewerUri(SystemMethods.GetCurrentProcessId()));
                     ChannelServices.RegisterChannel(_ipcChannel, true);
-                    
-                    // Only persist UI state info if this is not a sub-image handler.
-                    _formStateManager = new ExtractImageViewerForm.FormStateManager(
-                        this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, _sandDockManager);
+
+                    if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                    {
+                        // Only persist UI state info if this is not a sub-image handler.
+                        _formStateManager = new ExtractImageViewerForm.FormStateManager(
+                            this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, _sandDockManager);
+                    }
                 }
 
                 // Set whether the image search form should be opened
