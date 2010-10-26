@@ -28,3 +28,9 @@
 
 // Test on non-standard skew, orientation and rotation
 <TESTFOLDER>;.\Test15.rsd;.\Images\RotationOrientationSkew\;;$DirOf(<SourceDocName>)\..\..\Test15.voa
+
+// [FlexIDSCore:4381] Test that when merging into a single region, all attributes are merged.
+<TESTFOLDER>;.\Test16.rsd;.\Images\FlexIDSCore-4381\;;$DirOf(<SourceDocName>)\..\..\Test16.voa
+
+// [FlexIDSCore:4381] Test that when merging into individual raster zones works.
+<TESTFOLDER>;.\Test17.rsd;.\Images\FlexIDSCore-4381\;;$DirOf(<SourceDocName>)\..\..\Test17.voa
