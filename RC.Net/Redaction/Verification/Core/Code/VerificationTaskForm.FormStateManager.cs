@@ -164,7 +164,8 @@ namespace Extract.Redaction.Verification
                         XPathNavigator splitter = dataWindow.SelectSingleNode("Splitter");
                         if (splitter != null)
                         {
-                            _splitterDistance = GetAttribute<int>(splitter, "Distance");
+                            _splitterDistance = GetAttribute<int>(splitter, "Distance",
+                                _verificationForm._dataWindowSplitContainer.SplitterDistance);
                         }
                     }
 

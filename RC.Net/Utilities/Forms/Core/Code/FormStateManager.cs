@@ -430,8 +430,8 @@ namespace Extract.Utilities.Forms
 
                 // Load the UI state properties.
                 _bounds = GetBounds(element);
-                _state = GetAttribute<FormWindowState>(element, "State");
-                _fullScreen = GetAttribute<bool>(element, "FullScreen");
+                _state = GetAttribute<FormWindowState>(element, "State", _form.WindowState);
+                _fullScreen = GetAttribute<bool>(element, "FullScreen", false);
 
                 return element as IXPathNavigable;
             }
@@ -467,14 +467,24 @@ namespace Extract.Utilities.Forms
         /// <param name="xmlSource">An <see cref="XPathNavigator"/> for the XML from which to
         /// retrieve the attribute.</param>
         /// <param name="attributeName">The name of the attribute to retrieve</param>
+        /// <param name="defaultValue">The value that should be assumed if the specified attribute
+        /// value is blank or missing.</param>
         /// <returns>The value of the specified attribute.</returns>
-        protected static T GetAttribute<T>(XPathNavigator xmlSource, string attributeName)
+        protected static T GetAttribute<T>(XPathNavigator xmlSource, string attributeName,
+            T defaultValue)
         {
             try
             {
                 string value = xmlSource.GetAttribute(attributeName, string.Empty);
 
-                return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value);
+                if (string.IsNullOrEmpty(value))
+                {
+                    return defaultValue;
+                }
+                else
+                {
+                    return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value);
+                }
             }
             catch (Exception ex)
             {
@@ -693,12 +703,12 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <param name="xmlSource">The element from which bounds should be retrieved.</param>
         /// <returns>The bounds from the specified XML <paramref name="xmlSource"/>.</returns>
-        static Rectangle GetBounds(XPathNavigator xmlSource)
+        Rectangle GetBounds(XPathNavigator xmlSource)
         {
-            int x = GetAttribute<int>(xmlSource, "X");
-            int y = GetAttribute<int>(xmlSource, "Y");
-            int width = GetAttribute<int>(xmlSource, "Width");
-            int height = GetAttribute<int>(xmlSource, "Height");
+            int x = GetAttribute<int>(xmlSource, "X", _form.Bounds.X);
+            int y = GetAttribute<int>(xmlSource, "Y", _form.Bounds.Y);
+            int width = GetAttribute<int>(xmlSource, "Width", _form.Bounds.Width);
+            int height = GetAttribute<int>(xmlSource, "Height", _form.Bounds.Height);
 
             return new Rectangle(x, y, width, height);
         }
