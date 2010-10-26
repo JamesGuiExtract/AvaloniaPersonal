@@ -15,18 +15,18 @@
         {
             if (disposing)
             {
-                if(components != null)
+                if (components != null)
                 {
-                components.Dispose();
-                components = null;
+                    components.Dispose();
+                    components = null;
                 }
                 if (_refreshThreadEnded != null)
                 {
                     _refreshData = false;
-                   _endRefreshThread.Set();
-                   _refreshThreadEnded.WaitOne(30000);
-                   _refreshThreadEnded.Dispose();
-                   _refreshThreadEnded = null;
+                    _endRefreshThread.Set();
+                    _refreshThreadEnded.WaitOne(30000);
+                    _refreshThreadEnded.Dispose();
+                    _refreshThreadEnded = null;
                 }
                 if (_endRefreshThread != null)
                 {
@@ -38,6 +38,11 @@
                     Extract.Utilities.CollectionMethods.ClearAndDispose(
                         _rowsAndControllers);
                     _rowsAndControllers = null;
+                }
+                if (_formStateManager != null)
+                {
+                    _formStateManager.Dispose();
+                    _formStateManager = null;
                 }
             }
             base.Dispose(disposing);

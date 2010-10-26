@@ -4,6 +4,7 @@ using Extract.Utilities.Forms;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -171,6 +172,18 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         const int _REFRESH_THREAD_SLEEP_TIME = 1000;
 
+        /// <summary>
+        /// The full path to the file that contains information about persisting the 
+        /// <see cref="FAMNetworkDashboardForm"/>.
+        /// </summary>
+        static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
+            FileSystemMethods.ApplicationDataPath, "FAM Network Manager", "FamNetworkDashboard.xml");
+
+        /// <summary>
+        /// Name for the mutex used to serialize persistance of the control and form layout.
+        /// </summary>
+        static readonly string _MUTEX_STRING = "C26EBE45-3B95-4CA2-A843-34881D17E24C";
+
         #endregion Constants
 
         #region Fields
@@ -205,6 +218,11 @@ namespace Extract.FileActionManager.Utilities
         /// The file to open when the form loads.
         /// </summary>
         string _fileToOpen;
+
+        /// <summary>
+        /// Saves/restores window state info.
+        /// </summary>
+        FormStateManager _formStateManager;
 
         #endregion Fields
 
@@ -245,6 +263,14 @@ namespace Extract.FileActionManager.Utilities
             InitializeComponent();
 
             _fileToOpen = fileToOpen;
+
+            if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+            {
+                // Loads/save UI state properties
+                _formStateManager = new FormStateManager(
+                    this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, true, null);
+            }
+
         }
 
         #endregion Constructors

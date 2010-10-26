@@ -183,7 +183,7 @@ namespace Extract.IDShieldStatisticsReporter
                 {
                     // Loads/save UI state properties
                     _formStateManager = new FormStateManager(
-                        this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, null, false, null);
+                        this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, false, null);
                 }
 
                 // Set the form Icon to the IDShieldTester Icon

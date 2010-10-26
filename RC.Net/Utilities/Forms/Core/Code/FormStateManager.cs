@@ -81,7 +81,30 @@ namespace Extract.Utilities.Forms
         #endregion Fields
 
         #region Constructors
-            
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FormStateManager"/> class.
+        /// <para><b>Note</b></para>
+        /// <see cref="FormStateManager"/> should not be created or used in design time.
+        /// </summary>
+        /// <param name="form">The <see cref="Form"/> whose state is to be managed.</param>
+        /// <param name="persistenceFileName">The name of the file to which form properties will be
+        /// maintained.</param>
+        /// <param name="mutexName">Name for the mutex used to serialize persistance of the
+        /// control and form layout.</param>
+        /// <param name="manageToolStrips">If <see langword="true"/>, the form's
+        /// <see cref="ToolStrip"/> will be persisted.</param>
+        /// <param name="fullScreenTabText">If not <see langword="null"/>, an
+        /// <see cref="AutoHideScreenTab"/> will be displayed with the provided text that, if
+        /// clicked, will exit full screen mode.</param>
+        /// <throws><see cref="ExtractException"/> if instantiated at design-time.</throws>
+        public FormStateManager(Form form, string persistenceFileName, string mutexName,
+            bool manageToolStrips, string fullScreenTabText)
+            : this(form, persistenceFileName,
+                mutexName, null, manageToolStrips, fullScreenTabText)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FormStateManager"/> class.
         /// <para><b>Note</b></para>
@@ -510,7 +533,7 @@ namespace Extract.Utilities.Forms
                 _updatingStateReferenceCount--;
             }
         }
-        
+
         #endregion Methods
 
         #region IDisposable Members
@@ -632,7 +655,7 @@ namespace Extract.Utilities.Forms
 
                     if (_state != FormWindowState.Maximized)
                     {
-                        _bounds = 
+                        _bounds =
                             (_state == FormWindowState.Normal) ? _form.Bounds : _form.RestoreBounds;
                     }
                 }
@@ -706,7 +729,7 @@ namespace Extract.Utilities.Forms
                 throw ExtractException.AsExtractException("ELI28962", ex);
             }
         }
-        
+
         /// <summary>
         /// Raises the <see cref="FullScreenChanged"/> event.
         /// </summary>
