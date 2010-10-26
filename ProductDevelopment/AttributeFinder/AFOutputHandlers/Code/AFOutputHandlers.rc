@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -116,15 +114,15 @@ IDR_RUNOBJECTONQUERYPP  REGISTRY                "RunObjectOnQueryPP.rgs"
 IDR_CONDITIONALOUTPUTHANDLER REGISTRY                "ConditionalOutputHandler.rgs"
 IDR_MERGEATTRIBUTES     REGISTRY                "MergeAttributes.rgs"
 IDR_MERGEATTRIBUTESPP   REGISTRY                "MergeAttributesPP.rgs"
-IDR_MERGEATTRIBUTETREES     REGISTRY                "MergeAttributeTrees.rgs"
-IDR_MERGEATTRIBUTETREESPP   REGISTRY                "MergeAttributeTreesPP.rgs"
+IDR_MERGEATTRIBUTETREES REGISTRY                "MergeAttributeTrees.rgs"
+IDR_MERGEATTRIBUTETREESPP REGISTRY                "MergeAttributeTreesPP.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_DLG_SelectWithUI DIALOG  0, 0, 330, 193
+IDD_DLG_SelectWithUI DIALOG 0, 0, 330, 193
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_THICKFRAME
 CAPTION "Select Attributes"
 FONT 8, "MS Sans Serif"
@@ -173,8 +171,8 @@ BEGIN
     EDITTEXT        IDC_EDIT_SAMPLE,150,50,105,78,ES_AUTOHSCROLL | ES_READONLY
     CONTROL         "Include schema name in output",IDC_CHECK_SCHEMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,98,111,11
     EDITTEXT        IDC_EDIT_SCHEMANAME,40,114,102,14,ES_AUTOHSCROLL
-	CONTROL			"Remove spatial information in output", IDC_CHK_XML_OUT_REMOVE_SPATIAL,
-					"Button", BS_AUTOCHECKBOX | WS_TABSTOP,5,141,150,11
+    CONTROL         "Remove spatial information in output",IDC_CHK_XML_OUT_REMOVE_SPATIAL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,141,150,11
 END
 
 IDD_MODIFYATTRIBUTEVALUE DIALOGEX 0, 0, 254, 201
@@ -288,13 +286,13 @@ BEGIN
     LTEXT           "The object must be configured",IDC_TXT_MUST_CONFIGURE,10,150,120,10
 END
 
-IDD_MERGEATTRIBUTESPP DIALOGEX 0, 0, 256, 300
+IDD_MERGEATTRIBUTESPP DIALOGEX 0, 0, 256, 337
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_EDIT_QUERY,12,26,231,30,ES_MULTILINE | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_OVERLAP_PERCENT,162,60,18,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_OVERLAP_PERCENT,135,60,18,14,ES_AUTOHSCROLL
     CONTROL         "Use:",IDC_RADIO_SPECIFY_NAME,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,95,26,10
     CONTROL         "Preserve attribute name in this order of preference",IDC_RADIO_PRESERVE_NAME,
                     "Button",BS_AUTORADIOBUTTON,12,112,170,10
@@ -305,21 +303,25 @@ BEGIN
     PUSHBUTTON      "Modify...",IDC_BTN_MODIFY_NAME,201,161,42,14
     PUSHBUTTON      "",IDC_BTN_NAME_UP,201,179,18,18,BS_ICON
     PUSHBUTTON      "",IDC_BTN_NAME_DOWN,225,179,18,18,BS_ICON
-    CONTROL         "Use:",IDC_RADIO_SPECIFY_TYPE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,263,26,10
-    CONTROL         "Combine the types (Type1+Type2)",IDC_RADIO_COMBINE_TYPES,
-                    "Button",BS_AUTORADIOBUTTON,12,279,216,10
-    EDITTEXT        IDC_EDIT_TYPE,40,262,155,14,ES_AUTOHSCROLL
-    LTEXT           "Set the text of merged attribute to:",IDC_STATIC,12,220,108,8
     EDITTEXT        IDC_EDIT_VALUE,120,218,123,14,ES_AUTOHSCROLL
+    CONTROL         "Merge into single rectangular region based on overall bounds",IDC_RADIO_CREATE_MERGED_REGION,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,25,235,217,10
+    CONTROL         "Merge individual raster zones seperately",IDC_RADIO_MERGE_INDIVIDUAL_ZONES,
+                    "Button",BS_AUTORADIOBUTTON,25,251,216,10
     CONTROL         "Preserve the original attributes as sub-attributes to the merged attribute",IDC_CHECK_SUBATTRIBUTES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,234,235,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,268,235,10
+    CONTROL         "Use:",IDC_RADIO_SPECIFY_TYPE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,13,298,26,10
+    CONTROL         "Combine the types (Type1+Type2)",IDC_RADIO_COMBINE_TYPES,
+                    "Button",BS_AUTORADIOBUTTON,13,314,216,10
+    EDITTEXT        IDC_EDIT_TYPE,41,298,155,14,ES_AUTOHSCROLL
+    LTEXT           "Set the text of merged attribute to:",IDC_STATIC,12,220,108,8
     GROUPBOX        "Merge criteria",IDC_STATIC,6,2,244,78
     LTEXT           "Merge attributes matching this query",IDC_STATIC,12,14,120,8
-    LTEXT           "when they mutually overlap spatially by at least",IDC_STATIC,12,62,149,8
-    LTEXT           "percent.",IDC_STATIC,183,62,27,8
+    LTEXT           "when they overlap spatially by at least",IDC_STATIC,12,62,120,8
+    LTEXT           "percent.",IDC_STATIC,157,62,27,8
     GROUPBOX        "Name of merged attribute",IDC_STATIC,6,83,244,121
-    GROUPBOX        "Type of merged attribute",IDC_STATIC,6,251,244,43
-    GROUPBOX        "Value of merged attribute",IDC_STATIC,6,207,244,41
+    GROUPBOX        "Type of merged attribute",IDC_STATIC,7,287,244,43
+    GROUPBOX        "Value of merged attribute",IDC_STATIC,6,207,244,76
 END
 
 IDD_MERGEATTRIBUTETREESPP DIALOGEX 0, 0, 240, 265
@@ -327,20 +329,25 @@ STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-	LTEXT			"Attributes to be merged query", IDC_STATIC,5,5,120,8
-	EDITTEXT		IDC_EDIT_MERGE_TREES_QUERY,5,17,230,12,ES_AUTOHSCROLL
-	GROUPBOX		"Merge into", IDC_STATIC,5,34,230,41
-	CONTROL			"First attribute",IDC_RADIO_MERGE_INTO_FIRST, "Button", BS_AUTORADIOBUTTON | WS_GROUP, 10, 45, 80, 10
-	CONTROL			"Attribute with the most children", IDC_RADIO_MERGE_INTO_BIGGEST,"Button", BS_AUTORADIOBUTTON, 10, 60, 150, 10
-	LTEXT			"Subattributes to be compared (one per line)", IDC_STATIC,5,80,200,8
-	EDITTEXT		IDC_EDIT_MERGE_SUBATTRIBUTES,5,93,230,60,ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_WANTRETURN | WS_VSCROLL
-	GROUPBOX		"For non-matching comparison attributes", IDC_STATIC, 5, 158, 230, 41
-	CONTROL			"Discard attribute", IDC_RADIO_NOMATCH_DISCARD, "Button", BS_AUTORADIOBUTTON | WS_GROUP, 10, 169, 80, 10
-	CONTROL			"Preserve attribute", IDC_RADIO_NOMATCH_PRESERVE, "Button", BS_AUTORADIOBUTTON, 10, 184, 90, 10
-	CONTROL			"Case sensitive comparison", IDC_CHECK_MERGE_CASESENSITIVE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 5, 204, 110, 10
-	CONTROL			"Include type information in comparison", IDC_CHECK_MERGE_COMPARE_TYPE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 5, 219, 150, 10
-	CONTROL			"Include subattributes in comparison", IDC_CHECK_MERGE_COMPARE_SUBATTR, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 5, 234, 140, 10
-	CONTROL			"Remove empty attribute hierarchy", IDC_CHECK_MERGE_REMOVE_EMPTY, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 5, 249, 120, 10
+    LTEXT           "Attributes to be merged query",IDC_STATIC,5,5,120,8
+    EDITTEXT        IDC_EDIT_MERGE_TREES_QUERY,5,17,230,12,ES_AUTOHSCROLL
+    GROUPBOX        "Merge into",IDC_STATIC,5,34,230,41
+    CONTROL         "First attribute",IDC_RADIO_MERGE_INTO_FIRST,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,45,80,10
+    CONTROL         "Attribute with the most children",IDC_RADIO_MERGE_INTO_BIGGEST,
+                    "Button",BS_AUTORADIOBUTTON,10,60,150,10
+    LTEXT           "Subattributes to be compared (one per line)",IDC_STATIC,5,80,200,8
+    EDITTEXT        IDC_EDIT_MERGE_SUBATTRIBUTES,5,93,230,60,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    GROUPBOX        "For non-matching comparison attributes",IDC_STATIC,5,158,230,41
+    CONTROL         "Discard attribute",IDC_RADIO_NOMATCH_DISCARD,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,169,80,10
+    CONTROL         "Preserve attribute",IDC_RADIO_NOMATCH_PRESERVE,"Button",BS_AUTORADIOBUTTON,10,184,90,10
+    CONTROL         "Case sensitive comparison",IDC_CHECK_MERGE_CASESENSITIVE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,204,110,10
+    CONTROL         "Include type information in comparison",IDC_CHECK_MERGE_COMPARE_TYPE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,219,150,10
+    CONTROL         "Include subattributes in comparison",IDC_CHECK_MERGE_COMPARE_SUBATTR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,234,140,10
+    CONTROL         "Remove empty attribute hierarchy",IDC_CHECK_MERGE_REMOVE_EMPTY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,249,120,10
     ICON            IDI_ICON_INFO,IDC_MERGE_REMOVE_INFO,130,250,15,10,SS_NOTIFY
 END
 
@@ -351,7 +358,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_DLG_SelectWithUI, DIALOG
     BEGIN
@@ -399,7 +406,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 251
         TOPMARGIN, 7
-        BOTTOMMARGIN, 293
+        BOTTOMMARGIN, 330
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -422,14 +429,14 @@ IDI_ICON_DOWN           ICON                    "..\\..\\AFCore\\Code\\res\\icon
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "AFOutputHandlers"
     IDS_TITLERemoveEntriesFromListPP "RemoveEntriesFromListPP"
     IDS_HELPFILERemoveEntriesFromListPP "RemoveEntriesFromListPP"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_DOCSTRINGRemoveEntriesFromListPP "RemoveEntriesFromListPP"
     IDS_TITLEOutputToXMLPP  "&Title"
@@ -441,7 +448,7 @@ BEGIN
     IDS_TITLEOutputToVOAPP  "Output to VOA"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLEMoveAndModifyAttributesPP "Title"
     IDS_HELPFILEMoveAndModifyAttributesPP "Help File Name"
@@ -451,7 +458,7 @@ BEGIN
     IDS_DOCSTRINGRemoveSubAttributesPP "RemoveSubAttributes"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLEReformatPersonNamesPP "ReformatPersonNames"
     IDS_HELPFILEReformatPersonNamesPP "ReformatPersonNames"
@@ -461,7 +468,7 @@ BEGIN
     IDS_DOCSTRINGRunObjectOnQueryPP "Your Help String"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

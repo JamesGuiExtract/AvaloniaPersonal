@@ -320,6 +320,11 @@ library UCLID_AFOUTPUTHANDLERSLib
 		// If VARIANT_TRUE, the original attributes be added as as sub-attributes to the merged value.
 		[propget, id(9), helpstring("property PreserveAsSubAttributes")] HRESULT PreserveAsSubAttributes([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(9), helpstring("property PreserveAsSubAttributes")] HRESULT PreserveAsSubAttributes([in] VARIANT_BOOL newVal);
+
+		// If VARIANT_TRUE, the resulting attributes will be a unification of the overall region the attributes occupy.
+		// If VARIANT_FALSE, the attribute raster zones will be merged on an individual basis.
+		[propget, id(10), helpstring("property CreateMergedRegion")] HRESULT CreateMergedRegion([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(10), helpstring("property CreateMergedRegion")] HRESULT CreateMergedRegion([in] VARIANT_BOOL newVal);
 	};
 
 	[

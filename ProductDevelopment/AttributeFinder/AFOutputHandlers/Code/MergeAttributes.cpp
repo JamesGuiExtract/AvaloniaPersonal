@@ -11,7 +11,9 @@
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion			= 1;
+// Version 2: Added CreateMergedRegion. Default is false, however when version 1 files are loaded it
+// will default to true to maintain behavior for version 1 rule objects.
+const unsigned long gnCurrentVersion			= 2;
 const unsigned long gnDEFAULT_OVERLAP_PERCENT	= 75;
 const CRect grectNULL							= CRect(0, 0, 0, 0);
 const _bstr_t gbstrNEEDS_NAME					= "___NEEDS_NAME___";
@@ -377,6 +379,40 @@ STDMETHODIMP CMergeAttributes::put_PreserveAsSubAttributes(VARIANT_BOOL newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22913")
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_CreateMergedRegion(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI30839", pVal != NULL);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bCreateMergedRegion);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30840")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::put_CreateMergedRegion(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bCreateMergedRegion = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30841")
+}
 
 //--------------------------------------------------------------------------------------------------
 // IOutputHandler
@@ -417,31 +453,38 @@ STDMETHODIMP CMergeAttributes::raw_ProcessOutput(IIUnknownVector* pAttributes, I
 		IIUnknownVectorPtr ipMergeResults(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI23042", ipMergeResults);
 
+		// Load original candidates into the cache here.
+		long nTargetSize = ipTargetAttributes->Size();
+		for (long i = 0; i < nTargetSize; i++)
+		{
+			// Retrieve the pair of attributes to test.
+			IAttributePtr ipAttribute = ipTargetAttributes->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI30971", ipAttribute != NULL);
+
+			// [FlexIDSCore:3328] Don't attempt to process non-spatial attributes 
+			ISpatialStringPtr ipValue = ipAttribute->Value;
+			if (ipValue != NULL && asCppBool(ipValue->HasSpatialInfo()))
+			{
+				loadAttributeInfo(ipAttribute);
+			}
+		}
+
 		// Cycle through the target attributes every possible pair for merging.
 		// Get the count of target attributes with each iteration since new attributes may be added
 		// as processing progresses.
-		long nTargetSize = ipTargetAttributes->Size();
-		for (long i = 0; i < nTargetSize; i++)
+		for (long i = 0; i < nTargetSize - 1; i++)
 		{
 			// Retrieve the pair of attributes to test.
 			IAttributePtr ipAttribute1 = ipTargetAttributes->At(i);
 			ASSERT_RESOURCE_ALLOCATION("ELI23008", ipAttribute1 != NULL);
 
 			// [FlexIDSCore:3328] Don't attempt to process non-spatial attributes 
-			ISpatialStringPtr ipValue1 = ipAttribute1->Value;
-			if (ipValue1 == NULL || !asCppBool(ipValue1->HasSpatialInfo()))
+			if (m_mapAttributeInfo.find(ipAttribute1) == m_mapAttributeInfo.end())
 			{
 				continue;
 			}
 
-			if (m_mapAttributeInfo.find(ipAttribute1) == m_mapAttributeInfo.end())
-			{
-				// Original candidates need to be loaded into the cache here.  (Merged attributes
-				// will already be cached at this point)
-				loadAttributeInfo(ipAttribute1);
-			}
-
-			for (long j = 0; j < i; j++)
+			for (long j = i + 1; j < nTargetSize; j++)
 			{
 				IAttributePtr ipAttribute2 = ipTargetAttributes->At(j);
 				ASSERT_RESOURCE_ALLOCATION("ELI23009", ipAttribute2 != NULL);
@@ -472,6 +515,10 @@ STDMETHODIMP CMergeAttributes::raw_ProcessOutput(IIUnknownVector* pAttributes, I
 						ipMergeResults->PushBackIfNotContained(ipMergedAttribute);
 						ipTargetAttributes->PushBackIfNotContained(ipMergedAttribute);
 						nTargetSize = ipTargetAttributes->Size();
+
+						// Restart the j iteration in case the merged result would now merge with
+						// a value between i and j.
+						j = i;
 					}
 					
 					// It is possible both these attributes were already merged in which case
@@ -581,6 +628,16 @@ STDMETHODIMP CMergeAttributes::Load(IStream *pStream)
 		dataReader >> m_strSpecifiedType;
 		dataReader >> m_strSpecifiedValue;
 		dataReader >> m_bPreserveAsSubAttributes;
+		if (nDataVersion == 1)
+		{
+			// For old version of the rule, set m_bCreateMergedRegion = true so that the rule's
+			// behavior is not changed.
+			m_bCreateMergedRegion = true;
+		}
+		else
+		{
+			dataReader >> m_bCreateMergedRegion;
+		}
 
 		// Clone the NameMergePriority member
 		IPersistStreamPtr ipNameMergePriority;
@@ -622,6 +679,8 @@ STDMETHODIMP CMergeAttributes::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_strSpecifiedType;
 		dataWriter << m_strSpecifiedValue;
 		dataWriter << m_bPreserveAsSubAttributes;
+
+		dataWriter << m_bCreateMergedRegion;
 
 		dataWriter.flushToByteStream();
 
@@ -724,6 +783,7 @@ STDMETHODIMP CMergeAttributes::raw_CopyFrom(IUnknown *pObject)
 		m_strSpecifiedType			= asString(ipCopyThis->SpecifiedType);
 		m_strSpecifiedValue			= asString(ipCopyThis->SpecifiedValue);
 		m_bPreserveAsSubAttributes	= asCppBool(ipCopyThis->PreserveAsSubAttributes);
+		m_bCreateMergedRegion		= asCppBool(ipCopyThis->CreateMergedRegion);
 
 		// Clone the NameMergePriority member
 		ICopyableObjectPtr ipCopyableNameMergePriority = ipCopyThis->NameMergePriority;
@@ -944,7 +1004,8 @@ void CMergeAttributes::loadAttributeInfo(IAttributePtr ipAttribute)
 		}
 
 		// Use raster zones to retrieve the spatial information.
-		IIUnknownVectorPtr ipRasterZones = ipPage->GetOriginalImageRasterZones();
+		IIUnknownVectorPtr ipRasterZones =
+			ipPage->GetTranslatedImageRasterZones(m_ipDocText->SpatialPageInfos);
 		ASSERT_RESOURCE_ALLOCATION("ELI22904", ipRasterZones != NULL);
 
 		// Cycle through each raster zone and obtain a CRect representing each.
@@ -955,7 +1016,7 @@ void CMergeAttributes::loadAttributeInfo(IAttributePtr ipAttribute)
 		{
 			// Get the page bounds (for use by GetRectangularBounds).
 			// NOTE: All zones will be on the same page, so we only need to get the bounds once.
-			ipPageBounds = ipValue->GetOriginalImagePageBounds(nPage);
+			ipPageBounds = ipPage->GetOCRImageBounds();
 			ASSERT_RESOURCE_ALLOCATION("ELI30312", ipPageBounds != NULL);
 		}
 
@@ -1203,8 +1264,7 @@ ISpatialStringPtr CMergeAttributes::createMergedValue(IAttributePtr ipAttribute1
 	ASSERT_ARGUMENT("ELI22963", ipAttribute1 != NULL);
 	ASSERT_ARGUMENT("ELI22964", ipAttribute2 != NULL);
 
-	// If an entry has not been created for the specified page in m_ipStandardizedSpatialPageInfos,
-	// create one now.
+	// If an entry has not been created for the specified page in m_mapSpatialInfos, create one now.
 	if (m_mapSpatialInfos.find(nPage) == m_mapSpatialInfos.end())
 	{
 		// We want to modify the existing page's PageInfo for the attribute, but we don't want
@@ -1232,44 +1292,80 @@ ISpatialStringPtr CMergeAttributes::createMergedValue(IAttributePtr ipAttribute1
 		ipPageInfos->Set(it->first, it->second);
 	}
 
-	// This will store the total unified area of all raster zones.
-	CRect rectMergedRegion = grectNULL;
-
-	// Obtain the total area of ipAttribute1 on this page.
-	for each (CRect rect1 in m_mapAttributeInfo[ipAttribute1].mapRasterZones[nPage])
-	{
-		rectMergedRegion.UnionRect(rectMergedRegion, rect1);
-	}
-	
-	// Unify that with the total area of ipAttribute2 on this page.
-	for each (CRect rect2 in m_mapAttributeInfo[ipAttribute2].mapRasterZones[nPage])
-	{
-		rectMergedRegion.UnionRect(rectMergedRegion, rect2);
-	}
-
-	// Create an ILongRectangle using rectMergedRegion 
-	ILongRectanglePtr ipRect(CLSID_LongRectangle);
-	ASSERT_RESOURCE_ALLOCATION("ELI22894", ipRect);
-	ipRect->SetBounds(rectMergedRegion.left, rectMergedRegion.top,
-		rectMergedRegion.right, rectMergedRegion.bottom);
-
-	// Create a raster zone based on this rectangle.
-	IRasterZonePtr ipRasterZone(CLSID_RasterZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI22895", ipRasterZone);
-
-	ipRasterZone->CreateFromLongRectangle(ipRect, nPage);
-
-	// Get the value from ipAttribute1 to help in creating the merged value.
-	ISpatialStringPtr ipAttribute1Value = ipAttribute1->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI23034", ipAttribute1Value != NULL);
-
-	// Create a psuedo-spatial string with m_strSpecifiedValue as the text spread evenly across
-	// the entire area of the attribute
 	ISpatialStringPtr ipMergedValue(CLSID_SpatialString);
 	ASSERT_RESOURCE_ALLOCATION("ELI22892", ipMergedValue != NULL);
+
+	IIUnknownVectorPtr ipMergedRasterZones(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI30844", ipMergedRasterZones != NULL);
+
+	if (m_bCreateMergedRegion)
+	{
+		// This will store the total unified area of all raster zones.
+		CRect rectMergedRegion;
+		
+		// Obtain the total area of ipAttribute1 on this page.
+		for each (CRect rect1 in m_mapAttributeInfo[ipAttribute1].mapRasterZones[nPage])
+		{
+			rectMergedRegion.UnionRect(rectMergedRegion, rect1);
+		}
 	
-	ipMergedValue->CreatePseudoSpatialString(ipRasterZone, m_strSpecifiedValue.c_str(),
-		ipAttribute1Value->SourceDocName, ipPageInfos);
+		// Unify that with the total area of ipAttribute2 on this page.
+		for each (CRect rect2 in m_mapAttributeInfo[ipAttribute2].mapRasterZones[nPage])
+		{
+			rectMergedRegion.UnionRect(rectMergedRegion, rect2);
+		}
+
+		ipMergedRasterZones->PushBack(createRasterZone(rectMergedRegion, nPage));
+	}
+	// Merge the raster zones individually.
+	else
+	{
+		ILongRectanglePtr ipPageBounds = m_ipDocText->GetOCRImagePageBounds(nPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI30972", ipPageBounds != NULL);
+
+		// Create a vector of all raster zones in the two attributes.
+		vector<CRect> vecZoneRects(m_mapAttributeInfo[ipAttribute1].mapRasterZones[nPage].begin(),
+								   m_mapAttributeInfo[ipAttribute1].mapRasterZones[nPage].end());
+		vecZoneRects.insert(vecZoneRects.end(),
+							m_mapAttributeInfo[ipAttribute2].mapRasterZones[nPage].begin(),
+							m_mapAttributeInfo[ipAttribute2].mapRasterZones[nPage].end());
+
+		// Merge any overlapping raster zones.
+		for (vector<CRect>::iterator i = vecZoneRects.begin(); i < vecZoneRects.end() - 1; i++)
+		{
+			for (vector<CRect>::iterator j = i + 1; j != vecZoneRects.end(); j++)
+			{
+				CRect rectIntersection;
+				if (rectIntersection.IntersectRect(*i, *j))
+				{
+					i->UnionRect(*i, *j);
+
+					// If i & j were merged into i, raster zone j is no longer needed.
+					vecZoneRects.erase(j);
+					j = i;
+				}
+			}
+
+			ipMergedRasterZones->PushBack(createRasterZone(*i, nPage));
+		}
+	}
+
+	// If there is only one resulting raster zone, create a psuedo-spatial string with
+	// m_strSpecifiedValue as the text spread evenly across the entire area of the attribute.
+	if (ipMergedRasterZones->Size() == 1)
+	{
+		IRasterZonePtr ipRasterZone = ipMergedRasterZones->At(0);
+		ASSERT_RESOURCE_ALLOCATION("ELI30973", ipRasterZone != NULL);
+	
+		ipMergedValue->CreatePseudoSpatialString(ipRasterZone, m_strSpecifiedValue.c_str(),
+			m_ipDocText->SourceDocName, m_ipDocText->SpatialPageInfos);
+	}
+	// Otherwise, create a hybrid result with m_strSpecifiedValue as the text value.
+	else
+	{
+		ipMergedValue->CreateHybridString(ipMergedRasterZones, m_strSpecifiedValue.c_str(),
+			m_ipDocText->SourceDocName, m_ipDocText->SpatialPageInfos);
+	}
 
 	return ipMergedValue;
 }
@@ -1534,6 +1630,21 @@ long CMergeAttributes::removeAttribute(IAttributePtr ipAttribute,
 	return nIndex;
 }
 //--------------------------------------------------------------------------------------------------
+IRasterZonePtr CMergeAttributes::createRasterZone(CRect rect, long nPage)
+{
+	
+	ILongRectanglePtr ipRect(CLSID_LongRectangle);
+	ASSERT_RESOURCE_ALLOCATION("ELI22894", ipRect);
+	ipRect->SetBounds(rect.left, rect.top, rect.right, rect.bottom);
+
+	// Create a raster zone based on this rectangle.
+	IRasterZonePtr ipRasterZone(CLSID_RasterZone);
+	ASSERT_RESOURCE_ALLOCATION("ELI22895", ipRasterZone);
+
+	ipRasterZone->CreateFromLongRectangle(ipRect, nPage);
+	return ipRasterZone;
+}
+//--------------------------------------------------------------------------------------------------
 void CMergeAttributes::reset()
 {
 	// Reset all the rules settings.
@@ -1547,6 +1658,7 @@ void CMergeAttributes::reset()
 	m_bPreserveAsSubAttributes = true;
 	m_ipDocText = NULL;
 	m_mapSpatialInfos.clear();
+	m_bCreateMergedRegion = false;
 
 	m_ipNameMergePriority.CreateInstance(CLSID_VariantVector);
 	ASSERT_RESOURCE_ALLOCATION("ELI22840", m_ipNameMergePriority != NULL);

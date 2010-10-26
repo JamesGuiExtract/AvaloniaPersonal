@@ -78,6 +78,8 @@ public:
 	STDMETHOD(put_NameMergePriority)(IVariantVector *pNewVal);
 	STDMETHOD(get_PreserveAsSubAttributes)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_PreserveAsSubAttributes)(VARIANT_BOOL newVal);
+	STDMETHOD(get_CreateMergedRegion)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_CreateMergedRegion)(VARIANT_BOOL newVal);
 
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
@@ -140,6 +142,10 @@ private:
 
 	// If true, the original attributes be added as as sub-attributes to the merged value.
 	bool m_bPreserveAsSubAttributes;
+
+	// If true, the resulting attributes will be a unification of the overall region the attributes
+	// occupy, otherwise the attribute raster zones will be merged on an individual basis.
+	bool m_bCreateMergedRegion;
 
 	// Define type to represent the portion of an attribute that is on a given page and 
 	typedef pair<IAttribute*, long> AttributePage;
@@ -238,6 +244,9 @@ private:
 	// is the index that was removed from ipAttributeList.
 	long removeAttribute(IAttributePtr ipAttribute, IIUnknownVectorPtr ipAttributeList, 
 						 long nPage = -1);
+
+	// Creates a raster zone for the specified area on the specified page.
+	IRasterZonePtr createRasterZone(CRect rect, long nPage);
 
 	// Resets the rule's settings.
 	void reset();

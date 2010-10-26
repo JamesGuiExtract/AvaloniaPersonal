@@ -98,6 +98,8 @@ private:
 	CImageButtonWithStyle m_btnUp;
 	CImageButtonWithStyle m_btnDown;
 	ATLControls::CButton m_btnPreserveAsSubAttributes;
+	ATLControls::CButton m_btnCreateMergedRegion;
+	ATLControls::CButton m_btnMergeIndividualZones;
 
 	/////////////
 	// Methods

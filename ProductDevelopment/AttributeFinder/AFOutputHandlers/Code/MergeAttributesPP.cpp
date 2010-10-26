@@ -60,6 +60,8 @@ LRESULT CMergeAttributesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam
 		m_btnModify					= GetDlgItem(IDC_BTN_MODIFY_NAME);
 		m_btnRemove					= GetDlgItem(IDC_BTN_REMOVE_NAME);
 		m_btnPreserveAsSubAttributes = GetDlgItem(IDC_CHECK_SUBATTRIBUTES);
+		m_btnCreateMergedRegion		= GetDlgItem(IDC_RADIO_CREATE_MERGED_REGION);
+		m_btnMergeIndividualZones	= GetDlgItem(IDC_RADIO_MERGE_INDIVIDUAL_ZONES);
 		m_btnUp.SubclassDlgItem(IDC_BTN_NAME_UP, CWnd::FromHandle(m_hWnd));
 		m_btnDown.SubclassDlgItem(IDC_BTN_NAME_DOWN, CWnd::FromHandle(m_hWnd));
 		
@@ -78,6 +80,8 @@ LRESULT CMergeAttributesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam
 		m_editSpecifiedType.SetWindowText(asString(ipRule->SpecifiedType).c_str());
 		m_editSpecifiedValue.SetWindowText(asString(ipRule->SpecifiedValue).c_str());
 		m_btnPreserveAsSubAttributes.SetCheck(asBSTChecked(ipRule->PreserveAsSubAttributes));
+		m_btnCreateMergedRegion.SetCheck(asBSTChecked(ipRule->CreateMergedRegion));
+		m_btnMergeIndividualZones.SetCheck(asBSTChecked(ipRule->CreateMergedRegion == VARIANT_FALSE));
 
 		initializeList(m_listNameMergePriority, ipRule->NameMergePriority);
 
@@ -451,6 +455,9 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 				
 			ipRule->PreserveAsSubAttributes =
 				asVariantBool(m_btnPreserveAsSubAttributes.GetCheck() == BST_CHECKED);
+
+			ipRule->CreateMergedRegion =
+				asVariantBool(m_btnCreateMergedRegion.GetCheck() == BST_CHECKED);
 		}
 		
 		SetDirty(FALSE);
