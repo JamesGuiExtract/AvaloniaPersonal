@@ -12,10 +12,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using System.Drawing;
 
 namespace Extract.FileActionManager.Utilities
 {
+    /// <summary>
+    /// Enumeration for referring to the grid columns.
+    /// </summary>
+    enum GridColumns
+    {
+        MachineName = 0,
+
+        GroupName = 1,
+
+        FAMService = 2,
+
+        FDRSService = 3,
+
+        CPUUsage = 4
+    }
+
     /// <summary>
     /// Form definition for the network dashboard.
     /// </summary>
@@ -43,22 +58,6 @@ namespace Extract.FileActionManager.Utilities
             /// Button should control both services.
             /// </summary>
             Both = 0x1 | 0x2
-        }
-
-        /// <summary>
-        /// Enumeration for referring to the grid columns.
-        /// </summary>
-        enum GridColumns
-        {
-            MachineName = 0,
-
-            GroupName = 1,
-
-            FAMService = 2,
-
-            FDRSService = 3,
-
-            CPUUsage = 4
         }
 
         #endregion Internal use enum
@@ -275,6 +274,7 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 RefreshData(false);
+                UpdateEnabledStates();
             }
             catch (Exception ex)
             {
@@ -287,7 +287,7 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleOpenFileButtonClick(object sender, EventArgs e)
+        void HandleOpenFileClick(object sender, EventArgs e)
         {
             try
             {
@@ -300,6 +300,7 @@ namespace Extract.FileActionManager.Utilities
                     open.ValidateNames = true;
                     if (open.ShowDialog() == DialogResult.OK)
                     {
+                        Refresh();
                         LoadSettings(open.FileName);
                     }
                 }
@@ -315,7 +316,7 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleSaveFileButtonClick(object sender, EventArgs e)
+        void HandleSaveFileClick(object sender, EventArgs e)
         {
             try
             {
@@ -349,7 +350,7 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 // Build the group list
-                using (AddMachineForm addForm = new AddMachineForm(BuildGroupList()))
+                using (AddModifyMachineForm addForm = new AddModifyMachineForm(BuildGroupList()))
                 {
                     if (addForm.ShowDialog() == DialogResult.OK)
                     {
@@ -421,13 +422,16 @@ namespace Extract.FileActionManager.Utilities
             {
                 foreach (DataGridViewRow row in _machineListGridView.SelectedRows)
                 {
-                    ServiceMachineController controller = null;
-                    if (_rowsAndControllers.TryRemove(row, out controller))
+                    if (row.Visible)
                     {
-                        controller.Dispose();
+                        ServiceMachineController controller = null;
+                        if (_rowsAndControllers.TryRemove(row, out controller))
+                        {
+                            controller.Dispose();
+                        }
+                        _machineListGridView.Rows.RemoveAt(row.Index);
+                        row.Dispose();
                     }
-                    _machineListGridView.Rows.RemoveAt(row.Index);
-                    row.Dispose();
                 }
             }
             catch (Exception ex)
@@ -443,6 +447,55 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void HandleEditGroupButtonClick(object sender, EventArgs e)
         {
+            try
+            {
+                var rows = new List<DataGridViewRow>();
+                foreach (DataGridViewRow row in _machineListGridView.SelectedRows)
+                {
+                    if (row.Visible)
+                    {
+                        rows.Add(row);
+                    }
+                }
+
+                using (AddModifyMachineForm modifyForm = new AddModifyMachineForm(rows, BuildGroupList()))
+                {
+                    if (modifyForm.ShowDialog() == DialogResult.OK)
+                    {
+                        if (modifyForm.DataChanged)
+                        {
+                            // Get the group name and the rows to update
+                            string groupName = modifyForm.GroupName;
+                            var rowsToUpdate = modifyForm.Rows;
+
+                            // If only updating a single row, update machine name and group name
+                            if (rowsToUpdate.Count == 1)
+                            {
+                                string machineName = modifyForm.MachineName;
+                                var row = rowsToUpdate[0];
+                                row.Cells[(int)GridColumns.MachineName].Value = machineName;
+                                row.Cells[(int)GridColumns.GroupName].Value = groupName;
+                                UpdateServiceMachineController(row, groupName, machineName);
+                            }
+                            else
+                            {
+                                // Update the group for each row
+                                foreach (var row in rowsToUpdate)
+                                {
+                                    row.Cells[(int)GridColumns.GroupName].Value = groupName;
+                                    UpdateServiceMachineController(row, groupName);
+                                }
+                            }
+
+                            UpdateGroupFilterList();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30842", ex);
+            }
         }
 
         /// <summary>
@@ -464,8 +517,7 @@ namespace Extract.FileActionManager.Utilities
                 // Pass in true to start the services.
                 var controllerData = new ServiceControlThreadParameters(selectedRows,
                     _serviceToControl, true);
-                var thread = new Thread(ControlServices);
-                thread.Start(controllerData);
+                ThreadPool.QueueUserWorkItem((WaitCallback)ControlServices, controllerData);
             }
             catch (Exception ex)
             {
@@ -485,15 +537,17 @@ namespace Extract.FileActionManager.Utilities
                 List<DataGridViewRow> selectedRows = new List<DataGridViewRow>();
                 foreach (DataGridViewRow row in _machineListGridView.SelectedRows)
                 {
-                    selectedRows.Add(row);
+                    if (row.Visible)
+                    {
+                        selectedRows.Add(row);
+                    }
                 }
 
                 // Put the data into the structure to pass to the controller method.
                 // Pass in false to stop the services.
                 var controllerData = new ServiceControlThreadParameters(selectedRows,
                     _serviceToControl, false);
-                var thread = new Thread(ControlServices);
-                thread.Start(controllerData);
+                ThreadPool.QueueUserWorkItem((WaitCallback)ControlServices, controllerData);
             }
             catch (Exception ex)
             {
@@ -625,10 +679,14 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void HandleMachineGridViewSelectionChanged(object sender, EventArgs e)
         {
-            int count = _machineListGridView.SelectedRows.Count;
-            _removeMachineToolStripButton.Enabled = count > 0;
-            _modifyServiceDatabaseToolStripButton.Enabled = count == 1;
-            _editGroupToolStripButton.Enabled = count > 0;
+            try
+            {
+                UpdateEnabledStates();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30843", ex);
+            }
         }
 
         /// <summary>
@@ -674,6 +732,10 @@ namespace Extract.FileActionManager.Utilities
                     // All rows should be visible
                     foreach (DataGridViewRow row in _machineListGridView.Rows)
                     {
+                        if (row.Selected)
+                        {
+                            row.Selected = false;
+                        }
                         row.Visible = true;
                     }
                 }
@@ -724,10 +786,13 @@ namespace Extract.FileActionManager.Utilities
                 return;
             }
 
-            row.Cells[(int)GridColumns.FAMService].Value = data.FamServiceStatus;
-            row.Cells[(int)GridColumns.FDRSService].Value = data.FdrsServiceStatus;
-            row.Cells[(int)GridColumns.CPUUsage].Value =
-                data.CpuPercentage.ToString("F1", CultureInfo.CurrentCulture) + " %";
+            if (row.Visible)
+            {
+                row.Cells[(int)GridColumns.FAMService].Value = data.FamServiceStatus;
+                row.Cells[(int)GridColumns.FDRSService].Value = data.FdrsServiceStatus;
+                row.Cells[(int)GridColumns.CPUUsage].Value =
+                    data.CpuPercentage.ToString("F1", CultureInfo.CurrentCulture) + " %";
+            }
         }
 
         /// <summary>
@@ -754,13 +819,7 @@ namespace Extract.FileActionManager.Utilities
             }
             else
             {
-                Thread thread = new Thread(() =>
-                    {
-                        RefreshServiceData();
-                    }
-                );
-                thread.SetApartmentState(ApartmentState.MTA);
-                thread.Start();
+                ThreadPool.QueueUserWorkItem((WaitCallback)RefreshServiceDataForAllRows);
             }
         }
 
@@ -775,7 +834,7 @@ namespace Extract.FileActionManager.Utilities
                 {
                     if (_refreshData)
                     {
-                        RefreshServiceData();
+                        RefreshServiceDataForAllRows();
                     }
                 }
                 while (!_endRefreshThread.WaitOne(_REFRESH_THREAD_SLEEP_TIME));
@@ -800,43 +859,54 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Performs a single refresh of the service data in the machine list grid.
         /// </summary>
-        void RefreshServiceData()
+        void RefreshServiceDataForAllRows(object notUsed = null)
         {
             // Create a list of all current rows in the UI
-            List<DataGridViewRow> rows = new List<DataGridViewRow>();
             foreach (DataGridViewRow row in _machineListGridView.Rows)
             {
-                rows.Add(row);
+                if (row.Visible)
+                {
+                    ThreadPool.QueueUserWorkItem((WaitCallback)RefreshServiceData, row);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Refreshes the service data.
+        /// </summary>
+        /// <param name="rowObject">The row to update.</param>
+        void RefreshServiceData(object rowObject)
+        {
+            DataGridViewRow row = rowObject as DataGridViewRow;
+            if (row == null)
+            {
+                return;
             }
 
-            Parallel.ForEach<DataGridViewRow>(rows, row =>
+            ServiceMachineController controller = null;
+            try
+            {
+                // If the row is still in the collection and visible, get its controller,
+                // refresh the data and update the row
+                if (!_endRefreshThread.WaitOne(0)
+                    && _rowsAndControllers.TryGetValue(row, out controller))
                 {
-                    ServiceMachineController controller = null;
-                    try
-                    {
-                        // If the row is still in the collection and visible, get its controller,
-                        // refresh the data and update the row
-                        if (!_endRefreshThread.WaitOne(0) && row.Visible
-                            && _rowsAndControllers.TryGetValue(row, out controller))
-                        {
-                            var data = controller.RefreshData();
-                            RefreshRowData(row, data);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        var ee = new ExtractException("ELI30809", "Unable to update data.", ex);
-                        string machineName = null;
-                        if (controller != null)
-                        {
-                            machineName = controller.MachineName;
-                        }
-                        ee.AddDebugData("Machine Name", machineName ?? "Unknown", false);
-                        ee.Log();
-                        SetRowErrorText(row, ex.Message);
-                    }
+                    var data = controller.RefreshData();
+                    RefreshRowData(row, data);
                 }
-            );
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI30809", "Unable to update data.", ex);
+                string machineName = null;
+                if (controller != null)
+                {
+                    machineName = controller.MachineName;
+                }
+                ee.AddDebugData("Machine Name", machineName ?? "Unknown", false);
+                ee.Log();
+                SetRowErrorText(row, ex.Message);
+            }
         }
 
         /// <summary>
@@ -1041,6 +1111,42 @@ namespace Extract.FileActionManager.Utilities
 
             int index = _groupFilterComboBox.FindStringExact(currentSelection);
             _groupFilterComboBox.SelectedIndex = index != -1 ? index : 0;
+        }
+
+        /// <summary>
+        /// Updates the service machine controller.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <param name="groupName">Name of the group.</param>
+        /// <param name="machineName">Name of the machine.</param>
+        void UpdateServiceMachineController(DataGridViewRow row, string groupName,
+            string machineName = null)
+        {
+            ServiceMachineController controller = null;
+            if (_rowsAndControllers.TryGetValue(row, out controller))
+            {
+                controller.GroupName = groupName;
+                if (machineName != null)
+                {
+                    controller.MachineName = machineName;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the enabled states of the toolstrip buttons and menu items.
+        /// </summary>
+        void UpdateEnabledStates()
+        {
+            int rowCount = _machineListGridView.Rows.Count;
+            int selectedCount = _machineListGridView.SelectedRows.Count;
+
+            _saveFileToolStripButton.Enabled = rowCount > 0;
+            _saveToolStripMenuItem.Enabled = rowCount > 0;
+
+            _removeMachineToolStripButton.Enabled = selectedCount > 0;
+            _modifyServiceDatabaseToolStripButton.Enabled = selectedCount == 1;
+            _editMachineGroupAndNameToolStripButton.Enabled = selectedCount > 0;
         }
 
         #endregion Methods

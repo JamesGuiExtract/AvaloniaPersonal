@@ -1,6 +1,6 @@
 ﻿namespace Extract.FileActionManager.Utilities
 {
-    partial class AddMachineForm
+    partial class AddModifyMachineForm
     {
         /// <summary>
         /// Required designer variable.
@@ -63,6 +63,7 @@
             this._textMachineName.Name = "_textMachineName";
             this._textMachineName.Size = new System.Drawing.Size(298, 20);
             this._textMachineName.TabIndex = 1;
+            this._textMachineName.TextChanged += new System.EventHandler(this.HandleMachineNameTextChanged);
             // 
             // _browseMachineButton
             // 
@@ -84,6 +85,7 @@
             this._groupNameCombo.Name = "_groupNameCombo";
             this._groupNameCombo.Size = new System.Drawing.Size(331, 21);
             this._groupNameCombo.TabIndex = 3;
+            this._groupNameCombo.TextChanged += new System.EventHandler(this.HandleGroupNameTextChanged);
             // 
             // _cancelButton
             // 
@@ -105,7 +107,7 @@
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             // 
-            // AddMachineForm
+            // AddModifyMachineForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -120,7 +122,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "AddMachineForm";
+            this.Name = "AddModifyMachineForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Add Machine";
             this.ResumeLayout(false);

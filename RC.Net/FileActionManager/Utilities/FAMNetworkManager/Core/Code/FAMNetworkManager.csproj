@@ -99,11 +99,11 @@
     <Compile Include="AboutFAMNetworkManager.Designer.cs">
       <DependentUpon>AboutFAMNetworkManager.cs</DependentUpon>
     </Compile>
-    <Compile Include="AddMachineForm.cs">
+    <Compile Include="AddModifyMachineForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddMachineForm.Designer.cs">
-      <DependentUpon>AddMachineForm.cs</DependentUpon>
+    <Compile Include="AddModifyMachineForm.Designer.cs">
+      <DependentUpon>AddModifyMachineForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FAMNetworkDashboardForm.cs">
       <SubType>Form</SubType>
@@ -117,8 +117,8 @@
     <EmbeddedResource Include="AboutFAMNetworkManager.resx">
       <DependentUpon>AboutFAMNetworkManager.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AddMachineForm.resx">
-      <DependentUpon>AddMachineForm.cs</DependentUpon>
+    <EmbeddedResource Include="AddModifyMachineForm.resx">
+      <DependentUpon>AddModifyMachineForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FAMNetworkDashboardForm.resx">
       <DependentUpon>FAMNetworkDashboardForm.cs</DependentUpon>
