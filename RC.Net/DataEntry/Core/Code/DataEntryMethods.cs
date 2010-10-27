@@ -8,6 +8,7 @@ using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting;
 using System.Text;
@@ -1116,23 +1117,19 @@ namespace Extract.DataEntry
                     // different, an update is required.
                     if (!updateRequired)
                     {
+                        // If they are not the same size, an update is required.
                         if (newAutoCompleteList.Count != autoCompleteList.Count)
                         {
-                            // If they are not the same size, an update is required.
                             updateRequired = true;
                         }
-                        else
+                        // ...or if the new list differs at all from the old list, an update is
+                        // required.
+                        else if (autoCompleteList.Count != newAutoCompleteList
+                                    .Cast<string>()
+                                    .Intersect(autoCompleteList.Cast<string>())
+                                    .Count())
                         {
-                            // ...or if any value in the new list is not found in the old list, the
-                            // lists are different.
-                            foreach (string value in newAutoCompleteList)
-                            {
-                                if (!autoCompleteList.Contains(value))
-                                {
-                                    updateRequired = true;
-                                    break;
-                                }
-                            }
+                            updateRequired = true;
                         }
                     }
 
