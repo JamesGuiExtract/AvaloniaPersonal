@@ -36,6 +36,18 @@ namespace Extract.Utilities.Forms
         string _persistenceFileName;
 
         /// <summary>
+        /// The original value of <see cref="Form.FormBorderStyle"/> for the managed
+        /// <see cref="Form"/>.
+        /// </summary>
+        FormBorderStyle _originalBorderStyle;
+
+        /// <summary>
+        /// The original value of <see cref="Form.SizeGripStyle"/> for the managed
+        /// <see cref="Form"/>.
+        /// </summary>
+        SizeGripStyle _originalSizeGripStyle;
+
+        /// <summary>
         /// The name of the <see cref="SandDockManager"/> for which state information should be
         /// maintained.
         /// </summary>
@@ -61,6 +73,11 @@ namespace Extract.Utilities.Forms
         /// Indicates whether the form should be displayed in full screen mode.
         /// </summary>
         bool _fullScreen;
+
+        /// <summary>
+        /// Indicates whether full screen mode is supported by the managed <see cref="Form"/>.
+        /// </summary>
+        bool _supportsFullScreenMode = true;
 
         /// <summary>
         /// A reference count of the number of methods currently updating the <see cref="Form"/>'s
@@ -94,9 +111,11 @@ namespace Extract.Utilities.Forms
         /// control and form layout.</param>
         /// <param name="manageToolStrips">If <see langword="true"/>, the form's
         /// <see cref="ToolStrip"/> will be persisted.</param>
-        /// <param name="fullScreenTabText">If not <see langword="null"/>, an
+        /// <param name="fullScreenTabText">If not <see langword="null"/> or empty, an
         /// <see cref="AutoHideScreenTab"/> will be displayed with the provided text that, if
-        /// clicked, will exit full screen mode.</param>
+        /// clicked, will exit full screen mode. If <see langword="null"/> full screen mode will not
+        /// be supported and the persistence xml file will not contain the FullScreen attribute.
+        /// </param>
         /// <throws><see cref="ExtractException"/> if instantiated at design-time.</throws>
         public FormStateManager(Form form, string persistenceFileName, string mutexName,
             bool manageToolStrips, string fullScreenTabText)
@@ -119,9 +138,11 @@ namespace Extract.Utilities.Forms
         /// info will be persisted.</param>
         /// <param name="manageToolStrips">If <see langword="true"/>, the form's
         /// <see cref="ToolStrip"/> will be persisted.</param>
-        /// <param name="fullScreenTabText">If not <see langword="null"/>, an
+        /// <param name="fullScreenTabText">If not <see langword="null"/> or empty, an
         /// <see cref="AutoHideScreenTab"/> will be displayed with the provided text that, if
-        /// clicked, will exit full screen mode.</param>
+        /// clicked, will exit full screen mode. If <see langword="null"/> full screen mode will not
+        /// be supported and the persistence xml file will not contain the FullScreen attribute.
+        /// </param>
         /// <throws><see cref="ExtractException"/> if instantiated at design-time.</throws>
         public FormStateManager(Form form, string persistenceFileName, string mutexName,
             SandDockManager sandDockManager, bool manageToolStrips, string fullScreenTabText)
@@ -132,6 +153,8 @@ namespace Extract.Utilities.Forms
                     LicenseManager.UsageMode != LicenseUsageMode.Designtime);
 
                 _form = form;
+                _originalBorderStyle = _form.FormBorderStyle;
+                _originalSizeGripStyle = _form.SizeGripStyle;
                 _persistenceFileName = persistenceFileName;
                 _layoutMutex = new Mutex(false, mutexName);
                 _sandDockManager = sandDockManager;
@@ -147,6 +170,10 @@ namespace Extract.Utilities.Forms
                 {
                     _fullScreenTab = new AutoHideScreenTab(fullScreenTabText);
                     _fullScreenTab.LabelClicked += HandleFullScreenTabLabelClicked;
+                }
+                else if (fullScreenTabText == null)
+                {
+                    _supportsFullScreenMode = false;
                 }
             }
             catch (Exception ex)
@@ -401,7 +428,10 @@ namespace Extract.Utilities.Forms
                 SetAttribute(element, "Width", _bounds.Width);
                 SetAttribute(element, "Height", _bounds.Height);
                 SetAttribute(element, "State", _state);
-                SetAttribute(element, "FullScreen", _fullScreen);
+                if (_supportsFullScreenMode)
+                {
+                    SetAttribute(element, "FullScreen", _fullScreen);
+                }
 
                 return element;
             }
@@ -431,7 +461,10 @@ namespace Extract.Utilities.Forms
                 // Load the UI state properties.
                 _bounds = GetBounds(element);
                 _state = GetAttribute<FormWindowState>(element, "State", _form.WindowState);
-                _fullScreen = GetAttribute<bool>(element, "FullScreen", false);
+                if (_supportsFullScreenMode)
+                {
+                    _fullScreen = GetAttribute<bool>(element, "FullScreen", false);
+                }
 
                 return element as IXPathNavigable;
             }
@@ -507,6 +540,15 @@ namespace Extract.Utilities.Forms
 
                 if (showFullScreen)
                 {
+                    ExtractException.Assert("ELI30975",
+                        "Full screen mode is not supported for the current form.",
+                        _supportsFullScreenMode);
+
+                    // [FlexIDSCore:4457]
+                    // Setting the grip style to Hide doesn't actually seem to hide the grip. But
+                    // I'll keep the code here regardless since it should be here and in case
+                    // someone later discovers what was preventing the grip from being hidden.
+                    _form.SizeGripStyle = SizeGripStyle.Hide;
                     _form.WindowState = FormWindowState.Normal;
                     _form.FormBorderStyle = FormBorderStyle.None;
                     _form.Bounds = Screen.FromControl(_form).Bounds;
@@ -525,7 +567,8 @@ namespace Extract.Utilities.Forms
                     }
 
                     _form.Activated -= HandleFormActivated;
-                    _form.FormBorderStyle = FormBorderStyle.Sizable;
+                    _form.SizeGripStyle = _originalSizeGripStyle;
+                    _form.FormBorderStyle = _originalBorderStyle;
                     _form.Bounds = _bounds;
                     _form.WindowState = _state;
                 }
