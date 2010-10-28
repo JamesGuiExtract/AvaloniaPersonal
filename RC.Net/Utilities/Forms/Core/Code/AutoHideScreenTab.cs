@@ -421,32 +421,35 @@ namespace Extract.Utilities.Forms
 
                         _tabOutline = new GraphicsPath();
                         _tabOutline.StartFigure();
-                        
+
+                        Point startPoint = Point.Empty;
+                        Point endPoint = _tabArea.Location;
+
                         // The top
-                        dynamic segment = GetPathSegment(_tabArea.Location, _tabArea.Width, 0);
-                        _tabOutline.AddLine(segment.Start, segment.End);
+                        GetPathSegment(ref startPoint, ref endPoint, _tabArea.Width, 0);
+                        _tabOutline.AddLine(startPoint, endPoint);
 
                         // The right side
-                        segment = GetPathSegment(segment.End, 0, cornerRadius);
-                        _tabOutline.AddLine(segment.Start, segment.End);
+                        GetPathSegment(ref startPoint, ref endPoint, 0, cornerRadius);
+                        _tabOutline.AddLine(startPoint, endPoint);
 
                         // The bottom-right corner
-                        segment = GetPathSegment(segment.End, -cornerRadius, cornerRadius);
+                        GetPathSegment(ref startPoint, ref endPoint, -cornerRadius, cornerRadius);
                         _tabOutline.AddArc(Rectangle.FromLTRB(
-                            segment.End.X, segment.Start.Y, segment.Start.X, segment.End.Y), 0, 90);
+                            endPoint.X, startPoint.Y, startPoint.X, endPoint.Y), 0, 90);
 
                         // The bottom
-                        segment = GetPathSegment(segment.End, -_tabArea.Width + (2 * cornerRadius), 0);
-                        _tabOutline.AddLine(segment.Start, segment.End);
+                        GetPathSegment(ref startPoint, ref endPoint, -_tabArea.Width + (2 * cornerRadius), 0);
+                        _tabOutline.AddLine(startPoint, endPoint);
 
                         // The bottom-left corner
-                        segment = GetPathSegment(segment.End, -cornerRadius, -cornerRadius);
+                        GetPathSegment(ref startPoint, ref endPoint, -cornerRadius, -cornerRadius);
                         _tabOutline.AddArc(Rectangle.FromLTRB(
-                            segment.End.X, segment.End.Y, segment.Start.X, segment.Start.Y), 90, 90);
+                            endPoint.X, endPoint.Y, startPoint.X, startPoint.Y), 90, 90);
 
                         // The left side
-                        segment = GetPathSegment(segment.End, 0, -cornerRadius);
-                        _tabOutline.AddLine(segment.Start, segment.End);
+                        GetPathSegment(ref startPoint, ref endPoint, 0, -cornerRadius);
+                        _tabOutline.AddLine(startPoint, endPoint);
 
                         _tabOutline.CloseFigure();
                     }
@@ -528,26 +531,18 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Gets a path segment.
+        /// Gets a path segment based off the end point of the previous segment and the specified
+        /// offset from that point.
         /// </summary>
-        /// <param name="startPoint">The start point of the segment</param>
+        /// <param name="startPoint">The start point of the resulting segment.</param>
+        /// <param name="endPoint">The value passed in represents the starting point of the new
+        /// segment; the value returned is the ending point of the resulting segment.</param>
         /// <param name="xOffset">The x offset of the end point.</param>
         /// <param name="yOffset">The y offset of the end point.</param>
-        /// <returns>A <see langword="Tuple"/> with the values:
-        /// <list type="bullet">
-        /// <item><b>Start</b>:The <see cref="Point"/> representing the start of the segment.</item>
-        /// <item><b>End</b>:The <see cref="Point"/> representing the start of the segment.</item>  
-        /// </list></returns>
-        static dynamic GetPathSegment(Point startPoint, int xOffset, int yOffset)
+        static void GetPathSegment(ref Point startPoint, ref Point endPoint, int xOffset, int yOffset)
         {
-            Point endPoint = startPoint;
+            startPoint = endPoint;
             endPoint.Offset(xOffset, yOffset);
-            
-            return new
-            {
-                Start = startPoint,
-                End = endPoint
-            };
         }
 
         #endregion Private members

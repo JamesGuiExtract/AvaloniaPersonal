@@ -1572,7 +1572,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             _documentTypeComboBox.Items.Insert(0, documentType);
                         }
 
-                        SetActiveDocumentType(documentType, true);
+                        bool changedDocumentType, changedDataEntryConfig;
+                        SetActiveDocumentType(documentType, true, 
+                            out changedDocumentType, out changedDataEntryConfig);
                     }
 
                     // Record database statistics on load
@@ -2778,19 +2780,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="allowConfigurationChange"><see langword="true"/> if the configuration
         /// should be changed if the new document type calls for it, <see langword="false"/> if
         /// the current configuration should not be changed.</param>
-        /// <returns>A <see langword="Tuple"/> with the values:
-        /// <list type="bullet">
-        /// <item><b>ChangedDocumentType</b>: <see langword="true"/> if the active document type
-        /// was changed, <see langword="false"/> otherwise.</item>
-        /// <item><b>ChangedDataEntryConfig</b>: <see langword="true"/> if the active configuration
-        /// was changed, <see langword="false"/> otherwise.</item>
-        /// </list></returns>
-        dynamic SetActiveDocumentType(string documentType, bool allowConfigurationChange)
+        /// <param name="changedDocumentType"><see langword="true"/> if the active document type
+        /// was changed, <see langword="false"/> otherwise.</param>
+        /// <param name="changedDataEntryConfig"><see langword="true"/> if the active configuration
+        /// was changed, <see langword="false"/> otherwise</param>
+        void SetActiveDocumentType(string documentType, bool allowConfigurationChange,
+            out bool changedDocumentType, out bool changedDataEntryConfig)
         {
             try
             {
-                bool changedDocumentType = false;
-                bool changedDataEntryConfig = false;
+                changedDocumentType = false;
+                changedDataEntryConfig = false;
                 DataEntryConfiguration newDataEntryConfig = _defaultDataEntryConfig;
 
                 if (!documentType.Equals(_activeDocumentType, StringComparison.OrdinalIgnoreCase))
@@ -2853,12 +2853,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
                     }
                 }
-
-                return new
-                {
-                    ChangedDocumentType = changedDocumentType,
-                    ChangedDataEntryConfig = changedDataEntryConfig
-                };
             }
             catch (Exception ex)
             {
@@ -3014,10 +3008,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException.Assert("ELI30624", "Document type configurations not defined.",
                     _documentTypeConfigurations != null);
 
-                dynamic result = SetActiveDocumentType(documentType, allowConfigurationChange);
-                if (result.ChangedDocumentType)
+                bool changedDocumentType, changedDataEntryConfig;
+                SetActiveDocumentType(documentType, allowConfigurationChange,
+                    out changedDocumentType, out changedDataEntryConfig);
+                if (changedDocumentType)
                 {
-                    if (result.ChangedDataEntryConfig)
+                    if (changedDataEntryConfig)
                     {
                         // Adjust UI elements to reflect the new configuration.
                         SetUIConfiguration(_activeDataEntryConfig);
@@ -3040,7 +3036,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     if (_dataEntryControlHost != null)
                     {
                         // Apply the new document type to the DocumentType attribute.
-                        AssignNewDocumentType(documentType, result.ChangedDataEntryConfig);
+                        AssignNewDocumentType(documentType, changedDataEntryConfig);
                     }
                 }
             }
