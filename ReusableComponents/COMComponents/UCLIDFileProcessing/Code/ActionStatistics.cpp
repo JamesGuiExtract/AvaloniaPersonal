@@ -11,14 +11,17 @@
 //-------------------------------------------------------------------------------------------------
 CActionStatistics::CActionStatistics() :
 m_nNumDocuments(0),
+m_nNumDocumentsPending(0),
 m_nNumDocumentsComplete(0),
 m_nNumDocumentsFailed(0),
 m_nNumDocumentsSkipped(0),
 m_nNumPages(0),
+m_nNumPagesPending(0),
 m_nNumPagesComplete(0),
 m_nNumPagesFailed(0),
 m_nNumPagesSkipped(0),
 m_llNumBytes(0),
+m_llNumBytesPending(0),
 m_llNumBytesComplete(0),
 m_llNumBytesFailed(0),
 m_llNumBytesSkipped(0)
@@ -55,10 +58,10 @@ STDMETHODIMP CActionStatistics::get_NumDocuments(/*[out, retval]*/ long *pVal)
 		ASSERT_ARGUMENT("ELI26808", pVal != NULL);
 
 		*pVal = m_nNumDocuments;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14050")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumDocuments(/*[in]*/ long newVal)
@@ -68,10 +71,39 @@ STDMETHODIMP CActionStatistics::put_NumDocuments(/*[in]*/ long newVal)
 	try
 	{
 		m_nNumDocuments = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14051")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CActionStatistics::get_NumDocumentsPending(/*[out, retval]*/ long *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-	return S_OK;}
+	try
+	{
+		ASSERT_ARGUMENT("ELI30725", pVal != NULL);
+
+		*pVal = m_nNumDocumentsPending;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30726")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CActionStatistics::put_NumDocumentsPending(/*[in]*/ long newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_nNumDocumentsPending = newVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30727")
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumDocumentsComplete(/*[out, retval]*/ long *pVal)
 {
@@ -82,10 +114,10 @@ STDMETHODIMP CActionStatistics::get_NumDocumentsComplete(/*[out, retval]*/ long 
 		ASSERT_ARGUMENT("ELI26809", pVal != NULL);
 
 		*pVal = m_nNumDocumentsComplete;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14052")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumDocumentsComplete(/*[in]*/ long newVal)
@@ -95,10 +127,11 @@ STDMETHODIMP CActionStatistics::put_NumDocumentsComplete(/*[in]*/ long newVal)
 	try
 	{
 		m_nNumDocumentsComplete = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14053")
-
-	return S_OK;}
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumDocumentsFailed(/*[out, retval]*/ long *pVal)
 {
@@ -109,10 +142,10 @@ STDMETHODIMP CActionStatistics::get_NumDocumentsFailed(/*[out, retval]*/ long *p
 		ASSERT_ARGUMENT("ELI26810", pVal != NULL);
 
 		*pVal = m_nNumDocumentsFailed;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14054")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumDocumentsFailed(/*[in]*/ long newVal)
@@ -122,10 +155,11 @@ STDMETHODIMP CActionStatistics::put_NumDocumentsFailed(/*[in]*/ long newVal)
 	try
 	{
 		m_nNumDocumentsFailed = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14055")
-
-	return S_OK;}
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumDocumentsSkipped(/*[out, retval]*/ long *pVal)
 {
@@ -136,10 +170,10 @@ STDMETHODIMP CActionStatistics::get_NumDocumentsSkipped(/*[out, retval]*/ long *
 		ASSERT_ARGUMENT("ELI26811", pVal != NULL);
 
 		*pVal = m_nNumDocumentsSkipped;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26812")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumDocumentsSkipped(/*[in]*/ long newVal)
@@ -149,10 +183,11 @@ STDMETHODIMP CActionStatistics::put_NumDocumentsSkipped(/*[in]*/ long newVal)
 	try
 	{
 		m_nNumDocumentsSkipped = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26813")
-
-	return S_OK;}
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumPages(/*[out, retval]*/ long *pVal)
 {
@@ -176,10 +211,39 @@ STDMETHODIMP CActionStatistics::put_NumPages(/*[in]*/ long newVal)
 	try
 	{
 		m_nNumPages = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14057")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CActionStatistics::get_NumPagesPending(/*[out, retval]*/ long *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-	return S_OK;}
+	try
+	{
+		ASSERT_ARGUMENT("ELI30728", pVal != NULL);
+
+		*pVal = m_nNumPagesPending;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30729")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CActionStatistics::put_NumPagesPending(/*[in]*/ long newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_nNumPagesPending = newVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30730")
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumPagesComplete(/*[out, retval]*/ long *pVal)
 {
@@ -190,10 +254,10 @@ STDMETHODIMP CActionStatistics::get_NumPagesComplete(/*[out, retval]*/ long *pVa
 		ASSERT_ARGUMENT("ELI26818", pVal != NULL);
 
 		*pVal = m_nNumPagesComplete;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14058")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumPagesComplete(/*[in]*/ long newVal)
@@ -203,10 +267,11 @@ STDMETHODIMP CActionStatistics::put_NumPagesComplete(/*[in]*/ long newVal)
 	try
 	{
 		m_nNumPagesComplete = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14059")
-
-	return S_OK;}
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumPagesFailed(/*[out, retval]*/ long *pVal)
 {
@@ -217,10 +282,10 @@ STDMETHODIMP CActionStatistics::get_NumPagesFailed(/*[out, retval]*/ long *pVal)
 		ASSERT_ARGUMENT("ELI26817", pVal != NULL);
 
 		*pVal = m_nNumPagesFailed;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14060")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumPagesFailed(/*[in]*/ long newVal)
@@ -230,10 +295,10 @@ STDMETHODIMP CActionStatistics::put_NumPagesFailed(/*[in]*/ long newVal)
 	try
 	{
 		m_nNumPagesFailed = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14061")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumPagesSkipped(/*[out, retval]*/ long *pVal)
@@ -245,10 +310,10 @@ STDMETHODIMP CActionStatistics::get_NumPagesSkipped(/*[out, retval]*/ long *pVal
 		ASSERT_ARGUMENT("ELI26820", pVal != NULL);
 
 		*pVal = m_nNumPagesSkipped;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26821")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumPagesSkipped(/*[in]*/ long newVal)
@@ -258,10 +323,10 @@ STDMETHODIMP CActionStatistics::put_NumPagesSkipped(/*[in]*/ long newVal)
 	try
 	{
 		m_nNumPagesSkipped = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26822")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumBytes(/*[out, retval]*/ LONGLONG *pVal)
@@ -273,10 +338,10 @@ STDMETHODIMP CActionStatistics::get_NumBytes(/*[out, retval]*/ LONGLONG *pVal)
 		ASSERT_ARGUMENT("ELI26816", pVal != NULL);
 
 		*pVal = m_llNumBytes;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14062")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumBytes(/*[in]*/ LONGLONG newVal)
@@ -286,11 +351,39 @@ STDMETHODIMP CActionStatistics::put_NumBytes(/*[in]*/ LONGLONG newVal)
 	try
 	{
 		m_llNumBytes = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14063")
-
-	return S_OK;}
+}
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CActionStatistics::get_NumBytesPending(/*[out, retval]*/ LONGLONG *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI30731", pVal != NULL);
+
+		*pVal = m_llNumBytesPending;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30732")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CActionStatistics::put_NumBytesPending(/*[in]*/ LONGLONG newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		m_llNumBytesPending = newVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30733")
+}//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumBytesComplete(/*[out, retval]*/ LONGLONG *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -300,10 +393,10 @@ STDMETHODIMP CActionStatistics::get_NumBytesComplete(/*[out, retval]*/ LONGLONG 
 		ASSERT_ARGUMENT("ELI26815", pVal != NULL);
 
 		*pVal = m_llNumBytesComplete;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14064")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumBytesComplete(/*[in]*/ LONGLONG newVal)
@@ -313,10 +406,11 @@ STDMETHODIMP CActionStatistics::put_NumBytesComplete(/*[in]*/ LONGLONG newVal)
 	try
 	{
 		m_llNumBytesComplete = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14065")
-
-	return S_OK;}
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumBytesFailed(/*[out, retval]*/ LONGLONG *pVal)
 {
@@ -327,10 +421,10 @@ STDMETHODIMP CActionStatistics::get_NumBytesFailed(/*[out, retval]*/ LONGLONG *p
 		ASSERT_ARGUMENT("ELI26814", pVal != NULL);
 
 		*pVal = m_llNumBytesFailed;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14066")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumBytesFailed(/*[in]*/ LONGLONG newVal)
@@ -340,10 +434,10 @@ STDMETHODIMP CActionStatistics::put_NumBytesFailed(/*[in]*/ LONGLONG newVal)
 	try
 	{
 		m_llNumBytesFailed = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14067")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::get_NumBytesSkipped(/*[out, retval]*/ LONGLONG *pVal)
@@ -355,10 +449,10 @@ STDMETHODIMP CActionStatistics::get_NumBytesSkipped(/*[out, retval]*/ LONGLONG *
 		ASSERT_ARGUMENT("ELI26823", pVal != NULL);
 
 		*pVal = m_llNumBytesSkipped;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26824")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::put_NumBytesSkipped(/*[in]*/ LONGLONG newVal)
@@ -368,16 +462,18 @@ STDMETHODIMP CActionStatistics::put_NumBytesSkipped(/*[in]*/ LONGLONG newVal)
 	try
 	{
 		m_llNumBytesSkipped = newVal;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26825")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CActionStatistics::GetAllStatistics(long *plNumDocs, long *plNumDocsComplete,
-	  long *plNumDocsFailed, long *plNumDocsSkipped, long *plNumPages, long *plNumPagesComplete,
-	  long *plNumPagesFailed, long *plNumPagesSkipped, LONGLONG *pllNumBytes,
-	  LONGLONG *pllNumBytesComplete, LONGLONG *pllNumBytesFailed, LONGLONG *pllNumBytesSkipped)
+STDMETHODIMP CActionStatistics::GetAllStatistics(long *plNumDocs, long *plNumDocsPending, 
+		long* plNumDocsComplete, long* plNumDocsFailed, long* plNumDocsSkipped, 
+		long* plNumPages, long* plNumPagesPending, long* plNumPagesComplete, 
+		long* plNumPagesFailed, long* plNumPagesSkipped, LONGLONG* pllNumBytes, 
+		LONGLONG* pllNumBytesPending, LONGLONG* pllNumBytesComplete, 
+		LONGLONG* pllNumBytesFailed, LONGLONG* pllNumBytesSkipped)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -385,28 +481,34 @@ STDMETHODIMP CActionStatistics::GetAllStatistics(long *plNumDocs, long *plNumDoc
 	{
 		// Check arguments
 		ASSERT_ARGUMENT("ELI26829", plNumDocs != NULL);
+		ASSERT_ARGUMENT("ELI30734", plNumDocsPending != NULL);
 		ASSERT_ARGUMENT("ELI26830", plNumDocsComplete != NULL);
 		ASSERT_ARGUMENT("ELI26831", plNumDocsFailed != NULL);
 		ASSERT_ARGUMENT("ELI26832", plNumDocsSkipped != NULL);
 		ASSERT_ARGUMENT("ELI26833", plNumPages != NULL);
+		ASSERT_ARGUMENT("ELI30735", plNumPagesPending != NULL);
 		ASSERT_ARGUMENT("ELI26834", plNumPagesComplete != NULL);
 		ASSERT_ARGUMENT("ELI26835", plNumPagesFailed != NULL);
 		ASSERT_ARGUMENT("ELI26836", plNumPagesSkipped != NULL);
 		ASSERT_ARGUMENT("ELI26837", pllNumBytes != NULL);
+		ASSERT_ARGUMENT("ELI30736", pllNumBytesPending != NULL);
 		ASSERT_ARGUMENT("ELI26838", pllNumBytesComplete != NULL);
 		ASSERT_ARGUMENT("ELI26839", pllNumBytesFailed != NULL);
 		ASSERT_ARGUMENT("ELI26840", pllNumBytesSkipped != NULL);
 
 		// Copy the statistics data
 		*plNumDocs = m_nNumDocuments;
+		*plNumDocsPending = m_nNumDocumentsPending;
 		*plNumDocsComplete = m_nNumDocumentsComplete;
 		*plNumDocsFailed = m_nNumDocumentsFailed;
 		*plNumDocsSkipped = m_nNumDocumentsSkipped;
 		*plNumPages = m_nNumPages;
+		*plNumPagesPending = m_nNumPagesPending;
 		*plNumPagesComplete = m_nNumPagesComplete;
 		*plNumPagesFailed = m_nNumPagesFailed;
 		*plNumPagesSkipped = m_nNumPagesSkipped;
 		*pllNumBytes = m_llNumBytes;
+		*pllNumBytesPending = m_llNumBytesPending;
 		*pllNumBytesComplete = m_llNumBytesComplete;
 		*pllNumBytesFailed = m_llNumBytesFailed;
 		*pllNumBytesSkipped = m_llNumBytesSkipped;
@@ -416,10 +518,11 @@ STDMETHODIMP CActionStatistics::GetAllStatistics(long *plNumDocs, long *plNumDoc
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26841")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CActionStatistics::SetAllStatistics(long lNumDocs, long lNumDocsComplete,
-	  long lNumDocsFailed, long lNumDocsSkipped, long lNumPages, long lNumPagesComplete,
-	  long lNumPagesFailed, long lNumPagesSkipped, LONGLONG llNumBytes,
-	  LONGLONG llNumBytesComplete, LONGLONG llNumBytesFailed, LONGLONG llNumBytesSkipped)
+STDMETHODIMP CActionStatistics::SetAllStatistics(long lNumDocs, long lNumDocsPending, 
+		long lNumDocsComplete, long lNumDocsFailed, long lNumDocsSkipped, long lNumPages, 
+		long lNumPagesPending,  long lNumPagesComplete, long lNumPagesFailed, long lNumPagesSkipped, 
+		LONGLONG llNumBytes, LONGLONG llNumBytesPending, LONGLONG llNumBytesComplete, 
+		LONGLONG llNumBytesFailed, LONGLONG llNumBytesSkipped)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -427,14 +530,17 @@ STDMETHODIMP CActionStatistics::SetAllStatistics(long lNumDocs, long lNumDocsCom
 	{
 		// Copy the statistics data
 		m_nNumDocuments = lNumDocs;
+		m_nNumDocumentsPending = lNumDocsPending;
 		m_nNumDocumentsComplete = lNumDocsComplete;
 		m_nNumDocumentsFailed = lNumDocsFailed;
 		m_nNumDocumentsSkipped = lNumDocsSkipped;
 		m_nNumPages = lNumPages;
+		m_nNumPagesPending = lNumPagesPending;
 		m_nNumPagesComplete = lNumPagesComplete;
 		m_nNumPagesFailed = lNumPagesFailed;
 		m_nNumPagesSkipped = lNumPagesSkipped;
 		m_llNumBytes = llNumBytes;
+		m_llNumBytesPending = llNumBytesPending;
 		m_llNumBytesComplete = llNumBytesComplete;
 		m_llNumBytesFailed = llNumBytesFailed;
 		m_llNumBytesSkipped = llNumBytesSkipped;
@@ -589,6 +695,43 @@ STDMETHODIMP CActionStatistics::SetSkipped(long lNumDocsSkipped, long lNumPagesS
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26861")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CActionStatistics::GetPending(long *plNumDocsPending, long *plNumPagesPending,
+											 LONGLONG *pllNumBytesPending)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check arguments
+		ASSERT_ARGUMENT("ELI30737", plNumDocsPending != NULL);
+		ASSERT_ARGUMENT("ELI30738", plNumPagesPending != NULL);
+		ASSERT_ARGUMENT("ELI30739", pllNumBytesPending != NULL);
+
+		*plNumDocsPending = m_nNumDocumentsPending;
+		*plNumPagesPending = m_nNumPagesPending;
+		*pllNumBytesPending = m_llNumBytesPending;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30740")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CActionStatistics::SetPending(long lNumDocsPending, long lNumPagesPending,
+											 LONGLONG llNumBytesPending)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_nNumDocumentsPending = lNumDocsPending;
+		m_nNumPagesPending = lNumPagesPending;
+		m_llNumBytesPending = llNumBytesPending;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30741")
+}
 
 //-------------------------------------------------------------------------------------------------
 // ICopyableObject Methods
@@ -608,10 +751,10 @@ STDMETHODIMP CActionStatistics::raw_Clone(IUnknown * * pObject)
 
 		// Return the new object to the caller
 		*pObject = ipObjCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14069")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CActionStatistics::raw_CopyFrom(IUnknown * pObject)
@@ -624,13 +767,14 @@ STDMETHODIMP CActionStatistics::raw_CopyFrom(IUnknown * pObject)
 		ASSERT_RESOURCE_ALLOCATION("ELI14031", ipActionStats != NULL);
 
 		// Get the stats from the other statistics object
-		ipActionStats->GetAllStatistics(&m_nNumDocuments, &m_nNumDocumentsComplete,
-			&m_nNumDocumentsFailed, &m_nNumDocumentsSkipped, &m_nNumPages, &m_nNumPagesComplete,
-			&m_nNumPagesFailed, &m_nNumPagesSkipped, &m_llNumBytes, &m_llNumBytesComplete,
-			&m_llNumBytesFailed, &m_llNumBytesSkipped);
+		ipActionStats->GetAllStatistics(&m_nNumDocuments, &m_nNumDocumentsPending, 
+			&m_nNumDocumentsComplete, &m_nNumDocumentsFailed, &m_nNumDocumentsSkipped, 
+			&m_nNumPages, &m_nNumPagesPending, &m_nNumPagesComplete,
+			&m_nNumPagesFailed, &m_nNumPagesSkipped, &m_llNumBytes, &m_llNumBytesPending,
+			&m_llNumBytesComplete, &m_llNumBytesFailed, &m_llNumBytesSkipped);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14070")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------

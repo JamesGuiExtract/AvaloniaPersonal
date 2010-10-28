@@ -105,7 +105,8 @@ m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
 m_nUPIID(0),
-m_bFAMRegistered(false)
+m_bFAMRegistered(false),
+m_nActionStatisticsUpdateFreqInSeconds(5)
 {
 	try
 	{

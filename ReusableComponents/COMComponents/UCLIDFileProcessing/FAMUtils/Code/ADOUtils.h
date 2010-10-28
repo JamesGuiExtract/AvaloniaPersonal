@@ -186,6 +186,9 @@ FAMUTILS_API long getLastTableID ( const _ConnectionPtr& ipDBConnection, string 
 // PROMISE:	To return datetime as string from the SQL server using the GETDATE() SQL function 
 FAMUTILS_API string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection );
 
+// PROMISE: To return datetime as CTime from the SQL server using the GETDATE() SQL function
+FAMUTILS_API CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection);
+
 // Returns the connection string using the given server and database.
 FAMUTILS_API string createConnectionString(const string& strServer, const string& strDatabase);
 

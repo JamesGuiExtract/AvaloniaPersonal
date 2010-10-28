@@ -278,13 +278,9 @@ CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName )
 				throw ue;
 			}
 			
-			// Copy data to OleDateTime object
-			COleDateTime oleDateTime;
-			oleDateTime = vtItem;
-
 			// Get the date time as systemTime
 			SYSTEMTIME systemTime;
-			oleDateTime.GetAsSystemTime(systemTime);
+			VariantTimeToSystemTime(vtItem, &systemTime);
 
 			// Convert to CTime and return
 			return CTime(systemTime);
@@ -448,6 +444,22 @@ string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection )
 
 	// return the bstr as a string
 	return asString(vtTimeStr.bstrVal);;
+}
+//-------------------------------------------------------------------------------------------------
+CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection)
+{
+	ASSERT_ARGUMENT("ELI30822", ipDBConnection != NULL);
+
+	// Get the current date time
+	_RecordsetPtr ipRSTime;
+	ipRSTime = ipDBConnection->Execute (gstrGET_SQL_SERVER_TIME.c_str(), NULL, adCmdText );
+	ASSERT_RESOURCE_ALLOCATION("ELI30823", ipRSTime != NULL );
+	
+	// Get the fields pointer
+	FieldsPtr ipFields = ipRSTime->Fields;
+	ASSERT_RESOURCE_ALLOCATION("ELI30824", ipFields != NULL );
+
+	return getTimeDateField(ipFields, "CurrDateTime");
 }
 //-------------------------------------------------------------------------------------------------
 string createConnectionString(const string& strServer, const string& strDatabase)

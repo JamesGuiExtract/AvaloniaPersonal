@@ -27,6 +27,7 @@ static const string gstrINPUT_EVENT_HISTORY_SIZE = "InputEventHistorySize";
 static const string gstrREQUIRE_AUTHENTICATION_BEFORE_RUN = "RequireAuthenticationBeforeRun";
 static const string gstrAUTO_CREATE_ACTIONS = "AutoCreateActions";
 static const string gstrSKIP_AUTHENTICATION_ON_MACHINES = "SkipAuthenticationOnMachines";
+static const string gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS = "ActionStatisticsUpdateFreqInSeconds";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

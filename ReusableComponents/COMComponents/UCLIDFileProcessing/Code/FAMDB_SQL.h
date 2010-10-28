@@ -38,18 +38,41 @@ static const string gstrCREATE_QUEUE_EVENT_CODE_TABLE = "CREATE TABLE [QueueEven
 
 static const string gstrCREATE_ACTION_STATISTICS_TABLE = "CREATE TABLE [ActionStatistics]("
 	"[ActionID] [int] NOT NULL CONSTRAINT [PK_Statistics] PRIMARY KEY CLUSTERED,"
-	"[NumDocuments] [int] NOT NULL CONSTRAINT [DF_Statistics_TotalDocuments]  DEFAULT ((0)),"
-	"[NumDocumentsComplete] [int] NOT NULL CONSTRAINT [DF_Statistics_ProcessedDocuments]  DEFAULT ((0)),"
+	"[LastUpdateTimeStamp] [datetime] NULL,"
+	"[NumDocuments] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_TotalDocuments]  DEFAULT ((0)),"
+	"[NumDocumentsPending] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_TotalDocumentsPending]  DEFAULT ((0)),"
+	"[NumDocumentsComplete] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_ProcessedDocuments]  DEFAULT ((0)),"
 	"[NumDocumentsFailed] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumDocumentsFailed]  DEFAULT ((0)),"
 	"[NumDocumentsSkipped] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumDocumentsSkipped] DEFAULT ((0)),"
 	"[NumPages] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumPages]  DEFAULT ((0)),"
+	"[NumPagesPending] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumPagesPending]  DEFAULT ((0)),"
 	"[NumPagesComplete] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumPagesComplete]  DEFAULT ((0)),"
 	"[NumPagesFailed] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumPagesFailed]  DEFAULT ((0)),"
 	"[NumPagesSkipped] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumPagesSkipped]  DEFAULT ((0)),"
 	"[NumBytes] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytes]  DEFAULT ((0)),"
+	"[NumBytesPending] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesPending]  DEFAULT ((0)),"
 	"[NumBytesComplete] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesComplete]  DEFAULT ((0)),"
 	"[NumBytesFailed] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesFailed]  DEFAULT ((0)),"
 	"[NumBytesSkipped] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesSkipped]  DEFAULT ((0)))";
+
+static const string gstrCREATE_ACTION_STATISTICS_DELTA_TABLE = "CREATE TABLE [ActionStatisticsDelta]("
+	"[ID] [bigint] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ActionStatisticsDelta] PRIMARY KEY CLUSTERED,"
+	"[ActionID] [int] NOT NULL,"
+	"[NumDocuments] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_TotalDocuments]  DEFAULT ((0)),"
+	"[NumDocumentsPending] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_TotalDocumentsPending]  DEFAULT ((0)),"
+	"[NumDocumentsComplete] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_ProcessedDocuments]  DEFAULT ((0)),"
+	"[NumDocumentsFailed] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumDocumentsFailed]  DEFAULT ((0)),"
+	"[NumDocumentsSkipped] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumDocumentsSkipped] DEFAULT ((0)),"
+	"[NumPages] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumPages]  DEFAULT ((0)),"
+	"[NumPagesPending] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumPagesPending]  DEFAULT ((0)),"
+	"[NumPagesComplete] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumPagesComplete]  DEFAULT ((0)),"
+	"[NumPagesFailed] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumPagesFailed]  DEFAULT ((0)),"
+	"[NumPagesSkipped] [int] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumPagesSkipped]  DEFAULT ((0)),"
+	"[NumBytes] [bigint] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumBytes]  DEFAULT ((0)),"
+	"[NumBytesPending] [bigint] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumBytesPending]  DEFAULT ((0)),"
+	"[NumBytesComplete] [bigint] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumBytesComplete]  DEFAULT ((0)),"
+	"[NumBytesFailed] [bigint] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumBytesFailed]  DEFAULT ((0)),"
+	"[NumBytesSkipped] [bigint] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumBytesSkipped]  DEFAULT ((0)))";
 
 static const string gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE  ="CREATE TABLE [FileActionStateTransition]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FileActionStateTransition] PRIMARY KEY CLUSTERED,"
@@ -215,7 +238,12 @@ static const string gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX =
 	"[IX_FileActionStatus_ActionID_ActionStatus] ON [dbo].[FileActionStatus] "
 	"([ActionID] ASC, [ActionStatus] ASC)";
 
-// Add foreign keys SQL
+static const string gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX =
+	"CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_ActionStatisticsDeltaActionID_ID] ON [dbo].[ActionStatisticsDelta] "
+	"([ActionID] ASC, [ID] ASC)";
+
+	// Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
 	"ALTER TABLE [ActionStatistics]  "
 	"WITH CHECK ADD CONSTRAINT [FK_Statistics_Action] FOREIGN KEY([ActionID]) "
@@ -429,6 +457,13 @@ static const string gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+static const string gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK = 
+	"ALTER TABLE [dbo].[ActionStatisticsDelta] "
+	"WITH CHECK ADD CONSTRAINT [FK_ActionStatisticsDelta_Action] FOREIGN KEY([ActionID]) "
+	"REFERENCES [dbo].[Action] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_QUERY = 
 	"SELECT LockID, UPI, LockTime, DATEDIFF(second, LockTime, GETDATE()) AS TimeLocked "
@@ -453,3 +488,115 @@ static const string gstrDELETE_OLD_INPUT_EVENT_RECORDS =
 	"DELETE FROM InputEvent WHERE DATEDIFF(d, GETDATE(), [TimeStamp]) > (SELECT COALESCE("
 	"(SELECT CAST([Value] AS int) FROM [DBInfo] WHERE [Name] = '"
 	+ gstrINPUT_EVENT_HISTORY_SIZE + "'), 30))";
+
+// Query to use to calclulate and insert a new ActionStatistics records for the ActionID = <ActionIDToRecreate>
+// the <ActionIDToRecreate> needs to be replaced with the action id to recreate.
+// NOTE: This query will throw and exception if the ActionStatistics record for that action id 
+//		 already exists.
+static const string gstrRECREATE_ACTION_STATISTICS_FOR_ACTION = 
+	"INSERT INTO ActionStatistics  "
+	"SELECT 	ActionID, "
+	"	GetDate() AS LastupdateTimeStamp, "
+	"	NumDocuments,  "
+	"	NumDocumentsPending,  "
+	"	NumDocumentsComplete,  "
+	"	NumDocumentsFailed, "
+	"	NumDocumentsSkipped, "
+	"	NumPages, "
+	"	NumPagesPending, "
+	"	NumPagesComplete, "
+	"	NumPagesFailed, "
+	"	NumPagesSkipped, "
+	"	NumBytes, "
+	"	NumBytesPending, "
+	"	NumBytesComplete, "
+	"	NumBytesFailed, "
+	"	NumBytesSkipped "
+	"FROM "
+	"(Select ActionID,  "
+	"	SUM(TotalDocuments) AS NumDocuments,  "
+	"	SUM(DocsPending) AS [NumDocumentsPending], "
+	"	SUM(DocsCompleted) AS [NumDocumentsComplete],  "
+	"	SUM(DocsFailed) AS [NumDocumentsFailed],  "
+	"	SUM(DocsSkipped) AS [NumDocumentsSkipped],  "
+	"	SUM(TotalPages) AS [NumPages], "
+	"	SUM(PagesPending) AS [NumPagesPending], "
+	"	SUM(PagesCompleted) AS [NumPagesComplete], "
+	"	SUM(PagesFailed) AS [NumPagesFailed],  "
+	"	SUM(PagesSkipped) AS [NumPagesSkipped], "
+	"	SUM(TotalSize) AS [NumBytes],	 "
+	"	SUM(BytesPending) AS [NumBytesPending], "
+	"	SUM(BytesCompleted) AS [NumBytesComplete],  "
+	"	SUM(BytesFailed) AS [NumBytesFailed], "
+	"	SUM(BytesSkipped) AS [NumBytesSkipped] "
+	"	 "
+	"From "
+	"(SELECT     Action.ID as ActionID, FileActionStatus.ActionStatus, SUM(COALESCE(FAMFile.FileSize,0)) AS TotalSize, SUM(COALESCE(FAMFile.Pages,0)) AS TotalPages,  "
+	"                      SUM(CASE WHEN FileActionStatus.FileID IS NULL THEN 0 ELSE 1 END) AS TotalDocuments, SUM(CASE WHEN ActionStatus = 'C' THEN 1 ELSE 0 END) AS DocsCompleted,  "
+	"                      SUM(CASE WHEN ActionStatus = 'F' THEN 1 ELSE 0 END) AS DocsFailed, SUM(CASE WHEN ActionStatus = 'S' THEN 1 ELSE 0 END) AS DocsSkipped,  "
+	"                      SUM(CASE WHEN ActionStatus = 'C' THEN COALESCE(FAMFile.Pages, 0) ELSE 0 END) AS PagesCompleted,  "
+	"                      SUM(CASE WHEN ActionStatus = 'F' THEN COALESCE(FAMFile.Pages, 0) ELSE 0 END) AS PagesFailed,  "
+	"                      SUM(CASE WHEN ActionStatus = 'S' THEN COALESCE(FAMFile.Pages, 0) ELSE 0 END) AS PagesSkipped,  "
+	"                      SUM(CASE WHEN ActionStatus = 'C' THEN COALESCE(FAMFile.FileSize, 0) ELSE 0 END) AS BytesCompleted,  "
+	"                      SUM(CASE WHEN ActionStatus = 'F' THEN COALESCE(FAMFile.FileSize, 0) ELSE 0 END) AS BytesFailed,  "
+	"                      SUM(CASE WHEN ActionStatus = 'S' THEN COALESCE(FAMFile.FileSize, 0) ELSE 0 END) AS BytesSkipped,  "
+	"                      SUM(CASE WHEN ActionStatus = 'P' THEN 1 ELSE 0 END) AS DocsPending, "
+	"                      SUM(CASE WHEN ActionStatus = 'P' THEN COALESCE(FAMFile.Pages, 0) ELSE 0 END) AS PagesPending, "
+	"                      SUM(CASE WHEN ActionStatus = 'P' THEN COALESCE(FAMFile.FileSize, 0) ELSE 0 END) AS BytesPending, "
+	"                      Action.ID AS ASAction "
+	"FROM         FileActionStatus INNER JOIN "
+	"                      FAMFile ON FileActionStatus.FileID = FAMFile.ID LEFT JOIN "
+	"                      ActionStatistics ON ActionStatistics.ActionID = FileActionStatus.ActionID RIGHT JOIN Action ON Action.ID = FileActionStatus.ActionID "
+	"WHERE     (ActionStatistics.ActionID IS NULL)  "
+	"GROUP BY Action.ID, FileActionStatus.ActionStatus, ActionStatistics.ActionID) as totals "
+	"GROUP BY ActionID) as NewStats "
+	"where ActionID = <ActionIDToRecreate> ";
+
+// Query to use to update the ActionStatistics table from the ActionStatisticsDelta table
+// There are to variables that need to be replaced:
+//		<LastDeltaID>	Should be replaced with the last record in the ActionStatisticsDelta table 
+//						that will be included in the update to the ActionStatistics
+//		<ActionIDToUpdate> Should be replaced with the ActionID that is being updated
+static const string gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA = 
+	"UPDATE ActionStatistics "
+	"	SET LastUpdateTimeStamp = GETDATE(),  "
+	"	[NumDocuments] = ActionStatistics.[NumDocuments] + Changes.[NumDocuments], "
+	"	[NumDocumentsPending] = ActionStatistics.[NumDocumentsPending] + Changes.[NumDocumentsPending], "
+	"	[NumDocumentsComplete] =  ActionStatistics.[NumDocumentsComplete] + Changes.[NumDocumentsComplete], "
+	"    [NumDocumentsFailed] =  ActionStatistics.[NumDocumentsFailed] + Changes.[NumDocumentsFailed], "
+	"    [NumDocumentsSkipped] =  ActionStatistics.[NumDocumentsSkipped] + Changes.[NumDocumentsSkipped], "
+	"    [NumPages] =  ActionStatistics.[NumPages] + Changes.[NumPages], "
+	"    [NumPagesPending] =  ActionStatistics.[NumPagesPending] + Changes.[NumPagesPending], "
+	"    [NumPagesComplete] =  ActionStatistics.[NumPagesComplete] + Changes.[NumPagesComplete], "
+	"    [NumPagesFailed] =  ActionStatistics.[NumPagesFailed] + Changes.[NumPagesFailed], "
+	"    [NumPagesSkipped] =  ActionStatistics.[NumPagesSkipped] + Changes.[NumPagesSkipped], "
+	"    [NumBytes] =  ActionStatistics.[NumBytes] + Changes.[NumBytes], "
+	"    [NumBytesPending] =  ActionStatistics.[NumBytesPending] + Changes.[NumBytesPending], "
+	"    [NumBytesComplete] =  ActionStatistics.[NumBytesComplete] + Changes.[NumBytesComplete], "
+	"    [NumBytesFailed] =  ActionStatistics.[NumBytesFailed] + Changes.[NumBytesFailed], "
+	"    [NumBytesSkipped] =  ActionStatistics.[NumBytesSkipped] + Changes.[NumBytesSkipped] "
+	"       "
+	"FROM        "
+	"(SELECT [ActionID] "
+	"      ,SUM([NumDocuments]) AS [NumDocuments] "
+	"      ,SUM([NumDocumentsPending]) AS [NumDocumentsPending] "
+	"      ,SUM([NumDocumentsComplete]) AS [NumDocumentsComplete] "
+	"      ,SUM([NumDocumentsFailed]) AS [NumDocumentsFailed] "
+	"      ,SUM([NumDocumentsSkipped]) AS [NumDocumentsSkipped] "
+	"      ,SUM([NumPages]) AS [NumPages] "
+	"      ,SUM([NumPagesPending]) AS [NumPagesPending] "
+	"      ,SUM([NumPagesComplete]) AS [NumPagesComplete] "
+	"      ,SUM([NumPagesFailed]) AS [NumPagesFailed] "
+	"      ,SUM([NumPagesSkipped]) AS [NumPagesSkipped] "
+	"      ,SUM([NumBytes]) AS [NumBytes] "
+	"      ,SUM([NumBytesPending]) AS [NumBytesPending] "
+	"      ,SUM([NumBytesComplete]) AS [NumBytesComplete] "
+	"      ,SUM([NumBytesFailed]) AS [NumBytesFailed] "
+	"      ,SUM([NumBytesSkipped]) AS [NumBytesSkipped] "
+	"  FROM [Demo_IDShield].[dbo].[ActionStatisticsDelta] "
+	"  WHERE  ID <= <LastDeltaID> "
+	"  GROUP BY ActionID) as Changes "
+	"  WHERE ActionStatistics.ActionID = <ActionIDToUpdate>";
+
+
+

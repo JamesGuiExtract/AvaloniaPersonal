@@ -34,6 +34,7 @@ const string gstrADMIN_USER = "admin";
 static const string gstrACTION = "Action";
 static const string gstrACTION_STATE = "ActionState";
 static const string gstrACTION_STATISTICS = "ActionStatistics";
+static const string gstrACTION_STATISTICS_DELTA = "ActionStatisticsDelta";
 static const string gstrDB_INFO = "DBInfo";
 static const string gstrFAM_FILE = "FAMFile";
 static const string gstrFILE_ACTION_STATE_TRANSITION = "FileActionStateTransition";
@@ -250,9 +251,6 @@ private:
 	// handle has been set.
 	void postStatusUpdateNotification(EDatabaseWrapperObjectStatus eStatus);
 
-	// map to keep the stats for each of the Action
-	map<long, UCLID_FILEPROCESSINGLib::IActionStatisticsPtr> m_mapActionIDtoStats;
-
 	// Member variable that contains the last read schema version. 0 indicates no version
 	int m_iDBSchemaVersion;
 
@@ -328,6 +326,9 @@ private:
 
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
+
+	// Number of Seconds between refreshing the ActionStatistics
+	long m_nActionStatisticsUpdateFreqInSeconds;
 
 	IMiscUtilsPtr m_ipMiscUtils;
 
@@ -492,15 +493,15 @@ private:
 		EActionStatus eToStatus, UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewRecord, 
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord, bool bUpdateAndSaveStats = true);
 					
-	// PROMISE: To load the current stats record from the db from ActionStatistics table using the
+	// PROMISE: To load the stats record from the db from ActionStatistics table using the
 	//			connection provided.
-	//			if a record does not exist one is created by running recalculate stats
-	//			the record will be placed in the m_mapActionIDtoStats
-	//			if recalculate is called this returns true
-	bool loadStats(_ConnectionPtr ipConnection, long nActionID);
-
-	// PROMISE: To save the current stats record to that db ActionStatistics table
-	void saveStats(_ConnectionPtr ipConnection, long nActionID);
+	//			if a record does not exist and bDBLocked is true, stats will be calculate stats for the action
+	//			if the statistics loaded are out of date and bDBLocked is true, stats will be updated
+	//			from the ActionStatisticsDelta table
+	//			if the bDBLocked is false and no record exists or stats are out of date an exception
+	//			will be thrown.
+	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr loadStats(_ConnectionPtr ipConnection, 
+		long nActionID, bool bDBLocked);
 
 	// Returns the DBSchemaVersion
 	int getDBSchemaVersion();
@@ -704,6 +705,10 @@ private:
 	// Returns recordset opened as static containing the status record the file with nFileID and 
 	// action nActionID. If the status is unattempted the recordset will be empty
 	_RecordsetPtr getFileActionStatusSet(_ConnectionPtr& ipConnection, long nFileID, long nActionID);
+
+	// Method to add the current records from the ActionStatisticsDelta table to the 
+	// ActionStatistics table
+	void updateActionStatisticsFromDelta(const _ConnectionPtr& ipConnection, const long nActionID);
 
 	void validateLicense();
 

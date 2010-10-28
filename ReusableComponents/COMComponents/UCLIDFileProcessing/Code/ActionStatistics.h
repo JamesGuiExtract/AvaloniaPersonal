@@ -74,14 +74,22 @@ public:
 	STDMETHOD(put_NumPagesSkipped)(long newVal);
 	STDMETHOD(get_NumBytesSkipped)(LONGLONG* pVal);
 	STDMETHOD(put_NumBytesSkipped)(LONGLONG newVal);
-	STDMETHOD(GetAllStatistics)(long *plNumDocs, long* plNumDocsComplete, long* plNumDocsFailed,
-		long* plNumDocsSkipped, long* plNumPages, long* plNumPagesComplete, long* plNumPagesFailed,
-		long* plNumPagesSkipped, LONGLONG* pllNumBytes, LONGLONG* pllNumBytesComplete,
+	STDMETHOD(get_NumDocumentsPending)(long *pVal);
+	STDMETHOD(put_NumDocumentsPending)(long newVal);
+	STDMETHOD(get_NumPagesPending)(long* pVal);
+	STDMETHOD(put_NumPagesPending)(long newVal);
+	STDMETHOD(get_NumBytesPending)(LONGLONG* pVal);
+	STDMETHOD(put_NumBytesPending)(LONGLONG newVal);
+	STDMETHOD(GetAllStatistics)(long *plNumDocs, long *plNumDocsPending, long* plNumDocsComplete, 
+		long* plNumDocsFailed, long* plNumDocsSkipped, long* plNumPages, long* plNumPagesPending, 
+		long* plNumPagesComplete, long* plNumPagesFailed, long* plNumPagesSkipped, 
+		LONGLONG* pllNumBytes, LONGLONG* pllNumBytesPending, LONGLONG* pllNumBytesComplete, 
 		LONGLONG* pllNumBytesFailed, LONGLONG* pllNumBytesSkipped);
-	STDMETHOD(SetAllStatistics)(long lNumDocs, long lNumDocsComplete, long lNumDocsFailed,
-		long lNumDocsSkipped, long lNumPages, long lNumPagesComplete, long lNumPagesFailed,
-		long lNumPagesSkipped, LONGLONG llNumBytes, LONGLONG llNumBytesComplete,
-		LONGLONG llNumBytesFailed, LONGLONG llNumBytesSkipped);
+	STDMETHOD(SetAllStatistics)(long lNumDocs, long lNumDocsPending, long lNumDocsComplete, 
+		long lNumDocsFailed, long lNumDocsSkipped, long lNumPages, long lNumPagesPending, 
+		long lNumPagesComplete, long lNumPagesFailed, long lNumPagesSkipped, LONGLONG llNumBytes, 
+		LONGLONG llNumBytesPending, LONGLONG llNumBytesComplete, LONGLONG llNumBytesFailed, 
+		LONGLONG llNumBytesSkipped);
 	STDMETHOD(GetTotals)(long* plNumDocs, long* plNumPages, LONGLONG* pllNumBytes);
 	STDMETHOD(SetTotals)(long lNumDocs, long lNumPages, LONGLONG llNumBytes);
 	STDMETHOD(GetComplete)(long* plNumDocsComplete, long* plNumPagesComplete,
@@ -94,6 +102,9 @@ public:
 	STDMETHOD(GetSkipped)(long* plNumDocsSkipped, long* plNumPagesSkipped,
 		LONGLONG* pllNumBytesSkipped);
 	STDMETHOD(SetSkipped)(long lNumDocsSkipped, long lNumPagesSkipped, LONGLONG llNumBytesSkipped);
+	STDMETHOD(GetPending)(long* plNumDocsPending, long* plNumPagesPending,
+		LONGLONG* pllNumBytesPending);
+	STDMETHOD(SetPending)(long lNumDocsPending, long lNumPagesPending, LONGLONG llNumBytesPending);
 	
 	// ICopyableObject Methods
 	STDMETHOD(raw_Clone)(IUnknown * * pObject);
@@ -101,14 +112,17 @@ public:
 
 private:
 	long m_nNumDocuments;
+	long m_nNumDocumentsPending;
 	long m_nNumDocumentsComplete;
 	long m_nNumDocumentsFailed;
 	long m_nNumDocumentsSkipped;
 	long m_nNumPages;
+	long m_nNumPagesPending;
 	long m_nNumPagesComplete;
 	long m_nNumPagesFailed;
 	long m_nNumPagesSkipped;
 	long long m_llNumBytes;
+	long long m_llNumBytesPending;
 	long long m_llNumBytesComplete;
 	long long m_llNumBytesFailed;
 	long long m_llNumBytesSkipped;

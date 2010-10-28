@@ -30,7 +30,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 101;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 102;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -180,7 +180,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			+ strActionID + " AS ActionID FROM FAMFile WHERE FAMFile.ID IN (" : "";
 
 		// Reload the action statistics from the database
-		loadStats(ipConnection, nActionID);
+		//loadStats(ipConnection, nActionID);
 
 		// Execute the queries in groups of 10000 File IDs
 		size_t i=0;
@@ -232,9 +232,6 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				executeCmdQuery(ipConnection, strInsertIntoFAS + strFileIdList);
 			}
 		}
-
-		// Done setting all file states and updating statistics, push to the database now
-		saveStats(ipConnection, nActionID);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30295");
 }
@@ -933,140 +930,21 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 {
 	// Get the name of the action for the ID
 	string strActionName = getActionName(ipConnection, nActionID);	
+	string strActionID = asString(nActionID);
 
-	// Setup SQL string to calculate totals for each of the Action Types
-	string strCalcSQL = "SELECT COUNT(ID) AS NumDocs, ActionStatus" 
-		", SUM(FileSize) AS SumOfFileSize, SUM(Pages) AS SumOfPages FROM FAMFile "
-		" INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND "
-		" FileActionStatus.ActionID = " + asString(nActionID) +
-		" GROUP BY ActionStatus";
+	// Delete existing stats for action
+	string strDeleteExistingStatsSQL = "DELETE FROM ActionStatistics WHERE ActionID = " + strActionID;
+	executeCmdQuery(ipConnection, strDeleteExistingStatsSQL);
 
-	// Create a pointer to a recordset
-	_RecordsetPtr ipCalcStatsSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI30396", ipCalcStatsSet != NULL);
+	// Set up the query to recreate the statistics
+	string strCreateActionStatsSQL = gstrRECREATE_ACTION_STATISTICS_FOR_ACTION;
+	replaceVariable(strCreateActionStatsSQL, "<ActionIDToRecreate>", strActionID);
 
-	// Open the Calc set table in the database
-	ipCalcStatsSet->Open(strCalcSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
-		adOpenDynamic, adLockOptimistic, adCmdText);
+	// Recreate the statistics
+	executeCmdQuery(ipConnection, strCreateActionStatsSQL);
 
-	// Create a pointer to a recordset
-	_RecordsetPtr ipActionStats(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI30397", ipActionStats != NULL);
-
-	// Select the existing Statistics record if it exists
-	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
-
-	// Open the recordse to for the statisics with the record for ActionID if it exists
-	ipActionStats->Open(strSelectStat.c_str(), _variant_t((IDispatch *)ipConnection, true), 
-		adOpenDynamic, adLockOptimistic, adCmdText);
-
-	FieldsPtr ipActionFields = NULL;
-
-	// If no records in the data set then will need create a new record
-	if (ipActionStats->adoEOF == VARIANT_TRUE)
-	{
-		// Create new record
-		ipActionStats->AddNew();
-
-		// Get the fields from the new record
-		ipActionFields = ipActionStats->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI30398", ipActionFields != NULL);
-
-		//  Set Action ID
-		setLongField(ipActionFields, "ActionID", nActionID);
-	}
-	else
-	{
-		// Get the action fields
-		ipActionFields = ipActionStats->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI30399", ipActionFields != NULL);
-	}
-
-	// Initialize totals
-	long lTotalDocs = 0;
-	long lTotalPages = 0;
-	long long llTotalBytes = 0;
-
-	long lNumDocsFailed = 0;
-	long lNumPagesFailed = 0;
-	long long llNumBytesFailed = 0;
-
-	long lNumDocsCompleted = 0;
-	long lNumPagesCompleted = 0;
-	long long llNumBytesCompleted = 0;
-
-	long lNumDocsSkipped = 0;
-	long lNumPagesSkipped = 0;
-	long long llNumBytesSkipped = 0;
-
-	// Go thru each of the records in the Calculation set
-	while (ipCalcStatsSet->adoEOF == VARIANT_FALSE)
-	{
-		// Get the fields from the calc stat set
-		FieldsPtr ipCalcFields = ipCalcStatsSet->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI30400", ipCalcFields != NULL);
-
-		// Get the action state
-		string strActionState = getStringField(ipCalcFields, "ActionStatus"); 
-
-		long lNumDocs = getLongField(ipCalcFields, "NumDocs");
-		long lNumPages = getLongField(ipCalcFields, "SumOfPages");
-		long long llNumBytes = getLongLongField(ipCalcFields, "SumOfFileSize");
-
-		// Set the sums to the appropriate statistics property
-		if (strActionState == "F")
-		{
-			// Set Failed totals
-			lNumDocsFailed = lNumDocs;
-			lNumPagesFailed = lNumPages;
-			llNumBytesFailed = llNumBytes;
-		}
-		else if (strActionState == "C")
-		{
-			// Set Completed totals
-			lNumDocsCompleted = lNumDocs;
-			lNumPagesCompleted = lNumPages;
-			llNumBytesCompleted = llNumBytes;
-		}
-		else if (strActionState == "S")
-		{
-			// Set Skipped totals
-			lNumDocsSkipped = lNumDocs;
-			lNumPagesSkipped = lNumPages;
-			llNumBytesSkipped = llNumBytes;
-		}
-
-		// All values are added to the Totals
-		lTotalDocs += lNumDocs;
-		lTotalPages += lNumPages;
-		llTotalBytes += llNumBytes;
-
-		// Move to next record
-		ipCalcStatsSet->MoveNext();
-	}
-
-	// Set Failed totals
-	setLongField(ipActionFields, "NumDocumentsFailed", lNumDocsFailed);
-	setLongField(ipActionFields, "NumPagesFailed", lNumPagesFailed);
-	setLongLongField(ipActionFields, "NumBytesFailed", llNumBytesFailed);
-
-	// Set Completed totals
-	setLongField(ipActionFields, "NumDocumentsComplete", lNumDocsCompleted);
-	setLongField(ipActionFields, "NumPagesComplete", lNumPagesCompleted);
-	setLongLongField(ipActionFields, "NumBytesComplete", llNumBytesCompleted);
-
-	// Set Skipped totals
-	setLongField(ipActionFields, "NumDocumentsSkipped", lNumDocsSkipped);
-	setLongField(ipActionFields, "NumPagesSkipped", lNumPagesSkipped);
-	setLongLongField(ipActionFields, "NumBytesSkipped", llNumBytesSkipped);
-
-	// Save totals in the ActionStatistics table
-	setLongField(ipActionFields, "NumDocuments", lTotalDocs);
-	setLongField(ipActionFields, "NumPages", lTotalPages);
-	setLongLongField(ipActionFields, "NumBytes", llTotalBytes);
-
-	// Update the record
-	ipActionStats->Update();
+	// need to delete the records in the delta since they have been included in the total
+	executeCmdQuery(ipConnection, "DELETE FROM ActionStatisticsDelta WHERE ActionID = " + strActionID);
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::dropTables(bool bRetainUserTables)
@@ -1141,7 +1019,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX);
-		
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_TABLE);
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
+
 		// Only create the login table if it does not already exist
 		if (!doesTableExist(getDBConnection(), "Login"))
 		{
@@ -1181,6 +1061,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
 		vecQueries.push_back(gstrADD_ACTION_PROCESSINGFAM_FK);
+		vecQueries.push_back(gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1319,6 +1200,11 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 			// Add Skip Authentication For Services On Machines
 			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 				+ gstrSKIP_AUTHENTICATION_ON_MACHINES + "', '')";
+			vecQueries.push_back(strSQL);
+			
+			// Add ActionStatisticsUpdateFreqInSeconds setting default to 5
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS + "', '5')";
 			vecQueries.push_back(strSQL);
 		}
 
@@ -1472,129 +1358,123 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 			return;
 		}
 	}
+	
+	// Initialize the differences
+	long lNumDocsTotal(0), lNumPagesTotal(0);
+	LONGLONG llNumBytesTotal(0);
+	long lNumDocsFailed(0), lNumPagesFailed(0);
+	LONGLONG llNumBytesFailed(0);
+	long lNumDocsComplete(0), lNumPagesComplete(0);
+	LONGLONG llNumBytesComplete(0);
+	long lNumDocsSkipped(0), lNumPagesSkipped(0);
+	LONGLONG llNumBytesSkipped(0);
+	long lNumDocsPending(0), lNumPagesPending(0);
+	LONGLONG llNumBytesPending(0);
 
-	// load the record from the ActionStatistics table
-	if (bUpdateAndSaveStats)
-	{
-		if (loadStats(ipConnection, nActionID))
-		{
-			// if the stats were recalculated the all added on changed records have been included
-			return;
-		}
-	}
-
-	// Create an ActionStatistics pointer to return the values
-	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats;
-	ipActionStats = m_mapActionIDtoStats[nActionID];
-
-	// Transfer the data from the recordset to the ActionStatisticsPtr
+	// get the changes for the Delta record
 	switch (eToStatus)
 	{
 	case kActionFailed:
 		{
-			// Make sure the ipNewRecord is not NULL
-			ASSERT_ARGUMENT("ELI17046", ipNewRecord != NULL);
-			long lNumDocsFailed(0), lNumPagesFailed(0);
-			LONGLONG llNumBytesFailed(0);
-			ipActionStats->GetFailed(&lNumDocsFailed, &lNumPagesFailed, &llNumBytesFailed);
-			ipActionStats->SetFailed(lNumDocsFailed+1, lNumPagesFailed + lNewPages,
-				llNumBytesFailed + llNewFileSize);
+			lNumDocsFailed++;
+			lNumPagesFailed += lNewPages;
+			llNumBytesFailed += llNewFileSize;
 			break;
 		}
 
 	case kActionCompleted:
 		{
-			// Make sure the ipNewRecord is not NULL
-			ASSERT_ARGUMENT("ELI17048", ipNewRecord != NULL);
-			long lNumDocsComplete(0), lNumPagesComplete(0);
-			LONGLONG llNumBytesComplete(0);
-			ipActionStats->GetComplete(&lNumDocsComplete, &lNumPagesComplete, &llNumBytesComplete);
-			ipActionStats->SetComplete(lNumDocsComplete+1, lNumPagesComplete + lNewPages,
-				llNumBytesComplete + llNewFileSize);
+			lNumDocsComplete++;
+			lNumPagesComplete += lNewPages;
+			llNumBytesComplete += llNewFileSize;
 			break;
 		}
 
 	case kActionSkipped:
 		{
-			// Make sure the ipNewRecord is not NULL
-			ASSERT_ARGUMENT("ELI26803", ipNewRecord != NULL);
-			long lNumDocsSkipped(0), lNumPagesSkipped(0);
-			LONGLONG llNumBytesSkipped(0);
-			ipActionStats->GetSkipped(&lNumDocsSkipped, &lNumPagesSkipped, &llNumBytesSkipped);
-			ipActionStats->SetSkipped(lNumDocsSkipped+1, lNumPagesSkipped + lNewPages,
-				llNumBytesSkipped + llNewFileSize);
+			lNumDocsSkipped++;
+			lNumPagesSkipped += lNewPages;
+			llNumBytesSkipped += llNewFileSize;
 			break;
 		}
+	case kActionPending:
+		{
+			lNumDocsPending++;
+			lNumPagesPending += lNewPages;
+			llNumBytesPending += llNewFileSize;
+			break;
+		}			
 	}
 	// Add the new counts to the totals if the to status is not unattempted
 	if (eToStatus != kActionUnattempted)
 	{
-		// Make sure the ipNewRecord is not NULL
-		ASSERT_ARGUMENT("ELI17050", ipNewRecord != NULL);
-		long lNumDocsTotal(0), lNumPagesTotal(0);
-		LONGLONG llNumBytesTotal(0);
-		ipActionStats->GetTotals(&lNumDocsTotal, &lNumPagesTotal, &llNumBytesTotal);
-		ipActionStats->SetTotals(lNumDocsTotal+1, lNumPagesTotal + lNewPages,
-			llNumBytesTotal + llNewFileSize);
+		lNumDocsTotal++;
+		lNumPagesTotal += lNewPages;
+		llNumBytesTotal += llNewFileSize;
 	}
 
 	switch (eFromStatus)
 	{
 	case kActionFailed:
 		{
-			// Make sure the ipOldRecord is not NULL
-			ASSERT_ARGUMENT("ELI17052", ipOldRecord != NULL);
-			long lNumDocsFailed(0), lNumPagesFailed(0);
-			LONGLONG llNumBytesFailed(0);
-			ipActionStats->GetFailed(&lNumDocsFailed, &lNumPagesFailed, &llNumBytesFailed);
-			ipActionStats->SetFailed(lNumDocsFailed-1, lNumPagesFailed - lOldPages,
-				llNumBytesFailed - llOldFileSize);
+			lNumDocsFailed--;
+			lNumPagesFailed -= lOldPages;
+			llNumBytesFailed -= llOldFileSize;
 			break;
 		}
 
 	case kActionCompleted:
 		{
-			// Make sure the ipOldRecord is not NULL
-			long lNumDocsComplete(0), lNumPagesComplete(0);
-			LONGLONG llNumBytesComplete(0);
-			ipActionStats->GetComplete(&lNumDocsComplete, &lNumPagesComplete, &llNumBytesComplete);
-			ipActionStats->SetComplete(lNumDocsComplete-1, lNumPagesComplete - lOldPages,
-				llNumBytesComplete - llOldFileSize);
+			lNumDocsComplete--;
+			lNumPagesComplete -= lOldPages;
+			llNumBytesComplete -= llOldFileSize;
 			break;
 		}
 
 	case kActionSkipped:
 		{
-			// Make sure the ipOldRecord is not NULL
-			ASSERT_ARGUMENT("ELI17053", ipOldRecord != NULL);
-			long lNumDocsSkipped(0), lNumPagesSkipped(0);
-			LONGLONG llNumBytesSkipped(0);
-			ipActionStats->GetSkipped(&lNumDocsSkipped, &lNumPagesSkipped, &llNumBytesSkipped);
-			ipActionStats->SetSkipped(lNumDocsSkipped-1, lNumPagesSkipped - lOldPages,
-				llNumBytesSkipped - llOldFileSize);
+			lNumDocsSkipped--;
+			lNumPagesSkipped -= lOldPages;
+			llNumBytesComplete -= llOldFileSize;
+			break;
+		}
+	case kActionPending:
+		{
+			lNumDocsPending--;
+			lNumPagesPending -= lOldPages;
+			llNumBytesPending -= llOldFileSize;
 			break;
 		}
 	}
 
-	// Remove the counts form the totals if the from status is not unattempted
+	// Remove the counts from the totals if the from status is not unattempted
 	if (eFromStatus != kActionUnattempted)
 	{
-		// Make sure the ipOldRecord is not NULL
-		ASSERT_ARGUMENT("ELI17055", ipOldRecord != NULL);
-		long lNumDocsTotal(0), lNumPagesTotal(0);
-		LONGLONG llNumBytesTotal(0);
-		ipActionStats->GetTotals(&lNumDocsTotal, &lNumPagesTotal, &llNumBytesTotal);
-		ipActionStats->SetTotals(lNumDocsTotal-1, lNumPagesTotal - lOldPages,
-			llNumBytesTotal - llOldFileSize);
+		lNumDocsTotal--;
+		lNumPagesTotal -= lOldPages;
+		llNumBytesTotal -= llOldFileSize;
 	}
 
-	if (bUpdateAndSaveStats)
-	{
-		saveStats(ipConnection, nActionID);
-	}
+	// need to add the delta record with to ActionStatisticsDelta table
+	string strAddDeltaSQL;
+	strAddDeltaSQL = "INSERT INTO ActionStatisticsDelta (ActionID, NumDocuments, " 
+		"NumDocumentsPending, NumDocumentsComplete, NumDocumentsFailed, NumDocumentsSkipped, " 
+		"NumPages, NumPagesPending, NumPagesComplete, NumPagesFailed, NumPagesSkipped, " 
+		"NumBytes, NumBytesPending, NumBytesComplete, NumBytesFailed, NumBytesSkipped ) "
+		"VALUES (" + asString(nActionID) + ", " + asString(lNumDocsTotal) + ", " + 
+		asString(lNumDocsPending) + ", " + asString(lNumDocsComplete) + ", " + 
+		asString(lNumDocsFailed) + ", " + asString(lNumDocsSkipped) + ", " + 
+		asString(lNumPagesTotal) + ", " + asString(lNumPagesPending) + ", " + 
+		asString(lNumPagesComplete) + ", " + asString(lNumPagesFailed) + ", " + 
+		asString(lNumPagesSkipped) + ", " +	asString(llNumBytesTotal) + ", " + 
+		asString(llNumBytesPending) + ", " + asString(llNumBytesComplete) + ", " + 
+		asString(llNumBytesFailed) + ", " +	asString(llNumBytesSkipped) + ")";
+
+	executeCmdQuery(ipConnection, strAddDeltaSQL); 
 }
 //--------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, long nActionID)
+UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, 
+	long nActionID, bool bDBLocked)
 {
 	// Create a pointer to a recordset
 	_RecordsetPtr ipActionStatSet(__uuidof(Recordset));
@@ -1603,17 +1483,26 @@ bool CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, long nActionID)
 	// Select the existing Statistics record if it exists
 	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
 
-	// Open the recordse to for the statisics with the record for ActionID if it exists
+	// Open the recordset for the statisics with the record for ActionID if it exists
 	ipActionStatSet->Open(strSelectStat.c_str(), 
 		_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
 		adLockOptimistic, adCmdText);
 
 	bool bRecalculated = false;
-	if (ipActionStatSet->adoEOF == VARIANT_TRUE)
+	if (asCppBool(ipActionStatSet->adoEOF))
 	{
-		reCalculateStats(ipConnection, nActionID);
-		bRecalculated = true;
-		ipActionStatSet->Requery(adOptionUnspecified);
+		if (bDBLocked)
+		{
+			reCalculateStats(ipConnection, nActionID);
+			bRecalculated = true;
+			ipActionStatSet->Requery(adOptionUnspecified);
+		}
+		else
+		{
+			UCLIDException ue("ELI30976", "DB needs to be locked to calculate stats.");
+			ue.addDebugInfo("ActionID", nActionID);
+			throw ue;
+		}
 	}
 	if (ipActionStatSet->adoEOF == VARIANT_TRUE)
 	{
@@ -1630,6 +1519,32 @@ bool CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, long nActionID)
 	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats(CLSID_ActionStatistics);
 	ASSERT_RESOURCE_ALLOCATION("ELI14101", ipActionStats != NULL);
 
+	// Check the last updated time stamp 
+	CTime timeCurrent = getSQLServerDateTimeAsCTime(ipConnection);
+
+	CTime timeLastUpdated = getTimeDateField(ipFields, "LastUpdateTimeStamp");
+
+	CTimeSpan ts = timeCurrent - timeLastUpdated;
+	if ( ts.GetTotalSeconds() > m_nActionStatisticsUpdateFreqInSeconds)
+	{
+		if (bDBLocked)
+		{
+			// Need to update the ActionStatistics from the Delta table
+			updateActionStatisticsFromDelta(ipConnection, nActionID);
+		}
+		else
+		{
+			UCLIDException  ue("ELI30977", "DB needs to be locked to update stats.");
+			ue.addDebugInfo("ActionID", nActionID);
+			throw ue;
+		}
+	}
+
+	ipActionStatSet->Requery(adOptionUnspecified);
+
+	ipFields = ipActionStatSet->Fields;
+	ASSERT_RESOURCE_ALLOCATION("ELI30751", ipFields != NULL);
+
 	// Get all the data from the recordset
 	long lNumDocsFailed =  getLongField(ipFields, "NumDocumentsFailed");
 	long lNumPagesFailed = getLongField(ipFields, "NumPagesFailed");
@@ -1643,80 +1558,18 @@ bool CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, long nActionID)
 	long lNumDocs = getLongField(ipFields, "NumDocuments");
 	long lNumPages = getLongField(ipFields, "NumPages");
 	LONGLONG llNumBytes = getLongLongField(ipFields, "NumBytes");
+	long lNumDocsPending = getLongField(ipFields, "NumDocumentsPending");
+	long lNumPagesPending = getLongField(ipFields, "NumPagesPending");
+	LONGLONG llNumBytesPending = getLongLongField(ipFields, "NumBytesPending");
 
 	// Transfer the data from the recordset to the ActionStatisticsPtr
-	ipActionStats->SetAllStatistics(lNumDocs, lNumDocsComplete, lNumDocsFailed, lNumDocsSkipped,
-		lNumPages, lNumPagesComplete, lNumPagesFailed, lNumPagesSkipped, llNumBytes,
-		llNumBytesComplete, llNumBytesFailed, llNumBytesSkipped);
+	ipActionStats->SetAllStatistics(lNumDocs, lNumDocsPending, lNumDocsComplete, lNumDocsFailed, 
+		lNumDocsSkipped, lNumPages, lNumPagesPending, lNumPagesComplete, lNumPagesFailed, 
+		lNumPagesSkipped, llNumBytes, llNumBytesPending, llNumBytesComplete, llNumBytesFailed, 
+		llNumBytesSkipped);
 
-	// save the stats back to the map
-	m_mapActionIDtoStats[nActionID] = ipActionStats;
-	return bRecalculated;
-}
-//--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::saveStats(_ConnectionPtr ipConnection, long nActionID)
-{
-	// Find the stats for the given action
-	map<long, UCLID_FILEPROCESSINGLib::IActionStatisticsPtr>::iterator it =
-		m_mapActionIDtoStats.find(nActionID);
-	if (it == m_mapActionIDtoStats.end())
-	{
-		UCLIDException ue("ELI14104", "No Statistics to save.");
-		ue.addDebugInfo("ActionID", nActionID);
-		throw ue;
-	}
-
-	// Create a pointer to a recordset
-	_RecordsetPtr ipActionStatSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI19506", ipActionStatSet != NULL);
-
-	// Select the existing Statistics record if it exists
-	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
-
-	// Open the recordse to for the statisics with the record for ActionID if it exists
-	ipActionStatSet->Open(strSelectStat.c_str(), _variant_t((IDispatch *)ipConnection, true), 
-		adOpenDynamic, adLockOptimistic, adCmdText);
-
-	if (ipActionStatSet->adoEOF == VARIANT_FALSE)
-	{
-		// Create an ActionStatistics pointer to return the values
-		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats = it->second;
-
-		// Get all the statistics
-		long lNumDocs(-1), lNumDocsComplete(-1), lNumDocsFailed(-1), lNumDocsSkipped(-1),
-			lNumPages(-1), lNumPagesComplete(-1), lNumPagesFailed(-1), lNumPagesSkipped(-1);
-		LONGLONG llNumBytes(-1), llNumBytesComplete(-1), llNumBytesFailed(-1), llNumBytesSkipped(-1);
-		ipActionStats->GetAllStatistics(&lNumDocs, &lNumDocsComplete, &lNumDocsFailed,
-			&lNumDocsSkipped, &lNumPages, &lNumPagesComplete, &lNumPagesFailed, &lNumPagesSkipped,
-			&llNumBytes, &llNumBytesComplete, &llNumBytesFailed, &llNumBytesSkipped);
-
-		// Get the fields from the action stat set
-		FieldsPtr ipFields = ipActionStatSet->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI26877", ipFields != NULL);
-
-		// Transfer the data from the ActionStatisticsPtr to the recordset 
-		setLongField(ipFields, "NumDocumentsFailed", lNumDocsFailed);
-		setLongField(ipFields, "NumPagesFailed", lNumPagesFailed);
-		setLongLongField(ipFields, "NumBytesFailed", llNumBytesFailed);
-		setLongField(ipFields, "NumDocumentsComplete", lNumDocsComplete);
-		setLongField(ipFields, "NumPagesComplete", lNumPagesComplete);
-		setLongLongField(ipFields, "NumBytesComplete", llNumBytesComplete);
-		setLongField(ipFields, "NumDocumentsSkipped", lNumDocsSkipped);
-		setLongField(ipFields, "NumPagesSkipped", lNumPagesSkipped);
-		setLongLongField(ipFields, "NumBytesSkipped", llNumBytesSkipped);
-		setLongField(ipFields, "NumDocuments", lNumDocs);
-		setLongField(ipFields, "NumPages", lNumPages);
-		setLongLongField(ipFields, "NumBytes", llNumBytes);
-
-		// Update the action statistics
-		ipActionStatSet->Update();
-	}
-	else
-	{
-		UCLIDException uex("ELI26876", "Action statistics do not exist for this action!");
-		uex.addDebugInfo("Action ID", nActionID);
-		throw uex;
-	}
+	// Return the ActionStats pointer,
+	return ipActionStats;
 }
 //--------------------------------------------------------------------------------------------------
 int CFileProcessingDB::getDBSchemaVersion()
@@ -2172,6 +2025,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrACTION);
 	vecTables.push_back(gstrACTION_STATE);
 	vecTables.push_back(gstrACTION_STATISTICS);
+	vecTables.push_back(gstrACTION_STATISTICS_DELTA);
 	vecTables.push_back(gstrDB_INFO);
 	vecTables.push_back(gstrFAM_FILE);
 	vecTables.push_back(gstrFILE_ACTION_STATE_TRANSITION);
@@ -2383,6 +2237,10 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							_lastCodePos = "200";
 
 							m_strAutoRevertNotifyEmailList = getStringField(ipFields, "Value");
+						}
+						else if (strValue == gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS)
+						{
+							m_nActionStatisticsUpdateFreqInSeconds = asLong(getStringField(ipFields, "Value"));
 						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
@@ -3497,6 +3355,10 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 
 				// Update the FileActionStatus table
 				executeCmdQuery(ipConnection, strSQL);
+
+				// Update the Statistics
+				updateStats(ipConnection, nActionID, asEActionStatus(strFileFromState), 
+					kActionProcessing, ipFileRecord, ipFileRecord);
 				
 				strFileIDIn += strFileID;
 
@@ -3704,3 +3566,59 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction()
 		throw ue;
 	}
 }
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::updateActionStatisticsFromDelta(const _ConnectionPtr& ipConnection, const long nActionID)
+{
+	// Get the current last record id from the ActionStatisticsDelta table for the ActionID
+	string strActionID = asString(nActionID);
+	string strActionStatisticsDeltaSQL = 
+		"SELECT COALESCE(MAX(ID),0) AS LastDeltaID FROM ActionStatisticsDelta where ActionID = " + strActionID;
+	_RecordsetPtr ipActionStatisticsDeltaSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI30749", ipActionStatisticsDeltaSet != NULL);
+
+	// Open the set that will give the last id in the delta table for the action
+	ipActionStatisticsDeltaSet->Open(strActionStatisticsDeltaSQL.c_str(),
+		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
+
+	// Since the query for the set uses a Aggregate function (MAX) there should always
+	// be at least one record if not there there is a problem
+	if (asCppBool(ipActionStatisticsDeltaSet->adoEOF))
+	{
+		UCLIDException ue("ELI30774", "No records found.");
+		ue.addDebugInfo("ActionID", nActionID);
+		throw ue;
+	}
+
+	// get the fields
+	FieldsPtr ipFields = ipActionStatisticsDeltaSet->Fields;
+	ASSERT_RESOURCE_ALLOCATION("ELI30750", ipFields != NULL);
+
+	// Get the last delta id to update ( need this so we know what to remove for Delta table
+	LONGLONG llLastDeltaID = getLongLongField(ipFields, "LastDeltaID");
+
+	// IF the nLastDeltaID is 0 then there are not records in the delta table for the Action
+	if (llLastDeltaID == 0)
+	{
+		// No Delta records so just update the time stamp
+		string strUpdateTimeStamp = "UPDATE ActionStatistics SET [LastUpdateTimeStamp] = GetDate() "
+			"WHERE ActionID = " + strActionID;
+		executeCmdQuery (ipConnection, strUpdateTimeStamp);
+		return;
+	}
+
+	string strLastDeltaID = asString(llLastDeltaID);
+
+	// Build update query
+	string strUpdateActionStatistics = gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA;
+	replaceVariable(strUpdateActionStatistics, "<LastDeltaID>", strLastDeltaID);
+	replaceVariable(strUpdateActionStatistics, "<ActionIDToUpdate>", strActionID);
+
+	// Update the ActionStatistics table
+	executeCmdQuery(ipConnection, strUpdateActionStatistics);
+	
+	// Delete the ActionStatisticsDelta records that have just been updated
+	string strDeleteActionStatisticsDelta = "DELETE FROM ActionStatisticsDelta WHERE ActionID = " + 
+		strActionID + " AND ID <= " + strLastDeltaID;
+	executeCmdQuery(ipConnection, strDeleteActionStatisticsDelta);
+}
+//-------------------------------------------------------------------------------------------------

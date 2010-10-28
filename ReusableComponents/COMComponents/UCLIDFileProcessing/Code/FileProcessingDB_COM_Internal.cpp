@@ -1352,23 +1352,17 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID, IActio
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
-
+				
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
-				// Load stats from DB
-				loadStats(ipConnection, nActionID);
+				// return a new object with the statistics
+				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =  
+					loadStats(ipConnection, nActionID, bDBLocked);
+				ASSERT_RESOURCE_ALLOCATION("ELI14107", ipActionStats != NULL);
 
 				// Commit any changes (could have recreated the stats)
 				tg.CommitTrans();
-
-				// Create an ActionStatistics pointer to return the values
-				ICopyableObjectPtr ipCopyObj = m_mapActionIDtoStats[nActionID];
-				ASSERT_RESOURCE_ALLOCATION("ELI14633", ipCopyObj != NULL);
-
-				// return a new object with the statistics
-				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =  ipCopyObj->Clone();
-				ASSERT_RESOURCE_ALLOCATION("ELI14107", ipActionStats != NULL);
 
 				// Return the value
 				*pStats = (IActionStatistics *)ipActionStats.Detach();
