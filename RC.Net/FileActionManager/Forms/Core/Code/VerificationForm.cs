@@ -291,8 +291,7 @@ namespace Extract.FileActionManager.Forms
 
                     // Now request the lock for the verification UI thread again, but this time
                     // block until it is available.
-                    Monitor.Enter(_lock);
-                    haveLock = true;
+                    Monitor.Enter(_lock, ref haveLock);
                 }
 
                 _fileLoadedEvent.Reset();
