@@ -105,6 +105,10 @@
     <Compile Include="BetterComboBox.Designer.cs">
       <DependentUpon>BetterComboBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="BetterDataGridViewRow.cs" />
+    <Compile Include="BetterDataGridViewRow.Designer.cs">
+      <DependentUpon>BetterDataGridViewRow.cs</DependentUpon>
+    </Compile>
     <Compile Include="BetterProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>

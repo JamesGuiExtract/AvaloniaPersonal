@@ -33,12 +33,6 @@
                     _endRefreshThread.Dispose();
                     _endRefreshThread = null;
                 }
-                if (_rowsAndControllers != null)
-                {
-                    Extract.Utilities.CollectionMethods.ClearAndDispose(
-                        _rowsAndControllers);
-                    _rowsAndControllers = null;
-                }
                 if (_formStateManager != null)
                 {
                     _formStateManager.Dispose();
@@ -72,6 +66,7 @@
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -117,7 +112,7 @@
             // _toolStripContainer.ContentPanel
             // 
             this._toolStripContainer.ContentPanel.Controls.Add(this._machineListGridView);
-            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(742, 264);
+            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(742, 303);
             this._toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this._toolStripContainer.Name = "_toolStripContainer";
@@ -134,6 +129,7 @@
             // _machineListGridView
             // 
             this._machineListGridView.AllowUserToAddRows = false;
+            this._machineListGridView.AllowUserToResizeRows = false;
             this._machineListGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
@@ -170,10 +166,12 @@
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._machineListGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this._machineListGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this._machineListGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this._machineListGridView.Size = new System.Drawing.Size(742, 264);
+            this._machineListGridView.Size = new System.Drawing.Size(742, 303);
             this._machineListGridView.TabIndex = 0;
             this._machineListGridView.SelectionChanged += new System.EventHandler(this.HandleMachineGridViewSelectionChanged);
+            this._machineListGridView.DoubleClick += new System.EventHandler(this.HandleMachineGridViewRowDoubleClick);
             // 
             // MachineColumn
             // 
@@ -235,6 +233,7 @@
             this._fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._openToolStripMenuItem,
             this._saveToolStripMenuItem,
+            this._saveAsToolStripMenuItem,
             this.toolStripSeparator2,
             this._exitToolStripMenuItem});
             this._fileToolStripMenuItem.Name = "_fileToolStripMenuItem";
@@ -244,26 +243,36 @@
             // _openToolStripMenuItem
             // 
             this._openToolStripMenuItem.Name = "_openToolStripMenuItem";
-            this._openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+            this._openToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this._openToolStripMenuItem.Text = "&Open...";
             this._openToolStripMenuItem.Click += new System.EventHandler(this.HandleOpenFileClick);
             // 
             // _saveToolStripMenuItem
             // 
             this._saveToolStripMenuItem.Name = "_saveToolStripMenuItem";
-            this._saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this._saveToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this._saveToolStripMenuItem.Text = "&Save...";
             this._saveToolStripMenuItem.Click += new System.EventHandler(this.HandleSaveFileClick);
+            // 
+            // _saveAsToolStripMenuItem
+            // 
+            this._saveAsToolStripMenuItem.Name = "_saveAsToolStripMenuItem";
+            this._saveAsToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this._saveAsToolStripMenuItem.Text = "Save &As...";
+            this._saveAsToolStripMenuItem.Click += new System.EventHandler(this.HandleSaveAsClick);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(160, 6);
             // 
             // _exitToolStripMenuItem
             // 
             this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
-            this._exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+            this._exitToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this._exitToolStripMenuItem.Text = "E&xit";
             this._exitToolStripMenuItem.Click += new System.EventHandler(this.HandleExitMenuItemClick);
             // 
@@ -278,7 +287,7 @@
             // _aboutFamNetworkManagerMenuItem
             // 
             this._aboutFamNetworkManagerMenuItem.Name = "_aboutFamNetworkManagerMenuItem";
-            this._aboutFamNetworkManagerMenuItem.Size = new System.Drawing.Size(126, 22);
+            this._aboutFamNetworkManagerMenuItem.Size = new System.Drawing.Size(152, 22);
             this._aboutFamNetworkManagerMenuItem.Text = "&About...";
             this._aboutFamNetworkManagerMenuItem.Click += new System.EventHandler(this.HandleAboutFamNetworkManagerMenuItem);
             // 
@@ -296,7 +305,7 @@
             this._groupFilterComboBox});
             this._manageGridToolStrip.Location = new System.Drawing.Point(3, 24);
             this._manageGridToolStrip.Name = "_manageGridToolStrip";
-            this._manageGridToolStrip.Size = new System.Drawing.Size(450, 39);
+            this._manageGridToolStrip.Size = new System.Drawing.Size(400, 39);
             this._manageGridToolStrip.TabIndex = 1;
             // 
             // _openFileToolStripButton
@@ -348,13 +357,13 @@
             this._editMachineGroupAndNameToolStripButton.Name = "_editMachineGroupAndNameToolStripButton";
             this._editMachineGroupAndNameToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._editMachineGroupAndNameToolStripButton.Text = "Edit machine(s) group and name";
-            this._editMachineGroupAndNameToolStripButton.Click += new System.EventHandler(this.HandleEditGroupButtonClick);
+            this._editMachineGroupAndNameToolStripButton.Click += new System.EventHandler(this.HandleEditMachineOrGroupButtonClick);
             // 
             // _groupFilterComboBox
             // 
             this._groupFilterComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._groupFilterComboBox.Name = "_groupFilterComboBox";
-            this._groupFilterComboBox.Size = new System.Drawing.Size(250, 39);
+            this._groupFilterComboBox.Size = new System.Drawing.Size(200, 39);
             this._groupFilterComboBox.SelectedIndexChanged += new System.EventHandler(this.HandleFilterGroupsSelectedIndexChanged);
             // 
             // _updateToolStrip
@@ -369,7 +378,7 @@
             this._modifyServiceDatabaseToolStripButton,
             this._autoRefreshDataToolStripButton,
             this._refreshDataToolStripButton});
-            this._updateToolStrip.Location = new System.Drawing.Point(3, 63);
+            this._updateToolStrip.Location = new System.Drawing.Point(403, 24);
             this._updateToolStrip.Name = "_updateToolStrip";
             this._updateToolStrip.Size = new System.Drawing.Size(300, 39);
             this._updateToolStrip.TabIndex = 2;
@@ -443,6 +452,7 @@
             this.ClientSize = new System.Drawing.Size(742, 366);
             this.Controls.Add(this._toolStripContainer);
             this.MainMenuStrip = this._menuStrip;
+            this.MinimumSize = new System.Drawing.Size(500, 200);
             this.Name = "FAMNetworkDashboardForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "FAM Network Dashboard";
@@ -493,6 +503,7 @@
         private System.Windows.Forms.ToolStripMenuItem _openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem _saveAsToolStripMenuItem;
     }
 }
 

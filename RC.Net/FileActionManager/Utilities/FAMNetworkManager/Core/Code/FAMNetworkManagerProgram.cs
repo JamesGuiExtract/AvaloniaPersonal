@@ -30,9 +30,6 @@ namespace Extract.FileActionManager.Utilities
                     return;
                 }
 
-                // Load the licenses
-                LicenseUtilities.LoadLicenseFilesFromFolder(0, new Extract.Licensing.MapLabel());
-
                 // Get the file name from the command line
                 string fileName = args.Length == 1 ? Path.GetFullPath(args[0]) : null;
                 if (!string.IsNullOrEmpty(fileName) && !File.Exists(fileName))
@@ -42,6 +39,11 @@ namespace Extract.FileActionManager.Utilities
                     ee.AddDebugData("File To Open", fileName, false);
                     throw ee;
                 }
+
+                // Load and validate the license
+                LicenseUtilities.LoadLicenseFilesFromFolder(0, new Extract.Licensing.MapLabel());
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30982",
+                    "FAM Network Manager Application");
 
                 FAMNetworkDashboardForm form = new FAMNetworkDashboardForm(fileName);
                 form.Icon = Properties.Resources.FamNetworkManager;

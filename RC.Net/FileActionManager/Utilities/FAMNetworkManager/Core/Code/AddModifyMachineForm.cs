@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Utilities.Forms;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -16,7 +17,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Rows that will need to be updated based on changes made
         /// </summary>
-        List<DataGridViewRow> _rows;
+        List<BetterDataGridViewRow<RowDataItem>> _rows;
 
         /// <summary>
         /// Whether or not data has been changed.
@@ -48,17 +49,17 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="rows">The rows.</param>
         /// <param name="groupNames">The group names.</param>
-        public AddModifyMachineForm(IEnumerable<DataGridViewRow> rows, IEnumerable<string> groupNames)
+        public AddModifyMachineForm(IEnumerable<BetterDataGridViewRow<RowDataItem>> rows, IEnumerable<string> groupNames)
         {
             InitializeComponent();
 
             if (rows != null)
             {
-                _rows = new List<DataGridViewRow>(rows);
+                _rows = new List<BetterDataGridViewRow<RowDataItem>>(rows);
             }
             else
             {
-                _rows = new List<DataGridViewRow>();
+                _rows = new List<BetterDataGridViewRow<RowDataItem>>();
             }
 
             if (groupNames != null)
@@ -84,14 +85,20 @@ namespace Extract.FileActionManager.Utilities
             {
                 base.OnLoad(e);
                 string defaultGroupName = null;
-
-                if (_rows.Count == 1)
+                int count = _rows.Count;
+                if (count == 0)
                 {
+                    Text = "Add Machine";
+                }
+                else if (count == 1)
+                {
+                    Text = "Modify Machine Name Or Group";
                     _textMachineName.Text = _rows[0].Cells[(int)GridColumns.MachineName].Value.ToString();
                     defaultGroupName = _rows[0].Cells[(int)GridColumns.GroupName].Value.ToString();
                 }
-                else if (_rows.Count > 1)
+                else if (count > 1)
                 {
+                    Text = "Modify Group";
                     StringBuilder sb = new StringBuilder(
                         _rows[0].Cells[(int)GridColumns.MachineName].Value.ToString());
                     defaultGroupName = _rows[0].Cells[(int)GridColumns.GroupName].Value.ToString();
@@ -158,6 +165,32 @@ namespace Extract.FileActionManager.Utilities
             _dataChanged = true;
         }
 
+        /// <summary>
+        /// Handles the ok button click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleOkButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // Ensure that the machine name text box is not empty
+                if (string.IsNullOrWhiteSpace(_textMachineName.Text))
+                {
+                    MessageBox.Show("You must specify a machine name.",
+                        "No Machine Name", MessageBoxButtons.OK, MessageBoxIcon.Error,
+                        MessageBoxDefaultButton.Button1, 0);
+                    return;
+                }
+
+                DialogResult = DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30981", ex);
+            }
+        }
+
         #endregion Methods
 
         #region Properties
@@ -184,7 +217,7 @@ namespace Extract.FileActionManager.Utilities
         {
             get
             {
-                return _textMachineName.Text;
+                return _textMachineName.Text.Trim();
             }
         }
 
@@ -196,7 +229,7 @@ namespace Extract.FileActionManager.Utilities
         {
             get
             {
-                return _groupNameCombo.Text;
+                return _groupNameCombo.Text.Trim();
             }
         }
 
@@ -204,7 +237,7 @@ namespace Extract.FileActionManager.Utilities
         /// Gets the rows.
         /// </summary>
         /// <value>The rows.</value>
-        internal ReadOnlyCollection<DataGridViewRow> Rows
+        internal ReadOnlyCollection<BetterDataGridViewRow<RowDataItem>> Rows
         {
             get
             {

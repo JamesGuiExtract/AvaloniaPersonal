@@ -2,7 +2,6 @@
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -72,7 +71,7 @@ namespace Extract.FileActionManager.Utilities
             /// <summary>
             /// The selected rows that should have their service started/stopped.
             /// </summary>
-            readonly List<DataGridViewRow> _rows;
+            readonly List<BetterDataGridViewRow<RowDataItem>> _rows;
 
             /// <summary>
             /// The service to control (FAM, FDRS, or both).
@@ -95,10 +94,10 @@ namespace Extract.FileActionManager.Utilities
             /// <param name="serviceToControl">The service to control.</param>
             /// <param name="startService">if set to <see langword="true"/> start service
             /// otherwise stop service.</param>
-            public ServiceControlThreadParameters(List<DataGridViewRow> rows,
+            public ServiceControlThreadParameters(List<BetterDataGridViewRow<RowDataItem>> rows,
                 ServiceToControl serviceToControl, bool startService)
             {
-                _rows = new List<DataGridViewRow>(rows);
+                _rows = new List<BetterDataGridViewRow<RowDataItem>>(rows);
                 _serviceToControl = serviceToControl;
                 _startService = startService;
             }
@@ -111,7 +110,7 @@ namespace Extract.FileActionManager.Utilities
             /// Gets the rows.
             /// </summary>
             /// <value>The rows.</value>
-            public List<DataGridViewRow> Rows
+            public List<BetterDataGridViewRow<RowDataItem>> Rows
             {
                 get
                 {
@@ -173,6 +172,11 @@ namespace Extract.FileActionManager.Utilities
         const int _REFRESH_THREAD_SLEEP_TIME = 1000;
 
         /// <summary>
+        /// The title for the the FAM Manager application
+        /// </summary>
+        const string _FAM_MANAGER_TITLE = "FAM Network Manager";
+
+        /// <summary>
         /// The full path to the file that contains information about persisting the 
         /// <see cref="FAMNetworkDashboardForm"/>.
         /// </summary>
@@ -194,12 +198,6 @@ namespace Extract.FileActionManager.Utilities
         ServiceToControl _serviceToControl = ServiceToControl.Both;
 
         /// <summary>
-        /// Dictionary of the rows and their related <see cref="ServiceMachineController"/>
-        /// </summary>
-        ConcurrentDictionary<DataGridViewRow, ServiceMachineController> _rowsAndControllers =
-            new ConcurrentDictionary<DataGridViewRow, ServiceMachineController>();
-
-        /// <summary>
         /// Indicates whether the refresh data thread should update the data.
         /// </summary>
         volatile bool _refreshData;
@@ -217,7 +215,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The file to open when the form loads.
         /// </summary>
-        string _fileToOpen;
+        string _currentFile;
 
         /// <summary>
         /// Saves/restores window state info.
@@ -233,14 +231,22 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="row">The row to set the information for.</param>
         /// <param name="errorText">The text for the error.</param>
-        delegate void SetErrorTextDelegate(DataGridViewRow row, string errorText);
+        /// <param name="ee">The exception to add to the row.</param>
+        delegate void SetErrorTextDelegate(BetterDataGridViewRow<RowDataItem> row,
+            string errorText, ExtractException ee);
 
         /// <summary>
         /// Delegate method used to update the data for individual rows when a refresh is called.
         /// </summary>
         /// <param name="row">The row to update.</param>
         /// <param name="data">The data to update the row with.</param>
-        delegate void RefreshRowDataDelegate(DataGridViewRow row, ServiceStatusUpdateData data);
+        delegate void RefreshRowDataDelegate(BetterDataGridViewRow<RowDataItem> row, ServiceStatusUpdateData data);
+
+        /// <summary>
+        /// Delegate method used to refresh the data grid.
+        /// </summary>
+        /// <param name="autoUpdate">Whether auto-updating should be triggered or not.</param>
+        delegate void RefreshDataDelegate(bool autoUpdate);
 
         #endregion Delegates
 
@@ -262,7 +268,7 @@ namespace Extract.FileActionManager.Utilities
         {
             InitializeComponent();
 
-            _fileToOpen = fileToOpen;
+            _currentFile = fileToOpen;
 
             if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
             {
@@ -271,6 +277,7 @@ namespace Extract.FileActionManager.Utilities
                     this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, true, null);
             }
 
+            Text = _FAM_MANAGER_TITLE;
         }
 
         #endregion Constructors
@@ -286,6 +293,7 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 base.OnLoad(e);
+
                 _startStopTargetComboBox.SelectedIndex = 0;
 
                 // Launch the stats update thread
@@ -293,13 +301,11 @@ namespace Extract.FileActionManager.Utilities
                 thread.SetApartmentState(ApartmentState.MTA);
                 thread.Start();
 
-                if (!string.IsNullOrEmpty(_fileToOpen))
+                if (!string.IsNullOrEmpty(_currentFile))
                 {
-                    LoadSettings(_fileToOpen);
-                    _fileToOpen = string.Empty;
+                    LoadSettings(_currentFile);
                 }
 
-                RefreshData(false);
                 UpdateEnabledStates();
             }
             catch (Exception ex)
@@ -346,6 +352,30 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                if (string.IsNullOrEmpty(_currentFile))
+                {
+                    HandleSaveAsClick(sender, e);
+                }
+                else
+                {
+                    SaveSettings(_currentFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30776", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the save as click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleSaveAsClick(object sender, EventArgs e)
+        {
+            try
+            {
                 using (SaveFileDialog save = new SaveFileDialog())
                 {
                     save.Filter = _FILE_FILTER;
@@ -362,7 +392,7 @@ namespace Extract.FileActionManager.Utilities
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI30776", ex);
+                ExtractException.Display("ELI30978", ex);
             }
         }
 
@@ -385,46 +415,30 @@ namespace Extract.FileActionManager.Utilities
                         {
                             ServiceMachineController controller = new ServiceMachineController(
                                 addForm.MachineName, addForm.GroupName);
-                            DataGridViewRow row = new DataGridViewRow();
-                            if (!_rowsAndControllers.TryAdd(row, controller))
-                            {
-                                ExtractException ee = new ExtractException("ELI30802",
-                                    "Unable to add service controller to collection.");
-                                ee.AddDebugData("Machine Name", controller.MachineName, false);
-                                ee.AddDebugData("Group Name", controller.GroupName, false);
-
-                                // Dispose the control and row
-                                controller.Dispose();
-                                row.Dispose();
-
-                                throw ee;
-                            }
+                            var row = new BetterDataGridViewRow<RowDataItem>(
+                                new RowDataItem(controller));
 
                             row.CreateCells(_machineListGridView,
                                 new object[] { controller.MachineName, controller.GroupName,
                                 _REFRESHING, _REFRESHING, _REFRESHING});
                             _machineListGridView.Rows.Add(row);
 
-                            Thread thread = new Thread(() =>
+                            Task.Factory.StartNew(() =>
                                 {
                                     try
                                     {
-                                        var data = controller.RefreshData();
+                                        var data = row.DataItem.Controller.RefreshData();
                                         RefreshRowData(row, data);
                                     }
                                     catch (Exception ex)
                                     {
-                                        var ee = new ExtractException("ELI30821",
-                                            "Unable to update row data", ex);
+                                        var ee = ExtractException.AsExtractException("ELI30821", ex);
                                         ee.AddDebugData("Machine Name",
                                             controller.MachineName, false);
-                                        ee.Log();
-                                        SetRowErrorText(row, ex.Message);
+                                        SetRowErrorText(row, ex.Message, ee);
                                     }
                                 }
                             );
-                            thread.SetApartmentState(ApartmentState.MTA);
-                            thread.Start();
 
                             UpdateGroupFilterList();
                         }
@@ -446,15 +460,10 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                foreach (DataGridViewRow row in _machineListGridView.SelectedRows)
+                foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.SelectedRows)
                 {
                     if (row.Visible)
                     {
-                        ServiceMachineController controller = null;
-                        if (_rowsAndControllers.TryRemove(row, out controller))
-                        {
-                            controller.Dispose();
-                        }
                         _machineListGridView.Rows.RemoveAt(row.Index);
                         row.Dispose();
                     }
@@ -467,16 +476,16 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Handles the edit group button click.
+        /// Handles the edit machine or group button click.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleEditGroupButtonClick(object sender, EventArgs e)
+        void HandleEditMachineOrGroupButtonClick(object sender, EventArgs e)
         {
             try
             {
-                var rows = new List<DataGridViewRow>();
-                foreach (DataGridViewRow row in _machineListGridView.SelectedRows)
+                var rows = new List<BetterDataGridViewRow<RowDataItem>>();
+                foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.SelectedRows)
                 {
                     if (row.Visible)
                     {
@@ -502,6 +511,7 @@ namespace Extract.FileActionManager.Utilities
                                 row.Cells[(int)GridColumns.MachineName].Value = machineName;
                                 row.Cells[(int)GridColumns.GroupName].Value = groupName;
                                 UpdateServiceMachineController(row, groupName, machineName);
+                                Task.Factory.StartNew(RefreshServiceData, row);
                             }
                             else
                             {
@@ -510,6 +520,7 @@ namespace Extract.FileActionManager.Utilities
                                 {
                                     row.Cells[(int)GridColumns.GroupName].Value = groupName;
                                     UpdateServiceMachineController(row, groupName);
+                                    Task.Factory.StartNew(RefreshServiceData, row);
                                 }
                             }
 
@@ -533,17 +544,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                List<DataGridViewRow> selectedRows = new List<DataGridViewRow>();
-                foreach (DataGridViewRow row in _machineListGridView.SelectedRows)
-                {
-                    selectedRows.Add(row);
-                }
-
-                // Put the data into the structure to pass to the controller method.
-                // Pass in true to start the services.
-                var controllerData = new ServiceControlThreadParameters(selectedRows,
-                    _serviceToControl, true);
-                ThreadPool.QueueUserWorkItem((WaitCallback)ControlServices, controllerData);
+                ControlServiceForSelectedRows(true);
             }
             catch (Exception ex)
             {
@@ -560,20 +561,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                List<DataGridViewRow> selectedRows = new List<DataGridViewRow>();
-                foreach (DataGridViewRow row in _machineListGridView.SelectedRows)
-                {
-                    if (row.Visible)
-                    {
-                        selectedRows.Add(row);
-                    }
-                }
-
-                // Put the data into the structure to pass to the controller method.
-                // Pass in false to stop the services.
-                var controllerData = new ServiceControlThreadParameters(selectedRows,
-                    _serviceToControl, false);
-                ThreadPool.QueueUserWorkItem((WaitCallback)ControlServices, controllerData);
+                ControlServiceForSelectedRows(false);
             }
             catch (Exception ex)
             {
@@ -716,6 +704,34 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the machine grid view row double click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleMachineGridViewRowDoubleClick(object sender, EventArgs e)
+        {
+            try
+            {
+                var row = (BetterDataGridViewRow<RowDataItem>)
+                    _machineListGridView.SelectedRows[0];
+                if (row.DataItem.Exception != null)
+                {
+                    // Need to invoke the dialog so that the row selection from
+                    // the double-click completes
+                    BeginInvoke((MethodInvoker)(() =>
+                        {
+                            row.DataItem.Exception.Display();
+                        })
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30980", ex);
+            }
+        }
+
+        /// <summary>
         /// Handles the start stop combo selected index changed.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -756,7 +772,7 @@ namespace Extract.FileActionManager.Utilities
                 if (string.IsNullOrEmpty(selectedGroup))
                 {
                     // All rows should be visible
-                    foreach (DataGridViewRow row in _machineListGridView.Rows)
+                    foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
                     {
                         if (row.Selected)
                         {
@@ -767,7 +783,7 @@ namespace Extract.FileActionManager.Utilities
                 }
                 else
                 {
-                    foreach (DataGridViewRow row in _machineListGridView.Rows)
+                    foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
                     {
                         string temp = row.Cells[(int)GridColumns.GroupName].Value.ToString();
                         row.Visible = selectedGroup.Equals(temp, StringComparison.Ordinal);
@@ -803,7 +819,7 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="data">The data.</param>
-        void RefreshRowData(DataGridViewRow row, ServiceStatusUpdateData data)
+        void RefreshRowData(BetterDataGridViewRow<RowDataItem> row, ServiceStatusUpdateData data)
         {
             if (InvokeRequired)
             {
@@ -814,6 +830,8 @@ namespace Extract.FileActionManager.Utilities
 
             if (row.Visible)
             {
+                row.ErrorText = string.Empty;
+                row.DataItem.Exception = null;
                 row.Cells[(int)GridColumns.FAMService].Value = data.FamServiceStatus;
                 row.Cells[(int)GridColumns.FDRSService].Value = data.FdrsServiceStatus;
                 row.Cells[(int)GridColumns.CPUUsage].Value =
@@ -827,7 +845,7 @@ namespace Extract.FileActionManager.Utilities
         void RefreshData(bool autoUpdate)
         {
             // Clear all cells
-            foreach (DataGridViewRow row in _machineListGridView.Rows)
+            foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
             {
                 if (row.Visible)
                 {
@@ -845,7 +863,7 @@ namespace Extract.FileActionManager.Utilities
             }
             else
             {
-                ThreadPool.QueueUserWorkItem((WaitCallback)RefreshServiceDataForAllRows);
+                Task.Factory.StartNew(RefreshServiceDataForAllRows);
             }
         }
 
@@ -885,14 +903,14 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Performs a single refresh of the service data in the machine list grid.
         /// </summary>
-        void RefreshServiceDataForAllRows(object notUsed = null)
+        void RefreshServiceDataForAllRows()
         {
             // Create a list of all current rows in the UI
-            foreach (DataGridViewRow row in _machineListGridView.Rows)
+            foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
             {
                 if (row.Visible)
                 {
-                    ThreadPool.QueueUserWorkItem((WaitCallback)RefreshServiceData, row);
+                    Task.Factory.StartNew(RefreshServiceData, row);
                 }
             }
         }
@@ -903,35 +921,31 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="rowObject">The row to update.</param>
         void RefreshServiceData(object rowObject)
         {
-            DataGridViewRow row = rowObject as DataGridViewRow;
+            var row = rowObject as BetterDataGridViewRow<RowDataItem>;
             if (row == null)
             {
                 return;
             }
 
-            ServiceMachineController controller = null;
+            string machineName = null;
             try
             {
                 // If the row is still in the collection and visible, get its controller,
                 // refresh the data and update the row
                 if (!_endRefreshThread.WaitOne(0)
-                    && _rowsAndControllers.TryGetValue(row, out controller))
+                    && !row.IsDisposed)
                 {
+                    ServiceMachineController controller = row.DataItem.Controller;
+                    machineName = controller.MachineName;
                     var data = controller.RefreshData();
                     RefreshRowData(row, data);
                 }
             }
             catch (Exception ex)
             {
-                var ee = new ExtractException("ELI30809", "Unable to update data.", ex);
-                string machineName = null;
-                if (controller != null)
-                {
-                    machineName = controller.MachineName;
-                }
+                var ee = ExtractException.AsExtractException("ELI30809", ex);
                 ee.AddDebugData("Machine Name", machineName ?? "Unknown", false);
-                ee.Log();
-                SetRowErrorText(row, ex.Message);
+                SetRowErrorText(row, ex.Message, ee);
             }
         }
 
@@ -945,12 +959,11 @@ namespace Extract.FileActionManager.Utilities
             using (TemporaryWaitCursor cursor = new TemporaryWaitCursor())
             {
                 List<ServiceMachineController> data = new List<ServiceMachineController>();
-                foreach (DataGridViewRow row in _machineListGridView.Rows)
+                foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
                 {
-                    ServiceMachineController controller = null;
-                    if (_rowsAndControllers.TryGetValue(row, out controller))
+                    if (!row.IsDisposed)
                     {
-                        data.Add(controller);
+                        data.Add(row.DataItem.Controller);
                     }
                 }
                 using (FileStream stream = File.Open(fileName, FileMode.Create, FileAccess.Write))
@@ -959,6 +972,13 @@ namespace Extract.FileActionManager.Utilities
                     serializer.Serialize(stream, data);
                     stream.Flush();
                 }
+
+                // Update the current file name to the saved file name
+                _currentFile = fileName;
+
+                // Update the title
+                Text = _FAM_MANAGER_TITLE + " - " + _currentFile;
+
             }
         }
 
@@ -972,44 +992,43 @@ namespace Extract.FileActionManager.Utilities
             {
                 using (TemporaryWaitCursor cursor = new TemporaryWaitCursor())
                 {
-                    // Ensure the rows are disposed
-                    List<DataGridViewRow> rowsToClear = new List<DataGridViewRow>(
-                        _machineListGridView.Rows.Count);
-                    foreach (DataGridViewRow row in _machineListGridView.Rows)
-                    {
-                        rowsToClear.Add(row);
-                    }
-                    _machineListGridView.Rows.Clear();
-                    CollectionMethods.ClearAndDispose(rowsToClear);
-
+                    List<ServiceMachineController> controllers = null;
                     using (FileStream stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
                     {
                         XmlSerializer serializer = new XmlSerializer(typeof(List<ServiceMachineController>));
-                        List<ServiceMachineController> data =
-                            (List<ServiceMachineController>)serializer.Deserialize(stream);
-                        foreach (ServiceMachineController controller in data)
-                        {
-                            DataGridViewRow row = new DataGridViewRow();
-                            row.CreateCells(_machineListGridView);
-                            row.Cells[0].Value = controller.MachineName;
-                            row.Cells[1].Value = controller.GroupName;
-                            if (!_rowsAndControllers.TryAdd(row, controller))
-                            {
-                                ExtractException ee = new ExtractException("ELI30805",
-                                    "Unable to add service controller to collection.");
-                                ee.AddDebugData("Machine Name", controller.MachineName, false);
-                                ee.AddDebugData("Group Name", controller.GroupName, false);
+                        controllers = (List<ServiceMachineController>)serializer.Deserialize(stream);
+                    }
 
-                                // Dispose the control and row
-                                controller.Dispose();
-                                row.Dispose();
+                    // Ensure the rows are disposed before loading the new rows
+                    var rowsToDispose = new List<BetterDataGridViewRow<RowDataItem>>();
+                    foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
+                    {
+                        rowsToDispose.Add(row);
+                    }
+                    _machineListGridView.Rows.Clear();
+                    CollectionMethods.ClearAndDispose(rowsToDispose);
 
-                                throw ee;
-                            }
-                            _machineListGridView.Rows.Add(row);
-                        }
+                    _currentFile = fileName;
 
-                        UpdateGroupFilterList();
+                    foreach (ServiceMachineController controller in controllers)
+                    {
+                        var row = new BetterDataGridViewRow<RowDataItem>(
+                            new RowDataItem(controller));
+                        row.CreateCells(_machineListGridView);
+                        row.Cells[0].Value = controller.MachineName;
+                        row.Cells[1].Value = controller.GroupName;
+                        _machineListGridView.Rows.Add(row);
+                    }
+
+                    UpdateGroupFilterList();
+
+                    // Update the title
+                    Text = _FAM_MANAGER_TITLE + " - " + _currentFile;
+
+                    // Refresh the data if not currently auto-refreshing
+                    if (!_refreshData)
+                    {
+                        RefreshData(false);
                     }
                 }
             }
@@ -1028,11 +1047,11 @@ namespace Extract.FileActionManager.Utilities
         SortedSet<string> BuildGroupList()
         {
             SortedSet<string> groups = new SortedSet<string>();
-            foreach (var controller in _rowsAndControllers.Values)
+            foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
             {
-                if (controller != null)
+                if (!row.IsDisposed && row.DataItem.Controller != null)
                 {
-                    groups.Add(controller.GroupName);
+                    groups.Add(row.DataItem.Controller.GroupName);
                 }
             }
 
@@ -1044,18 +1063,28 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="errorText">The error text.</param>
-        void SetRowErrorText(DataGridViewRow row, string errorText)
+        /// <param name="ee">The exception to associate with the row.</param>
+        void SetRowErrorText(BetterDataGridViewRow<RowDataItem> row, string errorText,
+            ExtractException ee)
         {
             try
             {
                 if (InvokeRequired)
                 {
                     BeginInvoke(new SetErrorTextDelegate(SetRowErrorText),
-                        new object[] { row, errorText });
+                        new object[] { row, errorText, ee });
                     return;
                 }
 
-                row.ErrorText = errorText;
+                // Check if this is the same error
+                if (!row.IsDisposed && !row.ErrorText.Equals(errorText, StringComparison.Ordinal))
+                {
+                    row.ErrorText = errorText;
+                    row.Cells[(int)GridColumns.FAMService].Value = "error";
+                    row.Cells[(int)GridColumns.FDRSService].Value = "error";
+                    row.Cells[(int)GridColumns.CPUUsage].Value = "error";
+                    row.DataItem.Exception = ee;
+                }
             }
             catch (Exception ex)
             {
@@ -1082,40 +1111,38 @@ namespace Extract.FileActionManager.Utilities
             var fdrsService = data.ServiceToControl.HasFlag(ServiceToControl.FdrsService);
             var startService = data.StartService;
 
-            // Loop over the rows and start/stop the specified service for each row
-            Parallel.ForEach<DataGridViewRow>(data.Rows, row =>
-                {
-                    ServiceMachineController controller = null;
-                    try
+            foreach (BetterDataGridViewRow<RowDataItem> row in data.Rows)
+            {
+                Task.Factory.StartNew(() =>
                     {
-                        if (_rowsAndControllers.TryGetValue(row, out controller))
-                        {
-                            if (famService)
-                            {
-                                controller.ControlFamService(startService);
-                            }
-                            if (fdrsService)
-                            {
-                                controller.ControlFdrsService(startService);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        var ee = new ExtractException("ELI30803", "Failed to control service", ex);
                         string machineName = null;
-                        if (controller != null)
+                        try
                         {
-                            machineName = controller.MachineName;
+                            if (!row.IsDisposed)
+                            {
+                                var controller = row.DataItem.Controller;
+                                machineName = controller.MachineName;
+                                if (famService)
+                                {
+                                    controller.ControlFamService(startService);
+                                }
+                                if (fdrsService)
+                                {
+                                    controller.ControlFdrsService(startService);
+                                }
+                            }
                         }
-                        ee.AddDebugData("Machine Name", machineName ?? "Unknown", false);
-                        ee.AddDebugData("Starting Service", startService, false);
-                        ee.Log();
+                        catch (Exception ex)
+                        {
+                            var ee = ExtractException.AsExtractException("ELI30803", ex);
+                            ee.AddDebugData("Machine Name", machineName ?? "Unknown", false);
+                            ee.AddDebugData("Starting Service", startService, false);
 
-                        SetRowErrorText(row, ex.Message);
+                            SetRowErrorText(row, ex.Message, ee);
+                        }
                     }
-                }
-            );
+                );
+            }
         }
 
         /// <summary>
@@ -1145,12 +1172,12 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="row">The row.</param>
         /// <param name="groupName">Name of the group.</param>
         /// <param name="machineName">Name of the machine.</param>
-        void UpdateServiceMachineController(DataGridViewRow row, string groupName,
+        static void UpdateServiceMachineController(BetterDataGridViewRow<RowDataItem> row, string groupName,
             string machineName = null)
         {
-            ServiceMachineController controller = null;
-            if (_rowsAndControllers.TryGetValue(row, out controller))
+            if (!row.IsDisposed)
             {
+                var controller = row.DataItem.Controller;
                 controller.GroupName = groupName;
                 if (machineName != null)
                 {
@@ -1175,6 +1202,30 @@ namespace Extract.FileActionManager.Utilities
             _editMachineGroupAndNameToolStripButton.Enabled = selectedCount > 0;
         }
 
+        /// <summary>
+        /// Controls the service for selected rows.
+        /// </summary>
+        /// <param name="startService">if set to <see langword="true"/> the service
+        /// will be started, if <see langword="false"/> the service will be stopped..</param>
+        void ControlServiceForSelectedRows(bool startService)
+        {
+            List<BetterDataGridViewRow<RowDataItem>> selectedRows = new List<BetterDataGridViewRow<RowDataItem>>();
+            foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.SelectedRows)
+            {
+                if (row.Visible)
+                {
+                    selectedRows.Add(row);
+                }
+            }
+
+            // Put the data into the structure to pass to the controller method.
+            // Pass in true to start the service, false to stop the services.
+            var controllerData = new ServiceControlThreadParameters(selectedRows,
+                _serviceToControl, startService);
+            Task.Factory.StartNew(ControlServices, controllerData);
+        }
+
         #endregion Methods
+
     }
 }

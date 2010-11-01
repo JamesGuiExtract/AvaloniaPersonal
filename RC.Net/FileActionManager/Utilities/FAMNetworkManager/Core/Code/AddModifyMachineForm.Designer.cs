@@ -54,7 +54,7 @@
             labelGroupName.Location = new System.Drawing.Point(12, 48);
             labelGroupName.Name = "labelGroupName";
             labelGroupName.Size = new System.Drawing.Size(65, 13);
-            labelGroupName.TabIndex = 4;
+            labelGroupName.TabIndex = 3;
             labelGroupName.Text = "Group name";
             // 
             // _textMachineName
@@ -84,7 +84,7 @@
             this._groupNameCombo.Location = new System.Drawing.Point(12, 64);
             this._groupNameCombo.Name = "_groupNameCombo";
             this._groupNameCombo.Size = new System.Drawing.Size(331, 21);
-            this._groupNameCombo.TabIndex = 3;
+            this._groupNameCombo.TabIndex = 4;
             this._groupNameCombo.TextChanged += new System.EventHandler(this.HandleGroupNameTextChanged);
             // 
             // _cancelButton
@@ -93,24 +93,26 @@
             this._cancelButton.Location = new System.Drawing.Point(268, 91);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 5;
+            this._cancelButton.TabIndex = 6;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
             // _okButton
             // 
-            this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this._okButton.Location = new System.Drawing.Point(187, 92);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 6;
+            this._okButton.TabIndex = 5;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
+            this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
             // 
             // AddModifyMachineForm
             // 
+            this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(355, 124);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
