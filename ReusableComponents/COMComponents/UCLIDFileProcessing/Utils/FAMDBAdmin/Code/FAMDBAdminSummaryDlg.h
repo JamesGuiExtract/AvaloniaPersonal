@@ -24,9 +24,6 @@ public:
 	//			and the total files edit box based on that data
 	void populatePage();
 
-	// Used to execute prenormalized code - THIS SHOULD BE REMOVED ONCE NORMALIZED DB HAS BEEN FULLY TESTED
-	void populatePage2();
-
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL PreTranslateMessage(MSG* pMsg); // added as per P13 #4774

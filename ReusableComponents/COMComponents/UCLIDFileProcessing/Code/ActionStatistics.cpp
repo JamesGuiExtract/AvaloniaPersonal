@@ -479,39 +479,67 @@ STDMETHODIMP CActionStatistics::GetAllStatistics(long *plNumDocs, long *plNumDoc
 
 	try
 	{
-		// Check arguments
-		ASSERT_ARGUMENT("ELI26829", plNumDocs != NULL);
-		ASSERT_ARGUMENT("ELI30734", plNumDocsPending != NULL);
-		ASSERT_ARGUMENT("ELI26830", plNumDocsComplete != NULL);
-		ASSERT_ARGUMENT("ELI26831", plNumDocsFailed != NULL);
-		ASSERT_ARGUMENT("ELI26832", plNumDocsSkipped != NULL);
-		ASSERT_ARGUMENT("ELI26833", plNumPages != NULL);
-		ASSERT_ARGUMENT("ELI30735", plNumPagesPending != NULL);
-		ASSERT_ARGUMENT("ELI26834", plNumPagesComplete != NULL);
-		ASSERT_ARGUMENT("ELI26835", plNumPagesFailed != NULL);
-		ASSERT_ARGUMENT("ELI26836", plNumPagesSkipped != NULL);
-		ASSERT_ARGUMENT("ELI26837", pllNumBytes != NULL);
-		ASSERT_ARGUMENT("ELI30736", pllNumBytesPending != NULL);
-		ASSERT_ARGUMENT("ELI26838", pllNumBytesComplete != NULL);
-		ASSERT_ARGUMENT("ELI26839", pllNumBytesFailed != NULL);
-		ASSERT_ARGUMENT("ELI26840", pllNumBytesSkipped != NULL);
-
-		// Copy the statistics data
-		*plNumDocs = m_nNumDocuments;
-		*plNumDocsPending = m_nNumDocumentsPending;
-		*plNumDocsComplete = m_nNumDocumentsComplete;
-		*plNumDocsFailed = m_nNumDocumentsFailed;
-		*plNumDocsSkipped = m_nNumDocumentsSkipped;
-		*plNumPages = m_nNumPages;
-		*plNumPagesPending = m_nNumPagesPending;
-		*plNumPagesComplete = m_nNumPagesComplete;
-		*plNumPagesFailed = m_nNumPagesFailed;
-		*plNumPagesSkipped = m_nNumPagesSkipped;
-		*pllNumBytes = m_llNumBytes;
-		*pllNumBytesPending = m_llNumBytesPending;
-		*pllNumBytesComplete = m_llNumBytesComplete;
-		*pllNumBytesFailed = m_llNumBytesFailed;
-		*pllNumBytesSkipped = m_llNumBytesSkipped;
+		// Copy the statistics data to non null parameters
+		if (plNumDocs != NULL)
+		{
+			*plNumDocs = m_nNumDocuments;
+		}
+		if (plNumDocsPending != NULL)
+		{
+			*plNumDocsPending = m_nNumDocumentsPending;
+		}
+		if (plNumDocsComplete != NULL)
+		{
+			*plNumDocsComplete = m_nNumDocumentsComplete;
+		}
+		if (plNumDocsFailed != NULL)
+		{
+			*plNumDocsFailed = m_nNumDocumentsFailed;
+		}
+		if (plNumDocsSkipped != NULL)
+		{
+			*plNumDocsSkipped = m_nNumDocumentsSkipped;
+		}
+		if (plNumPages != NULL)
+		{
+			*plNumPages = m_nNumPages;
+		}
+		if (plNumPagesPending != NULL)
+		{
+			*plNumPagesPending = m_nNumPagesPending;
+		}
+		if (plNumPagesComplete != NULL)
+		{
+			*plNumPagesComplete = m_nNumPagesComplete;
+		}
+		if (plNumPagesFailed != NULL)
+		{
+			*plNumPagesFailed = m_nNumPagesFailed;
+		}
+		if (plNumPagesSkipped != NULL)
+		{
+			*plNumPagesSkipped = m_nNumPagesSkipped;
+		}
+		if (pllNumBytes != NULL)
+		{
+			*pllNumBytes = m_llNumBytes;
+		}
+		if (pllNumBytes != NULL)
+		{
+			*pllNumBytesPending = m_llNumBytesPending;
+		}
+		if (pllNumBytesComplete != NULL)
+		{
+			*pllNumBytesComplete = m_llNumBytesComplete;
+		}
+		if (pllNumBytesFailed != NULL)
+		{
+			*pllNumBytesFailed = m_llNumBytesFailed;
+		}
+		if (pllNumBytesSkipped != NULL)
+		{
+			*pllNumBytesSkipped = m_llNumBytesSkipped;
+		}
 
 		return S_OK;
 	}

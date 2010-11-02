@@ -332,7 +332,7 @@ BOOL FileProcessingDlg::OnInitDialog()
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+				  // EXCEPTION: OCX Property Pages should return FALSE
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnBtnRun() 
@@ -757,12 +757,12 @@ BOOL FileProcessingDlg::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT *pResul
 
 	BOOL retCode = FALSE;
 	
-    TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
-    UINT nID = pNMHDR->idFrom;
-    if (pNMHDR->code == TTN_NEEDTEXT && (pTTT->uFlags & TTF_IDISHWND))
-    {
-        // idFrom is actually the HWND of the tool, ex. button control, edit control, etc.
-        nID = ::GetDlgCtrlID((HWND)nID);
+	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
+	UINT nID = pNMHDR->idFrom;
+	if (pNMHDR->code == TTN_NEEDTEXT && (pTTT->uFlags & TTF_IDISHWND))
+	{
+		// idFrom is actually the HWND of the tool, ex. button control, edit control, etc.
+		nID = ::GetDlgCtrlID((HWND)nID);
 	}
 
 	if (nID)
@@ -939,26 +939,9 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 		// next time the function is called.
 		if( ipActionStatsNew != NULL )
 		{
-			// Prepare the counts for the status bar
-			m_nNumCompletedProcessing = ipActionStatsNew->NumDocumentsComplete;
-			m_nNumFailed = ipActionStatsNew->NumDocumentsFailed;
-			m_nNumTotalDocs = ipActionStatsNew->NumDocuments;
-			m_nNumSkipped = ipActionStatsNew->NumDocumentsSkipped;
-			
-			m_nNumPending = m_nNumTotalDocs - (m_nNumFailed + m_nNumCompletedProcessing
-				+ m_nNumSkipped);
-
-			// Check for skipped file processing
-			if (m_bProcessingSkippedFiles)
-			{
-				// Deduct the number currently processing from the skipped file count
-				m_nNumSkipped -= m_nNumCurrentlyProcessing;
-			}
-			else
-			{
-				// Deduct the number currently processing from the pending file count
-				m_nNumPending -= m_nNumCurrentlyProcessing;
-			}
+			ipActionStatsNew->GetAllStatistics(&m_nNumTotalDocs, &m_nNumPending, 
+				&m_nNumCompletedProcessing, &m_nNumFailed, &m_nNumSkipped,
+				NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 			if (m_nNumInitialCompleted == gnUNINITIALIZED || m_nNumInitialFailed == gnUNINITIALIZED)
 			{
