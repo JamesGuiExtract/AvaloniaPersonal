@@ -1,28 +1,25 @@
 // InputBox - Based on implementation by: Andrew Ma
 // URL: http://www.devhood.com/Tools/tool_details.aspx?tool_id=295
 
-using Extract;
 using Extract.Licensing;
 using System;
 using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace Extract.Utilities.Forms 
+namespace Extract.Utilities.Forms
 {
-	/// <summary>
-	/// Summary description for InputBoxForm.
-	/// </summary>
-	internal class InputBoxForm : Form
+    /// <summary>
+    /// Summary description for InputBoxForm.
+    /// </summary>
+    internal class InputBoxForm : Form
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(InputBoxForm).ToString();
+        static readonly string _OBJECT_NAME =
+           typeof(InputBoxForm).ToString();
 
         #endregion Constants
 
@@ -31,38 +28,38 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Okay <see cref="Button"/>.
         /// </summary>
-		private Button ok;
+        Button ok;
 
         /// <summary>
         /// Cancel <see cref="Button"/>.
         /// </summary>
-		private Button cancel;
+        Button cancel;
 
         /// <summary>
         /// <see cref="Label"/> for the input box.
         /// </summary>
-		private Label label;
+        Label label;
 
         /// <summary>
         /// <see cref="TextBox"/> containing the return value.
         /// </summary>
-		private TextBox result;
+        TextBox result;
 
         /// <summary>
         /// Field holding the return result of the input box.
         /// </summary>
-		private string returnValue;
+        string returnValue;
 
         /// <summary>
         /// <see cref="Point"/> representing the top left coordinate of where the
         /// input box should be displayed.
         /// </summary>
-		private Point startLocation;
+        Point startLocation;
 
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.Container components = null;
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        System.ComponentModel.Container components = null;
 
         #endregion Fields
 
@@ -71,8 +68,8 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Initializes a new <see cref="InputBoxForm"/> class.
         /// </summary>
-		public InputBoxForm()
-		{
+        public InputBoxForm()
+        {
             try
             {
                 // Validate the license
@@ -81,7 +78,7 @@ namespace Extract.Utilities.Forms
 
                 // Required for Windows Form Designer support
                 InitializeComponent();
-                this.returnValue = "";
+                returnValue = "";
             }
             catch (Exception ex)
             {
@@ -94,95 +91,95 @@ namespace Extract.Utilities.Forms
         #region IDisposable
 
         /// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if (components != null) 
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
+        /// Clean up any resources being used.
+        /// </summary>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null)
+                {
+                    components.Dispose();
+                }
+            }
+            base.Dispose(disposing);
         }
 
         #endregion IDisposable
 
         #region Windows Form Designer generated code
         /// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-            this.ok = new System.Windows.Forms.Button();
-            this.result = new System.Windows.Forms.TextBox();
-            this.label = new System.Windows.Forms.Label();
-            this.cancel = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+        /// Required method for Designer support - do not modify
+        /// the contents of method with the code editor.
+        /// </summary>
+        void InitializeComponent()
+        {
+            ok = new System.Windows.Forms.Button();
+            result = new System.Windows.Forms.TextBox();
+            label = new System.Windows.Forms.Label();
+            cancel = new System.Windows.Forms.Button();
+            SuspendLayout();
             // 
             // ok
             // 
-            this.ok.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ok.Location = new System.Drawing.Point(216, 56);
-            this.ok.Name = "ok";
-            this.ok.Size = new System.Drawing.Size(64, 24);
-            this.ok.TabIndex = 1;
-            this.ok.Text = "OK";
-            this.ok.Click += new System.EventHandler(this.ok_Click);
+            ok.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            ok.Location = new System.Drawing.Point(216, 56);
+            ok.Name = "ok";
+            ok.Size = new System.Drawing.Size(64, 24);
+            ok.TabIndex = 1;
+            ok.Text = "OK";
+            ok.Click += new System.EventHandler(ok_Click);
             // 
             // result
             // 
-            this.result.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            result.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.result.Location = new System.Drawing.Point(12, 30);
-            this.result.Name = "result";
-            this.result.Size = new System.Drawing.Size(338, 20);
-            this.result.TabIndex = 0;
-            this.result.WordWrap = false;
+            result.Location = new System.Drawing.Point(12, 30);
+            result.Name = "result";
+            result.Size = new System.Drawing.Size(338, 20);
+            result.TabIndex = 0;
+            result.WordWrap = false;
             // 
             // label
             // 
-            this.label.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            label.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.label.Location = new System.Drawing.Point(12, 8);
-            this.label.Name = "label";
-            this.label.Size = new System.Drawing.Size(344, 19);
-            this.label.TabIndex = 3;
-            this.label.Text = "InputBox";
+            label.Location = new System.Drawing.Point(12, 8);
+            label.Name = "label";
+            label.Size = new System.Drawing.Size(344, 19);
+            label.TabIndex = 3;
+            label.Text = "InputBox";
             // 
             // cancel
             // 
-            this.cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancel.Location = new System.Drawing.Point(286, 56);
-            this.cancel.Name = "cancel";
-            this.cancel.Size = new System.Drawing.Size(64, 24);
-            this.cancel.TabIndex = 2;
-            this.cancel.Text = "Cancel";
+            cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            cancel.Location = new System.Drawing.Point(286, 56);
+            cancel.Name = "cancel";
+            cancel.Size = new System.Drawing.Size(64, 24);
+            cancel.TabIndex = 2;
+            cancel.Text = "Cancel";
             // 
             // InputBoxForm
             // 
-            this.AcceptButton = this.ok;
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.CancelButton = this.cancel;
-            this.ClientSize = new System.Drawing.Size(362, 88);
-            this.Controls.Add(this.cancel);
-            this.Controls.Add(this.label);
-            this.Controls.Add(this.result);
-            this.Controls.Add(this.ok);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "InputBoxForm";
-            this.Text = "InputBox";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AcceptButton = ok;
+            AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            CancelButton = cancel;
+            ClientSize = new System.Drawing.Size(362, 88);
+            Controls.Add(cancel);
+            Controls.Add(label);
+            Controls.Add(result);
+            Controls.Add(ok);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "InputBoxForm";
+            Text = "InputBox";
+            ResumeLayout(false);
+            PerformLayout();
+        }
 
-		}
-		#endregion
+        #endregion
 
         #region event handlers
 
@@ -190,29 +187,26 @@ namespace Extract.Utilities.Forms
         /// Called during <see cref="Form.Load"/> to set the startup position
         /// (if it has been specified)
         /// </summary>
-        /// <param name="e">Data associated with this event.</param>
+        /// <param name="e">Data associated with event.</param>
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
             // If startup location has been specified, set the start location
-			if (!this.startLocation.IsEmpty) 
-			{
-				this.Top = this.startLocation.Y;
-				this.Left = this.startLocation.X;
-			}
+            if (!startLocation.IsEmpty)
+            {
+                Top = startLocation.Y;
+                Left = startLocation.X;
+            }
         }
 
-        private void ok_Click(object sender, EventArgs e)
+        void ok_Click(object sender, EventArgs e)
         {
             // Set the return value
             returnValue = result.Text;
 
             // Set the dialog result to OK
-            this.DialogResult = DialogResult.OK;
-
-            // Close this dialog
-            this.Close();
+            DialogResult = DialogResult.OK;
         }
 
         #endregion event handlers
@@ -221,56 +215,56 @@ namespace Extract.Utilities.Forms
         /// Sets the title for the input box.
         /// </summary>
         public string Title
-		{
-			set
-			{
-				this.Text = value;
-			}
-		}
+        {
+            set
+            {
+                Text = value;
+            }
+        }
 
         /// <summary>
         /// Sets the prompt label for the input box.
         /// </summary>
-		public string Prompt
-		{
-			set
-			{
-				this.label.Text = value;
-			}
-		}
+        public string Prompt
+        {
+            set
+            {
+                label.Text = value;
+            }
+        }
 
         /// <summary>
         /// Gets the return result for the input box.
         /// </summary>
-		public string ReturnValue
-		{
-			get
-			{
-				return returnValue;
-			}
-		}
+        public string ReturnValue
+        {
+            get
+            {
+                return returnValue;
+            }
+        }
 
         /// <summary>
         /// Sets the default response value for the input box.
         /// </summary>
-		public string DefaultResponse
-		{
-			set
-			{
-				this.result.Text = value;
-				this.result.SelectAll();
-			}
-		}
+        public string DefaultResponse
+        {
+            set
+            {
+                result.Text = value;
+                result.SelectAll();
+            }
+        }
 
         /// <summary>
         /// Sets a startup location for the input box.
         /// </summary>
-		public Point StartLocation
-		{
-			set
-			{
-				this.startLocation = value;
-			}
-		}
+        public Point StartLocation
+        {
+            set
+            {
+                startLocation = value;
+            }
+        }
     }
 }

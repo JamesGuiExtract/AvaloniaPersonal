@@ -26,6 +26,11 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(SQLCDBEditorForm).ToString();
 
+        /// <summary>
+        /// The default title for this form.
+        /// </summary>
+        const string _DEFAULT_TITLE = "SQLCDBEditor";
+
         #endregion Constants
 
         #region Fields
@@ -74,6 +79,11 @@ namespace Extract.SQLCDBEditor
         /// Indicates whether the file that was open has been saved.
         /// </summary>
         bool _fileSaved;
+
+        /// <summary>
+        /// A custom value to display in the title bar.
+        /// </summary>
+        string _customTitle;
 
         #endregion Fields
 
@@ -711,15 +721,17 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         void SetWindowTitle()
         {
-            // Check for a loaded database file
-            if (string.IsNullOrEmpty(_databaseFileName))
+            if (!string.IsNullOrEmpty(_customTitle))
             {
-                Text = "SQLCDBEditor";
+                Text = _customTitle + (_dirty ? "*" : "");
+            }
+            else if (!string.IsNullOrEmpty(_databaseFileName))
+            {
+                Text = _DEFAULT_TITLE + " - " + _databaseFileName + ((_dirty) ? "*" : "");
             }
             else
             {
-                // Set the Title text
-                Text = "SQLCDBEditor - " + ((_dirty) ? "*" : "") + _databaseFileName;
+                Text = _DEFAULT_TITLE;
             }
         }
 
@@ -830,6 +842,34 @@ namespace Extract.SQLCDBEditor
         #endregion Private Methods
 
         #region Properties
+
+        /// <summary>
+        /// Gets the default title for the window.
+        /// </summary>
+        /// <value>The default title.</value>
+        public static string DefaultTitle
+        {
+            get
+            {
+                return _DEFAULT_TITLE;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the custom title for the <see cref="Form"/>.
+        /// </summary>
+        /// <value>The custom title.</value>
+        public string CustomTitle
+        {
+            get
+            {
+                return _customTitle;
+            }
+            set
+            {
+                _customTitle = value;
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the open file has been saved.

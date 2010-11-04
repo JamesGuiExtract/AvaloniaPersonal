@@ -127,6 +127,12 @@
     <Compile Include="BrowseButton.Designer.cs">
       <DependentUpon>BrowseButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="PleaseWaitForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PleaseWaitForm.Designer.cs">
+      <DependentUpon>PleaseWaitForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="WindowWrapper.cs" />
     <Compile Include="ControlInvoker.cs" />
     <Compile Include="ExtractCursors.cs" />
@@ -238,6 +244,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="PleaseWaitForm.resx">
+      <DependentUpon>PleaseWaitForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProgressStatusDialogForm.resx">
       <DependentUpon>ProgressStatusDialogForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -17,7 +17,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Rows that will need to be updated based on changes made
         /// </summary>
-        List<BetterDataGridViewRow<RowDataItem>> _rows;
+        List<FAMNetworkDashboardRow> _rows;
 
         /// <summary>
         /// Whether or not data has been changed.
@@ -49,17 +49,17 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="rows">The rows.</param>
         /// <param name="groupNames">The group names.</param>
-        public AddModifyMachineForm(IEnumerable<BetterDataGridViewRow<RowDataItem>> rows, IEnumerable<string> groupNames)
+        public AddModifyMachineForm(IEnumerable<FAMNetworkDashboardRow> rows, IEnumerable<string> groupNames)
         {
             InitializeComponent();
 
             if (rows != null)
             {
-                _rows = new List<BetterDataGridViewRow<RowDataItem>>(rows);
+                _rows = new List<FAMNetworkDashboardRow>(rows);
             }
             else
             {
-                _rows = new List<BetterDataGridViewRow<RowDataItem>>();
+                _rows = new List<FAMNetworkDashboardRow>();
             }
 
             if (groupNames != null)
@@ -237,7 +237,7 @@ namespace Extract.FileActionManager.Utilities
         /// Gets the rows.
         /// </summary>
         /// <value>The rows.</value>
-        internal ReadOnlyCollection<BetterDataGridViewRow<RowDataItem>> Rows
+        internal ReadOnlyCollection<FAMNetworkDashboardRow> Rows
         {
             get
             {

@@ -60,6 +60,7 @@
             // _textMachineName
             // 
             this._textMachineName.Location = new System.Drawing.Point(12, 25);
+            this._textMachineName.MaxLength = 256;
             this._textMachineName.Name = "_textMachineName";
             this._textMachineName.Size = new System.Drawing.Size(298, 20);
             this._textMachineName.TabIndex = 1;
@@ -82,6 +83,7 @@
             this._groupNameCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this._groupNameCombo.FormattingEnabled = true;
             this._groupNameCombo.Location = new System.Drawing.Point(12, 64);
+            this._groupNameCombo.MaxLength = 40;
             this._groupNameCombo.Name = "_groupNameCombo";
             this._groupNameCombo.Size = new System.Drawing.Size(331, 21);
             this._groupNameCombo.TabIndex = 4;

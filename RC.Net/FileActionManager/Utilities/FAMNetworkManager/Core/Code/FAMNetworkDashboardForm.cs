@@ -2,16 +2,18 @@
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Soap;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace Extract.FileActionManager.Utilities
 {
@@ -32,36 +34,32 @@ namespace Extract.FileActionManager.Utilities
     }
 
     /// <summary>
+    /// Enumeration to determine what the start/stop service buttons control.
+    /// </summary>
+    [Flags]
+    enum ServiceToControl
+    {
+        /// <summary>
+        /// Button should control the FAM service.
+        /// </summary>
+        FamService = 0x1,
+
+        /// <summary>
+        /// Button should control the FDRS service.
+        /// </summary>
+        FdrsService = 0x2,
+
+        /// <summary>
+        /// Button should control both services.
+        /// </summary>
+        Both = 0x1 | 0x2
+    }
+
+    /// <summary>
     /// Form definition for the network dashboard.
     /// </summary>
     public partial class FAMNetworkDashboardForm : Form
     {
-        #region Internal use enum
-
-        /// <summary>
-        /// Enumeration to determine what the start/stop service buttons control.
-        /// </summary>
-        [Flags]
-        enum ServiceToControl
-        {
-            /// <summary>
-            /// Button should control the FAM service.
-            /// </summary>
-            FamService = 0x1,
-
-            /// <summary>
-            /// Button should control the FDRS service.
-            /// </summary>
-            FdrsService = 0x2,
-
-            /// <summary>
-            /// Button should control both services.
-            /// </summary>
-            Both = 0x1 | 0x2
-        }
-
-        #endregion Internal use enum
-
         #region ServiceControlThreadParamaters Class
 
         class ServiceControlThreadParameters
@@ -71,7 +69,7 @@ namespace Extract.FileActionManager.Utilities
             /// <summary>
             /// The selected rows that should have their service started/stopped.
             /// </summary>
-            readonly List<BetterDataGridViewRow<RowDataItem>> _rows;
+            readonly List<FAMNetworkDashboardRow> _rows;
 
             /// <summary>
             /// The service to control (FAM, FDRS, or both).
@@ -94,10 +92,10 @@ namespace Extract.FileActionManager.Utilities
             /// <param name="serviceToControl">The service to control.</param>
             /// <param name="startService">if set to <see langword="true"/> start service
             /// otherwise stop service.</param>
-            public ServiceControlThreadParameters(List<BetterDataGridViewRow<RowDataItem>> rows,
+            public ServiceControlThreadParameters(List<FAMNetworkDashboardRow> rows,
                 ServiceToControl serviceToControl, bool startService)
             {
-                _rows = new List<BetterDataGridViewRow<RowDataItem>>(rows);
+                _rows = new List<FAMNetworkDashboardRow>(rows);
                 _serviceToControl = serviceToControl;
                 _startService = startService;
             }
@@ -110,7 +108,7 @@ namespace Extract.FileActionManager.Utilities
             /// Gets the rows.
             /// </summary>
             /// <value>The rows.</value>
-            public List<BetterDataGridViewRow<RowDataItem>> Rows
+            public List<FAMNetworkDashboardRow> Rows
             {
                 get
                 {
@@ -149,6 +147,113 @@ namespace Extract.FileActionManager.Utilities
 
         #endregion ServiceControlThreadParamaters Class
 
+        #region FormSettings Class
+
+        /// <summary>
+        /// Class for saving the settings for the FAMNetworkManager application
+        /// </summary>
+        [Serializable]
+        sealed class FAMDashboardSettings : ISerializable
+        {
+            #region Constants
+
+            /// <summary>
+            /// The current version of the settings
+            /// </summary>
+            const int _CURRENT_VERSION = 1;
+
+            #endregion Constants
+
+            #region Fields
+
+            /// <summary>
+            /// The refresh thread sleep time value
+            /// </summary>
+            int _refreshSleepTime;
+
+            #endregion Fields
+
+            #region Constructors
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="FAMDashboardSettings"/> class.
+            /// </summary>
+            FAMDashboardSettings()
+            {
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="FAMDashboardSettings"/> class.
+            /// </summary>
+            /// <param name="refreshSleepTime">The refresh sleep time.</param>
+            public FAMDashboardSettings(int refreshSleepTime)
+            {
+                _refreshSleepTime = refreshSleepTime;
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="FAMDashboardSettings"/> class.
+            /// </summary>
+            /// <param name="info">The info.</param>
+            /// <param name="context">The context.</param>
+            FAMDashboardSettings(SerializationInfo info, StreamingContext context)
+            {
+                try
+                {
+                    int version = info.GetInt32("CurrentVersion");
+                    if (version > _CURRENT_VERSION)
+                    {
+                        var ee = new ExtractException("ELI30987", "Unable to load newer version of the settings.");
+                        ee.AddDebugData("Max Version", _CURRENT_VERSION, false);
+                        ee.AddDebugData("Version To Load", version, false);
+                        throw ee;
+                    }
+
+                    _refreshSleepTime = info.GetInt32("RefreshSleepTime");
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI30986", ex);
+                }
+            }
+
+            #endregion Constructors
+
+            #region Properties
+
+            /// <summary>
+            /// Gets or sets the refresh sleep time.
+            /// </summary>
+            /// <value>The refresh sleep time.</value>
+            public int RefreshSleepTime
+            {
+                get
+                {
+                    return _refreshSleepTime;
+                }
+            }
+
+            #endregion Properties
+
+            #region ISerializable Members
+
+            /// <summary>
+            /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
+            /// </summary>
+            /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> to populate with data.</param>
+            /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext"/>) for this serialization.</param>
+            /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
+            public void GetObjectData(SerializationInfo info, StreamingContext context)
+            {
+                info.AddValue("CurrentVersion", _CURRENT_VERSION);
+                info.AddValue("RefreshSleepTime", _refreshSleepTime);
+            }
+
+            #endregion
+        }
+
+        #endregion FormSettings Class
+
         #region Constants
 
         /// <summary>
@@ -169,7 +274,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Sleep time for the service status update thread.
         /// </summary>
-        const int _REFRESH_THREAD_SLEEP_TIME = 1000;
+        const int _DEFAULT_REFRESH_THREAD_SLEEP_TIME = 1000;
 
         /// <summary>
         /// The title for the the FAM Manager application
@@ -177,11 +282,23 @@ namespace Extract.FileActionManager.Utilities
         const string _FAM_MANAGER_TITLE = "FAM Network Manager";
 
         /// <summary>
+        /// Path to the folder containing the application settings for this application.
+        /// </summary>
+        static readonly string _APPLICATION_SETTINGS_DIR =
+            Path.Combine(FileSystemMethods.ApplicationDataPath, "FAM Network Manager");
+
+        /// <summary>
         /// The full path to the file that contains information about persisting the 
         /// <see cref="FAMNetworkDashboardForm"/>.
         /// </summary>
-        static readonly string _FORM_PERSISTENCE_FILE = FileSystemMethods.PathCombine(
-            FileSystemMethods.ApplicationDataPath, "FAM Network Manager", "FamNetworkDashboard.xml");
+        static readonly string _FORM_PERSISTENCE_FILE = Path.Combine(
+            _APPLICATION_SETTINGS_DIR, "FamNetworkDashboard.xml");
+
+        /// <summary>
+        /// The path to the file containing the settings for this application.
+        /// </summary>
+        static readonly string _APPLICATION_SETTINGS_FILE = Path.Combine(
+            _APPLICATION_SETTINGS_DIR, "FamNetworkManagerSettings.xml");
 
         /// <summary>
         /// Name for the mutex used to serialize persistance of the control and form layout.
@@ -203,14 +320,19 @@ namespace Extract.FileActionManager.Utilities
         volatile bool _refreshData;
 
         /// <summary>
-        /// Event to signal the refresh thread to exit
+        /// Event to signal the threads to exit.
         /// </summary>
-        ManualResetEvent _endRefreshThread = new ManualResetEvent(false);
+        ManualResetEvent _endThreads = new ManualResetEvent(false);
 
         /// <summary>
         /// Event to indicate the refresh thread has exited
         /// </summary>
         ManualResetEvent _refreshThreadEnded = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Event to indicate the cleanup thread has exited
+        /// </summary>
+        ManualResetEvent _cleanupThreadEnded = new ManualResetEvent(false);
 
         /// <summary>
         /// The file to open when the form loads.
@@ -222,6 +344,27 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         FormStateManager _formStateManager;
 
+        /// <summary>
+        /// Flag to indicate whether the current FNM instance is dirty or not.
+        /// </summary>
+        bool _dirty;
+
+        /// <summary>
+        /// The sleep time for the refresh thread
+        /// </summary>
+        volatile int _refreshSleepTime = _DEFAULT_REFRESH_THREAD_SLEEP_TIME;
+
+        /// <summary>
+        /// Collection of rows that have been deleted but not disposed yet.
+        /// </summary>
+        ConcurrentQueue<FAMNetworkDashboardRow> _deletedRows =
+            new ConcurrentQueue<FAMNetworkDashboardRow>();
+
+        /// <summary>
+        /// Flag to indicate whether the form should be reset to installed default state.
+        /// </summary>
+        bool _resetForm;
+
         #endregion Fields
 
         #region Delegates
@@ -230,17 +373,16 @@ namespace Extract.FileActionManager.Utilities
         /// Delegate method used to set the error information for a row.
         /// </summary>
         /// <param name="row">The row to set the information for.</param>
-        /// <param name="errorText">The text for the error.</param>
         /// <param name="ee">The exception to add to the row.</param>
-        delegate void SetErrorTextDelegate(BetterDataGridViewRow<RowDataItem> row,
-            string errorText, ExtractException ee);
+        delegate void SetErrorTextDelegate(FAMNetworkDashboardRow row,
+            ExtractException ee);
 
         /// <summary>
         /// Delegate method used to update the data for individual rows when a refresh is called.
         /// </summary>
         /// <param name="row">The row to update.</param>
         /// <param name="data">The data to update the row with.</param>
-        delegate void RefreshRowDataDelegate(BetterDataGridViewRow<RowDataItem> row, ServiceStatusUpdateData data);
+        delegate void RefreshRowDataDelegate(FAMNetworkDashboardRow row, ServiceStatusUpdateData data);
 
         /// <summary>
         /// Delegate method used to refresh the data grid.
@@ -256,7 +398,7 @@ namespace Extract.FileActionManager.Utilities
         /// Initializes a new instance of the <see cref="FAMNetworkDashboardForm"/> class.
         /// </summary>
         public FAMNetworkDashboardForm()
-            : this(null)
+            : this(null, false)
         {
         }
 
@@ -265,6 +407,17 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="fileToOpen">The file to open.</param>
         public FAMNetworkDashboardForm(string fileToOpen)
+            : this(fileToOpen, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FAMNetworkDashboardForm"/> class.
+        /// </summary>
+        /// <param name="fileToOpen">The file to open.</param>
+        /// <param name="resetForm">if set to <see langword="true"/> then persisted
+        /// form settings will not be used and form will be reset to install defaults.</param>
+        public FAMNetworkDashboardForm(string fileToOpen, bool resetForm)
         {
             InitializeComponent();
 
@@ -276,6 +429,8 @@ namespace Extract.FileActionManager.Utilities
                 _formStateManager = new FormStateManager(
                     this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, true, null);
             }
+
+            _resetForm = resetForm;
 
             Text = _FAM_MANAGER_TITLE;
         }
@@ -292,18 +447,31 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                if (_resetForm && _formStateManager != null)
+                {
+                    _formStateManager.SaveState();
+                }
+
                 base.OnLoad(e);
 
                 _startStopTargetComboBox.SelectedIndex = 0;
 
-                // Launch the stats update thread
-                Thread thread = new Thread(RefreshDataThread);
-                thread.SetApartmentState(ApartmentState.MTA);
-                thread.Start();
+                LoadSettings();
+
+                // Launch the refresh data thread
+                Thread refreshThread = new Thread(RefreshDataThread);
+                refreshThread.SetApartmentState(ApartmentState.MTA);
+                refreshThread.Start();
+
+                // Launch the row cleanup thread (handles disposing of rows
+                // that are removed from the datagrid)
+                Thread rowCleanupThread = new Thread(CleanupRowsThread);
+                rowCleanupThread.SetApartmentState(ApartmentState.MTA);
+                rowCleanupThread.Start();
 
                 if (!string.IsNullOrEmpty(_currentFile))
                 {
-                    LoadSettings(_currentFile);
+                    LoadMachineList(_currentFile);
                 }
 
                 UpdateEnabledStates();
@@ -311,6 +479,149 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ExtractException.Display("ELI30801", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Closing"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs"/> that contains the event data.</param>
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            try
+            {
+                if (!PromptForDirtyFile())
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                SaveSettings();
+
+                // End the worker threads
+                _endThreads.Set();
+
+                // Add all rows to the cleanup queue
+                foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
+                {
+                    _deletedRows.Enqueue(row);
+                }
+                _machineListGridView.Rows.Clear();
+
+                // Display the wait form while waiting for the service controllers to
+                // finish
+                using (ManualResetEvent eventHandle = new ManualResetEvent(false))
+                {
+                    var task = Task.Factory.StartNew(() =>
+                        {
+                            try
+                            {
+                                while (!_deletedRows.IsEmpty)
+                                {
+                                    var list = new List<FAMNetworkDashboardRow>();
+                                    FAMNetworkDashboardRow row = null;
+                                    while (_deletedRows.TryDequeue(out row))
+                                    {
+                                        if (row.ControllerOperating)
+                                        {
+                                            list.Add(row);
+                                        }
+                                        else
+                                        {
+                                            row.Dispose();
+                                        }
+                                    }
+
+                                    if (list.Count > 0)
+                                    {
+                                        foreach (var rowToKeep in list)
+                                        {
+                                            _deletedRows.Enqueue(rowToKeep);
+                                        }
+                                        list.Clear();
+
+                                        // Sleep to give controllers a chance to finish
+                                        // before checking again
+                                        Thread.Sleep(500);
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                eventHandle.Set();
+                            }
+                        }
+                    );
+
+                    if (!_deletedRows.IsEmpty)
+                    {
+                        using (var waitForm = new PleaseWaitForm(
+                            "Waiting for service controllers to finish.", eventHandle))
+                        {
+                            waitForm.ShowDialog();
+                        }
+                    }
+
+                    try
+                    {
+                        task.Wait();
+                    }
+                    catch (AggregateException ae)
+                    {
+                        throw ExtractException.AsExtractException("ELI30993", ae.Flatten());
+                    }
+                }
+
+                base.OnClosing(e);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30994", ex);
+            }
+        }
+
+        /// <summary>
+        /// Processes a command key.
+        /// </summary>
+        /// <param name="msg">A <see cref="T:System.Windows.Forms.Message"/>, passed by reference, that represents the Win32 message to process.</param>
+        /// <param name="keyData">One of the <see cref="T:System.Windows.Forms.Keys"/> values that represents the key to process.</param>
+        /// <returns>
+        /// true if the keystroke was processed and consumed by the control; otherwise, false to allow further processing.
+        /// </returns>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            try
+            {
+                bool handled = true;
+                switch (keyData)
+                {
+                    case Keys.Delete:
+                        HandleRemoveMachineButtonClick(this, new EventArgs());
+                        break;
+
+                    case Keys.F2:
+                        HandleEditMachineOrGroupButtonClick(this, new EventArgs());
+                        break;
+
+                    case Keys.F8:
+                        HandleAddMachineButtonClick(this, new EventArgs());
+                        break;
+
+                    case Keys.F5:
+                        RefreshData(false);
+                        break;
+
+                    default:
+                        handled = false;
+                        break;
+                }
+
+                return !handled ? base.ProcessCmdKey(ref msg, keyData) : handled;
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30995", ex);
+                return true;
             }
         }
 
@@ -323,6 +634,11 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                if (!PromptForDirtyFile())
+                {
+                    return;
+                }
+
                 using (OpenFileDialog open = new OpenFileDialog())
                 {
                     open.Filter = _FILE_FILTER;
@@ -333,7 +649,7 @@ namespace Extract.FileActionManager.Utilities
                     if (open.ShowDialog() == DialogResult.OK)
                     {
                         Refresh();
-                        LoadSettings(open.FileName);
+                        LoadMachineList(open.FileName);
                     }
                 }
             }
@@ -352,14 +668,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                if (string.IsNullOrEmpty(_currentFile))
-                {
-                    HandleSaveAsClick(sender, e);
-                }
-                else
-                {
-                    SaveSettings(_currentFile);
-                }
+                SaveMachineList(_currentFile);
             }
             catch (Exception ex)
             {
@@ -376,19 +685,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                using (SaveFileDialog save = new SaveFileDialog())
-                {
-                    save.Filter = _FILE_FILTER;
-                    save.DefaultExt = _DEFAULT_FILE_EXT;
-                    save.AddExtension = true;
-                    save.CheckPathExists = true;
-                    save.OverwritePrompt = true;
-                    save.ValidateNames = true;
-                    if (save.ShowDialog() == DialogResult.OK)
-                    {
-                        SaveSettings(save.FileName);
-                    }
-                }
+                SaveMachineList();
             }
             catch (Exception ex)
             {
@@ -415,7 +712,7 @@ namespace Extract.FileActionManager.Utilities
                         {
                             ServiceMachineController controller = new ServiceMachineController(
                                 addForm.MachineName, addForm.GroupName);
-                            var row = new BetterDataGridViewRow<RowDataItem>(
+                            var row = new FAMNetworkDashboardRow(
                                 new RowDataItem(controller));
 
                             row.CreateCells(_machineListGridView,
@@ -435,12 +732,14 @@ namespace Extract.FileActionManager.Utilities
                                         var ee = ExtractException.AsExtractException("ELI30821", ex);
                                         ee.AddDebugData("Machine Name",
                                             controller.MachineName, false);
-                                        SetRowErrorText(row, ex.Message, ee);
+                                        SetRowErrorText(row, ee);
                                     }
                                 }
                             );
 
+                            _dirty = true;
                             UpdateGroupFilterList();
+                            UpdateTitle();
                         }
                     }
                 }
@@ -460,14 +759,27 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.SelectedRows)
+                foreach (FAMNetworkDashboardRow row in _machineListGridView.SelectedRows)
                 {
                     if (row.Visible)
                     {
                         _machineListGridView.Rows.RemoveAt(row.Index);
-                        row.Dispose();
+                        _deletedRows.Enqueue(row);
+                        _dirty = true;
                     }
                 }
+
+                // Check if any rows were deleted and what the current row count is,
+                // if there is no current file and there are no rows clear the dirty flag
+                if (_dirty && string.IsNullOrWhiteSpace(_currentFile)
+                    && _machineListGridView.Rows.Count == 0)
+                {
+                    _dirty = false;
+                }
+
+                UpdateGroupFilterList();
+                UpdateTitle();
+                UpdateEnabledStates();
             }
             catch (Exception ex)
             {
@@ -484,8 +796,13 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                var rows = new List<BetterDataGridViewRow<RowDataItem>>();
-                foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.SelectedRows)
+                if (_machineListGridView.SelectedRows.Count < 1)
+                {
+                    return;
+                }
+
+                var rows = new List<FAMNetworkDashboardRow>();
+                foreach (FAMNetworkDashboardRow row in _machineListGridView.SelectedRows)
                 {
                     if (row.Visible)
                     {
@@ -499,6 +816,8 @@ namespace Extract.FileActionManager.Utilities
                     {
                         if (modifyForm.DataChanged)
                         {
+                            _dirty = true;
+
                             // Get the group name and the rows to update
                             string groupName = modifyForm.GroupName;
                             var rowsToUpdate = modifyForm.Rows;
@@ -510,7 +829,7 @@ namespace Extract.FileActionManager.Utilities
                                 var row = rowsToUpdate[0];
                                 row.Cells[(int)GridColumns.MachineName].Value = machineName;
                                 row.Cells[(int)GridColumns.GroupName].Value = groupName;
-                                UpdateServiceMachineController(row, groupName, machineName);
+                                row.UpdateMachineAndGroupName(machineName, groupName);
                                 Task.Factory.StartNew(RefreshServiceData, row);
                             }
                             else
@@ -519,12 +838,13 @@ namespace Extract.FileActionManager.Utilities
                                 foreach (var row in rowsToUpdate)
                                 {
                                     row.Cells[(int)GridColumns.GroupName].Value = groupName;
-                                    UpdateServiceMachineController(row, groupName);
+                                    row.UpdateMachineAndGroupName(null, groupName);
                                     Task.Factory.StartNew(RefreshServiceData, row);
                                 }
                             }
 
                             UpdateGroupFilterList();
+                            UpdateTitle();
                         }
                     }
                 }
@@ -590,10 +910,13 @@ namespace Extract.FileActionManager.Utilities
                     return;
                 }
 
+                string machineName = (string)_machineListGridView.SelectedRows[0].Cells[
+                    (int)GridColumns.MachineName].Value;
+
                 // Compute the name of the file
                 StringBuilder dbFile = new StringBuilder();
                 dbFile.Append(@"\\");
-                dbFile.Append(_machineListGridView.SelectedRows[0].Cells[(int)GridColumns.MachineName].Value);
+                dbFile.Append(machineName);
                 dbFile.Append(@"\c$\Program Files\Extract Systems\CommonComponents\ESFAMService.sdf");
                 if (!File.Exists(dbFile.ToString()))
                 {
@@ -613,6 +936,9 @@ namespace Extract.FileActionManager.Utilities
                     File.Copy(dbFile.ToString(), tempDb.FileName, true);
                     using (SQLCDBEditorForm editor = new SQLCDBEditorForm(tempDb.FileName, false))
                     {
+                        editor.CustomTitle = SQLCDBEditorForm.DefaultTitle + " - "
+                            + machineName + ": FAM Service Database";
+                        editor.StartPosition = FormStartPosition.CenterParent;
                         editor.ShowDialog();
                         if (editor.FileSaved)
                         {
@@ -712,17 +1038,20 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                var row = (BetterDataGridViewRow<RowDataItem>)
-                    _machineListGridView.SelectedRows[0];
-                if (row.DataItem.Exception != null)
+                if (_machineListGridView.SelectedRows.Count == 1)
                 {
-                    // Need to invoke the dialog so that the row selection from
-                    // the double-click completes
-                    BeginInvoke((MethodInvoker)(() =>
-                        {
-                            row.DataItem.Exception.Display();
-                        })
-                    );
+                    var row = (FAMNetworkDashboardRow)
+                        _machineListGridView.SelectedRows[0];
+                    if (row.Exception != null)
+                    {
+                        // Need to invoke the dialog so that the row selection from
+                        // the double-click completes
+                        BeginInvoke((MethodInvoker)(() =>
+                            {
+                                row.Exception.Display();
+                            })
+                        );
+                    }
                 }
             }
             catch (Exception ex)
@@ -772,7 +1101,7 @@ namespace Extract.FileActionManager.Utilities
                 if (string.IsNullOrEmpty(selectedGroup))
                 {
                     // All rows should be visible
-                    foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
+                    foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
                     {
                         if (row.Selected)
                         {
@@ -783,7 +1112,7 @@ namespace Extract.FileActionManager.Utilities
                 }
                 else
                 {
-                    foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
+                    foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
                     {
                         string temp = row.Cells[(int)GridColumns.GroupName].Value.ToString();
                         row.Visible = selectedGroup.Equals(temp, StringComparison.Ordinal);
@@ -815,11 +1144,52 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the set auto refresh thread sleep time menu item click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleSetAutoRefreshThreadSleepTime(object sender, EventArgs e)
+        {
+            try
+            {
+                string value = _refreshSleepTime.ToString(CultureInfo.CurrentCulture);
+                do
+                {
+                    if (InputBox.Show(this, "Auto refresh frequency in milliseconds:",
+                        "Refresh Time", ref value) == DialogResult.OK)
+                    {
+                        int temp;
+                        if (!int.TryParse(value, out temp) || temp <= 0)
+                        {
+                            MessageBox.Show("Invalid refresh time specified, must be an integer > 0",
+                                "Invalid Refresh Time", MessageBoxButtons.OK, MessageBoxIcon.Error,
+                                MessageBoxDefaultButton.Button1, 0);
+                        }
+                        else
+                        {
+                            _refreshSleepTime = temp;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                while (true);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30985", ex);
+            }
+        }
+
+        /// <summary>
         /// Refreshes the row data.
         /// </summary>
         /// <param name="row">The row.</param>
         /// <param name="data">The data.</param>
-        void RefreshRowData(BetterDataGridViewRow<RowDataItem> row, ServiceStatusUpdateData data)
+        void RefreshRowData(FAMNetworkDashboardRow row, ServiceStatusUpdateData data)
         {
             if (InvokeRequired)
             {
@@ -828,10 +1198,10 @@ namespace Extract.FileActionManager.Utilities
                 return;
             }
 
-            if (row.Visible)
+            if (row.Index != -1 && row.Visible)
             {
                 row.ErrorText = string.Empty;
-                row.DataItem.Exception = null;
+                row.Exception = null;
                 row.Cells[(int)GridColumns.FAMService].Value = data.FamServiceStatus;
                 row.Cells[(int)GridColumns.FDRSService].Value = data.FdrsServiceStatus;
                 row.Cells[(int)GridColumns.CPUUsage].Value =
@@ -845,7 +1215,7 @@ namespace Extract.FileActionManager.Utilities
         void RefreshData(bool autoUpdate)
         {
             // Clear all cells
-            foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
+            foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
             {
                 if (row.Visible)
                 {
@@ -881,7 +1251,7 @@ namespace Extract.FileActionManager.Utilities
                         RefreshServiceDataForAllRows();
                     }
                 }
-                while (!_endRefreshThread.WaitOne(_REFRESH_THREAD_SLEEP_TIME));
+                while (!_endThreads.WaitOne(_refreshSleepTime));
             }
             catch (ThreadAbortException)
             {
@@ -906,7 +1276,7 @@ namespace Extract.FileActionManager.Utilities
         void RefreshServiceDataForAllRows()
         {
             // Create a list of all current rows in the UI
-            foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
+            foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
             {
                 if (row.Visible)
                 {
@@ -921,72 +1291,88 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="rowObject">The row to update.</param>
         void RefreshServiceData(object rowObject)
         {
-            var row = rowObject as BetterDataGridViewRow<RowDataItem>;
+            var row = rowObject as FAMNetworkDashboardRow;
             if (row == null)
             {
                 return;
             }
 
-            string machineName = null;
             try
             {
                 // If the row is still in the collection and visible, get its controller,
                 // refresh the data and update the row
-                if (!_endRefreshThread.WaitOne(0)
-                    && !row.IsDisposed)
+                if (!_endThreads.WaitOne(0))
                 {
-                    ServiceMachineController controller = row.DataItem.Controller;
-                    machineName = controller.MachineName;
-                    var data = controller.RefreshData();
+                    var data = row.RefreshData();
                     RefreshRowData(row, data);
                 }
             }
             catch (Exception ex)
             {
                 var ee = ExtractException.AsExtractException("ELI30809", ex);
-                ee.AddDebugData("Machine Name", machineName ?? "Unknown", false);
-                SetRowErrorText(row, ex.Message, ee);
+                SetRowErrorText(row, ee);
             }
         }
 
         /// <summary>
-        /// Saves the settings.
+        /// Saves the machine list.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
-        void SaveSettings(string fileName)
+        bool SaveMachineList(string fileName = null)
         {
             Refresh();
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                using (SaveFileDialog save = new SaveFileDialog())
+                {
+                    save.Filter = _FILE_FILTER;
+                    save.DefaultExt = _DEFAULT_FILE_EXT;
+                    save.AddExtension = true;
+                    save.CheckPathExists = true;
+                    save.OverwritePrompt = true;
+                    save.ValidateNames = true;
+                    if (save.ShowDialog() == DialogResult.OK)
+                    {
+                        return SaveMachineList(save.FileName);
+                    }
+                }
+
+                return false;
+            }
+
             using (TemporaryWaitCursor cursor = new TemporaryWaitCursor())
             {
                 List<ServiceMachineController> data = new List<ServiceMachineController>();
-                foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
+                foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
                 {
-                    if (!row.IsDisposed)
-                    {
-                        data.Add(row.DataItem.Controller);
-                    }
+                    data.Add(row.DataItem.Controller);
                 }
+                var serializer = new SoapFormatter();
                 using (FileStream stream = File.Open(fileName, FileMode.Create, FileAccess.Write))
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<ServiceMachineController>));
-                    serializer.Serialize(stream, data);
+                    serializer.Serialize(stream, data.Count);
+                    foreach (var controller in data)
+                    {
+                        serializer.Serialize(stream, controller);
+                    }
                     stream.Flush();
                 }
 
                 // Update the current file name to the saved file name
                 _currentFile = fileName;
 
-                // Update the title
-                Text = _FAM_MANAGER_TITLE + " - " + _currentFile;
+                _dirty = false;
+                UpdateTitle();
 
+                return true;
             }
         }
 
         /// <summary>
-        /// Loads the settings.
+        /// Loads the stored list of machines.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
-        void LoadSettings(string fileName)
+        void LoadMachineList(string fileName)
         {
             try
             {
@@ -995,13 +1381,19 @@ namespace Extract.FileActionManager.Utilities
                     List<ServiceMachineController> controllers = null;
                     using (FileStream stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
                     {
-                        XmlSerializer serializer = new XmlSerializer(typeof(List<ServiceMachineController>));
-                        controllers = (List<ServiceMachineController>)serializer.Deserialize(stream);
+                        var serializer = new SoapFormatter();
+                        int count = (int)serializer.Deserialize(stream);
+                        controllers = new List<ServiceMachineController>(count);
+                        for (int i = 0; i < count; i++)
+                        {
+                            var controller = (ServiceMachineController)serializer.Deserialize(stream);
+                            controllers.Add(controller);
+                        }
                     }
 
                     // Ensure the rows are disposed before loading the new rows
-                    var rowsToDispose = new List<BetterDataGridViewRow<RowDataItem>>();
-                    foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
+                    var rowsToDispose = new List<FAMNetworkDashboardRow>();
+                    foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
                     {
                         rowsToDispose.Add(row);
                     }
@@ -1010,9 +1402,9 @@ namespace Extract.FileActionManager.Utilities
 
                     _currentFile = fileName;
 
-                    foreach (ServiceMachineController controller in controllers)
+                    foreach (var controller in controllers)
                     {
-                        var row = new BetterDataGridViewRow<RowDataItem>(
+                        var row = new FAMNetworkDashboardRow(
                             new RowDataItem(controller));
                         row.CreateCells(_machineListGridView);
                         row.Cells[0].Value = controller.MachineName;
@@ -1020,10 +1412,9 @@ namespace Extract.FileActionManager.Utilities
                         _machineListGridView.Rows.Add(row);
                     }
 
+                    _dirty = false;
                     UpdateGroupFilterList();
-
-                    // Update the title
-                    Text = _FAM_MANAGER_TITLE + " - " + _currentFile;
+                    UpdateTitle();
 
                     // Refresh the data if not currently auto-refreshing
                     if (!_refreshData)
@@ -1047,9 +1438,9 @@ namespace Extract.FileActionManager.Utilities
         SortedSet<string> BuildGroupList()
         {
             SortedSet<string> groups = new SortedSet<string>();
-            foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.Rows)
+            foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
             {
-                if (!row.IsDisposed && row.DataItem.Controller != null)
+                if (row.DataItem.Controller != null)
                 {
                     groups.Add(row.DataItem.Controller.GroupName);
                 }
@@ -1062,9 +1453,8 @@ namespace Extract.FileActionManager.Utilities
         /// Sets the row error text.
         /// </summary>
         /// <param name="row">The row.</param>
-        /// <param name="errorText">The error text.</param>
         /// <param name="ee">The exception to associate with the row.</param>
-        void SetRowErrorText(BetterDataGridViewRow<RowDataItem> row, string errorText,
+        void SetRowErrorText(FAMNetworkDashboardRow row,
             ExtractException ee)
         {
             try
@@ -1072,18 +1462,19 @@ namespace Extract.FileActionManager.Utilities
                 if (InvokeRequired)
                 {
                     BeginInvoke(new SetErrorTextDelegate(SetRowErrorText),
-                        new object[] { row, errorText, ee });
+                        new object[] { row, ee });
                     return;
                 }
 
                 // Check if this is the same error
-                if (!row.IsDisposed && !row.ErrorText.Equals(errorText, StringComparison.Ordinal))
+                if (row.Index != -1
+                    && !row.ErrorText.Equals(ee.Message, StringComparison.Ordinal))
                 {
-                    row.ErrorText = errorText;
-                    row.Cells[(int)GridColumns.FAMService].Value = "error";
-                    row.Cells[(int)GridColumns.FDRSService].Value = "error";
-                    row.Cells[(int)GridColumns.CPUUsage].Value = "error";
-                    row.DataItem.Exception = ee;
+                    row.ErrorText = ee.Message;
+                    row.Cells[(int)GridColumns.FAMService].Value = "";
+                    row.Cells[(int)GridColumns.FDRSService].Value = "";
+                    row.Cells[(int)GridColumns.CPUUsage].Value = "";
+                    row.Exception = ee;
                 }
             }
             catch (Exception ex)
@@ -1106,39 +1497,21 @@ namespace Extract.FileActionManager.Utilities
                 return;
             }
 
-            // Get the data from arguments
-            var famService = data.ServiceToControl.HasFlag(ServiceToControl.FamService);
-            var fdrsService = data.ServiceToControl.HasFlag(ServiceToControl.FdrsService);
+            var service = data.ServiceToControl;
             var startService = data.StartService;
 
-            foreach (BetterDataGridViewRow<RowDataItem> row in data.Rows)
+            foreach (FAMNetworkDashboardRow row in data.Rows)
             {
                 Task.Factory.StartNew(() =>
                     {
-                        string machineName = null;
                         try
                         {
-                            if (!row.IsDisposed)
-                            {
-                                var controller = row.DataItem.Controller;
-                                machineName = controller.MachineName;
-                                if (famService)
-                                {
-                                    controller.ControlFamService(startService);
-                                }
-                                if (fdrsService)
-                                {
-                                    controller.ControlFdrsService(startService);
-                                }
-                            }
+                            row.ControlService(service, startService);
                         }
                         catch (Exception ex)
                         {
                             var ee = ExtractException.AsExtractException("ELI30803", ex);
-                            ee.AddDebugData("Machine Name", machineName ?? "Unknown", false);
-                            ee.AddDebugData("Starting Service", startService, false);
-
-                            SetRowErrorText(row, ex.Message, ee);
+                            SetRowErrorText(row, ee);
                         }
                     }
                 );
@@ -1167,26 +1540,6 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Updates the service machine controller.
-        /// </summary>
-        /// <param name="row">The row.</param>
-        /// <param name="groupName">Name of the group.</param>
-        /// <param name="machineName">Name of the machine.</param>
-        static void UpdateServiceMachineController(BetterDataGridViewRow<RowDataItem> row, string groupName,
-            string machineName = null)
-        {
-            if (!row.IsDisposed)
-            {
-                var controller = row.DataItem.Controller;
-                controller.GroupName = groupName;
-                if (machineName != null)
-                {
-                    controller.MachineName = machineName;
-                }
-            }
-        }
-
-        /// <summary>
         /// Updates the enabled states of the toolstrip buttons and menu items.
         /// </summary>
         void UpdateEnabledStates()
@@ -1194,8 +1547,10 @@ namespace Extract.FileActionManager.Utilities
             int rowCount = _machineListGridView.Rows.Count;
             int selectedCount = _machineListGridView.SelectedRows.Count;
 
-            _saveFileToolStripButton.Enabled = rowCount > 0;
-            _saveToolStripMenuItem.Enabled = rowCount > 0;
+            var saveEnabled = rowCount > 0 || _dirty;
+            _saveFileToolStripButton.Enabled = saveEnabled;
+            _saveToolStripMenuItem.Enabled = saveEnabled;
+            _saveAsToolStripMenuItem.Enabled = saveEnabled;
 
             _removeMachineToolStripButton.Enabled = selectedCount > 0;
             _modifyServiceDatabaseToolStripButton.Enabled = selectedCount == 1;
@@ -1209,8 +1564,8 @@ namespace Extract.FileActionManager.Utilities
         /// will be started, if <see langword="false"/> the service will be stopped..</param>
         void ControlServiceForSelectedRows(bool startService)
         {
-            List<BetterDataGridViewRow<RowDataItem>> selectedRows = new List<BetterDataGridViewRow<RowDataItem>>();
-            foreach (BetterDataGridViewRow<RowDataItem> row in _machineListGridView.SelectedRows)
+            var selectedRows = new List<FAMNetworkDashboardRow>();
+            foreach (FAMNetworkDashboardRow row in _machineListGridView.SelectedRows)
             {
                 if (row.Visible)
                 {
@@ -1225,7 +1580,148 @@ namespace Extract.FileActionManager.Utilities
             Task.Factory.StartNew(ControlServices, controllerData);
         }
 
-        #endregion Methods
+        /// <summary>
+        /// Thread method that cleans up the deleted rows.
+        /// </summary>
+        void CleanupRowsThread()
+        {
+            try
+            {
+                while (!_endThreads.WaitOne(1000))
+                {
+                    var list = new List<FAMNetworkDashboardRow>();
+                    FAMNetworkDashboardRow row = null;
+                    while (!_endThreads.WaitOne(0)
+                        && !_deletedRows.IsEmpty
+                        && _deletedRows.TryDequeue(out row))
+                    {
+                        if (row.ControllerOperating)
+                        {
+                            list.Add(row);
+                        }
+                        else
+                        {
+                            row.Dispose();
+                        }
+                    }
+                    if (list.Count > 0)
+                    {
+                        foreach (var rowToKeep in list)
+                        {
+                            _deletedRows.Enqueue(rowToKeep);
+                        }
+                        list.Clear();
+                    }
+                }
+            }
+            catch (ThreadAbortException)
+            {
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Log("ELI30335", ex);
+            }
+            finally
+            {
+                if (_cleanupThreadEnded != null)
+                {
+                    _cleanupThreadEnded.Set();
+                }
+            }
+        }
 
+        /// <summary>
+        /// Updates the title.
+        /// </summary>
+        void UpdateTitle()
+        {
+            StringBuilder sb = new StringBuilder(_FAM_MANAGER_TITLE);
+            if (!string.IsNullOrWhiteSpace(_currentFile))
+            {
+                sb.Append(" - ");
+                sb.Append(_currentFile);
+            }
+
+            if (_dirty)
+            {
+                sb.Append("*");
+            }
+
+            Text = sb.ToString();
+        }
+
+        /// <summary>
+        /// Saves the settings.
+        /// </summary>
+        void SaveSettings()
+        {
+            var formatter = new SoapFormatter();
+            using (FileStream stream = new FileStream(_APPLICATION_SETTINGS_FILE,
+                FileMode.Create, FileAccess.Write))
+            {
+                formatter.Serialize(stream, new FAMDashboardSettings(_refreshSleepTime));
+                stream.Flush();
+            }
+        }
+
+        /// <summary>
+        /// Loads the settings.
+        /// </summary>
+        void LoadSettings()
+        {
+            if (!File.Exists(_APPLICATION_SETTINGS_FILE))
+            {
+                return;
+            }
+
+            var formatter = new SoapFormatter();
+            using (FileStream stream = new FileStream(_APPLICATION_SETTINGS_FILE,
+                FileMode.Open, FileAccess.Read))
+            {
+                var settings = (FAMDashboardSettings)formatter.Deserialize(stream);
+                if (settings.RefreshSleepTime <= 0)
+                {
+                    _refreshSleepTime = _DEFAULT_REFRESH_THREAD_SLEEP_TIME;
+                    var ee = new ExtractException("ELI30988",
+                        "Invalid refresh setting time in persisted settings, restoring default value.");
+                    ee.AddDebugData("Refresh Time", settings.RefreshSleepTime, false);
+                    throw ee;
+                }
+
+                _refreshSleepTime = settings.RefreshSleepTime;
+            }
+        }
+
+        /// <summary>
+        /// Prompts for file save if the file is dirty, returns <see langword="true"/>
+        /// if the file is saved.
+        /// </summary>
+        /// <returns></returns>
+        bool PromptForDirtyFile()
+        {
+            bool saved = true;
+            if (_dirty)
+            {
+                var result = MessageBox.Show(
+                    "File has not been saved, would you like to save now?",
+                    "File Not Saved", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1, 0);
+                if (result == DialogResult.Yes)
+                {
+                    if (!SaveMachineList(_currentFile))
+                    {
+                        saved = false;
+                    }
+                }
+                else if (result == DialogResult.Cancel)
+                {
+                    saved = false;
+                }
+            }
+
+            return saved;
+        }
+
+        #endregion Methods
     }
 }

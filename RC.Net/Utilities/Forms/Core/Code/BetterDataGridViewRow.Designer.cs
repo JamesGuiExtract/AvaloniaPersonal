@@ -15,9 +15,6 @@
         {
             if (disposing)
             {
-                // Set the disposed flag to true
-                _disposed = true;
-
                 if (components != null)
                 {
                     components.Dispose();

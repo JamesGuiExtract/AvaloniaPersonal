@@ -19,19 +19,32 @@ namespace Extract.FileActionManager.Utilities
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
+                bool resetForm = false;
+
+                string fileName = null;
                 if (args.Length > 1)
                 {
                     ShowUsage("Too many arguments specified.");
                     return;
                 }
-                else if (args.Length == 1 && args[0].Equals("/?", StringComparison.Ordinal))
+                else if (args.Length == 1)
                 {
-                    ShowUsage();
-                    return;
+                    var arg1 = args[0];
+                    if (arg1.Equals("/?", StringComparison.Ordinal))
+                    {
+                        ShowUsage();
+                        return;
+                    }
+                    else if (arg1.Equals("/reset", StringComparison.OrdinalIgnoreCase))
+                    {
+                        resetForm = true;
+                    }
+                    else
+                    {
+                        fileName = Path.GetFullPath(arg1);
+                    }
                 }
 
-                // Get the file name from the command line
-                string fileName = args.Length == 1 ? Path.GetFullPath(args[0]) : null;
                 if (!string.IsNullOrEmpty(fileName) && !File.Exists(fileName))
                 {
                     ExtractException ee = new ExtractException("ELI30820",
@@ -45,7 +58,7 @@ namespace Extract.FileActionManager.Utilities
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30982",
                     "FAM Network Manager Application");
 
-                FAMNetworkDashboardForm form = new FAMNetworkDashboardForm(fileName);
+                var form = new FAMNetworkDashboardForm(fileName, resetForm);
                 form.Icon = Properties.Resources.FamNetworkManager;
                 Application.Run(form);
             }
@@ -69,10 +82,11 @@ namespace Extract.FileActionManager.Utilities
             }
 
             sb.AppendLine("Usage:");
-            sb.AppendLine("FAMNetworkManager.exe [<FileToOpen>]|[/?]");
+            sb.AppendLine("FAMNetworkManager.exe [/?]|[<FileToOpen>]|[/reset]");
             sb.AppendLine("-----------------------------------------");
             sb.AppendLine("/? - Display usage message");
             sb.AppendLine("<FileToOpen> - The name of the '.fnm' file to load on opening");
+            sb.AppendLine("/reset - resets the application form to installed defaults");
 
             MessageBox.Show(sb.ToString(), "Usage", MessageBoxButtons.OK,
                 errorMessage == null ? MessageBoxIcon.Information : MessageBoxIcon.Error,

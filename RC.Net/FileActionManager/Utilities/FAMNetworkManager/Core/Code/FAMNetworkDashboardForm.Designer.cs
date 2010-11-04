@@ -23,15 +23,30 @@
                 if (_refreshThreadEnded != null)
                 {
                     _refreshData = false;
-                    _endRefreshThread.Set();
+                    _endThreads.Set();
                     _refreshThreadEnded.WaitOne(30000);
                     _refreshThreadEnded.Dispose();
                     _refreshThreadEnded = null;
                 }
-                if (_endRefreshThread != null)
+                if (_cleanupThreadEnded != null)
                 {
-                    _endRefreshThread.Dispose();
-                    _endRefreshThread = null;
+                    _endThreads.Set();
+                    _cleanupThreadEnded.WaitOne(30000);
+                    _cleanupThreadEnded.Dispose();
+                    _cleanupThreadEnded = null;
+                }
+                if (_endThreads != null)
+                {
+                    _endThreads.Dispose();
+                    _endThreads = null;
+                }
+                if (_deletedRows != null)
+                {
+                    foreach (var row in _deletedRows)
+                    {
+                        row.Dispose();
+                    }
+                    _deletedRows = null;
                 }
                 if (_formStateManager != null)
                 {
@@ -69,7 +84,9 @@
             this._saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._aboutFamNetworkManagerMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._manageGridToolStrip = new System.Windows.Forms.ToolStrip();
             this._openFileToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -112,7 +129,7 @@
             // _toolStripContainer.ContentPanel
             // 
             this._toolStripContainer.ContentPanel.Controls.Add(this._machineListGridView);
-            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(742, 303);
+            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(742, 264);
             this._toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this._toolStripContainer.Name = "_toolStripContainer";
@@ -129,6 +146,7 @@
             // _machineListGridView
             // 
             this._machineListGridView.AllowUserToAddRows = false;
+            this._machineListGridView.AllowUserToDeleteRows = false;
             this._machineListGridView.AllowUserToResizeRows = false;
             this._machineListGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -168,7 +186,7 @@
             this._machineListGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._machineListGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this._machineListGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this._machineListGridView.Size = new System.Drawing.Size(742, 303);
+            this._machineListGridView.Size = new System.Drawing.Size(742, 264);
             this._machineListGridView.TabIndex = 0;
             this._machineListGridView.SelectionChanged += new System.EventHandler(this.HandleMachineGridViewSelectionChanged);
             this._machineListGridView.DoubleClick += new System.EventHandler(this.HandleMachineGridViewRowDoubleClick);
@@ -221,7 +239,8 @@
             this._menuStrip.Dock = System.Windows.Forms.DockStyle.None;
             this._menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._fileToolStripMenuItem,
-            this.helpToolStripMenuItem});
+            this._toolsToolStripMenuItem,
+            this._helpToolStripMenuItem});
             this._menuStrip.Location = new System.Drawing.Point(0, 0);
             this._menuStrip.Name = "_menuStrip";
             this._menuStrip.Size = new System.Drawing.Size(742, 24);
@@ -276,13 +295,28 @@
             this._exitToolStripMenuItem.Text = "E&xit";
             this._exitToolStripMenuItem.Click += new System.EventHandler(this.HandleExitMenuItemClick);
             // 
-            // helpToolStripMenuItem
+            // _toolsToolStripMenuItem
             // 
-            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._optionsToolStripMenuItem});
+            this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
+            this._toolsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this._toolsToolStripMenuItem.Text = "&Tools";
+            // 
+            // _optionsToolStripMenuItem
+            // 
+            this._optionsToolStripMenuItem.Name = "_optionsToolStripMenuItem";
+            this._optionsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._optionsToolStripMenuItem.Text = "&Options...";
+            this._optionsToolStripMenuItem.Click += new System.EventHandler(this.HandleSetAutoRefreshThreadSleepTime);
+            // 
+            // _helpToolStripMenuItem
+            // 
+            this._helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._aboutFamNetworkManagerMenuItem});
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
-            this.helpToolStripMenuItem.Text = "&Help";
+            this._helpToolStripMenuItem.Name = "_helpToolStripMenuItem";
+            this._helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this._helpToolStripMenuItem.Text = "&Help";
             // 
             // _aboutFamNetworkManagerMenuItem
             // 
@@ -378,7 +412,7 @@
             this._modifyServiceDatabaseToolStripButton,
             this._autoRefreshDataToolStripButton,
             this._refreshDataToolStripButton});
-            this._updateToolStrip.Location = new System.Drawing.Point(403, 24);
+            this._updateToolStrip.Location = new System.Drawing.Point(3, 63);
             this._updateToolStrip.Name = "_updateToolStrip";
             this._updateToolStrip.Size = new System.Drawing.Size(300, 39);
             this._updateToolStrip.TabIndex = 2;
@@ -495,7 +529,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn FamServiceColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn FdrsServiceColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn CpuColumn;
-        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _aboutFamNetworkManagerMenuItem;
         private System.Windows.Forms.ToolStripComboBox _startStopTargetComboBox;
         private System.Windows.Forms.ToolStrip _updateToolStrip;
@@ -504,6 +538,8 @@
         private System.Windows.Forms.ToolStripMenuItem _saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem _saveAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _toolsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _optionsToolStripMenuItem;
     }
 }
 

@@ -30,11 +30,6 @@ namespace Extract.Utilities.Forms
         T _dataItem;
 
         /// <summary>
-        /// Indicates whether this row has been disposed yet or not.
-        /// </summary>
-        volatile bool _disposed;
-
-        /// <summary>
         /// Mutex object to provide thread safe access to the data item.
         /// </summary>
         object _lock = new object();
@@ -113,20 +108,6 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="BetterDataGridViewRow&lt;T&gt;"/> is disposed.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> if disposed; otherwise, <see langword="false"/>.
-        /// </value>
-        public bool IsDisposed
-        {
-            get
-            {
-                return _disposed;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the data item.
         /// </summary>
         /// <value>The data item.</value>
@@ -158,7 +139,6 @@ namespace Extract.Utilities.Forms
 
                             _dataItem = value;
                         }
-
                     }
                 }
                 catch (Exception ex)

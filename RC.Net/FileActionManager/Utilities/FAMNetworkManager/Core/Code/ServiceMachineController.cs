@@ -306,7 +306,10 @@ namespace Extract.FileActionManager.Utilities
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI30792", ex);
+                var ee = ExtractException.AsExtractException("ELI30792", ex);
+                ee.AddDebugData("Machine Name", _machineName ?? "Unknown", false);
+                ee.AddDebugData("Start/Stop FAM Service", startService ? "Start" : "Stop", false);
+                throw ee;
             }
         }
 
@@ -354,7 +357,10 @@ namespace Extract.FileActionManager.Utilities
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI30794", ex);
+                var ee = ExtractException.AsExtractException("ELI30794", ex);
+                ee.AddDebugData("Machine Name", _machineName ?? "Unknown", false);
+                ee.AddDebugData("Start/Stop FDRS Service", startService ? "Start" : "Stop", false);
+                throw ee;
             }
         }
 
@@ -419,22 +425,31 @@ namespace Extract.FileActionManager.Utilities
         /// <returns>The updated data.</returns>
         internal ServiceStatusUpdateData RefreshData()
         {
-            InitializeRemoteObjects();
+            try
+            {
+                InitializeRemoteObjects();
 
-            string famServiceStatus = null;
-            if (_famServiceInstalled)
-            {
-                _famServiceController.Refresh();
-                famServiceStatus = _famServiceController.Status.ToString();
+                string famServiceStatus = null;
+                if (_famServiceInstalled)
+                {
+                    _famServiceController.Refresh();
+                    famServiceStatus = _famServiceController.Status.ToString();
+                }
+                string fdrsServiceStatus = null;
+                if (_fdrsServiceInstalled)
+                {
+                    _fdrsServiceController.Refresh();
+                    fdrsServiceStatus = _fdrsServiceController.Status.ToString();
+                }
+                return new ServiceStatusUpdateData(famServiceStatus ?? "Not Installed",
+                    fdrsServiceStatus ?? "Not Installed", _cpuCounter.NextValue());
             }
-            string fdrsServiceStatus = null;
-            if (_fdrsServiceInstalled)
+            catch (Exception ex)
             {
-                _fdrsServiceController.Refresh();
-                fdrsServiceStatus = _fdrsServiceController.Status.ToString();
+                var ee = ExtractException.AsExtractException("ELI30996", ex);
+                ee.AddDebugData("Machine Name", _machineName, false);
+                throw ee;
             }
-            return new ServiceStatusUpdateData(famServiceStatus ?? "Not Installed",
-                fdrsServiceStatus ?? "Not Installed", _cpuCounter.NextValue());
         }
 
         #endregion Methods
