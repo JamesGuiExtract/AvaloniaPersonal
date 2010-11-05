@@ -822,23 +822,32 @@ namespace Extract.DataEntry
                     EndEdit();
                 }
 
-                // Obtain the initial value before calling ApplyAttributeToRow which may trigger
-                // auto-update queries and cause the value to change.
-                string initialValue = CurrentCell.Value.ToString();
-
-                CurrentCell.Value = "";
-
-                // Add a new attribute for the specified row.
-                ApplyAttributeToRow(e.Row.Index - 1, null, null);
-
-                // If the initial value was null or empty (can this happen?) there is nothing more
-                // to do.
-                if (string.IsNullOrEmpty(initialValue))
+                try
                 {
-                    return;
-                }
+                    OnUpdateStarted(new EventArgs());
 
-                BeginInvoke(new StringDelegate(BeginEdit), new object[] { initialValue });
+                    // Obtain the initial value before calling ApplyAttributeToRow which may trigger
+                    // auto-update queries and cause the value to change.
+                    string initialValue = CurrentCell.Value.ToString();
+
+                    CurrentCell.Value = "";
+
+                    // Add a new attribute for the specified row.
+                    ApplyAttributeToRow(e.Row.Index - 1, null, null);
+
+                    // If the initial value was null or empty (can this happen?) there is nothing more
+                    // to do.
+                    if (string.IsNullOrEmpty(initialValue))
+                    {
+                        return;
+                    }
+
+                    BeginInvoke(new StringDelegate(BeginEdit), new object[] { initialValue });
+                }
+                finally
+                {
+                    OnUpdateEnded(new EventArgs());
+                }
             }
             catch (Exception ex)
             {
@@ -901,6 +910,8 @@ namespace Extract.DataEntry
         /// <param name="e">A <see cref="KeyEventArgs"/> that contains the event data.</param>
         protected override void OnKeyDown(KeyEventArgs e)
         {
+            bool inUpdate = false;
+
             try
             {
                 // Default handled flag to false;
@@ -920,6 +931,10 @@ namespace Extract.DataEntry
                     {
                         // Copy selected rows
                         case Keys.C:
+
+                            inUpdate = true;
+                            OnUpdateStarted(new EventArgs());
+
                             if (enableRowOptions)
                             {
                                 CopySelectedRows();
@@ -934,6 +949,10 @@ namespace Extract.DataEntry
 
                         // Cut selected rows
                         case Keys.X:
+
+                            inUpdate = true;
+                            OnUpdateStarted(new EventArgs());
+
                             if (enableRowOptions && AllowUserToDeleteRows)
                             {
                                 CopySelectedRows();
@@ -955,6 +974,10 @@ namespace Extract.DataEntry
 
                         // Paste selected rows
                         case Keys.V:
+
+                            inUpdate = true;
+                            OnUpdateStarted(new EventArgs());
+
                             if (enableRowOptions && GetDataFormatName(Clipboard.GetDataObject()) != null)
                             {
                                 PasteRowData(Clipboard.GetDataObject());
@@ -970,6 +993,9 @@ namespace Extract.DataEntry
                         // Insert new row
                         case Keys.I:
                             {
+                                inUpdate = true;
+                                OnUpdateStarted(new EventArgs());
+
                                 if (AllowUserToAddRows)
                                 {
                                     InsertNewRow(true);
@@ -978,7 +1004,7 @@ namespace Extract.DataEntry
                                 }
                             }
                             break;
-                    }                 
+                    }
                 }
 
                 base.OnKeyDown(e);
@@ -988,6 +1014,13 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI24773", ex);
                 ee.AddDebugData("Event Data", e, false);
                 ee.Display();
+            }
+            finally
+            {
+                if (inUpdate)
+                {
+                    OnUpdateEnded(new EventArgs());
+                }
             }
         }
 
@@ -1005,9 +1038,18 @@ namespace Extract.DataEntry
                 if (EditingControl != null && m.Msg == WindowsMessage.KeyDown && 
                     m.WParam == (IntPtr)Keys.V && (ModifierKeys & Keys.Control) != 0)
                 {
-                    if (PasteCellData(Clipboard.GetDataObject()))
+                    try
                     {
-                        return true;
+                        OnUpdateStarted(new EventArgs());
+
+                        if (PasteCellData(Clipboard.GetDataObject()))
+                        {
+                            return true;
+                        }
+                    }
+                    finally
+                    {
+                        OnUpdateEnded(new EventArgs());
                     }
                 }
                 
@@ -1893,6 +1935,22 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Requests that the <see cref="IDataEntryControl"/> refresh all <see cref="IAttribute"/>
+        /// values to the screen.
+        /// </summary>
+        public override void RefreshAttributes()
+        {
+            try
+            {
+                SetAttributes(_sourceAttributes);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31010", ex);
+            }
+        }
+
         #endregion IDataEntryControl Methods
 
         #region Event Handlers
@@ -1992,6 +2050,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                OnUpdateStarted(new EventArgs());
+
                 InsertNewRow(true);
             }
             catch (Exception ex)
@@ -1999,6 +2059,10 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI24317", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+            finally
+            {
+                OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -2090,16 +2154,22 @@ namespace Extract.DataEntry
         {
             try
             {
+                OnUpdateStarted(new EventArgs());
+
                 InsertNewRow(true);
 
                 PasteRowData(Clipboard.GetDataObject());
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI24763", 
+                ExtractException ee = new ExtractException("ELI24763",
                     "Unable to insert copied rows!", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+            finally
+            {
+                OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -2590,8 +2660,7 @@ namespace Extract.DataEntry
             {
                 attribute = new AttributeClass();
                 attribute.Name = AttributeName;
-                AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, null, false,
-                    null, null, null, null);
+                AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this);
                 newAttributeCreated = true;
             }
 
@@ -2989,13 +3058,23 @@ namespace Extract.DataEntry
         /// </summary>
         void DeleteSelectedRows()
         {
-            // Delete each row in the current selection.
-            foreach (DataGridViewRow row in SelectedRows)
+            try
             {
-                if (!row.IsNewRow)
+                // Delay processing of changes in the control host until all rows have been deleted.
+                OnUpdateStarted(new EventArgs());
+
+                // Delete each row in the current selection.
+                foreach (DataGridViewRow row in SelectedRows)
                 {
-                    Rows.RemoveAt(row.Index);
+                    if (!row.IsNewRow)
+                    {
+                        Rows.RemoveAt(row.Index);
+                    }
                 }
+            }
+            finally
+            {
+                OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -3545,8 +3624,7 @@ namespace Extract.DataEntry
                         // correctly for column attributes. 
                         if (AttributeStatusInfo.GetParentAttribute(attribute) == null)
                         {
-                            AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, null,
-                                false, null, null, null, null);
+                            AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this);
                         }
 
                         ApplyAttributeToRow(destinationRows[rowsAdded].Index, attribute,

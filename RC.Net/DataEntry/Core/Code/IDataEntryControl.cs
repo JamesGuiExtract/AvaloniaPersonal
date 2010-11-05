@@ -192,6 +192,12 @@ namespace Extract.DataEntry
         bool ProcessSwipedText(SpatialString swipedText);
 
         /// <summary>
+        /// Requests that the <see cref="IDataEntryControl"/> refresh all <see cref="IAttribute"/>
+        /// values to the screen.
+        /// </summary>
+        void RefreshAttributes();
+
+        /// <summary>
         /// Requests that the <see cref="IDataEntryControl"/> refresh the specified
         /// <see cref="IAttribute"/>s' values to the screen.
         /// </summary>
@@ -208,6 +214,13 @@ namespace Extract.DataEntry
         /// a subsequent document is loaded.
         /// </summary>
         void ClearCachedData();
+
+        /// <summary>
+        /// Applies the selection state represented by <see paramref="selectionState"/> to the
+        /// control.
+        /// </summary>
+        /// <param name="selectionState">The <see cref="SelectionState"/> to apply.</param>
+        void ApplySelection(SelectionState selectionState);
 
         #endregion Methods
 

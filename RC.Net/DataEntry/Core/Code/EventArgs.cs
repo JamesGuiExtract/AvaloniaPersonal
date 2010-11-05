@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -9,24 +9,21 @@ using UCLID_COMUTILSLib;
 namespace Extract.DataEntry
 {
     /// <summary>
-    /// Provides the <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
-    /// that represent the spatial info to be associated with an 
-    /// <see cref="IDataEntryControl.AttributesSelected"/> event.
+    /// Represents the current selection within the data entry framework. This includes both the
+    /// selected <see cref="IAttribute"/>s as well as the indicated selection within the related
+    /// <see cref="IDataEntryControl"/>.
     /// </summary>
-    public class AttributesSelectedEventArgs : EventArgs
+    public class SelectionState
     {
         /// <summary>
-        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated
-        /// with the <see cref="IDataEntryControl.AttributesSelected"/> event.
+        /// The <see cref="IDataEntryControl"/> the selection pertains to.
         /// </summary>
-        readonly IUnknownVector _attributes;
+        readonly IDataEntryControl _dataEntryControl;
 
         /// <summary>
-        /// Indicates whether the firing control is to be associated only with the spatial info of
-        /// the specific attributes provided, or whether it should be associated with the spatial
-        /// info of all descendent attributes as well.
+        /// The selected <see cref="IAttribute"/>s.
         /// </summary>
-        readonly bool _includeSubAttributes;
+        readonly ReadOnlyCollection<IAttribute> _attributes;
 
         /// <summary>
         /// Indicates whether tooltips should be displayed for the attribute(s)
@@ -41,33 +38,62 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new <see cref="AttributesSelectedEventArgs"/> instance.
         /// </summary>
-        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
-        /// whose spatial information is to be associated with the <see cref="IDataEntryControl"/>.
-        /// </param>
-        /// <param name="includeSubAttributes">If <see langword="true"/>, the sender is to be
-        /// associated with the spatial info of the supplied attributes as well as all descendents 
-        /// of those <see cref="IAttribute"/>s. If <see langword="false"/>  the sender is to be
-        /// associated with the spatial info of only the supplied <see cref="IAttribute"/>s 
-        /// themselves.</param>
+        /// <param name="dataEntryControl">The <see cref="IDataEntryControl"/> the selection
+        /// pertains to.</param>
+        /// <param name="attributes">The selected <see cref="IAttribute"/>s.</param>
+        /// <param name="includeSubAttributes">If <see langword="true"/>, all descendents 
+        /// of the <see cref="IAttribute"/>s should be included in the selection,
+        /// <see langword="false"/> otherwise.</param>
         /// <param name="displayToolTips"><see langword="true"/> if tooltips should be displayed
         /// for the <see paramref="attributes"/>.</param>
         /// <param name="selectedGroupAttribute">The <see cref="IAttribute"/> representing a
         /// currently selected row or group. <see langword="null"/> if no row or group is selected.
         /// </param>
-        public AttributesSelectedEventArgs(IUnknownVector attributes, bool includeSubAttributes,
+        public SelectionState(IDataEntryControl dataEntryControl, IUnknownVector attributes,
+            bool includeSubAttributes, bool displayToolTips, IAttribute selectedGroupAttribute)
+            : this(dataEntryControl, 
+                DataEntryMethods.ToAttributeEnumerable(attributes, includeSubAttributes),
+                displayToolTips, selectedGroupAttribute)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="AttributesSelectedEventArgs"/> instance.
+        /// </summary>
+        /// <param name="dataEntryControl">The <see cref="IDataEntryControl"/> the selection
+        /// pertains to.</param>
+        /// <param name="attributes">The selected <see cref="IAttribute"/>s.</param>
+        /// <param name="displayToolTips"><see langword="true"/> if tooltips should be displayed
+        /// for the <see paramref="attributes"/>.</param>
+        /// <param name="selectedGroupAttribute">The <see cref="IAttribute"/> representing a
+        /// currently selected row or group. <see langword="null"/> if no row or group is selected.
+        /// </param>
+        public SelectionState(IDataEntryControl dataEntryControl, IEnumerable<IAttribute> attributes,
             bool displayToolTips, IAttribute selectedGroupAttribute)
         {
-            _attributes = attributes;
-            _includeSubAttributes = includeSubAttributes;
+            _dataEntryControl = dataEntryControl;
+            _attributes = new ReadOnlyCollection<IAttribute>(new List<IAttribute>(attributes));
             _displayToolTips = displayToolTips;
             _selectedGroupAttribute = selectedGroupAttribute;
         }
 
         /// <summary>
-        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated 
-        /// with the <see cref="IDataEntryControl.AttributesSelected"/> event.
+        /// Gets the <see cref="IDataEntryControl"/> the selection pertains to.
         /// </summary>
-        public IUnknownVector Attributes
+        /// <value>The <see cref="IDataEntryControl"/> the selection pertains to.</value>
+        public IDataEntryControl DataControl
+        {
+            get
+            {
+                return _dataEntryControl;
+            }
+        }
+
+        /// <summary>
+        /// Gets the selected <see cref="IAttribute"/>s.
+        /// </summary>
+        /// <value>The selected <see cref="IAttribute"/>s.</value>
+        public ReadOnlyCollection<IAttribute> Attributes
         {
             get
             {
@@ -76,22 +102,11 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// If <see langword="true"/>, the sender is to be associated with the spatial info of the 
-        /// supplied attributes as well as all descendents of those <see cref="IAttribute"/>s. If 
-        /// <see langword="false"/>  the sender is to be associated with the spatial info of only
-        /// the supplied <see cref="IAttribute"/>s themselves.
+        /// Gets whether tooltips should be displayed for the <see cref="Attributes"/>.
         /// </summary>
-        public bool IncludeSubAttributes
-        {
-            get
-            {
-                return _includeSubAttributes;
-            }
-        }
-
-        /// <summary>
+        /// <value>
         /// <see langword="true"/> if tooltips should be displayed for the <see cref="Attributes"/>.
-        /// </summary>
+        /// </value>
         public bool DisplayToolTips
         {
             get
@@ -111,6 +126,41 @@ namespace Extract.DataEntry
             get
             {
                 return _selectedGroupAttribute;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Provides the <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
+    /// that represent the spatial info to be associated with an 
+    /// <see cref="IDataEntryControl.AttributesSelected"/> event.
+    /// </summary>
+    public class AttributesSelectedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The <see cref="SelectionState"/> representing the new selection.
+        /// </summary>
+        SelectionState _selectionState;
+
+        /// <summary>
+        /// Initializes a new <see cref="AttributesSelectedEventArgs"/> instance.
+        /// </summary>
+        /// <param name="selectionState">The <see cref="SelectionState"/> representing the new
+        /// selection.</param>
+        public AttributesSelectedEventArgs(SelectionState selectionState)
+        {
+            _selectionState = selectionState;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="SelectionState"/> representing the new selection.
+        /// </summary>
+        /// <value>The <see cref="SelectionState"/> representing the new selection.</value>
+        public SelectionState SelectionState
+        {
+            get
+            {
+                return _selectionState;
             }
         }
     }
@@ -245,7 +295,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IDataEntryControl"/> associated with the attribute.
         /// </summary>
-        readonly IDataEntryControl _dataEntryControl;
+        readonly IDataEntryControl _dataControl;
 
         /// <summary>
         /// Initializes a new <see cref="AttributeInitializedEventArgs"/> instance.
@@ -262,7 +312,7 @@ namespace Extract.DataEntry
             {
                 _attribute = attribute;
                 _sourceAttributes = sourceAttributes;
-                _dataEntryControl = dataEntryControl;
+                _dataControl = dataEntryControl;
             }
             catch (Exception ex)
             {
@@ -301,7 +351,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _dataEntryControl;
+                return _dataControl;
             }
         }
     }
@@ -818,7 +868,6 @@ namespace Extract.DataEntry
         /// The <see cref="IAttribute"/> for which the viewed/unviewed status has changed.
         /// </summary>
         readonly IAttribute _attribute;
-
 
         /// <summary>
         /// Initializes a new <see cref="ViewedStateChangedEventArgs"/> instance.

@@ -198,6 +198,10 @@
     <Compile Include="DataEntryTableBase.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DataEntryTableBase.SelectionState.cs">
+      <DependentUpon>DataEntryTableBase.cs</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DataEntryTableColumn.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
@@ -207,6 +211,7 @@
     <Compile Include="DataEntryComboBoxCell.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataEntryUndoMementos.cs" />
     <Compile Include="IDataEntryApplication.cs" />
     <Compile Include="IDataEntryTableCell.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>

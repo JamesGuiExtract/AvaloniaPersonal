@@ -1,3 +1,4 @@
+using Extract.Licensing;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -23,6 +24,15 @@ namespace Extract.Utilities.Forms
     /// </summary>
     public class FormStateManager : IDisposable
     {
+        #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(FormStateManager).ToString();
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -122,6 +132,17 @@ namespace Extract.Utilities.Forms
             : this(form, persistenceFileName,
                 mutexName, null, manageToolStrips, fullScreenTabText)
         {
+
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(
+                    LicenseIdName.ExtractCoreObjects, "ELI30997", _OBJECT_NAME);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI30998", ex);
+            }
         }
 
         /// <summary>

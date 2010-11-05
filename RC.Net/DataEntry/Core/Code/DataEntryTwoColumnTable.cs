@@ -789,6 +789,16 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Requests that the <see cref="IDataEntryControl"/> refresh all <see cref="IAttribute"/>
+        /// values to the screen.
+        /// </summary>
+        public override void RefreshAttributes()
+        {
+            // Use the primarily mapped attribute map the attribute for each row.
+            ApplyAttribute();
+        }
+
         #endregion IDataEntryControl Methods
 
         #region Private Members

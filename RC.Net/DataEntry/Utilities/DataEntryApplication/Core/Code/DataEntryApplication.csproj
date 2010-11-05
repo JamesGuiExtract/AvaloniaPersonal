@@ -396,6 +396,7 @@
     <Content Include="Resources\NextInvalidButton.png" />
     <Content Include="Resources\SaveImageButtonSmall.png" />
     <Content Include="Resources\ShowAllHighlightsButton.png" />
+    <Content Include="Resources\UndoButton.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

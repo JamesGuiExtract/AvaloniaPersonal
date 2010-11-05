@@ -87,5 +87,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        internal static System.Drawing.Bitmap UndoButton {
+            get {
+                object obj = ResourceManager.GetObject("UndoButton", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

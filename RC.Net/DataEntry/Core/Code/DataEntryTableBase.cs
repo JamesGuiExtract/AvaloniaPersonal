@@ -2,13 +2,13 @@ using Extract.Imaging;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.ComponentModel;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Security.Permissions;
+using System.Linq;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -22,7 +22,7 @@ namespace Extract.DataEntry
     /// A base of common code needed by any <see cref="IDataEntryControl"/> that extends
     /// <see cref="DataGridView"/>.
     /// </summary>
-    public abstract class DataEntryTableBase : DataGridView, IDataEntryControl
+    public abstract partial class DataEntryTableBase : DataGridView, IDataEntryControl
     {
         #region Constants
 
@@ -1031,11 +1031,20 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Iterate both data entry and non-data entry cells that are selected both prior to
+                // and after the selection change to make sure the background color is updated
+                // correctly for all cells..
+                HashSet<DataGridViewCell> cellsToUpdate =
+                    new HashSet<DataGridViewCell>(SelectedCells.Cast<DataGridViewCell>());
+
                 base.OnSelectionChanged(e);
 
-                // Repeat the iteration for non-data entry cells to make sure the background color
-                // is updated for all cells in the table.
                 foreach (DataGridViewCell cell in SelectedCells)
+                {
+                    cellsToUpdate.Add(cell);
+                }
+
+                foreach (DataGridViewCell cell in cellsToUpdate)
                 {
                     UpdateCellStyle(cell);
                 }
@@ -1830,6 +1839,58 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Applies the selection state represented by <see paramref="selectionState"/> to the
+        /// control.
+        /// </summary>
+        /// <param name="selectionState">The <see cref="SelectionState"/> to apply.</param>
+        public void ApplySelection(Extract.DataEntry.SelectionState selectionState)
+        {
+            try
+            {
+                SelectionState tableSelectionState =
+                    selectionState as DataEntryTableBase.SelectionState;
+
+                if (tableSelectionState != null)
+                {
+                    using (new SelectionProcessingSuppressor(this))
+                    {
+                        EndEdit();
+                        ClearSelection();
+
+                        // Set the current cell before setting selection, otherwise setting the
+                        // current cell my undo intended selections.
+                        if (tableSelectionState.CurrentCellPosition != null)
+                        {
+                            CurrentCell = Rows[tableSelectionState.CurrentCellPosition.Item1].
+                                Cells[tableSelectionState.CurrentCellPosition.Item2];
+                        }
+
+                        foreach (Tuple<int, int> cellIndexes in tableSelectionState.SelectedCellLocations)
+                        {
+                            Rows[cellIndexes.Item1].Cells[cellIndexes.Item2].Selected = true;
+                        }
+
+                        foreach (int rowIndex in tableSelectionState.SelectedRowIndexes)
+                        {
+                            Rows[rowIndex].Selected = true;
+                        }
+
+                        foreach (int columnIndex in tableSelectionState.SelectedColumnIndexes)
+                        {
+                            Columns[columnIndex].Selected = true;
+                        }
+                    }
+
+                    ProcessSelectionChange();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.AsExtractException("ELI31011", ex);
+            }
+        }
+
         #endregion IDataEntryControl Members
 
         #region Abstract IDataEntryControl Members
@@ -1875,6 +1936,12 @@ namespace Extract.DataEntry
         /// a subsequent document is loaded.
         /// </summary>
         public abstract void ClearCachedData();
+
+        /// <summary>
+        /// Requests that the <see cref="IDataEntryControl"/> refresh all <see cref="IAttribute"/>
+        /// values to the screen.
+        /// </summary>
+        public abstract void RefreshAttributes();
 
         #endregion Abstract IDataEntryControl Members
 
@@ -1978,8 +2045,9 @@ namespace Extract.DataEntry
         {
             if (AttributesSelected != null)
             {
-                AttributesSelected(this, new AttributesSelectedEventArgs(attributes,
-                    includeSubAttributes, displayTooltips, selectedGroupAttribute));
+                var selectionState = new SelectionState(this, attributes, includeSubAttributes,
+                    displayTooltips, selectedGroupAttribute);
+                AttributesSelected(this, new AttributesSelectedEventArgs(selectionState));
             }
         }
 
