@@ -734,6 +734,13 @@ namespace Extract.DataEntry
         /// <summary>
         /// <see cref="DataEntryCopyButton"/> does not have any implementation for this method.
         /// </summary>
+        public virtual void RefreshAttributes()
+        {
+        }
+
+        /// <summary>
+        /// <see cref="DataEntryCopyButton"/> does not have any implementation for this method.
+        /// </summary>
         /// <param name="spatialInfoUpdated">Unused.</param>
         /// <param name="attributes">Unused.</param>
         public void RefreshAttributes(bool spatialInfoUpdated,  params IAttribute[] attributes)
@@ -744,6 +751,14 @@ namespace Extract.DataEntry
         /// <see cref="DataEntryCopyButton"/> doesn't cache any data.
         /// </summary>
         public void ClearCachedData()
+        {
+        }
+
+        /// <summary>
+        /// <see cref="DataEntryCopyButton"/> does not have any implementation for this method.
+        /// <param name="selectionState">Unused.</param>
+        /// </summary>
+        public void ApplySelection(SelectionState selectionState)
         {
         }
 
@@ -758,9 +773,9 @@ namespace Extract.DataEntry
         {
             if (this.AttributesSelected != null)
             {
-                AttributesSelected(this,
-                    new AttributesSelectedEventArgs(DataEntryMethods.AttributeAsVector(_attribute),
-                        false, true, null));
+                var selectionState = new SelectionState(this, 
+                    DataEntryMethods.AttributeAsVector(_attribute), false, true, null);
+                AttributesSelected(this, new AttributesSelectedEventArgs(selectionState));
             }
         }
 

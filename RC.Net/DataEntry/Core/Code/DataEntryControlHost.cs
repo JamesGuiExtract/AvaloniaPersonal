@@ -13,6 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -22,7 +23,6 @@ using UCLID_COMUTILSLib;
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 using ESpatialStringMode = UCLID_RASTERANDOCRMGMTLib.ESpatialStringMode;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
-
 
 namespace Extract.DataEntry
 {
@@ -279,10 +279,10 @@ namespace Extract.DataEntry
             new Dictionary<IAttribute, bool>();
 
         /// <summary>
-        /// A dictionary to keep track of each control's active attributes.
+        /// A dictionary to keep track of each control's selection state and active attributes.
         /// </summary>
-        readonly Dictionary<IDataEntryControl, List<IAttribute>> _controlAttributes =
-            new Dictionary<IDataEntryControl, List<IAttribute>>();
+        readonly Dictionary<IDataEntryControl, SelectionState> _controlSelectionState =
+            new Dictionary<IDataEntryControl, SelectionState>();
 
         /// <summary>
         /// A dictionary to keep track of each control's attributes that have tooltips.
@@ -576,6 +576,21 @@ namespace Extract.DataEntry
         /// Provided smart tag support to all text controls in the DEP.
         /// </summary>
         SmartTagManager _smartTagManager;
+
+        /// <summary>
+        /// Indicates whether the host in the midst of an undo operation.
+        /// </summary>
+        bool _inUndo;
+
+        /// <summary>
+        /// Indicates whether the host is currently idle (message pump is empty)
+        /// </summary>
+        bool _isIdle = true;
+
+        /// <summary>
+        /// Commands that should be executed the next time the host is idle.
+        /// </summary>
+        Queue<MethodInvoker> _idleCommands = new Queue<MethodInvoker>();
 
         /// <summary>
         /// Indicates whether the form as been loaded.
@@ -1172,6 +1187,13 @@ namespace Extract.DataEntry
                     return false;
                 }
 
+                // If a message is being processed, we are no longer idle. (NOTE: The EnterIdle
+                // message does not seem to be handled by PreFilterMessage).
+                if (_isIdle)
+                {
+                    _isIdle = false;
+                }
+
                 if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp)
                 {
                     // Check for shift or tab key press events
@@ -1663,26 +1685,33 @@ namespace Extract.DataEntry
                 bool spatialInfoConfirmed = false;
 
                 // Loop through every attribute in the active control.
-                List<IAttribute> activeAttributes;
-                if (_activeDataControl != null &&
-                    _controlAttributes.TryGetValue(_activeDataControl, out activeAttributes))
+                foreach (IAttribute attribute in GetActiveAttributes())
                 {
-                    foreach (IAttribute attribute in activeAttributes)
+                    // If the attribute has a spatial attribute, but the attribute's value has
+                    // not yet been accepted, interpret the edit as implicit acceptance of the
+                    // attribute's value.
+                    if (AttributeStatusInfo.GetHintType(attribute) == HintType.None &&
+                        !AttributeStatusInfo.IsAccepted(attribute))
                     {
-                        // If the attribute has a spatial attribute, but the attribute's value has
-                        // not yet been accepted, interpret the edit as implicit acceptance of the
-                        // attribute's value.
-                        if (AttributeStatusInfo.GetHintType(attribute) == HintType.None &&
-                            !AttributeStatusInfo.IsAccepted(attribute))
+                        // AddMemento needs to be called before changing the value so that the
+                        // DataEntryModifiedAttributeMemento knows of the attribute's original value.
+                        if (AttributeStatusInfo.UndoManager.TrackOperations)
                         {
-                            AttributeStatusInfo.AcceptValue(attribute, true);
-
-                            // Re-create the highlight
-                            RemoveAttributeHighlight(attribute);
-                            SetAttributeHighlight(attribute, true);
-
-                            spatialInfoConfirmed = true;
+                            AttributeStatusInfo.UndoManager.AddMemento(
+                                new DataEntryModifiedAttributeMemento(attribute));
                         }
+
+                        // Accepting spatial info will not trigger an EndEdit call to seperate this
+                        // as an independent operation but it should considered one.
+                        AttributeStatusInfo.UndoManager.StartNewOperation();
+
+                        AttributeStatusInfo.AcceptValue(attribute, true);
+
+                        // Re-create the highlight
+                        RemoveAttributeHighlight(attribute);
+                        SetAttributeHighlight(attribute, true);
+
+                        spatialInfoConfirmed = true;
                     }
                 }
 
@@ -1705,11 +1734,8 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Keep track if any attributes were updated.
-                bool spatialInfoRemoved = false;
-
-                // The selected & active attributes
-                List<IAttribute> activeAttributes = null;
+                // Keeps track of the attributes from which spatial info was removed.
+                List<IAttribute> modifiedAttributes = new List<IAttribute>();
 
                 try
                 {
@@ -1717,18 +1743,14 @@ namespace Extract.DataEntry
                     ControlUpdateReferenceCount++;
 
                     // Loop through every attribute in the active control.
-                    if (_activeDataControl != null &&
-                        _controlAttributes.TryGetValue(_activeDataControl, out activeAttributes))
+                    foreach (IAttribute attribute in GetActiveAttributes())
                     {
-                        foreach (IAttribute attribute in activeAttributes)
+                        // [DataEntry:642] Don't allow spatial info to be removed from attributes
+                        // mapped to dependent controls.
+                        if (AttributeStatusInfo.GetOwningControl(attribute) == _activeDataControl &&
+                            AttributeStatusInfo.RemoveSpatialInfo(attribute))
                         {
-                            // [DataEntry:642] Don't allow spatial info to be removed from attributes
-                            // mapped to dependent controls.
-                            if (AttributeStatusInfo.GetOwningControl(attribute) == _activeDataControl &&
-                                AttributeStatusInfo.RemoveSpatialInfo(attribute))
-                            {
-                                spatialInfoRemoved = true;
-                            }
+                            modifiedAttributes.Add(attribute);
                         }
                     }
                 }
@@ -1738,11 +1760,11 @@ namespace Extract.DataEntry
                 }
 
                 // Re-display the highlights if changes were made.
-                if (spatialInfoRemoved)
+                if (modifiedAttributes.Count > 0)
                 {
                     // [DataEntry:547]
                     // Refresh the attributes so that any hints can be updated.
-                    _activeDataControl.RefreshAttributes(true, activeAttributes.ToArray());
+                    _activeDataControl.RefreshAttributes(true, modifiedAttributes.ToArray());
                     _refreshActiveControlHighlights = true;
 
                     DrawHighlights(false);
@@ -1751,6 +1773,61 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI25978", ex);
+            }
+        }
+
+        /// <summary>
+        /// Reverts the changes from the last recorded operation.
+        /// </summary>
+        public void Undo()
+        {
+            try
+            {
+                using (new TemporaryWaitCursor())
+                {
+                    try
+                    {
+                        AttributeStatusInfo.UndoManager.TrackOperations = false;
+                        _controlUpdateReferenceCount++;
+                        _inUndo = true;
+
+                        // Before performing the undo, remove the active control status from the
+                        // the currently active control. Otherwise if undo attempts to revert the
+                        // status of currently selected attributes, it will not properly take effect
+                        // even if a different control will be active once Undo is complete.
+                        if (_activeDataControl != null)
+                        {
+                            _activeDataControl.IndicateActive(
+                                false, _imageViewer.DefaultHighlightColor);
+                        }
+
+                        AttributeStatusInfo.UndoManager.Undo();
+                    }
+                    finally
+                    {
+                        _inUndo = false;
+                        _controlUpdateReferenceCount--;
+                        _refreshActiveControlHighlights = true;
+
+                        DrawHighlights(true);
+                        
+                        // Call IndicateActive on the active data control after the undo operation
+                        // to ensure the selected attributes get marked viewed as appropriate.
+                        if (_activeDataControl != null)
+                        {
+                            ExecuteOnIdle(() => _activeDataControl.IndicateActive(
+                                true, _imageViewer.DefaultHighlightColor));
+                        }
+
+                        // Ensure that nothing that happened as a result of the undo counts as part of a new
+                        // operation (including any action that occured via the message queue).
+                        ExecuteOnIdle(() => AttributeStatusInfo.UndoManager.TrackOperations = true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31008", ex);
             }
         }
 
@@ -1764,6 +1841,9 @@ namespace Extract.DataEntry
                 // Set flag to indicate that a document change is in progress so that highlights
                 // are not redrawn as the spatial info of the controls are updated.
                 _changingData = true;
+
+                // The UndoManager does not need to track changes until data has been reloaded.
+                AttributeStatusInfo.UndoManager.TrackOperations = false;
 
                 // Clear any existing data in the controls. Do this before clearing any of the
                 // host's fields to avoid any possibility that clearing the controls triggers
@@ -1818,7 +1898,7 @@ namespace Extract.DataEntry
                 }
 
                 // Reset the other attribute mapping fields.
-                _controlAttributes.Clear();
+                _controlSelectionState.Clear();
                 _controlToolTipAttributes.Clear();
                 _hoverAttribute = null;
                 _displayedAttributeHighlights.Clear();
@@ -1953,6 +2033,7 @@ namespace Extract.DataEntry
                 InitializeSmartTagManager();
 
                 _dataEntryApp.ShowAllHighlightsChanged += HandleShowAllHighlightsChanged;
+                Application.Idle += HandleApplicationIdle;
 
                 _isLoaded = true;
             }
@@ -2208,6 +2289,21 @@ namespace Extract.DataEntry
                     return;
                 }
 
+                // Create a DataEntryActiveControlMemento now before _activeDataControl gets
+                // re-assigned, but don't send it to the UndoManager until all messages in the
+                // current chain are processed to ensure any significant events (like status
+                // changes) are triggered by IndicateActive before this "Supporting" memento is
+                // added. This ensures that the control that was active prior to the focus event
+                // that triggered the change is restored.
+                if (_activeDataControl != null && AttributeStatusInfo.UndoManager.TrackOperations)
+                {
+                    var activeControlMemento =
+                        new DataEntryActiveControlMemento(_activeDataControl);
+
+                    ExecuteOnIdle(() =>
+                        AttributeStatusInfo.UndoManager.AddMemento(activeControlMemento));
+                }
+
                 // If a refresh of the highlights is needed and the control is going out of focus,
                 // refresh the highlights now.
                 if (_refreshActiveControlHighlights && !_changingData)
@@ -2219,15 +2315,15 @@ namespace Extract.DataEntry
                 // the AttributesSelected event whether an attribute group is selected.
                 _currentlySelectedGroupAttribute = null;
 
+                // Notify AttributeStatusInfo that the current edit is over so that a
+                // non-incremental value modified event can be raised.
+                AttributeStatusInfo.EndEdit();
+
                 // De-activate any existing control that is active
                 if (_activeDataControl != null)
                 {
                     _activeDataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
                 }
-
-                // Notify AttributeStatusInfo that the current edit is over so that a
-                // non-incremental value modified event can be raised.
-                AttributeStatusInfo.EndEdit();
 
                 // If this method was attempting to change focus, there is at least once case where
                 // the control that was to gain focus does not yet have it. That case is where a
@@ -2321,8 +2417,6 @@ namespace Extract.DataEntry
                     _lastNavigationViaTabKey = null;
                 }
 
-                IDataEntryControl dataControl = (IDataEntryControl)sender;
-               
                 ExtractException endEditException = null;
                 try
                 {
@@ -2339,44 +2433,14 @@ namespace Extract.DataEntry
                     endEditException = ExtractException.AsExtractException("ELI27097", ex);
                 }
 
-                // Create lists to store the new active attributes and attributes that need tooltips.
-                // (must be created before the UpdateControlAttributes which is recursive)
-                _controlAttributes[dataControl] = new List<IAttribute>();
-                _controlToolTipAttributes[dataControl] = new List<IAttribute>();
-
-                // Once a new attribute is selected within a control, show tooltips again if they
-                // were hidden.
-                if (_temporarilyHidingTooltips)
-                {
-                    _temporarilyHidingTooltips = false;
-
-                    // The error icons for selected attributes will re-display automatically,
-                    // but if all highlights are showing, need to re-display all error icons.
-                    if (_dataEntryApp.ShowAllHighlights)
-                    {
-                        ShowAllErrorIcons(true);
-                    }
-                }
-
-                UpdateControlAttributes(dataControl, e.Attributes, e.IncludeSubAttributes,
-                    e.DisplayToolTips);
-
-                // If this is the active control and the image page is not in the process of being
-                // changed, redraw all highlights.
-                if (!_changingData && dataControl == _activeDataControl)
-                {
-                    DrawHighlights(true);
-                }
-
-                OnItemSelectionChanged();
+                // Displays the appropriate highlights, tooltips and error icons.
+                ApplySelection(e.SelectionState);
 
                 // If an exception was thrown from EndEdit, throw it here.
                 if (endEditException != null)
                 {
                     throw endEditException;
                 }
-
-                _currentlySelectedGroupAttribute = e.SelectedGroupAttribute;
             }
             catch (Exception ex)
             {
@@ -2415,7 +2479,10 @@ namespace Extract.DataEntry
             {
                 ControlUpdateReferenceCount--;
 
-                DrawHighlights(true);
+                if (ControlUpdateReferenceCount == 0)
+                {
+                    DrawHighlights(true);
+                }
             }
             catch (Exception ex)
             {
@@ -2435,6 +2502,12 @@ namespace Extract.DataEntry
         {
             try
             {
+                if (_inUndo)
+                {
+                    // None of the below code needs to execute when undo-ing attribute values.
+                    return;
+                }
+
                 // [DataEntry:757, 798]
                 // Check to see if the clipboard should be cleared based on a control's
                 // ClearClipboardOnPaste setting. This code is a shortcut to be able to implement
@@ -2490,13 +2563,13 @@ namespace Extract.DataEntry
                 if (!_changingData && _activeDataControl != null && !_processingSwipe
                     && e.AcceptSpatialInfo)
                 {
-                    List<IAttribute> activeAttributes;
-                    _controlAttributes.TryGetValue(_activeDataControl, out activeAttributes);
+                    SelectionState selectionState;
+                    _controlSelectionState.TryGetValue(_activeDataControl, out selectionState);
 
                     // For any attributes that have hints or that had not previously been accepted,
                     // reset their highlights to reflect 100 percent confidence. (The color of a
                     // hint will depend upon whether text has been entered)
-                    if (activeAttributes != null && activeAttributes.Contains(e.Attribute) &&
+                    if (selectionState != null && selectionState.Attributes.Contains(e.Attribute) &&
                         (AttributeStatusInfo.GetHintType(e.Attribute) != HintType.None ||
                          !AttributeStatusInfo.IsAccepted(e.Attribute)))
                     {
@@ -2506,7 +2579,7 @@ namespace Extract.DataEntry
 
                         // [DataEntry:261] Highlights should be made visible except indirect
                         // hints when multiple attributes are active.
-                        bool makeVisible = ((activeAttributes.Count == 1) || 
+                        bool makeVisible = ((selectionState.Attributes.Count == 1) || 
                              AttributeStatusInfo.GetHintType(e.Attribute) != HintType.Indirect);
 
                         SetAttributeHighlight(e.Attribute, makeVisible);
@@ -2750,7 +2823,8 @@ namespace Extract.DataEntry
 
                 // Disable validation on any controls in the _disabledValidationControls list.
                 Control control = e.DataEntryControl as Control;
-                if (control != null && _disabledValidationControls.Contains(control.Name))
+                if (!_inUndo && control != null && 
+                    _disabledValidationControls.Contains(control.Name))
                 {
                     AttributeStatusInfo.EnableValidation(e.Attribute, false);
 
@@ -3238,6 +3312,33 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Application.Idle"/> event in order to execute any pending
+        /// commands from <see cref="ExecuteOnIdle"/>.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleApplicationIdle(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_idleCommands.Count > 0)
+                {
+                    MethodInvoker methodInvoker = _idleCommands.Dequeue();
+                    BeginInvoke(methodInvoker);
+                }
+                else
+                {
+                    _isIdle = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31023", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region Internal Members
@@ -3280,7 +3381,8 @@ namespace Extract.DataEntry
                 new Dictionary<int,List<RasterZone>>();
 
             // Loop through each attribute
-            foreach (IAttribute attribute in attributes)
+            foreach (IAttribute attribute in
+                DataEntryMethods.ToAttributeEnumerable(attributes, includeSubAttributes))
             {
                 // Try to find the highlight(s) that have been associated with the attribute.
                 List<CompositeHighlightLayerObject> highlights;
@@ -3298,36 +3400,6 @@ namespace Extract.DataEntry
                         }
 
                         rasterZones.AddRange(highlight.GetRasterZones());
-                    }
-                }
-
-                // If raster zones from sub-attributes are to be included, recursively collect their
-                // raster zones as well.
-                if (includeSubAttributes)
-                {
-                    IUnknownVector subAttributesVector = attribute.SubAttributes;
-                    int count = subAttributesVector.Size();
-                    IAttribute[] subAttributeArray = new IAttribute[count];
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        subAttributeArray[i] = (IAttribute)subAttributesVector.At(i);
-                    }
-
-                    Dictionary<int, List<RasterZone>> subAttributeRasterZones =
-                        GetAttributeRasterZonesByPage(subAttributeArray, true);
-
-                    // Combine the raster zones from child attributes into the parent
-                    // attribute's raster zones.
-                    foreach (KeyValuePair<int, List<RasterZone>> keyValuePair in
-                        subAttributeRasterZones)
-                    {
-                        if (!rasterZonesByPage.ContainsKey(keyValuePair.Key))
-                        {
-                            rasterZonesByPage[keyValuePair.Key] = new List<RasterZone>();
-                        }
-
-                        rasterZonesByPage[keyValuePair.Key].AddRange(keyValuePair.Value);
                     }
                 }
             }
@@ -3410,6 +3482,78 @@ namespace Extract.DataEntry
             return sortedAttributes;
         }
 
+        /// <summary>
+        /// Applies the selection state represented by <see paramref="selectionState"/> by
+        /// displaying the appropriate highlights, tooltips and error icons.
+        /// </summary>
+        /// <param name="selectionState">The <see cref="SelectionState"/> to apply.</param>
+        internal void ApplySelection(SelectionState selectionState)
+        {
+            ExtractException.Assert("ELI25169", "Null argument exception!", selectionState != null);
+            ExtractException.Assert("ELI31018", "Null argument exception!",
+                selectionState.DataControl != null);
+
+            SelectionState lastSelectionState;
+            if (AttributeStatusInfo.UndoManager.TrackOperations &&
+                _controlSelectionState.TryGetValue(selectionState.DataControl, out lastSelectionState))
+            {
+                AttributeStatusInfo.UndoManager.AddMemento(
+                    new DataEntrySelectionMemento(this, lastSelectionState));
+            }
+
+            _controlSelectionState[selectionState.DataControl] = selectionState;
+            _controlToolTipAttributes[selectionState.DataControl] = new List<IAttribute>();
+
+            // Once a new attribute is selected within a control, show tooltips again if they
+            // were hidden.
+            if (_temporarilyHidingTooltips)
+            {
+                _temporarilyHidingTooltips = false;
+
+                // The error icons for selected attributes will re-display automatically,
+                // but if all highlights are showing, need to re-display all error icons.
+                if (_dataEntryApp.ShowAllHighlights)
+                {
+                    ShowAllErrorIcons(true);
+                }
+            }
+
+            // Loop through each attribute and compile the raster zones from each.
+            foreach (IAttribute attribute in selectionState.Attributes)
+            {
+                // If this attribute's value isn't viewable in the DEP, don't create a highlight for
+                // it.
+                if (!AttributeStatusInfo.IsViewable(attribute))
+                {
+                    continue;
+                }
+
+                // Only allow tooltips for attributes owned by dataControl.
+                if (selectionState.DisplayToolTips &&
+                    AttributeStatusInfo.GetOwningControl(attribute) == selectionState.DataControl)
+                {
+                    _controlToolTipAttributes[selectionState.DataControl].Add(attribute);
+                }
+
+                // Don't allow new highlights to be created if there is no longer a document loaded.
+                if (_imageViewer.IsImageAvailable)
+                {
+                    SetAttributeHighlight(attribute, false);
+                }
+            }
+
+            // If this is the active control and the image page is not in the process of being
+            // changed, redraw all highlights.
+            if (!_changingData && selectionState.DataControl == _activeDataControl)
+            {
+                DrawHighlights(true);
+            }
+
+            OnItemSelectionChanged();
+
+            _currentlySelectedGroupAttribute = selectionState.SelectedGroupAttribute;
+        }
+
         #endregion Internal Members
 
         #region Private Members
@@ -3432,11 +3576,21 @@ namespace Extract.DataEntry
                 {
                     if (_controlUpdateReferenceCount != value)
                     {
+                        // Within a control update, don't allow changes to be grouped into seperate
+                        // operations. Everything up until _controlUpdateReferenceCount == 0 should
+                        // be considered a single operation.
+                        if (_controlUpdateReferenceCount == 0 && value > 0)
+                        {
+                            AttributeStatusInfo.UndoManager.OperationInProgress = true;
+                        }
+
                         _controlUpdateReferenceCount = value;
 
                         if (_controlUpdateReferenceCount == 0)
                         {
                             OnUpdateEnded(new EventArgs());
+
+                            AttributeStatusInfo.UndoManager.OperationInProgress = false;
                         }
                     }
                 }
@@ -3869,9 +4023,9 @@ namespace Extract.DataEntry
                 int pageToShow = -1;
 
                 // Obtain the list of active attributes.
-                List<IAttribute> attributes;
+                SelectionState selectionState;
                 if (_activeDataControl != null &&
-                    _controlAttributes.TryGetValue(_activeDataControl, out attributes))
+                    _controlSelectionState.TryGetValue(_activeDataControl, out selectionState))
                 {
                     // Obtain the list of highlights that need tooltips.
                     List<IAttribute> activeToolTipAttributes;
@@ -3879,7 +4033,7 @@ namespace Extract.DataEntry
                         _activeDataControl, out activeToolTipAttributes);
 
                     // Loop through all active attributes to retrieve their highlights.
-                    foreach (IAttribute attribute in attributes)
+                    foreach (IAttribute attribute in selectionState.Attributes)
                     {
                         // Find any highlight CompositeHighlightLayerObject that has been created for
                         // this data entry control.
@@ -3927,7 +4081,7 @@ namespace Extract.DataEntry
 
                         // If the highlight is an in-direct hint, do not display it unless this is
                         // the only active attribute.
-                        if (attributes.Count > 1 &&
+                        if (selectionState.Attributes.Count > 1 &&
                             AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
                         {
                             continue;
@@ -4391,9 +4545,12 @@ namespace Extract.DataEntry
         {
             if (_activeDataControl != null)
             {
-                List<IAttribute> controlAttributes;
-                if (_controlAttributes.TryGetValue(_activeDataControl, out controlAttributes))
+                SelectionState selectionState;
+                if (_controlSelectionState.TryGetValue(_activeDataControl, out selectionState))
                 {
+                    List<IAttribute> controlAttributes =
+                        new List<IAttribute>(selectionState.Attributes);
+
                     if (includedAttribute != null)
                     {
                         controlAttributes.Add(includedAttribute);
@@ -4409,6 +4566,25 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets the <see cref="IAttribute"/>s currently selected in the _activeDataControl.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<IAttribute> GetActiveAttributes()
+        {
+            if (_activeDataControl != null)
+            {
+                SelectionState selectionState;
+                if (_controlSelectionState.TryGetValue(_activeDataControl, out selectionState))
+                {
+                    foreach (IAttribute attribute in selectionState.Attributes)
+                    {
+                        yield return attribute;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Retrieves the active attribute or selects from one of several active attributes.
         /// </summary>
         /// <param name="first">If <see langword="true"/> and at least 2 attributes are active, the
@@ -4421,16 +4597,16 @@ namespace Extract.DataEntry
         {
             if (_activeDataControl != null)
             {
-                List<IAttribute> activeAttributes;
-                if (_controlAttributes.TryGetValue(_activeDataControl, out activeAttributes))
+                SelectionState selectionState;
+                if (_controlSelectionState.TryGetValue(_activeDataControl, out selectionState))
                 {
-                    if (activeAttributes.Count == 1)
+                    if (selectionState.Attributes.Count == 1)
                     {
-                        return activeAttributes[0];
+                        return selectionState.Attributes[0];
                     }
                     else if (first != null)
                     {
-                        return GetFirstOrLastAttribute(activeAttributes, first.Value, 
+                        return GetFirstOrLastAttribute(selectionState.Attributes, first.Value, 
                             _activeDataControl);
                     }
                 }
@@ -4865,11 +5041,9 @@ namespace Extract.DataEntry
                 deletedAttributes != null);
 
             // Cycle through each deleted attribute
-            int count = deletedAttributes.Size();
-            for (int i = 0; i < count; i++)
+            foreach (IAttribute attribute in
+                DataEntryMethods.ToAttributeEnumerable(deletedAttributes, true))
             {
-                IAttribute attribute = (IAttribute)deletedAttributes.At(i);
-
                 // If the attribute is part of _newlyAddedAttributes, remove it.
                 if (_newlyAddedAttributes.Contains(attribute))
                 {
@@ -4897,9 +5071,6 @@ namespace Extract.DataEntry
                     HandleAttributeValueModified;
                 AttributeStatusInfo.GetStatusInfo(attribute).AttributeDeleted -=
                     HandleAttributeDeleted;
-
-                // Recursively search attribute's descendents for invalid and unviewed items.
-                ProcessDeletedAttributes(attribute.SubAttributes);
             }
         }
 
@@ -5652,70 +5823,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Updates the set of active (or selected) <see cref="IAttribute"/>s associated with the
-        /// specified <see cref="IDataEntryControl"/>.
-        /// </summary>
-        /// <param name="dataControl">The <see cref="IDataEntryControl"/> for which the set of
-        /// active <see cref="IAttribute"/>s need to be updated. Must not be <see langword="null"/>.
-        /// </param>
-        /// <param name="attributes">The <see cref="IAttribute"/>s to be considered active in the
-        /// specified <see cref="IDataEntryControl"/>. Must not be <see langword="null"/>.</param>
-        /// <param name="includeSubAttributes"><see langword="true"/> if all descendents of the
-        /// specified <see cref="IAttribute"/>s should be considered active as well;
-        /// <see langword="false"/> if they should not.</param>
-        /// <param name="displayToolTips"><see langword="true"/> to display tooltips for all
-        /// specified <see cref="IAttribute"/>s that are owned by the specfied
-        /// <see paramref="dataControl"/>.</param>
-        void UpdateControlAttributes(IDataEntryControl dataControl,
-            IUnknownVector attributes, bool includeSubAttributes, bool displayToolTips)
-        {
-            ExtractException.Assert("ELI25169", "Null argument exception!", dataControl != null);
-            ExtractException.Assert("ELI25170", "Null argument exception!", attributes != null);
-
-            // Loop through each attribute and compile the raster zones from each.
-            int attributeCount = attributes.Size();
-            for (int i = 0; i < attributeCount; i++)
-            {
-                // Can be null, so don't use explicit cast.
-                IAttribute attribute = attributes.At(i) as IAttribute;
-
-                if (attribute == null)
-                {
-                    continue;
-                }
-
-                // If the supplied attribute is not null and we are including sub-attributes, 
-                // collect the raster zones from this attribute's children.
-                if (includeSubAttributes)
-                {
-                    UpdateControlAttributes(
-                        dataControl, attribute.SubAttributes, true, displayToolTips);
-                }
-
-                // If this attribute's value isn't viewable in the DEP, don't create a highlight for
-                // it.
-                if (!AttributeStatusInfo.IsViewable(attribute))
-                {
-                    continue;
-                }
-
-                _controlAttributes[dataControl].Add(attribute);
-
-                // Only allow tooltips for attributes owned by dataControl.
-                if (displayToolTips && AttributeStatusInfo.GetOwningControl(attribute) == dataControl)
-                {
-                    _controlToolTipAttributes[dataControl].Add(attribute);
-                }
-
-                // Don't allow new highlights to be created if there is no longer a document loaded.
-                if (_imageViewer.IsImageAvailable)
-                {
-                    SetAttributeHighlight(attribute, false);
-                }
-            }
-        }
-
-        /// <summary>
         /// Creates highlights for all <see cref="IAttribute"/>s in the provided 
         /// <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s.
         /// </summary>
@@ -5726,20 +5833,9 @@ namespace Extract.DataEntry
             ExtractException.Assert("ELI25174", "Null argument exception!", attributes != null);
 
             // Loop through each attribute and compile the raster zones from each.
-            int attributeCount = attributes.Size();
-            for (int i = 0; i < attributeCount; i++)
+            foreach (IAttribute attribute in
+                DataEntryMethods.ToAttributeEnumerable(attributes, true))
             {
-                // Can be null, so don't use explicit cast.
-                IAttribute attribute = attributes.At(i) as IAttribute;
-
-                if (attribute == null)
-                {
-                    continue;
-                }
-
-                // Recursively show highlights for this attribute's descendents.
-                CreateAllAttributeHighlights(attribute.SubAttributes);
-
                 // If this attribute is not visible in the DEP, don't create a highlight.
                 if (!AttributeStatusInfo.IsViewable(attribute))
                 {
@@ -5796,8 +5892,8 @@ namespace Extract.DataEntry
                     // spatial info represents an indirect hint.
                     if (_dataEntryApp.ShowAllHighlights)
                     {
-                        if (_controlAttributes[_activeDataControl].Count == 1 &&
-                            _controlAttributes[_activeDataControl][0] == attribute)
+                        if (_controlSelectionState[_activeDataControl].Attributes.Count == 1 &&
+                            _controlSelectionState[_activeDataControl].Attributes[0] == attribute)
                         {
                             makeVisible = true;
                         }
@@ -6184,20 +6280,14 @@ namespace Extract.DataEntry
             List<IAttribute> viewableAttributes = new List<IAttribute>();
 
             // Traverse the tree of attributes looking for viewable ones owned by dataEntryControl.
-            int attributeCount = attributes.Size();
-            for (int i = 0; i < attributeCount; i++)
+            foreach (IAttribute attribute in
+                DataEntryMethods.ToAttributeEnumerable(attributes, true))
             {
-                IAttribute attribute = (IAttribute)attributes.At(i);
-
                 if (AttributeStatusInfo.GetOwningControl(attribute) == dataEntryControl &&
                     AttributeStatusInfo.IsViewable(attribute))
                 {
                     viewableAttributes.Add(attribute);
                 }
-
-                // Recurse through the descendent attributes.
-                viewableAttributes.AddRange(
-                    GetViewableAttributesInControl(dataEntryControl, attribute.SubAttributes));
             }
 
             return viewableAttributes;
@@ -6261,11 +6351,40 @@ namespace Extract.DataEntry
 
                 OnUpdateEnded(new EventArgs());
 
-                _dirty = false;
+                ExecuteOnIdle(() => AttributeStatusInfo.UndoManager.TrackOperations = true);
+                ExecuteOnIdle(() => _dirty = false);
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI30037", ex);
+            }
+        }
+
+        /// <summary>
+        /// Executes the provided delegate only after the DEP's message pump is completely empty.
+        /// This differs from simply using BeginInvoke to execute it via the message pump since
+        /// messages already in the queue may result in further messages getting queued. Therefore,
+        /// ExecuteOnIdle ensures that all other messages that are to occur as part of the current
+        /// message chain occur before the provided delegate.
+        /// </summary>
+        /// <param name="methodInvoker">The delegate invoker to execute once the DEP's message pump
+        /// is empty.</param>
+        public void ExecuteOnIdle(MethodInvoker methodInvoker)
+        {
+            try
+            {
+                if (_isIdle)
+                {
+                    BeginInvoke(methodInvoker);
+                }
+                else
+                {
+                    _idleCommands.Enqueue(methodInvoker);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31024", ex);
             }
         }
 

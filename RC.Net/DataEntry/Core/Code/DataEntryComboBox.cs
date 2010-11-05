@@ -175,6 +175,11 @@ namespace Extract.DataEntry
         /// </summary>
         bool _updatingComboBoxItems;
 
+        /// <summary>
+        /// The active <see cref="FontStyle"/> for the control.
+        /// </summary>
+        FontStyle _fontStyle;
+
         #endregion Fields
 
         #region Delegates
@@ -215,6 +220,8 @@ namespace Extract.DataEntry
                     LicenseIdName.DataEntryCoreComponents, "ELI25534", _OBJECT_NAME);
 
                 InitializeComponent();
+
+                _fontStyle = Font.Style;
             }
             catch (Exception ex)
             {
@@ -585,10 +592,10 @@ namespace Extract.DataEntry
             {
                 base.OnTextChanged(e);
 
-                // Only apply data if the combo box is currently mapped and we 
+                // Only apply data if the combo box is currently mapped and we aren't keeping track
+                // of an _originalValue which will be restored later.
                 if (_attribute != null &&
-                    (!_updatingComboBoxItems || 
-                        !string.IsNullOrEmpty(Text) || string.IsNullOrEmpty(_originalValue)))
+                    (!string.IsNullOrEmpty(Text) || string.IsNullOrEmpty(_originalValue)))
                 {
                     AttributeStatusInfo.SetValue(_attribute, Text, true, false);
                 }
@@ -1110,10 +1117,11 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.SetAttributeAsPersistable(_attribute, false);
                     }
 
-                    // If the attribute has not been viewed, apply bold font.  Otherwise, use
-                    // regular font.
+                    // If the attribute has not been viewed, apply bold font. Otherwise, use
+                    // regular font. Compare against _fontStyle instead of the current font since
+                    // a font change could be pending in the message queue.
                     bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
-                    if (Font.Bold == hasBeenViewed)
+                    if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                     {
                         SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
                     }
@@ -1162,9 +1170,10 @@ namespace Extract.DataEntry
                     base.BackColor = color;
 
                     // Mark the attribute as having been viewed and update the attribute's status
-                    // info accordingly.
+                    // info accordingly. Compare against _fontStyle instead of the current font
+                    // since a font change could be pending in the message queue.
                     AttributeStatusInfo.MarkAsViewed(_attribute, true);
-                    if (Font.Bold)
+                    if (_fontStyle == FontStyle.Bold)
                     {
                         SetFontStyle(FontStyle.Regular);
                     }
@@ -1209,6 +1218,15 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Requests that the <see cref="IDataEntryControl"/> refresh all <see cref="IAttribute"/>
+        /// values to the screen.
+        /// </summary>
+        public virtual void RefreshAttributes()
+        {
+            RefreshAttributes(true, _attribute);
+        }
+
+        /// <summary>
         /// Refreshes the <see cref="IAttribute"/>'s value to the combo box.
         /// </summary>
         /// <param name="spatialInfoUpdated"><see langword="true"/> if the attribute's spatial info
@@ -1237,9 +1255,16 @@ namespace Extract.DataEntry
                         // explicitly check validation here.
                         UpdateValidation();
 
-                        // Update the font according to the viewed status.
+                        // Raise the AttributesSelected event to re-notify the host of the spatial
+                        // information associated with the attribute in case the spatial info has
+                        // changed.
+                        OnAttributesSelected();
+
+                        // Update the font according to the viewed status. Compare against
+                        // _fontStyle instead of the current font since a font change could be
+                        // pending in the message queue.
                         bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
-                        if (Font.Bold == hasBeenViewed)
+                        if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                         {
                             SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
                         }
@@ -1319,6 +1344,16 @@ namespace Extract.DataEntry
         /// a subsequent document is loaded.
         /// </summary>
         public void ClearCachedData()
+        {
+            // Nothing to do.
+        }
+
+        /// <summary>
+        /// Applies the selection state represented by <see paramref="selectionState"/> to the
+        /// control.
+        /// </summary>
+        /// <param name="selectionState">The <see cref="SelectionState"/> to apply.</param>
+        public void ApplySelection(SelectionState selectionState)
         {
             // Nothing to do.
         }
@@ -1440,9 +1475,9 @@ namespace Extract.DataEntry
         {
             if (AttributesSelected != null)
             {
-                AttributesSelected(this,
-                    new AttributesSelectedEventArgs(DataEntryMethods.AttributeAsVector(_attribute),
-                        false, true, null));
+                var selectionState = new SelectionState(this,
+                    DataEntryMethods.AttributeAsVector(_attribute), false, true, null);
+                AttributesSelected(this, new AttributesSelectedEventArgs(selectionState));
             }
         }
 
@@ -1679,6 +1714,8 @@ namespace Extract.DataEntry
         /// <param name="fontStyle">The new <see cref="FontStyle"/> to apply.</param>
         void SetFontStyle(FontStyle fontStyle)
         {
+            _fontStyle = fontStyle;
+
             // [DataEntry:954]
             // Changing the font will cause an open list to collapse and re-display. At times this
             // results in a different value getting inadvertently selected. Record the original

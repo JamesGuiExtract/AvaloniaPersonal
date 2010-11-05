@@ -453,7 +453,9 @@ namespace Extract.DataEntry
                     if (index != -1)
                     {
                         // Remove the old attribute from the vector.
-                        attributeVector.Remove(index);
+                        // Use AttributeStatusInfo to delete it so the data entry framework is
+                        // notified of its deletion.
+                        AttributeStatusInfo.DeleteAttribute(oldAttribute);
                         oldAttributeRemoved = true;
                     }
                 }
@@ -511,10 +513,8 @@ namespace Extract.DataEntry
 
                 // The attribute must be re-initialized to update the position of the attribute
                 // in the overall attribute hierarchy.
-                AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(newAttribute);
-                AttributeStatusInfo.Initialize(newAttribute, attributeVector, statusInfo.OwningControl,
-                        null, false, statusInfo.TabStopMode, statusInfo.Validator,
-                        statusInfo.AutoUpdateQuery, statusInfo.ValidationQuery);
+                IDataEntryControl owningControl = AttributeStatusInfo.GetOwningControl(newAttribute);
+                AttributeStatusInfo.Initialize(newAttribute, attributeVector, owningControl);
 
                 return oldAttributeRemoved;
             }
@@ -548,6 +548,78 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI23974", ex);
+            }
+        }
+
+        /// <summary>
+        /// Converts the provided <see cref="IEnumerable{T}"/> of <see cref="IAttribute"/>s to an
+        /// <see cref="IEnumerable{T}"/> that optionally includes all sub-attributes as well.
+        /// </summary>
+        /// <param name="attributes">The source<see cref="IEnumerable{T}"/> of
+        /// <see cref="IAttribute"/>s.</param>
+        /// <param name="includeSubAttributes"><see langword="true"/> to include all sub-attributes
+        /// of the provided attributes, <see langword="false"/> to return the source enumeration.
+        /// If included, sub-attributes will occur earlier in the enumeration that their parents.
+        /// </param>
+        /// <returns>The resulting <see cref="IEnumerable{T}"/> of <see cref="IAttribute"/>s.</returns>
+        static internal IEnumerable<IAttribute> ToAttributeEnumerable(IEnumerable<IAttribute> attributes,
+            bool includeSubAttributes)
+        {
+            foreach (IAttribute attribute in attributes)
+            {
+                if (includeSubAttributes)
+                {
+                    foreach (IAttribute subAttribute in
+                        ToAttributeEnumerable(attribute.SubAttributes, true))
+                    {
+                        yield return subAttribute;
+                    }
+                }
+
+                yield return attribute;
+            }
+        }
+
+        /// <summary>
+        /// Converts the provided <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s to an
+        /// <see cref="IEnumerable{T}"/> that optionally includes all sub-attributes as well.
+        /// </summary>
+        /// <param name="attributes">The source <see cref="IUnknownVector"/> of
+        /// <see cref="IAttribute"/>s.</param>
+        /// <param name="includeSubAttributes"><see langword="true"/> to include all sub-attributes
+        /// of the provided attributes, <see langword="false"/> to return the source enumeration.
+        /// If included, sub-attributes will occur earlier in the enumeration that their parents.
+        /// </param>
+        /// <returns>The resulting <see cref="IEnumerable{T}"/> of <see cref="IAttribute"/>s.</returns>
+        static internal IEnumerable<IAttribute> ToAttributeEnumerable(IUnknownVector attributes,
+            bool includeSubAttributes)
+        {
+            ExtractException.Assert("ELI25170", "Null argument exception!", attributes != null);
+
+            // Loop through each attribute, but return sub-attributes first, if requested.
+            int attributeCount = attributes.Size();
+            for (int i = 0; i < attributeCount; i++)
+            {
+                // Can be null, so don't use explicit cast.
+                IAttribute attribute = attributes.At(i) as IAttribute;
+
+                if (attribute == null)
+                {
+                    continue;
+                }
+
+                // If the supplied attribute is not null and we are including sub-attributes, 
+                // collect the raster zones from this attribute's children.
+                if (includeSubAttributes)
+                {
+                    foreach (IAttribute subAttribute in
+                        ToAttributeEnumerable(attribute.SubAttributes, true))
+                    {
+                        yield return subAttribute;
+                    }
+                }
+
+                yield return attribute;
             }
         }
 

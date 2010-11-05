@@ -455,6 +455,13 @@ namespace Extract.DataEntry
         /// <summary>
         /// <see cref="DataEntryGroupBox"/> does not have any implementation for this method.
         /// </summary>
+        public virtual void RefreshAttributes()
+        {
+        }
+
+        /// <summary>
+        /// <see cref="DataEntryGroupBox"/> does not have any implementation for this method.
+        /// </summary>
         /// <param name="spatialInfoUpdated">Unused.</param>
         /// <param name="attributes">Unused.</param>
         public virtual void RefreshAttributes(bool spatialInfoUpdated, params IAttribute[] attributes)
@@ -467,6 +474,15 @@ namespace Extract.DataEntry
         /// a subsequent document is loaded.
         /// </summary>
         public void ClearCachedData()
+        {
+            // Nothing to do.
+        }
+
+        /// <summary>
+        /// <see cref="DataEntryGroupBox"/> does not have any implementation for this method.
+        /// </summary>
+        /// <param name="selectionState">Unused.</param>
+        public void ApplySelection(SelectionState selectionState)
         {
             // Nothing to do.
         }

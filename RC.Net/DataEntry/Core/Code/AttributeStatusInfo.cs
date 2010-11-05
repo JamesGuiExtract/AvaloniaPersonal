@@ -125,7 +125,7 @@ namespace Extract.DataEntry
         
         #endregion Constants
 
-        #region Fields
+        #region Static fields
 
         /// <summary>
         /// The filename of the currently open document.
@@ -194,6 +194,15 @@ namespace Extract.DataEntry
         static bool _validationTriggersEnabled;
 
         /// <summary>
+        /// Manages change history and provides ability to undo changes.
+        /// </summary>
+        static UndoManager _undoManager = new UndoManager();
+
+        #endregion static fields
+
+        #region Instance fields
+
+        /// <summary>
         /// Indicates whether the object has been modified since being loaded via the 
         /// IPersistStream interface. This is an int because that is the return type of 
         /// IPersistStream::IsDirty in order to support COM values of <see cref="HResult.Ok"/> and 
@@ -205,6 +214,11 @@ namespace Extract.DataEntry
         /// The control in charge of displaying the attribute.
         /// </summary>
         IDataEntryControl _owningControl;
+
+        /// <summary>
+        /// The the template to use to create new per-instance validator instances.
+        /// </summary>
+        IDataEntryValidator _validatorTemplate;
 
         /// <summary>
         /// The validator used to validate the attribute's data.
@@ -313,7 +327,7 @@ namespace Extract.DataEntry
         /// </summary>
         List<IAttribute> _tabGroup;
 
-        #endregion Fields
+        #endregion Instance fields
 
         #region Constructors
 
@@ -506,6 +520,19 @@ namespace Extract.DataEntry
         #region Static Members
 
         /// <summary>
+        /// Gets <see cref="UndoManager"/> which tracks change history and provides ability to undo
+        /// changes.
+        /// </summary>
+        /// <value>The <see cref="UndoManager"/>.</value>
+        internal static UndoManager UndoManager
+        {
+            get
+            {
+                return _undoManager;
+            }
+        }
+
+        /// <summary>
         /// Gets the filename of the currently open document.
         /// </summary>
         /// <returns>The filename of the currently open document.</returns>
@@ -616,6 +643,12 @@ namespace Extract.DataEntry
                 }
                 _validationTriggers.Clear();
 
+                // _undoManager.ClearHistory() call will release attributes that were deleted by the
+                // user (and thus are no longer in the _attributes hierarchy), so don't call it until
+                // the end of this ResetData.
+                _undoManager.ClearHistory();
+
+                // Release the attributes still in the _attributes hierarchy.
                 if (_attributes != null)
                 {
                     AttributeStatusInfo.ReleaseAttributes(_attributes);
@@ -625,6 +658,23 @@ namespace Extract.DataEntry
             {
                 throw ExtractException.AsExtractException("ELI25624", ex);
             }
+        }
+
+        /// <summary>
+        /// Initializes a <see cref="AttributeStatusInfo"/> instance for the specified
+        /// <see cref="IAttribute"/> with the specified parameters.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which an 
+        /// <see cref="AttributeStatusInfo"/> instance is being initialized.</param>
+        /// <param name="sourceAttributes">The vector of <see cref="IAttribute"/>s to which the
+        /// specified <see cref="IAttribute"/> is a member.</param>
+        /// <param name="owningControl">The <see cref="IDataEntryControl"/> in charge of displaying 
+        /// the specified <see cref="IAttribute"/>.</param>
+        [ComVisible(false)]
+        public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes,
+            IDataEntryControl owningControl)
+        {
+            Initialize(attribute, sourceAttributes, owningControl, null, false, null, null, null, null);
         }
 
         /// <summary>
@@ -725,13 +775,18 @@ namespace Extract.DataEntry
                 }
 
                 // Set/update the validator if necessary.
-                if (validatorTemplate != null && statusInfo._validator == null)
+                if (validatorTemplate != null && validatorTemplate != statusInfo._validatorTemplate)
+                {
+                    statusInfo._validatorTemplate = validatorTemplate;
+                }
+
+                if (statusInfo._validatorTemplate != null && statusInfo._validator == null)
                 {
                     // [DataEntry:861]
                     // Recent changes to validation in the DataEntry framework now require
                     // validators to have a 1 to 1 relationship with attribute it is validating so
                     // long as the validation is attribute specific.
-                    statusInfo._validator = validatorTemplate.GetPerAttributeInstance();
+                    statusInfo._validator = statusInfo._validatorTemplate.GetPerAttributeInstance();
                 }
 
                 // Update the tabStopMode if necessary
@@ -753,8 +808,8 @@ namespace Extract.DataEntry
                 bool previouslyInitialized = 
                     _subAttributesToParentMap.ContainsKey(attribute.SubAttributes);
 
-                // If the attribute's source attributes are have known parent, use it to generate
-                // the attribute to parent mapping.
+                // If the attribute's source attributes have known parent, use it to generate the
+                // attribute to parent mapping.
                 IAttribute parentAttribute;
                 if (_subAttributesToParentMap.TryGetValue(sourceAttributes, out parentAttribute))
                 {
@@ -764,19 +819,26 @@ namespace Extract.DataEntry
                 // Add a mapping for the attribute's subattributes for future reference.
                 _subAttributesToParentMap[attribute.SubAttributes] = attribute;
 
-                if (autoUpdateQuery != null && autoUpdateQuery != statusInfo._autoUpdateQuery)
+                // Find any existing auto-update trigger.
+                AutoUpdateTrigger existingAutoUpdateTrigger = null;
+                _autoUpdateTriggers.TryGetValue(attribute, out existingAutoUpdateTrigger);
+
+                if ((autoUpdateQuery != null && autoUpdateQuery != statusInfo._autoUpdateQuery) ||
+                    (statusInfo._autoUpdateQuery != null && existingAutoUpdateTrigger == null))
                 {
                     // Dispose of any previously existing auto-update trigger.
-                    AutoUpdateTrigger existingAutoUpdateTrigger;
-                    if (_autoUpdateTriggers.TryGetValue(attribute, out existingAutoUpdateTrigger))
+                    if (existingAutoUpdateTrigger != null)
                     {
                         existingAutoUpdateTrigger.Dispose();
                         _autoUpdateTriggers.Remove(attribute);
                     }
 
-                    statusInfo._autoUpdateQuery = autoUpdateQuery;
+                    if (autoUpdateQuery != null)
+                    {
+                        statusInfo._autoUpdateQuery = autoUpdateQuery;
+                    }
 
-                    if (!string.IsNullOrEmpty(autoUpdateQuery))
+                    if (!string.IsNullOrEmpty(statusInfo._autoUpdateQuery))
                     {
                         // We need to ensure that the attribute is a part of the sourceAttributes
                         // in order for AutoUpdateTrigger to creation to work. When creating a new
@@ -785,7 +847,7 @@ namespace Extract.DataEntry
                         sourceAttributes.PushBackIfNotContained(attribute);
 
                         _autoUpdateTriggers[attribute] = new AutoUpdateTrigger(attribute,
-                            autoUpdateQuery, _dbConnection, false, true);
+                            statusInfo._autoUpdateQuery, _dbConnection, false, true);
                     }
                 }
 
@@ -803,19 +865,26 @@ namespace Extract.DataEntry
                     }
                 }
 
-                if (validationQuery != null && validationQuery != statusInfo._validationQuery)
+                // Find any existing validation trigger.
+                AutoUpdateTrigger existingValidationTrigger = null;
+                _validationTriggers.TryGetValue(attribute, out existingValidationTrigger);
+
+                if ((validationQuery != null && validationQuery != statusInfo._validationQuery) ||
+                    (statusInfo._validationQuery != null && existingValidationTrigger == null))
                 {
                     // Dispose of any previously existing validation trigger.
-                    AutoUpdateTrigger existingValidationTrigger;
-                    if (_validationTriggers.TryGetValue(attribute, out existingValidationTrigger))
+                    if (existingValidationTrigger != null)
                     {
                         existingValidationTrigger.Dispose();
                         _validationTriggers.Remove(attribute);
                     }
 
-                    statusInfo._validationQuery = validationQuery;
+                    if (validationQuery != null)
+                    {
+                        statusInfo._validationQuery = validationQuery;
+                    }
 
-                    if (!string.IsNullOrEmpty(validationQuery))
+                    if (!string.IsNullOrEmpty(statusInfo._validationQuery))
                     {
                         // We need to ensure that the attribute is a part of the sourceAttributes
                         // in order for AutoUpdateTrigger to creation to work. When creating a new
@@ -824,7 +893,8 @@ namespace Extract.DataEntry
                         sourceAttributes.PushBackIfNotContained(attribute);
 
                         _validationTriggers[attribute] = new AutoUpdateTrigger(attribute,
-                            validationQuery, _dbConnection, true, _validationTriggersEnabled);
+                            statusInfo._validationQuery, _dbConnection, true,
+                            _validationTriggersEnabled);
                     }
                 }
                 else
@@ -866,6 +936,11 @@ namespace Extract.DataEntry
                 // attribute.
                 if (!previouslyInitialized)
                 {
+                    if (_undoManager.TrackOperations)
+                    {
+                        _undoManager.AddMemento(new DataEntryAddedAttributeMemento(attribute));
+                    }
+
                     OnAttributeInitialized(attribute, sourceAttributes, owningControl);
                 }
             }
@@ -930,8 +1005,9 @@ namespace Extract.DataEntry
         public static void SetValue(IAttribute attribute, SpatialString value,
             bool acceptSpatialInfo, bool endOfEdit)
         {
-            // In case of an error applying the new value, keep track of the original value.
-            SpatialString originalValue = null;
+            // Use modifiedAttributeMemento as a copy of the original value in case of an error as
+            // well as for use by the UndoManager so we do not make two copies of the spatial string.
+            DataEntryModifiedAttributeMemento modifiedAttributeMemento = null;
 
             try
             {
@@ -939,9 +1015,14 @@ namespace Extract.DataEntry
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI27093", _OBJECT_NAME);
 
-                // Make a copy of the original value.
-                ICopyableObject copySource = (ICopyableObject)attribute.Value;
-                originalValue = (SpatialString)copySource.Clone();
+                modifiedAttributeMemento = new DataEntryModifiedAttributeMemento(attribute);
+
+                // AddMemento needs to be called before changing the value so that the
+                // DataEntryModifiedAttributeMemento knows of the attribute's original value.
+                if (_undoManager.TrackOperations)
+                {
+                    _undoManager.AddMemento(modifiedAttributeMemento);
+                }
 
                 attribute.Value = value;
 
@@ -977,8 +1058,8 @@ namespace Extract.DataEntry
                     else
                     {
                         // If the attribute has not been added to _attributesBeingModified, add it.
-                        _attributesBeingModified[attribute] =
-                            new KeyValuePair<bool, SpatialString>(true, originalValue);
+                        _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
+                            true, modifiedAttributeMemento.OriginalValue);
                     }
 
                     // After queing the modification, call EndEdit if directed.
@@ -992,11 +1073,11 @@ namespace Extract.DataEntry
             {
                 // If there was an exception applying the value, restore the original value to
                 // prevent exceptions from continuously being generated.
-                if (originalValue != null)
+                if (modifiedAttributeMemento != null)
                 {
                     try
                     {
-                        attribute.Value = originalValue;
+                        attribute.Value = modifiedAttributeMemento.OriginalValue;
 
                         // After setting the value, refresh the value and raise
                         // AttributeValueModified to notify the host of the change.
@@ -1032,8 +1113,9 @@ namespace Extract.DataEntry
         public static void SetValue(IAttribute attribute, string value, bool acceptSpatialInfo,
             bool endOfEdit)
         {
-            // In case of an error applying the new value, keep track of the original value.
-            SpatialString originalValue = null;
+            // Use modifiedAttributeMemento as a copy of the original value in case of an error as
+            // well as for use by the UndoManager so we do not make two copies of the spatial string.
+            DataEntryModifiedAttributeMemento modifiedAttributeMemento = null;
 
             try
             {
@@ -1044,9 +1126,14 @@ namespace Extract.DataEntry
                 // Don't do anything if the specified value matches the existing value.
                 if (attribute.Value.String != value)
                 {
-                    // Make a copy of the original value.
-                    ICopyableObject copySource = (ICopyableObject)attribute.Value;
-                    originalValue = (SpatialString)copySource.Clone();
+                    modifiedAttributeMemento = new DataEntryModifiedAttributeMemento(attribute);
+
+                    // AddMemento needs to be called before changing the value so that the
+                    // DataEntryModifiedAttributeMemento knows of the attribute's original value.
+                    if (_undoManager.TrackOperations)
+                    {
+                        _undoManager.AddMemento(new DataEntryModifiedAttributeMemento(attribute));
+                    }
 
                     // If the attribute doesn't contain any spatial information, just
                     // change the text.
@@ -1077,8 +1164,8 @@ namespace Extract.DataEntry
 
                         if (!_attributesBeingModified.ContainsKey(attribute))
                         {
-                            _attributesBeingModified[attribute] =
-                                new KeyValuePair<bool, SpatialString>(false, originalValue);
+                            _attributesBeingModified[attribute] = new KeyValuePair<bool, SpatialString>(
+                                false, modifiedAttributeMemento.OriginalValue);
                         }
                     }
                 }
@@ -1093,11 +1180,11 @@ namespace Extract.DataEntry
             {
                 // If there was an exception applying the value, restore the original value to
                 // prevent exceptions from continuously being generated.
-                if (originalValue != null)
+                if (modifiedAttributeMemento != null)
                 {
                     try
                     {
-                        attribute.Value = originalValue;
+                        attribute.Value = modifiedAttributeMemento.OriginalValue;
 
                         // After setting the value, refresh the value and raise
                         // AttributeValueModified to notify the host of the change.
@@ -1148,6 +1235,10 @@ namespace Extract.DataEntry
                     validationTrigger.Dispose();
                 }
 
+                // Set the now disposed of validator to null so that if this attribute is later
+                // resurrected via Undo, the validatory will be re-initialized.
+                statusInfo._validator = null;
+
                 IUnknownVector subAttributes = attribute.SubAttributes;
                 _subAttributesToParentMap.Remove(attribute.SubAttributes);
 
@@ -1162,23 +1253,37 @@ namespace Extract.DataEntry
                 }
 
                 // Remove the attribute from the overall attribute heirarchy.
+                IUnknownVector parentCollection;
                 if (statusInfo._parentAttribute != null)
                 {
-                    statusInfo._parentAttribute.SubAttributes.RemoveValue(attribute);
+                    parentCollection = statusInfo._parentAttribute.SubAttributes;
                 }
                 else
                 {
-                    _attributes.RemoveValue(attribute);
+                    parentCollection = _attributes;
                 }
 
-                // Raise the AttributeDeleted event last otherwise it can cause the hosts' count
-                // of invalid and unviewed attributes to be off.
-                statusInfo.OnAttributeDeleted(attribute);
+                int index = -1;
+                parentCollection.FindByReference(attribute, 0, ref index);
 
-                // [DataEntry:693]
-                // Since the attribute will no longer be accessed by the DataEntry, it needs to be
-                // released with FinalReleaseComObject to prevent handle leaks.
-                Marshal.FinalReleaseComObject(attribute);
+                // TODO: There are some rare instances where the attribute is not found in the
+                // parent collection (index == -1). Really, the only side effect should be that
+                // FinalReleaseComObject won't be called for it... I don't think this warrants
+                // spending time tracking down or logging, at least for now.
+                if (index >= 0)
+                {
+                    // [DataEntry:693]
+                    // Send a DeletedAttributeMemento to the undo manager even if it is not currently
+                    // tracking operations so that FinalReleaseComObject can be called on the
+                    // attribute when the history is cleared in ResetData
+                    _undoManager.AddMemento(
+                        new DataEntryDeletedAttributeMemento(attribute, parentCollection, index));
+                    parentCollection.RemoveValue(attribute);
+
+                    // Raise the AttributeDeleted event last otherwise it can cause the hosts' count
+                    // of invalid and unviewed attributes to be off.
+                    statusInfo.OnAttributeDeleted(attribute);
+                }
             }
             catch (Exception ex)
             {
@@ -1371,6 +1476,13 @@ namespace Extract.DataEntry
                 // raise the ViewedStateChanged event to notify listeners of the new status.
                 if (statusInfo._isViewable && statusInfo._hasBeenViewed != hasBeenViewed)
                 {
+                    // AddMemento needs to be called before changing the status so that the
+                    // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
+                    if (_undoManager.TrackOperations)
+                    {
+                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
+                    }
+
                     statusInfo._hasBeenViewed = hasBeenViewed;
 
                     OnViewedStateChanged(attribute, hasBeenViewed);
@@ -1908,7 +2020,17 @@ namespace Extract.DataEntry
             {
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                statusInfo._hintType = hintType;
+                if (statusInfo._hintType != hintType)
+                {
+                    // AddMemento needs to be called before changing the status so that the
+                    // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
+                    if (_undoManager.TrackOperations)
+                    {
+                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
+                    }
+
+                    statusInfo._hintType = hintType;
+                }
             }
             catch (Exception ex)
             {
@@ -1953,7 +2075,17 @@ namespace Extract.DataEntry
             {
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                statusInfo._isAccepted = accept;
+                if (statusInfo._isAccepted != accept)
+                {
+                    // AddMemento needs to be called before changing the status so that the
+                    // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
+                    if (_undoManager.TrackOperations)
+                    {
+                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
+                    }
+
+                    statusInfo._isAccepted = accept;
+                }
             }
             catch (Exception ex)
             {
@@ -2001,7 +2133,17 @@ namespace Extract.DataEntry
             {
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                statusInfo._hintEnabled = hintEnabled;
+                if (statusInfo._hintEnabled != hintEnabled)
+                {
+                    // AddMemento needs to be called before changing the status so that the
+                    // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
+                    if (_undoManager.TrackOperations)
+                    {
+                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
+                    }
+
+                    statusInfo._hintEnabled = hintEnabled;
+                }
             }
             catch (Exception ex)
             {
@@ -2236,6 +2378,17 @@ namespace Extract.DataEntry
 
                 bool spatialInfoRemoved = false;
 
+                // AddMemento needs to be called before changing the value so that the
+                // DataEntryModifiedAttributeMemento knows of the attribute's original value.
+                if (_undoManager.TrackOperations)
+                {
+                    _undoManager.AddMemento(new DataEntryModifiedAttributeMemento(attribute));
+                }
+
+                // Removing spatial info will not trigger an EndEdit call to seperate this as an
+                // independent operation but it should considered one.
+                _undoManager.StartNewOperation();
+
                 // If the attribute has spatial information (a highlight), remove it and
                 // flag the attribute so that hints are not created in its place.
                 if (attribute.Value.HasSpatialInfo())
@@ -2253,6 +2406,13 @@ namespace Extract.DataEntry
 
                 if (spatialInfoRemoved)
                 {
+                    // AddMemento needs to be called before changing the status so that the
+                    // DataEntryAttributeStatusChangeMemento knows of the attribute's original status.
+                    if (_undoManager.TrackOperations)
+                    {
+                        _undoManager.AddMemento(new DataEntryAttributeStatusChangeMemento(attribute));
+                    }
+
                     statusInfo._hintEnabled = false;
 
                     // Notify listeners that spatial info has changed.
@@ -2493,6 +2653,9 @@ namespace Extract.DataEntry
                         _endEditInProgress = false;
                     }
                 }
+
+                // Any time EndEdit is called, consider it the end of an operation.
+                _undoManager.StartNewOperation();
             }
             catch (Exception ex)
             {
@@ -2573,15 +2736,9 @@ namespace Extract.DataEntry
         {
             try
             {
-                int count = attributes.Size();
-                for (int i = 0; i < count; i++)
+                foreach (IAttribute attribute in 
+                    DataEntryMethods.ToAttributeEnumerable(attributes, true))
                 {
-                    IAttribute attribute = (IAttribute)attributes.At(i);
-                    if (attribute.SubAttributes.Size() != 0)
-                    {
-                        ReleaseAttributes(attribute.SubAttributes);
-                    }
-
                     Marshal.FinalReleaseComObject(attribute);
                 }
             }
