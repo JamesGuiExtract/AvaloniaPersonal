@@ -79,6 +79,7 @@
             this.CpuColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -129,7 +130,7 @@
             // _toolStripContainer.ContentPanel
             // 
             this._toolStripContainer.ContentPanel.Controls.Add(this._machineListGridView);
-            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(742, 264);
+            this._toolStripContainer.ContentPanel.Size = new System.Drawing.Size(742, 303);
             this._toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this._toolStripContainer.Name = "_toolStripContainer";
@@ -186,10 +187,11 @@
             this._machineListGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._machineListGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this._machineListGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this._machineListGridView.Size = new System.Drawing.Size(742, 264);
+            this._machineListGridView.Size = new System.Drawing.Size(742, 303);
             this._machineListGridView.TabIndex = 0;
+            this._machineListGridView.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.HandleMachineGridViewMouseDoubleClick);
+            this._machineListGridView.RowHeaderMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.HandleMachineGridViewMouseDoubleClick);
             this._machineListGridView.SelectionChanged += new System.EventHandler(this.HandleMachineGridViewSelectionChanged);
-            this._machineListGridView.DoubleClick += new System.EventHandler(this.HandleMachineGridViewRowDoubleClick);
             // 
             // MachineColumn
             // 
@@ -223,6 +225,7 @@
             this.FdrsServiceColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.FdrsServiceColumn.FillWeight = 200F;
             this.FdrsServiceColumn.HeaderText = "FDRS Status";
+            this.FdrsServiceColumn.MinimumWidth = 50;
             this.FdrsServiceColumn.Name = "FdrsServiceColumn";
             this.FdrsServiceColumn.ReadOnly = true;
             // 
@@ -250,6 +253,7 @@
             // _fileToolStripMenuItem
             // 
             this._fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._newToolStripMenuItem,
             this._openToolStripMenuItem,
             this._saveToolStripMenuItem,
             this._saveAsToolStripMenuItem,
@@ -258,6 +262,14 @@
             this._fileToolStripMenuItem.Name = "_fileToolStripMenuItem";
             this._fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
             this._fileToolStripMenuItem.Text = "&File";
+            // 
+            // _newToolStripMenuItem
+            // 
+            this._newToolStripMenuItem.Name = "_newToolStripMenuItem";
+            this._newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+            this._newToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this._newToolStripMenuItem.Text = "&New";
+            this._newToolStripMenuItem.Click += new System.EventHandler(this.HandleNewToolStripMenuItemClick);
             // 
             // _openToolStripMenuItem
             // 
@@ -306,7 +318,7 @@
             // _optionsToolStripMenuItem
             // 
             this._optionsToolStripMenuItem.Name = "_optionsToolStripMenuItem";
-            this._optionsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._optionsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             this._optionsToolStripMenuItem.Text = "&Options...";
             this._optionsToolStripMenuItem.Click += new System.EventHandler(this.HandleSetAutoRefreshThreadSleepTime);
             // 
@@ -321,7 +333,7 @@
             // _aboutFamNetworkManagerMenuItem
             // 
             this._aboutFamNetworkManagerMenuItem.Name = "_aboutFamNetworkManagerMenuItem";
-            this._aboutFamNetworkManagerMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._aboutFamNetworkManagerMenuItem.Size = new System.Drawing.Size(126, 22);
             this._aboutFamNetworkManagerMenuItem.Text = "&About...";
             this._aboutFamNetworkManagerMenuItem.Click += new System.EventHandler(this.HandleAboutFamNetworkManagerMenuItem);
             // 
@@ -350,7 +362,7 @@
             this._openFileToolStripButton.Name = "_openFileToolStripButton";
             this._openFileToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._openFileToolStripButton.Text = "Open file";
-            this._openFileToolStripButton.ToolTipText = "Open file";
+            this._openFileToolStripButton.ToolTipText = "Open file\tCtrl+O";
             this._openFileToolStripButton.Click += new System.EventHandler(this.HandleOpenFileClick);
             // 
             // _saveFileToolStripButton
@@ -361,6 +373,7 @@
             this._saveFileToolStripButton.Name = "_saveFileToolStripButton";
             this._saveFileToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._saveFileToolStripButton.Text = "Save file";
+            this._saveFileToolStripButton.ToolTipText = "Save file\tCtrl+S";
             this._saveFileToolStripButton.Click += new System.EventHandler(this.HandleSaveFileClick);
             // 
             // _addMachineToolStripButton
@@ -371,6 +384,7 @@
             this._addMachineToolStripButton.Name = "_addMachineToolStripButton";
             this._addMachineToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._addMachineToolStripButton.Text = "Add machine";
+            this._addMachineToolStripButton.ToolTipText = "Add machine\tF8";
             this._addMachineToolStripButton.Click += new System.EventHandler(this.HandleAddMachineButtonClick);
             // 
             // _removeMachineToolStripButton
@@ -381,6 +395,7 @@
             this._removeMachineToolStripButton.Name = "_removeMachineToolStripButton";
             this._removeMachineToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._removeMachineToolStripButton.Text = "Remove machine";
+            this._removeMachineToolStripButton.ToolTipText = "Remove machine\tDel";
             this._removeMachineToolStripButton.Click += new System.EventHandler(this.HandleRemoveMachineButtonClick);
             // 
             // _editMachineGroupAndNameToolStripButton
@@ -391,6 +406,7 @@
             this._editMachineGroupAndNameToolStripButton.Name = "_editMachineGroupAndNameToolStripButton";
             this._editMachineGroupAndNameToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._editMachineGroupAndNameToolStripButton.Text = "Edit machine(s) group and name";
+            this._editMachineGroupAndNameToolStripButton.ToolTipText = "Edit machine(s) group and name\tF2";
             this._editMachineGroupAndNameToolStripButton.Click += new System.EventHandler(this.HandleEditMachineOrGroupButtonClick);
             // 
             // _groupFilterComboBox
@@ -412,7 +428,7 @@
             this._modifyServiceDatabaseToolStripButton,
             this._autoRefreshDataToolStripButton,
             this._refreshDataToolStripButton});
-            this._updateToolStrip.Location = new System.Drawing.Point(3, 63);
+            this._updateToolStrip.Location = new System.Drawing.Point(403, 24);
             this._updateToolStrip.Name = "_updateToolStrip";
             this._updateToolStrip.Size = new System.Drawing.Size(300, 39);
             this._updateToolStrip.TabIndex = 2;
@@ -477,10 +493,12 @@
             this._refreshDataToolStripButton.Name = "_refreshDataToolStripButton";
             this._refreshDataToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._refreshDataToolStripButton.Text = "Refresh status";
+            this._refreshDataToolStripButton.ToolTipText = "Refresh status\tF5";
             this._refreshDataToolStripButton.Click += new System.EventHandler(this.HandleRefreshDataButtonClick);
             // 
             // FAMNetworkDashboardForm
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(742, 366);
@@ -524,11 +542,6 @@
         private System.Windows.Forms.ToolStripButton _autoRefreshDataToolStripButton;
         private System.Windows.Forms.ToolStripButton _refreshDataToolStripButton;
         private System.Windows.Forms.ToolStripComboBox _groupFilterComboBox;
-        private System.Windows.Forms.DataGridViewTextBoxColumn MachineColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn GroupColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FamServiceColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FdrsServiceColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn CpuColumn;
         private System.Windows.Forms.ToolStripMenuItem _helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _aboutFamNetworkManagerMenuItem;
         private System.Windows.Forms.ToolStripComboBox _startStopTargetComboBox;
@@ -540,6 +553,12 @@
         private System.Windows.Forms.ToolStripMenuItem _saveAsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _optionsToolStripMenuItem;
+        private System.Windows.Forms.DataGridViewTextBoxColumn MachineColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn GroupColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FamServiceColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FdrsServiceColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn CpuColumn;
+        private System.Windows.Forms.ToolStripMenuItem _newToolStripMenuItem;
     }
 }
 

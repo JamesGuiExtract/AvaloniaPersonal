@@ -149,12 +149,6 @@ namespace Extract.SQLCDBEditor
                 // Initialize the dirty flag
                 _dirty = false;
 
-                // If there is a database file set open the database.
-                if (!string.IsNullOrEmpty(_databaseFileName))
-                {
-                    OpenDatabase(_databaseFileName);
-                }
-
                 if (!_standAlone)
                 {
                     closeToolStripMenuItem.Visible = false;
@@ -162,11 +156,19 @@ namespace Extract.SQLCDBEditor
                     openToolStripMenuItem.Visible = false;
                 }
 
-                EnableCommands();
+                // If there is a database file set open the database.
+                if (!string.IsNullOrEmpty(_databaseFileName))
+                {
+                    OpenDatabase(_databaseFileName);
+                }
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI29495", ex);
+            }
+            finally
+            {
+                EnableCommands();
             }
         }
 

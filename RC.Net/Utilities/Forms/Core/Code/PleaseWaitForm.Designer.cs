@@ -40,15 +40,17 @@
             this._labelMessage.Size = new System.Drawing.Size(35, 13);
             this._labelMessage.TabIndex = 0;
             this._labelMessage.Text = "label1";
+            this._labelMessage.UseWaitCursor = true;
             // 
             // _progressBar
             // 
             this._progressBar.Location = new System.Drawing.Point(12, 25);
-            this._progressBar.Name = "_progressBar";
             this._progressBar.MarqueeAnimationSpeed = 50;
+            this._progressBar.Name = "_progressBar";
             this._progressBar.Size = new System.Drawing.Size(370, 25);
             this._progressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this._progressBar.TabIndex = 1;
+            this._progressBar.UseWaitCursor = true;
             // 
             // PleaseWaitForm
             // 
@@ -62,8 +64,10 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "PleaseWaitForm";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Please Wait";
+            this.UseWaitCursor = true;
             this.ResumeLayout(false);
             this.PerformLayout();
 

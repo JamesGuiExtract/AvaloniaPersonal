@@ -1,15 +1,18 @@
 ﻿using Extract.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.ServiceProcess;
+using System.Text;
 
 namespace Extract.FileActionManager.Utilities
 {
     /// <summary>
     /// Class to hold the updated data results for the <see cref="ServiceMachineController"/> objects.
     /// </summary>
-    internal class ServiceStatusUpdateData
+    class ServiceStatusUpdateData
     {
         #region Fields
 
@@ -26,7 +29,12 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The current percentage of the CPU that is being used on the service machine.
         /// </summary>
-        readonly float _cpuPercentage;
+        readonly float? _cpuPercentage;
+
+        /// <summary>
+        /// Any exceptions associated with this data
+        /// </summary>
+        readonly ExtractException _exception;
 
         #endregion Fields
 
@@ -36,12 +44,14 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="famServiceStatus">The FAM service status.</param>
         /// <param name="fdrsServiceStatus">The FDRS service status.</param>
         /// <param name="cpuPercentage">The cpu percentage.</param>
+        /// <param name="exception">The exception.</param>
         public ServiceStatusUpdateData(string famServiceStatus, string fdrsServiceStatus,
-            float cpuPercentage)
+            float? cpuPercentage, ExtractException exception = null)
         {
             _famServiceStatus = famServiceStatus;
             _fdrsServiceStatus = fdrsServiceStatus;
             _cpuPercentage = cpuPercentage;
+            _exception = exception;
         }
 
         #region Properties
@@ -71,14 +81,37 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Gets the cpu percentage.
+        /// Gets the cpu percentage as a string.
         /// </summary>
-        /// <value>The cpu percentage.</value>
-        public float CpuPercentage
+        /// <value>The cpu percentage as a string.</value>
+        public string CpuPercentageString
         {
             get
             {
-                return _cpuPercentage;
+                StringBuilder sb = new StringBuilder();
+                if (_cpuPercentage.HasValue)
+                {
+                    sb.Append(_cpuPercentage.Value.ToString("F1", CultureInfo.CurrentCulture));
+                    sb.Append(" %");
+                }
+                else
+                {
+                    sb.Append("Counter N/A");
+                }
+
+                return sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Gets the exception.
+        /// </summary>
+        /// <value>The exception.</value>
+        public ExtractException Exception
+        {
+            get
+            {
+                return _exception;
             }
         }
 
@@ -113,19 +146,9 @@ namespace Extract.FileActionManager.Utilities
         ServiceController _famServiceController;
 
         /// <summary>
-        /// Indicates whether the FAM service is installed on the machine or not.
-        /// </summary>
-        bool _famServiceInstalled = true;
-
-        /// <summary>
         /// A service controller for controlling the FDRS service on the specified machine.
         /// </summary>
         ServiceController _fdrsServiceController;
-
-        /// <summary>
-        /// Indicates whether the FDRS service is installed on the machine or not.
-        /// </summary>
-        bool _fdrsServiceInstalled = true;
 
         /// <summary>
         /// The name of the machine.
@@ -275,7 +298,7 @@ namespace Extract.FileActionManager.Utilities
                     InitializeRemoteObjects();
                 }
 
-                if (_famServiceInstalled)
+                if (_famServiceController != null)
                 {
                     _famServiceController.Refresh();
                     ServiceControllerStatus status = _famServiceController.Status;
@@ -302,7 +325,6 @@ namespace Extract.FileActionManager.Utilities
             {
                 _famServiceController.Dispose();
                 _famServiceController = null;
-                _famServiceInstalled = false;
             }
             catch (Exception ex)
             {
@@ -326,17 +348,17 @@ namespace Extract.FileActionManager.Utilities
                     InitializeRemoteObjects();
                 }
 
-                if (_fdrsServiceInstalled)
+                if (_fdrsServiceController != null)
                 {
                     _fdrsServiceController.Refresh();
                     ServiceControllerStatus status = _fdrsServiceController.Status;
                     if (startService)
                     {
-                if (status != ServiceControllerStatus.Running
-                    || status != ServiceControllerStatus.StartPending)
-                {
-                    _fdrsServiceController.Start();
-                }
+                        if (status != ServiceControllerStatus.Running
+                            || status != ServiceControllerStatus.StartPending)
+                        {
+                            _fdrsServiceController.Start();
+                        }
                     }
                     else
                     {
@@ -353,7 +375,6 @@ namespace Extract.FileActionManager.Utilities
             {
                 _fdrsServiceController.Dispose();
                 _fdrsServiceController = null;
-                _fdrsServiceInstalled = false;
             }
             catch (Exception ex)
             {
@@ -373,13 +394,11 @@ namespace Extract.FileActionManager.Utilities
             {
                 _famServiceController.Dispose();
                 _famServiceController = null;
-                _famServiceInstalled = true;
             }
             if (_fdrsServiceController != null)
             {
                 _fdrsServiceController.Dispose();
                 _fdrsServiceController = null;
-                _fdrsServiceInstalled = true;
             }
             if (_cpuCounter != null)
             {
@@ -391,32 +410,100 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Initializes the remote objects.
         /// </summary>
-        void InitializeRemoteObjects()
+        ExtractException InitializeRemoteObjects()
         {
-            if (_famServiceController == null)
+            try
             {
-                _famServiceInstalled = SystemMethods.CheckServiceExists("ESFAMService",
-                    _machineName);
-                if (_famServiceInstalled)
+                var exceptions = new List<Exception>();
+
+                // Try to get the FAM service controller
+                var ex = TryGetServiceController("ESFAMService", _machineName,
+                    ref _famServiceController);
+                if (ex != null)
                 {
-                    _famServiceController = new ServiceController("ESFAMService", _machineName);
+                    exceptions.Add(ex);
+                }
+
+                // Try to get the FDRS service controller
+                ex = TryGetServiceController("ESFDRSService", _machineName,
+                    ref _fdrsServiceController);
+                if (ex != null)
+                {
+                    exceptions.Add(ex);
+                }
+
+                // Try to get the performance counter
+                if (_cpuCounter == null)
+                {
+                    try
+                    {
+                        _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total",
+                            _machineName);
+                        _cpuCounter.NextValue();
+                    }
+                    catch (Exception e)
+                    {
+                        if (_cpuCounter != null)
+                        {
+                            _cpuCounter.Dispose();
+                            _cpuCounter = null;
+                        }
+                        exceptions.Add(e);
+                    }
+                }
+
+                if (exceptions.Count > 0)
+                {
+                    if (exceptions.Count == 1)
+                    {
+                        throw ExtractException.AsExtractException("ELI31038", exceptions[0]);
+                    }
+                    else
+                    {
+                        var ae = new AggregateException(exceptions.ToArray());
+                        throw ExtractException.AsExtractException("ELI31028", ae.Flatten());
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex1)
+            {
+                return ExtractException.AsExtractException("ELI31029", ex1);
+            }
+        }
+
+        /// <summary>
+        /// Tries the get service controller.
+        /// </summary>
+        /// <param name="serviceName">Name of the service.</param>
+        /// <param name="machineName">Name of the machine.</param>
+        /// <param name="controller">The controller.</param>
+        static Exception TryGetServiceController(string serviceName, string machineName,
+            ref ServiceController controller)
+        {
+            if (controller == null)
+            {
+                if (SystemMethods.CheckServiceExists(serviceName, machineName))
+                {
+                    try
+                    {
+                        controller = new ServiceController(serviceName, machineName);
+                    }
+                    catch(Exception ex)
+                    {
+                        if (controller != null)
+                        {
+                            controller.Dispose();
+                            controller = null;
+                        }
+
+                        return ex;
+                    }
                 }
             }
-            if (_fdrsServiceController == null)
-            {
-                _fdrsServiceInstalled = SystemMethods.CheckServiceExists("ESFDRSService",
-                    _machineName);
-                if (_fdrsServiceInstalled)
-                {
-                    _fdrsServiceController = new ServiceController("ESFDRSService", _machineName);
-                }
-            }
-            if (_cpuCounter == null)
-            {
-                _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total",
-                    _machineName);
-                _cpuCounter.NextValue();
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -427,22 +514,23 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                InitializeRemoteObjects();
+                var ee = InitializeRemoteObjects();
 
                 string famServiceStatus = null;
-                if (_famServiceInstalled)
+                if (_famServiceController != null)
                 {
                     _famServiceController.Refresh();
                     famServiceStatus = _famServiceController.Status.ToString();
                 }
                 string fdrsServiceStatus = null;
-                if (_fdrsServiceInstalled)
+                if (_fdrsServiceController != null)
                 {
                     _fdrsServiceController.Refresh();
                     fdrsServiceStatus = _fdrsServiceController.Status.ToString();
                 }
                 return new ServiceStatusUpdateData(famServiceStatus ?? "Not Installed",
-                    fdrsServiceStatus ?? "Not Installed", _cpuCounter.NextValue());
+                    fdrsServiceStatus ?? "Not Installed",
+                    _cpuCounter != null ? (float?)_cpuCounter.NextValue() : null, ee);
             }
             catch (Exception ex)
             {

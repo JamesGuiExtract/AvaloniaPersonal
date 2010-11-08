@@ -67,9 +67,9 @@ namespace Extract.FileActionManager.Utilities
             #region Fields
 
             /// <summary>
-            /// The selected rows that should have their service started/stopped.
+            /// The selected row that should have their service started/stopped.
             /// </summary>
-            readonly List<FAMNetworkDashboardRow> _rows;
+            readonly FAMNetworkDashboardRow _row;
 
             /// <summary>
             /// The service to control (FAM, FDRS, or both).
@@ -88,14 +88,14 @@ namespace Extract.FileActionManager.Utilities
             /// <summary>
             /// Initializes a new instance of the <see cref="ServiceControlThreadParameters"/> class.
             /// </summary>
-            /// <param name="rows">The rows.</param>
+            /// <param name="row">The row.</param>
             /// <param name="serviceToControl">The service to control.</param>
             /// <param name="startService">if set to <see langword="true"/> start service
             /// otherwise stop service.</param>
-            public ServiceControlThreadParameters(List<FAMNetworkDashboardRow> rows,
+            public ServiceControlThreadParameters(FAMNetworkDashboardRow row,
                 ServiceToControl serviceToControl, bool startService)
             {
-                _rows = new List<FAMNetworkDashboardRow>(rows);
+                _row = row;
                 _serviceToControl = serviceToControl;
                 _startService = startService;
             }
@@ -105,14 +105,14 @@ namespace Extract.FileActionManager.Utilities
             #region Properties
 
             /// <summary>
-            /// Gets the rows.
+            /// Gets the row.
             /// </summary>
             /// <value>The rows.</value>
-            public List<FAMNetworkDashboardRow> Rows
+            public FAMNetworkDashboardRow Row
             {
                 get
                 {
-                    return _rows;
+                    return _row;
                 }
             }
 
@@ -265,6 +265,11 @@ namespace Extract.FileActionManager.Utilities
         /// Default file extension for the open/save file dialog
         /// </summary>
         const string _DEFAULT_FILE_EXT = "fnm";
+
+        /// <summary>
+        /// File extension supported by the drag/drop event
+        /// </summary>
+        const string _DRAG_FILE_EXT = "." + _DEFAULT_FILE_EXT;
 
         /// <summary>
         /// Constant string used to indicate that data is refreshing
@@ -437,7 +442,7 @@ namespace Extract.FileActionManager.Utilities
 
         #endregion Constructors
 
-        #region Methods
+        #region Event Handlers
 
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Form.Load"/> event.
@@ -501,12 +506,7 @@ namespace Extract.FileActionManager.Utilities
                 // End the worker threads
                 _endThreads.Set();
 
-                // Add all rows to the cleanup queue
-                foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
-                {
-                    _deletedRows.Enqueue(row);
-                }
-                _machineListGridView.Rows.Clear();
+                ClearAllGridRows();
 
                 // Display the wait form while waiting for the service controllers to
                 // finish
@@ -581,6 +581,78 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.DragEnter"/> event.
+        /// </summary>
+        /// <param name="drgevent">A <see cref="T:System.Windows.Forms.DragEventArgs"/> that contains the event data.</param>
+        protected override void OnDragEnter(DragEventArgs drgevent)
+        {
+            base.OnDragEnter(drgevent);
+            try
+            {
+                // Check if this is a file drop
+                if (drgevent.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    // Get the files being dragged
+                    string[] fileNames = (string[])drgevent.Data.GetData(DataFormats.FileDrop);
+
+                    // Check that there is only 1 file and that the extension is fnm
+                    if (fileNames.Length == 1
+                        && Path.GetExtension(fileNames[0]).Equals(_DRAG_FILE_EXT,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        drgevent.Effect = DragDropEffects.Copy;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31033", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.DragDrop"/> event.
+        /// </summary>
+        /// <param name="drgevent">A <see cref="T:System.Windows.Forms.DragEventArgs"/> that contains the event data.</param>
+        protected override void OnDragDrop(DragEventArgs drgevent)
+        {
+            base.OnDragDrop(drgevent);
+            try
+            {
+                // Check if this is a file drop event
+                if (drgevent.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    // Get the files being dragged
+                    string[] fileNames = (string[])drgevent.Data.GetData(DataFormats.FileDrop);
+
+                    // Check that there is only 1 file and that the extension is fnm
+                    if (fileNames.Length == 1
+                        && Path.GetExtension(fileNames[0]).Equals(_DRAG_FILE_EXT,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        // If the necessary, prompt for dirty file
+                        if (PromptForDirtyFile())
+                        {
+                            // Load the machine list
+                            LoadMachineList(Path.GetFullPath(fileNames[0]));
+                        }
+                    }
+                    else if (fileNames.Length > 1)
+                    {
+                        // If trying to open more than one file, display an error message
+                        MessageBox.Show("Cannot open more than one file.", "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning,
+                            MessageBoxDefaultButton.Button1, 0);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31027", ex);
+            }
+        }
+
+        /// <summary>
         /// Processes a command key.
         /// </summary>
         /// <param name="msg">A <see cref="T:System.Windows.Forms.Message"/>, passed by reference, that represents the Win32 message to process.</param>
@@ -608,7 +680,10 @@ namespace Extract.FileActionManager.Utilities
                         break;
 
                     case Keys.F5:
-                        RefreshData(false);
+                        if (!_refreshData)
+                        {
+                            RefreshData(false);
+                        }
                         break;
 
                     default:
@@ -918,10 +993,12 @@ namespace Extract.FileActionManager.Utilities
                 dbFile.Append(@"\\");
                 dbFile.Append(machineName);
                 dbFile.Append(@"\c$\Program Files\Extract Systems\CommonComponents\ESFAMService.sdf");
-                if (!File.Exists(dbFile.ToString()))
+                var fileInfo = new FileInfo(dbFile.ToString());
+                if (!fileInfo.Exists)
                 {
                     dbFile.Replace("Program Files", "Program Files (x86)");
-                    if (!File.Exists(dbFile.ToString()))
+                    fileInfo = new FileInfo(dbFile.ToString());
+                    if (fileInfo.Exists)
                     {
                         MessageBox.Show("Cannot find service database file to modify."
                             + Environment.NewLine + dbFile.ToString(), "Cannot Find File",
@@ -929,6 +1006,14 @@ namespace Extract.FileActionManager.Utilities
                             MessageBoxDefaultButton.Button1, 0);
                         return;
                     }
+                }
+                if (fileInfo.Attributes.HasFlag(FileAttributes.ReadOnly))
+                {
+                    MessageBox.Show("Service database file is readonly, cannot modify."
+                        + Environment.NewLine + dbFile.ToString(), "File Is Readonly",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error,
+                        MessageBoxDefaultButton.Button1, 0);
+                    return;
                 }
 
                 using (TemporaryFile tempDb = new TemporaryFile(".sdf"))
@@ -1030,37 +1115,6 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Handles the machine grid view row double click.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleMachineGridViewRowDoubleClick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_machineListGridView.SelectedRows.Count == 1)
-                {
-                    var row = (FAMNetworkDashboardRow)
-                        _machineListGridView.SelectedRows[0];
-                    if (row.Exception != null)
-                    {
-                        // Need to invoke the dialog so that the row selection from
-                        // the double-click completes
-                        BeginInvoke((MethodInvoker)(() =>
-                            {
-                                row.Exception.Display();
-                            })
-                        );
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI30980", ex);
-            }
-        }
-
-        /// <summary>
         /// Handles the start stop combo selected index changed.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -1125,6 +1179,36 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>
+        /// Handles the machine grid view mouse double click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.DataGridViewCellMouseEventArgs"/> instance containing the event data.</param>
+        void HandleMachineGridViewMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            try
+            {
+                if (e.RowIndex != -1)
+                {
+                    var row = (FAMNetworkDashboardRow)
+                        _machineListGridView.Rows[e.RowIndex];
+                    if (row.Exception != null)
+                    {
+                        // Need to invoke the dialog so that the row selection from
+                        // the double-click completes
+                        BeginInvoke((MethodInvoker)(() =>
+                            {
+                                row.Exception.Display();
+                            })
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI30980", ex);
+            }
+        }
 
         /// <summary>
         /// Handles the exit menu item click.
@@ -1185,6 +1269,37 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Handles the new tool strip menu item click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleNewToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!PromptForDirtyFile())
+                {
+                    return;
+                }
+
+                ClearAllGridRows();
+                _dirty = false;
+
+                UpdateGroupFilterList();
+                UpdateEnabledStates();
+                UpdateTitle();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31034", ex);
+            }
+        }
+
+        #endregion Event Handler
+
+        #region Methods
+
+        /// <summary>
         /// Refreshes the row data.
         /// </summary>
         /// <param name="row">The row.</param>
@@ -1200,12 +1315,19 @@ namespace Extract.FileActionManager.Utilities
 
             if (row.Index != -1 && row.Visible)
             {
-                row.ErrorText = string.Empty;
-                row.Exception = null;
                 row.Cells[(int)GridColumns.FAMService].Value = data.FamServiceStatus;
                 row.Cells[(int)GridColumns.FDRSService].Value = data.FdrsServiceStatus;
-                row.Cells[(int)GridColumns.CPUUsage].Value =
-                    data.CpuPercentage.ToString("F1", CultureInfo.CurrentCulture) + " %";
+                row.Cells[(int)GridColumns.CPUUsage].Value = data.CpuPercentageString;
+                if (data.Exception != null)
+                {
+                    row.Exception = data.Exception;
+                    row.ErrorText = data.Exception.Message;
+                }
+                else
+                {
+                    row.ErrorText = string.Empty;
+                    row.Exception = null;
+                }
             }
         }
 
@@ -1278,7 +1400,8 @@ namespace Extract.FileActionManager.Utilities
             // Create a list of all current rows in the UI
             foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
             {
-                if (row.Visible)
+                // Only launch a refresh task if the row is visible and not already refreshing
+                if (row.Visible && !row.RefreshingData)
                 {
                     Task.Factory.StartNew(RefreshServiceData, row);
                 }
@@ -1391,14 +1514,8 @@ namespace Extract.FileActionManager.Utilities
                         }
                     }
 
-                    // Ensure the rows are disposed before loading the new rows
-                    var rowsToDispose = new List<FAMNetworkDashboardRow>();
-                    foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
-                    {
-                        rowsToDispose.Add(row);
-                    }
-                    _machineListGridView.Rows.Clear();
-                    CollectionMethods.ClearAndDispose(rowsToDispose);
+                    // Clear the current grid
+                    ClearAllGridRows();
 
                     _currentFile = fileName;
 
@@ -1484,37 +1601,28 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Thread method used to start/stop services based on the service control data.
+        /// Controls the service task.
         /// </summary>
-        /// <param name="controlServicesData">A <see cref="ServiceControlThreadParameters"/>
-        /// object containing the data specifying which machines, which service and whether
-        /// to start or stop it.</param>
-        void ControlServices(object controlServicesData)
+        /// <param name="parameter">The thread data (should be of type
+        /// <see cref="ServiceControlThreadParameters"/>).</param>
+        void ControlServiceTask(object parameter)
         {
-            var data = controlServicesData as ServiceControlThreadParameters;
+            var data = parameter as ServiceControlThreadParameters;
             if (data == null)
             {
                 return;
             }
 
-            var service = data.ServiceToControl;
-            var startService = data.StartService;
-
-            foreach (FAMNetworkDashboardRow row in data.Rows)
+            var row = data.Row;
+            try
             {
-                Task.Factory.StartNew(() =>
-                    {
-                        try
-                        {
-                            row.ControlService(service, startService);
-                        }
-                        catch (Exception ex)
-                        {
-                            var ee = ExtractException.AsExtractException("ELI30803", ex);
-                            SetRowErrorText(row, ee);
-                        }
-                    }
-                );
+                row.ControlService(data.ServiceToControl, data.StartService);
+                RefreshServiceData(row);
+            }
+            catch (Exception ex)
+            {
+                var ee = ExtractException.AsExtractException("ELI30803", ex);
+                SetRowErrorText(row, ee);
             }
         }
 
@@ -1547,10 +1655,11 @@ namespace Extract.FileActionManager.Utilities
             int rowCount = _machineListGridView.Rows.Count;
             int selectedCount = _machineListGridView.SelectedRows.Count;
 
-            var saveEnabled = rowCount > 0 || _dirty;
-            _saveFileToolStripButton.Enabled = saveEnabled;
-            _saveToolStripMenuItem.Enabled = saveEnabled;
-            _saveAsToolStripMenuItem.Enabled = saveEnabled;
+            var enableSaveAndNew = rowCount > 0 || _dirty;
+            _newToolStripMenuItem.Enabled = enableSaveAndNew;
+            _saveFileToolStripButton.Enabled = enableSaveAndNew;
+            _saveToolStripMenuItem.Enabled = enableSaveAndNew;
+            _saveAsToolStripMenuItem.Enabled = enableSaveAndNew;
 
             _removeMachineToolStripButton.Enabled = selectedCount > 0;
             _modifyServiceDatabaseToolStripButton.Enabled = selectedCount == 1;
@@ -1565,19 +1674,52 @@ namespace Extract.FileActionManager.Utilities
         void ControlServiceForSelectedRows(bool startService)
         {
             var selectedRows = new List<FAMNetworkDashboardRow>();
+            var selectedNames = new List<string>();
             foreach (FAMNetworkDashboardRow row in _machineListGridView.SelectedRows)
             {
                 if (row.Visible)
                 {
                     selectedRows.Add(row);
+                    selectedNames.Add(row.Cells[(int)GridColumns.MachineName].Value.ToString());
+                }
+            }
+
+            // Build a prompt to alert the user before starting/stopping the services
+            if (selectedNames.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(startService ? "Start" : "Stop");
+                if (_serviceToControl == ServiceToControl.Both)
+                {
+                    sb.Append(" both the FAM and FDRS service");
+                }
+                else if (_serviceToControl.HasFlag(ServiceToControl.FamService))
+                {
+                    sb.Append(" the FAM service");
+                }
+                else
+                {
+                    sb.Append(" the FDRS service");
+                }
+                sb.AppendLine(" on the following machines:");
+                sb.Append(StringMethods.ConvertArrayToDelimitedList(selectedNames, ","));
+                var result = MessageBox.Show(sb.ToString(), "Control Service?",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button2, 0);
+                if (result == DialogResult.No)
+                {
+                    return;
                 }
             }
 
             // Put the data into the structure to pass to the controller method.
             // Pass in true to start the service, false to stop the services.
-            var controllerData = new ServiceControlThreadParameters(selectedRows,
-                _serviceToControl, startService);
-            Task.Factory.StartNew(ControlServices, controllerData);
+            foreach (FAMNetworkDashboardRow row in selectedRows)
+            {
+                var controllerData = new ServiceControlThreadParameters(row,
+                    _serviceToControl, startService);
+                Task.Factory.StartNew(ControlServiceTask, controllerData);
+            }
         }
 
         /// <summary>
@@ -1720,6 +1862,19 @@ namespace Extract.FileActionManager.Utilities
             }
 
             return saved;
+        }
+
+        /// <summary>
+        /// Clears all grid rows.
+        /// </summary>
+        void ClearAllGridRows()
+        {
+            // Add all rows to the cleanup queue
+            foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
+            {
+                _deletedRows.Enqueue(row);
+            }
+            _machineListGridView.Rows.Clear();
         }
 
         #endregion Methods

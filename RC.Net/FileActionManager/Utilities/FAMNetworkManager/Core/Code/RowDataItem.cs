@@ -270,6 +270,20 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Gets a value indicating whether the datais currently refreshing.
+        /// </summary>
+        /// <value>
+        ///	<see langword="true"/> if refreshing data; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool RefreshingData
+        {
+            get
+            {
+                return _refreshingData;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the exception.
         /// </summary>
         /// <value>The exception.</value>
