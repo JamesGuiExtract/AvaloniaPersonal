@@ -1,0 +1,192 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.89 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.89 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>DB Admin</b>
+        <ul>
+            <li><b>[LegacyRC #5884, #5885]</b> Exporting file lists
+            <ul>
+                <li>Export a list of files associated with <b>any</b> of a set of tags.</li>
+                <li>Export a list of files associated with <b>none</b> of a set of tags.</li>
+                <li>Export a list of files, narrowing the selection to a <b>random subset</b>
+                of all files.</li>
+                <li>Confirm that no errors are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5886]</b> Manually set priority
+            <ul>
+                <li>Manually set the priority of files associated with <b>none</b> of a list of
+                tags.</li>
+                <li>Confirm that no errors are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5909]</b> Can't create new database
+            <ul>
+                <li>Use the DB Admin to create a new database.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5888]</b> Scheduled processing traces logged on pause/unpause
+        <ul>
+            <li>Run <b>Compute Redactions.fps</b> from the ID Shield demo.</li>
+            <li>While it's processing, pause and unpause.</li>
+            <li>Confirm that neither ELI30309 nor ELI 30308 ("Application trace: File Action 
+            Manager processing now active/inactive per schedule") is logged.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5892, #5894, #5896, #5907]</b> New database schema
+        <ul>
+            <li>Confirm that you are using the new database schema.</li>
+            <li>Create a new database and add the actions Compute and Monkeys.</li>
+            <li>Queue several files for the action Compute.</li>
+            <li>In DB Admin, manually set a random subset of the files to Pending for the
+            action Monkeys.</li>
+            <li>Confirm that the action status changes as expected.</li>
+        <p>
+            <li>Queue some files.</li>
+            <li>Check the <b>force processing</b> box in the queue setup tab.</li>
+            <li>Confirm that the files can be requeued without error.</li>
+        <p>
+            <li>Open the <b>ProcessingFAM</b> table</li>
+            <li>Confirm the presence of an <b>ActionID</b> field.</li>
+        <p>
+            <li>Confirm the absence of a registry key to determine whether to use a 
+            prenormalized database.</li>
+        </ul></li>
+    <p>
+        <li><b>Install</b>
+        <ul>
+            <li><b>[FlexIDSCore #4396]</b> Assemblies fail to register
+            <ul>
+                <li>Confirm that <b>Extract.Utilities.Forms.dll</b> registers on install.</li>
+                <li>Confirm that <b>Extract.FileActionManager.Forms.dll</b> registers on 
+                install.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4399]</b> Install on 32-bit 2003 server
+            <ul>
+                <li>Confirm that .NET 3.5 installs correctly on a 32-bit server 2003 
+                machine.</li>
+                <li>Confirm that Extract software runs correctly after install.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNetRC #516]</b> Install .config files
+            <ul>
+                <li>Confirm that the following files are installed to CommonComponents as 
+                appropriate:
+                <ul>
+                    <li>ExtractImageViewer.exe.config</li>
+                    <li>ProcessFiles.exe.config</li>
+                    <li>IDShieldOffice.exe.config</li>
+                </ul></li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4403]</b> Ruleset editor MRU list
+        <ul>
+            <li>Open an empty ruleset editor.</li>
+            <li>Use the <b>File &gt; Open</b> menu to open an .rsd file.</li>
+            <li>Make some changes and save the .rsd file.</li>
+            <li>Confirm that no errors are displayed and that the MRU list is populated
+            appropriately.</li>
+        </ul></li>
+    <p>
+        <li><b>Data entry</b>
+        <ul>
+            <li><b>[DataEntry #928]</b>
+            <ul>
+                <li>Confirm that input event tracking works with the FLEX Index demo.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #933]</b>
+            <ul>
+                <li>Open one of the demo images for verification.</li>
+                <li>Enter edit mode in a cell.</li>
+                <li>Click on a populated cell in a <b>different</b> table such that it does not
+                enter edit mode (e.g., a cell in the Return Address table).</li>
+                <li>Press F2.</li>
+                <li>Confirm that edit mode is entered in the appropriate cell.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #1009]</b>
+            <ul>
+                <li>Confirm that the .config file includes the following application-wide 
+                settings:
+                <ul>
+                    <li>Application Title</li>
+                    <li>Application Icon</li>
+                    <li>About Logo</li>
+                    <li>Application Description</li>
+                    <li>Help file</li>
+                </ul></li>
+                <li>Confirm that each of those settings is required.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #1011]</b>
+            <ul>
+                <li>Confirm that <b>FlexDataEntryIcon.ico</b> and <b>FlexIndexAboutLogo.bmp</b>
+                are both installed to <b>&lt;ProgramFiles&gt;\Extract Systems\FlexIndex</b>.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #1020]</b>
+            <ul>
+                <li>Confirm that all characters of all labels in the generic DEP are correctly
+                displayed during verification.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
+<p>
+    <LI><h3>Automated Testing</h3>
+    <ul>
+        <LI>Automated Tests
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Document Classification
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Redaction
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Indexing
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+    </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+<p>
+        <li>64-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+    </ul></LI>
+</OL>
+</BODY>
+</HTML>
