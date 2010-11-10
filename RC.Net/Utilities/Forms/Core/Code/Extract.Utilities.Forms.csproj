@@ -127,6 +127,12 @@
     <Compile Include="BrowseButton.Designer.cs">
       <DependentUpon>BrowseButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="NumericEntryTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NumericEntryTextBox.Designer.cs">
+      <DependentUpon>NumericEntryTextBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="PleaseWaitForm.cs">
       <SubType>Form</SubType>
     </Compile>
