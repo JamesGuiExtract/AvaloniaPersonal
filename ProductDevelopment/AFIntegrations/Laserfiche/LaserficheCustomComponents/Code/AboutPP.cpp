@@ -12,7 +12,7 @@
 //--------------------------------------------------------------------------------------------------
 // Contants
 //--------------------------------------------------------------------------------------------------
-static const string gstrPATCH = "(Patch A RC1)";
+static const string gstrPATCH = "A";
 
 //--------------------------------------------------------------------------------------------------
 // CAboutPP dialog
@@ -63,7 +63,7 @@ BOOL CAboutPP::OnInitDialog()
 		strVersion += ::getFileVersion(getAppFullPath());
 		if (!gstrPATCH.empty())
 		{
-			strVersion += " " + gstrPATCH;
+			strVersion += gstrPATCH;
 		}
 
 		// Update the Version string in the UI

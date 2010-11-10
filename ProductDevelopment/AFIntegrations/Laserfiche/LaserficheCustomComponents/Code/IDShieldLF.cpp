@@ -173,6 +173,7 @@ CIDShieldLF::CIDShieldLF()
 			m_nMaxDocsToProcess = asLong(strMaxDocsToProcess);
 		}
 
+		// Initialize deafult search types
 		m_RepositorySettings.strDocumentSearchType = gstrDEFAULT_DOCUMENT_SEARCH_TYPE;
 		m_RepositorySettings.strFolderSearchType = gstrDEFAULT_FOLDER_SEARCH_TYPE;
 		m_RepositorySettings.strAllSearchType = gstrDEFAULT_ALL_SEARCH_TYPE;
@@ -993,7 +994,7 @@ void CIDShieldLF::validateRepositorySettings(EConnectionMode eConnectionMode)
 			loadSettings();
 			
 			// [FlexIDSIntegrations:139] Since only the service, on-demand processing, or
-			// administration console do anything with the rules, only validate the existance of
+			// administration console do anything with the rules, only validate the existence of
 			// the rules for these connection types.
 			if (eConnectionMode == kAdministrator ||
 				eConnectionMode == kService ||
@@ -2245,10 +2246,22 @@ bool CIDShieldLF::redactDocument(ILFDocumentPtr ipDocument, IProgressStatusPtr i
 				ILongRectanglePtr ipBounds = ipLine->GetBounds();
 				ASSERT_RESOURCE_ALLOCATION("ELI20513", ipBounds != NULL);
 
-				long nPage = ipLine->GetFirstPageNumber() - 1;
+				// [FlexIDSIntegrations:145] The bounds of the attribute needs to be rotated to
+				// compensate for rotation that has been applied within Laserfiche.
+				long nPage = ipLine->GetFirstPageNumber();
+				ILFPagePtr ipPage = vecPages[nPage - 1];
+				ASSERT_RESOURCE_ALLOCATION("ELI24623", ipPage != NULL);
+
+				ILFImagePtr ipImage = ipPage->GetImage();
+				ASSERT_RESOURCE_ALLOCATION("ELI24624", ipImage != NULL);
+
+				ISpatialPageInfoPtr ipPageInfo = ipLine->GetPageInfo(nPage);
+				ASSERT_RESOURCE_ALLOCATION("ELI24625", ipPageInfo != NULL)
+
+				ipBounds->Rotate(ipPageInfo->Width , ipPageInfo->Height, -ipImage->Rotation);
 
 				vector<ILFImageBlockAnnotationPtr> vecExistingRedactions = 
-					getRedactionsOnPage(vecPages[nPage], mapExistingAnnotations);
+					getRedactionsOnPage(ipPage, mapExistingAnnotations);
 
 				_lastCodePos = "170";
 
@@ -2269,7 +2282,7 @@ bool CIDShieldLF::redactDocument(ILFDocumentPtr ipDocument, IProgressStatusPtr i
 
 						// Apply a linked text & image redaction to the document without duplicating
 						// a redaction that is already in vecExistingAnnotations
-						addAnnotation(vecPages[nPage], ipBounds, true, true, gcolorDEFAULT, 
+						addAnnotation(ipPage, ipBounds, true, true, gcolorDEFAULT, 
 									  &vecExistingRedactions);
 					}
 					else if (m_RepositorySettings.bAutoTagForVerify)
@@ -2279,7 +2292,7 @@ bool CIDShieldLF::redactDocument(ILFDocumentPtr ipDocument, IProgressStatusPtr i
 						// Apply an image highlight to the attribute whether it is something we
 						// detected as a clue or sensitive data the the user has not configured
 						// to redact.
-						addAnnotation(vecPages[nPage], ipBounds, false, false, gcolorCLUE_HIGHLIGHT);
+						addAnnotation(ipPage, ipBounds, false, false, gcolorCLUE_HIGHLIGHT);
 					}
 				}
 
