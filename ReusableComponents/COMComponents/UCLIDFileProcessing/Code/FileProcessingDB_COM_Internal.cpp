@@ -437,11 +437,23 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 						else
 						{
 							strStatusSQL = "UPDATE FileActionStatus SET ActionStatus = '" + strNewStatus +
-								"' WHERE FileID = " + asString(nID) + " AND ActionID = " + asString(nActionID);
+								"' WHERE FileID = " + asString(nID) + " AND ActionID = " + asString(nActionID) +
+								" AND ActionStatus != '" + strNewStatus + "'";
 						}
 
-						// Update or insert the status
-						executeCmdQuery(ipConnection, strStatusSQL);	
+						// Update or insert the status 
+						long nRecordsAffected = executeCmdQuery(ipConnection, strStatusSQL);	
+
+						// if no records were affected need to throw an exception since this means
+						// the record has probably been updated since that last status was checked
+						if (nRecordsAffected == 0)
+						{
+							UCLIDException ue("ELI31061", "File status has already been changed.");
+							ue.addDebugInfo("FileID", nID);
+							ue.addDebugInfo("Action", strActionName);
+							ue.addDebugInfo("Status", strNewStatus);
+							throw ue;
+						}
 
 						// If the previous status was skipped, remove the record from the skipped file table
 						if (*pPrevStatus == kActionSkipped)
@@ -639,8 +651,13 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				// Begin a transaction
+				TransactionGuard tg(ipConnection);
+
 				// change the given files state to completed
-				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "");
+				setFileActionState(ipConnection, nFileID, asString(strAction), "C", "", -1);
+
+				tg.CommitTrans();
 
 				END_CONNECTION_RETRY(ipConnection, "ELI23529");
 			}
@@ -677,8 +694,13 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				// Begin a transaction
+				TransactionGuard tg(ipConnection);
+
 				// change the given files state to Failed
 				setFileActionState(ipConnection, nFileID, asString(strAction), "F", asString(strException));
+
+				tg.CommitTrans();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI23530");
 		}
@@ -709,9 +731,14 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
-
+				
+				// Begin a transaction
+				TransactionGuard tg(ipConnection);
+				
 				// change the given files state to Pending
 				setFileActionState(ipConnection, nFileID, asString(strAction), "P", "");
+
+				tg.CommitTrans();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI23531");
 		}
@@ -745,8 +772,13 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				// Begin a transaction
+				TransactionGuard tg(ipConnection);
+
 				// change the given files state to unattempted
 				setFileActionState(ipConnection, nFileID, asString(strAction), "U", "");
+
+				tg.CommitTrans();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI23532");
 		}
@@ -778,9 +810,14 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 		// Get the connection for the thread and save it locally.
 		ipConnection = getDBConnection();
 
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
 		// Change the given files state to Skipped
-		setFileActionState(ipConnection, nFileID, asString(strAction), "S", "", -1, true, 
+		setFileActionState(ipConnection, nFileID, asString(strAction), "S", "", -1,
 			asCppBool(bRemovePreviousSkipped));
+
+		tg.CommitTrans();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI26938");
 	}
@@ -979,7 +1016,7 @@ bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
 					}
 
 					setFileActionState(ipConnection, nFileID, strToAction, strToStatus, "",
-						nToActionID, false, true);
+						nToActionID, true);
 
 					// Update modified records count
 					nRecordsModified++;
@@ -1149,8 +1186,13 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				// Begin a transaction
+				TransactionGuard tg(ipConnection);
+
 				// change the status for the given file and return the previous state
 				*poldStatus = setFileActionState(ipConnection, nID, asString(strAction), asStatusString(eStatus), "");
+
+				tg.CommitTrans();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI23536");
 		}
@@ -1240,7 +1282,6 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// return the vector of file records
 				IIUnknownVectorPtr ipFiles = setFilesToProcessing(ipConnection, strSelectSQL, nActionID);
 				*pvecFileRecords = ipFiles.Detach();
-
 			END_CONNECTION_RETRY(ipConnection, "ELI30377");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30644");
@@ -1875,8 +1916,13 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 				// Get the action name
 				string strActionName = getActionName(ipConnection, nActionID);
 
+				// Begin a transaction
+				TransactionGuard tg(ipConnection);
+
 				// Set the file state to skipped
-				setFileActionState(ipConnection, nFileID, strActionName, "S", "", nActionID, true);
+				setFileActionState(ipConnection, nFileID, strActionName, "S", "", nActionID);
+
+				tg.CommitTrans();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI26778");
 		}
@@ -3214,7 +3260,7 @@ bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVari
 
 					// Set the file action state
 					setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", nToActionID, 
-						false, true);
+						true);
 
 					// Move to next record
 					ipFileSet->MoveNext();

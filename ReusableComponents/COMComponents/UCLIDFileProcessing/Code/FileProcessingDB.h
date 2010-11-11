@@ -436,17 +436,14 @@ private:
 
 	// PROMISE:	 To set the given File's action state for the action given by strAction to the 
 	//			state in strState and returns the old state using the connection object provided.
-	// NOTE:	If bLockDB == false then the outer scope must lock the DB and declare a transaction
-	//			guard, if bLockDB == true then this method will lock the DB and declare a
-	//			transaction guard (in this case the outer scope MUST NOT lock the DB or begin
-	//			a transaction)
+	// NOTE:	The outer scope should always lock the DB if required and create transaction if required
 	//			If bRemovePreviousSkipped is true and strState == "S" then the skipped file table
 	//			will be updated for the file with the information for the current user and process.
 	//			If bRemovePreviousSkipped is false and strState == "S" the UPIID will be updated,
 	//			but all other skipped file fields will be unmodified.
 	EActionStatus setFileActionState(_ConnectionPtr ipConnection, long nFileID,
 		string strAction, const string& strState, const string& strException,
-		long nActionID = -1, bool bLockDB = true, bool bRemovePreviousSkipped = false, 
+		long nActionID = -1, bool bRemovePreviousSkipped = false, 
 		const string& strFASTComment = "");
 
 	// PROMISE: To set the specified group of files' action state for the specified action.

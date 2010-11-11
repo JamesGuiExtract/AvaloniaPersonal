@@ -179,9 +179,6 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			+ getCurrentUserName() + "' AS UserName, FAMFile.ID, "
 			+ strActionID + " AS ActionID FROM FAMFile WHERE FAMFile.ID IN (" : "";
 
-		// Reload the action statistics from the database
-		//loadStats(ipConnection, nActionID);
-
 		// Execute the queries in groups of 10000 File IDs
 		size_t i=0;
 		size_t count = vecSetData.size();
@@ -239,14 +236,11 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection, long nFileID, 
 													string strAction, const string& strState,
 													const string& strException,
-													long nActionID, bool bLockDB,
-													bool bRemovePreviousSkipped,
+													long nActionID, bool bRemovePreviousSkipped,
 													const string& strFASTComment)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI03279");
 
-	auto_ptr<LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>> apDBlg;
-	auto_ptr<TransactionGuard> apTG;
 	try
 	{
 		ASSERT_ARGUMENT("ELI30390", ipConnection != NULL);
@@ -254,14 +248,6 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 
 		_lastCodePos = "10";
 		EActionStatus easRtn = kActionUnattempted;
-
-		if (bLockDB)
-		{
-			_lastCodePos = "20";
-			// Lock the database for this instance
-			apDBlg.reset(
-				new LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>(getThisAsCOMPtr()));
-		}
 
 		// Update action ID/Action name
 		if (!strAction.empty() && nActionID == -1)
@@ -303,13 +289,6 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					asString(nActionID);
 		
 		_lastCodePos = "90";
-		if (bLockDB)
-		{
-			_lastCodePos = "100";
-			// Begin a transaction
-			apTG.reset(new TransactionGuard(ipConnection));
-		}
-		_lastCodePos = "110";
 
 		// Find the file if it exists
 		if (ipFileSet->adoEOF == VARIANT_FALSE)
@@ -444,14 +423,6 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 			}
 			_lastCodePos = "330";
-
-			// If there is a transaction guard then commit the transaction
-			if (apTG.get() != NULL)
-			{
-				_lastCodePos = "340";
-				apTG->CommitTrans();
-			}
-			_lastCodePos = "350";
 		}
 		else
 		{
@@ -2923,8 +2894,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 
 			setFileActionState(ipConnection, getLongField(ipFields, "FileID"), 
 				strActionName, strRevertToStatus, 
-				"", getLongField(ipFields, "ActionID"), false, false,
-				strFASTComment);
+				"", getLongField(ipFields, "ActionID"), false, strFASTComment);
 
 			ipFileSet->MoveNext();
 		}

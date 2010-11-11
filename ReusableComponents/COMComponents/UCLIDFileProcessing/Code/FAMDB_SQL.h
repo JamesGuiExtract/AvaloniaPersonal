@@ -594,7 +594,7 @@ static const string gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA =
 	"      ,SUM([NumBytesFailed]) AS [NumBytesFailed] "
 	"      ,SUM([NumBytesSkipped]) AS [NumBytesSkipped] "
 	"  FROM [Demo_IDShield].[dbo].[ActionStatisticsDelta] "
-	"  WHERE  ID <= <LastDeltaID> "
+	"  WHERE  ID <= <LastDeltaID> AND ActionStatisticsDelta.ActionID = <ActionIDToUpdate> "
 	"  GROUP BY ActionID) as Changes "
 	"  WHERE ActionStatistics.ActionID = <ActionIDToUpdate>";
 
