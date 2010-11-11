@@ -72,11 +72,6 @@
     <ApplicationIcon>Resources\FAMDBLocker.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Extract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Drawing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Licensing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Utilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -124,6 +119,26 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Core\Code\Extract.csproj">
+      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
+      <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
+      <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
+      <Name>Extract.Drawing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
+      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
+      <Name>Extract.Interop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
+      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
+      <Name>Extract.Licensing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
