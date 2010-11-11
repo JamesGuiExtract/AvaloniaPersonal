@@ -795,6 +795,9 @@ namespace Extract.FileActionManager.Utilities
                                 _REFRESHING, _REFRESHING, _REFRESHING});
                             _machineListGridView.Rows.Add(row);
 
+                            // Scroll the row into view
+                            _machineListGridView.FirstDisplayedScrollingRowIndex = row.Index;
+
                             Task.Factory.StartNew(() =>
                                 {
                                     try
@@ -998,7 +1001,7 @@ namespace Extract.FileActionManager.Utilities
                 {
                     dbFile.Replace("Program Files", "Program Files (x86)");
                     fileInfo = new FileInfo(dbFile.ToString());
-                    if (fileInfo.Exists)
+                    if (!fileInfo.Exists)
                     {
                         MessageBox.Show("Cannot find service database file to modify."
                             + Environment.NewLine + dbFile.ToString(), "Cannot Find File",
@@ -1009,8 +1012,8 @@ namespace Extract.FileActionManager.Utilities
                 }
                 if (fileInfo.Attributes.HasFlag(FileAttributes.ReadOnly))
                 {
-                    MessageBox.Show("Service database file is readonly, cannot modify."
-                        + Environment.NewLine + dbFile.ToString(), "File Is Readonly",
+                    MessageBox.Show("Cannot modify read-only service database file."
+                        + Environment.NewLine + dbFile.ToString(), "File Is Read-only",
                         MessageBoxButtons.OK, MessageBoxIcon.Error,
                         MessageBoxDefaultButton.Button1, 0);
                     return;
@@ -1336,14 +1339,17 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         void RefreshData(bool autoUpdate)
         {
+            int[] refreshColumns = new int[] { (int)GridColumns.FAMService, (int)GridColumns.FDRSService,
+                (int)GridColumns.CPUUsage };
+
             // Clear all cells
             foreach (FAMNetworkDashboardRow row in _machineListGridView.Rows)
             {
                 if (row.Visible)
                 {
-                    for (int i = 2; i < 4; i++)
+                    foreach (var column in refreshColumns)
                     {
-                        row.Cells[i].Value = _REFRESHING;
+                        row.Cells[column].Value = _REFRESHING;
                     }
                     row.ErrorText = string.Empty;
                 }

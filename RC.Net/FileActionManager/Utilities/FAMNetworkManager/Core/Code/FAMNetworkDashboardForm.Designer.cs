@@ -362,7 +362,7 @@
             this._openFileToolStripButton.Name = "_openFileToolStripButton";
             this._openFileToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._openFileToolStripButton.Text = "Open file";
-            this._openFileToolStripButton.ToolTipText = "Open file\tCtrl+O";
+            this._openFileToolStripButton.ToolTipText = "Open file (Ctrl+O)";
             this._openFileToolStripButton.Click += new System.EventHandler(this.HandleOpenFileClick);
             // 
             // _saveFileToolStripButton
@@ -373,7 +373,7 @@
             this._saveFileToolStripButton.Name = "_saveFileToolStripButton";
             this._saveFileToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._saveFileToolStripButton.Text = "Save file";
-            this._saveFileToolStripButton.ToolTipText = "Save file\tCtrl+S";
+            this._saveFileToolStripButton.ToolTipText = "Save file (Ctrl+S)";
             this._saveFileToolStripButton.Click += new System.EventHandler(this.HandleSaveFileClick);
             // 
             // _addMachineToolStripButton
@@ -384,7 +384,7 @@
             this._addMachineToolStripButton.Name = "_addMachineToolStripButton";
             this._addMachineToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._addMachineToolStripButton.Text = "Add machine";
-            this._addMachineToolStripButton.ToolTipText = "Add machine\tF8";
+            this._addMachineToolStripButton.ToolTipText = "Add machine (F8)";
             this._addMachineToolStripButton.Click += new System.EventHandler(this.HandleAddMachineButtonClick);
             // 
             // _removeMachineToolStripButton
@@ -395,7 +395,7 @@
             this._removeMachineToolStripButton.Name = "_removeMachineToolStripButton";
             this._removeMachineToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._removeMachineToolStripButton.Text = "Remove machine";
-            this._removeMachineToolStripButton.ToolTipText = "Remove machine\tDel";
+            this._removeMachineToolStripButton.ToolTipText = "Remove machine (Del)";
             this._removeMachineToolStripButton.Click += new System.EventHandler(this.HandleRemoveMachineButtonClick);
             // 
             // _editMachineGroupAndNameToolStripButton
@@ -406,7 +406,7 @@
             this._editMachineGroupAndNameToolStripButton.Name = "_editMachineGroupAndNameToolStripButton";
             this._editMachineGroupAndNameToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._editMachineGroupAndNameToolStripButton.Text = "Edit machine(s) group and name";
-            this._editMachineGroupAndNameToolStripButton.ToolTipText = "Edit machine(s) group and name\tF2";
+            this._editMachineGroupAndNameToolStripButton.ToolTipText = "Edit machine(s) group and name (F2)";
             this._editMachineGroupAndNameToolStripButton.Click += new System.EventHandler(this.HandleEditMachineOrGroupButtonClick);
             // 
             // _groupFilterComboBox
@@ -493,7 +493,7 @@
             this._refreshDataToolStripButton.Name = "_refreshDataToolStripButton";
             this._refreshDataToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._refreshDataToolStripButton.Text = "Refresh status";
-            this._refreshDataToolStripButton.ToolTipText = "Refresh status\tF5";
+            this._refreshDataToolStripButton.ToolTipText = "Refresh status (F5)";
             this._refreshDataToolStripButton.Click += new System.EventHandler(this.HandleRefreshDataButtonClick);
             // 
             // FAMNetworkDashboardForm

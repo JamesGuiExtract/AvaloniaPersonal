@@ -514,22 +514,27 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                var exceptions = new List<Exception>();
                 var ee = InitializeRemoteObjects();
+                if (ee != null)
+                {
+                    exceptions.Add(ee);
+                }
 
-                string famServiceStatus = null;
-                if (_famServiceController != null)
+                string famServiceStatus = GetServiceStatus(ref _famServiceController, exceptions);
+                string fdrsServiceStatus = GetServiceStatus(ref _fdrsServiceController, exceptions);
+                if (exceptions.Count == 1)
                 {
-                    _famServiceController.Refresh();
-                    famServiceStatus = _famServiceController.Status.ToString();
+                    ee = ExtractException.AsExtractException("ELI31062", exceptions[0]);
                 }
-                string fdrsServiceStatus = null;
-                if (_fdrsServiceController != null)
+                else if (exceptions.Count > 0)
                 {
-                    _fdrsServiceController.Refresh();
-                    fdrsServiceStatus = _fdrsServiceController.Status.ToString();
+                    AggregateException ae = new AggregateException(exceptions.ToArray());
+                    ee = ExtractException.AsExtractException("ELI31063", ae.Flatten());
                 }
-                return new ServiceStatusUpdateData(famServiceStatus ?? "Not Installed",
-                    fdrsServiceStatus ?? "Not Installed",
+
+                return new ServiceStatusUpdateData(famServiceStatus ?? "Not Available",
+                    fdrsServiceStatus ?? "Not Available",
                     _cpuCounter != null ? (float?)_cpuCounter.NextValue() : null, ee);
             }
             catch (Exception ex)
@@ -538,6 +543,34 @@ namespace Extract.FileActionManager.Utilities
                 ee.AddDebugData("Machine Name", _machineName, false);
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// Gets the service status.
+        /// </summary>
+        /// <param name="controller">The controller.</param>
+        /// <param name="exceptions">If an exception occurs when getting the service status, it
+        /// should be added to this collection.</param>
+        /// <returns>The status of the service.</returns>
+        static string GetServiceStatus(ref ServiceController controller, List<Exception> exceptions)
+        {
+            string status = null;
+            if (controller != null)
+            {
+                try
+                {
+                    controller.Refresh();
+                    status = controller.Status.ToString();
+                }
+                catch(Exception ex)
+                {
+                    controller.Dispose();
+                    controller = null;
+                    exceptions.Add(ex);
+                }
+            }
+
+            return status;
         }
 
         #endregion Methods
