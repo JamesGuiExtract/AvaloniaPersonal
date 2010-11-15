@@ -64,6 +64,7 @@ using namespace UCLID_AFCORELib;
 using namespace LFSO72Lib;
 
 #import "..\..\..\..\..\ReusableComponents\APIs\Laserfiche\LFObjects\LFSO80.dll"
+#import "..\..\..\..\..\ReusableComponents\APIs\Laserfiche\LFObjects\LFSO81.dll"
 
 #import "..\..\..\..\..\ReusableComponents\APIs\Laserfiche\LFObjects\DocumentProcessor72.dll" named_guids
 using namespace DocumentProcessor72;

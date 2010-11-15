@@ -448,36 +448,56 @@ STDMETHODIMP CIDShieldLF::ConnectToActiveClient(EConnectionMode eConnectionMode,
 				// as an LFSO72 interface instance.
 				else if (m_strClientVersion.substr(0, 1) == "8")
 				{
-					// Retrieve information about the client connection using LFSO80 interfaces.
-					LFSO80Lib::ILFDatabasePtr ipDatabase80 = m_ipClient->GetDatabase();
-					if (ipDatabase80 == NULL)
+					string strServer;
+					string strRepository;
+					string strUser;
+
+					// [FlexIDSIntegrations:216]
+					// Retrieve information about the client connection using the LFSO namespace
+					// that corresponds with the client version.
+					bool bGotRepositoryInfo = false;
+					if (m_strClientVersion.substr(2, 1) == "0")
 					{
-						// [FlexIDSIntegrations:114] The ILFClient inteface seems picky concerning having focus
-						// to work. If we were not able to get the database, setting focus to the Client and
-						// then try again.
-						SetFocus(m_hwndClient);
-						
-						ipDatabase80 = m_ipClient->GetDatabase();
+						bGotRepositoryInfo = GetLoginInfoFrom80(strServer, strRepository, strUser);
+					}
+					else if (m_strClientVersion.substr(2, 1) == "1")
+					{
+						bGotRepositoryInfo = GetLoginInfoFrom81(strServer, strRepository, strUser);
+					}
+					
+					// To increase chances of being able to work with future versions of Laserfiche
+					// without modifying code, allow default LF login info to be specified in the
+					// registry if we were unable to obtain it programatically.
+					if (!bGotRepositoryInfo)
+					{
+						string strDefaultLogin = 
+							m_apCurrentUserRegSettings->getKeyValue(gstrREG_CLIENT_LOGINS_KEY, "");
+
+						if (!strDefaultLogin.empty())
+						{
+							vector<string> vecTokens;
+							StringTokenizer st('/');
+							st.parse(strDefaultLogin, vecTokens);
+
+							if (vecTokens.size() == 3)
+							{
+								strServer = vecTokens[0];
+								strRepository = vecTokens[1];
+								strUser = vecTokens[2];
+								bGotRepositoryInfo = true;
+							}
+						}
 					}
 
-					if (ipDatabase80 == NULL)
+					if (!bGotRepositoryInfo)
 					{
 						throw UCLIDException("ELI21891", "Please be sure you have selected a specific "
 							"repository or element of a repository before starting an ID Shield operation!");
 					}
-
-					LFSO80Lib::ILFServerPtr ipServer80 = ipDatabase80->Server;
-					ASSERT_RESOURCE_ALLOCATION("ELI21894", ipServer80 != NULL);
-
-					LFSO80Lib::ILFConnectionPtr ipConnection80 = ipDatabase80->CurrentConnection;
-					ASSERT_RESOURCE_ALLOCATION("ELI21895", ipConnection80 != NULL);
-
-					string strServer = asString(ipServer80->Name);
-					string strRepository = asString(ipDatabase80->Name);
-					string strUser = asString(ipConnection80->UserName);
-					string strPassword;
+					
+					string strPassword = "";
 					string strRegKey = strServer + "/" + strRepository + "/" + strUser;
-
+						
 					// Check to see if we have stored a password for this server/repository/user
 					if (m_apCurrentUserRegSettings->keyExists(gstrREG_CLIENT_LOGINS_KEY, strRegKey))
 					{
@@ -488,7 +508,8 @@ STDMETHODIMP CIDShieldLF::ConnectToActiveClient(EConnectionMode eConnectionMode,
 						try
 						{
 							// If we stored a password, attempt to login.
-							m_ipConnection = connectToRepository(strServer, strRepository, strUser, strPassword);	
+							m_ipConnection = connectToRepository(
+								strServer, strRepository, strUser, strPassword);
 						}
 						CATCH_AND_LOG_ALL_EXCEPTIONS("ELI21899")
 					}
@@ -514,7 +535,6 @@ STDMETHODIMP CIDShieldLF::ConnectToActiveClient(EConnectionMode eConnectionMode,
 						}
 						else
 						{
-							// pbSuccess is VARIANT_FALSE;
 							return S_OK;
 						}
 
@@ -529,9 +549,9 @@ STDMETHODIMP CIDShieldLF::ConnectToActiveClient(EConnectionMode eConnectionMode,
 								gstrREG_CLIENT_LOGINS_KEY, strRegKey, strPassword);
 						}
 						CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI21897");
-					}
 
-					m_ipDatabase = m_ipConnection->Database;
+						m_ipDatabase = m_ipConnection->Database;
+					}
 				}
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI21892");
@@ -2790,3 +2810,66 @@ void CIDShieldLF::validateLicense(EConnectionMode eConnectionMode)
 	}
 }
 //--------------------------------------------------------------------------------------------------
+bool CIDShieldLF::GetLoginInfoFrom80(string &rstrServer, string &rstrRepository, string &rstrUser)
+{
+	//Retrieve information about the client connection using the specified namespace's interfaces.
+	LFSO80Lib::ILFDatabasePtr ipDatabase = m_ipClient->GetDatabase();
+	if (ipDatabase == NULL)
+	{
+		// [FlexIDSIntegrations:114] The ILFClient inteface seems picky concerning having focus
+		// to work. If we were not able to get the database, setting focus to the Client and
+		// then try again.
+		SetFocus(m_hwndClient);
+		
+		ipDatabase = m_ipClient->GetDatabase();
+
+		if (ipDatabase == NULL)
+		{
+			return false;
+		}
+	}
+
+	LFSO80Lib::ILFServerPtr ipServer = ipDatabase->Server;
+	ASSERT_RESOURCE_ALLOCATION("ELI21894", ipServer != NULL);
+
+	LFSO81Lib::ILFConnectionPtr ipConnection = ipDatabase->CurrentConnection;
+	ASSERT_RESOURCE_ALLOCATION("ELI21895", ipConnection != NULL);
+
+	rstrServer = asString(ipServer->Name);
+	rstrRepository = asString(ipDatabase->Name);
+	rstrUser = asString(ipConnection->UserName);
+
+	return true;
+}
+//--------------------------------------------------------------------------------------------------
+bool CIDShieldLF::GetLoginInfoFrom81(string &rstrServer, string &rstrRepository, string &rstrUser)
+{
+	//Retrieve information about the client connection using the specified namespace's interfaces.
+	LFSO81Lib::ILFDatabasePtr ipDatabase = m_ipClient->GetDatabase();
+	if (ipDatabase == NULL)
+	{
+		// [FlexIDSIntegrations:114] The ILFClient inteface seems picky concerning having focus
+		// to work. If we were not able to get the database, setting focus to the Client and
+		// then try again.
+		SetFocus(m_hwndClient);
+		
+		ipDatabase = m_ipClient->GetDatabase();
+
+		if (ipDatabase == NULL)
+		{
+			return false;
+		}
+	}
+
+	LFSO81Lib::ILFServerPtr ipServer = ipDatabase->Server;
+	ASSERT_RESOURCE_ALLOCATION("ELI31064", ipServer != NULL);
+
+	LFSO81Lib::ILFConnectionPtr ipConnection = ipDatabase->CurrentConnection;
+	ASSERT_RESOURCE_ALLOCATION("ELI31065", ipConnection != NULL);
+
+	rstrServer = asString(ipServer->Name);
+	rstrRepository = asString(ipDatabase->Name);
+	rstrUser = asString(ipConnection->UserName);
+
+	return true;
+}

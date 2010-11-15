@@ -326,6 +326,12 @@ private:
 
 	// Validate the license file at a level that supports the indicated connection mode.
 	void validateLicense(EConnectionMode eConnectionMode);
+
+	// Retrieve the active LF repository and user from the 8.0 API
+	bool GetLoginInfoFrom80(string &rstrServer, string &rstrRepository, string &rstrUser);
+
+	// Retrieve the active LF repository and user from the 8.1 API
+	bool GetLoginInfoFrom81(string &rstrServer, string &rstrRepository, string &rstrUser);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(IDShieldLF), CIDShieldLF)
