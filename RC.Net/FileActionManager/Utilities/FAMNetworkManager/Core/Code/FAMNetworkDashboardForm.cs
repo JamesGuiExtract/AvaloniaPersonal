@@ -233,6 +233,11 @@ namespace Extract.FileActionManager.Utilities
         AutoResetEvent _refreshTimeChanged = new AutoResetEvent(false);
 
         /// <summary>
+        /// Event to indicate that the auto refresh button was toggled
+        /// </summary>
+        AutoResetEvent _autoRefreshToggled = new AutoResetEvent(false);
+
+        /// <summary>
         /// The file to open when the form loads.
         /// </summary>
         string _currentFile;
@@ -947,15 +952,24 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void HandleAutoRefreshDataButtonClick(object sender, EventArgs e)
         {
-            if (_autoRefreshDataToolStripButton.Checked)
+            try
             {
-                _refreshDataToolStripButton.Enabled = false;
-                RefreshData(true);
+                if (_autoRefreshDataToolStripButton.Checked)
+                {
+                    _refreshDataToolStripButton.Enabled = false;
+                    RefreshData(true);
+                }
+                else
+                {
+                    _refreshData = false;
+                    _refreshDataToolStripButton.Enabled = true;
+                }
+
+                _autoRefreshToggled.Set();
             }
-            else
+            catch (Exception ex)
             {
-                _refreshData = false;
-                _refreshDataToolStripButton.Enabled = true;
+                ExtractException.Display("ELI31066", ex);
             }
         }
 
@@ -1147,8 +1161,12 @@ namespace Extract.FileActionManager.Utilities
                         int temp;
                         if (!int.TryParse(value, out temp) || temp <= 0)
                         {
-                            MessageBox.Show("Invalid refresh time specified, must be an integer > 0",
-                                "Invalid Refresh Time", MessageBoxButtons.OK, MessageBoxIcon.Error,
+                            var sb = new StringBuilder("Invalid refresh time specified, ");
+                            sb.Append("must be an integer between 1 and ");
+                            sb.Append(int.MaxValue);
+                            sb.Append(" inclusive.");
+                            MessageBox.Show(sb.ToString(), "Invalid Refresh Time",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error,
                                 MessageBoxDefaultButton.Button1, 0);
                         }
                         else
@@ -1189,6 +1207,7 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 ClearAllGridRows();
+                _currentFile = null;
                 _dirty = false;
 
                 UpdateGroupFilterList();
@@ -1275,7 +1294,10 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                var handles = new WaitHandle[] { _endThreads, _refreshTimeChanged };
+                var handles = new WaitHandle[] {
+                    _endThreads, _refreshTimeChanged, _autoRefreshToggled
+                };
+
                 do
                 {
                     if (_refreshData)

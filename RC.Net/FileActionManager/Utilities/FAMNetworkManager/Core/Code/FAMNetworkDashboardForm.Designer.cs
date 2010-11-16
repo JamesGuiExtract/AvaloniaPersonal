@@ -45,6 +45,11 @@
                     _refreshTimeChanged.Dispose();
                     _refreshTimeChanged = null;
                 }
+                if (_autoRefreshToggled != null)
+                {
+                    _autoRefreshToggled.Dispose();
+                    _autoRefreshToggled = null;
+                }
                 if (_deletedRows != null)
                 {
                     foreach (var row in _deletedRows)
@@ -195,7 +200,6 @@
             this._machineListGridView.Size = new System.Drawing.Size(742, 303);
             this._machineListGridView.TabIndex = 0;
             this._machineListGridView.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.HandleMachineGridViewMouseDoubleClick);
-            this._machineListGridView.RowHeaderMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.HandleMachineGridViewMouseDoubleClick);
             this._machineListGridView.SelectionChanged += new System.EventHandler(this.HandleMachineGridViewSelectionChanged);
             // 
             // MachineColumn
