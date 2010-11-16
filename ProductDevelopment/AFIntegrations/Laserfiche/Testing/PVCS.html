@@ -87,6 +87,36 @@
 			<li>Confirm that an exception is displayed about multiple 
 			instances of the iamge already open.
 		</ul>
+<p>
+		<li><b>[Integrations #137]</b> Documents without a template are not found/processed.
+		<ul>
+			<li>Ensure the background service is running.
+			<li>Find or import a document in to Laserfiche that does not have a template (Display the template column to verify)
+			<li>Submit the document for background processing.
+			<li>Ensure the document is processed by the background service.
+		</ul>
+<p>
+		<li><b>[Integrations #138]</b> Background submission and verification should not require desktop license.
+		<ul>
+			<li>License the test machine so that it has only a verification license (not a desktop or server license)
+			<li>In the Laserfiche client submit a document for background processing; ensure no exception is displayed.
+			<li>In the Laserfiche client verify a document that is pending verification; ensure no exception is displayed.
+		</ul>
+<p>
+		<li><b>[Integrations #139]</b> Background submission and verification should not validate rules file.
+		<ul>
+			<li>If the rules file is visible on the client machine, rename the rules file directory.
+			<li>In the Laserfiche client submit a document for background processing; ensure no exception is displayed.
+			<li>In the Laserfiche client verify a document that is pending verification; ensure no exception is displayed.
+		</ul>
+<p>
+		<li><b>[Integrations #145]</b> Laserfiche image rotation is not taken into account
+		<ul>
+			<li>Import an image into Laserfiche that has rotation.
+			<li>One imported, use Laserfiche to rotate the image so it is upright.
+			<li>Redact the document with IDS for LF.
+			<li>Confirm clues and redactions are added in the correct location.  
+		</ul>		
 	</ul>
 <p>
 	<li><h3>Other</h3></li>
