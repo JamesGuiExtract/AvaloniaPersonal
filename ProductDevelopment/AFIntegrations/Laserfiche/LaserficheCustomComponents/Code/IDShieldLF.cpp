@@ -2832,7 +2832,7 @@ bool CIDShieldLF::GetLoginInfoFrom80(string &rstrServer, string &rstrRepository,
 	LFSO80Lib::ILFServerPtr ipServer = ipDatabase->Server;
 	ASSERT_RESOURCE_ALLOCATION("ELI21894", ipServer != NULL);
 
-	LFSO81Lib::ILFConnectionPtr ipConnection = ipDatabase->CurrentConnection;
+	LFSO80Lib::ILFConnectionPtr ipConnection = ipDatabase->CurrentConnection;
 	ASSERT_RESOURCE_ALLOCATION("ELI21895", ipConnection != NULL);
 
 	rstrServer = asString(ipServer->Name);
