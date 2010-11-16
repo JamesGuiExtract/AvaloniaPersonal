@@ -40,6 +40,11 @@
                     _endThreads.Dispose();
                     _endThreads = null;
                 }
+                if (_refreshTimeChanged != null)
+                {
+                    _refreshTimeChanged.Dispose();
+                    _refreshTimeChanged = null;
+                }
                 if (_deletedRows != null)
                 {
                     foreach (var row in _deletedRows)

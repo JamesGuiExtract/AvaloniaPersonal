@@ -22,5 +22,17 @@ namespace Extract.FileActionManager.Utilities.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int RefreshSleepTime {
+            get {
+                return ((int)(this["RefreshSleepTime"]));
+            }
+            set {
+                this["RefreshSleepTime"] = value;
+            }
+        }
     }
 }

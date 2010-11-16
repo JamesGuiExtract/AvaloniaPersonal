@@ -8,9 +8,10 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
-using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Formatters.Soap;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -147,113 +148,6 @@ namespace Extract.FileActionManager.Utilities
 
         #endregion ServiceControlThreadParamaters Class
 
-        #region FormSettings Class
-
-        /// <summary>
-        /// Class for saving the settings for the FAMNetworkManager application
-        /// </summary>
-        [Serializable]
-        sealed class FAMDashboardSettings : ISerializable
-        {
-            #region Constants
-
-            /// <summary>
-            /// The current version of the settings
-            /// </summary>
-            const int _CURRENT_VERSION = 1;
-
-            #endregion Constants
-
-            #region Fields
-
-            /// <summary>
-            /// The refresh thread sleep time value
-            /// </summary>
-            int _refreshSleepTime;
-
-            #endregion Fields
-
-            #region Constructors
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="FAMDashboardSettings"/> class.
-            /// </summary>
-            FAMDashboardSettings()
-            {
-            }
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="FAMDashboardSettings"/> class.
-            /// </summary>
-            /// <param name="refreshSleepTime">The refresh sleep time.</param>
-            public FAMDashboardSettings(int refreshSleepTime)
-            {
-                _refreshSleepTime = refreshSleepTime;
-            }
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="FAMDashboardSettings"/> class.
-            /// </summary>
-            /// <param name="info">The info.</param>
-            /// <param name="context">The context.</param>
-            FAMDashboardSettings(SerializationInfo info, StreamingContext context)
-            {
-                try
-                {
-                    int version = info.GetInt32("CurrentVersion");
-                    if (version > _CURRENT_VERSION)
-                    {
-                        var ee = new ExtractException("ELI30987", "Unable to load newer version of the settings.");
-                        ee.AddDebugData("Max Version", _CURRENT_VERSION, false);
-                        ee.AddDebugData("Version To Load", version, false);
-                        throw ee;
-                    }
-
-                    _refreshSleepTime = info.GetInt32("RefreshSleepTime");
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI30986", ex);
-                }
-            }
-
-            #endregion Constructors
-
-            #region Properties
-
-            /// <summary>
-            /// Gets or sets the refresh sleep time.
-            /// </summary>
-            /// <value>The refresh sleep time.</value>
-            public int RefreshSleepTime
-            {
-                get
-                {
-                    return _refreshSleepTime;
-                }
-            }
-
-            #endregion Properties
-
-            #region ISerializable Members
-
-            /// <summary>
-            /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
-            /// </summary>
-            /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> to populate with data.</param>
-            /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext"/>) for this serialization.</param>
-            /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
-            public void GetObjectData(SerializationInfo info, StreamingContext context)
-            {
-                info.AddValue("CurrentVersion", _CURRENT_VERSION);
-                info.AddValue("RefreshSleepTime", _refreshSleepTime);
-            }
-
-            #endregion
-        }
-
-        #endregion FormSettings Class
-
         #region Constants
 
         /// <summary>
@@ -300,12 +194,6 @@ namespace Extract.FileActionManager.Utilities
             _APPLICATION_SETTINGS_DIR, "FamNetworkDashboard.xml");
 
         /// <summary>
-        /// The path to the file containing the settings for this application.
-        /// </summary>
-        static readonly string _APPLICATION_SETTINGS_FILE = Path.Combine(
-            _APPLICATION_SETTINGS_DIR, "FamNetworkManagerSettings.xml");
-
-        /// <summary>
         /// Name for the mutex used to serialize persistance of the control and form layout.
         /// </summary>
         static readonly string _MUTEX_STRING = "C26EBE45-3B95-4CA2-A843-34881D17E24C";
@@ -340,6 +228,11 @@ namespace Extract.FileActionManager.Utilities
         ManualResetEvent _cleanupThreadEnded = new ManualResetEvent(false);
 
         /// <summary>
+        /// Event to indicate that the refresh time has changed
+        /// </summary>
+        AutoResetEvent _refreshTimeChanged = new AutoResetEvent(false);
+
+        /// <summary>
         /// The file to open when the form loads.
         /// </summary>
         string _currentFile;
@@ -357,7 +250,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The sleep time for the refresh thread
         /// </summary>
-        volatile int _refreshSleepTime = _DEFAULT_REFRESH_THREAD_SLEEP_TIME;
+        volatile int _refreshSleepTime;
 
         /// <summary>
         /// Collection of rows that have been deleted but not disposed yet.
@@ -369,6 +262,12 @@ namespace Extract.FileActionManager.Utilities
         /// Flag to indicate whether the form should be reset to installed default state.
         /// </summary>
         bool _resetForm;
+
+        /// <summary>
+        /// Configuration settings for this application
+        /// </summary>
+        readonly ConfigSettings<Properties.Settings> _config = new ConfigSettings<Properties.Settings>(
+            Path.Combine(FileSystemMethods.ApplicationDataPath, "FAMNetworkManager.config"));
 
         #endregion Fields
 
@@ -1254,7 +1153,11 @@ namespace Extract.FileActionManager.Utilities
                         }
                         else
                         {
-                            _refreshSleepTime = temp;
+                            if (temp != _refreshSleepTime)
+                            {
+                                _refreshSleepTime = temp;
+                                _refreshTimeChanged.Set();
+                            }
                             break;
                         }
                     }
@@ -1372,6 +1275,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                var handles = new WaitHandle[] { _endThreads, _refreshTimeChanged };
                 do
                 {
                     if (_refreshData)
@@ -1379,7 +1283,7 @@ namespace Extract.FileActionManager.Utilities
                         RefreshServiceDataForAllRows();
                     }
                 }
-                while (!_endThreads.WaitOne(_refreshSleepTime));
+                while (WaitHandle.WaitAny(handles, _refreshSleepTime) != 0);
             }
             catch (ThreadAbortException)
             {
@@ -1476,7 +1380,7 @@ namespace Extract.FileActionManager.Utilities
                 {
                     data.Add(row.DataItem.Controller);
                 }
-                var serializer = new SoapFormatter();
+                var serializer = new BinaryFormatter();
                 using (FileStream stream = File.Open(fileName, FileMode.Create, FileAccess.Write))
                 {
                     serializer.Serialize(stream, data.Count);
@@ -1507,16 +1411,59 @@ namespace Extract.FileActionManager.Utilities
             {
                 using (TemporaryWaitCursor cursor = new TemporaryWaitCursor())
                 {
+                    bool soapFormatted = false;
                     List<ServiceMachineController> controllers = null;
-                    using (FileStream stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
+                    try
                     {
-                        var serializer = new SoapFormatter();
-                        int count = (int)serializer.Deserialize(stream);
-                        controllers = new List<ServiceMachineController>(count);
-                        for (int i = 0; i < count; i++)
+                        using (FileStream stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
                         {
-                            var controller = (ServiceMachineController)serializer.Deserialize(stream);
-                            controllers.Add(controller);
+                            var serializer = new BinaryFormatter();
+                            int count = (int)serializer.Deserialize(stream);
+                            controllers = new List<ServiceMachineController>(count);
+                            for (int i = 0; i < count; i++)
+                            {
+                                var controller = (ServiceMachineController)serializer.Deserialize(stream);
+                                controllers.Add(controller);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        controllers = null;
+                        soapFormatted = true;
+                    }
+
+                    // TODO: Bridge code
+                    if (soapFormatted)
+                    {
+                        // Assume this is a soap formatted file, try that
+                        var sb = new StringBuilder(File.ReadAllText(fileName));
+                        var regex = new Regex(@"\d+\.\d+\.\d+\.\d+");
+                        var match = regex.Match(sb.ToString());
+                        if (match.Success)
+                        {
+                            var oldVersion = match.Value;
+                            var assemblyName = typeof(ServiceMachineController).Assembly.FullName;
+                            match = regex.Match(assemblyName);
+                            if (match.Success)
+                            {
+                                var versionString = match.Value;
+                                sb.Replace(oldVersion, versionString);
+                                File.WriteAllText(fileName, sb.ToString());
+                            }
+                        }
+
+                        using (FileStream stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
+                        {
+                            var serializer = new SoapFormatter();
+                            int count = (int)serializer.Deserialize(stream);
+                            controllers = new List<ServiceMachineController>(count);
+                            for (int i = 0; i < count; i++)
+                            {
+                                var controller = (ServiceMachineController)serializer.Deserialize(stream);
+                                controllers.Add(controller);
+                            }
+
                         }
                     }
 
@@ -1535,7 +1482,16 @@ namespace Extract.FileActionManager.Utilities
                         _machineListGridView.Rows.Add(row);
                     }
 
-                    _dirty = false;
+                    // TODO: Bridge code
+                    if (soapFormatted)
+                    {
+                        _dirty = true;
+                    }
+                    else
+                    {
+                        _dirty = false;
+                    }
+
                     UpdateGroupFilterList();
                     UpdateTitle();
 
@@ -1803,13 +1759,7 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         void SaveSettings()
         {
-            var formatter = new SoapFormatter();
-            using (FileStream stream = new FileStream(_APPLICATION_SETTINGS_FILE,
-                FileMode.Create, FileAccess.Write))
-            {
-                formatter.Serialize(stream, new FAMDashboardSettings(_refreshSleepTime));
-                stream.Flush();
-            }
+            _config.Settings.RefreshSleepTime = _refreshSleepTime;
         }
 
         /// <summary>
@@ -1817,26 +1767,14 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         void LoadSettings()
         {
-            if (!File.Exists(_APPLICATION_SETTINGS_FILE))
+            _refreshSleepTime = _config.Settings.RefreshSleepTime;
+            if (_refreshSleepTime <= 0)
             {
-                return;
-            }
-
-            var formatter = new SoapFormatter();
-            using (FileStream stream = new FileStream(_APPLICATION_SETTINGS_FILE,
-                FileMode.Open, FileAccess.Read))
-            {
-                var settings = (FAMDashboardSettings)formatter.Deserialize(stream);
-                if (settings.RefreshSleepTime <= 0)
-                {
-                    _refreshSleepTime = _DEFAULT_REFRESH_THREAD_SLEEP_TIME;
-                    var ee = new ExtractException("ELI30988",
-                        "Invalid refresh setting time in persisted settings, restoring default value.");
-                    ee.AddDebugData("Refresh Time", settings.RefreshSleepTime, false);
-                    throw ee;
-                }
-
-                _refreshSleepTime = settings.RefreshSleepTime;
+                var ee = new ExtractException("ELI30988",
+                    "Invalid refresh setting time in persisted settings, restoring default value.");
+                ee.AddDebugData("Refresh Time", _refreshSleepTime, false);
+                _refreshSleepTime = _DEFAULT_REFRESH_THREAD_SLEEP_TIME;
+                throw ee;
             }
         }
 
