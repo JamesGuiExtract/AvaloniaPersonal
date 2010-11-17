@@ -49,6 +49,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         const int _DATA_ENTRY_PANEL_PADDING = 3;
 
         /// <summary>
+        /// "Save and commit"
+        /// </summary>
+        const string _SAVE_AND_COMMIT = "Save and commit";
+
+        /// <summary>
         /// "Commit without saving"
         /// </summary>
         const string _COMMIT_WITHOUT_SAVING = "Commit without saving";
@@ -3127,15 +3132,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (enableSave)
                 {
-                    _saveAndCommitMenuItem.Text = _COMMIT_WITHOUT_SAVING;
-                    _saveAndCommitButton.Text = _COMMIT_WITHOUT_SAVING;
-                    _saveAndCommitButton.ToolTipText = _COMMIT_WITHOUT_SAVING + " (Ctrl+S)";
+                    _saveAndCommitMenuItem.Text = "&" + _SAVE_AND_COMMIT;
+                    _saveAndCommitButton.Text = _SAVE_AND_COMMIT;
+                    _saveAndCommitButton.ToolTipText = _SAVE_AND_COMMIT + " (Ctrl+S)";
                 }
                 else
                 {
-                    _saveAndCommitMenuItem.Text = "&Save and commit";
-                    _saveAndCommitButton.Text = "Save and commit";
-                    _saveAndCommitButton.ToolTipText = "Save and commit (Ctrl+S)";
+                    _saveAndCommitMenuItem.Text = "&" + _COMMIT_WITHOUT_SAVING;
+                    _saveAndCommitButton.Text = _COMMIT_WITHOUT_SAVING;
+                    _saveAndCommitButton.ToolTipText = _COMMIT_WITHOUT_SAVING + " (Ctrl+S)";
                 }
 
                 if (_isLoaded)
