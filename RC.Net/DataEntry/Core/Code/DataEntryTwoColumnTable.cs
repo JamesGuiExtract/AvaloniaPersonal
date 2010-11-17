@@ -795,8 +795,14 @@ namespace Extract.DataEntry
         /// </summary>
         public override void RefreshAttributes()
         {
-            // Use the primarily mapped attribute map the attribute for each row.
-            ApplyAttribute();
+            try
+            {
+                SetAttributes(_sourceAttributes);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31067", ex);
+            }
         }
 
         #endregion IDataEntryControl Methods
@@ -827,7 +833,6 @@ namespace Extract.DataEntry
                     if (index >= 0)
                     {
                         // Remove the old attribute.
-                        _sourceAttributes.Remove(index);
                         AttributeStatusInfo.DeleteAttribute(_attribute);
                     }
                 }
