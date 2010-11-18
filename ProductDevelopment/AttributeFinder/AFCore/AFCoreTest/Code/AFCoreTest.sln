@@ -418,6 +418,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFAMService", "..\..\..\..
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Database", "..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj", "{D0465C3D-527B-4B21-8E07-79A6CB762CC9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.DEP.Generic", "..\..\..\..\DataEntry\Generic\DEPs\GenericPanel\Core\Code\Extract.DataEntry.DEP.Generic.csproj", "{A24D4168-C496-4543-9C99-DE2E07FF71BF}"
 	ProjectSection(ProjectDependencies) = postProject
