@@ -352,15 +352,48 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 					_lastCodePos = "70";
 
+					// Requery the recordset so that we can get the file ID
+					ipFileSet->Requery(adOptionUnspecified);
+
+					_lastCodePos = "71";
+
+					// Check to make sure the recordset is not empty
+					if (ipFileSet->adoEOF == VARIANT_TRUE)
+					{
+						UCLIDException ue("ELI31070", "File record not found in database.");	
+						ue.addDebugInfo("Filename", strFileName);
+						throw ue;
+					}
+					
+					_lastCodePos = "72";
+
+					// Reset the ipFields to the requeried fields
+					ipFields = ipFileSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI31068", ipFields != NULL);
+
+					_lastCodePos = "73";
+
 					// get the new records ID to return
-					nID = getLastTableID(ipConnection, "FAMFile");
+					nID = getLongField(ipFields, "ID");
+					ASSERT_RESOURCE_ALLOCATION("ELI31069", nID > 0);
+
+					_lastCodePos = "74";
+
+					// Set the new file Record ID to nID;
+					ipNewFileRecord->FileID = nID;
+					
+					_lastCodePos = "80";
 
 					// Create a record in the FileActionStatus table for the status of the new record
 					string strStatusSQL = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus)  VALUES( " + 
 						asString(nID) + ", " + asString(nActionID) + ", '" + strNewStatus + "')";
 
+					_lastCodePos = "85";
+
 					// Execute query to insert the new FileActionStatus record
 					executeCmdQuery(ipConnection, strStatusSQL);
+
+					_lastCodePos = "87";
 
 					// update the statistics
 					updateStats(ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, NULL);
@@ -518,6 +551,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 		{
 			return false;
 		}
+		ue.addDebugInfo("FileName", asString(strFile));
 		throw ue;
 	}
 	return true;
