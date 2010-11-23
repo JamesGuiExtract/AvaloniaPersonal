@@ -161,6 +161,16 @@ namespace Extract.DataEntry
         /// </summary>
         FontStyle _fontStyle;
 
+        /// <summary>
+        /// The last noted selection start.
+        /// </summary>
+        int _lastSelectionStart;
+
+        /// <summary>
+        /// The last noted selection length.
+        /// </summary>
+        int _lastSelectionLength;
+
         #endregion Fields
 
         #region Delegates
@@ -203,6 +213,9 @@ namespace Extract.DataEntry
                 InitializeComponent();
 
                 _fontStyle = Font.Style;
+
+                _lastSelectionStart = SelectionStart;
+                _lastSelectionLength = SelectionLength;
             }
             catch (Exception ex)
             {
@@ -593,6 +606,9 @@ namespace Extract.DataEntry
                     AttributeStatusInfo.SetValue(_attribute, Text, true, false);
                 }
 
+                // Check for selection change as a result of the text change.
+                ProcessSelectionChange();
+
                 // Display a validation error icon if needed.
                 UpdateValidation();
             }
@@ -661,6 +677,9 @@ namespace Extract.DataEntry
                     Text = Text.Substring(1);
                     SelectAll();
                 }
+
+                // Check for selection change.
+                ProcessSelectionChange();
             }
             catch (Exception ex)
             {
@@ -743,6 +762,9 @@ namespace Extract.DataEntry
                     }
 
                     base.Text = value;
+
+                    // Check for selection change.
+                    ProcessSelectionChange();
                 }
                 catch (Exception ex)
                 {
@@ -805,6 +827,25 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI27650", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.MouseUp"/> event.
+        /// </summary>
+        /// <param name="mevent">The event data.</param>
+        protected override void OnMouseUp(MouseEventArgs mevent)
+        {
+            try
+            {
+                base.OnMouseUp(mevent);
+
+                // Check for selection change as a result of any mouse click.
+                ProcessSelectionChange();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31073", ex);
             }
         }
 
@@ -1339,10 +1380,25 @@ namespace Extract.DataEntry
         /// Applies the selection state represented by <see paramref="selectionState"/> to the
         /// control.
         /// </summary>
-        /// <param name="selectionState">The <see cref="SelectionState"/> to apply.</param>
-        public void ApplySelection(SelectionState selectionState)
+        /// <param name="selectionState">The <see cref="Extract.DataEntry.SelectionState"/> to
+        /// apply.</param>
+        public void ApplySelection(Extract.DataEntry.SelectionState selectionState)
         {
-            // Nothing to do.
+            try
+            {
+                SelectionState textBoxSelectionState =
+                            selectionState as DataEntryTextBox.SelectionState;
+
+                if (textBoxSelectionState != null)
+                {
+                    SelectionStart = textBoxSelectionState.SelectionStart;
+                    SelectionLength = textBoxSelectionState.SelectionLength;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31071", ex);
+            }
         }
 
         #endregion IDataEntryControl Methods
@@ -1462,8 +1518,7 @@ namespace Extract.DataEntry
         {
             if (AttributesSelected != null)
             {
-                var selectionState = new SelectionState(this, 
-                    DataEntryMethods.AttributeAsVector(_attribute), false, true, null);
+                var selectionState = new SelectionState(this);
                 AttributesSelected(this, new AttributesSelectedEventArgs(selectionState));
             }
         }
@@ -1693,6 +1748,26 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException.Display("ELI29998", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks for a change in the current selection. Needed to add
+        /// <see cref="DataEntrySelectionMemento"/>s to the <see cref="Extract.Utilities.UndoManager"/>
+        /// stack since there is no SelectionChanged event for the <see cref="TextBox"/> class.
+        /// </summary>
+        void ProcessSelectionChange()
+        {
+            if (SelectionStart != _lastSelectionStart || SelectionLength != _lastSelectionLength)
+            {
+                if (AttributeStatusInfo.UndoManager.TrackOperations)
+                {
+                    AttributeStatusInfo.UndoManager.AddMemento(
+                        new DataEntrySelectionMemento(_dataEntryControlHost, new SelectionState(this)));
+                }
+
+                _lastSelectionStart = SelectionStart;
+                _lastSelectionLength = SelectionLength;
             }
         }
 

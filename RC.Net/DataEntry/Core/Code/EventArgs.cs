@@ -784,7 +784,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException.AsExtractException("ELI25989", ex);
+                throw ExtractException.AsExtractException("ELI25989", ex);
             }
         }
 

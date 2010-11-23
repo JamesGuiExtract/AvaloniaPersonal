@@ -205,6 +205,10 @@
     <Compile Include="DataEntryTableColumn.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataEntryTextBox.SelectionState.cs">
+	  <DependentUpon>DataEntryTextBox.cs</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DataEntryTextBoxCell.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>

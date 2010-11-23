@@ -609,7 +609,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException.AsExtractException("ELI26153", ex);
+                throw ExtractException.AsExtractException("ELI26153", ex);
             }
         }
 

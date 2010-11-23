@@ -725,12 +725,13 @@ namespace Extract.DataEntry
         /// <param name="textBoxControl">A <see cref="TextBoxBase"/> whose current selection
         /// indicates which part of the existing text is to be replaced.</param>
         /// <param name="existingText">The existing <see cref="SpatialString"/> associated with 
-        /// <see paramref="textBoxControl"/>.
-        /// <para><b>Note</b></para>
-        /// This value will be modified (it is the same value that is returned).</param>
+        /// <see paramref="textBoxControl"/>.</param>
         /// <param name="newText">The <see cref="SpatialString"/> that is to replace the current
         /// selection.</param>
-        /// <returns></returns>
+        /// <returns>The <see cref="SpatialString"/> that results from inserting
+        /// <see paramref="newText"/> into <see paramref="existingText"/>. The return value may be
+        /// <see paramref="newText"/> itself if all of the existing text is being replaced.
+        /// </returns>
         internal static SpatialString InsertSpatialStringIntoSelection(TextBoxBase textBoxControl,
             SpatialString existingText, SpatialString newText)
         {
@@ -740,6 +741,11 @@ namespace Extract.DataEntry
                 // text with the swiped text.
                 if (textBoxControl.SelectionLength != textBoxControl.Text.Length)
                 {
+                    // Make a copy of the existing text so that the operation does not modify the
+                    // original text.
+                    ICopyableObject copySource = (ICopyableObject)existingText;
+                    existingText = (SpatialString)copySource.Clone();
+
                     // So that SpatialString::Insert/Append works properly ensure the source doc
                     // names are the same.
                     existingText.SourceDocName = newText.SourceDocName;
