@@ -666,9 +666,13 @@ namespace Extract.DataEntry
                 // Any existing attributes need to be cleared before loading the new attributes
                 // so that the current attributes don't get overwritten by auto-update queries
                 // in the process of loading.
-                if (_sourceAttributes != null && sourceAttributes != null)
+                if (_sourceAttributes != null)
                 {
-                    SetAttributes(null);
+                    ClearAttributeMappings(true);
+
+                    _attribute = null;
+
+                    ApplyAttribute();
                 }
                 
                 // [DataEntry:298]
@@ -680,25 +684,17 @@ namespace Extract.DataEntry
 
                 _sourceAttributes = sourceAttributes;
 
-                if (sourceAttributes == null)
-                {
-                    // If no data is being assigned, clear the existing attribute mappings and do not
-                    // attempt to map a new attribute.
-                    ClearAttributeMappings(true);
-
-                    _attribute = null;
-                }
-                else
+                if (sourceAttributes != null)
                 {
                     // Attempt to find a mapped attribute from the provided vector.  Create a new 
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(base.AttributeName,
                         _multipleMatchSelectionMode, !string.IsNullOrEmpty(base.AttributeName),
                         sourceAttributes, null, this, 0, false, TabStopMode.Never, null, null, null);
-                }
 
-                // Use the primarily mapped attribute map the attribute for each row.
-                ApplyAttribute();
+                    // Use the primarily mapped attribute map the attribute for each row.
+                    ApplyAttribute();
+                }
 
                 // Selecting all cells makes table look more "disabled".
                 if (base.Disabled)
