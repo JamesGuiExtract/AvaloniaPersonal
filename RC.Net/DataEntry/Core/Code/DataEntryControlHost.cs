@@ -1187,6 +1187,22 @@ namespace Extract.DataEntry
                     return false;
                 }
 
+                // [DataEntry:1034]
+                // Ensure no user input is handled while in the process of undo-ing an operation.
+                if (_inUndo)
+                {
+                    if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp ||
+                        m.Msg == WindowsMessage.LeftButtonDown ||
+                        m.Msg == WindowsMessage.LeftButtonUp ||
+                        m.Msg == WindowsMessage.MiddleButtonDown ||
+                        m.Msg == WindowsMessage.MiddleButtonUp ||
+                        m.Msg == WindowsMessage.RightButtonDown ||
+                        m.Msg == WindowsMessage.RightButtonUp)
+                    {
+                        return true;
+                    }
+                }
+
                 // If a message is being processed, we are no longer idle. (NOTE: The EnterIdle
                 // message does not seem to be handled by PreFilterMessage).
                 if (_isIdle)
@@ -1805,7 +1821,6 @@ namespace Extract.DataEntry
                     }
                     finally
                     {
-                        _inUndo = false;
                         _controlUpdateReferenceCount--;
                         _refreshActiveControlHighlights = true;
 
@@ -1822,6 +1837,7 @@ namespace Extract.DataEntry
                         // Ensure that nothing that happened as a result of the undo counts as part of a new
                         // operation (including any action that occured via the message queue).
                         ExecuteOnIdle(() => AttributeStatusInfo.UndoManager.TrackOperations = true);
+                        ExecuteOnIdle(() => _inUndo = false);
                     }
                 }
             }
@@ -3590,7 +3606,13 @@ namespace Extract.DataEntry
                         {
                             OnUpdateEnded(new EventArgs());
 
-                            AttributeStatusInfo.UndoManager.OperationInProgress = false;
+                            // [DataEntry:1027]
+                            // In order ensure that all message processing that happens a result of
+                            // the initial user input, don't end the current operation until the
+                            // host is once again idle and therefore occurs after any other message
+                            // invokes triggers by the initial operation.
+                            ExecuteOnIdle(() =>
+                                AttributeStatusInfo.UndoManager.OperationInProgress = false);
                         }
                     }
                 }

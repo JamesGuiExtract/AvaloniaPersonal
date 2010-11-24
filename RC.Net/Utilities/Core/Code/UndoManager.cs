@@ -133,6 +133,11 @@ namespace Extract.Utilities
         /// </summary>
         bool _newOperationPending;
 
+        /// <summary>
+        /// Indicates whether the current operation should be extended.
+        /// </summary>
+        bool _extendCurrentOperation;
+
         #endregion Fields
 
         #region Constructors
@@ -218,20 +223,29 @@ namespace Extract.Utilities
                                 // If starting a new operation, stop and record the current one.
                                 _undoStack.Push(_currentOperation);
                                 _currentOperation = new Stack<IUndoMemento>();
+                                _extendCurrentOperation = false;
                             }
-                            else if (_currentOperation
-                                .Any(m => m.Significance >= UndoMementoSignificance.Minor))
+                            // If extending the current operation, leave the _currentOperation
+                            // stack as is until the next call to StartNewOperation or until
+                            // OperationInProgress is set back to true.
+                            else if (!_extendCurrentOperation)
                             {
-                                // If ending an operation, if at least one memento was of at least
-                                // minor significance, consider a new operation to be pending.
-                                _newOperationPending = true;
-                            }
-                            else
-                            {
-                                // If ending an operation but none of the operations were significant,
-                                // discard them.
-                                _mementosToDispose.AddRange(_currentOperation.OfType<IDisposable>());
-                                _currentOperation.Clear();
+                                if (_currentOperation
+                                    .Any(m => m.Significance >= UndoMementoSignificance.Minor))
+                                {
+                                    // If ending an operation, if at least one memento was of at
+                                    // least minor significance, consider a new operation to be
+                                    // pending.
+                                    _newOperationPending = true;
+                                }
+                                else
+                                {
+                                    // If ending an operation but none of the operations were
+                                    // significant, discard them.
+                                    _mementosToDispose.AddRange(
+                                        _currentOperation.OfType<IDisposable>());
+                                    _currentOperation.Clear();
+                                }
                             }
                         }
 
@@ -330,7 +344,32 @@ namespace Extract.Utilities
         /// </summary>
         public void StartNewOperation()
         {
+            _extendCurrentOperation = false;
             _newOperationPending = true;
+        }
+
+        /// <summary>
+        /// Requests that the current operation be exetended beyond the next substantial data change
+        /// even if <see cref="StartNewOperation"/> had been called or
+        /// <see cref="OperationInProgress"/> is returned to <see langword="false"/> from
+        /// <see langword="true"/>. The operation will end the next time
+        /// <see cref="StartNewOperation"/> is called or <see cref="OperationInProgress"/> is set
+        /// back to <see langword="true"/>.
+        /// </summary>
+        public void ExtendCurrentOperation()
+        {
+            try
+            {
+                if (_currentOperation.Count > 0)
+                {
+                    _newOperationPending = false;
+                    _extendCurrentOperation = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31092", ex);
+            }
         }
 
         /// <summary>

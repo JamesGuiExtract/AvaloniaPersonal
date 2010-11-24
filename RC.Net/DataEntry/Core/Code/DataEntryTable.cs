@@ -813,6 +813,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                OnUpdateStarted(new EventArgs());
+
                 base.OnUserAddedRow(e);
 
                 // Re-enter edit mode so that any changes to the validation list based on triggers
@@ -822,38 +824,42 @@ namespace Extract.DataEntry
                     EndEdit();
                 }
 
-                try
+                // Obtain the initial value before calling ApplyAttributeToRow which may trigger
+                // auto-update queries and cause the value to change.
+                string initialValue = CurrentCell.Value.ToString();
+
+                CurrentCell.Value = "";
+
+                // Add a new attribute for the specified row.
+                ApplyAttributeToRow(e.Row.Index - 1, null, null);
+
+                // If the initial value was null or empty (can this happen?) there is nothing more
+                // to do.
+                if (string.IsNullOrEmpty(initialValue))
                 {
-                    OnUpdateStarted(new EventArgs());
-
-                    // Obtain the initial value before calling ApplyAttributeToRow which may trigger
-                    // auto-update queries and cause the value to change.
-                    string initialValue = CurrentCell.Value.ToString();
-
-                    CurrentCell.Value = "";
-
-                    // Add a new attribute for the specified row.
-                    ApplyAttributeToRow(e.Row.Index - 1, null, null);
-
-                    // If the initial value was null or empty (can this happen?) there is nothing more
-                    // to do.
-                    if (string.IsNullOrEmpty(initialValue))
-                    {
-                        return;
-                    }
-
-                    BeginInvoke(new StringDelegate(BeginEdit), new object[] { initialValue });
+                    return;
                 }
-                finally
-                {
-                    OnUpdateEnded(new EventArgs());
-                }
+
+                BeginInvoke((MethodInvoker)(() => BeginEdit(initialValue)));
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI24244", ex);
                 ee.AddDebugData("Event Data", e, false);
                 ee.Display();
+            }
+            finally
+            {
+                // [DataEntry:1027]
+                // Since the re-initialization of edit mode is being done via a begin invoke,
+                // the call to OnUpdateEnded needs to be invoked as well so that it happens
+                // after the re-initialization of edit mode.
+                BeginInvoke((MethodInvoker)(() => OnUpdateEnded(new EventArgs())));
+                if (AttributeStatusInfo.UndoManager.TrackOperations)
+                {
+                    BeginInvoke((MethodInvoker)(() =>
+                        AttributeStatusInfo.UndoManager.ExtendCurrentOperation()));
+                }
             }
         }
 
