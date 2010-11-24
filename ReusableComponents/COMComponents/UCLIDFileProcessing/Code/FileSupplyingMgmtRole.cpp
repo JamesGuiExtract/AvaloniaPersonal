@@ -385,9 +385,12 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionI
 					ipFileSupplierData->PutFileSupplierStatus( 
 						UCLID_FILEPROCESSINGLib::kActiveStatus );
 
-					::PostMessage( m_hWndOfUI, 
-						FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kActiveStatus, 
-						(LPARAM)ipFileSupplier.GetInterfacePtr());
+					if (m_hWndOfUI != NULL)
+					{
+						::PostMessage( m_hWndOfUI, 
+							FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kActiveStatus, 
+							(LPARAM)ipFileSupplier.GetInterfacePtr());
+					}
 				}
 			}
 		}
@@ -444,9 +447,12 @@ STDMETHODIMP CFileSupplyingMgmtRole::Stop(void)
 				// Update status and notify dialog
 				ipFileSupplierData->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kStoppedStatus );
 
-				::PostMessage( m_hWndOfUI, 
-					FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kStoppedStatus, 
-					(LPARAM)ipFileSupplier.GetInterfacePtr());
+				if (m_hWndOfUI != NULL)
+				{
+					::PostMessage( m_hWndOfUI, 
+						FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kStoppedStatus, 
+						(LPARAM)ipFileSupplier.GetInterfacePtr());
+				}
 			}
 		}
 		// Notify the FAM that supplying is complete
@@ -497,10 +503,13 @@ STDMETHODIMP CFileSupplyingMgmtRole::Pause(void)
 				// Set status to Paused
 				ipFileSupplierData->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kPausedStatus );
 
-				// Notify the dialog
-				::PostMessage( m_hWndOfUI, 
-					FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kPausedStatus, 
-					(LPARAM)ipFS.GetInterfacePtr() );
+				if (m_hWndOfUI != NULL)
+				{
+					// Notify the dialog
+					::PostMessage( m_hWndOfUI, 
+						FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kPausedStatus, 
+						(LPARAM)ipFS.GetInterfacePtr() );
+				}
 			}
 		}
 	}
@@ -549,10 +558,13 @@ STDMETHODIMP CFileSupplyingMgmtRole::Resume(void)
 				// Set status to Active
 				ipFileSupplierData->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kActiveStatus );
 
-				// Notify dialog of status change
-				::PostMessage( m_hWndOfUI, 
-					FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kActiveStatus, 
-					(LPARAM) ipFS.GetInterfacePtr() );
+				if (m_hWndOfUI != NULL)
+				{
+					// Notify dialog of status change
+					::PostMessage( m_hWndOfUI, 
+						FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kActiveStatus, 
+						(LPARAM) ipFS.GetInterfacePtr() );
+				}
 			}
 		}
 	}
@@ -835,19 +847,6 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 
 			bool bAlreadyExists = asCppBool(vbAlreadyExists);
 
-			// Create and fill the FileSupplyingRecord to be passed to PostMessage
-			// Using an auto pointer in order to prevent a memory leak due to exceptions
-			auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
-			apFileSupRec->m_eFSRecordType = kFileAdded;
-			apFileSupRec->m_strFSDescription = strFSDescription;
-			apFileSupRec->m_strOriginalFileName = strFile;
-			apFileSupRec->m_ulFileID = asUnsignedLong(asString(ipFileRecord->FileID));
-			apFileSupRec->m_ePreviousActionStatus = easPrev;
-			apFileSupRec->m_ulNumPages = ipFileRecord->Pages;
-			apFileSupRec->m_bAlreadyExisted = bAlreadyExists;
-			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
-			apFileSupRec->m_strPriority = strPriority;
-
 			// Increment the number of files supplied if:
 			// 1. The file did not already exist OR
 			// 2. The file existed and ForceProcessing is on
@@ -856,8 +855,24 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 				m_nFilesSupplied++;
 			}
 
-			// Post the message which will be handled by the FPDlg's OnQueueEvent method
-			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+			if (m_hWndOfUI != NULL)
+			{
+				// Create and fill the FileSupplyingRecord to be passed to PostMessage
+				// Using an auto pointer in order to prevent a memory leak due to exceptions
+				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				apFileSupRec->m_eFSRecordType = kFileAdded;
+				apFileSupRec->m_strFSDescription = strFSDescription;
+				apFileSupRec->m_strOriginalFileName = strFile;
+				apFileSupRec->m_ulFileID = (unsigned long) ipFileRecord->FileID;
+				apFileSupRec->m_ePreviousActionStatus = easPrev;
+				apFileSupRec->m_ulNumPages = ipFileRecord->Pages;
+				apFileSupRec->m_bAlreadyExisted = bAlreadyExists;
+				apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+				apFileSupRec->m_strPriority = strPriority;
+
+				// Post the message which will be handled by the FPDlg's OnQueueEvent method
+				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+			}
 		}
 		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI13792", kFileAdded)
 	}
@@ -921,17 +936,20 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRemoved(BSTR bstrFile, IFileSuppl
 			// Remove the files from the database
 			getFPMDB()->RemoveFile(bstrSimplifiedName, m_strAction.c_str());
 		
-			// Create and fill the FileSupplyingRecord to be passed to PostMessage
-			// Using an auto pointer in order to prevent a memory leak due to exceptions
-			auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
-			apFileSupRec->m_eFSRecordType = kFileRemoved;
-			apFileSupRec->m_strFSDescription = strFSDescription;
-			apFileSupRec->m_strOriginalFileName = strFile;
-			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
-			apFileSupRec->m_strPriority = strPriority;
-			
-			// Post the message which will be handled by the FPDlg's OnQueueEvent method
-			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+			if (m_hWndOfUI != NULL)
+			{
+				// Create and fill the FileSupplyingRecord to be passed to PostMessage
+				// Using an auto pointer in order to prevent a memory leak due to exceptions
+				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				apFileSupRec->m_eFSRecordType = kFileRemoved;
+				apFileSupRec->m_strFSDescription = strFSDescription;
+				apFileSupRec->m_strOriginalFileName = strFile;
+				apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+				apFileSupRec->m_strPriority = strPriority;
+
+				// Post the message which will be handled by the FPDlg's OnQueueEvent method
+				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+			}
 		}
 		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14931", kFileRemoved)
 	}
@@ -1003,24 +1021,20 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 			// Determine if new file name matches the FAM condition
 			bool bSkipNew = fileMatchesFAMCondition(strNewFile);
 
-			// Create and fill the FileSupplyingRecord to be passed to PostMessage
-			// Using an auto pointer in order to prevent a memory leak due to exceptions
-			auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+			
 
 			// Create the FileRecordPtr to catch AddFile's return value.
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 
+			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
+			VARIANT_BOOL bAlreadyExists;
 			bool bIsAdded = false;
 			if (!bSkipNew)
 			{
-				VARIANT_BOOL bAlreadyExists;
-				UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 				// Add the new filename to the db
 				ipFileRecord = getFPMDB()->AddFile(bstrNewSimplifiedName, m_strAction.c_str(), 
 					ePriority, ipFSData->ForceProcessing, VARIANT_FALSE,
 					UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );		
-				apFileSupRec->m_ePreviousActionStatus = easPrev;
-				apFileSupRec->m_bAlreadyExisted = (bAlreadyExists == VARIANT_TRUE);
 				bIsAdded = true;
 			}
 
@@ -1030,23 +1044,32 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 				getFPMDB()->RemoveFile(bstrOldSimplifiedName, m_strAction.c_str());
 			}
 		
-			// Fill the FileSupplyingRecord to be passed to PostMessage
-			apFileSupRec->m_eFSRecordType = kFileRenamed;
-			apFileSupRec->m_strFSDescription = strFSDescription;
-			apFileSupRec->m_strOriginalFileName = strOldFile;
-			apFileSupRec->m_strNewFileName = strNewFile;
-			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
-			apFileSupRec->m_strPriority = strPriority;
-
-			if (bIsAdded)
+			if (m_hWndOfUI != NULL)
 			{
-				// If the file was added, we have useful info in ipFileRecord
-				apFileSupRec->m_ulFileID = asUnsignedLong(asString(ipFileRecord->FileID));
-				apFileSupRec->m_ulNumPages = ipFileRecord->Pages;
-			}
+				// Create and fill the FileSupplyingRecord to be passed to PostMessage
+				// Using an auto pointer in order to prevent a memory leak due to exceptions
+				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				apFileSupRec->m_eFSRecordType = kFileRenamed;
+				apFileSupRec->m_strFSDescription = strFSDescription;
+				apFileSupRec->m_strOriginalFileName = strOldFile;
+				apFileSupRec->m_strNewFileName = strNewFile;
+				apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+				apFileSupRec->m_strPriority = strPriority;
 
-			// Post the message which will be handled by the FPDlg's OnQueueEvent method
-			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+				if (bIsAdded)
+				{
+					// If added get the previous status and whether it already existed
+					apFileSupRec->m_ePreviousActionStatus = easPrev;
+					apFileSupRec->m_bAlreadyExisted = asCppBool(bAlreadyExists);
+
+					// If the file was added, we have useful info in ipFileRecord
+					apFileSupRec->m_ulFileID = (unsigned long) ipFileRecord->FileID;
+					apFileSupRec->m_ulNumPages = ipFileRecord->Pages;
+				}
+
+				// Post the message which will be handled by the FPDlg's OnQueueEvent method
+				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+			}
 		}
 		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14937", kFileRenamed)
 	}
@@ -1114,21 +1137,23 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 				ePriority, ipFSData->ForceProcessing, VARIANT_TRUE,
 				UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );
 		
-			// Create and fill the FileSupplyingRecord to be passed to PostMessage
-			// Using an auto pointer in order to prevent a memory leak due to exceptions
-			auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
-			apFileSupRec->m_bAlreadyExisted = (bAlreadyExists == VARIANT_TRUE);
-			apFileSupRec->m_eFSRecordType = kFileModified;
-			apFileSupRec->m_strFSDescription = strFSDescription;
-			apFileSupRec->m_strOriginalFileName = strFile;
-			apFileSupRec->m_ulFileID = asUnsignedLong(asString(ipFileRecord->FileID));;
-			apFileSupRec->m_ePreviousActionStatus = easPrev;
-			apFileSupRec->m_ulNumPages = ipFileRecord->Pages;
-			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
-			apFileSupRec->m_strPriority = strPriority;
-
-			// Post the message which will be handled by the FPDlg's OnQueueEvent method
-			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+			if (m_hWndOfUI != NULL)
+			{
+				// Create and fill the FileSupplyingRecord to be passed to PostMessage
+				// Using an auto pointer in order to prevent a memory leak due to exceptions
+				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				apFileSupRec->m_bAlreadyExisted = (bAlreadyExists == VARIANT_TRUE);
+				apFileSupRec->m_eFSRecordType = kFileModified;
+				apFileSupRec->m_strFSDescription = strFSDescription;
+				apFileSupRec->m_strOriginalFileName = strFile;
+				apFileSupRec->m_ulFileID = (unsigned long) ipFileRecord->FileID;
+				apFileSupRec->m_ePreviousActionStatus = easPrev;
+				apFileSupRec->m_ulNumPages = ipFileRecord->Pages;
+				apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+				apFileSupRec->m_strPriority = strPriority;
+				// Post the message which will be handled by the FPDlg's OnQueueEvent method
+				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+			}
 		}
 		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14936", kFileModified)
 	}
@@ -1183,17 +1208,20 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderDeleted(BSTR bstrFolder, IFileS
 			// remove the folder from the database
 			getFPMDB()->RemoveFolder(bstrFolder, m_strAction.c_str());
 
-			// Create and fill the FileSupplyingRecord to be passed to PostMessage
-			// Using an auto pointer in order to prevent a memory leak due to exceptions
-			auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
-			apFileSupRec->m_eFSRecordType = kFolderRemoved;
-			apFileSupRec->m_strFSDescription = asString(ipObjectWithDescription->Description);
-			apFileSupRec->m_strOriginalFileName = asString(bstrFolder);
-			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
-			apFileSupRec->m_strPriority = strPriority;
+			if (m_hWndOfUI != NULL)
+			{
+				// Create and fill the FileSupplyingRecord to be passed to PostMessage
+				// Using an auto pointer in order to prevent a memory leak due to exceptions
+				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				apFileSupRec->m_eFSRecordType = kFolderRemoved;
+				apFileSupRec->m_strFSDescription = asString(ipObjectWithDescription->Description);
+				apFileSupRec->m_strOriginalFileName = asString(bstrFolder);
+				apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+				apFileSupRec->m_strPriority = strPriority;
 
-			// Post the message which will be handled by the FPDlg's OnQueueEvent method
-			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+				// Post the message which will be handled by the FPDlg's OnQueueEvent method
+				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+			}
 		}
 		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14940", kFolderRemoved)
 	}
@@ -1249,19 +1277,22 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderRenamed(BSTR bstrOldFolder, BST
 			// TODO: Database end needs to be implemented
 			//		 This currently doesnt do anything
 
-			// TODO: Need to set-up like it was done in FileRename once implementation is done
-			// Create and fill the FileSupplyingRecord to be passed to PostMessage
-			// Using an auto pointer in order to prevent a memory leak due to exceptions
-			auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
-			apFileSupRec->m_eFSRecordType = kFolderRenamed;
-			apFileSupRec->m_strFSDescription = strFSDescription;
-			apFileSupRec->m_strOriginalFileName = asString(bstrOldFolder);
-			apFileSupRec->m_strNewFileName = asString(bstrNewFolder);
-			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
-			apFileSupRec->m_strPriority = strPriority;
+			if (m_hWndOfUI != NULL)
+			{
+				// TODO: Need to set-up like it was done in FileRename once implementation is done
+				// Create and fill the FileSupplyingRecord to be passed to PostMessage
+				// Using an auto pointer in order to prevent a memory leak due to exceptions
+				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				apFileSupRec->m_eFSRecordType = kFolderRenamed;
+				apFileSupRec->m_strFSDescription = strFSDescription;
+				apFileSupRec->m_strOriginalFileName = asString(bstrOldFolder);
+				apFileSupRec->m_strNewFileName = asString(bstrNewFolder);
+				apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+				apFileSupRec->m_strPriority = strPriority;
 
-			// Create and fill the FileSupplyingRecord to be passed to PostMessage
-			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM)apFileSupRec.release(), 0);
+				// Create and fill the FileSupplyingRecord to be passed to PostMessage
+				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM)apFileSupRec.release(), 0);
+			}
 		}
 		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14941", kFolderRenamed)
 	}
@@ -1275,17 +1306,20 @@ void CFileSupplyingMgmtRole::postQueueEventReceivedNotification(BSTR bstrFile,
 																const string& strPriority,
 																EFileSupplyingRecordType eFSRecordType)
 {
-	// Create and fill the FileSupplyingRecord to be passed to PostMessage
-	// Using an auto pointer in order to prevent a memory leak due to exceptions
-	auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
-	apFileSupRec->m_eFSRecordType = eFSRecordType;
-	apFileSupRec->m_strFSDescription = strFSDescription;
-	apFileSupRec->m_strOriginalFileName = asString(bstrFile);
-	apFileSupRec->m_eQueueEventStatus = kQueueEventReceived;
-	apFileSupRec->m_strPriority = strPriority;
+	if (m_hWndOfUI != NULL)
+	{
+		// Create and fill the FileSupplyingRecord to be passed to PostMessage
+		// Using an auto pointer in order to prevent a memory leak due to exceptions
+		auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+		apFileSupRec->m_eFSRecordType = eFSRecordType;
+		apFileSupRec->m_strFSDescription = strFSDescription;
+		apFileSupRec->m_strOriginalFileName = asString(bstrFile);
+		apFileSupRec->m_eQueueEventStatus = kQueueEventReceived;
+		apFileSupRec->m_strPriority = strPriority;
 
-	// Post the message which will be handled by the FPDlg's OnQueueEvent method
-	::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+		// Post the message which will be handled by the FPDlg's OnQueueEvent method
+		::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CFileSupplyingMgmtRole::postQueueEventFailedNotification(BSTR bstrFile, 
@@ -1294,18 +1328,21 @@ void CFileSupplyingMgmtRole::postQueueEventFailedNotification(BSTR bstrFile,
 															  EFileSupplyingRecordType eFSRecordType,
 															  const UCLIDException& ue)
 {
-	// Create and fill the FileSupplyingRecord to be passed to PostMessage
-	// Using an auto pointer in order to prevent a memory leak due to exceptions
-	auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
-	apFileSupRec->m_eFSRecordType = eFSRecordType;
-	apFileSupRec->m_strFSDescription = strFSDescription;
-	apFileSupRec->m_strOriginalFileName = asString(bstrFile);
-	apFileSupRec->m_eQueueEventStatus = kQueueEventFailed;
-	apFileSupRec->m_ueException = ue;
-	apFileSupRec->m_strPriority = strPriority;
+	if (m_hWndOfUI != NULL)
+	{
+		// Create and fill the FileSupplyingRecord to be passed to PostMessage
+		// Using an auto pointer in order to prevent a memory leak due to exceptions
+		auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+		apFileSupRec->m_eFSRecordType = eFSRecordType;
+		apFileSupRec->m_strFSDescription = strFSDescription;
+		apFileSupRec->m_strOriginalFileName = asString(bstrFile);
+		apFileSupRec->m_eQueueEventStatus = kQueueEventFailed;
+		apFileSupRec->m_ueException = ue;
+		apFileSupRec->m_strPriority = strPriority;
 
-	// Post the message which will be handled by the FPDlg's OnQueueEvent method
-	::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+		// Post the message which will be handled by the FPDlg's OnQueueEvent method
+		::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
+	}
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingDone(IFileSupplier *pSupplier)
@@ -1342,9 +1379,12 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingDone(IFileSupplier *pSup
 			{
 				// Update status and notify dialog
 				ipFSD->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kDoneStatus );
-				::PostMessage( m_hWndOfUI, 
-					FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kDoneStatus, 
-					(LPARAM)ipFS.GetInterfacePtr() );
+				if (m_hWndOfUI != NULL)
+				{
+					::PostMessage( m_hWndOfUI, 
+						FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kDoneStatus, 
+						(LPARAM)ipFS.GetInterfacePtr() );
+				}
 				
 				// Add to the count of finished suppliers
 				m_nFinishedSupplierCount++;
@@ -1397,9 +1437,12 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingFailed(IFileSupplier *pS
 			{
 				// Update status and notify dialog
 				ipFSD->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kDoneStatus );
-				::PostMessage( m_hWndOfUI, 
-					FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kDoneStatus, 
-					(LPARAM)ipFS.GetInterfacePtr() );
+				if (m_hWndOfUI != NULL)
+				{
+					::PostMessage( m_hWndOfUI, 
+						FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kDoneStatus, 
+						(LPARAM)ipFS.GetInterfacePtr() );
+				}
 
 				// Add to the count of suppliers that have finished
 				m_nFinishedSupplierCount++;
