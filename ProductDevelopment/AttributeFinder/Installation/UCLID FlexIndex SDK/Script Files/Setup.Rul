@@ -142,6 +142,9 @@ Dlg_SdStartCopy:
    	               
 	// Install SQL CE   	               
    	InstallSQLCE();
+   	                      
+	// Install Office Redist
+   	InstallOfficeRedist();
    	
    	gbInstalled = TRUE;
 

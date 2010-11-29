@@ -1777,6 +1777,7 @@
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITEKEYINSTAL_FILES</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMPO_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
+		<row><td>PATH_TO_OFFICEREDIST_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\OfficeRedist</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REPORTS_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\Reports</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGIDSHIELD_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\SelfRegIDShieldComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL COMPACT EDI_FI</td><td>P:\AttributeFinder\RequiredInstalls\SQL Compact Edition Editor</td><td/><td>2</td></row>
@@ -2070,6 +2071,7 @@
 		<row><td>SetupFile2</td><td>Setup.bmp</td><td/><td>0</td><td>1</td><td>&lt;ISProjectDataFolder&gt;\support files\Setup.bmp</td></row>
 		<row><td>SetupFile3</td><td>sqlncli.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli.msi</td></row>
 		<row><td>SetupFile4</td><td>sqlncli_x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli_x64.msi</td></row>
+		<row><td>SetupFile5</td><td>o2007pia.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_OFFICEREDIST_FILES&gt;\o2007pia.msi</td></row>
 		<row><td>SetupFile7</td><td>CBUSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITEKEYINSTAL_FILES&gt;\CBUSetup.exe</td></row>
 		<row><td>SetupFile8</td><td>CRRuntime_12_1_mlb.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_CRYSTAL_REPORTS12&gt;\CRRuntime_12_1_mlb.msi</td></row>
 		<row><td>SetupFile9</td><td>SSCERuntime-ENU-x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime-ENU-x64.msi</td></row>
