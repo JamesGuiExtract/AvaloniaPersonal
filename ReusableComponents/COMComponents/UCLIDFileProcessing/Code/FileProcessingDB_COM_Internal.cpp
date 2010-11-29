@@ -477,15 +477,13 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 						// Update or insert the status 
 						long nRecordsAffected = executeCmdQuery(ipConnection, strStatusSQL);	
 
-						// if no records were affected need to throw an exception since this means
-						// the record has probably been updated since that last status was checked
+						// if no records were affected the previous status should be changed to the
+						// new status, since if no records were affected it was changed by another 
+						// process to the new status.
 						if (nRecordsAffected == 0)
 						{
-							UCLIDException ue("ELI31061", "File status has already been changed.");
-							ue.addDebugInfo("FileID", nID);
-							ue.addDebugInfo("Action", strActionName);
-							ue.addDebugInfo("Status", strNewStatus);
-							throw ue;
+							// Change previous status to new status
+							*pPrevStatus = eNewStatus;
 						}
 
 						// If the previous status was skipped, remove the record from the skipped file table
