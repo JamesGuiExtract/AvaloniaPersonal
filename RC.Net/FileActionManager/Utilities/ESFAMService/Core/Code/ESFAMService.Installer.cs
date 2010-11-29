@@ -54,15 +54,7 @@ namespace Extract.FileActionManager.Utilities
                 if (File.Exists(databaseFile))
                 {
                     // Build new database file name (add timestamp before extension)
-                    // and replace ':' with '_'
-                    string fileName = Path.GetFileNameWithoutExtension(databaseFile)
-                        + "." + DateTime.Now.ToString("s", CultureInfo.CurrentCulture)
-                        + Path.GetExtension(databaseFile);
-                    fileName = fileName.Replace(":", "_");
-
-                    // Buld the new file name
-                    fileName = FileSystemMethods.PathCombine(
-                        Path.GetDirectoryName(databaseFile), fileName);
+                    string fileName = FileSystemMethods.BuildTimeStampedBackupFileName(databaseFile, true);
 
                     FileSystemMethods.MoveFile(databaseFile, fileName, false);
                 }

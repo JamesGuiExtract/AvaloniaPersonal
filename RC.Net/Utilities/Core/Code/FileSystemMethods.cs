@@ -205,6 +205,14 @@ namespace Extract.Utilities
                         File.Move(source, destination);
                         return;
                     }
+                    catch (DirectoryNotFoundException)
+                    {
+                        throw;
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        throw;
+                    }
                     catch (IOException)
                     {
                         // The destination file exists. Ignore for now. 
@@ -805,34 +813,8 @@ namespace Extract.Utilities
                     throw ee;
                 }
 
-                // Validate the first path string
-                ValidatePathString(list[0]);
-
-                // Iterate the list of strings and append each one to the path
-                // adding directory separators as needed
-                StringBuilder sb = new StringBuilder(list[0]);
-                for (int i = 1; i < list.Length; i++)
-                {
-                    // Validate this path string
-                    ValidatePathString(list[i]);
-
-                    // Get the last character of the current "Path" string
-                    char ch = sb[sb.Length - 1];
-
-                    // Check if a directory separator is needed
-                    if (ch != Path.DirectorySeparatorChar
-                        && ch != Path.AltDirectorySeparatorChar)
-                    {
-                        // Add the directory separator
-                        sb.Append(Path.DirectorySeparatorChar);
-                    }
-
-                    // Append the next piece
-                    sb.Append(list[i]);
-                }
-
-                // Return the new path
-                return sb.ToString();
+                // Updated to use the .Net 4.0 path combine
+                return Path.Combine(list);
             }
             catch (Exception ex)
             {
@@ -871,6 +853,69 @@ namespace Extract.Utilities
             string file = Path.GetFileNameWithoutExtension(fullPath);
 
             return Path.Combine(directory, file);
+        }
+
+        /// <summary>
+        /// Builds the time stamped backup file name.
+        /// </summary>
+        /// <param name="fileName">Name of the file to compute timestamped backup file name.</param>
+        /// <param name="beforeExtension">if set to <see langword="true"/> then the date/time
+        /// stamp will be placed before the extension, if <see langword="false"/> then
+        /// the date/time stamp will be placed after the extension.</param>
+        /// <example>
+        /// This sample shows how to call, and what the return value is from calling this function
+        /// fileName = "C:\test\test.txt"
+        /// <code lang="C#">
+        /// string fileName = @"C:\test\test.txt";
+        /// var backupFileNameBeforeExt = BuildTimeStampedBackupFileName(fileName, true);
+        /// var backupFileNameAfterExt = BuildTimeStampedBackupFileName(fileName, false);
+        /// 
+        /// Console.WriteLine(backupFileNameBeforeExt); // C:\test\test.2010-11-29T09_15_30.txt"
+        /// Console.WriteLine(backupFileNameAfterExt); // C:\test\test.txt.2010-11-29T09_15_30"
+        /// </code>
+        /// </example>
+        /// <returns>The date/time stamped file name that can be used to backup the current file.
+        /// </returns>
+        public static string BuildTimeStampedBackupFileName(string fileName, bool beforeExtension)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(fileName))
+                {
+                    throw new ArgumentException("Filename cannot be null or empty string",
+                        "fileName");
+                }
+
+                // Ensure path is rooted
+                if (!Path.IsPathRooted(fileName))
+                {
+                    fileName = Path.GetFullPath(fileName);
+                }
+
+                string dateTime = "." + DateTime.Now.ToString("s",
+                    CultureInfo.CurrentCulture).Replace(":", "_");
+                string extension = Path.GetExtension(fileName);
+
+                var sb = new StringBuilder();
+                sb.Append(Path.Combine(Path.GetDirectoryName(fileName),
+                    Path.GetFileNameWithoutExtension(fileName)));
+                if (beforeExtension)
+                {
+                    sb.Append(dateTime);
+                    sb.Append(extension);
+                }
+                else
+                {
+                    sb.Append(extension);
+                    sb.Append(dateTime);
+                }
+
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31097", ex);
+            }
         }
 
         #endregion Methods
