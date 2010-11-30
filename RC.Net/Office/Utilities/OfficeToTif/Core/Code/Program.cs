@@ -98,16 +98,19 @@ namespace Extract.Office.Utilities.OfficeToTif
                     process.StartInfo.Arguments = "\"" + tempArgs.FileName + "\"";
                     switch (OfficeMethods.CheckOfficeVersion())
                     {
+                        case -1:
+                            throw new ExtractException("ELI31102", "Office is not installed.");
+
                         case 12:
                             process.StartInfo.FileName = _OFFICE_2007_CONVERTER;
                             break;
 
                         case 13:
                             // Perform office to Tif conversion with office 2010
-                            break;
+                            throw new NotSupportedException("Office 2010 is not currently supported.");
 
                         default:
-                            // This is an unsupported version or office was not installed
+                            ExtractException.ThrowLogicException("ELI31101");
                             break;
                     }
                     process.Start();
