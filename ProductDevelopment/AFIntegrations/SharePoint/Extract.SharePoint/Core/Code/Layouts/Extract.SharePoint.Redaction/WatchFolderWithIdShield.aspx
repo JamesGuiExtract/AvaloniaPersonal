@@ -69,6 +69,7 @@
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <asp:HiddenField ID="hiddenOutputLocation" runat="server" />
     <asp:HiddenField ID="hiddenSiteId" runat="server" />
+    <asp:HiddenField ID="hiddenFolderId" runat="server" />
     <asp:Panel ID="panelCannotWatch" runat="server" Visible="false">
         <asp:Label ID="labelCannotWatch" runat="server" ForeColor="Black" />
     </asp:Panel>

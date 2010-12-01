@@ -3,7 +3,4 @@
   <Files>
     <ProjectItemFile Source="Elements.xml" Target="IdShieldRibbon\" Type="ElementManifest" />
   </Files>
-  <FeatureProperties>
-    <FeatureProperty Key="LocalIdShieldFolder" Value="" />
-  </FeatureProperties>
 </ProjectItem>

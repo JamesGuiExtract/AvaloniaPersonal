@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Extract.SharePoint.Redaction.Layouts {
+namespace Extract.SharePoint.Redaction.Administration.Layouts {
     
     
     public partial class ConfigureIdShieldSettings {

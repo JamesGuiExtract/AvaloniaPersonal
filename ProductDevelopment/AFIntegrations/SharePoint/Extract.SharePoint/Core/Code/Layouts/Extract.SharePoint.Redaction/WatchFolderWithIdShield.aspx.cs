@@ -4,12 +4,6 @@ using Microsoft.SharePoint.WebControls;
 using System;
 using System.Collections.Generic;
 
-// Using statements to make dealing with folder settings more readable
-using SiteFolderSettingsCollection =
-System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
-using IdShieldFolderSettingsCollection =
-System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
-
 namespace Extract.SharePoint.Redaction.Layouts
 {
     /// <summary>
@@ -36,112 +30,121 @@ namespace Extract.SharePoint.Redaction.Layouts
                 Guid siteGuid = new Guid(siteId);
                 string currentFolder = ExtractSharePointHelper.GetSiteRelativeFolderPath(
                     Request.QueryString["folder"], siteGuid);
-
                 textCurrentFolderName.Text = currentFolder;
-
-                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
-                if (settings == null)
+                using (var site = new SPSite(siteGuid))
                 {
-                    radioParallel.Checked = true;
-                    ToggleAllOutputLocations();
-                    return;
-                }
-
-                SortedDictionary<string, FolderProcessingSettings> folderSettings =
-                    FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings,
-                    siteGuid);
-
-                // Search the collection of all folders being watched
-                string rootKey = string.Empty;
-                FolderProcessingSettings temp = null;
-                bool watchingSubfolders = false;
-                bool watchingCurrentFolder = false;
-                bool watchingParentRecursively = false;
-                foreach (KeyValuePair<string, FolderProcessingSettings> pair in folderSettings)
-                {
-                    string key = pair.Key;
-                    if (!watchingCurrentFolder
-                        && currentFolder.Equals(key, StringComparison.Ordinal))
+                    // Get the folder ID
+                    hiddenFolderId.Value = ExtractSharePointHelper.GetFolderId(site.RootWeb, currentFolder).ToString();
+                    var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(false);
+                    if (settings == null)
                     {
-                        watchingCurrentFolder = true;
-                        temp = pair.Value;
+                        radioParallel.Checked = true;
+                        ToggleAllOutputLocations();
+                        return;
                     }
-                    else if (currentFolder.StartsWith(key + "/", StringComparison.Ordinal))
+
+                    var siteSettings =
+                        settings.GetSiteSettings(siteGuid);
+                    if (siteSettings == null)
                     {
-                        if (pair.Value.RecurseSubfolders)
+                        radioParallel.Checked = true;
+                        ToggleAllOutputLocations();
+                        return;
+                    }
+
+                    // Search the collection of all folders being watched
+                    string rootKey = string.Empty;
+                    IdShieldFolderProcessingSettings temp = null;
+                    bool watchingSubfolders = false;
+                    bool watchingCurrentFolder = false;
+                    bool watchingParentRecursively = false;
+                    SPWeb web = site.RootWeb;
+                    foreach (KeyValuePair<Guid, IdShieldFolderProcessingSettings> pair in siteSettings)
+                    {
+                        string folderPath = pair.Value.GetFolderPath(web);
+                        if (!watchingCurrentFolder
+                            && currentFolder.Equals(folderPath, StringComparison.Ordinal))
                         {
-                            rootKey = key;
-                            watchingParentRecursively = true;
+                            watchingCurrentFolder = true;
                             temp = pair.Value;
-                            break;
+                        }
+                        else if (currentFolder.StartsWith(folderPath + "/", StringComparison.Ordinal))
+                        {
+                            if (pair.Value.RecurseSubfolders)
+                            {
+                                rootKey = folderPath;
+                                watchingParentRecursively = true;
+                                temp = pair.Value;
+                                break;
+                            }
+                        }
+                        else if (!watchingSubfolders
+                            && folderPath.StartsWith(currentFolder, StringComparison.Ordinal))
+                        {
+                            watchingSubfolders = true;
                         }
                     }
-                    else if (!watchingSubfolders
-                        && key.StartsWith(currentFolder, StringComparison.Ordinal))
+
+                    if (watchingParentRecursively)
                     {
-                        watchingSubfolders = true;
+                        // Hide the unnecessary controls
+                        HideNormalControls();
+                        panelCannotWatch.Visible = true;
+                        labelCannotWatch.Text = "Cannot add watch to this folder since "
+                            + "this folder is watched recursively by the settings for "
+                            + rootKey;
+
+                        return;
                     }
-                }
-
-                if (watchingParentRecursively)
-                {
-                    // Hide the unnecessary controls
-                    HideNormalControls();
-                    panelCannotWatch.Visible = true;
-                    labelCannotWatch.Text = "Cannot add watch to this folder since "
-                        + "this folder is watched recursively by the settings for "
-                        + rootKey;
-
-                    return;
-                }
-                if (watchingSubfolders)
-                {
-                    checkRecursively.Enabled = false;
-                }
-                if (watchingCurrentFolder)
-                {
-                    if (checkRecursively.Enabled)
+                    if (watchingSubfolders)
                     {
-                        checkRecursively.Checked = temp.RecurseSubfolders;
+                        checkRecursively.Enabled = false;
                     }
-                    textFileExtension.Text = temp.FileExtensions;
-                    checkAdded.Checked = temp.ProcessAddedFiles;
-                    checkModified.Checked = temp.ProcessModifiedFiles;
-                    hiddenOutputLocation.Value = temp.OutputLocation.ToString("G");
-                    switch (temp.OutputLocation)
+                    if (watchingCurrentFolder)
                     {
-                        case IdShieldOutputLocation.ParallelFolderPrefix:
-                        case IdShieldOutputLocation.ParallelFolderSuffix:
-                            radioParallel.Checked = true;
-                            textParallel.Text = temp.OutputLocationString;
-                            dropFolderName.SelectedIndex =
-                                temp.OutputLocation == IdShieldOutputLocation.ParallelFolderPrefix ?
-                                0 : 1;
-                            break;
+                        if (checkRecursively.Enabled)
+                        {
+                            checkRecursively.Checked = temp.RecurseSubfolders;
+                        }
+                        textFileExtension.Text = temp.FileExtensions;
+                        checkAdded.Checked = temp.ProcessAddedFiles;
+                        checkModified.Checked = temp.ProcessModifiedFiles;
+                        hiddenOutputLocation.Value = temp.IdShieldOutputLocation.ToString("G");
+                        switch (temp.IdShieldOutputLocation)
+                        {
+                            case IdShieldOutputLocation.ParallelFolderPrefix:
+                            case IdShieldOutputLocation.ParallelFolderSuffix:
+                                radioParallel.Checked = true;
+                                textParallel.Text = temp.IdShieldOutputLocationString;
+                                dropFolderName.SelectedIndex =
+                                    temp.IdShieldOutputLocation == IdShieldOutputLocation.ParallelFolderPrefix ?
+                                    0 : 1;
+                                break;
 
-                        case IdShieldOutputLocation.Subfolder:
-                            radioSubfolder.Checked = true;
-                            textSubfolder.Text = temp.OutputLocationString;
-                            break;
+                            case IdShieldOutputLocation.Subfolder:
+                                radioSubfolder.Checked = true;
+                                textSubfolder.Text = temp.IdShieldOutputLocationString;
+                                break;
 
-                        case IdShieldOutputLocation.PrefixFilename:
-                        case IdShieldOutputLocation.SuffixFilename:
-                            radioSameFolder.Checked = true;
-                            textPreSuffix.Text = temp.OutputLocationString;
-                            dropFileName.SelectedIndex =
-                                temp.OutputLocation == IdShieldOutputLocation.PrefixFilename ?
-                                0 : 1;
-                            break;
+                            case IdShieldOutputLocation.PrefixFilename:
+                            case IdShieldOutputLocation.SuffixFilename:
+                                radioSameFolder.Checked = true;
+                                textPreSuffix.Text = temp.IdShieldOutputLocationString;
+                                dropFileName.SelectedIndex =
+                                    temp.IdShieldOutputLocation == IdShieldOutputLocation.PrefixFilename ?
+                                    0 : 1;
+                                break;
 
-                        case IdShieldOutputLocation.MirrorDocumentLibrary:
-                            radioMirrorLibrary.Checked = true;
-                            textMirrorOut.Text = temp.OutputLocationString;
-                            break;
+                            case IdShieldOutputLocation.MirrorDocumentLibrary:
+                                radioMirrorLibrary.Checked = true;
+                                textMirrorOut.Text = temp.IdShieldOutputLocationString;
+                                break;
+                        }
                     }
-                }
-                else
-                {
-                    radioParallel.Checked = true;
+                    else
+                    {
+                        radioParallel.Checked = true;
+                    }
                 }
 
                 ToggleAllOutputLocations();
@@ -150,6 +153,7 @@ namespace Extract.SharePoint.Redaction.Layouts
             {
                 IdShieldHelper.LogException(ex, ErrorCategoryId.IdShieldWatchFolderConfiguration,
                     "ELI30556");
+
                 throw;
             }
         }
@@ -219,30 +223,27 @@ namespace Extract.SharePoint.Redaction.Layouts
                 }
                 locationString = locationString.Trim();
 
-                FolderProcessingSettings currentFolderSettings = new FolderProcessingSettings(
-                    textCurrentFolderName.Text, textFileExtension.Text, checkRecursively.Checked,
-                    checkAdded.Checked, checkModified.Checked, location, locationString);
-
-
                 // Need to run with elevated privileges in order to update the
                 // ID Shield settings object
                 SPUtility.ValidateFormDigest();
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(true);
-                    IdShieldFolderSettingsCollection siteSettings =
-                                FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
-                    SiteFolderSettingsCollection folderSettings;
-                    Guid siteId = new Guid(hiddenSiteId.Value);
-                    if (!siteSettings.TryGetValue(siteId, out folderSettings))
-                    {
-                        folderSettings = new SiteFolderSettingsCollection();
-                    }
-                    folderSettings[textCurrentFolderName.Text] = currentFolderSettings;
-                    siteSettings[siteId] = folderSettings;
+                    var folderId = new Guid(hiddenFolderId.Value);
+                    var siteId = new Guid(hiddenSiteId.Value);
 
-                    settings.FolderSettings =
-                        FolderProcessingSettings.SerializeFolderSettings(siteSettings);
+                    var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(true);
+
+                    // Get the existing site folder settings collection (or create a new
+                    // one if none currently exists
+                    var siteSettings = settings.GetSiteSettings(siteId, true);
+
+                    var currentFolderSettings = new IdShieldFolderProcessingSettings(
+                        folderId, textFileExtension.Text,
+                        checkRecursively.Checked, checkAdded.Checked, checkModified.Checked,
+                        location, locationString, siteSettings);
+
+                    // Store the current folder settings
+                    siteSettings[folderId] = currentFolderSettings;
 
                     // Update the settings
                     settings.Update();

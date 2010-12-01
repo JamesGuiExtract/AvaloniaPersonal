@@ -25,7 +25,7 @@ namespace Extract.SharePoint.Redaction.Features
                 site = properties.Feature.Parent as SPSite;
                 if (site != null)
                 {
-                    IdShieldSettings.AddActiveFeatureSiteId(site.ID);
+                    IdShieldProcessingFeatureSettings.AddActiveFeatureSiteId(site.ID);
 
                     using (SPSite tempSite = new SPSite(site.ID))
                     using (SPWeb web = tempSite.RootWeb)
@@ -69,7 +69,7 @@ namespace Extract.SharePoint.Redaction.Features
                 site = properties.Feature.Parent as SPSite;
                 if (site != null)
                 {
-                    IdShieldSettings.RemoveActiveFeatureSiteId(site.ID);
+                    IdShieldProcessingFeatureSettings.RemoveActiveFeatureSiteId(site.ID);
 
                     // Remove the hidden list if it exists
                     using (SPSite tempSite = new SPSite(site.ID))
@@ -92,23 +92,6 @@ namespace Extract.SharePoint.Redaction.Features
             }
 
             base.FeatureDeactivating(properties);
-        }
-
-        /// <summary>
-        /// Raises the feature uninstalling event.
-        /// </summary>
-        /// <param name="properties">The properties for the feature being uninstalled.</param>
-        public override void FeatureUninstalling(SPFeatureReceiverProperties properties)
-        {
-            try
-            {
-                IdShieldSettings.RemoveIdShieldSettings();
-                base.FeatureUninstalling(properties);
-            }
-            catch (Exception ex)
-            {
-                ExtractSharePointLoggingService.LogError(ErrorCategoryId.Feature, ex, "ELI30551");
-            }
         }
     }
 }

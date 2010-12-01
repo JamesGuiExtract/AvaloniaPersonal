@@ -1,5 +1,4 @@
-﻿using Microsoft.SharePoint;
-using System;
+﻿using System;
 using System.Globalization;
 
 namespace Extract.SharePoint.Redaction
@@ -26,11 +25,12 @@ namespace Extract.SharePoint.Redaction
             {
                 AddMachineNameDebug(ex);
 
-                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
+                IdShieldProcessingFeatureSettings settings =
+                    IdShieldProcessingFeatureSettings.GetIdShieldSettings(false);
                 if (settings != null)
                 {
                     ExtractSharePointHelper.LogExceptionTcp(
-                        settings.ExceptionServiceIPAddress, ex, eliCode);
+                        settings.ExceptionServiceIpAddress, ex, eliCode);
                 }
             }
             catch (Exception ex2)

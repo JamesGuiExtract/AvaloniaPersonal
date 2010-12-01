@@ -1,20 +1,11 @@
 ﻿using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.ApplicationPages;
-using Microsoft.SharePoint.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-// Using statements to make dealing with folder settings more readable
-using SiteFolderSettingsCollection =
-System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
-using IdShieldFolderSettingsCollection =
-System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
-
-namespace Extract.SharePoint.Redaction.Layouts
+namespace Extract.SharePoint.Redaction.Administration.Layouts
 {
     /// <summary>
     /// Code behind file for the ID Shield configuration page
@@ -36,38 +27,32 @@ namespace Extract.SharePoint.Redaction.Layouts
                     return;
                 }
 
-                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
+                var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(false);
                 if (settings == null)
                 {
                     return;
                 }
 
                 textFolder.Text = settings.LocalWorkingFolder;
-                textExceptionIpAddress.Text = settings.ExceptionServiceIPAddress;
-                IdShieldFolderSettingsCollection allSettings =
-                    FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
+                textExceptionIpAddress.Text = settings.ExceptionServiceIpAddress;
+                var allSettings = settings.AllSiteFolderSettings;
                 if (allSettings != null)
                 {
-                    bool filled = false;
-                    foreach (KeyValuePair<Guid, SiteFolderSettingsCollection> pair in allSettings)
+                    foreach (Guid key in allSettings.Keys)
                     {
-                        using (SPSite site = new SPSite(pair.Key))
+                        using (SPSite site = new SPSite(key))
                         {
                             string tempSiteId = site.ID.ToString("D", CultureInfo.CurrentCulture);
                             string siteLabel = "Site Url: " + site.ServerRelativeUrl
                                 + " Site ID: " + tempSiteId;
                             dropWatchedSites.Items.Add(siteLabel);
-
-                            if (!filled)
-                            {
-                                foreach (string folder in pair.Value.Keys)
-                                {
-                                    listWatchedFolders.Items.Add(folder);
-                                }
-
-                                filled = true;
-                            }
                         }
+                    }
+
+                    if (dropWatchedSites.Items.Count > 0)
+                    {
+                        dropWatchedSites.SelectedIndex = 0;
+                        UpdateListForCurrentSiteSelection(GetSiteIdFromSelection());
                     }
                 }
             }
@@ -115,11 +100,12 @@ namespace Extract.SharePoint.Redaction.Layouts
                 }
 
                 // Get the selected string from the list
-                string folder = listWatchedFolders.SelectedValue;
+                var selectedItem = listWatchedFolders.SelectedItem;
+                var folderId = new Guid(selectedItem.Value);
                 Guid siteId = GetSiteIdFromSelection();
 
-                // Get the string from the drop down list
-                IdShieldSettings.RemoveFolderWatching(folder, siteId, false);
+                // Remove the folder watching
+                IdShieldProcessingFeatureSettings.RemoveFolderWatching(folderId, siteId);
 
                 // Update list for current selected site
                 UpdateListForCurrentSiteSelection(siteId);
@@ -152,18 +138,21 @@ namespace Extract.SharePoint.Redaction.Layouts
                 }
 
                 Guid siteId = GetSiteIdFromSelection();
-                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
+                var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(false);
                 if (settings == null)
                 {
                     return;
                 }
 
-                SiteFolderSettingsCollection siteSettings =
-                    FolderProcessingSettings.DeserializeFolderSettings(
-                    settings.FolderSettings, siteId);
+                IdShieldFolderSettingsCollection siteSettings = null;
+                if (!settings.AllSiteFolderSettings.TryGetValue(siteId, out siteSettings))
+                {
+                    return;
+                }
 
-                FolderProcessingSettings folderSettings = null;
-                if (siteSettings.TryGetValue(listWatchedFolders.SelectedValue, out folderSettings))
+                var folderId = new Guid(listWatchedFolders.SelectedItem.Value);
+                IdShieldFolderProcessingSettings folderSettings = null;
+                if (siteSettings.TryGetValue(folderId, out folderSettings))
                 {
                     textWatchFolderSettings.Text = folderSettings.ComputeHumanReadableSettingString();
                 }
@@ -197,9 +186,9 @@ namespace Extract.SharePoint.Redaction.Layouts
                     folder = folder.Substring(0, folder.Length - 1);
                 }
 
-                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(true);
+                var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(true);
                 settings.LocalWorkingFolder = folder;
-                settings.ExceptionServiceIPAddress = textExceptionIpAddress.Text.Trim();
+                settings.ExceptionServiceIpAddress = textExceptionIpAddress.Text.Trim();
                 settings.Update();
 
                 DisplaySettingsUpdatedMessage();
@@ -233,19 +222,32 @@ namespace Extract.SharePoint.Redaction.Layouts
         /// Updates the list control with the list of watched folders for the
         /// selected site.
         /// </summary>
-        /// <param name="siteId"></param>
+        /// <param name="siteId">The site ID.</param>
         void UpdateListForCurrentSiteSelection(Guid siteId)
         {
             listWatchedFolders.Items.Clear();
-            IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
-            SiteFolderSettingsCollection siteSettings =
-                FolderProcessingSettings.DeserializeFolderSettings(
-                settings.FolderSettings, siteId);
-            if (siteSettings != null)
+            var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(false);
+            if (settings == null)
             {
-                foreach (string key in siteSettings.Keys)
+                return;
+            }
+            IdShieldFolderSettingsCollection siteSettings = null;
+            if (!settings.AllSiteFolderSettings.TryGetValue(siteId, out siteSettings))
+            {
+                return;
+            }
+
+            using (var site = new SPSite(siteId))
+            {
+                SPWeb web = site.RootWeb;
+                foreach (var settingPair in siteSettings)
                 {
-                    listWatchedFolders.Items.Add(key);
+                    if (settingPair.Value != null)
+                    {
+                        var item = new ListItem(settingPair.Value.GetFolderPath(web),
+                            settingPair.Key.ToString("N", CultureInfo.InvariantCulture));
+                        listWatchedFolders.Items.Add(item);
+                    }
                 }
             }
         }

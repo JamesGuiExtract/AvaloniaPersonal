@@ -2,14 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading;
-
-// Using statements to make dealing with folder settings more readable
-using SiteFolderSettingsCollection =
-System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
-using IdShieldFolderSettingsCollection =
-System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
 
 namespace Extract.SharePoint.Redaction
 {
@@ -23,14 +15,7 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// Collection to manage the current folder watch settings.
         /// </summary>
-        SiteFolderSettingsCollection _folderSettings =
-            new SiteFolderSettingsCollection();
-
-        /// <summary>
-        /// Holds the folder serialization string so that it can be compared
-        /// and deserialized if the settings are updated.
-        /// </summary>
-        string _folderSettingsSerializationString = string.Empty;
+        IdShieldFolderSettingsCollection _folderSettings;
 
         /// <summary>
         /// The working folder that files should be written to for processing
@@ -105,47 +90,6 @@ namespace Extract.SharePoint.Redaction
             base.ItemDeleted(properties);
         }
 
-        /// <summary>
-        /// An item is updating.
-        /// </summary>
-        /// <param name="properties">The properties associated with the item event.</param>
-        public override void ItemUpdating(SPItemEventProperties properties)
-        {
-            try
-            {
-                if (properties.Cancel)
-                {
-                    return;
-                }
-
-                SPListItem item = properties.ListItem;
-                if (item != null && item.FileSystemObjectType == SPFileSystemObjectType.Folder)
-                {
-                    // Get the old and new folder values
-                    string oldFolder = properties.BeforeUrl;
-                    string newFolder = properties.AfterUrl;
-                    if (!oldFolder.StartsWith("/", StringComparison.Ordinal))
-                    {
-                        oldFolder = "/" + oldFolder;
-                    }
-                    if (!newFolder.StartsWith("/", StringComparison.Ordinal))
-                    {
-                        newFolder = "/" + newFolder;
-                    }
-
-                    // Update the settings
-                    IdShieldSettings.UpdateSettingsForRenamedFolder(oldFolder, newFolder,
-                        properties.SiteId);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, "ELI30614");
-            }
-
-            base.ItemUpdating(properties);
-        }
-
         #endregion Event Handlers
 
         #region Methods
@@ -157,28 +101,19 @@ namespace Extract.SharePoint.Redaction
         /// ItemDeleted event.</param>
         static void HandleSharePointItemDeleted(SPItemEventProperties properties)
         {
-            string folder = null;
-            try
+            var listItem = properties.ListItem;
+            if (listItem != null)
             {
-                // Get the possible folder name
-                folder = properties.BeforeUrl;
-                if (!folder.StartsWith("/", StringComparison.Ordinal))
+                var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(false);
+                if (settings != null)
                 {
-                    folder = "/" + folder;
+                    var folderSettings = settings.GetSiteSettings(properties.SiteId);
+                    if (folderSettings != null)
+                    {
+                        folderSettings.Remove(listItem.UniqueId);
+                        settings.Update();
+                    }
                 }
-
-                // Attempt to remove the folder watching (this call does nothing if the
-                // folder is not currently being watched).
-                IdShieldSettings.RemoveFolderWatching(folder, properties.Web.Site.ID, true);
-            }
-            catch (Exception ex)
-            {
-                if (!string.IsNullOrEmpty(folder))
-                {
-                    ex.Data.Add("Folder Name", folder);
-                }
-
-                throw;
             }
         }
 
@@ -217,8 +152,11 @@ namespace Extract.SharePoint.Redaction
                 }
 
                 // Check for an output folder (if none is configured then do nothing)
-                if (!string.IsNullOrEmpty(_workingFolder))
+                if (!string.IsNullOrEmpty(_workingFolder) && _folderSettings != null)
                 {
+                    var file = item.File;
+                    var parentFolder = file.ParentFolder;
+
                     // Get the folder name for the item
                     string folder = item.Url;
                     fileName = item.Name;
@@ -226,8 +164,10 @@ namespace Extract.SharePoint.Redaction
                         folder.Insert(0, "/") : folder).Replace("/" + fileName, "");
 
                     // Attempt to get the settings for the folder
-                    foreach (KeyValuePair<string, FolderProcessingSettings> pair in _folderSettings)
+                    foreach (KeyValuePair<Guid, IdShieldFolderProcessingSettings> pair in _folderSettings)
                     {
+                        var folderSettings = pair.Value;
+
                         // Export the file if:
                         // 1. This is a modified event and the file id is contained in the
                         //      zero byte file list
@@ -237,9 +177,10 @@ namespace Extract.SharePoint.Redaction
                         // 3. The file matches the watch pattern
                         if ((eventType == FileEventType.FileModified
                                 && _zeroByteFiles.Contains(item.UniqueId))
-                            || ((pair.Value.EventTypes & eventType) != 0
-                                && IsFolderBeingWatched(folder, pair.Key, pair.Value.RecurseSubfolders)
-                                && pair.Value.DoesFileMatchPattern(fileName)
+                            || ((folderSettings.EventTypes & eventType) != 0
+                                && IsFolderBeingWatched(folder,
+                                folderSettings.GetFolderPath(item.Web), folderSettings.RecurseSubfolders)
+                                && folderSettings.DoesFileMatchPattern(fileName)
                             ))
                         {
                             using (SPSite tempSite = new SPSite(properties.SiteId))
@@ -248,14 +189,13 @@ namespace Extract.SharePoint.Redaction
                                 SPList list = web.Lists[item.ParentList.ID];
                                 SPListItem fileItem = list.GetItemByUniqueId(item.UniqueId);
 
-
-
                                 byte[] bytes = fileItem.File.OpenBinary(SPOpenBinaryOptions.SkipVirusScan);
                                 if (bytes.Length == 0 && eventType == FileEventType.FileAdded)
                                 {
                                     // Add this file ID to a list of pending ID's to be
                                     // handled in the update method
-                                    IdShieldSettings.AddZeroByteFileId(fileItem.File.UniqueId);
+                                    IdShieldProcessingFeatureSettings.AddZeroByteFileId(
+                                        fileItem.File.UniqueId);
                                 }
                                 else if (bytes.Length > 0)
                                 {
@@ -274,7 +214,8 @@ namespace Extract.SharePoint.Redaction
 
                                     if (_zeroByteFiles.Contains(fileItem.File.UniqueId))
                                     {
-                                        IdShieldSettings.RemoveZeroByteFileId(fileItem.File.UniqueId);
+                                        IdShieldProcessingFeatureSettings.RemoveZeroByteFileId(
+                                            fileItem.File.UniqueId);
                                     }
                                 }
                             }
@@ -363,22 +304,14 @@ namespace Extract.SharePoint.Redaction
         {
             lock (_lock)
             {
-                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
+                var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(false);
                 if (settings == null)
                 {
                     _workingFolder = string.Empty;
                     _folderSettings = null;
-                    _folderSettingsSerializationString = string.Empty;
                     return;
                 }
-                string temp = settings.FolderSettings;
-                if (temp.Length != _folderSettingsSerializationString.Length
-                    || !temp.Equals(_folderSettingsSerializationString, StringComparison.Ordinal))
-                {
-                    _folderSettings =
-                        FolderProcessingSettings.DeserializeFolderSettings(temp, siteId);
-                    _folderSettingsSerializationString = temp;
-                }
+                _folderSettings = settings.GetSiteSettings(siteId);
 
                 if (!string.IsNullOrEmpty(settings.LocalWorkingFolder))
                 {
@@ -401,7 +334,7 @@ namespace Extract.SharePoint.Redaction
                     }
                 }
 
-                _zeroByteFiles = new HashSet<Guid>(settings.AddedZeroByteFiles);
+                _zeroByteFiles = new HashSet<Guid>(settings.ZeroByteFiles);
             }
         }
 

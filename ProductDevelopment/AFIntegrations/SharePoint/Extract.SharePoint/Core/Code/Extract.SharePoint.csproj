@@ -75,16 +75,22 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtractProcessingFeatureSettings.cs" />
     <Compile Include="ExtractSharePointHelper.cs" />
     <Compile Include="ExtractSharePointLoggingService.cs" />
+    <Compile Include="Features\Extract.SharePoint.Redaction.Administration\Extract.SharePoint.Redaction.EventReceiver.cs">
+      <DependentUpon>Extract.SharePoint.Redaction.Administration.feature</DependentUpon>
+    </Compile>
     <Compile Include="Features\Extract.SharePoint.Redaction\Extract.SharePoint.Redaction.EventReceiver.cs">
       <DependentUpon>Extract.SharePoint.Redaction.feature</DependentUpon>
     </Compile>
     <Compile Include="FolderProcessingSettings.cs" />
     <Compile Include="IdShieldFileListener\IdShieldFileListener.cs" />
+    <Compile Include="IdShieldFolderProcessingSettings.cs" />
+    <Compile Include="IdShieldFolderSettingsCollection.cs" />
     <Compile Include="IdShieldFolderSweeper.cs" />
     <Compile Include="IdShieldHelper.cs" />
-    <Compile Include="IdShieldSettings.cs" />
+    <Compile Include="IdShieldProcessingFeatureSettings.cs" />
     <Compile Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx.cs">
       <DependentUpon>RemoveWatchFolderWithIdShield.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -138,6 +144,7 @@
     </None>
     <None Include="Package\Package.Template.xml">
       <DependentUpon>Package.package</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -146,9 +153,11 @@
   <ItemGroup>
     <Content Include="Features\Extract.SharePoint.Redaction\Extract.SharePoint.Redaction.Template.xml">
       <DependentUpon>Extract.SharePoint.Redaction.feature</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Features\Extract.SharePoint.Redaction.Administration\Extract.SharePoint.Redaction.Administration.Template.xml">
       <DependentUpon>Extract.SharePoint.Redaction.Administration.feature</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="IdShieldAdminConfiguration\Elements.xml">
       <SubType>Designer</SubType>
@@ -173,10 +182,10 @@
     <Content Include="Layouts\Extract.SharePoint.Redaction\RemoveWatchFolderWithIdShield.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx">
+    <Content Include="ADMIN\Extract.SharePoint.Redaction\ConfigureIdShieldSettings.aspx" />
+    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Layouts\Extract.SharePoint.Redaction\WatchFolderWithIdShield.aspx" />
     <Content Include="Layouts\Extract.SharePoint\EnableHelpers.js" />
   </ItemGroup>
   <ItemGroup>

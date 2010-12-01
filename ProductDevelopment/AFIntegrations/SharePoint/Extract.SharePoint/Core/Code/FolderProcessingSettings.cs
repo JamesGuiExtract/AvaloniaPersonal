@@ -1,37 +1,17 @@
 ﻿using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-
-// Using statements to make dealing with folder settings more readable
-using SiteFolderSettingsCollection =
-System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
-using IdShieldFolderSettingsCollection =
-System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
 
 namespace Extract.SharePoint
 {
     /// <summary>
-    /// Enumeration to indicate where redacted files should be placed when processed.
-    /// </summary>
-    internal enum IdShieldOutputLocation
-    {
-        ParallelFolderPrefix = 0,
-        ParallelFolderSuffix = 1,
-        Subfolder = 2,
-        PrefixFilename = 3,
-        SuffixFilename = 4,
-        MirrorDocumentLibrary = 5
-    }
-
-    /// <summary>
     /// Enumeration indicating what type of events that the receiver should listen for.
     /// </summary>
     [Flags]
+    [System.Runtime.InteropServices.GuidAttribute("54372C02-B371-497E-8F17-91187F1DF0B3")]
     internal enum FileEventType
     {
         FileNone = 0x0,
@@ -46,53 +26,39 @@ namespace Extract.SharePoint
     /// <summary>
     /// Class to hold the settings for the folder that will be processed.
     /// </summary>
-    [Serializable]
-    internal class FolderProcessingSettings : ISerializable
+    [System.Runtime.InteropServices.GuidAttribute("68CF2931-ECA7-4962-BD0A-04812042E8D1")]
+    internal class FolderProcessingSettings : SPPersistedObject
     {
-        #region Constants
-
-        /// <summary>
-        /// Current version of the settings class.
-        /// </summary>
-        static readonly int _CURRENT_VERSION = 1;
-
-        #endregion Constants
-
         #region Fields
 
         /// <summary>
-        /// The path of the folder to watch (relative to the SPWeb root)
+        /// The unique ID for the watched folder.
         /// </summary>
-        string _folderPath;
+        [Persisted]
+        Guid _folderId;
 
         /// <summary>
         /// Semicolon separeted list of file extensions to watch.
         /// </summary>
+        [Persisted]
         string _fileExtensions;
 
         /// <summary>
         /// List of the file extensions to watch (parsed from the _fileExtensions value)
         /// </summary>
-        List<string> _fileExtensionList = new List<string>();
+        [Persisted]
+        List<string> _fileExtensionList;
 
         /// <summary>
         /// Whether folders should be watched recursively
         /// </summary>
+        [Persisted]
         bool _recurse;
-
-        /// <summary>
-        /// The location in SharePoint that the redacted files should be placed
-        /// </summary>
-        IdShieldOutputLocation _outputLocation;
-
-        /// <summary>
-        /// The output location string (meaning of this string is related to _outputLocation)
-        /// </summary>
-        string _outputLocationString;
 
         /// <summary>
         /// The event types to listen for
         /// </summary>
+        [Persisted]
         FileEventType _eventType;
 
         #endregion Fields
@@ -103,58 +69,28 @@ namespace Extract.SharePoint
         /// Initializes a new instance of the <see cref="FolderProcessingSettings"/> class.
         /// </summary>
         public FolderProcessingSettings()
+            : base()
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FolderProcessingSettings"/> class.
         /// </summary>
-        /// <param name="folderPath">The path of the folder to watch.</param>
-        /// <param name="fileExtensions">The list of file extensions to watch for.</param>
-        /// <param name="recurse">Whether to recursively watch subfolders or not.</param>
-        /// <param name="added">Whether to watch files that are added.</param>
-        /// <param name="modified">Whether to watch files that are modified.</param>
-        /// <param name="outputLocation">The output location for the redacted file.</param>
-        /// <param name="outputLocationString">The output location for the redacted file
-        /// (this value's meaning is determined by <paramref name="outputLocation"/>.</param>
-        public FolderProcessingSettings(string folderPath, string fileExtensions,
-            bool recurse, bool added, bool modified, IdShieldOutputLocation outputLocation,
-            string outputLocationString)
+        /// <param name="folderId">The folder id.</param>
+        /// <param name="fileExtensions">The file extensions to watch for.</param>
+        /// <param name="recursive">If watching should be recursive.</param>
+        /// <param name="added">If watching added events.</param>
+        /// <param name="modified">If watching modified events.</param>
+        /// <param name="parent">The parent.</param>
+        protected FolderProcessingSettings(Guid folderId, string fileExtensions, bool recursive,
+            bool added, bool modified, SPPersistedObject parent)
+            : base(Guid.NewGuid().ToString("N"), parent)
         {
-            _folderPath = folderPath;
+            _folderId = folderId;
             FileExtensions = fileExtensions;
-            _recurse = recurse;
+            _recurse = recursive;
             ProcessAddedFiles = added;
             ProcessModifiedFiles = modified;
-            _outputLocation = outputLocation;
-            _outputLocationString = outputLocationString;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FolderProcessingSettings"/> class
-        /// from a serialized version of the class.
-        /// </summary>
-        /// <param name="info">The serialization info to read from.</param>
-        /// <param name="context">The context for the serialization stream.</param>
-        protected FolderProcessingSettings(SerializationInfo info, StreamingContext context)
-        {
-            int version = info.GetInt32("CurrentVersion");
-            if (version > _CURRENT_VERSION)
-            {
-                var ex = new FormatException("Unrecognized object version.");
-                ex.Data["VersionLoaded"] = version;
-                ex.Data["MaxVersion"] = _CURRENT_VERSION;
-                throw ex;
-            }
-
-            _folderPath = info.GetString("FolderPath");
-            FileExtensions = info.GetString("FileExtensions");
-            _recurse = info.GetBoolean("Recurse");
-            ProcessAddedFiles = info.GetBoolean("Added");
-            ProcessModifiedFiles = info.GetBoolean("Modified");
-            _outputLocation = (IdShieldOutputLocation)Enum.Parse(typeof(IdShieldOutputLocation),
-                info.GetString("OutputLocation"));
-            _outputLocationString = info.GetString("OutputLocationString");
         }
 
         #endregion Constructors
@@ -168,7 +104,7 @@ namespace Extract.SharePoint
         {
             get
             {
-                return _fileExtensions;
+                return _fileExtensions ?? string.Empty;
             }
             set
             {
@@ -179,7 +115,7 @@ namespace Extract.SharePoint
         }
 
         /// <summary>
-        /// Gets whether subfolders should be recursively searched.
+        /// Gets or sets whether subfolders should be recursively searched.
         /// </summary>
         public bool RecurseSubfolders
         {
@@ -190,7 +126,7 @@ namespace Extract.SharePoint
         }
 
         /// <summary>
-        /// Gets/sets whether added files should be processed.
+        /// Gets or sets whether added files should be processed.
         /// </summary>
         public bool ProcessAddedFiles
         {
@@ -212,7 +148,7 @@ namespace Extract.SharePoint
         }
 
         /// <summary>
-        /// Gets/sets whether modified files should be processed.
+        /// Gets or sets whether modified files should be processed.
         /// </summary>
         public bool ProcessModifiedFiles
         {
@@ -234,30 +170,7 @@ namespace Extract.SharePoint
         }
 
         /// <summary>
-        /// Gets the output location for the for the redacted file.
-        /// </summary>
-        public IdShieldOutputLocation OutputLocation
-        {
-            get
-            {
-                return _outputLocation;
-            }
-        }
-
-        /// <summary>
-        /// Gets the output location string for the redacted file. This values
-        /// meaning is based on the value of <see cref="OutputLocation"/>.
-        /// </summary>
-        public string OutputLocationString
-        {
-            get
-            {
-                return _outputLocationString;
-            }
-        }
-
-        /// <summary>
-        /// Gets/sets the event types to listen for.
+        /// Gets the event types to listen for.
         /// </summary>
         public FileEventType EventTypes
         {
@@ -272,11 +185,29 @@ namespace Extract.SharePoint
         #region Methods
 
         /// <summary>
+        /// Indicates whether this persisted class has additional update access
+        /// </summary>
+        /// <returns><see langword="true"/></returns>
+        protected override bool HasAdditionalUpdateAccess()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// Updates the file extension list based on the current value of
         /// <see cref="FileExtensions"/>.
         /// </summary>
         void UpdateFileExtensionList()
         {
+            if (_fileExtensionList == null)
+            {
+                _fileExtensionList = new List<string>();
+            }
+            else
+            {
+                _fileExtensionList.Clear();
+            }
+
             _fileExtensionList.AddRange(_fileExtensions.Split(
                 new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
         }
@@ -291,11 +222,14 @@ namespace Extract.SharePoint
         /// does not match.</returns>
         internal bool DoesFileMatchPattern(string fileName)
         {
-            foreach (string pattern in _fileExtensionList)
+            if (_fileExtensionList != null)
             {
-                if (StringType.StrLikeText(fileName, pattern))
+                foreach (string pattern in _fileExtensionList)
                 {
-                    return true;
+                    if (StringType.StrLikeText(fileName, pattern))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -303,86 +237,41 @@ namespace Extract.SharePoint
         }
 
         /// <summary>
-        /// Helper method that takes a collection of <see cref="FolderProcessingSettings"/>
-        /// objects and serializes them to a string of hex digits.
+        /// Gets the folder path.
         /// </summary>
-        /// <param name="settings">The collection to serialize.</param>
-        /// <returns>A string of hex digits representing a binary serialization of
-        /// the collection passed in.</returns>
-        internal static string SerializeFolderSettings(IdShieldFolderSettingsCollection settings)
+        /// <param name="web">The web.</param>
+        /// <returns>Either the path to the folder/list or <see cref="String.Empty"/> if
+        /// the item does not exist.</returns>
+        internal string GetFolderPath(SPWeb web)
         {
-            BinaryFormatter serializer = new BinaryFormatter();
-            using (MemoryStream stream = new MemoryStream())
+            string folderPath = string.Empty; 
+            try
             {
-                serializer.Serialize(stream, settings);
-                string result = BitConverter.ToString(stream.ToArray());
-                result = result.Replace("-", "");
+                SPFolder folder = web.GetFolder(_folderId);
+                if (folder.Exists)
+                {
+                    folderPath = folder.ServerRelativeUrl;
+                }
 
-                return result;
+                // Its not a folder, try getting it as a list
+                if (string.IsNullOrEmpty(folderPath))
+                {
+                    SPList list = web.Lists[_folderId];
+                    folderPath = list.RootFolder.ServerRelativeUrl;
+                }
             }
-        }
-
-        /// <summary>
-        /// Helper method that takes a hex string serialization of a collection of
-        /// <see cref="FolderProcessingSettings"/> objects and deserializes them
-        /// back to a collection.
-        /// </summary>
-        /// <param name="settings">A string of hex digits representing a binary serialization
-        /// of a collection of <see cref="FolderProcessingSettings"/>.</param>
-        /// <returns>The deserialized collection of <see cref="FolderProcessingSettings"/>.
-        /// </returns>
-        internal static IdShieldFolderSettingsCollection
-            DeserializeFolderSettings(string settings)
-        {
-            // If the string is empty just return an empty dictionary
-            if (string.IsNullOrEmpty(settings))
+            catch
             {
-                return new IdShieldFolderSettingsCollection();
             }
 
-            int length = settings.Length;
-            byte[] bytes = new byte[length / 2];
-            for (int i = 0; i < length; i += 2)
-            {
-                bytes[i / 2] = Convert.ToByte(settings.Substring(i, 2), 16);
-            }
-
-            using (MemoryStream stream = new MemoryStream(bytes))
-            {
-                BinaryFormatter serializer = new BinaryFormatter();
-                IdShieldFolderSettingsCollection folderSettings =
-                    (IdShieldFolderSettingsCollection)serializer.Deserialize(stream);
-
-                return folderSettings;
-            }
-        }
-
-        /// <summary>
-        /// Deserializes the folder settings collection and returns the folder settings
-        /// collection for the specified site.
-        /// </summary>
-        /// <param name="settings">The settings string to deserialize.</param>
-        /// <param name="siteId">The site ID to get settings for..</param>
-        /// <returns>The folder settings collection for the specified server relative site
-        /// location.</returns>
-        internal static SiteFolderSettingsCollection
-            DeserializeFolderSettings(string settings, Guid siteId)
-        {
-            IdShieldFolderSettingsCollection value = DeserializeFolderSettings(settings);
-            SiteFolderSettingsCollection result;
-            if (value.TryGetValue(siteId, out result))
-            {
-                return result;
-            }
-
-            return new SiteFolderSettingsCollection();
+            return folderPath;
         }
 
         /// <summary>
         /// Computes a human readable string version of the folder settings.
         /// </summary>
         /// <returns>A human readable stringized version of the folder settings.</returns>
-        internal string ComputeHumanReadableSettingString()
+        virtual internal string ComputeHumanReadableSettingString()
         {
             StringBuilder sb = new StringBuilder();
             if (_recurse)
@@ -408,60 +297,15 @@ namespace Extract.SharePoint
             {
                 sb.AppendLine("modified events");
             }
-
-            sb.Append("Output files to ");
-            switch (_outputLocation)
+            else
             {
-                case IdShieldOutputLocation.PrefixFilename:
-                    sb.Append("the same folder with a file name prefixed with: ");
-                    break;
-
-                case IdShieldOutputLocation.SuffixFilename:
-                    sb.Append("the same folder with a file name suffixed with: ");
-                    break;
-
-                case IdShieldOutputLocation.ParallelFolderPrefix:
-                    sb.Append("a parallel folder of the same name prefixed with: ");
-                    break;
-
-                case IdShieldOutputLocation.ParallelFolderSuffix:
-                    sb.Append("a parallel folder of the same name suffixed with: ");
-                    break;
-
-                case IdShieldOutputLocation.Subfolder:
-                    sb.Append("a sub folder with the name: ");
-                    break;
-
-                case IdShieldOutputLocation.MirrorDocumentLibrary:
-                    sb.Append("a mirrored document library called: ");
-                    break;
+                sb.Replace("Watching for ", "Not watching for any events");
+                sb.AppendLine();
             }
-            sb.AppendLine(_outputLocationString);
 
             return sb.ToString();
         }
 
         #endregion Methods
-
-        #region ISerializable Members
-
-        /// <summary>
-        /// Gets the current settings as object as a serialization stream.
-        /// </summary>
-        /// <param name="info">The serialization info to write to.</param>
-        /// <param name="context">The context for the serialization stream.</param>
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("CurrentVersion", _CURRENT_VERSION);
-            info.AddValue("FolderPath", _folderPath);
-            info.AddValue("FileExtensions", _fileExtensions);
-            info.AddValue("Recurse", _recurse);
-            info.AddValue("Added", ProcessAddedFiles);
-            info.AddValue("Modified", ProcessModifiedFiles);
-            info.AddValue("OutputLocation", _outputLocation.ToString("G"));
-            info.AddValue("OutputLocationString", _outputLocationString);
-        }
-
-        #endregion
     }
 }

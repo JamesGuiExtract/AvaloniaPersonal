@@ -2,14 +2,7 @@
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using System;
-using System.Collections.Generic;
 using System.Text;
-
-// Using statements to make dealing with folder settings more readable
-using SiteFolderSettingsCollection =
-System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
-using IdShieldFolderSettingsCollection =
-System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
 
 namespace Extract.SharePoint.Redaction.Layouts
 {
@@ -46,26 +39,28 @@ namespace Extract.SharePoint.Redaction.Layouts
                 Guid siteGuid = new Guid(siteId);
                 currentFolder = ExtractSharePointHelper.GetSiteRelativeFolderPath(currentFolder,
                     siteGuid);
-
                 textFolder.Text = currentFolder;
-                IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
-                if (settings == null)
+                using (var site = new SPSite(siteGuid))
                 {
-                    SetUIToIndicateNoFolderWatching();
-                    return;
-                }
+                    var folderId = ExtractSharePointHelper.GetFolderId(site.RootWeb, currentFolder);
+                    hiddenFolderId.Value = folderId.ToString();
+                    var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(false);
+                    if (settings == null)
+                    {
+                        SetUIToIndicateNoFolderWatching();
+                        return;
+                    }
 
-                SiteFolderSettingsCollection folderSettings =
-                    FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings,
-                    siteGuid);
-                    
-                if (!folderSettings.ContainsKey(currentFolder))
-                {
-                    SetUIToIndicateNoFolderWatching();
-                    return;
-                }
+                    var siteFolderSettings = settings.GetSiteSettings(siteGuid);
 
-                labelMessage.Text = "Remove the watching for this folder?";
+                    if (siteFolderSettings == null || !siteFolderSettings.ContainsKey(folderId))
+                    {
+                        SetUIToIndicateNoFolderWatching();
+                        return;
+                    }
+
+                    labelMessage.Text = "Remove the watching for this folder?";
+                }
             }
             catch (Exception ex)
             {
@@ -95,12 +90,14 @@ namespace Extract.SharePoint.Redaction.Layouts
         {
             try
             {
+                var siteId = new Guid(hiddenSiteId.Value);
+                var folderId = new Guid(hiddenFolderId.Value);
                 bool watchRemoved = false;
                 SPUtility.ValidateFormDigest();
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    watchRemoved = IdShieldSettings.RemoveFolderWatching(textFolder.Text,
-                        new Guid(hiddenSiteId.Value), false);
+                    watchRemoved =
+                        IdShieldProcessingFeatureSettings.RemoveFolderWatching(siteId, folderId);
                 });
 
                 StringBuilder sb = new StringBuilder("<script type=\"text/javascript\">");

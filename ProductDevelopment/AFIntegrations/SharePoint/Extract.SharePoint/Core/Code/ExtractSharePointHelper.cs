@@ -1,8 +1,8 @@
 ﻿using Extract.ExceptionService;
+using Microsoft.SharePoint;
 using System;
 using System.ServiceModel;
 using System.Text;
-using Microsoft.SharePoint;
 
 namespace Extract.SharePoint
 {
@@ -87,6 +87,25 @@ namespace Extract.SharePoint
             }
 
             return folder;
+        }
+
+        /// <summary>
+        /// Gets the folder id.
+        /// </summary>
+        /// <param name="web">The web.</param>
+        /// <param name="folderPath">The current folder.</param>
+        /// <returns>The unique Id for the folder.</returns>
+        static internal Guid GetFolderId(SPWeb web, string folderPath)
+        {
+            var sb = new StringBuilder(web.Url);
+            sb.Append(folderPath);
+            var folder = web.GetFolder(sb.ToString());
+            if (!folder.Exists)
+            {
+                throw new SPException("Cannot find folder.");
+            }
+
+            return folder.UniqueId;
         }
 
         #endregion Methods

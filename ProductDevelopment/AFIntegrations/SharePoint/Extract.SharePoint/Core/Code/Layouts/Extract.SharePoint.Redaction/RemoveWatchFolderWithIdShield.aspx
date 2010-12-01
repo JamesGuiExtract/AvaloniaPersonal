@@ -22,6 +22,7 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 <asp:HiddenField ID="hiddenSiteId" runat="server" />
+<asp:HiddenField ID="hiddenFolderId" runat="server" />
 <asp:Panel ID="panelTop" runat="server" GroupingText="Folder settings" ForeColor="Black">
 <table>
     <tr>

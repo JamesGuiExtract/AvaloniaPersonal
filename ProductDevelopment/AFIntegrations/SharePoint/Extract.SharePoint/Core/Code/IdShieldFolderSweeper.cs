@@ -6,12 +6,6 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-// Using statements to make dealing with folder settings more readable
-using SiteFolderSettingsCollection =
-System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>;
-using IdShieldFolderSettingsCollection =
-System.Collections.Generic.Dictionary<System.Guid, System.Collections.Generic.SortedDictionary<string, Extract.SharePoint.FolderProcessingSettings>>;
-
 namespace Extract.SharePoint.Redaction
 {
     /// <summary>
@@ -51,7 +45,7 @@ namespace Extract.SharePoint.Redaction
         /// <summary>
         /// The collection of folder settings keyed by the site id.
         /// </summary>
-        IdShieldFolderSettingsCollection _folderSettings;
+        Dictionary<Guid, IdShieldFolderSettingsCollection> _allSiteFolderSettings;
 
         /// <summary>
         /// Collection of sites which have the ID Shield feature activated.
@@ -219,8 +213,8 @@ namespace Extract.SharePoint.Redaction
             try
             {
                 // Get the folder settings
-                SiteFolderSettingsCollection folderSettings;
-                if (!_folderSettings.TryGetValue(siteId, out folderSettings))
+                IdShieldFolderSettingsCollection folderSettings = null;
+                if (!_allSiteFolderSettings.TryGetValue(siteId, out folderSettings))
                 {
                     return;
                 }
@@ -263,7 +257,7 @@ namespace Extract.SharePoint.Redaction
                             string destinationFileName = GetDestinationFileName(fileName,
                                 workingFolder + "\\",
                                 Path.GetExtension(Path.GetFileNameWithoutExtension(redactedFile)),
-                                folderSettings);
+                                folderSettings, web);
 
                             // Ensure the redacted file exists and the destination
                             // file name is not null or empty
@@ -497,14 +491,18 @@ namespace Extract.SharePoint.Redaction
         /// Gets the name of the destination file based on the current settings.
         /// </summary>
         /// <param name="fullPath">The full path to the .processed file.</param>
-        /// <param name="folderSettings">The settings collection to use to
-        /// build the destination file name.</param>
-        /// <param name="redactedExtension">The extension of the redacted file.</param>
         /// <param name="watchPath">The watch folder that is being monitored for
         /// processed documents.</param>
-        /// <returns>The destination for the file within the SP document library.</returns>
+        /// <param name="redactedExtension">The extension of the redacted file.</param>
+        /// <param name="folderSettings">The settings collection to use to
+        /// build the destination file name.</param>
+        /// <param name="web">The web containing the file.</param>
+        /// <returns>
+        /// The destination for the file within the SP document library.
+        /// </returns>
         static string GetDestinationFileName(string fullPath, string watchPath,
-            string redactedExtension, SiteFolderSettingsCollection folderSettings)
+            string redactedExtension, IdShieldFolderSettingsCollection folderSettings,
+            SPWeb web)
         {
             StringBuilder destination = new StringBuilder();
             string fileName = Path.GetFileNameWithoutExtension(fullPath);
@@ -520,15 +518,16 @@ namespace Extract.SharePoint.Redaction
             }
 
             // Find the folder settings
-            foreach (KeyValuePair<string, FolderProcessingSettings> pair in folderSettings)
+            foreach (KeyValuePair<Guid, IdShieldFolderProcessingSettings> pair in folderSettings)
             {
-                FolderProcessingSettings settings = pair.Value;
-                if (folder.Equals(pair.Key, StringComparison.Ordinal)
-                    || (folder.StartsWith(pair.Key + "/", StringComparison.Ordinal)
-                    && settings.RecurseSubfolders))
+                var folderSetting = pair.Value;
+                string settingsPath = folderSetting.GetFolderPath(web);
+                if (folder.Equals(settingsPath, StringComparison.Ordinal)
+                    || (folder.StartsWith(settingsPath + "/", StringComparison.Ordinal)
+                    && folderSetting.RecurseSubfolders))
                 {
                     // Compute the destination setting
-                    switch (settings.OutputLocation)
+                    switch (folderSetting.IdShieldOutputLocation)
                     {
                         case IdShieldOutputLocation.ParallelFolderPrefix:
                         case IdShieldOutputLocation.ParallelFolderSuffix:
@@ -539,9 +538,9 @@ namespace Extract.SharePoint.Redaction
 
                             destination.Append(folderUpOne);
                             destination.Append("/");
-                            if (settings.OutputLocation == IdShieldOutputLocation.ParallelFolderPrefix)
+                            if (folderSetting.IdShieldOutputLocation == IdShieldOutputLocation.ParallelFolderPrefix)
                             {
-                                destination.Append(settings.OutputLocationString);
+                                destination.Append(folderSetting.IdShieldOutputLocationString);
                                 destination.Append("_");
                                 destination.Append(topFolder);
                             }
@@ -549,7 +548,7 @@ namespace Extract.SharePoint.Redaction
                             {
                                 destination.Append(topFolder);
                                 destination.Append("_");
-                                destination.Append(settings.OutputLocationString);
+                                destination.Append(folderSetting.IdShieldOutputLocationString);
                             }
 
                             destination.Append("/");
@@ -559,7 +558,7 @@ namespace Extract.SharePoint.Redaction
                         case IdShieldOutputLocation.Subfolder:
                             destination.Append(folder);
                             destination.Append("/");
-                            destination.Append(settings.OutputLocationString);
+                            destination.Append(folderSetting.IdShieldOutputLocationString);
                             destination.Append("/");
                             destination.Append(fileName);
                             break;
@@ -568,9 +567,9 @@ namespace Extract.SharePoint.Redaction
                         case IdShieldOutputLocation.SuffixFilename:
                             destination.Append(folder);
                             destination.Append("/");
-                            if (settings.OutputLocation == IdShieldOutputLocation.PrefixFilename)
+                            if (folderSetting.IdShieldOutputLocation == IdShieldOutputLocation.PrefixFilename)
                             {
-                                destination.Append(settings.OutputLocationString);
+                                destination.Append(folderSetting.IdShieldOutputLocationString);
                                 destination.Append("_");
                                 destination.Append(fileName);
                             }
@@ -580,7 +579,7 @@ namespace Extract.SharePoint.Redaction
                                 string name = Path.GetFileNameWithoutExtension(fileName);
                                 destination.Append(name);
                                 destination.Append("_");
-                                destination.Append(settings.OutputLocationString);
+                                destination.Append(folderSetting.IdShieldOutputLocationString);
                                 destination.Append(extension);
                             }
                             break;
@@ -594,7 +593,7 @@ namespace Extract.SharePoint.Redaction
 
                             // Set destination to parallel location in specified library
                             destination.Append(dest.Replace(match.Value,
-                                settings.OutputLocationString));
+                                folderSetting.IdShieldOutputLocationString));
                             destination.Append(fileName);
                             break;
                     }
@@ -610,14 +609,14 @@ namespace Extract.SharePoint.Redaction
         /// </summary>
         void UpdateSettings()
         {
-            IdShieldSettings settings = IdShieldSettings.GetIdShieldSettings(false);
+            var settings = IdShieldProcessingFeatureSettings.GetIdShieldSettings(false);
             if (settings == null)
             {
                 _localWorkingFolder = string.Empty;
-                _folderSettings = null;
+                _allSiteFolderSettings = null;
                 return;
             }
-            _folderSettings = FolderProcessingSettings.DeserializeFolderSettings(settings.FolderSettings);
+            _allSiteFolderSettings = settings.AllSiteFolderSettings;
             _localWorkingFolder = settings.LocalWorkingFolder;
             _activeSites = new HashSet<Guid>(settings.ActiveSites);
         }
