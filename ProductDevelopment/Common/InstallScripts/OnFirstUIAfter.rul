@@ -24,6 +24,9 @@ begin
 	// Install the ESFAMService.exe 
 	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");
 
+	// Install the ESFDRSService.exe 
+	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFDRSService.exe\"");
+
     Disable(STATUSEX);
 
 	if ( gbInstalled ) then
