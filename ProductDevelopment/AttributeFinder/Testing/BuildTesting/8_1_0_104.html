@@ -1,0 +1,369 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.104 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.104 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>[DataEntry #156]</b>
+        <ul>
+            <li>Confirm the presence and correct behavior of an undo button.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1024]</b>
+        <ul>
+            <li>Run the FLEX Index demo rules on the demo images and queue the images for
+            verification.</li>
+            <li>Begin verification. Click in the city cell of the return address table.</li>
+            <li>Click in another field in a different table.</li>
+            <li>Click on the city cell again.</li>
+            <li>Confirm that processfiles.exe does not become unresponsive.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1028]</b>
+        <ul>
+            <li>Open verification in the FLEX Index demo.</li>
+            <li>Confirm the presence of a "Save and commit" tooltip and menu item.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1029]</b> Wrong control active
+        <ul>
+            <li>Open Example01.tif from the FLEX Index demo.</li>
+            <li>Add some rows to the Parties table.</li>
+            <li>Click in the Parcel Number field.</li>
+            <li>Press F3 or Go to next invalid. It should take you to the city field.</li>
+            <li>Swipe something.</li>
+            <li>Press Undo repeatedly.</li>
+            <li>Confirm that focus moves to the appropriate field.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1030]</b>
+        <ul>
+            <li>Open a FLEX Index demo image for verification.</li>
+            <li>Select all the cells in the Return Address table.</li>
+            <li>Swipe an address.</li>
+            <li>Hit undo.</li>
+            <li>Confirm that the table cells revert to their previous values.</li>
+            <li>Confirm that the reurn address table remains accessible via the Tab key.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1031]</b>
+        <ul>
+            <li>Open a document for verification on which a parcel number was found.</li>
+            <li>Swipe something multiline into that field. It should replace the current 
+            value.</li>
+            <li>Hit the undo button.</li>
+            <li>Swipe something multiline again.</li>
+            <li>Hit the undo button and confirm correct behavior.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1033]</b>
+        <ul>
+            <li>Open a document for verification that contains a populated text box field.</li>
+            <li>Place the cursor at the end of the field.</li>
+            <li>Swipe some additional text.</li>
+            <li>Press undo and confirm correct behavior.</li>
+        </ul></li>
+    <p>
+        <li>SQLCDBEditor
+        <ul>
+            <li><b>[DotNETRC #526]</b> Confirm that the usage message is correct.</li>
+        <p>
+        </ul></li>
+    <p>
+        <li>FAMNetworkManager
+        <ul>
+            <li><b>[DotNETRC #530]</b> Confirm utility exists.</li>
+            <li><b>[DotNETRC #532]</b> Confirm that window location and state are correctly
+            persisted.</li>
+            <li><b>[DotNETRC #534]</b> Confirm utility is included in ID Shield and FLEX Index
+            installs.</li>
+            <li><b>[DotNETRC #535]</b> Confirm menu includes Save and Save As options.</li>
+        <p>
+            <li><b>[DotNETRC #536]</b> Select a remotely monitored machine.</li>
+            <li>Hit the Modify service database button.</li>
+            <li>Confirm that the database editor's title bar tells you which database you are
+            editing (does not just have path to tmp file).</li>
+        <p>
+            <li><b>[DotNETRC #537]</b> Configure the network manager to monitor a machine that
+            doesn't exist.</li>
+            <li>Set it to auto-refresh.</li>
+            <li>Confirm that no flood of errors is logged.</li>
+        <p>
+            <li><b>[DotNETRC #538]</b> Open the network manager.</li>
+            <li>Load an .fnm file.</li>
+            <li>Confirm that the manager immediately tries to connect to the machines listed.</li>
+        <p>
+            <li><b>[DotNETRC #539, #565]</b> Confirm that there are appropriate limits on row, column,
+            and window dimensions.</li>
+        <p>
+            <li><b>[DotNETRC #540]</b> Open the "Edit machine" dialog and confirm that it has an
+            appropriate title.</li>
+            <li><b>[DotNETRC #541]</b> Confirm that it has an appropriate tab order.</li>
+            <li><b>[DotNETRC #542]</b> Confirm that ESC closes the dialog.</li>
+        <p>
+            <li><b>[DotNETRC #543]</b> Confirm that machines cannot be added with the name field
+            empty.</li>
+        <p>
+            <li><b>[DotNETRC #544]</b> Confirm the existence and functionality of the following
+            keyboard shortcuts:
+            <ul>
+                <li>F2</li>
+                <li>F5</li>
+                <li>F8</li>
+                <li>Delete</li>
+                <li>Ctrl+O</li>
+                <li>Ctrl+S</li>
+                <li>Ctrl+N</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #545]</b> 
+            <ul>
+                <li>Set up the network manager to monitor some machines.</li>
+                <li>Go to file &gt; open and select something that isn't an .fnm file.</li>
+                <li>Confirm that the current configuration is not cleared.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #546, #559]</b> Group list
+            <ul>
+                <li>Open the network manager and add a machine in the group Zombies.</li>
+                <li>Open an .fnm file that has a list of machines, none of which are in the
+                Zombies group.</li>
+                <li>Confirm that the group dropdown and autocomplete do not include Zombies.</li>
+                <li>Add one of the machines to the Zombies group.</li>
+                <li>Confirm that Zombies is included in the list.</li>
+                <li>Select that machine and delete it from the list.</li>
+                <li>Confirm that Zombies is not in the list again.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #547]</b> Confirm that leading and trailing whitespace is trimmed
+            from group names.</li>
+            <li><b>[DotNETRC #548]</b> Confirm that the license is checked when the utility is
+            opened.</li>
+        <p>
+            <li><b>[DotNETRC #549, #557]</b> Reconnecting
+            <ul>
+                <li>On machine A, add machine B to the monitored list.</li>
+                <li>Set the manager to auto-refresh.</li>
+                <li>Reboot B.</li>
+                <li>Start the service on B.</li>
+                <li>Check the manager on A. Confirm that it shows the correct connection
+                information for B.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #551]</b> Confirm that rows are refreshed when you start or stop the
+            service.</li>
+        <p>
+            <li><b>[DotNETRC #552]</b> Confirm that there is a character limit for group names and
+            machine names.</li>
+        <p>
+            <li><b>[DotNETRC #553]</b> Confirm that you are prompted to confirm when starting or
+            stopping the service.</li>
+        <p>
+            <li><b>[DotNETRC #554]</b> Confirm that the Save As command is disabled when
+            appropriate.</li>
+        <p>
+            <li><b>[DotNETRC #555]</b> Confirm that you are prompted to save appropriately after
+            modifying a file.</li>
+            <li><b>[DotNETRC #556]</b> Confirm that the title bar indicates the dirty status of
+            the file.</li>
+        <p>
+            <li><b>[DotNETRC #558]</b> With no .fnm file open, double-click around the grid
+            control and confirm that no errors are seen.</li>
+        <p>
+            <li>SQLCDBEditor stuff
+            <ul>
+                <li><b>[DotNETRC #560]</b> Confirm that the editor is not opened if the relevant
+                FAM database is read-only.</li>
+                <li><b>[DotNETRC #561]</b> Confirm that the correct buttons/commands are hidden
+                even if the .sdf file is corrupt.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #562]</b> Wait dialog
+            <ul>
+                <li>Connect to some machines.</li>
+                <li>Hit close.</li>
+                <li>While the Please Wait dialog is up, press alt+F4.</li>
+                <li>Confirm that the dialog does not close.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #563, #573, #579]</b>
+            <ul>
+                <li>Configure the manager to monitor a machine that doesn't exist.</li>
+                <li>Select that row of the table.</li>
+                <li>Double-click in a column header.</li>
+                <li>Double-click in the empty space at the bottom of the grid.</li>
+                <li>Confirm that neither of those situations displays the exception.</li>
+                <li>Confirm that the status for each of the services makes it clear that you are
+                not connected to the machine.</li>
+                <li>Confirm that only one exception is shown when you double-click in the row
+                header.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #564]</b> Confirm that the button tooltips include the keyboard
+            shortcuts.</li>
+        <p>
+            <li>Drag 'n' Drop
+            <ul>
+                <li><b>[DotNETRC #568]</b> Confirm that .fnm files can be dropped onto open
+                manager instances.</li>
+                <li>Confirm that multiple files cannot be dropped.</li>
+                <li>Confirm that other file types cannot be dropped.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #569]</b> Confirm that the F5 shortcut is functional only when the
+            Refresh button is enabled.</li>
+        <p>
+            <li><b>[DotNETRC #570]</b> Confirm that the service is correctly controlled on all
+            machines when multiple rows are selected.</li>
+        <p>
+            <li><b>[DotNETRC #574]</b> Confirm that the tooltips for toolstrip buttons use () to
+            indicate keyboard shortcuts.</li>
+        <p>
+            <li><b>[DotNETRC #575]</b> 
+            <ul>
+                <li>Connect to a machine on which the service database does not exist.</li>
+                <li>Select that row of the data grid and try to edit the database.</li>
+                <li>Confirm that a message box informs you that the database file could not be
+                found.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #578]</b>
+            <ul>
+                <li>Set your autorefresh time to something ridiculous, like 999999999.</li>
+                <li>Turn on autorefresh. Note that it will take a very long time to refresh.</li>
+                <li>Set the refresh time to something better.</li>
+                <li>Confirm that the refresh time changes immediately.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNETRC #580, #581]</b>
+            <ul>
+                <li>Confirm that no exception is displayed the first time you open the 
+                application.</li>
+                <li>Confirm that the application exhibits reasonable behavior regardless of the 
+                presence or absence of the user.config file.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>[DotNETRC #571 and #572]</b> Confirm that FAMDBLockChecker.exe is installed.</li>
+    <p>
+        <li><b>[DotNETRC #586]</b> Confirm that Extract.Office.dll is installed.</li>
+    <p>
+        <li><b>[FlexIDSCore #4458]</b> Confirm that the .resource files for data entry are
+        included in the install.</li>
+    <p>
+        <li><b>[FlexIDSCore #4381, #3394]</b> Run the test attached to the #4381.</li>
+    <p>
+        <Li><b>[LegacyRC #5916]</b> Confirm the presence of three Pending-related columns in 
+        the ActionsStatistics table.</li>
+        <li><b>[LegacyRC #5917]</b> ActionStatisticsDelta
+        <ul>
+            <li>Confirm presence of ActionStatisticsDelta table.</li>
+            <li>Confirm presence and functionality of ActionStatisticsUpdateFreqInSeconds DBInfo
+            setting.</li>
+            <li>Confirm that files can still be queued, processed, and have their action statuses
+            set correctly.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5919]</b> Confirm that the DB Admin summary page is using the pending
+        total columns in the ActionStatistics table.</li>
+        <li><b>[LegacyRC #5920]</b> Confirm that the FAM stats tab and status bar are as well.</li>
+    <p>
+        <li><b>[LegacyRC #5922]</b> Processing with multiple FAMs
+        <ul>
+            <li>Queue several copies of the ID Shield demo images.</li>
+            <li>Modify Compute Redactions.fps to include a 20 second sleep and no queueing.</li>
+            <li>Open and run 5 instances of Compute Redactions.fps.</li>
+            <li>Confirm that no deadlock exceptions are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5923]</b> Processing and queueing with multiple FAMs
+        <ul>
+            <li>Create several copies of the ID Shield demo images.</li>
+            <li>Add a 20 second sleep to Compute Redactions.fps.</li>
+            <li>Open 5 instances of Compute Redactions.fps. Disable queueing in 4 of them.</li>
+            <li>Run all 5. When processing has finished, confirm that the summary tab of the DB
+            Admin displays the correct statistics.</li>
+        <p>
+            <li>Reset all files to pending.</li>
+            <li>Create a single FAM instance with a single "Set file action status in db" 
+            task.</li>
+            <li>Run that FAM. While it is running, refresh the summary tab of the DB Admin.</li>
+            <li>Confirm that statistics are correctly reported when processing is finished.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5924]</b> Queueing from multiple FAMs
+        <ul>
+            <li>Create a folder containing ~10000 images.</li>
+            <li>Open 6 FAM instances configured to queue all the images in the image folder to the
+            same database.</li>
+            <li>Run them all. Confirm that all files are queued and no errors are seen.</lI>
+        <p>
+            <li>Clear the database.</li>
+            <li>Configure 3 FAM instances to queue distinct subsets of the images to the same
+            database.</li>
+            <li>Run them all. Confirm that all files are queued and no errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5928]</b> Confirm that you get the same (accurate) statistics regardless
+        of the name of your database.</li>
+    <p>
+        <li><b>[LegacyRC #5932]</b> 
+        <ul>
+            <li>Queue some files.</li>
+            <li>Check the force processing box and requeue them.</li>
+            <li>Confirm that no errors are seen.</li>
+        </ul></li>
+    </ul></li>
+<p>
+    <LI><h3>Automated Testing</h3>
+    <ul>
+        <LI>Automated Tests
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Document Classification
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Redaction
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Indexing
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+    </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+<p>
+        <li>64-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+    </ul></LI>
+</OL>
+</BODY>
+</HTML>
