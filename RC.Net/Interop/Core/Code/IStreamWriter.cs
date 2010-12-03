@@ -1,11 +1,10 @@
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 
 namespace Extract.Interop
 {
@@ -239,6 +238,28 @@ namespace Extract.Interop
                     "Unable to write double.", ex);
                 ee.AddDebugData("Value", value, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Writes the specified persist <see cref="IPersistStream"/> instance to the stream.
+        /// </summary>
+        /// <param name="persistStreamObject">The <see cref="IPersistStream"/> to write.</param>
+        /// <param name="clearDirtyFlag"><see langword="true"/> to the clear dirty flag, 
+        /// <see langword="false"/> otherwise.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "Flag")]
+        public void Write(IPersistStream persistStreamObject, bool clearDirtyFlag)
+        {
+            try
+            {
+                Guid classID;
+                persistStreamObject.GetClassID(out classID);
+                _formatter.Serialize(_stream, classID);
+                persistStreamObject.Save(new IStreamWrapper(_stream), clearDirtyFlag);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31051", ex);
             }
         }
 

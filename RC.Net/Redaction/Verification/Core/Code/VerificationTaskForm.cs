@@ -10,13 +10,13 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Security.Permissions;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
-using System.Xml;
 using TD.SandDock;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -31,7 +31,7 @@ namespace Extract.Redaction.Verification
     /// Represents a dialog that allows the user to verify redactions.
     /// </summary>
     [CLSCompliant(false)]
-    public sealed partial class VerificationTaskForm : Form, IVerificationForm
+    public sealed partial class VerificationTaskForm : Form, IVerificationForm, IMessageFilter
     {
         #region Constants
 
@@ -92,6 +92,12 @@ namespace Extract.Redaction.Verification
         /// The settings specified in the ID Shield initialization file.
         /// </summary>
         readonly InitializationSettings _iniSettings = new InitializationSettings();
+
+        /// <summary>
+        /// The config file that contains settings for the verification UI.
+        /// </summary>
+        readonly ConfigSettings<Properties.Settings> _config =
+            new ConfigSettings<Properties.Settings>();
 
         /// <summary>
         /// The file corresponding to the currently open vector of attributes (VOA) file.
@@ -160,6 +166,11 @@ namespace Extract.Redaction.Verification
         readonly IFileProcessingTask _actionStatusTask;
 
         /// <summary>
+        /// Used to set the file action status when a document is auto-advanced by the slideshow.
+        /// </summary>
+        readonly IFileProcessingTask _slideshowActionStatusTask;
+
+        /// <summary>
         /// The find or redact dialog.
         /// </summary>
         RuleForm _findOrRedactForm;
@@ -189,6 +200,58 @@ namespace Extract.Redaction.Verification
         /// Saves/restores window state info and provides full screen mode.
         /// </summary>
         VerificationTaskForm.FormStateManager _formStateManager;
+
+        /// <summary>
+        /// Indicates whether the slideshow is currently running.
+        /// </summary>
+        bool _slideshowRunning;
+
+        /// <summary>
+        /// Indicates whether the slideshow is currently paused.
+        /// </summary>
+        bool _slideshowPaused;
+
+        /// <summary>
+        /// A timer that fires when it is time for the slideshow to advance to the next
+        /// document/page.
+        /// </summary>
+        System.Windows.Forms.Timer _slideshowTimer = new System.Windows.Forms.Timer();
+
+        /// <summary>
+        /// Allows the "Slideshow Paused" message that is displayed when the slideshow is
+        /// automatically paused to be removed.
+        /// </summary>
+        CancellationTokenSource _slideshowMessageCanceler;
+
+        /// <summary>
+        /// The number of pages that have been automatically advanced by the slideshow in the
+        /// current document.
+        /// </summary>
+        int _numSlideshowAdvancedPages;
+
+        /// <summary>
+        /// The configure slideshow command
+        /// </summary>
+        // Include to ensure any added shortcut is disabled when the feature is not enabled.
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        ApplicationCommand _configSlideshowCommand;
+
+        /// <summary>
+        /// The start slideshow command
+        /// </summary>
+        // Include so that the shortcut is disabled when the feature is not enabled.
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        ApplicationCommand _startSlideshowCommand;
+
+        /// <summary>
+        /// The pause slideshow command
+        /// </summary>
+        ApplicationCommand _pauseSlideshowCommand;
+
+        /// <summary>
+        /// The stop slideshow command
+        /// </summary>
+        ApplicationCommand _stopSlideshowCommand;
 
         #endregion Fields
 
@@ -237,6 +300,20 @@ namespace Extract.Redaction.Verification
                 if (!_settings.General.RequireTypes)
                 {
                     _redactionGridView.AddRedactionType("");
+                }
+
+                // Initialize the slideshow timer and _slideshowActionStatusTask if the slideshow is
+                // enabled.
+                if (_settings.SlideshowSettings.SlideshowEnabled)
+                {
+                    _slideshowTimer.Tick += HandleSlideshowTimerTick;
+                    _slideshowTimer.Interval = _config.Settings.SlideshowInterval * 1000;
+
+                    if (_settings.SlideshowSettings.ApplyAutoAdvanceActionStatus)
+                    {
+                        _slideshowActionStatusTask = GetActionStatusTask(
+                            _settings.SlideshowSettings.AutoAdvanceSetActionStatusSettings);
+                    }
                 }
 
                 // [FlexIDSCore:4442]
@@ -408,6 +485,27 @@ namespace Extract.Redaction.Verification
                 VerificationMemento memento = GetCurrentDocument();
                 _actionStatusTask.ProcessFile(memento.SourceDocument, memento.FileId, memento.ActionId,
                     _tagManager, _fileDatabase, null, false);
+            }
+
+            // If at least one page has been automatically advanced on the document being saved,
+            // apply any tags or action status per the task configuration.
+            if (_numSlideshowAdvancedPages > 0)
+            {
+                VerificationMemento memento = null;
+                if (_settings.SlideshowSettings.ApplyAutoAdvanceTag)
+                {
+                    memento = GetCurrentDocument();
+                    _fileDatabase.TagFile(memento.FileId,
+                        _settings.SlideshowSettings.AutoAdvanceTag);
+                }
+
+                if (_slideshowActionStatusTask != null)
+                {
+                    memento = memento ?? GetCurrentDocument();
+                    _slideshowActionStatusTask.ProcessFile(memento.SourceDocument,
+                        memento.FileId, memento.ActionId, _tagManager, _fileDatabase,
+                        null, false);
+                }
             }
         }
 
@@ -646,6 +744,12 @@ namespace Extract.Redaction.Verification
             TimeInterval screenTime = _screenTime.Stop();
             SaveRedactionCounts(screenTime);
 
+            // Ensure slideshow timer is not running until the next document is completely loaded.
+            if (_slideshowTimer.Enabled)
+            {
+                _slideshowTimer.Enabled = false;
+            }
+
             CommitComment();
 
             if (IsInHistory)
@@ -837,6 +941,39 @@ namespace Extract.Redaction.Verification
 
             // Display the message box
             DialogResult result = MessageBox.Show(message.ToString(), "Save document?", 
+                MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
+            return result == DialogResult.Cancel;
+        }
+
+        /// <summary>
+        /// When the slideshow is advancing to the next document, if necessary displays a warning
+        /// message for invalid data or if data has been modified a message indicating the current
+        /// document will be saved and the user is navigating to next document. Allows the user to
+        /// cancel.
+        /// </summary>
+        /// <returns><see langword="true"/> if there is invalid data or the user chose to cancel; 
+        /// <see langword="false"/> if the data is valid and either the user chose to continue or
+        /// the document's data is unmodified.</returns>
+        bool WarnBeforeSlideshowAutoAdvance()
+        {
+            // If data is invalid, warn immediately.
+            if (WarnIfInvalid())
+            {
+                return true;
+            }
+
+            // If the user hasn't changed anything, don't prompt. Just move on.
+            if (!_redactionGridView.Dirty)
+            {
+                return false;
+            }
+
+            string message = "Corrections have been made to this document.\r\n\r\n" +
+                "Save this document and advance to the next?";
+
+            // Display the message box
+            DialogResult result = MessageBox.Show(message, "Save document?",
                 MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
 
             return result == DialogResult.Cancel;
@@ -1390,6 +1527,11 @@ namespace Extract.Redaction.Verification
 
                 _findOrRedactToolStripMenuItem.Enabled = true;
                 _findOrRedactToolStripButton.Enabled = true;
+
+                _slideshowPlayToolStripButton.Enabled = true;
+                _slideshowPlayToolStripButton.Checked = _slideshowRunning;
+                _slideshowPauseToolStripButton.Enabled = _slideshowRunning;
+                _slideshowStopToolStripButton.Enabled = _slideshowRunning;
             }
             else
             {
@@ -1414,6 +1556,10 @@ namespace Extract.Redaction.Verification
 
                 _findOrRedactToolStripMenuItem.Enabled = false;
                 _findOrRedactToolStripButton.Enabled = false;
+
+                _slideshowPlayToolStripButton.Enabled = false;
+                _slideshowPauseToolStripButton.Enabled = false;
+                _slideshowStopToolStripButton.Enabled = false;
             }
         }
 
@@ -1589,6 +1735,9 @@ namespace Extract.Redaction.Verification
 
                 base.OnLoad(e);
 
+                // So that PreFilterMessage is called.
+                Application.AddMessageFilter(this);
+
                 // Set the dockable window that the thumbnail toolstrip button controls
                 _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
 
@@ -1636,6 +1785,41 @@ namespace Extract.Redaction.Verification
                     _formStateManager.FullScreen = true;
                 }
                 _fullScreenToolStripMenuItem.Checked = _formStateManager.FullScreen;
+
+                _configSlideshowCommand = new ApplicationCommand(null, null, null,
+                    new ToolStripItem[] { _slideshowConfigToolStripButton, _slideshowConfigToolStripMenuItem },
+                    _settings.SlideshowSettings.SlideshowEnabled, true, 
+                    _settings.SlideshowSettings.SlideshowEnabled);
+
+                _startSlideshowCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                    new Keys[] { Keys.F5 }, StartSlideshow,
+                    new ToolStripItem[] { _slideshowPlayToolStripButton, _slideshowPlayToolStripMenuItem },
+                    _settings.SlideshowSettings.SlideshowEnabled, true,
+                    _settings.SlideshowSettings.SlideshowEnabled);
+
+                _pauseSlideshowCommand = new ApplicationCommand(null, null, null,
+                    new ToolStripItem[] { _slideshowPauseToolStripButton, _slideshowPauseToolStripMenuItem },
+                    false, true, false);
+
+                _stopSlideshowCommand = new ApplicationCommand(null, null, null,
+                    new ToolStripItem[] { _slideshowStopToolStripButton, _slideshowStopToolStripMenuItem },
+                    false, true, false);
+
+                _slideShowToolStrip.Visible = _settings.SlideshowSettings.SlideshowEnabled;
+                _slideshowToolStripMenuItemSeparator.Visible = _settings.SlideshowSettings.SlideshowEnabled;
+                _slideshowToolStripMenuItem.Visible = _settings.SlideshowSettings.SlideshowEnabled;
+
+                if (_settings.SlideshowSettings.SlideshowEnabled && 
+                    _config.Settings.AutoStartSlideshow)
+                {
+                    if (_config.Settings.AutoStartSlideshow)
+                    {
+                        StartSlideshow(true);
+
+                        // Start the slideshow, but disable the timer until the first document is loaded.
+                        _slideshowTimer.Enabled = false;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -2115,6 +2299,12 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                // Ensure slideshow timer is not running until the next document is completely loaded.
+                if (_slideshowTimer.Enabled)
+                {
+                    _slideshowTimer.Enabled = false;
+                }
+
                 UpdateControls();
 
                 if (_imageViewer.IsImageAvailable)
@@ -2133,6 +2323,37 @@ namespace Extract.Redaction.Verification
                             _redactionGridView.SelectOnly(0);
                         }
                     }
+
+                    if (_slideshowRunning)
+                    {
+                        // After advancing to the next document, the slideshow should automatically
+                        // resume if paused unless it should be paused to due to a document type
+                        // condition.
+                        bool pauseSlideshow = false;
+
+                        if (_settings.SlideshowSettings.CheckDocumentCondition)
+                        {
+                            VerificationMemento memento = GetCurrentDocument();
+                            IFAMCondition condition =
+                                _settings.SlideshowSettings.DocumentCondition.Object as IFAMCondition;
+                            if (condition.FileMatchesFAMCondition(memento.SourceDocument,
+                                _fileDatabase, memento.FileId, memento.ActionId, _tagManager))
+                            {
+                                pauseSlideshow = true;
+
+                                // Display a transparent message across the image viewer to notify
+                                // the user that the slideshow has been canceled.
+                                _slideshowMessageCanceler =
+                                    OverlayText.ShowText(_imageViewer, "Slideshow Paused", Font,
+                                        Color.FromArgb(100, Color.Red), null, 2);
+                            }
+                        }
+
+                        PauseSlideshow(pauseSlideshow);
+                        _slideshowTimer.Enabled = !pauseSlideshow;
+                    }
+
+                    _numSlideshowAdvancedPages = 0;
 
                     // Start recording the screen time
                     _screenTime.Start();
@@ -2282,6 +2503,144 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the slideshow config menu item or button click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleSlideshowConfigUIClick(object sender, EventArgs e)
+        {
+            try
+            {
+                ConfigureSlideshow();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31117", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the slideshow play menu item or button click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSlideshowPlayUIClick(object sender, EventArgs e)
+        {
+            try
+            {
+                StartSlideshow();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31118", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the slideshow pause menu item or button click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSlideshowPauseUIClick(object sender, EventArgs e)
+        {
+            try
+            {
+                ToggleSlideshowPause();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31119", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the slideshow stop menu item or button click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSlideshowStopUIClick(object sender, EventArgs e)
+        {
+            try
+            {
+                StopSlideshow();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31120", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the slideshow timer tick.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSlideshowTimerTick(object sender, EventArgs e)
+        {
+            try
+            {
+                // Don't re-start the clock on advancing to the next page/document until that
+                // document/page is completely loaded.
+                _slideshowTimer.Enabled = false;
+
+                // Ensure an image is still available.
+                if (!_imageViewer.IsImageAvailable)
+                {
+                    return;
+                }
+
+                _numSlideshowAdvancedPages++;
+
+                int nextPage = _pageSummaryView.GetNextUnvisitedPage(_imageViewer.PageNumber);
+                if (nextPage > 0)
+                {
+                    
+                    VisitPage(nextPage);
+                    _slideshowTimer.Enabled = true;
+                }
+                else
+                {
+                    if (IsInHistory)
+                    {
+                        GoToNextDocument();
+                    }
+                    else
+                    {
+                        _redactionGridView.CommitChanges();
+
+                        if (WarnBeforeSlideshowAutoAdvance())
+                        {
+                            PauseSlideshow(true);
+                        }
+                        else
+                        {
+                            Commit();
+
+                            AdvanceToNextDocument();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    StartSlideshow(false);
+                }
+                catch (Exception ex2)
+                {
+                    ExtractException.Log("ELI31121", ex2);
+                }
+
+                ExtractException.Display("ELI31122", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region IVerificationForm Members
@@ -2366,5 +2725,157 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion IVerificationForm Members
+
+        #region IMessageFilter Members
+
+        /// <summary>
+        /// Filters out a message before it is dispatched.
+        /// </summary>
+        /// <param name="m">The message to be dispatched. You cannot modify this message.</param>
+        /// <returns>
+        /// true to filter the message and stop it from being dispatched; false to allow the message to continue to the next filter or control.
+        /// </returns>
+        public bool PreFilterMessage(ref Message m)
+        {
+            try
+            {
+                if (_slideshowRunning && !_slideshowPaused)
+                {
+                    bool pauseSlideshow = false;
+
+                    if (m.Msg == WindowsMessage.KeyDown)
+                    {
+                        if (m.WParam != (IntPtr)Keys.F5)
+                        {
+                            pauseSlideshow = true;
+                        }
+                    }
+                    else if (m.Msg == WindowsMessage.LeftButtonDown)
+                    {
+                        Control clickedControl = FromHandle(m.HWnd);
+                        if (clickedControl != _slideShowToolStrip)
+                        {
+                            pauseSlideshow = true;
+                        }
+                    }
+                    else if (m.Msg == WindowsMessage.RightButtonDown)
+                    {
+                        pauseSlideshow = true;
+                    }
+
+                    if (pauseSlideshow)
+                    {
+                        PauseSlideshow(true);
+
+                        // Display a transparent message across the image viewer to notify
+                        // the user that the slideshow has been canceled.
+                        _slideshowMessageCanceler =
+                            OverlayText.ShowText(_imageViewer, "Slideshow Paused", Font,
+                                Color.FromArgb(100, Color.Red), null, 2);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31123", ex);
+            }
+
+            return false;
+        }
+
+        #endregion IMessageFilter Members
+
+        #region Private Members
+
+        /// <summary>
+        /// Configures the slideshow.
+        /// </summary>
+        void ConfigureSlideshow()
+        {
+            // PreFilterMessage will not pause for clicks within the slideshow toolbar.
+            // Need to pause independently for a config button click.
+            if (_slideshowRunning)
+            {
+                PauseSlideshow(true);
+            }
+
+            var slideshowOptionsDialog = new SlideshowUserOptionsDialog();
+            if (slideshowOptionsDialog.ShowDialog() == DialogResult.OK)
+            {
+                _slideshowTimer.Interval = _config.Settings.SlideshowInterval * 1000;
+            }
+        }
+
+        /// <summary>
+        /// Starts or stops the slideshow.
+        /// </summary>
+        /// <param name="start"><see langword="true"/> to start the slideshow, <see langword="false"/>
+        /// to stop it.</param>
+        void StartSlideshow(bool start)
+        {
+            if (_slideshowRunning != start)
+            {
+                _slideshowRunning = start;
+                _slideshowPlayToolStripButton.Checked = start;
+                _slideshowPlayToolStripMenuItem.Checked = start;
+                _pauseSlideshowCommand.Enabled = start;
+                _stopSlideshowCommand.Enabled = start;
+
+                _slideshowTimer.Enabled = start && _imageViewer.IsImageAvailable;
+            }
+
+            PauseSlideshow(false);
+        }
+
+        /// <summary>
+        /// Starts the slideshow.
+        /// </summary>
+        void StartSlideshow()
+        {
+            StartSlideshow(true);
+        }
+
+        /// <summary>
+        /// Stops the slideshow.
+        /// </summary>
+        void StopSlideshow()
+        {
+            StartSlideshow(false);
+        }
+
+        /// <summary>
+        /// Pauses/unpauses the slideshow.
+        /// </summary>
+        /// <param name="pause"><see langword="true"/> to pause the slideshow;
+        /// <see langword="false"/> to un-pause it.</param>
+        void PauseSlideshow(bool pause)
+        {
+            if (_slideshowPaused != pause)
+            {
+                if (!pause && _slideshowMessageCanceler != null)
+                {
+                    // If the slideshow is being un-paused, ensure the "Slideshow Paused" is closed.
+                    _slideshowMessageCanceler.Cancel();
+                }
+
+                _slideshowPaused = pause;
+                _slideshowPauseToolStripButton.Checked = pause;
+                _slideshowPauseToolStripMenuItem.Checked = pause;
+                _slideshowTimer.Enabled = !pause && _slideshowRunning && _imageViewer.IsImageAvailable;
+            }
+        }
+
+        /// <summary>
+        /// Toggles the slideshow pause state.
+        /// </summary>
+        void ToggleSlideshowPause()
+        {
+            if (_slideshowRunning)
+            {
+                PauseSlideshow(!_slideshowPaused);
+            }
+        }
+
+        #endregion Private Members
     }
 }

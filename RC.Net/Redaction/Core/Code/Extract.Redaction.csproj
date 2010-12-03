@@ -111,6 +111,7 @@
     <Compile Include="RedactionFileChanges.cs" />
     <Compile Include="SensitiveItem.cs" />
     <Compile Include="SetFileActionStatusSettings.cs" />
+    <Compile Include="SlideshowSettings.cs" />
     <Compile Include="SurroundContextSettings.cs" />
     <Compile Include="SurroundContextSettingsDialog.cs">
       <SubType>Form</SubType>

@@ -41,8 +41,10 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.GroupBox groupBox1;
             System.Windows.Forms.GroupBox groupBox2;
             System.Windows.Forms.Label label1;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationSettingsDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationSettingsDialog)); 
             System.Windows.Forms.GroupBox groupBox3;
+            System.Windows.Forms.GroupBox groupBox4;
+            this._launchFullScreenCheckBox = new System.Windows.Forms.CheckBox();
             this._enableInputEventTrackingCheckBox = new System.Windows.Forms.CheckBox();
             this._feedbackSettingsButton = new System.Windows.Forms.Button();
             this._collectFeedbackCheckBox = new System.Windows.Forms.CheckBox();
@@ -57,17 +59,20 @@ namespace Extract.Redaction.Verification
             this._backdropImageBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._backdropImageTextBox = new System.Windows.Forms.TextBox();
             this._backdropImageCheckBox = new System.Windows.Forms.CheckBox();
+            this._slideshowSettingsButton = new System.Windows.Forms.Button();
+            this._enableSlideshowCheckBox = new System.Windows.Forms.CheckBox();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._dataFileControl = new Extract.Redaction.DataFileControl();
-            this._launchFullScreenCheckBox = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox2 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
             groupBox3 = new System.Windows.Forms.GroupBox();
+            groupBox4 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
+            groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -85,6 +90,16 @@ namespace Extract.Redaction.Verification
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "General";
+            // 
+            // _launchFullScreenCheckBox
+            // 
+            this._launchFullScreenCheckBox.AutoSize = true;
+            this._launchFullScreenCheckBox.Location = new System.Drawing.Point(7, 139);
+            this._launchFullScreenCheckBox.Name = "_launchFullScreenCheckBox";
+            this._launchFullScreenCheckBox.Size = new System.Drawing.Size(236, 17);
+            this._launchFullScreenCheckBox.TabIndex = 6;
+            this._launchFullScreenCheckBox.Text = "Open verification window in full screen mode";
+            this._launchFullScreenCheckBox.UseVisualStyleBackColor = true;
             // 
             // _enableInputEventTrackingCheckBox
             // 
@@ -154,7 +169,7 @@ namespace Extract.Redaction.Verification
             groupBox2.Controls.Add(this._actionStatusComboBox);
             groupBox2.Controls.Add(this._actionNameComboBox);
             groupBox2.Controls.Add(this._fileActionCheckBox);
-            groupBox2.Location = new System.Drawing.Point(11, 330);
+            groupBox2.Location = new System.Drawing.Point(12, 383);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new System.Drawing.Size(369, 78);
             groupBox2.TabIndex = 3;
@@ -272,11 +287,45 @@ namespace Extract.Redaction.Verification
             this._backdropImageCheckBox.UseVisualStyleBackColor = true;
             this._backdropImageCheckBox.CheckedChanged += new System.EventHandler(this.HandleBackdropImageCheckBoxCheckedChanged);
             // 
+            // groupBox4
+            // 
+            groupBox4.Controls.Add(this._slideshowSettingsButton);
+            groupBox4.Controls.Add(this._enableSlideshowCheckBox);
+            groupBox4.Location = new System.Drawing.Point(12, 330);
+            groupBox4.Name = "groupBox4";
+            groupBox4.Size = new System.Drawing.Size(369, 47);
+            groupBox4.TabIndex = 4;
+            groupBox4.TabStop = false;
+            groupBox4.Text = "Slideshow";
+            // 
+            // _slideshowSettingsButton
+            // 
+            this._slideshowSettingsButton.Location = new System.Drawing.Point(286, 15);
+            this._slideshowSettingsButton.Name = "_slideshowSettingsButton";
+            this._slideshowSettingsButton.Size = new System.Drawing.Size(75, 23);
+            this._slideshowSettingsButton.TabIndex = 19;
+            this._slideshowSettingsButton.Text = "Settings...";
+            this._slideshowSettingsButton.UseVisualStyleBackColor = true;
+            this._slideshowSettingsButton.Click += new System.EventHandler(this.HandleSlideshowSettingsButtonClick);
+            // 
+            // _enableSlideshowCheckBox
+            // 
+            this._enableSlideshowCheckBox.AutoSize = true;
+            this._enableSlideshowCheckBox.Checked = true;
+            this._enableSlideshowCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._enableSlideshowCheckBox.Location = new System.Drawing.Point(6, 19);
+            this._enableSlideshowCheckBox.Name = "_enableSlideshowCheckBox";
+            this._enableSlideshowCheckBox.Size = new System.Drawing.Size(187, 17);
+            this._enableSlideshowCheckBox.TabIndex = 18;
+            this._enableSlideshowCheckBox.Text = "Enable slideshow in verification UI";
+            this._enableSlideshowCheckBox.UseVisualStyleBackColor = true;
+            this._enableSlideshowCheckBox.CheckedChanged += new System.EventHandler(this.HandleEnableSlideshowCheckBoxCheckedChanged);
+            // 
             // _cancelButton
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(305, 418);
+            this._cancelButton.Location = new System.Drawing.Point(305, 469);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 5;
@@ -286,7 +335,7 @@ namespace Extract.Redaction.Verification
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(224, 418);
+            this._okButton.Location = new System.Drawing.Point(224, 469);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 4;
@@ -301,23 +350,14 @@ namespace Extract.Redaction.Verification
             this._dataFileControl.Size = new System.Drawing.Size(369, 60);
             this._dataFileControl.TabIndex = 1;
             // 
-            // _launchFullScreenCheckBox
-            // 
-            this._launchFullScreenCheckBox.AutoSize = true;
-            this._launchFullScreenCheckBox.Location = new System.Drawing.Point(7, 139);
-            this._launchFullScreenCheckBox.Name = "_launchFullScreenCheckBox";
-            this._launchFullScreenCheckBox.Size = new System.Drawing.Size(236, 17);
-            this._launchFullScreenCheckBox.TabIndex = 6;
-            this._launchFullScreenCheckBox.Text = "Open verification window in full screen mode";
-            this._launchFullScreenCheckBox.UseVisualStyleBackColor = true;
-            // 
             // VerificationSettingsDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(392, 453);
+            this.ClientSize = new System.Drawing.Size(392, 504);
+            this.Controls.Add(groupBox4);
             this.Controls.Add(groupBox3);
             this.Controls.Add(groupBox2);
             this.Controls.Add(this._dataFileControl);
@@ -337,6 +377,8 @@ namespace Extract.Redaction.Verification
             groupBox2.PerformLayout();
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
+            groupBox4.ResumeLayout(false);
+            groupBox4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -361,5 +403,7 @@ namespace Extract.Redaction.Verification
         private Extract.Utilities.Forms.BrowseButton _backdropImageBrowseButton;
         private System.Windows.Forms.TextBox _backdropImageTextBox;
         private System.Windows.Forms.CheckBox _launchFullScreenCheckBox;
+        private System.Windows.Forms.Button _slideshowSettingsButton;
+        private System.Windows.Forms.CheckBox _enableSlideshowCheckBox;
     }
 }

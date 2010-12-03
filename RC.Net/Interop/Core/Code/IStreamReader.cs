@@ -274,6 +274,27 @@ namespace Extract.Interop
             }
         }
 
+        /// <summary>
+        /// Reads an <see cref="IPersistStream"/> instance from the stream.
+        /// </summary>
+        /// <returns>The <see cref="IPersistStream"/> instance.</returns>
+        public IPersistStream ReadIPersistStream()
+        {
+            try
+            {
+                Guid guid = (Guid)_formatter.Deserialize(_stream);
+                Type type = Type.GetTypeFromCLSID(guid);
+                IPersistStream persistStreamObject = (IPersistStream)Activator.CreateInstance(type);
+                persistStreamObject.Load(new IStreamWrapper(_stream));
+
+                return persistStreamObject;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI31103", "Unable to read IPersistStream.", ex);
+            }
+        }
+
         #endregion Methods
 
         #region IDisposable Members

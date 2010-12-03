@@ -20,6 +20,11 @@ namespace Extract.Redaction.Verification
         FeedbackSettings _feedback;
 
         /// <summary>
+        /// The slideshow settings.
+        /// </summary>
+        SlideshowSettings _slideshowSettings;
+
+        /// <summary>
         /// The verification settings.
         /// </summary>
         VerificationSettings _settings;
@@ -98,9 +103,11 @@ namespace Extract.Redaction.Verification
             SetFileActionStatusSettings action = GetActionStatusSettings();
             bool enableInputTracking = _enableInputEventTrackingCheckBox.Checked;
             bool launchInFullScreenMode = _launchFullScreenCheckBox.Checked;
+            SlideshowSettings slideshowSettings = GetSlideshowSettings();
 
             return new VerificationSettings(general, feedback, dataFile, useBackdropImage,
-                backdropImage, action, enableInputTracking, launchInFullScreenMode);
+                backdropImage, action, enableInputTracking, launchInFullScreenMode,
+                slideshowSettings);
         }
 
         /// <summary>
@@ -149,6 +156,27 @@ namespace Extract.Redaction.Verification
             EActionStatus actionStatus = GetActionStatusFromString(_actionStatusComboBox.Text);
 
             return new SetFileActionStatusSettings(enabled, actionName, actionStatus);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="SlideshowSettings"/> from the user interface.
+        /// </summary>
+        /// <returns>The <see cref="SlideshowSettings"/> from the user interface.
+        /// </returns>
+        SlideshowSettings GetSlideshowSettings()
+        {
+            bool enabled = _enableSlideshowCheckBox.Checked;
+            bool applyAutoAdvanceTag = _slideshowSettings.ApplyAutoAdvanceTag;
+            string autoAdvanceTag = _slideshowSettings.AutoAdvanceTag;
+            bool applyAutoAdvanceActionStatus = _slideshowSettings.ApplyAutoAdvanceActionStatus;
+            string autoAdvanceActionName = _slideshowSettings.AutoAdvanceActionName;
+            EActionStatus autoAdvanceActionStatus = _slideshowSettings.AutoAdvanceActionStatus;
+            bool checkDocTypeConditon = _slideshowSettings.CheckDocumentCondition;
+            ObjectWithDescription documentCondition = _slideshowSettings.DocumentCondition;
+
+            return new SlideshowSettings(enabled, applyAutoAdvanceTag, autoAdvanceTag,
+                applyAutoAdvanceActionStatus, autoAdvanceActionName, autoAdvanceActionStatus,
+                checkDocTypeConditon, documentCondition);
         }
 
         /// <summary>
@@ -230,6 +258,7 @@ namespace Extract.Redaction.Verification
         {
             // Enable or disable feedback settings
             _feedbackSettingsButton.Enabled = _collectFeedbackCheckBox.Checked;
+            _slideshowSettingsButton.Enabled = _enableSlideshowCheckBox.Checked;
 
             // Enable or disable settings
             bool enabled = _backdropImageCheckBox.Checked;
@@ -323,6 +352,10 @@ namespace Extract.Redaction.Verification
 
                 // Full screen mode
                 _launchFullScreenCheckBox.Checked = _settings.LaunchInFullScreenMode;
+
+                // Slideshow settings
+                _slideshowSettings = _settings.SlideshowSettings;
+                _enableSlideshowCheckBox.Checked = _slideshowSettings.SlideshowEnabled;
 
                 // Update the UI
                 UpdateControls();
@@ -477,6 +510,49 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException.Display("ELI29162", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the slideshow settings button click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleEnableSlideshowCheckBoxCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateControls();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31039", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the slideshow settings button click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSlideshowSettingsButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                using (SlideshowSettingsDialog dialog =
+                    new SlideshowSettingsDialog(_slideshowSettings))
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        _slideshowSettings = dialog.SlideshowSettings;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31037", ex);
             }
         }
 

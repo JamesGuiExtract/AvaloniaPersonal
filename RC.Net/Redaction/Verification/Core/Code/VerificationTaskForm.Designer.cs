@@ -52,6 +52,11 @@ namespace Extract.Redaction.Verification
                     _formStateManager.Dispose();
                     _formStateManager = null;
                 }
+                if (_slideshowTimer != null)
+                {
+                    _slideshowTimer.Dispose();
+                    _slideshowTimer = null;
+                }
 
                 // Collapsed or hidden dockable windows must be disposed explicitly [FIDSC #4246]
                 // TODO: Can be removed when Divelements corrects this in the next release (3.0.7+)
@@ -95,7 +100,6 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
             TD.SandDock.DockContainer dockContainer;
             System.Windows.Forms.ToolStripContainer imageViewerToolStripContainer;
-            System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator11;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
@@ -149,6 +153,12 @@ namespace Extract.Redaction.Verification
             this._selectLayerObjectToolStripMenuItem = new Extract.Imaging.Forms.SelectLayerObjectToolStripMenuItem();
             this._angularRedactionToolStripMenuItem = new Extract.Imaging.Forms.AngularRedactionToolStripMenuItem();
             this._rectangularRedactionToolStripMenuItem = new Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem();
+            this._slideshowToolStripMenuItemSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this._slideshowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._slideshowConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._slideshowPlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._slideshowPauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._slideshowStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this._optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -165,6 +175,11 @@ namespace Extract.Redaction.Verification
             this._lastExemptionToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._tagFileToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this._tagFileToolStripButton = new Extract.FileActionManager.Forms.TagFileToolStripButton();
+            this._slideShowToolStrip = new System.Windows.Forms.ToolStrip();
+            this._slideshowConfigToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._slideshowPlayToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._slideshowPauseToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._slideshowStopToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._dataWindowDockableWindow = new TD.SandDock.DockableWindow();
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
@@ -174,6 +189,9 @@ namespace Extract.Redaction.Verification
             this.zoomWindowToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
             this.panToolStripMenuItem1 = new Extract.Imaging.Forms.PanToolStripMenuItem();
             this.angularRedactionToolStripMenuItem1 = new Extract.Imaging.Forms.AngularRedactionToolStripMenuItem();
+            this.rectangularRedactionToolStripMenuItem1 = new Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem();
+            this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
+            this.blockFitSelectionToolStripMenuItem1 = new Extract.Imaging.Forms.BlockFitSelectionToolStripMenuItem();
             this._viewCommandsToolStrip = new System.Windows.Forms.ToolStrip();
             this._zoomInToolStripButton = new Extract.Imaging.Forms.ZoomInToolStripButton();
             this._zoomOutToolStripButton = new Extract.Imaging.Forms.ZoomOutToolStripButton();
@@ -202,8 +220,6 @@ namespace Extract.Redaction.Verification
             this._rectangularRedactionToolStripButton = new Extract.Imaging.Forms.RectangularRedactionToolStripButton();
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
-            this.rectangularRedactionToolStripMenuItem1 = new Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem();
-            this.blockFitSelectionToolStripMenuItem1 = new Extract.Imaging.Forms.BlockFitSelectionToolStripMenuItem();
             dataGridToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             label3 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -222,17 +238,18 @@ namespace Extract.Redaction.Verification
             toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
             dockContainer1 = new TD.SandDock.DockContainer();
             dataGridToolStripContainer.ContentPanel.SuspendLayout();
             dataGridToolStripContainer.TopToolStripPanel.SuspendLayout();
             dataGridToolStripContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._dataWindowSplitContainer)).BeginInit();
             this._dataWindowSplitContainer.Panel1.SuspendLayout();
             this._dataWindowSplitContainer.Panel2.SuspendLayout();
             this._dataWindowSplitContainer.SuspendLayout();
             this._menuStrip.SuspendLayout();
             this._basicDataGridToolStrip.SuspendLayout();
             this._exemptionsToolStrip.SuspendLayout();
+            this._slideShowToolStrip.SuspendLayout();
             dockContainer.SuspendLayout();
             this._dataWindowDockableWindow.SuspendLayout();
             imageViewerToolStripContainer.BottomToolStripPanel.SuspendLayout();
@@ -266,6 +283,7 @@ namespace Extract.Redaction.Verification
             dataGridToolStripContainer.TopToolStripPanel.Controls.Add(this._menuStrip);
             dataGridToolStripContainer.TopToolStripPanel.Controls.Add(this._basicDataGridToolStrip);
             dataGridToolStripContainer.TopToolStripPanel.Controls.Add(this._exemptionsToolStrip);
+            dataGridToolStripContainer.TopToolStripPanel.Controls.Add(this._slideShowToolStrip);
             // 
             // _dataWindowSplitContainer
             // 
@@ -291,7 +309,7 @@ namespace Extract.Redaction.Verification
             this._dataWindowSplitContainer.Panel2.Controls.Add(this._pageSummaryView);
             this._dataWindowSplitContainer.Panel2MinSize = 150;
             this._dataWindowSplitContainer.Size = new System.Drawing.Size(527, 815);
-            this._dataWindowSplitContainer.SplitterDistance = 500;
+            this._dataWindowSplitContainer.SplitterDistance = 498;
             this._dataWindowSplitContainer.TabIndex = 0;
             // 
             // _commentsTextBox
@@ -363,7 +381,7 @@ namespace Extract.Redaction.Verification
             this._redactionGridView.ImageViewer = null;
             this._redactionGridView.Location = new System.Drawing.Point(7, 170);
             this._redactionGridView.Name = "_redactionGridView";
-            this._redactionGridView.Size = new System.Drawing.Size(513, 329);
+            this._redactionGridView.Size = new System.Drawing.Size(513, 327);
             this._redactionGridView.TabIndex = 0;
             this._redactionGridView.ExemptionsApplied += new System.EventHandler<Extract.Redaction.Verification.ExemptionsAppliedEventArgs>(this.HandleRedactionGridViewExemptionsApplied);
             // 
@@ -385,7 +403,7 @@ namespace Extract.Redaction.Verification
             this._pageSummaryView.Location = new System.Drawing.Point(7, 19);
             this._pageSummaryView.MinimumSize = new System.Drawing.Size(100, 100);
             this._pageSummaryView.Name = "_pageSummaryView";
-            this._pageSummaryView.Size = new System.Drawing.Size(513, 282);
+            this._pageSummaryView.Size = new System.Drawing.Size(513, 284);
             this._pageSummaryView.TabIndex = 0;
             this._pageSummaryView.TabStop = false;
             // 
@@ -534,7 +552,7 @@ namespace Extract.Redaction.Verification
             this._zoomPreviousToolStripMenuItem,
             this._zoomNextToolStripMenuItem});
             this._zoomToolStripMenuItem.Name = "_zoomToolStripMenuItem";
-            this._zoomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._zoomToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this._zoomToolStripMenuItem.Text = "&Zoom";
             // 
             // _fitToPageToolStripMenuItem
@@ -613,7 +631,7 @@ namespace Extract.Redaction.Verification
             this._rotateCounterclockwiseToolStripMenuItem,
             this._rotateClockwiseToolStripMenuItem});
             this._rotateToolStripMenuItem.Name = "_rotateToolStripMenuItem";
-            this._rotateToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._rotateToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this._rotateToolStripMenuItem.Text = "&Rotate";
             // 
             // _rotateCounterclockwiseToolStripMenuItem
@@ -647,7 +665,7 @@ namespace Extract.Redaction.Verification
             this._nextPageToolStripMenuItem,
             this._lastPageToolStripMenuItem});
             this._gotoPageToolStripMenuItem.Name = "_gotoPageToolStripMenuItem";
-            this._gotoPageToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._gotoPageToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this._gotoPageToolStripMenuItem.Text = "&Goto page";
             // 
             // _firstPageToolStripMenuItem
@@ -714,13 +732,13 @@ namespace Extract.Redaction.Verification
             // toolStripSeparator13
             // 
             this.toolStripSeparator13.Name = "toolStripSeparator13";
-            this.toolStripSeparator13.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator13.Size = new System.Drawing.Size(158, 6);
             // 
             // _fullScreenToolStripMenuItem
             // 
             this._fullScreenToolStripMenuItem.Name = "_fullScreenToolStripMenuItem";
             this._fullScreenToolStripMenuItem.ShortcutKeyDisplayString = "F11";
-            this._fullScreenToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._fullScreenToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this._fullScreenToolStripMenuItem.Text = "&Full screen";
             this._fullScreenToolStripMenuItem.Click += new System.EventHandler(this.HandleFullScreenToolStripMenuItemClick);
             // 
@@ -732,6 +750,8 @@ namespace Extract.Redaction.Verification
             this._selectLayerObjectToolStripMenuItem,
             this._angularRedactionToolStripMenuItem,
             this._rectangularRedactionToolStripMenuItem,
+            this._slideshowToolStripMenuItemSeparator,
+            this._slideshowToolStripMenuItem,
             this._toolStripSeparator8,
             this._optionsToolStripMenuItem});
             this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
@@ -787,6 +807,50 @@ namespace Extract.Redaction.Verification
             this._rectangularRedactionToolStripMenuItem.ShortcutKeyDisplayString = "";
             this._rectangularRedactionToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
             this._rectangularRedactionToolStripMenuItem.Text = "&Rectangular redaction";
+            // 
+            // _slideshowToolStripMenuItemSeparator
+            // 
+            this._slideshowToolStripMenuItemSeparator.Name = "_slideshowToolStripMenuItemSeparator";
+            this._slideshowToolStripMenuItemSeparator.Size = new System.Drawing.Size(252, 6);
+            // 
+            // _slideshowToolStripMenuItem
+            // 
+            this._slideshowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._slideshowConfigToolStripMenuItem,
+            this._slideshowPlayToolStripMenuItem,
+            this._slideshowPauseToolStripMenuItem,
+            this._slideshowStopToolStripMenuItem});
+            this._slideshowToolStripMenuItem.Name = "_slideshowToolStripMenuItem";
+            this._slideshowToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._slideshowToolStripMenuItem.Text = "&Slideshow";
+            // 
+            // _slideshowConfigToolStripMenuItem
+            // 
+            this._slideshowConfigToolStripMenuItem.Name = "_slideshowConfigToolStripMenuItem";
+            this._slideshowConfigToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this._slideshowConfigToolStripMenuItem.Text = "&Options";
+            this._slideshowConfigToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowConfigUIClick);
+            // 
+            // _slideshowPlayToolStripMenuItem
+            // 
+            this._slideshowPlayToolStripMenuItem.Name = "_slideshowPlayToolStripMenuItem";
+            this._slideshowPlayToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this._slideshowPlayToolStripMenuItem.Text = "&Play";
+            this._slideshowPlayToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowPlayUIClick);
+            // 
+            // _slideshowPauseToolStripMenuItem
+            // 
+            this._slideshowPauseToolStripMenuItem.Name = "_slideshowPauseToolStripMenuItem";
+            this._slideshowPauseToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this._slideshowPauseToolStripMenuItem.Text = "P&ause";
+            this._slideshowPauseToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowPauseUIClick);
+            // 
+            // _slideshowStopToolStripMenuItem
+            // 
+            this._slideshowStopToolStripMenuItem.Name = "_slideshowStopToolStripMenuItem";
+            this._slideshowStopToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this._slideshowStopToolStripMenuItem.Text = "&Stop";
+            this._slideshowStopToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowStopUIClick);
             // 
             // _toolStripSeparator8
             // 
@@ -957,6 +1021,65 @@ namespace Extract.Redaction.Verification
             this._tagFileToolStripButton.Text = "Apply tags";
             this._tagFileToolStripButton.Visible = false;
             // 
+            // _slideShowToolStrip
+            // 
+            this._slideShowToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._slideShowToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._slideShowToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._slideshowConfigToolStripButton,
+            this._slideshowPlayToolStripButton,
+            this._slideshowPauseToolStripButton,
+            this._slideshowStopToolStripButton});
+            this._slideShowToolStrip.Location = new System.Drawing.Point(291, 24);
+            this._slideShowToolStrip.Name = "_slideShowToolStrip";
+            this._slideShowToolStrip.Size = new System.Drawing.Size(156, 39);
+            this._slideShowToolStrip.TabIndex = 2;
+            // 
+            // _slideshowConfigToolStripButton
+            // 
+            this._slideshowConfigToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._slideshowConfigToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_slideshowConfigToolStripButton.Image")));
+            this._slideshowConfigToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._slideshowConfigToolStripButton.Name = "_slideshowConfigToolStripButton";
+            this._slideshowConfigToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._slideshowConfigToolStripButton.Text = "Slideshow Options";
+            this._slideshowConfigToolStripButton.Click += new System.EventHandler(this.HandleSlideshowConfigUIClick);
+            // 
+            // _slideshowPlayToolStripButton
+            // 
+            this._slideshowPlayToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._slideshowPlayToolStripButton.Enabled = false;
+            this._slideshowPlayToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_slideshowPlayToolStripButton.Image")));
+            this._slideshowPlayToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._slideshowPlayToolStripButton.Name = "_slideshowPlayToolStripButton";
+            this._slideshowPlayToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._slideshowPlayToolStripButton.Text = "Slideshow Play (F5)";
+            this._slideshowPlayToolStripButton.ToolTipText = "Slideshow Play (F5)";
+            this._slideshowPlayToolStripButton.Click += new System.EventHandler(this.HandleSlideshowPlayUIClick);
+            // 
+            // _slideshowPauseToolStripButton
+            // 
+            this._slideshowPauseToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._slideshowPauseToolStripButton.Enabled = false;
+            this._slideshowPauseToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_slideshowPauseToolStripButton.Image")));
+            this._slideshowPauseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._slideshowPauseToolStripButton.Name = "_slideshowPauseToolStripButton";
+            this._slideshowPauseToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._slideshowPauseToolStripButton.Text = "Slideshow Pause";
+            this._slideshowPauseToolStripButton.Click += new System.EventHandler(this.HandleSlideshowPauseUIClick);
+            // 
+            // _slideshowStopToolStripButton
+            // 
+            this._slideshowStopToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._slideshowStopToolStripButton.Enabled = false;
+            this._slideshowStopToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_slideshowStopToolStripButton.Image")));
+            this._slideshowStopToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._slideshowStopToolStripButton.Name = "_slideshowStopToolStripButton";
+            this._slideshowStopToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._slideshowStopToolStripButton.Text = "Slideshow Stop";
+            this._slideshowStopToolStripButton.ToolTipText = "Slideshow Pausetop";
+            this._slideshowStopToolStripButton.Click += new System.EventHandler(this.HandleSlideshowStopUIClick);
+            // 
             // dockContainer
             // 
             dockContainer.ContentSize = 527;
@@ -1002,7 +1125,7 @@ namespace Extract.Redaction.Verification
             // imageViewerToolStripContainer.ContentPanel
             // 
             imageViewerToolStripContainer.ContentPanel.Controls.Add(this._imageViewer);
-            imageViewerToolStripContainer.ContentPanel.Size = new System.Drawing.Size(857, 865);
+            imageViewerToolStripContainer.ContentPanel.Size = new System.Drawing.Size(857, 787);
             imageViewerToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             imageViewerToolStripContainer.Location = new System.Drawing.Point(531, 0);
             imageViewerToolStripContainer.Name = "imageViewerToolStripContainer";
@@ -1012,9 +1135,9 @@ namespace Extract.Redaction.Verification
             // 
             // imageViewerToolStripContainer.TopToolStripPanel
             // 
-            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._basicImageViewerToolStrip);
-            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._pageNavigationToolStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsToolStrip);
+            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._pageNavigationToolStrip);
+            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._basicImageViewerToolStrip);
             // 
             // _imageViewerStatusStrip
             // 
@@ -1029,8 +1152,9 @@ namespace Extract.Redaction.Verification
             this._imageViewer.ContextMenuStrip = this._imageViewerContextMenu;
             this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
+            this._imageViewer.MinimumAngularHighlightHeight = 1;
             this._imageViewer.Name = "_imageViewer";
-            this._imageViewer.Size = new System.Drawing.Size(857, 865);
+            this._imageViewer.Size = new System.Drawing.Size(857, 787);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
             this._imageViewer.UseDefaultShortcuts = true;
@@ -1044,10 +1168,10 @@ namespace Extract.Redaction.Verification
             toolStripSeparator11,
             this.angularRedactionToolStripMenuItem1,
             this.rectangularRedactionToolStripMenuItem1,
-            toolStripSeparator12,
+            this.toolStripSeparator12,
             this.blockFitSelectionToolStripMenuItem1});
             this._imageViewerContextMenu.Name = "_imageViewerContextMenu";
-            this._imageViewerContextMenu.Size = new System.Drawing.Size(256, 120);
+            this._imageViewerContextMenu.Size = new System.Drawing.Size(256, 148);
             // 
             // selectLayerObjectToolStripMenuItem1
             // 
@@ -1084,11 +1208,6 @@ namespace Extract.Redaction.Verification
             toolStripSeparator11.Name = "toolStripSeparator11";
             toolStripSeparator11.Size = new System.Drawing.Size(252, 6);
             // 
-            // toolStripSeparator12
-            // 
-            toolStripSeparator12.Name = "toolStripSeparator12";
-            toolStripSeparator12.Size = new System.Drawing.Size(252, 6);
-            // 
             // angularRedactionToolStripMenuItem1
             // 
             this.angularRedactionToolStripMenuItem1.Enabled = false;
@@ -1098,6 +1217,31 @@ namespace Extract.Redaction.Verification
             this.angularRedactionToolStripMenuItem1.ShortcutKeyDisplayString = "";
             this.angularRedactionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
             this.angularRedactionToolStripMenuItem1.Text = "A&ngular redaction";
+            // 
+            // rectangularRedactionToolStripMenuItem1
+            // 
+            this.rectangularRedactionToolStripMenuItem1.Enabled = false;
+            this.rectangularRedactionToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("rectangularRedactionToolStripMenuItem1.Image")));
+            this.rectangularRedactionToolStripMenuItem1.ImageViewer = null;
+            this.rectangularRedactionToolStripMenuItem1.Name = "rectangularRedactionToolStripMenuItem1";
+            this.rectangularRedactionToolStripMenuItem1.ShortcutKeyDisplayString = "";
+            this.rectangularRedactionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this.rectangularRedactionToolStripMenuItem1.Text = "&Rectangular redaction";
+            // 
+            // toolStripSeparator12
+            // 
+            this.toolStripSeparator12.Name = "toolStripSeparator12";
+            this.toolStripSeparator12.Size = new System.Drawing.Size(252, 6);
+            // 
+            // blockFitSelectionToolStripMenuItem1
+            // 
+            this.blockFitSelectionToolStripMenuItem1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.blockFitSelectionToolStripMenuItem1.Enabled = false;
+            this.blockFitSelectionToolStripMenuItem1.ImageViewer = null;
+            this.blockFitSelectionToolStripMenuItem1.Name = "blockFitSelectionToolStripMenuItem1";
+            this.blockFitSelectionToolStripMenuItem1.ShortcutKeyDisplayString = "";
+            this.blockFitSelectionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this.blockFitSelectionToolStripMenuItem1.Text = "&Block fit selection";
             // 
             // _viewCommandsToolStrip
             // 
@@ -1119,9 +1263,9 @@ namespace Extract.Redaction.Verification
             this._rotateClockwiseToolStripButton,
             toolStripSeparator10,
             this._thumbnailsToolStripButton});
-            this._viewCommandsToolStrip.Location = new System.Drawing.Point(506, 0);
+            this._viewCommandsToolStrip.Location = new System.Drawing.Point(3, 0);
             this._viewCommandsToolStrip.Name = "_viewCommandsToolStrip";
-            this._viewCommandsToolStrip.Size = new System.Drawing.Size(351, 39);
+            this._viewCommandsToolStrip.Size = new System.Drawing.Size(432, 39);
             this._viewCommandsToolStrip.TabIndex = 2;
             // 
             // _zoomInToolStripButton
@@ -1256,10 +1400,11 @@ namespace Extract.Redaction.Verification
             // 
             // _thumbnailsToolStripButton
             // 
+            this._thumbnailsToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._thumbnailsToolStripButton.DockableWindow = null;
             this._thumbnailsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._thumbnailsToolStripButton.Name = "_thumbnailsToolStripButton";
             this._thumbnailsToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._thumbnailsToolStripButton.Text = "Show/Hide thumbnails";
             // 
             // _pageNavigationToolStrip
             // 
@@ -1271,7 +1416,7 @@ namespace Extract.Redaction.Verification
             this._pageNavigationToolStripTextBox,
             this._nextPageToolStripButton,
             this._lastPageToolStripButton});
-            this._pageNavigationToolStrip.Location = new System.Drawing.Point(273, 0);
+            this._pageNavigationToolStrip.Location = new System.Drawing.Point(3, 39);
             this._pageNavigationToolStrip.Name = "_pageNavigationToolStrip";
             this._pageNavigationToolStrip.Size = new System.Drawing.Size(233, 39);
             this._pageNavigationToolStrip.TabIndex = 1;
@@ -1341,7 +1486,7 @@ namespace Extract.Redaction.Verification
             this._selectLayerObjectToolStripButton,
             this._angularRedactionToolStripButton,
             this._rectangularRedactionToolStripButton});
-            this._basicImageViewerToolStrip.Location = new System.Drawing.Point(3, 0);
+            this._basicImageViewerToolStrip.Location = new System.Drawing.Point(3, 78);
             this._basicImageViewerToolStrip.Name = "_basicImageViewerToolStrip";
             this._basicImageViewerToolStrip.Size = new System.Drawing.Size(270, 39);
             this._basicImageViewerToolStrip.TabIndex = 0;
@@ -1459,23 +1604,6 @@ namespace Extract.Redaction.Verification
             this._thumbnailViewer.Size = new System.Drawing.Size(200, 878);
             this._thumbnailViewer.TabIndex = 0;
             // 
-            // rectangularRedactionToolStripMenuItem1
-            // 
-            this.rectangularRedactionToolStripMenuItem1.Enabled = false;
-            this.rectangularRedactionToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("rectangularRedactionToolStripMenuItem1.Image")));
-            this.rectangularRedactionToolStripMenuItem1.ImageViewer = null;
-            this.rectangularRedactionToolStripMenuItem1.Name = "rectangularRedactionToolStripMenuItem1";
-            this.rectangularRedactionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
-            this.rectangularRedactionToolStripMenuItem1.Text = "&Rectangular redaction";
-            //
-            // blockFitSelectionToolStripMenuItem1
-            //
-            this.blockFitSelectionToolStripMenuItem1.Enabled = false;
-            this.blockFitSelectionToolStripMenuItem1.ImageViewer = null;
-            this.blockFitSelectionToolStripMenuItem1.Name = "blockFitSelectionToolStripMenuItem1";
-            this.blockFitSelectionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
-            this.blockFitSelectionToolStripMenuItem1.Text = "&Block fit selection";
-            // 
             // VerificationTaskForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1484,11 +1612,10 @@ namespace Extract.Redaction.Verification
             this.Controls.Add(imageViewerToolStripContainer);
             this.Controls.Add(dockContainer1);
             this.Controls.Add(dockContainer);
-            this.Icon = Extract.Redaction.Verification.Properties.Resources.IDShieldIcon;
+            this.Icon = global::Extract.Redaction.Verification.Properties.Resources.IDShieldIcon;
             this.MainMenuStrip = this._menuStrip;
             this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "VerificationTaskForm";
-            this.ShowIcon = true;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ID Shield Verification (Waiting for file)";
             dataGridToolStripContainer.ContentPanel.ResumeLayout(false);
@@ -1500,6 +1627,7 @@ namespace Extract.Redaction.Verification
             this._dataWindowSplitContainer.Panel1.PerformLayout();
             this._dataWindowSplitContainer.Panel2.ResumeLayout(false);
             this._dataWindowSplitContainer.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._dataWindowSplitContainer)).EndInit();
             this._dataWindowSplitContainer.ResumeLayout(false);
             this._menuStrip.ResumeLayout(false);
             this._menuStrip.PerformLayout();
@@ -1507,6 +1635,8 @@ namespace Extract.Redaction.Verification
             this._basicDataGridToolStrip.PerformLayout();
             this._exemptionsToolStrip.ResumeLayout(false);
             this._exemptionsToolStrip.PerformLayout();
+            this._slideShowToolStrip.ResumeLayout(false);
+            this._slideShowToolStrip.PerformLayout();
             dockContainer.ResumeLayout(false);
             this._dataWindowDockableWindow.ResumeLayout(false);
             imageViewerToolStripContainer.BottomToolStripPanel.ResumeLayout(false);
@@ -1528,7 +1658,7 @@ namespace Extract.Redaction.Verification
             this.ResumeLayout(false);
 
         }
-
+     
         #endregion
 
         private TD.SandDock.SandDockManager _sandDockManager;
@@ -1632,5 +1762,17 @@ namespace Extract.Redaction.Verification
         private Imaging.Forms.RectangularRedactionToolStripMenuItem _rectangularRedactionToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator13;
         private System.Windows.Forms.ToolStripMenuItem _fullScreenToolStripMenuItem;
+        private System.Windows.Forms.ToolStrip _slideShowToolStrip;
+        private System.Windows.Forms.ToolStripButton _slideshowConfigToolStripButton;
+        private System.Windows.Forms.ToolStripButton _slideshowPlayToolStripButton;
+        private System.Windows.Forms.ToolStripButton _slideshowPauseToolStripButton;
+        private System.Windows.Forms.ToolStripButton _slideshowStopToolStripButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
+        private System.Windows.Forms.ToolStripSeparator _slideshowToolStripMenuItemSeparator;
+        private System.Windows.Forms.ToolStripMenuItem _slideshowToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _slideshowConfigToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _slideshowPlayToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _slideshowPauseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _slideshowStopToolStripMenuItem;
     }
 }

@@ -139,6 +139,7 @@
     <Compile Include="PleaseWaitForm.Designer.cs">
       <DependentUpon>PleaseWaitForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="OverlayText.cs" />
     <Compile Include="WindowWrapper.cs" />
     <Compile Include="ControlInvoker.cs" />
     <Compile Include="ExtractCursors.cs" />

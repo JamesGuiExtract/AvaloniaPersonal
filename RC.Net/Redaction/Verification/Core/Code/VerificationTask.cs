@@ -34,8 +34,10 @@ namespace Extract.Redaction.Verification
         /// Added backdrop image settings.
         /// <para>Version 6</para>
         /// Added full screen mode setting.
+        /// <para>Version 7</para>
+        /// Added slideshow settings.
         /// </summary>
-        const int _CURRENT_VERSION = 6;
+        const int _CURRENT_VERSION = 7;
         
         #endregion Constants
 

@@ -60,9 +60,9 @@ namespace Extract.Utilities
         Configuration _config;
 
         /// <summary>
-        /// The filename (wihthout path) of the open configuration.
+        /// The filename of the open configuration.
         /// </summary>
-        string _fileName;
+        string _configFileName;
 
         /// <summary>
         /// If <see langword="true"/>, properties will be saved to disk as soon as they are
@@ -104,8 +104,18 @@ namespace Extract.Utilities
         /// <summary>
         /// Initializes a new ConfigSettings instance.
         /// </summary>
-        /// <param name="configFileName">The config file to use as a source for the settings.
-        /// </param>
+        public ConfigSettings()
+            : this(null, true, true)
+        {
+        }
+
+        /// <overloads>Initializes a new ConfigSettings instance.</overloads>
+        /// <summary>
+        /// Initializes a new ConfigSettings instance.
+        /// </summary>
+        /// <param name="configFileName">The config file to use as a source for the settings. If
+        /// <see langword="null"/>, an appropriately named config file name will be automatically
+        /// generated within the users ApplicationData folder.</param>
         public ConfigSettings(string configFileName)
             : this(configFileName, true, true)
         {
@@ -131,8 +141,9 @@ namespace Extract.Utilities
         /// <summary>
         /// Initializes a new ConfigSettings instance.
         /// </summary>
-        /// <param name="configFileName">The config file to use as a source for the settings.
-        /// </param>
+        /// <param name="configFileName">The config file to use as a source for the settings. If
+        /// <see langword="null"/>, an appropriately named config file name will be automatically
+        /// generated within the users ApplicationData folder.</param>
         /// <param name="defaultConfigFileName">If not <see langword="null"/>, settings not present
         /// in <paramref name="configFileName"/> may be provided defaults from this config file.
         /// </param>
@@ -155,7 +166,19 @@ namespace Extract.Utilities
                 // Create a new instance (will have the default settings)
                 _settings = new T();
 
-                _fileName = Path.GetFileName(configFileName);
+                // If a filename was not specified, create one based on the name of the
+                // ApplicationDataPath and the assembly that defines T.
+                if (configFileName == null)
+                {
+                    _configFileName = Assembly.GetAssembly(typeof(T)).Location;
+                    _configFileName = Path.GetFileName(_configFileName);
+                    _configFileName = Path.Combine(
+                        FileSystemMethods.ApplicationDataPath, _configFileName + ".config");
+                }
+                else
+                {
+                    _configFileName = Path.GetFileName(configFileName);
+                }
 
                 // Lock around construction in case either this or another instance is creating
                 // an new configuration file.
@@ -163,17 +186,17 @@ namespace Extract.Utilities
                 {
                     _dynamic = dynamic;
 
-                    if (!File.Exists(configFileName))
+                    if (!File.Exists(_configFileName))
                     {
                         if (createIfMissing)
                         {
-                            CreateConfigFile(configFileName);
+                            CreateConfigFile(_configFileName);
                         }
                         else
                         {
                             ExtractException ee =
                                 new ExtractException("ELI29688", "Missing configuration file!");
-                            ee.AddDebugData("Filename", configFileName, false);
+                            ee.AddDebugData("Filename", _configFileName, false);
                             throw ee;
                         }
                     }
@@ -194,7 +217,7 @@ namespace Extract.Utilities
                     }
 
                     // Open the config file
-                    _configFileMap.ExeConfigFilename = configFileName;
+                    _configFileMap.ExeConfigFilename = _configFileName;
                     _config = ConfigurationManager.OpenMappedExeConfiguration(
                         _configFileMap, ConfigurationUserLevel.None);
 
@@ -214,7 +237,7 @@ namespace Extract.Utilities
             {
                 ExtractException ee = new ExtractException("ELI25407",
                     "Error loading configuration file!", ex);
-                ee.AddDebugData("Configuration filename", configFileName, false);
+                ee.AddDebugData("Configuration filename", configFileName ?? _configFileName, false);
                 throw ee;
             }
         }
@@ -438,10 +461,10 @@ namespace Extract.Utilities
                 lock (_lock)
                 {
                     object fileLock;
-                    if (!_fileLocks.TryGetValue(_fileName, out fileLock))
+                    if (!_fileLocks.TryGetValue(_configFileName, out fileLock))
                     {
                         fileLock = new object();
-                        _fileLocks[_fileName] = fileLock;
+                        _fileLocks[_configFileName] = fileLock;
                     }
 
                     return fileLock;
@@ -702,7 +725,7 @@ namespace Extract.Utilities
 
                     objectProperty.SetValue(instance,
                         TypeDescriptor.GetConverter(objectProperty.PropertyType).ConvertFromString(
-                            node.InnerText), null);
+                            node.InnerXml), null);
                 }
             }
         }

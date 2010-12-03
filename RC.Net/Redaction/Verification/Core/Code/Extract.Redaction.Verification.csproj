@@ -171,6 +171,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="RedactionGridViewRowComparer.cs" />
     <Compile Include="RedactionGridViewRow.cs" />
     <Compile Include="RedactionGridView.cs">
@@ -181,6 +186,18 @@
     </Compile>
     <Compile Include="RedactionCounts.cs" />
     <Compile Include="RegistryManager.cs" />
+    <Compile Include="SlideshowSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SlideshowSettingsDialog.Designer.cs">
+      <DependentUpon>SlideshowSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SlideshowUserOptionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SlideshowUserOptionsDialog.Designer.cs">
+      <DependentUpon>SlideshowUserOptionsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="VerificationAboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -374,6 +391,13 @@
       <SubType>Designer</SubType>
       <DependentUpon>RedactionGridView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SlideshowSettingsDialog.resx">
+      <DependentUpon>SlideshowSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SlideshowUserOptionsDialog.resx">
+      <DependentUpon>SlideshowUserOptionsDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="VerificationAboutBox.resx">
       <SubType>Designer</SubType>
       <DependentUpon>VerificationAboutBox.cs</DependentUpon>
@@ -395,6 +419,10 @@
     <None Include="app.config" />
     <None Include="ProcessFiles.exe.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Resources\Exemption.png" />
   </ItemGroup>

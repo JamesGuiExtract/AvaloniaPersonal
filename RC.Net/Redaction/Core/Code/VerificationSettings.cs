@@ -52,6 +52,11 @@ namespace Extract.Redaction
         /// </summary>
         readonly bool _launchInFullScreenMode;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        readonly SlideshowSettings _slideshowSettings;
+
         #endregion Fields
 
         #region Constructors
@@ -60,7 +65,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="VerificationSettings"/> class.
         /// </summary>
         public VerificationSettings() 
-            : this(null, null, null, false, null, null, false, false)
+            : this(null, null, null, false, null, null, false, false, null)
         {
 
         }
@@ -72,7 +77,7 @@ namespace Extract.Redaction
         public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback, 
             string inputFile, bool useBackdropImage, string backdropImage, 
             SetFileActionStatusSettings actionStatus, bool enableInputTracking,
-            bool launchInFullScreenMode)
+            bool launchInFullScreenMode, SlideshowSettings slideshowSettings)
         {
             _generalSettings = general ?? new GeneralVerificationSettings();
             _feedbackSettings = feedback ?? new FeedbackSettings();
@@ -82,6 +87,7 @@ namespace Extract.Redaction
             _actionStatusSettings = actionStatus ?? new SetFileActionStatusSettings();
             _enableInputTracking = enableInputTracking;
             _launchInFullScreenMode = launchInFullScreenMode;
+            _slideshowSettings = slideshowSettings ?? new SlideshowSettings();
         }
 
         #endregion Constructors
@@ -194,6 +200,18 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets the [SlideshowSettings].
+        /// </summary>
+        /// <value>The [SlideshowSettings].</value>
+        public SlideshowSettings SlideshowSettings
+        {
+            get
+            {
+                return _slideshowSettings;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -218,6 +236,7 @@ namespace Extract.Redaction
                 SetFileActionStatusSettings actionStatusSettings = null;
                 bool enableInputTracking = false;
                 bool launchInFullScreenMode = false;
+                SlideshowSettings slideshowSettings = null;
 
                 if (reader.Version < 2)
                 {
@@ -242,10 +261,14 @@ namespace Extract.Redaction
                 {
                     launchInFullScreenMode = reader.ReadBoolean();
                 }
+                if (reader.Version >= 7)
+                {
+                    slideshowSettings = SlideshowSettings.ReadFrom(reader);
+                }
 
                 return new VerificationSettings(general, feedback, inputFile, useBackdropImage,
                     backdropImage, actionStatusSettings, enableInputTracking,
-                    launchInFullScreenMode);
+                    launchInFullScreenMode, slideshowSettings);
             }
             catch (Exception ex)
             {
@@ -272,6 +295,7 @@ namespace Extract.Redaction
                 writer.Write(_useBackdropImage);
                 writer.Write(_backdropImage);
                 writer.Write(_launchInFullScreenMode);
+                _slideshowSettings.WriteTo(writer);
             }
             catch (Exception ex)
             {
