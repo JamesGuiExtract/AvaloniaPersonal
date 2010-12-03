@@ -828,7 +828,7 @@ namespace Extract.Redaction.Verification
             // 
             this._slideshowConfigToolStripMenuItem.Name = "_slideshowConfigToolStripMenuItem";
             this._slideshowConfigToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            this._slideshowConfigToolStripMenuItem.Text = "&Options";
+            this._slideshowConfigToolStripMenuItem.Text = "&Options...";
             this._slideshowConfigToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowConfigUIClick);
             // 
             // _slideshowPlayToolStripMenuItem

@@ -2596,7 +2596,7 @@ namespace Extract.Redaction.Verification
 
                 _numSlideshowAdvancedPages++;
 
-                int nextPage = _pageSummaryView.GetNextUnvisitedPage(_imageViewer.PageNumber);
+                int nextPage = GetNextPage();
                 if (nextPage > 0)
                 {
                     
