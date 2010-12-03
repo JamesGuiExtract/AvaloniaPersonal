@@ -22,7 +22,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 
 // This must be updated when the DB schema changes
-const long glIDShieldDBSchemaVersion = 2;
+const long glIDShieldDBSchemaVersion = 3;
 const string gstrID_SHIELD_SCHEMA_VERSION_NAME = "IDShieldSchemaVersion";
 static const string gstrSTORE_IDSHIELD_PROCESSING_HISTORY = "StoreIDShieldProcessingHistory";
 static const string gstrSTORE_HISTORY_DEFAULT_SETTING = "1"; // TRUE
@@ -209,7 +209,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcess
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL vbVerified, 
 		double lDuration, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound, 
-		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions)
+		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
+		long lNumPagesAutoAdvanced)
 {
 	try
 	{
@@ -217,7 +218,7 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 
 		if (!AddIDShieldData_Internal(false, lFileID, vbVerified, lDuration, lNumHCDataFound, 
 			lNumMCDataFound,	lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
-			lTotalManualRedactions))
+			lTotalManualRedactions, lNumPagesAutoAdvanced))
 		{
 			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipThis;
 			ipThis = this;
@@ -227,8 +228,8 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(ipThis);
 			
 			AddIDShieldData_Internal(true, lFileID, vbVerified, lDuration, lNumHCDataFound, 
-				lNumMCDataFound,	lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
-				lTotalManualRedactions);
+				lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 
+				lTotalManualRedactions, lNumPagesAutoAdvanced);
 		}
 		return S_OK;
 	}
@@ -415,7 +416,8 @@ void CIDShieldProductDBMgr::validateIDShieldSchemaVersion()
 //-------------------------------------------------------------------------------------------------
 bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileID, VARIANT_BOOL vbVerified, 
 		double lDuration, long lNumHCDataFound, long lNumMCDataFound, long lNumLCDataFound, 
-		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions)
+		long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
+		long lNumPagesAutoAdvanced)
 {
 	try
 	{
@@ -470,7 +472,8 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileI
 				+ ", " + asString(dTotalDuration) + ", " + asString(lNumHCDataFound) + ", "
 				+ asString(lNumMCDataFound) + ", " + asString(lNumLCDataFound) + ", "
 				+ asString(lNumCluesDataFound) + ", " + asString(lTotalRedactions) + ", "
-				+ asString(lTotalManualRedactions) + ")";
+				+ asString(lTotalManualRedactions) + ", "
+				+ asString(lNumPagesAutoAdvanced) + ")";
 
 			// Create a transaction guard
 			TransactionGuard tg(ipConnection);

@@ -33,6 +33,7 @@ public:
 	long m_lNumCluesFound;
 	long m_lTotalRedactions;
 	long m_lTotalManualRedactions;
+	long m_lNumPagesAutoAdvanced;
 
 private:
 

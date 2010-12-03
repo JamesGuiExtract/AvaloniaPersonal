@@ -26,7 +26,8 @@ static const string gstrCREATE_IDSHIELD_DATA =
 	" [NumLCDataFound] [int] NULL, "
 	" [NumCluesFound] [int] NULL, "
 	" [TotalManualRedactions] [int] NULL, "
-	" [TotalRedactions] [int] NULL)";
+	" [TotalRedactions] [int] NULL, "
+	" [NumPagesAutoAdvanced] [int] NULL)";
 
 // Query to add IDShieldData - FAMFile foreign key
 static const string gstrADD_FK_IDSHIELD_FAMFILE =
@@ -82,7 +83,8 @@ static const string gstrINSERT_IDSHIELD_DATA_RCD =
     "  ,[NumLCDataFound]"
     "  ,[NumCluesFound]"
     "  ,[TotalRedactions]"
-    "  ,[TotalManualRedactions]) "
+    "  ,[TotalManualRedactions]"
+	"  ,[NumPagesAutoAdvanced]) "
 	"  VALUES ";
 
 // Deletes all records in the IDShieldData table that 

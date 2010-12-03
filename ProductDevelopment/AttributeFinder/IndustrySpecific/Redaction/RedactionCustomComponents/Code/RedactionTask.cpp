@@ -394,7 +394,8 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 			// Add the IDShieldData record to the database
 			ipIDSDB->AddIDShieldData(nFileID, VARIANT_FALSE, swProcessingTime.getElapsedTime(), 
 				idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
-				idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions);
+				idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions,
+				idsData.m_lNumPagesAutoAdvanced);
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28604")

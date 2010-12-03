@@ -224,10 +224,10 @@ namespace Extract.Redaction.Verification
         CancellationTokenSource _slideshowMessageCanceler;
 
         /// <summary>
-        /// The number of pages that have been automatically advanced by the slideshow in the
-        /// current document.
+        /// The pages that have been automatically advanced by the slideshow in the current
+        /// document.
         /// </summary>
-        int _numSlideshowAdvancedPages;
+        HashSet<int> _setSlideshowAdvancedPages = new HashSet<int>();
 
         /// <summary>
         /// The configure slideshow command
@@ -489,7 +489,7 @@ namespace Extract.Redaction.Verification
 
             // If at least one page has been automatically advanced on the document being saved,
             // apply any tags or action status per the task configuration.
-            if (_numSlideshowAdvancedPages > 0)
+            if (_setSlideshowAdvancedPages.Count > 0)
             {
                 VerificationMemento memento = null;
                 if (_settings.SlideshowSettings.ApplyAutoAdvanceTag)
@@ -536,8 +536,8 @@ namespace Extract.Redaction.Verification
         void AddDatabaseData(int fileId, RedactionCounts counts, TimeInterval screenTime)
         {
             _idShieldDatabase.AddIDShieldData(fileId, true, screenTime.ElapsedSeconds, 
-                counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence, 
-                counts.Clues, counts.Total, counts.Manual);
+                counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence,
+                counts.Clues, counts.Total, counts.Manual, _setSlideshowAdvancedPages.Count);
         }
 
         /// <summary>
@@ -1222,6 +1222,18 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Gets the page for the currently selected redactions or if no redactions are 
+        /// selected the currently visible page.
+        /// </summary>
+        /// <returns>The page for the currently selected redactions or if no redactions are 
+        /// selected the currently visible page.</returns>
+        int GetCurrentPage()
+        {
+            int row = _redactionGridView.GetFirstSelectedRowIndex();
+            return GetActivePageByRowIndex(row);
+        }
+
+        /// <summary>
         /// Gets the page before the currently selected redactions or if no redactions are 
         /// selected the page before the currently visible page.
         /// </summary>
@@ -1229,8 +1241,7 @@ namespace Extract.Redaction.Verification
         /// selected the page before the currently visible page.</returns>
         int GetPreviousPage()
         {
-            int row = _redactionGridView.GetFirstSelectedRowIndex();
-            int page = GetActivePageByRowIndex(row) - 1;
+            int page = GetCurrentPage() - 1;
             return page < 1 ? -1 : page;
         }
 
@@ -1242,8 +1253,7 @@ namespace Extract.Redaction.Verification
         /// selected the page after the currently visible page.</returns>
         int GetNextPage()
         {
-            int row = _redactionGridView.GetLastSelectedRowIndex();
-            int page = GetActivePageByRowIndex(row) + 1;
+            int page = GetCurrentPage() + 1;
             return page > _imageViewer.PageCount ? -1 : page;
         }
 
@@ -2353,7 +2363,7 @@ namespace Extract.Redaction.Verification
                         _slideshowTimer.Enabled = !pauseSlideshow;
                     }
 
-                    _numSlideshowAdvancedPages = 0;
+                    _setSlideshowAdvancedPages.Clear();
 
                     // Start recording the screen time
                     _screenTime.Start();
@@ -2594,12 +2604,11 @@ namespace Extract.Redaction.Verification
                     return;
                 }
 
-                _numSlideshowAdvancedPages++;
+                _setSlideshowAdvancedPages.Add(GetCurrentPage());
 
-                int nextPage = GetNextPage();
-                if (nextPage > 0)
+                int nextPage = _imageViewer.PageNumber + 1;
+                if (nextPage <= _imageViewer.PageCount)
                 {
-                    
                     VisitPage(nextPage);
                     _slideshowTimer.Enabled = true;
                 }

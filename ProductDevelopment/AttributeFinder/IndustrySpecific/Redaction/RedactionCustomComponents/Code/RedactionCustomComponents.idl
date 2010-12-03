@@ -545,7 +545,8 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 		[id(1), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData([in] long lFileID, 
 			[in] VARIANT_BOOL vbVerified, [in] double lDuration, [in] long lNumHCDataFound, 
 			[in] long lNumMCDataFound, [in] long lNumLCDataFound, [in] long lNumCluesDataFound, 
-			[in] long lTotalRedactions, [in] long lTotalManualRedactions);
+			[in] long lTotalRedactions, [in] long lTotalManualRedactions,
+			[in] long lNumPagesAutoAdvanced);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To set the FAMDB
 		[propput, id(2), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);

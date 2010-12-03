@@ -33,6 +33,7 @@ void IDShieldData::clear()
 	m_lNumCluesFound = 0;
 	m_lTotalRedactions = 0;
 	m_lTotalManualRedactions = 0;
+	m_lNumPagesAutoAdvanced = 0;
 }
 //-------------------------------------------------------------------------------------------------
 void IDShieldData::calculateFromVector(IIUnknownVectorPtr ipAttributes, const set<string>& setRedactLabels)
