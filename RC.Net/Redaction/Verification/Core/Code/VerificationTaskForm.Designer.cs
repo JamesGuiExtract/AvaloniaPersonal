@@ -1038,7 +1038,7 @@ namespace Extract.Redaction.Verification
             // _slideshowConfigToolStripButton
             // 
             this._slideshowConfigToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._slideshowConfigToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_slideshowConfigToolStripButton.Image")));
+            this._slideshowConfigToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.SlideshowConfig;
             this._slideshowConfigToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._slideshowConfigToolStripButton.Name = "_slideshowConfigToolStripButton";
             this._slideshowConfigToolStripButton.Size = new System.Drawing.Size(36, 36);
@@ -1049,7 +1049,7 @@ namespace Extract.Redaction.Verification
             // 
             this._slideshowPlayToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._slideshowPlayToolStripButton.Enabled = false;
-            this._slideshowPlayToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_slideshowPlayToolStripButton.Image")));
+            this._slideshowPlayToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.SlideshowPlay;
             this._slideshowPlayToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._slideshowPlayToolStripButton.Name = "_slideshowPlayToolStripButton";
             this._slideshowPlayToolStripButton.Size = new System.Drawing.Size(36, 36);
@@ -1061,7 +1061,7 @@ namespace Extract.Redaction.Verification
             // 
             this._slideshowPauseToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._slideshowPauseToolStripButton.Enabled = false;
-            this._slideshowPauseToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_slideshowPauseToolStripButton.Image")));
+            this._slideshowPauseToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.SlideshowPause;
             this._slideshowPauseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._slideshowPauseToolStripButton.Name = "_slideshowPauseToolStripButton";
             this._slideshowPauseToolStripButton.Size = new System.Drawing.Size(36, 36);
@@ -1072,7 +1072,7 @@ namespace Extract.Redaction.Verification
             // 
             this._slideshowStopToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._slideshowStopToolStripButton.Enabled = false;
-            this._slideshowStopToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("_slideshowStopToolStripButton.Image")));
+            this._slideshowStopToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.SlideshowStop;
             this._slideshowStopToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._slideshowStopToolStripButton.Name = "_slideshowStopToolStripButton";
             this._slideshowStopToolStripButton.Size = new System.Drawing.Size(36, 36);
