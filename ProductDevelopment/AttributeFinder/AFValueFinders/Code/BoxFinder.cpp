@@ -1772,7 +1772,7 @@ IAttributePtr CBoxFinder::createTextResult(IAFDocumentPtr ipAFDoc, ILongRectangl
 	ASSERT_ARGUMENT("ELI20227", ipClue != NULL);
 
 	// Return the spatial string text found within the box
-	ISpatialStringPtr ipText =  getSpatialStringSearcher()->GetDataInRegion(ipBox, VARIANT_TRUE);
+	ISpatialStringPtr ipText =  getSpatialStringSearcher()->GetDataInRegion(ipBox, VARIANT_FALSE);
 	ASSERT_RESOURCE_ALLOCATION("ELI19785", ipText != NULL);
 
 	// Expand clue list to replace any file names with the clues from the specified file

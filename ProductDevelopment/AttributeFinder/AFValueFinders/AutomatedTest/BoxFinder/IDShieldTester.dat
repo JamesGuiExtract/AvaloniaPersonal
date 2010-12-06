@@ -123,3 +123,7 @@
 // Searches for a box from a document whose pages have all been excluded via an Select Page Region preprocessor
 // Tests: [FlexIDSCore:4296, 2988]
 <TESTFOLDER>;.\Test25.rsd;.\AutomatedTestFiles\r_362_4_scan_2805\;$DirOf(<SourceDocName>)\..\ActualVOA\Test25.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test25.voa
+
+// Ensures that Text results are returned by finding text in the correct region on rotated images.
+// Tests: [FlexIDSCore:4468]
+<TESTFOLDER>;.\Test26.rsd;.\AutomatedTestFiles\003\;$DirOf(<SourceDocName>)\..\ActualVOA\Test26.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test26.voa
