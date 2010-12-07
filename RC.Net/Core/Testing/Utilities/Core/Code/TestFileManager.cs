@@ -1,7 +1,6 @@
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Reflection;
 
@@ -150,32 +149,39 @@ namespace Extract.Testing.Utilities
         /// <param name="fileName">The name to assign to the temporary file. If
         /// <see langword="null"/> or empty string will auto-generate a temporary
         /// file name.</param>
-        /// <returns>A <see cref="TemporaryFile"/> for the embedded resource.
-        private TemporaryFile CreateTemporaryFile(string resource, string fileName)
+        /// <returns>A <see cref="TemporaryFile"/> for the embedded resource.</returns>
+        TemporaryFile CreateTemporaryFile(string resource, string fileName)
         {
             // If specified file name is null or empty just generate a new temp file.
             // If a file name is specified then associate a tempoary file with the specified name.
-            TemporaryFile tempFile;
-            if (string.IsNullOrEmpty(fileName))
+            TemporaryFile tempFile = null;
+            try
             {
-                tempFile = new TemporaryFile();
-            }
-            else
-            {
-                // Create a new TemporaryFile associated with the specified file name
-                FileInfo fileInfo = new FileInfo(fileName);
-                tempFile = new TemporaryFile(fileInfo);
-            }
+                if (string.IsNullOrWhiteSpace(fileName))
+                {
+                    tempFile = new TemporaryFile();
+                }
+                else
+                {
+                    // Create a new TemporaryFile associated with the specified file name
+                    FileInfo fileInfo = new FileInfo(fileName);
+                    tempFile = new TemporaryFile(fileInfo);
+                }
 
-            // Write the embedded testing image to a temporary file
-            using (Stream stream =
-                _assembly.GetManifestResourceStream(typeof(T), resource))
-            {
-                File.WriteAllBytes(tempFile.FileName,
-                    StreamMethods.ConvertStreamToByteArray(stream));
-            }
+                GeneralMethods.WriteEmbeddedResourceToFile<T>(_assembly,
+                    resource, tempFile.FileName);
 
-            return tempFile;
+                return tempFile;
+            }
+            catch
+            {
+                if (tempFile != null)
+                {
+                    tempFile.Dispose();
+                }
+
+                throw;
+            }
         }
 
         #endregion TestImageManager Methods
@@ -202,9 +208,10 @@ namespace Extract.Testing.Utilities
             if (disposing)
             {
                 // Dispose of each of the temporary files (this will delete the files)
-                foreach (TemporaryFile tempFile in _files.Values)
+                if (_files != null)
                 {
-                    tempFile.Dispose();
+                    CollectionMethods.ClearAndDispose(_files);
+                    _files = null;
                 }
             }
 

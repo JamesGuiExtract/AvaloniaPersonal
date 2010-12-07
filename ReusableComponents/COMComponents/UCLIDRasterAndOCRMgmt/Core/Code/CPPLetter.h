@@ -61,10 +61,50 @@ public:
 	   m_ucFont(ucFont)
 	{
 	}
+
+	CPPLetter(const CPPLetter& letter) :
+		m_usGuess1(letter.m_usGuess1),
+		m_usGuess2(letter.m_usGuess2),
+		m_usGuess3(letter.m_usGuess2),
+		m_usTop(letter.m_usTop),
+		m_usBottom(letter.m_usBottom),
+		m_usLeft(letter.m_usLeft),
+		m_usRight(letter.m_usRight),
+		m_usPageNumber(letter.m_usPageNumber),
+		m_bIsEndOfParagraph(letter.m_bIsEndOfParagraph),
+		m_bIsEndOfZone(letter.m_bIsEndOfZone),
+		m_bIsSpatial(letter.m_bIsSpatial),
+		m_ucFontSize(letter.m_ucFontSize),
+		m_ucCharConfidence(letter.m_ucCharConfidence),
+		m_ucFont(letter.m_ucFont)
+	{
+	}
+
 	
 	//////////////
 	// Methods
 	//////////////
+
+	CPPLetter& operator= (const CPPLetter& letter)
+	{
+		m_usGuess1 = letter.m_usGuess1;
+		m_usGuess2 = letter.m_usGuess2;
+		m_usGuess3 = letter.m_usGuess2;
+		m_usTop = letter.m_usTop;
+		m_usBottom = letter.m_usBottom;
+		m_usLeft = letter.m_usLeft;
+		m_usRight = letter.m_usRight;
+		m_usPageNumber = letter.m_usPageNumber;
+		m_bIsEndOfParagraph = letter.m_bIsEndOfParagraph;
+		m_bIsEndOfZone = letter.m_bIsEndOfZone;
+		m_bIsSpatial = letter.m_bIsSpatial;
+		m_ucFontSize = letter.m_ucFontSize;
+		m_ucCharConfidence = letter.m_ucCharConfidence;
+		m_ucFont = letter.m_ucFont;
+
+		return *this;
+	}
+
 	inline bool isItalic() const { return (m_ucFont & LTR_ITALIC) != 0; }
 	inline bool isBold() const { return (m_ucFont & LTR_BOLD) != 0; }
 	inline bool isSansSerif() const { return (m_ucFont & LTR_SANSSERIF) != 0; }
