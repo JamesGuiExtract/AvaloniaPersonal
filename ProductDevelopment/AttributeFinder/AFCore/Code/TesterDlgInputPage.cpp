@@ -640,6 +640,9 @@ void TesterDlgInputPage::inputFileChanged(string strFileName/* = */)
 			strFileName = (LPCTSTR)zInputFile;
 		}
 
+		// Trim the file name [FlexIDSCore #4456]
+		strFileName = trim(strFileName, " ", " ");
+
 		// If the filename has not changed since the last call, just return and use the current
 		// text.
 		if (strFileName == m_strCurrentInputFile)
