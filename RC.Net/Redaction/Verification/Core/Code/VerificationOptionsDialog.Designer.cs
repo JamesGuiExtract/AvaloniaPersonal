@@ -168,9 +168,6 @@ namespace Extract.Redaction.Verification
             this._autoToolComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._autoToolComboBox.Enabled = false;
             this._autoToolComboBox.FormattingEnabled = true;
-            this._autoToolComboBox.Items.AddRange(new object[] {
-            "pan",
-            "selection"});
             this._autoToolComboBox.Location = new System.Drawing.Point(77, 125);
             this._autoToolComboBox.Name = "_autoToolComboBox";
             this._autoToolComboBox.Size = new System.Drawing.Size(100, 21);

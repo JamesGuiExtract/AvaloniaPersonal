@@ -1,6 +1,5 @@
 using Extract.Imaging;
 using Extract.Imaging.Forms;
-using Extract.Utilities.Forms;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1509,8 +1508,11 @@ namespace Extract.Redaction.Verification
                 case AutoTool.Pan:
                     return CursorTool.Pan;
 
-                case AutoTool.SelectLayerObject:
+                case AutoTool.Selection:
                     return CursorTool.SelectLayerObject;
+
+                case AutoTool.Zoom:
+                    return CursorTool.ZoomWindow;
 
                 default:
                     throw new ExtractException("ELI27436", "Unexpected auto tool.");

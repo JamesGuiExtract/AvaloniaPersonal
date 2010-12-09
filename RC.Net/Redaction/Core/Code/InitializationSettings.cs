@@ -340,7 +340,7 @@ namespace Extract.Redaction
             int autoTool = iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_TOOL_KEY);
 
             // Ensure auto tool has a defined value
-            if (autoTool < 0 || autoTool > 2)
+            if (autoTool < 0 || autoTool > 3)
             {
                 return AutoTool.None;
             }

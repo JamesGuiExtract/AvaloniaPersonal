@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using System.Globalization;
+using System.Windows.Forms;
 
 namespace Extract.Redaction.Verification
 {
@@ -44,6 +40,12 @@ namespace Extract.Redaction.Verification
             InitializeComponent();
 
             _options = options ?? new VerificationOptions();
+
+            // Fill the tool combo box from the enum
+            var autoToolType = typeof(AutoTool);
+            var names = new List<string>(Enum.GetNames(autoToolType));
+            names.Remove(Enum.GetName(autoToolType, AutoTool.None));
+            _autoToolComboBox.Items.AddRange(names.ToArray());
         }
 
         #endregion VerificationOptionsDialog Constructors
@@ -92,7 +94,8 @@ namespace Extract.Redaction.Verification
         {
             if (_autoToolCheckBox.Checked)
             {
-                return (AutoTool)_autoToolComboBox.SelectedIndex + 1;
+                var tool = (AutoTool) Enum.Parse(typeof(AutoTool), _autoToolComboBox.Text, true);
+                return tool;
             }
 
             return AutoTool.None;
@@ -137,7 +140,7 @@ namespace Extract.Redaction.Verification
                 // Set auto tool settings
                 AutoTool autoTool = _options.AutoTool;
                 _autoToolCheckBox.Checked = autoTool != AutoTool.None;
-                _autoToolComboBox.SelectedIndex = autoTool == AutoTool.SelectLayerObject ? 1 : 0;
+                _autoToolComboBox.Text = Enum.GetName(typeof(AutoTool), autoTool);
 
                 UpdateControls();
             }

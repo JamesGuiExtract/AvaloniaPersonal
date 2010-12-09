@@ -9,16 +9,21 @@ namespace Extract.Redaction
         /// <summary>
         /// No cursor tool is specified
         /// </summary>
-        None,
+        None = 0,
 
         /// <summary>
         /// The pan tool
         /// </summary>
-        Pan,
+        Pan = 1,
 
         /// <summary>
         /// The select layer object tool
         /// </summary>
-        SelectLayerObject
+        Selection = 2,
+
+        /// <summary>
+        /// The zoom layer object tool
+        /// </summary>
+        Zoom = 3
     }
 }

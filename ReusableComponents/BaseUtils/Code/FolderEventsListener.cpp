@@ -389,32 +389,32 @@ bool FolderEventsListener::fileReadyForAccess(std::string strFileName)
 	return bReadable;
 }
 //-------------------------------------------------------------------------------------------------
-void FolderEventsListener::dispatchEvent(const FolderEvent& event)
+void FolderEventsListener::dispatchEvent(const FolderEvent& folderEvent)
 {
 	try
 	{
-		switch(event.m_nEvent)
+		switch(folderEvent.m_nEvent)
 		{
 		case kFileAdded:
-			onFileAdded(event.m_strFileNameNew);
+			onFileAdded(folderEvent.m_strFileNameNew);
 			break;
 		case kFileRemoved:
-			onFileRemoved(event.m_strFileNameOld);
+			onFileRemoved(folderEvent.m_strFileNameOld);
 			break;
 		case kFileModified:
-			onFileModified(event.m_strFileNameNew);
+			onFileModified(folderEvent.m_strFileNameNew);
 			break;
 		case kFileRenamed:
-			onFileRenamed(event.m_strFileNameOld, event.m_strFileNameNew);
+			onFileRenamed(folderEvent.m_strFileNameOld, folderEvent.m_strFileNameNew);
 			break;
 		case kFolderAdded:
-			onFolderAdded(event.m_strFileNameNew );
+			onFolderAdded(folderEvent.m_strFileNameNew );
 			break;
 		case kFolderRemoved:
-			onFolderRemoved(event.m_strFileNameOld );
+			onFolderRemoved(folderEvent.m_strFileNameOld );
 			break;
 		case kFolderRenamed:
-			onFolderRenamed(event.m_strFileNameOld, event.m_strFileNameNew);
+			onFolderRenamed(folderEvent.m_strFileNameOld, folderEvent.m_strFileNameNew);
 			break;
 		default:
 			break;
