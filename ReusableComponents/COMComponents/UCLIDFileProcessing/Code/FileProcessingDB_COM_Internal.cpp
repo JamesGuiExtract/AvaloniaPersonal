@@ -148,7 +148,7 @@ bool CFileProcessingDB::DeleteAction_Internal(bool bDBLocked, BSTR strAction)
 				long nActionID = getActionID(ipConnection, strActionName);
 
 				// Make sure processing is not active of this action
-				assertProcessingNotActiveForAction(ipConnection, nActionID);
+				assertProcessingNotActiveForAction(bDBLocked, ipConnection, nActionID);
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
@@ -427,7 +427,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 							// If auto-revert is to be attempted, but we have not attempted it yet.
 							if (m_bAutoRevertLockedFiles && !bAttemptedRevert)
 							{
-								revertTimedOutProcessingFAMs(ipConnection);
+								revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 								// Requery to see if the attempt had an effect on the file in question.
 								ipFileActionStatusSet->Requery(adOptionUnspecified);
@@ -918,7 +918,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 						// Begin a transaction
 						TransactionGuard tg(ipConnection);
 
-						revertTimedOutProcessingFAMs(ipConnection);
+						revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 						// Commit the changes to the database
 						tg.CommitTrans();
@@ -1312,7 +1312,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				replaceVariable(strSelectSQL, strActionIDPlaceHolder, asString(nActionID));
 
 				// return the vector of file records
-				IIUnknownVectorPtr ipFiles = setFilesToProcessing(ipConnection, strSelectSQL, nActionID);
+				IIUnknownVectorPtr ipFiles = setFilesToProcessing(bDBLocked, ipConnection, strSelectSQL, nActionID);
 				*pvecFileRecords = ipFiles.Detach();
 			END_CONNECTION_RETRY(ipConnection, "ELI30377");
 		}
@@ -1320,7 +1320,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 	}
 	catch(UCLIDException &ue)
 	{
-		if (bDBLocked)
+		if (!bDBLocked)
 		{
 			return false;
 		}
@@ -1520,7 +1520,7 @@ bool CFileProcessingDB::RenameAction_Internal(bool bDBLocked, long nActionID, BS
 				validateDBSchemaVersion();
 
 				// Make sure processing is not active of this action
-				assertProcessingNotActiveForAction(ipConnection, nActionID);
+				assertProcessingNotActiveForAction(bDBLocked, ipConnection, nActionID);
 
 				// Convert action names to string
 				string strOld = getActionName(ipConnection, nActionID);
@@ -4815,7 +4815,7 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 					" WHERE FAMFile.ID = " + asString(nFileId);
 
 				// Perform all processing related to setting a file as processing.
-				setFilesToProcessing(ipConnection, strSelectSQL, nActionID);
+				setFilesToProcessing(bDBLocked, ipConnection, strSelectSQL, nActionID);
 
 			END_CONNECTION_RETRY(ipConnection, "ELI30389");
 		}

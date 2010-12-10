@@ -598,5 +598,62 @@ static const string gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA =
 	"  GROUP BY ActionID) as Changes "
 	"  WHERE ActionStatistics.ActionID = <ActionIDToUpdate>";
 
-
-
+// Query used to get the files to process and add the appropriate items to LockedFile and FAST 
+// Variables that need to be replaced:
+//		<SelectFilesToProcessQuery> - The complete query that will select the files to process
+//		<ActionID> - The ID of the action being processed
+//		<UserID> - ID for the files are being processed under
+//		<MachineID> - ID for the machine processing the files
+//		<UPIID> - UPIID of the processing FAM
+static const string gstrGET_FILES_TO_PROCESS_QUERY = 
+	"DECLARE @OutputTableVar table ( \r\n"
+	"	[ID] [int] NOT NULL, \r\n"
+	"	[FileName] [nvarchar](255) NULL, \r\n"
+	"	[FileSize] [bigint] NOT NULL, \r\n"
+	"	[Pages] [int] NOT NULL, \r\n"
+	"	[Priority] [int] NOT NULL, \r\n"
+	"	[ASC_From] [nvarchar](1) NOT NULL \r\n"
+	"); \r\n"
+	"SET NOCOUNT ON \r\n"
+	"BEGIN TRY \r\n"
+	"	UPDATE FileActionStatus Set ActionStatus = 'R'  \r\n"
+	"	OUTPUT ATABLE.ID, ATABLE.FileName, ATABLE.FileSize, ATABLE.Pages, ATABLE.Priority, deleted.ActionStatus INTO @OutputTableVar \r\n"
+	"	FROM  \r\n"
+	"	( \r\n"
+	"		<SelectFilesToProcessQuery> ) AS ATABLE  \r\n"
+	"	INNER JOIN FileActionStatus on FileActionStatus.FileID = ATABLE.ID AND FileActionStatus.ActionID = <ActionID>;  \r\n"
+	"	INSERT INTO FileActionStateTransition (FileID, ActionID,  ASC_From, ASC_To,  \r\n"
+	"		DateTimeStamp, FAMUserID, MachineID, Exception, Comment) \r\n"
+	"	SELECT id, <ActionID> as ActionID, ASC_From, 'R' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
+	"		<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar; \r\n"
+	"	INSERT INTO LockedFile(FileID,ActionID,UPIID,StatusBeforeLock) \r\n"
+	"		SELECT ID, <ActionID> as ActionID, <UPIID> AS UPIID, ASC_From AS StatusBeforeLock FROM @OutputTableVar; \r\n"
+	"	SET NOCOUNT OFF \r\n"
+	"END TRY \r\n"
+	"BEGIN CATCH"
+	"\r\n"
+	// Ensure NOCOUNT is set to OFF
+	"SET NOCOUNT OFF\r\n"
+	"\r\n"
+	// Get the error message, severity and state
+	"	DECLARE @ErrorMessage NVARCHAR(4000);\r\n"
+	"	DECLARE @ErrorSeverity INT;\r\n"
+	"	DECLARE @ErrorState INT;\r\n"
+	"\r\n"
+	"SELECT \r\n"
+	"	@ErrorMessage = ERROR_MESSAGE(),\r\n"
+	"	@ErrorSeverity = ERROR_SEVERITY(),\r\n"
+	"	@ErrorState = ERROR_STATE();\r\n"
+	"\r\n"
+	// Check for state of 0 (cannot raise error with state 0, set to 1)
+	"IF @ErrorState = 0\r\n"
+	"	SELECT @ErrorState = 1\r\n"
+	"\r\n"
+	// Raise the error so that it will be caught at the outer scope
+	"RAISERROR (@ErrorMessage,\r\n"
+	"	@ErrorSeverity,\r\n"
+	"	@ErrorState\r\n"
+	");\r\n"
+	"\r\n"
+	"END CATCH\r\n"
+	"SELECT * FROM @OutputTableVar ";

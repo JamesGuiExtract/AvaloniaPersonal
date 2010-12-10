@@ -2549,10 +2549,20 @@ void CFileProcessingDB::clear(bool retainUserValues)
 {
 	try
 	{
-		CSingleLock lock(&m_mutex, TRUE);
-
 		// Make sure processing is not active
-		assertProcessingNotActiveForAnyAction();
+		// This check needs to be done with the database locked since it will attempt to revert
+		// timed out FAM's as part of the check for active processing
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+			// since we are clearing the database locking
+			// it will really have no effect so pass true so we
+			// can make sure there is no active processing 
+			assertProcessingNotActiveForAnyAction(true);
+		}
+		
+		CSingleLock lock(&m_mutex, TRUE);
 
 		// Begin a transaction
 		TransactionGuard tg(getDBConnection());
@@ -3013,7 +3023,7 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::revertTimedOutProcessingFAMs(const _ConnectionPtr& ipConnection)
+void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _ConnectionPtr& ipConnection)
 {
 	// Make sure the LastPingTime is up to date to keep before reverting so that the
 	// current session doesn't get auto reverted
@@ -3040,6 +3050,12 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(const _ConnectionPtr& ipCon
 		// Check for a dead FAM
 		if (nElapsed > m_nAutoRevertTimeOutInMinutes)
 		{
+			if (!bDBLocked) 
+			{
+				UCLIDException ue("ELI31136", "Database must be locked to revert files.");
+				throw  ue;
+			}
+
 			long nUPIID = getLongField(ipFields, "ID");
 			long nMinutesSinceLastPing = getLongField(ipFields, "Elapsed");
 
@@ -3242,10 +3258,12 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr &ipConnection,
+IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 														   const string& strSelectSQL,
 														   long nActionID)
 {
+	// Declare query string so that if there is an exception the query can be added to debug info
+	string strQuery;
 	try
 	{
 		try
@@ -3259,29 +3277,33 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 
 			if (m_bAutoRevertLockedFiles)
 			{
-				revertTimedOutProcessingFAMs(ipConnection);
+				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 			}
 
 			// Action Column to change
 			string strActionName = getActionName(ipConnection, nActionID);
 
-			// Recordset to contain the files to process
-			_RecordsetPtr ipFileSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI30402", ipFileSet != NULL);
+			// Setup query that will set the action status to processing and update the FAST and
+			// LockedFile records
+			strQuery = gstrGET_FILES_TO_PROCESS_QUERY;
 
+			// Replace the variable to set upt the query
+			replaceVariable(strQuery, "<SelectFilesToProcessQuery>", strSelectSQL);
+			replaceVariable(strQuery, "<ActionID>", asString(nActionID));
+			replaceVariable(strQuery, "<UserID>", asString(getFAMUserID(ipConnection)));
+			replaceVariable(strQuery, "<MachineID>", asString(getMachineID(ipConnection)));
+			replaceVariable(strQuery, "<UPIID>", asString(m_nUPIID));
+
+			// Loop to retry getting files until there are either no records returned 
 			// Get recordset of files to be set to processing.
-			ipFileSet->Open(strSelectSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-				adLockReadOnly, adCmdText);
+			// NOTE: Using execute to return a recordset because opening the query in a recordset results
+			// in odd behavior where 1 record would be returned but 6 records would be set to 
+			// processing
+			variant_t vtRecordsAffected = 0L;
+			_RecordsetPtr ipFileSet = ipConnection->Execute(strQuery.c_str(), &vtRecordsAffected,  adCmdText);
+			ASSERT_RESOURCE_ALLOCATION("ELI30402", ipFileSet != __nullptr);
 
-			// The state the records were in previous to being marked processing.
-			string strFromState;
-
-			// Convert ActionID to string
-			string strActionID = asString(nActionID);
-
-			// Fill the ipFiles collection, also update the FAMFile table and build
-			// the queries to update both the FAST table and the Locked file table
-			string strFileIDIn = "";
+			// Fill the ipFiles collection and update the stats
 			while (ipFileSet->adoEOF == VARIANT_FALSE)
 			{
 				FieldsPtr ipFields = ipFileSet->Fields;
@@ -3295,16 +3317,10 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 				// Put record in list of records to return
 				ipFiles->PushBack(ipFileRecord);
 
-				// Add the file ID to the list of ID's
-				if (!strFileIDIn.empty())
-				{
-					strFileIDIn += ", ";
-				}
-
 				string strFileID = asString(ipFileRecord->FileID);
 
 				// Get the previous state
-				string strFileFromState = getStringField(ipFields, "ActionStatus");
+				string strFileFromState = getStringField(ipFields, "ASC_From");
 
 				// Make sure the transition is valid
 				if (strFileFromState != "P" && strFileFromState != "S")
@@ -3317,74 +3333,12 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 					throw ue;
 				}
 
-				// TODO: Move this out of the loop and use FileID IN ( 
-				// and append list of FileIDs
-				// SQL statement to update the action status to processing
-				string strSQL = "UPDATE FileActionStatus Set ActionStatus = 'R' "
-					"WHERE FileID = " + strFileID + " AND ActionID = " + strActionID;
-
-				// Update the FileActionStatus table
-				executeCmdQuery(ipConnection, strSQL);
-
 				// Update the Statistics
 				updateStats(ipConnection, nActionID, asEActionStatus(strFileFromState), 
 					kActionProcessing, ipFileRecord, ipFileRecord);
 				
-				strFileIDIn += strFileID;
-
-				if (strFromState.empty())
-				{
-					strFromState = strFileFromState;
-				}
-				else if (strFromState != strFileFromState)
-				{
-					UCLIDException ue("ELI30406", "Unable to simultaneously set a batch of records "
-						"in multiple action states to processing!");
-					ue.addDebugInfo("Action Name", strActionName);
-					ue.addDebugInfo("File IDs", strFileIDIn);
-					ue.addDebugInfo("Action State A", strFromState);
-					ue.addDebugInfo("Action State B", strFileFromState);
-					throw ue;
-				}
-
 				// move to the next record in the recordset
 				ipFileSet->MoveNext();
-			}
-
-			// Check whether any file IDs have been added to the string
-			if (!strFileIDIn.empty())
-			{
-				strFileIDIn += ")";
-
-				// Get the from state for the queries
-				string strUPIID = asString(m_nUPIID);
-
-				// Update the FAST table if necessary
-				if (m_bUpdateFASTTable)
-				{
-					// Get the machine and user ID
-					string strMachineID = asString(getMachineID(ipConnection));
-					string strUserID = asString(getFAMUserID(ipConnection));
-
-					// Create query to update the FAST table
-					string strFASTSql =
-						"INSERT INTO " + gstrFILE_ACTION_STATE_TRANSITION + " (FileID, ActionID, "
-						"ASC_From, ASC_To, DateTimeStamp, FAMUserID, MachineID, Exception, "
-						"Comment) SELECT FAMFile.ID, " + strActionID + ", '" + strFromState
-						+ "', 'R', GETDATE(), " + strUserID + ", " + strMachineID
-						+ ", NULL, NULL FROM FAMFile WHERE FAMFile.ID IN (" + strFileIDIn;
-
-					executeCmdQuery(ipConnection, strFASTSql);
-				}
-
-				// Create query to create records in the LockedFile table
-				string strLockedTableSQL =
-					"INSERT INTO LockedFile (FileID, ActionID, UPIID, StatusBeforeLock) SELECT FAMFile.ID, "
-					+ strActionID + ", " + strUPIID + ", '" + strFromState + "' FROM FAMFile WHERE "
-					" FAMFile.ID IN (";
-
-				// Update the lock table
-				executeCmdQuery(ipConnection, strLockedTableSQL + strFileIDIn);
 			}
 
 			// Commit the changes to the database
@@ -3396,7 +3350,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(const _ConnectionPtr 
 	}
 	catch (UCLIDException &ue)
 	{
-		ue.addDebugInfo("Record Query", strSelectSQL, true);
+		ue.addDebugInfo("Record Query", strQuery, true);
 		throw ue;
 	}
 }
@@ -3446,7 +3400,8 @@ _RecordsetPtr CFileProcessingDB::getFileActionStatusSet(_ConnectionPtr& ipConnec
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30536")
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::assertProcessingNotActiveForAction(_ConnectionPtr ipConnection, const long &lActionID)
+void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _ConnectionPtr ipConnection, 
+	const long &lActionID)
 {
 	// If the ProcessingFAM table does not exist nothing is processing so return
 	if (!doesTableExist(ipConnection, gstrPROCESSING_FAM))
@@ -3460,7 +3415,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(_ConnectionPtr ipConn
 		// Begin a transaction for the revert 
 		TransactionGuard tgRevert(ipConnection);
 
-		revertTimedOutProcessingFAMs(ipConnection);
+		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 		tgRevert.CommitTrans();
 	}
@@ -3492,7 +3447,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(_ConnectionPtr ipConn
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::assertProcessingNotActiveForAnyAction()
+void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 {
 	_ConnectionPtr ipConnection = getDBConnection();
 
@@ -3508,7 +3463,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction()
 		// Begin a transaction for the revert 
 		TransactionGuard tgRevert(ipConnection);
 
-		revertTimedOutProcessingFAMs(ipConnection);
+		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 		tgRevert.CommitTrans();
 	}

@@ -349,12 +349,16 @@ private:
 	// PROMISE: Throws an exception if processing is active on the action.
 	// NOTE: If Auto revert is enabled the files will be reverted in a transaction, so this
 	//		 must be called outside of an active transaction.
-	void assertProcessingNotActiveForAction(_ConnectionPtr ipConnection, const long &lActionID);
+	//		bDBLocked - indicates if the database is locked, this is needed because the auto revert
+	//		requires the database to be locked.
+	void assertProcessingNotActiveForAction(bool bDBLocked, _ConnectionPtr ipConnection, const long &lActionID);
 
 	// PROMISE: Throws an exception if processing is active on any action.
 	// NOTE: If Auto revert is enabled the files will be reverted in a transaction, so this
 	//		 must be called outside of an active transaction.
-	void assertProcessingNotActiveForAnyAction();
+	//		bDBLocked - indicates if the database is locked, this is needed because the auto revert
+	//		requires the database to be locked.
+	void assertProcessingNotActiveForAnyAction(bool bDBLocked);
 
 	// PROMISE: returns a pointer to a new FileRecord object filled from ipFields
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecordFromFields(const FieldsPtr& ipFields,
@@ -640,7 +644,8 @@ private:
 		const string& strFASTComment = "", UCLIDException* pUE = NULL);
 
 	// Method checks for timed out FAM's and reverts file status for ones that are found.
-	void revertTimedOutProcessingFAMs(const _ConnectionPtr& ipConnection);
+	// If there are files to revert and bDBLocked is false an exception will be thrown
+	void revertTimedOutProcessingFAMs(bool bDBLocked, const _ConnectionPtr& ipConnection);
 
 	// Thread function that maintains the LastPingtime in the ProcessingFAM table in
 	// the database pData should be a pointer to the database object
@@ -692,8 +697,10 @@ private:
 	// REQUIRE:	The query must return the following columns from the FAMFile table:
 	//			SELECT ID, FileName, Pages, FileSize, Priority and the action status for the
 	//			current action from the FileActionStatus table.
+	//			if bDBLocked is false and there are files that need to be reverted an exception
+	//			will be thrown.
 	// RETURNS: A vector of IFileRecords for the files that were set to processing.
-	IIUnknownVectorPtr setFilesToProcessing(const _ConnectionPtr &ipConnection,
+	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 		const string& strSelectSQL, long nActionID);
 
 	// Gets a set containing the File ID's for all files that are skipped for the specified action

@@ -499,11 +499,14 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 		// Check License
 		validateLicense();
 
-		// Database should always be locked to prevent multiple FAMS from processing
-		// Lock the database for this instance
-		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-		GetFilesToProcess_Internal(true, strAction, nMaxFiles, bGetSkippedFiles, 
-			bstrSkippedForUserName, pvecFileRecords);
+		if (!GetFilesToProcess_Internal(false, strAction, nMaxFiles, bGetSkippedFiles, 
+				bstrSkippedForUserName, pvecFileRecords))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			GetFilesToProcess_Internal(true, strAction, nMaxFiles, bGetSkippedFiles, 
+				bstrSkippedForUserName, pvecFileRecords);
+		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13574");
