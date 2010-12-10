@@ -217,7 +217,7 @@ namespace Extract.Database.Test
                 var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
                 foreach (var data in fpsFileTable)
                 {
-                    Assert.That(_fromV2FpsTable[data.FileName] == data.NumberOfTimesToUse);
+                    Assert.That(_fromV2FpsTable[data.FileName] == data.NumberOfInstances);
                 }
             }
             finally
@@ -303,7 +303,7 @@ namespace Extract.Database.Test
                 foreach (var data in fpsFileTable)
                 {
                     var expected = _fromV3V4FpsTable[data.FileName];
-                    Assert.That(expected.Item1 == data.NumberOfTimesToUse
+                    Assert.That(expected.Item1 == data.NumberOfInstances
                         && expected.Item2 == data.NumberOfFilesToProcess);
                 }
             }
@@ -390,7 +390,7 @@ namespace Extract.Database.Test
                 foreach (var data in fpsFileTable)
                 {
                     var expected = _fromV3V4FpsTable[data.FileName];
-                    Assert.That(expected.Item1 == data.NumberOfTimesToUse
+                    Assert.That(expected.Item1 == data.NumberOfInstances
                         && expected.Item2 == data.NumberOfFilesToProcess);
                 }
             }
@@ -588,7 +588,7 @@ namespace Extract.Database.Test
                 fpsFiles.Add(new FpsFileTableV5()
                 {
                     FileName = data.Key,
-                    NumberOfTimesToUse = data.Value.Item1,
+                    NumberOfInstances = data.Value.Item1,
                     NumberOfFilesToProcess = data.Value.Item2.ToString(CultureInfo.InvariantCulture)
                 });
             }

@@ -18,7 +18,7 @@ namespace Extract.Database
         /// <summary>
         /// The number of times to use the FPS file.
         /// </summary>
-        readonly int _numberOfTimesToUse;
+        readonly int _numberOfInstances;
 
         /// <summary>
         /// The number of files to process before respawning the FPS file.
@@ -33,10 +33,10 @@ namespace Extract.Database
         /// Initializes a new instance of the <see cref="FpsFileTableData"/> struct.
         /// </summary>
         /// <param name="fileName">Name of the FPS file.</param>
-        /// <param name="numberOfTimesToUse">The number of times to use the FPS file.</param>
+        /// <param name="numberOfInstances">The number of instances to create for each FPS file.</param>
         /// <param name="numberOfFilesToProcess">The number of files to process.</param>
-        public FpsFileTableData(string fileName, int numberOfTimesToUse, string numberOfFilesToProcess)
-            : this(fileName, numberOfTimesToUse,
+        public FpsFileTableData(string fileName, int numberOfInstances, string numberOfFilesToProcess)
+            : this(fileName, numberOfInstances,
             int.Parse(numberOfFilesToProcess, CultureInfo.InvariantCulture))
         {
         }
@@ -45,12 +45,12 @@ namespace Extract.Database
         /// Initializes a new instance of the <see cref="FpsFileTableData"/> struct.
         /// </summary>
         /// <param name="fileName">Name of the FPS file.</param>
-        /// <param name="numberOfTimesToUse">The number of times to use the FPS file.</param>
+        /// <param name="numberOfInstances">The number of instances to create for each FPS file.</param>
         /// <param name="numberOfFilesToProcess">The number of files to process.</param>
-        public FpsFileTableData(string fileName, int numberOfTimesToUse, int numberOfFilesToProcess)
+        public FpsFileTableData(string fileName, int numberOfInstances, int numberOfFilesToProcess)
         {
             _fileName = fileName;
-            _numberOfTimesToUse = numberOfTimesToUse;
+            _numberOfInstances = numberOfInstances;
             _numberOfFilesToProcess = numberOfFilesToProcess;
         }
 
@@ -84,7 +84,7 @@ namespace Extract.Database
         public override int GetHashCode()
         {
             return _fileName.GetHashCode() ^ _numberOfFilesToProcess.GetHashCode()
-                ^ _numberOfTimesToUse.GetHashCode();
+                ^ _numberOfInstances.GetHashCode();
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Extract.Database
         {
             return (firstItem._fileName.Equals(secondItem._fileName, StringComparison.OrdinalIgnoreCase)
                 && firstItem._numberOfFilesToProcess == secondItem._numberOfFilesToProcess
-                && firstItem._numberOfTimesToUse == secondItem._numberOfTimesToUse);
+                && firstItem._numberOfInstances == secondItem._numberOfInstances);
         }
 
         /// <summary>
@@ -128,14 +128,14 @@ namespace Extract.Database
         }
 
         /// <summary>
-        /// Gets the number of times to use.
+        /// Gets the number of instances to create.
         /// </summary>
-        /// <value>The number of times to use.</value>
-        public int NumberOfTimesToUse
+        /// <value>The number of instances to create.</value>
+        public int NumberOfInstances
         {
             get
             {
-                return _numberOfTimesToUse;
+                return _numberOfInstances;
             }
         }
 

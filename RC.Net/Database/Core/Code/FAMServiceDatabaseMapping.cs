@@ -120,7 +120,7 @@ namespace Extract.Database
         /// <summary>
         /// The number of times to use the FPS file (ie the number of instances to launch).
         /// </summary>
-        int _numberOfTimesToUse;
+        int _numberOfInstances;
 
         /// <summary>
         /// Gets the ID.
@@ -177,16 +177,16 @@ namespace Extract.Database
         /// Gets the number of times to use.
         /// </summary>
         /// <value>The number of times to use.</value>
-        [Column(Name = "NumberOfTimesToUse", DbType = "INT DEFAULT 1 NOT NULL")]
-        public int NumberOfTimesToUse
+        [Column(Name = "NumberOfInstances", DbType = "INT DEFAULT 1 NOT NULL")]
+        public int NumberOfInstances
         {
             get
             {
-                return _numberOfTimesToUse;
+                return _numberOfInstances;
             }
             set
             {
-                _numberOfTimesToUse = value;
+                _numberOfInstances = value;
             }
         }
     }

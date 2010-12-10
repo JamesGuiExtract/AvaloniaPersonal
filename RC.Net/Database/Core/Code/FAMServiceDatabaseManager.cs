@@ -151,6 +151,30 @@ namespace Extract.Database
             }
         }
 
+        /// <summary>
+        /// Gets the settings.
+        /// </summary>
+        /// <value>The settings.</value>
+        public Dictionary<string, string> Settings
+        {
+            get
+            {
+                var settings = new Dictionary<string, string>();
+                using (var db = new FAMServiceDatabase(_databaseFile))
+                {
+                    var dbSettings = db.Settings;
+                    var schemaVersion = from s in dbSettings
+                                        select s.Value;
+                    foreach (var setting in dbSettings)
+                    {
+                        settings.Add(setting.Name, setting.Value);
+                    }
+
+                    return settings;
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -226,7 +250,7 @@ namespace Extract.Database
         /// Gets a collection containing the data from the FPSFile table in the service database.
         /// </summary>
         /// <param name="ignoreZeroRows">If <see langword="true"/> then any row whose
-        /// number of times to use value is 0 will be ignored.</param>
+        /// number of instances value is 0 will be ignored.</param>
         /// <returns>The collection of rows in the FPS file table.</returns>
         public ReadOnlyCollection<FpsFileTableData> GetFpsFileData(bool ignoreZeroRows)
         {
@@ -236,14 +260,14 @@ namespace Extract.Database
                 using (var db = new FAMServiceDatabaseV5(_databaseFile))
                 {
                     var fpsFiles = db.FpsFile.Select(f =>
-                            new FpsFileTableData(f.FileName, f.NumberOfTimesToUse,
+                            new FpsFileTableData(f.FileName, f.NumberOfInstances,
                                 f.NumberOfFilesToProcess));
 
                     if (fpsFiles.Count() > 0)
                     {
                         foreach (var data in fpsFiles)
                         {
-                            if (!ignoreZeroRows || data.NumberOfTimesToUse > 0)
+                            if (!ignoreZeroRows || data.NumberOfInstances > 0)
                             {
                                 returnList.Add(data);
                             }
@@ -388,7 +412,7 @@ namespace Extract.Database
                 newFpsFiles.Add(new FpsFileTableV5()
                     {
                         FileName = pair.Key,
-                        NumberOfTimesToUse = pair.Value,
+                        NumberOfInstances = pair.Value,
                         NumberOfFilesToProcess = "0"
                     });
             }
@@ -459,7 +483,7 @@ namespace Extract.Database
                 newFpsFiles.Add(new FpsFileTableV5()
                     {
                         FileName = pair.Key,
-                        NumberOfTimesToUse = fileData.Item1,
+                        NumberOfInstances = fileData.Item1,
                         NumberOfFilesToProcess = fileData.Item2.ToString(CultureInfo.InvariantCulture)
                     });
                 if (fileData.Item3)
