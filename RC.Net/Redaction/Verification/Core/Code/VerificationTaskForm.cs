@@ -1397,7 +1397,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void GoToPreviousDocument()
         {
-            if (_historyIndex > 0)
+            if (_imageViewer.IsImageAvailable && _historyIndex > 0)
             {
                 _redactionGridView.CommitChanges();
 
@@ -1416,14 +1416,14 @@ namespace Extract.Redaction.Verification
                         {
                             _processingStream = File.Open(_savedMemento.DisplayImage, FileMode.Open,
                                 FileAccess.Read, FileShare.Read);
-                        }
 
-                        // Log that the document was locked if necessary
-                        if (RegistryManager.LogFileLocking)
-                        {
-                            ExtractException ee = new ExtractException("ELI29942",
-                                "Application trace: Processing document locked");
-                            ee.Log();
+                            // Log that the document was locked if necessary
+                            if (RegistryManager.LogFileLocking)
+                            {
+                                ExtractException ee = new ExtractException("ELI29942",
+                                    "Application trace: Processing document locked");
+                                ee.Log();
+                            }
                         }
                     }
 
@@ -1494,14 +1494,14 @@ namespace Extract.Redaction.Verification
                 {
                     _processingStream.Dispose();
                     _processingStream = null;
-                }
 
-                // Log that the document was unlocked if necessary
-                if (RegistryManager.LogFileLocking)
-                {
-                    ExtractException ee = new ExtractException("ELI29945",
-                        "Application trace: Processing document unlocked");
-                    ee.Log();
+                    // Log that the document was unlocked if necessary
+                    if (RegistryManager.LogFileLocking)
+                    {
+                        ExtractException ee = new ExtractException("ELI29945",
+                            "Application trace: Processing document unlocked");
+                        ee.Log();
+                    }
                 }
             }
         }
