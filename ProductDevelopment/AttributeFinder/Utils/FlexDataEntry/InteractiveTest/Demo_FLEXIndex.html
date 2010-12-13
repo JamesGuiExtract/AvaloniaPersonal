@@ -16,150 +16,204 @@
 
 <OL>
 
-	<LI><h2>Instructions and Installation</h2>
-	<UL>
-		<LI>Confirm that the latest <b>Demo_FlexIndex</b> folder can be copied from the current 
-		build folder to C:\.
-		<li><b>[FlexIDSCore #4137]</b> Confirm that all files under the <b>Rules</b> folder 
-		are encrypted.
-		<li>Confirm that <b>DataEntry: Verify extracted data</b> requires only a <b>FLEX Index 
-		Client</b> license.
-		<li><b>[FlexIDSCore #4068]</b> Confirm that the blank database associated with the 
-		demo has the current schema version.
-	</UL>
+    <LI><h2>Instructions and Installation</h2>
+    <UL>
+        <LI>Confirm that the latest <b>Demo_FlexIndex</b> folder can be copied from the current 
+        build folder to C:\.</li>
+        <li><b>[FlexIDSCore #4137]</b> Confirm that all files under the <b>Rules</b> folder 
+        are encrypted.</li>
+        <li>Confirm that <b>DataEntry: Verify extracted data</b> requires only a <b>FLEX Index 
+        Client</b> license.</li>
+        <li><b>[FlexIDSCore #4068]</b> Confirm that the blank database associated with the 
+        demo has the current schema version.</li>
+    </UL></li>
 <p>
-	<LI><h2>Demo Images</h2>
-	<UL>
-		<LI>Exercise the installed rules and images using the <b>Demo_FLEXIndex.xls</b> 
-		spreadsheet.
-		<LI>Review the following items after finishing the verification
-		<ul>
-			<li>Confirm that VOA files were updated for each file in which changes 
-			were made.
-			<li>Confirm that XML files were created for each file.
-		</ul>
-	</UL>
+    <LI><h2>Demo Images</h2>
+    <UL>
+        <LI>Exercise the installed rules and images using the <b>Demo_FLEXIndex.xls</b> 
+        spreadsheet.</li>
+        <LI>Review the following items after finishing the verification
+        <ul>
+            <li>Confirm that VOA files were updated for each file in which changes 
+            were made.</li>
+            <li>Confirm that XML files were created for each file.</li>
+        </ul></li>
+    </UL></li>
 <p>
 
-	<LI><h2>User Interface</h2>
-	<UL>
-	   	<LI><b>General</b>
-      		<ul>
-			<li>Confirm that unviewed text is displayed in <b>Bold</b> font.
-			<li>Confirm that viewed text is displayed in <b>normal</b> font.
-	      	</ul>
+    <LI><h2>User Interface</h2>
+    <UL>
+        <LI><b>General</b>
+        <ul>
+            <li>Confirm that unviewed text is displayed in <b>Bold</b> font.</li>
+            <li>Confirm that viewed text is displayed in <b>normal</b> font.</li>
+            <li>Confirm that presence and of an <b>Undo</b> command. Test its behavior:
+            <ul>
+                <li>in different controls (party table, address table, text boxes...)</li>
+                <li>after saving</li>
+                <li>editing multiple attributes at once</li>
+                <li>using the button, keyboard shortcut, and menu item</li>
+                <li>any other situations that come to mind</li>
+            </ul></li>
+        </ul></li>
 <p>
-	   	<LI><b>Parcel Number</b>
-      		<ul>
-			<li>Confirm that an edit box exists for Parcel Number.
-			<li>Confirm that text can be swiped into the Parcel Number edit box.
-	      	</ul>
+        <LI><b>Parcel Number</b>
+        <ul>
+            <li>Confirm that an edit box exists for Parcel Number.</li>
+            <li>Confirm that text can be swiped into the Parcel Number edit box.</li>
+        </ul></li>
 <p>
-	   	<LI><b>Consideration Amount</b>
-      		<ul>
-			<li>Confirm that an edit box exists for Consideration Amount.
-			<li>Confirm that text can be swiped into the Consideration Amount edit box.
-	      	</ul>
+        <LI><b>Consideration Amount</b>
+        <ul>
+            <li>Confirm that an edit box exists for Consideration Amount.</li>
+            <li>Confirm that text can be swiped into the Consideration Amount edit box.</li>
+        </ul></li>
 <p>
-	   	<LI><b>Document Type</b>
-      		<ul>
-			<li>Confirm that an edit box exists for Document Type.
-			<li>Confirm that text can be swiped into the Document Type edit box.
-	      	</ul>
+        <LI><b>Document Type</b>
+        <ul>
+            <li>Confirm that an edit box exists for Document Type.</li>
+            <li>Confirm that text can be swiped into the Document Type edit box.</li>
+        </ul></li>
 <p>
-	   	<LI><b>Return Address</b>
-      		<ul>
-			<li>Confirm that rows exist for
-			<ul>
-				<li>Recipient
-				<li>Street Address
-				<li>City
-				<li>State
-				<li>Zip
-			</ul>
-			<li>Confirm that text can be swiped for each individual row.
-			<li>Confirm that an entire return address can be swiped.
-			<li><b>[DataEntry #890]</b> Confirm that the rows cannot be resized.
-			<li><b>[DataEntry #892]</b> Confirm that multiple rows can be selected 
-			and deleted.
-			<li><b>[DataEntry #911]</b> 
-			<ul>
-				<li>Open an image with a <b>Return Address</b>.
-				<li>Click on the <b>City</b> field and type <b>DEL</b>.
-				<li>Click the <b>Down</b> arrow and confirm that the City stays 
-				deleted.
-				<li>Click on the <b>State</b> field and type <b>DEL</b>.
-				<li>Click the <b>Down</b> arrow and confirm that the State stays 
-				deleted.
-				<li>Click on the <b>ZipCode</b> field and type <b>DEL</b>.
-				<li>Click the <b>Up</b> arrow and confirm that the Zip Code stays 
-				deleted.
-			</ul>
-	      	</ul>
+        <LI><b>Return Address</b>
+        <ul>
+            <li>Confirm that rows exist for
+            <ul>
+                <li>Recipient</li>
+                <li>Street Address</li>
+                <li>City</li>
+                <li>State</li>
+                <li>Zip</li>
+            </ul></li>
+            <li>Confirm that text can be swiped for each individual row.</li>
+            <li>Confirm that an entire return address can be swiped.</li>
+            <li><b>[DataEntry #890]</b> Confirm that the rows cannot be resized.</li>
+            <li><b>[DataEntry #892]</b> Confirm that multiple rows can be selected 
+            and deleted.</li>
+            <li><b>[DataEntry #911]</b> 
+            <ul>
+                <li>Open an image with a <b>Return Address</b>.</li>
+                <li>Click on the <b>City</b> field and type <b>DEL</b>.</li>
+                <li>Click the <b>Down</b> arrow and confirm that the City stays
+                deleted.</li>
+                <li>Click on the <b>State</b> field and type <b>DEL</b>.</li>
+                <li>Click the <b>Down</b> arrow and confirm that the State stays 
+                deleted.</li>
+                <li>Click on the <b>ZipCode</b> field and type <b>DEL</b>.</li>
+                <li>Click the <b>Up</b> arrow and confirm that the Zip Code stays 
+                deleted.</li>
+            </ul></li>
+        </ul></li>
 <p>
-	   	<LI><b>Parties</b>
-      		<ul>
-			<li>Confirm that columns exist for
-			<ul>
-				<li>First
-				<li>Middle
-				<li>Last / Company
-				<li>Party Type
-				<li>MappedTo
-			</ul>
-			<li>Confirm that text can be swiped for each individual cell.
-			<li>Confirm that text can be swiped to add a new party.
-			<li>Confirm that multiple parties can be added with a single swipe.
-			<li><b>[DataEntry #898]</b> Confirm that text in the <b>Type</b> column 
-			does not include spatial information.
-			<li><b>[DataEntry #899]</b> Confirm that an entire row can be selected and 
-			deleted.
-	      	</ul>
+        <LI><b>Parties</b>
+        <ul>
+            <li>Confirm that columns exist for
+            <ul>
+                <li>First</li>
+                <li>Middle</li>
+                <li>Last / Company</li>
+                <li>Party Type</li>
+                <li>MappedTo</li>
+            </ul></li>
+            <li>Confirm that text can be swiped for each individual cell.</li>
+            <li>Confirm that text can be swiped to add a new party.</li>
+            <li>Confirm that multiple parties can be added with a single swipe.</li>
+            <li><b>[DataEntry #898]</b> Confirm that text in the <b>Type</b> column 
+            does not include spatial information.</li>
+            <li><b>[DataEntry #899]</b> Confirm that an entire row can be selected and 
+            deleted.</li>
+        </ul></li>
 <p>
-	   	<LI><b>Legal Description</b>
-      		<ul>
-			<li>Confirm that columns exist for
-			<ul>
-				<li>Lot
-				<li>Block
-				<li>Subdivision
-			</ul>
-			<li>Confirm that a multi-line edit box is provided for the full-text 
-			Legal Description.
-			<li>Confirm that a scrollbar is available if enough text is provided.
-			<li>Confirm that text can be swiped for each individual cell in the 
-			split Legal Description.
-			<li>Confirm that a full Legal Description can be swiped to add a new split 
-			Legal Description.
-			<li>Confirm that text can be swiped to replace selected text in the 
-			full-text Legal Description field.
-			<li><b>[DataEntry #899]</b> Confirm that an entire row can be selected and 
-			deleted.
-	  	   	<LI><b>[DataEntry #927]</b> Confirm that the <b>Legal description</b> table 
-			supports tabbing by row.
-	      	</ul>
-	</UL>
+        <LI><b>Legal Description</b>
+        <ul>
+            <li>Confirm that columns exist for
+            <ul>
+                <li>Lot</li>
+                <li>Block</li>
+                <li>Subdivision</li>
+            </ul></li>
+            <li>Confirm that a multi-line edit box is provided for the full-text 
+            Legal Description.</li>
+            <li>Confirm that a scrollbar is available if enough text is provided.</li>
+            <li>Confirm that text can be swiped for each individual cell in the 
+            split Legal Description.</li>
+            <li>Confirm that a full Legal Description can be swiped to add a new split 
+            Legal Description.</li>
+            <li>Confirm that text can be swiped to replace selected text in the 
+            full-text Legal Description field.</li>
+            <li><b>[DataEntry #899]</b> Confirm that an entire row can be selected and 
+            deleted.</li>
+            <LI><b>[DataEntry #927]</b> Confirm that the <b>Legal description</b> table 
+            supports tabbing by row.</li>
+        </ul></li>
+    </UL></li>
 <p>
-	<LI><h2>Contents of XML Output</h2>
-	<UL>
-   		<LI>TBD
-	</UL> 
+    <LI><h2>Contents of XML Output</h2>
+    <UL>
+        <LI>TBD</li>
+    </UL></li>
 <p>
-	<LI><h2>Miscellaneous</h2>
-	<UL>
-   		<LI><b>[DataEntry #922]</b> Crash when switching between apps
-		<ul>
-			<li>Do lots of task switching while verification is active.
-			<li>Confirm that the FAM does not crash.
-		</ul>
+    <LI><h2>Miscellaneous</h2>
+    <UL>
+        <LI><b>[DataEntry #922]</b> Crash when switching between apps
+        <ul>
+            <li>Do lots of task switching while verification is active.</li>
+            <li>Confirm that the FAM does not crash.</li>
+        </ul></li>
 <p>
-  	   	<LI><b>[LegacyRC #5805]</b> FAM processing now active per schedule
-	       	<ul>
-	      		<li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.
-			<li>Confirm that after completion, the exception log does not contain 
-			an entry for <b>File Action Manager now active per schedule</b>.
-	       	</ul>
-	</UL> 
+        <LI><b>[LegacyRC #5805]</b> FAM processing now active per schedule
+        <ul>
+            <li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
+            <li>Confirm that after completion, the exception log does not contain 
+            an entry for <b>File Action Manager now active per schedule</b>.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1024]</b> CPU pegged
+        <ul>
+            <li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
+            <li>Open verification. Click in the city cell of the Return Address table.</li>
+            <li>Click in another field in a different control (not the same table.</li>
+            <li>Confirm that CPU usage remains normal.</li>
+            <li>Click around different controls in the DEP and confirm that CPU usage remains
+            normal.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1029]</b> Wrong control active after undo
+        <ul>
+            <li>Open Example01 from the FLEX Index demo.</li>
+            <li>Add some rows to the party table.</li>
+            <li>Select the Parcel Number field.</li>
+            <li>Press <b>F3</b>. It should take you to the St. Louis cell.</LI>
+            <li>Swipe something.</li>
+            <li>Press the <b>Undo</b> button repeatedly.</li>
+            <li>Confirm that focus moves to the party table as appropriate.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1030]</b> Undo and Return Address field
+        <ul>
+            <li>Open a FLEX Index demo image for verification.</li>
+            <li>Select all the cells in the Return Address table.</li>
+            <li>Swipe an address.</li>
+            <Li>After the address has been split, hit undo.</li>
+            <li>Confirm that whatever data was previously in the table is restored.</li>
+            <li>Confirm that the return address table is still part of the tab order.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1031, #1033]</b> Undo and text boxes
+        <ul>
+            <li>Open a document on which a parcel number was found.</li>
+            <li>Swipe something multiline. It should replace the current value.</li>
+            <li>Hit undo.</li>
+            <li>Swipe something multiline again.</li>
+            <li>Hit undo.</li>
+            <li>Confirm that the swiped text is removed.</li>
+        <p>
+            <li>Place the cursor at the end of a text box field.</li>
+            <li>Swipe some additional text. Confirm that it is correctly appended.</li>
+            <li>Press undo.</li>
+            <li>Confirm that the appended text is correctly removed.</li>
+        </ul></lI>
+    </UL></li>
 </OL>
 </BODY>
 </HTML>
