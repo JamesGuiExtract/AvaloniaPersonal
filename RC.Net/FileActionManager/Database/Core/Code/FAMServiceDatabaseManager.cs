@@ -1,4 +1,5 @@
-﻿using Extract.Licensing;
+﻿using Extract.Database;
+using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
 
-namespace Extract.Database
+namespace Extract.FileActionManager.Database
 {
     /// <summary>
     /// Manages the FAMService Database. Provides updating functionality and other methods

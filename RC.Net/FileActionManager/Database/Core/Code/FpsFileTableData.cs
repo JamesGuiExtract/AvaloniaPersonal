@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Extract.Database
+namespace Extract.FileActionManager.Database
 {
     /// <summary>
     /// Helper struct for managing FPSFile table data.

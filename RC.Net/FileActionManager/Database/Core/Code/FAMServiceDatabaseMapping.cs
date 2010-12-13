@@ -1,8 +1,9 @@
-﻿using Extract.Licensing;
+﻿using Extract.Database;
+using Extract.Licensing;
 using System.Data.Linq;
 using System.Data.Linq.Mapping;
 
-namespace Extract.Database
+namespace Extract.FileActionManager.Database
 {
     #region AllVersions
 
