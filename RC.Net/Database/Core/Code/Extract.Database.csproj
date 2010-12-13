@@ -74,9 +74,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseHelperMethods.cs" />
-    <Compile Include="FAMServiceDatabaseManager.cs" />
-    <Compile Include="FAMServiceDatabaseMapping.cs" />
-    <Compile Include="FpsFileTableData.cs" />
     <Compile Include="IDatabaseSchemaUpdater.cs" />
     <Compile Include="SqlCompactMethods.cs" />
     <Compile Include="SqlDatabaseMethods.cs" />
