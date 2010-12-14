@@ -558,7 +558,44 @@
 		</ul>
 	</ul>
 <p>
-	<li><h3>Test 7: Special cases</h3>
+<li><h3>Test 7: Login behavior for Laserfiche 8.0 and higher</h3>
+	<ul>
+		<li><h4>Using Windows Authentication (1.0.0.46 Patch C)</h4>
+		<ul>
+			<li>Use Laserfiche's administration console to add your domain account under <b>Users and Groups | Windows Accounts</b>.
+			<li>Log on to the machine using your domain account.
+			<li>Log into the <b>Laserfiche Client</b> using Windows authentication.
+			<li>With a document selected, press <b>Submit for background redaction</b>.
+			<li>Ensure that the operation commences without displaying a log in prompt.
+		</ul>
+		<li><h4>Using the default login registry value (1.0.0.46 Patch C)</h4>
+		<ul>
+			<li>Remove any keys or values under the <b>HKEY_CURRENT_USER\Software\Extract Systems\Laserfiche\Client Logins</b> registry key.
+			<li>Use Laserfiche's administration console to add your domain account under <b>Users and Groups | Windows Accounts</b>.
+			<li>Log on to the machine using your domain account.
+			<li>Log into the <b>Laserfiche Client</b> using Windows authentication.
+			<li>While still logged in, use the <b>Laserfiche Administration Console</b> to remove your domain username from <b>Users and Groups | Windows Accounts</b>.
+			<li>With a document selected, press <b>Submit for background redaction</b>.
+			<li>Ensure a login prompt is displayed with your domain user account in the <b>username</b> field.
+			<li>Press <b>Cancel</b> on the login prompt.
+			<li>For the registry value <b>HKEY_CURRENT_USER\Software\Extract Systems\Laserfiche\Client Logins\(default)</b> specify <b>*[server]/[repository]/[username]</b> where <b>username</b> is a valid Laserfiche <b>username</b>.
+			<li>With a document selected, press <b>Submit for background redaction</b>.
+			<li>Ensure a login prompt is displayed with the username you specified in the registry value.
+			<li>Enter the correct password and ensure the document submission is processed.
+			<li>With another document selected, press <b>Submit for background redaction</b>.
+			<li>Ensure the submission is processed without displaying a login prompt.
+			<li>In the <b>Laserfiche Client</b> log out of all repositories and log back in under a Laserfiche username (not Windows authentication)
+			<li>For the registry value <b>HKEY_CURRENT_USER\Software\Extract Systems\Laserfiche\Client Logins\(default)</b> specify <b>*[server]/[repository]</b>.
+			<li>With another document selected, press <b>Submit for background redaction</b>.
+			<li>Ensure a login prompt is displayed with a blank <b>username</b> field.
+			<li>Press <b>Cancel</b> on the login prompt.
+			<li>While still logged in, use the <b>Laserfiche Administration Console</b> to re-add your domain username to <b>Users and Groups | Windows Accounts</b>.
+			<li>Press <b>Submit for background redaction</b> again.
+			<li>Ensure the submission is processed without displaying a login prompt.
+		</ul>
+	</ul>
+<p>
+	<li><h3>Test 8: Special cases</h3>
 	<ul>
 		<li><h4>Document Window already open</h4>
 		<ul>

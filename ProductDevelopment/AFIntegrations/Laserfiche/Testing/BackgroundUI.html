@@ -187,6 +187,33 @@
 			and the thread count edit box and spinner.
 		</ul>
 	</ul>
+<p>		
+	<li><h3>Using Windows Authentication (1.0.0.46 Patch C)</h3></li> 
+	<ul>
+		<li>Use Laserfiche's administration console to add your domain account under <b>Users and Groups | Windows Accounts</b>.
+		<li>Log on to the machine under a different account than your domain account (such as local admin).
+		<li>Open Windows Service Management
+		<ul>
+			<li>Right-click on <b>My Computer</b> and select <b>Manage</b>.
+			<li>Select <b>Services</b> under <b>Services and Applications</b>.
+		</ul>
+		<li>Find the <b>Extract Systems ID Shield for Laserfiche</b> service.
+		<li>Right-click on the entry and select <b>Properties</b>.
+		<li>On the <b>Log on</b> tab, ensure the service is set to run under the Local System account.
+		<li>Open the b>ID Shield Background Service</b> console.
+		<li>Enter garbage text in the <b>Laserfiche User</b> and <b>Laserfiche Password</b> fields.
+		<li>Check the <b>Use Windows Authentication</b> option.
+		<li>Ensure the <b>Laserfiche User</b> and <b>Laserfiche Password</b> fields become grayed-out.
+		<li>Press the <b>OK</b> button.
+		<li>Ensure the console closes without error (Note: When using Windows authentication it will not validate the login at this time which is unlike when Windows authentication is not being used).
+		<li>Re-open the b>ID Shield Background Service</b> console.
+		<li>Ensure when the log in prompt is displayed the <b>Laserfiche User</b> and <b>Laserfiche Password</b> fields are grayed out and the <b>Use Windows Authentication</b> option is checked. 
+		<li>Press <b>Start</b>.
+		<li>Confirm that the service fails to start.
+		<li>Go back to the <b>Log on</b> tab for the service and configure it to run under your domain account.
+		<li>Attempt to start the service again.
+		<li>Confirm that this time, the service starts successfully.
+	</ul>
 </ul>
 </BODY>
 </HTML>
