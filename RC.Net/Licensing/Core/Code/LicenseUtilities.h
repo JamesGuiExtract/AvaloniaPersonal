@@ -88,6 +88,9 @@ namespace Extract
 			//			any privately licensed objects.
 			static String^ GetMapLabelValue(MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
+            // PURPOSE: To verify that the assembly is an extract assembly.
+            static bool VerifyAssemblyData(Assembly^ assembly);
+            //--------------------------------------------------------------------------------------
 
 		private:
             //--------------------------------------------------------------------------------------
