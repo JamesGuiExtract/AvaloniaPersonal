@@ -327,6 +327,9 @@ private:
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
 
+	// Contains the timeout in seconds to keep retrying the GetFilesToProcess Transaction
+	double m_dGetFilesToProcessTransactionTimeout;
+
 	// Number of Seconds between refreshing the ActionStatistics
 	long m_nActionStatisticsUpdateFreqInSeconds;
 

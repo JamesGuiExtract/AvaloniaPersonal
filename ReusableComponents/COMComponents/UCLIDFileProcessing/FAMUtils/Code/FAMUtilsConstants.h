@@ -28,6 +28,7 @@ static const string gstrREQUIRE_AUTHENTICATION_BEFORE_RUN = "RequireAuthenticati
 static const string gstrAUTO_CREATE_ACTIONS = "AutoCreateActions";
 static const string gstrSKIP_AUTHENTICATION_ON_MACHINES = "SkipAuthenticationOnMachines";
 static const string gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS = "ActionStatisticsUpdateFreqInSeconds";
+static const string gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT = "GetFilesToProcessTransactionTimeout";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;
@@ -35,6 +36,7 @@ static const int giDEFAULT_RETRY_COUNT = 10;
 static const double gdDEFAULT_RETRY_TIMEOUT = 120.0;  // seconds
 static const long gnPING_TIMEOUT = 60000; // 60 seconds
 static const long gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES = 5; // 5 minutes
+static const double gdMINIMUM_TRANSACTION_TIMEOUT = 300.0; // 5 minutes
 
 // Local machine as database host
 static const string gstrLOCAL_STRING = "(local)";

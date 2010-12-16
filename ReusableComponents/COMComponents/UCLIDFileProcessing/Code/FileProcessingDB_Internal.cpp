@@ -1177,6 +1177,13 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 				+ gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS + "', '5')";
 			vecQueries.push_back(strSQL);
+
+			// Add GetFilesToProcessTransactionTimeout setting default
+			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT + 
+				"', '" + asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0) + "')";
+			vecQueries.push_back(strSQL);
+
 		}
 
 		// Execute all of the queries
@@ -2073,6 +2080,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 		m_bUpdateFASTTable = true;
 		m_iNumberOfRetries = giDEFAULT_RETRY_COUNT;
 		m_dRetryTimeout = gdDEFAULT_RETRY_TIMEOUT;
+		m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
 
 		// Only load the settings if the table exists
 		if (doesTableExist(getDBConnection(), "DBInfo"))
@@ -2190,11 +2198,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 									ue.addDebugInfo("New value", gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
 									ue.log();
 
-									// Not sure if this is actually safe here.
-									// if updating this field fails it will be thrown out and rolled back in 
-									// a transaction in the outer scope.  A transaction cannot be created for
-									// this here because there will most likely be a transaction in the
-									// outer scope.
+									// Change the setting in the DBInfo table
 									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue + 
 										"' WHERE DBInfo.Name = '" + strValue + "'");
 								}
@@ -2211,7 +2215,44 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						}
 						else if (strValue == gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS)
 						{
+							_lastCodePos = "210";
+
 							m_nActionStatisticsUpdateFreqInSeconds = asLong(getStringField(ipFields, "Value"));
+						}
+						else if (strValue == gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT)
+						{
+							_lastCodePos = "220";
+
+							m_dGetFilesToProcessTransactionTimeout = 
+								asDouble(getStringField(ipFields, "Value"));
+
+							_lastCodePos = "230";
+							
+							// Need to make sure the value is above the minimum
+							if (m_dGetFilesToProcessTransactionTimeout < gdMINIMUM_TRANSACTION_TIMEOUT)
+							{
+								try
+								{
+									string strNewValue = asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
+									// Log application trace exception 
+									UCLIDException ue("ELI31146", "Application trace: DBInfo setting changed.");
+									ue.addDebugInfo("Setting", gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT);
+									ue.addDebugInfo("Old value", m_dGetFilesToProcessTransactionTimeout);
+									ue.addDebugInfo("New value", gdMINIMUM_TRANSACTION_TIMEOUT);
+									ue.log();
+									
+									_lastCodePos = "240";
+
+									// Change the setting in the DBInfo table 
+									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue + 
+										"' WHERE DBInfo.Name = '" + strValue + "'");
+								}
+								CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
+	
+								_lastCodePos = "250";
+
+								m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
+							}
 						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
@@ -2549,10 +2590,18 @@ void CFileProcessingDB::clear(bool retainUserValues)
 {
 	try
 	{
-		// Make sure processing is not active
-		// This check needs to be done with the database locked since it will attempt to revert
-		// timed out FAM's as part of the check for active processing
+		// Get the connection pointer
+		_ConnectionPtr ipConnection = getDBConnection();
+
+		// If the ProcessingFAM table does exist will need check for active processing
+		// since part of checking will be to revert timed out FAMS need to lock the database
+		// LegacyRCAndUtils #5940
+		if (doesTableExist(ipConnection, gstrPROCESSING_FAM))
 		{
+			// Make sure processing is not active
+			// This check needs to be done with the database locked since it will attempt to revert
+			// timed out FAM's as part of the check for active processing
+
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
@@ -2565,14 +2614,14 @@ void CFileProcessingDB::clear(bool retainUserValues)
 		CSingleLock lock(&m_mutex, TRUE);
 
 		// Begin a transaction
-		TransactionGuard tg(getDBConnection());
+		TransactionGuard tg(ipConnection);
 
 		// Get a list of the action names to preserve
 		vector<string> vecActionNames;
 		if (retainUserValues)
 		{
 			// Read all actions from the DB
-			IStrToStrMapPtr ipMapActions = getActions(getDBConnection());
+			IStrToStrMapPtr ipMapActions = getActions(ipConnection);
 			ASSERT_RESOURCE_ALLOCATION("ELI25184", ipMapActions != NULL);
 			IVariantVectorPtr ipActions = ipMapActions->GetKeys();
 			ASSERT_RESOURCE_ALLOCATION("ELI25185", ipActions != NULL);
@@ -2592,7 +2641,7 @@ void CFileProcessingDB::clear(bool retainUserValues)
 
 		// Only get the admin password if we are not retaining user values and the
 		// Login table already exists [LRCAU #5780]
-		if (!retainUserValues && doesTableExist(getDBConnection(), "Login"))
+		if (!retainUserValues && doesTableExist(ipConnection, "Login"))
 		{
 			// Need to store the admin login and add it back after re-adding the table
 			getEncryptedPWFromDB(strAdminPW, true);
@@ -3272,78 +3321,114 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != NULL);
 
-			// Begin a transaction
-			TransactionGuard tg(ipConnection);
+			bool bTransactionSuccessful = false;
 
-			if (m_bAutoRevertLockedFiles)
+			// Start the stopwatch to use to check for transaction timeout
+			StopWatch swTransactionRetryTimeout;
+			swTransactionRetryTimeout.start();
+
+			// Retry the transaction until successfull
+			while (!bTransactionSuccessful)
 			{
-				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-			}
+				// Begin a transaction
+				TransactionGuard tg(ipConnection);
 
-			// Action Column to change
-			string strActionName = getActionName(ipConnection, nActionID);
-
-			// Setup query that will set the action status to processing and update the FAST and
-			// LockedFile records
-			strQuery = gstrGET_FILES_TO_PROCESS_QUERY;
-
-			// Replace the variable to set upt the query
-			replaceVariable(strQuery, "<SelectFilesToProcessQuery>", strSelectSQL);
-			replaceVariable(strQuery, "<ActionID>", asString(nActionID));
-			replaceVariable(strQuery, "<UserID>", asString(getFAMUserID(ipConnection)));
-			replaceVariable(strQuery, "<MachineID>", asString(getMachineID(ipConnection)));
-			replaceVariable(strQuery, "<UPIID>", asString(m_nUPIID));
-
-			// Loop to retry getting files until there are either no records returned 
-			// Get recordset of files to be set to processing.
-			// NOTE: Using execute to return a recordset because opening the query in a recordset results
-			// in odd behavior where 1 record would be returned but 6 records would be set to 
-			// processing
-			variant_t vtRecordsAffected = 0L;
-			_RecordsetPtr ipFileSet = ipConnection->Execute(strQuery.c_str(), &vtRecordsAffected,  adCmdText);
-			ASSERT_RESOURCE_ALLOCATION("ELI30402", ipFileSet != __nullptr);
-
-			// Fill the ipFiles collection and update the stats
-			while (ipFileSet->adoEOF == VARIANT_FALSE)
-			{
-				FieldsPtr ipFields = ipFileSet->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != NULL);
-
-				// Get the file Record from the fields
-				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
-					getFileRecordFromFields(ipFields);
-				ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != NULL);
-
-				// Put record in list of records to return
-				ipFiles->PushBack(ipFileRecord);
-
-				string strFileID = asString(ipFileRecord->FileID);
-
-				// Get the previous state
-				string strFileFromState = getStringField(ipFields, "ASC_From");
-
-				// Make sure the transition is valid
-				if (strFileFromState != "P" && strFileFromState != "S")
+				try
 				{
-					UCLIDException ue("ELI30405", "Invalid File State Transition!");
-					ue.addDebugInfo("Old Status", asStatusName(strFileFromState));
-					ue.addDebugInfo("New Status", "Processing");
-					ue.addDebugInfo("Action Name", strActionName);
-					ue.addDebugInfo("File ID", strFileID);
-					throw ue;
+					try
+					{
+
+						if (m_bAutoRevertLockedFiles)
+						{
+							revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+						}
+
+						// Action Column to change
+						string strActionName = getActionName(ipConnection, nActionID);
+
+						// Setup query that will set the action status to processing and update the FAST and
+						// LockedFile records
+						strQuery = gstrGET_FILES_TO_PROCESS_QUERY;
+
+						// Replace the variable to set upt the query
+						replaceVariable(strQuery, "<SelectFilesToProcessQuery>", strSelectSQL);
+						replaceVariable(strQuery, "<ActionID>", asString(nActionID));
+						replaceVariable(strQuery, "<UserID>", asString(getFAMUserID(ipConnection)));
+						replaceVariable(strQuery, "<MachineID>", asString(getMachineID(ipConnection)));
+						replaceVariable(strQuery, "<UPIID>", asString(m_nUPIID));
+
+						// Loop to retry getting files until there are either no records returned 
+						// Get recordset of files to be set to processing.
+						// NOTE: Using execute to return a recordset because opening the query in a recordset results
+						// in odd behavior where 1 record would be returned but 6 records would be set to 
+						// processing
+						variant_t vtRecordsAffected = 0L;
+						_RecordsetPtr ipFileSet = ipConnection->Execute(strQuery.c_str(), &vtRecordsAffected,  adCmdText);
+						ASSERT_RESOURCE_ALLOCATION("ELI30402", ipFileSet != __nullptr);
+
+						// Fill the ipFiles collection and update the stats
+						while (ipFileSet->adoEOF == VARIANT_FALSE)
+						{
+							FieldsPtr ipFields = ipFileSet->Fields;
+							ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != NULL);
+
+							// Get the file Record from the fields
+							UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
+								getFileRecordFromFields(ipFields);
+							ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != NULL);
+
+							// Put record in list of records to return
+							ipFiles->PushBack(ipFileRecord);
+
+							string strFileID = asString(ipFileRecord->FileID);
+
+							// Get the previous state
+							string strFileFromState = getStringField(ipFields, "ASC_From");
+
+							// Make sure the transition is valid
+							if (strFileFromState != "P" && strFileFromState != "S")
+							{
+								UCLIDException ue("ELI30405", "Invalid File State Transition!");
+								ue.addDebugInfo("Old Status", asStatusName(strFileFromState));
+								ue.addDebugInfo("New Status", "Processing");
+								ue.addDebugInfo("Action Name", strActionName);
+								ue.addDebugInfo("File ID", strFileID);
+								throw ue;
+							}
+
+							// Update the Statistics
+							updateStats(ipConnection, nActionID, asEActionStatus(strFileFromState), 
+								kActionProcessing, ipFileRecord, ipFileRecord);
+
+							// move to the next record in the recordset
+							ipFileSet->MoveNext();
+						}
+
+						// Commit the changes to the database
+						tg.CommitTrans();
+						bTransactionSuccessful = true;
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31138");
 				}
+				catch (UCLIDException &ue)
+				{
+					// Check if this is a bad connection
+					if (!isConnectionAlive(ipConnection))
+					{
+						// if the connection is not alive just rethrow the exception 
+						throw ue;
+					}
 
-				// Update the Statistics
-				updateStats(ipConnection, nActionID, asEActionStatus(strFileFromState), 
-					kActionProcessing, ipFileRecord, ipFileRecord);
-				
-				// move to the next record in the recordset
-				ipFileSet->MoveNext();
+					// Check to see if the timeout value has been reached
+					if (swTransactionRetryTimeout.getElapsedTime() > m_dGetFilesToProcessTransactionTimeout)
+					{
+						UCLIDException uex("ELI31145", "Application Trace: Transaction retry timed out.", ue);
+						uex.addDebugInfo(gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT, 
+							asString(m_dGetFilesToProcessTransactionTimeout));
+						throw uex;
+					}
+				}
 			}
-
-			// Commit the changes to the database
-			tg.CommitTrans();
-
 			return ipFiles;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30407");
