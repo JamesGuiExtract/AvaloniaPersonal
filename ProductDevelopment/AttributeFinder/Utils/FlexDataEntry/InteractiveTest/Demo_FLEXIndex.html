@@ -20,12 +20,11 @@
     <UL>
         <LI>Confirm that the latest <b>Demo_FlexIndex</b> folder can be copied from the current 
         build folder to C:\.</li>
-        <li><b>[FlexIDSCore #4137]</b> Confirm that all files under the <b>Rules</b> folder 
-        are encrypted.</li>
+        <li>Confirm that all files under the <b>Rules</b> folder are encrypted.</li>
         <li>Confirm that <b>DataEntry: Verify extracted data</b> requires only a <b>FLEX Index 
         Client</b> license.</li>
-        <li><b>[FlexIDSCore #4068]</b> Confirm that the blank database associated with the 
-        demo has the current schema version.</li>
+        <li>Confirm that the blank database associated with the demo has the current schema 
+        version.</li>
     </UL></li>
 <p>
     <LI><h2>Demo Images</h2>
@@ -87,22 +86,6 @@
             </ul></li>
             <li>Confirm that text can be swiped for each individual row.</li>
             <li>Confirm that an entire return address can be swiped.</li>
-            <li><b>[DataEntry #890]</b> Confirm that the rows cannot be resized.</li>
-            <li><b>[DataEntry #892]</b> Confirm that multiple rows can be selected 
-            and deleted.</li>
-            <li><b>[DataEntry #911]</b> 
-            <ul>
-                <li>Open an image with a <b>Return Address</b>.</li>
-                <li>Click on the <b>City</b> field and type <b>DEL</b>.</li>
-                <li>Click the <b>Down</b> arrow and confirm that the City stays
-                deleted.</li>
-                <li>Click on the <b>State</b> field and type <b>DEL</b>.</li>
-                <li>Click the <b>Down</b> arrow and confirm that the State stays 
-                deleted.</li>
-                <li>Click on the <b>ZipCode</b> field and type <b>DEL</b>.</li>
-                <li>Click the <b>Up</b> arrow and confirm that the Zip Code stays 
-                deleted.</li>
-            </ul></li>
         </ul></li>
 <p>
         <LI><b>Parties</b>
@@ -118,10 +101,6 @@
             <li>Confirm that text can be swiped for each individual cell.</li>
             <li>Confirm that text can be swiped to add a new party.</li>
             <li>Confirm that multiple parties can be added with a single swipe.</li>
-            <li><b>[DataEntry #898]</b> Confirm that text in the <b>Type</b> column 
-            does not include spatial information.</li>
-            <li><b>[DataEntry #899]</b> Confirm that an entire row can be selected and 
-            deleted.</li>
         </ul></li>
 <p>
         <LI><b>Legal Description</b>
@@ -141,10 +120,7 @@
             Legal Description.</li>
             <li>Confirm that text can be swiped to replace selected text in the 
             full-text Legal Description field.</li>
-            <li><b>[DataEntry #899]</b> Confirm that an entire row can be selected and 
-            deleted.</li>
-            <LI><b>[DataEntry #927]</b> Confirm that the <b>Legal description</b> table 
-            supports tabbing by row.</li>
+            <li>Confirm that the <b>Legal description</b> table supports tabbing by row.</li>
         </ul></li>
     </UL></li>
 <p>
@@ -153,66 +129,118 @@
         <LI>TBD</li>
     </UL></li>
 <p>
-    <LI><h2>Miscellaneous</h2>
+    <LI><h2>Bug Fixes</h2>
     <UL>
-        <LI><b>[DataEntry #922]</b> Crash when switching between apps
-        <ul>
-            <li>Do lots of task switching while verification is active.</li>
-            <li>Confirm that the FAM does not crash.</li>
-        </ul></li>
-<p>
-        <LI><b>[LegacyRC #5805]</b> FAM processing now active per schedule
-        <ul>
-            <li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
-            <li>Confirm that after completion, the exception log does not contain 
-            an entry for <b>File Action Manager now active per schedule</b>.</li>
-        </ul></li>
-    <p>
-        <li><b>[DataEntry #1024]</b> CPU pegged
-        <ul>
-            <li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
-            <li>Open verification. Click in the city cell of the Return Address table.</li>
-            <li>Click in another field in a different control (not the same table.</li>
-            <li>Confirm that CPU usage remains normal.</li>
-            <li>Click around different controls in the DEP and confirm that CPU usage remains
-            normal.</li>
-        </ul></li>
-    <p>
-        <li><b>[DataEntry #1029]</b> Wrong control active after undo
-        <ul>
-            <li>Open Example01 from the FLEX Index demo.</li>
-            <li>Add some rows to the party table.</li>
-            <li>Select the Parcel Number field.</li>
-            <li>Press <b>F3</b>. It should take you to the St. Louis cell.</LI>
-            <li>Swipe something.</li>
-            <li>Press the <b>Undo</b> button repeatedly.</li>
-            <li>Confirm that focus moves to the party table as appropriate.</li>
-        </ul></li>
-    <p>
-        <li><b>[DataEntry #1030]</b> Undo and Return Address field
-        <ul>
-            <li>Open a FLEX Index demo image for verification.</li>
-            <li>Select all the cells in the Return Address table.</li>
-            <li>Swipe an address.</li>
-            <Li>After the address has been split, hit undo.</li>
-            <li>Confirm that whatever data was previously in the table is restored.</li>
-            <li>Confirm that the return address table is still part of the tab order.</li>
-        </ul></li>
-    <p>
-        <li><b>[DataEntry #1031, #1033]</b> Undo and text boxes
-        <ul>
-            <li>Open a document on which a parcel number was found.</li>
-            <li>Swipe something multiline. It should replace the current value.</li>
-            <li>Hit undo.</li>
-            <li>Swipe something multiline again.</li>
-            <li>Hit undo.</li>
-            <li>Confirm that the swiped text is removed.</li>
+        <li><b>Pre-8.0 bug fixes</b>
+        <ol>
+            <li><b>[DataEntry #890]</b> Resizing address rows
+            <!-- fixed v 8.0.0.26 -->
+            <ul>
+                <li>Confirm that the rows and columns in the return address table cannot be
+                resized.</li>
+            </ul></li>
         <p>
-            <li>Place the cursor at the end of a text box field.</li>
-            <li>Swipe some additional text. Confirm that it is correctly appended.</li>
-            <li>Press undo.</li>
-            <li>Confirm that the appended text is correctly removed.</li>
-        </ul></lI>
+            <li><b>[DataEntry #892]</b> Selecting multiple rows in address table
+            <!-- fixed v 8.0.0.26 -->
+            <ul>
+                <li>Confirm that multiple rows of the address table can be selected and
+                deleted.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #898]</b> No spatial information for type
+            <!-- fixed v 8.0.0.41 -->
+            <ul>
+                <li>Confirm that text in the <b>Type</b> column of the <b>Party</b> table does not
+                include spatial information.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #899]</b> Deleting rows
+            <!-- fixed v 8.0.0.42 -->
+            <ul>
+                <li>Confirm that entire rows can be deleted without error from the party and legal
+                description tables.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #911]</b> Delete behavior in address table
+            <!-- fixed v 8.0.0.45 -->
+            <ul>
+                <li>Open an image with a <b>Return Address</b>.</li>
+                <li>Click on the <b>City</b> field and hit <b>DEL</b>.</li>
+                <li>Click the <b>Down</b> arrow and confirm that the city remains deleted.</li>
+                <li>Click on the <b>State</b> field and hit <b>DEL</b>.</li>
+                <li>Click the <b>Down</b> arrow and confirm that the state remains deleted.</li>
+                <li>Click on the <b>ZipCode</b> field and hit <b>DEL</b>.</li>
+                <li>Click the <b>Up</b> arrow and confirm that the zip code remains deleted.</li>
+            </ul></li>
+        <p>
+            <LI><b>[DataEntry #922]</b> Crash when switching between apps
+            <!-- fixed v LabDE 1.5.0.128 -->
+            <ul>
+                <li>Do lots of task switching while verification is active.</li>
+                <li>Confirm that the FAM does not crash.</li>
+            </ul></li>
+        <p>
+            <LI><b>[LegacyRC #5805]</b> FAM processing now active per schedule
+            <!-- fixed v 8.0.0.60 -->
+            <ul>
+                <li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
+                <li>Confirm that after completion, the exception log does not contain 
+                an entry for <b>File Action Manager now active per schedule</b>.</li>
+            </ul></li>
+        </ol></li>
+        <p>
+        <li><b>Pre-9.0 bug fixes</b>
+        <ol>
+            <li><b>[DataEntry #1024]</b> CPU pegged
+            <!-- fixed v 8.1.0.90 -->
+            <ul>
+                <li>Exercise <b>ExtractData.fps</b> from <b>Demo_FLEXIndex</b>.</li>
+                <li>Open verification. Click in the city cell of the Return Address table.</li>
+                <li>Click in another field in a different control (not the same table.</li>
+                <li>Confirm that CPU usage remains normal.</li>
+                <li>Click around different controls in the DEP and confirm that CPU usage remains
+                normal.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #1029]</b> Wrong control active after undo
+            <!-- fixed v 8.1.0.102 -->
+            <ul>
+                <li>Open Example01 from the FLEX Index demo.</li>
+                <li>Add some rows to the party table.</li>
+                <li>Select the Parcel Number field.</li>
+                <li>Press <b>F3</b>. It should take you to the St. Louis cell.</LI>
+                <li>Swipe something.</li>
+                <li>Press the <b>Undo</b> button repeatedly.</li>
+                <li>Confirm that focus moves to the party table as appropriate.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #1030]</b> Undo and Return Address field
+            <!-- fixed v 8.1.0.102 -->
+            <ul>
+                <li>Open a FLEX Index demo image for verification.</li>
+                <li>Select all the cells in the Return Address table.</li>
+                <li>Swipe an address.</li>
+                <Li>After the address has been split, hit undo.</li>
+                <li>Confirm that whatever data was previously in the table is restored.</li>
+                <li>Confirm that the return address table is still part of the tab order.</li>
+            </ul></li>
+        <p>
+            <li><b>[DataEntry #1031, #1033]</b> Undo and text boxes
+            <!-- fixed v 8.1.0.102 -->
+            <ul>
+                <li>Open a document on which a parcel number was found.</li>
+                <li>Swipe something multiline. It should replace the current value.</li>
+                <li>Hit undo.</li>
+                <li>Swipe something multiline again.</li>
+                <li>Hit undo.</li>
+                <li>Confirm that the swiped text is removed.</li>
+            <p>
+                <li>Place the cursor at the end of a text box field.</li>
+                <li>Swipe some additional text. Confirm that it is correctly appended.</li>
+                <li>Press undo.</li>
+                <li>Confirm that the appended text is correctly removed.</li>
+            </ul></lI>
+        </ol></li>
     </UL></li>
 </OL>
 </BODY>
