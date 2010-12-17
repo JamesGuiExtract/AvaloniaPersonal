@@ -273,7 +273,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::clear(bool bClearUI)
 {
-	if(bClearUI)
+	if(m_hDlg != NULL && bClearUI)
 	{
 		::SendMessage(m_hDlg, FP_CLEAR_UI, 0, 0);
 	}
@@ -597,7 +597,7 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 		}
 
 		_lastCodePos = "340";
-		if(m_hDlg)
+		if(m_hDlg != NULL)
 		{
 			_lastCodePos = "350";
 			SendStatusMessage(m_hDlg, nTaskID, eOldStatus, eNewStatus);

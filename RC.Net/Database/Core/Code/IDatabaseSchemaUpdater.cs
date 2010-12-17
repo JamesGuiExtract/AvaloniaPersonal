@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
@@ -12,12 +13,26 @@ namespace Extract.Database
     public interface IDatabaseSchemaUpdater
     {
         /// <summary>
+        /// Sets the database connection to be used by the schema updater.
+        /// </summary>
+        /// <value>The database connection.</value>
+        void SetDatabaseConnection(DbConnection connection);
+
+        /// <summary>
         /// Gets a value indicating whether a database schema update is required.
         /// </summary>
         /// <value>
         /// <see langword="true"/> if an update is required; otherwise, <see langword="false"/>.
         /// </value>
         bool IsUpdateRequired { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the current database schema is of a newer version.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the schema is a newer version.
+        /// </value>
+        bool IsNewerVersion { get; }
 
         /// <summary>
         /// Begins the update to latest schema.

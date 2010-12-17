@@ -28,6 +28,8 @@ DECLARE_REGISTRY_RESOURCEID(IDR_SPATIALSTRINGSEARCHER)
 
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 
+	void FinalRelease();
+
 BEGIN_COM_MAP(CSpatialStringSearcher)
 	COM_INTERFACE_ENTRY(ISpatialStringSearcher)
 	COM_INTERFACE_ENTRY2(IDispatch,ISpatialStringSearcher)
@@ -98,6 +100,16 @@ private:
 	{
 	public:
 		LocalLetter();
+
+		LocalLetter(unsigned int uiLetter, unsigned int uiZone, unsigned int uiParagraph,
+			unsigned int uiLine, unsigned int uiWord)
+			: m_uiLetter(uiLetter),
+			  m_uiZone(uiZone),
+			  m_uiParagraph(uiParagraph),
+			  m_uiLine(uiLine),
+			  m_uiWord(uiWord)
+		{};
+
 		////////////
 		// Methods
 		////////////

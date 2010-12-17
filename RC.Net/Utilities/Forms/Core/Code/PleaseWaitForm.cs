@@ -114,6 +114,9 @@ namespace Extract.Utilities.Forms
             {
                 InitializeComponent();
 
+                // Default the start position to center in the parent
+                StartPosition = FormStartPosition.CenterParent;
+
                 if (string.IsNullOrWhiteSpace(messageText))
                 {
                     throw new ArgumentException("Message cannot be null or empty.", "messageText");

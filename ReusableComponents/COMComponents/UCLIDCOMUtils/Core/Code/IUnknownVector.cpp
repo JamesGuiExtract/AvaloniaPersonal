@@ -58,6 +58,15 @@ CIUnknownVector::~CIUnknownVector()
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16509");
 }
+//-------------------------------------------------------------------------------------------------
+void CIUnknownVector::FinalRelease()
+{
+	try
+	{
+		m_vecIUnknowns.clear();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31145");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IIUnknownVector
@@ -125,7 +134,7 @@ STDMETHODIMP CIUnknownVector::At2(long lPos, IDispatch **pObj)
 
 		// find the object at the specified index, increment the reference, and return it.
 		IDispatchPtr ipDispatch = m_vecIUnknowns[lPos];
-		if (ipDispatch)
+		if (ipDispatch != __nullptr)
 		{
 			IDispatchPtr ipShallowCopy = ipDispatch;
 			*pObj = ipShallowCopy.Detach();

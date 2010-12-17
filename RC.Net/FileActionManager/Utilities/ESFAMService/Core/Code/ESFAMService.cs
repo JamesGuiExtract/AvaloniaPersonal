@@ -1,12 +1,13 @@
+using Extract.FileActionManager.Database;
 using Extract.Licensing;
 using Extract.Utilities;
 using FAMProcessLib;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlServerCe;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Text;
@@ -80,50 +81,6 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(ESFAMService).ToString();
 
-        /// <summary>
-        /// The default sleep time the service should use when starting (default is 2 minutes)
-        /// </summary>
-        internal static readonly int DefaultSleepTimeOnStartup = 120000;
-
-        /// <summary>
-        /// The setting key to read the sleep time on startup value from.
-        /// </summary>
-        internal static readonly string SleepTimeOnStartupKey = "SleepTimeOnStart";
-
-        /// <summary>
-        /// The setting key to read the dependent services value from.
-        /// </summary>
-        internal static readonly string DependentServices = "DependentServices";
-
-        /// <summary>
-        /// The setting key to read the number of files to process from.
-        /// </summary>
-        internal static readonly string NumberOfFilesToProcessGlobal =
-            "NumberOfFilesToProcessPerFAMInstance";
-
-        /// <summary>
-        /// The column name for the number of files to process specified for each FPS file.
-        /// </summary>
-        internal static readonly string NumberOfFilesToProcess = "NumberOfFilesToProcess";
-
-        /// <summary>
-        /// The default number of files to process before respawning the FAMProcess
-        /// <para><b>Note:</b></para>
-        /// A value of 0 indicates that the process should keep processing until it is
-        /// stopped and will not be respawned. Negative values are not allowed.
-        /// </summary>
-        internal const int DefaultNumberOfFilesToProcess = 0;
-
-        /// <summary>
-        /// The setting key for the current fam service database schema
-        /// </summary>
-        internal static readonly string ServiceDatabaseSchemaVersion = "ServiceDBSchemaVersion";
-
-        /// <summary>
-        /// The current FAM Service database schema version
-        /// </summary>
-        internal const int CurrentDatabaseSchemaVersion = 4;
-
         #endregion Constants
 
         #region Fields
@@ -135,11 +92,6 @@ namespace Extract.FileActionManager.Utilities
         static readonly string _databaseFile = FileSystemMethods.PathCombine(
             Path.GetDirectoryName(Assembly.GetAssembly(typeof(ESFAMService)).Location),
             "ESFAMService.sdf");
-
-        /// <summary>
-        /// The connection string for connecting to the SqlCE database.
-        /// </summary>
-        static readonly string _connection = "Data Source='" + _databaseFile + "';";
 
         /// <summary>
         /// Event to indicate processing should stop.
@@ -210,21 +162,24 @@ namespace Extract.FileActionManager.Utilities
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI28495",
                     _OBJECT_NAME);
 
+                var dbManager = new FAMServiceDatabaseManager(_databaseFile);
+
                 // Validate the service database schema
-                int schemaVersion = GetDatabaseSchemaVersion();
-                if (schemaVersion != CurrentDatabaseSchemaVersion)
+                int schemaVersion = dbManager.GetSchemaVersion();
+                if (schemaVersion != FAMServiceDatabaseManager.CurrentSchemaVersion)
                 {
                     ExtractException ee = new ExtractException("ELI29802",
-                        "Invalid service database schema version.");
+                        dbManager.IsUpdateRequired ? "Service database must be updated to current schema."
+                        : "Invalid service database schema version.");
                     ee.AddDebugData("Current Supported Schema Version",
-                        CurrentDatabaseSchemaVersion, false);
+                        FAMServiceDatabaseManager.CurrentSchemaVersion, false);
                     ee.AddDebugData("Database Schema Version", schemaVersion, false);
                     throw ee;
                 }
 
                 // Get the list of FPS file processing arguments from the database
                 List<ProcessingThreadArguments> fpsFileArguments =
-                    GetFpsFileProcessingArguments(GetGlobalNumberOfFilesToProcess());
+                    GetFpsFileProcessingArguments(dbManager);
 
                 // [DNRCAU #357] - Log application trace when service is starting
                 ExtractException ee2 = new ExtractException("ELI28772",
@@ -307,15 +262,30 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Thread function that sleeps on intial startup and then sets the startThreads event.
         /// </summary>
-        void SleepAndCheckDependentServices()
+        void SleepAndCheckDependentServices(object serviceDBManager)
         {
             try
             {
-                int sleepTime = GetStartupSleepTime();
+                var dbManager = serviceDBManager as FAMServiceDatabaseManager;
+                if (dbManager == null)
+                {
+                    throw new ArgumentException(
+                        "Specified db manager is either null or not a FAMServiceDatabaseManager.");
+                }
+
+                int sleepTime = int.Parse(dbManager.Settings[FAMServiceDatabaseManager.SleepTimeOnStartupKey],
+                    CultureInfo.InvariantCulture);
+                if (sleepTime <= 0)
+                {
+                    var ee = new ExtractException("ELI31139", "Sleep time on startup must be > 0.");
+                    ee.AddDebugData("Sleep Time", sleepTime, false);
+                    throw ee;
+                }
+
                 _stopProcessing.WaitOne(sleepTime);
 
                 // Get the collection of ServiceController's for the dependent services
-                List<ServiceController> dependentServices = GetDependentServiceControllers();
+                List<ServiceController> dependentServices = GetDependentServiceControllers(dbManager);
 
                 // Check if the dependent services have started.
                 // Keep checking until either:
@@ -686,126 +656,27 @@ namespace Extract.FileActionManager.Utilities
         #region Methods
 
         /// <summary>
-        /// Gets the specified setting from the database.
-        /// </summary>
-        /// <param name="settingName">The setting to retrieve.</param>
-        /// <returns>The string value for the setting.</returns>
-        static string GetSettingFromDatabase(string settingName)
-        {
-            SqlCeConnection dbConnection = null;
-            SqlCeCommand command = null;
-            SqlCeDataReader reader = null;
-            try
-            {
-                string query = "SELECT [Value] FROM Settings WHERE [Name] = '"
-                    + settingName + "'";
-
-                // Connect to the database
-                dbConnection = new SqlCeConnection(_connection);
-                dbConnection.Open();
-                command = new SqlCeCommand(query, dbConnection);
-                reader = command.ExecuteReader();
-
-                string value = "";
-                if (reader.Read())
-                {
-                    value = reader.IsDBNull(0) ? "" : reader.GetString(0);
-                }
-
-                return value;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI29151", ex);
-            }
-            finally
-            {
-                if (reader != null)
-                {
-                    reader.Dispose();
-                }
-                if (command != null)
-                {
-                    command.Dispose();
-                }
-                if (dbConnection != null)
-                {
-                    dbConnection.Dispose();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the startup sleep time value from the database.
-        /// </summary>
-        /// <returns>The startup sleep time value.</returns>
-        static int GetStartupSleepTime()
-        {
-            try
-            {
-                string time = GetSettingFromDatabase(SleepTimeOnStartupKey);
-                int value = DefaultSleepTimeOnStartup;
-                if (!string.IsNullOrEmpty(time))
-                {
-                    if (!int.TryParse(time, out value))
-                    {
-                        ExtractException ee = new ExtractException("ELI29138",
-                            "Initial sleep time value is not a valid integer value.");
-                        ee.AddDebugData("Initial Sleep Time Value", time, false);
-                        throw ee;
-                    }
-                    else if (value < 0)
-                    {
-                        ExtractException ee = new ExtractException("ELI29140",
-                            "Sleep time must be a positive value.");
-                        ee.AddDebugData("Sleep Time Value", time, false);
-                        throw ee;
-                    }
-                }
-
-                return value;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI29141", ex);
-            }
-        }
-
-        /// <summary>
         /// Gets the list of dependent services from the service database.
         /// </summary>
         /// <returns>The list of dependent services from the service database.</returns>
-        static List<string> GetDependentServices()
+        static List<string> GetDependentServices(FAMServiceDatabaseManager dbManager)
         {
             try
             {
-                string names = GetSettingFromDatabase(DependentServices);
-                Dictionary<string, object> serviceNames = new Dictionary<string,object>();
-                object temp = new object();
-                if (!string.IsNullOrEmpty(names))
+                var names = dbManager.Settings[FAMServiceDatabaseManager.DependentServicesKey];
+                var serviceNames = new HashSet<string>();
+                if (!string.IsNullOrWhiteSpace(names))
                 {
                     // Tokenize the list by the pipe character
                     foreach (string service in names.Split(
                         new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        // Add each unique service name to the collection
-                        string upper = service.ToUpperInvariant().Trim();
-                        if (!serviceNames.ContainsKey(upper))
-                        {
-                            serviceNames.Add(upper, temp);
-                        }
+                        serviceNames.Add(service.ToUpperInvariant().Trim());
                     }
                 }
 
-                // Get a list of service names from the collection
-                List<string> services = new List<string>();
-                foreach (string service in serviceNames.Keys)
-                {
-                    services.Add(service);
-                }
-
                 // Return the collection
-                return services;
+                return serviceNames.ToList();
             }
             catch (Exception ex)
             {
@@ -817,13 +688,14 @@ namespace Extract.FileActionManager.Utilities
         /// Gets a <see cref="List{T}"/> of <see cref="ServiceController"/>s
         /// for each dependent service listed in the service database settings table.
         /// </summary>
+        /// <param name="dbManager">The service database manager to use.</param>
         /// <returns>A collection of <see cref="ServiceController"/>s for the
         /// dependent services in the service database settings table.</returns>
-        static List<ServiceController> GetDependentServiceControllers()
+        static List<ServiceController> GetDependentServiceControllers(
+            FAMServiceDatabaseManager dbManager)
         {
-            // Get the list of dependent service names and sort it
-            List<string> dependentServiceNames = GetDependentServices();
-            dependentServiceNames.Sort();
+            // Get the list of dependent service names 
+            List<string> dependentServiceNames = GetDependentServices(dbManager);
 
             // Get the list of all services
             Dictionary<string, ServiceController> displayNames;
@@ -861,6 +733,8 @@ namespace Extract.FileActionManager.Utilities
             // the current system, log an exception with this list.
             if (dependentServiceNames.Count > 0)
             {
+                // Sort the list before adding it to debug data
+                dependentServiceNames.Sort();
                 string services =
                     StringMethods.ConvertArrayToDelimitedList(dependentServiceNames, ",");
                 ExtractException ee = new ExtractException("ELI29146",
@@ -923,64 +797,43 @@ namespace Extract.FileActionManager.Utilities
         /// Goes to the database and gets the list of <see cref="ProcessingThreadArguments"/>
         /// for each row in the FPSFile table that has AutoStart = 1.
         /// </summary>
-        /// <param name="globalNumberOfFilesToProcess">The global number of files to
-        /// process per instance setting.  This is used as the default value for the
-        /// number of files to process for each thread.</param> 
-        /// <returns>A list containing the processing thread arguments for each
-        /// FPS file that will be launched when the processing threads are started.</returns>
+        /// <param name="dbManager">The service DB manager.</param>
+        /// <returns>
+        /// A list containing the processing thread arguments for each
+        /// FPS file that will be launched when the processing threads are started.
+        /// </returns>
         static List<ProcessingThreadArguments> GetFpsFileProcessingArguments(
-            int globalNumberOfFilesToProcess)
+            FAMServiceDatabaseManager dbManager)
         {
-            SqlCeConnection dbConnection = null;
-            SqlCeCommand command = null;
-            SqlCeDataReader reader = null;
             try
             {
-                List<ProcessingThreadArguments> fpsFiles = new List<ProcessingThreadArguments>();
-
-                // Connect to the database
-                dbConnection = new SqlCeConnection(_connection);
-                dbConnection.Open();
-
-                // Get a data adapter connected to the FPSFile table
-                command = new SqlCeCommand(
-                    "SELECT [FileName], [" + NumberOfFilesToProcess
-                    + "] FROM [FPSFile] WHERE [AutoStart] = 1", dbConnection);
-
-                reader = command.ExecuteReader();
-                while (reader.Read())
+                // Get the global number of files to process
+                int globalNumberOfFilesToProcess = 0;
+                var numberToProcessString =
+                    dbManager.Settings[FAMServiceDatabaseManager.NumberOfFilesToProcessGlobalKey];
+                if (string.IsNullOrWhiteSpace(numberToProcessString))
                 {
-                    // Get the file name
-                    string fileName =
-                        reader.IsDBNull(0) ? string.Empty : reader.GetString(0).Trim();
-                    if (string.IsNullOrEmpty(fileName))
+                    new ExtractException("ELI31140",
+                        "Application Trace: Default number of files to process is empty.").Log();
+                }
+                else if (!int.TryParse(numberToProcessString, out globalNumberOfFilesToProcess))
+                {
+                    var ee = new ExtractException("ELI31141",
+                        "Application Trace: Default number of files to process is out of range or incorrect format.");
+                    ee.AddDebugData("Value Found", numberToProcessString, false);
+                    ee.AddDebugData("Value Expected", "Number >= 0", false);
+                    ee.Log();
+                }
+
+                List<ProcessingThreadArguments> fpsFiles = new List<ProcessingThreadArguments>();
+                foreach(var fpsFileData in dbManager.GetFpsFileData(true))
+                {
+                    int numberToProcess = Math.Min(fpsFileData.NumberOfFilesToProcess, globalNumberOfFilesToProcess);
+                    for (int i = 0; i < fpsFileData.NumberOfInstances; i++)
                     {
-                        continue;
+                        fpsFiles.Add(new ProcessingThreadArguments(fpsFileData.FileName,
+                            numberToProcess));
                     }
-
-                    // Default the number of files to process to the global number
-                    int numberOfFilesToProcess = globalNumberOfFilesToProcess;
-
-                    // If a different value has been specified for this FPS file, read it.
-                    if (!reader.IsDBNull(1))
-                    {
-                        string temp = reader.GetString(1).Trim();
-                        if (!string.IsNullOrEmpty(temp))
-                        {
-                            // Parse the number
-                            if (!int.TryParse(temp, out numberOfFilesToProcess) ||
-                                numberOfFilesToProcess < 0)
-                            {
-                                ExtractException ee = new ExtractException("ELI30257",
-                                    "NumberOfFilesToProcess is not a valid positive integer.");
-                                ee.AddDebugData("FPS File Name", fileName, false);
-                                ee.AddDebugData("NumberOfFilesToProcess", temp, false);
-                                throw ee;
-                            }
-                        }
-                    }
-
-                    fpsFiles.Add(new ProcessingThreadArguments(fileName, numberOfFilesToProcess));
                 }
 
                 return fpsFiles;
@@ -988,85 +841,6 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28499", ex);
-            }
-            finally
-            {
-                if (reader != null)
-                {
-                    reader.Dispose();
-                }
-                if (command != null)
-                {
-                    command.Dispose();
-                }
-                if (dbConnection != null)
-                {
-                    dbConnection.Dispose();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the current schema version from the database setting.
-        /// </summary>
-        /// <returns>The database schema version.</returns>
-        static int GetDatabaseSchemaVersion()
-        {
-            try
-            {
-                string schemaVersionString = GetSettingFromDatabase(ServiceDatabaseSchemaVersion);
-                if (!string.IsNullOrEmpty(schemaVersionString))
-                {
-                    int schemaVersion;
-                    if (!int.TryParse(schemaVersionString, out schemaVersion) ||
-                        schemaVersion < 0)
-                    {
-                        throw new ExtractException("ELI29799",
-                            "Setting is not a valid positive integer.");
-                    }
-
-                    return schemaVersion;
-                }
-                else
-                {
-                    throw new ExtractException("ELI29800",
-                        "Schema version setting is missing from database.");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI29801", ex);
-            }
-        }
-
-        /// <summary>
-        /// Gets the number of files to process from the database setting.
-        /// </summary>
-        /// <returns>The number of files to process.</returns>
-        static int GetGlobalNumberOfFilesToProcess()
-        {
-            string numberString = "";
-            try
-            {
-                int numberOfFiles = DefaultNumberOfFilesToProcess;
-                numberString = GetSettingFromDatabase(NumberOfFilesToProcessGlobal);
-                if (!string.IsNullOrEmpty(numberString))
-                {
-                    if (!int.TryParse(numberString, out numberOfFiles) ||
-                        numberOfFiles < 0)
-                    {
-                        throw new ExtractException("ELI29186",
-                            "Setting is not a valid positive integer.");
-                    }
-                }
-
-                return numberOfFiles;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI29187", ex);
-                ee.AddDebugData("Default Number Of Files", numberString, false);
-                throw ee;
             }
         }
 
@@ -1152,18 +926,6 @@ namespace Extract.FileActionManager.Utilities
             get
             {
                 return _databaseFile;
-            }
-        }
-
-        /// <summary>
-        /// Gets the database connection string.
-        /// </summary>
-        /// <returns>The database connection string.</returns>
-        public static string DatabaseConnectionString
-        {
-            get
-            {
-                return _connection;
             }
         }
 

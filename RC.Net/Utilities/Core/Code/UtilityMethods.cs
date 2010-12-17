@@ -1,9 +1,9 @@
+using Extract.Licensing;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace Extract.Utilities
 {
@@ -68,6 +68,131 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI31131", ex);
+            }
+        }
+
+        /// <summary>
+        /// Creates the type from type name.
+        /// </summary>
+        /// <param name="typeName">Name of the type.</param>
+        /// <returns>An instance of the specified type.</returns>
+        public static object CreateTypeFromTypeName(string typeName)
+        {
+            try
+            {
+                // Build name of assembly from typename (i.e. this assumes that type name follows
+                // Extract standards - Extract.Test.FakeAssembly.FakeType
+                // is in Extract.Test.FakeAssembly.dll)
+
+                // Build the name to the assembly containing the type
+                var sb = new StringBuilder();
+                var names = typeName.Split(new char[] { '.' },
+                    StringSplitOptions.RemoveEmptyEntries);
+                if (names.Length > 0)
+                {
+                    sb.Append(names[0]);
+                }
+                for (int i = 1; i < names.Length - 1; i++)
+                {
+                    sb.Append(".");
+                    sb.Append(names[i]);
+                }
+                var assemblyName = new AssemblyName();
+                assemblyName.Name = sb.ToString();
+
+                // Load the assembly if needed
+                var assembly = LoadAssemblyIfNotLoaded(assemblyName);
+
+                // Create the type and return it
+                return assembly.CreateInstance(typeName, true);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31149", ex);
+            }
+        }
+
+        /// <summary>
+        /// Loads the assembly if not loaded.
+        /// </summary>
+        /// <param name="assemblyName">Name of the assembly to load.</param>
+        /// <returns>The loaded assembly.</returns>
+        public static Assembly LoadAssemblyIfNotLoaded(AssemblyName assemblyName)
+        {
+            try
+            {
+                string shortName = assemblyName.Name;
+                Assembly assembly = null;
+                foreach (var loadedAssembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    if (shortName.Equals(loadedAssembly.GetName().Name,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        assembly = loadedAssembly;
+                        break;
+                    }
+                }
+
+                // If the assembly is not loaded, load it
+                if (assembly == null)
+                {
+                    assembly = Assembly.Load(assemblyName);
+                }
+
+                return assembly;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31153", ex);
+            }
+        }
+
+        /// <summary>
+        /// Creates the type from assembly.
+        /// </summary>
+        /// <typeparam name="T">The type to load from the assembly.</typeparam>
+        /// <param name="assemblyFileName">Name of the assembly file.</param>
+        /// <returns>A new instance of <typeparamref name="T"/>.</returns>
+        public static T CreateTypeFromAssembly<T>(string assemblyFileName) where T : class, new()
+        {
+            try
+            {
+                var assembly = Assembly.LoadFrom(assemblyFileName);
+                if (!LicenseUtilities.VerifyAssemblyData(assembly))
+                {
+                    var ee = new ExtractException("ELI31150",
+                        "Unable to load assembly, verification failed.");
+                    ee.AddDebugData("Assembly File", assemblyFileName, true);
+                    throw ee;
+                }
+
+                T value = null;
+                // Using reflection, iterate the classes in the assembly looking for one that 
+                // implements DataEntryControlHost
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (type.BaseType == typeof(T))
+                    {
+                        if (value == null)
+                        {
+                            var ee = new ExtractException("ELI31151",
+                                "Assembly contains multiple implementations of specified type.");
+                            ee.AddDebugData("Type", typeof(T).ToString(), false);
+                            throw ee;
+                        }
+
+                        // Create and instance of the DEP class.
+                        value = (T)assembly.CreateInstance(type.ToString());
+
+                        // Keep searching to ensure there are not multiple implementations
+                    }
+                }
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31152", ex);
             }
         }
     }

@@ -2,6 +2,7 @@
 using Extract.Licensing;
 using System.Data.Linq;
 using System.Data.Linq.Mapping;
+using System.Data.SqlServerCe;
 
 namespace Extract.FileActionManager.Database
 {
@@ -78,6 +79,17 @@ namespace Extract.FileActionManager.Database
         {
             LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                 "ELI31098", _OBJECT_NAME);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FAMServiceDatabase"/> class.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public FAMServiceDatabase(SqlCeConnection connection)
+            : base(connection)
+        {
+            LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
+                "ELI31156", _OBJECT_NAME);
         }
 
         /// <summary>
@@ -161,7 +173,7 @@ namespace Extract.FileActionManager.Database
         /// Gets the number of files to process.
         /// </summary>
         /// <value>The number of files to process.</value>
-        [Column(Name = "NumberOfFilesToProcess", DbType = "NVARCHAR(50)")]
+        [Column(Name = "NumberOfFilesToProcess", DbType = "NVARCHAR(15)")]
         public string NumberOfFilesToProcess
         {
             get
@@ -203,6 +215,15 @@ namespace Extract.FileActionManager.Database
         /// <param name="fileName">The SQL Compact file name.</param>
         public FAMServiceDatabaseV5(string fileName) :
             base(fileName)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FAMServiceDatabaseV5"/> class.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public FAMServiceDatabaseV5(SqlCeConnection connection)
+            : base(connection)
         {
         }
 
@@ -336,6 +357,15 @@ namespace Extract.FileActionManager.Database
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="FAMServiceDatabaseV4"/> class.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public FAMServiceDatabaseV4(SqlCeConnection connection)
+            : base(connection)
+        {
+        }
+
+        /// <summary>
         /// Gets the FPS file table.
         /// </summary>
         /// <value>The FPS file table.</value>
@@ -464,6 +494,15 @@ namespace Extract.FileActionManager.Database
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="FAMServiceDatabaseV3"/> class.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public FAMServiceDatabaseV3(SqlCeConnection connection)
+            : base(connection)
+        {
+        }
+
+        /// <summary>
         /// Gets the FPS file table.
         /// </summary>
         /// <value>The FPS file table.</value>
@@ -566,6 +605,15 @@ namespace Extract.FileActionManager.Database
         /// <param name="fileName">The Sql compact file name.</param>
         public FAMServiceDatabaseV2(string fileName)
             : base(fileName)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FAMServiceDatabaseV2"/> class.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        public FAMServiceDatabaseV2(SqlCeConnection connection)
+            : base(connection)
         {
         }
 

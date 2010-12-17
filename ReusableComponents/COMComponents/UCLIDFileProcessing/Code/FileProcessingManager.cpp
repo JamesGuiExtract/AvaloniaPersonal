@@ -114,7 +114,7 @@ STDMETHODIMP CFileProcessingManager::ShowUI(VARIANT_BOOL bRunOnInit, VARIANT_BOO
 		m_nNumberOfFilesToExecute = iNumDocsToExecute;
 
 		m_apDlg->DoModal();
-		m_apDlg.reset(NULL);
+		m_apDlg.reset();
 
 		// Call the clear method to make sure everything is cleaned up
 		clear();
@@ -203,7 +203,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		m_recordMgr.setNumberOfFilesToProcess(m_nNumberOfFilesToExecute);
 
 		// if there is a dialog set it to receive status updates
-		if(m_apDlg.get())
+		if(m_apDlg.get() != __nullptr)
 		{
 			m_recordMgr.setDlg(m_apDlg->m_hWnd);
 		}

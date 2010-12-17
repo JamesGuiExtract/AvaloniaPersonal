@@ -23,6 +23,8 @@ public:
 	CIUnknownVector();
 	~CIUnknownVector();
 
+	void FinalRelease();
+
 DECLARE_REGISTRY_RESOURCEID(IDR_IUNKNOWNVECTOR)
 
 DECLARE_PROTECT_FINAL_CONSTRUCT()

@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Windows.Forms;
 using System.Xml.XPath;
 using UCLID_AFCORELib;
@@ -2935,30 +2934,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // A variable to store the return value
-                DataEntryControlHost controlHost = null;
-
-                ExtractException.Assert("ELI23680", "Cannot find specified assembly!",
-                    File.Exists(assemblyFileName));
-
-                // Load the specified assembly
-                Assembly assembly = Assembly.LoadFrom(assemblyFileName);
-
-                // Using reflection, iterate the classes in the assembly looking for one that 
-                // implements DataEntryControlHost
-                Type[] types = assembly.GetTypes();
-                foreach (Type type in types)
-                {
-                    if (type.BaseType == typeof(DataEntryControlHost))
-                    {
-                        ExtractException.Assert("ELI23675",
-                            "Assembly implements multiple data entry control hosts!", controlHost == null);
-
-                        // Create and instance of the DEP class.
-                        controlHost = (DataEntryControlHost)assembly.CreateInstance(type.ToString());
-
-                        // Keep searching to ensure there are not multiple implementations
-                    }
-                }
+                DataEntryControlHost controlHost =
+                    UtilityMethods.CreateTypeFromAssembly<DataEntryControlHost>(assemblyFileName);
 
                 ExtractException.Assert("ELI23676",
                     "Failed to find data entry control host implementation!", controlHost != null);

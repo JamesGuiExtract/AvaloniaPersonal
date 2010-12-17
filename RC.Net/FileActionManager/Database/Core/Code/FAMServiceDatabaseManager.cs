@@ -4,12 +4,14 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.Common;
 using System.Data.Linq;
+using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
@@ -28,18 +30,6 @@ namespace Extract.FileActionManager.Database
         /// The object name use in licensing calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(FAMServiceDatabaseManager).ToString();
-
-        /// <summary>
-        /// The path to this assembly.
-        /// </summary>
-        static readonly string _ASSEMBLY_LOCATION =
-            Assembly.GetAssembly(typeof(FAMServiceDatabaseManager)).Location;
-
-        /// <summary>
-        /// The default FAM service database name.
-        /// </summary>
-        static readonly string _DEFAULT_FILE_NAME = Path.Combine(
-            Path.GetDirectoryName(_ASSEMBLY_LOCATION), "ESFAMService.sdf");
 
         /// <summary>
         /// The setting key for the current fam service database schema
@@ -94,6 +84,16 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         string _databaseFile;
 
+        /// <summary>
+        /// Db connection associated with this manager.
+        /// </summary>
+        SqlCeConnection _connection;
+
+        /// <summary>
+        /// The current schema version of the database.
+        /// </summary>
+        int _versionNumber;
+
         #endregion Fields
 
         #region Constructor
@@ -102,7 +102,7 @@ namespace Extract.FileActionManager.Database
         /// Initializes a new instance of the <see cref="FAMServiceDatabaseManager"/> class.
         /// </summary>
         public FAMServiceDatabaseManager()
-            : this(null)
+            : this(string.Empty)
         {
         }
 
@@ -118,12 +118,31 @@ namespace Extract.FileActionManager.Database
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI31074", _OBJECT_NAME);
 
-                _databaseFile =
-                    string.IsNullOrWhiteSpace(fileName) ? _DEFAULT_FILE_NAME : fileName;
+                _databaseFile = string.IsNullOrWhiteSpace(fileName) ? null : fileName;
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI31075", ex);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FAMServiceDatabaseManager"/> class.
+        /// </summary>
+        /// <param name="connection">The database connection.</param>
+        public FAMServiceDatabaseManager(SqlCeConnection connection)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
+                    "ELI31157", _OBJECT_NAME);
+
+                SetDatabaseConnection(connection);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31158", ex);
             }
         }
 
@@ -146,9 +165,21 @@ namespace Extract.FileActionManager.Database
             }
             set
             {
-                ExtractException.Assert("ELI31076", "Database file name cannot be null or empty.",
-                    !string.IsNullOrWhiteSpace(value));
-                _databaseFile = value;
+                try
+                {
+                    ExtractException.Assert("ELI31076", "Database file name cannot be null or empty.",
+                        !string.IsNullOrWhiteSpace(value));
+                    if (!value.Equals(_databaseFile, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _connection = null;
+                        _databaseFile = value;
+                        _versionNumber = 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI31162", ex);
+                }
             }
         }
 
@@ -160,18 +191,30 @@ namespace Extract.FileActionManager.Database
         {
             get
             {
-                var settings = new Dictionary<string, string>();
-                using (var db = new FAMServiceDatabase(_databaseFile))
+                FAMServiceDatabase db = null;
+                try
                 {
-                    var dbSettings = db.Settings;
-                    var schemaVersion = from s in dbSettings
-                                        select s.Value;
-                    foreach (var setting in dbSettings)
+                    if (_connection != null)
                     {
-                        settings.Add(setting.Name, setting.Value);
+                        db = new FAMServiceDatabase(_connection);
+                    }
+                    else
+                    {
+                        db = new FAMServiceDatabase(_databaseFile);
                     }
 
-                    return settings;
+                    return db.Settings.ToDictionary(s => s.Name, s => s.Value);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI31161", ex);
+                }
+                finally
+                {
+                    if (db != null)
+                    {
+                        db.Dispose();
+                    }
                 }
             }
         }
@@ -208,12 +251,12 @@ namespace Extract.FileActionManager.Database
         /// <see langword="false"/></returns>
         // Using an out parameter here so that the user can retrieve the name of the backup
         // file that was created if a new database was created and a backup was created.
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId="1#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
         public bool CreateDatabase(bool backup, out string backupFile)
         {
             try
             {
-                string backupFileName = null;
+                backupFile = null;
                 if (!File.Exists(_databaseFile))
                 {
                     // Ensure the directory exists
@@ -221,24 +264,28 @@ namespace Extract.FileActionManager.Database
                 }
                 else if (backup)
                 {
-                    backupFileName = BackupDatabase();
+                    backupFile = BackupDatabase();
                 }
 
                 bool created = false;
-                using (var serviceDB = new FAMServiceDatabaseV5(_databaseFile))
+                if (_connection == null || _connection.State == ConnectionState.Closed)
                 {
-                    if (!serviceDB.DatabaseExists())
+                    using (var serviceDB = new FAMServiceDatabaseV5(_databaseFile))
                     {
-                        // Create the DB and initialize the settings table
-                        serviceDB.CreateDatabase();
-                        serviceDB.Settings.InsertAllOnSubmit<SettingsTable>(
-                            BuildListOfDefaultSettings());
-                        serviceDB.SubmitChanges(ConflictMode.FailOnFirstConflict);
-                        created = true;
+                        if (!serviceDB.DatabaseExists())
+                        {
+                            // Create the DB and initialize the settings table
+                            serviceDB.CreateDatabase();
+                            serviceDB.Settings.InsertAllOnSubmit<SettingsTable>(
+                                BuildListOfDefaultSettings());
+                            serviceDB.SubmitChanges(ConflictMode.FailOnFirstConflict);
+                            created = true;
+                        }
                     }
                 }
 
-                backupFile = backupFileName;
+                // Reset version number
+                _versionNumber = 0;
                 return created;
             }
             catch (Exception ex)
@@ -255,32 +302,46 @@ namespace Extract.FileActionManager.Database
         /// <returns>The collection of rows in the FPS file table.</returns>
         public ReadOnlyCollection<FpsFileTableData> GetFpsFileData(bool ignoreZeroRows)
         {
+            FAMServiceDatabaseV5 db = null;
             try
             {
-                var returnList = new List<FpsFileTableData>();
-                using (var db = new FAMServiceDatabaseV5(_databaseFile))
+                if (_connection != null)
                 {
-                    var fpsFiles = db.FpsFile.Select(f =>
-                            new FpsFileTableData(f.FileName, f.NumberOfInstances,
-                                f.NumberOfFilesToProcess));
+                    db = new FAMServiceDatabaseV5(_connection);
+                }
+                else
+                {
+                    db = new FAMServiceDatabaseV5(_databaseFile);
+                }
 
-                    if (fpsFiles.Count() > 0)
+                var returnList = new List<FpsFileTableData>();
+                var fpsFiles = db.FpsFile.Select(f =>
+                        new FpsFileTableData(f.FileName, f.NumberOfInstances,
+                            f.NumberOfFilesToProcess));
+
+                if (fpsFiles.Count() > 0)
+                {
+                    foreach (var data in fpsFiles)
                     {
-                        foreach (var data in fpsFiles)
+                        if (!ignoreZeroRows || data.NumberOfInstances > 0)
                         {
-                            if (!ignoreZeroRows || data.NumberOfInstances > 0)
-                            {
-                                returnList.Add(data);
-                            }
+                            returnList.Add(data);
                         }
                     }
-
-                    return returnList.AsReadOnly();
                 }
+
+                return returnList.AsReadOnly();
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI31078", ex);
+            }
+            finally
+            {
+                if (db != null)
+                {
+                    db.Dispose();
+                }
             }
         }
 
@@ -330,10 +391,20 @@ namespace Extract.FileActionManager.Database
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public int GetSchemaVersion()
         {
-            try
+            if (_versionNumber == 0)
             {
-                using (var db = new FAMServiceDatabase(_databaseFile))
+                FAMServiceDatabase db = null;
+                try
                 {
+                    if (_connection != null)
+                    {
+                        db = new FAMServiceDatabase(_connection);
+                    }
+                    else
+                    {
+                        db = new FAMServiceDatabase(_databaseFile);
+                    }
+
                     var settings = db.Settings;
                     var schemaVersion = from s in settings
                                         where s.Name == ServiceDBSchemaVersionKey
@@ -354,14 +425,22 @@ namespace Extract.FileActionManager.Database
                         ee.AddDebugData("Schema Version Number", schemaVersion.First(), false);
                         throw ee;
                     }
-
-                    return version;
+                    _versionNumber = version;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI31081", ex);
+                }
+                finally
+                {
+                    if (db != null)
+                    {
+                        db.Dispose();
+                    }
                 }
             }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI31081", ex);
-            }
+
+            return _versionNumber;
         }
 
         /// <summary>
@@ -571,6 +650,55 @@ namespace Extract.FileActionManager.Database
                 }
             }
 
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the current database schema is of a newer version.
+        /// </summary>
+        /// <value><see langword="true"/> if the schema is a newer version.</value>
+        public bool IsNewerVersion
+        {
+            get
+            {
+                try
+                {
+                    return GetSchemaVersion() > CurrentSchemaVersion;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI31166", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the database connection to be used by the schema updater.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <value>The database connection.</value>
+        public void SetDatabaseConnection(DbConnection connection)
+        {
+            try
+            {
+                if (connection == null)
+                {
+                    throw new ArgumentNullException("connection");
+                }
+
+                var sqlConnection = connection as SqlCeConnection;
+                if (sqlConnection == null)
+                {
+                    throw new ExtractException("ELI31159",
+                        "This schema updater only works on SqlCe connections.");
+                }
+                _connection = sqlConnection;
+                _databaseFile = _connection.Database;
+                _versionNumber = 0;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31160", ex);
+            }
         }
 
         /// <summary>

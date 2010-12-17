@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using UCLID_COMUTILSLib;
-using UCLID_COMLMLib;
-using System.Runtime.InteropServices;
-using Extract;
 using Extract.Licensing;
+using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+using UCLID_COMLMLib;
+using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities.Parsers
 {
@@ -85,7 +82,7 @@ namespace Extract.Utilities.Parsers
             set
             {
                 // Only change the value if it is different from the previous value.
-                if (_pattern != value)
+                if (!_pattern.Equals(value, StringComparison.Ordinal))
                 {
                     _pattern = value;
 
@@ -152,7 +149,7 @@ namespace Extract.Utilities.Parsers
                             Group g = foundMatch.Groups[i];
 
                             // Get the name of the group from the parser
-                            string groupName = GetRegexParser().GroupNameFromNumber(i);
+                            string groupName = parser.GroupNameFromNumber(i);
 
                             // Create a new token object
                             Token captureToken = new Token();
@@ -203,6 +200,9 @@ namespace Extract.Utilities.Parsers
         {
             try
             {
+                // Make sure the Parser is licensed
+                ValidateLicense();
+
                 // Get the parser
                 Regex parser = GetRegexParser();
 
@@ -232,6 +232,9 @@ namespace Extract.Utilities.Parsers
         {
             try
             {
+                // Make sure the Parser is licensed
+                ValidateLicense();
+
                 // Get the parser
                 Regex parser = GetRegexParser();
 
@@ -258,6 +261,9 @@ namespace Extract.Utilities.Parsers
         {
             try
             {
+                // Make sure the Parser is licensed
+                ValidateLicense();
+
                 // Get the number of pattern expressions
                 int numberOfExpressions = pvecExpressions.Size;
 
@@ -265,7 +271,7 @@ namespace Extract.Utilities.Parsers
                 for (int i = 0; i < numberOfExpressions; i++)
                 {
                     // Get the pattern
-                    this.Pattern = (string)pvecExpressions[i];
+                    Pattern = (string)pvecExpressions[i];
 
                     // Check the input string for the pattern
                     bool found = GetRegexParser().IsMatch(strInput);
@@ -301,25 +307,20 @@ namespace Extract.Utilities.Parsers
         {
             try
             {
+                // Make sure the Parser is licensed
+                ValidateLicense();
+
                 // Get parser
                 Regex parser = GetRegexParser();
 
                 // Find the pattern in the input
                 Match foundMatch = parser.Match(strInput);
 
-                // If found check if it is exact size of input
-                if (foundMatch.Success)
-                {
-                    // If the beginning and end of the match is the beginning and end of the
-                    // input string return true
-                    if (foundMatch.Index == 0 && foundMatch.Length == strInput.Length)
-                    {
-                        return true;
-                    }
-                }
-
-                // Not an exact match
-                return false;
+                // If the beginning and end of the match is the beginning and end of the
+                // input string return true
+                return foundMatch.Success
+                    && foundMatch.Index == 0
+                    && foundMatch.Length == strInput.Length;
             }
             catch (Exception ex)
             {

@@ -35,14 +35,14 @@ CSpatialStringSearcher::EIntersection CSpatialStringSearcher::LocalEntity::inter
 	{
 		return kNotIntersecting;
 	}
-	if(	rEnt.m_lRight <= m_lRight &&
+	else if(rEnt.m_lRight <= m_lRight &&
 		rEnt.m_lLeft >= m_lLeft &&
 		rEnt.m_lTop >= m_lTop &&
 		rEnt.m_lBottom <= m_lBottom)
 	{
 		return kContains;
 	}
-	if(	m_lRight <= rEnt.m_lRight &&
+	else if(m_lRight <= rEnt.m_lRight &&
 		m_lLeft >= rEnt.m_lLeft &&
 		m_lTop >= rEnt.m_lTop &&
 		m_lBottom <= rEnt.m_lBottom)
@@ -67,14 +67,7 @@ CSpatialStringSearcher::LocalLetter::LocalLetter() : LocalEntity(),
 //-------------------------------------------------------------------------------------------------
 bool CSpatialStringSearcher::LocalLetter::operator<(const LocalLetter& l2)
 {
-	if (m_uiLetter < l2.m_uiLetter)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return m_uiLetter < l2.m_uiLetter;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -159,6 +152,15 @@ CSpatialStringSearcher::~CSpatialStringSearcher()
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16540");
 }
+//-------------------------------------------------------------------------------------------------
+void CSpatialStringSearcher::FinalRelease()
+{
+	try
+	{
+		clear();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31137");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
@@ -198,21 +200,26 @@ STDMETHODIMP CSpatialStringSearcher::InitSpatialStringSearcher(ISpatialString* p
 
 		// assign our string to the new string
 		m_ipSpatialString = ipSpatialString;
-		m_strSourceDocName = asString(ipSpatialString->SourceDocName);
+		m_strSourceDocName = asString(m_ipSpatialString->SourceDocName);
 
 		// confirm that the string is spatial
 		if (m_ipSpatialString->GetMode() == kSpatialMode)
 		{
 			// Get the spatial page info map
-			m_ipSpatialPageInfoMap = ipSpatialString->SpatialPageInfos;
+			m_ipSpatialPageInfoMap = m_ipSpatialString->SpatialPageInfos;
 			createLocalLetters();
 			createLocalWords();
 			createLocalLines();
 		}
+
+		// Shrink the vectors to fit the current data
+		m_vecLetters.shrink_to_fit();
+		m_vecWords.shrink_to_fit();
+		m_vecLines.shrink_to_fit();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07789");
-	
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialStringSearcher::GetDataInRegion(ILongRectangle *ipRect, 
@@ -248,10 +255,10 @@ STDMETHODIMP CSpatialStringSearcher::GetDataInRegion(ILongRectangle *ipRect,
 
 		// Return the string
 		*ipReturnString = (ISpatialString*) ipNewStr.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10636");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialStringSearcher::GetDataOutOfRegion(ILongRectangle *ipRect, ISpatialString **ipReturnString)
@@ -431,8 +438,8 @@ void CSpatialStringSearcher::clear()
 	m_vecLines.clear();
 
 	// Release our pointer to the spatial string and its associated data items
-	m_ipSpatialPageInfoMap = NULL;
-	m_ipSpatialString = NULL;
+	m_ipSpatialPageInfoMap = __nullptr;
+	m_ipSpatialString = __nullptr;
 	m_strSourceDocName = "";
 
 	// Set the document boundaries to 0
@@ -452,25 +459,26 @@ void CSpatialStringSearcher::createLocalLetters()
 	unsigned int iCurrZone = 0;
 
 	// populate the list of local letters and add them to the spatial data structure
-	long numLetters;
-	CPPLetter* pLetters = NULL;
-	m_ipSpatialString->GetOCRImageLetterArray(&numLetters, (void**)&pLetters);
-	ASSERT_RESOURCE_ALLOCATION("ELI25990", pLetters != NULL);
-	for (long i = 0; i < numLetters; i++)
+	vector<CPPLetter> vecCppLetters;
 	{
-		const CPPLetter& letter = pLetters[i];
+		long numLetters;
+		CPPLetter* pLetters = NULL;
+		m_ipSpatialString->GetOCRImageLetterArray(&numLetters, (void**)&pLetters);
+		ASSERT_RESOURCE_ALLOCATION("ELI25990", pLetters != NULL);
 
-		m_vecLetters.push_back(LocalLetter());
+		// Copy the letters to a local vector
+		vecCppLetters.resize(numLetters);
+		memcpy(&(vecCppLetters[0]), pLetters, numLetters * sizeof(CPPLetter));
+	}
+
+	for (long i = 0; i < vecCppLetters.size(); i++)
+	{
+		const CPPLetter& letter = vecCppLetters[i];
+
+		m_vecLetters.push_back(LocalLetter(i, iCurrZone, iCurrParagraph, iCurrLine, iCurrWord));
 		LocalLetter& rLocalLetter = m_vecLetters[i];
 		rLocalLetter.letter = letter;
 		
-		// Set the letters properties
-		rLocalLetter.m_uiLetter = i;
-		rLocalLetter.m_uiWord = iCurrWord;
-		rLocalLetter.m_uiLine = iCurrLine;
-		rLocalLetter.m_uiParagraph = iCurrParagraph;
-		rLocalLetter.m_uiZone = iCurrZone;
-
 		// if this is the last letter in a word
 		if (m_ipSpatialString->GetIsEndOfWord(i) == VARIANT_TRUE)
 		{

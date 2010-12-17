@@ -1,3 +1,4 @@
+using Extract.Database;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -6,6 +7,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Extract.SQLCDBEditor
@@ -19,6 +23,129 @@ namespace Extract.SQLCDBEditor
     /// </summary>
     public partial class SQLCDBEditorForm : Form
     {
+        #region Internal Class
+
+        /// <summary>
+        /// Internal class that manages a data table, adapter and commandbuilder for each
+        /// table in the compact database
+        /// </summary>
+        class DataTableInformation : IDisposable
+        {
+            #region Fields
+
+            /// <summary>
+            /// The data table associated with this information
+            /// </summary>
+            DataTable _table;
+
+            /// <summary>
+            /// The data adapter for the data table
+            /// </summary>
+            SqlCeDataAdapter _adapter;
+
+            /// <summary>
+            /// The command builder that enables insert/update/deletes to be run
+            /// </summary>
+            SqlCeCommandBuilder _command;
+
+            #endregion Fields
+
+            #region Constructor
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DataTableInformation"/> class
+            /// with an emtpy table.
+            /// </summary>
+            [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
+            public DataTableInformation()
+            {
+                _table = new DataTable();
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DataTableInformation"/> class.
+            /// </summary>
+            /// <param name="table">The table.</param>
+            /// <param name="adapter">The adapter.</param>
+            public DataTableInformation(DataTable table, SqlCeDataAdapter adapter)
+            {
+                _table = table;
+                _adapter = adapter;
+                _command = new SqlCeCommandBuilder(adapter);
+            }
+
+            #endregion Constructor
+
+            #region Methods
+
+            /// <summary>
+            /// Updates the underlying data table using the cached adapter
+            /// </summary>
+            public void UpdateTable()
+            {
+                _adapter.Update(_table);
+            }
+
+            #endregion Methods
+
+            #region Properties
+
+            /// <summary>
+            /// Gets the data table.
+            /// </summary>
+            /// <value>The data table.</value>
+            public DataTable DataTable
+            {
+                get
+                {
+                    return _table;
+                }
+            }
+
+            #endregion Properties
+
+            #region IDisposable Members
+
+            /// <summary>
+            /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            /// </summary>
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            /// <summary>
+            /// Releases unmanaged and - optionally - managed resources
+            /// </summary>
+            /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+            void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    if (_command != null)
+                    {
+                        _command.Dispose();
+                        _command = null;
+                    }
+                    if (_adapter != null)
+                    {
+                        _adapter.Dispose();
+                        _adapter = null;
+                    }
+                    if (_table != null)
+                    {
+                        _table.Dispose();
+                        _table = null;
+                    }
+                }
+            }
+
+            #endregion
+        }
+
+        #endregion Internal Class
+
         #region Constants
 
         /// <summary>
@@ -46,18 +173,10 @@ namespace Extract.SQLCDBEditor
         SqlCeConnection _connection;
 
         /// <summary>
-        /// Dictionary that stores the DataTable using the table name as a key.
-        /// This keeps the table that was set as the DataSource of the grid if another
-        /// table was selected.
+        /// Dictionary mapping each table name to a class containing the table, adapter and
+        /// commandbuilder
         /// </summary>
-        Dictionary<string, DataTable> _dictionaryOfTables;
-
-        /// <summary>
-        /// Dictionary that stores the adapter used to fill the DataTable object for the table name.
-        /// The key is the table name.
-        /// This keeps the DataAdapter the will need to be used to call update to save changes. 
-        /// </summary>
-        Dictionary<string, SqlCeDataAdapter> _dictionaryOfAdapters;
+        Dictionary<string, DataTableInformation> _dictionaryOfTableInformation;
 
         /// <summary>
         /// Flag used to indicate that there are changes to the database that need to be saved.
@@ -85,10 +204,15 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         string _customTitle;
 
+        /// <summary>
+        /// The database schema updater used to update the current schema
+        /// </summary>
+        IDatabaseSchemaUpdater _schemaUpdater;
+
         #endregion Fields
 
-        #region Constructors 
-        
+        #region Constructors
+
         /// <summary>
         /// Initializes the SQLCDBEditorForm
         /// </summary>
@@ -144,22 +268,25 @@ namespace Extract.SQLCDBEditor
                 base.OnLoad(e);
 
                 // Set the dataGridView datasource to the bindingSource
-                dataGridView.DataSource = bindingSource;
+                _dataGridView.DataSource = bindingSource;
 
                 // Initialize the dirty flag
                 _dirty = false;
 
                 if (!_standAlone)
                 {
-                    closeToolStripMenuItem.Visible = false;
-                    openToolStripButton.Visible = false;
-                    openToolStripMenuItem.Visible = false;
+                    _closeToolStripMenuItem.Visible = false;
+                    _openToolStripButton.Visible = false;
+                    _openToolStripMenuItem.Visible = false;
                 }
 
                 // If there is a database file set open the database.
                 if (!string.IsNullOrEmpty(_databaseFileName))
                 {
-                    OpenDatabase(_databaseFileName);
+                    // Invoking so that the Form completes loading before the database
+                    // is opened. This way if the user is prompted about a database
+                    // needing to be updated, the form will already be opened.
+                    BeginInvoke((MethodInvoker)(() => { OpenDatabase(_databaseFileName); }));
                 }
             }
             catch (Exception ex)
@@ -175,7 +302,7 @@ namespace Extract.SQLCDBEditor
         #endregion Overrides
 
         #region Event Handlers
-        
+
         /// <summary>
         /// Handles the Form Closing event.
         /// </summary>
@@ -328,7 +455,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 // Load the selected table into the dataGridView
-                LoadTable(listBoxTables.Text);
+                LoadTable(_listBoxTables.Text);
             }
             catch (Exception ex)
             {
@@ -347,7 +474,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 // Check if the current cell in the grid is dirty
-                if (dataGridView.IsCurrentCellDirty)
+                if (_dataGridView.IsCurrentCellDirty)
                 {
                     // Set the dirty flag
                     _dirty = true;
@@ -415,6 +542,28 @@ namespace Extract.SQLCDBEditor
             }
         }
 
+        /// <summary>
+        /// Handles the update to current schema menu item click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleUpdateToCurrentSchemaClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_schemaUpdater == null || !_schemaUpdater.IsUpdateRequired)
+                {
+                    return;
+                }
+
+                UpdateToCurrentSchema();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31163", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -423,82 +572,19 @@ namespace Extract.SQLCDBEditor
         /// Method loads the given table into the dataGridView.
         /// </summary>
         /// <param name="tableName">Name of the table to load.</param>
-        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "commandBuilder")]
         [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
         void LoadTable(string tableName)
         {
-            DataTable table;
+            DataTableInformation info;
 
             // Check if the table to be loaded has been loaded before
-            if (!String.IsNullOrEmpty(tableName))
+            if (!string.IsNullOrWhiteSpace(tableName))
             {
-                if (!_dictionaryOfTables.TryGetValue(tableName, out table))
-                {
-                    // Table has not been loaded before so load it
-                    table = new DataTable();
-
-                    // Setup dataAdapter to get the data
-                    SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter("SELECT * FROM " + tableName, _connection);
-
-                    // Setup of the commands for Select, Update, and Delete
-                    SqlCeCommandBuilder commandBuilder = new SqlCeCommandBuilder(dataAdapter);
-
-                    // Fill the table with the data from the dataAdapter
-                    dataAdapter.Fill(table);
-
-                    // Fill the schema for the table for the database
-                    dataAdapter.FillSchema(table, SchemaType.Source);
-
-                    // Check for auto increment fields and default column values
-                    foreach (DataColumn c in table.Columns)
-                    {
-                        // Get the information for the current column
-                        using (SqlCeCommand sqlcmd = new SqlCeCommand(
-                            "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
-                            tableName + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
-                        {
-                            using (SqlCeResultSet columnsResult = 
-                                sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
-                            {
-                                int colPos;
-
-                                // Get the first record in the result set - should only be one
-                                if (columnsResult.ReadFirst())
-                                {
-                                    // If the column is an auto increment column set the seed value to next
-                                    // auto increment value for the column
-                                    if (c.AutoIncrement)
-                                    {
-                                        // Get the position of the AUTOINC_NEXT field
-                                        colPos = columnsResult.GetOrdinal("AUTOINC_NEXT");
-
-                                        // Set the seed to the value in the AUTOINC_NEXT field
-                                        c.AutoIncrementSeed = (long)columnsResult.GetValue(colPos);
-                                    }
-
-                                    // Set the default for a column if one is defined
-                                    colPos = columnsResult.GetOrdinal("COLUMN_HASDEFAULT");
-                                    if (columnsResult.GetBoolean(colPos))
-                                    {
-                                        // Set the default value for the column
-                                        colPos = columnsResult.GetOrdinal("COLUMN_DEFAULT");
-                                        c.DefaultValue = columnsResult.GetValue(colPos);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Add the new adapter to the list of adapters
-                    _dictionaryOfAdapters.Add(tableName, dataAdapter);
-
-                    // Add the new table to the list of tables
-                   _dictionaryOfTables.Add(tableName, table);
-                }
+                info = LoadTableFromDatabase(tableName);
 
                 // Check for unique constraints
                 bool _hasUniqueContraint = false;
-                foreach (Constraint c in table.Constraints)
+                foreach (Constraint c in info.DataTable.Constraints)
                 {
                     // Check if current constraint is unique					
                     if (c is UniqueConstraint)
@@ -511,19 +597,139 @@ namespace Extract.SQLCDBEditor
 
                 // Set the ReadOnly and AllowUserToAddRows so that if no unique constraint
                 // the grid cannot be modified and rows cannot be added
-                dataGridView.ReadOnly = !_hasUniqueContraint;
-                dataGridView.AllowUserToAddRows = _hasUniqueContraint;
+                _dataGridView.ReadOnly = !_hasUniqueContraint;
+                _dataGridView.AllowUserToAddRows = _hasUniqueContraint;
             }
             else
             {
-               // If the table has not been created create an empty table
-                table = new DataTable();
+                // If the table has not been created create an empty table
+
+                info = new DataTableInformation();
             }
+
+            var table = info.DataTable;
+
             // Set the bindingSoure dataSource to the table
             bindingSource.DataSource = table;
-            
+
+            using (var graphics = _dataGridView.CreateGraphics())
+            {
+                var font = _dataGridView.ColumnHeadersDefaultCellStyle.Font;
+                for (int i = 0; i < table.Columns.Count; i++)
+                {
+                    var column = table.Columns[i];
+                    var type = column.DataType;
+                    float fillWeight = 200;
+                    if (type == typeof(bool))
+                    {
+                        fillWeight = 100;
+                    }
+                    else if (type == typeof(string))
+                    {
+                        if (column.MaxLength > 500)
+                        {
+                            fillWeight = 450;
+                        }
+                        else if (column.MaxLength > 300)
+                        {
+                            fillWeight = 400;
+                        }
+                        else if (column.MaxLength > 150)
+                        {
+                            fillWeight = 350;
+                        }
+                        else
+                        {
+                            fillWeight = 250;
+                        }
+                    }
+
+                    // Get the head text and measure out the minimum width to display the string
+                    // Pad the width by 4 pixels (2 each side)
+                    var temp = _dataGridView.Columns[i].HeaderText;
+                    var size = graphics.MeasureString(temp, font);
+                    _dataGridView.Columns[i].MinimumWidth = (int)(size.Width + 0.5) + 4;
+                    _dataGridView.Columns[i].FillWeight = fillWeight;
+                    _dataGridView.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                }
+            }
+
             // Reset the current cell
-            dataGridView.CurrentCell = null;
+            _dataGridView.CurrentCell = null;
+        }
+
+        /// <summary>
+        /// Loads the table from database.
+        /// </summary>
+        /// <param name="tableName">Name of the table to load.</param>
+        /// <returns>The loaded table.</returns>
+        [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
+        DataTableInformation LoadTableFromDatabase(string tableName)
+        {
+            // Check if this table has been loaded already
+            DataTableInformation info = null;
+            if (_dictionaryOfTableInformation.TryGetValue(tableName, out info))
+            {
+                // Return the loaded table
+                return info;
+            }
+
+            // Table has not been loaded before so load it
+            var table = new DataTable();
+
+            // Setup dataAdapter to get the data
+            SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter("SELECT * FROM " + tableName, _connection);
+
+            // Fill the table with the data from the dataAdapter
+            dataAdapter.Fill(table);
+
+            // Fill the schema for the table for the database
+            dataAdapter.FillSchema(table, SchemaType.Source);
+
+            // Check for auto increment fields and default column values
+            foreach (DataColumn c in table.Columns)
+            {
+                // Get the information for the current column
+                using (SqlCeCommand sqlcmd = new SqlCeCommand(
+                    "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" +
+                    tableName + "' AND COLUMN_NAME = '" + c.ColumnName + "'", _connection))
+                {
+                    using (SqlCeResultSet columnsResult =
+                        sqlcmd.ExecuteResultSet(ResultSetOptions.Scrollable))
+                    {
+                        int colPos;
+
+                        // Get the first record in the result set - should only be one
+                        if (columnsResult.ReadFirst())
+                        {
+                            // If the column is an auto increment column set the seed value to next
+                            // auto increment value for the column
+                            if (c.AutoIncrement)
+                            {
+                                // Get the position of the AUTOINC_NEXT field
+                                colPos = columnsResult.GetOrdinal("AUTOINC_NEXT");
+
+                                // Set the seed to the value in the AUTOINC_NEXT field
+                                c.AutoIncrementSeed = (long)columnsResult.GetValue(colPos);
+                            }
+
+                            // Set the default for a column if one is defined
+                            colPos = columnsResult.GetOrdinal("COLUMN_HASDEFAULT");
+                            if (columnsResult.GetBoolean(colPos))
+                            {
+                                // Set the default value for the column
+                                colPos = columnsResult.GetOrdinal("COLUMN_DEFAULT");
+                                c.DefaultValue = columnsResult.GetValue(colPos);
+                            }
+                        }
+                    }
+                }
+            }
+
+            info = new DataTableInformation(table, dataAdapter);
+            _dictionaryOfTableInformation.Add(tableName, info);
+
+            return info;
         }
 
         /// <summary>
@@ -531,57 +737,51 @@ namespace Extract.SQLCDBEditor
         /// method does not save any changes to the database that was previously loaded. If the 
         /// database should be saved it should be done before calling this method.
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "commandBuilder")]
         [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
-        void LoadTableNames()
+        HashSet<string> LoadTableNames()
         {
             // Remove the handler for the SelectedValueChanged event while loading the list box
-            listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
+            _listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
 
+            SqlCeDataAdapter tableListDataAdapter = null;
             try
             {
-                // If dictionary of tables already exist clear the values it contains.
-                if (_dictionaryOfTables != null)
+                // If dictionary of table information already exist clear the values it contains.
+                if (_dictionaryOfTableInformation != null)
                 {
-                    CollectionMethods.ClearAndDispose(_dictionaryOfTables);
+                    CollectionMethods.ClearAndDispose(_dictionaryOfTableInformation);
                 }
 
-                // Create a new dictionary of Tables
-                _dictionaryOfTables = new Dictionary<string, DataTable>();
-
-                // If dictionary of Adapters already exists clear the values it contains
-                if (_dictionaryOfAdapters != null)
-                {
-                    CollectionMethods.ClearAndDispose(_dictionaryOfAdapters);
-                }
-
-                // Create a new dictionary of adapters
-                _dictionaryOfAdapters = new Dictionary<string, SqlCeDataAdapter>();
-
-                // Create a new DataTable for the table names in this database
-                DataTable tableNameTable = new DataTable();
+                // Create a new dictionary of table information
+                _dictionaryOfTableInformation = new Dictionary<string, DataTableInformation>();
 
                 // Create adapter for the list of tables.
-                SqlCeDataAdapter tableListDataAdapter =
+                tableListDataAdapter =
                     new SqlCeDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", _connection);
 
-                // Create the commands for the tableListDataAdapter 
-                SqlCeCommandBuilder commandBuilder = new SqlCeCommandBuilder(tableListDataAdapter);
-
-                // Fill the tableNameTable with data from the adapter
+                // Create a new DataTable for the table names in this database and fill it
+                var tableNameTable = new DataTable();
                 tableListDataAdapter.Fill(tableNameTable);
 
                 // Set the member to display from the table
-                listBoxTables.DisplayMember = "TABLE_NAME";
+                _listBoxTables.DisplayMember = "TABLE_NAME";
 
                 // Set the listbox datasource to the tableNameTable
-                listBoxTables.DataSource = tableNameTable;
+                _listBoxTables.DataSource = tableNameTable;
 
                 // Reset the _dirty flag
                 _dirty = false;
 
                 // Update menu and tool strip
                 EnableCommands();
+
+                var tableNames = new HashSet<string>();
+                foreach (DataRow row in tableNameTable.Rows)
+                {
+                    tableNames.Add(row["TABLE_NAME"].ToString());
+                }
+
+                return tableNames;
             }
             catch (Exception ex)
             {
@@ -589,8 +789,13 @@ namespace Extract.SQLCDBEditor
             }
             finally
             {
+                if (tableListDataAdapter != null)
+                {
+                    tableListDataAdapter.Dispose();
+                }
+
                 // Activate the SelectedValueChanged event handler
-                listBoxTables.SelectedValueChanged += ListBoxTables_SelectedValueChanged;
+                _listBoxTables.SelectedValueChanged += ListBoxTables_SelectedValueChanged;
             }
         }
 
@@ -609,51 +814,26 @@ namespace Extract.SQLCDBEditor
             using (new TemporaryWaitCursor())
             {
                 // Check for an edit in progress on the current row in the datagrid
-                if (dataGridView.IsCurrentRowDirty)
+                if (_dataGridView.IsCurrentRowDirty)
                 {
                     // Change the current cell to get the changes to the current cell saved to 
                     // the datasource
-                    dataGridView.CurrentCell = null;
+                    _dataGridView.CurrentCell = null;
                 }
 
-                // Begin a transaction so all or non of the changes are commited
+                // Begin a transaction so all or none of the changes are commited
                 SqlCeTransaction transaction = _connection.BeginTransaction();
                 try
                 {
-                    // Go through all of the tables in the ditionary of tables
-                    foreach (KeyValuePair<string, DataTable> kv in _dictionaryOfTables)
+                    // Go through all of the table information objects in the dictionary and
+                    // update them.
+                    foreach (var tableinformation in _dictionaryOfTableInformation.Values)
                     {
-                        // Get the DataTable
-                        DataTable dt = kv.Value;
-
-                        // Try to get the adapter for that table
-                        SqlCeDataAdapter da;
-                        if (_dictionaryOfAdapters.TryGetValue(kv.Key, out da))
-                        {
-                            // Update the the database
-                            da.Update(dt);
-                        }
+                        tableinformation.UpdateTable();
                     }
 
                     // Commit the transaction
                     transaction.Commit();
-
-                    // Clear _dirty flag
-                    _dirty = false;
-
-                    // Update window text
-                    SetWindowTitle();
-
-                    // Update menu and tool strip
-                    EnableCommands();
-
-                    // Open database to refresh the tables.
-                    OpenDatabase(_databaseFileName);
-
-                    // Display message that save was successful.
-                    MessageBox.Show("Database was saved successfully.", "Database save",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information,
-                        MessageBoxDefaultButton.Button1, 0);
 
                     _fileSaved = true;
                 }
@@ -670,8 +850,25 @@ namespace Extract.SQLCDBEditor
                 {
                     transaction.Dispose();
                 }
+
+                // Clear _dirty flag
+                _dirty = false;
+
+                // Update window text
+                SetWindowTitle();
+
+                // Update menu and tool strip
+                EnableCommands();
+
+                // Display message that save was successful.
+                MessageBox.Show("Database was saved successfully.", "Database save",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information,
+                    MessageBoxDefaultButton.Button1, 0);
+
+                // Open database to refresh the tables.
+                OpenDatabase(_databaseFileName);
             }
-       }
+        }
 
         /// <summary>
         /// Method opens a connection to the database.
@@ -679,41 +876,115 @@ namespace Extract.SQLCDBEditor
         /// <param name="databaseToOpen">SQL CE Database file to open.</param>
         void OpenDatabase(string databaseToOpen)
         {
-            // If same database is open need to save the current table
-            string currentlyOpenTable = "";
-            if (databaseToOpen == _databaseFileName)
+            try
             {
-                // reopening the current database.
-                currentlyOpenTable = listBoxTables.Text;
+                // If same database is open need to save the current table
+                string currentlyOpenTable = "";
+                if (databaseToOpen == _databaseFileName)
+                {
+                    // reopening the current database.
+                    currentlyOpenTable = _listBoxTables.Text;
+                }
+
+                // Reset the schema updater
+                _schemaUpdater = null;
+
+                // Close the database
+                CloseDatabase();
+
+                // Set the _databaseFileName
+                _databaseFileName = databaseToOpen;
+
+                // Create the connection to the database
+                _connection = new SqlCeConnection(
+                    SqlCompactMethods.BuildDBConnectionString(_databaseFileName, true));
+
+                // Open the connection.
+                _connection.Open();
+
+                // Load the table names into the listBox
+                var tableNames = LoadTableNames();
+
+                // If this database was previously open reopen the same table
+                if (!string.IsNullOrEmpty(currentlyOpenTable))
+                {
+                    _listBoxTables.SelectedIndex = _listBoxTables.FindStringExact(currentlyOpenTable);
+                }
+
+                // Load the currently selected table into the dataGridView
+                LoadTable(_listBoxTables.Text);
+
+                SetWindowTitle();
+
+                _fileSaved = false;
+
+                CheckSchemaVersionAndPromptForUpdate(tableNames);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31165", ex);
+            }
+            finally
+            {
+                // Make sure the commands are enabled/disabled appropriately
+                EnableCommands();
+            }
+        }
+
+        /// <summary>
+        /// Checks the schema version and prompts the user if an update is required.
+        /// <para><b>Note:</b></para>
+        /// This will also update the status bar in the UI to indicate known schema,
+        /// unknown schema, update needed.
+        /// </summary>
+        /// <param name="tableNames">The table names.</param>
+        void CheckSchemaVersionAndPromptForUpdate(HashSet<string> tableNames)
+        {
+            _schemaUpdater = GetSchemaUpdater(tableNames);
+            string statusText = "Database schema is current.";
+            Color textColor = Color.Green;
+            bool promptForUpdate = false;
+            bool canUpdateSchema = false;
+            if (_schemaUpdater != null)
+            {
+                _schemaUpdater.SetDatabaseConnection(_connection);
+                if (_schemaUpdater.IsUpdateRequired)
+                {
+                    promptForUpdate = true;
+                    canUpdateSchema = true;
+                    textColor = Color.Black;
+                    statusText = "Database schema requires updating.";
+                }
+                else if (_schemaUpdater.IsNewerVersion)
+                {
+                    statusText = "Database was created in a newer version.";
+                    textColor = Color.Red;
+                    canUpdateSchema = false;
+                }
+            }
+            else
+            {
+                textColor = Color.Red;
+                statusText = "Unknown Database Schema";
             }
 
-            // Close the database
-            CloseDatabase();
+            _updateToCurrentSchemaToolStripMenuItem.Enabled = canUpdateSchema;
+            _statusLabelSchemaInfo.ForeColor = textColor;
+            _statusLabelSchemaInfo.Text = statusText;
 
-            // Set the _databaseFileName
-            _databaseFileName = databaseToOpen;
-
-            // Create the connection to the database
-            _connection = new SqlCeConnection(@"Data Source=" + _databaseFileName + ";File Mode=Exclusive;");
-
-            // Open the connection.
-            _connection.Open();
-
-            // Load the table names into the listBox
-            LoadTableNames();
-
-            // If this database was previously open reopen the same table
-            if (!string.IsNullOrEmpty(currentlyOpenTable))
+            if (promptForUpdate)
             {
-                listBoxTables.SelectedIndex = listBoxTables.FindStringExact(currentlyOpenTable);
+                var result = MessageBox.Show(
+                    "Database schema requires an update, would you like to update now?",
+                    "Schema out of date", MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0);
+                if (result == DialogResult.Yes)
+                {
+                    // Invoking the method here so that the update can be started after
+                    // this method finishes execution
+                    BeginInvoke((MethodInvoker)(() => { UpdateToCurrentSchema(); }));
+                }
             }
-
-            // Load the currently selected table into the dataGridView
-            LoadTable(listBoxTables.Text);
-
-            SetWindowTitle();
-
-            _fileSaved = false;
         }
 
         /// <summary>
@@ -749,7 +1020,7 @@ namespace Extract.SQLCDBEditor
             if (_dirty)
             {
                 // Ask user if changes should be saved
-                DialogResult result = MessageBox.Show("Save changes?", "Save", 
+                DialogResult result = MessageBox.Show("Save changes?", "Save",
                     MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
                 // If yes save the changes
@@ -772,9 +1043,12 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         void EnableCommands()
         {
-            closeToolStripMenuItem.Enabled = !string.IsNullOrEmpty(_databaseFileName);
-            saveToolStripButton.Enabled = _dirty;
-            saveToolStripMenuItem.Enabled = _dirty;
+            _closeToolStripMenuItem.Enabled = !string.IsNullOrEmpty(_databaseFileName);
+            _saveToolStripButton.Enabled = _dirty;
+            _saveToolStripMenuItem.Enabled = _dirty;
+            _updateToCurrentSchemaToolStripMenuItem.Enabled =
+                _schemaUpdater != null
+                && _schemaUpdater.IsUpdateRequired;
         }
 
         /// <summary>
@@ -783,18 +1057,18 @@ namespace Extract.SQLCDBEditor
         void CloseDatabase()
         {
             // Remove the handler for the SelectedValueChanged event.
-            listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
+            _listBoxTables.SelectedValueChanged -= ListBoxTables_SelectedValueChanged;
 
             // Clear the listbox
-            IDisposable d = (IDisposable)listBoxTables.DataSource;
+            IDisposable d = _listBoxTables.DataSource as IDisposable;
             if (d != null)
             {
                 d.Dispose();
             }
-            listBoxTables.DataSource = null;
+            _listBoxTables.DataSource = null;
 
             // Clear the data grid binding source
-            d = (IDisposable)bindingSource.DataSource;
+            d = bindingSource.DataSource as IDisposable;
             if (d != null)
             {
                 d.Dispose();
@@ -802,18 +1076,11 @@ namespace Extract.SQLCDBEditor
             bindingSource.DataSource = null;
 
 
-            // Clear dictionary of adapters
-            if (_dictionaryOfAdapters != null)
+            // Clear table information
+            if (_dictionaryOfTableInformation != null)
             {
-                CollectionMethods.ClearAndDispose(_dictionaryOfAdapters);
-                _dictionaryOfAdapters = null;
-            }
-
-            // Clear dictionary of tables
-            if (_dictionaryOfTables != null)
-            {
-                CollectionMethods.ClearAndDispose(_dictionaryOfTables);
-                _dictionaryOfTables = null;
+                CollectionMethods.ClearAndDispose(_dictionaryOfTableInformation);
+                _dictionaryOfTableInformation = null;
             }
 
             // Clear database file name
@@ -839,6 +1106,119 @@ namespace Extract.SQLCDBEditor
             }
 
             SetWindowTitle();
+        }
+
+        /// <summary>
+        /// Attempts to get the <see cref="IDatabaseSchemaUpdater"/> for known schemas.
+        /// </summary>
+        /// <param name="tableNames">The table names for the current database.</param>
+        IDatabaseSchemaUpdater GetSchemaUpdater(HashSet<string> tableNames)
+        {
+            IDatabaseSchemaUpdater updater = null;
+            if (tableNames.Contains("Settings"))
+            {
+                var info = LoadTableFromDatabase("Settings");
+
+                // Look for the schema manager
+                var result = info.DataTable.Select("Name = '"
+                    + DatabaseHelperMethods.DatabaseSchemaManagerKey + "'");
+                if (result.Length == 1)
+                {
+                    // Build the name to the assembly containing the manager
+                    var className = result[0]["Value"].ToString();
+                    updater =
+                        UtilityMethods.CreateTypeFromTypeName(className) as IDatabaseSchemaUpdater;
+                    if (updater == null)
+                    {
+                        var ee = new ExtractException("ELI31154",
+                            "Database contained an entry for schema manager, "
+                        + "but it does not contain a schema updater.");
+                        ee.AddDebugData("Class Name", className, false);
+                        throw ee;
+                    }
+                }
+                else
+                {
+                    // No schema updater defined. Check for FPSFile table
+                    if (tableNames.Contains("FPSFile"))
+                    {
+                        updater = (IDatabaseSchemaUpdater)UtilityMethods.CreateTypeFromTypeName(
+                            "Extract.FileActionManager.Database.FAMServiceDatabaseManager");
+                    }
+                }
+            }
+            else
+            {
+                // TODO: Implement check for LabDE Order Mapper schema
+            }
+
+            return updater;
+        }
+
+        /// <summary>
+        /// Updates to current schema.
+        /// </summary>
+        void UpdateToCurrentSchema()
+        {
+            try
+            {
+                // Store the db name and close the open database
+                string tempName = _databaseFileName;
+                CloseDatabase();
+
+                using (var eventHandle = new ManualResetEvent(false))
+                using (var waitForm = new PleaseWaitForm("Please wait while the database schema is updated.",
+                    eventHandle, 3))
+                {
+                    var tempTask = Task.Factory.StartNew(() =>
+                    {
+                        using (var connection = new SqlCeConnection(
+                            SqlCompactMethods.BuildDBConnectionString(tempName, false)))
+                        {
+                            _schemaUpdater.SetDatabaseConnection(connection);
+                            try
+                            {
+                                var task =
+                                    _schemaUpdater.BeginUpdateToLatestSchema(null,
+                                    new CancellationTokenSource());
+                                task.Wait();
+                            }
+                            finally
+                            {
+                                eventHandle.Set();
+                            }
+                        }
+                    });
+
+                    waitForm.ShowDialog();
+
+                    // Perform wait (this forces any aggregate exceptions
+                    // from the task to be thrown)
+                    try
+                    {
+                        tempTask.Wait();
+                    }
+                    catch (AggregateException ex)
+                    {
+                        throw ExtractException.AsExtractException("ELI31164", ex.Flatten());
+                    }
+                }
+
+                // Invoking so that the update method completes and then the prompt is displayed
+                // before the database is reopened.
+                BeginInvoke((MethodInvoker)(() =>
+                {
+                    MessageBox.Show(this, "Database has been updated to current schema.",
+                        "Database Updated", MessageBoxButtons.OK, MessageBoxIcon.Information,
+                        MessageBoxDefaultButton.Button1, 0);
+
+                    OpenDatabase(tempName);
+                }));
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31167", ex);
+            }
         }
 
         #endregion Private Methods

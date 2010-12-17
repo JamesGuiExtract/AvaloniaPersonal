@@ -459,6 +459,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FAMNetworkManager", "..\..\..\..\..\RC.Net\FileActionManager\Utilities\FamNetworkManager\Core\Code\FAMNetworkManager.csproj", "{3C8E394A-5194-4726-9B3F-4752BDE436C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLCDBEditor", "..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Code\SQLCDBEditor.csproj", "{4A3328DB-8492-467C-9EC9-D84EE38432EA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C15ABD31-ADA3-4EB1-91D5-3392D375FF12} = {C15ABD31-ADA3-4EB1-91D5-3392D375FF12}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Database", "..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj", "{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}"
 EndProject

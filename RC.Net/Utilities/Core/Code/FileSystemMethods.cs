@@ -35,15 +35,16 @@ namespace Extract.Utilities
             Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Extract Systems");
 
         /// <summary>
+        /// The path to the common components folder.
+        /// </summary>
+        static readonly string _COMMON_COMPONENTS_PATH = Path.Combine(
+            _EXTRACT_SYSTEMS_PATH, "CommonComponents");
+
+        /// <summary>
         /// The full path to the Extract Systems application data folder.
         /// </summary>
         static readonly string _APPLICATION_DATA_PATH = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Extract Systems");
-
-        /// <summary>
-        /// Contains the list of invalid path characters.
-        /// </summary>
-        static readonly char[] _invalidPathCharacters = Path.GetInvalidPathChars();
 
         #endregion Fields
 
@@ -70,6 +71,18 @@ namespace Extract.Utilities
             get
             {
                 return _EXTRACT_SYSTEMS_PATH;
+            }
+        }
+
+        /// <summary>
+        /// Gets the full path to the CommonComponents directory.
+        /// </summary>
+        /// <value>The full path to the CommonComponents directory.</value>
+        public static string CommonComponentsPath
+        {
+            get
+            {
+                return _COMMON_COMPONENTS_PATH;
             }
         }
 
@@ -819,24 +832,6 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28504", ex);
-            }
-        }
-
-        /// <summary>
-        /// Checks the provided path for invalid path characters and throws an exception
-        /// if any invalid characters are found.
-        /// </summary>
-        /// <param name="path">The path to check for invalid characters.</param>
-        static void ValidatePathString(string path)
-        {
-            int index = path.IndexOfAny(_invalidPathCharacters);
-            if (index != -1)
-            {
-                ExtractException ee =
-                    new ExtractException("ELI28501", "Path contains an invalid character.");
-                ee.AddDebugData("Invalid Path String", path, false);
-                ee.AddDebugData("Index Of Invalid Character", index, false);
-                throw ee;
             }
         }
 
