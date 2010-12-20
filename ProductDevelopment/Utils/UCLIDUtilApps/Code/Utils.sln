@@ -138,8 +138,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Drawing", "..\..\..
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OSSpecificInstaller", "..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcxproj", "{15ABFF7E-907A-4131-8532-847B60E1A987}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLCDBEditor", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Code\SQLCDBEditor.csproj", "{4A3328DB-8492-467C-9EC9-D84EE38432EA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactExporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj", "{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactImporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj", "{DEDE4275-343B-40C2-B336-040D3D182A44}"
@@ -159,7 +157,7 @@ Global
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 73
+		ProjectCount = 72
 		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj
 		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcxproj
@@ -225,14 +223,13 @@ Global
 		ProjectRelativeDiskPath63 = ..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj
 		ProjectRelativeDiskPath64 = ..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj
 		ProjectRelativeDiskPath65 = ..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcxproj
-		ProjectRelativeDiskPath66 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Code\SQLCDBEditor.csproj
-		ProjectRelativeDiskPath67 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
-		ProjectRelativeDiskPath68 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
-		ProjectRelativeDiskPath69 = ..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcxproj
-		ProjectRelativeDiskPath70 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
-		ProjectRelativeDiskPath71 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\UEXExtractor\Core\Code\ExtractDebugData.csproj
-		ProjectRelativeDiskPath72 = ..\..\..\..\RC.Net\UtilityApplications\Services\ESFDRSService\Core\Code\ESFDRSService.csproj
-		ProjectRelativeDiskPath73 = ..\..\..\..\RC.Net\FileActionManager\Utilities\FAMDBLockChecker\Core\Code\FAMDBLockChecker.csproj
+		ProjectRelativeDiskPath66 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
+		ProjectRelativeDiskPath67 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
+		ProjectRelativeDiskPath68 = ..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcxproj
+		ProjectRelativeDiskPath69 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
+		ProjectRelativeDiskPath70 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\UEXExtractor\Core\Code\ExtractDebugData.csproj
+		ProjectRelativeDiskPath71 = ..\..\..\..\RC.Net\UtilityApplications\Services\ESFDRSService\Core\Code\ESFDRSService.csproj
+		ProjectRelativeDiskPath72 = ..\..\..\..\RC.Net\FileActionManager\Utilities\FAMDBLockChecker\Core\Code\FAMDBLockChecker.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1025,18 +1022,6 @@ Global
 		{15ABFF7E-907A-4131-8532-847B60E1A987}.Release|Win32.ActiveCfg = Release|Win32
 		{15ABFF7E-907A-4131-8532-847B60E1A987}.Release|Win32.Build.0 = Release|Win32
 		{15ABFF7E-907A-4131-8532-847B60E1A987}.Release|x86.ActiveCfg = Release|Win32
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Release|Win32.ActiveCfg = Release|Any CPU
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA}.Release|x86.ActiveCfg = Release|Any CPU
 		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
