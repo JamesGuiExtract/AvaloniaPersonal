@@ -291,6 +291,10 @@ library UCLID_FILEPROCESSINGLib
 		//				may be being used in multiple threads. This will happen per processing session
 		//				not per file
 		[id(14), helpstring("method Close")] HRESULT Close();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To return boolean flag indicating if the task or any of the sub tasks require admin access to run
+		[id(15), helpstring("method RequiresAdminAccess")] HRESULT RequiresAdminAccess(
+			[out, retval] VARIANT_BOOL* pbResult);
 	};
 
 	[

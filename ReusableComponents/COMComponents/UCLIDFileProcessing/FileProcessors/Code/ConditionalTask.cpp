@@ -403,6 +403,21 @@ STDMETHODIMP CConditionalTask::raw_Close()
 	
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConditionalTask::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31179", pbResult != __nullptr);
+
+		*pbResult = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31180");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IConditionalTask

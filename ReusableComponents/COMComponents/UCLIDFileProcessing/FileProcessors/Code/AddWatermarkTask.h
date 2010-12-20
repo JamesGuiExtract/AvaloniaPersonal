@@ -111,6 +111,7 @@ public:
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);
 	STDMETHOD(raw_Cancel)();
 	STDMETHOD(raw_Close)();
+	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 //----------------------------------------------------------------------------------------------
 // ILicensedComponent

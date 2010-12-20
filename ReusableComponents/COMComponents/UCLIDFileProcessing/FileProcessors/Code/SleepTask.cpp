@@ -345,6 +345,21 @@ STDMETHODIMP CSleepTask::raw_Close()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29590");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSleepTask::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31193", pbResult != __nullptr);
+
+		*pbResult = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31194");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ILicensedComponent

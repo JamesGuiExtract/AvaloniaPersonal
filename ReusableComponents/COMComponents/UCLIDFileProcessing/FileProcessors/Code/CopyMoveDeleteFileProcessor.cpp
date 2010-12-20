@@ -296,6 +296,21 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_Close()
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31183", pbResult != __nullptr);
+
+		*pbResult = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31184");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ICategorizedComponent

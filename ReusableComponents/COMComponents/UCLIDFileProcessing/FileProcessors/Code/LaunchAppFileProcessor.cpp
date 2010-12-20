@@ -204,6 +204,21 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_Close()
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CLaunchAppFileProcessor::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31185", pbResult != __nullptr);
+
+		*pbResult = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31186");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ICategorizedComponent

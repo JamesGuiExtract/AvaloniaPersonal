@@ -347,6 +347,21 @@ STDMETHODIMP CConvertToPDFTask::raw_Close()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18757");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConvertToPDFTask::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31181", pbResult != __nullptr);
+
+		*pbResult = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31182");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent

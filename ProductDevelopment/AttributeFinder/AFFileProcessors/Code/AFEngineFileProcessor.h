@@ -89,6 +89,7 @@ END_CATEGORY_MAP()
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);
 	STDMETHOD(raw_Cancel)();
 	STDMETHOD(raw_Close)();
+	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 // IMustBeConfiguredObject
 	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL * pbValue);
