@@ -9,57 +9,6 @@ namespace Extract.FileActionManager.Database
     #region AllVersions
 
     /// <summary>
-    /// Table mapping definition for the settings table
-    /// </summary>
-    [Table(Name = "Settings")]
-    public class SettingsTable
-    {
-        /// <summary>
-        /// The Name column of the settings table.
-        /// </summary>
-        string _name;
-
-        /// <summary>
-        /// The Value column of the settings table.
-        /// </summary>
-        string _value;
-
-        /// <summary>
-        /// Gets the name.
-        /// </summary>
-        /// <value>The name.</value>
-        [Column(Name = "Name", IsPrimaryKey = true, DbType = "NVARCHAR(100)")]
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
-            set
-            {
-                _name = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <value>The value.</value>
-        [Column(Name = "Value", DbType = "NVARCHAR(512)")]
-        public string Value
-        {
-            get
-            {
-                return _value;
-            }
-            set
-            {
-                _value = value;
-            }
-        }
-    }
-
-    /// <summary>
     /// DataContext mapping for the FAMService database. Use this connection
     /// to get the settings table and get the current SchemaVersion
     /// </summary>
@@ -96,11 +45,11 @@ namespace Extract.FileActionManager.Database
         /// Gets the settings table.
         /// </summary>
         /// <value>The settings table.</value>
-        public Table<SettingsTable> Settings
+        public Table<Settings> Settings
         {
             get
             {
-                return GetTable<SettingsTable>();
+                return GetTable<Settings>();
             }
         }
     }

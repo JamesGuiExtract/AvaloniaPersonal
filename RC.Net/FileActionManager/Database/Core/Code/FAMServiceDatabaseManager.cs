@@ -276,7 +276,7 @@ namespace Extract.FileActionManager.Database
                         {
                             // Create the DB and initialize the settings table
                             serviceDB.CreateDatabase();
-                            serviceDB.Settings.InsertAllOnSubmit<SettingsTable>(
+                            serviceDB.Settings.InsertAllOnSubmit<Settings>(
                                 BuildListOfDefaultSettings());
                             serviceDB.SubmitChanges(ConflictMode.FailOnFirstConflict);
                             created = true;
@@ -349,31 +349,31 @@ namespace Extract.FileActionManager.Database
         /// Builds the list of default settings.
         /// </summary>
         /// <returns></returns>
-        static List<SettingsTable> BuildListOfDefaultSettings()
+        static List<Settings> BuildListOfDefaultSettings()
         {
-            var items = new List<SettingsTable>();
+            var items = new List<Settings>();
 
-            items.Add(new SettingsTable()
+            items.Add(new Settings()
             {
                 Name = SleepTimeOnStartupKey,
                 Value = DefaultSleepTimeOnStartup.ToString(CultureInfo.InvariantCulture)
             });
-            items.Add(new SettingsTable()
+            items.Add(new Settings()
             {
                 Name = DependentServicesKey,
                 Value = ""
             });
-            items.Add(new SettingsTable()
+            items.Add(new Settings()
             {
                 Name = NumberOfFilesToProcessGlobalKey,
                 Value = DefaultNumberOfFilesToProcess.ToString(CultureInfo.InvariantCulture)
             });
-            items.Add(new SettingsTable()
+            items.Add(new Settings()
             {
                 Name = ServiceDBSchemaVersionKey,
                 Value = CurrentSchemaVersion.ToString(CultureInfo.InvariantCulture)
             });
-            items.Add(new SettingsTable()
+            items.Add(new Settings()
             {
                 Name = DatabaseHelperMethods.DatabaseSchemaManagerKey,
                 Value = DBSchemaManager
@@ -604,7 +604,7 @@ namespace Extract.FileActionManager.Database
                 {
                     var currentSettings = currentDb.Settings;
 
-                    foreach (SettingsTable table in oldDb.Settings)
+                    foreach (Settings table in oldDb.Settings)
                     {
                         // Do not copy schema version or schema manager key
                         if (table.Name.Equals(ServiceDBSchemaVersionKey, StringComparison.OrdinalIgnoreCase)

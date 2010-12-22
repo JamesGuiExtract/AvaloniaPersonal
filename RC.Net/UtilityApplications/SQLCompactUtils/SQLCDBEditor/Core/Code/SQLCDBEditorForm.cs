@@ -1089,6 +1089,8 @@ namespace Extract.SQLCDBEditor
             // Clear Dirty Flag
             _dirty = false;
 
+            _statusLabelSchemaInfo.Text = "";
+
             // Update menu and tool strip
             EnableCommands();
 
@@ -1149,7 +1151,13 @@ namespace Extract.SQLCDBEditor
             }
             else
             {
-                // TODO: Implement check for LabDE Order Mapper schema
+                // Check for expected LabDE order mapper tables
+                if (tableNames.Contains("LabOrder") && tableNames.Contains("LabTest")
+                    && tableNames.Contains("LabOrderTest") && tableNames.Contains("AlternateTestName"))
+                {
+                    updater = (IDatabaseSchemaUpdater)UtilityMethods.CreateTypeFromTypeName(
+                        "Extract.LabResultsCustomComponents.OrderMapperDatabaseSchemaManager");
+                }
             }
 
             return updater;

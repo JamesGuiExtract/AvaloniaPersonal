@@ -67,6 +67,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\..\..\RC.Net\APIs\SqlCompact_3.5\Desktop\System.Data.SqlServerCe.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
@@ -86,6 +87,7 @@
     <Compile Include="LabOrder.cs" />
     <Compile Include="LabTest.cs" />
     <Compile Include="OrderGrouping.cs" />
+    <Compile Include="OrderMapperDatabaseManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -101,6 +103,10 @@
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj">
+      <Project>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</Project>
+      <Name>Extract.Database</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>

@@ -76,6 +76,7 @@
     <Compile Include="DatabaseHelperMethods.cs" />
     <Compile Include="IDatabaseSchemaUpdater.cs" />
     <Compile Include="SqlCompactMethods.cs" />
+    <Compile Include="SqlCompactTableMappings.cs" />
     <Compile Include="SqlDatabaseMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistryManager.cs" />
