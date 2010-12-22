@@ -96,7 +96,8 @@ namespace Extract.Utilities
         /// <summary>
         /// File-specific mutexs to lock access while creating/saving config files
         /// </summary>
-        static readonly Dictionary<string, object> _fileLocks = new Dictionary<string, object>();
+        static readonly Dictionary<string, object> _fileLocks =
+            new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         #endregion Fields
 
@@ -177,7 +178,7 @@ namespace Extract.Utilities
                 }
                 else
                 {
-                    _configFileName = Path.GetFileName(configFileName);
+                    _configFileName = Path.GetFullPath(configFileName);
                 }
 
                 // Lock around construction in case either this or another instance is creating

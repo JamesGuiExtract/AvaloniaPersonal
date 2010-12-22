@@ -296,6 +296,7 @@ namespace Extract.IDShieldStatisticsReporter
                     _redactHCDataCheckBox.Checked = (attributesToRedact.IndexOf("HCData") >= 0);
                     _redactMCDataCheckBox.Checked = (attributesToRedact.IndexOf("MCData") >= 0);
                     _redactLCDataCheckBox.Checked = (attributesToRedact.IndexOf("LCData") >= 0);
+                    _redactManualDataCheckBox.Checked = (attributesToRedact.IndexOf("Manual") >= 0);
                 }
 
                 _dataTypesTextBox.Enabled = _limitTypesCheckBox.Checked;
@@ -534,6 +535,8 @@ namespace Extract.IDShieldStatisticsReporter
                     ? (queryForAutomatedRedaction.Length > 0 ? "|MCData" : "MCData") : "");
                 queryForAutomatedRedaction.Append(_redactLCDataCheckBox.Checked 
                     ? (queryForAutomatedRedaction.Length > 0 ? "|LCData" : "LCData") : "");
+                queryForAutomatedRedaction.Append(_redactManualDataCheckBox.Checked
+                    ? (queryForAutomatedRedaction.Length > 0 ? "|Manual" : "Manual") : "");
                 _testerSettings.QueryForAutomatedRedaction = queryForAutomatedRedaction.ToString();
 
                 _testerSettings.Save(settingFileName);

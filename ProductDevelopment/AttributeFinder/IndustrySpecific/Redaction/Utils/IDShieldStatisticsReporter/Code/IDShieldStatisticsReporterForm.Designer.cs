@@ -51,6 +51,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._analyzeTab = new System.Windows.Forms.TabPage();
             this._analyzeButton = new System.Windows.Forms.Button();
             this._analysisGroupBox = new System.Windows.Forms.GroupBox();
+            this._redactManualDataCheckBox = new System.Windows.Forms.CheckBox();
             this._verificationFileConditionButton = new System.Windows.Forms.Button();
             this._automatedFileConditionButton = new System.Windows.Forms.Button();
             this._redactLCDataCheckBox = new System.Windows.Forms.CheckBox();
@@ -96,7 +97,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._tabControl.Location = new System.Drawing.Point(13, 13);
             this._tabControl.Name = "_tabControl";
             this._tabControl.SelectedIndex = 0;
-            this._tabControl.Size = new System.Drawing.Size(496, 291);
+            this._tabControl.Size = new System.Drawing.Size(496, 313);
             this._tabControl.TabIndex = 0;
             // 
             // _feedbackDataTab
@@ -105,7 +106,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._feedbackDataTab.Location = new System.Drawing.Point(4, 22);
             this._feedbackDataTab.Name = "_feedbackDataTab";
             this._feedbackDataTab.Padding = new System.Windows.Forms.Padding(3);
-            this._feedbackDataTab.Size = new System.Drawing.Size(488, 265);
+            this._feedbackDataTab.Size = new System.Drawing.Size(488, 287);
             this._feedbackDataTab.TabIndex = 0;
             this._feedbackDataTab.Text = "Feedback data";
             this._feedbackDataTab.UseVisualStyleBackColor = true;
@@ -174,7 +175,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._analyzeTab.Location = new System.Drawing.Point(4, 22);
             this._analyzeTab.Name = "_analyzeTab";
             this._analyzeTab.Padding = new System.Windows.Forms.Padding(3);
-            this._analyzeTab.Size = new System.Drawing.Size(488, 265);
+            this._analyzeTab.Size = new System.Drawing.Size(488, 287);
             this._analyzeTab.TabIndex = 1;
             this._analyzeTab.Text = "Analyze";
             this._analyzeTab.UseVisualStyleBackColor = true;
@@ -182,7 +183,7 @@ namespace Extract.IDShieldStatisticsReporter
             // _analyzeButton
             // 
             this._analyzeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._analyzeButton.Location = new System.Drawing.Point(407, 236);
+            this._analyzeButton.Location = new System.Drawing.Point(407, 257);
             this._analyzeButton.Name = "_analyzeButton";
             this._analyzeButton.Size = new System.Drawing.Size(75, 23);
             this._analyzeButton.TabIndex = 1;
@@ -194,6 +195,7 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             this._analysisGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this._analysisGroupBox.Controls.Add(this._redactManualDataCheckBox);
             this._analysisGroupBox.Controls.Add(this._verificationFileConditionButton);
             this._analysisGroupBox.Controls.Add(this._automatedFileConditionButton);
             this._analysisGroupBox.Controls.Add(this._redactLCDataCheckBox);
@@ -206,27 +208,37 @@ namespace Extract.IDShieldStatisticsReporter
             this._analysisGroupBox.Controls.Add(this._label2);
             this._analysisGroupBox.Location = new System.Drawing.Point(7, 7);
             this._analysisGroupBox.Name = "_analysisGroupBox";
-            this._analysisGroupBox.Size = new System.Drawing.Size(475, 222);
+            this._analysisGroupBox.Size = new System.Drawing.Size(475, 244);
             this._analysisGroupBox.TabIndex = 0;
             this._analysisGroupBox.TabStop = false;
             this._analysisGroupBox.Text = "Analysis options";
             // 
+            // _redactManualDataCheckBox
+            // 
+            this._redactManualDataCheckBox.AutoSize = true;
+            this._redactManualDataCheckBox.Location = new System.Drawing.Point(9, 190);
+            this._redactManualDataCheckBox.Name = "_redactManualDataCheckBox";
+            this._redactManualDataCheckBox.Size = new System.Drawing.Size(181, 17);
+            this._redactManualDataCheckBox.TabIndex = 8;
+            this._redactManualDataCheckBox.Text = "Manually identified sensitive data";
+            this._redactManualDataCheckBox.UseVisualStyleBackColor = true;
+            // 
             // _verificationFileConditionButton
             // 
-            this._verificationFileConditionButton.Location = new System.Drawing.Point(242, 191);
+            this._verificationFileConditionButton.Location = new System.Drawing.Point(242, 213);
             this._verificationFileConditionButton.Name = "_verificationFileConditionButton";
             this._verificationFileConditionButton.Size = new System.Drawing.Size(227, 23);
-            this._verificationFileConditionButton.TabIndex = 9;
+            this._verificationFileConditionButton.TabIndex = 10;
             this._verificationFileConditionButton.Text = "Verification file selection condition...";
             this._verificationFileConditionButton.UseVisualStyleBackColor = true;
             this._verificationFileConditionButton.Click += new System.EventHandler(this.OnVerificationFileConditionButtonClick);
             // 
             // _automatedFileConditionButton
             // 
-            this._automatedFileConditionButton.Location = new System.Drawing.Point(9, 191);
+            this._automatedFileConditionButton.Location = new System.Drawing.Point(9, 213);
             this._automatedFileConditionButton.Name = "_automatedFileConditionButton";
             this._automatedFileConditionButton.Size = new System.Drawing.Size(227, 23);
-            this._automatedFileConditionButton.TabIndex = 8;
+            this._automatedFileConditionButton.TabIndex = 9;
             this._automatedFileConditionButton.Text = "Automated file selection condition...";
             this._automatedFileConditionButton.UseVisualStyleBackColor = true;
             this._automatedFileConditionButton.Click += new System.EventHandler(this.OnAutomatedFileConditionButtonClick);
@@ -322,7 +334,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._reviewTab.Controls.Add(this._label4);
             this._reviewTab.Location = new System.Drawing.Point(4, 22);
             this._reviewTab.Name = "_reviewTab";
-            this._reviewTab.Size = new System.Drawing.Size(488, 265);
+            this._reviewTab.Size = new System.Drawing.Size(488, 287);
             this._reviewTab.TabIndex = 2;
             this._reviewTab.Text = "Review";
             this._reviewTab.UseVisualStyleBackColor = true;
@@ -337,7 +349,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._reviewTabControl.Location = new System.Drawing.Point(6, 40);
             this._reviewTabControl.Name = "_reviewTabControl";
             this._reviewTabControl.SelectedIndex = 0;
-            this._reviewTabControl.Size = new System.Drawing.Size(479, 222);
+            this._reviewTabControl.Size = new System.Drawing.Size(479, 244);
             this._reviewTabControl.TabIndex = 2;
             // 
             // _statisticsTab
@@ -346,7 +358,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._statisticsTab.Location = new System.Drawing.Point(4, 22);
             this._statisticsTab.Name = "_statisticsTab";
             this._statisticsTab.Padding = new System.Windows.Forms.Padding(3);
-            this._statisticsTab.Size = new System.Drawing.Size(471, 196);
+            this._statisticsTab.Size = new System.Drawing.Size(471, 218);
             this._statisticsTab.TabIndex = 0;
             this._statisticsTab.Text = "Statistics";
             this._statisticsTab.UseVisualStyleBackColor = true;
@@ -361,7 +373,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._statisticsTextBox.Name = "_statisticsTextBox";
             this._statisticsTextBox.ReadOnly = true;
             this._statisticsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._statisticsTextBox.Size = new System.Drawing.Size(458, 183);
+            this._statisticsTextBox.Size = new System.Drawing.Size(458, 205);
             this._statisticsTextBox.TabIndex = 0;
             // 
             // _fileListTab
@@ -375,7 +387,7 @@ namespace Extract.IDShieldStatisticsReporter
             this._fileListTab.Location = new System.Drawing.Point(4, 22);
             this._fileListTab.Name = "_fileListTab";
             this._fileListTab.Padding = new System.Windows.Forms.Padding(3);
-            this._fileListTab.Size = new System.Drawing.Size(471, 196);
+            this._fileListTab.Size = new System.Drawing.Size(471, 218);
             this._fileListTab.TabIndex = 1;
             this._fileListTab.Text = "File lists";
             this._fileListTab.UseVisualStyleBackColor = true;
@@ -383,7 +395,7 @@ namespace Extract.IDShieldStatisticsReporter
             // _fileListCountTextBox
             // 
             this._fileListCountTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._fileListCountTextBox.Location = new System.Drawing.Point(369, 168);
+            this._fileListCountTextBox.Location = new System.Drawing.Point(369, 190);
             this._fileListCountTextBox.Name = "_fileListCountTextBox";
             this._fileListCountTextBox.ReadOnly = true;
             this._fileListCountTextBox.Size = new System.Drawing.Size(95, 20);
@@ -393,7 +405,7 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             this._label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._label7.AutoSize = true;
-            this._label7.Location = new System.Drawing.Point(145, 171);
+            this._label7.Location = new System.Drawing.Point(145, 193);
             this._label7.Name = "_label7";
             this._label7.Size = new System.Drawing.Size(218, 13);
             this._label7.TabIndex = 4;
@@ -406,7 +418,7 @@ namespace Extract.IDShieldStatisticsReporter
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._fileListListBox.Location = new System.Drawing.Point(6, 71);
             this._fileListListBox.Name = "_fileListListBox";
-            this._fileListListBox.Size = new System.Drawing.Size(458, 82);
+            this._fileListListBox.Size = new System.Drawing.Size(458, 95);
             this._fileListListBox.TabIndex = 3;
             this._fileListListBox.DoubleClick += new System.EventHandler(this.OnFileListListBoxDoubleClick);
             // 
@@ -465,9 +477,9 @@ namespace Extract.IDShieldStatisticsReporter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(521, 316);
+            this.ClientSize = new System.Drawing.Size(521, 338);
             this.Controls.Add(this._tabControl);
-            this.MinimumSize = new System.Drawing.Size(529, 350);
+            this.MinimumSize = new System.Drawing.Size(529, 372);
             this.Name = "IDShieldStatisticsReporterForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "ID Shield Statistics Reporter";
@@ -524,6 +536,7 @@ namespace Extract.IDShieldStatisticsReporter
         private System.Windows.Forms.ListBox _fileListListBox;
         private System.Windows.Forms.TextBox _fileListCountTextBox;
         private System.Windows.Forms.Label _label7;
+        private System.Windows.Forms.CheckBox _redactManualDataCheckBox;
     }
 }
 
