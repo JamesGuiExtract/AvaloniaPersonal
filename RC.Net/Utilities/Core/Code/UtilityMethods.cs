@@ -173,7 +173,7 @@ namespace Extract.Utilities
                 {
                     if (type.BaseType == typeof(T))
                     {
-                        if (value == null)
+                        if (value != null)
                         {
                             var ee = new ExtractException("ELI31151",
                                 "Assembly contains multiple implementations of specified type.");
