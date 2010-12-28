@@ -174,6 +174,7 @@ BEGIN_MESSAGE_MAP(CUEXViewerDlg, CDialog)
 	ON_COMMAND(ID_FILE_START_NEW_LOG_FILE, &CUEXViewerDlg::OnFileStartNewLogFile)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_UEX, &CUEXViewerDlg::OnNMRclickListUex)
 	ON_COMMAND(ID_TOOLS_EXPORTDEBUGDATA, &CUEXViewerDlg::OnToolsExportDebugData)
+	ON_COMMAND(ID_ELILISTCONTEXT_SELECTELICODE, &CUEXViewerDlg::OnSelectELICode)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -1294,29 +1295,9 @@ void CUEXViewerDlg::OnCopyELICode()
 
 		// Get index of selected item
 		int iItem = m_listUEX.GetNextSelectedItem( pos );
-				
-		// Retrieve this data structure
-		ITEMINFO* pData = (ITEMINFO *)m_listUEX.GetItemData( iItem );
-		ASSERT_RESOURCE_ALLOCATION("ELI28709", pData != NULL);
-
-		// This ELI Code will only be used it the pData->strData value is not a stringized exception
-		string strELICode = "ELI28695";
-
-		// Create a UCLIDException object
-		UCLIDException	ue;
-		// Create the exception from the items data which should always be stringized exception
-		// if it is the ELI code in strELICode will not be used if it is not a 
-		// stringized exception the strELICode will be the top ELI code of the exception
-		ue.createFromString(strELICode, pData->strData);
-
-		// Check if there the top ELICode is the same as the one passed to the creatFromString
-		// method which should never happen
-		string strTopELI = ue.getTopELI();
-		if ( strTopELI == strELICode )
-		{
-			// The exception should always be valid so throw a logic exception if this happens
-			THROW_LOGIC_ERROR_EXCEPTION("ELI28696");
-		}
+			
+		// Get the ELI code from this item.
+		string strTopELI = getItemELICode(iItem);
 
 		// Put the ELI code on the clipboard
 		ClipboardManager clipboardMgr( this );
@@ -1340,6 +1321,47 @@ void CUEXViewerDlg::OnToolsExportDebugData()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28732");
+}
+//-------------------------------------------------------------------------------------------------
+void CUEXViewerDlg::OnSelectELICode()
+{
+	try
+	{
+		POSITION pos = m_listUEX.GetFirstSelectedItemPosition();
+
+		// Don't do anything if nothing is selected
+		if (pos == NULL || m_listUEX.GetSelectedCount() > 1)
+		{
+			return;
+		}
+
+		CWaitCursor wait;
+
+		// Get index of selected item
+		int iItem = m_listUEX.GetNextSelectedItem(pos);
+
+		// Get the selected ELI code
+		string strSelectedELI = getItemELICode(iItem);
+
+		int nCount = m_listUEX.GetItemCount();
+		for (int i = 0; i < nCount; i++)
+		{
+			// Get the ELI code from this item.
+			string strELI = getItemELICode(i);
+
+			if (strELI == strSelectedELI)
+			{
+				// Select if the ELI code matches
+				m_listUEX.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
+			}
+			else
+			{
+				// Otherwise, ensure the item is not selected.
+				m_listUEX.SetItemState(i, 0, LVIS_SELECTED);
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31249");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1876,5 +1898,32 @@ void CUEXViewerDlg::setItemText(int iIndex, int iColumn, string strText)
 	// Write the text to the specified row and column
 	m_listUEX.SetItemText( iIndex, iColumn, strText.c_str() );
 }
+//-------------------------------------------------------------------------------------------------
+string CUEXViewerDlg::getItemELICode(int iIndex)
+{
+	// Retrieve this data structure
+	ITEMINFO* pData = (ITEMINFO *)m_listUEX.GetItemData(iIndex);
+	ASSERT_RESOURCE_ALLOCATION("ELI28709", pData != NULL);
 
+	// This ELI Code will only be used it the pData->strData value is not a stringized exception
+	string strELICode = "ELI28695";
+
+	// Create a UCLIDException object
+	UCLIDException	ue;
+	// Create the exception from the items data which should always be stringized exception
+	// if it is the ELI code in strELICode will not be used if it is not a 
+	// stringized exception the strELICode will be the top ELI code of the exception
+	ue.createFromString(strELICode, pData->strData);
+
+	// Check if there the top ELICode is the same as the one passed to the creatFromString
+	// method which should never happen
+	string strTopELI = ue.getTopELI();
+	if ( strTopELI == strELICode )
+	{
+		// The exception should always be valid so throw a logic exception if this happens
+		THROW_LOGIC_ERROR_EXCEPTION("ELI28696");
+	}
+
+	return strTopELI;
+}
 //-------------------------------------------------------------------------------------------------

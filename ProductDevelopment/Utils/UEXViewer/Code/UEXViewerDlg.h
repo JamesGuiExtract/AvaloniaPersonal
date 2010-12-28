@@ -114,6 +114,7 @@ protected:
 	afx_msg void OnNMRclickListUex(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnToolsExportDebugData();
 	afx_msg void OnFileStartNewLogFile();
+	afx_msg void OnSelectELICode();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -187,6 +188,11 @@ protected:
 	//			iColumn - Column in list
 	//			strText - Text for cell
 	void setItemText(int iIndex, int iColumn, string strText);
+
+	//=======================================================================
+	// PURPOSE: Retrieves the ELI code from the specified row
+	// ARGS:	iIndex - Index of the row.
+	string getItemELICode(int iIndex);
 
 private:
 	// Width of each column
