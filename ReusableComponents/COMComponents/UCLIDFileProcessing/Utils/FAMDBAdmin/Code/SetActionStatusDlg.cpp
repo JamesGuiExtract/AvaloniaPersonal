@@ -27,7 +27,19 @@ CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessin
 m_ipFAMDB(ipFAMDB),
 m_pFAMDBAdmin(pFAMDBAdmin)
 {
+	ASSERT_ARGUMENT("ELI31255", ipFAMDB != NULL);
 	ASSERT_ARGUMENT("ELI27697", pFAMDBAdmin != NULL);
+}
+//-------------------------------------------------------------------------------------------------
+CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+	CFAMDBAdminDlg* pFAMDBAdmin, const SelectFileSettings &selectSettings)
+: CDialog(CSetActionStatusDlg::IDD)
+, m_ipFAMDB(ipFAMDB)
+, m_pFAMDBAdmin(pFAMDBAdmin)
+, m_settings(selectSettings)
+{
+	ASSERT_ARGUMENT("ELI31256", ipFAMDB != NULL);
+	ASSERT_ARGUMENT("ELI31257", pFAMDBAdmin != NULL);
 }
 //-------------------------------------------------------------------------------------------------
 CSetActionStatusDlg::~CSetActionStatusDlg()

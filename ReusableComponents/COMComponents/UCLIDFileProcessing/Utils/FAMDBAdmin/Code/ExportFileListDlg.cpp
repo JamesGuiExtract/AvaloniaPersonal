@@ -32,6 +32,16 @@ m_ipFAMDB(ipFAMDB)
 	//{{AFX_DATA_INIT(CExportFileListDlg)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
+	ASSERT_ARGUMENT("ELI31250", ipFAMDB != NULL);
+}
+//-------------------------------------------------------------------------------------------------
+CExportFileListDlg::CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+	const SelectFileSettings &selectSettings)
+: CDialog(CExportFileListDlg::IDD)
+, m_ipFAMDB(ipFAMDB)
+, m_settings(selectSettings)
+{
+	ASSERT_ARGUMENT("ELI31251", ipFAMDB != NULL);
 }
 //-------------------------------------------------------------------------------------------------
 CExportFileListDlg::~CExportFileListDlg()

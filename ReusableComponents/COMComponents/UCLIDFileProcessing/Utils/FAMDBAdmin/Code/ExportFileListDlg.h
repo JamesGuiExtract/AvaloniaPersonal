@@ -19,6 +19,8 @@ class CExportFileListDlg : public CDialog
 public:
 // Construction
 	CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr pFAMDB);
+	CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr pFAMDB,
+		const SelectFileSettings& selectSettings);
 	~CExportFileListDlg();
 
 // Dialog Data

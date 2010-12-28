@@ -1,8 +1,10 @@
 #pragma once
 #include "afxdlgs.h"
 #include "resource.h"
+#include "SelectFilesDlg.h"
 
 #include <string>
+using namespace std;
 
 class CFAMDBAdminSummaryDlg :
 	public CPropertyPage
@@ -35,6 +37,9 @@ protected:
 	//---------------------------------------------------------------------------------------------
 	afx_msg void OnBnClickedRefreshSummary();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnContextExportFileList();
+	afx_msg void OnContextSetFileActionStatus();
 	virtual BOOL OnInitDialog();
 
 private:
@@ -50,6 +55,10 @@ private:
 
 	// The Database pointer obj to work with
 	IFileProcessingDBPtr m_ipFAMDB;
+
+	// Stores file selection information based on the right-click location in the summary grid for
+	// use by the "Set file action status" and "Export file list" context menu options.
+	SelectFileSettings m_contextMenuFileSelection;
 
 	//---------------------------------------------------------------------------------------------
 	// Helper methods

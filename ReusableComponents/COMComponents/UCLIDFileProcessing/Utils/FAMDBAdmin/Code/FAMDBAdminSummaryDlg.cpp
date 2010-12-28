@@ -1,6 +1,8 @@
 // FAMDBAdminSummaryDlg.cpp 
 #include "StdAfx.h"
 #include "FAMDBAdminSummaryDlg.h"
+#include "ExportFileListDlg.h"
+#include "SetActionStatusDlg.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -24,15 +26,18 @@ const int giTOTALS_COLUMN = 7;
 const int giNUMBER_OF_COLUMNS = 8;
 const int giMIN_SIZE_COLUMN = 80;
 
-// constants for the labels in the summary list control
-const string gstrACTION_LABEL = "Action";
-const string gstrUNATTEMPTED_LABEL = "Unattempted";
-const string gstrPENDING_LABEL = "Pending";
-const string gstrPROCESSING_LABEL = "Processing";
-const string gstrCOMPLETED_LABEL = "Complete";
-const string gstrSKIPPED_LABEL = "Skipped";
-const string gstrFAILED_LABEL = "Failed";
-const string gstrTOTALS_LABEL = "Total";
+// action status codes and action status names for each column of the list control
+const string gmapCOLUMN_STATUS[][2] =
+{
+	{ "",  "Action" },
+	{ "U", "Unattempted"},
+	{ "P", "Pending" },
+	{ "R", "Processing" },
+	{ "C", "Complete" },
+	{ "S", "Skipped" },
+	{ "F", "Failed" },
+	{ "",  "Total" }
+};
 
 // constants for the query to get the total number of files referenced in the database
 const string gstrTOTAL_FILECOUNT_FIELD = "FileCount";
@@ -80,6 +85,9 @@ void CFAMDBAdminSummaryDlg::DoDataExchange(CDataExchange *pDX)
 BEGIN_MESSAGE_MAP(CFAMDBAdminSummaryDlg, CPropertyPage)
 	ON_BN_CLICKED(IDC_BUTTON_REFRESH_SUMMARY, &OnBnClickedRefreshSummary)
 	ON_WM_SIZE()
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_ACTIONS, &CFAMDBAdminSummaryDlg::OnNMRClickListActions)
+	ON_COMMAND(ID_SUMMARY_MENU_EXPORT_LIST, &OnContextExportFileList)
+	ON_COMMAND(ID_SUMMARY_MENU_SET_ACTION_STATUS,  &OnContextSetFileActionStatus)
 END_MESSAGE_MAP()
 //--------------------------------------------------------------------------------------------------
 
@@ -228,6 +236,73 @@ void CFAMDBAdminSummaryDlg::OnBnClickedRefreshSummary()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19797");
 }
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	try
+	{
+		*pResult = 0;
+
+		// Retrieve information about the active cell.
+		LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+		// If there is a valid selection...
+		if (pNMItemActivate->iItem >= 0 && pNMItemActivate->iSubItem >= 0)
+		{
+			// If the selected column has an associated action status code... 
+			string strActionStatus = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][0];
+			if (!strActionStatus.empty())
+			{
+				// Prepare file selection info based on the selected action and actions status
+				string strContextActionStatusName = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][1];
+				string strContextActionName = m_listActions.GetItemText(pNMItemActivate->iItem, 0);
+
+				m_contextMenuFileSelection.setScope(eAllFilesForWhich);
+				m_contextMenuFileSelection.setStatus(m_ipFAMDB->AsEActionStatus(strActionStatus.c_str()));
+				m_contextMenuFileSelection.setStatusString(strContextActionStatusName);		
+				m_contextMenuFileSelection.setActionID(m_ipFAMDB->GetActionID(strContextActionName.c_str()));		
+				m_contextMenuFileSelection.setAction(strContextActionName);
+				m_contextMenuFileSelection.setUser(gstrANY_USER);
+
+				CMenu menu;
+				menu.LoadMenu(IDR_MENU_SUMMARY_CONTEXT);
+				CMenu *pContextMenu = menu.GetSubMenu(0);
+			
+				// Get the cursor position
+				CPoint point;
+				GetCursorPos(&point);
+
+				// Display the context menu
+				pContextMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, 
+					point.x, point.y, this);
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31252");
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::OnContextExportFileList()
+{
+	try
+	{
+		// Display the exporting file list dialog
+		CExportFileListDlg dlgExportFiles(m_ipFAMDB, m_contextMenuFileSelection);
+		dlgExportFiles.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31253");
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::OnContextSetFileActionStatus()
+{
+	try
+	{
+		// Display the set file action status dialog
+		CFAMDBAdminDlg *pFAMDBAdminDlg = (CFAMDBAdminDlg*)AfxGetMainWnd();
+		CSetActionStatusDlg dlgSetActionStatus(m_ipFAMDB, pFAMDBAdminDlg, m_contextMenuFileSelection);
+		dlgSetActionStatus.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31254");
+}
 
 //--------------------------------------------------------------------------------------------------
 // Public methods
@@ -247,15 +322,15 @@ void CFAMDBAdminSummaryDlg::prepareListControl()
 	// also, insert a temporary width, this will get reset in the OnInitDialog which will
 	// call resizeListColumns to size the columns based on the list control's dimensions
 	m_listActions.SetExtendedStyle(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
-	m_listActions.InsertColumn(giACTION_COLUMN, gstrACTION_LABEL.c_str(), LVCFMT_LEFT, 50);
+	m_listActions.InsertColumn(giACTION_COLUMN, gmapCOLUMN_STATUS[giACTION_COLUMN][1].c_str(), LVCFMT_LEFT, 50);
 	m_listActions.InsertColumn(giUNATTEMPTED_COLUMN, 
-		gstrUNATTEMPTED_LABEL.c_str(), LVCFMT_LEFT, 25);
-	m_listActions.InsertColumn(giPENDING_COLUMN, gstrPENDING_LABEL.c_str(), LVCFMT_LEFT, 25);
-	m_listActions.InsertColumn(giPROCESSING_COLUMN, gstrPROCESSING_LABEL.c_str(), LVCFMT_LEFT, 25);
-	m_listActions.InsertColumn(giCOMPLETED_COLUMN, gstrCOMPLETED_LABEL.c_str(), LVCFMT_LEFT, 25);
-	m_listActions.InsertColumn(giSKIPPED_COLUMN, gstrSKIPPED_LABEL.c_str(), LVCFMT_LEFT, 25);
-	m_listActions.InsertColumn(giFAILED_COLUMN, gstrFAILED_LABEL.c_str(), LVCFMT_LEFT, 25);
-	m_listActions.InsertColumn(giTOTALS_COLUMN, gstrTOTALS_LABEL.c_str(), LVCFMT_LEFT, 25);
+		gmapCOLUMN_STATUS[giUNATTEMPTED_COLUMN][1].c_str(), LVCFMT_LEFT, 25);
+	m_listActions.InsertColumn(giPENDING_COLUMN, gmapCOLUMN_STATUS[giPENDING_COLUMN][1].c_str(), LVCFMT_LEFT, 25);
+	m_listActions.InsertColumn(giPROCESSING_COLUMN, gmapCOLUMN_STATUS[giPROCESSING_COLUMN][1].c_str(), LVCFMT_LEFT, 25);
+	m_listActions.InsertColumn(giCOMPLETED_COLUMN, gmapCOLUMN_STATUS[giCOMPLETED_COLUMN][1].c_str(), LVCFMT_LEFT, 25);
+	m_listActions.InsertColumn(giSKIPPED_COLUMN, gmapCOLUMN_STATUS[giSKIPPED_COLUMN][1].c_str(), LVCFMT_LEFT, 25);
+	m_listActions.InsertColumn(giFAILED_COLUMN, gmapCOLUMN_STATUS[giFAILED_COLUMN][1].c_str(), LVCFMT_LEFT, 25);
+	m_listActions.InsertColumn(giTOTALS_COLUMN, gmapCOLUMN_STATUS[giTOTALS_COLUMN][1].c_str(), LVCFMT_LEFT, 25);
 }
 //--------------------------------------------------------------------------------------------------
 void CFAMDBAdminSummaryDlg::resizeListColumns()

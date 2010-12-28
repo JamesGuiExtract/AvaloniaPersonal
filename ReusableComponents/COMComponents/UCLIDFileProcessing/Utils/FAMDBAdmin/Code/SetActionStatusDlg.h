@@ -21,6 +21,8 @@ public:
 // Construction
 	CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
 		CFAMDBAdminDlg* pFAMDBAdmin);
+	CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+		CFAMDBAdminDlg* pFAMDBAdmin, const SelectFileSettings &selectSettings);
 	~CSetActionStatusDlg();
 
 // Dialog Data
