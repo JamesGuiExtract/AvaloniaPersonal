@@ -139,13 +139,25 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 				// if the schema is 100 or higher the database is using the FileActionStatus table
 				// instead of columns in the FAMFile table.
 				// TODO: Remove if statement when it is no longer required to support columns in FAMFile table
-				if (ipFAMDB->DBSchemaVersion >= 100 )
-				{
-					strQueryPart2 += " LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
-						" AND FileActionStatus.ActionID = " + asString(m_nActionID);
-					strQueryPart2 += " WHERE (FileActionStatus.ActionStatus = '"
-						+ strStatus + "')";
-				}
+                if (ipFAMDB->DBSchemaVersion >= 100 )
+                {
+                    strQueryPart2 += " LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
+                        " AND FileActionStatus.ActionID = " + asString(m_nActionID);
+                    strQueryPart2 += " WHERE (";
+
+                    // [LRCAU #5942] - Files are no longer marked as unattempted due to the
+                    // database normalization changes. A file is unattempted for a particular
+                    // action if it does not contain an entry in the FileActionStatus table.
+                    if (m_nStatus == kActionUnattempted)
+                    {
+                        strQueryPart2 += "FileActionStatus.FileID IS NULL)";
+                    }
+                    else
+                    {
+                        strQueryPart2 += "FileActionStatus.ActionStatus = '"
+                            + strStatus + "')";
+                    }
+                }
 				else
 				{
 					strQueryPart2 += "WHERE (ASC_" + m_strAction + " = '"
