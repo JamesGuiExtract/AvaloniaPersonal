@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using Extract.Utilities.Forms;
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using TD.SandDock;
 
 namespace Extract.Imaging.Forms
@@ -24,6 +21,11 @@ namespace Extract.Imaging.Forms
         /// thumbnail viewer.
         /// </summary>
         DockableWindow _dockableWindow;
+
+        /// <summary>
+        /// Indicates whether the dockable window was collapsed before hiding it or not.
+        /// </summary>
+        bool _collapsed;
 
         #endregion Fields
 
@@ -108,12 +110,36 @@ namespace Extract.Imaging.Forms
                     // If the window is opened or collapsed, close it
                     if (_dockableWindow.IsOpen || _dockableWindow.Collapsed)
                     {
+                        _collapsed = _dockableWindow.Collapsed;
                         _dockableWindow.Close();
                     }
                     else
                     {
-                        // Window is not open, open it
-                        _dockableWindow.Open();
+                        var form = _collapsed ? Parent.FindForm() : null;
+                        try
+                        {
+                            // Suspend layout so that there is no flicker from the collapsing
+                            if (form != null)
+                            {
+                                form.SuspendLayout();
+                            }
+
+                            // Window is not open, open it
+                            _dockableWindow.Open();
+                            if (_collapsed)
+                            {
+                                _dockableWindow.Collapsed = true;
+                            }
+                        }
+                        finally
+                        {
+                            // Reset the collapsed state
+                            _collapsed = false;
+                            if (form != null)
+                            {
+                                form.ResumeLayout();
+                            }
+                        }
                     }
                 }
 
