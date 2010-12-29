@@ -114,7 +114,8 @@ protected:
 	afx_msg void OnNMRclickListUex(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnToolsExportDebugData();
 	afx_msg void OnFileStartNewLogFile();
-	afx_msg void OnSelectELICode();
+	afx_msg void OnSelectMatchingTopLevelExceptions();
+	afx_msg void OnSelectMatchingExceptionHierarchies();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -190,9 +191,17 @@ protected:
 	void setItemText(int iIndex, int iColumn, string strText);
 
 	//=======================================================================
-	// PURPOSE: Retrieves the ELI code from the specified row
+	// PURPOSE: Retrieves the comma separated ELI codes from the specified row
 	// ARGS:	iIndex - Index of the row.
-	string getItemELICode(int iIndex);
+	//			bIncludeInnerELICodes - true to include all inner ELI codes
+	//				false to include only the top-level ELI code
+	string getItemELICodes(int iIndex, bool bIncludeInnerELICodes);
+
+	//=======================================================================
+	// PURPOSE: Selects all exceptions matching the currently selected exception
+	// ARGS:	bMatchEntireHierarchy - true if the entire exception hierarchy must match in order
+	//				to be selected, false if only the top-level ELI code must match.
+	void selectMatchingExceptions(bool bMatchEntireHierarchy);
 
 private:
 	// Width of each column

@@ -108,15 +108,16 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 			m_comboStatusFromAction.SetItemData(iIndexActionFrom, nID);
 		}
 		
-		// Set the current action to the first action in three combo boxes
-		m_comboActions.SetCurSel(0);
-		m_comboStatusFromAction.SetCurSel(0);
+		// Per discussion with Arvind:
+		// Don't initialize the target action or status. If a user is forced to consciously make a
+		// choice, it is less likely they will accidentally make a mistake that will be hard to
+		// correct.
+		// m_comboActions.SetCurSel(0);
+		// m_comboStatusFromAction.SetCurSel(0);
+		// m_comboNewStatus.SetCurSel(1);
 
 		// Set the status items into combo boxes
 		CFAMDBAdminUtils::addStatusInComboBox(m_comboNewStatus);
-
-		// Set the initial status to Pending
-		m_comboNewStatus.SetCurSel(1);
 
 		// Select the all file reference radio button and new action status
 		// radio button as default setting

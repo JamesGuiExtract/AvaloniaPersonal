@@ -555,7 +555,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&File Action Manager...\tCtrl+F", ID_TOOLS_FILEACTIONMANAGER
         MENUITEM SEPARATOR
-        MENUITEM "E&xport file lists...",       ID_TOOLS_EXPORTFILELISTS
+        MENUITEM "E&xport file list...",        ID_TOOLS_EXPORTFILELISTS
         MENUITEM "&Reports...",                 ID_TOOLS_REPORTS
     END
     POPUP "&Help"
@@ -571,7 +571,7 @@ BEGIN
     POPUP ""
     BEGIN
         MENUITEM "Manually set action status...", ID_SUMMARY_MENU_SET_ACTION_STATUS
-        MENUITEM "Export file lists...",        ID_SUMMARY_MENU_EXPORT_LIST
+        MENUITEM "Export file list...",         ID_SUMMARY_MENU_EXPORT_LIST
         MENUITEM SEPARATOR
         MENUITEM "Cancel",                      ID_SUMMARY_MENU_CANCEL
     END

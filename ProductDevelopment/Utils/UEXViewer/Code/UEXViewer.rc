@@ -268,8 +268,9 @@ IDR_ELI_LIST_CONTEXT_MENU MENU
 BEGIN
     POPUP "ELIListContext"
     BEGIN
-        MENUITEM "Select all instances of this exception", ID_ELILISTCONTEXT_SELECTELICODE
-        MENUITEM "Copy ELI code",               ID_ELILISTCONTEXT_COPYELICODE
+        MENUITEM "Select all matching top-level exceptions", ID_ELILISTCONTEXT_MATCHING_TOPLEVEL
+		MENUITEM "Select all matching exception hierarchies", ID_ELILISTCONTEXT_MATCHING_HIERARCHIES
+        MENUITEM "Copy top ELI code",           ID_ELILISTCONTEXT_COPYELICODE
         MENUITEM SEPARATOR
         MENUITEM "Cancel",                      ID_ELILISTCONTEXT_CANCEL
     END
