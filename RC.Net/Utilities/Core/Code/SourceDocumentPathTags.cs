@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 
 namespace Extract.Utilities
 {
@@ -11,6 +9,15 @@ namespace Extract.Utilities
     [DisplayName("Source Document")]
     public class SourceDocumentPathTags : PathTagsBase
     {
+        #region Constants
+
+        /// <summary>
+        /// Constant for the source doc name tag.
+        /// </summary>
+        static readonly string _SOURCE_DOC_NAME_TAG = "<SourceDocName>";
+
+        #endregion Constants
+
         #region SourceDocumentPathTags Constructors
 
         /// <summary>
@@ -41,10 +48,27 @@ namespace Extract.Utilities
         static Dictionary<string, string> GetTagsToValues(string sourceDocument)
         {
             Dictionary<string, string> tagsToValues = new Dictionary<string, string>(1);
-            tagsToValues.Add("<SourceDocName>", sourceDocument);
+            tagsToValues.Add(_SOURCE_DOC_NAME_TAG, sourceDocument);
             return tagsToValues;
         }
 
         #endregion SourceDocumentPathTags Methods
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the source document name tag.
+        /// </summary>
+        /// <value>The source document name tag.</value>
+        public static string SourceDocumentTag
+        {
+            get
+            {
+                return _SOURCE_DOC_NAME_TAG;
+            }
+        }
+
+        #endregion Properties
+
     }
 }

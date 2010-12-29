@@ -350,7 +350,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI27893",
-					_COMPONENT_DESCRIPTION);
+                    _COMPONENT_DESCRIPTION);
 
                 // Create a tag manager and expand the tags in the file name
                 FileActionManagerPathTags tags = new FileActionManagerPathTags(
@@ -394,15 +394,16 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
-		/// <summary>
-		/// Returns bool value indicating if the task requires admin access
-		/// </summary>
-		/// <returns><see langword="true"/> if the task requires admin access
-		/// <see langword="false"/> if task does not require admin access</returns>
-		public bool RequiresAdminAccess()
-		{
-			return false;
-		}
+        /// <summary>
+        /// Returns bool value indicating if the task requires admin access
+        /// </summary>
+        /// <returns><see langword="true"/> if the task requires admin access
+        /// <see langword="false"/> if task does not require admin access</returns>
+        public bool RequiresAdminAccess()
+        {
+            return false;
+        }
+
         #endregion
 
         #region ILicensedComponent Members
@@ -628,9 +629,9 @@ namespace Extract.FileActionManager.FileProcessors
                 ExtractException ee = ExtractException.AsExtractException("ELI27990", ex);
                 if (inputFile != null)
                 {
-		            ee.AddDebugData("PDF Manager File Information",
+                    ee.AddDebugData("PDF Manager File Information",
                        inputFile.FileNameInformationString, false);
-	            }
+                }
                 ee.AddDebugData("Total Pages", pageCount, false);
                 if (batesNumbers != null)
                 {

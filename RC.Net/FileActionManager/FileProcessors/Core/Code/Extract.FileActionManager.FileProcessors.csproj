@@ -107,6 +107,13 @@
     <Compile Include="ModifyPdfFileTask.cs" />
     <Compile Include="ModifyPdfFileTaskSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SetFilePrioritySettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetFilePrioritySettingsDialog.Designer.cs">
+      <DependentUpon>SetFilePrioritySettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SetFilePriorityTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
@@ -140,6 +147,10 @@
     <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
+      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
+      <Name>Extract.FileActionManager.Forms</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -184,6 +195,9 @@
     <EmbeddedResource Include="ModifyPdfFileSettingsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ModifyPdfFileSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetFilePrioritySettingsDialog.resx">
+      <DependentUpon>SetFilePrioritySettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
