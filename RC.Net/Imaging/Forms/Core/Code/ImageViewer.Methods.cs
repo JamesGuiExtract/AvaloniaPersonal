@@ -3375,95 +3375,106 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Shrinks the left side of the fitting data to exclude all-white pixel columns.
+        /// Shrinks the left side of the fitting data so that the boundary is right up against
+        /// (but not on) the left-most pixel content.
         /// </summary>
         /// <param name="data">The fitting data to shrink.</param>
         /// <param name="probe">The probe used to test image pixels.</param>
         static void ShrinkLeftSide(FittingData data, PixelProbe probe)
         {
             // Iterate over each column, checking if the left side can be shrunk by one pixel
-            while (data.LeftTop.X < data.RightBottom.X)
+            for (float left = data.LeftTop.X; left < data.RightBottom.X; left++)
             {
                 // Iterate over each pixel in this column
                 for (float y = data.LeftTop.Y; y <= data.RightBottom.Y; y++)
                 {
                     // Check whether this pixel is black
-                    if (IsPixelBlack(data.LeftTop.X, y, data.Theta, probe))
+                    if (IsPixelBlack(left, y, data.Theta, probe, true))
                     {
+                        // If this row contains a black pixel don't want it as the boundary;
+                        // we want the previous row.
+                        data.LeftTop.X = Math.Max(left - 1, data.LeftTop.X);
+
                         // We are done.
                         return;
                     }
                 }
-
-                data.LeftTop.X++;
             }
         }
 
         /// <summary>
-        /// Shrinks the right side of the fitting data to exclude all-white pixel columns.
+        /// Shrinks the right side of the fitting data so that the boundary is right up against
+        /// (but not on) the right-most pixel content.
         /// </summary>
         /// <param name="data">The fitting data to shrink.</param>
         /// <param name="probe">The probe used to test image pixels.</param>
         static void ShrinkRightSide(FittingData data, PixelProbe probe)
         {
             // Iterate over each column, checking if the right side can be shrunk by one pixel
-            while (data.RightBottom.X > data.LeftTop.X)
+            for (float right = data.RightBottom.X; right > data.LeftTop.X; right--)
             {
                 // Iterate over each pixel in this column
                 for (float y = data.LeftTop.Y; y <= data.RightBottom.Y; y++)
                 {
                     // Check whether this pixel is black
-                    if (IsPixelBlack(data.RightBottom.X, y, data.Theta, probe))
+                    if (IsPixelBlack(right, y, data.Theta, probe, false))
                     {
+                        // If this row contains a black pixel don't want it as the boundary;
+                        // we want the previous row.
+                        data.RightBottom.X = Math.Min(right + 1, data.RightBottom.X);
+
                         // We are done.
                         return;
                     }
                 }
-
-                data.RightBottom.X--;
             }
         }
 
         /// <summary>
-        /// Shrinks the top side of the fitting data to exclude all-white pixel rows.
+        /// Shrinks the top side of the fitting data so that the boundary is right up against
+        /// (but not on) the top-most pixel content.
         /// </summary>
         /// <param name="data">The fitting data to shrink.</param>
         /// <param name="probe">The probe used to test image pixels.</param>
         static void ShrinkTopSide(FittingData data, PixelProbe probe)
         {
             // Iterate over each row, checking if the top side can be shrunk by one pixel
-            while (data.LeftTop.Y < data.RightBottom.Y)
+            for (float top = data.LeftTop.Y; top < data.RightBottom.Y; top++)
             {
-
                 // Check whether this row contains a black pixel
-                if (RowContainsBlackPixel(data.LeftTop.Y, data.LeftTop.X, data.RightBottom.X, data.Theta, probe))
+                if (RowContainsBlackPixel(top, data.LeftTop.X, data.RightBottom.X, data.Theta, probe, true))
                 {
+                    // If this row contains a black pixel don't want it as the boundary;
+                    // we want the previous row.
+                    data.LeftTop.Y = Math.Max(top - 1, data.LeftTop.Y);
+
                     // We are done.
                     return;
                 }
-
-                data.LeftTop.Y++;
             }
         }
 
         /// <summary>
-        /// Shrinks the bottom side of the fitting data to exclude all-white pixel rows.
+        /// Shrinks the bottom side of the fitting data so that the boundary is right up against
+        /// (but not on) the bottom-most pixel content.
         /// </summary>
         /// <param name="data">The fitting data to shrink.</param>
         /// <param name="probe">The probe used to test image pixels.</param>
         static void ShrinkBottomSide(FittingData data, PixelProbe probe)
         {
             // Iterate over each row, checking if the bottom side can be shrunk by one pixel
-            while (data.RightBottom.Y > data.LeftTop.Y)
+            for (float bottom = data.RightBottom.Y; bottom > data.LeftTop.Y; bottom--)
             {
                 // Check whether this row contains a black pixel
-                if (RowContainsBlackPixel(data.RightBottom.Y, data.LeftTop.X, data.RightBottom.X, data.Theta, probe))
+                if (RowContainsBlackPixel(bottom, data.LeftTop.X, data.RightBottom.X, data.Theta, probe, false))
                 {
+                    // If this row contains a black pixel don't want it as the boundary;
+                    // we want the previous row.
+                    data.RightBottom.Y = Math.Min(bottom + 1, data.RightBottom.Y);
+
                     // We are done.
                     return;
                 }
-
-                data.RightBottom.Y--;
             }
         }
 
@@ -3531,16 +3542,20 @@ namespace Extract.Imaging.Forms
         /// <param name="right">The right most pixel in the row.</param>
         /// <param name="theta">The cosine and sine theta of the angle of the row.</param>
         /// <param name="probe">The probe used to test image pixels.</param>
+        /// <param name="ceiling"><see langword="null"/> to round test nearest pixels,
+        /// <see langword="true"/> to round up, thus testing the next lower row of pixels on the page,
+        /// <see langword="false"/> to round down, thus testing the next higher row of pixels.</param>
         /// <returns><see langword="true"/> if any pixel in the <paramref name="y"/> from 
         /// <paramref name="left"/> to <paramref name="right"/> is black; <see langword="false"/> 
         /// if all pixels in the <paramref name="y"/> from <paramref name="left"/> to 
         /// <paramref name="right"/> are white.</returns>
-        static bool RowContainsBlackPixel(float y, float left, float right, PointF theta, PixelProbe probe)
+        static bool RowContainsBlackPixel(float y, float left, float right, PointF theta,
+            PixelProbe probe, bool? ceiling)
         {
             for (float x = left; x <= right; x++)
             {
                 // Check whether this pixel is black
-                if (IsPixelBlack(x, y, theta, probe))
+                if (IsPixelBlack(x, y, theta, probe, ceiling))
                 {
                     return true;
                 }
@@ -3557,12 +3572,18 @@ namespace Extract.Imaging.Forms
         /// <param name="theta">The cosine and sine of the angle of rotation of the coordinate 
         /// system.</param>
         /// <param name="probe">The probe used to test image pixels.</param>
+        /// <param name="ceiling"><see langword="null"/> to round test nearest pixel,
+        /// <see langword="true"/> to round up, thus testing the pixel to the lower-right on the page,
+        /// <see langword="false"/> to round down, thus testing the pixel to the upper-left on the page.
+        /// </param>
         /// <returns><see langword="true"/> if the specified pixel is black; 
         /// <see langword="false"/> if the specified pixel is white.</returns>
-        static bool IsPixelBlack(float x, float y, PointF theta, PixelProbe probe)
+        static bool IsPixelBlack(float x, float y, PointF theta, PixelProbe probe, bool? ceiling)
         {
             PointF pixel = GeometryMethods.Rotate(x, y, theta);
-            Point point = Point.Round(pixel);
+            Point point = ceiling.HasValue 
+                ? (ceiling.Value ? Point.Ceiling(pixel) : Point.Truncate(pixel))
+                : Point.Round(pixel);
 
             return probe.Contains(point) && probe.IsPixelBlack(point);
         }
@@ -3588,7 +3609,7 @@ namespace Extract.Imaging.Forms
                     return -1;
                 }
             }
-            while (!RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe));
+            while (!RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe, null));
 
             // Look for the next row of white pixels
             do
@@ -3601,7 +3622,7 @@ namespace Extract.Imaging.Forms
                     return -1;
                 }
             }
-            while (RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe));
+            while (RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe, null));
 
             // Store this point. This is the row to split if minimum requirements have been met.
             float rowToSplit = row;
@@ -3619,7 +3640,19 @@ namespace Extract.Imaging.Forms
                     return -1;
                 }
             }
-            while (!RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe));
+            while (!RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe, null));
+
+            // Attempt to split the zones as evenly as possible by setting rowToSplit to the middle
+            // of white area between the zones rather than the beginning of it.
+            row = rowToSplit;
+            do
+            {
+                row++;
+            }
+            while (!RowContainsBlackPixel(row, data.LeftTop.X, data.RightBottom.X, data.Theta, probe, null));
+
+            // Get the center of the original rowToSplit and the last all white row.
+            rowToSplit = (row + rowToSplit - 1) / 2;
 
             // If we reached this point, we have found a row that can split the highlight
             return rowToSplit;
