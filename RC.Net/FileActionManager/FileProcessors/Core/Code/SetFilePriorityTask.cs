@@ -18,8 +18,8 @@ namespace Extract.FileActionManager.FileProcessors
     [Guid("372B40FA-8116-433A-8B6D-6739B555CB57")]
     [ProgId("Extract.FileActionManager.FileProcessors.SetFilePriorityTask")]
     public class SetFilePriorityTask : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask, ILicensedComponent,
-        IPersistStream
+        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask, 
+        ILicensedComponent, IPersistStream
     {
         #region Constants
 
@@ -376,6 +376,10 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        #endregion IFileProcessingTask Members
+
+        #region IAccessRequired Members
+
         /// <summary>
         /// Returns bool value indicating if the task requires admin access
         /// </summary>
@@ -387,7 +391,7 @@ namespace Extract.FileActionManager.FileProcessors
             return true;
         }
 
-        #endregion
+        #endregion IAccessRequired Members
 
         #region ILicensedComponent Members
 

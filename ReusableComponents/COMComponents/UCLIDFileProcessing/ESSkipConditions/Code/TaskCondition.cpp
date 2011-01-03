@@ -184,6 +184,24 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFilePro
 
 	return S_OK;
 }
+	
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTaskCondition::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31221", pbResult != __nullptr);
+
+		*pbResult = m_ipTask->RequiresAdminAccess();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31222");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ISupportErrorInfo

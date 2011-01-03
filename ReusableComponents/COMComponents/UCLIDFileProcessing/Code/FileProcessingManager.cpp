@@ -1388,16 +1388,11 @@ bool CFileProcessingManager::isUserAuthenticationRequired()
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingManager::isDBPasswordRequired()
 {
-	// Password is required if:
-	// 1. File processing is enabled [LRCAU #5478]
-	// 2. Skipped files are being processed
-	// 3. Processing skipped files for any user
-	// 4. DBInfo setting requires password to process skipped files for any user
-	return (getActionMgmtRole(m_ipFPMgmtRole)->Enabled == VARIANT_TRUE
-			&& m_ipFPMgmtRole->ProcessSkippedFiles == VARIANT_TRUE
-			&& m_ipFPMgmtRole->SkippedForAnyUser == VARIANT_TRUE
-			&& asString(getFPMDB()->GetDBInfoSetting(
-				gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str())) == "1");
+	// Get the AccessRequires interface for the management role to check if Admin access is required
+	IAccessRequiredPtr ipAccess(m_ipFPMgmtRole);
+	ASSERT_RESOURCE_ALLOCATION("ELI31274", ipAccess != __nullptr);
+		
+	return ipAccess->RequiresAdminAccess() == VARIANT_TRUE;
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingManager::authenticateForProcessing()

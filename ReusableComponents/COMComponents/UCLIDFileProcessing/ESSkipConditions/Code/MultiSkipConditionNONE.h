@@ -33,6 +33,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 BEGIN_COM_MAP(CMultiFAMConditionNONE)
 	COM_INTERFACE_ENTRY(IFAMCondition)
 	COM_INTERFACE_ENTRY2(IDispatch, IFAMCondition)
+	COM_INTERFACE_ENTRY(IAccessRequired)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
@@ -58,6 +59,10 @@ public:
 // IFAMCondition
 	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, 
 		long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
+
+// IAccessRequired
+	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
+
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
 

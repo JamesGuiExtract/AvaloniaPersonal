@@ -6,6 +6,7 @@
 #include "FP_UI_Notifications.h"
 #include "FileProcessingUtils.h"
 #include "CommonConstants.h"
+#include "HelperFunctions.h"
 
 #include <LicenseMgmt.h>
 #include <COMUtils.h>
@@ -13,6 +14,8 @@
 #include <ComponentLicenseIDs.h>
 #include <ThreadSafeLogFile.h>
 #include <ValueRestorer.h>
+#include <FAMUtilsConstants.h>
+#include <FAMHelperFunctions.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -107,7 +110,8 @@ STDMETHODIMP CFileProcessingMgmtRole::InterfaceSupportsErrorInfo(REFIID riid)
 	{
 		&IID_IFileActionMgmtRole,
 		&IID_ILicensedComponent,
-		&IID_IFileProcessingMgmtRole
+		&IID_IFileProcessingMgmtRole,
+		&IID_IAccessRequired
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -387,6 +391,37 @@ STDMETHODIMP CFileProcessingMgmtRole::ValidateStatus(void)
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14350")
+}
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31246", pbResult != __nullptr);
+
+		// Admin access is required if 
+		// 1. File processing is enabled [LRCAU #5478]
+		// 2. Skipped files are being processed
+		// 3. Processing skipped files for any user
+		// 4. DBInfo setting requires password to process skipped files for any user
+		// 5. Any of the tasks being processed requires admin access
+		// 5. The error task requires admin access
+
+		bool bResult = m_bEnabled && (m_bProcessSkippedFiles && m_bSkippedForAnyUser &&
+			(asString(getFPMDB()->GetDBInfoSetting(gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str())) == "1")
+			|| checkForRequiresAdminAccess(m_ipFileProcessingTasks)  
+			|| checkForRequiresAdminAccess(getErrorHandlingTask()));
+		
+		*pbResult = asVariantBool(bResult);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31247");
 }
 
 //-------------------------------------------------------------------------------------------------

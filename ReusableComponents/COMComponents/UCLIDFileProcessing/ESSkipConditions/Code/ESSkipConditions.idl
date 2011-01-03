@@ -205,6 +205,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;
 		interface IFAMCondition;
+		interface IAccessRequired;
 	};
 	[
 		uuid(657EB1F4-9890-45e1-A68F-EEEC8E12037D),
@@ -227,6 +228,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;
 		interface IFAMCondition;
+		interface IAccessRequired;
 	};
 	[
 		uuid(3BF3D2A3-7DA3-4a8d-B4AC-D7D36956A063),
@@ -248,6 +250,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ILicensedComponent;
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;
+		interface IAccessRequired;
 	};
 
 	[
@@ -290,6 +293,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface IClipboardCopyable;
 		interface IMustBeConfiguredObject;
 		interface IFAMCondition;
+		interface IAccessRequired;
 	};
 	[
 		uuid(46571961-56D1-4157-92BF-1FA791658174),
@@ -312,6 +316,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;
 		interface IFAMCondition;
+		interface IAccessRequired;
 	};
 	[
 		uuid(3FB14376-588C-43AD-98FA-1C0AEFC6DEB2),
@@ -343,6 +348,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ICopyableObject;
 		interface ICategorizedComponent;
 		interface IMustBeConfiguredObject;
+		interface IAccessRequired;
 	};
 
 	[
@@ -356,6 +362,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ICopyableObject;
 		interface ICategorizedComponent;
 		interface IMustBeConfiguredObject;
+		interface IAccessRequired;
 	};
 
 	[
@@ -369,6 +376,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ICopyableObject;
 		interface ICategorizedComponent;
 		interface IMustBeConfiguredObject;
+		interface IAccessRequired;
 	};
 
 	[
@@ -382,6 +390,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ICopyableObject;
 		interface ICategorizedComponent;
 		interface IMustBeConfiguredObject;
+		interface IAccessRequired;
 	};
 
 	[
@@ -396,6 +405,7 @@ library EXTRACT_FAMCONDITIONSLib
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;
 		interface ILicensedComponent;
+		interface IAccessRequired;
 	};
 
 	[

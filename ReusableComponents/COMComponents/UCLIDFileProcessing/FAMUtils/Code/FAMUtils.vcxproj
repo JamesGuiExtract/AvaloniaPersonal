@@ -134,6 +134,7 @@
     <ClCompile Include="DBInfoCombo.cpp" />
     <ClCompile Include="DialogSelect.cpp" />
     <ClCompile Include="DotNetUtils.cpp" />
+    <ClCompile Include="FAMHelperFunctions.cpp" />
     <ClCompile Include="FAMUtils.cpp" />
     <ClCompile Include="FileProcessingConfigMgr.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -152,6 +153,7 @@
     <ClInclude Include="DBInfoCombo.h" />
     <ClInclude Include="DialogSelect.h" />
     <ClInclude Include="DotNetUtils.h" />
+    <ClInclude Include="FAMHelperFunctions.h" />
     <ClInclude Include="FAMUtils.h" />
     <ClInclude Include="FAMUtilsConstants.h" />
     <ClInclude Include="FileProcessingConfigMgr.h" />

@@ -46,6 +46,7 @@ BEGIN_COM_MAP(CIDShieldVOAFileContentsCondition)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IFAMCondition)
+	COM_INTERFACE_ENTRY(IAccessRequired)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 END_COM_MAP()
@@ -110,6 +111,9 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 // IFAMCondition
 	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, 
 		long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
+
+// IAccessRequired
+	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID* pClassID);

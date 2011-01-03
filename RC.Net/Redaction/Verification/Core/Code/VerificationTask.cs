@@ -342,6 +342,10 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        #endregion IFileProcessingTask Members
+
+		#region IAccessRequired Members
+
 		/// <summary>
 		/// Returns bool value indicating if the task requires admin access
 		/// </summary>
@@ -351,12 +355,12 @@ namespace Extract.Redaction.Verification
 		{
 			return false;
 		}
-		
-        #endregion IFileProcessingTask Members
 
-        #region ILicensedComponent Members
+		#endregion IAccessRequired Members
 
-        /// <summary>
+		#region ILicensedComponent Members
+
+		/// <summary>
         /// Gets whether this component is licensed.
         /// </summary>
         /// <returns><see langword="true"/> if the component is licensed; <see langword="false"/> 

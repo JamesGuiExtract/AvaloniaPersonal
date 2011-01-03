@@ -323,6 +323,9 @@ STDMETHODIMP CManageTagsTask::raw_Close()
 	
 	return S_OK;
 }
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CManageTagsTask::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {
@@ -551,7 +554,8 @@ STDMETHODIMP CManageTagsTask::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_IFileProcessingTask,
 			&IID_ILicensedComponent,
-			&IID_IMustBeConfiguredObject
+			&IID_IMustBeConfiguredObject,
+			&IID_IAccessRequired
 		};
 
 		for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)

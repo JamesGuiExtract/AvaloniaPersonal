@@ -62,8 +62,8 @@ STDMETHODIMP CRedactFileProcessor::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
-		&IID_ILicensedComponent
-
+		&IID_ILicensedComponent,
+		&IID_IAccessRequired
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -130,6 +130,9 @@ STDMETHODIMP CRedactFileProcessor::raw_Close()
 
 	return S_OK;
 }
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactFileProcessor::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {

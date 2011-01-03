@@ -39,6 +39,7 @@ BEGIN_COM_MAP(CConvertToPDFTask)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IFileProcessingTask)
+	COM_INTERFACE_ENTRY(IAccessRequired)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IPersistStream)
@@ -76,6 +77,8 @@ public:
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);
 	STDMETHOD(raw_Cancel)();
 	STDMETHOD(raw_Close)();
+
+// IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 // ILicensedComponent

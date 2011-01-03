@@ -507,7 +507,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 throw ExtractException.CreateComVisible("ELI23873", "Unable to close.", ex);
             }
         }
-		
+
+		#endregion IFileProcessingTask Members
+
+		#region IAccessRequired Members
+
 		/// <summary>
 		/// Returns bool value indicating if the task requires admin access
 		/// </summary>
@@ -518,7 +522,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 			return false;
 		}
 
-        #endregion IFileProcessingTask Members
+		#endregion IAccessRequired Members
 
         #region ICopyableObject Members
 

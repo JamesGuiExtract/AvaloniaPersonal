@@ -347,6 +347,9 @@ STDMETHODIMP CConvertToPDFTask::raw_Close()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18757");
 }
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConvertToPDFTask::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {
@@ -626,7 +629,8 @@ STDMETHODIMP CConvertToPDFTask::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_IFileProcessingTask,
 			&IID_ILicensedComponent,
-			&IID_IMustBeConfiguredObject
+			&IID_IMustBeConfiguredObject,
+			&IID_IAccessRequired
 		};
 
 		for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)

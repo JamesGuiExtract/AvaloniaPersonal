@@ -393,8 +393,12 @@ namespace Extract.FileActionManager.FileProcessors
                     "Unable to process the file.", ee);
             }
         }
+		
+		#endregion IFileProcessingTask Members
 
-        /// <summary>
+		#region IAccessRequired Members
+
+		/// <summary>
         /// Returns bool value indicating if the task requires admin access
         /// </summary>
         /// <returns><see langword="true"/> if the task requires admin access

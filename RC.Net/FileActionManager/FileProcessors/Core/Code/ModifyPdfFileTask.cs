@@ -514,6 +514,10 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+		#endregion IFileProcessingTask Members
+
+		#region IAccessRequired Members
+
 		/// <summary>
 		/// Returns bool value indicating if the task requires admin access
 		/// </summary>
@@ -523,9 +527,10 @@ namespace Extract.FileActionManager.FileProcessors
 		{
 			return false;
 		}
-        #endregion
 
-        #region ILicensedComponent Members
+		#endregion IAccessRequired Members
+
+		#region ILicensedComponent Members
 
         /// <summary>
         /// Gets whether this component is licensed.

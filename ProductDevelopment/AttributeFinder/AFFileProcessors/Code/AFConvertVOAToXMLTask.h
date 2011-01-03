@@ -42,6 +42,7 @@ BEGIN_COM_MAP(CAFConvertVOAToXMLTask)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
+	COM_INTERFACE_ENTRY(IAccessRequired)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 END_COM_MAP()
 
@@ -79,6 +80,8 @@ END_CATEGORY_MAP()
 		EFileProcessingResult *pResult);
 	STDMETHOD(raw_Cancel)();
 	STDMETHOD(raw_Close)();
+
+// IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 // IMustBeConfiguredObject

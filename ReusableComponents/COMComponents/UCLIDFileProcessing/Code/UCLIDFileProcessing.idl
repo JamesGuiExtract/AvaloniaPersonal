@@ -217,7 +217,7 @@ library UCLID_FILEPROCESSINGLib
 	// If the task cannot be run multithreaded, the task is required to control processing 
 	// via mutexs as necessary to make it thread-safe. Currently there is only one case
 	// where this is an issue: the RedactionVerificationUI.
-	interface IFileProcessingTask : IDispatch
+	interface IFileProcessingTask : IAccessRequired
 	{
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:		To alert the file processor that processing is about to start so it can 
@@ -292,9 +292,6 @@ library UCLID_FILEPROCESSINGLib
 		//				not per file
 		[id(14), helpstring("method Close")] HRESULT Close();
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE:	To return boolean flag indicating if the task or any of the sub tasks require admin access to run
-		[id(15), helpstring("method RequiresAdminAccess")] HRESULT RequiresAdminAccess(
-			[out, retval] VARIANT_BOOL* pbResult);
 	};
 
 	[
@@ -470,7 +467,7 @@ library UCLID_FILEPROCESSINGLib
 		helpstring("IFAMCondition Interface"),
 		pointer_default(unique)
 	]
-	interface IFAMCondition : IDispatch
+	interface IFAMCondition : IAccessRequired
 	{
 		[id(1), helpstring("method FileMatchesFAMCondition")] HRESULT FileMatchesFAMCondition(
 			[in] BSTR bstrFile, [in] IFileProcessingDB* pFPDB, [in] long lFileID, 
@@ -1229,7 +1226,8 @@ library UCLID_FILEPROCESSINGLib
 		helpstring("IFileProcessingMgmtRole Interface"),
 		pointer_default(unique)
 	]
-	interface IFileProcessingMgmtRole : IDispatch{
+	interface IFileProcessingMgmtRole : IAccessRequired
+	{
 
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return the collection of IFileProcessingTask items 
@@ -1550,6 +1548,7 @@ library UCLID_FILEPROCESSINGLib
 	{
 		[default] interface IFileProcessingMgmtRole;
 		interface IFileActionMgmtRole;
+		interface IAccessRequired;
 	};
 	[
 		uuid(180CE276-B05E-4557-A6AB-3B5FE29587F5),

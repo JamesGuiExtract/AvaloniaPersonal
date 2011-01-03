@@ -541,6 +541,10 @@ namespace Extract.Redaction
             }
         }
 
+		#endregion IFileProcessingTask Members
+
+		#region IAccessRequired Members
+
 		/// <summary>
 		/// Returns bool value indicating if the task requires admin access
 		/// </summary>
@@ -551,7 +555,7 @@ namespace Extract.Redaction
 			return false;
 		}
 
-        #endregion IFileProcessingTask Members
+		#endregion IAccessRequired Members
 
         #region ILicensedComponent Members
 

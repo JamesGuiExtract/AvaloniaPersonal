@@ -56,7 +56,8 @@ STDMETHODIMP CCleanupImageFileProcessor::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
 		&IID_IMustBeConfiguredObject,
-		&IID_ICleanupImageFileProcessor
+		&IID_ICleanupImageFileProcessor,
+		&IID_IAccessRequired
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -184,6 +185,9 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_Close()
 
 	return S_OK;
 }
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CCleanupImageFileProcessor::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {

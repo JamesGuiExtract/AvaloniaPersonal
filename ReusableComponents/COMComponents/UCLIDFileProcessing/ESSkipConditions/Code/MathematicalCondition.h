@@ -40,6 +40,7 @@ BEGIN_COM_MAP(CMathematicalCondition)
 	COM_INTERFACE_ENTRY(IClipboardCopyable)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(IFAMCondition)
+	COM_INTERFACE_ENTRY(IAccessRequired)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 END_COM_MAP()
@@ -89,6 +90,9 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 // IFAMCondition
 	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, 
 		long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
+
+// IAccessRequired
+	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID* pClassID);

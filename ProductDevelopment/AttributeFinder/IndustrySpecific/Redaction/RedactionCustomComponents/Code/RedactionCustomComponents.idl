@@ -632,6 +632,7 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 		interface ICopyableObject;
 		interface ILicensedComponent;
 		interface IMustBeConfiguredObject;
+		interface IAccessRequired;
 	};
 
 	[
@@ -656,6 +657,7 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 		interface ICopyableObject;
 		interface ILicensedComponent;
 		interface IMustBeConfiguredObject;
+		interface IAccessRequired;
 	};
 
 	[
@@ -680,6 +682,7 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 		interface ICopyableObject;
 		interface IMustBeConfiguredObject;
 		interface IFAMCondition;
+		interface IAccessRequired;
 	};
 
 	[
@@ -752,6 +755,7 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 		interface ICopyableObject;
 		interface ILicensedComponent;
 		interface IMustBeConfiguredObject;
+		interface IAccessRequired;
 	};
 	[
 		uuid(A68A4C80-CCDA-429A-B1E0-FF4E2FCC775A),

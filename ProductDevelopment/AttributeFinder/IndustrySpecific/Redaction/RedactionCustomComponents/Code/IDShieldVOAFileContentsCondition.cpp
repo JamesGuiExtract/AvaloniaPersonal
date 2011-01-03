@@ -569,7 +569,8 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::InterfaceSupportsErrorInfo(REFII
 			&IID_ICopyableObject,
 			&IID_IPersistStream,
 			&IID_IMustBeConfiguredObject,
-			&IID_IFAMCondition
+			&IID_IFAMCondition,
+			&IID_IAccessRequired
 		};
 
 		for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -998,6 +999,24 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(BSTR
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17396");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31203", pbResult != __nullptr);
+
+		*pbResult = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31204");
 }
 
 //-------------------------------------------------------------------------------------------------

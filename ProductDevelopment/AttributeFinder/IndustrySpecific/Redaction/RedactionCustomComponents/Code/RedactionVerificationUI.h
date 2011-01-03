@@ -38,6 +38,7 @@ BEGIN_COM_MAP(CRedactionVerificationUI)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(IFileProcessingTask)
+	COM_INTERFACE_ENTRY(IAccessRequired)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 END_COM_MAP()
@@ -112,6 +113,8 @@ END_CATEGORY_MAP()
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);
 	STDMETHOD(raw_Cancel)();
 	STDMETHOD(raw_Close)();
+
+// IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 // ICategorizedComponent

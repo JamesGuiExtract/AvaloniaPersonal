@@ -345,6 +345,9 @@ STDMETHODIMP CSleepTask::raw_Close()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29590");
 }
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSleepTask::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {
@@ -567,7 +570,8 @@ STDMETHODIMP CSleepTask::InterfaceSupportsErrorInfo(REFIID riid)
 			&IID_ICopyableObject,
 			&IID_IFileProcessingTask,
 			&IID_ILicensedComponent,
-			&IID_IMustBeConfiguredObject
+			&IID_IMustBeConfiguredObject,
+			&IID_IAccessRequired
 		};
 
 		for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)

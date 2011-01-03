@@ -48,7 +48,8 @@ STDMETHODIMP CFileExistence::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
 		&IID_IMustBeConfiguredObject,
-		&IID_IFAMCondition
+		&IID_IFAMCondition,
+		&IID_IAccessRequired
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -370,6 +371,24 @@ STDMETHODIMP CFileExistence::raw_FileMatchesFAMCondition(BSTR bstrFile, IFilePro
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13669");
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileExistence::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31205", pbResult != __nullptr);
+
+		*pbResult = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31206");
 }
 
 //-------------------------------------------------------------------------------------------------

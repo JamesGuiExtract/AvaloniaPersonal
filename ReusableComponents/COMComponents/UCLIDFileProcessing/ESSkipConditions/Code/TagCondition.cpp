@@ -220,6 +220,24 @@ STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProc
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27535");
 }
+	
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTagCondition::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31219", pbResult != __nullptr);
+
+		*pbResult = VARIANT_FALSE;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31220");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ISupportErrorInfo

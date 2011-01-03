@@ -50,7 +50,8 @@ STDMETHODIMP CRedactionVerificationUI::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_IFileProcessingTask,
 		&IID_ICategorizedComponent,
 		&IID_ICopyableObject,
-		&IID_ILicensedComponent
+		&IID_ILicensedComponent,
+		&IID_IAccessRequired
 	};
 
 	for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -992,6 +993,9 @@ STDMETHODIMP CRedactionVerificationUI::raw_Close()
 
 	return S_OK;
 }
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionVerificationUI::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {

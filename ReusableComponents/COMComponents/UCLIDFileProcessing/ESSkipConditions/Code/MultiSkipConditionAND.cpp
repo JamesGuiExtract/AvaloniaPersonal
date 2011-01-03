@@ -8,6 +8,7 @@
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <cpputil.h>
+#include <FAMHelperFunctions.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -46,7 +47,8 @@ STDMETHODIMP CMultiFAMConditionAND::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_IPersistStream,
-		&IID_IMultipleObjectHolder
+		&IID_IMultipleObjectHolder,
+		&IID_IAccessRequired
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -81,6 +83,24 @@ STDMETHODIMP CMultiFAMConditionAND::raw_FileMatchesFAMCondition(BSTR bstrFile,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13830")
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionAND::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31211", pbResult != __nullptr);
+
+		*pbResult = asVariantBool(checkForRequiresAdminAccess(m_ipMultiFAMConditions));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31212");
 }
 
 //-------------------------------------------------------------------------------------------------

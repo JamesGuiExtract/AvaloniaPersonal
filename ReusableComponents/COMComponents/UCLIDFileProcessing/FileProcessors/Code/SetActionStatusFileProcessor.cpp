@@ -56,7 +56,8 @@ STDMETHODIMP CSetActionStatusFileProcessor::InterfaceSupportsErrorInfo(REFIID ri
 		&IID_IMustBeConfiguredObject,
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
-		&IID_IFileProcessingTask
+		&IID_IFileProcessingTask,
+		&IID_IAccessRequired
 	};
 
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -278,6 +279,9 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_Close()
 
 	return S_OK;
 }
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSetActionStatusFileProcessor::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {

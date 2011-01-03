@@ -34,6 +34,7 @@ BEGIN_COM_MAP(CCopyMoveDeleteFileProcessor)
 	COM_INTERFACE_ENTRY2(IDispatch, ICopyMoveDeleteFileProcessor)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY(IFileProcessingTask)
+	COM_INTERFACE_ENTRY(IAccessRequired)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
 	COM_INTERFACE_ENTRY(ICopyableObject)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
@@ -90,6 +91,8 @@ public:
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);
 	STDMETHOD(raw_Cancel)();
 	STDMETHOD(raw_Close)();
+
+// IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 // ICopyableObject

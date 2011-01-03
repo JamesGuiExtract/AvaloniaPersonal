@@ -73,7 +73,8 @@ STDMETHODIMP CLaunchAppFileProcessor::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
 		&IID_IMustBeConfiguredObject,
-		&IID_ILaunchAppFileProcessor
+		&IID_ILaunchAppFileProcessor,
+		&IID_IAccessRequired
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -204,6 +205,9 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_Close()
 
 	return S_OK;
 }
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CLaunchAppFileProcessor::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {

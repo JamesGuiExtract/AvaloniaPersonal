@@ -8,6 +8,7 @@
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <cpputil.h>
+#include <FAMHelperFunctions.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -81,6 +82,24 @@ STDMETHODIMP CMultiFAMConditionOR::raw_FileMatchesFAMCondition(BSTR bstrFile,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13866")
 
 	return S_OK;
+}
+	
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionOR::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31217", pbResult != __nullptr);
+
+		*pbResult = asVariantBool(checkForRequiresAdminAccess(m_ipMultiFAMConditions));
+		 
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31218");
 }
 
 //-------------------------------------------------------------------------------------------------

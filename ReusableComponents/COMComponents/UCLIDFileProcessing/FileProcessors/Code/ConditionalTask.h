@@ -41,6 +41,7 @@ public:
 		COM_INTERFACE_ENTRY(IConditionalTask)
 		COM_INTERFACE_ENTRY2(IDispatch, IConditionalTask)
 		COM_INTERFACE_ENTRY(IFileProcessingTask)
+		COM_INTERFACE_ENTRY(IAccessRequired)
 		COM_INTERFACE_ENTRY(ISupportErrorInfo)
 		COM_INTERFACE_ENTRY(ILicensedComponent)
 		COM_INTERFACE_ENTRY(ICategorizedComponent)
@@ -105,6 +106,8 @@ public:
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);
 	STDMETHOD(raw_Cancel)();
 	STDMETHOD(raw_Close)();
+
+// IAccessRequired
 	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 private:

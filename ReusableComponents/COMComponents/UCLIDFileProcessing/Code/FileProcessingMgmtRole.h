@@ -61,6 +61,7 @@ BEGIN_COM_MAP(CFileProcessingMgmtRole)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
+	COM_INTERFACE_ENTRY(IAccessRequired)
 END_COM_MAP()
 
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -84,6 +85,9 @@ public:
 	STDMETHOD(put_Enabled)(VARIANT_BOOL newVal);
 	STDMETHOD(Clear)(void);
 	STDMETHOD(ValidateStatus)(void);
+
+// IAccessRequired
+	STDMETHOD(raw_RequiresAdminAccess)(VARIANT_BOOL* pbResult);
 
 // IFileProcessingMgmtRole
 	STDMETHOD(get_FileProcessors)(IIUnknownVector** pVal);

@@ -77,7 +77,8 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::InterfaceSupportsErrorInfo(REFIID rii
 		&IID_ICopyableObject,
 		&IID_IPersistStream,
 		&IID_IMustBeConfiguredObject,
-		&IID_ICopyMoveDeleteFileProcessor
+		&IID_ICopyMoveDeleteFileProcessor,
+		&IID_IAccessRequired
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -296,6 +297,9 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_Close()
 
 	return S_OK;
 }
+
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {

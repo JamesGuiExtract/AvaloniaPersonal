@@ -148,6 +148,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESFileSuppliers", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\ESFileSuppliers\Code\ESFileSuppliers.vcxproj", "{C0338948-9E74-4A31-957E-079544C9C29D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESFAMConditions", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\ESSkipConditions\Code\ESSkipConditions.vcxproj", "{6EC454B7-CC66-4629-B171-81E964ED6B4C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5A74ECB3-8B17-42B5-B77F-44C35D489A64} = {5A74ECB3-8B17-42B5-B77F-44C35D489A64}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageFormatConverter", "..\..\..\..\Utils\ImageFormatConverter\Code\ImageFormatConverter.vcxproj", "{24365F79-6711-43AC-9141-BFE2A2A35744}"
 EndProject

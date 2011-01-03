@@ -1443,6 +1443,21 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 	};
 
+	[
+		object,
+		uuid(DB7D6286-96BE-4866-81BC-640A39335E1D),
+		dual,
+		nonextensible,
+		helpstring("IAccessRequired Interface"),
+		pointer_default(unique)
+	]
+	interface IAccessRequired : IDispatch
+	{
+		// PURPOSE:	To return boolean flag indicating if the object requires admin access to run
+		[id(2001), helpstring("method RequiresAdminAccess")] HRESULT RequiresAdminAccess(
+			[out, retval] VARIANT_BOOL* pbResult);			
+	}	
+	
 	//---------------------------------------------------------------------------------------------
 	//-C O C L A S S E S --------------------------------------------------------------------------
 	//---------------------------------------------------------------------------------------------

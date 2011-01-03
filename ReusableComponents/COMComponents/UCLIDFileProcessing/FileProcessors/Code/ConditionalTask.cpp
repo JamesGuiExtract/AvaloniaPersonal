@@ -9,6 +9,7 @@
 #include <ComponentLicenseIDs.h>
 #include <COMUtils.h>
 #include <cpputil.h>
+#include <FAMHelperFunctions.h>
 
 using namespace std;
 
@@ -403,6 +404,9 @@ STDMETHODIMP CConditionalTask::raw_Close()
 	
 	return S_OK;
 }
+	
+//-------------------------------------------------------------------------------------------------
+// IAccessRequired interface implementation
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConditionalTask::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 {
@@ -412,7 +416,13 @@ STDMETHODIMP CConditionalTask::raw_RequiresAdminAccess(VARIANT_BOOL* pbResult)
 	{
 		ASSERT_ARGUMENT("ELI31179", pbResult != __nullptr);
 
-		*pbResult = VARIANT_FALSE;
+		*pbResult = asVariantBool(checkForRequiresAdminAccess(m_ipFAMCondition));
+
+		if (*pbResult == VARIANT_FALSE)
+		{
+			*pbResult = (checkForRequiresAdminAccess(m_ipTasksForTrue) || 
+				checkForRequiresAdminAccess(m_ipTasksForFalse)) ? VARIANT_TRUE : VARIANT_FALSE;
+		}
 
 		return S_OK;
 	}
