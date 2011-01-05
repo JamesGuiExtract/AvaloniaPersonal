@@ -35,7 +35,7 @@ extern CComModule _Module;
 // Constants
 //--------------------------------------------------------------------------------------------------
 // current version
-const unsigned long gnCurrentVersion = 3;
+const unsigned long gnCurrentVersion = 4;
 
 //--------------------------------------------------------------------------------------------------
 // CCopyMoveDeleteFileProcessor
@@ -47,6 +47,7 @@ CCopyMoveDeleteFileProcessor::CCopyMoveDeleteFileProcessor()
   m_strDst(""),
   m_bCreateDirectory(true),
   m_bAllowReadonly(false),
+  m_bModifySourceDocName(false),
   m_eSrcMissingType(kCMDSourceMissingError),
   m_eDestPresentType(kCMDDestinationPresentError)
 {
@@ -309,7 +310,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_RequiresAdminAccess(VARIANT_BOOL*
 	{
 		ASSERT_ARGUMENT("ELI31183", pbResult != __nullptr);
 
-		*pbResult = VARIANT_FALSE;
+		*pbResult = m_bModifySourceDocName ? VARIANT_TRUE : VARIANT_FALSE;
 
 		return S_OK;
 	}
@@ -353,6 +354,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		m_eSrcMissingType = (ECMDSourceMissingType)ipCopyThis->GetSourceMissingType();
 		m_eDestPresentType = (ECMDDestinationPresentType)ipCopyThis->GetDestinationPresentType();
 		m_bAllowReadonly = asCppBool(ipCopyThis->AllowReadonly);
+		m_bModifySourceDocName = asCppBool(ipCopyThis->ModifySourceDocName);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12812");
 
@@ -401,6 +403,8 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::IsDirty(void)
 //-------------------------------------------------------------------------------------------------
 // Version 3:
 //		Added m_bAllowReadonly to allow move and delete of readonly files
+// Version 4:
+//		Added m_bModifySourceDocName to allow modification of the SourceDocName in the database
 STDMETHODIMP CCopyMoveDeleteFileProcessor::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -415,6 +419,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::Load(IStream *pStream)
 		m_eSrcMissingType = kCMDSourceMissingError;
 		m_eDestPresentType = kCMDDestinationPresentError;
 		m_bAllowReadonly = false;
+		m_bModifySourceDocName = false;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -468,6 +473,12 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::Load(IStream *pStream)
 			dataReader >> m_bAllowReadonly;
 		}
 
+		// Get Items for version 4
+		if (nDataVersion >= 4)
+		{
+			dataReader >> m_bModifySourceDocName;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -500,6 +511,8 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::Save(IStream *pStream, BOOL fClearDir
 		dataWriter << (long)m_eDestPresentType;
 
 		dataWriter << m_bAllowReadonly;
+
+		dataWriter << m_bModifySourceDocName;
 
 		dataWriter.flushToByteStream();
 
@@ -888,6 +901,40 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::put_AllowReadonly(VARIANT_BOOL newVal
 		m_bAllowReadonly = asCppBool(newVal);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI23607");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CCopyMoveDeleteFileProcessor::get_ModifySourceDocName(VARIANT_BOOL *pRetVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31276", pRetVal != NULL);
+
+		// Check license
+		validateLicense();
+
+		*pRetVal = asVariantBool(m_bModifySourceDocName);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31277");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CCopyMoveDeleteFileProcessor::put_ModifySourceDocName(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		m_bModifySourceDocName = asCppBool(newVal);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31278");
 
 	return S_OK;
 }

@@ -160,6 +160,8 @@ library UCLID_FILEPROCESSORSLib
 		[propput, id(9), helpstring("property DestinationPresentType")] HRESULT DestinationPresentType([in] ECMDDestinationPresentType newVal);
 		[propget, id(10), helpstring("property AllowReadonly")] HRESULT AllowReadonly([out, retval] VARIANT_BOOL* pRetVal);
 		[propput, id(10), helpstring("property AllowReadonly")] HRESULT AllowReadonly([in] VARIANT_BOOL newVal);
+		[propget, id(11), helpstring("property ModifySourceDocName")] HRESULT ModifySourceDocName([out, retval] VARIANT_BOOL* pRetVal);
+		[propput, id(11), helpstring("property ModifySourceDocName")] HRESULT ModifySourceDocName([in] VARIANT_BOOL newVal);
 	};
 
 	// ILaunchAppFileProcessor interface

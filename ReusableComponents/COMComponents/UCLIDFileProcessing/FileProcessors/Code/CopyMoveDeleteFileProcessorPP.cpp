@@ -93,15 +93,15 @@ STDMETHODIMP CCopyMoveDeleteFileProcessorPP::Apply(void)
 				m_cmbDst.GetWindowText(&bstrDstFileName);
 
 				// Set Operation
-				if (m_radioMove.GetCheck() == 1)
+				if (m_radioMove.GetCheck() == BST_CHECKED)
 				{
 					ipFP->SetMoveFiles(_bstr_t(bstrSrcFileName), _bstr_t(bstrDstFileName));
 				}
-				else if (m_radioCopy.GetCheck() == 1)
+				else if (m_radioCopy.GetCheck() == BST_CHECKED)
 				{
 					ipFP->SetCopyFiles(_bstr_t(bstrSrcFileName), _bstr_t(bstrDstFileName));
 				}
-				else if (m_radioDelete.GetCheck() == 1)
+				else if (m_radioDelete.GetCheck() == BST_CHECKED)
 				{
 					ipFP->SetDeleteFiles(_bstr_t(bstrSrcFileName));
 				}
@@ -111,14 +111,14 @@ STDMETHODIMP CCopyMoveDeleteFileProcessorPP::Apply(void)
 				}
 
 				// Set allow readonly
-				ipFP->AllowReadonly = asVariantBool(m_btnAllowReadonly.GetCheck() == 1);
+				ipFP->AllowReadonly = asVariantBool(m_btnAllowReadonly.GetCheck() == BST_CHECKED);
 
 				// Handle Source radio buttons
-				if (m_radioSrcErr.GetCheck() == 1)
+				if (m_radioSrcErr.GetCheck() == BST_CHECKED)
 				{
 					ipFP->SourceMissingType = UCLID_FILEPROCESSORSLib::kCMDSourceMissingError;
 				}
-				else if (m_radioSrcSkip.GetCheck() == 1)
+				else if (m_radioSrcSkip.GetCheck() == BST_CHECKED)
 				{
 					ipFP->SourceMissingType = UCLID_FILEPROCESSORSLib::kCMDSourceMissingSkip;
 				}
@@ -128,21 +128,24 @@ STDMETHODIMP CCopyMoveDeleteFileProcessorPP::Apply(void)
 				}
 
 				// Handle Destination folder creation
-				ipFP->CreateFolder = (m_btnCreateFolder.GetCheck() == 1) 
+				ipFP->CreateFolder = (m_btnCreateFolder.GetCheck() == BST_CHECKED) 
 					? VARIANT_TRUE : VARIANT_FALSE;
 
+				// Set flag for modifing the source doc name
+				ipFP->ModifySourceDocName = asVariantBool(m_btnModifySourceDocName.GetCheck() == BST_CHECKED);
+
 				// Handle Destination radio buttons
-				if (m_radioDstErr.GetCheck() == 1)
+				if (m_radioDstErr.GetCheck() == BST_CHECKED)
 				{
 					ipFP->DestinationPresentType = 
 						UCLID_FILEPROCESSORSLib::kCMDDestinationPresentError;
 				}
-				else if (m_radioDstSkip.GetCheck() == 1)
+				else if (m_radioDstSkip.GetCheck() == BST_CHECKED)
 				{
 					ipFP->DestinationPresentType = 
 						UCLID_FILEPROCESSORSLib::kCMDDestinationPresentSkip;
 				}
-				else if (m_radioDstOver.GetCheck() == 1)
+				else if (m_radioDstOver.GetCheck() == BST_CHECKED)
 				{
 					ipFP->DestinationPresentType = 
 						UCLID_FILEPROCESSORSLib::kCMDDestinationPresentOverwrite;
@@ -155,6 +158,19 @@ STDMETHODIMP CCopyMoveDeleteFileProcessorPP::Apply(void)
 				// Save the current source and destination files to history
 				pushCurrentFilesToHistory(true);
 				pushCurrentFilesToHistory(false);
+
+				// If Modify source doc name was checked need to warn the user that
+				// it is an advanced feature
+				if (ipFP->ModifySourceDocName == VARIANT_TRUE)
+				{
+					if (MessageBox("Modifying SourceDocName in the database is an advanced option \r\n"
+							   "that must be used carefully.  \r\n\n"
+							   "Are you sure you want to change the SourceDocName in the database?",
+							   "Advanced Setting", MB_YESNO | MB_ICONWARNING) != IDYES)
+					{
+						return S_FALSE;
+					}
+				}
 			}
 		}
 
@@ -204,9 +220,10 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 			m_radioDstSkip = GetDlgItem( IDC_RADIO_DEST_NOERR );
 			m_radioDstOver = GetDlgItem( IDC_RADIO_DEST_OVERWRITE );
 			m_btnCreateFolder = GetDlgItem( IDC_CHECK_DIRECTORY );
+			m_btnModifySourceDocName = GetDlgItem(IDC_CHECK_MODIFY_SOURCEDOCNAME);
 
 			// Set allow readonly
-			m_btnAllowReadonly.SetCheck(asCppBool(ipFP->AllowReadonly) ? 1 : 0);
+			m_btnAllowReadonly.SetCheck(asCppBool(ipFP->AllowReadonly) ? BST_CHECKED : BST_UNCHECKED);
 
 			// Set operation radio button
 			BOOL bTmp;
@@ -214,15 +231,15 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 			switch(eOperation)
 			{
 			case kCMDOperationMoveFile:
-				m_radioMove.SetCheck(1);
+				m_radioMove.SetCheck(BST_CHECKED);
 				OnClickedRadioMove(0, 0, 0, bTmp);
 				break;
 			case kCMDOperationCopyFile:
-				m_radioCopy.SetCheck(1);
+				m_radioCopy.SetCheck(BST_CHECKED);
 				OnClickedRadioCopy(0, 0, 0, bTmp);
 				break;
 			case kCMDOperationDeleteFile:
-				m_radioDelete.SetCheck(1);
+				m_radioDelete.SetCheck(BST_CHECKED);
 				OnClickedRadioDelete(0, 0, 0, bTmp);
 				break;
 			default:
@@ -241,11 +258,11 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 			// Set source radio button
 			if (ipFP->SourceMissingType == kCMDSourceMissingError)
 			{
-				m_radioSrcErr.SetCheck( 1 );
+				m_radioSrcErr.SetCheck(BST_CHECKED);
 			}
 			else if (ipFP->SourceMissingType == kCMDSourceMissingSkip)
 			{
-				m_radioSrcSkip.SetCheck( 1 );
+				m_radioSrcSkip.SetCheck(BST_CHECKED);
 			}
 			else
 			{
@@ -253,20 +270,23 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 			}
 
 			// Set folder creation
-			m_btnCreateFolder.SetCheck( (ipFP->CreateFolder == VARIANT_TRUE) ? 1 : 0 );
+			m_btnCreateFolder.SetCheck( (ipFP->CreateFolder == VARIANT_TRUE) ? BST_CHECKED : BST_UNCHECKED );
+
+			// Set Modify Source doc name
+			m_btnModifySourceDocName.SetCheck(asBSTChecked(ipFP->ModifySourceDocName));
 
 			// Set destination radio button
 			if (ipFP->DestinationPresentType == kCMDDestinationPresentError)
 			{
-				m_radioDstErr.SetCheck( 1 );
+				m_radioDstErr.SetCheck(BST_CHECKED);
 			}
 			else if (ipFP->DestinationPresentType == kCMDDestinationPresentSkip)
 			{
-				m_radioDstSkip.SetCheck( 1 );
+				m_radioDstSkip.SetCheck(BST_CHECKED);
 			}
 			else if (ipFP->DestinationPresentType == kCMDDestinationPresentOverwrite)
 			{
-				m_radioDstOver.SetCheck( 1 );
+				m_radioDstOver.SetCheck(BST_CHECKED);
 			}
 			else
 			{
@@ -287,18 +307,7 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnClickedRadioMove(WORD wNotifyCode, WOR
 
 	try
 	{
-		// Enable Destination controls
-		m_cmbDst.EnableWindow(TRUE);
-		m_btnDstSelectTag.EnableWindow(TRUE);
-		m_btnDstBrowse.EnableWindow(TRUE);
-
-		m_btnCreateFolder.EnableWindow( TRUE );
-		m_radioDstErr.EnableWindow( TRUE );
-		m_radioDstSkip.EnableWindow( TRUE );
-		m_radioDstOver.EnableWindow( TRUE );
-
-		// [FlexIDSCore #3176] Disable readonly checkbox
-		m_btnAllowReadonly.EnableWindow(FALSE);
+		updateEnabledState();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12186");
 
@@ -311,18 +320,7 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnClickedRadioCopy(WORD wNotifyCode, WOR
 
 	try
 	{
-		// Enable Destination controls
-		m_cmbDst.EnableWindow(TRUE);
-		m_btnDstSelectTag.EnableWindow(TRUE);
-		m_btnDstBrowse.EnableWindow(TRUE);
-
-		m_btnCreateFolder.EnableWindow( TRUE );
-		m_radioDstErr.EnableWindow( TRUE );
-		m_radioDstSkip.EnableWindow( TRUE );
-		m_radioDstOver.EnableWindow( TRUE );
-
-		// Disable readonly checkbox
-		m_btnAllowReadonly.EnableWindow(FALSE);
+		updateEnabledState();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12187");
 
@@ -335,18 +333,7 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnClickedRadioDelete(WORD wNotifyCode, W
 
 	try
 	{
-		// Disable Destination controls
-		m_cmbDst.EnableWindow(FALSE);
-		m_btnDstSelectTag.EnableWindow(FALSE);
-		m_btnDstBrowse.EnableWindow(FALSE);
-
-		m_btnCreateFolder.EnableWindow( FALSE );
-		m_radioDstErr.EnableWindow( FALSE );
-		m_radioDstSkip.EnableWindow( FALSE );
-		m_radioDstOver.EnableWindow( FALSE );
-
-		// Enable readonly checkbox
-		m_btnAllowReadonly.EnableWindow(TRUE);
+		updateEnabledState();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12188");
 
@@ -631,5 +618,28 @@ void CCopyMoveDeleteFileProcessorPP::validateLicense()
 
 	VALIDATE_LICENSE( COPYMOVEDELETEFP_PP_COMPONENT_ID, "ELI12193", 
 		"CopyMoveDelete File Processor PP" );
+}
+//-------------------------------------------------------------------------------------------------
+void CCopyMoveDeleteFileProcessorPP::updateEnabledState()
+{
+	bool bDeleteSelected = m_radioDelete.GetCheck() == BST_CHECKED;
+
+	// Set up enabled state based on wheither delete is checked
+	BOOL bEnableForDelete = bDeleteSelected ? TRUE : FALSE;
+	BOOL bDisableForDelete = bDeleteSelected ? FALSE : TRUE;
+
+	// Disable or enable destination controls
+	m_cmbDst.EnableWindow(bDisableForDelete);
+	m_btnDstSelectTag.EnableWindow(bDisableForDelete);
+	m_btnDstBrowse.EnableWindow(bDisableForDelete);
+
+	m_btnCreateFolder.EnableWindow(bDisableForDelete);
+	m_radioDstErr.EnableWindow(bDisableForDelete);
+	m_radioDstSkip.EnableWindow(bDisableForDelete);
+	m_radioDstOver.EnableWindow(bDisableForDelete);
+	m_btnModifySourceDocName.EnableWindow(bDisableForDelete);
+
+	// Enable or disable readonly checkbox
+	m_btnAllowReadonly.EnableWindow(bEnableForDelete);
 }
 //-------------------------------------------------------------------------------------------------

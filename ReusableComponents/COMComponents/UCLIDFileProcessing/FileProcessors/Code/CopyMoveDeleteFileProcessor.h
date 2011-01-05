@@ -70,6 +70,8 @@ public:
 	STDMETHOD(put_DestinationPresentType)(ECMDDestinationPresentType newVal);
 	STDMETHOD(get_AllowReadonly)(/*[out, retval]*/ VARIANT_BOOL *pRetVal);
 	STDMETHOD(put_AllowReadonly)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_ModifySourceDocName)(/*[out, retval]*/ VARIANT_BOOL *pRetVal);
+	STDMETHOD(put_ModifySourceDocName)(/*[in]*/ VARIANT_BOOL newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -119,6 +121,9 @@ private:
 
 	// Specifies whether move/delete will work on readonly files
 	bool	m_bAllowReadonly; 
+
+	// Specifies if the source doc name should be modified in the database
+	bool m_bModifySourceDocName;
 
 	/////////////
 	// Methods

@@ -77,6 +77,7 @@ private:
 	ATLControls::CButton m_radioCopy;
 	ATLControls::CButton m_radioDelete;
 	ATLControls::CButton m_btnAllowReadonly;
+	ATLControls::CButton m_btnModifySourceDocName;
 
 	ATLControls::CComboBox m_cmbSrc;
 	CImageButtonWithStyle m_btnSrcSelectTag;
@@ -121,6 +122,9 @@ private:
 	// Saves the current files in combo boxes to history list if not already there
 	// the bIsSource flag is used control whether it is source file or destination file
 	void pushCurrentFilesToHistory(bool bIsSource);
+
+	// Updates the enabled state of the buttons using the current state of the delete radio button
+	void updateEnabledState();
 	
 	// ensure that this component is licensed
 	void validateLicense();

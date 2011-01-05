@@ -130,7 +130,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_PAGE_NUMBERS,93,35,119,12,ES_AUTOHSCROLL
 END
 
-IDD_COPYMOVEDELETEFILEPROCESSORPP DIALOGEX 0, 0, 283, 248
+IDD_COPYMOVEDELETEFILEPROCESSORPP DIALOGEX 0, 0, 283, 264
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
@@ -152,16 +152,18 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_BROWSE_DST,255,150,15,14
     CONTROL         "Create destination folder if not present",IDC_CHECK_DIRECTORY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,167,145,12
+    CONTROL         "Modify SourceDocName in database to match the above destination filename.",
+					IDC_CHECK_MODIFY_SOURCEDOCNAME, "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,184,260,12
     CONTROL         "Skip the operation and record an error",IDC_RADIO_DEST_ERR,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,196,181,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,212,181,10
     CONTROL         "Skip the operation without error",IDC_RADIO_DEST_NOERR,
-                    "Button",BS_AUTORADIOBUTTON,21,209,177,10
+                    "Button",BS_AUTORADIOBUTTON,21,225,177,10
     CONTROL         "Overwrite the file and continue",IDC_RADIO_DEST_OVERWRITE,
-                    "Button",BS_AUTORADIOBUTTON,21,222,177,10
+                    "Button",BS_AUTORADIOBUTTON,21,238,177,10
     GROUPBOX        "From",IDC_STATIC,7,40,268,93
     GROUPBOX        "If Source File Does Not Exist",IDC_STATIC,14,86,220,40
-    GROUPBOX        "To",IDC_STATIC,7,138,268,105
-    GROUPBOX        "If Destination File Already Exists",IDC_STATIC,14,184,220,53
+    GROUPBOX        "To",IDC_STATIC,7,138,268,121
+    GROUPBOX        "If Destination File Already Exists",IDC_STATIC,14,200,220,53
 END
 
 IDD_LAUNCHAPPFILEPROCESSORPP DIALOGEX 0, 0, 310, 123
