@@ -50,6 +50,11 @@ namespace Extract.Utilities.Forms
         static Cursor _rectangularHighlight;
 
         /// <summary>
+        /// The word highlight cursor.
+        /// </summary>
+        static Cursor _wordHighlight;
+
+        /// <summary>
         /// The delete cursor.
         /// </summary>
         static Cursor _delete;
@@ -150,6 +155,24 @@ namespace Extract.Utilities.Forms
                 }
 
                 return _rectangularHighlight;
+            }
+        }
+
+        /// <summary>
+        /// Gets the word highlighter cursor.
+        /// </summary>
+        /// <value>The word highlighter cursor.</value>
+        public static Cursor WordHighlight
+        {
+            get
+            {
+                if (_wordHighlight == null)
+                {
+                    _wordHighlight = GetCursor(typeof(ExtractCursors),
+                        "Resources.WordHighlight.cur");
+                }
+
+                return _wordHighlight;
             }
         }
 

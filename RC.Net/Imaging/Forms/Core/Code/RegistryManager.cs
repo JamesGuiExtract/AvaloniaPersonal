@@ -102,6 +102,11 @@ namespace Extract.Imaging.Forms
         const string _RECTANGULAR_SELECTION_TOOL_VALUE = "16";
 
         /// <summary>
+        /// Value to store in the registry for the Word selection tool.
+        /// </summary>
+        const string _WORD_SELECTION_TOOL_VALUE = "32";
+
+        /// <summary>
         /// Value to store in the registry for fit to width mode.
         /// </summary>
         const string _FIT_TO_WIDTH_VALUE = "0";
@@ -262,8 +267,18 @@ namespace Extract.Imaging.Forms
                 _SELECTION_TOOL_USER_KEY, _RECTANGULAR_SELECTION_TOOL_VALUE);
 
             // Return the appropriate cursor tool
-            return registryValue == _RECTANGULAR_SELECTION_TOOL_VALUE ?
-                CursorTool.RectangularHighlight : CursorTool.AngularHighlight;
+            if (registryValue == _RECTANGULAR_SELECTION_TOOL_VALUE)
+            {
+                return CursorTool.RectangularHighlight;
+            }
+            else if (registryValue == _ANGULAR_SELECTION_TOOL_VALUE)
+            {
+                return CursorTool.AngularHighlight;
+            }
+            else
+            {
+                return CursorTool.WordHighlight;
+            }
         }
 
         /// <summary>
@@ -277,8 +292,18 @@ namespace Extract.Imaging.Forms
                 _SELECTION_TOOL_USER_KEY, _RECTANGULAR_SELECTION_TOOL_VALUE);
 
             // Return the appropriate cursor tool
-            return registryValue == _RECTANGULAR_SELECTION_TOOL_VALUE ?
-                CursorTool.RectangularRedaction : CursorTool.AngularRedaction;
+            if (registryValue == _RECTANGULAR_SELECTION_TOOL_VALUE)
+            {
+                return CursorTool.RectangularRedaction;
+            }
+            else if (registryValue == _ANGULAR_SELECTION_TOOL_VALUE)
+            {
+                return CursorTool.AngularRedaction;
+            }
+            else
+            {
+                return CursorTool.WordRedaction;
+            }
         }
 
         /// <summary>
@@ -300,6 +325,11 @@ namespace Extract.Imaging.Forms
                     case CursorTool.RectangularHighlight:
                     case CursorTool.RectangularRedaction:
                         registryValue = _RECTANGULAR_SELECTION_TOOL_VALUE;
+                        break;
+
+                    case CursorTool.WordHighlight:
+                    case CursorTool.WordRedaction:
+                        registryValue = _WORD_SELECTION_TOOL_VALUE;
                         break;
 
                     default:

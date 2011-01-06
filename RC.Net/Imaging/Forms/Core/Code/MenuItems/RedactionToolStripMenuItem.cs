@@ -38,6 +38,13 @@ namespace Extract.Imaging.Forms
             ToolStripButtonConstants._ANGULAR_REDACTION_BUTTON_IMAGE_SMALL);
 
         /// <summary>
+        /// Holds the word redaction button image.
+        /// </summary>
+        private static Image _wordRedactionButtonImage = (Image)new Bitmap(
+            typeof(RedactionToolStripMenuItem),
+            ToolStripButtonConstants._WORD_REDACTION_BUTTON_IMAGE);
+
+        /// <summary>
         /// Image viewer with which this menu item connects.
         /// </summary>
         private ImageViewer _imageViewer;
@@ -74,13 +81,22 @@ namespace Extract.Imaging.Forms
             _redactionTool = RegistryManager.GetLastUsedRedactionTool();
 
             // Set the image based on the last used redaction tool
-            if (_redactionTool == CursorTool.AngularRedaction)
+            switch (_redactionTool)
             {
-                base.Image = _angularRedactionButtonImage;
-            }
-            else
-            {
-                base.Image = _rectangularRedactionButtonImage;
+                case CursorTool.AngularRedaction:
+                    base.Image = _angularRedactionButtonImage;
+                    break;
+
+                case CursorTool.RectangularRedaction:
+                    base.Image = _rectangularRedactionButtonImage;
+                    break;
+
+                case CursorTool.WordRedaction:
+                    base.Image = _wordRedactionButtonImage;
+                    break;
+
+                default:
+                    throw new ExtractException("ELI31307", "Unexpected cursor tool");
             }
 
             // Disable menu item by default
@@ -200,6 +216,10 @@ namespace Extract.Imaging.Forms
 
                 case CursorTool.RectangularRedaction:
                     base.Image = _rectangularRedactionButtonImage;
+                    break;
+
+                case CursorTool.WordRedaction:
+                    base.Image = _wordRedactionButtonImage;
                     break;
 
                 default:

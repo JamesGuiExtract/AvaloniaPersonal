@@ -111,6 +111,18 @@
     <Compile Include="Controls\AngularRedactionToolStripButton.Designer.cs">
       <DependentUpon>AngularRedactionToolStripButton.cs</DependentUpon>
     </Compile>
+	<Compile Include="Controls\WordHighlightToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\WordRedactionToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\WordRedactionToolStripButton.Designer.cs">
+      <DependentUpon>WordRedactionToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\WordHighlightToolStripButton.Designer.cs">
+      <DependentUpon>WordHighlightToolStripButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\DeleteLayerObjectsToolStripButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -224,7 +236,7 @@
     <Compile Include="FittingData.cs" />
     <Compile Include="ImageLayerObject.cs" />
     <Compile Include="ImageViewer.ImageReaderCache.cs">
-	  <DependentUpon>ImageViewer.cs</DependentUpon>
+      <DependentUpon>ImageViewer.cs</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ImageViewerCursors.cs" />
@@ -255,6 +267,10 @@
     </Compile>
     <Compile Include="ImageViewer.Methods.cs">
       <DependentUpon>ImageViewer.cs</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+	<Compile Include="ImageViewer.WordHighlightManager.cs">
+	  <DependentUpon>ImageViewer.cs</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ImageViewer.Obsolete.cs">
@@ -297,6 +313,18 @@
     </Compile>
     <Compile Include="MenuItems\CloseImageToolStripMenuItem.Designer.cs">
       <DependentUpon>CloseImageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\WordHighlightToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\WordHighlightToolStripMenuItem.Designer.cs">
+      <DependentUpon>WordHighlightToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\WordRedactionToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\WordRedactionToolStripMenuItem.Designer.cs">
+      <DependentUpon>WordRedactionToolStripMenuItem.cs</DependentUpon>
     </Compile>
     <Compile Include="MenuItems\DeleteLayerObjectsToolStripMenuItem.cs">
       <SubType>Component</SubType>
@@ -932,6 +960,14 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\WordHighlightButton.png" />
+    <EmbeddedResource Include="Resources\WordRedactionButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\WordHighlightButtonSmall.png" />
+    <Content Include="Resources\WordRedactionButtonSmall.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

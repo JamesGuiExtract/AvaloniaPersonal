@@ -88,8 +88,8 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Occurs when a <see cref="LayerObject"/> is removed from the collection.
         /// </summary>
-        /// <seealso cref="Remove(long)"/>
-        /// <seealso cref="Remove(LayerObject)"/>
+        /// <seealso cref="Remove(long, bool)"/>
+        /// <seealso cref="Remove(LayerObject, bool)"/>
         /// <seealso cref="Clear"/>
         public event EventHandler<LayerObjectDeletedEventArgs> LayerObjectDeleted;
 
@@ -316,11 +316,13 @@ namespace Extract.Imaging.Forms
         /// Removes the layerObject with the specified id.
         /// </summary>
         /// <param name="id">The id of the layerObject to remove.</param>
-        /// <event cref="LayerObjectDeleted">Occurs on successful <see cref="Remove(long)"/>.
+        /// <param name="dispose"><see langword="true"/> if the layer object should be disposed
+        /// after it is removed, otherwise <see langword="false"/></param>
+        /// <event cref="LayerObjectDeleted">Occurs on successful removal.
         /// </event>
         /// <exception cref="ExtractException">A <see cref="LayerObject"/> with the specified 
         /// <paramref name="id"/> is not contained in the collection.</exception>
-        public void Remove(long id)
+        public void Remove(long id, bool dispose)
         {
             try
             {
@@ -333,7 +335,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Remove the specified layer object
-                Remove(new LayerObject[] { layerObject });
+                Remove(new LayerObject[] { layerObject }, dispose);
             }
             catch (Exception e)
             {
@@ -350,11 +352,13 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="layerObject">The layerObject to remove from the collection.</param>
         /// <returns>The layerObject that was removed.</returns>
-        /// <event cref="LayerObjectDeleted">Occurs on a successful <see cref="Remove(LayerObject)"/>.
+        /// <param name="dispose"><see langword="true"/> if the layer object should be disposed
+        /// after it is removed, otherwise <see langword="false"/></param>
+        /// <event cref="LayerObjectDeleted">Occurs on a successful removal.
         /// </event>
         /// <exception cref="ExtractException">The <paramref name="layerObject"/> is not contained 
         /// in the collection.</exception>
-        public void Remove(LayerObject layerObject)
+        public void Remove(LayerObject layerObject, bool dispose)
         {
             try
             {
@@ -365,7 +369,7 @@ namespace Extract.Imaging.Forms
                         "Cannot remove layerObject. LayerObject not found.");
                 }
 
-                Remove(new LayerObject[] { layerObject });
+                Remove(new LayerObject[] { layerObject }, dispose);
             }
             catch (Exception e)
             {
@@ -389,11 +393,13 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="layerObjects">An <see cref="IEnumerable{T}"/> collection
         /// of <see cref="LayerObject"/> objects to be removed from the collection.</param>
+        /// <param name="dispose"><see langword="true"/> if the layer object should be disposed
+        /// after it is removed, otherwise <see langword="false"/></param>
         /// <exception cref="ExtractException">If <paramref name="layerObjects"/>
         /// is <see langword="null"/></exception>
         /// <exception cref="ExtractException">If any of the <see cref="LayerObject"/>
         /// objects are not part of the current <see cref="LayerObject"/> collection.</exception>
-        public void Remove(IEnumerable<LayerObject> layerObjects)
+        public void Remove(IEnumerable<LayerObject> layerObjects, bool dispose)
         {
             try
             {
@@ -427,7 +433,7 @@ namespace Extract.Imaging.Forms
                 // may have added or removed layer objects from the collection.
                 foreach (LayerObject layerObject in eventArgs.LayerObjects)
                 {
-                    RemoveOne(layerObject);
+                    RemoveOne(layerObject, dispose);
                 }
             }
             catch (Exception ex)
@@ -440,8 +446,10 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Removes all selected objects from the <see cref="LayerObjectsCollection"/>.
         /// </summary>
+        /// <param name="dispose"><see langword="true"/> if the layer object should be disposed
+        /// after it is removed, otherwise <see langword="false"/></param>
         /// <event cref="LayerObjectDeleted">Occurs for each layerObject that is removed.</event>
-        public void RemoveSelected()
+        public void RemoveSelected(bool dispose)
         {
             try
             {
@@ -454,7 +462,7 @@ namespace Extract.Imaging.Forms
                     // Remove each layerObject individually
                     foreach (LayerObject layerObject in objects)
                     {
-                        this.Remove(layerObject);
+                        this.Remove(layerObject, dispose);
                     }
                 }
             }
@@ -468,8 +476,10 @@ namespace Extract.Imaging.Forms
         /// Removes all selected objects from the <see cref="LayerObjectsCollection"/>.
         /// </summary>
         /// <param name="pageNumber">The page to remove selected objects from.</param>
+        /// <param name="dispose"><see langword="true"/> if the layer object should be disposed
+        /// after it is removed, otherwise <see langword="false"/></param>
         /// <event cref="LayerObjectDeleted">Occurs for each layerObject that is removed.</event>
-        public void RemoveSelected(int pageNumber)
+        public void RemoveSelected(int pageNumber, bool dispose)
         {
             try
             {
@@ -484,7 +494,7 @@ namespace Extract.Imaging.Forms
                     {
                         if (layerObject.PageNumber == pageNumber)
                         {
-                            this.Remove(layerObject);
+                            this.Remove(layerObject, dispose);
                         }
                     }
                 }
@@ -530,7 +540,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Remove all the layer objects
-                Remove(_objects.Values);
+                Remove(_objects.Values, true);
             }
             catch (Exception ex)
             {
@@ -925,8 +935,8 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">A <see cref="LayerObjectDeletedEventArgs"/> that contains the event 
         /// data.</param>
-        /// <seealso cref="Remove(long)"/>
-        /// <seealso cref="Remove(LayerObject)"/>
+        /// <seealso cref="Remove(long, bool)"/>
+        /// <seealso cref="Remove(LayerObject, bool)"/>
         protected virtual void OnLayerObjectDeleted(LayerObjectDeletedEventArgs e)
         {
             if (LayerObjectDeleted != null)
@@ -946,7 +956,7 @@ namespace Extract.Imaging.Forms
             // If this object is in a current selection, remove it
             if (_selection != null && _selection.Contains(e.LayerObject))
             {
-                _selection.Remove(e.LayerObject);
+                _selection.Remove(e.LayerObject, true);
             }
 
             // Raise the event if there is a listener
@@ -1039,7 +1049,9 @@ namespace Extract.Imaging.Forms
         /// Removes the specified layer object.
         /// </summary>
         /// <param name="layerObject">The layer object to remove.</param>
-        private void RemoveOne(LayerObject layerObject)
+        /// <param name="dispose"><see langword="true"/> if the layer object should be disposed
+        /// after it is removed, otherwise <see langword="false"/></param>
+        private void RemoveOne(LayerObject layerObject, bool dispose)
         {
             // If this is the selection collection, just reset the selected property.
             if (_isSelectionCollection)
@@ -1093,19 +1105,19 @@ namespace Extract.Imaging.Forms
                 // Check if the selection contains the layerObject being removed
                 if (_selection.Contains(layerObject.Id))
                 {
-                    _selection.RemoveOne(layerObject);
+                    _selection.RemoveOne(layerObject, dispose);
                 }
-
-                // Detach this layerObject from the image viewer
-                layerObject.ImageViewer = null;
             }
 
             // Raise the layerObject deleted event
             OnLayerObjectDeleted(new LayerObjectDeletedEventArgs(layerObject));
 
             // Dispose of the layer object if the collection has a selection collection
-            if (_selection != null)
+            if (_selection != null && dispose)
             {
+                // Detach this layerObject from the image viewer
+                layerObject.ImageViewer = null;
+
                 layerObject.Dispose();
             }
         }

@@ -393,6 +393,27 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Determines whether the specified rectangle intersects with the
+        /// <see cref="ImageLayerObject"/>.
+        /// </summary>
+        /// <param name="rectangle">The rectangle to test for containment in logical (image)
+        /// coordinates.
+        /// </param>
+        /// <returns><see langword="true"/> if the rectangle intersects the
+        /// <see cref="ImageLayerObject"/>; <see langword="false"/> if it does not.</returns>
+        public override bool HitTest(Rectangle rectangle)
+        {
+            try
+            {
+                return GetBounds().IntersectsWith(rectangle);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31289", ex);
+            }
+        }
+
+        /// <summary>
         /// Gets the smallest rectangle that contains the <see cref="ImageLayerObject"/> in 
         /// physical (client) coordinates.
         /// </summary>

@@ -905,6 +905,26 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Determines whether the specified rectangle intersects with the highlight.
+        /// </summary>
+        /// <param name="rectangle">The rectangle to test for containment in logical (image)
+        /// coordinates.
+        /// </param>
+        /// <returns><see langword="true"/> if the rectangle intersects the highlight;
+        /// <see langword="false"/> if it does not.</returns>
+        public override bool HitTest(Rectangle rectangle)
+        {
+            try
+            {
+                return _region.IsVisible(rectangle);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31288", ex);
+            }
+        }
+
+        /// <summary>
         /// Retrieves the cursor when the mouse is over a grip handle.
         /// </summary>
         /// <returns>The cursor when the mouse is over a grip handle.</returns>

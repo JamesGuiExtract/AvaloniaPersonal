@@ -431,7 +431,28 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _cacheImages;
 
+        /// <summary>
+        /// Helper class that creates and displays <see cref="Highlight"/>s for the word
+        /// redaction/highlighter tools by using image OCR data.
+        /// </summary>
+        WordHighlightManager _wordHighlightManager;
+
+        /// <summary>
+        /// A list of <see cref="PostPaintDelegate"/>s that are to run at the end of the next paint
+        /// operation.
+        /// </summary>
+        List<PostPaintDelegate> _postPaintMethods = new List<PostPaintDelegate>();
+
         #endregion Fields
+
+        #region Delegates
+
+        /// <summary>
+        /// Delegate for methods that are to run at the end of the next paint operation.
+        /// </summary>
+        delegate void PostPaintDelegate(PaintEventArgs e);
+
+        #endregion Delegates
 
         #region Image Viewer Events
 
@@ -583,6 +604,8 @@ namespace Extract.Imaging.Forms
 
                 // Handle layer object remove events
                 _layerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
+
+                _wordHighlightManager = new WordHighlightManager(this);
             }
             catch (Exception e)
             {
@@ -677,6 +700,8 @@ namespace Extract.Imaging.Forms
                         case CursorTool.EditHighlightText:
                         case CursorTool.RectangularHighlight:
                         case CursorTool.RectangularRedaction:
+                        case CursorTool.WordHighlight:
+                        case CursorTool.WordRedaction:
 
                             // Turn off interactive mode
                             base.InteractiveMode = RasterViewerInteractiveMode.None;
@@ -733,7 +758,9 @@ namespace Extract.Imaging.Forms
                     if (_cursorTool == CursorTool.AngularHighlight ||
                         _cursorTool == CursorTool.RectangularHighlight ||
                         _cursorTool == CursorTool.AngularRedaction ||
-                        _cursorTool == CursorTool.RectangularRedaction)
+                        _cursorTool == CursorTool.RectangularRedaction ||
+                        _cursorTool == CursorTool.WordHighlight ||
+                        _cursorTool == CursorTool.WordRedaction)
                     {
                         // Store the current selection tool in the registry
                         RegistryManager.SetLastUsedSelectionTool(_cursorTool);
@@ -2208,7 +2235,10 @@ namespace Extract.Imaging.Forms
             // Determine whether the method should look for any layer objects under the selection
             // tool. (If false, all current _layerObjectsUnderSelectionTool members will be removed).
             bool lookForLayerObjectsUnderSelectionTool =
-                (e != null && _cursorTool == CursorTool.SelectLayerObject && IsImageAvailable);
+                (e != null && IsImageAvailable &&
+                 (_cursorTool == CursorTool.SelectLayerObject ||
+                  _cursorTool == CursorTool.WordHighlight ||
+                  _cursorTool == CursorTool.WordRedaction));
 
             // If looking for new layer objects, initialize _layerObjectsUnderSelectionTool if
             // necessary.
@@ -2223,11 +2253,39 @@ namespace Extract.Imaging.Forms
             // Initialize a list of new layer objects under the selection tool.
             List<LayerObject> newLayerObjects = new List<LayerObject>();
 
-            Point imagePoint = new Point();
+            bool useRegion = false;
+            Point imagePoint = Point.Empty;
+            Rectangle imageRegion = Rectangle.Empty;
+
             if (lookForLayerObjectsUnderSelectionTool)
             {
-                // Obtain the mouse position in image coordinates.
-                imagePoint = GeometryMethods.InvertPoint(_transform, e.Location);
+                // If a tracking operation is active, look for all layer objects within the tracking
+                // operation's rectangle rather than under only the cursor.
+                if (_trackingData != null)
+                {
+                    // Convert the rectangle from client to image coordinates
+                    imageRegion =
+                        GetTransformedRectangle(_trackingData.Rectangle, true);
+
+                    // Ensure imageRegion width & height > 0, otherwise it will not intersect with
+                    // anything. 
+                    if (imageRegion.Width == 0)
+                    {
+                        imageRegion.Width++;
+                    }
+                    if (imageRegion.Height == 0)
+                    {
+                        imageRegion.Height++;
+                    }
+
+                    useRegion = true;
+                }
+                // Otherwise, look only under the cursor itself.
+                else
+                {
+                    // Obtain the mouse position in image coordinates.
+                    imagePoint = GeometryMethods.InvertPoint(_transform, e.Location);
+                }
             }
 
             // For all current members of _layerObjectsUnderSelectionTool, ensure they are still
@@ -2236,19 +2294,24 @@ namespace Extract.Imaging.Forms
             {
                 for (int i = 0; i < _layerObjectsUnderSelectionTool.Count; i++)
                 {
-                    LayerObject layerObject = _layerObjectsUnderSelectionTool[0];
+                    LayerObject layerObject = _layerObjectsUnderSelectionTool[i];
 
-                    // Remove from _layerObjectsUnderSelectionTool if we are not looking for layer 
-                    // objects, the layer object is no longer in the image viewer or the layer object
-                    // is no longer found under the selection tool.
-                    if (!lookForLayerObjectsUnderSelectionTool ||
-                        !_layerObjects.Contains(layerObject) ||
-                        layerObject.PageNumber != _pageNumber ||
-                        !layerObject.HitTest(imagePoint))
+                    // If we are not looking for layer objects, the layer object is no longer in the
+                    // image viewer or the layer object is on this page, test to see if it is
+                    // under the selection tool or selection box.
+                    if (lookForLayerObjectsUnderSelectionTool ||
+                        _layerObjects.Contains(layerObject) ||
+                        layerObject.PageNumber == _pageNumber)
                     {
-                        removedLayerObjects.Add(layerObject);
-                        _layerObjectsUnderSelectionTool.RemoveAt(i);
-                        i--;
+                        // If not, remove from _layerObjectsUnderSelectionTool
+                        bool contained = (useRegion && layerObject.HitTest(imageRegion)) ||
+                                         (!useRegion && layerObject.HitTest(imagePoint));
+                        if (!contained)
+                        {
+                            removedLayerObjects.Add(layerObject);
+                            _layerObjectsUnderSelectionTool.RemoveAt(i);
+                            i--;
+                        }
                     }
                 }
             }
@@ -2265,10 +2328,12 @@ namespace Extract.Imaging.Forms
                         continue;
                     }
 
-                    // Check if the mouse cursor is over a layer object and that 
-                    // _layerObjectsUnderSelectionTool doesn't already contain the layer object.
-                    if (layerObject.HitTest(imagePoint) &&
-                        !_layerObjectsUnderSelectionTool.Contains(layerObject))
+                    // Check if the mouse cursor or tracking rectangle is over a layer object and
+                    // that _layerObjectsUnderSelectionTool doesn't already contain the layer
+                    // object.
+                    bool contained = (useRegion && layerObject.HitTest(imageRegion)) ||
+                                     (!useRegion && layerObject.HitTest(imagePoint));
+                    if (contained && !_layerObjectsUnderSelectionTool.Contains(layerObject))
                     {
                         newLayerObjects.Add(layerObject);
                     }
@@ -2657,7 +2722,15 @@ namespace Extract.Imaging.Forms
                 {
                     _activeLinkedLayerObject.DrawLinkArrows(e.Graphics);
                 }
-                
+
+                // Run all methods that have been scheduled to run at the end of the next paint
+                // operation, then reset the _postPaintMethods list.
+                foreach (PostPaintDelegate method in _postPaintMethods)
+                {
+                    method(e);
+                }
+                _postPaintMethods.Clear();
+
                 base.OnPostImagePaint(e);
             }
             catch (Exception ex)
@@ -2822,7 +2895,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Raises the <see cref="SelectionToolEnteredLayerObject"/> event.
         /// </summary>
-        /// <param name="e">The event data associated with the <see cref="LayerObjectEventArgs"/> 
+        /// <param name="e">The event data associated with the <see cref="LayerObjectEventArgs"/>
         /// event.</param>
         void OnSelectionToolEnteredLayerObject(LayerObjectEventArgs e)
         {

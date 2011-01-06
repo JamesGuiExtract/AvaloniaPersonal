@@ -153,6 +153,7 @@ namespace Extract.Redaction.Verification
             this._selectLayerObjectToolStripMenuItem = new Extract.Imaging.Forms.SelectLayerObjectToolStripMenuItem();
             this._angularRedactionToolStripMenuItem = new Extract.Imaging.Forms.AngularRedactionToolStripMenuItem();
             this._rectangularRedactionToolStripMenuItem = new Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem();
+            this._wordRedactionToolStripMenuItem = new Extract.Imaging.Forms.WordRedactionToolStripMenuItem();
             this._slideshowToolStripMenuItemSeparator = new System.Windows.Forms.ToolStripSeparator();
             this._slideshowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._slideshowConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -185,13 +186,14 @@ namespace Extract.Redaction.Verification
             this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._imageViewerContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.selectLayerObjectToolStripMenuItem1 = new Extract.Imaging.Forms.SelectLayerObjectToolStripMenuItem();
-            this.zoomWindowToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
-            this.panToolStripMenuItem1 = new Extract.Imaging.Forms.PanToolStripMenuItem();
-            this.angularRedactionToolStripMenuItem1 = new Extract.Imaging.Forms.AngularRedactionToolStripMenuItem();
-            this.rectangularRedactionToolStripMenuItem1 = new Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem();
+            this._selectLayerObjectToolStripMenuItem1 = new Extract.Imaging.Forms.SelectLayerObjectToolStripMenuItem();
+            this._zoomWindowToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
+            this._panToolStripMenuItem1 = new Extract.Imaging.Forms.PanToolStripMenuItem();
+            this._angularRedactionToolStripMenuItem1 = new Extract.Imaging.Forms.AngularRedactionToolStripMenuItem();
+            this._rectangularRedactionToolStripMenuItem1 = new Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem();
+            this._wordRedactionToolStripMenuItem1 = new Extract.Imaging.Forms.WordRedactionToolStripMenuItem();
             this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
-            this.blockFitSelectionToolStripMenuItem1 = new Extract.Imaging.Forms.BlockFitSelectionToolStripMenuItem();
+            this._blockFitSelectionToolStripMenuItem1 = new Extract.Imaging.Forms.BlockFitSelectionToolStripMenuItem();
             this._viewCommandsToolStrip = new System.Windows.Forms.ToolStrip();
             this._zoomInToolStripButton = new Extract.Imaging.Forms.ZoomInToolStripButton();
             this._zoomOutToolStripButton = new Extract.Imaging.Forms.ZoomOutToolStripButton();
@@ -218,6 +220,7 @@ namespace Extract.Redaction.Verification
             this._selectLayerObjectToolStripButton = new Extract.Imaging.Forms.SelectLayerObjectToolStripButton();
             this._angularRedactionToolStripButton = new Extract.Imaging.Forms.AngularRedactionToolStripButton();
             this._rectangularRedactionToolStripButton = new Extract.Imaging.Forms.RectangularRedactionToolStripButton();
+            this._wordRedactionToolStripButton = new Extract.Imaging.Forms.WordRedactionToolStripButton();
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             dataGridToolStripContainer = new System.Windows.Forms.ToolStripContainer();
@@ -750,6 +753,7 @@ namespace Extract.Redaction.Verification
             this._selectLayerObjectToolStripMenuItem,
             this._angularRedactionToolStripMenuItem,
             this._rectangularRedactionToolStripMenuItem,
+            this._wordRedactionToolStripMenuItem,
             this._slideshowToolStripMenuItemSeparator,
             this._slideshowToolStripMenuItem,
             this._toolStripSeparator8,
@@ -807,6 +811,16 @@ namespace Extract.Redaction.Verification
             this._rectangularRedactionToolStripMenuItem.ShortcutKeyDisplayString = "";
             this._rectangularRedactionToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
             this._rectangularRedactionToolStripMenuItem.Text = "&Rectangular redaction";
+            // 
+            // _wordRedactionToolStripMenuItem
+            // 
+            this._wordRedactionToolStripMenuItem.Enabled = false;
+            this._wordRedactionToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_wordRedactionToolStripMenuItem.Image")));
+            this._wordRedactionToolStripMenuItem.ImageViewer = null;
+            this._wordRedactionToolStripMenuItem.Name = "_wordRedactionToolStripMenuItem";
+            this._wordRedactionToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._wordRedactionToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._wordRedactionToolStripMenuItem.Text = "&Word redaction";
             // 
             // _slideshowToolStripMenuItemSeparator
             // 
@@ -1162,86 +1176,94 @@ namespace Extract.Redaction.Verification
             // _imageViewerContextMenu
             // 
             this._imageViewerContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectLayerObjectToolStripMenuItem1,
-            this.zoomWindowToolStripMenuItem1,
-            this.panToolStripMenuItem1,
+            this._selectLayerObjectToolStripMenuItem1,
+            this._zoomWindowToolStripMenuItem1,
+            this._panToolStripMenuItem1,
             toolStripSeparator11,
-            this.angularRedactionToolStripMenuItem1,
-            this.rectangularRedactionToolStripMenuItem1,
+            this._angularRedactionToolStripMenuItem1,
+            this._rectangularRedactionToolStripMenuItem1,
+            this._wordRedactionToolStripMenuItem1,
             this.toolStripSeparator12,
-            this.blockFitSelectionToolStripMenuItem1});
+            this._blockFitSelectionToolStripMenuItem1});
             this._imageViewerContextMenu.Name = "_imageViewerContextMenu";
-            this._imageViewerContextMenu.Size = new System.Drawing.Size(256, 148);
+            this._imageViewerContextMenu.Size = new System.Drawing.Size(256, 170);
             // 
-            // selectLayerObjectToolStripMenuItem1
+            // _selectLayerObjectToolStripMenuItem1
             // 
-            this.selectLayerObjectToolStripMenuItem1.Enabled = false;
-            this.selectLayerObjectToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("selectLayerObjectToolStripMenuItem1.Image")));
-            this.selectLayerObjectToolStripMenuItem1.ImageViewer = null;
-            this.selectLayerObjectToolStripMenuItem1.Name = "selectLayerObjectToolStripMenuItem1";
-            this.selectLayerObjectToolStripMenuItem1.ShortcutKeyDisplayString = "";
-            this.selectLayerObjectToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
-            this.selectLayerObjectToolStripMenuItem1.Text = "Select redactions and other objects";
+            this._selectLayerObjectToolStripMenuItem1.Enabled = false;
+            this._selectLayerObjectToolStripMenuItem1.ImageViewer = null;
+            this._selectLayerObjectToolStripMenuItem1.Name = "_selectLayerObjectToolStripMenuItem1";
+            this._selectLayerObjectToolStripMenuItem1.ShortcutKeyDisplayString = "";
+            this._selectLayerObjectToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this._selectLayerObjectToolStripMenuItem1.Text = "Select redactions and other objects";
             // 
-            // zoomWindowToolStripMenuItem1
+            // _zoomWindowToolStripMenuItem1
             // 
-            this.zoomWindowToolStripMenuItem1.Enabled = false;
-            this.zoomWindowToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("zoomWindowToolStripMenuItem1.Image")));
-            this.zoomWindowToolStripMenuItem1.ImageViewer = null;
-            this.zoomWindowToolStripMenuItem1.Name = "zoomWindowToolStripMenuItem1";
-            this.zoomWindowToolStripMenuItem1.ShortcutKeyDisplayString = "";
-            this.zoomWindowToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
-            this.zoomWindowToolStripMenuItem1.Text = "&Zoom window";
+            this._zoomWindowToolStripMenuItem1.Enabled = false;
+            this._zoomWindowToolStripMenuItem1.ImageViewer = null;
+            this._zoomWindowToolStripMenuItem1.Name = "_zoomWindowToolStripMenuItem1";
+            this._zoomWindowToolStripMenuItem1.ShortcutKeyDisplayString = "";
+            this._zoomWindowToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this._zoomWindowToolStripMenuItem1.Text = "&Zoom window";
             // 
-            // panToolStripMenuItem1
+            // _panToolStripMenuItem1
             // 
-            this.panToolStripMenuItem1.Enabled = false;
-            this.panToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("panToolStripMenuItem1.Image")));
-            this.panToolStripMenuItem1.ImageViewer = null;
-            this.panToolStripMenuItem1.Name = "panToolStripMenuItem1";
-            this.panToolStripMenuItem1.ShortcutKeyDisplayString = "";
-            this.panToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
-            this.panToolStripMenuItem1.Text = "P&an";
+            this._panToolStripMenuItem1.Enabled = false;
+            this._panToolStripMenuItem1.ImageViewer = null;
+            this._panToolStripMenuItem1.Name = "_panToolStripMenuItem1";
+            this._panToolStripMenuItem1.ShortcutKeyDisplayString = "";
+            this._panToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this._panToolStripMenuItem1.Text = "P&an";
             // 
             // toolStripSeparator11
             // 
             toolStripSeparator11.Name = "toolStripSeparator11";
             toolStripSeparator11.Size = new System.Drawing.Size(252, 6);
             // 
-            // angularRedactionToolStripMenuItem1
+            // _angularRedactionToolStripMenuItem1
             // 
-            this.angularRedactionToolStripMenuItem1.Enabled = false;
-            this.angularRedactionToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("angularRedactionToolStripMenuItem1.Image")));
-            this.angularRedactionToolStripMenuItem1.ImageViewer = null;
-            this.angularRedactionToolStripMenuItem1.Name = "angularRedactionToolStripMenuItem1";
-            this.angularRedactionToolStripMenuItem1.ShortcutKeyDisplayString = "";
-            this.angularRedactionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
-            this.angularRedactionToolStripMenuItem1.Text = "A&ngular redaction";
+            this._angularRedactionToolStripMenuItem1.Enabled = false;
+            this._angularRedactionToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("_angularRedactionToolStripMenuItem1.Image")));
+            this._angularRedactionToolStripMenuItem1.ImageViewer = null;
+            this._angularRedactionToolStripMenuItem1.Name = "_angularRedactionToolStripMenuItem1";
+            this._angularRedactionToolStripMenuItem1.ShortcutKeyDisplayString = "";
+            this._angularRedactionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this._angularRedactionToolStripMenuItem1.Text = "A&ngular redaction";
             // 
-            // rectangularRedactionToolStripMenuItem1
+            // _rectangularRedactionToolStripMenuItem1
             // 
-            this.rectangularRedactionToolStripMenuItem1.Enabled = false;
-            this.rectangularRedactionToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("rectangularRedactionToolStripMenuItem1.Image")));
-            this.rectangularRedactionToolStripMenuItem1.ImageViewer = null;
-            this.rectangularRedactionToolStripMenuItem1.Name = "rectangularRedactionToolStripMenuItem1";
-            this.rectangularRedactionToolStripMenuItem1.ShortcutKeyDisplayString = "";
-            this.rectangularRedactionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
-            this.rectangularRedactionToolStripMenuItem1.Text = "&Rectangular redaction";
+            this._rectangularRedactionToolStripMenuItem1.Enabled = false;
+            this._rectangularRedactionToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("_rectangularRedactionToolStripMenuItem1.Image")));
+            this._rectangularRedactionToolStripMenuItem1.ImageViewer = null;
+            this._rectangularRedactionToolStripMenuItem1.Name = "_rectangularRedactionToolStripMenuItem1";
+            this._rectangularRedactionToolStripMenuItem1.ShortcutKeyDisplayString = "";
+            this._rectangularRedactionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this._rectangularRedactionToolStripMenuItem1.Text = "&Rectangular redaction";
+            // 
+            // _wordRedactionToolStripMenuItem1
+            // 
+            this._wordRedactionToolStripMenuItem1.Enabled = false;
+            this._wordRedactionToolStripMenuItem1.Image = ((System.Drawing.Image)(resources.GetObject("_wordRedactionToolStripMenuItem1.Image")));
+            this._wordRedactionToolStripMenuItem1.ImageViewer = null;
+            this._wordRedactionToolStripMenuItem1.Name = "_wordRedactionToolStripMenuItem1";
+            this._wordRedactionToolStripMenuItem1.ShortcutKeyDisplayString = "";
+            this._wordRedactionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this._wordRedactionToolStripMenuItem1.Text = "&Word redaction";
             // 
             // toolStripSeparator12
             // 
             this.toolStripSeparator12.Name = "toolStripSeparator12";
             this.toolStripSeparator12.Size = new System.Drawing.Size(252, 6);
             // 
-            // blockFitSelectionToolStripMenuItem1
+            // _blockFitSelectionToolStripMenuItem1
             // 
-            this.blockFitSelectionToolStripMenuItem1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.blockFitSelectionToolStripMenuItem1.Enabled = false;
-            this.blockFitSelectionToolStripMenuItem1.ImageViewer = null;
-            this.blockFitSelectionToolStripMenuItem1.Name = "blockFitSelectionToolStripMenuItem1";
-            this.blockFitSelectionToolStripMenuItem1.ShortcutKeyDisplayString = "";
-            this.blockFitSelectionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
-            this.blockFitSelectionToolStripMenuItem1.Text = "&Block fit selection";
+            this._blockFitSelectionToolStripMenuItem1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this._blockFitSelectionToolStripMenuItem1.Enabled = false;
+            this._blockFitSelectionToolStripMenuItem1.ImageViewer = null;
+            this._blockFitSelectionToolStripMenuItem1.Name = "_blockFitSelectionToolStripMenuItem1";
+            this._blockFitSelectionToolStripMenuItem1.ShortcutKeyDisplayString = "";
+            this._blockFitSelectionToolStripMenuItem1.Size = new System.Drawing.Size(255, 22);
+            this._blockFitSelectionToolStripMenuItem1.Text = "&Block fit selection";
             // 
             // _viewCommandsToolStrip
             // 
@@ -1485,10 +1507,11 @@ namespace Extract.Redaction.Verification
             this._panToolStripButton,
             this._selectLayerObjectToolStripButton,
             this._angularRedactionToolStripButton,
-            this._rectangularRedactionToolStripButton});
+            this._rectangularRedactionToolStripButton,
+            this._wordRedactionToolStripButton});
             this._basicImageViewerToolStrip.Location = new System.Drawing.Point(3, 78);
             this._basicImageViewerToolStrip.Name = "_basicImageViewerToolStrip";
-            this._basicImageViewerToolStrip.Size = new System.Drawing.Size(270, 39);
+            this._basicImageViewerToolStrip.Size = new System.Drawing.Size(306, 39);
             this._basicImageViewerToolStrip.TabIndex = 0;
             // 
             // _printImageToolStripButton
@@ -1568,6 +1591,16 @@ namespace Extract.Redaction.Verification
             this._rectangularRedactionToolStripButton.ImageViewer = null;
             this._rectangularRedactionToolStripButton.Name = "_rectangularRedactionToolStripButton";
             this._rectangularRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
+            // 
+            // _wordRedactionToolStripButton
+            // 
+            this._wordRedactionToolStripButton.BaseToolTipText = "Create word redaction";
+            this._wordRedactionToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._wordRedactionToolStripButton.Enabled = false;
+            this._wordRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._wordRedactionToolStripButton.ImageViewer = null;
+            this._wordRedactionToolStripButton.Name = "_wordRedactionToolStripButton";
+            this._wordRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
             // 
             // dockContainer1
             // 
@@ -1671,6 +1704,7 @@ namespace Extract.Redaction.Verification
         private Extract.Imaging.Forms.SelectLayerObjectToolStripButton _selectLayerObjectToolStripButton;
         private Extract.Imaging.Forms.AngularRedactionToolStripButton _angularRedactionToolStripButton;
         private Extract.Imaging.Forms.RectangularRedactionToolStripButton _rectangularRedactionToolStripButton;
+        private Extract.Imaging.Forms.WordRedactionToolStripButton _wordRedactionToolStripButton;
         private System.Windows.Forms.ToolStrip _pageNavigationToolStrip;
         private Extract.Imaging.Forms.FirstPageToolStripButton _firstPageToolStripButton;
         private Extract.Imaging.Forms.PreviousPageToolStripButton _previousPageToolStripButton;
@@ -1727,12 +1761,13 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.ToolStripButton _findOrRedactToolStripButton;
         private Extract.Imaging.Forms.PrintViewToolStripMenuItem _printViewToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip _imageViewerContextMenu;
-        private Extract.Imaging.Forms.SelectLayerObjectToolStripMenuItem selectLayerObjectToolStripMenuItem1;
-        private Extract.Imaging.Forms.ZoomWindowToolStripMenuItem zoomWindowToolStripMenuItem1;
-        private Extract.Imaging.Forms.PanToolStripMenuItem panToolStripMenuItem1;
-        private Extract.Imaging.Forms.AngularRedactionToolStripMenuItem angularRedactionToolStripMenuItem1;
-        private Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem rectangularRedactionToolStripMenuItem1;
-        private Extract.Imaging.Forms.BlockFitSelectionToolStripMenuItem blockFitSelectionToolStripMenuItem1;
+        private Extract.Imaging.Forms.SelectLayerObjectToolStripMenuItem _selectLayerObjectToolStripMenuItem1;
+        private Extract.Imaging.Forms.ZoomWindowToolStripMenuItem _zoomWindowToolStripMenuItem1;
+        private Extract.Imaging.Forms.PanToolStripMenuItem _panToolStripMenuItem1;
+        private Extract.Imaging.Forms.AngularRedactionToolStripMenuItem _angularRedactionToolStripMenuItem1;
+        private Extract.Imaging.Forms.RectangularRedactionToolStripMenuItem _rectangularRedactionToolStripMenuItem1;
+        private Extract.Imaging.Forms.WordRedactionToolStripMenuItem _wordRedactionToolStripMenuItem1;
+        private Extract.Imaging.Forms.BlockFitSelectionToolStripMenuItem _blockFitSelectionToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem _viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _zoomToolStripMenuItem;
         private Imaging.Forms.FitToPageToolStripMenuItem _fitToPageToolStripMenuItem;
@@ -1760,6 +1795,7 @@ namespace Extract.Redaction.Verification
         private Imaging.Forms.SelectLayerObjectToolStripMenuItem _selectLayerObjectToolStripMenuItem;
         private Imaging.Forms.AngularRedactionToolStripMenuItem _angularRedactionToolStripMenuItem;
         private Imaging.Forms.RectangularRedactionToolStripMenuItem _rectangularRedactionToolStripMenuItem;
+        private Imaging.Forms.WordRedactionToolStripMenuItem _wordRedactionToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator13;
         private System.Windows.Forms.ToolStripMenuItem _fullScreenToolStripMenuItem;
         private System.Windows.Forms.ToolStrip _slideShowToolStrip;

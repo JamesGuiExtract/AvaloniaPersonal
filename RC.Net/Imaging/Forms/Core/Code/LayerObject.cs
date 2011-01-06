@@ -457,7 +457,7 @@ namespace Extract.Imaging.Forms
                         // Remove the layer object if was not already
                         if (selection.Contains(this))
                         {
-                            selection.Remove(this);
+                            selection.Remove(this, true);
                         }
                     }
                 }
@@ -776,6 +776,15 @@ namespace Extract.Imaging.Forms
         /// <returns><see langword="true"/> if the point is contained by the layer object; 
         /// <see langword="false"/> if the point is not contained.</returns>
         public abstract bool HitTest(Point point);
+
+        /// <summary>
+        /// Determines whether the specified rectangle intersects with the layer object.
+        /// </summary>
+        /// <param name="rectangle">The rectangle to test for containment in logical (image)
+        /// coordinates.</param>
+        /// <returns><see langword="true"/> if the rectangle intersects the layer object; 
+        /// <see langword="false"/> if it does not.</returns>
+        public abstract bool HitTest(Rectangle rectangle);
 
         /// <summary>
         /// Determines the average distance between the specified point in logical (image)

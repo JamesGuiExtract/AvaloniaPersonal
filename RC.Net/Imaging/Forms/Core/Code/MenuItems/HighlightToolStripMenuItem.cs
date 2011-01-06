@@ -38,6 +38,13 @@ namespace Extract.Imaging.Forms
             ToolStripButtonConstants._ANGULAR_HIGHLIGHT_BUTTON_IMAGE);
 
         /// <summary>
+        /// Holds the word highlight button image.
+        /// </summary>
+        private static Image _wordHighlightButtonImage = (Image)new Bitmap(
+            typeof(HighlightToolStripMenuItem),
+            ToolStripButtonConstants._WORD_HIGHLIGHT_BUTTON_IMAGE);
+
+        /// <summary>
         /// Image viewer with which this menu item connects.
         /// </summary>
         private ImageViewer _imageViewer;
@@ -74,13 +81,22 @@ namespace Extract.Imaging.Forms
             _highlightTool = RegistryManager.GetLastUsedHighlightTool();
 
             // Set the image based on the last used highlight tool
-            if (_highlightTool == CursorTool.AngularHighlight)
+            switch (_highlightTool)
             {
-                base.Image = _angularHighlightButtonImage;
-            }
-            else
-            {
-                base.Image = _rectangularHighlightButtonImage;
+                case CursorTool.AngularHighlight:
+                    base.Image = _angularHighlightButtonImage;
+                    break;
+
+                case CursorTool.RectangularHighlight:
+                    base.Image = _rectangularHighlightButtonImage;
+                    break;
+
+                case CursorTool.WordHighlight:
+                    base.Image = _wordHighlightButtonImage;
+                    break;
+
+                default:
+                    throw new ExtractException("ELI31306", "Unexpected cursor tool");
             }
 
             // Disable menu item by default
@@ -202,6 +218,10 @@ namespace Extract.Imaging.Forms
 
                 case CursorTool.RectangularHighlight:
                     base.Image = _rectangularHighlightButtonImage;
+                    break;
+
+                case CursorTool.WordHighlight:
+                    base.Image = _wordHighlightButtonImage;
                     break;
 
                 default:

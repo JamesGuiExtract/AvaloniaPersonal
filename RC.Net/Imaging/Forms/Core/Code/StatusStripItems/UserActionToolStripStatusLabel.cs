@@ -135,6 +135,14 @@ namespace Extract.Imaging.Forms
                         base.Text = "Click and drag to draw a rectangular redaction.";
                         break;
 
+                    case CursorTool.WordHighlight:
+                        base.Text = "Click on an outlined word or drag across one to draw a highlight for it.";
+                        break;
+
+                    case CursorTool.WordRedaction:
+                        base.Text = "Click on an outlined word or drag across one to draw a redaction for it";
+                        break;
+
                     case CursorTool.SelectLayerObject:
                         base.Text = "Click on an object to select it.";
                         break;

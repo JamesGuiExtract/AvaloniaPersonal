@@ -32,6 +32,11 @@ namespace Extract.Imaging.Forms
         RectangularHighlight,
 
         /// <summary>
+        /// Allows to create a highlight automatically fitted to a word by using OCR data.
+        /// </summary>
+        WordHighlight,
+
+        /// <summary>
         /// Allows the user to draw an angled rectangular redaction.
         /// </summary>
         AngularRedaction,
@@ -41,6 +46,11 @@ namespace Extract.Imaging.Forms
         /// to the sides of the image.
         /// </summary>
         RectangularRedaction,
+
+        /// <summary>
+        /// Allows to create a redaction automatically fitted to a word by using OCR data.
+        /// </summary>
+        WordRedaction,
 
         /// <summary>
         /// Allows the user to specify the default highlight height of angular highlights.

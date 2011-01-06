@@ -2430,6 +2430,13 @@ namespace Extract.Imaging.Forms
                     _trackingData = new TrackingData(this, mouseX, mouseY, GetVisibleImageArea());
                     break;
 
+                case CursorTool.WordHighlight:
+                case CursorTool.WordRedaction:
+                    
+                    _trackingData = new TrackingData(this, mouseX, mouseY, GetVisibleImageArea());
+                    _wordHighlightManager.StartTrackingOperation();
+                    break;
+
                 case CursorTool.EditHighlightText:
                     {
 
@@ -2514,7 +2521,7 @@ namespace Extract.Imaging.Forms
                         {
                             // The control key is pressed and a selected 
                             // layer object was clicked. Remove the layer object.
-                            _layerObjects.Selection.Remove(clickedObject);
+                            _layerObjects.Selection.Remove(clickedObject, true);
 
                             // Invalidate the image viewer to remove any previous grip 
                             // handles and to redraw these grip handles
@@ -2763,14 +2770,9 @@ namespace Extract.Imaging.Forms
                     {
                         // This is a click and drag multiple layer objects event
 
-                        // Erase the previous frame if it exists
-                        ControlPaint.DrawReversibleFrame(RectangleToScreen(_trackingData.Rectangle),
-                            Color.Black, FrameStyle.Thick);
-
-                        // Recalculate and redraw the new frame
+                        // Recalculate and redraw a new selection border
                         _trackingData.UpdateRectangle(mouseX, mouseY);
-                        ControlPaint.DrawReversibleFrame(RectangleToScreen(_trackingData.Rectangle),
-                            Color.Black, FrameStyle.Thick);
+                        ExecutePostPaintMethod((e) => DrawTrackingRectangleBorder(e));
                     }
                     else
                     {
@@ -2803,11 +2805,35 @@ namespace Extract.Imaging.Forms
                     }
                     break;
 
+                case CursorTool.WordHighlight:
+                case CursorTool.WordRedaction:
+
+                    // Recalculate and redraw a new selection border
+                    _trackingData.UpdateRectangle(mouseX, mouseY);
+                    ExecutePostPaintMethod((e) => DrawTrackingRectangleBorder(e));
+                    break;
+
                 default:
 
                     // There is no interactive region associated with this region OR
                     // the interactivity is handled by the Leadtools RasterImageViewer
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Draws a border around the current tracking rectangle.
+        /// </summary>
+        /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/> instance
+        /// containing the event data.</param>
+        void DrawTrackingRectangleBorder(PaintEventArgs e)
+        {
+            if (_trackingData != null)
+            {
+                using (Pen pen = new Pen(Color.Black, 2))
+                {
+                    e.Graphics.DrawRectangle(pen, _trackingData.Rectangle);
+                }
             }
         }
 
@@ -2851,7 +2877,8 @@ namespace Extract.Imaging.Forms
         Color GetHighlightDrawColor()
         {
             if (_cursorTool == CursorTool.AngularHighlight ||
-                _cursorTool == CursorTool.RectangularHighlight)
+                _cursorTool == CursorTool.RectangularHighlight ||
+                _cursorTool == CursorTool.WordHighlight)
             {
                 return _defaultHighlightColor;
             }
@@ -2910,7 +2937,14 @@ namespace Extract.Imaging.Forms
                         break;
 
                     case CursorTool.ExtractImage:
+
                         EndExtractImageRegion(mouseX, mouseY, cancel);
+                        break;
+
+                    case CursorTool.WordHighlight:
+                    case CursorTool.WordRedaction:
+
+                        _wordHighlightManager.EndTrackingOperation(cancel);
                         break;
 
                     default:
@@ -3712,7 +3746,7 @@ namespace Extract.Imaging.Forms
             // Delete any layer objects that intersected
             foreach (int id in layerObjectIds)
             {
-                _layerObjects.Remove(id);
+                _layerObjects.Remove(id, true);
             }
 
             // Refresh the image
@@ -4890,18 +4924,24 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null && _allowHighlight)
                 {
                     // If the current tool is a highlight tool, toggle it
-                    if (_cursorTool == CursorTool.RectangularHighlight)
+                    switch (_cursorTool)
                     {
-                        CursorTool = CursorTool.AngularHighlight;
-                    }
-                    else if (_cursorTool == CursorTool.AngularHighlight)
-                    {
-                        CursorTool = CursorTool.RectangularHighlight;
-                    }
-                    else
-                    {
-                        // Select the last used highlight tool
-                        CursorTool = RegistryManager.GetLastUsedHighlightTool();
+                        case CursorTool.AngularHighlight:
+                            CursorTool = CursorTool.RectangularHighlight;
+                            break;
+
+                        case CursorTool.RectangularHighlight:
+                            CursorTool = CursorTool.WordHighlight;
+                            break;
+
+                        case CursorTool.WordHighlight:
+                            CursorTool = CursorTool.AngularHighlight;
+                            break;
+
+                        default:
+                            // Select the last used highlight tool
+                            CursorTool = RegistryManager.GetLastUsedHighlightTool();
+                            break;
                     }
                 }
             }
@@ -4948,6 +4988,24 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Activates the word highlight <see cref="CursorTool"/>.
+        /// </summary>
+        public void SelectWordHighlightTool()
+        {
+            try
+            {
+                if (base.Image != null)
+                {
+                    CursorTool = CursorTool.WordHighlight;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31297", ex);
+            }
+        }
+
+        /// <summary>
         /// Activates either the rectangular or angular redaction <see cref="CursorTool"/>, 
         /// whichever was used last.
         /// </summary>
@@ -4961,18 +5019,24 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null)
                 {
                     // If the current tool is a redaction tool, toggle it
-                    if (_cursorTool == CursorTool.RectangularRedaction)
+                    switch (_cursorTool)
                     {
-                        CursorTool = CursorTool.AngularRedaction;
-                    }
-                    else if (_cursorTool == CursorTool.AngularRedaction)
-                    {
-                        CursorTool = CursorTool.RectangularRedaction;
-                    }
-                    else
-                    {
-                        // Select the last used redaction tool
-                        CursorTool = RegistryManager.GetLastUsedRedactionTool();
+                        case CursorTool.AngularRedaction:
+                            CursorTool = CursorTool.RectangularRedaction;
+                            break;
+
+                        case CursorTool.RectangularRedaction:
+                            CursorTool = CursorTool.WordRedaction;
+                            break;
+
+                        case CursorTool.WordRedaction:
+                            CursorTool = CursorTool.AngularRedaction;
+                            break;
+
+                        default:
+                            // Select the last used redaction tool
+                            CursorTool = RegistryManager.GetLastUsedRedactionTool();
+                            break;
                     }
                 }
             }
@@ -5414,7 +5478,7 @@ namespace Extract.Imaging.Forms
                 if (deleteMe.Count > 0)
                 {
                     // Delete the selected layer objects
-                    _layerObjects.Remove(deleteMe);
+                    _layerObjects.Remove(deleteMe, true);
                 }
 
                 // Refresh the image viewer
@@ -5925,6 +5989,17 @@ namespace Extract.Imaging.Forms
             {
                 Refresh();
             }
+        }
+
+        /// <summary>
+        /// Invalidates the <see cref="ImageViewer"/> and executes the specified
+        /// <see paramref="method"/> at the end of the resulting paint operation.
+        /// </summary>
+        /// <param name="method">The <see cref="PostPaintDelegate"/> to be executed.</param>
+        void ExecutePostPaintMethod(PostPaintDelegate method)
+        {
+            _postPaintMethods.Add(method);
+            Invalidate();
         }
 
         #endregion

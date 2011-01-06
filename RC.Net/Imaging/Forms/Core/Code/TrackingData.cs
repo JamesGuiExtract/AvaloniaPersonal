@@ -273,6 +273,12 @@ namespace Extract.Imaging.Forms
             {
                 UtilityMethods.Swap(ref left, ref right);
             }
+            else if (_startPoint.X == x)
+            {
+                // Ensure rectangle isn't empty so that it can always be used to test for
+                // intersection.
+                right = left + 1;
+            }
 
             // Calculate the y coordinates of the rectangle
             int top = _startPoint.Y;
@@ -280,6 +286,12 @@ namespace Extract.Imaging.Forms
             if (_startPoint.Y > y)
             {
                 UtilityMethods.Swap(ref top, ref bottom);
+            }
+            else if (_startPoint.Y == y)
+            {
+                // Ensure rectangle isn't empty so that it can always be used to test for
+                // intersection.
+                bottom = top + 1;
             }
 
             // Create the new rectangle

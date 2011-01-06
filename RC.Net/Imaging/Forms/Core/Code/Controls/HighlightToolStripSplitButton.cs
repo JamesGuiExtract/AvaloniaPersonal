@@ -52,6 +52,13 @@ namespace Extract.Imaging.Forms
             ToolStripButtonConstants._ANGULAR_HIGHLIGHT_BUTTON_IMAGE);
 
         /// <summary>
+        /// Holds the word highlight button image.
+        /// </summary>
+        private static Image _wordHighlightButtonImage = (Image)new Bitmap(
+            typeof(HighlightToolStripSplitButton),
+            ToolStripButtonConstants._RECTANGULAR_HIGHLIGHT_BUTTON_IMAGE);
+
+        /// <summary>
         /// Image viewer with which this button connects.
         /// </summary>
         private ImageViewer _imageViewer;
@@ -330,6 +337,11 @@ namespace Extract.Imaging.Forms
 
                     case CursorTool.RectangularHighlight:
                         SetImage(_rectangularHighlightButtonImage);
+                        _highlightTool = CursorTool.RectangularHighlight;
+                        break;
+
+                    case CursorTool.WordHighlight:
+                        SetImage(_wordHighlightButtonImage);
                         _highlightTool = CursorTool.RectangularHighlight;
                         break;
 

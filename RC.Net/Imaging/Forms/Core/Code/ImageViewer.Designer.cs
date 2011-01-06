@@ -19,6 +19,11 @@ namespace Extract.Imaging.Forms
         {
             if (disposing)
             {
+                if (_wordHighlightManager != null)
+                {
+                    _wordHighlightManager.Dispose();
+                    _wordHighlightManager = null;
+                }
                 if (components != null)
                 {
                     components.Dispose();

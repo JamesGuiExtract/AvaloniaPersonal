@@ -264,6 +264,37 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Determines whether the specified rectangle intersects with the
+        /// <see cref="CompositeLayerObject{T}"/>.
+        /// </summary>
+        /// <param name="rectangle">The rectangle to test for containment in logical (image)
+        /// coordinates.
+        /// </param>
+        /// <returns><see langword="true"/> if the rectangle intersects the
+        /// <see cref="CompositeLayerObject{T}"/>; <see langword="false"/> if it does not.</returns>
+        public override bool HitTest(Rectangle rectangle)
+        {
+            try
+            {
+                // Check if any object is hit
+                foreach (T layerObject in _objects)
+                {
+                    if (layerObject.HitTest(rectangle))
+                    {
+                        return true;
+                    }
+                }
+
+                // No object was hit
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31281", ex);
+            }
+        }
+
+        /// <summary>
         /// Retrieves the zero-based grip handle id that contains the specified point.
         /// </summary>
         /// <param name="point">The point to retrieve the grip handle in physical (client) 

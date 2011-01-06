@@ -153,6 +153,30 @@ namespace Extract.Imaging.Forms
             "Create rectangular highlight";
 
         /// <summary>
+        /// Constant string for the word highlight button image.
+        /// </summary>
+        public const string _WORD_HIGHLIGHT_BUTTON_IMAGE =
+            "Resources.WordHighlightButton.png";
+
+        /// <summary>
+        /// Constant string for a small version of the word highlight button image.
+        /// </summary>
+        public const string _WORD_HIGHLIGHT_BUTTON_IMAGE_SMALL =
+            "Resources.WordHighlightButtonSmall.png";
+
+        /// <summary>
+        /// Constant string for the word highlight button text.
+        /// </summary>
+        public const string _WORD_HIGHLIGHT_BUTTON_TEXT =
+            "Word highlight";
+
+        /// <summary>
+        /// Constant string for the word highlight button tool tip text.
+        /// </summary>
+        public const string _WORD_HIGHLIGHT_BUTTON_TOOL_TIP =
+            "Create word highlight";
+
+        /// <summary>
         /// Constant string for the rectangular redaction button image.
         /// </summary>
         public const string _RECTANGULAR_REDACTION_BUTTON_IMAGE =
@@ -169,6 +193,30 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public const string _RECTANGULAR_REDACTION_BUTTON_TOOL_TIP =
             "Create rectangular redaction";
+
+        /// <summary>
+        /// Constant string for the word redaction button image.
+        /// </summary>
+        public const string _WORD_REDACTION_BUTTON_IMAGE =
+            "Resources.WordRedactionButton.png";
+
+        /// <summary>
+        /// Constant string for a small version of the word redaction button image.
+        /// </summary>
+        public const string _WORD_REDACTION_BUTTON_IMAGE_SMALL =
+            "Resources.WordRedactionButtonSmall.png";
+
+        /// <summary>
+        /// Constant string for the word redaction button text.
+        /// </summary>
+        public const string _WORD_REDACTION_BUTTON_TEXT =
+            "Word redaction";
+
+        /// <summary>
+        /// Constant string for the word redaction button tool tip text.
+        /// </summary>
+        public const string _WORD_REDACTION_BUTTON_TOOL_TIP =
+            "Create word redaction";
 
         /// <summary>
         /// Constant string for the set highlight height button image.
@@ -887,6 +935,18 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public const string _ANGULAR_REDACTION_MENU_ITEM_TEXT =
             "A&ngular redaction";
+
+        /// <summary>
+        /// Constant string for the word highlight menu item text.
+        /// </summary>
+        public const string _WORD_HIGHLIGHT_MENU_ITEM_TEXT =
+            "&Word highlight";
+
+        /// <summary>
+        /// Constant string for the word redaction menu item text.
+        /// </summary>
+        public const string _WORD_REDACTION_MENU_ITEM_TEXT =
+            "&Word redaction";
 
         /// <summary>
         /// Constant string for the highlight menu item text.

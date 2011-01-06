@@ -1189,7 +1189,15 @@ namespace Extract.SQLCDBEditor
                                 var task =
                                     _schemaUpdater.BeginUpdateToLatestSchema(null,
                                     new CancellationTokenSource());
-                                task.Wait();
+
+                                try
+                                {
+                                    task.Wait();
+                                }
+                                finally
+                                {
+                                    task.Dispose();
+                                }
                             }
                             finally
                             {

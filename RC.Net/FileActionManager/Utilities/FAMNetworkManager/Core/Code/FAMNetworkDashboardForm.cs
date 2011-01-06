@@ -474,6 +474,10 @@ namespace Extract.FileActionManager.Utilities
                     {
                         throw ExtractException.AsExtractException("ELI30993", ae.Flatten());
                     }
+                    finally
+                    {
+                        task.Dispose();
+                    }
                 }
 
                 base.OnClosing(e);
