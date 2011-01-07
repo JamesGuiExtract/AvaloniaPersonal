@@ -1230,7 +1230,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         // Remove the layer objects deleted event handler while removing
                         // the temporary highlights
                         _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
-                        _imageViewer.LayerObjects.Remove(_tempHighlights);
+                        _imageViewer.LayerObjects.Remove(_tempHighlights, true);
                         _tempHighlights.Clear();
                     }
                     finally

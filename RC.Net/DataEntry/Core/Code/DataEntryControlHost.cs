@@ -1894,7 +1894,7 @@ namespace Extract.DataEntry
                 {
                     if (_imageViewer.LayerObjects.Contains(highlight))
                     {
-                        _imageViewer.LayerObjects.Remove(highlight);
+                        _imageViewer.LayerObjects.Remove(highlight, true);
                     }
 
                     highlight.Dispose();
@@ -2671,7 +2671,7 @@ namespace Extract.DataEntry
                         startedSwipeProcessing = true;
                         _processingSwipe = true;
 
-                        _imageViewer.LayerObjects.Remove(e.LayerObject);
+                        _imageViewer.LayerObjects.Remove(e.LayerObject, true);
                         e.LayerObject.Dispose();
 
                         // Recognize the text in the highlight's raster zone and send it to the active
@@ -5955,7 +5955,7 @@ namespace Extract.DataEntry
 
                     if (_imageViewer.LayerObjects.Contains(highlight))
                     {
-                        _imageViewer.LayerObjects.Remove(highlight);
+                        _imageViewer.LayerObjects.Remove(highlight, true);
                     }
 
                     highlight.Dispose();
@@ -6017,7 +6017,7 @@ namespace Extract.DataEntry
                 {
                     if (_imageViewer.LayerObjects.Contains(errorIcon))
                     {
-                        _imageViewer.LayerObjects.Remove(errorIcon);
+                        _imageViewer.LayerObjects.Remove(errorIcon, true);
                     }
 
                     errorIcon.Dispose();
