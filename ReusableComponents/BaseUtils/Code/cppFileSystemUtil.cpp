@@ -892,6 +892,12 @@ string buildAbsolutePath(const string& strFileOrDirPath)
 
 		return strNewPath;
 	}
+    else if (strFileOrDirPath.find_first_of("..") != string::npos)
+    {
+        string strSimple = strFileOrDirPath;
+        simplifyPathName(strSimple);
+        return strSimple;
+    }
 	else
 	{
 		return strFileOrDirPath;

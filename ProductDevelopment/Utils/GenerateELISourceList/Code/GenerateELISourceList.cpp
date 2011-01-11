@@ -212,12 +212,19 @@ int main(int argc, char* argv[])
 	{
 		// get the root folder path, which is the first parameter
 		// Note: argv[0] is the program name
-		string strRootFolder(argv[1]);
+		string strRootFolder = buildAbsolutePath(argv[1]);
+        string strSharePointFolder = buildAbsolutePath(strRootFolder + "\\..\\SharePoint");
+        
 		// get the output file name
 		string strOutputFile(argv[2]);
 		
 		// find all qualified files inside specified root folder recursively
 		vector<string> vecFiles = getFileNamesIn(strRootFolder);
+        if (isValidFolder(strSharePointFolder))
+        {
+            vector<string> vecTemp = getFileNamesIn(strSharePointFolder);
+            vecFiles.insert(vecFiles.end(), vecTemp.begin(), vecTemp.end());
+        }
 
 		if (!vecFiles.empty())
 		{
