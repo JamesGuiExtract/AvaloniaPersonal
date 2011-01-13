@@ -287,6 +287,42 @@ namespace Extract.Drawing
         }
 
         /// <summary>
+        /// Returns the smallest <see cref="RectangleF"/> that contains all specified points.
+        /// </summary>
+        /// <param name="points">The array of <see cref="PointF"/>s that the resulting rectangle
+        /// will contain.</param>
+        /// <returns>The smallest <see cref="RectangleF"/> that contains all specified points.
+        /// </returns>
+        public static RectangleF GetBoundingRectangle(PointF[] points)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI31329",
+                    _OBJECT_NAME);
+
+                ExtractException.Assert("ELI31330", "Invalid parameter!", points.Length > 0);
+
+                RectangleF bounds = new RectangleF(points[0], new SizeF(0, 0));
+
+                for (int i = 1; i < points.Length; i++)
+                {
+                    bounds = RectangleF.FromLTRB(
+                        Math.Min(bounds.Left, points[i].X),
+                        Math.Min(bounds.Top, points[i].Y),
+                        Math.Max(bounds.Right, points[i].X),
+                        Math.Max(bounds.Bottom, points[i].Y));
+                }
+
+                return bounds;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31331", ex);
+            }
+        }
+
+        /// <summary>
         /// Rotates the specified rectangle the specified number of degress around the specified
         /// point.
         /// <para><b>Note:</b></para>

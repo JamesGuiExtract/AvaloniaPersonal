@@ -124,8 +124,7 @@ namespace Extract.Imaging.Forms
                 _region.MakeEmpty();
 
                 // Construct a default line segment in screen coordinates
-                Point startPointInScreen = _control.PointToScreen(_startPoint);
-                _line = new Point[] { startPointInScreen, startPointInScreen };
+                _line = new Point[] { _startPoint, _startPoint };
 
                 // Capture mouse events
                 control.Capture = true;
@@ -307,11 +306,8 @@ namespace Extract.Imaging.Forms
         public void UpdateLine(int x, int y)
         {
             // Ensure the end point is within the cropping rectangle
-            Point endPoint = GeometryMethods.GetClippedEndPoint(
+            _line[1] = GeometryMethods.GetClippedEndPoint(
                 _startPoint, new Point(x, y), _cropWithin);
-
-            // Store the new endpoint in screen coordinates
-            _line[1] = _control.PointToScreen(endPoint);
         }
 
         #endregion Methods
