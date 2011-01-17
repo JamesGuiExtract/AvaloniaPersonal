@@ -1,8 +1,7 @@
-using System.Drawing;
-using System.Collections.Generic;
-using System;
 using Extract.Drawing;
-using System.Drawing.Drawing2D;
+using System;
+using System.Drawing;
+using System.Linq;
 using System.Threading;
 
 namespace Extract.Imaging.Forms
@@ -104,12 +103,10 @@ namespace Extract.Imaging.Forms
 
                 // To initialize the width and height, retrieve a rectangle in the zone's coordinate
                 // system.
-                using (Matrix transform = new Matrix())
-                {
-                    RectangleF rectangle = GetWorkingRectangle(Side.Left, transform);
-                    _width = rectangle.Width;
-                    _height = rectangle.Height;
-                }
+                PointF theta;
+                RectangleF rectangle = GetWorkingRectangle(Side.Left, out theta);
+                _width = rectangle.Width;
+                _height = rectangle.Height;
             }
             catch (Exception ex)
             {
@@ -210,114 +207,108 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                using (Matrix transform = new Matrix())
+                // Retrieve a working rectangle relative to the zone's coordinate system and
+                // with the side to be operated upon as the left side.
+                PointF theta;
+                RectangleF rectangle = GetWorkingRectangle(side, out theta);
+
+                // If shrinking and a max row was not sepecified or the specified max is wider
+                // than the working rectangle, adjust accordingly.
+                if (shrink && (max <= 0 || max > (int)rectangle.Width))
                 {
-                    // Retrieve a working rectangle relative to the zone's coordinate system and
-                    // with the side to be operated upon as the left side.
-                    RectangleF rectangle = GetWorkingRectangle(side, transform);
+                    max = (int)rectangle.Width;
+                }
 
-                    // Reverse the transform so that it can be used to convert working coordinate to
-                    // image coordiates.
-                    transform.Invert();
+                // Round pixels in a way that ensures zone bounds encompass all content they are
+                // intended to.
+                bool roundPixelUp = findBlack;
 
-                    // If shrinking and a max row was not sepecified or the specified max is wider
-                    // than the working rectangle, adjust accordingly.
-                    if (shrink && (max <= 0 || max > (int)rectangle.Width))
-                    {
-                        max = (int)rectangle.Width;
-                    }
-
-                    // Round pixels in a way that ensures zone bounds encompass all content they are
-                    // intended to.
-                    bool roundPixelUp = (findBlack == shrink);
-
-                    FuzzyEdgeQualifier countQualifier = null;
-                    FuzzyEdgeQualifier spreadQualifier = null;
-                    bool useFuzzyFactor = fuzzyFactor.HasValue;
+                FuzzyEdgeQualifier countQualifier = null;
+                FuzzyEdgeQualifier spreadQualifier = null;
+                bool useFuzzyFactor = fuzzyFactor.HasValue;
                     
-                    // If an edge is allowed to be found using "fuzzy" logic, initialize
-                    // FuzzyEdgeQualifier based on the base raster zone line pixel content.
-                    if (useFuzzyFactor)
+                // If an edge is allowed to be found using "fuzzy" logic, initialize
+                // FuzzyEdgeQualifier based on the base raster zone line pixel content.
+                if (useFuzzyFactor)
+                {
+                    // Fuzzy logic doesn't make sense when trying to find black pixel content.
+                    ExtractException.Assert("ELI31349", "Internal image searching error",
+                        !findBlack);
+
+                    bool offPage;
+                    int initialSpread;
+                    int initialCount = CheckRowPixels(rectangle, 0, theta, probe,
+                        roundPixelUp, false, out offPage, out initialSpread);
+
+                    countQualifier = new FuzzyEdgeQualifier(initialCount, fuzzyFactor.Value);
+                    spreadQualifier = new FuzzyEdgeQualifier(initialSpread, fuzzyFactor.Value);
+                }
+
+                // If an edge is found, this value will be set.
+                float? edge = null;
+
+                // Loop through the range of specified rows looking for one that qualifies as
+                // the edge of pixel content.
+                for (float row = shrink ? min : -min;
+                        max == 0 || Math.Abs(row) <= (float)max;
+                        row += shrink ? 1 : -1)
+                {
+                    if (_cancelToken != null)
                     {
-                        // Fuzzy logic doesn't make sense when trying to find black pixel content.
-                        ExtractException.Assert("ELI31349", "Internal image searching error",
-                            !findBlack);
-
-                        bool offPage;
-                        int initialSpread;
-	                    int initialCount = CheckRowPixels(rectangle, 0, transform, probe,
-                            roundPixelUp, false, out offPage, out initialSpread);
-
-                        countQualifier = new FuzzyEdgeQualifier(initialCount, fuzzyFactor.Value);
-                        spreadQualifier = new FuzzyEdgeQualifier(initialSpread, fuzzyFactor.Value);
+                        _cancelToken.Value.ThrowIfCancellationRequested();
                     }
 
-                    // If an edge is found, this value will be set.
-                    float? edge = null;
+                    // Scan the current row's pixels.
+	                bool offPage;
+	                int spread;
+                    int count = CheckRowPixels(rectangle, row, theta, probe, roundPixelUp,
+                        !useFuzzyFactor, out offPage, out spread);
 
-                    // Loop through the range of specified rows looking for one that qualifies as
-                    // the edge of pixel content.
-                    for (float row = shrink ? min : -min;
-                         max == 0 || Math.Abs(row) <= (float)max;
-                         row += shrink ? 1 : -1)
+                    if (count > 0 == findBlack)
                     {
-                        if (_cancelToken != null)
+                        // We found a true edge of pixel content.
+                        edge = row;
+                        break;
+                    }
+                    else if (useFuzzyFactor)
+                    {
+                        // If we haven't yet found the edge of pixel content, see if we have
+                        // found a row that qualifies as an edge using fuzzy logice.
+                        edge = countQualifier.GetQualifyingRow(row, count);
+                        if (edge.HasValue)
                         {
-                            _cancelToken.Value.ThrowIfCancellationRequested();
-                        }
-
-                        // Scan the current row's pixels.
-	                    bool offPage;
-	                    int spread;
-	                    int count = CheckRowPixels(rectangle, row, transform, probe, roundPixelUp,
-                            !useFuzzyFactor, out offPage, out spread);
-
-                        if (count > 0 == findBlack)
-                        {
-                            // We found a true edge of pixel content.
-                            edge = row;
                             break;
                         }
-                        else if (useFuzzyFactor)
+
+                        edge = spreadQualifier.GetQualifyingRow(row, spread);
+                        if (edge.HasValue)
                         {
-                            // If we haven't yet found the edge of pixel content, see if we have
-                            // found a row that qualifies as an edge using fuzzy logice.
-                            edge = countQualifier.GetQualifyingRow(row, count);
-                            if (edge.HasValue)
-                            {
-                                break;
-                            }
-
-                            edge = spreadQualifier.GetQualifyingRow(row, spread);
-                            if (edge.HasValue)
-                            {
-                                break;
-                            }
-                        }
-
-	                    // If none of the pixels in the row were onpage, stop the search.
-	                    if (offPage)
-	                    {
-		                    break;
-	                    }
-                    }
-
-                    // If no row was found, if using fuzzy logic ask for the best qualified row
-                    // (if such a row exists).
-                    if (!edge.HasValue && useFuzzyFactor)
-                    {
-                        edge = countQualifier.GetCandidateRow();
-                        if (!edge.HasValue)
-                        {
-                            edge = spreadQualifier.GetCandidateRow();
+                            break;
                         }
                     }
 
-                    // Return the number of rows from the base, minus the buffer.
-                    if (edge.HasValue)
+	                // If none of the pixels in the row were onpage, stop the search.
+	                if (offPage)
+	                {
+		                break;
+	                }
+                }
+
+                // If no row was found, if using fuzzy logic ask for the best qualified row
+                // (if such a row exists).
+                if (!edge.HasValue && useFuzzyFactor)
+                {
+                    edge = countQualifier.GetCandidateRow();
+                    if (!edge.HasValue)
                     {
-                        return Math.Max(Math.Abs(edge.Value) - buffer, min);
+                        edge = spreadQualifier.GetCandidateRow();
                     }
+                }
+
+                // Return the number of rows from the base, minus the buffer.
+                if (edge.HasValue)
+                {
+                    return Math.Max(Math.Abs(edge.Value) - buffer, min);
                 }
 
                 return null;
@@ -335,48 +326,42 @@ namespace Extract.Imaging.Forms
         /// <param name="distance">The distance to move the side (negative to shrink).</param>
         public void InflateSide(Side side, float distance)
         {
-            using (Matrix transform = new Matrix())
+            // Retrieve a working rectangle relative to the zone's coordinate system and
+            // with the side to be operated upon as the left side.
+            PointF theta;
+            RectangleF rectangle = GetWorkingRectangle(side, out theta);
+
+            // Ensure we don't move one side past the opposing side.
+            if (rectangle.Width + distance < 0)
             {
-                // Retrieve a working rectangle relative to the zone's coordinate system and
-                // with the side to be operated upon as the left side.
-                RectangleF rectangle = GetWorkingRectangle(side, transform);
+                distance = -rectangle.Width;
+            }
 
-                // Ensure we don't move one side past the opposing side.
-                if (rectangle.Width + distance < 0)
-                {
-                    distance = -rectangle.Width;
-                }
+            // Adjust the rectangle by the specified distance.
+            rectangle.Location =
+                new PointF(rectangle.Location.X - distance, rectangle.Location.Y);
+            rectangle.Width += distance;
 
-                // Adjust the rectangle by the specified distance.
-                rectangle.Location =
-                    new PointF(rectangle.Location.X - distance, rectangle.Location.Y);
-                rectangle.Width += distance;
+            // Set the new vertices.
+            _vertices[0] = rectangle.Location;
+            _vertices[1] = new PointF(rectangle.Right, rectangle.Top);
+            _vertices[2] = new PointF(rectangle.Right, rectangle.Bottom);
+            _vertices[3] = new PointF(rectangle.Left, rectangle.Bottom);
 
-                // Obtain the new vertices.
-                PointF[] updatedVertices = 
-                { 
-                    rectangle.Location, 
-                    new PointF(rectangle.Right, rectangle.Top),
-                    new PointF(rectangle.Right, rectangle.Bottom),
-                    new PointF(rectangle.Left, rectangle.Bottom)
-                };
-
-                // Invert the transform so the vertices can be translated back into image
-                // coordinates.
-                transform.Invert();
-
-                transform.TransformPoints(updatedVertices);
-                updatedVertices.CopyTo(_vertices, 0);
-
-                // Update the width/height field as appropriate.
-                if (side == Side.Left || side == Side.Right)
-                {
-                    _width += distance;
-                }
-                else
-                {
-                    _height += distance;
-                }
+            // Rotate the vertices into the image coordinate system.
+            for (int i = 0; i < 4; i++)
+            {
+                _vertices[i] = GeometryMethods.Rotate(_vertices[i], theta);
+            }
+            
+            // Update the width/height field as appropriate.
+            if (side == Side.Left || side == Side.Right)
+            {
+                _width += distance;
+            }
+            else
+            {
+                _height += distance;
             }
         }
 
@@ -386,29 +371,38 @@ namespace Extract.Imaging.Forms
         /// <returns>The <see cref="RasterZone"/> equivalent of this instance.</returns>
         public RasterZone ToRasterZone()
         {
-            using (Matrix transform = new Matrix())
+            // Retrieve a working rectangle relative to the zone's coordinate system and
+            // with the side to be operated upon as the left side.
+            PointF theta;
+            RectangleF rectangle = GetWorkingRectangle(Side.Left, out theta);
+
+            // Compute the start and end points.
+            float midPoint = rectangle.Location.Y + (_height / 2);
+            
+            PointF start = new PointF(rectangle.Left, midPoint);
+            start = GeometryMethods.Rotate(start, theta);
+
+            PointF end = new PointF(rectangle.Right, midPoint);
+            end = GeometryMethods.Rotate(end, theta);
+
+            // Adjust coordinates to ensure the raster zone doesn't shrink from points that are
+            // rounded off in the wrong direction.
+            int startX = (int)((start.X < end.X) ? start.X : Math.Ceiling(start.X));
+            int startY = (int)((start.Y < end.Y) ? start.Y : Math.Ceiling(start.Y));
+            int endX = (int)((end.X < start.X) ? end.X : Math.Ceiling(end.X));
+            int endY = (int)((end.Y < start.Y) ? end.Y : Math.Ceiling(end.Y));
+            int height = (int)Math.Ceiling(_height);
+
+            // If the height is odd, the top and bottom of the zone will be a .5 value. When such a
+            // zone is displayed, those values will be rounded off, potentially exposing pixel
+            // content. Expand the zone by a pixel to prevent this.
+            if (height % 2 == 1)
             {
-                // Retrieve a working rectangle relative to the zone's coordinate system and
-                // with the side to be operated upon as the left side.
-                RectangleF rectangle = GetWorkingRectangle(Side.Left, transform);
-
-                // Compute the start and end points.
-                float midPoint = rectangle.Location.Y + (_height / 2);
-
-                PointF[] startAndEndPoints = new PointF[2];
-                startAndEndPoints[0] = new PointF(rectangle.Left, midPoint);
-                startAndEndPoints[1] = new PointF(rectangle.Right, midPoint);
-
-                // Invert the transform so the computed coordinates can be converted back into image
-                // coordinates.
-                transform.Invert();
-                transform.TransformPoints(startAndEndPoints);
-
-                // Create the raster zone
-                return new RasterZone((int)Math.Round(startAndEndPoints[0].X), (int)Math.Round(startAndEndPoints[0].Y),
-                                      (int)Math.Round(startAndEndPoints[1].X), (int)Math.Round(startAndEndPoints[1].Y),
-                                      (int)Math.Ceiling(_height), _pageNumber);
+                height++;
             }
+
+            // Create the raster zone
+            return new RasterZone(startX, startY, endX, endY, height, _pageNumber);
         }
 
         #endregion Methods
@@ -451,28 +445,34 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="side">The <see cref="Side"/> of the zone the work is to be related to.
         /// </param>
-        /// <param name="transform">A <see cref="Matrix"/> used to rotate the vertices into the
-        /// working coordinate system. This method has the side effect of leaving the appropriate
-        /// transforms from the image coordinate system to the working coordinate system in place
-        /// when this method returns.</param>
+        /// <param name="theta">X and Y theta values used to rotate coordinates from the returned
+        /// rectangle back into the image coordinate system.</param>
         /// <returns>The <see cref="RectangleF"/> representing the appropriately rotated zone.
         /// </returns>
-        RectangleF GetWorkingRectangle(Side side, Matrix transform)
+        RectangleF GetWorkingRectangle(Side side, out PointF theta)
         {
             // Rotate the zone to horizontal
-            transform.Rotate(-(float)_angle);
+            double workingAngle = -_angle;
 
             // If necessary, rotate it further such that the side to be worked on becomes the left
             // side of the working zone.
-            if (side != Side.Left)
-            {
-                transform.Rotate((float)side * -90);
-            }
+            workingAngle -= (double)side * 90;
+
+            workingAngle = GeometryMethods.ConvertDegreesToRadians(workingAngle);
+
+            // Create theta values to translate the image coordinates into the working coordinate
+            // system.
+            PointF workingTheta = 
+                new PointF((float)Math.Sin(workingAngle), (float)Math.Cos(workingAngle));
 
             // Calculate the vertices of this rectangle.
-            PointF[] workingVertices = new PointF[4];
-            _vertices.CopyTo(workingVertices, 0);
-            transform.TransformPoints(workingVertices);
+            PointF[] workingVertices = _vertices
+                .Select(p => GeometryMethods.Rotate(p, workingTheta))
+                .ToArray();
+
+            // Reverse the transform so that it can be used to convert working coordinate to
+            // image coordiates.
+            theta = new PointF((float)Math.Sin(-workingAngle), (float)Math.Cos(-workingAngle));
 
             // Return the rectangle.
             return GeometryMethods.GetBoundingRectangle(workingVertices);
@@ -486,8 +486,8 @@ namespace Extract.Imaging.Forms
         /// side.</param>
         /// <param name="offset">The x-coordinate offest of the row to scan from the left side of
         /// the working rectangle.</param>
-        /// <param name="transform">A <see cref="Matrix"/> that will convert the working coordinates
-        /// into image coordinates.</param>
+        /// <param name="theta">X and Y theta values that will convert the working coordinates into
+        /// image coordinates.</param>
         /// <param name="probe">A <see cref="PixelProbe"/> that allows access to the image pixels.
         /// </param>
         /// <param name="roundPixelUp"><see langword="true"/> to round pixel coordinates up before
@@ -500,7 +500,7 @@ namespace Extract.Imaging.Forms
         /// <param name="spread">The distance between the first and last black pixel found in the
         /// row.</param>
         /// <returns>The number of black pixels found in the row.</returns>
-        static int CheckRowPixels(RectangleF rectangle, float offset, Matrix transform,
+        static int CheckRowPixels(RectangleF rectangle, float offset, PointF theta,
             PixelProbe probe, bool roundPixelUp, bool allowShortCircuit, out bool offPage, out int spread)
         {
             int count = 0;
@@ -518,7 +518,7 @@ namespace Extract.Imaging.Forms
             {
                 bool pixelOffPage;
                 bool pixelIsBlack =
-                    IsPixelBlack(pixel, transform, probe, roundPixelUp, out pixelOffPage);
+                    IsPixelBlack(pixel, theta, probe, roundPixelUp, out pixelOffPage);
                 if (!pixelOffPage && offPage)
                 {
                     // If the pixel is not offpage, the row is not entirely offpage.
@@ -551,8 +551,8 @@ namespace Extract.Imaging.Forms
         /// Determines if the specified pixel is black.
         /// </summary>
         /// <param name="pixel">The pixel to test (in working coordinates).</param>
-        /// <param name="transform">A <see cref="Matrix"/> that will convert the working coordinates
-        /// into image coordinates.</param>
+        /// <param name="theta">X and Y theta values that will convert the working coordinates into
+        /// image coordinates.</param>
         /// <param name="probe">A <see cref="PixelProbe"/> that allows access to the image pixels.
         /// </param>
         /// <param name="roundPixelUp"><see langword="true"/> to round pixel coordinates up before
@@ -562,14 +562,13 @@ namespace Extract.Imaging.Forms
         /// <see langword="true"/> if the specified pixel is black; <see langword="false"/> if the
         /// specified pixel is white.
         /// </returns>
-        static bool IsPixelBlack(PointF pixel, Matrix transform, PixelProbe probe,
+        static bool IsPixelBlack(PointF pixel, PointF theta, PixelProbe probe,
             bool roundPixelUp, out bool offPage)
         {
             // Convert the pixel coordinates into image coordinates.
-            PointF[] pixelArray = new PointF[] { pixel };
-            transform.TransformPoints(pixelArray);
+            pixel = GeometryMethods.Rotate(pixel, theta);
 
-            Point point = roundPixelUp ? Point.Ceiling(pixelArray[0]) : Point.Truncate(pixelArray[0]);
+            Point point = roundPixelUp ? Point.Ceiling(pixel) : Point.Truncate(pixel);
 
             offPage = !probe.Contains(point);
 
@@ -620,6 +619,11 @@ namespace Extract.Imaging.Forms
             public int _minimaThreshold;
 
             /// <summary>
+            /// The lowest value found for any row.
+            /// </summary>
+            public int _lowValue;
+
+            /// <summary>
             /// The value a row following a candidate row must be above to be a qualifying row.
             /// </summary>
             public int? _maximaThreshold;
@@ -636,6 +640,7 @@ namespace Extract.Imaging.Forms
                 // Do not allow 0 as the initial value so that multiplication with the specified
                 // factor is alwasy meaningful.
                 _initialValue = (initialValue == 0) ? 1 : initialValue;
+                _lowValue = _initialValue;
                 _factor = factor;
 
                 // Determine the value at which a row will become a candidate edge.
@@ -675,10 +680,17 @@ namespace Extract.Imaging.Forms
                 }
                 else if (value < _minimaThreshold)
                 {
-                    // The value for this row is below the threshold to be a candidate edge.
+                    // For any row with a value below the threshold to be a candidate edge,
+                    // make it a candiated edge (error toward a larger zone).
                     _candidateRow = row;
-                    _minimaThreshold = value;
-                    _maximaThreshold = (int)Math.Floor((float)value / _factor);
+
+                    if (value < _lowValue)
+                    {
+                        // If this is a new low value, use it as the basis for a reduced maxima
+                        // threshold.
+                        _lowValue = value;
+                        _maximaThreshold = (int)Math.Floor((float)value / _factor);
+                    }
                 }
                 else if (_maximaThreshold.HasValue && value > _maximaThreshold.Value)
                 {

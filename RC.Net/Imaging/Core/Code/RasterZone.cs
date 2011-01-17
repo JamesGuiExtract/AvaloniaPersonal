@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Text;
 using System.Xml;
@@ -57,7 +58,7 @@ namespace Extract.Imaging
         /// Initliazes a new <see cref="RasterZone"/> class with default arguments.
         /// </summary>
         public RasterZone() :
-            this(0,0,0,0,0,-1)
+            this(0, 0, 0, 0, 0, -1)
         {
         }
 
@@ -73,7 +74,7 @@ namespace Extract.Imaging
         /// <param name="pageNumber">The page that the raster zone is defined for.</param>
         // This is not the compound word "endpoint". This is the "end point", meant in contrast to
         // "start point".
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", 
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "endPoint")]
         public RasterZone(Point startPoint, Point endPoint, int height, int pageNumber) :
             this(startPoint.X, startPoint.Y, endPoint.X, endPoint.Y, height, pageNumber)
@@ -86,10 +87,11 @@ namespace Extract.Imaging
         /// </summary>
         /// <param name="rectangle">A <see cref="Rectangle"/> object.</param>
         /// <param name="pageNumber">The page number for this <see cref="RasterZone"/></param>
-        public RasterZone(Rectangle rectangle, int pageNumber) : this(rectangle.Left,
-            ((int)(rectangle.Height / 2.0 + 0.5)) + rectangle.Top, rectangle.Right,
-            ((int)(rectangle.Height / 2.0 + 0.5)) + rectangle.Top, rectangle.Height,
-            pageNumber)
+        public RasterZone(Rectangle rectangle, int pageNumber)
+            : this(rectangle.Left,
+                ((int)(rectangle.Height / 2.0 + 0.5)) + rectangle.Top, rectangle.Right,
+                ((int)(rectangle.Height / 2.0 + 0.5)) + rectangle.Top, rectangle.Height,
+                pageNumber)
         {
         }
 
@@ -99,7 +101,7 @@ namespace Extract.Imaging
         /// </summary>
         /// <param name="comRasterZone">A RasterZone object.</param>
         [CLSCompliant(false)]
-        public RasterZone(ComRasterZone comRasterZone) 
+        public RasterZone(ComRasterZone comRasterZone)
         {
             try
             {
@@ -108,7 +110,7 @@ namespace Extract.Imaging
 
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23122",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 _start.X = comRasterZone.StartX;
                 _start.Y = comRasterZone.StartY;
@@ -139,7 +141,7 @@ namespace Extract.Imaging
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23123",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 _start = new Point(startX, startY);
                 _end = new Point(endX, endY);
@@ -262,7 +264,7 @@ namespace Extract.Imaging
             try
             {
                 // Return the bounding rectangle
-                return GeometryMethods.GetBoundingRectangle(_start, _end, _height);;
+                return GeometryMethods.GetBoundingRectangle(_start, _end, _height);
             }
             catch (Exception ex)
             {
@@ -339,7 +341,7 @@ namespace Extract.Imaging
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23154",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 ExtractException.Assert("ELI22531", "Raster zone collection must not be null.",
                     rasterZones != null);
@@ -371,6 +373,81 @@ namespace Extract.Imaging
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI22532", ex);
+            }
+        }
+
+        /// <summary>
+        /// Creates a bounding rectangle for the specified collection of zones in a coordinate
+        /// system aligned with the zones' average angle.
+        /// </summary>
+        /// <param name="rasterZones">The <see cref="RasterZone"/>s to be contained in the bounds.
+        /// </param>
+        /// <param name="averageRotation">The average angle of the <see paramref="rasterZones"/>
+        /// and the angle of the coordinate system of the returned rectangle.</param>
+        /// <returns>The bounding <see cref="RectangleF"/>.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
+        public static RectangleF GetAngledBoundingRectangle(IList<RasterZone> rasterZones,
+            out double averageRotation)
+        {
+            try
+            {
+                // Keep track of the average height of all raster zones as well as all start and end
+                // points.
+                double firstRasterZoneRotation = 0;
+                averageRotation = 0;
+                Point[] rasterZonePoints = new Point[rasterZones.Count * 4];
+
+                // Compile the raster zone points as well as the height and rotation from all zones.
+                for (int i = 0; i < rasterZones.Count; i++)
+                {
+                    PointF[] currentZoneVertices = rasterZones[i].GetBoundaryPoints();
+                    for (int j = 0; j < 4; j++)
+                    {
+                        rasterZonePoints[(i * 4) + j] =
+                            new Point((int)Math.Round(currentZoneVertices[j].X),
+                                (int)Math.Round(currentZoneVertices[j].Y));
+                    }
+
+                    double rasterZoneRotation = rasterZones[i].ComputeSkew(false);
+
+                    // [DataEntry:352]
+                    // Ensure the angle of each zone is relative to the initial raster zone rotation so
+                    // there aren't overflow issues when computing the average (eg. -179 vs 180).
+                    if (i == 0)
+                    {
+                        firstRasterZoneRotation = rasterZoneRotation;
+                    }
+                    else
+                    {
+                        // [DataEntry:361]
+                        // There seem to be cases where some raster zones are backwards. Round the
+                        // angle delta to the nearest PI radians.
+                        rasterZoneRotation = firstRasterZoneRotation + GeometryMethods.GetAngleDelta(
+                            firstRasterZoneRotation, rasterZoneRotation, Math.PI);
+                    }
+                    averageRotation += rasterZoneRotation;
+                }
+
+                // Convert to degrees
+                averageRotation = GeometryMethods.ConvertRadiansToDegrees(averageRotation);
+
+                // Obtain the average rotation of the zones.
+                averageRotation /= rasterZones.Count;
+
+                // Rotate the raster zone points into a coordinate system relative to the raster zones'
+                // rotation.
+                using (Matrix transform = new Matrix())
+                {
+                    transform.Rotate((float)-averageRotation);
+                    transform.TransformPoints(rasterZonePoints);
+                }
+
+                // Obtain a bounding rectangle for the raster zone points.
+                return GeometryMethods.GetBoundingRectangle(rasterZonePoints);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31362", ex);
             }
         }
 
@@ -861,7 +938,7 @@ namespace Extract.Imaging
         /// than <paramref name="zone2"/> and <see langword="false"/> otherwise.</returns>
         public static bool operator >(RasterZone zone1, RasterZone zone2)
         {
-            return zone1.CompareTo(zone2) > 0; 
+            return zone1.CompareTo(zone2) > 0;
         }
         #endregion
     }

@@ -1,12 +1,13 @@
 ﻿using Extract.Drawing;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -23,12 +24,63 @@ namespace Extract.Imaging.Forms
         /// </summary>
         class WordHighlightManager : IDisposable
         {
+            #region Constants
+
+            /// <summary>
+            /// Controls how lenient the algorighm to find auto-fit zones is when a hard edge of
+            /// pixel content cannot be found.
+            /// </summary>
+            const float _AUTO_FIT_FUZZY_FACTOR = 0.3F;
+
+            #endregion Constants
+
             #region Fields
 
             /// <summary>
             /// A lock to synchronize access to the <see cref="WordHighlightManager"/>'s fields.
             /// </summary>
             object _lock = new object();
+
+            /// <summary>
+            /// A <see cref="BackgroundWorker"/> object that, when the word highlight/redaction tool
+            /// is active, loads word spatial info from OCR data and displays dynamic auto-fit
+            /// highlights during tracking events.
+            /// </summary>
+            BackgroundWorker _backgroundWorker;
+
+            /// <summary>
+            /// Set when the background worker is inactive or doesn't currently have operation to
+            /// perform.
+            /// </summary>
+            ManualResetEvent _backgroundWorkerIdle = new ManualResetEvent(true); 
+
+            /// <summary>
+            /// An event to signal the background worker that a new operation is available to
+            /// perform (or to stop waiting since the backgroung worker is being deactivated).
+            /// </summary>
+            EventWaitHandle _operationAvailable = new ManualResetEvent(false);
+
+            /// <summary>
+            /// Allows the most recently started operation to be canceled.
+            /// </summary>
+            volatile CancellationTokenSource _canceler;
+
+            /// <summary>
+            /// The <see cref="CancellationToken"/> assosicated with _canceler that operations
+            /// should periodically check to see if they have been canceled.
+            /// </summary>
+            CancellationToken _cancelToken;
+
+            /// <summary>
+            /// An operation that has been scheduled to run as soon as any currently running
+            /// operation ends.
+            /// </summary>
+            volatile Action _pendingOperation;
+
+            /// <summary>
+            /// Indicates the number of outstanding calls scheduled to run via the UI message queue.
+            /// </summary>
+            volatile int _executeInUIReferenceCount = 0;
 
             /// <summary>
             /// The <see cref="ImageViewer"/> for which word highlights are being managed.
@@ -42,33 +94,19 @@ namespace Extract.Imaging.Forms
 
             /// <summary>
             /// The collection of word highlights that have been created based on OCR data, grouped
-            /// by page.
+            /// by page. Concurrent because in the case of a cancelled background LoaderOperation,
+            /// it may have scheduled highlights to be added/removed via the UI message queue and
+            /// this could conceivably end up running after the next background operation has begun.
             /// </summary>
-            volatile Dictionary<int, HashSet<LayerObject>> _wordHighlights =
-                new Dictionary<int, HashSet<LayerObject>>();
+            ConcurrentDictionary<int, HashSet<LayerObject>> _wordHighlights =
+                new ConcurrentDictionary<int, HashSet<LayerObject>>();
 
             /// <summary>
-            /// The most recently started task.
+            /// Maps each word to the id of the line on the page it belongs to so that when multiple
+            /// words on the same line are selected, they can be combined into one highlight.
             /// </summary>
-            volatile CancellationTokenSource _currentTaskCanceler;
-
-            /// <summary>
-            /// A collection of all tasks that have not yet been disposed of along with their
-            /// associated <see cref="CancellationTokenSource"/> objects.
-            /// </summary>
-            volatile Dictionary<Task, CancellationTokenSource> _tasks =
-                new Dictionary<Task, CancellationTokenSource>();
-
-            /// <summary>
-            /// A list of tasks that have either ended or have been canceled.
-            /// </summary>
-            volatile Task[] _tasksToDispose;
-
-            /// <summary>
-            /// Indicates whether the loaded data should be cleared and disposed of before
-            /// starting the next load task.
-            /// </summary>
-            volatile bool _clearData;
+            volatile Dictionary<LayerObject, int> _wordLineMapping =
+                new Dictionary<LayerObject, int>();
 
             /// <summary>
             /// A set of all pages for which word highlights have been added.
@@ -85,7 +123,12 @@ namespace Extract.Imaging.Forms
             /// Indicates whether the WordHighlightManager is currently removing word layer objects
             /// from the image viewer.
             /// </summary>
-            bool _removingWordHighlights;
+            volatile bool _removingWordHighlights;
+
+            /// <summary>
+            /// Indicates whether word highlights are currently being loaded.
+            /// </summary>
+            volatile bool _loadingWordHighlights;
 
             /// <summary>
             /// The maximum height of an automatically sized zone for each page.
@@ -107,7 +150,13 @@ namespace Extract.Imaging.Forms
             /// <summary>
             /// The current auto fit highlight (if any).
             /// </summary>
-            Highlight _autoFitHighlight;
+            volatile Highlight _autoFitHighlight;
+
+            /// <summary>
+            /// Indicates whether the loaded data should be cleared and disposed of before
+            /// starting the next load task.
+            /// </summary>
+            volatile bool _clearData;
 
             /// <summary>
             /// <see langword="true"/> if currently loading/managing word highlights.
@@ -206,8 +255,21 @@ namespace Extract.Imaging.Forms
             /// <see cref="Redaction"/>/<see cref="Highlight"/> is to be created.</param>
             public void EndTrackingOperation(bool cancel)
             {
+                bool restartWordLoading = false;
+
                 try
                 {
+                    // Before accessing fields that may be modifed by the background worker, stop
+                    // any currently running operation on the background worker.
+                    lock (_lock)
+                    {
+                        restartWordLoading = _loadingWordHighlights || 
+                            !_pagesOfAddedWordHighlights.Contains(_imageViewer.PageNumber);
+                        CancelRunningOperation();
+                    }
+
+                    _backgroundWorkerIdle.WaitOne();
+
                     if (cancel)
                     {
                         // If cancelling, simply reset the highlight color and hide all active
@@ -220,97 +282,7 @@ namespace Extract.Imaging.Forms
                     }
                     else
                     {
-                        // Collect all raster zones from the active highlights.
-                        List<RasterZone> rasterZones = new List<RasterZone>();
-
-                        // The highlights that are to be turned in highlights may be either 1 or
-                        // more word highlights or an auto fit highlight.
-                        IEnumerable<RasterZone> zonesToHighlight = new List<RasterZone>();
-                        if (_trackingStartLocation.HasValue)
-                        {
-                            if (_autoFitHighlight != null)
-                            {
-                                zonesToHighlight =
-                                    new RasterZone[] { _autoFitHighlight.ToRasterZone() };
-                            }
-                            else if (_currentAutoFitLocation.HasValue)
-                            {
-                                // Get the points of the tracking event's bisecting line
-                                Point[] points = new Point[]
-                                    {
-                                        _trackingStartLocation.Value,
-                                        _currentAutoFitLocation.Value
-                                    };
-
-                                // Convert the points from client to image coordinates.
-                                GeometryMethods.InvertPoints(_imageViewer._transform, points);
-
-                                // Create a raster zone of the default height.
-                                RasterZone defaultZone = new RasterZone(points[0], points[1],
-                                    _imageViewer.DefaultHighlightHeight, _imageViewer.PageNumber);
-
-                                zonesToHighlight = new RasterZone[] { defaultZone };
-                            }
-                        }
-                        else
-                        {
-                            foreach (Highlight highlight in _activeWordHighlights)
-                            {
-                                highlight.SetColor(Color.White, false);
-                                highlight.Visible = false;
-                            }
-
-                            zonesToHighlight =
-                                _activeWordHighlights.Select(h => ((Highlight)h).ToRasterZone());
-                        }
-
-                        foreach (RasterZone zone in zonesToHighlight)
-                        {
-                            // Attempt to adjust the fit of each raster zone so that they don't
-                            // allow for any "leaked" pixels. This will also eliminate zones that
-                            // aren't of the minimum height.
-                            using (PixelProbe probe =
-                                _imageViewer._reader.CreatePixelProbe(_imageViewer.PageNumber))
-                            {
-                                FittingData data = new FittingData(zone);
-
-                                // Expand out up to 2 pixel in each direction looking for an all
-                                // white row to ensure the zone has encapsulated all pixel content.
-                                data.FitEdge(Side.Left, probe, false, false, null, 0, 0, 2);
-                                data.FitEdge(Side.Top, probe, false, false, null, 0, 0, 2);
-                                data.FitEdge(Side.Right, probe, false, false, null, 0, 0, 2);
-                                data.FitEdge(Side.Bottom, probe, false, false, null, 0, 0, 2);
-
-                                // Shrink any sides with excess space and eliminate zones that
-                                // are too small.
-                                RasterZone fittedZone = GetBlockFittedZone(data, probe);
-
-                                if (fittedZone != null)
-                                {
-                                    rasterZones.Add(fittedZone);
-                                }
-                            }
-                        }
-
-                        // Create a highlight or redaction using these zones as long as there is at
-                        // least one qualifying zone.
-                        if (rasterZones.Count > 0)
-                        {
-                            if (_imageViewer._cursorTool == CursorTool.WordHighlight)
-                            {
-                                Highlight highlight =
-                                    new Highlight(_imageViewer, LayerObject.ManualComment,
-                                        rasterZones[0]);
-                                _imageViewer._layerObjects.Add(highlight);
-                            }
-                            else
-                            {
-                                Redaction redaction = new Redaction(_imageViewer,
-                                    _imageViewer.PageNumber, LayerObject.ManualComment, rasterZones,
-                                    _imageViewer._defaultRedactionFillColor);
-                                _imageViewer._layerObjects.Add(redaction);
-                            }
-                        }
+                        CreateOutputHighlight();
                     }
 
                     // De-activate all word highlights until the tool is used/moved again.
@@ -323,13 +295,6 @@ namespace Extract.Imaging.Forms
                         _trackingStartLocation = null;
 
                         RemoveAutoFitHighlight();
-
-                        // Call activate to ensure we pick up loading word highlights again if
-                        // a loading task was canceled to perform the auto tracking operation.
-                        if (_active)
-                        {
-                            Activate();
-                        }
                     }
 
                     _imageViewer.Invalidate();
@@ -337,6 +302,15 @@ namespace Extract.Imaging.Forms
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI31296", ex);
+                }
+                finally
+                {
+                    // Call activate to ensure we pick up loading word highlights again if
+                    // a loading task was canceled.
+                    if (restartWordLoading)
+                    {
+                        Activate();
+                    }
                 }
             }
 
@@ -365,7 +339,7 @@ namespace Extract.Imaging.Forms
                     // Otherwise, deactivate and reset all loaded data
                     else if (_active)
                     {
-                        Deactivate(true, false);
+                        Deactivate(true);
                     }
                 }
                 catch (Exception ex)
@@ -385,7 +359,7 @@ namespace Extract.Imaging.Forms
                 try
                 {
                     // Deactivate and reset all loaded data
-                    Deactivate(true, false);
+                    Deactivate(true);
                 }
                 catch (Exception ex)
                 {
@@ -435,7 +409,7 @@ namespace Extract.Imaging.Forms
                     }
                     else
                     {
-                        Deactivate(false, false);
+                        Deactivate(false);
                     }
                 }
                 catch (Exception ex)
@@ -539,6 +513,8 @@ namespace Extract.Imaging.Forms
             /// instance containing the event data.</param>
             void HandleDeletingLayerObjects(object sender, DeletingLayerObjectsEventArgs e)
             {
+                bool restartWordLoading = false;
+
                 try
                 {
                     // If the WordHighlight manager is the one deleting ignore the event.
@@ -546,6 +522,16 @@ namespace Extract.Imaging.Forms
                     {
                         return;
                     }
+
+                    // Before accessing fields that may be modifed by the background worker, stop
+                    // any currently running operation on the background worker.
+                    lock (_lock)
+                    {
+                        restartWordLoading = _loadingWordHighlights;
+                        CancelRunningOperation();
+                    }
+
+                    _backgroundWorkerIdle.WaitOne();
 
                     // Get a set of the layer objects being deleted that are word highlights.
                     HashSet<LayerObject> deletedWordHighlights =
@@ -556,61 +542,62 @@ namespace Extract.Imaging.Forms
                     // reload the highlights for the affected pages.
                     if (deletedWordHighlights.Count > 0)
                     {
-                        // Before modifying any of the data structures stop any executing tasks.
-                        Deactivate(false, false);
+                        restartWordLoading |= true;
 
-                        lock (_lock)
+                        // Collect a list of all pages from which highlights are being deleted and all
+                        // word highlights from those pages.
+                        IEnumerable<int> affectedPages = deletedWordHighlights
+                            .Select(h => h.PageNumber)
+                            .Distinct();
+                        List<LayerObject> highlightsFromAffectedPages = new List<LayerObject>();
+                        foreach (int page in affectedPages)
                         {
-                            WaitForEndedTasks(null);
+                            HashSet<LayerObject> pageHighlights;
+                            ExtractException.Assert("ELI31363", "Internal error.",
+                                _wordHighlights.TryRemove(page, out pageHighlights));
+                            highlightsFromAffectedPages.AddRange(pageHighlights);
 
-                            // Collect a list of all pages highlights are being deleted from and all
-                            // word highlights from those pages.
-                            IEnumerable<int> affectedPages = deletedWordHighlights
-                                .Select(h => h.PageNumber)
-                                .Distinct();
-                            List<LayerObject> highlightsFromAffectedPages = new List<LayerObject>();
-                            foreach (int page in affectedPages)
+                            // No longer consider any of these highlights as loaded.
+                            _pagesOfAddedWordHighlights.Remove(page);
+                            foreach (Highlight highlight in pageHighlights)
                             {
-                                HashSet<LayerObject> pageHighlights = _wordHighlights[page];
-                                highlightsFromAffectedPages.AddRange(pageHighlights);
-
-                                // No longer consider any of these highlights as loaded.
-                                _pagesOfAddedWordHighlights.Remove(page);
-                                _wordHighlights.Remove(page);
-                            }
-
-                            // Look for any highlights on the affected pages that aren't already
-                            // being deleted and delete them so that word highlights are duplicated
-                            // when they are re-loaded.
-                            List<LayerObject> remainingHighlights =
-                                new List<LayerObject>(highlightsFromAffectedPages
-                                    .Where(h => !deletedWordHighlights.Contains(h)));
-
-                            if (remainingHighlights.Count > 0)
-                            {
-                                try
-                                {
-                                    _removingWordHighlights = true;
-                                    _imageViewer.LayerObjects.Remove(remainingHighlights, true);
-                                }
-                                finally
-                                {
-                                    _removingWordHighlights = false;
-                                }
+                                _wordLineMapping.Remove(highlight);
                             }
                         }
 
-                        // As long as an image is still available, re-activate to start re-loading
-                        // the highlight data.
-                        if (_imageViewer.IsImageAvailable)
+                        // Look for any highlights on the affected pages that aren't already
+                        // being deleted and delete them so that word highlights aren't duplicated
+                        // when they are re-loaded.
+                        List<LayerObject> remainingHighlights =
+                            new List<LayerObject>(highlightsFromAffectedPages
+                                .Where(h => !deletedWordHighlights.Contains(h)));
+
+                        if (remainingHighlights.Count > 0)
                         {
-                            Activate();
+                            try
+                            {
+                                _removingWordHighlights = true;
+                                _imageViewer.LayerObjects.Remove(remainingHighlights, true);
+                            }
+                            finally
+                            {
+                                _removingWordHighlights = false;
+                            }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     ExtractException.Display("ELI31320", ex);
+                }
+                finally
+                {
+                    // Call activate to ensure we pick up loading word highlights again if
+                    // a loading task was canceled.
+                    if (restartWordLoading)
+                    {
+                        Activate();
+                    }
                 }
             }
 
@@ -640,9 +627,17 @@ namespace Extract.Imaging.Forms
                         }
                     }
 
-                    // Otherwise, cancel any currently running task and start calculating an
-                    // auto-fit zone based on the current location.
-                    StartAutoFitTask(_trackingStartLocation.Value, e.Location);
+                    _currentAutoFitLocation = e.Location;
+
+                    // Get the points to be used by the AutoFitOperation
+                    Point[] points = new Point[] { _trackingStartLocation.Value, e.Location };
+
+                    // Convert the points from client to image coordinates.
+                    GeometryMethods.InvertPoints(_imageViewer._transform, points);
+
+                    // Cancel any currently running task and start calculating an auto-fit zone
+                    // based on the current mouse location.
+                    StartOperation(() => AutoFitOperation(points[0], points[1]));
                 }
                 catch (Exception ex)
                 {
@@ -677,14 +672,36 @@ namespace Extract.Imaging.Forms
                     // Dispose of managed resources
                     try
                     {
-                        Deactivate(true, true);
-
-                        // Not necessary, but appeases FXCop.
-                        if (_currentTaskCanceler != null)
+                        if (_backgroundWorker != null)
                         {
-                            _currentTaskCanceler.Dispose();
-                            _currentTaskCanceler = null;
+                            Deactivate(false);
+                            _backgroundWorkerIdle.WaitOne(5000);
+
+                            _backgroundWorker.Dispose();
+                            _backgroundWorker = null;
                         }
+
+                        ClearData();
+
+                        if (_backgroundWorkerIdle != null)
+                        {
+                            _backgroundWorkerIdle.Dispose();
+                            _backgroundWorkerIdle = null;
+                        }
+
+                        if (_operationAvailable != null)
+                        {
+                            _operationAvailable.Dispose();
+                            _operationAvailable = null;
+                        }
+
+                        if (_canceler != null)
+                        {
+                            _canceler.Dispose();
+                            _canceler = null;
+                        }
+
+                        // Not necessary since this happens in ClearData, but it appeases FXCop.
                         if (_autoFitHighlight != null)
                         {
                             _autoFitHighlight.Dispose();
@@ -723,18 +740,23 @@ namespace Extract.Imaging.Forms
                                 HandleDeletingLayerObjects;
                         }
 
-                        // Cancel the most recently started loading task. A new task will be
-                        // restarted on the current image viewer page.
-                        CancelRunningTask();
+                        // Create the background worker if it has not yet been created.
+                        if (_backgroundWorker == null)
+                        {
+                            _backgroundWorker = new BackgroundWorker();
+                            _backgroundWorker.WorkerSupportsCancellation = true;
+                            _backgroundWorker.DoWork += WorkerThread;
+                        }
 
-                        // Create and start a new loading task.
-                        _currentTaskCanceler = new CancellationTokenSource();
-                        CancellationToken token = _currentTaskCanceler.Token;
+                        // If the background worker is not currently running, start it.
+                        if (!_backgroundWorker.IsBusy)
+                        {
+                            _backgroundWorker.RunWorkerAsync();
+                        }
 
-                        Task task = Task.Factory.StartNew(() => LoaderTask(token), token);
-
-                        // Keep track of the task and canceler so they can be disposed of later.
-                        _tasks[task] = _currentTaskCanceler;
+                        // Start a new loading task for the current image viewer page (canceling any
+                        // other operation currently in progress.
+                        StartOperation(() => LoaderOperation());
                     }
                 }
                 catch (Exception ex)
@@ -748,9 +770,7 @@ namespace Extract.Imaging.Forms
             /// </summary>
             /// <param name="clearData"><see langword="true"/> to clear and dispose of all loaded
             /// data after deactivating, <see langword="false"/> otherwise.</param>
-            /// <param name="waitForTasks"><see langword="true"/> to block until all tasks all
-            /// tasks have completed.</param>
-            void Deactivate(bool clearData, bool waitForTasks)
+            void Deactivate(bool clearData)
             {
                 try
                 {
@@ -769,14 +789,33 @@ namespace Extract.Imaging.Forms
                                 HandleDeletingLayerObjects;
                         }
 
-                        CancelRunningTask();
-
                         _clearData |= clearData;
 
-                        // Wait until the running tasks have stopped if requested.
-                        if (waitForTasks)
+                        if (clearData)
                         {
-                            WaitForEndedTasks(null);
+                            // Ensure _trackingStartLocation is reset in the UI thread since a
+                            // nullable cannot be volatile.
+                            _trackingStartLocation = null;
+                        }
+
+                        if (_backgroundWorker != null && _backgroundWorker.IsBusy)
+                        {
+                            // Call cancel on the background worker so the background thread will end
+                            // after any currently running operation is complete.
+                            _backgroundWorker.CancelAsync();
+
+                            // Signal any currently running operation to cancel.
+                            CancelRunningOperation();
+
+                            // In case the background thread is currently waiting on the next
+                            // operation, set _operationAvailable to end the wait.
+                            _operationAvailable.Set();
+                        }
+                        else if (_clearData)
+                        {
+                            // If the worker thread is not running, but the data is to be cleared,
+                            // do it here.
+                            ClearData();
                         }
                     }
                 }
@@ -787,114 +826,158 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
+            /// Cancels any currently running operation and starts the specified
+            /// <see paramref="operation"/> instead.
+            /// </summary>
+            /// <param name="operation">The <see cref="Action"/> to perform.</param>
+            void StartOperation(Action operation)
+            {
+                // Cancel any currently running operation.
+                CancelRunningOperation();
+
+                // Schedule the new operation.
+                _pendingOperation = operation;
+
+                // Signal the _backgroundWorker that an operation is available.
+                _operationAvailable.Set();
+            }
+
+            /// <summary>
             /// Cancels the actively running task (if there is one).
             /// <para><b>Note</b></para>
             /// This method must be called within a lock.
             /// </summary>
-            void CancelRunningTask()
+            void CancelRunningOperation()
             {
-                // Cancel any currently running task.
-                if (_currentTaskCanceler != null &&
-                    !_currentTaskCanceler.IsCancellationRequested)
+                // Cancel any currently running operation.
+                if (_canceler != null && !_canceler.IsCancellationRequested)
                 {
-                    _currentTaskCanceler.Cancel();
+                    _canceler.Cancel();
                 }
 
-                // Any load tasks in the collection at this point are to be disposed of.
-                if (_tasks.Count > 0)
-                {
-                    _tasksToDispose = _tasks.Keys.ToArray();
-                }
+                _pendingOperation = null;
             }
 
             /// <summary>
-            /// Blocks until all cancelled load tasks have stopped.
-            /// <para><b>Note</b></para>
-            /// This method must be called within a lock.
+            /// Encapsulates the lifespan of the _backgroundWorker thread. This thread will
+            /// continually loop to perform any scheduled background operation for the word
+            /// highlight/redaction tool. If no operation is available, as long as the tool is
+            /// active the thread will wait in an idle state for an operation to be requested.
             /// </summary>
-            /// <param name="cancelToken">A <see cref="CancellationToken"/> to abort the wait.
-            /// </param>
-            void WaitForEndedTasks(CancellationToken? cancelToken)
+            void WorkerThread(object sender, DoWorkEventArgs e)
             {
-                if (_tasksToDispose != null)
+                // The only case in which the thread should not continue to loop is if the worker
+                // itself has been canceled.
+                while (!_backgroundWorker.CancellationPending)
                 {
                     try
                     {
-                        // Wait for any tasks that are still running to complete.
-                        if (cancelToken.HasValue)
+                        // Check for an available operation.
+                        if (!_operationAvailable.WaitOne(0))
                         {
-                            // While it would seem passing cancelToken.Value to the overload of
-                            // WaitAll that takes a CancellationToken would ensure the wait is
-                            // aborted when the token is canceled, that does not seem to be the
-                            // case. Check the cancelToken manually every 200 ms to ensure we don't
-                            // continue to wait if canceled.
-                            do
+                            // If there is no pending operation, the background worker is idle.
+                            _backgroundWorkerIdle.Set();
+
+                            _operationAvailable.WaitOne();
+                        }
+
+                        // In case of a cancelled operation, give any pending UI operations every
+                        // opportunity possible to cancel. (We cannot call DoEvents or wait
+                        // indefinetly since that could cause a deadlock).
+                        for (int i = 0; _executeInUIReferenceCount > 0; i++)
+                        {
+                            Thread.Sleep(50);
+
+                            // Give up after a second.
+                            if (i > 20)
                             {
-                                cancelToken.Value.ThrowIfCancellationRequested();
+                                ExtractException ee = new ExtractException("ELI31371",
+                                    "Background operation could not be canceled in a safe manner.");
+                                ee.Log();
+                                break;
                             }
-                            while (!Task.WaitAll(_tasksToDispose, 200, cancelToken.Value));
-                        }
-                        else
-                        {
-                            Task.WaitAll(_tasksToDispose);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // Exceptions will have already been displayed by the tasks themselves.
-                    }
-                    finally
-                    {
-                        // If this task is canceled, the _tasksToDispose may still be running
-                        // and should not be disposed of.
-                        if (cancelToken.HasValue)
-                        {
-                            cancelToken.Value.ThrowIfCancellationRequested();
                         }
 
-                        try
+                        // Initialize the next operation to perform.
+                        Action currentOperation;
+                        lock (_lock)
                         {
-                            // Dispose of the tasks and their CancelTokenSource's.
-                            foreach (Task task in _tasksToDispose)
-                            {
-                                try
-                                {
-                                    _tasks[task].Dispose();
-                                    task.Dispose();
-                                    _tasks.Remove(task);
-                                }
-                                catch (Exception ex)
-                                {
-                                    ExtractException.Log("ELI31302", ex);
-                                }
-                            }
+                            _operationAvailable.Reset();
 
-                            _tasksToDispose = null;
-
-                            // If requested, clear and dispose of all loaded data.
                             if (_clearData)
                             {
                                 ClearData();
                             }
+
+                            if (_pendingOperation == null || _backgroundWorker.CancellationPending)
+                            {
+                                continue;
+                            }
+
+                            _backgroundWorkerIdle.Reset();
+
+                            currentOperation = _pendingOperation;
+                            _pendingOperation = null;
+
+                            if (_canceler != null)
+                            {
+                                _canceler.Dispose();
+                            }
+                            _canceler = new CancellationTokenSource();
+                            _cancelToken = _canceler.Token;
                         }
-                        catch (Exception ex)
+
+                        // Attempt to load OCR data for the current document for the operations
+                        // to use.
+                        if (_ocrData == null)
                         {
-                            ExtractException.Log("ELI31303", ex);
+                            string ocrFileName = _imageViewer._imageFile + ".uss";
+                            if (File.Exists(ocrFileName))
+                            {
+                                _ocrData = (ISpatialString)new SpatialStringClass();
+                                _ocrData.LoadFrom(ocrFileName, false);
+                            }
+                        }
+
+                        _cancelToken.ThrowIfCancellationRequested();
+
+                        // Perform the operation.
+                        currentOperation();
+                    }
+                    catch (OperationCanceledException)
+                    { }
+                    catch (Exception ex)
+                    {
+                        // If the task threw an exception but a cancel has been requested, assume
+                        // the exception resulted from attempting an operation that should not have
+                        // occured after cancelation (for example, accessing the current page number
+                        if (!_cancelToken.IsCancellationRequested)
+                        {
+                            string message = (_imageViewer.CursorTool == CursorTool.WordHighlight)
+                                ? "Error loading data for word highlight tool."
+                                : "Error loading data for word redaction tool.";
+
+                            // Display any non-cancelation exception so the user is notified right away
+                            // instead of when the page is changed or the document is closed.
+                            ExtractException ee = new ExtractException("ELI31365", message, ex);
+
+                            _imageViewer.Invoke((MethodInvoker)(() => ee.Display()));
                         }
                     }
                 }
+
+                // If the background worker has been stopped, consider the background worker idle.
+                _backgroundWorkerIdle.Set();
             }
 
             /// <summary>
             /// Clear and disposes of all loaded data.
+            /// <para><b>Note</b></para>
+            /// This method must be called from within a lock.
             /// </summary>
             void ClearData()
             {
-                if (_trackingStartLocation != null)
-                {
-                    _trackingStartLocation = null;
-                    _imageViewer.MouseMove -= HandleImageViewerMouseMove;
-                }
+                _imageViewer.MouseMove -= HandleImageViewerMouseMove;
 
                 if (_autoFitHighlight != null)
                 {
@@ -912,6 +995,7 @@ namespace Extract.Imaging.Forms
 
                 _pagesOfAddedWordHighlights.Clear();
                 _wordHighlights.Clear();
+                _wordLineMapping.Clear();
                 _autoZoneHeightLimit.Clear();
                 _ocrData = null;
 
@@ -919,56 +1003,18 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
-            /// Cancels any current running task as starts a new task to create an auto-fit
-            /// highlight based on the current tracking data.
-            /// </summary>
-            /// <param name="startPoint">The start <see cref="Point"/> of the auto-fit calculation.
-            /// </param>
-            /// <param name="endPoint">The end <see cref="Point"/> of the auto-fit calculation.
-            /// </param>
-            void StartAutoFitTask(Point startPoint, Point endPoint)
-            {
-                lock (_lock)
-                {
-                    if (_active)
-                    {
-                        _currentAutoFitLocation = endPoint;
-
-                        CancelRunningTask();
-
-                        // Create and start a new loading task.
-                        _currentTaskCanceler = new CancellationTokenSource();
-                        CancellationToken token = _currentTaskCanceler.Token;
-
-                        Task task = Task.Factory.StartNew(() => 
-                            AutoFitTask(token, startPoint,endPoint), token);
-
-                        // Keep track of the task and canceler so they can be disposed of later.
-                        _tasks[task] = _currentTaskCanceler;
-                    }
-                }
-            }
-
-            /// <summary>
             /// Encapsulates a task to calculate an angular highlight automatically sized to pixel
             /// content using the start and end point of the tracking operation as the start and
             /// end point of the raster zone.
             /// </summary>
-            /// <param name="cancelToken">A <see cref="CancellationToken"/> to halt execution of the
-            /// task.</param>
             /// <param name="startPoint">The start <see cref="Point"/> of the auto-fit calculation.
             /// </param>
             /// <param name="endPoint">The end <see cref="Point"/> of the auto-fit calculation.
             /// </param>
-            void AutoFitTask(CancellationToken cancelToken, Point startPoint, Point endPoint)
+            void AutoFitOperation(Point startPoint, Point endPoint)
             {
                 try
                 {
-                    // Wait for any cancelled task and load OCR data.
-                    CommonTaskStart(cancelToken);
-
-                    cancelToken.ThrowIfCancellationRequested();
-
                     // Attempt to find an already specified auto zone height limit for the current page.
                     int page = _imageViewer.PageNumber;
                     int zoneHeightLimit = 0;
@@ -994,151 +1040,56 @@ namespace Extract.Imaging.Forms
 
                     // Create a probe to read image pixels.
                     using (PixelProbe probe = _imageViewer._reader.CreatePixelProbe(page))
-                    using (Matrix transform = (Matrix)_imageViewer._transform.Clone())
                     {
-                        Point[] points;
+                        _cancelToken.ThrowIfCancellationRequested();
 
-                        cancelToken.ThrowIfCancellationRequested();
-
-                        points = new Point[] { startPoint, endPoint };
-                    
-                        // Convert the points from client to image coordinates.
-                        GeometryMethods.InvertPoints(transform, points);
+                        Color outlineColor = LayerObject.SelectionPen.Color;
 
                         // Generate a 1 pixel hight raster zone as the basis of the fitting
                         // operation.
-                        RasterZone rasterZone = new RasterZone(points[0], points[1], 1, page);
+                        RasterZone rasterZone = new RasterZone(startPoint, endPoint, 1, page);
 
                         // Create a new FittingData instance and try to find the top edge of pixel
                         // content. Allow for an edge to be found using "fuzzy" logic.
-                        FittingData data = new FittingData(rasterZone, cancelToken);
-                        if (data.FitEdge(Side.Top, probe, false, false, 0.2F, 0, 0, zoneHeightLimit))
+                        FittingData data = new FittingData(rasterZone, _cancelToken);
+                        if (data.FitEdge(Side.Top, probe, false, false, _AUTO_FIT_FUZZY_FACTOR, 0, 0,
+                            zoneHeightLimit))
                         {
                             int remainingHeight = zoneHeightLimit - (int)data.Height;
 
                             // If a top edge was found, search downward for an opposing edge.
                             if (remainingHeight > 0 &&
-                                data.FitEdge(Side.Bottom, probe, false, false, 0.1F, 0, 0, remainingHeight) &&
+                                data.FitEdge(Side.Bottom, probe, false, false,
+                                    _AUTO_FIT_FUZZY_FACTOR, 0, 0, remainingHeight) &&
                                 data.Height >= _MIN_SPLIT_HEIGHT)
                             {
                                 // Shrink the left and right side to fit pixel content.
                                 data.FitEdge(Side.Left, probe);
                                 data.FitEdge(Side.Right, probe);
 
-                                // Generate a raster zone based on the fitting data.
-                                rasterZone = data.ToRasterZone();
-                                Highlight highlight = null;
+                                // Generate the new auto-fitted highlight.
+                                Highlight highlight = new Highlight(_imageViewer, "",
+                                    data.ToRasterZone(), "", _imageViewer.GetHighlightDrawColor());
+                                highlight.Selectable = false;
+                                highlight.CanRender = false;
+                                highlight.OutlineColor = outlineColor;
 
-                                try
+                                // Add the new auto-fit highlight
+                                ExecuteInUI((MethodInvoker)(() =>
                                 {
-                                    // Generate the auto-fitted highlight.
-                                    highlight = new Highlight(_imageViewer, "", rasterZone, "",
-                                        _imageViewer.GetHighlightDrawColor());
-                                    highlight.Selectable = false;
-                                    highlight.CanRender = false;
-                                    highlight.OutlineColor = LayerObject.SelectionPen.Color;
-
-                                    // Remove any previous auto-fit highlight.
                                     RemoveAutoFitHighlight();
-
-                                    // Add the new one.
                                     AddAutoFitHighlight(highlight);
-                                }
-                                catch
-                                {
-                                    // Dispose of the highlight if it was not added successfully.
-                                    if (highlight != null && highlight != _autoFitHighlight)
-                                    {
-                                        highlight.Dispose();
-                                    }
-
-                                    throw;
-                                }
+                                }));
                             }
                         }
                     }
-
-                    return;
                 }
                 catch (OperationCanceledException)
-                {
-                    // If canceled, re-throw the exception to allow the task status to be set to
-                    // canceled, but don't display the exception as will happen with any other type
-                    // of exception.
-                    throw;
-                }
+                { }
                 catch (Exception ex)
                 {
-                    if (cancelToken.IsCancellationRequested)
-                    {
-                        // If the task threw an exception but a cancel has been requested, assume
-                        // the exception resulted from attempting an operation that should not have
-                        // occured after cancelation (for example, accessing the current page number
-                        // after a document has been closed).
-                        throw new OperationCanceledException();
-                    }
-                    else
-                    {
-                        string message = (_imageViewer.CursorTool == CursorTool.WordHighlight)
-                            ? "Error creating word highlight."
-                            : "Error creating word redaction.";
-
-                        // Display any non-cancelation exception so the user is notified right away
-                        // instead of when the page is changed or the document is closed.
-                        ExtractException ee = new ExtractException("ELI31352", message, ex);
-
-                        ExtractException.Display("ELI31353", ee);
-
-                        // Even though this will be eaten in the long run, still throw so that the task
-                        // status will be set to faulted.
-                        throw ee;
-                    }
+                    throw ExtractException.AsExtractException("ELI31352", ex);
                 }
-            }
-
-            /// <summary>
-            /// Removes and disposes of any existing auto-fit highlight.
-            /// </summary>
-            /// <param name="highlight">The newly calculated auto-fit highlight to be added to the
-            /// image viewer.</param>
-            void AddAutoFitHighlight(Highlight highlight)
-            {
-                // Ensure an auto-event tracking event is still active before adding the auto-fit
-                // highlight.
-                if (InAutoFitOperation)
-                {
-                    _imageViewer.BeginInvoke((MethodInvoker)(() =>
-                    {
-                        InsertWordLayerObjects(highlight.PageNumber, new LayerObject[] { highlight });
-                        _autoFitHighlight = highlight;
-                        _imageViewer.Invalidate();
-                    }));
-                }
-            }
-
-            /// <summary>
-            /// Removes and disposes of any existing auto-fit highlight.
-            /// </summary>
-            void RemoveAutoFitHighlight()
-            {
-                _currentAutoFitLocation = null;
-                _imageViewer.BeginInvoke((MethodInvoker)(() =>
-                {
-                    if (_autoFitHighlight != null)
-                    {
-                        if (_imageViewer.IsImageAvailable &&
-                            _imageViewer.LayerObjects.Contains(_autoFitHighlight))
-                        {
-                            _imageViewer._layerObjects.Remove(_autoFitHighlight, true);
-                        }
-                        else
-                        {
-                            _autoFitHighlight.Dispose();
-                        }
-
-                        _autoFitHighlight = null;
-                    }
-                }));
             }
 
             /// <summary>
@@ -1149,54 +1100,41 @@ namespace Extract.Imaging.Forms
             /// pages, another tasks instance should be run when the image viewer page is changed
             /// (this task will also remove highlights from all pages except the current page).
             /// </summary>
-            /// <param name="cancelToken">A <see cref="CancellationToken"/> to halt execution of the
-            /// task.</param>
-            void LoaderTask(CancellationToken cancelToken)
+            void LoaderOperation()
             {
                 try
                 {
-                    // Wait for any cancelled task and load OCR data.
-                    CommonTaskStart(cancelToken);
-
                     // If there is no OCR data, there is nothing more to be done.
                     if (_ocrData == null)
                     {
                         return;
                     }
 
+                    _loadingWordHighlights = true;
+
                     // Loop through all pages starting at the current page to ensure highlights for
                     // the current page are loaded first.
                     int page = _imageViewer.PageNumber;
                     do
                     {
-                        cancelToken.ThrowIfCancellationRequested();
+                        _cancelToken.ThrowIfCancellationRequested();
 
                         // Create highlights for each word on the page (if they have not already
                         // been created).
-                        HashSet<LayerObject> wordHighlights = LoadWordHighlightsForPage(page, cancelToken);
+                        HashSet<LayerObject> wordHighlights = LoadWordHighlightsForPage(page);
 
                         if (page == _imageViewer.PageNumber)
                         {
-                            // If this is the current page and the highlights have not already been
-                            // added to the page, add them now.
-                            if (wordHighlights != null && !_pagesOfAddedWordHighlights.Contains(page))
-                            {
-                                // Invoke to avoid modifying the imageViewer from outside the UI thread.
-                                _imageViewer.Invoke((MethodInvoker)(() =>
-                                    InsertWordLayerObjects(page, wordHighlights)));
-                            }
+                            // If this is the current page, add the word highlights to the page if
+                            // they have not already been added.
+                            ExecuteInUI((MethodInvoker)(() => AddWordLayerObjects(page, wordHighlights)));
                         }
                         else
                         {
                             // If this is not the current page, but highlights were previously
                             // added to the page, remove them to prevent bogging down the image
                             // viewer on documents with lots of pages.
-                            if (_pagesOfAddedWordHighlights.Contains(page))
-                            {
-                                // Invoke to avoid modifying the imageViewer from outside the UI thread.
-                                _imageViewer.Invoke((MethodInvoker)(() =>
-                                    RemoveWordLayerObjects(page)));
-                            }
+                            ExecuteInUI((MethodInvoker)(() => RemoveWordLayerObjects(page)));
                         }
 
                         // Increment the page number (looping back to the first page if necessary).
@@ -1205,67 +1143,14 @@ namespace Extract.Imaging.Forms
                     while (page != _imageViewer.PageNumber);
                 }
                 catch (OperationCanceledException)
-                {
-                    // If canceled, re-throw the exception to allow the task status to be set to
-                    // canceled, but don't display the exception as will happen with any other type
-                    // of exception.
-                    throw;
-                }
+                { }
                 catch (Exception ex)
                 {
-                    if (cancelToken.IsCancellationRequested)
-                    {
-                        // If the task threw an exception but a cancel has been requested, assume
-                        // the exception resulted from attempting an operation that should not have
-                        // occured after cancelation (for example, accessing the current page number
-                        // after a document has been closed).
-                        throw new OperationCanceledException();
-                    }
-                    else
-                    {
-                        string message = (_imageViewer.CursorTool == CursorTool.WordHighlight)
-                            ? "Failed to load data for word highlight tool."
-                            : "Failed to load data for word redation tool.";
-
-                        // Display any non-cancelation exception so the user is notified right away
-                        // instead of when the page is changed or the document is closed.
-                        ExtractException ee = new ExtractException("ELI31298", message, ex);
-
-                        ExtractException.Display("ELI31299", ee);
-
-                        // Even though this will be eaten in the long run, still throw so that the task
-                        // status will be set to faulted.
-                        throw ee;
-                    }
+                    throw ExtractException.AsExtractException("ELI31298", ex);
                 }
-            }
-
-            /// <summary>
-            /// Common code to newly starting tasks-- wait for any cancelled tasks and loads OCR
-            /// data.
-            /// </summary>
-            /// <param name="cancelToken">A <see cref="CancellationToken"/> to halt execution of the
-            /// task.</param>
-            void CommonTaskStart(CancellationToken cancelToken)
-            {
-                // Wait for previous tasks to complete for thread saftey of the data.
-                // Do so in a lock with a wait that watches the cancel token to ensure this task
-                // doesn't wait on itself if it was cancelled between the time it started
-                // and when it starts waiting on the running tasks.
-                lock (_lock)
+                finally
                 {
-                    WaitForEndedTasks(cancelToken);
-                }
-
-                // Attempt to load OCR data for the current document.
-                if (_ocrData == null)
-                {
-                    string ocrFileName = _imageViewer._imageFile + ".uss";
-                    if (File.Exists(ocrFileName))
-                    {
-                        _ocrData = (ISpatialString)new SpatialStringClass();
-                        _ocrData.LoadFrom(ocrFileName, false);
-                    }
+                    _loadingWordHighlights = false;
                 }
             }
 
@@ -1275,19 +1160,19 @@ namespace Extract.Imaging.Forms
             /// it was previously canceled.
             /// </summary>
             /// <param name="page">The page to load.</param>
-            /// <param name="cancelToken">A <see cref="CancellationToken"/> to halt execution of the
-            /// task.</param>
             /// <returns>A <see cref="HashSet{T}"/> of <see cref="LayerObject"/>s representing the
             /// words on the specified page.</returns>
-            HashSet<LayerObject> LoadWordHighlightsForPage(int page, CancellationToken cancelToken)
+            HashSet<LayerObject> LoadWordHighlightsForPage(int page)
             {
                 // Retrieve an IUnknownVector of SpatialStrings representing the words on the page.
                 ISpatialString pageData = (ISpatialString)_ocrData.GetSpecifiedPages(page, page);
-                IUnknownVector words = pageData.GetWords();
-                int wordCount = words.Size();
 
-                // If there a no words on the page, return null;
-                if (wordCount == 0)
+                // Get the data grouped by lines.
+                IUnknownVector pageLines = pageData.GetLines();
+                int lineCount = pageLines.Size();
+
+                // If there is no OCR data on the page, return null;
+                if (lineCount == 0)
                 {
                     return null;
                 }
@@ -1300,53 +1185,136 @@ namespace Extract.Imaging.Forms
                     _wordHighlights[page] = wordHighlights;
                 }
 
-                // Loop through the words on the page, starting where left off if appropriate.
-                for (int i = wordHighlights.Count; i < wordCount; i++)
+                // Keeps track of the starting point of each line in terms of the number of words
+                // on the page before it.
+                int lineStartIndex = 0;
+
+                // Loop through the lines on the page
+                for (int i = 0; i < lineCount; i++)
                 {
-                    cancelToken.ThrowIfCancellationRequested();
+                    // Get the words from this line.
+                    ISpatialString line = (ISpatialString)pageLines.At(i);
+                    IUnknownVector words = line.GetWords();
+                    int wordCount = words.Size();
 
-                    // Get a raster zone for the word.
-                    ISpatialString word = (ISpatialString)words.At(i);
-                    IUnknownVector comRasterZones = word.GetOriginalImageRasterZones();
+                    // This line has already been entirely loaded. Move onto the next.
+                    if (wordHighlights.Count >= lineStartIndex + wordCount)
+                    {
+                        lineStartIndex += wordCount;
+                        continue;
+                    }
 
-                    ExtractException.Assert("ELI31304", "Unexpected raster zone in OCR data.",
-                        comRasterZones.Size() == 1);
+                    // In case some, but not all words were loaded for this line, determine the word
+                    // to load next.
+                    int nextWordToLoad = wordHighlights.Count - lineStartIndex;
+                    
+                    // Generate an int to uniquely identify this line on the document.
+                    int lineIdentifier = (page << 16) | i;
 
-                    ComRasterZone comRasterZone = comRasterZones.At(0) as ComRasterZone;
+                    // Loop through the words on the line
+                    for (int j = nextWordToLoad; j < wordCount; j++)
+                    {
+                        _cancelToken.ThrowIfCancellationRequested();
 
-                    ExtractException.Assert("ELI31305", "Invalid raster zone in OCR data.",
-                        comRasterZone != null);
+                        // Get a raster zone for the word.
+                        ISpatialString word = (ISpatialString)words.At(j);
+                        IUnknownVector comRasterZones = word.GetOriginalImageRasterZones();
 
-                    RasterZone rasterZone = new RasterZone(comRasterZone);
+                        ExtractException.Assert("ELI31304", "Unexpected raster zone in OCR data.",
+                            comRasterZones.Size() == 1);
 
-                    // Use the raster zone to create a highlight.
-                    Highlight highlight =
-                        new Highlight(_imageViewer, "", rasterZone, "", Color.White);
-                    highlight.Selectable = false;
-                    highlight.CanRender = false;
-                    highlight.OutlineColor = LayerObject.SelectionPen.Color;
-                    highlight.Visible = false;
-                    wordHighlights.Add(highlight);
+                        ComRasterZone comRasterZone = comRasterZones.At(0) as ComRasterZone;
+
+                        ExtractException.Assert("ELI31305", "Invalid raster zone in OCR data.",
+                            comRasterZone != null);
+
+                        RasterZone rasterZone = new RasterZone(comRasterZone);
+
+                        // Use the raster zone to create a highlight.
+                        Highlight highlight =
+                            new Highlight(_imageViewer, "", rasterZone, "", Color.White);
+                        highlight.Selectable = false;
+                        highlight.CanRender = false;
+                        highlight.OutlineColor = LayerObject.SelectionPen.Color;
+                        highlight.Visible = false;
+
+                        _wordLineMapping[highlight] = lineIdentifier;
+                        wordHighlights.Add(highlight);
+                    }
+
+                    lineStartIndex += wordCount;
                 }
 
                 return wordHighlights;
             }
 
             /// <summary>
+            /// Adds the specified <see paramref="method"/> to the UI's message queue so that it is
+            /// processed by the UI without interrupting any active message handler. This method
+            /// blocks until the method has been executed or until the current background operation
+            /// has been canceled.
+            /// <para><b>Note</b></para>
+            /// This method cannot block indefinetly because the UI may be waiting on the background
+            /// thread (ie, it must adhere to _cancelToken).
+            /// </summary>
+            /// <param name="method">The <see cref="Delegate"/> to execute in the UI thread.</param>
+            void ExecuteInUI(Delegate method)
+            {
+                // To avoid scheduling to the UI unnecessarilly, check cancelation token first.
+                _cancelToken.ThrowIfCancellationRequested();
+
+                // Keep track of the fact that the method was scheduled to execute.
+                _executeInUIReferenceCount++;
+
+                // Invoke to avoid modifying the imageViewer from outside the UI thread. Use begin
+                // invoke so the operation isn't executed in the middle of another UI event.
+                _imageViewer.BeginInvoke(method);
+
+                // By scheduling a decrement of _UIOperationReferenceCount, we'll have record of
+                // whether the method was called, even if the blocking here was cancelled.
+                IAsyncResult result =
+                    _imageViewer.BeginInvoke((MethodInvoker)(() => _executeInUIReferenceCount--));
+
+                WaitHandle[] waitHandles = new WaitHandle[] 
+                {
+                    result.AsyncWaitHandle,
+                    _cancelToken.WaitHandle
+                };
+
+                // For thread safety of fields modified in the background thread don't return until
+                // the method has been executed (or the operation has been canceled.
+                WaitHandle.WaitAny(waitHandles);
+
+                // If cancelled, end task immediately so it doesn't touch any fields used in the
+                // invoke.
+                _cancelToken.ThrowIfCancellationRequested();
+            }
+
+            /// <summary>
             /// Adds the specified <see cref="LayerObjects"/> to the <see cref="ImageViewer"/>.
             /// </summary>
-            /// <param name="page"></param>
-            /// <param name="wordHighlights"></param>
-            void InsertWordLayerObjects(int page, IEnumerable<LayerObject> wordHighlights)
+            /// <param name="page">The page to which the highlights should be added.</param>
+            /// <param name="wordHighlights">The highlights to add.</param>
+            void AddWordLayerObjects(int page, IEnumerable<LayerObject> wordHighlights)
             {
-                if (_imageViewer.IsImageAvailable)
+                try
                 {
-                    foreach (LayerObject layerObject in wordHighlights)
+                    // If the image is still available and the highlights have not already been
+                    // added to the page, add them now.
+                    if (_imageViewer.IsImageAvailable && wordHighlights != null &&
+                        !_pagesOfAddedWordHighlights.Contains(page))
                     {
-                        _imageViewer._layerObjects.Add(layerObject);
-                    }
+                        foreach (LayerObject layerObject in wordHighlights)
+                        {
+                            _imageViewer._layerObjects.Add(layerObject);
+                        }
 
-                    _pagesOfAddedWordHighlights.Add(page);
+                        _pagesOfAddedWordHighlights.Add(page);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Log("ELI31367", ex);
                 }
             }
 
@@ -1357,18 +1325,85 @@ namespace Extract.Imaging.Forms
             /// image viewer.</param>
             void RemoveWordLayerObjects(int page)
             {
-                if (_imageViewer.IsImageAvailable)
+                try
                 {
-                    try
+                    if (_pagesOfAddedWordHighlights.Contains(page))
                     {
-                        _removingWordHighlights = true;
-                        _imageViewer._layerObjects.Remove(_wordHighlights[page], false);
                         _pagesOfAddedWordHighlights.Remove(page);
+
+                        if (_imageViewer.IsImageAvailable)
+                        {
+                            _removingWordHighlights = true;
+                            _imageViewer._layerObjects.Remove(_wordHighlights[page], false);
+                        }
                     }
-                    finally
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Log("ELI31368", ex);
+                }
+                finally
+                {
+                    _removingWordHighlights = false;
+                }
+            }
+
+            /// <summary>
+            /// Removes and disposes of any existing auto-fit highlight.
+            /// </summary>
+            /// <param name="highlight">The newly calculated auto-fit highlight to be added to the
+            /// image viewer.</param>
+            void AddAutoFitHighlight(Highlight highlight)
+            {
+                try
+                {
+                    // Ensure an auto-event tracking event is still active before adding the auto-fit
+                    // highlight.
+                    if (_imageViewer.IsImageAvailable && InAutoFitOperation)
                     {
-                        _removingWordHighlights = false;
+                        _imageViewer._layerObjects.Add(highlight);
+                        _autoFitHighlight = highlight;
+                        _imageViewer.Invalidate();
                     }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Log("ELI31369", ex);
+                }
+            }
+
+            /// <summary>
+            /// Removes and disposes of any existing auto-fit highlight.
+            /// </summary>
+            void RemoveAutoFitHighlight()
+            {
+                try
+                {
+                    _currentAutoFitLocation = null;
+
+                    if (_autoFitHighlight != null)
+                    {
+                        if (_imageViewer.IsImageAvailable &&
+                            _imageViewer.LayerObjects.Contains(_autoFitHighlight))
+                        {
+                            _removingWordHighlights = true;
+                            _imageViewer._layerObjects.Remove(_autoFitHighlight, true);
+                        }
+                        else
+                        {
+                            _autoFitHighlight.Dispose();
+                        }
+
+                        _autoFitHighlight = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Log("ELI31370", ex);
+                }
+                finally
+                {
+                    _removingWordHighlights = false;
                 }
             }
 
@@ -1392,6 +1427,225 @@ namespace Extract.Imaging.Forms
                 }
 
                 return false;
+            }
+
+            /// <summary>
+            /// Adds a <see cref="Highlight"/> or <see cref="Redaction"/> to the image viewer based
+            /// on the current tracking data.
+            /// </summary>
+            void CreateOutputHighlight()
+            {
+                // Collect all raster zones from the active highlights.
+                List<RasterZone> rasterZones = new List<RasterZone>();
+
+                // The highlights that are to be turned in highlights may be either 1 or
+                // more word highlights or an auto fit highlight.
+                List<RasterZone> zonesToHighlight = new List<RasterZone>();
+                if (InAutoFitOperation)
+                {
+                    RasterZone autoFitZone = GetAutoFitOutputZone();
+                    if (autoFitZone != null)
+                    {
+                        zonesToHighlight.Add(autoFitZone);
+                    }
+                }
+                else
+                {
+                    zonesToHighlight.AddRange(GetWordOutputZones());
+                }
+
+                foreach (RasterZone zone in zonesToHighlight)
+                {
+                    // Attempt to adjust the fit of each raster zone so that they don't
+                    // allow for any "leaked" pixels. This will also eliminate zones that
+                    // aren't of the minimum height.
+                    using (PixelProbe probe =
+                        _imageViewer._reader.CreatePixelProbe(_imageViewer.PageNumber))
+                    {
+                        FittingData data = new FittingData(zone);
+
+                        // Expand out up to 2 pixel in each direction looking for an all
+                        // white row to ensure the zone has encapsulated all pixel content.
+                        data.FitEdge(Side.Left, probe, false, false, null, 0, 0, 2);
+                        data.FitEdge(Side.Top, probe, false, false, null, 0, 0, 2);
+                        data.FitEdge(Side.Right, probe, false, false, null, 0, 0, 2);
+                        data.FitEdge(Side.Bottom, probe, false, false, null, 0, 0, 2);
+
+                        // Shrink any sides with excess space and eliminate zones that
+                        // are too small.
+                        RasterZone fittedZone = GetBlockFittedZone(data, probe);
+
+                        if (fittedZone != null)
+                        {
+                            rasterZones.Add(fittedZone);
+                        }
+                    }
+                }
+
+                // Create a highlight or redaction using these zones as long as there is at
+                // least one qualifying zone.
+                if (rasterZones.Count > 0)
+                {
+                    if (_imageViewer._cursorTool == CursorTool.WordHighlight)
+                    {
+                        Highlight highlight =
+                            new Highlight(_imageViewer, LayerObject.ManualComment,
+                                rasterZones[0]);
+                        _imageViewer._layerObjects.Add(highlight);
+                    }
+                    else
+                    {
+                        Redaction redaction = new Redaction(_imageViewer,
+                            _imageViewer.PageNumber, LayerObject.ManualComment, rasterZones,
+                            _imageViewer._defaultRedactionFillColor);
+                        _imageViewer._layerObjects.Add(redaction);
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Creates a auto-fit <see cref="RasterZone"/> based on the current tracking data if
+            /// possible.
+            /// </summary>
+            /// <returns>The <see cref="RasterZone"/> if possible, otherwise <see langword="null"/>.
+            /// </returns>
+            RasterZone GetAutoFitOutputZone()
+            {
+                RasterZone autoFitZone = null;
+
+                if (_autoFitHighlight != null)
+                {
+                    autoFitZone = _autoFitHighlight.ToRasterZone();
+                }
+                else if (_currentAutoFitLocation.HasValue)
+                {
+                    // Get the points of the tracking event's bisecting line
+                    Point[] points = new Point[]
+                    {
+                        _trackingStartLocation.Value,
+                        _currentAutoFitLocation.Value
+                    };
+
+                    // Convert the points from client to image coordinates.
+                    GeometryMethods.InvertPoints(_imageViewer._transform, points);
+
+                    // Compute the distance betwen the points.
+                    int dX = points[0].X - points[1].X;
+                    int dY = points[0].Y - points[1].Y;
+                    double distance = Math.Sqrt(dX * dX + dY * dY);
+
+                    // If the mouse hasn't moved at least 5 image pixels, disregard the
+                    // operation.
+                    if (distance > 5)
+                    {
+                        // Create a raster zone of the default height.
+                        RasterZone defaultZone = new RasterZone(points[0], points[1],
+                            _imageViewer.DefaultHighlightHeight, _imageViewer.PageNumber);
+
+                        autoFitZone = defaultZone;
+                    }
+                }
+
+                return autoFitZone;
+            }
+
+            /// <summary>
+            /// Creates a collection of <see cref="RasterZone"/>s based on the words indicated by
+            /// the current tracking data. Words on the same line will be combined into a single
+            /// <see cref="RasterZone"/>
+            /// </summary>
+            /// <returns>The <see cref="RasterZone"/>s.</returns>
+            IEnumerable<RasterZone> GetWordOutputZones()
+            {
+                List<RasterZone> wordOutputZones = new List<RasterZone>();
+
+                // Group all selected words by line.
+                Dictionary<int, List<RasterZone>> rasterZonesByLine =
+                    new Dictionary<int, List<RasterZone>>();
+
+                foreach (Highlight highlight in _activeWordHighlights)
+                {
+                    // In the process, make the highlights invisible again.
+                    highlight.SetColor(Color.White, false);
+                    highlight.Visible = false;
+
+                    // Retrieve the line ID for the word
+                    int lineIdentifier = _wordLineMapping[highlight];
+
+                    // Creates new set for this line if necessary.
+                    List<RasterZone> lineRasterZones;
+                    if (!rasterZonesByLine.TryGetValue(lineIdentifier, out lineRasterZones))
+                    {
+                        lineRasterZones = new List<RasterZone>();
+                        rasterZonesByLine[lineIdentifier] = lineRasterZones;
+                    }
+
+                    lineRasterZones.Add(highlight.ToRasterZone());
+                }
+
+                // For each set of raster zones on a line, create a bounding raster zone that shares
+                // the average angle of all the zones.
+                foreach (List<RasterZone> lineRasterZones in rasterZonesByLine.Values)
+                {
+                    if (lineRasterZones.Count == 1)
+                    {
+                        // If there's only one zone on the line, simply use it.
+                        wordOutputZones.Add(lineRasterZones[0]);
+                    }
+                    else
+                    {
+                        // Otherwise, find a bounding rectangle for the zones in a coordinate
+                        // system aligned with the zones' average angle.
+                        double angle;
+                        RectangleF bounds =
+                            RasterZone.GetAngledBoundingRectangle(lineRasterZones, out angle);
+
+                        // Create a start and end point for the zone in the raster zones' coordinate
+                        // system.
+                        float verticalMidPoint = bounds.Top + bounds.Height / 2F;
+                        PointF[] points = new PointF[]
+                                    {
+                                        new PointF(bounds.Left, verticalMidPoint),
+                                        new PointF(bounds.Right, verticalMidPoint)
+                                    };
+
+                        // Translate these points into the image coordinate system.
+                        using (Matrix transform = new Matrix())
+                        {
+                            transform.Rotate((float)angle);
+                            transform.TransformPoints(points);
+                        }
+
+                        // Adjust coordinates to ensure the raster zone doesn't shrink from points that are
+                        // rounded off in the wrong direction.
+                        int startX = (int)((points[0].X < points[1].X) 
+                            ? points[0].X
+                            :Math.Ceiling(points[0].X));
+                        int startY = (int)((points[0].Y < points[1].Y) 
+                            ? points[0].Y
+                            : Math.Ceiling(points[0].Y));
+                        int endX = (int)((points[1].X < points[0].X) 
+                            ? points[1].X
+                            : Math.Ceiling(points[1].X));
+                        int endY = (int)((points[1].Y < points[0].Y) 
+                            ? points[1].Y
+                            : Math.Ceiling(points[1].Y));
+                        int height = (int)Math.Ceiling(bounds.Height);
+
+                        // If the height is odd, the top and bottom of the zone will be a .5 value. When such a
+                        // zone is displayed, those values will be rounded off, potentially exposing pixel
+                        // content. Expand the zone by a pixel to prevent this.
+                        if (height % 2 == 1)
+                        {
+                            height++;
+                        }
+
+                        wordOutputZones.Add(new RasterZone(startX, startY, endX, endY, height,
+                            _imageViewer.PageNumber));
+                    }
+                }
+
+                return wordOutputZones;
             }
 
             #endregion Private Members

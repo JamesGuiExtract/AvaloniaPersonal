@@ -5717,59 +5717,9 @@ namespace Extract.DataEntry
             IList<RasterZone> rasterZones, AnchorAlignment anchorAlignment, double anchorOffsetAngle,
             int standoffDistance, out double anchoredObjectRotation)
         {
-            // Keep track of the average height of all raster zones as well as all start and end
-            // points.
-            double firstRasterZoneRotation = 0;
-            double averageRotation = 0;
-            Point[] rasterZonePoints = new Point[rasterZones.Count * 4];
-           
-            // Compile the raster zone points as well as the height and rotation from all zones.
-            for (int i = 0; i < rasterZones.Count; i++)
-            {
-                PointF[] currentZoneVertices = rasterZones[i].GetBoundaryPoints();
-                for (int j = 0; j < 4; j++)
-                {
-                    rasterZonePoints[(i * 4) + j] =
-                        new Point((int)Math.Round(currentZoneVertices[j].X),
-                            (int)Math.Round(currentZoneVertices[j].Y));
-                }
-
-                double rasterZoneRotation = rasterZones[i].ComputeSkew(false);
-
-                // [DataEntry:352]
-                // Ensure the angle of each zone is relative to the initial raster zone rotation so
-                // there aren't overflow issues when computing the average (eg. -179 vs 180).
-                if (i == 0)
-                {
-                    firstRasterZoneRotation = rasterZoneRotation;
-                }
-                else
-                {
-                    // [DataEntry:361]
-                    // There seem to be cases where some raster zones are backwards. Round the
-                    // angle delta to the nearest PI radians.
-                    rasterZoneRotation = firstRasterZoneRotation + GeometryMethods.GetAngleDelta(
-                        firstRasterZoneRotation, rasterZoneRotation, Math.PI);
-                }
-                averageRotation += rasterZoneRotation;
-            }
-
-            // Convert to degrees
-            averageRotation = GeometryMethods.ConvertRadiansToDegrees(averageRotation);
-
-            // Obtain the average rotation of the zones.
-            averageRotation /= rasterZones.Count;
-            
-            // Rotate the raster zone points into a coordinate system relative to the raster zones'
-            // rotation.
-            using (Matrix transform = new Matrix())
-            {
-                transform.Rotate((float)-averageRotation);
-                transform.TransformPoints(rasterZonePoints);
-            }
-
-            // Obtain a bounding rectangle for the raster zone points.
-            Rectangle bounds = GeometryMethods.GetBoundingRectangle(rasterZonePoints);
+            double averageRotation;
+            RectangleF bounds =
+                RasterZone.GetAngledBoundingRectangle(rasterZones, out averageRotation);
 
             // Based on the raster zones' dimensions, calculate how far from level the raster zones
             // can be and still have a level tooltip before the tooltip would overlap with one of the
@@ -5794,36 +5744,36 @@ namespace Extract.DataEntry
             }
 
             // Find the reference location for the anchor point using the specified AnchorAlignment.
-            Point[] anchorPoint = { bounds.Location };
-            
+            Point[] anchorPoint = { Point.Round(bounds.Location) };
+
             switch (anchorAlignment)
             {
                 case AnchorAlignment.LeftTop:
                     // Nothing to do
                     break;
                 case AnchorAlignment.Top:
-                    anchorPoint[0].Offset(bounds.Width / 2, 0);
+                    anchorPoint[0].Offset((int)bounds.Width / 2, 0);
                     break;
                 case AnchorAlignment.RightTop:
-                    anchorPoint[0].Offset(bounds.Width, 0);
+                    anchorPoint[0].Offset((int)bounds.Width, 0);
                     break;
                 case AnchorAlignment.Right:
-                    anchorPoint[0].Offset(bounds.Width, bounds.Height / 2);
+                    anchorPoint[0].Offset((int)bounds.Width, (int)bounds.Height / 2);
                     break;
                 case AnchorAlignment.RightBottom:
-                    anchorPoint[0].Offset(bounds.Width, bounds.Height);
+                    anchorPoint[0].Offset((int)(int)bounds.Width, (int)bounds.Height);
                     break;
                 case AnchorAlignment.Bottom:
-                    anchorPoint[0].Offset(bounds.Width / 2, bounds.Height);
+                    anchorPoint[0].Offset((int)bounds.Width / 2, (int)bounds.Height);
                     break;
                 case AnchorAlignment.LeftBottom:
-                    anchorPoint[0].Offset(0, bounds.Height);
+                    anchorPoint[0].Offset(0, (int)bounds.Height);
                     break;
                 case AnchorAlignment.Left:
-                    anchorPoint[0].Offset(0, bounds.Height / 2);
+                    anchorPoint[0].Offset(0, (int)bounds.Height / 2);
                     break;
                 case AnchorAlignment.Center:
-                    anchorPoint[0].Offset(bounds.Width / 2, bounds.Height / 2);
+                    anchorPoint[0].Offset((int)bounds.Width / 2, (int)bounds.Height / 2);
                     break;
             }
 
@@ -5842,6 +5792,7 @@ namespace Extract.DataEntry
             }
 
             return anchorPoint[0];
+
         }
 
         /// <summary>
