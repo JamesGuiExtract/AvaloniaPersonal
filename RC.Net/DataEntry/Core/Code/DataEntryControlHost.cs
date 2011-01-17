@@ -5726,7 +5726,7 @@ namespace Extract.DataEntry
             // raster zones. This calculation assumes the tooltip will be placed half the height of
             // the raster zone above the raster zone.
             double roundingCuttoffAngle = (180.0 / Math.PI) * GeometryMethods.GetAngle(
-                new Point(0, 0), new Point(bounds.Width, standoffDistance));
+                new PointF(0, 0), new PointF(bounds.Width, standoffDistance));
 
             // Allow a maximum of 5 degress of departure from level even if a greater angle was
             // calculated based on the raster zone dimensions.
