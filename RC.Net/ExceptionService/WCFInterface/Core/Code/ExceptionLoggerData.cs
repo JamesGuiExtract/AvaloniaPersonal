@@ -36,6 +36,11 @@ namespace Extract.ExceptionService
         /// </summary>
         readonly static int _CURRENT_VERSION = 3;
 
+        /// <summary>
+        /// The length at which to split the serialized exception.
+        /// </summary>
+        const int _SPLIT_LENGTH = 8000;
+
         #endregion Constants
 
         #region Fields
@@ -98,18 +103,24 @@ namespace Extract.ExceptionService
             if (version < 3)
             {
                 string data = info.GetString("ExceptionString");
-                _data = DeserializeExceptionFromHexString(data);
+                _data = SerializationHelper.DeserializeFromHexString<Exception>(data);
             }
             else
             {
+                // Get the string count
                 int count = info.GetInt32("StringCount");
-                StringBuilder sb = new StringBuilder();
+
+                // Initialize capacity to approximate final length
+                StringBuilder sb = new StringBuilder(count * _SPLIT_LENGTH);
+
+                // Read each string and append to the StringBuilder
                 for (int i = 0; i < count; i++)
                 {
                     sb.Append(info.GetString(_EXCEPTION_PIECE_TAG
                         + i.ToString(CultureInfo.InvariantCulture)));
                 }
-                _data = DeserializeExceptionFromHexString(sb.ToString());
+
+                _data = SerializationHelper.DeserializeFromHexString<Exception>(sb.ToString());
             }
 
             if (version > 1)
@@ -151,32 +162,6 @@ namespace Extract.ExceptionService
         #region Methods
 
         /// <summary>
-        /// Converts an array of <see cref="byte"/> into a <see cref="string"/> of hex characters.
-        /// </summary>
-        /// <param name="value">An array of <see cref="byte"/>.  Must not be null.</param>
-        /// <returns>A string containing each of the bytes as a two character hex string.</returns>
-        static string ConvertBytesToHexString(byte[] value)
-        {
-            if (value != null)
-            {
-                // Create a string builder with a capacity of twice the length of the bytes
-                // since it takes two characters to represent each byte
-                StringBuilder sb = new StringBuilder(value.Length * 2);
-                foreach (byte bite in value)
-                {
-                    sb.Append(bite.ToString("X2", CultureInfo.InvariantCulture));
-                }
-
-                // Return the string
-                return sb.ToString();
-            }
-            else
-            {
-                return string.Empty;
-            }
-        }
-
-        /// <summary>
         /// Serializes an exception using a the binary formatter into a string of hex characters.
         /// </summary>
         /// <param name="e">The exception to be serialized.</param>
@@ -185,84 +170,21 @@ namespace Extract.ExceptionService
         /// </returns>
         static List<string> SerializeExceptionToHexStrings(Exception e)
         {
+            string hexException = e.ToSerializedHexString();
+
+            // Need to split the string at 8000 character increments due to 
+            // XML serializer length limitations.
             List<string> strings = new List<string>();
-            using (MemoryStream stream = new MemoryStream())
+            while (hexException.Length > _SPLIT_LENGTH)
             {
-                BinaryFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(stream, e);
-
-                // Need to split the string at 8000 character increments due to 
-                // XML serializer length limitations.
-                string hexException = ConvertBytesToHexString(stream.ToArray());
-                while (hexException.Length > 8000)
-                {
-                    strings.Add(hexException.Substring(0, 8000));
-                    hexException = hexException.Remove(0, 8000);
-                }
-
-                // Add the remaining string to the list
-                strings.Add(hexException);
+                strings.Add(hexException.Substring(0, _SPLIT_LENGTH));
+                hexException = hexException.Remove(0, _SPLIT_LENGTH);
             }
+
+            // Add the remaining string to the list
+            strings.Add(hexException);
 
             return strings;
-        }
-
-        /// <summary>
-        /// Deserializes an exception that has been serialized using a binary formatter
-        /// and then converted to a hex string.
-        /// </summary>
-        /// <param name="hexException">The hex string version of the serialized exception.</param>
-        /// <returns>The deserialized verison of the exception.</returns>
-        public static Exception DeserializeExceptionFromHexString(string hexException)
-        {
-            // Convert the hex string back to bytes
-            byte[] bytes = ConvertHexStringToBytes(hexException);
-
-            if (bytes != null)
-            {
-                // Deserialize the exception and return it.
-                using (MemoryStream stream = new MemoryStream(bytes))
-                {
-                    BinaryFormatter formatter = new BinaryFormatter();
-                    stream.Position = 0;
-
-                    // Read the exception from the stream
-                    Exception e = (Exception)formatter.Deserialize(stream);
-
-                    return e;
-                }
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Converts a <see cref="string"/> of Hex values to an array of  <see cref="byte"/>.
-        /// </summary>
-        /// <param name="hexValue">A <see cref="string"/> of hex values.  Must
-        /// have an even length (every two characters translate to one byte).</param>
-        /// <returns>An array of <see cref="byte"/> containing the converted hex characters.</returns>
-        static byte[] ConvertHexStringToBytes(string hexValue)
-        {
-            if (hexValue.Length % 2 == 0)
-            {
-                // Create an array of bytes to hold the converted bytes
-                byte[] bytes = new byte[hexValue.Length / 2];
-                for (int i = 0; i < hexValue.Length; i += 2)
-                {
-                    // Convert each HEX value from the string to a byte (two characters per byte)
-                    bytes[i / 2] = Convert.ToByte(hexValue.Substring(i, 2), 16);
-                }
-
-                // Return the converted bytes
-                return bytes;
-            }
-            else
-            {
-                return null;
-            }
         }
 
         #endregion Methods

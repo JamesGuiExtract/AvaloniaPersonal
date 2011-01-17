@@ -113,9 +113,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\WCFInterface\Core\Code\Extract.ExceptionService.WcfInterface.csproj">
+    <ProjectReference Include="..\..\..\Core\ExtensionMethods\Core\Code\Extract.ExtensionMethods.csproj">
+      <Project>{40DE51C9-1848-4897-93C6-78CF24C33516}</Project>
+      <Name>Extract.ExtensionMethods</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\WCFInterface\Core\Code\Extract.ExceptionService.WCFInterface.csproj">
       <Project>{E2701E73-4D37-477B-8359-5614136DFA09}</Project>
-      <Name>Extract.ExceptionService.WcfInterface</Name>
+      <Name>Extract.ExceptionService.WCFInterface</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

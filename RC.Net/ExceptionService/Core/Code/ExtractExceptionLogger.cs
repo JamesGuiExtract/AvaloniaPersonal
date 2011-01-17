@@ -44,51 +44,6 @@ namespace Extract.ExceptionService
         #region Methods
 
         /// <summary>
-        /// Converts an array of <see cref="byte"/> into a <see cref="string"/> of hex characters.
-        /// </summary>
-        /// <param name="value">An array of <see cref="byte"/>.  Must not be null.</param>
-        /// <returns>A string containing each of the bytes as a two character hex string.</returns>
-        static string ConvertBytesToHexString(byte[] value)
-        {
-            if (value != null)
-            {
-                // Create a string builder with a capacity of twice the length of the bytes
-                // since it takes two characters to represent each byte
-                StringBuilder sb = new StringBuilder(value.Length * 2);
-                foreach (byte bite in value)
-                {
-                    sb.Append(bite.ToString("X2", CultureInfo.InvariantCulture));
-                }
-
-                // Return the string
-                return sb.ToString();
-            }
-            else
-            {
-                return string.Empty;
-            }
-        }
-
-        /// <summary>
-        /// Serializes an exception using a the binary formatter into a string of hex characters.
-        /// </summary>
-        /// <param name="e">The exception to be serialized.</param>
-        /// <returns>A hex string representing the binary formatted version of the exception.
-        /// </returns>
-        static string SerializeExceptionToHexString(Exception e)
-        {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                BinaryFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(stream, e);
-
-                string hexException = ConvertBytesToHexString(stream.ToArray());
-
-                return hexException;
-            }
-        }
-
-        /// <summary>
         /// Adds the specified ELI code as debug data to the exception.
         /// </summary>
         /// <param name="ex">The exception to add the ELI code to.</param>
@@ -140,7 +95,7 @@ namespace Extract.ExceptionService
                 }
 
                 // Serialize the exception as a hex string and write to temp file
-                string hexException = SerializeExceptionToHexString(ee);
+                string hexException = ee.ToSerializedHexString();
                 tempFile = Path.GetTempFileName();
                 File.WriteAllText(tempFile, hexException);
 
