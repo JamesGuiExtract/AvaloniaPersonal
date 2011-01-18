@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
@@ -8,37 +9,6 @@ using System.Text.RegularExpressions;
 
 namespace Extract
 {
-    /// <summary>
-    /// Class contains helper methods to aid in serialization tasks.
-    /// </summary>
-    public static class SerializationHelper
-    {
-        /// <summary>
-        /// Deserializes the data from a hexadecimal string.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="serializedHexString">The serialized hexadecimal string.</param>
-        /// <returns>A new <typeparamref name="T"/> that is equivalent to the serialized
-        /// string representation.</returns>
-        public static T DeserializeFromHexString<T>(string serializedHexString) where T : ISerializable
-        {
-            if (string.IsNullOrEmpty(serializedHexString))
-            {
-                throw new ArgumentException("Serialized data string must not be null or empty.",
-                    "serializedHexString");
-            }
-
-            var bytes = serializedHexString.ToByteArray();
-            using (var stream = new MemoryStream(bytes))
-            {
-                stream.Position = 0;
-                var formatter = new BinaryFormatter();
-                var data = (T)formatter.Deserialize(stream);
-                return data;
-            }
-        }
-    }
-
     /// <summary>
     /// Helper class containing extension methods.
     /// </summary>
@@ -83,6 +53,10 @@ namespace Extract
         /// <see langword="true"/> if the specified <paramref name="hexValue"/>
         /// is stringized byte array; otherwise, <see langword="false"/>.
         /// </returns>
+        // Using the word Stringized since that is what this method checks. Is the passed in hexadecimal string
+        // a valid stringized byte stream (i.e. string must contain an even number of characters
+        // and only contain characters that are valid hexadecimal characters
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Stringized")]
         public static bool IsStringizedByteArray(this string hexValue)
         {
             return hexValue.Length % 2 == 0 && _hexValidation.IsMatch(hexValue);
@@ -143,6 +117,66 @@ namespace Extract
             }
         }
 
+        /// <summary>
+        /// Deserializes the data from a hexadecimal string.
+        /// </summary>
+        /// <typeparam name="T">The type of object to deserialize from the string.</typeparam>
+        /// <param name="serializedHexValue">The serialized hexadecimal string.</param>
+        /// <returns>A new <typeparamref name="T"/> that is equivalent to the serialized
+        /// string representation.</returns>
+        public static T DeserializeFromHexString<T>(this string serializedHexValue) where T : ISerializable
+        {
+            if (string.IsNullOrEmpty(serializedHexValue))
+            {
+                throw new ArgumentException("Serialized data string must not be null or empty.",
+                    "serializedHexValue");
+            }
+
+            var bytes = serializedHexValue.ToByteArray();
+            using (var stream = new MemoryStream(bytes))
+            {
+                stream.Position = 0;
+                var formatter = new BinaryFormatter();
+                var data = (T)formatter.Deserialize(stream);
+                return data;
+            }
+        }
+
         #endregion Serialization Methods
+
+        #region Stream Methods
+
+        /// <summary>
+        /// Reads from stream with a default buffer size of 32768.
+        /// <para><b>Note:</b></para>
+        /// Caller is responsible to open and close all streams.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="destination">The destination.</param>
+        public static void ReadFromStream(this Stream source, Stream destination)
+        {
+            source.ReadFromStream(destination, 32768);
+        }
+
+        /// <summary>
+        /// Reads from stream.
+        /// <para><b>Note:</b></para>
+        /// Caller is responsible to open and close all streams.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="destination">The destination.</param>
+        /// <param name="bufferSize">Size of the buffer.</param>
+        public static void ReadFromStream(this Stream source, Stream destination, int bufferSize)
+        {
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead = 0;
+            do
+            {
+                bytesRead = source.Read(buffer, 0, bufferSize);
+                destination.Write(buffer, 0, bytesRead);
+            } while (bytesRead != 0);
+        }
+
+        #endregion Stream Methods
     }
 }

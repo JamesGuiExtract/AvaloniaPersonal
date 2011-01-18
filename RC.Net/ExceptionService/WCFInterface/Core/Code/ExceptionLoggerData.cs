@@ -103,7 +103,7 @@ namespace Extract.ExceptionService
             if (version < 3)
             {
                 string data = info.GetString("ExceptionString");
-                _data = SerializationHelper.DeserializeFromHexString<Exception>(data);
+                _data = data.DeserializeFromHexString<Exception>();
             }
             else
             {
@@ -120,7 +120,7 @@ namespace Extract.ExceptionService
                         + i.ToString(CultureInfo.InvariantCulture)));
                 }
 
-                _data = SerializationHelper.DeserializeFromHexString<Exception>(sb.ToString());
+                _data = sb.ToString().DeserializeFromHexString<Exception>();
             }
 
             if (version > 1)
