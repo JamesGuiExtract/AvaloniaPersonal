@@ -111,7 +111,13 @@
     <Compile Include="Controls\AngularRedactionToolStripButton.Designer.cs">
       <DependentUpon>AngularRedactionToolStripButton.cs</DependentUpon>
     </Compile>
-	<Compile Include="Controls\WordHighlightToolStripButton.cs">
+    <Compile Include="Controls\MagnifierWindowToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\MagnifierWindowToolStripButton.Designer.cs">
+      <DependentUpon>MagnifierWindowToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\WordHighlightToolStripButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\WordRedactionToolStripButton.cs">
@@ -269,8 +275,8 @@
       <DependentUpon>ImageViewer.cs</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-	<Compile Include="ImageViewer.WordHighlightManager.cs">
-	  <DependentUpon>ImageViewer.cs</DependentUpon>
+    <Compile Include="ImageViewer.WordHighlightManager.cs">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ImageViewer.Obsolete.cs">
@@ -290,6 +296,12 @@
       <DependentUpon>LastPageToolStripButton.cs</DependentUpon>
     </Compile>
     <Compile Include="LayerObject.cs" />
+    <Compile Include="MagnifierControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MagnifierControl.Designer.cs">
+      <DependentUpon>MagnifierControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="MenuItems\AngularHighlightToolStripMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -752,6 +764,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\MagnifierWindowToolStripButton.resx">
+      <DependentUpon>MagnifierWindowToolStripButton.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditHighlightTextForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>EditHighlightTextForm.cs</DependentUpon>
@@ -966,6 +982,7 @@
     <EmbeddedResource Include="Resources\WordRedactionButton.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\MagnifierWindowButton.png" />
     <Content Include="Resources\WordHighlightButtonSmall.png" />
     <Content Include="Resources\WordRedactionButtonSmall.png" />
   </ItemGroup>

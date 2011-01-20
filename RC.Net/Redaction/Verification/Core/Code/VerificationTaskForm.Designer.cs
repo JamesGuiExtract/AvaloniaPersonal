@@ -70,6 +70,11 @@ namespace Extract.Redaction.Verification
                     _thumbnailDockableWindow.Dispose();
                     _thumbnailDockableWindow = null;
                 }
+                if (_magnifierDockableWindow != null)
+                {
+                    _magnifierDockableWindow.Dispose();
+                    _magnifierDockableWindow = null;
+                }
             }
 
             // Release unmanaged resources
@@ -223,6 +228,9 @@ namespace Extract.Redaction.Verification
             this._wordRedactionToolStripButton = new Extract.Imaging.Forms.WordRedactionToolStripButton();
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
+            this._magnifierDockableWindow = new TD.SandDock.DockableWindow();
+            this._magnifierControl = new System.Windows.Forms.Panel();
+            this._magnifierToolStripButton = new Extract.Imaging.Forms.MagnifierWindowToolStripButton();
             dataGridToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             label3 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
@@ -265,6 +273,7 @@ namespace Extract.Redaction.Verification
             this._basicImageViewerToolStrip.SuspendLayout();
             dockContainer1.SuspendLayout();
             this._thumbnailDockableWindow.SuspendLayout();
+            this._magnifierDockableWindow.SuspendLayout();
             this.SuspendLayout();
             // 
             // dataGridToolStripContainer
@@ -1098,10 +1107,13 @@ namespace Extract.Redaction.Verification
             // 
             dockContainer.ContentSize = 527;
             dockContainer.Controls.Add(this._dataWindowDockableWindow);
+            dockContainer.Controls.Add(this._magnifierDockableWindow);
             dockContainer.Dock = System.Windows.Forms.DockStyle.Left;
             dockContainer.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
-            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
-                        ((TD.SandDock.DockControl)(this._dataWindowDockableWindow))}, this._dataWindowDockableWindow)))});
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 585.9155F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._dataWindowDockableWindow))}, this._dataWindowDockableWindow))),
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 214.0845F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._magnifierDockableWindow))}, this._magnifierDockableWindow)))});
             dockContainer.Location = new System.Drawing.Point(0, 0);
             dockContainer.Manager = this._sandDockManager;
             dockContainer.Name = "dockContainer";
@@ -1284,10 +1296,11 @@ namespace Extract.Redaction.Verification
             this._rotateCounterclockwiseToolStripButton,
             this._rotateClockwiseToolStripButton,
             toolStripSeparator10,
-            this._thumbnailsToolStripButton});
+            this._thumbnailsToolStripButton,
+            this._magnifierToolStripButton});
             this._viewCommandsToolStrip.Location = new System.Drawing.Point(3, 0);
             this._viewCommandsToolStrip.Name = "_viewCommandsToolStrip";
-            this._viewCommandsToolStrip.Size = new System.Drawing.Size(432, 39);
+            this._viewCommandsToolStrip.Size = new System.Drawing.Size(499, 39);
             this._viewCommandsToolStrip.TabIndex = 2;
             // 
             // _zoomInToolStripButton
@@ -1637,6 +1650,34 @@ namespace Extract.Redaction.Verification
             this._thumbnailViewer.Size = new System.Drawing.Size(200, 878);
             this._thumbnailViewer.TabIndex = 0;
             // 
+            // _magnifierDockableWindow
+            // 
+            this._magnifierDockableWindow.Controls.Add(this._magnifierControl);
+            this._magnifierDockableWindow.Guid = new System.Guid("ae627741-717d-48f0-8e85-071b39098d21");
+            this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 601);
+            this._magnifierDockableWindow.Name = "_magnifierDockableWindow";
+            this._magnifierDockableWindow.PrimaryControl = this;
+            this._magnifierDockableWindow.Size = new System.Drawing.Size(527, 161);
+            this._magnifierDockableWindow.TabIndex = 0;
+            this._magnifierDockableWindow.Text = "Magnifier";
+            // 
+            // _magnifierControl
+            // 
+            this._magnifierControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._magnifierControl.Location = new System.Drawing.Point(0, 0);
+            this._magnifierControl.Name = "_magnifierControl";
+            this._magnifierControl.Size = new System.Drawing.Size(527, 161);
+            this._magnifierControl.TabIndex = 0;
+            // 
+            // _magnifierToolStripButton
+            // 
+            this._magnifierToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._magnifierToolStripButton.DockableWindow = null;
+            this._magnifierToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._magnifierToolStripButton.Name = "_magnifierToolStripButton";
+            this._magnifierToolStripButton.Size = new System.Drawing.Size(36, 36);
+            this._magnifierToolStripButton.Text = "Show/Hide magnifier";
+            // 
             // VerificationTaskForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1688,6 +1729,7 @@ namespace Extract.Redaction.Verification
             this._basicImageViewerToolStrip.PerformLayout();
             dockContainer1.ResumeLayout(false);
             this._thumbnailDockableWindow.ResumeLayout(false);
+            this._magnifierDockableWindow.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1810,5 +1852,8 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.ToolStripMenuItem _slideshowPlayToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _slideshowPauseToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _slideshowStopToolStripMenuItem;
+        private DockableWindow _magnifierDockableWindow;
+        private System.Windows.Forms.Panel _magnifierControl;
+        private Imaging.Forms.MagnifierWindowToolStripButton _magnifierToolStripButton;
     }
 }

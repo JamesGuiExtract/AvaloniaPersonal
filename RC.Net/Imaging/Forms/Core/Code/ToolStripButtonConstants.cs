@@ -1076,6 +1076,18 @@ namespace Extract.Imaging.Forms
         public const string _THUMBNAIL_VIEWER_BUTTON_TEXT =
             "Show/Hide thumbnails";
 
+        /// <summary>
+        /// Constant string for the thumbnail viewer button image.
+        /// </summary>
+        public const string _MAGNIFIER_WINDOW_BUTTON_IMAGE =
+            "Resources.MagnifierWindowButton.png";
+
+        /// <summary>
+        /// Constant string for the magnifier window button text.
+        /// </summary>
+        public const string _MAGNIFIER_WINDOW_BUTTON_TEXT =
+            "Show/Hide magnifier window";
+
         #endregion OtherToolStripButtons
     }
 }

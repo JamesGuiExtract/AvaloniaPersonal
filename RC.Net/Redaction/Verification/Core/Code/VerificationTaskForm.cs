@@ -1748,8 +1748,9 @@ namespace Extract.Redaction.Verification
                 // So that PreFilterMessage is called.
                 Application.AddMessageFilter(this);
 
-                // Set the dockable window that the thumbnail toolstrip button controls
+                // Set the dockable window that the thumbnail and magnifier toolstrip button control.
                 _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
+                _magnifierToolStripButton.DockableWindow = _magnifierDockableWindow;
 
                 // It is important that this line comes AFTER EstablishConnections, 
                 // because the page summary view needs to handle this event FIRST.
