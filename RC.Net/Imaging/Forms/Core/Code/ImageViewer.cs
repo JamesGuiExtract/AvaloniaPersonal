@@ -2190,11 +2190,18 @@ namespace Extract.Imaging.Forms
         /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
         protected override void OnMouseLeave(EventArgs e)
         {
-            base.OnMouseLeave(e);
+            try
+            {
+                base.OnMouseLeave(e);
 
-            // If the mouse has left the image viewer, remove all entries from 
-            // _layerObjectsUnderSelectionTool (and raise the SelectionToolLeftLayerObject for each)
-            UpdateLayerObjectsUnderSelectionTool(null);
+                // If the mouse has left the image viewer, remove all entries from 
+                // _layerObjectsUnderSelectionTool (and raise the SelectionToolLeftLayerObject for each)
+                UpdateLayerObjectsUnderSelectionTool(null);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31376", ex);
+            }
         }
 
         /// <summary>
@@ -2292,6 +2299,14 @@ namespace Extract.Imaging.Forms
             // under the selection tool.
             if (_layerObjectsUnderSelectionTool != null)
             {
+                // If not looking for any objects under the selection tool, simply remove all
+                // existing objects from _layerObjectsUnderSelectionTool
+                if (!lookForLayerObjectsUnderSelectionTool)
+                {
+                    removedLayerObjects.AddRange(_layerObjectsUnderSelectionTool);
+                    _layerObjectsUnderSelectionTool.Clear();
+                }
+
                 for (int i = 0; i < _layerObjectsUnderSelectionTool.Count; i++)
                 {
                     LayerObject layerObject = _layerObjectsUnderSelectionTool[i];
