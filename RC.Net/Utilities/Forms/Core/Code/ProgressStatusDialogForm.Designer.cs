@@ -81,6 +81,7 @@
             this.MinimizeBox = false;
             this.Name = "ProgressStatusDialogForm";
             this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Progress Status";
             this.ResumeLayout(false);
 

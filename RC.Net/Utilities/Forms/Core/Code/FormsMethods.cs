@@ -269,13 +269,31 @@ namespace Extract.Utilities.Forms
         {
             try
             {
+                CenterFormInRectangle(formToCenter, formToCenterIn.DesktopBounds);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI22220", ex);
+            }
+        }
+
+        /// <summary>
+        /// Centers the <paramref name="formToCenter"/> <see cref="Form"/>
+        /// in the <paramref name="rectangleToCenterIn"/> <see cref="Form"/>.
+        /// </summary>
+        /// <param name="formToCenter">The <see cref="Form"/> to be centered.</param>
+        /// <param name="rectangleToCenterIn">The <see cref="Rectangle"/> to be centered on.</param>
+        public static void CenterFormInRectangle(Form formToCenter, Rectangle rectangleToCenterIn)
+        {
+            try
+            {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23144",
                     _OBJECT_NAME);
 
                 // Get the location and size of the parent form
-                Point formToCenterInLocation = formToCenterIn.Location;
-                Size formToCenterInSize = formToCenterIn.Size;
+                Point formToCenterInLocation = rectangleToCenterIn.Location;
+                Size formToCenterInSize = rectangleToCenterIn.Size;
 
                 // Compute and set the location for this form
                 formToCenter.Location = new Point(
@@ -284,9 +302,10 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI22220", ex);
+                throw ExtractException.AsExtractException("ELI31383", ex);
             }
         }
+
         #endregion Methods
     }
 }

@@ -178,6 +178,7 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FAMDBHelperFunctions.cpp" />
     <ClCompile Include="DataEntryCustomComponents.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -211,6 +212,7 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FAMDBHelperFunctions.h" />
     <ClInclude Include="DataEntry_DB_SQL.h" />
     <ClInclude Include="DataEntryProductDBMgr.h" />
     <ClInclude Include="Resource.h" />

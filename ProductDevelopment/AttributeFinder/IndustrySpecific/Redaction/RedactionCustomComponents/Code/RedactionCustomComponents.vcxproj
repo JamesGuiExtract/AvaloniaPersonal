@@ -169,6 +169,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FAMDBHelperFunctions.cpp" />
     <ClCompile Include="FeedbackDlg.cpp" />
     <ClCompile Include="FilterIDShieldDataFileTask.cpp" />
     <ClCompile Include="FilterIDShieldDataFileTaskPP.cpp" />
@@ -272,6 +273,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FAMDBHelperFunctions.h" />
     <ClInclude Include="FeedbackDlg.h" />
     <ClInclude Include="FilterIDShieldDataFileTask.h" />
     <ClInclude Include="FilterIDShieldDataFileTaskPP.h" />

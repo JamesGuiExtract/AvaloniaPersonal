@@ -777,7 +777,10 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrSettingName, [in] BSTR bstrSettingValue, [in] VARIANT_BOOL vbSetIfExists);
 
 		// PROMISE: To return the value for the setting name from the DBInfo table
-		[id(38), helpstring("method GetDBInfoSetting")] HRESULT GetDBInfoSetting([in] BSTR bstrSettingName, [out, retval] BSTR* pbstrSettingValue);
+		// PARAMS:	vbThrowIfMissing- If VARIANT_TRUE, if the setting is missing an exception will be thrown.
+		//				If VARIANT_FALSE and the setting is missing, a blank value will be returned.
+		[id(38), helpstring("method GetDBInfoSetting")] HRESULT GetDBInfoSetting(
+			[in] BSTR bstrSettingName, [in] VARIANT_BOOL vbThrowIfMissing, [out, retval] BSTR* pbstrSettingValue);
 
 		// PROMISE: To lock the database 
 		// NOTE:	This method locks the mutex, adds lock record to the database and sends 
@@ -1082,6 +1085,10 @@ library UCLID_FILEPROCESSINGLib
 		//-----------------------------------------------------------------------------------------
 		[id(95), helpstring("method CloseAllDBConnections")] HRESULT CloseAllDBConnections();
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Updates the currently connected database to the latest schema.
+		[id(96), helpstring("method UpgradeToCurrentSchema")] HRESULT UpgradeToCurrentSchema(
+			[in] IProgressStatus* pProgressStatus);
+		//-----------------------------------------------------------------------------------------
 	};
 
 	[
@@ -1099,6 +1106,41 @@ library UCLID_FILEPROCESSINGLib
 
 		// PROMISE: To remove any relationships and tables that were added in a call to AddProductSpecificSchema
 		[id(2), helpstring("method RemoveProductSpecificSchema")] HRESULT RemoveProductSpecificSchema([in] IFileProcessingDB* pDB);
+
+		// PROMISE: Ensures the product database schema is up-to-date.
+		[id(3), helpstring("method ValidateSchema")] HRESULT ValidateSchema([in] IFileProcessingDB* pDB);
+
+		// PROMISE: Returns an IVariantVector of the names of all rows in the DBInfo table
+		// this product-specific database manages or has managed since FAM DB version 23.
+		[id(4), helpstring("method GetDBInfoRows")] HRESULT GetDBInfoRows([out, retval] IVariantVector** ppDBInfoRows);
+
+		// PROMISE: Returns an IVariantVector of the names of all database tables this
+		// product-specific database manages or has managed since FAM DB version 23.
+		[id(5), helpstring("method GetTables")] HRESULT GetTables([out, retval] IVariantVector** ppTables);
+
+		// PROMISE: Updates (or provides a relative time estimation for the product-specific database
+		//			for an update) on the specified connection to the latest version corresponding to
+		//			the specified FAM DB version.
+		// ARGS:	pDB - The database being acted upon.
+		//			pConnection - The database connection to use so that aborted updates can be
+		//				backed out by the caller.
+		//			nFAMDBSchemaVersion - The update should correspond to this FAM DB version.
+		//			pnProdSchemaVersion - The value passed in specifies the starting product-specific
+		//				DB version, the value passed back represents the updated version. If the value
+		//				passed in is 0, the current product-specific version will be used as the
+		//				starting point.
+		//			pnNumSteps - If a non-NULL pointer is passed in, rather than actually performing
+		//				the update, pnNumSteps will instead be assigned the number of progress steps
+		//				that should be assigned to the update. Suggested values for implementers are:
+		//				3 = An O(1) operation such as creating a new table.
+		//				10 = A relatively simple O(n) DB query to run relative to the number of files
+		//					in the database.
+		//			pProgressStatus - The progress status object to update during the operation (can
+		//				be NULL if not progress updates are needed.
+		[id(6), helpstring("method UpdateSchemaForFAMDBVersion")] HRESULT UpdateSchemaForFAMDBVersion(
+			[in] IFileProcessingDB* pDB, [in] _Connection* pConnection, [in] long nFAMDBSchemaVersion,
+			[in, out] long* pnProdSchemaVersion, [in, out] long* pnNumSteps,
+			[in] IProgressStatus* pProgressStatus);
 	};
 
 	[

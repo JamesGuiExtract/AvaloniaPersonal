@@ -196,8 +196,8 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		getFPMDB()->ResetDBConnection();
 
 		// Check whether or not FAM Session history should be recorded
-		m_bRecordFAMSessions =
-			asString(getFPMDB()->GetDBInfoSetting(gstrSTORE_FAM_SESSION_HISTORY.c_str())) == "1";
+		m_bRecordFAMSessions = asString(
+			getFPMDB()->GetDBInfoSetting(gstrSTORE_FAM_SESSION_HISTORY.c_str(), VARIANT_TRUE)) == "1";
 
 		// Set the number of files to process
 		m_recordMgr.setNumberOfFilesToProcess(m_nNumberOfFilesToExecute);
@@ -1376,7 +1376,7 @@ bool CFileProcessingManager::isUserAuthenticationRequired()
 {
 	// Check if authentication is required
 	bool bRequire = asString(getFPMDB()->GetDBInfoSetting(
-		gstrREQUIRE_AUTHENTICATION_BEFORE_RUN.c_str())) == "1";
+		gstrREQUIRE_AUTHENTICATION_BEFORE_RUN.c_str(), VARIANT_TRUE)) == "1";
 
 	if (bRequire)
 	{

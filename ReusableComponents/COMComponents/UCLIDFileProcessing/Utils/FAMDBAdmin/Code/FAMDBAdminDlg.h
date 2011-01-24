@@ -42,6 +42,7 @@ protected:
 	afx_msg void OnOK();
 	afx_msg void OnDatabaseClear();
 	afx_msg void OnDatabaseResetLock();
+	afx_msg void OnDatabaseUpdateSchema();
 	afx_msg void OnDatabaseChangePassword();
 	afx_msg void OnDatabaseLogout();
 	afx_msg void OnActionManuallySetActionStatus();
@@ -91,6 +92,18 @@ private:
 	// Category manager to check for registered category implementations
 	ICategoryManagerPtr m_ipCategoryManager;
 
+	// An IProgressStatus object with which to display schema update progress
+	IProgressStatusPtr m_ipSchemaUpdateProgressStatus;
+
+	// The IProgressStatusDialog for m_ipSchemaUpdateProgressStatus. 
+	IProgressStatusDialogPtr m_ipSchemaUpdateProgressStatusDialog;
+
+	// Indicates whether the most recently attempt schema update succeeded.
+	bool m_bSchemaUpdateSucceeded;
+
+	// Indicates wether the current database schema is known to be out-of-date.
+	bool m_bDBSchemaIsNotCurrent;
+
 	//////////
 	//Methods
 	/////////
@@ -124,4 +137,7 @@ private:
 
 	// Refreshes the statistics on a summary tab
 	void updateSummaryTab();
+
+	// Attempts to upgrade the current database to the latest schema.
+	static UINT upgradeToCurrentSchemaThread(LPVOID pParam);
 };

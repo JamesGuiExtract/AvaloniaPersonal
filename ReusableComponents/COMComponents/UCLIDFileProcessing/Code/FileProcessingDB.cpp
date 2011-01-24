@@ -106,7 +106,9 @@ m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
 m_nUPIID(0),
 m_bFAMRegistered(false),
-m_nActionStatisticsUpdateFreqInSeconds(5)
+m_nActionStatisticsUpdateFreqInSeconds(5),
+m_bValidatingOrUpdatingSchema(false),
+m_bProductSpecificDBSchemasAreValid(false)
 {
 	try
 	{
@@ -1103,7 +1105,8 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18936");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, BSTR* pbstrSettingValue)
+STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, VARIANT_BOOL vbThrowIfMissing,
+	BSTR* pbstrSettingValue)
 {
 	try
 	{
@@ -1111,12 +1114,12 @@ STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, BSTR* pbs
 
 		validateLicense();
 
-		if (!GetDBInfoSetting_Internal(false, bstrSettingName, pbstrSettingValue))
+		if (!GetDBInfoSetting_Internal(false, bstrSettingName, vbThrowIfMissing, pbstrSettingValue))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
-			GetDBInfoSetting_Internal(true, bstrSettingName, pbstrSettingValue);
+			GetDBInfoSetting_Internal(true, bstrSettingName, vbThrowIfMissing, pbstrSettingValue);
 		}
 		return S_OK;
 	}
@@ -2255,6 +2258,27 @@ STDMETHODIMP CFileProcessingDB::GetConnectionRetrySettings(long* pnNumberOfRetri
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29863");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::UpgradeToCurrentSchema(IProgressStatus *pProgressStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		IProgressStatusPtr ipProgressStatus(pProgressStatus);
+
+		if (!UpgradeToCurrentSchema_Internal(false, ipProgressStatus))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			UpgradeToCurrentSchema_Internal(true, ipProgressStatus);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31390");
 }
 
 //-------------------------------------------------------------------------------------------------

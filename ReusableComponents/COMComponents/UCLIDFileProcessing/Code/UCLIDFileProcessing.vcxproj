@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="ActionStatistics.cpp" />
     <ClCompile Include="DatabaseStatusIconUpdater.cpp" />
+    <ClCompile Include="FAMDBHelperFunctions.cpp" />
     <ClCompile Include="FAMDBUtils.cpp" />
     <ClCompile Include="FAMTagManager.cpp" />
     <ClCompile Include="FileProcessingDB.cpp" />
@@ -323,6 +324,7 @@
     <ClInclude Include="ActionStatistics.h" />
     <ClInclude Include="CommonConstants.h" />
     <ClInclude Include="DatabaseStatusIconUpdater.h" />
+    <ClInclude Include="FAMDBHelperFunctions.h" />
     <ClInclude Include="FAMDB_SQL.h" />
     <ClInclude Include="FAMDBUtils.h" />
     <ClInclude Include="FAMTagManager.h" />

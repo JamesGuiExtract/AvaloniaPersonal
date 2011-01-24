@@ -4,6 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "UCLIDFileProcessing.h"
+#include "FAMDBHelperFunctions.h"
 #include "FilePriorityHelper.h"
 #include "FP_UI_Notifications.h"
 #include "TransactionGuard.h"
@@ -140,7 +141,8 @@ public:
 	STDMETHOD(CreateNewDB)(BSTR bstrNewDBName);
 	STDMETHOD(ConnectLastUsedDBThisProcess)();
 	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue, VARIANT_BOOL vbSetIfExists);
-	STDMETHOD(GetDBInfoSetting)(BSTR bstrSettingName, BSTR* pbstrSettingValue);
+	STDMETHOD(GetDBInfoSetting)(BSTR bstrSettingName, VARIANT_BOOL vbThrowIfMissing,
+		BSTR* pbstrSettingValue);
 	STDMETHOD(LockDB)();
 	STDMETHOD(UnlockDB)();
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
@@ -203,6 +205,7 @@ public:
 	STDMETHOD(SetFileStatusToProcessing)(long nFileId, long nActionID);
 	STDMETHOD(GetConnectionRetrySettings)(long* pnNumberOfRetries, double* pdRetryTimeout);
 	STDMETHOD(CloseAllDBConnections)();
+	STDMETHOD(UpgradeToCurrentSchema)(IProgressStatus* pProgressStatus);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -253,6 +256,9 @@ private:
 
 	// Member variable that contains the last read schema version. 0 indicates no version
 	int m_iDBSchemaVersion;
+
+	// For the name of each product specific database component, its associated schema version.
+	bool m_bProductSpecificDBSchemasAreValid;
 
 	// This contains the UniqueProcess Identifier (UPI)
 	string m_strUPI;
@@ -344,6 +350,9 @@ private:
 	// if this is true pingDB updates the LastPingTime in ProcessingFAM record 
 	// and will log changes of the m_nUPIID
 	bool m_bFAMRegistered;
+
+	// Indicates whether the DB schema is currently being validated or upgraded.
+	volatile bool m_bValidatingOrUpdatingSchema;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods
@@ -471,10 +480,16 @@ private:
 	// PROMISE:	To Add all tables in the database
 	// NOTE:	If the operation is to be transactional the BeginTransaction should be done before calling
 	void addTables(bool bAddUserTables);
+
+	// PROMISE: Retrieves a vector of SQL queries that creates all the tables for the current DB schema.
+	vector<string> getTableCreationQueries(bool bIncludeUserTables);
 	
 	// PROMISE:	To set the initial values for QueueEventCode, ActionState and DBInfo
 	// NOTE:	If the operation is to be transactional the BeginTransaction should be done before calling
 	void initializeTableValues(bool bInitializeUserTables);
+
+	// PROMISE: Gets the default values for each of the DBInfo values managed by the FAM DB.
+	map<string, string> getDBInfoDefaultValues();
 
 	// PROMISE: To copy the status from the strFrom action to the strTo action
 	//			if bAddTransRecords is true records will be added to the transition table
@@ -639,7 +654,8 @@ private:
 	long getTagID(const _ConnectionPtr& ipConnection, string& rstrTagName);
 
 	// Internal function for getting DB info settings
-	string getDBInfoSetting(const _ConnectionPtr& ipConnection, const string& strSettingName);
+	string getDBInfoSetting(const _ConnectionPtr& ipConnection, const string& strSettingName,
+		bool bThrowIfMissing);
 
 	// Reverts file in the LockedFile table to the previous status if the current
 	// status is still processing.
@@ -717,6 +733,15 @@ private:
 	// ActionStatistics table
 	void updateActionStatisticsFromDelta(const _ConnectionPtr& ipConnection, const long nActionID);
 
+	// Returns a vector of the names of all DBInfo rows and tables in the database that are not
+	// managed by the FAM DB itself or by one of the installed product-specific DBs
+	vector<string> findUnrecognizedSchemaElements(const _ConnectionPtr& ipConnection);
+
+	// Runs the UpdateSchemaForFAMDBVersion function for each installed product-specific database.
+	void executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection, int nFAMSchemaVersion,
+		long *pnStepCount, IProgressStatusPtr ipProgressStatus,
+		map<string, long> &rmapProductSpecificVersions);
+
 	void validateLicense();
 
 	// Internal implementation methods
@@ -754,7 +779,8 @@ private:
 	bool GetActionID_Internal(bool bDBLocked, BSTR bstrActionName, long* pnActionID); 
 	bool SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, BSTR bstrSettingValue, 
 		VARIANT_BOOL vbSetIfExists);
-	bool GetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, BSTR* pbstrSettingValue);
+	bool GetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, VARIANT_BOOL vbThrowIfMissing,
+		BSTR* pbstrSettingValue);
 	bool GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery, _Recordset** ppVal);
 	bool GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, long *pnFileID);
 	bool GetActionName_Internal(bool bDBLocked, long nActionID, BSTR *pbstrActionName);
@@ -810,6 +836,7 @@ private:
 	bool GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BSTR bstrActionName,
 		IFileRecord** ppFileRecord);
 	bool SetFileStatusToProcessing_Internal(bool bDBLocked, long nFileId, long nActionID);
+	bool UpgradeToCurrentSchema_Internal(bool bDBLocked, IProgressStatusPtr ipProgressStatus);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

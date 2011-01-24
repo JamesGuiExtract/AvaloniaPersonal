@@ -9,12 +9,11 @@
 
 #include <vector>
 #include <string>
-
+#include <map>
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
-
 
 // CIDShieldProductDBMgr
 class ATL_NO_VTABLE CIDShieldProductDBMgr :
@@ -62,6 +61,12 @@ public:
 // IProductSpecificDBMgr Methods
 	STDMETHOD(raw_AddProductSpecificSchema)(IFileProcessingDB *pDB);
 	STDMETHOD(raw_RemoveProductSpecificSchema)(IFileProcessingDB *pDB);
+	STDMETHOD(raw_ValidateSchema)(IFileProcessingDB* pDB);
+	STDMETHOD(raw_GetDBInfoRows)(IVariantVector** ppDBInfoRows);
+	STDMETHOD(raw_GetTables)(IVariantVector** ppTables);
+	STDMETHOD(raw_UpdateSchemaForFAMDBVersion)(IFileProcessingDB* pDB,
+		_Connection* pConnection, long nFAMDBSchemaVersion, long* pnProdSchemaVersion,
+		long* pnNumSteps, IProgressStatus* pProgressStatus);
 
 // IIDShieldProductDBMgr Methods
 	STDMETHOD(AddIDShieldData)(long lFileID, VARIANT_BOOL vbVerified, double lDuration, 
@@ -100,7 +105,9 @@ private:
 	void getIDShieldTables(std::vector<std::string>& rvecTables);
 
 	// Throws an exception if the schema version in the database does not match current version
-	void validateIDShieldSchemaVersion();
+	// If bThrowIfMissing is true, an exception will be thrown if the version number is missing
+	// from the database; if false if the DB setting is missing, it will be considered valid.
+	void validateIDShieldSchemaVersion(bool bThrowIfMissing);
 
 	void validateLicense();
 
@@ -108,6 +115,13 @@ private:
 	bool AddIDShieldData_Internal(bool bDBLocked, long lFileID, VARIANT_BOOL vbVerified, double lDuration, 
 		long lNumHCDataFound, long lNumMCDataFound,	long lNumLCDataFound, long lNumCluesDataFound, 
 		long lTotalRedactions, long lTotalManualRedactions, long lNumPagesAutoAdvanced);
+
+	// Retrieves the set of SQL queries used to create the IDShield specific database tables.
+	const vector<string> getTableCreationQueries();
+
+	// Retrieves a map of each DBInfo value the IDShield specific DB component uses and its default
+	// value.
+	map<string, string> getDBInfoDefaultValues();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(IDShieldProductDBMgr), CIDShieldProductDBMgr)

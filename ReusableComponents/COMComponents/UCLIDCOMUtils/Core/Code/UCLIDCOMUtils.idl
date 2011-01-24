@@ -1359,8 +1359,6 @@ library UCLID_COMUTILSLib
 	{
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:	To instantiate and show a modeless version of the progress status dialog.
-		// REQUIRE: pProgressStatus != NULL && pProgressStatus points to a valid progress status
-		//			object.
 		// PROMISE:	To bring up a modeless version of the progress status dialog box and update
 		//			the progress status at the specified refresh rate. The handle of the 
 		//			progress status dialog window is returned, which the caller can use with 
@@ -1441,6 +1439,45 @@ library UCLID_COMUTILSLib
 		//			Subsequent calls to ShowModelessDialog() will re-show the hidden window.
 		[id(4), helpstring("method Close")] HRESULT Close();
 		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To instantiate and show a modal version of the progress status dialog that will
+		//			block on the calling thread until closed.
+		// PROMISE:	To bring up a modal version of the progress status dialog box and update
+		//			the progress status at the specified refresh rate.
+		// NOTES:	All subsequent calls to ShowModelessDialog() or ShowModalDialog will merely
+		//			re-show the window that became hidden the last time it was closed. If
+		//			ShowModalDialog is called when the dialog is already open, and exception will
+		//			result.
+		// ARGUMENTS:
+		//			hWndParent - the window handle to the window that should be treated as the
+		//				parent for the progress status dialog. If there is no parent window, pass
+		//				NULL for this parameter.
+		//			strWindowTitle - the caption for the progress status dialog.  This parameter
+		//				is used to set the Title property (see documentation of the Title property).
+		//			pProgressStatus - the top level progress status object whose progress 
+		//				information and sub-progress information (depending upon nNumProgressLevels)
+		//				is to be displayed in the progress status dialog.  This parameter is used
+		//				to set the ProgressStatusObject property (see documentation of that property).
+		//			nNumProgressLevels - the number of levels of progress status objects to 
+		//				graphically display in the progress status dialog.  The progress status 
+		//				dialog will display N levels of progress status at any given time where
+		//				N = min(nNumProgressLevels, X) where X is the total depth of the 
+		//				progress status objects represented by pProgressStatus.  This argument
+		//				therefore affects the height of the progress status dialog.
+		//			nDelayBetweenRefreshes - the delay, in milliseconds, between updates of the 
+		//				progress status information in the progress status dialog.
+		//			bShowCloseButton - if set to VARIANT_TRUE, the close button will be shown, 
+		//				thereby allowing the user to close the window.
+		//			hStopEvent - If non-NULL a stop button is displayed on the progress dialog.
+		//				In the event the stop button is pressed, the hStopEvent will be signaled
+		//				to notify the caller.  The progress dialog will remain displayed with 
+		//				"Stopping..." as the progress message until it is closed by the caller.
+		// REQUIRE:	
+		// PROMISE:	
+		[id(5), helpstring("method ShowModalDialog")] HRESULT ShowModalDialog(
+			[in] HANDLE hWndParent, [in] BSTR strWindowTitle, [in] IProgressStatus *pProgressStatus, 
+			[in] long nNumProgressLevels, [in] long nDelayBetweenRefreshes, 
+			[in] VARIANT_BOOL bShowCloseButton, [in] HANDLE hStopEvent, 
+			[out, retval] long *phWndProgressStatusDialog);
 	};
 
 	[

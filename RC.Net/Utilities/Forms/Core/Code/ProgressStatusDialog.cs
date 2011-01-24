@@ -1,8 +1,8 @@
-﻿using Extract.Interop;
-using Extract.Licensing;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using Extract.Interop;
+using Extract.Licensing;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 
@@ -145,6 +145,50 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI30345",
+                    "Failed to show progress dialog.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Displays the <see cref="ProgressStatusDialogForm"/> as a modeless dialog
+        /// box.
+        /// </summary>
+        /// <param name="hWndParent">The parent window for the dialog.</param>
+        /// <param name="strWindowTitle">The title to display in the progress dialog.</param>
+        /// <param name="pProgressStatus">The progress status object to use to update the
+        /// progress bars.</param>
+        /// <param name="nNumProgressLevels">The number of levels of progress to display.</param>
+        /// <param name="nDelayBetweenRefreshes">The amount of delay between refreshes of the
+        /// progress information.</param>
+        /// <param name="bShowCloseButton">Whether the close button should be displayed or not.</param>
+        /// <param name="hStopEvent">The event handle to signal when the stop button is pressed.
+        /// If <paramref name="hStopEvent"/> is <see cref="IntPtr.Zero"/> then no stop
+        /// button will be displayed.</param>
+        /// <returns>The Hresult for the call.</returns>
+        [CLSCompliant(false)]
+        public int ShowModalDialog(IntPtr hWndParent, string strWindowTitle,
+            ProgressStatus pProgressStatus, int nNumProgressLevels, int nDelayBetweenRefreshes,
+            bool bShowCloseButton, IntPtr hStopEvent)
+        {
+            try
+            {
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI31407", _OBJECT_NAME);
+
+                if (_statusForm == null)
+                {
+                    _statusForm = new ProgressStatusDialogForm(nNumProgressLevels,
+                        nDelayBetweenRefreshes, bShowCloseButton, hStopEvent);
+                }
+
+                _statusForm.UpdateTitle(strWindowTitle);
+                _statusForm.ProgressStatus = pProgressStatus;
+
+                return (int)_statusForm.ShowDialog(new WindowWrapper(hWndParent));
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI31408",
                     "Failed to show progress dialog.", ex);
             }
         }

@@ -13,6 +13,7 @@
 #include <FAMUtilsConstants.h>
 #include <TransactionGuard.h>
 #include <ADOUtils.h>
+#include <FAMDBHelperFunctions.h>
 
 using namespace ADODB;
 using namespace std;
@@ -22,6 +23,8 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 
 // This must be updated when the DB schema changes
+// !!!ATTENTION!!!
+// An UpdateToSchemaVersion method must be added when checking in a new schema version.
 static const long glDATAENTRY_DB_SCHEMA_VERSION = 2;
 static const string gstrDATA_ENTRY_SCHEMA_VERSION_NAME = "DataEntrySchemaVersion";
 static const string gstrSTORE_DATAENTRY_PROCESSING_HISTORY = "StoreDataEntryProcessingHistory";
@@ -163,22 +166,18 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 
 		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
 
-		// Create the vector of Queries to execute
-		vector<string> vecCreateQueries;
+		// Retrieve the queries for creating DataEntry DB table(s).
+		const vector<string> vecTableCreationQueries = getTableCreationQueries();
+		vector<string> vecCreateQueries(vecTableCreationQueries.begin(), vecTableCreationQueries.end());
 
-		vecCreateQueries.push_back(gstrCREATE_DATAENTRY_DATA);
+		// Add the queries to create keys/constraints.
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_FAMFILE);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_FAMUSER);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_ACTION);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_MACHINE);
 		vecCreateQueries.push_back(gstrCREATE_FILEID_DATETIMESTAMP_INDEX);
-
-		vecCreateQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_DEFINITION);
-
 		vecCreateQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_TYPE);
 		vecCreateQueries.push_back(gstrPOPULATE_DATAENTRY_COUNTER_TYPES);
-
-		vecCreateQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_VALUE);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_INSTANCE);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_ID);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_TYPE);
@@ -186,18 +185,19 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 		// Execute the queries to create the data entry table
 		executeVectorOfSQL(ipDBConnection, vecCreateQueries);
 
-		// Set the schema version
-		ipDB->SetDBInfoSetting(gstrDATA_ENTRY_SCHEMA_VERSION_NAME.c_str(), 
-			asString(glDATAENTRY_DB_SCHEMA_VERSION).c_str(), VARIANT_TRUE);
+		// Set the default values for the DBInfo settings.
+		map<string, string> mapDBInfoDefaultValues = getDBInfoDefaultValues();
+		for (map<string, string>::iterator iterDBInfoValues = mapDBInfoDefaultValues.begin();
+			iterDBInfoValues != mapDBInfoDefaultValues.end();
+			iterDBInfoValues++)
+		{
+			VARIANT_BOOL vbSetIfExists =
+				asVariantBool(iterDBInfoValues->first == gstrDATA_ENTRY_SCHEMA_VERSION_NAME);
 
-		// Set the default
-		ipDB->SetDBInfoSetting(gstrSTORE_DATAENTRY_PROCESSING_HISTORY.c_str(), 
-			gstrSTORE_HISTORY_DEFAULT_SETTING.c_str(), VARIANT_FALSE);
+			ipDB->SetDBInfoSetting(iterDBInfoValues->first.c_str(),
+				iterDBInfoValues->second.c_str(), vbSetIfExists);
+		}
 
-		// Set data entry counters
-		ipDB->SetDBInfoSetting(gstrENABLE_DATA_ENTRY_COUNTERS.c_str(), 
-			gstrENABLE_DATA_ENTRY_COUNTERS_DEFAULT_SETTING.c_str(), VARIANT_FALSE);
-	
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28992");
@@ -233,6 +233,131 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProces
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28995");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDataEntryProductDBMgr::raw_ValidateSchema(IFileProcessingDB* pDB)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		// Update the FAMDB pointer if it is new.
+		if (m_ipFAMDB != pDB)
+		{
+			m_ipFAMDB = pDB;
+			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
+		
+			// Reset the database connection
+			m_ipDBConnection = NULL;
+		}
+
+		validateDataEntrySchemaVersion(false);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31423");
+}
+//-------------------------------------------------------------------------------------------------
+// WARNING: If any DBInfo row is removed, this code needs to be modified so that it does not treat
+// the removed element(s) on and old schema versions as unrecognized.
+STDMETHODIMP CDataEntryProductDBMgr::raw_GetDBInfoRows(IVariantVector** ppDBInfoRows)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		IVariantVectorPtr ipDBInfoRows(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI31424", ipDBInfoRows != NULL);
+
+		map<string, string> mapDBInfoValues = getDBInfoDefaultValues();
+		for (map<string, string>::iterator iterDBInfoValues = mapDBInfoValues.begin();
+			 iterDBInfoValues != mapDBInfoValues.end();
+			 iterDBInfoValues++)
+		{
+			ipDBInfoRows->PushBack(iterDBInfoValues->first.c_str());
+		}
+
+		*ppDBInfoRows = ipDBInfoRows.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31425");
+}
+//-------------------------------------------------------------------------------------------------
+// WARNING: If any table is removed, this code needs to be modified so that it does not treat the
+// removed element(s) on and old schema versions as unrecognized.
+STDMETHODIMP CDataEntryProductDBMgr::raw_GetTables(IVariantVector** ppTables)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		IVariantVectorPtr ipTables(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI31426", ipTables != NULL);
+
+		const vector<string> vecTableCreationQueries = getTableCreationQueries();
+		vector<string> vecTablesNames = getTableNamesFromCreationQueries(vecTableCreationQueries);
+		for (vector<string>::iterator iter = vecTablesNames.begin();
+			 iter != vecTablesNames.end();
+			 iter++)
+		{
+			ipTables->PushBack(iter->c_str());
+		}
+
+		*ppTables = ipTables.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31427");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessingDB* pDB,
+	_Connection* pConnection, long nFAMDBSchemaVersion, long* pnProdSchemaVersion, long* pnNumSteps,
+	IProgressStatus* pProgressStatus)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		IFileProcessingDBPtr ipDB(pDB);
+		ASSERT_ARGUMENT("ELI31428", ipDB != NULL);
+
+		_ConnectionPtr ipConnection(pConnection);
+		ASSERT_ARGUMENT("ELI31429", ipConnection != NULL);
+
+		ASSERT_ARGUMENT("ELI31430", pnProdSchemaVersion != NULL);
+
+		if (*pnProdSchemaVersion == 0)
+		{
+			string strVersion = asString(
+				ipDB->GetDBInfoSetting(gstrDATA_ENTRY_SCHEMA_VERSION_NAME.c_str(), VARIANT_FALSE));
+			
+			// If the DataEntry specific components are missing, there is nothing to do.
+			if (strVersion.empty())
+			{
+				return S_OK;
+			}
+
+			*pnProdSchemaVersion = asLong(strVersion);
+		}
+
+		switch (*pnProdSchemaVersion)
+		{
+			case 2: break;
+
+			default:
+				{
+					UCLIDException ue("ELI31431",
+						"Automatic updates are not supported for the current schema.");
+					ue.addDebugInfo("FAM Schema Version", nFAMDBSchemaVersion, false);
+					ue.addDebugInfo("ID Shield Schema Version", *pnProdSchemaVersion, false);
+					throw ue;
+				}
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31432");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -336,14 +461,15 @@ ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection()
 			m_ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified);
 
 			// Get the command timeout from the FAMDB DBInfo table
-			string strValue = asString(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str()));
+			string strValue = asString(
+				m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
 
 			// Set the command timeout
 			m_ipDBConnection->CommandTimeout = asLong(strValue);
 
 			// Get the setting for storing Data Entry processing history
 			strValue = asString(m_ipFAMDB->GetDBInfoSetting(
-				gstrSTORE_DATAENTRY_PROCESSING_HISTORY.c_str()));
+				gstrSTORE_DATAENTRY_PROCESSING_HISTORY.c_str(), VARIANT_TRUE));
 
 			// Set the local setting for storing history
 			m_bStoreDataEntryProcessingHistory = strValue == asString(TRUE);
@@ -368,20 +494,24 @@ void CDataEntryProductDBMgr::getDataEntryTables(vector<string>& rvecTables)
 	rvecTables.push_back(gstrDATAENTRY_DATA_COUNTER_VALUE);
 }
 //-------------------------------------------------------------------------------------------------
-void CDataEntryProductDBMgr::validateDataEntrySchemaVersion()
+void CDataEntryProductDBMgr::validateDataEntrySchemaVersion(bool bThrowIfMissing)
 {
 	ASSERT_RESOURCE_ALLOCATION("ELI29005", m_ipFAMDB != NULL);
 
 	// Get the Version from the FAMDB DBInfo table
-	string strValue = asString(m_ipFAMDB->GetDBInfoSetting(gstrDATA_ENTRY_SCHEMA_VERSION_NAME.c_str()));
+	string strValue = asString(m_ipFAMDB->GetDBInfoSetting(
+		gstrDATA_ENTRY_SCHEMA_VERSION_NAME.c_str(), asVariantBool(bThrowIfMissing)));
 
-	// Check against expected version
-	if (asLong(strValue) != glDATAENTRY_DB_SCHEMA_VERSION)
+	if (bThrowIfMissing || !strValue.empty())
 	{
-		UCLIDException ue("ELI29006", "Data Entry database schema is not current version!");
-		ue.addDebugInfo("Expected", glDATAENTRY_DB_SCHEMA_VERSION);
-		ue.addDebugInfo("Database Version", strValue);
-		throw ue;
+		// Check against expected version
+		if (asLong(strValue) != glDATAENTRY_DB_SCHEMA_VERSION)
+		{
+			UCLIDException ue("ELI29006", "Data Entry database schema is not current version!");
+			ue.addDebugInfo("Expected", glDATAENTRY_DB_SCHEMA_VERSION);
+			ue.addDebugInfo("Database Version", strValue);
+			throw ue;
+		}
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -389,7 +519,8 @@ bool CDataEntryProductDBMgr::areCountersEnabled()
 {
 	try
 	{
-		string strValue = asString(m_ipFAMDB->GetDBInfoSetting(gstrENABLE_DATA_ENTRY_COUNTERS.c_str()));
+		string strValue = asString(
+			m_ipFAMDB->GetDBInfoSetting(gstrENABLE_DATA_ENTRY_COUNTERS.c_str(), VARIANT_TRUE));
 		return strValue == "1";
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29059");
@@ -425,7 +556,7 @@ bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFil
 			ASSERT_ARGUMENT("ELI29051", plInstanceID != NULL);
 
 			// Validate data entry schema
-			validateDataEntrySchemaVersion();
+			validateDataEntrySchemaVersion(true);
 
 			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
 			_ConnectionPtr ipConnection = NULL;
@@ -551,7 +682,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 			}
 
 			// Validate data entry schema
-			validateDataEntrySchemaVersion();
+			validateDataEntrySchemaVersion(true);
 
 			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
 			_ConnectionPtr ipConnection = NULL;
@@ -639,3 +770,32 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 	}
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
+const vector<string> CDataEntryProductDBMgr::getTableCreationQueries()
+{
+	vector<string> vecQueries;
+
+	// WARNING: If any table is removed, code needs to be modified so that
+	// findUnrecognizedSchemaElements does not treat the element on old schema versions as
+	// unrecognized.
+	vecQueries.push_back(gstrCREATE_DATAENTRY_DATA);
+	vecQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_DEFINITION);
+	vecQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_TYPE);
+	vecQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_VALUE);
+
+	return vecQueries;
+}
+//-------------------------------------------------------------------------------------------------
+map<string, string> CDataEntryProductDBMgr::getDBInfoDefaultValues()
+{
+	map<string, string> mapDefaultValues;
+
+	// WARNING: If any DBInfo row is removed, code needs to be modified so that
+	// findUnrecognizedSchemaElements does not treat the element on old schema versions as
+	// unrecognized.
+	mapDefaultValues[gstrDATA_ENTRY_SCHEMA_VERSION_NAME] = asString(glDATAENTRY_DB_SCHEMA_VERSION);
+	mapDefaultValues[gstrSTORE_DATAENTRY_PROCESSING_HISTORY] = gstrSTORE_HISTORY_DEFAULT_SETTING;
+	mapDefaultValues[gstrENABLE_DATA_ENTRY_COUNTERS] = gstrENABLE_DATA_ENTRY_COUNTERS_DEFAULT_SETTING;
+
+	return mapDefaultValues;
+}//-------------------------------------------------------------------------------------------------

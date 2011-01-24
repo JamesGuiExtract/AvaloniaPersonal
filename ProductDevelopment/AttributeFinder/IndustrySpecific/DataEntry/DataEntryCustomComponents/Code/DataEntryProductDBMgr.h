@@ -60,6 +60,12 @@ public:
 // IProductSpecificDBMgr Methods
 	STDMETHOD(raw_AddProductSpecificSchema)(IFileProcessingDB *pDB);
 	STDMETHOD(raw_RemoveProductSpecificSchema)(IFileProcessingDB *pDB);
+	STDMETHOD(raw_ValidateSchema)(IFileProcessingDB* pDB);
+	STDMETHOD(raw_GetDBInfoRows)(IVariantVector** ppDBInfoRows);
+	STDMETHOD(raw_GetTables)(IVariantVector** ppTables);
+	STDMETHOD(raw_UpdateSchemaForFAMDBVersion)(IFileProcessingDB* pDB, _Connection* pConnection,
+		long nFAMDBSchemaVersion, long* pnProdSchemaVersion, long* pnNumSteps,
+		IProgressStatus* pProgressStatus);
 
 // IDataEntryProductDBMgr Methods
 	STDMETHOD(AddDataEntryData)(long lFileID, long nActionID, double lDuration, long* plInstanceID);
@@ -111,7 +117,9 @@ private:
 	void getDataEntryTables(std::vector<std::string>& rvecTables);
 
 	// Throws an exception if the schema version in the database does not match current version
-	void validateDataEntrySchemaVersion();
+	// If bThrowIfMissing is true, an exception will be thrown if the version number is missing
+	// from the database; if false if the DB setting is missing, it will be considered valid.
+	void validateDataEntrySchemaVersion(bool bThrowIfMissing);
 
 	// Method to check whether data entry counters are enabled in the database
 	bool areCountersEnabled();
@@ -128,6 +136,13 @@ private:
 		double lDuration, long* plInstanceID);
 	bool RecordCounterValues_Internal(bool bDBLocked, long* plInstanceToken,
 		long lDataEntryDataInstanceID, IIUnknownVector* pAttributes);
+
+	// Retrieves the set of SQL queries used to create the DataEntry specific database tables.
+	const vector<string> getTableCreationQueries();
+
+	// Retrieves a map of each DBInfo value the DataEntry specific DB component uses and its default
+	// value.
+	map<string, string> getDBInfoDefaultValues();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(DataEntryProductDBMgr), CDataEntryProductDBMgr)

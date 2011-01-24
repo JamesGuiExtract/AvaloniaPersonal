@@ -46,6 +46,10 @@ m_ipFAMDB(ipFAMDB),
 m_bIsDBGood(false),
 m_ipMiscUtils(NULL),
 m_ipCategoryManager(NULL),
+m_ipSchemaUpdateProgressStatus(NULL),
+m_ipSchemaUpdateProgressStatusDialog(NULL),
+m_bSchemaUpdateSucceeded(false),
+m_bDBSchemaIsNotCurrent(false),
 m_bInitialized(false)
 {
 	try
@@ -93,6 +97,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_DATABASE_EXIT, &CFAMDBAdminDlg::OnExit)
 	ON_COMMAND(ID_DATABASE_CLEAR, &CFAMDBAdminDlg::OnDatabaseClear)
 	ON_COMMAND(ID_DATABASE_RESETLOCK, &CFAMDBAdminDlg::OnDatabaseResetLock)
+	ON_COMMAND(ID_DATABASE_UPDATE_SCHEMA, &CFAMDBAdminDlg::OnDatabaseUpdateSchema)
 	ON_COMMAND(ID_DATABASE_CHANGEPASSWORD, &CFAMDBAdminDlg::OnDatabaseChangePassword)
 	ON_COMMAND(ID_DATABASE_LOGOUT, &CFAMDBAdminDlg::OnDatabaseLogout)
 	ON_COMMAND(ID_TOOLS_MANUALLYSETACTIONSTATUS, &CFAMDBAdminDlg::OnActionManuallySetActionStatus)
@@ -156,6 +161,24 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 
 		// Set the Server and DB names
 		m_propDatabasePage.setServerAndDBName(strServer, strDatabase);
+
+		// If the DB is not connected and valid, if it is because the schema is out of date, prompt
+		// to updgrade now.
+		if (!m_bIsDBGood)
+		{
+			string strCurDBStatus = asString(m_ipFAMDB->GetCurrentConnectionStatus());
+			if (strCurDBStatus == gstrWRONG_SCHEMA)
+			{
+				int iResult = MessageBox("This database was created with a different version of "
+					"the software.\r\n\r\nDo you wish to update the database to be compatible with "
+					"the current software version?", "Update Datatabase Schema?",
+					MB_YESNO);
+				if (iResult == IDYES)
+				{
+					OnDatabaseUpdateSchema();
+				}
+			}
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14870");
 
@@ -274,6 +297,7 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 
 		// Set the database is good flag to false
 		m_bIsDBGood = false;
+		m_bDBSchemaIsNotCurrent = false;
 		try
 		{
 			// Clear the database
@@ -281,6 +305,13 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 		}
 		catch (...)
 		{
+			// Determine if the reason the clear failed is because the schema is out-of-date.
+			string strCurDBStatus = asString(m_ipFAMDB->GetCurrentConnectionStatus());
+			if (strCurDBStatus == gstrWRONG_SCHEMA)
+			{
+				m_bDBSchemaIsNotCurrent = true;
+			}
+
 			// Enable menus
 			enableMenus();
 
@@ -339,6 +370,68 @@ void CFAMDBAdminDlg::OnDatabaseResetLock()
 		MessageBox("Current database lock has been reset.", "Success", MB_ICONINFORMATION);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14862");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		try
+		{
+			// Until it succeeds, the update has failed.
+			m_bSchemaUpdateSucceeded = false;
+
+			// Initialize the progress status.
+			m_ipSchemaUpdateProgressStatusDialog.CreateInstance(
+				"Extract.Utilties.Forms.ProgressStatusDialog");
+			ASSERT_RESOURCE_ALLOCATION("ELI31385", m_ipSchemaUpdateProgressStatusDialog != NULL);
+
+			m_ipSchemaUpdateProgressStatus.CreateInstance(CLSID_ProgressStatus);
+			ASSERT_RESOURCE_ALLOCATION("ELI31386", m_ipSchemaUpdateProgressStatus != NULL);
+
+			// Start background thread to perform the upgrade
+			AfxBeginThread(upgradeToCurrentSchemaThread, this);
+
+			// Show a modal progress status dialog that cannot be closed by the user. The background
+			// thread will close the dialog once the udpate has completed (whether successfully or not).
+			m_ipSchemaUpdateProgressStatusDialog->ShowModalDialog(m_hWnd, "Schema Update",
+				m_ipSchemaUpdateProgressStatus, 2, 100, VARIANT_FALSE, NULL);
+
+			if (m_bSchemaUpdateSucceeded)
+			{
+				OnDBConfigChanged(asString(m_ipFAMDB->DatabaseServer), asString(m_ipFAMDB->DatabaseName));
+
+				// Set the database status
+				setUIDatabaseStatus();
+
+				MessageBox("Database schema has been updated.", "Success", MB_ICONINFORMATION);
+
+				// Update menu & summary info
+				enableMenus();
+				updateSummaryTab();
+			}
+			else
+			{
+				MessageBox("Failed to update database schema.", "Failure", MB_ICONINFORMATION);
+			}
+		}
+		CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31388");
+
+		if (m_ipSchemaUpdateProgressStatusDialog != NULL)
+		{
+			m_ipSchemaUpdateProgressStatusDialog.Release();
+			m_ipSchemaUpdateProgressStatusDialog = NULL;
+		}
+
+		if (m_ipSchemaUpdateProgressStatus != NULL)
+		{
+			m_ipSchemaUpdateProgressStatus.Release();
+			m_ipSchemaUpdateProgressStatus = NULL;
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14864");
 }
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnDatabaseChangePassword()
@@ -701,6 +794,7 @@ void CFAMDBAdminDlg::OnDBConfigChanged(const std::string& strServer, const std::
 	{
 		// Preset the DB good flag to false
 		m_bIsDBGood = false;
+		m_bDBSchemaIsNotCurrent = false;
 
 		// Set the server and database
 		m_ipFAMDB->DatabaseServer = strServer.c_str();
@@ -713,7 +807,17 @@ void CFAMDBAdminDlg::OnDBConfigChanged(const std::string& strServer, const std::
 		m_bIsDBGood = true;
 	}
 	// Log exceptions so exception dialog doesn't come up before the FAMDBAdminDlg
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18173"); 
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18173");
+
+	if (!m_bIsDBGood)
+	{
+		// Determine if the reason the reset failed is because the schema is out-of-date.
+		string strCurDBStatus = asString(m_ipFAMDB->GetCurrentConnectionStatus());
+		if (strCurDBStatus == gstrWRONG_SCHEMA)
+		{
+			m_bDBSchemaIsNotCurrent = true;
+		}
+	}
 
 	// Get and set the status on the Database page
 	setUIDatabaseStatus();
@@ -753,6 +857,7 @@ void CFAMDBAdminDlg::enableMenus()
 
 	// Only enable other menu items if the db connection is good
 	pMenu->EnableMenuItem(ID_DATABASE_RESETLOCK, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_DATABASE_UPDATE_SCHEMA, m_bDBSchemaIsNotCurrent ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_DATABASE_CHANGEPASSWORD, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_TAGS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_COUNTERS, m_bIsDBGood ? nEnable : nDisable);
@@ -871,5 +976,44 @@ void CFAMDBAdminDlg::updateSummaryTab()
 	{
 		m_propSummaryPage.populatePage();
 	}
+}
+//--------------------------------------------------------------------------------------------------
+UINT CFAMDBAdminDlg::upgradeToCurrentSchemaThread(LPVOID pParam)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI31384", pParam != NULL);
+		CFAMDBAdminDlg *pFAMDBAdminDlg = (CFAMDBAdminDlg *)pParam;
+
+		ASSERT_ARGUMENT("ELI31448", pFAMDBAdminDlg->m_ipFAMDB != NULL);
+		
+		try
+		{
+			try
+			{
+				// Perform the schema update.
+				pFAMDBAdminDlg->m_ipFAMDB->UpgradeToCurrentSchema(
+					pFAMDBAdminDlg->m_ipSchemaUpdateProgressStatus);
+
+				// If we got here, the upgrade succeeded
+				pFAMDBAdminDlg->m_bSchemaUpdateSucceeded = true;		
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31389")
+		}
+		catch (UCLIDException &ue)
+		{
+			ue.display();
+		}
+
+		// Ensure the progress status had a chance to be displayed before attempting to close it.
+		Sleep(200);
+		emptyWindowsMessageQueue();
+			
+		// Close the progress status dialog so the UI thread can continue.
+		pFAMDBAdminDlg->m_ipSchemaUpdateProgressStatusDialog->Close();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31387");
+
+	return 0;
 }
 //--------------------------------------------------------------------------------------------------

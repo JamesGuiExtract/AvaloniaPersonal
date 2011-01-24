@@ -489,8 +489,8 @@ static const string gstrDELETE_OLD_INPUT_EVENT_RECORDS =
 	"(SELECT CAST([Value] AS int) FROM [DBInfo] WHERE [Name] = '"
 	+ gstrINPUT_EVENT_HISTORY_SIZE + "'), 30))";
 
-// Query to use to calclulate and insert a new ActionStatistics records for the ActionID = <ActionIDToRecreate>
-// the <ActionIDToRecreate> needs to be replaced with the action id to recreate.
+// Query to use to calclulate and insert new ActionStatistics records for the ActionIDs when the id
+// to recreate is determined by the <ActionIDWhereClause> which needs to be substituted in.
 // NOTE: This query will throw and exception if the ActionStatistics record for that action id 
 //		 already exists.
 static const string gstrRECREATE_ACTION_STATISTICS_FOR_ACTION = 
@@ -550,7 +550,7 @@ static const string gstrRECREATE_ACTION_STATISTICS_FOR_ACTION =
 	"WHERE     (ActionStatistics.ActionID IS NULL)  "
 	"GROUP BY Action.ID, FileActionStatus.ActionStatus, ActionStatistics.ActionID) as totals "
 	"GROUP BY ActionID) as NewStats "
-	"where ActionID = <ActionIDToRecreate> ";
+	"<ActionIDWhereClause> ";
 
 // Query to use to update the ActionStatistics table from the ActionStatisticsDelta table
 // There are to variables that need to be replaced:

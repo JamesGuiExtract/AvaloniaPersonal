@@ -210,8 +210,8 @@ namespace Extract.FileActionManager.Forms
                 }
 
                 // Check whether event tracking is enabled
-                _trackEvents = _database.GetDBInfoSetting("EnableInputEventTracking").Equals("1",
-                    StringComparison.OrdinalIgnoreCase);
+                _trackEvents = _database.GetDBInfoSetting("EnableInputEventTracking", true)
+                    .Equals("1", StringComparison.OrdinalIgnoreCase);
 
                 if (_trackEvents)
                 {

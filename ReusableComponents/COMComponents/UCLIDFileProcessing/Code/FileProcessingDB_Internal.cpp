@@ -4,6 +4,7 @@
 #include "FileProcessingDB.h"
 #include "FAMDB_SQL.h"
 #include "FPCategories.h"
+#include "FAMDBHelperFunctions.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -17,6 +18,7 @@
 #include <StopWatch.h>
 #include <StringTokenizer.h>
 #include <stringCSIS.h>
+#include <ValueRestorer.h>
 
 #include <string>
 #include <memory>
@@ -30,6 +32,8 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
+// !!!ATTENTION!!!
+// An UpdateToSchemaVersion method must be added when checking in a new schema version.
 const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 102;
 
 // Define four UCLID passwords used for encrypting the password
@@ -901,21 +905,21 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 {
 	// Get the name of the action for the ID
 	string strActionName = getActionName(ipConnection, nActionID);	
-	string strActionID = asString(nActionID);
+	string strWhere = "WHERE ActionID = " + asString(nActionID);
 
 	// Delete existing stats for action
-	string strDeleteExistingStatsSQL = "DELETE FROM ActionStatistics WHERE ActionID = " + strActionID;
+	string strDeleteExistingStatsSQL = "DELETE FROM ActionStatistics " + strWhere;
 	executeCmdQuery(ipConnection, strDeleteExistingStatsSQL);
 
 	// Set up the query to recreate the statistics
 	string strCreateActionStatsSQL = gstrRECREATE_ACTION_STATISTICS_FOR_ACTION;
-	replaceVariable(strCreateActionStatsSQL, "<ActionIDToRecreate>", strActionID);
+	replaceVariable(strCreateActionStatsSQL, "<ActionIDWhereClause>", strWhere);
 
 	// Recreate the statistics
 	executeCmdQuery(ipConnection, strCreateActionStatsSQL);
 
 	// need to delete the records in the delta since they have been included in the total
-	executeCmdQuery(ipConnection, "DELETE FROM ActionStatisticsDelta WHERE ActionID = " + strActionID);
+	executeCmdQuery(ipConnection, "DELETE FROM ActionStatisticsDelta " + strWhere);
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::dropTables(bool bRetainUserTables)
@@ -948,55 +952,33 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 {
 	try
 	{
-		vector<string> vecQueries;
-
-		// Add the user tables if necessary
-		if (bAddUserTables)
-		{
-			vecQueries.push_back(gstrCREATE_DB_INFO_TABLE);
-			vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
-			vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE);
-			vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX);
-		}
-
-		// Add queries to create tables to the vector
-		vecQueries.push_back(gstrCREATE_ACTION_TABLE);
-		vecQueries.push_back(gstrCREATE_LOCK_TABLE);
-		vecQueries.push_back(gstrCREATE_ACTION_STATE_TABLE);
-		vecQueries.push_back(gstrCREATE_FAM_FILE_TABLE);
-		vecQueries.push_back(gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX);
-		vecQueries.push_back(gstrCREATE_FAM_FILE_INDEX);
-		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_CODE_TABLE);
-		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_TABLE);
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE);
-		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_TABLE);
-		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
-		vecQueries.push_back(gstrCREATE_MACHINE_TABLE);
-		vecQueries.push_back(gstrCREATE_FAM_USER_TABLE);
-		vecQueries.push_back(gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE);
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
-		vecQueries.push_back(gstrCREATE_FAM_SKIPPED_FILE_TABLE);
-		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
-		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_UPI_INDEX);
-		vecQueries.push_back(gstrCREATE_FAM_FILE_TAG_TABLE);
-		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
-		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE);
-		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_UPI_INDEX);
-		vecQueries.push_back(gstrCREATE_LOCKED_FILE_TABLE);
-		vecQueries.push_back(gstrCREATE_FPS_FILE_TABLE);
-		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
-		vecQueries.push_back(gstrCREATE_FAM_SESSION);
-		vecQueries.push_back(gstrCREATE_INPUT_EVENT);
-		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX);
-		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_TABLE);
-		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
+		// Get a vector of SQL queries that will create the database tables
+		vector<string> vecQueries = getTableCreationQueries(bAddUserTables);
 
 		// Only create the login table if it does not already exist
-		if (!doesTableExist(getDBConnection(), "Login"))
+		if (doesTableExist(getDBConnection(), "Login"))
 		{
-			vecQueries.push_back(gstrCREATE_LOGIN_TABLE);
+			eraseFromVector(vecQueries, gstrCREATE_LOGIN_TABLE);
+		}
+
+		// Add indexes
+		vecQueries.push_back(gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX);
+		vecQueries.push_back(gstrCREATE_FAM_FILE_INDEX);
+		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_UPI_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
+		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_UPI_INDEX);
+		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
+		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX);
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
+		
+		// Add user-table specific indices if necessary.
+		if (bAddUserTables)
+		{
+			vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX);
 		}
 
 		// Add Foreign keys 
@@ -1038,6 +1020,48 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		executeVectorOfSQL(getDBConnection(), vecQueries);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18011");
+}
+//--------------------------------------------------------------------------------------------------
+vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTables)
+{
+	vector<string> vecQueries;
+
+	// WARNING: If any table is removed, code needs to be modified so that
+	// findUnrecognizedSchemaElements does not treat the element on old schema versions as
+	// unrecognized.
+
+	// Add the user tables if necessary
+	if (bIncludeUserTables)
+	{
+		vecQueries.push_back(gstrCREATE_DB_INFO_TABLE);
+		vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
+		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE);
+	}
+
+	// Add queries to create tables to the vector
+	vecQueries.push_back(gstrCREATE_ACTION_TABLE);
+	vecQueries.push_back(gstrCREATE_LOCK_TABLE);
+	vecQueries.push_back(gstrCREATE_ACTION_STATE_TABLE);
+	vecQueries.push_back(gstrCREATE_FAM_FILE_TABLE);
+	vecQueries.push_back(gstrCREATE_QUEUE_EVENT_CODE_TABLE);
+	vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_TABLE);
+	vecQueries.push_back(gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE);
+	vecQueries.push_back(gstrCREATE_QUEUE_EVENT_TABLE);
+	vecQueries.push_back(gstrCREATE_MACHINE_TABLE);
+	vecQueries.push_back(gstrCREATE_FAM_USER_TABLE);
+	vecQueries.push_back(gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE);
+	vecQueries.push_back(gstrCREATE_FAM_SKIPPED_FILE_TABLE);
+	vecQueries.push_back(gstrCREATE_FAM_FILE_TAG_TABLE);
+	vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE);
+	vecQueries.push_back(gstrCREATE_LOCKED_FILE_TABLE);
+	vecQueries.push_back(gstrCREATE_FPS_FILE_TABLE);
+	vecQueries.push_back(gstrCREATE_FAM_SESSION);
+	vecQueries.push_back(gstrCREATE_INPUT_EVENT);
+	vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
+	vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_TABLE);
+	vecQueries.push_back(gstrCREATE_LOGIN_TABLE);
+
+	return vecQueries;
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
@@ -1084,112 +1108,57 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		// Initialize the DB Info settings if necessary
 		if (bInitializeUserTables)
 		{
-			// Add the schema version to the DBInfo table
-			string strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrFAMDB_SCHEMA_VERSION +
-				"', '" + asString(ms_lFAMDBSchemaVersion) + "')";
-			vecQueries.push_back(strSQL);
+			// Retrieve the default DBInfo values
+			map<string, string> mapDBInfoDefaultValues = getDBInfoDefaultValues();
+			long nValueCount = mapDBInfoDefaultValues.size();
 
-			// Add Command Timeout setting
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCOMMAND_TIMEOUT +
-				"', '" + asString(glDEFAULT_COMMAND_TIMEOUT) + "')";
-			vecQueries.push_back(strSQL);
-
-			// Add Update Queue Event Table setting
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_QUEUE_EVENT_TABLE 
-				+ "', '1')";
-			vecQueries.push_back(strSQL);
-
-			// Add Update Queue Event Table setting
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_FAST_TABLE + "', '1')";
-			vecQueries.push_back(strSQL);
-
-			// Add Auto Delete File Action Comment On Complete setting
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_DELETE_FILE_ACTION_COMMENT
-				+ "', '0')";
-			vecQueries.push_back(strSQL);
-
-			// Add Require Password To Process All Skipped Files setting (default to true)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED
-				+ "', '1')";
-			vecQueries.push_back(strSQL);
-
-			// Add Allow Dynamic Tag Creation setting (default to false)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrALLOW_DYNAMIC_TAG_CREATION
-				+ "', '0')";
-			vecQueries.push_back(strSQL);
-
-			// Add AutoRevertLockedFiles setting (default to true)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_LOCKED_FILES
-				+ "', '1')";
-			vecQueries.push_back(strSQL);
-
-			// Add AutoRevertTimeOutInMinutes setting (default to 60 minutes)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_TIME_OUT_IN_MINUTES
-				+ "', '60')";
-			vecQueries.push_back(strSQL);
-			
-			// Add AutoRevertNotifyEmailList setting (default to empy string)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_NOTIFY_EMAIL_LIST
-				+ "', '')";
-			vecQueries.push_back(strSQL);
-
-			// Add NumberOfConnectionRetries setting (default to empy string)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrNUMBER_CONNECTION_RETRIES
-				+ "', '10')";
-			vecQueries.push_back(strSQL);
-			
-			// Add ConnectionRetryTimeout setting (default to empy string)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCONNECTION_RETRY_TIMEOUT
-				+ "', '120')";
-			vecQueries.push_back(strSQL);
-
-			// Add StoreFAMSessionHistory setting (default to true)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrSTORE_FAM_SESSION_HISTORY
-				+ "', '1')";
-			vecQueries.push_back(strSQL);
-
-			// Add the EnableInputEventTracking setting (default to false)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrENABLE_INPUT_EVENT_TRACKING
-				+ "', '0')";
-			vecQueries.push_back(strSQL);
-
-			// Add the InputEventHistorySize setting (default to 30 days)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrINPUT_EVENT_HISTORY_SIZE
-				+ "', '30')";
-			vecQueries.push_back(strSQL);
-
-			// Add RequireAuthenticationBeforeRun setting (default to false)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_AUTHENTICATION_BEFORE_RUN
-				+ "', '0')";
-			vecQueries.push_back(strSQL);
-
-			// Add Auto Create Actions setting (default to false)
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_CREATE_ACTIONS
-				+ "', '0')";
-			vecQueries.push_back(strSQL);
-
-			// Add Skip Authentication For Services On Machines
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-				+ gstrSKIP_AUTHENTICATION_ON_MACHINES + "', '')";
-			vecQueries.push_back(strSQL);
-			
-			// Add ActionStatisticsUpdateFreqInSeconds setting default to 5
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-				+ gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS + "', '5')";
-			vecQueries.push_back(strSQL);
-
-			// Add GetFilesToProcessTransactionTimeout setting default
-			strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-				+ gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT + 
-				"', '" + asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0) + "')";
-			vecQueries.push_back(strSQL);
-
+			// For each DBInfo value, create a query to set the default value.
+			for (map<string, string>::iterator iterDBInfoValues = mapDBInfoDefaultValues.begin();
+				iterDBInfoValues != mapDBInfoDefaultValues.end();
+				iterDBInfoValues++)
+			{
+				string strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" +
+					iterDBInfoValues->first + "', '" + iterDBInfoValues->second + "')";
+				vecQueries.push_back(strSQL);
+			}
 		}
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27606")
+}
+//-------------------------------------------------------------------------------------------------
+map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
+{
+	map<string, string> mapDefaultValues;
+
+	// WARNING: If any DBInfo row is removed, code needs to be modified so that
+	// findUnrecognizedSchemaElements does not treat the element on old schema versions as
+	// unrecognized.
+	mapDefaultValues[gstrFAMDB_SCHEMA_VERSION] = asString(ms_lFAMDBSchemaVersion);
+	mapDefaultValues[gstrCOMMAND_TIMEOUT] = asString(glDEFAULT_COMMAND_TIMEOUT);
+	mapDefaultValues[gstrUPDATE_QUEUE_EVENT_TABLE] = "1";
+	mapDefaultValues[gstrUPDATE_FAST_TABLE] = "1";
+	mapDefaultValues[gstrAUTO_DELETE_FILE_ACTION_COMMENT] = "0";
+	mapDefaultValues[gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED] = "1";
+	mapDefaultValues[gstrALLOW_DYNAMIC_TAG_CREATION] = "0";
+	mapDefaultValues[gstrAUTO_REVERT_LOCKED_FILES] = "1";
+	mapDefaultValues[gstrAUTO_REVERT_TIME_OUT_IN_MINUTES] = "60";
+	mapDefaultValues[gstrAUTO_REVERT_NOTIFY_EMAIL_LIST] = "";
+	mapDefaultValues[gstrNUMBER_CONNECTION_RETRIES] = "10";
+	mapDefaultValues[gstrCONNECTION_RETRY_TIMEOUT] = "120";
+	mapDefaultValues[gstrSTORE_FAM_SESSION_HISTORY] = "1";
+	mapDefaultValues[gstrENABLE_INPUT_EVENT_TRACKING] = "0";
+	mapDefaultValues[gstrINPUT_EVENT_HISTORY_SIZE] = "30";
+	mapDefaultValues[gstrREQUIRE_AUTHENTICATION_BEFORE_RUN] = "0";
+	mapDefaultValues[gstrAUTO_CREATE_ACTIONS] = "0";
+	mapDefaultValues[gstrSKIP_AUTHENTICATION_ON_MACHINES] = "";
+	mapDefaultValues[gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS] = "5";
+	mapDefaultValues[gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT] =
+		asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
+
+	return mapDefaultValues;
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, const string& strFrom, 
@@ -1575,17 +1544,58 @@ int CFileProcessingDB::getDBSchemaVersion()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::validateDBSchemaVersion()
 {
-	// Get the Schema Version from the database
-	int iDBSchemaVersion = getDBSchemaVersion();
-	if (iDBSchemaVersion != ms_lFAMDBSchemaVersion)
+	// If in the process of checking the database schema or during an update operation, do not
+	// validate the database schema; this would cause the schema update to fail or infinite recursion.
+	if (!m_bValidatingOrUpdatingSchema)
 	{
-		// Update the current connection status string
-		m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
+		// Prevent recursion when the product specific DBs check their version.
+		ValueRestorer<volatile bool> restorer(m_bValidatingOrUpdatingSchema, false);
+		m_bValidatingOrUpdatingSchema = true;
 
-		UCLIDException ue("ELI14380", "DB Schema version does not match.");
-		ue.addDebugInfo("SchemaVer in Database", iDBSchemaVersion);
-		ue.addDebugInfo("SchemaVer expected", ms_lFAMDBSchemaVersion);
-		throw ue;
+		// Get the Schema Version from the database
+		int iDBSchemaVersion = getDBSchemaVersion();
+		if (iDBSchemaVersion != ms_lFAMDBSchemaVersion)
+		{
+			// Update the current connection status string
+			m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
+
+			UCLIDException ue("ELI14380", "DB Schema version does not match.");
+			ue.addDebugInfo("SchemaVer in Database", iDBSchemaVersion);
+			ue.addDebugInfo("SchemaVer expected", ms_lFAMDBSchemaVersion);
+			throw ue;
+		}
+
+		// If we have yet to flag all the product specific DBs as valid, attempt to validate each.
+		if (!m_bProductSpecificDBSchemasAreValid)
+		{
+			// Get a list of all installed & licensed product-specific database managers.
+			IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
+			ASSERT_RESOURCE_ALLOCATION("ELI31433", ipProdSpecificMgrs != NULL);
+
+			// Loop through the managers and validate the schema of each.
+			long nCountProdSpecMgrs = ipProdSpecificMgrs->Size();
+			for (long i = 0; i < nCountProdSpecMgrs; i++)
+			{
+				UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipProdSpecificDBMgr =
+					ipProdSpecificMgrs->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI31434", ipProdSpecificDBMgr != NULL);
+
+				try
+				{
+					ipProdSpecificDBMgr->ValidateSchema(getThisAsCOMPtr());
+				}
+				catch (...)
+				{
+					// Update the current connection status string
+					m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
+					throw;
+				}
+			}
+
+			// If we reached this point without and exception being thrown, all installed and
+			// licensed product specific DB components have up-to-data schema versions.
+			m_bProductSpecificDBSchemasAreValid = true;
+		}
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -2873,7 +2883,8 @@ void CFileProcessingDB::validateFileID(const _ConnectionPtr& ipConnection, long 
 }
 //--------------------------------------------------------------------------------------------------
 string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
-										   const string& strSettingName)
+										   const string& strSettingName,
+										   bool bThrowIfMissing)
 {
 	try
 	{
@@ -2895,13 +2906,16 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 			// Return the setting value
 			return getStringField(ipDBInfoSet->Fields, "Value");
 		}
-		else
+		else if (bThrowIfMissing)
 		{
 			UCLIDException ue("ELI18940", "DBInfo setting does not exist!");
 			ue.addDebugInfo("Setting", strSettingName);
 			throw  ue;
 		}
-
+		else
+		{
+			return "";
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27388");
 }
@@ -3128,7 +3142,7 @@ bool CFileProcessingDB::isInputEventTrackingEnabled(const _ConnectionPtr& ipConn
 	{
 		// Check the DB setting (only check once per session)
 		static bool bInputTrackingEnabled =
-			getDBInfoSetting(ipConnection, gstrENABLE_INPUT_EVENT_TRACKING) == "1";
+			getDBInfoSetting(ipConnection, gstrENABLE_INPUT_EVENT_TRACKING, true) == "1";
 
 		return bInputTrackingEnabled;
 	}
@@ -3165,7 +3179,7 @@ bool CFileProcessingDB::isMachineInListOfMachinesToSkipUserAuthentication(
 	try
 	{
 		// Get the list of machine names
-		string strMachines = getDBInfoSetting(ipConnection, gstrSKIP_AUTHENTICATION_ON_MACHINES);
+		string strMachines = getDBInfoSetting(ipConnection, gstrSKIP_AUTHENTICATION_ON_MACHINES, true);
 
 		// Tokenize by either comma, semicolon, or pipe
 		vector<string> vecTokens;
@@ -3630,5 +3644,194 @@ void CFileProcessingDB::updateActionStatisticsFromDelta(const _ConnectionPtr& ip
 	string strDeleteActionStatisticsDelta = "DELETE FROM ActionStatisticsDelta WHERE ActionID = " + 
 		strActionID + " AND ID <= " + strLastDeltaID;
 	executeCmdQuery(ipConnection, strDeleteActionStatisticsDelta);
+}
+//-------------------------------------------------------------------------------------------------
+set<string> getDBTableNames(const _ConnectionPtr& ipConnection)
+{
+	set<string> setTableNames;
+
+	// Retrieve the schema info for all tables in the database.
+	_RecordsetPtr ipTables = ipConnection->OpenSchema(adSchemaTables);
+	ASSERT_RESOURCE_ALLOCATION("ELI31391", ipTables != NULL);
+
+	// Loop through all tables to compile a list of all table names (in uppercase)
+	while (!asCppBool(ipTables->adoEOF))
+	{
+		string strType = getStringField(ipTables->Fields, "TABLE_TYPE");
+
+		// Include only dbo tables in the list, not sys tables.
+		// (Using a criteria on the OpenSchema call does not seem to work).
+		if (_stricmp(strType.c_str(), "TABLE") == 0)
+		{
+			// Get the Name of the Foreign key table
+			string strTableName = getStringField(ipTables->Fields, "TABLE_NAME");
+			makeUpperCase(strTableName);
+
+			setTableNames.insert(strTableName);
+		}
+
+		ipTables->MoveNext();
+	}
+
+	return setTableNames;
+}
+//-------------------------------------------------------------------------------------------------
+set<string> getDBInfoRowNames(const _ConnectionPtr& ipConnection)
+{
+	set<string> setDBInfoRows;
+
+	_RecordsetPtr ipResultSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI31392", ipResultSet != NULL);
+
+	// Query for all rows in the DBInfo table
+	string strDBInfoQuery = "SELECT [Name] FROM DBInfo";
+	ipResultSet->Open(strDBInfoQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+		adOpenStatic, adLockReadOnly, adCmdText);
+
+	// Loop through all DBInfo rows to compile a list of the names (in uppercase).
+	while (!asCppBool(ipResultSet->adoEOF))
+	{
+		string strRowName = getStringField(ipResultSet->Fields, "Name");
+		makeUpperCase(strRowName);
+		setDBInfoRows.insert(strRowName);
+
+		ipResultSet->MoveNext();
+	}
+
+	return setDBInfoRows;
+}
+//-------------------------------------------------------------------------------------------------
+// WARNING: If any DBInfo row or table is removed, this code needs to be modified so that it does
+// not treat the removed element(s) on and old schema versions as unrecognized.
+vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _ConnectionPtr& ipConnection)
+{
+	vector<string> vecUnrecognizedElements;
+
+	// Get an uppercase list of the names of all tables currently in the database.
+	set<string> setTableNames = getDBTableNames(ipConnection);
+
+	// Get an uppercase list of the names of all DBInfo rows currently in the database.
+	set<string> setDBInfoRows;
+	if (setTableNames.find("DBINFO") != setTableNames.end())
+	{
+		setDBInfoRows = getDBInfoRowNames(ipConnection);
+	}
+
+	// Retrieve a list of all tables the FAM DB has managed since version 23
+	vector<string> vecTableCreationQueries = getTableCreationQueries(true);
+	vector<string> vecFAMDBTableNames = getTableNamesFromCreationQueries(vecTableCreationQueries);
+
+	// Remove all tables known to the FAM DB from the names of tables found in the DB to leave a
+	// list of tables unknown to the FAM DB.
+	long nFAMTableCount = vecFAMDBTableNames.size();
+	for (long i = 0; i < nFAMTableCount; i++)
+	{
+		string strTableName = vecFAMDBTableNames[i];
+		makeUpperCase(strTableName);
+		setTableNames.erase(strTableName);
+	}
+
+	// Retrieve a list of all DBInfo rows the FAM DB has managed since version 23
+	map<string, string> mapDBInfoValues = getDBInfoDefaultValues();
+	long nDBInfoValueCount = mapDBInfoValues.size();
+
+	// Remove all rows known to the FAM DB from the names of DBINfo rows found in the DB to leave a
+	// list of DBInfo rows unknown to the FAM DB.
+	for (map<string, string>::iterator iterDBInfoValues = mapDBInfoValues.begin();
+		 iterDBInfoValues != mapDBInfoValues.end();
+		 iterDBInfoValues++)
+	{
+		string strDBInfoValueName = iterDBInfoValues->first;
+		makeUpperCase(strDBInfoValueName);
+		setDBInfoRows.erase(strDBInfoValueName);
+	}
+
+	// If both lists are now empty, there is no need to check with product specific databases.
+	if (setTableNames.size() == 0 && setDBInfoRows.size() == 0)
+	{
+		return vecUnrecognizedElements;
+	}
+
+	// Get a list of all installed & licensed product-specific database managers.
+	IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
+	ASSERT_RESOURCE_ALLOCATION("ELI31394", ipProdSpecificMgrs != NULL);
+
+	// Loop through the managers asking them to remove from the list of existing tables and DBInfo
+	// rows the elements they have managed since FAM DB schema version 23.
+	long nCountProdSpecMgrs = ipProdSpecificMgrs->Size();
+	for (long i = 0; i < nCountProdSpecMgrs; i++)
+	{
+		UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipProdSpecificDBMgr =
+			ipProdSpecificMgrs->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI31395", ipProdSpecificDBMgr != NULL);
+
+		IVariantVectorPtr ipVecProdSpecificDBInfoRows = ipProdSpecificDBMgr->GetDBInfoRows();
+		ASSERT_RESOURCE_ALLOCATION("ELI31396", ipVecProdSpecificDBInfoRows != NULL);
+
+		long nCountDBInfoRows = ipVecProdSpecificDBInfoRows->Size;
+		for (long j = 0; j < nCountDBInfoRows; j++)
+		{
+			string strDBInfoRow = asString(ipVecProdSpecificDBInfoRows->GetItem(j).bstrVal);
+			makeUpperCase(strDBInfoRow);
+
+			setDBInfoRows.erase(strDBInfoRow);
+		}
+
+		IVariantVectorPtr ipVecProdSpecificTables = ipProdSpecificDBMgr->GetTables();
+		ASSERT_RESOURCE_ALLOCATION("ELI31397", ipVecProdSpecificTables != NULL);
+
+		long nCountTables = ipVecProdSpecificTables->Size;
+		for (long j = 0; j < nCountTables; j++)
+		{
+			string strTableName = asString(ipVecProdSpecificTables->GetItem(j).bstrVal);
+			makeUpperCase(strTableName);
+
+			setTableNames.erase(strTableName);
+		}
+	}
+
+	// If setDBInfoRows has any remaining values, add them to the list of unrecognized elements in
+	// the DB.
+	if (setDBInfoRows.size() > 0)
+	{
+		vecUnrecognizedElements.insert(vecUnrecognizedElements.end(),
+			setDBInfoRows.begin(), setDBInfoRows.end());
+	}
+
+	// If setTableNames has any remaining values, add them to the list of unrecognized elements in
+	// the DB.
+	if (setTableNames.size() > 0)
+	{
+		vecUnrecognizedElements.insert(vecUnrecognizedElements.end(),
+			setTableNames.begin(), setTableNames.end());
+	}
+
+	return vecUnrecognizedElements;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection,
+	int nFAMSchemaVersion, long *pnStepCount, IProgressStatusPtr ipProgressStatus,
+	map<string, long> &rmapProductSpecificVersions)
+{
+	IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
+	ASSERT_RESOURCE_ALLOCATION("ELI31398", ipProdSpecificMgrs != NULL);
+
+	// Loop throught all installed & licensed product-specific DB managers and call
+	// UpdateSchemaForFAMDBVersion for each.
+	long nCountProdSpecMgrs = ipProdSpecificMgrs->Size();
+	for (long i = 0; i < nCountProdSpecMgrs; i++)
+	{
+		UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipProdSpecificDBMgr =
+			ipProdSpecificMgrs->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI31399", ipProdSpecificDBMgr != NULL);
+
+		ICategorizedComponentPtr ipComponent(ipProdSpecificDBMgr);
+		ASSERT_RESOURCE_ALLOCATION("ELI31400", ipComponent != NULL);
+
+		string strId = asString(ipComponent->GetComponentDescription());
+		
+		ipProdSpecificDBMgr->UpdateSchemaForFAMDBVersion(getThisAsCOMPtr(), ipConnection,
+			nFAMSchemaVersion, &(rmapProductSpecificVersions[strId]), pnStepCount, ipProgressStatus);
+	}
 }
 //-------------------------------------------------------------------------------------------------

@@ -537,8 +537,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (_countersEnabled)
                 {
                     _countersEnabled =
-                        _fileProcessingDb.GetDBInfoSetting("EnableDataEntryCounters").Equals(
-                            "1", StringComparison.OrdinalIgnoreCase);
+                        _fileProcessingDb.GetDBInfoSetting("EnableDataEntryCounters", true)
+                            .Equals("1", StringComparison.OrdinalIgnoreCase);
                 }
 
                 // Get the action name if there is an associated action ID.

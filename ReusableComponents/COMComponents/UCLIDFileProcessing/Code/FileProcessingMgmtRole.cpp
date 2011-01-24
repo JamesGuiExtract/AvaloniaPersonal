@@ -413,7 +413,8 @@ STDMETHODIMP CFileProcessingMgmtRole::raw_RequiresAdminAccess(VARIANT_BOOL* pbRe
 		// 5. The error task requires admin access
 
 		bool bResult = m_bEnabled && (m_bProcessSkippedFiles && m_bSkippedForAnyUser &&
-			(asString(getFPMDB()->GetDBInfoSetting(gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str())) == "1")
+			(asString(getFPMDB()->GetDBInfoSetting(
+				gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str(), VARIANT_TRUE)) == "1")
 			|| checkForRequiresAdminAccess(m_ipFileProcessingTasks)  
 			|| checkForRequiresAdminAccess(getErrorHandlingTask()));
 		

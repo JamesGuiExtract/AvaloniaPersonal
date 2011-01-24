@@ -75,7 +75,178 @@ using namespace ADODB;
 			} \
 		} \
 		while (!bRetrySuccess);
+
 //-------------------------------------------------------------------------------------------------
+// Schema update functions
+// 
+// NOTE TO IMPLEMENTERS: If pnNumSteps is not null, rather than performing a schema update,
+// pnNumSteps should instead be assigned a number of steps corresponding to the number of progress
+// steps that should be assigned. Suggested values are:
+// 3 = An O(1) operation such as creating a new table.
+// 10 = A relatively simple O(n) DB query to run relative to the number of files in the database.
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion101(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 101;
+
+		if (pnNumSteps != NULL)
+		{
+			// This update requires potentialy creating a new row in the FileActionStatus table for
+			// every row in the FAMFile table and is therefore O(n) relative to the number of files
+			// in the DB.
+			*pnNumSteps += 10;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		_RecordsetPtr ipProcessingFAMCount(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI31446", ipProcessingFAMCount != NULL);
+
+		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [ProcessingFAM]",
+			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
+
+		ipProcessingFAMCount->MoveFirst();
+		long nRowCount = getLongField(ipProcessingFAMCount->Fields, "FAMCOUNT");
+		if (nRowCount > 0)
+		{
+			throw UCLIDException("ELI31445", "Unable to update database since at least one instance "
+				"of File Action Manager is currently processing files in the database");
+		}
+
+		// Drop ProcessingFAM so it can be re-created with the proper columns.
+		// No need to transfer data. It will be assumed that all entries are crashed/hung instances.
+		vecQueries.push_back("ALTER TABLE [LockedFile] DROP CONSTRAINT [FK_LockedFile_ProcessingFAM]");
+		vecQueries.push_back("DROP TABLE [ProcessingFAM]");
+		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_PROCESSINGFAM_FK);
+
+		// Create the FileActionStatus table and associated indexes/constraints.
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX);
+		vecQueries.push_back(gstrADD_ACTION_PROCESSINGFAM_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
+	
+		// Add query to transfer the data from the old FAMFile.ASC columns into the new FileActionStatus
+		// table, then drop the FAMFile.ASC columns columns
+		vecQueries.push_back(
+			"DECLARE @dynamic_command NVARCHAR(MAX)\r\n"
+			"DECLARE @action_name NVARCHAR(50)\r\n"
+			"DECLARE @action_id NVARCHAR(8)\r\n"
+			"DECLARE action_cursor CURSOR FOR SELECT [ASCName], [ID] FROM [Action]\r\n"
+
+			"OPEN action_cursor\r\n"
+
+			"BEGIN TRY\r\n"
+			"	FETCH NEXT FROM action_cursor INTO @action_name, @action_id\r\n"
+
+			"	WHILE @@FETCH_STATUS = 0\r\n"
+			"	BEGIN\r\n"
+			"		SET @dynamic_command = 'INSERT INTO [FileActionStatus]\r\n"
+			"				([ActionID], [FileID], [ActionStatus])\r\n"
+			"			SELECT ' + @action_id + ', [ID], [ASC_' + @action_name + '] FROM [FAMFile]\r\n"
+			"				WHERE ASC_' + @action_name + ' != ''U'''\r\n"
+			"		EXEC (@dynamic_command)\r\n"
+
+			"		SET @dynamic_command =\r\n"
+			"			'ALTER TABLE [FAMFile] DROP CONSTRAINT FK_ASC_' + @action_name\r\n"
+			"		EXEC (@dynamic_command)\r\n"
+
+			"		SET @dynamic_command =\r\n"
+			"			'DROP INDEX IX_ASC_' + @action_name + ' ON [FAMFile]'\r\n"
+			"		EXEC (@dynamic_command)\r\n"
+
+			"		SET @dynamic_command =\r\n"
+			"			'ALTER TABLE [FAMFile] DROP CONSTRAINT DF_ASC_' + @action_name\r\n"
+			"		EXEC (@dynamic_command)\r\n"
+
+			"		SET @dynamic_command =\r\n"
+			"			'ALTER TABLE [FAMFile] DROP COLUMN ASC_' + @action_name\r\n"
+			"		EXEC (@dynamic_command)\r\n"
+
+			"		FETCH NEXT FROM action_cursor INTO @action_name, @action_id\r\n"
+			"	END\r\n"
+
+			"	CLOSE action_cursor\r\n"
+			"	DEALLOCATE action_cursor\r\n"
+			"END TRY\r\n"
+			"BEGIN CATCH\r\n"
+			"	CLOSE action_cursor\r\n"
+			"	DEALLOCATE action_cursor\r\n"
+	
+			"	DECLARE @error_message NVARCHAR(MAX)\r\n"
+			"	DECLARE @error_severity INT\r\n"
+			"	DECLARE @error_state INT\r\n"
+	
+			"	SELECT\r\n"
+			"		@error_message = ERROR_MESSAGE(),\r\n"
+			"		@error_severity = ERROR_SEVERITY(),\r\n"
+			"		@error_state = ERROR_STATE()\r\n"
+			
+			"	IF @error_state = 0\r\n"
+			"		SELECT @error_state = 1\r\n"
+
+			"	RAISERROR (@error_message, @error_severity, @error_state)\r\n"
+			"END CATCH\r\n");
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '101' WHERE [Name] = '" + 
+			gstrFAMDB_SCHEMA_VERSION + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31437");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion102(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 102;
+
+		if (pnNumSteps != NULL)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Drop ActionStatistics table so it can be re-created with the proper columns.
+		// No need to transfer data; instead, regenerate the stats afterward.
+		vecQueries.push_back("DROP Table [ActionStatistics]");
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_TABLE);
+
+		// Add new ActionStatisticsDelta table.
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_TABLE);
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
+		vecQueries.push_back(gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK);
+
+		// Add default value for ActionStatisticsUpdateFreqInSeconds.
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS + "', '5')");
+
+		// Regenerate the action statistics for all actions (empty "where" clause)
+		string strCreateActionStatsSQL = gstrRECREATE_ACTION_STATISTICS_FOR_ACTION;
+		replaceVariable(strCreateActionStatsSQL, "<ActionIDWhereClause>", "");
+		vecQueries.push_back(strCreateActionStatsSQL);
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '102' WHERE [Name] = '" + 
+			gstrFAMDB_SCHEMA_VERSION + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31438");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -1777,7 +1948,8 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, BSTR* pbstrSettingValue)
+bool CFileProcessingDB::GetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName,
+	VARIANT_BOOL vbThrowIfMissing, BSTR* pbstrSettingValue)
 {
 	try
 	{
@@ -1797,7 +1969,8 @@ bool CFileProcessingDB::GetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 				validateDBSchemaVersion();
 
 				// Get the setting
-				string strSetting = getDBInfoSetting(ipConnection, asString(bstrSettingName));
+				string strSetting = getDBInfoSetting(ipConnection, asString(bstrSettingName),
+					asCppBool(vbThrowIfMissing));
 
 				// Set the return value
 				*pbstrSettingValue = _bstr_t(strSetting.c_str()).Detach();
@@ -3176,7 +3349,8 @@ bool CFileProcessingDB::AllowDynamicTagCreation_Internal(bool bDBLocked, VARIANT
 				ipConnection = getDBConnection();
 
 				// Get the allow dynamic tag creation setting value
-				string strSetting = getDBInfoSetting(ipConnection, gstrALLOW_DYNAMIC_TAG_CREATION);
+				string strSetting =
+					getDBInfoSetting(ipConnection, gstrALLOW_DYNAMIC_TAG_CREATION, true);
 
 				// Set the out value
 				*pvbVal = strSetting == "1" ? VARIANT_TRUE : VARIANT_FALSE;
@@ -4623,7 +4797,8 @@ bool CFileProcessingDB::GetAutoCreateActions_Internal(bool bDBLocked, VARIANT_BO
 				ipConnection = getDBConnection();
 
 				// Get the setting
-				string strSetting = getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS);
+				string strSetting =
+					getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS, true);
 
 				// Set the out value
 				*pvbValue = strSetting == "1" ? VARIANT_TRUE : VARIANT_FALSE;
@@ -4679,7 +4854,7 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 				if (ipActionSet->adoEOF == VARIANT_TRUE)
 				{
 					// Action is not created
-					if (getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS) == "1")
+					if (getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS, true) == "1")
 					{
 						// AutoCreateActions is set, create the action
 						*plId = addActionToRecordset(ipConnection, ipActionSet, strActionName);
@@ -4823,6 +4998,178 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 	}
 	catch(UCLIDException &ue)
 	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
+														IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		try
+		{
+			m_bValidatingOrUpdatingSchema = true;
+
+			// Assume a lock is going to be neccessary for a schema update.
+			ASSERT_ARGUMENT("ELI31401", bDBLocked == true);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = NULL;
+
+			ipProgressStatus->InitProgressStatus("Inspecting schema...", 0, 0, VARIANT_TRUE);
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+
+			// If there are any unrecognized schema elements in the database, disallow a schema
+			// update.
+			vector<string> vecUnrecognizedSchemaElements =
+				findUnrecognizedSchemaElements(ipConnection);
+			if (vecUnrecognizedSchemaElements.size() > 0)
+			{
+				UCLIDException ue("ELI31402",
+					"Database contains custom or unlicensed elements and cannot be upgraded.");
+				for (vector<string>::iterator iter = vecUnrecognizedSchemaElements.begin();
+					 iter != vecUnrecognizedSchemaElements.end();
+					 iter++)
+				{
+					ue.addDebugInfo("Database Element", *iter);
+				}
+
+				throw ue;
+			}
+
+			TransactionGuard tg(ipConnection);
+
+			// Defines the signature for a function which will upgrade the FAM DB schema from one schema
+			// number to the next.
+			typedef int (*DB_SCHEMA_UPDATE_FUNC)(_ConnectionPtr, long*, IProgressStatusPtr);
+
+			// First, get a vector of the schema update functions needed to upgrade the core FAM DB
+			// components.
+			vector<DB_SCHEMA_UPDATE_FUNC> vecUpdateFuncs;
+
+			int nCurrentSchemaVersion = getDBSchemaVersion();
+			int nSchemaVersion = getDBSchemaVersion();
+			switch (nSchemaVersion)
+			{
+				case 23:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion101);
+				case 101:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion102);
+				case 102:	break;
+
+				default:
+					{
+						UCLIDException ue("ELI31403",
+							"Automatic updates are not supported for the current schema.");
+						ue.addDebugInfo("Schema version", nSchemaVersion, false);
+						throw ue;
+					}
+			}
+
+			// Each "stage" of the schema update progress will correspond to a single FAM DB schema
+			// version. Depending upon whether product-specific upgrades are needed for the final
+			// FAM DB schema number, this may or may not include the final FAM DB schema number.
+			int nStageCount = vecUpdateFuncs.size();
+
+			// Keeps track of the total number of progress status steps to allocate for each stage
+			// of the upgrade operation.
+			vector<int> vecStepCounts;
+
+			// Keeps track of the total number of progress status steps to allocate to the upgrade
+			// operation.
+			long nTotalStepCount = 0;
+			
+			// A working count of the steps for each stage.
+			long nStepCount = 0;
+			
+			// For each product-specific database, the current schema version being acted upon.
+			map<string, long> mapProductSpecificVersions;
+
+			// For each FAM DB schema version in the conversion process, query each product-specific
+			// database manager for any schema updates that occured during the time the FAM DB was
+			// at the corresponding schema version.
+			typedef vector<DB_SCHEMA_UPDATE_FUNC>::iterator funcIterator;
+			funcIterator iterFunc = vecUpdateFuncs.begin();
+			while (true)
+			{
+				// Get a count of the total number of steps required for all product-specific
+				// schema update steps corresponding to the FAM DB nSchemaVersion. 
+				nStepCount = 0;
+				executeProdSpecificSchemaUpdateFuncs(ipConnection, nSchemaVersion, &nStepCount,
+					NULL, mapProductSpecificVersions);
+
+				if (iterFunc != vecUpdateFuncs.end())
+				{
+					// Add the progress steps for the next FAM DB update.
+					nSchemaVersion = (*iterFunc)(ipConnection, &nStepCount, NULL);
+				}
+				else if (nStepCount > 0)
+				{
+					// For the final FAM schema version, if there are product-specific schema
+					// updates, run these as an extra "stage".
+					nStageCount++;
+				}
+
+				vecStepCounts.push_back(nStepCount);
+				nTotalStepCount += nStepCount;
+
+				if (iterFunc == vecUpdateFuncs.end())
+				{
+					break;
+				}
+
+				iterFunc++;
+			}
+
+			// After a valid upgrade path has been verified and the number of progress steps has
+			// been initialized, loop through the upgrade methods, this time performing upgrade.
+			nSchemaVersion = nCurrentSchemaVersion;
+			mapProductSpecificVersions.clear();
+
+			ipProgressStatus->InitProgressStatus(
+				"Updating database schema...", 0, nTotalStepCount, VARIANT_TRUE);
+
+			int nFuncCount = vecUpdateFuncs.size();
+			for (int i = 0; i < nStageCount; i++)
+			{
+				CString zMessage;
+				zMessage.Format("Updating database schema... (Step %i of %i)", i + 1, nStageCount);
+				ipProgressStatus->StartNextItemGroup(zMessage.GetString(), vecStepCounts[i]);
+
+				executeProdSpecificSchemaUpdateFuncs(ipConnection, nSchemaVersion, NULL,
+					ipProgressStatus->SubProgressStatus, mapProductSpecificVersions);
+
+				if (i < nFuncCount)
+				{
+					nSchemaVersion = vecUpdateFuncs[i](ipConnection, NULL, ipProgressStatus->SubProgressStatus);
+				}
+
+				ipProgressStatus->CompleteCurrentItemGroup();
+			}
+
+			tg.CommitTrans();
+
+			// Force the DBInfo values (including schema version) to be reloaded on the next call to
+			// validateDBSchemaVersion
+			m_iDBSchemaVersion = 0; 
+
+			END_CONNECTION_RETRY(ipConnection, "ELI31404");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31405");
+
+		m_bValidatingOrUpdatingSchema = false;
+	}
+	catch(UCLIDException &ue)
+	{
+		m_bValidatingOrUpdatingSchema = false;
+
 		if (!bDBLocked)
 		{
 			return false;
