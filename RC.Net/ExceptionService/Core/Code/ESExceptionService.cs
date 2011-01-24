@@ -232,12 +232,11 @@ namespace Extract.ExceptionService
 
                 try
                 {
-                    _host = new ServiceHost(typeof(ExtractExceptionLogger),
-                        new Uri("net.tcp://localhost"));
+                    _host = new ServiceHost(typeof(ExtractExceptionLogger));
+                    var address = "net.tcp://localhost/" + ExceptionLoggerData.WcfTcpEndPoint;
                     NetTcpBinding binding = new NetTcpBinding();
                     binding.PortSharingEnabled = true;
-                    _host.AddServiceEndpoint(typeof(IExtractExceptionLogger), binding,
-                        ExceptionLoggerData.WcfTcpEndPoint);
+                    _host.AddServiceEndpoint(typeof(IExtractExceptionLogger), binding, address);
                     _host.Open();
                     _host.Faulted += HandleHostFaulted;
                     _host.Closed += HandleHostClosed;
