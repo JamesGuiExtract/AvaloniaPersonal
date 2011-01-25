@@ -6220,7 +6220,7 @@ namespace Extract.DataEntry
             }
 
             // Lock the DEP's parent (a Panel) to prevent scrolling
-            FormsMethods.LockControlUpdate(Parent, lockUpdates);
+            FormsMethods.LockControlUpdate(Parent, lockUpdates, true);
 
             // Lock each visible control.
             foreach (IDataEntryControl dataControl in _dataControls)
@@ -6228,7 +6228,7 @@ namespace Extract.DataEntry
                 Control control = (Control)dataControl;
                 if (control.Visible)
                 {
-                    FormsMethods.LockControlUpdate(control, lockUpdates);
+                    FormsMethods.LockControlUpdate(control, lockUpdates, true);
                 }
             }
         }

@@ -2711,20 +2711,28 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Updates the <see cref="_trackingData"/> using the specified mouse position.
         /// </summary>
+        /// <param name="e">The <see cref="PaintEventArgs"/> to which any tracking graphics should
+        /// be drawn.</param>
         /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         // This method has undergone a security review.
         [SuppressMessage("Microsoft.Security", 
             "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
-        void UpdateTracking(int mouseX, int mouseY)
+        void UpdateTracking(PaintEventArgs e, int mouseX, int mouseY)
         {
+            // Ensure the tracking event hasn't already ended.
+            if (_trackingData == null)
+            {
+                return;
+            }
+
             // Update the tracking dependent upon the active cursor tool
             switch (_cursorTool)
             {
                 case CursorTool.AngularHighlight:
                 case CursorTool.AngularRedaction:
 
-                    UpdateDrawingHighlight(mouseX, mouseY, true);
+                    UpdateDrawingHighlight(e, mouseX, mouseY, true);
                     break;
 
                 case CursorTool.DeleteLayerObjects:
@@ -2761,7 +2769,7 @@ namespace Extract.Imaging.Forms
                 case CursorTool.RectangularHighlight:
                 case CursorTool.RectangularRedaction:
 
-                    UpdateDrawingHighlight(mouseX, mouseY, false);
+                    UpdateDrawingHighlight(e, mouseX, mouseY, false);
                     break;
 
                 case CursorTool.SelectLayerObject:
@@ -2772,7 +2780,7 @@ namespace Extract.Imaging.Forms
 
                         // Recalculate and redraw a new selection border
                         _trackingData.UpdateRectangle(mouseX, mouseY);
-                        ExecutePostPaintMethod((e) => DrawTrackingRectangleBorder(e));
+                        DrawTrackingRectangleBorder(e);
                     }
                     else
                     {
@@ -2793,7 +2801,7 @@ namespace Extract.Imaging.Forms
                     _trackingData.UpdateLine(mouseX, mouseY);
 
                     Pen solidBlackPen = ExtractPens.GetPen(Color.Black);
-                    ExecutePostPaintMethod(e => DrawTrackingLine(e, solidBlackPen));
+                    DrawTrackingLine(e, solidBlackPen);
                     break;
 
                 case CursorTool.WordHighlight:
@@ -2806,13 +2814,13 @@ namespace Extract.Imaging.Forms
                         _trackingData.UpdateLine(mouseX, mouseY);
 
                         Pen dashedPen = ExtractPens.GetThickDashedPen(GetHighlightDrawColor());
-                        ExecutePostPaintMethod(e => DrawTrackingLine(e, dashedPen));
+                        DrawTrackingLine(e, dashedPen);
                     }
                     else
                     {
                         // Recalculate and redraw a new selection border
                         _trackingData.UpdateRectangle(mouseX, mouseY);
-                        ExecutePostPaintMethod(e => DrawTrackingRectangleBorder(e));
+                        DrawTrackingRectangleBorder(e);
                     }
                     break;
 
@@ -2858,32 +2866,29 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Updates the highlight being drawn during an interactive manual highlight event.
         /// </summary>
+        /// <param name="e">The <see cref="PaintEventArgs"/> to which the tracking highlight should
+        /// be drawn.</param>
         /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         /// <param name="angularHighlight"><see langword="true"/> if the highlight being updated 
         /// is angular; <see langword="false"/> if it is rectangular.</param>
-        void UpdateDrawingHighlight(int mouseX, int mouseY, bool angularHighlight)
+        void UpdateDrawingHighlight(PaintEventArgs e, int mouseX, int mouseY, bool angularHighlight)
         {
-            // Get a drawing surface for the interactive highlight
-            using (Graphics graphics = CreateGraphics())
+            // Get the appropriate color for drawing the object
+            Color drawColor = GetHighlightDrawColor();
+
+            // Recalculate and redraw the new interactive highlight
+            if (angularHighlight)
             {
-                // Get the appropriate color for drawing the object
-                Color drawColor = GetHighlightDrawColor();
+                _trackingData.UpdateAngularRegion(mouseX, mouseY);
+            }
+            else
+            {
+                _trackingData.UpdateRectangularRegion(mouseX, mouseY);
+            }
 
-                // Erase the previous highlight if it exists
-                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.NotXorPen);
-                gdiGraphics.FillRegion(_trackingData.Region, drawColor);
-
-                // Recalculate and redraw the new interactive highlight
-                if (angularHighlight)
-                {
-                    _trackingData.UpdateAngularRegion(mouseX, mouseY);
-                }
-                else
-                {
-                    _trackingData.UpdateRectangularRegion(mouseX, mouseY);
-                }
-
+            using (GdiGraphics gdiGraphics = new GdiGraphics(e.Graphics, RasterDrawMode.NotXorPen))
+            {
                 gdiGraphics.FillRegion(_trackingData.Region, drawColor);
             }
         }
@@ -3121,9 +3126,6 @@ namespace Extract.Imaging.Forms
             {
                 graphics = CreateGraphics();
 
-                // Get the appropriate color for drawing the object
-                Color drawColor = GetHighlightDrawColor();
-
                 // Save the current tracking region
                 tempRegion = _trackingData.Region.Clone();
 
@@ -3169,10 +3171,6 @@ namespace Extract.Imaging.Forms
                         }
                     }
                 }
-
-                // Erase the previous highlight if it exists
-                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.NotXorPen);
-                gdiGraphics.FillRegion(tempRegion, drawColor);
             }
             finally
             {
@@ -3517,13 +3515,8 @@ namespace Extract.Imaging.Forms
             {
                 graphics = CreateGraphics();
 
-                // Get the appropriate color for drawing the object
-                Color drawColor = GetHighlightDrawColor();
-
                 // Store the current tracking region
                 tempRegion = _trackingData.Region.Clone();
-
-                GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen);
 
                 // If the event was not canceled process the end of the tracking
                 if (!cancel)
@@ -3538,9 +3531,6 @@ namespace Extract.Imaging.Forms
                         int height;
                         GetSpatialDataFromClientRectangle(_trackingData.Rectangle,
                             out points, out height);
-
-                        // Draw the new highlight
-                        gdiGraphics.FillRegion(_trackingData.Region, drawColor);
 
                         if (_cursorTool == CursorTool.RectangularHighlight)
                         {
@@ -3561,10 +3551,6 @@ namespace Extract.Imaging.Forms
                         }
                     }
                 }
-
-                // Erase the previous highlight if it exists
-                gdiGraphics.DrawMode = RasterDrawMode.NotXorPen;
-                gdiGraphics.FillRegion(tempRegion, drawColor);
             }
             finally
             {
@@ -4119,7 +4105,7 @@ namespace Extract.Imaging.Forms
 
                 // Update the tracking data (ensure the height is at least the minimum)
                 _trackingData.Height = Math.Max(height, minHeight);
-                UpdateTracking(mouseX, mouseY);
+                ExecutePostPaintMethod((e) => UpdateTracking(e, mouseX, mouseY));
             }
         }
 
@@ -4614,6 +4600,144 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI26545", ex);
+            }
+        }
+
+        /// <summary>
+        /// Paints the <see cref="ImageViewer"/> to the specified <see paramref="graphics"/> with
+        /// the image portion being painted being centered on <see paramref="centerPoint"/> and
+        /// zoomed using the specified <see paramref="scaleFactor"/>.
+        /// </summary>
+        /// <param name="graphics">The <see cref="Graphics"/> to which the <see cref="ImageViewer"/>
+        /// should be painted.</param>
+        /// <param name="clip">The destination clip bounds to which drawing should occur in
+        /// <see paramref="graphics"/>.</param>
+        /// <param name="centerPoint">The <see cref="Point"/> in <see cref="ImageViewer"/> client
+        /// coordinates on which the painted image should be centered.</param>
+        /// <param name="scaleFactor">The factor of zoom where 1F = 1 image pixel to 1 screen pixel,
+        /// 5F = 1 image pixel to 5 screen pixels, etc.</param>
+        public void PaintToGraphics(Graphics graphics, Rectangle clip, Point centerPoint,
+            double scaleFactor)
+        {
+            // Keep track of the original zoom, tracking and PostPaintMethods so they can be restored.
+            ZoomInfo? originalZoom = null;
+            TrackingData originalTrackingData = null;
+            List<PostPaintDelegate> originalPostPaintMethods = null;
+
+            try
+            {
+                // Since a new zoom setting needs to be temporarily applied, ensure this doesn't
+                // cause the image viewer to be invalidated or drawn.
+                _preventInvalidate = true;
+                FormsMethods.LockControlUpdate(this, true, false);
+
+                // Start with a solid background.
+                graphics.Clear(SystemColors.ControlDark);
+
+                if (IsImageAvailable)
+                {
+                    // We're about to change the zoom, store the original zoom.
+                    originalZoom = GetZoomInfo();
+
+                    // We'll need a transformed version the tracking data if a tracking event is
+                    // active.
+                    Point trackingStart = Point.Empty;
+                    if (_trackingData != null)
+                    {
+                        trackingStart = _trackingData.StartPoint;
+                    }
+
+                    // Transform centerPoint and trackStart into image coordinates.
+                    Point[] transformedPoints = new Point[] { centerPoint, trackingStart };
+                    GeometryMethods.InvertPoints(_transform, transformedPoints);
+
+                    // Zoom in on this point.
+                    ZoomInfo magnifiedZoom = originalZoom.Value;
+                    magnifiedZoom.Center = transformedPoints[0];
+                    magnifiedZoom.ScaleFactor = scaleFactor;
+                    SetZoomInfo(magnifiedZoom, false);
+
+                    // Convert the center point back into client coordinates now that the image is
+                    // zoomed so that we have a reference point for the center of the area to be
+                    // painted. Because the image may have been shifted to best fit it to the
+                    // ImageViewer, these points may not be the same as the original centerPoint and
+                    // trackingStart.
+                    _transform.TransformPoints(transformedPoints);
+
+                    // Create an image viewer oriented clip area based on centerPosition and the
+                    // size of the destination clip area.
+                    int left = clip.Left + transformedPoints[0].X - (clip.Width / 2);
+                    int top = clip.Top + transformedPoints[0].Y - (clip.Height / 2);
+                    clip = new Rectangle(left, top, clip.Width, clip.Height);
+
+                    using (Matrix transform = graphics.Transform)
+                    {
+                        // Shift the source graphics so that its coordinates will match up with the'
+                        // image viewer client coordinates to be painted and apply the clip.
+                        transform.Translate(-left, -top);
+                        graphics.Transform = transform;
+                        PaintEventArgs paintEventArgs = new PaintEventArgs(graphics, clip);
+
+                        if (_trackingData != null)
+                        {
+                            // If in a tracking operation, make a backup of the original tracking
+                            // data, then create a new one scaled to the destination graphics.
+                            originalTrackingData = _trackingData;
+
+                            // Create a transformed version of the tracking data for the destination
+                            // graphics.
+                            int trackingHeight = (int)((double)_trackingData.Height *
+                                magnifiedZoom.ScaleFactor / originalZoom.Value.ScaleFactor);
+                            _trackingData = new TrackingData(this, transformedPoints[1].X,
+                                transformedPoints[1].Y, clip, trackingHeight);
+
+                            // Keep track of any existing PostPaint methods; we'll be executing a
+                            // special PostPaint for this call.
+                            originalPostPaintMethods = new List<PostPaintDelegate>(_postPaintMethods);
+                            _postPaintMethods.Clear();
+
+                            // Call update tracking so that any tracking graphics are displayed in
+                            // the destination graphics.
+                            ExecutePostPaintMethod((e) =>
+                                UpdateTracking(e, transformedPoints[0].X, transformedPoints[0].Y));
+                        }
+
+                        // This will execute the post-paint methods as well.
+                        InvokePaint(this, paintEventArgs);
+
+                        // Restore the graphics transform back to its previous state.
+                        transform.Translate(left, top);
+                        graphics.Transform = transform;
+                    }
+                }
+            }
+            catch (ExtractException ex)
+            {
+                throw ExtractException.AsExtractException("ELI31453", ex);
+            }
+            finally
+            {
+                // Restore the original zoom
+                if (originalZoom.HasValue)
+                {
+                    SetZoomInfo(originalZoom.Value, false);
+                }
+
+                // Restore the original tracking data.
+                if (originalTrackingData != null)
+                {
+                    _trackingData = originalTrackingData;
+                }
+
+                // Restore the original PostPaint methods.
+                if (originalPostPaintMethods != null)
+                {
+                    _postPaintMethods = originalPostPaintMethods;
+                }
+
+                // Allow painting of the ImageViewer again.
+                FormsMethods.LockControlUpdate(this, false, false);
+                _preventInvalidate = false;
             }
         }
 
@@ -5737,14 +5861,14 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Invalidates the <see cref="ImageViewer"/> and executes the specified
+        /// Refreshes the <see cref="ImageViewer"/> and executes the specified
         /// <see paramref="method"/> at the end of the resulting paint operation.
         /// </summary>
         /// <param name="method">The <see cref="PostPaintDelegate"/> to be executed.</param>
         void ExecutePostPaintMethod(PostPaintDelegate method)
         {
             _postPaintMethods.Add(method);
-            Invalidate();
+            Refresh();
         }
 
         #endregion

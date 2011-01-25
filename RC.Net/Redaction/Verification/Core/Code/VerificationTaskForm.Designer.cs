@@ -229,7 +229,7 @@ namespace Extract.Redaction.Verification
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             this._magnifierDockableWindow = new TD.SandDock.DockableWindow();
-            this._magnifierControl = new System.Windows.Forms.Panel();
+            this._magnifierControl = new Imaging.Forms.MagnifierControl();
             this._magnifierToolStripButton = new Extract.Imaging.Forms.MagnifierWindowToolStripButton();
             dataGridToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             label3 = new System.Windows.Forms.Label();
@@ -1853,7 +1853,7 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.ToolStripMenuItem _slideshowPauseToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _slideshowStopToolStripMenuItem;
         private DockableWindow _magnifierDockableWindow;
-        private System.Windows.Forms.Panel _magnifierControl;
+        private Imaging.Forms.MagnifierControl _magnifierControl;
         private Imaging.Forms.MagnifierWindowToolStripButton _magnifierToolStripButton;
     }
 }

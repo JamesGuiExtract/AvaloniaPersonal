@@ -791,8 +791,10 @@ namespace Extract.Imaging.Forms
 
                     // Draw the border
                     GdiPen pen = ExtractPens.GetThickGdiPen(BorderColor.Value);
-                    GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen);
-                    gdiGraphics.DrawPolygon(pen, vertices);
+                    using (GdiGraphics gdiGraphics = new GdiGraphics(graphics, RasterDrawMode.MaskPen))
+                    {
+                        gdiGraphics.DrawPolygon(pen, vertices);
+                    }
                 }
             }
             catch (Exception ex)
@@ -823,7 +825,7 @@ namespace Extract.Imaging.Forms
                 // Paint the highlight's region
                 if (_color != Color.Transparent)
                 {
-                    GdiGraphics gdiGraphics = new GdiGraphics(graphics, drawMode);
+                    using (GdiGraphics gdiGraphics = new GdiGraphics(graphics, drawMode))
                     using (Region region = Region.Clone())
                     {
                         // Transform region coordinates from logical to destination

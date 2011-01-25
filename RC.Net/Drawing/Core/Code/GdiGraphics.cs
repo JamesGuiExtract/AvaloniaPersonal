@@ -1,16 +1,18 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using Extract.Licensing;
+using System.Drawing.Drawing2D;
 
 namespace Extract.Drawing
 {
     /// <summary>
     /// Represents a graphics device interface (GDI) drawing surface.
     /// </summary>
-    public class GdiGraphics
+    public class GdiGraphics : IDisposable
     {
         #region Constants
 
@@ -18,6 +20,11 @@ namespace Extract.Drawing
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(GeometryMethods).ToString();
+
+        /// <summary>
+        /// The elements of the identity Matrix. Used to test if a matrix is the identity.
+        /// </summary>
+        static readonly float[] _IDENTITY_MATRIX_ELEMENTS = new float[] { 1F, 0F, 0F, 1F, 0F, 0F };
 
         #endregion Constants
 
@@ -27,6 +34,11 @@ namespace Extract.Drawing
         /// The graphics object from which to create GDI handles.
         /// </summary>
         readonly Graphics _graphics;
+
+        /// <summary>
+        /// A <see cref="Matrix"/> that should be used to transform coordinates before drawing.
+        /// </summary>
+        Matrix _transform;
 
         /// <summary>
         /// The raster drawing mode to use when drawing GDI figures.
@@ -46,11 +58,45 @@ namespace Extract.Drawing
         /// </param>
         public GdiGraphics(Graphics graphics, RasterDrawMode drawMode)
         {
-            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI29675",
-                _OBJECT_NAME);
+            try
+            {
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI29675",
+                        _OBJECT_NAME);
 
-            _graphics = graphics;
-            _drawMode = drawMode;
+                _graphics = graphics;
+                _drawMode = drawMode;
+
+                // Use the same transform as the supplied graphics. This is a copy or the original
+                // and needs to be disposed of.
+                _transform = _graphics.Transform;
+
+                // However, if the transform is the identity matrix (and thus would have no effect),
+                // go ahead and dispose of it right away since it won't be needed.
+                // NOTE: For some reason that I don't understand, the IsIdentity property returns false
+                // even when the matrix appears to be the identity. Therefore, compare each matrix
+                // element to the identity matrix elements
+                float[] elements = _transform.Elements;
+                int i;
+                for (i = 0; i < 6; i++)
+                {
+                    if (elements[i] != _IDENTITY_MATRIX_ELEMENTS[i])
+                    {
+                        // _transform is not the identity matrix.
+                        break;
+                    }
+                }
+
+                if (i == 6)
+                {
+                    // _transform is the identity matrix; it is not needed.
+                    _transform.Dispose();
+                    _transform = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31455", ex);
+            }
         }
 
         #endregion Constructors
@@ -84,27 +130,18 @@ namespace Extract.Drawing
         /// <param name="points">The vertices of the polygon.</param>
         public void DrawPolygon(GdiPen pen, Point[] points)
         {
-            IntPtr deviceContext = IntPtr.Zero;
             try
             {
-                deviceContext = _graphics.GetHdc();
+                if (_transform != null)
+                {
+                    _transform.TransformPoints(points);
+                }
 
-                NativeMethods.SetDrawMode(deviceContext, _drawMode);
-
-                NativeMethods.SelectGdiObject(deviceContext, pen.Handle);
-
-                NativeMethods.DrawPolygon(deviceContext, points);
+                DrawPolygon_Internal(pen, points);
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29680", ex);
-            }
-            finally
-            {
-                if (deviceContext != IntPtr.Zero)
-                {
-                    _graphics.ReleaseHdc(deviceContext);
-                }
             }
         }
 
@@ -117,13 +154,19 @@ namespace Extract.Drawing
         {
             try
             {
+                if (_transform != null)
+                {
+                    _transform.TransformPoints(points);
+                }
+
                 Point[] rounded = new Point[points.Length];
+
                 for (int i = 0; i < points.Length; i++)
                 {
                     rounded[i] = Point.Round(points[i]);
                 }
 
-                DrawPolygon(pen, rounded);
+                DrawPolygon_Internal(pen, rounded);
             }
             catch (Exception ex)
             {
@@ -201,5 +244,67 @@ namespace Extract.Drawing
         }
 
         #endregion Methods
+
+        /// <summary>
+        /// Draws a polygon defined by the specified points. 
+        /// </summary>
+        /// <param name="pen">Pen that determines the color, width, and style of the polygon.</param>
+        /// <param name="points">The vertices of the polygon.</param>
+        void DrawPolygon_Internal(GdiPen pen, Point[] points)
+        {
+            IntPtr deviceContext = IntPtr.Zero;
+            try
+            {
+                deviceContext = _graphics.GetHdc();
+
+                NativeMethods.SetDrawMode(deviceContext, _drawMode);
+
+                NativeMethods.SelectGdiObject(deviceContext, pen.Handle);
+
+                NativeMethods.DrawPolygon(deviceContext, points);
+            }
+            finally
+            {
+                if (deviceContext != IntPtr.Zero)
+                {
+                    _graphics.ReleaseHdc(deviceContext);
+                }
+            }
+        }
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="GdiGraphics"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <overloads>Releases resources used by the <see cref="GdiGraphics"/>.
+        /// </overloads>
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="GdiGraphics"/>. 
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose of managed resources
+                if (_transform != null)
+                {
+                    _transform.Dispose();
+                    _transform = null;
+                }
+            }
+
+            // Dispose of ummanaged resources
+        }
+
+        #endregion IDisposable Members
     }
 }
