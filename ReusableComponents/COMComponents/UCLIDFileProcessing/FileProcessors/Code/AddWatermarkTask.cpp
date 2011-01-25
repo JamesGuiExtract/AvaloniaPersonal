@@ -340,7 +340,7 @@ STDMETHODIMP CAddWatermarkTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -352,12 +352,13 @@ STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(BSTR bstrFileFullName, long nFil
 		validateLicense();
 
 		// check for NULL parameters
-		ASSERT_ARGUMENT("ELI19938", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI19939", pTagManager != NULL);
 		ASSERT_ARGUMENT("ELI19940", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31333", ipFileRecord != __nullptr);
 
 		// get the source doc name
-		string strSourceDoc = asString(bstrFileFullName);
+		string strSourceDoc = asString(ipFileRecord->Name);
 		validateFileOrFolderExistence(strSourceDoc);
 
 		// construct the full path to the input and output images

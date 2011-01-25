@@ -338,7 +338,7 @@ STDMETHODIMP CModulusEqualsMathCondition::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IMathConditionChecker
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CModulusEqualsMathCondition::raw_CheckCondition(BSTR bstrFileName, long lFileID, 
+STDMETHODIMP CModulusEqualsMathCondition::raw_CheckCondition(IFileRecord* pFileRecord, 
 	long lActionID, VARIANT_BOOL* pbResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -346,6 +346,10 @@ STDMETHODIMP CModulusEqualsMathCondition::raw_CheckCondition(BSTR bstrFileName, 
 	try
 	{
 		validateLicense();
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31447", ipFileRecord != __nullptr);
+
+		long lFileID = ipFileRecord->FileID;
 
 		// Ensure the file ID is valid
 		if (lFileID <= 0)

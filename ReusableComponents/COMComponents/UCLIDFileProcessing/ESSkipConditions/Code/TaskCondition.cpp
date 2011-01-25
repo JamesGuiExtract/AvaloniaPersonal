@@ -123,17 +123,16 @@ STDMETHODIMP CTaskCondition::put_LogExceptions(VARIANT_BOOL newVal)
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB* pFPDB, 
-	long lFileID, long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecord, IFileProcessingDB* pFPDB, 
+	long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		string strSourceFileName = asString(bstrFile);
-		ASSERT_ARGUMENT("ELI20079", !strSourceFileName.empty());
 		ASSERT_ARGUMENT("ELI20082", pFAMTM != NULL);
 		ASSERT_ARGUMENT("ELI20083", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI31354", pFileRecord != __nullptr);
 
 		validateLicense();
 
@@ -161,7 +160,7 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFilePro
 				// Execute the task.
 				// The condition is satisfied if the task completed without exception or cancellation
 				EFileProcessingResult eResult = m_ipFAMTaskExecutor->InitProcessClose(
-					bstrFile, ipTasks, lFileID, lActionID, pFPDB, pFAMTM, NULL, VARIANT_FALSE);
+					pFileRecord, ipTasks, lActionID, pFPDB, pFAMTM, NULL, VARIANT_FALSE);
 				*pRetVal = asVariantBool(eResult == kProcessingSuccessful);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20162");

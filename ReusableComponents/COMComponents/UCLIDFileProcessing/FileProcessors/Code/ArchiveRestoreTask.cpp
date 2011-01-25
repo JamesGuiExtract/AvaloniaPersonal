@@ -370,7 +370,7 @@ STDMETHODIMP CArchiveRestoreTask::raw_Init(long nActionID, IFAMTagManager* pFAMT
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -383,9 +383,12 @@ STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(BSTR bstrFileFullName, long nF
 		validateLicense();
 
 		// check for NULL parameters
-		ASSERT_ARGUMENT("ELI24578", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI24579", pTagManager != NULL);
 		ASSERT_ARGUMENT("ELI24580", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31335", ipFileRecord != __nullptr);
+
+		long nFileID = ipFileRecord->FileID;
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
@@ -396,7 +399,7 @@ STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(BSTR bstrFileFullName, long nF
 		_lastCodePos = "20";
 
 		// get the source doc name
-		string strSourceDoc = asString(bstrFileFullName);
+		string strSourceDoc = asString(ipFileRecord->Name);
 		_lastCodePos = "30";
 
 		// construct the full path to the file to archive/restore

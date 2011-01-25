@@ -253,7 +253,7 @@ STDMETHODIMP CManageTagsTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CManageTagsTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CManageTagsTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -267,6 +267,10 @@ STDMETHODIMP CManageTagsTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileI
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_ARGUMENT("ELI27461", ipDB != NULL);
 		ASSERT_ARGUMENT("ELI27462", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31339", ipFileRecord != __nullptr);
+
+		long nFileID = ipFileRecord->FileID;
 
 		// Validate the tags [LRCAU #5447]
 		validateTags(ipDB);

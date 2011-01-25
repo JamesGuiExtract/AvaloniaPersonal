@@ -47,7 +47,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 // IGenericMultiFAMCondition
 	STDMETHOD(FileMatchesFAMCondition)(IIUnknownVector* pFAMConditions, ELogicalOperator eLogicalOperator, 
-		BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, long lActionID, 
+		IFileRecord* pFileRecord, IFileProcessingDB* pFPDB, long lActionID, 
 		IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
 
 private:

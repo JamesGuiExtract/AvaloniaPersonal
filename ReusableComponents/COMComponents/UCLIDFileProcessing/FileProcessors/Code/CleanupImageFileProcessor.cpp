@@ -109,7 +109,7 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_Init(long nActionID, IFAMTagManager
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CCleanupImageFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID,
+STDMETHODIMP CCleanupImageFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord,
 	long nActionID, IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -120,12 +120,13 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, 
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17912", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17911", pTagManager != NULL);
 		ASSERT_ARGUMENT("ELI17902", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31336", ipFileRecord != __nullptr);
 
 		// get the input file name as a string
-		string strImageFileName = asString(bstrFileFullName);
+		string strImageFileName = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI17913", strImageFileName.empty() == false);
 
 		// verify the image file existence
@@ -150,7 +151,7 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, 
 		ASSERT_RESOURCE_ALLOCATION("ELI17290", ipICEngine != NULL);
 
 		// call the CleanupImage operation on the image file 
-		ipICEngine->CleanupImage(bstrFileFullName, strOutputFileName.c_str(), strSettingsFileName.c_str());
+		ipICEngine->CleanupImage(strImageFileName.c_str(), strOutputFileName.c_str(), strSettingsFileName.c_str());
 
 		// successful completion
 		*pResult = kProcessingSuccessful;

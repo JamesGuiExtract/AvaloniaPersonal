@@ -287,7 +287,7 @@ STDMETHODIMP CConditionalTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -298,10 +298,10 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFile
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17906", bstrFileFullName != NULL);
-		ASSERT_ARGUMENT("ELI17907", asString(bstrFileFullName).empty() == false);
 		ASSERT_ARGUMENT("ELI17908", pTagManager != NULL);
 		ASSERT_ARGUMENT("ELI17910", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31337", ipFileRecord != __nullptr);
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
@@ -329,7 +329,7 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFile
 
 		// Exercise the FAM Condition
 		bool bConditionSatisfied = asCppBool(ipFAMCondition->FileMatchesFAMCondition(
-			bstrFileFullName, pDB, nFileID, nActionID, pTagManager));
+			ipFileRecord, pDB, nActionID, pTagManager));
 
 		// Kick off progress status for task execution
 		IProgressStatusPtr ipSubProgressStatus = NULL;
@@ -349,8 +349,8 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFile
 			if (m_ipTasksForTrue != NULL && m_ipTasksForTrue->Size() > 0)
 			{
 				// Execute true tasks
-				*pResult = m_ipFAMTaskExecutor->InitProcessClose(bstrFileFullName, 
-					m_ipTasksForTrue, nFileID, nActionID, pDB, pTagManager, ipSubProgressStatus,
+				*pResult = m_ipFAMTaskExecutor->InitProcessClose(ipFileRecord, 
+					m_ipTasksForTrue, nActionID, pDB, pTagManager, ipSubProgressStatus,
 					bCancelRequested);
 			}
 		}
@@ -360,8 +360,8 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFile
 			if (m_ipTasksForFalse != NULL && m_ipTasksForFalse->Size() > 0)
 			{
 				// Execute false tasks
-				*pResult = m_ipFAMTaskExecutor->InitProcessClose(bstrFileFullName, 
-					m_ipTasksForFalse, nFileID, nActionID, pDB, pTagManager, ipSubProgressStatus,
+				*pResult = m_ipFAMTaskExecutor->InitProcessClose(ipFileRecord, 
+					m_ipTasksForFalse, nActionID, pDB, pTagManager, ipSubProgressStatus,
 					bCancelRequested);
 			}
 		}

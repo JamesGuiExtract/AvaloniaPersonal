@@ -329,8 +329,8 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Processes the specified file.
         /// </summary>
-        /// <param name="bstrFileFullName">The file to process.</param>
-        /// <param name="nFileID">The ID of the file being processed.</param>
+        /// <param name="pFileRecord">The file record that contains the info of the file being 
+		/// processed.</param>
         /// <param name="nActionID">The ID of the action being processed.</param>
         /// <param name="pFAMTM">A File Action Manager Tag Manager for expanding tags.</param>
         /// <param name="pDB">The File Action Manager database.</param>
@@ -341,7 +341,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <returns><see langword="true"/> if processing should continue; <see langword="false"/> 
         /// if all file processing should be cancelled.</returns>
         [CLSCompliant(false)]
-        public EFileProcessingResult ProcessFile(string bstrFileFullName, int nFileID,
+        public EFileProcessingResult ProcessFile(FileRecord pFileRecord,
             int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
             ProgressStatus pProgressStatus, bool bCancelRequested)
         {
@@ -354,7 +354,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Create a tag manager and expand the tags in the file name
                 FileActionManagerPathTags tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(bstrFileFullName), pFAMTM.FPSFileDir);
+                    Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir);
                 fileName = tags.Expand(_fileName);
 
                 // Ensure the database counter exists
@@ -383,7 +383,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     ee.AddDebugData("File Being Processed", fileName, false);
                 }
-                ee.AddDebugData("File ID", nFileID, false);
+                ee.AddDebugData("File ID", pFileRecord.FileID, false);
                 ee.AddDebugData("Action ID", nActionID, false);
                 ee.AddDebugData("User Counter", string.IsNullOrEmpty(_format.DatabaseCounter)
                     ? "<Empty String>" : _format.DatabaseCounter, false);

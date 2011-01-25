@@ -259,7 +259,7 @@ STDMETHODIMP CSleepTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29586");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CSleepTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CSleepTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {

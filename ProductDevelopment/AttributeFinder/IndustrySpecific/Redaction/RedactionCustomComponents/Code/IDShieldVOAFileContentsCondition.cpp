@@ -910,8 +910,8 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::GetSizeMax(ULARGE_INTEGER *pcbSi
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, 
-	IFileProcessingDB* pFPDB, long lFileID, long lActionID, IFAMTagManager* pFAMTM, 
+STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecord,
+	IFileProcessingDB* pFPDB, long lActionID, IFAMTagManager* pFAMTM, 
 	VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -921,12 +921,13 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(BSTR
 	{
 		ASSERT_ARGUMENT("ELI17606", pFAMTM != NULL);
 		ASSERT_ARGUMENT("ELI17607", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI31355", pFileRecord != __nullptr);
 
 		// default to condition failed, set to TRUE once condition has been satisfied
 		*pRetVal = VARIANT_FALSE;
 
 		// Call ExpandTagsAndTFE() to convert bstrFile by expanding tags and functions
-		string strSource = asString(bstrFile);
+		string strSource = asString(pFileRecord->Name);
 		string strTarget = CRedactionCustomComponentsUtils::ExpandTagsAndTFE(pFAMTM, m_strTargetFileName, strSource);
 		_lastCodePos = "10";
 

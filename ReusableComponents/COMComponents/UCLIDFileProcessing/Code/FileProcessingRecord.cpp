@@ -295,3 +295,7 @@ UCLID_FILEPROCESSINGLib::EFilePriority FileProcessingRecord::getPriority() const
 	return m_lfrFileRcd.Priority;
 }
 //-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IFileRecordPtr FileProcessingRecord::getFileRecord() 
+{
+	return m_lfrFileRcd.getFileRecord();
+}

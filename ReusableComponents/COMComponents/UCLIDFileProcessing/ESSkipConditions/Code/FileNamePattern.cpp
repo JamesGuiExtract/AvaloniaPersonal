@@ -594,15 +594,18 @@ STDMETHODIMP CFileNamePattern::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB* pFPDB, 
-	long lFileID, long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(IFileRecord* pFileRecord, IFileProcessingDB* pFPDB, 
+	long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
 {	
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31358", ipFileRecord != __nullptr);
+
 		// String contain the current source file name
-		string strSourceFileName = asString(bstrFile); //e.g. strSourceFileName = "C:\123.tif"
+		string strSourceFileName = asString(ipFileRecord->Name); //e.g. strSourceFileName = "C:\123.tif"
 		// String contain the regular expression
 		string strRegExp = "";
 
@@ -642,7 +645,7 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileP
 			try
 			{
 				string rootTag = "<FPSFileDir>";
-				strRootFolder = asString( ipTag->ExpandTags(_bstr_t(rootTag.c_str()), bstrFile) );
+				strRootFolder = asString( ipTag->ExpandTags(_bstr_t(rootTag.c_str()), strSourceFileName.c_str()) );
 			}
 			catch(...)
 			{

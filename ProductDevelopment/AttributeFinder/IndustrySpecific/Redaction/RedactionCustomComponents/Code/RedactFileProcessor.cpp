@@ -91,7 +91,7 @@ STDMETHODIMP CRedactFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAM
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager* pTagManager, IFileProcessingDB* pDB, IProgressStatus* pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult* pResult)
 {

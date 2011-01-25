@@ -413,9 +413,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Opens the specified document to allow indexed data to be verified/edited.
         /// </summary>
-        /// <param name="bstrFileFullName">A <see langword="string"/> that specifies the file being
-        /// processed.</param>
-        /// <param name="nFileID">The ID of the file being processed.</param>
+		/// <param name="pFileRecord">The file record that contains the info of the file being 
+		/// processed.</param>
         /// <param name="nActionID">The ID of the action being processed.</param>
         /// <param name="pFAMTM">The <see cref="FAMTagManager"/> to use if needed.</param>
         /// <param name="pDB">The <see cref="FileProcessingDB"/> in use.</param>
@@ -431,7 +430,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// was skipped, but the user wishes to continue viewing subsequent documents.
         /// </returns>
         [CLSCompliant(false)]
-        public EFileProcessingResult ProcessFile(string bstrFileFullName, int nFileID,
+        public EFileProcessingResult ProcessFile(FileRecord pFileRecord,
             int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
             ProgressStatus pProgressStatus, bool bCancelRequested)
         {
@@ -453,8 +452,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     // As long as processing has not been cancelled, open the supplied document in the
                     // data entry form.
-                    processingResult = _dataEntryFormManager.ShowDocument(bstrFileFullName,
-                        nFileID, nActionID, pFAMTM, pDB);
+                    processingResult = _dataEntryFormManager.ShowDocument(pFileRecord.Name,
+                        pFileRecord.FileID, nActionID, pFAMTM, pDB);
                 }
 
                 return processingResult;

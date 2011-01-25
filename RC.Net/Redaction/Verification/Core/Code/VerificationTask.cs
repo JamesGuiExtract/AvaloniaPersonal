@@ -304,9 +304,9 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Processes the specified file.
         /// </summary>
-        /// <param name="bstrFileFullName">The file to process.</param>
-        /// <param name="nFileID">The ID of the file being processed.</param>
-        /// <param name="nActionID">The ID of the action being processed.</param>
+		/// <param name="pFileRecord">The file record that contains the info of the file being 
+		/// processed.</param>
+		/// <param name="nActionID">The ID of the action being processed.</param>
         /// <param name="pFAMTM">A File Action Manager Tag Manager for expanding tags.</param>
         /// <param name="pDB">The File Action Manager database.</param>
         /// <param name="pProgressStatus">Object to provide progress status updates to caller.
@@ -316,7 +316,7 @@ namespace Extract.Redaction.Verification
         /// <returns><see langword="true"/> if processing should continue; <see langword="false"/> 
         /// if all file processing should be cancelled.</returns>
         [CLSCompliant(false)]
-        public EFileProcessingResult ProcessFile(string bstrFileFullName, int nFileID, int nActionID,
+        public EFileProcessingResult ProcessFile(FileRecord pFileRecord, int nActionID,
             FAMTagManager pFAMTM, FileProcessingDB pDB, ProgressStatus pProgressStatus, bool bCancelRequested)
         {
             try
@@ -330,7 +330,7 @@ namespace Extract.Redaction.Verification
                     return EFileProcessingResult.kProcessingCancelled;
                 }
 
-                EFileProcessingResult result = _form.ShowDocument(bstrFileFullName, nFileID,
+                EFileProcessingResult result = _form.ShowDocument(pFileRecord.Name, pFileRecord.FileID,
                     nActionID, pFAMTM, pDB);
 
                 return result;

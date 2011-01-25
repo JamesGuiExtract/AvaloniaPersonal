@@ -130,7 +130,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_Init(long nActionID, IFAMTagManag
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID,
+STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord,
     long nActionID, IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -141,14 +141,15 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(BSTR bstrFileFullName
 		// Check license
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI17914", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17904", pTagManager != NULL);
 		ASSERT_ARGUMENT("ELI17903", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31341", ipFileRecord != __nullptr);
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
 
-		std::string strSourceDocName = asString(bstrFileFullName);
+		std::string strSourceDocName = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI17915", strSourceDocName.empty() == false);
 
 		// Call ExpandTagsAndTFE() to expand tags and functions

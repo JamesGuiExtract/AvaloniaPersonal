@@ -42,11 +42,11 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 // IFileProcessingTaskExecutor
 	STDMETHOD(Init)(IIUnknownVector *pFileProcessingTasks, long nActionID, IFileProcessingDB *pDB,
 		IFAMTagManager *pFAMTagManager);
-	STDMETHOD(ProcessFile)(BSTR bstrSourceDocName, long nFileID, long nActionID,
+	STDMETHOD(ProcessFile)(IFileRecord* pFileRecord, long nActionID,
 		IProgressStatus *pProgressStatus, VARIANT_BOOL vbCancelRequested,
 		EFileProcessingResult* pResult);
-	STDMETHOD(InitProcessClose)(BSTR bstrSourceDocName, IIUnknownVector *pFileProcessingTasks, 
-		long nFileID, long nActionID, IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager,
+	STDMETHOD(InitProcessClose)(IFileRecord* pFileRecord, IIUnknownVector *pFileProcessingTasks, 
+		long nActionID, IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager,
 		IProgressStatus *pProgressStatus, VARIANT_BOOL bCancelRequested,
 		EFileProcessingResult* pResult);
 	STDMETHOD(Cancel)();
@@ -128,8 +128,8 @@ private:
 	void validateLicense();
 
 	// Internal ProcessFile method
-	EFileProcessingResult processFile(const string& strSourceDocName,
-		long nFileID, long nActionID, const IProgressStatusPtr& ipProgressStatus,
+	EFileProcessingResult processFile(IFileRecord* pFileRecord,
+		long nActionID, const IProgressStatusPtr& ipProgressStatus,
 		bool bCancelRequested);
 
 	// Internal Init method

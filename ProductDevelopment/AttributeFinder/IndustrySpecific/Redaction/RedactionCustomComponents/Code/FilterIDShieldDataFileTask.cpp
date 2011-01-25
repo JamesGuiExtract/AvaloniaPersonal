@@ -80,7 +80,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_Init(long nActionID, IFAMTagManage
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID,
+STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(IFileRecord* pFileRecord,
 	long nActionID, IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -92,6 +92,8 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(BSTR bstrFileFullName,
 		validateLicense();
 
 		ASSERT_ARGUMENT("ELI24785", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31343", ipFileRecord != __nullptr);
 
 		// Get the tag manager
 		IFAMTagManagerPtr ipFamTagManager(pTagManager);
@@ -101,7 +103,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(BSTR bstrFileFullName,
 		*pResult = kProcessingSuccessful;
 
 		// Get source doc
-		string strSourceDoc = asString(bstrFileFullName);
+		string strSourceDoc = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI24788", !strSourceDoc.empty());
 
 		// Get the VOA file to read and ensure it exists

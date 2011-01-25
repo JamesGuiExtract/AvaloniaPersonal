@@ -170,7 +170,7 @@ library EXTRACT_FAMCONDITIONSLib
 		// with different logical operators
 		[id(1), helpstring("method FileMatchesFAMCondition")] HRESULT FileMatchesFAMCondition(
 			[in] IIUnknownVector* pFAMConditions, [in] ELogicalOperator eLogicalOperator, 
-			[in] BSTR bstrFile, [in] IFileProcessingDB* pFPDB, [in] long lFileID, 
+			[in] IFileRecord* pFileRecord, [in] IFileProcessingDB* pFPDB,
 			[in] long lActionID, [in] IFAMTagManager* pFAMTM, [out, retval] VARIANT_BOOL* pRetVal);
 	};
 

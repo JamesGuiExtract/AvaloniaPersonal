@@ -164,14 +164,16 @@ STDMETHODIMP CTagCondition::put_Tags(IVariantVector *pVecTags)
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB* pFPDB, 
-	long lFileID, long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecord, IFileProcessingDB* pFPDB, 
+	long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		string strSourceFileName = asString(bstrFile);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31361", ipFileRecord != __nullptr);
+		string strSourceFileName = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI27529", !strSourceFileName.empty());
 		IFileProcessingDBPtr ipFPDB(pFPDB);
 		ASSERT_ARGUMENT("ELI27530", ipFPDB != NULL);
@@ -187,7 +189,7 @@ STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProc
 			throw ue;
 		}
 
-		IVariantVectorPtr ipTagsOnFile = ipFPDB->GetTagsOnFile(lFileID);
+		IVariantVectorPtr ipTagsOnFile = ipFPDB->GetTagsOnFile(ipFileRecord->FileID);
 		ASSERT_RESOURCE_ALLOCATION("ELI27534", ipTagsOnFile != NULL);
 
 		// Iterate through all of the tags

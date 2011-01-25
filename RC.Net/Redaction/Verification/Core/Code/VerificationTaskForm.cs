@@ -482,8 +482,14 @@ namespace Extract.Redaction.Verification
             // Commit
             if (_actionStatusTask != null)
             {
-                VerificationMemento memento = GetCurrentDocument();
-                _actionStatusTask.ProcessFile(memento.SourceDocument, memento.FileId, memento.ActionId,
+				VerificationMemento memento = GetCurrentDocument();
+
+				// Set up file record for call to processfile
+				FileRecordClass fileRecord = new FileRecordClass();
+				fileRecord.Name = memento.SourceDocument;
+				fileRecord.FileID = memento.FileId;
+
+                _actionStatusTask.ProcessFile(fileRecord, memento.ActionId,
                     _tagManager, _fileDatabase, null, false);
             }
 
@@ -502,8 +508,14 @@ namespace Extract.Redaction.Verification
                 if (_slideshowActionStatusTask != null)
                 {
                     memento = memento ?? GetCurrentDocument();
-                    _slideshowActionStatusTask.ProcessFile(memento.SourceDocument,
-                        memento.FileId, memento.ActionId, _tagManager, _fileDatabase,
+
+					// Set up file record for call to processfile
+					FileRecordClass fileRecord = new FileRecordClass();
+					fileRecord.Name = memento.SourceDocument;
+					fileRecord.FileID = memento.FileId;
+
+					_slideshowActionStatusTask.ProcessFile(fileRecord,
+						memento.ActionId, _tagManager, _fileDatabase,
                         null, false);
                 }
             }
@@ -2347,8 +2359,13 @@ namespace Extract.Redaction.Verification
                             VerificationMemento memento = GetCurrentDocument();
                             IFAMCondition condition =
                                 _settings.SlideshowSettings.DocumentCondition.Object as IFAMCondition;
-                            if (condition.FileMatchesFAMCondition(memento.SourceDocument,
-                                _fileDatabase, memento.FileId, memento.ActionId, _tagManager))
+
+                            FileRecordClass fileRecord = new FileRecordClass();
+                            fileRecord.Name = memento.SourceDocument;
+                            fileRecord.FileID = memento.FileId;
+
+                            if (condition.FileMatchesFAMCondition(fileRecord,
+                                _fileDatabase, memento.ActionId, _tagManager))
                             {
                                 pauseSlideshow = true;
 

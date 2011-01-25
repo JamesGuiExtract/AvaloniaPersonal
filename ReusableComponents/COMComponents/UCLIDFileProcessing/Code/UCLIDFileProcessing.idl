@@ -31,6 +31,7 @@ library UCLID_FILEPROCESSINGLib
 	interface IFAMTagManager;
 	interface IRoleNotifyFAM;
 	interface ISetProcessingSchedule;
+	interface IFileRecord;
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S -----------------------------------------------------------------------------------
@@ -144,7 +145,7 @@ library UCLID_FILEPROCESSINGLib
 	{
 		// Returns VARIANT_TRUE if the condition is met and VARIANT_FALSE if it is not met
 		[id(10001), helpstring("method CheckCondition")] HRESULT CheckCondition(
-			[in] BSTR bstrFileName,	[in] long lFileID, [in] long lActionID, 
+			[in] IFileRecord* pFileRecord, [in] long lActionID, 
 			[out, retval] VARIANT_BOOL* pbResult);
 	};
 
@@ -241,11 +242,10 @@ library UCLID_FILEPROCESSINGLib
 		//				vector returned MUST contain any files to output with an empty string "" as the last entry in the vector.
 		//				IF the strFileFullName was not "" an empty string "" should not be returned in the
 		//				pFiles vector.
-		// ARGUMENTS:	bstrFileFullName - The file to be processed
+		// ARGUMENTS:	pFileRecord - The file record of the file to be processed
 		//				pResult - If kProcessingSuccessful, file should be set to Completed,
 		//					if kProcessingCancelled, file should revert to pending, and
 		//					if kProcessingSkipped, file should be set to skipped.
-		//				nFileID - The ID of the file to act upon
 		//				nActionID - The ID of the action being processed
 		//				pFAMTM - A FAMTagManager object for expanding filename tags/methods
 		//				pDB - The database being operated upon
@@ -273,8 +273,8 @@ library UCLID_FILEPROCESSINGLib
 		//					guarantee for a particular SourceDocName, like a database transaction which is either 
 		//					committed or rolled back.
 		// NOTE:		See note about IFileProcessingTask multithreading above
-		[id(12), helpstring("method ProcessFile")] HRESULT ProcessFile([in] BSTR bstrFileFullName, 
-			[in] long nFileID, [in] long nActionID, [in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB* pDB, 
+		[id(12), helpstring("method ProcessFile")] HRESULT ProcessFile([in] IFileRecord* pFileRecord, 
+			[in] long nActionID, [in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB* pDB, 
 			[in] IProgressStatus* pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
 			[out, retval] EFileProcessingResult* pResult);
 		//-----------------------------------------------------------------------------------------
@@ -470,7 +470,7 @@ library UCLID_FILEPROCESSINGLib
 	interface IFAMCondition : IAccessRequired
 	{
 		[id(1), helpstring("method FileMatchesFAMCondition")] HRESULT FileMatchesFAMCondition(
-			[in] BSTR bstrFile, [in] IFileProcessingDB* pFPDB, [in] long lFileID, 
+			[in] IFileRecord* pFileRecord, [in] IFileProcessingDB* pFPDB, 
 			[in] long lActionID, [in] IFAMTagManager* pFAMTagManager, 
 			[out, retval] VARIANT_BOOL* pRetVal);
 	};
@@ -1464,8 +1464,7 @@ library UCLID_FILEPROCESSINGLib
 			[in] long nActionID, [in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To process the given file
-		// ARGS:	bstrSourceDocName- The file to act upon
-		//			nFileID - The ID of the file to act upon
+		// ARGS:	pFileRecord - The file record of the file to process
 		//			nActionID - The ID of the action being processed
 		//			pProgressStatus- The ProgressStatus object to update
 		//			pbSuccessfulCompletion- VARIANT_TRUE if successful; VARIANT_FALSE is indicative of cancellation since
@@ -1473,14 +1472,13 @@ library UCLID_FILEPROCESSINGLib
 		//			bCancelRequested - VARIANT_TRUE if the user has requested cancellation.  IFileProcessingTaskExecutor
 		//				doesn't act upon this flag, but passes it on to the tasks it executes
 		// REQUIRED: Init must have been called prior to calling ProcessFile.
-		[id(2), helpstring("method ProcessFile")] HRESULT ProcessFile([in] BSTR bstrSourceDocName,
-			[in] long nFileID, [in] long nActionID, [in] IProgressStatus* pProgressStatus,
+		[id(2), helpstring("method ProcessFile")] HRESULT ProcessFile([in] IFileRecord* pFileRecord, 
+			[in] long nActionID, [in] IProgressStatus* pProgressStatus,
 			[in] VARIANT_BOOL bCancelRequested, [out, retval] EFileProcessingResult* pResult);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: To process the given file with one call (separate calls to Init and Close not required)
-		// ARGS:	bstrSourceDocName- The file to act upon
+		// ARGS:	pFileRecord - The file record of the file to process
 		//			pFileProcessingTasks- A Object with Description list of file processing tasks
-		//			nFileID - The ID of the file to act upon
 		//			nActionID - The ID of the action being processed
 		//			pDB- The database being acted upon
 		//			pFAMTagManager- The tag manager to use when required
@@ -1491,9 +1489,8 @@ library UCLID_FILEPROCESSINGLib
 		//				an error should fire an exception
 		// REQUIRED: Nothing.
 		[id(3), helpstring("method InitProcessClose")] HRESULT InitProcessClose(
-			[in] BSTR bstrSourceDocName, [in] IIUnknownVector* pFileProcessingTasks,
-			[in] long nFileID, [in] long nActionID,
-			[in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager, 
+			[in] IFileRecord* pFileRecord, [in] IIUnknownVector* pFileProcessingTasks,
+			[in] long nActionID, [in] IFileProcessingDB* pDB, [in] IFAMTagManager* pFAMTagManager, 
 			[in] IProgressStatus* pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
 			[out, retval] EFileProcessingResult* pResult);
 		//-----------------------------------------------------------------------------------------

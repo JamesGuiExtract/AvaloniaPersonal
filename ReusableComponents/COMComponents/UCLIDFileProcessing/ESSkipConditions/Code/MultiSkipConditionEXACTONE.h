@@ -57,7 +57,7 @@ public:
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IFAMCondition
-	STDMETHOD(raw_FileMatchesFAMCondition)(BSTR bstrFile, IFileProcessingDB* pFPDB, long lFileID, 
+	STDMETHOD(raw_FileMatchesFAMCondition)(IFileRecord* pFileRecord, IFileProcessingDB* pFPDB,
 		long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
 
 // IAccessRequired

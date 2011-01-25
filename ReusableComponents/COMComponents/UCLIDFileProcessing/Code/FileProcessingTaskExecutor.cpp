@@ -78,7 +78,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingT
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(BSTR bstrSourceDocName, long nFileID,
+STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(IFileRecord* pFileRecord,
 	long nActionID, IProgressStatus *pProgressStatus, VARIANT_BOOL vbCancelRequested, 
 	EFileProcessingResult *pResult)
 {
@@ -94,15 +94,14 @@ STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(BSTR bstrSourceDocName, lo
 		verifyInitialization();
 
 		// Assert required arguments
-		ASSERT_ARGUMENT("ELI17706", bstrSourceDocName != NULL);
-		ASSERT_ARGUMENT("ELI17877", !asString(bstrSourceDocName).empty());
+		ASSERT_ARGUMENT("ELI31323", pFileRecord != __nullptr);
 		ASSERT_ARGUMENT("ELI17704", pResult != NULL);
 
 		// ProgressStatus not required... don't use if NULL
 		IProgressStatusPtr ipProgressStatus(pProgressStatus);
 
 		// Process the file and set the return value
-		*pResult = processFile(asString(bstrSourceDocName), nFileID, nActionID, ipProgressStatus,
+		*pResult = processFile(pFileRecord, nActionID, ipProgressStatus,
 			asCppBool(vbCancelRequested));
 
 		return S_OK;
@@ -112,8 +111,8 @@ STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(BSTR bstrSourceDocName, lo
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(BSTR bstrSourceDocName, 
-	IIUnknownVector *pFileProcessingTasks, long nFileID, long nActionID,
+STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(IFileRecord* pFileRecord, 
+	IIUnknownVector *pFileProcessingTasks, long nActionID,
 	IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager, 
 	IProgressStatus *pProgressStatus, VARIANT_BOOL bCancelRequested, 
 	EFileProcessingResult *pResult)
@@ -129,10 +128,11 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(BSTR bstrSourceDocNam
 
 		// Verify required arguments
 		IIUnknownVectorPtr ipFileProcessingTasks(pFileProcessingTasks);
-		ASSERT_ARGUMENT("ELI17863", ipFileProcessingTasks != NULL);
+		ASSERT_ARGUMENT("ELI17863", ipFileProcessingTasks !=  __nullptr);
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(pFAMTagManager);
-		ASSERT_ARGUMENT("ELI17865", ipFAMTagManager != NULL);
-		ASSERT_ARGUMENT("ELI17866", pResult != NULL);
+		ASSERT_ARGUMENT("ELI17865", ipFAMTagManager !=  __nullptr);
+		ASSERT_ARGUMENT("ELI17866", pResult !=  __nullptr);
+		ASSERT_ARGUMENT("ELI31324", pFileRecord != __nullptr);
 
 		// ProgressStatus and database not required.  Won't be used if NULL
 		IProgressStatusPtr ipProgressStatus(pProgressStatus);
@@ -144,7 +144,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(BSTR bstrSourceDocNam
 		// Process the tasks
 		try
 		{
-			*pResult = processFile(asString(bstrSourceDocName), nFileID, nActionID, ipProgressStatus,
+			*pResult = processFile(pFileRecord, nActionID, ipProgressStatus,
 				asCppBool(bCancelRequested));
 		}
 		catch (...)
@@ -310,11 +310,20 @@ void CFileProcessingTaskExecutor::verifyInitialization()
 }
 //-------------------------------------------------------------------------------------------------
 EFileProcessingResult CFileProcessingTaskExecutor::processFile(
-	const string& strSourceDocName, long nFileID, long nActionID,
+	IFileRecord* pFileRecord, long nActionID,
 	const IProgressStatusPtr& ipProgressStatus, bool bCancelRequested)
 {
 	try
 	{
+		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_RESOURCE_ALLOCATION("ELI31322", ipFileRecord != __nullptr);
+
+		// Get the source doc name from the file record
+		string strSourceDocName = asString(ipFileRecord->Name);
+		ASSERT_RESOURCE_ALLOCATION("ELI17877", !strSourceDocName.empty());
+
+		long nFileID = ipFileRecord->FileID;
+
 		// Progress status can be null, initialize if it exists
 		if (ipProgressStatus)
 		{
@@ -373,7 +382,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						bool bCancel = (bCancelRequested || m_eventCancelRequested.isSignaled());
 
 						UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult =
-							m_ipCurrentTask->ProcessFile(strSourceDocName.c_str(), nFileID,
+							m_ipCurrentTask->ProcessFile(ipFileRecord,
 							nActionID, m_ipFAMTagManager, m_ipDB, ipSubProgressStatus,
 							asVariantBool(bCancel));
 

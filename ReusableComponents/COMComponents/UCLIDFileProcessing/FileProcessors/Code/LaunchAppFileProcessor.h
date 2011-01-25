@@ -90,7 +90,7 @@ public:
 
 // IFileProcessingTask
 	STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB *pDB);
-	STDMETHOD(raw_ProcessFile)(BSTR bstrFileFullName, long nFileID, long nActionID,
+	STDMETHOD(raw_ProcessFile)(IFileRecord* pFileRecord, long nActionID,
 		IFAMTagManager *pFAMTM, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 		VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult);
 	STDMETHOD(raw_Cancel)();

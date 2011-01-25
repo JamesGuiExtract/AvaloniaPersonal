@@ -120,7 +120,7 @@ STDMETHODIMP CRedactionTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17789");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager* pTagManager, IFileProcessingDB* pDB, IProgressStatus* pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult* pResult)
 {
@@ -138,8 +138,9 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 		swProcessingTime.start();
 		_lastCodePos = "20";
 
-		ASSERT_ARGUMENT("ELI17928", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17929", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31344", ipFileRecord != __nullptr);
 
 		// Create an smart FAM Tag Pointer
 		IFAMTagManagerPtr ipFAMTagManager = pTagManager;
@@ -147,9 +148,11 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID
 		_lastCodePos = "30";
 
 		// input file for processing
-		string strInputFile = asString(bstrFileFullName);
+		string strInputFile = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI17930", !strInputFile.empty());
 		_lastCodePos = "40";
+
+		long nFileID = ipFileRecord->FileID;
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;

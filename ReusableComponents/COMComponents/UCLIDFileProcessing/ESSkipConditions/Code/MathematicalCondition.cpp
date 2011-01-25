@@ -403,8 +403,8 @@ STDMETHODIMP CMathematicalCondition::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMathematicalCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, 
-	IFileProcessingDB* pFPDB, long lFileID, long lActionID, IFAMTagManager* pFAMTM, 
+STDMETHODIMP CMathematicalCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecord, 
+	IFileProcessingDB* pFPDB, long lActionID, IFAMTagManager* pFAMTM, 
 	VARIANT_BOOL* pRetVal)
 {	
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -415,6 +415,8 @@ STDMETHODIMP CMathematicalCondition::raw_FileMatchesFAMCondition(BSTR bstrFile,
 
 		// Check the arguments
 		ASSERT_ARGUMENT("ELI27163", pRetVal != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31359", ipFileRecord != __nullptr);
 
 		// Ensure the object has been configured
 		if (isConfigured() == VARIANT_FALSE)
@@ -425,7 +427,7 @@ STDMETHODIMP CMathematicalCondition::raw_FileMatchesFAMCondition(BSTR bstrFile,
 
 		// Check the condition
 		bool bConditionMet = 
-			asCppBool(m_ipConditionChecker->CheckCondition(bstrFile, lFileID, lActionID));
+			asCppBool(m_ipConditionChecker->CheckCondition(ipFileRecord, lActionID));
 
 		// Reverse result if considering the condition not met
 		if (!m_bConsiderConditionMet)

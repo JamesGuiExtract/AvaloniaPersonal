@@ -375,7 +375,7 @@ STDMETHODIMP COnceEveryMathCondition::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IMathConditionChecker
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP COnceEveryMathCondition::raw_CheckCondition(BSTR bstrFileName, long lFileID, 
+STDMETHODIMP COnceEveryMathCondition::raw_CheckCondition(IFileRecord* pFileRecord, 
 	long lActionID, VARIANT_BOOL* pbResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

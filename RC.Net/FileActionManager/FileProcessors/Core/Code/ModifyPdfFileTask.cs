@@ -469,9 +469,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Processes the specified file.
         /// </summary>
-        /// <param name="bstrFileFullName">The file to process.</param>
-        /// <param name="nFileID">The ID of the file being processed.</param>
-        /// <param name="nActionID">The ID of the action being processed.</param>
+		/// <param name="pFileRecord">The file record that contains the info of the file being 
+		/// processed.</param>
+		/// <param name="nActionID">The ID of the action being processed.</param>
         /// <param name="pFAMTM">A File Action Manager Tag Manager for expanding tags.</param>
         /// <param name="pDB">The File Action Manager database.</param>
         /// <param name="pProgressStatus">Object to provide progress status updates to caller.
@@ -481,7 +481,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <returns>An <see cref="EFileProcessingResult"/> indicating the result of the
         /// processing.</returns>
         [CLSCompliant(false)]
-        public EFileProcessingResult ProcessFile(string bstrFileFullName, int nFileID,
+        public EFileProcessingResult ProcessFile(FileRecord pFileRecord,
             int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
             ProgressStatus pProgressStatus, bool bCancelRequested)
         {
@@ -492,7 +492,7 @@ namespace Extract.FileActionManager.FileProcessors
                     "ELI29655", _COMPONENT_DESCRIPTION);
 
                 // Get the file name and initialize a path tags class
-                string fileName = Path.GetFullPath(bstrFileFullName);
+                string fileName = Path.GetFullPath(pFileRecord.Name);
                 FileActionManagerPathTags pathTags =
                     new FileActionManagerPathTags(fileName, pFAMTM.FPSFileDir);
 
@@ -507,7 +507,7 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI29657", ex);
-                ee.AddDebugData("Source Document", bstrFileFullName, false);
+                ee.AddDebugData("Source Document", pFileRecord.Name, false);
                 ee.AddDebugData("PDF File From Settings", _settings.PdfFile, false);
 
                 throw ExtractException.CreateComVisible("ELI29658", "Failed Modify pdf task.", ee);

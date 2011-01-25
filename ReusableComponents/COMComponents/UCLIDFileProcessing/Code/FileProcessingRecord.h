@@ -120,6 +120,8 @@ public:
 	//			if the m_ipFileRcd is NULL an exception will be thrown
 	UCLID_FILEPROCESSINGLib::EFilePriority getPriority() const;
 	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Returns the underlying file record
+	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecord();
 
 	static const long NO_ID;
 
@@ -173,6 +175,11 @@ private:
 				FileRecord = ipRecord;
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26743");
+		}
+
+		UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecord()
+		{
+			return FileRecord;
 		}
 
 		void reset()

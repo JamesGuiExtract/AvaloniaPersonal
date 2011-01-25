@@ -76,7 +76,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_Init(long nActionID, IFAMTagManager* pF
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(BSTR strFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -88,8 +88,11 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(BSTR strFileFullName, long 
 		ASSERT_ARGUMENT("ELI26287", ipTagManager != NULL);
 		ASSERT_ARGUMENT("ELI26255", pResult != NULL);
 
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31332", ipFileRecord != __nullptr);
+
 		// Input file for processing
-		string strSourceDoc = asString(strFileFullName);
+		string strSourceDoc = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI26256", strSourceDoc.empty() == false);
 
 		// Check license

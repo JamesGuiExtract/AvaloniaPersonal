@@ -125,7 +125,7 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_Init(long nActionID, IFAMTagManager* p
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CLaunchAppFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CLaunchAppFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pFAMTM, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -135,14 +135,15 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, lon
 	{
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI17916", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17918", pFAMTM != NULL);
 		ASSERT_ARGUMENT("ELI17919", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31340", ipFileRecord != __nullptr);
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
 
-		string strSourceDocName = asString(bstrFileFullName);
+		string strSourceDocName = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI17917", strSourceDocName.empty() == false);
 
 		// Call ExpandTagsAndTFE() to expand tags and functions

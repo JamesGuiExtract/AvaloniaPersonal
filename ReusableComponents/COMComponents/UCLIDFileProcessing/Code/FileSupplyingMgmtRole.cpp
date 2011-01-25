@@ -1696,8 +1696,12 @@ bool CFileSupplyingMgmtRole::fileMatchesFAMCondition(const string& strFile)
 		// check if a skip condition has been specified and is enabled
 		if (ipFAMCondition != NULL && m_ipFAMCondition->Enabled == VARIANT_TRUE)
 		{
+			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
+			ASSERT_RESOURCE_ALLOCATION("ELI31356", ipFileRecord != __nullptr);
+			ipFileRecord->Name = strFile.c_str();
+			ipFileRecord->FileID = -1;
 			VARIANT_BOOL vbMatch = ipFAMCondition->FileMatchesFAMCondition(
-				strFile.c_str(), getFPMDB(), -1, m_lActionId, getFAMTagManager());
+				ipFileRecord, getFPMDB(), m_lActionId, getFAMTagManager());
 			if (vbMatch == VARIANT_TRUE)
 			{
 				return true;

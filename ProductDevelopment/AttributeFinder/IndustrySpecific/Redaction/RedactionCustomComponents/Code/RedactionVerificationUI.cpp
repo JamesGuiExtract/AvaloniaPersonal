@@ -954,7 +954,7 @@ STDMETHODIMP CRedactionVerificationUI::raw_Init(long nActionID, IFAMTagManager* 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactionVerificationUI::raw_ProcessFile(BSTR bstrFileFullName, long nFileID,
+STDMETHODIMP CRedactionVerificationUI::raw_ProcessFile(IFileRecord* pFileRecord,
 	long nActionID, IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {

@@ -351,14 +351,17 @@ STDMETHODIMP CFileExistence::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IFAMCondition
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileExistence::raw_FileMatchesFAMCondition(BSTR bstrFile, IFileProcessingDB* pFPDB, 
-	long lFileID, long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
+STDMETHODIMP CFileExistence::raw_FileMatchesFAMCondition(IFileRecord* pFileRecord, IFileProcessingDB* pFPDB, 
+	long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		std::string strSourceFileName = asString(bstrFile);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_RESOURCE_ALLOCATION("ELI31357", ipFileRecord != __nullptr);
+
+		std::string strSourceFileName = asString(ipFileRecord->Name);
 
 		// Call ExpandTagsAndTFE() to expand tags and utility functions
 		string strFAMConditionFile = CFAMConditionUtils::ExpandTagsAndTFE(pFAMTM, m_strFileName, strSourceFileName);

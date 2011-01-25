@@ -110,11 +110,16 @@ namespace Extract.FileActionManager.RunFPSFile
                     FAMTagManagerClass tagManager = new FAMTagManagerClass();
                     tagManager.FPSFileDir = Path.GetDirectoryName(_fpsFileName);
 
+                    // Setup file record for call to InitProcessClose
+					FileRecordClass fileRecord = new FileRecordClass();
+                    fileRecord.Name = _sourceDocName;
+					fileRecord.FileID = 0;
+
                     // Use a local task executor to directly execute the file processing tasks.
                     FileProcessingTaskExecutorClass taskExecutor =
                         new FileProcessingTaskExecutorClass();
-                    taskExecutor.InitProcessClose(_sourceDocName,
-                        fileProcessingManager.FileProcessingMgmtRole.FileProcessors, 0, 0, null,
+					taskExecutor.InitProcessClose(fileRecord,
+                        fileProcessingManager.FileProcessingMgmtRole.FileProcessors, 0, null,
                         tagManager, null, false);
                 }
                 else

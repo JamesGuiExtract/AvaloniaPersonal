@@ -220,7 +220,7 @@ STDMETHODIMP CConvertToPDFTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18751");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -232,12 +232,13 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, long nFil
 		validateLicense();
 
 		// check for NULL parameters
-		ASSERT_ARGUMENT("ELI18752", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI18753", pTagManager != NULL);
 		ASSERT_ARGUMENT("ELI18754", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31338", ipFileRecord != __nullptr);
 
 		// get the source doc name
-		string strSourceDoc = asString(bstrFileFullName);
+		string strSourceDoc = asString(ipFileRecord->Name);
 		validateFileOrFolderExistence(strSourceDoc);
 
 		// construct the full path to the input and output images

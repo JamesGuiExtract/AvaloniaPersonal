@@ -1801,10 +1801,17 @@ bool CFileProcessingDB::ExportFileList_Internal(bool bDBLocked, BSTR strQuery, B
 				// Setup the counter for the number of records
 				long nNumRecords = 0;
 
+				// Create empty FileRecord object for the random check condition
+				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
+				ASSERT_RESOURCE_ALLOCATION("ELI31346", ipFileRecord != __nullptr);
+
+				ipFileRecord->Name = "";
+				ipFileRecord->FileID = -1;
+
 				// Fill the ipFiles collection
 				while (ipFileSet->adoEOF == VARIANT_FALSE)
 				{
-					if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", 0, 0) == VARIANT_TRUE)
+					if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
 					{
 						// Get the FileName
 						string strFile = getStringField(ipFileSet->Fields, "FileName");
@@ -2391,12 +2398,17 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
 					adOpenForwardOnly, adLockReadOnly, adCmdText);
 
+				// Create an empty file record object for the random condition.
+				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
+				ipFileRecord->Name = "";
+				ipFileRecord->FileID = 0;
+
 				// Get the list of file ID's to modify
 				long nNumRecordsModified = 0;
 				vector<long> vecFileIds;
 				while (ipFileSet->adoEOF == VARIANT_FALSE)
 				{
-					if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", 0, 0) == VARIANT_TRUE)
+					if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
 					{
 						// Get the file ID
 						vecFileIds.push_back(getLongField(ipFileSet->Fields, "ID"));
@@ -3623,11 +3635,18 @@ bool CFileProcessingDB::SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSe
 				ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
 					adLockReadOnly, adCmdText);
 
+				// Create empty FileRecord object for the random check condition
+				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
+				ASSERT_RESOURCE_ALLOCATION("ELI31345", ipFileRecord != __nullptr);
+
+				ipFileRecord->Name = "";
+				ipFileRecord->FileID = 0;
+
 				// Build a list of file ID's to set
 				stack<string> stackIDs;
 				while (ipFileSet->adoEOF == VARIANT_FALSE)
 				{
-					if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", 0, 0) == VARIANT_TRUE)
+					if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
 					{
 						// Get the file ID
 						stackIDs.push(asString(getLongField(ipFileSet->Fields, "ID")));

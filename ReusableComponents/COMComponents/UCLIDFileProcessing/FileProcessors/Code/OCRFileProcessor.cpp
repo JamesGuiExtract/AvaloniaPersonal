@@ -137,7 +137,7 @@ STDMETHODIMP COCRFileProcessor::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP COCRFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -148,10 +148,11 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFil
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17920", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17923", pResult != NULL);
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31332", ipFileRecord != __nullptr);
 
-		string strImageFileName = asString(bstrFileFullName);
+		string strImageFileName = asString(ipFileRecord->Name);
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;

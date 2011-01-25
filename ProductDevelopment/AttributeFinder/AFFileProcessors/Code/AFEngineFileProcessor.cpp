@@ -91,7 +91,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_Init(long nActionID, IFAMTagManager* pF
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName, long nFileID, long nActionID,
+STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
 	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
@@ -104,11 +104,13 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName, long 
 
 		IFAMTagManagerPtr ipTagManager(pTagManager);
 		ASSERT_ARGUMENT("ELI26658", ipTagManager != NULL);
-		ASSERT_ARGUMENT("ELI17934", strFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17935", pResult != NULL);
 		
+		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI31334", ipFileRecord != __nullptr);
+
 		// Input file for processing
-		string strInputFile = asString(strFileFullName);
+		string strInputFile = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI17936", strInputFile.empty() == false);
 
 		// Expand the tags for the rules file
