@@ -265,6 +265,15 @@ namespace Extract.Imaging.Forms
         /// <param name="y">The physical (client) y coordinate of the mouse cursor.</param>
         public void UpdateRectangle(int x, int y)
         {
+            // [FlexIDSCore:4510]
+            // If the cursor is in the same spot the tracking event started, assign an empty
+            // rectangle so it can't result in a redaction/highlight being created.
+            if (x == _startPoint.X && y == _startPoint.Y)
+            {
+                _rectangle = Rectangle.Empty;
+                return;
+            }
+
             // Calculate the x coordinates of the rectangle
             int left = _startPoint.X;
             int right = x;

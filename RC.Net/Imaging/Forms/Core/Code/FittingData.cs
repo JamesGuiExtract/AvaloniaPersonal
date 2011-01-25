@@ -434,6 +434,75 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Determines if the specified points define a line along a similar angle to the zone
+        /// defined by this <see cref="FittingData"/> instance that passes across the left side of
+        /// this zone and whose plane passes between both pairs of vertices (whether or not the end
+        /// point is past the zone's right side).
+        /// </summary>
+        /// <param name="startPoint">The starting <see cref="PointF"/> of the line to test.</param>
+        /// <param name="endPoint">The ending <see cref="PointF"/> of the line to test.</param>
+        /// <returns><see langword="true"/> if the line passes through the zone defined by this
+        /// <see cref="FittingData"/> instance, <see langword="false"/> otherwise.</returns>
+        public bool LinePassesThrough(PointF startPoint, PointF endPoint)
+        {
+            try
+            {
+                // Create a theta value to translate the provied points into the this zone's
+                // coordinate system.
+                PointF workingTheta =
+                    new PointF((float)Math.Sin(-_angle), (float)Math.Cos(-_angle));
+
+                // Convert the points into this zone's coordinate system.
+                startPoint = GeometryMethods.Rotate(startPoint, workingTheta);
+                endPoint = GeometryMethods.Rotate(endPoint, workingTheta);
+
+                // Obtain a working rectangle to compare to the provided points.
+                PointF thisTheta;
+                RectangleF workingRectangle = GetWorkingRectangle(Side.Left, out thisTheta);
+
+                // If the points are on opposite sides of this zone's left side, test whether it
+                // passes through both pairs of vertices.
+                if (startPoint.X < workingRectangle.Left && endPoint.X > workingRectangle.Left)
+                {
+                    // Compute the angle of the provided points.
+                    double parameterAngle = GeometryMethods.GetAngle(startPoint, endPoint);
+                    parameterAngle = GeometryMethods.ConvertRadiansToDegrees(parameterAngle);
+                    GeometryMethods.GetAngleDelta(0, parameterAngle, true);
+
+                    // Compute the difference in angle between the provided line and this zone.
+                    double diffAngle = parameterAngle - _angle;
+
+                    // Rotate the endPoint into its own coordinate system.
+                    workingTheta =
+                        new PointF((float)Math.Sin(-diffAngle), (float)Math.Cos(-diffAngle));
+                    endPoint = GeometryMethods.Rotate(endPoint, workingTheta);
+
+                    // Move the endpoint so that it is aligned with the right side of this zone.
+                    endPoint.X = workingRectangle.Right;
+
+                    // Move the endpoint back into this raster zones coordinate system to determine
+                    // the spot in which the provided plane intersects the right side of this zone.
+                    workingTheta =
+                        new PointF((float)Math.Sin(diffAngle), (float)Math.Cos(diffAngle));
+                    endPoint = GeometryMethods.Rotate(endPoint, workingTheta);
+
+                    // If the point of intersection is below the top of this zone, but above the
+                    // bottom consider that it passes through this zone.
+                    if (endPoint.Y > workingRectangle.Top && endPoint.Y < workingRectangle.Bottom)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31462", ex);
+            }
+        }
+
         #endregion ICloneable Members
 
         #region Private Members

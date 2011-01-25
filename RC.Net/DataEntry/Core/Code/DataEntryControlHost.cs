@@ -1126,13 +1126,18 @@ namespace Extract.DataEntry
                         _imageViewer.CursorToolChanged -= HandleCursorToolChanged;
                         _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                         _imageViewer.PreviewKeyDown -= HandleImageViewerPreviewKeyDown;
-                        _imageViewer.SelectionToolEnteredLayerObject -= HandleSelectionToolEnteredLayerObject;
-                        _imageViewer.SelectionToolLeftLayerObject -= HandleSelectionToolLeftLayerObject;
+                        _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
+                        _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
                         _imageViewer.MouseDown -= HandleImageViewerMouseDown;
                         _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
                         _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
                         _imageViewer.PageChanged -= HandleImageViewerPageChanged;
                         _imageViewer.FitModeChanged -= HandleImageViewerFitModeChanged;
+                        if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
+                        {
+                            _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
+                            _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
+                        }
                     }
 
                     // Store the new image viewer internally
@@ -1144,13 +1149,16 @@ namespace Extract.DataEntry
                         _imageViewer.CursorToolChanged += HandleCursorToolChanged;
                         _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                         _imageViewer.PreviewKeyDown += HandleImageViewerPreviewKeyDown;
-                        _imageViewer.SelectionToolEnteredLayerObject += HandleSelectionToolEnteredLayerObject;
-                        _imageViewer.SelectionToolLeftLayerObject += HandleSelectionToolLeftLayerObject;
                         _imageViewer.MouseDown += HandleImageViewerMouseDown;
                         _imageViewer.ZoomChanged += HandleImageViewerZoomChanged;
                         _imageViewer.ScrollPositionChanged += HandleImageViewerScrollPositionsChanged;
                         _imageViewer.PageChanged += HandleImageViewerPageChanged;
                         _imageViewer.FitModeChanged += HandleImageViewerFitModeChanged;
+                        if (_imageViewer.CursorTool == CursorTool.SelectLayerObject)
+                        {
+                            _imageViewer.CursorEnteredLayerObject += HandleCursorEnteredLayerObject;
+                            _imageViewer.CursorLeftLayerObject += HandleCursorLeftLayerObject;
+                        }
 
                         _imageViewer.DefaultHighlightColor = _defaultHighlightColor;
                         _imageViewer.AllowBandedSelection = false;
@@ -2207,9 +2215,23 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (e.CursorTool != CursorTool.None)
+                if (e.CursorTool != _lastCursorTool)
                 {
-                    _lastCursorTool = e.CursorTool;
+                    if (e.CursorTool == CursorTool.SelectLayerObject)
+                    {
+                        _imageViewer.CursorEnteredLayerObject += HandleCursorEnteredLayerObject;
+                        _imageViewer.CursorLeftLayerObject += HandleCursorLeftLayerObject;
+                    }
+                    else if (_lastCursorTool == CursorTool.SelectLayerObject)
+                    {
+                        _imageViewer.CursorEnteredLayerObject -= HandleCursorEnteredLayerObject;
+                        _imageViewer.CursorLeftLayerObject -= HandleCursorLeftLayerObject;
+                    }
+
+                    if (e.CursorTool != CursorTool.None)
+                    {
+                        _lastCursorTool = e.CursorTool;
+                    }
                 }
             }
             catch (Exception ex)
@@ -3004,13 +3026,13 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer"/> SelectionToolEnteredLayerObject event in order
+        /// Handles the <see cref="ImageViewer"/> CursorEnteredLayerObject event in order
         /// to display a tooltip for data the selection tool is currently hovering over.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="LayerObjectEventArgs"/> that contains the event data.
         /// </param>
-        void HandleSelectionToolEnteredLayerObject(object sender, LayerObjectEventArgs e)
+        void HandleCursorEnteredLayerObject(object sender, LayerObjectEventArgs e)
         {
             try
             {
@@ -3054,13 +3076,13 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer"/> SelectionToolLeftLayerObject event in order
+        /// Handles the <see cref="ImageViewer"/> CursorLeftLayerObject event in order
         /// to remove a tooltip for data the selection tool was previously hovering over.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="LayerObjectEventArgs"/> that contains the event data.
         /// </param>
-        void HandleSelectionToolLeftLayerObject(object sender, LayerObjectEventArgs e)
+        void HandleCursorLeftLayerObject(object sender, LayerObjectEventArgs e)
         {
             try
             {

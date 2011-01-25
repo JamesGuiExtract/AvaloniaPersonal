@@ -260,7 +260,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// If non-null, contains the layer objects under the selection tool.
         /// </summary>
-        List<LayerObject> _layerObjectsUnderSelectionTool;
+        List<LayerObject> _layerObjectsUnderCursor;
 
         /// <summary>
         /// The default highlight color for newly created highlights.
@@ -527,22 +527,22 @@ namespace Extract.Imaging.Forms
         public event EventHandler<FileOpenErrorEventArgs> FileOpenError;
 
         /// <summary>
-        /// Occurs when the selection tool enters the bounds of a <see cref="LayerObject"/>.
+        /// Occurs when the cursor enters the bounds of a <see cref="LayerObject"/>.
         /// <para><b>NOTE:</b></para>
         /// This event is raised even for <see cref="LayerObject"/>s that are not visible or that
         /// are not selectable. It is up to the receiver to filter events for
         /// <see cref="LayerObject"/>s that should be ignored.
         /// </summary>
-        public event EventHandler<LayerObjectEventArgs> SelectionToolEnteredLayerObject;
+        public event EventHandler<LayerObjectEventArgs> CursorEnteredLayerObject;
 
         /// <summary>
-        /// Occurs when the selection tool leaves the bounds of a <see cref="LayerObject"/>.
+        /// Occurs when the cursor leaves the bounds of a <see cref="LayerObject"/>.
         /// <para><b>NOTE:</b></para>
         /// This event is raised even for <see cref="LayerObject"/>s that are not visible or that
         /// are not selectable. It is up to the receiver to filter events for
         /// <see cref="LayerObject"/>s that should be ignored.
         /// </summary>
-        public event EventHandler<LayerObjectEventArgs> SelectionToolLeftLayerObject;
+        public event EventHandler<LayerObjectEventArgs> CursorLeftLayerObject;
 
         /// <summary>
         /// Occurs when a sub image has been extracted from the present image.
@@ -657,6 +657,18 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
+                    if (value == _cursorTool)
+                    {
+                        return;
+                    }
+
+                    // [FlexIDSCore:4507]
+                    // If a tracking event is currently in progress, cancel it.
+                    if (_trackingData != null)
+                    {
+                        EndTracking(0, 0, true);
+                    }
+
                     // Ensure an image is open
                     ExtractException.Assert("ELI21321", "Image must be open.",
                         base.Image != null || value == CursorTool.None);
@@ -741,9 +753,8 @@ namespace Extract.Imaging.Forms
                         _activeLinkedLayerObject = null;
 
                         // If the cursor tool is no longer the selection tool, remove all entries
-                        // from _layerObjectsUnderSelectionTool (and raise the 
-                        // SelectionToolLeftLayerObject for each)
-                        UpdateLayerObjectsUnderSelectionTool(null);
+                        // from _layerObjectsUnderCursor (and raise the CursorLeftLayerObject for each)
+                        UpdateLayerObjectsUnderCursor(null);
                     }
 
                     // Set the cursor tool
@@ -2161,10 +2172,9 @@ namespace Extract.Imaging.Forms
             {
                 base.OnMouseMove(e);
 
-                // Update _layerObjectsUnderSelectionTool contents and raise the 
-                // SelectionToolEnteredLayerObject and SelectionToolLeftLayerObject events as
-                // necessary.
-                UpdateLayerObjectsUnderSelectionTool(e);
+                // Update _layerObjectsUnderCursor contents and raise the CursorEnteredLayerObject
+                // and CursorLeftLayerObject events as necessary.
+                UpdateLayerObjectsUnderCursor(e);
 
                 // Process this mouse event if an interactive region is being created
                 if (_trackingData != null && e.Button == MouseButtons.Left)
@@ -2202,8 +2212,8 @@ namespace Extract.Imaging.Forms
                 base.OnMouseLeave(e);
 
                 // If the mouse has left the image viewer, remove all entries from 
-                // _layerObjectsUnderSelectionTool (and raise the SelectionToolLeftLayerObject for each)
-                UpdateLayerObjectsUnderSelectionTool(null);
+                // _layerObjectsUnderCursor (and raise the CursorLeftLayerObject for each)
+                UpdateLayerObjectsUnderCursor(null);
             }
             catch (Exception ex)
             {
@@ -2236,29 +2246,29 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Updates the _layerObjectsUnderSelectionTool and raises the
-        /// <see cref="SelectionToolEnteredLayerObject"/> and 
-        /// <see cref="SelectionToolLeftLayerObject"/> events as appropriate.
+        /// Updates the _layerObjectsUnderCursor and raises the <see cref="CursorEnteredLayerObject"/>
+        /// and <see cref="CursorLeftLayerObject"/> events as appropriate.
         /// </summary>
         /// <param name="e">If not <see langword="null"/>, contains a <see cref="MouseEventArgs"/>
         /// that contains infomation about the mouse event that triggered this call. If
-        /// <see langword="null"/>, <see cref="SelectionToolLeftLayerObject"/> will be raised for
-        /// all <see cref="LayerObject"/>s previously under the selection tool.</param>
-        void UpdateLayerObjectsUnderSelectionTool(MouseEventArgs e)
+        /// <see langword="null"/>, <see cref="CursorLeftLayerObject"/> will be raised for
+        /// all <see cref="LayerObject"/>s previously under the cursor.</param>
+        void UpdateLayerObjectsUnderCursor(MouseEventArgs e)
         {
             // Determine whether the method should look for any layer objects under the selection
-            // tool. (If false, all current _layerObjectsUnderSelectionTool members will be removed).
-            bool lookForLayerObjectsUnderSelectionTool =
-                (e != null && IsImageAvailable &&
-                 (_cursorTool == CursorTool.SelectLayerObject ||
-                  _cursorTool == CursorTool.WordHighlight ||
-                  _cursorTool == CursorTool.WordRedaction));
+            // tool. (If false, all current _layerObjectsUnderCursor members will be removed).
+            bool lookForLayerObjectsUnderCursor = (e != null && IsImageAvailable);
 
-            // If looking for new layer objects, initialize _layerObjectsUnderSelectionTool if
+            // Don't bother looking for layerobjects under the cursor if no one is listening
+            // for the events.
+            lookForLayerObjectsUnderCursor &=
+                (CursorEnteredLayerObject != null || CursorLeftLayerObject != null);
+
+            // If looking for new layer objects, initialize _layerObjectsUnderCursor if
             // necessary.
-            if (lookForLayerObjectsUnderSelectionTool && _layerObjectsUnderSelectionTool == null)
+            if (lookForLayerObjectsUnderCursor && _layerObjectsUnderCursor == null)
             {
-                _layerObjectsUnderSelectionTool = new List<LayerObject>();
+                _layerObjectsUnderCursor = new List<LayerObject>();
             }
 
             // Initialize a list of layer objects no longer under the selection tool.
@@ -2271,7 +2281,7 @@ namespace Extract.Imaging.Forms
             Point imagePoint = Point.Empty;
             Rectangle imageRegion = Rectangle.Empty;
 
-            if (lookForLayerObjectsUnderSelectionTool)
+            if (lookForLayerObjectsUnderCursor)
             {
                 // If a tracking operation is active, look for all layer objects within the tracking
                 // operation's rectangle rather than under only the cursor.
@@ -2302,44 +2312,50 @@ namespace Extract.Imaging.Forms
                 }
             }
 
-            // For all current members of _layerObjectsUnderSelectionTool, ensure they are still
-            // under the selection tool.
-            if (_layerObjectsUnderSelectionTool != null)
+            // For all current members of _layerObjectsUnderCursor, ensure they are still under the
+            // cursor.
+            if (_layerObjectsUnderCursor != null)
             {
                 // If not looking for any objects under the selection tool, simply remove all
-                // existing objects from _layerObjectsUnderSelectionTool
-                if (!lookForLayerObjectsUnderSelectionTool)
+                // existing objects from _layerObjectsUnderCursor
+                if (!lookForLayerObjectsUnderCursor)
                 {
-                    removedLayerObjects.AddRange(_layerObjectsUnderSelectionTool);
-                    _layerObjectsUnderSelectionTool.Clear();
+                    removedLayerObjects.AddRange(_layerObjectsUnderCursor);
+                    _layerObjectsUnderCursor.Clear();
                 }
 
-                for (int i = 0; i < _layerObjectsUnderSelectionTool.Count; i++)
+                for (int i = 0; i < _layerObjectsUnderCursor.Count; i++)
                 {
-                    LayerObject layerObject = _layerObjectsUnderSelectionTool[i];
+                    LayerObject layerObject = _layerObjectsUnderCursor[i];
 
-                    // If we are not looking for layer objects, the layer object is no longer in the
-                    // image viewer or the layer object is on this page, test to see if it is
-                    // under the selection tool or selection box.
-                    if (lookForLayerObjectsUnderSelectionTool ||
-                        _layerObjects.Contains(layerObject) ||
+                    // Presume the cursor or selection area is not contained in the layer object
+                    // until we find otherwise.
+                    bool contained = false;
+
+                    // If we are looking for layer objects, the layer object is in the image viewer
+                    // and the layer object is on this page, test to see if it is under the
+                    // selection tool or selection box.
+                    if (lookForLayerObjectsUnderCursor &&
+                        _layerObjects.Contains(layerObject) &&
                         layerObject.PageNumber == _pageNumber)
                     {
-                        // If not, remove from _layerObjectsUnderSelectionTool
-                        bool contained = (useRegion && layerObject.HitTest(imageRegion)) ||
-                                         (!useRegion && layerObject.HitTest(imagePoint));
-                        if (!contained)
-                        {
-                            removedLayerObjects.Add(layerObject);
-                            _layerObjectsUnderSelectionTool.RemoveAt(i);
-                            i--;
-                        }
+                        contained = (useRegion && layerObject.HitTest(imageRegion)) ||
+                                    (!useRegion && layerObject.HitTest(imagePoint));
+                    }
+
+                    // If the cursor or selection area is not contained in this layer object, remove
+                    // from _layerObjectsUnderCursor.
+                    if (!contained)
+                    {
+                        removedLayerObjects.Add(layerObject);
+                        _layerObjectsUnderCursor.RemoveAt(i);
+                        i--;
                     }
                 }
             }
 
             // If searching for layer objects, try to find any underneath the selection tool.
-            if (lookForLayerObjectsUnderSelectionTool)
+            if (lookForLayerObjectsUnderCursor)
             {
                 // Iterate through all layer objects
                 foreach (LayerObject layerObject in _layerObjects)
@@ -2351,11 +2367,11 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Check if the mouse cursor or tracking rectangle is over a layer object and
-                    // that _layerObjectsUnderSelectionTool doesn't already contain the layer
+                    // that _layerObjectsUnderCursor doesn't already contain the layer
                     // object.
                     bool contained = (useRegion && layerObject.HitTest(imageRegion)) ||
                                      (!useRegion && layerObject.HitTest(imagePoint));
-                    if (contained && !_layerObjectsUnderSelectionTool.Contains(layerObject))
+                    if (contained && !_layerObjectsUnderCursor.Contains(layerObject))
                     {
                         newLayerObjects.Add(layerObject);
                     }
@@ -2364,23 +2380,23 @@ namespace Extract.Imaging.Forms
             else
             {
                 // If not looking for layer objects under the cursor, un-initialize 
-                // _layerObjectsUnderSelectionTool after all event have been raised.
-                _layerObjectsUnderSelectionTool = null;
+                // _layerObjectsUnderCursor after all event have been raised.
+                _layerObjectsUnderCursor = null;
             }
 
-            // Raise the SelectionToolLeftLayerObject for all layer objects no longer in
-            // _layerObjectsUnderSelectionTool
+            // Raise the CursorLeftLayerObject for all layer objects no longer in
+            // _layerObjectsUnderCursor
             foreach (LayerObject layerObject in removedLayerObjects)
             {
-                OnSelectionToolLeftLayerObject(new LayerObjectEventArgs(layerObject));
+                OnCursorlLeftLayerObject(new LayerObjectEventArgs(layerObject));
             }
 
-            // Raise the SelectionToolEnteredLayerObject for all layer objects that have been
-            // added to _layerObjectsUnderSelectionTool.
+            // Raise the CursorEnteredLayerObject for all layer objects that have been added
+            // to _layerObjectsUnderCursor.
             foreach (LayerObject layerObject in newLayerObjects)
             {
-                OnSelectionToolEnteredLayerObject(new LayerObjectEventArgs(layerObject));
-                _layerObjectsUnderSelectionTool.Add(layerObject);
+                OnCursorEnteredLayerObject(new LayerObjectEventArgs(layerObject));
+                _layerObjectsUnderCursor.Add(layerObject);
             }
         }
 
@@ -2410,12 +2426,12 @@ namespace Extract.Imaging.Forms
             }
             // If we reached this point _activeLinkedLayerObject is null
 
-            // If _layerObjectsUnderSelectionTool is initialized we can use its members
-            // rather than iterating all layer objects to find one which should be made active.
-            if (_layerObjectsUnderSelectionTool != null)
+            // If _layerObjectsUnderCursor is initialized we can use its members rather than
+            // iterating all layer objects to find one which should be made active.
+            if (_layerObjectsUnderCursor != null)
             {
                 // Check if the mouse is over a visible linked layer object
-                foreach (LayerObject layerObject in _layerObjectsUnderSelectionTool)
+                foreach (LayerObject layerObject in _layerObjectsUnderCursor)
                 {
                     if (layerObject.IsLinked && layerObject.Visible)
                     {
@@ -2425,7 +2441,7 @@ namespace Extract.Imaging.Forms
                     }
                 }
             }
-            // If _layerObjectsUnderSelectionTool is null, search all layer objects to find one that
+            // If _layerObjectsUnderCursor is null, search all layer objects to find one that
             // should be made active.
             else
             {
@@ -2494,11 +2510,11 @@ namespace Extract.Imaging.Forms
                 }
             }
 
-            // If _layerObjectsUnderSelectionTool is initialized we can use its members
+            // If _layerObjectsUnderCursor is initialized we can use its members
             // rather than iterating all layer objects to find one which should change the cursor.
-            if (_layerObjectsUnderSelectionTool != null)
+            if (_layerObjectsUnderCursor != null)
             {
-                foreach (LayerObject layerObject in _layerObjectsUnderSelectionTool)
+                foreach (LayerObject layerObject in _layerObjectsUnderCursor)
                 {
                     if (layerObject.Selectable && layerObject.Visible)
                     {
@@ -2507,8 +2523,8 @@ namespace Extract.Imaging.Forms
                     }
                 }
             }
-            // If _layerObjectsUnderSelectionTool is null, search all layer objects to find any that
-            // should change the cursor.
+            // If _layerObjectsUnderCursor is null, search all layer objects to find any that should
+            // change the cursor.
             else
             {
                 // Convert the mouse click to image coordinates
@@ -2915,28 +2931,28 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Raises the <see cref="SelectionToolEnteredLayerObject"/> event.
+        /// Raises the <see cref="CursorEnteredLayerObject"/> event.
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="LayerObjectEventArgs"/>
         /// event.</param>
-        void OnSelectionToolEnteredLayerObject(LayerObjectEventArgs e)
+        void OnCursorEnteredLayerObject(LayerObjectEventArgs e)
         {
-            if (SelectionToolEnteredLayerObject != null)
+            if (CursorEnteredLayerObject != null)
             {
-                SelectionToolEnteredLayerObject(this, e);
+                CursorEnteredLayerObject(this, e);
             }
         }
 
         /// <summary>
-        /// Raises the <see cref="SelectionToolLeftLayerObject"/> event.
+        /// Raises the <see cref="CursorLeftLayerObject"/> event.
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="LayerObjectEventArgs"/> 
         /// event.</param>
-        void OnSelectionToolLeftLayerObject(LayerObjectEventArgs e)
+        void OnCursorlLeftLayerObject(LayerObjectEventArgs e)
         {
-            if (SelectionToolLeftLayerObject != null)
+            if (CursorLeftLayerObject != null)
             {
-                SelectionToolLeftLayerObject(this, e);
+                CursorLeftLayerObject(this, e);
             }
         }
 

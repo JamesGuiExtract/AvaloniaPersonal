@@ -289,7 +289,7 @@ namespace Extract.Imaging.Forms
                         CancelRunningOperation();
                     }
 
-                    if (!_backgroundWorkerIdle.WaitOne(3000))
+                    if (!_backgroundWorkerIdle.WaitOne(1000))
                     {
                         new ExtractException("ELI31374",
                             "Application trace: Word highlight background operation aborted.").Log();
@@ -434,14 +434,14 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
-            /// Handles the case that selection tool entered a layer object so that word highlights
+            /// Handles the case that the cursor entered a layer object so that word highlights
             /// are displayed if the <see cref="WordHighlightManager"/> is active and the layer
             /// object is a word highlight.
             /// </summary>
             /// <param name="sender">The sender.</param>
             /// <param name="e">The <see cref="Extract.Imaging.Forms.LayerObjectEventArgs"/>
             /// instance containing the event data.</param>
-            void HandleSelectionToolEnteredLayerObject(object sender, LayerObjectEventArgs e)
+            void HandleCursorEnteredLayerObject(object sender, LayerObjectEventArgs e)
             {
                 try
                 {
@@ -489,13 +489,13 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
-            /// Handles the case that the selection tool left a layer object so that, if it is a
+            /// Handles the case that the cursor left a layer object so that, if it is a
             /// word highlight it can be hidden.
             /// </summary>
             /// <param name="sender">The sender.</param>
             /// <param name="e">The <see cref="Extract.Imaging.Forms.LayerObjectEventArgs"/>
             /// instance containing the event data.</param>
-            void HandleSelectionToolLeftLayerObject(object sender, LayerObjectEventArgs e)
+            void HandleCursorLeftLayerObject(object sender, LayerObjectEventArgs e)
             {
                 try
                 {
@@ -552,7 +552,7 @@ namespace Extract.Imaging.Forms
                         CancelRunningOperation();
                     }
 
-                    if (!_backgroundWorkerIdle.WaitOne(3000))
+                    if (!_backgroundWorkerIdle.WaitOne(1000))
                     {
                         new ExtractException("ELI31375",
                             "Application trace: Word highlight background operation aborted.").Log();
@@ -779,10 +779,10 @@ namespace Extract.Imaging.Forms
                             _active = true;
 
                             // If active, watch for when the cursor enters/leaves word highlights
-                            _imageViewer.SelectionToolEnteredLayerObject +=
-                                HandleSelectionToolEnteredLayerObject;
-                            _imageViewer.SelectionToolLeftLayerObject +=
-                                HandleSelectionToolLeftLayerObject;
+                            _imageViewer.CursorEnteredLayerObject +=
+                                HandleCursorEnteredLayerObject;
+                            _imageViewer.CursorLeftLayerObject +=
+                                HandleCursorLeftLayerObject;
                             _imageViewer.LayerObjects.DeletingLayerObjects +=
                                 HandleDeletingLayerObjects;
                         }
@@ -843,11 +843,11 @@ namespace Extract.Imaging.Forms
                             _active = false;
 
                             // Stop watching for when the cursor enters/leaves word highlights
-                            _imageViewer.SelectionToolEnteredLayerObject -=
-                                HandleSelectionToolEnteredLayerObject;
+                            _imageViewer.CursorEnteredLayerObject -=
+                                HandleCursorEnteredLayerObject;
 
-                            _imageViewer.SelectionToolLeftLayerObject -=
-                                HandleSelectionToolLeftLayerObject;
+                            _imageViewer.CursorLeftLayerObject -=
+                                HandleCursorLeftLayerObject;
                             _imageViewer.LayerObjects.DeletingLayerObjects -=
                                 HandleDeletingLayerObjects;
                         }
@@ -1149,7 +1149,22 @@ namespace Extract.Imaging.Forms
                                     RemoveAutoFitHighlight();
                                     AddAutoFitHighlight(highlight);
                                 }));
+
+                                return;
                             }
+                        }
+                    }
+
+                    // If a new auto-fit highlight wasn't able to be created, ensure the start and
+                    // end point pass though an already existing auto-fit highlight. If they don't,
+                    // remove it.
+                    if (_autoFitHighlight != null)
+                    {
+                        FittingData autoZoneFittingData =
+                            new FittingData(_autoFitHighlight.ToRasterZone());
+                        if (!autoZoneFittingData.LinePassesThrough(startPoint, endPoint))
+                        {
+                            ExecuteInUI((MethodInvoker)(() => RemoveAutoFitHighlight()));
                         }
                     }
                 }
