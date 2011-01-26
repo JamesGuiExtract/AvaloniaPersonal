@@ -153,7 +153,7 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 		string strServer = asString(m_ipFAMDB->DatabaseServer);
 		string strDatabase = asString(m_ipFAMDB->DatabaseName);
 
-		string strCaption = strServer + ":" + strDatabase + " - " + gstrTITLE;
+		string strCaption = strDatabase + " on " + strServer + " - " + gstrTITLE;
 		SetWindowText(strCaption.c_str());
 
 		// Save the good settings to the registry

@@ -176,7 +176,6 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_ACTION);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRYDATA_MACHINE);
 		vecCreateQueries.push_back(gstrCREATE_FILEID_DATETIMESTAMP_INDEX);
-		vecCreateQueries.push_back(gstrCREATE_DATAENTRY_COUNTER_TYPE);
 		vecCreateQueries.push_back(gstrPOPULATE_DATAENTRY_COUNTER_TYPES);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_INSTANCE);
 		vecCreateQueries.push_back(gstrADD_FK_DATAENTRY_COUNTER_VALUE_ID);
