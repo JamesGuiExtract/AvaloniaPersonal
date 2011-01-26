@@ -148,9 +148,9 @@ map<string, string> searchLinesWithELICode(const vector<string>& vecFilesToSearc
 		{
 			getline(ifs, strLine);
 
-			int nFound = strLine.find("ELI");
+			size_t nFound = strLine.find("ELI");
 			// search for ELIXXXXX in the line
-			if (nFound != string::npos)
+			if (nFound != string::npos && (nFound+7) < strLine.length())
 			{
 				char cChar = strLine[nFound+3];
 				// make sure the following char after ELI is a numeric char
