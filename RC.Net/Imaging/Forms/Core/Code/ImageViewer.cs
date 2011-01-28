@@ -438,10 +438,10 @@ namespace Extract.Imaging.Forms
         WordHighlightManager _wordHighlightManager;
 
         /// <summary>
-        /// A list of <see cref="PostPaintDelegate"/>s that are to run at the end of the next paint
-        /// operation.
+        /// A <see cref="PostPaintDelegate"/> that is to be called in order to update the tracking 
+        /// data and display tracking-related graphics in PostImagePaint.
         /// </summary>
-        List<PostPaintDelegate> _postPaintMethods = new List<PostPaintDelegate>();
+        PostPaintDelegate _trackingUpdateCall;
 
         /// <summary>
         /// Indicates whether calls to Invalidate should be blocked if they are known to be
@@ -675,25 +675,6 @@ namespace Extract.Imaging.Forms
 
                     switch (value)
                     {
-                        case CursorTool.ZoomWindow:
-
-                            // Allow the user to define a region to zoom to using drag and drop
-                            base.InteractiveMode = RasterViewerInteractiveMode.ZoomTo;
-
-                            // Set the region combine mode
-                            base.InteractiveRegionCombineMode = RasterRegionCombineMode.Set;
-
-                            // Zoom to a rectangular region
-                            base.InteractiveRegionType =
-                                RasterViewerInteractiveRegionType.Rectangle;
-
-                            // Allow for the animation of the rectangular region 
-                            AnimateRegion = true;
-
-                            // Store this as the last active continuous use cursor tool
-                            _lastContinuousUseTool = value;
-                            break;
-
                         case CursorTool.Pan:
 
                             // Allow the user to pan the image using drag and drop
@@ -720,6 +701,7 @@ namespace Extract.Imaging.Forms
                         case CursorTool.RectangularRedaction:
                         case CursorTool.WordHighlight:
                         case CursorTool.WordRedaction:
+                        case CursorTool.ZoomWindow:
 
                             // Turn off interactive mode
                             base.InteractiveMode = RasterViewerInteractiveMode.None;
@@ -2179,9 +2161,11 @@ namespace Extract.Imaging.Forms
                 // Process this mouse event if an interactive region is being created
                 if (_trackingData != null && e.Button == MouseButtons.Left)
                 {
-                    // Update the tracking event
-                    ExecutePostPaintMethod((paintEventArgs) =>
-                        UpdateTracking(paintEventArgs, e.X, e.Y));
+                    // Assign a tracking update call to update the tracking region and display
+                    // tracking graphics and invalidate to trigger the graphics to be drawn.
+                    _trackingUpdateCall =
+                        ((paintEventArgs) => UpdateTracking(paintEventArgs, e.X, e.Y));
+                    Invalidate();
                 }
                 else if (IsImageAvailable && _cursorTool == CursorTool.SelectLayerObject)
                 {
@@ -2761,13 +2745,12 @@ namespace Extract.Imaging.Forms
                     _activeLinkedLayerObject.DrawLinkArrows(e.Graphics);
                 }
 
-                // Run all methods that have been scheduled to run at the end of the next paint
-                // operation, then reset the _postPaintMethods list.
-                foreach (PostPaintDelegate method in _postPaintMethods)
+                // Run _trackingUpdateCall if assigned to update the tracking region and display
+                // tracking related graphics.
+                if (_trackingUpdateCall != null)
                 {
-                    method(e);
+                    _trackingUpdateCall(e);
                 }
-                _postPaintMethods.Clear();
 
                 base.OnPostImagePaint(e);
             }

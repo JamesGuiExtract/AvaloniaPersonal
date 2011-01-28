@@ -2824,6 +2824,13 @@ namespace Extract.Imaging.Forms
                     }
                     break;
 
+                case CursorTool.ZoomWindow:
+                    
+                    // Recalculate and redraw a new selection border
+                    _trackingData.UpdateRectangle(mouseX, mouseY);
+                    DrawTrackingRectangleBorder(e);
+                    break;
+
                 default:
 
                     // There is no interactive region associated with this region OR
@@ -2930,6 +2937,9 @@ namespace Extract.Imaging.Forms
                 }
                 _trackingEventEnding = true;
 
+                // Stop calls to UpdateTracking
+                _trackingUpdateCall = null;
+
                 // Update the tracking dependent upon the active cursor tool
                 switch (_cursorTool)
                 {
@@ -2968,6 +2978,14 @@ namespace Extract.Imaging.Forms
                     case CursorTool.WordRedaction:
 
                         _wordHighlightManager.EndTrackingOperation(cancel);
+                        break;
+
+                    case CursorTool.ZoomWindow:
+
+                        if (!cancel)
+                        {
+                            ZoomToRectangle(_trackingData.Rectangle);
+                        }
                         break;
 
                     default:
@@ -3951,17 +3969,38 @@ namespace Extract.Imaging.Forms
         /// <event cref="ZoomChanged">Method was successful.</event>
         void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory)
         {
+            SetZoomInfo(zoomInfo, updateZoomHistory, true, true);
+        }
+
+        /// <summary>
+        /// Sets the zoom info and optionally updates the zoom history.
+        /// </summary>
+        /// <param name="zoomInfo">The new zoom info.</param>
+        /// <param name="updateZoomHistory"><see langword="true"/> if the zoom history should be 
+        /// updated; <see langword="false"/> if it should not be updated.</param>
+        /// <param name="raiseZoomChanged"><see langword="true"/> if the <see cref="ZoomChanged"/> 
+        /// event should be raised if an image is open; <see langword="false"/> if it should not 
+        /// be raised.</param>
+        /// <param name="raiseFitModeChanged"><see langword="true"/> if the 
+        /// <see cref="FitModeChanged"/> event should be raised; <see langword="false"/> if it 
+        /// should not be raised.</param>
+        /// <event cref="ZoomChanged">Method was successful.</event>
+        void SetZoomInfo(ZoomInfo zoomInfo, bool updateZoomHistory, bool raiseZoomChanged,
+            bool raiseFitModeChanged)
+        {
             // Check if the fit mode is specified
             if (zoomInfo.FitMode != FitMode.None)
             {
-                SetFitMode(zoomInfo.FitMode, updateZoomHistory, true, true);
+                SetFitMode(zoomInfo.FitMode, updateZoomHistory, raiseZoomChanged, raiseFitModeChanged);
             }
             else
             {
                 // Reset the fit mode if it is set
                 if (_fitMode != FitMode.None)
                 {
-                    SetFitMode(FitMode.None, false, false, true);
+                    // 01/28/10 SNK Always passing raiseZoomChanged as false here to preserve
+                    // previous behavior. I'm not sure if there is a reason for it.
+                    SetFitMode(FitMode.None, false, false, raiseFitModeChanged);
                 }
 
                 // Set the new scale factor
@@ -3969,7 +4008,7 @@ namespace Extract.Imaging.Forms
             }
 
             // Center at the specified point
-            CenterAtPoint(zoomInfo.Center, updateZoomHistory, true);
+            CenterAtPoint(zoomInfo.Center, updateZoomHistory, raiseZoomChanged);
         }
 
         /// <summary>
@@ -4105,7 +4144,10 @@ namespace Extract.Imaging.Forms
 
                 // Update the tracking data (ensure the height is at least the minimum)
                 _trackingData.Height = Math.Max(height, minHeight);
-                ExecutePostPaintMethod((e) => UpdateTracking(e, mouseX, mouseY));
+
+                // Assign a new tracking update call and refresh to draw the new highlight.
+                _trackingUpdateCall = ((e) => UpdateTracking(e, mouseX, mouseY));
+                Refresh();
             }
         }
 
@@ -4622,21 +4664,21 @@ namespace Extract.Imaging.Forms
             // Keep track of the original zoom, tracking and PostPaintMethods so they can be restored.
             ZoomInfo? originalZoom = null;
             TrackingData originalTrackingData = null;
-            List<PostPaintDelegate> originalPostPaintMethods = null;
+            PostPaintDelegate originalTrackingUpdateCall = _trackingUpdateCall;
 
             try
             {
                 // Since a new zoom setting needs to be temporarily applied, ensure this doesn't
                 // cause the image viewer to be invalidated or drawn.
                 _preventInvalidate = true;
-                FormsMethods.LockControlUpdate(this, true, false);
+                FormsMethods.LockControlUpdate(this, true);
 
                 // Start with a solid background.
                 graphics.Clear(SystemColors.ControlDark);
 
                 if (IsImageAvailable)
                 {
-                    // We're about to change the zoom, store the original zoom.
+                    // We're about to change the zoom, store the original zoom & fit mode
                     originalZoom = GetZoomInfo();
 
                     // We'll need a transformed version the tracking data if a tracking event is
@@ -4652,10 +4694,9 @@ namespace Extract.Imaging.Forms
                     GeometryMethods.InvertPoints(_transform, transformedPoints);
 
                     // Zoom in on this point.
-                    ZoomInfo magnifiedZoom = originalZoom.Value;
-                    magnifiedZoom.Center = transformedPoints[0];
-                    magnifiedZoom.ScaleFactor = scaleFactor;
-                    SetZoomInfo(magnifiedZoom, false);
+                    ZoomInfo magnifiedZoom =
+                        new ZoomInfo(transformedPoints[0], scaleFactor, FitMode.None);
+                    SetZoomInfo(magnifiedZoom, false, false, false);
 
                     // Convert the center point back into client coordinates now that the image is
                     // zoomed so that we have a reference point for the center of the area to be
@@ -4691,18 +4732,13 @@ namespace Extract.Imaging.Forms
                             _trackingData = new TrackingData(this, transformedPoints[1].X,
                                 transformedPoints[1].Y, clip, trackingHeight);
 
-                            // Keep track of any existing PostPaint methods; we'll be executing a
-                            // special PostPaint for this call.
-                            originalPostPaintMethods = new List<PostPaintDelegate>(_postPaintMethods);
-                            _postPaintMethods.Clear();
-
-                            // Call update tracking so that any tracking graphics are displayed in
-                            // the destination graphics.
-                            ExecutePostPaintMethod((e) =>
+                            // Assign a temporary tracking update call to allow tracking event
+                            // graphics to be painted to the provided graphics.
+                            _trackingUpdateCall = ((e) =>
                                 UpdateTracking(e, transformedPoints[0].X, transformedPoints[0].Y));
                         }
 
-                        // This will execute the post-paint methods as well.
+                        // This will execute the _trackingUpdateCall as part of the paint.
                         InvokePaint(this, paintEventArgs);
 
                         // Restore the graphics transform back to its previous state.
@@ -4717,10 +4753,10 @@ namespace Extract.Imaging.Forms
             }
             finally
             {
-                // Restore the original zoom
+                // Restore the original zoom.
                 if (originalZoom.HasValue)
                 {
-                    SetZoomInfo(originalZoom.Value, false);
+                    SetZoomInfo(originalZoom.Value, false, false, false);
                 }
 
                 // Restore the original tracking data.
@@ -4730,13 +4766,10 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Restore the original PostPaint methods.
-                if (originalPostPaintMethods != null)
-                {
-                    _postPaintMethods = originalPostPaintMethods;
-                }
+                _trackingUpdateCall = originalTrackingUpdateCall;
 
                 // Allow painting of the ImageViewer again.
-                FormsMethods.LockControlUpdate(this, false, false);
+                FormsMethods.LockControlUpdate(this, false);
                 _preventInvalidate = false;
             }
         }
@@ -5858,17 +5891,6 @@ namespace Extract.Imaging.Forms
             {
                 Refresh();
             }
-        }
-
-        /// <summary>
-        /// Refreshes the <see cref="ImageViewer"/> and executes the specified
-        /// <see paramref="method"/> at the end of the resulting paint operation.
-        /// </summary>
-        /// <param name="method">The <see cref="PostPaintDelegate"/> to be executed.</param>
-        void ExecutePostPaintMethod(PostPaintDelegate method)
-        {
-            _postPaintMethods.Add(method);
-            Refresh();
         }
 
         #endregion

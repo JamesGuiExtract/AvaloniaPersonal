@@ -73,18 +73,15 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Prevents the specified <see cref="Control"/> from updating (redrawing) until the lock
+        /// Prevents the specified <see cref="Control"/> from updating (redrawing) until the lock 
         /// is released.
         /// </summary>
         /// <param name="control">The <see cref="Control"/> for which updating is to be locked/
         /// unlocked.</param>
         /// <param name="lockUpdate"><see langword="true"/> to lock the
         /// <see cref="Control"/>from updating or <see langword="false"/> to release the lock and allow
-        /// updates again.</param>
-        /// <param name="allowRefresh">If <see langword="true"/> and <see paramref="lockUpdate"/> is
-        /// <see langword="false"/>, the control will be refreshed to show changes that took place
-        /// while the control was locked.</param>
-        public static void LockControlUpdate(Control control, bool lockUpdate, bool allowRefresh)
+        /// updates again and refresh the control.</param>
+        public static void LockControlUpdate(Control control, bool lockUpdate)
         {
             try
             {
@@ -96,7 +93,7 @@ namespace Extract.Utilities.Forms
 
                 // If unlocking the updates, refresh the control now to show changes
                 // since the lock was applied.
-                if (allowRefresh && !lockUpdate)
+                if (!lockUpdate)
                 {
                     control.Refresh();
                 }

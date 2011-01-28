@@ -202,7 +202,7 @@ namespace Extract.DataEntry.DEP.Generic
                         _originalLayoutSettings[control] = layoutSettings;
                     }
 
-                    FormsMethods.LockControlUpdate(this, true, true);
+                    FormsMethods.LockControlUpdate(this, true);
                 }
 
                 // Allow the base class to perform the initial layout.
@@ -226,7 +226,7 @@ namespace Extract.DataEntry.DEP.Generic
                 if (_created)
                 {
                     // Unlock control updates to allow the panel and its controls to be drawn again.
-                    FormsMethods.LockControlUpdate(this, false, true);
+                    FormsMethods.LockControlUpdate(this, false);
 
                     try
                     {

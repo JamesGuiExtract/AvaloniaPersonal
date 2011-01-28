@@ -33,6 +33,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _painting;
 
+        /// <summary>
+        /// The last known location of the mouse in the <see cref="ImageViewer"/>.
+        /// </summary>
+        Point _lastMouseLocation;
+
         #endregion Fields
 
         #region Constructors
@@ -164,11 +169,8 @@ namespace Extract.Imaging.Forms
                 if (!_painting)
                 {
                     // As long as the post paint event wasn't a result of this control's paint,
-                    // force a refresh via the message queue; Invalidate often won't trigger a
-                    // paint for quite some time during an image viewer tracking event, but forcing
-                    // an immediate refresh while the ImageViewer is still painting will prevent the
-                    // ImageViewer from being drawn correctly.
-                    BeginInvoke((MethodInvoker)(() => Refresh()));
+                    // update the magnifier.
+                    DoRefresh();
                 }
             }
             catch (Exception ex)
@@ -187,9 +189,16 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                // Whenever the image viewer is invalidated, invalidate this control to update the
-                // area of the image that is zoomed in.
-                Invalidate();
+                // ImageViewer.PaintToGraphics seems to trigger mouse events even though the mouse
+                // hasn't actually moved (seems to be related to the LockControlUpdate calls).
+                // Ensure the mouse has actually moved before updating.
+                if (e.Location != _lastMouseLocation)
+                {
+                    _lastMouseLocation = e.Location;
+
+                    // Whenever the mouse has moved, update.
+                    DoRefresh();
+                }
             }
             catch (Exception ex)
             {
@@ -198,5 +207,28 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion Event Handlers
+
+        #region Private Members
+
+        /// <summary>
+        /// Causes the magnifier window up repaint itself.
+        /// </summary>
+        void DoRefresh()
+        {
+            // If a panning tracking event is active (in which case the image
+            // region displayed in the magnifier shouldn't change) don't bother updating. Updating
+            // can cause the image region to bobble around, though I'm not sure exactly why.
+            if (_imageViewer.IsTracking && _imageViewer.CursorTool == CursorTool.Pan)
+            {
+                return;
+            }
+
+            // As long as the user is not currently panning, force an immediate refresh to ensure
+            // the magnifier is udpdated at the same time the image viewer is. Invalidate often
+            // won't trigger a paint for quite some time during an image viewer tracking event.
+            Refresh();
+        }
+
+        #endregion Private Members
     }
 }
