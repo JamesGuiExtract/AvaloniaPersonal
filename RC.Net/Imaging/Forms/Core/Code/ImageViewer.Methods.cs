@@ -4665,12 +4665,13 @@ namespace Extract.Imaging.Forms
             ZoomInfo? originalZoom = null;
             TrackingData originalTrackingData = null;
             PostPaintDelegate originalTrackingUpdateCall = _trackingUpdateCall;
+            Point? originalScrollPosition = null;
 
             try
             {
                 // Since a new zoom setting needs to be temporarily applied, ensure this doesn't
                 // cause the image viewer to be invalidated or drawn.
-                _preventInvalidate = true;
+                _paintingToGraphics = true;
                 FormsMethods.LockControlUpdate(this, true);
 
                 // Start with a solid background.
@@ -4680,6 +4681,7 @@ namespace Extract.Imaging.Forms
                 {
                     // We're about to change the zoom, store the original zoom & fit mode
                     originalZoom = GetZoomInfo();
+                    originalScrollPosition = ScrollPosition;
 
                     // We'll need a transformed version the tracking data if a tracking event is
                     // active.
@@ -4717,6 +4719,11 @@ namespace Extract.Imaging.Forms
                         // image viewer client coordinates to be painted and apply the clip.
                         transform.Translate(-left, -top);
                         graphics.Transform = transform;
+
+                        // [FlexIDSCore:4520]
+                        // Update the clip so that it does not extend outside of the image itself.
+                        clip.Intersect(PhysicalViewRectangle);
+
                         PaintEventArgs paintEventArgs = new PaintEventArgs(graphics, clip);
 
                         if (_trackingData != null)
@@ -4759,6 +4766,17 @@ namespace Extract.Imaging.Forms
                     SetZoomInfo(originalZoom.Value, false, false, false);
                 }
 
+                // [FlexIDS:4524]
+                // Due to rounding issues, especially if magnifiedZoom is greater than originalZoom,
+                // the resulting scroll position after restoring originalScaleFactor may be off by
+                // a pixel or two which can otherwise cause the image to scroll in the main image
+                // viewer when the mouse moves. Restore the exact scroll position to prevent this.
+                if (originalScrollPosition.HasValue &&
+                    ScrollPosition != originalScrollPosition.Value)
+                {
+                    ScrollPosition = originalScrollPosition.Value;
+                }
+
                 // Restore the original tracking data.
                 if (originalTrackingData != null)
                 {
@@ -4770,7 +4788,7 @@ namespace Extract.Imaging.Forms
 
                 // Allow painting of the ImageViewer again.
                 FormsMethods.LockControlUpdate(this, false);
-                _preventInvalidate = false;
+                _paintingToGraphics = false;
             }
         }
 
