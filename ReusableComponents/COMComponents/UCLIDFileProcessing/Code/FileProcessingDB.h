@@ -206,6 +206,7 @@ public:
 	STDMETHOD(GetConnectionRetrySettings)(long* pnNumberOfRetries, double* pdRetryTimeout);
 	STDMETHOD(CloseAllDBConnections)();
 	STDMETHOD(UpgradeToCurrentSchema)(IProgressStatus* pProgressStatus);
+	STDMETHOD(RenameFile)(IFileRecord* pFileRecord, BSTR bstrNewName, VARIANT_BOOL* pbNameChanged);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -837,6 +838,7 @@ private:
 		IFileRecord** ppFileRecord);
 	bool SetFileStatusToProcessing_Internal(bool bDBLocked, long nFileId, long nActionID);
 	bool UpgradeToCurrentSchema_Internal(bool bDBLocked, IProgressStatusPtr ipProgressStatus);
+	bool RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRecord, BSTR bstrNewName, VARIANT_BOOL* pbNameChanged);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

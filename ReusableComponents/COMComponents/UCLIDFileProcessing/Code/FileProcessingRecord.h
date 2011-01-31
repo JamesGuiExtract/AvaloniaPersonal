@@ -134,14 +134,13 @@ private:
 	public:
 		// Holds a copy of the file record object
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr FileRecord;
-		string FileName;
 		long FileID;
 		long ActionID;
 		long long FileSize;
 		long NumberOfPages;
 		UCLID_FILEPROCESSINGLib::EFilePriority Priority;
 
-		LocalFileRecord() : FileRecord(NULL), FileName(""), FileID(-1), ActionID(-1),
+		LocalFileRecord() : FileRecord(NULL), FileID(-1), ActionID(-1),
 			FileSize(-1), NumberOfPages(-1),
 			Priority((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault)
 		{
@@ -168,9 +167,6 @@ private:
 				ipRecord->GetFileData(&FileID, &ActionID, bstrFileName.GetAddress(),
 					&FileSize, &NumberOfPages, &Priority);
 
-				// Convert bstr to string
-				FileName = asString(bstrFileName);
-
 				// Store the record
 				FileRecord = ipRecord;
 			}
@@ -186,7 +182,6 @@ private:
 		{
 			try
 			{
-				FileName = "";
 				FileID = -1;
 				ActionID = -1;
 				FileSize = -1;

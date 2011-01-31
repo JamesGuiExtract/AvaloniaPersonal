@@ -162,6 +162,8 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(IFileRecord* pFileRec
 				// Call ExpandTagsAndTFE() to expand tags and functions
 				std::string strExDst = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strDst, strSourceDocName);
 
+				simplifyPathName(strExDst);
+
 				// Check destination folder
 				handleDirectory( strExDst );
 
@@ -176,6 +178,27 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(IFileRecord* pFileRec
 				{
 					// Move File - overwrite if present
 					moveFile( strExSrc, strExDst, true, m_bAllowReadonly );
+
+					if (m_bModifySourceDocName)
+					{
+						try
+						{
+							try
+							{
+								pDB->RenameFile(ipFileRecord, strExDst.c_str());
+							}
+							CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31468");
+						}
+						catch (UCLIDException &ue)
+						{
+							UCLIDException uex("ELI31469", "File was moved successfully, "
+								"but unable to change name in FAM database.", ue);
+							uex.addDebugInfo("Name in DB", strSourceDocName);
+							uex.addDebugInfo("Name to change to", strExDst);
+							throw uex;
+						}
+					}
+
 				}
 				// Source file not found, check for error condition
 				else if (m_eSrcMissingType == kCMDSourceMissingError)
@@ -203,6 +226,8 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(IFileRecord* pFileRec
 				// Call ExpandTagsAndTFE() to expand tags and functions
 				std::string strExDst = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strDst, strSourceDocName);  
 
+				simplifyPathName(strExDst);
+
 				// Check destination folder
 				handleDirectory( strExDst );
 
@@ -217,6 +242,27 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(IFileRecord* pFileRec
 				{
 					// Copy File
 					copyFile(strExSrc, strExDst);
+
+					if (m_bModifySourceDocName)
+					{
+						try
+						{
+							try
+							{
+								pDB->RenameFile(ipFileRecord, strExDst.c_str());
+							}
+							CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31504");
+						}
+						catch (UCLIDException &ue)
+						{
+							UCLIDException uex("ELI31470", "File was copied successfully, "
+								"but unable to change name in FAM database.", ue);
+							uex.addDebugInfo("Name in DB", strSourceDocName);
+							uex.addDebugInfo("Name to change to", strExDst);
+							throw uex;
+						}
+					}
+
 				}
 				// Source file not found, check for error condition
 				else if (m_eSrcMissingType == kCMDSourceMissingError)

@@ -2280,6 +2280,26 @@ STDMETHODIMP CFileProcessingDB::UpgradeToCurrentSchema(IProgressStatus *pProgres
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31390");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RenameFile(IFileRecord* pFileRecord, BSTR bstrNewName, VARIANT_BOOL* pbNameChanged)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+
+		if (!RenameFile_Internal(false, pFileRecord, bstrNewName, pbNameChanged))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			RenameFile_Internal(true, pFileRecord, bstrNewName, pbNameChanged);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31463");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

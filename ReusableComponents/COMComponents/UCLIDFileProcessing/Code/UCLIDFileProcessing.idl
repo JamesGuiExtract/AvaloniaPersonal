@@ -1089,6 +1089,11 @@ library UCLID_FILEPROCESSINGLib
 		[id(96), helpstring("method UpgradeToCurrentSchema")] HRESULT UpgradeToCurrentSchema(
 			[in] IProgressStatus* pProgressStatus);
 		//-----------------------------------------------------------------------------------------
+
+		// PURPOSE: To rename the file in whose file record is passed in to the given name or path in
+		//			in the database
+		[id(97), helpstring("method RenameFile")] HRESULT RenameFile([in] IFileRecord* pFileRecord,
+			[in] BSTR bstrNewName, [out, retval] VARIANT_BOOL* pbNameChanged);
 	};
 
 	[

@@ -5198,3 +5198,67 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRecord, BSTR bstrNewName, VARIANT_BOOL* pbNameChanged)
+{
+	try
+	{
+		try
+		{
+			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(pFileRecord);
+			ASSERT_ARGUMENT("ELI31464", ipFileRecord != __nullptr);
+			string strNewName = asString(bstrNewName);
+			ASSERT_ARGUMENT("ELI31465", !strNewName.empty());
+			
+			string strCurrFileName = ipFileRecord->Name;
+
+			string strChangeNameQuery = "UPDATE [FAMFile]   SET [FileName] = '" + strNewName + 
+				"' WHERE FileName = '" + strCurrFileName + "' AND ID = " + asString(ipFileRecord->FileID);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = NULL;
+
+			*pbNameChanged = VARIANT_FALSE;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Set the transaction guard
+				TransactionGuard tg(ipConnection);
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				long lRecordsAffected = executeCmdQuery(ipConnection, strChangeNameQuery);
+
+				// There should be one record affected if not an exception should be thrown
+				if (lRecordsAffected != 1)
+				{
+					UCLIDException ue("ELI31495", "Unable to change file name in FAM Database.");
+					ue.addDebugInfo("Query", strChangeNameQuery);
+					throw ue;
+				}
+
+				// Commit the transaction
+				tg.CommitTrans();
+
+				// Since the new name is now in the database update the file record that was passed in
+				ipFileRecord->Name = strNewName.c_str();
+
+				*pbNameChanged = VARIANT_TRUE;
+
+			END_CONNECTION_RETRY(ipConnection, "ELI31466");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31467");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}

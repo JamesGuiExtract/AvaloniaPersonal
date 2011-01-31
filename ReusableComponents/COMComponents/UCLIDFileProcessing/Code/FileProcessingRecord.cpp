@@ -241,7 +241,9 @@ string FileProcessingRecord::getFileName() const
 		UCLIDException ue("ELI14211", "File record is not set.");
 		throw ue;
 	}
-	return m_lfrFileRcd.FileName;
+	// since the file name can be changed inside the file record this now needs to return the 
+	// file name in the stored FileRecord object
+	return m_lfrFileRcd.FileRecord->Name;
 }
 //-------------------------------------------------------------------------------------------------
 long FileProcessingRecord::getFileID() const
