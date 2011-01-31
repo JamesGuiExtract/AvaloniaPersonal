@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace Extract
@@ -209,7 +209,7 @@ namespace Extract
         /// <param name="ex">The exception.</param>
         public static void DisplayInMessageBox(this Exception ex)
         {
-            MessageBox.Show(ex.Message, ex.GetType().ToString(), MessageBoxButtons.OK,
+            MessageBox.Show(ex.ToString(), ex.GetType().ToString(), MessageBoxButtons.OK,
                 MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
         }
 
@@ -238,21 +238,28 @@ namespace Extract
                 }
 
                 // Serialize the exception as a hex string and write to temp file
-                string hexException = ex.ToSerializedHexString();
+                string hexException = null;
+                try
+                {
+                    hexException = ex.ToSerializedHexString();
+                }
+                catch (SerializationException se)
+                {
+                    hexException = new UnableToSerializeException("ELI31492", ex, se)
+                        .ToSerializedHexString();
+                }
+
                 tempFile = Path.GetTempFileName();
                 File.WriteAllText(tempFile, hexException);
 
                 // Build the arguments for the exception helper app
-                StringBuilder arguments = new StringBuilder();
-                arguments.Append('"');
-                arguments.Append(tempFile);
-                arguments.Append('"');
+                var arguments = string.Concat("\"", tempFile, "\"");
 
                 // Launch the helper app
                 using (Process process = new Process())
                 {
                     process.StartInfo.FileName = _EXCEPTION_HELPER_APP;
-                    process.StartInfo.Arguments = arguments.ToString();
+                    process.StartInfo.Arguments = arguments;
                     process.Start();
                     process.WaitForExit();
                 }
@@ -267,7 +274,7 @@ namespace Extract
                     // application log.
                     var assembly = Assembly.GetCallingAssembly().GetName();
                     EventLog.WriteEntry(assembly.Name,
-                        eliCode + " " + exception.Message, EventLogEntryType.Error);
+                        eliCode + " " + exception.ToString(), EventLogEntryType.Error);
                 }
                 catch { }
 

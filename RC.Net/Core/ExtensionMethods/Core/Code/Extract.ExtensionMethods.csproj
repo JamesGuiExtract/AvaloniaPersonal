@@ -60,7 +60,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="ProcessingFailedException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnableToSerializeException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
