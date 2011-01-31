@@ -958,6 +958,10 @@ namespace Extract.Imaging.Forms
                                 // Give up after a second.
                                 if (i > 20)
                                 {
+                                    // In this case, reset the canceler so that it is not disposed of
+                                    // so that its cancel token can still be checked if and when the
+                                    // UI operation is finally run.
+                                    _canceler = null;
                                     new ExtractException("ELI31371",
                                         "Application trace: Word highlight background operation aborted.").Log();
                                     break;
@@ -997,7 +1001,10 @@ namespace Extract.Imaging.Forms
                             // to use.
                             if (_ocrData == null)
                             {
-                                string ocrFileName = _imageViewer._imageFile + ".uss";
+                                string ocrFileName = string.Empty;
+
+                                ExecuteInUI(() => ocrFileName = _imageViewer._imageFile + ".uss");
+
                                 if (File.Exists(ocrFileName))
                                 {
                                     _ocrData = (ISpatialString)new SpatialStringClass();
@@ -1082,10 +1089,25 @@ namespace Extract.Imaging.Forms
             /// </param>
             void AutoFitOperation(Point startPoint, Point endPoint)
             {
+                PixelProbe probe = null;
+
                 try
                 {
+                    // Attempt to retrieve the image page currently being displayed and a PixelProbe
+                    // for it. If unable to, an image isn't currently available and the operation
+                    // should be aborted.
+                    int page = -1;
+                    ExecuteInUI(() =>
+                    {
+                        page = _imageViewer.PageNumber;
+                        probe = _imageViewer._reader.CreatePixelProbe(page);
+                    });
+                    if (page == -1 || probe == null)
+                    {
+                        return;
+                    }
+
                     // Attempt to find an already specified auto zone height limit for the current page.
-                    int page = _imageViewer.PageNumber;
                     int zoneHeightLimit = 0;
                     if (!_autoZoneHeightLimit.TryGetValue(page, out zoneHeightLimit))
                     {
@@ -1107,51 +1129,47 @@ namespace Extract.Imaging.Forms
                         _autoZoneHeightLimit[page] = zoneHeightLimit;
                     }
 
-                    // Create a probe to read image pixels.
-                    using (PixelProbe probe = _imageViewer._reader.CreatePixelProbe(page))
+                    _cancelToken.ThrowIfCancellationRequested();
+
+                    Color outlineColor = LayerObject.SelectionPen.Color;
+
+                    // Generate a 1 pixel hight raster zone as the basis of the fitting
+                    // operation.
+                    RasterZone rasterZone = new RasterZone(startPoint, endPoint, 1, page);
+
+                    // Create a new FittingData instance and try to find the top edge of pixel
+                    // content. Allow for an edge to be found using "fuzzy" logic.
+                    FittingData data = new FittingData(rasterZone, _cancelToken);
+                    if (data.FitEdge(Side.Top, probe, false, false, _AUTO_FIT_FUZZY_FACTOR, 0, 0,
+                        zoneHeightLimit))
                     {
-                        _cancelToken.ThrowIfCancellationRequested();
+                        int remainingHeight = zoneHeightLimit - (int)data.Height;
 
-                        Color outlineColor = LayerObject.SelectionPen.Color;
-
-                        // Generate a 1 pixel hight raster zone as the basis of the fitting
-                        // operation.
-                        RasterZone rasterZone = new RasterZone(startPoint, endPoint, 1, page);
-
-                        // Create a new FittingData instance and try to find the top edge of pixel
-                        // content. Allow for an edge to be found using "fuzzy" logic.
-                        FittingData data = new FittingData(rasterZone, _cancelToken);
-                        if (data.FitEdge(Side.Top, probe, false, false, _AUTO_FIT_FUZZY_FACTOR, 0, 0,
-                            zoneHeightLimit))
+                        // If a top edge was found, search downward for an opposing edge.
+                        if (remainingHeight > 0 &&
+                            data.FitEdge(Side.Bottom, probe, false, false,
+                                _AUTO_FIT_FUZZY_FACTOR, 0, 0, remainingHeight) &&
+                            data.Height >= _MIN_SPLIT_HEIGHT)
                         {
-                            int remainingHeight = zoneHeightLimit - (int)data.Height;
+                            // Shrink the left and right side to fit pixel content.
+                            data.FitEdge(Side.Left, probe);
+                            data.FitEdge(Side.Right, probe);
 
-                            // If a top edge was found, search downward for an opposing edge.
-                            if (remainingHeight > 0 &&
-                                data.FitEdge(Side.Bottom, probe, false, false,
-                                    _AUTO_FIT_FUZZY_FACTOR, 0, 0, remainingHeight) &&
-                                data.Height >= _MIN_SPLIT_HEIGHT)
+                            // Generate the new auto-fitted highlight.
+                            Highlight highlight = new Highlight(_imageViewer, "",
+                                data.ToRasterZone(), "", _imageViewer.GetHighlightDrawColor());
+                            highlight.Selectable = false;
+                            highlight.CanRender = false;
+                            highlight.OutlineColor = outlineColor;
+
+                            // Add the new auto-fit highlight
+                            ExecuteInUI(() =>
                             {
-                                // Shrink the left and right side to fit pixel content.
-                                data.FitEdge(Side.Left, probe);
-                                data.FitEdge(Side.Right, probe);
+                                RemoveAutoFitHighlight();
+                                AddAutoFitHighlight(highlight);
+                            });
 
-                                // Generate the new auto-fitted highlight.
-                                Highlight highlight = new Highlight(_imageViewer, "",
-                                    data.ToRasterZone(), "", _imageViewer.GetHighlightDrawColor());
-                                highlight.Selectable = false;
-                                highlight.CanRender = false;
-                                highlight.OutlineColor = outlineColor;
-
-                                // Add the new auto-fit highlight
-                                ExecuteInUI((MethodInvoker)(() =>
-                                {
-                                    RemoveAutoFitHighlight();
-                                    AddAutoFitHighlight(highlight);
-                                }));
-
-                                return;
-                            }
+                            return;
                         }
                     }
 
@@ -1164,7 +1182,7 @@ namespace Extract.Imaging.Forms
                             new FittingData(_autoFitHighlight.ToRasterZone());
                         if (!autoZoneFittingData.LinePassesThrough(startPoint, endPoint))
                         {
-                            ExecuteInUI((MethodInvoker)(() => RemoveAutoFitHighlight()));
+                            ExecuteInUI(() => RemoveAutoFitHighlight());
                         }
                     }
                 }
@@ -1173,6 +1191,13 @@ namespace Extract.Imaging.Forms
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI31352", ex);
+                }
+                finally
+                {
+                    if (probe != null)
+                    {
+                        probe.Dispose();
+                    }
                 }
             }
 
@@ -1194,9 +1219,24 @@ namespace Extract.Imaging.Forms
                         return;
                     }
 
+                    // Attempt to retrieve the image page currently being displayed and the total
+                    // page count. If unable to, an image isn't currently available and the
+                    // operation should be aborted.
+                    int startingPage = -1;
+                    int pageCount = -1;
+                    ExecuteInUI(() =>
+                    {
+                        startingPage = _imageViewer.PageNumber;
+                        pageCount = _imageViewer.PageCount;
+                    });
+                    if (startingPage == -1 || pageCount == -1)
+                    {
+                        return;
+                    }
+
                     // Loop through all pages starting at the current page to ensure highlights for
                     // the current page are loaded first.
-                    int page = _imageViewer.PageNumber;
+                    int page = startingPage;
                     do
                     {
                         _cancelToken.ThrowIfCancellationRequested();
@@ -1205,24 +1245,27 @@ namespace Extract.Imaging.Forms
                         // been created).
                         HashSet<LayerObject> wordHighlights = LoadWordHighlightsForPage(page);
 
-                        if (page == _imageViewer.PageNumber)
+                        ExecuteInUI(() =>
                         {
-                            // If this is the current page, add the word highlights to the page if
-                            // they have not already been added.
-                            ExecuteInUI((MethodInvoker)(() => AddWordLayerObjects(page, wordHighlights)));
-                        }
-                        else
-                        {
-                            // If this is not the current page, but highlights were previously
-                            // added to the page, remove them to prevent bogging down the image
-                            // viewer on documents with lots of pages.
-                            ExecuteInUI((MethodInvoker)(() => RemoveWordLayerObjects(page)));
-                        }
+                            if (page == startingPage)
+                            {
+                                // If this is the current page, add the word highlights to the page if
+                                // they have not already been added.
+                                AddWordLayerObjects(page, wordHighlights);
+                            }
+                            else
+                            {
+                                // If this is not the current page, but highlights were previously
+                                // added to the page, remove them to prevent bogging down the image
+                                // viewer on documents with lots of pages.
+                                RemoveWordLayerObjects(page);
+                            }
+                        });
 
                         // Increment the page number (looping back to the first page if necessary).
-                        page = (page < _imageViewer.PageCount) ? page + 1 : 1;
+                        page = (page < pageCount) ? page + 1 : 1;
                     }
-                    while (page != _imageViewer.PageNumber);
+                    while (page != startingPage);
                 }
                 catch (OperationCanceledException)
                 { }
@@ -1342,8 +1385,8 @@ namespace Extract.Imaging.Forms
             /// This method cannot block indefinetly because the UI may be waiting on the background
             /// thread (ie, it must adhere to _cancelToken).
             /// </summary>
-            /// <param name="method">The <see cref="Delegate"/> to execute in the UI thread.</param>
-            void ExecuteInUI(Delegate method)
+            /// <param name="method">The <see cref="Action"/> to execute in the UI thread.</param>
+            void ExecuteInUI(Action method)
             {
                 // To avoid scheduling to the UI unnecessarilly, check cancelation token first.
                 _cancelToken.ThrowIfCancellationRequested();
@@ -1351,14 +1394,29 @@ namespace Extract.Imaging.Forms
                 // Keep track of the fact that the method was scheduled to execute.
                 _executeInUIReferenceCount++;
 
+                // Assign a local copy of the _cancelToken to check inside the invoke call so that
+                // even if the worker thread is running a different operation by the time occurs
+                // and, therefore, _cancelToken is now set to a different token, the Invoke can stil
+                // know if the operation that launched it has been cancelled.
+                CancellationToken cancelToken = _cancelToken;
+
                 // Invoke to avoid modifying the imageViewer from outside the UI thread. Use begin
                 // invoke so the operation isn't executed in the middle of another UI event.
-                _imageViewer.BeginInvoke(method);
+                IAsyncResult result = _imageViewer.BeginInvoke((MethodInvoker)(() => 
+                    {
+                        // If the task was cancelled before invoked or no image is loaded do not
+                        // execute the method.
+                        if (!cancelToken.IsCancellationRequested &&
+                            _imageViewer.IsImageAvailable)
+                        {
+                            method();
+                        }
 
-                // By scheduling a decrement of _UIOperationReferenceCount, we'll have record of
-                // whether the method was called, even if the blocking here was cancelled.
-                IAsyncResult result =
-                    _imageViewer.BeginInvoke((MethodInvoker)(() => _executeInUIReferenceCount--));
+                        // By decrementing _UIOperationReferenceCount as part of the invoke, we'll
+                        // have record of whether the method was called, even if the blocking here
+                        // was cancelled.
+                        _executeInUIReferenceCount--;
+                    }));
 
                 WaitHandle[] waitHandles = new WaitHandle[] 
                 {
