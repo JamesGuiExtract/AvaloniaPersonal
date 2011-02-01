@@ -209,7 +209,7 @@ namespace Extract
         /// <param name="ex">The exception.</param>
         public static void DisplayInMessageBox(this Exception ex)
         {
-            MessageBox.Show(ex.ToString(), ex.GetType().ToString(), MessageBoxButtons.OK,
+            MessageBox.Show(ex.Message, ex.GetType().ToString(), MessageBoxButtons.OK,
                 MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
         }
 
