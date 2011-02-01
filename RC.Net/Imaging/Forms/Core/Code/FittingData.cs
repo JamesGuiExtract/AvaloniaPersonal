@@ -148,6 +148,8 @@ namespace Extract.Imaging.Forms
         /// first to the last pixel in a row must decline, then increase in order for the row of the
         /// minimum value to qualify as the edge of pixel content. If <see langword="null"/>, no
         /// fuzzy logic will be used to find an edge (default = <see langword="null"/>).</param>
+        /// <param name="fuzzyBuffer">After qualifying a "fuzzy" edge of pixel content, the distance
+        /// to keep searching for a true edge before using the fuzzy edge. (default = 0)</param>
         /// <param name="buffer">If a qualifying row is found, how many rows prior to the qualifying
         /// row to move the side. This will never result in the side moving in the opposite
         /// direction specified by <see paramref="side"/>. (default = 1)</param>
@@ -156,12 +158,14 @@ namespace Extract.Imaging.Forms
         /// maximum value other than the other side of the zone when <see paramref="shrink"/> is
         /// <see langword="true"/>. (default = 0)</param>
         public bool FitEdge(Side side, PixelProbe probe, bool shrink = true, bool findBlack = true,
-            float? fuzzyFactor = null, float buffer = 1, float min = 0, float max = 0)
+            float? fuzzyFactor = null, int fuzzyBuffer = 0, float buffer = 1, float min = 0,
+            float max = 0)
         {
             try
             {
                 // Search for the edge of pixel content
-                float? edge = FindEdge(side, probe, shrink, findBlack, fuzzyFactor, buffer, min, max);
+                float? edge = FindEdge(side, probe, shrink, findBlack, fuzzyFactor, fuzzyBuffer,
+                    buffer, min, max);
 
                 // If an edge was found, adjust the side of the zone accordingly.
                 if (edge != null)
@@ -193,6 +197,8 @@ namespace Extract.Imaging.Forms
         /// first to the last pixel in a row must decline, then increase in order for the row of the
         /// minimum value to qualify as the edge of pixel content. If <see langword="null"/>, no
         /// fuzzy logic will be used to find an edge (default = <see langword="null"/>).</param>
+        /// <param name="fuzzyBuffer">After qualifying a "fuzzy" edge of pixel content, the distance
+        /// to keep searching for a true edge before using the fuzzy edge. (default = 0)</param>
         /// <param name="buffer">If a qualifying row is found, how many rows prior to the qualifying
         /// row return. This will never result in a negative number for a found edge. (default = 1)
         /// </param>
@@ -203,7 +209,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The number of pixels from the side to a qualifying edge of pixel content.
         /// -1 if no edge was found.</returns>
         public float? FindEdge(Side side, PixelProbe probe, bool shrink = true, bool findBlack = true,
-            float? fuzzyFactor = null, float buffer = 0, float min = 0, float max = 0)
+            float? fuzzyFactor = null, int fuzzyBuffer = 0, float buffer = 0, float min = 0, float max = 0)
         {
             try
             {
@@ -274,13 +280,13 @@ namespace Extract.Imaging.Forms
                     {
                         // If we haven't yet found the edge of pixel content, see if we have
                         // found a row that qualifies as an edge using fuzzy logice.
-                        edge = countQualifier.GetQualifyingRow(row, count);
+                        edge = countQualifier.GetQualifyingRow(row, count, fuzzyBuffer);
                         if (edge.HasValue)
                         {
                             break;
                         }
 
-                        edge = spreadQualifier.GetQualifyingRow(row, spread);
+                        edge = spreadQualifier.GetQualifyingRow(row, spread, fuzzyBuffer);
                         if (edge.HasValue)
                         {
                             break;
@@ -656,12 +662,6 @@ namespace Extract.Imaging.Forms
         class FuzzyEdgeQualifier
         {
             /// <summary>
-            /// If a row is found to be qualified fuzzily as an edge of pixel content, search this
-            /// many rows more of content for true edge before returning the fuzzy edge.
-            /// </summary>
-            const int _QUALIFIED_ROW_BUFFER = 25;
-
-            /// <summary>
             /// The factor by which the data value being checked must decline, then increase in
             /// order for the row of the minimum value to qualify as the edge of pixel content.
             /// </summary>
@@ -735,14 +735,16 @@ namespace Extract.Imaging.Forms
             /// <param name="row">The index of the latest row data.</param>
             /// <param name="value">A value that corresponds to a measure of row pixel content.
             /// </param>
+            /// <param name="buffer">After qualifying a "fuzzy" edge of pixel content, the distance
+            /// to keep searching for a true edge before using the fuzzy edge.</param>
             /// <returns>A qualifying row index or <see langword="null"/> if no qualifying row has
             /// yet been found.</returns>
-            public float? GetQualifyingRow(float row, int value)
+            public float? GetQualifyingRow(float row, int value, int buffer)
             {
                 if (_qualifiedRow.HasValue)
                 {
                     // If we have a qualified row, continue searching for a true edge for a bit more.
-                    if (Math.Abs(row - _qualifiedRow.Value) > _QUALIFIED_ROW_BUFFER)
+                    if (Math.Abs(row - _qualifiedRow.Value) > buffer)
                     {
                         return _qualifiedRow;
                     }

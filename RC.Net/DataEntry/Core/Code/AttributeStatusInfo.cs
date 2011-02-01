@@ -620,9 +620,6 @@ namespace Extract.DataEntry
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.DataEntryCoreComponents, "ELI26133", _OBJECT_NAME);
 
-                _sourceDocName = sourceDocName;
-                _attributes = attributes;
-                _dbConnection = dbConnection;
                 _statusInfoMap.Clear();
                 _subAttributesToParentMap.Clear();
                 _attributesBeingModified.Clear();
@@ -653,6 +650,10 @@ namespace Extract.DataEntry
                 {
                     AttributeStatusInfo.ReleaseAttributes(_attributes);
                 }
+
+                _attributes = attributes;
+                _sourceDocName = sourceDocName;
+                _dbConnection = dbConnection;
             }
             catch (Exception ex)
             {

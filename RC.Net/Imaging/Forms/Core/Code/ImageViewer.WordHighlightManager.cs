@@ -27,10 +27,21 @@ namespace Extract.Imaging.Forms
             #region Constants
 
             /// <summary>
+            /// The maximum height of an auto-fit zone in terms of the average line height of the page.
+            /// </summary>
+            const float _AUTO_FIT_MAX_HEIGHT = 5F;
+
+            /// <summary>
             /// Controls how lenient the algorighm to find auto-fit zones is when a hard edge of
             /// pixel content cannot be found.
             /// </summary>
-            const float _AUTO_FIT_FUZZY_FACTOR = 0.3F;
+            const float _AUTO_FIT_FUZZY_FACTOR = 0.25F;
+
+            /// <summary>
+            /// After finding qualifying a "fuzzy" edge to an auto-fit zone, continue searching
+            /// this much further for a true edge.
+            /// </summary>
+            const float _AUTO_FIT_FUZZY_BUFFER = 0.5F;
 
             #endregion Constants
 
@@ -125,9 +136,9 @@ namespace Extract.Imaging.Forms
             volatile bool _loadingWordHighlights;
 
             /// <summary>
-            /// The maximum height of an automatically sized zone for each page.
+            /// The average line height for each page.
             /// </summary>
-            Dictionary<int, int> _autoZoneHeightLimit = new Dictionary<int, int>();
+            Dictionary<int, int> _averageLineHeight = new Dictionary<int, int>();
 
             /// <summary>
             /// The starting point in client coordinates of the current tracking operation. Used
@@ -1056,7 +1067,7 @@ namespace Extract.Imaging.Forms
                 _pagesOfAddedWordHighlights.Clear();
                 _wordHighlights.Clear();
                 _wordLineMapping.Clear();
-                _autoZoneHeightLimit.Clear();
+                _averageLineHeight.Clear();
                 _ocrData = null;
 
                 _clearData = false;
@@ -1091,9 +1102,9 @@ namespace Extract.Imaging.Forms
                         return;
                     }
 
-                    // Attempt to find an already specified auto zone height limit for the current page.
-                    int zoneHeightLimit = 0;
-                    if (!_autoZoneHeightLimit.TryGetValue(page, out zoneHeightLimit))
+                    // Attempt to find an already calculated average line height for the current page.
+                    int averageLineHeight = 0;
+                    if (!_averageLineHeight.TryGetValue(page, out averageLineHeight))
                     {
                         if (_ocrData != null)
                         {
@@ -1101,17 +1112,21 @@ namespace Extract.Imaging.Forms
                             ISpatialString pageData = (ISpatialString)_ocrData.GetSpecifiedPages(page, page);
 
                             // Base the height limit on the average line height for the page.
-                            zoneHeightLimit = pageData.GetAverageLineHeight() * 5;
+                            averageLineHeight = pageData.GetAverageLineHeight() * 5;
                         }
 
-                        // Ensure the height limit is at least 100 pixels.
-                        if (zoneHeightLimit < 100)
+                        // Ensure the average line height is at least 30 pixels.
+                        if (averageLineHeight < 30)
                         {
-                            zoneHeightLimit = 100;
+                            averageLineHeight = 30;
                         }
 
-                        _autoZoneHeightLimit[page] = zoneHeightLimit;
+                        _averageLineHeight[page] = averageLineHeight;
                     }
+
+                    // Base the auto-fit zone max height and fuzzy edge buffer on the line height.
+                    int zoneHeightLimit = (int)(averageLineHeight * _AUTO_FIT_MAX_HEIGHT);
+                    int fuzzyEdgeBuffer = (int)(averageLineHeight * _AUTO_FIT_FUZZY_BUFFER);
 
                     _cancelToken.ThrowIfCancellationRequested();
 
@@ -1124,15 +1139,15 @@ namespace Extract.Imaging.Forms
                     // Create a new FittingData instance and try to find the top edge of pixel
                     // content. Allow for an edge to be found using "fuzzy" logic.
                     FittingData data = new FittingData(rasterZone, _cancelToken);
-                    if (data.FitEdge(Side.Top, probe, false, false, _AUTO_FIT_FUZZY_FACTOR, 0, 0,
-                        zoneHeightLimit))
+                    if (data.FitEdge(Side.Top, probe, false, false, _AUTO_FIT_FUZZY_FACTOR,
+                        fuzzyEdgeBuffer, 0, 0, zoneHeightLimit))
                     {
                         int remainingHeight = zoneHeightLimit - (int)data.Height;
 
                         // If a top edge was found, search downward for an opposing edge.
                         if (remainingHeight > 0 &&
-                            data.FitEdge(Side.Bottom, probe, false, false,
-                                _AUTO_FIT_FUZZY_FACTOR, 0, 0, remainingHeight) &&
+                            data.FitEdge(Side.Bottom, probe, false, false, _AUTO_FIT_FUZZY_FACTOR,
+                                fuzzyEdgeBuffer, 0, 0, remainingHeight) &&
                             data.Height >= _MIN_SPLIT_HEIGHT)
                         {
                             // Shrink the left and right side to fit pixel content.
@@ -1597,13 +1612,13 @@ namespace Extract.Imaging.Forms
 
                         // Expand out up to 2 pixel in each direction looking for an all
                         // white row to ensure the zone has encapsulated all pixel content.
-                        data.FitEdge(Side.Left, probe, false, false, null, 0, 0,
+                        data.FitEdge(Side.Left, probe, false, false, null, 0, 0, 0,
                             horizontalExpandLimit);
-                        data.FitEdge(Side.Top, probe, false, false, null, 0, 0,
+                        data.FitEdge(Side.Top, probe, false, false, null, 0, 0, 0,
                             verticalExpandLimit);
-                        data.FitEdge(Side.Right, probe, false, false, null, 0, 0,
+                        data.FitEdge(Side.Right, probe, false, false, null, 0, 0, 0,
                             horizontalExpandLimit);
-                        data.FitEdge(Side.Bottom, probe, false, false, null, 0, 0,
+                        data.FitEdge(Side.Bottom, probe, false, false, null, 0, 0, 0,
                             verticalExpandLimit);
 
                         // Shrink any sides with excess space and eliminate zones that

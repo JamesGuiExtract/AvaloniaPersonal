@@ -1523,6 +1523,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _temporaryDocumentType = null;
                 }
 
+                // Ensure the data in the controls is cleared when a document is closed or prior to
+                // loading any new data.
+                if (_dataEntryControlHost != null)
+                {
+                    _dataEntryControlHost.ClearData();
+                }
+
                 if (!_imageViewer.IsImageAvailable)
                 {
                     // The goto next invalid and unviewed buttons and menu options will be enabled via
