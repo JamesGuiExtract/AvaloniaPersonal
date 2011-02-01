@@ -65,6 +65,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._selectLayerObjectMenuItem = new Extract.Imaging.Forms.SelectLayerObjectToolStripMenuItem();
             this._angularHighlightToolStripMenuItem = new Extract.Imaging.Forms.AngularHighlightToolStripMenuItem();
             this._rectangularHighlightToolStripMenuItem = new Extract.Imaging.Forms.RectangularHighlightToolStripMenuItem();
+            this._wordHighlightToolStripMenuItem = new Extract.Imaging.Forms.WordHighlightToolStripMenuItem();
             this._toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this._allowTabbingByGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
@@ -86,6 +87,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._selectLayerObjectToolStripButton = new Extract.Imaging.Forms.SelectLayerObjectToolStripButton();
             this._angularHighlightToolStripButton = new Extract.Imaging.Forms.AngularHighlightToolStripButton();
             this._rectangularHighlightToolStripButton = new Extract.Imaging.Forms.RectangularHighlightToolStripButton();
+            this._wordHighlightToolStripButton = new Extract.Imaging.Forms.WordHighlightToolStripButton();
             this._pageNavigationImageViewerToolStrip = new System.Windows.Forms.ToolStrip();
             this._firstPageToolStripButton = new Extract.Imaging.Forms.FirstPageToolStripButton();
             this._previousPageToolStripButton = new Extract.Imaging.Forms.PreviousPageToolStripButton();
@@ -192,6 +194,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._imageViewer.Size = new System.Drawing.Size(802, 506);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
+            this._imageViewer.WordHighlightToolEnabled = true;
             // 
             // _toolStripContainer
             // 
@@ -542,6 +545,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._selectLayerObjectMenuItem,
             this._angularHighlightToolStripMenuItem,
             this._rectangularHighlightToolStripMenuItem,
+            this._wordHighlightToolStripMenuItem,
             this._toolStripSeparator8,
             this._allowTabbingByGroupToolStripMenuItem,
             this._toolStripSeparator9,
@@ -599,6 +603,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rectangularHighlightToolStripMenuItem.ShortcutKeyDisplayString = "";
             this._rectangularHighlightToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
             this._rectangularHighlightToolStripMenuItem.Text = "&Swipe text in rectangular zone";
+            // 
+            // _wordHighlightToolStripMenuItem
+            // 
+            this._wordHighlightToolStripMenuItem.Enabled = false;
+            this._wordHighlightToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_wordHighlightToolStripMenuItem.Image")));
+            this._wordHighlightToolStripMenuItem.ImageViewer = null;
+            this._wordHighlightToolStripMenuItem.Name = "_wordHighlightToolStripMenuItem";
+            this._wordHighlightToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._wordHighlightToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
+            this._wordHighlightToolStripMenuItem.Text = "Swipe &word(s)";
             // 
             // _toolStripSeparator8
             // 
@@ -748,10 +762,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._panToolStripButton,
             this._selectLayerObjectToolStripButton,
             this._angularHighlightToolStripButton,
-            this._rectangularHighlightToolStripButton});
+            this._rectangularHighlightToolStripButton,
+            this._wordHighlightToolStripButton});
             this._basicCommandsImageViewerToolStrip.Location = new System.Drawing.Point(312, 24);
             this._basicCommandsImageViewerToolStrip.Name = "_basicCommandsImageViewerToolStrip";
-            this._basicCommandsImageViewerToolStrip.Size = new System.Drawing.Size(183, 39);
+            this._basicCommandsImageViewerToolStrip.Size = new System.Drawing.Size(219, 39);
             this._basicCommandsImageViewerToolStrip.TabIndex = 0;
             // 
             // _zoomWindowToolStripButton
@@ -804,6 +819,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rectangularHighlightToolStripButton.Name = "_rectangularHighlightToolStripButton";
             this._rectangularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
             // 
+            // _wordHighlightToolStripButton
+            // 
+            this._wordHighlightToolStripButton.BaseToolTipText = "Swipe word(s) (Alt+S)";
+            this._wordHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._wordHighlightToolStripButton.Enabled = false;
+            this._wordHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._wordHighlightToolStripButton.ImageViewer = null;
+            this._wordHighlightToolStripButton.Name = "_wordHighlightToolStripButton";
+            this._wordHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
+            // 
             // _pageNavigationImageViewerToolStrip
             // 
             this._pageNavigationImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -815,7 +840,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._pageNavigationToolStripTextBox,
             this._nextPageToolStripButton,
             this._lastPageToolStripButton});
-            this._pageNavigationImageViewerToolStrip.Location = new System.Drawing.Point(495, 24);
+            this._pageNavigationImageViewerToolStrip.Location = new System.Drawing.Point(531, 24);
             this._pageNavigationImageViewerToolStrip.Name = "_pageNavigationImageViewerToolStrip";
             this._pageNavigationImageViewerToolStrip.Size = new System.Drawing.Size(224, 39);
             this._pageNavigationImageViewerToolStrip.TabIndex = 0;
@@ -877,7 +902,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._viewCommandsImageViewerToolStrip.Dock = System.Windows.Forms.DockStyle.None;
             this._viewCommandsImageViewerToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._viewCommandsImageViewerToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(719, 24);
+            this._viewCommandsImageViewerToolStrip.Location = new System.Drawing.Point(755, 24);
             this._viewCommandsImageViewerToolStrip.Name = "_viewCommandsImageViewerToolStrip";
             this._viewCommandsImageViewerToolStrip.Size = new System.Drawing.Size(303, 39);
             this._viewCommandsImageViewerToolStrip.TabIndex = 0;
@@ -993,6 +1018,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private Extract.Imaging.Forms.PanToolStripButton _panToolStripButton;
         private Extract.Imaging.Forms.AngularHighlightToolStripButton _angularHighlightToolStripButton;
         private Extract.Imaging.Forms.RectangularHighlightToolStripButton _rectangularHighlightToolStripButton;
+        private Extract.Imaging.Forms.WordHighlightToolStripButton _wordHighlightToolStripButton;
         private System.Windows.Forms.StatusStrip _statusStrip;
         private Extract.Imaging.Forms.UserActionToolStripStatusLabel _userActionToolStripStatusLabel;
         private Extract.Imaging.Forms.ResolutionToolStripStatusLabel _resolutionToolStripStatusLabel;
@@ -1027,6 +1053,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private Extract.Imaging.Forms.PanToolStripMenuItem _panToolStripMenuItem;
         private Extract.Imaging.Forms.AngularHighlightToolStripMenuItem _angularHighlightToolStripMenuItem;
         private Extract.Imaging.Forms.RectangularHighlightToolStripMenuItem _rectangularHighlightToolStripMenuItem;
+        private Extract.Imaging.Forms.WordHighlightToolStripMenuItem _wordHighlightToolStripMenuItem;
         private DataEntryScrollPanel _scrollPanel;
         private System.Windows.Forms.ToolStrip _dataEntryOperationsToolStrip;
         private System.Windows.Forms.ToolStripButton _nextUnviewedToolStripButton;

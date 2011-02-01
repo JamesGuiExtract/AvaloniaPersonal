@@ -2521,7 +2521,7 @@ namespace Extract.Imaging.Forms
                         {
                             // The control key is pressed and a selected 
                             // layer object was clicked. Remove the layer object.
-                            _layerObjects.Selection.Remove(clickedObject, true);
+                            _layerObjects.Selection.Remove(clickedObject, true, true);
 
                             // Invalidate the image viewer to remove any previous grip 
                             // handles and to redraw these grip handles
@@ -3508,7 +3508,7 @@ namespace Extract.Imaging.Forms
             // Delete any layer objects that intersected
             foreach (int id in layerObjectIds)
             {
-                _layerObjects.Remove(id, true);
+                _layerObjects.Remove(id);
             }
 
             // Refresh the image
@@ -4851,7 +4851,8 @@ namespace Extract.Imaging.Forms
                             break;
 
                         case CursorTool.RectangularHighlight:
-                            CursorTool = CursorTool.WordHighlight;
+                            CursorTool = WordHighlightToolEnabled
+                                ? CursorTool.WordHighlight : CursorTool.AngularHighlight;
                             break;
 
                         case CursorTool.WordHighlight:
@@ -4860,7 +4861,15 @@ namespace Extract.Imaging.Forms
 
                         default:
                             // Select the last used highlight tool
-                            CursorTool = RegistryManager.GetLastUsedHighlightTool();
+                            CursorTool cursorTool = RegistryManager.GetLastUsedHighlightTool();
+                            if (cursorTool == CursorTool.WordHighlight && !WordHighlightToolEnabled)
+                            {
+                                CursorTool = CursorTool.AngularHighlight;
+                            }
+                            else
+                            {
+                                CursorTool = cursorTool;
+                            }
                             break;
                     }
                 }
@@ -5398,7 +5407,7 @@ namespace Extract.Imaging.Forms
                 if (deleteMe.Count > 0)
                 {
                     // Delete the selected layer objects
-                    _layerObjects.Remove(deleteMe, true);
+                    _layerObjects.Remove(deleteMe, true, true);
                 }
 
                 // Refresh the image viewer

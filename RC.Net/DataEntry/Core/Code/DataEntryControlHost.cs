@@ -654,6 +654,10 @@ namespace Extract.DataEntry
                                                     new HighlightColor(100, Color.LightGreen)};
                 HighlightColors = highlightColors;
 
+                // Set the selection pen (used only to specify color of word highlighter dashed
+                // hover border).
+                LayerObject.SelectionPen = ExtractPens.GetThickPen(Color.Gray);
+
                 // Blinking error icons are annoying and unnecessary.
                 _validationErrorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
                 _validationWarningErrorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
@@ -1902,10 +1906,12 @@ namespace Extract.DataEntry
                 {
                     if (_imageViewer.LayerObjects.Contains(highlight))
                     {
-                        _imageViewer.LayerObjects.Remove(highlight, true);
+                        _imageViewer.LayerObjects.Remove(highlight, true, false);
                     }
-
-                    highlight.Dispose();
+                    else
+                    {
+                        highlight.Dispose();
+                    }
                 }
                 _highlightAttributes.Clear();
 
@@ -2686,28 +2692,57 @@ namespace Extract.DataEntry
                 if (!_processingSwipe && _activeDataControl != null &&
                     _activeDataControl.SupportsSwiping)
                 {
-                    Highlight highlight = e.LayerObject as Highlight;
+                    List<RasterZone> highlightedZones = new List<RasterZone>();
 
+                    // Angular and rectangular swipes will be highlights.
+                    Highlight highlight = e.LayerObject as Highlight;
                     if (highlight != null)
+                    {
+                        highlightedZones.Add(highlight.ToRasterZone());
+                    }
+                    else
+                    {
+                        // Word highlighter swipes will be CompositeHighlightLayerObjects.
+                        CompositeHighlightLayerObject compositeHighlight =
+                            e.LayerObject as CompositeHighlightLayerObject;
+                        if (compositeHighlight != null)
+                        {
+                            highlightedZones.AddRange(compositeHighlight.GetRasterZones());
+                        }
+                    }
+
+                    if (highlightedZones.Count > 0)
                     {
                         startedSwipeProcessing = true;
                         _processingSwipe = true;
 
-                        _imageViewer.LayerObjects.Remove(e.LayerObject, true);
-                        e.LayerObject.Dispose();
+                        _imageViewer.LayerObjects.Remove(e.LayerObject, true, false);
 
                         // Recognize the text in the highlight's raster zone and send it to the active
                         // data control for processing.
                         using (new TemporaryWaitCursor())
                         {
-                            SpatialString ocrText;
+                            SpatialString ocrText = null;
 
                             try
                             {
-                                // [DataEntry:294] Keep the angle threshold small so long swipes on
-                                // slightly skewed docs don't include more text than intended.
-                                ocrText = _ocrManager.GetOcrText(
-                                    _imageViewer.ImageFile, highlight.ToRasterZone(), 0.2);
+
+                                foreach (RasterZone zone in highlightedZones)
+                                {
+                                    // [DataEntry:294] Keep the angle threshold small so long swipes
+                                    // on slightly skewed docs don't include more text than intended.
+                                    SpatialString zoneOcrText = _ocrManager.GetOcrText(
+                                        _imageViewer.ImageFile, zone, 0.2);
+
+                                    if (ocrText == null)
+                                    {
+                                        ocrText = zoneOcrText;
+                                    }
+                                    else
+                                    {
+                                        ocrText.Append(zoneOcrText);
+                                    }
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -4230,7 +4265,7 @@ namespace Extract.DataEntry
                             RemoveAttributeToolTip(_hoverAttribute);
                             _hoverToolTip = new DataEntryToolTip(this, _hoverAttribute, true, null);
 
-                            _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject);
+                            _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject, false);
                         }
                     }
                 }
@@ -5328,7 +5363,7 @@ namespace Extract.DataEntry
 
                 _attributeHighlights[attribute].Add(highlight);
                 _highlightAttributes[highlight] = attribute;
-                _imageViewer.LayerObjects.Add(highlight);
+                _imageViewer.LayerObjects.Add(highlight, false);
             }
 
             // Create an error icon for the attribute if the value is currently invalid
@@ -5698,7 +5733,7 @@ namespace Extract.DataEntry
                 errorIcon.Visible = makeVisible;
                 errorIcon.CanRender = false;
 
-                _imageViewer.LayerObjects.Add(errorIcon);
+                _imageViewer.LayerObjects.Add(errorIcon, false);
 
                 // NOTE: For now I think the cases where the error icon would extend off-page are so
                 // rare that it's not worth handling. But this would be where such a check should
@@ -5928,10 +5963,12 @@ namespace Extract.DataEntry
 
                     if (_imageViewer.LayerObjects.Contains(highlight))
                     {
-                        _imageViewer.LayerObjects.Remove(highlight, true);
+                        _imageViewer.LayerObjects.Remove(highlight, true, false);
                     }
-
-                    highlight.Dispose();
+                    else
+                    {
+                        highlight.Dispose();
+                    }
                 }
 
                 _attributeHighlights.Remove(attribute);
@@ -5990,10 +6027,12 @@ namespace Extract.DataEntry
                 {
                     if (_imageViewer.LayerObjects.Contains(errorIcon))
                     {
-                        _imageViewer.LayerObjects.Remove(errorIcon, true);
+                        _imageViewer.LayerObjects.Remove(errorIcon, true, false);
                     }
-
-                    errorIcon.Dispose();
+                    else
+                    {
+                        errorIcon.Dispose();
+                    }
                 }
 
                 _attributeErrorIcons.Remove(attribute);

@@ -457,7 +457,7 @@ namespace Extract.Imaging.Forms
                         // Remove the layer object if was not already
                         if (selection.Contains(this))
                         {
-                            selection.Remove(this, true);
+                            selection.Remove(this, true, true);
                         }
                     }
                 }

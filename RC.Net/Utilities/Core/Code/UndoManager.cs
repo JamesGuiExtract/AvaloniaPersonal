@@ -309,7 +309,7 @@ namespace Extract.Utilities
                     if (_operationInProgress || _currentOperation.Count > 0 ||
                         memento.Significance >= UndoMementoSignificance.Minor)
                     {
-                        if (_currentOperation.Where(m => m.Supersedes(memento)).Count() == 0)
+                        if (!_currentOperation.Any(m => m.Supersedes(memento)))
                         {
                             _currentOperation.Push(memento);
 

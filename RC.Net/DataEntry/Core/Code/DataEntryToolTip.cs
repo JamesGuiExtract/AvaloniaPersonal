@@ -360,7 +360,7 @@ namespace Extract.DataEntry
                         if (_host.ImageViewer != null &&
                             _host.ImageViewer.LayerObjects.Contains(_textLayerObject))
                         {
-                            _host.ImageViewer.LayerObjects.Remove(_textLayerObject, true);
+                            _host.ImageViewer.LayerObjects.Remove(_textLayerObject);
                         }
 
                         _textLayerObject.Dispose();

@@ -714,7 +714,7 @@ namespace Extract.Rules
                 // Remove the currently visible find result if possible
                 if (_imageViewer.LayerObjects.Contains(_findResults[_nextFindResult - 1].CompositeMatch.Id))
                 {
-                    _imageViewer.LayerObjects.Remove(_findResults[_nextFindResult - 1].CompositeMatch, true);
+                    _imageViewer.LayerObjects.Remove(_findResults[_nextFindResult - 1].CompositeMatch);
                 }
 
                 // Invalidate the form so it will redraw

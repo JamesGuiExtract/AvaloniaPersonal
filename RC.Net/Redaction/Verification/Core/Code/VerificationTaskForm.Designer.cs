@@ -1184,6 +1184,7 @@ namespace Extract.Redaction.Verification
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
             this._imageViewer.UseDefaultShortcuts = true;
+            this._imageViewer.WordHighlightToolEnabled = true;
             // 
             // _imageViewerContextMenu
             // 

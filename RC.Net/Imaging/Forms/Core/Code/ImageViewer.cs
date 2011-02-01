@@ -2029,6 +2029,20 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the word highlight/redaction tool is enabled.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the word highlight/redaction tool is enabled;
+        /// <see langword="false"/> if it cannot be used.
+        /// </value>
+        [DefaultValue(false)]
+        public bool WordHighlightToolEnabled
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region OnEvents

@@ -120,12 +120,6 @@ namespace Extract.Imaging.Forms
             HashSet<LayerObject> _activeWordHighlights = new HashSet<LayerObject>();
 
             /// <summary>
-            /// Indicates whether the WordHighlightManager is currently removing word layer objects
-            /// from the image viewer.
-            /// </summary>
-            volatile bool _removingWordHighlights;
-
-            /// <summary>
             /// Indicates whether word highlights are currently being loaded.
             /// </summary>
             volatile bool _loadingWordHighlights;
@@ -538,12 +532,6 @@ namespace Extract.Imaging.Forms
 
                 try
                 {
-                    // If the WordHighlight manager is the one deleting ignore the event.
-                    if (_removingWordHighlights)
-                    {
-                        return;
-                    }
-
                     // Before accessing fields that may be modifed by the background worker, stop
                     // any currently running operation on the background worker.
                     lock (_lock)
@@ -599,15 +587,7 @@ namespace Extract.Imaging.Forms
 
                         if (remainingHighlights.Count > 0)
                         {
-                            try
-                            {
-                                _removingWordHighlights = true;
-                                _imageViewer.LayerObjects.Remove(remainingHighlights, true);
-                            }
-                            finally
-                            {
-                                _removingWordHighlights = false;
-                            }
+                            _imageViewer.LayerObjects.Remove(remainingHighlights, true, false);
                         }
                     }
                 }
@@ -772,6 +752,10 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
+                    ExtractException.Assert("ELI31505",
+                        "The word higlight/redaction tool is disabled an cannot be used.",
+                        _imageViewer.WordHighlightToolEnabled);
+
                     lock (_lock)
                     {
                         if (!_active)
@@ -1442,14 +1426,12 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    // If the image is still available and the highlights have not already been
-                    // added to the page, add them now.
-                    if (_imageViewer.IsImageAvailable && wordHighlights != null &&
-                        !_pagesOfAddedWordHighlights.Contains(page))
+                    // If the highlights have not already been added to the page, add them now.
+                    if (wordHighlights != null && !_pagesOfAddedWordHighlights.Contains(page))
                     {
                         foreach (LayerObject layerObject in wordHighlights)
                         {
-                            _imageViewer._layerObjects.Add(layerObject);
+                            _imageViewer._layerObjects.Add(layerObject, false);
                         }
 
                         _pagesOfAddedWordHighlights.Add(page);
@@ -1474,20 +1456,12 @@ namespace Extract.Imaging.Forms
                     {
                         _pagesOfAddedWordHighlights.Remove(page);
 
-                        if (_imageViewer.IsImageAvailable)
-                        {
-                            _removingWordHighlights = true;
-                            _imageViewer._layerObjects.Remove(_wordHighlights[page], false);
-                        }
+                        _imageViewer._layerObjects.Remove(_wordHighlights[page], false, false);
                     }
                 }
                 catch (Exception ex)
                 {
                     ExtractException.Log("ELI31368", ex);
-                }
-                finally
-                {
-                    _removingWordHighlights = false;
                 }
             }
 
@@ -1502,9 +1476,9 @@ namespace Extract.Imaging.Forms
                 {
                     // Ensure an auto-event tracking event is still active before adding the auto-fit
                     // highlight.
-                    if (_imageViewer.IsImageAvailable && InAutoFitOperation)
+                    if (InAutoFitOperation)
                     {
-                        _imageViewer._layerObjects.Add(highlight);
+                        _imageViewer._layerObjects.Add(highlight, false);
                         _autoFitHighlight = highlight;
                         _imageViewer.Invalidate();
                     }
@@ -1526,11 +1500,9 @@ namespace Extract.Imaging.Forms
 
                     if (_autoFitHighlight != null)
                     {
-                        if (_imageViewer.IsImageAvailable &&
-                            _imageViewer.LayerObjects.Contains(_autoFitHighlight))
+                        if (_imageViewer.LayerObjects.Contains(_autoFitHighlight))
                         {
-                            _removingWordHighlights = true;
-                            _imageViewer._layerObjects.Remove(_autoFitHighlight, true);
+                            _imageViewer._layerObjects.Remove(_autoFitHighlight, true, false);
                         }
                         else
                         {
@@ -1543,10 +1515,6 @@ namespace Extract.Imaging.Forms
                 catch (Exception ex)
                 {
                     ExtractException.Log("ELI31370", ex);
-                }
-                finally
-                {
-                    _removingWordHighlights = false;
                 }
             }
 

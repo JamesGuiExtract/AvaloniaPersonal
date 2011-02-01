@@ -1182,31 +1182,20 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                 int height = int.Parse(data[4], CultureInfo.CurrentCulture);
                 int pageNumber = int.Parse(data[5], CultureInfo.CurrentCulture);
 
-                try
+                // Add the highlight to the image viewer (make the highlight
+                // non-selectable)
+                Highlight highlight = new Highlight(_imageViewer, "Temp Highlight",
+                    startPoint, endPoint, height, pageNumber);
+                highlight.Selectable = false;
+
+                // Don't raise the LayerObjectAdded event when adding the temporary highlight.
+                _imageViewer.LayerObjects.Add(highlight, false);
+                _tempHighlights.Add(highlight);
+
+                // Move to the page containing the highlight if it is not visible
+                if (_imageViewer.PageNumber != pageNumber)
                 {
-                    // Remove the layer object added handler while the temp highlight is added
-                    _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
-
-                    // Add the highlight to the image viewer (make the highlight
-                    // non-selectable)
-                    Highlight highlight = new Highlight(_imageViewer, "Temp Highlight",
-                        startPoint, endPoint, height, pageNumber);
-                    highlight.Selectable = false;
-
-                    _imageViewer.LayerObjects.Add(highlight);
-                    _tempHighlights.Add(highlight);
-
-                    // Move to the page containing the highlight if it is not visible
-                    if (_imageViewer.PageNumber != pageNumber)
-                    {
-                        _imageViewer.PageNumber = pageNumber;
-                    }
-                }
-                finally
-                {
-                    // Add the layer object added handler back now that the temp highlight
-                    // has been added
-                    _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+                    _imageViewer.PageNumber = pageNumber;
                 }
             }
             catch (Exception ex)
@@ -1225,18 +1214,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             {
                 if (_tempHighlights.Count > 0)
                 {
-                    try
-                    {
-                        // Remove the layer objects deleted event handler while removing
-                        // the temporary highlights
-                        _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
-                        _imageViewer.LayerObjects.Remove(_tempHighlights, true);
-                        _tempHighlights.Clear();
-                    }
-                    finally
-                    {
-                        _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
-                    }
+                    // Don't raise the LayerObjectDeleted event while removing the temporary
+                    // highlights.
+                    _imageViewer.LayerObjects.Remove(_tempHighlights, true, false);
+                    _tempHighlights.Clear();
                 }
             }
             catch (Exception ex)
