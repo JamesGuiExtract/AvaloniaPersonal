@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -318,5 +319,32 @@ namespace Extract
             }
         }
         #endregion Exception Methods
+
+        #region Collection Methods
+
+        /// <summary>
+        /// Tries to add the key value pair to the <see cref="Dictionary{K,V}"/> if the key is
+        /// not already present in the dictionary.
+        /// </summary>
+        /// <typeparam name="TKey">The type for the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type for the values in the dictionary.</typeparam>
+        /// <param name="dictionary">The dictionary.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        /// <returns><see langword="true"/> if the key and value are added to the dictionary
+        /// or <see langword="false"/> otherwise.</returns>
+        public static bool TryAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {
+            if (dictionary.ContainsKey(key))
+            {
+                return false;
+            }
+
+            dictionary.Add(key, value);
+
+            return true;
+        }
+
+        #endregion Collection Methods
     }
 }
