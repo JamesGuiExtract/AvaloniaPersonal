@@ -5198,7 +5198,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRecord, BSTR bstrNewName, VARIANT_BOOL* pbNameChanged)
+bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRecord, BSTR bstrNewName)
 {
 	try
 	{
@@ -5209,6 +5209,9 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 			string strNewName = asString(bstrNewName);
 			ASSERT_ARGUMENT("ELI31465", !strNewName.empty());
 			
+			// Simplify the path for the new name
+			simplifyPathName(strNewName);
+
 			string strCurrFileName = ipFileRecord->Name;
 
 			string strChangeNameQuery = "UPDATE [FAMFile]   SET [FileName] = '" + strNewName + 
@@ -5216,8 +5219,6 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = NULL;
-
-			*pbNameChanged = VARIANT_FALSE;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -5237,6 +5238,7 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 				{
 					UCLIDException ue("ELI31495", "Unable to change file name in FAM Database.");
 					ue.addDebugInfo("Query", strChangeNameQuery);
+					ue.addDebugInfo("RecordsAffected", asString(lRecordsAffected));
 					throw ue;
 				}
 
@@ -5245,8 +5247,6 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 
 				// Since the new name is now in the database update the file record that was passed in
 				ipFileRecord->Name = strNewName.c_str();
-
-				*pbNameChanged = VARIANT_TRUE;
 
 			END_CONNECTION_RETRY(ipConnection, "ELI31466");
 		}

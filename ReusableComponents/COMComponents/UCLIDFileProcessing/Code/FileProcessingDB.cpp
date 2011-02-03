@@ -2281,7 +2281,7 @@ STDMETHODIMP CFileProcessingDB::UpgradeToCurrentSchema(IProgressStatus *pProgres
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31390");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RenameFile(IFileRecord* pFileRecord, BSTR bstrNewName, VARIANT_BOOL* pbNameChanged)
+STDMETHODIMP CFileProcessingDB::RenameFile(IFileRecord* pFileRecord, BSTR bstrNewName)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -2290,11 +2290,11 @@ STDMETHODIMP CFileProcessingDB::RenameFile(IFileRecord* pFileRecord, BSTR bstrNe
 		validateLicense();
 
 
-		if (!RenameFile_Internal(false, pFileRecord, bstrNewName, pbNameChanged))
+		if (!RenameFile_Internal(false, pFileRecord, bstrNewName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-			RenameFile_Internal(true, pFileRecord, bstrNewName, pbNameChanged);
+			RenameFile_Internal(true, pFileRecord, bstrNewName);
 		}
 		return S_OK;
 	}
