@@ -2257,7 +2257,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue + 
 										"' WHERE DBInfo.Name = '" + strValue + "'");
 								}
-								CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
+								CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31520");
 	
 								_lastCodePos = "250";
 

@@ -431,7 +431,7 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 			m_ipSchemaUpdateProgressStatus = NULL;
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14864");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31521");
 }
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnDatabaseChangePassword()

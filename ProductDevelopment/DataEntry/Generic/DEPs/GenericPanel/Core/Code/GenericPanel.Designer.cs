@@ -30,7 +30,7 @@ namespace Extract.DataEntry.DEP.Generic
         {
             Extract.DataEntry.HighlightColor highlightColor1 = new Extract.DataEntry.HighlightColor();
             Extract.DataEntry.HighlightColor highlightColor2 = new Extract.DataEntry.HighlightColor();
-            this._flowLayoutPanel = new Extract.DataEntry.DEP.Generic.AnchoredFlowLayoutPanel();
+            this._flowLayoutPanel = new Extract.Utilities.Forms.AnchoredFlowLayoutPanel();
             this._label1 = new System.Windows.Forms.Label();
             this._field1 = new Extract.DataEntry.DataEntryTextBox();
             this._label2 = new System.Windows.Forms.Label();
@@ -568,7 +568,7 @@ namespace Extract.DataEntry.DEP.Generic
 
         #endregion
 
-        private AnchoredFlowLayoutPanel _flowLayoutPanel;
+        private Extract.Utilities.Forms.AnchoredFlowLayoutPanel _flowLayoutPanel;
         private DataEntryTextBox _field1;
         private System.Windows.Forms.Label _label1;
         private DataEntryTextBox _field2;

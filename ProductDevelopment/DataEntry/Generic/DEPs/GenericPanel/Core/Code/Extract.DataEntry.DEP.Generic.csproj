@@ -71,12 +71,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnchoredFlowLayoutPanel.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="AnchoredFlowLayoutPanel.Designer.cs">
-      <DependentUpon>AnchoredFlowLayoutPanel.cs</DependentUpon>
-    </Compile>
     <Compile Include="GenericPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

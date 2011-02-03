@@ -186,8 +186,8 @@
   <data name="_fitToPageToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAALAQAA
-        CwEBNnBPWwAAAxZJREFUWEetl79PWlEUxx2atFO3/hiatJMCCxGUAMapSSddahNNE9vGP6BrXdp0YCdh
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAALAAAA
+        CwAB5DetvwAAAxZJREFUWEetl79PWlEUxx2atFO3/hiatJMCCxGUAMapSSddahNNE9vGP6BrXdp0YCdh
         MYwuTZqaOLMRfqMhihGERAMOhhoQEhSIgp6e74uXPOyD94uTfMPAPed+3rnn3nvuBBFNyDUzM9NzOp1k
         RhyDXC5Xye12f5xQMPl8A5PjD0zs8/moUCjQyckJHR8fa1a5XKZEIkHr6+vk8XjwEX8Z5utDBlWAg4MD
         uru743H67Pr6mlqtFp2enpLf7yev10sMUJuenv4mh1AFKBaLugEAfHV1RfV6nbrdLl1cXFAgEKC5uTlA
@@ -206,8 +206,8 @@
   <data name="_fitToWidthToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAALAQAA
-        CwEBNnBPWwAAAtJJREFUWEfFl8trGnEQxz0U2lNvfRwK7SlGL0FNgiZ4KvTUXJpCQsG25A/otbm09OBd
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAALAAAA
+        CwAB5DetvwAAAtJJREFUWEfFl8trGnEQxz0U2lNvfRwK7SlGL0FNgiZ4KvTUXJpCQsG25A/otbm09OBd
         8CI55lIoFTx7Cya+CT7wCQnqQWzQKGhi8BGn8126silGd9dt84PvaXdmPju/mf3NT0dEOqmWl5eHFouF
         5hH7oNXV1ZLVan2nm7Ck8W4ExwMEdjqdVCgU6PT0lE5OTmSrXC5TKBSi3d1dstls+IhfDPPpb4aZAOl0
         mkajEb+nbPV6Pbq8vKRKpUIul4vW1taIARomk+mzFGImQLFYVAwA4IuLC2o2mzQYDOj8/Jzcbjetr68D
@@ -493,8 +493,8 @@
   <data name="_angularRedactionToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAALBgAA
-        CwYBZDTpJAAAAXxJREFUWEftl71KxEAUhVdRtBEUxQdQEewES39KC1/B3kJtVwVB7AWL1OIPFhYS9C3y
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAALBQAA
+        CwUByY3ISQAAAXxJREFUWEftl71KxEAUhVdRtBEUxQdQEewES39KC1/B3kJtVwVB7AWL1OIPFhYS9C3y
         HnmR+J0wN4xRkd2ZjIW58LHZLOSce+fOzexg8I9iglynHLpOGhVqYtUx74wkMVEpyrI0E0eobsNSChON
         uAx4JoaI7zoTnVXhi3hRFJVwy3HmTHRi4EfxPM8r4UyoEtHjV/Esy8zAXWz1UcTfEI9qYFTxBwyoD6LE
         OOLnKO/FUA8R1ywIilBxjeaxoxevR6uwCWdDxtvn2mrqdmu44Pnfl70ve9KG04BoSp662206/cmaN+K2
@@ -703,9 +703,6 @@
         SUVORK5CYII=
 </value>
   </data>
-  <metadata name="dockContainer1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
   <metadata name="_viewCommandsToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>210, 56</value>
   </metadata>
@@ -728,6 +725,9 @@
     <value>650, 17</value>
   </metadata>
   <metadata name="toolStripSeparator4.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="dockContainer1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
 </root>

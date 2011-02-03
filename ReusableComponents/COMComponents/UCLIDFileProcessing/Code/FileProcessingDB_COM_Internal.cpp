@@ -2003,7 +2003,7 @@ bool CFileProcessingDB::GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQue
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI19881", ppVal != NULL);
+			ASSERT_ARGUMENT("ELI31522", ppVal != NULL);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = NULL;

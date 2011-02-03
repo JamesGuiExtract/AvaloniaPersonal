@@ -192,12 +192,6 @@
     <Compile Include="SlideshowSettingsDialog.Designer.cs">
       <DependentUpon>SlideshowSettingsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="SlideshowUserOptionsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SlideshowUserOptionsDialog.Designer.cs">
-      <DependentUpon>SlideshowUserOptionsDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="VerificationAboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -393,10 +387,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SlideshowSettingsDialog.resx">
       <DependentUpon>SlideshowSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SlideshowUserOptionsDialog.resx">
-      <DependentUpon>SlideshowUserOptionsDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="VerificationAboutBox.resx">
       <SubType>Designer</SubType>

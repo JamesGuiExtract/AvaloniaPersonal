@@ -230,13 +230,6 @@ namespace Extract.Redaction.Verification
         HashSet<int> _setSlideshowAdvancedPages = new HashSet<int>();
 
         /// <summary>
-        /// The configure slideshow command
-        /// </summary>
-        // Include to ensure any added shortcut is disabled when the feature is not enabled.
-        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        ApplicationCommand _configSlideshowCommand;
-
-        /// <summary>
         /// The start slideshow command
         /// </summary>
         // Include so that the shortcut is disabled when the feature is not enabled.
@@ -1707,6 +1700,8 @@ namespace Extract.Redaction.Verification
             _redactionGridView.AutoTool = _options.AutoTool;
             _redactionGridView.AutoZoom = _options.AutoZoom;
             _redactionGridView.AutoZoomScale = _options.AutoZoomScale;
+
+            _slideshowTimer.Interval = _config.Settings.SlideshowInterval * 1000;
         }
 
         /// <summary>
@@ -1808,11 +1803,6 @@ namespace Extract.Redaction.Verification
                     _formStateManager.FullScreen = true;
                 }
                 _fullScreenToolStripMenuItem.Checked = _formStateManager.FullScreen;
-
-                _configSlideshowCommand = new ApplicationCommand(null, null, null,
-                    new ToolStripItem[] { _slideshowConfigToolStripButton, _slideshowConfigToolStripMenuItem },
-                    _settings.SlideshowSettings.SlideshowEnabled, true, 
-                    _settings.SlideshowSettings.SlideshowEnabled);
 
                 _startSlideshowCommand = new ApplicationCommand(_imageViewer.Shortcuts,
                     new Keys[] { Keys.F5 }, StartSlideshow,
@@ -2532,23 +2522,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the slideshow config menu item or button click.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleSlideshowConfigUIClick(object sender, EventArgs e)
-        {
-            try
-            {
-                ConfigureSlideshow();
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI31117", ex);
-            }
-        }
-
-        /// <summary>
         /// Handles the slideshow play menu item or button click.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -2813,25 +2786,6 @@ namespace Extract.Redaction.Verification
         #endregion IMessageFilter Members
 
         #region Private Members
-
-        /// <summary>
-        /// Configures the slideshow.
-        /// </summary>
-        void ConfigureSlideshow()
-        {
-            // PreFilterMessage will not pause for clicks within the slideshow toolbar.
-            // Need to pause independently for a config button click.
-            if (_slideshowRunning)
-            {
-                PauseSlideshow(true);
-            }
-
-            var slideshowOptionsDialog = new SlideshowUserOptionsDialog();
-            if (slideshowOptionsDialog.ShowDialog() == DialogResult.OK)
-            {
-                _slideshowTimer.Interval = _config.Settings.SlideshowInterval * 1000;
-            }
-        }
 
         /// <summary>
         /// Starts or stops the slideshow.

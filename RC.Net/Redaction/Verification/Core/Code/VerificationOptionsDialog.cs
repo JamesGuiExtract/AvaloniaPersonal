@@ -1,3 +1,4 @@
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,6 +17,12 @@ namespace Extract.Redaction.Verification
         /// Settings for the <see cref="VerificationTaskForm"/> user interface.
         /// </summary>
         VerificationOptions _options;
+
+        /// <summary>
+        /// The config file used to retrieve/store the options for the slideshow.
+        /// </summary>
+        readonly ConfigSettings<Properties.Settings> _config =
+            new ConfigSettings<Properties.Settings>();
 
         #endregion VerificationOptionsDialog Fields
 
@@ -46,6 +53,9 @@ namespace Extract.Redaction.Verification
             var names = new List<string>(Enum.GetNames(autoToolType));
             names.Remove(Enum.GetName(autoToolType, AutoTool.None));
             _autoToolComboBox.Items.AddRange(names.ToArray());
+
+            _slideshowAutoStartCheckBox.Checked = _config.Settings.AutoStartSlideshow;
+            _slideshowIntervalUpDown.Value = _config.Settings.SlideshowInterval;
         }
 
         #endregion VerificationOptionsDialog Constructors
@@ -165,9 +175,24 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                if (_slideshowIntervalUpDown.Value < 1 || _slideshowIntervalUpDown.Value > 999)
+                {
+                    MessageBox.Show("The number of seconds must be a value between 1 and 999",
+                        "Invalid value", MessageBoxButtons.OK, MessageBoxIcon.None,
+                        MessageBoxDefaultButton.Button1, 0);
+                    _tabControl.SelectedTab = _slideshowTabPage;
+                    _slideshowIntervalUpDown.Focus();
+                    return;
+                }
+
                 // Store settings
                 _options = GetVerificationOptions();
-                this.DialogResult = DialogResult.OK;
+                
+                _config.Settings.AutoStartSlideshow = _slideshowAutoStartCheckBox.Checked;
+                _config.Settings.SlideshowInterval = (int)_slideshowIntervalUpDown.Value;
+                _config.Save();
+
+                DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {
