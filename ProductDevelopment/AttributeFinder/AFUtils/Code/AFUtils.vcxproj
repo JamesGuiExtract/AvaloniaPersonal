@@ -58,11 +58,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>
-      <Message>Performing registration</Message>
-      <Command>regsvr32 /s /c "$(TargetPath)"
-echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
-</Command>
-      <Outputs>$(OutDir)regsvr32.trg;%(Outputs)</Outputs>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <Midl>
       <TypeLibraryName>.\..\Release/AFUtils.tlb</TypeLibraryName>
@@ -99,6 +100,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Release/UCLIDAFUtils.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -107,11 +109,12 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CustomBuildStep>
-      <Message>Performing registration</Message>
-      <Command>regsvr32 /s /c "$(TargetPath)"
-echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
-</Command>
-      <Outputs>$(OutDir)regsvr32.trg;%(Outputs)</Outputs>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <Midl>
       <TypeLibraryName>.\..\Debug/AFUtils.tlb</TypeLibraryName>
@@ -149,6 +152,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Debug/UCLIDAFUtils.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>

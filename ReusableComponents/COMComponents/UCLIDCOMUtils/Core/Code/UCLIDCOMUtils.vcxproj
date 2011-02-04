@@ -105,6 +105,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Release/UCLIDCOMUtils.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>..\..\..\..\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -160,6 +161,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Debug/UCLIDCOMUtils.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>..\..\..\..\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -168,6 +170,11 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Debug/UCLIDCOMUtils.bsc</OutputFile>
     </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <Link>
+      <RegisterOutput>true</RegisterOutput>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CategoryManager.cpp">

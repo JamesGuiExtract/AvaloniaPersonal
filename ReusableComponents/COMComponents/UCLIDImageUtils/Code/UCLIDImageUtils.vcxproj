@@ -101,6 +101,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Release/UCLIDImageUtils.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -154,6 +155,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Debug/UCLIDImageUtils.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>

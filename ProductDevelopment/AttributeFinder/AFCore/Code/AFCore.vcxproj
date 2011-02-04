@@ -108,6 +108,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Debug/UCLIDAFCore.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -159,11 +160,17 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Release/UCLIDAFCore.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Release/AFCore.bsc</OutputFile>
     </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <Link>
+      <RegisterOutput>true</RegisterOutput>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AddRuleDlg.cpp">

@@ -101,6 +101,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Release/UCLIDRasterAndOCRMgmt.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -155,6 +156,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Debug/UCLIDRasterAndOCRMgmt.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>

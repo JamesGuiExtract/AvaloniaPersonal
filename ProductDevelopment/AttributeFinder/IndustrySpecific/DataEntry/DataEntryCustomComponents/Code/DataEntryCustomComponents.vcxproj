@@ -113,6 +113,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Release/DataEntryCC.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -165,6 +166,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Debug/DataEntryCC.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -176,6 +178,9 @@
       <Outputs>
       </Outputs>
     </CustomBuildStep>
+    <Link>
+      <RegisterOutput>true</RegisterOutput>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FAMDBHelperFunctions.cpp" />

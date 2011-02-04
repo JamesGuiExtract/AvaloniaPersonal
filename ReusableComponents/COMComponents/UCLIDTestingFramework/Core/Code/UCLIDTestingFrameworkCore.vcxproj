@@ -99,6 +99,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Release/UCLIDTestingFrameworkCore.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -150,6 +151,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\..\Debug/UCLIDTestingFrameworkCore.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <RegisterOutput>true</RegisterOutput>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
