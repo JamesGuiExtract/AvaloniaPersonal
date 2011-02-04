@@ -1,7 +1,4 @@
-﻿using Extract.Database;
-using Extract.Licensing;
-using Extract.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -14,6 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Extract.Database;
+using Extract.Utilities;
 using UCLID_COMUTILSLib;
 
 namespace Extract.FileActionManager.Database
@@ -114,10 +113,6 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
-                    "ELI31074", _OBJECT_NAME);
-
                 _databaseFile = string.IsNullOrWhiteSpace(fileName) ? null : fileName;
             }
             catch (Exception ex)
@@ -134,10 +129,6 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
-                    "ELI31157", _OBJECT_NAME);
-
                 SetDatabaseConnection(connection);
             }
             catch (Exception ex)

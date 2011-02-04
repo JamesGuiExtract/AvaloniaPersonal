@@ -15,19 +15,12 @@ namespace Extract.FileActionManager.Database
     public class FAMServiceDatabase : DataContext
     {
         /// <summary>
-        /// Name of the object used in license validation calls.
-        /// </summary>
-        static readonly string _OBJECT_NAME = typeof(FAMServiceDatabase).ToString();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="FAMServiceDatabase"/> class.
         /// </summary>
         /// <param name="fileName">The Sql compact file name.</param>
         public FAMServiceDatabase(string fileName) :
             base(SqlCompactMethods.BuildDBConnectionString(fileName))
         {
-            LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
-                "ELI31098", _OBJECT_NAME);
         }
 
         /// <summary>
@@ -37,8 +30,6 @@ namespace Extract.FileActionManager.Database
         public FAMServiceDatabase(SqlCeConnection connection)
             : base(connection)
         {
-            LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
-                "ELI31156", _OBJECT_NAME);
         }
 
         /// <summary>
