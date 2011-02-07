@@ -89,7 +89,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\..\..\..\..\..\Binaries\Debug/SSOCR.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SSOCR.def</ModuleDefinitionFile>
@@ -138,7 +138,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\..\..\..\..\..\Binaries\Release/SSOCR.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SSOCR.def</ModuleDefinitionFile>

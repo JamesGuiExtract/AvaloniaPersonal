@@ -88,7 +88,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\..\..\..\..\..\..\Binaries\Debug/SpotRecIRAutoTest.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\SpotRecIRAutoTest.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -136,7 +136,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\..\..\..\..\..\..\Binaries\Release/SpotRecIRAutoTest.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\SpotRecIRAutoTest.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -87,7 +87,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\..\..\..\..\Binaries\Release/AFSplittersTest.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\AFSplittersTest.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -136,7 +136,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\..\..\..\..\Binaries\Debug/AFSplittersTest.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\AFSplittersTest.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>

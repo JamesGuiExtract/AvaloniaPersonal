@@ -108,7 +108,7 @@
     </ResourceCompile>
     <Link>
       <RegisterOutput>false</RegisterOutput>
-      <OutputFile>..\..\..\..\..\Binaries\Debug/ESFAMConditions.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <ModuleDefinitionFile>.\ESSkipConditions.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -158,7 +158,7 @@
     </ResourceCompile>
     <Link>
       <RegisterOutput>false</RegisterOutput>
-      <OutputFile>..\..\..\..\..\Binaries\Release/ESFAMConditions.dll</OutputFile>
+      <OutputFile>..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <ModuleDefinitionFile>.\ESSkipConditions.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>

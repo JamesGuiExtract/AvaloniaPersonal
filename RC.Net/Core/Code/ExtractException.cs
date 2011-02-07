@@ -1518,4 +1518,35 @@ namespace Extract
 
         #endregion Static methods
     }
+
+    /// <summary>
+    /// Class containing extension methods for working with <see cref="Exception"/>
+    /// </summary>
+    public static class ExceptionExtensionMethods
+    {
+        /// <summary>Wraps the exception as an <see cref="ExtractException"/>.</summary>
+        /// <param name="ex">The exception to wrap.</param>
+        /// <param name="eliCode">The eli code to associate with the exception.</param>
+        /// <returns>The specified exception wrapped as an <see cref="ExtractException"/>.</returns>
+        public static ExtractException AsExtract(this Exception ex, string eliCode)
+        {
+            return ExtractException.AsExtractException(eliCode, ex);
+        }
+
+        /// <summary>Displays the exception in the Extract exception viewer.</summary>
+        /// <param name="ex">The exception to display.</param>
+        /// <param name="eliCode">The eli code to associate with the exception.</param>
+        public static void ExtractDisplay(this Exception ex, string eliCode)
+        {
+            ExtractException.Display(eliCode, ex);
+        }
+
+        /// <summary>Logs the exception to the Extract exception log.</summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="eliCode">The eli code to associate with the exception.</param>
+        public static void ExtractLog(this Exception ex, string eliCode)
+        {
+            ExtractException.Log(eliCode, ex);
+        }
+    }
 }
