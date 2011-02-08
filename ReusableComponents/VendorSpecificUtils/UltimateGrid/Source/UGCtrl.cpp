@@ -4028,6 +4028,7 @@ int	CUGCtrl::DeleteRow(long row){
 	int rt = m_GI->m_defDataSource->DeleteRow(row);
 	if(rt == UG_SUCCESS){
 		SetNumberRows(m_GI->m_numberRows - 1);
+		m_GI->m_multiSelect->ClearAll();
 	}
 	return rt;
 }
