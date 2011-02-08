@@ -1,6 +1,6 @@
 #pragma once
 
-// CQueueGrid.h : interface of the CQueueGrid class
+// CTaskGrid.h : interface of the CTaskGrid class
 //
 // The following code is code a modification of the Ultimate Grid source available here:
 // http://www.codeproject.com/KB/MFC/UltimateGrid.aspx
@@ -11,15 +11,16 @@
 #include <vector>
 using namespace std;
 
-const int WM_QUEUE_GRID_CELL_VALUE_CHANGE	= WM_USER + 101;
-const int WM_QUEUE_GRID_DBLCLICK			= WM_USER + 102;
-const int WM_QUEUE_GRID_SELCHANGE			= WM_USER + 103;
+const int WM_TASK_GRID_CELL_VALUE_CHANGE	= WM_USER + 101;
+const int WM_TASK_GRID_DBLCLICK				= WM_USER + 102;
+const int WM_TASK_GRID_SELCHANGE			= WM_USER + 103;
+const int WM_TASK_GRID_RCLICK				= WM_USER + 104;
 
-class CQueueGrid:public CUGCtrl
+class CTaskGrid:public CUGCtrl
 {
 public:
-	CQueueGrid();
-	~CQueueGrid();
+	CTaskGrid();
+	~CTaskGrid();
 
 protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -32,7 +33,7 @@ private:
 	//}}AFX_VIRTUAL
 
 	
-	//{{AFX_MSG(CQueueGrid)
+	//{{AFX_MSG(CTaskGrid)
 	// NOTE - the ClassWizard will add and remove member functions here.
 	//    DO NOT EDIT what you see in these blocks of generated code!
 	//}}AFX_MSG
@@ -155,16 +156,38 @@ public:
 	//trackig window
 	virtual void OnTrackingWindowMoved(RECT *origRect,RECT *newRect);
 
-	void InsertRow(int index);
-	void SetRowInfo(int nRow, bool bEnabled, bool bForceProcessing,
-		UCLID_FILEPROCESSINGLib::EFilePriority ePriority, const string &strDescription,
-		const string &strStatus);
+	// SNK 2/7/2011
+	// Gets/set the checkbox in the "Run" column of the table.
+	bool GetCheck(int nRowIndex);
+	void SetCheck(int nRowIndex, bool bCheck);
+
+	// SNK 2/7/2011
+	// Gets/set the text in the "Task" column of the table.
+	string GetText(int nRowIndex);
+	void SetText(int nRowIndex, string strText);
+
+	// SNK 2/7/2011
+	// Insert a new row at the specified index.
+	void InsertRow(int nRowIndex);
+	
+	// SNK 2/7/2011
+	// Gets the first selected row from the table (-1 if there is no selected row)
+	int GetFirstSelectedRow();
+
+	// SNK 2/7/2011
+	// Gets the next selected row from the table. Must be preceeded by a call to
+	// GetFirstSelectedRow. (-1 if there are no more selected rows).
+	int GetNextSelectedRow();
+
+	// SNK 2/7/2011
+	// Selects the specified row (while maintaining any existing selection).
+	void SelectRow(int nRowIndex);
 
 private:
 
 	CFont m_font;
 
-	static string m_strPriorities;
-
-	int m_currentRow;
+	// When iterating selected rows with GetFirstSelectedRow & GetLasstSelectedRow, this is the
+	// row index returne by the previous call to either.
+	int m_lastSelectedRow;
 };

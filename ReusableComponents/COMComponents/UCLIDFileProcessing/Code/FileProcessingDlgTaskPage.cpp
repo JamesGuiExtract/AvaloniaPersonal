@@ -115,7 +115,6 @@ void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN_THREADS, m_SpinThreads);
 	DDX_Control(pDX, IDC_RADIO_KEEP_PROCESSING_FILES, m_btnKeepProcessingWithEmptyQueue);
 	DDX_Control(pDX, IDC_RADIO_STOP_PROCESSING_FILES, m_btnStopProcessingWithEmptyQueue);
-	DDX_Control(pDX, IDC_LIST_FP, m_fileProcessorList);
 	DDX_Control(pDX, IDC_CHECK_LOG_ERROR_DETAILS, m_btnLogErrorDetails);
 	DDX_Check(pDX, IDC_CHECK_LOG_ERROR_DETAILS, m_bLogErrorDetails);
 	DDX_Control(pDX, IDC_EDIT_ERROR_LOG, m_editErrorLog);
@@ -146,8 +145,7 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_BN_CLICKED(IDC_RADIO_THREADS, OnBtnNumThread)
 	ON_BN_CLICKED(IDC_RADIO_KEEP_PROCESSING_FILES, OnBtnKeepProcessingWithEmptyQueue)
 	ON_BN_CLICKED(IDC_RADIO_STOP_PROCESSING_FILES, OnBtnStopProcessingWithEmptyQueue)
-	ON_LBN_SELCHANGE(IDC_LIST_FP, OnSelchangeListFileProcessors)
-	ON_LBN_DBLCLK(IDC_LIST_FP, OnDblclkListFileProcessors)
+	ON_MESSAGE(WM_TASK_GRID_SELCHANGE, OnGridSelChange)
 	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_CHECK_LOG_ERROR_DETAILS, OnCheckLogErrorDetails)
 	ON_EN_CHANGE(IDC_EDIT_ERROR_LOG, &FileProcessingDlgTaskPage::OnEnChangeEditErrorLog)
@@ -155,13 +153,13 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BTN_BROWSE_LOG, OnBtnBrowseErrorLog)
 	ON_BN_CLICKED(IDC_CHECK_EXECUTE_TASK, OnCheckExecuteErrorTask)
 	ON_BN_CLICKED(IDC_BTN_SELECT_ERROR_TASK, OnBtnAddErrorTask)
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST_FP, &FileProcessingDlgTaskPage::OnNMDblclkListFp)
-	ON_NOTIFY(NM_RCLICK, IDC_LIST_FP, &FileProcessingDlgTaskPage::OnNMRclickListFp)
+	ON_MESSAGE(WM_TASK_GRID_DBLCLICK, OnGridDblClick)
+	ON_MESSAGE(WM_TASK_GRID_RCLICK, OnGridRightClick)
 	ON_COMMAND(ID_CONTEXT_CUT, &FileProcessingDlgTaskPage::OnContextCut)
 	ON_COMMAND(ID_CONTEXT_COPY, &FileProcessingDlgTaskPage::OnContextCopy)
 	ON_COMMAND(ID_CONTEXT_PASTE, &FileProcessingDlgTaskPage::OnContextPaste)
 	ON_COMMAND(ID_CONTEXT_DELETE, &FileProcessingDlgTaskPage::OnContextDelete)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_FP, &FileProcessingDlgTaskPage::OnLvnItemchangedListFp)
+	ON_MESSAGE(WM_TASK_GRID_CELL_VALUE_CHANGE, OnCellValueChange)
 	ON_EN_CHANGE(IDC_EDIT_THREADS, &FileProcessingDlgTaskPage::OnEnChangeEditThreads)
 	ON_BN_CLICKED(IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
 	ON_BN_CLICKED(IDC_RADIO_PROCESS_SKIPPED_FILES, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
@@ -182,6 +180,8 @@ BOOL FileProcessingDlgTaskPage::OnInitDialog()
 	try
 	{
 		CPropertyPage::OnInitDialog();
+
+		m_fileProcessorList.AttachGrid(this, IDC_LIST_FP);
 		
 		//create instances of necessary variables
 		m_ipClipboardMgr.CreateInstance(CLSID_ClipboardObjectManager);
@@ -197,10 +197,6 @@ BOOL FileProcessingDlgTaskPage::OnInitDialog()
 		m_SpinThreads.SetBuddy(pEdit);
 		m_SpinThreads.SetRange32(0, giTHREADS_UPPER_RANGE);
 
-		// Enable full row selection plus grid lines and checkboxes
-		m_fileProcessorList.SetExtendedStyle( LVS_EX_GRIDLINES | 
-			LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES );
-
 		//////////////////
 		// Prepare headers
 		//////////////////
@@ -210,12 +206,6 @@ BOOL FileProcessingDlgTaskPage::OnInitDialog()
 
 		// Compute width for Description column
 		long	lDWidth = rect.Width() - glENABLED_WIDTH;
-
-		// Add 2 column headings to list
-		m_fileProcessorList.InsertColumn( 0, "Run", LVCFMT_LEFT, 
-			glENABLED_WIDTH, 0 );
-		m_fileProcessorList.InsertColumn( 1, "Task", LVCFMT_LEFT, 
-			lDWidth, 1 );
 
 		// Load icon for Doc Tag selection
 		m_btnErrorSelectTag.SetIcon( ::LoadIcon( _Module.m_hInstResource, 
@@ -258,22 +248,18 @@ void FileProcessingDlgTaskPage::OnBtnAdd()
 		// check OK was selected
 		if (vbDirty)
 		{
-			// Get index of previously selected File Processor
-			int iIndex = -1;
-			POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-			if (pos != NULL)
-			{
-				// Get index of first selection
-				iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-
-				// Insert position is after the first selected item (P13 #4732)
-				iIndex++;
-			}
-
+			// Get index of first selection.
+			int iIndex = m_fileProcessorList.GetFirstSelectedRow();
+			
 			// If no current selection, insert item at end of list
 			if (iIndex == -1)
 			{
-				iIndex = m_fileProcessorList.GetItemCount();
+				iIndex = m_fileProcessorList.GetNumberRows();
+			}
+			else
+			{
+				// Insert position is after the first selected item (P13 #4732)
+				iIndex++;
 			}
 
 			// Insert the object-with-description into the vector and refresh the list
@@ -281,10 +267,10 @@ void FileProcessingDlgTaskPage::OnBtnAdd()
 			refresh();
 
 			// clear the previous selection if any
-			clearListSelection();
+			m_fileProcessorList.ClearSelections();
 
-			// Retain selection and focus
-			m_fileProcessorList.SetItemState( iIndex, LVIS_SELECTED, LVIS_SELECTED );
+			// Set selection and focus
+			m_fileProcessorList.SelectRow(iIndex);
 			m_fileProcessorList.SetFocus();
 
 			// Update the display
@@ -307,25 +293,16 @@ void FileProcessingDlgTaskPage::OnBtnRemove()
 
 	try
 	{
-		// Check for current selection
-		int iIndex = -1;
-		POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
-		{
-			// Get index of first selection
-			iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-		}
-
-		// Check for multiple selection
-		int iIndex2 = m_fileProcessorList.GetNextSelectedItem( pos );
-
+		// Get index of first selection.
+		int iIndex = m_fileProcessorList.GetFirstSelectedRow();
+		
 		// Handle single-selection case
 		int		iResult;
 		CString	zPrompt;
-		if (iIndex2 == -1)
+		if (m_fileProcessorList.GetNextSelectedRow() == -1)
 		{
 			// Retrieve current file processor description
-			CString	zDescription = m_fileProcessorList.GetItemText( iIndex, 1 );
+			CString	zDescription = m_fileProcessorList.GetText(iIndex).c_str();
 
 			// Create prompt for confirmation
 			zPrompt.Format( "Are you sure that task '%s' should be deleted?", 
@@ -345,14 +322,11 @@ void FileProcessingDlgTaskPage::OnBtnRemove()
 		// Act on response
 		if (iResult == IDYES)
 		{
-			// Mark selected items for deletion
-			markSelectedTasks();
-
 			// Delete the marked file processors
-			deleteMarkedTasks();
+			deleteSelectedTasks();
 
 			// Select the next (or the last) file processor
-			int iCount = m_fileProcessorList.GetItemCount();
+			int iCount = m_fileProcessorList.GetNumberRows();
 			if (iCount <= iIndex)
 			{
 				iIndex = iCount - 1;
@@ -360,7 +334,7 @@ void FileProcessingDlgTaskPage::OnBtnRemove()
 		}
 
 		// Retain selection and focus
-		m_fileProcessorList.SetItemState( iIndex, LVIS_SELECTED, LVIS_SELECTED );
+		m_fileProcessorList.SelectRow(iIndex);
 		m_fileProcessorList.SetFocus();
 
 		// Refresh the display
@@ -382,14 +356,8 @@ void FileProcessingDlgTaskPage::OnBtnModify()
 
 	try
 	{
-		// Check for current file processor selection
-		int iIndex = -1;
-		POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
-		{
-			// Get index of first selection
-			iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-		}
+		// Get index of first selection.
+		int iIndex = m_fileProcessorList.GetFirstSelectedRow();
 
 		if (iIndex > -1)
 		{
@@ -424,26 +392,25 @@ void FileProcessingDlgTaskPage::OnBtnDown()
 
 	try
 	{	
-		// Check for current file processor selection
-		int iIndex = -1;
-		POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
-		{
-			// Get index of first selection
-			iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-		}
-
+		// Get index of first selection
+		int iIndex = m_fileProcessorList.GetFirstSelectedRow();
+		
 		// Selection cannot be at bottom of list
-		int iCount = m_fileProcessorList.GetItemCount();
+		int iCount = m_fileProcessorList.GetNumberRows();
 		if (iIndex < iCount - 1)
 		{
 			// Update the file processors vector and refresh the list
 			getFileProcessorsData()->Swap( iIndex, iIndex + 1 );
 			refresh();
 
-			// Retain selection and focus
-			m_fileProcessorList.SetItemState( iIndex + 1, LVIS_SELECTED, LVIS_SELECTED );
+			// Set selection and focus
+			m_fileProcessorList.ClearSelections();
+			m_fileProcessorList.SelectRow(iIndex + 1);
 			m_fileProcessorList.SetFocus();
+
+			// Sometimes the Ultimate Grid doesn't draw all rows correctly if RedrawAll isn't called
+			// here.
+			m_fileProcessorList.RedrawAll();
 
 			// Update button states
 			setButtonStates();
@@ -459,14 +426,8 @@ void FileProcessingDlgTaskPage::OnBtnUp()
 
 	try
 	{	
-		// Check for current file processor selection
-		int iIndex = -1;
-		POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
-		{
-			// Get index of first selection
-			iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-		}
+		// Get index of first selection
+		int iIndex = m_fileProcessorList.GetFirstSelectedRow();
 
 		// Selection cannot be at top of list
 		if (iIndex > 0)
@@ -475,9 +436,14 @@ void FileProcessingDlgTaskPage::OnBtnUp()
 			getFileProcessorsData()->Swap( iIndex, iIndex - 1 );
 			refresh();
 
-			// Retain selection and focus
-			m_fileProcessorList.SetItemState( iIndex - 1, LVIS_SELECTED, LVIS_SELECTED );
+			// Set selection and focus
+			m_fileProcessorList.ClearSelections();
+			m_fileProcessorList.SelectRow(iIndex - 1);
 			m_fileProcessorList.SetFocus();
+
+			// Sometimes the Ultimate Grid doesn't draw all rows correctly if RedrawAll isn't called
+			// here.
+			m_fileProcessorList.RedrawAll();
 
 			// Update button states
 			setButtonStates();
@@ -486,7 +452,7 @@ void FileProcessingDlgTaskPage::OnBtnUp()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13507")
 }
 //--------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnSelchangeListFileProcessors() 
+LRESULT FileProcessingDlgTaskPage::OnGridSelChange(WPARAM wParam, LPARAM lParam)
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
@@ -497,12 +463,8 @@ void FileProcessingDlgTaskPage::OnSelchangeListFileProcessors()
 		setButtonStates();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13508")
-}
-//-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnDblclkListFileProcessors() 
-{
-	// call modify for the selected item
-	OnBtnModify();
+
+	return 0;
 }
 //--------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::OnCheckLogErrorDetails()
@@ -802,11 +764,6 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		// resize list box width
 		rectList.right = rectDlg.right - nLen1 - nAddButtonWidth - nLen3;
 
-		// set the width of the second column to reflect the width of the list control
-		// We are subtracting 4 pixels here for the left border line, right border line, and
-		// the two column dividing lines.
-		m_fileProcessorList.SetColumnWidth(1, rectList.Width() - glENABLED_WIDTH - 4 );
-
 		// Resize buttons
 		rectAddButton.right = rectDlg.right - nLen1;
 		rectAddButton.left = rectAddButton.right - nAddButtonWidth;
@@ -1074,22 +1031,16 @@ void FileProcessingDlgTaskPage::OnBtnStopProcessingWithEmptyQueue()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15953");
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnNMDblclkListFp(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT FileProcessingDlgTaskPage::OnGridDblClick(WPARAM wParam, LPARAM lParam)
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
 
 	try
 	{	
-		// get the current file processor selection
-		int iIndex = -1;
-		POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
-		{
-			// Get index of first selection
-			iIndex = m_fileProcessorList.GetNextSelectedItem(pos);
-		}
-
+		// Get index of first selection
+		int iIndex = m_fileProcessorList.GetFirstSelectedRow();
+		
 		if (iIndex > -1)
 		{
 			// retrieve the selected file processor
@@ -1107,74 +1058,66 @@ void FileProcessingDlgTaskPage::OnNMDblclkListFp(NMHDR *pNMHDR, LRESULT *pResult
 				replaceFileProcessorAt(iIndex, ipObject);
 			}
 		}
-
-		*pResult = 0;
-
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13490")
+
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnNMRclickListFp(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT FileProcessingDlgTaskPage::OnGridRightClick(WPARAM wParam, LPARAM lParam)
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
 
 	try
-	{	// Check for current selection
-		if (pNMHDR)
+	{	
+		// Get index of first selection
+		int iIndex = lParam;
+			
+		// Load the context menu
+		CMenu menu;
+		menu.LoadMenu( IDR_MNU_CONTEXT );
+		CMenu *pContextMenu = menu.GetSubMenu( 0 );
+			
+		//////////////////////////
+		// Enable or disable items
+		//////////////////////////
+		UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
+		UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+			
+		// enable/disable context menu items properly
+		pContextMenu->EnableMenuItem(ID_CONTEXT_CUT, iIndex == -1 ? nDisable : nEnable);
+		pContextMenu->EnableMenuItem(ID_CONTEXT_COPY, iIndex == -1 ? nDisable : nEnable );
+		pContextMenu->EnableMenuItem(ID_CONTEXT_DELETE, iIndex == -1 ? nDisable : nEnable );
+			
+		// Check Clipboard object type
+		if(m_ipClipboardMgr != NULL &&
+			(asCppBool(m_ipClipboardMgr->IUnknownVectorIsOWDOfType(IID_IFileProcessingTask)) ||
+			asCppBool(m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IFileProcessingTask))))
 		{
-			int iIndex = -1;
-			POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-			if (pos != NULL)
-			{
-				// Get index of first selection
-				iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-			}
-			
-			// Load the context menu
-			CMenu menu;
-			menu.LoadMenu( IDR_MNU_CONTEXT );
-			CMenu *pContextMenu = menu.GetSubMenu( 0 );
-			
-			//////////////////////////
-			// Enable or disable items
-			//////////////////////////
-			UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
-			UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-			
-			// enable/disable context menu items properly
-			pContextMenu->EnableMenuItem(ID_CONTEXT_CUT, iIndex == -1 ? nDisable : nEnable);
-			pContextMenu->EnableMenuItem(ID_CONTEXT_COPY, iIndex == -1 ? nDisable : nEnable );
-			pContextMenu->EnableMenuItem(ID_CONTEXT_DELETE, iIndex == -1 ? nDisable : nEnable );
-			
-			// Check Clipboard object type
-			if(m_ipClipboardMgr != NULL &&
-				(asCppBool(m_ipClipboardMgr->IUnknownVectorIsOWDOfType(IID_IFileProcessingTask)) ||
-				asCppBool(m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IFileProcessingTask))))
-			{
-				// Object is a vector of IFileProcessingTasks OR Object is a
-				// single IFileProcessingTask
-				pContextMenu->EnableMenuItem( ID_CONTEXT_PASTE, nEnable);
-			}
-			else
-			{
-				// The clipboard manager is either NULL OR Object is
-				// neither a vector of IFileProcessingTask items
-				// nor a single IFileProcessingTask item
-				pContextMenu->EnableMenuItem( ID_CONTEXT_PASTE, nDisable );
-			}
-			
-			// Map the point to the correct position
-			CPoint	point;
-			GetCursorPos( &point );
-			
-			// Display and manage the context menu
-			pContextMenu->TrackPopupMenu( TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, 
-				point.x, point.y, this );
+			// Object is a vector of IFileProcessingTasks OR Object is a
+			// single IFileProcessingTask
+			pContextMenu->EnableMenuItem( ID_CONTEXT_PASTE, nEnable);
 		}
-		*pResult = 0;
+		else
+		{
+			// The clipboard manager is either NULL OR Object is
+			// neither a vector of IFileProcessingTask items
+			// nor a single IFileProcessingTask item
+			pContextMenu->EnableMenuItem( ID_CONTEXT_PASTE, nDisable );
+		}
+			
+		// Map the point to the correct position
+		CPoint	point;
+		GetCursorPos( &point );
+			
+		// Display and manage the context menu
+		pContextMenu->TrackPopupMenu( TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, 
+			point.x, point.y, this );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13492")
+
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::OnContextCut()
@@ -1210,14 +1153,8 @@ void FileProcessingDlgTaskPage::OnContextCopy()
 	{
 		if (m_ipClipboardMgr)
 		{
-			// Check for current selection
-			int iIndex = -1;
-			POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-			if (pos != NULL)
-			{
-				// Get index of first selection
-				iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-			}
+			// Get index of first selection
+			int iIndex = m_fileProcessorList.GetFirstSelectedRow();
 
 			if (iIndex == -1)
 			{
@@ -1231,7 +1168,7 @@ void FileProcessingDlgTaskPage::OnContextCopy()
 			ASSERT_RESOURCE_ALLOCATION( "ELI13501", ipCopiedFPs != NULL );
 
 			// Add each selected to vector
-			while (iIndex != -1)
+			do
 			{
 				// Retrieve the selected
 				IUnknownPtr	ipObject = getFileProcessorsData()->At( iIndex );
@@ -1240,9 +1177,9 @@ void FileProcessingDlgTaskPage::OnContextCopy()
 				// Add the File Processor to the vector
 				ipCopiedFPs->PushBack( ipObject );
 
-				// Get the next selection
-				iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
+				iIndex = m_fileProcessorList.GetNextSelectedRow();
 			}
+			while (iIndex != -1);
 
 			// ClipboardManager will handle the Copy
 			m_ipClipboardMgr->CopyObjectToClipboard( ipCopiedFPs );
@@ -1288,22 +1225,17 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 				"Clipboard object is not a File Processor." );
 		}
 
-		// Check for current File Processor selection
-		int iIndex = -1;
-		POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
-		{
-			// Get index of first selection
-			iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-		}
-
+		// Get index of first selection
+		int iIndex = m_fileProcessorList.GetFirstSelectedRow();
+		
 		// Check for item count if no selection
 		if (iIndex == -1)
 		{
-			iIndex = m_fileProcessorList.GetItemCount();
+			iIndex = m_fileProcessorList.GetNumberRows();
 		}
 
-		clearListSelection();
+		// The indexes of all rows added so that they can be selected once the operation is complete.
+		set<int> setAddedRows;
 
 		// Handle single-task case
 		if (bSingleTask)
@@ -1319,14 +1251,13 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 			getFileProcessorsData()->Insert( iIndex, ipNewFP );
 
 			// Insert the item into the list
-			m_fileProcessorList.InsertItem( iIndex, "" );
+			m_fileProcessorList.InsertRow(iIndex);
 
 			// Add the description and update the checkbox setting
-			m_fileProcessorList.SetItemText( iIndex, 1, strDescription.c_str() );
-			m_fileProcessorList.SetCheck( iIndex, asMFCBool( ipNewFP->Enabled ) );
+			m_fileProcessorList.SetText(iIndex, strDescription.c_str());
+			m_fileProcessorList.SetCheck(iIndex, asCppBool(ipNewFP->Enabled));
 
-			// Select the new item
-			m_fileProcessorList.SetItemState( iIndex, LVIS_SELECTED, LVIS_SELECTED );
+			setAddedRows.insert(iIndex);
 		}
 		// Handle vector of one-or-more File Processors case
 		else
@@ -1337,7 +1268,7 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 			int iCount = ipPastedFPs->Size();
 
 			// Add each File Processor to the list and the vector
-			for (int i = 0; i < iCount; i++)
+			for (int i = 0; i < iCount; i++, iIndex++)
 			{
 				// Retrieve File Processor and description
 				IObjectWithDescriptionPtr	ipNewFP = ipPastedFPs->At( i );
@@ -1347,18 +1278,24 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 				// Insert the new File Processor object-with-description into the vector
 				// This MUST be done before setting the checked state in the list
 				// [LRCAU #5603]
-				getFileProcessorsData()->Insert( iIndex + i, ipNewFP );
+				getFileProcessorsData()->Insert(iIndex, ipNewFP );
 
 				// Insert the item into the list
-				m_fileProcessorList.InsertItem( iIndex + i, "" );
+				m_fileProcessorList.InsertRow(iIndex );
 
 				// Add the description and update the checkbox setting
-				m_fileProcessorList.SetItemText( iIndex + i, 1, strDescription.c_str() );
-				m_fileProcessorList.SetCheck( iIndex + i, asMFCBool( ipNewFP->Enabled ) );
+				m_fileProcessorList.SetText(iIndex, strDescription.c_str());
+				m_fileProcessorList.SetCheck(iIndex, asCppBool(ipNewFP->Enabled));
 
-				// select the new item
-				m_fileProcessorList.SetItemState( iIndex+i, LVIS_SELECTED, LVIS_SELECTED );
+				setAddedRows.insert(iIndex);
 			}
+		}
+
+		// Select the new item(s)
+		m_fileProcessorList.ClearSelections();
+		for (set<int>::iterator iter = setAddedRows.begin(); iter != setAddedRows.end(); iter++)
+		{
+			m_fileProcessorList.SelectRow(*iter);
 		}
 
 		// Update the button states
@@ -1382,55 +1319,34 @@ void FileProcessingDlgTaskPage::OnContextDelete()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15354");
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnLvnItemchangedListFp(NMHDR *pNMHDR, LRESULT *pResult)
+LRESULT FileProcessingDlgTaskPage::OnCellValueChange(WPARAM wParam, LPARAM lParam)
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
-
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 
 	try
 	{
 		// Update button states first
 		setButtonStates();
 
-		// Notification code derived from 
-		// http://www.codeguru.com/cpp/controls/listview/checkboxes/article.php/c917/
+		// Extract Row and Column
+		short nRow = (short)LOWORD(lParam);
+		short nCol = (short)HIWORD(lParam);
 
-		// Check for no changes
-		if ((pNMLV->uOldState == 0) && (pNMLV->uNewState == 0))
+		// Only concerned here with whether the check box column of a valid row changed.
+		if (nRow < 0 || nCol != 0)
 		{
-			return;
+			return 0;
 		}
 
-		// Retrieve old check box state
-		BOOL bPrevState = (BOOL)(((pNMLV->uOldState & LVIS_STATEIMAGEMASK)>>12)-1);
-		if (bPrevState < 0)
-		{
-			// On startup there's no previous state so assign as false (unchecked)
-			bPrevState = 0;
-		}
-
-		// New check box state
-		BOOL bChecked = (BOOL)(((pNMLV->uNewState & LVIS_STATEIMAGEMASK)>>12)-1);
-		if (bChecked < 0)
-		{
-			// On non-checkbox notifications assume false
-			bChecked = 0;
-		}
-
-		// Just return if no change in check box
-		if (bPrevState == bChecked)
-		{
-			return;
-		}
+		bool bChecked = m_fileProcessorList.GetCheck(nRow);
 
 		// If this file processor is already present
 		IIUnknownVectorPtr ipCollection = getFileProcessorsData();
 		ASSERT_RESOURCE_ALLOCATION("ELI15995", ipCollection != NULL);
-		if (ipCollection->Size() > pNMLV->iItem)
+		if (ipCollection->Size() > nRow)
 		{
 			// Retrieve affected file processor
-			IObjectWithDescriptionPtr	ipFP = getFileProcessorsData()->At( pNMLV->iItem );
+			IObjectWithDescriptionPtr	ipFP = getFileProcessorsData()->At(nRow);
 			ASSERT_RESOURCE_ALLOCATION("ELI15983", ipFP != NULL);
 
 			// Retrieve existing state
@@ -1449,7 +1365,7 @@ void FileProcessingDlgTaskPage::OnLvnItemchangedListFp(NMHDR *pNMHDR, LRESULT *p
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13503");
 
-	*pResult = 0;
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::OnLButtonDblClk(UINT nFlags, CPoint point)
@@ -1620,7 +1536,10 @@ void FileProcessingDlgTaskPage::OnBnClickedButtonSetSchedule()
 void FileProcessingDlgTaskPage::refresh()
 {
 	// Remove any listed File Processors
-	m_fileProcessorList.DeleteAllItems();
+	while (m_fileProcessorList.GetNumberRows() > 0)
+	{
+		m_fileProcessorList.DeleteRow(0);
+	}
 
 	// Add each File Processor to the list
 	IIUnknownVectorPtr ipFPData = getFileProcessorsData();
@@ -1722,7 +1641,7 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_btnAdd.EnableWindow(FALSE);
 		m_btnModify.EnableWindow(FALSE);
 		m_btnRemove.EnableWindow(FALSE);
-		m_fileProcessorList.SetSelectionMark(-1);
+		m_fileProcessorList.ClearSelections();
 		m_fileProcessorList.EnableWindow(FALSE);
 		m_btnUp.EnableWindow(FALSE);
 		m_btnDown.EnableWindow(FALSE);
@@ -1898,55 +1817,19 @@ void FileProcessingDlgTaskPage::addFileProcessor(IObjectWithDescriptionPtr ipObj
 	CString zDescription = (char*)ipObject->Description;
 
 	// Add item to end of list, set the text, set the checkbox
-	int iIndex = m_fileProcessorList.GetItemCount();
-	int iNewIndex = m_fileProcessorList.InsertItem( iIndex, "" );
-	m_fileProcessorList.SetItemText( iNewIndex, 1, zDescription.operator LPCTSTR() );
-	m_fileProcessorList.SetCheck( iNewIndex, asMFCBool( ipObject->Enabled ) );
+	int iIndex = m_fileProcessorList.GetNumberRows();
+	m_fileProcessorList.InsertRow(iIndex);
+	m_fileProcessorList.SetText(iIndex, (LPCTSTR)zDescription);
+	m_fileProcessorList.SetCheck(iIndex, asCppBool(ipObject->Enabled));
 
 	//Update the button states
 	setButtonStates();
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::clearListSelection()
-{
-	POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-	if (pos == NULL)
-	{
-		// no item selected, return
-		return;
-	}
-	
-	while (pos)
-	{
-		int nItemSelected = m_fileProcessorList.GetNextSelectedItem(pos);
-		m_fileProcessorList.SetItemState(nItemSelected, 0, LVIS_SELECTED);
-	}
-}
-//-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::markSelectedTasks() 
-{
-	POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-	if (pos != NULL)
-	{
-		// Get index of first selection
-		int iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-
-		// Loop through selected items
-		while (iIndex != -1)
-		{
-			// Set ItemData = 1 as a "mark"
-			m_fileProcessorList.SetItemData( iIndex, (DWORD) 1 );
-
-			// Get index of next selected item
-			iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::deleteMarkedTasks() 
+void FileProcessingDlgTaskPage::deleteSelectedTasks() 
 {
 	// Get list count
-	int iCount = m_fileProcessorList.GetItemCount();
+	int iCount = m_fileProcessorList.GetNumberRows();
 	if (iCount == 0)
 	{
 		return;
@@ -1959,19 +1842,27 @@ void FileProcessingDlgTaskPage::deleteMarkedTasks()
 		throw UCLIDException( "ELI13493", "File Processors are not defined." );
 	}
 
-	// Step backwards through list
-	for (int i = iCount - 1; i >= 0; i--)
+	// Pust the rows to delete to a stack so that they can be deleted in reverse order.
+	stack<int> rowsToDelete;
+	int iIndex = m_fileProcessorList.GetFirstSelectedRow();
+	while (iIndex != -1)
 	{
-		// Retrieve ItemData and look for "mark"
-		DWORD	dwData = m_fileProcessorList.GetItemData( i );
-		if (dwData == 1)
-		{
-			// Remove this item from list
-			m_fileProcessorList.DeleteItem( i );
+		rowsToDelete.push(iIndex);
+		iIndex = m_fileProcessorList.GetNextSelectedRow();
+	}
 
-			// Remove this item from the vector of file processors
-			getFileProcessorsData()->Remove( i );
-		}
+	// Delete the rows in reverse order so that the indexes remain valid.
+	while (!rowsToDelete.empty())
+	{
+		int iIndex = rowsToDelete.top();
+
+		// Remove this item from list
+		m_fileProcessorList.DeleteRow(iIndex);
+
+		// Remove this item from the vector of file processors
+		getFileProcessorsData()->Remove(iIndex);
+
+		rowsToDelete.pop();
 	}
 
 	// Update the button states
@@ -1988,7 +1879,7 @@ void FileProcessingDlgTaskPage::setButtonStates()
 	m_fileProcessorList.EnableWindow( TRUE );
 
 	// Check count of file processors
-	int	iCount = m_fileProcessorList.GetItemCount();
+	int	iCount = m_fileProcessorList.GetNumberRows();
 	if (iCount == 0)
 	{
 		// Disable other buttons
@@ -1999,22 +1890,16 @@ void FileProcessingDlgTaskPage::setButtonStates()
 	}
 	else
 	{	
-		// Next have to see if an item is selected
-		int iIndex = -1;
-		POSITION pos = m_fileProcessorList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
-		{
-			// Get index of first selection
-			iIndex = m_fileProcessorList.GetNextSelectedItem( pos );
-		}
+		// Get index of first selection
+		int iIndex = m_fileProcessorList.GetFirstSelectedRow();
+
 		if (iIndex > -1)
 		{
 			// Enable the Delete button
 			m_btnRemove.EnableWindow( TRUE );
 
 			// Check for multiple selection
-			int iIndex2 = m_fileProcessorList.GetNextSelectedItem( pos );
-			if (iIndex2 == -1)
+			if (m_fileProcessorList.GetNextSelectedRow() == -1)
 			{
 				// Only one selected, enable Configure
 				m_btnModify.EnableWindow( TRUE );
@@ -2112,13 +1997,14 @@ void FileProcessingDlgTaskPage::replaceFileProcessorAt(int iIndex, IObjectWithDe
 	getFileProcessorsData()->Insert(iIndex, ipNewFP );
 
 	// Update the file processor listbox
-	m_fileProcessorList.DeleteItem( iIndex );
-	m_fileProcessorList.InsertItem( iIndex, "" );
-	m_fileProcessorList.SetItemText( iIndex, 1, ipNewFP->Description );
-	m_fileProcessorList.SetCheck( iIndex, ipNewFP->Enabled );
+	m_fileProcessorList.DeleteRow(iIndex);
+	m_fileProcessorList.InsertRow(iIndex);
+	m_fileProcessorList.SetText(iIndex, asString(ipNewFP->Description));
+	m_fileProcessorList.SetCheck(iIndex, asCppBool(ipNewFP->Enabled));
 
 	// Retain selection and focus
-	m_fileProcessorList.SetItemState( iIndex, LVIS_SELECTED, LVIS_SELECTED );
+	m_fileProcessorList.ClearSelections();
+	m_fileProcessorList.SelectRow(iIndex);
 	m_fileProcessorList.SetFocus();
 }
 //-------------------------------------------------------------------------------------------------

@@ -4,9 +4,12 @@
 // FileProcessingDlgTaskPage.h : header file
 
 #include <vector>
+#include <stack>
 #include <string>
 #include "afxwin.h"
 #include <ImageButtonWithStyle.h>
+
+#include "TaskGrid.h"
 
 using namespace std;
 
@@ -52,7 +55,7 @@ public:
 	CButton m_btnNumThreads;
 	CEdit m_editThreads;
 	CSpinButtonCtrl m_SpinThreads;
-	CListCtrl	m_fileProcessorList;
+	CTaskGrid m_fileProcessorList;
 	CButton m_btnKeepProcessingWithEmptyQueue;
 	CButton m_btnStopProcessingWithEmptyQueue;
 	CButton	m_btnLogErrorDetails;
@@ -89,20 +92,19 @@ protected:
 	afx_msg void OnBtnModify();
 	afx_msg void OnBtnDown();
 	afx_msg void OnBtnUp();
-	afx_msg void OnSelchangeListFileProcessors();
-	afx_msg void OnDblclkListFileProcessors();
+	afx_msg LRESULT OnGridSelChange(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnGridDblClick(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnBtnMaxThread();
 	afx_msg void OnBtnNumThread();
 	afx_msg void OnBtnKeepProcessingWithEmptyQueue();
 	afx_msg void OnBtnStopProcessingWithEmptyQueue();
-	afx_msg void OnNMDblclkListFp(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMRclickListFp(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg LRESULT OnGridRightClick(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnContextCut();
 	afx_msg void OnContextCopy();
 	afx_msg void OnContextPaste();
 	afx_msg void OnContextDelete();
-	afx_msg void OnLvnItemchangedListFp(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg LRESULT OnCellValueChange(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnEnChangeEditThreads();
 	afx_msg void OnCheckLogErrorDetails();
 	afx_msg void OnEnChangeEditErrorLog();
@@ -133,14 +135,8 @@ private:
 	// Enable/disable various buttons based upon which items are selected
 	void	setButtonStates();
 
-	// clear all the selections from the listbox
-	void	clearListSelection();
-
-	// Uses SetItemData to mark selected tasks for later deletion
-	void	markSelectedTasks(); 
-
-	// Deletes tasks that have been marked for deletion via SetItemData
-	void	deleteMarkedTasks();	
+	// Deletes the currently selected tasks
+	void	deleteSelectedTasks();	
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: sets rectWindow to the position and dimensions of the dialog item
