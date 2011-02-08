@@ -349,6 +349,7 @@
     <ClCompile Include="Win32Semaphore.cpp" />
     <ClCompile Include="Win32Timer.cpp" />
     <ClCompile Include="Win32Util.cpp" />
+    <ClCompile Include="WindowPersistenceMgr.cpp" />
     <ClCompile Include="XBrowseForFolder.cpp" />
     <ClCompile Include="XInfoTip.cpp" />
     <ClCompile Include="NewHeaderCtrl.cpp" />
@@ -384,6 +385,7 @@
     <ClInclude Include="CpuUsage.h" />
     <ClInclude Include="CursorToolTipCtrl.h" />
     <ClInclude Include="DateUtil.h" />
+    <ClInclude Include="WindowPersistenceMgr.h" />
     <ClInclude Include="EncryptedFileManager.h" />
     <ClInclude Include="EncryptionEngine.h" />
     <ClInclude Include="ErrorInfo.h" />

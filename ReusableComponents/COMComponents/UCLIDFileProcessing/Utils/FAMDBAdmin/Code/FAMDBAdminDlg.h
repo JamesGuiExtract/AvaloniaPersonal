@@ -4,7 +4,7 @@
 #pragma once
 #include "FAMDBAdminSummaryDlg.h"
 
-#include <RegistryPersistenceMgr.h>
+#include <WindowPersistenceMgr.h>
 #include <FileProcessingConfigMgr.h>
 #include <ResizablePropertySheet.h>
 #include <DatabasePage.h>
@@ -39,6 +39,7 @@ protected:
 	afx_msg void OnHelpAbout();
 	afx_msg void OnExportFileLists();
 	afx_msg void OnExit();
+	afx_msg void OnCancel();
 	afx_msg void OnOK();
 	afx_msg void OnDatabaseClear();
 	afx_msg void OnDatabaseResetLock();
@@ -103,6 +104,9 @@ private:
 
 	// Indicates wether the current database schema is known to be out-of-date.
 	bool m_bDBSchemaIsNotCurrent;
+
+	// Saves/restores window position/size info to/from the registry.
+	WindowPersistenceMgr m_windowMgr;
 
 	//////////
 	//Methods

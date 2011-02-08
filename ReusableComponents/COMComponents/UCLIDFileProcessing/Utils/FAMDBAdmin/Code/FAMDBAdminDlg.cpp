@@ -21,6 +21,7 @@
 #include <ComUtils.h>
 #include <RegistryPersistenceMgr.h>
 #include <FAMUtilsConstants.h>
+#include <RegConstants.h>
 
 #include <set>
 
@@ -36,12 +37,14 @@ const int giMIN_WINDOW_HEIGHT = 320;
 const string gstrFILE_ACTION_MANAGER_FILENAME = "ProcessFiles.exe";
 const string gstrREPORT_VIEWER_EXE = "ReportViewer.exe";
 const string gstrTITLE = "File Action Manager Database Administration";
+const string gstrFAMDB_REG_KEY = gstrCOM_COMPONENTS_REG_PATH + "\\UCLIDFileProcessing\\FAMDBAdmin";
 
 //-------------------------------------------------------------------------------------------------
 // CFAMDBAdminDlg dialog
 //-------------------------------------------------------------------------------------------------
 CFAMDBAdminDlg::CFAMDBAdminDlg(IFileProcessingDBPtr ipFAMDB,CWnd* pParent /*=NULL*/)
 : CDialog(CFAMDBAdminDlg::IDD, pParent),
+m_windowMgr(this, gstrFAMDB_REG_KEY),
 m_ipFAMDB(ipFAMDB),
 m_bIsDBGood(false),
 m_ipMiscUtils(NULL),
@@ -59,8 +62,7 @@ m_bInitialized(false)
 
 		m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_FAMDBADMIN);
 
-		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new
-			FileProcessingConfigMgr());
+		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new FileProcessingConfigMgr());
 
 		// Set the Database Page notify to this object ( so the status can be updated )
 		m_propDatabasePage.setNotifyDBConfigChanged(this);
@@ -129,6 +131,9 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 		// when the application's main window is not a dialog
 		SetIcon(m_hIcon, TRUE);			// Set big icon
 		SetIcon(m_hIcon, FALSE);		// Set small icon
+
+		// Restore the dialog to the position it was in last time it was open.
+		m_windowMgr.RestoreWindowPosition();
 
 		// Load and update the menu
 		loadMenu();
@@ -246,10 +251,23 @@ void CFAMDBAdminDlg::OnExit()
 
 	try
 	{
-		m_ipFAMDB = NULL;
-		CDialog::OnCancel();
+		OnCancel();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13986");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnCancel()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{
+		// Save the dialog's current size/position to the registry.
+		m_windowMgr.SaveWindowPosition();
+
+		CDialog::OnCancel();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31578");
 }
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnOK()
