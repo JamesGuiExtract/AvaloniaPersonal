@@ -124,7 +124,7 @@ namespace Extract.ExtractDebugData
 
                 ExtractException.Assert("ELI30585", "Invalid specifications file.",
                     File.Exists(SpecificationFile));
-                ExtractException.Assert("ELI30585", "Output filename must be specified.",
+                ExtractException.Assert("ELI31588", "Output filename must be specified.",
                     !string.IsNullOrEmpty(OutputFile));
 
                 FindUexFiles(uexPath);

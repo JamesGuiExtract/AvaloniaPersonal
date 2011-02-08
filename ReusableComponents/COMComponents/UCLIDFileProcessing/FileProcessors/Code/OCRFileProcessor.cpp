@@ -150,7 +150,7 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 
 		ASSERT_ARGUMENT("ELI17923", pResult != NULL);
 		IFileRecordPtr ipFileRecord(pFileRecord);
-		ASSERT_ARGUMENT("ELI31332", ipFileRecord != __nullptr);
+		ASSERT_ARGUMENT("ELI31586", ipFileRecord != __nullptr);
 
 		string strImageFileName = asString(ipFileRecord->Name);
 

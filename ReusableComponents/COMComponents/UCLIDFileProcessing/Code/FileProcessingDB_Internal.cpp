@@ -3436,7 +3436,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 					// Check to see if the timeout value has been reached
 					if (swTransactionRetryTimeout.getElapsedTime() > m_dGetFilesToProcessTransactionTimeout)
 					{
-						UCLIDException uex("ELI31145", "Application Trace: Transaction retry timed out.", ue);
+						UCLIDException uex("ELI31587", "Application Trace: Transaction retry timed out.", ue);
 						uex.addDebugInfo(gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT, 
 							asString(m_dGetFilesToProcessTransactionTimeout));
 						throw uex;
@@ -3523,7 +3523,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 
 	// Check for active processing for the action
 	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI30360", ipProcessingSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI31589", ipProcessingSet != NULL);
 
 	// Open recordset with ProcessingFAM records that show processing on the action
 	string strSQL = "SELECT UPI FROM ProcessingFAM WHERE ActionID = " + strActionID;
