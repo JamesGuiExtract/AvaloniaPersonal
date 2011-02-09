@@ -1440,7 +1440,7 @@ bool CFileProcessingManager::authenticateForProcessing()
 					hParent = pWnd->m_hWnd;
 				}
 
-				MessageBox(hParent, "Invalid password. Cannot process skipped files for all users.",
+				MessageBox(hParent, "Admin password invalid.",
 					"Authentication Failed", MB_OK | MB_ICONERROR);
 			}
 			return false;

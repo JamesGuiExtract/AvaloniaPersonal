@@ -70,7 +70,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the file name
                 if (string.IsNullOrWhiteSpace(_renameFileToTextBox.Text))
                 {
-                    MessageBox.Show("You must specify Rename SourceDocName to string.",
+                    MessageBox.Show("You must specify a new SourceDocName.",
                         "No File Name", MessageBoxButtons.OK, MessageBoxIcon.Error,
                         MessageBoxDefaultButton.Button1, 0);
                     _renameFileToTextBox.Focus();

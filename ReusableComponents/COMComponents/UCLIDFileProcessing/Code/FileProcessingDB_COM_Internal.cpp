@@ -5250,6 +5250,10 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 			string strCurrFileName = ipFileRecord->Name;
 			string strFileID = asString(ipFileRecord->FileID);
 
+			// Make sure any ' are escaped by using '' for both the current file name and the new file name
+			replaceVariable(strNewName, "'", "''");
+			replaceVariable(strCurrFileName, "'", "''");
+
 			string strChangeNameQuery = "UPDATE [FAMFile]   SET [FileName] = '" + strNewName + 
 				"' WHERE FileName = '" + strCurrFileName + "' AND ID = " + strFileID;
 
