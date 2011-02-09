@@ -29,6 +29,7 @@ static const string gstrAUTO_CREATE_ACTIONS = "AutoCreateActions";
 static const string gstrSKIP_AUTHENTICATION_ON_MACHINES = "SkipAuthenticationOnMachines";
 static const string gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS = "ActionStatisticsUpdateFreqInSeconds";
 static const string gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT = "GetFilesToProcessTransactionTimeout";
+static const string gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY = "StoreDocNameChangeHistory";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

@@ -199,6 +199,16 @@ static const string gstrCREATE_FILE_ACTION_STATUS =
 	"	[FileID] ASC "
 	")) ";
 
+static const string gstrCREATE_SOURCE_DOC_CHANGE_HISTORY =
+	"CREATE TABLE [SourceDocChangeHistory]( "
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_SourceDocChangeHistory] PRIMARY KEY CLUSTERED, "
+	"[FileID] [int] NOT NULL, "
+	"[FromFileName]  [nvarchar](255) NULL,"
+	"[ToFileName]  [nvarchar](255) NULL,"
+	"[TimeStamp] [DateTime] NOT NULL, "
+	"[FAMUserID] int NOT NULL, "
+	"[MachineID] int NOT NULL) ";
+
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "
 	"ON [FAMFile]([Priority] DESC, [ID] ASC)";
@@ -461,6 +471,27 @@ static const string gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK =
 	"ALTER TABLE [dbo].[ActionStatisticsDelta] "
 	"WITH CHECK ADD CONSTRAINT [FK_ActionStatisticsDelta_Action] FOREIGN KEY([ActionID]) "
 	"REFERENCES [dbo].[Action] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMFILE_FK = 
+	"ALTER TABLE [dbo].[SourceDocChangeHistory]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_SourceDocChangeHistory_FAMFile] FOREIGN KEY([FileID]) "
+	"REFERENCES [dbo].[FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMUSER_FK =
+	"ALTER TABLE [dbo].[SourceDocChangeHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_SourceDocChangeHistory_User] FOREIGN KEY([FAMUserID]) "
+	"REFERENCES [dbo].[FAMUser]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_SOURCE_DOC_CHANGE_HISTORY_MACHINE_FK =
+	"ALTER TABLE [dbo].[SourceDocChangeHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_SourceDocChangeHistory_Machine] FOREIGN KEY([MachineID]) "
+	"REFERENCES [dbo].[Machine]([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 

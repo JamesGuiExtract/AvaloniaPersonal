@@ -340,6 +340,9 @@ private:
 	// Number of Seconds between refreshing the ActionStatistics
 	long m_nActionStatisticsUpdateFreqInSeconds;
 
+	// Flag indicating whether to store source doc change history
+	bool m_bStoreSourceDocChangeHistory;
+
 	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Events used for the LastPingThread

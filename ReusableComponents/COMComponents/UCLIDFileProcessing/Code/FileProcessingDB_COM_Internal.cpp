@@ -247,6 +247,40 @@ int UpdateToSchemaVersion102(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31438");
 }
+int  UpdateToSchemaVersion103(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 103;
+
+		if (pnNumSteps != NULL)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Add StoreSourceDocChangeHistory table
+		vecQueries.push_back(gstrCREATE_SOURCE_DOC_CHANGE_HISTORY);
+		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMUSER_FK);
+		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_MACHINE_FK);
+		
+		// Add default value for StoreSourceDocChangeHistory.
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY + "', '1')");
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '103' WHERE [Name] = '" + 
+			gstrFAMDB_SCHEMA_VERSION + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31527");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -5081,7 +5115,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			{
 				case 23:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion101);
 				case 101:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion102);
-				case 102:	break;
+				case 102:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion103);
+				case 103:	break;
 
 				default:
 					{
@@ -5213,9 +5248,10 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 			simplifyPathName(strNewName);
 
 			string strCurrFileName = ipFileRecord->Name;
+			string strFileID = asString(ipFileRecord->FileID);
 
 			string strChangeNameQuery = "UPDATE [FAMFile]   SET [FileName] = '" + strNewName + 
-				"' WHERE FileName = '" + strCurrFileName + "' AND ID = " + asString(ipFileRecord->FileID);
+				"' WHERE FileName = '" + strCurrFileName + "' AND ID = " + strFileID;
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = NULL;
@@ -5242,6 +5278,17 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 					throw ue;
 				}
 
+				// If storing history need to update the SourceDocChangeHistory table
+				if (m_bStoreSourceDocChangeHistory)
+				{
+					string strChangeHistoryQuery = "INSERT INTO [SourceDocChangeHistory]  ([FileID], [FromFileName], "
+						"[ToFileName], [TimeStamp], [FAMUserID], [MachineID]) VALUES "
+						"(" + strFileID + ", '" + strCurrFileName + "', '" + strNewName + "', GetDate(), " 
+						+ asString(getFAMUserID(ipConnection)) + ", " + asString(getMachineID(ipConnection)) + ")";
+
+					executeCmdQuery(ipConnection, strChangeHistoryQuery);
+				}
+				
 				// Commit the transaction
 				tg.CommitTrans();
 
