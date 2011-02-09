@@ -1,6 +1,7 @@
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
 
@@ -56,6 +57,8 @@ namespace Extract.Redaction.Verification
 
             _slideshowAutoStartCheckBox.Checked = _config.Settings.AutoStartSlideshow;
             _slideshowIntervalUpDown.Value = _config.Settings.SlideshowInterval;
+            _slideshowIntervalUpDown.UserTextCorrected += HandleSlideshowIntervalCorrected;
+
         }
 
         #endregion VerificationOptionsDialog Constructors
@@ -152,6 +155,19 @@ namespace Extract.Redaction.Verification
                 _autoToolCheckBox.Checked = autoTool != AutoTool.None;
                 _autoToolComboBox.Text = Enum.GetName(typeof(AutoTool), autoTool);
 
+                // [FlexIDSCore:4528]
+                // With an Aero theme, the tab control the _autoZoomScaleTrackBar is drawn on
+                // is transparent and, therefore, inherits the SystemColors.Window color. Otherwise,
+                // ensure the _autoZoomScaleTrackBar assumes the same color as the _generalTabPage.
+                if (_generalTabPage.BackColor == Color.Transparent)
+                {
+                    _autoZoomScaleTrackBar.BackColor = SystemColors.Window;
+                }
+                else
+                {
+                    _autoZoomScaleTrackBar.BackColor = _generalTabPage.BackColor;
+                }
+
                 UpdateControls();
             }
             catch (Exception ex)
@@ -165,6 +181,35 @@ namespace Extract.Redaction.Verification
         #region VerificationOptionsDialog Event Handlers
 
         /// <summary>
+        /// Handles the case that the user entered a slideshow interval that the control corrected
+        /// due to being out of the valid range, etc.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSlideshowIntervalCorrected(object sender, EventArgs e)
+        {
+            try
+            {
+                MessageBox.Show("The number of seconds must be a value between 1 and 99",
+                        "Invalid value", MessageBoxButtons.OK, MessageBoxIcon.None,
+                        MessageBoxDefaultButton.Button1, 0);
+
+                // Re-select the _slideshowIntervalUpDown control, but only after any other events
+                // in the message queue have been processed so those event don't undo this selection.
+                BeginInvoke((MethodInvoker)(() =>
+                {
+                    _tabControl.SelectedTab = _slideshowTabPage;
+                    _slideshowIntervalUpDown.Focus();
+                }));
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31592", ex);
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
@@ -173,32 +218,37 @@ namespace Extract.Redaction.Verification
         /// <see cref="Control.Click"/> event.</param>
         void HandleOkButtonClick(object sender, EventArgs e)
         {
+            bool slideshowIntervalValid = true;
+            EventHandler<EventArgs> handleUserTextCorrected =
+                ((tempSender, tempEventArgs) => slideshowIntervalValid = false);
+
             try
             {
-                if (_slideshowIntervalUpDown.Value < 1 || _slideshowIntervalUpDown.Value > 999)
-                {
-                    MessageBox.Show("The number of seconds must be a value between 1 and 999",
-                        "Invalid value", MessageBoxButtons.OK, MessageBoxIcon.None,
-                        MessageBoxDefaultButton.Button1, 0);
-                    _tabControl.SelectedTab = _slideshowTabPage;
-                    _slideshowIntervalUpDown.Focus();
-                    return;
-                }
-
-                // Store settings
-                _options = GetVerificationOptions();
-                
+                // Before checking the _slideshowIntervalUpDown value, register
+                // slideshowIntervalValid to be set to false in the case that UserTextCorrected is
+                // raised.
+                _slideshowIntervalUpDown.UserTextCorrected += handleUserTextCorrected;
                 _config.Settings.AutoStartSlideshow = _slideshowAutoStartCheckBox.Checked;
                 _config.Settings.SlideshowInterval = (int)_slideshowIntervalUpDown.Value;
-                _config.Save();
 
-                DialogResult = DialogResult.OK;
+                // Store settings and close the dialog only if slideshowIntervalValid.
+                if (slideshowIntervalValid)
+                {
+                    _options = GetVerificationOptions();
+                    _config.Save();
+
+                    DialogResult = DialogResult.OK;
+                }
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI27409", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+            finally
+            {
+                _slideshowIntervalUpDown.UserTextCorrected -= handleUserTextCorrected;
             }
         }
 

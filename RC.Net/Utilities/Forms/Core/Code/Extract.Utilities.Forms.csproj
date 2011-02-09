@@ -109,6 +109,12 @@
     <Compile Include="BetterDataGridViewRow.Designer.cs">
       <DependentUpon>BetterDataGridViewRow.cs</DependentUpon>
     </Compile>
+    <Compile Include="BetterNumericUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BetterNumericUpDown.Designer.cs">
+      <DependentUpon>BetterNumericUpDown.cs</DependentUpon>
+    </Compile>
     <Compile Include="BetterProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>

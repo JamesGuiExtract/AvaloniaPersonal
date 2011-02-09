@@ -54,7 +54,7 @@ namespace Extract.Redaction.Verification
             this._slideshowTabPage = new System.Windows.Forms.TabPage();
             this._slideshowAutoStartCheckBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
-            this._slideshowIntervalUpDown = new System.Windows.Forms.NumericUpDown();
+            this._slideshowIntervalUpDown = new Extract.Utilities.Forms.BetterNumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
             groupBox1 = new System.Windows.Forms.GroupBox();
             label2 = new System.Windows.Forms.Label();
@@ -83,7 +83,6 @@ namespace Extract.Redaction.Verification
             // 
             // _autoZoomScaleTrackBar
             // 
-            this._autoZoomScaleTrackBar.BackColor = System.Drawing.SystemColors.Window;
             this._autoZoomScaleTrackBar.Enabled = false;
             this._autoZoomScaleTrackBar.LargeChange = 3;
             this._autoZoomScaleTrackBar.Location = new System.Drawing.Point(10, 36);
@@ -249,7 +248,12 @@ namespace Extract.Redaction.Verification
             // 
             this._slideshowIntervalUpDown.Location = new System.Drawing.Point(289, 11);
             this._slideshowIntervalUpDown.Maximum = new decimal(new int[] {
-            1000,
+            99,
+            0,
+            0,
+            0});
+            this._slideshowIntervalUpDown.Minimum = new decimal(new int[] {
+            1,
             0,
             0,
             0});
@@ -314,7 +318,7 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.TextBox _autoZoomScaleTextBox;
         private System.Windows.Forms.CheckBox _slideshowAutoStartCheckBox;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.NumericUpDown _slideshowIntervalUpDown;
+        private Extract.Utilities.Forms.BetterNumericUpDown _slideshowIntervalUpDown;
         private System.Windows.Forms.Label label5;
     }
 }
