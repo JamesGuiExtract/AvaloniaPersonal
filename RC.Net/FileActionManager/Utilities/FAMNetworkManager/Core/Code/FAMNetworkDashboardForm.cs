@@ -1224,6 +1224,67 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        /// <summary>Handles the data grid view preview key down.</summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.PreviewKeyDownEventArgs"/> instance containing the event data.</param>
+        void HandleDataGridViewPreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            try
+            {
+                // The data grid view does not pass the shift-tab key down event
+                // if the current selection is the top row in the grid.
+                // In order to maintain the cycling behavior, we need
+                // to ensure the key down event fires for this key combination.
+                if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.Shift)
+                {
+                    e.IsInputKey = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI31597");
+            }
+        }
+
+        /// <summary>Handles the data grid view key down.</summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing the event data.</param>
+        void HandleDataGridViewKeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                if (e.KeyCode == Keys.Tab
+                    && (e.Modifiers == Keys.None || e.Modifiers == Keys.Shift))
+                {
+                    var row = _machineListGridView.CurrentRow;
+                    if (row != null)
+                    {
+                        var count = _machineListGridView.Rows.Count;
+                        var reverse = e.Modifiers == Keys.Shift;
+                        var index = row.Index + (reverse ? -1 : 1);
+                        if (index < 0)
+                        {
+                            index = count - 1;
+                        }
+                        else if (index >= count)
+                        {
+                            index = 0;
+                        }
+
+                        // Move to the next/previous row
+                        _machineListGridView.CurrentCell =
+                            _machineListGridView.Rows[index].Cells[0];
+
+                        e.Handled = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI31598");
+            }
+        }
+
         #endregion Event Handler
 
         #region Methods

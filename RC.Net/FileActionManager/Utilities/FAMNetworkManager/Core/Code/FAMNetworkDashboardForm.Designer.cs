@@ -200,6 +200,8 @@
             this._machineListGridView.Size = new System.Drawing.Size(742, 303);
             this._machineListGridView.TabIndex = 0;
             this._machineListGridView.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.HandleMachineGridViewMouseDoubleClick);
+            this._machineListGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.HandleDataGridViewKeyDown);
+            this._machineListGridView.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.HandleDataGridViewPreviewKeyDown);
             this._machineListGridView.SelectionChanged += new System.EventHandler(this.HandleMachineGridViewSelectionChanged);
             // 
             // MachineColumn
