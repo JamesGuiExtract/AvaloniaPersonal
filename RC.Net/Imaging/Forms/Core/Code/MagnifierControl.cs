@@ -33,11 +33,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _painting;
 
-        /// <summary>
-        /// The last known location of the mouse in the <see cref="ImageViewer"/>.
-        /// </summary>
-        Point _lastMouseLocation;
-
         #endregion Fields
 
         #region Constructors
@@ -189,16 +184,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                // ImageViewer.PaintToGraphics seems to trigger mouse events even though the mouse
-                // hasn't actually moved (seems to be related to the LockControlUpdate calls).
-                // Ensure the mouse has actually moved before updating.
-                if (e.Location != _lastMouseLocation)
-                {
-                    _lastMouseLocation = e.Location;
-
-                    // Whenever the mouse has moved, update.
-                    DoRefresh();
-                }
+                // Whenever the mouse has moved, update.
+                DoRefresh();
             }
             catch (Exception ex)
             {

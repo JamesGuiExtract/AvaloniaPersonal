@@ -448,6 +448,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _paintingToGraphics = false;
 
+        /// <summary>
+        /// The last known location of the mouse.
+        /// </summary>
+        Point _lastMouseLocation;
+
         #endregion Fields
 
         #region Delegates
@@ -2165,6 +2170,17 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                // [FlexIDSCore:4536]
+                // PaintToGraphics can cause superfluous mouse move events as a result of the
+                // LockControlUpdate(this, false) call at the end. This can cause undesired side
+                // effects. Block mouse move events if the mouse hasn't actually moved.
+                if (e.Location == _lastMouseLocation)
+                {
+                    return;
+                }
+
+                _lastMouseLocation = e.Location;
+
                 base.OnMouseMove(e);
 
                 // Update _layerObjectsUnderCursor contents and raise the CursorEnteredLayerObject
@@ -2661,6 +2677,10 @@ namespace Extract.Imaging.Forms
             try
             {
                 base.OnMouseUp(e);
+
+                // Allow the next MouseMove event to be fired-- otherwise the cursor won't get set
+                // correctly in the case that cusor is dependent on mouse position.
+                _lastMouseLocation = Point.Empty;
 
                 // Process this mouse event if an interactive region is being created
                 if (_trackingData != null && e.Button == MouseButtons.Left)
