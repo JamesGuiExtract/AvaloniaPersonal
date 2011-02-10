@@ -2782,9 +2782,13 @@ namespace Extract.Imaging.Forms
                         _trackingData.UpdateRectangle(mouseX, mouseY);
                         DrawTrackingRectangleBorder(e);
                     }
-                    else
+                    // [FlexIDSCore:4527]
+                    // Don't process layer object events if currently in _paintingToGraphics
+                    // since we don't want the ImageViewer transform used for the target graphics
+                    // to affect the size/position of the layer objects.
+                    else if (!_paintingToGraphics)
                     {
-                        // This is a layer object event
+                        // This is a layer object event.
                         foreach (LayerObject layerObject in _layerObjects.Selection)
                         {
                             if (layerObject.TrackingData != null)
@@ -4786,9 +4790,13 @@ namespace Extract.Imaging.Forms
                 // Restore the original PostPaint methods.
                 _trackingUpdateCall = originalTrackingUpdateCall;
 
+                // Set _paintingToGraphics back to false before LockControlUpdate since the refresh
+                // triggered by LockControlUpdate(this, false) will be painting back to this
+                // control's graphics.
+                _paintingToGraphics = false;   
+
                 // Allow painting of the ImageViewer again.
                 FormsMethods.LockControlUpdate(this, false);
-                _paintingToGraphics = false;
             }
         }
 
