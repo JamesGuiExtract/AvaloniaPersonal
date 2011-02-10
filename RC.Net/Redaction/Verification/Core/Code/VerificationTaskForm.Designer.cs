@@ -1633,7 +1633,7 @@ namespace Extract.Redaction.Verification
             // _magnifierDockableWindow
             // 
             this._magnifierDockableWindow.Controls.Add(this._magnifierControl);
-            this._magnifierDockableWindow.Guid = new System.Guid("ae627741-717d-48f0-8e85-071b39098d21");
+            this._magnifierDockableWindow.Guid = new System.Guid("3dc14a68-1717-4ee9-b9c3-a28e90c98124");
             this._magnifierDockableWindow.Location = new System.Drawing.Point(0, 601);
             this._magnifierDockableWindow.Name = "_magnifierDockableWindow";
             this._magnifierDockableWindow.PrimaryControl = this;
