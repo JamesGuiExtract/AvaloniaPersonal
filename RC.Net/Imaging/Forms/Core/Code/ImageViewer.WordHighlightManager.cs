@@ -302,7 +302,14 @@ namespace Extract.Imaging.Forms
 
                     if (!cancel)
                     {
-                        CreateOutputHighlight();
+                        if (_imageViewer._cursorTool == CursorTool.WordHighlight)
+                        {
+                            CreateOutputHighlight<CompositeHighlightLayerObject>();
+                        }
+                        else
+                        {
+                            CreateOutputHighlight<Redaction>();
+                        }
                     }
 
                     // Hide all word highlights until the tool is used/moved again.
@@ -1559,7 +1566,7 @@ namespace Extract.Imaging.Forms
             /// Adds a <see cref="Highlight"/> or <see cref="Redaction"/> to the image viewer based
             /// on the current tracking data.
             /// </summary>
-            void CreateOutputHighlight()
+            void CreateOutputHighlight<T>() where T : CompositeHighlightLayerObject
             {
                 // Collect all raster zones from the active highlights.
                 List<RasterZone> rasterZones = new List<RasterZone>();
@@ -1634,46 +1641,53 @@ namespace Extract.Imaging.Forms
 
                 if (rasterZones.Count > 0)
                 {
-                    // In order to check if the potential output is a duplicate of something that
-                    // already exists, get a list of all raster zones of existing
-                    // highlights/redactions.
-                    List<RasterZone> existingRasterZones = new List<RasterZone>();
-                    if (_imageViewer._cursorTool == CursorTool.WordHighlight)
-                    {
-                        existingRasterZones.AddRange(_imageViewer.LayerObjects
-                            .OfType<CompositeHighlightLayerObject>()
-                            .Where(lo => !IsWordHighlight(lo))
-                            .SelectMany(h => h.GetRasterZones())
-                            .Where(z => z.PageNumber == _imageViewer.PageNumber));
-                    }
-                    else
-                    {
-                        existingRasterZones.AddRange(_imageViewer.LayerObjects
-                            .OfType<Redaction>()
-                            .Where(lo => !IsWordHighlight(lo))
-                            .SelectMany(h => h.GetRasterZones())
-                            .Where(z => z.PageNumber == _imageViewer.PageNumber));
-                    }
+                    // Create the candidate layer object and get the candidate rasterZones to check
+                    // against the current doc for duplicates.
+                    CompositeHighlightLayerObject outputLayerObject = null;
 
-                    // If the raster zones aren't all duplicates of existing redaction/highlights
-                    // create the output redaction/highlight.
-                    if (!rasterZones.All(z => existingRasterZones
-                            .Any(e => e.CompareTo(z) == 0)))
+                    try
                     {
-                        if (_imageViewer._cursorTool == CursorTool.WordHighlight)
+                        if (typeof(T) == typeof(Redaction))
                         {
-                            CompositeHighlightLayerObject highlight =
-                                new CompositeHighlightLayerObject(_imageViewer, _imageViewer.PageNumber,
-                                    LayerObject.ManualComment, rasterZones,
-                                    _imageViewer._defaultHighlightColor);
-                            _imageViewer._layerObjects.Add(highlight);
+                            outputLayerObject = new Redaction(_imageViewer,
+                                _imageViewer.PageNumber, LayerObject.ManualComment, rasterZones,
+                                _imageViewer._defaultRedactionFillColor);
                         }
                         else
                         {
-                            Redaction redaction = new Redaction(_imageViewer,
-                                _imageViewer.PageNumber, LayerObject.ManualComment, rasterZones,
-                                _imageViewer._defaultRedactionFillColor);
-                            _imageViewer._layerObjects.Add(redaction);
+                            outputLayerObject = new CompositeHighlightLayerObject(_imageViewer,
+                                    _imageViewer.PageNumber, LayerObject.ManualComment, rasterZones,
+                                    _imageViewer._defaultHighlightColor);
+                        }
+
+                        rasterZones = new List<RasterZone>(outputLayerObject.GetRasterZones());
+
+                        // In order to check if the potential output is a duplicate of something
+                        // that already exists, get a list of all raster zones of existing
+                        // highlights/redactions.
+                        List<RasterZone> existingRasterZones = new List<RasterZone>(
+                            _imageViewer.LayerObjects
+                                .OfType<T>()
+                                .Where(lo => lo.GetType() == typeof(T) && !IsWordHighlight(lo))
+                                .SelectMany(h => h.GetRasterZones())
+                                .Where(z => z.PageNumber == _imageViewer.PageNumber));
+
+                        // If the candidate raster zones aren't all duplicates of existing
+                        // redaction/highlights add it to the image viewer.
+                        if (!rasterZones.All(z => existingRasterZones
+                                .Any(e => e.Equals(z))))
+                        {
+                            _imageViewer._layerObjects.Add(outputLayerObject);
+                            
+                            // Set to null so it doesn't get disposed of.
+                            outputLayerObject = null;
+                        }
+                    }
+                    finally
+                    {
+                        if (outputLayerObject != null)
+                        {
+                            outputLayerObject.Dispose();
                         }
                     }
                 }
