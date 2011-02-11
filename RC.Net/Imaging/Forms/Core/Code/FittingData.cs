@@ -139,6 +139,16 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="side">The <see cref="Side"/> of the region to be fitted.</param>
         /// <param name="probe">The <see cref="PixelProbe"/> to check pixel data.</param>
+        public bool FitEdge(Side side, PixelProbe probe)
+        {
+            return FitEdge(side, probe, true, true, null, 0, 1, 0, 0);
+        }
+            
+        /// <summary>
+        /// Fits the specified side of the region to pixel content in the image if possible.
+        /// </summary>
+        /// <param name="side">The <see cref="Side"/> of the region to be fitted.</param>
+        /// <param name="probe">The <see cref="PixelProbe"/> to check pixel data.</param>
         /// <param name="shrink"><see langword="true"/> to attempt to adjust the side by making the
         /// zone smaller; <see langword="false"/> to attempt to expand the zone.</param>
         /// <param name="findBlack"><see langword="true"/> to look for the next row containing black
@@ -147,19 +157,18 @@ namespace Extract.Imaging.Forms
         /// <param name="fuzzyFactor">The factor by which pixel content or the distance from the
         /// first to the last pixel in a row must decline, then increase in order for the row of the
         /// minimum value to qualify as the edge of pixel content. If <see langword="null"/>, no
-        /// fuzzy logic will be used to find an edge (default = <see langword="null"/>).</param>
+        /// fuzzy logic will be used to find an edge.</param>
         /// <param name="fuzzyBuffer">After qualifying a "fuzzy" edge of pixel content, the distance
-        /// to keep searching for a true edge before using the fuzzy edge. (default = 0)</param>
+        /// to keep searching for a true edge before using the fuzzy edge.</param>
         /// <param name="buffer">If a qualifying row is found, how many rows prior to the qualifying
         /// row to move the side. This will never result in the side moving in the opposite
-        /// direction specified by <see paramref="side"/>. (default = 1)</param>
-        /// <param name="min">The minimum number of rows to move the side. (default = 0)</param>
+        /// direction specified by <see paramref="side"/>.</param>
+        /// <param name="min">The minimum number of rows to move the side.</param>
         /// <param name="max">The maximum number of rows to move the side. Specify 0 if there is no
         /// maximum value other than the other side of the zone when <see paramref="shrink"/> is
-        /// <see langword="true"/>. (default = 0)</param>
-        public bool FitEdge(Side side, PixelProbe probe, bool shrink = true, bool findBlack = true,
-            float? fuzzyFactor = null, int fuzzyBuffer = 0, float buffer = 1, float min = 0,
-            float max = 0)
+        /// <see langword="true"/>.</param>
+        public bool FitEdge(Side side, PixelProbe probe, bool shrink, bool findBlack,
+            float? fuzzyFactor, int fuzzyBuffer, float buffer, float min, float max)
         {
             try
             {
@@ -196,20 +205,20 @@ namespace Extract.Imaging.Forms
         /// <param name="fuzzyFactor">The factor by which pixel content or the distance from the
         /// first to the last pixel in a row must decline, then increase in order for the row of the
         /// minimum value to qualify as the edge of pixel content. If <see langword="null"/>, no
-        /// fuzzy logic will be used to find an edge (default = <see langword="null"/>).</param>
+        /// fuzzy logic will be used to find an edge.</param>
         /// <param name="fuzzyBuffer">After qualifying a "fuzzy" edge of pixel content, the distance
-        /// to keep searching for a true edge before using the fuzzy edge. (default = 0)</param>
+        /// to keep searching for a true edge before using the fuzzy edge.</param>
         /// <param name="buffer">If a qualifying row is found, how many rows prior to the qualifying
-        /// row return. This will never result in a negative number for a found edge. (default = 1)
+        /// row return. This will never result in a negative number for a found edge.
         /// </param>
-        /// <param name="min">The minimum number of rows to search. (default = 0)</param>
+        /// <param name="min">The minimum number of rows to search.</param>
         /// <param name="max">The maximum number of rows to search. Specify 0 if there is no
         /// maximum value other than the other side of the zone when <see paramref="shrink"/> is
-        /// <see langword="true"/>. (default = 0)</param>
+        /// <see langword="true"/>.</param>
         /// <returns>The number of pixels from the side to a qualifying edge of pixel content.
         /// -1 if no edge was found.</returns>
-        public float? FindEdge(Side side, PixelProbe probe, bool shrink = true, bool findBlack = true,
-            float? fuzzyFactor = null, int fuzzyBuffer = 0, float buffer = 0, float min = 0, float max = 0)
+        public float? FindEdge(Side side, PixelProbe probe, bool shrink, bool findBlack,
+            float? fuzzyFactor, int fuzzyBuffer, float buffer, float min, float max)
         {
             try
             {

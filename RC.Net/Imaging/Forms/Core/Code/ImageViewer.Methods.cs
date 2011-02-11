@@ -3394,7 +3394,7 @@ namespace Extract.Imaging.Forms
                     data.InflateSide(Side.Top, -rowToSplit - 1);
 
                     // Trim whitespace from the top
-                    data.FitEdge(Side.Top, probe, true, true);
+                    data.FitEdge(Side.Top, probe);
 
                     // Look for a place to split the highlight
                     rowToSplit = FindRowToSplit(data, probe);
@@ -3426,7 +3426,7 @@ namespace Extract.Imaging.Forms
             float maxRow = (data.Height - _MIN_SPLIT_HEIGHT);
 
             // Starting at the minimum split height, find the first row containing a black pixel
-            float? row = data.FindEdge(Side.Top, probe, true, true, null, 0, _MIN_SPLIT_HEIGHT, maxRow);
+            float? row = data.FindEdge(Side.Top, probe, true, true, null, 0, 0, _MIN_SPLIT_HEIGHT, maxRow);
 
             if (!row.HasValue)
             {
@@ -3434,7 +3434,7 @@ namespace Extract.Imaging.Forms
             }
 
             // Look for the next row of white pixels. This is the candidate split point.
-            row = data.FindEdge(Side.Top, probe, true, false, null, 0, row.Value + 1, maxRow);
+            row = data.FindEdge(Side.Top, probe, true, false, null, 0, 0, row.Value + 1, maxRow);
 
             if (!row.HasValue)
             {
@@ -3447,7 +3447,7 @@ namespace Extract.Imaging.Forms
             // Starting at the minimum split height for the second highlight, find the first row
             // containing a black pixel and ensure it allows for _MIN_SPLIT_HEIGHT of the second
             // zone.
-            row = data.FindEdge(Side.Bottom, probe, true, true, null, 0, row.Value + 1, maxRow);
+            row = data.FindEdge(Side.Bottom, probe, true, true, null, 0, 0, row.Value + 1, maxRow);
 
             if (!row.HasValue)
             {

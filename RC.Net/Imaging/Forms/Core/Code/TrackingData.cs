@@ -126,6 +126,11 @@ namespace Extract.Imaging.Forms
                 // Construct a default line segment in screen coordinates
                 _line = new Point[] { _startPoint, _startPoint };
 
+                // [FlexIDSCore:4513]
+                // Ensure the rectangle is initialized at the correct location in case its
+                // coordinates get used despite the fact that it has no size yet.
+                _rectangle = new Rectangle(_startPoint, new Size(0, 0));
+
                 // Capture mouse events
                 control.Capture = true;
             }
@@ -266,11 +271,12 @@ namespace Extract.Imaging.Forms
         public void UpdateRectangle(int x, int y)
         {
             // [FlexIDSCore:4510]
-            // If the cursor is in the same spot the tracking event started, assign an empty
-            // rectangle so it can't result in a redaction/highlight being created.
+            // If the cursor is in the same spot the tracking event started, assign a zero width]
+            // and height rectangle so it can't result in a redaction/highlight being created by the
+            // angular or retangular redacton tools if the mouse hasn't moved.
             if (x == _startPoint.X && y == _startPoint.Y)
             {
-                _rectangle = Rectangle.Empty;
+                _rectangle = new Rectangle(_startPoint, new Size(0, 0));
                 return;
             }
 

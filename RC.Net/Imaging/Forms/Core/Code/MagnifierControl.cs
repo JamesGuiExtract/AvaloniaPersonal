@@ -29,6 +29,11 @@ namespace Extract.Imaging.Forms
         ImageViewer _imageViewer;
 
         /// <summary>
+        /// Indicates whether the magnifier is currently magnifying.
+        /// </summary>
+        bool _active;
+
+        /// <summary>
         /// Indicates whether the <see cref="MagnifierControl"/> is currently being painted.
         /// </summary>
         bool _painting;
@@ -90,12 +95,17 @@ namespace Extract.Imaging.Forms
                         {
                             _imageViewer.PostImagePaint -= HandleImageViewerPostImagePaint;
                             _imageViewer.MouseMove -= HandleImageViewerMouseMove;
+                            _imageViewer.ImageFileClosing -= HandleImageFileClosing;
+                            _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                         }
 
                         _imageViewer = value;
+                        _active = _imageViewer.IsImageAvailable;
 
                         _imageViewer.PostImagePaint += HandleImageViewerPostImagePaint;
                         _imageViewer.MouseMove += HandleImageViewerMouseMove;
+                        _imageViewer.ImageFileClosing += HandleImageFileClosing;
+                        _imageViewer.ImageFileChanged += HandleImageFileChanged;
                     }
                 }
                 catch (Exception ex)
@@ -122,7 +132,7 @@ namespace Extract.Imaging.Forms
 
                 base.OnPaint(e);
 
-                if (_imageViewer != null)
+                if (_active && _imageViewer != null)
                 {
                     // Have the image viewer draw the area centered around the mouse zoomed in such
                     // that 1 image pixel = 1 screen pixel.
@@ -190,6 +200,47 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 ExtractException.Display("ELI31450", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the <see cref="ImageViewer"/>'s image file has changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.ImageFileChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        {
+            try
+            {
+                // Invoke _active = true on the message queue to ensure magnification doesn't start
+                // until the image is completely loaded.
+                if (_imageViewer.IsImageAvailable)
+                {
+                    BeginInvoke((MethodInvoker)(() => _active = true));
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31600", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the he case that the <see cref="ImageViewer"/> is closing its current image.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.ImageFileClosingEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleImageFileClosing(object sender, ImageFileClosingEventArgs e)
+        {
+            try
+            {
+                _active = false;
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31601", ex);
             }
         }
 
