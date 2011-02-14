@@ -1,0 +1,364 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.150 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.150 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>[DataEntry #1048, #1038]</b> Data Entry standalone mode
+        <ul>
+            <li>Confirm that you can open the Data Entry Application in standalone mode. Note
+            that you may have to run scripts to make the .config file compatible with the current
+            build.</li>
+            <li>Open a document with data.</li>
+            <li>Close the document.</li>
+            <li>Confirm that the data is cleared from the DEP.</li>
+        </ul></li>
+    <p>
+        <li><b>[DataEntry #1046]</b> Word highlight tool in data entry
+        <ul>
+            <li>Confirm the presence and correct behavior of the word highlight tool in the data
+            entry UI.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRCAndUtils #598, #595]</b> Extract Image Viewer
+        <ul>
+            <li>Play with the .NET image viewer and confirm that there is no way to access the
+            word highlight tool.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRCAndUtils #566]</b> FAM Network Manager
+        <ul>
+            <li>Confirm that when you tab through the FAM Network Manager, each tab advances the
+            selection one row (not cell-by-cell).</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRCAndUtils #517]</b> .NET install
+        <ul>
+            <li>Confirm that .NET 4.0 can be installed on 32-bit Server 2003.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4512]</b> Things to watch for in verification testing
+        <ul>
+            <li>As you test ID Shield verification, confirm that:
+            <ul>
+                <li>The grey dashed line displayed by the word redaction tool in pixel-fitting
+                mode remains visible at all appropriate times.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>Word redaction issues</b>
+        <ul>
+            <li><b>[FlexIDSCore #4494]</b> Duplicate redactions
+            <ul>
+                <li>Select the word redaction tool and click on a word to create a redaction.</li>
+                <li>Confirm that you cannot create an exact duplicate redaction.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4496]</b> Don't display unredactable zones
+            <ul>
+                <li>Make a local copy of one of the images and .uss files from the ManyPageImages
+                folder on I:. Note that the .uss files have a 2007 modified date.</li>
+                <li>Open the image for verification and select the word redaction tool.</li>
+                <li>Above "JUDGMENT BY OPERATION OF LAW" there's a dashed line. Mouse over it and
+                confirm that no highlight is displayed by the word redaction tool.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4500]</b> Word redaction highlights in history
+            <ul>
+                <li>Queue some documents that have .uss files.</li>
+                <li>Open the first document and select the word redaction tool.</li>
+                <li>Save. In the new document, note that dashed boxes appear around words as you mouse
+                over them.</li>
+                <li>Navigate back to the first document. Confirm that dashed boxes appear as you mouse
+                over words.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4501]</b> Orphaned boxes
+            <ul>
+                <li>Select the word redaction tool and hover over a word so that a dashed box appears
+                around the word.</li>
+                <li>Press the escape key and move the mouse. Confirm that the dashed box disappears
+                when you switch tools.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4502, #4505, #4506]</b> 
+            <ul>
+                <li>Select the word redaction tool.</li>
+                <li>Navigate as quickly as possible among a few documents (by, for example, saving a
+                couple, then navigating back and forth in the history). Do this using toolstrip
+                buttons and keyboard shortcuts, with the redaction tool hovering inside the image 
+                viewer or elsewhere.</li>
+                <li>Confirm that no errors or unexpected behavior (e.g., highlights being displayed 
+                for the incorrect document, lockups) are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4503]</b> Object reference exception
+            <ul>
+                <li>Hover the word redaction tool over a word so that a dashed box appears around the
+                word.</li>
+                <li>Press ctrl+s to save and move to the next document.</li>
+                <li>Confirm that no exceptions are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4504]</b> Confirm that redactions drawn with the word redaction tool
+            must be within the image.</li>
+        <p>
+            <li><b>[FlexIDSCore #4507]</b> Exception on cancel
+            <ul>
+                <li>Select the word redaction tool. Hold the shift key and click and drag to begin
+                drawing a redaction in pixel-fitting mode.</li>
+                <li>Before releasing the mouse button, press the context menu key and use the keyboard
+                to select one of the other tools.</li>
+                <li>Select the word redaction tool again. Hold the shift key and begin to draw a 
+                pixel-fit redaction again.</li>
+                <li>Before releasing the mouse button, right click to cancel.</li>
+                <li>Confirm that no exceptions are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4510]</b> Select the rectangular redaction tool and confirm that 
+            clicking in the image viewer does not create a new redaction.</li>
+        <p>
+            <li><b>[FlexIDSCore #4534]</b> Duplicate
+            <ul>
+                <li>Open TestImage001.tif for verification.</li>
+                <li>Use the word redaction tool to redact the words "CURRENT" and "CHILD" from the
+                document title.</li>
+                <li>Use the word redaction tool to redact just the word "CURRENT".</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>Magnifier window issues</b>
+        <ul>
+            <li><b>[FlexIDSCore #4513]</b> Confirm the presence of the magnifier window in the 
+            ID Shield verification UI.</li>
+            <li><b>[FlexIDSCore #4514]</b> Confirm that the redaction fill color always fills 
+            redactions displayed in the magnifier window as appropriate.</li>
+        <p>
+            <li><b>[FlexIDSCore #4515]</b> Magnifier window on fit to page/width
+            <ul>
+                <li>Open an image for verification.</li>
+                <li>Open the magnifier window.</li>
+                <li>Confirm that the magnifier window remains zoomed in appropriately when you fit to
+                page or fit to width.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4517]</b> With the magnifier window open, select the zoom tool 
+            and click and drag in the image viewer. Confirm that no unreasonable flicker is 
+            seen.</li>
+        <p>
+            <li><b>[FlexIDSCore #4518]</b> Scroll/refresh issues
+            <ul>
+                <li>Confirm that the main image viewer window is refreshing appropriately.</li>
+                <li>Zoom in close to the bottom of a page with the magnifier window open.</li>
+                <li>Press w to fit to width.</li>
+                <li>Confirm that no unexpected scrolling occurs.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4520]</b> Try to draw a redaction that outside the edge of an
+            image, and confirm that the magnifier window does not show the redaction.</li>
+        <p>
+            <li><b>[FlexIDSCore #4521]</b> Slideshow + magnifier
+            <ul>
+                <li>Configure the slideshow feature to advance every second.</li>
+                <li>Open the magnifier window.</li>
+                <li>Start the slideshow. Keep the cursor in the image window.</li>
+                <li>Confirm that the slideshow advances as expected.</li>
+            </ul><li>
+        <p>
+            <li><b>[FlexIDSCore #4522]</b> Undock the magnifier window and make it very large and
+            very small; confirm that in all circumstances it remains appropriately centered on the
+            cursor.</li>
+        <p>
+            <li><b>[FlexIDSCore #4523]</b> Zoom in and pan around the image; confirm that the
+            magnifier window remains still during the pan tracking event.</li>
+        <p>
+            <li><b>[FlexIDSCore #4524]</b> More scrolling
+            <ul>
+                <li>Zoom in on an image with the magnifier open.</li>
+                <li>Move the mouse around near the top of the screen.</li>
+                <li>Confirm that no unexpected scrolling occurs.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4531, #4532]</b> Thumbnail viewer/magnifier window
+            <ul>
+                <li>Set up verification to have the thumbnail viewer docked on the right side of
+                the image viewer and the magnifier docked at the bottom of the data window.</li>
+                <li>Close and reopen verification. Confirm that the thumbnail and magnifier 
+                locations were correctly persisted.</li>
+                <li>Close the thumbnail viewer, then close and reopen verification. Confirm 
+                correctly persisted locations.</li>
+                <li>Open the thumbnail viewer and close the magnifier, then close and reopen
+                verification. Confirm correctly persisted locations.</li>
+                <li>Close the thumbnail viewer, then close and reopen verification again. Confirm
+                correctly persisted locations.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4536]</b> Resizing
+            <ul>
+                <li>With the magnifier window open, use the selection tool to click on a grip
+                handle.</li>
+                <li>Confirm that the redaction size does not change.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4528]</b> Slideshow option spin control tweaks
+        <ul>
+            <li>Confirm that the spin control for slideshow options in verification is wide enough
+            to display all valid values.</li>
+            <li>Confirm that the arrows in the spin control can't be used to set the value to an
+            invalid value.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4529]</b> Confirm that the zoom level slider in verification options
+        is drawn in the same color as the rest of the window background.</li>
+    <p>
+        <li><b>FAM issues</b>
+        <ul>
+            <li><b>[LegacyRC #5921]</b> Confirm that the Processing Setup tab of the FAM uses the
+            Ultimate Grid and that it functions correctly.</li>
+        <p>
+            <li><b>[LegacyRC #5955]</b> CopyMoveDelete
+            <ul>
+                <li>Confirm that the CopyMoveDelete task has been modified to support the
+                modification of SourceDocName in the database.</li>
+                <li>Confirm that when that option is used, the user is prompted to confirm before
+                the config page closes.</li>
+                <li>Confirm that iff the task is configured to modify SourceDocName, the user is
+                prompted for the database admin password when starting to process files.</li>
+                <li>Confirm that if the Copy/Move succeeds but the SourceDocName change fails,
+                the logged exception unambiguously indicates what happened.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5967, #5969, #6970, #5971</b> Modify SourceDocName task
+            <ul>
+                <li>Confirm that the task exists.</li>
+                <li>Confirm that the user is prompted for confirmation after configuring the 
+                task.</li>
+                <li>Confirm that the task prompts for the database admin password before it 
+                runs.</li>
+            <p>
+                <li>Confirm that entering a target SourceDocName that includes single quotes does
+                not break the SQL query.</li>
+            <p>
+                <li>In the config dialog, leave the text box blank and hit OK.</li>
+                <li>Confirm that the error dialog that comes up is easily understood.</li>
+            <p>
+                <li>Open the config dialog.</li>
+                <li>Confirm that it does not get a separate entry in the Windows task bar.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5968]</b> Message on failed authentication
+            <ul>
+                <li>Configure a Set File Priority or Modify SourceDocName task.</li>
+                <li>Hit the play button.</li>
+                <li>When prompted for the database password, enter a blank or incorrect password
+                and hit OK.</li>
+                <li>Confirm that the authentication failure dialog that appears contains
+                reasonable text (for instance, it should not mention skipped files).</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>DB Admin issues</b>
+        <ul>
+            <li><b>[LegacyRC #5950]</b> Confirm that the set file action status target action and
+            status default to blank.</li>
+        <p>
+            <li><b>[LegacyRC #5961]</b> Updating database schema
+            <ul>
+                <li>Get a FLEX Index server license.</li>
+                <li>Connect to an ID Shield database with an out-of-date schema version.</li>
+                <li>Confirm that you are prompted to update.</li>
+                <li>Confirm that you cannot actually update, because the database contains 
+                components that are not currently licensed.</li>
+                <li>Get an ID Shield server license.</li>
+                <li>Confirm that the ID Shield database can be updated correctly.</li>
+                <li>Connect to a FLEX Index database with an out-of-date-schema version.</li>
+                <li>Confirm that you are prompted to update.</li>
+                <li>Confirm that the upgrade does not add/update components specific to ID Shield
+                that are not present in the original database.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5962]</b> Confirm that the application's title bar reads "[DB] on
+            [Server]".</li>
+        <p>
+            <li><b>[LegacyRC #5963]</b> Confirm that the application's location is persisted.</li>
+        <p>
+            <li><b>[LegacyRC #5964]</b> Confirm that databases can be created and cleared.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5954]</b> After install, confirm that no licensing exceptions related to
+        the FAMServiceDatabaseManager were logged.</li>
+    <p>
+        <li><b>[LegacyRC #5972]</b> SourceDocName change history table
+        <ul>
+            <li>Create a new database.</li>
+            <li>Confirm that the DBInfo table includes a StoreSourceDocNameChangeHistory setting
+            that defaults to 1.</li>
+            <li>Confirm the presence of a SourceDocNameChange table with the following columns:
+            <ul>
+                <li>ID</li>
+                <li>File ID</li>
+                <li>FromFileName</li>
+                <li>ToFileName</li>
+                <li>TimeStamp</li>
+                <li>MachineID</li>
+                <li>UserID</li>
+            </ul></li>
+            <li>Confirm that SourceDocName changes are logged appropriately as determined by the
+            DBInfo table setting.</li>
+        </ul></li>
+    </ul></li>
+    
+<p>
+    <LI><h3>Automated Testing</h3>
+    <ul>
+        <LI>Automated Tests
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Document Classification
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Redaction
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Indexing
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+    </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+<p>
+        <li>64-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+    </ul></LI>
+</OL>
+</BODY>
+</HTML>

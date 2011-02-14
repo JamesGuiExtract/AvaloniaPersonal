@@ -1,0 +1,206 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.126 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.126 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>[DataEntry #1045]</b>
+        <ul>
+            <li>TBD
+        </ul></li>
+    <p>
+        <li><b>[DNRCAU #582]</b>
+        <ul>
+            <li>Confirm that the FDRS service is installed with ID Shield and FLEX Index.</li>
+            <li>Confirm that it works correctly.</li>
+        </ul></li>
+    <p>
+        <li><b>[DNRCAU #583, #590, #591, #594]</b> Schema updating
+        <ul>
+            <li>Confirm that the ESFAMService database includes a column for the number of
+            instances of each .fps file to run.</li>
+            <li>Open the SQLCDBEditor. Confirm that the status bar will display correctly in the
+            following situations:
+            <ul>
+                <li>current schema</li>
+                <li>schema needs to be updated</li>
+                <li>schema unrecognized</li>
+                <li>schema is newer than current</li>
+            </ul></li>
+        </ul></li>
+    <p> 
+        <li><b>[DNRCAU #589]</b>
+        <ul>
+            <li>Open an image in the Extract Image Viewer.</li>
+            <li>Click on the Auto-Hide button in the thumbnail viewer. Confirm that the viewer is
+            hidden.</li>
+            <li>Click the Show/Hide thumbnails button. Confirm that the thumbnail fiewer is
+            closed.</li>
+            <li>Click Show/Hide again. Confirm that the thumbnail viewer is still autohidden when
+            it is reopened.
+        </ul></li>
+    <p>
+        <li><b>[DNRCAU #592]</b>
+        <ul>
+            <li>Confirm that the Data Entry task can be run.</li>
+        </ul></li>
+    <p>
+        <li><b>[DNRCAU #593]</b>
+        <ul>
+            <li>Confirm the presence of a Set File Priority task.</li>
+            <li>Confirm that a FLEX Index or ID Shield server license is required to run it.</li>
+            <li>Confirm that it does what it says on the tin.</li>
+        </ul></li>
+    <p>
+        <li><b>FlexIDSCore #4277, #4289, #4398, #4470, #4488, #4489, #4490]</b> ID Shield 
+        Verification
+        <ul>
+            <li>Draw an angular redaction over some text.</li>
+            <li>Use the autofit tool in the context menu to block fit the redaction.</li>
+            <li>Confirm that applying the autofit tool again does not further change the redaction
+            size/shape.</li>
+            <li>Repeat the test a few times and confirm that the initial autofit size is always
+            final.</li>
+        <p>
+            <li>Confirm that the ID Shield options can be set to select the <b>Zoom</b> tool
+            immediately after drawing a redaction.</li>
+        <p>
+            <li>Set up an .fps file to run single-threaded with verification and additional tasks
+            such that there will be a longish waiting period between document.</li>
+            <li>Start processing; save the fist document.</li>
+            <li>Before the next file loads, press <b>ctrl+shift+tab</b> to navigate to the 
+            previous document.</li>
+            <li>Confirm that the keyboard shortcut has no effect when no document is open.</li>
+        <p>
+            <li>Confirm the presence and functionality of the slideshow feature
+            <ul>
+                <li>Confirm that there are task-level configuration settings that determine
+                whether or not the feature is available in the UI, when it should be automatically
+                paused, and what (if any) tags or file action statuses should be applied to 
+                documents that are auto-advanced.</li>
+                <li>Confirm that those settings work correctly.</li>
+                <li>Confirm that settings in the verification UI determine how many seconds to
+                pause on each document and whether or not the slideshow should begin as soon as
+                verification opens.</li>
+                <li>Confirm that those settings also work correctly.</li>
+                <li>Confirm that the slideshow pauses on any user interaction.</li>
+            </ul></li>
+        <p>
+            <li>Confirm that block-fitted and line-fitted redactions unambiguously completely
+            cover all black pixels over which they are drawn.</li>
+        <P>
+            <li>Verify an image that is rotated 90 degrees.</li>
+            <li>Rotate the image so that it is vertical.</li>
+            <li>Make a redaction while holding the shift key to line-fit the redaction.</li>
+            <li>Confirm that the redaction is drawn correctly.</li>
+        <p>
+            <li>Confirm the presence and correct behavior of the magic (word) redaction tool.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4456]</b>
+        <ul>
+            <li>Open the rule tester.</li>
+            <li>Confirm that the <b>Perform OCR</b> box is checked.</li>
+            <li>Paste the path to an image into the filename box.</li>
+            <li>Add a space at the end.</li>
+            <li>Hit the play button or click in the text box that displays the input text.</li>
+            <li>Confirm that the image is OCRed.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4468]</b>
+        <ul>
+            <li>Confirm that the party finder national ruleset tests for financing statements all
+            pass.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4486]</b>
+        <ul>
+            <li>Open the ID Shield Statistics Reporter.</li>
+            <li>In the Analyze tab, confirm that <b>Manual</b> is one of the options for data
+            items to consider redacted.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5926]</b>
+        <ul>
+            <li>Confirm that no errors are seen processing with multiple FAMs on the same machine
+            using the same database.</li>
+            <li>Confirm that no errors are seen processing with multiple FAMs on the same machine 
+            using different databases.</li>
+            <li>Confirm that no errors are seen processing with multiple FAMS on separate test
+            machines pointing at the same database.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5940, #5942, #5949]</b>
+        <ul>
+            <li>Confirm that a new database can be created.</li>
+            <li>Confirm that a list of files in the <b>Unattempted</b> state can be exported from
+            the DB Admin.</li>
+            <li>Confirm that a context menu option exists to set file action status or export a
+            list of all files in a particular cell of the summary tab.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5941, #5952, #5953]</b>
+        <ul>
+            <li>TBD
+        </ul>
+    <p>
+        <li><b>[LegacyRC #5947, #5948]</b> UEX Viewer
+        <ul>
+            <li>Confirm that <b>Ctrl+I</b> inverts your current selection in the UEX Viewer.</li>
+            <li>Confirm that context menu options exist to select all UEX Log entries with
+            matching top-level exceptions or all entries with matching exception hierarchies.</li>
+        </ul></li>
+    </ul></li>
+<p>
+    <LI><h3>Automated Testing</h3>
+    <ul>
+        <LI>Automated Tests
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Document Classification
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Redaction
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Indexing
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+    </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+<p>
+        <li>64-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+    </ul></LI>
+</OL>
+</BODY>
+</HTML>
