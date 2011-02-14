@@ -90,7 +90,8 @@ namespace Extract.Imaging.Forms
         /// May be <see langword="null"/> if no keys are associated with the menu item.</returns>
         protected override Keys[] GetKeys()
         {
-            return null;
+            return ImageViewer == null ? null :
+                ImageViewer.Shortcuts.GetKeys(base.ImageViewer.ToggleRedactionTool);
         }
 
         /// <summary>

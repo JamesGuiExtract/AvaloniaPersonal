@@ -3218,6 +3218,58 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                ModifySelectedHighlights((highlight, quietSetData) =>
+                    BlockFitHighlight(highlight, quietSetData));
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31624", ex);
+            }
+        }
+
+        /// <summary>
+        /// Shrinks each side of all <see cref="Highlight"/> or
+        /// <see cref="CompositeHighlightLayerObject"/>s in the current selection by 1 pixel.
+        /// </summary>
+        internal void ShrinkSelectedZones()
+        {
+            try
+            {
+                ModifySelectedHighlights((highlight, quietSetData) =>
+                    InflateHighlight(highlight, quietSetData, -1, -1, -1, -1));
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31623", ex);
+            }
+        }
+
+        /// <summary>
+        /// Enlarges each side of all <see cref="Highlight"/> or
+        /// <see cref="CompositeHighlightLayerObject"/>s in the current selection by 1 pixel.
+        /// </summary>
+        internal void EnlargeSelectedZones()
+        {
+            try
+            {
+                ModifySelectedHighlights((highlight, quietSetData) =>
+                    InflateHighlight(highlight, quietSetData, 1, 1, 1, 1));
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31622", ex);
+            }
+        }
+
+        /// <summary>
+        /// Modifies every <see cref="Highlight"/> or <see cref="CompositeHighlightLayerObject"/> in
+        /// the current selection by performing the specified <see paramref="modificationDelegate"/>.
+        /// </summary>
+        /// <param name="modificationDelegate">The modification delegate.</param>
+        void ModifySelectedHighlights(ModifyHighlightDelegate modificationDelegate)
+        {
+            try
+            {
                 using (new TemporaryWaitCursor())
                 {
                     // Get the list of selected layer objects
@@ -3226,32 +3278,32 @@ namespace Extract.Imaging.Forms
                     // Iterate through the list of selected objects
                     foreach (LayerObject layerObject in objects)
                     {
-                        // If the object is a single highlight, attempt to block fit it.
+                        // If the object is a single highlight, perform the modification.
                         Highlight highlight = layerObject as Highlight;
                         if (highlight != null)
                         {
                             // Fit the highlight (pass false so that layer object changed
                             // events are raised)
-                            BlockFitHighlight(highlight, false);
+                            modificationDelegate(highlight, false);
 
                             continue;
                         }
 
-                        // If the object is a composite highlight object, attempt
-                        // to fit each internal highlight
+                        // If the object is a composite highlight object, attempt to perform the
+                        // modification on each internal highlight.
                         CompositeHighlightLayerObject composite =
                             layerObject as CompositeHighlightLayerObject;
                         if (composite != null)
                         {
                             foreach (Highlight compositeHighlight in composite.Objects)
                             {
-                                // Fit the highlight (pass true so that layer object
-                                // changed events are not raised)
-                                BlockFitHighlight(compositeHighlight, true);
+                                // Perform the modification on the highlight (pass true so that
+                                // layer object changed events are not raised)
+                                modificationDelegate(compositeHighlight, true);
                             }
 
-                            // Set the dirty flag (which will also raise
-                            // the layer object changed event).
+                            // Set the dirty flag (which will also raise the layer object changed
+                            // event).
                             composite.Dirty = true;
                         }
                     }
@@ -3284,6 +3336,31 @@ namespace Extract.Imaging.Forms
                 // Update the highlights spatial data with the fitted zone
                 highlight.SetSpatialData(zone, quietSetData);
             }
+        }
+
+        /// <summary>
+        /// Inflates each side the specified <see paramref="highlight"/> by the specified number of
+        /// pixels.
+        /// </summary>
+        /// <param name="highlight">The <see cref="Highlight"/> to modify.</param>
+        /// <param name="quietSetData"><see langword="true"/> if the
+        /// <see cref="Highlight.SetSpatialData(RasterZone, bool)"/> call should raise a
+        /// layer object changed event, <see langword="false"/> otherwise.</param>
+        /// <param name="left">The number of pixels to inflate the left side.</param>
+        /// <param name="top">The number of pixels to inflate the top side.</param>
+        /// <param name="right">The number of pixels to inflate the right side.</param>
+        /// <param name="bottom">The number of pixels to inflate the bottom side.</param>
+        static void InflateHighlight(Highlight highlight, bool quietSetData, int left, int top, int right,
+            int bottom)
+        {
+            // Get the fitted zone and use it to inflate the sides by the specified distances.
+            FittingData data = new FittingData(highlight.ToRasterZone());
+            data.InflateSide(Side.Left, left);
+            data.InflateSide(Side.Top, top);
+            data.InflateSide(Side.Right, right);
+            data.InflateSide(Side.Bottom, bottom);
+
+            highlight.SetSpatialData(data.ToRasterZone(), quietSetData);
         }
 
         /// <summary>
@@ -4102,6 +4179,11 @@ namespace Extract.Imaging.Forms
             // Go to previous layer object
             _mainShortcuts[Keys.F3 | Keys.Shift] = GoToPreviousLayerObject;
             _mainShortcuts[Keys.Control | Keys.Oemcomma] = GoToPreviousLayerObject;
+
+            // Fit/shrink/enlarge selected zones.
+            _mainShortcuts[Keys.K] = BlockFitSelectedZones;
+            _mainShortcuts[Keys.OemMinus] = ShrinkSelectedZones;
+            _mainShortcuts[Keys.Oemplus] = EnlargeSelectedZones;
 
             // Increase highlight height
             _captureShortcuts[Keys.Oemplus] = IncreaseHighlightHeight;

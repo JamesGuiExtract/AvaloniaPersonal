@@ -1798,6 +1798,9 @@ namespace Extract.Redaction.Verification
                 // Full screen mode.
                 _imageViewer.Shortcuts[Keys.F11] = ToggleFullScreen;
 
+                // Magnifier window
+                _imageViewer.Shortcuts[Keys.F12] = (() => _magnifierToolStripButton.PerformClick());
+
                 if (_settings.LaunchInFullScreenMode)
                 {
                     _formStateManager.FullScreen = true;

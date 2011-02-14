@@ -462,6 +462,15 @@ namespace Extract.Imaging.Forms
         /// </summary>
         delegate void PostPaintDelegate(PaintEventArgs e);
 
+        /// <summary>
+        /// Delegate for modifying the spatial info of highlights.
+        /// </summary>
+        /// <param name="highlight">The <see cref="Highlight"/> to modify.</param>
+        /// <param name="quietSetData">Whether or not the
+        /// <see cref="Highlight.SetSpatialData(RasterZone, bool)"/> call should raise a
+        /// layer object changed event.</param>
+        delegate void ModifyHighlightDelegate(Highlight highlight, bool quietSetData);
+
         #endregion Delegates
 
         #region Image Viewer Events

@@ -92,8 +92,18 @@ namespace Extract.Imaging.Forms
         /// May be <see langword="null"/> if no keys are associated with the menu item.</returns>
         protected override Keys[] GetKeys()
         {
-            return base.ImageViewer == null ? null :
-                base.ImageViewer.Shortcuts.GetKeys(base.ImageViewer.SelectRectangularHighlightTool);
+            Keys[] keys = null;
+
+            if (ImageViewer != null)
+            {
+                keys = ImageViewer.Shortcuts.GetKeys(ImageViewer.SelectRectangularHighlightTool);
+                if (keys.Length == 0)
+                {
+                    keys = ImageViewer.Shortcuts.GetKeys(ImageViewer.ToggleHighlightTool);
+                }
+            }
+
+            return keys;
         }
 
         /// <summary>

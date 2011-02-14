@@ -326,6 +326,18 @@
     <Compile Include="MenuItems\CloseImageToolStripMenuItem.Designer.cs">
       <DependentUpon>CloseImageToolStripMenuItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="MenuItems\EnlargeSelectionToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\EnlargeSelectionToolStripMenuItem.Designer.cs">
+      <DependentUpon>EnlargeSelectionToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\ShrinkSelectionToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\ShrinkSelectionToolStripMenuItem.Designer.cs">
+      <DependentUpon>ShrinkSelectionToolStripMenuItem.cs</DependentUpon>
+    </Compile>
     <Compile Include="MenuItems\WordHighlightToolStripMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>

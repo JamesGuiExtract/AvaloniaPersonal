@@ -1021,7 +1021,29 @@ namespace Extract.Imaging.Forms
         /// Constant string for the block fit selections menu item text.
         /// </summary>
         public const string _BLOCK_FIT_SELECTION_MENU_ITEM_TEXT =
-            "&Block fit selection";
+            "Auto-shrin&k selection";
+
+        /// <summary>
+        /// Constant string for the shrink selection menu item text.
+        /// </summary>
+        public const string _SHRINK_SELECTION_MENU_ITEM_TEXT =
+            "Shrink selection";
+
+        /// <summary>
+        /// Constant string for the shrink selection menu item image.
+        /// </summary>
+        public const string _SHRINK_SELECTION_MENU_ITEM_IMAGE = null;
+
+        /// <summary>
+        /// Constant string for the enlarge selection menu item text.
+        /// </summary>
+        public const string _ENLARGE_SELECTION_MENU_ITEM_TEXT =
+            "Enlarge selection";
+
+        /// <summary>
+        /// Constant string for the enlarge selection menu item image.
+        /// </summary>
+        public const string _ENLARGE_SELECTION_MENU_ITEM_IMAGE = null;
 
         #endregion
 
