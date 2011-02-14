@@ -96,6 +96,12 @@ public:
 		VARIANT_BOOL* pvbIsItalic, long* plFontSize);
 	STDMETHOD(get_PdfPasswordSettings)(IPdfPasswordSettings** ppPdfSettings);
 	STDMETHOD(put_PdfPasswordSettings)(IPdfPasswordSettings* pPdfSettings);
+	STDMETHOD(get_TextToReplace)(BSTR* pbstrTextToReplace);
+	STDMETHOD(put_TextToReplace)(BSTR bstrTextToReplace);
+	STDMETHOD(get_ReplacementText)(BSTR* pbstrReplacementText);
+	STDMETHOD(put_ReplacementText)(BSTR bstrReplacementText);
+	STDMETHOD(get_AutoAdjustTextCasing)(VARIANT_BOOL* pvbAdjustCasing);
+	STDMETHOD(put_AutoAdjustTextCasing)(VARIANT_BOOL vbAdjustCasing);
 
 // IFileProcessingTask
 	STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB *pDB);

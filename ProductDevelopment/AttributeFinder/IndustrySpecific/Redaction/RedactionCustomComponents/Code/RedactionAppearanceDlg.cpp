@@ -48,6 +48,9 @@ const ColorOption gcoCOLOR_OPTIONS[] =
 //-------------------------------------------------------------------------------------------------
 RedactionAppearanceOptions::RedactionAppearanceOptions()
  : m_strText(""),
+   m_strTextToReplace(""),
+   m_strReplacementText(""),
+   m_bAdjustTextCasing(false),
    m_crBorderColor(0),
    m_crFillColor(0),
    m_iPointSize(8)
@@ -91,6 +94,9 @@ string RedactionAppearanceOptions::getFontAsString()
 void RedactionAppearanceOptions::reset()
 {
 	m_strText = "";
+	m_strTextToReplace = "";
+	m_strReplacementText = "";
+	m_bAdjustTextCasing = false;
 	m_crBorderColor = 0;
 	m_crFillColor = 0;
 	memset(&m_lgFont, 0, sizeof(LOGFONT));
@@ -173,11 +179,15 @@ void CRedactionAppearanceDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_BORDER_COLOR, m_comboBorderColor);
 	DDX_Control(pDX, IDC_COMBO_FILL_COLOR, m_comboFillColor);
 	DDX_Control(pDX, IDC_EDIT_FONT, m_editFontDescription);
+	DDX_Control(pDX, IDC_CHECK_REPLACE_TEXT, m_checkReplaceText);
+	DDX_Control(pDX, IDC_EDIT_REPLACE_TEXT, m_editTextToReplace);
+	DDX_Control(pDX, IDC_EDIT_REPLACEMENT_TEXT, m_editReplacementText);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CRedactionAppearanceDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_SELECT_FONT, &CRedactionAppearanceDlg::OnBnClickedButtonSelectFont)
 	ON_BN_CLICKED(IDC_BUTTON_REDACTION_TEXT_TAG, &CRedactionAppearanceDlg::OnBnClickedButtonRedactionTextTag)
+	ON_BN_CLICKED(IDC_CHECK_REPLACE_TEXT, &CRedactionAppearanceDlg::OnCheckChangedCheckReplaceText)
 	ON_CBN_SELENDCANCEL(IDC_COMBO_REDACTION_TEXT, &CRedactionAppearanceDlg::OnCbnSelendcancelComboRedactionText)
 	ON_CBN_EDITCHANGE(IDC_COMBO_REDACTION_TEXT, &CRedactionAppearanceDlg::OnCbnEditchangeComboRedactionText)
 	ON_CBN_SELCHANGE(IDC_COMBO_REDACTION_TEXT, &CRedactionAppearanceDlg::OnCbnSelchangeComboRedactionText)
@@ -214,6 +224,18 @@ BOOL CRedactionAppearanceDlg::OnInitDialog()
 
 		// Set redaction text
 		m_comboText.SetWindowText(m_options.m_strText.c_str());
+		if (!m_options.m_strTextToReplace.empty())
+		{
+			m_checkReplaceText.SetCheck(BST_CHECKED);
+			m_editTextToReplace.SetWindowText(m_options.m_strTextToReplace.c_str());
+			m_editReplacementText.SetWindowText(m_options.m_strReplacementText.c_str());
+		}
+		else
+		{
+			m_checkReplaceText.SetCheck(BST_UNCHECKED);
+			m_editTextToReplace.EnableWindow(FALSE);
+			m_editReplacementText.EnableWindow(FALSE);
+		}
 
 		// Set colors
 		m_comboBorderColor.SetCurSel( getIndexFromColor(m_options.m_crBorderColor) );
@@ -236,6 +258,18 @@ void CRedactionAppearanceDlg::OnOK()
 		CString zText;
 		m_comboText.GetWindowText(zText);
 		m_options.m_strText = zText;
+		if (m_checkReplaceText.GetCheck() == BST_CHECKED)
+		{
+			m_editTextToReplace.GetWindowText(zText);
+			m_options.m_strTextToReplace = zText;
+			m_editReplacementText.GetWindowText(zText);
+			m_options.m_strReplacementText = zText;
+		}
+		else
+		{
+			m_options.m_strTextToReplace = "";
+			m_options.m_strReplacementText = "";
+		}
 
 		// Set the border color
 		int selection = m_comboBorderColor.GetCurSel();
@@ -375,6 +409,17 @@ void CRedactionAppearanceDlg::OnCbnSelchangeComboRedactionText()
 		updateSampleRedactionText(strText);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24955")
+}
+//-------------------------------------------------------------------------------------------------
+void CRedactionAppearanceDlg::OnCheckChangedCheckReplaceText()
+{
+	try
+	{
+		BOOL bEnable = asMFCBool(m_checkReplaceText.GetCheck() == BST_CHECKED);
+		m_editTextToReplace.EnableWindow(bEnable);
+		m_editReplacementText.EnableWindow(bEnable);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31663");
 }
 //-------------------------------------------------------------------------------------------------
 

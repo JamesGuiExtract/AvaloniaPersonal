@@ -14,6 +14,9 @@ struct RedactionAppearanceOptions
 {
 	// Variables
 	string m_strText;
+	string m_strTextToReplace;
+	string m_strReplacementText;
+	bool m_bAdjustTextCasing;
 	COLORREF m_crBorderColor;
 	COLORREF m_crFillColor;
 	LOGFONT m_lgFont;
@@ -54,6 +57,7 @@ protected:
 	afx_msg void OnCbnSelendcancelComboRedactionText();
 	afx_msg void OnCbnEditchangeComboRedactionText();
 	afx_msg void OnCbnSelchangeComboRedactionText();
+	afx_msg void OnCheckChangedCheckReplaceText();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -66,6 +70,9 @@ private:
 	// Text
 	CComboBox m_comboText;
 	CButton m_buttonTextTag;
+	CButton m_checkReplaceText;
+	CEdit m_editTextToReplace;
+	CEdit m_editReplacementText;
 	CEdit m_editSampleText;
 
 	// Color

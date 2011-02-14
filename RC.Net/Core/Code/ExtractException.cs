@@ -1548,5 +1548,26 @@ namespace Extract
         {
             ExtractException.Log(eliCode, ex);
         }
+
+        /// <summary>Logs the exception to the Extract exception log.</summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="eliCode">The eli code to associate with the exception.</param>
+        /// <param name="logFileName">The name of the exception log file to log to.</param>
+        public static void ExtractLog(this Exception ex, string eliCode, string logFileName)
+        {
+            ExtractException.Log(logFileName, eliCode, ex);
+        }
+
+        /// <summary>
+        /// Wraps the exception as a COM visible <see cref="ExtractException"/>.
+        /// </summary>
+        /// <param name="ex">The exception to wrap.</param>
+        /// <param name="eliCode">The eli code.</param>
+        /// <param name="message">The message.</param>
+        /// <returns>A COM visible <see cref="ExtractException"/></returns>
+        public static ExtractException CreateComVisible(this Exception ex, string eliCode, string message)
+        {
+            return ExtractException.CreateComVisible(eliCode, message, ex);
+        }
     }
 }

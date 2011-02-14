@@ -8,761 +8,776 @@ import "oaidl.idl";
 import "ocidl.idl";
 
 [
-	uuid(18CF5BEC-2929-43DD-86E0-7D50F152663A),
-	version(1.0),
-	helpstring("UCLID RedactionCustomComponents 1.0 Type Library")
+    uuid(18CF5BEC-2929-43DD-86E0-7D50F152663A),
+    version(1.0),
+    helpstring("UCLID RedactionCustomComponents 1.0 Type Library")
 ]
 library UCLID_REDACTIONCUSTOMCOMPONENTSLib
 {
-	importlib("stdole32.tlb");
-	importlib("stdole2.tlb");
-	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
-	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
-	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
-	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
-	importlib("..\..\..\..\AFCore\Code\AFCore.tlb");
-	importlib("c:\Program Files\Common Files\System\ADO\msado27.tlb");
-	importlib("..\..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.tlb");
+    importlib("stdole32.tlb");
+    importlib("stdole2.tlb");
+    importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+    importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+    importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+    importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
+    importlib("..\..\..\..\AFCore\Code\AFCore.tlb");
+    importlib("c:\Program Files\Common Files\System\ADO\msado27.tlb");
+    importlib("..\..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.tlb");
 
 
-	/////////////
-	//Enums
-	/////////////
-	typedef 
-	[
-		uuid(4F270408-3CDB-418d-BBC1-5EAED2574CEB),
-		helpstring("ID Shield Data File Contents Condition missing file action")
-	]
+    /////////////
+    //Enums
+    /////////////
+    typedef 
+    [
+        uuid(4F270408-3CDB-418d-BBC1-5EAED2574CEB),
+        helpstring("ID Shield Data File Contents Condition missing file action")
+    ]
     enum
-	{
-		kThrowError = 0,
-		kConsiderSatisfied = 1,
+    {
+        kThrowError = 0,
+        kConsiderSatisfied = 1,
         kConsiderUnsatisfied = 2
     } EMissingVOAFileBehavior;
 
-	typedef
-	[
-		uuid(770A2666-F7EC-45fd-9A42-A6F97EC5F3BD),
-		helpstring("ID Shield Data File Contents Condition attribute quantifiers")
-	]
-	enum
-	{
-		// Does not contain any of the attributes
-		kNone = 0,
+    typedef
+    [
+        uuid(770A2666-F7EC-45fd-9A42-A6F97EC5F3BD),
+        helpstring("ID Shield Data File Contents Condition attribute quantifiers")
+    ]
+    enum
+    {
+        // Does not contain any of the attributes
+        kNone = 0,
 
-		// Contains at least one of any of attributes
-		kAny = 1,
+        // Contains at least one of any of attributes
+        kAny = 1,
 
-		// Contains at least one of each of the attributes
-		kOneOfEach = 2,
+        // Contains at least one of each of the attributes
+        kOneOfEach = 2,
 
-		// Contains at least one of any of the attributes and no other attributes
-		kOnlyAny = 3,
+        // Contains at least one of any of the attributes and no other attributes
+        kOnlyAny = 3,
 
-		// The number of total attribute quantifiers
-		kNumQuantifiers = 4
+        // The number of total attribute quantifiers
+        kNumQuantifiers = 4
 
-		// NOTE: kNumQuantifiers should be incremented when adding new quantifiers
-	} EAttributeQuantifier;
+        // NOTE: kNumQuantifiers should be incremented when adding new quantifiers
+    } EAttributeQuantifier;
 
-	typedef
-	[
-		uuid(3A992D9A-79DF-4DA2-A1CC-E1BCF33D6048),
-		helpstring("ID Shield feedback collection options")
-	]
-	enum
-	{
-		kFeedbackCollectNone = 0,     // Do not collect feedback 
-		kFeedbackCollectRedact = 1,   // Collect feedback for all verified images with redactions
-		kFeedbackCollectCorrect = 2,  // Collect feedback for all images with user corrections
+    typedef
+    [
+        uuid(3A992D9A-79DF-4DA2-A1CC-E1BCF33D6048),
+        helpstring("ID Shield feedback collection options")
+    ]
+    enum
+    {
+        kFeedbackCollectNone = 0,     // Do not collect feedback 
+        kFeedbackCollectRedact = 1,   // Collect feedback for all verified images with redactions
+        kFeedbackCollectCorrect = 2,  // Collect feedback for all images with user corrections
 //		kFeedbackCollectNoRedact = 4, // Collect feedback for all unredacted, uncorrected images
-		kFeedbackCollectAll = 7       // Collect feedback for all verified images
-	} EFeedbackCollectOption;
+        kFeedbackCollectAll = 7       // Collect feedback for all verified images
+    } EFeedbackCollectOption;
 
-	/////////////
-	// Interfaces
-	/////////////
-	[
-		object,
-		uuid(0620C574-4CB8-4C73-83D1-1C2D3E56138B),
-		dual,
-		helpstring("IRedactionVerificationUI Interface"),
-		pointer_default(unique)
-	]
-	interface IRedactionVerificationUI : IDispatch
-	{
-		[id(1), helpstring("method ShowUI")] HRESULT ShowUI(BSTR strFileName);
-		[propget, id(3), helpstring("property ReviewAllPages")] HRESULT ReviewAllPages([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(3), helpstring("property ReviewAllPages")] HRESULT ReviewAllPages([in] VARIANT_BOOL newVal);
-		[propget, id(8), helpstring("property AlwaysOutputImage")] HRESULT AlwaysOutputImage([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(8), helpstring("property AlwaysOutputImage")] HRESULT AlwaysOutputImage([in] VARIANT_BOOL newVal);
-		[propget, id(9), helpstring("property OutputImageName")] HRESULT OutputImageName([out, retval] BSTR* pVal);
-		[propput, id(9), helpstring("property OutputImageName")] HRESULT OutputImageName([in] BSTR newVal);
-		[propget, id(10), helpstring("property AlwaysOutputMeta")] HRESULT AlwaysOutputMeta([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(10), helpstring("property AlwaysOutputMeta")] HRESULT AlwaysOutputMeta([in] VARIANT_BOOL newVal);
-		[propget, id(11), helpstring("property MetaOutputName")] HRESULT MetaOutputName([out, retval] BSTR* pVal);
-		[propput, id(11), helpstring("property MetaOutputName")] HRESULT MetaOutputName([in] BSTR newVal);
-		// Option to persist any existing annotations into the output file
-		// Default setting is false
-		[propget, id(16), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(16), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([in] VARIANT_BOOL newVal);
-		// Option to apply redactions as annotations in the output file
-		// Default setting is false
-		[propget, id(17), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(17), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([in] VARIANT_BOOL newVal);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether to collect redaction accuracy feedback information
-		[propget, id(22), helpstring("property CollectFeedback")] HRESULT 
-			CollectFeedback([out, retval] VARIANT_BOOL* pvbCollectFeedback);
-		[propput, id(22), helpstring("property CollectFeedback")] HRESULT 
-			CollectFeedback([in] VARIANT_BOOL vbCollectFeedback);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Bitwise OR-ed mask determines whether to:
-		//          (1) kFeedbackCollectNone - do not collect feedback data
-		//          (2) kFeedbackCollectRedact - collect feedback for all verified redactions
-		//          (3) kFeedbackCollectCorrect - collect feedback for user-corrected redactions
-		//          (4) kFeedbackCollectAll - collect feedback for all verified documents
-		[propget, id(23), helpstring("property FeedbackCollectOption")] HRESULT 
-			FeedbackCollectOption([out, retval] EFeedbackCollectOption *peFeedbackCollectOption);
-		[propput, id(23), helpstring("property FeedbackCollectOption")] HRESULT
-			FeedbackCollectOption([in] EFeedbackCollectOption eFeedbackCollectOption);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Folder in which to store feedback data
-		[propget, id(24), helpstring("property FeedbackDataFolder")] HRESULT 
-			FeedbackDataFolder([out, retval] BSTR *pbstrFeedbackDataFolder);
-		[propput, id(24), helpstring("property FeedbackDataFolder")] HRESULT
-			FeedbackDataFolder([in] BSTR bstrFeedbackDataFolder);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether to store the original image in the feedback data folder
-		[propget, id(25), helpstring("property CollectFeedbackImage")] HRESULT 
-			CollectFeedbackImage([out, retval] VARIANT_BOOL *pvbCollectFeedbackImage);
-		[propput, id(25), helpstring("property CollectFeedbackImage")] HRESULT
-			CollectFeedbackImage([in] VARIANT_BOOL vbCollectFeedbackImage);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether to use the original filename for feedback documents (VARIANT_TRUE) or
-		//          whether to generate a unique filename for each document (VARIANT_FALSE)
-		[propget, id(26), helpstring("property FeedbackOriginalFilenames")] HRESULT 
-			FeedbackOriginalFilenames([out, retval] VARIANT_BOOL *pvbFeedbackOriginalFilenames);
-		[propput, id(26), helpstring("property FeedbackOriginalFilenames")] HRESULT
-			FeedbackOriginalFilenames([in] VARIANT_BOOL vbFeedbackOriginalFilenames);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether to require that users specify a type for all redactions (VARIANT_TRUE)
-		//			or whether to allow redactions to contain no type (VARIANT_FALSE)
-		//			Added as per [p16 #2833] - JDS 01/28/2008
-		[propget, id(27), helpstring("property RequireRedactionTypes")] HRESULT
-			RequireRedactionTypes([out, retval] VARIANT_BOOL* pvbRequireRedactionTypes);
-		[propput, id(27), helpstring("property RequireRedactionTypes")] HRESULT
-			RequireRedactionTypes([in] VARIANT_BOOL vbRequireRedactionTypes);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The full path to ID Shield data file to use as input. May contain tags
-		[propget, id(28), helpstring("property InputDataFile")] HRESULT InputDataFile(
-			[out, retval] BSTR *pbstrInputDataFile);
-		[propput, id(28), helpstring("property InputDataFile")] HRESULT InputDataFile(
-			[in] BSTR bstrInputDataFile);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether to use the redacted image as input if it already exists (VARIANT_TRUE)
-		//          or whether to use the original image (VARIANT_FALSE)
-		[propget, id(29), helpstring("property InputRedactedImage")] HRESULT InputRedactedImage(
-			[out, retval] VARIANT_BOOL *pvbInputRedactedImage);
-		[propput, id(29), helpstring("property InputRedactedImage")] HRESULT InputRedactedImage(
-			[in] VARIANT_BOOL vbInputRedactedImage);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether to require the verifier to apply an exemption code to each redaction
-		//          before continuing to the next document (VARIANT_TRUE) or whether the verifier
-		//          can continue to the next document without applying exemption codes (VARIANT_FALSE)
-		[propget, id(30), helpstring("property RequireExemptionCodes")] HRESULT RequireExemptionCodes(
-			[out, retval] VARIANT_BOOL *pvbRequireExemptionCodes);
-		[propput, id(30), helpstring("property RequireExemptionCodes")] HRESULT RequireExemptionCodes(
-			[in] VARIANT_BOOL vbRequireExemptionCodes);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Text to print on each output redaction. May contain tags.
-		[propget, id(31), helpstring("property RedactionText")] HRESULT RedactionText(
-			[out, retval] BSTR *pbstrRedactionText);
-		[propput, id(31), helpstring("property RedactionText")] HRESULT RedactionText(
-			[in] BSTR bstrRedactionText);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The border color of output redactions expressed as an RGB color.
-		[propget, id(32), helpstring("property BorderColor")] HRESULT BorderColor(
-			[out, retval] long *plBorderColor);
-		[propput, id(32), helpstring("property BorderColor")] HRESULT BorderColor(
-			[in] long lBorderColor);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The fill color of output redactions expressed as an RGB color.
-		[propget, id(33), helpstring("property FillColor")] HRESULT FillColor(
-			[out, retval] long *plFillColor);
-		[propput, id(33), helpstring("property FillColor")] HRESULT FillColor(
-			[in] long lFillColor);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The name of the font to use for redaction text.
-		[propget, id(34), helpstring("property FontName")] HRESULT FontName(
-			[out, retval] BSTR *pbstrFontName);
-		[propput, id(34), helpstring("property FontName")] HRESULT FontName(
-			[in] BSTR bstrFontName);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether the redaction text font is bold (VARIANT_TRUE).
-		[propget, id(35), helpstring("property IsBold")] HRESULT IsBold(
-			[out, retval] VARIANT_BOOL *pvbBold);
-		[propput, id(35), helpstring("property IsBold")] HRESULT IsBold(
-			[in] VARIANT_BOOL vbBold);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether the redaction text font is italic (VARIANT_TRUE).
-		[propget, id(36), helpstring("property IsItalic")] HRESULT IsItalic(
-			[out, retval] VARIANT_BOOL *pvbItalic);
-		[propput, id(36), helpstring("property IsItalic")] HRESULT IsItalic(
-			[in] VARIANT_BOOL vbItalic);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The size of the redaction text in points.
-		[propget, id(37), helpstring("property FontSize")] HRESULT FontSize(
-			[out, retval] long *plFontSize);
-		[propput, id(37), helpstring("property FontSize")] HRESULT FontSize([in] long lFontSize);
-		//-----------------------------------------------------------------------------------------
-	};
+    /////////////
+    // Interfaces
+    /////////////
+    [
+        object,
+        uuid(0620C574-4CB8-4C73-83D1-1C2D3E56138B),
+        dual,
+        helpstring("IRedactionVerificationUI Interface"),
+        pointer_default(unique)
+    ]
+    interface IRedactionVerificationUI : IDispatch
+    {
+        [id(1), helpstring("method ShowUI")] HRESULT ShowUI(BSTR strFileName);
+        [propget, id(3), helpstring("property ReviewAllPages")] HRESULT ReviewAllPages([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(3), helpstring("property ReviewAllPages")] HRESULT ReviewAllPages([in] VARIANT_BOOL newVal);
+        [propget, id(8), helpstring("property AlwaysOutputImage")] HRESULT AlwaysOutputImage([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(8), helpstring("property AlwaysOutputImage")] HRESULT AlwaysOutputImage([in] VARIANT_BOOL newVal);
+        [propget, id(9), helpstring("property OutputImageName")] HRESULT OutputImageName([out, retval] BSTR* pVal);
+        [propput, id(9), helpstring("property OutputImageName")] HRESULT OutputImageName([in] BSTR newVal);
+        [propget, id(10), helpstring("property AlwaysOutputMeta")] HRESULT AlwaysOutputMeta([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(10), helpstring("property AlwaysOutputMeta")] HRESULT AlwaysOutputMeta([in] VARIANT_BOOL newVal);
+        [propget, id(11), helpstring("property MetaOutputName")] HRESULT MetaOutputName([out, retval] BSTR* pVal);
+        [propput, id(11), helpstring("property MetaOutputName")] HRESULT MetaOutputName([in] BSTR newVal);
+        // Option to persist any existing annotations into the output file
+        // Default setting is false
+        [propget, id(16), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(16), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([in] VARIANT_BOOL newVal);
+        // Option to apply redactions as annotations in the output file
+        // Default setting is false
+        [propget, id(17), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(17), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([in] VARIANT_BOOL newVal);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether to collect redaction accuracy feedback information
+        [propget, id(22), helpstring("property CollectFeedback")] HRESULT 
+            CollectFeedback([out, retval] VARIANT_BOOL* pvbCollectFeedback);
+        [propput, id(22), helpstring("property CollectFeedback")] HRESULT 
+            CollectFeedback([in] VARIANT_BOOL vbCollectFeedback);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Bitwise OR-ed mask determines whether to:
+        //          (1) kFeedbackCollectNone - do not collect feedback data
+        //          (2) kFeedbackCollectRedact - collect feedback for all verified redactions
+        //          (3) kFeedbackCollectCorrect - collect feedback for user-corrected redactions
+        //          (4) kFeedbackCollectAll - collect feedback for all verified documents
+        [propget, id(23), helpstring("property FeedbackCollectOption")] HRESULT 
+            FeedbackCollectOption([out, retval] EFeedbackCollectOption *peFeedbackCollectOption);
+        [propput, id(23), helpstring("property FeedbackCollectOption")] HRESULT
+            FeedbackCollectOption([in] EFeedbackCollectOption eFeedbackCollectOption);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Folder in which to store feedback data
+        [propget, id(24), helpstring("property FeedbackDataFolder")] HRESULT 
+            FeedbackDataFolder([out, retval] BSTR *pbstrFeedbackDataFolder);
+        [propput, id(24), helpstring("property FeedbackDataFolder")] HRESULT
+            FeedbackDataFolder([in] BSTR bstrFeedbackDataFolder);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether to store the original image in the feedback data folder
+        [propget, id(25), helpstring("property CollectFeedbackImage")] HRESULT 
+            CollectFeedbackImage([out, retval] VARIANT_BOOL *pvbCollectFeedbackImage);
+        [propput, id(25), helpstring("property CollectFeedbackImage")] HRESULT
+            CollectFeedbackImage([in] VARIANT_BOOL vbCollectFeedbackImage);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether to use the original filename for feedback documents (VARIANT_TRUE) or
+        //          whether to generate a unique filename for each document (VARIANT_FALSE)
+        [propget, id(26), helpstring("property FeedbackOriginalFilenames")] HRESULT 
+            FeedbackOriginalFilenames([out, retval] VARIANT_BOOL *pvbFeedbackOriginalFilenames);
+        [propput, id(26), helpstring("property FeedbackOriginalFilenames")] HRESULT
+            FeedbackOriginalFilenames([in] VARIANT_BOOL vbFeedbackOriginalFilenames);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether to require that users specify a type for all redactions (VARIANT_TRUE)
+        //			or whether to allow redactions to contain no type (VARIANT_FALSE)
+        //			Added as per [p16 #2833] - JDS 01/28/2008
+        [propget, id(27), helpstring("property RequireRedactionTypes")] HRESULT
+            RequireRedactionTypes([out, retval] VARIANT_BOOL* pvbRequireRedactionTypes);
+        [propput, id(27), helpstring("property RequireRedactionTypes")] HRESULT
+            RequireRedactionTypes([in] VARIANT_BOOL vbRequireRedactionTypes);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The full path to ID Shield data file to use as input. May contain tags
+        [propget, id(28), helpstring("property InputDataFile")] HRESULT InputDataFile(
+            [out, retval] BSTR *pbstrInputDataFile);
+        [propput, id(28), helpstring("property InputDataFile")] HRESULT InputDataFile(
+            [in] BSTR bstrInputDataFile);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether to use the redacted image as input if it already exists (VARIANT_TRUE)
+        //          or whether to use the original image (VARIANT_FALSE)
+        [propget, id(29), helpstring("property InputRedactedImage")] HRESULT InputRedactedImage(
+            [out, retval] VARIANT_BOOL *pvbInputRedactedImage);
+        [propput, id(29), helpstring("property InputRedactedImage")] HRESULT InputRedactedImage(
+            [in] VARIANT_BOOL vbInputRedactedImage);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether to require the verifier to apply an exemption code to each redaction
+        //          before continuing to the next document (VARIANT_TRUE) or whether the verifier
+        //          can continue to the next document without applying exemption codes (VARIANT_FALSE)
+        [propget, id(30), helpstring("property RequireExemptionCodes")] HRESULT RequireExemptionCodes(
+            [out, retval] VARIANT_BOOL *pvbRequireExemptionCodes);
+        [propput, id(30), helpstring("property RequireExemptionCodes")] HRESULT RequireExemptionCodes(
+            [in] VARIANT_BOOL vbRequireExemptionCodes);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Text to print on each output redaction. May contain tags.
+        [propget, id(31), helpstring("property RedactionText")] HRESULT RedactionText(
+            [out, retval] BSTR *pbstrRedactionText);
+        [propput, id(31), helpstring("property RedactionText")] HRESULT RedactionText(
+            [in] BSTR bstrRedactionText);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The border color of output redactions expressed as an RGB color.
+        [propget, id(32), helpstring("property BorderColor")] HRESULT BorderColor(
+            [out, retval] long *plBorderColor);
+        [propput, id(32), helpstring("property BorderColor")] HRESULT BorderColor(
+            [in] long lBorderColor);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The fill color of output redactions expressed as an RGB color.
+        [propget, id(33), helpstring("property FillColor")] HRESULT FillColor(
+            [out, retval] long *plFillColor);
+        [propput, id(33), helpstring("property FillColor")] HRESULT FillColor(
+            [in] long lFillColor);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The name of the font to use for redaction text.
+        [propget, id(34), helpstring("property FontName")] HRESULT FontName(
+            [out, retval] BSTR *pbstrFontName);
+        [propput, id(34), helpstring("property FontName")] HRESULT FontName(
+            [in] BSTR bstrFontName);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether the redaction text font is bold (VARIANT_TRUE).
+        [propget, id(35), helpstring("property IsBold")] HRESULT IsBold(
+            [out, retval] VARIANT_BOOL *pvbBold);
+        [propput, id(35), helpstring("property IsBold")] HRESULT IsBold(
+            [in] VARIANT_BOOL vbBold);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether the redaction text font is italic (VARIANT_TRUE).
+        [propget, id(36), helpstring("property IsItalic")] HRESULT IsItalic(
+            [out, retval] VARIANT_BOOL *pvbItalic);
+        [propput, id(36), helpstring("property IsItalic")] HRESULT IsItalic(
+            [in] VARIANT_BOOL vbItalic);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The size of the redaction text in points.
+        [propget, id(37), helpstring("property FontSize")] HRESULT FontSize(
+            [out, retval] long *plFontSize);
+        [propput, id(37), helpstring("property FontSize")] HRESULT FontSize([in] long lFontSize);
+        //-----------------------------------------------------------------------------------------
+    };
 
-	[
-		object,
-		uuid(ABA15651-75D7-45C3-BCAD-3C3BD5AAFA61),
-		dual,
-		helpstring("IRedactFileProcessor Interface"),
-		pointer_default(unique)
-	]
-	interface IRedactFileProcessor : IDispatch
-	{
-		// Name of the Rules file to use to find the text to be redacted
-		[propget, id(1), helpstring("property RuleFileName")] HRESULT RuleFileName([out, retval] BSTR *pVal);
-		[propput, id(1), helpstring("property RuleFileName")] HRESULT RuleFileName([in] BSTR newVal);
-		// Name of the Output file, this can use Tags eg. <SourceDocName>, <SourceDocName.FileName> ...
-		// If the file selected for output exists it will be overwitten without warning
-		[propget, id(2), helpstring("property OutputFileName")] HRESULT OutputFileName([out, retval] BSTR *pVal);
-		[propput, id(2), helpstring("property OutputFileName")] HRESULT OutputFileName([in] BSTR newVal);
-		// Option to use USS file if it exists if the input file is and image file
-		[propget, id(3), helpstring("property ReadFromUSS")] HRESULT ReadFromUSS([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(3), helpstring("property ReadFromUSS")] HRESULT ReadFromUSS([in] VARIANT_BOOL newVal);
-		// pvecAttributeNames == NULL indicates all attributes should be selected.
-		[propget, id(4), helpstring("property AttributeNames")] HRESULT AttributeNames([out, retval] IVariantVector * *pVal);
-		[propput, id(4), helpstring("property AttributeNames")] HRESULT AttributeNames([in] IVariantVector * newVal);
-		// Option to create output file only if redactable data was found in the input file where:
-		//   0 : Always create redaction file
-		//   1 : Create redaction file only if redactable data was found
-		[propget, id(5), helpstring("property CreateOutputFile")] HRESULT CreateOutputFile([out, retval] long *pVal);
-		[propput, id(5), helpstring("property CreateOutputFile")] HRESULT CreateOutputFile([in] long newVal);
-		[propget, id(6), helpstring("property UseVOA")] HRESULT UseVOA([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(6), helpstring("property UseVOA")] HRESULT UseVOA([in] VARIANT_BOOL newVal);
-		[propget, id(7), helpstring("property VOAFileName")] HRESULT VOAFileName([out, retval] BSTR *pVal);
-		[propput, id(7), helpstring("property VOAFileName")] HRESULT VOAFileName([in] BSTR newVal);
-		// Option to persist any existing annotations into the output file
-		// Default setting is false
-		[propget, id(8), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(8), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([in] VARIANT_BOOL newVal);
-		// Option to apply redactions as annotations in the output file
-		// Default setting is false
-		[propget, id(9), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(9), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([in] VARIANT_BOOL newVal);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: VARIANT_TRUE to use the previously redacted image as input if available;
-		//          VARIANT_FALSE to use the original image.
-		[propget, id(11), helpstring("property UseRedactedImage")] HRESULT UseRedactedImage(
-			[out, retval] VARIANT_BOOL* pvbUseRedactedImage);
-		[propput, id(11), helpstring("property UseRedactedImage")] HRESULT UseRedactedImage(
-			[in] VARIANT_BOOL vbUseRedactedImage);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Text to print on each output redaction. May contain tags.
-		[propget, id(12), helpstring("property RedactionText")] HRESULT RedactionText(
-			[out, retval] BSTR *pbstrRedactionText);
-		[propput, id(12), helpstring("property RedactionText")] HRESULT RedactionText(
-			[in] BSTR bstrRedactionText);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The border color of output redactions expressed as an RGB color.
-		[propget, id(13), helpstring("property BorderColor")] HRESULT BorderColor(
-			[out, retval] long *plBorderColor);
-		[propput, id(13), helpstring("property BorderColor")] HRESULT BorderColor(
-			[in] long lBorderColor);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The fill color of output redactions expressed as an RGB color.
-		[propget, id(14), helpstring("property FillColor")] HRESULT FillColor(
-			[out, retval] long *plFillColor);
-		[propput, id(14), helpstring("property FillColor")] HRESULT FillColor(
-			[in] long lFillColor);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The name of the font to use for redaction text.
-		[propget, id(15), helpstring("property FontName")] HRESULT FontName(
-			[out, retval] BSTR *pbstrFontName);
-		[propput, id(15), helpstring("property FontName")] HRESULT FontName(
-			[in] BSTR bstrFontName);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether the redaction text font is bold (VARIANT_TRUE).
-		[propget, id(16), helpstring("property IsBold")] HRESULT IsBold(
-			[out, retval] VARIANT_BOOL *pvbBold);
-		[propput, id(16), helpstring("property IsBold")] HRESULT IsBold(
-			[in] VARIANT_BOOL vbBold);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether the redaction text font is italic (VARIANT_TRUE).
-		[propget, id(17), helpstring("property IsItalic")] HRESULT IsItalic(
-			[out, retval] VARIANT_BOOL *pvbItalic);
-		[propput, id(17), helpstring("property IsItalic")] HRESULT IsItalic(
-			[in] VARIANT_BOOL vbItalic);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The size of the redaction text in points.
-		[propget, id(18), helpstring("property FontSize")] HRESULT FontSize(
-			[out, retval] long *plFontSize);
-		[propput, id(18), helpstring("property FontSize")] HRESULT FontSize([in] long lFontSize);
-		//-----------------------------------------------------------------------------------------
-	};
+    [
+        object,
+        uuid(ABA15651-75D7-45C3-BCAD-3C3BD5AAFA61),
+        dual,
+        helpstring("IRedactFileProcessor Interface"),
+        pointer_default(unique)
+    ]
+    interface IRedactFileProcessor : IDispatch
+    {
+        // Name of the Rules file to use to find the text to be redacted
+        [propget, id(1), helpstring("property RuleFileName")] HRESULT RuleFileName([out, retval] BSTR *pVal);
+        [propput, id(1), helpstring("property RuleFileName")] HRESULT RuleFileName([in] BSTR newVal);
+        // Name of the Output file, this can use Tags eg. <SourceDocName>, <SourceDocName.FileName> ...
+        // If the file selected for output exists it will be overwitten without warning
+        [propget, id(2), helpstring("property OutputFileName")] HRESULT OutputFileName([out, retval] BSTR *pVal);
+        [propput, id(2), helpstring("property OutputFileName")] HRESULT OutputFileName([in] BSTR newVal);
+        // Option to use USS file if it exists if the input file is and image file
+        [propget, id(3), helpstring("property ReadFromUSS")] HRESULT ReadFromUSS([out, retval] VARIANT_BOOL *pVal);
+        [propput, id(3), helpstring("property ReadFromUSS")] HRESULT ReadFromUSS([in] VARIANT_BOOL newVal);
+        // pvecAttributeNames == NULL indicates all attributes should be selected.
+        [propget, id(4), helpstring("property AttributeNames")] HRESULT AttributeNames([out, retval] IVariantVector * *pVal);
+        [propput, id(4), helpstring("property AttributeNames")] HRESULT AttributeNames([in] IVariantVector * newVal);
+        // Option to create output file only if redactable data was found in the input file where:
+        //   0 : Always create redaction file
+        //   1 : Create redaction file only if redactable data was found
+        [propget, id(5), helpstring("property CreateOutputFile")] HRESULT CreateOutputFile([out, retval] long *pVal);
+        [propput, id(5), helpstring("property CreateOutputFile")] HRESULT CreateOutputFile([in] long newVal);
+        [propget, id(6), helpstring("property UseVOA")] HRESULT UseVOA([out, retval] VARIANT_BOOL *pVal);
+        [propput, id(6), helpstring("property UseVOA")] HRESULT UseVOA([in] VARIANT_BOOL newVal);
+        [propget, id(7), helpstring("property VOAFileName")] HRESULT VOAFileName([out, retval] BSTR *pVal);
+        [propput, id(7), helpstring("property VOAFileName")] HRESULT VOAFileName([in] BSTR newVal);
+        // Option to persist any existing annotations into the output file
+        // Default setting is false
+        [propget, id(8), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(8), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([in] VARIANT_BOOL newVal);
+        // Option to apply redactions as annotations in the output file
+        // Default setting is false
+        [propget, id(9), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(9), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([in] VARIANT_BOOL newVal);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: VARIANT_TRUE to use the previously redacted image as input if available;
+        //          VARIANT_FALSE to use the original image.
+        [propget, id(11), helpstring("property UseRedactedImage")] HRESULT UseRedactedImage(
+            [out, retval] VARIANT_BOOL* pvbUseRedactedImage);
+        [propput, id(11), helpstring("property UseRedactedImage")] HRESULT UseRedactedImage(
+            [in] VARIANT_BOOL vbUseRedactedImage);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Text to print on each output redaction. May contain tags.
+        [propget, id(12), helpstring("property RedactionText")] HRESULT RedactionText(
+            [out, retval] BSTR *pbstrRedactionText);
+        [propput, id(12), helpstring("property RedactionText")] HRESULT RedactionText(
+            [in] BSTR bstrRedactionText);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The border color of output redactions expressed as an RGB color.
+        [propget, id(13), helpstring("property BorderColor")] HRESULT BorderColor(
+            [out, retval] long *plBorderColor);
+        [propput, id(13), helpstring("property BorderColor")] HRESULT BorderColor(
+            [in] long lBorderColor);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The fill color of output redactions expressed as an RGB color.
+        [propget, id(14), helpstring("property FillColor")] HRESULT FillColor(
+            [out, retval] long *plFillColor);
+        [propput, id(14), helpstring("property FillColor")] HRESULT FillColor(
+            [in] long lFillColor);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The name of the font to use for redaction text.
+        [propget, id(15), helpstring("property FontName")] HRESULT FontName(
+            [out, retval] BSTR *pbstrFontName);
+        [propput, id(15), helpstring("property FontName")] HRESULT FontName(
+            [in] BSTR bstrFontName);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether the redaction text font is bold (VARIANT_TRUE).
+        [propget, id(16), helpstring("property IsBold")] HRESULT IsBold(
+            [out, retval] VARIANT_BOOL *pvbBold);
+        [propput, id(16), helpstring("property IsBold")] HRESULT IsBold(
+            [in] VARIANT_BOOL vbBold);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether the redaction text font is italic (VARIANT_TRUE).
+        [propget, id(17), helpstring("property IsItalic")] HRESULT IsItalic(
+            [out, retval] VARIANT_BOOL *pvbItalic);
+        [propput, id(17), helpstring("property IsItalic")] HRESULT IsItalic(
+            [in] VARIANT_BOOL vbItalic);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The size of the redaction text in points.
+        [propget, id(18), helpstring("property FontSize")] HRESULT FontSize(
+            [out, retval] long *plFontSize);
+        [propput, id(18), helpstring("property FontSize")] HRESULT FontSize([in] long lFontSize);
+        //-----------------------------------------------------------------------------------------
+    };
 
-	[
-		object,
-		uuid(5021D817-8418-4ff2-8188-204A636CFD27),
-		dual,
-		helpstring("IRedactionTask Interface"),
-		pointer_default(unique)
-	]
-	interface IRedactionTask : IDispatch
-	{
-		//-----------------------------------------------------------------------------------------
-		// Name of the Output file, this can use Tags eg. <SourceDocName>, <SourceDocName.FileName> ...
-		// If the file selected for output exists it will be overwitten without warning
-		[propget, id(1), helpstring("property OutputFileName")] HRESULT OutputFileName([out, retval] BSTR *pVal);
-		[propput, id(1), helpstring("property OutputFileName")] HRESULT OutputFileName([in] BSTR newVal);
-		//-----------------------------------------------------------------------------------------
-		// pvecAttributeNames == NULL indicates all attributes should be selected.
-		[propget, id(2), helpstring("property AttributeNames")] HRESULT AttributeNames([out, retval] IVariantVector** ppVal);
-		[propput, id(2), helpstring("property AttributeNames")] HRESULT AttributeNames([in] IVariantVector* pVal);
-		//-----------------------------------------------------------------------------------------
-		[propget, id(3), helpstring("property VOAFileName")] HRESULT VOAFileName([out, retval] BSTR *pVal);
-		[propput, id(3), helpstring("property VOAFileName")] HRESULT VOAFileName([in] BSTR newVal);
-		//-----------------------------------------------------------------------------------------
-		// Option to persist any existing annotations into the output file
-		// Default setting is false
-		[propget, id(4), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(4), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([in] VARIANT_BOOL newVal);
-		//-----------------------------------------------------------------------------------------
-		// Option to apply redactions as annotations in the output file
-		// Default setting is false
-		[propget, id(5), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(5), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([in] VARIANT_BOOL newVal);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: VARIANT_TRUE to use the previously redacted image as input if available;
-		//          VARIANT_FALSE to use the original image.
-		[propget, id(6), helpstring("property UseRedactedImage")] HRESULT UseRedactedImage(
-			[out, retval] VARIANT_BOOL* pvbUseRedactedImage);
-		[propput, id(6), helpstring("property UseRedactedImage")] HRESULT UseRedactedImage(
-			[in] VARIANT_BOOL vbUseRedactedImage);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Text to print on each output redaction. May contain tags.
-		[propget, id(7), helpstring("property RedactionText")] HRESULT RedactionText(
-			[out, retval] BSTR *pbstrRedactionText);
-		[propput, id(7), helpstring("property RedactionText")] HRESULT RedactionText(
-			[in] BSTR bstrRedactionText);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The border color of output redactions expressed as an RGB color.
-		[propget, id(8), helpstring("property BorderColor")] HRESULT BorderColor(
-			[out, retval] long *plBorderColor);
-		[propput, id(8), helpstring("property BorderColor")] HRESULT BorderColor(
-			[in] long lBorderColor);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The fill color of output redactions expressed as an RGB color.
-		[propget, id(9), helpstring("property FillColor")] HRESULT FillColor(
-			[out, retval] long *plFillColor);
-		[propput, id(9), helpstring("property FillColor")] HRESULT FillColor(
-			[in] long lFillColor);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The name of the font to use for redaction text.
-		[propget, id(10), helpstring("property FontName")] HRESULT FontName(
-			[out, retval] BSTR *pbstrFontName);
-		[propput, id(10), helpstring("property FontName")] HRESULT FontName(
-			[in] BSTR bstrFontName);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether the redaction text font is bold (VARIANT_TRUE).
-		[propget, id(11), helpstring("property IsBold")] HRESULT IsBold(
-			[out, retval] VARIANT_BOOL *pvbBold);
-		[propput, id(11), helpstring("property IsBold")] HRESULT IsBold(
-			[in] VARIANT_BOOL vbBold);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Whether the redaction text font is italic (VARIANT_TRUE).
-		[propget, id(12), helpstring("property IsItalic")] HRESULT IsItalic(
-			[out, retval] VARIANT_BOOL *pvbItalic);
-		[propput, id(12), helpstring("property IsItalic")] HRESULT IsItalic(
-			[in] VARIANT_BOOL vbItalic);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: The size of the redaction text in points.
-		[propget, id(13), helpstring("property FontSize")] HRESULT FontSize(
-			[out, retval] long *plFontSize);
-		[propput, id(13), helpstring("property FontSize")] HRESULT FontSize([in] long lFontSize);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To get all of the font data in a single call
-		[id(14), helpstring("method GetFontData")] HRESULT GetFontData(
-			[out] BSTR* pbstrFontName, [out] VARIANT_BOOL* pvbIsBold,
-			[out] VARIANT_BOOL* pvbIsItalic, [out] long* plFontSize);
-		//-----------------------------------------------------------------------------------------
-		[propget, id(15), helpstring("property PdfPasswordSettings")] HRESULT PdfPasswordSettings(
-			[out, retval] IPdfPasswordSettings** ppPdfSettings);
-		[propput, id(15), helpstring("property PdfPasswordSettings")] HRESULT PdfPasswordSettings(
-			[in] IPdfPasswordSettings* pPdfSettings);
-		//-----------------------------------------------------------------------------------------
-	};
+    [
+        object,
+        uuid(5021D817-8418-4ff2-8188-204A636CFD27),
+        dual,
+        helpstring("IRedactionTask Interface"),
+        pointer_default(unique)
+    ]
+    interface IRedactionTask : IDispatch
+    {
+        //-----------------------------------------------------------------------------------------
+        // Name of the Output file, this can use Tags eg. <SourceDocName>, <SourceDocName.FileName> ...
+        // If the file selected for output exists it will be overwitten without warning
+        [propget, id(1), helpstring("property OutputFileName")] HRESULT OutputFileName([out, retval] BSTR *pVal);
+        [propput, id(1), helpstring("property OutputFileName")] HRESULT OutputFileName([in] BSTR newVal);
+        //-----------------------------------------------------------------------------------------
+        // pvecAttributeNames == NULL indicates all attributes should be selected.
+        [propget, id(2), helpstring("property AttributeNames")] HRESULT AttributeNames([out, retval] IVariantVector** ppVal);
+        [propput, id(2), helpstring("property AttributeNames")] HRESULT AttributeNames([in] IVariantVector* pVal);
+        //-----------------------------------------------------------------------------------------
+        [propget, id(3), helpstring("property VOAFileName")] HRESULT VOAFileName([out, retval] BSTR *pVal);
+        [propput, id(3), helpstring("property VOAFileName")] HRESULT VOAFileName([in] BSTR newVal);
+        //-----------------------------------------------------------------------------------------
+        // Option to persist any existing annotations into the output file
+        // Default setting is false
+        [propget, id(4), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(4), helpstring("property CarryForwardAnnotations")] HRESULT CarryForwardAnnotations([in] VARIANT_BOOL newVal);
+        //-----------------------------------------------------------------------------------------
+        // Option to apply redactions as annotations in the output file
+        // Default setting is false
+        [propget, id(5), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(5), helpstring("property ApplyRedactionsAsAnnotations")] HRESULT ApplyRedactionsAsAnnotations([in] VARIANT_BOOL newVal);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: VARIANT_TRUE to use the previously redacted image as input if available;
+        //          VARIANT_FALSE to use the original image.
+        [propget, id(6), helpstring("property UseRedactedImage")] HRESULT UseRedactedImage(
+            [out, retval] VARIANT_BOOL* pvbUseRedactedImage);
+        [propput, id(6), helpstring("property UseRedactedImage")] HRESULT UseRedactedImage(
+            [in] VARIANT_BOOL vbUseRedactedImage);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Text to print on each output redaction. May contain tags.
+        [propget, id(7), helpstring("property RedactionText")] HRESULT RedactionText(
+            [out, retval] BSTR *pbstrRedactionText);
+        [propput, id(7), helpstring("property RedactionText")] HRESULT RedactionText(
+            [in] BSTR bstrRedactionText);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The border color of output redactions expressed as an RGB color.
+        [propget, id(8), helpstring("property BorderColor")] HRESULT BorderColor(
+            [out, retval] long *plBorderColor);
+        [propput, id(8), helpstring("property BorderColor")] HRESULT BorderColor(
+            [in] long lBorderColor);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The fill color of output redactions expressed as an RGB color.
+        [propget, id(9), helpstring("property FillColor")] HRESULT FillColor(
+            [out, retval] long *plFillColor);
+        [propput, id(9), helpstring("property FillColor")] HRESULT FillColor(
+            [in] long lFillColor);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The name of the font to use for redaction text.
+        [propget, id(10), helpstring("property FontName")] HRESULT FontName(
+            [out, retval] BSTR *pbstrFontName);
+        [propput, id(10), helpstring("property FontName")] HRESULT FontName(
+            [in] BSTR bstrFontName);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether the redaction text font is bold (VARIANT_TRUE).
+        [propget, id(11), helpstring("property IsBold")] HRESULT IsBold(
+            [out, retval] VARIANT_BOOL *pvbBold);
+        [propput, id(11), helpstring("property IsBold")] HRESULT IsBold(
+            [in] VARIANT_BOOL vbBold);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Whether the redaction text font is italic (VARIANT_TRUE).
+        [propget, id(12), helpstring("property IsItalic")] HRESULT IsItalic(
+            [out, retval] VARIANT_BOOL *pvbItalic);
+        [propput, id(12), helpstring("property IsItalic")] HRESULT IsItalic(
+            [in] VARIANT_BOOL vbItalic);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: The size of the redaction text in points.
+        [propget, id(13), helpstring("property FontSize")] HRESULT FontSize(
+            [out, retval] long *plFontSize);
+        [propput, id(13), helpstring("property FontSize")] HRESULT FontSize([in] long lFontSize);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: To get all of the font data in a single call
+        [id(14), helpstring("method GetFontData")] HRESULT GetFontData(
+            [out] BSTR* pbstrFontName, [out] VARIANT_BOOL* pvbIsBold,
+            [out] VARIANT_BOOL* pvbIsItalic, [out] long* plFontSize);
+        //-----------------------------------------------------------------------------------------
+        [propget, id(15), helpstring("property PdfPasswordSettings")] HRESULT PdfPasswordSettings(
+            [out, retval] IPdfPasswordSettings** ppPdfSettings);
+        [propput, id(15), helpstring("property PdfPasswordSettings")] HRESULT PdfPasswordSettings(
+            [in] IPdfPasswordSettings* pPdfSettings);
+        //-----------------------------------------------------------------------------------------
+		[propget, id(16), helpstring("property TextToReplace")] HRESULT TextToReplace(
+			[out, retval] BSTR* pbstrTextToReplace);
+		[propput, id(16), helpstring("property TextToReplace")] HRESULT TextToReplace(
+			[in] BSTR bstrTextToReplace);
+        //-----------------------------------------------------------------------------------------
+		[propget, id(17), helpstring("property ReplacementText")] HRESULT ReplacementText(
+			[out, retval] BSTR* pbstrReplacementText);
+		[propput, id(17), helpstring("property ReplacementText")] HRESULT ReplacementText(
+			[in] BSTR bstrReplacementText);
+        //-----------------------------------------------------------------------------------------
+		[propget, id(18), helpstring("property AutoAdjustTextCasing")] HRESULT
+			AutoAdjustTextCasing([out, retval] VARIANT_BOOL* pvbAdjustCasing);
+		[propput, id(18), helpstring("property AutoAdjustTextCasing")] HRESULT
+			AutoAdjustTextCasing([in] VARIANT_BOOL vbAdjustCasing);
+        //-----------------------------------------------------------------------------------------
+    };
 
-	[
-		object,
-		uuid(323ABC95-7227-4338-A170-D038F9DDC3E2),
-		dual,
-		nonextensible,
-		helpstring("IIDShieldVOAFileContentsCondition Interface"),
-		pointer_default(unique)
-	]
-	interface IIDShieldVOAFileContentsCondition : IDispatch
-	{
-		// Should condition depend upon data contents?
-		[propget, id(1), helpstring("property CheckDataContents")] HRESULT CheckDataContents([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(1), helpstring("property CheckDataContents")] HRESULT CheckDataContents([in] VARIANT_BOOL newVal);
+    [
+        object,
+        uuid(323ABC95-7227-4338-A170-D038F9DDC3E2),
+        dual,
+        nonextensible,
+        helpstring("IIDShieldVOAFileContentsCondition Interface"),
+        pointer_default(unique)
+    ]
+    interface IIDShieldVOAFileContentsCondition : IDispatch
+    {
+        // Should condition depend upon data contents?
+        [propget, id(1), helpstring("property CheckDataContents")] HRESULT CheckDataContents([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(1), helpstring("property CheckDataContents")] HRESULT CheckDataContents([in] VARIANT_BOOL newVal);
 
-		// Which types of data content should it depend upon? (high-low confidence, clues or manual)
-		[propget, id(2), helpstring("property LookForHCData")] HRESULT LookForHCData([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(2), helpstring("property LookForHCData")] HRESULT LookForHCData([in] VARIANT_BOOL newVal);
-		[propget, id(3), helpstring("property LookForMCData")] HRESULT LookForMCData([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(3), helpstring("property LookForMCData")] HRESULT LookForMCData([in] VARIANT_BOOL newVal);
-		[propget, id(4), helpstring("property LookForLCData")] HRESULT LookForLCData([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(4), helpstring("property LookForLCData")] HRESULT LookForLCData([in] VARIANT_BOOL newVal);
-		[propget, id(5), helpstring("property LookForManualData")] HRESULT LookForManualData([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(5), helpstring("property LookForManualData")] HRESULT LookForManualData([in] VARIANT_BOOL newVal);
-		[propget, id(6), helpstring("property LookForClues")] HRESULT LookForClues([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(6), helpstring("property LookForClues")] HRESULT LookForClues([in] VARIANT_BOOL newVal);
-		
-		// Should condition depend upon doc type?
-		[propget, id(7), helpstring("property CheckDocType")] HRESULT CheckDocType([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(7), helpstring("property CheckDocType")] HRESULT CheckDocType([in] VARIANT_BOOL newVal);
-		
-		// Which doc types and doc category to look for
-		[propget, id(8), helpstring("property DocCategory")] HRESULT DocCategory([out, retval] BSTR* pVal);
-		[propput, id(8), helpstring("property DocCategory")] HRESULT DocCategory([in] BSTR newVal);
-		[propget, id(9), helpstring("property DocTypes")] HRESULT DocTypes([out, retval] IVariantVector** pVal);
-		[propput, id(9), helpstring("property DocTypes")] HRESULT DocTypes([in] IVariantVector* newVal);
-		
-		// Where is the VOA file located
-		[propget, id(10), helpstring("property TargetFileName")] HRESULT TargetFileName([out, retval] BSTR* pVal);
-		[propput, id(10), helpstring("property TargetFileName")] HRESULT TargetFileName([in] BSTR newVal);
+        // Which types of data content should it depend upon? (high-low confidence, clues or manual)
+        [propget, id(2), helpstring("property LookForHCData")] HRESULT LookForHCData([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(2), helpstring("property LookForHCData")] HRESULT LookForHCData([in] VARIANT_BOOL newVal);
+        [propget, id(3), helpstring("property LookForMCData")] HRESULT LookForMCData([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(3), helpstring("property LookForMCData")] HRESULT LookForMCData([in] VARIANT_BOOL newVal);
+        [propget, id(4), helpstring("property LookForLCData")] HRESULT LookForLCData([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(4), helpstring("property LookForLCData")] HRESULT LookForLCData([in] VARIANT_BOOL newVal);
+        [propget, id(5), helpstring("property LookForManualData")] HRESULT LookForManualData([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(5), helpstring("property LookForManualData")] HRESULT LookForManualData([in] VARIANT_BOOL newVal);
+        [propget, id(6), helpstring("property LookForClues")] HRESULT LookForClues([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(6), helpstring("property LookForClues")] HRESULT LookForClues([in] VARIANT_BOOL newVal);
+        
+        // Should condition depend upon doc type?
+        [propget, id(7), helpstring("property CheckDocType")] HRESULT CheckDocType([out, retval] VARIANT_BOOL* pVal);
+        [propput, id(7), helpstring("property CheckDocType")] HRESULT CheckDocType([in] VARIANT_BOOL newVal);
+        
+        // Which doc types and doc category to look for
+        [propget, id(8), helpstring("property DocCategory")] HRESULT DocCategory([out, retval] BSTR* pVal);
+        [propput, id(8), helpstring("property DocCategory")] HRESULT DocCategory([in] BSTR newVal);
+        [propget, id(9), helpstring("property DocTypes")] HRESULT DocTypes([out, retval] IVariantVector** pVal);
+        [propput, id(9), helpstring("property DocTypes")] HRESULT DocTypes([in] IVariantVector* newVal);
+        
+        // Where is the VOA file located
+        [propget, id(10), helpstring("property TargetFileName")] HRESULT TargetFileName([out, retval] BSTR* pVal);
+        [propput, id(10), helpstring("property TargetFileName")] HRESULT TargetFileName([in] BSTR newVal);
 
-		// Specifies behavior if VOA file is missing
-		[propget, id(11), helpstring("property MissingFileBehavior")] HRESULT MissingFileBehavior([out, retval] EMissingVOAFileBehavior* pVal);
-		[propput, id(11), helpstring("property MissingFileBehavior")] HRESULT MissingFileBehavior([in] EMissingVOAFileBehavior newVal);
+        // Specifies behavior if VOA file is missing
+        [propget, id(11), helpstring("property MissingFileBehavior")] HRESULT MissingFileBehavior([out, retval] EMissingVOAFileBehavior* pVal);
+        [propput, id(11), helpstring("property MissingFileBehavior")] HRESULT MissingFileBehavior([in] EMissingVOAFileBehavior newVal);
 
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Gets or sets the quantifier to use when testing attribute conditions.
-		[propget, id(12), helpstring("property AttributeQuantifier")] HRESULT AttributeQuantifier(
-			[out, retval] EAttributeQuantifier* pVal);
-		[propput, id(12), helpstring("property AttributeQuantifier")] HRESULT AttributeQuantifier(
-			[in] EAttributeQuantifier newVal);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Gets or sets the quantifier to use when testing attribute conditions.
+        [propget, id(12), helpstring("property AttributeQuantifier")] HRESULT AttributeQuantifier(
+            [out, retval] EAttributeQuantifier* pVal);
+        [propput, id(12), helpstring("property AttributeQuantifier")] HRESULT AttributeQuantifier(
+            [in] EAttributeQuantifier newVal);
 
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Gets or sets whether the condition object should allow only the condition itself
-		//			to be configured.
-		[propget, id(13), helpstring("property ConfigureConditionsOnly")] HRESULT ConfigureConditionsOnly(
-			[out, retval] VARIANT_BOOL* pVal);
-		[propput, id(13), helpstring("property ConfigureConditionsOnly")] HRESULT ConfigureConditionsOnly(
-			[in] VARIANT_BOOL newVal);
-	};
-	[
-		object,
-		uuid(7EF76098-F5EC-49DD-891A-A34174F5BEAF),
-		dual,
-		nonextensible,
-		helpstring("ISelectTargetFileUI Interface"),
-		pointer_default(unique)
-	]
-	interface ISelectTargetFileUI : IDispatch
-	{
-		// Properties to specify behavior of file dialog
-		// FileName is used both to initialize the contents of the edit box and to retrieve user input
-		// Default value: ""
-		[propget, id(1), helpstring("property FileName")] HRESULT FileName([out, retval] BSTR *pVal);
-		[propput, id(1), helpstring("property FileName")] HRESULT FileName([in] BSTR newVal);
-		// FileTypes is used to specify the file types list in the CFileDialog should the user hit the browse button
-		// default value: "All Files (*.*)|*.*||"
-		[propget, id(2), helpstring("property FileTypes")] HRESULT FileTypes([out, retval] BSTR *pVal);
-		[propput, id(2), helpstring("property FileTypes")] HRESULT FileTypes([in] BSTR newVal);
-		// Default extension is used for the CFileDialog should the user hit the browse button\
-		// Example: ".voa"
-		// Default value: ""
-		[propget, id(3), helpstring("property DefaultExtension")] HRESULT DefaultExtension([out, retval] BSTR *pVal);
-		[propput, id(3), helpstring("property DefaultExtension")] HRESULT DefaultExtension([in] BSTR newVal);
-		// DefaultFileName specifies the value the edit box will be set to if the reset button is pressed
-		// If no default name is specified, the reset button will not be shown.
-		// Default value: ""
-		[propget, id(4), helpstring("property DefaultFileName")] HRESULT DefaultFileName([out, retval] BSTR *pVal);
-		[propput, id(4), helpstring("property DefaultFileName")] HRESULT DefaultFileName([in] BSTR newVal);
-		// Title specifies the title of the dialog box that is shown.
-		// Default value: "Select File"
-		[propget, id(5), helpstring("property Title")] HRESULT Title([out, retval] BSTR *pVal);
-		[propput, id(5), helpstring("property Title")] HRESULT Title([in] BSTR newVal);
-		// Instructions specifies the value of the line of static text that appears above the edit box
-		// Default value: "Select target file"
-		[propget, id(6), helpstring("property Instructions")] HRESULT Instructions([out, retval] BSTR *pVal);
-		[propput, id(6), helpstring("property Instructions")] HRESULT Instructions([in] BSTR newVal);
-		
-		// PROMISE: Displays the dialog and retrieves user input.
-		// RETURNS: true if the okay button was pressed, false if the user cancelled
-		// Set the FileName property before making this call to specify the default value of the edit box
-		// If the method returns true, the user-inputed value may be retrieved using the FileName property
-		[id(7), helpstring("method PromptForFile")] HRESULT PromptForFile([out, retval] VARIANT_BOOL *pVal);
-	};
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Gets or sets whether the condition object should allow only the condition itself
+        //			to be configured.
+        [propget, id(13), helpstring("property ConfigureConditionsOnly")] HRESULT ConfigureConditionsOnly(
+            [out, retval] VARIANT_BOOL* pVal);
+        [propput, id(13), helpstring("property ConfigureConditionsOnly")] HRESULT ConfigureConditionsOnly(
+            [in] VARIANT_BOOL newVal);
+    };
+    [
+        object,
+        uuid(7EF76098-F5EC-49DD-891A-A34174F5BEAF),
+        dual,
+        nonextensible,
+        helpstring("ISelectTargetFileUI Interface"),
+        pointer_default(unique)
+    ]
+    interface ISelectTargetFileUI : IDispatch
+    {
+        // Properties to specify behavior of file dialog
+        // FileName is used both to initialize the contents of the edit box and to retrieve user input
+        // Default value: ""
+        [propget, id(1), helpstring("property FileName")] HRESULT FileName([out, retval] BSTR *pVal);
+        [propput, id(1), helpstring("property FileName")] HRESULT FileName([in] BSTR newVal);
+        // FileTypes is used to specify the file types list in the CFileDialog should the user hit the browse button
+        // default value: "All Files (*.*)|*.*||"
+        [propget, id(2), helpstring("property FileTypes")] HRESULT FileTypes([out, retval] BSTR *pVal);
+        [propput, id(2), helpstring("property FileTypes")] HRESULT FileTypes([in] BSTR newVal);
+        // Default extension is used for the CFileDialog should the user hit the browse button\
+        // Example: ".voa"
+        // Default value: ""
+        [propget, id(3), helpstring("property DefaultExtension")] HRESULT DefaultExtension([out, retval] BSTR *pVal);
+        [propput, id(3), helpstring("property DefaultExtension")] HRESULT DefaultExtension([in] BSTR newVal);
+        // DefaultFileName specifies the value the edit box will be set to if the reset button is pressed
+        // If no default name is specified, the reset button will not be shown.
+        // Default value: ""
+        [propget, id(4), helpstring("property DefaultFileName")] HRESULT DefaultFileName([out, retval] BSTR *pVal);
+        [propput, id(4), helpstring("property DefaultFileName")] HRESULT DefaultFileName([in] BSTR newVal);
+        // Title specifies the title of the dialog box that is shown.
+        // Default value: "Select File"
+        [propget, id(5), helpstring("property Title")] HRESULT Title([out, retval] BSTR *pVal);
+        [propput, id(5), helpstring("property Title")] HRESULT Title([in] BSTR newVal);
+        // Instructions specifies the value of the line of static text that appears above the edit box
+        // Default value: "Select target file"
+        [propget, id(6), helpstring("property Instructions")] HRESULT Instructions([out, retval] BSTR *pVal);
+        [propput, id(6), helpstring("property Instructions")] HRESULT Instructions([in] BSTR newVal);
+        
+        // PROMISE: Displays the dialog and retrieves user input.
+        // RETURNS: true if the okay button was pressed, false if the user cancelled
+        // Set the FileName property before making this call to specify the default value of the edit box
+        // If the method returns true, the user-inputed value may be retrieved using the FileName property
+        [id(7), helpstring("method PromptForFile")] HRESULT PromptForFile([out, retval] VARIANT_BOOL *pVal);
+    };
 
-	[ 
-	  object,
-	  uuid(A48992C7-0C0E-41F9-8D0C-FC533367559F),
-	  dual,
-	  helpstring("ISSNFinder Interface"),
-	  pointer_default(unique)
-	]
-	interface ISSNFinder : IDispatch
-	{
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Sets all the user options for the SSNFinder object.
-		// PARAMS:  (1) bstrSubattributeName - name for each subattribute containing the found SSNs.
-		//          (2) vbSpatialSubattribute - VARIANT_TRUE if the subattribute should be spatial,
-		//                VARIANT_FALSE if the subattribute should be hybrid.
-		//          (3) vbClearIfNoneFound - if no SSNs are found, VARIANT_TRUE indicates the 
-		//                returned attribute should be empty (ie. removed), VARIANT_FALSE indicates
-		//                the returned attribute should be unmodified.
-		[id(1), helpstring("method SetOptions")] HRESULT SetOptions([in] BSTR bstrSubattributeName, 
-			[in] VARIANT_BOOL vbSpatialSubattribute, [in] VARIANT_BOOL vbClearIfNoneFound);
-		[id(2), helpstring("method GetOptions")] HRESULT GetOptions([out] BSTR* pbstrSubattributeName,
-			[out] VARIANT_BOOL* pvbSpatialSubattribute, [out] VARIANT_BOOL* pvbClearIfNoneFound);
-	};
+    [ 
+      object,
+      uuid(A48992C7-0C0E-41F9-8D0C-FC533367559F),
+      dual,
+      helpstring("ISSNFinder Interface"),
+      pointer_default(unique)
+    ]
+    interface ISSNFinder : IDispatch
+    {
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: Sets all the user options for the SSNFinder object.
+        // PARAMS:  (1) bstrSubattributeName - name for each subattribute containing the found SSNs.
+        //          (2) vbSpatialSubattribute - VARIANT_TRUE if the subattribute should be spatial,
+        //                VARIANT_FALSE if the subattribute should be hybrid.
+        //          (3) vbClearIfNoneFound - if no SSNs are found, VARIANT_TRUE indicates the 
+        //                returned attribute should be empty (ie. removed), VARIANT_FALSE indicates
+        //                the returned attribute should be unmodified.
+        [id(1), helpstring("method SetOptions")] HRESULT SetOptions([in] BSTR bstrSubattributeName, 
+            [in] VARIANT_BOOL vbSpatialSubattribute, [in] VARIANT_BOOL vbClearIfNoneFound);
+        [id(2), helpstring("method GetOptions")] HRESULT GetOptions([out] BSTR* pbstrSubattributeName,
+            [out] VARIANT_BOOL* pvbSpatialSubattribute, [out] VARIANT_BOOL* pvbClearIfNoneFound);
+    };
 
-	[
-		object,
-		uuid(ADE58043-5972-4C10-B2C4-4A98F28323A8),
-		dual,
-		nonextensible,
-		helpstring("IIDShieldProductDBMgr Interface"),
-		pointer_default(unique)
-	]
-	interface IIDShieldProductDBMgr : IDispatch
-	{
-		//-----------------------------------------------------------------------------------------
-		// PROMISE: To add a record in the IDShieldData table in the database for the file with the
-		//          given values.
-		// NOTE:	Any existing records in the table that have IsMostRecentUpdate set to 1 will 
-		//          have it reset to 0 and the new record will have IsMostRecentUpdate set to 1.
-		[id(1), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData([in] long lFileID, 
-			[in] VARIANT_BOOL vbVerified, [in] double lDuration, [in] long lNumHCDataFound, 
-			[in] long lNumMCDataFound, [in] long lNumLCDataFound, [in] long lNumCluesDataFound, 
-			[in] long lTotalRedactions, [in] long lTotalManualRedactions,
-			[in] long lNumPagesAutoAdvanced);
-		//-----------------------------------------------------------------------------------------
-		// PROMISE: To set the FAMDB
-		[propput, id(2), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
-		//-----------------------------------------------------------------------------------------
-		// PROMISE: To return a recordset opened with the results of the query in bstrQuery
-		[id(3), helpstring("method GetResultsForQuery")] HRESULT GetResultsForQuery([in] BSTR bstrQuery, 
-			[out,retval] _Recordset** ppVal);
-		//-----------------------------------------------------------------------------------------
-		// PROMISE: Returns the FAM file ID for the specified file, otherwise throws exception.
-		[id(4), helpstring("method GetFileID")] HRESULT GetFileID([in] BSTR bstrFileName, 
-			[out, retval] long* plFileID);
-	};
+    [
+        object,
+        uuid(ADE58043-5972-4C10-B2C4-4A98F28323A8),
+        dual,
+        nonextensible,
+        helpstring("IIDShieldProductDBMgr Interface"),
+        pointer_default(unique)
+    ]
+    interface IIDShieldProductDBMgr : IDispatch
+    {
+        //-----------------------------------------------------------------------------------------
+        // PROMISE: To add a record in the IDShieldData table in the database for the file with the
+        //          given values.
+        // NOTE:	Any existing records in the table that have IsMostRecentUpdate set to 1 will 
+        //          have it reset to 0 and the new record will have IsMostRecentUpdate set to 1.
+        [id(1), helpstring("method AddIDShieldData")] HRESULT AddIDShieldData([in] long lFileID, 
+            [in] VARIANT_BOOL vbVerified, [in] double lDuration, [in] long lNumHCDataFound, 
+            [in] long lNumMCDataFound, [in] long lNumLCDataFound, [in] long lNumCluesDataFound, 
+            [in] long lTotalRedactions, [in] long lTotalManualRedactions,
+            [in] long lNumPagesAutoAdvanced);
+        //-----------------------------------------------------------------------------------------
+        // PROMISE: To set the FAMDB
+        [propput, id(2), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* newVal);
+        //-----------------------------------------------------------------------------------------
+        // PROMISE: To return a recordset opened with the results of the query in bstrQuery
+        [id(3), helpstring("method GetResultsForQuery")] HRESULT GetResultsForQuery([in] BSTR bstrQuery, 
+            [out,retval] _Recordset** ppVal);
+        //-----------------------------------------------------------------------------------------
+        // PROMISE: Returns the FAM file ID for the specified file, otherwise throws exception.
+        [id(4), helpstring("method GetFileID")] HRESULT GetFileID([in] BSTR bstrFileName, 
+            [out, retval] long* plFileID);
+    };
 
-	[
-		object,
-		uuid(ACD35C3E-5F92-444E-A667-C702D451D032),
-		dual,
-		nonextensible,
-		helpstring("IFilterIDShieldDataFileTask Interface"),
-		pointer_default(unique)
-	]
-	interface IFilterIDShieldDataFileTask : IDispatch
-	{
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To get/set the name of the VOA file to be filtered
-		[propput, id(1), helpstring("property VOAFileToRead")]
-			HRESULT VOAFileToRead([in] BSTR bstrVOAFileName);
-		[propget, id(1), helpstring("property VOAFileToRead")]
-			HRESULT VOAFileToRead([out, retval] BSTR* pbstrVOAFileName);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To get/set the data types to filter
-		[propput, id(2), helpstring("property DataTypes")]
-			HRESULT DataTypes([in] IVariantVector* pDataTypes);
-		[propget, id(2), helpstring("property DataTypes")]
-			HRESULT DataTypes([out, retval] IVariantVector** ppDataTypes);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To get/set the name of the VOA file to write the filtered data to
-		[propput, id(3), helpstring("property VOAFileToWrite")]
-			HRESULT VOAFileToWrite([in] BSTR bstrVOAFileName);
-		[propget, id(3), helpstring("property VOAFileToWrite")]
-			HRESULT VOAFileToWrite([out, retval] BSTR* pbstrVOAFileName);
-		//-----------------------------------------------------------------------------------------
-	};
+    [
+        object,
+        uuid(ACD35C3E-5F92-444E-A667-C702D451D032),
+        dual,
+        nonextensible,
+        helpstring("IFilterIDShieldDataFileTask Interface"),
+        pointer_default(unique)
+    ]
+    interface IFilterIDShieldDataFileTask : IDispatch
+    {
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: To get/set the name of the VOA file to be filtered
+        [propput, id(1), helpstring("property VOAFileToRead")]
+            HRESULT VOAFileToRead([in] BSTR bstrVOAFileName);
+        [propget, id(1), helpstring("property VOAFileToRead")]
+            HRESULT VOAFileToRead([out, retval] BSTR* pbstrVOAFileName);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: To get/set the data types to filter
+        [propput, id(2), helpstring("property DataTypes")]
+            HRESULT DataTypes([in] IVariantVector* pDataTypes);
+        [propget, id(2), helpstring("property DataTypes")]
+            HRESULT DataTypes([out, retval] IVariantVector** ppDataTypes);
+        //-----------------------------------------------------------------------------------------
+        // PURPOSE: To get/set the name of the VOA file to write the filtered data to
+        [propput, id(3), helpstring("property VOAFileToWrite")]
+            HRESULT VOAFileToWrite([in] BSTR bstrVOAFileName);
+        [propget, id(3), helpstring("property VOAFileToWrite")]
+            HRESULT VOAFileToWrite([out, retval] BSTR* pbstrVOAFileName);
+        //-----------------------------------------------------------------------------------------
+    };
 
-	////////////
-	// CoClasses
-	////////////
+    ////////////
+    // CoClasses
+    ////////////
 
-	// Redaction verification
-	[
-		uuid(9B27EFA7-7DA2-4161-B903-6AD0BAE6B1F1),
-		helpstring("RedactionVerificationUI Class")
-	]
-	coclass RedactionVerificationUI
-	{
-		[default] interface IRedactionVerificationUI;
-		interface IFileProcessingTask;
-		interface ICategorizedComponent;
-		interface ICopyableObject;
-		interface ILicensedComponent;
-		interface IMustBeConfiguredObject;
-	};
+    // Redaction verification
+    [
+        uuid(9B27EFA7-7DA2-4161-B903-6AD0BAE6B1F1),
+        helpstring("RedactionVerificationUI Class")
+    ]
+    coclass RedactionVerificationUI
+    {
+        [default] interface IRedactionVerificationUI;
+        interface IFileProcessingTask;
+        interface ICategorizedComponent;
+        interface ICopyableObject;
+        interface ILicensedComponent;
+        interface IMustBeConfiguredObject;
+    };
 
-	[
-		uuid(80596F69-4889-480D-B142-DD2FF780B57E),
-		helpstring("RedactionVerificationUIPP Class")
-	]
-	coclass RedactionVerificationUIPP
-	{
-		interface IUnknown;
-	};
+    [
+        uuid(80596F69-4889-480D-B142-DD2FF780B57E),
+        helpstring("RedactionVerificationUIPP Class")
+    ]
+    coclass RedactionVerificationUIPP
+    {
+        interface IUnknown;
+    };
 
-	// Legacy redaction task
-	[
-		uuid(20DDA9F8-5337-4711-B6B1-45DF74CD6634),
-		helpstring("RedactFileProcessor Class")
-	]
-	coclass RedactFileProcessor
-	{
-		[default] interface IRedactFileProcessor;
-		interface IFileProcessingTask;
-		interface ICategorizedComponent;
-		interface ICopyableObject;
-		interface ILicensedComponent;
-		interface IMustBeConfiguredObject;
-		interface IAccessRequired;
-	};
+    // Legacy redaction task
+    [
+        uuid(20DDA9F8-5337-4711-B6B1-45DF74CD6634),
+        helpstring("RedactFileProcessor Class")
+    ]
+    coclass RedactFileProcessor
+    {
+        [default] interface IRedactFileProcessor;
+        interface IFileProcessingTask;
+        interface ICategorizedComponent;
+        interface ICopyableObject;
+        interface ILicensedComponent;
+        interface IMustBeConfiguredObject;
+        interface IAccessRequired;
+    };
 
-	[
-		uuid(0E51486F-AFE4-41FC-9A44-FAED6C7E2903),
-		helpstring("RedactFileProcessorPP Class")
-	]
-	coclass RedactFileProcessorPP
-	{
-		interface IUnknown;
-	};
+    [
+        uuid(0E51486F-AFE4-41FC-9A44-FAED6C7E2903),
+        helpstring("RedactFileProcessorPP Class")
+    ]
+    coclass RedactFileProcessorPP
+    {
+        interface IUnknown;
+    };
 
-	// Redaction task
-	[
-		uuid(36D14C41-CE3D-4950-AC47-2664563340B1),
-		helpstring("RedactionTask Class")
-	]
-	coclass RedactionTask
-	{
-		[default] interface IRedactionTask;
-		interface IFileProcessingTask;
-		interface ICategorizedComponent;
-		interface ICopyableObject;
-		interface ILicensedComponent;
-		interface IMustBeConfiguredObject;
-		interface IAccessRequired;
-	};
+    // Redaction task
+    [
+        uuid(36D14C41-CE3D-4950-AC47-2664563340B1),
+        helpstring("RedactionTask Class")
+    ]
+    coclass RedactionTask
+    {
+        [default] interface IRedactionTask;
+        interface IFileProcessingTask;
+        interface ICategorizedComponent;
+        interface ICopyableObject;
+        interface ILicensedComponent;
+        interface IMustBeConfiguredObject;
+        interface IAccessRequired;
+    };
 
-	[
-		uuid(FC033951-2DBF-44ff-9394-E0D120DCB618),
-		helpstring("RedactionTaskPP Class")
-	]
-	coclass RedactionTaskPP
-	{
-		interface IUnknown;
-	};
+    [
+        uuid(FC033951-2DBF-44ff-9394-E0D120DCB618),
+        helpstring("RedactionTaskPP Class")
+    ]
+    coclass RedactionTaskPP
+    {
+        interface IUnknown;
+    };
 
-	// VOA file contents
-	[
-		uuid(B4105A87-92B7-4CE9-8FAC-BC0026478411),
-		helpstring("IDShieldVOAFileContentsCondition Class")
-	]
-	coclass IDShieldVOAFileContentsCondition
-	{
-		[default] interface IIDShieldVOAFileContentsCondition;
-		interface ILicensedComponent;
-		interface ICategorizedComponent;
-		interface ICopyableObject;
-		interface IMustBeConfiguredObject;
-		interface IFAMCondition;
-		interface IAccessRequired;
-	};
+    // VOA file contents
+    [
+        uuid(B4105A87-92B7-4CE9-8FAC-BC0026478411),
+        helpstring("IDShieldVOAFileContentsCondition Class")
+    ]
+    coclass IDShieldVOAFileContentsCondition
+    {
+        [default] interface IIDShieldVOAFileContentsCondition;
+        interface ILicensedComponent;
+        interface ICategorizedComponent;
+        interface ICopyableObject;
+        interface IMustBeConfiguredObject;
+        interface IFAMCondition;
+        interface IAccessRequired;
+    };
 
-	[
-		uuid(1D40316E-4B4A-47A6-9EF5-559DB32D738F),
-		helpstring("IDShieldVOAFileContentsConditionPP Class")
-	]
-	coclass IDShieldVOAFileContentsConditionPP
-	{
-		[default] interface IUnknown;
-	};
+    [
+        uuid(1D40316E-4B4A-47A6-9EF5-559DB32D738F),
+        helpstring("IDShieldVOAFileContentsConditionPP Class")
+    ]
+    coclass IDShieldVOAFileContentsConditionPP
+    {
+        [default] interface IUnknown;
+    };
 
-	// Select target file
-	[
-		uuid(02AEEE32-789A-4975-A625-7C9544C8316F),
-		helpstring("SelectTargetFileUI Class")
-	]
-	coclass SelectTargetFileUI
-	{
-		[default] interface ISelectTargetFileUI;
-		interface ILicensedComponent;
-	};
+    // Select target file
+    [
+        uuid(02AEEE32-789A-4975-A625-7C9544C8316F),
+        helpstring("SelectTargetFileUI Class")
+    ]
+    coclass SelectTargetFileUI
+    {
+        [default] interface ISelectTargetFileUI;
+        interface ILicensedComponent;
+    };
 
-	// SSN Finder
-	[ 
-	  uuid(8B93BCF6-293A-457B-8202-B77FE1DEE42B),
-	  helpstring("SSNFinder Class")
-	]
-	coclass SSNFinder
-	{
-		[default] interface ISSNFinder;
-		interface IAttributeModifyingRule;
-		interface ICategorizedComponent;
-		interface ICopyableObject;
-		interface ILicensedComponent;
-		interface IMustBeConfiguredObject;
-	};
+    // SSN Finder
+    [ 
+      uuid(8B93BCF6-293A-457B-8202-B77FE1DEE42B),
+      helpstring("SSNFinder Class")
+    ]
+    coclass SSNFinder
+    {
+        [default] interface ISSNFinder;
+        interface IAttributeModifyingRule;
+        interface ICategorizedComponent;
+        interface ICopyableObject;
+        interface ILicensedComponent;
+        interface IMustBeConfiguredObject;
+    };
 
-	[
-	  uuid(209B4D3D-9706-4295-86A1-3E130B2FA0AF),
-	  helpstring("SSNFinderPP Class")
-	]
-	coclass SSNFinderPP
-	{
-		interface IUnknown;
-	}; 
+    [
+      uuid(209B4D3D-9706-4295-86A1-3E130B2FA0AF),
+      helpstring("SSNFinderPP Class")
+    ]
+    coclass SSNFinderPP
+    {
+        interface IUnknown;
+    }; 
 
-	// ID Shield database manager
-	[
-		uuid(ED3295F2-7D53-4CCB-A246-BF3118B10012),
-		helpstring("IDShieldProductDBMgr Class")
-	]
-	coclass IDShieldProductDBMgr
-	{
-		[default] interface IIDShieldProductDBMgr;
-		interface IProductSpecificDBMgr;
-		interface ICategorizedComponent;
-		interface ILicensedComponent;
-	};
+    // ID Shield database manager
+    [
+        uuid(ED3295F2-7D53-4CCB-A246-BF3118B10012),
+        helpstring("IDShieldProductDBMgr Class")
+    ]
+    coclass IDShieldProductDBMgr
+    {
+        [default] interface IIDShieldProductDBMgr;
+        interface IProductSpecificDBMgr;
+        interface ICategorizedComponent;
+        interface ILicensedComponent;
+    };
 
-	// IFilterIDShieldDataFile task and property page
-	[
-		uuid(85D176EC-411F-4568-965B-CAA7F528EFD6),
-		helpstring("FilterIDShieldDataFileTask Class")
-	]
-	coclass FilterIDShieldDataFileTask
-	{
-		[default] interface IFilterIDShieldDataFileTask;
-		interface IFileProcessingTask;
-		interface ICategorizedComponent;
-		interface ICopyableObject;
-		interface ILicensedComponent;
-		interface IMustBeConfiguredObject;
-		interface IAccessRequired;
-	};
-	[
-		uuid(A68A4C80-CCDA-429A-B1E0-FF4E2FCC775A),
-		helpstring("FilterIDShieldDataFileTaskPP Class")
-	]
-	coclass FilterIDShieldDataFileTaskPP
-	{
-		interface IUnknown;
-	};
+    // IFilterIDShieldDataFile task and property page
+    [
+        uuid(85D176EC-411F-4568-965B-CAA7F528EFD6),
+        helpstring("FilterIDShieldDataFileTask Class")
+    ]
+    coclass FilterIDShieldDataFileTask
+    {
+        [default] interface IFilterIDShieldDataFileTask;
+        interface IFileProcessingTask;
+        interface ICategorizedComponent;
+        interface ICopyableObject;
+        interface ILicensedComponent;
+        interface IMustBeConfiguredObject;
+        interface IAccessRequired;
+    };
+    [
+        uuid(A68A4C80-CCDA-429A-B1E0-FF4E2FCC775A),
+        helpstring("FilterIDShieldDataFileTaskPP Class")
+    ]
+    coclass FilterIDShieldDataFileTaskPP
+    {
+        interface IUnknown;
+    };
 };
