@@ -181,6 +181,7 @@
 #define IDC_CHECK_REPLACE_TEXT			363
 #define IDC_EDIT_REPLACE_TEXT			364
 #define IDC_EDIT_REPLACEMENT_TEXT		365
+#define IDC_CHECK_ADJUST_CASE			366
 
 // Next default values for new objects
 // 
@@ -188,7 +189,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         32781
-#define _APS_NEXT_CONTROL_VALUE         366
+#define _APS_NEXT_CONTROL_VALUE         367
 #define _APS_NEXT_SYMED_VALUE           155
 #endif
 #endif

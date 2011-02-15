@@ -810,6 +810,21 @@ void makeTitleCase(string& strInput)
 	}
 }
 //--------------------------------------------------------------------------------------------------
+void makeSentenceCase(string& strInput)
+{
+	if (strInput.empty())
+	{
+		return;
+	}
+
+	size_t nLength = strInput.length();
+	strInput[0] = (char)toupper(strInput[0]);
+	for(size_t i=1; i < nLength; i++)
+	{
+		strInput[i] = (char)tolower(strInput[i]);
+	}
+}
+//--------------------------------------------------------------------------------------------------
 void reverseString(string& strText)
 {
 	// Get pointer to input string
@@ -1429,5 +1444,12 @@ string removeUnprintableCharacters(const string& strInput)
 	}
 
 	return strRet;
+}
+//--------------------------------------------------------------------------------------------------
+bool isSentenceCase(const string& strText)
+{
+	return !strText.empty()
+		&& strText.substr(0,1).find_first_of(gstrUPPER_ALPHA) != string::npos
+		&& strText.substr(1).find_first_of(gstrUPPER_ALPHA) == string::npos;
 }
 //--------------------------------------------------------------------------------------------------

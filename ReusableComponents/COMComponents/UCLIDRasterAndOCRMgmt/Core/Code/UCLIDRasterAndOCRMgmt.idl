@@ -1355,7 +1355,19 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(6), helpstring("method ExtendDataInRegion")] HRESULT ExtendDataInRegion(
 			[in] ILongRectangle *pRect, [in] long lNumWordsToExtend, 
 			[in] VARIANT_BOOL vbExtendHeight, [out, retval] ISpatialString** ppFound);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return a spatial string containing the word immediately to the left
+		// of the specified region.
+		[id(7), helpstring("method GetLeftWord")] HRESULT GetLeftWord(
+			[in] ILongRectangle* ipRect, [out, retval] ISpatialString** ipReturnString);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return a spatial string containing the word immediately to the right
+		// of the specified region.
+		[id(8), helpstring("method GetRightWord")] HRESULT GetRightWord(
+			[in] ILongRectangle* ipRect, [out, retval] ISpatialString** ipReturnString);
+		//-----------------------------------------------------------------------------------------
 	};
+
 	[
 		object,
 		uuid(1605ED5D-C80B-4AC6-85AF-01535E9A4C09),

@@ -1422,11 +1422,25 @@ bool isImageFileExtension(string strExt)
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
-bool isThreeDigitExtension(const string& strExt)
+bool isNumericExtension(const string& strExt)
 {
-	return (strExt.length() == 4 && strExt[0] == '.' &&
-		isDigitChar(strExt[1]) && isDigitChar(strExt[2]) &&
-		isDigitChar(strExt[3]));
+	if (strExt.length() < 2 || strExt[0] != '.')
+	{
+		return false;
+	}
+	else
+	{
+		string::const_iterator it = strExt.begin();
+		for(it++; it != strExt.end(); it++)
+		{
+			if (!isDigitChar(*it))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
 //--------------------------------------------------------------------------------------------------
 EFileType getFileType(const string& strFileName)
@@ -1470,7 +1484,7 @@ EFileType getFileType(const string& strFileName)
 	// Check utility list of image file extensions
 	// also accepting three digits as indicating an image file
 	else if (isImageFileExtension( strExt ) || 
-		isThreeDigitExtension( strExt ))
+		isNumericExtension( strExt ))
 	{
 		return kImageFile;
 	}

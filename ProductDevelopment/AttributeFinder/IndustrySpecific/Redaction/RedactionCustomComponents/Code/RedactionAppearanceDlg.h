@@ -71,6 +71,7 @@ private:
 	CComboBox m_comboText;
 	CButton m_buttonTextTag;
 	CButton m_checkReplaceText;
+	CButton m_checkAutoAdjustCase;
 	CEdit m_editTextToReplace;
 	CEdit m_editReplacementText;
 	CEdit m_editSampleText;

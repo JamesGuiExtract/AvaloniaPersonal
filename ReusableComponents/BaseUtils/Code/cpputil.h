@@ -395,7 +395,7 @@ EXPORT_BaseUtils bool isValidFile(const string& strFile);
 //			return false)
 EXPORT_BaseUtils bool isValidFolder(const string& strFolder);
 //-------------------------------------------------------------------------------------------------
-EXPORT_BaseUtils bool isThreeDigitExtension(const string& strExt);
+EXPORT_BaseUtils bool isNumericExtension(const string& strExt);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the file version
 // REQUIRE: strFileFullName must be fully qualified file name
@@ -611,6 +611,8 @@ EXPORT_BaseUtils void makeLowerCase(string & strInput);
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils void makeTitleCase(string & strInput);
 //-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils void makeSentenceCase(string& strInput);
+//-------------------------------------------------------------------------------------------------
 // Reverse the characters of strText
 // i.e. "Hello World!" ---> "!dlroW olleH"
 EXPORT_BaseUtils void reverseString(string& strText);
@@ -758,6 +760,10 @@ EXPORT_BaseUtils int findWordMatch(const string& strInput,
 								   const string& strWord, 
 								   int nStartPos = 0,		// start searching position
 								   bool bCaseSensitive = false);
+//-------------------------------------------------------------------------------------------------
+// Checks whether or not the provided string is in sentence case (i.e. only the first
+// word has been capitalized)
+EXPORT_BaseUtils bool isSentenceCase(const string& strText);
 
 //-------------------------------------------------------------------------------------------------
 // ********* Number Operations **********

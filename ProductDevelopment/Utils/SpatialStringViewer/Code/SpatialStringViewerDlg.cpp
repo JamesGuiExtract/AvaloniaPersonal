@@ -883,8 +883,8 @@ std::string CSpatialStringViewerDlg::getUSSFileName(const std::string strInputNa
 	// is found, we will simply validate and return the original input file
 	string strAssociatedFile = strInputName;
 
-	// Check if the extension is an image file or 3 digit extension [LRCAU #5208]
-	if( isImageFileExtension(strExt) || isThreeDigitExtension(strExt))
+	// Check if the extension is an image file or numeric extension [LRCAU #5208]
+	if( isImageFileExtension(strExt) || isNumericExtension(strExt))
 	{
 		// Append ".uss" and look for this file
 		strAssociatedFile += string( ".uss" );
@@ -898,8 +898,8 @@ std::string CSpatialStringViewerDlg::getUSSFileName(const std::string strInputNa
 		strExt = getExtensionFromFullPath(strInputFileWithoutExt);
 
 		// check if the original file's sub-extension is an image file or
-		// three digit extension [LRCAU #5210]
-		if( isImageFileExtension(strExt) || isThreeDigitExtension(strExt))
+		// numeric extension [LRCAU #5210]
+		if( isImageFileExtension(strExt) || isNumericExtension(strExt))
 		{
 			strAssociatedFile = strInputFileWithoutExt + string(".uss");
 		}

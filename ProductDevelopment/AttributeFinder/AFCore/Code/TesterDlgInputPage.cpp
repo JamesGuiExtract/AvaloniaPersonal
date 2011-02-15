@@ -441,10 +441,10 @@ ISpatialStringPtr TesterDlgInputPage::openFile(const string& strFileName)
 		return ipText;
 	}
 
-	// NOTE: if the extension is 3 digits, then assume it's an image
-	// (Many customers store tif images with a 3 digit extension where
-	// the three digits represent the number of pages in the image)
-	if (isImageFileExtension(strExtension ) || isThreeDigitExtension(strExtension))
+	// NOTE: if the extension contains only digits, then assume it's an image
+	// (Many customers store tif images with a 3 or 4 digit extension where
+	// the digits represent the number of pages in the image)
+	if (isImageFileExtension(strExtension ) || isNumericExtension(strExtension))
 	{
 		// If perform OCR is checked, then try to either load the USS file or perform
 		// the OCR on the image

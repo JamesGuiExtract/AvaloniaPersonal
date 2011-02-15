@@ -177,6 +177,32 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         }
         _lastCodePos = "100";
 
+		// If adjusting the redaction text casing
+		// and there is a valid USS file, initialize the spatial string searcher
+		ISpatialStringSearcherPtr ipSearcher = __nullptr;
+		ISpatialStringSearcherPtr ipAttrSearcher = __nullptr;
+		if (m_redactionAppearance.m_bAdjustTextCasing
+			&& isValidFile(strImageName + ".uss"))
+		{
+			ISpatialStringPtr ipText(CLSID_SpatialString);
+			ASSERT_RESOURCE_ALLOCATION("ELI31676", ipText != __nullptr);
+
+			ipText->LoadFrom((strImageName + ".uss").c_str(), VARIANT_FALSE);
+
+			ipSearcher.CreateInstance(CLSID_SpatialStringSearcher);
+			ASSERT_RESOURCE_ALLOCATION("ELI31677", ipSearcher != __nullptr);
+
+			ipSearcher->InitSpatialStringSearcher(ipText);
+
+			// This searcher will be used to search the context for each
+			// attribute and will be initialized with the expanded context
+			// region for the attribute. In order to be more performative, 
+			// this searcher is created once here, but will be initialized each
+			// time it is needed with the expanded attribute region.
+			ipAttrSearcher.CreateInstance(CLSID_SpatialStringSearcher);
+			ASSERT_RESOURCE_ALLOCATION("ELI31678", ipSearcher != __nullptr);
+		}
+
         // Expand tags and text functions to get the output name
         string strOutputName = CRedactionCustomComponentsUtils::ExpandTagsAndTFE(
             ipFAMTagManager, m_strOutputFileName, strImageName);
@@ -193,17 +219,6 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 
         // Validate input image exists
         ::validateFileOrFolderExistence(strImageName);
-
-        // Create AFDocument
-        UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-        ASSERT_RESOURCE_ALLOCATION("ELI09172", ipAFDoc != NULL);
-
-        // Get Text element for AFDoc
-        ISpatialStringPtr ipText = ipAFDoc->Text;
-        ASSERT_RESOURCE_ALLOCATION("ELI14967", ipText != NULL);
-
-        // Set the AFDoc SourceDocName property
-        ipText->SourceDocName = strImageName.c_str();
 
         _lastCodePos = "110";
         // Create Found attributes vector
@@ -306,18 +321,152 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
                     replaceVariable(strText, m_redactionAppearance.m_strTextToReplace,
                         m_redactionAppearance.m_strReplacementText, kReplaceAll);
                 }
+
                 // Get the Raster zones to redact
                 IIUnknownVectorPtr ipRasterZones = ipValue->GetOriginalImageRasterZones();
                 ASSERT_RESOURCE_ALLOCATION("ELI09180", ipRasterZones != NULL);
                 _lastCodePos = "280";
 
+				IIUnknownVectorPtr ipOcrZones = __nullptr;
+				if (ipSearcher != __nullptr && isSentenceCase(strText))
+				{
+					ipOcrZones = ipValue->GetOCRImageRasterZones();
+					ASSERT_RESOURCE_ALLOCATION("ELI31664", ipOcrZones != __nullptr);
+				}
+
                 // Add to the vector of zones to redact
                 long lZoneCount = ipRasterZones->Size();
                 for (long j = 0; j < lZoneCount; j++)
                 {
-                    // Bring raster zone
+					// Get the raster zone
                     IRasterZonePtr ipRasterZone = ipRasterZones->At(j);
                     ASSERT_RESOURCE_ALLOCATION("ELI24862", ipRasterZone != NULL);
+
+					// Store the text value locally (this value may be changed
+					// if auto-adjust case is true)
+					string strRedactionText = strText;
+
+					// If there is a valid spatial string searcher, then attempt to update
+					// the case of the text based on the searcher results
+					if (ipOcrZones != __nullptr)
+					{
+		                _lastCodePos = "280_10";
+
+						// Get the ocr zone
+						IRasterZonePtr ipOcrZone = ipOcrZones->At(j);
+						ASSERT_RESOURCE_ALLOCATION("ELI31669", ipOcrZone != __nullptr);
+
+						ILongRectanglePtr ipBounds = ipValue->GetOCRImagePageBounds(
+							ipOcrZone->PageNumber);
+						ASSERT_RESOURCE_ALLOCATION("ELI31670", ipBounds != __nullptr);
+
+						// Get the bounds
+						ILongRectanglePtr ipRect = ipOcrZone->GetRectangularBounds(ipBounds);
+						ASSERT_RESOURCE_ALLOCATION("ELI31671", ipRect != __nullptr);
+
+						// Get the spatial string for the attribute
+						ISpatialStringPtr ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+						ASSERT_RESOURCE_ALLOCATION("ELI31680", ipTemp != __nullptr);
+						string strTemp = asString(ipTemp);
+						size_t nIndex = strTemp.find_last_of(".!?");
+
+						bool bMakeLowerCase = false;
+						if (nIndex == string::npos || nIndex < (strTemp.length() - 1))
+						{
+							// Get the page bounds
+							long nPageLeft(0), nPageTop(0), nPageBottom(0), nPageRight(0);
+							ipBounds->GetBounds(&nPageLeft, &nPageTop, &nPageRight, &nPageBottom);
+
+							// Get the bounds of the zone
+							long nRectLeft(0), nRectTop(0), nRectBottom(0), nRectRight(0);
+							ipRect->GetBounds(&nRectLeft, &nRectTop, &nRectRight, &nRectBottom);
+
+							// Store the original zone bounds
+							ILongRectanglePtr ipOrigRect(CLSID_LongRectangle);
+							ASSERT_RESOURCE_ALLOCATION("ELI31679", ipOrigRect);
+							ipOrigRect->SetBounds(nRectLeft, nRectTop, nRectRight, nRectBottom);
+
+							// Get the average height. This is the height we
+							// will use to expand the region (both up and down) to encompass other
+							// lines in the region.
+							long nHeightIncrease = ipTemp->GetAverageCharHeight();
+
+							// First set the bounds left and right and check for words
+							ipRect->SetBounds(nPageLeft, nRectTop,
+								nPageRight, nRectBottom);
+							ipRect->Clip(nPageLeft, nPageTop, nPageRight, nPageBottom);
+
+							ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+							ASSERT_RESOURCE_ALLOCATION("ELI31681", ipTemp != __nullptr);
+
+							// Initialize the attribute searcher with this string
+							ipAttrSearcher->InitSpatialStringSearcher(ipTemp);
+
+							// Look left and right, if empty in either direction, expand
+							// the zone of searching up and/or down based on missing words
+							ISpatialStringPtr ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
+							ISpatialStringPtr ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
+							if (ipLeftWord == __nullptr || ipRightWord == __nullptr)
+							{
+								nRectTop -= ipLeftWord == __nullptr ? nHeightIncrease : 0;
+								nRectBottom += ipRightWord == __nullptr ? nHeightIncrease : 0;
+								ipRect->SetBounds(nPageLeft, nRectTop, nPageRight, nRectBottom);
+								ipRect->Clip(nPageLeft, nPageTop, nPageRight, nPageBottom);
+
+								// Get the data from the expanded region
+								ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+								ASSERT_RESOURCE_ALLOCATION("ELI31682", ipTemp != __nullptr);
+
+								ipAttrSearcher->InitSpatialStringSearcher(ipTemp);
+
+								// Get the new left and right words
+								ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
+								ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
+							}
+
+							// If there is a word to the left, look for punctuation
+							if (ipLeftWord != __nullptr)
+							{
+								string strLeft = asString(ipLeftWord->String);
+								if (strLeft.substr(strLeft.length() - 1)
+									.find_first_of(".!?") == string::npos)
+								{
+									// No punctuation to the left, look for lower case letters
+									if (strLeft.find_first_of(gstrLOWER_ALPHA) != string::npos)
+									{
+										// found lower case letters
+										bMakeLowerCase = true;
+									}
+								}
+								else
+								{
+									// Sentence punctuation to the left, set right word to
+									// null, no need to check further
+									ipRightWord = __nullptr;
+								}
+							}
+							if (!bMakeLowerCase && ipRightWord != __nullptr)
+							{
+								string strRight = asString(ipRightWord->String);
+								if (strRight.find_first_of(gstrLOWER_ALPHA) != string::npos)
+								{
+									bMakeLowerCase = true;
+								}
+							}
+						}
+						else
+						{
+							bMakeLowerCase = true;
+						}
+
+						if (bMakeLowerCase)
+						{
+							makeLowerCase(strRedactionText);
+						}
+
+		                _lastCodePos = "280_20";
+					}
+	                _lastCodePos = "285";
 
                     // Construct the page raster zone
                     PageRasterZone zone;
@@ -326,7 +475,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
                     zone.m_crTextColor = crTextColor;
                     zone.m_font = m_redactionAppearance.m_lgFont;
                     zone.m_iPointSize = m_redactionAppearance.m_iPointSize;
-                    zone.m_strText = strText;
+                    zone.m_strText = strRedactionText;
                     ipRasterZone->GetData(&(zone.m_nStartX), &(zone.m_nStartY), &(zone.m_nEndX),
                         &(zone.m_nEndY), &(zone.m_nHeight), &(zone.m_nPage));
 
@@ -337,21 +486,6 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
             _lastCodePos = "290";
         }
         _lastCodePos = "300";
-
-        // modify AFDocument's text's source document name to be image
-        // name if the input source document is a USS file
-        if (strExt == ".uss")
-        {
-            _lastCodePos = "310";
-
-            // Retrieve text from AFDocument
-            ISpatialStringPtr ipText = ipAFDoc->Text;
-            ASSERT_RESOURCE_ALLOCATION("ELI15635", ipText != NULL);
-
-            // Updated the source name to the image name
-            ipText->SourceDocName = strImageName.c_str();
-        }
-        _lastCodePos = "320";
 
         // check to see if output path exists, if not try to create
         string strOutputPath = getDirectoryFromFullPath(strOutputName, false);

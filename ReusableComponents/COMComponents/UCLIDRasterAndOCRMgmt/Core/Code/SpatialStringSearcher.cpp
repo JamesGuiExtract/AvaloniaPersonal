@@ -367,6 +367,152 @@ STDMETHODIMP CSpatialStringSearcher::ExtendDataInRegion(ILongRectangle *pRect,
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialStringSearcher::GetLeftWord(ILongRectangle *pRect, ISpatialString **ppReturnString)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31665", ppReturnString != NULL);
+
+		validateLicense();
+
+		// Default to NULL return
+		*ppReturnString = __nullptr;
+
+		ILongRectanglePtr ipRect(pRect);
+		ASSERT_RESOURCE_ALLOCATION("ELI31666", ipRect != NULL);
+
+		// Get a vector of all the letters that fall in the region
+		vector<int> vecLetters;		
+		getUnsortedLettersInRegion(ipRect, vecLetters);
+
+		// Convert the vector of letters to a vector of substrings
+		vector<LocalSubstring> vecSubstrings;
+		getLettersAsSubstrings(vecLetters, vecSubstrings);
+
+		if (vecSubstrings.size() < 1)
+		{
+			return S_OK;
+		}
+
+		// Get the first substring and expand it to the left
+		LocalSubstring& sub = vecSubstrings[0];
+		unsigned int uiStart = sub.m_uiStartLetter;
+		sub.expandLeft(1, m_vecLetters, m_vecWords);
+
+		// If expansion is in same word, just return
+		if (uiStart <= sub.m_uiStartLetter)
+		{
+			return S_OK;
+		}
+
+		unsigned int uiWord = m_vecLetters[sub.m_uiStartLetter].m_uiWord;
+
+		// If word is outside bounds of word vector, just return
+		if (uiWord < 0 || uiWord >= m_vecWords.size())
+		{
+			return S_OK;
+		}
+
+		// Get the starting word for the expanded substring
+		LocalWord& word = m_vecWords[uiWord];
+
+		// Clear the letter vector and add the indexes for each letter in the left-most word
+		vecLetters.clear();
+		for (unsigned int i=word.m_uiStart; i <= word.m_uiEnd; i++)
+		{
+			vecLetters.push_back(i);
+		}
+
+		// Create a return string from the left most word
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFound =
+			createStringFromLetterIndexes(vecLetters, false);
+		ASSERT_RESOURCE_ALLOCATION("ELI31667", ipFound != __nullptr);
+
+		*ppReturnString = (ISpatialString*)ipFound.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31668");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialStringSearcher::GetRightWord(ILongRectangle *pRect, ISpatialString **ppReturnString)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31672", ppReturnString != NULL);
+
+		validateLicense();
+
+		// Default to NULL return
+		*ppReturnString = __nullptr;
+
+		ILongRectanglePtr ipRect(pRect);
+		ASSERT_RESOURCE_ALLOCATION("ELI31673", ipRect != NULL);
+
+		// Get a vector of all the letters that fall in the region
+		vector<int> vecLetters;		
+		getUnsortedLettersInRegion(ipRect, vecLetters);
+
+		// Convert the vector of letters to a vector of substrings
+		vector<LocalSubstring> vecSubstrings;
+		getLettersAsSubstrings(vecLetters, vecSubstrings);
+
+		if (vecSubstrings.size() < 1)
+		{
+			return S_OK;
+		}
+
+		// Get the first substring and expand it to the right
+		LocalSubstring& sub = vecSubstrings[vecSubstrings.size()-1];
+		unsigned int uiEnd = sub.m_uiEndLetter;
+		sub.expandRight(1, m_vecLetters, m_vecWords);
+		unsigned int uiNewEnd = sub.m_uiEndLetter;
+		if (uiNewEnd >= m_vecLetters.size())
+		{
+			uiNewEnd = m_vecLetters.size() - 1;
+		}
+
+		// If expansion is in same word, just return
+		if (uiEnd >= uiNewEnd)
+		{
+			return S_OK;
+		}
+
+		unsigned int uiWord = m_vecLetters[uiNewEnd].m_uiWord;
+
+		// If word is outside bounds of word vector, just return
+		if (uiWord < 0 || uiWord >= m_vecWords.size())
+		{
+			return S_OK;
+		}
+
+		// Get the ending word for the expanded substring
+		LocalWord& word = m_vecWords[uiWord];
+
+
+		// Clear the letter vector and add the indexes for each letter in the right-most word
+		vecLetters.clear();
+		for (unsigned int i=word.m_uiStart; i <= word.m_uiEnd && i < m_vecLetters.size(); i++)
+		{
+			vecLetters.push_back(i);
+		}
+
+		// Create a return string from the left most word
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFound =
+			createStringFromLetterIndexes(vecLetters, false);
+		ASSERT_RESOURCE_ALLOCATION("ELI31674", ipFound != __nullptr);
+
+		*ppReturnString = (ISpatialString*)ipFound.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31675");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialStringSearcher::SetIncludeDataOnBoundary(VARIANT_BOOL bInclude)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -471,7 +617,7 @@ void CSpatialStringSearcher::createLocalLetters()
 		memcpy(&(vecCppLetters[0]), pLetters, numLetters * sizeof(CPPLetter));
 	}
 
-	for (long i = 0; i < vecCppLetters.size(); i++)
+	for (size_t i = 0; i < vecCppLetters.size(); i++)
 	{
 		const CPPLetter& letter = vecCppLetters[i];
 

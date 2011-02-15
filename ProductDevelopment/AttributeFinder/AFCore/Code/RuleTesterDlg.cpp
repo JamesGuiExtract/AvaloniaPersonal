@@ -885,11 +885,11 @@ void RuleTesterDlg::processDroppedFile(char *pszFile)
 	string strExt = getExtensionFromFullPath(pszFile, true);
 	bool bIsGDD = strExt == ".gdd";
 
-	// NOTE: if the extension is 3 digits, then assume it's an image
-	// (Many customers store tif images with a 3 digit extension where
-	// the three digits represent the number of pages in the image)
+	// NOTE: if the extension consists of only digits, then assume it's an image
+	// (Many customers store tif images with a 3 or 4 digit extension where
+	// the digits represent the number of pages in the image)
 
-	if (isImageFileExtension(strExt) || bIsGDD || isThreeDigitExtension(strExt))
+	if (isImageFileExtension(strExt) || bIsGDD || isNumericExtension(strExt))
 	{
 		openImageOrGDDFile(pszFile, bIsGDD);
 	}

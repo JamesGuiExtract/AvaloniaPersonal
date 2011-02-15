@@ -2089,7 +2089,7 @@ void SpotRecognitionDlg::OnDropFiles(HDROP hDropInfo)
 			string strExtension = getExtensionFromFullPath(strFile, true);
 			// if this is an image file
 			if (isImageFileExtension( strExtension )
-				|| isThreeDigitExtension( strExtension ))
+				|| isNumericExtension( strExtension ))
 			{
 				// Attempt to open the file
 				openFile2(strFile);

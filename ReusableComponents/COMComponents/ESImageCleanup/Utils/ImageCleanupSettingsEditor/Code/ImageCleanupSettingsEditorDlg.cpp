@@ -1131,7 +1131,7 @@ void CImageCleanupSettingsEditorDlg::OnChangeTestInFileName()
 		if (m_chkOutFile.GetCheck() == BST_UNCHECKED)
 		{
 			string strExt = getExtensionFromFullPath(m_strInImageFile, true);
-			if (isImageFileExtension(strExt) || isThreeDigitExtension(strExt))
+			if (isImageFileExtension(strExt) || isNumericExtension(strExt))
 			{
 				m_strOutImageFile = getCleanImageName(m_strInImageFile);
 				m_editOutFile.SetWindowText(m_strOutImageFile.c_str());
@@ -1764,11 +1764,11 @@ void CImageCleanupSettingsEditorDlg::setButtonStates()
 		// set the test area button states
 		bool bEnableIn(false), bEnableOut(false);
 
-		// check if it is image extension or three digit extension (many customers store tif
-		// images with a 3 digit extension where the three digits represent the number of
+		// check if it is image extension or numeric extension (many customers store tif
+		// images with a numeric extension where the digits represent the number of
 		// pages in the image
 		string strExt = getExtensionFromFullPath(m_strInImageFile, true);
-		if (isImageFileExtension(strExt) || isThreeDigitExtension(strExt))
+		if (isImageFileExtension(strExt) || isNumericExtension(strExt))
 		{
 			bEnableIn = isFileOrFolderValid(m_strInImageFile);
 		}
@@ -1778,7 +1778,7 @@ void CImageCleanupSettingsEditorDlg::setButtonStates()
 
 		// check if the output image file has an image extension
 		strExt = getExtensionFromFullPath(m_strOutImageFile, true);
-		bEnableOut = (isImageFileExtension(strExt) || isThreeDigitExtension(strExt));
+		bEnableOut = (isImageFileExtension(strExt) || isNumericExtension(strExt));
 
 		m_btnOpenOutFile.EnableWindow(asMFCBool(bEnableOut));
 

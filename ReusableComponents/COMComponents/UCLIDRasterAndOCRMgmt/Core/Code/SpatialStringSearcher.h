@@ -50,6 +50,8 @@ public:
 	STDMETHOD(InitSpatialStringSearcher)(ISpatialString* pSpatialString);
 	STDMETHOD(ExtendDataInRegion)(ILongRectangle *pRect, long lNumWordsToExtend, 
 		VARIANT_BOOL vbExtendHeight, ISpatialString** ppFound);
+	STDMETHOD(GetLeftWord)(ILongRectangle* ipRect, ISpatialString** ipReturnString);
+	STDMETHOD(GetRightWord)(ILongRectangle* ipRect, ISpatialString** ipReturnString);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

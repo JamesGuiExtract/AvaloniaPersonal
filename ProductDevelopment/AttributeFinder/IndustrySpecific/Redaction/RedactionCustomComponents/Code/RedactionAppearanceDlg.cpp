@@ -182,6 +182,7 @@ void CRedactionAppearanceDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_REPLACE_TEXT, m_checkReplaceText);
 	DDX_Control(pDX, IDC_EDIT_REPLACE_TEXT, m_editTextToReplace);
 	DDX_Control(pDX, IDC_EDIT_REPLACEMENT_TEXT, m_editReplacementText);
+	DDX_Control(pDX, IDC_CHECK_ADJUST_CASE, m_checkAutoAdjustCase);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CRedactionAppearanceDlg, CDialog)
@@ -236,6 +237,7 @@ BOOL CRedactionAppearanceDlg::OnInitDialog()
 			m_editTextToReplace.EnableWindow(FALSE);
 			m_editReplacementText.EnableWindow(FALSE);
 		}
+		m_checkAutoAdjustCase.SetCheck(asBSTChecked(m_options.m_bAdjustTextCasing));
 
 		// Set colors
 		m_comboBorderColor.SetCurSel( getIndexFromColor(m_options.m_crBorderColor) );
@@ -270,6 +272,7 @@ void CRedactionAppearanceDlg::OnOK()
 			m_options.m_strTextToReplace = "";
 			m_options.m_strReplacementText = "";
 		}
+		m_options.m_bAdjustTextCasing = m_checkAutoAdjustCase.GetCheck() == BST_CHECKED;
 
 		// Set the border color
 		int selection = m_comboBorderColor.GetCurSel();
