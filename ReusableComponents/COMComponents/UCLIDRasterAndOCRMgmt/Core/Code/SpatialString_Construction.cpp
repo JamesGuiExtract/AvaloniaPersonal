@@ -451,9 +451,9 @@ STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName,
 		// functions to read the text from the ASCII file
 		string strInputFile = asString(strFullFileName);
 		EFileType eFileType = getFileType(strInputFile);
-		if (eFileType == kTXTFile)
+		if (eFileType == kTXTFile || eFileType == kXMLFile)
 		{
-			loadFromTXTFile(strInputFile);
+			loadTextWithPositionalData(strInputFile);
 		}
 		else if (eFileType == kUSSFile)
 		{

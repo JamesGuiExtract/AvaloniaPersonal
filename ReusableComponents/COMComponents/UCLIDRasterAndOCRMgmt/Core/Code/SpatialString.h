@@ -294,6 +294,10 @@ private:
 	void loadFromTXTFile(const string& strFileName);
 	void saveToTXTFile(const string& strFileName);
 	//----------------------------------------------------------------------------------------------
+	// Loads specified text file as "indexed" text by loading it as a spatial string where the X
+	// coordinate of each letter is the position of the character in the text file.
+	void loadTextWithPositionalData(const string& strFileName);
+	//----------------------------------------------------------------------------------------------
 	// according to pass in start/end page number and total page number,
 	// find out the actual start/end page number 
 	// Return true if entire document shall be returned

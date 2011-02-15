@@ -152,49 +152,61 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31586", ipFileRecord != __nullptr);
 
-		string strImageFileName = asString(ipFileRecord->Name);
+		string strInputFileName = asString(ipFileRecord->Name);
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
 
 		// verify the file existence
-		::validateFileOrFolderExistence(strImageFileName);
+		::validateFileOrFolderExistence(strInputFileName);
 
 		// append .uss to the image file name
-		string strOutputFileName = strImageFileName + ".uss";
-
-		// get the image to OCR
-		string strImageToOcr = m_bUseCleanedImageIfAvailable ?
-			getCleanImageNameIfExists(strImageFileName) : strImageFileName;
+		string strOutputFileName = strInputFileName + ".uss";
 
 		ISpatialStringPtr ipSS = NULL;
 
-		// based on the type
-		switch (m_eOCRPageRangeType)
+		EFileType eFileType = getFileType(strInputFileName);
+		if (eFileType == kTXTFile || eFileType == kXMLFile)
 		{
-		case UCLID_FILEPROCESSORSLib::kOCRAll:
-			{
-				ipSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
-					1, -1, UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
-					UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
-			}
-			break;
-		case UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages:
-			{
-				ipSS = getOCREngine()->RecognizeTextInImage2(strImageToOcr.c_str(), 
-					get_bstr_t(m_strSpecificPages), VARIANT_TRUE, pProgressStatus);
-			}
-			break;
-		default:
-			THROW_LOGIC_ERROR_EXCEPTION("ELI28161");
-			break;
-		}
-		ASSERT_RESOURCE_ALLOCATION("ELI28150", ipSS != NULL);
+			// If a text file, load as "indexed" text.
+			ipSS.CreateInstance(CLSID_SpatialString);
+			ASSERT_RESOURCE_ALLOCATION("ELI31683", ipSS != NULL);
 
-		// Ensure source doc name is original image file if a clean image was used
-		if (m_bUseCleanedImageIfAvailable)
+			ipSS->LoadFrom(strInputFileName.c_str(), VARIANT_FALSE);
+		}
+		else
 		{
-			ipSS->SourceDocName = strImageFileName.c_str();
+			// get the image to OCR
+			string strImageToOcr = m_bUseCleanedImageIfAvailable ?
+				getCleanImageNameIfExists(strInputFileName) : strInputFileName;
+
+			// based on the type
+			switch (m_eOCRPageRangeType)
+			{
+			case UCLID_FILEPROCESSORSLib::kOCRAll:
+				{
+					ipSS = getOCREngine()->RecognizeTextInImage(strImageToOcr.c_str(), 
+						1, -1, UCLID_RASTERANDOCRMGMTLib::kNoFilter, "", 
+						UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
+				}
+				break;
+			case UCLID_FILEPROCESSORSLib::kOCRSpecifiedPages:
+				{
+					ipSS = getOCREngine()->RecognizeTextInImage2(strImageToOcr.c_str(), 
+						get_bstr_t(m_strSpecificPages), VARIANT_TRUE, pProgressStatus);
+				}
+				break;
+			default:
+				THROW_LOGIC_ERROR_EXCEPTION("ELI28161");
+				break;
+			}
+			ASSERT_RESOURCE_ALLOCATION("ELI28150", ipSS != NULL);
+
+			// Ensure source doc name is original image file if a clean image was used
+			if (m_bUseCleanedImageIfAvailable)
+			{
+				ipSS->SourceDocName = strInputFileName.c_str();
+			}
 		}
 
 		// OutputFileName = InputFileName.uss even if cleaned image was used

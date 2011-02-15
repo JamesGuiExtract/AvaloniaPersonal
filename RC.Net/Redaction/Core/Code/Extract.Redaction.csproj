@@ -109,6 +109,14 @@
     <Compile Include="RedactionItem.cs" />
     <Compile Include="RedactionFileLoader.cs" />
     <Compile Include="RedactionFileChanges.cs" />
+    <Compile Include="CreateRedactedTextTask.cs" />
+    <Compile Include="CreateRedactedTextSettings.cs" />
+    <Compile Include="CreateRedactedTextSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateRedactedTextSettingsDialog.designer.cs">
+      <DependentUpon>CreateRedactedTextSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="SensitiveItem.cs" />
     <Compile Include="SetFileActionStatusSettings.cs" />
     <Compile Include="SlideshowSettings.cs" />
@@ -130,6 +138,9 @@
     <EmbeddedResource Include="MetadataSettingsDialog.resx">
       <DependentUpon>MetadataSettingsDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateRedactedTextSettingsDialog.resx">
+      <DependentUpon>CreateRedactedTextSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SurroundContextSettingsDialog.resx">
       <SubType>Designer</SubType>

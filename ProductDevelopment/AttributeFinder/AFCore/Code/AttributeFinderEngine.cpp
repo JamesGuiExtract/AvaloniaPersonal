@@ -133,6 +133,9 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 
 		_lastCodePos = "2";
 
+		// Determine file type
+		EFileType eFileType = getFileType(strInputFile);
+
 		// Check source document name (only if vbUseAFDocText == FALSE)
 		bool bLoadFromFile = false;
 		bool bNeedToOCR = false;
@@ -140,26 +143,20 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		{
 			// verify validity of input file
 			validateFileOrFolderExistence(strInputFile);
-			_lastCodePos = "3";
-			
-			// Determine file type
-			EFileType eFileType = getFileType(strInputFile);
-			_lastCodePos = "4";
+			_lastCodePos = "3";	
 
-			// Since the Source document is given
-			switch (eFileType)
+			if (eFileType == kUSSFile)
 			{
-			// Read text from file into Spatial String
-			case kTXTFile:
-			case kUSSFile:
+				// Load uss file.
 				bLoadFromFile = true;
-				break;
-
-			// assume this is an image file and attempt OCR [P16 #2813]
-			default:
-				bNeedToOCR = true;
-				break;
 			}
+			else
+			{
+				// If an image OCR... if text bNeedToOCR will cause the text to get loaded as
+				// "indexed" text.
+				bNeedToOCR = true;
+			}
+
 			_lastCodePos = "5";
 		}
 
@@ -222,11 +219,25 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 				ipProgressStatus->StartNextItemGroup("Performing OCR...", nNUM_PROGRESS_ITEMS_OCR);
 			}
 			_lastCodePos = "14";
+			
+			// If this is a text file, load the file as "indexed" text.
+			if (eFileType == kTXTFile || eFileType == kXMLFile)
+			{
+				ISpatialStringPtr ipText = ipAFDoc->Text;
+				ASSERT_RESOURCE_ALLOCATION("ELI31687", ipText != __nullptr);
 
-			// Retrieve text from all pages of image, retaining spatial information
-			// pass in the SubProgressStatus, or NULL if ipProgressStatus is NULL
-			ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile(strSrcDocFileName, nNumOfPagesToRecognize, 
-				getOCREngine(), ipProgressStatus ? ipProgressStatus->SubProgressStatus : NULL);
+				// Load the spatial string from the file
+				ipText->LoadFrom(strInputFile.c_str(), VARIANT_FALSE);
+			}
+			// Assume this is an image file and attempt OCR [P16 #2813]
+			else
+			{
+				// Retrieve text from all pages of image, retaining spatial information
+				// pass in the SubProgressStatus, or NULL if ipProgressStatus is NULL
+				ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile(strSrcDocFileName,
+					nNumOfPagesToRecognize, getOCREngine(),
+					ipProgressStatus ? ipProgressStatus->SubProgressStatus : NULL);
+			}
 		}
 		_lastCodePos = "15";
 

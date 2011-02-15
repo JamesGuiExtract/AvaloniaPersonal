@@ -135,17 +135,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		if (m_bReadUSSFileIfExist)
 		{
 			EFileType eFileType = getFileType(strInputFile);
-			string strSpatialStringFile = "";
-			if (eFileType == kImageFile)
-			{
-				// Add USS extension
-				strSpatialStringFile = strInputFile + ".uss";
-			}
-			else if (eFileType == kUSSFile || eFileType == kTXTFile)
-			{
-				// File is uss or text, just load from input file
-				strSpatialStringFile = strInputFile;
-			}
+			string strSpatialStringFile = (eFileType == kUSSFile)
+				? strInputFile : strInputFile + ".uss";
 
 			if (!strSpatialStringFile.empty() && isValidFile(strSpatialStringFile))
 			{
@@ -207,26 +198,39 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 				ipProgressStatus->StartNextItemGroup("Performing OCR...", nNUM_PROGRESS_ITEMS_OCR);
 			}
 
-			// Get the name of the file to OCR
-			string strFileToOCR =
-				m_bUseCleanedImage ? getCleanImageNameIfExists(strInputFile) : strInputFile;
-
-			// Perform the OCR as configured by the user
-			switch (m_eOCRPagesType)
+			EFileType eFileType = getFileType(strInputFile);
+			if (eFileType == kImageFile)
 			{
-			case kOCRAllPages:
+				// Get the name of the file to OCR
+				string strFileToOCR =
+					m_bUseCleanedImage ? getCleanImageNameIfExists(strInputFile) : strInputFile;
+
+				// Perform the OCR as configured by the user
+				switch (m_eOCRPagesType)
 				{
-					// Recognize the image file and put the spatial string in ipAFDoc
-					ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile( strFileToOCR.c_str(), 
-						-1, getOCREngine(), ipProgressStatusToUseForSubTasks);
+				case kOCRAllPages:
+					{
+						// Recognize the image file and put the spatial string in ipAFDoc
+						ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile( strFileToOCR.c_str(), 
+							-1, getOCREngine(), ipProgressStatusToUseForSubTasks);
+					}
+					break;
+				case kOCRCertainPages:
+					{
+						ipAFDoc->Text = getOCREngine()->RecognizeTextInImage2( strFileToOCR.c_str(), 
+							m_strSpecificPages.c_str(), VARIANT_TRUE, ipProgressStatusToUseForSubTasks);
+					}
+					break;
 				}
-				break;
-			case kOCRCertainPages:
-				{
-					ipAFDoc->Text = getOCREngine()->RecognizeTextInImage2( strFileToOCR.c_str(), 
-						m_strSpecificPages.c_str(), VARIANT_TRUE, ipProgressStatusToUseForSubTasks);
-				}
-				break;
+			}
+			// Text file
+			else
+			{
+				ISpatialStringPtr ipText = ipAFDoc->Text;
+				ASSERT_RESOURCE_ALLOCATION("ELI31688", ipText != __nullptr);
+
+				// Load a spatial string as indexed text
+				ipText->LoadFrom(strInputFile.c_str(), VARIANT_FALSE);
 			}
 
 			// Ensure the appropriate source doc name is in the spatial string

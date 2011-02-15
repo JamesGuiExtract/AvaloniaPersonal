@@ -996,6 +996,88 @@ void CSpatialString::saveToTXTFile(const string& strFileName)
     waitForFileToBeReadable(strFileName);
 }
 //-------------------------------------------------------------------------------------------------
+void CSpatialString::loadTextWithPositionalData(const string& strFileName)
+{
+	// Load the file as text.
+	string text = getTextFileContentsAsString(strFileName);
+	size_t length = text.length();
+
+	// Initialize a letter array that will be used to create the spatial string.
+	vector<CPPLetter> vecLetters(length);
+	CPPLetter *plastSpatialLetter = NULL;
+
+	// Loop through each charater of the file.
+	for (size_t i = 0; i < length; i++)
+	{
+		char c = text[i];
+		CPPLetter& letter = vecLetters[i];
+
+		// Specify the character.
+		letter.m_usGuess1 = c;
+		letter.m_usGuess2 = c;
+		letter.m_usGuess3 = c;
+
+		// If the character is whitespace, don't specify spatial info, but check if this makes the
+		// last non-spatial character the end of a zone or the end of a paragraph.
+		if (isWhitespaceChar(c))
+		{
+			if (plastSpatialLetter != NULL)
+			{
+				// If there is more than one consecutive non-spatial char, ensure the last spatial
+				// char is treated as end-of-zone.
+				if (!vecLetters[i - 1].m_bIsSpatial)
+				{
+					c = '\t';
+				}
+
+				switch (c)
+				{
+					case '\r':
+					case '\n': 
+						plastSpatialLetter->m_bIsEndOfZone = true;
+						plastSpatialLetter->m_bIsEndOfParagraph = true;
+						plastSpatialLetter = NULL;
+						break;
+
+					case '\t': 
+						if (!plastSpatialLetter->m_bIsEndOfZone)
+						{
+							plastSpatialLetter->m_bIsEndOfZone = true;
+						}
+				}
+			}
+		}
+		// This is a spatial character, assign an "index" for the character in the text file.
+		else
+		{
+			letter.m_bIsSpatial = true;
+			letter.m_usPageNumber = 1;
+			letter.m_usLeft = i;
+			letter.m_usRight = i;
+			letter.m_usTop = 0;
+			letter.m_usBottom = 1;
+			plastSpatialLetter = &letter;
+		}
+	}
+
+	// The page info should be as many pixels wide as there are characters in the file and 1 pixel
+	// high.
+	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
+	ASSERT_RESOURCE_ALLOCATION("ELI31685", ipPageInfo != NULL);
+	ipPageInfo->Width = length;
+	ipPageInfo->Height = 1;
+	ipPageInfo->Deskew = 0.0;
+	ipPageInfo->Orientation = UCLID_RASTERANDOCRMGMTLib::kRotNone;
+
+	// Create a spatial page info map
+	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
+	ASSERT_RESOURCE_ALLOCATION("ELI31686", ipPageInfoMap != NULL);
+	ipPageInfoMap->Set(1, ipPageInfo);
+
+	getThisAsCOMPtr()->CreateFromLetterArray(length, &(vecLetters[0]), strFileName.c_str(),
+		ipPageInfoMap);
+}
+//-------------------------------------------------------------------------------------------------
 void CSpatialString::validateAndMergeSourceDocName(const string& strSourceDocName)
 {
     // if a source document name is associated with the other string,

@@ -2780,7 +2780,7 @@ namespace Extract.Imaging.Forms
 
                         // Recalculate and redraw a new selection border
                         _trackingData.UpdateRectangle(mouseX, mouseY);
-                        DrawTrackingRectangleBorder(e);
+                        DrawTrackingRectangleBorder(e, Color.Black);
                     }
                     // [FlexIDSCore:4527]
                     // Don't process layer object events if currently in _paintingToGraphics
@@ -2824,7 +2824,7 @@ namespace Extract.Imaging.Forms
                     {
                         // Recalculate and redraw a new selection border
                         _trackingData.UpdateRectangle(mouseX, mouseY);
-                        DrawTrackingRectangleBorder(e);
+                        DrawTrackingRectangleBorder(e, Color.DimGray);
                     }
                     break;
 
@@ -2832,7 +2832,7 @@ namespace Extract.Imaging.Forms
                     
                     // Recalculate and redraw a new selection border
                     _trackingData.UpdateRectangle(mouseX, mouseY);
-                    DrawTrackingRectangleBorder(e);
+                    DrawTrackingRectangleBorder(e, Color.Black);
                     break;
 
                 default:
@@ -2848,11 +2848,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/> instance
         /// containing the event data.</param>
-        void DrawTrackingRectangleBorder(PaintEventArgs e)
+        /// <param name="color">The <see cref="Color"/> the tracking rectangle shoould be.</param>
+        void DrawTrackingRectangleBorder(PaintEventArgs e, Color color)
         {
             if (_trackingData != null)
             {
-                using (Pen pen = new Pen(Color.Black, 2))
+                using (Pen pen = new Pen(color, 2))
                 {
                     e.Graphics.DrawRectangle(pen, _trackingData.Rectangle);
                 }

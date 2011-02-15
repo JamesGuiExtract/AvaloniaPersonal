@@ -116,7 +116,7 @@ namespace Extract.Redaction
         /// </summary>
         public RedactionFileLoader(ConfidenceLevelsCollection levels)
         {
-            LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
+            LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects,
                 "ELI28215", _OBJECT_NAME);
 
             _levels = levels;
