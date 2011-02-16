@@ -1273,7 +1273,7 @@ void getImagesInOutputDirectory(string strOut, multimap<L_INT, L_INT>& rmmapFile
 					{
 						string strExt = getExtensionFromFullPath(strFileName);
 
-						if (isImageFileExtension(strExt) || isThreeDigitExtension(strExt))
+						if (isImageFileExtension(strExt) || isNumericExtension(strExt))
 						{
 							FILEINFO flInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
@@ -1356,7 +1356,7 @@ void getUniqueImageFilesAndCopyToOutputDirectory(string strRoot, const string& s
 						// check if it is an image file
 						string strExt = getExtensionFromFullPath(strFileName);
 
-						if (isImageFileExtension(strExt) || isThreeDigitExtension(strExt))
+						if (isImageFileExtension(strExt) || isNumericExtension(strExt))
 						{
 							FILEINFO flInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
