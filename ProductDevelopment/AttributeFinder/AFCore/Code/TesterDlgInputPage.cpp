@@ -435,7 +435,7 @@ ISpatialStringPtr TesterDlgInputPage::openFile(const string& strFileName)
 	
 	// If the extension is txt get the file into a buffer and set the 
 	// text into the edit control
-	if (strExtension == ".TXT" || strExtension == ".USS")
+	if (strExtension == ".TXT" || strExtension == ".USS" || strExtension == ".XML")
 	{
 		ipText->LoadFrom(get_bstr_t(strFileName.c_str()), VARIANT_FALSE);
 		return ipText;
