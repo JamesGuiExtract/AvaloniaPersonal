@@ -2039,6 +2039,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFAM_SESSION);
 	vecTables.push_back(gstrINPUT_EVENT);
 	vecTables.push_back(gstrFILE_ACTION_STATUS);
+	vecTables.push_back(gstrSOURCE_DOC_CHANGE_HISTORY);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

@@ -56,6 +56,7 @@ static const string gstrFPS_FILE = "FPSFile";
 static const string gstrFAM_SESSION = "FAMSession";
 static const string gstrINPUT_EVENT = "InputEvent";
 static const string gstrFILE_ACTION_STATUS = "FileActionStatus";
+static const string gstrSOURCE_DOC_CHANGE_HISTORY = "SourceDocChangeHistory";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
