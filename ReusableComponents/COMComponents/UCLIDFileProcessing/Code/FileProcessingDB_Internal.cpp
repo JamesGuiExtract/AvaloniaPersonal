@@ -2687,7 +2687,7 @@ void CFileProcessingDB::clear(bool retainUserValues)
 		// Add the admin user back with admin PW
 		if (!strAdminPW.empty())
 		{
-			storeEncryptedPasswordAndUserName(strAdminPW, true, false);
+			storeEncryptedPasswordAndUserName(strAdminPW, true, false, false);
 		}
 
 		tg.CommitTrans();

@@ -641,7 +641,7 @@ void dropTablesInVector(const _ConnectionPtr& ipDBConnection, const vector<strin
 					string strDropSQL = "DROP TABLE [" + strTableName + "]";
 
 					// Drop the table
-					executeCmdQuery(ipDBConnection, strDropSQL, true);
+					executeCmdQuery(ipDBConnection, strDropSQL, false);
 				}
 			}
 			ipTables->MoveNext();
