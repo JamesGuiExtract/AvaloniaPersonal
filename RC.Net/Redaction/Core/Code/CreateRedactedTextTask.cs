@@ -219,21 +219,18 @@ namespace Extract.Redaction
                     source.LoadFrom(pFileRecord.Name, false);
                 }
 
-                // Initialize the source string and a list of character indexes for mapping indexes
-                // in the source string to the current location in the output string.
-                string sourceString = source.String;
-                int length = sourceString.Length;
-                List<int> charIndexes = new List<int>(Enumerable.Range(0, length));
-
-                StringBuilder outputString = new StringBuilder(sourceString);
-
                 // Load the redactions
                 FileActionManagerPathTags pathTags =
                     new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir);
                 string voaFile = pathTags.Expand(_settings.DataFile);
                 _voaLoader.LoadFrom(voaFile, pFileRecord.Name);
 
-                // Loop through each attribute to redact the text
+                // Build up a list of redaction zones where each redaction zone may encompass 2 or
+                // more overlapping redactions. Item1 of each <see cref="Tuple(int, int)"/> in this
+                // list is the starting index of the zone and Item2 is the ending index of the zone.
+                List<Tuple<int, int>> redactionZones = new List<Tuple<int, int>>();
+
+                // Loop through each attribute to redact
                 foreach (SpatialString value in _voaLoader.Items
                     .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
                     .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute.Value)
@@ -245,87 +242,16 @@ namespace Extract.Redaction
                     int startIndex = boundingRect.Left;
                     int endIndex = boundingRect.Right;
 
-                    // Find the corresponding start index and length in the outputString. Any
-                    // part of the string that has already been redacted by a different attribute
-                    // will not be included in this range of characters.
-                    // TODO: Handle case that characters in the middle of the attribute have been
-                    // replaced.
-                    int outputStartIndex = -1;
-                    int sourceIndex;
-                    for (sourceIndex = startIndex; sourceIndex <= endIndex; sourceIndex++)
-                    {
-                        int outputIndex = charIndexes.FindIndex((index) => sourceIndex == index);
-
-                        if (outputStartIndex == -1)
-                        {
-                            if (outputIndex != -1)
-                            {
-                                startIndex = sourceIndex;
-                                outputStartIndex = outputIndex;
-                            }
-                        }
-                        else if (outputIndex == -1)
-                        {
-                            break;
-                        }
-                    }
-
-                    // If all the source text has already been replaced, there is nothing to do for
-                    // this attribute.
-                    if (outputStartIndex == -1)
-                    {
-                        continue;
-                    }
-
-                    // Calculate the text to replace.
-                    int lengthToReplace = sourceIndex - startIndex;
-                    string textToReplace = sourceString.Substring(startIndex, lengthToReplace);
-                    string replacementText = string.Empty;
-
-                    // Calculate the text replacement text.
-                    if (_settings.ReplaceCharacters)
-                    {
-                        if (_settings.CharactersToReplace == CharacterClass.All)
-                        {
-                            if (!string.IsNullOrEmpty(_settings.ReplacementValue))
-                            {
-                                replacementText =
-                                    new string(_settings.ReplacementValue[0], lengthToReplace);
-                            }
-                        }
-                        else
-                        {
-                            replacementText = _regex.Replace(textToReplace, _settings.ReplacementValue ?? "");
-                        }
-                    }
-                    else
-                    {
-                        StringBuilder replacementBuilder = new StringBuilder(
-                            textToReplace.Length + (_settings.XmlElementName.Length * 2) + 5);
-
-                        replacementBuilder.Append("<");
-                        replacementBuilder.Append(_settings.XmlElementName);
-                        replacementBuilder.Append(">");
-                        replacementBuilder.Append(textToReplace);
-                        replacementBuilder.Append("</");
-                        replacementBuilder.Append(_settings.XmlElementName);
-                        replacementBuilder.Append(">");
-                        replacementText = replacementBuilder.ToString();
-                    }
-
-                    // Replace the text
-                    outputString.Remove(outputStartIndex, lengthToReplace);
-                    outputString.Insert(outputStartIndex, replacementText);
-
-                    // Update charIndexes to reflect the updated outputString.
-                    charIndexes.RemoveRange(outputStartIndex, lengthToReplace);
-                    charIndexes.InsertRange(outputStartIndex, 
-                        Enumerable.Repeat<int>(-1, replacementText.Length));
+                    // Combine this range of indexes with indexes previously slated for redaction.
+                    MergeWithExistingRedactionZones(redactionZones, startIndex, endIndex);
                 }
+
+                // Create a redacted version of source.String using the calculated redaction zones.
+                string redactedString = CreateRedactions(source.String, redactionZones);
 
                 // Generate the output file.
                 string outputFileName = pathTags.Expand(_settings.OutputFileName);
-                File.WriteAllText(outputFileName, outputString.ToString());
+                File.WriteAllText(outputFileName, redactedString);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
@@ -581,6 +507,142 @@ namespace Extract.Redaction
         public void CopyFrom(CreateRedactedTextTask task)
         {
             _settings = task._settings;
+        }
+
+        /// <summary>
+        /// Given and existing list of <see paramref="redactionZones"/> and a new span of indexes to
+        /// redact, adds the new span of indexes by either creating a new image zone or merging it
+        /// with one or more existing redaction zones.
+        /// </summary>
+        /// <param name="redactionZones">A list of existing spans of indexes to redact where Item1
+        /// of each <see cref="Tuple"/> is the starting index of the zone and Item2 is the
+        /// ending index of the zone.</param>
+        /// <param name="startIndex">The index of the first character in the span to redact.</param>
+        /// <param name="endIndex">The index of the last character in the span to redact.</param>
+        static void MergeWithExistingRedactionZones(List<Tuple<int, int>> redactionZones,
+            int startIndex, int endIndex)
+        {
+            // Create a new Tuple to represent the new redaction.
+            Tuple<int, int> newRedactionZone = new Tuple<int, int>(startIndex, endIndex);
+
+            // Loop though each existing redaction zone to compare it to the new zone.
+            int firstOverlappingIndex = -1;
+            for (int i = 0; i < redactionZones.Count; i++)
+            {
+                Tuple<int, int> redactionZone = redactionZones[i];
+
+                // If the zone exactly matches an existing zone, nothing needs to be done.
+                if (redactionZone.Equals(newRedactionZone))
+                {
+                    return;
+                }
+                // If the zone overlaps an existing zone, merge it.
+                else if ((newRedactionZone.Item1 > redactionZone.Item2) ==
+                         (newRedactionZone.Item2 < redactionZone.Item1))
+                {
+                    // Create the merged span.
+                    newRedactionZone = new Tuple<int, int>(
+                        (int)Math.Min(newRedactionZone.Item1, redactionZone.Item1),
+                        (int)Math.Max(newRedactionZone.Item2, redactionZone.Item2));
+                    
+                    // If the zone has not yet been merged, modify the existing zone and make note
+                    // of which one was modified.
+                    if (firstOverlappingIndex == -1)
+                    {
+                        redactionZones[i] = newRedactionZone;
+                        firstOverlappingIndex = i;
+                    }
+                    // If the zone was already merged, the most recent overlapping zone is no
+                    // longer needed.
+                    else
+                    {
+                        redactionZones[firstOverlappingIndex] = newRedactionZone;
+                        redactionZones.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+
+            // If the new zone was not merged with an existing zone, add the new zone to
+            // redactionZones.
+            if (firstOverlappingIndex == -1)
+            {
+                redactionZones.Add(newRedactionZone);
+            }
+        }
+
+        /// <summary>
+        /// Creates a copy of <see paramref="sourceString"/> where the text of each specified
+        /// <see paramref="redactionZones"/> has been redacted.
+        /// </summary>
+        /// <param name="sourceString">The <see cref="string"/> to redact.</param>
+        /// <param name="redactionZones">The character indexes to redact where Item1 of each
+        /// <see cref="Tuple"/> is the starting index of each zone to redact and
+        /// Item2 is the ending index of the zone.</param>
+        /// <returns>A redacted version of <see paramref="sourceString"/>.</returns>
+        string CreateRedactions(string sourceString, List<Tuple<int, int>> redactionZones)
+        {
+            StringBuilder outputString = new StringBuilder(sourceString);
+
+            // Initialize a list to map charater indexes in outputString back to the corresponding
+            // index of sourceString. (The indexes of charIndexes are the character indexes in
+            // outputString while the values of charIndexes are the character indexes in
+            // sourceString).
+            List<int> charIndexes = new List<int>(Enumerable.Range(0, sourceString.Length));
+
+            // Loop through each redactionZone to redact the text in outputString.
+            foreach (Tuple<int, int> redactionZone in redactionZones)
+            {
+                int outputIndex = charIndexes.FindIndex((index) => redactionZone.Item1 == index);
+                ExtractException.Assert("ELI31693", "Missing text file index.", outputIndex != -1);
+
+                // Calculate the text to replace.
+                int lengthToReplace = redactionZone.Item2 - redactionZone.Item1 + 1;
+                string textToReplace = sourceString.Substring(redactionZone.Item1, lengthToReplace);
+                string replacementText = string.Empty;
+
+                // Calculate the text replacement text.
+                if (_settings.ReplaceCharacters)
+                {
+                    if (_settings.CharactersToReplace == CharacterClass.All)
+                    {
+                        if (!string.IsNullOrEmpty(_settings.ReplacementValue))
+                        {
+                            replacementText =
+                                new string(_settings.ReplacementValue[0], lengthToReplace);
+                        }
+                    }
+                    else
+                    {
+                        replacementText = _regex.Replace(textToReplace, _settings.ReplacementValue ?? "");
+                    }
+                }
+                else
+                {
+                    StringBuilder replacementBuilder = new StringBuilder(
+                        textToReplace.Length + (_settings.XmlElementName.Length * 2) + 5);
+
+                    replacementBuilder.Append("<");
+                    replacementBuilder.Append(_settings.XmlElementName);
+                    replacementBuilder.Append(">");
+                    replacementBuilder.Append(textToReplace);
+                    replacementBuilder.Append("</");
+                    replacementBuilder.Append(_settings.XmlElementName);
+                    replacementBuilder.Append(">");
+                    replacementText = replacementBuilder.ToString();
+                }
+
+                // Replace the text
+                outputString.Remove(outputIndex, lengthToReplace);
+                outputString.Insert(outputIndex, replacementText);
+
+                // Update charIndexes to reflect the updated outputString.
+                charIndexes.RemoveRange(outputIndex, lengthToReplace);
+                charIndexes.InsertRange(outputIndex,
+                    Enumerable.Repeat<int>(-1, replacementText.Length));
+            }
+
+            return outputString.ToString();
         }
 
         #endregion Private Members
