@@ -11,6 +11,16 @@ namespace Extract.Redaction
     /// </summary>
     public partial class CreateRedactedTextSettingsDialog : Form
     {
+        #region Constants
+
+        /// <summary>
+        /// The label for the option to add a random number of characters to redacted text.
+        /// </summary>
+        static readonly string _ADD_CHARACTERS_LABEL =
+            "\"X\" characters to obscure length of sensitive text.";
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -32,12 +42,17 @@ namespace Extract.Redaction
             {
                 InitializeComponent();
 
+                foreach (CharacterClass characterClass in Enum.GetValues(typeof(CharacterClass)))
+                {
+                    _charsToReplaceComboBox.Items.Add(characterClass.ToReadableString());
+                }
+
                 _settings = settings ?? new CreateRedactedTextSettings();
 
                 _outputPathTagsButton.PathTags = new FileActionManagerPathTags();
 
-                // Configure all check boxes to enable/disable dependent controls when their check
-                // state is changed.
+                // Configure all controls to enable/disable dependent controls as appropriate when
+                // their state changes.
                 _redactSpecificTypesRadioButton.CheckedChanged += ((sender, e) =>
                     {
                         bool enable = _redactSpecificTypesRadioButton.Checked;
@@ -50,13 +65,79 @@ namespace Extract.Redaction
                     });
 
                 _otherDataCheckBox.CheckedChanged += ((sender, e) =>
-                    _dataTypesTextBox.Enabled = _otherDataCheckBox.Checked);
+                    _dataTypesTextBox.Enabled = 
+                        _redactSpecificTypesRadioButton.Checked && _otherDataCheckBox.Checked);
 
                 _replaceCharactersRadioButton.CheckedChanged += ((sender, e) =>
                     {
-                        _charsToReplaceComboBox.Enabled = _replaceCharactersRadioButton.Checked;
-                        _replacementValueTextBox.Enabled = _replaceCharactersRadioButton.Checked;
+                        try
+                        {
+                            _charsToReplaceComboBox.Enabled = _replaceCharactersRadioButton.Checked;
+                            _replacementCharTextBox.Enabled = _replaceCharactersRadioButton.Checked;
+                            SetAddCharactersOptionEnabledStatus();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI31696");
+                        }
                     });
+
+                _charsToReplaceComboBox.SelectedIndexChanged += ((sender, e) =>
+                    {
+                        try
+                        {
+                            SetAddCharactersOptionEnabledStatus();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI31698");
+                        }
+                    });
+
+                _replacementCharTextBox.TextChanged += ((sender, e) =>
+                    {
+                        try
+                        {
+                            _addCharactersLabel2.Text =
+                                _ADD_CHARACTERS_LABEL.Replace("X", _replacementCharTextBox.Text);
+                            SetAddCharactersOptionEnabledStatus();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI31699");
+                        }
+                    });
+
+                _addCharactersCheckBox.CheckedChanged += ((sender, e) =>
+                    {
+                        try
+                        {
+                            SetAddCharactersOptionEnabledStatus();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI31700");
+                        }
+                    });
+
+                _addCharactersUpDown.UserTextCorrected += ((sender, e) =>
+                    {
+                        try
+                        {
+                            MessageBox.Show("The maximum number of charaters to add to each " +
+                                "redaction must be between 1 and 99", "Invalid number of characters.",
+                                MessageBoxButtons.OK, MessageBoxIcon.None,
+                                MessageBoxDefaultButton.Button1, 0);
+                            _addCharactersUpDown.Focus();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI31701");
+                        }
+                    });
+
+                _replaceTextRadioButton.CheckedChanged += ((sender, e) =>
+                    _replacementTextTextBox.Enabled = _replaceTextRadioButton.Checked);
 
                 _surroundTextRadioButton.CheckedChanged += ((sender, e) =>
                     _xmlElementTextBox.Enabled = _surroundTextRadioButton.Checked);
@@ -127,14 +208,42 @@ namespace Extract.Redaction
                 _otherDataCheckBox.Checked =
                     _settings.RedactOtherTypes && !string.IsNullOrEmpty(_dataTypesTextBox.Text);
 
-                _replaceCharactersRadioButton.Checked = _settings.ReplaceCharacters;
-                _surroundTextRadioButton.Checked = !_settings.ReplaceCharacters;
+                switch (_settings.RedactionMethod)
+                {
+                    case RedactionMethod.ReplaceCharacters:
+                        {
+                            _replaceCharactersRadioButton.Checked = true;
+                        }
+                        break;
 
-                _charsToReplaceComboBox.SetSelectedText(
-                    (_settings.CharactersToReplace == CharacterClass.All) ? "all" : "alpha numeric");
+                    case RedactionMethod.ReplaceText:
+                        {
+                            _replaceTextRadioButton.Checked = true;
+                        }
+                        break;
 
-                _replacementValueTextBox.Text = _settings.ReplacementValue;
-                _replacementValueTextBox.Enabled = _replaceCharactersRadioButton.Checked;
+                    case RedactionMethod.SurroundWithXml:
+                        {
+                            _surroundTextRadioButton.Checked = true;
+                        }
+                        break;
+                }
+
+                _charsToReplaceComboBox.SelectedIndex = (int)_settings.CharactersToReplace;
+                _charsToReplaceComboBox.Enabled = _replaceCharactersRadioButton.Checked;
+
+                _replacementCharTextBox.Text = _settings.ReplacementCharacter;
+                _replacementCharTextBox.Enabled = _replaceCharactersRadioButton.Checked;
+
+                _addCharactersCheckBox.Checked = _settings.AddCharactersToRedaction;
+                _addCharactersUpDown.Value = _settings.MaxNumberAddedCharacters;
+                _addCharactersLabel2.Text =
+                    _ADD_CHARACTERS_LABEL.Replace("X", _replacementCharTextBox.Text);
+
+                SetAddCharactersOptionEnabledStatus();
+
+                _replacementTextTextBox.Text = _settings.ReplacementText;
+                _replacementTextTextBox.Enabled = _replaceTextRadioButton.Checked;
 
                 _xmlElementTextBox.Text = _settings.XmlElementName;
                 _xmlElementTextBox.Enabled = _surroundTextRadioButton.Checked;
@@ -193,18 +302,32 @@ namespace Extract.Redaction
                 bool replaceAllTypes = _redactAllTypesRadioButton.Checked;
                 bool specifyOtherTypes = _otherDataCheckBox.Checked;
                 string[] dataTypes = GetDataTypes();
-                bool replaceCharacters = _replaceCharactersRadioButton.Checked;
-                CharacterClass charactersToReplace = (_charsToReplaceComboBox.Text == "all")
-                    ? CharacterClass.All
-                    : CharacterClass.Alphanumeric;
-                string replacementValue = _replacementValueTextBox.Text;
+                RedactionMethod redactionMethod;
+                if (_replaceCharactersRadioButton.Checked)
+                {
+                    redactionMethod = RedactionMethod.ReplaceCharacters;
+                }
+                else if (_replaceTextRadioButton.Checked)
+                {
+                    redactionMethod = RedactionMethod.ReplaceText;
+                }
+                else
+                {
+                    redactionMethod = RedactionMethod.SurroundWithXml;
+                }
+                CharacterClass charactersToReplace =
+                    (CharacterClass)_charsToReplaceComboBox.SelectedIndex;
+                string replacementChar = _replacementCharTextBox.Text;
+                bool addCharsToRedaction = _addCharactersCheckBox.Checked;
+                int maxNumberAddedCharacters = (int)_addCharactersUpDown.Value;
+                string replacementText = _replacementTextTextBox.Text;
                 string xmlElementName = _xmlElementTextBox.Text;
                 string dataFile = _dataFileControl.DataFile;
                 string outputFileName = _outputLocationTextBox.Text;
 
                 return new CreateRedactedTextSettings(replaceAllTypes, specifyOtherTypes, dataTypes,
-                    replaceCharacters, charactersToReplace, replacementValue, xmlElementName,
-                    dataFile, outputFileName);
+                    redactionMethod, charactersToReplace, replacementChar, addCharsToRedaction,
+                    maxNumberAddedCharacters, replacementText, xmlElementName, dataFile, outputFileName);
             }
             catch (Exception ex)
             {
@@ -282,12 +405,27 @@ namespace Extract.Redaction
                 }
             }
 
-            if (_surroundTextRadioButton.Checked &&
-                string.IsNullOrWhiteSpace(_xmlElementTextBox.Text))
+            if (_surroundTextRadioButton.Checked)
             {
-                _xmlElementTextBox.Focus();
-                MessageBox.Show("Please specify the name of the XML element used to surround sensitive text",
-                    "Specify XML element name", MessageBoxButtons.OK, MessageBoxIcon.None,
+                try
+                {
+                    UtilityMethods.ValidateXmlElementName(_xmlElementTextBox.Text);
+                }
+                catch
+                {
+                    _xmlElementTextBox.Focus();
+                    MessageBox.Show("The XML element name is missing or invalid.",
+                        "Invalid XML element name", MessageBoxButtons.OK, MessageBoxIcon.None,
+                        MessageBoxDefaultButton.Button1, 0);
+                    return true;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(_dataFileControl.DataFile))
+            {
+                _outputLocationTextBox.Focus();
+                MessageBox.Show("Please specify the data file containing the redaction data.",
+                    "Missing data filename", MessageBoxButtons.OK, MessageBoxIcon.None,
                     MessageBoxDefaultButton.Button1, 0);
                 return true;
             }
@@ -301,10 +439,27 @@ namespace Extract.Redaction
                 return true;
             }
             
-
             return false;
         }
 
+         /// <summary>
+         /// Sets the enabled state of all <see cref="Control"/>s associated with the option to add
+         /// characters to redacted items to obscure the length of the original data.
+         /// </summary>
+        void SetAddCharactersOptionEnabledStatus()
+        {
+            bool enable = _replaceCharactersRadioButton.Checked &&
+                          _charsToReplaceComboBox.SelectedIndex == (int)CharacterClass.All &&
+                          !string.IsNullOrEmpty(_replacementCharTextBox.Text);
+
+            _addCharactersCheckBox.Enabled = enable;
+            enable &= _addCharactersCheckBox.Checked;
+
+            _addCharactersLabel1.Enabled = enable && enable;
+            _addCharactersLabel2.Enabled = enable && enable;
+            _addCharactersUpDown.Enabled = enable && enable;
+        }
+        
         #endregion Private Members
     }
 }

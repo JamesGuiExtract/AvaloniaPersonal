@@ -36,8 +36,14 @@ namespace Extract.Redaction
 
         /// <summary>
         /// Current task version.
+        /// Version 2:
+        /// bool ReplaceCharacters -> RedactionMethod RedactionMethod
+        /// string ReplacementValue -> string ReplacementCharacter
+        /// Added: bool AddCharactersToRedaction
+        /// Added: int MaxNumberAddedCharacters
+        /// Added: string ReplacementText
         /// </summary>
-        internal const int _CURRENT_VERSION = 1;
+        internal const int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -64,6 +70,11 @@ namespace Extract.Redaction
         /// Used to see out characters in sensitive data that should be replaced.
         /// </summary>
         Regex _regex;
+
+        /// <summary>
+        /// Used to generate a random number of characters for <see cref="GetNumberCharactersToAdd"/>.
+        /// </summary>
+        Random _randomNumberGenerator;
 
         #endregion Fields
 
@@ -170,7 +181,7 @@ namespace Extract.Redaction
 
                 // If replacing only alpha numeric characters, create a Regex to seek out only alpha
                 // numic characters.
-                if (_settings.ReplaceCharacters &&
+                if (_settings.RedactionMethod == RedactionMethod.ReplaceCharacters &&
                     _settings.CharactersToReplace == CharacterClass.Alphanumeric)
                 {
                     _regex = new Regex("\\w");
@@ -602,34 +613,53 @@ namespace Extract.Redaction
                 string replacementText = string.Empty;
 
                 // Calculate the text replacement text.
-                if (_settings.ReplaceCharacters)
+                switch (_settings.RedactionMethod)
                 {
-                    if (_settings.CharactersToReplace == CharacterClass.All)
-                    {
-                        if (!string.IsNullOrEmpty(_settings.ReplacementValue))
+                    case RedactionMethod.ReplaceCharacters:
                         {
-                            replacementText =
-                                new string(_settings.ReplacementValue[0], lengthToReplace);
-                        }
-                    }
-                    else
-                    {
-                        replacementText = _regex.Replace(textToReplace, _settings.ReplacementValue ?? "");
-                    }
-                }
-                else
-                {
-                    StringBuilder replacementBuilder = new StringBuilder(
-                        textToReplace.Length + (_settings.XmlElementName.Length * 2) + 5);
+                            if (_settings.CharactersToReplace == CharacterClass.All)
+                            {
+                                if (!string.IsNullOrEmpty(_settings.ReplacementCharacter))
+                                {
+                                    int replacementLength = lengthToReplace;
+                                    if (_settings.AddCharactersToRedaction)
+                                    {
+                                        replacementLength += GetNumberCharactersToAdd();
+                                    }
 
-                    replacementBuilder.Append("<");
-                    replacementBuilder.Append(_settings.XmlElementName);
-                    replacementBuilder.Append(">");
-                    replacementBuilder.Append(textToReplace);
-                    replacementBuilder.Append("</");
-                    replacementBuilder.Append(_settings.XmlElementName);
-                    replacementBuilder.Append(">");
-                    replacementText = replacementBuilder.ToString();
+                                    replacementText = new string(
+                                        _settings.ReplacementCharacter[0], replacementLength);
+                                }
+                            }
+                            else
+                            {
+                                replacementText = _regex.Replace(
+                                    textToReplace, _settings.ReplacementCharacter ?? "");
+                            }
+                        }
+                        break;
+
+                    case RedactionMethod.ReplaceText:
+                        {
+                            replacementText = _settings.ReplacementText;
+                        }
+                        break;
+
+                    case RedactionMethod.SurroundWithXml:
+                        {
+                            StringBuilder replacementBuilder = new StringBuilder(
+                                textToReplace.Length + (_settings.XmlElementName.Length * 2) + 5);
+
+                            replacementBuilder.Append("<");
+                            replacementBuilder.Append(_settings.XmlElementName);
+                            replacementBuilder.Append(">");
+                            replacementBuilder.Append(textToReplace);
+                            replacementBuilder.Append("</");
+                            replacementBuilder.Append(_settings.XmlElementName);
+                            replacementBuilder.Append(">");
+                            replacementText = replacementBuilder.ToString();
+                        }
+                        break;
                 }
 
                 // Replace the text
@@ -643,6 +673,22 @@ namespace Extract.Redaction
             }
 
             return outputString.ToString();
+        }
+
+        /// <summary>
+        /// Gets the number characters to add to the next redacted item when the
+        /// <see cref="CreateRedactedTextSettings.AddCharactersToRedaction"/> option is
+        /// <see langword="true"/>.
+        /// </summary>
+        /// <returns>The number characters to add to the next redacted item.</returns>
+        int GetNumberCharactersToAdd()
+        {
+            if (_randomNumberGenerator == null)
+            {
+                _randomNumberGenerator = new Random((int)DateTime.Now.Ticks);
+            }
+
+            return _randomNumberGenerator.Next(_settings.MaxNumberAddedCharacters + 1);
         }
 
         #endregion Private Members

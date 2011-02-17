@@ -1,5 +1,6 @@
 using Extract.Licensing;
 using System;
+using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +13,15 @@ namespace Extract.Utilities
     /// </summary>
     public static class UtilityMethods
     {
+        #region Constants
+
+        /// <summary>
+        /// Object name used for license validation calls.
+        /// </summary>
+        readonly static string _OBJECT_NAME = typeof(UtilityMethods).ToString();
+
+        #endregion Constants
+
         /// <summary>
         /// Swaps two value types in place.
         /// </summary>
@@ -193,6 +203,39 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI31152", ex);
+            }
+        }
+
+        /// <summary>
+        /// Used to validate names for XML elements.
+        /// </summary>
+        static RegexStringValidator _xmlNameValidator;
+
+        /// <summary>
+        /// Validates an XML name element name per the specifications here:
+        /// http://www.w3.org/TR/REC-xml/#NT-S
+        /// </summary>
+        /// <param name="name">The name to be validated.</param>
+        public static void ValidateXmlElementName(string name)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI31717", _OBJECT_NAME);
+
+                if (_xmlNameValidator == null)
+                {
+                    string nameStartChar = @":A-Z_a-z\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD";
+                    string nameChar = @"-.0-9\xB7\u0300-\u036F\u203F-\u2040" + nameStartChar;
+
+                    _xmlNameValidator = new RegexStringValidator("^[" + nameStartChar + "][" + nameChar + "]+$");
+                }
+
+                _xmlNameValidator.Validate(name);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI31702");
             }
         }
     }

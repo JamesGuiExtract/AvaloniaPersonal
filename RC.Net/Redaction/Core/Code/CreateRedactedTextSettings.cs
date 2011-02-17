@@ -16,12 +16,66 @@ namespace Extract.Redaction
         /// <summary>
         /// All characters
         /// </summary>
-        All,
+        All = 0,
 
         /// <summary>
         /// Letters, digits, and underscores
         /// </summary>
-        Alphanumeric
+        Alphanumeric = 1
+    }
+
+    /// <summary>
+    /// Provides extension methods for the <see cref="CharacterClass"/> enum.
+    /// </summary>
+    public static class CharacterClassExtensionMethods
+    {
+        /// <summary>
+        /// Converts the specified <see cref="CharacterClass"/> value into a readable string.
+        /// </summary>
+        /// <param name="characterClass"></param>
+        /// <returns>The specified <see cref="CharacterClass"/> as a readable string.</returns>
+        public static string ToReadableString(this CharacterClass characterClass)
+        {
+            try
+            {
+                switch (characterClass)
+                {
+                    case CharacterClass.All:
+                        return "all";
+                    case CharacterClass.Alphanumeric:
+                        return "alpha numeric";
+
+                    default:
+                        throw new ExtractException("ELI31694", "Unhandled character class");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI31697");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Represents the methods in which the <see cref="CreateRedactedTextTask"/> class can redact text
+    /// files.
+    /// </summary>
+    public enum RedactionMethod
+    {
+        /// <summary>
+        /// Replaces each individual character in sensitive data with the specified character.
+        /// </summary>
+        ReplaceCharacters,
+
+        /// <summary>
+        /// Replaces each sensitive data item with the specified text.
+        /// </summary>
+        ReplaceText,
+
+        /// <summary>
+        /// Surrounds the sensitive data with the specified XML element.
+        /// </summary>
+        SurroundWithXml
     }
 
     #endregion Enums
@@ -31,30 +85,6 @@ namespace Extract.Redaction
     /// </summary>
     public class CreateRedactedTextSettings
     {
-        #region Constants
-
-        /// <summary>
-        /// The default XML element to use when surrounding sensitive text.
-        /// </summary>
-        static readonly string _DEFAULT_REPLACEMENT_VALUE = "X";
-
-        /// <summary>
-        /// The default XML element to use when surrounding sensitive text.
-        /// </summary>
-        static readonly string _DEFAULT_XML_ELEMENT =  "Sensitive";
-
-        /// <summary>
-        /// The default location of the data file.
-        /// </summary>
-        static readonly string _DEFAULT_DATA_FILE =  "<SourceDocName>.voa";
-
-        /// <summary>
-        /// The default output filename.
-        /// </summary>
-        static readonly string _DEFAULT_OUTPUT_FILE = "$InsertBeforeExt(<SourceDocName>,.redacted)";
-
-        #endregion Constants
-
         #region Fields
 
         /// <summary>
@@ -78,10 +108,26 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="CreateRedactedTextSettings"/> class.
         /// </summary>
         public CreateRedactedTextSettings()
-            : this(true, false, new string[] { }, true, CharacterClass.All,
-                _DEFAULT_REPLACEMENT_VALUE, _DEFAULT_XML_ELEMENT, _DEFAULT_DATA_FILE,
-                _DEFAULT_OUTPUT_FILE)
         {
+            try
+            {
+                RedactAllTypes = true;
+                RedactOtherTypes = false;
+                DataTypes = new ReadOnlyCollection<string>(new string[] { });
+                RedactionMethod = RedactionMethod.ReplaceCharacters;
+                CharactersToReplace = CharacterClass.All;
+                ReplacementCharacter = "X";
+                AddCharactersToRedaction = false;
+                MaxNumberAddedCharacters = 5;
+                ReplacementText = "[REDACTED]";
+                XmlElementName = "Sensitive";
+                DataFile = "<SourceDocName>.voa";
+                OutputFileName = "$InsertBeforeExt(<SourceDocName>,.redacted)";
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI31695");
+            }
         }
 
         /// <summary>
@@ -90,37 +136,52 @@ namespace Extract.Redaction
         /// <param name="redactAllTypes">Indicates whether all data types should be redacted.</param>
         /// <param name="redactOtherTypes">Indicates non-standard ID Shield data types should be
         /// redacted.</param>
-        /// <param name="dataTypes">Gets all data types referenced in the settings. NOTE: A data
+        /// <param name="dataTypes">The data types referenced in the settings. NOTE: A data
         /// type in this list is not necessarily configured to be redacted. Only if the
         /// <see cref="IsTypeToRedact"/> returns <see langword="true"/> for a given type should it
         /// be redacted.</param>
-        /// <param name="replaceCharacters">Indicates whether the sensitive text will be redacted
-        /// by replacing characters in the sensitive data.</param>
-        /// <param name="charactersToReplace">Indicates which <see cref="CharacterClass"/> should be
-        /// replaced when redacting sensitive data. (Ignored if <see cref="ReplaceCharacters"/> is
-        /// <see langword="false"/>)</param>
-        /// <param name="replacementValue">Specifies the <see langword="string"/> that should
-        /// replace characters when redacting sensitive data. (Ignored if
-        /// <see cref="ReplaceCharacters"/> is <see langword="false"/>)</param>
+        /// <param name="redactionMethod">The <see cref="RedactionMethod"/> that determines how
+        /// sensitive data will be replaced or protected in the output text.</param>
+        /// <param name="charactersToReplace">Specifies which <see cref="CharacterClass"/> should be
+        /// replaced when redacting sensitive data. Ignored if <see paramref="redactionMethod"/> is
+        /// not ReplaceCharacters.</param>
+        /// <param name="replacementCharacter">Specifies the <see langword="string"/> that should
+        /// replace characters in sensitive data. Ignored if <see cref="RedactionMethod"/> is not
+        /// ReplaceCharacters.</param>
+        /// <param name="addCharactersToRedaction">Specifies whether a random number of characters
+        /// should be appended to the redacted text to obscure the number of characters in the
+        /// sensitive data. Ignored if <see cref="RedactionMethod"/> is not ReplaceCharacters.
+        /// </param>
+        /// <param name="maxNumberAddedCharacters">Specifies the maxium number of characters to be
+        /// appended to redacted text when <see paramref="addCharactersToRedaction"/> is
+        /// <see langword="true"/>. Ignored if <see cref="RedactionMethod"/> is not
+        /// ReplaceCharacters.</param>
+        /// <param name="replacementText">The <see cref="string"/> that should replace any discrete
+        /// sensitive data item. Ignored if <see cref="RedactionMethod"/> is not ReplaceText.</param>
         /// <param name="xmlElementName">Specifies the name of XML element which should be used to
-        /// surround sensitive data. data. Ignored if <see cref="ReplaceCharacters"/> is
-        /// <see langword="true"/></param>
+        /// surround sensitive data. data. Ignored if <see cref="RedactionMethod"/> is not
+        /// SurroundWithXml.</param>
         /// <param name="dataFile">The vector of attributes (VOA) file containing the data to be
         /// replaced in the source document.</param>
         /// <param name="outputFileName">The filename to which the redacted text is to be written.
         /// </param>
         public CreateRedactedTextSettings(bool redactAllTypes, bool redactOtherTypes,
-            string[] dataTypes, bool replaceCharacters, CharacterClass charactersToReplace,
-            string replacementValue, string xmlElementName, string dataFile, string outputFileName)
+            string[] dataTypes, RedactionMethod redactionMethod, CharacterClass charactersToReplace,
+            string replacementCharacter, bool addCharactersToRedaction, 
+            int maxNumberAddedCharacters, string replacementText, string xmlElementName,
+            string dataFile, string outputFileName)
         {
             try
             {
                 RedactAllTypes = redactAllTypes;
                 RedactOtherTypes = redactOtherTypes;
                 DataTypes = new ReadOnlyCollection<string>(dataTypes);
-                ReplaceCharacters = replaceCharacters;
+                RedactionMethod = redactionMethod;
                 CharactersToReplace = charactersToReplace;
-                ReplacementValue = replacementValue;
+                ReplacementCharacter = replacementCharacter;
+                AddCharactersToRedaction = addCharactersToRedaction;
+                MaxNumberAddedCharacters = maxNumberAddedCharacters;
+                ReplacementText = replacementText;
                 XmlElementName = xmlElementName;
                 DataFile = dataFile;
                 OutputFileName = outputFileName;
@@ -139,6 +200,8 @@ namespace Extract.Redaction
         /// Gets data types that are "standard" rule output and will be specified via checkboxes
         /// (as opposed to the "Other" data type box in the configuration dialog).
         /// </summary>
+        /// <value>A <see cref="ReadOnlyCollection{T}"/> of <see langword="string"/>s populated
+        /// with the data types that are "standard" rule output.</value>
         public static ReadOnlyCollection<string> StandardDataTypes
         {
             get
@@ -184,12 +247,11 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets whether the sensitive text will be redacted by replacing characters in the
-        /// sensitive data.
+        /// Gets the <see cref="RedactionMethod"/> that determines how sensitive data will be
+        /// replaced or protected in the output text.
         /// </summary>
-        /// <value><see langword="true"/> if characters in the sensitive 
-        /// <see langword="false"/> if specified text should be redacted.</value>
-        public bool ReplaceCharacters
+        /// <value>The <see cref="RedactionMethod"/>.</value>
+        public RedactionMethod RedactionMethod
         {
             get;
             private set;
@@ -197,8 +259,9 @@ namespace Extract.Redaction
 
         /// <summary>
         /// Gets which <see cref="CharacterClass"/> should be replaced when redacting sensitive
-        /// data. (Ignored if <see cref="ReplaceCharacters"/> is <see langword="false"/>)
+        /// data. Ignored if <see cref="RedactionMethod"/> is not ReplaceCharacters.
         /// </summary>
+        /// <value>The <see cref="CharacterClass"/> that should be replaced.</value>
         public CharacterClass CharactersToReplace
         {
             get;
@@ -206,10 +269,49 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets the <see langword="string"/> that should replace characters when redacting
-        /// sensitive data. (Ignored if <see cref="ReplaceCharacters"/> is <see langword="false"/>)
+        /// Gets the <see langword="string"/> that should replace characters in sensitive data.
+        /// Ignored if <see cref="RedactionMethod"/> is not ReplaceCharacters.
         /// </summary>
-        public string ReplacementValue
+        /// <value>The <see langword="string"/> that should replace characters in sensitive data.
+        /// </value>
+        public string ReplacementCharacter
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets whether a random number of characters should be appended to the redacted text to
+        /// obscure the number of characters in the sensitive data. Ignored if
+        /// <see cref="RedactionMethod"/> is not ReplaceCharacters.
+        /// </summary>
+        /// <value><see langword="true"/> if a random number of characters should be appended to the
+        /// redacted text; otherwise, <see langword="false"/>.</value>
+        public bool AddCharactersToRedaction
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the maxium number of characters to be appended to redacted text when
+        /// <see paramref="AddCharactersToRedaction"/>  is <see langword="true"/>. Ignored if
+        /// <see cref="RedactionMethod"/> is not ReplaceCharacters.
+        /// </summary>
+        /// <value>The maxium number of characters to be appended.</value>
+        public int MaxNumberAddedCharacters
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="string"/> that should replace any discrete
+        /// sensitive data item. Ignored if <see cref="RedactionMethod"/> is not ReplaceText.
+        /// </summary>
+        /// <value>The <see cref="string"/> that should replace any discrete sensitive data item.
+        /// </value>
+        public string ReplacementText
         {
             get;
             private set;
@@ -217,7 +319,7 @@ namespace Extract.Redaction
 
         /// <summary>
         /// Gets a the name of XML element which should be used to surround sensitive data.
-        /// data. Ignored if <see cref="ReplaceCharacters"/> is <see langword="true"/>.
+        /// data. Ignored if <see cref="RedactionMethod"/> is not SurroundWithXml.
         /// </summary>
         /// <value>
         /// The name of XML element which should be used to surround sensitive data.
@@ -302,19 +404,33 @@ namespace Extract.Redaction
                     CreateRedactedTextTask._COMPONENT_DESCRIPTION + ".",
                     reader.Version <= CreateRedactedTextTask._CURRENT_VERSION);
 
-                bool replaceAllTypes = reader.ReadBoolean();
-                bool redactOtherTypes = reader.ReadBoolean();
-                string[] dataTypes = reader.ReadStringArray();
-                bool replaceCharacters = reader.ReadBoolean();
-                CharacterClass charactersToReplace = (CharacterClass)reader.ReadInt32();
-                string replacementValue = reader.ReadString();
-                string xmlElementName = reader.ReadString();
-                string dataFile = reader.ReadString();
-                string outputFileName = reader.ReadString();
+                CreateRedactedTextSettings settings = new CreateRedactedTextSettings();
 
-                return new CreateRedactedTextSettings(replaceAllTypes, redactOtherTypes, dataTypes,
-                    replaceCharacters, charactersToReplace, replacementValue, xmlElementName,
-                    dataFile, outputFileName);
+                settings.RedactAllTypes = reader.ReadBoolean();
+                settings.RedactOtherTypes = reader.ReadBoolean();
+                settings.DataTypes = new ReadOnlyCollection<string>(reader.ReadStringArray());
+
+                if (reader.Version < 2)
+                {
+                    // Convert old "ReplaceCharacters" setting to a RedactionMethod setting.
+                    settings.RedactionMethod = reader.ReadBoolean()
+                        ? RedactionMethod.ReplaceCharacters : RedactionMethod.SurroundWithXml;
+                }
+                else
+                {
+                    settings.RedactionMethod = (RedactionMethod)reader.ReadInt32();
+                    settings.AddCharactersToRedaction = reader.ReadBoolean();
+                    settings.MaxNumberAddedCharacters = reader.ReadInt32();
+                    settings.ReplacementText = reader.ReadString();
+                }
+
+                settings.CharactersToReplace = (CharacterClass)reader.ReadInt32();
+                settings.ReplacementCharacter = reader.ReadString();
+                settings.XmlElementName = reader.ReadString();
+                settings.DataFile = reader.ReadString();
+                settings.OutputFileName = reader.ReadString();
+
+                return settings;
             }
             catch (Exception ex)
             {
@@ -336,9 +452,12 @@ namespace Extract.Redaction
                 writer.Write(RedactAllTypes);
                 writer.Write(RedactOtherTypes);
                 writer.Write(DataTypes.ToArray());
-                writer.Write(ReplaceCharacters);
+                writer.Write((int)RedactionMethod);
+                writer.Write(AddCharactersToRedaction);
+                writer.Write(MaxNumberAddedCharacters);
+                writer.Write(ReplacementText);
                 writer.Write((int)CharactersToReplace);
-                writer.Write(ReplacementValue);
+                writer.Write(ReplacementCharacter);
                 writer.Write(XmlElementName);
                 writer.Write(DataFile);
                 writer.Write(OutputFileName);
