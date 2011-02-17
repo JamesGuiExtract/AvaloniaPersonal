@@ -613,6 +613,10 @@ library UCLID_COMUTILSLib
 		[propput, id(1), helpstring("property StringKey")] HRESULT StringKey([in] BSTR newVal);
 		[propget, id(2), helpstring("property StringValue")] HRESULT StringValue([out, retval] BSTR *pVal);
 		[propput, id(2), helpstring("property StringValue")] HRESULT StringValue([in] BSTR newVal);
+		[id(3), helpstring("method SetKeyValuePair")] HRESULT SetKeyValuePair([in] BSTR bstrKey,
+			[in] BSTR bstrVal);
+		[id(4), helpstring("method GetKeyValuePair")] HRESULT GetKeyValuePair([out] BSTR* pbstrKey,
+			[out] BSTR* bstrVal);
 	};
 	[
 		object,

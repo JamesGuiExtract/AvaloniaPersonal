@@ -188,19 +188,21 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 			ASSERT_RESOURCE_ALLOCATION("ELI31676", ipText != __nullptr);
 
 			ipText->LoadFrom((strImageName + ".uss").c_str(), VARIANT_FALSE);
+			if (ipText->HasSpatialInfo() == VARIANT_TRUE)
+			{
+				ipSearcher.CreateInstance(CLSID_SpatialStringSearcher);
+				ASSERT_RESOURCE_ALLOCATION("ELI31677", ipSearcher != __nullptr);
 
-			ipSearcher.CreateInstance(CLSID_SpatialStringSearcher);
-			ASSERT_RESOURCE_ALLOCATION("ELI31677", ipSearcher != __nullptr);
+				ipSearcher->InitSpatialStringSearcher(ipText);
 
-			ipSearcher->InitSpatialStringSearcher(ipText);
-
-			// This searcher will be used to search the context for each
-			// attribute and will be initialized with the expanded context
-			// region for the attribute. In order to be more performative, 
-			// this searcher is created once here, but will be initialized each
-			// time it is needed with the expanded attribute region.
-			ipAttrSearcher.CreateInstance(CLSID_SpatialStringSearcher);
-			ASSERT_RESOURCE_ALLOCATION("ELI31678", ipSearcher != __nullptr);
+				// This searcher will be used to search the context for each
+				// attribute and will be initialized with the expanded context
+				// region for the attribute. In order to be more performative, 
+				// this searcher is created once here, but will be initialized each
+				// time it is needed with the expanded attribute region.
+				ipAttrSearcher.CreateInstance(CLSID_SpatialStringSearcher);
+				ASSERT_RESOURCE_ALLOCATION("ELI31678", ipSearcher != __nullptr);
+			}
 		}
 
         // Expand tags and text functions to get the output name
@@ -367,104 +369,117 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 						// Get the spatial string for the attribute
 						ISpatialStringPtr ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
 						ASSERT_RESOURCE_ALLOCATION("ELI31680", ipTemp != __nullptr);
-						string strTemp = asString(ipTemp);
-						size_t nIndex = strTemp.find_last_of(".!?");
 
-						bool bMakeLowerCase = false;
-						if (nIndex == string::npos || nIndex < (strTemp.length() - 1))
+						// Only continue if the returned region has spatial information
+						if (ipTemp->HasSpatialInfo() == VARIANT_TRUE)
 						{
-							// Get the page bounds
-							long nPageLeft(0), nPageTop(0), nPageBottom(0), nPageRight(0);
-							ipBounds->GetBounds(&nPageLeft, &nPageTop, &nPageRight, &nPageBottom);
+							string strTemp = asString(ipTemp);
+							size_t nIndex = strTemp.find_last_of(".!?");
+							_lastCodePos = "280_15";
 
-							// Get the bounds of the zone
-							long nRectLeft(0), nRectTop(0), nRectBottom(0), nRectRight(0);
-							ipRect->GetBounds(&nRectLeft, &nRectTop, &nRectRight, &nRectBottom);
-
-							// Store the original zone bounds
-							ILongRectanglePtr ipOrigRect(CLSID_LongRectangle);
-							ASSERT_RESOURCE_ALLOCATION("ELI31679", ipOrigRect);
-							ipOrigRect->SetBounds(nRectLeft, nRectTop, nRectRight, nRectBottom);
-
-							// Get the average height. This is the height we
-							// will use to expand the region (both up and down) to encompass other
-							// lines in the region.
-							long nHeightIncrease = ipTemp->GetAverageCharHeight();
-
-							// First set the bounds left and right and check for words
-							ipRect->SetBounds(nPageLeft, nRectTop,
-								nPageRight, nRectBottom);
-							ipRect->Clip(nPageLeft, nPageTop, nPageRight, nPageBottom);
-
-							ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-							ASSERT_RESOURCE_ALLOCATION("ELI31681", ipTemp != __nullptr);
-
-							// Initialize the attribute searcher with this string
-							ipAttrSearcher->InitSpatialStringSearcher(ipTemp);
-
-							// Look left and right, if empty in either direction, expand
-							// the zone of searching up and/or down based on missing words
-							ISpatialStringPtr ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
-							ISpatialStringPtr ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
-							if (ipLeftWord == __nullptr || ipRightWord == __nullptr)
+							bool bMakeLowerCase = false;
+							if (nIndex == string::npos || nIndex < (strTemp.length() - 1))
 							{
-								nRectTop -= ipLeftWord == __nullptr ? nHeightIncrease : 0;
-								nRectBottom += ipRightWord == __nullptr ? nHeightIncrease : 0;
-								ipRect->SetBounds(nPageLeft, nRectTop, nPageRight, nRectBottom);
+								_lastCodePos = "280_16";
+
+								// Get the page bounds
+								long nPageLeft(0), nPageTop(0), nPageBottom(0), nPageRight(0);
+								ipBounds->GetBounds(&nPageLeft, &nPageTop, &nPageRight, &nPageBottom);
+
+								// Get the bounds of the zone
+								long nRectLeft(0), nRectTop(0), nRectBottom(0), nRectRight(0);
+								ipRect->GetBounds(&nRectLeft, &nRectTop, &nRectRight, &nRectBottom);
+
+								// Store the original zone bounds
+								ILongRectanglePtr ipOrigRect(CLSID_LongRectangle);
+								ASSERT_RESOURCE_ALLOCATION("ELI31679", ipOrigRect);
+								ipOrigRect->SetBounds(nRectLeft, nRectTop, nRectRight, nRectBottom);
+
+								// Get the average height. This is the height we
+								// will use to expand the region (both up and down) to encompass other
+								// lines in the region.
+								long nHeightIncrease = ipTemp->GetAverageCharHeight();
+
+								// First set the bounds left and right and check for words
+								ipRect->SetBounds(nPageLeft, nRectTop,
+									nPageRight, nRectBottom);
 								ipRect->Clip(nPageLeft, nPageTop, nPageRight, nPageBottom);
 
-								// Get the data from the expanded region
 								ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-								ASSERT_RESOURCE_ALLOCATION("ELI31682", ipTemp != __nullptr);
+								ASSERT_RESOURCE_ALLOCATION("ELI31681", ipTemp != __nullptr);
 
+								// Initialize the attribute searcher with this string
 								ipAttrSearcher->InitSpatialStringSearcher(ipTemp);
+								_lastCodePos = "280_17";
 
-								// Get the new left and right words
-								ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
-								ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
-							}
-
-							// If there is a word to the left, look for punctuation
-							if (ipLeftWord != __nullptr)
-							{
-								string strLeft = asString(ipLeftWord->String);
-								if (strLeft.substr(strLeft.length() - 1)
-									.find_first_of(".!?") == string::npos)
+								// Look left and right, if empty in either direction, expand
+								// the zone of searching up and/or down based on missing words
+								ISpatialStringPtr ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
+								ISpatialStringPtr ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
+								if (ipLeftWord == __nullptr || ipRightWord == __nullptr)
 								{
-									// No punctuation to the left, look for lower case letters
-									if (strLeft.find_first_of(gstrLOWER_ALPHA) != string::npos)
+									_lastCodePos = "280_18";
+									nRectTop -= ipLeftWord == __nullptr ? nHeightIncrease : 0;
+									nRectBottom += ipRightWord == __nullptr ? nHeightIncrease : 0;
+									ipRect->SetBounds(nPageLeft, nRectTop, nPageRight, nRectBottom);
+									ipRect->Clip(nPageLeft, nPageTop, nPageRight, nPageBottom);
+
+									// Get the data from the expanded region
+									ipTemp = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+									ASSERT_RESOURCE_ALLOCATION("ELI31682", ipTemp != __nullptr);
+
+									ipAttrSearcher->InitSpatialStringSearcher(ipTemp);
+
+									// Get the new left and right words
+									ipLeftWord = ipAttrSearcher->GetLeftWord(ipOrigRect);
+									ipRightWord = ipAttrSearcher->GetRightWord(ipOrigRect);
+								}
+								_lastCodePos = "280_19";
+
+								// If there is a word to the left, look for punctuation
+								if (ipLeftWord != __nullptr)
+								{
+									_lastCodePos = "280_19_A";
+									string strLeft = asString(ipLeftWord->String);
+									if (strLeft.substr(strLeft.length() - 1)
+										.find_first_of(".!?") == string::npos)
 									{
-										// found lower case letters
+										// No punctuation to the left, look for lower case letters
+										if (strLeft.find_first_of(gstrLOWER_ALPHA) != string::npos)
+										{
+											// found lower case letters
+											bMakeLowerCase = true;
+										}
+									}
+									else
+									{
+										// Sentence punctuation to the left, set right word to
+										// null, no need to check further
+										ipRightWord = __nullptr;
+									}
+								}
+								if (!bMakeLowerCase && ipRightWord != __nullptr)
+								{
+									_lastCodePos = "280_19_B";
+									string strRight = asString(ipRightWord->String);
+									if (strRight.find_first_of(gstrLOWER_ALPHA) != string::npos)
+									{
 										bMakeLowerCase = true;
 									}
 								}
-								else
-								{
-									// Sentence punctuation to the left, set right word to
-									// null, no need to check further
-									ipRightWord = __nullptr;
-								}
 							}
-							if (!bMakeLowerCase && ipRightWord != __nullptr)
+							else
 							{
-								string strRight = asString(ipRightWord->String);
-								if (strRight.find_first_of(gstrLOWER_ALPHA) != string::npos)
-								{
-									bMakeLowerCase = true;
-								}
+								bMakeLowerCase = true;
 							}
-						}
-						else
-						{
-							bMakeLowerCase = true;
-						}
 
-						if (bMakeLowerCase)
-						{
-							makeLowerCase(strRedactionText);
-						}
+							if (bMakeLowerCase)
+							{
+								makeLowerCase(strRedactionText);
+							}
 
-		                _lastCodePos = "280_20";
+			                _lastCodePos = "280_20";
+						}
 					}
 	                _lastCodePos = "285";
 

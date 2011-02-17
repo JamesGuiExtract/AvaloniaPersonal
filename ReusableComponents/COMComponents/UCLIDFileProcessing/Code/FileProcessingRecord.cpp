@@ -243,7 +243,7 @@ string FileProcessingRecord::getFileName() const
 	}
 	// since the file name can be changed inside the file record this now needs to return the 
 	// file name in the stored FileRecord object
-	return m_lfrFileRcd.FileRecord->Name;
+	return asString(m_lfrFileRcd.FileRecord->Name);
 }
 //-------------------------------------------------------------------------------------------------
 long FileProcessingRecord::getFileID() const

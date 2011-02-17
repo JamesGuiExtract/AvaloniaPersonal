@@ -70,7 +70,8 @@ namespace Extract.Interop
 
                 // Validate the version
                 ExtractException.Assert("ELI26185", "Unrecognized version number.",
-                    _version <= version);
+                    _version <= version, "Version Expected", version,
+                    "Version Loaded", _version);
             }
             catch (Exception ex)
             {

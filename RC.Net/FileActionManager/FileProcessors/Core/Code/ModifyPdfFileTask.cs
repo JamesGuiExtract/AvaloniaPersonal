@@ -629,7 +629,7 @@ namespace Extract.FileActionManager.FileProcessors
 	        catch (Exception ex)
 	        {
 		        throw ExtractException.CreateComVisible("ELI29661", 
-			        "Unable to save verification task.", ex);
+			        "Unable to save Modify pdf task.", ex);
 	        }
         }
 

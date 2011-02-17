@@ -48,6 +48,7 @@ STDMETHODIMP CStringPair::InterfaceSupportsErrorInfo(REFIID riid)
 	{
 		&IID_IStringPair,
 		&IID_ICopyableObject,
+		&IID_IPersistStream,
 		&IID_ILicensedComponent
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -70,11 +71,11 @@ STDMETHODIMP CStringPair::get_StringKey(BSTR *pVal)
 	{
 		validateLicense();
 
-		*pVal = _bstr_t(m_strKey.c_str()).copy();
+		*pVal = _bstr_t(m_strKey.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04236");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CStringPair::put_StringKey(BSTR newVal)
@@ -87,10 +88,10 @@ STDMETHODIMP CStringPair::put_StringKey(BSTR newVal)
 
 		m_strKey = asString( newVal );
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04237");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CStringPair::get_StringValue(BSTR *pVal)
@@ -101,11 +102,11 @@ STDMETHODIMP CStringPair::get_StringValue(BSTR *pVal)
 	{
 		validateLicense();
 
-		*pVal = _bstr_t(m_strValue.c_str()).copy();
+		*pVal = _bstr_t(m_strValue.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04238");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CStringPair::put_StringValue(BSTR newVal)
@@ -118,10 +119,47 @@ STDMETHODIMP CStringPair::put_StringValue(BSTR newVal)
 
 		m_strValue = asString( newVal );
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04239");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CStringPair::SetKeyValuePair(BSTR bstrKey, BSTR bstrVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-	return S_OK;
+	try
+	{
+		validateLicense();
+
+		m_strKey = asString(bstrKey);
+		m_strValue = asString(bstrVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31689");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CStringPair::GetKeyValuePair(BSTR* pbstrKey, BSTR* pbstrVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31690", pbstrKey != __nullptr);
+		ASSERT_ARGUMENT("ELI31691", pbstrVal != __nullptr);
+
+		validateLicense();
+
+		*pbstrKey = _bstr_t(m_strKey.c_str()).Detach();
+		*pbstrVal = _bstr_t(m_strValue.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31692");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -180,10 +218,10 @@ STDMETHODIMP CStringPair::Load(IStream *pStream)
 		
 		// set the dirty flag to false as we've just loaded the object
 		m_bDirty = false;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04937");
-	
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CStringPair::Save(IStream *pStream, BOOL fClearDirty)
@@ -209,11 +247,10 @@ STDMETHODIMP CStringPair::Save(IStream *pStream, BOOL fClearDirty)
 		
 		// clear the flag as specified
 		if (fClearDirty) m_bDirty = false;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04938");
-
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CStringPair::GetSizeMax(ULARGE_INTEGER *pcbSize)
@@ -237,12 +274,18 @@ STDMETHODIMP CStringPair::CopyFrom(IUnknown *pObject)
 		UCLID_COMUTILSLib::IStringPairPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI08316", ipSource != NULL);
 
-		m_strKey = asString(ipSource->GetStringKey());
-		m_strValue = asString(ipSource->GetStringValue());
+		_bstr_t bstrKey;
+		_bstr_t bstrValue;
+		ipSource->GetKeyValuePair(bstrKey.GetAddress(), bstrValue.GetAddress());
+
+		m_strKey = asString(bstrKey);
+		m_strValue = asString(bstrValue);
+
+		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08317");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CStringPair::Clone(IUnknown* *pObject)
@@ -263,10 +306,10 @@ STDMETHODIMP CStringPair::Clone(IUnknown* *pObject)
 
 		// return the new variant vector to the caller
 		*pObject = ipObjCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04943");
-
-	return S_OK;
 }
 
 //--------------------------------------------------------------------------------------------------

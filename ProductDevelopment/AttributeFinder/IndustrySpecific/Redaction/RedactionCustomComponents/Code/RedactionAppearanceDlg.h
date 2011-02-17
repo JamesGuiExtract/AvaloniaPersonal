@@ -4,6 +4,8 @@
 #include "afxwin.h"
 
 #include <string>
+#include <vector>
+#include <utility>
 
 using namespace std;
 
@@ -14,6 +16,7 @@ struct RedactionAppearanceOptions
 {
 	// Variables
 	string m_strText;
+	vector<pair<string,string>> m_vecReplacements;
 	string m_strTextToReplace;
 	string m_strReplacementText;
 	bool m_bAdjustTextCasing;

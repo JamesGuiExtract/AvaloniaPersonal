@@ -374,14 +374,20 @@ STDMETHODIMP CSpatialStringSearcher::GetLeftWord(ILongRectangle *pRect, ISpatial
 	try
 	{
 		ASSERT_ARGUMENT("ELI31665", ppReturnString != NULL);
+		ILongRectanglePtr ipRect(pRect);
+		ASSERT_ARGUMENT("ELI31666", ipRect != NULL);
 
 		validateLicense();
 
 		// Default to NULL return
 		*ppReturnString = __nullptr;
 
-		ILongRectanglePtr ipRect(pRect);
-		ASSERT_RESOURCE_ALLOCATION("ELI31666", ipRect != NULL);
+		// If less than 5 spatial letters in the searcher, there is no
+		// enough context to look for words, just return
+		if (m_vecLetters.size() < 5)
+		{
+			return S_OK;
+		}
 
 		// Get a vector of all the letters that fall in the region
 		vector<int> vecLetters;		
@@ -444,14 +450,20 @@ STDMETHODIMP CSpatialStringSearcher::GetRightWord(ILongRectangle *pRect, ISpatia
 	try
 	{
 		ASSERT_ARGUMENT("ELI31672", ppReturnString != NULL);
+		ILongRectanglePtr ipRect(pRect);
+		ASSERT_ARGUMENT("ELI31673", ipRect != NULL);
 
 		validateLicense();
 
 		// Default to NULL return
 		*ppReturnString = __nullptr;
 
-		ILongRectanglePtr ipRect(pRect);
-		ASSERT_RESOURCE_ALLOCATION("ELI31673", ipRect != NULL);
+		// If less than 5 spatial letters in the searcher, there is no
+		// enough context to look for words, just return
+		if (m_vecLetters.size() < 5)
+		{
+			return S_OK;
+		}
 
 		// Get a vector of all the letters that fall in the region
 		vector<int> vecLetters;		

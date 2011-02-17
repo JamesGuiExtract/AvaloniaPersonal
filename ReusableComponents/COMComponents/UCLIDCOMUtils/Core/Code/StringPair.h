@@ -43,6 +43,8 @@ public:
 	STDMETHOD(put_StringValue)(/*[in]*/ BSTR newVal);
 	STDMETHOD(get_StringKey)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_StringKey)(/*[in]*/ BSTR newVal);
+	STDMETHOD(SetKeyValuePair)(BSTR bstrKey, BSTR bstrVal);
+	STDMETHOD(GetKeyValuePair)(BSTR* pbstrKey, BSTR* pbstrVal);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
