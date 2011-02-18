@@ -927,6 +927,9 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 
 		// Move list and buttons
 		m_fileProcessorList.MoveWindow(&rectList);
+		// Resize the picture control around the processor list grid
+		rectList.InflateRect(1, 1, 1, 1);
+		GetDlgItem(IDC_PICTURE)->MoveWindow(&rectList);
 		m_btnAdd.MoveWindow(&rectAddButton);
 		m_btnRemove.MoveWindow(&rectDeleteButton);
 		m_btnModify.MoveWindow(&rectModifyButton);
