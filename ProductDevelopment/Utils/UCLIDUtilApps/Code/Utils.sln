@@ -127,6 +127,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Licensing", "..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj", "{212E31D9-5F02-43AA-8625-BCB86B15CF8F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities", "..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj", "{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmbedPageNumber", "..\..\..\..\RC.Net\UtilityApplications\CustomApplications\EmbedPageNumber\Core\Code\EmbedPageNumber.csproj", "{3EF20B91-1AE1-46D1-BAFF-4ED8FC9DF166}"
 EndProject
@@ -152,12 +155,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFDRSService", "..\..\..\.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FAMDBLockChecker", "..\..\..\..\RC.Net\FileActionManager\Utilities\FAMDBLockChecker\Core\Code\FAMDBLockChecker.csproj", "{B617ED69-72EC-4567-98FB-4A6151BBCE9C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SetOperations", "..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Code\SetOperations.csproj", "{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Database", "..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj", "{D0465C3D-527B-4B21-8E07-79A6CB762CC9}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 72
+		ProjectCount = 74
 		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj
 		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcxproj
@@ -230,6 +237,8 @@ Global
 		ProjectRelativeDiskPath70 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\UEXExtractor\Core\Code\ExtractDebugData.csproj
 		ProjectRelativeDiskPath71 = ..\..\..\..\RC.Net\UtilityApplications\Services\ESFDRSService\Core\Code\ESFDRSService.csproj
 		ProjectRelativeDiskPath72 = ..\..\..\..\RC.Net\FileActionManager\Utilities\FAMDBLockChecker\Core\Code\FAMDBLockChecker.csproj
+		ProjectRelativeDiskPath73 = ..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Code\SetOperations.csproj
+		ProjectRelativeDiskPath74 = ..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1106,6 +1115,30 @@ Global
 		{B617ED69-72EC-4567-98FB-4A6151BBCE9C}.Release|Win32.ActiveCfg = Release|x86
 		{B617ED69-72EC-4567-98FB-4A6151BBCE9C}.Release|x86.ActiveCfg = Release|x86
 		{B617ED69-72EC-4567-98FB-4A6151BBCE9C}.Release|x86.Build.0 = Release|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Debug|Win32.ActiveCfg = Debug|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Debug|x86.ActiveCfg = Debug|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Debug|x86.Build.0 = Debug|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Release|Any CPU.ActiveCfg = Release|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Release|Mixed Platforms.Build.0 = Release|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Release|Win32.ActiveCfg = Release|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Release|x86.ActiveCfg = Release|x86
+		{173E34B9-7542-4ADD-83CC-B07FC77C4DE5}.Release|x86.Build.0 = Release|x86
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Release|Win32.ActiveCfg = Release|Any CPU
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
