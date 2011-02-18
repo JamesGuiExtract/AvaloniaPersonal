@@ -119,7 +119,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>RegAsm "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"
+    <PostBuildEvent>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\RegAsm "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"
 CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
