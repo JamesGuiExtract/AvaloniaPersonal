@@ -314,6 +314,7 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.Redaction.CustomComponentsHelper.dll</td><td>{BC1778CF-1B0D-4DB8-A811-8F3213EA5016}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.customcomp</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td>{DEC2B72C-0860-4D86-80E3-1D0DD6D14F94}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.verificati</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.dll</td><td>{BE1E239C-C3B7-4027-8488-645FC27F5851}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.dll</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FlexIndexComponents</td><td>{964AC833-306B-4B9B-9FFC-C7E885AB040B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td>This is for shortcuts to files installed with Flex Index Merge Module</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1149,6 +1150,7 @@
 		<col key="yes" def="s72">Component_</col>
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>IDShieldMain</td><td>ExemptionCodes</td></row>
+		<row><td>IDShieldMain</td><td>Extract.Redaction.CustomComponentsHelper.dll</td></row>
 		<row><td>IDShieldMain</td><td>Extract.Redaction.Verification.dll</td></row>
 		<row><td>IDShieldMain</td><td>Extract.Redaction.dll</td></row>
 		<row><td>IDShieldMain</td><td>FlexIndexComponents</td></row>
@@ -1176,6 +1178,7 @@
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>RedactionCC.dll</td><td>RedactionCC.dll</td><td>REDACT~1.DLL|RedactionCC.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGIDSHIELD_FILES&gt;\RedactionCC.dll</td><td>17</td><td/></row>
+		<row><td>extract.redaction.customcomp</td><td>Extract.Redaction.CustomComponentsHelper.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.CustomComponentsHelper.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.CustomComponentsHelper.dll</td><td>1</td><td/></row>
 		<row><td>extract.redaction.dll</td><td>Extract.Redaction.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.dll</td><td>17</td><td/></row>
 		<row><td>extract.redaction.verificati</td><td>Extract.Redaction.Verification.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.Verification.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.Verification.dll</td><td>17</td><td/></row>
 		<row><td>idshieldstatisticsreporter.e</td><td>IDShieldStatisticsReporter.exe</td><td>IDSHIE~1.EXE|IDShieldStatisticsReporter.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\IDShieldStatisticsReporter.exe</td><td>1</td><td/></row>
@@ -1434,6 +1437,7 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>ExemptionCodes</td><td/><td/><td>_DC4F41A0_2184_486F_85BC_827E04CF07BD_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Extract.Redaction.CustomComponentsHelper.dll</td><td/><td/><td>_01E0B1D8_4082_473F_AA8B_C078BA868206_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td/><td/><td>_9455B052_64C2_4C44_BABF_F480528B2F4B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.dll</td><td/><td/><td>_B4448636_A587_4E5B_B2D0_3EC1207C1F4A_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FlexIndexComponents</td><td/><td/><td>_CF3653D1_3395_4E45_AEBD_D8C55EF5394F_FILTER</td><td/><td/><td/><td/></row>
