@@ -243,18 +243,25 @@ namespace Extract.Redaction
 
                 // Loop through each attribute to redact
                 foreach (SpatialString value in _voaLoader.Items
-                    .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
-                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute.Value)
-                    .Where(value => value.HasSpatialInfo()))
+                    .Where(sensitiveItem =>
+                        sensitiveItem.Attribute.Redacted &&
+                        sensitiveItem.Attribute.ComAttribute.Value.HasSpatialInfo())
+                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute.Value))
                 {
-                    // Text is "indexed" by storing the index of each character as the "left"
-                    // coordinate in the attribute's spatial string.
-                    ILongRectangle boundingRect = value.GetOCRImageBounds();
-                    int startIndex = boundingRect.Left;
-                    int endIndex = boundingRect.Right;
+                    // Loop through each raster zone in the attribute.
+                    foreach (RasterZone rasterZone in
+                        value.GetOCRImageRasterZones().ToIEnumerable<RasterZone>())
+                    {
+                        // Text is "indexed" by storing the index of each character as the "left"
+                        // coordinate in the attribute's spatial string.
+                        ILongRectangle boundingRect =
+                            rasterZone.GetRectangularBounds(source.GetOCRImageBounds());
+                        int startIndex = boundingRect.Left;
+                        int endIndex = boundingRect.Right;
 
-                    // Combine this range of indexes with indexes previously slated for redaction.
-                    MergeWithExistingRedactionZones(redactionZones, startIndex, endIndex);
+                        // Combine this range of indexes with indexes previously slated for redaction.
+                        MergeWithExistingRedactionZones(redactionZones, startIndex, endIndex);
+                    }
                 }
 
                 // Create a redacted version of source.String using the calculated redaction zones.

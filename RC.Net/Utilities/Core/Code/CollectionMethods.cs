@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
-using System.Text;
 using System.Collections.Generic;
+using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities
 {
@@ -218,6 +218,58 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI26708", ex);
+            }
+        }
+
+        /// <summary>
+        /// Converts <see paramref="enumerable"/> into an <see cref="IIUnknownVector"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of object in the enumerable.</typeparam>
+        /// <param name="enumerable">The <see cref="IEnumerable{T}"/> to convert.</param>
+        /// <returns>An <see cref="IIUnknownVector"/> of type <see paramref="T"/>.</returns>
+        [CLSCompliant(false)]
+        public static IIUnknownVector ToIUnknownVector<T>(this IEnumerable<T> enumerable)
+        {
+            try
+            {
+                IIUnknownVector vector = new IUnknownVector();
+                foreach (T value in enumerable)
+                {
+                    vector.PushBack(value);
+                }
+
+                return vector;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31777", ex);
+            }
+        }
+
+        /// <summary>
+        /// Converts <see paramref="comVector"/> into an <see cref="IEnumerable"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of object in the vector.</typeparam>
+        /// <param name="comVector">The <see cref="IIUnknownVector"/> to convert.</param>
+        /// <returns>An <see cref="IEnumerable"/> of type <see paramref="T"/>.</returns>
+        [CLSCompliant(false)]
+        public static IEnumerable<T> ToIEnumerable<T>(this IIUnknownVector comVector)
+        {
+            try
+            {
+                int size = comVector.Size();
+                List<T> list = new List<T>(size);
+
+                for (int i = 0; i < size; i++)
+                {
+                    list.Add((T)comVector.At(i));
+                }
+
+                return list;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31778", ex);
             }
         }
     }
