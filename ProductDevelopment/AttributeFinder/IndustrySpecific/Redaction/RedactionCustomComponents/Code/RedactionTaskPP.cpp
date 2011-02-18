@@ -173,10 +173,11 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 
 			// Set the redaction text and options
 			ipRedactFileProc->RedactionText = m_redactionAppearance.m_strText.c_str();
-			ipRedactFileProc->TextToReplace = m_redactionAppearance.m_strTextToReplace.c_str();
-			ipRedactFileProc->ReplacementText = m_redactionAppearance.m_strReplacementText.c_str();
 			ipRedactFileProc->AutoAdjustTextCasing =
 				asVariantBool(m_redactionAppearance.m_bAdjustTextCasing);
+			ipRedactFileProc->ReplacementValues = m_redactionAppearance.getReplacements();
+			ipRedactFileProc->PrefixText = m_redactionAppearance.m_strPrefixText.c_str();
+			ipRedactFileProc->SuffixText = m_redactionAppearance.m_strSuffixText.c_str();
 
 			// Set the redaction colors
 			ipRedactFileProc->BorderColor = m_redactionAppearance.m_crBorderColor;
@@ -291,9 +292,11 @@ LRESULT CRedactionTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 
 		// Get the redaction text
 		m_redactionAppearance.m_strText = asString(ipRedactFileProc->RedactionText);
-		m_redactionAppearance.m_strTextToReplace = asString(ipRedactFileProc->TextToReplace);
-		m_redactionAppearance.m_strReplacementText = asString(ipRedactFileProc->ReplacementText);
 		m_redactionAppearance.m_bAdjustTextCasing = asCppBool(ipRedactFileProc->AutoAdjustTextCasing);
+
+		m_redactionAppearance.updateReplacementsFromVector(ipRedactFileProc->ReplacementValues);
+		m_redactionAppearance.m_strPrefixText = asString(ipRedactFileProc->PrefixText);
+		m_redactionAppearance.m_strSuffixText = asString(ipRedactFileProc->SuffixText);
 
 		// Get the redaction colors
 		m_redactionAppearance.m_crBorderColor = ipRedactFileProc->BorderColor;

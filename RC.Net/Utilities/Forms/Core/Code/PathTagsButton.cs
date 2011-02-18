@@ -3,10 +3,7 @@ using Extract.Utilities.Forms.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
@@ -61,7 +58,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// The names of valid function tags.
         /// </summary>
-        static string[] _functionTags = GetFunctionTags();
+        static readonly string[] _functionTags = GetFunctionTags();
 
         /// <summary>
         /// The context menu that is displayed when the tag button is clicked.
@@ -78,6 +75,11 @@ namespace Extract.Utilities.Forms
         /// image only.
         /// </summary>
         PathTagsButtonDisplayStyle _displayStyle = PathTagsButtonDisplayStyle.ImageOnly;
+
+        /// <summary>
+        /// Whether or not function tags should be displayed in the drop down.
+        /// </summary>
+        bool _displayFunctionTags = true;
 
         #endregion PathTagsButton Fields
 
@@ -200,6 +202,24 @@ namespace Extract.Utilities.Forms
                 {
                     throw ExtractException.AsExtractException("ELI26498", ex);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets whether function tags should be displayed in the drop down.
+        /// </summary>
+        [Category("Behavior")]
+        [Description("The path tags that are available for selection.")]
+        [DefaultValue(true)]
+        public bool DisplayFunctionTags
+        {
+            get
+            {
+                return _displayFunctionTags;
+            }
+            set
+            {
+                _displayFunctionTags = value;
             }
         }
 
@@ -330,16 +350,20 @@ namespace Extract.Utilities.Forms
                         items.Add(new ToolStripMenuItem(docTag));
                     }
 
-                    // Only add the separator if there was at least one doc tag
-                    if (items.Count > 0)
+                    // Check if displaying function tags
+                    if (_displayFunctionTags)
                     {
-                        items.Add(new ToolStripSeparator());
-                    }
+                        // Only add the separator if there was at least one doc tag
+                        if (items.Count > 0)
+                        {
+                            items.Add(new ToolStripSeparator());
+                        }
 
-                    // Add the function tags
-                    foreach (string function in _functionTags)
-                    {
-                        items.Add(new ToolStripMenuItem(function));
+                        // Add the function tags
+                        foreach (string function in _functionTags)
+                        {
+                            items.Add(new ToolStripMenuItem(function));
+                        }
                     }
                 }
 

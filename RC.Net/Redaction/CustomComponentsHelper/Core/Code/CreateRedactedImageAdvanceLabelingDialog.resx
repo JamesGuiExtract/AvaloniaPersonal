@@ -117,14 +117,48 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="icon_down" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon_down.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <metadata name="groupBox1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="_buttonUp.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADrwAAA68AZW8ckkAAACISURBVFhH7ZRZDoAgDEQ5eo/Wm6FtxIiy+EHbGKcJH4TA
+        ewxLSigk8PEE8u4vLaQKPERCoUSk7UjBLYkK7i1RwZk5S3lJPOBFwEOiCRcBD4kh3FriFdxK4v7Oz75c
+        uhb08hxbc5d9VnrrBwLLQL2FIIAEkAASMP9oZgAcwSwh8/HwIzDf4b8AGy3B7ZnhjjplAAAAAElFTkSu
+        QmCC
+</value>
   </data>
-  <data name="icon_up" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon_up.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="_buttonDown.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADrwAAA68AZW8ckkAAACXSURBVFhH7ZYNDoAgCIU9OkfjZhQttjQdmhr9wObcmvU+
+        HiwMweOFDhAAkAQiEi9+tubC6/th7oA5gHmNzR1wAHfAHfiPAzLdTrsyDUvvXfqDbh9jwZyojOJ0l/P7
+        eO4e0U0Qo8XFtiqIWeJVELPFixByHTtcybprrnVrVI67Mk+hIohR3a5lnoWwEo96opXcz7sDj3JgAb6q
+        7ZnuLfZZAAAAAElFTkSuQmCC
+</value>
   </data>
-  <data name="SelectDocTagArrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\SelectDocTagArrow.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <metadata name="groupBox2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="_suffixTags.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABKSURBVFhH7dIxCgAgDARB//9pxUKwsgiBsxj7C8vgGB4B
+        AgQIEKgLzPq0Z7kDohEnIBZxB0QivhHo+VGFKxH2QqcJAQIECBB4CyyqxA/xREJjJwAAAABJRU5ErkJg
+        gg==
+</value>
   </data>
+  <data name="_prefixTags.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABKSURBVFhH7dIxCgAgDARB//9pxUKwsgiBsxj7C8vgGB4B
+        AgQIEKgLzPq0Z7kDohEnIBZxB0QivhHo+VGFKxH2QqcJAQIECBB4CyyqxA/xREJjJwAAAABJRU5ErkJg
+        gg==
+</value>
+  </data>
+  <metadata name="_buttonCancel.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
 </root>

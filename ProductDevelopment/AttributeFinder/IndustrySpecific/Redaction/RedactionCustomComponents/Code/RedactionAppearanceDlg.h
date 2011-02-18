@@ -17,9 +17,9 @@ struct RedactionAppearanceOptions
 	// Variables
 	string m_strText;
 	vector<pair<string,string>> m_vecReplacements;
-	string m_strTextToReplace;
-	string m_strReplacementText;
 	bool m_bAdjustTextCasing;
+	string m_strPrefixText;
+	string m_strSuffixText;
 	COLORREF m_crBorderColor;
 	COLORREF m_crFillColor;
 	LOGFONT m_lgFont;
@@ -33,6 +33,12 @@ struct RedactionAppearanceOptions
 
 	// Reset all values to their defaults
 	void reset();
+
+	// Gets the vector of replacements as an IUnknownVector of StringPairs
+	IIUnknownVectorPtr getReplacements();
+
+	// Updates the replacement vector with the StringPairs in the IUnknownVector
+	void updateReplacementsFromVector(IIUnknownVectorPtr ipReplacements);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -60,7 +66,7 @@ protected:
 	afx_msg void OnCbnSelendcancelComboRedactionText();
 	afx_msg void OnCbnEditchangeComboRedactionText();
 	afx_msg void OnCbnSelchangeComboRedactionText();
-	afx_msg void OnCheckChangedCheckReplaceText();
+	afx_msg void OnBnClickedButtonAdvancedSettings();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -73,10 +79,6 @@ private:
 	// Text
 	CComboBox m_comboText;
 	CButton m_buttonTextTag;
-	CButton m_checkReplaceText;
-	CButton m_checkAutoAdjustCase;
-	CEdit m_editTextToReplace;
-	CEdit m_editReplacementText;
 	CEdit m_editSampleText;
 
 	// Color

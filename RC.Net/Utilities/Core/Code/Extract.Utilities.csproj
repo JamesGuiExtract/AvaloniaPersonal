@@ -91,6 +91,7 @@
     <Compile Include="RegistryMethods.cs" />
     <Compile Include="SourceDocumentPathTags.cs" />
     <Compile Include="StreamMethods.cs" />
+    <Compile Include="StringPair.cs" />
     <Compile Include="SystemMethods.cs" />
     <Compile Include="TemporaryFile.cs" />
     <Compile Include="TemporaryFileCopyManager.cs" />

@@ -60,6 +60,9 @@ using namespace UCLID_FILEPROCESSINGLib;
 #import "..\..\..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.tlb" named_guids
 using namespace Extract_Imaging;
 
+#import "..\..\..\..\..\..\RC.Net\Redaction\CustomComponentsHelper\Core\Code\Extract.Redaction.CustomComponentsHelper.tlb" named_guids
+using namespace Extract_Redaction_CustomComponentsHelper;
+
 #import "RedactionCustomComponents.tlb"  
 
 //{{AFX_INSERT_LOCATION}}

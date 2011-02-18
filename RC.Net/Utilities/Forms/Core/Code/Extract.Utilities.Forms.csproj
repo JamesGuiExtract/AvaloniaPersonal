@@ -146,6 +146,15 @@
       <DependentUpon>PleaseWaitForm.cs</DependentUpon>
     </Compile>
     <Compile Include="OverlayText.cs" />
+    <Compile Include="TwoValueEntryDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TwoValueEntryDialog.Designer.cs">
+      <DependentUpon>TwoValueEntryDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UpAndDownButtons.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="WindowWrapper.cs" />
     <Compile Include="ControlInvoker.cs" />
     <Compile Include="ExtractCursors.cs" />
@@ -255,6 +264,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>InputBoxForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TwoValueEntryDialog.resx">
+      <DependentUpon>TwoValueEntryDialog.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PleaseWaitForm.resx">
@@ -361,6 +373,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\WordHighlight.cur" />
     <EmbeddedResource Include="Resources\WordRedaction.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_down.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_up.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

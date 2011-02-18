@@ -311,6 +311,9 @@
       <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Redaction\CustomComponentsHelper\Core\Code\Extract.Redaction.CustomComponentsHelper.csproj">
+      <Project>{66e9e1cc-5169-463f-ad55-001acd1f4080}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcxproj">
       <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

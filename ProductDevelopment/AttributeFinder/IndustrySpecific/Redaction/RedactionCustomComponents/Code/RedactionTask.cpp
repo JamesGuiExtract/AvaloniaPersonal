@@ -15,6 +15,7 @@
 #include <MiscLeadUtils.h>
 
 #include <string>
+#include <set>
 
 using namespace std;
 
@@ -24,7 +25,10 @@ using namespace std;
 // Version 2 - Added support for PDF security
 // Version 3 - Added TextToReplace, ReplacementText, and AutoAdjustCase settings for
 //		redaction appearance
-const unsigned long gnCurrentVersion = 3;
+// Version 4 - Changed replace text from single replacement to group of replacement settings,
+//		moved advanced text settings to seperate dialog, added settings for prefix and suffix
+//		text for the first instance of a type
+const unsigned long gnCurrentVersion = 4;
 
 //-------------------------------------------------------------------------------------------------
 // CRedactionTask
@@ -134,6 +138,10 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         // Check license
         validateLicense();
         _lastCodePos = "10";
+
+		// Set of type names that have been seen already (used to track first instance
+		// of a type when using prefix and suffix text
+		set<string> setTypes;
 
         // Start the a stop watch to track processing time
         StopWatch swProcessingTime;
@@ -313,16 +321,35 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
             {
                 string strCodes = getExemptionCodes(ipAttr);
 
+				string strType = asString(ipAttr->Type);
+
                 // Get the text associated with this attribute
                 string strText = CRedactionCustomComponentsUtils::ExpandRedactionTags(
-                    m_redactionAppearance.m_strText, strCodes, asString(ipAttr->Type));
+                    m_redactionAppearance.m_strText, strCodes, strType);
+				string strPrefixText = "";
+				string strSuffixText = "";
                 _lastCodePos = "270";
 
-                if (!m_redactionAppearance.m_strTextToReplace.empty())
-                {
-                    replaceVariable(strText, m_redactionAppearance.m_strTextToReplace,
-                        m_redactionAppearance.m_strReplacementText, kReplaceAll);
-                }
+				if (setTypes.find(strType) == setTypes.end())
+				{
+					strPrefixText = CRedactionCustomComponentsUtils::ExpandRedactionTags(
+						m_redactionAppearance.m_strPrefixText, strCodes, strType);
+					strSuffixText = CRedactionCustomComponentsUtils::ExpandRedactionTags(
+						m_redactionAppearance.m_strSuffixText, strCodes, strType);
+					setTypes.insert(strType);
+				}
+
+				// Handle all replacement values
+				if (m_redactionAppearance.m_vecReplacements.size())
+				{
+					for(vector<pair<string, string>>::iterator it =
+						m_redactionAppearance.m_vecReplacements.begin();
+						it != m_redactionAppearance.m_vecReplacements.end();
+						it++)
+					{
+						replaceVariable(strText, it->first, it->second, kReplaceAll);
+					}
+				}
 
                 // Get the Raster zones to redact
                 IIUnknownVectorPtr ipRasterZones = ipValue->GetOriginalImageRasterZones();
@@ -490,7 +517,17 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
                     zone.m_crTextColor = crTextColor;
                     zone.m_font = m_redactionAppearance.m_lgFont;
                     zone.m_iPointSize = m_redactionAppearance.m_iPointSize;
-                    zone.m_strText = strRedactionText;
+
+					// Set the appropriate text for the redaction
+					// If the first redaction, add prefix and suffix text
+					if (j == 0)
+					{
+						zone.m_strText = strPrefixText + strRedactionText + strSuffixText;
+					}
+					else
+					{
+	                    zone.m_strText = strRedactionText;
+					}
                     ipRasterZone->GetData(&(zone.m_nStartX), &(zone.m_nStartY), &(zone.m_nEndX),
                         &(zone.m_nEndY), &(zone.m_nHeight), &(zone.m_nPage));
 
@@ -719,9 +756,10 @@ STDMETHODIMP CRedactionTask::raw_CopyFrom(IUnknown* pObject)
 
         // Retrieve redaction appearance settings
         m_redactionAppearance.m_strText = asString(ipSource->RedactionText);
-        m_redactionAppearance.m_strTextToReplace = asString(ipSource->TextToReplace);
-        m_redactionAppearance.m_strReplacementText = asString(ipSource->ReplacementText);
         m_redactionAppearance.m_bAdjustTextCasing = asCppBool(ipSource->AutoAdjustTextCasing);
+		m_redactionAppearance.updateReplacementsFromVector(ipSource->ReplacementValues);
+		m_redactionAppearance.m_strPrefixText = asString(ipSource->PrefixText);
+		m_redactionAppearance.m_strSuffixText = asString(ipSource->SuffixText);
         m_redactionAppearance.m_crBorderColor = ipSource->BorderColor;
         m_redactionAppearance.m_crFillColor = ipSource->FillColor;
         
@@ -1386,82 +1424,9 @@ STDMETHODIMP CRedactionTask::GetFontData(BSTR* pbstrFontName, VARIANT_BOOL* pvbI
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29791");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactionTask::get_TextToReplace(BSTR* pbstrTextToReplace)
-{
-    AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-    try
-    {
-        ASSERT_ARGUMENT("ELI31655", pbstrTextToReplace != NULL);
-
-        // Check license state
-        validateLicense();
-
-        // Return setting to caller
-        *pbstrTextToReplace = _bstr_t(m_redactionAppearance.m_strTextToReplace.c_str()).Detach();
-
-        return S_OK;
-    }
-    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31656")
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactionTask::put_TextToReplace(BSTR bstrTextToReplace)
-{
-    AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-    try
-    {
-        // Check license state
-        validateLicense();
-
-        m_redactionAppearance.m_strTextToReplace = asString(bstrTextToReplace);
-        m_bDirty = true;
-
-        return S_OK;
-    }
-    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31657")
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactionTask::get_ReplacementText(BSTR* pbstrReplacementText)
-{
-    AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-    try
-    {
-        ASSERT_ARGUMENT("ELI31658", pbstrReplacementText != NULL);
-
-        // Check license state
-        validateLicense();
-
-        // Return setting to caller
-        *pbstrReplacementText =
-            _bstr_t(m_redactionAppearance.m_strReplacementText.c_str()).Detach();
-
-        return S_OK;
-    }
-    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31659")
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactionTask::put_ReplacementText(BSTR bstrReplacementText)
-{
-    AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-    try
-    {
-        // Check license state
-        validateLicense();
-
-        m_redactionAppearance.m_strReplacementText = asString(bstrReplacementText);
-        m_bDirty = true;
-
-        return S_OK;
-    }
-    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31660")
-}
-//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::get_AutoAdjustTextCasing(VARIANT_BOOL* pvbAdjustCasing)
 {
-    AFX_MANAGE_STATE(AfxGetStaticModuleState())
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
     try
     {
@@ -1475,12 +1440,12 @@ STDMETHODIMP CRedactionTask::get_AutoAdjustTextCasing(VARIANT_BOOL* pvbAdjustCas
 
         return S_OK;
     }
-    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31661")
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31661");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRedactionTask::put_AutoAdjustTextCasing(VARIANT_BOOL vbAdjustCasing)
 {
-    AFX_MANAGE_STATE(AfxGetStaticModuleState())
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
     try
     {
@@ -1493,7 +1458,116 @@ STDMETHODIMP CRedactionTask::put_AutoAdjustTextCasing(VARIANT_BOOL vbAdjustCasin
 
         return S_OK;
     }
-    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31662")
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31662");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::get_ReplacementValues(IIUnknownVector** ppvecReplacements)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+    try
+    {
+		ASSERT_ARGUMENT("ELI31751", ppvecReplacements != __nullptr);
+
+        // Check license state
+        validateLicense();
+
+		IIUnknownVectorPtr ipReplacements = m_redactionAppearance.getReplacements();
+		ASSERT_RESOURCE_ALLOCATION("ELI31752", ipReplacements != __nullptr);
+
+		*ppvecReplacements = ipReplacements.Detach();
+
+        return S_OK;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31753");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::put_ReplacementValues(IIUnknownVector* pvecReplacements)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+    try
+    {
+		IIUnknownVectorPtr ipReplacements(pvecReplacements);
+		ASSERT_ARGUMENT("ELI31754", ipReplacements != __nullptr);
+
+        // Check license state
+        validateLicense();
+
+		m_redactionAppearance.updateReplacementsFromVector(ipReplacements);
+		m_bDirty = true;
+
+        return S_OK;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31755");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::get_PrefixText(BSTR* pbstrPrefixText)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+    try
+    {
+		ASSERT_ARGUMENT("ELI31756", pbstrPrefixText != __nullptr);
+
+        // Check license state
+        validateLicense();
+
+		*pbstrPrefixText = _bstr_t(m_redactionAppearance.m_strPrefixText.c_str()).Detach();
+
+        return S_OK;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31757");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::put_PrefixText(BSTR bstrPrefixText)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+    try
+    {
+        // Check license state
+        validateLicense();
+
+		m_redactionAppearance.m_strPrefixText = asString(bstrPrefixText);
+
+        return S_OK;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31758");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::get_SuffixText(BSTR* pbstrSuffixText)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+    try
+    {
+		ASSERT_ARGUMENT("ELI31759", pbstrSuffixText != __nullptr);
+
+        // Check license state
+        validateLicense();
+
+		*pbstrSuffixText = _bstr_t(m_redactionAppearance.m_strSuffixText.c_str()).Detach();
+
+        return S_OK;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31760");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRedactionTask::put_SuffixText(BSTR bstrSuffixText)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+    try
+    {
+        // Check license state
+        validateLicense();
+
+		m_redactionAppearance.m_strSuffixText = asString(bstrSuffixText);
+
+        return S_OK;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31761");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1577,12 +1651,32 @@ STDMETHODIMP CRedactionTask::Load(IStream* pStream)
 
         // Redaction appearance
         dataReader >> m_redactionAppearance.m_strText;
+
+		// Get advanced redaction appearance settings
         if (nDataVersion >= 3)
         {
-            dataReader >> m_redactionAppearance.m_strTextToReplace;
-            dataReader >> m_redactionAppearance.m_strReplacementText;
+			vector<pair<string,string>>& vecReplacements = m_redactionAppearance.m_vecReplacements;
+
+			string strTemp1(""), strTemp2("");
+			unsigned long ulTemp(1);
+			if (nDataVersion >= 4)
+			{
+				dataReader >> ulTemp;
+			}
+			for(unsigned long i=0; i < ulTemp; i++)
+			{
+				dataReader >> strTemp1;
+				dataReader >> strTemp2;
+				vecReplacements.push_back(make_pair(strTemp1, strTemp2));
+			}
             dataReader >> m_redactionAppearance.m_bAdjustTextCasing;
         }
+		if (nDataVersion >= 4)
+		{
+			dataReader >> m_redactionAppearance.m_strPrefixText;
+			dataReader >> m_redactionAppearance.m_strSuffixText;
+		}
+
         dataReader >> m_redactionAppearance.m_crBorderColor;
         dataReader >> m_redactionAppearance.m_crFillColor;
 
@@ -1666,9 +1760,19 @@ STDMETHODIMP CRedactionTask::Save(IStream* pStream, BOOL fClearDirty)
 
         // Redaction text
         dataWriter << m_redactionAppearance.m_strText;
-        dataWriter << m_redactionAppearance.m_strTextToReplace;
-        dataWriter << m_redactionAppearance.m_strReplacementText;
+
+		// Advanced redaction text settings
+		dataWriter << (unsigned long)m_redactionAppearance.m_vecReplacements.size();
+		for(vector<pair<string,string>>::iterator it = m_redactionAppearance.m_vecReplacements.begin();
+			it != m_redactionAppearance.m_vecReplacements.end(); it++)
+		{
+			dataWriter << it->first;
+			dataWriter << it->second;
+		}
         dataWriter << m_redactionAppearance.m_bAdjustTextCasing;
+
+		dataWriter << m_redactionAppearance.m_strPrefixText;
+		dataWriter << m_redactionAppearance.m_strSuffixText;
 
         // Save redaction color options
         dataWriter << m_redactionAppearance.m_crBorderColor;

@@ -60,6 +60,20 @@ namespace Extract.Utilities.Forms.Properties {
             }
         }
         
+        internal static System.Drawing.Icon icon_down {
+            get {
+                object obj = ResourceManager.GetObject("icon_down", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon icon_up {
+            get {
+                object obj = ResourceManager.GetObject("icon_up", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
         internal static System.Drawing.Icon SelectDocTagArrow {
             get {
                 object obj = ResourceManager.GetObject("SelectDocTagArrow", resourceCulture);

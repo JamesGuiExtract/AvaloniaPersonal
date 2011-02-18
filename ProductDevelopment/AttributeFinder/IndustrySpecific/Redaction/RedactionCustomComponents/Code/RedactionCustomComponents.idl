@@ -398,20 +398,25 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
         [propput, id(15), helpstring("property PdfPasswordSettings")] HRESULT PdfPasswordSettings(
             [in] IPdfPasswordSettings* pPdfSettings);
         //-----------------------------------------------------------------------------------------
-		[propget, id(16), helpstring("property TextToReplace")] HRESULT TextToReplace(
-			[out, retval] BSTR* pbstrTextToReplace);
-		[propput, id(16), helpstring("property TextToReplace")] HRESULT TextToReplace(
-			[in] BSTR bstrTextToReplace);
-        //-----------------------------------------------------------------------------------------
-		[propget, id(17), helpstring("property ReplacementText")] HRESULT ReplacementText(
-			[out, retval] BSTR* pbstrReplacementText);
-		[propput, id(17), helpstring("property ReplacementText")] HRESULT ReplacementText(
-			[in] BSTR bstrReplacementText);
-        //-----------------------------------------------------------------------------------------
 		[propget, id(18), helpstring("property AutoAdjustTextCasing")] HRESULT
 			AutoAdjustTextCasing([out, retval] VARIANT_BOOL* pvbAdjustCasing);
 		[propput, id(18), helpstring("property AutoAdjustTextCasing")] HRESULT
 			AutoAdjustTextCasing([in] VARIANT_BOOL vbAdjustCasing);
+        //-----------------------------------------------------------------------------------------
+		[propget, id(19), helpstring("property ReplacementValues")] HRESULT
+			ReplacementValues([out, retval] IIUnknownVector** ppvecReplacements);
+		[propput, id(19), helpstring("property ReplacementValues")] HRESULT
+			ReplacementValues([in] IIUnknownVector* pvecReplacements);
+        //-----------------------------------------------------------------------------------------
+		[propget, id(20), helpstring("property PrefixText")] HRESULT PrefixText(
+			[out, retval] BSTR* pbstrPrefixText);
+		[propput, id(20), helpstring("property PrefixText")] HRESULT PrefixText(
+			[in] BSTR bstrPrefixText);
+        //-----------------------------------------------------------------------------------------
+		[propget, id(21), helpstring("property SuffixText")] HRESULT SuffixText(
+			[out, retval] BSTR* pbstrSuffixText);
+		[propput, id(21), helpstring("property SuffixText")] HRESULT SuffixText(
+			[in] BSTR bstrSuffixText);
         //-----------------------------------------------------------------------------------------
     };
 

@@ -126,8 +126,11 @@ const string CRedactionCustomComponentsUtils::ExpandRedactionTags(const string& 
 {
 	// Replace the tags
 	string strResult = strTagText;
-	replaceVariable(strResult, gstrEXEMPTION_CODES_TAG, strExemptionCodes);
-	replaceVariable(strResult, gstrFIELD_TYPE_TAG, strFieldType);
+	if (!strResult.empty())
+	{
+		replaceVariable(strResult, gstrEXEMPTION_CODES_TAG, strExemptionCodes);
+		replaceVariable(strResult, gstrFIELD_TYPE_TAG, strFieldType);
+	}
 
 	// Return the result
 	return strResult;

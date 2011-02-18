@@ -8,6 +8,7 @@
 
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
+#include <COMUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -48,9 +49,9 @@ const ColorOption gcoCOLOR_OPTIONS[] =
 //-------------------------------------------------------------------------------------------------
 RedactionAppearanceOptions::RedactionAppearanceOptions()
  : m_strText(""),
-   m_strTextToReplace(""),
-   m_strReplacementText(""),
    m_bAdjustTextCasing(false),
+   m_strPrefixText(""),
+   m_strSuffixText(""),
    m_crBorderColor(0),
    m_crFillColor(0),
    m_iPointSize(8)
@@ -94,8 +95,7 @@ string RedactionAppearanceOptions::getFontAsString()
 void RedactionAppearanceOptions::reset()
 {
 	m_strText = "";
-	m_strTextToReplace = "";
-	m_strReplacementText = "";
+	m_vecReplacements.clear();
 	m_bAdjustTextCasing = false;
 	m_crBorderColor = 0;
 	m_crFillColor = 0;
@@ -103,6 +103,39 @@ void RedactionAppearanceOptions::reset()
 	lstrcpyn(m_lgFont.lfFaceName, "Times New Roman", LF_FACESIZE);
 	m_lgFont.lfWeight = FW_NORMAL;
 	m_iPointSize = 8;
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr RedactionAppearanceOptions::getReplacements()
+{
+	IIUnknownVectorPtr ipReplacements(CLSID_IUnknownVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI31779", ipReplacements != __nullptr);
+
+	for(vector<pair<string, string>>::iterator it = m_vecReplacements.begin();
+		it != m_vecReplacements.end(); it++)
+	{
+		IStringPairPtr ipPair(CLSID_StringPair);
+		ASSERT_RESOURCE_ALLOCATION("ELI31780", ipPair != __nullptr);
+		ipPair->SetKeyValuePair(it->first.c_str(), it->second.c_str());
+		ipReplacements->PushBack(ipPair);
+	}
+
+	return ipReplacements;
+}
+//-------------------------------------------------------------------------------------------------
+void RedactionAppearanceOptions::updateReplacementsFromVector(IIUnknownVectorPtr ipReplacements)
+{
+	m_vecReplacements.clear();
+	int nSize = ipReplacements->Size();
+	for (int i=0; i < nSize; i++)
+	{
+		IStringPairPtr ipPair = ipReplacements->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI31781", ipPair != __nullptr);
+
+		_bstr_t bstrKey;
+		_bstr_t bstrVal;
+		ipPair->GetKeyValuePair(bstrKey.GetAddress(), bstrVal.GetAddress());
+		m_vecReplacements.push_back(make_pair(asString(bstrKey), asString(bstrVal)));
+	}
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -179,16 +212,13 @@ void CRedactionAppearanceDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_BORDER_COLOR, m_comboBorderColor);
 	DDX_Control(pDX, IDC_COMBO_FILL_COLOR, m_comboFillColor);
 	DDX_Control(pDX, IDC_EDIT_FONT, m_editFontDescription);
-	DDX_Control(pDX, IDC_CHECK_REPLACE_TEXT, m_checkReplaceText);
-	DDX_Control(pDX, IDC_EDIT_REPLACE_TEXT, m_editTextToReplace);
-	DDX_Control(pDX, IDC_EDIT_REPLACEMENT_TEXT, m_editReplacementText);
-	DDX_Control(pDX, IDC_CHECK_ADJUST_CASE, m_checkAutoAdjustCase);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CRedactionAppearanceDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_SELECT_FONT, &CRedactionAppearanceDlg::OnBnClickedButtonSelectFont)
 	ON_BN_CLICKED(IDC_BUTTON_REDACTION_TEXT_TAG, &CRedactionAppearanceDlg::OnBnClickedButtonRedactionTextTag)
-	ON_BN_CLICKED(IDC_CHECK_REPLACE_TEXT, &CRedactionAppearanceDlg::OnCheckChangedCheckReplaceText)
+	ON_BN_CLICKED(IDC_BUTTON_ADVANCED_TEXT_SETTINGS, &CRedactionAppearanceDlg::OnBnClickedButtonAdvancedSettings)
+
 	ON_CBN_SELENDCANCEL(IDC_COMBO_REDACTION_TEXT, &CRedactionAppearanceDlg::OnCbnSelendcancelComboRedactionText)
 	ON_CBN_EDITCHANGE(IDC_COMBO_REDACTION_TEXT, &CRedactionAppearanceDlg::OnCbnEditchangeComboRedactionText)
 	ON_CBN_SELCHANGE(IDC_COMBO_REDACTION_TEXT, &CRedactionAppearanceDlg::OnCbnSelchangeComboRedactionText)
@@ -225,19 +255,7 @@ BOOL CRedactionAppearanceDlg::OnInitDialog()
 
 		// Set redaction text
 		m_comboText.SetWindowText(m_options.m_strText.c_str());
-		if (!m_options.m_strTextToReplace.empty())
-		{
-			m_checkReplaceText.SetCheck(BST_CHECKED);
-			m_editTextToReplace.SetWindowText(m_options.m_strTextToReplace.c_str());
-			m_editReplacementText.SetWindowText(m_options.m_strReplacementText.c_str());
-		}
-		else
-		{
-			m_checkReplaceText.SetCheck(BST_UNCHECKED);
-			m_editTextToReplace.EnableWindow(FALSE);
-			m_editReplacementText.EnableWindow(FALSE);
-		}
-		m_checkAutoAdjustCase.SetCheck(asBSTChecked(m_options.m_bAdjustTextCasing));
+
 
 		// Set colors
 		m_comboBorderColor.SetCurSel( getIndexFromColor(m_options.m_crBorderColor) );
@@ -260,19 +278,7 @@ void CRedactionAppearanceDlg::OnOK()
 		CString zText;
 		m_comboText.GetWindowText(zText);
 		m_options.m_strText = zText;
-		if (m_checkReplaceText.GetCheck() == BST_CHECKED)
-		{
-			m_editTextToReplace.GetWindowText(zText);
-			m_options.m_strTextToReplace = zText;
-			m_editReplacementText.GetWindowText(zText);
-			m_options.m_strReplacementText = zText;
-		}
-		else
-		{
-			m_options.m_strTextToReplace = "";
-			m_options.m_strReplacementText = "";
-		}
-		m_options.m_bAdjustTextCasing = m_checkAutoAdjustCase.GetCheck() == BST_CHECKED;
+
 
 		// Set the border color
 		int selection = m_comboBorderColor.GetCurSel();
@@ -380,6 +386,31 @@ void CRedactionAppearanceDlg::OnBnClickedButtonRedactionTextTag()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24635")
 }
 //-------------------------------------------------------------------------------------------------
+void CRedactionAppearanceDlg::OnBnClickedButtonAdvancedSettings()
+{
+	try
+	{
+		ICreateRedactedImageAdvancedLabelSettingsPtr ipSettings(CLSID_CreateRedactedImageAdvancedLabelSettings);
+		ASSERT_RESOURCE_ALLOCATION("ELI31750", ipSettings != __nullptr);
+
+		ipSettings->AutoAdjustCase = m_options.m_bAdjustTextCasing;
+		ipSettings->PrefixFirstInstance = m_options.m_strPrefixText.c_str();
+		ipSettings->SuffixFirstInstance = m_options.m_strSuffixText.c_str();
+		ipSettings->Replacements = m_options.getReplacements();
+
+		IConfigurableObjectPtr ipConfigure = ipSettings;
+		ASSERT_RESOURCE_ALLOCATION("ELI31782", ipConfigure != __nullptr);
+		if (ipConfigure->RunConfiguration() == VARIANT_TRUE)
+		{
+			m_options.m_bAdjustTextCasing = asCppBool(ipSettings->AutoAdjustCase);
+			m_options.m_strPrefixText = asString(ipSettings->PrefixFirstInstance);
+			m_options.m_strSuffixText = asString(ipSettings->SuffixFirstInstance);
+			m_options.updateReplacementsFromVector(ipSettings->Replacements);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31749");
+}
+//-------------------------------------------------------------------------------------------------
 void CRedactionAppearanceDlg::OnCbnSelendcancelComboRedactionText()
 {
 	try
@@ -412,17 +443,7 @@ void CRedactionAppearanceDlg::OnCbnSelchangeComboRedactionText()
 		updateSampleRedactionText(strText);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24955")
-}
-//-------------------------------------------------------------------------------------------------
-void CRedactionAppearanceDlg::OnCheckChangedCheckReplaceText()
-{
-	try
-	{
-		BOOL bEnable = asMFCBool(m_checkReplaceText.GetCheck() == BST_CHECKED);
-		m_editTextToReplace.EnableWindow(bEnable);
-		m_editReplacementText.EnableWindow(bEnable);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31663");
+
 }
 //-------------------------------------------------------------------------------------------------
 
