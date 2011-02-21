@@ -4819,10 +4819,39 @@ namespace Extract.Imaging.Forms
                             // data, then create a new one scaled to the destination graphics.
                             originalTrackingData = _trackingData;
 
+                            // [FlexIDSCore:4557]
+                            // Get the ratio of magnified zoom factor to original zoom factor.
+                            // ZoomInfo.ScaleFactor is only accurate when a fit mode is not set;
+                            // if a fit mode is set it will need to be calculated.
+                            double magnifiedZoomRatio;    
+                            switch (originalZoom.Value.FitMode)
+                            {
+                                case FitMode.FitToWidth:
+                                    {
+                                        magnifiedZoomRatio = (double)ImageWidth / (double)Width;
+                                    }
+                                    break;
+
+                                case FitMode.FitToPage:
+                                    {
+                                        magnifiedZoomRatio = Math.Max(
+                                            (double)ImageWidth / (double)Width,
+                                            (double)ImageHeight / (double)Height);
+                                    }
+                                    break;
+
+                                default:
+                                    {
+                                        magnifiedZoomRatio =
+                                            magnifiedZoom.ScaleFactor / originalZoom.Value.ScaleFactor;
+                                    }
+                                    break;
+                            }
+
                             // Create a transformed version of the tracking data for the destination
                             // graphics.
-                            int trackingHeight = (int)((double)_trackingData.Height *
-                                magnifiedZoom.ScaleFactor / originalZoom.Value.ScaleFactor);
+                            int trackingHeight =
+                                (int)((double)_trackingData.Height * magnifiedZoomRatio);
                             _trackingData = new TrackingData(this, transformedPoints[1].X,
                                 transformedPoints[1].Y, clip, trackingHeight);
 
