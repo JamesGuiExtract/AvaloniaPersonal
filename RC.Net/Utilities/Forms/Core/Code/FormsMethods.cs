@@ -75,6 +75,10 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Prevents the specified <see cref="Control"/> from updating (redrawing) until the lock 
         /// is released.
+        /// <para><b>Note</b></para>
+        /// In most situations it is advisable to invalidate or redraw controls after unlocking
+        /// updates otherwise changes to the control that occured while it was locked will not be
+        /// displayed.
         /// </summary>
         /// <param name="control">The <see cref="Control"/> for which updating is to be locked/
         /// unlocked.</param>
@@ -90,13 +94,6 @@ namespace Extract.Utilities.Forms
                     _OBJECT_NAME);
 
                 NativeMethods.LockControlUpdate(control, lockUpdate);
-
-                // If unlocking the updates, refresh the control now to show changes
-                // since the lock was applied.
-                if (!lockUpdate)
-                {
-                    control.Refresh();
-                }
             }
             catch (Exception ex)
             {

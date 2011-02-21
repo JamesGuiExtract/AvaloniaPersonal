@@ -4880,6 +4880,16 @@ namespace Extract.Imaging.Forms
 
                 // Allow painting of the ImageViewer again.
                 FormsMethods.LockControlUpdate(this, false);
+
+                // Refresh if a tracking event is in progress or _refreshAfterPaintToGraphics is set
+                // to ensure all layer object and tracking event graphics updates are properly
+                // displayed.
+                if (_trackingData != null || _refreshAfterPaintToGraphics)
+                {
+                    _refreshAfterPaintToGraphics = false;
+
+                    Refresh();
+                }
             }
         }
 

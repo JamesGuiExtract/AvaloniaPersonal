@@ -449,6 +449,12 @@ namespace Extract.Imaging.Forms
         bool _paintingToGraphics = false;
 
         /// <summary>
+        /// Indicates whether Refresh needs to be called at the end of a call to
+        /// <see cref="PaintToGraphics"/>.
+        /// </summary>
+        bool _refreshAfterPaintToGraphics;
+
+        /// <summary>
         /// The last known location of the mouse.
         /// </summary>
         Point _lastMouseLocation;
@@ -621,8 +627,10 @@ namespace Extract.Imaging.Forms
                 // Store the original transformation matrix
                 _transform = base.Transform;
 
-                // Handle layer object remove events
+                // Handle layer object object added/deleted/visibility changed events
                 _layerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
+                _layerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+                _layerObjects.LayerObjectVisibilityChanged += HandleLayerObjectVisibilityChanged;
 
                 _wordHighlightManager = new WordHighlightManager(this);
             }
@@ -3312,6 +3320,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                _refreshAfterPaintToGraphics = true;
+
                 // Check if the deleted layer object is the active linked layer object
                 if (e.LayerObject == _activeLinkedLayerObject)
                 {
@@ -3323,6 +3333,42 @@ namespace Extract.Imaging.Forms
                 ExtractException ee = ExtractException.AsExtractException("ELI22659", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the LayerObjectCollection LayerObjectVisibilityChanged event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.LayerObjectVisibilityChangedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleLayerObjectVisibilityChanged(object sender, LayerObjectVisibilityChangedEventArgs e)
+        {
+            try
+            {
+                _refreshAfterPaintToGraphics = true;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI31799");
+            }
+        }
+
+        /// <summary>
+        /// Handles the LayerObjectCollection LayerObjectLayerObjectAdded event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.LayerObjectAddedEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
+        {
+            try
+            {
+                _refreshAfterPaintToGraphics = true;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI31800");
             }
         }
 

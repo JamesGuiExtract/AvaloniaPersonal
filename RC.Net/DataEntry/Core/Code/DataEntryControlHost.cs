@@ -6292,6 +6292,13 @@ namespace Extract.DataEntry
                     FormsMethods.LockControlUpdate(control, lockUpdates);
                 }
             }
+
+            // If unlocking the updates, refresh the control now to show changes since the lock was
+            // applied.
+            if (!lockUpdates)
+            {
+                Refresh();
+            }
         }
 
         /// <summary>

@@ -228,6 +228,10 @@ namespace Extract.Utilities.Forms
                     // Unlock control updates to allow the panel and its controls to be drawn again.
                     FormsMethods.LockControlUpdate(this, false);
 
+                    // When unlocking control updates, refresh the control now to show changes since
+                    // the lock was applied.
+                    Refresh();
+
                     try
                     {
                         // Prevent restoration of layout parameters from triggering additional

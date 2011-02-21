@@ -49,10 +49,17 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                InitializeComponent();
+                // Load licenses in design mode
+                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                {
+                    // Load the license files from folder
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI31380",
                     _OBJECT_NAME);
+
+                InitializeComponent();
 
                 // Double-buffer to prevent flickering
                 SetStyle(ControlStyles.UserPaint, true);
@@ -194,8 +201,11 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                // Whenever the mouse has moved, update.
-                DoRefresh();
+                // Whenever the mouse has moved, update. Unlike during a tracking event when
+                // DoRefresh is necessary to ensure the magnifier is properly updated during the
+                // event, it is sufficient to invalidate during a mouse move event. This will help
+                // prevent the magnifier from interfering with other more important operations.
+                Invalidate();
             }
             catch (Exception ex)
             {
