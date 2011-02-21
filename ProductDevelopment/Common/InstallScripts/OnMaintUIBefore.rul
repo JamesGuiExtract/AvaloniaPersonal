@@ -72,6 +72,9 @@ Dlg_SdFeatureTree:
 				// Uninstall ESFAMService
 				UninstallDotNetService("\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");
 				
+				// Uninstall the ESFDRSService.exe 
+				UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFDRSService.exe\"");
+				
 				// Uninstall Crystal Reports
 				UninstallCrystalReports12();
 				UninstallInstallSQLCE ();
