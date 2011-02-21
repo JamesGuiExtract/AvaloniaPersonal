@@ -1,9 +1,8 @@
-using Extract.Encryption;
 using Extract.Licensing;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -16,6 +15,15 @@ namespace Extract.Encryption
     [Category("Extract Encryption")]
     public class TestExtractEncryption
     {
+        /// <summary>
+        /// Setup method to initalize the testing environment.
+        /// </summary>
+        [TestFixtureSetUp]
+        public static void Setup()
+        {
+            GeneralMethods.TestSetup();
+        }
+
         /// <summary>
         /// Tests encrypting a string of text.
         /// </summary>
@@ -31,6 +39,26 @@ namespace Extract.Encryption
         {
             // Encrypt the string
             string encryptedText = ExtractEncryption.EncryptString(text, new MapLabel());
+
+            // Check that the encrypted string does not match the original string
+            Assert.That(encryptedText != text);
+        }
+
+        /// <summary>
+        /// Tests encrypting a string of text with the extension method.
+        /// </summary>
+        /// <param name="text">The text to encrypt.</param>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public static void Automated_TestEncryptingTextExtension([Values(
+            "This is a test string!",
+            "This is\n\tanother\n\t\ttest string",
+            "This test string is larger than the\nother test strings, but should still\t\t\n\n\tencrypt fine!",
+            "This string is the longest\n\nof\tthem\tyet\n\t\t\but there should still\n\n\n\t\tbe\tno\nproblem\n\twith\t\t\tencrypting\nthis\ntext"
+            )] string text)
+        {
+            // Encrypt the string
+            string encryptedText = text.ExtractEncrypt(new MapLabel());
 
             // Check that the encrypted string does not match the original string
             Assert.That(encryptedText != text);
@@ -153,6 +181,28 @@ namespace Extract.Encryption
             // Encrypt and then decrypt the text
             string encryptedText = ExtractEncryption.EncryptString(text, new MapLabel());
             string decryptedText = ExtractEncryption.DecryptString(encryptedText, new MapLabel());
+
+            // Check that the encrypted text is not the same as the original and that
+            // the decrypted text is
+            Assert.That((encryptedText != text && decryptedText == text));
+        }
+
+        /// <summary>
+        /// Tests decrypting an encrypted string of text with the extension method.
+        /// </summary>
+        /// <param name="text">The text that will be encrypted and then decrypted.</param>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public static void Automated_TestDecryptingTextExtension([Values(
+            "This is a test string!",
+            "This is\n\tanother\n\t\ttest string",
+            "This test string is larger than the\nother test strings, but should still\t\t\n\n\tencrypt fine!",
+            "This string is the longest\n\nof\tthem\tyet\n\t\t\but there should still\n\n\n\t\tbe\tno\nproblem\n\twith\t\t\tencrypting\nthis\ntext"
+            )] string text)
+        {
+            // Encrypt and then decrypt the text
+            string encryptedText = ExtractEncryption.EncryptString(text, new MapLabel());
+            string decryptedText = encryptedText.ExtractDecrypt(new MapLabel());
 
             // Check that the encrypted text is not the same as the original and that
             // the decrypted text is

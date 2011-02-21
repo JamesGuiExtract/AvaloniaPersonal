@@ -138,5 +138,22 @@ namespace Extract
 			//			Microsoft.Design::CA1053 - Static holder types should not have constructors
 			ExtractEncryption(void) {};
 		};
+
+		[System::Runtime::CompilerServices::Extension]
+		public ref class EncryptionExtensions abstract sealed
+		{
+		public:
+			[System::Runtime::CompilerServices::Extension]
+			static String^ ExtractEncrypt(String^ value, MapLabel^ mapLabel)
+			{
+				return ExtractEncryption::EncryptString(value, mapLabel);
+			}
+
+			[System::Runtime::CompilerServices::Extension]
+			static String^ ExtractDecrypt(String^ value, MapLabel^ mapLabel)
+			{
+				return ExtractEncryption::DecryptString(value, mapLabel);
+			}
+		};
 	};
 };
