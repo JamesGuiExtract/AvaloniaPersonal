@@ -105,8 +105,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetAllSampleImageTypes", ".
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LogProcessStats", "..\..\LogProcessStats\Code\LogProcessStats.vcxproj", "{019EE5EB-D6A9-4231-9807-E485DF279745}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SetOp", "..\..\SetOp\Code\SetOp.vcxproj", "{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetWordLengthDist", "..\..\GetWordLengthDist\Code\GetWordLengthDist.vcxproj", "{49DCB86A-B4B4-421B-B7F4-C3EF46644875}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sleep", "..\..\Sleep\Code\Sleep.vcxproj", "{9326A24D-1BDB-4745-BBF6-27BDA2C3C284}"
@@ -159,12 +157,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SetOperations", "..\..\..\.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Database", "..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj", "{D0465C3D-527B-4B21-8E07-79A6CB762CC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.SetOperations.Test", "..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Testing\Automated\Extract.SetOperations.Test.csproj", "{46D2F7A2-176F-43A4-B182-FBB208D6E261}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities", "..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 74
+		ProjectCount = 75
 		ProjectRelativeDiskPath1 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj
 		ProjectRelativeDiskPath3 = ..\..\ChangeCase\ChangeCase.vcxproj
@@ -217,28 +219,29 @@ Global
 		ProjectRelativeDiskPath50 = ..\..\CopyNumberedFiles\Code\CopyNumberedFiles.vcxproj
 		ProjectRelativeDiskPath51 = ..\..\GetAllSampleImageTypes\Code\GetAllSampleImageTypes.vcxproj
 		ProjectRelativeDiskPath52 = ..\..\LogProcessStats\Code\LogProcessStats.vcxproj
-		ProjectRelativeDiskPath53 = ..\..\SetOp\Code\SetOp.vcxproj
-		ProjectRelativeDiskPath54 = ..\..\GetWordLengthDist\Code\GetWordLengthDist.vcxproj
-		ProjectRelativeDiskPath55 = ..\..\Sleep\Code\Sleep.vcxproj
-		ProjectRelativeDiskPath56 = ..\..\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj
-		ProjectRelativeDiskPath57 = ..\..\..\..\RC.Net\UtilityApplications\OCRSingleDocument\Core\Code\OcrSingleDocument.csproj
-		ProjectRelativeDiskPath58 = ..\..\..\..\RC.Net\Core\Code\Extract.csproj
-		ProjectRelativeDiskPath59 = ..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj
-		ProjectRelativeDiskPath60 = ..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj
-		ProjectRelativeDiskPath61 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\EmbedPageNumber\Core\Code\EmbedPageNumber.csproj
-		ProjectRelativeDiskPath62 = ..\..\..\..\ReusableComponents\BaseUtils\TestApps\TestTextFunctionExpander\Code\TestTextFunctionExpander.csproj
-		ProjectRelativeDiskPath63 = ..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj
-		ProjectRelativeDiskPath64 = ..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj
-		ProjectRelativeDiskPath65 = ..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcxproj
-		ProjectRelativeDiskPath66 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
-		ProjectRelativeDiskPath67 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
-		ProjectRelativeDiskPath68 = ..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcxproj
-		ProjectRelativeDiskPath69 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
-		ProjectRelativeDiskPath70 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\UEXExtractor\Core\Code\ExtractDebugData.csproj
-		ProjectRelativeDiskPath71 = ..\..\..\..\RC.Net\UtilityApplications\Services\ESFDRSService\Core\Code\ESFDRSService.csproj
-		ProjectRelativeDiskPath72 = ..\..\..\..\RC.Net\FileActionManager\Utilities\FAMDBLockChecker\Core\Code\FAMDBLockChecker.csproj
-		ProjectRelativeDiskPath73 = ..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Code\SetOperations.csproj
-		ProjectRelativeDiskPath74 = ..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj
+		ProjectRelativeDiskPath53 = ..\..\GetWordLengthDist\Code\GetWordLengthDist.vcxproj
+		ProjectRelativeDiskPath54 = ..\..\Sleep\Code\Sleep.vcxproj
+		ProjectRelativeDiskPath55 = ..\..\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj
+		ProjectRelativeDiskPath56 = ..\..\..\..\RC.Net\UtilityApplications\OCRSingleDocument\Core\Code\OcrSingleDocument.csproj
+		ProjectRelativeDiskPath57 = ..\..\..\..\RC.Net\Core\Code\Extract.csproj
+		ProjectRelativeDiskPath58 = ..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj
+		ProjectRelativeDiskPath59 = ..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj
+		ProjectRelativeDiskPath60 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\EmbedPageNumber\Core\Code\EmbedPageNumber.csproj
+		ProjectRelativeDiskPath61 = ..\..\..\..\ReusableComponents\BaseUtils\TestApps\TestTextFunctionExpander\Code\TestTextFunctionExpander.csproj
+		ProjectRelativeDiskPath62 = ..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj
+		ProjectRelativeDiskPath63 = ..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj
+		ProjectRelativeDiskPath64 = ..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcxproj
+		ProjectRelativeDiskPath65 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
+		ProjectRelativeDiskPath66 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
+		ProjectRelativeDiskPath67 = ..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcxproj
+		ProjectRelativeDiskPath68 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
+		ProjectRelativeDiskPath69 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\UEXExtractor\Core\Code\ExtractDebugData.csproj
+		ProjectRelativeDiskPath70 = ..\..\..\..\RC.Net\UtilityApplications\Services\ESFDRSService\Core\Code\ESFDRSService.csproj
+		ProjectRelativeDiskPath71 = ..\..\..\..\RC.Net\FileActionManager\Utilities\FAMDBLockChecker\Core\Code\FAMDBLockChecker.csproj
+		ProjectRelativeDiskPath72 = ..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Code\SetOperations.csproj
+		ProjectRelativeDiskPath73 = ..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj
+		ProjectRelativeDiskPath74 = ..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Testing\Automated\Extract.SetOperations.Test.csproj
+		ProjectRelativeDiskPath75 = ..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -875,18 +878,6 @@ Global
 		{019EE5EB-D6A9-4231-9807-E485DF279745}.Release|Win32.ActiveCfg = Release|Win32
 		{019EE5EB-D6A9-4231-9807-E485DF279745}.Release|Win32.Build.0 = Release|Win32
 		{019EE5EB-D6A9-4231-9807-E485DF279745}.Release|x86.ActiveCfg = Release|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Debug|Win32.ActiveCfg = Debug|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Debug|Win32.Build.0 = Debug|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Debug|x86.ActiveCfg = Debug|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Release|Any CPU.ActiveCfg = Release|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Release|Win32.ActiveCfg = Release|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Release|Win32.Build.0 = Release|Win32
-		{34ECFAB2-A082-4BD6-AFE5-E6EA501A4F42}.Release|x86.ActiveCfg = Release|Win32
 		{49DCB86A-B4B4-421B-B7F4-C3EF46644875}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{49DCB86A-B4B4-421B-B7F4-C3EF46644875}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{49DCB86A-B4B4-421B-B7F4-C3EF46644875}.Debug|Mixed Platforms.Build.0 = Debug|Win32
@@ -1139,6 +1130,30 @@ Global
 		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Release|Win32.ActiveCfg = Release|Any CPU
 		{D0465C3D-527B-4B21-8E07-79A6CB762CC9}.Release|x86.ActiveCfg = Release|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Release|Win32.ActiveCfg = Release|Any CPU
+		{46D2F7A2-176F-43A4-B182-FBB208D6E261}.Release|x86.ActiveCfg = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Win32.ActiveCfg = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

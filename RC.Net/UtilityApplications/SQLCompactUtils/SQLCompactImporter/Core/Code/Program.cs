@@ -182,8 +182,7 @@ namespace Extract.SqlCompactImporter
                         StringBuilder commandText = new StringBuilder("INSERT INTO [");
                         commandText.Append(settings.TableName);
                         commandText.Append("] ([");
-                        commandText.Append(
-                            StringMethods.ConvertArrayToDelimitedList(includedColumns, "], ["));
+                        commandText.Append(string.Join("], [", includedColumns)); 
                         commandText.Append("]) VALUES (");
 
                         // Parameterize the data for each column and build them into the command.
