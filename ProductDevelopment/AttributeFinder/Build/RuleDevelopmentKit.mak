@@ -90,7 +90,6 @@ CopyFilesToInstallFolder:
 	@COPY /V  "$(BinariesFolder)\BaseUtilsTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
  	@COPY /V  "$(BinariesFolder)\VBScriptUtils.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
  	@COPY /V  "$(BinariesFolder)\OcrSingleDocument.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
- 	@COPY /V  "$(BinariesFolder)\SetOp.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V  "$(BinariesFolder)\GetWordLengthDist.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V  "$(BinariesFolder)\CopyNumberedFiles.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	
