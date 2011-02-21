@@ -17,7 +17,7 @@
     #define UCLID_DIR "\\UCLID Software\\CommonComponents"
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
     #define REG_PATH_SQL_NATIVE_CLIENT "SOFTWARE\\Microsoft\\Microsoft SQL Native Client 10.0\\CurrentVersion"
-    #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition"
+    #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition\\v3.5"
     #define SQL_COMPACT_EDITION_GUID "{E59113EB-0285-4BFD-A37A-B79EAC6B8F4B}"
     #define REG_PATH_DOT_NET_VER_2_0 "\\SOFTWARE\\Microsoft\\.NETFramework\\policy\\v2.0"
     #define REG_PATH_UNINSTALL "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
