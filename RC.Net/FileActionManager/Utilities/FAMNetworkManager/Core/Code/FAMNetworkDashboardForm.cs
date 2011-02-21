@@ -1751,7 +1751,7 @@ namespace Extract.FileActionManager.Utilities
                     sb.Append(" the FDRS service");
                 }
                 sb.AppendLine(" on the following machines:");
-                sb.Append(StringMethods.ConvertArrayToDelimitedList(selectedNames, ","));
+                sb.Append(string.Join(", ", selectedNames));
                 var result = MessageBox.Show(sb.ToString(), "Control Service?",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question,
                     MessageBoxDefaultButton.Button2, 0);

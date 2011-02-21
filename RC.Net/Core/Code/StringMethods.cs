@@ -1,8 +1,9 @@
-using Extract;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Extract
 {
@@ -23,20 +24,7 @@ namespace Extract
         {
             try
             {
-                // Ensure string has an even length
-                ExtractException.Assert("ELI22623", "Hex string is not of proper length!",
-                    hexValue.Length % 2 == 0);
-
-                // Create an array of bytes to hold the converted bytes
-                byte[] bytes = new byte[hexValue.Length / 2];
-                for (int i = 0; i < hexValue.Length; i += 2)
-                {
-                    // Convert each HEX value from the string to a byte (two characters per byte)
-                    bytes[i / 2] = Convert.ToByte(hexValue.Substring(i, 2), 16);
-                }
-
-                // Return the converted bytes
-                return bytes;
+                return hexValue.ToByteArray();
             }
             catch (Exception ex)
             {
@@ -196,48 +184,13 @@ namespace Extract
         }
 
         /// <summary>
-        /// Creates a delimited list using the provided array of strings and delimiter.
-        /// </summary>
-        /// <param name="values">The <see cref="string"/> elements that are to be used to build
-        /// the list.</param>
-        /// <param name="delimiter">The delimeter that should be inserted between each value. Can be
-        /// <see langword="null"/> or empty if all values should be run together.</param>
-        /// <returns>A <see langword="string"/> containing all values from
-        /// <see paramref="values"/>A delimited list containing each of the strings in the array.</returns>
-        public static string ConvertArrayToDelimitedList(IList<string> values, string delimiter)
-        {
-            try
-            {
-                ExtractException.Assert("ELI29083", "Values array cannot be null.",
-                    values != null);
-
-                StringBuilder result = new StringBuilder();
-                if (values.Count > 0)
-                {
-                    result.Append(values[0]);
-                    for (int i = 1; i < values.Count; i++)
-                    {
-                        result.Append(delimiter);
-                        result.Append(values[i]);
-                    }
-                }
-
-                return result.ToString();
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI29149", ex);
-            }
-        }
-
-        /// <summary>
         /// Converts the specified value to a string.
         /// This method will return <see cref="String.Empty"/> if <paramref name="value"/>
         /// is <see langword="null"/>.
         /// </summary>
         /// <param name="value">The value to convert to a string.</param>
         /// <returns><paramref name="value"/> converted to a string.</returns>
-        public static string ConvertObjectToString(object value)
+        public static string AsString(this object value)
         {
             return value != null ? value.ToString() : string.Empty;
         }
@@ -274,20 +227,16 @@ namespace Extract
                     return -1;
                 }
 
+                int count = valueToSearch.Length-1;
                 int index = int.MaxValue;
                 foreach(string value in valuesToFind)
                 {
-                    // Break from the loop if the string becomes null or empty
-                    if (string.IsNullOrEmpty(valueToSearch))
-                    {
-                        break;
-                    }
-
                     // Find the first index of the string
-                    int temp = valueToSearch.IndexOf(value, comparisonType);
+                    int temp = valueToSearch.IndexOf(value, 0, count, comparisonType);
                     if (temp != -1 && temp < index)
                     {
                         index = temp;
+                        count = index;
                     }
                 }
                 if (index == int.MaxValue)

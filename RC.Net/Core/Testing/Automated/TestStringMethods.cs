@@ -102,57 +102,6 @@ namespace Extract.Test
         }
 
         /// <summary>
-        /// Tests that the conversion of a list of values to a delimited string works properly.
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void ConvertArrayToDelimitedListSingleCharacter()
-        {
-            string delimitedList = "a,b,c,d,e,f,g,h,i,j,k,l,m,n";
-            string[] strings = delimitedList.Split(',');
-            string convertedList = StringMethods.ConvertArrayToDelimitedList(strings, ",");
-            Assert.That(delimitedList.Equals(convertedList, StringComparison.Ordinal));
-        }
-
-        /// <summary>
-        /// Tests that the conversion of a list of values to a delimited string works properly
-        /// when the delimiter is more than a single character.
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void ConvertArrayToDelimitedListMultipleCharacter()
-        {
-            string delimiter = "::%%::";
-            string delimitedList = "a,b,c,d,e,f,g,h,i,j,k,l,m,n";
-            string[] strings = delimitedList.Split(',');
-            string convertedList = StringMethods.ConvertArrayToDelimitedList(strings, delimiter);
-            delimitedList = delimitedList.Replace(",", delimiter);
-            Assert.That(delimitedList.Equals(convertedList, StringComparison.Ordinal));
-        }
-
-        /// <summary>
-        /// Tests that the conversion of an empty list to a delimited string yields an
-        /// empty string.
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void ConvertArrayToDelimitedListEmptyList()
-        {
-            string result = StringMethods.ConvertArrayToDelimitedList(new string[] { }, ",");
-            Assert.That(result.Length == 0);
-        }
-
-        /// <summary>
-        /// Tests that the convert array to delimited list throws an exception when the list is
-        /// <see langword="null"/>
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void ConvertArrayToDelimitedListExceptionWithNullList()
-        {
-            Assert.Throws<ExtractException>(delegate
-            {
-                StringMethods.ConvertArrayToDelimitedList(null, ",");
-            });
-        }
-
-        /// <summary>
         /// Tests that the FindIndexOfAny function correctly finds the index of a single word.
         /// </summary>
         // Testing the default behavior in this class and so we do not want to
@@ -180,7 +129,7 @@ namespace Extract.Test
         [Test, Category("Automated")]
         public static void FindIndexOfAnyMultipleItems()
         {
-            string[] items = new string[] { "Hello", "World", "!" };
+            string[] items = new string[] { "World", "Hello", "!" };
             string helloWorld = "Hello World!";
             int index = StringMethods.FindIndexOfAny(helloWorld, items);
             Assert.That(index == 0);

@@ -565,8 +565,7 @@ namespace Extract.FileActionManager.Database
 
             if (filesWithDifferentCounts.Count > 0)
             {
-                string listOfFiles =
-                    StringMethods.ConvertArrayToDelimitedList(filesWithDifferentCounts, ", ");
+                string listOfFiles = string.Join(", ", filesWithDifferentCounts);
                 var ee = new ExtractException("ELI31082",
                     "Application Trace: Service database had FPS files with different number of files to process.");
                 ee.AddDebugData("Old Service Database", backupFile, false);

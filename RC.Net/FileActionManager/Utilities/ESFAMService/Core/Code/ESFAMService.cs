@@ -326,8 +326,7 @@ namespace Extract.FileActionManager.Utilities
                     {
                         allStartedAfterSleep = false;
 
-                        string services =
-                            StringMethods.ConvertArrayToDelimitedList(serviceNotStarted, ",");
+                        string services = string.Join(", ", serviceNotStarted);
                         ExtractException ee = new ExtractException("ELI29147",
                             "Application Trace: Waiting for dependent services to start.");
                         ee.AddDebugData("Services", services, false);
@@ -735,8 +734,7 @@ namespace Extract.FileActionManager.Utilities
             {
                 // Sort the list before adding it to debug data
                 dependentServiceNames.Sort();
-                string services =
-                    StringMethods.ConvertArrayToDelimitedList(dependentServiceNames, ",");
+                string services = string.Join(", ", dependentServiceNames);
                 ExtractException ee = new ExtractException("ELI29146",
                     "Application Trace: Services not found on current system.");
                 ee.AddDebugData("Services", services, false);

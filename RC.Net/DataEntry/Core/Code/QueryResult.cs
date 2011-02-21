@@ -608,8 +608,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                FirstStringValue =
-                    StringMethods.ConvertArrayToDelimitedList(ToStringArray(), delimiter);
+                FirstStringValue = string.Join(delimiter, ToStringArray());
 
                 // We no longer have multiple results, so break off any linked values it
                 // previously had.

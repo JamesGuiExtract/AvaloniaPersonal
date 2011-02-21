@@ -88,7 +88,7 @@ namespace Extract.AttributeFinder
                 string nameList = "";
                 try
                 {
-                    nameList = StringMethods.ConvertArrayToDelimitedList(names, ", ");
+                    nameList = string.Join(", ", names);
                 }
                 catch (Exception){}
                 ee.AddDebugData("Attribute names", nameList, false);

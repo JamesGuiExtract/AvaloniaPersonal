@@ -384,13 +384,13 @@ namespace Extract.Utilities
                             // It is also safe to call Convert.ToUInt16 for a null
                             // reference, the conversion will return 0 in this case.
                             WindowsPrinterInformation entry = new WindowsPrinterInformation();
-                            entry.DriverName = StringMethods.ConvertObjectToString(obj["DriverName"]);
-                            entry.Location = StringMethods.ConvertObjectToString(obj["Location"]);
-                            entry.Name = StringMethods.ConvertObjectToString(obj["Name"]);
+                            entry.DriverName = obj["DriverName"].AsString();
+                            entry.Location = obj["Location"].AsString();
+                            entry.Name = obj["Name"].AsString();
                             entry.Network = Convert.ToBoolean(obj["Network"],
                                 CultureInfo.InvariantCulture);
-                            entry.PortName = StringMethods.ConvertObjectToString(obj["PortName"]);
-                            entry.ServerName = StringMethods.ConvertObjectToString(obj["ServerName"]);
+                            entry.PortName = obj["PortName"].AsString();
+                            entry.ServerName = obj["ServerName"].AsString();
                             entry.Shared = Convert.ToBoolean(obj["Shared"],
                                 CultureInfo.InvariantCulture);
                             entry.Status = (PrinterStatus)Enum.ToObject(typeof(PrinterStatus),

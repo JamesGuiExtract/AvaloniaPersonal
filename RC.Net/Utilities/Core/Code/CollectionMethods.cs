@@ -272,5 +272,36 @@ namespace Extract.Utilities
                 throw ExtractException.AsExtractException("ELI31778", ex);
             }
         }
+
+        /// <summary>
+        /// Tries to add the key value pair to the <see cref="Dictionary{K,V}"/> if the key is
+        /// not already present in the dictionary.
+        /// </summary>
+        /// <typeparam name="TKey">The type for the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type for the values in the dictionary.</typeparam>
+        /// <param name="dictionary">The dictionary.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        /// <returns><see langword="true"/> if the key and value are added to the dictionary
+        /// or <see langword="false"/> otherwise.</returns>
+        public static bool TryAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary,
+            TKey key, TValue value)
+        {
+            try
+            {
+                if (dictionary.ContainsKey(key))
+                {
+                    return false;
+                }
+
+                dictionary[key] = value;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI31806");
+            }
+        }
     }
 }
