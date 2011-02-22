@@ -170,6 +170,13 @@ namespace Extract.Utilities.Forms
         /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/> instance containing the event data.</param>
         void HandleTargetPaint(object sender, PaintEventArgs e)
         {
+            // [FlexIDSCore:4556]
+            // It seems in some cases e.Graphics must be null. In that case, nothing can be drawn.
+            if (e.Graphics == null)
+            {
+                return;
+            }
+
             Font font = _font;
 
             try 
