@@ -337,6 +337,9 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 						FILE_ATTRIBUTE_NORMAL);
 				}
 
+				// Ensure the folder exists
+				createDirectory(getDirectoryFromFullPath(strLicenseIdEnumFile));
+
 				// Write the files
 				writeToFile(strNewIdFileContents, strLicenseIdEnumFile);
 				writeToFile(strNewMapFileContents, strMapLicenseIdToComponentIdFile);
