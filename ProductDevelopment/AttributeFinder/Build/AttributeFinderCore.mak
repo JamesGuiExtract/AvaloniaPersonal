@@ -240,7 +240,6 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY "$(BinariesFolder)\Extract.Geometry.Test.dll" "$(InternalUseBuildFilesArchive)\NUnitDlls"
 	@COPY "$(BinariesFolder)\Extract.Imaging.Forms.Test.dll" "$(InternalUseBuildFilesArchive)\NUnitDlls"
 	@COPY "$(BinariesFolder)\Extract.Utilities.Test.dll" "$(InternalUseBuildFilesArchive)\NUnitDlls"
-	@COPY "$(BinariesFolder)\Extract.FileActionManager.Database.Test.dll" "$(InternalUseBuildFilesArchive)\NUnitDlls"
 	@COPY "$(BinariesFolder)\Extract.SetOperations.Test.dll" "$(InternalUseBuildFilesArchive)\NUnitDlls"
 	
 # Create .rl files for registration
