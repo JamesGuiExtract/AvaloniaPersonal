@@ -3237,7 +3237,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 ModifySelectedHighlights((highlight, quietSetData) =>
-                    InflateHighlight(highlight, quietSetData, -1, -1, -1, -1));
+                    InflateHighlight(highlight, quietSetData, -2));
             }
             catch (Exception ex)
             {
@@ -3254,7 +3254,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 ModifySelectedHighlights((highlight, quietSetData) =>
-                    InflateHighlight(highlight, quietSetData, 1, 1, 1, 1));
+                    InflateHighlight(highlight, quietSetData, 2));
             }
             catch (Exception ex)
             {
@@ -3340,28 +3340,29 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Inflates each side the specified <see paramref="highlight"/> by the specified number of
-        /// pixels.
+        /// Inflates the height of the specified <see paramref="highlight"/> by the specified
+        /// number of pixels.
         /// </summary>
         /// <param name="highlight">The <see cref="Highlight"/> to modify.</param>
         /// <param name="quietSetData"><see langword="true"/> if the
         /// <see cref="Highlight.SetSpatialData(RasterZone, bool)"/> call should raise a
         /// layer object changed event, <see langword="false"/> otherwise.</param>
-        /// <param name="left">The number of pixels to inflate the left side.</param>
-        /// <param name="top">The number of pixels to inflate the top side.</param>
-        /// <param name="right">The number of pixels to inflate the right side.</param>
-        /// <param name="bottom">The number of pixels to inflate the bottom side.</param>
-        static void InflateHighlight(Highlight highlight, bool quietSetData, int left, int top, int right,
-            int bottom)
+        /// <param name="distance">The number of pixels by which the height should be changed
+        /// (positive to inflate, negative to shrink)</param>
+        static void InflateHighlight(Highlight highlight, bool quietSetData, int distance)
         {
             // Get the fitted zone and use it to inflate the sides by the specified distances.
-            FittingData data = new FittingData(highlight.ToRasterZone());
-            data.InflateSide(Side.Left, left);
-            data.InflateSide(Side.Top, top);
-            data.InflateSide(Side.Right, right);
-            data.InflateSide(Side.Bottom, bottom);
-
-            highlight.SetSpatialData(data.ToRasterZone(), quietSetData);
+            if (highlight.Height + distance > Highlight.MinSize.Height)
+            {
+                if (quietSetData)
+                {
+                    highlight.QuietSetHeight(highlight.Height + distance);
+                }
+                else
+                {
+                    highlight.Height += distance;
+                }
+            }
         }
 
         /// <summary>
@@ -4184,7 +4185,9 @@ namespace Extract.Imaging.Forms
             // Fit/shrink/enlarge selected zones.
             _mainShortcuts[Keys.K] = BlockFitSelectedZones;
             _mainShortcuts[Keys.OemMinus] = ShrinkSelectedZones;
+            _mainShortcuts[Keys.Subtract] = ShrinkSelectedZones;
             _mainShortcuts[Keys.Oemplus] = EnlargeSelectedZones;
+            _mainShortcuts[Keys.Add] = EnlargeSelectedZones;
 
             // Increase highlight height
             _captureShortcuts[Keys.Oemplus] = IncreaseHighlightHeight;
