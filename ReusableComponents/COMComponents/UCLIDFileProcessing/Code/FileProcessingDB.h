@@ -359,6 +359,10 @@ private:
 	// Indicates whether the DB schema is currently being validated or upgraded.
 	volatile bool m_bValidatingOrUpdatingSchema;
 
+	// Indicates that a revert has been started on another thread so it is not
+	// necessary to start it again.
+	volatile bool m_bRevertInProgress;
+
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------

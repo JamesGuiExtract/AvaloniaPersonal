@@ -108,7 +108,8 @@ m_nUPIID(0),
 m_bFAMRegistered(false),
 m_nActionStatisticsUpdateFreqInSeconds(5),
 m_bValidatingOrUpdatingSchema(false),
-m_bProductSpecificDBSchemasAreValid(false)
+m_bProductSpecificDBSchemasAreValid(false),
+m_bRevertInProgress(false)
 {
 	try
 	{

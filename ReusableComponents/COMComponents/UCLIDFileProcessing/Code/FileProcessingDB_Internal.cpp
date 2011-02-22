@@ -3104,47 +3104,65 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 	// current session doesn't get auto reverted
 	pingDB();
 
-	// Query to show the elapsed time since last ping for all ProcessingFAM records
-	string strElapsedSQL = "SELECT [ID], DATEDIFF(minute,[LastPingTime],GetDate()) as Elapsed "
+	// check to see if this already running in this process
+	if (m_bRevertInProgress)
+	{
+		return;
+	}
+
+	try
+	{
+		// Set the revert in progress flag so only one thread executes this per process
+		m_bRevertInProgress = true;
+
+		// Query to show the elapsed time since last ping for all ProcessingFAM records
+		string strElapsedSQL = "SELECT [ID], DATEDIFF(minute,[LastPingTime],GetDate()) as Elapsed "
 			"FROM [ProcessingFAM]";
 
-	_RecordsetPtr ipFileSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI27813", ipFileSet != NULL);
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27813", ipFileSet != NULL);
 
-	ipFileSet->Open(strElapsedSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
-		adOpenForwardOnly, adLockReadOnly, adCmdText);
+		ipFileSet->Open(strElapsedSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
-	// Step through all of the ProcessingFAM records to find dead FAM's
-	while(ipFileSet->adoEOF == VARIANT_FALSE)
-	{
-		FieldsPtr ipFields = ipFileSet->Fields;
-		
-		// Get the Elapsed time since the last ping
-		long nElapsed = getLongField(ipFields,"Elapsed");
-		
-		// Check for a dead FAM
-		if (nElapsed > m_nAutoRevertTimeOutInMinutes)
+		// Step through all of the ProcessingFAM records to find dead FAM's
+		while(ipFileSet->adoEOF == VARIANT_FALSE)
 		{
-			if (!bDBLocked) 
+			FieldsPtr ipFields = ipFileSet->Fields;
+
+			// Get the Elapsed time since the last ping
+			long nElapsed = getLongField(ipFields,"Elapsed");
+
+			// Check for a dead FAM
+			if (nElapsed > m_nAutoRevertTimeOutInMinutes)
 			{
-				UCLIDException ue("ELI31136", "Database must be locked to revert files.");
-				throw  ue;
+				if (!bDBLocked) 
+				{
+					UCLIDException ue("ELI31136", "Database must be locked to revert files.");
+					throw  ue;
+				}
+
+				long nUPIID = getLongField(ipFields, "ID");
+				long nMinutesSinceLastPing = getLongField(ipFields, "Elapsed");
+
+				UCLIDException ue("ELI27814", "Application Trace: Files were reverted to original status.");
+				ue.addDebugInfo("Minutes files locked", nMinutesSinceLastPing);
+
+				// Build the comment for the FAST table
+				string strRevertComment = "Auto reverted after " + asString(nMinutesSinceLastPing) + " minutes.";
+
+				// Revert the files for this dead FAM to there previous status
+				revertLockedFilesToPreviousState(ipConnection, nUPIID, strRevertComment, &ue);
 			}
-
-			long nUPIID = getLongField(ipFields, "ID");
-			long nMinutesSinceLastPing = getLongField(ipFields, "Elapsed");
-
-			UCLIDException ue("ELI27814", "Application Trace: Files were reverted to original status.");
-			ue.addDebugInfo("Minutes files locked", nMinutesSinceLastPing);
-
-			// Build the comment for the FAST table
-			string strRevertComment = "Auto reverted after " + asString(nMinutesSinceLastPing) + " minutes.";
-
-			// Revert the files for this dead FAM to there previous status
-			revertLockedFilesToPreviousState(ipConnection, nUPIID, strRevertComment, &ue);
+			// move to next Processing FAM record
+			ipFileSet->MoveNext();
 		}
-		// move to next Processing FAM record
-		ipFileSet->MoveNext();
+		m_bRevertInProgress = false;
+	}
+	catch(...)
+	{
+		m_bRevertInProgress = false;
+		throw;
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -3347,6 +3365,19 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != NULL);
 
+			// Revert files before attempting to get the files to process
+			if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
+			{
+				// Begin a transaction
+				TransactionGuard tgRevert(ipConnection);
+
+				// Revert files
+				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+				// Commit the reverted files
+				tgRevert.CommitTrans();
+			}
+
 			bool bTransactionSuccessful = false;
 
 			// Start the stopwatch to use to check for transaction timeout
@@ -3363,12 +3394,6 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 				{
 					try
 					{
-
-						if (m_bAutoRevertLockedFiles)
-						{
-							revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-						}
-
 						// Action Column to change
 						string strActionName = getActionName(ipConnection, nActionID);
 
