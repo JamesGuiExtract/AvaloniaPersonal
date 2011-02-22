@@ -231,15 +231,20 @@ namespace Extract.Imaging.Forms
         /// <param name="y">The physical (client) y coordinate of the mouse cursor.</param>
         public void UpdateAngularRegion(int x, int y)
         {
-            // Dispose of the previous region if it exists
-            if (_region != null)
+            // [FlexIDSCore:4543]
+            // Only update region if _cropWithin has non-zero width and height.
+            if (_cropWithin.Width > 0 && _cropWithin.Height > 0)
             {
-                _region.Dispose();
-            }
+                // Dispose of the previous region if it exists
+                if (_region != null)
+                {
+                    _region.Dispose();
+                }
 
-            // Update the region
-            _region = Highlight.GetAngularRegion(_startPoint, new Point(x, y), _height);
-            _region.Intersect(_cropWithin);
+                // Update the region
+                _region = Highlight.GetAngularRegion(_startPoint, new Point(x, y), _height);
+                _region.Intersect(_cropWithin);
+            }
         }
 
         /// <summary>
@@ -274,7 +279,10 @@ namespace Extract.Imaging.Forms
             // If the cursor is in the same spot the tracking event started, assign a zero width]
             // and height rectangle so it can't result in a redaction/highlight being created by the
             // angular or retangular redacton tools if the mouse hasn't moved.
-            if (x == _startPoint.X && y == _startPoint.Y)
+            // [FlexIDSCore:4543]
+            // Return empty rectangle if _cropWithin has zero width or height.
+            if ((x == _startPoint.X && y == _startPoint.Y) ||
+                _cropWithin.Width == 0 || _cropWithin.Height == 0)
             {
                 _rectangle = new Rectangle(_startPoint, new Size(0, 0));
                 return;
@@ -320,9 +328,14 @@ namespace Extract.Imaging.Forms
         /// <param name="y">The physical (client) y coordinate of the mouse cursor.</param>
         public void UpdateLine(int x, int y)
         {
-            // Ensure the end point is within the cropping rectangle
-            _line[1] = GeometryMethods.GetClippedEndPoint(
-                _startPoint, new Point(x, y), _cropWithin);
+            // [FlexIDSCore:4543]
+            // Only update line if _cropWithin has non-zero width and height.
+            if (_cropWithin.Width > 0 && _cropWithin.Height > 0)
+            {
+                // Ensure the end point is within the cropping rectangle
+                _line[1] = GeometryMethods.GetClippedEndPoint(
+                    _startPoint, new Point(x, y), _cropWithin);
+            }
         }
 
         #endregion Methods
