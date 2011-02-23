@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Extract.Interop;
+using Extract.Licensing;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Extract.Interop;
-using Extract.Licensing;
+using System.Threading;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 
@@ -28,6 +29,16 @@ namespace Extract.Utilities.Forms
         /// </summary>
         ProgressStatusDialogForm _statusForm;
 
+        /// <summary>
+        /// Indicates whether this dialog has been _closed.
+        /// </summary>
+        volatile bool _closed;
+        
+        /// <summary>
+        /// Indicates whether the dialog can be closed.
+        /// </summary>
+        ManualResetEvent _modalDialogClosable = new ManualResetEvent(true);
+
         #endregion Fields
 
         #region IProgressStatusDialog Members
@@ -45,7 +56,16 @@ namespace Extract.Utilities.Forms
                         "Cannot close progress dialog if it has not been shown.");
                 }
 
-                _statusForm.Hide();
+                // If the dialog is in the process of being displayed, wait until it is visible
+                // before attempting to close.
+                _modalDialogClosable.WaitOne();
+
+                _closed = true;
+
+                if (_statusForm.Visible)
+                {
+                    _statusForm.Hide();
+                }
             }
             catch (Exception ex)
             {
@@ -132,6 +152,7 @@ namespace Extract.Utilities.Forms
                         nDelayBetweenRefreshes, bShowCloseButton, hStopEvent);
                 }
 
+                _closed = false;
                 _statusForm.UpdateTitle(strWindowTitle);
                 _statusForm.ProgressStatus = pProgressStatus;
 
@@ -150,10 +171,9 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Displays the <see cref="ProgressStatusDialogForm"/> as a modeless dialog
-        /// box.
+        /// Initializes a <see cref="ProgressStatusDialog"/> instance to be used by a subsequent call
+        /// to <see cref="ShowModalDialog"/>.
         /// </summary>
-        /// <param name="hWndParent">The parent window for the dialog.</param>
         /// <param name="strWindowTitle">The title to display in the progress dialog.</param>
         /// <param name="pProgressStatus">The progress status object to use to update the
         /// progress bars.</param>
@@ -164,30 +184,71 @@ namespace Extract.Utilities.Forms
         /// <param name="hStopEvent">The event handle to signal when the stop button is pressed.
         /// If <paramref name="hStopEvent"/> is <see cref="IntPtr.Zero"/> then no stop
         /// button will be displayed.</param>
+        [CLSCompliant(false)]
+        public void Initialize(string strWindowTitle, ProgressStatus pProgressStatus, int nNumProgressLevels,
+            int nDelayBetweenRefreshes, bool bShowCloseButton, IntPtr hStopEvent)
+        {
+            try
+            {
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI31814", _OBJECT_NAME);
+
+                if (_statusForm == null)
+                {
+                    _statusForm = new ProgressStatusDialogForm(nNumProgressLevels,
+                        nDelayBetweenRefreshes, bShowCloseButton, hStopEvent);
+
+                    // Once the modal dialog changes visibility, it is free to be closed.
+                    _statusForm.VisibleChanged += ((sender, e) =>
+                        _modalDialogClosable.Set());
+                }
+
+                _closed = false;
+                _statusForm.UpdateTitle(strWindowTitle);
+                _statusForm.ProgressStatus = pProgressStatus;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI31815",
+                    "Failed to show progress dialog.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Displays the <see cref="ProgressStatusDialogForm"/> as a modal dialog box.
+        /// </summary>
+        /// <param name="hWndParent">The parent window for the dialog.</param>
         /// <returns>The Hresult for the call.</returns>
         [CLSCompliant(false)]
-        public int ShowModalDialog(IntPtr hWndParent, string strWindowTitle,
-            ProgressStatus pProgressStatus, int nNumProgressLevels, int nDelayBetweenRefreshes,
-            bool bShowCloseButton, IntPtr hStopEvent)
+        public int ShowModalDialog(IntPtr hWndParent)
         {
             try
             {
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI31407", _OBJECT_NAME);
 
-                if (_statusForm == null)
+                ExtractException.Assert("ELI31816",
+                    "Progress dialog must be initialized before ShowModalDialog is called.",
+                    _statusForm != null);
+
+                // Block calls to close until the dialog has been displayed to prevent it from being
+                // closed just before the call to ShowDialog.
+                _modalDialogClosable.Reset();
+
+                if (_closed)
                 {
-                    _statusForm = new ProgressStatusDialogForm(nNumProgressLevels,
-                        nDelayBetweenRefreshes, bShowCloseButton, hStopEvent);
+                    _modalDialogClosable.Set();
+                    return HResult.Ok;
                 }
-
-                _statusForm.UpdateTitle(strWindowTitle);
-                _statusForm.ProgressStatus = pProgressStatus;
-
-                return (int)_statusForm.ShowDialog(new WindowWrapper(hWndParent));
+                else
+                {
+                    return (int)_statusForm.ShowDialog(new WindowWrapper(hWndParent));
+                }
             }
             catch (Exception ex)
             {
+                _modalDialogClosable.Set();
+
                 throw ExtractException.CreateComVisible("ELI31408",
                     "Failed to show progress dialog.", ex);
             }
@@ -282,6 +343,12 @@ namespace Extract.Utilities.Forms
                 {
                     _statusForm.Dispose();
                     _statusForm = null;
+                }
+
+                if (_modalDialogClosable != null)
+                {
+                    _modalDialogClosable.Dispose();
+                    _modalDialogClosable = null;
                 }
             }
         }

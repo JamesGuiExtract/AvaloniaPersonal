@@ -409,13 +409,15 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 			m_ipSchemaUpdateProgressStatus.CreateInstance(CLSID_ProgressStatus);
 			ASSERT_RESOURCE_ALLOCATION("ELI31386", m_ipSchemaUpdateProgressStatus != NULL);
 
+			m_ipSchemaUpdateProgressStatusDialog->Initialize(get_bstr_t("Schema Update"),
+				m_ipSchemaUpdateProgressStatus, 2, 100, VARIANT_FALSE, NULL);
+
 			// Start background thread to perform the upgrade
 			AfxBeginThread(upgradeToCurrentSchemaThread, this);
 
 			// Show a modal progress status dialog that cannot be closed by the user. The background
 			// thread will close the dialog once the udpate has completed (whether successfully or not).
-			m_ipSchemaUpdateProgressStatusDialog->ShowModalDialog(m_hWnd, "Schema Update",
-				m_ipSchemaUpdateProgressStatus, 2, 100, VARIANT_FALSE, NULL);
+			m_ipSchemaUpdateProgressStatusDialog->ShowModalDialog(m_hWnd);
 
 			if (m_bSchemaUpdateSucceeded)
 			{
@@ -1022,10 +1024,6 @@ UINT CFAMDBAdminDlg::upgradeToCurrentSchemaThread(LPVOID pParam)
 		{
 			ue.display();
 		}
-
-		// Ensure the progress status had a chance to be displayed before attempting to close it.
-		Sleep(200);
-		emptyWindowsMessageQueue();
 			
 		// Close the progress status dialog so the UI thread can continue.
 		pFAMDBAdminDlg->m_ipSchemaUpdateProgressStatusDialog->Close();

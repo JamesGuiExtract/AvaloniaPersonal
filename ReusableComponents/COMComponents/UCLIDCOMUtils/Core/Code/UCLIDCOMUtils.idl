@@ -1443,18 +1443,12 @@ library UCLID_COMUTILSLib
 		//			Subsequent calls to ShowModelessDialog() will re-show the hidden window.
 		[id(4), helpstring("method Close")] HRESULT Close();
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To instantiate and show a modal version of the progress status dialog that will
-		//			block on the calling thread until closed.
+		// PURPOSE: To initialize a progress status dialog to be used by a subsequent call to
+		//			ShowModalDialog.
 		// PROMISE:	To bring up a modal version of the progress status dialog box and update
 		//			the progress status at the specified refresh rate.
-		// NOTES:	All subsequent calls to ShowModelessDialog() or ShowModalDialog will merely
-		//			re-show the window that became hidden the last time it was closed. If
-		//			ShowModalDialog is called when the dialog is already open, and exception will
-		//			result.
+		// NOTES:	ShowModalDialog cannot be used until Initialize has been called.
 		// ARGUMENTS:
-		//			hWndParent - the window handle to the window that should be treated as the
-		//				parent for the progress status dialog. If there is no parent window, pass
-		//				NULL for this parameter.
 		//			strWindowTitle - the caption for the progress status dialog.  This parameter
 		//				is used to set the Title property (see documentation of the Title property).
 		//			pProgressStatus - the top level progress status object whose progress 
@@ -1475,12 +1469,21 @@ library UCLID_COMUTILSLib
 		//				In the event the stop button is pressed, the hStopEvent will be signaled
 		//				to notify the caller.  The progress dialog will remain displayed with 
 		//				"Stopping..." as the progress message until it is closed by the caller.
-		// REQUIRE:	
-		// PROMISE:	
-		[id(5), helpstring("method ShowModalDialog")] HRESULT ShowModalDialog(
-			[in] HANDLE hWndParent, [in] BSTR strWindowTitle, [in] IProgressStatus *pProgressStatus, 
+		[id(5), helpstring("method Initialize")] void Initialize(
+			[in] BSTR strWindowTitle, [in] IProgressStatus *pProgressStatus, 
 			[in] long nNumProgressLevels, [in] long nDelayBetweenRefreshes, 
-			[in] VARIANT_BOOL bShowCloseButton, [in] HANDLE hStopEvent, 
+			[in] VARIANT_BOOL bShowCloseButton, [in] HANDLE hStopEvent);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To show a modal version of the progress status dialog that will
+		//			block on the calling thread until closed.
+		// PROMISE:	To bring up a modal version of the progress status dialog box and update
+		//			the progress status at the specified refresh rate.
+		// ARGUMENTS:
+		//			hWndParent - the window handle to the window that should be treated as the
+		//				parent for the progress status dialog. If there is no parent window, pass
+		//				NULL for this parameter.
+		// REQUIRE:	Initialize must have been called prior to calling this method.
+		[id(6), helpstring("method ShowModalDialog")] HRESULT ShowModalDialog([in] HANDLE hWndParent,
 			[out, retval] long *phWndProgressStatusDialog);
 	};
 
