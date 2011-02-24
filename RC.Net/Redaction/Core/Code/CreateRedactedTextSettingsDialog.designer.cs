@@ -214,7 +214,7 @@
             this._addCharactersLabel1.Location = new System.Drawing.Point(47, 49);
             this._addCharactersLabel1.Name = "_addCharactersLabel1";
             this._addCharactersLabel1.Size = new System.Drawing.Size(102, 13);
-            this._addCharactersLabel1.TabIndex = 5;
+            this._addCharactersLabel1.TabIndex = 7;
             this._addCharactersLabel1.Text = "Randomly add up to";
             // 
             // _replacementTextTextBox
@@ -224,7 +224,7 @@
             this._replacementTextTextBox.Location = new System.Drawing.Point(25, 92);
             this._replacementTextTextBox.Name = "_replacementTextTextBox";
             this._replacementTextTextBox.Size = new System.Drawing.Size(414, 20);
-            this._replacementTextTextBox.TabIndex = 9;
+            this._replacementTextTextBox.TabIndex = 10;
             // 
             // _replaceTextRadioButton
             // 
@@ -232,7 +232,7 @@
             this._replaceTextRadioButton.Location = new System.Drawing.Point(7, 72);
             this._replaceTextRadioButton.Name = "_replaceTextRadioButton";
             this._replaceTextRadioButton.Size = new System.Drawing.Size(236, 17);
-            this._replaceTextRadioButton.TabIndex = 8;
+            this._replaceTextRadioButton.TabIndex = 1;
             this._replaceTextRadioButton.TabStop = true;
             this._replaceTextRadioButton.Text = "Replace sensitive text with the following text:";
             this._replaceTextRadioButton.UseVisualStyleBackColor = true;
@@ -243,7 +243,7 @@
             this._addCharactersLabel2.Location = new System.Drawing.Point(198, 49);
             this._addCharactersLabel2.Name = "_addCharactersLabel2";
             this._addCharactersLabel2.Size = new System.Drawing.Size(241, 13);
-            this._addCharactersLabel2.TabIndex = 7;
+            this._addCharactersLabel2.TabIndex = 9;
             this._addCharactersLabel2.Text = "\"X\" characters to obscure length of sensitive text.";
             // 
             // _addCharactersUpDown
@@ -261,7 +261,7 @@
             0});
             this._addCharactersUpDown.Name = "_addCharactersUpDown";
             this._addCharactersUpDown.Size = new System.Drawing.Size(37, 20);
-            this._addCharactersUpDown.TabIndex = 6;
+            this._addCharactersUpDown.TabIndex = 8;
             this._addCharactersUpDown.Value = new decimal(new int[] {
             5,
             0,
@@ -274,7 +274,7 @@
             this._addCharactersCheckBox.Location = new System.Drawing.Point(26, 48);
             this._addCharactersCheckBox.Name = "_addCharactersCheckBox";
             this._addCharactersCheckBox.Size = new System.Drawing.Size(15, 14);
-            this._addCharactersCheckBox.TabIndex = 4;
+            this._addCharactersCheckBox.TabIndex = 6;
             this._addCharactersCheckBox.UseVisualStyleBackColor = true;
             // 
             // _replacementCharTextBox
@@ -283,7 +283,7 @@
             this._replacementCharTextBox.MaxLength = 1;
             this._replacementCharTextBox.Name = "_replacementCharTextBox";
             this._replacementCharTextBox.Size = new System.Drawing.Size(22, 20);
-            this._replacementCharTextBox.TabIndex = 3;
+            this._replacementCharTextBox.TabIndex = 5;
             // 
             // label1
             // 
@@ -291,7 +291,7 @@
             this.label1.Location = new System.Drawing.Point(176, 21);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(175, 13);
-            this.label1.TabIndex = 2;
+            this.label1.TabIndex = 4;
             this.label1.Text = "characters in the sensitive text with:";
             // 
             // _charsToReplaceComboBox
@@ -301,7 +301,7 @@
             this._charsToReplaceComboBox.Location = new System.Drawing.Point(74, 18);
             this._charsToReplaceComboBox.Name = "_charsToReplaceComboBox";
             this._charsToReplaceComboBox.Size = new System.Drawing.Size(96, 21);
-            this._charsToReplaceComboBox.TabIndex = 1;
+            this._charsToReplaceComboBox.TabIndex = 3;
             // 
             // _surroundTextRadioButton
             // 
@@ -309,7 +309,7 @@
             this._surroundTextRadioButton.Location = new System.Drawing.Point(7, 118);
             this._surroundTextRadioButton.Name = "_surroundTextRadioButton";
             this._surroundTextRadioButton.Size = new System.Drawing.Size(272, 17);
-            this._surroundTextRadioButton.TabIndex = 10;
+            this._surroundTextRadioButton.TabIndex = 2;
             this._surroundTextRadioButton.TabStop = true;
             this._surroundTextRadioButton.Text = "Surround sensitive text with an XML element named:";
             this._surroundTextRadioButton.UseVisualStyleBackColor = true;

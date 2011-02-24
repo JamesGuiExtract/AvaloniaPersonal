@@ -111,9 +111,9 @@ namespace Extract.Redaction
         {
             try
             {
-                RedactAllTypes = true;
+                RedactAllTypes = false;
                 RedactOtherTypes = false;
-                DataTypes = new ReadOnlyCollection<string>(new string[] { });
+                DataTypes = new ReadOnlyCollection<string>(_standardDataTypes);
                 RedactionMethod = RedactionMethod.ReplaceCharacters;
                 CharactersToReplace = CharacterClass.All;
                 ReplacementCharacter = "X";
