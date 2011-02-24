@@ -329,7 +329,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		uex.log();
 
 		// Alert the FAMDBAdmin to update the status tab
-		m_pFAMDBAdmin->NotifyStatusChanged();
+		m_pFAMDBAdmin->UpdateSummaryTab(lToActionID);
 
 		if(bCloseDialog)
 		{

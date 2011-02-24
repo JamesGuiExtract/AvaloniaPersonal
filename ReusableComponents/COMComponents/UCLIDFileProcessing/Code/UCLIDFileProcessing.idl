@@ -699,7 +699,8 @@ library UCLID_FILEPROCESSINGLib
 
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To return a IActionStistics pointer that contains the current stats for the given action
-		[id(19), helpstring("method GetStats")] HRESULT GetStats([in] long nActionID, [out, retval] IActionStatistics** pStats);
+		[id(19), helpstring("method GetStats")] HRESULT GetStats([in] long nActionID,
+			[in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
 
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To Clear the database

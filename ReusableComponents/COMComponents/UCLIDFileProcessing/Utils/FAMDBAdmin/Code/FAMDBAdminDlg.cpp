@@ -334,7 +334,7 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 			enableMenus();
 
 			// Update the summary tab
-			updateSummaryTab();
+			UpdateSummaryTab();
 			throw;
 		}
 
@@ -360,7 +360,7 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 		enableMenus();
 
 		// Update the summary tab
-		updateSummaryTab();
+		UpdateSummaryTab();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14861");
 }
@@ -430,7 +430,7 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 
 				// Update menu & summary info
 				enableMenus();
-				updateSummaryTab();
+				UpdateSummaryTab();
 			}
 			else
 			{
@@ -775,7 +775,7 @@ void CFAMDBAdminDlg::OnManageActions()
 		dlg.DoModal();
 
 		//Update the summary tab
-		updateSummaryTab();
+		UpdateSummaryTab();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29104");
 }//-------------------------------------------------------------------------------------------------
@@ -794,12 +794,15 @@ void CFAMDBAdminDlg::OnToolsSetPriority()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27698");
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::NotifyStatusChanged()
+void CFAMDBAdminDlg::UpdateSummaryTab(long nActionID /*= -1*/)
 {
 	try
 	{
 		// Update the summary tab
-		updateSummaryTab();
+		if (m_propSummaryPage.m_hWnd != NULL)
+		{
+			m_propSummaryPage.populatePage(nActionID);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27696");
 }
@@ -988,14 +991,6 @@ void CFAMDBAdminDlg::setUIDatabaseStatus()
 
 	// Set the status default status
 	m_propDatabasePage.setDBConnectionStatus ( strCurrDBStatus );
-}
-//--------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::updateSummaryTab()
-{
-	if (m_propSummaryPage.m_hWnd != NULL)
-	{
-		m_propSummaryPage.populatePage();
-	}
 }
 //--------------------------------------------------------------------------------------------------
 UINT CFAMDBAdminDlg::upgradeToCurrentSchemaThread(LPVOID pParam)

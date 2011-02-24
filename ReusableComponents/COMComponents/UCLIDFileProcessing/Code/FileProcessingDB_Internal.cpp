@@ -1426,7 +1426,7 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 }
 //--------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, 
-	long nActionID, bool bDBLocked)
+	long nActionID, bool bForceUpdate, bool bDBLocked)
 {
 	// Create a pointer to a recordset
 	_RecordsetPtr ipActionStatSet(__uuidof(Recordset));
@@ -1477,7 +1477,7 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 	CTime timeLastUpdated = getTimeDateField(ipFields, "LastUpdateTimeStamp");
 
 	CTimeSpan ts = timeCurrent - timeLastUpdated;
-	if ( ts.GetTotalSeconds() > m_nActionStatisticsUpdateFreqInSeconds)
+	if (bForceUpdate || ts.GetTotalSeconds() > m_nActionStatisticsUpdateFreqInSeconds)
 	{
 		if (bDBLocked)
 		{

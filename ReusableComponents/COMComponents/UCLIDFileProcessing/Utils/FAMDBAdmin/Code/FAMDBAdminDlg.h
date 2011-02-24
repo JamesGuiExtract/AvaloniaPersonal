@@ -65,7 +65,9 @@ public:
 	virtual void OnDBConfigChanged(const string& strServer, const string& strDatabase);
 
 	// Method called to cause the summary tab to refresh its data
-	void NotifyStatusChanged();
+	// If nActionID is -1, all actions are refreshed. Otherwise, only the action with the specified
+	// action ID is refreshed.
+	void UpdateSummaryTab(long nActionID = -1);
 
 private:
 	//////////
@@ -138,9 +140,6 @@ private:
 
 	// Gets the status from the database and updates the status on the Database page
 	void setUIDatabaseStatus();
-
-	// Refreshes the statistics on a summary tab
-	void updateSummaryTab();
 
 	// Attempts to upgrade the current database to the latest schema.
 	static UINT upgradeToCurrentSchemaThread(LPVOID pParam);

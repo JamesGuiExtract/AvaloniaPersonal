@@ -368,7 +368,7 @@ void CFAMDBAdminSummaryDlg::resizeListColumns()
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void CFAMDBAdminSummaryDlg::populatePage()
+void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 {
 	try
 	{
@@ -378,8 +378,16 @@ void CFAMDBAdminSummaryDlg::populatePage()
 		// Set the wait cursor
 		CWaitCursor wait;
 
-		// clear the list control first
-		m_listActions.DeleteAllItems();
+		// Clear the list control if refreshing all actions
+		if (nActionIDToRefresh < 0)
+		{
+			m_listActions.DeleteAllItems();
+		}
+		// Need to refresh all actions if the table has not yet been populated.
+		else if (m_listActions.GetItemCount() == 0)
+		{
+			nActionIDToRefresh = -1;
+		}
 
 		long long llFileCount = 0;
 
@@ -414,10 +422,25 @@ void CFAMDBAdminSummaryDlg::populatePage()
 			string strActionName = asString(bstrKey);
 			long nActionID = asLong(asString(bstrValue));
 
+			if (nActionIDToRefresh >= 0)
+			{
+				// If refreshing only one action, and this is that action, delete the previous row
+				// for that action
+				if (nActionIDToRefresh == nActionID)
+				{
+					m_listActions.DeleteItem(i);
+				}
+				// Otherwise, there is nothing to do for this action.
+				else
+				{
+					continue;
+				}
+			}
+
 			// insert the action name into the list control
 			int nItem = m_listActions.InsertItem(i, strActionName.c_str());
 
-			IActionStatisticsPtr ipActionStats = m_ipFAMDB->GetStats(nActionID);
+			IActionStatisticsPtr ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE);
 
 			long lPending, lCompleted, lSkipped, lFailed, lTotal;
 
@@ -445,8 +468,14 @@ void CFAMDBAdminSummaryDlg::populatePage()
 			// fill in the total column (sum of all files except Unattempted)
 			m_listActions.SetItemText(nItem, giTOTALS_COLUMN,
 				commaFormatNumber((long long) (lTotal)).c_str());
-		}
 
+			// If we are to refresh only this action, there is no point in looping through the rest
+			// of the actions.
+			if (nActionIDToRefresh >= 0)
+			{
+				break;
+			}
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30527");
 }

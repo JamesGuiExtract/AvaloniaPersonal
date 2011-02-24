@@ -24,7 +24,9 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To retrieve the current data from the database and fill in the list control
 	//			and the total files edit box based on that data
-	void populatePage();
+	// ARGS:	nActionID- If -1, all actions are refreshed. Otherwise, only the action with the
+	//			specified action ID is refreshed.
+	void populatePage(long nActionIDToRefresh = -1);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

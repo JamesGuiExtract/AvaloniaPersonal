@@ -119,7 +119,7 @@ public:
 		EActionStatus* poldStatus);
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
-	STDMETHOD(GetStats)(long nActionID, IActionStatistics** pStats);
+	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(Clear)(VARIANT_BOOL vbRetainUserValues);
 	STDMETHOD(CopyActionStatusFromAction)(long  nFromAction, long nToAction);
 	STDMETHOD(RenameAction)(long  nActionID, BSTR strNewActionName);
@@ -529,7 +529,7 @@ private:
 	//			if the bDBLocked is false and no record exists or stats are out of date an exception
 	//			will be thrown.
 	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr loadStats(_ConnectionPtr ipConnection, 
-		long nActionID, bool bDBLocked);
+		long nActionID, bool bForceUpdate, bool bDBLocked);
 
 	// Returns the DBSchemaVersion
 	int getDBSchemaVersion();
@@ -779,7 +779,7 @@ private:
 	bool GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
-	bool GetStats_Internal(bool bDBLocked, long nActionID, IActionStatistics* *pStats);
+	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
 	bool CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction);
 	bool RenameAction_Internal(bool bDBLocked, long nActionID, BSTR strNewActionName);
 	bool Clear_Internal(bool bDBLocked, VARIANT_BOOL vbRetainUserValues);

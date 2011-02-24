@@ -536,7 +536,8 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13611");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetStats(/*[in]*/ long nActionID, /*[out, retval]*/ IActionStatistics* *pStats)
+STDMETHODIMP CFileProcessingDB::GetStats(long nActionID, VARIANT_BOOL vbForceUpdate,
+	IActionStatistics* *pStats)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -544,12 +545,12 @@ STDMETHODIMP CFileProcessingDB::GetStats(/*[in]*/ long nActionID, /*[out, retval
 	{
 		validateLicense();
 
-		if (!GetStats_Internal(false, nActionID, pStats))
+		if (!GetStats_Internal(false, nActionID, vbForceUpdate, pStats))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
-			GetStats_Internal(true, nActionID, pStats);
+			GetStats_Internal(true, nActionID, vbForceUpdate, pStats);
 		}
 		return S_OK;
 	}

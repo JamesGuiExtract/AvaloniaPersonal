@@ -2476,7 +2476,7 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 				{
 					// Get the stats from the db in a temp object so that the UI will not be blocked
 					UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = 
-						ipFPMDB->GetStats( nActionID );
+						ipFPMDB->GetStats(nActionID, VARIANT_FALSE);
 					ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != NULL);
 				
 					_lastCodePos = "70";
@@ -2494,7 +2494,7 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 			// finishes the stats that are displayed will be current at the time of the thread stop event being signaled.
 			// If this is the only instance and it is processing files the final stats will show that the processing is 
 			// finished instead of showing the stats as of the last timout
-			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = ipFPMDB->GetStats( nActionID );
+			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_TRUE);
 			
 			_lastCodePos = "90";
 			
