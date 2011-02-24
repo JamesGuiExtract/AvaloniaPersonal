@@ -100,8 +100,7 @@ namespace Extract.Redaction
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI31634",
-                    "Unabled to create \"Create redacted text\" task.", ex);
+                throw ex.AsExtract("ELI31634");
             }
         }
 

@@ -98,6 +98,13 @@
     </Compile>
     <Compile Include="ApplyBatesNumberTask.cs" />
     <Compile Include="BatesNumberGeneratorWithDatabase.cs" />
+    <Compile Include="CreateFileTask.cs" />
+    <Compile Include="CreateFileTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateFileTaskSettingsDialog.Designer.cs">
+      <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ModifyPdfFileSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -198,6 +205,9 @@
     <EmbeddedResource Include="ApplyBatesNumberSettingsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateFileTaskSettingsDialog.resx">
+      <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ModifyPdfFileSettingsDialog.resx">
       <SubType>Designer</SubType>
