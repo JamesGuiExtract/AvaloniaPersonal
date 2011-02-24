@@ -47,11 +47,13 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 private:
+	std::string m_strCacheFileRoot;
 	void verifyCategoryName(const std::string& strCategoryName);
 	void verifyComponentDescription(const std::string& strDescription);
 
 	void validateLicense();
 	std::string getCacheFileName(const std::string& strCategoryName);
+	std::string getCacheFileRoot();
 	void createCacheFile(BSTR bstrCategoryName,
 		const std::string& strFileName);
 

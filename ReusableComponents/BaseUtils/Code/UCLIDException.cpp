@@ -77,7 +77,7 @@ string UCLIDException::ms_strSerial = "";
 
 // Path in the 'all user\application data' folder to the exception log
 // [LRCAU #5028 - 11/18/2008 JDS]
-const string gstrLOG_FILE_APP_DATA_PATH = "\\Extract Systems\\LogFiles\\Misc";
+const string gstrDEFAULT_EXCEPTION_LOG_PATH = "\\LogFiles\\Misc\\ExtractException.Uex";
 
 // Mutex for protecting access to the log file
 static auto_ptr<CMutex> apmutexLogFile;
@@ -1322,38 +1322,22 @@ void UCLIDException::throwAsCOMError()
 //-------------------------------------------------------------------------------------------------
 const string& UCLIDException::getDefaultLogFileFullPath()
 {
+	static string ls_strLogFile = "";
+
 	try
 	{
-		static string ls_strLogFile = "";
-
 		// initialize the log file name if it has not yet been initialized
 		if (ls_strLogFile == "")
 		{
-			string strDir("");
-			try
-			{
-				// Get the common App data folder [LRCAU #5028 - 11/18/2008 JDS]
-				getSpecialFolderPath(CSIDL_COMMON_APPDATA, strDir);
-
-				// Append the path within common data
-				strDir += gstrLOG_FILE_APP_DATA_PATH;
-			}
-			catch (...)
-			{
-				strDir = "";
-			}
-
-			// Define complete relative path to UEX file
-			// As per [LRCAU #5148] file name should be changed to
-			// ExtractException.uex
-			ls_strLogFile = strDir + "\\ExtractException.Uex";
+			ls_strLogFile = getExtractApplicationDataPath() + gstrDEFAULT_EXCEPTION_LOG_PATH;
 		}
 
 		return ls_strLogFile;
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20313");
-	
-	return gstrEMPTY_STRING;
+	catch (...)
+	{
+		return gstrEMPTY_STRING;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void UCLIDException::setErrorLabel(HRESULT hr, string& rstrErrorLabel)

@@ -46,6 +46,7 @@ STDMETHODIMP CCategoryManager::InterfaceSupportsErrorInfo(REFIID riid)
 // ICategoryManager
 //-------------------------------------------------------------------------------------------------
 CCategoryManager::CCategoryManager()
+	: m_strCacheFileRoot("")
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -104,10 +105,26 @@ STDMETHODIMP CCategoryManager::GetCategoryNames(BSTR strPrefix, IVariantVector *
 //-------------------------------------------------------------------------------------------------
 string CCategoryManager::getCacheFileName(const string& strCategoryName)
 {
-	string strCacheFileName = getModuleDirectory(_Module.GetModuleInstance()) + "\\";
-	strCacheFileName += strCategoryName;
-	strCacheFileName += ".lst";
+	string strCacheFileName = getCacheFileRoot() + strCategoryName + ".lst";
 	return strCacheFileName;
+}
+//-------------------------------------------------------------------------------------------------
+string CCategoryManager::getCacheFileRoot()
+{
+	if (m_strCacheFileRoot == "")
+	{
+		m_strCacheFileRoot = getExtractApplicationDataPath() + "\\CategoryFiles";
+
+		// Ensure the directory exists
+		if (!isValidFolder(m_strCacheFileRoot))
+		{
+			createDirectory(m_strCacheFileRoot);
+		}
+
+		m_strCacheFileRoot += "\\";
+	}
+
+	return m_strCacheFileRoot;
 }
 //-------------------------------------------------------------------------------------------------
 void CCategoryManager::verifyComponentDescription(const string& strDescription)

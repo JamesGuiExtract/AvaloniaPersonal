@@ -6,9 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
@@ -90,8 +88,7 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         // Store the database parallel to the ESFAMService.exe file [DNRCAU #381]
         static readonly string _databaseFile = FileSystemMethods.PathCombine(
-            Path.GetDirectoryName(Assembly.GetAssembly(typeof(ESFAMService)).Location),
-            "ESFAMService.sdf");
+            FileSystemMethods.CommonApplicationDataPath, "ESFAMService", "ESFAMService.sdf");
 
         /// <summary>
         /// Event to indicate processing should stop.

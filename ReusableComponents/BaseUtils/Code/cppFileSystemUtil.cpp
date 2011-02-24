@@ -2240,6 +2240,15 @@ void getSpecialFolderPath(int CSIDL, string& rstrPath)
 	rstrPath = szPath;
 }
 //--------------------------------------------------------------------------------------------------
+string getExtractApplicationDataPath()
+{
+	string strApplicationDataPath("");
+	getSpecialFolderPath(CSIDL_COMMON_APPDATA, strApplicationDataPath);
+	strApplicationDataPath += "\\Extract Systems";
+
+	return strApplicationDataPath;
+}
+//--------------------------------------------------------------------------------------------------
 void setFileAttributes(const string& strFileName, DWORD dwFileAttributes,
 					   bool bThrowExceptionIfNotSuccess)
 {
