@@ -12,7 +12,7 @@ using namespace System;
 //--------------------------------------------------------------------------------------------------
 // Public methods
 //--------------------------------------------------------------------------------------------------
-PdfLock::PdfLock() : pLoadLocker(NULL)
+PdfLock::PdfLock() : pLoadLocker(__nullptr)
 {
 	try
 	{
@@ -21,10 +21,10 @@ PdfLock::PdfLock() : pLoadLocker(NULL)
 	catch(UCLIDException& uex)
 	{
 		// Ensure the memory is cleaned up
-		if (pLoadLocker != NULL)
+		if (pLoadLocker != __nullptr)
 		{
 			delete pLoadLocker;
-			pLoadLocker = NULL;
+			pLoadLocker = __nullptr;
 		}
 
 		ExtractException^ ee = gcnew ExtractException("ELI29716", "Unable to create new PdfLock.",
@@ -34,18 +34,19 @@ PdfLock::PdfLock() : pLoadLocker(NULL)
 	catch(Exception^ ex)
 	{
 		// Ensure the memory is cleaned up
-		if (pLoadLocker != NULL)
+		if (pLoadLocker != __nullptr)
 		{
 			delete pLoadLocker;
-			pLoadLocker = NULL;
+			pLoadLocker = __nullptr;
 		}
+
 		// Wrap all exceptions as an ExtractException
 		ExtractException^ ee = ExtractException::AsExtractException("ELI29717", ex);
 		throw ee;
 	}
 }
 //--------------------------------------------------------------------------------------------------
-PdfLock::PdfLock(bool lock) : pLoadLocker(NULL)
+PdfLock::PdfLock(bool lock) : pLoadLocker(__nullptr)
 {
 	if (lock)
 	{
@@ -56,10 +57,10 @@ PdfLock::PdfLock(bool lock) : pLoadLocker(NULL)
 		catch(UCLIDException& uex)
 		{
 			// Ensure the memory is cleaned up
-			if (pLoadLocker != NULL)
+			if (pLoadLocker != __nullptr)
 			{
 				delete pLoadLocker;
-				pLoadLocker = NULL;
+				pLoadLocker = __nullptr;
 			}
 
 			ExtractException^ ee = gcnew ExtractException("ELI29712", "Unable to create new PdfLock.",
@@ -69,11 +70,12 @@ PdfLock::PdfLock(bool lock) : pLoadLocker(NULL)
 		catch(Exception^ ex)
 		{
 			// Ensure the memory is cleaned up
-			if (pLoadLocker != NULL)
+			if (pLoadLocker != __nullptr)
 			{
 				delete pLoadLocker;
-				pLoadLocker = NULL;
+				pLoadLocker = __nullptr;
 			}
+
 			// Wrap all exceptions as an ExtractException
 			ExtractException^ ee = ExtractException::AsExtractException("ELI29713", ex);
 			throw ee;
@@ -85,10 +87,10 @@ PdfLock::~PdfLock()
 {
 	try
 	{
-		if (pLoadLocker != NULL)
+		if (pLoadLocker != __nullptr)
 		{
 			delete pLoadLocker;
-			pLoadLocker = NULL;
+			pLoadLocker = __nullptr;
 		}
 	}
 	catch(Exception^ ex)
@@ -105,10 +107,10 @@ PdfLock::!PdfLock()
 {
 	try
 	{
-		if (pLoadLocker != NULL)
+		if (pLoadLocker != __nullptr)
 		{
 			delete pLoadLocker;
-			pLoadLocker = NULL;
+			pLoadLocker = __nullptr;
 		}
 	}
 	catch(...)

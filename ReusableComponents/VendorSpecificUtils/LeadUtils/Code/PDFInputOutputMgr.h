@@ -3,6 +3,7 @@
 #include "LeadUtils.h"
 
 #include <TemporaryFileName.h>
+#include <Win32Event.h>
 
 #include <string>
 #include <memory>
@@ -16,6 +17,7 @@ class CachedFileData
 {
 public:
 	CachedFileData(const string& strPDFName);
+	~CachedFileData();
 
 	// Original filename passed to constructor and lower-case copy
 	string							m_strOriginalFileName;
@@ -27,6 +29,21 @@ public:
 
 	// Timestamp of strLCOriginalFileName used to properly deal with image rescans
 	CTime								m_tmOriginalFileModificationTime;
+
+	// Waits for the pdf conversion to complete
+	void waitForConversion();
+
+private:
+
+	typedef struct ConversionData {
+		string strPdfName;
+		string strTempName;
+		Win32Event m_eventConverted;
+	};
+
+	ConversionData m_data;
+
+	static UINT convertPdf(LPVOID pData);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -78,7 +95,7 @@ private:
 	// Provides special handling for input PDF files only.
 	// - Adds file to map of active files.  
 	// - Converts strName to temporary TIF
-	string addActiveFile(string strName);
+	string addActiveFile(const string& strName);
 
 	// Adds specified item to top of queue of inactive files.  Removes item at bottom of queue if 
 	// queue was already at maximum capacity.
@@ -88,10 +105,18 @@ private:
 	// map of active files if found and bMoveToActive == true.
 	static bool isFileInactive(const string &strLCName, bool bMoveToActive);
 
-	// Returns true if strLCName is already in the map of active files, otherwise false.
-	bool isFileInMap(const string &strLCName);
+	// Searches queue of inactive files and returns true if the file is found
+	static bool isFileInactive(CachedFileData* pCFD);
+
+	// Returns the pointer to the item from the map if it is in the map, or __nullptr otherwise
+	// If bErase == true, then will erase the item from the map before returning the pointer.
+	// NOTE: This method will search and possibly modify the static map. It must not be
+	//		 called without first locking the static mutex
+	CachedFileData* getFileFromMap(const string& strLCName, bool bErase = false);
 
 	// Moves specified file from map of active files, if found, to top of deque of inactive files.
+	// NOTE: This method will search and modify the static map as well as the inactive queue.
+	//		 It must not be called without first locking the static mutex
 	void removeActiveFile(const string &strLCName);
 
 	// Removes last / oldest item from the collection of inactive files.

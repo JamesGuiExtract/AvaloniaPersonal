@@ -53,17 +53,24 @@ CachedFileData::CachedFileData(const string& strPDFName)
 		{
 			// Create new Temporary File Name object
 			m_apTFN = auto_ptr<TemporaryFileName>(new TemporaryFileName( NULL, ".tif", true ));
-			ASSERT_RESOURCE_ALLOCATION( "ELI16138", m_apTFN.get() != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI16138", m_apTFN.get() != __nullptr );
 
 			// Store original filename and lower-case copy
 			m_strOriginalFileName = m_strLCOriginalFileName = strPDFName;
 			makeLowerCase( m_strLCOriginalFileName );
 
-			// Convert PDF input file to temporary TIF
-			convertPDFToTIF( strPDFName, m_apTFN->getName() );
-
 			// Store last modified time
 			m_tmOriginalFileModificationTime = getFileModificationTimeStamp( strPDFName );
+
+			// Set the conversion data members
+			m_data.strPdfName = strPDFName;
+			m_data.strTempName = m_apTFN->getName();
+
+			// Start the conversion thread
+			if(!AfxBeginThread(convertPdf, &m_data))
+			{
+				throw UCLIDException("ELI31873", "Unable to initialize pdf conversion thread.");
+			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25222");
 	}
@@ -73,6 +80,43 @@ CachedFileData::CachedFileData(const string& strPDFName)
 		throw ue;
 	}
 }
+//-------------------------------------------------------------------------------------------------
+CachedFileData::~CachedFileData()
+{
+	try
+	{
+		// Wait for the pdf conversion to finish
+		m_data.m_eventConverted.wait();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31871");
+}
+//-------------------------------------------------------------------------------------------------
+void CachedFileData::waitForConversion()
+{
+	// Block until the conversion is complete
+	m_data.m_eventConverted.wait();
+}
+//-------------------------------------------------------------------------------------------------
+UINT CachedFileData::convertPdf(void* pData)
+{
+	ConversionData* pCData = __nullptr;
+	try
+	{
+		pCData = (ConversionData*) pData;
+		ASSERT_RESOURCE_ALLOCATION("ELI25209", pCData != __nullptr);
+
+			// Convert PDF input file to temporary TIF
+		convertPDFToTIF(pCData->strPdfName, pCData->strTempName);
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31872");
+
+	if (pCData != __nullptr)
+	{
+		pCData->m_eventConverted.signal();
+	}
+
+	return 0;
+}
 
 //-------------------------------------------------------------------------------------------------
 // PDFInputOutputMgr
@@ -80,7 +124,7 @@ CachedFileData::CachedFileData(const string& strPDFName)
 PDFInputOutputMgr::PDFInputOutputMgr(const string& strOriginalName, bool bFileUsedAsInput,
 									 const string& strUserPassword, const string& strOwnerPassword,
 									 int nPermissions)
-: m_apTFN(NULL),
+: m_apTFN(__nullptr),
   m_strFileNameInformationString(""),
   m_bOriginalUsedAsInput(bFileUsedAsInput),
   m_strUserPassword(strUserPassword),
@@ -112,9 +156,6 @@ PDFInputOutputMgr::PDFInputOutputMgr(const string& strOriginalName, bool bFileUs
 			// Check file existence
 			validateFileOrFolderExistence( strOriginalName );
 
-			// Protect collections against access by other threads
-			CSingleLock lg( &ms_mutex, TRUE );
-
 			// Provide image to cache
 			m_strWorkingName = addActiveFile( strOriginalName );
 		}
@@ -122,7 +163,7 @@ PDFInputOutputMgr::PDFInputOutputMgr(const string& strOriginalName, bool bFileUs
 		{
 			// Create new Temporary File Name object
 			m_apTFN = auto_ptr<TemporaryFileName>(new TemporaryFileName( NULL, ".tif", true ));
-			ASSERT_RESOURCE_ALLOCATION( "ELI16180", m_apTFN.get() != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI16180", m_apTFN.get() != __nullptr );
 
 			// Working filename is the name of the temporary file
 			m_strWorkingName = m_apTFN->getName();
@@ -145,14 +186,15 @@ PDFInputOutputMgr::~PDFInputOutputMgr()
 	{
 		if (m_bOriginalUsedAsInput)
 		{
+			makeLowerCase( m_strOriginalName );
+
 			// Protect collections against access by other threads
 			CSingleLock lg( &ms_mutex, TRUE );
 
 			// Move this file from active collection to inactive collection, if present
-			makeLowerCase( m_strOriginalName );
 			removeActiveFile( m_strOriginalName );
 		}
-		else if (m_apTFN.get() != NULL)
+		else if (m_apTFN.get() != __nullptr)
 		{
 			// Ensure we can read the temporary file before attempting to convert it
 			waitForFileToBeReadable(m_apTFN->getName());
@@ -205,10 +247,8 @@ void PDFInputOutputMgr::sFlushCache()
 	map<string, CachedFileData *>::iterator iterMap;
 	for (iterMap = ms_mapActiveFiles.begin(); iterMap != ms_mapActiveFiles.end(); iterMap++)
 	{
-		// Retrieve and delete this item
-		CachedFileData* pCFD = (*iterMap).second;
-		ASSERT_RESOURCE_ALLOCATION( "ELI16168", pCFD != NULL );
-		delete pCFD;
+		// No need to check for NULL, it is safe to delete on NULL (C++ standard && Stroustrup)
+		delete iterMap->second;
 	}
 
 	// Clear the map
@@ -226,133 +266,94 @@ void PDFInputOutputMgr::sFlushCache()
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-string PDFInputOutputMgr::addActiveFile(string strName)
+string PDFInputOutputMgr::addActiveFile(const string& strName)
 {
-	// No special handling for non-PDF images
-	if (!isPDFFile( strName ))
+	try
 	{
-		// Just return the input name
-		return strName;
-	}
-
-#ifdef _CACHE_LOGGING
-	// Prepare log file
-	ThreadSafeLogFile tslf;
-#endif
-
-	// Convert filename to lower-case for comparison
-	string strLCName = strName;
-	makeLowerCase( strLCName );
-
-	// Protect collections against access by other threads
-	CSingleLock lg( &ms_mutex, TRUE );
-
-	// Check the map of active files
-	if (isFileInMap( strLCName ))
-	{
-		// Retrieve data structure
-		CachedFileData* pCFD = ms_mapActiveFiles[strLCName];
-		ASSERT_RESOURCE_ALLOCATION( "ELI16142", pCFD != NULL );
-
-#ifdef _CACHE_LOGGING
-		// Add entry to default log file
-		string strText = "Found file in map: ";
-		strText += strLCName;
-		tslf.writeLine( strText.c_str() );
-#endif
-
-		// Return name of working file
-		// (use the working file from the cached file data) [LRCAU #5264]
-		TemporaryFileName* pTempFile = pCFD->m_apTFN.get();
-		ASSERT_RESOURCE_ALLOCATION("ELI16143", pTempFile != NULL);
-		return pTempFile->getName();
-	}
-	// File must be moved from the inactive list back to the map of active files
-	else if (isFileInactive( strLCName, true ))
-	{
-		// Retrieve data structure
-		CachedFileData* pCFD = ms_mapActiveFiles[strLCName];
-		ASSERT_RESOURCE_ALLOCATION( "ELI16140", pCFD != NULL );
-
-#ifdef _CACHE_LOGGING
-		// Add entry to default log file
-		string strText = "Found file in inactive queue: ";
-		strText += strLCName;
-		tslf.writeLine( strText.c_str() );
-#endif
-
-		// Get timestamp of this file and compare against stored time
-		CTime tmFile = getFileModificationTimeStamp( strName );
-		if (tmFile > pCFD->m_tmOriginalFileModificationTime)
+		// No special handling for non-PDF images
+		if (!isPDFFile( strName ))
 		{
-			// The file has been modified since being added to the cache
-			// so a new cache entry must be created and the old entry replaced
-			CachedFileData* pNewCFD = new CachedFileData( strName );
-			ASSERT_RESOURCE_ALLOCATION( "ELI16175", pNewCFD != NULL );
-
-			// Delete the previous CFD item
-			CachedFileData* pOldCFD = ms_mapActiveFiles[strLCName];
-			ASSERT_RESOURCE_ALLOCATION( "ELI16179", pOldCFD != NULL );
-			delete pOldCFD;
-
-			// Overwrite this item in the map
-			ms_mapActiveFiles[strLCName] = pNewCFD;
-
-#ifdef _CACHE_LOGGING
-			// Add entry to default log file
-			string strText = "Overwrote existing entry in map: ";
-			strText += strLCName;
-			tslf.writeLine( strText.c_str() );
-#endif
-
-			// Return name of new temporary file
-			TemporaryFileName* pTempFile = pNewCFD->m_apTFN.get();
-			ASSERT_RESOURCE_ALLOCATION("ELI25271", pTempFile != NULL);
-			return pTempFile->getName();
+			// Just return the input name
+			return strName;
 		}
-		else
+
+		// Convert filename to lower-case for comparison
+		string strLCName = strName;
+		makeLowerCase( strLCName );
+
+		// Mutex over collection access
+		CSingleLock lg( &ms_mutex, TRUE );
+
+		// Attemp to get the file from the map
+		CachedFileData* pCFD = getFileFromMap(strLCName);
+
+		// File is not in map
+		if (pCFD == __nullptr)
 		{
-			// Return name of working file
-			TemporaryFileName* pTempFile = pCFD->m_apTFN.get();
-			ASSERT_RESOURCE_ALLOCATION("ELI16141", pTempFile != NULL);
-			return pTempFile->getName();
+			// Check for inactive file (if inactive, make it active again)
+			if (isFileInactive(strLCName, true))
+			{
+				// Retrieve data structure
+				pCFD = ms_mapActiveFiles[strLCName];
+				ASSERT_RESOURCE_ALLOCATION( "ELI16140", pCFD != __nullptr );
+
+				CTime tmFile = getFileModificationTimeStamp( strName );
+				if (tmFile > pCFD->m_tmOriginalFileModificationTime)
+				{
+					// The file has been modified since being added to the cache
+					// so a new cache entry must be created and the old entry replaced
+					CachedFileData* pNewCFD = new CachedFileData( strName );
+					ASSERT_RESOURCE_ALLOCATION( "ELI16175", pNewCFD != __nullptr );
+
+					// Delete the previous CFD item
+					delete pCFD;
+					pCFD = pNewCFD;
+
+					// Overwrite this item in the map
+					ms_mapActiveFiles[strLCName] = pCFD;
+				}
+			}
+			else // Not inactive, need to create a new cached file
+			{
+				// Create new data structure
+				pCFD = new CachedFileData( strName );
+				ASSERT_RESOURCE_ALLOCATION( "ELI16144", pCFD != __nullptr );
+
+				// Add this data structure to the map
+				ms_mapActiveFiles[strLCName] = pCFD;
+			}
 		}
-	}
-	// File must be added to the map of active files
-	else
-	{
-		// Create new data structure
-		CachedFileData* pCFD = new CachedFileData( strName );
-		ASSERT_RESOURCE_ALLOCATION( "ELI16144", pCFD != NULL );
 
-		// Add this file and data structure to the map
-		ms_mapActiveFiles[strLCName] = pCFD;
+		// Unlock the mutex
+		lg.Unlock();
 
-#ifdef _CACHE_LOGGING
-		// Add entry to default log file
-		string strText = "Added new entry to map: ";
-		strText += strLCName;
-		tslf.writeLine( strText.c_str() );
-#endif
-
-		// Return name of working file
+		// Get the name of the temporary file (this is the file name that
+		// will be returned from this method)
 		TemporaryFileName* pTempFile = pCFD->m_apTFN.get();
-		ASSERT_RESOURCE_ALLOCATION("ELI25272", pTempFile != NULL);
-		return pTempFile->getName();
+		ASSERT_RESOURCE_ALLOCATION("ELI25272", pTempFile != __nullptr);
+
+		// Replace the LC name with the temporary file name (this is the
+		// value that will be returned from the method)
+		strLCName = pTempFile->getName();
+
+		// Wait for the temporary file conversion to complete
+		pCFD->waitForConversion();
+
+		// Return the temporary name
+		return strLCName;
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31870");
 }
 //--------------------------------------------------------------------------------------------------
 void PDFInputOutputMgr::addItemToInactiveQueue(CachedFileData* pCFD)
 {
-	// Retrieve lower-case copy of original filename
-	ASSERT_ARGUMENT( "ELI16169", pCFD != NULL );
-	string strLCName = pCFD->m_strLCOriginalFileName;
+	ASSERT_ARGUMENT( "ELI16169", pCFD != __nullptr );
 
 	// Protect collections against access by other threads
 	CSingleLock lg( &ms_mutex, TRUE );
 
 	// Just return if file is already in the inactive queue
-	if (isFileInactive( strLCName, false ))
+	if (isFileInactive(pCFD))
 	{
 		return;
 	}
@@ -360,20 +361,29 @@ void PDFInputOutputMgr::addItemToInactiveQueue(CachedFileData* pCFD)
 	// Check previous cache size
 	if (ms_quInactiveFiles.size() == ms_nMaxCacheSize)
 	{
-#ifdef _CACHE_LOGGING
-		// Add entry to default log file
-		ThreadSafeLogFile tslf;
-		string strText = "Queue is too full for: ";
-		strText += strLCName;
-		tslf.writeLine( strText.c_str() );
-#endif
-
 		// Cache is already full, remove the oldest item
 		removeLastItem();
 	}
 
 	// Add this item to the top of the queue
 	ms_quInactiveFiles.push_front( pCFD );
+}
+//--------------------------------------------------------------------------------------------------
+bool PDFInputOutputMgr::isFileInactive(CachedFileData* pCFD)
+{
+	deque<CachedFileData*>::iterator quIter;
+
+	// Protect collections against access by other threads
+	CSingleLock lg( &ms_mutex, TRUE );
+	for(quIter = ms_quInactiveFiles.begin(); quIter != ms_quInactiveFiles.end(); quIter++)
+	{
+		if (*quIter == pCFD)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 //--------------------------------------------------------------------------------------------------
 bool PDFInputOutputMgr::isFileInactive(const string &strLCName, bool bMoveToActive)
@@ -387,7 +397,7 @@ bool PDFInputOutputMgr::isFileInactive(const string &strLCName, bool bMoveToActi
 	{
 		// Retrieve this data structure
 		CachedFileData* pThisCFD = *quIter;
-		ASSERT_RESOURCE_ALLOCATION( "ELI16146", pThisCFD != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI16146", pThisCFD != __nullptr );
 
 		// Compare the filenames : case-insensitive
 		if (strLCName == pThisCFD->m_strLCOriginalFileName)
@@ -410,43 +420,32 @@ bool PDFInputOutputMgr::isFileInactive(const string &strLCName, bool bMoveToActi
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
-bool PDFInputOutputMgr::isFileInMap(const string &strLCName)
+CachedFileData* PDFInputOutputMgr::getFileFromMap(const string& strLCName, bool bErase)
 {
-	// Protect collections against access by other threads
-	CSingleLock lg( &ms_mutex, TRUE );
+	CachedFileData* pReturn = __nullptr;
 
-	return (ms_mapActiveFiles.count(strLCName) > 0);
+	map<string, CachedFileData*>::iterator it = ms_mapActiveFiles.find(strLCName);
+	if (it != ms_mapActiveFiles.end())
+	{
+		pReturn = it->second;
+		if (bErase)
+		{
+			ms_mapActiveFiles.erase(it);
+		}
+	}
+
+	return pReturn;
 }
 //--------------------------------------------------------------------------------------------------
 void PDFInputOutputMgr::removeActiveFile(const string &strLCName)
 {
-	// Protect collections against access by other threads
-	CSingleLock lg( &ms_mutex, TRUE );
-
-	// Check the map of active files
-	if (isFileInMap( strLCName ))
+	// Get the cached data for the file from the map, removing it from the
+	// map if it is found.
+	CachedFileData* pCFD = getFileFromMap(strLCName, true);
+	if (pCFD != __nullptr)
 	{
-		// Retrieve the data structure
-		CachedFileData* pCFD = ms_mapActiveFiles[strLCName];
-		ASSERT_RESOURCE_ALLOCATION( "ELI16148", pCFD != NULL );
-
-		// Add the data structure to the top of the inactive files queue
+		// Add the cached data to the inactive queue
 		addItemToInactiveQueue( pCFD );
-
-#ifdef _CACHE_LOGGING
-		// Add log file entry
-		ThreadSafeLogFile tslf;
-		string strText = "Moved file to inactive queue: ";
-		strText += pCFD->m_strLCOriginalFileName;
-		tslf.writeLine( strText.c_str() );
-#endif
-
-		// Remove this map entry
-		map<string, CachedFileData *>::iterator mapIter = ms_mapActiveFiles.find( strLCName );
-		if (mapIter != ms_mapActiveFiles.end())
-		{
-			ms_mapActiveFiles.erase( mapIter );
-		}
 	}
 	// else not contained in the map so no movement is needed
 }
@@ -458,15 +457,7 @@ void PDFInputOutputMgr::removeLastItem()
 
 	// Retrieve last inactive file
 	CachedFileData* pLastCFD = ms_quInactiveFiles.back();
-	ASSERT_RESOURCE_ALLOCATION( "ELI16139", pLastCFD != NULL );
-
-#ifdef _CACHE_LOGGING
-	// Add log file entry
-	ThreadSafeLogFile tslf;
-	string strText = "Removing last item from queue: ";
-	strText += pLastCFD->strLCOriginalFileName;
-	tslf.writeLine( strText.c_str() );
-#endif
+	ASSERT_RESOURCE_ALLOCATION( "ELI16139", pLastCFD != __nullptr );
 
 	// Delete the CachedFileData object, also deleting the temporary file
 	delete pLastCFD;

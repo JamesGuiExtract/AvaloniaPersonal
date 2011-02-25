@@ -57,7 +57,7 @@ bool	LeadToolsPDFLoadLocker::ms_bSerializeLeadToolsCalls = false;
 
 //-------------------------------------------------------------------------------------------------
 LeadToolsPDFLoadLocker::LeadToolsPDFLoadLocker(const string& strFileName)
-:m_pLock(NULL)
+:m_pLock(__nullptr)
 {
 	// If a file is PDF file, acquire ownership of the mutex
 	// so that other thread could not call the loadbitmap method
@@ -84,7 +84,7 @@ LeadToolsPDFLoadLocker::LeadToolsPDFLoadLocker(const string& strFileName)
 }
 //-------------------------------------------------------------------------------------------------
 LeadToolsPDFLoadLocker::LeadToolsPDFLoadLocker(const bool bProgrammaticallyForceLock)
-:m_pLock(NULL)
+:m_pLock(__nullptr)
 {
 	// Acquire ownership of the mutex so that other threads cannot call L_xxx() functions
 	if (bProgrammaticallyForceLock)
@@ -113,11 +113,11 @@ LeadToolsPDFLoadLocker::~LeadToolsPDFLoadLocker()
 {
 	try
 	{
-		if (m_pLock)
+		if (m_pLock != __nullptr)
 		{
 			// Release the mutex
 			delete m_pLock;
-			m_pLock = NULL;
+			m_pLock = __nullptr;
 		}
 	}	
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16469");
@@ -1114,7 +1114,7 @@ void convertPDFToTIF(const string& strPDF, const string& strTIF)
 
 			// Run the EXE with arguments and appropriate wait time (P13 #4415)
 			// Use infinite wait time (P13 #4634)
-			runExtractEXE( strEXEPath, strArguments, INFINITE );
+			runExeWithProcessKiller(strEXEPath, true, strArguments);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25221")
 	}

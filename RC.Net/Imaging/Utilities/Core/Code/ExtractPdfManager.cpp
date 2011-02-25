@@ -14,6 +14,7 @@ using namespace System::Windows::Forms;
 // Public methods
 //--------------------------------------------------------------------------------------------------
 ExtractPdfManager::ExtractPdfManager(System::String ^fileName, bool fileUsedAsInput)
+	: _pdfFile(__nullptr)
 {
 	try
 	{
@@ -34,6 +35,12 @@ ExtractPdfManager::ExtractPdfManager(System::String ^fileName, bool fileUsedAsIn
 	}
 	catch(UCLIDException& uex)
 	{
+		if (_pdfFile != __nullptr)
+		{
+			delete _pdfFile;
+			_pdfFile = __nullptr;
+		}
+
 		ExtractException^ ee = gcnew ExtractException("ELI28018",
 			"Unable to create new ExtractPdfManager.",
 			StringHelpers::AsSystemString(uex.asStringizedByteStream()));
@@ -41,6 +48,12 @@ ExtractPdfManager::ExtractPdfManager(System::String ^fileName, bool fileUsedAsIn
 	}
 	catch(Exception^ ex)
 	{
+		if (_pdfFile != __nullptr)
+		{
+			delete _pdfFile;
+			_pdfFile = __nullptr;
+		}
+
 		// Wrap all exceptions as an ExtractException
 		ExtractException^ ee = ExtractException::AsExtractException("ELI28019", ex);
 		throw ee;
@@ -50,12 +63,12 @@ ExtractPdfManager::ExtractPdfManager(System::String ^fileName, bool fileUsedAsIn
 ExtractPdfManager::~ExtractPdfManager()
 {
 	// Release the PDF manager
-	if (_pdfFile != NULL)
+	if (_pdfFile != __nullptr)
 	{
 		try
 		{
 			delete _pdfFile;
-			_pdfFile = NULL;
+			_pdfFile = __nullptr;
 		}
 		catch(Exception^ ex)
 		{
@@ -112,7 +125,7 @@ String^ ExtractPdfManager::FileNameInformationString::get()
 //--------------------------------------------------------------------------------------------------
 ExtractPdfManager::!ExtractPdfManager()
 {
-	if (_pdfFile != NULL)
+	if (_pdfFile != __nullptr)
 	{
 		try
 		{
