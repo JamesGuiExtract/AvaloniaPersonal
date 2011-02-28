@@ -117,7 +117,7 @@ namespace Extract.Imaging
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28012",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 // Ensure that the image object is not null and that the percentage is
                 // greater than 0
@@ -170,7 +170,7 @@ namespace Extract.Imaging
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30248",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 if (angle != 0)
                 {
@@ -212,7 +212,7 @@ namespace Extract.Imaging
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI30247",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 // Clip the bounds within the bounds of the image
                 bounds.Intersect(new Rectangle(new Point(0,0), new Size(source.Width, source.Height)));
@@ -290,7 +290,7 @@ namespace Extract.Imaging
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28013",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 // Calculate the skew of the raster zone in degrees.
                 skew = zone.ComputeSkew(true);
@@ -476,7 +476,7 @@ namespace Extract.Imaging
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28054",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 // Sometimes the call to CreateLeadDC can return an IntPtr.Zero, in this
                 // case we should dispose of the page, call garbage collection, reclone
@@ -719,7 +719,7 @@ namespace Extract.Imaging
 
                 using (ImageReader reader = codecs.CreateReader(fileName))
                 {
-                    return IsPdf(reader.Format);
+                    return reader.IsPdf;
                 }
             }
             catch (Exception ex)

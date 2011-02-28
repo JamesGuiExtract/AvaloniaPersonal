@@ -274,6 +274,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.FileProcessors", "..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj", "{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C} = {14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
 EndProject
@@ -473,12 +474,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Redaction.CustomCom
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModifyPdfFile", "..\..\..\..\..\RC.Net\Imaging\Utilities\ModifyPdfFile\Core\Code\ModifyPdfFile.csproj", "{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 148
+		ProjectCount = 149
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -627,6 +630,7 @@ Global
 		ProjectRelativeDiskPath146 = ..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Code\SQLCDBEditor.csproj
 		ProjectRelativeDiskPath147 = ..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj
 		ProjectRelativeDiskPath148 = ..\..\..\..\..\RC.Net\Redaction\CustomComponentsHelper\Core\Code\Extract.Redaction.CustomComponentsHelper.csproj
+		ProjectRelativeDiskPath149 = ..\..\..\..\..\RC.Net\Imaging\Utilities\ModifyPdfFile\Core\Code\ModifyPdfFile.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2125,6 +2129,14 @@ Global
 		{66E9E1CC-5169-463F-AD55-001ACD1F4080}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{66E9E1CC-5169-463F-AD55-001ACD1F4080}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{66E9E1CC-5169-463F-AD55-001ACD1F4080}.Release|Win32.ActiveCfg = Release|Any CPU
+		{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}.Debug|Win32.ActiveCfg = Debug|x86
+		{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}.Release|Any CPU.ActiveCfg = Release|x86
+		{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}.Release|Win32.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

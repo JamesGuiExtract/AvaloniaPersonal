@@ -29,7 +29,7 @@ namespace Extract.Imaging
         /// <see langword="true"/> if <see cref="ImageCodecs"/> has been disposed; 
         /// <see langword="false"/> if <see cref="ImageCodecs"/> has not been disposed.
         /// </summary>
-        bool _disposed;
+        volatile bool _disposed;
 
         /// <summary>
         /// <see langword="true"/> if PDF documents should be loaded as bitonal images; 
@@ -196,10 +196,10 @@ namespace Extract.Imaging
         {
             if (disposing && !_disposed)
             {
+                _disposed = true;
+
                 // Dispose of managed objects
                 RasterCodecs.Shutdown();
-
-                _disposed = true;
             }
 
             // Dispose of unmanaged resources

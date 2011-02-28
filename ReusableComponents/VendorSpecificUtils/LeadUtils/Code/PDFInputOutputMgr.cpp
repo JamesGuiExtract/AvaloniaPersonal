@@ -9,15 +9,6 @@
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
 
-// By default, logging can only be enabled in debug mode
-#ifdef _DEBUG
-//#define _CACHE_LOGGING
-#endif
-
-#ifdef _CACHE_LOGGING
-#include <ThreadSafeLogFile.h>
-#endif
-
 using namespace std;
 
 //--------------------------------------------------------------------------------------------------

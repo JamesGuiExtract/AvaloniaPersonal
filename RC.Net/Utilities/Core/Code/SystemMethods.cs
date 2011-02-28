@@ -1,11 +1,12 @@
+using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.ServiceProcess;
-using Extract.Licensing;
 
 namespace Extract.Utilities
 {
@@ -263,6 +264,54 @@ namespace Extract.Utilities
                         controller.Dispose();
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Runs the specified executable with the specified arguments, appends a /ef [TempFile]
+        /// to the argument list. If an exception is logged to the temp file, it will be
+        /// loaded and thrown.
+        /// </summary>
+        /// <param name="exeFile">The executable to run.</param>
+        /// <param name="arguments">The command line arguments for the executable.</param>
+        public static void RunExtractExecutable(string exeFile,  IEnumerable<string> arguments)
+        {
+            try
+            {
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI31884", _OBJECT_NAME);
+
+                using (var tempFile = new TemporaryFile(".uex"))
+                using (var process = new Process())
+                {
+                    // Add the /ef argument to the list of arguments
+                    var args = new List<string>(arguments);
+                    args.Add(string.Concat("/ef \"", tempFile.FileName, "\""));
+
+                    // Set the start info for the process
+                    process.StartInfo = new ProcessStartInfo(exeFile,
+                        string.Join(" ", args.ToArray()));
+
+                    // Launch the process and wait for exit
+                    process.Start();
+                    process.WaitForExit();
+
+                    var info = new FileInfo(tempFile.FileName);
+                    if (info.Length > 0)
+                    {
+                        throw ExtractException.LoadFromFile("ELI31875", tempFile.FileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI31876");
+                ee.AddDebugData("Executable Name", exeFile, false);
+
+                // Encrypt the arguments as they may contain passwords or other information
+                ee.AddDebugData("Arguments", string.Join(", ", arguments.ToArray()), true);
+
+                throw ee;
             }
         }
     }

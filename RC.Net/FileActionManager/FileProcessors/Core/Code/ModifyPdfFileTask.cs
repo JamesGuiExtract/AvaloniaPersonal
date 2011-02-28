@@ -2,7 +2,6 @@ using Extract.Imaging;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
-using PegasusImaging.WinForms.PdfXpress3;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +12,7 @@ using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using System.Reflection;
 
 namespace Extract.FileActionManager.FileProcessors
 {
@@ -39,12 +39,11 @@ namespace Extract.FileActionManager.FileProcessors
         const int _CURRENT_VERSION = 1;
 
         /// <summary>
-        /// The XFDF text as a <see cref="T:byte[]"/>.
+        /// The path to the modify pdf file executable (looks for the exe alongside this assembly).
         /// </summary>
-        static readonly byte[] _xfdfBytes = BuildEmptyXfdfStream();
-
-        // Unlock codes for the PdfXpress engine
-        static readonly int[] _ul = new int[] {352502263,995632770,1963445779,32594};
+        static readonly string _MODIFY_PDF = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+            "ModifyPdfFile.exe");
 
         #endregion Constants
 
@@ -64,12 +63,6 @@ namespace Extract.FileActionManager.FileProcessors
         /// Used to check whether the document is a PDF file or not.
         /// </summary>
         ImageCodecs _codecs;
-
-        /// <summary>
-        /// Mutex used to guarantee single threadedness to the remove annotations method
-        /// </summary>
-        static Mutex _mutex =
-            ThreadingMethods.GetGlobalNamedMutex(@"Global\EC9E480D-BE75-4749-A5DF-2FD6583F8FAC");
 
         #endregion Fields
 
@@ -182,113 +175,6 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29647", ex);
-            }
-        }
-
-        /// <summary>
-        /// Builds an empty xfdf byte array.
-        /// </summary>
-        /// <returns>A <see cref="T:byte[]"/> containing an empty xfdf string.</returns>
-        static byte[] BuildEmptyXfdfStream()
-        {
-            // The xfdf string to remove annotations
-            string xfdfText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xfdf xmlns="
-                + "\"http://ns.adobe.com/xfdf/\" xml:space=\"preserve\"><annots/><ids original="
-                + "\"0FF75CC9984F9D5DB0952D7ABA83CDE4\" modified=\"0FF75CC9984F9D5DB0952D7ABA83CDE4\"/>"
-                + "</xfdf>";
-
-            // Convert the string to a byte array
-            byte[] xfdf = ASCIIEncoding.ASCII.GetBytes(xfdfText);
-
-            return xfdf;
-        }
-
-        /// <summary>
-        /// Removes the annotations from the specified file.
-        /// </summary>
-        /// <param name="pdfFile">The file to remove annotations from.</param>
-        void RemoveAnnotationsFromPdfFile(string pdfFile)
-        {
-            // Ensure a file name was specified and that it exists.
-            ExtractException.Assert("ELI29701", "Specified PDF file does not exist.",
-                !string.IsNullOrEmpty(pdfFile) && File.Exists(pdfFile), "PDF File Name", pdfFile);
-
-            // Ensure the file is a PDF file [LRCAU #5729]
-            ExtractException.Assert("ELI29695", "File is not a pdf file.",
-                ImageMethods.IsPdf(pdfFile, _codecs), "PDF File Name", pdfFile);
-
-            PdfXpress express = null;
-            Document document = null;
-            TemporaryFile tempFile = null;
-            try
-            {
-                // Block until the mutex is available
-                _mutex.WaitOne();
-
-                // Create a temporary PDF file to write to
-                tempFile = new TemporaryFile(".pdf");
-
-                // Initialize the PdfXpress engine
-                express = new PdfXpress();
-                express.Initialize();
-                express.Licensing.UnlockRuntime(_ul[0], _ul[1], _ul[2], _ul[3]);
-
-                // Open the file
-                document = new Document(express, pdfFile);
-
-                // Check for remove annotations
-                if (_settings.RemoveAnnotations)
-                {
-                    // Create the Xfdf options (set all annotations on all pages and allow delete)
-                    XfdfOptions xfdfoptions = new XfdfOptions();
-                    xfdfoptions.WhichAnnotation = XfdfOptions.AllAnnotations;
-                    xfdfoptions.WhichPage = XfdfOptions.AllPages;
-                    xfdfoptions.CanDeleteAnnotations = true;
-
-                    // Import the xfdf bytes containing no annotations (this will remove
-                    // the annotations from the document)
-                    document.ImportXfdf(xfdfoptions, _xfdfBytes);
-                }
-
-                // Set the save file options to save to the temp file
-                SaveOptions sfo = new SaveOptions();
-                sfo.Filename = tempFile.FileName;
-                sfo.Overwrite = true;
-
-                // Save the document
-                document.Save(sfo);
-
-                // Dispose of the pdf express document
-                document.Dispose();
-                document = null;
-
-                // Move the temp file to the destination
-                FileSystemMethods.MoveFile(tempFile.FileName, pdfFile, true);
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI29702", ex);
-                ee.AddDebugData("PDF File Name", pdfFile, false);
-                throw ee;
-            }
-            finally
-            {
-                if (document != null)
-                {
-                    document.Dispose();
-                }
-                if (tempFile != null)
-                {
-                    tempFile.Dispose();
-                }
-                if (express != null)
-                {
-                    express.Dispose();
-                }
-
-                // Ensure the mutex is released (do this as the last step after
-                // the PdfXpress engine is released)
-                _mutex.ReleaseMutex();
             }
         }
 
@@ -428,11 +314,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (_codecs != null)
-                {
-                    _codecs.Dispose();
-                    _codecs = null;
-                }
+                // Do nothing
             }
             catch (Exception ex)
             {
@@ -455,9 +337,6 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.PegasusPdfxpressModifyPdf,
                     "ELI29653", _COMPONENT_DESCRIPTION);
-
-                // Create the ImageCodecs object
-                _codecs = new ImageCodecs();
             }
             catch (Exception ex)
             {
@@ -469,9 +348,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Processes the specified file.
         /// </summary>
-		/// <param name="pFileRecord">The file record that contains the info of the file being 
-		/// processed.</param>
-		/// <param name="nActionID">The ID of the action being processed.</param>
+        /// <param name="pFileRecord">The file record that contains the info of the file being 
+        /// processed.</param>
+        /// <param name="nActionID">The ID of the action being processed.</param>
         /// <param name="pFAMTM">A File Action Manager Tag Manager for expanding tags.</param>
         /// <param name="pDB">The File Action Manager database.</param>
         /// <param name="pProgressStatus">Object to provide progress status updates to caller.
@@ -499,8 +378,24 @@ namespace Extract.FileActionManager.FileProcessors
                 // Expand any path tags in the file name
                 string pdfFile = pathTags.Expand(_settings.PdfFile);
 
-                // Remove the annotations
-                RemoveAnnotationsFromPdfFile(pdfFile);
+                // Modify the pdf to a temporary file, only copy if all is successful.
+                using (var tempFile = new TemporaryFile(".pdf"))
+                {
+                    var args = new List<string>();
+                    args.Add(string.Concat("\"", pdfFile, "\""));
+                    args.Add(string.Concat("\"", tempFile.FileName, "\""));
+                    args.Add("/o");
+                    if (_settings.RemoveAnnotations)
+                    {
+                        args.Add("/ra");
+                    }
+
+                    // Run the modify pdf executable
+                    SystemMethods.RunExtractExecutable(_MODIFY_PDF, args);
+
+                    // All was successful, move the temporary file back to the source file.
+                    FileSystemMethods.MoveFile(tempFile.FileName, pdfFile, true);
+                }
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
@@ -514,23 +409,23 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
-		#endregion IFileProcessingTask Members
+        #endregion IFileProcessingTask Members
 
-		#region IAccessRequired Members
+        #region IAccessRequired Members
 
-		/// <summary>
-		/// Returns bool value indicating if the task requires admin access
-		/// </summary>
-		/// <returns><see langword="true"/> if the task requires admin access
-		/// <see langword="false"/> if task does not require admin access</returns>
-		public bool RequiresAdminAccess()
-		{
-			return false;
-		}
+        /// <summary>
+        /// Returns bool value indicating if the task requires admin access
+        /// </summary>
+        /// <returns><see langword="true"/> if the task requires admin access
+        /// <see langword="false"/> if task does not require admin access</returns>
+        public bool RequiresAdminAccess()
+        {
+            return false;
+        }
 
-		#endregion IAccessRequired Members
+        #endregion IAccessRequired Members
 
-		#region ILicensedComponent Members
+        #region ILicensedComponent Members
 
         /// <summary>
         /// Gets whether this component is licensed.
@@ -611,7 +506,7 @@ namespace Extract.FileActionManager.FileProcessors
         public void Save(System.Runtime.InteropServices.ComTypes.IStream stream, bool clearDirty)
         {
             try 
-	        {
+            {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
                     // Serialize the settings
@@ -625,12 +520,12 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _dirty = false;
                 }
-	        }
-	        catch (Exception ex)
-	        {
-		        throw ExtractException.CreateComVisible("ELI29661", 
-			        "Unable to save Modify pdf task.", ex);
-	        }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI29661", 
+                    "Unable to save Modify pdf task.", ex);
+            }
         }
 
         /// <summary>

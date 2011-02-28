@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Extract.Utilities
 {
@@ -236,6 +237,27 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI31702");
+            }
+        }
+
+        /// <summary>
+        /// Displays a message box with the specified message and caption.
+        /// </summary>
+        /// <param name="message">The message to display.</param>
+        /// <param name="caption">The caption for the message box.</param>
+        /// <param name="error">If <see langword="true"/> displays the error icon, otherwise
+        /// displays the information icon.</param>
+        public static void ShowMessageBox(string message, string caption, bool error)
+        {
+            try
+            {
+                MessageBox.Show(message, caption, MessageBoxButtons.OK,
+                    error ? MessageBoxIcon.Error : MessageBoxIcon.Information,
+                    MessageBoxDefaultButton.Button1, 0);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI31890");
             }
         }
     }

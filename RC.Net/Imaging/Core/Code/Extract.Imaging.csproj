@@ -101,6 +101,7 @@
       <DependentUpon>BatesNumberFormatPropertyPage.cs</DependentUpon>
     </Compile>
     <Compile Include="BatesNumberHelper.cs" />
+    <Compile Include="ImageConstants.cs" />
     <Compile Include="ImagePageProperties.cs" />
     <Compile Include="ImageReader.cs" />
     <Compile Include="ImageCodecs.cs" />

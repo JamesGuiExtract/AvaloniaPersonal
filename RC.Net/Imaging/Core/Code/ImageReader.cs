@@ -58,7 +58,7 @@ namespace Extract.Imaging
         /// <see langword="true"/> if the image is a portable document format (PDF) file;
         /// <see langword="false"/> if the image is not a PDF file.
         /// </summary>
-        readonly bool _isPdf;
+        public bool IsPdf { get; private set; }
 
         /// <summary>
         /// The command used to modify PDF files back to 1 bit per pixel after loading
@@ -120,13 +120,19 @@ namespace Extract.Imaging
                     }
                 }
 
-                _isPdf = ImageMethods.IsPdf(_format);
+                IsPdf = ImageMethods.IsPdf(_format);
             }
             catch (Exception ex)
             {
                 if (_stream != null)
                 {
                     _stream.Dispose();
+                    _stream = null;
+                }
+                if (_codecs != null)
+                {
+                    _codecs.Dispose();
+                    _codecs = null;
                 }
 
                 ExtractException ee = new ExtractException("ELI28623",
@@ -179,7 +185,7 @@ namespace Extract.Imaging
             try
             {
                 lock (_lock)
-                using (new PdfLock(_isPdf))
+                using (new PdfLock(IsPdf))
                 {
                     if (!_loadedImages.TryGetValue(pageNumber, out image))
                     {
@@ -187,7 +193,7 @@ namespace Extract.Imaging
                             pageNumber, pageNumber);
 
                         // If loading PDF as bitonal and this file is a PDF, set bits per pixel to 1
-                        if (_loadPdfAsBitonal && _isPdf)
+                        if (_loadPdfAsBitonal && IsPdf)
                         {
                             ConvertToBitonalImage(image);
                         }
@@ -229,14 +235,14 @@ namespace Extract.Imaging
                     }
                     else
                     {
-                        using (new PdfLock(_isPdf))
+                        using (new PdfLock(IsPdf))
                         {
                             image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
                                 pageNumber, pageNumber);
 
                             // If loading PDF as bitonal and this file is a PDF, set bits per pixel
                             // to 1
-                            if (_loadPdfAsBitonal && _isPdf)
+                            if (_loadPdfAsBitonal && IsPdf)
                             {
                                 ConvertToBitonalImage(image);
                             }
@@ -290,7 +296,7 @@ namespace Extract.Imaging
             try
             {
                 lock (_lock)
-                using (new PdfLock(_isPdf))
+                using (new PdfLock(IsPdf))
                 {
                     // Get the dimensions of this page.
                     ImagePageProperties properties = GetPageProperties(pageNumber);
@@ -328,7 +334,7 @@ namespace Extract.Imaging
         {
             try
             {
-                using (new PdfLock(_isPdf))
+                using (new PdfLock(IsPdf))
                 {
                     return GetPageProperties(pageNumber); 
                 }
@@ -372,7 +378,7 @@ namespace Extract.Imaging
             {
                 lock (_lock)
                 {
-                    return _isPdf ? null :
+                    return IsPdf ? null :
                         _codecs.ReadTag(_fileName, pageNumber, RasterTagMetadata.AnnotationTiff);
                 }
             }
@@ -397,7 +403,7 @@ namespace Extract.Imaging
             try
             {
                 lock(_lock)
-                using (new PdfLock(_isPdf))
+                using (new PdfLock(IsPdf))
                 {
                     image = _codecs.Load(_stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 
                 }
@@ -444,17 +450,22 @@ namespace Extract.Imaging
             if (disposing)
             {
                 // Dispose of managed objects
-                CollectionMethods.ClearAndDispose(_loadedImages);
-                if (_codecs != null)
+                if (_loadedImages != null)
                 {
-                    _codecs.Dispose();
-                    _codecs = null;
+                    CollectionMethods.ClearAndDispose(_loadedImages);
+                    _loadedImages = null;
                 }
                 if (_stream != null)
                 {
                     _stream.Dispose();
                     _stream = null;
                 }
+                if (_codecs != null)
+                {
+                    _codecs.Dispose();
+                    _codecs = null;
+                }
+
                 // Log that the lock was released if necessary
                 if (RegistryManager.LogFileLocking)
                 {
