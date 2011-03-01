@@ -3,6 +3,7 @@ using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
@@ -12,39 +13,13 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileProcessors
 {
     /// <summary>
-    /// Specifies a the resolution <see cref="CreateFileTask"/> should take when the target file
-    /// already exists.
-    /// </summary>
-    public enum CreateFileConflictResolution
-    {
-        /// <summary>
-        /// Don't write the file; throw an exception.
-        /// </summary>
-        GenerateError = 0,
-
-        /// <summary>
-        /// Don't write the file; continue without exception.
-        /// </summary>
-        SkipWithoutError = 1,
-
-        /// <summary>
-        /// Overwrite the existing file.
-        /// </summary>
-        Overwrite = 2,
-
-        /// <summary>
-        /// Append to the existing file.
-        /// </summary>
-        Append = 3
-    }
-
-    /// <summary>
-    /// An <see cref="IFileProcessingTask"/> which generates a file.
+    /// An <see cref="IFileProcessingTask"/> which deletes a specified directory so long as it is
+    /// empty.
     /// </summary>
     [ComVisible(true)]
-    [Guid("4D7F59D3-ECD2-46F0-8750-71194A131777")]
-    [ProgId("Extract.FileActionManager.FileProcessors.CreateFileTask")]
-    public class CreateFileTask : ICategorizedComponent, IConfigurableObject,
+    [Guid("A697CE90-5D82-4674-98C4-181BF46846B0")]
+    [ProgId("Extract.FileActionManager.FileProcessors.DeleteEmptyFolderTask")]
+    public class DeleteEmptyFolderTask : ICategorizedComponent, IConfigurableObject,
         IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask,
         ILicensedComponent, IPersistStream
     {
@@ -53,7 +28,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Create file";
+        const string _COMPONENT_DESCRIPTION = "Core: Delete empty folder";
 
         /// <summary>
         /// Current task version.
@@ -65,20 +40,24 @@ namespace Extract.FileActionManager.FileProcessors
         #region Fields
 
         /// <summary>
-        /// The name of the file to be generated.
+        /// The name of the folder to be deleted (if empty).
         /// </summary>
-        string _fileName;
+        string _folderName;
 
         /// <summary>
-        /// The contents of the file to be generated.
+        /// Indicates whether any root folder which end up empty as well should be deleted too.
         /// </summary>
-        string _fileContents;
+        bool _deleteRecursively;
 
         /// <summary>
-        /// The <see cref="CreateFileConflictResolution"/> that should be employed when the target
-        /// file already exists.
+        /// Indicates whether recursive deletion should be stopped at a specified folder.
         /// </summary>
-        CreateFileConflictResolution _conflictResolution;
+        bool _limitRecursion;
+
+        /// <summary>
+        /// If _limitRecursion is set, the folder at which deletion should be stopped.
+        /// </summary>
+        string _recursionLimit;
 
         /// <summary>
         /// Indicates that settings have been changed, but not saved.
@@ -90,18 +69,18 @@ namespace Extract.FileActionManager.FileProcessors
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateFileTask"/> class.
+        /// Initializes a new instance of the <see cref="DeleteEmptyFolderTask"/> class.
         /// </summary>
-        public CreateFileTask()
+        public DeleteEmptyFolderTask()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateFileTask"/> class.
+        /// Initializes a new instance of the <see cref="DeleteEmptyFolderTask"/> class.
         /// </summary>
-        /// <param name="task">The <see cref="CreateFileTask"/> from which settings should
+        /// <param name="task">The <see cref="DeleteEmptyFolderTask"/> from which settings should
         /// be copied.</param>
-        public CreateFileTask(CreateFileTask task)
+        public DeleteEmptyFolderTask(DeleteEmptyFolderTask task)
         {
             try
             {
@@ -109,7 +88,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI31849");
+                throw ex.AsExtract("ELI31855");
             }
         }
 
@@ -131,7 +110,7 @@ namespace Extract.FileActionManager.FileProcessors
         #region IConfigurableObject Members
 
         /// <summary>
-        /// Performs configuration needed to create a valid <see cref="CreateFileTask"/>.
+        /// Performs configuration needed to create a valid <see cref="DeleteEmptyFolderTask"/>.
         /// </summary>
         /// <returns><see langword="true"/> if the configuration was successfully updated or
         /// <see langword="false"/> if configuration was unsuccessful.</returns>
@@ -139,17 +118,19 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                using (var dialog = new CreateFileTaskSettingsDialog())
+                using (var dialog = new DeleteEmptyFolderTaskSettingsDialog())
                 {
-                    dialog.FileName = _fileName;
-                    dialog.FileContents = _fileContents;
-                    dialog.CreateFileConflictResolution = _conflictResolution;
+                    dialog.FolderName = _folderName;
+                    dialog.DeleteRecursively = _deleteRecursively;
+                    dialog.LimitRecursion = _limitRecursion;
+                    dialog.RecursionLimit = _recursionLimit;
 
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
-                        _fileName = dialog.FileName;
-                        _fileContents = dialog.FileContents;
-                        _conflictResolution = dialog.CreateFileConflictResolution;
+                        _folderName = dialog.FolderName;
+                        _deleteRecursively = dialog.DeleteRecursively;
+                        _limitRecursion = dialog.LimitRecursion;
+                        _recursionLimit = dialog.RecursionLimit;
 
                         _dirty = true;
                         return true;
@@ -160,7 +141,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI31833",
+                throw ExtractException.CreateComVisible("ELI31856",
                     "Error running configuration.", ex);
             }
         }
@@ -178,7 +159,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </returns>
         public bool IsConfigured()
         {
-            return !string.IsNullOrWhiteSpace(_fileName);
+            return !string.IsNullOrWhiteSpace(_folderName);
         }
 
         #endregion IMustBeConfiguredObject Members
@@ -186,39 +167,39 @@ namespace Extract.FileActionManager.FileProcessors
         #region ICopyableObject Members
 
         /// <summary>
-        /// Creates a copy of the <see cref="CreateFileTask"/> instance.
+        /// Creates a copy of the <see cref="DeleteEmptyFolderTask"/> instance.
         /// </summary>
-        /// <returns>A copy of the <see cref="CreateFileTask"/> instance.</returns>
+        /// <returns>A copy of the <see cref="DeleteEmptyFolderTask"/> instance.</returns>
         public object Clone()
         {
             try
             {
-                return new CreateFileTask(this);
+                return new DeleteEmptyFolderTask(this);
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI31834", "Unable to clone object.", ex);
+                throw ExtractException.CreateComVisible("ELI31857", "Unable to clone object.", ex);
             }
         }
 
         /// <summary>
-        /// Copies the specified <see cref="CreateFileTask"/> instance into this one.
+        /// Copies the specified <see cref="DeleteEmptyFolderTask"/> instance into this one.
         /// </summary>
         /// <param name="pObject">The object from which to copy.</param>
         public void CopyFrom(object pObject)
         {
             try
             {
-                var task = pObject as CreateFileTask;
+                var task = pObject as DeleteEmptyFolderTask;
                 if (task == null)
                 {
-                    throw new InvalidCastException("Invalid cast to CreateFileTask");
+                    throw new InvalidCastException("Invalid cast to DeleteEmptyFolderTask");
                 }
                 CopyFrom(task);
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI31835", "Unable to copy object.", ex);
+                throw ExtractException.CreateComVisible("ELI31858", "Unable to copy object.", ex);
             }
         }
 
@@ -254,12 +235,12 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
-                    "ELI31850", _COMPONENT_DESCRIPTION);
+                validateLicense("ELI31859");
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI31851", "Unable to initialize \"Create file\" task.");
+                throw ex.CreateComVisible("ELI31860",
+                    "Unable to initialize \"Delete empty folder\" task.");
             }
         }
 
@@ -285,51 +266,64 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
-                    "ELI31836", _COMPONENT_DESCRIPTION);
+                validateLicense("ELI31861");
 
                 FileActionManagerPathTags pathTags =
                     new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir);
-                string fileName = pathTags.Expand(_fileName);
-                string fileContents = pathTags.Expand(_fileContents);
+                string folderName = pathTags.Expand(_folderName);
+                folderName = folderName.Replace('/', '\\').TrimEnd('\\');
 
-                ExtractException.Assert("ELI31854",
-                    "\"Create file\" task cannot write to the source document",
-                    !fileName.Equals(pFileRecord.Name, StringComparison.OrdinalIgnoreCase));
-
-                // Create the directory the file is to be written to if it does not already exist.
-                string directory = Path.GetDirectoryName(fileName);
-                if (!Directory.Exists(directory))
+                string recursionLimit = string.Empty;
+                if (_deleteRecursively && _limitRecursion)
                 {
-                    Directory.CreateDirectory(directory);
+                    recursionLimit = pathTags.Expand(_recursionLimit);
+                    recursionLimit = recursionLimit.Replace('/', '\\').TrimEnd('\\');
                 }
 
-                if (File.Exists(fileName))
+                // If the folder doesn't exist, there is nothing to do.
+                if (Directory.Exists(folderName))
                 {
-                    switch (_conflictResolution)
+                    if (_limitRecursion &&
+                        !folderName.StartsWith(recursionLimit, StringComparison.OrdinalIgnoreCase))
                     {
-                        case CreateFileConflictResolution.GenerateError:
-                            {
-                                ExtractException ee = new ExtractException("ELI31852",
-                                    "Create file task failed to create the file because it already existed.");
-                                ee.AddDebugData("Filename", fileName, false);
-                                throw ee;
-                            }
-
-                        case CreateFileConflictResolution.SkipWithoutError:
-                            {
-                                return EFileProcessingResult.kProcessingSuccessful;
-                            }
+                        ExtractException ee = new ExtractException("ELI31886",
+                            "Delete folder task is incorrectly configured. " +
+                            "Recursion limit folder is not a parent of the folder to delete.");
+                        ee.AddDebugData("Folder", folderName, false);
+                        ee.AddDebugData("Recursion Limit", recursionLimit, false);
+                        throw ee;
                     }
-                }
 
-                if (_conflictResolution == CreateFileConflictResolution.Append)
-                {
-                    File.AppendAllText(fileName, fileContents);
-                }
-                else
-                {
-                    File.WriteAllText(fileName, fileContents);
+                    // Delete this folder (if empty), then loop to delete parent folders if
+                    // _deleteAncestors is specified.
+                    while (!Directory.EnumerateFileSystemEntries(folderName).Any())
+                    {
+                        // If limiting recursion at a specific folder, check to see if this is
+                        // that folder.
+                        if (_limitRecursion
+                            && folderName.Length == recursionLimit.Length)
+                        {
+                            // If the parent folder is the recurions limit, stop the recursion.
+                            break;
+                        }
+
+                        Directory.Delete(folderName);
+                        if (!_deleteRecursively)
+                        {
+                            break;
+                        }
+                        
+                        DirectoryInfo parentInfo = Directory.GetParent(folderName);
+
+                        if (parentInfo == null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            folderName = parentInfo.FullName;
+                        }
+                    }
                 }
 
                 // If we reached this point then processing was successful
@@ -337,7 +331,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI31837", "Unable to process the file.");
+                throw ex.CreateComVisible("ELI31862", "Unable to process the file.");
             }
         }
 
@@ -372,7 +366,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI31838",
+                throw ExtractException.CreateComVisible("ELI31863",
                     "Unable to determine license status.", ex);
             }
         }
@@ -412,9 +406,10 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    _fileName = reader.ReadString();
-                    _fileContents = reader.ReadString();
-                    _conflictResolution = (CreateFileConflictResolution)reader.ReadInt32();
+                    _folderName = reader.ReadString();
+                    _deleteRecursively = reader.ReadBoolean();
+                    _limitRecursion = reader.ReadBoolean();
+                    _recursionLimit = reader.ReadString();
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -422,7 +417,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI31839",
+                throw ExtractException.CreateComVisible("ELI31864",
                     "Unable to load object from stream.", ex);
             }
         }
@@ -442,11 +437,12 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    writer.Write(_fileName);
-                    writer.Write(_fileContents);
-                    writer.Write((int)_conflictResolution);
+                    writer.Write(_folderName);
+                    writer.Write(_deleteRecursively);
+                    writer.Write(_limitRecursion);
+                    writer.Write(_recursionLimit);
 
-                   // Write to the provided IStream.
+                    // Write to the provided IStream.
                     writer.WriteTo(stream);
                 }
 
@@ -457,7 +453,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI31840",
+                throw ExtractException.CreateComVisible("ELI31865",
                     "Unable to save object to stream", ex);
             }
         }
@@ -501,16 +497,29 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Copies the specified <see cref="CreateFileTask"/> instance into this one.
+        /// Copies the specified <see cref="DeleteEmptyFolderTask"/> instance into this one.
         /// </summary>
-        /// <param name="task">The <see cref="CreateFileTask"/> from which to copy.</param>
-        void CopyFrom(CreateFileTask task)
+        /// <param name="task">The <see cref="DeleteEmptyFolderTask"/> from which to copy.</param>
+        void CopyFrom(DeleteEmptyFolderTask task)
         {
-            _fileName = task._fileName;
-            _fileContents = task._fileContents;
-            _conflictResolution = task._conflictResolution;
+            _folderName = task._folderName;
+            _deleteRecursively = task._deleteRecursively;
+            _limitRecursion = task._limitRecursion;
+            _recursionLimit = task._recursionLimit;
 
             _dirty = true;
+        }
+
+        /// <summary>
+        /// Throws an <see cref="ExtractException"/> if a the software is not properly licensed to
+        /// use this task.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with any thrown licensing exception.
+        /// </param>
+        static void validateLicense(string eliCode)
+        {
+            LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
+                eliCode, _COMPONENT_DESCRIPTION);
         }
 
         #endregion Private Members

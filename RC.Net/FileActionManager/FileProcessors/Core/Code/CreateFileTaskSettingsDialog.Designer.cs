@@ -200,7 +200,11 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this._fileNameTagsButton);
             this.Controls.Add(this._fileNameTextBox);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "CreateFileTaskSettingsDialog";
+            this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure: Create file";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
