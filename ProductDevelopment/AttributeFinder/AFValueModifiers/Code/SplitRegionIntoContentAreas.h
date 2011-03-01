@@ -238,6 +238,10 @@ private:
 		// Returns the total area in pixels;
 		int getArea() { return (Width() * Height()); }
 
+		// Less than operator is used by std::set. Adding this operator allows ContentAreaInfo to be
+		// used in a set.
+		friend bool operator < (const CRect& first, const CRect& second);
+
 		// Specifies the original area bounds prior to any modification.
 		CRect m_rectOriginal;
 
@@ -335,6 +339,10 @@ private:
 
 	// A collection of the current content area candidates
 	vector<ContentAreaInfo> m_vecContentAreas;
+
+	// Keeps track of new areas that have been created within expand and merge areas to ensure
+	// against getting in a loop where the same new area is being added repeatedly.
+	set<ContentAreaInfo> m_setPreviouslyAddedAreas;
 
 	// A collection of image areas that can be ignored in subsquent processing, either because the
 	// area is already a candidate, or it is determined that this area does not contain any content

@@ -1284,6 +1284,34 @@ CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const CRect &rect
 , m_eBottomBoundaryState(kNotFound)
 {
 }
+//--------------------------------------------------------------------------------------------------
+bool operator < (const CRect& first, const CRect& second)
+{
+	// A comparison of the rectangle bounds of a ContentAreaInfo objects is all we need for the set
+	// implementation (don't bother with the ContentAreaInfo specific fields).
+
+	if (first.left != second.left)
+	{
+		return first.left < second.left;
+	}
+
+	if (first.top != second.top)
+	{
+		return first.top < second.top;
+	}
+
+	if (first.right != second.right)
+	{
+		return first.right < second.right;
+	}
+	
+	if (first.bottom != second.bottom)
+	{
+		return first.bottom < second.bottom;
+	}	
+
+	return false;
+}
 
 //--------------------------------------------------------------------------------------------------
 // Private Methods
@@ -1321,6 +1349,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 		// Clear any existing results or excluded areas.
 		m_vecContentAreas.clear();
 		m_vecExcludedAreas.clear();
+		m_setPreviouslyAddedAreas.clear();
 
 		IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
 		ASSERT_RESOURCE_ALLOCATION("ELI22104", ipSubAttributes != NULL);
@@ -1669,8 +1698,19 @@ void CSplitRegionIntoContentAreas::expandAndMergeAreas()
 				// attemptMerge calls.
 				if (!vecAreasToAdd.empty())
 				{
-					m_vecContentAreas.insert(m_vecContentAreas.end(), 
-						vecAreasToAdd.begin(), vecAreasToAdd.end());
+					for (vector<ContentAreaInfo>::iterator iter = vecAreasToAdd.begin();
+						 iter != vecAreasToAdd.end();
+						 iter++)
+					{
+						// [FlexIDSCore:4570]
+						// To help ensure against an infinite loop, ensure expandAndMergeAreas hasn't
+						// already added an identical ContentAreaInfo.
+						if (m_setPreviouslyAddedAreas.find(*iter) == m_setPreviouslyAddedAreas.end())
+						{
+							m_vecContentAreas.push_back(*iter);
+							m_setPreviouslyAddedAreas.insert(*iter);
+						}
+					}
 				}
 			}
 		}
@@ -2323,6 +2363,7 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 					{
 						ContentAreaInfo newArea(*pImpressionableArea);
 						newArea.top = areaLower.bottom;
+						newArea.m_eTopBoundaryState = kLocked;
 						rvecAreasToAdd.push_back(newArea);
 					}		
 					else if (pImpressionableArea == &areaLower &&
@@ -2330,6 +2371,7 @@ bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp,
 					{
 						ContentAreaInfo newArea(*pImpressionableArea);
 						newArea.bottom = areaHigher.top;
+						newArea.m_eBottomBoundaryState = kLocked;
 						rvecAreasToAdd.push_back(newArea);
 					}
 
