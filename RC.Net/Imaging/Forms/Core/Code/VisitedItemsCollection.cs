@@ -82,17 +82,6 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        /// <summary>
-        /// Gets the count of all items (visible or not).
-        /// </summary>
-        public int TotalCount
-        {
-            get
-            {
-                return _count;
-            }
-        }
-
         #endregion Properties
 
         #region IEnumerable<int> Members

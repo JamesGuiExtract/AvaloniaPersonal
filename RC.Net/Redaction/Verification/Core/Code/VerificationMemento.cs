@@ -62,6 +62,11 @@ namespace Extract.Redaction.Verification
         bool _hasContainedRedactions;
 
         /// <summary>
+        /// The number of pages in the document.
+        /// </summary>
+        int _pageCount;
+
+        /// <summary>
         /// A collection of the visited 0-based page numbers.
         /// </summary>
         VisitedItemsCollection _visitedPages;
@@ -75,11 +80,6 @@ namespace Extract.Redaction.Verification
         /// The number of seconds the document has been displayed for verification this session.
         /// </summary>
         double _screenTimeThisSession;
-
-        /// <summary>
-        /// Indicates whether this document has been committed.
-        /// </summary>
-        bool _committed;
 
         #endregion Fields
 
@@ -245,6 +245,25 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Gets or sets the page count.
+        /// </summary>
+        /// <value>
+        /// The page count.
+        /// </value>
+        public int PageCount
+        {
+            get
+            {
+                return _pageCount;
+            }
+
+            set
+            {
+                _pageCount = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the 0-based visited page numbers.
         /// </summary>
         /// <value>The 0-based visited page numbers.</value>
@@ -292,24 +311,6 @@ namespace Extract.Redaction.Verification
             set
             {
                 _screenTimeThisSession = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether this document has been committed.
-        /// </summary>
-        /// <value><see langword="true"/> if the document has bee committed; otherwise,
-        /// <see langword="false"/>.</value>
-        public bool Committed
-        {
-            get
-            {
-                return _committed;
-            }
-
-            set
-            {
-                _committed = value;
             }
         }
 
