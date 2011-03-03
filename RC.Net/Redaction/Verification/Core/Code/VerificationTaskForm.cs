@@ -14,6 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -246,6 +247,13 @@ namespace Extract.Redaction.Verification
         /// </summary>
         ApplicationCommand _stopSlideshowCommand;
 
+        /// <summary>
+        /// Keeps track of the total number of pages and total verification time for all documents
+        /// committed this session that are not currently in the history queue.
+        /// Item1 is the total number of pages, and Item2 is the total verification time.
+        /// </summary>
+        Tuple<int, double> _preHistoricPageVerificationTime = new Tuple<int, double>(0, 0);
+
         #endregion Fields
 
         #region Events
@@ -469,8 +477,8 @@ namespace Extract.Redaction.Verification
         void Commit()
         {
             // Save
-            TimeInterval screenTime = _screenTime.Stop();
-            Save(screenTime);
+            TimeInterval screenTime = StopScreenTimeTimer();
+            Save(screenTime, true);
 
             // Commit
             if (_actionStatusTask != null)
@@ -562,7 +570,10 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Saves the currently viewed voa file.
         /// </summary>
-        void Save(TimeInterval screenTime)
+        /// <param name="screenTime">The duration of time spent verifying the document.</param>
+        /// <param name="committed"><see langword="true"/> if the document was commited; otherwise,
+        /// <see langword="false"/>.</param>
+        void Save(TimeInterval screenTime, bool committed)
         {
             bool collectFeedback = ShouldCollectFeedback();
 
@@ -574,7 +585,7 @@ namespace Extract.Redaction.Verification
             }
 
             // Save the voa
-            SaveCurrentMemento(screenTime);
+            SaveCurrentMemento(screenTime, committed);
 
             // Collect expected data feedback if necessary
             if (collectFeedback)
@@ -590,7 +601,9 @@ namespace Extract.Redaction.Verification
         /// Saves the current vector of attributes file to the specified location.
         /// </summary>
         /// <param name="screenTime">The duration of time spent verifying the document.</param>
-        void SaveCurrentMemento(TimeInterval screenTime)
+        /// <param name="committed"><see langword="true"/> if the document was commited; otherwise,
+        /// <see langword="false"/>.</param>
+        void SaveCurrentMemento(TimeInterval screenTime, bool committed)
         {
             VerificationMemento memento = GetCurrentDocument();
             RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
@@ -603,6 +616,8 @@ namespace Extract.Redaction.Verification
             // Ensure HasContainedRedactions is set to true if the _redactionGridView was saved with
             // redactions present.
             memento.HasContainedRedactions |= _redactionGridView.HasRedactions;
+
+            memento.Committed |= committed;
         }
 
         /// <summary>
@@ -746,7 +761,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void AdvanceToNextDocument()
         {
-            TimeInterval screenTime = _screenTime.Stop();
+            TimeInterval screenTime = StopScreenTimeTimer();
             SaveRedactionCounts(screenTime);
 
             // Ensure slideshow timer is not running until the next document is completely loaded.
@@ -767,6 +782,17 @@ namespace Extract.Redaction.Verification
                 // If the max document history was reached, drop the first item
                 if (_history.Count == _history.Capacity)
                 {
+                    // If the document being removed from the history queue has been commited, apply
+                    // the number of pages in the document and time displayed to
+                    // _preHistoricPageVerificationTime.
+                    VerificationMemento memento = _history[0];
+                    if (memento.Committed)
+                    {
+                        _preHistoricPageVerificationTime = new Tuple<int, double>(
+                            _preHistoricPageVerificationTime.Item1 + memento.VisitedPages.TotalCount,
+                            _preHistoricPageVerificationTime.Item2 + memento.ScreenTimeThisSession);
+                    }
+
                     _imageViewer.UnloadImage(_history[0].DisplayImage);
 
                     _history.RemoveAt(0);
@@ -787,6 +813,75 @@ namespace Extract.Redaction.Verification
                 // Successfully complete this file
                 OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
             }
+        }
+
+        /// <summary>
+        /// Starts _screenTime and updates _verificationRateStatusLabel and _pagesPerHourStatusLabel.
+        /// </summary>
+        void StartScreenTimeTimer()
+        {
+            // If _verificationRateStatusLabel exists, update it.
+            if (_verificationRateStatusLabel != null)
+            {
+                VerificationMemento thisMemento = GetCurrentDocument();
+                _verificationRateStatusLabel.Start((thisMemento == null)
+                    ? 0 : thisMemento.ScreenTimeThisSession);
+            }
+
+            // If _pagesPerHourStatusLabel exists, update it.
+            if (_pagesPerHourStatusLabel != null)
+            {
+                // Calculate a tuple representing the total number of pages and total time spent
+                // verifying documents committed this session (including both documents in and
+                // before the history queue).
+                int totalPageCount = _preHistoricPageVerificationTime.Item1;
+                double totalTime = _preHistoricPageVerificationTime.Item2;
+                foreach (var memento in _history.Where(memento => memento.Committed))
+                {
+                    totalPageCount += memento.VisitedPages.TotalCount;
+                    totalTime += memento.ScreenTimeThisSession;
+                }
+
+                // Calculate the average number of pages verified per hour.
+                double averagePagesPerHour = (totalTime > 0)
+                    ? totalPageCount / (totalTime / 3600) : 0;
+
+                // Update the status label text.
+                _pagesPerHourStatusLabel.Text = string.Format(
+                    CultureInfo.CurrentCulture, "Average pages/hour: {0:#}", averagePagesPerHour);
+            }
+
+            _screenTime.Start();
+        }
+
+        /// <summary>
+        /// Stops _screenTime and updates _verificationRateStatusLabel.
+        /// </summary>
+        /// <returns>The <see cref="TimeInterval"/> elased between the time the timer was started
+        /// and now.</returns>
+        TimeInterval StopScreenTimeTimer()
+        {
+            bool running = _screenTime.Running;
+
+            TimeInterval screenTime = _screenTime.Stop();
+
+            // Only update memento.ScreenTimeThisSession and stop _verificationRateStatusLabel if
+            // the timer was running before this call.
+            if (running)
+            {
+                VerificationMemento memento = GetCurrentDocument();
+                if (memento != null)
+                {
+                    memento.ScreenTimeThisSession += screenTime.ElapsedSeconds;
+                }
+
+                if (_verificationRateStatusLabel != null)
+                {
+                    _verificationRateStatusLabel.Stop();
+                }
+            }
+
+            return screenTime;
         }
         
         /// <summary>
@@ -889,8 +984,8 @@ namespace Extract.Redaction.Verification
                         }
                         else
                         {
-                            TimeInterval screenTime = _screenTime.Stop();
-                            Save(screenTime);
+                            TimeInterval screenTime = StopScreenTimeTimer();
+                            Save(screenTime, false);
                         }
                     }
                 }
@@ -1409,7 +1504,7 @@ namespace Extract.Redaction.Verification
                 // Check if changes have been made before moving away from a history document
                 if (!WarnIfDirty())
                 {
-                    TimeInterval screenTime = _screenTime.Stop();
+                    TimeInterval screenTime = StopScreenTimeTimer();
                     SaveRedactionCounts(screenTime);
 
                     CommitComment();
@@ -1986,8 +2081,8 @@ namespace Extract.Redaction.Verification
                 {
                     _redactionGridView.CommitChanges();
 
-                    TimeInterval screenTime = _screenTime.Stop();
-                    Save(screenTime);
+                    TimeInterval screenTime = StopScreenTimeTimer();
+                    Save(screenTime, false);
 
                     SaveRedactionCounts(screenTime);
                 }
@@ -2017,7 +2112,7 @@ namespace Extract.Redaction.Verification
 
                     if (!WarnIfDirty())
                     {
-                        TimeInterval screenTime = _screenTime.Stop();
+                        TimeInterval screenTime = StopScreenTimeTimer();
                         SaveRedactionCounts(screenTime);
 
                         CommitComment();
@@ -2377,7 +2472,7 @@ namespace Extract.Redaction.Verification
                     _setSlideshowAdvancedPages.Clear();
 
                     // Start recording the screen time
-                    _screenTime.Start();
+                    StartScreenTimeTimer();
                 }
                 else
                 {

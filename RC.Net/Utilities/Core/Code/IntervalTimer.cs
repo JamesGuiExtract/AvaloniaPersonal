@@ -26,6 +26,20 @@ namespace Extract.Utilities
 
         #endregion Fields
 
+        #region Properties
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="IntervalTimer"/> is running.
+        /// </summary>
+        /// <value><see langword="true"/> if running; otherwise, <see langword="false"/>.</value>
+        public bool Running
+        {
+            get;
+            private set;
+        }
+
+        #endregion Properties
+
         #region Methods
 
         /// <summary>
@@ -56,6 +70,8 @@ namespace Extract.Utilities
             {
                 _startTime = DateTime.Now;
                 _stopWatch = Stopwatch.StartNew();
+
+                Running = true;
             }
             catch (Exception ex)
             {
@@ -72,8 +88,11 @@ namespace Extract.Utilities
         {
             try
             {
+                Running = false;
+
                 _stopWatch.Stop();
                 double elapsedSeconds = _stopWatch.ElapsedMilliseconds / 1000.0;
+
                 return new TimeInterval(_startTime, elapsedSeconds);
             }
             catch (Exception ex)

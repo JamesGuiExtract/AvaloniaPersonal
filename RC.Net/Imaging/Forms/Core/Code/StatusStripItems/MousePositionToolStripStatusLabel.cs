@@ -63,7 +63,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Default width for this <see cref="ToolStripStatusLabel"/>
         /// </summary>
-        private static readonly int _DEFAULT_MOUSEPOSITION_WIDTH = 175;
+        private static readonly int _DEFAULT_MOUSEPOSITION_WIDTH = 100;
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.

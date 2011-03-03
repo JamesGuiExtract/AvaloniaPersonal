@@ -71,6 +71,16 @@ namespace Extract.Redaction.Verification
         /// </summary>
         VisitedItemsCollection _visitedRedactions;
 
+        /// <summary>
+        /// The number of seconds the document has been displayed for verification this session.
+        /// </summary>
+        double _screenTimeThisSession;
+
+        /// <summary>
+        /// Indicates whether this document has been committed.
+        /// </summary>
+        bool _committed;
+
         #endregion Fields
 
         #region Constructors
@@ -263,6 +273,43 @@ namespace Extract.Redaction.Verification
             set
             {
                 _visitedRedactions = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the number of seconds the document has been displayed for verification this
+        /// session.
+        /// </summary>
+        /// <value>The number of seconds the document has been displayed for verification this
+        /// session.</value>
+        public double ScreenTimeThisSession
+        {
+            get
+            {
+                return _screenTimeThisSession;
+            }
+
+            set
+            {
+                _screenTimeThisSession = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether this document has been committed.
+        /// </summary>
+        /// <value><see langword="true"/> if the document has bee committed; otherwise,
+        /// <see langword="false"/>.</value>
+        public bool Committed
+        {
+            get
+            {
+                return _committed;
+            }
+
+            set
+            {
+                _committed = value;
             }
         }
 

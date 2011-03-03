@@ -206,6 +206,12 @@
     <Compile Include="VerificationOptionsDialog.Designer.cs">
       <DependentUpon>VerificationOptionsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="VerificationTimeStatusStripLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VerificationTimeStatusStripLabel.Designer.cs">
+      <DependentUpon>VerificationTimeStatusStripLabel.cs</DependentUpon>
+    </Compile>
     <Compile Include="VerificationRuleFormHelper.cs" />
     <Compile Include="VerificationSettingsDialog.cs">
       <SubType>Form</SubType>

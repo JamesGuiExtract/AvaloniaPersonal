@@ -118,6 +118,9 @@ namespace Extract.Redaction.Verification
             this._currentDocumentTextBox = new System.Windows.Forms.TextBox();
             this._documentTypeTextBox = new System.Windows.Forms.TextBox();
             this._redactionGridView = new Extract.Redaction.Verification.RedactionGridView();
+            this._dataWindowStatusStrip = new System.Windows.Forms.StatusStrip();
+            this._verificationRateStatusLabel = new Extract.Redaction.Verification.VerificationTimeStatusStripLabel();
+            this._pagesPerHourStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this._pageSummaryView = new Extract.Imaging.Forms.PageSummaryView();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -260,6 +263,7 @@ namespace Extract.Redaction.Verification
             this._dataWindowSplitContainer.Panel1.SuspendLayout();
             this._dataWindowSplitContainer.Panel2.SuspendLayout();
             this._dataWindowSplitContainer.SuspendLayout();
+            this._dataWindowStatusStrip.SuspendLayout();
             this._menuStrip.SuspendLayout();
             this._basicDataGridToolStrip.SuspendLayout();
             this._exemptionsToolStrip.SuspendLayout();
@@ -302,6 +306,7 @@ namespace Extract.Redaction.Verification
             // 
             // _dataWindowSplitContainer
             // 
+            this._dataWindowSplitContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this._dataWindowSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._dataWindowSplitContainer.Location = new System.Drawing.Point(0, 0);
             this._dataWindowSplitContainer.Name = "_dataWindowSplitContainer";
@@ -319,7 +324,8 @@ namespace Extract.Redaction.Verification
             this._dataWindowSplitContainer.Panel1MinSize = 225;
             // 
             // _dataWindowSplitContainer.Panel2
-            // 
+            //
+            this._dataWindowSplitContainer.Panel2.Controls.Add(this._dataWindowStatusStrip);
             this._dataWindowSplitContainer.Panel2.Controls.Add(label4);
             this._dataWindowSplitContainer.Panel2.Controls.Add(this._pageSummaryView);
             this._dataWindowSplitContainer.Panel2MinSize = 150;
@@ -400,6 +406,43 @@ namespace Extract.Redaction.Verification
             this._redactionGridView.TabIndex = 0;
             this._redactionGridView.ExemptionsApplied += new System.EventHandler<Extract.Redaction.Verification.ExemptionsAppliedEventArgs>(this.HandleRedactionGridViewExemptionsApplied);
             // 
+            // _dataWindowStatusStrip
+            // 
+            this._dataWindowStatusStrip.GripMargin = new System.Windows.Forms.Padding(0);
+            this._dataWindowStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._verificationRateStatusLabel,
+            this._pagesPerHourStatusLabel});
+            this._dataWindowStatusStrip.Location = new System.Drawing.Point(0, 162);
+            this._dataWindowStatusStrip.Name = "_dataWindowStatusStrip";
+            this._dataWindowStatusStrip.Size = new System.Drawing.Size(525, 22);
+            this._dataWindowStatusStrip.TabIndex = 2;
+            // 
+            // _verificationRateStatusLabel
+            // 
+            this._verificationRateStatusLabel.AutoSize = false;
+            this._verificationRateStatusLabel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+            this._verificationRateStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this._verificationRateStatusLabel.Name = "_verificationRateStatusLabel";
+            this._verificationRateStatusLabel.Size = new System.Drawing.Size(285, 17);
+            this._verificationRateStatusLabel.Spring = true;
+            this._verificationRateStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // _pagesPerHourStatusLabel
+            // 
+            this._pagesPerHourStatusLabel.AutoSize = false;
+            this._pagesPerHourStatusLabel.Name = "_pagesPerHourStatusLabel";
+            this._pagesPerHourStatusLabel.Size = new System.Drawing.Size(175, 17);
+            this._pagesPerHourStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // _dataWindowStatusStrip
+            // 
+            this._dataWindowStatusStrip.GripMargin = new System.Windows.Forms.Padding(0);
+            this._dataWindowStatusStrip.Location = new System.Drawing.Point(0, 164);
+            this._dataWindowStatusStrip.Name = "_dataWindowStatusStrip";
+            this._dataWindowStatusStrip.Size = new System.Drawing.Size(527, 22);
+            this._dataWindowStatusStrip.TabIndex = 2;
+            this._dataWindowStatusStrip.Text = "statusStrip1";
+            // 
             // label4
             // 
             label4.AutoSize = true;
@@ -418,7 +461,7 @@ namespace Extract.Redaction.Verification
             this._pageSummaryView.Location = new System.Drawing.Point(7, 19);
             this._pageSummaryView.MinimumSize = new System.Drawing.Size(100, 100);
             this._pageSummaryView.Name = "_pageSummaryView";
-            this._pageSummaryView.Size = new System.Drawing.Size(513, 284);
+            this._pageSummaryView.Size = new System.Drawing.Size(513, 262);
             this._pageSummaryView.TabIndex = 0;
             this._pageSummaryView.TabStop = false;
             // 
@@ -1723,6 +1766,8 @@ namespace Extract.Redaction.Verification
             this._dataWindowSplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._dataWindowSplitContainer)).EndInit();
             this._dataWindowSplitContainer.ResumeLayout(false);
+            this._dataWindowStatusStrip.ResumeLayout(false);
+            this._dataWindowStatusStrip.PerformLayout();
             this._menuStrip.ResumeLayout(false);
             this._menuStrip.PerformLayout();
             this._basicDataGridToolStrip.ResumeLayout(false);
@@ -1876,5 +1921,8 @@ namespace Extract.Redaction.Verification
         private Extract.Imaging.Forms.EnlargeSelectionToolStripMenuItem _enlargeRedactionToolStripMenuItem;
         private Extract.Imaging.Forms.ShrinkSelectionToolStripMenuItem _shrinkRedactionToolStripMenuItem;
         private Imaging.Forms.ZoomPreviousToolStripMenuItem _zoomPreviousToolStripMenuItem1;
+        private System.Windows.Forms.StatusStrip _dataWindowStatusStrip;
+        private Extract.Redaction.Verification.VerificationTimeStatusStripLabel _verificationRateStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel _pagesPerHourStatusLabel;
     }
 }
