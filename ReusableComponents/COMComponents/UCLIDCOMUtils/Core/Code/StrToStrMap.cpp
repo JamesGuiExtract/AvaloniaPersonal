@@ -73,10 +73,7 @@ STDMETHODIMP CStrToStrMap::Set(BSTR key, BSTR value)
 	{
 		validateLicense();
 		
-		string stdstrKey = asString( key );
-		string stdstrValue = asString( value );
-
-		m_mapKeyToValue[stdstrKey] = stdstrValue;
+		m_mapKeyToValue[asString(key)] = asString(value);
 
 		m_bDirty = true;
 	}
@@ -322,6 +319,8 @@ STDMETHODIMP CStrToStrMap::Merge(IStrToStrMap *pMapToMerge, EMergeMethod eMergeM
 
 			mergeKeyValue(bstrKey, bstrValue, eMergeMethod);
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI20195");
 }
@@ -339,8 +338,40 @@ STDMETHODIMP CStrToStrMap::MergeKeyValue(BSTR bstrKey, BSTR bstrValue, EMergeMet
 		validateLicense();
 
 		mergeKeyValue(bstrKey, bstrValue, eMergeMethod);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI20198");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CStrToStrMap::GetAllKeyValuePairs(IIUnknownVector** ppPairs)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI31903", ppPairs != __nullptr);
+
+		// validate license
+		validateLicense();
+
+		UCLID_COMUTILSLib::IIUnknownVectorPtr ipPairs(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI31904", ipPairs != __nullptr);
+		for(map<string, string>::iterator it = m_mapKeyToValue.begin();
+			it != m_mapKeyToValue.end(); it++)
+		{
+			UCLID_COMUTILSLib::IStringPairPtr ipPair(CLSID_StringPair);
+			ASSERT_RESOURCE_ALLOCATION("ELI31905", ipPair != __nullptr);
+			
+			ipPair->SetKeyValuePair(it->first.c_str(), it->second.c_str());
+			ipPairs->PushBack(ipPair);
+		}
+
+		*ppPairs = (IIUnknownVector*) ipPairs.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31906");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -203,7 +203,7 @@ namespace Extract.Utilities.Forms
         void ok_Click(object sender, EventArgs e)
         {
             // Set the return value
-            returnValue = result.Text;
+            returnValue = result.Text.Trim();
 
             // Set the dialog result to OK
             DialogResult = DialogResult.OK;

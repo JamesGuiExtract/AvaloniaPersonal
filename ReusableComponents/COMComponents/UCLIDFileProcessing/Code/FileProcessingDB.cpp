@@ -2302,6 +2302,72 @@ STDMETHODIMP CFileProcessingDB::RenameFile(IFileRecord* pFileRecord, BSTR bstrNe
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31463");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_DBInfoSettings(IStrToStrMap** ppSettings)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		ASSERT_ARGUMENT("ELI31907", ppSettings != __nullptr);
+
+		if (!get_DBInfoSettings_Internal(false, ppSettings))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			get_DBInfoSettings_Internal(true, ppSettings);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31908");
+
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::put_DBInfoSettings(IStrToStrMap* pSettings)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+		IStrToStrMapPtr ipSettings(pSettings);
+		ASSERT_ARGUMENT("ELI31909", ipSettings != __nullptr);
+
+			IIUnknownVectorPtr ipPairs = ipSettings->GetAllKeyValuePairs();
+			ASSERT_RESOURCE_ALLOCATION("ELI31910", ipPairs != __nullptr);
+
+			// Get the key value pairs from the StrToStrMap and create the update queries
+			int nSize = ipPairs->Size();
+			vector<string> vecQueries;
+			vecQueries.reserve(nSize);
+			for(int i=0; i < nSize; i++)
+			{
+				IStringPairPtr ipPair = ipPairs->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI31911", ipPair != __nullptr);
+
+				_bstr_t bstrKey;
+				_bstr_t bstrValue;
+				ipPair->GetKeyValuePair(bstrKey.GetAddress(), bstrValue.GetAddress());
+
+				string strQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
+				replaceVariable(strQuery, gstrSETTING_NAME, asString(bstrKey), kReplaceFirst);
+				replaceVariable(strQuery, gstrSETTING_VALUE, asString(bstrValue), kReplaceFirst);
+				vecQueries.push_back(strQuery);
+			}
+
+		if (!put_DBInfoSettings_Internal(false, vecQueries))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			put_DBInfoSettings_Internal(true, vecQueries);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31912");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

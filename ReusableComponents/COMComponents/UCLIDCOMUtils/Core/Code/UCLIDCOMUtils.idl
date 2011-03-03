@@ -493,6 +493,12 @@ library UCLID_COMUTILSLib
 		//											   (append _x to the key where x is an interger)
 		[id(11), helpstring("method MergeKeyValue")] HRESULT MergeKeyValue(
 			[in] BSTR bstrKey, [in] BSTR bstrValue, [in] EMergeMethod eMergeMethod);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return an IIUnknownVector or IStringPair objects representing the
+		//			entire collection.
+		[id(12), helpstring("method GetAllKeyValuePairs")] HRESULT GetAllKeyValuePairs(
+			[out, retval] IIUnknownVector** ppPairs);
 	};
 	[
 		object,

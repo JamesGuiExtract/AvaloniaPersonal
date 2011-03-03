@@ -46,6 +46,7 @@ protected:
 	afx_msg void OnDatabaseUpdateSchema();
 	afx_msg void OnDatabaseChangePassword();
 	afx_msg void OnDatabaseLogout();
+	afx_msg void OnDatabaseSetOptions();
 	afx_msg void OnActionManuallySetActionStatus();
 	afx_msg void OnHelpFileActionManagerHelp();
 	afx_msg void OnSize(UINT nType, int cx, int cy);

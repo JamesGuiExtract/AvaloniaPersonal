@@ -63,7 +63,7 @@ namespace Extract.ReportViewer
 
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23805",
-					_OBJECT_NAME);
+                    _OBJECT_NAME);
 
                 InitializeComponent();
 
@@ -249,7 +249,9 @@ namespace Extract.ReportViewer
         {
             try
             {
-                _dateRangeParameter.Minimum = _parameterValueBegin.Value;
+                // DNRCAU #531 - 0 the seconds
+                var dateTime = _parameterValueBegin.Value;
+                _dateRangeParameter.Minimum = dateTime.AddSeconds(-dateTime.Second);
             }
             catch (Exception ex)
             {
@@ -270,7 +272,9 @@ namespace Extract.ReportViewer
         {
             try
             {
-                _dateRangeParameter.Maximum = _parameterValueEnd.Value;
+                // DNRCAU #531 - 0 the seconds
+                var dateTime = _parameterValueEnd.Value;
+                _dateRangeParameter.Maximum = dateTime.AddSeconds(-dateTime.Second);
             }
             catch (Exception ex)
             {

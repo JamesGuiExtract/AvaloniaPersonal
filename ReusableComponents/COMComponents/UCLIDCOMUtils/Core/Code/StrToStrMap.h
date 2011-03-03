@@ -56,6 +56,7 @@ public:
 	STDMETHOD(Merge)(/*[in]*/ IStrToStrMap *pMapToMerge, /*[in]*/ EMergeMethod eMergeMethod);
 	STDMETHOD(MergeKeyValue)(/*[in]*/ BSTR bstrKey, /*[in]*/ BSTR bstrValue, 
 		/*[in]*/ EMergeMethod eMergeMethod);
+	STDMETHOD(GetAllKeyValuePairs)(IIUnknownVector** ppPairs);
 
 //IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);

@@ -135,7 +135,7 @@ STDMETHODIMP CSpatialString::ConsolidateChars(BSTR strChars, VARIANT_BOOL bCaseS
 		validateLicense();
 
 		// the current starting position
-		int nCurrentPos = 0;
+		size_t nCurrentPos = 0;
 		string stdstrChars = asString(strChars);
 		if (bCaseSensitive == VARIANT_FALSE)
 		{
@@ -152,7 +152,7 @@ STDMETHODIMP CSpatialString::ConsolidateChars(BSTR strChars, VARIANT_BOOL bCaseS
 			}
 
 			// search for the first (or next) instance of any of the chars in strChars
-			int nFoundPos = strTempCurrentString.find_first_of(stdstrChars, nCurrentPos);
+			size_t nFoundPos = strTempCurrentString.find_first_of(stdstrChars, nCurrentPos);
 			if (nFoundPos == string::npos)
 			{
 				break;
@@ -160,10 +160,10 @@ STDMETHODIMP CSpatialString::ConsolidateChars(BSTR strChars, VARIANT_BOOL bCaseS
 
 			// search for consecutive characters following the above found
 			// character
-			long nStartDeletePos = nFoundPos + 1;
-			long nEndDeletePos = nFoundPos + 1;
+			size_t nStartDeletePos = nFoundPos + 1;
+			size_t nEndDeletePos = nFoundPos + 1;
 			bool bDelete = false;
-			while (nEndDeletePos + 1 < strTempCurrentString.length() &&
+			while (nEndDeletePos < strTempCurrentString.length() &&
 				   stdstrChars.find(strTempCurrentString[nEndDeletePos]) != string::npos)
 			{
 				nEndDeletePos++;

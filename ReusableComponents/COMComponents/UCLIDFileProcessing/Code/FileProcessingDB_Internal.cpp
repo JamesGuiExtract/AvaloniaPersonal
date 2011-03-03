@@ -1114,7 +1114,6 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		{
 			// Retrieve the default DBInfo values
 			map<string, string> mapDBInfoDefaultValues = getDBInfoDefaultValues();
-			long nValueCount = mapDBInfoDefaultValues.size();
 
 			// For each DBInfo value, create a query to set the default value.
 			for (map<string, string>::iterator iterDBInfoValues = mapDBInfoDefaultValues.begin();

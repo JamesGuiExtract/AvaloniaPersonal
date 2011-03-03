@@ -16,7 +16,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Object name string used in licensing calls.
         /// </summary>
-        static readonly string _OBJECT_NAME = typeof(BetterProgressBar).ToString();
+        static readonly string _OBJECT_NAME = typeof(BetterNumericUpDown).ToString();
 
         #endregion Constants
 

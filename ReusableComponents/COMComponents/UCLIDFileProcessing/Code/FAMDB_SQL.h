@@ -514,6 +514,17 @@ static const string gstrSETTING_NAME = "<SettingName>";
 static const string gstrDBINFO_SETTING_QUERY = 
 	"SELECT [Name], [Value] FROM DBInfo WHERE [Name] = '" + gstrSETTING_NAME + "'";
 
+// Query for getting all DB info settings
+static const string gstrDBINFO_GET_SETTINGS_QUERY =
+	"SELECT [Name], [Value] FROM DBInfo";
+
+// Constant to be replaced in the DBInfo Setting query
+static const string gstrSETTING_VALUE = "<SettingValue>";
+
+// Query for updating the DB info settings
+static const string gstrDBINFO_UPDATE_SETTINGS_QUERY =
+	"UPDATE DBInfo SET [Value] = '" + gstrSETTING_VALUE + "' WHERE [Name] = '" + gstrSETTING_NAME + "'";
+
 // Query to delete old input event records from the InputEvent table
 static const string gstrDELETE_OLD_INPUT_EVENT_RECORDS =
 	"DELETE FROM InputEvent WHERE DATEDIFF(d, GETDATE(), [TimeStamp]) > (SELECT COALESCE("

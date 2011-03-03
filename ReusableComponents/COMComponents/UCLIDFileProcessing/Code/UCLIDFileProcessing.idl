@@ -1095,6 +1095,15 @@ library UCLID_FILEPROCESSINGLib
 		//			in the database
 		[id(97), helpstring("method RenameFile")] HRESULT RenameFile([in] IFileRecord* pFileRecord,
 			[in] BSTR bstrNewName);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get/put the list of DB info settings
+		// NOTE: The put method will not validate the setting name, if the setting
+		// name does not exist, it will just be ignored
+		[propget, id(98), helpstring("property DBInfoSettings")] HRESULT DBInfoSettings(
+			[out, retval] IStrToStrMap** ppSettings);
+		[propput, id(98), helpstring("property DBInfoSettings")] HRESULT DBInfoSettings(
+			[in] IStrToStrMap* pSettings);
 	};
 
 	[
@@ -1536,6 +1545,21 @@ library UCLID_FILEPROCESSINGLib
 		[id(1), helpstring("method PromptForSchedule")] HRESULT PromptForSchedule(
 			[in]IVariantVector* pSchedule, [out, retval] IVariantVector** ppNewSchedule); 
 	};
+
+	[
+		object,
+		uuid(40CEC6E1-1A84-484A-9E3D-AFA736D9327B),
+		dual,
+		helpstring("IConfigureDBInfoSettings Interface"),
+		pointer_default(unique)
+	]
+	interface IConfigureDBInfoSettings : IDispatch
+	{
+		// PURPOSE: To prompt the user to modify the DB info settings. Returns VARIANT_TRUE
+		// if the settings were updated and VARIANT_FALSE if they were not updated.
+		[id(1), helpstring("method PromptForSettings")] HRESULT PromptForSettings(
+			[in] IFileProcessingDB* pDBManager, [out, retval] VARIANT_BOOL* pbUpdated);
+	}
 
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------

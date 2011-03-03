@@ -39,6 +39,9 @@ const string gstrREPORT_VIEWER_EXE = "ReportViewer.exe";
 const string gstrTITLE = "File Action Manager Database Administration";
 const string gstrFAMDB_REG_KEY = gstrCOM_COMPONENTS_REG_PATH + "\\UCLIDFileProcessing\\FAMDBAdmin";
 
+// Guid for the COM class that displays the DB info configuration dialog
+const string gstrDB_OPTIONS_GUID = "{F86BB12C-EB1C-44EA-B5EA-9A428A601608}";
+
 //-------------------------------------------------------------------------------------------------
 // CFAMDBAdminDlg dialog
 //-------------------------------------------------------------------------------------------------
@@ -100,6 +103,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_DATABASE_CLEAR, &CFAMDBAdminDlg::OnDatabaseClear)
 	ON_COMMAND(ID_DATABASE_RESETLOCK, &CFAMDBAdminDlg::OnDatabaseResetLock)
 	ON_COMMAND(ID_DATABASE_UPDATE_SCHEMA, &CFAMDBAdminDlg::OnDatabaseUpdateSchema)
+	ON_COMMAND(ID_DATABASE_SET_OPTIONS, &CFAMDBAdminDlg::OnDatabaseSetOptions)
 	ON_COMMAND(ID_DATABASE_CHANGEPASSWORD, &CFAMDBAdminDlg::OnDatabaseChangePassword)
 	ON_COMMAND(ID_DATABASE_LOGOUT, &CFAMDBAdminDlg::OnDatabaseLogout)
 	ON_COMMAND(ID_TOOLS_MANUALLYSETACTIONSTATUS, &CFAMDBAdminDlg::OnActionManuallySetActionStatus)
@@ -452,6 +456,25 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31521");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnDatabaseSetOptions()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		IConfigureDBInfoSettingsPtr ipSettings(gstrDB_OPTIONS_GUID.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI31930", ipSettings != __nullptr);
+		if (ipSettings->PromptForSettings(m_ipFAMDB) == VARIANT_TRUE)
+		{
+			// Reset the connection to update the cached settings in the FAMDB pointer
+			m_ipFAMDB->ResetDBConnection();
+
+			MessageBox("Database settings have been updated.", "Settings Updated");
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31931");
 }
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnDatabaseChangePassword()

@@ -535,6 +535,8 @@ BEGIN
         MENUITEM "&Reset lock\tCtrl+R",         ID_DATABASE_RESETLOCK
 		MENUITEM "&Update database schema...",  ID_DATABASE_UPDATE_SCHEMA
         MENUITEM SEPARATOR
+		MENUITEM "&Database options...",		ID_DATABASE_SET_OPTIONS
+        MENUITEM SEPARATOR
         MENUITEM "C&hange password...\tCtrl+H", ID_DATABASE_CHANGEPASSWORD
         MENUITEM "Log&out",                     ID_DATABASE_LOGOUT
         MENUITEM SEPARATOR

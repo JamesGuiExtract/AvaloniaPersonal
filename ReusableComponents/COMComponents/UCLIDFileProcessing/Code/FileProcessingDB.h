@@ -208,6 +208,8 @@ public:
 	STDMETHOD(CloseAllDBConnections)();
 	STDMETHOD(UpgradeToCurrentSchema)(IProgressStatus* pProgressStatus);
 	STDMETHOD(RenameFile)(IFileRecord* pFileRecord, BSTR bstrNewName);
+	STDMETHOD(get_DBInfoSettings)(IStrToStrMap** ppSettings);
+	STDMETHOD(put_DBInfoSettings)(IStrToStrMap* pSettings);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -847,6 +849,8 @@ private:
 	bool SetFileStatusToProcessing_Internal(bool bDBLocked, long nFileId, long nActionID);
 	bool UpgradeToCurrentSchema_Internal(bool bDBLocked, IProgressStatusPtr ipProgressStatus);
 	bool RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRecord, BSTR bstrNewName);
+	bool get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap** ppSettings);
+	bool put_DBInfoSettings_Internal(bool bDBLocked, const vector<string>& vecQueries);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

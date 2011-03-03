@@ -5314,3 +5314,105 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 	}
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap** ppSettings)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI31895", ppSettings != __nullptr);
+
+			IStrToStrMapPtr ipSettings(CLSID_StrToStrMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI31896", ipSettings != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = NULL;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Create a pointer to a recordset
+				_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI31897", ipDBInfoSet != __nullptr);
+
+				// Open the record set using the Setting Query		
+				ipDBInfoSet->Open(gstrDBINFO_GET_SETTINGS_QUERY.c_str(),
+					_variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly,
+					adLockReadOnly, adCmdText); 
+
+				while (ipDBInfoSet->adoEOF == VARIANT_FALSE)
+				{
+					FieldsPtr ipFields = ipDBInfoSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI31898", ipFields != __nullptr);
+
+					string strKey = getStringField(ipFields, "Name");
+					string strValue = getStringField(ipFields, "Value");
+					ipSettings->Set(strKey.c_str(), strValue.c_str());
+
+					ipDBInfoSet->MoveNext();
+				}
+
+				*ppSettings = ipSettings.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI31899");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31900");
+	}
+	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::put_DBInfoSettings_Internal(bool bDBLocked,
+	const vector<string>& vecQueries)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = NULL;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Set the transaction guard
+				TransactionGuard tg(ipConnection);
+
+				executeVectorOfSQL(ipConnection, vecQueries);
+
+				tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI31901");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31902");
+	}
+	catch(UCLIDException& uex)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw uex;
+	}
+
+	return true;
+}
