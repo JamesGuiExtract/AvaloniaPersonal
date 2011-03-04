@@ -501,12 +501,12 @@ begin
 		// Install SQL Compact Edition
 		// 32bit needs to be installed even on 64 bit
 		szProgram = "msiexec";
-		szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime-ENU-x86.msi" + " /qb";
+		szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x86-ENU.msi" + " /qb";
 		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
 
 		// If 64 bit OS install 64 version of SSCE	
 		if ( SYSINFO.bIsWow64 ) then
-			szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime-ENU-x64.msi" + " /qb";
+			szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime_x64-ENU.msi" + " /qb";
 			LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
 		endif;
 		SdShowMsg("Setup is Installing SQL Compact Edition", FALSE);
