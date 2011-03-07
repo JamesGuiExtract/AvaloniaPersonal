@@ -402,11 +402,9 @@ library UCLID_FILEPROCESSORSLib
 		[propput, id(1), helpstring("property Operation")] HRESULT Operation(
 			[in] EManageTagsOperationType newOperation);
 		
-		// Gets/sets the tag names to manage
-		[propget, id(2), helpstring("property Tags")] HRESULT Tags(
-			[out, retval] IVariantVector** ppvecTags);
-		[propput, id(2), helpstring("property Tags")] HRESULT Tags(
-			[in] IVariantVector* pvecTags);
+		// Gets/sets the tag names to manage (tags is a semi-colon delimited string)
+		[propget, id(2), helpstring("property Tags")] HRESULT Tags([out, retval] BSTR* pbstrTags);
+		[propput, id(2), helpstring("property Tags")] HRESULT Tags([in] BSTR bstrTags);
 	};
 
 	// ISleepTask

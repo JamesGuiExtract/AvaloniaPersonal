@@ -1502,7 +1502,8 @@ STDMETHODIMP CFileProcessingDB::ToggleTagOnFile(long nFileID, BSTR bstrTagName)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27354");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::AddTag(BSTR bstrTagName, BSTR bstrTagDescription)
+STDMETHODIMP CFileProcessingDB::AddTag(BSTR bstrTagName, BSTR bstrTagDescription,
+	VARIANT_BOOL vbFailIfExists)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1510,12 +1511,28 @@ STDMETHODIMP CFileProcessingDB::AddTag(BSTR bstrTagName, BSTR bstrTagDescription
 	{
 		validateLicense();
 
-		if (!AddTag_Internal(false, bstrTagName, bstrTagDescription))
+		string strTagName = asString(bstrTagName);
+		string strDescription = asString(bstrTagDescription);
+
+		// Validate the tag name
+		validateTagName(strTagName);
+
+		// Validate the description length
+		if (strDescription.length() > 255)
+		{
+			UCLIDException ue("ELI29349", "Description is longer than 255 characters.");
+			ue.addDebugInfo("Description", strDescription);
+			ue.addDebugInfo("Description Length", strDescription.length());
+			throw ue;
+		}
+
+		bool bFailIfExists = asCppBool(vbFailIfExists);
+		if (!AddTag_Internal(false, strTagName, strDescription, bFailIfExists))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
-			AddTag_Internal(true, bstrTagName, bstrTagDescription);
+			AddTag_Internal(true, strTagName, strDescription, bFailIfExists);
 		}
 		return S_OK;
 	}

@@ -85,8 +85,8 @@ public:
 //----------------------------------------------------------------------------------------------
 	STDMETHOD(put_Operation)(EManageTagsOperationType newVal);
 	STDMETHOD(get_Operation)(EManageTagsOperationType* pVal);
-	STDMETHOD(put_Tags)(IVariantVector* pvecTags);
-	STDMETHOD(get_Tags)(IVariantVector** ppvecTags);
+	STDMETHOD(put_Tags)(BSTR bstrTags);
+	STDMETHOD(get_Tags)(BSTR* pbstrTags);
 
 //----------------------------------------------------------------------------------------------
 // ICategorizedComponent
@@ -145,8 +145,7 @@ private:
 	// The operation to perform archive/restore
 	EManageTagsOperationType m_operationType;
 
-	// The tags to operate on
-	IVariantVectorPtr m_ipVecTags;
+	vector<string> m_vecTags;
 
 	// dirty flag
 	bool m_bDirty;
@@ -170,6 +169,9 @@ private:
 
 	// Toggles all the tags on the specified file
 	void toggleTagsOnFile(const IFileProcessingDBPtr& ipDB, long nFileID);
+	
+	// Returns a tokenized string that represents all tags
+	string tokenizeTags();
 };
 
 OBJECT_ENTRY_AUTO(CLSID_ManageTagsTask, CManageTagsTask)

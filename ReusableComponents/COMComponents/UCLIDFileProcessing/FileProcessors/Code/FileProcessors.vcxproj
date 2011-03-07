@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -61,9 +61,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CustomBuildStep>
-      <Message></Message>
-      <Command></Command>
-      <Outputs></Outputs>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <Midl>
       <TypeLibraryName>.\..\Debug/FileProcessors.tlb</TypeLibraryName>
@@ -110,9 +113,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>
-      <Message></Message>
-      <Command></Command>
-      <Outputs></Outputs>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <Midl>
       <TypeLibraryName>.\..\Release/FileProcessors.tlb</TypeLibraryName>
@@ -297,6 +303,7 @@
     <ClInclude Include="FileProcessorsUtils.h" />
     <ClInclude Include="LaunchAppFileProcessor.h" />
     <ClInclude Include="LaunchAppFileProcessorPP.h" />
+    <ClInclude Include="ManageTagsConstants.h" />
     <ClInclude Include="ManageTagsTask.h" />
     <ClInclude Include="ManageTagsTaskPP.h" />
     <ClInclude Include="OCRFileProcessor.h" />

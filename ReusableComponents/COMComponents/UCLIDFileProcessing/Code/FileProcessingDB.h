@@ -164,7 +164,7 @@ public:
 	STDMETHOD(TagFile)(long nFileID, BSTR bstrTagName);
 	STDMETHOD(UntagFile)(long nFileID, BSTR bstrTagName);
 	STDMETHOD(ToggleTagOnFile)(long nFileID, BSTR bstrTagName);
-	STDMETHOD(AddTag)(BSTR bstrTagName, BSTR bstrTagDescription);
+	STDMETHOD(AddTag)(BSTR bstrTagName, BSTR bstrTagDescription, VARIANT_BOOL vbFailIfExists);
 	STDMETHOD(DeleteTag)(BSTR bstrTagName);
 	STDMETHOD(ModifyTag)(BSTR bstrOldTagName, BSTR bstrNewTagName, BSTR bstrNewTagDescription);
 	STDMETHOD(GetFilesWithTags)(IVariantVector* pvecTagNames, VARIANT_BOOL vbAndOperation,
@@ -809,7 +809,8 @@ private:
 	bool TagFile_Internal(bool bDBLocked, long nFileID, BSTR bstrTagName);
 	bool UntagFile_Internal(bool bDBLocked, long nFileID, BSTR bstrTagName);
 	bool ToggleTagOnFile_Internal(bool bDBLocked, long nFileID, BSTR bstrTagName);
-	bool AddTag_Internal(bool bDBLocked, BSTR bstrTagName, BSTR bstrTagDescription);
+	bool AddTag_Internal(bool bDBLocked, const string& strTagName, const string& strTagDescription,
+		bool bFailIfExists);
 	bool DeleteTag_Internal(bool bDBLocked, BSTR bstrTagName);
 	bool ModifyTag_Internal(bool bDBLocked, BSTR bstrOldTagName, BSTR bstrNewTagName,
 		BSTR bstrNewTagDescription);

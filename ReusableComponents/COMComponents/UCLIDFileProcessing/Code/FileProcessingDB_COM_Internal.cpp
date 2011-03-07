@@ -2736,6 +2736,10 @@ bool CFileProcessingDB::TagFile_Internal(bool bDBLocked, long nFileID, BSTR bstr
 			string strTagName = asString(bstrTagName);
 			validateTagName(strTagName);
 
+			// Get the query for adding the tag, update with appropriate file ID
+			string strQuery = gstrTAG_FILE_QUERY;
+			replaceVariable(strQuery, gstrTAG_FILE_ID_VAR, asString(nFileID));
+
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = NULL;
 
@@ -2749,38 +2753,14 @@ bool CFileProcessingDB::TagFile_Internal(bool bDBLocked, long nFileID, BSTR bstr
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
-				// Validate the file ID
-				validateFileID(ipConnection, nFileID);
-
 				// Get the tag ID (this will also validate the ID)
 				long nTagID = getTagID(ipConnection, strTagName);
 
-				string strQuery = "SELECT [FileID], [TagID] FROM [FileTag] WHERE [FileID] = "
-					+ asString(nFileID) + " AND [TagID] = " + asString(nTagID);
+				// Update the query with the tag ID
+				replaceVariable(strQuery, gstrTAG_ID_VAR, asString(nTagID));
 
-				// Create a pointer to a recordset
-				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27344", ipTagSet != NULL);
-
-				// Open Recordset that contains the tag names
-				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-					adLockOptimistic, adCmdText);
-
-				// Only need to add a record if one does not already exist
-				if(ipTagSet->adoEOF == VARIANT_TRUE)
-				{
-					// Add a new record
-					ipTagSet->AddNew();
-
-					// Get the fields pointer
-					FieldsPtr ipFields = ipTagSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI27345", ipFields != NULL);
-
-					setLongField(ipFields, "FileID", nFileID);
-					setLongField(ipFields, "TagID", nTagID);
-
-					ipTagSet->Update();
-				}
+				// Execute the query to add the tag
+				executeCmdQuery(ipConnection, strQuery);
 
 				tg.CommitTrans();
 
@@ -2808,6 +2788,10 @@ bool CFileProcessingDB::UntagFile_Internal(bool bDBLocked, long nFileID, BSTR bs
 			string strTagName = asString(bstrTagName);
 			validateTagName(strTagName);
 
+			// Get the query for removing the tag, update with appropriate file ID
+			string strQuery = gstrUNTAG_FILE_QUERY;
+			replaceVariable(strQuery, gstrTAG_FILE_ID_VAR, asString(nFileID));
+
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = NULL;
 
@@ -2821,31 +2805,14 @@ bool CFileProcessingDB::UntagFile_Internal(bool bDBLocked, long nFileID, BSTR bs
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
-				// Validate the file ID
-				validateFileID(ipConnection, nFileID);
-
 				// Get the tag ID (this will also validate the ID)
 				long nTagID = getTagID(ipConnection, strTagName);
 
-				string strQuery = "SELECT [FileID], [TagID] FROM [FileTag] WHERE [FileID] = "
-					+ asString(nFileID) + " AND [TagID] = " + asString(nTagID);
+				// Update the query with the tag ID
+				replaceVariable(strQuery, gstrTAG_ID_VAR, asString(nTagID));
 
-				// Create a pointer to a recordset
-				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27348", ipTagSet != NULL);
-
-				// Open Recordset that contains the tag names
-				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-					adLockOptimistic, adCmdText);
-
-				// Only need to remove the record if one exists
-				if(ipTagSet->adoEOF == VARIANT_FALSE)
-				{
-					// Delete this record
-					ipTagSet->Delete(adAffectCurrent);
-
-					ipTagSet->Update();
-				}
+				// Execute the query to remove the tag
+				executeCmdQuery(ipConnection, strQuery);
 
 				tg.CommitTrans();
 
@@ -2873,6 +2840,10 @@ bool CFileProcessingDB::ToggleTagOnFile_Internal(bool bDBLocked, long nFileID, B
 			string strTagName = asString(bstrTagName);
 			validateTagName(strTagName);
 
+			// Get the query for toggling the tag, update with appropriate file ID
+			string strQuery = gstrTOGGLE_TAG_FOR_FILE_QUERY;
+			replaceVariable(strQuery, gstrTAG_FILE_ID_VAR, asString(nFileID));
+
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = NULL;
 
@@ -2886,45 +2857,14 @@ bool CFileProcessingDB::ToggleTagOnFile_Internal(bool bDBLocked, long nFileID, B
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
-				// Validate the file ID
-				validateFileID(ipConnection, nFileID);
-
 				// Get the tag ID (this will also validate the ID)
 				long nTagID = getTagID(ipConnection, strTagName);
 
-				string strQuery = "SELECT [FileID], [TagID] FROM [FileTag] WHERE [FileID] = "
-					+ asString(nFileID) + " AND [TagID] = " + asString(nTagID);
+				// Update the query with the tag ID
+				replaceVariable(strQuery, gstrTAG_ID_VAR, asString(nTagID));
 
-				// Create a pointer to a recordset
-				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27351", ipTagSet != NULL);
-
-				// Open Recordset that contains the tag names
-				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-					adLockOptimistic, adCmdText);
-
-				// If record does not exist, add it
-				if (ipTagSet->adoEOF == VARIANT_TRUE)
-				{
-					// Add a new record
-					ipTagSet->AddNew();
-
-					// Get the fields pointer
-					FieldsPtr ipFields = ipTagSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI27352", ipFields != NULL);
-
-					setLongField(ipFields, "FileID", nFileID);
-					setLongField(ipFields, "TagID", nTagID);
-
-				}
-				// Record does exist, remove it
-				else
-				{
-					ipTagSet->Delete(adAffectCurrent);
-				}	
-
-				// Update the table
-				ipTagSet->Update();
+				// Execute the query to toggle the tag
+				executeCmdQuery(ipConnection, strQuery);
 
 				tg.CommitTrans();
 
@@ -2943,30 +2883,13 @@ bool CFileProcessingDB::ToggleTagOnFile_Internal(bool bDBLocked, long nFileID, B
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::AddTag_Internal(bool bDBLocked, BSTR bstrTagName, BSTR bstrTagDescription)
+bool CFileProcessingDB::AddTag_Internal(bool bDBLocked, const string& strTagName,
+	const string& strDescription, bool bFailIfExists)
 {
 	try
 	{
 		try
 		{
-			// Get the tag name
-			string strTagName = asString(bstrTagName);
-
-			// Validate the tag name
-			validateTagName(strTagName);
-
-			// Get the description
-			string strDescription = asString(bstrTagDescription);
-
-			// Check the description length
-			if (strDescription.length() > 255)
-			{
-				UCLIDException ue("ELI29349", "Description is longer than 255 characters.");
-				ue.addDebugInfo("Description", strDescription);
-				ue.addDebugInfo("Description Length", strDescription.length());
-				throw ue;
-			}
-
 			string strQuery = "SELECT [TagName], [TagDescription] FROM [Tag] WHERE [TagName] = '"
 				+ strTagName + "'";
 
@@ -2993,6 +2916,11 @@ bool CFileProcessingDB::AddTag_Internal(bool bDBLocked, BSTR bstrTagName, BSTR b
 
 				if (ipTagSet->adoEOF == VARIANT_FALSE)
 				{
+					if (!bFailIfExists)
+					{
+						return true;
+					}
+
 					string strCurrentDescription = getStringField(ipTagSet->Fields, "TagDescription");
 
 					UCLIDException ue("ELI27356", "Specified tag already exists!");

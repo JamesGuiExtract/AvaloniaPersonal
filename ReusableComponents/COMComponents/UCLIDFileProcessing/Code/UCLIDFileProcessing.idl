@@ -887,9 +887,11 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrTagName);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To add a new tag to the Tag table with the specified description.
-		// REQUIRE: bstrTagName is not NULL or empty string AND bstrTagName does not already
-		//			exist in the Tag table.
-		[id(58), helpstring("method AddTag")] HRESULT AddTag([in] BSTR bstrTagName, [in] BSTR bstrTagDescription);
+		// REQUIRE: bstrTagName is not NULL or empty string
+		//			If vbFailIfExist == VARIANT_TRUE also requires that bstrTagName does not
+		//			already exist.
+		[id(58), helpstring("method AddTag")] HRESULT AddTag([in] BSTR bstrTagName,
+			[in] BSTR bstrTagDescription, [in] VARIANT_BOOL vbFailIfExist);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To remove the specified tag from the Tag table. If bstrTagName does not exist
 		//			in the Tag table then the Tag table will remain unchanged.

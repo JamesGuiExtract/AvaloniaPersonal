@@ -348,7 +348,7 @@ namespace Extract.FileActionManager.Forms
             {
                 // Add and tag the file
                 FileTag tag = e.FileTag;
-                _database.AddTag(tag.Name, tag.Description);
+                _database.AddTag(tag.Name, tag.Description, true);
                 _database.TagFile(_fileId, tag.Name);
             }
             catch (Exception ex)

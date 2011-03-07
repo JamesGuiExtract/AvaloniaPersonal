@@ -246,7 +246,7 @@ void CManageTagsDlg::OnBtnAdd()
 					try
 					{
 						// Add the new tag
-						m_ipFAMDB->AddTag(strTagName.c_str(), strDescription.c_str());
+						m_ipFAMDB->AddTag(strTagName.c_str(), strDescription.c_str(), VARIANT_TRUE);
 					}
 					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28311");
 				}

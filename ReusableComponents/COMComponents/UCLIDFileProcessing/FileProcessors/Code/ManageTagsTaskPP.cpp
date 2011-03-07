@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "ManageTagsTaskPP.h"
+#include "ManageTagsConstants.h"
 #include "..\..\..\UCLIDFileProcessing\Code\FPCategories.h"
 
 #include <UCLIDException.h>
@@ -9,6 +10,7 @@
 #include <ComponentLicenseIDs.h>
 #include <COMUtils.h>
 #include <cpputil.h>
+#include <StringTokenizer.h>
 
 //-------------------------------------------------------------------------------------------------
 // CManageTagsTaskPP
@@ -84,22 +86,23 @@ STDMETHODIMP CManageTagsTaskPP::Apply()
 			int lSize = m_listTags.GetItemCount();
 			if (lSize > 0)
 			{
-				IVariantVectorPtr ipVecTags(CLSID_VariantVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI27497", ipVecTags != NULL);
-
+				string strTags;
 				for (int i=0; i < lSize; i++)
 				{
 					if (m_listTags.GetCheckState(i) == TRUE)
 					{
 						_bstr_t bstrTag;
 						m_listTags.GetItemText(i, 0, bstrTag.GetBSTR());
-
-						ipVecTags->PushBack(_variant_t(bstrTag));
+						if (!strTags.empty())
+						{
+							strTags += gstrTAG_DELIMITER;
+						}
+						strTags += asString(bstrTag);
 					}
 				}
 
 				// Ensure at least 1 item is checked
-				if (ipVecTags->Size == 0)
+				if (strTags.empty())
 				{
 					MessageBox("At least 1 tag should be selected!", "No Tag Selected", MB_OK | MB_ICONERROR);
 					m_listTags.SetFocus();
@@ -128,7 +131,7 @@ STDMETHODIMP CManageTagsTaskPP::Apply()
 				}
 
 				// Set the tags and the operation
-				ipManageTags->Tags = ipVecTags;
+				ipManageTags->Tags = strTags.c_str();
 				ipManageTags->Operation = eOpType;
 			}
 			else
@@ -273,29 +276,26 @@ void CManageTagsTaskPP::selectTags(const UCLID_FILEPROCESSORSLib::IManageTagsTas
 		ASSERT_ARGUMENT("ELI27505", ipManageTags != NULL);
 
 		// Get the list of tags from the object
-		IVariantVectorPtr ipVecTags = ipManageTags->Tags;
+		string strTags = asString(ipManageTags->Tags);
+		vector<string> vecTags;
+		StringTokenizer::sGetTokens(strTags, gstrTAG_DELIMITER, vecTags);
 
 		// Only select tags if the list is not NULL (unconfigured object starts with NULL tags)
-		if (ipVecTags != NULL)
+		if (!vecTags.empty())
 		{
-			// Get the size
-			long lSize = ipVecTags->Size;
-
 			// Set the check state for each tag in the list
 			vector<string> vecTagsNotFound;
 			LVFINDINFO info;
 			info.flags = LVFI_STRING;
-			for (long i=0; i < lSize; i++)
+			for (vector<string>::iterator it = vecTags.begin(); it != vecTags.end(); it++)
 			{
-				string strTagName = asString(ipVecTags->Item[i].bstrVal);
-
 				// Find each value in the list
-				info.psz = strTagName.c_str();
+				info.psz = it->c_str();
 				int iIndex = m_listTags.FindItem(&info, -1);
 				if (iIndex == -1)
 				{
 					// Tag was not found, add to the list of not found
-					vecTagsNotFound.push_back(strTagName);
+					vecTagsNotFound.push_back(*it);
 				}
 				else
 				{

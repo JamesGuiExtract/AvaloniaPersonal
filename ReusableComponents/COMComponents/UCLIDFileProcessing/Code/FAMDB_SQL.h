@@ -699,3 +699,27 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 	"\r\n"
 	"END CATCH\r\n"
 	"SELECT * FROM @OutputTableVar ";
+
+// Queries for tagging/untagging files and toggling tags
+static const string gstrTAG_FILE_ID_VAR = "<FileID>";
+static const string gstrTAG_ID_VAR = "<TagID>";
+
+// Insertion query for adding a tag to a file (NOTE, this query
+// will attempt to add the tag even if it already exists, if it
+// already exists, this will cause a duplicate record exception
+// due to the unique index on the key/tag pair)
+static const string gstrADD_TAG_QUERY = 
+	"INSERT INTO [FileTag] ([FileID], [TagID]) VALUES("
+	+ gstrTAG_FILE_ID_VAR + ", " + gstrTAG_ID_VAR + ")";
+
+// Adds a tag to a file if it is not already tagged
+static const string gstrTAG_FILE_QUERY =
+	"IF NOT EXISTS (SELECT [FileID] FROM [FileTag] WHERE [FileID] = "
+	+ gstrTAG_FILE_ID_VAR + " AND [TagID] = "
+	+ gstrTAG_ID_VAR + ") " + gstrADD_TAG_QUERY;
+static const string gstrUNTAG_FILE_QUERY =
+	"DELETE FROM [FileTag] WHERE [FileID] = "
+	+ gstrTAG_FILE_ID_VAR + " AND [TagID] = "
+	+ gstrTAG_ID_VAR;
+static const string gstrTOGGLE_TAG_FOR_FILE_QUERY =
+	gstrTAG_FILE_QUERY + " ELSE " + gstrUNTAG_FILE_QUERY;
