@@ -33,6 +33,8 @@ const unsigned long gnCurrentVersion = 2;
 // component description
 const string gstrMANAGE_TAGS_COMPONENT_DESCRIPTION = "Core: Manage tags";
 
+const string gstrDYNAMIC_DESCRIPTION = "Dynamically added by the Manage tags task.";
+
 //--------------------------------------------------------------------------------------------------
 // CManageTagsTask
 //--------------------------------------------------------------------------------------------------
@@ -249,17 +251,37 @@ STDMETHODIMP CManageTagsTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAc
 	{
 		// Check license
 		validateLicense();
+
 		// Check for NULL parameters
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_ARGUMENT("ELI27461", ipDB != NULL);
-		ASSERT_ARGUMENT("ELI27462", pResult != NULL);
 		IFileRecordPtr ipFileRecord(pFileRecord);
+		ASSERT_ARGUMENT("ELI27461", ipDB != __nullptr);
+		ASSERT_ARGUMENT("ELI27462", pResult != __nullptr);
 		ASSERT_ARGUMENT("ELI31339", ipFileRecord != __nullptr);
+		ASSERT_ARGUMENT("ELI31997", pTagManager != __nullptr);
 
+		// Get file ID and source doc name
 		long nFileID = ipFileRecord->FileID;
+		string strSourceDoc = asString(ipFileRecord->Name);
 
-		// Validate the tags [LRCAU #5447]
-		validateTags(ipDB);
+		// Build expanded list of tags
+		vector<string> vecTags;
+		for(vector<string>::iterator it = m_vecTags.begin(); it != m_vecTags.end(); it++)
+		{
+			// Check if string contains expansion symbols
+			if (it->find_first_of("<$") != string::npos)
+			{
+				vecTags.push_back(CFileProcessorsUtils::ExpandTagsAndTFE(
+					pTagManager, *it, strSourceDoc));
+			}
+			else
+			{
+				vecTags.push_back(*it);
+			}
+		}
+
+		// Validate/add tags as needed (Do not add tags if removing)
+		validateAndAddTags(vecTags, ipDB, m_operationType != kOperationRemoveTags);
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
@@ -268,24 +290,24 @@ STDMETHODIMP CManageTagsTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAc
 		switch(m_operationType)
 		{
 		case kOperationApplyTags:
-			addTagsToFile(ipDB, nFileID);
+			addTagsToFile(vecTags, ipDB, nFileID);
 			break;
 
 		case kOperationRemoveTags:
-			removeTagsFromFile(ipDB, nFileID);
+			removeTagsFromFile(vecTags, ipDB, nFileID);
 			break;
 
 		case kOperationToggleTags:
-			toggleTagsOnFile(ipDB, nFileID);
+			toggleTagsOnFile(vecTags, ipDB, nFileID);
 			break;
 
 		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI27463");
 		}
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27464")
 
-	return S_OK;
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27464");
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CManageTagsTask::raw_Cancel()
@@ -575,30 +597,42 @@ void CManageTagsTask::validateLicense()
 	VALIDATE_LICENSE(gnFILE_ACTION_MANAGER_OBJECTS, "ELI27483", "Manage Tags Task");
 }
 //--------------------------------------------------------------------------------------------------
-void CManageTagsTask::validateTags(const IFileProcessingDBPtr& ipDB)
+//--------------------------------------------------------------------------------------------------
+void CManageTagsTask::validateAndAddTags(const vector<string>& vecTags,
+	const IFileProcessingDBPtr& ipDB, bool bAddIfMissing)
 {
 	try
 	{
+		bool bAllowDynamicTags = asCppBool(ipDB->AllowDynamicTagCreation());
+
 		// Get the list of tags from the database
 		IVariantVectorPtr ipVecTags = ipDB->GetTagNames();
 		ASSERT_RESOURCE_ALLOCATION("ELI27703", ipVecTags != NULL);
 
-		for(vector<string>::iterator it = m_vecTags.begin(); it != m_vecTags.end(); it++)
+		for(vector<string>::const_iterator it = vecTags.begin(); it != vecTags.end(); it++)
 		{
 			if (ipVecTags->Contains(it->c_str()) == VARIANT_FALSE)
 			{
-				UCLIDException uex("ELI27704", "Invalid tag: Tag no longer exists in database.");
-				uex.addDebugInfo("Database Name", asString(ipDB->GetDatabaseName()));
-				uex.addDebugInfo("Database Server", asString(ipDB->GetDatabaseServer()));
-				uex.addDebugInfo("Tag Name", *it);
-				throw uex;
+				if (!bAllowDynamicTags)
+				{
+					UCLIDException uex("ELI27704", "Invalid tag: Tag does not exist in database.");
+					uex.addDebugInfo("Database Name", asString(ipDB->GetDatabaseName()));
+					uex.addDebugInfo("Database Server", asString(ipDB->GetDatabaseServer()));
+					uex.addDebugInfo("Tag Name", *it);
+					throw uex;
+				}
+				else if(bAddIfMissing)
+				{
+					ipDB->AddTag(it->c_str(), gstrDYNAMIC_DESCRIPTION.c_str(), VARIANT_FALSE); 
+				}
 			}
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27705");
 }
 //--------------------------------------------------------------------------------------------------
-void CManageTagsTask::addTagsToFile(const IFileProcessingDBPtr &ipDB, long nFileID)
+void CManageTagsTask::addTagsToFile(const vector<string>& vecTags,
+	const IFileProcessingDBPtr &ipDB, long nFileID)
 {
 	try
 	{
@@ -609,7 +643,7 @@ void CManageTagsTask::addTagsToFile(const IFileProcessingDBPtr &ipDB, long nFile
 			throw UCLIDException("ELI27511", "No tags to add to the file.");
 		}
 			
-		for(vector<string>::iterator it = m_vecTags.begin(); it != m_vecTags.end(); it++)
+		for(vector<string>::const_iterator it = vecTags.begin(); it != vecTags.end(); it++)
 		{
 			ipDB->TagFile(nFileID, it->c_str());
 		}
@@ -617,7 +651,8 @@ void CManageTagsTask::addTagsToFile(const IFileProcessingDBPtr &ipDB, long nFile
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27487");
 }
 //--------------------------------------------------------------------------------------------------
-void CManageTagsTask::removeTagsFromFile(const IFileProcessingDBPtr &ipDB, long nFileID)
+void CManageTagsTask::removeTagsFromFile(const vector<string>& vecTags,
+	const IFileProcessingDBPtr &ipDB, long nFileID)
 {
 	try
 	{
@@ -629,7 +664,7 @@ void CManageTagsTask::removeTagsFromFile(const IFileProcessingDBPtr &ipDB, long 
 		}
 			
 		// Loop through each tag and remove it from the specified file
-		for(vector<string>::iterator it = m_vecTags.begin(); it != m_vecTags.end(); it++)
+		for(vector<string>::const_iterator it = vecTags.begin(); it != vecTags.end(); it++)
 		{
 			ipDB->UntagFile(nFileID, it->c_str());
 		}
@@ -637,7 +672,8 @@ void CManageTagsTask::removeTagsFromFile(const IFileProcessingDBPtr &ipDB, long 
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27489");
 }
 //--------------------------------------------------------------------------------------------------
-void CManageTagsTask::toggleTagsOnFile(const IFileProcessingDBPtr &ipDB, long nFileID)
+void CManageTagsTask::toggleTagsOnFile(const vector<string>& vecTags,
+	const IFileProcessingDBPtr &ipDB, long nFileID)
 {
 	try
 	{
@@ -649,7 +685,7 @@ void CManageTagsTask::toggleTagsOnFile(const IFileProcessingDBPtr &ipDB, long nF
 		}
 			
 		// Loop through each tag and toggle it for the specified file
-		for(vector<string>::iterator it = m_vecTags.begin(); it != m_vecTags.end(); it++)
+		for(vector<string>::const_iterator it = vecTags.begin(); it != vecTags.end(); it++)
 		{
 			ipDB->ToggleTagOnFile(nFileID, it->c_str());
 		}

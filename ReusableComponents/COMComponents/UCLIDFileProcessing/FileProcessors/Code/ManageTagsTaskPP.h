@@ -15,6 +15,8 @@
 #include "resource.h"       // main symbols
 #include "FileProcessors.h"
 
+#include <ImageButtonWithStyle.h>
+
 #include <string>
 
 using namespace std;
@@ -47,6 +49,11 @@ public:
 	BEGIN_MSG_MAP(CManageTagsTaskPP)
 		CHAIN_MSG_MAP(IPropertyPageImpl<CManageTagsTaskPP>)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		COMMAND_HANDLER(IDC_BTN_TAG_DOC_TAG, BN_CLICKED, OnClickedBtnTagsDocTags)
+		COMMAND_HANDLER(IDC_COMBO_TAGS, CBN_SELENDCANCEL, OnCbnSelEndCancelCmbTags)
+
+		// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
+		REFLECT_NOTIFICATIONS()
 	END_MSG_MAP()
 
 // Handler prototypes:
@@ -63,13 +70,14 @@ public:
 	// Message handlers
 	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnClickedBtnRadioOperation(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedBtnTagsDocTags(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCbnSelEndCancelCmbTags(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	// Ensures that this component is licensed
 	void validateLicense();
 
-	// Loads the tags from the database, returns true if there was at least 1 tag
-	// to load, false otherwise
+	// Loads the tags from the database
 	void loadTagsFromDatabase(const IFileProcessingDBPtr& ipDB);
 
 	void prepareControls();
@@ -83,7 +91,11 @@ private:
 	ATLControls::CButton m_radioAddTags;
 	ATLControls::CButton m_radioRemoveTags;
 	ATLControls::CButton m_radioToggleTags;
-	ATLControls::CListViewCtrl m_listTags;
+	ATLControls::CComboBox m_comboTags;
+	CImageButtonWithStyle m_btnTagsDocTags;
+
+	// Holds the selection from the tags combo edit control
+	DWORD m_dwComboTagsSel;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ManageTagsTaskPP), CManageTagsTaskPP)

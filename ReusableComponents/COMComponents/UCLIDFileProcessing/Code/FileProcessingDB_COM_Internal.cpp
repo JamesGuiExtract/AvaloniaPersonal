@@ -2805,8 +2805,26 @@ bool CFileProcessingDB::UntagFile_Internal(bool bDBLocked, long nFileID, BSTR bs
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
-				// Get the tag ID (this will also validate the ID)
-				long nTagID = getTagID(ipConnection, strTagName);
+				long nTagID = 0;
+
+				try
+				{
+					// Get the tag ID (this will also validate the ID)
+					nTagID = getTagID(ipConnection, strTagName);
+				}
+				catch(...)
+				{
+					// If allowing dynamic tag creation, just return true at this point
+					// (an exception indicates the tag doesn't exist)
+					if(m_bAllowDynamicTagCreation)
+					{
+						return true;
+					}
+					else
+					{
+						throw;
+					}
+				}
 
 				// Update the query with the tag ID
 				replaceVariable(strQuery, gstrTAG_ID_VAR, asString(nTagID));
@@ -3305,44 +3323,6 @@ bool CFileProcessingDB::GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVa
 		throw ue;
 	}
 	return true;
-}
-//-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::AllowDynamicTagCreation_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal)
-{
-	try
-	{
-		try
-		{
-			ASSERT_ARGUMENT("ELI27378", pvbVal != NULL);
-
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
-
-			BEGIN_CONNECTION_RETRY();
-
-				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
-
-				// Get the allow dynamic tag creation setting value
-				string strSetting =
-					getDBInfoSetting(ipConnection, gstrALLOW_DYNAMIC_TAG_CREATION, true);
-
-				// Set the out value
-				*pvbVal = strSetting == "1" ? VARIANT_TRUE : VARIANT_FALSE;
-
-			END_CONNECTION_RETRY(ipConnection, "ELI27379");
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30683");
-	}
-	catch(UCLIDException &ue)
-	{
-		if (!bDBLocked)
-		{
-			return false;
-		}
-		throw ue;
-	}
-	return true;	 
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVariantVector *pvecTagNames,

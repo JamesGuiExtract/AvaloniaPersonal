@@ -2275,6 +2275,12 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 
 							m_bStoreSourceDocChangeHistory = getStringField(ipFields, "Value") == "1";
 						}
+						else if (strValue == gstrALLOW_DYNAMIC_TAG_CREATION)
+						{
+							_lastCodePos = "270";
+
+							m_bAllowDynamicTagCreation = getStringField(ipFields, "Value") == "1";
+						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
 					{

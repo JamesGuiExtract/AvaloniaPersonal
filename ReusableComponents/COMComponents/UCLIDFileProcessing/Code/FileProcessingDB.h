@@ -346,6 +346,9 @@ private:
 	// Flag indicating whether to store source doc change history
 	bool m_bStoreSourceDocChangeHistory;
 
+	// Flag indicating whether tags can be dynamically created.
+	bool m_bAllowDynamicTagCreation;
+
 	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Events used for the LastPingThread
@@ -817,7 +820,6 @@ private:
 	bool GetFilesWithTags_Internal(bool bDBLocked, IVariantVector* pvecTagNames,
 		VARIANT_BOOL vbAndOperation, IVariantVector** ppvecFileIDs);
 	bool GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVariantVector** ppvecTagNames);
-	bool AllowDynamicTagCreation_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal);
 	bool SetStatusForFilesWithTags_Internal(bool bDBLocked, IVariantVector *pvecTagNames,
 		VARIANT_BOOL vbAndOperation, long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
 	bool ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQuery, long* pnRecordsAffected);

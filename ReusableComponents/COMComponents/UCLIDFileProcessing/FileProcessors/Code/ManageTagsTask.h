@@ -159,16 +159,17 @@ private:
 
 	// Checks the list of tags and ensures they still exist in the database before
 	// continuing
-	void validateTags(const IFileProcessingDBPtr& ipDB);
+	void validateAndAddTags(const vector<string>& vecTags, const IFileProcessingDBPtr& ipDB,
+		bool bAddIfMissing);
 
 	// Adds all the tags to the specified file
-	void addTagsToFile(const IFileProcessingDBPtr& ipDB, long nFileID);
+	void addTagsToFile(const vector<string>& vecTags, const IFileProcessingDBPtr& ipDB, long nFileID);
 
 	// Removes all the tags from the specified file
-	void removeTagsFromFile(const IFileProcessingDBPtr& ipDB, long nFileID);
+	void removeTagsFromFile(const vector<string>& vecTags, const IFileProcessingDBPtr& ipDB, long nFileID);
 
 	// Toggles all the tags on the specified file
-	void toggleTagsOnFile(const IFileProcessingDBPtr& ipDB, long nFileID);
+	void toggleTagsOnFile(const vector<string>& vecTags, const IFileProcessingDBPtr& ipDB, long nFileID);
 	
 	// Returns a tokenized string that represents all tags
 	string tokenizeTags();

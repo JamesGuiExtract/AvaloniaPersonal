@@ -1627,14 +1627,12 @@ STDMETHODIMP CFileProcessingDB::AllowDynamicTagCreation(VARIANT_BOOL* pvbVal)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI32002", pvbVal != __nullptr);
+
 		validateLicense();
 
-		if (!AllowDynamicTagCreation_Internal(false, pvbVal))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-			AllowDynamicTagCreation_Internal(true, pvbVal);
-		}
+		*pvbVal = asVariantBool(m_bAllowDynamicTagCreation);
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27380");
