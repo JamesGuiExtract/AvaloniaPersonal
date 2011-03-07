@@ -250,7 +250,7 @@ bool CDocumentClassifierTester::compareTags(const string& strDocName,
 				/////////////////////////////////////////////////////
 				// Check ExpectedDocTypes for a Document Type keyword
 				/////////////////////////////////////////////////////
-				if (strExpectedDocTypes[0] == '<')
+				if ((strExpectedDocTypes.length() > 0) && strExpectedDocTypes[0] == '<')
 				{
 					// Handle <FailIfZero> case 
 					if (strExpectedDocTypes == gstrKeywordFailIfZero)

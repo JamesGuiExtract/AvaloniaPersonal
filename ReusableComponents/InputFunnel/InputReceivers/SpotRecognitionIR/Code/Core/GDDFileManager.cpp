@@ -650,7 +650,7 @@ string GDDFileManager::sGetImageNameFromGDDFile(const string& strPathName)
 	{
 		getline(infile, strLine);
 	} 
-	while (strLine[0] == '#'  && !infile.eof());
+	while (!infile.eof() && !strLine.empty() && strLine[0] == '#');
 
 	// return the first non-comment line, which is the image name
 	if (infile)

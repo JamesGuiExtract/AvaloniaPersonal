@@ -820,11 +820,16 @@ STDMETHODIMP CSpatialString::Save(IStream *pStream, BOOL fClearDirty)
 			// write the number of letters
 			dataWriter << (long)m_vecLetters.size();
 
-			// Set the size of the bytestream
-			bs.setSize(m_vecLetters.size() * sizeof(CPPLetter));
+			if (ulNumLetters > 0)
+			{
+				long lSize = m_vecLetters.size() * sizeof(CPPLetter);
 
-			memcpy(bs.getData(), &(m_vecLetters[0]), m_vecLetters.size() * sizeof(CPPLetter));
-			dataWriter.write(bs);
+				// Set the size of the bytestream
+				bs.setSize(lSize);
+
+				memcpy_s(bs.getData(), lSize, &(m_vecLetters[0]), lSize);
+				dataWriter.write(bs);
+			}
 		}
 
 		// MUST flush the bytestream before writing out the COM object(s)

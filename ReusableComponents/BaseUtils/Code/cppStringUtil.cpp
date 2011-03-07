@@ -464,6 +464,12 @@ unsigned int getPositionOfFirstAlpha(const string &strText, unsigned int uiStart
 //--------------------------------------------------------------------------------------------------
 bool isAlphaNumeric(const string& strText, const unsigned int& uiPos)
 {
+	// check for empty string
+	if (strText.empty())
+	{
+		return false;
+	}
+
 	if ( uiPos < strText.size() )
 	{
 		char cTemp = strText[uiPos];
@@ -509,7 +515,7 @@ void makeFirstCharToUpper(string& strInput)
 {
 	// if the first character is an alphabetic character, then
 	// make it upper case.
-	if (strInput[0] >= 'a' && strInput[0] <= 'z')
+	if (!strInput.empty() && strInput[0] >= 'a' && strInput[0] <= 'z')
 	{
 		strInput[0] += 'A' - 'a';
 	}
@@ -718,10 +724,11 @@ void convertCppStringToNormalString(string& strCppStr)
 void convertNormalStringToCppString(string& strNormalStr)
 {
 	size_t findpos = 0;
-	while (true)
+	unsigned int uiNormalStrLength = strNormalStr.length();
+	while (findpos != string::npos && findpos < uiNormalStrLength)
 	{
 		findpos = strNormalStr.find("\\", findpos);
-		if (findpos != string::npos)
+		if (findpos != string::npos && findpos < uiNormalStrLength - 1)
 		{
 			char nextChar(strNormalStr[findpos + 1]); 
 			// replace "\\\\" with "\\"
@@ -747,10 +754,45 @@ void convertNormalStringToCppString(string& strNormalStr)
 			// replace "\\xXX" with "\xXX"
 			else if (nextChar == 'x')
 			{
-				char zChar[10] = "?"; 
-				zChar[0] = getValueOfHexChar(strNormalStr[findpos+2])*16
-							+ getValueOfHexChar(strNormalStr[findpos+3]);
-				strNormalStr.replace(findpos, 4, zChar);
+				// if the there is not a character after the x or the character is 
+				// not a valid hex character there is nothing to do 
+				// Only supporting specification of 1 or 2 hex digits after the x
+				unsigned int uiFirstHexCharPos = findpos + 1;
+				unsigned int uiSecondHexCharPos = findpos + 2;
+	
+				// if hex digits are found convert to the represented character
+				if (uiFirstHexCharPos < uiNormalStrLength)
+				{
+					char zChar[10] = "?"; 
+
+					unsigned char ucCurrChar = strNormalStr[uiFirstHexCharPos];
+
+					// Check if first location after x is a Hex digit
+					if (isHexChar(ucCurrChar))
+					{
+						// Convert to character value
+						zChar[0] = getValueOfHexChar(ucCurrChar);
+
+						int iNumberOfCharToReplaced = 3;
+
+						if (uiSecondHexCharPos < uiNormalStrLength )
+						{
+							ucCurrChar = strNormalStr[uiSecondHexCharPos];
+
+							// check if it is a hex digit
+							if ( isHexChar(ucCurrChar))
+							{
+								// move the current value in zChar[0] to the upper 4 bits and add the value 
+								// of the second digit
+								zChar[0] = zChar[0] * 16 + getValueOfHexChar(ucCurrChar);
+								iNumberOfCharToReplaced++;
+							}
+						}
+
+						// replace the characters representing the character with the character value
+						strNormalStr.replace(findpos, iNumberOfCharToReplaced, zChar);
+					}
+				}
 			}
 			// replace "\\a" with "\a"
 			else if (nextChar == 'a')
@@ -1042,6 +1084,8 @@ string combine(const string& strInput,
 {
 	string strRet("");
 
+	unsigned int uiInputSize = strInput.length();
+
 	// current reading position in the input string
 	unsigned int uiCurrentPos = 0;
 	unsigned int uiStartPos = 0, uiEndPos = 0;
@@ -1060,7 +1104,7 @@ string combine(const string& strInput,
 
 	while (uiStartPos != string::npos)
 	{
-		if (uiStartPos >= strInput.size()-1)
+		if (uiStartPos >= uiInputSize - 1)
 		{
 			UCLIDException ue("ELI06915", 
 				"Input string contains percent sign at the end of the string.");
@@ -1077,17 +1121,17 @@ string combine(const string& strInput,
 			// interpret the previous pattern, and append it to strRet
 			string strNumber("");
 			unsigned int uiNumberOfDigits = 0;
-			while (true)
+			for ( unsigned int u = uiStartPos + 1; u < uiInputSize; u++)
 			{
-				// number of digits after the last percent sign
-				uiNumberOfDigits++;
-				if (::isdigit((unsigned char) strInput[uiStartPos + uiNumberOfDigits]))
+				if (::isdigit((unsigned char) strInput[u]))
 				{
-					strNumber += strInput.substr(uiStartPos + uiNumberOfDigits, 1);
+					strNumber += strInput.substr(u, 1);
+					
+					// number of digits after the last percent sign
+					uiNumberOfDigits++;
 				}
 				else
 				{
-					uiNumberOfDigits--;
 					break;
 				}
 			}
@@ -1145,18 +1189,18 @@ string combine(const string& strInput,
 		else
 		{
 			string strNumber("");
-			unsigned long ulNumberOfDigits = 0;
-			while (true)
+			unsigned int uiNumberOfDigits = 0;
+			for ( unsigned int u = uiStartPos + 1; u < uiInputSize; u++)
 			{
-				// number of digits after the last percent sign
-				ulNumberOfDigits++;
-				if (::isdigit((unsigned char) strInput[uiStartPos + ulNumberOfDigits]))
+				if (::isdigit((unsigned char) strInput[u]))
 				{
-					strNumber += strInput.substr(uiStartPos + ulNumberOfDigits, 1);
+					strNumber += strInput.substr(u, 1);
+					
+					// number of digits after the last percent sign
+					uiNumberOfDigits++;
 				}
 				else
 				{
-					ulNumberOfDigits--;
 					break;
 				}
 			}
@@ -1186,7 +1230,7 @@ string combine(const string& strInput,
 
 			strRet += vecInterpretations[ulNumber-1];
 			
-			uiCurrentPos = uiStartPos + ulNumberOfDigits + 1;
+			uiCurrentPos = uiStartPos + uiNumberOfDigits + 1;
 
 			// get the string in between previous and next percent signs
 			strRet += strInput.substr(uiCurrentPos, uiEndPos - uiCurrentPos);

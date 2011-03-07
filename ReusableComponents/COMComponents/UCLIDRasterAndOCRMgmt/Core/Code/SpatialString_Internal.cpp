@@ -159,7 +159,11 @@ void CSpatialString::insert(long nPos,
                 if (nNumLetters > 0)
                 {	
                     vecLetters.resize(nNumLetters);
-                    memcpy(&(vecLetters[0]), letters, nNumLetters * sizeof(CPPLetter));
+					// Since the m_vecLetters was just resized to nNumLetters the copy size 
+					// is the same
+					long lCopySize = sizeof(CPPLetter) * nNumLetters;
+
+					memcpy_s(&(vecLetters[0]), lCopySize, letters, lCopySize);
                 }
 
                 // Verify that the letters being inserted fit between the letters already
@@ -1002,6 +1006,16 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName)
 	string text = getTextFileContentsAsString(strFileName);
 	size_t length = text.length();
 
+	// Check for an empty string
+	if (text.empty())
+	{
+		reset(true, true);
+
+		// Copy the source doc name
+		m_strSourceDocName = strFileName;
+		return;
+	}
+
 	// Initialize a letter array that will be used to create the spatial string.
 	vector<CPPLetter> vecLetters(length);
 	CPPLetter *plastSpatialLetter = NULL;
@@ -1242,7 +1256,10 @@ void CSpatialString::processLetters(CPPLetter* letters, long nNumLetters)
         
         if(nNumLetters > 0)
         {
-            memcpy(&m_vecLetters[0], letters, sizeof(CPPLetter) * nNumLetters);
+			// Since the m_vecLetters was just resized to nNumLetters the copy size 
+			// is the same
+			long lCopySize = sizeof(CPPLetter) * nNumLetters;
+            memcpy_s(&m_vecLetters[0], lCopySize , letters, lCopySize);
         }
     }
 
@@ -3240,7 +3257,11 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
             
             if(nNumLetters > 0)
             {
-                memcpy(&(m_vecLetters[0]), letters, nNumLetters*sizeof(CPPLetter));
+				// Since the m_vecLetters was just resized to nNumLetters the copy size 
+				// is the same
+				long lCopySize = sizeof(CPPLetter) * nNumLetters;
+
+				memcpy_s(&(m_vecLetters[0]), lCopySize, letters, lCopySize);
             }
         }
         // If the object is hybrid, get the raster zone(s)

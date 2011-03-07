@@ -481,6 +481,12 @@ void CStringCSISTester::getFindResults( const stringCSIS& str1, const stringCSIS
 	size_t lOffset =  0;
 	size_t lPos;
 
+	// if str2 is empty the result set will be empty
+	if ( str2.empty())
+	{
+		return;
+	}
+
 	// loop to find all chars in str2 found in str1
 	do
 	{
@@ -532,6 +538,12 @@ void CStringCSISTester::getFindFirstNotOfResults(const stringCSIS& str1, const s
 	long lOffset =  0;
 	long lPos;
 
+	// if str2 is an empty string the results should be empty
+	if (str2.empty())
+	{
+		return;
+	}
+
 	// loop to find all chars in str2 found in str1
 	do
 	{
@@ -582,6 +594,12 @@ void CStringCSISTester::getFindFirstOfResults(const stringCSIS& str1, const stri
 	// SetlOffset to 0 - we will find all occurrences of the chars in str2
 	long lOffset =  0;
 	long lPos;
+
+	// if str2 is empty the results should be empty
+	if (str2.empty())
+	{
+		return;
+	}
 
 	// loop to find all chars in str2 found in str1
 	do
@@ -635,6 +653,12 @@ void CStringCSISTester::getFindLastNotOfResults(const stringCSIS& str1, const st
 	long lOffset = (long)string::npos;
 	long lPos;
 
+	// if str2 is empty the results should be empty
+	if (str2.empty())
+	{
+		return;
+	}
+
 	// loop to find all chars in str2 found in str1
 	do
 	{
@@ -686,6 +710,12 @@ void CStringCSISTester::getFindLastOfResults(const stringCSIS& str1, const strin
 	long lOffset =  (long)string::npos;
 	long lPos;
 
+	// if str2 is empty the results should be empty
+	if (str2.empty())
+	{
+		return;
+	}
+
 	// loop to find all chars in str2 found in str1
 	do
 	{
@@ -736,6 +766,12 @@ void CStringCSISTester::getRfindResults(const stringCSIS& str1, const stringCSIS
 	// Set lOffset to length of string since search is from the end and we will find all occurrences of the chars in str2
 	long lOffset = (long)string::npos;
 	long lPos;
+
+	// if str2 is empty the results should be empty
+	if (str2.empty())
+	{
+		return;
+	}
 
 	// loop to find all chars in str2 found in str1
 	do

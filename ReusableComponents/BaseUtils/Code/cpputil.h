@@ -678,6 +678,8 @@ EXPORT_BaseUtils void convertCppStringToNormalString(string& strCppStr);
 // convert normal string to cpp string
 // Example: "hello \\\\n hello" --> "hello \\n hello"
 //			"hello \\x2c hello" --> "hello , hello"
+//			This will not support converting more that 2 hex digits after \\x nor will it 
+//			convert octal digits e.g. "\\54" will not be changed to ",' but stay "\\54"
 EXPORT_BaseUtils void convertNormalStringToCppString(string& strNormalStr);
 //-------------------------------------------------------------------------------------------------
 // make a string suitable for using as part of a regular expression

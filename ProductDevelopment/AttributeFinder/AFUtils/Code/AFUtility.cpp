@@ -1314,7 +1314,9 @@ ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat,
 	ASSERT_RESOURCE_ALLOCATION("ELI19187", ipNewName != NULL);
 
 	unsigned int ui;
-	for (ui = 0; ui < strFormat.length(); ui++)
+	unsigned int uiLength = strFormat.length();
+
+	for (ui = 0; ui < uiLength; ui++)
 	{
 		char c = strFormat.at(ui);
 		if (c == '<')
@@ -1365,7 +1367,7 @@ ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat,
 			}
 
 			// if character after starting "%" is digit extract the number from the identifier
-			if (isDigitChar(strFormat[ulIdentStartPos]))
+			if (ulIdentStartPos < uiLength && isDigitChar(strFormat[ulIdentStartPos]))
 			{
 				unsigned long ulNumberEndPos = strFormat.find_first_not_of("0123456789", ulIdentStartPos);
 

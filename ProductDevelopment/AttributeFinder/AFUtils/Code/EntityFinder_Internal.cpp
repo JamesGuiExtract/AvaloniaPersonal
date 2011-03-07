@@ -1791,7 +1791,7 @@ long CEntityFinder::findFirstCaseWord(const string& strText, int iStartPos, bool
 			}
 
 			// Ignore the word "of" if this is a Company and not the last word
-			if (bIsCompany && (i < iCount - 1) && 
+			if (bIsCompany && (i < iCount - 1) && strWord.length() >= 2 &&
 				((strWord[0] == 'o' || strWord[0] == 'O') && 
 				(strWord[1] == 'f' || strWord[1] == 'F')))
 			{
@@ -2682,8 +2682,10 @@ long CEntityFinder::removeFirstDigitsWords(const string& strInput, IRegularExprP
 					long lLetterPos = strWord.find_first_of(gstrLetters, lDigitPos); 
 					if (lLetterPos == string::npos)
 					{
+						int iWordLength = strWord.length();
+
 						// Only digits - except for four-digit year
-						if ((strWord.length() != 4) || (strWord[0] == '0'))
+						if ((iWordLength != 4) || (iWordLength > 0) && (strWord[0] == '0'))
 						{
 							bNotAcceptable = true;
 						}
@@ -2762,20 +2764,24 @@ string	CEntityFinder::trimLeadingNonsense(string strInput, IRegularExprParserPtr
 		{
 			// Remove leading lower-case text
 			strInput = strInput.substr( iFirstUpper, lLength - iFirstUpper );
+			
+			// Get length of input
+			lLength = strInput.length();
 
 			// Trim this word if starts with a lower-case character
 			// Unless it contains ".com" (P16 #2020)
-			if ((strInput[0] >= 'a') && (strInput[0] <= 'z') && 
+			if ((lLength > 0) && (strInput[0] >= 'a') && (strInput[0] <= 'z') && 
 				(strInput.find( ".com" ) == string::npos))
 			{
 				long lWhitePos = strInput.find_first_of( " \r\n" );
 				if (lWhitePos != string::npos)
 				{
 					strInput = strInput.substr( lWhitePos, lLength - lWhitePos );
+
+					// update the length
+					lLength = strInput.length();
 				}
 			}
-
-			lLength = strInput.length();
 
 			// Set flag
 			bStillTrimming = true;

@@ -551,6 +551,12 @@ void CAFUtility::getQueryPatterns(string strQuery,
 {
 	// clear the vector
 	rvecPatterns.clear();
+	
+	// return if strQuery is an empty string
+	if (strQuery.empty())
+	{
+		return;
+	}
 
 	// if the query contains a leading slash, delete the
 	// leading slash

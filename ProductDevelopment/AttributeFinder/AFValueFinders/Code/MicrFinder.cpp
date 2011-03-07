@@ -1592,7 +1592,7 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 
 		// Trim only the first zero (if it is there) for
 		// the second piece
-		if (strSecondPiece[0] == '0')
+		if ((strSecondPiece.length() > 1) && strSecondPiece[0] == '0')
 		{
 			strSecondPiece = strSecondPiece.substr(1, 3);
 		}

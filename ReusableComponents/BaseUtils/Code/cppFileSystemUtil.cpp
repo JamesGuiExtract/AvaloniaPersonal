@@ -1388,7 +1388,7 @@ bool isPDFFile(const string& strName)
 bool isImageFileExtension(string strExt)
 {
 	// erase the leading period if any
-	if (strExt[0] == '.')
+	if (strExt.substr(0,1) == ".")
 	{
 		strExt.erase(0, 1);
 	}
