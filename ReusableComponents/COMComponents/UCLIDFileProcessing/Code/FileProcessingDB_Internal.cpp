@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 103;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 104;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -1018,6 +1018,10 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMUSER_FK);
 		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_MACHINE_FK);
+		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_TAG_FK);
+		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_FAMUSER_FK);
+		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_MACHINE_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1064,6 +1068,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_TABLE);
 	vecQueries.push_back(gstrCREATE_LOGIN_TABLE);
 	vecQueries.push_back(gstrCREATE_SOURCE_DOC_CHANGE_HISTORY);
+	vecQueries.push_back(gstrCREATE_DOC_TAG_HISTORY_TABLE);
 
 	return vecQueries;
 }
@@ -1161,6 +1166,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT] =
 		asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
 	mapDefaultValues[gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY] = "1";
+	mapDefaultValues[gstrSTORE_DOC_TAG_HISTORY] = "1";
 
 	return mapDefaultValues;
 }
@@ -2039,6 +2045,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrINPUT_EVENT);
 	vecTables.push_back(gstrFILE_ACTION_STATUS);
 	vecTables.push_back(gstrSOURCE_DOC_CHANGE_HISTORY);
+	vecTables.push_back(gstrDOC_TAG_HISTORY);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -2280,6 +2287,12 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							_lastCodePos = "270";
 
 							m_bAllowDynamicTagCreation = getStringField(ipFields, "Value") == "1";
+						}
+						else if (strValue == gstrSTORE_DOC_TAG_HISTORY)
+						{
+							_lastCodePos = "280";
+
+							m_bStoreDocTagHistory = getStringField(ipFields, "Value") == "1";
 						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))

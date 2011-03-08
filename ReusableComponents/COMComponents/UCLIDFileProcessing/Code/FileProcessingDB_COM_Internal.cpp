@@ -247,6 +247,7 @@ int UpdateToSchemaVersion102(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31438");
 }
+//-------------------------------------------------------------------------------------------------
 int  UpdateToSchemaVersion103(_ConnectionPtr ipConnection, long* pnNumSteps, 
 	IProgressStatusPtr ipProgressStatus)
 {
@@ -281,6 +282,43 @@ int  UpdateToSchemaVersion103(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31527");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion104(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 104;
+
+		if (pnNumSteps != NULL)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Add DocTagHistory table
+		vecQueries.push_back(gstrCREATE_DOC_TAG_HISTORY_TABLE);
+		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_TAG_FK);
+		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_FAMUSER_FK);
+		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_MACHINE_FK);
+		
+		// Add default value for StoreDocTagHistory.
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrSTORE_DOC_TAG_HISTORY + "', '1')");
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '104' WHERE [Name] = '" + 
+			gstrFAMDB_SCHEMA_VERSION + "'");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31987");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -2759,6 +2797,25 @@ bool CFileProcessingDB::TagFile_Internal(bool bDBLocked, long nFileID, BSTR bstr
 				// Update the query with the tag ID
 				replaceVariable(strQuery, gstrTAG_ID_VAR, asString(nTagID));
 
+				if (m_bStoreDocTagHistory)
+				{
+					// Update history
+					replaceVariable(strQuery, gstrUPDATE_DOC_TAG_HISTORY_VAR, "1");
+
+					// Insert user/machine ID for doc history table
+					replaceVariable(strQuery, gstrUSER_ID_VAR, asString(getFAMUserID(ipConnection)));
+					replaceVariable(strQuery, gstrMACHINE_ID_VAR, asString(getMachineID(ipConnection)));
+				}
+				else
+				{
+					// Do not update history
+					replaceVariable(strQuery, gstrUPDATE_DOC_TAG_HISTORY_VAR, "0");
+
+					// User/machine ID are not needed.
+					replaceVariable(strQuery, gstrUSER_ID_VAR, "0");
+					replaceVariable(strQuery, gstrMACHINE_ID_VAR, "0");
+				}
+
 				// Execute the query to add the tag
 				executeCmdQuery(ipConnection, strQuery);
 
@@ -2829,6 +2886,25 @@ bool CFileProcessingDB::UntagFile_Internal(bool bDBLocked, long nFileID, BSTR bs
 				// Update the query with the tag ID
 				replaceVariable(strQuery, gstrTAG_ID_VAR, asString(nTagID));
 
+				if (m_bStoreDocTagHistory)
+				{
+					// Update history
+					replaceVariable(strQuery, gstrUPDATE_DOC_TAG_HISTORY_VAR, "1");
+
+					// Insert user/machine ID for doc history table
+					replaceVariable(strQuery, gstrUSER_ID_VAR, asString(getFAMUserID(ipConnection)));
+					replaceVariable(strQuery, gstrMACHINE_ID_VAR, asString(getMachineID(ipConnection)));
+				}
+				else
+				{
+					// Do not update history
+					replaceVariable(strQuery, gstrUPDATE_DOC_TAG_HISTORY_VAR, "0");
+
+					// User/machine ID are not needed.
+					replaceVariable(strQuery, gstrUSER_ID_VAR, "0");
+					replaceVariable(strQuery, gstrMACHINE_ID_VAR, "0");
+				}
+
 				// Execute the query to remove the tag
 				executeCmdQuery(ipConnection, strQuery);
 
@@ -2880,6 +2956,25 @@ bool CFileProcessingDB::ToggleTagOnFile_Internal(bool bDBLocked, long nFileID, B
 
 				// Update the query with the tag ID
 				replaceVariable(strQuery, gstrTAG_ID_VAR, asString(nTagID));
+
+				if (m_bStoreDocTagHistory)
+				{
+					// Update history
+					replaceVariable(strQuery, gstrUPDATE_DOC_TAG_HISTORY_VAR, "1");
+
+					// Insert user/machine ID for doc history table
+					replaceVariable(strQuery, gstrUSER_ID_VAR, asString(getFAMUserID(ipConnection)));
+					replaceVariable(strQuery, gstrMACHINE_ID_VAR, asString(getMachineID(ipConnection)));
+				}
+				else
+				{
+					// Do not update history
+					replaceVariable(strQuery, gstrUPDATE_DOC_TAG_HISTORY_VAR, "0");
+
+					// User/machine ID are not needed.
+					replaceVariable(strQuery, gstrUSER_ID_VAR, "0");
+					replaceVariable(strQuery, gstrMACHINE_ID_VAR, "0");
+				}
 
 				// Execute the query to toggle the tag
 				executeCmdQuery(ipConnection, strQuery);
@@ -5025,7 +5120,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 23:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion101);
 				case 101:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion102);
 				case 102:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion103);
-				case 103:	break;
+				case 103:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion104);
+				case 104:	break;
 
 				default:
 					{

@@ -57,6 +57,7 @@ static const string gstrFAM_SESSION = "FAMSession";
 static const string gstrINPUT_EVENT = "InputEvent";
 static const string gstrFILE_ACTION_STATUS = "FileActionStatus";
 static const string gstrSOURCE_DOC_CHANGE_HISTORY = "SourceDocChangeHistory";
+static const string gstrDOC_TAG_HISTORY = "DocTagHistory";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -348,6 +349,9 @@ private:
 
 	// Flag indicating whether tags can be dynamically created.
 	bool m_bAllowDynamicTagCreation;
+
+	// Flag indicating whether to store doc tag history
+	bool m_bStoreDocTagHistory;
 
 	IMiscUtilsPtr m_ipMiscUtils;
 
@@ -820,6 +824,7 @@ private:
 	bool GetFilesWithTags_Internal(bool bDBLocked, IVariantVector* pvecTagNames,
 		VARIANT_BOOL vbAndOperation, IVariantVector** ppvecFileIDs);
 	bool GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVariantVector** ppvecTagNames);
+	bool AllowDynamicTagCreation_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal);
 	bool SetStatusForFilesWithTags_Internal(bool bDBLocked, IVariantVector *pvecTagNames,
 		VARIANT_BOOL vbAndOperation, long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
 	bool ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQuery, long* pnRecordsAffected);

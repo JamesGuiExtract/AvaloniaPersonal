@@ -209,6 +209,16 @@ static const string gstrCREATE_SOURCE_DOC_CHANGE_HISTORY =
 	"[FAMUserID] int NOT NULL, "
 	"[MachineID] int NOT NULL) ";
 
+static const string gstrCREATE_DOC_TAG_HISTORY_TABLE =
+	"CREATE TABLE [DocTagHistory]( "
+	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_DocTagHistory] PRIMARY KEY CLUSTERED, "
+	"[FileID] [int] NOT NULL, "
+	"[TagID] [int] NOT NULL, "
+	"[Tagged] [bit] NOT NULL,"
+	"[TimeStamp] [DateTime] NOT NULL, "
+	"[FAMUserID] int NOT NULL, "
+	"[MachineID] int NOT NULL) ";
+
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "
 	"ON [FAMFile]([Priority] DESC, [ID] ASC)";
@@ -495,6 +505,34 @@ static const string gstrADD_SOURCE_DOC_CHANGE_HISTORY_MACHINE_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+static const string gstrADD_DOC_TAG_HISTORY_FAMFILE_FK = 
+	"ALTER TABLE [dbo].[DocTagHistory]  "
+	"WITH CHECK ADD CONSTRAINT [FK_DocTagHistory_FAMFile] FOREIGN KEY([FileID]) "
+	"REFERENCES [dbo].[FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_DOC_TAG_HISTORY_TAG_FK = 
+	"ALTER TABLE [dbo].[DocTagHistory]  "
+	"WITH CHECK ADD CONSTRAINT [FK_DocTagHistory_Tag] FOREIGN KEY([TagID]) "
+	"REFERENCES [dbo].[Tag] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_DOC_TAG_HISTORY_FAMUSER_FK = 
+	"ALTER TABLE [dbo].[DocTagHistory]  "
+	"WITH CHECK ADD CONSTRAINT [FK_DocTagHistory_FAMUser] FOREIGN KEY([FAMUserID]) "
+	"REFERENCES [dbo].[FAMUser] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_DOC_TAG_HISTORY_MACHINE_FK = 
+	"ALTER TABLE [dbo].[DocTagHistory]  "
+	"WITH CHECK ADD CONSTRAINT [FK_DocTagHistory_Machine] FOREIGN KEY([MachineID]) "
+	"REFERENCES [dbo].[Machine] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_QUERY = 
 	"SELECT LockID, UPI, LockTime, DATEDIFF(second, LockTime, GETDATE()) AS TimeLocked "
@@ -703,23 +741,43 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 // Queries for tagging/untagging files and toggling tags
 static const string gstrTAG_FILE_ID_VAR = "<FileID>";
 static const string gstrTAG_ID_VAR = "<TagID>";
+static const string gstrUSER_ID_VAR = "<UserID>";
+static const string gstrMACHINE_ID_VAR = "<MachineID>";
+static const string gstrUPDATE_DOC_TAG_HISTORY_VAR = "<UpdateDocTagHistory>";
+
+// Updates the DocTagHistory table if gstrUPDATE_DOC_TAG_HISTORY_VAR is 1
+// NOTE: This query ends with " END" to ensure it is nested withing whichever query
+// uses it. Therefore, any query using it must include "BEGIN".
+#define UPDATE_DOC_TAG_HISTORY_QUERY(TagAdded) \
+	" IF (1 = " + gstrUPDATE_DOC_TAG_HISTORY_VAR + ")" \
+	+ " INSERT INTO [DocTagHistory]  ([FileID], [TagID], " \
+	"[Tagged], [TimeStamp], [FAMUserID], [MachineID]) VALUES " \
+	"(" + gstrTAG_FILE_ID_VAR + ", " + gstrTAG_ID_VAR + ", " + TagAdded \
+	+ ", GetDate(), " + gstrUSER_ID_VAR + ", " + gstrMACHINE_ID_VAR + ") END"; 
 
 // Insertion query for adding a tag to a file (NOTE, this query
 // will attempt to add the tag even if it already exists, if it
 // already exists, this will cause a duplicate record exception
 // due to the unique index on the key/tag pair)
 static const string gstrADD_TAG_QUERY = 
-	"INSERT INTO [FileTag] ([FileID], [TagID]) VALUES("
-	+ gstrTAG_FILE_ID_VAR + ", " + gstrTAG_ID_VAR + ")";
+	"BEGIN INSERT INTO [FileTag] ([FileID], [TagID]) VALUES("
+	+ gstrTAG_FILE_ID_VAR + ", " + gstrTAG_ID_VAR + ")"
+	+ UPDATE_DOC_TAG_HISTORY_QUERY("1");
 
 // Adds a tag to a file if it is not already tagged
 static const string gstrTAG_FILE_QUERY =
 	"IF NOT EXISTS (SELECT [FileID] FROM [FileTag] WHERE [FileID] = "
 	+ gstrTAG_FILE_ID_VAR + " AND [TagID] = "
 	+ gstrTAG_ID_VAR + ") " + gstrADD_TAG_QUERY;
+
+// Removes a tag from a file.
 static const string gstrUNTAG_FILE_QUERY =
-	"DELETE FROM [FileTag] WHERE [FileID] = "
+	"BEGIN DELETE FROM [FileTag] WHERE [FileID] = "
 	+ gstrTAG_FILE_ID_VAR + " AND [TagID] = "
-	+ gstrTAG_ID_VAR;
+	+ gstrTAG_ID_VAR
+	+ UPDATE_DOC_TAG_HISTORY_QUERY("0");
+
+// Adds a tag to a file if the file isn't already tagged, otherwise
+// removes the tag.
 static const string gstrTOGGLE_TAG_FOR_FILE_QUERY =
 	gstrTAG_FILE_QUERY + " ELSE " + gstrUNTAG_FILE_QUERY;

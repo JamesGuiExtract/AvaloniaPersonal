@@ -68,6 +68,7 @@
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
+            this._checkStoreDocTagHistory = new System.Windows.Forms.CheckBox();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -115,7 +116,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(254, 99);
+            label1.Location = new System.Drawing.Point(254, 122);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(35, 13);
             label1.TabIndex = 20;
@@ -280,6 +281,7 @@
             // 
             // _tabHistory
             // 
+            this._tabHistory.Controls.Add(this._checkStoreDocTagHistory);
             this._tabHistory.Controls.Add(this._upDownInputEventHistory);
             this._tabHistory.Controls.Add(label1);
             this._tabHistory.Controls.Add(this._checkStoreInputEventTracking);
@@ -298,7 +300,7 @@
             // 
             // _upDownInputEventHistory
             // 
-            this._upDownInputEventHistory.Location = new System.Drawing.Point(208, 97);
+            this._upDownInputEventHistory.Location = new System.Drawing.Point(208, 120);
             this._upDownInputEventHistory.Maximum = new decimal(new int[] {
             365,
             0,
@@ -322,7 +324,7 @@
             // _checkStoreInputEventTracking
             // 
             this._checkStoreInputEventTracking.AutoSize = true;
-            this._checkStoreInputEventTracking.Location = new System.Drawing.Point(6, 98);
+            this._checkStoreInputEventTracking.Location = new System.Drawing.Point(6, 121);
             this._checkStoreInputEventTracking.Name = "_checkStoreInputEventTracking";
             this._checkStoreInputEventTracking.Size = new System.Drawing.Size(196, 17);
             this._checkStoreInputEventTracking.TabIndex = 4;
@@ -353,7 +355,7 @@
             // _storeFAMSessionHistory
             // 
             this._storeFAMSessionHistory.AutoSize = true;
-            this._storeFAMSessionHistory.Location = new System.Drawing.Point(6, 75);
+            this._storeFAMSessionHistory.Location = new System.Drawing.Point(6, 98);
             this._storeFAMSessionHistory.Name = "_storeFAMSessionHistory";
             this._storeFAMSessionHistory.Size = new System.Drawing.Size(250, 17);
             this._storeFAMSessionHistory.TabIndex = 3;
@@ -560,6 +562,16 @@
             this._buttonRefresh.UseVisualStyleBackColor = true;
             this._buttonRefresh.Click += new System.EventHandler(this.HandleRefreshDialog);
             // 
+            // _checkStoreDocTagHistory
+            // 
+            this._checkStoreDocTagHistory.AutoSize = true;
+            this._checkStoreDocTagHistory.Location = new System.Drawing.Point(6, 75);
+            this._checkStoreDocTagHistory.Name = "_checkStoreDocTagHistory";
+            this._checkStoreDocTagHistory.Size = new System.Drawing.Size(152, 17);
+            this._checkStoreDocTagHistory.TabIndex = 21;
+            this._checkStoreDocTagHistory.Text = "Store document tag history";
+            this._checkStoreDocTagHistory.UseVisualStyleBackColor = true;
+            // 
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -632,6 +644,7 @@
         private System.Windows.Forms.FlowLayoutPanel _productSpecificLayout;
         private Utilities.Forms.BetterNumericUpDown _upDownRevertMinutes;
         private Utilities.Forms.BetterNumericUpDown _upDownInputEventHistory;
+        private System.Windows.Forms.CheckBox _checkStoreDocTagHistory;
     }
 }
 
