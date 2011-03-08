@@ -163,6 +163,7 @@
 #define IDC_RADIO_PROCESS_SKIPPED_FILES 350
 #define IDC_COMBO_SKIPPED_SCOPE         351
 #define IDC_STATIC_SKIPPED              352
+#define IDR_MENU_FAM_MRU				353
 #define IDC_BUTTON_DB_NAME_BROWSE       1000
 #define IDC_EDIT_DB_SERVER              1001
 #define IDC_EDIT_DB_NAME                1002
@@ -209,13 +210,24 @@
 #define ID_CONTEXT_CUT                  32799
 #define ID_CONTEXT_CANCEL               32800
 #define ID_TOOLS_DATABASEADMINISTRATIONUTILITY 32802
+#define ID_BTN_FAM_OPEN                32803
+#define ID_BTN_FAM_SAVE                 32804
+#define ID_FAM_MRU_FILE1				32805
+#define ID_FAM_MRU_FILE2				32806
+#define ID_FAM_MRU_FILE3				32807
+#define ID_FAM_MRU_FILE4				32808
+#define ID_FAM_MRU_FILE5				32809
+#define ID_FAM_MRU_FILE6				32810
+#define ID_FAM_MRU_FILE7				32811
+#define ID_FAM_MRU_FILE8				32812
+#define ID_MNU_FAM_MRU					32813
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        2006
-#define _APS_NEXT_COMMAND_VALUE         32803
+#define _APS_NEXT_COMMAND_VALUE         32814
 #define _APS_NEXT_CONTROL_VALUE         2012
 #define _APS_NEXT_SYMED_VALUE           2001
 #endif

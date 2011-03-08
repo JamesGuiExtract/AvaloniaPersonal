@@ -126,6 +126,12 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
 		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new
 			FileProcessingConfigMgr());
 
+		// create a registry config mgr for the MRU list settings
+		m_upUserConfig.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER,
+			gstrREG_ROOT_KEY + "\\UCLIDFileProcessing\\FileProcessingDlg"));
+
+		m_upMRUList.reset(new MRUList(m_upUserConfig.get(), "\\MRUList", "File_%d", 8));
+
 		m_dlgOptions.setConfigManager(ma_pCfgMgr.get());
 
 		// Set the NotifyDBConfigFileChanged pointer for the DatabasePage
@@ -164,7 +170,6 @@ void FileProcessingDlg::DoDataExchange(CDataExchange* pDX)
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(FileProcessingDlg, CDialog)
-	//{{AFX_MSG_MAP(FileProcessingDlg)
 	ON_WM_SIZE()
 	ON_WM_GETMINMAXINFO()
 	ON_WM_PAINT()
@@ -197,9 +202,12 @@ BEGIN_MESSAGE_MAP(FileProcessingDlg, CDialog)
 	ON_COMMAND(ID_PROCESS_PAUSEPROCESSING, OnProcessPauseProcessing)
 	ON_COMMAND(ID_HELP_ABOUTFILEPROCESSINGMANAGER, OnHelpAboutfileprocessingmanager)
 	ON_COMMAND(ID_HELP_FILEPROCESSINGMANAGERHELP, &FileProcessingDlg::OnHelpFileprocessingmanagerhelp)
-	//}}AFX_MSG_MAP
+	ON_COMMAND(ID_BTN_FAM_OPEN, &FileProcessingDlg::OnFileOpen)
+	ON_COMMAND(ID_BTN_FAM_SAVE, &FileProcessingDlg::OnFileSave)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXT,0x0000,0xFFFF,OnToolTipNotify)
 	ON_COMMAND(ID_TOOLS_DATABASEADMINISTRATIONUTILITY, &FileProcessingDlg::OnToolsFAMDBAdmin)
+	ON_COMMAND_RANGE(ID_FAM_MRU_FILE1, ID_FAM_MRU_FILE8, &FileProcessingDlg::OnSelectFAMMRUPopupMenu)
+	ON_NOTIFY(TBN_DROPDOWN, AFX_IDW_TOOLBAR, &FileProcessingDlg::OnToolbarDropDown)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -1543,6 +1551,74 @@ void FileProcessingDlg::OnToolsFAMDBAdmin()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17611");
 }
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::OnToolbarDropDown(NMHDR* pNMHDR, LRESULT *plr)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{	
+		NMTOOLBAR *pTB = (NMTOOLBAR *)pNMHDR;
+		UINT nID = pTB->iItem;
+		
+		// Switch on button command id's.
+		if (nID == ID_BTN_FAM_OPEN)
+		{
+			// load the popup MRU file list menu
+			CMenu menuLoader;
+			if (!menuLoader.LoadMenu(IDR_MENU_FAM_MRU))
+			{
+				throw UCLIDException("ELI32003", "Failed to load Most Recent Used File list.");
+			}
+			
+			CMenu* pPopup = menuLoader.GetSubMenu(0);
+			if (pPopup != __nullptr)
+			{
+				m_upMRUList->readFromPersistentStore();
+				long nSize = m_upMRUList->getCurrentListSize();
+				if (nSize > 0)
+				{
+					// remove the "No File" item from the menu
+					pPopup->RemoveMenu(ID_MNU_FAM_MRU, MF_BYCOMMAND);
+				}
+
+				for(long i = nSize-1; i >= 0; i--)
+				{
+					CString pszFile(m_upMRUList->at(i).c_str());
+					if (!pszFile.IsEmpty())
+					{
+						pPopup->InsertMenu(0, MF_BYPOSITION, ID_FAM_MRU_FILE1+i, pszFile);
+					}
+				}
+
+				CRect rc;
+				m_toolBar.SendMessage(TB_GETRECT, pTB->iItem, (LPARAM)&rc);
+				m_toolBar.ClientToScreen(&rc);
+				
+				pPopup->TrackPopupMenu( TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
+					rc.left, rc.bottom, this, &rc);
+			}
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32004");
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::OnSelectFAMMRUPopupMenu(UINT nID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{	
+		if (nID >= ID_FAM_MRU_FILE1 && nID <= ID_FAM_MRU_FILE8)
+		{
+			// get the current selected file index of MRU list
+			int nCurrentSelectedFileIndex = nID - ID_FAM_MRU_FILE1;
+
+			openFile(m_upMRUList->at(nCurrentSelectedFileIndex));
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32006");
+}
 
 //--------------------------------------------------------------------------------------------------
 // INotifyDBConfigChanged class
@@ -1873,6 +1949,12 @@ void FileProcessingDlg::createToolBar()
 	// And position the control bars
 	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 
+	// add a drop down arrow next to the Open button
+	m_toolBar.GetToolBarCtrl().SetExtendedStyle(TBSTYLE_EX_DRAWDDARROWS);
+	DWORD dwStyle = m_toolBar.GetButtonStyle(m_toolBar.CommandToIndex(ID_BTN_FAM_OPEN));
+	dwStyle |= TBBS_DROPDOWN; 
+	m_toolBar.SetButtonStyle(m_toolBar.CommandToIndex(ID_BTN_FAM_OPEN), dwStyle);
+
 	UpdateWindow();
 	Invalidate();
 }
@@ -1984,6 +2066,8 @@ void FileProcessingDlg::updateUI()
 
 		// Disable/enable run save and save as button and menu items
 		m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, asMFCBool(bEnableRun) );
+		m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_OPEN, asMFCBool(!m_bRunning));
+		m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_SAVE, asMFCBool(bEnableSave));
 		pMenu->EnableMenuItem(ID_FILE_SAVE, MF_BYCOMMAND | (bEnableSave ?  MF_ENABLED : MF_GRAYED) );
 		pMenu->EnableMenuItem(ID_FILE_SAVEAS, MF_BYCOMMAND | (bEnableSaveAs ? MF_ENABLED : MF_GRAYED) );
 		pMenu->EnableMenuItem(ID_PROCESS_STARTPROCESSING, MF_BYCOMMAND | (bEnableRun ? MF_ENABLED: MF_GRAYED) );
@@ -2098,13 +2182,11 @@ void FileProcessingDlg::openFile(string strFileName)
 		updateUI();
 
 		// add the file to MRU list
-		// addFileToMRUList(strFileName);
-
-		// update the caption of the window to contain the filename
+		addFileToMRUList(strFileName);
 	}
 	catch (...)
 	{
-		// removeFileFromMRUList(strFileName);
+		removeFileFromMRUList(strFileName);
 		throw;
 	}
 }
@@ -2148,6 +2230,12 @@ bool FileProcessingDlg::saveFile(std::string strFileName)
 		return false;
 	}
 	getFPM()->SaveTo(get_bstr_t(strFileName), VARIANT_TRUE);
+
+	// If the file name changed, update MRU list
+	if (!stringCSIS::sEqual(strFileName, m_strCurrFPSFilename))
+	{
+		addFileToMRUList(strFileName);
+	}
 	setCurrFPSFile(strFileName);
 
 	return true;
@@ -2707,5 +2795,21 @@ void FileProcessingDlg::updateUIForProcessingComplete()
 		updateMenuAndToolbar();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29347");
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::addFileToMRUList(const string& strFileToAdd)
+{
+	// Update the list, add the new item, write the list back out
+	m_upMRUList->readFromPersistentStore();
+	m_upMRUList->addItem(strFileToAdd);
+	m_upMRUList->writeToPersistentStore();	
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlg::removeFileFromMRUList(const string& strFileToRemove)
+{
+	// Update the list, remove the item, write the list back out
+	m_upMRUList->readFromPersistentStore();
+	m_upMRUList->removeItem(strFileToRemove);
+	m_upMRUList->writeToPersistentStore();	
 }
 //-------------------------------------------------------------------------------------------------

@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -141,9 +139,9 @@ BEGIN
     PUSHBUTTON      "Commands >",IDC_BTN_MODIFY,199,60,50,14
     PUSHBUTTON      "",IDC_BTN_UP,199,80,22,21,BS_ICON
     PUSHBUTTON      "",IDC_BTN_DOWN,227,80,22,21,BS_ICON
-	LTEXT           "",IDC_LIST_FP,7,19,184,90,SS_SUNKEN
+    LTEXT           "",IDC_LIST_FP,7,19,184,90,SS_SUNKEN
     CONTROL         "",IDC_PICTURE,"Static",SS_BLACKFRAME,7,19,186,92
-	CONTROL         "Log the details of the error to the following file",IDC_CHECK_LOG_ERROR_DETAILS,
+    CONTROL         "Log the details of the error to the following file",IDC_CHECK_LOG_ERROR_DETAILS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,128,158,10
     EDITTEXT        IDC_EDIT_ERROR_LOG,26,140,163,12,ES_AUTOHSCROLL
     PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,195,139,10,14,BS_ICON
@@ -317,8 +315,11 @@ END
 // Toolbar
 //
 
-IDR_TOOLBAR_PROCESS_FILE TOOLBAR  16, 15
+IDR_TOOLBAR_PROCESS_FILE TOOLBAR 16, 15
 BEGIN
+    BUTTON      ID_BTN_FAM_OPEN
+    BUTTON      ID_BTN_FAM_SAVE
+    SEPARATOR
     BUTTON      IDC_BTN_RUN
     BUTTON      IDC_BTN_PAUSE
     BUTTON      IDC_BTN_STOP
@@ -365,7 +366,7 @@ IDI_ICON_INFO           ICON                    "..\\..\\..\\BaseUtils\\Code\\re
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_DLG_PROCESS_FILE, DIALOG
     BEGIN
@@ -468,7 +469,7 @@ END
 // Menu
 //
 
-IDR_MENU_PROCESS_FILES MENU 
+IDR_MENU_PROCESS_FILES MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -503,7 +504,7 @@ BEGIN
     END
 END
 
-IDR_MENU_SELECT_DOC_TAG MENU 
+IDR_MENU_SELECT_DOC_TAG MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -514,7 +515,7 @@ BEGIN
     END
 END
 
-IDR_MNU_CONTEXT MENU 
+IDR_MNU_CONTEXT MENU
 BEGIN
     POPUP "Context"
     BEGIN
@@ -527,13 +528,21 @@ BEGIN
     END
 END
 
+IDR_MENU_FAM_MRU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "No File",                     ID_MNU_FAM_MRU, GRAYED
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Accelerator
 //
 
-IDR_ACCELERATORS ACCELERATORS 
+IDR_ACCELERATORS ACCELERATORS
 BEGIN
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
@@ -547,12 +556,12 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "UCLIDFileProcessing"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDC_BTN_RUN             "Start processing"
     IDC_BTN_STOP            "Stop processing"
@@ -560,14 +569,20 @@ BEGIN
     IDC_BTN_CHECK_FOR_NEW_COMPONENTS "Check for new File Processors"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     ID_TOOLS_AUTOSCROLL     "Enable/disable auto-scrolling of the Report grid"
     IDC_BTN_PAUSE           "Pause processing"
     ID_HELP_FILEPROCESSINGMANAGERHELP "File Action Manager Help"
 END
 
-#endif    // English (U.S.) resources
+STRINGTABLE
+BEGIN
+    ID_BTN_FAM_OPEN         "Open file"
+    ID_BTN_FAM_SAVE         "Save file"
+END
+
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

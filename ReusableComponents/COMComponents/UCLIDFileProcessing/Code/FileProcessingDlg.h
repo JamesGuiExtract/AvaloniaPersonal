@@ -23,6 +23,7 @@
 #include <FileRecoveryManager.h>
 #include <DatabasePage.h>
 #include <FileProcessingConfigMgr.h>
+#include <MRUList.h>
 
 #include <set>
 
@@ -133,6 +134,8 @@ protected:
 	afx_msg void OnHelpAboutfileprocessingmanager();
 	afx_msg void OnHelpFileprocessingmanagerhelp();
 	afx_msg void OnToolsFAMDBAdmin();
+	afx_msg void OnToolbarDropDown(NMHDR* pNMHDR, LRESULT *plr);
+	afx_msg void OnSelectFAMMRUPopupMenu(UINT nID);
 	BOOL OnToolTipNotify(UINT nID, NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
 
@@ -260,6 +263,10 @@ private:
 	// if processing is inactive by the schedule it will contain "Processing Inactive"
 	string m_strProcessingStateString;
 
+	// MRU List objects
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_upUserConfig;
+	std::unique_ptr<MRUList> m_upMRUList;
+
 	////////////
 	// Methods
 	///////////
@@ -338,6 +345,10 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Promise: To update the UI to the appropriate state when processing has completed
 	void updateUIForProcessingComplete();
+	//---------------------------------------------------------------------------------------------
+	void addFileToMRUList(const string& strFileToAdd);
+	//---------------------------------------------------------------------------------------------
+	void removeFileFromMRUList(const string& strFileToRemove);
 	//---------------------------------------------------------------------------------------------
 
 	// Stops the statistics thread
