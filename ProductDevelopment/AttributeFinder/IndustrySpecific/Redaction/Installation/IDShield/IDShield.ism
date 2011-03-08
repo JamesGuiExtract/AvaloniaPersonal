@@ -434,7 +434,7 @@
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXEMPTION_CODES_DIR</td><td>INSTALLDIR</td><td>EXEMPT~1|ExemptionCodes</td><td/><td>0</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
-		<row><td>EXTRACT_SYSTEMS1</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>FILE_PROCESSING_COMPONENTS</td><td>COMMON_COMPONENTS</td><td>FILEPR~1|FileProcessingComponents</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX</td><td>EXTRACT_SYSTEMS</td><td>FLEXIN~1|FlexIndex</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_BIN</td><td>FLEX_INDEX</td><td>Bin</td><td/><td>0</td><td/></row>
@@ -3967,7 +3967,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1</td><td>newfolder1</td><td>##ID_STRING11##</td><td>Help</td><td>[HELP]IDShield.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut10</td><td>newfolder2</td><td>##ID_STRING19##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut111</td><td>newfolder2</td><td>##ID_STRING22##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]DetectAndReportFailure.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut12</td><td>newfolder2</td><td>##ID_STRING33##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]SQLCDBEditor.exe</td><td>"[COMMON_COMPONENTS]ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut12</td><td>newfolder2</td><td>##ID_STRING33##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]SQLCDBEditor.exe</td><td>"[EXTRACT_SYSTEMS_COMMON_APP_DATA]ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut121</td><td>newfolder1</td><td>##ID_STRING23##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1211</td><td>newfolder2</td><td>##ID_STRING28##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut13</td><td>newfolder2</td><td>##ID_STRING34##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]IDShieldStatisticsReporter.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>

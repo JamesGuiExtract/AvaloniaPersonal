@@ -439,7 +439,7 @@
 		<row><td>DATABASE_DIR</td><td>INSTALLDIR</td><td>Database</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
-		<row><td>EXTRACT_SYSTEMS1</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>FILE_PROCESSING_COMPONENTS</td><td>COMMON_COMPONENTS</td><td>FILEPR~1|FileProcessingComponents</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_BIN</td><td>INSTALLDIR</td><td>Bin</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_COMPONENTS_BIN</td><td>AF_COMPONENTS</td><td>Bin</td><td/><td>0</td><td/></row>
@@ -5174,7 +5174,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut13</td><td>newfolder1</td><td>##ID_STRING29##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut141</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING31##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1411</td><td>newfolder1</td><td>##ID_STRING34##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td>"[COMMON_COMPONENTS]ESFAMService.sdf"</td><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut15</td><td>newfolder1</td><td>##ID_STRING39##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]SQLCDBEditor</td><td>"[COMMON_COMPONENTS]ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut15</td><td>newfolder1</td><td>##ID_STRING39##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]SQLCDBEditor</td><td>"[EXTRACT_SYSTEMS_COMMON_APP_DATA]ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>newfolder1</td><td>##ID_STRING5##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]Feedback.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING6##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder1</td><td>##ID_STRING7##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
