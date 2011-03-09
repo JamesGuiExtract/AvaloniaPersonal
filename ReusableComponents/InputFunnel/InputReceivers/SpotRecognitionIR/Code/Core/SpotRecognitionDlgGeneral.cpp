@@ -484,18 +484,21 @@ void SpotRecognitionDlg::configureToolBarButtonsAndUGD()
 	UINT nResourceID, nStyle;
 	long nIndex = m_apToolBar->CommandToIndex(IDC_BTN_SelectText);
 	m_apToolBar->GetButtonInfo(nIndex, nResourceID, nStyle, nImage);
-	if (m_eCurrSelectionTool == kSelectText)
+	switch(m_eCurrSelectionTool)
 	{
+	case kSelectText:
+	case kSelectWordText:
 		nImage = kSRBmpSwipe;
-	}
-	else if (m_eCurrSelectionTool == kSelectRectText)
-	{
+		break;
+
+	case kSelectRectText:
 		nImage = kSRBmpRect;
-	}
-	else
-	{
+		break;
+
+	default:
 		THROW_LOGIC_ERROR_EXCEPTION("ELI11365");
 	}
+
 	m_apToolBar->SetButtonInfo(nIndex, nResourceID, nStyle,  nImage);
 
 	// the UCLIDGenericDisplay control should be in the zone selection / creation mode only

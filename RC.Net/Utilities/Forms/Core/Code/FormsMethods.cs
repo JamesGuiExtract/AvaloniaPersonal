@@ -305,4 +305,165 @@ namespace Extract.Utilities.Forms
 
         #endregion Methods
     }
+
+    /// <summary>
+    /// Helper class that can be used in a using statement to lock control updating
+    /// </summary>
+    public class LockControlUpdates : IDisposable
+    {
+        #region Fields
+
+        /// <summary>
+        /// The control that has its updating locked
+        /// </summary>
+        Control _control;
+
+        /// <summary>
+        /// Indicates whether the control is locked or not
+        /// </summary>
+        bool _locked;
+
+        /// <summary>
+        /// Indicates whether the control should be invalidated when it is unlocked
+        /// </summary>
+        bool _invalidateOnUnlock;
+
+        #endregion Fields
+
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LockControlUpdates"/> class.
+        /// </summary>
+        /// <param name="control">The control to lock.</param>
+        public LockControlUpdates(Control control) :
+            this(control, true, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LockControlUpdates"/> class.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        /// <param name="initiallyLock">if set to <see langword="true"/> will intially lock
+        /// the control.</param>
+        public LockControlUpdates(Control control, bool initiallyLock)
+            : this(control, initiallyLock, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LockControlUpdates"/> class.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        /// <param name="initiallyLock">if set to <see langword="true"/> will intially lock
+        /// the control.</param>
+        /// <param name="invalidateOnUnlock">If <see langword="true"/> then
+        /// <paramref name="control"/> will be invalidated after unlocking.</param>
+        public LockControlUpdates(Control control, bool initiallyLock,
+            bool invalidateOnUnlock)
+        {
+            try
+            {
+                if (control == null)
+                {
+                    throw new ArgumentNullException("control");
+                }
+
+                _control = control;
+                _invalidateOnUnlock = invalidateOnUnlock;
+
+                if (initiallyLock)
+                {
+                    Lock();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32012");
+            }
+        }
+
+        #endregion Constructors
+
+        #region Methods
+
+        /// <summary>
+        /// Locks the control.
+        /// </summary>
+        public void Lock()
+        {
+            try
+            {
+                if (!_locked)
+                {
+                    FormsMethods.LockControlUpdate(_control, true);
+                    _locked = !_locked;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32013");
+            }
+        }
+
+        /// <summary>
+        /// Unlocks the control
+        /// </summary>
+        public void Unlock()
+        {
+            try
+            {
+                if (_locked)
+                {
+                    FormsMethods.LockControlUpdate(_control, false);
+                    _locked = !_locked;
+                    if (_invalidateOnUnlock)
+                    {
+                        _control.Invalidate();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32014");
+            }
+        }
+
+        #endregion Methods
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        private void Dispose(Boolean disposing)
+        {
+            if (disposing)
+            {
+                if (_control != null)
+                {
+                    Unlock();
+                    _control = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            // Call the private Dispose(bool) helper and indicate 
+            // that we are explicitly disposing
+            this.Dispose(true);
+
+            // Tell the garbage collector that the object doesn't require any
+            // cleanup when collected since Dispose was called explicitly.
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
+    }
 }

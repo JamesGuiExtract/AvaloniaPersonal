@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreateFileTaskSettingsDialog));
-            this._fileNameTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._fileNameTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -39,21 +38,12 @@
             this._generateErrorRadioButton = new System.Windows.Forms.RadioButton();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
-            this._fileContentsTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this._fileContentsTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._fileNameTagsButton = new Extract.Utilities.Forms.PathTagsButton();
+            this._fileContentsTextBox = new Extract.Utilities.Forms.BetterMultilineTextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // _fileNameTagsButton
-            // 
-            this._fileNameTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._fileNameTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_fileNameTagsButton.Image")));
-            this._fileNameTagsButton.Location = new System.Drawing.Point(426, 25);
-            this._fileNameTagsButton.Name = "_fileNameTagsButton";
-            this._fileNameTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._fileNameTagsButton.TabIndex = 2;
-            this._fileNameTagsButton.UseVisualStyleBackColor = true;
             // 
             // _fileNameTextBox
             // 
@@ -154,19 +144,6 @@
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
-            // _fileContentsTextBox
-            // 
-            this._fileContentsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this._fileContentsTextBox.Location = new System.Drawing.Point(12, 67);
-            this._fileContentsTextBox.MinimumSize = new System.Drawing.Size(408, 96);
-            this._fileContentsTextBox.Multiline = true;
-            this._fileContentsTextBox.Name = "_fileContentsTextBox";
-            this._fileContentsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._fileContentsTextBox.Size = new System.Drawing.Size(408, 96);
-            this._fileContentsTextBox.TabIndex = 4;
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -186,20 +163,42 @@
             this._fileContentsTagsButton.TabIndex = 5;
             this._fileContentsTagsButton.UseVisualStyleBackColor = true;
             // 
+            // _fileNameTagsButton
+            // 
+            this._fileNameTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileNameTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_fileNameTagsButton.Image")));
+            this._fileNameTagsButton.Location = new System.Drawing.Point(426, 25);
+            this._fileNameTagsButton.Name = "_fileNameTagsButton";
+            this._fileNameTagsButton.Size = new System.Drawing.Size(18, 20);
+            this._fileNameTagsButton.TabIndex = 2;
+            this._fileNameTagsButton.UseVisualStyleBackColor = true;
+            // 
+            // _fileContentsTextBox
+            // 
+            this._fileContentsTextBox.AcceptsReturn = true;
+            this._fileContentsTextBox.Location = new System.Drawing.Point(12, 67);
+            this._fileContentsTextBox.Name = "_fileContentsTextBox";
+            this._fileContentsTextBox.Size = new System.Drawing.Size(408, 96);
+            this._fileContentsTextBox.TabIndex = 9;
+            this._fileContentsTextBox.WordWrap = false;
+            // 
             // CreateFileTaskSettingsDialog
             // 
+            this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(453, 332);
+            this.Controls.Add(this._fileContentsTextBox);
             this.Controls.Add(this._fileContentsTagsButton);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this._fileContentsTextBox);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this._fileNameTagsButton);
             this.Controls.Add(this._fileNameTextBox);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "CreateFileTaskSettingsDialog";
@@ -225,8 +224,8 @@
         private System.Windows.Forms.RadioButton _generateErrorRadioButton;
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
-        private System.Windows.Forms.TextBox _fileContentsTextBox;
         private System.Windows.Forms.Label label2;
         private Utilities.Forms.PathTagsButton _fileContentsTagsButton;
+        private Utilities.Forms.BetterMultilineTextBox _fileContentsTextBox;
     }
 }
