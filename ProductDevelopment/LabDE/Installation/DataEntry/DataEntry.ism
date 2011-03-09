@@ -186,6 +186,7 @@
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{0A06E51C-1038-4613-AACE-79E968210746}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{5B173D58-7D91-43A5-BCE8-16447E2EF734}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>interop.uclid_dataentrycusto.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{9681B55A-3FCF-4928-914C-2AEB433FB11A}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Spring.Core.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{A098E88A-AA54-4425-AF7C-A133E20465A5}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>spring.core.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -363,6 +364,7 @@
 		<row><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.DLL|DataEntryCC.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryCC.dll</td><td>17</td><td/></row>
 		<row><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.DataEntry.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.dll</td><td>17</td><td/></row>
 		<row><td>interop.uclid_dataentrycusto.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>INTERO~1.DLL|Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Interop.UCLID_DATAENTRYCUSTOMCOMPONENTSLib.dll</td><td>17</td><td/></row>
+		<row><td>spring.core.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Spring.Core.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SPRING~1.DLL|Spring.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Spring.Core.dll</td><td>1</td><td/></row>
 	</table>
 
 	<table name="Font">
@@ -483,6 +485,7 @@
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_1D662107_2612_4CA6_B3AF_26979F2ED520_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_4BAA7454_B79D_4DFD_8BA6_ED0A4CA7C219_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_67840FA9_4B65_4033_BDE5_C7B089E8928F_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Spring.Core.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_E5CD0E70_D1C1_4F7E_8EAB_8576D2A3DFE2_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -1071,6 +1074,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>Interop.UCLID_DATAENTRYCUSTO.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>NonSelfRegisteredComponents.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
+		<row><td>Spring.Core.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 	</table>
 
 	<table name="ModuleConfiguration">
