@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 
@@ -14,6 +15,8 @@ namespace Extract.SetOperations
     /// <summary>
     /// Enumeration for possible set operations
     /// </summary>
+    // Do not rename the enum constants
+    [ObfuscationAttribute(Exclude=true, Feature="renaming", StripAfterObfuscation=true)]
     enum SetOperation
     {
         /// <summary>
@@ -408,9 +411,9 @@ namespace Extract.SetOperations
             sb.AppendLine("[/c] [/i] [/ef <LogFileName>]");
             sb.AppendLine();
             sb.AppendLine("FileA: The first list file");
-            sb.AppendLine("Operation: union, intersection, or complement");
+            sb.AppendLine("Operation: union, intersect, or complement");
             sb.AppendLine("    Union: FileA ⋃ FileB => All elements from A and B (no duplicates)");
-            sb.AppendLine("    Intersection: FileA ⋂ FileB => All elements that are in both A and B");
+            sb.AppendLine("    Intersect: FileA ⋂ FileB => All elements that are in both A and B");
             sb.AppendLine("    Complement: FileA ~ FileB => All elements in A that are not in B");
             sb.AppendLine("FileB: The second list file");
             sb.AppendLine("OutputFile: The file that will contain the result of the list operation");
@@ -420,7 +423,7 @@ namespace Extract.SetOperations
             sb.AppendLine();
             sb.AppendLine("Example:");
             sb.AppendLine("--------------");
-            sb.AppendLine("SetOperations.exe \"C:\\testing\\lista.txt\" union \"C:\\testing\\listb.txt\" /c /i");
+            sb.AppendLine("SetOperations.exe \"C:\\testing\\lista.txt\" union \"C:\\testing\\listb.txt\" \"C:\\testing\\union.txt\" /c /i");
             sb.AppendLine();
 
             MessageBox.Show(sb.ToString(), "Usage", MessageBoxButtons.OK,
