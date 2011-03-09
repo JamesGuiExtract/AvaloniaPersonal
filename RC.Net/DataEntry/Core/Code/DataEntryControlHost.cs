@@ -3313,7 +3313,7 @@ namespace Extract.DataEntry
                     DataEntryQuery dataEntryQuery =
                         DataEntryQuery.Create(e.Value, activeAttribute, _dbConnection,
                         MultipleQueryResultSelectionMode.None, true);
-                    QueryResult queryResult = dataEntryQuery.Evaluate(null);
+                    QueryResult queryResult = dataEntryQuery.Evaluate();
                     e.Value = queryResult.ToString();
                 }
             }

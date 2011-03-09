@@ -567,8 +567,8 @@ namespace Extract.DataEntry
                 if (dataValidity != DataValidity.Valid)
                 {
                     // If validation fails on a combo box cell, clear the data in the cell since it
-                    // displayed wouldn't be displayed in the cell but would be displayed as a tooltip.
-                    if (cell is DataEntryComboBoxCell)
+                    // wouldn't be displayed in the cell but would be displayed as a tooltip.
+                    if (dataValidity != DataValidity.ValidationWarning && cell is DataEntryComboBoxCell)
                     {
                         // Only clear the value if it is not already empty to avoid an infinite
                         // recursion loop by triggering cell validation.

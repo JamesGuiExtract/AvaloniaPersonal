@@ -108,13 +108,6 @@ namespace Extract.DataEntry
         /// </summary>
         MultipleQueryResultSelectionMode _selectionMode;
 
-        /// <summary>
-        /// Contains named results that are stored for use by downstream queries. These are the
-        /// original, unmodified results of the query node in which thery were named and are
-        /// not a reference to any results to be output that may have since been modified.
-        /// </summary>
-        Dictionary<string, QueryResult> _namedResults = new Dictionary<string, QueryResult>();
-
         #endregion Fields
        
         #region Constructors
@@ -126,7 +119,7 @@ namespace Extract.DataEntry
         /// Initializes a new, empty <see cref="QueryResult"/> instance.
         /// </summary>
         public QueryResult()
-            : this(null, MultipleQueryResultSelectionMode.None, "")
+            : this(MultipleQueryResultSelectionMode.None, "")
         {
         }
 
@@ -145,17 +138,17 @@ namespace Extract.DataEntry
                 if (queryResult.IsAttribute)
                 {
                     _attributeResults = new List<IAttribute>(queryResult._attributeResults);
-                    Initialize<IAttribute>(null, queryResult.SelectionMode, _attributeResults);
+                    Initialize<IAttribute>(queryResult.SelectionMode, _attributeResults);
                 }
                 else if (queryResult.IsSpatial)
                 {
                     _spatialResults = new List<SpatialString>(queryResult._spatialResults);
-                    Initialize<SpatialString>(null, queryResult.SelectionMode, _spatialResults);
+                    Initialize<SpatialString>(queryResult.SelectionMode, _spatialResults);
                 }
                 else
                 {
                     _stringResults = new List<string>(queryResult._stringResults);
-                    Initialize<string>(null, queryResult.SelectionMode, _stringResults);
+                    Initialize<string>(queryResult.SelectionMode, _stringResults);
                 }
 
                 if (queryResult._nextValue != null)
@@ -171,35 +164,19 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Initializes a new, empty, named <see cref="QueryResult"/> instance.
-        /// </summary>
-        /// <param name="name">If not <see langword="null"/>, downstream
-        /// <see cref="DataEntryQuery"/>s will be able to access this result by name. Can be
-        /// <see langword="null"/> if the results do not need to be accessed separately from the
-        /// overal <see cref="QueryResult"/>.</param>
-        public QueryResult(string name)
-            : this(name, MultipleQueryResultSelectionMode.None, "")
-        {
-        }
-
-        /// <summary>
         /// Initializes a new <see cref="QueryResult"/> instance.
         /// </summary>
-        /// <param name="name">If not <see langword="null"/>, downstream
-        /// <see cref="DataEntryQuery"/>s will be able to access this result by name. Can be
-        /// <see langword="null"/> if the results do not need to be accessed separately from the
-        /// overal <see cref="QueryResult"/>.</param>
         /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> that will
         /// govern how this <see cref="QueryResult"/> is combined with others.</param>
         /// <param name="stringResults">One or more <see langword="string"/> values representing the
         /// result of a <see cref="DataEntryQuery"/>.</param>
-        public QueryResult(string name, MultipleQueryResultSelectionMode selectionMode,
+        public QueryResult(MultipleQueryResultSelectionMode selectionMode,
             params string[] stringResults)
         {
             try
             {
                 _stringResults = new List<string>(stringResults);
-                Initialize<string>(name, selectionMode, _stringResults);
+                Initialize<string>(selectionMode, _stringResults);
             }
             catch (Exception ex)
             {
@@ -210,21 +187,17 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new <see cref="QueryResult"/> instance.
         /// </summary>
-        /// <param name="name">If not <see langword="null"/>, downstream
-        /// <see cref="DataEntryQuery"/>s will be able to access this result by name. Can be
-        /// <see langword="null"/> if the results do not need to be accessed separately from the
-        /// overal <see cref="QueryResult"/>.</param>
         /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> that will
         /// govern how this <see cref="QueryResult"/> is combined with others.</param>
         /// <param name="spatialResults">One or more <see cref="SpatialString"/> values representing
         /// the result of a <see cref="DataEntryQuery"/>.</param>
-        public QueryResult(string name, MultipleQueryResultSelectionMode selectionMode,
+        public QueryResult(MultipleQueryResultSelectionMode selectionMode,
             params SpatialString[] spatialResults)
         {
             try
             {
                 _spatialResults = new List<SpatialString>(spatialResults);
-                Initialize<SpatialString>(name, selectionMode, _spatialResults);
+                Initialize<SpatialString>(selectionMode, _spatialResults);
             }
             catch (Exception ex)
             {
@@ -235,21 +208,17 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new <see cref="QueryResult"/> instance.
         /// </summary>
-        /// <param name="name">If not <see langword="null"/>, downstream
-        /// <see cref="DataEntryQuery"/>s will be able to access this result by name. Can be
-        /// <see langword="null"/> if the results do not need to be accessed separately from the
-        /// overal <see cref="QueryResult"/>.</param>
         /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> that will
         /// govern how this <see cref="QueryResult"/> is combined with others.</param>
         /// <param name="attributeResults">One or more <see cref="SpatialString"/> values representing
         /// the result of a <see cref="DataEntryQuery"/>.</param>
-        public QueryResult(string name, MultipleQueryResultSelectionMode selectionMode,
+        public QueryResult(MultipleQueryResultSelectionMode selectionMode,
             params IAttribute[] attributeResults)
         {
             try
             {
                 _attributeResults = new List<IAttribute>(attributeResults);
-                Initialize<IAttribute>(name, selectionMode, _attributeResults);
+                Initialize<IAttribute>(selectionMode, _attributeResults);
             }
             catch (Exception ex)
             {
@@ -755,26 +724,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Retrieves a stored <see cref="QueryResult"/> by name.
-        /// </summary>
-        /// <param name="name">The name of the result to retrieve.</param>
-        /// <returns>The <see cref="QueryResult"/> by the given name.</returns>
-        public QueryResult GetNamedResult(string name)
-        {
-            try
-            {
-                // Throw an exception if its not there.
-                return _namedResults[name];
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI28918", ex);
-                ee.AddDebugData("Result name", name, false);
-                throw ee;
-            }
-        }
-
-        /// <summary>
         /// Combines the given results into a single result.
         /// <para><b>Note</b></para>
         /// The original results may be altered and should no longer be used.
@@ -787,10 +736,6 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Ensure all named results are carried over into the return value.
-                resultA.IncludeNamedResults(resultB);
-                resultB._namedResults = resultA._namedResults;
-
                 // If resultA is empty, simply use resultB (and vice-versa)
                 if (resultA.IsEmpty)
                 {
@@ -1030,57 +975,6 @@ namespace Extract.DataEntry
             }
         }
 
-        /// <summary>
-        /// Applies all named results from the specified <see cref="QueryResult"/> to this instance.
-        /// </summary>
-        /// <param name="otherResults">The <see cref="QueryResult"/> containing named results that
-        /// should be shared with this instance.</param>
-        public void IncludeNamedResults(params QueryResult[] otherResults)
-        {
-            try
-            {
-                foreach (QueryResult otherResult in otherResults)
-                {
-                    if (otherResult == null)
-                    {
-                        continue;
-                    }
-
-                    foreach (KeyValuePair<string, QueryResult> otherNamedResult
-                                in otherResult._namedResults)
-                    { 
-                        if (!_namedResults.ContainsKey(otherNamedResult.Key))
-                        {
-                            _namedResults[otherNamedResult.Key] = otherNamedResult.Value;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI28980", ex);
-            }
-        }
-
-        /// <summary>
-        /// Creates a named result from the current instance.
-        /// </summary>
-        /// <param name="name">The name the result should be accessed with.</param>
-        public void CreateNamedResult(string name)
-        {
-            try
-            {
-                ExtractException.Assert("ELI28977", "Query result name not specified!",
-                    !string.IsNullOrEmpty(name));
-
-                _namedResults[name] = new QueryResult(this);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI29182", ex);
-            }
-        }
-
         #endregion Methods
 
         #region IEnumerable Members
@@ -1109,14 +1003,10 @@ namespace Extract.DataEntry
         /// Initializes the <see cref="QueryResult"/> given the specified list of values.
         /// </summary>
         /// <typeparam name="T">The list <see langword="Type"/></typeparam>
-        /// <param name="name">If not <see langword="null"/>, downstream
-        /// <see cref="DataEntryQuery"/>s will be able to access this result by name. Can be
-        /// <see langword="null"/> if the results do not need to be accessed separately from the
-        /// overal <see cref="QueryResult"/>.</param>
         /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> to be
         /// associated with this result.</param>
         /// <param name="valuesList">The values that are to comprise this result.</param>
-        void Initialize<T>(string name, MultipleQueryResultSelectionMode selectionMode, List<T> valuesList)
+        void Initialize<T>(MultipleQueryResultSelectionMode selectionMode, List<T> valuesList)
         {
             _selectionMode = selectionMode;
 
@@ -1133,11 +1023,6 @@ namespace Extract.DataEntry
             }
 
             _hasMultipleValues = (valuesList.Count > 1);
-
-            if (!string.IsNullOrEmpty(name))
-            {
-                CreateNamedResult(name);
-            }
         }
 
         /// <summary>
@@ -1154,19 +1039,16 @@ namespace Extract.DataEntry
 
                 if (IsAttribute)
                 {
-                    resultCopy = new QueryResult(null, SelectionMode, FirstAttributeValue);
+                    resultCopy = new QueryResult(SelectionMode, FirstAttributeValue);
                 }
                 else if (IsSpatial)
                 {
-                    resultCopy = new QueryResult(null, SelectionMode, FirstSpatialStringValue);
+                    resultCopy = new QueryResult(SelectionMode, FirstSpatialStringValue);
                 }
                 else
                 {
-                    resultCopy = new QueryResult(null, SelectionMode, FirstStringValue);
+                    resultCopy = new QueryResult(SelectionMode, FirstStringValue);
                 }
-
-                // Don't copy _namedResults... each named result should be available within the
-                // the same "Distinct" result.
 
                 return resultCopy;
             }
@@ -1201,7 +1083,7 @@ namespace Extract.DataEntry
                     _attributeResults.CopyTo(1, remainingResults, 0, remainingResults.Length);
                     _attributeResults.RemoveRange(1, _attributeResults.Count - 1);
 
-                    newResultInstance = new QueryResult(null, selectionMode, remainingResults);
+                    newResultInstance = new QueryResult(selectionMode, remainingResults);
                 }
                 else if (_spatialResults != null && _spatialResults.Count > 1)
                 {
@@ -1209,7 +1091,7 @@ namespace Extract.DataEntry
                     _spatialResults.CopyTo(1, remainingResults, 0, remainingResults.Length);
                     _spatialResults.RemoveRange(1, _spatialResults.Count - 1);
 
-                    newResultInstance = new QueryResult(null, selectionMode, remainingResults);
+                    newResultInstance = new QueryResult(selectionMode, remainingResults);
                 }
                 else if (_stringResults != null && _stringResults.Count > 1)
                 {
@@ -1217,14 +1099,11 @@ namespace Extract.DataEntry
                     _stringResults.CopyTo(1, remainingResults, 0, remainingResults.Length);
                     _stringResults.RemoveRange(1, _stringResults.Count - 1);
 
-                    newResultInstance = new QueryResult(null, selectionMode, remainingResults);
+                    newResultInstance = new QueryResult(selectionMode, remainingResults);
                 }
 
                 if (newResultInstance != null)
                 {
-                    // Pass on any named results.
-                    newResultInstance.IncludeNamedResults(this);
-
                     // Assign the next result reference.
                     _nextValue = newResultInstance;
                 }

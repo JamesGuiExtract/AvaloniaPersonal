@@ -366,8 +366,7 @@ namespace Extract.DataEntry
                     {
                         // Override the default error message if the query provides one.
                         _overrideErrorMessage =
-                            validationFailure.Value.DataEntryQuery.GetValidationMessage(
-                                validationFailure.Value.QueryResult);
+                            validationFailure.Value.DataEntryQuery.GetValidationMessage();
 
                         if (throwException)
                         {
@@ -423,7 +422,7 @@ namespace Extract.DataEntry
                 // used or if the validation values have not yet been calculated.
                 if (dataEntryQuery.ValidValue != null || validationQuery.ValidationValues == null)
                 {
-                    QueryResult queryResult = dataEntryQuery.Evaluate(null);
+                    QueryResult queryResult = dataEntryQuery.Evaluate();
 
                     if (dataEntryQuery.ValidValue != null)
                     {

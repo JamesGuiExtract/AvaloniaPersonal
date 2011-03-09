@@ -1,11 +1,15 @@
 using Extract.Utilities;
+using Extract.Utilities.Parsers;
+using Spring.Core.TypeConversion;
+using Spring.Core.TypeResolution;
+using Spring.Expressions;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using UCLID_AFCORELib;
@@ -72,6 +76,38 @@ namespace Extract.DataEntry
 
     #endregion Enums
 
+    #region Extension Methods
+
+    /// <summary>
+    /// Extension methods used by the data entry framework
+    /// </summary>
+    static class ExtensionMethods
+    {
+        /// <summary>
+        /// Converts a <see langword="string"/> to a <see langword="bool"/> where "0" and "1" are
+        /// recognized as well as "true" and "false".
+        /// </summary>
+        /// <param name="value">The <see langword="string"/> to be converted.</param>
+        /// <returns>The <see langword="bool"/> equivalent.</returns>
+        public static bool ToBoolean(this string value)
+        {
+            if (value == "1")
+            {
+                return true;
+            }
+            else if (value == "0")
+            {
+                return false;
+            }
+
+            return bool.Parse(value);
+        }
+    }
+
+    #endregion Extension Methods
+
+    #region QueryNode
+
     /// <summary>
     /// Describes an element of an <see cref="DataEntryQuery"/>.
     /// </summary>
@@ -88,8 +124,19 @@ namespace Extract.DataEntry
         string _name;
 
         /// <summary>
+        /// If this node is named, this is the last calculated result or <see langword="null"/> if
+        /// the node has not yet been evaluated.
+        /// </summary>
+        protected QueryResult _namedResult;
+
+        /// <summary>
+        /// The DataEntryQueries to which this query is a descendent.
+        /// </summary>
+        protected HashSet<DataEntryQuery> _rootQueries = new HashSet<DataEntryQuery>();
+
+        /// <summary>
         /// Specifies whether the query node should be parameterized if it is used
-        /// in an <see cref="SqlQueryNode"/>.
+        /// in an <see cref="SqlQueryNode"/> or <see cref="ExpressionQueryNode"/>.
         /// </summary>
         bool _parameterize = true;
 
@@ -139,6 +186,12 @@ namespace Extract.DataEntry
         bool _resolveOnLoad;
 
         /// <summary>
+        /// The properties assigned to the query node via <see cref="XmlAttribute"/>s (name/value
+        /// pairs).
+        /// </summary>
+        private Dictionary<string, string> _properties = new Dictionary<string, string>();
+
+        /// <summary>
         /// Initializes a new <see cref="QueryNode"/> instance.
         /// </summary>
         /// <param name="selectionMode">The <see cref="MultipleQueryResultSelectionMode"/> that
@@ -154,15 +207,25 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets properties associated with this query node that have been specified via XML
+        /// attributes.
+        /// </summary>
+        /// <value>The properties.</value>
+        public Dictionary<string, string> Properties
+        {
+            get
+            {
+                return _properties;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether the query node should be should be parameterized if it is used
-        /// in an <see cref="SqlQueryNode"/>.
+        /// in an <see cref="SqlQueryNode"/> or <see cref="ExpressionQueryNode"/>.
         /// </summary>
         /// <value><see langword="true"/> if the query's result should be parameterized when
-        /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
-        /// query's result should be used as literal text.</value>
-        /// <returns><see langword="true"/> if the query's result will be parameterized when
-        /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
-        /// query's result will be used as literal text.</returns>
+        /// used as part of an <see cref="SqlQueryNode"/> or <see cref="ExpressionQueryNode"/>,
+        /// <see langword="false"/> if the query's result should be used as literal text.</value>
         public bool Parameterize
         {
             get
@@ -376,10 +439,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Evaluates the query.
         /// </summary>
-        /// <param name="existingResult">A <see cref="QueryResult"/> providing context and access
-        /// to named results for the current evaluation.</param>
         /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
-        public abstract QueryResult Evaluate(QueryResult existingResult);
+        public abstract QueryResult Evaluate();
 
         /// <summary>
         /// Loads the <see cref="QueryNode"/> using the specified XML query string.
@@ -387,88 +448,93 @@ namespace Extract.DataEntry
         /// <param name="xmlNode">The XML query string defining the query.</param>
         /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
         /// query.</param>
-        public virtual void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery)
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        public virtual void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
         {
             try
             {
-                XmlAttribute xmlAttribute = xmlNode.Attributes["Name"];
-                if (xmlAttribute != null)
+                // Populate the assigned properties.
+                foreach (XmlAttribute xmlAttribute in xmlNode.Attributes)
                 {
-                    Name = xmlAttribute.Value;
+                    _properties[xmlAttribute.Name] = xmlAttribute.Value;
                 }
 
-                xmlAttribute = xmlNode.Attributes["SelectionMode"];
-                if (xmlAttribute != null)
+                string xmlAttributeValue;
+
+                if (_properties.TryGetValue("Name", out xmlAttributeValue))
                 {
-                    if (xmlAttribute.Value.Equals("First", StringComparison.OrdinalIgnoreCase))
+                    Name = xmlAttributeValue;
+                    namedQueries[xmlAttributeValue] = this;
+                }
+
+                if (_properties.TryGetValue("SelectionMode", out xmlAttributeValue))
+                {
+                    if (xmlAttributeValue.Equals("First", StringComparison.OrdinalIgnoreCase))
                     {
                         SelectionMode = MultipleQueryResultSelectionMode.First;
                     }
-                    else if (xmlAttribute.Value.Equals("List", StringComparison.OrdinalIgnoreCase))
+                    else if (xmlAttributeValue.Equals("List", StringComparison.OrdinalIgnoreCase))
                     {
                         SelectionMode = MultipleQueryResultSelectionMode.List;
                     }
-                    else if (xmlAttribute.Value.Equals("Distinct", StringComparison.OrdinalIgnoreCase))
+                    else if (xmlAttributeValue.Equals("Distinct", StringComparison.OrdinalIgnoreCase))
                     {
                         SelectionMode = MultipleQueryResultSelectionMode.Distinct;
                     }
-                    else if (xmlAttribute.Value.Equals("None", StringComparison.OrdinalIgnoreCase))
+                    else if (xmlAttributeValue.Equals("None", StringComparison.OrdinalIgnoreCase))
                     {
                         SelectionMode = MultipleQueryResultSelectionMode.None;
                     }
                 }
 
                 // Required unless specified otherwise.
-                xmlAttribute = xmlNode.Attributes["Required"];
-                if (xmlAttribute != null && xmlAttribute.Value == "0")
+                if (_properties.TryGetValue("Required", out xmlAttributeValue))
                 {
-                    Required = false;
+                    Required = xmlAttributeValue.ToBoolean();
                 }
 
-                xmlAttribute = xmlNode.Attributes["SpatialMode"];
-                if (xmlAttribute != null)
+                if (_properties.TryGetValue("SpatialMode", out xmlAttributeValue))
                 {
-                    if (xmlAttribute.Value.Equals("Force", StringComparison.OrdinalIgnoreCase))
+                    if (xmlAttributeValue.Equals("Force", StringComparison.OrdinalIgnoreCase))
                     {
                         SpatialMode = SpatialMode.Force;
                     }
-                    else if (xmlAttribute.Value.Equals("Only", StringComparison.OrdinalIgnoreCase))
+                    else if (xmlAttributeValue.Equals("Only", StringComparison.OrdinalIgnoreCase))
                     {
                         SpatialMode = SpatialMode.Only;
                     }
-                    else if (xmlAttribute.Value.Equals("None", StringComparison.OrdinalIgnoreCase))
+                    else if (xmlAttributeValue.Equals("None", StringComparison.OrdinalIgnoreCase))
                     {
                         SpatialMode = SpatialMode.None;
                     }
                 }
 
                 // Parameterize unless the parameterize attribute is present and specifies not to.
-                xmlAttribute = xmlNode.Attributes["Parameterize"];
-                if (xmlAttribute != null && xmlAttribute.Value == "0")
+                if (_properties.TryGetValue("Parameterize", out xmlAttributeValue))
                 {
-                    Parameterize = false;
+                    Parameterize = xmlAttributeValue.ToBoolean();
                 }
 
                 // Include unless otherwise specified.
-                xmlAttribute = xmlNode.Attributes["Exclude"];
-                if (xmlAttribute != null && xmlAttribute.Value == "1")
+                if (_properties.TryGetValue("Exclude", out xmlAttributeValue))
                 {
-                    ExcludeFromResult = true;
+                    ExcludeFromResult = xmlAttributeValue.ToBoolean();
                 }
 
-                xmlAttribute = xmlNode.Attributes["ValidationListType"];
-                if (xmlAttribute != null)
+                if (_properties.TryGetValue("ValidationListType", out xmlAttributeValue))
                 {
-                    if (xmlAttribute.Value.Equals("Both", StringComparison.OrdinalIgnoreCase))
+                    if (xmlAttributeValue.Equals("Both", StringComparison.OrdinalIgnoreCase))
                     {
                         ValidationListType = ValidationListType.Both;
                     }
-                    else if (xmlAttribute.Value.Equals("ValidationListOnly",
+                    else if (xmlAttributeValue.Equals("ValidationListOnly",
                         StringComparison.OrdinalIgnoreCase))
                     {
                         ValidationListType = ValidationListType.ValidationListOnly;
                     }
-                    else if (xmlAttribute.Value.Equals("AutoCompleteOnly",
+                    else if (xmlAttributeValue.Equals("AutoCompleteOnly",
                         StringComparison.OrdinalIgnoreCase))
                     {
                         ValidationListType = ValidationListType.AutoCompleteOnly;
@@ -476,17 +542,15 @@ namespace Extract.DataEntry
                 }
 
                 // Use case-sensitive processing unless otherwise specified.
-                xmlAttribute = xmlNode.Attributes["CaseSensitive"];
-                if (xmlAttribute != null && xmlAttribute.Value == "0")
+                if (_properties.TryGetValue("CaseSensitive", out xmlAttributeValue))
                 {
-                    _caseSensitive = false;
+                    _caseSensitive = xmlAttributeValue.ToBoolean();
                 }
 
                 // If set, the value should be returned as a single string of delimited values.
-                xmlAttribute = xmlNode.Attributes["StringList"];
-                if (xmlAttribute != null)
+                if (_properties.TryGetValue("StringList", out xmlAttributeValue))
                 {
-                    _stringListDelimiter = xmlAttribute.Value;
+                    _stringListDelimiter = xmlAttributeValue;
                 }
             }
             catch (Exception ex)
@@ -494,7 +558,28 @@ namespace Extract.DataEntry
                 throw ExtractException.AsExtractException("ELI28934", ex);
             }
         }
+
+        /// <summary>
+        /// Specfies that this <see cref="QueryNode"/> is a sub-component to the specified
+        /// <see cref="DataEntryQuery"/>.
+        /// </summary>
+        /// <param name="rootQuery">The <see cref="DataEntryQuery"/> for which this
+        /// <see cref="QueryNode"/> is a sub-component.</param>
+        public virtual void AddRootQuery(DataEntryQuery rootQuery)
+        {
+            if (rootQuery != null && rootQuery != this)
+            {
+                if (!_rootQueries.Contains(rootQuery))
+                {
+                    _rootQueries.Add(rootQuery);
+                }
+            }
+        }
     }
+
+    #endregion QueryNode
+
+    #region LiteralQueryNode
 
     /// <summary>
     /// A <see cref="QueryNode"/> consisting of literal text and, optionally, extract systems
@@ -511,8 +596,9 @@ namespace Extract.DataEntry
         {
             _query = query;
 
-            // A literal query node is the only node type that should default to being parameterized
-            // in an SQL query (since the text would almost certainly be the SQL query itself).
+            // A literal query node is the only node type that should default to not being
+            // parameterized in an SQL query or expression (since the text would almost certainly
+            // be a core part the SQL query or expression rather than a variable).
             Parameterize = false;
         }
 
@@ -538,10 +624,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Evaluates the query.
         /// </summary>
-        /// <param name="existingResult">A <see cref="QueryResult"/> providing context and access
-        /// to named results for the current evaluation.</param>
         /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
-        public override QueryResult Evaluate(QueryResult existingResult)
+        public override QueryResult Evaluate()
         {
             ExtractException.Assert("ELI26753", "Cannot evaluate un-resolved query!",
                 this.GetIsMinimallyResolved());
@@ -558,9 +642,13 @@ namespace Extract.DataEntry
             string[] parsedQuery =
                 expandedQuery.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
-            return new QueryResult(Name, SelectionMode, parsedQuery);
+            return new QueryResult(SelectionMode, parsedQuery);
         }
     }
+
+    #endregion LiteralQueryNode
+
+    #region SourceDocNameQueryNode
 
     /// <summary>
     /// A <see cref="QueryNode"/> to be resolved using the current source doc name.
@@ -606,17 +694,20 @@ namespace Extract.DataEntry
         /// <param name="xmlNode">The XML query string defining the query.</param>
         /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
         /// query.</param>
-        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery)
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
         {
             try
             {
-                base.LoadFromXml(xmlNode, rootQuery);
+                base.LoadFromXml(xmlNode, rootQuery, namedQueries);
 
                 // Use the full path of the document unless specified not to.
                 XmlAttribute xmlAttribute = xmlNode.Attributes["UseFullPath"];
-                if (xmlAttribute != null && xmlAttribute.Value == "0")
+                if (xmlAttribute != null)
                 {
-                    _useFullPath = false;
+                    _useFullPath = xmlAttribute.Value.ToBoolean();
                 }
             }
             catch (Exception ex)
@@ -628,22 +719,24 @@ namespace Extract.DataEntry
         /// <summary>
         /// Evaluates the query using the current source doc name.
         /// </summary>
-        /// <param name="existingResult">A <see cref="QueryResult"/> providing context and access
-        /// to named results for the current evaluation.</param>
         /// <returns>The current source doc name</returns>
-        public override QueryResult Evaluate(QueryResult existingResult)
+        public override QueryResult Evaluate()
         {
             if (_useFullPath)
             {
-                return new QueryResult(Name, SelectionMode, AttributeStatusInfo.SourceDocName);
+                return new QueryResult(SelectionMode, AttributeStatusInfo.SourceDocName);
             }
             else
             {
-                return new QueryResult(Name, SelectionMode,
+                return new QueryResult(SelectionMode,
                     Path.GetFileName(AttributeStatusInfo.SourceDocName));
             }
         }
     }
+
+    #endregion SourceDocNameQueryNode
+
+    #region SolutionDirectoryQueryNode
 
     /// <summary>
     /// A <see cref="QueryNode"/> to insert the solution directory name.
@@ -691,11 +784,9 @@ namespace Extract.DataEntry
         /// <summary>
         /// Evaluates the query using the solution directory (as a UNC path, if possible).
         /// </summary>
-        /// <param name="existingResult">A <see cref="QueryResult"/> providing context and access
-        /// to named results for the current evaluation.</param>
         /// <returns>The query using the solution directory (as a UNC path, if possible).
         /// </returns>
-        public override QueryResult Evaluate(QueryResult existingResult)
+        public override QueryResult Evaluate()
         {
             try
             {
@@ -714,7 +805,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                return new QueryResult(Name, SelectionMode, _solutionDirectory);
+                return new QueryResult(SelectionMode, _solutionDirectory);
             }
             catch (Exception ex)
             {
@@ -723,10 +814,14 @@ namespace Extract.DataEntry
         }
     }
 
+    #endregion SolutionDirectoryQueryNode
+
+    #region ResultQueryNode
+
     /// <summary>
     /// A <see cref="QueryNode"/> to allow access and manipulation of named results.
     /// </summary>
-    internal class ResultQueryNode : QueryNode
+    internal class ResultQueryNode : ComplexQueryNode
     {
         /// <summary>
         /// Combine two results (as lists) together.
@@ -768,8 +863,25 @@ namespace Extract.DataEntry
         /// Initializes a new <see cref="ResultQueryNode"/> instance.
         /// </summary>
         public ResultQueryNode()
-            : base(MultipleQueryResultSelectionMode.None, false)
+            : base(null, null, MultipleQueryResultSelectionMode.None, false)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="ResultQueryNode"/> instance.
+        /// </summary>
+        /// <param name="argument1Name">The name of the result to be used as the first argument.
+        /// </param>
+        /// <param name="rootQuery">The root <see cref="DataEntryQuery"/> this result node belongs
+        /// to.</param>
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        public ResultQueryNode(string argument1Name, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
+            : base(null, null, MultipleQueryResultSelectionMode.None, false)
+        {
+            _argument1Name = argument1Name;
+            RegisterArgument(_argument1Name, rootQuery, namedQueries);
         }
 
         /// <summary>
@@ -778,7 +890,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> since this query is always resolved.</returns>
         public override bool GetIsMinimallyResolved()
         {
-            return true;
+            return base.GetIsMinimallyResolved();
         }
 
         /// <summary>
@@ -788,7 +900,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> since this query is always resolved.</returns>
         public override bool GetIsFullyResolved()
         {
-            return true;
+            return base.GetIsFullyResolved();
         }
 
         /// <summary>
@@ -797,11 +909,14 @@ namespace Extract.DataEntry
         /// <param name="xmlNode">The XML query string defining the query.</param>
         /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
         /// query.</param>
-        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery)
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
         {
             try
             {
-                base.LoadFromXml(xmlNode, rootQuery);
+                base.LoadFromXml(xmlNode, rootQuery, namedQueries);
 
                 // An operation is not required, but if provieded, ensure a valid operation was
                 // specified.
@@ -825,19 +940,22 @@ namespace Extract.DataEntry
                 }
 
                 // Arg1 is always required.
-                xmlAttribute = xmlNode.Attributes["Arg1"];
-                ExtractException.Assert("ELI28937", "List query missing argument 1!",
-                    xmlAttribute != null && !string.IsNullOrEmpty(xmlAttribute.Value));
-                _argument1Name = xmlAttribute.Value;
-
-                // Arg2 is required only if an operation was specified.
-                xmlAttribute = xmlNode.Attributes["Arg2"];
-                ExtractException.Assert("ELI28938", "List query missing argument 2!",
-                    string.IsNullOrEmpty(_operation) ||
-                    (xmlAttribute != null && !string.IsNullOrEmpty(xmlAttribute.Value)));
-                if (xmlAttribute != null)
+                if (Properties.TryGetValue("Arg1", out _argument1Name))
                 {
-                    _argument2Name = xmlAttribute.Value;
+                    RegisterArgument(_argument1Name, rootQuery, namedQueries);
+                }
+                else
+                {
+                    ExtractException ee = new ExtractException("ELI31590",
+                        "List query missing argument 1!");
+                    ee.AddDebugData("Name", _argument1Name, false);
+                    throw ee;
+                }
+
+                // Arg2 is optional.
+                if (Properties.TryGetValue("Arg2", out _argument2Name))
+                {
+                    RegisterArgument(_argument2Name, rootQuery, namedQueries);
                 }
             }
             catch (Exception ex)
@@ -847,31 +965,52 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Links the <see cref="QueryNode"/> referenced by <see paramref="resultName"/> to this
+        /// node.
+        /// </summary>
+        /// <param name="resultName">The name of the <see cref="QueryNode"/> that is to be an
+        /// argument.</param>
+        /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
+        /// query.</param>
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        void RegisterArgument(string resultName, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
+        {
+            QueryNode namedQuery;
+            if (!namedQueries.TryGetValue(resultName, out namedQuery))
+            {
+                ExtractException ee = new ExtractException("ELI31977", "Undefined query!");
+                ee.AddDebugData("Name", resultName, false);
+                throw ee;
+            }
+            namedQuery.AddRootQuery(rootQuery);
+            _namedDependencies[resultName] = namedQuery;
+            _childNodes.Add(namedQuery);
+        }
+
+        /// <summary>
         /// Evaluates the query by retrieving and manipulating the previous results as configured.
         /// </summary>
-        /// <param name="existingResult">A <see cref="QueryResult"/> providing context and access
-        /// to named results for the current evaluation.</param>
         /// <returns>The QueryResult representing the results of the operation.</returns>
-        public override QueryResult Evaluate(QueryResult existingResult)
+        public override QueryResult Evaluate()
         {
             try
             {
                 // Retrieve both arguments.
-                QueryResult argument1 = existingResult.GetNamedResult(_argument1Name);
-                argument1 = new QueryResult(argument1);
+                QueryResult argument1 = GetNamedResult(_argument1Name);
 
                 // If no operation is specified, simply return argument 1.
                 if (string.IsNullOrEmpty(_operation))
                 {
                     if (!string.IsNullOrEmpty(Name))
                     {
-                        argument1.CreateNamedResult(Name);
+                        _namedResult = new QueryResult(argument1);
                     }
                     return argument1;
                 }
                 
-                QueryResult argument2 = existingResult.GetNamedResult(_argument2Name);
-                argument2 = new QueryResult(argument2);
+                QueryResult argument2 = GetNamedResult(_argument2Name);
                 
                 // Combine the results if specified
                 if (_operation.Equals(_COMBINE_LISTS_OPERATION, StringComparison.OrdinalIgnoreCase))
@@ -916,7 +1055,7 @@ namespace Extract.DataEntry
                         if (_operation.Equals(
                                 _COMPARE_LISTS_OPERATION, StringComparison.OrdinalIgnoreCase))
                         {
-                            return new QueryResult(Name, MultipleQueryResultSelectionMode.None, "0");
+                            return new QueryResult(MultipleQueryResultSelectionMode.None, "0");
                         }
                         // If this is the first unique value, initialize the unique value list.
                         else if (uniqueToArgument1Head == null)
@@ -940,11 +1079,11 @@ namespace Extract.DataEntry
                 {
                     if (matchingCount == argument2Strings.Length)
                     {
-                        return new QueryResult(Name, MultipleQueryResultSelectionMode.None, "1");
+                        return new QueryResult(MultipleQueryResultSelectionMode.None, "1");
                     }
                     else
                     {
-                        return new QueryResult(Name, MultipleQueryResultSelectionMode.None, "0");
+                        return new QueryResult(MultipleQueryResultSelectionMode.None, "0");
                     }
                 }
                 // If subtracting arguement 2, return the list of values unique to argument 1 that
@@ -954,13 +1093,13 @@ namespace Extract.DataEntry
                 {
                     if (uniqueToArgument1Head == null)
                     {
-                        return new QueryResult(Name);
+                        return new QueryResult();
                     }
                     else
                     {
                         if (!string.IsNullOrEmpty(Name))
                         {
-                            uniqueToArgument1Head.CreateNamedResult(Name);
+                            _namedResult = new QueryResult(uniqueToArgument1Head);
                         }
                         return uniqueToArgument1Head;
                     }
@@ -975,17 +1114,16 @@ namespace Extract.DataEntry
         }
     }
 
+    #endregion ResultQueryNode
+
+    #region ComplexQueryNode
+
     /// <summary>
     /// A <see cref="QueryNode"/> that is comprised of one or more child
     /// <see cref="QueryNode"/>s.
     /// </summary>
     internal class ComplexQueryNode : QueryNode
     {
-        /// <summary>
-        /// The DataEntryQuery to which this query is a descendent.
-        /// </summary>
-        protected DataEntryQuery _rootQuery;
-
         /// <summary>
         /// The child QueryNodes of this query node.
         /// </summary>
@@ -1021,12 +1159,10 @@ namespace Extract.DataEntry
         DbConnection _dbConnection;
 
         /// <summary>
-        /// Keeps track of the results of all child <see cref="DataEntryQuery"/>s that were used to
-        /// evaluate/resolve this query in order to ensure all named results are passed on in the
-        /// final <see cref="QueryResult"/>.
+        /// The named <see cref="QueryNode"/>s which this <see cref="QueryNode"/> references.
         /// </summary>
-        Dictionary<QueryNode, QueryResult> _childQueryResults =
-            new Dictionary<QueryNode, QueryResult>();
+        protected Dictionary<string, QueryNode> _namedDependencies =
+            new Dictionary<string, QueryNode>();
 
         /// <overrides>
         /// Initializes a new <see cref="ComplexQueryNode"/> instance.
@@ -1127,14 +1263,17 @@ namespace Extract.DataEntry
         /// <param name="xmlNode">The XML query string defining the query.</param>
         /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
         /// query.</param>
-        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery)
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
         {
             try
             {
                 _query = xmlNode.InnerXml;
-                _rootQuery = rootQuery;
+                AddRootQuery(rootQuery);
 
-                base.LoadFromXml(xmlNode, rootQuery);
+                base.LoadFromXml(xmlNode, rootQuery, namedQueries);
 
                 // Iterate through each child of the current XML node and use each to initialize a
                 // new child QueryNode.
@@ -1184,6 +1323,31 @@ namespace Extract.DataEntry
                             childQueryNode =
                                 new ComplexQueryNode(RootAttribute, DbConnection, ResolveOnLoad);
                         }
+                        else if (childElement.Name.Equals("Regex",
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            childQueryNode =
+                                new RegexQueryNode(RootAttribute, DbConnection, ResolveOnLoad);
+                        }
+                        else if (childElement.Name.Equals("Expression",
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            childQueryNode =
+                                new ExpressionQueryNode(RootAttribute, DbConnection, ResolveOnLoad);
+                        }
+                        else if (namedQueries.ContainsKey(childElement.Name))
+                        {
+                            // If the node name matches the name of one of the name QueryNodes,
+                            // create this node as a single-argument ResultQueryNode.
+                            childQueryNode = new ResultQueryNode();
+                            childQueryNode.Properties["Arg1"] = childElement.Name;
+                        }
+                        else
+                        {
+                            ExtractException ee = new ExtractException("ELI26726", "Unrecognized element in query.");
+                            ee.AddDebugData("Element Name", childElement.Name, false);
+                            throw ee;
+                        }
 
                         // If there is only one child query node, assume the user is going to want
                         // it to have the same selection mode as the overall query by default.
@@ -1192,11 +1356,13 @@ namespace Extract.DataEntry
                             childQueryNode.SelectionMode = SelectionMode;
                         }
 
-                        ExtractException.Assert("ELI26726", "Failed parsing auto-update query!",
-                            childQueryNode != null);
+                        childQueryNode.LoadFromXml(childNode, rootQuery, namedQueries);
 
-                        // Load the node.
-                        childQueryNode.LoadFromXml(childNode, rootQuery);
+                        if (!string.IsNullOrEmpty(childQueryNode.Name))
+                        {
+                            _namedDependencies[childQueryNode.Name] = childQueryNode;
+                        }
+
                         _childNodes.Add(childQueryNode);
                     }
                 }
@@ -1205,6 +1371,34 @@ namespace Extract.DataEntry
             {
                 throw ExtractException.AsExtractException("ELI28958", ex);
             }
+        }
+
+        /// <summary>
+        /// Specfies that this <see cref="QueryNode"/> is a sub-component to the specified
+        /// <see cref="DataEntryQuery"/>.
+        /// </summary>
+        /// <param name="rootQuery">The <see cref="DataEntryQuery"/> for which this
+        /// <see cref="QueryNode"/> is a sub-component.</param>
+        public override void AddRootQuery(DataEntryQuery rootQuery)
+        {
+            base.AddRootQuery(rootQuery);
+
+            foreach (QueryNode childNode in _childNodes)
+            {
+                childNode.AddRootQuery(rootQuery);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the <see cref="QueryResult"/> for the <see cref="QueryNode"/> of the specified
+        /// <see paramref="name"/>.
+        /// </summary>
+        /// <param name="name">The name of the <see cref="QueryNode"/> for which a result is needed.
+        /// </param>
+        /// <returns>The <see cref="QueryResult"/> for the <see cref="QueryNode"/>.</returns>
+        protected QueryResult GetNamedResult(string name)
+        {
+            return _namedDependencies[name].Evaluate();
         }
 
         /// <summary>
@@ -1323,20 +1517,17 @@ namespace Extract.DataEntry
         /// <summary>
         /// Evaluates the query by combining all child <see cref="QueryNode"/>s.
         /// </summary>
-        /// <param name="existingResult">A <see cref="QueryResult"/> providing context and access
-        /// to named results for the current evaluation.</param>
         /// <returns>A <see langword="string"/> representing the result of the query.</returns>
-        public override QueryResult Evaluate(QueryResult existingResult)
+        public override QueryResult Evaluate()
         {
             try
             {
                 QueryResult result = new QueryResult();
-                result.IncludeNamedResults(existingResult);
 
                 // Combine the results of all child nodes.
                 foreach (QueryNode childNode in _childNodes)
                 {
-                    QueryResult childQueryResult = GetChildQueryResult(childNode, result);
+                    QueryResult childQueryResult = childNode.Evaluate();
 
                     // Flatten the result into a delimited string if specified.
                     if (!string.IsNullOrEmpty(childNode.StringListDelimiter))
@@ -1351,7 +1542,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                return FinalizeComplexQueryResult(existingResult, result);
+                return result;
             }
             catch (Exception ex)
             {
@@ -1361,73 +1552,11 @@ namespace Extract.DataEntry
                 throw ee;
             }
         }
-
-        /// <summary>
-        /// All classes derived from <see cref="ComplexQueryNode"/> should use this method when the
-        /// result of a child <see cref="QueryNode"/> is needed. This method ensures all named
-        /// results are passed on to downstream queries.
-        /// </summary>
-        /// <param name="queryNode">The <see cref="QueryNode"/> instance which needs to be
-        /// evaluated.</param>
-        /// <param name="existingResult">The current <see cref="QueryResult"/> providing context
-        /// for upstream named results.</param>
-        /// <returns>The <see cref="QueryResult"/> generated by evaluating
-        /// <see paramref="queryNode"/>.</returns>
-        protected QueryResult GetChildQueryResult(QueryNode queryNode, QueryResult existingResult)
-        {
-            try
-            {
-                QueryResult queryResult = queryNode.Evaluate(existingResult);
-                _childQueryResults[queryNode] = queryResult;
-                existingResult.IncludeNamedResults(queryResult);
-
-                return queryResult;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI28969", ex);
-            }
-        }
-
-        /// <summary>
-        /// All classes derived from <see cref="ComplexQueryNode"/> should call this method prior to
-        /// returning their final <see cref="QueryResult"/> from <see cref="QueryNode.Evaluate"/>.
-        /// This method ensures all named results are passed on to downstream queries.
-        /// </summary>
-        /// <param name="existingResult">The existing <see cref="QueryResult"/> which provides
-        /// access to upstream named results.</param>
-        /// <param name="finalResult">The <see cref="QueryResult"/> being returned from 
-        /// <see cref="QueryNode.Evaluate"/>.</param>
-        protected QueryResult FinalizeComplexQueryResult(QueryResult existingResult,
-            QueryResult finalResult)
-        {
-            try
-            {
-                // Make the result a named result if a name as been specified.
-                if (!string.IsNullOrEmpty(Name))
-                {
-                    finalResult.CreateNamedResult(Name);
-                }
-
-                // Pass on named results from the existing query to the final result.
-                finalResult.IncludeNamedResults(existingResult);
-
-                // Pass on named results from the child queries to the final result.
-                if (_childQueryResults.Values.Count > 0)
-                {
-                    QueryResult[] childQueryResults = new QueryResult[_childQueryResults.Values.Count];
-                    _childQueryResults.Values.CopyTo(childQueryResults, 0);
-                    finalResult.IncludeNamedResults(childQueryResults);
-                }
-
-                return finalResult;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI28970", ex);
-            }
-        }
     }
+
+    #endregion ComplexQueryNode
+
+    #region SqlQueryNode
 
     /// <summary>
     /// A <see cref="QueryNode"/> that is to be resolved using an SQL query against the active
@@ -1454,10 +1583,8 @@ namespace Extract.DataEntry
         /// Evaluates the query by using the combined result of all child
         /// <see cref="QueryNode"/>s as an SQL query against the active database.
         /// </summary>
-        /// <param name="existingResult">A <see cref="QueryResult"/> providing context and access
-        /// to named results for the current evaluation.</param>
         /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
-        public override QueryResult Evaluate(QueryResult existingResult)
+        public override QueryResult Evaluate()
         {
             try
             {
@@ -1471,7 +1598,6 @@ namespace Extract.DataEntry
                     sqlCeConnection != null);
 
                 QueryResult result = new QueryResult();
-                result.IncludeNamedResults(existingResult);
 
                 StringBuilder sqlQuery = new StringBuilder();
 
@@ -1485,7 +1611,7 @@ namespace Extract.DataEntry
                 // Combine the result of all child queries parameterizing as necessary.
                 foreach (QueryNode childNode in _childNodes)
                 {
-                    QueryResult childQueryResult = GetChildQueryResult(childNode, result);
+                    QueryResult childQueryResult = childNode.Evaluate();
 
                     // Evaluate, but don't include any excluded child results.
                     if (childNode.ExcludeFromResult)
@@ -1538,11 +1664,11 @@ namespace Extract.DataEntry
                         if (spatialResult != null && spatialResult.HasSpatialInfo())
                         {
                             spatialResult.ReplaceAndDowngradeToHybrid("");
-                            result = new QueryResult(Name, SelectionMode, spatialResult);
+                            result = new QueryResult(SelectionMode, spatialResult);
                         }
                         else
                         {
-                            result = new QueryResult(Name);
+                            result = new QueryResult();
                         }
                     }
                     // Apply the spatial infomation of child nodes with "Force" spatial mode if
@@ -1567,16 +1693,16 @@ namespace Extract.DataEntry
                             }
                         }
 
-                        result = new QueryResult(Name, SelectionMode, spatialResults);
+                        result = new QueryResult(SelectionMode, spatialResults);
                     }
                     // Otherwise, just return the text value.
                     else
                     {
-                        result = new QueryResult(Name, SelectionMode, queryResults);
+                        result = new QueryResult(SelectionMode, queryResults);
                     }
                 }
 
-                return FinalizeComplexQueryResult(existingResult, result);
+                return result;
             }
             catch (Exception ex)
             {
@@ -1587,6 +1713,10 @@ namespace Extract.DataEntry
             }
         }
     }
+
+    #endregion SqlQueryNode
+
+    #region AttributeQueryNode
 
     /// <summary>
     /// A <see cref="QueryNode"/> that is to be resolved using the value of an
@@ -1605,10 +1735,10 @@ namespace Extract.DataEntry
         string _attributeValueFullPath;
 
         /// <summary>
-        /// The name of a <see cref="QueryResult"/> that contains the <see cref="IAttribute"/> to
-        /// be used as the <see cref="ComplexQueryNode.RootAttribute"/>.
+        /// A <see cref="ResultQueryNode"/> which refers to the <see cref="IAttribute"/>(s) which
+        /// should serve as the root of the path to the target <see cref="IAttribute"/>(s).
         /// </summary>
-        string _rootAttributeResultName;
+        ResultQueryNode _rootAttributeResultQuery;
 
         /// <summary>
         /// Specifies whether changes to the attribute should trigger the parent
@@ -1638,17 +1768,20 @@ namespace Extract.DataEntry
         /// <param name="xmlNode">The XML query string defining the query.</param>
         /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
         /// query.</param>
-        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery)
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
         {
             try
             {
-                base.LoadFromXml(xmlNode, rootQuery);
+                base.LoadFromXml(xmlNode, rootQuery, namedQueries);
 
                 // Changes to the attribute should trigger an update unless specified not to.
                 XmlAttribute xmlAttribute = xmlNode.Attributes["TriggerUpdate"];
-                if (xmlAttribute != null && xmlAttribute.Value == "0")
+                if (xmlAttribute != null)
                 {
-                    _triggerUpdate = false;
+                    _triggerUpdate = xmlAttribute.Value.ToBoolean();
                 }
 
                 // If the query begins with a slash, search from the root of the attribute
@@ -1663,7 +1796,10 @@ namespace Extract.DataEntry
                     xmlAttribute = xmlNode.Attributes["Root"];
                     if (xmlAttribute != null && !string.IsNullOrEmpty(xmlAttribute.Value))
                     {
-                        _rootAttributeResultName = xmlAttribute.Value;
+                        _rootAttributeResultQuery =
+                            new ResultQueryNode(xmlAttribute.Value, rootQuery, namedQueries);
+                        _rootAttributeResultQuery.ExcludeFromResult = true;
+                        _childNodes.Add(_rootAttributeResultQuery);
                         RootAttribute = null;
                     }
                     else if (ResolveOnLoad)
@@ -1678,6 +1814,34 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI26756", ex);
                 ee.AddDebugData("XML", xmlNode.InnerXml, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Specfies that this <see cref="QueryNode"/> is a sub-component to the specified
+        /// <see cref="DataEntryQuery"/>.
+        /// </summary>
+        /// <param name="rootQuery">The <see cref="DataEntryQuery"/> for which this
+        /// <see cref="QueryNode"/> is a sub-component.</param>
+        public override void AddRootQuery(DataEntryQuery rootQuery)
+        {
+            // Determine whether trigger(s) needs to be set on rootQuery so that it is re-evaluated
+            // every time this node is evaluated.
+            bool setTrigger = _triggerUpdate &&
+                              _triggerAttributes.Count > 0 &&
+                              rootQuery != null &&
+                              !_rootQueries.Contains(rootQuery);
+
+            base.AddRootQuery(rootQuery);
+
+            // Set the triggers if necessary.
+            if (setTrigger)
+            {
+                foreach (IAttribute triggerAttribute in _triggerAttributes)
+                {
+                    rootQuery.SetTrigger(triggerAttribute,
+                        SelectionMode != MultipleQueryResultSelectionMode.None);
+                }
             }
         }
 
@@ -1703,7 +1867,7 @@ namespace Extract.DataEntry
                     (!base.Required || _triggerAttributes.Count > 0 ||
                      SelectionMode == MultipleQueryResultSelectionMode.List ||
                      SelectionMode == MultipleQueryResultSelectionMode.Distinct ||
-                     !string.IsNullOrEmpty(_rootAttributeResultName) ||
+                     _rootAttributeResultQuery != null ||
                      _query.StartsWith("/", StringComparison.Ordinal)));
         }
 
@@ -1734,10 +1898,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Evaluates the query by using the value of the specified <see cref="IAttribute"/>.
         /// </summary>
-        /// <param name="existingResult">A <see cref="QueryResult"/> providing context and access
-        /// to named results for the current evaluation.</param>
         /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
-        public override QueryResult Evaluate(QueryResult existingResult)
+        public override QueryResult Evaluate()
         {
             try
             {
@@ -1746,10 +1908,9 @@ namespace Extract.DataEntry
 
                 // If the RootAttribute needs to be resolved at evaluation time.
                 List<IAttribute> resultingAttributes = new List<IAttribute>();
-                if ((existingResult != null && !string.IsNullOrEmpty(_rootAttributeResultName)))
+                if (_rootAttributeResultQuery != null)
                 {
-                    QueryResult namedResult =
-                        existingResult.GetNamedResult(_rootAttributeResultName);
+                    QueryResult namedResult = _rootAttributeResultQuery.Evaluate();
                     if (namedResult.IsAttribute)
                     {
                         // There may be multiple root attributes. Add the results using each root
@@ -1759,7 +1920,7 @@ namespace Extract.DataEntry
                             try
                             {
                                 RootAttribute = attribute;
-                                RegisterTriggerCandidate(null, existingResult);
+                                RegisterTriggerCandidate(null);
                                 resultingAttributes.AddRange(_triggerAttributes);
                             }
                             finally
@@ -1774,7 +1935,7 @@ namespace Extract.DataEntry
                 }
                 else if (!GetIsFullyResolved())
                 {
-                    RegisterTriggerCandidate(null, existingResult);
+                    RegisterTriggerCandidate(null);
                     resultingAttributes.AddRange(_triggerAttributes);
                 }
                 else
@@ -1788,7 +1949,7 @@ namespace Extract.DataEntry
 
                 if (resultingAttributes.Count > 0)
                 {
-                    results = new QueryResult(Name, SelectionMode, resultingAttributes.ToArray());
+                    results = new QueryResult(SelectionMode, resultingAttributes.ToArray());
 
                     // Modify results to reflect Only or None spatial mode settings.
                     if (SpatialMode == SpatialMode.Only)
@@ -1804,7 +1965,7 @@ namespace Extract.DataEntry
                     }
                 }
                 
-                return FinalizeComplexQueryResult(existingResult, results ?? new QueryResult());
+                return results ?? new QueryResult();
             }
             catch (Exception ex)
             {
@@ -1815,9 +1976,6 @@ namespace Extract.DataEntry
             }
         }
 
-        /// <overrides>
-        /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
-        /// </overrides>
         /// <summary>
         /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
         /// </summary>
@@ -1829,36 +1987,13 @@ namespace Extract.DataEntry
         /// resolved; <see langword="false"/> otherwise.</returns>
         public override bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo)
         {
-            try
-            {
-                return RegisterTriggerCandidate(statusInfo, null);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI28974", ex);
-            }
-        }
-
-        /// <summary>
-        /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
-        /// </summary>
-        /// <param name="statusInfo">If <see langword="null"/> the <see cref="QueryNode"/> will
-        /// attempt to resolve all unresolved triggers. If specified, the corresponding
-        /// query node will attempt to register the corresponding <see cref="IAttribute"/> with
-        /// all unresolved nodes.</param>
-        /// <param name="existingResult">A <see cref="QueryResult"/> providing context and access
-        /// to named results for the current evaluation.</param>
-        /// <returns><see langword="true"/> if one or more <see cref="QueryNode"/>s were
-        /// resolved; <see langword="false"/> otherwise.</returns>
-        bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo, QueryResult existingResult)
-        {
             // First attempt to register all child nodes.
             bool resolved = base.RegisterTriggerCandidate(statusInfo);
 
             // If all child nodes are resolved, but this node is not, attempt to resolve it.
             if (!this.GetIsFullyResolved() && base.GetIsMinimallyResolved())
             {
-                string childQueryString = base.Evaluate(existingResult).ToString();
+                string childQueryString = base.Evaluate().ToString();
 
                 if (string.IsNullOrEmpty(_attributeValueFullPath))
                 {
@@ -1952,11 +2087,14 @@ namespace Extract.DataEntry
             // if the trigger attribute is deleted.
             statusInfo.AttributeDeleted += HandleAttributeDeleted;
 
-            // Set a trigger for the attribute on the root node.
+            // Set a trigger for the attribute on all root nodes.
             if (_triggerUpdate)
             {
-                _rootQuery.SetTrigger(triggerAttribute,
-                    SelectionMode != MultipleQueryResultSelectionMode.None);
+                foreach (DataEntryQuery rootQuery in _rootQueries)
+                {
+                    rootQuery.SetTrigger(triggerAttribute,
+                        SelectionMode != MultipleQueryResultSelectionMode.None);
+                }
             }
             
             _triggerAttributes.Add(triggerAttribute);
@@ -1987,14 +2125,243 @@ namespace Extract.DataEntry
                             AttributeStatusInfo.GetStatusInfo(triggerAttribute);
             statusInfo.AttributeDeleted -= HandleAttributeDeleted;
 
-            _rootQuery.ClearTrigger(triggerAttribute,
-                SelectionMode != MultipleQueryResultSelectionMode.None);
+            foreach (DataEntryQuery rootQuery in _rootQueries)
+            {
+                rootQuery.ClearTrigger(triggerAttribute,
+                    SelectionMode != MultipleQueryResultSelectionMode.None);
+            }
 
             _triggerAttributes.Remove(triggerAttribute);
         }
 
         #endregion Private Members
     }
+
+    #endregion SqlQueryNode
+
+    #region RegexQueryNode
+
+    /// <summary>
+    /// A <see cref="QueryNode"/> that is resolved by extracting matches in the query's value for
+    /// the provided regex pattern.
+    /// </summary>
+    internal class RegexQueryNode : ComplexQueryNode
+    {
+        /// <summary>
+        /// The <see cref="DotNetRegexParser"/> used to search for regex matches.
+        /// </summary>
+        DotNetRegexParser _regexParser = new DotNetRegexParser();
+
+        /// <summary>
+        /// Indicates whether only the first match should be returned or all matches should be
+        /// returned.
+        /// </summary>
+        bool _firstMatchOnly = true;
+
+        /// <summary>
+        /// Initializes a new <see cref="RegexQueryNode"/> instance.
+        /// </summary>
+        /// <param name="rootAttribute">The <see cref="IAttribute"/> that should be considered the
+        /// root of any attribute query.</param>
+        /// <param name="dbConnection">The <see cref="DbConnection"/> that should be used to
+        /// evaluate any SQL queries.</param>
+        /// <param name="resolveOnLoad"><see langword="true"/> if the query will resolve itself if
+        /// possible as it is loaded, <see langword="false"/> if RegisterTriggerCandidate must be
+        /// called manually to resolve the query if attribute triggers are involved.</param>
+        public RegexQueryNode(IAttribute rootAttribute, DbConnection dbConnection, bool resolveOnLoad)
+            : base(rootAttribute, dbConnection, MultipleQueryResultSelectionMode.List, resolveOnLoad)
+        {
+        }
+
+        /// <summary>
+        /// Loads the <see cref="RegexQueryNode"/> using the specified XML query string.
+        /// </summary>
+        /// <param name="xmlNode">The XML query string defining the query.</param>
+        /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
+        /// query.</param>
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
+        {
+            try
+            {
+                base.LoadFromXml(xmlNode, rootQuery, namedQueries);
+
+                // Changes to the attribute should trigger an update unless specified not to.
+                XmlAttribute xmlAttribute = xmlNode.Attributes["Pattern"];
+                ExtractException.Assert("ELI31978",
+                    "Regex query node must contain a \"Pattern\" attribute.", xmlAttribute != null);
+
+                _regexParser.Pattern = xmlAttribute.Value;
+
+                xmlAttribute = xmlNode.Attributes["FirstMatchOnly"];
+                if (xmlAttribute != null)
+                {
+                    _firstMatchOnly = xmlAttribute.Value.ToBoolean();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31981", ex);
+            }
+        }
+
+        /// <summary>
+        /// Evaluates the query by searching the results of <see cref="ComplexQueryNode.Evaluate"/>
+        /// with the configured regex pattern.
+        /// </summary>
+        /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
+        public override QueryResult Evaluate()
+        {
+            try
+            {
+                ExtractException.Assert("ELI31979", "Cannot evaluate un-resolved query!",
+                    this.GetIsMinimallyResolved());
+
+                // The string to search is the result of the base class's evaluation.
+                string childQueryString = base.Evaluate().ToString();
+
+                // Search for regex matches
+                IUnknownVector regexResults =
+                    _regexParser.Find(childQueryString, _firstMatchOnly, false);
+                
+                // Convert the matches to a string array.
+                string[] matches = regexResults.ToIEnumerable<IObjectPair>()
+                    .Select(resultPair => ((Token)(resultPair.Object1)).Value)
+                    .ToArray();
+
+                return new QueryResult(SelectionMode, matches);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI31980", ex);
+            }
+        }
+    }
+
+    #endregion RegexQueryNode
+
+    #region ExpressionQueryNode
+
+    /// <summary>
+    /// A <see cref="QueryNode"/> that is resolved by evaluating an expression using the Spring.Net
+    /// expression evaluation engine.
+    /// </summary>
+    internal class ExpressionQueryNode : ComplexQueryNode
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionQueryNode"/> class.
+        /// </summary>
+        /// <param name="rootAttribute">The <see cref="IAttribute"/> that should be considered the
+        /// root of any attribute query.</param>
+        /// <param name="dbConnection">The <see cref="DbConnection"/> that should be used to
+        /// evaluate any SQL queries.</param>
+        /// <param name="resolveOnLoad"><see langword="true"/> if the query will resolve itself if
+        /// possible as it is loaded, <see langword="false"/> otherwise.</param>
+        /// <overrides>
+        /// Initializes a new <see cref="ComplexQueryNode"/> instance.
+        ///   </overrides>
+        public ExpressionQueryNode(IAttribute rootAttribute, DbConnection dbConnection, bool resolveOnLoad)
+            : base(rootAttribute, dbConnection, resolveOnLoad)
+        {
+        }
+
+        /// <summary>
+        /// Evaluates the query by combining evaluating the expression.
+        /// </summary>
+        /// <returns>
+        /// A <see langword="string"/> representing the result of the query.
+        /// </returns>
+        public override QueryResult Evaluate()
+        {
+            StringBuilder expressionBuilder = new StringBuilder();
+
+            try
+            {
+                Dictionary<string, object> variables = new Dictionary<string, object>();
+
+                int variableNum = 0;
+                foreach (QueryNode childNode in _childNodes)
+                {
+                    // Add any unparameterized node as part of the expression string itself.
+                    if (!childNode.Parameterize)
+                    {
+                        expressionBuilder.Append(childNode.Evaluate());
+                    }
+                    // Any parameterized nodes should be be treated as variables of a specific type
+                    else
+                    {
+                        // Create a unique name for the variable.
+                        variableNum++;
+                        string variableName = string.Format(CultureInfo.InvariantCulture,
+                            "Variable{0}", variableNum);
+
+                        string stringValue = childNode.Evaluate().ToString();
+                        object value = null;
+
+                        // Determine the type to which the chileNode's result should be cast at
+                        // evaluation time.
+                        Type type = null;
+                        string typeName;
+                        if (childNode.Properties.TryGetValue("Type", out typeName))
+                        {
+                            type = TypeResolutionUtils.ResolveType(typeName);
+                        }
+
+                        // If not specified, treat as a string.
+                        if (type == null)
+                        {
+                            value = stringValue;
+                        }
+                        // Otherwise, try to cast to the specified type.
+                        else
+                        {
+                            try
+                            {
+                                value = TypeConversionUtils.ConvertValueIfNecessary(type, stringValue, variableName);
+                            }
+                            catch
+                            {
+                                // If the cast failed, use a default value (if one is provided)
+                                string defaultValue;
+                                if (childNode.Properties.TryGetValue("Default", out defaultValue))
+                                {
+                                    value = TypeConversionUtils.ConvertValueIfNecessary(type, defaultValue, variableName);
+                                }
+                                // Otherwise, use the default value of the type.
+                                else if (type.IsValueType)
+                                {
+                                    value = Activator.CreateInstance(type);
+                                }
+                            }
+                        }
+
+                        variables[variableName] = value;
+
+                        // Plug the variable name into the expression.
+                        expressionBuilder.Append("#");
+                        expressionBuilder.Append(variableName);
+                    }
+                }
+
+                string expression = expressionBuilder.ToString();
+                string result = ExpressionEvaluator.GetValue(null, expression, variables).ToString();
+
+                return new QueryResult(SelectionMode, result);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ex.AsExtract("ELI31983");
+                ee.AddDebugData("Expression", expressionBuilder.ToString(), false);
+                throw ee;
+            }
+        }
+    }
+
+    #endregion ExpressionQueryNode
+
+    #region DataEntryQuery
 
     /// <summary>
     /// The master <see cref="QueryNode"/> class used to construct queries from their XML
@@ -2119,12 +2486,22 @@ namespace Extract.DataEntry
         {
             try
             {
+                // The resulting list of queries.
                 List<DataEntryQuery> queryList = new List<DataEntryQuery>();
+
+                // A query containing named QueryNodes accessible by all defined DataEntryQueries.
+                DataEntryQuery queryNodeDeclarations = null;
+
+                // A collection named QueryNodes accessible to subquent DataEntryQueries that are
+                // loaded (includes name nodes both from the declarations node and the queries
+                // themselves).
+                Dictionary<string, QueryNode> namedQueries = new Dictionary<string, QueryNode>();
 
                 // In order to avoid requiring queries to be wrapped in a query element, enclose the
                 // query in a Query element if it hasn't already been.
                 xml = xml.Trim();
-                if (xml.IndexOf("<Query", StringComparison.OrdinalIgnoreCase) != 0)
+                if (xml.IndexOf("<Query", StringComparison.OrdinalIgnoreCase) != 0 &&
+                    xml.IndexOf("<Declarations", StringComparison.OrdinalIgnoreCase) != 0)
                 {
                     xml = "<Query>" + xml + "</Query>";
                 }
@@ -2136,12 +2513,26 @@ namespace Extract.DataEntry
                 xmlDocument.InnerXml = xml;
                 XmlNode rootNode = xmlDocument.FirstChild;
 
+                // Load any query node declarations that will be referenced by primary queries.
+                XmlNode declarationsNode = rootNode.ChildNodes
+                    .Cast<XmlNode>()
+                    .Where(n => n.Name.Equals("Declarations", StringComparison.OrdinalIgnoreCase))
+                    .FirstOrDefault();
+                if (declarationsNode != null)
+                {
+                    queryNodeDeclarations = new DataEntryQuery(rootAttribute, dbConnection,
+                        selectionMode, resolveOnLoad);
+                    queryNodeDeclarations.LoadFromXml(declarationsNode, null, namedQueries);
+                }
+
                 // Use the XML to generate all queries to be used for this trigger.
-                foreach (XmlNode node in rootNode.ChildNodes)
+                foreach (XmlNode node in rootNode.ChildNodes
+                    .OfType<XmlNode>()
+                    .Where(n => n.Name.Equals("Query", StringComparison.OrdinalIgnoreCase)))
                 {
                     DataEntryQuery dataEntryQuery = new DataEntryQuery(rootAttribute, dbConnection,
                         selectionMode, resolveOnLoad);
-                    dataEntryQuery.LoadFromXml(node, dataEntryQuery);
+                    dataEntryQuery.LoadFromXml(node, dataEntryQuery, namedQueries);
                     queryList.Add(dataEntryQuery);
                 }
 
@@ -2297,7 +2688,10 @@ namespace Extract.DataEntry
 
                     // Ensure all nodes in the query update cached resolved status values to reflect
                     // the change.
-                    _rootQuery.UpdateResolvedStatus();
+                    foreach (DataEntryQuery rootQuery in _rootQueries)
+                    {
+                        rootQuery.UpdateResolvedStatus();
+                    }
                 }
             }
             catch (Exception ex)
@@ -2312,17 +2706,20 @@ namespace Extract.DataEntry
         /// <param name="xmlNode">The XML query string defining the query.</param>
         /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
         /// query.</param>
-        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery)
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        public override void LoadFromXml(XmlNode xmlNode, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
         {
             try
             {
-                base.LoadFromXml(xmlNode, rootQuery);
+                base.LoadFromXml(xmlNode, rootQuery, namedQueries);
 
                 // Check to see if this query has been specified as the default.
                 XmlAttribute xmlAttribute = xmlNode.Attributes["Default"];
-                if (xmlAttribute != null && xmlAttribute.Value == "1")
+                if (xmlAttribute != null)
                 {
-                    DefaultQuery = true;
+                    DefaultQuery = xmlAttribute.Value.ToBoolean();
                 }
 
                 xmlAttribute = xmlNode.Attributes["ValidValue"];
@@ -2339,9 +2736,9 @@ namespace Extract.DataEntry
 
                 // Not a validation warning by default
                 xmlAttribute = xmlNode.Attributes["ValidationWarning"];
-                if (xmlAttribute != null && xmlAttribute.Value == "1")
+                if (xmlAttribute != null)
                 {
-                    _isValidationWarning = true;
+                    _isValidationWarning = xmlAttribute.Value.ToBoolean();
                 }
             }
             catch (Exception ex)
@@ -2358,7 +2755,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns>If not <see langword="null"/> the result is a validation message that should
         /// be used in place of the control's pre-defined error message.</returns>
-        public string GetValidationMessage(QueryResult existingResult)
+        public string GetValidationMessage()
         {
             try
             {
@@ -2368,7 +2765,7 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    return existingResult.GetNamedResult(_validationMessageResultName).ToString();
+                    return GetNamedResult(_validationMessageResultName).ToString();
                 }
             }
             catch (Exception ex)
@@ -2512,4 +2909,6 @@ namespace Extract.DataEntry
 
         #endregion Private Members
     }
+
+    #endregion DataEntryQuery
 }

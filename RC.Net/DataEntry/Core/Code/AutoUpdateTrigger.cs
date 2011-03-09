@@ -415,7 +415,7 @@ namespace Extract.DataEntry
                 if (dataEntryQuery.GetIsMinimallyResolved())
                 {
                     // If so, evaluate it.
-                    QueryResult queryResult = dataEntryQuery.Evaluate(null);
+                    QueryResult queryResult = dataEntryQuery.Evaluate();
 
                     // Use the results to update the target attribute's validation list if the
                     // AutoUpdateTrigger is a validation trigger.
