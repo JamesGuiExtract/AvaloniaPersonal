@@ -483,6 +483,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModifyPdfFile", "..\..\..\..\..\RC.Net\Imaging\Utilities\ModifyPdfFile\Core\Code\ModifyPdfFile.csproj", "{14B6CC8E-CFF8-408C-98EA-43B9BB13E50C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.FileSuppliers", "..\..\..\..\..\RC.Net\FileActionManager\FileSuppliers\Core\Code\Extract.FileActionManager.FileSuppliers.csproj", "{62521920-F2EF-4B6C-AF12-68ADA4791FCF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
