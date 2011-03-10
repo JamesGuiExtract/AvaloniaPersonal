@@ -181,6 +181,7 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
+		<row><td>Common.Logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{57B7B6A7-22C7-4D9B-BADC-961F7AD7FB5A}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>common.logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{26431AF3-29B3-4D12-9672-40A5214682D4}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>dataentryapplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{AC48C02C-A4E0-4362-B219-4E05B2AC825D}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{0A06E51C-1038-4613-AACE-79E968210746}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -360,6 +361,7 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
+		<row><td>common.logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Common.Logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>COMMON~1.DLL|Common.Logging.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Common.Logging.dll</td><td>1</td><td/></row>
 		<row><td>dataentryapplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.EXE|DataEntryApplication.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryApplication.exe</td><td>17</td><td/></row>
 		<row><td>dataentrycc.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.DLL|DataEntryCC.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryCC.dll</td><td>17</td><td/></row>
 		<row><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.DataEntry.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.dll</td><td>17</td><td/></row>
@@ -480,6 +482,7 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
+		<row><td>Common.Logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_F3FB7C2E_31E9_41EA_9A93_604685ECA431_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_9E879378_D7C5_4840_9A1D_B25425D160EB_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_2B40FBD6_FCA9_4A23_B379_C74A24F5A282_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_1D662107_2612_4CA6_B3AF_26979F2ED520_FILTER</td><td/><td/><td/><td/></row>
@@ -1069,6 +1072,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="s72">Component</col>
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
+		<row><td>Common.Logging.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>DataEntryCC.dll.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
