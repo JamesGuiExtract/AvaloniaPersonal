@@ -285,9 +285,9 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Initializes an object from the <see cref="IStream"/> where it was previously saved.
+        /// Initializes an object from the IStream where it was previously saved.
         /// </summary>
-        /// <param name="stream"><see cref="IStream"/> from which the object should be loaded.
+        /// <param name="stream">IStream from which the object should be loaded.
         /// </param>
         public void Load(System.Runtime.InteropServices.ComTypes.IStream stream)
         {
@@ -305,10 +305,10 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Saves an object into the specified <see cref="IStream"/> and indicates whether the 
+        /// Saves an object into the specified IStream and indicates whether the 
         /// object should reset its dirty flag.
         /// </summary>
-        /// <param name="stream"><see cref="IStream"/> into which the object should be saved.
+        /// <param name="stream">IStream into which the object should be saved.
         /// </param>
         /// <param name="clearDirty">Value that indicates whether to clear the dirty flag after the
         /// save is complete. If <see langword="true"/>, the flag should be cleared. If 
