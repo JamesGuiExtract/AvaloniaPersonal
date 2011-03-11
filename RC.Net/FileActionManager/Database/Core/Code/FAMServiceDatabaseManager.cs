@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Extract.Database;
+using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -11,9 +13,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Extract.Database;
-using Extract.Utilities;
 using UCLID_COMUTILSLib;
+
+using CurrentFAMServiceDB = Extract.FileActionManager.Database.FAMServiceDatabaseV6;
 
 namespace Extract.FileActionManager.Database
 {
@@ -38,7 +40,7 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// The current service database schema version.
         /// </summary>
-        public static readonly int CurrentSchemaVersion = 5;
+        public static readonly int CurrentSchemaVersion = FAMServiceDatabase.CurrentSchemaVersion;
 
         /// <summary>
         /// The class that manages this schema and can perform upgrades to the latest schema.
@@ -256,12 +258,13 @@ namespace Extract.FileActionManager.Database
                 else if (backup)
                 {
                     backupFile = BackupDatabase();
+                    File.Delete(_databaseFile);
                 }
 
                 bool created = false;
                 if (_connection == null || _connection.State == ConnectionState.Closed)
                 {
-                    using (var serviceDB = new FAMServiceDatabaseV5(_databaseFile))
+                    using (var serviceDB = new CurrentFAMServiceDB(_databaseFile))
                     {
                         if (!serviceDB.DatabaseExists())
                         {
@@ -293,16 +296,16 @@ namespace Extract.FileActionManager.Database
         /// <returns>The collection of rows in the FPS file table.</returns>
         public ReadOnlyCollection<FpsFileTableData> GetFpsFileData(bool ignoreZeroRows)
         {
-            FAMServiceDatabaseV5 db = null;
+            CurrentFAMServiceDB db = null;
             try
             {
                 if (_connection != null)
                 {
-                    db = new FAMServiceDatabaseV5(_connection);
+                    db = new CurrentFAMServiceDB(_connection);
                 }
                 else
                 {
-                    db = new FAMServiceDatabaseV5(_databaseFile);
+                    db = new CurrentFAMServiceDB(_databaseFile);
                 }
 
                 var returnList = new List<FpsFileTableData>();
@@ -376,13 +379,16 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// Gets the schema version.
         /// </summary>
+        /// <param name="forceUpdate">If <see langword="true"/> then will go back
+        /// to the database to update the cached schema version number; otherwise
+        /// only updates the schema version number if it is 0.</param>
         /// <returns>The schema version for the database.</returns>
         // This is better suited as a method since it performs significant
         // computation.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public int GetSchemaVersion()
+        public int GetSchemaVersion(bool forceUpdate = false)
         {
-            if (_versionNumber == 0)
+            if (_versionNumber == 0 || forceUpdate)
             {
                 FAMServiceDatabase db = null;
                 try
@@ -435,7 +441,7 @@ namespace Extract.FileActionManager.Database
         }
 
         /// <summary>
-        /// Computes the timestamped file name for the backup file and moves the
+        /// Computes the timestamped file name for the backup file and copies the
         /// current database file to that location.
         /// </summary>
         /// <returns>The path to the backup file.</returns>
@@ -443,142 +449,8 @@ namespace Extract.FileActionManager.Database
         {
             string backupFile = FileSystemMethods.BuildTimeStampedBackupFileName(_databaseFile, true);
 
-            FileSystemMethods.MoveFile(_databaseFile, backupFile, false);
+            File.Copy(_databaseFile, backupFile, true);
             return backupFile;
-        }
-
-        /// <summary>
-        /// Updates the database from the version 2 schema to the version 5 schema.
-        /// <para><b>Note:</b></para>
-        /// This should not be called unles <see cref="BackupDatabase"/> has been
-        /// called first. The <see cref="string"/> returned from the call should be
-        /// passed into this method.
-        /// </summary>
-        /// <param name="backupFile">The name of the backup file.</param>
-        void UpdateFromVersion2Schema(string backupFile)
-        {
-            CopySettings(backupFile);
-            var oldFpsFiles = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            using (var oldDb = new FAMServiceDatabaseV2(backupFile))
-            {
-                foreach (var oldTable in oldDb.FpsFile)
-                {
-                    string fileName = oldTable.FileName;
-
-                    // Get the current count
-                    int fileCount = 0;
-                    oldFpsFiles.TryGetValue(fileName, out fileCount);
-
-                    // Increment appropriately
-                    fileCount += oldTable.AutoStart ? 1 : 0;
-
-                    // Set the new count
-                    oldFpsFiles[fileName] = fileCount;
-                }
-            }
-
-            var newFpsFiles = new List<FpsFileTableV5>();
-            foreach (var pair in oldFpsFiles)
-            {
-                newFpsFiles.Add(new FpsFileTableV5()
-                    {
-                        FileName = pair.Key,
-                        NumberOfInstances = pair.Value,
-                        NumberOfFilesToProcess = "0"
-                    });
-            }
-            using (var currentDb = new FAMServiceDatabaseV5(_databaseFile))
-            {
-                currentDb.FpsFile.InsertAllOnSubmit(newFpsFiles);
-                currentDb.SubmitChanges(ConflictMode.FailOnFirstConflict);
-            }
-        }
-
-        /// <summary>
-        /// Updates the database from either version 3 or 4 schema to the version 5 schema.
-        /// <para><b>Note:</b></para>
-        /// This should not be called unles <see cref="BackupDatabase"/> has been
-        /// called first. The <see cref="string"/> returned from the call should be
-        /// passed into this method.
-        /// </summary>
-        /// <param name="backupFile">The name of the backup file.</param>
-        void UpdateFromVersion3Or4Schema(string backupFile)
-        {
-            CopySettings(backupFile);
-
-            var oldFpsFiles = new Dictionary<string, Tuple<int, int, bool>>(
-                StringComparer.OrdinalIgnoreCase);
-            using (var oldDb = new FAMServiceDatabaseV4(backupFile))
-            {
-                foreach (var oldTable in oldDb.FpsFile)
-                {
-                    string fileName = oldTable.FileName;
-                    int increment = oldTable.AutoStart ? 1 : 0;
-                    int numberOfFiles = 0;
-                    if (!int.TryParse(oldTable.NumberOfFilesToProcess, out numberOfFiles))
-                    {
-                        numberOfFiles = 0;
-                    }
-
-                    Tuple<int, int, bool> fileData = null;
-                    if (oldFpsFiles.TryGetValue(fileName, out fileData))
-                    {
-                        int count = fileData.Item1 + (oldTable.AutoStart ? 1 : 0);
-                        bool countChanged = false;
-                        if (numberOfFiles < fileData.Item2)
-                        {
-                            countChanged = true;
-                        }
-                        else
-                        {
-                            numberOfFiles = fileData.Item2;
-                        }
-                        fileData = new Tuple<int, int, bool>(count, numberOfFiles,
-                            fileData.Item3 | countChanged);
-                    }
-                    else
-                    {
-                        fileData = new Tuple<int, int, bool>(increment, numberOfFiles, false);
-                    }
-
-                    // Set the new count
-                    oldFpsFiles[fileName] = fileData;
-                }
-            }
-
-            var filesWithDifferentCounts = new List<string>();
-            var newFpsFiles = new List<FpsFileTableV5>();
-            foreach (var pair in oldFpsFiles)
-            {
-                var fileData = pair.Value;
-                newFpsFiles.Add(new FpsFileTableV5()
-                    {
-                        FileName = pair.Key,
-                        NumberOfInstances = fileData.Item1,
-                        NumberOfFilesToProcess = fileData.Item2.ToString(CultureInfo.InvariantCulture)
-                    });
-                if (fileData.Item3)
-                {
-                    filesWithDifferentCounts.Add(pair.Key);
-                }
-            }
-
-            if (filesWithDifferentCounts.Count > 0)
-            {
-                string listOfFiles = string.Join(", ", filesWithDifferentCounts);
-                var ee = new ExtractException("ELI31082",
-                    "Application Trace: Service database had FPS files with different number of files to process.");
-                ee.AddDebugData("Old Service Database", backupFile, false);
-                ee.AddDebugData("New Service Database", _databaseFile, false);
-                ee.AddDebugData("FPS Files With Different Number Of Files", listOfFiles, false);
-                ee.Log();
-            }
-
-            using (var currentDb = new FAMServiceDatabaseV5(_databaseFile))
-            {
-                currentDb.FpsFile.InsertAllOnSubmit(newFpsFiles);
-                currentDb.SubmitChanges(ConflictMode.FailOnFirstConflict);
-            }
         }
 
         /// <summary>
@@ -729,23 +601,33 @@ namespace Extract.FileActionManager.Database
                     // Check if the task has already been cancelled
                     ct.ThrowIfCancellationRequested();
 
-                    string backUpFileName = null;
-                    CreateDatabase(true, out backUpFileName);
+                    string backUpFileName = BackupDatabase();
 
-                    switch (version)
+                    while (version < CurrentSchemaVersion)
                     {
-                        case 2:
-                            UpdateFromVersion2Schema(backUpFileName);
-                            break;
+                        switch (version)
+                        {
+                            case 2:
+                                UpdateFromVersion2SchemaTo6();
+                                break;
 
-                        case 3:
-                        case 4:
-                            UpdateFromVersion3Or4Schema(backUpFileName);
-                            break;
+                            case 3:
+                            case 4:
+                                UpdateFromVersion3Or4SchemaTo6(backUpFileName);
+                                break;
 
-                        default:
-                            ExtractException.ThrowLogicException("ELI31085");
-                            break;
+                            case 5:
+                                UpdateFromVersion5SchemaTo6();
+                                break;
+
+                            default:
+                                var ee = new ExtractException("ELI31085",
+                                    "Unrecognized schema version.");
+                                ee.AddDebugData("Schema Version", version, false);
+                                throw ee;
+                        }
+
+                        version = GetSchemaVersion(true);
                     }
 
                     if (progressStatus != null)
@@ -765,5 +647,255 @@ namespace Extract.FileActionManager.Database
         }
 
         #endregion
+
+        #region Database Schema Update Methods
+
+        /// <summary>
+        /// Updates the database from the version 2 schema to the version 6 schema.
+        /// <para><b>Note:</b></para>
+        /// This should not be called unles <see cref="BackupDatabase"/> has been
+        /// called first.
+        /// </summary>
+        void UpdateFromVersion2SchemaTo6()
+        {
+            var oldFpsFiles = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            using (var oldDb = new FAMServiceDatabaseV2(_databaseFile))
+            {
+                foreach (var oldTable in oldDb.FpsFile)
+                {
+                    string fileName = oldTable.FileName;
+
+                    // Get the current count
+                    int fileCount = 0;
+                    oldFpsFiles.TryGetValue(fileName, out fileCount);
+
+                    // Increment appropriately
+                    fileCount += oldTable.AutoStart ? 1 : 0;
+
+                    // Set the new count
+                    oldFpsFiles[fileName] = fileCount;
+                }
+
+            }
+
+            var fpsFileData = new List<FpsFileTableV6>();
+            foreach (var pair in oldFpsFiles)
+            {
+                fpsFileData.Add(new FpsFileTableV6()
+                    {
+                        FileName = pair.Key,
+                        NumberOfInstances = pair.Value,
+                        NumberOfFilesToProcess = -1
+                    });
+            }
+
+            UpdateToVersion6(fpsFileData);
+        }
+
+        /// <summary>
+        /// Updates the database from either version 3 or 4 schema to the version 6 schema.
+        /// <para><b>Note:</b></para>
+        /// This should not be called unles <see cref="BackupDatabase"/> has been
+        /// called first. The <see cref="string"/> returned from the call should be
+        /// passed into this method.
+        /// </summary>
+        /// <param name="backupFile">The name of the backup file.</param>
+        void UpdateFromVersion3Or4SchemaTo6(string backupFile)
+        {
+            var oldFpsFiles = new Dictionary<string, Tuple<int, int, bool>>(
+                StringComparer.OrdinalIgnoreCase);
+            using (var oldDb = new FAMServiceDatabaseV4(_databaseFile))
+            {
+                foreach (var oldTable in oldDb.FpsFile)
+                {
+                    string fileName = oldTable.FileName;
+                    int increment = oldTable.AutoStart ? 1 : 0;
+                    int numberOfFiles = 0;
+                    if (string.IsNullOrWhiteSpace(oldTable.NumberOfFilesToProcess)
+                        || !int.TryParse(oldTable.NumberOfFilesToProcess, out numberOfFiles))
+                    {
+                        numberOfFiles = -1;
+                    }
+
+                    Tuple<int, int, bool> fileData = null;
+                    if (oldFpsFiles.TryGetValue(fileName, out fileData))
+                    {
+                        int count = fileData.Item1 + (oldTable.AutoStart ? 1 : 0);
+                        bool countChanged = false;
+                        if (numberOfFiles < fileData.Item2)
+                        {
+                            countChanged = true;
+                        }
+                        else
+                        {
+                            numberOfFiles = fileData.Item2;
+                        }
+                        fileData = new Tuple<int, int, bool>(count, numberOfFiles,
+                            fileData.Item3 | countChanged);
+                    }
+                    else
+                    {
+                        fileData = new Tuple<int, int, bool>(increment, numberOfFiles, false);
+                    }
+
+                    // Set the new count
+                    oldFpsFiles[fileName] = fileData;
+                }
+            }
+
+            var filesWithDifferentCounts = new List<string>();
+            var fpsFileData = new List<FpsFileTableV6>();
+            foreach (var pair in oldFpsFiles)
+            {
+                var fileData = pair.Value;
+                fpsFileData.Add(new FpsFileTableV6()
+                    {
+                        FileName = pair.Key,
+                        NumberOfInstances = fileData.Item1,
+                        NumberOfFilesToProcess = fileData.Item2
+                    });
+                if (fileData.Item3)
+                {
+                    filesWithDifferentCounts.Add(pair.Key);
+                }
+            }
+
+            if (filesWithDifferentCounts.Count > 0)
+            {
+                string listOfFiles = string.Join(", ", filesWithDifferentCounts);
+                var ee = new ExtractException("ELI31082",
+                    "Application Trace: Service database had FPS files with different number of files to process.");
+                ee.AddDebugData("Old Service Database", backupFile, false);
+                ee.AddDebugData("New Service Database", _databaseFile, false);
+                ee.AddDebugData("FPS Files With Different Number Of Files", listOfFiles, false);
+                ee.Log();
+            }
+
+            UpdateToVersion6(fpsFileData);
+        }
+
+        /// <summary>
+        /// Updates the database from version 5 schema to the version 6 schema.
+        /// <para><b>Note:</b></para>
+        /// This should not be called unles <see cref="BackupDatabase"/> has been
+        /// called first.
+        /// </summary>
+        void UpdateFromVersion5SchemaTo6()
+        {
+            var fpsFileData = new List<FpsFileTableV6>();
+            using (var oldDb = new FAMServiceDatabaseV5(_databaseFile))
+            {
+                // Set all null number of files to process to -1
+                oldDb.ExecuteCommand("UPDATE [FPSFile] SET [NumberOfFilesToProcess] = '-1' "
+                    + "WHERE [NumberOfFilesToProcess] IS NULL");
+
+                // Read the data from the old FPS file table and create data entries
+                // for the new FPS file table
+                foreach (var oldTable in oldDb.FpsFile)
+                {
+                    int numberToProcess = 0;
+                    if (string.IsNullOrWhiteSpace(oldTable.NumberOfFilesToProcess)
+                        || !int.TryParse(oldTable.NumberOfFilesToProcess, out numberToProcess))
+                    {
+                        numberToProcess = -1;
+                    }
+
+                    fpsFileData.Add(new FpsFileTableV6()
+                    {
+                        FileName = oldTable.FileName,
+                        NumberOfInstances = oldTable.NumberOfInstances,
+                        NumberOfFilesToProcess = numberToProcess
+                    });
+                }
+            }
+
+            UpdateToVersion6(fpsFileData);
+        }
+
+        /// <summary>
+        /// Updates the database to version 6
+        /// </summary>
+        /// <param name="fpsFileData">The data to add to the FPS file table.</param>
+        void UpdateToVersion6(IEnumerable<FpsFileTableV6> fpsFileData)
+        {
+            FAMServiceDatabaseV6 currentDb = null;
+            DbTransaction trans = null;
+            try
+            {
+                currentDb = new FAMServiceDatabaseV6(_databaseFile);
+                if (currentDb.Connection.State != ConnectionState.Open)
+                {
+                    currentDb.Connection.Open();
+                }
+                trans = currentDb.Connection.BeginTransaction();
+                currentDb.Transaction = trans;
+
+                // Drop the FPS file table
+                currentDb.ExecuteCommand("DROP TABLE [FPSFile]");
+
+                // Create the version 6 FPS file table
+                currentDb.ExecuteCommand("CREATE TABLE FPSFile ([FileName] NVARCHAR(512), "
+                    + "[NumberOfFilesToProcess] INT DEFAULT -1 NOT NULL, "
+                    + "[NumberOfInstances] INT DEFAULT 1 NOT NULL)");
+
+                foreach (var dataRow in fpsFileData)
+                {
+                    currentDb.ExecuteCommand(string.Concat("INSERT INTO [FPSFile] ",
+                        "([FileName], [NumberOfFilesToProcess], [NumberOfInstances]) ",
+                        "VALUES('", dataRow.FileName, "', ", dataRow.NumberOfFilesToProcess,
+                        ", ", dataRow.NumberOfInstances, ")"));
+                }
+
+                // If there is no schema manager defined, add it
+                if (currentDb.Settings
+                    .Count(s => s.Name == DatabaseHelperMethods.DatabaseSchemaManagerKey) == 0)
+                {
+                    currentDb.Settings.InsertOnSubmit(new Settings()
+                    {
+                        Name = DatabaseHelperMethods.DatabaseSchemaManagerKey,
+                        Value = DBSchemaManager
+                    });
+                }
+
+                // Update the schema version to 6
+                var setting = currentDb.Settings
+                    .Where(s => s.Name == ServiceDBSchemaVersionKey)
+                    .FirstOrDefault();
+                if (setting.Value == null)
+                {
+                    var ee = new ExtractException("ELI32017",
+                        "No Service db schema version key found.");
+                    ee.AddDebugData("Database File", _databaseFile, false);
+                    throw ee;
+                }
+                setting.Value = "6";
+
+                currentDb.SubmitChanges(ConflictMode.FailOnFirstConflict);
+
+                trans.Commit();
+            }
+            catch (Exception ex)
+            {
+                if (trans != null)
+                {
+                    trans.Rollback();
+                }
+
+                throw ex.AsExtract("ELI32018");
+            }
+            finally
+            {
+                if (trans != null)
+                {
+                    trans.Dispose();
+                }
+                if (currentDb != null)
+                {
+                    currentDb.Dispose();
+                }
+            }
+        }
+
+        #endregion Database Schema Update Methods
     }
 }

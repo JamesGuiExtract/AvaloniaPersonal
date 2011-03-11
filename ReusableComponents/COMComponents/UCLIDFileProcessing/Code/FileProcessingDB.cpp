@@ -1439,7 +1439,7 @@ STDMETHODIMP CFileProcessingDB::HasTags(VARIANT_BOOL* pvbVal)
 		}
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27343");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32027");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::TagFile(long nFileID, BSTR bstrTagName)

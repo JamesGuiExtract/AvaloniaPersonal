@@ -94,7 +94,7 @@ UINT CachedFileData::convertPdf(void* pData)
 	try
 	{
 		pCData = (ConversionData*) pData;
-		ASSERT_RESOURCE_ALLOCATION("ELI25209", pCData != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI32028", pCData != __nullptr);
 
 			// Convert PDF input file to temporary TIF
 		convertPDFToTIF(pCData->strPdfName, pCData->strTempName);

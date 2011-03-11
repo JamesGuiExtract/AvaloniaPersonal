@@ -1430,7 +1430,7 @@ STDMETHODIMP CRedactionTask::get_AutoAdjustTextCasing(VARIANT_BOOL* pvbAdjustCas
 
     try
     {
-        ASSERT_ARGUMENT("ELI24868", pvbAdjustCasing != NULL);
+        ASSERT_ARGUMENT("ELI32029", pvbAdjustCasing != NULL);
         
         // Check license state
         validateLicense();

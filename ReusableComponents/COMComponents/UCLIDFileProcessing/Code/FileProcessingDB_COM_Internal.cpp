@@ -66,7 +66,7 @@ using namespace ADODB;
 				}\
 				if (!bRetryExceptionLogged) \
 				{ \
-					UCLIDException uex("ELI23631", "Database connection failed. Attempting to reconnect.", ue); \
+					UCLIDException uex("ELI32030", "Database connection failed. Attempting to reconnect.", ue); \
 					uex.log(); \
 					bRetryExceptionLogged = true; \
 				} \

@@ -101,25 +101,14 @@ namespace Extract.FileActionManager.Utilities
         ManualResetEvent _startThreads = new ManualResetEvent(false);
 
         /// <summary>
-        /// The collection of threads which are running.
-        /// </summary>
-        readonly List<Thread> _processingThreads = new List<Thread>();
-
-        /// <summary>
-        /// Thread which will sleep for the initial sleep time value and then set the
-        /// _startThreads event handle
-        /// </summary>
-        Thread _sleepThread;
-
-        /// <summary>
         /// Event handle that is set when all threads have stopped
         /// </summary>
-        ManualResetEvent _threadsStopped;
+        CountdownEvent _threadsStopped;
 
         /// <summary>
-        /// The count of active processing threads
+        /// The count of processing threads
         /// </summary>
-        volatile int _activeProcessingThreadCount;
+        volatile int _threadCount;
 
         /// <summary>
         /// The count of threads that required authentication to run.
@@ -184,24 +173,23 @@ namespace Extract.FileActionManager.Utilities
                 ee2.Log();
 
                 // Create the sleep thread and start it
-                _sleepThread = new Thread(SleepAndCheckDependentServices);
-                _sleepThread.Start();
+                new Thread(SleepAndCheckDependentServices).Start();
 
                 lock (_lock)
                 {
-                    // Create and launch a processing thread for each fps file.
-                    _threadsStopped = new ManualResetEvent(fpsFileArguments.Count == 0);
-                    for (int i = 0; i < fpsFileArguments.Count; i++)
-                    {
-                        // Create a new thread and add it to the collection.
-                        Thread thread = new Thread(ProcessFiles);
-                        _processingThreads.Add(thread);
+                    _threadCount = fpsFileArguments.Count;
+                    _threadsStopped = new CountdownEvent(_threadCount);
+                }
 
-                        // Start the thread in a Multithreaded apartment
-                        thread.SetApartmentState(ApartmentState.MTA);
-                        thread.Start(fpsFileArguments[i]);
-                        _activeProcessingThreadCount++;
-                    }
+                // Create and launch a processing thread for each fps file.
+                foreach (var threadData in fpsFileArguments)
+                {
+                    // Create a new thread and add it to the collection.
+                    Thread thread = new Thread(ProcessFiles);
+
+                    // Start the thread in a Multithreaded apartment
+                    thread.SetApartmentState(ApartmentState.MTA);
+                    thread.Start(threadData);
                 }
             }
             catch (Exception ex)
@@ -618,30 +606,17 @@ namespace Extract.FileActionManager.Utilities
                 // Mutex around the active thread count decrement
                 lock (_lock)
                 {
-                    _activeProcessingThreadCount--;
-                    if (_activeProcessingThreadCount <= 0)
+                    if (_threadsStopped != null)
                     {
-                        if (_threadsStopped != null)
-                        {
-                            // Wrap in a try/catch and log to ensure no exceptions thrown
-                            // from the finally block.
-                            try
-                            {
-                                _threadsStopped.Set();
-                            }
-                            catch (Exception ex)
-                            {
-                                ExtractException.Log("ELI28506", ex);
-                            }
-                        }
+                        _threadsStopped.Signal();
+                    }
 
-                        // Check if all threads failed to launch because they required authentication
-                        if (_threadsThatRequireAuthentication == _processingThreads.Count)
-                        {
-                            // All threads failed due to authentication requirement
-                            // call Stop to stop the service
-                            Stop();
-                        }
+                    // Check if all threads failed to launch because they required authentication
+                    if (_threadsThatRequireAuthentication == _threadCount)
+                    {
+                        // All threads failed due to authentication requirement
+                        // call Stop to stop the service
+                        Stop();
                     }
                 }
             }
@@ -823,7 +798,8 @@ namespace Extract.FileActionManager.Utilities
                 List<ProcessingThreadArguments> fpsFiles = new List<ProcessingThreadArguments>();
                 foreach(var fpsFileData in dbManager.GetFpsFileData(true))
                 {
-                    int numberToProcess = Math.Min(fpsFileData.NumberOfFilesToProcess, globalNumberOfFilesToProcess);
+                    int numberToProcess = fpsFileData.NumberOfFilesToProcess == -1 ?
+                        globalNumberOfFilesToProcess : fpsFileData.NumberOfFilesToProcess;
                     for (int i = 0; i < fpsFileData.NumberOfInstances; i++)
                     {
                         fpsFiles.Add(new ProcessingThreadArguments(fpsFileData.FileName,
@@ -865,7 +841,7 @@ namespace Extract.FileActionManager.Utilities
 
                 // Only wait if there is a wait handle
                 // and the caller has specified to wait
-                while (canRequestAdditionalTime && _threadsStopped != null && !_threadsStopped.WaitOne(1000))
+                while (canRequestAdditionalTime && _threadsStopped != null && !_threadsStopped.Wait(1000))
                 {
                     RequestAdditionalTime(1200);
                 }
@@ -874,7 +850,7 @@ namespace Extract.FileActionManager.Utilities
                 ExtractException ee2 = new ExtractException("ELI28774",
                     "Application trace: FAM Service stopped.");
                 ee2.AddDebugData("Threads Stopped",
-                    _threadsStopped != null ? _threadsStopped.WaitOne(0) : true, false);
+                    _threadsStopped != null ? _threadsStopped.Wait(0) : true, false);
                 ee2.Log();
 
                 // Set successful exit code
@@ -892,19 +868,13 @@ namespace Extract.FileActionManager.Utilities
                     // Done with the thread event close the handle and set to null
                     if (_threadsStopped != null)
                     {
-                        _threadsStopped.Close();
+                        _threadsStopped.Dispose();
                         _threadsStopped = null;
                     }
-
-                    // Set the active processing count back to 0
-                    _activeProcessingThreadCount = 0;
 
                     // Set the threads that required authentication back to 0
                     _threadsThatRequireAuthentication = 0;
                 }
-
-                // Empty the processing threads collection since we are done with the threads
-                _processingThreads.Clear();
             }
         }
 

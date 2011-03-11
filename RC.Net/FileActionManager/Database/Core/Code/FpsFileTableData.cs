@@ -37,7 +37,8 @@ namespace Extract.FileActionManager.Database
         /// <param name="numberOfFilesToProcess">The number of files to process.</param>
         public FpsFileTableData(string fileName, int numberOfInstances, string numberOfFilesToProcess)
             : this(fileName, numberOfInstances,
-            int.Parse(numberOfFilesToProcess, CultureInfo.InvariantCulture))
+            !string.IsNullOrWhiteSpace(numberOfFilesToProcess) ?
+            int.Parse(numberOfFilesToProcess, CultureInfo.InvariantCulture) : -1)
         {
         }
 
