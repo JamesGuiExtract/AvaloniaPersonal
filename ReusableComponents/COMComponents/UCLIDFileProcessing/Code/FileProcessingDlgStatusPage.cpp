@@ -15,6 +15,7 @@
 #include <COMUtils.h>
 #include <ExtractMFCUtils.h>
 #include <ListControlSelectionRestorer.h>
+#include <ClipboardManager.h>
 
 #include <string>
 #include <vector>
@@ -117,22 +118,22 @@ BOOL FileProcessingDlgStatusPage::PreTranslateMessage(MSG* pMsg)
 void FileProcessingDlgStatusPage::DoDataExchange(CDataExchange* pDX)
 {
 	CPropertyPage::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(FileProcessingDlgStatusPage)
 	DDX_Control(pDX, IDC_CURRENT_FILES_LIST, m_currentFilesList);
 	DDX_Control(pDX, IDC_COMPLETE_FILES_LIST, m_completedFilesList);
 	DDX_Control(pDX, IDC_FAILED_FILES_LIST, m_failedFilesList);
-	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(FileProcessingDlgStatusPage, CPropertyPage)
-	//{{AFX_MSG_MAP(FileProcessingDlgStatusPage)
 	ON_WM_SIZE()
 	ON_WM_TIMER()
 	ON_NOTIFY(NM_DBLCLK, IDC_FAILED_FILES_LIST, &FileProcessingDlgStatusPage::OnNMDblclkFailedFilesList)
 	ON_NOTIFY(NM_DBLCLK, IDC_CURRENT_FILES_LIST, &FileProcessingDlgStatusPage::OnNMDblclkCurrentFilesList)
+	ON_NOTIFY(NM_RCLICK, IDC_CURRENT_FILES_LIST, &FileProcessingDlgStatusPage::OnNMRclkFileLists)
+	ON_NOTIFY(NM_RCLICK, IDC_COMPLETE_FILES_LIST, &FileProcessingDlgStatusPage::OnNMRclkFileLists)
+	ON_NOTIFY(NM_RCLICK, IDC_FAILED_FILES_LIST, &FileProcessingDlgStatusPage::OnNMRclkFileLists)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_FAILED_FILES_LIST, &FileProcessingDlgStatusPage::OnItemchangedFailedFilesList)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRESS_DETAILS, &FileProcessingDlgStatusPage::OnBtnClickedProgressDetails)
-	//}}AFX_MSG_MAP
+	ON_BN_CLICKED(IDC_BUTTON_EXCEPTION_DETAILS, &FileProcessingDlgStatusPage::OnBtnClickedExceptionDetails)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -150,6 +151,8 @@ void FileProcessingDlgStatusPage::clear()
 	m_vecCompFileIds.clear();
 	m_vecFailFileIds.clear();
 	m_vecFailedUEXCodes.clear();
+	m_setLockedFileIds.clear();
+	m_queueStatusUpdates.clear();
 
 	// Clear the processing time
 	m_completedFailedOrCurrentTime.clear();
@@ -158,12 +161,34 @@ void FileProcessingDlgStatusPage::clear()
 	m_nTotalBytesProcessed = 0;
 	m_nTotalPagesProcessed = 0;
 	m_nTotalDocumentsProcessed = 0;
+
+	// Update the enabled state of the exception details button
+	long result = 0;
+	OnItemchangedFailedFilesList(__nullptr, &result);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::onStatusChange(long nFileId, ERecordStatus eOldStatus, ERecordStatus eNewStatus)
 {
 	// by default, assume that the transition is valid
 	bool bUnexpectedTransition = false;
+
+	CSingleLock lg(&m_mutex, TRUE);
+	if (m_setLockedFileIds.find(nFileId) != m_setLockedFileIds.end())
+	{
+		StatusUpdateInfo info;
+		info.FileId = nFileId;
+		info.OldStatus = eOldStatus;
+		info.NewStatus = eNewStatus;
+		m_queueStatusUpdates.push_back(info);
+		return;
+	}
+	else if (!m_queueStatusUpdates.empty())
+	{
+		StatusUpdateInfo info = m_queueStatusUpdates.front();
+		m_queueStatusUpdates.pop_front();
+		onStatusChange(info.FileId, info.OldStatus, info.NewStatus);
+	}
+	lg.Unlock();
 
 	// based upon what the old status and the new status is, update the UI
 	switch (eOldStatus)
@@ -483,7 +508,7 @@ void FileProcessingDlgStatusPage::OnBtnClickedProgressDetails()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16603")
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgStatusPage::OnNMDblclkFailedFilesList(NMHDR *pNMHDR, LRESULT *pResult)
+void FileProcessingDlgStatusPage::OnBtnClickedExceptionDetails()
 {
 	try
 	{
@@ -514,10 +539,20 @@ void FileProcessingDlgStatusPage::OnNMDblclkFailedFilesList(NMHDR *pNMHDR, LRESU
 
 		// display the UE (do not log it)
 		ue.display(false);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14947")
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgStatusPage::OnNMDblclkFailedFilesList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	try
+	{
+		// Do the same as if the user clicked the exception details button
+		OnBtnClickedExceptionDetails();
 
 		*pResult = 0;
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14947")
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32032");
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::OnNMDblclkCurrentFilesList(NMHDR *pNMHDR, LRESULT *pResult)
@@ -530,6 +565,132 @@ void FileProcessingDlgStatusPage::OnNMDblclkCurrentFilesList(NMHDR *pNMHDR, LRES
 		*pResult = 0;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16596")
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgStatusPage::OnNMRclkFileLists(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	long nFileId = -1;
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI32033", pNMHDR != __nullptr);
+
+			CListCtrl* pList = __nullptr;
+			vector<long>* pvecListItems = __nullptr;
+			switch(pNMHDR->idFrom)
+			{
+			case IDC_CURRENT_FILES_LIST:
+				pList = &m_currentFilesList;
+				pvecListItems = &m_vecCurrFileIds;
+				break;
+			case IDC_COMPLETE_FILES_LIST:
+				pList = &m_completedFilesList;
+				pvecListItems = &m_vecCompFileIds;
+				break;
+			case IDC_FAILED_FILES_LIST:
+				pList = &m_failedFilesList;
+				pvecListItems = &m_vecFailFileIds;
+				break;
+			}
+
+			int iPos = getIndexOfFirstSelectedItem(*pList);
+			if (iPos < 0)
+			{
+				return;
+			}
+			nFileId = pvecListItems->at(iPos);
+
+			// Mutex around set access
+			CSingleLock lg(&m_mutex, TRUE);
+			m_setLockedFileIds.insert(nFileId);
+			lg.Unlock();
+
+			const FileProcessingRecord& record = m_pRecordMgr->getTask(nFileId);
+			string strFileName = record.getFileName();
+
+			CMenu menu;
+			menu.LoadMenu(IDR_MENU_FAM_GRID_CONTEXT);
+			CMenu* pContextMenu = menu.GetSubMenu(0);
+
+			CPoint point;
+			GetCursorPos(&point);
+			int val = pContextMenu->TrackPopupMenu(
+				TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON | TPM_RETURNCMD,
+				point.x, point.y, this);
+			switch(val)
+			{
+			case ID_GRID_CONTEXT_COPY_FILENAME:
+				{
+					ClipboardManager clippy(this);
+					clippy.writeText(strFileName);
+				}
+				break;
+
+			case ID_GRID_CONTEXT_OPEN_FILE:
+				{
+					if (isValidFile(strFileName))
+					{
+						string strPath;
+						getSpecialFolderPath(CSIDL_SYSTEM, strPath);
+						strPath += "\\explorer.exe";
+						runEXE(strPath, strFileName);
+					}
+					else
+					{
+						UCLIDException ue("ELI32034", "The file cannot be found or is inaccessible.");
+						ue.addDebugInfo("File Name", strFileName);
+						throw ue;
+					}
+				}
+				break;
+
+			case ID_GRID_CONTEXT_OPEN_FILE_LOCATION:
+				{
+					string strDir = getDirectoryFromFullPath(strFileName);
+					if (isValidFolder(strDir))
+					{
+						string strPath;
+						getSpecialFolderPath(CSIDL_SYSTEM, strPath);
+						strPath += "\\explorer.exe";
+						runEXE(strPath, strDir);
+					}
+					else
+					{
+						UCLIDException ue("ELI32035", "The folder cannot be found or is inaccessible.");
+						ue.addDebugInfo("Folder Name", strDir);
+						ue.addDebugInfo("File Name", strFileName);
+						throw ue;
+					}
+				}
+				break;
+			}
+
+			lg.Lock();
+			m_setLockedFileIds.erase(nFileId);
+			lg.Unlock();
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32036");
+	}
+	catch(UCLIDException& uex)
+	{
+		if (nFileId != -1)
+		{
+			CSingleLock lg(&m_mutex, TRUE);
+			m_setLockedFileIds.erase(nFileId);
+			lg.Unlock();
+		}
+
+		uex.display();
+	}
+
+	if (pResult != __nullptr)
+	{
+		*pResult = 0;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::OnItemchangedFailedFilesList(NMHDR* pNMHDR, LRESULT* pResult) 

@@ -10,6 +10,8 @@
 #include <FileProcessingConfigMgr.h>
 
 #include <vector>
+#include <deque>
+#include <set>
 #include <string>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -70,34 +72,42 @@ public:
 	void ResetInitialized();
 
 // Overrides
-	// ClassWizard generate virtual function overrides
-	//{{AFX_VIRTUAL(FileProcessingDlgStatusPage)
 	protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
-	// Generated message map functions
-	//{{AFX_MSG(FileProcessingDlgStatusPage)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg void OnNMDblclkFailedFilesList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMDblclkCurrentFilesList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMRclkFileLists(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBtnClickedProgressDetails();
 	afx_msg void OnItemchangedFailedFilesList(NMHDR* pNMHDR, LRESULT* pResult);
-	//}}AFX_MSG
+	afx_msg void OnBtnClickedExceptionDetails();
 	DECLARE_MESSAGE_MAP()
 
 private:
+	struct StatusUpdateInfo
+	{
+		long FileId;
+		ERecordStatus OldStatus;
+		ERecordStatus NewStatus;
+	};
+
 	//////////////
 	// Variables
 	//////////////
 	std::vector<long> m_vecCurrFileIds;
 	std::vector<long> m_vecCompFileIds;
 	std::vector<long> m_vecFailFileIds;
+	std::set<long> m_setLockedFileIds;
+	std::deque<StatusUpdateInfo> m_queueStatusUpdates;
+
+	// Mutex used to protect access to the status update queue for locked file ids
+	CMutex m_mutex;
 
 	// vector of strings for UEX codes to go with failed files
 	std::vector<std::string> m_vecFailedUEXCodes;

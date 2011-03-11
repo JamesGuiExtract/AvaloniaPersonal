@@ -536,6 +536,19 @@ BEGIN
     END
 END
 
+IDR_MENU_FAM_GRID_CONTEXT MENU
+BEGIN
+	POPUP "Context"
+	BEGIN
+		MENUITEM "Copy filename",				ID_GRID_CONTEXT_COPY_FILENAME
+        MENUITEM SEPARATOR
+		MENUITEM "Open file...",				ID_GRID_CONTEXT_OPEN_FILE
+		MENUITEM "Open file location...",		ID_GRID_CONTEXT_OPEN_FILE_LOCATION
+        MENUITEM SEPARATOR
+		MENUITEM "Cancel",						ID_CONTEXT_CANCEL
+	END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

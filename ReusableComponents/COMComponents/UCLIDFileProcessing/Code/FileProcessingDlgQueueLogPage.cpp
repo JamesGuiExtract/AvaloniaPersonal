@@ -102,6 +102,7 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgQueueLogPage, CPropertyPage)
 	ON_WM_SIZE()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_FAILED_QUEING, &FileProcessingDlgQueueLogPage::OnNMDblclkFailedFilesList)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_FAILED_QUEING, &FileProcessingDlgQueueLogPage::OnLvnItemchangedListFailedQueing)
+	ON_BN_CLICKED(IDC_BUTTON_QUEUE_EXCEPTION_DETAILS, &FileProcessingDlgQueueLogPage::OnBtnClickedExceptionDetails)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -207,7 +208,7 @@ void FileProcessingDlgQueueLogPage::OnSize(UINT nType, int cx, int cy)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14040")
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgQueueLogPage::OnNMDblclkFailedFilesList(NMHDR *pNMHDR, LRESULT *pResult)
+void FileProcessingDlgQueueLogPage::OnBtnClickedExceptionDetails()
 {
 	try
 	{
@@ -234,10 +235,20 @@ void FileProcessingDlgQueueLogPage::OnNMDblclkFailedFilesList(NMHDR *pNMHDR, LRE
 		
 		// display the UE (do not log it)
 		ue.display(false);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14946")
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgQueueLogPage::OnNMDblclkFailedFilesList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	try
+	{
+		// Do the same as if the user clicked the exception details button
+		OnBtnClickedExceptionDetails();
 
 		*pResult = 0;
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14946")
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32031");
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgQueueLogPage::OnLvnItemchangedListFailedQueing(NMHDR *pNMHDR, LRESULT *pResult)
@@ -554,6 +565,10 @@ void FileProcessingDlgQueueLogPage::clear()
 	m_listQueueLog.DeleteAllItems();
 	m_listFailedQueing.DeleteAllItems();
 	m_vecExceptions.clear();
+
+	// Update the enabled state of the exception details button
+	long result = 0;
+	OnLvnItemchangedListFailedQueing(__nullptr, &result);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgQueueLogPage::setConfigMgr(FileProcessingConfigMgr *pCfgMgr)
