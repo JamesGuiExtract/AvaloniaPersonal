@@ -103,11 +103,6 @@ private:
 	std::vector<long> m_vecCurrFileIds;
 	std::vector<long> m_vecCompFileIds;
 	std::vector<long> m_vecFailFileIds;
-	std::set<long> m_setLockedFileIds;
-	std::deque<StatusUpdateInfo> m_queueStatusUpdates;
-
-	// Mutex used to protect access to the status update queue for locked file ids
-	CMutex m_mutex;
 
 	// vector of strings for UEX codes to go with failed files
 	std::vector<std::string> m_vecFailedUEXCodes;

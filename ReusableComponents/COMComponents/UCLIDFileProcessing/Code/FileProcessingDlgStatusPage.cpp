@@ -14,7 +14,6 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <ExtractMFCUtils.h>
-#include <ListControlSelectionRestorer.h>
 #include <ClipboardManager.h>
 
 #include <string>
@@ -151,8 +150,6 @@ void FileProcessingDlgStatusPage::clear()
 	m_vecCompFileIds.clear();
 	m_vecFailFileIds.clear();
 	m_vecFailedUEXCodes.clear();
-	m_setLockedFileIds.clear();
-	m_queueStatusUpdates.clear();
 
 	// Clear the processing time
 	m_completedFailedOrCurrentTime.clear();
@@ -171,24 +168,6 @@ void FileProcessingDlgStatusPage::onStatusChange(long nFileId, ERecordStatus eOl
 {
 	// by default, assume that the transition is valid
 	bool bUnexpectedTransition = false;
-
-	CSingleLock lg(&m_mutex, TRUE);
-	if (m_setLockedFileIds.find(nFileId) != m_setLockedFileIds.end())
-	{
-		StatusUpdateInfo info;
-		info.FileId = nFileId;
-		info.OldStatus = eOldStatus;
-		info.NewStatus = eNewStatus;
-		m_queueStatusUpdates.push_back(info);
-		return;
-	}
-	else if (!m_queueStatusUpdates.empty())
-	{
-		StatusUpdateInfo info = m_queueStatusUpdates.front();
-		m_queueStatusUpdates.pop_front();
-		onStatusChange(info.FileId, info.OldStatus, info.NewStatus);
-	}
-	lg.Unlock();
 
 	// based upon what the old status and the new status is, update the UI
 	switch (eOldStatus)
@@ -572,120 +551,92 @@ void FileProcessingDlgStatusPage::OnNMRclkFileLists(NMHDR* pNMHDR, LRESULT* pRes
 	AFX_MANAGE_STATE(AfxGetModuleState());
 	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
 
-	long nFileId = -1;
 	try
 	{
-		try
+		ASSERT_ARGUMENT("ELI32033", pNMHDR != __nullptr);
+
+		CListCtrl* pList = __nullptr;
+		vector<long>* pvecListItems = __nullptr;
+		switch(pNMHDR->idFrom)
 		{
-			ASSERT_ARGUMENT("ELI32033", pNMHDR != __nullptr);
+		case IDC_CURRENT_FILES_LIST:
+			pList = &m_currentFilesList;
+			pvecListItems = &m_vecCurrFileIds;
+			break;
+		case IDC_COMPLETE_FILES_LIST:
+			pList = &m_completedFilesList;
+			pvecListItems = &m_vecCompFileIds;
+			break;
+		case IDC_FAILED_FILES_LIST:
+			pList = &m_failedFilesList;
+			pvecListItems = &m_vecFailFileIds;
+			break;
 
-			CListCtrl* pList = __nullptr;
-			vector<long>* pvecListItems = __nullptr;
-			switch(pNMHDR->idFrom)
-			{
-			case IDC_CURRENT_FILES_LIST:
-				pList = &m_currentFilesList;
-				pvecListItems = &m_vecCurrFileIds;
-				break;
-			case IDC_COMPLETE_FILES_LIST:
-				pList = &m_completedFilesList;
-				pvecListItems = &m_vecCompFileIds;
-				break;
-			case IDC_FAILED_FILES_LIST:
-				pList = &m_failedFilesList;
-				pvecListItems = &m_vecFailFileIds;
-				break;
-			}
+		default:
+			THROW_LOGIC_ERROR_EXCEPTION("ELI32083");
+		}
 
-			int iPos = getIndexOfFirstSelectedItem(*pList);
-			if (iPos < 0)
-			{
-				return;
-			}
-			nFileId = pvecListItems->at(iPos);
+		vector<int> vecSelected = getIndexOfAllSelectedItems(*pList);
+		if (vecSelected.empty())
+		{
+			return;
+		}
 
-			// Mutex around set access
-			CSingleLock lg(&m_mutex, TRUE);
-			m_setLockedFileIds.insert(nFileId);
-			lg.Unlock();
-
+		vector<string> vecFileNames;
+		for(vector<int>::iterator it = vecSelected.begin(); it != vecSelected.end(); it++)
+		{
+			long nFileId = pvecListItems->at(*it);
 			const FileProcessingRecord& record = m_pRecordMgr->getTask(nFileId);
-			string strFileName = record.getFileName();
-
-			CMenu menu;
-			menu.LoadMenu(IDR_MENU_FAM_GRID_CONTEXT);
-			CMenu* pContextMenu = menu.GetSubMenu(0);
-
-			CPoint point;
-			GetCursorPos(&point);
-			int val = pContextMenu->TrackPopupMenu(
-				TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON | TPM_RETURNCMD,
-				point.x, point.y, this);
-			switch(val)
-			{
-			case ID_GRID_CONTEXT_COPY_FILENAME:
-				{
-					ClipboardManager clippy(this);
-					clippy.writeText(strFileName);
-				}
-				break;
-
-			case ID_GRID_CONTEXT_OPEN_FILE:
-				{
-					if (isValidFile(strFileName))
-					{
-						string strPath;
-						getSpecialFolderPath(CSIDL_SYSTEM, strPath);
-						strPath += "\\explorer.exe";
-						runEXE(strPath, strFileName);
-					}
-					else
-					{
-						UCLIDException ue("ELI32034", "The file cannot be found or is inaccessible.");
-						ue.addDebugInfo("File Name", strFileName);
-						throw ue;
-					}
-				}
-				break;
-
-			case ID_GRID_CONTEXT_OPEN_FILE_LOCATION:
-				{
-					string strDir = getDirectoryFromFullPath(strFileName);
-					if (isValidFolder(strDir))
-					{
-						string strPath;
-						getSpecialFolderPath(CSIDL_SYSTEM, strPath);
-						strPath += "\\explorer.exe";
-						runEXE(strPath, strDir);
-					}
-					else
-					{
-						UCLIDException ue("ELI32035", "The folder cannot be found or is inaccessible.");
-						ue.addDebugInfo("Folder Name", strDir);
-						ue.addDebugInfo("File Name", strFileName);
-						throw ue;
-					}
-				}
-				break;
-			}
-
-			lg.Lock();
-			m_setLockedFileIds.erase(nFileId);
-			lg.Unlock();
+			vecFileNames.push_back(record.getFileName());
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32036");
-	}
-	catch(UCLIDException& uex)
-	{
-		if (nFileId != -1)
+
+		CMenu menu;
+		menu.LoadMenu(IDR_MENU_FAM_GRID_CONTEXT);
+		CMenu* pContextMenu = menu.GetSubMenu(0);
+
+		// enable/disable context menu items properly
+		size_t nSize = vecFileNames.size();
+		UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
+		UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+		pContextMenu->EnableMenuItem(ID_GRID_CONTEXT_COPY_FILENAME, nSize > 0 ? nEnable : nDisable);
+		pContextMenu->EnableMenuItem(ID_GRID_CONTEXT_OPEN_FILE, nSize == 1 ? nEnable : nDisable );
+		pContextMenu->EnableMenuItem(ID_GRID_CONTEXT_OPEN_FILE_LOCATION, nSize == 1 ? nEnable : nDisable );
+
+		CPoint point;
+		GetCursorPos(&point);
+		int val = pContextMenu->TrackPopupMenu(
+			TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON | TPM_RETURNCMD,
+			point.x, point.y, this);
+		switch(val)
 		{
-			CSingleLock lg(&m_mutex, TRUE);
-			m_setLockedFileIds.erase(nFileId);
-			lg.Unlock();
-		}
+		case ID_GRID_CONTEXT_COPY_FILENAME:
+			{
+				string strFileNames = vecFileNames[0];
+				for(size_t i=1; i < nSize; i++)
+				{
+					strFileNames += "\r\n";
+					strFileNames += vecFileNames[i];
+				}
+				ClipboardManager clippy(this);
+				clippy.writeText(strFileNames);
+			}
+			break;
 
-		uex.display();
+		case ID_GRID_CONTEXT_OPEN_FILE:
+		case ID_GRID_CONTEXT_OPEN_FILE_LOCATION:
+			{
+				bool bOpenLocation = val == ID_GRID_CONTEXT_OPEN_FILE_LOCATION;
+				string strExe;
+				getSpecialFolderPath(CSIDL_SYSTEM, strExe);
+				strExe += "\\explorer.exe";
+				string strFileName = bOpenLocation ?
+					getDirectoryFromFullPath(vecFileNames[0]) : vecFileNames[0];
+				runEXE(strExe, strFileName);
+			}
+			break;
+		}
 	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32036");
 
 	if (pResult != __nullptr)
 	{
@@ -966,7 +917,6 @@ void FileProcessingDlgStatusPage::moveTaskFromPendingToCurrent(long nFileID)
 
 	// append a new record and update the default columns
 	int iNewItemIndex = appendNewRecord(m_currentFilesList, task);
-	ListControlSelectionRestorer lcsr(m_currentFilesList, iNewItemIndex);
 	
 	// update the folder column
 	m_currentFilesList.SetItemText(iNewItemIndex, giLIST1_FOLDER_COLUMN, 
@@ -1068,9 +1018,6 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToFailed(long nFileID)
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::removeTaskFromCurrentList(long nFileID)
 {
-	// Maintain list selection index
-	ListControlSelectionRestorer lcsr(m_currentFilesList, 0);
-
 	// Figure out it's location in the currently processing vector
 	int iPos = getTaskPosFromVector(m_vecCurrFileIds, nFileID);
 

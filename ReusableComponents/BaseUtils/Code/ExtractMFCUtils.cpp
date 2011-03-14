@@ -165,3 +165,17 @@ void loadComboBoxFromVector(CComboBox& rComboBox, std::vector<std::string>& vecI
 	}
 }
 //-------------------------------------------------------------------------------------------------
+vector<int> getIndexOfAllSelectedItems(CListCtrl& rListCtrl)
+{
+	vector<int> vecSelectedItems;
+
+	// Determine if there is a selection in the list control.
+	POSITION pos = rListCtrl.GetFirstSelectedItemPosition();
+	while (pos != __nullptr)
+	{
+		vecSelectedItems.push_back(rListCtrl.GetNextSelectedItem(pos));
+	}
+
+	return vecSelectedItems;
+}
+//-------------------------------------------------------------------------------------------------

@@ -10,6 +10,7 @@
 #include <UCLIDException.h>
 #include <ExtractMFCUtils.h>
 #include <TemporaryResourceOverride.h>
+#include <ClipboardManager.h>
 
 // columns common to all 3 grids
 static const int giALL_LISTS_DATE_COLUMN = 0;
@@ -102,6 +103,9 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgQueueLogPage, CPropertyPage)
 	ON_WM_SIZE()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_FAILED_QUEING, &FileProcessingDlgQueueLogPage::OnNMDblclkFailedFilesList)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_FAILED_QUEING, &FileProcessingDlgQueueLogPage::OnLvnItemchangedListFailedQueing)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_ATTEMPTING_TO_QUEUE, &FileProcessingDlgQueueLogPage::OnNMRclkFileLists)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_QUEUE_LOG, &FileProcessingDlgQueueLogPage::OnNMRclkFileLists)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_FAILED_QUEING, &FileProcessingDlgQueueLogPage::OnNMRclkFileLists)
 	ON_BN_CLICKED(IDC_BUTTON_QUEUE_EXCEPTION_DETAILS, &FileProcessingDlgQueueLogPage::OnBtnClickedExceptionDetails)
 END_MESSAGE_MAP()
 
@@ -263,6 +267,96 @@ void FileProcessingDlgQueueLogPage::OnLvnItemchangedListFailedQueing(NMHDR *pNMH
 		*pResult = 0;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16808")
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgQueueLogPage::OnNMRclkFileLists(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI32065", pNMHDR != __nullptr);
+
+		CListCtrl* pList = __nullptr;
+		int iFolderColumn = 0;
+		switch(pNMHDR->idFrom)
+		{
+		case IDC_LIST_ATTEMPTING_TO_QUEUE:
+			pList = &m_listAttemptingToQueue;
+			iFolderColumn = giLIST1_FOLDER_COLUMN;
+			break;
+		case IDC_LIST_QUEUE_LOG:
+			pList = &m_listQueueLog;
+			iFolderColumn = giLIST2_FOLDER_COLUMN;
+			break;
+		case IDC_LIST_FAILED_QUEING:
+			pList = &m_listFailedQueing;
+			iFolderColumn = giLIST3_FOLDER_COLUMN;
+			break;
+
+		default:
+			THROW_LOGIC_ERROR_EXCEPTION("ELI32084");
+		}
+
+		vector<string> vecFileNames;
+		getFileNamesFromAllSelectedRows(*pList, iFolderColumn, vecFileNames);
+		if (vecFileNames.empty())
+		{
+			return;
+		}
+
+		CMenu menu;
+		menu.LoadMenu(IDR_MENU_FAM_GRID_CONTEXT);
+		CMenu* pContextMenu = menu.GetSubMenu(0);
+
+		size_t nSize = vecFileNames.size();
+		UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
+		UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+		pContextMenu->EnableMenuItem(ID_GRID_CONTEXT_COPY_FILENAME, nSize > 0 ? nEnable : nDisable);
+		pContextMenu->EnableMenuItem(ID_GRID_CONTEXT_OPEN_FILE, nSize == 1 ? nEnable : nDisable );
+		pContextMenu->EnableMenuItem(ID_GRID_CONTEXT_OPEN_FILE_LOCATION, nSize == 1 ? nEnable : nDisable );
+
+		CPoint point;
+		GetCursorPos(&point);
+		int val = pContextMenu->TrackPopupMenu(
+			TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON | TPM_RETURNCMD,
+			point.x, point.y, this);
+		switch(val)
+		{
+		case ID_GRID_CONTEXT_COPY_FILENAME:
+			{
+				string strFileNames = vecFileNames[0];
+				for(size_t i=1; i < vecFileNames.size(); i++)
+				{
+					strFileNames += "\r\n";
+					strFileNames += vecFileNames[i];
+				}
+				ClipboardManager clippy(this);
+				clippy.writeText(strFileNames);
+			}
+			break;
+
+		case ID_GRID_CONTEXT_OPEN_FILE:
+		case ID_GRID_CONTEXT_OPEN_FILE_LOCATION:
+			{
+				bool bOpenLocation = val == ID_GRID_CONTEXT_OPEN_FILE_LOCATION;
+				string strExe;
+				getSpecialFolderPath(CSIDL_SYSTEM, strExe);
+				strExe += "\\explorer.exe";
+				string strFileName = bOpenLocation ?
+					getDirectoryFromFullPath(vecFileNames[0]) : vecFileNames[0];
+				runEXE(strExe, strFileName);
+			}
+			break;
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32066");
+
+	if (pResult != __nullptr)
+	{
+		*pResult = 0;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -452,6 +546,9 @@ long FileProcessingDlgQueueLogPage::appendNewRecord(CListCtrl& rListCtrl,
 	{
 		strFolder = pFileSupRec->m_strOriginalFileName;
 	}
+
+	// Simplify the path name
+	simplifyPathName(strFolder);
 	rListCtrl.SetItemText(nNewItemIndex, getFolderColumnID(rListCtrl), strFolder.c_str());
 
 	// If Autoscroll is enabled, focus on the new item
@@ -794,5 +891,19 @@ void FileProcessingDlgQueueLogPage::repositionButton(UINT uiButtonID, UINT uiLab
 	// Move the details button to the newly computed position
 	ScreenToClient(rectDetailsButton);
 	pwndDetailsButton->MoveWindow(&rectDetailsButton);
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgQueueLogPage::getFileNamesFromAllSelectedRows(CListCtrl& rListCtrl,
+	int iFolderColumn, vector<string>& rvecFileNames)
+{
+	rvecFileNames.clear();
+	POSITION pos = rListCtrl.GetFirstSelectedItemPosition();
+	while (pos != __nullptr)
+	{
+		int iPos = rListCtrl.GetNextSelectedItem(pos);
+		CString zFolderName = rListCtrl.GetItemText(iPos, iFolderColumn);
+		CString zFileName = rListCtrl.GetItemText(iPos, giALL_LISTS_FILENAME_COLUMN);
+		rvecFileNames.push_back((LPCTSTR)(zFolderName + "\\" + zFileName));
+	}
 }
 //-------------------------------------------------------------------------------------------------

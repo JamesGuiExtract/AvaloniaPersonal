@@ -48,3 +48,12 @@ EXPORT_BaseUtils int getIndexOfFirstSelectedItem(CListCtrl& rListCtrl);
 // NOTE:	The combo box list is reset before the items in the vector are added.
 EXPORT_BaseUtils void loadComboBoxFromVector(CComboBox& rComboBox, std::vector<std::string>& vecItems);
 //-------------------------------------------------------------------------------------------------
+// PURPOSE: To determine the index of all selected items in a list control
+// PROMISE:	If rListCtrl has at least one item selected, then:
+//			(a) If rListCtrl is a single-select list control, the index of the selected item will
+//				be returned.
+//			(b) If rListCtrl is a multi-select list control, the index of all selected items
+//				will be returned.
+//			If there is no selection in rListCtrl, then an empty vector will be returned
+EXPORT_BaseUtils std::vector<int> getIndexOfAllSelectedItems(CListCtrl& rListCtrl);
+//-------------------------------------------------------------------------------------------------

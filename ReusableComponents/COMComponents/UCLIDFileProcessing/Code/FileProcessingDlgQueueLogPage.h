@@ -60,6 +60,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnNMDblclkFailedFilesList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMRclkFileLists(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnItemchangedListFailedQueing(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBtnClickedExceptionDetails();
 	DECLARE_MESSAGE_MAP()
@@ -159,5 +160,9 @@ private:
 	//				will match the right coordinates of the re-positioned button after this method
 	//				executes.
 	void repositionButton(UINT uiButtonID, UINT uiLabelID, CListCtrl& rListCtrl);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To fill the provided vector with the filenames from each selected item in the grid
+	void getFileNamesFromAllSelectedRows(CListCtrl& rListCtrl, int iFolderColumn,
+		std::vector<string>& rvecFileNames);
 	//---------------------------------------------------------------------------------------------
 };
