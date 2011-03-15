@@ -853,9 +853,9 @@ ISpatialAttributeMergeUtilsPtr CMergeAttributes::getAttributeMerger()
 
 		// Use the largest percentage of mutual overlap between the two. [FlexIDSCore #3509]
 		m_ipAttributeMerger->UseMutualOverlap = VARIANT_FALSE;
-		
-		return m_ipAttributeMerger;
 	}
+
+	return m_ipAttributeMerger;
 }
 //--------------------------------------------------------------------------------------------------
 void CMergeAttributes::validateLicense()
