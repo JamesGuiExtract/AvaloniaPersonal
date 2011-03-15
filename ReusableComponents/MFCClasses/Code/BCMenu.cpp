@@ -2034,9 +2034,10 @@ void BCMenu::SynchronizeMenu(void)
 	BCMenuData *mdata;
 	CString string;
 	UINT submenu,nID=0,state,j;
+	UINT menuItemCount = GetMenuItemCount();
 	
 	InitializeMenuList(0);
-	for(j=0;j<GetMenuItemCount();++j){
+	for(j=0;j<menuItemCount;++j){
 		mdata=NULL;
 		state=GetMenuState(j,MF_BYPOSITION);
 		if(state&MF_POPUP){
