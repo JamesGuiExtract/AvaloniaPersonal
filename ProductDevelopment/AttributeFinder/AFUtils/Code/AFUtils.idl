@@ -115,6 +115,19 @@ library UCLID_AFUTILSLib
 		kRelatedCompanySubsidiary
 	} ERelatedCompanyType;
 
+	// Options for the selected the value of a merged field
+	typedef 
+	[
+		uuid(36499B68-A7E7-4706-BEF6-D60DB86CDC91), 
+		helpstring("UCLID Field Merge Mode")
+	]
+    enum
+	{
+		kSpecifyField,
+        kCombineField,
+		kPreserveField
+    } EFieldMergeMode;
+
 	// Interfaces
 	[
 		object,
@@ -548,6 +561,76 @@ library UCLID_AFUTILSLib
 		//-----------------------------------------------------------------------------------------
 	};
 
+	[
+        object,
+        uuid(4B12CDE6-B74E-4283-8BD2-16B3FE752519),
+        dual,
+        nonextensible,
+        helpstring("ISpatialAttributeMergeUtils Interface"),
+        pointer_default(unique)
+    ]
+    interface ISpatialAttributeMergeUtils : IDispatch
+    {
+		// The percentage two spatial attributes must overlap in order to qualify to be merged into a single zone.
+		[propget, id(1), helpstring("property OverlapPercent")] HRESULT OverlapPercent([out, retval] double *pVal);
+		[propput, id(1), helpstring("property OverlapPercent")] HRESULT OverlapPercent([in] double newVal);
+
+		// If VARIANT_TRUE, OverlapPercent refers to the minimum percentage overlap when compared both ways;
+		// If VARIANT_FALSE, OverlapPercent refers to the maximum percentage overlap.
+		[propget, id(2), helpstring("property UseMutualOverlap")] HRESULT UseMutualOverlap([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property UseMutualOverlap")] HRESULT UseMutualOverlap([in]VARIANT_BOOL newVal);
+		
+		// Specifies the method that should be used to determine the name of the merged attribute.
+		[propget, id(3), helpstring("property NameMergeMode")] HRESULT NameMergeMode([out, retval] EFieldMergeMode *pVal);
+		[propput, id(3), helpstring("property NameMergeMode")] HRESULT NameMergeMode([in] EFieldMergeMode newVal);
+
+		// Specifies the method that should be used to determine the type of the merged attribute.
+		[propget, id(4), helpstring("property TypeMergeMode")] HRESULT TypeMergeMode([out, retval] EFieldMergeMode *pVal);
+		[propput, id(4), helpstring("property TypeMergeMode")] HRESULT TypeMergeMode([in] EFieldMergeMode newVal);
+
+		// If NameMergeMode == kSpecifyField, merged attributes will be assigned this value.
+		[propget, id(5), helpstring("property SpecifiedName")] HRESULT SpecifiedName([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property SpecifiedName")] HRESULT SpecifiedName([in] BSTR newVal);
+		
+		// If TypeMergeMode == kSpecifyField, merged attributes will be assigned this type.
+		[propget, id(6), helpstring("property SpecifiedType")] HRESULT SpecifiedType([out, retval] BSTR *pVal);
+		[propput, id(6), helpstring("property SpecifiedType")] HRESULT SpecifiedType([in] BSTR newVal);
+		
+		// The text of merged attributes will be assigned this value.
+		[propget, id(7), helpstring("property SpecifiedValue")] HRESULT SpecifiedValue([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property SpecifiedValue")] HRESULT SpecifiedValue([in] BSTR newVal);
+		
+		// If NameMergeMode == kPreserveField, this specifies the priority in which names should be preserved.
+		[propget, id(8), helpstring("property NameMergePriority")] HRESULT NameMergePriority([out, retval] IVariantVector **pVal);
+		[propput, id(8), helpstring("property NameMergePriority")] HRESULT NameMergePriority([in] IVariantVector *pNewVal);
+		
+		// If VARIANT_TRUE, the original attributes will be added as as sub-attributes to the merged value.
+		[propget, id(9), helpstring("property PreserveAsSubAttributes")] HRESULT PreserveAsSubAttributes([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(9), helpstring("property PreserveAsSubAttributes")] HRESULT PreserveAsSubAttributes([in] VARIANT_BOOL newVal);
+		
+		// If VARIANT_TRUE, the resulting attributes will be a unification of the overall region the attributes occupy.
+		// If VARIANT_FALSE, the attribute raster zones will be merged on an individual basis.
+		[propget, id(10), helpstring("property CreateMergedRegion")] HRESULT CreateMergedRegion([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(10), helpstring("property CreateMergedRegion")] HRESULT CreateMergedRegion([in] VARIANT_BOOL newVal);
+
+		// Searches pAttributes for any attributes that qualify spatially to be merged based on the current settings.
+		// NOTE: This call does not modify pAttributes; ApplyMerges must be called to apply the qualifying merges.
+		[id(11), helpstring("method FindQualifiedMerges")] HRESULT FindQualifiedMerges([in] IIUnknownVector* pAttributes,
+			[in] ISpatialString *pDocText);
+
+		// Compares the spatial attributes in the two sets.
+		// Returns VARIANT_TRUE if all attributes in either set match per the current settings.
+		// Returns VARIANT_FALSE if at least one spatial attribute in one of the sets could not be merged with an attribute
+		// from the other set.
+		[id(12), helpstring("method CompareAttributeSets")] HRESULT CompareAttributeSets(
+			[in] IIUnknownVector* pvecAttributesSet1, [in] IIUnknownVector* pvecAttributesSet2, [in] ISpatialString *pDocText,
+			[out, retval] VARIANT_BOOL* pvbMatching);
+
+		// For each attribute in the provided vector of attributes that qualified to be merged via either a call to
+		// FindQualifiedMerges or CompareAttributeSets, the attribute is replaced with the qualified merge.
+		[id(13), helpstring("method ApplyMerges")] HRESULT ApplyMerges([in] IIUnknownVector* pvecAttributeSet);
+    };
+
 	// Coclasses
 	[
 		uuid(E1F4636A-34C8-4C66-9B3F-D0EB3CA54C2F),
@@ -621,4 +704,13 @@ library UCLID_AFUTILSLib
 	{
 		interface IUnknown;
 	};
+
+    [
+        uuid(6129276F-894D-432B-A666-56DE36E084C3),
+        helpstring("SpatialAttributeMergeUtils Class")
+    ]
+    coclass SpatialAttributeMergeUtils
+    {
+        [default] interface ISpatialAttributeMergeUtils;
+    };
 };

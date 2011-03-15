@@ -228,11 +228,11 @@ namespace Extract.Utilities
         /// <param name="enumerable">The <see cref="IEnumerable{T}"/> to convert.</param>
         /// <returns>An <see cref="IIUnknownVector"/> of type <see paramref="T"/>.</returns>
         [CLSCompliant(false)]
-        public static IIUnknownVector ToIUnknownVector<T>(this IEnumerable<T> enumerable)
+        public static IUnknownVector ToIUnknownVector<T>(this IEnumerable<T> enumerable)
         {
             try
             {
-                IIUnknownVector vector = new IUnknownVector();
+                IUnknownVector vector = new IUnknownVector();
                 foreach (T value in enumerable)
                 {
                     vector.PushBack(value);

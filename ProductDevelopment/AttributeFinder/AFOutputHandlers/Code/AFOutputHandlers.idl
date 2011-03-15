@@ -20,6 +20,7 @@ library UCLID_AFOUTPUTHANDLERSLib
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
 	importlib("..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb");
 	importlib("..\..\AFCore\Code\AFCore.tlb");
+	importlib("..\..\AFUtils\Code\AFUtils.tlb");
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S -----------------------------------------------------------------------------------
@@ -61,19 +62,6 @@ library UCLID_AFOUTPUTHANDLERSLib
 		kXMLOriginal = 0,		// Use original format with sub-attributes
         kXMLSchema = 1			// Use schema-compliant format
     } EXMLOutputFormat;
-
-	// Options for the selected the value of a merged field
-	typedef 
-	[
-		uuid(36499B68-A7E7-4706-BEF6-D60DB86CDC91), 
-		helpstring("UCLID Field Merge Mode")
-	]
-    enum
-	{
-		kSpecifyField,
-        kCombineField,
-		kPreserveField
-    } EFieldMergeMode;
 
 	// Options for the Merge attribute trees merge location
 	typedef

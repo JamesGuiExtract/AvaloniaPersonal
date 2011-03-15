@@ -33,6 +33,7 @@ IDR_ENTITYKEYWORDS      REGISTRY                "EntityKeywords.rgs"
 IDR_DOCUMENTSORTER      REGISTRY                "DocumentSorter.rgs"
 IDR_AFUTILITY           REGISTRY                "AFUtility.rgs"
 IDR_DOCUMENTCLASSIFIERPP REGISTRY                "DocumentClassifierPP.rgs"
+IDR_SPATIALATTRIBUTEMERGEUTILS REGISTRY                "SpatialAttributeMergeUtils.rgs"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

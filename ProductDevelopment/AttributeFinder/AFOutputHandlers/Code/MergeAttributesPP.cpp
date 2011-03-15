@@ -407,12 +407,12 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 					throw;
 				}
 
-				ipRule->NameMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kSpecifyField;
+				ipRule->NameMergeMode = (EFieldMergeMode) kSpecifyField;
 				ipRule->SpecifiedName = bstrName;
 			}
 			else
 			{
-				ipRule->NameMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kPreserveField;
+				ipRule->NameMergeMode = (EFieldMergeMode) kPreserveField;
 				ipRule->SpecifiedName = verifyControlValueAsBSTR(m_editSpecifiedName);
 
 				if (ipNamePrioirtyList->Size == 0)
@@ -441,12 +441,12 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 					}
 				}
 
-				ipRule->TypeMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kSpecifyField;
+				ipRule->TypeMergeMode = (EFieldMergeMode) kSpecifyField;
 				ipRule->SpecifiedType = bstrType;
 			}
 			else
 			{
-				ipRule->TypeMergeMode = (UCLID_AFOUTPUTHANDLERSLib::EFieldMergeMode) kCombineField;
+				ipRule->TypeMergeMode = (EFieldMergeMode) kCombineField;
 				ipRule->SpecifiedType = verifyControlValueAsBSTR(m_editSpecifiedType);
 			}
 

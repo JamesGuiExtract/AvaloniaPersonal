@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtils.SpatialAttributeMergeUtils.1 = s 'SpatialAttributeMergeUtils Class'
+	{
+		CLSID = s '{6129276F-894D-432B-A666-56DE36E084C3}'
+	}
+	UCLIDAFUtils.SpatialAttributeMergeUtils = s 'SpatialAttributeMergeUtils Class'
+	{
+		CLSID = s '{6129276F-894D-432B-A666-56DE36E084C3}'
+		CurVer = s 'UCLIDAFUtils.SpatialAttributeMergeUtils.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6129276F-894D-432B-A666-56DE36E084C3} = s 'SpatialAttributeMergeUtils Class'
+		{
+			ProgID = s 'UCLIDAFUtils.SpatialAttributeMergeUtils.1'
+			VersionIndependentProgID = s 'UCLIDAFUtils.SpatialAttributeMergeUtils'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{18CF5BEC-2929-43DD-86E0-7D50F152663A}'
+		}
+	}
+}

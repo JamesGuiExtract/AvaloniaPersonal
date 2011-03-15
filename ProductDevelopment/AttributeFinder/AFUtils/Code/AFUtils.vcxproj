@@ -245,6 +245,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="SpatialAttributeMergeUtils.cpp" />
     <ClCompile Include="RuleSetLoader.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -264,6 +265,7 @@
     <None Include="EntityFinder.rgs" />
     <None Include="EntityKeywords.rgs" />
     <None Include="MERSHandler.rgs" />
+    <None Include="SpatialAttributeMergeUtils.rgs" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="AFUtils.idl">
@@ -298,6 +300,7 @@
     <ClInclude Include="EntityKeywords.h" />
     <ClInclude Include="MERSHandler.h" />
     <ClInclude Include="PatternHolder.h" />
+    <ClInclude Include="SpatialAttributeMergeUtils.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SpecialStringDefinitions.h" />
     <ClInclude Include="StdAfx.h" />

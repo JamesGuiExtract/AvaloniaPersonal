@@ -80,6 +80,14 @@
   <ItemGroup>
     <Compile Include="AutoTool.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="VOAFileMergeTaskSettings.cs" />
+    <Compile Include="VOAFileMergeTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VOAFileMergeTaskSettingsDialog.Designer.cs">
+      <DependentUpon>VOAFileMergeTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VOAFileMergeTask.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="ConfidenceLevel.cs" />
     <Compile Include="ConfidenceLevelsCollection.cs" />
@@ -95,6 +103,8 @@
     <Compile Include="FeedbackSettings.cs" />
     <Compile Include="GeneralVerificationSettings.cs" />
     <Compile Include="IDShieldTesterSettings.cs" />
+    <Compile Include="VOAFileCompareCondition.cs" />
+    <Compile Include="VOAFileCompareConditionSettings.cs" />
     <Compile Include="InitializationSettings.cs" />
     <Compile Include="MasterExemptionCodeList.cs" />
     <Compile Include="MetadataSettings.cs" />
@@ -129,8 +139,17 @@
     </Compile>
     <Compile Include="SurroundContextTask.cs" />
     <Compile Include="VerificationSettings.cs" />
+    <Compile Include="VOAFileCompareConditionSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VOAFileCompareConditionSettingsDialog.Designer.cs">
+      <DependentUpon>VOAFileCompareConditionSettingsDialog.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="VOAFileMergeTaskSettingsDialog.resx">
+      <DependentUpon>VOAFileMergeTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DataFileControl.resx">
       <SubType>Designer</SubType>
       <DependentUpon>DataFileControl.cs</DependentUpon>
@@ -145,6 +164,9 @@
     <EmbeddedResource Include="SurroundContextSettingsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>SurroundContextSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VOAFileCompareConditionSettingsDialog.resx">
+      <DependentUpon>VOAFileCompareConditionSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
