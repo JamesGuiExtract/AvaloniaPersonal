@@ -41,6 +41,9 @@ using namespace UCLID_SSOCRLib;
 #import "..\..\AFCore\Code\AFCore.tlb" named_guids
 using namespace UCLID_AFCORELib;
 
+#import "..\..\AFUtils\Code\AFUtils.tlb" named_guids
+using namespace UCLID_AFUTILSLib;
+
 #import "..\..\AFOutputHandlers\Code\AFOutputHandlers.tlb" named_guids
 using namespace UCLID_AFOUTPUTHANDLERSLib;
 
