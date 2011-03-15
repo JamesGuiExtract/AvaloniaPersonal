@@ -39,7 +39,7 @@ CMergeAttributes::~CMergeAttributes()
 	{
 		m_ipAFUtility = __nullptr;
 		m_ipNameMergePriority = __nullptr;
-		m_ipAttributeMerger = __nullptr
+		m_ipAttributeMerger = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI22731");
 }
@@ -51,6 +51,13 @@ HRESULT CMergeAttributes::FinalConstruct()
 //--------------------------------------------------------------------------------------------------
 void CMergeAttributes::FinalRelease()
 {
+	try
+	{
+		m_ipAFUtility = __nullptr;
+		m_ipNameMergePriority = __nullptr;
+		m_ipAttributeMerger = __nullptr;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI32139");
 }
 
 //--------------------------------------------------------------------------------------------------
