@@ -15,6 +15,7 @@
 #include "FileProcessingUtils.h"
 #include "FileProcessingDlg.h"
 #include "CommonConstants.h"
+#include "AdvancedTaskSettingsDlg.h"
 
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
@@ -40,12 +41,6 @@ const long	glENABLED_WIDTH = 50;
 // Index of "Anyone" from the skipped file scope combo box
 const int giCOMBO_INDEX_ANYONE = 1;
 
-// The upper bound for the threads dialog box
-const int giTHREADS_UPPER_RANGE = 100;
-
-// ProgID for the set schedule COM object
-const string gstrSET_SCHEDULE_PROG_ID = "Extract.FileActionManager.Forms.SetProcessingSchedule";
-
 //-------------------------------------------------------------------------------------------------
 // FileProcessingDlgTaskPage property page
 //-------------------------------------------------------------------------------------------------
@@ -55,14 +50,12 @@ FileProcessingDlgTaskPage::FileProcessingDlgTaskPage()
 : CPropertyPage(FileProcessingDlgTaskPage::IDD), 
   m_ipClipboardMgr(NULL),
   m_ipMiscUtils(NULL),
-  m_ipSchedule(NULL),
   m_dwSel(0),
   m_bEnabled(true),
   m_bInitialized(false),
   m_bLogErrorDetails(FALSE),
   m_bExecuteErrorTask(FALSE),
-  m_pFPM(NULL),
-  m_bLimitProcessingTimes(FALSE)
+  m_pFPM(NULL)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -72,7 +65,6 @@ FileProcessingDlgTaskPage::~FileProcessingDlgTaskPage()
 	{
 		m_ipClipboardMgr = NULL;
 		m_ipMiscUtils = NULL;
-		m_ipSchedule = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16529");
 }
@@ -109,12 +101,6 @@ void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_REMOVE, m_btnRemove);
 	DDX_Control(pDX, IDC_BTN_UP, m_btnUp);
 	DDX_Control(pDX, IDC_BTN_DOWN, m_btnDown);
-	DDX_Control(pDX, IDC_RADIO_MAX_THREADS, m_btnMaxThreads);
-	DDX_Control(pDX, IDC_RADIO_THREADS, m_btnNumThreads);
-	DDX_Control(pDX, IDC_EDIT_THREADS, m_editThreads);
-	DDX_Control(pDX, IDC_SPIN_THREADS, m_SpinThreads);
-	DDX_Control(pDX, IDC_RADIO_KEEP_PROCESSING_FILES, m_btnKeepProcessingWithEmptyQueue);
-	DDX_Control(pDX, IDC_RADIO_STOP_PROCESSING_FILES, m_btnStopProcessingWithEmptyQueue);
 	DDX_Control(pDX, IDC_CHECK_LOG_ERROR_DETAILS, m_btnLogErrorDetails);
 	DDX_Check(pDX, IDC_CHECK_LOG_ERROR_DETAILS, m_bLogErrorDetails);
 	DDX_Control(pDX, IDC_EDIT_ERROR_LOG, m_editErrorLog);
@@ -123,16 +109,14 @@ void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_BROWSE_LOG, m_btnBrowseErrorLog);
 	DDX_Control(pDX, IDC_CHECK_EXECUTE_TASK, m_btnExecuteErrorTask);
 	DDX_Check(pDX, IDC_CHECK_EXECUTE_TASK, m_bExecuteErrorTask);
+	DDX_Control(pDX, IDC_EDIT_EXECUTE_TASK, m_editExecuteTask);
 	DDX_Text(pDX, IDC_EDIT_EXECUTE_TASK, m_zErrorTaskDescription);
 	DDX_Control(pDX, IDC_BTN_SELECT_ERROR_TASK, m_btnSelectErrorTask);
 	DDX_Control(pDX, IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, m_radioProcessAll);
 	DDX_Control(pDX, IDC_RADIO_PROCESS_SKIPPED_FILES, m_radioProcessSkipped);
 	DDX_Control(pDX, IDC_COMBO_SKIPPED_SCOPE, m_comboSkipped);
 	DDX_Control(pDX, IDC_STATIC_SKIPPED, m_staticSkipped);
-	DDX_Control(pDX, IDC_STATIC_PROCESSING_SCHEDULE, m_groupProcessingSchedule);
-	DDX_Check(pDX, IDC_CHECK_LIMIT_PROCESSING, m_bLimitProcessingTimes);
-	DDX_Control(pDX, IDC_BUTTON_SET_SCHEDULE, m_btnSetSchedule);
-	DDX_Control(pDX, IDC_CHECK_LIMIT_PROCESSING, m_checkLimitProcessing);
+	DDX_Control(pDX, IDC_BUTTON_TASK_ADVANCED_SETTINGS, m_btnAdvancedSettings);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
@@ -141,10 +125,6 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BTN_MODIFY, OnBtnModify)
 	ON_BN_CLICKED(IDC_BTN_DOWN, OnBtnDown)
 	ON_BN_CLICKED(IDC_BTN_UP, OnBtnUp)
-	ON_BN_CLICKED(IDC_RADIO_MAX_THREADS, OnBtnMaxThread)
-	ON_BN_CLICKED(IDC_RADIO_THREADS, OnBtnNumThread)
-	ON_BN_CLICKED(IDC_RADIO_KEEP_PROCESSING_FILES, OnBtnKeepProcessingWithEmptyQueue)
-	ON_BN_CLICKED(IDC_RADIO_STOP_PROCESSING_FILES, OnBtnStopProcessingWithEmptyQueue)
 	ON_MESSAGE(WM_TASK_GRID_SELCHANGE, OnGridSelChange)
 	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_CHECK_LOG_ERROR_DETAILS, OnCheckLogErrorDetails)
@@ -160,13 +140,11 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_COMMAND(ID_CONTEXT_PASTE, &FileProcessingDlgTaskPage::OnContextPaste)
 	ON_COMMAND(ID_CONTEXT_DELETE, &FileProcessingDlgTaskPage::OnContextDelete)
 	ON_MESSAGE(WM_TASK_GRID_CELL_VALUE_CHANGE, OnCellValueChange)
-	ON_EN_CHANGE(IDC_EDIT_THREADS, &FileProcessingDlgTaskPage::OnEnChangeEditThreads)
 	ON_BN_CLICKED(IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
 	ON_BN_CLICKED(IDC_RADIO_PROCESS_SKIPPED_FILES, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
 	ON_CBN_SELCHANGE(IDC_COMBO_SKIPPED_SCOPE, &FileProcessingDlgTaskPage::OnComboSkippedChange)
-	ON_BN_CLICKED(IDC_CHECK_LIMIT_PROCESSING, &FileProcessingDlgTaskPage::OnBtnClickedCheckLimitProcessing)
-	ON_BN_CLICKED(IDC_BUTTON_SET_SCHEDULE, &FileProcessingDlgTaskPage::OnBnClickedButtonSetSchedule)
 	ON_WM_LBUTTONDBLCLK()
+	ON_BN_CLICKED(IDC_BUTTON_TASK_ADVANCED_SETTINGS, &FileProcessingDlgTaskPage::OnBtnAdvancedSettings)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -190,12 +168,6 @@ BOOL FileProcessingDlgTaskPage::OnInitDialog()
 		// load icons for up and down buttons
 		m_btnUp.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_UP)));
 		m_btnDown.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_DOWN)));
-
-		//Set the Edit Threads box to be controlled by the spin control.
-		CEdit *pEdit;
-		pEdit = (CEdit *)GetDlgItem( IDC_EDIT_THREADS );
-		m_SpinThreads.SetBuddy(pEdit);
-		m_SpinThreads.SetRange32(0, giTHREADS_UPPER_RANGE);
 
 		//////////////////
 		// Prepare headers
@@ -649,94 +621,68 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		static bool bInit = false;
 		static int nLen1, nLen2, nLen3, nLen4, nLen5, nAddButtonWidth, nUpWidth;
 		static int nKeepProcessingAsAddedHeight = 0;
+
+		// Width of the line used for the group box
+		static const int nGROUPBOX_LINE_WIDTH = 2;
+
 		CRect rectDlg, rectDownButton, rectList;
 		CRect rectAddButton, rectUpButton, rectDeleteButton, rectModifyButton;
 		CRect rectErrorGrp, rectCheckLogError, rectEditErrorLog, rectCheckExecuteTask, rectEditExecuteTask, 
 			rectDocTag, rectBrowse, rectSelect;
 		CRect rectProcessScopeGrp, rectProcessAll, rectProcessSkipped, rectComboSkippedScope, rectSkippedText;
-		CRect rectContinuousGrp, rectKeepProc, rectStopProc;
-		CRect rectThreadGrp, rectMaxThreadOption, rectThreadOption, rectEditThreads, rectThreadTxt, rectSpinBtn;
-		CRect rectScheduleGrp, rectLimitCheck, rectScheduleBtn;
+		CRect rectAdvancedButton;
 
 		// Get positions of list and buttons
-		getDlgItemWindowRect(IDC_LIST_FP, rectList);
+		m_fileProcessorList.GetWindowRect(&rectList);
 		ScreenToClient(&rectList);
-		getDlgItemWindowRect(IDC_BTN_ADD, rectAddButton);
+		m_btnAdd.GetWindowRect(&rectAddButton);
 		ScreenToClient(&rectAddButton);
-		getDlgItemWindowRect(IDC_BTN_REMOVE, rectDeleteButton);
+		m_btnRemove.GetWindowRect(&rectDeleteButton);
 		ScreenToClient(&rectDeleteButton);
-		getDlgItemWindowRect(IDC_BTN_MODIFY, rectModifyButton);
+		m_btnModify.GetWindowRect(&rectModifyButton);
 		ScreenToClient(&rectModifyButton);			
-		getDlgItemWindowRect(IDC_BTN_UP, rectUpButton);
+		m_btnUp.GetWindowRect(&rectUpButton);
 		ScreenToClient(&rectUpButton);
-		getDlgItemWindowRect(IDC_BTN_DOWN, rectDownButton);
+		m_btnDown.GetWindowRect(&rectDownButton);
 		ScreenToClient(&rectDownButton);
 
 		// Get positions of Error group
 		getDlgItemWindowRect(IDC_STATIC_ERROR_GROUP, rectErrorGrp);
 		ScreenToClient(&rectErrorGrp);
-		getDlgItemWindowRect(IDC_CHECK_LOG_ERROR_DETAILS, rectCheckLogError);
+		m_btnLogErrorDetails.GetWindowRect(&rectCheckLogError);
 		ScreenToClient(&rectCheckLogError);
-		getDlgItemWindowRect(IDC_EDIT_ERROR_LOG, rectEditErrorLog);
+		m_editErrorLog.GetWindowRect(&rectEditErrorLog);
 		ScreenToClient(&rectEditErrorLog);
-		getDlgItemWindowRect(IDC_BTN_SELECT_DOC_TAG, rectDocTag);
+		m_btnErrorSelectTag.GetWindowRect(&rectDocTag);
 		ScreenToClient(&rectDocTag);
-		getDlgItemWindowRect(IDC_BTN_BROWSE_LOG, rectBrowse);
+		m_btnBrowseErrorLog.GetWindowRect(&rectBrowse);
 		ScreenToClient(&rectBrowse);
-		getDlgItemWindowRect(IDC_CHECK_EXECUTE_TASK, rectCheckExecuteTask);
+		m_btnExecuteErrorTask.GetWindowRect(&rectCheckExecuteTask);
 		ScreenToClient(&rectCheckExecuteTask);
-		getDlgItemWindowRect(IDC_EDIT_EXECUTE_TASK, rectEditExecuteTask);
+		m_editExecuteTask.GetWindowRect(&rectEditExecuteTask);
 		ScreenToClient(&rectEditExecuteTask);
-		getDlgItemWindowRect(IDC_BTN_SELECT_ERROR_TASK, rectSelect);
+		m_btnSelectErrorTask.GetWindowRect(&rectSelect);
 		ScreenToClient(&rectSelect);
 
 		// Get positions of the Process Scope group items
 		getDlgItemWindowRect(IDC_STATIC_FPSCOPE_GROUP, rectProcessScopeGrp);
 		ScreenToClient(&rectProcessScopeGrp);
-		getDlgItemWindowRect(IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, rectProcessAll);
+		m_radioProcessAll.GetWindowRect(&rectProcessAll);
 		ScreenToClient(&rectProcessAll);
-		getDlgItemWindowRect(IDC_RADIO_PROCESS_SKIPPED_FILES, rectProcessSkipped);
+		m_radioProcessSkipped.GetWindowRect(&rectProcessSkipped);
 		ScreenToClient(&rectProcessSkipped);
-		getDlgItemWindowRect(IDC_COMBO_SKIPPED_SCOPE, rectComboSkippedScope);
+		m_comboSkipped.GetWindowRect(&rectComboSkippedScope);
 		ScreenToClient(&rectComboSkippedScope);
-		getDlgItemWindowRect(IDC_STATIC_SKIPPED, rectSkippedText);
+		m_staticSkipped.GetWindowRect(&rectSkippedText);
 		ScreenToClient(&rectSkippedText);
+		m_btnAdvancedSettings.GetWindowRect(&rectAdvancedButton);
+		ScreenToClient(&rectAdvancedButton);
 
-		// Get positions of the Processing schedule group
-		getDlgItemWindowRect(IDC_STATIC_PROCESSING_SCHEDULE, rectScheduleGrp);
-		ScreenToClient(&rectScheduleGrp);
-		getDlgItemWindowRect(IDC_CHECK_LIMIT_PROCESSING, rectLimitCheck);
-		ScreenToClient(&rectLimitCheck);
-		getDlgItemWindowRect(IDC_BUTTON_SET_SCHEDULE, rectScheduleBtn);
-		ScreenToClient(&rectScheduleBtn);
-
-		// Get positions of Continuous Processing group items
-		getDlgItemWindowRect(IDC_STATIC_CONTINUOUS_GROUP, rectContinuousGrp);
-		ScreenToClient(&rectContinuousGrp);
-		getDlgItemWindowRect(IDC_RADIO_KEEP_PROCESSING_FILES, rectKeepProc);
-		ScreenToClient(&rectKeepProc);
-		getDlgItemWindowRect(IDC_RADIO_STOP_PROCESSING_FILES, rectStopProc);
-		ScreenToClient(&rectStopProc);
-
-		// Get positions of Threads group items
-		getDlgItemWindowRect(IDC_STATIC_THREAD_GROUP, rectThreadGrp);
-		ScreenToClient(&rectThreadGrp);
-		getDlgItemWindowRect(IDC_RADIO_MAX_THREADS, rectMaxThreadOption);
-		ScreenToClient(&rectMaxThreadOption);
-		getDlgItemWindowRect(IDC_RADIO_THREADS, rectThreadOption);
-		ScreenToClient(&rectThreadOption);
-		getDlgItemWindowRect(IDC_EDIT_THREADS, rectEditThreads);
-		ScreenToClient(&rectEditThreads);
-		getDlgItemWindowRect(IDC_SPIN_THREADS, rectSpinBtn);
-		ScreenToClient(&rectSpinBtn);
-		getDlgItemWindowRect(IDC_STATIC_THREADS, rectThreadTxt);
-		ScreenToClient(&rectThreadTxt);
+		GetClientRect(&rectDlg);
 
 		// Set values for static items
 		if (!bInit)
 		{
-			GetClientRect(&rectDlg);
-
 			// distance from right of the Add button to the right of the dialog
 			// should be the same as the distance from left of List to left of Dialog
 			nLen1 = rectList.left - rectDlg.left;
@@ -757,113 +703,37 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 			nUpWidth = rectUpButton.Width();
 			bInit = true;
 		}
-		
-		// get dialog rect
-		GetClientRect(&rectDlg);
 
 		// resize list box width
 		rectList.right = rectDlg.right - nLen1 - nAddButtonWidth - nLen3;
 
 		// Resize buttons
-		rectAddButton.right = rectDlg.right - nLen1;
-		rectAddButton.left = rectAddButton.right - nAddButtonWidth;
-		rectDeleteButton.right = rectDlg.right - nLen1;
-		rectDeleteButton.left = rectDeleteButton.right - nAddButtonWidth;
-		rectModifyButton.right = rectDlg.right - nLen1;
-		rectModifyButton.left = rectModifyButton.right - nAddButtonWidth;
-		rectDownButton.right = rectDlg.right - nLen1;
-		rectDownButton.left = rectDownButton.right - nUpWidth;
-		rectUpButton.right = rectDownButton.left - nLen2;
-		rectUpButton.left = rectUpButton.right - nUpWidth;
-
-		// Resize Continuous Processing group items
-		int nWidth = rectThreadGrp.Width();
-		int nGroupHeight = rectContinuousGrp.Height();
-		rectContinuousGrp.bottom = rectDlg.bottom - nLen4;
-		rectContinuousGrp.top = rectContinuousGrp.bottom - nGroupHeight;
-		rectContinuousGrp.right = rectList.right - (nWidth + nLen4);
-
-		int nHeight = rectKeepProc.Height();
-		int nSpace = rectStopProc.top - rectKeepProc.bottom;
-		rectKeepProc.top = rectContinuousGrp.top + nLen5;
-		rectKeepProc.bottom = rectKeepProc.top + nHeight;
-		rectStopProc.top = rectKeepProc.bottom + nSpace;
-		rectStopProc.bottom = rectStopProc.top + nHeight;
-
-		// Resize Threads group items
-		int nShiftRight = rectList.right - rectThreadGrp.right;
-		nGroupHeight = rectThreadGrp.Height();
-		rectThreadGrp.bottom = rectContinuousGrp.bottom;
-		rectThreadGrp.top = rectContinuousGrp.top;
-		rectThreadGrp.right = rectList.right;
-		rectThreadGrp.left = rectThreadGrp.right - nWidth;
-
-		nHeight = rectMaxThreadOption.Height();
-		nSpace = rectThreadOption.top - rectMaxThreadOption.bottom;
-		rectMaxThreadOption.OffsetRect(nShiftRight, 0);
-		rectMaxThreadOption.top = rectThreadGrp.top + nLen5;
-		rectMaxThreadOption.bottom = rectMaxThreadOption.top + nHeight;
-
-		nHeight = rectThreadOption.Height();
-		rectThreadOption.top = rectMaxThreadOption.bottom + nSpace;
-		rectThreadOption.bottom = rectThreadOption.top + nHeight;
-		rectThreadOption.OffsetRect(nShiftRight, 0);
-		nHeight = rectThreadTxt.Height();
-		rectThreadTxt.top = rectThreadOption.top;
-		rectThreadTxt.bottom = rectThreadOption.top + nHeight;
-		rectThreadTxt.OffsetRect(nShiftRight, 0);
-
-		nHeight = rectEditThreads.Height();
-		rectEditThreads.top = rectThreadTxt.top + rectThreadTxt.Height()/2 - nHeight/2;
-		rectEditThreads.bottom = rectEditThreads.top + nHeight;
-		rectEditThreads.OffsetRect(nShiftRight, 0);
-		nSpace = rectSpinBtn.Width();
-		rectSpinBtn.left = rectEditThreads.right;
-		rectSpinBtn.right = rectSpinBtn.left + nSpace;
-		rectSpinBtn.top = rectEditThreads.top;
-		rectSpinBtn.bottom = rectEditThreads.bottom;
+		int nButtonLeft = rectDlg.right - nLen1 - nAddButtonWidth;
+		rectAddButton.MoveToX(nButtonLeft);
+		rectDeleteButton.MoveToX(nButtonLeft);
+		rectModifyButton.MoveToX(nButtonLeft);
+		rectUpButton.MoveToX(nButtonLeft);
+		rectDownButton.MoveToX(rectUpButton.right + nLen2);
 
 		// Resize processing scope group items
-		nGroupHeight = rectProcessScopeGrp.Height();
-		rectProcessScopeGrp.bottom = rectThreadGrp.top - nLen4;
+		int nGroupHeight = rectProcessScopeGrp.Height();
+		rectProcessScopeGrp.bottom = rectDlg.bottom - nLen4;
 		rectProcessScopeGrp.top = rectProcessScopeGrp.bottom - nGroupHeight;
-		rectProcessScopeGrp.right = rectList.right - (rectThreadGrp.Width() + nLen4);
+		rectProcessScopeGrp.left = rectList.left;
+		rectProcessScopeGrp.right = rectList.right;
 
-		nHeight = rectProcessAll.Height();
-		nSpace = rectProcessSkipped.top - rectProcessAll.bottom;
+		int nHeight = rectProcessAll.Height();
+		long nSpace = rectProcessSkipped.top - rectProcessAll.bottom;
 		rectProcessAll.top = rectProcessScopeGrp.top + nLen5;
 		rectProcessAll.bottom = rectProcessAll.top + nHeight;
 		rectProcessSkipped.top = rectProcessAll.bottom + nSpace;
 		rectProcessSkipped.bottom = rectProcessSkipped.top + nHeight;
 		rectSkippedText.top = rectProcessSkipped.top;
 		rectSkippedText.bottom = rectSkippedText.top + nHeight;
-		
-		// Resize the processing schedule controls
-		rectScheduleGrp.top = rectProcessScopeGrp.top;
-		rectScheduleGrp.bottom = rectProcessScopeGrp.bottom;
-		rectScheduleGrp.right = rectList.right;
-		rectScheduleGrp.left = rectThreadGrp.left;
-
-		nWidth = rectLimitCheck.Width();
-		nHeight = rectLimitCheck.Height();
-		rectLimitCheck.left = rectScheduleGrp.left + nLen5;
-		rectLimitCheck.right = rectLimitCheck.left + nWidth;
-		rectLimitCheck.top = rectScheduleGrp.top + nLen5;
-		rectLimitCheck.bottom = rectLimitCheck.top + nHeight;
-		
-		// Width of the line used for the group box
-		static const int nGROUPBOX_LINE_WIDTH = 2;
-
-		nWidth = rectScheduleBtn.Width();
-		nHeight = rectScheduleBtn.Height();
-		rectScheduleBtn.top = rectLimitCheck.bottom + nSpace;
-		rectScheduleBtn.bottom = rectScheduleBtn.top + nHeight;
-		rectScheduleBtn.right = rectScheduleGrp.right - nLen2 - nGROUPBOX_LINE_WIDTH;
-		rectScheduleBtn.left = rectScheduleBtn.right - nWidth;
 
 		// Move the combo box
 		nHeight = rectComboSkippedScope.Height();
-		nWidth = rectComboSkippedScope.Width();
+		int nWidth = rectComboSkippedScope.Width();
 		rectComboSkippedScope.top = rectProcessSkipped.top + rectProcessSkipped.Height()/2 - nHeight/2;
 		rectComboSkippedScope.bottom = rectComboSkippedScope.top + nHeight;
 		rectComboSkippedScope.left = rectProcessSkipped.right + nSpace;
@@ -874,6 +744,9 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		rectSkippedText.left = rectComboSkippedScope.right + nSpace;
 		rectSkippedText.right = rectSkippedText.left + nWidth;
  
+		// Move the advanced button
+		rectAdvancedButton.MoveToXY(nButtonLeft, rectProcessScopeGrp.top + 5);
+		
 		// Resize Error group items
 		int nButtonToEditVerticalAdjustment = rectEditErrorLog.top - rectBrowse.top;
 		nGroupHeight = rectErrorGrp.Height();
@@ -927,6 +800,7 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 
 		// Move list and buttons
 		m_fileProcessorList.MoveWindow(&rectList);
+
 		// Resize the picture control around the processor list grid
 		rectList.InflateRect(1, 1, 1, 1);
 		GetDlgItem(IDC_PICTURE)->MoveWindow(&rectList);
@@ -944,94 +818,50 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		m_btnBrowseErrorLog.MoveWindow(&rectBrowse);
 		m_btnExecuteErrorTask.MoveWindow(&rectCheckExecuteTask);
 		m_btnSelectErrorTask.MoveWindow(&rectSelect);
-		GetDlgItem(IDC_EDIT_EXECUTE_TASK)->MoveWindow(&rectEditExecuteTask);
+		m_editExecuteTask.MoveWindow(&rectEditExecuteTask);
 
 		// Move processing scope group items
 		GetDlgItem(IDC_STATIC_FPSCOPE_GROUP)->MoveWindow(&rectProcessScopeGrp);
 		m_radioProcessAll.MoveWindow(&rectProcessAll);
 		m_radioProcessSkipped.MoveWindow(&rectProcessSkipped);
 		m_comboSkipped.MoveWindow(&rectComboSkippedScope);
-		GetDlgItem(IDC_STATIC_SKIPPED)->MoveWindow(&rectSkippedText);
+		m_staticSkipped.MoveWindow(&rectSkippedText);
 
-		// Move Continuous Processing group items
-		GetDlgItem(IDC_STATIC_CONTINUOUS_GROUP)->MoveWindow(&rectContinuousGrp);
-		m_btnKeepProcessingWithEmptyQueue.MoveWindow(&rectKeepProc);
-		m_btnStopProcessingWithEmptyQueue.MoveWindow(&rectStopProc);
-
-		// Move Thread group items
-		GetDlgItem(IDC_STATIC_THREAD_GROUP)->MoveWindow(&rectThreadGrp);
-		m_btnMaxThreads.MoveWindow(&rectMaxThreadOption);
-		m_btnNumThreads.MoveWindow(&rectThreadOption);
-		m_editThreads.MoveWindow(&rectEditThreads);
-		GetDlgItem(IDC_STATIC_THREADS)->MoveWindow(&rectThreadTxt);
-		m_SpinThreads.MoveWindow(&rectSpinBtn);
-
-		// Move process schedule items
-		m_groupProcessingSchedule.MoveWindow(&rectScheduleGrp);
-		m_checkLimitProcessing.MoveWindow(&rectLimitCheck);
-		m_btnSetSchedule.MoveWindow(&rectScheduleBtn);
+		// Move the advanced button
+		m_btnAdvancedSettings.MoveWindow(&rectAdvancedButton);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13509")
 }
 //--------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnBtnMaxThread() 
+void FileProcessingDlgTaskPage::OnBtnAdvancedSettings()
 {
-	AFX_MANAGE_STATE(AfxGetModuleState());
-
 	try
 	{
-		getFPMgmtRole()->NumThreads = 0;
-		setButtonStates();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13401");
-}
-//--------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnBtnNumThread()
-{
-	AFX_MANAGE_STATE(AfxGetModuleState());
-
-	try
-	{
-		// if the editbox is empty, default its value to 1
-		CString zText;
-		m_editThreads.GetWindowTextA(zText);
-		if (zText.IsEmpty())
+		UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipFPM = getFPMgmtRole();
+		IVariantVectorPtr ipSchedule = __nullptr;
+		if (ipFPM->LimitProcessingToSchedule == VARIANT_TRUE)
 		{
-			m_editThreads.SetWindowText("1");
+			ipSchedule = ipFPM->ProcessingSchedule;
 		}
-
-		// Provide number of threads to the MgmtRole object (P13 #4312)
-		int nNumThreads = getNumThreads();
-		getFPMgmtRole()->NumThreads = nNumThreads;
-
-		// Enable and disable controls as appropriate
-		setButtonStates();
+		AdvancedTaskSettingsDlg settings(ipFPM->NumThreads,
+			asCppBool(ipFPM->KeepProcessingAsAdded), ipSchedule, this);
+		if (settings.DoModal() == IDOK)
+		{
+			ipFPM->NumThreads = settings.getNumberOfThreads();
+			ipFPM->KeepProcessingAsAdded = asVariantBool(settings.getKeepProcessing());
+			ipSchedule = settings.getSchedule();
+			if (ipSchedule != __nullptr)
+			{
+				ipFPM->LimitProcessingToSchedule = VARIANT_TRUE;
+				ipFPM->ProcessingSchedule = ipSchedule;
+			}
+			else
+			{
+				ipFPM->LimitProcessingToSchedule = VARIANT_FALSE;
+			}
+		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13402");
-}
-//--------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnBtnKeepProcessingWithEmptyQueue()
-{
-	AFX_MANAGE_STATE(AfxGetModuleState());
-
-	try
-	{
-		// Update the File Proceesing Management Role setting
-		getFPMgmtRole()->KeepProcessingAsAdded = VARIANT_TRUE;
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15952");
-}
-//--------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnBtnStopProcessingWithEmptyQueue()
-{
-	AFX_MANAGE_STATE(AfxGetModuleState());
-
-	try
-	{
-		// Update the File Proceesing Management Role setting
-		getFPMgmtRole()->KeepProcessingAsAdded = VARIANT_FALSE;
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15953");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32138");
 }
 //-------------------------------------------------------------------------------------------------
 LRESULT FileProcessingDlgTaskPage::OnGridDblClick(WPARAM wParam, LPARAM lParam)
@@ -1436,22 +1266,6 @@ void FileProcessingDlgTaskPage::OnLButtonDblClk(UINT nFlags, CPoint point)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16113");
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnEnChangeEditThreads()
-{
-	try
-	{
-		// In order to prevent unnecessary "dirty" state in the FPM, set the # of threads
-		// only if it is different from what the current value is.
-		long nCurrNumThreads = getFPMgmtRole()->NumThreads;
-		long nNewNumThreads = getNumThreads();
-		if (nCurrNumThreads != nNewNumThreads)
-		{
-			getFPMgmtRole()->NumThreads = nNewNumThreads;
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15356");
-}
-//-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped()
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
@@ -1487,51 +1301,6 @@ void FileProcessingDlgTaskPage::OnComboSkippedChange()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26923");
 }
-//-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnBtnClickedCheckLimitProcessing()
-{
-	AFX_MANAGE_STATE(AfxGetModuleState());
-
-	try
-	{
-		UpdateData(TRUE);
-
-		// Set the Limit processing to scheduled flag
-		getFPMgmtRole()->LimitProcessingToSchedule = asVariantBool(m_bLimitProcessingTimes);
-
-		// Enable / disable controls as appropriate
-		setButtonStates();
-		updateUI();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28053");
-}
-//-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnBnClickedButtonSetSchedule()
-{
-	AFX_MANAGE_STATE(AfxGetModuleState());
-
-	try
-	{
-		if (m_ipSchedule == NULL)
-		{
-			m_ipSchedule = getFPMgmtRole()->ProcessingSchedule;
-		}
-
-		// Get the set schedule COM object
-		UCLID_FILEPROCESSINGLib::ISetProcessingSchedulePtr ipSet(gstrSET_SCHEDULE_PROG_ID.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI30412", ipSet != NULL);
-
-		// Prompt the user to set the new schedule
-		IVariantVectorPtr ipSchedule = ipSet->PromptForSchedule(m_ipSchedule);
-		if (ipSchedule != NULL)
-		{
-			// Update the FPMgmtRole schedule
-			getFPMgmtRole()->ProcessingSchedule = ipSchedule;
-			m_ipSchedule = ipSchedule;
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28063");
-}
 
 //-------------------------------------------------------------------------------------------------
 // Public methods
@@ -1556,48 +1325,6 @@ void FileProcessingDlgTaskPage::refresh()
 
 	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipMgmtRole = getFPMgmtRole();
 
-	// Retrieve number of desired threads
-	long lCount = ipMgmtRole->NumThreads;
-
-	// Handle max count case
-	if (lCount == 0)
-	{
-		// Select the Max Count button
-		m_btnNumThreads.SetCheck( 0 );
-		m_btnMaxThreads.SetCheck( 1 );
-
-		// Clear and disable the edit box
-		m_editThreads.SetWindowTextA( "" );
-		m_editThreads.EnableWindow( FALSE );
-		m_SpinThreads.EnableWindow( FALSE );
-	}
-	else
-	{
-		// Select the Num Threads button
-		m_btnMaxThreads.SetCheck( 0 );
-		m_btnNumThreads.SetCheck( 1 );
-
-		// Update and enable the edit box
-		m_editThreads.EnableWindow( TRUE );
-		m_editThreads.SetWindowTextA( asString( lCount ).c_str() );
-		m_SpinThreads.EnableWindow( TRUE );
-	}
-
-	// Get the CompleteOnNoRcdFromDB flag
-	bool bCompleteOnNoRcdFromDB = ipMgmtRole->KeepProcessingAsAdded == VARIANT_FALSE;
-	if (bCompleteOnNoRcdFromDB)
-	{
-		// Select the Stop Processing button
-		m_btnKeepProcessingWithEmptyQueue.SetCheck( 0 );
-		m_btnStopProcessingWithEmptyQueue.SetCheck( 1 );
-	}
-	else
-	{
-		// Select the Keep Processing button
-		m_btnStopProcessingWithEmptyQueue.SetCheck( 0 );
-		m_btnKeepProcessingWithEmptyQueue.SetCheck( 1 );
-	}
-
 	// Update error log items
 	m_bLogErrorDetails = asMFCBool( ipMgmtRole->LogErrorDetails );
 	m_zErrorLog = asString( ipMgmtRole->ErrorLogName ).c_str();
@@ -1614,18 +1341,6 @@ void FileProcessingDlgTaskPage::refresh()
 	m_radioProcessAll.SetCheck(asBSTChecked(!bProcessSkipped));
 	m_radioProcessSkipped.SetCheck(asBSTChecked(bProcessSkipped));
 	m_comboSkipped.SetCurSel(ipMgmtRole->SkippedForAnyUser == VARIANT_FALSE ? 0 : 1);
-
-	// Get the limit processing times flag
-	m_bLimitProcessingTimes = asMFCBool(ipMgmtRole->LimitProcessingToSchedule);
-
-	m_ipSchedule = NULL;
-
-	// If limiting the processing get the schedule
-	if (asCppBool(m_bLimitProcessingTimes))
-	{
-		m_ipSchedule = ipMgmtRole->ProcessingSchedule;
-		ASSERT_RESOURCE_ALLOCATION("ELI28164", m_ipSchedule != NULL);
-	}
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::setFPMgr(UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPMgr)
@@ -1648,13 +1363,6 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_fileProcessorList.EnableWindow(FALSE);
 		m_btnUp.EnableWindow(FALSE);
 		m_btnDown.EnableWindow(FALSE);
-		m_btnMaxThreads.EnableWindow(FALSE);
-		m_btnNumThreads.EnableWindow(FALSE);
-		m_editThreads.EnableWindow(FALSE);
-		m_SpinThreads.EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC_THREADS)->EnableWindow( FALSE );
-		m_btnKeepProcessingWithEmptyQueue.EnableWindow(FALSE);
-		m_btnStopProcessingWithEmptyQueue.EnableWindow(FALSE);
 
 		// Error log and task controls
 		m_btnLogErrorDetails.EnableWindow(FALSE);
@@ -1672,18 +1380,9 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_btnExecuteErrorTask.EnableWindow(FALSE);
 		m_btnSelectErrorTask.EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_EXECUTE_TASK)->EnableWindow(FALSE);
-
-		// Processing schedule controls
-		m_checkLimitProcessing.EnableWindow(FALSE);
-		m_btnSetSchedule.EnableWindow(FALSE);
 	}
 	else
 	{
-		m_btnMaxThreads.EnableWindow(TRUE);
-		m_btnNumThreads.EnableWindow(TRUE);
-		m_btnKeepProcessingWithEmptyQueue.EnableWindow(TRUE);
-		m_btnStopProcessingWithEmptyQueue.EnableWindow(TRUE);
-
 		// Error log and task controls
 		m_btnLogErrorDetails.EnableWindow(TRUE);
 		if (m_bLogErrorDetails)
@@ -1698,65 +1397,9 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_radioProcessSkipped.EnableWindow(TRUE);
 		m_staticSkipped.EnableWindow(TRUE);
 
-		m_checkLimitProcessing.EnableWindow(TRUE);
-
 		// Set the button states that depend on settings
 		setButtonStates();
 	}
-}
-//-------------------------------------------------------------------------------------------------
-int FileProcessingDlgTaskPage::getNumThreads()
-{
-	// Default to Max
-	int nNewValue = 0;
-	if ( m_hWnd != NULL ) 
-	{
-		if ( m_btnNumThreads.GetCheck() == BST_CHECKED )
-		{
-			CString zNumThreads;
-			m_editThreads.GetWindowTextA( zNumThreads);
-			string strNumThreads = zNumThreads;
-			if ( strNumThreads != "" )
-			{
-				bool bUpdateText = false;
-				try
-				{
-					// Get the value
-					nNewValue = asLong( strNumThreads );
-
-					// Check that it is in the acceptable range
-					if (nNewValue > giTHREADS_UPPER_RANGE)
-					{
-						bUpdateText = true;
-						nNewValue = giTHREADS_UPPER_RANGE;
-					}
-					else if (nNewValue < 0)
-					{
-						bUpdateText = true;
-						nNewValue = 0;
-					}
-
-				}
-				catch(...)
-				{
-					// Set the value to 1
-					nNewValue = 1;
-					bUpdateText = true;
-				}
-
-				if (bUpdateText)
-				{
-					m_editThreads.SetWindowText(asString(nNewValue).c_str());
-				}
-			}
-			else
-			{
-				nNewValue = 0;
-			}
-		}
-	}
-
-	return nNewValue;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::ResetInitialized()
@@ -1956,12 +1599,6 @@ void FileProcessingDlgTaskPage::setButtonStates()
 		}
 	}
 
-	// Enable / disable the edit box and spin control for number of threads
-	BOOL bNumThreadsChecked = asMFCBool(m_btnNumThreads.GetCheck() == BST_CHECKED);
-	m_editThreads.EnableWindow( bNumThreadsChecked );
-	m_SpinThreads.EnableWindow( bNumThreadsChecked );
-	GetDlgItem(IDC_STATIC_THREADS)->EnableWindow( TRUE );
-
 	// Can always check/uncheck log error details
 	m_btnLogErrorDetails.EnableWindow(TRUE); 
 
@@ -1979,8 +1616,6 @@ void FileProcessingDlgTaskPage::setButtonStates()
 	// Enable / disable error task controls
 	GetDlgItem(IDC_EDIT_EXECUTE_TASK)->EnableWindow(m_bExecuteErrorTask);
 	m_btnSelectErrorTask.EnableWindow(m_bExecuteErrorTask);
-
-	m_btnSetSchedule.EnableWindow(m_bLimitProcessingTimes);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::updateUI()

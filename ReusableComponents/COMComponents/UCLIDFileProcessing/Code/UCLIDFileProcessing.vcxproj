@@ -177,6 +177,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActionStatistics.cpp" />
+    <ClCompile Include="AdvancedTaskSettingsDlg.cpp" />
     <ClCompile Include="DatabaseStatusIconUpdater.cpp" />
     <ClCompile Include="FAMDBHelperFunctions.cpp" />
     <ClCompile Include="FAMDBUtils.cpp" />
@@ -328,6 +329,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionStatistics.h" />
+    <ClInclude Include="AdvancedTaskSettingsDlg.h" />
     <ClInclude Include="CommonConstants.h" />
     <ClInclude Include="DatabaseStatusIconUpdater.h" />
     <ClInclude Include="FAMDBHelperFunctions.h" />

@@ -51,13 +51,7 @@ public:
 	CButton	m_btnRemove;
 	CImageButtonWithStyle m_btnUp;
 	CImageButtonWithStyle m_btnDown;
-	CButton m_btnMaxThreads;
-	CButton m_btnNumThreads;
-	CEdit m_editThreads;
-	CSpinButtonCtrl m_SpinThreads;
 	CTaskGrid m_fileProcessorList;
-	CButton m_btnKeepProcessingWithEmptyQueue;
-	CButton m_btnStopProcessingWithEmptyQueue;
 	CButton	m_btnLogErrorDetails;
 	BOOL	m_bLogErrorDetails;
 	CEdit m_editErrorLog;
@@ -72,10 +66,8 @@ public:
 	CButton m_radioProcessSkipped;
 	CComboBox m_comboSkipped;
 	CStatic m_staticSkipped;
-	CStatic m_groupProcessingSchedule;
-	BOOL m_bLimitProcessingTimes;
-	CButton m_checkLimitProcessing;
-	CButton m_btnSetSchedule;
+	CButton m_btnAdvancedSettings;
+	CEdit m_editExecuteTask;
 
 // Overrides
 	// ClassWizard generate virtual function overrides
@@ -95,17 +87,12 @@ protected:
 	afx_msg LRESULT OnGridSelChange(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnGridDblClick(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnBtnMaxThread();
-	afx_msg void OnBtnNumThread();
-	afx_msg void OnBtnKeepProcessingWithEmptyQueue();
-	afx_msg void OnBtnStopProcessingWithEmptyQueue();
 	afx_msg LRESULT OnGridRightClick(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnContextCut();
 	afx_msg void OnContextCopy();
 	afx_msg void OnContextPaste();
 	afx_msg void OnContextDelete();
 	afx_msg LRESULT OnCellValueChange(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnEnChangeEditThreads();
 	afx_msg void OnCheckLogErrorDetails();
 	afx_msg void OnEnChangeEditErrorLog();
 	afx_msg void OnBtnErrorSelectDocTag();
@@ -114,9 +101,8 @@ protected:
 	afx_msg void OnBtnAddErrorTask();
 	afx_msg void OnBtnProcessAllOrSkipped();
 	afx_msg void OnComboSkippedChange();
-	afx_msg void OnBtnClickedCheckLimitProcessing();
-	afx_msg void OnBnClickedButtonSetSchedule();
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnBtnAdvancedSettings();
 	
 	DECLARE_MESSAGE_MAP()
 
@@ -194,7 +180,4 @@ private:
 	// before OnInitDialog() will be skipped, then it will be set to true inside 
 	// OnInitDialog()
 	bool m_bInitialized;
-
-	// Vector to hold the hourly schedule
-	IVariantVectorPtr  m_ipSchedule;
 };
