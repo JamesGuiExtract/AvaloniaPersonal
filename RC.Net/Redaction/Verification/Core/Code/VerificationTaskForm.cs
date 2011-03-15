@@ -80,6 +80,22 @@ namespace Extract.Redaction.Verification
         /// </summary>
         static readonly string _MUTEX_STRING = "13D6A5A4-1E1E-4815-9B81-9A77E4FF4997";
 
+        /// <summary>
+        /// System command to execute the screen saver application specified in the [boot] section
+        /// of the System.ini file.
+        /// </summary>
+        static readonly int _SC_SCREENSAVER = 0xF140;
+
+        /// <summary>
+        /// System command to set the state of the display. This command supports devices that have
+        /// power-saving features, such as a battery-powered personal computer.
+        /// The lParam parameter can have the following values:
+        ///     -1 (the display is powering on)
+        ///     1 (the display is going to low power)
+        ///     2 (the display is being shut off)
+        /// </summary>
+        static readonly int _SC_MONITORPOWER = 0xF170;
+
         #endregion Constants
 
         #region Fields
@@ -2857,6 +2873,15 @@ namespace Extract.Redaction.Verification
                     else if (m.Msg == WindowsMessage.RightButtonDown)
                     {
                         pauseSlideshow = true;
+                    }
+                    else if (m.Msg == WindowsMessage.SystemCommand &&
+                             (m.WParam.ToInt32() == _SC_SCREENSAVER ||
+                              (m.WParam.ToInt32() == _SC_MONITORPOWER && m.LParam.ToInt32() > 0)))
+                    {
+                        // [FlexIDSCore:4592]
+                        // Don't allow the screen saver to kick in or the monitor to power off while
+                        // the slideshow is active.
+                        return true;
                     }
 
                     if (pauseSlideshow)
