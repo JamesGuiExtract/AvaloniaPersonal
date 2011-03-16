@@ -224,19 +224,14 @@ namespace Extract.Redaction.Verification
         bool _slideshowRunning;
 
         /// <summary>
-        /// Indicates whether the slideshow is currently paused.
-        /// </summary>
-        bool _slideshowPaused;
-
-        /// <summary>
         /// A timer that fires when it is time for the slideshow to advance to the next
         /// document/page.
         /// </summary>
         System.Windows.Forms.Timer _slideshowTimer = new System.Windows.Forms.Timer();
 
         /// <summary>
-        /// Allows the "Slideshow Paused" message that is displayed when the slideshow is
-        /// automatically paused to be removed.
+        /// Allows the "Slideshow Stopped" message that is displayed when the slideshow is
+        /// automatically stopped to be removed.
         /// </summary>
         CancellationTokenSource _slideshowMessageCanceler;
 
@@ -252,11 +247,6 @@ namespace Extract.Redaction.Verification
         // Include so that the shortcut is disabled when the feature is not enabled.
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         ApplicationCommand _startSlideshowCommand;
-
-        /// <summary>
-        /// The pause slideshow command
-        /// </summary>
-        ApplicationCommand _pauseSlideshowCommand;
 
         /// <summary>
         /// The stop slideshow command
@@ -1015,44 +1005,90 @@ namespace Extract.Redaction.Verification
         /// <see langword="false"/> if the data is valid and the user chose to continue.</returns>
         bool WarnBeforeTabCommit()
         {
-            // If data is invalid, warn immediately
-            if (WarnIfInvalid())
+            bool continueSlideshow = false;
+
+            try
             {
-                return true;
-            }
+                // If data is invalid, warn immediately
+                if (WarnIfInvalid())
+                {
+                    return true;
+                }
 
-            // Indicate that all sensitive data has been reviewed
-            StringBuilder message = new StringBuilder();
-            if (_redactionGridView.Rows.Count > 0)
+                if (_slideshowRunning)
+                {
+                    // Set _slideshowRunning = false so that it doesn't get automatically stopped
+                    // when the message box displays.
+                    _slideshowRunning = false;
+
+                    // Disable the timer so that it doesn't advance in the background while the
+                    // message box is displayed.
+                    _slideshowTimer.Enabled = false;
+
+                    // Indicate that the slideshow should be allowed to continue after saving.
+                    continueSlideshow = true;
+                }
+
+                // Indicate that all sensitive data has been reviewed
+                StringBuilder message = new StringBuilder();
+                if (_redactionGridView.Rows.Count > 0)
+                {
+                    message.AppendLine("All found sensitive data and clues have been reviewed.");
+                }
+
+                // Indicate how many pages have been visited
+                message.Append("You have visited ");
+                if (_pageSummaryView.HasVisitedAllPages)
+                {
+                    message.Append("all");
+                }
+                else
+                {
+                    string visitedPages = _pageSummaryView.VisitedPageCount.ToString(CultureInfo.CurrentCulture);
+                    string totalPages = _imageViewer.PageCount.ToString(CultureInfo.CurrentCulture);
+
+                    message.Append(visitedPages);
+                    message.Append(" of ");
+                    message.Append(totalPages);
+                }
+                message.AppendLine(" pages in this document.");
+                message.AppendLine();
+
+                message.Append("Save this document and advance to the next?");
+
+                // Display the message box
+                DialogResult result = MessageBox.Show(message.ToString(), "Save document?",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
+                // If cancelled, stop the slideshow.
+                if (continueSlideshow && result == DialogResult.Cancel)
+                {
+                    continueSlideshow = false;
+                    StopSlideshow(true);
+                }
+
+                return result == DialogResult.Cancel;
+            }
+            catch (Exception ex)
             {
-                message.AppendLine("All found sensitive data and clues have been reviewed.");
-            }
+                // If there was an exception, stop the slideshow.
+                if (continueSlideshow)
+                {
+                    continueSlideshow = false;
+                    StopSlideshow(true);
+                }
 
-            // Indicate how many pages have been visited
-            message.Append("You have visited ");
-            if (_pageSummaryView.HasVisitedAllPages)
+                throw ex.AsExtract("ELI32151");
+            }
+            finally
             {
-                message.Append("all");
+                if (continueSlideshow)
+                {
+                    // Set _slideshowRunning back to true so that the slidshow will continue with
+                    // the next document.
+                    _slideshowRunning = true;
+                }
             }
-            else
-            {
-                string visitedPages = _pageSummaryView.VisitedPageCount.ToString(CultureInfo.CurrentCulture);
-                string totalPages = _imageViewer.PageCount.ToString(CultureInfo.CurrentCulture);
-
-                message.Append(visitedPages);
-                message.Append(" of ");
-                message.Append(totalPages);
-            }
-            message.AppendLine(" pages in this document.");
-            message.AppendLine();
-
-            message.Append("Save this document and advance to the next?");
-
-            // Display the message box
-            DialogResult result = MessageBox.Show(message.ToString(), "Save document?", 
-                MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-
-            return result == DialogResult.Cancel;
         }
 
         /// <summary>
@@ -1649,7 +1685,6 @@ namespace Extract.Redaction.Verification
 
                 _slideshowPlayToolStripButton.Enabled = true;
                 _slideshowPlayToolStripButton.Checked = _slideshowRunning;
-                _slideshowPauseToolStripButton.Enabled = _slideshowRunning;
                 _slideshowStopToolStripButton.Enabled = _slideshowRunning;
             }
             else
@@ -1677,7 +1712,6 @@ namespace Extract.Redaction.Verification
                 _findOrRedactToolStripButton.Enabled = false;
 
                 _slideshowPlayToolStripButton.Enabled = false;
-                _slideshowPauseToolStripButton.Enabled = false;
                 _slideshowStopToolStripButton.Enabled = false;
             }
         }
@@ -1917,10 +1951,6 @@ namespace Extract.Redaction.Verification
                     _settings.SlideshowSettings.SlideshowEnabled, true,
                     _settings.SlideshowSettings.SlideshowEnabled);
 
-                _pauseSlideshowCommand = new ApplicationCommand(null, null, null,
-                    new ToolStripItem[] { _slideshowPauseToolStripButton, _slideshowPauseToolStripMenuItem },
-                    false, true, false);
-
                 _stopSlideshowCommand = new ApplicationCommand(null, null, null,
                     new ToolStripItem[] { _slideshowStopToolStripButton, _slideshowStopToolStripMenuItem },
                     false, true, false);
@@ -2012,6 +2042,28 @@ namespace Extract.Redaction.Verification
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Form.Deactivate"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="T:System.EventArgs"/> that contains the event data.
+        /// </param>
+        protected override void OnDeactivate(EventArgs e)
+        {
+            try
+            {
+                if (_slideshowRunning)
+                {
+                    StopSlideshow(true);
+                }
+
+                base.OnDeactivate(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32149");
+            }
         }
 
         #endregion Overrides
@@ -2451,10 +2503,8 @@ namespace Extract.Redaction.Verification
 
                     if (_slideshowRunning)
                     {
-                        // After advancing to the next document, the slideshow should automatically
-                        // resume if paused unless it should be paused to due to a document type
-                        // condition.
-                        bool pauseSlideshow = false;
+                        // Stop the slideshow if it should be stopped to due to a document type condition.
+                        bool stopSlideshow = false;
 
                         if (_settings.SlideshowSettings.CheckDocumentCondition)
                         {
@@ -2469,18 +2519,21 @@ namespace Extract.Redaction.Verification
                             if (condition.FileMatchesFAMCondition(fileRecord,
                                 _fileDatabase, memento.ActionId, _tagManager))
                             {
-                                pauseSlideshow = true;
-
-                                // Display a transparent message across the image viewer to notify
-                                // the user that the slideshow has been canceled.
-                                _slideshowMessageCanceler =
-                                    OverlayText.ShowText(_imageViewer, "Slideshow Paused", Font,
-                                        Color.FromArgb(100, Color.Red), null, 2);
+                                stopSlideshow = true;
                             }
                         }
 
-                        PauseSlideshow(pauseSlideshow);
-                        _slideshowTimer.Enabled = !pauseSlideshow;
+                        if (stopSlideshow)
+                        {
+                            // When stopping, display a transparent message across the image viewer
+                            // to notify the user that the slideshow has been canceled.
+                            StopSlideshow(true);
+                        }
+                        else
+                        {
+                            // Restart the slideshow timer now that the document has been loaded.
+                            _slideshowTimer.Enabled = true;
+                        }
                     }
 
                     _setSlideshowAdvancedPages.Clear();
@@ -2652,24 +2705,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the slideshow pause menu item or button click.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleSlideshowPauseUIClick(object sender, EventArgs e)
-        {
-            try
-            {
-                ToggleSlideshowPause();
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI31119", ex);
-            }
-        }
-
-        /// <summary>
         /// Handles the slideshow stop menu item or button click.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -2679,7 +2714,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                StopSlideshow();
+                StopSlideshow(false);
             }
             catch (Exception ex)
             {
@@ -2727,7 +2762,7 @@ namespace Extract.Redaction.Verification
 
                         if (WarnBeforeSlideshowAutoAdvance())
                         {
-                            PauseSlideshow(true);
+                            StopSlideshow(false);
                         }
                         else
                         {
@@ -2851,15 +2886,23 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (_slideshowRunning && !_slideshowPaused)
+                if (_slideshowRunning)
                 {
-                    bool pauseSlideshow = false;
+                    bool stopSlideshow = false;
 
                     if (m.Msg == WindowsMessage.KeyDown)
                     {
-                        if (m.WParam != (IntPtr)Keys.F5)
+                        Keys key = (Keys)m.WParam.ToInt32();
+
+                        // Unless the key is related to starting the slideshow or advancing,
+                        // stop the slideshow.
+                        if (key != Keys.F5 &&
+                            key != Keys.PageDown &&
+                            key != Keys.Tab &&
+                            key != Keys.ControlKey &&
+                            (key != Keys.S || Control.ModifierKeys != Keys.Control))
                         {
-                            pauseSlideshow = true;
+                            stopSlideshow = true;
                         }
                     }
                     else if (m.Msg == WindowsMessage.LeftButtonDown)
@@ -2867,32 +2910,23 @@ namespace Extract.Redaction.Verification
                         Control clickedControl = FromHandle(m.HWnd);
                         if (clickedControl != _slideShowToolStrip)
                         {
-                            pauseSlideshow = true;
+                            stopSlideshow = true;
                         }
                     }
                     else if (m.Msg == WindowsMessage.RightButtonDown)
                     {
-                        pauseSlideshow = true;
+                        stopSlideshow = true;
                     }
                     else if (m.Msg == WindowsMessage.SystemCommand &&
                              (m.WParam.ToInt32() == _SC_SCREENSAVER ||
                               (m.WParam.ToInt32() == _SC_MONITORPOWER && m.LParam.ToInt32() > 0)))
                     {
-                        // [FlexIDSCore:4592]
-                        // Don't allow the screen saver to kick in or the monitor to power off while
-                        // the slideshow is active.
-                        return true;
+                        stopSlideshow = true;
                     }
 
-                    if (pauseSlideshow)
+                    if (stopSlideshow)
                     {
-                        PauseSlideshow(true);
-
-                        // Display a transparent message across the image viewer to notify
-                        // the user that the slideshow has been canceled.
-                        _slideshowMessageCanceler =
-                            OverlayText.ShowText(_imageViewer, "Slideshow Paused", Font,
-                                Color.FromArgb(100, Color.Red), null, 2);
+                        StopSlideshow(true);
                     }
                 }
             }
@@ -2915,18 +2949,21 @@ namespace Extract.Redaction.Verification
         /// to stop it.</param>
         void StartSlideshow(bool start)
         {
-            if (_slideshowRunning != start)
+            if (!start || _slideshowRunning != start)
             {
+                if (start && _slideshowMessageCanceler != null)
+                {
+                    // If the slideshow is being started, ensure the "Slideshow Paused" is closed.
+                    _slideshowMessageCanceler.Cancel();
+                }
+
                 _slideshowRunning = start;
                 _slideshowPlayToolStripButton.Checked = start;
                 _slideshowPlayToolStripMenuItem.Checked = start;
-                _pauseSlideshowCommand.Enabled = start;
                 _stopSlideshowCommand.Enabled = start;
 
                 _slideshowTimer.Enabled = start && _imageViewer.IsImageAvailable;
             }
-
-            PauseSlideshow(false);
         }
 
         /// <summary>
@@ -2940,41 +2977,20 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Stops the slideshow.
         /// </summary>
-        void StopSlideshow()
+        /// <param name="showMessage"><see langword="true"/> to display a transparent
+        /// "Slideshow Stopped" message across then image viewer; <see langword="false"/> otherwise.
+        /// </param>
+        void StopSlideshow(bool showMessage)
         {
             StartSlideshow(false);
-        }
 
-        /// <summary>
-        /// Pauses/unpauses the slideshow.
-        /// </summary>
-        /// <param name="pause"><see langword="true"/> to pause the slideshow;
-        /// <see langword="false"/> to un-pause it.</param>
-        void PauseSlideshow(bool pause)
-        {
-            if (_slideshowPaused != pause)
+            if (showMessage)
             {
-                if (!pause && _slideshowMessageCanceler != null)
-                {
-                    // If the slideshow is being un-paused, ensure the "Slideshow Paused" is closed.
-                    _slideshowMessageCanceler.Cancel();
-                }
-
-                _slideshowPaused = pause;
-                _slideshowPauseToolStripButton.Checked = pause;
-                _slideshowPauseToolStripMenuItem.Checked = pause;
-                _slideshowTimer.Enabled = !pause && _slideshowRunning && _imageViewer.IsImageAvailable;
-            }
-        }
-
-        /// <summary>
-        /// Toggles the slideshow pause state.
-        /// </summary>
-        void ToggleSlideshowPause()
-        {
-            if (_slideshowRunning)
-            {
-                PauseSlideshow(!_slideshowPaused);
+                // Display a transparent message across the image viewer to notify
+                // the user that the slideshow has been canceled.
+                _slideshowMessageCanceler =
+                    OverlayText.ShowText(_imageViewer, "Slideshow Stopped", Font,
+                        Color.FromArgb(100, Color.Red), null, 2);
             }
         }
 

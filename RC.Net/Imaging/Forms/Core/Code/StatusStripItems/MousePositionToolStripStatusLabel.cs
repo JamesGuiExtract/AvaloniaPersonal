@@ -61,11 +61,6 @@ namespace Extract.Imaging.Forms
             "X: {0:0} ({2:0%}), Y: {1:0} ({3:0%})";
 
         /// <summary>
-        /// Default width for this <see cref="ToolStripStatusLabel"/>
-        /// </summary>
-        private static readonly int _DEFAULT_MOUSEPOSITION_WIDTH = 100;
-
-        /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         private static readonly string _OBJECT_NAME =
@@ -128,7 +123,7 @@ namespace Extract.Imaging.Forms
 
                 // Set the label to fixed width and the text alignment to right
                 base.AutoSize = false;
-                base.Width = _DEFAULT_MOUSEPOSITION_WIDTH;
+                base.Width = _displayPercentages ? 175 : 100;
                 base.TextAlign = ContentAlignment.MiddleLeft;
             }
             catch (Exception ex)

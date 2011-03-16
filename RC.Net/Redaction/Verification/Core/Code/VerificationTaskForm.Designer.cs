@@ -54,6 +54,8 @@ namespace Extract.Redaction.Verification
                 }
                 if (_slideshowTimer != null)
                 {
+                    // Set _slideshowRunning = false to ensure the _slideshowTimer isn't used again.
+                    _slideshowRunning = false;
                     _slideshowTimer.Dispose();
                     _slideshowTimer = null;
                 }
@@ -166,7 +168,6 @@ namespace Extract.Redaction.Verification
             this._slideshowToolStripMenuItemSeparator = new System.Windows.Forms.ToolStripSeparator();
             this._slideshowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._slideshowPlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._slideshowPauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._slideshowStopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this._optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -186,7 +187,6 @@ namespace Extract.Redaction.Verification
             this._tagFileToolStripButton = new Extract.FileActionManager.Forms.TagFileToolStripButton();
             this._slideShowToolStrip = new System.Windows.Forms.ToolStrip();
             this._slideshowPlayToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this._slideshowPauseToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._slideshowStopToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._dataWindowDockableWindow = new TD.SandDock.DockableWindow();
             this._sandDockManager = new TD.SandDock.SandDockManager();
@@ -886,10 +886,9 @@ namespace Extract.Redaction.Verification
             // 
             this._slideshowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._slideshowPlayToolStripMenuItem,
-            this._slideshowPauseToolStripMenuItem,
             this._slideshowStopToolStripMenuItem});
             this._slideshowToolStripMenuItem.Name = "_slideshowToolStripMenuItem";
-            this._slideshowToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
+            this._slideshowToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this._slideshowToolStripMenuItem.Text = "&Slideshow";
             // 
             // _slideshowPlayToolStripMenuItem
@@ -898,13 +897,6 @@ namespace Extract.Redaction.Verification
             this._slideshowPlayToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             this._slideshowPlayToolStripMenuItem.Text = "&Play";
             this._slideshowPlayToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowPlayUIClick);
-            // 
-            // _slideshowPauseToolStripMenuItem
-            // 
-            this._slideshowPauseToolStripMenuItem.Name = "_slideshowPauseToolStripMenuItem";
-            this._slideshowPauseToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            this._slideshowPauseToolStripMenuItem.Text = "P&ause";
-            this._slideshowPauseToolStripMenuItem.Click += new System.EventHandler(this.HandleSlideshowPauseUIClick);
             // 
             // _slideshowStopToolStripMenuItem
             // 
@@ -1088,11 +1080,10 @@ namespace Extract.Redaction.Verification
             this._slideShowToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this._slideShowToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._slideshowPlayToolStripButton,
-            this._slideshowPauseToolStripButton,
             this._slideshowStopToolStripButton});
             this._slideShowToolStrip.Location = new System.Drawing.Point(291, 24);
             this._slideShowToolStrip.Name = "_slideShowToolStrip";
-            this._slideShowToolStrip.Size = new System.Drawing.Size(156, 39);
+            this._slideShowToolStrip.Size = new System.Drawing.Size(84, 39);
             this._slideShowToolStrip.TabIndex = 2;
             // 
             // _slideshowPlayToolStripButton
@@ -1107,17 +1098,6 @@ namespace Extract.Redaction.Verification
             this._slideshowPlayToolStripButton.ToolTipText = "Slideshow Play (F5)";
             this._slideshowPlayToolStripButton.Click += new System.EventHandler(this.HandleSlideshowPlayUIClick);
             // 
-            // _slideshowPauseToolStripButton
-            // 
-            this._slideshowPauseToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._slideshowPauseToolStripButton.Enabled = false;
-            this._slideshowPauseToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.SlideshowPause;
-            this._slideshowPauseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._slideshowPauseToolStripButton.Name = "_slideshowPauseToolStripButton";
-            this._slideshowPauseToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._slideshowPauseToolStripButton.Text = "Slideshow Pause";
-            this._slideshowPauseToolStripButton.Click += new System.EventHandler(this.HandleSlideshowPauseUIClick);
-            // 
             // _slideshowStopToolStripButton
             // 
             this._slideshowStopToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -1127,7 +1107,7 @@ namespace Extract.Redaction.Verification
             this._slideshowStopToolStripButton.Name = "_slideshowStopToolStripButton";
             this._slideshowStopToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._slideshowStopToolStripButton.Text = "Slideshow Stop";
-            this._slideshowStopToolStripButton.ToolTipText = "Slideshow Pausetop";
+            this._slideshowStopToolStripButton.ToolTipText = "Slideshow Stop";
             this._slideshowStopToolStripButton.Click += new System.EventHandler(this.HandleSlideshowStopUIClick);
             // 
             // dockContainer
@@ -1907,13 +1887,11 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.ToolStripMenuItem _fullScreenToolStripMenuItem;
         private System.Windows.Forms.ToolStrip _slideShowToolStrip;
         private System.Windows.Forms.ToolStripButton _slideshowPlayToolStripButton;
-        private System.Windows.Forms.ToolStripButton _slideshowPauseToolStripButton;
         private System.Windows.Forms.ToolStripButton _slideshowStopToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
         private System.Windows.Forms.ToolStripSeparator _slideshowToolStripMenuItemSeparator;
         private System.Windows.Forms.ToolStripMenuItem _slideshowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _slideshowPlayToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _slideshowPauseToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _slideshowStopToolStripMenuItem;
         private DockableWindow _magnifierDockableWindow;
         private Imaging.Forms.MagnifierControl _magnifierControl;

@@ -130,20 +130,6 @@ namespace Extract.Redaction.Verification.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap SlideshowConfig {
-            get {
-                object obj = ResourceManager.GetObject("SlideshowConfig", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap SlideshowPause {
-            get {
-                object obj = ResourceManager.GetObject("SlideshowPause", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap SlideshowPlay {
             get {
                 object obj = ResourceManager.GetObject("SlideshowPlay", resourceCulture);
