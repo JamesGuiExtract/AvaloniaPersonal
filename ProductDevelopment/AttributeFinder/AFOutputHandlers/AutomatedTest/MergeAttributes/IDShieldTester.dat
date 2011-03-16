@@ -34,3 +34,6 @@
 
 // [FlexIDSCore:4381] Test that when merging into individual raster zones works.
 <TESTFOLDER>;.\Test17.rsd;.\Images\FlexIDSCore-4381\;;$DirOf(<SourceDocName>)\..\..\Test17.voa
+
+// [FlexIDSCore:4591] Test that all raster zones end up in the result even when all raster zones don't overlap.
+<TESTFOLDER>;.\Test18.rsd;.\Images\FlexIDSCore-4591\;;$DirOf(<SourceDocName>)\..\..\Test18.voa
