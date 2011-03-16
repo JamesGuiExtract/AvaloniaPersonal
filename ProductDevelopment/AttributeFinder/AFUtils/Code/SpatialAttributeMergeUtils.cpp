@@ -1091,7 +1091,7 @@ ISpatialStringPtr CSpatialAttributeMergeUtils::createMergedValue(IAttributePtr i
 							m_mapAttributeInfo[ipAttribute2].mapRasterZones[nPage].end());
 
 		// Merge any overlapping raster zones.
-		for (vector<CRect>::iterator i = vecZoneRects.begin(); i < vecZoneRects.end() - 1; i++)
+		for (vector<CRect>::iterator i = vecZoneRects.begin(); i != vecZoneRects.end(); i++)
 		{
 			for (vector<CRect>::iterator j = i + 1; j != vecZoneRects.end(); j++)
 			{
