@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FPRecordManager.h"
 #include "FP_UI_Notifications.h"
+#include "CommonConstants.h"
 
 #include <FileProcessingConfigMgr.h>
 #include <cpputil.h>
@@ -25,13 +26,13 @@ FPRecordManager::FPRecordManager()
   m_bSkippedFilesForCurrentUser(true),
   m_nNumberOfFilesProcessed(0),
   m_nNumberOfFilesProcessedSuccessfully(0),
-  m_nNumberOfFilesFailed(0)
+  m_nNumberOfFilesFailed(0),
+  m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
 {
 	try
 	{
 		// Get the max number of files to load in the record manager from the database
 		FileProcessingConfigMgr fpCfgMgr;
-		m_nMaxFilesFromDB = fpCfgMgr.getMaxFilesFromDB();
 		m_nMillisecondsBetweenDBCheck = fpCfgMgr.getMillisecondsBetweenDBCheck();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13993");

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "resource.h"
+#include "CommonConstants.h"
 
 #include <afxwin.h>
 #include <afxcmn.h>
@@ -17,7 +18,8 @@ class AdvancedTaskSettingsDlg: public CDialog
 public:
 // constructor
 	AdvancedTaskSettingsDlg(int iNumThreads=0, bool bKeepProcessing=false,
-		IVariantVectorPtr ipSchedule=__nullptr, CWnd* pParent = __nullptr);
+		IVariantVectorPtr ipSchedule=__nullptr, long nNumFilesFromDb=gnMAX_NUMBER_OF_FILES_FROM_DB,
+		CWnd* pParent = __nullptr);
 	virtual ~AdvancedTaskSettingsDlg();
 
 // Dialog Data
@@ -27,6 +29,7 @@ public:
 	int getNumberOfThreads();
 	bool getKeepProcessing();
 	IVariantVectorPtr getSchedule();
+	long getNumberOfFilesFromDb();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -39,6 +42,7 @@ protected:
 	afx_msg void OnBtnStopProcessingWithEmptyQueue();
 	afx_msg void OnBtnClickedCheckLimitProcessing();
 	afx_msg void OnBnClickedButtonSetSchedule();
+	afx_msg void OnEnChangeEditNumFiles();
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -56,15 +60,19 @@ private:
 	CStatic m_groupProcessingSchedule;
 	CButton m_checkLimitProcessing;
 	CButton m_btnSetSchedule;
+	CEdit m_editNumFiles;
+	CSpinButtonCtrl m_SpinNumFiles;
 
 	BOOL m_bLimitProcessingTimes;
 	int m_iNumThreads;
 	bool m_bKeepProcessing;
 	IVariantVectorPtr m_ipSchedule;
+	long m_nNumFiles;
 
 	///////////
 	//Methods
 	//////////
 	void updateEnabledStates();
 	int getNumThreads();
+	long getNumFiles();
 };

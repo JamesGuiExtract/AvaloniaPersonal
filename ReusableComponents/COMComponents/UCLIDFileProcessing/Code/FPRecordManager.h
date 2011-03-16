@@ -147,6 +147,10 @@ public:
 	// PROMISE: To return true if stop processing has been signaled and false otherwise.
 	bool processingIsStopped();
 	//---------------------------------------------------------------------------------------------
+	// PROMISE: To set the max number of files to get from the database at once
+	inline void setMaxNumberOfFilesFromDB(long nMaxNumberOfFiles)
+		{ m_nMaxFilesFromDB = nMaxNumberOfFiles; }
+	//---------------------------------------------------------------------------------------------
 
 private:
 

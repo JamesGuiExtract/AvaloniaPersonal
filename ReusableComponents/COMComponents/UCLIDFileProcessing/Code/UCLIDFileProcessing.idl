@@ -422,6 +422,12 @@ library UCLID_FILEPROCESSINGLib
 		//			prompted for a password they did not correctly enter.
 		[id(53), helpstring("method AuthenticateForProcessing")] HRESULT AuthenticateForProcessing(
 			[out, retval] VARIANT_BOOL* pvbAuthenticated);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets/sets the number of files to queue from the DB when processing
+		[propget, id(54), helpstring("property MaxFilesFromDB")] HRESULT
+			MaxFilesFromDB([out, retval] long* pVal);
+		[propput, id(54), helpstring("property MaxFilesFromDB")] HRESULT
+			MaxFilesFromDB([in] long newVal);
 	};
 
 	[

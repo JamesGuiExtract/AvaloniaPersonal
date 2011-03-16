@@ -55,8 +55,6 @@ DECLARE_REGISTRY_RESOURCEID(IDR_FILEPROCESSINGMGMTROLE)
 BEGIN_COM_MAP(CFileProcessingMgmtRole)
 	COM_INTERFACE_ENTRY(IFileProcessingMgmtRole)
 	COM_INTERFACE_ENTRY(IFileActionMgmtRole)
-	// TODO: why does the following line cause a compile error here, but similar code in other classes don't?
-	//COM_INTERFACE_ENTRY(IDispatch)
 	COM_INTERFACE_ENTRY2(IDispatch, IFileProcessingMgmtRole)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(ILicensedComponent)

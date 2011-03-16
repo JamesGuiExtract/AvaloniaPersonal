@@ -414,24 +414,6 @@ void FileProcessingConfigMgr::setRestrictNumStoredRecords(bool bRestrict)
 	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS, bRestrict ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------
-long FileProcessingConfigMgr::getMaxFilesFromDB()
-{
-	// Set return value to defaultg
-	long rtnValue = DEFAULT_MAX_FILES_FROM_DB;
-	
-	// if key exists get that value other wise set the default value
-	if ( m_apHKCU->keyExists(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB))
-	{
-		rtnValue = asLong(m_apHKCU->getKeyValue(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB));
-	}
-	else
-	{
-		// Set the default value
-		m_apHKCU->setKeyValue(gstrFP_RECORD_MGR_PATH, MAX_FILES_FROM_DB, asString(DEFAULT_MAX_FILES_FROM_DB));
-	}
-	return rtnValue;
-}
-//-------------------------------------------------------------------------------------------------
 long FileProcessingConfigMgr::getMillisecondsBetweenDBCheck()
 {
 	// Set return value to defaultg

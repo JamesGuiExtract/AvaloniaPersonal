@@ -147,8 +147,12 @@ private:
 	//          and points m_ipClipboardMgr to it. returns m_ipClipboardMgr.
 	IMiscUtilsPtr getMiscUtils();
 
+	// Wrap the file processing manager in a smart pointer
+	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr getFPMgr();
+
 	// get the file processing mgmt role for brief use
-	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr getFPMgmtRole();
+	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr getFPMgmtRole(
+		UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPM = __nullptr);
 
 	// get the file processor data vector for brief use
 	IIUnknownVectorPtr getFileProcessorsData();

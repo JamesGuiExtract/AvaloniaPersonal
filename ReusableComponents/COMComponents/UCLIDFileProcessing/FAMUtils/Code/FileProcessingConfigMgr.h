@@ -67,9 +67,6 @@ public:
 	// Saves the server and database as the last good settings in the registry
 	void setLastGoodDBSettings(const string& strServer, const string& strDatabase);
 
-	// Return the Max number of files to get from the database for the recordmgr Defaults to 1
-	long getMaxFilesFromDB();
-
 	// Return the number of milliseconds to sleep between checking the DB for new files
 	long getMillisecondsBetweenDBCheck();
 

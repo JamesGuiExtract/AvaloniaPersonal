@@ -5,6 +5,7 @@
 #include "FileProcessingManager.h"
 #include "FP_UI_Notifications.h"
 #include "FileProcessingUtils.h"
+#include "CommonConstants.h"
 
 #include <ComponentLicenseIDs.h>
 #include <ComUtils.h>
@@ -37,7 +38,8 @@ m_strPreviousDBName(""),
 m_isDBConnectionReady(false),
 m_nNumberOfFilesToExecute(0),
 m_bCancelling(false),
-m_bRecordFAMSessions(false)
+m_bRecordFAMSessions(false),
+m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
 {
 	try
 	{
@@ -201,6 +203,9 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 
 		// Set the number of files to process
 		m_recordMgr.setNumberOfFilesToProcess(m_nNumberOfFilesToExecute);
+
+		// Set the max number of files to get from the DB
+		m_recordMgr.setMaxNumberOfFilesFromDB(m_nMaxFilesFromDB);
 
 		// if there is a dialog set it to receive status updates
 		if(m_apDlg.get() != __nullptr)
@@ -1100,6 +1105,48 @@ STDMETHODIMP CFileProcessingManager::AuthenticateForProcessing(VARIANT_BOOL* pvb
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29563");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_MaxFilesFromDB(long* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI32143", pVal != __nullptr);
+
+		*pVal = m_nMaxFilesFromDB;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32144");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::put_MaxFilesFromDB(long newVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (newVal < gnNUM_FILES_LOWER_RANGE || newVal > gnNUM_FILES_UPPER_RANGE)
+		{
+			UCLIDException ue("ELI32146", "Value was out of range.");
+			ue.addDebugInfo("Lower Bound", gnNUM_FILES_LOWER_RANGE);
+			ue.addDebugInfo("Upper Bound", gnNUM_FILES_UPPER_RANGE);
+			ue.addDebugInfo("Value Specified", newVal);
+			throw ue;
+		}
+
+		m_bDirty = m_nMaxFilesFromDB != newVal;
+		m_nMaxFilesFromDB = newVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32145");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
@@ -1282,6 +1329,8 @@ void CFileProcessingManager::clear()
 		getFPMDB()->DatabaseServer = "";
 		getFPMDB()->DatabaseName = "";
 		getFPMDB()->ResetDBConnection();
+
+		m_nMaxFilesFromDB = gnMAX_NUMBER_OF_FILES_FROM_DB;
 
 		m_bDirty = false;
 	}

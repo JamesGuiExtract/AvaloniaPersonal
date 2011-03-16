@@ -3,6 +3,7 @@
 #include "UCLIDFileProcessing.h"
 #include "FileProcessingManager.h"
 #include "HelperFunctions.h"
+#include "CommonConstants.h"
 
 #include <UCLIDException.h>
 #include <ByteStream.h>
@@ -13,7 +14,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 13;
+const unsigned long gnCurrentVersion = 14;
 const int gnOLD_CONVERT_VERSION = 10;
 
 //-------------------------------------------------------------------------------------------------
@@ -83,6 +84,8 @@ STDMETHODIMP CFileProcessingManager::IsDirty(void)
 // Version 13:
 //	 Removed the DBConfig file name
 //	 Added the Server and Database
+// Version 14:
+//	 Added Max files from DB into FPS file settings as opposed to registry setting
 STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -93,7 +96,7 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 		validateLicense();
 
 		// Reset all the member variables
-		getThisAsCOMPtr()->Clear();
+		clear();
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -157,6 +160,26 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 			getFPMDB()->DatabaseName = strDatabase.c_str();
 		}
 
+		// Get the max files from db value
+		if (nDataVersion > 13)
+		{
+			dataReader >> m_nMaxFilesFromDB;
+			if (m_nMaxFilesFromDB < gnNUM_FILES_LOWER_RANGE
+				|| m_nMaxFilesFromDB > gnNUM_FILES_UPPER_RANGE)
+			{
+				long nLoaded = m_nMaxFilesFromDB;
+				m_nMaxFilesFromDB = min(max(m_nMaxFilesFromDB, gnNUM_FILES_LOWER_RANGE),
+					gnNUM_FILES_UPPER_RANGE);
+				UCLIDException ue("ELI32147",
+					"Application Trace: Persisted value for max files from database was out of range. Reset to closest value.");
+				ue.addDebugInfo("Lower Bound", gnNUM_FILES_LOWER_RANGE);
+				ue.addDebugInfo("Upper Bound", gnNUM_FILES_UPPER_RANGE);
+				ue.addDebugInfo("Loaded Value", nLoaded);
+				ue.addDebugInfo("Closest Value", m_nMaxFilesFromDB);
+				ue.log();
+			}
+		}
+
 		// Read in the collected File Supplying Management Role
 		IPersistStreamPtr ipFSObj;
 		readObjectFromStream( ipFSObj, pStream, "ELI14399" );
@@ -211,6 +234,8 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 		
 		// Save the database name
 		dataWriter << asString(getFPMDB()->DatabaseName);
+
+		dataWriter << m_nMaxFilesFromDB;
 		
 		// Flush the stream
 		dataWriter.flushToByteStream();

@@ -93,6 +93,8 @@ public:
 	STDMETHOD(ProcessSingleFile)(BSTR bstrSourceDocName,VARIANT_BOOL vbQueue,
 		VARIANT_BOOL vbProcess, VARIANT_BOOL vbForceProcessing, EFilePriority eFilePriority);
 	STDMETHOD(AuthenticateForProcessing)(VARIANT_BOOL* pvbAuthenticated);
+	STDMETHOD(get_MaxFilesFromDB)(long* pVal);
+	STDMETHOD(put_MaxFilesFromDB)(long newVal);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -194,6 +196,9 @@ private:
 		kBeginStop,
 		kEndStop
 	};
+
+	// The max number of files to grab from the DB when processing
+	long m_nMaxFilesFromDB;
 
 	///////////
 	// Methods

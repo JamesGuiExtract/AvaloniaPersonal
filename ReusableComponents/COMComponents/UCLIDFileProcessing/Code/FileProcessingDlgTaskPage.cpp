@@ -837,14 +837,15 @@ void FileProcessingDlgTaskPage::OnBtnAdvancedSettings()
 {
 	try
 	{
-		UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipFPM = getFPMgmtRole();
+		UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPMgr = getFPMgr();
+		UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipFPM = getFPMgmtRole(ipFPMgr);
 		IVariantVectorPtr ipSchedule = __nullptr;
 		if (ipFPM->LimitProcessingToSchedule == VARIANT_TRUE)
 		{
 			ipSchedule = ipFPM->ProcessingSchedule;
 		}
 		AdvancedTaskSettingsDlg settings(ipFPM->NumThreads,
-			asCppBool(ipFPM->KeepProcessingAsAdded), ipSchedule, this);
+			asCppBool(ipFPM->KeepProcessingAsAdded), ipSchedule, ipFPMgr->MaxFilesFromDB, this);
 		if (settings.DoModal() == IDOK)
 		{
 			ipFPM->NumThreads = settings.getNumberOfThreads();
@@ -859,6 +860,7 @@ void FileProcessingDlgTaskPage::OnBtnAdvancedSettings()
 			{
 				ipFPM->LimitProcessingToSchedule = VARIANT_FALSE;
 			}
+			ipFPMgr->MaxFilesFromDB = settings.getNumberOfFilesFromDb();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32138");
@@ -1646,14 +1648,21 @@ void FileProcessingDlgTaskPage::replaceFileProcessorAt(int iIndex, IObjectWithDe
 	m_fileProcessorList.SetFocus();
 }
 //-------------------------------------------------------------------------------------------------
-UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr FileProcessingDlgTaskPage::getFPMgmtRole()
+UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr FileProcessingDlgTaskPage::getFPMgr()
 {
 	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPM( m_pFPM );
-	ASSERT_RESOURCE_ALLOCATION("ELI14294", ipFPM != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14294", ipFPM != __nullptr);
 
+	return ipFPM;
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr FileProcessingDlgTaskPage::getFPMgmtRole(
+	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPM)
+{
 	// get the file processing mgmt role
-	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipFPMgmtRole = ipFPM->FileProcessingMgmtRole;
-	ASSERT_RESOURCE_ALLOCATION("ELI14295", ipFPMgmtRole != NULL);
+	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipFPMgmtRole =
+		(ipFPM != __nullptr ? ipFPM : getFPMgr())->FileProcessingMgmtRole;
+	ASSERT_RESOURCE_ALLOCATION("ELI14295", ipFPMgmtRole != __nullptr);
 
 	return ipFPMgmtRole;
 }

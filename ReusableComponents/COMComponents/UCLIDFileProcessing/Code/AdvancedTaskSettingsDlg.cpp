@@ -19,12 +19,13 @@ const string gstrSET_SCHEDULE_PROG_ID = "Extract.FileActionManager.Forms.SetProc
 IMPLEMENT_DYNAMIC(AdvancedTaskSettingsDlg, CDialog)
 //-------------------------------------------------------------------------------------------------
 AdvancedTaskSettingsDlg::AdvancedTaskSettingsDlg(int iNumThreads, bool bKeepProcessing,
-	IVariantVectorPtr ipSchedule, CWnd* pParent) :
+	IVariantVectorPtr ipSchedule, long nNumFilesFromDb, CWnd* pParent) :
     CDialog(AdvancedTaskSettingsDlg::IDD, pParent),
 	m_iNumThreads(iNumThreads),
 	m_bKeepProcessing(bKeepProcessing),
 	m_ipSchedule(ipSchedule),
-	m_bLimitProcessingTimes(asMFCBool(ipSchedule != __nullptr))
+	m_bLimitProcessingTimes(asMFCBool(ipSchedule != __nullptr)),
+	m_nNumFiles(nNumFilesFromDb)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -44,6 +45,8 @@ void AdvancedTaskSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_LIMIT_PROCESSING, m_bLimitProcessingTimes);
 	DDX_Control(pDX, IDC_BUTTON_SET_SCHEDULE, m_btnSetSchedule);
 	DDX_Control(pDX, IDC_CHECK_LIMIT_PROCESSING, m_checkLimitProcessing);
+	DDX_Control(pDX, IDC_EDIT_NUM_FILES_FROM_DB, m_editNumFiles);
+	DDX_Control(pDX, IDC_SPIN_NUM_FILES, m_SpinNumFiles);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(AdvancedTaskSettingsDlg, CDialog)
@@ -55,6 +58,7 @@ BEGIN_MESSAGE_MAP(AdvancedTaskSettingsDlg, CDialog)
 	ON_EN_CHANGE(IDC_EDIT_THREADS, OnEnChangeEditThreads)
 	ON_BN_CLICKED(IDC_CHECK_LIMIT_PROCESSING, OnBtnClickedCheckLimitProcessing)
 	ON_BN_CLICKED(IDC_BUTTON_SET_SCHEDULE, OnBnClickedButtonSetSchedule)
+	ON_EN_CHANGE(IDC_EDIT_NUM_FILES_FROM_DB, OnEnChangeEditNumFiles)
 END_MESSAGE_MAP()
 //-------------------------------------------------------------------------------------------------
 BOOL AdvancedTaskSettingsDlg::OnInitDialog() 
@@ -69,6 +73,10 @@ BOOL AdvancedTaskSettingsDlg::OnInitDialog()
 		m_SpinThreads.SetBuddy(&m_editThreads);
 		m_SpinThreads.SetRange32(0, giTHREADS_UPPER_RANGE);
 
+		// Set the edit num files box to be controlled by the spin control
+		m_SpinNumFiles.SetBuddy(&m_editNumFiles);
+		m_SpinNumFiles.SetRange32(gnNUM_FILES_LOWER_RANGE, gnNUM_FILES_UPPER_RANGE);
+
 		bool bMaxThreads = m_iNumThreads == 0;
 		m_btnMaxThreads.SetCheck(asBSTChecked(bMaxThreads));
 		m_btnNumThreads.SetCheck(asBSTChecked(!bMaxThreads));
@@ -80,6 +88,8 @@ BOOL AdvancedTaskSettingsDlg::OnInitDialog()
 
 		m_btnKeepProcessingWithEmptyQueue.SetCheck(asBSTChecked(m_bKeepProcessing));
 		m_btnStopProcessingWithEmptyQueue.SetCheck(asBSTChecked(!m_bKeepProcessing));
+
+		m_editNumFiles.SetWindowText(asString(m_nNumFiles).c_str());
 
 		updateEnabledStates();
 
@@ -108,6 +118,7 @@ void AdvancedTaskSettingsDlg::OnBtnOK()
 		}
 
 		m_iNumThreads = getNumThreads();
+		m_nNumFiles = getNumFiles();
 
 		CDialog::OnOK();
 	}
@@ -156,6 +167,15 @@ void AdvancedTaskSettingsDlg::OnEnChangeEditThreads()
 		m_iNumThreads = getNumThreads();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32124");
+}
+//--------------------------------------------------------------------------------------------------
+void AdvancedTaskSettingsDlg::OnEnChangeEditNumFiles()
+{
+	try
+	{
+		m_nNumFiles = getNumFiles();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32141");
 }
 //--------------------------------------------------------------------------------------------------
 void AdvancedTaskSettingsDlg::OnBtnKeepProcessingWithEmptyQueue()
@@ -247,6 +267,11 @@ IVariantVectorPtr AdvancedTaskSettingsDlg::getSchedule()
 	return __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
+long AdvancedTaskSettingsDlg::getNumberOfFilesFromDb()
+{
+	return m_nNumFiles;
+}
+//-------------------------------------------------------------------------------------------------
 void AdvancedTaskSettingsDlg::updateEnabledStates()
 {
 	UpdateData(FALSE);
@@ -303,6 +328,49 @@ int AdvancedTaskSettingsDlg::getNumThreads()
 		else
 		{
 			nNewValue = 0;
+		}
+	}
+
+	return nNewValue;
+}
+//-------------------------------------------------------------------------------------------------
+long AdvancedTaskSettingsDlg::getNumFiles()
+{
+	// Default to default value
+	long nNewValue = gnMAX_NUMBER_OF_FILES_FROM_DB;
+	CString zNumFiles;
+	m_editNumFiles.GetWindowText(zNumFiles);
+	string strNumFiles = zNumFiles;
+	if ( strNumFiles != "" )
+	{
+		bool bUpdateText = false;
+		try
+		{
+			// Get the value
+			nNewValue = asLong( strNumFiles );
+
+			// Check that it is in the acceptable range
+			if (nNewValue > gnNUM_FILES_UPPER_RANGE)
+			{
+				bUpdateText = true;
+				nNewValue = gnNUM_FILES_UPPER_RANGE;
+			}
+			else if (nNewValue < gnNUM_FILES_LOWER_RANGE)
+			{
+				bUpdateText = true;
+				nNewValue = gnNUM_FILES_LOWER_RANGE;
+			}
+		}
+		catch(...)
+		{
+			// Set the value to 1
+			nNewValue = 1;
+			bUpdateText = true;
+		}
+
+		if (bUpdateText)
+		{
+			m_editNumFiles.SetWindowText(asString(nNewValue).c_str());
 		}
 	}
 
