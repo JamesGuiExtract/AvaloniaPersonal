@@ -57,10 +57,9 @@ CProcessFilesApp theApp;
 const char *gpszFPSFileDescription = "Extract Systems FPS File";
 const char *gpszFPSFileExtension = ".fps";
 const string gstrRECOVERY_PROMPT =
-	"It appears that you were unable to save your work from the \n"
-	"previous session because of an application crash or other \n"
-	"catastrophic failure. Would you like to attempt recovering \n"
-	"the File Action Manager settings from your previous session?\n";
+	"It appears that there are unsaved changes from a previously open File Action Manager.  "
+	"This can happen because of an application crash or other error.  Would you like to attempt "
+	"recovering the File Action Manager settings from your previous session?";
 
 //-------------------------------------------------------------------------------------------------
 // CProcessFilesApp initialization
@@ -427,24 +426,13 @@ BOOL CProcessFilesApp::InitInstance()
 			IFileProcessingManagerPtr ipFileProcMgr(CLSID_FileProcessingManager);
 			ASSERT_RESOURCE_ALLOCATION("ELI08894", ipFileProcMgr != NULL);
 
-			// Get the current execute file name
-			string strModuleFileName = getCurrentProcessEXEFullPath();
-			// Get the handler to the current instance
-			HMODULE hModule = ::GetModuleHandle(strModuleFileName.c_str());
-			if (hModule == NULL)
-			{
-				UCLIDException ue("ELI14659", "Unable to retrieve module handle!");
-				ue.addDebugInfo("Module", strModuleFileName);
-				throw ue;
-			}
-
 			// Create an FileRecoveryManager object
-			auto_ptr<FileRecoveryManager> apFRM(NULL);
+			unique_ptr<FileRecoveryManager> apFRM(__nullptr);
 
 			if ( !bRunningAsService )
 			{
 				// setup the FileRecoveryManager
-				apFRM = auto_ptr<FileRecoveryManager>(new FileRecoveryManager(hModule, ".tmp"));
+				apFRM.reset(new FileRecoveryManager(".tmp"));
 
 				// if a file Processing recovery file exists, then ask the user if they
 				// want to recover FAM settings
@@ -460,8 +448,7 @@ BOOL CProcessFilesApp::InitInstance()
 						// NOTE: We are setting the bSetDirtyFlagToTrue flag to VARIANT_TRUE
 						// so that the user is prompted for saving when they try
 						// to close the FAM window
-						ipFileProcMgr->LoadFrom(get_bstr_t(
-							strRecoveryFileName.c_str()), VARIANT_TRUE);
+						ipFileProcMgr->LoadFrom(strRecoveryFileName.c_str(), VARIANT_TRUE);
 					}
 					else if ( strFileName != "" )
 					{

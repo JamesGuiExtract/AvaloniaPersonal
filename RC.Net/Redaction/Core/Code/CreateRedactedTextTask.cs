@@ -59,7 +59,7 @@ namespace Extract.Redaction
         /// <summary>
         /// The settings for this object.
         /// </summary>
-        CreateRedactedTextSettings _settings;
+        CreateRedactedTextSettings _settings = new CreateRedactedTextSettings();
 
         /// <summary>
         /// Loads attributes to be redacted from voa files.

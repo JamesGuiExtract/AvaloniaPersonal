@@ -64,7 +64,7 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
  m_strLastFileOpened(""),
  m_eContextMenuCtrl(kNoControl),
  m_strCurrentFileName(""),
- m_FRM(_Module.m_hInst, ".tmp"),
+ m_FRM(".tmp"),
  m_iDESC_LIST_COLUMN(1),
  m_strBinFolder(strBinFolder),
  m_pMRUFilesMenu(NULL)

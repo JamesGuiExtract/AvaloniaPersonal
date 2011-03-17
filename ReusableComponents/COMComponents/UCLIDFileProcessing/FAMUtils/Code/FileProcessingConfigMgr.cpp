@@ -44,6 +44,7 @@ const string FileProcessingConfigMgr::AUTO_SCROLLING = "AutoScrolling";
 const string FileProcessingConfigMgr::LAST_GOOD_SERVER = "LastGoodServer";
 const string FileProcessingConfigMgr::LAST_GOOD_DATABASE = "LastGoodDatabase";
 const string FileProcessingConfigMgr::USE_PRE_NORMALIZED = "UsePreNormalized";
+const string FileProcessingConfigMgr::AUTO_SAVE_FPS_FILE = "AutoSaveFPS";
 
 // Minimum width and height for the dialog
 const int FileProcessingConfigMgr::DLG_MIN_WIDTH = 380;
@@ -620,6 +621,30 @@ bool FileProcessingConfigMgr::getUsePreNormalized()
 	}
 
 	return bUsePreNormalized;
+}
+//-------------------------------------------------------------------------------------------------
+bool FileProcessingConfigMgr::getAutoSaveFPSOnRun()
+{
+	bool bAutoSave = false;
+	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE))
+	{
+		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE, "0");
+	}
+	else
+	{
+		string strVal = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE);
+		if (!strVal.empty())
+		{
+			bAutoSave = (strVal == "1");
+		}
+	}
+
+	return bAutoSave;
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingConfigMgr::setAutoSaveFPSOnRun(bool bAutoSave)
+{
+	m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE, bAutoSave ? "1" : "0");
 }
 
 //-------------------------------------------------------------------------------------------------

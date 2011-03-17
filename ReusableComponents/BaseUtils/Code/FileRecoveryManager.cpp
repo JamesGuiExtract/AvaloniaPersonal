@@ -9,11 +9,11 @@
 #include <io.h>
 
 //-------------------------------------------------------------------------------------------------
-FileRecoveryManager::FileRecoveryManager(HMODULE hEXEModule,
-										 const string& strSuffix, 
-										 const string& strPrefix)
-:m_strRecoveryFileSuffix(strSuffix), m_strRecoveryFilePrefix(strPrefix),
-m_hEXEModule(hEXEModule), m_strRecoveryFileName("")
+FileRecoveryManager::FileRecoveryManager(const string& strSuffix, 
+										 const string& strPrefix) :
+	m_strRecoveryFileSuffix(strSuffix),
+	m_strRecoveryFilePrefix(strPrefix),
+	m_strRecoveryFileName("")
 {
 	// Get the user app data folder
 	getSpecialFolderPath(CSIDL_LOCAL_APPDATA, m_strRecoveryFileFolder);

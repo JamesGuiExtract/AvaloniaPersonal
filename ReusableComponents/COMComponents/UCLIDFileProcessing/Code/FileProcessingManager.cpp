@@ -124,8 +124,8 @@ STDMETHODIMP CFileProcessingManager::ShowUI(VARIANT_BOOL bRunOnInit, VARIANT_BOO
 		// Release the memory for Roles
 		// This will allow FileProcessingManager to get destroyed since these
 		// contain smart pointer to the FileProcessingManager
-		m_ipFPMgmtRole = NULL;
-		m_ipFSMgmtRole = NULL;
+		m_ipFPMgmtRole = __nullptr;
+		m_ipFSMgmtRole = __nullptr;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08846")
 

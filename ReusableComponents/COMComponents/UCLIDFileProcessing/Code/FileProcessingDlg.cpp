@@ -229,7 +229,7 @@ BOOL FileProcessingDlg::OnInitDialog()
 			if ( !m_bRunningAsService)
 			{
 				// User also needs write permission in the file recovery folder (P13 #4327)
-				if (m_pFRM != NULL && m_pFRM->isRecoveryFolderWritable())
+				if (m_pFRM != __nullptr && m_pFRM->isRecoveryFolderWritable())
 				{
 					SetTimer(giAUTO_SAVE_TIMERID, giAUTO_SAVE_FREQUENCY, NULL);
 				}
@@ -303,7 +303,7 @@ BOOL FileProcessingDlg::OnInitDialog()
 			DragAcceptFiles();
 
 			// We will initialize the UI with settings from the attached manager
-			if (m_pFileProcMgr != NULL)
+			if (m_pFileProcMgr != __nullptr)
 			{
 				loadSettingsFromManager();
 			}
@@ -362,20 +362,33 @@ void FileProcessingDlg::OnBtnRun()
 
 		UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPM = getFPM();
 
-		// sometimes, the processing may cause the program the crash.  This
-		// can happen if one or more of the components are poorly written.
-		// The user may not have saved the FAM...save the FAM settings in
-		// a temporary file so that it can be recovered in case of a crash
-		// NOTE: we are passing VARIANT_FALSE as the second argument
-		// here because we don't want the internal dirty flag to be
-		// effected by this SaveTo() call.
-	
-		if ( m_pFRM != NULL)
+		// If auto-saving FPS file is enabled, save the FPS file
+		if (m_dlgOptions.getAutoSaveFPSFile())
 		{
-			ipFPM->SaveTo(get_bstr_t(m_pFRM->getRecoveryFileName().c_str()),
-				VARIANT_FALSE);
+			if (!saveFile(m_strCurrFPSFilename))
+			{
+				// Do not run if the save failed/was cancelled
+				return;
+			}
 		}
-		
+		else if (m_pFRM != __nullptr)
+		{
+			// sometimes, the processing may cause the program the crash.  This
+			// can happen if one or more of the components are poorly written.
+			// The user may not have saved the FAM...save the FAM settings in
+			// a temporary file so that it can be recovered in case of a crash
+			// NOTE: we are passing VARIANT_FALSE as the second argument
+			// here because we don't want the internal dirty flag to be
+			// effected by this SaveTo() call.
+			IPersistStreamPtr ipPersist = ipFPM;
+			if (ipPersist->IsDirty() == S_OK)
+			{
+				// Only perform the frm save if the file is dirty
+				ipFPM->SaveTo(m_pFRM->getRecoveryFileName().c_str(), 
+					VARIANT_FALSE);
+			}
+		}
+	
 		// Prompt for a password if one is needed. If one was needed but not supplied, processing
 		// is not allowed.
 		if (!asCppBool(ipFPM->AuthenticateForProcessing()))
@@ -843,10 +856,16 @@ void FileProcessingDlg::OnTimer(UINT nIDEvent)
 			{
 				// Only do auto-save if processing / supplying / statistics has 
 				// not started (P13 #4168)
-				if ( m_pFRM != NULL )
+				if ( m_pFRM != __nullptr)
 				{
-					m_pFileProcMgr->SaveTo(get_bstr_t(m_pFRM->getRecoveryFileName().c_str()), 
-						VARIANT_FALSE);
+					// Only save if the current file is dirty [LRCAU #6012]
+					UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPM = getFPM();
+					IPersistStreamPtr ipPersist = ipFPM;
+					if (ipPersist->IsDirty() == S_OK)
+					{
+						ipFPM->SaveTo(m_pFRM->getRecoveryFileName().c_str(), 
+							VARIANT_FALSE);
+					}
 				}
 			}
 			break;
@@ -1211,7 +1230,7 @@ void FileProcessingDlg::OnFileNew()
 		setCurrFPSFile( "" );
 
 		// Delete recovery file - user has started a new file
-		if ( m_pFRM != NULL )
+		if ( m_pFRM != __nullptr )
 		{
 			m_pFRM->deleteRecoveryFile();
 		}
@@ -2181,6 +2200,12 @@ void FileProcessingDlg::openFile(string strFileName)
 		updateMenuAndToolbar();
 		updateUI();
 
+		// Delete recovery file - user has opened a new file
+		if ( m_pFRM != __nullptr )
+		{
+			m_pFRM->deleteRecoveryFile();
+		}
+
 		// add the file to MRU list
 		addFileToMRUList(strFileName);
 	}
@@ -2229,7 +2254,14 @@ bool FileProcessingDlg::saveFile(std::string strFileName)
 	{
 		return false;
 	}
+
 	getFPM()->SaveTo(get_bstr_t(strFileName), VARIANT_TRUE);
+
+	// Delete recovery file - user has saved the file
+	if ( m_pFRM != __nullptr )
+	{
+		m_pFRM->deleteRecoveryFile();
+	}
 
 	// If the file name changed, update MRU list
 	if (!stringCSIS::sEqual(strFileName, m_strCurrFPSFilename))
@@ -2328,6 +2360,11 @@ void FileProcessingDlg::loadSettingsFromManager()
 	// Get the .FPS filename and set it to the current FPS file
 	string strFPSFile = asString( getFPM()->FPSFileName );
 	setCurrFPSFile(strFPSFile);
+	if (!strFPSFile.empty())
+	{
+		// [LRCAU #6008] - Files opened on command line should be added the MRU list
+		addFileToMRUList(strFPSFile);
+	}
 
 	// set the database file for the datatabase page
 	if (isPageDisplayed(kDatabasePage))
@@ -2357,16 +2394,8 @@ void FileProcessingDlg::loadSettingsFromManager()
 //-------------------------------------------------------------------------------------------------
 bool FileProcessingDlg::flushSettingsToManager()
 {
-	// Update restriction of number of records to display
-	if (m_dlgOptions.getRestrictDisplayRecords())
-	{
 		getFPM()->RestrictNumStoredRecords = VARIANT_TRUE;
 		getFPM()->MaxStoredRecords = m_dlgOptions.getMaxDisplayRecords();
-	}
-	else
-	{
-		getFPM()->RestrictNumStoredRecords = VARIANT_FALSE;
-	}
 
 	return true;
 }

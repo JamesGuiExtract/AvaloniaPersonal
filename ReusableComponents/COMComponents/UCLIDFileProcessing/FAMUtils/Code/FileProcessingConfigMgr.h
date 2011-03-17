@@ -93,6 +93,9 @@ public:
 	// Gets the UsePreNormalized setting from the registry;
 	bool getUsePreNormalized();
 
+	bool getAutoSaveFPSOnRun();
+	void setAutoSaveFPSOnRun(bool bAutoSave);
+
 private:
 	static const string WINDOW_POS_X;
 	static const string WINDOW_POS_Y;
@@ -117,6 +120,7 @@ private:
 	static const string FileProcessingConfigMgr::LAST_GOOD_SERVER;
 	static const string FileProcessingConfigMgr::LAST_GOOD_DATABASE;
 	static const string USE_PRE_NORMALIZED;
+	static const string AUTO_SAVE_FPS_FILE;
 
 	// Dialog size bounds
 	static const int DLG_MIN_WIDTH;

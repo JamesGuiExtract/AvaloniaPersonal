@@ -156,7 +156,7 @@ CImageCleanupSettingsEditorDlg::CImageCleanupSettingsEditorDlg(CWnd* pParent /*=
 	m_strCurrentFileName(rstrFileToOpen),
 	m_strBinFolder(""),
 	m_strLastFileOpened(""),
-	m_FRM(GetModuleHandle(NULL), ".tmp"),
+	m_FRM(".tmp"),
 	m_strImageViewerExePath(""),
 	m_bDirty(false),
 	m_pMRUFilesMenu(NULL)

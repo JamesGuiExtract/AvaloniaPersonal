@@ -20,39 +20,31 @@ public:
 
 	void setConfigManager(FileProcessingConfigMgr* pConfigManager);
 
-	bool getRestrictDisplayRecords();
-	void setRestrictDisplayRecords(bool bRestrictDisplayRecords);
+	enum { IDD = IDD_DLG_OPTIONS };
 
 	long getMaxDisplayRecords();
-	void setMaxDisplayRecords(long nMaxDisplayRecords);
-
-// Dialog Data
-	//{{AFX_DATA(FileProcessingOptionsDlg)
-	enum { IDD = IDD_DLG_OPTIONS };
-	CEdit	m_editMaxDisplayRecords;
-	//}}AFX_DATA
-
+	bool getAutoSaveFPSFile();
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(FileProcessingOptionsDlg)
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
 
-	// Generated message map functions
-	//{{AFX_MSG(FileProcessingOptionsDlg)
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
-	//}}AFX_MSG
+	afx_msg void OnEnChangeEditMaxDisplay();
 	DECLARE_MESSAGE_MAP()
 
 private:
 	FileProcessingConfigMgr* m_pConfigManager;
-};
+	CEdit	m_editMaxDisplayRecords;
+	CSpinButtonCtrl m_SpinMaxRecords;
+	BOOL m_bAutoSave;
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+	void setMaxDisplayRecords(long nMaxDisplayRecords);
+	void setAutoSaveFPSFile();
+
+	long getMaxNumberOfRecordsFromDialog();
+};

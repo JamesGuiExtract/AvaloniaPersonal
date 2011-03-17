@@ -18,7 +18,7 @@ public:
 	//			such as ".txt", ".rsd", etc
 	//			hEXEModule should be the module handle for the EXE
 	//			using this class
-	FileRecoveryManager(HMODULE hEXEModule, const string& strSuffix, 
+	FileRecoveryManager(const string& strSuffix, 
 		const string& strPrefix = "");
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return true if a file exists that needs to be recovered.
@@ -47,7 +47,6 @@ private:
 	string m_strRecoveryFilePrefix;
 	string m_strRecoveryFileSuffix;
 	string m_strRecoveryFileName;
-	HMODULE m_hEXEModule;
 
 	bool isCurrentlyExecutingSimilarProcess(DWORD dwProcessID);
 };

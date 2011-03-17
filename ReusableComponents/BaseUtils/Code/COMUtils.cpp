@@ -685,11 +685,6 @@ HRESULT EXPORT_BaseUtils waitForStgFileCreate(BSTR strFileName, IStorage** ppSto
 void EXPORT_BaseUtils readObjectFromFile(IPersistStreamPtr ipObject, BSTR bstrFileName, 
 										 BSTR bstrObjectName, bool bEncrypted, string strSignature)
 {
-	// [LRCAU #5987] - Validate file existence so exception is clearer when attempting to
-	// open the file storage object fails.
-	string strFileName = asString(bstrFileName);
-	validateFileOrFolderExistence(strFileName, "ELI31841");
-
 	// Read the file storage
 	IStoragePtr ipStorage;
 	readStorageFromFile(&ipStorage, bstrFileName, bEncrypted);
@@ -707,7 +702,7 @@ void EXPORT_BaseUtils readObjectFromFile(IPersistStreamPtr ipObject, BSTR bstrFi
 		if (strSignatureFromFile != strSignature.c_str())
 		{
 			UCLIDException ue("ELI25405", "Invalid signature.");
-			ue.addDebugInfo("File name", strFileName);
+			ue.addDebugInfo("File name", asString(bstrFileName));
 			ue.addDebugInfo("Stream name", asString(bstrObjectName));
 			ue.addDebugInfo("Expected signature", strSignature, bEncrypted);
 			ue.addDebugInfo("Actual signature", strSignatureFromFile, bEncrypted);
@@ -730,6 +725,8 @@ void EXPORT_BaseUtils readObjectFromFile(IPersistStreamPtr ipObject, BSTR bstrFi
 //-------------------------------------------------------------------------------------------------
 void readStorageFromFile(IStorage** ppStorage, BSTR bstrFileName, bool bEncrypted)
 {
+	// [LRCAU #5987] Validate file existence
+	validateFileOrFolderExistence(asString(bstrFileName), "ELI31841");
 	if (bEncrypted)
 	{
 		readStorageFromEncryptedFile(ppStorage, bstrFileName);

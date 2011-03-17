@@ -1633,8 +1633,9 @@ void FileProcessingDlgTaskPage::updateUI()
 void FileProcessingDlgTaskPage::replaceFileProcessorAt(int iIndex, IObjectWithDescriptionPtr ipNewFP)
 {
 	// Update the file processors data
-	getFileProcessorsData()->Remove( iIndex );
-	getFileProcessorsData()->Insert(iIndex, ipNewFP );
+	auto ipFPD = getFileProcessorsData();
+	ipFPD->Remove( iIndex );
+	ipFPD->Insert(iIndex, ipNewFP );
 
 	// Update the file processor listbox
 	m_fileProcessorList.DeleteRow(iIndex);

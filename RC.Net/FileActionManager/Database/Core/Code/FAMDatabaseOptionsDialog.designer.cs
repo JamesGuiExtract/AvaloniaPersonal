@@ -45,6 +45,7 @@
             this._checkAutoCreateActions = new System.Windows.Forms.CheckBox();
             this._checkAllowdynamicTagCreation = new System.Windows.Forms.CheckBox();
             this._tabHistory = new System.Windows.Forms.TabPage();
+            this._checkStoreDocTagHistory = new System.Windows.Forms.CheckBox();
             this._upDownInputEventHistory = new Extract.Utilities.Forms.BetterNumericUpDown();
             this._checkStoreInputEventTracking = new System.Windows.Forms.CheckBox();
             this._checkStoreQueueEventHistory = new System.Windows.Forms.CheckBox();
@@ -68,7 +69,6 @@
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
-            this._checkStoreDocTagHistory = new System.Windows.Forms.CheckBox();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -185,7 +185,6 @@
             this._upDownRevertMinutes.Name = "_upDownRevertMinutes";
             this._upDownRevertMinutes.Size = new System.Drawing.Size(49, 20);
             this._upDownRevertMinutes.TabIndex = 4;
-            this._upDownRevertMinutes.ThousandsSeparator = true;
             this._upDownRevertMinutes.Value = new decimal(new int[] {
             1440,
             0,
@@ -297,6 +296,16 @@
             this._tabHistory.Text = "History";
             this._tabHistory.ToolTipText = "FAM history settings";
             this._tabHistory.UseVisualStyleBackColor = true;
+            // 
+            // _checkStoreDocTagHistory
+            // 
+            this._checkStoreDocTagHistory.AutoSize = true;
+            this._checkStoreDocTagHistory.Location = new System.Drawing.Point(6, 75);
+            this._checkStoreDocTagHistory.Name = "_checkStoreDocTagHistory";
+            this._checkStoreDocTagHistory.Size = new System.Drawing.Size(152, 17);
+            this._checkStoreDocTagHistory.TabIndex = 21;
+            this._checkStoreDocTagHistory.Text = "Store document tag history";
+            this._checkStoreDocTagHistory.UseVisualStyleBackColor = true;
             // 
             // _upDownInputEventHistory
             // 
@@ -562,16 +571,6 @@
             this._buttonRefresh.UseVisualStyleBackColor = true;
             this._buttonRefresh.Click += new System.EventHandler(this.HandleRefreshDialog);
             // 
-            // _checkStoreDocTagHistory
-            // 
-            this._checkStoreDocTagHistory.AutoSize = true;
-            this._checkStoreDocTagHistory.Location = new System.Drawing.Point(6, 75);
-            this._checkStoreDocTagHistory.Name = "_checkStoreDocTagHistory";
-            this._checkStoreDocTagHistory.Size = new System.Drawing.Size(152, 17);
-            this._checkStoreDocTagHistory.TabIndex = 21;
-            this._checkStoreDocTagHistory.Text = "Store document tag history";
-            this._checkStoreDocTagHistory.UseVisualStyleBackColor = true;
-            // 
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -586,6 +585,7 @@
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(497, 354);
             this.Name = "FAMDatabaseOptionsDialog";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Database Options";
             this._tabControlSettings.ResumeLayout(false);
