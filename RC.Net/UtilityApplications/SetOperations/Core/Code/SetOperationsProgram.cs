@@ -8,6 +8,8 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Extract.SetOperations
@@ -47,10 +49,7 @@ namespace Extract.SetOperations
         /// </summary>
         const string _TABLE_B = "Table_B";
 
-        /// <summary>
-        /// Constant for the result table name in the temporary database.
-        /// </summary>
-        const string _TABLE_R = "Table_Result";
+        static ManualResetEvent _applicationDone = new ManualResetEvent(false);
 
         /// <summary>
         /// The main entry point for the application.
@@ -60,6 +59,7 @@ namespace Extract.SetOperations
         {
             string exceptionLogFile = null;
             TemporaryFile tempDb = null;
+            Task task = null;
             try
             {
                 // Validate argument count
@@ -132,11 +132,42 @@ namespace Extract.SetOperations
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI31625",
                     "SetOperations.exe");
 
-                // Load input files into temporary database
-                tempDb = LoadTemporaryDb(fileA, fileB, ignoreCase, ignoreDuplicates);
+                tempDb = new TemporaryFile(".sdf");
+                using (var canceler = new CancellationTokenSource())
+                {
+                    // Handle the cancel key event
+                    Console.CancelKeyPress += delegate(object o, ConsoleCancelEventArgs e)
+                    {
+                        Console.WriteLine("Cancelling - please wait...");
+                        canceler.Cancel();
 
-                // Perform the specified operation and write out result file
-                PerformOperation(tempDb, operation, outputFile);
+                        // Wait for the application to complete
+                        _applicationDone.WaitOne();
+                    };
+
+                    var token = canceler.Token;
+                    task = Task.Factory.StartNew(() =>
+                        {
+                            // Load input files into temporary database
+                            LoadTemporaryDb(tempDb, fileA, fileB, ignoreCase,
+                                ignoreDuplicates, token);
+
+                            // Perform the specified operation and write out result file
+                            PerformOperation(tempDb, operation, outputFile, token);
+                        }, token);
+
+                    try
+                    {
+                        task.Wait();
+                    }
+                    catch (AggregateException ae)
+                    {
+                        if(task.Status != TaskStatus.Canceled)
+                        {
+                            throw ae.Flatten();
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -155,28 +186,31 @@ namespace Extract.SetOperations
                 {
                     tempDb.Dispose();
                 }
+                if (task != null)
+                {
+                    task.Dispose();
+                    task = null;
+                }
+
+                _applicationDone.Set();
             }
         }
 
         /// <summary>
         /// Loads the temporary db.
         /// </summary>
+        /// <param name="tempFile">The temporary file to write to.</param>
         /// <param name="fileA">The file A.</param>
         /// <param name="fileB">The file B.</param>
         /// <param name="ignoreCase">if set to <see langword="true"/> [ignore case].</param>
         /// <param name="ignoreDuplicates">if set to <see langword="true"/> [ignore duplicates].</param>
-        /// <returns></returns>
-        static TemporaryFile LoadTemporaryDb(string fileA, string fileB,
-            bool ignoreCase, bool ignoreDuplicates)
+        /// <param name="token">Token to indicate if the operation has been cancelled</param>
+        static void LoadTemporaryDb(TemporaryFile tempFile, string fileA, string fileB,
+            bool ignoreCase, bool ignoreDuplicates, CancellationToken token)
         {
-            TemporaryFile tempFile = null;
-            try
-            {
                 const string valueParameter = "@valueParameter";
 
-                tempFile = new TemporaryFile(".sdf");
-                var connectionString = SqlCompactMethods.BuildDBConnectionString(
-                    tempFile.FileName);
+                var connectionString = GetConnectionString(tempFile);
                 using (var engine = new SqlCeEngine(connectionString))
                 {
                     // Since the temp file generation creates a file, it must
@@ -185,7 +219,7 @@ namespace Extract.SetOperations
                     engine.CreateDatabase();
                     if (!ignoreCase)
                     {
-                        engine.Compact("DataSource=; Case Sensitive=True;");
+                        engine.Compact("Data Source=; Case Sensitive=True;");
                     }
                 }
 
@@ -201,7 +235,8 @@ namespace Extract.SetOperations
                     var tables = new Dictionary<string, string>();
                     tables[_TABLE_A] = fileA;
                     tables[_TABLE_B] = fileB;
-                    tables[_TABLE_R] = string.Empty;
+
+                    token.ThrowIfCancellationRequested();
 
                     // For each table in the collection:
                     // 1. Create it
@@ -225,8 +260,10 @@ namespace Extract.SetOperations
                         {
                             try
                             {
+                                token.ThrowIfCancellationRequested();
                                 command.ExecuteNonQuery();
                                 command.CommandText = index;
+                                token.ThrowIfCancellationRequested();
                                 command.ExecuteNonQuery();
                                 command.CommandText = insert;
                                 if (string.IsNullOrWhiteSpace(fileName))
@@ -237,6 +274,7 @@ namespace Extract.SetOperations
                                 command.Parameters.Add(valueParameter, "").DbType = DbType.String;
                                 foreach (var line in File.ReadLines(fileName))
                                 {
+                                    token.ThrowIfCancellationRequested();
                                     // Ignore blank lines
                                     if (!string.IsNullOrWhiteSpace(line))
                                     {
@@ -249,6 +287,10 @@ namespace Extract.SetOperations
                                         }
                                     }
                                 }
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                throw;
                             }
                             catch (Exception ex)
                             {
@@ -283,18 +325,6 @@ namespace Extract.SetOperations
                     // Close the connection
                     connection.Close();
                 }
-
-                return tempFile;
-            }
-            catch
-            {
-                if (tempFile != null)
-                {
-                    tempFile.Dispose();
-                }
-
-                throw;
-            }
         }
 
         /// <summary>
@@ -303,31 +333,30 @@ namespace Extract.SetOperations
         /// <param name="tempDb">The temp db.</param>
         /// <param name="operation">The operation.</param>
         /// <param name="outputFile">The output file.</param>
+        /// <param name="token">Token to indicate if the operation has been cancelled</param>
         static void PerformOperation(TemporaryFile tempDb,
-            SetOperation operation, string outputFile)
+            SetOperation operation, string outputFile, CancellationToken token)
         {
-            using (var connection = new SqlCeConnection(
-                SqlCompactMethods.BuildDBConnectionString(tempDb.FileName)))
+            using (var connection = new SqlCeConnection(GetConnectionString(tempDb)))
             {
                 if (connection.State == ConnectionState.Closed)
                 {
                     connection.Open();
                 }
 
+                token.ThrowIfCancellationRequested();
+
                 // Get the set operation query to execute
                 var query = BuildSetOperationQuery(operation);
-                using (var command = new SqlCeCommand(query, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
 
                 // Output the updated list
                 using (var output = new StreamWriter(outputFile))
-                using (var command = new SqlCeCommand("SELECT [DataValue] FROM " + _TABLE_R, connection))
+                using (var command = new SqlCeCommand(query, connection))
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
+                        token.ThrowIfCancellationRequested();
                         output.WriteLine(reader.GetString(0));
                     }
 
@@ -343,12 +372,10 @@ namespace Extract.SetOperations
         /// Builds the set operation query.
         /// </summary>
         /// <param name="operation">The operation.</param>
-        /// <returns></returns>
+        /// <returns>The select query for the specified operation.</returns>
         private static string BuildSetOperationQuery(SetOperation operation)
         {
-            var query = new StringBuilder("INSERT INTO ", 1024);
-            query.Append(_TABLE_R);
-            query.Append(" ([DataValue]) ( ");
+            var query = new StringBuilder(1024);
             switch (operation)
             {
                 case SetOperation.Union:
@@ -389,9 +416,19 @@ namespace Extract.SetOperations
                     ExtractException.ThrowLogicException("ELI31629");
                     break;
             }
-            query.Append(" )");
 
             return query.ToString();
+        }
+
+        /// <summary>
+        /// Gets the connection string.
+        /// </summary>
+        /// <param name="tempFile">The temp file.</param>
+        /// <returns>The connection string</returns>
+        static string GetConnectionString(TemporaryFile tempFile)
+        {
+            return SqlCompactMethods.BuildDBConnectionString(
+                        tempFile.FileName, false, SqlCompactMethods.MaxCompactDatabaseSize);
         }
 
         /// <summary>
