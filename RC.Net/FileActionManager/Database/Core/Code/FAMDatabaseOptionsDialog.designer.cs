@@ -45,12 +45,13 @@
             this._checkAutoCreateActions = new System.Windows.Forms.CheckBox();
             this._checkAllowdynamicTagCreation = new System.Windows.Forms.CheckBox();
             this._tabHistory = new System.Windows.Forms.TabPage();
+            this._checkStoreDBSettingsChangeHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreDocTagHistory = new System.Windows.Forms.CheckBox();
             this._upDownInputEventHistory = new Extract.Utilities.Forms.BetterNumericUpDown();
             this._checkStoreInputEventTracking = new System.Windows.Forms.CheckBox();
             this._checkStoreQueueEventHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreFASTHistory = new System.Windows.Forms.CheckBox();
-            this._storeFAMSessionHistory = new System.Windows.Forms.CheckBox();
+            this._checkStoreFAMSessionHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreSourceDocChangeHistory = new System.Windows.Forms.CheckBox();
             this._tabSecurity = new System.Windows.Forms.TabPage();
             this._buttonRemoveMachine = new System.Windows.Forms.Button();
@@ -280,13 +281,14 @@
             // 
             // _tabHistory
             // 
+            this._tabHistory.Controls.Add(this._checkStoreDBSettingsChangeHistory);
             this._tabHistory.Controls.Add(this._checkStoreDocTagHistory);
             this._tabHistory.Controls.Add(this._upDownInputEventHistory);
             this._tabHistory.Controls.Add(label1);
             this._tabHistory.Controls.Add(this._checkStoreInputEventTracking);
             this._tabHistory.Controls.Add(this._checkStoreQueueEventHistory);
             this._tabHistory.Controls.Add(this._checkStoreFASTHistory);
-            this._tabHistory.Controls.Add(this._storeFAMSessionHistory);
+            this._tabHistory.Controls.Add(this._checkStoreFAMSessionHistory);
             this._tabHistory.Controls.Add(this._checkStoreSourceDocChangeHistory);
             this._tabHistory.Location = new System.Drawing.Point(4, 22);
             this._tabHistory.Name = "_tabHistory";
@@ -297,13 +299,23 @@
             this._tabHistory.ToolTipText = "FAM history settings";
             this._tabHistory.UseVisualStyleBackColor = true;
             // 
+            // _checkStoreDBSettingsChangeHistory
+            // 
+            this._checkStoreDBSettingsChangeHistory.AutoSize = true;
+            this._checkStoreDBSettingsChangeHistory.Location = new System.Drawing.Point(6, 144);
+            this._checkStoreDBSettingsChangeHistory.Name = "_checkStoreDBSettingsChangeHistory";
+            this._checkStoreDBSettingsChangeHistory.Size = new System.Drawing.Size(209, 17);
+            this._checkStoreDBSettingsChangeHistory.TabIndex = 7;
+            this._checkStoreDBSettingsChangeHistory.Text = "Store database settings change history";
+            this._checkStoreDBSettingsChangeHistory.UseVisualStyleBackColor = true;
+            // 
             // _checkStoreDocTagHistory
             // 
             this._checkStoreDocTagHistory.AutoSize = true;
             this._checkStoreDocTagHistory.Location = new System.Drawing.Point(6, 75);
             this._checkStoreDocTagHistory.Name = "_checkStoreDocTagHistory";
             this._checkStoreDocTagHistory.Size = new System.Drawing.Size(152, 17);
-            this._checkStoreDocTagHistory.TabIndex = 21;
+            this._checkStoreDocTagHistory.TabIndex = 3;
             this._checkStoreDocTagHistory.Text = "Store document tag history";
             this._checkStoreDocTagHistory.UseVisualStyleBackColor = true;
             // 
@@ -322,7 +334,7 @@
             0});
             this._upDownInputEventHistory.Name = "_upDownInputEventHistory";
             this._upDownInputEventHistory.Size = new System.Drawing.Size(40, 20);
-            this._upDownInputEventHistory.TabIndex = 5;
+            this._upDownInputEventHistory.TabIndex = 6;
             this._upDownInputEventHistory.Value = new decimal(new int[] {
             1,
             0,
@@ -336,7 +348,7 @@
             this._checkStoreInputEventTracking.Location = new System.Drawing.Point(6, 121);
             this._checkStoreInputEventTracking.Name = "_checkStoreInputEventTracking";
             this._checkStoreInputEventTracking.Size = new System.Drawing.Size(196, 17);
-            this._checkStoreInputEventTracking.TabIndex = 4;
+            this._checkStoreInputEventTracking.TabIndex = 5;
             this._checkStoreInputEventTracking.Text = "Store input event tracking history for";
             this._checkStoreInputEventTracking.UseVisualStyleBackColor = true;
             this._checkStoreInputEventTracking.CheckedChanged += new System.EventHandler(this.HandleInputEventHistoryCheckChangedEvent);
@@ -361,15 +373,15 @@
             this._checkStoreFASTHistory.Text = "Store file action state transition history";
             this._checkStoreFASTHistory.UseVisualStyleBackColor = true;
             // 
-            // _storeFAMSessionHistory
+            // _checkStoreFAMSessionHistory
             // 
-            this._storeFAMSessionHistory.AutoSize = true;
-            this._storeFAMSessionHistory.Location = new System.Drawing.Point(6, 98);
-            this._storeFAMSessionHistory.Name = "_storeFAMSessionHistory";
-            this._storeFAMSessionHistory.Size = new System.Drawing.Size(250, 17);
-            this._storeFAMSessionHistory.TabIndex = 3;
-            this._storeFAMSessionHistory.Text = "Store File Action Manager (FAM) session history";
-            this._storeFAMSessionHistory.UseVisualStyleBackColor = true;
+            this._checkStoreFAMSessionHistory.AutoSize = true;
+            this._checkStoreFAMSessionHistory.Location = new System.Drawing.Point(6, 98);
+            this._checkStoreFAMSessionHistory.Name = "_checkStoreFAMSessionHistory";
+            this._checkStoreFAMSessionHistory.Size = new System.Drawing.Size(250, 17);
+            this._checkStoreFAMSessionHistory.TabIndex = 4;
+            this._checkStoreFAMSessionHistory.Text = "Store File Action Manager (FAM) session history";
+            this._checkStoreFAMSessionHistory.UseVisualStyleBackColor = true;
             // 
             // _checkStoreSourceDocChangeHistory
             // 
@@ -626,7 +638,7 @@
         private System.Windows.Forms.CheckBox _checkStoreInputEventTracking;
         private System.Windows.Forms.CheckBox _checkStoreQueueEventHistory;
         private System.Windows.Forms.CheckBox _checkStoreFASTHistory;
-        private System.Windows.Forms.CheckBox _storeFAMSessionHistory;
+        private System.Windows.Forms.CheckBox _checkStoreFAMSessionHistory;
         private System.Windows.Forms.CheckBox _checkStoreSourceDocChangeHistory;
         private System.Windows.Forms.Button _buttonRemoveEmail;
         private System.Windows.Forms.Button _buttonModifyEmail;
@@ -645,6 +657,7 @@
         private Utilities.Forms.BetterNumericUpDown _upDownRevertMinutes;
         private Utilities.Forms.BetterNumericUpDown _upDownInputEventHistory;
         private System.Windows.Forms.CheckBox _checkStoreDocTagHistory;
+        private System.Windows.Forms.CheckBox _checkStoreDBSettingsChangeHistory;
     }
 }
 

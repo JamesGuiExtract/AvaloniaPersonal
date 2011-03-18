@@ -468,6 +468,12 @@ void CFAMDBAdminDlg::OnDatabaseSetOptions()
 		ASSERT_RESOURCE_ALLOCATION("ELI31930", ipSettings != __nullptr);
 		if (ipSettings->PromptForSettings(m_ipFAMDB) == VARIANT_TRUE)
 		{
+			UCLIDException uex("ELI32165", "Application trace: Database settings changed");
+			uex.addDebugInfo("User Name", getCurrentUserName());
+			uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
+			uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
+			uex.log();
+
 			// Reset the connection to update the cached settings in the FAMDB pointer
 			m_ipFAMDB->ResetDBConnection();
 

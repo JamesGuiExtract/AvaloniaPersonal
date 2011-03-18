@@ -6,6 +6,10 @@
 
 using namespace std;
 
+// User ID and Machine ID query constants
+static const string gstrUSER_ID_VAR = "<UserID>";
+static const string gstrMACHINE_ID_VAR = "<MachineID>";
+
 // Create Table SQL statements
 static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [Action] ([ID] [int] IDENTITY(1,1) NOT NULL "
 	"CONSTRAINT [PK_Action] PRIMARY KEY CLUSTERED, " 
@@ -17,7 +21,7 @@ static const string gstrCREATE_LOCK_TABLE =
 	"[LockTime] datetime NOT NULL CONSTRAINT [DF_LockTable_LockTime]  DEFAULT (GETDATE()))";
 
 static const string gstrCREATE_DB_INFO_TABLE = 
-	"CREATE TABLE [DBInfo]("
+	"CREATE TABLE [DBInfo]([ID] int IDENTITY(1,1) NOT NULL, "
 	"[Name] [nvarchar](50) NOT NULL PRIMARY KEY CLUSTERED, "
 	"[Value] [nvarchar](max))";
 
@@ -219,7 +223,20 @@ static const string gstrCREATE_DOC_TAG_HISTORY_TABLE =
 	"[FAMUserID] int NOT NULL, "
 	"[MachineID] int NOT NULL) ";
 
+static const string gstrCREATE_DB_INFO_CHANGE_HISTORY_TABLE =
+	"CREATE TABLE [DBInfoChangeHistory]( "
+	"[ID] INT IDENTITY(1,1) NOT NULL CONSTRAINT [PK_DBInfoHistory] PRIMARY KEY CLUSTERED, "
+	"[FAMUserID] INT NOT NULL, "
+	"[MachineID] INT NOT NULL, "
+	"[DBInfoID] INT NOT NULL, "
+	"[OldValue] NVARCHAR(MAX), "
+	"[NewValue] NVARCHAR(MAX), "
+	"[TimeStamp] DATETIME NOT NULL DEFAULT(GETDATE()))";
+
 // Create table indexes SQL
+static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
+	"ON [DBInfo]([ID])";
+
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "
 	"ON [FAMFile]([Priority] DESC, [ID] ASC)";
 
@@ -533,6 +550,27 @@ static const string gstrADD_DOC_TAG_HISTORY_MACHINE_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+static const string gstrADD_DB_INFO_HISTORY_MACHINE_FK =
+	"ALTER TABLE [dbo].[DBInfoChangeHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_DBInfoChangeHistory_Machine] FOREIGN KEY([MachineID]) "
+	"REFERENCES [dbo].[Machine]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_DB_INFO_HISTORY_FAMUSER_FK =
+	"ALTER TABLE [dbo].[DBInfoChangeHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_DBInfoChangeHistory_User] FOREIGN KEY([FAMUserID]) "
+	"REFERENCES [dbo].[FAMUser]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_DB_INFO_HISTORY_DB_INFO_FK =
+	"ALTER TABLE [dbo].[DBInfoChangeHistory] "
+	"WITH CHECK ADD CONSTRAINT [FK_DBInfoChageHistory_DBInfo] FOREIGN KEY([DBinfoID]) "
+	"REFERENCES [dbo].[DBInfo]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_QUERY = 
 	"SELECT LockID, UPI, LockTime, DATEDIFF(second, LockTime, GETDATE()) AS TimeLocked "
@@ -561,7 +599,25 @@ static const string gstrSETTING_VALUE = "<SettingValue>";
 
 // Query for updating the DB info settings
 static const string gstrDBINFO_UPDATE_SETTINGS_QUERY =
-	"UPDATE DBInfo SET [Value] = '" + gstrSETTING_VALUE + "' WHERE [Name] = '" + gstrSETTING_NAME + "'";
+	"UPDATE DBInfo SET [Value] = '" + gstrSETTING_VALUE + "' WHERE [Name] = '"
+	+ gstrSETTING_NAME + "' AND [Value] <> '" + gstrSETTING_VALUE + "'";
+
+// Query for updating the DB info settings and storing the change history
+static const string gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY =
+	"DECLARE @ChangeHistory TABLE (UserID INT, MachineID INT, DBInfoID INT, "
+	"OldValue NVARCHAR(MAX), NewValue NVARCHAR(MAX)); UPDATE [DBInfo] SET [Value] = '"
+	+ gstrSETTING_VALUE + "' OUTPUT " + gstrUSER_ID_VAR + ", "
+	+ gstrMACHINE_ID_VAR + ", INSERTED.[ID] AS DBInfoID, "
+	"DELETED.[Value] AS OldValue, INSERTED.[Value] AS NewValue INTO "
+	"@ChangeHistory (UserID, MachineID, DBInfoID, OldValue, NewValue) "
+	"WHERE [Name] = '" + gstrSETTING_NAME + "' AND [Value] <> '" + gstrSETTING_VALUE
+	+ "'; INSERT INTO [DBInfoChangeHistory] ([FAMUserID], [MachineID], [DBInfoID], "
+	"[OldValue], [NewValue]) SELECT * FROM @ChangeHistory;";
+
+// Query to set the last DB info changed time
+static const string gstrUPDATE_DB_INFO_LAST_CHANGE_TIME =
+	"UPDATE [DBInfo] SET [Value] = CONVERT(NVARCHAR(MAX), GETDATE(), 21) WHERE [Name] = '"
+	+ gstrLAST_DB_INFO_CHANGE + "'";
 
 // Query to delete old input event records from the InputEvent table
 static const string gstrDELETE_OLD_INPUT_EVENT_RECORDS =
@@ -741,8 +797,6 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 // Queries for tagging/untagging files and toggling tags
 static const string gstrTAG_FILE_ID_VAR = "<FileID>";
 static const string gstrTAG_ID_VAR = "<TagID>";
-static const string gstrUSER_ID_VAR = "<UserID>";
-static const string gstrMACHINE_ID_VAR = "<MachineID>";
 static const string gstrUPDATE_DOC_TAG_HISTORY_VAR = "<UpdateDocTagHistory>";
 
 // Updates the DocTagHistory table if gstrUPDATE_DOC_TAG_HISTORY_VAR is 1

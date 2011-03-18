@@ -31,6 +31,8 @@ static const string gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS = "ActionStatis
 static const string gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT = "GetFilesToProcessTransactionTimeout";
 static const string gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY = "StoreDocNameChangeHistory";
 static const string gstrSTORE_DOC_TAG_HISTORY = "StoreDocTagHistory";
+static const string gstrSTORE_DB_INFO_HISTORY = "StoreDBInfoChangeHistory";
+static const string gstrLAST_DB_INFO_CHANGE = "LastDBInfoChange";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

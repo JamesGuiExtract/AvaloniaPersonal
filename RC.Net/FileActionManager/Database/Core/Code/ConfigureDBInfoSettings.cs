@@ -45,7 +45,12 @@ namespace Extract.FileActionManager.Database
 
                 using (var dialog = new FAMDatabaseOptionsDialog(server, database))
                 {
-                    return dialog.ShowDialog() == DialogResult.OK;
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        return dialog.SettingsUpdated;
+                    }
+
+                    return false;
                 }
             }
             catch (Exception ex)

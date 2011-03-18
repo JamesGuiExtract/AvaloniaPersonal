@@ -1105,13 +1105,17 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrNewName);
 
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To get/put the list of DB info settings
-		// NOTE: The put method will not validate the setting name, if the setting
-		// name does not exist, it will just be ignored
+		// PURPOSE: To get the list of DB info settings
 		[propget, id(98), helpstring("property DBInfoSettings")] HRESULT DBInfoSettings(
 			[out, retval] IStrToStrMap** ppSettings);
-		[propput, id(98), helpstring("property DBInfoSettings")] HRESULT DBInfoSettings(
-			[in] IStrToStrMap* pSettings);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the DB info settings, returns a count of rows that were updated
+		// NOTE: The method will not validate the setting name, if the setting
+		// name does not exist, it will just be ignored. Also, the count that is returned
+		// does not include the update of the LastDBInfoChange time stamp. The time stamp
+		// is only set if at least 1 item in the list of settings is updated.
+		[id(99), helpstring("method SetDBInfoSettings")] HRESULT SetDBInfoSettings(
+			[in] IStrToStrMap* pSettings, [out, retval] long* plNumUpdatedRows);
 	};
 
 	[

@@ -318,6 +318,47 @@ int UpdateToSchemaVersion104(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31987");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion105(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		const int nNewSchemaVersion = 105;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Add DocTagHistory table
+		vecQueries.push_back("ALTER TABLE [DBInfo] ADD ID INT IDENTITY(1,1) NOT NULL");
+		vecQueries.push_back(gstrCREATE_DB_INFO_ID_INDEX);
+		vecQueries.push_back(gstrCREATE_DB_INFO_CHANGE_HISTORY_TABLE);
+		vecQueries.push_back(gstrADD_DB_INFO_HISTORY_FAMUSER_FK);
+		vecQueries.push_back(gstrADD_DB_INFO_HISTORY_MACHINE_FK);
+		vecQueries.push_back(gstrADD_DB_INFO_HISTORY_DB_INFO_FK);
+		
+		// Add default value for StoreDBInfoHistory.
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrSTORE_DB_INFO_HISTORY + "', '1')");
+
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '105' WHERE [Name] = '" + 
+			gstrFAMDB_SCHEMA_VERSION + "'");
+
+		// Add default value for last DB info change
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrLAST_DB_INFO_CHANGE + "', '" + getSQLServerDateTime(ipConnection) + "')");
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32167");
+}
 
 
 //-------------------------------------------------------------------------------------------------
@@ -2028,15 +2069,13 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName,
-	VARIANT_BOOL vbThrowIfMissing, BSTR* pbstrSettingValue)
+bool CFileProcessingDB::GetDBInfoSetting_Internal(bool bDBLocked, const string& strSettingName,
+	bool bThrowIfMissing, string& rstrSettingValue)
 {
 	try
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI18938", pbstrSettingValue != NULL);
-
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = NULL;
 
@@ -2049,11 +2088,8 @@ bool CFileProcessingDB::GetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 				validateDBSchemaVersion();
 
 				// Get the setting
-				string strSetting = getDBInfoSetting(ipConnection, asString(bstrSettingName),
-					asCppBool(vbThrowIfMissing));
-
-				// Set the return value
-				*pbstrSettingValue = _bstr_t(strSetting.c_str()).Detach();
+				rstrSettingValue = getDBInfoSetting(ipConnection, strSettingName,
+					bThrowIfMissing);
 
 			END_CONNECTION_RETRY(ipConnection, "ELI27327");
 		}
@@ -5121,7 +5157,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 101:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion102);
 				case 102:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion103);
 				case 103:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion104);
-				case 104:	break;
+				case 104:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion105);
+				case 105:	break;
 
 				default:
 					{
@@ -5380,8 +5417,8 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::put_DBInfoSettings_Internal(bool bDBLocked,
-	const vector<string>& vecQueries)
+bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateHistory,
+	vector<string> vecQueries, long& rnNumRowsUpdated)
 {
 	try
 	{
@@ -5401,7 +5438,29 @@ bool CFileProcessingDB::put_DBInfoSettings_Internal(bool bDBLocked,
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection);
 
-				executeVectorOfSQL(ipConnection, vecQueries);
+				if (bUpdateHistory)
+				{
+					// If updating history, need to get user and machine id
+					string strUserId = asString(getFAMUserID(ipConnection));
+					string strMachineId = asString(getMachineID(ipConnection));
+
+					// Update the queries with the user and machine id
+					for(vector<string>::iterator it = vecQueries.begin();
+						it != vecQueries.end(); it++)
+					{
+						replaceVariable(*it, gstrUSER_ID_VAR, strUserId, kReplaceAll);
+						replaceVariable(*it, gstrMACHINE_ID_VAR, strUserId, kReplaceAll);
+					}
+				}
+
+				// Execute query and get count of updated rows
+				rnNumRowsUpdated = executeVectorOfSQL(ipConnection, vecQueries);
+
+				// If at least 1 row was updated, update the last DB info changed value
+				if (rnNumRowsUpdated > 0)
+				{
+					executeCmdQuery(ipConnection, gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
+				}
 
 				tg.CommitTrans();
 
@@ -5420,3 +5479,4 @@ bool CFileProcessingDB::put_DBInfoSettings_Internal(bool bDBLocked,
 
 	return true;
 }
+//-------------------------------------------------------------------------------------------------

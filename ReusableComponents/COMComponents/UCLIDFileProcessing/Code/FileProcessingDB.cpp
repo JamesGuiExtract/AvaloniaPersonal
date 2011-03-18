@@ -1114,15 +1114,23 @@ STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, VARIANT_B
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+		ASSERT_ARGUMENT("ELI18938", pbstrSettingValue != __nullptr);
+
 		validateLicense();
 
-		if (!GetDBInfoSetting_Internal(false, bstrSettingName, vbThrowIfMissing, pbstrSettingValue))
+		bool bThrowIfMissing = asCppBool(vbThrowIfMissing);
+		string strSettingName = asString(bstrSettingName);
+		string strVal;
+		if (!GetDBInfoSetting_Internal(false, strSettingName, bThrowIfMissing, strVal))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
-			GetDBInfoSetting_Internal(true, bstrSettingName, vbThrowIfMissing, pbstrSettingValue);
+			GetDBInfoSetting_Internal(true, strSettingName, bThrowIfMissing, strVal);
 		}
+
+		*pbstrSettingValue = _bstr_t(strVal.c_str()).Detach();
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18937");
@@ -2340,7 +2348,7 @@ STDMETHODIMP CFileProcessingDB::get_DBInfoSettings(IStrToStrMap** ppSettings)
 
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::put_DBInfoSettings(IStrToStrMap* pSettings)
+STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long* pnNumRowsUpdated)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -2349,35 +2357,52 @@ STDMETHODIMP CFileProcessingDB::put_DBInfoSettings(IStrToStrMap* pSettings)
 		validateLicense();
 		IStrToStrMapPtr ipSettings(pSettings);
 		ASSERT_ARGUMENT("ELI31909", ipSettings != __nullptr);
+		ASSERT_ARGUMENT("ELI32173", pnNumRowsUpdated != __nullptr);
 
-			IIUnknownVectorPtr ipPairs = ipSettings->GetAllKeyValuePairs();
-			ASSERT_RESOURCE_ALLOCATION("ELI31910", ipPairs != __nullptr);
-
-			// Get the key value pairs from the StrToStrMap and create the update queries
-			int nSize = ipPairs->Size();
-			vector<string> vecQueries;
-			vecQueries.reserve(nSize);
-			for(int i=0; i < nSize; i++)
-			{
-				IStringPairPtr ipPair = ipPairs->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI31911", ipPair != __nullptr);
-
-				_bstr_t bstrKey;
-				_bstr_t bstrValue;
-				ipPair->GetKeyValuePair(bstrKey.GetAddress(), bstrValue.GetAddress());
-
-				string strQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
-				replaceVariable(strQuery, gstrSETTING_NAME, asString(bstrKey), kReplaceFirst);
-				replaceVariable(strQuery, gstrSETTING_VALUE, asString(bstrValue), kReplaceFirst);
-				vecQueries.push_back(strQuery);
-			}
-
-		if (!put_DBInfoSettings_Internal(false, vecQueries))
+		string strSettingVal;
+		if (!GetDBInfoSetting_Internal(false, gstrSTORE_DB_INFO_HISTORY, true, strSettingVal))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-			put_DBInfoSettings_Internal(true, vecQueries);
+			GetDBInfoSetting_Internal(true, gstrSTORE_DB_INFO_HISTORY, true, strSettingVal);
 		}
+
+		// Get the base update query
+		bool bUpdateHistory = strSettingVal == "1";
+		string strBaseQuery = bUpdateHistory ? gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY
+			: gstrDBINFO_UPDATE_SETTINGS_QUERY;
+
+		IIUnknownVectorPtr ipPairs = ipSettings->GetAllKeyValuePairs();
+		ASSERT_RESOURCE_ALLOCATION("ELI31910", ipPairs != __nullptr);
+
+		// Get the key value pairs from the StrToStrMap and create the update queries
+		int nSize = ipPairs->Size();
+		vector<string> vecQueries;
+		vecQueries.reserve(nSize);
+		for(int i=0; i < nSize; i++)
+		{
+			IStringPairPtr ipPair = ipPairs->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI31911", ipPair != __nullptr);
+
+			_bstr_t bstrKey;
+			_bstr_t bstrValue;
+			ipPair->GetKeyValuePair(bstrKey.GetAddress(), bstrValue.GetAddress());
+
+			string strQuery = strBaseQuery;
+			replaceVariable(strQuery, gstrSETTING_NAME, asString(bstrKey), kReplaceAll);
+			replaceVariable(strQuery, gstrSETTING_VALUE, asString(bstrValue), kReplaceAll);
+			vecQueries.push_back(strQuery);
+		}
+
+		long nNumRowsUpdated = 0;
+		if (!SetDBInfoSettings_Internal(false, bUpdateHistory, vecQueries, nNumRowsUpdated))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			SetDBInfoSettings_Internal(true, bUpdateHistory, vecQueries, nNumRowsUpdated);
+		}
+
+		*pnNumRowsUpdated = nNumRowsUpdated;
 
 		return S_OK;
 	}

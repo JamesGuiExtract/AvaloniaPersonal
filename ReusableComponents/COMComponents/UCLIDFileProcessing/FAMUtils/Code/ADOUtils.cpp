@@ -676,16 +676,18 @@ bool doesTableExist(const _ConnectionPtr& ipDBConnection, string strTable)
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-void executeVectorOfSQL(const _ConnectionPtr& ipDBConnection, const vector<string>& vecQueries )
+long executeVectorOfSQL(const _ConnectionPtr& ipDBConnection, const vector<string>& vecQueries )
 {	
-	ASSERT_ARGUMENT("ELI18822", ipDBConnection != NULL);
+	ASSERT_ARGUMENT("ELI18822", ipDBConnection != __nullptr);
+
+	long nNumRowsUpdated = 0;
 
 	// Execute all of the queries
 	for each ( string s in vecQueries )
 	{
 		try
 		{
-			executeCmdQuery(ipDBConnection, s);
+			nNumRowsUpdated += executeCmdQuery(ipDBConnection, s);
 		}
 		catch(UCLIDException& ue )
 		{
@@ -694,6 +696,8 @@ void executeVectorOfSQL(const _ConnectionPtr& ipDBConnection, const vector<strin
 			throw uexOuter;
 		}
 	}
+
+	return nNumRowsUpdated;
 }
 //-------------------------------------------------------------------------------------------------
 FAMUTILS_API void copyExistingFields(const FieldsPtr& ipSource, const FieldsPtr& ipDest, bool bCopyID)

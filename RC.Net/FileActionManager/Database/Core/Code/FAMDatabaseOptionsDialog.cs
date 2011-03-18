@@ -39,6 +39,7 @@ namespace Extract.FileActionManager.Database
         const string _STORE_FAM_SESSION_HISTORY = "StoreFAMSessionHistory";
         const string _ENABLE_INPUT_EVENT_TRACKING = "EnableInputEventTracking";
         const string _INPUT_EVENT_HISTORY_SIZE = "InputEventHistorySize";
+        const string _STORE_DB_INFO_HISTORY = "StoreDBInfoChangeHistory";
 
         // Constants for Security tab
         const string _REQUIRE_PASSWORD_TO_PROCESS_SKIPPED = "RequirePasswordToProcessAllSkippedFiles";
@@ -51,6 +52,9 @@ namespace Extract.FileActionManager.Database
         const string _DATA_ENTRY_SCHEMA_VERSION_NAME = "DataEntrySchemaVersion";
         const string _STORE_DATAENTRY_PROCESSING_HISTORY = "StoreDataEntryProcessingHistory";
         const string _ENABLE_DATA_ENTRY_COUNTERS = "EnableDataEntryCounters";
+
+        // Constant for retrieving the last DB info change
+        const string _LAST_DB_INFO_CHANGE = "LastDBInfoChange";
 
         static readonly char[] _SPLIT_CHARS = new char[] { ',', ';', '|' };
 
@@ -78,6 +82,17 @@ namespace Extract.FileActionManager.Database
         /// Collection of setting keys and check boxes
         /// </summary>
         Dictionary<string, CheckBox> _keysToCheckBox;
+
+        /// <summary>
+        /// The last settings change time retrieved from the database
+        /// </summary>
+        DateTime _lastSettingChange;
+
+        /// <summary>
+        /// Indicates whether settings where actually updated or not when
+        /// the dialog closed.
+        /// </summary>
+        public bool SettingsUpdated { get; private set; }
 
         #endregion Fields
 
@@ -126,6 +141,30 @@ namespace Extract.FileActionManager.Database
                 db.ResetDBConnection();
 
                 var settings = db.DBInfoSettings;
+
+                string lastModifyTime = settings.GetValue(_LAST_DB_INFO_CHANGE);
+                DateTime lastChange;
+                bool logged = false;
+                while (!DateTime.TryParse(lastModifyTime, out lastChange))
+                {
+                    if (!logged)
+                    {
+                        var ee = new ExtractException("ELI32170",
+                            "The " + _LAST_DB_INFO_CHANGE + " value was not a valid time stamp.");
+                        ee.AddDebugData("Last Time Stamp", lastModifyTime, false);
+                        ee.Log();
+                        logged = true;
+                    }
+
+                    // Update to a valid time stamp
+                    db.ExecuteCommandQuery("UPDATE [DBInfo] SET [Value] = "
+                        + "CONVERT(NVARCHAR(MAX), GETDATE(), 21) WHERE "
+                        + "[Name] = '" + _LAST_DB_INFO_CHANGE + "'");
+
+                    // Get the modified timestamp
+                    lastModifyTime = db.GetDBInfoSetting(_LAST_DB_INFO_CHANGE, true);
+                }
+                _lastSettingChange = lastChange;
 
                 // Set the object to null so the COM object can be released sooner.
                 db = null;
@@ -322,6 +361,7 @@ namespace Extract.FileActionManager.Database
             dictionary[_ENABLE_INPUT_EVENT_TRACKING] = _checkStoreInputEventTracking;
             dictionary[_REQUIRE_PASSWORD_TO_PROCESS_SKIPPED] = _checkRequirePasswordForSkipped;
             dictionary[_REQUIRE_AUTHENTICATION_BEFORE_RUN] = _checkRequireAuthenticationToRun;
+            dictionary[_STORE_DB_INFO_HISTORY] = _checkStoreDBSettingsChangeHistory;
 
             return dictionary;
         }
@@ -557,7 +597,21 @@ namespace Extract.FileActionManager.Database
                 db.DatabaseServer = _server;
                 db.DatabaseName = _database;
                 db.ResetDBConnection();
-                db.DBInfoSettings = map;
+
+                // Check last db info update time
+                string lastTime = db.GetDBInfoSetting(_LAST_DB_INFO_CHANGE, true);
+                DateTime last = DateTime.Parse(lastTime, CultureInfo.InvariantCulture);
+                if (_lastSettingChange < last)
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "The database settings have been modified by another user. "
+                        + "Please refresh the configuration window to see latest settings."
+                        + Environment.NewLine + "Note: This will reset your changes.",
+                        "Settings Modified", false);
+                    return;
+                }
+
+                SettingsUpdated = db.SetDBInfoSettings(map) > 0;
                 db = null;
 
                 DialogResult = DialogResult.OK;

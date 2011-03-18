@@ -219,7 +219,8 @@ FAMUTILS_API void dropTablesInVector(const _ConnectionPtr& ipDBConnection, const
 FAMUTILS_API bool doesTableExist(const _ConnectionPtr& ipDBConnection, string strTable);
 
 // PROMISE: To call executeCmdQuery on all of the sql Queries in vecQueries
-FAMUTILS_API void executeVectorOfSQL(const _ConnectionPtr& ipDBConnection, const vector<string>& vecQueries ); 
+//			Returns the total number of rows updated from all queries
+FAMUTILS_API long executeVectorOfSQL(const _ConnectionPtr& ipDBConnection, const vector<string>& vecQueries ); 
 
 // PROMISE: To copy the values for fields that are in both ipSource and ipDest.
 //			If bCopyID is false then a field named "ID" will not be copied.

@@ -58,6 +58,7 @@ static const string gstrINPUT_EVENT = "InputEvent";
 static const string gstrFILE_ACTION_STATUS = "FileActionStatus";
 static const string gstrSOURCE_DOC_CHANGE_HISTORY = "SourceDocChangeHistory";
 static const string gstrDOC_TAG_HISTORY = "DocTagHistory";
+static const string gstrDB_INFO_HISTORY = "DBInfoChangeHistory";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -210,7 +211,7 @@ public:
 	STDMETHOD(UpgradeToCurrentSchema)(IProgressStatus* pProgressStatus);
 	STDMETHOD(RenameFile)(IFileRecord* pFileRecord, BSTR bstrNewName);
 	STDMETHOD(get_DBInfoSettings)(IStrToStrMap** ppSettings);
-	STDMETHOD(put_DBInfoSettings)(IStrToStrMap* pSettings);
+	STDMETHOD(SetDBInfoSettings)(IStrToStrMap* pSettings, long* plNumUpdatedRows);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -797,8 +798,8 @@ private:
 	bool GetActionID_Internal(bool bDBLocked, BSTR bstrActionName, long* pnActionID); 
 	bool SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, BSTR bstrSettingValue, 
 		VARIANT_BOOL vbSetIfExists);
-	bool GetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSettingName, VARIANT_BOOL vbThrowIfMissing,
-		BSTR* pbstrSettingValue);
+	bool GetDBInfoSetting_Internal(bool bDBLocked, const string& strSettingName, bool bThrowIfMissing,
+		string& rstrSettingValue);
 	bool GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQuery, _Recordset** ppVal);
 	bool GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, long *pnFileID);
 	bool GetActionName_Internal(bool bDBLocked, long nActionID, BSTR *pbstrActionName);
@@ -858,7 +859,8 @@ private:
 	bool UpgradeToCurrentSchema_Internal(bool bDBLocked, IProgressStatusPtr ipProgressStatus);
 	bool RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRecord, BSTR bstrNewName);
 	bool get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap** ppSettings);
-	bool put_DBInfoSettings_Internal(bool bDBLocked, const vector<string>& vecQueries);
+	bool SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateHistory,
+		vector<string> vecQueries, long& nNumRowsUpdated);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 104;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 105;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -979,6 +979,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		if (bAddUserTables)
 		{
 			vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX);
+			vecQueries.push_back(gstrCREATE_DB_INFO_ID_INDEX);
 		}
 
 		// Add Foreign keys 
@@ -1022,6 +1023,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_TAG_FK);
 		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_FAMUSER_FK);
 		vecQueries.push_back(gstrADD_DOC_TAG_HISTORY_MACHINE_FK);
+		vecQueries.push_back(gstrADD_DB_INFO_HISTORY_FAMUSER_FK);
+		vecQueries.push_back(gstrADD_DB_INFO_HISTORY_MACHINE_FK);
+		vecQueries.push_back(gstrADD_DB_INFO_HISTORY_DB_INFO_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -1069,6 +1073,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_LOGIN_TABLE);
 	vecQueries.push_back(gstrCREATE_SOURCE_DOC_CHANGE_HISTORY);
 	vecQueries.push_back(gstrCREATE_DOC_TAG_HISTORY_TABLE);
+	vecQueries.push_back(gstrCREATE_DB_INFO_CHANGE_HISTORY_TABLE);
 
 	return vecQueries;
 }
@@ -1167,6 +1172,16 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 		asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
 	mapDefaultValues[gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY] = "1";
 	mapDefaultValues[gstrSTORE_DOC_TAG_HISTORY] = "1";
+	mapDefaultValues[gstrSTORE_DB_INFO_HISTORY] = "1";
+	try
+	{
+		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = getSQLServerDateTime(getDBConnection());
+	}
+	catch(...)
+	{
+		// Just eat an exception if the current time could not be retrieved from the DB
+		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = "";
+	}
 
 	return mapDefaultValues;
 }
@@ -2046,6 +2061,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFILE_ACTION_STATUS);
 	vecTables.push_back(gstrSOURCE_DOC_CHANGE_HISTORY);
 	vecTables.push_back(gstrDOC_TAG_HISTORY);
+	vecTables.push_back(gstrDB_INFO_HISTORY);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
