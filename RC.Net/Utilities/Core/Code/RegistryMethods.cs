@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.ServiceProcess;
 
 namespace Extract.Utilities
 {
@@ -197,6 +198,68 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI30194", ex);
+            }
+        }
+
+        /// <summary>
+        /// Opens the remote registry key.
+        /// </summary>
+        /// <param name="hive">The hive.</param>
+        /// <param name="machine">The machine.</param>
+        /// <param name="subkey">The sub key.</param>
+        /// <returns>The open sub key from the remote machine.</returns>
+        public static RegistryKey OpenRemoteRegistryKey(RegistryHive hive,
+            string machine, string subkey)
+        {
+            // Validate the license
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                "ELI32166", _OBJECT_NAME);
+
+            try
+            {
+                ValidateRemoteRegistryRunning(machine);
+
+                var regKey = RegistryKey.OpenRemoteBaseKey(hive, machine).OpenSubKey(subkey);
+                return regKey;
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI32155");
+                ee.AddDebugData("Machine Name", machine, false);
+                ee.AddDebugData("Hive", hive.ToString(), true);
+                ee.AddDebugData("Sub Key", subkey, true);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if the remote registry service is running on the specified machine.
+        /// </summary>
+        /// <param name="machineName">The machine to check for the remote registry
+        /// service.</param>
+        /// <returns><see langword="true"/> if the service is running.</returns>
+        public static void ValidateRemoteRegistryRunning(string machineName)
+        {
+            // Validate the license
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                "ELI32163", _OBJECT_NAME);
+
+            try
+            {
+                using (var regService = new ServiceController("RemoteRegistry", machineName))
+                {
+                    if (regService.Status != ServiceControllerStatus.Running)
+                    {
+                        throw new ExtractException("ELI32161",
+                            "The remote registry service is not running.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI32162");
+                ee.AddDebugData("Machine Name", machineName, false);
+                throw ee;
             }
         }
 

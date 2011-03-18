@@ -437,8 +437,10 @@ namespace Extract.FileActionManager.Utilities
                 {
                     try
                     {
-                        _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total",
-                            _machineName);
+                        RegistryMethods.ValidateRemoteRegistryRunning(_machineName);
+
+                        _cpuCounter = new PerformanceCounter("Processor", "% Processor Time",
+                            "_Total", _machineName);
                         _cpuCounter.NextValue();
                     }
                     catch (Exception e)

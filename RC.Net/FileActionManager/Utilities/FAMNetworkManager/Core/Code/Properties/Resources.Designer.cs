@@ -116,6 +116,13 @@ namespace Extract.FileActionManager.Utilities.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap RemoteDesktop {
+            get {
+                object obj = ResourceManager.GetObject("RemoteDesktop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap RemoveServerButton {
             get {
                 object obj = ResourceManager.GetObject("RemoveServerButton", resourceCulture);

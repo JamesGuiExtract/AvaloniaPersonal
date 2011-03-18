@@ -268,6 +268,46 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Runs the executable. Will block until the executable completes.
+        /// </summary>
+        /// <param name="exeFile">The exe file.</param>
+        /// <param name="arguments">The arguments.</param>
+        public static void RunExecutable(string exeFile, IEnumerable<string> arguments)
+        {
+            RunExecutable(exeFile, arguments, int.MaxValue);
+        }
+
+        /// <summary>
+        /// Runs the executable. Will block until <paramref name="timeToWait"/> has exceeded
+        /// or executable completes. (if <paramref name="timeToWait"/> is
+        /// <see cref="Int32.MaxValue"/> then will block until executable completes).
+        /// </summary>
+        /// <param name="exeFile">The exe file.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <param name="timeToWait">The time to wait.</param>
+        public static void RunExecutable(string exeFile, IEnumerable<string> arguments,
+            int timeToWait)
+        {
+            try
+            {
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI32158", _OBJECT_NAME);
+
+                using (var process = new Process())
+                {
+                    process.StartInfo = new ProcessStartInfo(exeFile,
+                        string.Join(" ", arguments.ToArray()));
+                    process.Start();
+                    process.WaitForExit(timeToWait);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32159");
+            }
+        }
+
+        /// <summary>
         /// Runs the specified executable with the specified arguments, appends a /ef [TempFile]
         /// to the argument list. If an exception is logged to the temp file, it will be
         /// loaded and thrown.
@@ -282,19 +322,12 @@ namespace Extract.Utilities
                     "ELI31884", _OBJECT_NAME);
 
                 using (var tempFile = new TemporaryFile(".uex"))
-                using (var process = new Process())
                 {
-                    // Add the /ef argument to the list of arguments
                     var args = new List<string>(arguments);
                     args.Add(string.Concat("/ef \"", tempFile.FileName, "\""));
 
-                    // Set the start info for the process
-                    process.StartInfo = new ProcessStartInfo(exeFile,
-                        string.Join(" ", args.ToArray()));
-
-                    // Launch the process and wait for exit
-                    process.Start();
-                    process.WaitForExit();
+                    // Run the executable and wait for it to exit
+                    RunExecutable(exeFile, args);
 
                     var info = new FileInfo(tempFile.FileName);
                     if (info.Length > 0)

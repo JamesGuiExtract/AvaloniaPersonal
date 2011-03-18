@@ -1,3 +1,4 @@
+using Microsoft.Win32;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -53,7 +54,40 @@ namespace Extract.Utilities
             Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
             "Extract Systems");
 
+        /// <summary>
+        /// The registry sub key path for the shell folders (this key is located under HKLM)
+        /// </summary>
+        static readonly string _REG_SUBKEY_SHELL_FOLDERS =
+            @"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders";
+
         #endregion Fields
+
+        /// <summary>
+        /// Gets the path to the extract systems folder in the common application
+        /// data location of a remote machine. The path will be returned in the format
+        /// of a UNC path using an adimistrative share.
+        /// <example>
+        /// If the path on the remote machine 'Chuck' is 'C:\ProgramData' then the
+        /// returned path will be '\\Chuck\C$\ProgramData\Extract Systems'
+        /// </example>
+        /// </summary>
+        /// <param name="machineName">The remote machine to get the path from.</param>
+        /// <returns>The path on the remote machine.</returns>
+        public static string GetRemoteExtractCommonApplicationDataPath(string machineName)
+        {
+            try
+            {
+                var key = RegistryMethods.OpenRemoteRegistryKey(RegistryHive.LocalMachine,
+                        machineName, _REG_SUBKEY_SHELL_FOLDERS);
+                var path = Path.Combine(key.GetValue("Common AppData").ToString(),
+                    "Extract Systems").Replace(":\\", "$\\");
+                return @"\\" + machineName + "\\" + path;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32157");
+            }
+        }
 
         #region Properties
 

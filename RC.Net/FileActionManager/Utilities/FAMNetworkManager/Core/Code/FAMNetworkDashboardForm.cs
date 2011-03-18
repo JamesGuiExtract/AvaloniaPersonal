@@ -899,29 +899,25 @@ namespace Extract.FileActionManager.Utilities
                 string machineName = (string)_machineListGridView.SelectedRows[0].Cells[
                     (int)GridColumns.MachineName].Value;
 
+                var appDataPath = FileSystemMethods.GetRemoteExtractCommonApplicationDataPath(
+                    machineName);
+
+                string dbFile = Path.Combine(appDataPath, "ESFAMService", "ESFAMService.sdf");
+
                 // Compute the name of the file
-                StringBuilder dbFile = new StringBuilder();
-                dbFile.Append(@"\\");
-                dbFile.Append(machineName);
-                dbFile.Append(@"\c$\Program Files\Extract Systems\CommonComponents\ESFAMService.sdf");
-                var fileInfo = new FileInfo(dbFile.ToString());
+                var fileInfo = new FileInfo(dbFile);
                 if (!fileInfo.Exists)
                 {
-                    dbFile.Replace("Program Files", "Program Files (x86)");
-                    fileInfo = new FileInfo(dbFile.ToString());
-                    if (!fileInfo.Exists)
-                    {
                         MessageBox.Show("Cannot find service database file to modify."
-                            + Environment.NewLine + dbFile.ToString(), "Cannot Find File",
+                            + Environment.NewLine + dbFile, "Cannot Find File",
                             MessageBoxButtons.OK, MessageBoxIcon.Error,
                             MessageBoxDefaultButton.Button1, 0);
                         return;
-                    }
                 }
                 if (fileInfo.Attributes.HasFlag(FileAttributes.ReadOnly))
                 {
                     MessageBox.Show("Cannot modify read-only service database file."
-                        + Environment.NewLine + dbFile.ToString(), "File Is Read-only",
+                        + Environment.NewLine + dbFile, "File Is Read-only",
                         MessageBoxButtons.OK, MessageBoxIcon.Error,
                         MessageBoxDefaultButton.Button1, 0);
                     return;
@@ -929,7 +925,7 @@ namespace Extract.FileActionManager.Utilities
 
                 using (TemporaryFile tempDb = new TemporaryFile(".sdf"))
                 {
-                    File.Copy(dbFile.ToString(), tempDb.FileName, true);
+                    File.Copy(dbFile, tempDb.FileName, true);
                     using (SQLCDBEditorForm editor = new SQLCDBEditorForm(tempDb.FileName, false))
                     {
                         editor.CustomTitle = SQLCDBEditorForm.DefaultTitle + " - "
@@ -938,7 +934,7 @@ namespace Extract.FileActionManager.Utilities
                         editor.ShowDialog();
                         if (editor.FileSaved)
                         {
-                            File.Copy(tempDb.FileName, dbFile.ToString(), true);
+                            File.Copy(tempDb.FileName, dbFile, true);
                         }
                     }
                 }
@@ -1283,6 +1279,33 @@ namespace Extract.FileActionManager.Utilities
             {
                 ex.ExtractDisplay("ELI31598");
             }
+        }
+
+        /// <summary>
+        /// Handles the remote desktop button click.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleRemoteDesktopButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_machineListGridView.SelectedRows.Count != 1)
+                {
+                    return;
+                }
+
+                string machineName = (string)_machineListGridView.SelectedRows[0].Cells[
+                    (int)GridColumns.MachineName].Value;
+
+                // Launch the remote desktop for the machine
+                SystemMethods.RunExecutable("mstsc.exe", new string[] { "/v:" + machineName }, 0);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32160");
+            }
+
         }
 
         #endregion Event Handler
@@ -1712,6 +1735,7 @@ namespace Extract.FileActionManager.Utilities
 
             _removeMachineToolStripButton.Enabled = selectedCount > 0;
             _modifyServiceDatabaseToolStripButton.Enabled = selectedCount == 1;
+            _remoteDesktopToolStripButton.Enabled = selectedCount == 1;
             _editMachineGroupAndNameToolStripButton.Enabled = selectedCount > 0;
         }
 

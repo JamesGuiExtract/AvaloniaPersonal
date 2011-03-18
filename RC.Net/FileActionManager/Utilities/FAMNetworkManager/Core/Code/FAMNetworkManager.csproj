@@ -203,6 +203,9 @@
   <ItemGroup>
     <None Include="Resources\EditGroupButton.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RemoteDesktop.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
