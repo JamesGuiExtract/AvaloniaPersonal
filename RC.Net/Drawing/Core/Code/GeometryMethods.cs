@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace Extract.Drawing
 {
@@ -129,12 +130,13 @@ namespace Extract.Drawing
         }
 
         /// <summary>
-        /// Retrieves the center point of a line in logical (image) coordinates.
+        /// Retrieves the center point of a vector of points.
         /// </summary>
-        /// <param name="start">The starting <see cref="Point"/> of a line segment.</param>
-        /// <param name="end">The ending <see cref="Point"/> of a line segment.</param>
-        /// <returns>The center point of a line in logical (image) coordinates.</returns>
-        public static PointF GetCenterPoint(PointF start, PointF end)
+        /// <param name="points">The <see cref="PointF"/>s for which a center point should be found.
+        /// </param>
+        /// <returns>The <see cref="PointF"/> that lines in the center of <see paramref="points"/>.
+        /// </returns>
+        public static PointF GetCenterPoint(params PointF[] points)
         {
             try
             {
@@ -142,11 +144,75 @@ namespace Extract.Drawing
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23164",
 					_OBJECT_NAME);
 
-                return new PointF((start.X + end.X) / 2F, (start.Y + end.Y) / 2F);
+                float x = points.Select(point => point.X).Average();
+                float y = points.Select(point => point.Y).Average();
+
+                return new PointF(x, y);
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI22206", ex);
+            }
+        }
+
+        /// <summary>
+        /// Expands the points outward from the center. For a vector of 2 points, the points are
+        /// expanded directly away from the center. For a vector of 4 points, the points are assumed
+        /// to represent the corners of a rectangle and are therefore expanded by the specified
+        /// number of pixels along each axis in order to expand the 
+        /// </summary>
+        /// <param name="distance">The distance.</param>
+        /// <param name="points">The points.</param>
+        /// <throws><see cref="ExtractException"/> if <see paramref="points"/> does not contain
+        /// either 2 or 4 points.</throws>
+        public static void ExpandPoints(float distance, PointF[] points)
+        {
+            try
+            {
+                PointF centerPoint = GetCenterPoint(points);
+
+                int count = points.Length;
+                if (points.Length == 2)
+                {
+                    // Expand each point directly away from the center point.
+                    for (int i = 0; i < count; i++)
+                    {
+                        PointF point = points[i];
+                        var vector = new System.Windows.Vector(point.X - centerPoint.X, point.Y - centerPoint.Y);
+                        vector = System.Windows.Vector.Multiply(distance / vector.Length, vector);
+                        points[i] = new PointF(point.X + (float)vector.X, point.Y + (float)vector.Y);
+                    }
+                }
+                else if (points.Length == 4)
+                {
+                    // Expand each point an equal amount along each axis away from the center point.
+                    for (int i = 0; i < count; i++)
+                    {
+                        PointF point = points[i];
+                        float xOffset = point.X - centerPoint.X;
+                        if (xOffset != 0)
+                        {
+                            xOffset = (xOffset * distance) / Math.Abs(xOffset);
+                        }
+                        float yOffset = point.Y - centerPoint.Y;
+                        if (yOffset != 0)
+                        {
+                            yOffset = (yOffset * distance) / Math.Abs(yOffset);
+                        }
+                        points[i] = (new PointF(point.X + xOffset, point.Y + yOffset));
+                    }
+                }
+                else
+                {
+                    ExtractException ee = new ExtractException("ELI32171",
+                        "ExpandPoints called with an invalid number of points!");
+                    ee.AddDebugData("Point count", points.Length, false);
+                    throw ee;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32175");
             }
         }
 

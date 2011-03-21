@@ -1605,10 +1605,14 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Inflates each side of the <see cref="Highlight"/> by the specified amount.
         /// </summary>
-        /// <param name="size">The amount to inflate each side of the <see cref="Highlight"/> in 
+        /// <param name="size">The amount to inflate each side of the <see cref="Highlight"/> in
         /// logical (image) pixels.</param>
-        /// <remarks>Negative values of <paramref name="size"/> deflate the highlight.</remarks>
-        public void Inflate(double size)
+        /// <param name="setDirty">if set to <see langword="true"/> the dirty flag will be set.
+        /// </param>
+        /// <remarks>
+        /// Negative values of <paramref name="size"/> deflate the highlight.
+        /// </remarks>
+        public void Inflate(double size, bool setDirty)
         {
             try
             {
@@ -1631,14 +1635,11 @@ namespace Extract.Imaging.Forms
                     }
                     else
                     {
-                        // Calculate the vector to apply to the start and end points
-                        double magnitude = Math.Sqrt(deltaX * deltaX + deltaY * deltaY) * size;
-                        Point vector = new Point(
-                            (int)(deltaX / magnitude + 0.5), (int)(deltaY / magnitude + 0.5));
-
-                        // Offset the endpoints by the amount specified
-                        _startPoint.Offset(-vector.X, -vector.Y);
-                        _endPoint.Offset(vector);
+                        // Expand the start and end point directly away from the center point.
+                        PointF[] expandedPoints = new PointF[] { _startPoint, _endPoint };
+                        GeometryMethods.ExpandPoints((float)size, expandedPoints);
+                        _startPoint = Point.Round(expandedPoints[0]);
+                        _endPoint = Point.Round(expandedPoints[1]);
 
                         // Inflate the height
                         _height += (int)(size * 2 + 0.5);
@@ -1652,7 +1653,10 @@ namespace Extract.Imaging.Forms
                     CalculateRegion();
                 }
 
-                Dirty = true;
+                if (setDirty)
+                {
+                    Dirty = true;
+                }
             }
             catch (Exception ex)
             {

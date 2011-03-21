@@ -179,7 +179,10 @@ namespace Extract.Imaging.Forms
                 // If an edge was found, adjust the side of the zone accordingly.
                 if (edge != null)
                 {
-                    InflateSide(side, shrink ? -edge.Value : edge.Value);
+                    if (edge.Value != 0F)
+                    {
+                        InflateSide(side, shrink ? -edge.Value : edge.Value);
+                    }
                     return true;
                 }
 
@@ -652,7 +655,10 @@ namespace Extract.Imaging.Forms
             // Convert the pixel coordinates into image coordinates.
             pixel = GeometryMethods.Rotate(pixel, theta);
 
-            Point point = roundPixelUp ? Point.Ceiling(pixel) : Point.Truncate(pixel);
+            // [FlexIDSCore:4603]
+            // Since we are not back in the image coordinate system, roundPixelUp will depend on the
+            // value of theta.X.
+            Point point = (roundPixelUp == theta.X > 0) ? Point.Ceiling(pixel) : Point.Truncate(pixel);
 
             offPage = !probe.Contains(point);
 

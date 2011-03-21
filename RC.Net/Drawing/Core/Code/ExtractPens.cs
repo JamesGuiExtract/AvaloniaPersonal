@@ -24,9 +24,10 @@ namespace Extract.Drawing
         static readonly Dictionary<Color, Pen> _thickPens = new Dictionary<Color, Pen>();
 
         /// <summary>
-        /// A collection of thick GDI pens, keyed by color.
+        /// A collection of GDI pens, keyed by color and width.
         /// </summary>
-        static readonly Dictionary<Color, GdiPen> _thickGdiPens = new Dictionary<Color, GdiPen>();
+        static readonly Dictionary<KeyValuePair<Color, int>, GdiPen> _gdiPens =
+            new Dictionary<KeyValuePair<Color, int>, GdiPen>();
 
         /// <summary>
         /// A collection of thick dashed pens, keyed by color.
@@ -59,9 +60,9 @@ namespace Extract.Drawing
         static readonly object _lockThick = new object();
 
         /// <summary>
-        /// Mutex object to provide exclusive access to the thick GDI pens collections
+        /// Mutex object to provide exclusive access to the GDI pens collections
         /// </summary>
-        static readonly object _lockGdiThick = new object();
+        static readonly object _lockGdi = new object();
 
         /// <summary>
         /// Mutex object to provide exclusive access to the thick dashed pens collections
@@ -186,6 +187,40 @@ namespace Extract.Drawing
         }
 
         /// <summary>
+        /// Creates a GDI pen from the specified color.
+        /// </summary>
+        /// <param name="color">The color of the GDI pen to create.</param>
+        /// <param name="width">The width of the pen to create.</param>
+        /// <returns>A GDI pen from the specified color.</returns>
+        public static GdiPen GetGdiPen(Color color, int width)
+        {
+            try
+            {
+                // Mutex around collection to prevent multiple reads and writes
+                GdiPen gdiPen;
+                lock (_lockGdi)
+                {
+                    // The key for the _gdiPens dictionary is a combination of color and width.
+                    var key = new KeyValuePair<Color, int>(color, width);
+
+                    // Check if the pen has already been created
+                    if (!_gdiPens.TryGetValue(key, out gdiPen))
+                    {
+                        // Create the pen
+                        gdiPen = new GdiPen(color, width);
+                        _gdiPens.Add(key, gdiPen);
+                    }
+                }
+
+                return gdiPen;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI32174", ex);
+            }
+        }
+
+        /// <summary>
         /// Creates a thick GDI pen from the specified color.
         /// </summary>
         /// <param name="color">The color of the GDI pen to create.</param>
@@ -194,20 +229,7 @@ namespace Extract.Drawing
         {
             try
             {
-                // Mutex around collection to prevent multiple reads and writes
-                GdiPen thickPen;
-                lock (_lockGdiThick)
-                {
-                    // Check if the pen has already been created
-                    if (!_thickGdiPens.TryGetValue(color, out thickPen))
-                    {
-                        // Create the pen
-                        thickPen = new GdiPen(color, ThickPenWidth);
-                        _thickGdiPens.Add(color, thickPen);
-                    }
-                }
-
-                return thickPen;
+                return GetGdiPen(color, ThickPenWidth);
             }
             catch (Exception ex)
             {

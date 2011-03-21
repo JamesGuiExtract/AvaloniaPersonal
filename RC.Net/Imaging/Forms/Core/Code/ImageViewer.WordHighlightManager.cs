@@ -249,20 +249,9 @@ namespace Extract.Imaging.Forms
                             // Hide any active word highlights.
                             foreach (Highlight highlight in _activeWordHighlights)
                             {
-                                highlight.SetColor(Color.White, false);
                                 highlight.Visible = false;
                             }
                             _activeWordHighlights.Clear();
-                        }
-                    }
-                    // Otherwise, this tracking operation will select word highlights to redact.
-                    else
-                    {
-                        Color highlightColor = _imageViewer.GetHighlightDrawColor();
-
-                        foreach (Highlight highlight in _activeWordHighlights)
-                        {
-                            highlight.SetColor(highlightColor, false);
                         }
                     }
                 }
@@ -474,13 +463,6 @@ namespace Extract.Imaging.Forms
                         {
                             highlight.Visible = true;
 
-                            // If a tracking operation is active, display the redaction/highlight
-                            // fill color as well.
-                            if (_imageViewer._trackingData != null)
-                            {
-                                highlight.SetColor(_imageViewer.GetHighlightDrawColor(), false);
-                            }
-
                             _activeWordHighlights.Add(e.LayerObject);
 
                             // If not in a tracking operation, invalidate the image viewer to
@@ -527,7 +509,6 @@ namespace Extract.Imaging.Forms
                         // than the redaction/highlight color).
                         Highlight highlight = (Highlight)e.LayerObject;
                         highlight.Visible = false;
-                        highlight.SetColor(Color.White, false);
 
                         _imageViewer.Invalidate();
                     }
@@ -1137,8 +1118,6 @@ namespace Extract.Imaging.Forms
 
                     _cancelToken.ThrowIfCancellationRequested();
 
-                    Color outlineColor = LayerObject.SelectionPen.Color;
-
                     // Generate a 1 pixel hight raster zone as the basis of the fitting
                     // operation.
                     RasterZone rasterZone = new RasterZone(startPoint, endPoint, 1, page);
@@ -1166,7 +1145,6 @@ namespace Extract.Imaging.Forms
                                 data.ToRasterZone(), "", _imageViewer.GetHighlightDrawColor());
                             highlight.Selectable = false;
                             highlight.CanRender = false;
-                            highlight.OutlineColor = outlineColor;
 
                             // Add the new auto-fit highlight
                             ExecuteInUI(() =>
@@ -1311,6 +1289,8 @@ namespace Extract.Imaging.Forms
                     return null;
                 }
 
+                Color highlightColor = _imageViewer.GetHighlightDrawColor();
+
                 // Create or retrieve an existing HashSet to hold the words for the current page.
                 HashSet<LayerObject> wordHighlights;
                 if (!_wordHighlights.TryGetValue(page, out wordHighlights))
@@ -1366,11 +1346,18 @@ namespace Extract.Imaging.Forms
 
                         // Use the raster zone to create a highlight.
                         Highlight highlight =
-                            new Highlight(_imageViewer, "", rasterZone, "", Color.White);
+                            new Highlight(_imageViewer, "", rasterZone, "", highlightColor);
                         highlight.Selectable = false;
                         highlight.CanRender = false;
-                        highlight.OutlineColor = LayerObject.SelectionPen.Color;
                         highlight.Visible = false;
+
+                        // [FlexIDSCore:4601]
+                        // Until pixels are scanned to refine the borders of OCR coordinates when
+                        // adding a redaction, the OCR coordinates may be a pixel too small in some
+                        // cases. Therefore, pad the preview highlights by a pixel in each direction
+                        // to give the user confidence that when the redaction is added it will
+                        // properly cover the entire word.
+                        highlight.Inflate(1.0, false);
 
                         _wordLineMapping[highlight] = lineIdentifier;
                         wordHighlights.Add(highlight);
@@ -1756,7 +1743,6 @@ namespace Extract.Imaging.Forms
                 foreach (Highlight highlight in _activeWordHighlights)
                 {
                     // In the process, make the highlights invisible again.
-                    highlight.SetColor(Color.White, false);
                     highlight.Visible = false;
 
                     // Retrieve the line ID for the word
@@ -1770,7 +1756,14 @@ namespace Extract.Imaging.Forms
                         rasterZonesByLine[lineIdentifier] = lineRasterZones;
                     }
 
-                    lineRasterZones.Add(highlight.ToRasterZone());
+                    // [FlexIDSCore:4601]
+                    // Since the word highlight zones have been padded by an extra pixel, shrink it
+                    // back down to its original size before scanning image pixels for precise
+                    // sizing.
+                    Highlight temp = new Highlight(_imageViewer, "", highlight.ToRasterZone());
+                    temp.Inflate(-1.0, false);
+
+                    lineRasterZones.Add(temp.ToRasterZone());
                 }
 
                 // For each set of raster zones on a line, create a bounding raster zone that shares
@@ -1847,7 +1840,6 @@ namespace Extract.Imaging.Forms
                 // highlights.
                 foreach (Highlight highlight in _activeWordHighlights)
                 {
-                    highlight.SetColor(Color.White, false);
                     highlight.Visible = false;
                 }
 

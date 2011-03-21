@@ -2853,9 +2853,11 @@ namespace Extract.Imaging.Forms
         {
             if (_trackingData != null)
             {
-                using (Pen pen = new Pen(color, 2))
+                GdiPen pen = ExtractPens.GetGdiPen(color, 2);
+                using (GdiGraphics gdiGraphics = new GdiGraphics(e.Graphics, RasterDrawMode.MaskPen))
                 {
-                    e.Graphics.DrawRectangle(pen, _trackingData.Rectangle);
+                    PointF[] vertices = DrawingMethods.GetVertices(_trackingData.Rectangle, null);
+                    gdiGraphics.DrawPolygon(pen, vertices);
                 }
             }
         }
