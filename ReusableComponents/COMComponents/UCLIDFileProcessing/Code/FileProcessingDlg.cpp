@@ -1815,6 +1815,8 @@ void FileProcessingDlg::updateMenuAndToolbar()
 	}
 
 	// update the toolbar buttons
+	m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_OPEN, asMFCBool(!bRunningStatus));
+	m_toolBar.GetToolBarCtrl().EnableButton(ID_BTN_FAM_SAVE, asMFCBool(!bRunningStatus));
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_RUN, asMFCBool(bEnableRun) );
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_PAUSE, asMFCBool(bEnablePause) );
 	m_toolBar.GetToolBarCtrl().EnableButton(IDC_BTN_STOP, asMFCBool(bEnableStop) );

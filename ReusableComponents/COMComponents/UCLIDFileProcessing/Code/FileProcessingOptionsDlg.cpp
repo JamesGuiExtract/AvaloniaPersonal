@@ -16,7 +16,7 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const int giMAX_DISPLAY_RECORDS = 999;
+const int giMAX_DISPLAY_RECORDS = 9999;
 
 //-------------------------------------------------------------------------------------------------
 // FileProcessingOptionsDlg dialog
@@ -99,6 +99,13 @@ void FileProcessingOptionsDlg::OnOK()
 	try
 	{
 		UpdateData(TRUE);
+		if (m_editMaxDisplayRecords.LineLength() == 0)
+		{
+			MessageBox("The maximum number of completed records to display cannot be blank.",
+				"Invalid Entry", MB_OK | MB_ICONWARNING);
+			m_editMaxDisplayRecords.SetFocus();
+			return;
+		}
 
 		// Save number of displayed records
 		setMaxDisplayRecords(getMaxNumberOfRecordsFromDialog());
@@ -156,6 +163,8 @@ long FileProcessingOptionsDlg::getMaxNumberOfRecordsFromDialog()
 		if (bUpdateText)
 		{
 			m_editMaxDisplayRecords.SetWindowText(asString(nNewValue).c_str());
+			int nLen = m_editMaxDisplayRecords.LineLength();
+			m_editMaxDisplayRecords.SetSel(0, nLen);
 		}
 	}
 

@@ -112,8 +112,22 @@ void AdvancedTaskSettingsDlg::OnBtnOK()
 		if (m_bLimitProcessingTimes == TRUE && m_ipSchedule == __nullptr)
 		{
 			MessageBox("You must define a processing schedule.", "No Schedule",
-				MB_ICONERROR | MB_OK);
+				MB_ICONWARNING | MB_OK);
 			m_btnSetSchedule.SetFocus();
+			return;
+		}
+		if (m_btnNumThreads.GetCheck() == BST_CHECKED && m_editThreads.LineLength() == 0)
+		{
+			MessageBox("Number of threads to use for processing must not be blank.",
+				"Invalid Entry", MB_ICONWARNING | MB_OK);
+			m_editThreads.SetFocus();
+			return;
+		}
+		if (m_editNumFiles.LineLength() == 0)
+		{
+			MessageBox("Number of files to retrieve from the queue must not be blank.",
+				"Invalid Entry", MB_ICONWARNING | MB_OK);
+			m_editNumFiles.SetFocus();
 			return;
 		}
 
@@ -323,6 +337,8 @@ int AdvancedTaskSettingsDlg::getNumThreads()
 			if (bUpdateText)
 			{
 				m_editThreads.SetWindowText(asString(nNewValue).c_str());
+				int nLength = m_editThreads.LineLength();
+				m_editThreads.SetSel(0, nLength);
 			}
 		}
 		else
@@ -371,6 +387,8 @@ long AdvancedTaskSettingsDlg::getNumFiles()
 		if (bUpdateText)
 		{
 			m_editNumFiles.SetWindowText(asString(nNewValue).c_str());
+			int nLength = m_editNumFiles.LineLength();
+			m_editNumFiles.SetSel(0, nLength);
 		}
 	}
 

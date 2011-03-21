@@ -362,9 +362,15 @@ void FileProcessingDlgActionPage::refresh(bool bWarnIfActionNotFound)
 			bResetPage = true;
 		}
 
+		if (bResetPage && bWarnIfActionNotFound)
+		{
+			// Need to reset the action name in the FPM so FAM UI won't allow running
+			getFPM()->ActionName = "";
+		}
+
 		// Reset or update the action name and associated edit box
 		m_zActionName = bResetPage ? "" : strActionName.c_str();
-		GetDlgItem(IDC_ACTION)->SetWindowText( m_zActionName.GetBuffer() );
+		GetDlgItem(IDC_ACTION)->SetWindowText( m_zActionName );
 
 		// Enable or disable three check boxes
 		m_btnQueue.EnableWindow(asMFCBool(!bResetPage));
