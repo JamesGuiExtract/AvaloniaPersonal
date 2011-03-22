@@ -58,7 +58,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -76,7 +76,7 @@
     <Link>
       <AdditionalDependencies>ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;Ltimgefx_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\Binaries\Debug/ImageFormatConverter.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -90,7 +90,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -108,7 +108,7 @@
     <Link>
       <AdditionalDependencies>ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;Ltimgefx_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\Binaries\Release/ImageFormatConverter.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
