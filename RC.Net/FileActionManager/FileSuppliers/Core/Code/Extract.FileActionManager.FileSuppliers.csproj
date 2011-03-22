@@ -54,9 +54,6 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Leadtools, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86" />
-    <Reference Include="Leadtools.Annotations, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86" />
-    <Reference Include="Leadtools.Codecs, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />

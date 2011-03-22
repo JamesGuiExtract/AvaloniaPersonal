@@ -1,5 +1,6 @@
 using Extract.Licensing;
 using Leadtools;
+using Leadtools.Drawing;
 using Leadtools.WinForms;
 using System;
 using System.ComponentModel;
@@ -139,7 +140,7 @@ namespace Extract.Imaging.Forms
         {
             using (Image image = new Bitmap(typeof(ThumbnailViewer), "Resources.Loading.png"))
             {
-                return new RasterImage(image);
+                return RasterImageConverter.ConvertFromImage(image, ConvertFromImageOptions.None);
             }
         }
 

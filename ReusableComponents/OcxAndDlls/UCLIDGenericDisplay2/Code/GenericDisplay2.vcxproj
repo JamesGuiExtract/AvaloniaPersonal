@@ -74,7 +74,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_17\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -127,7 +127,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_16.5\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_17\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>

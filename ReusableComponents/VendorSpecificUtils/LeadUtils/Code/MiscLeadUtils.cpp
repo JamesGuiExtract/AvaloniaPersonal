@@ -135,9 +135,6 @@ void addTextToImage(HDC hDC, const PageRasterZone &rZone, int iVerticalDpi);
 // PROMISE: To return the path to the folder containing LeadUtils.dll with trailing \.
 string getLeadUtilsDirectory();
 //-------------------------------------------------------------------------------------------------
-// PROMISE: To return the path to the Leadtools PDF initialization files
-string getPDFInitializationDirectory();
-//-------------------------------------------------------------------------------------------------
 // PROMISE: Gets a font size in points that fits within the specified zone.
 int getFontSizeThatFits(HDC hDC, const PageRasterZone& zone, int iVerticalDpi);
 //-------------------------------------------------------------------------------------------------
@@ -933,19 +930,6 @@ void initPDFSupport()
 		// Retrieve default load options
 		L_GetPDFOptions( &pdfOptions, sizeof(pdfOptions) );
 
-		// Set the PDF initialization directory [LRCAU #5102]
-		string strTempDir = getPDFInitializationDirectory();
-		try
-		{
-			throwExceptionIfNotSuccess(L_SetPDFInitDir((char*)(strTempDir.c_str())),
-				"ELI24246", "Application Trace: Unable to set initial PDF directory");
-		}
-		catch(UCLIDException& uex)
-		{
-			uex.addDebugInfo("PDF Directory", strTempDir);
-			uex.log();
-		}
-
 		// Only set options if not already the correct options
 		if ( pdfOptions.nXResolution != iOpenXRes ||
 				pdfOptions.nYResolution != iOpenYRes ||
@@ -1628,18 +1612,6 @@ string getLeadUtilsDirectory()
 	string strDLLPath = ::getModuleDirectory( "LeadUtils.dll" );
 	strDLLPath += "\\";
 	return strDLLPath;
-}
-//-------------------------------------------------------------------------------------------------
-string getPDFInitializationDirectory()
-{
-#ifdef DEBUG
-		string strTemp = getLeadUtilsDirectory()
-			+ "..\\..\\ReusableComponents\\APIs\\LeadTools_16.5\\PDF";
-#else
-		string strTemp = getLeadUtilsDirectory() + "pdf";
-#endif
-		simplifyPathName(strTemp);
-		return strTemp;
 }
 //-------------------------------------------------------------------------------------------------
 int getFontSizeThatFits(HDC hDC, const PageRasterZone& zone, int iVerticalDpi)

@@ -213,9 +213,9 @@ namespace Extract.Imaging.Forms
                     return FitMode.FitToPage;
                 }
                 else if (registryValue == _FIT_TO_WIDTH_VALUE)
-	            {
+                {
                     return FitMode.FitToWidth;
-	            }
+                }
                 else
                 {
                     return FitMode.None;
@@ -339,11 +339,11 @@ namespace Extract.Imaging.Forms
                 _userSpotRecognitionSubkey.SetValue(_SELECTION_TOOL_USER_KEY, registryValue);
             }
             catch (Exception ex)
-	        {
+            {
                 ExtractException ee = ExtractException.AsExtractException("ELI23223", ex);
-	            ee.AddDebugData("Cursor tool", cursorTool, false);
-	            throw ee;
-	        }
+                ee.AddDebugData("Cursor tool", cursorTool, false);
+                throw ee;
+            }
         }
 
         /// <summary>
@@ -575,25 +575,5 @@ namespace Extract.Imaging.Forms
         }
 
         #endregion RegistryManager Methods
-
-        #region RegistryManager Properties
-
-        /// <summary>
-        /// Gets the number of retries to try when saving a file
-        /// (See IDSD #331)
-        /// </summary>
-        public static int SaveRetries
-        {
-            get
-            {
-                // Get the retries key
-                int? retries = _userSpotRecognitionSubkey.GetValue(_SAVE_RETRY, 20) as int?;
-
-                // Return the value from the registry key
-                return retries ?? 20;
-            }
-        }
-
-        #endregion RegistryManager Properties
     }
 }

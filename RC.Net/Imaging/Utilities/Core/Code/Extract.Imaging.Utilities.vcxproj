@@ -57,7 +57,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include;..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;CODE_ANALYSIS;_ATL_MIXED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -86,7 +86,7 @@ CommonDebugPostBuild.bat "$(TargetPath)"</Command>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include;..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;CODE_ANALYSIS;_ATL_MIXED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -126,8 +126,8 @@ CommonDebugPostBuild.bat "$(TargetPath)"</Command>
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
     </Reference>
-    <Reference Include="Leadtools, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907">
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\DotNet\Leadtools.dll</HintPath>
+    <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907">
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.dll</HintPath>
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
     </Reference>

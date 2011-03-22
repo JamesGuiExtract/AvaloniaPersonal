@@ -13,8 +13,6 @@ namespace Extract.Imaging
     {
         #region Constants
 
-        static readonly string _PDF_INITIALIZATION_DIRECTORY = GetPdfInitializationDirectory();
-
         static readonly string _OBJECT_NAME = typeof(ImageCodecs).ToString();
 
         static readonly int _DEFAULT_PDF_DISPLAY_DEPTH = 24;
@@ -52,9 +50,6 @@ namespace Extract.Imaging
             {
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28485",
                     _OBJECT_NAME);
-
-                // Load Leadtools libraries
-                RasterCodecs.Startup();
 
                 // Load pdfs as bitonal images if bitonal support is unlocked
                 _loadPdfAsBitonal = !RasterSupport.IsLocked(RasterSupportType.Bitonal);
@@ -146,7 +141,6 @@ namespace Extract.Imaging
         /// </summary>
         static void SetOptions(CodecsOptions options)
         {
-            options.Pdf.InitialPath = _PDF_INITIALIZATION_DIRECTORY;
             options.Pdf.Save.UseImageResolution = true;
             options.Tiff.Load.IgnoreViewPerspective = true;
 
@@ -154,23 +148,6 @@ namespace Extract.Imaging
             options.Pdf.Load.DisplayDepth = _DEFAULT_PDF_DISPLAY_DEPTH;
             options.Pdf.Load.XResolution = _DEFAULT_PDF_RESOLUTION;
             options.Pdf.Load.YResolution = _DEFAULT_PDF_RESOLUTION;
-        }
-
-        /// <summary>
-        /// Gets the PDF initialization directory (the directory that contains
-        /// the Lib, Resource, and Fonts directories).
-        /// </summary>
-        /// <returns>The PDF initialization directory.</returns>
-        static string GetPdfInitializationDirectory()
-        {
-            const string pdfDirectory = 
-#if DEBUG
-                @"..\..\ReusableComponents\APIs\LeadTools_16.5\PDF";
-#else
-                @".\PDF";
-#endif
-
-            return FileSystemMethods.GetAbsolutePath(pdfDirectory);
         }
 
         #endregion Methods
@@ -197,9 +174,6 @@ namespace Extract.Imaging
             if (disposing && !_disposed)
             {
                 _disposed = true;
-
-                // Dispose of managed objects
-                RasterCodecs.Shutdown();
             }
 
             // Dispose of unmanaged resources

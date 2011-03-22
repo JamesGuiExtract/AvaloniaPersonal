@@ -4,6 +4,7 @@ using Extract.Licensing;
 using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Annotations;
+using Leadtools.Drawing;
 using Leadtools.WinForms;
 using System;
 using System.Collections.Generic;
@@ -124,11 +125,6 @@ namespace Extract.Imaging.Forms
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(ImageViewer).ToString();
-
-        /// <summary>
-        /// The number of times to retry acquring the device context for saving.
-        /// </summary>
-        static readonly int _SAVE_RETRY_COUNT = RegistryManager.SaveRetries;
 
         /// <summary>
         /// One-based index of the default image file type. This value corresponds to the all 

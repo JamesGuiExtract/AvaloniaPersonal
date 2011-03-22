@@ -188,7 +188,7 @@ namespace Extract.Imaging
                     {
                         // Not as fast rotation
                         RotateCommand rotate = new RotateCommand((angle % 360) * 100,
-                            RotateCommandFlags.Resize, RasterColor.FromGdiPlusColor(Color.White));
+                            RotateCommandFlags.Resize, Color.White.AsRasterColor());
                         rotate.Run(image);
                     }
                 }
@@ -229,12 +229,13 @@ namespace Extract.Imaging
                 subImage.YResolution = source.YResolution;
 
                 // Initialize the destination image to all white.
-                FillCommand fillCommand = new FillCommand(new RasterColor(Color.White));
+                var fillCommand = new FillCommand(Color.White.AsRasterColor());
                 fillCommand.Run(subImage);
 
                 // Copy the content from the source image into the raster zone image.
                 CombineFastCommand combineCommand = new CombineFastCommand(subImage,
-                    bounds, sourcePoint, CombineFastCommandFlags.SourceCopy);
+                    bounds.AsLeadRect(), sourcePoint.AsLeadPoint(),
+                    CombineFastCommandFlags.SourceCopy);
                 combineCommand.Run(source);
 
                 return subImage;
@@ -327,7 +328,7 @@ namespace Extract.Imaging
                 rasterZoneImage.OriginalFormat = page.OriginalFormat;
 
                 // Initialize the destination image to all white.
-                FillCommand fillCommand = new FillCommand(new RasterColor(Color.White));
+                FillCommand fillCommand = new FillCommand(Color.White.AsRasterColor());
                 fillCommand.Run(rasterZoneImage);
 
                 // Since the bounding rectangle may extend offpage but we can't copy from offpage
@@ -349,7 +350,8 @@ namespace Extract.Imaging
 
                 // Copy the content from the source image into the raster zone image.
                 CombineFastCommand combineCommand = new CombineFastCommand(rasterZoneImage, 
-                    adjustedBoundingRectangle, sourcePoint, CombineFastCommandFlags.SourceCopy);
+                    adjustedBoundingRectangle.AsLeadRect(), sourcePoint.AsLeadPoint(),
+                    CombineFastCommandFlags.SourceCopy);
                 combineCommand.Run(page);
 
                 // Since the center point of the raster zone's on-page content is at the exact 
@@ -358,7 +360,7 @@ namespace Extract.Imaging
                 // re-sizing so content isn't cropped from the raster zone.)
                 RotateCommand rotateCommand = new RotateCommand();
                 rotateCommand.Angle = (int)(-skew * 100);
-                rotateCommand.FillColor = new RasterColor(Color.White);
+                rotateCommand.FillColor = Color.White.AsRasterColor();
                 rotateCommand.Flags = RotateCommandFlags.Resize | RotateCommandFlags.Bicubic;
                 rotateCommand.Run(rasterZoneImage);
 
@@ -375,7 +377,7 @@ namespace Extract.Imaging
 
                 // Crop off any excess content leaving only the content from the raster zone itself.
                 CropCommand cropCommand = new CropCommand();
-                cropCommand.Rectangle = finalImageArea;
+                cropCommand.Rectangle = finalImageArea.AsLeadRect();
                 cropCommand.Run(rasterZoneImage);
                 
                 // To allow coordinates from the resulting image to be translated into the source
@@ -440,117 +442,6 @@ namespace Extract.Imaging
                     "Failed to extract raster zone image!", ex);
                 ee.AddDebugData("Raster Zone", zone.ToString(), false);
                 throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Attempts to create a lead tools device context handle that can be used
-        /// to create a graphics object for drawing on/manipulating an image. The
-        /// method will retry the specified number of times and either return a
-        /// handle or throw an exception if it was unsuccessful after retrying.
-        /// </summary>
-        /// <param name="imageToClone">The image object that will be cloned.  This should
-        /// be a single page <see cref="RasterImage"/>.</param>
-        /// <param name="retryCount">The number of times to attempt to create the
-        /// device context.</param>
-        /// <param name="command">A <see cref="ColorResolutionCommand"/> to use to
-        /// convert the cloned page. If <see langword="null"/> the cloned page
-        /// will be left as is.  If not <see langword="null"/> the page will
-        /// be modified if its bits per pixel are less than the bits per pixel
-        /// property of the ColorResolutionCommand.</param>
-        /// <param name="pageNumber">The page that is being worked on (used for exception
-        /// debug information).</param>
-        /// <param name="clonedPage">The image object that the returned device
-        /// context relates to.</param>
-        /// <returns>A device context (which must be freed via a call to
-        /// <see cref="RasterImage.DeleteLeadDC"/>) for the image.</returns>
-        // An out parameter is necessary since the Device context that is created is
-        // related to the image that it is created from which means we need to return the image
-        // for the returned device context.
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId="4#")]
-        public static IntPtr GetLeadDCWithRetries(RasterImage imageToClone, int retryCount,
-            ColorResolutionCommand command, int pageNumber, out RasterImage clonedPage)
-        {
-            RasterImage page = null;
-            try
-            {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI28054",
-                    _OBJECT_NAME);
-
-                // Sometimes the call to CreateLeadDC can return an IntPtr.Zero, in this
-                // case we should dispose of the page, call garbage collection, reclone
-                // the page and retry the CreateLeadDC call [IDSD #331]
-                IntPtr hdc = IntPtr.Zero;
-                int retries = 0;
-                for (; retries < retryCount; retries++)
-                {
-                    // Clone the page before manipulating it
-                    page = imageToClone.Clone();
-
-                    // Run the resolution command (if it exists) on any image that
-                    // is less than the commands bits per pixel
-                    if (command != null && page.BitsPerPixel < command.BitsPerPixel)
-                    {
-                        command.Run(page);
-                    }
-
-                    // Get a handle to a device context
-                    hdc = page.CreateLeadDC();
-
-                    // If successful, just break from loop
-                    if (hdc != IntPtr.Zero)
-                    {
-                        break;
-                    }
-
-                    // Dispose of the page and call garbage collector
-                    page.Dispose();
-                    page = null;
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                }
-
-                // If it was successful, but only after a retry, log an exception
-                if (hdc != IntPtr.Zero && retries > 0)
-                {
-                    ExtractException ee = new ExtractException("ELI28182",
-                        "Application Trace: Device context created successfully after retry.");
-                    ee.AddDebugData("Retries attempted", retries, false);
-                    AddImageDebugInfo(ee, imageToClone, pageNumber);
-                    ee.Log();
-                }
-                else if (hdc == IntPtr.Zero)
-                {
-                    // Dispose of the page if it exists
-                    if (page != null)
-                    {
-                        page.Dispose();
-                        page = null;
-                    }
-
-                    // Throw an exception
-                    ExtractException ee = new ExtractException("ELI28050",
-                        "Unable to create device context.");
-                    ee.AddDebugData("Memory before reclaim", GC.GetTotalMemory(false), false);
-                    ee.AddDebugData("Memory after reclaim", GC.GetTotalMemory(true), false);
-                    ee.AddDebugData("Retry count", retryCount, false);
-                    AddImageDebugInfo(ee, imageToClone, pageNumber);
-                    throw ee;
-                }
-
-                clonedPage = page;
-                return hdc;
-            }
-            catch (Exception ex)
-            {
-                // Dispose of the page if an exception occurred
-                if (page != null)
-                {
-                    page.Dispose();
-                }
-
-                throw ExtractException.AsExtractException("ELI28051", ex);
             }
         }
 
@@ -725,6 +616,87 @@ namespace Extract.Imaging
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29700", ex);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Collection of helper extension methods
+    /// </summary>
+    public static class ImageLeadtoolsExtensions
+    {
+        /// <summary>
+        /// Gets the specified <see cref="Rectangle"/> as a
+        /// <see cref="LeadRect"/>
+        /// </summary>
+        /// <param name="rectangle">The rectangle.</param>
+        /// <returns>A new <see cref="LeadRect"/>.</returns>
+        public static LeadRect AsLeadRect(this Rectangle rectangle)
+        {
+            try
+            {
+                return new LeadRect(rectangle.Left, rectangle.Top,
+                    rectangle.Width, rectangle.Height);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32176");
+            }
+        }
+
+        /// <summary>
+        /// Gets the specified <see cref="Point"/> as a
+        /// <see cref="LeadPoint"/>
+        /// </summary>
+        /// <param name="point">The point.</param>
+        /// <returns>A new <see cref="LeadPoint"/>.</returns>
+        public static LeadPoint AsLeadPoint(this Point point)
+        {
+            try
+            {
+                return new LeadPoint(point.X, point.Y);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32177");
+            }
+        }
+
+        /// <summary>
+        /// Gets the specified <see cref="Color"/> as a
+        /// <see cref="RasterColor"/>.
+        /// </summary>
+        /// <param name="color">The color.</param>
+        /// <returns>A new <see cref="RasterColor"/>.</returns>
+        public static RasterColor AsRasterColor(this Color color)
+        {
+            try
+            {
+                return new RasterColor(color.A, color.R, color.G, color.B);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32178");
+            }
+        }
+
+        /// <summary>
+        /// Gets the specified <see cref="LeadSize"/> as a
+        /// <see cref="Size"/>.
+        /// </summary>
+        /// <param name="size">The size.</param>
+        /// <returns>A new <see cref="Size"/>.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
+            MessageId="AsSize")]
+        public static Size AsSize(this LeadSize size)
+        {
+            try
+            {
+                return new Size(size.Width, size.Height);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32179");
             }
         }
     }

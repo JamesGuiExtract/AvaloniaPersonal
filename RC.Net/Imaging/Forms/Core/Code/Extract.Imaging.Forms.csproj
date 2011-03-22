@@ -67,21 +67,24 @@
     <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Leadtools, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Annotations, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Annotations, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.Annotations.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.Codecs.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.WinForms, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Drawing">
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.WinForms, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.WinForms.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

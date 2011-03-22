@@ -5,6 +5,7 @@ using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using Leadtools;
+using Leadtools.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -330,7 +331,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Processes the specified file.
         /// </summary>
         /// <param name="pFileRecord">The file record that contains the info of the file being 
-		/// processed.</param>
+        /// processed.</param>
         /// <param name="nActionID">The ID of the action being processed.</param>
         /// <param name="pFAMTM">A File Action Manager Tag Manager for expanding tags.</param>
         /// <param name="pDB">The File Action Manager database.</param>
@@ -393,12 +394,12 @@ namespace Extract.FileActionManager.FileProcessors
                     "Unable to process the file.", ee);
             }
         }
-		
-		#endregion IFileProcessingTask Members
+        
+        #endregion IFileProcessingTask Members
 
-		#region IAccessRequired Members
+        #region IAccessRequired Members
 
-		/// <summary>
+        /// <summary>
         /// Returns bool value indicating if the task requires admin access
         /// </summary>
         /// <returns><see langword="true"/> if the task requires admin access
@@ -682,10 +683,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                 bool wontFitOnPage = false;
                 RasterImage image = null;
-                RasterImage clonedPage = null;
                 Font pixelFont = null;
-                IntPtr hdc = IntPtr.Zero;
-                Graphics graphics = null;
+                RasterGraphics rg = null;
                 try
                 {
                     // Load the image page
@@ -702,21 +701,16 @@ namespace Extract.FileActionManager.FileProcessors
                     pixelFont = FontMethods.ConvertFontToUnits(_format.Font,
                     image.YResolution, GraphicsUnit.Pixel);
 
-                    // Get a device context handle from the lead tools image
-                    // (also returns a clone of the image page to operate on)
-                    hdc = ImageMethods.GetLeadDCWithRetries(image, 5, null, pageNumber,
-                        out clonedPage);
+                    rg = RasterImagePainter.CreateGraphics(image);
 
-                    // Create a graphics object from the handle
-                    graphics = Graphics.FromHdc(hdc);
-                    
                     // Compute the bounds for the string
                     Rectangle bounds = DrawingMethods.ComputeStringBounds(batesNumber,
-                        graphics, pixelFont, 0, 0F, anchorPoint,
+                        rg.Graphics, pixelFont, 0, 0F, anchorPoint,
                         _format.AnchorAlignment);
 
                     // Ensure the Bates number fits on the image page
-                    Rectangle pageBounds = new Rectangle(new Point(0, 0), image.ImageSize);
+                    Rectangle pageBounds = new Rectangle(new Point(0, 0),
+                        image.ImageSize.AsSize());
 
                     if (!pageBounds.Contains(bounds))
                     {
@@ -736,11 +730,11 @@ namespace Extract.FileActionManager.FileProcessors
                     }
 
                     // Draw the Bates number on the image
-                    DrawingMethods.DrawString(batesNumber, graphics, graphics.Transform,
-                        pixelFont, 0, 0F, bounds, null, null);
+                    DrawingMethods.DrawString(batesNumber, rg.Graphics,
+                        rg.Graphics.Transform, pixelFont, 0, 0F, bounds, null, null);
 
                     // Save the image page (use append to add it to the end of the file)
-                    writer.AppendImage(clonedPage);
+                    writer.AppendImage(image);
 
                     // If there were annotation tags, save those as well
                     if (tag != null)
@@ -786,21 +780,13 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         pixelFont.Dispose();
                     }
-                    if (graphics != null)
+                    if (rg != null)
                     {
-                        graphics.Dispose();
-                    }
-                    if (hdc != IntPtr.Zero)
-                    {
-                        RasterImage.DeleteLeadDC(hdc);
+                        rg.Dispose();
                     }
                     if (image != null)
                     {
                         image.Dispose();
-                    }
-                    if (clonedPage != null)
-                    {
-                        clonedPage.Dispose();
                     }
                 }
             }

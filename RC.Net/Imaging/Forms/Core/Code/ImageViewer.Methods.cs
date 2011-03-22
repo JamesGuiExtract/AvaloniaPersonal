@@ -4,6 +4,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Annotations;
+using Leadtools.Drawing;
 using Leadtools.ImageProcessing;
 using Leadtools.WinForms;
 using System;
@@ -515,12 +516,11 @@ namespace Extract.Imaging.Forms
         /// to <see cref="ImageFile"/>.</exception>
         public void SaveImage(string fileName, RasterImageFormat format)
         {
-            TemporaryWaitCursor waitCursor = null;
             int originalPage = _pageNumber;
+            TemporaryWaitCursor waitCursor = null;
             Matrix transform = null;
-            IntPtr hdc = IntPtr.Zero;
-            Graphics graphics = null;
             ImageWriter writer = Codecs.CreateWriter(fileName, format);
+            ImageReader reader = Codecs.CreateReader(_imageFile);
             try
             {
                 // Ensure not saving to the currently open image
@@ -542,75 +542,65 @@ namespace Extract.Imaging.Forms
                 ColorResolutionCommand command = GetSixteenBppConverter(); // Used to change bpp of image
                 for (int i = 1; i <= _pageCount; i++)
                 {
-                    // TODO: This could be reworked to go directly to disk without changing page number
-                    // Go to the specified page
-                    SetPageNumber(i, false, false);
-
-                    RasterImage page;
-                    hdc = ImageMethods.GetLeadDCWithRetries(base.Image, _SAVE_RETRY_COUNT,
-                        command, i, out page);
-
-                    // Create a graphics object from the handle
-                    graphics = Graphics.FromHdc(hdc);
-
-                    // Calculate the rotated transform for this page
-                    transform = GetRotatedMatrix(graphics.Transform, false);
-
-                    // Render the annotations
-                    RasterTagMetadata tag = null;
-                    if (_annotations != null)
+                    var page = reader.ReadPage(i);
+                    if (page.BitsPerPixel < command.BitsPerPixel)
                     {
-                        // Rotate the annotations
-                        _annotations.Transform = graphics.Transform.Clone();
-                        RotateAnnotations();
-
-                        // Check whether the output image is a tiff
-                        if (annCodecs != null)
-                        {
-                            // Save annotations in a tiff tag
-                            tag = annCodecs.SaveToTag(_annotations, AnnCodecsTagFormat.Tiff);
-                        }
-                        else
-                        {
-                            // Burn the annotations directly onto the output image
-                            _annotations.Draw(graphics);
-                        }
+                        command.Run(page);
                     }
 
-                    // Render the layer objects
-                    foreach (LayerObject layerObject in _layerObjects)
+                    using (var rg = RasterImagePainter.CreateGraphics(page))
                     {
-                        if (layerObject.PageNumber == i)
+                        // Calculate the rotated transform for this page
+                        transform = GetRotatedMatrix(rg.Graphics.Transform, false);
+
+                        // Render the annotations
+                        RasterTagMetadata tag = null;
+                        if (_annotations != null)
                         {
-                            layerObject.Render(graphics, transform);
+                            // Rotate the annotations
+                            _annotations.Transform = rg.Graphics.Transform.Clone();
+                            RotateAnnotations();
+
+                            // Check whether the output image is a tiff
+                            if (annCodecs != null)
+                            {
+                                // Save annotations in a tiff tag
+                                tag = annCodecs.SaveToTag(_annotations, AnnCodecsTagFormat.Tiff);
+                            }
+                            else
+                            {
+                                // Burn the annotations directly onto the output image
+                                _annotations.Draw(rg.Graphics);
+                            }
                         }
-                    }
 
-                    // Apply the watermark if necessary
-                    if (_watermark != null)
-                    {
-                        DrawWatermark(page, graphics);
-                    }
+                        // Render the layer objects
+                        foreach (LayerObject layerObject in _layerObjects)
+                        {
+                            if (layerObject.PageNumber == i)
+                            {
+                                layerObject.Render(rg.Graphics, transform);
+                            }
+                        }
 
-                    // Dispose of the transform
-                    transform.Dispose();
+                        // Apply the watermark if necessary
+                        if (_watermark != null)
+                        {
+                            DrawWatermark(page, rg.Graphics);
+                        }
 
-                    // Release the device context
-                    RasterImage.DeleteLeadDC(hdc);
+                        // Dispose of the transform
+                        transform.Dispose();
+                        transform = null;
 
-                    // Dispose of the graphics object
-                    graphics.Dispose();
-
-                    // Add the page to the resultant image
-                    writer.AppendImage(page);
-                    if (tag != null)
-                    {
-                        writer.WriteTagOnPage(tag, i);
+                        // Add the page to the resultant image
+                        writer.AppendImage(page);
+                        if (tag != null)
+                        {
+                            writer.WriteTagOnPage(tag, i);
+                        }
                     }
                 }
-                transform = null;
-                hdc = IntPtr.Zero;
-                graphics = null;
 
                 // Save the file
                 writer.Commit(true);
@@ -633,17 +623,13 @@ namespace Extract.Imaging.Forms
                 {
                     transform.Dispose();
                 }
-                if (hdc != IntPtr.Zero)
-                {
-                    RasterImage.DeleteLeadDC(hdc);
-                }
-                if (graphics != null)
-                {
-                    graphics.Dispose();
-                }
                 if (writer != null)
                 {
                     writer.Dispose();
+                }
+                if (reader != null)
+                {
+                    reader.Dispose();
                 }
             }
         }
@@ -2101,7 +2087,8 @@ namespace Extract.Imaging.Forms
                 imageToPrinter = GetRotatedMatrix(unrotatedToPrinter, false);
 
                 // Draw the image
-                using (Image img = base.Image.ConvertToGdiPlusImage())
+                using (var img = RasterImageConverter.ConvertToImage(base.Image,
+                    ConvertToImageOptions.None))
                 {
                     e.Graphics.DrawImage(img, destination, source, GraphicsUnit.Pixel);
                 }
