@@ -24,6 +24,11 @@ using namespace std;
 //--------------------------------------------------------------------------------------------------
 bool replaceVariable(string& s, const string& t1, const string& t2)
 {
+	if (s.empty() || t1 == t2)
+	{
+		return false;
+	}
+
 	// this function replaces all occurrences of t1 in S by t2
 	size_t findpos;
 	bool bReturnType;
@@ -31,11 +36,11 @@ bool replaceVariable(string& s, const string& t1, const string& t2)
 	findpos = s.find(t1);
 	if (findpos == string::npos)
 	{
-		bReturnType = 0;
+		bReturnType = false;
 	}
 	else
 	{
-		bReturnType = 1;
+		bReturnType = true;
 		while (findpos != string::npos)
 		{
 			s.replace(findpos, t1.length(), t2);
@@ -55,11 +60,14 @@ bool replaceVariable(string& s, const char * t1, const string& t2)
 //--------------------------------------------------------------------------------------------------
 bool replaceVariable(string& s, const string& t1, const string& t2, EReplaceType eReplaceType)
 {
-	string strMessage;
 	bool bReturnType;
 	size_t findpos;
 	
-	if(eReplaceType == kReplaceAll)
+	if (s.empty() || t1 == t2)
+	{
+		bReturnType = false;
+	}
+	else if(eReplaceType == kReplaceAll)
 	{
 		bReturnType = replaceVariable(s, t1, t2);
 	}
@@ -68,12 +76,12 @@ bool replaceVariable(string& s, const string& t1, const string& t2, EReplaceType
 		findpos = s.find(t1);
 		if(findpos == string::npos)
 		{
-			bReturnType = 0;
+			bReturnType = false;
 		}
 		else
 		{
 			s.replace(findpos, t1.length(), t2);
-			bReturnType = 1;
+			bReturnType = true;
 		}
 	}
 	else if(eReplaceType == kReplaceLast)
@@ -81,19 +89,17 @@ bool replaceVariable(string& s, const string& t1, const string& t2, EReplaceType
 		findpos = s.rfind(t1);
 		if(findpos == string::npos)
 		{
-			bReturnType = 0;
+			bReturnType = false;
 		}
 		else
 		{
 			s.replace(findpos, t1.length(), t2);
-			bReturnType = 1;
+			bReturnType = true;
 		}
 	}
 	else
 	{
-		bReturnType = 0;
-		strMessage = "ERROR: the replacement type is not valid!";
-		throw UCLIDException("ELI00325", strMessage);
+		throw UCLIDException("ELI00325", "The replacement type is not valid.");
 	}
 	return bReturnType;
 }

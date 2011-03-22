@@ -340,7 +340,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 				}
 
 				// Handle all replacement values
-				if (m_redactionAppearance.m_vecReplacements.size())
+				if (!strText.empty() && m_redactionAppearance.m_vecReplacements.size() > 0)
 				{
 					for(vector<pair<string, string>>::iterator it =
 						m_redactionAppearance.m_vecReplacements.begin();
