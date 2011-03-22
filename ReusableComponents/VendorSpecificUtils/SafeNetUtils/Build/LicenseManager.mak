@@ -62,7 +62,7 @@ CopyFilesToExtractLMInstall:
 
 BuildExtractLMInstall:CopyFilesToExtractLMInstall
     @ECHO Building Extract Systems LM installation...
-	@SET PATH=%windir%;%windir%\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;%VAULT_DIR%\win32;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Nuance_16.3\bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_16.5\Bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\RogueWave\bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\SafeNetUltraPro\Bin;%DevEnvDir%;%VCPP_DIR%\BIN;%VS_COMMON%\Tools;%VS_COMMON%\Tools\bin;%VCPP_DIR%\PlatformSDK\bin;C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;%VCPP_DIR%\VCPackages
+	@SET PATH=%windir%;%windir%\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;%VAULT_DIR%\win32;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Nuance_16.3\bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_17\Bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\RogueWave\bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\SafeNetUltraPro\Bin;%DevEnvDir%;%VCPP_DIR%\BIN;%VS_COMMON%\Tools;%VS_COMMON%\Tools\bin;%VCPP_DIR%\PlatformSDK\bin;C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;%VCPP_DIR%\VCPackages
 	$(SetProductVerScript) "$(ExtractLMInstallRootDir)\Extract Systems LM.ism" "$(ReusableComponentsVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractLMInstallRootDir)\Extract Systems LM.ism"
 	
