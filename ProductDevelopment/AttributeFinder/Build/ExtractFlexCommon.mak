@@ -65,10 +65,9 @@ ObfuscateFiles:
 CopyExtractFlexCommonFiles: CleanupExtractFlexCommonFiles ObfuscateFiles
     @ECHO Copying the ExtractFlexCommon files to installation directory...
 	@COPY /v  "$(BinariesFolder)\Obfuscated\*.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet\Leadtools*.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
+	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet\Leadtools*.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(RCNETDir)\APIs\Divelements\SandDock\bin\SandDock.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles" 
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Bin\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\pdf\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles\pdf" /v /s /e /y
     @XCOPY "$(ReusableComponentsRootDirectory)\APIs\Nuance_16.3\bin\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_EXCEPTIONMGMTLib.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMUTILSLib.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
