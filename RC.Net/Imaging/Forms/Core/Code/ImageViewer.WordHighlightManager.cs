@@ -1,4 +1,5 @@
 ﻿using Extract.Drawing;
+using Extract.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -46,6 +47,12 @@ namespace Extract.Imaging.Forms
             #endregion Constants
 
             #region Fields
+
+            /// <summary>
+            /// The config file that contains settings for the image viewer.
+            /// </summary>
+            readonly ConfigSettings<Properties.Settings> _config =
+                new ConfigSettings<Properties.Settings>();
 
             /// <summary>
             /// A lock to synchronize access to the <see cref="WordHighlightManager"/>'s fields.
@@ -1118,7 +1125,7 @@ namespace Extract.Imaging.Forms
 
                     _cancelToken.ThrowIfCancellationRequested();
 
-                    // Generate a 1 pixel hight raster zone as the basis of the fitting
+                    // Generate a 1 pixel height raster zone as the basis of the fitting
                     // operation.
                     RasterZone rasterZone = new RasterZone(startPoint, endPoint, 1, page);
 
@@ -1137,14 +1144,15 @@ namespace Extract.Imaging.Forms
                             data.Height >= _MIN_SPLIT_HEIGHT)
                         {
                             // Shrink the left and right side to fit pixel content.
-                            data.FitEdge(Side.Left, probe);
-                            data.FitEdge(Side.Right, probe);
+                            data.FitEdge(Side.Left, probe, buffer: 0F);
+                            data.FitEdge(Side.Right, probe, buffer: 0F);
 
                             // Generate the new auto-fitted highlight.
                             Highlight highlight = new Highlight(_imageViewer, "",
                                 data.ToRasterZone(), "", _imageViewer.GetHighlightDrawColor());
                             highlight.Selectable = false;
                             highlight.CanRender = false;
+                            highlight.Inflate((double)_config.Settings.AutoFitZonePadding + 1, false);
 
                             // Add the new auto-fit highlight
                             ExecuteInUI(() =>
@@ -1354,10 +1362,10 @@ namespace Extract.Imaging.Forms
                         // [FlexIDSCore:4601]
                         // Until pixels are scanned to refine the borders of OCR coordinates when
                         // adding a redaction, the OCR coordinates may be a pixel too small in some
-                        // cases. Therefore, pad the preview highlights by a pixel in each direction
-                        // to give the user confidence that when the redaction is added it will
-                        // properly cover the entire word.
-                        highlight.Inflate(1.0, false);
+                        // cases. Therefore, pad the preview highlights by AutoFitZonePadding in
+                        // each direction to give the user confidence that when the redaction is
+                        // added it will properly cover the entire word.
+                        highlight.Inflate((double)_config.Settings.AutoFitZonePadding + 1, false);
 
                         _wordLineMapping[highlight] = lineIdentifier;
                         wordHighlights.Add(highlight);
@@ -1604,15 +1612,21 @@ namespace Extract.Imaging.Forms
                     {
                         FittingData data = new FittingData(zone);
 
+                        // Shrink the box such that there are [AutoFitZonePadding] rows of white
+                        // pixels between the edge of the zone and the contained pixel content.
+                        // (buffer is the distance from the first row of pixels, not the number of
+                        // rows of pixels in between as with AutoFitZonePadding).
+                        int buffer = _config.Settings.AutoFitZonePadding + 1;
+
                         // Expand out up to 2 pixel in each direction looking for an all
                         // white row to ensure the zone has encapsulated all pixel content.
-                        data.FitEdge(Side.Left, probe, false, false, null, 0, 0, 0,
+                        data.FitEdge(Side.Left, probe, false, false, null, 0, buffer, 0,
                             horizontalExpandLimit);
-                        data.FitEdge(Side.Top, probe, false, false, null, 0, 0, 0,
+                        data.FitEdge(Side.Top, probe, false, false, null, 0, buffer, 0,
                             verticalExpandLimit);
-                        data.FitEdge(Side.Right, probe, false, false, null, 0, 0, 0,
+                        data.FitEdge(Side.Right, probe, false, false, null, 0, buffer, 0,
                             horizontalExpandLimit);
-                        data.FitEdge(Side.Bottom, probe, false, false, null, 0, 0, 0,
+                        data.FitEdge(Side.Bottom, probe, false, false, null, 0, buffer, 0,
                             verticalExpandLimit);
 
                         // Shrink any sides with excess space and eliminate zones that
@@ -1756,14 +1770,7 @@ namespace Extract.Imaging.Forms
                         rasterZonesByLine[lineIdentifier] = lineRasterZones;
                     }
 
-                    // [FlexIDSCore:4601]
-                    // Since the word highlight zones have been padded by an extra pixel, shrink it
-                    // back down to its original size before scanning image pixels for precise
-                    // sizing.
-                    Highlight temp = new Highlight(_imageViewer, "", highlight.ToRasterZone());
-                    temp.Inflate(-1.0, false);
-
-                    lineRasterZones.Add(temp.ToRasterZone());
+                    lineRasterZones.Add(highlight.ToRasterZone());
                 }
 
                 // For each set of raster zones on a line, create a bounding raster zone that shares

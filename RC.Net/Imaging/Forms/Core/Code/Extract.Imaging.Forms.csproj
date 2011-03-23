@@ -627,6 +627,11 @@
     <Compile Include="Controls\RectangularHighlightToolStripButton.Designer.cs">
       <DependentUpon>RectangularHighlightToolStripButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Redaction.cs" />
     <Compile Include="RegistryManager.cs" />
     <Compile Include="Controls\RotateClockwiseToolStripButton.cs">
@@ -1003,6 +1008,13 @@
     <EmbeddedResource Include="Resources\MagnifierWindowButton.png" />
     <Content Include="Resources\WordHighlightButtonSmall.png" />
     <Content Include="Resources\WordRedactionButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
