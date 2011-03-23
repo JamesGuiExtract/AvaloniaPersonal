@@ -124,17 +124,17 @@
             this._pauseOnDocumentConditionCheckBox.AutoSize = true;
             this._pauseOnDocumentConditionCheckBox.Location = new System.Drawing.Point(12, 110);
             this._pauseOnDocumentConditionCheckBox.Name = "_pauseOnDocumentConditionCheckBox";
-            this._pauseOnDocumentConditionCheckBox.Size = new System.Drawing.Size(344, 17);
+            this._pauseOnDocumentConditionCheckBox.Size = new System.Drawing.Size(336, 17);
             this._pauseOnDocumentConditionCheckBox.TabIndex = 11;
-            this._pauseOnDocumentConditionCheckBox.Text = "Pause slideshow when the document meets the following condition:";
+            this._pauseOnDocumentConditionCheckBox.Text = "Stop slideshow when the document meets the following condition:";
             this._pauseOnDocumentConditionCheckBox.UseVisualStyleBackColor = true;
             this._pauseOnDocumentConditionCheckBox.CheckedChanged += new System.EventHandler(this.HandleCheckDocumentConditionCheckChanged);
             // 
             // _documentConditionTextBox
             // 
+            this._documentConditionTextBox.Enabled = false;
             this._documentConditionTextBox.Location = new System.Drawing.Point(31, 134);
             this._documentConditionTextBox.Name = "_documentConditionTextBox";
-            this._documentConditionTextBox.ReadOnly = true;
             this._documentConditionTextBox.Size = new System.Drawing.Size(283, 20);
             this._documentConditionTextBox.TabIndex = 12;
             this._documentConditionTextBox.DoubleClick += new System.EventHandler(this.HandleDocumentConditionTextBoxDoubleClick);

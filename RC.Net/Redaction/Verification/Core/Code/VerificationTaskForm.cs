@@ -266,6 +266,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         Tuple<int, double> _preHistoricPageVerificationTime = new Tuple<int, double>(0, 0);
 
+        /// <summary>
+        /// To allow shortcut keys to be handled when focus is in an undocked sanddock pane.
+        /// </summary>
+        ShortcutsMessageFilter _shortcutsMessageFilter;
+
         #endregion Fields
 
         #region Events
@@ -350,6 +355,12 @@ namespace Extract.Redaction.Verification
                     HandleImageViewerSelectionLayerObjectAdded;
                 _imageViewer.LayerObjects.Selection.LayerObjectDeleted += 
                     HandleImageViewerSelectionLayerObjectDeleted;
+
+                // [FlexIDSCore:4482]
+                // Initialize a message filter to allow shortcuts to be handled even when focus is
+                // in an undocked Sandock pane.
+                _shortcutsMessageFilter = new ShortcutsMessageFilter(
+                    ShortcutsEnabled, _imageViewer.Shortcuts, this);
 
                 _invoker = new ControlInvoker(this);
 
@@ -1688,8 +1699,7 @@ namespace Extract.Redaction.Verification
                 _findOrRedactToolStripMenuItem.Enabled = true;
                 _findOrRedactToolStripButton.Enabled = true;
 
-                _slideshowPlayToolStripButton.Enabled = true;
-                _slideshowPlayToolStripButton.Checked = _slideshowRunning;
+                _slideshowPlayToolStripButton.Enabled = !_slideshowRunning;
                 _slideshowStopToolStripButton.Enabled = _slideshowRunning;
             }
             else
@@ -2895,38 +2905,56 @@ namespace Extract.Redaction.Verification
                 {
                     bool stopSlideshow = false;
 
-                    if (m.Msg == WindowsMessage.KeyDown)
+                    switch (m.Msg)
                     {
-                        Keys key = (Keys)m.WParam.ToInt32();
+                        case WindowsMessage.KeyDown:
+                        case WindowsMessage.SystemKeyDown:
+                            {
+                                Keys key = (Keys)m.WParam.ToInt32();
 
-                        // Unless the key is related to starting the slideshow or advancing,
-                        // stop the slideshow.
-                        if (key != Keys.F5 &&
-                            key != Keys.PageDown &&
-                            key != Keys.Tab &&
-                            key != Keys.ControlKey &&
-                            (key != Keys.S || Control.ModifierKeys != Keys.Control))
-                        {
-                            stopSlideshow = true;
-                        }
-                    }
-                    else if (m.Msg == WindowsMessage.LeftButtonDown)
-                    {
-                        Control clickedControl = FromHandle(m.HWnd);
-                        if (clickedControl != _slideShowToolStrip)
-                        {
-                            stopSlideshow = true;
-                        }
-                    }
-                    else if (m.Msg == WindowsMessage.RightButtonDown)
-                    {
-                        stopSlideshow = true;
-                    }
-                    else if (m.Msg == WindowsMessage.SystemCommand &&
-                             (m.WParam.ToInt32() == _SC_SCREENSAVER ||
-                              (m.WParam.ToInt32() == _SC_MONITORPOWER && m.LParam.ToInt32() > 0)))
-                    {
-                        stopSlideshow = true;
+                                // Unless the key is related to starting the slideshow or advancing,
+                                // stop the slideshow.
+                                if (key != Keys.F5 &&
+                                    key != Keys.PageDown &&
+                                    key != Keys.Tab &&
+                                    key != Keys.ControlKey &&
+                                    (key != Keys.S || Control.ModifierKeys != Keys.Control))
+                                {
+                                    stopSlideshow = true;
+                                }
+                            }
+                            break;
+
+                        case WindowsMessage.LeftButtonDown:
+                            {
+                                Control clickedControl = FromHandle(m.HWnd);
+                                if (clickedControl != _slideShowToolStrip)
+                                {
+                                    stopSlideshow = true;
+                                }
+                            }
+                            break;
+
+                        case WindowsMessage.MiddleButtonDown:
+                        case WindowsMessage.RightButtonDown:
+                        case WindowsMessage.MouseWheel:
+                        case WindowsMessage.NonClientLeftButtonDown:
+                        case WindowsMessage.NonClientRightButtonDown:
+                        case WindowsMessage.NonClientMiddleButtonDown:
+                            {
+                                stopSlideshow = true;
+                            }
+                            break;
+
+                        case WindowsMessage.SystemCommand:
+                            {
+                                if (m.WParam.ToInt32() == _SC_SCREENSAVER ||
+                                    (m.WParam.ToInt32() == _SC_MONITORPOWER && m.LParam.ToInt32() > 0))
+                                {
+                                    stopSlideshow = true;
+                                }
+                            }
+                            break;
                     }
 
                     if (stopSlideshow)
@@ -2963,8 +2991,7 @@ namespace Extract.Redaction.Verification
                 }
 
                 _slideshowRunning = start;
-                _slideshowPlayToolStripButton.Checked = start;
-                _slideshowPlayToolStripMenuItem.Checked = start;
+                _startSlideshowCommand.Enabled = !start;
                 _stopSlideshowCommand.Enabled = start;
 
                 if (start && _imageViewer.IsImageAvailable)

@@ -322,6 +322,8 @@ namespace Extract.Redaction.Verification
                 Guid guid = new Guid();
                 MiscUtils.HandlePlugInObjectDoubleClick(_documentCondition, _CONDITION_CATEGORY_NAME,
                     _CONDITION_CATEGORY, true, 0, guid);
+
+                UpdateControls();
             }
             catch (Exception ex)
             {
@@ -347,7 +349,6 @@ namespace Extract.Redaction.Verification
                 _actionStatusComboBox.Enabled = _setFileActionStatusCheckBox.Checked;
 
                 _documentConditionButton.Enabled = _pauseOnDocumentConditionCheckBox.Checked;
-                _documentConditionTextBox.Enabled = _pauseOnDocumentConditionCheckBox.Checked;
                 if (_documentCondition.Object == null)
                 {
                     _documentConditionTextBox.Text = String.Empty;

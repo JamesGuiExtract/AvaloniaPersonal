@@ -246,6 +246,7 @@ namespace Extract.Redaction.Verification
             // 
             // _slideshowIntervalUpDown
             // 
+            this._slideshowIntervalUpDown.IntegersOnly = true;
             this._slideshowIntervalUpDown.Location = new System.Drawing.Point(289, 11);
             this._slideshowIntervalUpDown.Maximum = new decimal(new int[] {
             99,

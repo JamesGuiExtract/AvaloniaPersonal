@@ -42,6 +42,11 @@ namespace Extract.Redaction.Verification
                     _inputEventTracker.Dispose();
                     _inputEventTracker = null;
                 }
+                if (_shortcutsMessageFilter != null)
+                {
+                    _shortcutsMessageFilter.Dispose();
+                    _shortcutsMessageFilter = null;
+                }
                 if (_findOrRedactForm != null)
                 {
                     _findOrRedactForm.Dispose();

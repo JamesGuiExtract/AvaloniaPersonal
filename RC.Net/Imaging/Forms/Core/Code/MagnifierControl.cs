@@ -102,6 +102,7 @@ namespace Extract.Imaging.Forms
                         {
                             _imageViewer.PostImagePaint -= HandleImageViewerPostImagePaint;
                             _imageViewer.MouseMove -= HandleImageViewerMouseMove;
+                            _imageViewer.MouseLeave -= HandleImageViewerMouseLeave;
                             _imageViewer.ImageFileClosing -= HandleImageFileClosing;
                             _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                         }
@@ -111,6 +112,7 @@ namespace Extract.Imaging.Forms
 
                         _imageViewer.PostImagePaint += HandleImageViewerPostImagePaint;
                         _imageViewer.MouseMove += HandleImageViewerMouseMove;
+                        _imageViewer.MouseLeave += HandleImageViewerMouseLeave;
                         _imageViewer.ImageFileClosing += HandleImageFileClosing;
                         _imageViewer.ImageFileChanged += HandleImageFileChanged;
                     }
@@ -214,6 +216,26 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Handles the image viewer mouse leave.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleImageViewerMouseLeave(object sender, EventArgs e)
+        {
+            try
+            {
+                // Whenever the mouse has left the image viewer, invalidate to allow the magnified
+                // image portion currently displayed to be cleared.
+                Invalidate();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI32189", ex);
+            }
+        }
+
+        /// <summary>
         /// Handles the case that the <see cref="ImageViewer"/>'s image file has changed.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -247,6 +269,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 _active = false;
+                Invalidate();
             }
             catch (Exception ex)
             {

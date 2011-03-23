@@ -4756,7 +4756,7 @@ namespace Extract.Imaging.Forms
                 // Start with a solid background.
                 graphics.Clear(SystemColors.ControlDark);
 
-                if (IsImageAvailable)
+                if (IsImageAvailable && ClientRectangle.Contains(centerPoint))
                 {
                     // We're about to change the zoom, store the original zoom & fit mode
                     originalZoom = GetZoomInfo();
