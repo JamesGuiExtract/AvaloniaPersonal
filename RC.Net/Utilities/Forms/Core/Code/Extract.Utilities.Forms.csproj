@@ -68,6 +68,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="SandDock, Version=3.0.3.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
@@ -76,8 +78,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnchorAlignmentControl.cs">
@@ -235,6 +239,12 @@
     </Compile>
     <Compile Include="TimeoutResult.cs" />
     <Compile Include="WindowsMessage.cs" />
+    <Compile Include="TimerBarControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TimerBarControl.Designer.cs">
+      <DependentUpon>TimerBarControl.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
@@ -269,6 +279,9 @@
     <EmbeddedResource Include="InputBoxForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>InputBoxForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TimerBarControl.resx">
+      <DependentUpon>TimerBarControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TwoValueEntryDialog.resx">
       <DependentUpon>TwoValueEntryDialog.cs</DependentUpon>

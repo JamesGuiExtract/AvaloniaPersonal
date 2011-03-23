@@ -86,6 +86,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.WinForms.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
@@ -96,6 +98,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnchoredObject.cs" />

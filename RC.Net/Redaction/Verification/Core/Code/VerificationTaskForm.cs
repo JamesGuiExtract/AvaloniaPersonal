@@ -14,7 +14,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -228,6 +227,12 @@ namespace Extract.Redaction.Verification
         /// document/page.
         /// </summary>
         System.Windows.Forms.Timer _slideshowTimer = new System.Windows.Forms.Timer();
+
+        /// <summary>
+        /// Keep track of the last time the slideshow timer was stopped so we can automatically stop
+        /// the slideshow if an image hasn't been displayed in at least 10 seconds (queue is empty).
+        /// </summary>
+        DateTime? _slideshowTimerLastStopTime;
 
         /// <summary>
         /// Allows the "Slideshow Stopped" message that is displayed when the slideshow is
@@ -769,7 +774,7 @@ namespace Extract.Redaction.Verification
             // Ensure slideshow timer is not running until the next document is completely loaded.
             if (_slideshowTimer.Enabled)
             {
-                _slideshowTimer.Enabled = false;
+                StopSlideshowTimer();
             }
 
             CommitComment();
@@ -1023,7 +1028,7 @@ namespace Extract.Redaction.Verification
 
                     // Disable the timer so that it doesn't advance in the background while the
                     // message box is displayed.
-                    _slideshowTimer.Enabled = false;
+                    StopSlideshowTimer();
 
                     // Indicate that the slideshow should be allowed to continue after saving.
                     continueSlideshow = true;
@@ -1967,7 +1972,7 @@ namespace Extract.Redaction.Verification
                         StartSlideshow(true);
 
                         // Start the slideshow, but disable the timer until the first document is loaded.
-                        _slideshowTimer.Enabled = false;
+                        StopSlideshowTimer();
                     }
                 }
             }
@@ -2479,7 +2484,7 @@ namespace Extract.Redaction.Verification
                 // Ensure slideshow timer is not running until the next document is completely loaded.
                 if (_slideshowTimer.Enabled)
                 {
-                    _slideshowTimer.Enabled = false;
+                    StopSlideshowTimer();
                 }
 
                 UpdateControls();
@@ -2532,7 +2537,7 @@ namespace Extract.Redaction.Verification
                         else
                         {
                             // Restart the slideshow timer now that the document has been loaded.
-                            _slideshowTimer.Enabled = true;
+                            StartSlideshowTimer();
                         }
                     }
 
@@ -2734,7 +2739,7 @@ namespace Extract.Redaction.Verification
             {
                 // Don't re-start the clock on advancing to the next page/document until that
                 // document/page is completely loaded.
-                _slideshowTimer.Enabled = false;
+                StopSlideshowTimer();
 
                 // Ensure an image is still available.
                 if (!_imageViewer.IsImageAvailable)
@@ -2748,7 +2753,7 @@ namespace Extract.Redaction.Verification
                 if (nextPage <= _imageViewer.PageCount)
                 {
                     VisitPage(nextPage);
-                    _slideshowTimer.Enabled = true;
+                    StartSlideshowTimer();
                 }
                 else
                 {
@@ -2962,7 +2967,16 @@ namespace Extract.Redaction.Verification
                 _slideshowPlayToolStripMenuItem.Checked = start;
                 _stopSlideshowCommand.Enabled = start;
 
-                _slideshowTimer.Enabled = start && _imageViewer.IsImageAvailable;
+                if (start && _imageViewer.IsImageAvailable)
+                {
+                    StartSlideshowTimer();
+                }
+                else
+                {
+                    StopSlideshowTimer();
+
+                    _slideshowTimerLastStopTime = null;
+                }
             }
         }
 
@@ -2991,6 +3005,44 @@ namespace Extract.Redaction.Verification
                 _slideshowMessageCanceler =
                     OverlayText.ShowText(_imageViewer, "Slideshow Stopped", Font,
                         Color.FromArgb(100, Color.Red), null, 2);
+            }
+        }
+
+        /// <summary>
+        /// Starts the slideshow timer and displays a progress indicator.
+        /// </summary>
+        void StartSlideshowTimer()
+        {
+            ExtractException.Assert("ELI32180", "Slideshow error.", _slideshowRunning);
+            _timerBarControl.Visible = true;
+            _timerBarControl.StartTimer(_slideshowTimer.Interval);
+            _slideshowTimer.Enabled = true;
+
+            if (_slideshowTimerLastStopTime.HasValue && 
+                DateTime.Now.AddSeconds(-10) > _slideshowTimerLastStopTime)
+            {
+                // [FlexIDSCore:4596]
+                // If there is more than a 10 second gap between the last image getting closed and
+                // the new one being opened, assume the last file was the last in the queue at the
+                // time and stop the slideshow.
+                StopSlideshow(true);
+            }
+        }
+
+        /// <summary>
+        /// Stops the slideshow timer and stops the progress indicator.
+        /// </summary>
+        void StopSlideshowTimer()
+        {
+            _slideshowTimer.Enabled = false;
+            _timerBarControl.StopTimer(true);
+            if (_slideshowRunning)
+            {
+                _slideshowTimerLastStopTime = DateTime.Now;
+            }
+            else
+            {
+                _timerBarControl.Visible = false;
             }
         }
 
