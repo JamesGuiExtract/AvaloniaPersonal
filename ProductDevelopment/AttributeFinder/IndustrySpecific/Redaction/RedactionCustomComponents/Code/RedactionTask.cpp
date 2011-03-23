@@ -1897,7 +1897,7 @@ void CRedactionTask::storeMetaData(const string& strVoaFile, IIUnknownVectorPtr 
 
         // Calculate the next id
         long lNextId = getNextId(ipAttributes);
-        assignIds(ipRedactedAttributes, lNextId, strSourceDocument);
+        assignIds(ipAttributes, lNextId, strSourceDocument);
 
         // Calculate the next redaction session
         long lNextSession = getNextSessionId(ipAttributes);

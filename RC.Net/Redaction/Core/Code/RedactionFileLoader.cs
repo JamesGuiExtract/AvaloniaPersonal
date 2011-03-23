@@ -311,11 +311,12 @@ namespace Extract.Redaction
                 AddNonOutputAttributes(previous, level, revisions);
             }
 
+            // Determine the next attribute id
+            // NOTE: This must be done before the call to initialize sensitive items
+            _nextId = GetNextId(_sensitiveItems, _revisionsAttribute);
+
             // Ensure all sensitive items have attribute ids and are in their initial toggled state
             InitializeSensitiveItems(_sensitiveItems);
-
-            // Determine the next attribute id
-            _nextId = GetNextId(_sensitiveItems, _revisionsAttribute);
 
             // Get all previous sessions
             _allSessions = AttributeMethods.GetAttributesByName(attributes,
