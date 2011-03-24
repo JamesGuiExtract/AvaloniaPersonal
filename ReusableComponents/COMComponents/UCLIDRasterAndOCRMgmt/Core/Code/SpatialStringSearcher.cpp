@@ -669,10 +669,10 @@ void CSpatialStringSearcher::createLocalLetters()
 		}
 
 		// Set the bounds
-		rLocalLetter.m_lLeft = letter.m_usLeft;
-		rLocalLetter.m_lRight = letter.m_usRight;
-		rLocalLetter.m_lTop = letter.m_usTop;
-		rLocalLetter.m_lBottom = letter.m_usBottom;
+		rLocalLetter.m_lLeft = letter.m_ulLeft;
+		rLocalLetter.m_lRight = letter.m_ulRight;
+		rLocalLetter.m_lTop = letter.m_ulTop;
+		rLocalLetter.m_lBottom = letter.m_ulBottom;
 
 		// Create the document boundaries
 		if (rLocalLetter.m_lLeft < m_lStringLeft || m_lStringLeft < 0)
@@ -1277,13 +1277,13 @@ void CSpatialStringSearcher::addLocalLetter(vector<CPPLetter>& vecLetters,
 		CPPLetter cppLetter = letter.letter;
 
 		const LocalLine& line = m_vecLines[letter.m_uiLine];
-		if (cppLetter.m_usTop > line.m_lTop)
+		if (cppLetter.m_ulTop > (unsigned long) line.m_lTop)
 		{
-			cppLetter.m_usTop = (unsigned short) line.m_lTop;
+			cppLetter.m_ulTop = line.m_lTop;
 		}
-		if (cppLetter.m_usBottom < line.m_lBottom)
+		if (cppLetter.m_ulBottom < (unsigned long) line.m_lBottom)
 		{
-			cppLetter.m_usBottom = (unsigned short) line.m_lBottom;
+			cppLetter.m_ulBottom = line.m_lBottom;
 		}
 
 		vecLetters.push_back(cppLetter);

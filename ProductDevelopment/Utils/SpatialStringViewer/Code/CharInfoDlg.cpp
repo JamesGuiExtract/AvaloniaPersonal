@@ -138,10 +138,10 @@ void CharInfoDlg::setCharacterData(const ILetterPtr& ripLetter)
 	m_edGuess3.SetWindowText( processGuess(letter.m_usGuess3) );
 
 	// set the rectangle coordinate's edit boxes
-	m_edTop.SetWindowText( processRectangleCoordinate(letter.m_usTop).c_str() );
-	m_edBottom.SetWindowText( processRectangleCoordinate(letter.m_usBottom).c_str() );
-	m_edLeft.SetWindowText( processRectangleCoordinate(letter.m_usLeft).c_str() );
-	m_edRight.SetWindowText( processRectangleCoordinate(letter.m_usRight).c_str() );
+	m_edTop.SetWindowText( processRectangleCoordinate(letter.m_ulTop).c_str() );
+	m_edBottom.SetWindowText( processRectangleCoordinate(letter.m_ulBottom).c_str() );
+	m_edLeft.SetWindowText( processRectangleCoordinate(letter.m_ulLeft).c_str() );
+	m_edRight.SetWindowText( processRectangleCoordinate(letter.m_ulRight).c_str() );
 
 
 	// format the confidence

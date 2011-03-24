@@ -1520,8 +1520,8 @@ void CSplitRegionIntoContentAreas::splitLineFragments(IIUnknownVectorPtr ipLines
 					continue;
 				}
 
-				CRect rectLetter(letter.m_usLeft, letter.m_usTop,
-					letter.m_usRight, letter.m_usBottom);
+				CRect rectLetter(letter.m_ulLeft, letter.m_ulTop,
+					letter.m_ulRight, letter.m_ulBottom);
 				if (rectLetter.IsRectEmpty())
 				{
 					continue;

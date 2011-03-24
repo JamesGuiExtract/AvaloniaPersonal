@@ -1299,10 +1299,10 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 				// this is a non-space letter
 
 				// store the position of the current letter
-				letter.m_usTop = pCurLetter->top;
-				letter.m_usLeft = pCurLetter->left;
-				letter.m_usBottom = pCurLetter->top + pCurLetter->height;
-				letter.m_usRight = pCurLetter->left + pCurLetter->width;
+				letter.m_ulTop = pCurLetter->top;
+				letter.m_ulLeft = pCurLetter->left;
+				letter.m_ulBottom = pCurLetter->top + pCurLetter->height;
+				letter.m_ulRight = pCurLetter->left + pCurLetter->width;
 
 				// get the first guess for this character if it was recognized
 				// or the unrecognized symbol if it was not

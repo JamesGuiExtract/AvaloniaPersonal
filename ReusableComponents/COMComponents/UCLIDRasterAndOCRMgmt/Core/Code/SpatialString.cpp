@@ -177,10 +177,10 @@ STDMETHODIMP CSpatialString::Offset(long nX, long nY)
 
 				if (letter.m_bIsSpatial)
 				{
-					letter.m_usTop += (unsigned short) nY;
-					letter.m_usLeft += (unsigned short) nX;
-					letter.m_usRight += (unsigned short) nX;
-					letter.m_usBottom += (unsigned short) nY;
+					letter.m_ulTop += nY;
+					letter.m_ulLeft += nX;
+					letter.m_ulRight += nX;
+					letter.m_ulBottom += nY;
 				}
 			}//end for
 		}

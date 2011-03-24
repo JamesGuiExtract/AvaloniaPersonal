@@ -220,10 +220,10 @@ STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR 
 			vecLetters.push_back(CPPLetter(usLetter,
 				usLetter,
 				usLetter,
-				(unsigned short) nTop,
-				(unsigned short) nBottom,
-				(unsigned short) ufLeftBound,
-				(unsigned short) (ufLeftBound + ufCharWidth),
+				nTop,
+				nBottom,
+				(unsigned long) ufLeftBound,
+				(unsigned long) (ufLeftBound + ufCharWidth),
 				(unsigned short) nPageNum,
 				false, false, true, (unsigned char) ufCharWidth, 100, 0));
 
@@ -231,7 +231,7 @@ STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR 
 		}
 
 		// set the last character's right bound to the right bound of the region
-		vecLetters[nLetterCount - 1].m_usRight = (unsigned short) nRight;
+		vecLetters[nLetterCount - 1].m_ulRight = nRight;
 
 		processLetters(&vecLetters[0], nLetterCount);
 

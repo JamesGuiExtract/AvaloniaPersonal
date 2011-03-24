@@ -20,7 +20,7 @@ class CPPLetter
 public:
 	CPPLetter() :
 	m_usGuess1(-1), m_usGuess2(-1), m_usGuess3(-1), 
-	m_usTop(-1), m_usLeft(-1), m_usRight(-1), m_usBottom(-1), 
+	m_ulTop(-1), m_ulLeft(-1), m_ulRight(-1), m_ulBottom(-1), 
 	m_usPageNumber(-1),
 	m_bIsEndOfParagraph(false),
 	m_bIsEndOfZone(false),
@@ -34,10 +34,10 @@ public:
 	CPPLetter(unsigned short usGuess1,
 			  unsigned short usGuess2,
 			  unsigned short usGuess3,
-			  unsigned short usTop,
-			  unsigned short usBottom,
-			  unsigned short usLeft,
-			  unsigned short usRight,
+			  unsigned long ulTop,
+			  unsigned long ulBottom,
+			  unsigned long ulLeft,
+			  unsigned long ulRight,
 			  unsigned short usPageNumber,
 			  bool bIsEndOfParagraph,
 			  bool bIsEndOfZone,
@@ -48,10 +48,10 @@ public:
 	 : m_usGuess1(usGuess1), 
 	   m_usGuess2(usGuess2), 
 	   m_usGuess3(usGuess3), 
-	   m_usTop(usTop), 
-	   m_usBottom(usBottom), 
-	   m_usLeft(usLeft), 
-	   m_usRight(usRight), 
+	   m_ulTop(ulTop), 
+	   m_ulBottom(ulBottom), 
+	   m_ulLeft(ulLeft), 
+	   m_ulRight(ulRight), 
 	   m_usPageNumber(usPageNumber),
 	   m_bIsEndOfParagraph(bIsEndOfParagraph),
 	   m_bIsEndOfZone(bIsEndOfZone),
@@ -66,10 +66,10 @@ public:
 		m_usGuess1(letter.m_usGuess1),
 		m_usGuess2(letter.m_usGuess2),
 		m_usGuess3(letter.m_usGuess2),
-		m_usTop(letter.m_usTop),
-		m_usBottom(letter.m_usBottom),
-		m_usLeft(letter.m_usLeft),
-		m_usRight(letter.m_usRight),
+		m_ulTop(letter.m_ulTop),
+		m_ulBottom(letter.m_ulBottom),
+		m_ulLeft(letter.m_ulLeft),
+		m_ulRight(letter.m_ulRight),
 		m_usPageNumber(letter.m_usPageNumber),
 		m_bIsEndOfParagraph(letter.m_bIsEndOfParagraph),
 		m_bIsEndOfZone(letter.m_bIsEndOfZone),
@@ -90,10 +90,10 @@ public:
 		m_usGuess1 = letter.m_usGuess1;
 		m_usGuess2 = letter.m_usGuess2;
 		m_usGuess3 = letter.m_usGuess2;
-		m_usTop = letter.m_usTop;
-		m_usBottom = letter.m_usBottom;
-		m_usLeft = letter.m_usLeft;
-		m_usRight = letter.m_usRight;
+		m_ulTop = letter.m_ulTop;
+		m_ulBottom = letter.m_ulBottom;
+		m_ulLeft = letter.m_ulLeft;
+		m_ulRight = letter.m_ulRight;
 		m_usPageNumber = letter.m_usPageNumber;
 		m_bIsEndOfParagraph = letter.m_bIsEndOfParagraph;
 		m_bIsEndOfZone = letter.m_bIsEndOfZone;
@@ -143,10 +143,10 @@ public:
 	unsigned short m_usGuess3;
 	
 	// The spatialBoundaries of the letter
-	unsigned short m_usTop;
-	unsigned short m_usLeft;
-	unsigned short m_usRight;
-	unsigned short m_usBottom;
+	unsigned long m_ulTop;
+	unsigned long m_ulLeft;
+	unsigned long m_ulRight;
+	unsigned long m_ulBottom;
 	
 	// max number of pages per document is limited to 65535
 	// The page on which this character lies

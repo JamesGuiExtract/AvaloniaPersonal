@@ -17,7 +17,7 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 6;
+const unsigned long gnCurrentVersion = 7;
 
 //-------------------------------------------------------------------------------------------------
 // CLetter
@@ -65,10 +65,10 @@ STDMETHODIMP CLetter::raw_CopyFrom(IUnknown * pObject)
 		ASSERT_RESOURCE_ALLOCATION("ELI08311", ipSource != NULL);
 
 		// copy the information from this object to the other object
-		m_letter.m_usLeft = (unsigned short) ipSource->GetLeft();
-		m_letter.m_usTop = (unsigned short) ipSource->GetTop();
-		m_letter.m_usRight = (unsigned short) ipSource->GetRight();
-		m_letter.m_usBottom = (unsigned short) ipSource->GetBottom();
+		m_letter.m_ulLeft = ipSource->GetLeft();
+		m_letter.m_ulTop = ipSource->GetTop();
+		m_letter.m_ulRight = ipSource->GetRight();
+		m_letter.m_ulBottom = ipSource->GetBottom();
 
 		m_letter.m_usGuess1 = (unsigned short) ipSource->GetGuess1();
 		m_letter.m_usGuess2 = (unsigned short) ipSource->GetGuess2();
@@ -126,7 +126,7 @@ STDMETHODIMP CLetter::get_Left(long *pVal)
 		// validate license
 		validateLicense();
 
-		*pVal = m_letter.m_usLeft;
+		*pVal = m_letter.m_ulLeft;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05655")
 
@@ -142,7 +142,7 @@ STDMETHODIMP CLetter::put_Left(long newVal)
 		// validate license
 		validateLicense();
 
-		m_letter.m_usLeft = (unsigned short) newVal;
+		m_letter.m_ulLeft = (unsigned short) newVal;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05656")
 
@@ -158,7 +158,7 @@ STDMETHODIMP CLetter::get_Top(long *pVal)
 		// validate license
 		validateLicense();
 
-		*pVal = m_letter.m_usTop;
+		*pVal = m_letter.m_ulTop;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05657")
 
@@ -174,7 +174,7 @@ STDMETHODIMP CLetter::put_Top(long newVal)
 		// validate license
 		validateLicense();
 
-		m_letter.m_usTop = (unsigned short) newVal;
+		m_letter.m_ulTop = (unsigned short) newVal;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05658")
 
@@ -190,7 +190,7 @@ STDMETHODIMP CLetter::get_Right(long *pVal)
 		// validate license
 		validateLicense();
 
-		*pVal = m_letter.m_usRight;
+		*pVal = m_letter.m_ulRight;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05659")
 
@@ -206,7 +206,7 @@ STDMETHODIMP CLetter::put_Right(long newVal)
 		// validate license
 		validateLicense();
 
-		m_letter.m_usRight = (unsigned short) newVal;
+		m_letter.m_ulRight = (unsigned short) newVal;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05660")
 
@@ -222,7 +222,7 @@ STDMETHODIMP CLetter::get_Bottom(long *pVal)
 		// validate license
 		validateLicense();
 
-		*pVal = m_letter.m_usBottom;
+		*pVal = m_letter.m_ulBottom;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05661")
 
@@ -238,7 +238,7 @@ STDMETHODIMP CLetter::put_Bottom(long newVal)
 		// validate license
 		validateLicense();
 
-		m_letter.m_usBottom = (unsigned short) newVal;
+		m_letter.m_ulBottom = (unsigned short) newVal;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05662")
 
@@ -523,10 +523,10 @@ STDMETHODIMP CLetter::Offset(long nX, long nY)
 		// if this letter is spatial, then apply the offset
 		if (m_letter.m_bIsSpatial)
 		{
-			m_letter.m_usTop += (unsigned short) nY;
-			m_letter.m_usLeft += (unsigned short) nX;
-			m_letter.m_usRight += (unsigned short) nX;
-			m_letter.m_usBottom += (unsigned short) nY;
+			m_letter.m_ulTop += nY;
+			m_letter.m_ulLeft += nX;
+			m_letter.m_ulRight += nX;
+			m_letter.m_ulBottom += nY;
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06661")
@@ -948,7 +948,12 @@ STDMETHODIMP CLetter::Load(IStream *pStream)
 		{
 		// read the object data
 			dataReader >> m_letter.m_usGuess1 >> m_letter.m_usGuess2 >> m_letter.m_usGuess3;
-			dataReader >> m_letter.m_usTop >> m_letter.m_usLeft >> m_letter.m_usRight >> m_letter.m_usBottom;
+			unsigned short usTop, usLeft, usRight, usBottom;
+			dataReader >> usTop >> usLeft >> usRight >> usBottom;
+			m_letter.m_ulTop = usTop;
+			m_letter.m_ulLeft = usLeft;
+			m_letter.m_ulRight = usRight;
+			m_letter.m_ulBottom = usBottom;
 			unsigned char ucTemp;
 			dataReader >> ucTemp;
 			m_letter.m_usPageNumber = ucTemp;
@@ -961,7 +966,12 @@ STDMETHODIMP CLetter::Load(IStream *pStream)
 		else if(nDataVersion == 2)
 		{
 			dataReader >> m_letter.m_usGuess1 >> m_letter.m_usGuess2 >> m_letter.m_usGuess3;
-			dataReader >> m_letter.m_usTop >> m_letter.m_usLeft >> m_letter.m_usRight >> m_letter.m_usBottom;
+			unsigned short usTop, usLeft, usRight, usBottom;
+			dataReader >> usTop >> usLeft >> usRight >> usBottom;
+			m_letter.m_ulTop = usTop;
+			m_letter.m_ulLeft = usLeft;
+			m_letter.m_ulRight = usRight;
+			m_letter.m_ulBottom = usBottom;
 			unsigned char ucTemp;
 			dataReader >> ucTemp;
 			m_letter.m_usPageNumber = ucTemp;
@@ -973,7 +983,12 @@ STDMETHODIMP CLetter::Load(IStream *pStream)
 		else if(nDataVersion == 3)
 		{
 			dataReader >> m_letter.m_usGuess1 >> m_letter.m_usGuess2 >> m_letter.m_usGuess3;
-			dataReader >> m_letter.m_usTop >> m_letter.m_usLeft >> m_letter.m_usRight >> m_letter.m_usBottom;
+			unsigned short usTop, usLeft, usRight, usBottom;
+			dataReader >> usTop >> usLeft >> usRight >> usBottom;
+			m_letter.m_ulTop = usTop;
+			m_letter.m_ulLeft = usLeft;
+			m_letter.m_ulRight = usRight;
+			m_letter.m_ulBottom = usBottom;
 			unsigned char ucTemp;
 			dataReader >> ucTemp;
 			m_letter.m_usPageNumber = ucTemp;
@@ -984,7 +999,12 @@ STDMETHODIMP CLetter::Load(IStream *pStream)
 		else if(nDataVersion == 4)
 		{
 			dataReader >> m_letter.m_usGuess1 >> m_letter.m_usGuess2 >> m_letter.m_usGuess3;
-			dataReader >> m_letter.m_usTop >> m_letter.m_usLeft >> m_letter.m_usRight >> m_letter.m_usBottom;
+			unsigned short usTop, usLeft, usRight, usBottom;
+			dataReader >> usTop >> usLeft >> usRight >> usBottom;
+			m_letter.m_ulTop = usTop;
+			m_letter.m_ulLeft = usLeft;
+			m_letter.m_ulRight = usRight;
+			m_letter.m_ulBottom = usBottom;
 			unsigned char ucTemp;
 			dataReader >> ucTemp;
 			m_letter.m_usPageNumber = ucTemp;
@@ -997,7 +1017,12 @@ STDMETHODIMP CLetter::Load(IStream *pStream)
 		else if(nDataVersion == 5)
 		{
 			dataReader >> m_letter.m_usGuess1 >> m_letter.m_usGuess2 >> m_letter.m_usGuess3;
-			dataReader >> m_letter.m_usTop >> m_letter.m_usLeft >> m_letter.m_usRight >> m_letter.m_usBottom;
+			unsigned short usTop, usLeft, usRight, usBottom;
+			dataReader >> usTop >> usLeft >> usRight >> usBottom;
+			m_letter.m_ulTop = usTop;
+			m_letter.m_ulLeft = usLeft;
+			m_letter.m_ulRight = usRight;
+			m_letter.m_ulBottom = usBottom;
 			unsigned char ucTemp;
 			dataReader >> ucTemp;
 			m_letter.m_usPageNumber = ucTemp;
@@ -1008,10 +1033,27 @@ STDMETHODIMP CLetter::Load(IStream *pStream)
 			dataReader >> m_letter.m_ucCharConfidence;
 			dataReader >> m_letter.m_ucFont;
 		}
-		else if(nDataVersion >= 6)
+		else if(nDataVersion == 6)
 		{
 			dataReader >> m_letter.m_usGuess1 >> m_letter.m_usGuess2 >> m_letter.m_usGuess3;
-			dataReader >> m_letter.m_usTop >> m_letter.m_usLeft >> m_letter.m_usRight >> m_letter.m_usBottom;
+			unsigned short usTop, usLeft, usRight, usBottom;
+			dataReader >> usTop >> usLeft >> usRight >> usBottom;
+			m_letter.m_ulTop = usTop;
+			m_letter.m_ulLeft = usLeft;
+			m_letter.m_ulRight = usRight;
+			m_letter.m_ulBottom = usBottom;
+			dataReader >> m_letter.m_usPageNumber;
+			dataReader >> m_letter.m_bIsEndOfParagraph;
+			dataReader >> m_letter.m_bIsEndOfZone;
+			dataReader >> m_letter.m_bIsSpatial;
+			dataReader >> m_letter.m_ucFontSize;
+			dataReader >> m_letter.m_ucCharConfidence;
+			dataReader >> m_letter.m_ucFont;
+		}
+		else if(nDataVersion >= 7)
+		{
+			dataReader >> m_letter.m_usGuess1 >> m_letter.m_usGuess2 >> m_letter.m_usGuess3;
+			dataReader >> m_letter.m_ulTop >> m_letter.m_ulLeft >> m_letter.m_ulRight >> m_letter.m_ulBottom;
 			dataReader >> m_letter.m_usPageNumber;
 			dataReader >> m_letter.m_bIsEndOfParagraph;
 			dataReader >> m_letter.m_bIsEndOfZone;
@@ -1043,7 +1085,7 @@ STDMETHODIMP CLetter::Save(IStream *pStream, BOOL fClearDirty)
 
 		// write the object data
 		dataWriter << m_letter.m_usGuess1 << m_letter.m_usGuess2 << m_letter.m_usGuess3;
-		dataWriter << m_letter.m_usTop << m_letter.m_usLeft << m_letter.m_usRight << m_letter.m_usBottom;
+		dataWriter << m_letter.m_ulTop << m_letter.m_ulLeft << m_letter.m_ulRight << m_letter.m_ulBottom;
 		dataWriter << m_letter.m_usPageNumber;
 		dataWriter << m_letter.m_bIsEndOfParagraph;
 		dataWriter << m_letter.m_bIsEndOfZone;
@@ -1083,7 +1125,7 @@ STDMETHODIMP CLetter::GetSizeMax(ULARGE_INTEGER *pcbSize)
 void CLetter::reset()
 {
 	m_letter.m_usGuess1 = m_letter.m_usGuess2 = m_letter.m_usGuess3 = 0;
-	m_letter.m_usTop = m_letter.m_usLeft = m_letter.m_usRight = m_letter.m_usBottom = 0;
+	m_letter.m_ulTop = m_letter.m_ulLeft = m_letter.m_ulRight = m_letter.m_ulBottom = 0;
 	m_letter.m_bIsEndOfParagraph = m_letter.m_bIsEndOfZone = false;
 	m_letter.m_bIsSpatial = false;
 	m_letter.m_usPageNumber = -1;

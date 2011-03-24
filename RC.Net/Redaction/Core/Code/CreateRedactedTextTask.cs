@@ -248,7 +248,6 @@ namespace Extract.Redaction
                 LongRectangle textBounds = source.GetOCRImageBounds();
                 if (textBounds.Left != 0 ||
                     textBounds.Top != 0 ||
-                    textBounds.Right != (source.String.Length + 1)||
                     textBounds.Bottom != 2)
                 {
                     throw new ExtractException("ELI32207",

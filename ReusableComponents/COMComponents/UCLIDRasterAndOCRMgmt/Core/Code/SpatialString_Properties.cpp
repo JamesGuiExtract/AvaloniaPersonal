@@ -978,17 +978,17 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 						c == 'g' ||
 						c == 'y')
 					{
-						totLargeCharHeight += letter.m_usBottom - letter.m_usTop;
+						totLargeCharHeight += letter.m_ulBottom - letter.m_ulTop;
 						numLargeChars++;
 					}
 					else if ( (c >= 'a' && c <= 'z') ) // if c is a 'small' character
 					{
-						totSmallCharHeight += letter.m_usBottom - letter.m_usTop;
+						totSmallCharHeight += letter.m_ulBottom - letter.m_ulTop;
 						numSmallChars++;
 					}
 					else // if c is any other character character
 					{
-						int h = letter.m_usBottom - letter.m_usTop;
+						int h = letter.m_ulBottom - letter.m_ulTop;
 						if (h > maxCharHeight)
 							maxCharHeight = h;
 					}
@@ -1166,8 +1166,8 @@ STDMETHODIMP CSpatialString::GetSplitLines(long nMaxSpace, IIUnknownVector** ppR
 				CPPLetter& letter1 = letters[end1];
 				CPPLetter& letter2 = letters[start2];
 			
-				long lRight1 = letter1.m_usRight;
-				long lLeft2 = letter2.m_usLeft;
+				long lRight1 = letter1.m_ulRight;
+				long lLeft2 = letter2.m_ulLeft;
 
 				if ((lLeft2 - lRight1) > nMaxPixelSpace)
 				{

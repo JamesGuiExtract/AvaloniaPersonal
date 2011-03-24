@@ -99,10 +99,8 @@ private:
 	/*
 	// The following variables correspond to the variables of the
 	// LETTER structure in the Scansoft RecApi.
-	// character guesses and pixel boundaries are limited to
-	// a 65,535 maximum number
 	unsigned short m_usGuess1, m_usGuess2, m_usGuess3;
-	unsigned short m_usTop, m_usLeft, m_usRight, m_usBottom;
+	unsigned long m_ulTop, m_ulLeft, m_ulRight, m_ulBottom;
 	
 	// max number of pages per document is limited to 255
 	unsigned char m_ucPageNumber;

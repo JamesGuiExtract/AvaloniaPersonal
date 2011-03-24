@@ -1066,10 +1066,10 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName)
 		{
 			letter.m_bIsSpatial = true;
 			letter.m_usPageNumber = 1;
-			letter.m_usLeft = i;
-			letter.m_usRight = i;
-			letter.m_usTop = 0;
-			letter.m_usBottom = 1;
+			letter.m_ulLeft = i;
+			letter.m_ulRight = i;
+			letter.m_ulTop = 0;
+			letter.m_ulBottom = 1;
 			plastSpatialLetter = &letter;
 		}
 	}
@@ -1866,8 +1866,8 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
                 }
 
                 // Get the spatial area of the current character.
-                CRect rectLetter(m_vecLetters[j].m_usLeft, m_vecLetters[j].m_usTop, 
-                    m_vecLetters[j].m_usRight, m_vecLetters[j].m_usBottom);
+                CRect rectLetter(m_vecLetters[j].m_ulLeft, m_vecLetters[j].m_ulTop, 
+                    m_vecLetters[j].m_ulRight, m_vecLetters[j].m_ulBottom);
 
                 // Combine the character's area with the area of the current raster zone as a whole.
                 rectCurrentZone.UnionRect(rectCurrentZone, rectLetter);
@@ -2600,7 +2600,7 @@ long CSpatialString::getAverageCharHeight()
                 continue;
             }
 
-            totalCharHeight += letter.m_usBottom - letter.m_usTop;
+            totalCharHeight += letter.m_ulBottom - letter.m_ulTop;
             numChars++;
         }
 
@@ -2667,7 +2667,7 @@ long CSpatialString::getAverageCharWidth()
                     continue;
                 }
 
-                totalCharWidth += letter2.m_usLeft - letter1.m_usLeft;
+                totalCharWidth += letter2.m_ulLeft - letter1.m_ulLeft;
                 numChars++;
             }
         }
@@ -2693,7 +2693,7 @@ long CSpatialString::getAverageCharWidth()
                     continue;
                 }
 
-                long w = letter.m_usRight - letter.m_usLeft;
+                long w = letter.m_ulRight - letter.m_ulLeft;
 
                 totalCharWidth += w;
                 numChars++;
@@ -2767,7 +2767,7 @@ vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> CSpatialString::getOCRImageRas
                 }
 
                 // Form a rectangle from the letter
-                CRect rect(letter.m_usLeft, letter.m_usTop, letter.m_usRight, letter.m_usBottom);
+                CRect rect(letter.m_ulLeft, letter.m_ulTop, letter.m_ulRight, letter.m_ulBottom);
 
                 // Iterate the rest of the letters in the line updating the rectangle bounds
                 long lBounds = min(it->second + 1, lLettersSize);
@@ -2782,10 +2782,10 @@ vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> CSpatialString::getOCRImageRas
                     }
 
                     // Update the rectangle based on this spatial letter
-                    rect.left = min(rect.left, tempLetter.m_usLeft);
-                    rect.top = min(rect.top, tempLetter.m_usTop);
-                    rect.right = max(rect.right, tempLetter.m_usRight);
-                    rect.bottom = max(rect.bottom, tempLetter.m_usBottom);
+                    rect.left = min(rect.left, (LONG)tempLetter.m_ulLeft);
+                    rect.top = min(rect.top, (LONG)tempLetter.m_ulTop);
+                    rect.right = max(rect.right, (LONG)tempLetter.m_ulRight);
+                    rect.bottom = max(rect.bottom, (LONG)tempLetter.m_ulBottom);
                 }
 
                 // Create a long rectangle from the CRect

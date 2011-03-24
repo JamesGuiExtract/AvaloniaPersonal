@@ -10,7 +10,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 12;
+const unsigned long gnCurrentVersion = 13;
 const string gstrRASTER_OCR_SECTION = "\\ReusableComponents\\COMComponents\\UCLIDRasterAndOCRMgmt";
 const string gstrCONVERT_LEGACY_STRINGS_KEY = "ConvertLegacyHybridStrings";
 
@@ -280,6 +280,7 @@ STDMETHODIMP CSpatialString::IsDirty(void)
 // Version 10 - Added m_bIsForcedRotation
 // Version 11 - Removed m_bIsForcedRotation
 // Version 12 - Added OCR Engine Version information
+// Version 13 - Spatial coordinates are now stored as unsigned long instead of unsigned short
 STDMETHODIMP CSpatialString::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -415,10 +416,10 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 					letter.m_usGuess1 = letters[i].m_usGuess1; 
 					letter.m_usGuess2 = letters[i].m_usGuess2;
 					letter.m_usGuess3 = letters[i].m_usGuess3;
-					letter.m_usTop = letters[i].m_usTop;
-					letter.m_usBottom = letters[i].m_usBottom;
-					letter.m_usLeft = letters[i].m_usLeft;
-					letter.m_usRight = letters[i].m_usRight;
+					letter.m_ulTop = letters[i].m_usTop;
+					letter.m_ulBottom = letters[i].m_usBottom;
+					letter.m_ulLeft = letters[i].m_usLeft;
+					letter.m_ulRight = letters[i].m_usRight;
 					letter.m_usPageNumber = letters[i].m_ucPageNumber;
 					letter.m_bIsEndOfParagraph = letters[i].m_bIsEndOfParagraph;
 					letter.m_bIsEndOfZone = letters[i].m_bIsEndOfZone;
@@ -484,10 +485,10 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 					letter.m_usGuess1 = letters[i].m_usGuess1; 
 					letter.m_usGuess2 = letters[i].m_usGuess2;
 					letter.m_usGuess3 = letters[i].m_usGuess3;
-					letter.m_usTop = letters[i].m_usTop;
-					letter.m_usBottom = letters[i].m_usBottom;
-					letter.m_usLeft = letters[i].m_usLeft;
-					letter.m_usRight = letters[i].m_usRight;
+					letter.m_ulTop = letters[i].m_usTop;
+					letter.m_ulBottom = letters[i].m_usBottom;
+					letter.m_ulLeft = letters[i].m_usLeft;
+					letter.m_ulRight = letters[i].m_usRight;
 					letter.m_usPageNumber = letters[i].m_ucPageNumber;
 					letter.m_bIsEndOfParagraph = letters[i].m_bIsEndOfParagraph;
 					letter.m_bIsEndOfZone = letters[i].m_bIsEndOfZone;
@@ -567,10 +568,10 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 						letter.m_usGuess1 = letters[i].m_usGuess1; 
 						letter.m_usGuess2 = letters[i].m_usGuess2;
 						letter.m_usGuess3 = letters[i].m_usGuess3;
-						letter.m_usTop = letters[i].m_usTop;
-						letter.m_usBottom = letters[i].m_usBottom;
-						letter.m_usLeft = letters[i].m_usLeft;
-						letter.m_usRight = letters[i].m_usRight;
+						letter.m_ulTop = letters[i].m_usTop;
+						letter.m_ulBottom = letters[i].m_usBottom;
+						letter.m_ulLeft = letters[i].m_usLeft;
+						letter.m_ulRight = letters[i].m_usRight;
 						letter.m_usPageNumber = letters[i].m_ucPageNumber;
 						letter.m_bIsEndOfParagraph = letters[i].m_bIsEndOfParagraph;
 						letter.m_bIsEndOfZone = letters[i].m_bIsEndOfZone;
@@ -618,16 +619,75 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 
 				if (nNumLetters > 0)
 				{
-					// Determine size of chunk of Letters objects
-					ByteStream bs;
-					bs.setSize( nNumLetters * sizeof(CPPLetter) );
+					if (nDataVersion < 13)
+					{
+						struct Version9Letter
+						{
+							unsigned short m_usGuess1;
+							unsigned short m_usGuess2;
+							unsigned short m_usGuess3;
+							unsigned short m_usTop;
+							unsigned short m_usLeft;
+							unsigned short m_usRight;
+							unsigned short m_usBottom;
+							unsigned short m_usPageNumber;
+							bool m_bIsEndOfParagraph;
+							bool m_bIsEndOfZone;
+							bool m_bIsSpatial;
+							unsigned char m_ucFontSize;
+							unsigned char m_ucCharConfidence;
+							unsigned char m_ucFont;
+						};
 
-					// Read the chunk of letters and hold as an array
-					dataReader.read( bs );
-					CPPLetter* letters = (CPPLetter*)bs.getData();
+						// Read the letter objects as one chunk
+						ByteStream bs;
+						bs.setSize(nNumLetters*sizeof(Version9Letter));
+						dataReader.read(bs);
 
-					// Note: this call will build the string
-					updateLetters( letters, nNumLetters );
+						// Convert the Version9Letter into current CppLetters
+						Version9Letter* letters = (Version9Letter*)bs.getData();
+						vector<CPPLetter> vecLetters;
+
+						for (int i = 0; i < nNumLetters; i++)
+						{
+							CPPLetter letter;
+
+							// Copy each element from Version9Letter to CPPLetter
+							letter.m_usGuess1 = letters[i].m_usGuess1; 
+							letter.m_usGuess2 = letters[i].m_usGuess2;
+							letter.m_usGuess3 = letters[i].m_usGuess3;
+							letter.m_ulTop = letters[i].m_usTop;
+							letter.m_ulBottom = letters[i].m_usBottom;
+							letter.m_ulLeft = letters[i].m_usLeft;
+							letter.m_ulRight = letters[i].m_usRight;
+							letter.m_usPageNumber = letters[i].m_usPageNumber;
+							letter.m_bIsEndOfParagraph = letters[i].m_bIsEndOfParagraph;
+							letter.m_bIsEndOfZone = letters[i].m_bIsEndOfZone;
+							letter.m_bIsSpatial = letters[i].m_bIsSpatial;
+							letter.m_ucFontSize = letters[i].m_ucFontSize;
+							letter.m_ucCharConfidence = letters[i].m_ucCharConfidence;
+							letter.m_ucFont = letters[i].m_ucFont;
+
+							// Add this new CPP letter into the collection
+							vecLetters.push_back(letter);
+						}
+
+						// Note: this call will build the string
+						updateLetters(&vecLetters[0], nNumLetters);
+					}
+					else
+					{
+						// Determine size of chunk of Letters objects
+						ByteStream bs;
+						bs.setSize(nNumLetters * sizeof(CPPLetter));
+
+						// Read the chunk of letters and hold as an array
+						dataReader.read( bs );
+						CPPLetter* letters = (CPPLetter*)bs.getData();
+
+						// Note: this call will build the string
+						updateLetters(letters, nNumLetters);
+					}
 				}
 			}
 			else if (m_eMode == kHybridMode)
