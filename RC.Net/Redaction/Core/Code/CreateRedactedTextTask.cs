@@ -217,6 +217,20 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI31641",
                     _COMPONENT_DESCRIPTION);
 
+                // Load the redactions
+                FileActionManagerPathTags pathTags =
+                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir);
+                string voaFile = pathTags.Expand(_settings.DataFile);
+
+                if (!File.Exists(voaFile))
+                {
+                    ExtractException ee = new ExtractException("ELI32205", "VOA file not found.");
+                    ee.AddDebugData("File name", voaFile, false);
+                    throw ee;
+                }
+
+                _voaLoader.LoadFrom(voaFile, pFileRecord.Name);
+
                 // Load the "spatial" string containing the text index data.
                 SpatialString source = new SpatialString();
                 string ussFileName = pFileRecord.Name + ".uss";
@@ -229,11 +243,17 @@ namespace Extract.Redaction
                     source.LoadFrom(pFileRecord.Name, false);
                 }
 
-                // Load the redactions
-                FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir);
-                string voaFile = pathTags.Expand(_settings.DataFile);
-                _voaLoader.LoadFrom(voaFile, pFileRecord.Name);
+                // [FlexIDSCore:4598]
+                // Throw an exception if the OCR data isn't text index data.
+                LongRectangle textBounds = source.GetOCRImageBounds();
+                if (textBounds.Left != 0 ||
+                    textBounds.Top != 0 ||
+                    textBounds.Right != (source.String.Length + 1)||
+                    textBounds.Bottom != 2)
+                {
+                    throw new ExtractException("ELI32207",
+                        "\"" + _COMPONENT_DESCRIPTION + "\" task can be used only on text files.");
+                }
 
                 // Build up a list of redaction zones where each redaction zone may encompass 2 or
                 // more overlapping redactions. Item1 of each <see cref="Tuple(int, int)"/> in this

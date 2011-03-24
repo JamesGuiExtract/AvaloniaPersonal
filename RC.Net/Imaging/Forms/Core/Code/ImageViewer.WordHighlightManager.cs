@@ -1405,18 +1405,27 @@ namespace Extract.Imaging.Forms
                 // invoke so the operation isn't executed in the middle of another UI event.
                 IAsyncResult result = _imageViewer.BeginInvoke((MethodInvoker)(() => 
                     {
-                        // If the task was cancelled before invoked or no image is loaded do not
-                        // execute the method.
-                        if (!cancelToken.IsCancellationRequested &&
-                            _imageViewer.IsImageAvailable)
+                        try
                         {
-                            method();
+                            // If the task was cancelled before invoked or no image is loaded do not
+                            // execute the method.
+                            if (!cancelToken.IsCancellationRequested &&
+                                _imageViewer.IsImageAvailable)
+                            {
+                                method();
+                            }
                         }
-
-                        // By decrementing _UIOperationReferenceCount as part of the invoke, we'll
-                        // have record of whether the method was called, even if the blocking here
-                        // was cancelled.
-                        _executeInUIReferenceCount--;
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI32209");
+                        }
+                        finally
+                        {
+                            // By decrementing _UIOperationReferenceCount as part of the invoke, we'll
+                            // have record of whether the method was called, even if the blocking here
+                            // was cancelled.
+                            _executeInUIReferenceCount--;
+                        }
                     }));
 
                 WaitHandle[] waitHandles = new WaitHandle[] 
