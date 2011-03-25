@@ -180,7 +180,7 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 			{
 				int iResult = MessageBox("This database was created with a different version of "
 					"the software.\r\n\r\nDo you wish to update the database to be compatible with "
-					"the current software version?", "Update Datatabase Schema?",
+					"the current software version?", "Update Database Schema?",
 					MB_YESNO);
 				if (iResult == IDYES)
 				{
