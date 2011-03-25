@@ -2,7 +2,6 @@
 
 #include "stdafx.h"
 #include "ImageLineUtility.h"
-#include "PDFInputOutputMgr.h"
 
 #include <l_bitmap.h>		// LeadTools Imaging library
 #include <MiscLeadUtils.h>
@@ -1712,11 +1711,8 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
 	lfo.PageNumber = nPageNum;
 
-	// Convert the PDF input image to a temporary TIF
-	PDFInputOutputMgr ltPDF(strImageFileName, true);
-
 	// Load the image as a 1 bit image.  LeadTool's line finding only works on 1 bit images.
-	L_INT nRet = L_LoadBitmap(_bstr_t(ltPDF.getFileName().c_str()), &hBitmap, sizeof(BITMAPHANDLE), 1, 
+	L_INT nRet = L_LoadBitmap((char*) strImageFileName.c_str(), &hBitmap, sizeof(BITMAPHANDLE), 1, 
 		ORDER_RGB, &lfo, &fileInfo);
 	throwExceptionIfNotSuccess(nRet, "ELI19845", 
 		"Internal error: Unable to load image!", strImageFileName);

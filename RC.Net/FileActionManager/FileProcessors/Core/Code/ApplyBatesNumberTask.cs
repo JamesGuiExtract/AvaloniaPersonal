@@ -570,18 +570,15 @@ namespace Extract.FileActionManager.FileProcessors
                 "Image File Name", fileName);
 
             // Ensure IDisposable objects are disposed
-            ExtractPdfManager inputFile = null;
             ImageReader reader = null;
-            ExtractPdfManager outputFile = null;
             ImageWriter writer = null;
             int pageCount = 0;
             List<string> batesNumbers = null;
+            TemporaryFile outputFile = null;
             try
             {
-                inputFile = new ExtractPdfManager(fileName, true);
-
                 // Get the file info along with the page information
-                reader = _codecs.CreateReader(inputFile.FileName);
+                reader = _codecs.CreateReader(fileName);
 
                 // Get the image information
                 pageCount = reader.PageCount;
@@ -595,7 +592,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Create a temporary file to apply the Bates number to
                 // and wrap it in a PDF manager
-                outputFile = new ExtractPdfManager(fileName, false);
+                outputFile = new TemporaryFile(Path.GetExtension(fileName));
 
                 // Generate bates numbers
                 batesNumbers = new List<string>(generator.GetNextNumberStrings(pageCount));
@@ -610,7 +607,7 @@ namespace Extract.FileActionManager.FileProcessors
                         progressStatus.StartNextItemGroup("", 1);
                     }
                     
-                    ApplyBatesNumberToPage(batesNumbers[i - 1], i, inputFile, reader, writer);
+                    ApplyBatesNumberToPage(batesNumbers[i - 1], i, fileName, reader, writer);
                 }
                 reader.Dispose();
                 reader = null;
@@ -632,11 +629,6 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI27990", ex);
-                if (inputFile != null)
-                {
-                    ee.AddDebugData("PDF Manager File Information",
-                       inputFile.FileNameInformationString, false);
-                }
                 ee.AddDebugData("Total Pages", pageCount, false);
                 if (batesNumbers != null)
                 {
@@ -646,10 +638,6 @@ namespace Extract.FileActionManager.FileProcessors
             }
             finally
             {
-                if (inputFile != null)
-                {
-                    inputFile.Dispose();
-                }
                 if (reader != null)
                 {
                     reader.Dispose();
@@ -674,7 +662,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="reader">The reader from which to read the page.</param>
         /// <param name="writer">The writer to which to write the bates number.</param>
         void ApplyBatesNumberToPage(string batesNumber, int pageNumber, 
-            ExtractPdfManager inputFile, ImageReader reader, ImageWriter writer)
+            string inputFile, ImageReader reader, ImageWriter writer)
         {
             int retryCount = 0;
             while (retryCount < _MAX_RETRIES)
@@ -724,8 +712,7 @@ namespace Extract.FileActionManager.FileProcessors
                         ee.AddDebugData("Bates Number Anchor Point", anchorPoint, false);
                         ee.AddDebugData("Page Number", pageNumber, false);
                         ee.AddDebugData("Image Bounds", pageBounds, false);
-                        ee.AddDebugData("Image File Name",
-                            inputFile.FileNameInformationString, false);
+                        ee.AddDebugData("Image File Name", inputFile, false);
                         throw ee;
                     }
 
@@ -757,8 +744,7 @@ namespace Extract.FileActionManager.FileProcessors
                             "Application Trace: Could not apply Bates number on page, retrying.", ex);
                         ee.AddDebugData("Retry Count", retryCount, false);
                         ee.AddDebugData("Page Number", pageNumber, false);
-                        ee.AddDebugData("Image File Name",
-                            inputFile.FileNameInformationString, false);
+                        ee.AddDebugData("Image File Name", inputFile, false);
                         ee.Log();
                         System.Threading.Thread.Sleep(100);
                     }
@@ -769,8 +755,7 @@ namespace Extract.FileActionManager.FileProcessors
                         ee.AddDebugData("Number Of Retries", retryCount, false);
                         ee.AddDebugData("Page Number", pageNumber, false);
                         ee.AddDebugData("Bates Number String", batesNumber, false);
-                        ee.AddDebugData("Image File Name",
-                            inputFile.FileNameInformationString, false);
+                        ee.AddDebugData("Image File Name", inputFile, false);
                         throw ee;
                     }
                 }

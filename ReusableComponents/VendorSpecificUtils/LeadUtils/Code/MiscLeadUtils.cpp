@@ -42,86 +42,8 @@ const int giDEFAULT_JPEG_COMPRESSION_FLAG = 80;
 const int giDEFAULT_PDF_DISPLAY_DEPTH = 24;
 const int giDEFAULT_PDF_RESOLUTION = 300;
 
-//-------------------------------------------------------------------------------------------------
-// Private class - LeadToolsPDFLoadLocker
-//-------------------------------------------------------------------------------------------------
-// Declare CMutex object
-CMutex LeadToolsPDFLoadLocker::ms_mutex;
-
 // The maximum opacity (ie. completely opaque)
 L_INT giMAX_OPACITY = 255;
-
-// Default values for registry items
-bool	LeadToolsPDFLoadLocker::ms_bRegistryValueRead = false;
-bool	LeadToolsPDFLoadLocker::ms_bSerializeLeadToolsCalls = false;
-
-//-------------------------------------------------------------------------------------------------
-LeadToolsPDFLoadLocker::LeadToolsPDFLoadLocker(const string& strFileName)
-:m_pLock(__nullptr)
-{
-	// If a file is PDF file, acquire ownership of the mutex
-	// so that other thread could not call the loadbitmap method
-	if (isPDFFile( strFileName ))
-	{
-		m_pLock = new CSingleLock(&ms_mutex, TRUE);		
-	}
-	// Check registry setting to determine mutex ownership
-	else
-	{
-		// Read registry setting once
-		if (!ms_bRegistryValueRead)
-		{
-			ms_bSerializeLeadToolsCalls = isLeadToolsSerialized();
-			ms_bRegistryValueRead = true;
-		}
-
-		// Create lock object if serialization is required
-		if (ms_bSerializeLeadToolsCalls)
-		{
-			m_pLock = new CSingleLock(&ms_mutex, TRUE);		
-		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
-LeadToolsPDFLoadLocker::LeadToolsPDFLoadLocker(const bool bProgrammaticallyForceLock)
-:m_pLock(__nullptr)
-{
-	// Acquire ownership of the mutex so that other threads cannot call L_xxx() functions
-	if (bProgrammaticallyForceLock)
-	{
-		m_pLock = new CSingleLock(&ms_mutex, TRUE);		
-	}
-	// Check registry setting to determine mutex ownership
-	else
-	{
-		// Read registry setting once
-		if (!ms_bRegistryValueRead)
-		{
-			ms_bSerializeLeadToolsCalls = isLeadToolsSerialized();
-			ms_bRegistryValueRead = true;
-		}
-
-		// Create lock object if serialization is required
-		if (ms_bSerializeLeadToolsCalls)
-		{
-			m_pLock = new CSingleLock(&ms_mutex, TRUE);		
-		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
-LeadToolsPDFLoadLocker::~LeadToolsPDFLoadLocker()
-{
-	try
-	{
-		if (m_pLock != __nullptr)
-		{
-			// Release the mutex
-			delete m_pLock;
-			m_pLock = __nullptr;
-		}
-	}	
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16469");
-}
 
 //-------------------------------------------------------------------------------------------------
 // Predefined Local Functions
@@ -162,6 +84,183 @@ void pageZoneToAnnRect(const PageRasterZone& rZone, ANNRECT& rect);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To encrypt the specified string using the PdfSecurity keys
 string encryptString(const string& strString);
+
+//-------------------------------------------------------------------------------------------------
+// Exported classes
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+// PDFSecuritySettings
+//-------------------------------------------------------------------------------------------------
+PDFSecuritySettings::PDFSecuritySettings(const string& strUserPassword,
+	const string& strOwnerPassword, long nPermissions, bool bSetPDFLoadOptions) :
+	m_bSetLoadOptions(bSetPDFLoadOptions)
+{
+	try
+	{
+		setPDFSaveOptions(strUserPassword, strOwnerPassword, nPermissions);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32200");
+}
+//-------------------------------------------------------------------------------------------------
+PDFSecuritySettings::~PDFSecuritySettings()
+{
+	try
+	{
+		if (m_pOriginalOptions.get() != __nullptr)
+		{
+			try
+			{
+				throwExceptionIfNotSuccess(L_SetPDFSaveOptions(m_pOriginalOptions.get()),
+					"ELI32199", "Unable to set PDF save options back to default.");
+			}
+			catch(UCLIDException& uex)
+			{
+				uex.log();
+			}
+		}
+		if (m_pOriginalLoadOptions.get() != __nullptr)
+		{
+			try
+			{
+				throwExceptionIfNotSuccess(L_SetPDFOptions(m_pOriginalLoadOptions.get()),
+					"ELI32217", "Unable to set PDF load options back to default.");
+			}
+			catch(UCLIDException& uex)
+			{
+				uex.log();
+			}
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI32198");
+}
+//-------------------------------------------------------------------------------------------------
+void PDFSecuritySettings::setPDFSaveOptions(const string& strUserPassword,
+	const string& strOwnerPassword, long nPermissions)
+{
+	size_t nUserLength = strUserPassword.length();
+	size_t nOwnerLength = strOwnerPassword.length();
+	if (nUserLength > FILEPDFOPTIONS_MAX_PASSWORD_LEN
+		|| nOwnerLength > FILEPDFOPTIONS_MAX_PASSWORD_LEN)
+	{
+		UCLIDException ue("ELI32221", "Specified password is too long.");
+		ue.addDebugInfo("Max Password Length", FILEPDFOPTIONS_MAX_PASSWORD_LEN);
+		ue.addDebugInfo("User Password Length", nUserLength);
+		ue.addDebugInfo("Owner Password Length", nOwnerLength);
+		throw ue;
+	}
+
+	if (nUserLength > 0 || nOwnerLength > 0)
+	{
+		FILEPDFSAVEOPTIONS pdfsfo = GetLeadToolsSizedStruct<FILEPDFSAVEOPTIONS>(0);
+		throwExceptionIfNotSuccess(
+			L_GetPDFSaveOptions(&pdfsfo, sizeof(FILEPDFSAVEOPTIONS)), "ELI32201",
+			"Failed to get PDF save options.");
+
+		// Store the original options
+		m_pOriginalOptions.reset(new FILEPDFSAVEOPTIONS());
+		*m_pOriginalOptions = pdfsfo;
+
+		pdfsfo.b128bit = L_TRUE;
+		if (nUserLength > 0)
+		{
+			errno_t err = strncpy_s((char*)pdfsfo.szUserPassword, FILEPDFOPTIONS_MAX_PASSWORD_LEN,
+				strUserPassword.c_str(),  nUserLength);
+			if (err != 0)
+			{
+				UCLIDException ue("ELI32202", "Unable to set user password.");
+				ue.addWin32ErrorInfo(err);
+				throw ue;
+			}
+
+			if (m_bSetLoadOptions)
+			{
+				FILEPDFOPTIONS pdfOptions = GetLeadToolsSizedStruct<FILEPDFOPTIONS>(0);
+				throwExceptionIfNotSuccess(L_GetPDFOptions(&pdfOptions, sizeof(FILEPDFOPTIONS)),
+					"ELI32218", "Failed to get PDF options.");
+				m_pOriginalLoadOptions.reset(new FILEPDFOPTIONS());
+				*m_pOriginalLoadOptions = pdfOptions;
+				err = strncpy_s((char*)pdfOptions.szPassword, FILEPDFOPTIONS_MAX_PASSWORD_LEN,
+					strUserPassword.c_str(), nUserLength);
+				if (err != 0)
+				{
+					UCLIDException ue("ELI32219", "Unable to set PDF load password.");
+					ue.addWin32ErrorInfo(err);
+					throw ue;
+				}
+
+				throwExceptionIfNotSuccess(L_SetPDFOptions(&pdfOptions),
+					"ELI32220", "Failed to set PDF options.");
+			}
+		}
+		if (nOwnerLength > 0)
+		{
+			errno_t err = strncpy_s((char*)pdfsfo.szOwnerPassword, FILEPDFOPTIONS_MAX_PASSWORD_LEN,
+				strOwnerPassword.c_str(),  nOwnerLength);
+			if (err != 0)
+			{
+				UCLIDException ue("ELI32203", "Unable to set owner password.");
+				ue.addWin32ErrorInfo(err);
+				throw ue;
+			}
+
+			// Set the permissions
+			pdfsfo.dwEncryptFlags = getLeadtoolsPermissions(nPermissions);
+		}
+
+		throwExceptionIfNotSuccess(L_SetPDFSaveOptions(&pdfsfo),
+			"ELI32204", "Unable to set PDF save options.");
+	}
+}
+//-------------------------------------------------------------------------------------------------
+unsigned int PDFSecuritySettings::getLeadtoolsPermissions(long nPermissions)
+{
+	unsigned int uiLtPermissions = 0;
+	if (nPermissions > 0)
+	{
+		if (isFlagSet(nPermissions, giAllowLowQualityPrinting))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_PRINTDOCUMENT;
+		}
+		if (isFlagSet(nPermissions, giAllowHighQualityPrinting))
+		{
+			// Need to allow document printing to allow high quality printing
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_PRINTDOCUMENT;
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_PRINTFAITHFUL;
+		}
+		if (isFlagSet(nPermissions, giAllowDocumentModifications))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYDOCUMENT;
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYANNOTATION;
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_FILLFORM;
+		}
+		if (isFlagSet(nPermissions, giAllowContentCopying))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_EXTRACTTEXTGRAPHICS;
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_EXTRACTTEXT;
+		}
+		if (isFlagSet(nPermissions, giAllowContentCopyingForAccessibility))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_EXTRACTTEXT;
+		}
+		if (isFlagSet(nPermissions, giAllowAddingModifyingAnnotations))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYANNOTATION;
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_FILLFORM;
+		}
+		if (isFlagSet(nPermissions, giAllowFillingInFields))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_FILLFORM;
+		}
+		if (isFlagSet(nPermissions, giAllowDocumentAssembly))
+		{
+			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_ASSEMBLEDOCUMENT;
+		}
+	}
+
+	return uiLtPermissions;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Exported DLL Functions
 //-------------------------------------------------------------------------------------------------
@@ -260,17 +359,13 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
 		_lastCodePos = "20";
 
-		// Get initialized FILEINFO struct
-		FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
+		// Check if outputting a PDF file
+		bool bOutputIsPdf = isPDFFile(strOutputImageName);
 
-		// Convert the PDF input image to a temporary TIF
-		PDFInputOutputMgr ltPDF( strImageFileName, true );
-		char* pszInputFile = (char*) ltPDF.getFileName().c_str();
+		char* pszInputFile = (char*) strImageFileName.c_str();
 
-		// Get the file info
-		throwExceptionIfNotSuccess(L_FileInfo(pszInputFile, &fileInfo,
-			sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL), "ELI27301",
-			"Unable to get file info.", ltPDF.getFileNameInformationString());
+		FILEINFO fileInfo;
+		getFileInformation(strImageFileName, true, fileInfo);
 
 		// Get the number of pages
 		long nNumberOfPages = fileInfo.TotalPages;
@@ -282,7 +377,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		// and retaining or applying annotations then throw an exception
 		// [FlexIDSCore #4115]
 		if ((bRetainAnnotations || bApplyAsAnnotations)
-			&& !isTiff(iFormat) && !isPDFFile(strOutputImageName))
+			&& !isTiff(iFormat) && !bOutputIsPdf)
 		{
 			UCLIDException uex("ELI29824", "Cannot apply annotations to a non-tiff image.");
 			uex.addDebugInfo("Redaction Source", strImageFileName);
@@ -303,6 +398,15 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		BrushCollection brushes;
 		PenCollection pens;
 
+		// If output is a PDF, write to temporary tif and convert at the end
+		string strOutputWorking = strOutputImageName;
+		unique_ptr<TemporaryFileName> pPDFOut(__nullptr);
+		if (bOutputIsPdf)
+		{
+			pPDFOut.reset(new TemporaryFileName(__nullptr, ".tif"));
+			strOutputWorking = pPDFOut->getName();
+		}
+
 		// loop to allow for multiple attempts to fill an image area (P16 #2593)
 		bool bSuccessful = false;
 		bool bAnnotationsAppliedToDocument = false;
@@ -312,7 +416,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 			// Write the output to a temporary file so that the creation of the
 			// redacted image appears as an atomic operation [FlexIDSCore #3547]
 			TemporaryFileName tempOutFile(NULL,
-				getExtensionFromFullPath(strOutputImageName).c_str(), true);
+				getExtensionFromFullPath(strOutputWorking).c_str(), true);
 
 			// Flag to indicate if any annotations been applied, if so then
 			// L_AnnSetTag will need to be called to reset them
@@ -326,11 +430,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 			{
 				try
 				{
-					// Create PDFOutputManager object to handle file conversion
-					// if result will be PDF
-					PDFInputOutputMgr outMgr( tempOutFile.getName(), false,
-						strUserPassword, strOwnerPassword, nPermissions);
-
 					int nRet = FAILURE;
 
 					// Get initialized SAVEFILEOPTION struct
@@ -362,11 +461,11 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						LeadToolsBitmapFreeer freer(hBitmap);
 
 						// Load the bitmap
-						loadImagePage(ltPDF, hBitmap, fileInfo, lfo, false);
+						loadImagePage(strImageFileName, hBitmap, fileInfo, lfo, false);
 						_lastCodePos = "70_A_Page#" + strPageNumber;
 
 						bool bLoadExistingAnnotations = bRetainAnnotations
-							&& hasAnnotations(ltPDF.getFileName(), lfo, iFormat);
+							&& hasAnnotations(strImageFileName, lfo, iFormat);
 
 						// Create Annotation container sized to image extent if applying as annotations
 						// or retaining existing annotations
@@ -393,7 +492,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 								// Load any existing annotations on this page
 								nRet = L_AnnLoad(pszInputFile, &hFileContainer, &lfo);
 								throwExceptionIfNotSuccess(nRet, "ELI14630", 
-									"Could not load annotations.", ltPDF.getFileNameInformationString());
+									"Could not load annotations.", strImageFileName);
 
 								// Check for NULL or empty container
 								if (hFileContainer != NULL)
@@ -531,7 +630,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						if (!bAnnotationsAppliedToPage)
 						{
 							// Save the image page
-							saveImagePage(hBitmap, outMgr, fileInfo, sfOptions);
+							saveImagePage(hBitmap, tempOutFile.getName(), fileInfo, sfOptions);
 						}
 						else
 						{
@@ -543,7 +642,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 								"Could not save redaction annotation objects.");
 
 							// Save the image page with the annotations
-							saveImagePage(hBitmap, outMgr, fileInfo, sfOptions);
+							saveImagePage(hBitmap, tempOutFile.getName(), fileInfo, sfOptions);
 
 							// Set annotations added to document flag [FlexIDSCore #3131]
 							bAnnotationsAppliedToDocument = true;
@@ -629,7 +728,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 
 				// Since save was successful, copy the temp file to the output file
 				// [FlexIDSCore #3547]
-				copyFile(tempOutFile.getName(), strOutputImageName);
+				copyFile(tempOutFile.getName(), strOutputWorking);
 				break;
 			}
 		}
@@ -645,15 +744,21 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		}
 		else
 		{
-			if(bAnnotationsAppliedToDocument && isPDFFile(strOutputImageName))
+			if (bOutputIsPdf)
 			{
-				// Log application trace if annotations added to the document and
-				// output is a PDF [FlexIDSCore #3131 - JDS - 12/18/2008] 
-				UCLIDException uex("ELI23594",
-					"Application trace: Burned annotations into a PDF.");
-				uex.addDebugInfo("Input Image File", strImageFileName);
-				uex.addDebugInfo("Output Image File", strOutputImageName);
-				uex.log();
+				convertTIFToPDF(pPDFOut->getName(), strOutputImageName,
+					bAnnotationsAppliedToDocument, strUserPassword, strOwnerPassword, nPermissions);
+
+				if(bAnnotationsAppliedToDocument)
+				{
+					// Log application trace if annotations added to the document and
+					// output is a PDF [FlexIDSCore #3131 - JDS - 12/18/2008] 
+					UCLIDException uex("ELI23594",
+						"Application trace: Burned annotations into a PDF.");
+					uex.addDebugInfo("Input Image File", strImageFileName);
+					uex.addDebugInfo("Output Image File", strOutputImageName);
+					uex.log();
+				}
 			}
 		}
 	}
@@ -687,11 +792,12 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 
 	// Create a temporary file for the output
 	TemporaryFileName tmpOutput("", NULL, getExtensionFromFullPath(strOutputFileName).c_str(), true);
+	const string& strTempOut = tmpOutput.getName();
+	char* pszOutput = (char*)strTempOut.c_str();
 
-	// Get initialized FILEINFO for first page
-	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-	L_INT nRet = L_FileInfo((char*)vecImageFiles[0].c_str(), &fileInfo, sizeof(FILEINFO), 0, NULL);
-	throwExceptionIfNotSuccess(nRet, "ELI30029", "Unable to get file information.", vecImageFiles[0]);
+	// Get file info
+	FILEINFO fileInfo;
+	getFileInformation(vecImageFiles[0], false, fileInfo);
 
 	// Get the appropriate compression factor for the specified format [LRCAU #5284]
 	L_INT nCompression = getCompressionFactor(fileInfo.Format);
@@ -712,23 +818,20 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 
 		// if the image page file exists, load it and add it to the
 		// bitmap list.
-		if (isFileOrFolderValid(strPage))
+		if (isValidFile(strPage))
 		{
 			// Temporary holder for a bitmap
 			BITMAPHANDLE hTmpBmp = {0};
 			LeadToolsBitmapFreeer freer(hTmpBmp);
 
-			// Convert the PDF input image to a temporary TIF
-			LeadToolsPDFLoadLocker ltPDF(strPage);
-
 			// Set flags to get file information when loading bitmap
-			nRet = L_LoadBitmap( (char*)strPage.c_str(), &hTmpBmp, 
+			L_INT nRet = L_LoadBitmap( (char*)strPage.c_str(), &hTmpBmp, 
 				sizeof(BITMAPHANDLE), 0, ORDER_RGB, NULL, 0);
 			throwExceptionIfNotSuccess(nRet, "ELI09044", "Unable to load bitmap.", strPage);
 
 			// Save the page to the multipage image using the format of the first page of the image
 			sfOptions.PageNumber = i + 1;
-			nRet = L_SaveBitmap((char*)tmpOutput.getName().c_str(), &hTmpBmp, fileInfo.Format, 
+			nRet = L_SaveBitmap(pszOutput, &hTmpBmp, fileInfo.Format, 
 				fileInfo.BitsPerPixel, nCompression, &sfOptions);
 			throwExceptionIfNotSuccess(nRet, "ELI09045",
 				"Unable to insert page in image.", strPage);
@@ -743,7 +846,7 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 	}
 
 	// Ensure the image has the correct number of pages
-	int nNumberWritten = getNumberOfPagesInImage(tmpOutput.getName());
+	int nNumberWritten = getNumberOfPagesInImage(strTempOut);
 	if (nNumImages != nNumberWritten)
 	{
 		UCLIDException ue("ELI30100", "Page count mismatch.");
@@ -754,41 +857,34 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 	}
 
 	// Move the temporary file to its final destination
-	copyFile(tmpOutput.getName(), strOutputFileName, bOverwriteExistingFile);
-
-	// Make sure the file can be read
-	waitForFileToBeReadable(strOutputFileName);
+	copyFile(strTempOut, strOutputFileName, bOverwriteExistingFile);
 }
 //-------------------------------------------------------------------------------------------------
-int getNumberOfPagesInImage( const string& strImageFileName )
+void getFileInformation(const string& strImageFileName, bool bIncludePageCount, FILEINFO& rFileInfo,
+	LOADFILEOPTION* pLFO)
 {
 	int nNumFailedAttempts = 0;
-
 	try
 	{
-		validateFileOrFolderExistence(strImageFileName, "ELI28231");
+		validateFileOrFolderExistence(strImageFileName, "ELI32190");
 
 		// Get initialized FILEINFO struct
-		FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
+		rFileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
-		// Get Number of Pages
 		int nRet = FAILURE;
+		L_UINT flags = bIncludePageCount ? FILEINFO_TOTALPAGES : 0;
+		char* pszFileName = (char*)strImageFileName.c_str();
 		while (nNumFailedAttempts < gnNUMBER_ATTEMPTS_BEFORE_FAIL)
 		{
-			// Leadtools pdf read support is not thread safe. Lock access if this is a PDF.
-			{
-				LeadToolsPDFLoadLocker ltLocker(strImageFileName);
 
-				nRet = L_FileInfo( (char*)( strImageFileName.c_str() ), &fileInfo, 
-				sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL);
-			}
+			nRet = L_FileInfo(pszFileName, &rFileInfo, sizeof(FILEINFO), flags, pLFO);
 
 			// Check result
 			if (nRet == SUCCESS)
 			{
 				if (nNumFailedAttempts != 0)
 				{
-					UCLIDException ue("ELI20365",
+					UCLIDException ue("ELI32191",
 						"Application Trace: Successfully gathered file information.");
 					ue.addDebugInfo("File name", strImageFileName);
 					ue.addDebugInfo("Retries attempted", nNumFailedAttempts);
@@ -804,65 +900,66 @@ int getNumberOfPagesInImage( const string& strImageFileName )
 				nNumFailedAttempts++;
 
 				// Sleep before retrying the FileInfo call
-				Sleep( gnSLEEP_BETWEEN_RETRY_MS );
+				Sleep(gnSLEEP_BETWEEN_RETRY_MS);
 			}
 		}
 
 		// Throw exception if all retries failed
-		throwExceptionIfNotSuccess(nRet, "ELI09166", "Could not obtain image info.",
+		throwExceptionIfNotSuccess(nRet, "ELI32192", "Could not obtain image info.",
 			strImageFileName);
+	}
+	catch (UCLIDException& ue)
+	{
+		ue.addDebugInfo("Retries attempted", nNumFailedAttempts);
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+int getNumberOfPagesInImage( const string& strImageFileName )
+{
+	try
+	{
+		// Get initialized FILEINFO struct
+		FILEINFO fileInfo;
+		getFileInformation(strImageFileName, true, fileInfo);
 
 		// Return actual page count
 		return fileInfo.TotalPages;
 	}
-	catch (UCLIDException& ue)
-	{
-		UCLIDException uexOuter("ELI15314", "Unable to determine image page count.", ue);
-		uexOuter.addDebugInfo("Retries attempted", nNumFailedAttempts);
-		throw uexOuter;
-	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15314");
 }
 //-------------------------------------------------------------------------------------------------
 void getImageXAndYResolution(const string& strImageFileName, int& riXResolution, 
 							 int& riYResolution)
 {
-	// Get initialized FILEINFO struct
-	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
+	try
+	{
+		// Get initialized FILEINFO struct
+		FILEINFO fileInfo;
+		getFileInformation(strImageFileName, false, fileInfo);
 
-	// Convert a PDF input image to a temporary TIF
-	PDFInputOutputMgr ltPDF( strImageFileName, true );
-
-	LeadToolsPDFLoadLocker ltLocker(false);
-
-	// Get File Information
-	throwExceptionIfNotSuccess(L_FileInfo( (char*)( ltPDF.getFileName().c_str() ), &fileInfo, 
-		sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL ), 
-		"ELI20250", "Could not obtain image info.", ltPDF.getFileNameInformationString());
-
-	riXResolution = fileInfo.XResolution;
-	riYResolution = fileInfo.YResolution;
+		riXResolution = fileInfo.XResolution;
+		riYResolution = fileInfo.YResolution;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32193");
 }
 //-------------------------------------------------------------------------------------------------
 void getImagePixelHeightAndWidth(const string& strImageFileName, int& riHeight, int& riWidth,
 								 int nPageNum)
 {
-	// Get initialized FILEINFO struct
-	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
+	try
+	{
+		// Get initialized LOADFILEOPTION struct. 
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(0);
+		lfo.PageNumber = nPageNum;
 
-	// Get initialized LOADFILEOPTION struct. 
-	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(0);
-	lfo.PageNumber = nPageNum;
+		FILEINFO fileInfo;
+		getFileInformation(strImageFileName, false, fileInfo, &lfo);
 
-	// Provide thread safety when dealing with PDF's
-	LeadToolsPDFLoadLocker ltLocker(strImageFileName);
-
-	// Get File Information
-	throwExceptionIfNotSuccess(L_FileInfo( (char*)( strImageFileName.c_str() ), &fileInfo, 
-		sizeof(FILEINFO), 0, &lfo), 
-		"ELI20247", "Could not obtain image info.", strImageFileName);
-
-	riHeight = fileInfo.Height;
-	riWidth = fileInfo.Width;
+		riHeight = fileInfo.Height;
+		riWidth = fileInfo.Width;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32194");
 }
 //-------------------------------------------------------------------------------------------------
 void initPDFSupport()
@@ -946,34 +1043,28 @@ void initPDFSupport()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-int getImageViewPerspective(const string strImageFileName, int nPageNum)
+int getImageViewPerspective(const string& strImageFileName, int nPageNum)
 {
-	// Treat PDF images as having TOP_LEFT perspective
-	if (isPDFFile(strImageFileName))
+	try
 	{
-		return TOP_LEFT;
+		// Treat PDF images as having TOP_LEFT perspective
+		if (isPDFFile(strImageFileName))
+		{
+			return TOP_LEFT;
+		}
+
+		// Get initialized LOADFILEOPTION struct and set the page number
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(0);
+		lfo.PageNumber = nPageNum;
+
+		// Get the file info
+		FILEINFO fileInfo;
+		getFileInformation(strImageFileName, false, fileInfo, &lfo);
+
+		// Return ViewPerspective field
+		return fileInfo.ViewPerspective;
 	}
-
-	// Get initialized FILEINFO struct
-	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-
-	// Get initialized LOADFILEOPTION struct. 
-	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(0);
-
-	// Set page number
-	lfo.PageNumber = nPageNum;
-
-	LeadToolsPDFLoadLocker ltLocker(false);
-
-	// Get File Information
-	int nRet = L_FileInfo( (char*)( strImageFileName.c_str() ), &fileInfo, 
-		sizeof(FILEINFO), 0, &lfo );
-
-	throwExceptionIfNotSuccess(nRet, "ELI16655", 
-		"Could not obtain image info.", strImageFileName );
-
-	// Return ViewPerspective field
-	return fileInfo.ViewPerspective;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32208");
 }
 //-------------------------------------------------------------------------------------------------
 void unlockDocumentSupport()
@@ -1169,6 +1260,55 @@ bool isTiff(int iFormat)
 	}
 }
 //-------------------------------------------------------------------------------------------------
+bool isTiff(const string& strImageFile)
+{
+	try
+	{
+		// Get the file info for the image file
+		FILEINFO fileInfo;
+		getFileInformation(strImageFile, false, fileInfo);
+
+		return isTiff(fileInfo.Format);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32214");
+}
+//-------------------------------------------------------------------------------------------------
+bool isPDF(int iFormat)
+{
+	switch(iFormat)
+	{
+	case FILE_RAS_PDF:
+	case FILE_RAS_PDF_G3_1D:
+	case FILE_RAS_PDF_G3_2D:
+	case FILE_RAS_PDF_G4:
+	case FILE_RAS_PDF_JPEG:
+	case FILE_RAS_PDF_JPEG_422:
+	case FILE_RAS_PDF_JPEG_411:
+	case FILE_RAS_PDF_LZW:
+	case FILE_RAS_PDF_JBIG2:
+	case FILE_PDF_LEAD_MRC:
+	case FILE_RAS_PDF_CMYK:
+	case FILE_RAS_PDF_LZW_CMYK:
+		return true;
+
+	default:
+		return false;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+bool isPDF(const string& strImageFile)
+{
+	try
+	{
+		// Get the file info for the image file
+		FILEINFO fileInfo;
+		getFileInformation(strImageFile, false, fileInfo);
+
+		return isPDF(fileInfo.Format);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32215");
+}
+//-------------------------------------------------------------------------------------------------
 bool hasAnnotations(const string& strFilename, LOADFILEOPTION &lfo, int iFileFormat)
 {
 	// if this is not a tiff file it does not contain annotations.
@@ -1191,7 +1331,8 @@ bool hasAnnotations(const string& strFilename, LOADFILEOPTION &lfo, int iFileFor
 	// if some other error was found, throw an exception
 	if(iRet <= 0)
 	{
-		throwExceptionIfNotSuccess(iRet, "ELI20788", "Could not load annotations from tiff tag.");
+		throwExceptionIfNotSuccess(iRet, "ELI20788", "Could not load annotations from tiff tag.",
+			strFilename);
 	}
 
 	// return true if there is at least one annotation object
@@ -1345,50 +1486,13 @@ void loadImagePage(const string& strImageFileName, unsigned long ulPage, BITMAPH
 			"ELI13283", "Unable to get default file load options for LeadTools imaging library.");
 		lfo.PageNumber = ulPage;
 
-		// Wrap the input image in PDF manager
-		PDFInputOutputMgr inputFile(strImageFileName, true);
-
-		loadImagePage(inputFile, rBitmap, rflInfo, lfo, bChangeViewPerspective);
+		loadImagePage(strImageFileName, rBitmap, rflInfo, lfo, bChangeViewPerspective);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28126");
 }
 //-------------------------------------------------------------------------------------------------
 void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
 				   FILEINFO& rFileInfo, LOADFILEOPTION& lfo, bool bChangeViewPerspective)
-{
-	try
-	{
-		// Wrap input file in PDF manager
-		PDFInputOutputMgr inputFile(strImageFileName, true);
-
-		loadImagePage(inputFile, rBitmap, rFileInfo, lfo, bChangeViewPerspective);
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27285");
-}
-//-------------------------------------------------------------------------------------------------
-void loadImagePage(PDFInputOutputMgr& inputFile, BITMAPHANDLE& rBitmap,
-				   FILEINFO& rFileInfo, LOADFILEOPTION& lfo, bool bChangeViewPerspective)
-{
-	try
-	{
-		try
-		{
-			// Check that the PDF manager is in input mode
-			ASSERT_ARGUMENT("ELI27288", inputFile.isInputFile());
-
-			loadImagePage(inputFile.getFileName(), rBitmap, rFileInfo, lfo, false, bChangeViewPerspective);
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28837");
-	}
-	catch(UCLIDException& uex)
-	{
-		uex.addDebugInfo("PDF Manager File", inputFile.getFileNameInformationString());
-		throw uex;
-	}
-}
-//-------------------------------------------------------------------------------------------------
-void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap, FILEINFO& rflInfo,
-				   LOADFILEOPTION& lfo, bool bLockPdf, bool bChangeViewPerspective)
 {
 	try
 	{
@@ -1407,15 +1511,9 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap, FILEIN
 			long nNumFailedAttempts = 0;
 			while (nNumFailedAttempts < iRetryCount)
 			{
-				// Scope for the PDF load locker
-				{
-					// Lock the PDF loading if bLockPdf == true
-					auto_ptr<LeadToolsPDFLoadLocker> apLoadLock;
-					apLoadLock.reset(bLockPdf ? new LeadToolsPDFLoadLocker(strImageFileName) : NULL);
 
-					nRet = L_LoadBitmap(pszImageFile, &rBitmap, sizeof(BITMAPHANDLE), 0,
-						ORDER_RGB, &lfo, &rflInfo);
-				}
+				nRet = L_LoadBitmap(pszImageFile, &rBitmap, sizeof(BITMAPHANDLE), 0,
+					ORDER_RGB, &lfo, &rFileInfo);
 
 				// Check result
 				if (nRet == SUCCESS)
@@ -1446,8 +1544,8 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap, FILEIN
 			{
 				UCLIDException ue("ELI29835",
 					"Application Trace: Successfully loaded image page after retry.");
-				ue.addDebugInfo("Page Number", lfo.PageNumber);
 				ue.addDebugInfo("Image File Name", strImageFileName);
+				ue.addDebugInfo("Page Number", lfo.PageNumber);
 				ue.addDebugInfo("Retries", nNumFailedAttempts);
 				ue.log();
 			}
@@ -1482,10 +1580,7 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO&
 			"ELI27292", "Unable to get default save file options.");
 		sfo.PageNumber = lPageNumber;
 
-		// Wrap the output file in a PDF manager
-		PDFInputOutputMgr outFile(strOutputFile, false);
-
-		saveImagePage(hBitmap, outFile, flInfo, sfo);
+		saveImagePage(hBitmap, strOutputFile, flInfo, sfo);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27282");
 }
@@ -1495,38 +1590,14 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO&
 {
 	try
 	{
-		// Wrap the output file in a PDF manager
-		PDFInputOutputMgr outFile(strOutputFile, false);
+		int nFileFormat = flInfo.Format;
+		int nBitsPerPixel = flInfo.BitsPerPixel;
+		int nCompressionFactor = getCompressionFactor(nFileFormat);
 
-		saveImagePage(hBitmap, outFile, flInfo, sfo);
+		saveImagePage(hBitmap, strOutputFile, nFileFormat, nCompressionFactor, 
+			nBitsPerPixel, sfo);
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27284");
-}
-//-------------------------------------------------------------------------------------------------
-void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
-				   FILEINFO& flInfo, SAVEFILEOPTION &sfo)
-{
-	try
-	{
-		try
-		{
-			// Check that the PDF manager is in output mode
-			ASSERT_ARGUMENT("ELI27289", !outFile.isInputFile());
-
-			int nFileFormat = flInfo.Format;
-			int nBitsPerPixel = flInfo.BitsPerPixel;
-			int nCompressionFactor = getCompressionFactor(nFileFormat);
-
-			saveImagePage(hBitmap, outFile.getFileName(), nFileFormat, nCompressionFactor, 
-				nBitsPerPixel, sfo);
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28838");
-	}
-	catch(UCLIDException& uex)
-	{
-		uex.addDebugInfo("PDF Manager File", outFile.getFileNameInformationString());
-		throw uex;
-	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28838");
 }
 //-------------------------------------------------------------------------------------------------
 void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, int nFileFormat,

@@ -8,8 +8,9 @@
 #include <LicenseMgmt.h>
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
-#include <PDFInputOutputMgr.h>
 #include <ComUtils.h>
+#include <TemporaryFileName.h>
+#include <MiscLeadUtils.h>
 
 #include <vector>
 #include <utility>
@@ -322,8 +323,16 @@ void CCheckFinder::findChecks(const string& strImageName, const vector<long>& ve
 		ASSERT_ARGUMENT("ELI24503", ipAttributes != NULL);
 
 		// Handle PDF's (cannot load PDF directly into Inlite engine without PDF license)
-		PDFInputOutputMgr inputFile(strImageName, true);
-		_bstr_t bstrImageName = get_bstr_t(inputFile.getFileName());
+		string strWorkingFile = strImageName;
+		unique_ptr<TemporaryFileName> pTempFile(__nullptr);
+		if (isPDF(strImageName))
+		{
+			pTempFile.reset(new TemporaryFileName(__nullptr, ".tif"));
+			strWorkingFile = pTempFile->getName();
+			convertPDFToTIF(strImageName, strWorkingFile);
+		}
+
+		_bstr_t bstrImageName = _bstr_t(strWorkingFile.c_str());
 		_lastCodePos = "10";
 
 		// Create a map to store the check image bounds and page dimensions for found checks

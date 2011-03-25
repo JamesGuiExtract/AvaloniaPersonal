@@ -2,7 +2,6 @@
 #pragma once
 
 #include "LeadUtils.h"
-#include "PDFInputOutputMgr.h"
 
 #include <TemporaryFileName.h>
 #include <UCLIDException.h>
@@ -185,26 +184,6 @@ private:
 	map<COLORREF, HPEN> m_mapColorToPen;
 };
 
-//-------------------------------------------------------------------------------------------------
-// Class used to protect loading PDF files in 
-// Multi-threading environment.[P13: 4313]
-class LEADUTILS_API LeadToolsPDFLoadLocker
-{
-public:
-	LeadToolsPDFLoadLocker(const string& strFileName);
-	LeadToolsPDFLoadLocker(const bool bProgrammaticallyForceLock);
-	~LeadToolsPDFLoadLocker();
-
-private:
-	// Synchronization members
-	static CMutex ms_mutex;
-	CSingleLock *m_pLock;
-
-	// Registry setting members
-	static bool	ms_bRegistryValueRead;
-	static bool	ms_bSerializeLeadToolsCalls;
-};
-
 //------------------------------------------------------------------------------------------------
 // PURPOSE: Retrieves a user friendly description of the specified Leadtools error code.
 LEADUTILS_API string getErrorCodeDescription(int iErrorCode);
@@ -256,6 +235,11 @@ LEADUTILS_API void createMultiPageImage(vector<string> vecImageFiles,
 										string strOutputFileName,
 										bool bOverwriteExistingFile);
 //-------------------------------------------------------------------------------------------------
+// Gets the file info from the specified image file. (NOTE: This will zero out the passed in
+// FILEINFO and will fill it with information from the specified file name)
+LEADUTILS_API void getFileInformation(const string& strFileName, bool includePageCount,
+	FILEINFO& rFileInfo, LOADFILEOPTION* pLfo = __nullptr);
+//-------------------------------------------------------------------------------------------------
 // PROMISE: To take an image file name and return the number of pages in the image
 LEADUTILS_API int getNumberOfPagesInImage( const string& strImageFileName );
 //-------------------------------------------------------------------------------------------------
@@ -287,22 +271,6 @@ LEADUTILS_API void loadImagePage(const string& strImageFileName, BITMAPHANDLE &r
 								 FILEINFO& rflInfo, LOADFILEOPTION& lfo,
 								 bool bChangeViewPerspective = true);
 //-------------------------------------------------------------------------------------------------
-// PROMISE: To return the handle of a bitmap for the specified file loaded based upon
-//			the provided LOADFILEOPTION (will load the page set in the lfo.PageNumber field)
-//			the bitmap will have to be freed by caller
-// REQUIRE:	inputFile is in input mode
-LEADUTILS_API void loadImagePage(PDFInputOutputMgr& inputFile, BITMAPHANDLE& rBitmap,
-								 FILEINFO& rflInfo, LOADFILEOPTION& lfo,
-								 bool bChangeViewPerspective = true);
-//-------------------------------------------------------------------------------------------------
-// PROMISE: To return the handle of a bitmap for the specified file loaded based upon
-//			the provided LOADFILEOPTION (will load the page set in the lfo.PageNumber field)
-//			the bitmap will have to be freed by the caller. If bLockPDF == true then
-//			the LeadtoolsPDFLoadLocker will be instantiated for the load call.
-LEADUTILS_API void loadImagePage(const string& strImageFileName, BITMAPHANDLE &rBitmap,
-								 FILEINFO &rflInfo, LOADFILEOPTION& lfo, bool bLockPdf,
-								 bool bChangeViewPerspective = true);
-//-------------------------------------------------------------------------------------------------
 // PROMISE: To save the bitmap to the specified image at the specified page number
 // NOTE:	This code will internally perform multiple retry attempts when saving the page.
 LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile,
@@ -311,11 +279,6 @@ LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputF
 // PROMISE: To save the bitmap to the specified image based on the SAVEFILEOPTION struct.
 // NOTE:	This code will internally perform multiple retry attempts when saving the page.
 LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile,
-								 FILEINFO& flInfo, SAVEFILEOPTION& sfo);
-//-------------------------------------------------------------------------------------------------
-// PROMISE: To save the bitmap to the specified image based on the SAVEFILEOPTION struct.
-// NOTE:	This code will internally perform multiple retry attempts when saving the page.
-LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
 								 FILEINFO& flInfo, SAVEFILEOPTION& sfo);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To save the bitmap to the specified image based on the SAVEFILEOPTION struct.
@@ -342,7 +305,7 @@ LEADUTILS_API void initPDFSupport();
 //			7 = RIGHT_BOTTOM
 //			8 = LEFT_BOTTOM or TOP_LEFT270 ( rotated 270 degrees clockwise )
 // NOTE:	nPageNum is a 1-based page number.
-LEADUTILS_API int getImageViewPerspective(const string strImageFileName, int nPageNum);
+LEADUTILS_API int getImageViewPerspective(const string& strImageFileName, int nPageNum);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To unlock the LeadTools Document Toolkit if Annotation support is licensed.
 LEADUTILS_API void unlockDocumentSupport();
@@ -373,8 +336,13 @@ LEADUTILS_API void convertPDFToTIF(const string& strPDF, const string& strTIF);
 LEADUTILS_API void pageZoneToPoints(const PageRasterZone &rZone, POINT &p1, POINT &p2, POINT &p3, 
 									POINT &p4);
 //-------------------------------------------------------------------------------------------------
-// PROMISE: Returns true if the Leadtools file format number corresponds to a tiff tag.
+// PROMISE: Returns true if the Leadtools file format number corresponds to a tiff file.
 LEADUTILS_API bool isTiff(int iFormat);
+LEADUTILS_API bool isTiff(const string& strImageFile);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Returns true if the Leadtools file format number corresponds to a PDF file.
+LEADUTILS_API bool isPDF(int iFormat);
+LEADUTILS_API bool isPDF(const string& strImageFile);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Returns true if the specified file page has an annotations tag, false otherwise.
 LEADUTILS_API bool hasAnnotations(const string& strFilename, LOADFILEOPTION &lfo, int iFileFormat);
@@ -395,6 +363,30 @@ LEADUTILS_API void drawRedactionZone(HDC hDC, const PageRasterZone& rZone, int n
 LEADUTILS_API void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap);
 //-------------------------------------------------------------------------------------------------
 LEADUTILS_API void deleteLeadDC(HDC& hDC);
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+// Sets the PDF save options for the current thread to the specified settings
+// Reverts the settings when the class is destructed
+class LEADUTILS_API PDFSecuritySettings
+{
+public:
+	PDFSecuritySettings(const string& strUserPassword, const string& strOwnerPassword,
+		long nPermissions, bool bSetPDFLoadOptions = false);
+	~PDFSecuritySettings();
+
+private:
+	bool m_bSetLoadOptions;
+
+	unique_ptr<FILEPDFSAVEOPTIONS> m_pOriginalOptions;
+
+	unique_ptr<FILEPDFOPTIONS> m_pOriginalLoadOptions;
+
+	void setPDFSaveOptions(const string& strUserPassword,
+		const string& strOwnerPassword, long nPermissions);
+
+	unsigned int getLeadtoolsPermissions(long nSecuritySettings);
+};
 
 //-------------------------------------------------------------------------------------------------
 // Class used to manage a lead tools device context object

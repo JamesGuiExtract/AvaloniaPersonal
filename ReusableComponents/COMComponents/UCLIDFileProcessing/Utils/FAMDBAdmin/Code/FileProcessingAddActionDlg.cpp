@@ -160,7 +160,7 @@ void FileProcessingAddActionDlg::OnBnClickOK()
 			// Invalid identifier, throw exception
 			UCLIDException ue( "ELI14770", "Invalid name for new action!" );
 			ue.addDebugInfo( "Invalid Name", strNewName );
-			ue.addDebugInfo( "Valid Pattern", "_*[a-zA-Z][a-zA-Z0-9]*" );
+			ue.addDebugInfo( "Valid Pattern", "[_a-zA-Z]+[_a-zA-Z0-9]*" );
 			throw ue;
 		}
 		

@@ -145,54 +145,6 @@ void decryptString(string& rstrEncryptedString)
 	bsm >> rstrEncryptedString;
 }
 //-------------------------------------------------------------------------------------------------
-unsigned int getLtPermissions(long nPermissions)
-{
-	unsigned int uiLtPermissions = 0;
-	if (nPermissions > 0)
-	{
-		if (isFlagSet(nPermissions, giAllowLowQualityPrinting))
-		{
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_PRINTDOCUMENT;
-		}
-		if (isFlagSet(nPermissions, giAllowHighQualityPrinting))
-		{
-			// Need to allow document printing to allow high quality printing
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_PRINTDOCUMENT;
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_PRINTFAITHFUL;
-		}
-		if (isFlagSet(nPermissions, giAllowDocumentModifications))
-		{
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYDOCUMENT;
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYANNOTATION;
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_FILLFORM;
-		}
-		if (isFlagSet(nPermissions, giAllowContentCopying))
-		{
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_EXTRACTTEXTGRAPHICS;
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_EXTRACTTEXT;
-		}
-		if (isFlagSet(nPermissions, giAllowContentCopyingForAccessibility))
-		{
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_EXTRACTTEXT;
-		}
-		if (isFlagSet(nPermissions, giAllowAddingModifyingAnnotations))
-		{
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV2_MODIFYANNOTATION;
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_FILLFORM;
-		}
-		if (isFlagSet(nPermissions, giAllowFillingInFields))
-		{
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_FILLFORM;
-		}
-		if (isFlagSet(nPermissions, giAllowDocumentAssembly))
-		{
-			uiLtPermissions |= PDF_SECURITYFLAGS_REV3_ASSEMBLEDOCUMENT;
-		}
-	}
-
-	return uiLtPermissions;
-}
-//-------------------------------------------------------------------------------------------------
 // Gets the padding distance necessary when converting to a PDF
 int getPadDistance(int iDimension)
 {
@@ -251,11 +203,8 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			L_INT nRet = FAILURE;
 
 			// Get the file info
-			FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-			nRet = L_FileInfo((char*)strInputFileName.c_str(), &fileInfo, sizeof(FILEINFO),
-				FILEINFO_TOTALPAGES, NULL);
-			throwExceptionIfNotSuccess(nRet, "ELI25229",
-				"Could not obtain FileInfo", strInputFileName);
+			FILEINFO fileInfo;
+			getFileInformation(strInputFileName, true, fileInfo); 
 
 			// Get the total number of pages from the file info
 			L_INT nPages = fileInfo.TotalPages;
@@ -272,6 +221,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			L_INT   nQFactor = PQ1;
 			int		nBitsPerPixel = 1; 
 			bool	bBurnAnnotations = false;
+			unique_ptr<PDFSecuritySettings> pSecuritySettings(__nullptr);
 			switch (eOutputType)
 			{
 			case kFileType_Pdf:
@@ -279,40 +229,8 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 					// Check for security settings for PDF files
 					if (!strUserPassword.empty() || !strOwnerPassword.empty())
 					{
-						FILEPDFSAVEOPTIONS pdfsfo = GetLeadToolsSizedStruct<FILEPDFSAVEOPTIONS>(0);
-						throwExceptionIfNotSuccess(
-							L_GetPDFSaveOptions(&pdfsfo, sizeof(FILEPDFSAVEOPTIONS)), "ELI29752",
-							"Failed to get PDF save options.");
-
-						pdfsfo.b128bit = L_TRUE;
-						if (!strUserPassword.empty())
-						{
-							errno_t err = strncpy_s((char*)pdfsfo.szUserPassword, 255,
-								strUserPassword.c_str(),  strUserPassword.length());
-							if (err != 0)
-							{
-								UCLIDException ue("ELI29762", "Unable to set user password.");
-								ue.addWin32ErrorInfo(err);
-								throw ue;
-							}
-						}
-						if (!strOwnerPassword.empty())
-						{
-							errno_t err = strncpy_s((char*)pdfsfo.szOwnerPassword, 255,
-								strOwnerPassword.c_str(),  strOwnerPassword.length());
-							if (err != 0)
-							{
-								UCLIDException ue("ELI29763", "Unable to set owner password.");
-								ue.addWin32ErrorInfo(err);
-								throw ue;
-							}
-
-							// Set the permissions
-							pdfsfo.dwEncryptFlags = getLtPermissions(nPermissions);
-						}
-
-						throwExceptionIfNotSuccess(L_SetPDFSaveOptions(&pdfsfo),
-							"ELI29792", "Unable to set PDF save options.");
+						pSecuritySettings.reset(new PDFSecuritySettings(strUserPassword,
+							strOwnerPassword, nPermissions, true));
 					}
 
 					// Set output format
@@ -380,7 +298,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 				BITMAPHANDLE hBitmap = {0};
 				LeadToolsBitmapFreeer freer(hBitmap);
-				loadImagePage(strInputFileName, hBitmap, fileInfo, lfo, false, false);
+				loadImagePage(strInputFileName, hBitmap, fileInfo, lfo, false);
 
 				// Load the existing annotations if bRetainAnnotations and they exist.
 				if(bRetainAnnotations && hasAnnotations(strInputFileName, lfo, iFormat))

@@ -3,7 +3,6 @@
 #include "ExtractZoneAsImage.h"
 #include "LeadToolsBitmapFreeer.h"
 #include "MiscLeadUtils.h"
-#include "PDFInputOutputMgr.h"
 
 #include <UCLIDException.h>
 #include <mathUtil.h>
@@ -230,19 +229,13 @@ void extractZoneAsImage(BITMAPHANDLE *phBitmap, long nStartX,
 	LeadToolsBitmapFreeer freeer( hBitmapImageZone, true );
 	extractZoneAsBitmap( phBitmap, nStartX, nStartY, nEndX, nEndY, nHeight, &hBitmapImageZone);
 	
-	// Create PDFOutputManager object to handle file conversion
-	// If result will be PDF
-	// - The zone will be written to an internal temporary file
-	// - Desired PDF output file will be created from conversion of this temporary TIF
-	PDFInputOutputMgr outMgr( strZoneImageFileName, false );
-
-	L_INT nRet = L_SaveBitmap( _bstr_t( outMgr.getFileName().c_str() ), &hBitmapImageZone, 
+	L_INT nRet = L_SaveBitmap( (char*) strZoneImageFileName.c_str(), &hBitmapImageZone, 
 		iOutputImageFormat, hBitmapImageZone.BitsPerPixel, 2, NULL);
 	throwExceptionIfNotSuccess(nRet, "ELI03359", "Unable to copy portion of rotated image!",
-		outMgr.getFileNameInformationString());	
+		strZoneImageFileName);	
 
 	// Wait for file access
-	waitForFileToBeReadable(outMgr.getFileName());
+	waitForFileToBeReadable(strZoneImageFileName);
 }
 //-------------------------------------------------------------------------------------------------
 void getPolygonBoundingRect(const vector<POINT>& vecPolygonVertices, int &nOriginX, int &nOriginY, 
@@ -313,17 +306,14 @@ void extractPolygonAsImage(const string& strImageFile,
 	BITMAPHANDLE hBitmap;
 	LeadToolsBitmapFreeer freeerBM( hBitmap, true );
 	
-	// Convert a PDF input image to a temporary TIF
-	PDFInputOutputMgr ltPDF( strImageFile, true );
-
 	// Get initialized FILEINFO struct
 	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 	
 	// Load the bitmap
-	L_INT nRet = L_LoadBitmap( _bstr_t( ltPDF.getFileName().c_str() ), &hBitmap, 
+	L_INT nRet = L_LoadBitmap( (char*) strImageFile.c_str(), &hBitmap, 
 		sizeof(BITMAPHANDLE), 0, ORDER_RGB, NULL, &fileInfo);
 	throwExceptionIfNotSuccess(nRet, "ELI15923", "Unable to load bitmap.", 
-		ltPDF.getFileNameInformationString());
+		strImageFile);
 
 	if (hBitmap.ViewPerspective != TOP_LEFT)
 	{
@@ -369,32 +359,24 @@ void extractPolygonAsImage(const string& strImageFile,
 	// Create a polygonal region 
 	nRet = L_SetBitmapRgnPolygon(&hFinal, &XForm, pPolyPt, nLen, L_POLY_WINDING, L_RGN_SETNOT);
 
-	// Individual scope for L_GetPixelColor()
-	COLORREF bgdColor;
-	{
-
-		// fill the region with whatever is the background color
-		// take the top-left pixel's color as the background color
-		bgdColor = L_GetPixelColor(&hBitmap, 0, 0);
-	}
+	// fill the region with whatever is the background color
+	// take the top-left pixel's color as the background color
+	COLORREF bgdColor = L_GetPixelColor(&hBitmap, 0, 0);
 	
 	// wipe out anything outside the region with bgdColor
 	nRet = L_FillBitmap(&hFinal, bgdColor);
 	L_FreeBitmapRgn(&hFinal);
 
-	// Create PDFOutputManager object to handle file conversion
-	// If result will be PDF
-	// - The polygonal region will be written to an internal temporary file
-	// - Desired PDF output file will be created from conversion of this temporary TIF
-	PDFInputOutputMgr outMgr( strOutputImageFile, false );
+	// Get the correct compression factor
+	int nCompression = getCompressionFactor(fileInfo.Format);
 
 	// now save the new bitmap to a file
-	nRet = L_SaveBitmap( _bstr_t(outMgr.getFileName().c_str()), &hFinal, fileInfo.Format, 
-		hFinal.BitsPerPixel, 2, NULL);
-	throwExceptionIfNotSuccess(nRet, "ELI23548", "Unable to copy portion of image!",
-		outMgr.getFileNameInformationString());	
+	nRet = L_SaveBitmap( (char*) strOutputImageFile.c_str(), &hFinal, fileInfo.Format, 
+		hFinal.BitsPerPixel, nCompression, NULL);
+	throwExceptionIfNotSuccess(nRet, "ELI23548", "Unable to copy portion of image.",
+		strOutputImageFile);	
 
 	// Wait for file access
-	waitForFileToBeReadable(outMgr.getFileName());
+	waitForFileToBeReadable(strOutputImageFile);
 }
 //-------------------------------------------------------------------------------------------------

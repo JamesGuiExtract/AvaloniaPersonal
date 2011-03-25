@@ -1080,9 +1080,6 @@ void SpotRecognitionDlg::openFile(const string& strFileName)
 					// Get initialized FILEINFO struct
 					FILEINFO FileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
-					// Provide multi-thread protection for PDF images
-					LeadToolsPDFLoadLocker ltPDF( strFileToOpenName );
-
 					// Get the file information 
 					L_INT nRetCode = L_FileInfo(const_cast<char*>(strFileToOpenName.c_str()), 
 						&FileInfo, sizeof(FILEINFO), 0, NULL);
@@ -2230,24 +2227,18 @@ string SpotRecognitionDlg::createSubImage(const std::string& strOriginalImageFil
 
 	// Get initialized FILEINFO struct
 	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-	L_INT nRet;
 
+	// Get file info
+	L_INT nRet = L_FileInfo(const_cast<char*>(strOriginalImageFileName.c_str()), &fileInfo, 
+		sizeof(FILEINFO), 0, NULL);
+
+	// get original file info
+	if (nRet < 1)
 	{
-		// Limit ltLocker scope to the L_FileInfo call
-		LeadToolsPDFLoadLocker ltLocker(false);
-
-		// Get file info
-		nRet = L_FileInfo(const_cast<char*>(strOriginalImageFileName.c_str()), &fileInfo, 
-			sizeof(FILEINFO), 0, NULL);
-
-		// get original file info
-		if (nRet < 1)
-		{
-			UCLIDException uclidException("ELI03245", "Failed to get original image info.");
-			uclidException.addDebugInfo("strImageFileName", strOriginalImageFileName);
-			uclidException.addDebugInfo("Error Code", nRet);
-			throw uclidException;
-		}
+		UCLIDException uclidException("ELI03245", "Failed to get original image info.");
+		uclidException.addDebugInfo("strImageFileName", strOriginalImageFileName);
+		uclidException.addDebugInfo("Error Code", nRet);
+		throw uclidException;
 	}
 
 	// Get initialized FILEPDFOPTIONS struct
@@ -2273,18 +2264,6 @@ string SpotRecognitionDlg::createSubImage(const std::string& strOriginalImageFil
 		&loadOptions, &fileInfo );
 	throwExceptionIfNotSuccess(nRet, "ELI16948", "Could not load the file.",
 		strOriginalImageFileName);
-/*
-	// load the original image into the memory
-	nRet = L_LoadBitmap(const_cast<char*>(strOriginalImageFileName.c_str()), 
-		&origImageHandle, sizeof(BITMAPHANDLE), 0, ORDER_RGB, &loadOptions, NULL);
-	if (nRet < 1)
-	{
-		UCLIDException uclidException("ELI03246", "Failed to load original image into the memory.");
-		uclidException.addDebugInfo("strImageFileName", strOriginalImageFileName);
-		uclidException.addDebugInfo("Error Code", nRet);
-		throw uclidException;
-	}
-*/
 
 	// Define associated rectangle
 	RECT rc;

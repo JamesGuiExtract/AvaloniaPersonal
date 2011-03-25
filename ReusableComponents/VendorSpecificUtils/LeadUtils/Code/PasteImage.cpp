@@ -14,7 +14,6 @@
 #include "stdafx.h"
 #include "PasteImage.h"
 #include "MiscLeadUtils.h"
-#include "PDFInputOutputMgr.h"
 #include "LeadToolsBitmapFreeer.h"
 #include "LeadToolsFormatHelpers.h"
 
@@ -46,91 +45,82 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 			// Create a temporary file for writing [LRCAU #5408]
 			TemporaryFileName tmpOutFile("", getExtensionFromFullPath(strOutputImage).c_str());
 
+
 			// Needed outside PDF manager scope
 			long nPageCount = 0;
 
-			// Scope for the PDF managers
+			// Wait for the input file to be readable
+			waitForFileToBeReadable(strInputImage, true);
+
+			// Get the file info for the input image
+			FILEINFO fileInfo;
+			getFileInformation(strInputImage, true, fileInfo);
+
+			// Get the page count and format information
+			nPageCount = fileInfo.TotalPages;
+			int iFormat = fileInfo.Format;
+
+			// Get the vector of page numbers to stamp
+			validatePageNumbers(strPagesToStamp);
+			set<int> setPages = getPageNumbersAsSet(nPageCount, strPagesToStamp, true);
+
+			// create a load files option
+			LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(
+				ELO_IGNOREVIEWPERSPECTIVE | ELO_ROTATED);
+
+			// Create the save options
+			SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
+
+			// Get the default save options
+			throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
+				"ELI20071", "Failed getting default save options!"); 
+
+			// Loop through each page of the image
+			_lastCodePos = "40";
+			for (long i = 1; i <= nPageCount; i++)
 			{
-				// Wait for the input file to be readable
-				waitForFileToBeReadable(strInputImage, true);
+				string strPageCount = asString(i);
 
-				// create an input manager for the input image
-				PDFInputOutputMgr inImage(strInputImage, true);
-				PDFInputOutputMgr outImage(tmpOutFile.getName(), false);
-				_lastCodePos = "20";
+				// Set FILEINFO_FORMATVALID (this will speed up the L_LoadBitmap calls)
+				fileInfo = GetLeadToolsSizedStruct<FILEINFO>(FILEINFO_FORMATVALID);
+				fileInfo.Format = iFormat;
 
-				// Get the file info for the input image
-				FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-				throwExceptionIfNotSuccess(L_FileInfo((char*)inImage.getFileName().c_str(),
-					&fileInfo, sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL), "ELI27421",
-					"Could not obtain FileInfo!", inImage.getFileNameInformationString());
+				// Set the 1-relative page number in the LOADFILEOPTION structure 
+				lfo.PageNumber = i;
 
-				// Get the page count and format information
-				nPageCount = fileInfo.TotalPages;
-				int iFormat = fileInfo.Format;
+				// Declare the bitmaphandle and set the freer class to release it
+				BITMAPHANDLE hBitmap = {0};
+				LeadToolsBitmapFreeer inFreer(hBitmap);
+				_lastCodePos = "40_A_Page# " + strPageCount;
 
-				// Get the vector of page numbers to stamp
-				validatePageNumbers(strPagesToStamp);
-				set<int> setPages = getPageNumbersAsSet(nPageCount, strPagesToStamp, true);
+				// Load this image page
+				loadImagePage(strInputImage, hBitmap, fileInfo, lfo, false);
 
-				// create a load files option
-				LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(
-					ELO_IGNOREVIEWPERSPECTIVE | ELO_ROTATED);
-
-				// Create the save options
-				SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-
-				// Get the default save options
-				throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
-					"ELI20071", "Failed getting default save options!"); 
-
-				// Loop through each page of the image
-				_lastCodePos = "40";
-				for (long i = 1; i <= nPageCount; i++)
+				// Check for stamp page
+				if (setPages.find(i) != setPages.end())
 				{
-					string strPageCount = asString(i);
-
-					// Set FILEINFO_FORMATVALID (this will speed up the L_LoadBitmap calls)
-					fileInfo = GetLeadToolsSizedStruct<FILEINFO>(FILEINFO_FORMATVALID);
-					fileInfo.Format = iFormat;
-
-					// Set the 1-relative page number in the LOADFILEOPTION structure 
-					lfo.PageNumber = i;
-
 					// Declare the bitmaphandle and set the freer class to release it
-					BITMAPHANDLE hBitmap = {0};
-					LeadToolsBitmapFreeer inFreer(hBitmap);
-					_lastCodePos = "40_A_Page# " + strPageCount;
+					BITMAPHANDLE hPasteBitmap;
+					LeadToolsBitmapFreeer freer(hPasteBitmap, true);
+					_lastCodePos = "40_A_10_Page# " + strPageCount;
 
-					// Load this image page
-					loadImagePage(inImage, hBitmap, fileInfo, lfo, false);
+					// Get a file info for the stamp
+					FILEINFO flPasteInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
-					// Check for stamp page
-					if (setPages.find(i) != setPages.end())
-					{
-						// Declare the bitmaphandle and set the freer class to release it
-						BITMAPHANDLE hPasteBitmap;
-						LeadToolsBitmapFreeer freer(hPasteBitmap, true);
-						_lastCodePos = "40_A_10_Page# " + strPageCount;
+					// load the stamp image
+					loadStampBitmap(strPasteImage, fileInfo, flPasteInfo, hPasteBitmap);
+					_lastCodePos = "40_A_20_Page# " + strPageCount;
 
-						// Get a file info for the stamp
-						FILEINFO flPasteInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-
-						// load the stamp image
-						loadStampBitmap(strPasteImage, fileInfo, flPasteInfo, hPasteBitmap);
-						_lastCodePos = "40_A_20_Page# " + strPageCount;
-
-						// Place the stamp
-						placeStamp(hPasteBitmap, hBitmap, dHorizPercent, dVertPercent);
-					}
-					_lastCodePos = "40_B_Page# " + strPageCount;
-
-					// Save this page
-					sfo.PageNumber = i;
-					saveImagePage(hBitmap, outImage, fileInfo, sfo);
-					_lastCodePos = "40_C_Page# " + strPageCount;
+					// Place the stamp
+					placeStamp(hPasteBitmap, hBitmap, dHorizPercent, dVertPercent);
 				}
-			} // End scope for PDF managers
+				_lastCodePos = "40_B_Page# " + strPageCount;
+
+				// Save this page
+				sfo.PageNumber = i;
+				saveImagePage(hBitmap, tmpOutFile.getName(), fileInfo, sfo);
+				_lastCodePos = "40_C_Page# " + strPageCount;
+			}
 			_lastCodePos = "50";
 
 			// Ensure that the temporary file has the same number of pages as the original
@@ -172,18 +162,12 @@ void loadStampBitmap(const string& strPasteImage, const FILEINFO& flInInfo,
 		// check to be sure the BITMAPHANDLE has not been allocated yet
 		ASSERT_ARGUMENT("ELI20061", !(rhPasteBitmap.Flags.Allocated));
 
-		// create an input manager for the stamp image
-		PDFInputOutputMgr pasteImage(strPasteImage, true);
-
 		// create a load files option
 		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(
 			ELO_IGNOREVIEWPERSPECTIVE | ELO_ROTATED);
 
 		// get the file info for the stamp image
-		throwExceptionIfNotSuccess(L_FileInfo((char*)pasteImage.getFileName().c_str(),
-			&rflPasteInfo, sizeof(rflPasteInfo), FILEINFO_TOTALPAGES, NULL), "ELI20062", 
-			"Could not obtain watermark file information!", 
-			pasteImage.getFileNameInformationString());
+		getFileInformation(strPasteImage, true, rflPasteInfo);
 
 		// ensure that the stamp image contains only 1 page
 		if (rflPasteInfo.TotalPages > 1)
@@ -198,19 +182,19 @@ void loadStampBitmap(const string& strPasteImage, const FILEINFO& flInInfo,
 		if (rflPasteInfo.BitsPerPixel != flInInfo.BitsPerPixel)
 		{
 			// load the paste image, set the pixel depth to match the source image
-			throwExceptionIfNotSuccess(L_LoadBitmapResize(_bstr_t(pasteImage.getFileName().c_str()),
+			throwExceptionIfNotSuccess(L_LoadBitmapResize((char*) strPasteImage.c_str(),
 				&rhPasteBitmap, sizeof(rhPasteBitmap), rflPasteInfo.Width, rflPasteInfo.Height, 
 				flInInfo.BitsPerPixel, SIZE_NORMAL, flInInfo.Order, &lfo, &rflPasteInfo),
 				"ELI20063", "Could not open and resize the watermark image!", 
-				pasteImage.getFileNameInformationString());
+				strPasteImage);
 		}
 		else
 		{
 			// load the paste image
-			throwExceptionIfNotSuccess(L_LoadBitmap(_bstr_t(pasteImage.getFileName().c_str()), 
+			throwExceptionIfNotSuccess(L_LoadBitmap((char*) strPasteImage.c_str(), 
 				&rhPasteBitmap, sizeof(rhPasteBitmap), 0, 0,
 				&lfo, &rflPasteInfo), "ELI20064", "Could not open the watermark image",
-				pasteImage.getFileNameInformationString());
+				strPasteImage);
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27278");

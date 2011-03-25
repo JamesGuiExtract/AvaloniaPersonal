@@ -10,7 +10,6 @@
 #include <l_bitmap.h>		// LeadTools Imaging library
 #include <MiscLeadUtils.h>
 #include <ComponentLicenseIDs.h>
-#include <PDFInputOutputMgr.h>
 
 #include <algorithm>
 #include <fstream>
@@ -314,17 +313,10 @@ void COCRUtils::processImageFile(const string& strImageFile, int nMaxNumOfPages,
 	// if this image is not the 3-digit type of image file
 	else
 	{
-		// Convert the PDF input image to a temporary TIF
-		PDFInputOutputMgr ltPDF( strImageFile, true );
-
 		// Get initialized FILEINFO struct
-		FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
+		FILEINFO fileInfo;
+		getFileInformation(strImageFile, true, fileInfo);
 
-		LeadToolsPDFLoadLocker ltLocker(false);
-
-		// get total number of pages of this image
-		L_FileInfo( _bstr_t(ltPDF.getFileName().c_str()), &fileInfo, sizeof(FILEINFO), 
-			FILEINFO_TOTALPAGES, NULL);
 		int nTotalPages = fileInfo.TotalPages;
 		
 		// the actual number of pages to process for this image file

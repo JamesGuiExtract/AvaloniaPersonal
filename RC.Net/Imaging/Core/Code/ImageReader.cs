@@ -110,14 +110,11 @@ namespace Extract.Imaging
                     ee.Log();
                 }
 
-                using (new PdfLock())
+                // Get file information
+                using (CodecsImageInfo info = _codecs.GetInformation(_stream, true))
                 {
-                    // Get file information
-                    using (CodecsImageInfo info = _codecs.GetInformation(_stream, true))
-                    {
-                        _pageCount = info.TotalPages;
-                        _format = info.Format;
-                    }
+                    _pageCount = info.TotalPages;
+                    _format = info.Format;
                 }
 
                 IsPdf = ImageMethods.IsPdf(_format);
@@ -185,7 +182,6 @@ namespace Extract.Imaging
             try
             {
                 lock (_lock)
-                using (new PdfLock(IsPdf))
                 {
                     if (!_loadedImages.TryGetValue(pageNumber, out image))
                     {
@@ -235,20 +231,17 @@ namespace Extract.Imaging
                     }
                     else
                     {
-                        using (new PdfLock(IsPdf))
+                        image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
+                            pageNumber, pageNumber);
+
+                        // If loading PDF as bitonal and this file is a PDF, set bits per pixel
+                        // to 1
+                        if (_loadPdfAsBitonal && IsPdf)
                         {
-                            image = _codecs.Load(_stream, 0, CodecsLoadByteOrder.BgrOrGray,
-                                pageNumber, pageNumber);
-
-                            // If loading PDF as bitonal and this file is a PDF, set bits per pixel
-                            // to 1
-                            if (_loadPdfAsBitonal && IsPdf)
-                            {
-                                ConvertToBitonalImage(image);
-                            }
-
-                            return image;
+                            ConvertToBitonalImage(image);
                         }
+
+                        return image;
                     }
                 }
             }
@@ -295,23 +288,19 @@ namespace Extract.Imaging
         {
             try
             {
-                lock (_lock)
-                using (new PdfLock(IsPdf))
-                {
-                    // Get the dimensions of this page.
-                    ImagePageProperties properties = GetPageProperties(pageNumber);
+                // Get the dimensions of this page.
+                ImagePageProperties properties = GetPageProperties(pageNumber);
 
-                    // Calculate how far from the desired size the original image is
-                    double scale = Math.Min(fitWithin.Width / (double)properties.Width,
-                        fitWithin.Height / (double)properties.Height);
+                // Calculate how far from the desired size the original image is
+                double scale = Math.Min(fitWithin.Width / (double)properties.Width,
+                    fitWithin.Height / (double)properties.Height);
 
-                    // Set the desired width and height, maintaining aspect ratio
-                    int width = (int)(properties.Width * scale);
-                    int height = (int)(properties.Height * scale);
+                // Set the desired width and height, maintaining aspect ratio
+                int width = (int)(properties.Width * scale);
+                int height = (int)(properties.Height * scale);
 
-                    return _codecs.Load(_fileName, width, height, 24, RasterSizeFlags.Bicubic,
-                        CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 
-                }
+                return _codecs.Load(_fileName, width, height, 24, RasterSizeFlags.Bicubic,
+                    CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 
             }
             catch (Exception ex)
             {
@@ -334,10 +323,7 @@ namespace Extract.Imaging
         {
             try
             {
-                using (new PdfLock(IsPdf))
-                {
-                    return GetPageProperties(pageNumber); 
-                }
+                return GetPageProperties(pageNumber); 
             }
             catch (Exception ex)
             {
@@ -403,7 +389,6 @@ namespace Extract.Imaging
             try
             {
                 lock(_lock)
-                using (new PdfLock(IsPdf))
                 {
                     image = _codecs.Load(_stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 
                 }

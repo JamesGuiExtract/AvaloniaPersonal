@@ -17,7 +17,6 @@
 #include <Win32Util.h>
 #include <RegConstants.h>
 #include <LoadFileDlgThread.h>
-#include <PDFInputOutputMgr.h>
 #include <FAMUtilsConstants.h>
 #include <SuspendWindowUpdates.h>
 

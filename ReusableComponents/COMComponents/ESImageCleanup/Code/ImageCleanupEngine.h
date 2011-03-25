@@ -5,7 +5,6 @@
 #include "ESImageCleanup.h"
 
 #include <MiscLeadUtils.h>
-#include <PDFInputOutputMgr.h>
 
 #include <string>
 #include <set>
@@ -63,10 +62,6 @@ private:
 	void cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServerPtr& ipciServer,
 		const ICiRepairPtr& ipciRepair,
 		const vector<ESImageCleanupLib::IImageCleanupOperationPtr>& vecOperations);
-	//----------------------------------------------------------------------------------------------
-	// PURPOSE:	To write the cleaned up image page to the PDFInputOutputMgr output file
-	void writeCleanImage(unsigned long lNumberOfPages, const FILEINFO& rFileInfo,
-		PDFInputOutputMgr& rOutMgr);
 	//----------------------------------------------------------------------------------------------
 	void getSetOfPages(set<int>& rsetPageNumbers,
 		const ESImageCleanupLib::IImageCleanupSettingsPtr& ipSettings, int nPageCount);

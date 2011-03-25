@@ -1331,19 +1331,10 @@ string SpotRecognitionDlg::getZoneText(IRasterZonePtr& ripZone, IProgressStatus*
 	// Create temporary file for bitmap output
 	TemporaryFileName tempOutFile( NULL, ".bmp", true );
 
-	// Individual scope for L_FileConvert()
-	{
-		// Provide multi-thread protection for PDF images
-		LeadToolsPDFLoadLocker ltPDF( tempImgFile.getName() );
-
-		if (L_FileConvert(
-			(char *)tempImgFile.getName().c_str(), 
-			(char *)tempOutFile.getName().c_str(), 
-			FILE_BMP, 0, 0, 8, 0, NULL, NULL, NULL ) < 1)
-		{
-			throw UCLIDException("ELI03419", "Unable to convert image!");
-		}
-	}
+	L_INT nRet = L_FileConvert( (char *)tempImgFile.getName().c_str(),
+		(char *)tempOutFile.getName().c_str(), FILE_BMP, 0, 0, 8, 0, NULL, NULL, NULL);
+	throwExceptionIfNotSuccess(nRet, "ELI03419", "Unable to convert image.",
+		(LPCTSTR) m_UCLIDGenericDisplayCtrl.getImageName());
 
 	// specify the use of a training file associated with the current input type
 	// if any errors are encountered, ignore them

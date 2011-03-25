@@ -566,7 +566,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         }
 
         // Save redactions
-        fillImageArea(strImageToRedact.c_str(), strOutputName.c_str(), vecZones, 
+        fillImageArea(strImageToRedact, strOutputName, vecZones, 
             m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations,
             strUser, strOwner, nPermissions);
         _lastCodePos = "400";

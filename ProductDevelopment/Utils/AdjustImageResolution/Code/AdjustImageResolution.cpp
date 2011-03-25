@@ -14,8 +14,8 @@
 #include <l_bitmap.h>		// LeadTools Imaging library
 #include <ComponentLicenseIDs.h>
 #include <MiscLeadUtils.h>
-#include <PDFInputOutputMgr.h>
 #include <LeadToolsFormatHelpers.h>
+#include <LeadToolsBitmapFreeer.h>
 
 #include <vector>
 #include <string>
@@ -83,23 +83,9 @@ void setImageResolution(const string& strImageFileName, int nNewXResolution, int
 	{
 		// Scope for the input PDF manager
 		{
-			// Convert the PDF input image to a temporary TIF
-			PDFInputOutputMgr ltPDF( strImageFileName, true );
-			_lastCodePos = "10";
-
 			// Retrieve file information - page count and file format
-			FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-			int nRet = L_FileInfo( _bstr_t(ltPDF.getFileName().c_str()), &fileInfo, 
-				sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL );
-			if (nRet != SUCCESS)
-			{
-				UCLIDException uex("ELI13403", "Could not retrieve file information.");
-				uex.addDebugInfo("Original File Name", ltPDF.getFileNameInformationString());
-				uex.addDebugInfo("PDF Manager File Name", ltPDF.getFileName());
-				uex.addDebugInfo("Error Code", nRet);
-				uex.addDebugInfo("Error String", getErrorCodeDescription(nRet));
-				throw uex;
-			}
+			FILEINFO fileInfo;
+			getFileInformation(strImageFileName, true, fileInfo);
 			_lastCodePos = "20";
 
 			int nPageCount = fileInfo.TotalPages;
@@ -108,30 +94,17 @@ void setImageResolution(const string& strImageFileName, int nNewXResolution, int
 			// Ensure at least one page needs adjustment [LegacyRCAndUtils #5009]
 			bool bNeedsAdjustment = needsAdjustment(fileInfo, nNewXResolution, nNewYResolution, 
 				nMaxHeight, nMaxWidth);
-			LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(0);
 			_lastCodePos = "30";
+
+			LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(0);
 			for (int i = 2; !bNeedsAdjustment && i <= nPageCount; i++)
 			{
 				// Set page number
 				lfo.PageNumber = i;
+				getFileInformation(strImageFileName, false, fileInfo, &lfo);
 
-				// Get the file info for this page
-				fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-				nRet = L_FileInfo(_bstr_t(ltPDF.getFileName().c_str()), &fileInfo,
-					sizeof(FILEINFO), 0, &lfo);
-				if (nRet != SUCCESS)
-				{
-					UCLIDException uex("ELI23887", "Could not retrieve file information.");
-					uex.addDebugInfo("Original File Name", ltPDF.getFileNameInformationString());
-					uex.addDebugInfo("PDF Manager File Name", ltPDF.getFileName());
-					uex.addDebugInfo("Error Code", nRet);
-					uex.addDebugInfo("Error String", getErrorCodeDescription(nRet));
-					uex.addDebugInfo("Page number", i);
-					throw uex;
-				}
 				// Check if this page needs adjustment
-				bNeedsAdjustment = 
-					needsAdjustment(fileInfo, nNewXResolution, nNewYResolution,
+				bNeedsAdjustment = needsAdjustment(fileInfo, nNewXResolution, nNewYResolution,
 					nMaxHeight, nMaxWidth);
 			}
 			_lastCodePos = "40";
@@ -164,7 +137,7 @@ void setImageResolution(const string& strImageFileName, int nNewXResolution, int
 
 			// Get initialized SAVEFILEOPTION struct
 			SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-			nRet = L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION));
+			L_INT nRet = L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION));
 			throwExceptionIfNotSuccess(nRet, "ELI25294", "Failed getting default save options!");
 
 			// Load, adjust, and save the file - one page at a time
@@ -175,82 +148,20 @@ void setImageResolution(const string& strImageFileName, int nNewXResolution, int
 				// Set page numbers to load and save
 				lfo.PageNumber = i;
 				sfo.PageNumber = i;
-				_lastCodePos = "75_A_" + strPage;
 
-				// Load this page
-				BITMAPHANDLE bmh = {0};
-				nRet = L_LoadBitmap(_bstr_t(ltPDF.getFileName().c_str()), &bmh,
-					sizeof(BITMAPHANDLE), 0, 0, &lfo, NULL);
-				if (nRet != SUCCESS)
-				{
-					UCLIDException uex("ELI13404", "Could not load the page.");
-					uex.addDebugInfo("Original File Name", ltPDF.getFileNameInformationString());
-					uex.addDebugInfo("PDF Manager File Name", ltPDF.getFileName());
-					uex.addDebugInfo("Error Code", nRet);
-					uex.addDebugInfo("Error String", getErrorCodeDescription(nRet));
-					uex.addDebugInfo("Page number", i);
-					uex.addDebugInfo("Compression Flag", nCompression);
-					addFormatDebugInfo(uex, fileInfo.Format);
-					throw uex;
-				}
+				// Load the image page
+				BITMAPHANDLE bmh;
+				LeadToolsBitmapFreeer freer(bmh);
+				loadImagePage(strImageFileName, bmh, fileInfo, lfo, false);
+
 				_lastCodePos = "75_B_" + strPage;
 
 				// Adjust the resolution
 				bmh.XResolution = nNewXResolution;
 				bmh.YResolution = nNewYResolution;
 
-				// Save this page of the original file
-				int nNumFailedAttempts = 0;
-				while (nNumFailedAttempts < iRetryCount)
-				{
-					nRet = L_SaveBitmap(_bstr_t(tfn.getName().c_str()), &bmh, format,
-						bmh.BitsPerPixel, nCompression, &sfo);
-
-					// Check result
-					if (nRet == SUCCESS)
-					{
-						// Exit loop
-						break;
-					}
-					else
-					{
-						// Increment counter
-						nNumFailedAttempts++;
-
-						// Sleep before retrying the Save
-						Sleep( iRetryTimeout);
-					}
-				}
-				_lastCodePos = "75_C_" + strPage;
-				if (nRet != SUCCESS)
-				{
-					UCLIDException ue("ELI13405", "Could not save the page.");
-					ue.addDebugInfo("Image Name", tfn.getName());
-					ue.addDebugInfo("Destination Image", strImageFileName);
-					ue.addDebugInfo("Actual Page", i);
-					ue.addDebugInfo("Error description", getErrorCodeDescription(nRet));
-					ue.addDebugInfo("Actual Error Code", nRet);
-					ue.addDebugInfo("Retries attempted", nNumFailedAttempts);
-					ue.addDebugInfo("Max Retries", iRetryCount);
-					throw ue;
-				}
-				else
-				{
-					if (nNumFailedAttempts > 0)
-					{
-						UCLIDException ue("ELI25153",
-							"Application Trace:Saved image page successfully after retry.");
-						ue.addDebugInfo("Retries", nNumFailedAttempts);
-						ue.addDebugInfo("Image", tfn.getName());
-						ue.addDebugInfo("Destination Image", strImageFileName);
-						ue.addDebugInfo("Page", i);
-						ue.log();
-					}
-				}
+				saveImagePage(bmh, tfn.getName(), format, nCompression, bmh.BitsPerPixel, sfo);
 				_lastCodePos = "75_D_" + strPage;
-
-				// Free the bitmap
-				L_FreeBitmap(&bmh);
 			} // end for each page
 			_lastCodePos = "80";
 
@@ -259,7 +170,7 @@ void setImageResolution(const string& strImageFileName, int nNewXResolution, int
 			_lastCodePos = "90";
 
 			// Overwrite original file
-			copyFile(tfn.getName(), ltPDF.getFileName());
+			copyFile(tfn.getName(), strImageFileName);
 			_lastCodePos = "100";
 		} // End scope for input PDF manager
 		_lastCodePos = "110";

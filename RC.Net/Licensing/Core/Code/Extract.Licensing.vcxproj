@@ -54,6 +54,8 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\binaries\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\Release\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <LinkKeyFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(ProjectDir)..\..\..\Core\Code\ExtractInternalKey.snk"</LinkKeyFile>
+    <LinkKeyFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(ProjectDir)..\..\..\Core\Code\ExtractInternalKey.snk"</LinkKeyFile>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -90,8 +92,7 @@
       <DelaySign>true</DelaySign>
     </Link>
     <PostBuildEvent>
-      <Command>sn -R "$(TargetPath)" "$(ProjectDir)..\..\..\Core\Code\ExtractInternalKey.snk"
-CommonDebugPostBuild.bat "$(TargetPath)"</Command>
+      <Command>CommonDebugPostBuild.bat "$(TargetPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -127,8 +128,7 @@ CommonDebugPostBuild.bat "$(TargetPath)"</Command>
       <KeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</KeyFile>
     </Link>
     <PostBuildEvent>
-      <Command>sn -R "$(TargetPath)" "$(ProjectDir)..\..\..\Core\Code\ExtractInternalKey.snk"
-CommonDebugPostBuild.bat "$(TargetPath)"</Command>
+      <Command>CommonDebugPostBuild.bat "$(TargetPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

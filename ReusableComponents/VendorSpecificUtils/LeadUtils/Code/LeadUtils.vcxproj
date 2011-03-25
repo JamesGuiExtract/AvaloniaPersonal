@@ -174,7 +174,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="PasteImage.cpp" />
-    <ClCompile Include="PDFInputOutputMgr.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -196,7 +195,6 @@
     <ClInclude Include="LineRect.h" />
     <ClInclude Include="MiscLeadUtils.h" />
     <ClInclude Include="PasteImage.h" />
-    <ClInclude Include="PDFInputOutputMgr.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>

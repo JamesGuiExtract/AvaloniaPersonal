@@ -8,7 +8,6 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <MiscLeadUtils.h>
-#include <PDFInputOutputMgr.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <Misc.h>
@@ -97,115 +96,112 @@ STDMETHODIMP CImageCleanupEngine::CleanupImageInternalUseOnly(BSTR bstrInputFile
 		string strInputFile = asString(bstrInputFile);
 		string strOutputFile = asString(bstrOutputFile);
 
+		string strWorkingInput = strInputFile;
+		unique_ptr<TemporaryFileName> pTempInput(__nullptr);
+		if (isPDF(strInputFile))
+		{
+			pTempInput.reset(new TemporaryFileName(__nullptr, ".tif"));
+			strWorkingInput = pTempInput->getName();
+			convertPDFToTIF(strInputFile, strWorkingInput);
+		}
+
+		bool bOutputPDF = isPDFFile(strOutputFile);
+		TemporaryFileName tempFile(NULL,
+			bOutputPDF ? ".tif" : getExtensionFromFullPath(strOutputFile).c_str());
+
 		// Get a temporary file so that write operations appear atomic
-		TemporaryFileName tempFile(NULL, getExtensionFromFullPath(strOutputFile).c_str());
 		_lastCodePos = "10";
 
 		int nPageCount = 0;
+		FILEINFO fileInfo;
+		getFileInformation(strWorkingInput, true, fileInfo);
 
-		// Scope for PDF manager
+		// Cache the format
+		int iFormat = fileInfo.Format;
+
+		// Get the page count
+		nPageCount = fileInfo.TotalPages;
+
+		// Store whether image is 1 bit per pixel or not
+		bool bOneBitPerPixel = fileInfo.BitsPerPixel == 1;
+		if (!bOneBitPerPixel && fileInfo.BitsPerPixel != 8 && fileInfo.BitsPerPixel != 24)
 		{
-			// create the manager for the output file
-			PDFInputOutputMgr outMgr(tempFile.getName(), false);
+			UCLIDException ue("ELI20364", "Unsupported bits per pixel!");
+			ue.addDebugInfo("Supported bits per pixel", "1, 8, or 24");
+			ue.addDebugInfo("BitsPerPixel", fileInfo.BitsPerPixel);
+			ue.addDebugInfo("Input File", strInputFile);
+			throw ue;
+		}
 
-			// Create a PDF manager for the input image
-			PDFInputOutputMgr inMgr(strInputFile, true);
-			_lastCodePos = "20";
+		// Get a vector of pages to clean
+		set<int> setPagesToClean;
+		getSetOfPages(setPagesToClean, ipImageCleanupSettings, nPageCount);
+		_lastCodePos = "30";
 
-			// Get the file info for the image
-			FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-			throwExceptionIfNotSuccess(L_FileInfo((char*)inMgr.getFileName().c_str(), &fileInfo,
-				sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL), "ELI27303", "Unable to get file info!",
-				inMgr.getFileNameInformationString());
+		// Get the load file options
+		LOADFILEOPTION lfo =
+			GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE | ELO_ROTATED);
 
-			// Cache the format
-			int iFormat = fileInfo.Format;
+		// Get the save file options
+		SAVEFILEOPTION sfo =
+			GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
+		throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
+			"ELI27308", "Unable to get default save options!");
 
-			// Get the page count
-			nPageCount = fileInfo.TotalPages;
+		// Attach mutex to CSingleLock and lock it
+		CSingleLock snglLock(&sg_mutexINLITE_MUTEX, TRUE);
 
-			// Store whether image is 1 bit per pixel or not
-			bool bOneBitPerPixel = fileInfo.BitsPerPixel == 1;
+		// get the clear image server
+		ICiServerPtr ipciServer(CLSID_CiServer);
+		ASSERT_RESOURCE_ALLOCATION("ELI17099", ipciServer != NULL);
+		_lastCodePos = "40";
 
-			if (!bOneBitPerPixel && fileInfo.BitsPerPixel != 8 && fileInfo.BitsPerPixel != 24)
+		// get a repair image pointer
+		ICiRepairPtr ipciRepair = ipciServer->CreateRepair();
+		ASSERT_RESOURCE_ALLOCATION("ELI17100", ipciRepair != NULL);
+
+		// Need to process each page individually
+		_lastCodePos = "50";
+		for (int i=1; i <= nPageCount; i++)
+		{
+			string strPageNum = asString(i);
+
+			fileInfo = GetLeadToolsSizedStruct<FILEINFO>(FILEINFO_FORMATVALID);
+			fileInfo.Format = iFormat;
+
+			// Set the page
+			lfo.PageNumber = i;
+			sfo.PageNumber = i;
+
+			// Load the page
+			BITMAPHANDLE hBitmap = {0};
+			LeadToolsBitmapFreeer freer(hBitmap);
+			loadImagePage(strWorkingInput, hBitmap, fileInfo, lfo, false);
+			_lastCodePos = "50_A_Page#" + strPageNum;
+
+			// Check if this page is in the page to clean set
+			if (setPagesToClean.find(i) != setPagesToClean.end())
 			{
-				UCLIDException ue("ELI20364", "Unsupported bits per pixel!");
-				ue.addDebugInfo("Supported bits per pixel", "1, 8, or 24");
-				ue.addDebugInfo("BitsPerPixel", fileInfo.BitsPerPixel);
-				ue.addDebugInfo("Input File", strInputFile);
-				throw ue;
-			}
-
-			// Get a vector of pages to clean
-			set<int> setPagesToClean;
-			getSetOfPages(setPagesToClean, ipImageCleanupSettings, nPageCount);
-			_lastCodePos = "30";
-
-			// Get the load file options
-			LOADFILEOPTION lfo =
-				GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE | ELO_ROTATED);
-
-			// Get the save file options
-			SAVEFILEOPTION sfo =
-				GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-			throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
-				"ELI27308", "Unable to get default save options!");
-
-			// Attach mutex to CSingleLock and lock it
-			CSingleLock snglLock(&sg_mutexINLITE_MUTEX, TRUE);
-
-			// get the clear image server
-			ICiServerPtr ipciServer(CLSID_CiServer);
-			ASSERT_RESOURCE_ALLOCATION("ELI17099", ipciServer != NULL);
-			_lastCodePos = "40";
-
-			// get a repair image pointer
-			ICiRepairPtr ipciRepair = ipciServer->CreateRepair();
-			ASSERT_RESOURCE_ALLOCATION("ELI17100", ipciRepair != NULL);
-
-			// Need to process each page individually
-			_lastCodePos = "50";
-			for (int i=1; i <= nPageCount; i++)
-			{
-				string strPageNum = asString(i);
-
-				fileInfo = GetLeadToolsSizedStruct<FILEINFO>(FILEINFO_FORMATVALID);
-				fileInfo.Format = iFormat;
-
-				// Set the page
-				lfo.PageNumber = i;
-				sfo.PageNumber = i;
-
-				// Load the page
-				BITMAPHANDLE hBitmap = {0};
-				LeadToolsBitmapFreeer freer(hBitmap);
-				loadImagePage(inMgr, hBitmap, fileInfo, lfo, false);
-				_lastCodePos = "50_A_Page#" + strPageNum;
-
-				// Check if this page is in the page to clean set
-				if (setPagesToClean.find(i) != setPagesToClean.end())
+				// For bitonal images need to check the palette and switch it if it is not {black, white}
+				// [p13 #4826 & #4702]
+				if (bOneBitPerPixel)
 				{
-					// For bitonal images need to check the palette and switch it if it is not {black, white}
-					// [p13 #4826 & #4702]
-					if (bOneBitPerPixel)
-					{
-						swapPalette(hBitmap);
-					}
-					
-					cleanImagePage(hBitmap, ipciServer, ipciRepair, vecEnabledCleanupOperations);
+					swapPalette(hBitmap);
 				}
-				_lastCodePos = "50_B_Page#" + strPageNum;
 
-				// Save the bitmap page to the output image
-				saveImagePage(hBitmap, outMgr, fileInfo, sfo);
-				_lastCodePos = "50_C_Page#" + strPageNum;
+				cleanImagePage(hBitmap, ipciServer, ipciRepair, vecEnabledCleanupOperations);
 			}
-			_lastCodePos = "60";
+			_lastCodePos = "50_B_Page#" + strPageNum;
 
-			// Finished with clear image objects, unlock the mutex
-			snglLock.Unlock();	
+			// Save the bitmap page to the output image
+			saveImagePage(hBitmap, tempFile.getName(), fileInfo, sfo);
+			_lastCodePos = "50_C_Page#" + strPageNum;
+		}
+		_lastCodePos = "60";
 
-		} // End PDF manager scope
+		// Finished with clear image objects, unlock the mutex
+		snglLock.Unlock();	
+
 		_lastCodePos = "70";
 
 		// Ensure the output image is the same size as the input image
@@ -223,12 +219,19 @@ STDMETHODIMP CImageCleanupEngine::CleanupImageInternalUseOnly(BSTR bstrInputFile
 		}
 		_lastCodePos = "80";
 
-		// Copy the temp file to the output file
-		copyFile(tempFile.getName(), strOutputFile, true);
+		if (bOutputPDF)
+		{
+			convertTIFToPDF(tempFile.getName(), strOutputFile);
+		}
+		else
+		{
+			// Copy the temp file to the output file
+			copyFile(tempFile.getName(), strOutputFile, true);
+		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17095");
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CImageCleanupEngine::CleanupImage(BSTR bstrInputFile, BSTR bstrOutputFile, 
