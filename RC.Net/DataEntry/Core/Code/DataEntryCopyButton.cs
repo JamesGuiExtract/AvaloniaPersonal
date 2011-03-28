@@ -473,7 +473,13 @@ namespace Extract.DataEntry
                 // would not be mapped into the attribute hierarchy.
                 // Also, prevent it from being enabled if explicitly disabled via the
                 // IDataEntryControl interface.
-                base.Enabled = (sourceAttributes != null && !_disabled);
+                Enabled = (sourceAttributes != null && !_disabled);
+
+                if (!Enabled)
+                {
+                    // If not enabled, ensure the error icon is reset.
+                    _errorProvider.SetError(this, "");
+                }
 
                 if (sourceAttributes == null)
                 {
@@ -539,7 +545,7 @@ namespace Extract.DataEntry
                 // propagated.
                 if (e.Attributes != null && e.Attributes.Size() == 1)
                 {
-                    base.Enabled = !_disabled;
+                    Enabled = !_disabled;
 
                     // This is a dependent child to the sender. Re-map this control using the
                     // updated attribute's children.

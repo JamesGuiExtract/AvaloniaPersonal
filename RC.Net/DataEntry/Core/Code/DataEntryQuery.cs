@@ -881,7 +881,7 @@ namespace Extract.DataEntry
             : base(null, null, MultipleQueryResultSelectionMode.None, false)
         {
             _argument1Name = argument1Name;
-            RegisterArgument(_argument1Name, rootQuery, namedQueries);
+            AddNamedDependency(_argument1Name, rootQuery, namedQueries);
         }
 
         /// <summary>
@@ -942,7 +942,7 @@ namespace Extract.DataEntry
                 // Arg1 is always required.
                 if (Properties.TryGetValue("Arg1", out _argument1Name))
                 {
-                    RegisterArgument(_argument1Name, rootQuery, namedQueries);
+                    AddNamedDependency(_argument1Name, rootQuery, namedQueries);
                 }
                 else
                 {
@@ -955,38 +955,13 @@ namespace Extract.DataEntry
                 // Arg2 is optional.
                 if (Properties.TryGetValue("Arg2", out _argument2Name))
                 {
-                    RegisterArgument(_argument2Name, rootQuery, namedQueries);
+                    AddNamedDependency(_argument2Name, rootQuery, namedQueries);
                 }
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI28932", ex);
             }
-        }
-
-        /// <summary>
-        /// Links the <see cref="QueryNode"/> referenced by <see paramref="resultName"/> to this
-        /// node.
-        /// </summary>
-        /// <param name="resultName">The name of the <see cref="QueryNode"/> that is to be an
-        /// argument.</param>
-        /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
-        /// query.</param>
-        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
-        /// available to allow referencing of named nodes by subsequent nodes.</param>
-        void RegisterArgument(string resultName, DataEntryQuery rootQuery,
-            Dictionary<string, QueryNode> namedQueries)
-        {
-            QueryNode namedQuery;
-            if (!namedQueries.TryGetValue(resultName, out namedQuery))
-            {
-                ExtractException ee = new ExtractException("ELI31977", "Undefined query!");
-                ee.AddDebugData("Name", resultName, false);
-                throw ee;
-            }
-            namedQuery.AddRootQuery(rootQuery);
-            _namedDependencies[resultName] = namedQuery;
-            _childNodes.Add(namedQuery);
         }
 
         /// <summary>
@@ -1386,6 +1361,34 @@ namespace Extract.DataEntry
             foreach (QueryNode childNode in _childNodes)
             {
                 childNode.AddRootQuery(rootQuery);
+            }
+        }
+
+        /// <summary>
+        /// Links the <see cref="QueryNode"/> referenced by <see paramref="resultName"/> to this
+        /// node.
+        /// </summary>
+        /// <param name="resultName">The name of the <see cref="QueryNode"/> that is to be an
+        /// argument.</param>
+        /// <param name="rootQuery">The <see cref="DataEntryQuery"/> that is the root of this
+        /// query.</param>
+        /// <param name="namedQueries">A communal collection of named <see cref="QueryNode"/>s
+        /// available to allow referencing of named nodes by subsequent nodes.</param>
+        protected void AddNamedDependency(string resultName, DataEntryQuery rootQuery,
+            Dictionary<string, QueryNode> namedQueries)
+        {
+            if (!_namedDependencies.ContainsKey(resultName))
+            {
+                QueryNode namedQuery;
+                if (!namedQueries.TryGetValue(resultName, out namedQuery))
+                {
+                    ExtractException ee = new ExtractException("ELI31977", "Undefined query!");
+                    ee.AddDebugData("Name", resultName, false);
+                    throw ee;
+                }
+                namedQuery.AddRootQuery(rootQuery);
+                _namedDependencies[resultName] = namedQuery;
+                _childNodes.Add(namedQuery);
             }
         }
 
@@ -2523,6 +2526,14 @@ namespace Extract.DataEntry
                     queryNodeDeclarations = new DataEntryQuery(rootAttribute, dbConnection,
                         selectionMode, resolveOnLoad);
                     queryNodeDeclarations.LoadFromXml(declarationsNode, null, namedQueries);
+
+                    // ExcludeFromResult is implied by virtue of the fact that the QueryNode is
+                    // defined in the declarations node. Set ExcludeFromResult to ensure the nodes
+                    // themselves can't directly be included by any that referenced it.
+                    foreach (QueryNode namedQuery in namedQueries.Values)
+                    {
+                        namedQuery.ExcludeFromResult = true;
+                    }
                 }
 
                 // Use the XML to generate all queries to be used for this trigger.
@@ -2732,6 +2743,7 @@ namespace Extract.DataEntry
                 if (xmlAttribute != null)
                 {
                     _validationMessageResultName = xmlAttribute.Value;
+                    AddNamedDependency(_validationMessageResultName, rootQuery, namedQueries);
                 }
 
                 // Not a validation warning by default

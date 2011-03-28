@@ -536,14 +536,15 @@ namespace Extract.DataEntry
             {
                 IAttribute attribute = dataEntryCell.Attribute;
 
-                if (attribute == null || AttributeStatusInfo.GetOwningControl(attribute).Disabled)
-                {
-                    // Nothing to do.
-                    return;
-                }
-
                 DataGridViewCell cell = dataEntryCell.AsDataGridViewCell;
                 DataValidity dataValidity;
+
+                if (attribute == null || AttributeStatusInfo.GetOwningControl(attribute).Disabled)
+                {
+                    // Nothing to do except clear any existing validation errors/warnings.
+                    cell.ErrorText = "";
+                    return;
+                }
 
                 // [DataEntry:913]
                 // If someone is typing in a text box cell, we don't want to auto-correct as they

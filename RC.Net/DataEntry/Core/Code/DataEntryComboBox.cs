@@ -1067,7 +1067,7 @@ namespace Extract.DataEntry
                     // If the source attribute is null, clear existing data and do not attempt to
                     // map to a new attribute.
                     _attribute = null;
-                    Text = "";
+                    SelectedIndex = -1;
                 }
                 else
                 {
