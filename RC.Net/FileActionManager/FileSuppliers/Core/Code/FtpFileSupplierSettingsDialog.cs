@@ -1,5 +1,7 @@
 ﻿using EnterpriseDT.Net.Ftp;
 using EnterpriseDT.Net.Ftp.Forms;
+using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Windows.Forms;
 
@@ -94,7 +96,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 }
 
                 _newExtensionTextBox.Text = _settings.NewExtensionForRemoteFile;
-                _localWorkingFoldertextBox.Text = _settings.LocalWorkingFolder;
+                _localWorkingFolderTextBox.Text = _settings.LocalWorkingFolder;
 
                 _secureFTPConnection = _settings.ConfiguredFtpConnection ?? new SecureFTPConnection();
                 
@@ -152,7 +154,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 }
 
                 _settings.NewExtensionForRemoteFile = _newExtensionTextBox.Text;
-                _settings.LocalWorkingFolder = _localWorkingFoldertextBox.Text;
+                _settings.LocalWorkingFolder = _localWorkingFolderTextBox.Text;
 
                 _settings.ConfiguredFtpConnection = (SecureFTPConnection) _ftpConnectionEditor.Connection;
 
@@ -214,6 +216,40 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
+        /// <summary>
+        /// Handles the UserTextCorrected event for the polling interval control
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandlePollingIntervalNumericUpDownUserTextCorrected(object sender, EventArgs e)
+        {
+            try
+            {
+                UtilityMethods.ShowMessageBox(
+                    "The polling interval must be between 1 and 1,440 minutes.",
+                    "Invalid polling interval", true);
+
+                // Re-select the _pollingIntervalNumericUpDown control, but only after any other events
+                // in the message queue have been processed so those event don't undo this selection.
+                BeginInvoke((MethodInvoker)(() =>
+                {
+                    try
+                    {
+                        _settingsTabControl.SelectedTab = _generalSettingsTabPage;
+                        _pollingIntervalNumericUpDown.Focus();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractDisplay("ELI32249");
+                    }
+                }));
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32250");
+            }
+        }
+
         #endregion
 
         #region Helper functions
@@ -266,11 +302,11 @@ namespace Extract.FileActionManager.FileSuppliers
                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
                 _newExtensionTextBox.Focus();
             }
-            else if (string.IsNullOrWhiteSpace(_localWorkingFoldertextBox.Text))
+            else if (string.IsNullOrWhiteSpace(_localWorkingFolderTextBox.Text))
             {
                 MessageBox.Show("Local working folder must be specified.", "Configuration error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
-                _localWorkingFoldertextBox.Focus();
+                _localWorkingFolderTextBox.Focus();
             }
             else if (string.IsNullOrWhiteSpace(_ftpConnectionEditor.Connection.ServerAddress))
             {

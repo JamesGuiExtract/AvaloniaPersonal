@@ -1,6 +1,7 @@
 ﻿using EnterpriseDT.Net.Ftp;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -101,6 +102,9 @@ namespace Extract.FileActionManager.FileSuppliers
         // from the ftp server
         Thread _ftpDownloadManagerThread;
 
+        // LocalWorkingFolder with tags expanded
+        string _expandedLocalWorkingFolder;
+
         #endregion
 
         #region Properties
@@ -197,6 +201,9 @@ namespace Extract.FileActionManager.FileSuppliers
             AfterDownloadAction = AfterDownloadRemoteFileActon.DeleteRemoteFile;
             _supplyingStarted = new EventWaitHandle(false, EventResetMode.AutoReset);
             _stopSupplying = false;
+            
+            // Set Polling IntervalInMinutes to the default
+            PollingIntervalInMinutes = 1;
         }
 
         /// <summary>
@@ -382,6 +389,11 @@ namespace Extract.FileActionManager.FileSuppliers
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_licenseId,
                    "ELI32216", _COMPONENT_DESCRIPTION);
+
+                FileActionManagerSupplierPathTags pathTags = 
+                    new FileActionManagerSupplierPathTags(pFAMTM.FPSFileDir);
+
+                _expandedLocalWorkingFolder = pathTags.Expand(LocalWorkingFolder);
 
                 // Set the file target
                 _fileTarget = pTarget;
@@ -714,7 +726,8 @@ namespace Extract.FileActionManager.FileSuppliers
                         }
 
                         // make sure the path exists on the local machine
-                        string pathForFile = LocalWorkingFolder + "\\" + currentWorkingDir.Remove(0, RemoteDownloadFolder.Length);
+                        string pathForFile = _expandedLocalWorkingFolder + "\\" + 
+                            currentWorkingDir.Remove(0, RemoteDownloadFolder.Length);
                         pathForFile = pathForFile.Replace('/', '\\');
                         pathForFile = pathForFile.Replace("\\\\", "\\"); 
                         if (!Directory.Exists(pathForFile))

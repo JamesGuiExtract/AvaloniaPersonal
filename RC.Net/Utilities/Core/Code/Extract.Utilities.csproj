@@ -79,6 +79,7 @@
     <Compile Include="CommentedTextFileReader.cs" />
     <Compile Include="ConfigSettings.cs" />
     <Compile Include="FileActionManagerPathTags.cs" />
+    <Compile Include="FileActionManagerSupplierPathTags.cs" />
     <Compile Include="FileSystemMethods.cs" />
     <Compile Include="InitializationFile.cs" />
     <Compile Include="IntervalTimer.cs" />
