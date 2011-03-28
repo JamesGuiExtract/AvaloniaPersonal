@@ -192,6 +192,8 @@ namespace Extract.FileActionManager.FileSuppliers
         public FtpFileSupplier()
         {
             ConfiguredFtpConnection = new SecureFTPConnection();
+            ConfiguredFtpConnection.LicenseOwner = "trialuser";
+            ConfiguredFtpConnection.LicenseKey = "701-9435-3077-362";
             AfterDownloadAction = AfterDownloadRemoteFileActon.DeleteRemoteFile;
             _supplyingStarted = new EventWaitHandle(false, EventResetMode.AutoReset);
             _stopSupplying = false;
@@ -506,6 +508,8 @@ namespace Extract.FileActionManager.FileSuppliers
                         ConfiguredFtpConnection = new SecureFTPConnection();
                         ConfiguredFtpConnection.Load(ftpDataStream);
                     }
+                    ConfiguredFtpConnection.LicenseOwner = "trialuser";
+                    ConfiguredFtpConnection.LicenseKey = "701-9435-3077-362";
                 }
 
                 // Freshly loaded object is no longer dirty
