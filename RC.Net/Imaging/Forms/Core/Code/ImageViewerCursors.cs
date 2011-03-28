@@ -87,7 +87,7 @@ namespace Extract.Imaging.Forms
                 {
                     try
                     {
-                        ExtractCursors.DisposeCursorAndNativeHandle(_tool);
+                        _tool.Dispose();
                     }
                     catch (Exception ex)
                     {
@@ -99,7 +99,7 @@ namespace Extract.Imaging.Forms
                 {
                     try
                     {
-                        ExtractCursors.DisposeCursorAndNativeHandle(_active);
+                        _active.Dispose();
                     }
                     catch (Exception ex)
                     {

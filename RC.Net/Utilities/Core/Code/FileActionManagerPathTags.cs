@@ -11,6 +11,20 @@ namespace Extract.Utilities
     [DisplayName("File Action Manager")]
     public class FileActionManagerPathTags : PathTagsBase
     {
+        #region Constants
+
+        /// <summary>
+        /// Constant string for the source doc tag.
+        /// </summary>
+        public static readonly string SourceDocumentTag = "<SourceDocName>";
+
+        /// <summary>
+        /// Constant string for the FPS file directory tag.
+        /// </summary>
+        public static readonly string FpsFileDirectoryTag = "<FPSFileDir>";
+
+        #endregion Constants
+
         #region FileActionManagerPathTags Constructors
 
         /// <summary>
@@ -45,8 +59,8 @@ namespace Extract.Utilities
             string fpsDirectory)
         {
             Dictionary<string, string> tagsToValues = new Dictionary<string,string>(2);
-            tagsToValues.Add("<SourceDocName>", sourceDocument);
-            tagsToValues.Add("<FPSFileDir>", fpsDirectory);
+            tagsToValues.Add(SourceDocumentTag, sourceDocument);
+            tagsToValues.Add(FpsFileDirectoryTag, fpsDirectory);
             return tagsToValues;
         }
 

@@ -124,6 +124,13 @@
       <DependentUpon>ModifySourceDocNameInDBSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RasterizePdfTask.cs" />
+    <Compile Include="RasterizePdfTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RasterizePdfTaskSettingsDialog.Designer.cs">
+      <DependentUpon>RasterizePdfTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="SetFilePrioritySettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -222,6 +229,9 @@
     <EmbeddedResource Include="ModifySourceDocNameInDBSettingsDialog.resx">
       <DependentUpon>ModifySourceDocNameInDBSettingsDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RasterizePdfTaskSettingsDialog.resx">
+      <DependentUpon>RasterizePdfTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SetFilePrioritySettingsDialog.resx">
       <DependentUpon>SetFilePrioritySettingsDialog.cs</DependentUpon>

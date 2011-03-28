@@ -1,11 +1,14 @@
 using Extract.Drawing;
 using Extract.Licensing;
+using Extract.Utilities;
 using Leadtools;
 using Leadtools.ImageProcessing;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
+using System.Reflection;
 
 namespace Extract.Imaging
 {
@@ -17,6 +20,18 @@ namespace Extract.Imaging
         #region Constants
 
         static readonly string _OBJECT_NAME = typeof(ImageMethods).ToString();
+
+        /// <summary>
+        /// Path to the ImageFormatConverter (ImageFormatConverter should be parallel
+        /// to Extract.Imaging)
+        /// </summary>
+        static readonly string _IMAGE_FORMAT_CONVERTER =
+#if DEBUG
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase),
+                "ImageFormatConverter.exe");
+#else
+            Path.Combine(FileSystemMethods.CommonComponentsPath, "ImageFormatConverter.exe");
+#endif
 
         #endregion Constants
 
@@ -616,6 +631,27 @@ namespace Extract.Imaging
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI29700", ex);
+            }
+        }
+
+        /// <summary>
+        /// Converts the PDF to tif.
+        /// </summary>
+        /// <param name="inputFile">The input file.</param>
+        /// <param name="outputFile">The output file.</param>
+        public static void ConvertPdfToTif(string inputFile, string outputFile)
+        {
+            try
+            {
+                LicenseUtilities.ValidateLicense(LicenseIdName.PdfReadWriteFeature,
+                    "ELI32223", "Convert PDF to TIF");
+
+                var arguments = new string[] { inputFile, outputFile, "/tif" };
+                SystemMethods.RunExtractExecutable(_IMAGE_FORMAT_CONVERTER, arguments);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32222");
             }
         }
     }

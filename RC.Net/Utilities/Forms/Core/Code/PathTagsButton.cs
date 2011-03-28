@@ -129,6 +129,15 @@ namespace Extract.Utilities.Forms
         #region Properties
 
         /// <summary>
+        /// Gets/sets the text control associated with this <see cref="PathTagsButton"/>.
+        /// </summary>
+        /// <returns>The text control associated with this <see cref="PathTagsButton"/>.</returns>
+        /// <value>The text control associated with this <see cref="PathTagsButton"/>.</value>
+        [DefaultValue(null)]
+        [Description("The text control to automatically update when a tag is selected.")]
+        public TextBox TextControl { get; set; }
+
+        /// <summary>
         /// Gets or sets the path tags that are available for selection.
         /// </summary>
         /// <value>The path tags that are available for selection.</value>
@@ -412,6 +421,11 @@ namespace Extract.Utilities.Forms
                 string tagName = e.ClickedItem.Text;
                 if (!string.IsNullOrEmpty(tagName))
                 {
+                    if (TextControl != null)
+                    {
+                        TextControl.SelectedText = tagName;
+                    }
+
                     // Raise the TagSelected event
                     OnTagSelected(new TagSelectedEventArgs(tagName));
                 }
