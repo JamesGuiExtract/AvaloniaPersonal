@@ -22,10 +22,7 @@ namespace Extract.FileActionManager.FileProcessors
                 InitializeComponent();
 
                 _fileNameTagsButton.PathTags = new FileActionManagerPathTags();
-                _fileNameTagsButton.TagSelected += HandleFileNameTagSelected;
-
                 _fileContentsTagsButton.PathTags = new FileActionManagerPathTags();
-                _fileContentsTagsButton.TagSelected += HandleFileContentsTagSelected;
 
                 _okButton.Click += HandleOkButtonClick;
             }
@@ -161,44 +158,6 @@ namespace Extract.FileActionManager.FileProcessors
         #endregion Properties
 
         #region Event Handlers
-
-        /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleFileNameTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _fileNameTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31847");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleFileContentsTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _fileContentsTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31853");
-            }
-        }
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event.

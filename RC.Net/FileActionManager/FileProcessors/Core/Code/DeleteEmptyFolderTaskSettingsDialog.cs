@@ -31,12 +31,7 @@ namespace Extract.FileActionManager.FileProcessors
                 InitializeComponent();
 
                 _folderNameTagsButton.PathTags = new FileActionManagerPathTags();
-                _folderNameTagsButton.TagSelected += HandleFolderNameTagSelected;
-
                 _recursionLimitTagsButton.PathTags = new FileActionManagerPathTags();
-                _recursionLimitTagsButton.TagSelected += HandleRecursionLimitTagSelected;
-
-                _recursionLimitBrowseButton.TextControl = _recursionLimitTextBox;
 
                 // Specify enabled/disabled status of controls dependent on
                 // _deleteRecursivelyCheckBox.
@@ -189,44 +184,6 @@ namespace Extract.FileActionManager.FileProcessors
         #endregion Properties
 
         #region Event Handlers
-
-        /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleFolderNameTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _folderNameTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31868");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleRecursionLimitTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _recursionLimitTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31874");
-            }
-        }
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event.

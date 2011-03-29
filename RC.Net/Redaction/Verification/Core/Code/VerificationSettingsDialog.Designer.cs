@@ -253,8 +253,8 @@ namespace Extract.Redaction.Verification
             this._backdropImagePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._backdropImagePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._backdropImagePathTagsButton.TabIndex = 2;
+            this._backdropImagePathTagsButton.TextControl = _backdropImageTextBox;
             this._backdropImagePathTagsButton.UseVisualStyleBackColor = true;
-            this._backdropImagePathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandleBackdropImagePathTagsButtonTagSelected);
             // 
             // _backdropImageBrowseButton
             // 

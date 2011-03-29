@@ -123,27 +123,6 @@ namespace Extract.Redaction
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleMetadataPathTagsButtonTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _metadataFileTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI26308", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="BrowseButton.PathSelected"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 

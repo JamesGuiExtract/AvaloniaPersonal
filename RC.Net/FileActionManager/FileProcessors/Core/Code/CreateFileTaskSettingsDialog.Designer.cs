@@ -161,6 +161,7 @@
             this._fileContentsTagsButton.Name = "_fileContentsTagsButton";
             this._fileContentsTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileContentsTagsButton.TabIndex = 5;
+            this._fileContentsTagsButton.TextControl = _fileContentsTextBox;
             this._fileContentsTagsButton.UseVisualStyleBackColor = true;
             // 
             // _fileNameTagsButton
@@ -171,6 +172,7 @@
             this._fileNameTagsButton.Name = "_fileNameTagsButton";
             this._fileNameTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileNameTagsButton.TabIndex = 2;
+            this._fileNameTagsButton.TextControl = _fileNameTextBox;
             this._fileNameTagsButton.UseVisualStyleBackColor = true;
             // 
             // _fileContentsTextBox

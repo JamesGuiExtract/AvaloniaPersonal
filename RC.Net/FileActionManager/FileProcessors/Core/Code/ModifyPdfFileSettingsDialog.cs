@@ -109,23 +109,6 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
-        /// <summary>
-        /// Handles the <see cref="Control.Click"/> for the <see cref="PathTagsButton"/>.
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        void HandlePathTagsTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _pdfFileTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI29637", ex);
-            }
-        }
-
         #endregion Event Handlers
 
         #region Methods

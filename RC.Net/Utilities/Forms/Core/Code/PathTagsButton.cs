@@ -424,6 +424,16 @@ namespace Extract.Utilities.Forms
                     if (TextControl != null)
                     {
                         TextControl.SelectedText = tagName;
+
+                        // If a tag function has been selected, automatically position the cursor
+                        // between the parentheses
+                        if (tagName.StartsWith("$", StringComparison.OrdinalIgnoreCase) &&
+                            tagName.EndsWith("()", StringComparison.OrdinalIgnoreCase))
+                        {
+                            TextControl.SelectionStart -= 1;
+                            TextControl.SelectionLength = 0;
+                            TextControl.Focus();
+                        }
                     }
 
                     // Raise the TagSelected event

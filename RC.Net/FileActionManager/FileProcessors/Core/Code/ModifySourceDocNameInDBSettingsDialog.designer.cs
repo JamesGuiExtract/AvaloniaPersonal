@@ -103,8 +103,8 @@
             this._fileTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileTagsButton.TabIndex = 1;
+            this._fileTagsButton.TextControl = _renameFileToTextBox;
             this._fileTagsButton.UseVisualStyleBackColor = true;
-            this._fileTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandlePathTagSelected);
             // 
             // ModifySourceDocNameInDBSettingsDialog
             // 

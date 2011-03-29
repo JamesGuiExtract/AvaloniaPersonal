@@ -121,6 +121,7 @@
             this._recursionLimitTagsButton.Name = "_recursionLimitTagsButton";
             this._recursionLimitTagsButton.Size = new System.Drawing.Size(18, 20);
             this._recursionLimitTagsButton.TabIndex = 17;
+            this._recursionLimitTagsButton.TextControl = _recursionLimitTextBox;
             this._recursionLimitTagsButton.UseVisualStyleBackColor = true;
             // 
             // _folderNameTagsButton
@@ -131,6 +132,7 @@
             this._folderNameTagsButton.Name = "_folderNameTagsButton";
             this._folderNameTagsButton.Size = new System.Drawing.Size(18, 20);
             this._folderNameTagsButton.TabIndex = 13;
+            this._folderNameTagsButton.TextControl = _folderNameTextBox;
             this._folderNameTagsButton.UseVisualStyleBackColor = true;
             // 
             // _recursionLimitBrowseButton

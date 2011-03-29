@@ -230,8 +230,8 @@
             this._suffixTags.Name = "_suffixTags";
             this._suffixTags.Size = new System.Drawing.Size(18, 20);
             this._suffixTags.TabIndex = 6;
+            this._suffixTags.TextControl = _textSuffix;
             this._suffixTags.UseVisualStyleBackColor = true;
-            this._suffixTags.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandleSuffixTagSelected);
             // 
             // _textPrefix
             // 
@@ -257,8 +257,8 @@
             this._prefixTags.Name = "_prefixTags";
             this._prefixTags.Size = new System.Drawing.Size(18, 20);
             this._prefixTags.TabIndex = 3;
+            this._prefixTags.TextControl = _textPrefix;
             this._prefixTags.UseVisualStyleBackColor = true;
-            this._prefixTags.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandlePrefixTagSelected);
             // 
             // _checkSuffixText
             // 

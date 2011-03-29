@@ -108,8 +108,8 @@ namespace Extract.Redaction.Verification
             this._dataFolderPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._dataFolderPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._dataFolderPathTagsButton.TabIndex = 2;
+            this._dataFolderPathTagsButton.TextControl = _dataFolderTextBox;
             this._dataFolderPathTagsButton.UseVisualStyleBackColor = true;
-            this._dataFolderPathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandleDataFolderPathTagsButtonTagSelected);
             // 
             // _dataFolderBrowseButton
             // 

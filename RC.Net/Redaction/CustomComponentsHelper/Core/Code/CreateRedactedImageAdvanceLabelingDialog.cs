@@ -140,40 +140,6 @@ namespace Extract.Redaction.CustomComponentsHelper
         }
 
         /// <summary>
-        /// Handles the prefix tag selected.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="Extract.Utilities.Forms.TagSelectedEventArgs"/> instance containing the event data.</param>
-        void HandlePrefixTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _textPrefix.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31736");
-            }
-        }
-
-        /// <summary>
-        /// Handles the suffix tag selected.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="Extract.Utilities.Forms.TagSelectedEventArgs"/> instance containing the event data.</param>
-        void HandleSuffixTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _textSuffix.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31737");
-            }
-        }
-
-        /// <summary>
         /// Handles the add replacement clicked.
         /// </summary>
         /// <param name="sender">The sender.</param>

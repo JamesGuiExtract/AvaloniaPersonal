@@ -457,25 +457,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleBackdropImagePathTagsButtonTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _backdropImageTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI29669", ex);
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="BrowseButton.PathSelected"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 

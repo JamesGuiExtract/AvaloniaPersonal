@@ -87,48 +87,6 @@ namespace Extract.IDShieldStatisticsReporter
             }
         }
 
-        /// <summary>
-        /// Handles the found data <see cref="PathTagsButton"/> 
-        /// <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        void OnFoundDataPathTagsButtonTagSelected(object sender,
-            Extract.Utilities.Forms.TagSelectedEventArgs e)
-        {
-            try
-            {
-                _foundDataPathTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI28654", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the expected data <see cref="PathTagsButton"/> 
-        /// <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        private void OnExpectedDataPathTagsButtonTagSelected(object sender,
-            Extract.Utilities.Forms.TagSelectedEventArgs e)
-        {
-            try
-            {
-                _expectedDataPathTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI28655", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
         #endregion Event handlers
     }
 }

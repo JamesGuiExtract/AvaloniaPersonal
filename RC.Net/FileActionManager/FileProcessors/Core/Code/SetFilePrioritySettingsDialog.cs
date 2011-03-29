@@ -119,24 +119,6 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
-        /// <summary>
-        /// Handles the path tag selected.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="TagSelectedEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandlePathTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _fileNameTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI31585", ex);
-            }
-        }
-
         #endregion Methods
     }
 }

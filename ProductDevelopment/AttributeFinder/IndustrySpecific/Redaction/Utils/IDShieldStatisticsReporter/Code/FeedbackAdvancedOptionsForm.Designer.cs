@@ -87,8 +87,8 @@ namespace Extract.IDShieldStatisticsReporter
             this._foundDataPathTagsButton.Name = "_foundDataPathTagsButton";
             this._foundDataPathTagsButton.Size = new System.Drawing.Size(18, 22);
             this._foundDataPathTagsButton.TabIndex = 2;
+            this._foundDataPathTagsButton.TextControl = _foundDataPathTextBox;
             this._foundDataPathTagsButton.UseVisualStyleBackColor = true;
-            this._foundDataPathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.OnFoundDataPathTagsButtonTagSelected);
             // 
             // _expectedDataPathTagsButton
             // 
@@ -98,9 +98,9 @@ namespace Extract.IDShieldStatisticsReporter
             this._expectedDataPathTagsButton.Name = "_expectedDataPathTagsButton";
             this._expectedDataPathTagsButton.Size = new System.Drawing.Size(18, 21);
             this._expectedDataPathTagsButton.TabIndex = 6;
+            this._expectedDataPathTagsButton.TextControl = _expectedDataPathTextBox;
             this._expectedDataPathTagsButton.UseVisualStyleBackColor = true;
-            this._expectedDataPathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.OnExpectedDataPathTagsButtonTagSelected);
-            // 
+            //
             // _expectedDataBrowseButton
             // 
             this._expectedDataBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));

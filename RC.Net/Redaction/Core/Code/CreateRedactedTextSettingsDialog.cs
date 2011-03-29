@@ -51,7 +51,6 @@ namespace Extract.Redaction
                 _settings = settings ?? new CreateRedactedTextSettings();
 
                 _outputPathTagsButton.PathTags = new FileActionManagerPathTags();
-                _outputPathTagsButton.TagSelected += HandleFileNameTagSelected;
 
                 // Configure all controls to enable/disable dependent controls as appropriate when
                 // their state changes.
@@ -263,27 +262,6 @@ namespace Extract.Redaction
         #endregion Overrides
 
         #region Event Handlers
-
-        /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleFileNameTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _outputLocationTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI31848", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event.

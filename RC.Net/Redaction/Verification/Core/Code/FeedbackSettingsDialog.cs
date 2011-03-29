@@ -207,27 +207,6 @@ namespace Extract.Redaction.Verification
         #region FeedbackSettingsDialog Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="PathTagsButton.TagSelected"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="PathTagsButton.TagSelected"/> event.</param>
-        void HandleDataFolderPathTagsButtonTagSelected(object sender, TagSelectedEventArgs e)
-        {
-            try
-            {
-                _dataFolderTextBox.SelectedText = e.Tag;
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI26332", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="BrowseButton.PathSelected"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 

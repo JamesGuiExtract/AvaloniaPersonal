@@ -82,8 +82,8 @@ namespace Extract.Redaction
             this._metadataPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._metadataPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._metadataPathTagsButton.TabIndex = 2;
+            this._metadataPathTagsButton.TextControl = _metadataFileTextBox;
             this._metadataPathTagsButton.UseVisualStyleBackColor = true;
-            this._metadataPathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandleMetadataPathTagsButtonTagSelected);
             // 
             // _metadataBrowseButton
             // 

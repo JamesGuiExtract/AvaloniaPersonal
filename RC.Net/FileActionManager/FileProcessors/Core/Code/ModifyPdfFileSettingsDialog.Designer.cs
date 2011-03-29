@@ -84,8 +84,8 @@ namespace Extract.FileActionManager.FileProcessors
             this._pdfFilePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._pdfFilePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._pdfFilePathTagsButton.TabIndex = 2;
+            this._pdfFilePathTagsButton.TextControl = _pdfFileTextBox;
             this._pdfFilePathTagsButton.UseVisualStyleBackColor = true;
-            this._pdfFilePathTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandlePathTagsTagSelected);
             // 
             // label1
             // 

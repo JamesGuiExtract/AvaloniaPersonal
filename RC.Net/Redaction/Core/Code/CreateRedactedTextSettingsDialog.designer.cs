@@ -355,6 +355,7 @@
             this._outputPathTagsButton.Name = "_outputPathTagsButton";
             this._outputPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._outputPathTagsButton.TabIndex = 1;
+            this._outputPathTagsButton.TextControl = _outputLocationTextBox;
             this._outputPathTagsButton.UseVisualStyleBackColor = true;
             // 
             // _outputLocationTextBox
