@@ -83,7 +83,7 @@ END_MESSAGE_MAP()
 //-------------------------------------------------------------------------------------------------
 CSRIRImageViewerDlg::CSRIRImageViewerDlg(ISpotRecognitionWindowPtr ipSRIR, 
 										 bool bShowSearch/*false*/, 
-										 CWnd* pParent /*=NULL*/)
+										 CWnd* pParent /*=__nullptr*/)
 : CDialog(CSRIRImageViewerDlg::IDD, pParent), 
   m_ipSRIR(ipSRIR),
   m_lRefCount(0), 
@@ -101,10 +101,10 @@ CSRIRImageViewerDlg::CSRIRImageViewerDlg(ISpotRecognitionWindowPtr ipSRIR,
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 	// initialize the persistence manager
-	m_apCfg = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+	m_apCfg = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr(HKEY_CURRENT_USER,
 		gstrREG_ROOT_KEY + "\\InputFunnel\\Utils\\SRIRImageViewerDlg"));
-	ASSERT_RESOURCE_ALLOCATION("ELI06338", m_apCfg.get() != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06338", m_apCfg.get() != __nullptr);
 
 	// This line must be last because it calls OnInitDialog
 	Create(CSRIRImageViewerDlg::IDD, pParent);
@@ -206,7 +206,7 @@ void CSRIRImageViewerDlg::handleRecognizedText(const std::string& strText)
 			{
 				// Get the window handle for the ImageWindow
 				IInputReceiverPtr ipSR = m_ipSRIR;
-				ASSERT_RESOURCE_ALLOCATION("ELI25516", ipSR != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25516", ipSR != __nullptr);
 				HWND hWnd = (HWND) ipSR->WindowHandle;
 
 				// Display the OCR results (make them modal to the ImageViewer) [LRCAU #5307]
@@ -245,7 +245,7 @@ BOOL CSRIRImageViewerDlg::OnInitDialog()
 		ASSERT(IDM_ABOUTBOX < 0xF000);
 
 		CMenu* pSysMenu = GetSystemMenu(FALSE);
-		if (pSysMenu != NULL)
+		if (pSysMenu != __nullptr)
 		{
 			CString strAboutMenu;
 			strAboutMenu.LoadString(IDS_ABOUTBOX);
@@ -423,7 +423,7 @@ STDMETHODIMP CSRIRImageViewerDlg::QueryInterface( REFIID iid, void FAR* FAR* ppv
 	else
 		*ppvObj = NULL;
 
-	if (*ppvObj != NULL)
+	if (*ppvObj != __nullptr)
 	{
 		AddRef();
 		return S_OK;
@@ -462,7 +462,7 @@ STDMETHODIMP CSRIRImageViewerDlg::raw_NotifyParagraphTextRecognized(
 	{
 		// pass the received text to the input property page
 		ISpatialStringPtr ipText(pText);
-		ASSERT_RESOURCE_ALLOCATION("ELI06745", ipText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06745", ipText != __nullptr);
 
 		_bstr_t _bstrParagraphText = ipText->String;
 		

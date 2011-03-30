@@ -36,7 +36,7 @@ CMERSTester::CMERSTester()
 	try
 	{
 		m_ipAFUtility.CreateInstance( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION("ELI07366", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07366", m_ipAFUtility != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07367")
 }
@@ -149,10 +149,10 @@ STDMETHODIMP CMERSTester::raw_RunAutomatedTests(IVariantVector* pParams, BSTR st
 			
 			try
 			{
-				if (m_ipMERSHandler == NULL)
+				if (m_ipMERSHandler == __nullptr)
 				{
 					m_ipMERSHandler.CreateInstance(CLSID_MERSHandler);
-					ASSERT_RESOURCE_ALLOCATION("ELI06292", m_ipMERSHandler != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI06292", m_ipMERSHandler != __nullptr);
 				}
 
 				// get mock attributes 
@@ -161,13 +161,13 @@ STDMETHODIMP CMERSTester::raw_RunAutomatedTests(IVariantVector* pParams, BSTR st
 				
 				// get input file contents
 				ISpatialStringPtr ipOriginalInputText(CLSID_SpatialString);
-				ASSERT_RESOURCE_ALLOCATION("ELI07321", ipOriginalInputText != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07321", ipOriginalInputText != __nullptr);
 				ipOriginalInputText->LoadFrom(
 					_bstr_t(strInputTextFile.c_str()), VARIANT_FALSE);
 				
 				// create a spatial string to store the contents
 				IAFDocumentPtr ipOriginInput(CLSID_AFDocument);
-				ASSERT_RESOURCE_ALLOCATION("ELI06302", ipOriginInput != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06302", ipOriginInput != __nullptr);
 				ipOriginInput->Text = ipOriginalInputText;
 
 				// pass them through the MERS handler
@@ -290,7 +290,7 @@ const std::string CMERSTester::getMasterTestFileName(IVariantVectorPtr ipParams,
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		// get the DAT filename
 		string strMasterDatFileName = ::getAbsoluteFileName(strTCLFile, asString(_bstr_t(ipParams->GetItem(1))), true);

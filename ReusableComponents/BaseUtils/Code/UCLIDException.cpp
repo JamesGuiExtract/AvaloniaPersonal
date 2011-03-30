@@ -67,7 +67,7 @@ const unsigned long gnSIGNATURE_SIZE = 8;
 // Current version number of the UCLIDException class
 const unsigned long gnCURRENT_VERSION = 3;
 
-UCLIDExceptionHandler* UCLIDException::ms_pCurrentExceptionHandler = NULL;	
+UCLIDExceptionHandler* UCLIDException::ms_pCurrentExceptionHandler = __nullptr;	
 
 // Stores the name and version of the application throwing the exception
 string UCLIDException::ms_strApplication = "";
@@ -80,7 +80,7 @@ string UCLIDException::ms_strSerial = "";
 const string gstrDEFAULT_EXCEPTION_LOG_PATH = "\\LogFiles\\Misc\\ExtractException.Uex";
 
 // Mutex for protecting access to the log file
-static auto_ptr<CMutex> apmutexLogFile;
+static unique_ptr<CMutex> apmutexLogFile;
 static CMutex smutexCreate;
 
 //-------------------------------------------------------------------------------------------------
@@ -89,17 +89,17 @@ static CMutex smutexCreate;
 CMutex* getLogFileMutex()
 {
 	// Check if the log file mutex has been created yet
-	if (apmutexLogFile.get() == NULL)
+	if (apmutexLogFile.get() == __nullptr)
 	{
 		// Lock around creating the log file mutex
 		CSingleLock lgTemp(&smutexCreate, TRUE);
 
 		// Check again if it has been created
-		if (apmutexLogFile.get() == NULL)
+		if (apmutexLogFile.get() == __nullptr)
 		{
 			// Create the log file mutex
 			apmutexLogFile.reset(getGlobalNamedMutex(gstrLOG_FILE_MUTEX));
-			ASSERT_RESOURCE_ALLOCATION("ELI29994", apmutexLogFile.get() != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29994", apmutexLogFile.get() != __nullptr);
 		}
 	}
 
@@ -111,7 +111,7 @@ CMutex* getLogFileMutex()
 //-------------------------------------------------------------------------------------------------
 unsigned char* externManipulator(const char* pszInput, unsigned long* pulLength)
 {
-	unsigned char* pszOutput = NULL;
+	unsigned char* pszOutput = __nullptr;
 
 	INIT_EXCEPTION_AND_TRACING("MLI00417");
 
@@ -119,8 +119,8 @@ unsigned char* externManipulator(const char* pszInput, unsigned long* pulLength)
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI21087", pszInput != NULL);
-			ASSERT_ARGUMENT("ELI21089", pulLength != NULL);
+			ASSERT_ARGUMENT("ELI21087", pszInput != __nullptr);
+			ASSERT_ARGUMENT("ELI21089", pulLength != __nullptr);
 
 			string strInput(pszInput);
 
@@ -152,7 +152,7 @@ unsigned char* externManipulator(const char* pszInput, unsigned long* pulLength)
 			// NOTE: Need to use CoTaskMemAlloc to allocate the memory so that it can be
 			// released on the C# side, CANNOT USE NEW
 			pszOutput = (unsigned char*) CoTaskMemAlloc(sizeof(char) * *pulLength);
-			ASSERT_RESOURCE_ALLOCATION("ELI21614", pszOutput != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI21614", pszOutput != __nullptr);
 			
 			// Copy the encrypted bytes into the newly allocated buffer
 			memcpy(pszOutput, bsEncryptedBytes.getData(), *pulLength);
@@ -167,7 +167,7 @@ unsigned char* externManipulator(const char* pszInput, unsigned long* pulLength)
 		*pulLength = 0;
 
 		// Ensure all allocated memory is cleaned up
-		if (pszOutput != NULL)
+		if (pszOutput != __nullptr)
 		{
 			CoTaskMemFree(pszOutput);	
 		}
@@ -257,7 +257,7 @@ LastCodePosition::operator const string()
 UCLIDException::UCLIDException(void)
 :	m_strELI(""),
 	m_strDescription(""),
-	m_apueInnerException(NULL)
+	m_apueInnerException(__nullptr)
 {
 	// Default constructor has no data associated with it.
 }
@@ -310,7 +310,7 @@ void UCLIDException::createFromString(const string& strELI, const string& strDat
 UCLIDException::UCLIDException(const string& strELI, const string& strText)
 :	m_strELI(strELI),
 	m_strDescription(strText),
-	m_apueInnerException(NULL)
+	m_apueInnerException(__nullptr)
 {
 	try
 	{
@@ -330,7 +330,7 @@ UCLIDException::UCLIDException(const UCLIDException& uclidException)
 		m_vecStackTrace = uclidException.m_vecStackTrace;
 
 		// Create the copy of the Inner Exception.
-		if (uclidException.m_apueInnerException.get() != NULL)
+		if (uclidException.m_apueInnerException.get() != __nullptr)
 		{
 			// Set the inner exception.
 			m_apueInnerException.reset(new UCLIDException(*uclidException.getInnerException()));
@@ -374,7 +374,7 @@ UCLIDException& UCLIDException::operator=(const UCLIDException& uclidException)
 		m_strDescription = uclidException.m_strDescription;
 
 		// Create the copy of the Inner Exception.
-		if (uclidException.m_apueInnerException.get() != NULL)
+		if (uclidException.m_apueInnerException.get() != __nullptr)
 		{
 			// Set the inner exception.
 			m_apueInnerException.reset(new UCLIDException(*uclidException.getInnerException()));
@@ -407,7 +407,7 @@ ByteStream UCLIDException::asByteStream() const
 		streamManipulator << m_strDescription;
 
 		// Output boolean value to indicate if there is an inner exception 
-		bool bIsInnerException = m_apueInnerException.get() != NULL;
+		bool bIsInnerException = m_apueInnerException.get() != __nullptr;
 		streamManipulator << bIsInnerException;
 
 		// Write the inner exception to the string
@@ -585,7 +585,7 @@ void UCLIDException::addDebugInfo(const string& strKeyName, const UCLIDException
 		try
 		{
 			// Add as debug info all history entries from ue
-			for (const UCLIDException *pException = &ue; pException != NULL; 
+			for (const UCLIDException *pException = &ue; pException != __nullptr; 
 				pException = pException->getInnerException())
 			{
 				string strException = pException->getTopELI() + " " + pException->getTopText();
@@ -819,7 +819,7 @@ string UCLIDException::getAllELIs() const
 		_lastCodePos = "100";
 
 		// If there is an inner exception add the ELI Codes for it.
-		if (m_apueInnerException.get() != NULL)
+		if (m_apueInnerException.get() != __nullptr)
 		{
 			_lastCodePos = "10";
 			strResult += "," + m_apueInnerException->getAllELIs();
@@ -1045,7 +1045,7 @@ UCLIDExceptionHandler* UCLIDException::getDefaultHandler()
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20306");
 	
-	return NULL;
+	return __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 UCLIDExceptionHandler* UCLIDException::setExceptionHandler(UCLIDExceptionHandler* pHandler)
@@ -1054,7 +1054,7 @@ UCLIDExceptionHandler* UCLIDException::setExceptionHandler(UCLIDExceptionHandler
 	{
 		UCLIDExceptionHandler *pOldHandler = ms_pCurrentExceptionHandler;
 
-		if (pHandler != NULL)
+		if (pHandler != __nullptr)
 		{
 			ms_pCurrentExceptionHandler = pHandler;
 		}
@@ -1067,14 +1067,14 @@ UCLIDExceptionHandler* UCLIDException::setExceptionHandler(UCLIDExceptionHandler
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20307");
 
-	return NULL;
+	return __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void UCLIDException::display(bool bLogException, bool bForceDisplay) const
 {
 	try
 	{
-		if (ms_pCurrentExceptionHandler == NULL)
+		if (ms_pCurrentExceptionHandler == __nullptr)
 		{
 			ms_pCurrentExceptionHandler = getDefaultHandler();
 		}
@@ -1736,7 +1736,7 @@ void UCLIDException::loadFromStream(ByteStream& rByteStream)
 			if (bIsInnerException)
 			{
 				m_apueInnerException.reset(new UCLIDException());
-				ASSERT_RESOURCE_ALLOCATION("ELI21244", m_apueInnerException.get() != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI21244", m_apueInnerException.get() != __nullptr);
 
 				// Version 2 inner exceptions where streamed in stringized byte form
 				if (nVersionNumber == 2)
@@ -1788,7 +1788,7 @@ void UCLIDException::loadFromStream(ByteStream& rByteStream)
 					// of the new inner exception
 					ueInnerMost->m_apueInnerException.reset(new UCLIDException(strELI, strText));
 					ueInnerMost = ueInnerMost->m_apueInnerException.get();
-					ASSERT_RESOURCE_ALLOCATION("ELI21245", ueInnerMost != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI21245", ueInnerMost != __nullptr);
 					_lastCodePos = "110";
 				}
 			}
@@ -2017,7 +2017,7 @@ void UCLIDException::asString(string& rResult, bool bRecursiveCall) const
 
 	// Call recursively if there is an inner exception
 	const UCLIDException *pueInner = getInnerException();
-	if (pueInner != NULL)
+	if (pueInner != __nullptr)
 	{
 		pueInner->asString(rResult, true);
 	}

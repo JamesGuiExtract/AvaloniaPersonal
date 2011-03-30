@@ -70,7 +70,7 @@ STDMETHODIMP CAddWatermarkTask::get_InputImageFile(BSTR *pbstrInputImageFile)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19914", pbstrInputImageFile != NULL);
+		ASSERT_ARGUMENT("ELI19914", pbstrInputImageFile != __nullptr);
 
 		validateLicense();
 
@@ -105,7 +105,7 @@ STDMETHODIMP CAddWatermarkTask::get_StampImageFile(BSTR *pbstrStampImageFile)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19917", pbstrStampImageFile != NULL);
+		ASSERT_ARGUMENT("ELI19917", pbstrStampImageFile != __nullptr);
 
 		validateLicense();
 
@@ -140,7 +140,7 @@ STDMETHODIMP CAddWatermarkTask::get_HorizontalPercentage(double *pdHorizPercenta
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19920", pdHorizPercentage != NULL);
+		ASSERT_ARGUMENT("ELI19920", pdHorizPercentage != __nullptr);
 
 		validateLicense();
 
@@ -175,7 +175,7 @@ STDMETHODIMP CAddWatermarkTask::get_VerticalPercentage(double *pdVertPercentage)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19923", pdVertPercentage != NULL);
+		ASSERT_ARGUMENT("ELI19923", pdVertPercentage != __nullptr);
 
 		validateLicense();
 
@@ -210,7 +210,7 @@ STDMETHODIMP CAddWatermarkTask::get_PagesToStamp(BSTR *pbstrPagesToStamp)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19926", pbstrPagesToStamp != NULL);
+		ASSERT_ARGUMENT("ELI19926", pbstrPagesToStamp != __nullptr);
 
 		validateLicense();
 
@@ -277,7 +277,7 @@ STDMETHODIMP CAddWatermarkTask::raw_CopyFrom(IUnknown* pObject)
 
 		// get the AddWatermarkTask object
 		UCLID_FILEPROCESSORSLib::IAddWatermarkTaskPtr ipAddWatermarkTask(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI19931", ipAddWatermarkTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19931", ipAddWatermarkTask != __nullptr);
 
 		// copy the data from the WatermarkTask object
 		m_strInputImage = asString(ipAddWatermarkTask->InputImageFile);
@@ -304,15 +304,15 @@ STDMETHODIMP CAddWatermarkTask::raw_Clone(IUnknown** ppObject)
 		validateLicense();
 
 		// ensure that the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI19933", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI19933", ppObject != __nullptr);
 
 		// get the copyable object interface
 		ICopyableObjectPtr ipObjCopy(CLSID_AddWatermarkTask);
-		ASSERT_RESOURCE_ALLOCATION("ELI19934", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19934", ipObjCopy != __nullptr);
 
 		// create a shallow copy
 		IUnknownPtr ipUnknown(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI19935", ipUnknown != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19935", ipUnknown != __nullptr);
 		ipObjCopy->CopyFrom(ipUnknown);
 
 		// return the new AddWatermarkTask to the caller
@@ -352,8 +352,8 @@ STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		validateLicense();
 
 		// check for NULL parameters
-		ASSERT_ARGUMENT("ELI19939", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI19940", pResult != NULL);
+		ASSERT_ARGUMENT("ELI19939", pTagManager != __nullptr);
+		ASSERT_ARGUMENT("ELI19940", pResult != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31333", ipFileRecord != __nullptr);
 
@@ -436,7 +436,7 @@ STDMETHODIMP CAddWatermarkTask::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI19944", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19944", pbValue != __nullptr);
 
 		try
 		{
@@ -469,7 +469,7 @@ STDMETHODIMP CAddWatermarkTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
 		validateLicense();
 
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI19946", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19946", pbValue != __nullptr);
 
 		// AddWatermark is configured if there is an input image, a stamp image
 		// and the horizontal and vertical percentages have been set
@@ -494,7 +494,7 @@ STDMETHODIMP CAddWatermarkTask::GetClassID(CLSID* pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19948", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI19948", pClassID != __nullptr);
 
 		*pClassID = CLSID_AddWatermarkTask;
 	}
@@ -528,7 +528,7 @@ STDMETHODIMP CAddWatermarkTask::Load(IStream* pStream)
 		
 		// use a smart pointer for the IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI19950", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19950", ipStream != __nullptr);
 
 		// read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -603,7 +603,7 @@ STDMETHODIMP CAddWatermarkTask::Save(IStream* pStream, BOOL fClearDirty)
 
 		// use a smart pointer for IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI19955", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19955", ipStream != __nullptr);
 
 		// write the bytestream data into the IStream object
 		long nDataLength = data.getLength();

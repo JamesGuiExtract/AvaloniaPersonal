@@ -45,7 +45,7 @@ CDocumentClassifierTester::CDocumentClassifierTester()
 	{
 		// Create the Document Classifier
 		m_ipDocClassifier.CreateInstance( CLSID_DocumentClassifier );
-		ASSERT_RESOURCE_ALLOCATION("ELI06004", m_ipDocClassifier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06004", m_ipDocClassifier != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06031")
 }
@@ -181,7 +181,7 @@ bool CDocumentClassifierTester::compareTags(const string& strDocName,
 
 	// Retrieve information from the String Tags
 	IStrToStrMapPtr ipStringTags = ipAFDoc->StringTags;
-	if (ipStringTags != NULL && ipStringTags->Size > 0)
+	if (ipStringTags != __nullptr && ipStringTags->Size > 0)
 	{
 		// Get the document probability
 		string strActualProbability = asString(ipStringTags->GetValue(_bstr_t(DOC_PROBABILITY.c_str())));
@@ -229,11 +229,11 @@ bool CDocumentClassifierTester::compareTags(const string& strDocName,
 		string strActualDocTypes("");
 		IStrToObjectMapPtr ipObjTags = ipAFDoc->ObjectTags;
 
-		if (ipObjTags != NULL && ipObjTags->Size > 0)
+		if (ipObjTags != __nullptr && ipObjTags->Size > 0)
 		{
 			// get found document types
 			IVariantVectorPtr ipDocTypes = ipObjTags->GetValue(_bstr_t(DOC_TYPE.c_str()));
-			if (ipDocTypes != NULL)
+			if (ipDocTypes != __nullptr)
 			{
 				long lSize = ipDocTypes->Size;
 				for (long n = 0; n < lSize; n++)
@@ -628,7 +628,7 @@ bool CDocumentClassifierTester::processTestCase(const string& strInputFileName,
 	{			
 		// create a new AFDocument for holding the value and tags
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI06005", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06005", ipAFDoc != __nullptr);
 
 		// Read the input file into a Spatial String
 		ISpatialStringPtr ipText = ipAFDoc->Text;
@@ -667,7 +667,7 @@ bool CDocumentClassifierTester::processTestCase(const string& strInputFileName,
 			}
 
 			// Apply this text to the AFDocument object
-			ASSERT_RESOURCE_ALLOCATION( "ELI08565", ipSomeText != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08565", ipSomeText != __nullptr );
 			ipAFDoc->Text = ipSomeText;
 		}
 
@@ -695,7 +695,7 @@ std::string CDocumentClassifierTester::getObjectID(IAFDocumentPtr ipAFDoc, const
 	string strObjectID("");
 
 	IStrToObjectMapPtr ipObjMap = ipAFDoc->ObjectTags;
-	if (ipObjMap != NULL && ipObjMap->Size > 0)
+	if (ipObjMap != __nullptr && ipObjMap->Size > 0)
 	{
 		// Check if the the object ID that need to be found is inside 
 		if (ipObjMap->Contains(get_bstr_t(strTagName.c_str())) == VARIANT_TRUE)
@@ -724,7 +724,7 @@ const std::string CDocumentClassifierTester::getMasterTestFileName(IVariantVecto
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		// get the DAT filename
 		string strMasterDatFileName = ::getAbsoluteFileName(strTCLFile, asString(_bstr_t(ipParams->GetItem(1))), true);

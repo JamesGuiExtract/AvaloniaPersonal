@@ -21,7 +21,7 @@ WindowPersistenceMgr::WindowPersistenceMgr(CWnd *pWnd, string strRegistryKey)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI31579", pWnd != NULL);
+		ASSERT_ARGUMENT("ELI31579", pWnd != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31580");
 }

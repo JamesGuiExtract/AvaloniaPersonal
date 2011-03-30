@@ -26,7 +26,7 @@ CConditionalRulePP::CConditionalRulePP()
 		m_dwDocStringID = IDS_DOCSTRINGConditionalRulePP;
 	
 		m_ipCategoryMgr.CreateInstance(CLSID_CategoryManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI10759", m_ipCategoryMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10759", m_ipCategoryMgr != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI10758");
 }
@@ -44,7 +44,7 @@ STDMETHODIMP CConditionalRulePP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFCORELib::IConditionalRulePtr ipRule = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI10769", ipRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10769", ipRule != __nullptr);
 			
 			// ensure the Condition is configured
 			if (objectMustBeConfigured(m_ipCondition))
@@ -103,7 +103,7 @@ LRESULT CConditionalRulePP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam
 	try
 	{
 		UCLID_AFCORELib::IConditionalRulePtr ipRule = m_ppUnk[0];
-		if (ipRule != NULL)
+		if (ipRule != __nullptr)
 		{
 			m_cmbTrueFalse = GetDlgItem(IDC_CMB_TRUE_FALSE);
 			m_cmbCondition = GetDlgItem(IDC_CMB_CONDITION);
@@ -119,10 +119,10 @@ LRESULT CConditionalRulePP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam
 
 			m_ipConditionMap = populateCombo(m_cmbCondition, AFAPI_CONDITIONS_CATEGORYNAME);
 			m_ipCondition = ipRule->GetCondition();
-			if(m_ipCondition != NULL)
+			if(m_ipCondition != __nullptr)
 			{
 				ICategorizedComponentPtr ipObject(m_ipCondition);
-				ASSERT_RESOURCE_ALLOCATION("ELI10763", ipObject != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI10763", ipObject != __nullptr);
 				_bstr_t bstrName = ipObject->GetComponentDescription();
 				m_cmbCondition.SelectString( -1, bstrName );	
 			}
@@ -134,10 +134,10 @@ LRESULT CConditionalRulePP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam
 
 			m_ipRuleMap = populateCombo(m_cmbRule, strCategoryName);
 			m_ipRule = ipRule->GetRule();
-			if(m_ipRule != NULL)
+			if(m_ipRule != __nullptr)
 			{
 				ICategorizedComponentPtr ipObject(m_ipRule);
-				ASSERT_RESOURCE_ALLOCATION("ELI10771", ipObject != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI10771", ipObject != __nullptr);
 				_bstr_t bstrName = ipObject->GetComponentDescription();
 				m_cmbRule.SelectString( -1, bstrName );	
 			}
@@ -166,7 +166,7 @@ LRESULT CConditionalRulePP::OnClickedBtnConfigCondition(WORD wNotifyCode,
 	try
 	{
 		ICategorizedComponentPtr ipComponent = m_ipCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI10767", ipComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10767", ipComponent != __nullptr);
 		configureComponent(ipComponent);
 		m_ipCondition = ipComponent;
 		showReminder();
@@ -185,7 +185,7 @@ LRESULT CConditionalRulePP::OnClickedBtnConfigRule(WORD wNotifyCode,
 	try
 	{
 		ICategorizedComponentPtr ipComponent = m_ipRule;
-		ASSERT_RESOURCE_ALLOCATION("ELI10768", ipComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10768", ipComponent != __nullptr);
 		configureComponent(ipComponent);
 		m_ipRule = ipComponent;
 		showReminder();
@@ -249,7 +249,7 @@ IStrToStrMapPtr CConditionalRulePP::populateCombo(ATLControls::CComboBox& m_cmbO
 	CString	zName;
 	long nNumEntries = ipMap->GetSize();
 	UCLID_COMUTILSLib::IVariantVectorPtr ipKeys = ipMap->GetKeys();
-	ASSERT_RESOURCE_ALLOCATION("ELI10760", ipKeys != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10760", ipKeys != __nullptr);
 	int i;
 	for (i = 0; i < nNumEntries; i++)
 	{
@@ -291,7 +291,7 @@ ICategorizedComponentPtr CConditionalRulePP::createObjectFromName(std::string st
 		// if the object is privately licensed, then initialize
 		// the private license
 		IPrivateLicensedComponentPtr ipPLComponent = ipComponent;
-		if (ipPLComponent != NULL)
+		if (ipPLComponent != __nullptr)
 		{
 			_bstr_t _bstrKey = LICENSE_MGMT_PASSWORD.c_str();
 			ipPLComponent->InitPrivateLicense(_bstrKey);
@@ -300,8 +300,8 @@ ICategorizedComponentPtr CConditionalRulePP::createObjectFromName(std::string st
 		return ipComponent;
 	}
 	
-	// Not found in map, just return NULL
-	return NULL;
+	// Not found in map, just return __nullptr
+	return __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void CConditionalRulePP::showReminder()
@@ -332,7 +332,7 @@ void CConditionalRulePP::toggleConfigButtons()
 {
 	ISpecifyPropertyPagesPtr ipPP( m_ipCondition );
 	BOOL bEnable = FALSE;
-	if (ipPP != NULL) 
+	if (ipPP != __nullptr) 
 	{
 		bEnable = TRUE;
 	}
@@ -340,7 +340,7 @@ void CConditionalRulePP::toggleConfigButtons()
 
 	ipPP = m_ipRule;
 	bEnable = FALSE;
-	if (ipPP != NULL) 
+	if (ipPP != __nullptr) 
 	{
 		bEnable = TRUE;
 	}
@@ -350,16 +350,16 @@ void CConditionalRulePP::toggleConfigButtons()
 void CConditionalRulePP::configureComponent(ICategorizedComponentPtr& ipObject)
 {
 	// Must have a combo box selection
-	if (ipObject != NULL)
+	if (ipObject != __nullptr)
 	{
 		// Create the ObjectPropertiesUI object
 		IObjectPropertiesUIPtr	ipProperties( CLSID_ObjectPropertiesUI );
-		ASSERT_RESOURCE_ALLOCATION("ELI10764", ipProperties != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10764", ipProperties != __nullptr);
 
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyObj = ipObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI10765", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10765", ipCopyObj != __nullptr);
 		UCLID_COMUTILSLib::ICategorizedComponentPtr ipCopy = ipCopyObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI10766", ipCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10766", ipCopy != __nullptr);
 
 		string strComponentDesc = ipCopy->GetComponentDescription();
 		string strTitle = string( "Configure " ) + strComponentDesc;

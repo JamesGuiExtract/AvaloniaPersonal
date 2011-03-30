@@ -162,7 +162,7 @@ void changeAttributePath(const string& strNewPath, const vector<string>& vecVOAF
 		{
 			// create an IUnknownVector
 			IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI20349", ipAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20349", ipAttributes != __nullptr);
 			_lastCodePos = "20";
 
 			// get the VOA file name
@@ -182,12 +182,12 @@ void changeAttributePath(const string& strNewPath, const vector<string>& vecVOAF
 			{
 				// get the attribute
 				IAttributePtr ipAttribute = ipAttributes->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI20350", ipAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20350", ipAttribute != __nullptr);
 				_lastCodePos = "60";
 
 				// get the spatial string for the attribute
 				ISpatialStringPtr ipValue = ipAttribute->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI20351", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20351", ipValue != __nullptr);
 				_lastCodePos = "70";
 
 				// get the underlyinh SourceDocName

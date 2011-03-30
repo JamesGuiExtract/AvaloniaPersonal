@@ -68,10 +68,10 @@ STDMETHODIMP CLimitAsMidPart::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09287", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09287", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->GetValue();
-		ASSERT_ARGUMENT("ELI06619", ipInputText != NULL);
+		ASSERT_ARGUMENT("ELI06619", ipInputText != __nullptr);
 
 		// End position must be beyond start position
 		if (m_nStartPos <= m_nEndPos)
@@ -109,10 +109,10 @@ STDMETHODIMP CLimitAsMidPart::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 				// Continue with extraction if desired end position not beyond end of 
 				// string OR if a smaller length result is acceptable
 				ISpatialStringPtr ipModifiedValue = ipInputText->GetSubString(nSpecifiedStartPos, nSpecifiedEndPos);
-				ASSERT_RESOURCE_ALLOCATION("ELI25961", ipModifiedValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25961", ipModifiedValue != __nullptr);
 
 				ICopyableObjectPtr ipCopier = ipInputText;
-				ASSERT_RESOURCE_ALLOCATION("ELI25962", ipCopier != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25962", ipCopier != __nullptr);
 				ipCopier->CopyFrom(ipModifiedValue);
 			}
 			// Consider Remove case
@@ -165,7 +165,7 @@ STDMETHODIMP CLimitAsMidPart::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::ILimitAsMidPartPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08279", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08279", ipSource != __nullptr);
 
 		m_nStartPos = ipSource->GetStartPosition();
 		m_nEndPos = ipSource->GetEndPosition();
@@ -188,7 +188,7 @@ STDMETHODIMP CLimitAsMidPart::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_LimitAsMidPart);
-		ASSERT_RESOURCE_ALLOCATION("ELI08354", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08354", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -210,7 +210,7 @@ STDMETHODIMP CLimitAsMidPart::raw_GetComponentDescription(BSTR * pstrComponentDe
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19601", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19601", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Extract or remove middle characters").Detach();
 	}

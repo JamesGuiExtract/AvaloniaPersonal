@@ -56,9 +56,9 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore1(IAttribute * pAttribute, 
 		validateLicense();
 		
 		// Make sure the arguments are valid
-		ASSERT_ARGUMENT("ELI29338", pScore != NULL );
+		ASSERT_ARGUMENT("ELI29338", pScore != __nullptr );
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_ARGUMENT("ELI29335", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI29335", ipAttribute != __nullptr);
 
 		// Get the score
 		*pScore = getAttributeScore(ipAttribute);
@@ -78,9 +78,9 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore2(IIUnknownVector * pAttrib
 		validateLicense();
 		
 		// Make sure the arguments are valid
-		ASSERT_ARGUMENT("ELI29339", pScore != NULL );
+		ASSERT_ARGUMENT("ELI29339", pScore != __nullptr );
 		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_ARGUMENT("ELI29340", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI29340", ipAttributes != __nullptr);
 
 		// Calculate the score
 		//		if kAverage then score will be average of each attributes score
@@ -92,7 +92,7 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetDataScore2(IIUnknownVector * pAttrib
 		for (long n=0; n < nSize; n++)
 		{
 			IAttributePtr ipAttribute = ipAttributes->At(n);
-			ASSERT_ARGUMENT("ELI29341", ipAttribute != NULL);
+			ASSERT_ARGUMENT("ELI29341", ipAttribute != __nullptr);
 
 			// Get the score for this attribute
 			nTmpScore = getAttributeScore(ipAttribute);
@@ -138,7 +138,7 @@ STDMETHODIMP CCharacterConfidenceDS::raw_GetComponentDescription(BSTR * pstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29319", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI29319", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Character confidence data scorer").Detach();
 
@@ -175,7 +175,7 @@ STDMETHODIMP CCharacterConfidenceDS::Load(IStream *pStream)
 		// validate License
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29345",  pStream != NULL);
+		ASSERT_ARGUMENT("ELI29345",  pStream != __nullptr);
 		
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -210,7 +210,7 @@ STDMETHODIMP CCharacterConfidenceDS::Save(IStream *pStream, BOOL fClearDirty)
 		// validate License
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29344", pStream != NULL);
+		ASSERT_ARGUMENT("ELI29344", pStream != __nullptr);
 		
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -257,7 +257,7 @@ STDMETHODIMP CCharacterConfidenceDS::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFDATASCORERSLib::ICharacterConfidenceDSPtr ipFrom(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI29324", ipFrom != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29324", ipFrom != __nullptr);
 
 		m_eAggregateFunction = (EAggregateFunctions)ipFrom->AggregateFunction;
 
@@ -275,12 +275,12 @@ STDMETHODIMP CCharacterConfidenceDS::raw_Clone(IUnknown **ppObject)
 		// validate License
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI29342", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI29342", ppObject != __nullptr);
 
 		// create a new instance of the EntityNameDataScorer
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_CharacterConfidenceDS);
-		ASSERT_RESOURCE_ALLOCATION("ELI29315", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29315", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -334,7 +334,7 @@ STDMETHODIMP CCharacterConfidenceDS::get_AggregateFunction(EAggregateFunctions *
 		// validate License
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI29323", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29323", pVal != __nullptr);
 
 		*pVal = m_eAggregateFunction;
 
@@ -375,7 +375,7 @@ STDMETHODIMP CCharacterConfidenceDS::raw_IsConfigured(VARIANT_BOOL * pbConfigure
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29343", pbConfigured != NULL);
+		ASSERT_ARGUMENT("ELI29343", pbConfigured != __nullptr);
 
 		// Make sure the argument is valid
 		*pbConfigured = VARIANT_TRUE;
@@ -400,7 +400,7 @@ long CCharacterConfidenceDS::getAttributeScore(IAttributePtr ipAttr)
 
 	// Get the value
 	ISpatialStringPtr ipValue = ipAttr->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI29336", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI29336", ipValue != __nullptr);
 
 	// Get the score
 	switch (m_eAggregateFunction)

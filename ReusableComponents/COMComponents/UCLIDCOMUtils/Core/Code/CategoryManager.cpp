@@ -170,7 +170,7 @@ void CCategoryManager::createCacheFile(BSTR bstrCategoryName,
 			try
 			{		 
 				UCLID_COMUTILSLib::ICategorizedComponentPtr ipComponent(vecComponentProgIDs[i].c_str());
-				if (ipComponent == NULL)
+				if (ipComponent == __nullptr)
 				{
 					UCLIDException ue("ELI18366",
 						"Application Trace: Component has no category information.");
@@ -181,7 +181,7 @@ void CCategoryManager::createCacheFile(BSTR bstrCategoryName,
 				// if they either do not implement ILicensedComponent or if
 				// ILicensedComponent::IsLicensed returns VARIANT_TRUE
 				ILicensedComponentPtr ipLic(ipComponent);
-				if (ipLic != NULL &&
+				if (ipLic != __nullptr &&
 					ipLic->IsLicensed() == VARIANT_FALSE)
 				{
 					// Component is not licensed; do not add it to the cache.
@@ -275,7 +275,7 @@ STDMETHODIMP CCategoryManager::GetDescriptionToProgIDMap2(BSTR strCategoryName,
 		// create the return map object
 		UCLID_COMUTILSLib::IStrToStrMapPtr ipDescriptionToProgIDMap(CLSID_StrToStrMap);
 		
-		if (ipDescriptionToProgIDMap == NULL)
+		if (ipDescriptionToProgIDMap == __nullptr)
 		{
 			throw UCLIDException("ELI04262", "Unable to create StrToStrMap object!");
 		}
@@ -378,7 +378,7 @@ STDMETHODIMP CCategoryManager::CheckForNewComponents(IVariantVector *pCategoryNa
 	try
 	{
 		UCLID_COMUTILSLib::IVariantVectorPtr ipCategoryNames(pCategoryNames);
-		ASSERT_ARGUMENT("ELI18164", ipCategoryNames != NULL);
+		ASSERT_ARGUMENT("ELI18164", ipCategoryNames != __nullptr);
 
 		int nCount = ipCategoryNames->Size;
 
@@ -437,7 +437,7 @@ bool CCategoryManager::componentImplementsRequiredInteraces(const string& strPro
 
 	// create the component
 	IUnknownPtr ipUnknown(strProgID.c_str());
-	if (ipUnknown == NULL)
+	if (ipUnknown == __nullptr)
 	{
 		UCLIDException ue("ELI04588", "Unable to create component!");
 		ue.addDebugInfo("ProgID", strProgID);
@@ -453,7 +453,7 @@ bool CCategoryManager::componentImplementsRequiredInteraces(const string& strPro
 		ipUnknown.QueryInterface(pIIDs[j], &ipTemp);
 		
 		// if the QI fails - return false
-		if (ipTemp == NULL)
+		if (ipTemp == __nullptr)
 		{
 			return false;
 		}
@@ -474,7 +474,7 @@ void CCategoryManager::validateLicense()
 UCLID_COMUTILSLib::ICategoryManagerPtr CCategoryManager::getThisAsCOMPtr()
 {
 	UCLID_COMUTILSLib::ICategoryManagerPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI18161", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18161", ipThis != __nullptr);
 
 	return ipThis;
 }

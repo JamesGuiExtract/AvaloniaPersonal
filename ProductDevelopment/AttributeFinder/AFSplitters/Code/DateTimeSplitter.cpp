@@ -77,11 +77,11 @@ STDMETHODIMP CDateTimeSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDo
 		{
 			// Create local Attribute object
 			IAttributePtr	ipAttr( pAttribute );
-			ASSERT_RESOURCE_ALLOCATION("ELI09750", ipAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09750", ipAttr != __nullptr);
 
 			// Retrieve Attribute Value text
 			ISpatialStringPtr ipValue = ipAttr->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI15538", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15538", ipValue != __nullptr);
 			string strText = asString( ipValue->String );
 
 			///////////////////////////////////
@@ -211,7 +211,7 @@ STDMETHODIMP CDateTimeSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDo
 			if (m_dt.GetStatus() == COleDateTime::valid)
 			{
 				IIUnknownVectorPtr ipMainAttrSub = ipAttr->SubAttributes;
-				ASSERT_RESOURCE_ALLOCATION("ELI09756", ipMainAttrSub != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09756", ipMainAttrSub != __nullptr);
 
 				getDate(ipValue, ipMainAttrSub, m_bShowDayOfWeek, bFoundDay, m_bSplitDefaults,
 						lMonth, bStillValid, lDay, lYear);
@@ -246,7 +246,7 @@ STDMETHODIMP CDateTimeSplitter::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19592", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19592", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Split date and/or time").Detach();
 	}
@@ -269,7 +269,7 @@ STDMETHODIMP CDateTimeSplitter::raw_Clone(IUnknown * * pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_DateTimeSplitter );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09722", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09722", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -325,7 +325,7 @@ STDMETHODIMP CDateTimeSplitter::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19089", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19089", pbValue != __nullptr);
 
 		try
 		{
@@ -599,7 +599,7 @@ STDMETHODIMP CDateTimeSplitter::get_MinimumTwoDigitYear(long *plVal)
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI25894", plVal != NULL);
+		ASSERT_ARGUMENT("ELI25894", plVal != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -635,7 +635,7 @@ STDMETHODIMP CDateTimeSplitter::get_TwoDigitYearBeforeCurrent(VARIANT_BOOL *pvbV
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI25895", pvbVal != NULL);
+		ASSERT_ARGUMENT("ELI25895", pvbVal != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -885,14 +885,14 @@ void CDateTimeSplitter::trimColonWS(std::string & strText)
 void CDateTimeSplitter::getDayOfWeek(ISpatialStringPtr& ipString, IIUnknownVectorPtr& ipMainAttrSub)
 {
 	IAttributePtr	ipDayOfWeek( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION("ELI09766", ipDayOfWeek != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09766", ipDayOfWeek != __nullptr);
 
 	// Get DayOfWeek from the COleDateTime data member
 	string strDOW = getDayOfWeekName( m_dt.GetDayOfWeek() );
 
 	// Search for this string within the original text
 	ISpatialStringPtr	ipValue = findSubstring( ipString, strDOW, false, false );
-	ASSERT_RESOURCE_ALLOCATION("ELI09767", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09767", ipValue != __nullptr);
 
 	// Build the sub-attribute and add to the collection
 	ipDayOfWeek->PutName( _bstr_t( "DayOfWeek" ) );
@@ -904,7 +904,7 @@ void CDateTimeSplitter::getMonth(ISpatialStringPtr& ipString, IIUnknownVectorPtr
 								long &lMonth, bool &bStillValid)
 {
 	IAttributePtr	ipMonth( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION("ELI09757", ipMonth != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09757", ipMonth != __nullptr);
 	ISpatialStringPtr	ipValue;
 
 	// Get the month name
@@ -913,7 +913,7 @@ void CDateTimeSplitter::getMonth(ISpatialStringPtr& ipString, IIUnknownVectorPtr
 	{
 		// Look for month name in the original text
 		ipValue = findSubstring( ipString, strMonthName, false, false );
-		ASSERT_RESOURCE_ALLOCATION("ELI19097", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19097", ipValue != __nullptr);
 	}
 	else
 	{
@@ -946,20 +946,20 @@ void CDateTimeSplitter::getMonth(ISpatialStringPtr& ipString, IIUnknownVectorPtr
 			{
 				// Get the month sub-attribute as a hybrid string
 				ipValue = findSubstring( ipString, strMonth, true, true );
-				ASSERT_RESOURCE_ALLOCATION("ELI19098", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19098", ipValue != __nullptr);
 			}
 			else
 			{
 				// Find the month number
 				ipValue = findSubstring( ipString, strMonth, false, true );
-				ASSERT_RESOURCE_ALLOCATION("ELI19460", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19460", ipValue != __nullptr);
 			}
 		}
 		else
 		{
 			// Invalid month number
 			ipValue.CreateInstance( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION("ELI19110", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19110", ipValue != __nullptr);
 			bStillValid = false;
 		}
 	}
@@ -974,7 +974,7 @@ void CDateTimeSplitter::getDay(ISpatialStringPtr& ipString, IIUnknownVectorPtr &
 							   long& lDay, bool &bStillValid)
 {
 	IAttributePtr	ipDay( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION("ELI09759", ipDay != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09759", ipDay != __nullptr);
 	ISpatialStringPtr	ipValue;
 
 	// Protect against invalid day number
@@ -988,13 +988,13 @@ void CDateTimeSplitter::getDay(ISpatialStringPtr& ipString, IIUnknownVectorPtr &
 
 		// Find the day number
 		ipValue = findSubstring( ipString, strDay, false, true );
-		ASSERT_RESOURCE_ALLOCATION("ELI19105", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19105", ipValue != __nullptr);
 	}
 	else
 	{
 		// Invalid day number
 		ipValue.CreateInstance( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION("ELI19107", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19107", ipValue != __nullptr);
 		bStillValid = false;
 	}
 
@@ -1008,7 +1008,7 @@ void CDateTimeSplitter::getYear(ISpatialStringPtr& ipString, IIUnknownVectorPtr 
 							   long& lYear, bool &bStillValid)
 {
 	IAttributePtr	ipYear( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION("ELI09760", ipYear != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09760", ipYear != __nullptr);
 	ISpatialStringPtr	ipValue;
 
 	// Protect against invalid year
@@ -1022,7 +1022,7 @@ void CDateTimeSplitter::getYear(ISpatialStringPtr& ipString, IIUnknownVectorPtr 
 		{
 			// Find the four-digit year number
 			ipValue = findSubstring( ipString, strYear, false, false );
-			ASSERT_RESOURCE_ALLOCATION("ELI19108", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19108", ipValue != __nullptr);
 		}
 		else
 		{
@@ -1031,13 +1031,13 @@ void CDateTimeSplitter::getYear(ISpatialStringPtr& ipString, IIUnknownVectorPtr 
 
 			// Find the two-digit year number
 			ipValue = findSubstring( ipString, strYear, false, true );
-			ASSERT_RESOURCE_ALLOCATION("ELI19196", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19196", ipValue != __nullptr);
 		}
 	}
 	else
 	{
 		ipValue.CreateInstance( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION("ELI19109", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19109", ipValue != __nullptr);
 		bStillValid = false;
 	}
 
@@ -1051,7 +1051,7 @@ void CDateTimeSplitter::getHour(ISpatialStringPtr& ipString, IIUnknownVectorPtr 
 							   long& lHour, bool &bIsAM)
 {
 	IAttributePtr	ipHour( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION("ELI09774", ipHour != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09774", ipHour != __nullptr);
 	ISpatialStringPtr	ipValue;
 
 	// Military format?
@@ -1062,7 +1062,7 @@ void CDateTimeSplitter::getHour(ISpatialStringPtr& ipString, IIUnknownVectorPtr 
 
 		// Find the hour number
 		ipValue = findSubstring( ipString, strHour, false, true );
-		ASSERT_RESOURCE_ALLOCATION("ELI19085", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19085", ipValue != __nullptr);
 
 		// Add Hour sub-attribute
 		ipHour->PutName( _bstr_t( "Hour" ) );
@@ -1104,7 +1104,7 @@ void CDateTimeSplitter::getHour(ISpatialStringPtr& ipString, IIUnknownVectorPtr 
 		// Find the hour number
 		string strHour = asString( lHour );
 		ipValue = findSubstring( ipString, strHour, false, true );
-		ASSERT_RESOURCE_ALLOCATION("ELI19086", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19086", ipValue != __nullptr);
 
 		// Add Hour sub-attribute
 		ipHour->PutName( _bstr_t( "Hour" ) );
@@ -1113,7 +1113,7 @@ void CDateTimeSplitter::getHour(ISpatialStringPtr& ipString, IIUnknownVectorPtr 
 
 		// Create and add AM/PM sub-attribute
 		IAttributePtr	ipAMPM( CLSID_Attribute );
-		ASSERT_RESOURCE_ALLOCATION("ELI09776", ipAMPM != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09776", ipAMPM != __nullptr);
 		ISpatialStringPtr	ipAMPMValue;
 
 		if (bIsAM)
@@ -1124,7 +1124,7 @@ void CDateTimeSplitter::getHour(ISpatialStringPtr& ipString, IIUnknownVectorPtr 
 		{
 			ipAMPMValue = findSubstring( ipString, "PM", false, false );
 		}
-		ASSERT_RESOURCE_ALLOCATION("ELI09777", ipAMPMValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09777", ipAMPMValue != __nullptr);
 
 		// Build the sub-attribute and add to the collection
 		ipAMPM->PutName( _bstr_t( "AMPM" ) );
@@ -1136,7 +1136,7 @@ void CDateTimeSplitter::getHour(ISpatialStringPtr& ipString, IIUnknownVectorPtr 
 void CDateTimeSplitter::getMinute(ISpatialStringPtr& ipString, IIUnknownVectorPtr &ipMainAttrSub)
 {
 	IAttributePtr	ipMinute( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION("ELI09778", ipMinute != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09778", ipMinute != __nullptr);
 	ISpatialStringPtr	ipValue;
 
 	// Create a search string
@@ -1144,7 +1144,7 @@ void CDateTimeSplitter::getMinute(ISpatialStringPtr& ipString, IIUnknownVectorPt
 
 	// Find the minute number
 	ipValue = findSubstring( ipString, strMinute, false, true );
-	ASSERT_RESOURCE_ALLOCATION("ELI19087", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19087", ipValue != __nullptr);
 
 	// Build the sub-attribute and add to the collection
 	ipMinute->PutName( _bstr_t( "Minute" ) );
@@ -1155,7 +1155,7 @@ void CDateTimeSplitter::getMinute(ISpatialStringPtr& ipString, IIUnknownVectorPt
 void CDateTimeSplitter::getSecond(ISpatialStringPtr& ipString, IIUnknownVectorPtr &ipMainAttrSub)
 {
 	IAttributePtr	ipSecond( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION("ELI09780", ipSecond != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09780", ipSecond != __nullptr);
 	ISpatialStringPtr	ipValue;
 
 	// Create a search string
@@ -1163,7 +1163,7 @@ void CDateTimeSplitter::getSecond(ISpatialStringPtr& ipString, IIUnknownVectorPt
 
 	// Find the second number
 	ipValue = findSubstring( ipString, strSecond, false, true );
-	ASSERT_RESOURCE_ALLOCATION("ELI19088", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19088", ipValue != __nullptr);
 
 	// Build the sub-attribute and add to the collection
 	ipSecond->PutName( _bstr_t( "Second" ) );
@@ -1175,7 +1175,7 @@ void CDateTimeSplitter::formatOutput(ISpatialStringPtr& ipString, IIUnknownVecto
 									 const bool bStillValid)
 {
 	IAttributePtr	ipFormat( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION("ELI09761", ipFormat != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09761", ipFormat != __nullptr);
 	ISpatialStringPtr	ipValue;
 
 	if (bStillValid)
@@ -1185,7 +1185,7 @@ void CDateTimeSplitter::formatOutput(ISpatialStringPtr& ipString, IIUnknownVecto
 
 		// Look for the sub-string, and return a hybrid string if not found
 		ipValue = findSubstring( ipString, LPCTSTR(zFormat), false, false );
-		ASSERT_RESOURCE_ALLOCATION("ELI09764", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09764", ipValue != __nullptr);
 
 		// Build the sub-attribute and add to the collection
 		ipFormat->PutName( _bstr_t( "Formatted" ) );
@@ -1349,7 +1349,7 @@ ISpatialStringPtr CDateTimeSplitter::findSubstring(ISpatialStringPtr& ipOriginal
 		{
 			// Found the substring and this is not expected to be duplicated
 			ipSubString = ipOriginal->GetSubString( lFoundPos, lFoundPos + strSearch.length() - 1 );
-			ASSERT_RESOURCE_ALLOCATION("ELI19076", ipSubString != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19076", ipSubString != __nullptr);
 		}
 		else
 		{
@@ -1368,7 +1368,7 @@ ISpatialStringPtr CDateTimeSplitter::findSubstring(ISpatialStringPtr& ipOriginal
 					// Second example not found
 					ipSubString = ipOriginal->GetSubString( lFoundPos, 
 						lFoundPos + strSearch.length() - 1 );
-					ASSERT_RESOURCE_ALLOCATION("ELI19195", ipSubString != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI19195", ipSubString != __nullptr);
 				}
 			}
 			else
@@ -1390,7 +1390,7 @@ ISpatialStringPtr CDateTimeSplitter::findSubstring(ISpatialStringPtr& ipOriginal
 	{
 		// Create the new Spatial String
 		ipSubString.CreateInstance( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION("ELI19077", ipSubString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19077", ipSubString != __nullptr);
 
 		if (ipOriginal->HasSpatialInfo() == VARIANT_TRUE)
 		{

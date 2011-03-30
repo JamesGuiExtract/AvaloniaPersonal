@@ -29,8 +29,8 @@ CLoopFinder::~CLoopFinder()
 {
 	try
 	{
-		m_ipFindingRule = NULL;
-		m_ipPreprocessor = NULL;
+		m_ipFindingRule = __nullptr;
+		m_ipPreprocessor = __nullptr;
 		m_ipCondition	 = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI23907");
@@ -89,34 +89,34 @@ STDMETHODIMP CLoopFinder::raw_ParseText(IAFDocument * pDocument, IProgressStatus
 		validateLicense();
 
 		// Assert arguments
-		ASSERT_ARGUMENT("ELI23965", pAttributes != NULL);
+		ASSERT_ARGUMENT("ELI23965", pAttributes != __nullptr);
 
 		// make a copy of the AFDocument for the doc to run on
 		IAFDocumentPtr ipAFDoc(pDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI25088", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25088", ipAFDoc != __nullptr);
 		ICopyableObjectPtr ipCopyObj = ipAFDoc;
-		ASSERT_RESOURCE_ALLOCATION("ELI25089", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25089", ipCopyObj != __nullptr);
 		IAFDocumentPtr ipDocCopy = ipCopyObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI25090", ipDocCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25090", ipDocCopy != __nullptr);
 
 		// Create vector for resulting Attributes
 		IIUnknownVectorPtr ipAttributes( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION("ELI24195", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24195", ipAttributes != __nullptr);
 
 		// Set the Finding rule from the Object with description
 		IAttributeFindingRulePtr ipFindingRule = m_ipFindingRule->Object;
-		ASSERT_RESOURCE_ALLOCATION("ELI24031", ipFindingRule != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI24031", ipFindingRule != __nullptr );
 
 		// Set the Pre Processor from the Object with description
 		IDocumentPreprocessorPtr ipPreProcessor = m_ipPreprocessor->Object;
-		ASSERT_RESOURCE_ALLOCATION("ELI24033", ipPreProcessor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24033", ipPreProcessor != __nullptr);
 
 		// Set the Condition from the Object with descripiton if not kForLoop
-		IAFConditionPtr ipCondition = NULL;
+		IAFConditionPtr ipCondition = __nullptr;
 		if (m_eLoopType != kForLoop)
 		{
 			ipCondition = m_ipCondition->Object;
-			ASSERT_RESOURCE_ALLOCATION("ELI24032", ipCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24032", ipCondition != __nullptr);
 		}
 
 		// Initialize the number of iterations through the loop
@@ -142,7 +142,7 @@ STDMETHODIMP CLoopFinder::raw_ParseText(IAFDocument * pDocument, IProgressStatus
 				{
 					// Run the Finding Rule
 					IIUnknownVectorPtr ipFound = ipFindingRule->ParseText(ipDocCopy, pProgressStatus);
-					ASSERT_RESOURCE_ALLOCATION("ELI24196", ipFound != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24196", ipFound != __nullptr);
 
 					// Add the results to the return vector
 					ipAttributes->Append(ipFound);
@@ -178,7 +178,7 @@ STDMETHODIMP CLoopFinder::raw_ParseText(IAFDocument * pDocument, IProgressStatus
 			IRuleExecutionEnvPtr ipRuleEnv(CLSID_RuleExecutionEnv);
 			
 			// Only add the debug info if the RuleExecutionEnv was successfully created
-			if (ipRuleEnv != NULL)
+			if (ipRuleEnv != __nullptr)
 			{
 				ue.addDebugInfo("RuleFile", asString(ipRuleEnv->GetCurrentRSDFileName()));
 			}
@@ -187,7 +187,7 @@ STDMETHODIMP CLoopFinder::raw_ParseText(IAFDocument * pDocument, IProgressStatus
 			ISpatialStringPtr ipText = ipAFDoc->Text;
 
 			// Get the current file being processed
-			if ( ipText != NULL )
+			if ( ipText != __nullptr )
 			{
 				ue.addDebugInfo("InputFile", asString(ipText->SourceDocName));
 			}
@@ -211,7 +211,7 @@ STDMETHODIMP CLoopFinder::raw_GetComponentDescription(BSTR * pstrComponentDescri
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23911", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI23911", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Loop finder").Detach();
 
@@ -232,10 +232,10 @@ STDMETHODIMP CLoopFinder::raw_Clone(LPUNKNOWN * pObject)
 		// validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23963", pObject != NULL);
+		ASSERT_ARGUMENT("ELI23963", pObject != __nullptr);
 
 		ICopyableObjectPtr ipObjCopy(CLSID_LoopFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI23913", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23913", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -257,7 +257,7 @@ STDMETHODIMP CLoopFinder::raw_CopyFrom(LPUNKNOWN pObject)
 		// validate license first
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI23952", pObject != NULL);
+		ASSERT_ARGUMENT("ELI23952", pObject != __nullptr);
 
 		UCLID_AFVALUEFINDERSLib::ILoopFinderPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI23915", ipSource!=NULL);
@@ -272,7 +272,7 @@ STDMETHODIMP CLoopFinder::raw_CopyFrom(LPUNKNOWN pObject)
 		ICopyableObjectPtr ipCopyObj = ipSource->Condition;
 		if (m_eLoopType != kForLoop)
 		{
-			if (ipCopyObj != NULL)
+			if (ipCopyObj != __nullptr)
 			{
 				m_ipCondition = ipCopyObj->Clone();
 			}
@@ -280,14 +280,14 @@ STDMETHODIMP CLoopFinder::raw_CopyFrom(LPUNKNOWN pObject)
 
 		// Clone the Finding rule.
 		ipCopyObj = ipSource->FindingRule;
-		if (ipCopyObj != NULL)
+		if (ipCopyObj != __nullptr)
 		{
 			m_ipFindingRule = ipCopyObj->Clone();
 		}
 
 		// Clone the preprocessor.
 		ipCopyObj = ipSource->Preprocessor;
-		if (ipCopyObj != NULL)
+		if (ipCopyObj != __nullptr)
 		{
 			m_ipPreprocessor = ipCopyObj->Clone();
 		}
@@ -338,20 +338,20 @@ STDMETHODIMP CLoopFinder::raw_IsConfigured(VARIANT_BOOL * pbConfigured)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23953", pbConfigured != NULL);
+		ASSERT_ARGUMENT("ELI23953", pbConfigured != __nullptr);
 
 		bool bConfigured;
 		
 		IMustBeConfiguredObjectPtr ipConfigObj;
-		if (m_ipFindingRule != NULL)
+		if (m_ipFindingRule != __nullptr)
 		{
 			// Get the finding rule
 			ipConfigObj = m_ipFindingRule->Object;
 
 			// Is configured only if the finding rule object is not null and if the 
 			// rule implements IMustBeConfiguredObject and it is configured
-			bConfigured = m_ipFindingRule->Object != NULL;
-			bConfigured = bConfigured && (ipConfigObj == NULL || 
+			bConfigured = m_ipFindingRule->Object != __nullptr;
+			bConfigured = bConfigured && (ipConfigObj == __nullptr || 
 				asCppBool(ipConfigObj->IsConfigured()));
 		}
 		else
@@ -367,14 +367,14 @@ STDMETHODIMP CLoopFinder::raw_IsConfigured(VARIANT_BOOL * pbConfigured)
 		if (bConfigured && m_eLoopType != kForLoop)
 		{
 			// Condition has been set
-			if (m_ipCondition != NULL)
+			if (m_ipCondition != __nullptr)
 			{
 				ipConfigObj = m_ipCondition->Object;
 
 				// Is configured only if the Condition object is not null and if the 
 				// it implements IMustBeConfiguredObject and it is configured
-				bConfigured = m_ipCondition->Object != NULL;
-				bConfigured = bConfigured && (ipConfigObj == NULL || 
+				bConfigured = m_ipCondition->Object != __nullptr;
+				bConfigured = bConfigured && (ipConfigObj == __nullptr || 
 					asCppBool(ipConfigObj->IsConfigured()));
 			}
 			else
@@ -384,15 +384,15 @@ STDMETHODIMP CLoopFinder::raw_IsConfigured(VARIANT_BOOL * pbConfigured)
 		}
 		
 		// Check if the preprocessor is configured
-		if (bConfigured && m_ipPreprocessor != NULL)
+		if (bConfigured && m_ipPreprocessor != __nullptr)
 		{
 			// Get the IMustBeConfigured object
 			ipConfigObj = m_ipPreprocessor->Object;
 			
 			// Is configured only if the Preprocessor object is not null and if the 
 			// it implements IMustBeConfiguredObject and it is configured
-			bConfigured = m_ipPreprocessor->Object != NULL;
-			bConfigured = bConfigured && (ipConfigObj == NULL || 
+			bConfigured = m_ipPreprocessor->Object != __nullptr;
+			bConfigured = bConfigured && (ipConfigObj == __nullptr || 
 				asCppBool(ipConfigObj->IsConfigured()));
 		}
 		else 
@@ -415,7 +415,7 @@ STDMETHODIMP CLoopFinder::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24102", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI24102", pClassID != __nullptr);
 
 		*pClassID = CLSID_LoopFinder;
 
@@ -440,12 +440,12 @@ STDMETHODIMP CLoopFinder::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24103", pStream != NULL);
+		ASSERT_ARGUMENT("ELI24103", pStream != __nullptr);
 		
 		// Reset all of the values
-		m_ipCondition = NULL;
-		m_ipPreprocessor = NULL;
-		m_ipFindingRule = NULL;
+		m_ipCondition = __nullptr;
+		m_ipPreprocessor = __nullptr;
+		m_ipFindingRule = __nullptr;
 		m_nIterations = 0;
 		m_bLogExceptionForMaxIterations = false;
 
@@ -482,18 +482,18 @@ STDMETHODIMP CLoopFinder::Load(IStream *pStream)
 		IPersistStreamPtr ipObj;
 		readObjectFromStream(ipObj, pStream, "ELI23949");
 		m_ipFindingRule = ipObj;
-		ASSERT_RESOURCE_ALLOCATION("ELI24105", m_ipFindingRule != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24105", m_ipFindingRule != __nullptr);
 
 		readObjectFromStream(ipObj, pStream, "ELI23950");
 		m_ipPreprocessor = ipObj;
-		ASSERT_RESOURCE_ALLOCATION("ELI24104", m_ipPreprocessor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24104", m_ipPreprocessor != __nullptr);
 		
 		// Only get the Condition if the loop type is not for
 		if (m_eLoopType != kForLoop)
 		{
 			readObjectFromStream(ipObj, pStream, "ELI23951");
 			m_ipCondition = ipObj;
-			ASSERT_RESOURCE_ALLOCATION("ELI24106", m_ipCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24106", m_ipCondition != __nullptr);
 		}
 
 		// Clear the dirty flag as we've loaded a fresh object
@@ -512,7 +512,7 @@ STDMETHODIMP CLoopFinder::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24107", pStream != NULL);
+		ASSERT_ARGUMENT("ELI24107", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -535,12 +535,12 @@ STDMETHODIMP CLoopFinder::Save(IStream *pStream, BOOL fClearDirty)
 		
 		// Write Finding Rule
 		IPersistStreamPtr ipObj = m_ipFindingRule;
-		ASSERT_RESOURCE_ALLOCATION("ELI23943", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23943", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI23944", fClearDirty);
 
 		// Write PreProcessor
 		ipObj = m_ipPreprocessor;
-		ASSERT_RESOURCE_ALLOCATION("ELI23945", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23945", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI23946", fClearDirty);
 
 		// Only write the condition if the value is valid
@@ -548,7 +548,7 @@ STDMETHODIMP CLoopFinder::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			// Write Condition
 			ipObj = m_ipCondition;
-			ASSERT_RESOURCE_ALLOCATION("ELI23947", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI23947", ipObj != __nullptr);
 			writeObjectToStream(ipObj, pStream, "ELI23948", fClearDirty);
 		}
 
@@ -579,10 +579,10 @@ STDMETHODIMP CLoopFinder::get_FindingRule(IObjectWithDescription ** pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23954", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23954", pVal != __nullptr);
 
 		// If FindingRule is NULL return NULL otherwise return a shallow copy
-		if (m_ipFindingRule == NULL )
+		if (m_ipFindingRule == __nullptr )
 		{
 			*pVal = NULL;
 		}
@@ -623,10 +623,10 @@ STDMETHODIMP CLoopFinder::get_Preprocessor(IObjectWithDescription ** pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23955", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23955", pVal != __nullptr);
 
 		// If Preprocessor is NULL return NULL otherwise return a shallow copy
-		if (m_ipPreprocessor == NULL)
+		if (m_ipPreprocessor == __nullptr)
 		{
 			*pVal = NULL;
 		}
@@ -669,10 +669,10 @@ STDMETHODIMP CLoopFinder::get_Condition(IObjectWithDescription ** pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23956", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23956", pVal != __nullptr);
 
 		// If the condition is null return the null value
-		if ( m_ipCondition == NULL )
+		if ( m_ipCondition == __nullptr )
 		{
 			*pVal = NULL;
 		}
@@ -714,7 +714,7 @@ STDMETHODIMP CLoopFinder::get_ConditionValue( VARIANT_BOOL *pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23957", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23957", pVal != __nullptr);
 
 		// Return the Conditon Value
 		*pVal = asVariantBool(m_bConditionValue);
@@ -756,7 +756,7 @@ STDMETHODIMP CLoopFinder::get_LogExceptionForMaxIterations( VARIANT_BOOL *pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23958", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23958", pVal != __nullptr);
 
 		// Return the Log exception flag
 		*pVal = asVariantBool(m_bLogExceptionForMaxIterations);
@@ -798,7 +798,7 @@ STDMETHODIMP CLoopFinder::get_Iterations( long *pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23959", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23959", pVal != __nullptr);
 
 		// Return the number of iterations
 		*pVal = m_nIterations;
@@ -837,7 +837,7 @@ STDMETHODIMP CLoopFinder::get_LoopType( ELoopType *pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23966", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23966", pVal != __nullptr);
 
 		// Return the loop type
 		*pVal = m_eLoopType;
@@ -865,7 +865,7 @@ STDMETHODIMP CLoopFinder::put_LoopType( ELoopType newVal)
 		// If loop type is kForLoop reset the condition
 		if (m_eLoopType == kForLoop)
 		{
-			m_ipCondition = NULL;
+			m_ipCondition = __nullptr;
 
 			// Log Exception for max iterations should be false if loop type is for
 			m_bLogExceptionForMaxIterations = false;

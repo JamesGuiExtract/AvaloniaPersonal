@@ -32,7 +32,7 @@ CImageRegionWithLines::~CImageRegionWithLines()
 {
 	try
 	{
-		m_ipImageLineUtility = NULL;
+		m_ipImageLineUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18374");
 }
@@ -55,7 +55,7 @@ STDMETHODIMP CImageRegionWithLines::get_LineUtil(IUnknown **ppVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18842", ppVal != NULL);
+		ASSERT_ARGUMENT("ELI18842", ppVal != __nullptr);
 
 		validateLicense();
 
@@ -90,7 +90,7 @@ STDMETHODIMP CImageRegionWithLines::get_PageSelectionMode(EPageSelectionMode *pV
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18917", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18917", pVal != __nullptr);
 
 		validateLicense();
 
@@ -124,7 +124,7 @@ STDMETHODIMP CImageRegionWithLines::get_NumFirstPages(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18920", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18920", pVal != __nullptr);
 
 		validateLicense();
 
@@ -160,7 +160,7 @@ STDMETHODIMP CImageRegionWithLines::get_NumLastPages(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18923", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18923", pVal != __nullptr);
 
 		validateLicense();
 
@@ -196,7 +196,7 @@ STDMETHODIMP CImageRegionWithLines::get_SpecifiedPages(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18926", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18926", pVal != __nullptr);
 
 		validateLicense();
 
@@ -238,7 +238,7 @@ STDMETHODIMP CImageRegionWithLines::get_AttributeText(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18929", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18929", pVal != __nullptr);
 
 		validateLicense();
 
@@ -272,7 +272,7 @@ STDMETHODIMP CImageRegionWithLines::get_IncludeLines(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18932", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18932", pVal != __nullptr);
 
 		validateLicense();
 
@@ -313,14 +313,14 @@ STDMETHODIMP CImageRegionWithLines::raw_ParseText(IAFDocument* pAFDoc, IProgress
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI18375", ipAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI18375", ipAFDoc != __nullptr);
 		ISpatialStringPtr ipAFDocText(ipAFDoc->Text);
-		ASSERT_ARGUMENT("ELI19041", ipAFDocText != NULL);
-		ASSERT_ARGUMENT("ELI18376", ppAttributes != NULL);
+		ASSERT_ARGUMENT("ELI19041", ipAFDocText != __nullptr);
+		ASSERT_ARGUMENT("ELI18376", ppAttributes != __nullptr);
 
 		// Create an attribute vector to store the results
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI18399", ipAttributes != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI18399", ipAttributes != __nullptr );
 
 		// Populate a vector of ints that indicates which pages
 		// to process
@@ -371,7 +371,7 @@ STDMETHODIMP CImageRegionWithLines::raw_ParseText(IAFDocument* pAFDoc, IProgress
 		// Process one page at a time
 		for each (int nPageNum in vecPages)
 		{
-			IIUnknownVectorPtr ipSubLineRects = NULL;
+			IIUnknownVectorPtr ipSubLineRects = __nullptr;
 
 			// Default to search for horizontal lines in case no page info is available.
 			VARIANT_BOOL bHorizontal = VARIANT_TRUE;
@@ -380,13 +380,13 @@ STDMETHODIMP CImageRegionWithLines::raw_ParseText(IAFDocument* pAFDoc, IProgress
 			// [FlexIDSCore:3182]
 			// Check to see if the specified page has any spatial text information.
 			ISpatialStringPtr ipPage = ipAFDocText->GetSpecifiedPages(nPageNum, nPageNum);
-			ASSERT_RESOURCE_ALLOCATION("ELI24099", ipPage != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24099", ipPage != __nullptr);
 
 			if (ipPage->String.length() > 0)
 			{
 				// Obtain page information (if available) and use it to get the page's orientation.
 				ISpatialPageInfoPtr ipPageInfo = ipAFDocText->GetPageInfo(nPageNum);
-				ASSERT_RESOURCE_ALLOCATION("ELI19440", ipPageInfo != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19440", ipPageInfo != __nullptr);
 
 				// Determine which way to orient the search based on the page text orientation.
 				EOrientation ePageOrientation = ipPageInfo->Orientation;
@@ -405,12 +405,12 @@ STDMETHODIMP CImageRegionWithLines::raw_ParseText(IAFDocument* pAFDoc, IProgress
 				ipAFDocText->SourceDocName, nPageNum, -deskew, bHorizontal, 
 				m_bIncludeLines ? &ipSubLineRects : NULL);
 
-			ASSERT_RESOURCE_ALLOCATION("ELI18412", ipGroupRects != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18412", ipGroupRects != __nullptr);
 
 			if (m_bIncludeLines)
 			{
 				// If including lines, assert that ipSubLineRects was allocated
-				ASSERT_RESOURCE_ALLOCATION("ELI19027", ipSubLineRects != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19027", ipSubLineRects != __nullptr);
 
 				// We should get a vector back for every group, plus an extra vector with all
 				// lines in the document
@@ -421,7 +421,7 @@ STDMETHODIMP CImageRegionWithLines::raw_ParseText(IAFDocument* pAFDoc, IProgress
 
 				// The vector of all lines on the page is at the last position in the vector
 				IIUnknownVectorPtr ipLineRects = ipSubLineRects->At(ipGroupRects->Size());
-				ASSERT_RESOURCE_ALLOCATION("ELI19026", ipLineRects != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19026", ipLineRects != __nullptr);
 
 				// Create an attribute representing the lines on the page
 				IAttributePtr ipLines = createAttributeFromRects(ipLineRects, "Lines", 
@@ -434,7 +434,7 @@ STDMETHODIMP CImageRegionWithLines::raw_ParseText(IAFDocument* pAFDoc, IProgress
 			for (int i = 0; i < ipGroupRects->Size(); i++)
 			{	
 				ILongRectanglePtr ipRect = ipGroupRects->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI18721", ipRect != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18721", ipRect != __nullptr);
 
 				// Create an attribute to represent the image region
 				IAttributePtr ipAttribute = createSpatialAttribute(ipRect, ipAFDocText, nPageNum);
@@ -444,15 +444,15 @@ STDMETHODIMP CImageRegionWithLines::raw_ParseText(IAFDocument* pAFDoc, IProgress
 					// If lines are included, create a sub-attribute to represent the lines
 					// that form the image region
 					IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-					ASSERT_RESOURCE_ALLOCATION("ELI18716", ipSubAttributes != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI18716", ipSubAttributes != __nullptr);
 
 					IIUnknownVectorPtr ipLines = ipSubLineRects->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI18723", ipLines != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI18723", ipLines != __nullptr);
 
 					IAttributePtr ipSubLines = createAttributeFromRects(ipLines, "...sub-lines", 
 						asString(ipAFDocText->SourceDocName), ipAFDocText->SpatialPageInfos,
 						nPageNum);
-					ASSERT_RESOURCE_ALLOCATION("ELI18722", ipSubLines != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI18722", ipSubLines != __nullptr);
 
 					ipSubAttributes->PushBack(ipSubLines);
 				}
@@ -482,7 +482,7 @@ STDMETHODIMP CImageRegionWithLines::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		validateLicense();
 
 		// Check parameter
-		ASSERT_ARGUMENT("ELI18378", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18378", pbValue != __nullptr);
 
 		// Ensure attribute text is specified.  All other settings will validated as they are set.
 		if (m_strAttributeText.empty())
@@ -509,7 +509,7 @@ STDMETHODIMP CImageRegionWithLines::raw_GetComponentDescription(BSTR *pbstrCompo
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18380", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI18380", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Find image region with lines").Detach();
 	}
@@ -531,14 +531,14 @@ STDMETHODIMP CImageRegionWithLines::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IImageRegionWithLinesPtr ipCopyThis = pObject;
-		ASSERT_ARGUMENT("ELI18382", ipCopyThis != NULL);
+		ASSERT_ARGUMENT("ELI18382", ipCopyThis != __nullptr);
 
 		// clone the ImageLineUtility member
 		IImageLineUtilityPtr ipSourceLineUtil(ipCopyThis->LineUtil);
 		if (ipSourceLineUtil)
 		{
 			ICopyableObjectPtr ipCopyObj(ipSourceLineUtil);
-			ASSERT_RESOURCE_ALLOCATION("ELI18987", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18987", ipCopyObj != __nullptr);
 			m_ipImageLineUtility = ipCopyObj->Clone();
 		}
 
@@ -564,11 +564,11 @@ STDMETHODIMP CImageRegionWithLines::raw_Clone(IUnknown **pObject)
 		// Validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18386", pObject != NULL);
+		ASSERT_ARGUMENT("ELI18386", pObject != __nullptr);
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_ImageRegionWithLines);
-		ASSERT_RESOURCE_ALLOCATION("ELI18387", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18387", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -590,7 +590,7 @@ STDMETHODIMP CImageRegionWithLines::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18389", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI18389", pClassID != __nullptr);
 
 		*pClassID = CLSID_ImageRegionWithLines;
 	}
@@ -619,10 +619,10 @@ STDMETHODIMP CImageRegionWithLines::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18392", pStream != NULL);
+		ASSERT_ARGUMENT("ELI18392", pStream != __nullptr);
 
 		//Clear the existing data
-		m_ipImageLineUtility = NULL;
+		m_ipImageLineUtility = __nullptr;
 		m_ePageSelectionMode = kAllPages;
 		m_nNumFirstPages = 0;
 		m_nNumLastPages = 0;
@@ -683,7 +683,7 @@ STDMETHODIMP CImageRegionWithLines::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18395", pStream != NULL);
+		ASSERT_ARGUMENT("ELI18395", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -709,7 +709,7 @@ STDMETHODIMP CImageRegionWithLines::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the line util to the stream
 		IPersistStreamPtr ipLineUtilStream(getImageLineUtility());
-		ASSERT_RESOURCE_ALLOCATION("ELI18953", ipLineUtilStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18953", ipLineUtilStream != __nullptr);
 		writeObjectToStream(ipLineUtilStream, pStream, "ELI18954", fClearDirty);
 
 		// Clear the flag as specified
@@ -739,7 +739,7 @@ STDMETHODIMP CImageRegionWithLines::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18397", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18397", pbValue != __nullptr);
 
 		try
 		{
@@ -795,10 +795,10 @@ STDMETHODIMP CImageRegionWithLines::InterfaceSupportsErrorInfo(REFIID riid)
 IImageLineUtilityPtr CImageRegionWithLines::getImageLineUtility()
 {
 	// Create image Utils object if not already created
-	if (m_ipImageLineUtility == NULL )
+	if (m_ipImageLineUtility == __nullptr )
 	{
 		m_ipImageLineUtility.CreateInstance(CLSID_ImageLineUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI18409", m_ipImageLineUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18409", m_ipImageLineUtility != __nullptr);
 	}
 
 	return m_ipImageLineUtility;
@@ -808,23 +808,23 @@ IAttributePtr CImageRegionWithLines::createAttributeFromRects(IIUnknownVectorPtr
 		const string &strText, const string &strSourceDocName, ILongToObjectMapPtr ipPageInfoMap, 
 		int nPageNum)
 {
-	ASSERT_ARGUMENT("ELI18719", ipRects != NULL);
+	ASSERT_ARGUMENT("ELI18719", ipRects != __nullptr);
 	ASSERT_ARGUMENT("ELI18720", !strText.empty());
 	ASSERT_ARGUMENT("ELI19967", nPageNum > 0);
 
 	// Create an IIUnknownVector to store the raster zones that will be used for the attribute
 	IIUnknownVectorPtr ipAttributeZones(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI18698", ipAttributeZones != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18698", ipAttributeZones != __nullptr);
 
 	// For each ipRect
 	for (int i = 0; i < ipRects->Size() ; i++)
 	{	
 		// Obtain a copy of the rect for the raster zone
 		ILongRectanglePtr ipRect = ipRects->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI18696", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18696", ipRect != __nullptr);
 
 		ILongRectanglePtr ipRectClone = ipRect->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI18709", ipRectClone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18709", ipRectClone != __nullptr);
 		long lLeft, lTop, lRight, lBottom;
 		ipRectClone->GetBounds(&lLeft, &lTop, &lRight, &lBottom);
 
@@ -848,7 +848,7 @@ IAttributePtr CImageRegionWithLines::createAttributeFromRects(IIUnknownVectorPtr
 
 		// Create the raster zone
 		IRasterZonePtr	ipZone(CLSID_RasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI18697", ipZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18697", ipZone != __nullptr);
 
 		ipZone->CreateFromLongRectangle(ipRectClone, nPageNum);
 
@@ -858,14 +858,14 @@ IAttributePtr CImageRegionWithLines::createAttributeFromRects(IIUnknownVectorPtr
 
 	// Build a SpatialString from the raster zone vector
 	ISpatialStringPtr ipValue(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI18700", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18700", ipValue != __nullptr);
 
 	ipValue->CreateHybridString(ipAttributeZones, strText.c_str(), 
 		strSourceDocName.c_str(), ipPageInfoMap);
 
 	// Assign the spatial string to the attribute
 	IAttributePtr ipAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI18699", ipAttribute != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18699", ipAttribute != __nullptr);
 	ipAttribute->Value = ipValue;
 
 	return ipAttribute;
@@ -875,13 +875,13 @@ IAttributePtr CImageRegionWithLines::createSpatialAttribute(ILongRectanglePtr ip
 															ISpatialStringPtr ipDocText,
 															int nPageNum)
 {
-	ASSERT_ARGUMENT("ELI19964", ipDocText != NULL);
-	ASSERT_ARGUMENT("ELI19965", ipRect != NULL);
+	ASSERT_ARGUMENT("ELI19964", ipDocText != __nullptr);
+	ASSERT_ARGUMENT("ELI19965", ipRect != __nullptr);
 	ASSERT_ARGUMENT("ELI19966", nPageNum > 0);
 
 	// Create the raster zone
 	IRasterZonePtr	ipZone(CLSID_RasterZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI19971", ipZone != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19971", ipZone != __nullptr);
 
 	ipZone->CreateFromLongRectangle(ipRect, nPageNum);
 
@@ -892,10 +892,10 @@ IAttributePtr CImageRegionWithLines::createSpatialAttribute(ILongRectanglePtr ip
 	// We want to modify the existing page's PageInfo for the attribute, but we don't want
 	// to affect the existing page, so obtain a copy.
 	ICopyableObjectPtr ipCloneThis = ipDocText->GetPageInfo(nPageNum);
-	ASSERT_RESOURCE_ALLOCATION("ELI25257", ipCloneThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI25257", ipCloneThis != __nullptr);
 
 	ISpatialPageInfoPtr ipPageInfoClone = ipCloneThis->Clone();
-	ASSERT_RESOURCE_ALLOCATION("ELI25258", ipPageInfoClone != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI25258", ipPageInfoClone != __nullptr);
 	
 	// [FlexIDSCore:3185]
 	// The line coordinates we used to create the raster zone were based on the original orientation,
@@ -906,7 +906,7 @@ IAttributePtr CImageRegionWithLines::createSpatialAttribute(ILongRectanglePtr ip
 
 	// create a spatial page info map for the new spatial string
 	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
-	ASSERT_RESOURCE_ALLOCATION("ELI25259", ipPageInfoMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI25259", ipPageInfoMap != __nullptr);
 	ipPageInfoMap->Set(nPageNum, ipPageInfoClone);
 
 	// Build a spatial string (in spatial mode) that occupies the full extent of ipZone with
@@ -916,7 +916,7 @@ IAttributePtr CImageRegionWithLines::createSpatialAttribute(ILongRectanglePtr ip
 
 	// Create the attribute
 	IAttributePtr ipAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI19974", ipAttribute != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI19974", ipAttribute != __nullptr );
 
 	ipAttribute->Value = ipSpatialString;
 

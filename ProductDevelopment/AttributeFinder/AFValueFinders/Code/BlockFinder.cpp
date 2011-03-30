@@ -33,10 +33,10 @@ CBlockFinder::CBlockFinder()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI19416", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI19416", m_ipMiscUtils != __nullptr );
 
 		m_ipClues.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI05740", m_ipClues != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05740", m_ipClues != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05739")
 }
@@ -88,14 +88,14 @@ STDMETHODIMP CBlockFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 
 		// Create local Document pointer
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI30086", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30086", ipAFDoc != __nullptr);
 
 		// Get the text out from the spatial string
 		ISpatialStringPtr ipInputText(ipAFDoc->Text);
-		ASSERT_RESOURCE_ALLOCATION("ELI30087", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30087", ipInputText != __nullptr);
 		
 		IIUnknownVectorPtr ipItems( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION("ELI11005", ipItems != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11005", ipItems != __nullptr);
 
 		if (ipInputText->IsEmpty() == VARIANT_FALSE)
 		{
@@ -104,7 +104,7 @@ STDMETHODIMP CBlockFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		}
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI10076", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10076", ipAttributes != __nullptr);
 
 		// Populate collection of Attributes
 		for (int n = 0; n < ipItems->Size(); n++)
@@ -137,10 +137,10 @@ STDMETHODIMP CBlockFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* 
 	try
 	{
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI10079", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10079", ipAttribute != __nullptr);
 
 		ISpatialStringPtr ipInputText(ipAttribute->Value);
-		ASSERT_RESOURCE_ALLOCATION("ELI30088", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30088", ipAttribute != __nullptr);
 
 		IAFDocumentPtr ipOriginInput(pOriginInput);
 		// Not required to be non-NULL
@@ -153,7 +153,7 @@ STDMETHODIMP CBlockFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* 
 		}
 
 		ISpatialStringPtr ipNewValue(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI10080", ipNewValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10080", ipNewValue != __nullptr);
 
 		if(ipItems->Size() > 0)
 		{
@@ -224,7 +224,7 @@ STDMETHODIMP CBlockFinder::raw_GetComponentDescription(BSTR * pstrComponentDescr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19575", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19575", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Block finder").Detach();
 	}
@@ -275,7 +275,7 @@ STDMETHODIMP CBlockFinder::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08244", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08244", ipSource != __nullptr);
 
 		m_strBlockSeparator = asString(ipSource->GetBlockSeparator());
 		m_bInputAsOneBlock = (ipSource->GetInputAsOneBlock() == VARIANT_TRUE) ? true : false;
@@ -288,7 +288,7 @@ STDMETHODIMP CBlockFinder::raw_CopyFrom(IUnknown *pObject)
 		m_bIsCluePartOfAWord = (ipSource->GetIsCluePartOfAWord()==VARIANT_TRUE) ? true : false;
 
 		IShallowCopyablePtr ipCopyableObject = ipSource->GetClues();
-		ASSERT_RESOURCE_ALLOCATION("ELI08246", ipCopyableObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08246", ipCopyableObject != __nullptr);
 		m_ipClues = ipCopyableObject->ShallowCopy();
 
 		m_bPairBeginEndStrings = (ipSource->PairBeginAndEnd == VARIANT_TRUE) ? true : false;
@@ -312,7 +312,7 @@ STDMETHODIMP CBlockFinder::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_BlockFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI08343", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08343", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -358,7 +358,7 @@ STDMETHODIMP CBlockFinder::Load(IStream *pStream)
 		m_nMinNumberOfClues = 1;
 		m_bGetMaxOnly = false;
 		m_bIsCluePartOfAWord = false;
-		m_ipClues = NULL;
+		m_ipClues = __nullptr;
 		m_eDefineBlocks = kSeparatorString;
 		
 		// Read the bytestream data from the IStream object
@@ -406,7 +406,7 @@ STDMETHODIMP CBlockFinder::Load(IStream *pStream)
 		// Read the clue list
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI09963");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI05732", "Clue list could not be read from stream!");
 		}
@@ -457,7 +457,7 @@ STDMETHODIMP CBlockFinder::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the clue list to the IStream object
 		IPersistStreamPtr ipObj(m_ipClues);
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI05733", "Clues collection does not support persistence!" );
 		}
@@ -704,14 +704,14 @@ STDMETHODIMP CBlockFinder::GetBlockScore(BSTR strBlockText, IAFDocument* pAFDoc,
 
 		// Get a regular expression parser
 		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("BlockFinder");
-		ASSERT_RESOURCE_ALLOCATION("ELI05738", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05738", ipParser != __nullptr);
 
 		// All comparisons are case insensitive
 		ipParser->IgnoreCase = VARIANT_TRUE;
 
 		// Get a list of values that includes values from any specified files.
 		IVariantVectorPtr ipExpandedClues = m_cachedListLoader.expandList(m_ipClues, ipAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI30089", ipExpandedClues != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30089", ipExpandedClues != __nullptr);
 
 		string strBlock = asString( strBlockText );
 		long nCluesSize = ipExpandedClues->Size;
@@ -738,7 +738,7 @@ STDMETHODIMP CBlockFinder::GetBlockScore(BSTR strBlockText, IAFDocument* pAFDoc,
 			ipParser->Pattern = strClue.c_str();
 			IIUnknownVectorPtr ipFoundMatches = ipParser->Find(strBlockText, VARIANT_FALSE, 
 				VARIANT_FALSE);
-			if (ipFoundMatches != NULL && ipFoundMatches->Size() > 0)
+			if (ipFoundMatches != __nullptr && ipFoundMatches->Size() > 0)
 			{
 				nScore += ipFoundMatches->Size();
 			}
@@ -774,8 +774,6 @@ STDMETHODIMP CBlockFinder::put_Clues(IVariantVector *newVal)
 	try
 	{
 		validateLicense();
-
-		if (m_ipClues) m_ipClues = NULL;
 
 		m_ipClues = newVal;
 
@@ -978,7 +976,7 @@ IIUnknownVectorPtr CBlockFinder::getBlocksBeginEnd(ISpatialStringPtr ipSS)
 {
 
 	IIUnknownVectorPtr	ipItems(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI10074", ipItems != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10074", ipItems != __nullptr);
 
 	string strText = asString(ipSS->String);
 	unsigned long ulCurrPos = 0;
@@ -1066,14 +1064,14 @@ IIUnknownVectorPtr CBlockFinder::chooseBlocks(IIUnknownVectorPtr ipItems,
 	IIUnknownVectorPtr ipFoundBlocks(NULL);
 
 	UCLID_AFVALUEFINDERSLib::IBlockFinderPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI10078", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10078", ipThis != __nullptr);
 
 	// find what?
 	if (!m_bFindAllBlocks)
 	{
 		
 		ipFoundBlocks.CreateInstance(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI10077", ipFoundBlocks != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10077", ipFoundBlocks != __nullptr);
 		if (m_nMinNumberOfClues <= 0)
 		{
 			UCLIDException ue("ELI05734", 

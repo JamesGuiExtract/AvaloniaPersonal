@@ -53,11 +53,11 @@ MERSFinder::~MERSFinder()
 {
 	try
 	{
-		m_ipEntityFinder = NULL;
-		m_ipSPM = NULL;
-		m_ipExprDefined = NULL;
-		m_ipDataScorer = NULL;
-		m_ipMiscUtils = NULL;
+		m_ipEntityFinder = __nullptr;
+		m_ipSPM = __nullptr;
+		m_ipExprDefined = __nullptr;
+		m_ipDataScorer = __nullptr;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16434");
 }
@@ -68,8 +68,8 @@ MERSFinder::~MERSFinder()
 void MERSFinder::findMERS( IIUnknownVectorPtr ipVecEntities, IAFDocumentPtr ipAFDoc )
 {
 	// ensure pre-requisites
-	ASSERT_ARGUMENT("ELI09475", ipVecEntities != NULL)
-	ASSERT_ARGUMENT("ELI09476", ipAFDoc != NULL)
+	ASSERT_ARGUMENT("ELI09475", ipVecEntities != __nullptr)
+	ASSERT_ARGUMENT("ELI09476", ipAFDoc != __nullptr)
 	
 	IAFDocumentPtr ipOriginalDoc(ipAFDoc);
 	
@@ -81,7 +81,7 @@ void MERSFinder::findMERS( IIUnknownVectorPtr ipVecEntities, IAFDocumentPtr ipAF
 	for (long n = 0; n < nSize; n++)
 	{
 		IAttributePtr ipAttribute = ipFoundAttributes->At(n);
-		ASSERT_RESOURCE_ALLOCATION("ELI09477", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09477", ipAttribute != __nullptr);
 		
 		ISpatialStringPtr ipAttrValue = ipAttribute->Value;
 		// first to check if the value contains MERS keyword
@@ -102,12 +102,12 @@ void MERSFinder::findMERS( IIUnknownVectorPtr ipVecEntities, IAFDocumentPtr ipAF
 			{
 				// if MERS is found the subattributes from previous split are invalid so remove them
 				IIUnknownVectorPtr ipSubs = ipAttribute->SubAttributes;
-				ASSERT_RESOURCE_ALLOCATION("ELI15603", ipSubs != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15603", ipSubs != __nullptr);
 				ipSubs->Clear();
 				
 				// Create Splitter Object
 				IAttributeSplitterPtr ipEntitySplitter(CLSID_EntityNameSplitter);
-				ASSERT_RESOURCE_ALLOCATION("ELI09809", ipEntitySplitter != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI09809", ipEntitySplitter != __nullptr );
 
 				// Assign mers keyword to the attribute value
 				ipAttribute->Value = ipMERSKeyword;
@@ -118,7 +118,7 @@ void MERSFinder::findMERS( IIUnknownVectorPtr ipVecEntities, IAFDocumentPtr ipAF
 				// create an sub attribute called NomineeFor 
 				// with the found value as for this attribute
 				IAttributePtr ipSubAttr(CLSID_Attribute);
-				ASSERT_RESOURCE_ALLOCATION("ELI09478", ipSubAttr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09478", ipSubAttr != __nullptr);
 				ipSubAttr->Name = "NomineeFor";
 				ipSubAttr->Value = ipAttrValue;
 
@@ -131,11 +131,11 @@ void MERSFinder::findMERS( IIUnknownVectorPtr ipVecEntities, IAFDocumentPtr ipAF
 				{
 					// Retrieve the first sub-attribute
 					IAttributePtr ipFirstSubAttr = ipSubs->At(0);
-					ASSERT_RESOURCE_ALLOCATION( "ELI10187", ipFirstSubAttr != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI10187", ipFirstSubAttr != __nullptr );
 
 					// Retrieve the sub-attributes
 					IIUnknownVectorPtr ipFirstSubs = ipFirstSubAttr->SubAttributes;
-					ASSERT_RESOURCE_ALLOCATION("ELI15604", ipFirstSubs != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15604", ipFirstSubs != __nullptr);
 
 					// Add NomineeFor under the first split sub attribute
 					ipFirstSubs->PushBack( ipSubAttr );
@@ -153,21 +153,21 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 								IRegularExprParserPtr ipParser )
 {
 	IAFDocumentPtr ipOriginalDoc(ipAFDoc);
-	ASSERT_RESOURCE_ALLOCATION("ELI09479", ipOriginalDoc != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09479", ipOriginalDoc != __nullptr);
 	ISpatialStringPtr ipOriginalText = ipOriginalDoc->Text;
 	
 	IAttributePtr	ipAttribute(ipAttr);
-	ASSERT_RESOURCE_ALLOCATION( "ELI19456", ipAttribute != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI19456", ipAttribute != __nullptr );
 	
 	// take the text to be modified
 	ISpatialStringPtr ipTextToBeModified = ipAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI19360", ipTextToBeModified != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19360", ipTextToBeModified != __nullptr);
 	
 	// Allocate data scorer for scoring results
-	if ( m_ipDataScorer == NULL )
+	if ( m_ipDataScorer == __nullptr )
 	{
 		m_ipDataScorer.CreateInstance(CLSID_EntityNameDataScorer);
-		ASSERT_RESOURCE_ALLOCATION("ELI09498", m_ipDataScorer != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09498", m_ipDataScorer != __nullptr );
 	}
 	// get the string value of the text
 	string strValue = asString(ipTextToBeModified->String);
@@ -177,29 +177,29 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 	if (findMERSKeyword(strValue, nStartPos, nEndPos, ipParser))
 	{
 		IAttributePtr ipTempAttr(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI09503", ipTempAttr != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09503", ipTempAttr != __nullptr );
 		// search pattern 3 first
 		ISpatialStringPtr ipFoundValue = patternSearch3(ipOriginalText);
 		ipTempAttr->Value = ipFoundValue;
 
 		string strValueFound = "";
-		if ( ipFoundValue != NULL )
+		if ( ipFoundValue != __nullptr )
 		{
 			strValueFound = asString(ipFoundValue->String);
 		}
 		long nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
-		if (ipFoundValue == NULL || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser ) 
+		if (ipFoundValue == __nullptr || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser ) 
 				|| nDataScore < MINSCORE )
 		{
 			// now search pattern 1
 			ipFoundValue = patternSearch1(ipOriginalText);
 			ipTempAttr->Value = ipFoundValue;
-			if ( ipFoundValue != NULL )
+			if ( ipFoundValue != __nullptr )
 			{
 				strValueFound = ipFoundValue->String;
 			}
 			nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
-			if (ipFoundValue == NULL || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser )
+			if (ipFoundValue == __nullptr || findMERSKeyword ( strValueFound, nStartPos, nEndPos, ipParser )
 				|| nDataScore < MINSCORE)
 			{
 				// no entity found in the first pattern,  
@@ -209,13 +209,13 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 				nDataScore = m_ipDataScorer->GetDataScore1( ipTempAttr );
 				if ( nDataScore < MINSCORE )
 				{
-					ipFoundValue = NULL;
+					ipFoundValue = __nullptr;
 				}
 			}
 		}
 		
 		ICopyableObjectPtr ipCopier = ipTextToBeModified;
-		ASSERT_RESOURCE_ALLOCATION("ELI25966", ipCopier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25966", ipCopier != __nullptr);
 
 		if (ipFoundValue)
 		{
@@ -228,7 +228,7 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 			// then modify this value to have "MORTGAGE ELECTRONIC 
 			// REGISTRATION SYSTEMS" only
 			ISpatialStringPtr ipMERSKeyword = ipTextToBeModified->GetSubString(nStartPos, nEndPos);
-			ASSERT_RESOURCE_ALLOCATION("ELI25967", ipMERSKeyword != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25967", ipMERSKeyword != __nullptr);
 			ipCopier->CopyFrom(ipMERSKeyword);
 		}
 	}
@@ -237,18 +237,18 @@ void MERSFinder::findNomineeFor( IAttributePtr ipAttr, IAFDocumentPtr ipAFDoc,
 
 ISpatialStringPtr MERSFinder::extractEntity(ISpatialStringPtr ipInputText)
 {
-	if (m_ipEntityFinder == NULL)
+	if (m_ipEntityFinder == __nullptr)
 	{
 		m_ipEntityFinder.CreateInstance(CLSID_EntityFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI09481", m_ipEntityFinder != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09481", m_ipEntityFinder != __nullptr);
 	}
 
 	// make a copy of the input string
 	ICopyableObjectPtr ipCopyable(ipInputText);
-	ASSERT_RESOURCE_ALLOCATION("ELI09482", ipCopyable != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09482", ipCopyable != __nullptr);
 
 	ISpatialStringPtr ipRet(ipCopyable->Clone());
-	ASSERT_RESOURCE_ALLOCATION("ELI09483", ipRet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09483", ipRet != __nullptr);
 
 	m_ipEntityFinder->FindEntities(ipRet);
 
@@ -270,7 +270,7 @@ ISpatialStringPtr MERSFinder::findMatchEntity(ISpatialString* pInputText,
 	// store input text in the smart pointer
 	ISpatialStringPtr ipInputText(pInputText);
 	ISpatialStringPtr ipResult(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI09484", ipResult != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09484", ipResult != __nullptr);
 
 	// get actual text value out from the input text
 	if (ipInputText->String.length() == 0)
@@ -281,7 +281,7 @@ ISpatialStringPtr MERSFinder::findMatchEntity(ISpatialString* pInputText,
 	// find match using string pattern matcher
 	IStrToObjectMapPtr ipFoundMatches = match(ipInputText, strPattern, 
 		bCaseSensitive, bGreedy);
-	ASSERT_RESOURCE_ALLOCATION("ELI09485", ipFoundMatches != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09485", ipFoundMatches != __nullptr);
 
 	// Note: in this perticular case, we always expect one and only one
 	// value to be found in the input text
@@ -300,7 +300,7 @@ ISpatialStringPtr MERSFinder::findMatchEntity(ISpatialString* pInputText,
 	ipFoundMatches->GetKeyValue(0, &bstrVariableName, &ipUnkVariableValue);
 
 	ITokenPtr ipToken = ipUnkVariableValue;
-	ASSERT_RESOURCE_ALLOCATION("ELI09487", ipToken != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09487", ipToken != __nullptr);
 	
 	// get start and end position of the found value
 	long nStartPos = ipToken->StartPosition;
@@ -340,10 +340,10 @@ bool MERSFinder::findMERSKeyword(const string& strInput, int& nStartPos, int& nE
 
 		// set start and end position
 		IObjectPairPtr ipObjPair = ipFoundMatch->At(0);
-		ASSERT_RESOURCE_ALLOCATION("ELI09489", ipObjPair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09489", ipObjPair != __nullptr);
 
 		ITokenPtr ipMatch = ipObjPair->Object1;
-		ASSERT_RESOURCE_ALLOCATION("ELI09491", ipMatch != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09491", ipMatch != __nullptr);
 
 		nStartPos = ipMatch->StartPosition;
 		nEndPos = ipMatch->EndPosition;
@@ -380,10 +380,10 @@ IStrToObjectMapPtr MERSFinder::match(ISpatialStringPtr& ripInput,
 									   bool bCaseSensitive,
 									   bool bGreedy)
 {
-	if (m_ipSPM == NULL)
+	if (m_ipSPM == __nullptr)
 	{
 		m_ipSPM.CreateInstance(CLSID_StringPatternMatcher);
-		ASSERT_RESOURCE_ALLOCATION("ELI09492", m_ipSPM != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09492", m_ipSPM != __nullptr);
 		// by default, case insensitive
 		m_ipSPM->CaseSensitive = VARIANT_FALSE;
 		// by default, treat multiple white space a one
@@ -409,7 +409,7 @@ ISpatialStringPtr MERSFinder::patternSearch1(ISpatialString* pOriginalText)
 	// find the match
 	ISpatialStringPtr ipFoundString = findMatchEntity(ipOriginText, 
 		strPattern, false, false, true);
-	if (ipFoundString == NULL)
+	if (ipFoundString == __nullptr)
 	{
 		// if this pattern can't be found in the input string, 
 		// no more further search is required.
@@ -532,7 +532,7 @@ ISpatialStringPtr MERSFinder::patternSearch3(ISpatialString* pOriginalText)
 	// find the match
 	ISpatialStringPtr ipFoundString = findMatchEntity(ipOriginText, 
 		strPattern, false, false, true);
-	if (ipFoundString == NULL)
+	if (ipFoundString == __nullptr)
 	{
 		// if this pattern can't be found in the input string, 
 		// no more further search shall be proceeded
@@ -558,10 +558,10 @@ ISpatialStringPtr MERSFinder::patternSearch3(ISpatialString* pOriginalText)
 //-------------------------------------------------------------------------------------------------
 void MERSFinder::setPredefinedExpressions()
 {
-	if (m_ipExprDefined == NULL)
+	if (m_ipExprDefined == __nullptr)
 	{
 		m_ipExprDefined.CreateInstance(CLSID_StrToStrMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI09493", m_ipExprDefined != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09493", m_ipExprDefined != __nullptr);
 		m_ipExprDefined->Set(_bstr_t("NonTP"), _bstr_t(NON_TP.c_str()));
 		m_ipExprDefined->Set(_bstr_t("BorrowerIs"), _bstr_t(BORROWER_IS.c_str()));
 		m_ipExprDefined->Set(_bstr_t("LenderIs"), _bstr_t(LENDER_IS.c_str()));
@@ -574,7 +574,7 @@ IRegularExprParserPtr MERSFinder::getMERSParser()
 	try
 	{
 		IRegularExprParserPtr ipMERSParser = m_ipMiscUtils->GetNewRegExpParserInstance("MERSFinder");
-		ASSERT_RESOURCE_ALLOCATION("ELI19370", ipMERSParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19370", ipMERSParser != __nullptr);
 
 		ipMERSParser->Pattern = "(Mortgage\\s+Electronic\\s+Registration\\s+System(s)?"
 			"|\\bMERS\\b|Mortgage[\\s\\S]+?Registration\\s+System(s)?)([\\s\\S]{1,3}Inc(\\s*\\.)?)?";

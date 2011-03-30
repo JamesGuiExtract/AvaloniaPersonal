@@ -28,7 +28,7 @@ CStringTokenizerSplitter::CStringTokenizerSplitter()
 		resetVariablesToDefault();
 
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI29469", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29469", m_ipMiscUtils != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29470");
 }
@@ -37,7 +37,7 @@ CStringTokenizerSplitter::~CStringTokenizerSplitter()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16329");
 }
@@ -196,10 +196,10 @@ STDMETHODIMP CStringTokenizerSplitter::get_AttributeNameAndValueExprVector(IIUnk
 		validateLicense();
 
 		// if the vector has not yet been created, create it
-		if (m_ipVecNameValuePair == NULL)
+		if (m_ipVecNameValuePair == __nullptr)
 		{
 			m_ipVecNameValuePair.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI05386", m_ipVecNameValuePair != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05386", m_ipVecNameValuePair != __nullptr);
 		}
 
 		CComQIPtr<IIUnknownVector> ipObj = m_ipVecNameValuePair;
@@ -220,14 +220,14 @@ STDMETHODIMP CStringTokenizerSplitter::put_AttributeNameAndValueExprVector(IIUnk
 		validateLicense();
 
 		IIUnknownVectorPtr ipVecNameValuePair = newVal;
-		ASSERT_RESOURCE_ALLOCATION("ELI05797", ipVecNameValuePair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05797", ipVecNameValuePair != __nullptr);
 
 		// validate the entries
 		long nItems = ipVecNameValuePair->Size();
 		for (int i = 0; i < nItems; i++)
 		{
 			IStringPairPtr ipStringPair = ipVecNameValuePair->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI19178", ipStringPair != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19178", ipStringPair != __nullptr);
 
 			// ensure that the name contains non-whitespace chars
 			string strName = ipStringPair->StringKey;
@@ -313,16 +313,16 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 		validateLicense();
 
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI05398", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05398", ipAttribute != __nullptr);
 		ISpatialStringPtr ipValue = ipAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI20000", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20000", ipValue != __nullptr);
 		IIUnknownVectorPtr ipSubs = ipAttribute->SubAttributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI15571", ipSubs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15571", ipSubs != __nullptr);
 
 		// tokenize the string
 		CString zDelimiter(m_cDelimiter);
 		IIUnknownVectorPtr ipTokens = ipValue->Tokenize(_bstr_t(zDelimiter));
-		ASSERT_RESOURCE_ALLOCATION("ELI20001", ipTokens != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20001", ipTokens != __nullptr);
 		long nNumTokens = ipTokens->Size();
 
 		// depending upon the split type, create the sub attributes
@@ -339,7 +339,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 
 				// create an IAttribute
 				IAttributePtr ipSubAttribute(CLSID_Attribute);
-				ASSERT_RESOURCE_ALLOCATION("ELI05397", ipSubAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI05397", ipSubAttribute != __nullptr);
 				ipSubAttribute->Name = _bstr_t(strName.c_str());
 				ISpatialStringPtr ipSubAttrValue = ipTokens->At(i);
 				ipSubAttribute->Value = ipSubAttrValue;
@@ -359,7 +359,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 			for (int i = 0; i < nNumSubAttributes; i++)
 			{
 				IStringPairPtr ipStringPair = m_ipVecNameValuePair->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI20002", ipStringPair != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20002", ipStringPair != __nullptr);
 
 				// get the value expression string and replace %1 with the first
 				// token, %2 with second token, etc.
@@ -370,7 +370,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 				IIUnknownVectorPtr ipVecTokens;
 				ipVecTokens = ipParser->Find(strValue.c_str(), VARIANT_FALSE, 
 					VARIANT_FALSE);
-				ASSERT_RESOURCE_ALLOCATION("ELI05400", ipVecTokens != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI05400", ipVecTokens != __nullptr);
 
 				// vector to store token indices
 				vector<int> vecTokensToBeReplaced;
@@ -378,9 +378,9 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 				for (int j = 0; j < nInstances; j++)
 				{
 					IObjectPairPtr ipObjPair = ipVecTokens->At(j);
-					ASSERT_RESOURCE_ALLOCATION("ELI20003", ipObjPair != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI20003", ipObjPair != __nullptr);
 					ITokenPtr ipToken = ipObjPair->Object1;
-					ASSERT_RESOURCE_ALLOCATION("ELI20004", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI20004", ipToken != __nullptr);
 					_bstr_t _bstrTokenValue = ipToken->Value;
 
 					// determine the token number
@@ -395,7 +395,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 				sort(vecTokensToBeReplaced.begin(), vecTokensToBeReplaced.end());
 
 				IIUnknownVectorPtr ipVecRasterZones(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI20208", ipVecRasterZones != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20208", ipVecRasterZones != __nullptr);
 				
 				// iterate through all the instances of % followed by a number
 				// and do the search-replace with token values
@@ -418,7 +418,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 					if (nTokenIndex <= nNumTokens - 1)
 					{
 						ISpatialStringPtr ipReplacement = ipTokens->At(nTokenIndex);
-						ASSERT_RESOURCE_ALLOCATION("ELI20005", ipReplacement != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI20005", ipReplacement != __nullptr);
 						strToReplaceWith = ipReplacement->String;
 
 						// append the spatial information for this string, if it exists [P16 #2699]
@@ -436,12 +436,12 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 				{
 					// create an IAttribute
 					IAttributePtr ipSubAttribute(CLSID_Attribute);
-					ASSERT_RESOURCE_ALLOCATION("ELI05401", ipSubAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI05401", ipSubAttribute != __nullptr);
 					ipSubAttribute->Name = ipStringPair->StringKey;
 
 					// store the value of the subattribute
 					ISpatialStringPtr ipSubValue = ipSubAttribute->Value;
-					ASSERT_RESOURCE_ALLOCATION("ELI20006", ipSubValue != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI20006", ipSubValue != __nullptr);
 
 					// check if the original attribute's value is spatial
 					if(ipValue->HasSpatialInfo() == VARIANT_TRUE)
@@ -476,7 +476,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_GetComponentDescription(BSTR * pstrCo
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19567", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19567", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Split attributes using tokens").Detach();
 	}
@@ -499,7 +499,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_CopyFrom(IUnknown *pObject)
 
 		// copy the delimiter
 		UCLID_AFSPLITTERSLib::IStringTokenizerSplitterPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08236", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08236", ipSource != __nullptr);
 
 		m_cDelimiter = (char)ipSource->GetDelimiter();
 
@@ -522,7 +522,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_CopyFrom(IUnknown *pObject)
 				if (ipVector)
 				{
 					ICopyableObjectPtr ipCopyableObj = ipVector;
-					ASSERT_RESOURCE_ALLOCATION("ELI08237", ipCopyableObj != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI08237", ipCopyableObj != __nullptr);
 					m_ipVecNameValuePair = ipCopyableObj->Clone();
 				}
 				break;
@@ -548,7 +548,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_StringTokenizerSplitter);
-		ASSERT_RESOURCE_ALLOCATION("ELI05297", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05297", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -576,7 +576,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_IsConfigured(VARIANT_BOOL * pbValue)
 
 		if (m_cDelimiter != 0 &&
 		   ((m_eSplitType == kEachTokenAsSubAttribute && !m_strFieldNameExpression.empty()) ||
-			(m_eSplitType == kEachTokenAsSpecified && m_ipVecNameValuePair != NULL && 
+			(m_eSplitType == kEachTokenAsSpecified && m_ipVecNameValuePair != __nullptr && 
 			m_ipVecNameValuePair->Size()>0)) )
 		{
 			bConfigured = true;
@@ -664,7 +664,7 @@ STDMETHODIMP CStringTokenizerSplitter::Load(IStream *pStream)
 			{
 				IPersistStreamPtr ipObj;
 				readObjectFromStream(ipObj, pStream, "ELI09962");
-				if (ipObj == NULL)
+				if (ipObj == __nullptr)
 				{
 					throw UCLIDException( "ELI05396", 
 						"Sub-Attribute name-and-value-expression vector could not be read from stream!" );
@@ -716,7 +716,7 @@ STDMETHODIMP CStringTokenizerSplitter::Save(IStream *pStream, BOOL fClearDirty)
 		if (m_eSplitType == kEachTokenAsSpecified)
 		{
 			IPersistStreamPtr ipPersistentObj = m_ipVecNameValuePair;
-			if (ipPersistentObj == NULL)
+			if (ipPersistentObj == __nullptr)
 			{
 				throw UCLIDException("ELI05395", "Sub-Attribute name-and-value-expression vector does not support persistence!");
 			}
@@ -838,10 +838,10 @@ void CStringTokenizerSplitter::validateFieldNameExpression(const string& strFiel
 
 	// Create a local parser object with case sensitive 
 	IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI12963", ipMiscUtils != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI12963", ipMiscUtils != __nullptr );
 
 	IRegularExprParserPtr ipLocalParser = ipMiscUtils->GetNewRegExpParserInstance("StringTokenizerSplitter");
-	ASSERT_RESOURCE_ALLOCATION("ELI12964", ipLocalParser != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12964", ipLocalParser != __nullptr);
 	
 	ipLocalParser->put_IgnoreCase (false);
 
@@ -875,7 +875,7 @@ void CStringTokenizerSplitter::resetVariablesToDefault()
 	m_cDelimiter = ',';
 	m_strFieldNameExpression = "Field_%d";
 	m_eSplitType = kEachTokenAsSubAttribute;
-	m_ipVecNameValuePair = NULL;
+	m_ipVecNameValuePair = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 IRegularExprParserPtr CStringTokenizerSplitter::getRegExParser(const string& strPattern)
@@ -884,7 +884,7 @@ IRegularExprParserPtr CStringTokenizerSplitter::getRegExParser(const string& str
 	{
 		IRegularExprParserPtr ipParser =
 			m_ipMiscUtils->GetNewRegExpParserInstance("StringTokenizerSplitter");
-		ASSERT_RESOURCE_ALLOCATION("ELI05399", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05399", ipParser != __nullptr);
 
 		ipParser->Pattern = strPattern.c_str();
 

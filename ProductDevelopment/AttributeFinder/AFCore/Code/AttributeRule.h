@@ -101,13 +101,13 @@ private:
 	//	PURPOSE: to return m_ipAttributeModifyingRuleInfos
 	//
 	//	PROMISE: to create an instance of AttributeModifyingRuleInfos and assign it to 
-	//			 m_ipAttributeModifyingRuleInfos if m_ipAttributeModifyingRuleInfos is NULL
+	//			 m_ipAttributeModifyingRuleInfos if m_ipAttributeModifyingRuleInfos is __nullptr
 	IIUnknownVectorPtr getAttribModifyRuleInfos();
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: to return m_ipDocPreprocessor
 	//
 	// PROMISE: to create an instance of DocumentPreprocessor and assign it to m_ipDocPreprocessor 
-	//			if m_ipDocPreprocessor is NULL
+	//			if m_ipDocPreprocessor is __nullptr
 	IObjectWithDescriptionPtr getDocPreprocessor();
 	//----------------------------------------------------------------------------------------------
 	// apply modifying rules on the attribute

@@ -48,7 +48,7 @@ STDMETHODIMP CRedactionVerificationUIPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI18556", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18556", pbValue != __nullptr);
 
 		try
 		{
@@ -299,7 +299,7 @@ LRESULT CRedactionVerificationUIPP::OnBnClickedButtonDataFile(WORD wNotifyCode, 
 	{
 		// Get SelectTargetFile object
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::ISelectTargetFileUIPtr ipFileSelector(CLSID_SelectTargetFileUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI24872", ipFileSelector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24872", ipFileSelector != __nullptr);
 
 		// Initialize parameters
 		ipFileSelector->Title = "Specify ID Shield data file path";

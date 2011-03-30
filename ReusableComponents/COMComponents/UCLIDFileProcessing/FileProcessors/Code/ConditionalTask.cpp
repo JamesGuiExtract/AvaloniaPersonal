@@ -41,7 +41,7 @@ CConditionalTask::CConditionalTask()
 	try
 	{
 		m_ipFAMTaskExecutor.CreateInstance(CLSID_FileProcessingTaskExecutor);
-		ASSERT_RESOURCE_ALLOCATION("ELI17767", m_ipFAMTaskExecutor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17767", m_ipFAMTaskExecutor != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI17941");
 }
@@ -51,11 +51,11 @@ CConditionalTask::~CConditionalTask()
 	try
 	{
 		// Set COM pointers to NULL
-		m_ipFAMCondition = NULL;
-		m_ipTasksForTrue = NULL;
-		m_ipTasksForFalse = NULL;
-		m_ipFAMTaskExecutor = NULL;
-		m_ipMiscUtils = NULL;
+		m_ipFAMCondition = __nullptr;
+		m_ipTasksForTrue = __nullptr;
+		m_ipTasksForFalse = __nullptr;
+		m_ipFAMTaskExecutor = __nullptr;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16610")
 }
@@ -70,11 +70,11 @@ void CConditionalTask::FinalRelease()
 	try
 	{
 		// Set COM pointers to NULL
-		m_ipFAMCondition = NULL;
-		m_ipTasksForTrue = NULL;
-		m_ipTasksForFalse = NULL;
-		m_ipFAMTaskExecutor = NULL;
-		m_ipMiscUtils = NULL;
+		m_ipFAMCondition = __nullptr;
+		m_ipTasksForTrue = __nullptr;
+		m_ipTasksForFalse = __nullptr;
+		m_ipFAMTaskExecutor = __nullptr;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27261");
 }
@@ -138,7 +138,7 @@ STDMETHODIMP CConditionalTask::raw_GetComponentDescription(BSTR * pstrComponentD
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19611", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI19611", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Core: Conditionally execute task(s)").Detach();
 	}
@@ -158,21 +158,21 @@ STDMETHODIMP CConditionalTask::raw_CopyFrom(IUnknown *pObject)
 	{
 		// Create the other Conditional Task object
 		UCLID_FILEPROCESSORSLib::IConditionalTaskPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI16170", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16170", ipSource != __nullptr);
 
 		// Copy the FAMCondition
 		ICopyableObjectPtr ipCopyableObject = ipSource->FAMCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI16624", ipCopyableObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16624", ipCopyableObject != __nullptr);
 		m_ipFAMCondition = ipCopyableObject->Clone();
 
 		// Copy the collection of tasks to be executed if condition is true
 		ipCopyableObject = ipSource->TasksForConditionTrue;
-		ASSERT_RESOURCE_ALLOCATION("ELI16625", ipCopyableObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16625", ipCopyableObject != __nullptr);
 		m_ipTasksForTrue = ipCopyableObject->Clone();
 
 		// Copy the collection of tasks to be executed if condition is false
 		ipCopyableObject = ipSource->TasksForConditionFalse;
-		ASSERT_RESOURCE_ALLOCATION("ELI16626", ipCopyableObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16626", ipCopyableObject != __nullptr);
 		m_ipTasksForFalse = ipCopyableObject->Clone();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16171");
@@ -191,7 +191,7 @@ STDMETHODIMP CConditionalTask::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_ConditionalTask);
-		ASSERT_RESOURCE_ALLOCATION("ELI16172", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16172", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -217,10 +217,10 @@ STDMETHODIMP CConditionalTask::raw_NotifyCopiedFromClipboard()
 		validateLicense();
 
 		// Check the condition object itself
-		if (m_ipFAMCondition != NULL)
+		if (m_ipFAMCondition != __nullptr)
 		{
 			IClipboardCopyablePtr ipClip = m_ipFAMCondition->Object;
-			if (ipClip != NULL)
+			if (ipClip != __nullptr)
 			{
 				ipClip->NotifyCopiedFromClipboard();
 			}
@@ -251,7 +251,7 @@ STDMETHODIMP CConditionalTask::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		bool bConfigured = true;
 
 		// The FAMCondition must be defined
-		if ((m_ipFAMCondition == NULL) || (m_ipFAMCondition->Object == NULL))
+		if ((m_ipFAMCondition == __nullptr) || (m_ipFAMCondition->Object == NULL))
 		{
 			bConfigured = false;
 		}
@@ -298,8 +298,8 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17908", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI17910", pResult != NULL);
+		ASSERT_ARGUMENT("ELI17908", pTagManager != __nullptr);
+		ASSERT_ARGUMENT("ELI17910", pResult != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31337", ipFileRecord != __nullptr);
 
@@ -308,7 +308,7 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 
 		// Retrieve the FAM Condition from the Object-With-Description
 		IFAMConditionPtr ipFAMCondition = m_ipFAMCondition->Object;
-		ASSERT_ARGUMENT( "ELI17041", ipFAMCondition != NULL );
+		ASSERT_ARGUMENT( "ELI17041", ipFAMCondition != __nullptr );
 
 		// Set weighting for condition progress status.
 		// At this point we can't know the number of tasks to execute.  Guesstimate 
@@ -332,7 +332,7 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 			ipFileRecord, pDB, nActionID, pTagManager));
 
 		// Kick off progress status for task execution
-		IProgressStatusPtr ipSubProgressStatus = NULL;
+		IProgressStatusPtr ipSubProgressStatus = __nullptr;
 		if (ipProgressStatus)
 		{
 			string strMessage = "Executing tasks for ";
@@ -346,7 +346,7 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 		if (bConditionSatisfied)
 		{
 			// Ensure there are tasks to execute before attempting to execute them
-			if (m_ipTasksForTrue != NULL && m_ipTasksForTrue->Size() > 0)
+			if (m_ipTasksForTrue != __nullptr && m_ipTasksForTrue->Size() > 0)
 			{
 				// Execute true tasks
 				*pResult = m_ipFAMTaskExecutor->InitProcessClose(ipFileRecord, 
@@ -357,7 +357,7 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(IFileRecord* pFileRecord, long nA
 		else
 		{
 			// Ensure there are tasks to execute before attempting to execute them
-			if (m_ipTasksForFalse != NULL && m_ipTasksForFalse->Size() > 0)
+			if (m_ipTasksForFalse != __nullptr && m_ipTasksForFalse->Size() > 0)
 			{
 				// Execute false tasks
 				*pResult = m_ipFAMTaskExecutor->InitProcessClose(ipFileRecord, 
@@ -442,10 +442,10 @@ STDMETHODIMP CConditionalTask::get_FAMCondition(IObjectWithDescription* *pVal)
 		validateLicense();
 
 		// Create the condition object-with-description if needed
-		if (m_ipFAMCondition == NULL)
+		if (m_ipFAMCondition == __nullptr)
 		{
 			m_ipFAMCondition.CreateInstance( CLSID_ObjectWithDescription );
-			ASSERT_RESOURCE_ALLOCATION( "ELI16121", m_ipFAMCondition != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI16121", m_ipFAMCondition != __nullptr );
 		}
 
 		// Return shallow copy of the OWD
@@ -485,10 +485,10 @@ STDMETHODIMP CConditionalTask::get_TasksForConditionTrue(IIUnknownVector* *pVal)
 		validateLicense();
 
 		// Create collection, if needed
-		if (m_ipTasksForTrue == NULL)
+		if (m_ipTasksForTrue == __nullptr)
 		{
 			m_ipTasksForTrue.CreateInstance( CLSID_IUnknownVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI16124", m_ipTasksForTrue != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI16124", m_ipTasksForTrue != __nullptr );
 		}
 
 		// Provide shallow copy to caller
@@ -528,10 +528,10 @@ STDMETHODIMP CConditionalTask::get_TasksForConditionFalse(IIUnknownVector* *pVal
 		validateLicense();
 
 		// Create collection, if needed
-		if (m_ipTasksForFalse == NULL)
+		if (m_ipTasksForFalse == __nullptr)
 		{
 			m_ipTasksForFalse.CreateInstance( CLSID_IUnknownVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI16127", m_ipTasksForFalse != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI16127", m_ipTasksForFalse != __nullptr );
 		}
 
 		// Provide shallow copy to caller
@@ -613,9 +613,9 @@ STDMETHODIMP CConditionalTask::Load(IStream *pStream)
 	try
 	{
 		// Reset member variables
-		m_ipFAMCondition = NULL;
-		m_ipTasksForTrue = NULL;
-		m_ipTasksForFalse = NULL;
+		m_ipFAMCondition = __nullptr;
+		m_ipTasksForTrue = __nullptr;
+		m_ipTasksForFalse = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -685,17 +685,17 @@ STDMETHODIMP CConditionalTask::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the FAM Condition
 		IPersistStreamPtr ipFAMObj = m_ipFAMCondition;
-		ASSERT_RESOURCE_ALLOCATION( "ELI16188", ipFAMObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI16188", ipFAMObj != __nullptr );
 		writeObjectToStream( ipFAMObj, pStream, "ELI16189", fClearDirty );
 
 		// Write the collection of tasks for Condition = true
 		IPersistStreamPtr ipTrueObj = m_ipTasksForTrue;
-		ASSERT_RESOURCE_ALLOCATION( "ELI16190", ipTrueObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI16190", ipTrueObj != __nullptr );
 		writeObjectToStream( ipTrueObj, pStream, "ELI16191", fClearDirty );
 
 		// Write the collection of tasks for Condition = false
 		IPersistStreamPtr ipFalseObj = m_ipTasksForFalse;
-		ASSERT_RESOURCE_ALLOCATION( "ELI16192", ipFalseObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI16192", ipFalseObj != __nullptr );
 		writeObjectToStream( ipFalseObj, pStream, "ELI16193", fClearDirty );
 
 		// Clear the flag as specified
@@ -720,10 +720,10 @@ STDMETHODIMP CConditionalTask::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 IMiscUtilsPtr CConditionalTask::getMiscUtils()
 {
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI19441", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI19441", m_ipMiscUtils != __nullptr );
 	}
 	
 	return m_ipMiscUtils;
@@ -740,7 +740,7 @@ void CConditionalTask::notifyClipboardCopiedForTask(const IIUnknownVectorPtr& ip
 {
 	try
 	{
-		if (ipTasks == NULL)
+		if (ipTasks == __nullptr)
 		{
 			return;
 		}
@@ -753,11 +753,11 @@ void CConditionalTask::notifyClipboardCopiedForTask(const IIUnknownVectorPtr& ip
 		{
 			// Get the OWD from the task list
 			IObjectWithDescriptionPtr ipTemp = ipTasks->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI27263", ipTemp != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27263", ipTemp != __nullptr);
 			
 			// Check for OWD containing ClipboardCopyable object
 			IClipboardCopyablePtr ipClip = ipTemp->Object;
-			if (ipClip != NULL)
+			if (ipClip != __nullptr)
 			{
 				// Notify that the object has been copied
 				ipClip->NotifyCopiedFromClipboard();

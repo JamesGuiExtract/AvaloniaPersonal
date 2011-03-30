@@ -107,7 +107,7 @@ string SelectFileSettings::getSummaryString()
 string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const string& strSelect, 
 	const string& strOrderByClause)
 {
-	ASSERT_ARGUMENT("ELI27722", ipFAMDB != NULL);
+	ASSERT_ARGUMENT("ELI27722", ipFAMDB != __nullptr);
 	
 	string strQueryPart1 = "SELECT " + strSelect + " FROM ";
 	string strQueryPart2;

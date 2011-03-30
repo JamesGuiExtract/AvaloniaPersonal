@@ -211,7 +211,7 @@ STDMETHODIMP CSpatialContentBasedAS::raw_GetComponentDescription(BSTR * pstrComp
 	
 	try
 	{
-		ASSERT_ARGUMENT("ELI19632", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19632", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Spatial content attribute selector").Detach();
 	}
@@ -235,7 +235,7 @@ STDMETHODIMP CSpatialContentBasedAS::raw_Clone(IUnknown * * pObject)
 		// create a new instance of the EntityNameDataScorer
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_SpatialContentBasedAS);
-		ASSERT_RESOURCE_ALLOCATION("ELI13282", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13282", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -257,7 +257,7 @@ STDMETHODIMP CSpatialContentBasedAS::raw_CopyFrom(IUnknown * pObject)
 		// validate license
 		validateLicense();
 		UCLID_AFSELECTORSLib::ISpatialContentBasedASPtr ipFrom(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI13338", ipFrom != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13338", ipFrom != __nullptr );
 
 		m_bContains = ipFrom->Contains == VARIANT_TRUE;
 		m_lConsecutiveRows = ipFrom->ConsecutiveRows;
@@ -485,10 +485,10 @@ void CSpatialContentBasedAS::validateLicense()
 //-------------------------------------------------------------------------------------------------
 IImageUtilsPtr CSpatialContentBasedAS::getImageUtils()
 {
-	if ( m_ipImageUtils == NULL )
+	if ( m_ipImageUtils == __nullptr )
 	{
 		m_ipImageUtils.CreateInstance(CLSID_ImageUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13340", m_ipImageUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13340", m_ipImageUtils != __nullptr );
 	}
 	return m_ipImageUtils;
 }
@@ -496,9 +496,9 @@ IImageUtilsPtr CSpatialContentBasedAS::getImageUtils()
 void CSpatialContentBasedAS::selectMatchingAttrs(IIUnknownVectorPtr ipAttributes, 
 												 IIUnknownVectorPtr ipSelected)
 {
-	ASSERT_ARGUMENT("ELI13342", ipSelected != NULL );
+	ASSERT_ARGUMENT("ELI13342", ipSelected != __nullptr );
 
-	if ( ipAttributes != NULL )
+	if ( ipAttributes != __nullptr )
 	{
 		long lAttributesSize = ipAttributes->Size();
 		for (long i = 0; i < lAttributesSize; i++)
@@ -507,18 +507,18 @@ void CSpatialContentBasedAS::selectMatchingAttrs(IIUnknownVectorPtr ipAttributes
 
 			// Retrieve this Attribute
 			IAttributePtr ipAttribute = ipAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI13341", ipAttribute != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI13341", ipAttribute != __nullptr );
 
 			// Retrieve the associated Spatial String
 			ISpatialStringPtr ipValue = ipAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI15838", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15838", ipValue != __nullptr );
 
 			// This Attribute contains spatial information
 			if ( ipValue->HasSpatialInfo() == VARIANT_TRUE )
 			{
 				// Retrieve the collected raster zones
 				IIUnknownVectorPtr ipRasterZones = ipValue->GetOriginalImageRasterZones();
-				ASSERT_RESOURCE_ALLOCATION("ELI15842", ipRasterZones != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI15842", ipRasterZones != __nullptr );
 
 				// Process each raster zone
 				long lSize = ipRasterZones->Size();
@@ -526,12 +526,12 @@ void CSpatialContentBasedAS::selectMatchingAttrs(IIUnknownVectorPtr ipAttributes
 				{
 					// Retrieve this raster zone
 					IRasterZonePtr ipZone = ipRasterZones->At(z);
-					ASSERT_RESOURCE_ALLOCATION("ELI13343", ipZone != NULL );
+					ASSERT_RESOURCE_ALLOCATION("ELI13343", ipZone != __nullptr );
 
 					// Get the image statistics for this raster zone
 					IImageStatsPtr ipImageStats = getImageUtils()->GetImageStats(
 						ipValue->SourceDocName, ipZone );
-					ASSERT_RESOURCE_ALLOCATION("ELI13426", ipImageStats != NULL );
+					ASSERT_RESOURCE_ALLOCATION("ELI13426", ipImageStats != __nullptr );
 
 					// Check for "text" contained within the zone
 					if ( getImageUtils()->IsTextInZone( ipImageStats, m_lConsecutiveRows, 
@@ -580,12 +580,12 @@ void CSpatialContentBasedAS::selectMatchingAttrs(IIUnknownVectorPtr ipAttributes
 			{
 				// Retrieve the sub-attributes
 				IIUnknownVectorPtr ipSubs = ipAttribute->SubAttributes;
-				ASSERT_RESOURCE_ALLOCATION("ELI15843", ipSubs != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI15843", ipSubs != __nullptr );
 				if (ipSubs->Size() > 0)
 				{
 					// Create collection for filtered sub-attributes
 					IIUnknownVectorPtr ipFiltered( CLSID_IUnknownVector );
-					ASSERT_RESOURCE_ALLOCATION("ELI15844", ipFiltered != NULL );
+					ASSERT_RESOURCE_ALLOCATION("ELI15844", ipFiltered != __nullptr );
 
 					// Process the sub-attributes
 					selectMatchingAttrs( ipAttribute->SubAttributes, ipFiltered );

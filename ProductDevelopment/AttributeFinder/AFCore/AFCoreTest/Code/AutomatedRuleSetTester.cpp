@@ -135,18 +135,18 @@ void markAsInvalid(vector<AttributeScoreData>& rvecData, long lExpectedIndex, lo
 //-------------------------------------------------------------------------------------------------
 void makeAttributesUpperCase(IIUnknownVectorPtr ipAttributes)
 {
-	ASSERT_ARGUMENT("ELI24689", ipAttributes != NULL);
+	ASSERT_ARGUMENT("ELI24689", ipAttributes != __nullptr);
 
 	long lSize = ipAttributes->Size();
 	for(long i = 0; i < lSize; i++)
 	{
 		// Get this Attribute
 		IAttributePtr ipAttr = ipAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI09731", ipAttr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09731", ipAttr != __nullptr);
 
 		// Get the Value
 		ISpatialStringPtr ipValue = ipAttr->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI15521", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15521", ipValue != __nullptr);
 
 		// Convert the Value to upper case
 		ipValue->ToUpperCase();
@@ -170,10 +170,10 @@ CAutomatedRuleSetTester::CAutomatedRuleSetTester()
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI07427", m_ipAttrFinderEngine != NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI07429", m_ipCurrentAttributes != NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI15211", m_ipFAMTagManager != NULL );
-		ASSERT_RESOURCE_ALLOCATION("ELI28477", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07427", m_ipAttrFinderEngine != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI07429", m_ipCurrentAttributes != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI15211", m_ipFAMTagManager != __nullptr );
+		ASSERT_RESOURCE_ALLOCATION("ELI28477", m_ipAFUtility != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07430")
 }
@@ -182,10 +182,10 @@ CAutomatedRuleSetTester::~CAutomatedRuleSetTester()
 {
 	try
 	{
-		m_ipAttrFinderEngine = NULL;
-		m_ipCurrentAttributes = NULL;
-		m_ipFAMTagManager = NULL;
-		m_ipAFUtility = NULL;
+		m_ipAttrFinderEngine = __nullptr;
+		m_ipCurrentAttributes = __nullptr;
+		m_ipFAMTagManager = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16307");
 }
@@ -224,7 +224,7 @@ STDMETHODIMP CAutomatedRuleSetTester::raw_RunAutomatedTests(IVariantVector* pPar
 			m_bEAVMustExist = false;
 			m_bCaseSensitive = true;
 
-			if (m_ipResultLogger == NULL)
+			if (m_ipResultLogger == __nullptr)
 			{
 				throw UCLIDException("ELI06120", "Please set ResultLogger before proceeding.");
 			}
@@ -319,7 +319,7 @@ string CAutomatedRuleSetTester::attributeAsString(IAttributePtr ipAttribute, int
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24690", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI24690", ipAttribute != __nullptr);
 
 		// format the level string
 		string strDots("");
@@ -335,7 +335,7 @@ string CAutomatedRuleSetTester::attributeAsString(IAttributePtr ipAttribute, int
 
 		// Retrieve Value object
 		ISpatialStringPtr ipValue = ipAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI15520", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15520", ipValue != __nullptr);
 
 		// Get the string - convert any cpp string (ex. \r, \n, etc. )to normal string
 		// (ex. \\r, \\n, etc.) for display purpose
@@ -379,7 +379,7 @@ string CAutomatedRuleSetTester::getAttributesCompareString(IIUnknownVectorPtr ip
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24691", ipAttributes != NULL)
+		ASSERT_ARGUMENT("ELI24691", ipAttributes != __nullptr)
 
 			// Create the string
 			string strAttributes("");
@@ -408,7 +408,7 @@ string CAutomatedRuleSetTester::getQualifiedName(IAttributePtr ipAttribute,
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24692", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI24692", ipAttribute != __nullptr);
 
 		string strNameType = asString(ipAttribute->Name);
 		string strType = asString(ipAttribute->Type);
@@ -425,14 +425,14 @@ string CAutomatedRuleSetTester::getTopLevelAttributeString(IAttributePtr ipAttri
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24693", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI24693", ipAttribute != __nullptr);
 
 		// Build a string for the name
 		string strAttribute = asString(ipAttribute->Name) + "|";
 
 		// Get the value
 		ISpatialStringPtr ipSS = ipAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI24694", ipSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24694", ipSS != __nullptr);
 		strAttribute += asString(ipSS->String);
 
 		// Get the type and add it if it is not empty
@@ -452,14 +452,14 @@ long CAutomatedRuleSetTester::getAttributeSize(IAttributePtr ipAttribute)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24695", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI24695", ipAttribute != __nullptr);
 
 		// Default count to 1
 		long lCount = 1;
 
 		// Get subattributes
 		IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-		if (ipSubAttributes != NULL)
+		if (ipSubAttributes != __nullptr)
 		{
 			// For each sub attribute, get the count
 			long lSize = ipSubAttributes->Size();
@@ -480,8 +480,8 @@ pair<long, bool> CAutomatedRuleSetTester::computeScore(IAttributePtr ipExpected,
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24701", ipExpected != NULL);
-		ASSERT_ARGUMENT("ELI24702", ipFound != NULL);
+		ASSERT_ARGUMENT("ELI24701", ipExpected != __nullptr);
+		ASSERT_ARGUMENT("ELI24702", ipFound != __nullptr);
 
 		long lScore = 0;
 		bool bMatched = false;
@@ -499,9 +499,9 @@ pair<long, bool> CAutomatedRuleSetTester::computeScore(IAttributePtr ipExpected,
 
 			// Get the sub attributes
 			IIUnknownVectorPtr ipExpectedSubs = ipExpected->SubAttributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI24703", ipExpectedSubs != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24703", ipExpectedSubs != __nullptr);
 			IIUnknownVectorPtr ipFoundSubs = ipFound->SubAttributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI24704", ipFound != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24704", ipFound != __nullptr);
 
 			// Create and initialize the map to store whether an Attribute was a match
 			// and/or was a best match:
@@ -523,7 +523,7 @@ pair<long, bool> CAutomatedRuleSetTester::computeScore(IAttributePtr ipExpected,
 			{
 				// Get the expected attribute
 				IAttributePtr ipTemp1 = ipExpectedSubs->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI24706", ipTemp1 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24706", ipTemp1 != __nullptr);
 
 				// Compute the score for each found attribute
 				// Store the scores in a vector (computeScore returns a pair
@@ -545,7 +545,7 @@ pair<long, bool> CAutomatedRuleSetTester::computeScore(IAttributePtr ipExpected,
 
 					// Get the found attribute
 					IAttributePtr ipTemp2 = ipFoundSubs->At(j);
-					ASSERT_RESOURCE_ALLOCATION("ELI24707", ipTemp2 != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24707", ipTemp2 != __nullptr);
 
 					// Compute the score and store the computed score in the
 					// score vector
@@ -607,7 +607,7 @@ pair<long, bool> CAutomatedRuleSetTester::computeScore(IAttributePtr ipExpected,
 				{
 					// Get the found attribute
 					IAttributePtr ipTemp = ipFoundSubs->At(it->first);
-					ASSERT_RESOURCE_ALLOCATION("ELI24709", ipTemp != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24709", ipTemp != __nullptr);
 
 					// False positive, score is AttributeSize * -1
 					lTempScore = -1 * getAttributeSize(ipTemp);
@@ -649,7 +649,7 @@ bool CAutomatedRuleSetTester::compareAttributes(IIUnknownVectorPtr ipFoundAttrib
 	bool bReturn = false;
 
 	// Do the comparison
-	if ((ipFoundAttributes != NULL) && (ipExpectedAttributes != NULL))
+	if ((ipFoundAttributes != __nullptr) && (ipExpectedAttributes != __nullptr))
 	{
 		// Compare and count all expected and found attributes
 		bReturn = compareResultVectors( ipFoundAttributes, ipExpectedAttributes );
@@ -697,7 +697,7 @@ string CAutomatedRuleSetTester::getDocumentClassificationInfo(IAFDocumentPtr ipA
 	
 	IStrToObjectMapPtr ipObjectTags(ipAFDoc->ObjectTags);
 	string strDocType("");
-	if (ipObjectTags != NULL && ipObjectTags->Size > 0)
+	if (ipObjectTags != __nullptr && ipObjectTags->Size > 0)
 	{
 		if (ipObjectTags->Contains(get_bstr_t(DOC_TYPE.c_str())) == VARIANT_TRUE)
 		{
@@ -766,14 +766,14 @@ IIUnknownVectorPtr CAutomatedRuleSetTester::getAttributesFromFile(const string& 
 		if(!isFileOrFolderValid(strAttrFileName))
 		{
 			IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI09711", ipAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09711", ipAttributes != __nullptr);
 			return ipAttributes;
 		}
 		else
 		{
 			IIUnknownVectorPtr ipAttributes =
 				m_ipAFUtility->GetAttributesFromFile(get_bstr_t(strAttrFileName.c_str()));
-			ASSERT_RESOURCE_ALLOCATION("ELI28452", ipAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28452", ipAttributes != __nullptr);
 
 			// Metadata attributes should not be considered in any test; remove them from the vector.
 			m_ipAFUtility->RemoveMetadataAttributes(ipAttributes);
@@ -792,7 +792,7 @@ string CAutomatedRuleSetTester::getRuleID(IAFDocumentPtr ipAFDoc)
 	string strRuleID("");
 
 	IStrToObjectMapPtr ipObjMap = ipAFDoc->ObjectTags;
-	if (ipObjMap != NULL && ipObjMap->Size > 0)
+	if (ipObjMap != __nullptr && ipObjMap->Size > 0)
 	{
 		// before put any attributes in the grid, add record(s) to grid
 		// to display the which rule is actually used to capture the data if any
@@ -1206,7 +1206,7 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 			{
 				// Make up a IAFDocument
 				IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-				ASSERT_RESOURCE_ALLOCATION("ELI07440", ipAFDoc != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07440", ipAFDoc != __nullptr);
 
 				// find all attributes in the text file
 				m_ipCurrentAttributes = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, 
@@ -1252,15 +1252,15 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 	{
 		try
 		{
-			if ( m_ipCurrentAttributes == NULL )
+			if ( m_ipCurrentAttributes == __nullptr )
 			{
 				m_ipCurrentAttributes.CreateInstance( CLSID_IUnknownVector );
-				ASSERT_RESOURCE_ALLOCATION("ELI09207", m_ipCurrentAttributes != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI09207", m_ipCurrentAttributes != __nullptr );
 			}
 
 			// get expected attributes from the file
 			IIUnknownVectorPtr ipExpectedAttributes = getAttributesFromFile(strEAVFile);
-			ASSERT_RESOURCE_ALLOCATION("ELI25295", ipExpectedAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25295", ipExpectedAttributes != __nullptr);
 
 			if(!m_bCaseSensitive)
 			{
@@ -1428,7 +1428,7 @@ const string CAutomatedRuleSetTester::getMasterTestFileName(IVariantVectorPtr ip
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		// get the DAT filename
 		string strMasterDatFileName = ::getAbsoluteFileName(strTCLFile, asString(_bstr_t(ipParams->GetItem(1))), true);
@@ -1467,19 +1467,19 @@ bool CAutomatedRuleSetTester::compareResultVectors(IIUnknownVectorPtr ipFound,
 		// if both found and expected are empty return true
 		// bMatched is true if the found is exactly equal to expected
 		bool bMatched = true;
-		if (( ipFound == NULL || ipFound->Size() == 0 ) && 
-			(ipExpected == NULL || ipExpected->Size() == 0 ))
+		if (( ipFound == __nullptr || ipFound->Size() == 0 ) && 
+			(ipExpected == __nullptr || ipExpected->Size() == 0 ))
 		{
 			//return a matched value
 			return bMatched;
 		}
-		else if ( ipFound == NULL || ipFound->Size() == 0 )
+		else if ( ipFound == __nullptr || ipFound->Size() == 0 )
 		{
 			// Expected attributes are counted at the beginning of the match, nothing to do here
 			// just set bMatched to false
 			bMatched = false;
 		}
-		else if ( ipExpected == NULL || ipExpected->Size() == 0 )
+		else if ( ipExpected == __nullptr || ipExpected->Size() == 0 )
 		{
 			// Nothing expected but something found and need to add to count
 			bMatched = false;
@@ -1487,7 +1487,7 @@ bool CAutomatedRuleSetTester::compareResultVectors(IIUnknownVectorPtr ipFound,
 			for (int i = 0; i < lSize; i++)
 			{
 				IAttributePtr ipFoundAttribute = ipFound->At( i );
-				ASSERT_RESOURCE_ALLOCATION("ELI24713", ipFoundAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24713", ipFoundAttribute != __nullptr);
 
 				// Get the qualified name
 				string strNewQualifiedName = getQualifiedName(ipFoundAttribute, strQualifiedAttrName,
@@ -1519,7 +1519,7 @@ bool CAutomatedRuleSetTester::compareResultVectors(IIUnknownVectorPtr ipFound,
 			{
 				// Get the found attribute
 				IAttributePtr ipFoundAttribute = ipFound->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI24697", ipFoundAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24697", ipFoundAttribute != __nullptr);
 
 				vecFoundAttributes.push_back(pair<IAttributePtr, bool>(ipFoundAttribute, false));
 			}
@@ -1532,7 +1532,7 @@ bool CAutomatedRuleSetTester::compareResultVectors(IIUnknownVectorPtr ipFound,
 			for (long i=0; i < lExpectedSize; i++)
 			{
 				IAttributePtr ipExpectedAttribute = ipExpected->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI24961", ipExpectedAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24961", ipExpectedAttribute != __nullptr);
 
 				vecExpectedAttributes.push_back(
 					pair<IAttributePtr, bool>(ipExpectedAttribute, false));
@@ -1559,7 +1559,7 @@ bool CAutomatedRuleSetTester::compareResultVectors(IIUnknownVectorPtr ipFound,
 			{
 				// Get the current expected attribute
 				IAttributePtr ipExpectedAttribute = vecExpectedAttributes[i].first;
-				ASSERT_RESOURCE_ALLOCATION("ELI24696", ipExpectedAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24696", ipExpectedAttribute != __nullptr);
 
 				// Compute the scores for each found attribute vs the current expected
 				// attribute.  For each score, fill in an AttributeScoreData struct
@@ -1596,9 +1596,9 @@ bool CAutomatedRuleSetTester::compareResultVectors(IIUnknownVectorPtr ipFound,
 				// Get the attributes from the expected and found vectors
 				IAttributePtr ipExpectedAttribute =
 					vecExpectedAttributes[it->m_lExpectedIndex].first;
-				ASSERT_RESOURCE_ALLOCATION("ELI24698", ipExpectedAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24698", ipExpectedAttribute != __nullptr);
 				IAttributePtr ipFoundAttribute = vecFoundAttributes[it->m_lFoundIndex].first;
-				ASSERT_RESOURCE_ALLOCATION("ELI24699", ipFoundAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24699", ipFoundAttribute != __nullptr);
 
 				// Mark these attributes as used
 				vecFoundAttributes[it->m_lFoundIndex].second = true;
@@ -1642,7 +1642,7 @@ bool CAutomatedRuleSetTester::compareResultVectors(IIUnknownVectorPtr ipFound,
 
 					// Get the attribute
 					IAttributePtr ipFoundAttribute = vecFoundAttributes[i].first;
-					ASSERT_RESOURCE_ALLOCATION("ELI24700", ipFoundAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24700", ipFoundAttribute != __nullptr);
 
 					// Get the qualified name
 					string strNewQualifiedName = getQualifiedName(ipFoundAttribute,
@@ -1783,7 +1783,7 @@ void CAutomatedRuleSetTester::countExpectedAttributes(IIUnknownVectorPtr ipExpec
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24718", ipExpected != NULL);
+		ASSERT_ARGUMENT("ELI24718", ipExpected != __nullptr);
 
 		// setup the separator for building Qualified names the first call this function should have 
 		// an empty string for the strTotalNamePrefix and there should not be a separator
@@ -1797,7 +1797,7 @@ void CAutomatedRuleSetTester::countExpectedAttributes(IIUnknownVectorPtr ipExpec
 		for (long i = 0; i < lSize; i++)
 		{
 			IAttributePtr ipExpectedAttribute = ipExpected->At( i );
-			ASSERT_RESOURCE_ALLOCATION("ELI24719", ipExpectedAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24719", ipExpectedAttribute != __nullptr);
 
 			string strNewQualifiedName = getQualifiedName(ipExpectedAttribute,
 				strQualifiedAttrName, strSeparator);

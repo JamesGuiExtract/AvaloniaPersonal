@@ -60,9 +60,9 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 										  IIUnknownVectorPtr& ripAttributes,
 										  string& rstrPatternID)
 {
-	ASSERT_ARGUMENT("ELI07165", ripAttributes != NULL);
-	ASSERT_ARGUMENT("ELI08644", ipSPM != NULL);
-	ASSERT_ARGUMENT("ELI08645", ipSPMFinder != NULL);
+	ASSERT_ARGUMENT("ELI07165", ripAttributes != __nullptr);
+	ASSERT_ARGUMENT("ELI08644", ipSPM != __nullptr);
+	ASSERT_ARGUMENT("ELI08645", ipSPMFinder != __nullptr);
 
 	// get the return match type from the SPM
 	UCLID_AFVALUEFINDERSLib::ESPMReturnMatchType eReturnMatchType = 
@@ -70,7 +70,7 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 
 	// get the data scorer object
 	IObjectWithDescriptionPtr ipDataScorerObjWithDesc = ipSPMFinder->DataScorer;
-	ASSERT_RESOURCE_ALLOCATION("ELI08641", ipDataScorerObjWithDesc != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08641", ipDataScorerObjWithDesc != __nullptr);
 
 	IDataScorerPtr ipDataScorer = ipDataScorerObjWithDesc->Object;
 	
@@ -83,7 +83,7 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 		|| eReturnMatchType == UCLID_AFVALUEFINDERSLib::kReturnBestMatch)
 	{
 		ipResultAttributes.CreateInstance(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI08642", ipResultAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08642", ipResultAttributes != __nullptr);
 	}
 
 	// local variable to keep track of the highest score so far
@@ -140,7 +140,7 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 			// create a local vector to store the found attributes in this
 			// iteration of pattern matching
 			IIUnknownVectorPtr ipFoundAttributes(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI08640", ipFoundAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08640", ipFoundAttributes != __nullptr);
 
 			// Create each Attribute
 			for (long n = 0; n < nSize; n++)
@@ -150,7 +150,7 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 				IUnknownPtr ipUnknown;
 				ipFoundMatches->GetKeyValue(n, &bstrMatchVariableName, &ipUnknown);
 				ITokenPtr ipToken = ipUnknown;
-				ASSERT_RESOURCE_ALLOCATION("ELI07161", ipToken != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07161", ipToken != __nullptr);
 				
 				// get the related type name
 				string strAttributeType = asString(bstrMatchVariableName);
@@ -168,7 +168,7 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 			// the matches.  If a DataScorer has been provided
 			// then, get the score of the attributes
 			long nThisDataScore = 0;
-			if (ipDataScorer != NULL)
+			if (ipDataScorer != __nullptr)
 			{
 				// get the score of the data
 				nThisDataScore = ipDataScorer->GetDataScore2(ipFoundAttributes);
@@ -247,7 +247,7 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 	// or if the match-return-type was either "return all matches"
 	// or "return best match"
 	// if any attributes were found, return them
-	if (ipResultAttributes != NULL && ipResultAttributes->Size() > 0)
+	if (ipResultAttributes != __nullptr && ipResultAttributes->Size() > 0)
 	{
 		// update the outer scope variables
 		ripAttributes = ipResultAttributes;
@@ -264,17 +264,17 @@ void PatternFileInterpreter::readPatterns(const string& strInput,
 										  bool bInputIsFile,
 										  bool bClearPatterns)
 {
-	if (m_ipVariables == NULL)
+	if (m_ipVariables == __nullptr)
 	{
 		m_ipVariables.CreateInstance(CLSID_StrToStrMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI07143", m_ipVariables != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07143", m_ipVariables != __nullptr);
 	}
 
 	// Create utility object, if needed
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		m_ipMiscUtils.CreateInstance( CLSID_MiscUtils );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07640", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07640", m_ipMiscUtils != __nullptr );
 	}
 
 	if (bClearPatterns)
@@ -427,13 +427,13 @@ IAttributePtr PatternFileInterpreter::generateAttribute(ISpatialStringPtr ipOrig
 		// the substring out from original spatial string ipOriginalText
 		// and store it in the Attribute.
 		ISpatialStringPtr ipAttributeValue = ipOriginalText->GetSubString(nStartPos, nEndPos);
-		ASSERT_RESOURCE_ALLOCATION("ELI07162", ipAttributeValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07162", ipAttributeValue != __nullptr);
 
 		// make sure the entity finder finds something
 		if (ipAttributeValue->IsEmpty() == VARIANT_FALSE)
 		{
 			IAttributePtr ipAttribute(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI07163", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07163", ipAttribute != __nullptr);
 
 			ipAttribute->Type = _bstr_t(strAttributeType.c_str());
 			ipAttribute->Value = ipAttributeValue;

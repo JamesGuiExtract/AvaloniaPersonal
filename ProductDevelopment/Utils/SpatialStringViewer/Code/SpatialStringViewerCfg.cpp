@@ -28,9 +28,9 @@ SpatialStringViewerCfg::SpatialStringViewerCfg(CSpatialStringViewerDlg *pDlg)
 	try
 	{
 		// create an instance of the registry persistence manager
-		m_apCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(new 
+		m_apCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(new 
 			RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-		ASSERT_RESOURCE_ALLOCATION("ELI06724", m_apCfgMgr.get() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06724", m_apCfgMgr.get() != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06725")
 }

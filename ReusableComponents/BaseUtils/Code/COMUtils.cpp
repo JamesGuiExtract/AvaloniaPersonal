@@ -255,7 +255,7 @@ void readObjectFromStream(IPersistStreamPtr& ipObj, IStream *pStream, string str
 		try
 		{
 			// reset the object
-			ipObj = NULL;
+			ipObj = __nullptr;
 
 			// read class ID from the stream
 			CLSID clsID;
@@ -348,42 +348,6 @@ _bstr_t EXPORT_BaseUtils get_bstr_t(string str)
 //-------------------------------------------------------------------------------------------------
 _bstr_t EXPORT_BaseUtils get_bstr_t(const char* szStr)
 {	
-	/* This was the original reason this function was used it is no longer required
-	Per Andrew email 12-13-2004
-	bstr_t get_bstr_t(string str);
-	_bstr_t get_bstr_t(const char* szStr);
-
-	Why is this important?
-	- It has been discovered that _bstr_t cannot (for some unknown and
-	unexplained my microsoft reason) handle conversion of very long character
-	arrays.  We have thousands of calls in our code that look like this:
-
-	string strText;
-	... strText is assigned to some huge string ...
-	ipComponent->SomeComMethod(_bstr_t(strText.c_str()), bOtherParams);
-
-	If strText is large, for instance one of our XML Files, the constructor
-	throws an exception.  An exception is also thrown in cases like the
-	following.
-
-	string strText;
-	... strText is assigned to some huge string ...
-	_bstr_t _bstr;
-	_bstr = strText;
-
-	>From now on ALWAYS use get_bstr_t(xxx) when you need to convert to a BSTR or
-	_bstr_t.
-	In addition we will need to systematically make this change everywhere in
-	our software (roughly 2700 places).
-
-	long nLen = strlen(szStr)+1;
-	WCHAR *wstr = new WCHAR[nLen]; // This was changed from auto_ptr since pointers to arrays should not be using auto_ptr's
-	MultiByteToWideChar(CP_ACP, 0, szStr, nLen, wstr, nLen );
-	_bstr_t _bstr(wstr);
-	
-	delete [] wstr;
-	return _bstr;
-	*/
 	// If the input string is null return an empty _bstr_t
 	if ( szStr == NULL )
 	{
@@ -414,15 +378,15 @@ std::string EXPORT_BaseUtils asString(BSTR strVal)
 _bstr_t EXPORT_BaseUtils writeObjectToBSTR(IPersistStreamPtr& ipObj, BOOL bClearDirty)
 {
 	// Create a stream
-	IStreamPtr ipStream = NULL;
+	IStreamPtr ipStream = __nullptr;
 	CreateStreamOnHGlobal(NULL, TRUE, &ipStream);
-	if (ipStream == NULL)
+	if (ipStream == __nullptr)
 	{
 		throw UCLIDException("ELI06691", "Unable to create stream object!");
 	}
 
 	// Save the object to the stream
-	ASSERT_RESOURCE_ALLOCATION("ELI11062", ipObj != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI11062", ipObj != __nullptr);
 	writeObjectToStream(ipObj, ipStream, "ELI11076", bClearDirty);
 
 	// Set the stream seek pointer back to the beginning of the stream
@@ -498,10 +462,10 @@ _bstr_t EXPORT_BaseUtils writeObjectToBSTR(IPersistStreamPtr& ipObj, BOOL bClear
 //-------------------------------------------------------------------------------------------------
 void EXPORT_BaseUtils readObjectFromBSTR(IPersistStreamPtr& ipObj, _bstr_t _bstr)
 {
-	IStreamPtr ipStream = NULL;
+	IStreamPtr ipStream = __nullptr;
 	CreateStreamOnHGlobal(NULL, TRUE, &ipStream);
 
-	if (ipStream == NULL)
+	if (ipStream == __nullptr)
 	{
 		throw UCLIDException("ELI19322", "Unable to create stream object!");
 	}
@@ -539,12 +503,12 @@ void EXPORT_BaseUtils readObjectFromBSTR(IPersistStreamPtr& ipObj, _bstr_t _bstr
 void EXPORT_BaseUtils clearDirtyFlag(IPersistStreamPtr& ipObj)
 {
 	// validate argument
-	ASSERT_ARGUMENT("ELI20263", ipObj != NULL);
+	ASSERT_ARGUMENT("ELI20263", ipObj != __nullptr);
 
 	// create a stream object
 	IStreamPtr ipStream;
 	CreateStreamOnHGlobal(NULL, TRUE, &ipStream);
-	ASSERT_RESOURCE_ALLOCATION("ELI20262", ipStream != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20262", ipStream != __nullptr);
 
 	// clear the dirty flag by saving the object to the stream
 	HANDLE_HRESULT(ipObj->Save(ipStream, TRUE), "ELI20260", "Unable to clear dirty flag.", ipObj, 
@@ -556,7 +520,7 @@ void EXPORT_BaseUtils clearDirtyFlag(IPersistStreamPtr& ipObj)
 HRESULT EXPORT_BaseUtils waitForStgFileAccess(BSTR strFileName, IStorage** ppStorage)
 {
 	// Ensure the file name is not empty string
-	ASSERT_ARGUMENT("ELI23899", strFileName != NULL && _bstr_t(strFileName, true).length() > 0);
+	ASSERT_ARGUMENT("ELI23899", strFileName != __nullptr && _bstr_t(strFileName, true).length() > 0);
 
 	// Get the timeout and retry count
 	int iTimeout = -1;
@@ -570,7 +534,7 @@ HRESULT EXPORT_BaseUtils waitForStgFileAccess(BSTR strFileName, IStorage** ppSto
 	do
 	{
 		// Open the file storage
-		IStoragePtr ipStorage = NULL;
+		IStoragePtr ipStorage = __nullptr;
 		STGOPTIONS options = {gSTORAGE_VERSION};
 		StgOpenStorageEx(strFileName, gdwSTORAGE_ACCESS_MODE, STGFMT_DOCFILE, 0, &options, 
 			0, IID_IStorage, (void**)&ipStorage);
@@ -578,15 +542,15 @@ HRESULT EXPORT_BaseUtils waitForStgFileAccess(BSTR strFileName, IStorage** ppSto
 		// Check the return value
 		bRtnValue = hr == S_OK;
 
-		// If the file was successfully opened AND pStorage != NULL then
+		// If the file was successfully opened AND pStorage != __nullptr then
 		// set *ppStorage to the open storage object
-		if (bRtnValue && ppStorage != NULL)
+		if (bRtnValue && ppStorage != __nullptr)
 		{
 			*ppStorage = ipStorage.Detach();
 		}
 		else
 		{
-			ipStorage = NULL;
+			ipStorage = __nullptr;
 		}
 
 		// if file is not accessible check retry count 
@@ -620,8 +584,8 @@ HRESULT EXPORT_BaseUtils waitForStgFileAccess(BSTR strFileName, IStorage** ppSto
 HRESULT EXPORT_BaseUtils waitForStgFileCreate(BSTR strFileName, IStorage** ppStorage, DWORD dwMode)
 {
 	// Ensure the file name is not empty string
-	ASSERT_ARGUMENT("ELI24711", strFileName != NULL && _bstr_t(strFileName, true).length() > 0);
-	ASSERT_ARGUMENT("ELI24712", ppStorage != NULL);
+	ASSERT_ARGUMENT("ELI24711", strFileName != __nullptr && _bstr_t(strFileName, true).length() > 0);
+	ASSERT_ARGUMENT("ELI24712", ppStorage != __nullptr);
 
 	// Get the timeout and retry count
 	int iTimeout = -1;
@@ -635,7 +599,7 @@ HRESULT EXPORT_BaseUtils waitForStgFileCreate(BSTR strFileName, IStorage** ppSto
 	do
 	{
 		// Open the file storage
-		IStoragePtr ipStorage = NULL;
+		IStoragePtr ipStorage = __nullptr;
 		hr = StgCreateStorageEx(strFileName, dwMode, STGFMT_DOCFILE, 0, NULL, 0, IID_IStorage, 
 			(void**)&ipStorage);
 
@@ -650,7 +614,7 @@ HRESULT EXPORT_BaseUtils waitForStgFileCreate(BSTR strFileName, IStorage** ppSto
 		}
 		else
 		{
-			ipStorage = NULL;
+			ipStorage = __nullptr;
 		}
 
 		// if file is not accessible check retry count 
@@ -723,8 +687,8 @@ void EXPORT_BaseUtils readObjectFromFile(IPersistStreamPtr ipObject, BSTR bstrFi
 	}
 
 	// Ensure the stream and storage are closed [LRCAU #5078]
-	ipStream = NULL;
-	ipStorage = NULL;
+	ipStream = __nullptr;
+	ipStorage = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void readStorageFromFile(IStorage** ppStorage, BSTR bstrFileName, bool bEncrypted)
@@ -743,8 +707,8 @@ void readStorageFromFile(IStorage** ppStorage, BSTR bstrFileName, bool bEncrypte
 //-------------------------------------------------------------------------------------------------
 void readStreamFromStorage(IStream** ppStream, IStoragePtr ipStorage, BSTR bstrStreamName)
 {
-	ASSERT_ARGUMENT("ELI25409", ppStream != NULL);
-	ASSERT_ARGUMENT("ELI25410", ipStorage != NULL);
+	ASSERT_ARGUMENT("ELI25409", ppStream != __nullptr);
+	ASSERT_ARGUMENT("ELI25410", ipStorage != __nullptr);
 
 	HRESULT hr = ipStorage->OpenStream(bstrStreamName, 0, gdwSTREAM_ACCESS_MODE, 0, ppStream);
 	if (*ppStream == NULL || FAILED(hr))
@@ -761,7 +725,7 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI25598", ipObject != NULL);
+		ASSERT_ARGUMENT("ELI25598", ipObject != __nullptr);
 
 		// Create a directory for the file if necessary
 		string strFileName = asString(bstrFileName);
@@ -770,7 +734,7 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 		// Create the file storage object
 		IStoragePtr ipStorage;
 		HRESULT hr = waitForStgFileCreate(bstrFileName, &ipStorage, gdwSTORAGE_CREATE_MODE);
-		if (ipStorage == NULL || FAILED(hr))
+		if (ipStorage == __nullptr || FAILED(hr))
 		{
 			UCLIDException ue("ELI25588", "Unable to create file storage object.");
 			ue.addDebugInfo("File name", strFileName);
@@ -783,7 +747,7 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 			// Create a stream within the storage object to store the object
 			IStreamPtr ipStream;
 			hr = ipStorage->CreateStream(bstrObjectName, gdwSTREAM_CREATE_MODE, 0, 0, &ipStream);
-			if (ipStream == NULL || FAILED(hr))
+			if (ipStream == __nullptr || FAILED(hr))
 			{
 				UCLIDException ue("ELI25589", "Unable to create stream object.");
 				ue.addDebugInfo("File name", strFileName);
@@ -808,8 +772,8 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 			}
 
 			// Ensure the stream and storage are closed [LRCAU #5078]
-			ipStream = NULL;
-			ipStorage = NULL;
+			ipStream = __nullptr;
+			ipStorage = __nullptr;
 		}
 		catch (...)
 		{
@@ -834,7 +798,7 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 //-------------------------------------------------------------------------------------------------
 void readStorageFromUnencryptedFile(IStorage** ppStorage, BSTR bstrFileName)
 {
-	ASSERT_ARGUMENT("ELI25411", ppStorage != NULL);
+	ASSERT_ARGUMENT("ELI25411", ppStorage != __nullptr);
 
 	STGOPTIONS options = {gSTORAGE_VERSION};
 	HRESULT hr = StgOpenStorageEx(bstrFileName, gdwSTORAGE_ACCESS_MODE, STGFMT_DOCFILE, 0, 
@@ -856,7 +820,7 @@ void readStorageFromUnencryptedFile(IStorage** ppStorage, BSTR bstrFileName)
 //-------------------------------------------------------------------------------------------------
 void readStorageFromEncryptedFile(IStorage** ppStorage, BSTR bstrFileName)
 {
-	ASSERT_ARGUMENT("ELI25412", ppStorage != NULL);
+	ASSERT_ARGUMENT("ELI25412", ppStorage != __nullptr);
 
 	string strFileName = asString(bstrFileName);
 
@@ -907,7 +871,7 @@ void readStorageFromEncryptedFile(IStorage** ppStorage, BSTR bstrFileName)
 	}
 	catch (...)
 	{
-		if (pucDecryptedBytes != NULL)
+		if (pucDecryptedBytes != __nullptr)
 		{
 			delete [] pucDecryptedBytes;
 			pucDecryptedBytes = NULL;
@@ -917,7 +881,7 @@ void readStorageFromEncryptedFile(IStorage** ppStorage, BSTR bstrFileName)
 	}
 
 	// Clear the memory from the file decryption
-	if (pucDecryptedBytes != NULL)
+	if (pucDecryptedBytes != __nullptr)
 	{
 		delete [] pucDecryptedBytes;
 		pucDecryptedBytes = NULL;

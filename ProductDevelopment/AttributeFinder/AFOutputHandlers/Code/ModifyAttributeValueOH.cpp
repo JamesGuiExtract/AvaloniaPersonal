@@ -26,7 +26,7 @@ CModifyAttributeValueOH::CModifyAttributeValueOH()
   m_bCreateSubAttribute(false)
 {
 	m_ipAFUtil.CreateInstance(CLSID_AFUtility);
-	ASSERT_RESOURCE_ALLOCATION("ELI08744", m_ipAFUtil != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08744", m_ipAFUtil != __nullptr);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ STDMETHODIMP CModifyAttributeValueOH::get_AttributeQuery(/*[out, retval]*/ BSTR 
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI08533", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI08533", pVal != __nullptr );
 
 		// Return the Attribute Name
 		*pVal = _bstr_t( m_strAttributeQuery.c_str() ).Detach();
@@ -125,7 +125,7 @@ STDMETHODIMP CModifyAttributeValueOH::get_AttributeName(/*[out, retval]*/ BSTR *
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI10010", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI10010", pVal != __nullptr );
 
 		// Return the Attribute Name
 		*pVal = _bstr_t(m_strAttributeName.c_str()).Detach();
@@ -173,7 +173,7 @@ STDMETHODIMP CModifyAttributeValueOH::get_AttributeValue(/*[out, retval]*/ BSTR 
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI08535", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI08535", pVal != __nullptr );
 
 		// Return the Attribute Value
 		*pVal = _bstr_t( m_strAttributeValue.c_str() ).Detach();
@@ -211,7 +211,7 @@ STDMETHODIMP CModifyAttributeValueOH::get_AttributeType(/*[out, retval]*/ BSTR *
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI08733", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI08733", pVal != __nullptr );
 
 		// Return the Attribute Type
 		*pVal = _bstr_t( m_strAttributeType.c_str() ).Detach();
@@ -409,19 +409,19 @@ STDMETHODIMP CModifyAttributeValueOH::raw_ProcessOutput(IIUnknownVector* pAttrib
 
 		// Local copy of original Attributes
 		IIUnknownVectorPtr ipOrigAttributes( pAttributes );
-		ASSERT_ARGUMENT("ELI08544", ipOrigAttributes != NULL);
+		ASSERT_ARGUMENT("ELI08544", ipOrigAttributes != __nullptr);
 
 		// query the vector for desired attributes
 		IIUnknownVectorPtr ipQueriedAttributes = m_ipAFUtil->QueryAttributes(
 				ipOrigAttributes, _bstr_t(m_strAttributeQuery.c_str()), VARIANT_FALSE);
 
-		if (ipQueriedAttributes != NULL)
+		if (ipQueriedAttributes != __nullptr)
 		{
 			long nMatchedNum = ipQueriedAttributes->Size();
 			for (long n=0; n<nMatchedNum; n++)
 			{
 				IAttributePtr ipMatchedAttr = ipQueriedAttributes->At(n);
-				ASSERT_RESOURCE_ALLOCATION("ELI08542", ipMatchedAttr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI08542", ipMatchedAttr != __nullptr);
 
 				// This is a pointer to the attribute that will be updated with
 				// new info 
@@ -431,9 +431,9 @@ STDMETHODIMP CModifyAttributeValueOH::raw_ProcessOutput(IIUnknownVector* pAttrib
 				// I the create subAttr
 				if (m_bCreateSubAttribute)
 				{
-					ipUpdateAttr = NULL;
+					ipUpdateAttr = __nullptr;
 					ipUpdateAttr.CreateInstance(CLSID_Attribute);
-					ASSERT_RESOURCE_ALLOCATION("ELI10268", ipUpdateAttr != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI10268", ipUpdateAttr != __nullptr);
 				}
 				// modify attribute value or type
 				if (m_bSetAttributeName)
@@ -464,7 +464,7 @@ STDMETHODIMP CModifyAttributeValueOH::raw_ProcessOutput(IIUnknownVector* pAttrib
 				if (m_bCreateSubAttribute)
 				{
 					IIUnknownVectorPtr ipSub = ipMatchedAttr->SubAttributes;
-					ASSERT_RESOURCE_ALLOCATION( "ELI15525", ipSub != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI15525", ipSub != __nullptr );
 					ipSub->PushBack(ipUpdateAttr);
 				}
 			}
@@ -552,7 +552,7 @@ STDMETHODIMP CModifyAttributeValueOH::raw_GetComponentDescription(BSTR * pstrCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19544", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19544", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Modify attributes").Detach();
 	}
@@ -572,7 +572,7 @@ STDMETHODIMP CModifyAttributeValueOH::raw_CopyFrom(IUnknown *pObject)
 	{
 		
 		UCLID_AFOUTPUTHANDLERSLib::IModifyAttributeValueOHPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION( "ELI08547", ipSource != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08547", ipSource != __nullptr );
 		
 		// Copy Attribute Name and Value
 		m_strAttributeQuery = asString( ipSource->AttributeQuery );
@@ -605,7 +605,7 @@ STDMETHODIMP CModifyAttributeValueOH::raw_Clone(IUnknown **pObject)
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_ModifyAttributeValueOH );
-		ASSERT_RESOURCE_ALLOCATION( "ELI08548", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08548", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom( ipUnk );

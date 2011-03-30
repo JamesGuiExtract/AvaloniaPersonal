@@ -23,8 +23,8 @@ CClipboardObjectManager::CClipboardObjectManager()
 {
 	try
 	{
-		m_apCBMWnd = auto_ptr<ClipboardManagerWnd>(new ClipboardManagerWnd());
-		ASSERT_RESOURCE_ALLOCATION("ELI05553", m_apCBMWnd.get() != NULL);
+		m_apCBMWnd = unique_ptr<ClipboardManagerWnd>(new ClipboardManagerWnd());
+		ASSERT_RESOURCE_ALLOCATION("ELI05553", m_apCBMWnd.get() != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI05551")
 }
@@ -156,7 +156,7 @@ STDMETHODIMP CClipboardObjectManager::IUnknownVectorIsOWDOfType(IID riid, VARIAN
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17576", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI17576", pbValue != __nullptr);
 
 		// call the corresponding method on the underlying clipboard manager
 		// window object
@@ -220,7 +220,7 @@ void CClipboardObjectManager::notifyCopiedFromClipboard(const IUnknownPtr& ipObj
 	{
 		// Check if the object is a clipboard copyable object
 		UCLID_COMUTILSLib::IClipboardCopyablePtr ipClip = ipObj;
-		if (ipClip != NULL)
+		if (ipClip != __nullptr)
 		{
 			// Call notify
 			ipClip->NotifyCopiedFromClipboard();
@@ -229,7 +229,7 @@ void CClipboardObjectManager::notifyCopiedFromClipboard(const IUnknownPtr& ipObj
 
 		// Check if the object is an object with description object
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipOWD = ipObj;
-		if (ipOWD != NULL)
+		if (ipOWD != __nullptr)
 		{
 			notifyCopiedFromClipboard(ipOWD->Object);
 			return;
@@ -237,7 +237,7 @@ void CClipboardObjectManager::notifyCopiedFromClipboard(const IUnknownPtr& ipObj
 
 		// Check if this object is an IUnknownVector
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipVec = ipObj;
-		if (ipVec != NULL)
+		if (ipVec != __nullptr)
 		{
 			// Check each item in the IUnknownVector
 			long nSize = ipVec->Size();

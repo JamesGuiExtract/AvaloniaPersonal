@@ -129,10 +129,10 @@ LRESULT CDocumentClassifierPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPa
 //--------------------------------------------------------------------------------------------------
 void CDocumentClassifierPP::populateComboBox(const string& strCurrentText)
 {
-	if (m_ipAFUtility == NULL)
+	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI07121", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07121", m_ipAFUtility != __nullptr);
 	}
 
 	// get \ComponentData\DocumentClassifiers folder

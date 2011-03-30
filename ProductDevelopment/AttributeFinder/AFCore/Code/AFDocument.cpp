@@ -11,9 +11,9 @@
 // CAFDocument
 //-------------------------------------------------------------------------------------------------
 CAFDocument::CAFDocument()
-: m_ipText(NULL),
-  m_ipStringTags(NULL),
-  m_ipObjectTags(NULL)
+: m_ipText(__nullptr),
+  m_ipStringTags(__nullptr),
+  m_ipObjectTags(__nullptr)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -55,10 +55,10 @@ STDMETHODIMP CAFDocument::get_Text(ISpatialString **pVal)
 	{
 		validateLicense();
 
-		if (m_ipText == NULL)
+		if (m_ipText == __nullptr)
 		{
 			m_ipText.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI05870", m_ipText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05870", m_ipText != __nullptr);
 		}
 
 		ISpatialStringPtr ipShallowCopy = m_ipText;
@@ -92,10 +92,10 @@ STDMETHODIMP CAFDocument::get_StringTags(IStrToStrMap **pVal)
 	{
 		validateLicense();
 
-		if (m_ipStringTags == NULL)
+		if (m_ipStringTags == __nullptr)
 		{
 			m_ipStringTags.CreateInstance(CLSID_StrToStrMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI05871", m_ipStringTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05871", m_ipStringTags != __nullptr);
 		}
 
 		IStrToStrMapPtr ipShallowCopy = m_ipStringTags;
@@ -129,10 +129,10 @@ STDMETHODIMP CAFDocument::get_ObjectTags(IStrToObjectMap **pVal)
 	{
 		validateLicense();
 
-		if (m_ipObjectTags == NULL)
+		if (m_ipObjectTags == __nullptr)
 		{
 			m_ipObjectTags.CreateInstance(CLSID_StrToObjectMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI05872", m_ipObjectTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05872", m_ipObjectTags != __nullptr);
 		}
 
 		IStrToObjectMapPtr ipShallowCopy = m_ipObjectTags;
@@ -194,27 +194,27 @@ STDMETHODIMP CAFDocument::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFCORELib::IAFDocumentPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08201", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08201", ipSource != __nullptr);
 	
 		ISpatialStringPtr ipSS = ipSource->GetText();
 		if (ipSS)
 		{
 			ICopyableObjectPtr ipCopyObj(ipSS);
-			ASSERT_RESOURCE_ALLOCATION("ELI08326", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08326", ipCopyObj != __nullptr);
 			m_ipText = ipCopyObj->Clone();
 		}
 		IStrToStrMapPtr ipSTS = ipSource->GetStringTags();
 		if (ipSTS)
 		{
 			ICopyableObjectPtr ipCopyObj(ipSTS);
-			ASSERT_RESOURCE_ALLOCATION("ELI08327", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08327", ipCopyObj != __nullptr);
 			m_ipStringTags = ipCopyObj->Clone();
 		}
 		IStrToObjectMapPtr ipSTOM = ipSource->GetObjectTags();
 		if (ipSTOM)
 		{
 			ICopyableObjectPtr ipCopyObj(ipSTOM);
-			ASSERT_RESOURCE_ALLOCATION("ELI08328", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08328", ipCopyObj != __nullptr);
 			m_ipObjectTags = ipCopyObj->Clone();
 		}
 	}
@@ -235,7 +235,7 @@ STDMETHODIMP CAFDocument::raw_Clone(IUnknown **pObject)
 		// Create a new IAFDocument object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI05853", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05853", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

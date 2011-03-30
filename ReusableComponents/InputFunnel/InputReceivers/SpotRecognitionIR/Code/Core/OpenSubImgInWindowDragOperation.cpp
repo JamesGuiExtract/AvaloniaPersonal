@@ -27,7 +27,7 @@ void OpenSubImgInWindowDragOperation::processDragOperation(const CartographicPoi
 	CComBSTR bstrTooltip, bstrTrainingFile;
 	m_ipSRIR->GetSubImageHandler(&ipSubImageHandler, &bstrTooltip, &bstrTrainingFile);
 
-	if (ipSubImageHandler == NULL)
+	if (ipSubImageHandler == __nullptr)
 	{
 		return;
 	}

@@ -50,7 +50,7 @@ public:
 
 	static inline void sDeleteInstance()
     {
-		if (ms_apInstance != NULL)
+		if (ms_apInstance != __nullptr)
 		{
 			// This will delete the existing pointer and set instance to NULL
 			// Calling sDeleteInstance after using the pointer is not required unless

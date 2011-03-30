@@ -44,7 +44,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 //--------------------------------------------------------------------------------------------------
 // Globals
 //--------------------------------------------------------------------------------------------------
-auto_ptr<ProcessInformationLogger> gapLogProcessInfo; // pointer to the ProcessInformationLogger
+unique_ptr<ProcessInformationLogger> gapLogProcessInfo; // pointer to the ProcessInformationLogger
 
 bool bCtrlCHandled = false;
 
@@ -430,16 +430,16 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 					}
 
 					// load the user arguments into the ProcessInformationLogger
-					gapLogProcessInfo = auto_ptr<ProcessInformationLogger> 
-						(new ProcessInformationLogger(setProcessIDs, setProcessNames, 
-						lRefreshInterval, strWorkingDirectory));
+					gapLogProcessInfo.reset(new ProcessInformationLogger(setProcessIDs,
+						setProcessNames, lRefreshInterval, strWorkingDirectory));
 
 					cout << "Beginning logging - Ctrl+C to end. " << endl;
+
 					// start logging
 					// NOTE: this will not return until user presses Ctrl+C
 					gapLogProcessInfo->start();
 
-					// reset the auto_ptr to NULL (must do this before call to CoUninitialize)
+					// reset the unique_ptr to NULL (must do this before call to CoUninitialize)
 					gapLogProcessInfo.reset();
 
 					CoUninitialize();		

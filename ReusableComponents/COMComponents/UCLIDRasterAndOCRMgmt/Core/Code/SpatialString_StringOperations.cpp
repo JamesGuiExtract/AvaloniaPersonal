@@ -20,7 +20,7 @@ STDMETHODIMP CSpatialString::Insert(long nPos, ISpatialString *pString)
 		validateLicense();
 
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipString(pString);
-		ASSERT_ARGUMENT("ELI25883", ipString != NULL);
+		ASSERT_ARGUMENT("ELI25883", ipString != __nullptr);
 
 		insert(nPos, ipString);
 	}
@@ -40,7 +40,7 @@ STDMETHODIMP CSpatialString::Append(ISpatialString *pString)
 		
 		// verify valid argument sent in
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStringToAppend(pString);
-		ASSERT_RESOURCE_ALLOCATION("ELI06456", ipStringToAppend != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06456", ipStringToAppend != __nullptr);
 
 		// Append is an insert at the end of the string.
 		append(ipStringToAppend);
@@ -57,14 +57,14 @@ STDMETHODIMP CSpatialString::GetSubString(long nStart, long nEnd,
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25884", pSubString != NULL);
+		ASSERT_ARGUMENT("ELI25884", pSubString != __nullptr);
 
 		// Check license
 		validateLicense();
 
 		// Get the sub-string
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipString = getSubString(nStart, nEnd);
-		ASSERT_RESOURCE_ALLOCATION("ELI25885", ipString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25885", ipString != __nullptr);
 
 		// Set the return value
 		*pSubString = (ISpatialString*) ipString.Detach();
@@ -320,7 +320,7 @@ STDMETHODIMP CSpatialString::FindFirstInstanceOfChar(long nChar, long nStartPos,
 		validateLicense();
 
 		// ensure valid arguments
-		ASSERT_ARGUMENT("ELI06522", pMatchPos != NULL);
+		ASSERT_ARGUMENT("ELI06522", pMatchPos != __nullptr);
 		verifyValidIndex(nStartPos);
 
 		// return position
@@ -343,7 +343,7 @@ STDMETHODIMP CSpatialString::Tokenize(BSTR strDelimiter, IIUnknownVector **pvecI
 
 		// Create vector for resulting ISpatialStrings
 		IIUnknownVectorPtr ipTokens(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI06597", ipTokens != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06597", ipTokens != __nullptr);
 
 		// find delimiter
 		string stdstrDelimiter = asString(strDelimiter);
@@ -361,7 +361,7 @@ STDMETHODIMP CSpatialString::Tokenize(BSTR strDelimiter, IIUnknownVector **pvecI
 			{
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipItem =
 					getSubString(nStartPos, nDelimPos - 1);
-				ASSERT_RESOURCE_ALLOCATION("ELI15419", ipItem != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15419", ipItem != __nullptr);
 
 				// Push the sub string from between the two delimeters onto the list of tokens
 				ipTokens->PushBack(ipItem);
@@ -381,7 +381,7 @@ STDMETHODIMP CSpatialString::Tokenize(BSTR strDelimiter, IIUnknownVector **pvecI
 				// get the rest of the text after last found delimiter
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLastItem = 
 					getSubString(nStartPos, m_strString.size() - 1);
-				ASSERT_RESOURCE_ALLOCATION("ELI16918", ipLastItem != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI16918", ipLastItem != __nullptr);
 				ipTokens->PushBack(ipLastItem);
 				break;
 			}
@@ -389,7 +389,7 @@ STDMETHODIMP CSpatialString::Tokenize(BSTR strDelimiter, IIUnknownVector **pvecI
 			{
 				// create an empty spatial string
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLastItem(CLSID_SpatialString);
-				ASSERT_RESOURCE_ALLOCATION("ELI06647", ipLastItem != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06647", ipLastItem != __nullptr);
 				ipTokens->PushBack(ipLastItem);
 				break;
 			}
@@ -564,7 +564,7 @@ STDMETHODIMP CSpatialString::FindFirstInstanceOfString(BSTR strSearchString, lon
 		validateLicense();
 
 		// Ensure valid arguments
-		ASSERT_ARGUMENT( "ELI10451", pMatchPos != NULL );
+		ASSERT_ARGUMENT( "ELI10451", pMatchPos != __nullptr );
 		verifyValidIndex( nStartPos );
 
 		// Return position from case-sensitive search
@@ -587,7 +587,7 @@ STDMETHODIMP CSpatialString::FindFirstInstanceOfStringCIS(BSTR strSearchString, 
 		validateLicense();
 
 		// Ensure valid arguments
-		ASSERT_ARGUMENT( "ELI19099", pMatchPos != NULL );
+		ASSERT_ARGUMENT( "ELI19099", pMatchPos != __nullptr );
 		verifyValidIndex( nStartPos );
 
 		// Return position from case-insensitive search
@@ -611,7 +611,7 @@ STDMETHODIMP CSpatialString::ContainsStringInVector(IVariantVector* pVecBSTRs,
 
 		// Make sure the parser passed is not NULL.
 		IRegularExprParserPtr ipRegExprParser(pRegExprParser);
-		ASSERT_ARGUMENT("ELI22548", ipRegExprParser != NULL );
+		ASSERT_ARGUMENT("ELI22548", ipRegExprParser != __nullptr );
 
 		// for storing endpoints of found string
 		long lStart, lEnd;
@@ -672,8 +672,8 @@ STDMETHODIMP CSpatialString::FindFirstItemInVector(IVariantVector* pList,
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25886", plStart != NULL);
-		ASSERT_ARGUMENT("ELI25887", plEnd != NULL);
+		ASSERT_ARGUMENT("ELI25886", plStart != __nullptr);
+		ASSERT_ARGUMENT("ELI25887", plEnd != __nullptr);
 
 		// Check licensing
 		validateLicense();
@@ -702,8 +702,8 @@ STDMETHODIMP CSpatialString::FindFirstItemInRegExpVector(IVariantVector* pList,
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25888", plStart != NULL);
-		ASSERT_ARGUMENT("ELI25889", plEnd != NULL);
+		ASSERT_ARGUMENT("ELI25888", plStart != __nullptr);
+		ASSERT_ARGUMENT("ELI25889", plEnd != __nullptr);
 
 		// Check licensing
 		validateLicense();

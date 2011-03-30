@@ -28,9 +28,9 @@ ScansoftOCRCfg::ScansoftOCRCfg()
 	try
 	{
 		// create an instance of the registry persistence manager
-		m_pCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		m_pCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-		ASSERT_RESOURCE_ALLOCATION("ELI10629", m_pCfgMgr.get() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10629", m_pCfgMgr.get() != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI10628")
 }

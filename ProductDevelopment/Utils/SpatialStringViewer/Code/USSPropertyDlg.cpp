@@ -57,7 +57,7 @@ USSPropertyDlg::~USSPropertyDlg()
 {
 	try
 	{
-		m_ipSpatialPageInfoCollection = NULL;
+		m_ipSpatialPageInfoCollection = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16495");
 }
@@ -166,7 +166,7 @@ void USSPropertyDlg::populateListControl()
 {
 	// get vector of keys from the map of SpatialPageInfoPtrs.
 	IVariantVectorPtr ipKeyVect = m_ipSpatialPageInfoCollection->GetKeys();
-	ASSERT_RESOURCE_ALLOCATION("ELI16820", ipKeyVect != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16820", ipKeyVect != __nullptr);
 	
 	long lVectorSize = ipKeyVect->GetSize();
 	
@@ -179,7 +179,7 @@ void USSPropertyDlg::populateListControl()
 		
 		// now retrieve the ISpatialPageInfoPtr
 		ISpatialPageInfoPtr ipPageInfo = m_ipSpatialPageInfoCollection->GetValue(lPage);
-		if (ipPageInfo == NULL)
+		if (ipPageInfo == __nullptr)
 		{
 			UCLIDException ue("ELI16821", "No spatial page info for page!");
 			ue.addDebugInfo("Page", lPage);

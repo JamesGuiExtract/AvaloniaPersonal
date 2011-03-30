@@ -119,8 +119,8 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 									  long nHeight, BITMAPHANDLE *phSubImageBitmap)
 {
 	// Check bitmap handles
-	ASSERT_ARGUMENT("ELI15834", phBitmap != NULL);
-	ASSERT_ARGUMENT("ELI15835", phSubImageBitmap != NULL);
+	ASSERT_ARGUMENT("ELI15834", phBitmap != __nullptr);
+	ASSERT_ARGUMENT("ELI15835", phSubImageBitmap != __nullptr);
 
 	// determine the bounding Rectangle of the inclined ImageZone
 	// this rectangle is actually used to rotate the text to 0 degree inclination
@@ -223,7 +223,7 @@ void extractZoneAsImage(BITMAPHANDLE *phBitmap, long nStartX,
 
 {
 	// Check bitmap handle
-	ASSERT_ARGUMENT("ELI15836", phBitmap != NULL);
+	ASSERT_ARGUMENT("ELI15836", phBitmap != __nullptr);
 
 	BITMAPHANDLE hBitmapImageZone;
 	LeadToolsBitmapFreeer freeer( hBitmapImageZone, true );

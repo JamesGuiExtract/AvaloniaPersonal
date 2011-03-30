@@ -25,17 +25,17 @@ const int iMAX_FOLDER_HISTORY_SIZE = 8;
 // CFolderFSPP
 //-------------------------------------------------------------------------------------------------
 CFolderFSPP::CFolderFSPP()
-:	ma_pUserCfgMgr(NULL),
-	ma_pCfgMgr(NULL)
+:	ma_pUserCfgMgr(__nullptr),
+	ma_pCfgMgr(__nullptr)
 {
 	try
 	{
 		// Check licensing
 		validateLicense();
-		ma_pUserCfgMgr = auto_ptr<RegistryPersistenceMgr>( new RegistryPersistenceMgr(HKEY_CURRENT_USER, 
+		ma_pUserCfgMgr = unique_ptr<RegistryPersistenceMgr>( new RegistryPersistenceMgr(HKEY_CURRENT_USER, 
 			gstrREG_ROOT_KEY + "\\ReusableComponents\\COMComponents\\ESFileSuppliers"));
 
-		ma_pCfgMgr = auto_ptr<FileSupplierConfigMgr> (new FileSupplierConfigMgr(ma_pUserCfgMgr.get(), "\\FolderFS"));
+		ma_pCfgMgr = unique_ptr<FileSupplierConfigMgr> (new FileSupplierConfigMgr(ma_pUserCfgMgr.get(), "\\FolderFS"));
 
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13754")

@@ -69,7 +69,7 @@ const std::string CSpatialStringSearcherTester::getMasterTestFileName(IVariantVe
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		std::string strMasterTestFile = asString(_bstr_t(ipParams->GetItem(1)));
 

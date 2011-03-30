@@ -30,12 +30,12 @@ SelectDBDialog::SelectDBDialog(IFileProcessingDBPtr ipFAMDB, CWnd* pParent /*=NU
 	try
 	{
 		// ipFAMDB must exist
-		ASSERT_ARGUMENT("ELI17557", ipFAMDB != NULL);
+		ASSERT_ARGUMENT("ELI17557", ipFAMDB != __nullptr);
 
 		// Load the Icon
 		m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_FAMDBADMIN);
 
-		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new
+		ma_pCfgMgr = unique_ptr<FileProcessingConfigMgr>(new
 			FileProcessingConfigMgr());
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI17538");
@@ -45,7 +45,7 @@ SelectDBDialog::~SelectDBDialog()
 {
 	try
 	{
-		m_ipFAMDB = NULL;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI17561");
 }

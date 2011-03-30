@@ -62,7 +62,7 @@ STDMETHODIMP CSmoothCharactersICO::raw_GetComponentDescription(BSTR * pstrCompon
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17807", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI17807", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Smooth characters").Detach();
 	}
@@ -81,7 +81,7 @@ STDMETHODIMP CSmoothCharactersICO::raw_CopyFrom(IUnknown * pObject)
 	try
 	{
 		ESImageCleanupLib::ISmoothCharactersICOPtr ipCopyThis(pObject);	
-		ASSERT_RESOURCE_ALLOCATION("ELI17809", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17809", ipCopyThis != __nullptr);
 
 		m_lSmoothType = ipCopyThis->SmoothType;
 	}
@@ -96,15 +96,15 @@ STDMETHODIMP CSmoothCharactersICO::raw_Clone(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17811", pObject != NULL);
+		ASSERT_ARGUMENT("ELI17811", pObject != __nullptr);
 
 		// create a copyable object pointer
 		ICopyableObjectPtr ipObjCopy(CLSID_SmoothCharactersICO);
-		ASSERT_RESOURCE_ALLOCATION("ELI17812", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17812", ipObjCopy != __nullptr);
 
 		// set the IUnknownPtr to the current object
 		IUnknownPtr ipUnk = this;
-		ASSERT_RESOURCE_ALLOCATION("ELI17813", ipUnk != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17813", ipUnk != __nullptr);
 
 		// copy to the copyable object pointer
 		ipObjCopy->CopyFrom(ipUnk);
@@ -127,7 +127,7 @@ STDMETHODIMP CSmoothCharactersICO::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI17815", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI17815", pbValue != __nullptr);
 
 		try
 		{
@@ -156,7 +156,7 @@ STDMETHODIMP CSmoothCharactersICO::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17817", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI17817", pClassID != __nullptr);
 
 		*pClassID = CLSID_SmoothCharactersICO;
 	}
@@ -178,7 +178,7 @@ STDMETHODIMP CSmoothCharactersICO::Load(IStream * pStream)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17818", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17818", pStream != __nullptr);
 
 		// reset the smooth type to default value
 		m_lSmoothType = ciSmoothLightenEdges;
@@ -220,7 +220,7 @@ STDMETHODIMP CSmoothCharactersICO::Save(IStream * pStream, BOOL fClearDirty)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17821", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17821", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -272,7 +272,7 @@ STDMETHODIMP CSmoothCharactersICO::Perform(void* pciRepair)
 
 		// wrap the ClearImage repair pointer in smart pointer
 		ICiRepairPtr ipciRepair((ICiRepair*) pciRepair);
-		ASSERT_RESOURCE_ALLOCATION("ELI17823", ipciRepair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17823", ipciRepair != __nullptr);
 
 		// perform the ClearImage SmoothCharacters method
 		ipciRepair->SmoothCharacters((ESmoothType)m_lSmoothType);
@@ -291,7 +291,7 @@ STDMETHODIMP CSmoothCharactersICO::get_SmoothType(long* plSmoothType)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17825", plSmoothType != NULL);
+		ASSERT_ARGUMENT("ELI17825", plSmoothType != __nullptr);
 
 		*plSmoothType = m_lSmoothType;
 	}

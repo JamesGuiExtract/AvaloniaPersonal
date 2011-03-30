@@ -46,10 +46,10 @@ CLegalDescSplitter::~CLegalDescSplitter()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
-		m_ipRegExParser = NULL;
-		m_ipAFUtility = NULL;
-		m_ipLegalTypeToRuleSetMap = NULL;
+		m_ipMiscUtils = __nullptr;
+		m_ipRegExParser = __nullptr;
+		m_ipAFUtility = __nullptr;
+		m_ipLegalTypeToRuleSetMap = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29462");
 }
@@ -193,12 +193,12 @@ STDMETHODIMP CLegalDescSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFD
 
 			//Create local copies of  Attribute and subattribues
 			IAttributePtr ipMainAttribute( pAttribute );
-			ASSERT_RESOURCE_ALLOCATION("ELI08404", ipMainAttribute != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08404", ipMainAttribute != __nullptr );
 			IIUnknownVectorPtr ipMainAttrSub = ipMainAttribute->SubAttributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI08407", ipMainAttrSub != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08407", ipMainAttrSub != __nullptr );
 
 			ISpatialStringPtr ipValue = ipMainAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI10427", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI10427", ipValue != __nullptr );
 
 			// Get a new regular expression parser
 			m_ipRegExParser = getParser();
@@ -222,14 +222,14 @@ STDMETHODIMP CLegalDescSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFD
 			processLegal ("any", ipMainAttribute->Value, ipMainAttrSub );
 
 			// Reset the regular expression parser
-			m_ipRegExParser = NULL;
+			m_ipRegExParser = __nullptr;
 		}
 		catch(...)
 		{
 			try
 			{
 				// Ensure the regular expression parser is reset
-				m_ipRegExParser = NULL;
+				m_ipRegExParser = __nullptr;
 			}
 			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29463");
 
@@ -250,7 +250,7 @@ STDMETHODIMP CLegalDescSplitter::raw_GetComponentDescription(BSTR * pstrComponen
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19564", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19564", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Split a legal description").Detach();
 	}
@@ -280,7 +280,7 @@ STDMETHODIMP CLegalDescSplitter::raw_Clone(IUnknown * * pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_LegalDescSplitter );
-		ASSERT_RESOURCE_ALLOCATION("ELI08399", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08399", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -334,7 +334,7 @@ void CLegalDescSplitter::validateLicense()
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::processAFDcoument(IAFDocumentPtr& ipAFDoc)
 {
-	ASSERT_ARGUMENT("ELI08409", ipAFDoc != NULL );
+	ASSERT_ARGUMENT("ELI08409", ipAFDoc != __nullptr );
 
 	// first check to see if the document has already been processed
 	IStrToStrMapPtr ipStringTags(ipAFDoc->StringTags);
@@ -344,13 +344,13 @@ void CLegalDescSplitter::processAFDcoument(IAFDocumentPtr& ipAFDoc)
 		||ipStringTags->Contains(_bstr_t(DOC_PROBABILITY.c_str())) == VARIANT_FALSE)
 	{
 		// use county document classifier to distinguish the document type
-		if (m_ipDocPreprocessor == NULL)
+		if (m_ipDocPreprocessor == __nullptr)
 		{
 			m_ipDocPreprocessor.CreateInstance(CLSID_DocumentClassifier);
-			ASSERT_RESOURCE_ALLOCATION("ELI08049", m_ipDocPreprocessor != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08049", m_ipDocPreprocessor != __nullptr);
 			// set industry category name
 			IDocumentClassifierPtr ipDocClassifier(m_ipDocPreprocessor);
-			ASSERT_RESOURCE_ALLOCATION("ELI08408", ipDocClassifier != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08408", ipDocClassifier != __nullptr );
 			ipDocClassifier->IndustryCategoryName = "Legal Descriptions";
 		}
 		m_ipDocPreprocessor->Process(ipAFDoc, NULL);
@@ -359,8 +359,8 @@ void CLegalDescSplitter::processAFDcoument(IAFDocumentPtr& ipAFDoc)
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipSubAttributes)
 {
-	ASSERT_ARGUMENT("ELI07973", ipInputText != NULL );
-	ASSERT_ARGUMENT("ELI07974", ipSubAttributes != NULL );
+	ASSERT_ARGUMENT("ELI07973", ipInputText != __nullptr );
+	ASSERT_ARGUMENT("ELI07974", ipSubAttributes != __nullptr );
 	
 	// get the input string from the spatial string
 	_bstr_t _bstrText(ipInputText->String);
@@ -379,7 +379,7 @@ void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ip
 															strIncBetweenPattern, strLocationInclude, strAlwaysKeepRegExp, strExcludeRegionExp, true );
 
 	IIUnknownVectorPtr ipMuniFound (CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION( "ELI10213", ipMuniFound != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10213", ipMuniFound != __nullptr );
 	// Find Muni's
 	// TODO: if multiple found they should be put with the correct location
 	processMuni(ipInputText, ipMuniFound );
@@ -398,12 +398,12 @@ void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ip
 		for ( int i = 0; i < nNumLocations; i++ )
 		{
 			ISpatialStringPtr ipLocation = ipLocationStrings->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08410", ipLocation != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08410", ipLocation != __nullptr );
 			if (ipLocation )
 			{	
 				//Create a AFDocument for processing the Attribute
 				IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-				ASSERT_RESOURCE_ALLOCATION("ELI07953", ipAFDoc != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI07953", ipAFDoc != __nullptr );
 				ipAFDoc->Text = ipLocation;
 
 				// first process the AFDocument to get proper tags for the document
@@ -414,7 +414,7 @@ void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ip
 				// the DOC PROBABILITY tag, otherwise somthing's wrong with
 				// our logic.
 				IStrToStrMapPtr ipStringTags(ipAFDoc->StringTags);
-				ASSERT_RESOURCE_ALLOCATION("ELI07954", ipStringTags != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07954", ipStringTags != __nullptr);
 				if (ipStringTags->Contains(DOC_PROBABILITY.c_str()) == VARIANT_FALSE)
 				{
 					// something wrong in our program logic
@@ -423,7 +423,7 @@ void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ip
 
 				// get the object tags associated with the document
 				IStrToObjectMapPtr ipObjTags(ipAFDoc->ObjectTags);
-				ASSERT_RESOURCE_ALLOCATION("ELI07956", ipObjTags != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07956", ipObjTags != __nullptr);
 
 				// check to see if a string tag for the document type
 				// exists.  If not, do not split
@@ -436,7 +436,7 @@ void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ip
 
 				// get the vector of document type names
 				IVariantVectorPtr ipVecDocTypes = ipObjTags->GetValue(_bstr_t(DOC_TYPE.c_str()));
-				ASSERT_RESOURCE_ALLOCATION("ELI07958", ipVecDocTypes != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07958", ipVecDocTypes != __nullptr);
 			
 				// Process each document type found if none the Legal doesn't get processed
 				long nNumDocTypes = ipVecDocTypes->Size;
@@ -450,7 +450,7 @@ void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ip
 				
 						// create an attribute to store the value
 						IAttributePtr ipAttribute(CLSID_Attribute);
-						ASSERT_RESOURCE_ALLOCATION("ELI07978", ipAttribute != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI07978", ipAttribute != __nullptr);
 
 						// set the match as the value of the attribute
 						ipAttribute->Value = ipLocation;
@@ -459,16 +459,16 @@ void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ip
 						//Add type sub attribute under Location
 						// Create local copy of Location subattributes
 						IIUnknownVectorPtr ipLocationSubAttr(ipAttribute->SubAttributes);
-						ASSERT_RESOURCE_ALLOCATION("ELI07980", ipLocationSubAttr != NULL );
+						ASSERT_RESOURCE_ALLOCATION("ELI07980", ipLocationSubAttr != __nullptr );
 				
 						//Create type sub attribute
 						//IAttributePtr ipLegalDescType (CLSID_Attribute);
-						//ASSERT_RESOURCE_ALLOCATION("ELI07960", ipLegalDescType != NULL );
+						//ASSERT_RESOURCE_ALLOCATION("ELI07960", ipLegalDescType != __nullptr );
 				
 						//Set Types Values and name
 						//ipLegalDescType->Name = "Type";
 						//ISpatialStringPtr ipTypeStr(CLSID_SpatialString);
-						//ASSERT_RESOURCE_ALLOCATION("ELI07961", ipTypeStr != NULL );
+						//ASSERT_RESOURCE_ALLOCATION("ELI07961", ipTypeStr != __nullptr );
 						//ipTypeStr->String = strDocType.c_str();
 						//ipLegalDescType->Value = ipTypeStr;
 				
@@ -510,11 +510,11 @@ void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ip
 							{
 								// Retrieve this Attribute
 								IAttributePtr ipCurrMuni = ipMuniFound->At(k);
-								ASSERT_RESOURCE_ALLOCATION("ELI15556", ipCurrMuni != NULL );
+								ASSERT_RESOURCE_ALLOCATION("ELI15556", ipCurrMuni != __nullptr );
 
 								// Retrieve collected sub-attributes
 								IIUnknownVectorPtr ipSub = ipCurrMuni->SubAttributes;
-								ASSERT_RESOURCE_ALLOCATION("ELI15557", ipSub != NULL);
+								ASSERT_RESOURCE_ALLOCATION("ELI15557", ipSub != __nullptr);
 
 								// Check sub-attribute count
 								int nNumSubAttrs = ipSub->Size();
@@ -522,9 +522,9 @@ void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ip
 								{
 									// Make copy of this Attribute
 									ICopyableObjectPtr ipObj = ipCurrMuni;
-									ASSERT_RESOURCE_ALLOCATION("ELI15558", ipObj != NULL);
+									ASSERT_RESOURCE_ALLOCATION("ELI15558", ipObj != __nullptr);
 									ipSelectedMuni = ipObj->Clone();
-									ASSERT_RESOURCE_ALLOCATION("ELI15559", ipSelectedMuni != NULL);
+									ASSERT_RESOURCE_ALLOCATION("ELI15559", ipSelectedMuni != __nullptr);
 
 									// Update maximum count
 									nMax = nNumSubAttrs;
@@ -562,9 +562,9 @@ void CLegalDescSplitter::processSubBLOLocation( ISpatialStringPtr ipInputText, I
 
 	// Setup subdivision string for building by removing found lot and block parts
 	ISpatialStringPtr ipSubdivision(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI08059", ipSubdivision != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08059", ipSubdivision != __nullptr );
 	ICopyableObjectPtr ipObjectTo = ipSubdivision;
-	ASSERT_RESOURCE_ALLOCATION("ELI08411", ipObjectTo != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08411", ipObjectTo != __nullptr );
 	ipObjectTo->CopyFrom ( ipInputText );
 
 	// Load Block regular expression strings
@@ -635,7 +635,7 @@ void CLegalDescSplitter::processSubBLOLocation( ISpatialStringPtr ipInputText, I
 	{
 		// create an attribute to store the value
 		IAttributePtr ipAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI19161", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19161", ipAttribute != __nullptr);
 
 		// set the match as the value of the attribute, and add
 		// the attribute to the result vector
@@ -648,17 +648,17 @@ void CLegalDescSplitter::processSubBLOLocation( ISpatialStringPtr ipInputText, I
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::processCondoULocation( ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipSubAttributes)
 {
-	ASSERT_ARGUMENT("ELI08412", ipInputText != NULL );
-	ASSERT_ARGUMENT("ELI08413", ipSubAttributes != NULL );
+	ASSERT_ARGUMENT("ELI08412", ipInputText != __nullptr );
+	ASSERT_ARGUMENT("ELI08413", ipSubAttributes != __nullptr );
 	
 	// get the input string from the spatial string
 	_bstr_t _bstrText(ipInputText->String);
 
 	// Setup Condominium string for building by removing found Unit and Building parts
 	ISpatialStringPtr ipCondominium(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI19121", ipCondominium != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI19121", ipCondominium != __nullptr );
 	ICopyableObjectPtr ipObjectTo = ipCondominium;
-	ASSERT_RESOURCE_ALLOCATION("ELI08414", ipObjectTo != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08414", ipObjectTo != __nullptr );
 	ipObjectTo->CopyFrom ( ipInputText );
 
 	// Load Building regular expression strings
@@ -706,7 +706,7 @@ void CLegalDescSplitter::processCondoULocation( ISpatialStringPtr ipInputText, I
 	{
 		// create an attribute to store the value
 		IAttributePtr ipAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI19451", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19451", ipAttribute != __nullptr);
 
 		// set the match as the value of the attribute, and add
 		// the attribute to the result vector
@@ -719,17 +719,17 @@ void CLegalDescSplitter::processCondoULocation( ISpatialStringPtr ipInputText, I
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::processPLSLocation( ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipSubAttributes)
 {
-	ASSERT_ARGUMENT("ELI08478", ipInputText != NULL );
-	ASSERT_ARGUMENT("ELI08479", ipSubAttributes != NULL );
+	ASSERT_ARGUMENT("ELI08478", ipInputText != __nullptr );
+	ASSERT_ARGUMENT("ELI08479", ipSubAttributes != __nullptr );
 
 	// get the input string from the spatial string
 	_bstr_t _bstrText(ipInputText->String);
 
 	// Setup subdivision string for building by removing found lot and block parts
 	ISpatialStringPtr ipRemaining(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI08504", ipRemaining != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08504", ipRemaining != __nullptr );
 	ICopyableObjectPtr ipObjectTo = ipRemaining;
-	ASSERT_RESOURCE_ALLOCATION("ELI08505", ipObjectTo != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08505", ipObjectTo != __nullptr );
 	ipObjectTo->CopyFrom ( ipInputText );
 
 
@@ -883,26 +883,26 @@ void CLegalDescSplitter::processCSMLocation( ISpatialStringPtr ipInputText, IIUn
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::processMuni( ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipSubAttributes)
 {
-	ASSERT_ARGUMENT("ELI08073", ipInputText != NULL );
-	ASSERT_ARGUMENT("ELI08074", ipSubAttributes != NULL );
+	ASSERT_ARGUMENT("ELI08073", ipInputText != __nullptr );
+	ASSERT_ARGUMENT("ELI08074", ipSubAttributes != __nullptr );
 
 	// Setup the ruleset for finding the Municipality string and subattributes
 	setupMuniRuleSet();
 
 	// Setup working String so preprocessors have no effect on string
 	ISpatialStringPtr ipWorkValue(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI08402", ipWorkValue != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08402", ipWorkValue != __nullptr );
 	ICopyableObjectPtr ipObjectTo = ipWorkValue;
-	ASSERT_RESOURCE_ALLOCATION("ELI08415", ipObjectTo != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08415", ipObjectTo != __nullptr );
 	ipObjectTo->CopyFrom ( ipInputText );
 
 	// Create AF Document for splitting
 	IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-	ASSERT_RESOURCE_ALLOCATION("ELI08295", ipAFDoc != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08295", ipAFDoc != __nullptr );
 	ipAFDoc->Text = ipWorkValue;
 
 	IVariantVectorPtr ipvecAttributeNames(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI08296", ipvecAttributeNames != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08296", ipvecAttributeNames != __nullptr );
 
 	// Add the Attribute name to find
 	ipvecAttributeNames->PushBack("Municipality");
@@ -911,11 +911,11 @@ void CLegalDescSplitter::processMuni( ISpatialStringPtr ipInputText, IIUnknownVe
 	//Determine if more than one type and rename Village, City, or Town Subattributes	
 	// Holds the shared attributes
 	IIUnknownVectorPtr ipSharedAttrs ( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION("ELI08305", ipSharedAttrs != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08305", ipSharedAttrs != __nullptr );
 	
 	// Holds the each of the Attributes with the name of Village, City, or Town
 	IIUnknownVectorPtr ipNameTypes ( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION("ELI08307", ipNameTypes != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08307", ipNameTypes != __nullptr );
 
 	// Number of Municipality attributes found
 	long nNumAttr = ipAttributes->Size();
@@ -927,7 +927,7 @@ void CLegalDescSplitter::processMuni( ISpatialStringPtr ipInputText, IIUnknownVe
 
 		// Current found attribute to work with
 		IAttributePtr ipCurrAttr = ipAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI08416", ipCurrAttr != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08416", ipCurrAttr != __nullptr );
 
 		// Separate the Town, Village, and city attributes from the others
 		IIUnknownVectorPtr ipCurrSubAttrs ( ipCurrAttr->SubAttributes );
@@ -936,7 +936,7 @@ void CLegalDescSplitter::processMuni( ISpatialStringPtr ipInputText, IIUnknownVe
 		for ( c = 0; c < nNumSubAttrs; c++ )
 		{
 			IAttributePtr ipCurrSubAttr = ipCurrSubAttrs->At(c);
-			ASSERT_RESOURCE_ALLOCATION("ELI08417", ipCurrSubAttr != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08417", ipCurrSubAttr != __nullptr );
 			string strName = ipCurrSubAttr->Name;
 			// If the attribute name is VillageOf, TownOf or CityOf these will be used for the type
 			// of municipality and not be output as sub attributes.
@@ -960,7 +960,7 @@ void CLegalDescSplitter::processMuni( ISpatialStringPtr ipInputText, IIUnknownVe
 
 			// Build the type Attribute
 			IAttributePtr ipNameAttr = ipNameTypes->At(c);
-			ASSERT_RESOURCE_ALLOCATION("ELI08418", ipNameAttr != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08418", ipNameAttr != __nullptr );
 			// Create new Municipality object
 			IAttributePtr ipCurrMuni = createAttribute( string(ipCurrAttr->Name), ipNameAttr->Value );
 			ipCurrMuni->Type = ipNameAttr->Name;
@@ -990,8 +990,8 @@ void CLegalDescSplitter::addAsAttributes( string strAttributeName,
 										 bool bApplyModifiers,
 										 string strAttrType)
 {
-	ASSERT_ARGUMENT ( "ELI08050", ipAttributeStrings != NULL );
-	ASSERT_ARGUMENT ( "ELI08051", ipAttributeList != NULL );
+	ASSERT_ARGUMENT ( "ELI08050", ipAttributeStrings != __nullptr );
+	ASSERT_ARGUMENT ( "ELI08051", ipAttributeList != __nullptr );
 	
 	long nSize = ipAttributeStrings->Size();
 	if ( nSize == 0 )
@@ -1006,12 +1006,12 @@ void CLegalDescSplitter::addAsAttributes( string strAttributeName,
 		{
 			// create an attribute to store the value
 			IAttributePtr ipAttribute(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI08052", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08052", ipAttribute != __nullptr);
 
 			// set the match as the value of the attribute, and add
 			// the attribute to the result vector
 			ISpatialStringPtr ipValue = ipAttributeStrings->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08460", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08460", ipValue != __nullptr );
 			// Trim leading and trailing " marks
 			ipValue->Trim( "\"", "\"" );	
 			if ( bApplyModifiers )
@@ -1040,7 +1040,7 @@ void CLegalDescSplitter::addAsAttributes( string strAttributeName,
 		{
 			// Get current string
 			ISpatialStringPtr ipCurrentStr = ipAttributeStrings->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08419", ipCurrentStr != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08419", ipCurrentStr != __nullptr );
 			// Trim leading and trailing " marks
 			ipCurrentStr->Trim( "\"", "\"" );
 			if ( ipCurrentStr )
@@ -1062,7 +1062,7 @@ void CLegalDescSplitter::addAsAttributes( string strAttributeName,
 		}
 		// create an attribute to store the value
 		IAttributePtr ipAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI08053", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08053", ipAttribute != __nullptr);
 
 		// set the match as the value of the attribute, and add
 		// the attribute to the result vector
@@ -1086,7 +1086,7 @@ IIUnknownVectorPtr CLegalDescSplitter::getFoundStrings( ISpatialStringPtr ipInpu
 													   string strExcludeRegionExp,
 													   bool bExcludeAfter1stInitially  )
 {
-	ASSERT_ARGUMENT("ELI08420", ipInputText != NULL );
+	ASSERT_ARGUMENT("ELI08420", ipInputText != __nullptr );
 	// get the input string from the spatial string
 	_bstr_t _bstrText(ipInputText->String);
 
@@ -1096,13 +1096,13 @@ IIUnknownVectorPtr CLegalDescSplitter::getFoundStrings( ISpatialStringPtr ipInpu
 	m_ipRegExParser->IgnoreCase = VARIANT_TRUE;
 	IIUnknownVectorPtr ipMatches = m_ipRegExParser->Find(_bstrText, VARIANT_FALSE, VARIANT_FALSE);
 	IIUnknownVectorPtr ipReturnStrings(CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI08057", ipReturnStrings != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI08057", ipReturnStrings != __nullptr );
 
 	m_ipRegExParser->Pattern = _bstr_t(strExcludeRegionExp.c_str());
 	IIUnknownVectorPtr ipExcludeRegions;
 	if ( strExcludeRegionExp == "" ) 
 	{
-		ipExcludeRegions = NULL;
+		ipExcludeRegions = __nullptr;
 	}
 	else
 	{
@@ -1121,7 +1121,7 @@ IIUnknownVectorPtr CLegalDescSplitter::getFoundStrings( ISpatialStringPtr ipInpu
 		{
 			// each item in the ipMatches is of type IObjectPair
 			IObjectPairPtr ipObjPair = ipMatches->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08421", ipObjPair != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08421", ipObjPair != __nullptr );
 			// Token is the first object in the object pair
 			ITokenPtr ipToken = ipObjPair->Object1;
 			if (ipToken)
@@ -1140,7 +1140,7 @@ IIUnknownVectorPtr CLegalDescSplitter::getFoundStrings( ISpatialStringPtr ipInpu
 
 				// create a spatial string representing the match
 				ISpatialStringPtr ipMatch = ipInputText->GetSubString(nStart, nEnd);
-				ASSERT_RESOURCE_ALLOCATION("ELI08058", ipMatch != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI08058", ipMatch != __nullptr);
 
 				//string strDisplay = ipMatch->String;
 				//MessageBox(NULL, strDisplay.c_str(), "found String", MB_OK );
@@ -1253,10 +1253,10 @@ string CLegalDescSplitter::getRegExpForType( string strDocType, string strFileNa
 //-------------------------------------------------------------------------------------------------
 IAFUtilityPtr CLegalDescSplitter::getAFUtility()
 {
-	if (m_ipAFUtility == NULL)
+	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07976", m_ipAFUtility != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07976", m_ipAFUtility != __nullptr );
 	}
 	
 	return m_ipAFUtility;
@@ -1264,10 +1264,10 @@ IAFUtilityPtr CLegalDescSplitter::getAFUtility()
 //-------------------------------------------------------------------------------------------------
 IMiscUtilsPtr CLegalDescSplitter::getMiscUtils()
 {
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI07977", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI07977", m_ipMiscUtils != __nullptr );
 	}
 	
 	return m_ipMiscUtils;
@@ -1276,7 +1276,7 @@ IMiscUtilsPtr CLegalDescSplitter::getMiscUtils()
 IAttributePtr CLegalDescSplitter::createAttribute( string strAttrName, ISpatialStringPtr ipAttrValue )
 {
 	IAttributePtr ipAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI08178", ipAttribute != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08178", ipAttribute != __nullptr);
 
 	// set the match as the value of the attribute, and add
 	// the attribute to the result vector
@@ -1288,9 +1288,9 @@ IAttributePtr CLegalDescSplitter::createAttribute( string strAttrName, ISpatialS
 IAttributePtr CLegalDescSplitter::createAttribute( string strAttrName, string strAttrValue )
 {
 	IAttributePtr ipAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI08180", ipAttribute != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08180", ipAttribute != __nullptr);
 	ISpatialStringPtr ipAttrValue(CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION("ELI08183", ipAttrValue != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08183", ipAttrValue != __nullptr );
 	ipAttrValue->CreateNonSpatialString(strAttrValue.c_str(), "");
 
 	// set the match as the value of the attribute, and add
@@ -1304,7 +1304,7 @@ void CLegalDescSplitter::setupMuniRuleSet()
 {
 
 	// if m_ipFindInfo has been setup reload if LoadFilePerSession is not set
-	if (m_ipMuniRuleSet != NULL ) 
+	if (m_ipMuniRuleSet != __nullptr ) 
 	{
 		if ( getAFUtility()->GetLoadFilePerSession() == VARIANT_TRUE )
 		{
@@ -1321,7 +1321,7 @@ void CLegalDescSplitter::setupMuniRuleSet()
 		_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
 
 	m_ipMuniRuleSet.CreateInstance(CLSID_RuleSet);
-	ASSERT_RESOURCE_ALLOCATION("ELI08373", m_ipMuniRuleSet != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08373", m_ipMuniRuleSet != __nullptr );
 
 	// Load Ruleset
 	m_ipMuniRuleSet->LoadFrom(_bstr_t(strRSDFile.c_str()), VARIANT_FALSE);
@@ -1333,20 +1333,20 @@ IIUnknownVectorPtr CLegalDescSplitter::processValueParts( ISpatialStringPtr ipMa
 														 string strExtractRegExp,
 														 string strBeforeRegExp )
 {
-	ASSERT_ARGUMENT("ELI08480", ipPartStrings != NULL );
+	ASSERT_ARGUMENT("ELI08480", ipPartStrings != __nullptr );
 
 	IIUnknownVectorPtr ipResults(CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION("ELI08062", ipResults != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08062", ipResults != __nullptr );
 	// Setup ipRemoveStrings to hold strings to remove from ipMainValue
 	IVariantVectorPtr ipRemoveStrings ( CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI08054", ipRemoveStrings != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08054", ipRemoveStrings != __nullptr);
 	// Extract the values from the Parts and remove from ipMainValue
 	long nNumValues = ipPartStrings->Size();
 	for ( int i = 0; i < nNumValues; i++ )
 	{
 		// Get Part to process
 		ISpatialStringPtr ipPart = ipPartStrings->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI08422", ipPart != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08422", ipPart != __nullptr );
 
 		//Extract the value from the part
 		IIUnknownVectorPtr ipFoundStrings = getFoundStrings( ipPart, strExtractRegExp );
@@ -1364,7 +1364,7 @@ IIUnknownVectorPtr CLegalDescSplitter::processValueParts( ISpatialStringPtr ipMa
 			ipResults->Append( ipFoundStrings );
 		}
 	
-		if ( ipMainValue != NULL )
+		if ( ipMainValue != __nullptr )
 		{
 			// Add to Remove Strings to find and remove from MainValue string
 			ipRemoveStrings->PushBack(_bstr_t ( strPart.c_str() ));
@@ -1415,16 +1415,16 @@ IIUnknownVectorPtr CLegalDescSplitter::processValueParts( ISpatialStringPtr ipMa
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CLegalDescSplitter::expandNumericRanges ( IIUnknownVectorPtr ipRangedValues )
 {
-	ASSERT_ARGUMENT("ELI08423", ipRangedValues != NULL );
+	ASSERT_ARGUMENT("ELI08423", ipRangedValues != __nullptr );
 	IIUnknownVectorPtr ipResults(CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION("ELI08400", ipResults != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08400", ipResults != __nullptr );
 
 	// check each found string for range
 	long nNumValues = ipRangedValues->Size();
 	for ( int i = 0; i < nNumValues; i++ )
 	{
 		ISpatialStringPtr ipRangeValue = ipRangedValues->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI08424", ipRangeValue != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08424", ipRangeValue != __nullptr );
 		string strRangeValue = ipRangeValue->String;
 		if ( isRegExpInText ( strRangeValue, RANGE_PATTERN ) )
 		{
@@ -1437,9 +1437,9 @@ IIUnknownVectorPtr CLegalDescSplitter::expandNumericRanges ( IIUnknownVectorPtr 
 				THROW_LOGIC_ERROR_EXCEPTION("ELI08087");
 			}
 			ISpatialStringPtr ipFirst = ipRangeLimits->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI08425", ipFirst != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08425", ipFirst != __nullptr );
 			ISpatialStringPtr ipLast = ipRangeLimits->At(1);
-			ASSERT_RESOURCE_ALLOCATION("ELI08426", ipLast != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08426", ipLast != __nullptr );
 			string strFirst = asString(ipFirst->String);
 			string strLast = asString(ipLast->String);
 			long lFirst = asLong(strFirst);
@@ -1449,7 +1449,7 @@ IIUnknownVectorPtr CLegalDescSplitter::expandNumericRanges ( IIUnknownVectorPtr 
 			for ( long i = lFirst + 1; i < lLast ; i++ )
 			{
 				ISpatialStringPtr ipValue (CLSID_SpatialString );
-				ASSERT_RESOURCE_ALLOCATION("ELI08079", ipValue != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI08079", ipValue != __nullptr );
 				ipValue->CreateNonSpatialString(asString(i).c_str(), "");
 					
 				ipResults->PushBack ( ipValue );
@@ -1469,14 +1469,14 @@ IIUnknownVectorPtr CLegalDescSplitter::expandNumericRanges ( IIUnknownVectorPtr 
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::makeRangeSeparatorDash( IIUnknownVectorPtr ipRangedValues )
 {
-	ASSERT_ARGUMENT("ELI10353", ipRangedValues != NULL );
+	ASSERT_ARGUMENT("ELI10353", ipRangedValues != __nullptr );
 
 	// check each found string for range
 	long nNumValues = ipRangedValues->Size();
 	for ( int i = 0; i < nNumValues; i++ )
 	{
 		ISpatialStringPtr ipRangeValue = ipRangedValues->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI10354", ipRangeValue != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI10354", ipRangeValue != __nullptr );
 		string strRangeValue = ipRangeValue->String;
 		if ( isRegExpInText ( strRangeValue, RANGE_PATTERN ) )
 		{
@@ -1489,9 +1489,9 @@ void CLegalDescSplitter::makeRangeSeparatorDash( IIUnknownVectorPtr ipRangedValu
 				THROW_LOGIC_ERROR_EXCEPTION("ELI10355");
 			}
 			ISpatialStringPtr ipFirst = ipRangeLimits->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI10356", ipFirst != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI10356", ipFirst != __nullptr );
 			ISpatialStringPtr ipLast = ipRangeLimits->At(1);
-			ASSERT_RESOURCE_ALLOCATION("ELI10357", ipLast != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI10357", ipLast != __nullptr );
 
 			// Test of having a range that always has  - separating it
 			ipRangeValue->Clear();
@@ -1512,10 +1512,10 @@ IRuleSetPtr CLegalDescSplitter::getModifierRuleSet( string strLegalType )
 	}
 
 	// If m_ipLegalTypeToRuleSetMap has not yet been used create it
-	if ( m_ipLegalTypeToRuleSetMap == NULL )
+	if ( m_ipLegalTypeToRuleSetMap == __nullptr )
 	{
 		m_ipLegalTypeToRuleSetMap.CreateInstance(CLSID_StrToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI08464", m_ipLegalTypeToRuleSetMap != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08464", m_ipLegalTypeToRuleSetMap != __nullptr );
 	}
 
 	VARIANT_BOOL bLoadFilePerSession = getAFUtility()->GetLoadFilePerSession() ;
@@ -1524,7 +1524,7 @@ IRuleSetPtr CLegalDescSplitter::getModifierRuleSet( string strLegalType )
 		if ( m_ipLegalTypeToRuleSetMap->Contains( strLegalType.c_str() ) )
 		{
 			IRuleSetPtr ipModifierRuleSet = m_ipLegalTypeToRuleSetMap->GetValue ( strLegalType.c_str());
-			ASSERT_RESOURCE_ALLOCATION("ELI08466", ipModifierRuleSet != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08466", ipModifierRuleSet != __nullptr );
 			return ipModifierRuleSet;
 		}
 	}
@@ -1537,7 +1537,7 @@ IRuleSetPtr CLegalDescSplitter::getModifierRuleSet( string strLegalType )
 		_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
 
 	IRuleSetPtr ipModifierRuleSet(CLSID_RuleSet);
-	ASSERT_RESOURCE_ALLOCATION("ELI08467", ipModifierRuleSet != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08467", ipModifierRuleSet != __nullptr );
 
 	// Load Ruleset
 	ipModifierRuleSet->LoadFrom(_bstr_t(strRSDFile.c_str()), VARIANT_FALSE);
@@ -1551,21 +1551,21 @@ IRuleSetPtr CLegalDescSplitter::getModifierRuleSet( string strLegalType )
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CLegalDescSplitter::applyModifiers( string strLegalType, string strAttrName, ISpatialStringPtr ipValue )
 {
-	ASSERT_ARGUMENT("ELI08470", ipValue != NULL );
+	ASSERT_ARGUMENT("ELI08470", ipValue != __nullptr );
 
 	// Create AF Document for splitting
 	IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-	ASSERT_RESOURCE_ALLOCATION("ELI08468", ipAFDoc != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08468", ipAFDoc != __nullptr );
 	ipAFDoc->Text = ipValue;
 
 	IVariantVectorPtr ipvecAttributeNames(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI08469", ipvecAttributeNames != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08469", ipvecAttributeNames != __nullptr );
 
 	// Add the Attribute name to find
 	ipvecAttributeNames->PushBack( strAttrName.c_str());
 
 	IRuleSetPtr ipModifierRuleSet = getModifierRuleSet( strLegalType );
-	ASSERT_RESOURCE_ALLOCATION("ELI08471", ipModifierRuleSet != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08471", ipModifierRuleSet != __nullptr );
 
 	IIUnknownVectorPtr ipAttributes = ipModifierRuleSet->ExecuteRulesOnText( ipAFDoc, ipvecAttributeNames, NULL );
 
@@ -1574,7 +1574,7 @@ ISpatialStringPtr CLegalDescSplitter::applyModifiers( string strLegalType, strin
 	if ( nNumAttr == 1 )
 	{
 		IAttributePtr ipAttr = ipAttributes->At(0);
-		ASSERT_RESOURCE_ALLOCATION("ELI08473", ipAttr != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08473", ipAttr != __nullptr );
 		return ipAttr->Value;
 	}
 	// if 0 or more than one value return the original string
@@ -1583,7 +1583,7 @@ ISpatialStringPtr CLegalDescSplitter::applyModifiers( string strLegalType, strin
 //-------------------------------------------------------------------------------------------------
 bool CLegalDescSplitter::valueWithinRegions(long nStart, long nEnd, IIUnknownVectorPtr &ipRegions)
 {
-	if ( ipRegions == NULL  )
+	if ( ipRegions == __nullptr  )
 	{
 		return false;
 	}
@@ -1592,7 +1592,7 @@ bool CLegalDescSplitter::valueWithinRegions(long nStart, long nEnd, IIUnknownVec
 	{
 		// each item in the ipMatches is of type IObjectPair
 		IObjectPairPtr ipObjPair = ipRegions->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI08793", ipObjPair != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08793", ipObjPair != __nullptr );
 		// Token is the first object in the object pair
 		ITokenPtr ipToken = ipObjPair->Object1;
 		if (ipToken)
@@ -1614,8 +1614,8 @@ bool CLegalDescSplitter::valueWithinRegions(long nStart, long nEnd, IIUnknownVec
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::splitAndAddTown( IIUnknownVectorPtr ipTownValues, IIUnknownVectorPtr ipSubAttrs )
 {
-	ASSERT_ARGUMENT ( "ELI10214", ipSubAttrs != NULL )
-	if ( ipTownValues == NULL )
+	ASSERT_ARGUMENT ( "ELI10214", ipSubAttrs != __nullptr )
+	if ( ipTownValues == __nullptr )
 	{
 		return;
 	}
@@ -1638,8 +1638,8 @@ void CLegalDescSplitter::splitAndAddTown( IIUnknownVectorPtr ipTownValues, IIUnk
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::splitAndAddRange( IIUnknownVectorPtr ipRangeValues, IIUnknownVectorPtr ipSubAttrs )
 {
-	ASSERT_ARGUMENT ( "ELI10215", ipSubAttrs != NULL )
-	if ( ipRangeValues == NULL )
+	ASSERT_ARGUMENT ( "ELI10215", ipSubAttrs != __nullptr )
+	if ( ipRangeValues == __nullptr )
 	{
 		return;
 	}
@@ -1662,11 +1662,11 @@ void CLegalDescSplitter::splitAndAddRange( IIUnknownVectorPtr ipRangeValues, IIU
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::reTypeAttribute ( IAttributePtr ipLocationAttr, IIUnknownVectorPtr ipParentSubAttrs )
 {
-	if ( ipLocationAttr == NULL )
+	if ( ipLocationAttr == __nullptr )
 	{
 		return;
 	}
-	ASSERT_ARGUMENT( "ELI10216", ipParentSubAttrs != NULL );
+	ASSERT_ARGUMENT( "ELI10216", ipParentSubAttrs != __nullptr );
 	string strAttrType = ipLocationAttr->Type;
 	if ( strAttrType == "SUB_BLO")
 	{
@@ -1681,7 +1681,7 @@ void CLegalDescSplitter::reTypeAttribute ( IAttributePtr ipLocationAttr, IIUnkno
 		for ( i = 0; i < nNumSubAttrs; i++ )
 		{
 			IAttributePtr ipCurrAttr = ipLocationSubAttr->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI10217", ipCurrAttr != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI10217", ipCurrAttr != __nullptr );
 
 			string strName = ipCurrAttr->Name;
 			if ( strName == "Block" )
@@ -1702,13 +1702,13 @@ void CLegalDescSplitter::reTypeAttribute ( IAttributePtr ipLocationAttr, IIUnkno
 		if ( bOutlotFound && bLotFound )
 		{
 			ICopyableObjectPtr ipClone = ipLocationAttr;
-			ASSERT_RESOURCE_ALLOCATION("ELI10218", ipClone != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI10218", ipClone != __nullptr );
 
 			IAttributePtr ipOutlotAttr = ipClone->Clone();
 
 			// Get sub-attributes
 			IIUnknownVectorPtr ipSub = ipOutlotAttr->SubAttributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI15560", ipSub != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15560", ipSub != __nullptr);
 
 			long nNumLots = vecLotIndexes.size();
 			for ( i = 0; i < nNumLots; i++ )
@@ -1746,7 +1746,7 @@ void CLegalDescSplitter::reTypeAttribute ( IAttributePtr ipLocationAttr, IIUnkno
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr  CLegalDescSplitter::consolidateValues ( IIUnknownVectorPtr ipValueStrings, bool expandRanges )
 {
-	if (ipValueStrings == NULL )
+	if (ipValueStrings == __nullptr )
 	{
 		return NULL;
 	}
@@ -1756,7 +1756,7 @@ IIUnknownVectorPtr  CLegalDescSplitter::consolidateValues ( IIUnknownVectorPtr i
 
 	// Allocate the return vector
 	IIUnknownVectorPtr ipReturnValues (CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10360", ipReturnValues != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10360", ipReturnValues != __nullptr );
 
 	map< long, ISpatialStringPtr> mapValuesToLong;
 	mapValuesToLong.clear();
@@ -1764,7 +1764,7 @@ IIUnknownVectorPtr  CLegalDescSplitter::consolidateValues ( IIUnknownVectorPtr i
 	for ( long i = 0; i < nNumValues; i++ )
 	{
 		ISpatialStringPtr ipCurrValue = ipExpandedValues->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI10361", ipCurrValue != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI10361", ipCurrValue != __nullptr );
 
 		string strValue = ipCurrValue->String;
 		long nValue = atol(strValue.c_str());
@@ -1829,7 +1829,7 @@ IIUnknownVectorPtr  CLegalDescSplitter::consolidateValues ( IIUnknownVectorPtr i
 		ipRangeValue->Append( ipLastValue );
 		ipReturnValues->PushBack( ipRangeValue );
 	}
-	else if ( ipLastValue != NULL )
+	else if ( ipLastValue != __nullptr )
 	{
 		ipReturnValues->PushBack( ipLastValue );
 	}
@@ -1838,9 +1838,9 @@ IIUnknownVectorPtr  CLegalDescSplitter::consolidateValues ( IIUnknownVectorPtr i
 //-------------------------------------------------------------------------------------------------
 void CLegalDescSplitter::separateFullAndPartial ( IIUnknownVectorPtr ipValueStrings, IIUnknownVectorPtr &ipFullValues, IIUnknownVectorPtr &ipPartValues )
 {
-	ASSERT_ARGUMENT("ELI10364", ipValueStrings != NULL );
-	ASSERT_ARGUMENT("ELI10365", ipValueStrings != NULL );
-	ASSERT_ARGUMENT("ELI10366", ipValueStrings != NULL );
+	ASSERT_ARGUMENT("ELI10364", ipValueStrings != __nullptr );
+	ASSERT_ARGUMENT("ELI10365", ipValueStrings != __nullptr );
+	ASSERT_ARGUMENT("ELI10366", ipValueStrings != __nullptr );
 
 	long nNumValues = ipValueStrings->Size();
 	bool isPartial = false;
@@ -1854,11 +1854,11 @@ void CLegalDescSplitter::separateFullAndPartial ( IIUnknownVectorPtr ipValueStri
 			continue;
 		}
 		ISpatialStringPtr ipCurrValue = ipValueStrings->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI10367", ipCurrValue != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI10367", ipCurrValue != __nullptr );
 		if ( i + 1 < nNumValues )
 		{
 			ISpatialStringPtr ipNextValue = ipValueStrings->At(i+1);
-			ASSERT_RESOURCE_ALLOCATION("ELI10445", ipNextValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI10445", ipNextValue != __nullptr );
 
 			string strNextValue = ipNextValue->String;
 			if ( isRegExpInText ( strNextValue, "except[\\s\\S]+?(feet|thereof)" ) )
@@ -1894,7 +1894,7 @@ IRegularExprParserPtr CLegalDescSplitter::getParser()
 	{
 		IRegularExprParserPtr ipParser =
 			getMiscUtils()->GetNewRegExpParserInstance("LegalDescSplitter");
-		ASSERT_RESOURCE_ALLOCATION("ELI07965", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07965", ipParser != __nullptr);
 
 		return ipParser;
 	}

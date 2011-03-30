@@ -72,7 +72,7 @@ STDMETHODIMP CLoopPreprocessorPP::Apply(void)
 				}
 
 				// Set the Preprocessor if a Preprocessor was selected
-				if (m_ipSelectedPreprocessor != NULL)
+				if (m_ipSelectedPreprocessor != __nullptr)
 				{
 					ipLoopPreprocessor->Preprocessor = m_ipSelectedPreprocessor;;
 				}
@@ -87,7 +87,7 @@ STDMETHODIMP CLoopPreprocessorPP::Apply(void)
 				}
 
 				// Set the Condition if a Condition was selected
-				if (m_ipSelectedCondition != NULL)
+				if (m_ipSelectedCondition != __nullptr)
 				{
 					ipLoopPreprocessor->Condition = m_ipSelectedCondition;
 				}
@@ -170,14 +170,14 @@ LRESULT CLoopPreprocessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 
 				// Set the Preprocessor and initialize the description if it exists
 				m_ipSelectedPreprocessor = ipLoopPreprocessor->Preprocessor;
-				if ( m_ipSelectedPreprocessor != NULL )
+				if ( m_ipSelectedPreprocessor != __nullptr )
 				{
 					m_editPreprocessor.SetWindowTextA(m_ipSelectedPreprocessor->Description);
 				}
 
 				// Set the Condition and initialize the description if it exists
 				m_ipSelectedCondition = ipLoopPreprocessor->Condition;
-				if ( m_ipSelectedCondition != NULL )
+				if ( m_ipSelectedCondition != __nullptr )
 				{
 					m_editCondition.SetWindowTextA(m_ipSelectedCondition->Description);
 				}
@@ -368,11 +368,11 @@ void CLoopPreprocessorPP::validateLicense()
 IMiscUtilsPtr CLoopPreprocessorPP::getMiscUtils()
 {
 	// check if a MiscUtils object has all ready been created
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		// create MiscUtils object
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI24178", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24178", m_ipMiscUtils != __nullptr);
 	}
 
 	return m_ipMiscUtils;
@@ -542,7 +542,7 @@ IObjectWithDescriptionPtr CLoopPreprocessorPP::updateUIForSelected(IObjectWithDe
 {
 	// Convert selected object to Categorized component to get description
 	ICategorizedComponentPtr ipCategoryObj = ipSelected->Object;
-	ASSERT_RESOURCE_ALLOCATION("ELI24774", ipCategoryObj != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI24774", ipCategoryObj != __nullptr);
 
 	// Set the description for the object.
 	rEditControl.SetWindowTextA(ipSelected->Description);
@@ -559,10 +559,10 @@ void CLoopPreprocessorPP::configureObject(IObjectWithDescriptionPtr &ipObject, A
 	IObjectWithDescriptionPtr ipSelectedObject = ipObject;
 
 	// If there is no selected object create it
-	if ( ipSelectedObject == NULL)
+	if ( ipSelectedObject == __nullptr)
 	{
 		ipSelectedObject.CreateInstance(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI24775", ipSelectedObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24775", ipSelectedObject != __nullptr);
 	}
 
 	// Get the configure button rect for positioning the Select menu
@@ -588,10 +588,10 @@ void CLoopPreprocessorPP::configureObjectForDblClick(IObjectWithDescriptionPtr &
 	IObjectWithDescriptionPtr ipSelectedObject = ipObject;
 
 	// If there is no selected object create it
-	if ( ipSelectedObject == NULL)
+	if ( ipSelectedObject == __nullptr)
 	{
 		ipSelectedObject.CreateInstance(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI24776", ipSelectedObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24776", ipSelectedObject != __nullptr);
 	}
 
 	// allow the user to select and configure object

@@ -62,8 +62,8 @@ FileProcessingDlgScopePage::~FileProcessingDlgScopePage()
 	try
 	{
 		// Ensure COM pointers are released
-		m_ipClipboardMgr = NULL;
-		m_ipMiscUtils = NULL;
+		m_ipClipboardMgr = __nullptr;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16528");
 }
@@ -85,14 +85,14 @@ void FileProcessingDlgScopePage::refresh()
 
 	// Add each File Supplier to the list
 	IIUnknownVectorPtr ipFileSuppliersData = getFSMgmtRole()->FileSuppliers;
-	ASSERT_RESOURCE_ALLOCATION("ELI14259", ipFileSuppliersData != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14259", ipFileSuppliersData != __nullptr);
 
 	int iCount = ipFileSuppliersData->Size();
 	for (int i = 0; i < iCount; i++)
 	{
 		// Retrieve this File Supplier Data object
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD = ipFileSuppliersData->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI13733", ipFSD != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13733", ipFSD != __nullptr);
 
 		// Update this row in the grid
 		updateList( i, ipFSD );
@@ -106,7 +106,7 @@ void FileProcessingDlgScopePage::refresh()
 
 	// Update the FAM Condition
 	IObjectWithDescriptionPtr ipConditionObjWithDesc = getFSMgmtRole()->FAMCondition;
-	if (ipConditionObjWithDesc->Object != NULL)
+	if (ipConditionObjWithDesc->Object != __nullptr)
 	{
 		// get the FAM condition's description
 		_bstr_t _bstrText = ipConditionObjWithDesc->GetDescription();
@@ -126,7 +126,7 @@ void FileProcessingDlgScopePage::ResetInitialized()
 void FileProcessingDlgScopePage::setConfigMgr(FileProcessingConfigMgr* cfgMgr)
 {
 	m_cfgMgr = cfgMgr;
-	ASSERT_RESOURCE_ALLOCATION("ELI08915", m_cfgMgr != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08915", m_cfgMgr != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgScopePage::setEnabled(bool bEnabled)
@@ -140,7 +140,7 @@ void FileProcessingDlgScopePage::setEnabled(bool bEnabled)
 void FileProcessingDlgScopePage::setFPMgr(UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPMgr)
 {
 	m_pFPM = pFPMgr;
-	ASSERT_RESOURCE_ALLOCATION("ELI14078", m_pFPM != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14078", m_pFPM != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgScopePage::updateSupplierStatus(WPARAM wParam, LPARAM lParam)
@@ -162,7 +162,7 @@ void FileProcessingDlgScopePage::updateSupplierStatus(WPARAM wParam, LPARAM lPar
 		{
 			// Retrieve this File Supplier
 			UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipThisFS = getFileSupplier( i );
-			ASSERT_RESOURCE_ALLOCATION("ELI14043", ipThisFS != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14043", ipThisFS != __nullptr);
 
 			// Compare File Suppliers
 			if ((LPARAM)ipThisFS.GetInterfacePtr() == lParam)
@@ -261,7 +261,7 @@ BOOL FileProcessingDlgScopePage::OnInitDialog()
 
 		// Resize the Picture control around the Grid
 		CWnd*	pPicture = GetDlgItem( IDC_PICTURE );
-		if (pPicture != NULL)
+		if (pPicture != __nullptr)
 		{
 			// Get the Grid dimensions
 			CRect	rectGrid;
@@ -300,7 +300,7 @@ void FileProcessingDlgScopePage::OnBtnAdd()
 	{
 		// create a new ObjectWithDescription for the user to select or configure
 		IObjectWithDescriptionPtr ipObject(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI13683", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13683", ipObject != __nullptr);
 
 		// allow the user to select and configure ipObject
 		VARIANT_BOOL vbResult = getMiscUtils()->AllowUserToSelectAndConfigureObject(ipObject,
@@ -336,7 +336,7 @@ void FileProcessingDlgScopePage::OnBtnAdd()
 
 			// Create a new FileSupplierData object with Not Forced
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD( CLSID_FileSupplierData );
-			ASSERT_RESOURCE_ALLOCATION( "ELI13730", ipFSD != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13730", ipFSD != __nullptr );
 			ipFSD->ForceProcessing = VARIANT_FALSE;
 
 			// Insert the object-with-description into the File Supplier Data object and
@@ -429,7 +429,7 @@ void FileProcessingDlgScopePage::OnBtnConfigure()
 		{
 			// Retrieve selected File Supplier Data
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr	ipFSD = getFileSuppliersData()->At( iSelectedRow );
-			ASSERT_RESOURCE_ALLOCATION( "ELI13936", ipFSD != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13936", ipFSD != __nullptr );
 
 			// get the position and dimensions of the command button
 			RECT rectCommandButton;
@@ -598,11 +598,11 @@ void FileProcessingDlgScopePage::OnLButtonDblClk(UINT nFlags, CPoint point)
 		CWnd *tmpChild = ChildWindowFromPoint(point, CWP_SKIPTRANSPARENT);
 
 		// if the child was returned check if it is the condition control
-		if (tmpChild != NULL && tmpChild->GetDlgCtrlID() == IDC_EDIT_CONDITION)
+		if (tmpChild != __nullptr && tmpChild->GetDlgCtrlID() == IDC_EDIT_CONDITION)
 		{
 			// get the current FAM condition
 			IObjectWithDescriptionPtr ipFAMCondition = getFSMgmtRole()->FAMCondition;
-			ASSERT_RESOURCE_ALLOCATION("ELI16087", ipFAMCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16087", ipFAMCondition != __nullptr);
 
 			// allow the user to select and/or configure ipFAMCondition
 			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipFAMCondition,
@@ -635,7 +635,7 @@ void FileProcessingDlgScopePage::OnBtnSelectCondition()
 	{
 		// get the FAMCondition object-with-description
 		IObjectWithDescriptionPtr ipCondition = getFSMgmtRole()->FAMCondition;
-		ASSERT_RESOURCE_ALLOCATION( "ELI13558", ipCondition != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI13558", ipCondition != __nullptr );
 		
 		// get the dimensions of the FAM condition command button
 		RECT rectConditionCommandButton;
@@ -676,7 +676,7 @@ void FileProcessingDlgScopePage::OnContextCopy()
 	{
 		// Retrieve existing FAM condition
 		IObjectWithDescriptionPtr	ipObject = getFSMgmtRole()->FAMCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI15815", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15815", ipObject != __nullptr);
 
 		// ClipboardManager will handle the Copy
 		getClipboardManager()->CopyObjectToClipboard( ipObject );
@@ -694,7 +694,7 @@ void FileProcessingDlgScopePage::OnContextPaste()
 		{
 			// Retrieve object from ClipboardManager
 			ipObject = getClipboardManager()->GetObjectInClipboard();
-			ASSERT_RESOURCE_ALLOCATION("ELI15817", ipObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15817", ipObject != __nullptr);
 		}
 		else
 		{
@@ -704,7 +704,7 @@ void FileProcessingDlgScopePage::OnContextPaste()
 
 		// Set the FAM condition
 		IObjectWithDescriptionPtr ipSK = ipObject;
-		if (ipSK != NULL)
+		if (ipSK != __nullptr)
 		{
 			getFSMgmtRole()->FAMCondition = ipSK;
 
@@ -724,7 +724,7 @@ void FileProcessingDlgScopePage::OnContextDelete()
 		// Retrieve existing FAM condition description
 		CString	zDesc;
 		IObjectWithDescriptionPtr ipSK = getFSMgmtRole()->FAMCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI15819", ipSK != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI15819", ipSK != __nullptr );
 		string strDescription(ipSK->Description);
 		zDesc = strDescription.c_str();
 
@@ -772,7 +772,7 @@ LRESULT FileProcessingDlgScopePage::OnCellValueChange(WPARAM wParam, LPARAM lPar
 			// Get the file supplier for this row
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD =
 				getFileSuppliersData()->At(nRow);
-			ASSERT_RESOURCE_ALLOCATION("ELI30503", ipFSD != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30503", ipFSD != __nullptr);
 
 			// Get the new value from the grid
 			CString zValue(m_wndGrid.QuickGetText(nCol, nRow));
@@ -784,7 +784,7 @@ LRESULT FileProcessingDlgScopePage::OnCellValueChange(WPARAM wParam, LPARAM lPar
 					{
 						// Retrieve the Object With Description
 						IObjectWithDescriptionPtr ipObjWD = ipFSD->FileSupplier;
-						ASSERT_RESOURCE_ALLOCATION("ELI30504", ipObjWD != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI30504", ipObjWD != __nullptr);
 
 						// Update the Enabled flag
 						ipObjWD->Enabled = asVariantBool(zValue == "1");
@@ -836,7 +836,7 @@ LRESULT FileProcessingDlgScopePage::OnGridDblClick(WPARAM wParam, LPARAM lParam)
 			// retrieve the selected file supplier data
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr 
 				ipFileSuppliersData = getFileSuppliersData()->At(nRow);
-			ASSERT_RESOURCE_ALLOCATION("ELI16085", ipFileSuppliersData != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI16085", ipFileSuppliersData != __nullptr );
 
 			// allow the user to configure the selected file supplier
 			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipFileSuppliersData->FileSupplier,
@@ -929,7 +929,7 @@ UCLID_FILEPROCESSINGLib::IFileSupplierPtr FileProcessingDlgScopePage::getFileSup
 {
 	// get the file suppliers data
 	IIUnknownVectorPtr ipFileSuppliersData = getFSMgmtRole()->FileSuppliers;
-	if (ipFileSuppliersData == NULL)
+	if (ipFileSuppliersData == __nullptr)
 	{
 		return NULL;
 	}
@@ -942,11 +942,11 @@ UCLID_FILEPROCESSINGLib::IFileSupplierPtr FileProcessingDlgScopePage::getFileSup
 
 	// Retrieve desired FileSupplierData item 
 	UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipData = ipFileSuppliersData->At( iRow );
-	ASSERT_RESOURCE_ALLOCATION("ELI13731", ipData != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI13731", ipData != __nullptr);
 
 	// get the file supplier obj-with-desc
 	IObjectWithDescriptionPtr ipFSObjWithDesc = ipData->FileSupplier;
-	ASSERT_RESOURCE_ALLOCATION("ELI14263", ipFSObjWithDesc != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14263", ipFSObjWithDesc != __nullptr);
 
 	// Return FileSupplier object from Data item
 	return ipFSObjWithDesc->Object;
@@ -966,7 +966,7 @@ UCLID_FILEPROCESSINGLib::EFileSupplierStatus FileProcessingDlgScopePage::getStat
 
 	// Get desired File Supplier Data item
 	UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD = getFileSuppliersData()->At(iRow);
-	ASSERT_RESOURCE_ALLOCATION("ELI13732", ipFSD != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI13732", ipFSD != __nullptr);
 
 	// Return status
 	return ipFSD->FileSupplierStatus;
@@ -1042,11 +1042,11 @@ void FileProcessingDlgScopePage::updateList(int nRow,
 											UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD)
 {
 	// Object must be defined
-	ASSERT_RESOURCE_ALLOCATION("ELI13948", ipFSD != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI13948", ipFSD != __nullptr);
 
 	// Retrieve associated ObjectWithDescription
 	IObjectWithDescriptionPtr ipObj = ipFSD->FileSupplier;
-	ASSERT_RESOURCE_ALLOCATION("ELI13734", ipObj != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI13734", ipObj != __nullptr);
 
 	// Retrieve Enabled state
 	bool bEnabled = (ipObj->Enabled == VARIANT_TRUE);
@@ -1086,7 +1086,7 @@ void FileProcessingDlgScopePage::getDlgItemWindowRect(UINT uiDlgItemResourceID, 
 {
 	// retrieve the dialog item using its resource ID
 	CWnd* cwndDlgItem = GetDlgItem(uiDlgItemResourceID);
-	ASSERT_RESOURCE_ALLOCATION("ELI19439", cwndDlgItem != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19439", cwndDlgItem != __nullptr);
 
 	// set the window rect to the appropriate position and dimensions
 	cwndDlgItem->GetWindowRect(&rectWindow);
@@ -1095,11 +1095,11 @@ void FileProcessingDlgScopePage::getDlgItemWindowRect(UINT uiDlgItemResourceID, 
 UCLID_FILEPROCESSINGLib::IFileSupplyingMgmtRolePtr FileProcessingDlgScopePage::getFSMgmtRole()
 {
 	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPM( m_pFPM );
-	ASSERT_RESOURCE_ALLOCATION("ELI14264", ipFPM != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14264", ipFPM != __nullptr);
 
 	// get the file supplying mgmt role
 	UCLID_FILEPROCESSINGLib::IFileSupplyingMgmtRolePtr ipFSMgmtRole = ipFPM->FileSupplyingMgmtRole;
-	ASSERT_RESOURCE_ALLOCATION("ELI14258", ipFSMgmtRole != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14258", ipFSMgmtRole != __nullptr);
 
 	return ipFSMgmtRole;
 }
@@ -1108,7 +1108,7 @@ IIUnknownVectorPtr FileProcessingDlgScopePage::getFileSuppliersData()
 {
 	// get the file supplying mgmt role
 	IIUnknownVectorPtr ipFileSuppliersData = getFSMgmtRole()->FileSuppliers;
-	ASSERT_RESOURCE_ALLOCATION("ELI19429", ipFileSuppliersData != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19429", ipFileSuppliersData != __nullptr);
 
 	return ipFileSuppliersData;
 }
@@ -1120,7 +1120,7 @@ IClipboardObjectManagerPtr FileProcessingDlgScopePage::getClipboardManager()
 	{
 		// create MiscUtils object
 		m_ipClipboardMgr.CreateInstance(CLSID_ClipboardObjectManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI16088", m_ipClipboardMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16088", m_ipClipboardMgr != __nullptr);
 	}
 
 	return m_ipClipboardMgr;
@@ -1133,7 +1133,7 @@ IMiscUtilsPtr FileProcessingDlgScopePage::getMiscUtils()
 	{
 		// create MiscUtils object
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI19438", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19438", m_ipMiscUtils != __nullptr);
 	}
 
 	return m_ipMiscUtils;

@@ -21,8 +21,8 @@ const unsigned long gnCurrentVersion = 1;
 CMultiFAMConditionEXACTONE::CMultiFAMConditionEXACTONE()
 : m_bDirty(false)
 {
-	m_ipGenericMultiFAMCondition = NULL;
-	m_ipMultiFAMConditions = NULL;
+	m_ipGenericMultiFAMCondition = __nullptr;
+	m_ipMultiFAMConditions = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 CMultiFAMConditionEXACTONE::~CMultiFAMConditionEXACTONE()
@@ -69,10 +69,10 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_FileMatchesFAMCondition(IFileRecord
 	try
 	{
 		// Create m_ipGenericMultiFAMCondition if not exist
-		if (m_ipGenericMultiFAMCondition == NULL)
+		if (m_ipGenericMultiFAMCondition == __nullptr)
 		{
 			m_ipGenericMultiFAMCondition.CreateInstance(CLSID_GenericMultiFAMCondition);
-			ASSERT_RESOURCE_ALLOCATION("ELI13797", m_ipGenericMultiFAMCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13797", m_ipGenericMultiFAMCondition != __nullptr);
 		}
 
 		// call FileMatchesFAMCondition inside GenericMultiFAMCondition class
@@ -156,7 +156,7 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::Load(IStream *pStream)
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI13804");
 		m_ipMultiFAMConditions = ipObj;
-		ASSERT_RESOURCE_ALLOCATION("ELI13805", m_ipMultiFAMConditions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13805", m_ipMultiFAMConditions != __nullptr);
 
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
@@ -188,7 +188,7 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::Save(IStream *pStream, BOOL fClearDirty
 
 		// write the vector of FAM conditions to the stream
 		IPersistStreamPtr ipObj = m_ipMultiFAMConditions;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI13807", "IIUnknownVector component does not support persistence!");
 		}
@@ -222,15 +222,15 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		IMultipleObjectHolderPtr ipObj = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI13810", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13810", ipObj != __nullptr);
 
 		// get the vector of FAM Condition from the other object
 		IIUnknownVectorPtr ipMultiFAMCond = ipObj->ObjectsVector;
-		ASSERT_RESOURCE_ALLOCATION("ELI13811", ipMultiFAMCond != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13811", ipMultiFAMCond != __nullptr);
 
 		// copy the vector of FAM conditions
 		m_ipMultiFAMConditions = ipMultiFAMCond->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI13812", m_ipMultiFAMConditions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13812", m_ipMultiFAMConditions != __nullptr);
 
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13813")
@@ -250,7 +250,7 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_Clone(IUnknown **pObject)
 		// create another instance of this object
 		ICopyableObjectPtr ipObjCopy; 
 		ipObjCopy.CreateInstance(CLSID_MultiFAMConditionEXACTONE);
-		ASSERT_RESOURCE_ALLOCATION("ELI13814", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13814", ipObjCopy != __nullptr);
 
 		// Ask the other object to copy itself from this object
 		IUnknownPtr ipUnk = this;
@@ -305,10 +305,10 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::get_ObjectsVector(IIUnknownVector* *pVa
 		validateLicense();
 
 		// Create m_ipMultiFAMConditions if not exist
-		if (m_ipMultiFAMConditions == NULL)
+		if (m_ipMultiFAMConditions == __nullptr)
 		{
 			m_ipMultiFAMConditions.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI13818", m_ipMultiFAMConditions != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13818", m_ipMultiFAMConditions != __nullptr);
 		}
 
 		// return a reference to the internal vector
@@ -331,7 +331,7 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::put_ObjectsVector(IIUnknownVector *newV
 
 		// convert argument to smart pointer
 		IIUnknownVectorPtr ipMultiFAMConditions(newVal);
-		ASSERT_RESOURCE_ALLOCATION("ELI13827", ipMultiFAMConditions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13827", ipMultiFAMConditions != __nullptr);
 
 		// ensure that each of the items in the vector is an object with description
 		// where the object is a FAM condition
@@ -339,7 +339,7 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::put_ObjectsVector(IIUnknownVector *newV
 		for (int i = 0; i < nNumItems; i++)
 		{
 			IObjectWithDescriptionPtr ipObj = ipMultiFAMConditions->At(i);
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				UCLIDException ue("ELI13828", "Invalid object in vector - expecting vector of IObjectWithDescription objects!");
 				ue.addDebugInfo("index", i);
@@ -347,7 +347,7 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::put_ObjectsVector(IIUnknownVector *newV
 			}
 
 			IFAMConditionPtr ipFAMCondition = ipObj->Object;
-			if (ipFAMCondition == NULL)
+			if (ipFAMCondition == __nullptr)
 			{
 				UCLIDException ue("ELI13836", "Invalid object in ObjectWithDescription - expecting IFAMCondition object!");
 				ue.addDebugInfo("index", i);
@@ -401,7 +401,7 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_IsConfigured(VARIANT_BOOL * pbValue
 
 		// This object is considered configured if
 		// there's at least one object in the vector
-		*pbValue = asVariantBool(m_ipMultiFAMConditions != NULL && 
+		*pbValue = asVariantBool(m_ipMultiFAMConditions != __nullptr && 
 			m_ipMultiFAMConditions->Size() != 0);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13857");
@@ -418,7 +418,7 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_GetComponentDescription(BSTR * pstr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19639", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19639", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Exactly ONE in multiple conditions").Detach();
 	}

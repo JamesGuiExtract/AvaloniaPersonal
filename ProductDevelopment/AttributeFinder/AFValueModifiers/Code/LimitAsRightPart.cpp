@@ -67,10 +67,10 @@ STDMETHODIMP CLimitAsRightPart::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09288", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09288", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->GetValue();
-		ASSERT_ARGUMENT("ELI06620", ipInputText != NULL);
+		ASSERT_ARGUMENT("ELI06620", ipInputText != __nullptr);
 
 		// Extract or Remove requires a number of characters
 		if (m_nNumOfChars > 0)
@@ -116,10 +116,10 @@ STDMETHODIMP CLimitAsRightPart::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 
 			// Provide result to caller
 			ISpatialStringPtr ipModifiedValue = ipInputText->GetSubString(nStartPos, nEndPos);
-			ASSERT_RESOURCE_ALLOCATION("ELI25963", ipModifiedValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25963", ipModifiedValue != __nullptr);
 
 			ICopyableObjectPtr ipCopier = ipInputText;
-			ASSERT_RESOURCE_ALLOCATION("ELI25964", ipCopier != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25964", ipCopier != __nullptr);
 			ipCopier->CopyFrom(ipModifiedValue);
 		}
 	}
@@ -141,7 +141,7 @@ STDMETHODIMP CLimitAsRightPart::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::ILimitAsRightPartPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08281", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08281", ipSource != __nullptr);
 
 		m_nNumOfChars = ipSource->GetNumberOfCharacters();
 		m_bAcceptSmallerLength = (ipSource->GetAcceptSmallerLength()==VARIANT_TRUE) ? true : false;
@@ -162,7 +162,7 @@ STDMETHODIMP CLimitAsRightPart::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_LimitAsRightPart);
-		ASSERT_RESOURCE_ALLOCATION("ELI08353", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08353", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -203,7 +203,7 @@ STDMETHODIMP CLimitAsRightPart::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19602", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19602", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Extract or remove rightmost characters").Detach();
 	}

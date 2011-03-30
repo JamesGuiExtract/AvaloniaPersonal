@@ -148,7 +148,7 @@ m_nTotalNumChars(0)
 	try
 	{
 		// create instance of the configuration settings object
-		m_apSettings = auto_ptr<SpatialStringViewerCfg>(new SpatialStringViewerCfg(this));
+		m_apSettings = unique_ptr<SpatialStringViewerCfg>(new SpatialStringViewerCfg(this));
 
 		//{{AFX_DATA_INIT(CSpatialStringViewerDlg)
 		m_zText = _T("");
@@ -158,7 +158,7 @@ m_nTotalNumChars(0)
 
 		// create a spatial string object
 		m_ipSpatialString.CreateInstance(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI06719", m_ipSpatialString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06719", m_ipSpatialString != __nullptr);
 
 		// parse the command line argument and obtain the name of the USS file
 		/*		if (__argc > 2)
@@ -184,27 +184,27 @@ CSpatialStringViewerDlg::~CSpatialStringViewerDlg()
 		if (ma_pFindRegExDlg.get())
 		{
 			ma_pFindRegExDlg->DestroyWindow();
-			ma_pFindRegExDlg.reset(NULL);
+			ma_pFindRegExDlg.reset(__nullptr);
 		}
 		if (ma_pCharInfoDlg.get())
 		{
 			ma_pCharInfoDlg->DestroyWindow();
-			ma_pCharInfoDlg.reset(NULL);
+			ma_pCharInfoDlg.reset(__nullptr);
 		}
 		if(ma_pFontSizeDistDlg.get())
 		{
 			ma_pFontSizeDistDlg->DestroyWindow();
-			ma_pFontSizeDistDlg.reset(NULL);
+			ma_pFontSizeDistDlg.reset(__nullptr);
 		}
 		if (ma_pWordLengthDistDlg.get())
 		{
 			ma_pWordLengthDistDlg->DestroyWindow();
-			ma_pWordLengthDistDlg.reset(NULL);
+			ma_pWordLengthDistDlg.reset(__nullptr);
 		}
 
 		if (m_apSettings.get())
 		{
-			m_apSettings.reset(NULL);
+			m_apSettings.reset(__nullptr);
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16494");
@@ -252,11 +252,11 @@ BOOL CSpatialStringViewerDlg::OnInitDialog()
 		CDialog::OnInitDialog();
 
 		// get pointers to modeless dialogs
-		ma_pFindRegExDlg = auto_ptr<FindRegExDlg>(new FindRegExDlg(this, m_apSettings.get(), this));
-		ma_pCharInfoDlg = auto_ptr<CharInfoDlg>(new CharInfoDlg(this));
-		ma_pFontSizeDistDlg = auto_ptr<FontSizeDistributionDlg>(
+		ma_pFindRegExDlg = unique_ptr<FindRegExDlg>(new FindRegExDlg(this, m_apSettings.get(), this));
+		ma_pCharInfoDlg = unique_ptr<CharInfoDlg>(new CharInfoDlg(this));
+		ma_pFontSizeDistDlg = unique_ptr<FontSizeDistributionDlg>(
 			new FontSizeDistributionDlg(this, m_apSettings.get(), this));
-		ma_pWordLengthDistDlg = auto_ptr<WordLengthDistributionDlg>(
+		ma_pWordLengthDistDlg = unique_ptr<WordLengthDistributionDlg>(
 			new WordLengthDistributionDlg(this, m_apSettings.get(), this));
 
 		// create modeless dialogs
@@ -266,7 +266,7 @@ BOOL CSpatialStringViewerDlg::OnInitDialog()
 		ma_pWordLengthDistDlg->Create(WordLengthDistributionDlg::IDD, NULL);
 
 		// if there is no spatial string object, then just close this window
-		if (m_ipSpatialString == NULL)
+		if (m_ipSpatialString == __nullptr)
 		{
 			PostMessage(WM_CLOSE);
 			return TRUE;
@@ -279,7 +279,7 @@ BOOL CSpatialStringViewerDlg::OnInitDialog()
 		ASSERT(IDM_ABOUTBOX < 0xF000);
 
 		CMenu* pSysMenu = GetSystemMenu(FALSE);
-		if (pSysMenu != NULL)
+		if (pSysMenu != __nullptr)
 		{
 			CString strAboutMenu;
 			strAboutMenu.LoadString(IDS_ABOUTBOX);
@@ -554,7 +554,7 @@ void CSpatialStringViewerDlg::OnFileProperties()
 				// Create an empty spatial page info for empty spatial strings [LRCU #5313]
 				ipCollOfPageInfo.CreateInstance(CLSID_LongToObjectMap);
 			}
-			ASSERT_RESOURCE_ALLOCATION("ELI16819", ipCollOfPageInfo != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16819", ipCollOfPageInfo != __nullptr);
 
 			// Display the property dialog box
 			USSPropertyDlg dlg(strSourceDocName, m_strOriginalSourceDoc, 
@@ -684,7 +684,7 @@ BOOL CSpatialStringViewerDlg::PreTranslateMessage(MSG* pMsg)
 				// Get the page number of the character following the cursor
 				if(nEnd < m_ipSpatialString->Size)
 				{
-					ILetterPtr ipLetter = NULL;
+					ILetterPtr ipLetter = __nullptr;
 					m_ipSpatialString->GetNextOCRImageSpatialLetter(nEnd, &ipLetter);
 
 					if(ipLetter)
@@ -714,7 +714,7 @@ BOOL CSpatialStringViewerDlg::PreTranslateMessage(MSG* pMsg)
 						ILetterPtr ipLetter = m_ipSpatialString->GetOCRImageLetter(nCharacter);
 
 						// check to be sure we have a letter
-						if (ipLetter != NULL)
+						if (ipLetter != __nullptr)
 						{
 							// update the Character Info window if it is visible
 							if (ma_pCharInfoDlg.get() && 
@@ -731,7 +731,7 @@ BOOL CSpatialStringViewerDlg::PreTranslateMessage(MSG* pMsg)
 				{
 					// Get the mode font size and mean confidence of the selected text
 					ISpatialStringPtr ipSubString = m_ipSpatialString->GetSubString(nStart, nEnd-1);
-					ASSERT_RESOURCE_ALLOCATION("ELI20673", ipSubString != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI20673", ipSubString != __nullptr);
 
 					if(ipSubString->HasSpatialInfo() == VARIANT_TRUE)
 					{

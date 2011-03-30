@@ -90,14 +90,14 @@ UINT ProgressDlgTaskRunner::threadFunc(LPVOID pParam)
 	{
 		int retCode = 1;
 		ProgressDlgTaskRunner* pTaskRunner = (ProgressDlgTaskRunner*)pParam;
-		ASSERT_RESOURCE_ALLOCATION("ELI25239", pTaskRunner != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25239", pTaskRunner != __nullptr);
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		try
 		{
 			try
 			{
 				IProgressTask* pProgressTask = pTaskRunner->m_pProgressTask;
-				ASSERT_RESOURCE_ALLOCATION("ELI25240", pProgressTask != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25240", pProgressTask != __nullptr);
 				pProgressTask->runTask(pTaskRunner, pTaskRunner->m_nTaskID);
 			}
 			// We need a UCLIDException that we can save to rethrow from the main thread 

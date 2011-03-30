@@ -122,7 +122,7 @@ m_bRevertInProgress(false)
 		}
 
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI29457", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29457", m_ipMiscUtils != __nullptr);
 
 		// set the Unique Process Identifier string to be used to in locking the database
 		m_strUPI = UPI::getCurrentProcessUPI().getUPI();
@@ -650,7 +650,7 @@ STDMETHODIMP CFileProcessingDB::ResetDBLock(void)
 	try
 	{
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-		ADODB::_ConnectionPtr ipConnection = NULL;
+		ADODB::_ConnectionPtr ipConnection = __nullptr;
 		
 		BEGIN_CONNECTION_RETRY();
 		
@@ -755,8 +755,8 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20471", pbLoginCancelled != NULL);
-		ASSERT_ARGUMENT("ELI20472", pbLoginValid != NULL);
+		ASSERT_ARGUMENT("ELI20471", pbLoginCancelled != __nullptr);
+		ASSERT_ARGUMENT("ELI20472", pbLoginValid != __nullptr);
 
 		// Convert bShowAdmin parameter to cpp bool for later use
 		bool bUseAdmin  = asCppBool(bShowAdmin);
@@ -853,7 +853,7 @@ STDMETHODIMP CFileProcessingDB::get_DBSchemaVersion(LONG* pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI15149", pVal != NULL);
+		ASSERT_ARGUMENT("ELI15149", pVal != __nullptr);
 
 		*pVal = getDBSchemaVersion();
 
@@ -934,7 +934,7 @@ STDMETHODIMP CFileProcessingDB::GetCurrentConnectionStatus(BSTR* pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17566", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17566", pVal != __nullptr);
 
 		// Don't return the current connection in the middle of a reset event [FlexIDSCore #3463]
 		string strResult = m_strCurrentConnectionStatus;
@@ -975,7 +975,7 @@ STDMETHODIMP CFileProcessingDB::get_DatabaseServer(BSTR* pVal)
 	
 	try
 	{
-		ASSERT_ARGUMENT("ELI17564", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17564", pVal != __nullptr);
 
 		*pVal = get_bstr_t(m_strDatabaseServer).Detach();
 
@@ -1008,7 +1008,7 @@ STDMETHODIMP CFileProcessingDB::get_DatabaseName(BSTR* pVal)
 	
 	try
 	{
-		ASSERT_ARGUMENT("ELI17565", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17565", pVal != __nullptr);
 
 		*pVal = get_bstr_t(m_strDatabaseName).Detach();
 
@@ -1192,7 +1192,7 @@ STDMETHODIMP CFileProcessingDB::GetResultsForQuery(BSTR bstrQuery, _Recordset** 
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI19881", ppVal != NULL);
+		ASSERT_ARGUMENT("ELI19881", ppVal != __nullptr);
 
 		validateLicense();
 
@@ -1216,7 +1216,7 @@ STDMETHODIMP CFileProcessingDB::AsStatusString(EActionStatus eaStatus, BSTR *pbs
 
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI19899", pbstrStatusString != NULL);
+		ASSERT_ARGUMENT("ELI19899", pbstrStatusString != __nullptr);
 
 		*pbstrStatusString = get_bstr_t(asStatusString(eaStatus)).Detach();
 	}
@@ -1233,7 +1233,7 @@ STDMETHODIMP CFileProcessingDB::AsEActionStatus(BSTR bstrStatus, EActionStatus *
 
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI19900", peaStatus != NULL);
+		ASSERT_ARGUMENT("ELI19900", peaStatus != __nullptr);
 
 		*peaStatus = asEActionStatus(asString(bstrStatus));
 	}
@@ -1680,10 +1680,10 @@ STDMETHODIMP CFileProcessingDB::GetPriorities(IVariantVector** ppvecPriorities)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27596", ppvecPriorities != NULL);
+		ASSERT_ARGUMENT("ELI27596", ppvecPriorities != __nullptr);
 
 		IVariantVectorPtr ipVecPriorities(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI27597", ipVecPriorities != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27597", ipVecPriorities != __nullptr);
 
 		// Add the priority levels to the vector
 		ipVecPriorities->PushBack("Low");
@@ -1708,7 +1708,7 @@ STDMETHODIMP CFileProcessingDB::AsPriorityString(EFilePriority ePriority, BSTR *
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27671", pbstrPriority != NULL);
+		ASSERT_ARGUMENT("ELI27671", pbstrPriority != __nullptr);
 
 		*pbstrPriority = _bstr_t(
 			getPriorityString((UCLID_FILEPROCESSINGLib::EFilePriority)ePriority).c_str()).Detach();
@@ -1726,7 +1726,7 @@ STDMETHODIMP CFileProcessingDB::AsEFilePriority(BSTR bstrPriority, EFilePriority
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27673", pePriority != NULL);
+		ASSERT_ARGUMENT("ELI27673", pePriority != __nullptr);
 
 		*pePriority = (EFilePriority) getPriorityFromString(asString(bstrPriority));
 
@@ -2203,10 +2203,10 @@ STDMETHODIMP CFileProcessingDB::CanSkipAuthenticationOnThisMachine(VARIANT_BOOL*
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		ASSERT_ARGUMENT("ELI29207", pvbSkipAuthentication != NULL);
+		ASSERT_ARGUMENT("ELI29207", pvbSkipAuthentication != __nullptr);
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-		ADODB::_ConnectionPtr ipConnection = NULL;
+		ADODB::_ConnectionPtr ipConnection = __nullptr;
 		
 		BEGIN_CONNECTION_RETRY();
 
@@ -2272,8 +2272,8 @@ STDMETHODIMP CFileProcessingDB::GetConnectionRetrySettings(long* pnNumberOfRetri
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29861", pnNumberOfRetries != NULL);
-		ASSERT_ARGUMENT("ELI29862", pdRetryTimeout != NULL);
+		ASSERT_ARGUMENT("ELI29861", pnNumberOfRetries != __nullptr);
+		ASSERT_ARGUMENT("ELI29862", pdRetryTimeout != __nullptr);
 
 		validateLicense();
 

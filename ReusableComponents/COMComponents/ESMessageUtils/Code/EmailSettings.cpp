@@ -404,7 +404,7 @@ STDMETHODIMP CEmailSettings::get_SMTPTimeout(LONG *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25063", pVal != NULL );
+		ASSERT_ARGUMENT("ELI25063", pVal != __nullptr );
 		*pVal = m_nSMTPTimeout;
 
 		return S_OK;

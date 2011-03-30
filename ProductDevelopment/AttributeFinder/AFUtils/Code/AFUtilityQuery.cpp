@@ -39,7 +39,7 @@ STDMETHODIMP CAFUtility::QueryAttributes(IIUnknownVector *pvecAttributes,
 
 		// wrap the input vector of attributes in a smart pointer
 		IIUnknownVectorPtr ipInput(pvecAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI07936", ipInput != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07936", ipInput != __nullptr);
 
 		string strMainQuery = asString(strQuery);
 		IIUnknownVectorPtr ipResult = getCandidateAttributes(ipInput, strMainQuery,
@@ -64,10 +64,10 @@ STDMETHODIMP CAFUtility::GetAttributeParent(IIUnknownVector *pvecAttributes,
 		validateLicense();
 
 		IIUnknownVectorPtr ipvecAttributes(pvecAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI09452", ipvecAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09452", ipvecAttributes != __nullptr);
 
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI09453", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09453", ipAttribute != __nullptr);
 
 		// Default the return value to NULL
 		*pRetVal = NULL;
@@ -76,7 +76,7 @@ STDMETHODIMP CAFUtility::GetAttributeParent(IIUnknownVector *pvecAttributes,
 		IAttributePtr ipParent = getAttributeParent(ipvecAttributes, ipAttribute);
 
 		// If a parent attribute was found, return the parent
-		if (ipParent != NULL)
+		if (ipParent != __nullptr)
 		{
 			*pRetVal = ipParent.Detach();
 		}
@@ -99,17 +99,17 @@ STDMETHODIMP CAFUtility::GetAttributeRoot(IIUnknownVector *pvecAttributes,
 		validateLicense();
 
 		IIUnknownVectorPtr ipvecAttributes(pvecAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI19365", ipvecAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19365", ipvecAttributes != __nullptr);
 
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI19366", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19366", ipAttribute != __nullptr);
 
-		IAttributePtr ipParent = NULL;
+		IAttributePtr ipParent = __nullptr;
 		long lSize = ipvecAttributes->Size();
 		for (long i = 0; i < lSize; i++)
 		{
 			IAttributePtr ipTmpAttr = ipvecAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI19367", ipTmpAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19367", ipTmpAttr != __nullptr);
 
 			// If the attribute itself is a root return itself
 			if (ipTmpAttr == ipAttribute)
@@ -119,7 +119,7 @@ STDMETHODIMP CAFUtility::GetAttributeRoot(IIUnknownVector *pvecAttributes,
 			}
 
 			ipParent = getParent(ipTmpAttr, ipAttribute);
-			if (ipParent != NULL)
+			if (ipParent != __nullptr)
 			{
 				// return the topmost ancestor
 				*pRetVal = ipTmpAttr.Detach();
@@ -226,10 +226,10 @@ STDMETHODIMP CAFUtility::RemoveAttribute(IIUnknownVector *pvecAttributes,
 		validateLicense();
 
 		IIUnknownVectorPtr ipvecAttributes(pvecAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI09465", ipvecAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09465", ipvecAttributes != __nullptr);
 
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI19368", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19368", ipAttribute != __nullptr);
 
 		removeAttribute(ipvecAttributes, ipAttribute);
 
@@ -250,15 +250,15 @@ STDMETHODIMP CAFUtility::RemoveAttributes(IIUnknownVector *pvecAttributes,
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(pvecAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI09519", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09519", ipAttributes != __nullptr);
 		IIUnknownVectorPtr ipRemove(pvecRemove);
-		ASSERT_RESOURCE_ALLOCATION("ELI09520", ipRemove != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09520", ipRemove != __nullptr);
 
 		long lSize = ipRemove->Size();
 		for (long i = 0; i < lSize; i++)
 		{
 			IAttributePtr ipAttr = ipRemove->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI09521", ipAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09521", ipAttr != __nullptr);
 			removeAttribute(ipAttributes, ipAttr);
 		}
 
@@ -321,7 +321,7 @@ STDMETHODIMP CAFUtility::IsValidQuery(BSTR bstrQuery, VARIANT_BOOL* pRetVal)
 
 			// Create a temporary attribute to test names and types for validity
 			IAttributePtr ipTmp(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI10432", ipTmp != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10432", ipTmp != __nullptr);
 			try
 			{
 				unsigned int ui;
@@ -372,7 +372,7 @@ STDMETHODIMP CAFUtility::RemoveMetadataAttributes(IIUnknownVector *pvecAttribute
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributeVector(pvecAttributes);
-		ASSERT_ARGUMENT("ELI28439", ipAttributeVector != NULL);
+		ASSERT_ARGUMENT("ELI28439", ipAttributeVector != __nullptr);
 
 		removeMetadataAttributes(ipAttributeVector);
 
@@ -393,8 +393,8 @@ void CAFUtility::processAttributeForMatches(IAttributePtr& ripAttribute,
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI19873", ripAttribute != NULL);
-		ASSERT_ARGUMENT("ELI19874", ripMatches != NULL);
+		ASSERT_ARGUMENT("ELI19873", ripAttribute != __nullptr);
+		ASSERT_ARGUMENT("ELI19874", ripMatches != __nullptr);
 
 		// default this returned value to false(attribute is not matched yet)
 		rbAttributeWasMatched = false;
@@ -452,10 +452,10 @@ void CAFUtility::processAttributeForMatches(IAttributePtr& ripAttribute,
 				if (vecNonSelectPatterns.size() > 0)
 				{
 					IIUnknownVectorPtr ipSubAttributes = ripAttribute->SubAttributes;
-					ASSERT_RESOURCE_ALLOCATION("ELI10220", ipSubAttributes != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI10220", ipSubAttributes != __nullptr);
 
 					IIUnknownVectorPtr ipTmpAttributes(CLSID_IUnknownVector);
-					ASSERT_RESOURCE_ALLOCATION("ELI19872", ipTmpAttributes != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI19872", ipTmpAttributes != __nullptr);
 
 					vector<CAFUtility::QueryPattern> tmpVec;
 					processAttributesForMatches( vecNonSelectPatterns, tmpVec, 0, 
@@ -477,7 +477,7 @@ void CAFUtility::processAttributeForMatches(IAttributePtr& ripAttribute,
 
 			// get the sub-attributes of the attribute
 			IIUnknownVectorPtr ipSubAttributes = ripAttribute->SubAttributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI07941", ipSubAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07941", ipSubAttributes != __nullptr);
 
 			processAttributesForMatches(vecPatterns, vecNonSelectPatterns, 
 				nCurrentMatchPos + 1, ripMatches, bRemoveMatchFromParent, ipSubAttributes);
@@ -502,7 +502,7 @@ void CAFUtility::processAttributesForMatches( const vector<CAFUtility::QueryPatt
 		{
 			// get the attribute at the current position and attempt matching
 			IAttributePtr ipAttribute = ripAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI07938", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07938", ipAttribute != __nullptr);
 
 			bool bAttrMatched = false;
 			// process the sub-attribute for the next level of match
@@ -611,7 +611,7 @@ IAttributePtr CAFUtility::getParent(const IAttributePtr& ipTestParent,
 	try
 	{
 		IIUnknownVectorPtr ipSubAttributes = ipTestParent->SubAttributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI26438", ipSubAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26438", ipSubAttributes != __nullptr);
 
 		// First check if the sub attributes collection contains this attribute
 		long lFoundIndex = -1;
@@ -628,10 +628,10 @@ IAttributePtr CAFUtility::getParent(const IAttributePtr& ipTestParent,
 		for (long i = 0; i < lSubSize; i++)
 		{
 			IAttributePtr ipTmpAttr = ipSubAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI09450", ipTmpAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09450", ipTmpAttr != __nullptr);
 
 			IAttributePtr ipParent = getParent(ipTmpAttr, ipAttribute);
-			if (ipParent != NULL)
+			if (ipParent != __nullptr)
 			{
 				return ipParent;
 			}
@@ -649,7 +649,7 @@ IIUnknownVectorPtr CAFUtility::getCandidateAttributes(const IIUnknownVectorPtr& 
 	{
 		// create the results vector
 		IIUnknownVectorPtr ipResult(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI07932", ipResult != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07932", ipResult != __nullptr);
 
 		// if the query contains a pipe character then an OR query
 		// has been defined - in which case, get each of the OR'ed 
@@ -695,16 +695,16 @@ void CAFUtility::removeAttribute(const IIUnknownVectorPtr& ipAttributes,
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI26435", ipAttributes != NULL);
-		ASSERT_ARGUMENT("ELI26436", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI26435", ipAttributes != __nullptr);
+		ASSERT_ARGUMENT("ELI26436", ipAttribute != __nullptr);
 
 		// Attempt to find the parent attribute
 		IAttributePtr ipParent = getAttributeParent(ipAttributes, ipAttribute);
-		if (ipParent != NULL)
+		if (ipParent != __nullptr)
 		{
 			// Get the sub attributes collection and remove the value
 			IIUnknownVectorPtr ipSubAttributes = ipParent->SubAttributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI26429", ipSubAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26429", ipSubAttributes != __nullptr);
 			ipSubAttributes->RemoveValue(ipAttribute);
 		}
 		else
@@ -721,18 +721,18 @@ IAttributePtr CAFUtility::getAttributeParent(const IIUnknownVectorPtr& ipAttribu
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI26431", ipAttributes != NULL);
-		ASSERT_ARGUMENT("ELI26432", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI26431", ipAttributes != __nullptr);
+		ASSERT_ARGUMENT("ELI26432", ipAttribute != __nullptr);
 
-		IAttributePtr ipParent = NULL;
+		IAttributePtr ipParent = __nullptr;
 		long lSize = ipAttributes->Size();
 		for (long i = 0; i < lSize; i++)
 		{
 			IAttributePtr ipTmpAttr = ipAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI26433", ipTmpAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26433", ipTmpAttr != __nullptr);
 
 			ipParent = getParent(ipTmpAttr, ipAttribute);
-			if (ipParent != NULL)
+			if (ipParent != __nullptr)
 			{
 				break;
 			}
@@ -751,7 +751,7 @@ void CAFUtility::removeMetadataAttributes(const IIUnknownVectorPtr &ripAttribute
 		for (long i = 0; i < lSize; i++)
 		{
 			IAttributePtr ipAttribute = ripAttributeVector->At(i);
-			ASSERT_ARGUMENT("ELI28451", ipAttribute != NULL);
+			ASSERT_ARGUMENT("ELI28451", ipAttribute != __nullptr);
 
 			// Per discussion with Arvind, assume any attribute whose name begins with an underscore
 			// is metadata.

@@ -282,7 +282,7 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE:	Reset all member variables.  The m_strSourceDocName attribute 
 	//			will be reset only if bResetSourceDocName == true. The m_ipPageInfoMap will
-	//			only be reset if bResetPageInfo == true and m_ipPageInfoMap != NULL
+	//			only be reset if bResetPageInfo == true and m_ipPageInfoMap != __nullptr
 	void reset(bool bResetSourceDocName, bool bResetPageInfo);
 	//----------------------------------------------------------------------------------------------
 	// PROMISE: To compute m_strString from ipLetters, and to set m_ipLetters to 
@@ -414,14 +414,14 @@ private:
 	//			to the original image coordinates.
 	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToNewPageInfo(
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone,
-		ILongToObjectMapPtr ipNewPageInfoMap = NULL);
+		ILongToObjectMapPtr ipNewPageInfoMap = __nullptr);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: Adjusts the specified coordinates so they are relative to the specified spatial page
 	//			info. If ipNewPageInfoMap is NULL, the coordinates returned will be relative to the
 	//			original image coordinates.
 	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToNewPageInfo(long lStartX, long lStartY,
 		long lEndX, long lEndY, long lHeight, int nPage,
-		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo = NULL);
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo = __nullptr);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: Given an image of the specified width and height, returns the center point (with
 	//			x and y coordinates inverted if specified.

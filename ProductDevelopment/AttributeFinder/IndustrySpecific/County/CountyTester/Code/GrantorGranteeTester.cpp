@@ -46,8 +46,8 @@ CGrantorGranteeTester::CGrantorGranteeTester()
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI06335", m_ipAttrFinderEngine != NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI07368", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06335", m_ipAttrFinderEngine != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI07368", m_ipAFUtility != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06337")
 }
@@ -90,7 +90,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI11932", pParams != NULL);
+			ASSERT_ARGUMENT("ELI11932", pParams != __nullptr);
 
 			IVariantVectorPtr ipParams(pParams);
 			// we never expect the params vector to be empty
@@ -102,7 +102,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 			// Check license
 			validateLicense();
 
-			if (m_ipResultLogger == NULL)
+			if (m_ipResultLogger == __nullptr)
 			{
 				throw UCLIDException("ELI06313", "Please set ResultLogger before proceeding.");
 			}
@@ -598,7 +598,7 @@ string CGrantorGranteeTester::getDocumentClassificationInfo(IAFDocumentPtr ipAFD
 	
 	IStrToObjectMapPtr ipObjectTags(ipAFDoc->ObjectTags);
 	string strDocType("");
-	if (ipObjectTags != NULL && ipObjectTags->Size > 0)
+	if (ipObjectTags != __nullptr && ipObjectTags->Size > 0)
 	{
 		if (ipObjectTags->Contains(_bstr_t(DOC_TYPE.c_str())) == VARIANT_TRUE)
 		{
@@ -660,7 +660,7 @@ string CGrantorGranteeTester::getDocumentProbabilityString(const string& strProb
 IIUnknownVectorPtr CGrantorGranteeTester::getExpectedAttributes(const string& strExpectedAttrFileName)
 {
 	IIUnknownVectorPtr ipExpectedAttributes(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI06327", ipExpectedAttributes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06327", ipExpectedAttributes != __nullptr);
 
 	// get all attributes from the file
 	IIUnknownVectorPtr ipAllAttributes = 
@@ -685,7 +685,7 @@ IIUnknownVectorPtr CGrantorGranteeTester::getExpectedAttributes(const string& st
 IIUnknownVectorPtr CGrantorGranteeTester::getGrantorGranteeAttributes(IAttributePtr ipAttribute)
 {
 	IIUnknownVectorPtr ipRetVec(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI19320", ipRetVec != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19320", ipRetVec != __nullptr);
 
 	// retain the attribute name and type
 	string strName = ipAttribute->Name;
@@ -694,7 +694,7 @@ IIUnknownVectorPtr CGrantorGranteeTester::getGrantorGranteeAttributes(IAttribute
 	// now take a look at the first level sub attributes and find 
 	// the ones with the names as "Person" or "Company"
 	IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-	if (ipSubAttributes != NULL && ipSubAttributes->Size() > 0)
+	if (ipSubAttributes != __nullptr && ipSubAttributes->Size() > 0)
 	{
 		long nSize = ipSubAttributes->Size();
 		for (long n=0; n<nSize; n++)
@@ -736,7 +736,7 @@ string CGrantorGranteeTester::getRuleID(IAFDocumentPtr ipAFDoc)
 	string strRuleID("");
 
 	IStrToObjectMapPtr ipObjMap = ipAFDoc->ObjectTags;
-	if (ipObjMap != NULL && ipObjMap->Size > 0)
+	if (ipObjMap != __nullptr && ipObjMap->Size > 0)
 	{
 		// before put any attributes in the grid, add record(s) to grid
 		// to display the which rule is actually used to capture the data if any
@@ -868,7 +868,7 @@ void CGrantorGranteeTester::interpretLine(const string& strLineText,
 									vecTokens[1], true );
 
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI09533", ipAFDoc != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09533", ipAFDoc != __nullptr );
 		string strReadFromFileName = m_ipAFUtility->ExpandTags( vecTokens[2].c_str(), ipAFDoc );
 		strReadFromFileName = getAbsoluteFileName(strCurrentDatFileName,
 									strReadFromFileName, false );
@@ -1030,17 +1030,17 @@ void CGrantorGranteeTester::processTestCase(const string& strRSDFile,
 
 		// Make up a SpatialString
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI07439", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07439", ipAFDoc != __nullptr);
 		ISpatialStringPtr ipInputText = ipAFDoc->Text;
 		ipInputText->LoadFrom(_bstr_t(strInputTextFile.c_str()), VARIANT_TRUE);
 		// find all attributes in the text file
-		if (m_ipCurrentAttributes != NULL )
+		if (m_ipCurrentAttributes != __nullptr )
 		{
 			m_ipCurrentAttributes->Clear();
 		}
 		IIUnknownVectorPtr ipFoundAttributes = m_ipAttrFinderEngine->FindAttributes( ipAFDoc, _bstr_t(""), -1, 
 			_bstr_t( strRSDFile.c_str() ), NULL, VARIANT_TRUE, NULL );
-		ASSERT_RESOURCE_ALLOCATION("ELI08799", ipFoundAttributes != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08799", ipFoundAttributes != __nullptr );
 
 		m_ipCurrentAttributes = ipFoundAttributes;
 		
@@ -1087,10 +1087,10 @@ void CGrantorGranteeTester::processTestCase(const string& strRSDFile,
 
 		// Make sure there is something to compare against otherwise compareAttributes will throw 
 		// exception and not count the expected attributes
-		if ( m_ipCurrentAttributes == NULL )
+		if ( m_ipCurrentAttributes == __nullptr )
 		{
 			m_ipCurrentAttributes.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI09206", m_ipCurrentAttributes != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09206", m_ipCurrentAttributes != __nullptr );
 		}
 		// get expected attributes from the file
 		IIUnknownVectorPtr ipExpectedAttributes = getExpectedAttributes(strEAVFile);

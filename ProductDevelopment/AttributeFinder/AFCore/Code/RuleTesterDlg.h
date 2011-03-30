@@ -31,7 +31,7 @@ class RuleTesterDlg :	public CDialog,
 // Construction
 public:
 	RuleTesterDlg(FileRecoveryManager *pFRM, 
-		UCLID_AFCORELib::IRuleSetPtr& ipRuleSet, CWnd* pParent = NULL);   // standard constructor
+		UCLID_AFCORELib::IRuleSetPtr& ipRuleSet, CWnd* pParent = __nullptr);   // standard constructor
 	~RuleTesterDlg();
 
 	void setCurrentAttributeName(const std::string& strAttributeName);
@@ -135,13 +135,13 @@ private:
 	std::string strResultAttrSourceDoc;
 
 	// Handles configuration persistence
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<TesterConfigMgr> ma_pCfgTesterMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<TesterConfigMgr> ma_pCfgTesterMgr;
 
 	// reference count for this COM object
 	long m_lRefCount;
 
-	std::auto_ptr<CToolBar>	m_apToolBar;
+	std::unique_ptr<CToolBar>	m_apToolBar;
 
 	UCLID_AFCORELib::IRuleSetPtr& m_ipRuleSet;
 
@@ -196,7 +196,7 @@ private:
 	//=============================================================================
 	// PURPOSE: Adds sub-attributes of specified Attribute to the list under
 	//             the specified HTREEITEM
-	// REQUIRE: ipAttribute != NULL
+	// REQUIRE: ipAttribute != __nullptr
 	// PROMISE: None.
 	// ARGS:	ipAttribute - parent Attribute
 	//             hItem - element in Tree List associated with ipAttribute

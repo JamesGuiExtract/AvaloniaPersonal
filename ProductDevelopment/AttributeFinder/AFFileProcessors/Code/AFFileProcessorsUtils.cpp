@@ -104,7 +104,7 @@ const std::string CAFFileProcessorsUtils::ExpandTagsAndTFE(IFAMTagManagerPtr ipF
 IFAMTagManagerPtr CAFFileProcessorsUtils::getFAMTagManager()
 {
 	IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-	ASSERT_RESOURCE_ALLOCATION("ELI15002", ipFAMTagManager != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15002", ipFAMTagManager != __nullptr);
 	return ipFAMTagManager;
 }
 //--------------------------------------------------------------------------------------------------

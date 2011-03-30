@@ -86,7 +86,7 @@ const string CFileProcessingUtils::ExpandTagsAndTFE(UCLID_FILEPROCESSINGLib::IFA
 	//////////////////////////////////////////////////////////////////////////
 
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipTag = UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr(pFAMTM);
-	ASSERT_RESOURCE_ALLOCATION("ELI18001", ipTag != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18001", ipTag != __nullptr);
 
 	// Pass the file name with the tags(strFile) and the source doc name(strSourceDocName) as parameters to Expandtags
 	// If file name contains <SourceDocName>, ExpandTags() will use strSourceDocName to expand it [P13: 3901]
@@ -111,7 +111,7 @@ const string CFileProcessingUtils::ExpandTagsAndTFE(UCLID_FILEPROCESSINGLib::IFA
 UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr CFileProcessingUtils::getFAMTagManager()
 {
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-	ASSERT_RESOURCE_ALLOCATION("ELI18002", ipFAMTagManager != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18002", ipFAMTagManager != __nullptr);
 	return ipFAMTagManager;
 }
 //--------------------------------------------------------------------------------------------------

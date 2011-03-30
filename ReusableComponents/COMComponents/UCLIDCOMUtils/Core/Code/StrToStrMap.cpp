@@ -117,7 +117,7 @@ STDMETHODIMP CStrToStrMap::Contains(BSTR key, VARIANT_BOOL *bFound)
 	{
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI28401", bFound != NULL);
+		ASSERT_ARGUMENT("ELI28401", bFound != __nullptr);
 
 		string stdstrKey = asString( key );
 
@@ -174,10 +174,10 @@ STDMETHODIMP CStrToStrMap::GetKeys(IVariantVector **pKeys)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28402", pKeys != NULL);
+		ASSERT_ARGUMENT("ELI28402", pKeys != __nullptr);
 		
 		UCLID_COMUTILSLib::IVariantVectorPtr ipKeys(CLSID_VariantVector);
-		if (ipKeys == NULL)
+		if (ipKeys == __nullptr)
 		{
 			throw UCLIDException("ELI04372", "Unable to create VariantVector object!");
 		}
@@ -203,7 +203,7 @@ STDMETHODIMP CStrToStrMap::get_Size(long *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28403", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28403", pVal != __nullptr);
 		
 		*pVal = m_mapKeyToValue.size();
 	}
@@ -221,8 +221,8 @@ STDMETHODIMP CStrToStrMap::GetKeyValue(long nIndex, BSTR *pstrKey, BSTR *pstrVal
 		// validate the license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28404", pstrKey != NULL);
-		ASSERT_ARGUMENT("ELI28405", pstrValue != NULL);
+		ASSERT_ARGUMENT("ELI28404", pstrKey != __nullptr);
+		ASSERT_ARGUMENT("ELI28405", pstrValue != __nullptr);
 		
 		// ensure that the index is valid
 		if ((unsigned long) nIndex >= m_mapKeyToValue.size())
@@ -303,7 +303,7 @@ STDMETHODIMP CStrToStrMap::Merge(IStrToStrMap *pMapToMerge, EMergeMethod eMergeM
 	try
 	{
 		UCLID_COMUTILSLib::IStrToStrMapPtr ipMapToMerge(pMapToMerge);
-		ASSERT_ARGUMENT("ELI20194", ipMapToMerge != NULL);
+		ASSERT_ARGUMENT("ELI20194", ipMapToMerge != __nullptr);
 
 		// validate license
 		validateLicense();
@@ -331,8 +331,8 @@ STDMETHODIMP CStrToStrMap::MergeKeyValue(BSTR bstrKey, BSTR bstrValue, EMergeMet
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20196", bstrKey != NULL);
-		ASSERT_ARGUMENT("ELI20197", bstrValue != NULL);
+		ASSERT_ARGUMENT("ELI20196", bstrKey != __nullptr);
+		ASSERT_ARGUMENT("ELI20197", bstrValue != __nullptr);
 
 		// validate license
 		validateLicense();
@@ -417,7 +417,7 @@ STDMETHODIMP CStrToStrMap::Load(IStream *pStream)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28406", pStream != NULL);
+		ASSERT_ARGUMENT("ELI28406", pStream != __nullptr);
 
 		// clear the internal map
 		m_mapKeyToValue.clear();
@@ -483,7 +483,7 @@ STDMETHODIMP CStrToStrMap::Save(IStream *pStream, BOOL fClearDirty)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28407", pStream != NULL);
+		ASSERT_ARGUMENT("ELI28407", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -543,7 +543,7 @@ STDMETHODIMP CStrToStrMap::CopyFrom(IUnknown * pObject)
 
 		// Clear the other map object
 		UCLID_COMUTILSLib::IStrToStrMapPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI19349", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19349", ipSource != __nullptr);
 
 		clear();
 
@@ -572,7 +572,7 @@ STDMETHODIMP CStrToStrMap::Clone(IUnknown * * pObject)
 		// Create a new map
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_StrToStrMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI19355", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19355", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

@@ -82,20 +82,20 @@ STDMETHODIMP CCheckFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus *
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI24499", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24499", ipAFDoc != __nullptr);
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI24377", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24377", ipAttributes != __nullptr);
 
 		// Get the spatial string
 		ISpatialStringPtr ipSS = ipAFDoc->Text;
 
 		// Check that there is a spatial string and it has spatial info
-		if (ipSS != NULL && ipSS->HasSpatialInfo() == VARIANT_TRUE)
+		if (ipSS != __nullptr && ipSS->HasSpatialInfo() == VARIANT_TRUE)
 		{
 			// Get the pages from the spatial string [FlexIDSCore #3523]
 			IIUnknownVectorPtr ipPages = ipSS->GetPages();
-			ASSERT_RESOURCE_ALLOCATION("ELI25602", ipPages != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25602", ipPages != __nullptr);
 
 			// Build a vector of pages to process
 			long lSize = ipPages->Size();
@@ -104,7 +104,7 @@ STDMETHODIMP CCheckFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus *
 			{
 				// Get the page
 				ISpatialStringPtr ipPage = ipPages->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI25603", ipPage != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25603", ipPage != __nullptr);
 
 				// Get the page number for the page
 				long lPageNum = ipPage->GetFirstPageNumber();
@@ -132,7 +132,7 @@ STDMETHODIMP CCheckFinder::raw_GetComponentDescription(BSTR * pstrComponentDescr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24379", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI24379", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Check finder").Detach();
 	}
@@ -167,10 +167,10 @@ STDMETHODIMP CCheckFinder::raw_Clone(IUnknown * * pObject)
 		// validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24382", pObject != NULL);
+		ASSERT_ARGUMENT("ELI24382", pObject != __nullptr);
 
 		ICopyableObjectPtr ipObjCopy(CLSID_CheckFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI24383", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24383", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -289,7 +289,7 @@ STDMETHODIMP CCheckFinder::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI24388", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI24388", pbValue != __nullptr);
 
 		try
 		{
@@ -320,7 +320,7 @@ void CCheckFinder::findChecks(const string& strImageName, const vector<long>& ve
 	{
 		// Ensure the image exists
 		ASSERT_ARGUMENT("ELI24502", isValidFile(strImageName));
-		ASSERT_ARGUMENT("ELI24503", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI24503", ipAttributes != __nullptr);
 
 		// Handle PDF's (cannot load PDF directly into Inlite engine without PDF license)
 		string strWorkingFile = strImageName;
@@ -348,11 +348,11 @@ void CCheckFinder::findChecks(const string& strImageName, const vector<long>& ve
 
 			// Create the MICR reader (need to create a new one for each page)
 			_CcMicrReaderPtr ipReader(CLSID_CcMicrReader);
-			ASSERT_RESOURCE_ALLOCATION("ELI24504", ipReader != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24504", ipReader != __nullptr);
 
 			// Open the image
 			ICiImagePtr ipImage = ipReader->Image;
-			ASSERT_RESOURCE_ALLOCATION("ELI24505", ipImage != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24505", ipImage != __nullptr);
 			ipImage->Open(bstrImageName, *it);
 			_lastCodePos = "20_B_" + strCount;
 
@@ -371,15 +371,15 @@ void CCheckFinder::findChecks(const string& strImageName, const vector<long>& ve
 			_lastCodePos = "20_E_" + strCount;
 
 			// Check for extracted check
-			if (ipCheckImage != NULL)
+			if (ipCheckImage != __nullptr)
 			{
 				// Get the first MICR object
 				_CcMicrPtr ipMicr = ipReader->GetMicrLine(1);
-				ASSERT_RESOURCE_ALLOCATION("ELI24506", ipMicr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24506", ipMicr != __nullptr);
 
 				// Get the document object
 				_CcMicrInfoPtr ipDocument = ipMicr->Document;
-				ASSERT_RESOURCE_ALLOCATION("ELI24507", ipDocument != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24507", ipDocument != __nullptr);
 
 				checkData.skew = ipDocument->Skew;
 				_lastCodePos = "20_E_15" + strCount;
@@ -420,7 +420,7 @@ void CCheckFinder::findChecks(const string& strImageName, const vector<long>& ve
 			// Build the new attribute
 			IAttributePtr ipNewAttribute = buildAttribute(strImageName, it->first,
 				checkData, rect, "Check");
-			ASSERT_RESOURCE_ALLOCATION("ELI24508", ipNewAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24508", ipNewAttribute != __nullptr);
 
 			// Add the new attribute to the vector of attributes
 			ipAttributes->PushBack(ipNewAttribute);
@@ -440,7 +440,7 @@ IAttributePtr CCheckFinder::buildAttribute(const string& strImageName, long lPag
 	{
 		// Create a spatial page info
 		ISpatialPageInfoPtr ipInfo(CLSID_SpatialPageInfo);
-		ASSERT_RESOURCE_ALLOCATION("ELI24510", ipInfo != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24510", ipInfo != __nullptr);
 		ipInfo->Width = checkData.width;
 		ipInfo->Height = checkData.height;
 		ipInfo->Deskew = 0.0;
@@ -449,19 +449,19 @@ IAttributePtr CCheckFinder::buildAttribute(const string& strImageName, long lPag
 
 		// Create a spatial page info map
 		ILongToObjectMapPtr ipMap(CLSID_LongToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI24511", ipMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24511", ipMap != __nullptr);
 		ipMap->Set(lPage, ipInfo);
 		_lastCodePos = "20";
 
 		// Create a new rectangle
 		ILongRectanglePtr ipRect(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI24512", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24512", ipRect != __nullptr);
 		ipRect->SetBounds(rect.left, rect.top, rect.right, rect.bottom);
 		_lastCodePos = "30";
 
 		// Create a new raster zone
 		IRasterZonePtr ipRasterZone(CLSID_RasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI24513", ipRasterZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24513", ipRasterZone != __nullptr);
 		ipRasterZone->CreateFromLongRectangle(ipRect, lPage);
 		_lastCodePos = "40";
 
@@ -474,19 +474,19 @@ IAttributePtr CCheckFinder::buildAttribute(const string& strImageName, long lPag
 
 		// Create a new IUnknownVector
 		IIUnknownVectorPtr ipZones(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI24514", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24514", ipZones != __nullptr);
 		ipZones->PushBack(ipRasterZone);
 		_lastCodePos = "50";
 
 		// Create a new hybrid spatial string
 		ISpatialStringPtr ipSS(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI24515", ipSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24515", ipSS != __nullptr);
 		ipSS->CreateHybridString(ipZones, "Check image", strImageName.c_str(), ipMap);
 		_lastCodePos = "60";
 
 		// Create a new attribute
 		IAttributePtr ipAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI24516", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24516", ipAttribute != __nullptr);
 		ipAttribute->Value = ipSS;
 		_lastCodePos = "70";
 

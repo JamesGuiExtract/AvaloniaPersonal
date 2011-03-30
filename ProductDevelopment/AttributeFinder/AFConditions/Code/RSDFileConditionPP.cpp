@@ -26,7 +26,7 @@ CRSDFileConditionPP::CRSDFileConditionPP()
 		m_dwDocStringID = IDS_DOCSTRINGRSDFileConditionPP;
 
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI10927", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10927", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI10911");
 }
@@ -45,7 +45,7 @@ STDMETHODIMP CRSDFileConditionPP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFCONDITIONSLib::IRSDFileConditionPtr ipCondition = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI10912", ipCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10912", ipCondition != __nullptr);
 
 			// Set the .rsd file name
 			m_editRSDFileName = GetDlgItem(IDC_EDIT_RSD_FILE);
@@ -87,7 +87,7 @@ LRESULT CRSDFileConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 	try
 	{
 		UCLID_AFCONDITIONSLib::IRSDFileConditionPtr ipCondition = m_ppUnk[0];
-		if (ipCondition != NULL)
+		if (ipCondition != __nullptr)
 		{
 			// Get controls
 			m_editRSDFileName = GetDlgItem(IDC_EDIT_RSD_FILE);

@@ -74,7 +74,7 @@ private:
 
 	//------------------------------------------------------------------------------------------------
 	// PURPOSE: returns a pointer to a valid SSOCR engine.
-	// PROMISE: creates and licenses a new SSOCR engine if m_ipOCREngine is NULL.
+	// PROMISE: creates and licenses a new SSOCR engine if m_ipOCREngine is __nullptr.
 	//          sets the new SSOCR engine to the default for the input manager.
 	//          returns m_ipOCREngine.
 	IOCREnginePtr getOCREngine();

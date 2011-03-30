@@ -246,7 +246,7 @@ LRESULT CDateTimeSplitterPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 
 		// Access the underlying object
 		UCLID_AFSPLITTERSLib::IDateTimeSplitterPtr ipObj = m_ppUnk[0];
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI09768", "No object associated with this property page!");
 		}

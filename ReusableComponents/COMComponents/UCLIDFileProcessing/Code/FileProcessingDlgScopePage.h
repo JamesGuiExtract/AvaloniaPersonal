@@ -38,7 +38,7 @@ public:
 	void setEnabled(bool bEnabled);
 
 	// Will update status for the specified File Supplier
-	// or all Suppliers if ipFS == NULL.  Also updates enabled/disabled 
+	// or all Suppliers if ipFS == __nullptr.  Also updates enabled/disabled 
 	// state for action buttons
 	void updateSupplierStatus(WPARAM wParam, LPARAM lParam);
 

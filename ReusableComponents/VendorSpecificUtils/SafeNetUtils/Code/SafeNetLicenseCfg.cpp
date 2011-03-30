@@ -33,9 +33,9 @@ const string gstrDEFAULT_WAIT_TIMEOUT_FOR_USB_KEY_RETRY = "300"; // Seconds(5 mi
 SafeNetLicenseCfg::SafeNetLicenseCfg()
 {
 	// create instance of the persistence mgr
-	ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(new 
+	ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(new 
 		RegistryPersistenceMgr( HKEY_LOCAL_MACHINE, gstrREG_ROOT_KEY ));
-	ASSERT_RESOURCE_ALLOCATION( "ELI11312", ma_pUserCfgMgr.get() != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI11312", ma_pUserCfgMgr.get() != __nullptr );
 }
 //-------------------------------------------------------------------------------------------------
 SafeNetLicenseCfg::~SafeNetLicenseCfg()

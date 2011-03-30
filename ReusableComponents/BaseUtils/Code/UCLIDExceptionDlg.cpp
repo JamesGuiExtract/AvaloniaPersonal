@@ -105,7 +105,7 @@ void UCLIDExceptionDlg::OnButtonDetails()
 
 			// Update auto close text
 			CButton* pButton = (CButton *)GetDlgItem( IDC_CHECK_TIMEOUT );
-			if (pButton != NULL)
+			if (pButton != __nullptr)
 			{
 				string strLabel = makeTimeoutString( 0 );
 				pButton->SetWindowText( strLabel.c_str() );
@@ -186,7 +186,7 @@ BOOL UCLIDExceptionDlg::OnInitDialog()
 		if (m_bAutoTimeout)
 		{
 			CButton* pButton = (CButton *)GetDlgItem( IDC_CHECK_TIMEOUT );
-			if (pButton != NULL)
+			if (pButton != __nullptr)
 			{
 				pButton->SetCheck( BST_CHECKED );
 				pButton->EnableWindow( TRUE );
@@ -252,7 +252,7 @@ void UCLIDExceptionDlg::OnCheckTimeout()
 	{
 		// Retrieve current setting
 		CButton* pButton = (CButton *)GetDlgItem( IDC_CHECK_TIMEOUT );
-		if (pButton != NULL)
+		if (pButton != __nullptr)
 		{
 			int iResult = pButton->GetCheck();
 			if (iResult == BST_UNCHECKED)

@@ -141,7 +141,7 @@ int getIndexOfFirstSelectedItem(CListCtrl& rListCtrl)
 	// Determine if there is a selection in the list control.
 	POSITION pos = rListCtrl.GetFirstSelectedItemPosition();
 
-	if (pos != NULL)
+	if (pos != __nullptr)
 	{
 		// There is at least one item selected in the list control.
 		// Return the index of the first selected item.

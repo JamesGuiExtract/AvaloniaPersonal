@@ -38,7 +38,7 @@ STDMETHODIMP CMathematicalConditionPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI27169", pbValue != NULL);
+			ASSERT_ARGUMENT("ELI27169", pbValue != __nullptr);
 
 			// Check license
 			validateLicense();
@@ -71,7 +71,7 @@ STDMETHODIMP CMathematicalConditionPP::Apply(void)
 			EXTRACT_FAMCONDITIONSLib::IMathematicalFAMConditionPtr ipMathematicalCondition(m_ppUnk[i]);
 			if (ipMathematicalCondition)
 			{
-				IMathConditionCheckerPtr ipChecker = NULL;
+				IMathConditionCheckerPtr ipChecker = __nullptr;
 
 				// Get the data (validating as we go)
 				if (m_radioRandom.GetCheck() == BST_CHECKED)
@@ -103,7 +103,7 @@ STDMETHODIMP CMathematicalConditionPP::Apply(void)
 
 					// Create a new condition and set the percentage
 					IRandomMathConditionPtr ipRandom(CLSID_RandomMathCondition);
-					ASSERT_RESOURCE_ALLOCATION("ELI27171", ipRandom != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI27171", ipRandom != __nullptr);
 					ipRandom->Percent = nVal;
 
 					// Set the checker condition object
@@ -151,7 +151,7 @@ STDMETHODIMP CMathematicalConditionPP::Apply(void)
 
 					// Create a new condition and set the count and unique ID
 					IOnceEveryMathConditionPtr ipOnce(CLSID_OnceEveryMathCondition);
-					ASSERT_RESOURCE_ALLOCATION("ELI27173", ipOnce != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI27173", ipOnce != __nullptr);
 					ipOnce->NumberOfTimes = nVal;
 					ipOnce->UsageID = strGuid.c_str();
 
@@ -215,7 +215,7 @@ STDMETHODIMP CMathematicalConditionPP::Apply(void)
 
 					// Create a new condition and set the modulus and equals values
 					IModulusEqualsMathConditionPtr ipMod(CLSID_ModulusEqualsMathCondition);
-					ASSERT_RESOURCE_ALLOCATION("ELI27174", ipMod != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI27174", ipMod != __nullptr);
 					ipMod->Modulus = nMod;
 					ipMod->ModEquals = nModEquals;
 
@@ -229,7 +229,7 @@ STDMETHODIMP CMathematicalConditionPP::Apply(void)
 				}
 
 				// Ensure the checker object has been set
-				ASSERT_RESOURCE_ALLOCATION("ELI27176", ipChecker != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27176", ipChecker != __nullptr);
 
 				// Set the math condition object
 				ipMathematicalCondition->MathematicalCondition = ipChecker;
@@ -285,20 +285,20 @@ LRESULT CMathematicalConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 
 			// If it is not NULL, then check for which condition object it is
 			// and update the UI accordingly
-			if (ipChecker != NULL)
+			if (ipChecker != __nullptr)
 			{
 				// Attempt to get the checker as each type of checker object
 				IRandomMathConditionPtr ipRandom = ipChecker;
 				IOnceEveryMathConditionPtr ipOnce = ipChecker;
 				IModulusEqualsMathConditionPtr ipMod = ipChecker;
-				if (ipRandom != NULL)
+				if (ipRandom != __nullptr)
 				{
 					// Bools are already defaulted to this case, no need to change them
 
 					// Set the edit box from the object
 					m_editRandomPercent.SetWindowText(asString(ipRandom->Percent).c_str());
 				}
-				else if (ipOnce != NULL)
+				else if (ipOnce != __nullptr)
 				{
 					// Update bools
 					bRandom = false;
@@ -307,7 +307,7 @@ LRESULT CMathematicalConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 					// Set the edit box from the object
 					m_editOnceEvery.SetWindowText(asString(ipOnce->NumberOfTimes).c_str());
 				}
-				else if (ipMod != NULL)
+				else if (ipMod != __nullptr)
 				{
 					// Update bools
 					bRandom = false;

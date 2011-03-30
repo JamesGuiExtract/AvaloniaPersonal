@@ -63,13 +63,13 @@ STDMETHODIMP CEliminateDuplicates::raw_ProcessOutput(IIUnknownVector* pAttribute
 
 		// Loop through the vector and discard duplicate attributes.
 		IIUnknownVectorPtr ipOrignAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI05048", ipOrignAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05048", ipOrignAttributes != __nullptr);
 
 		for (long n = 0; n < ipOrignAttributes->Size(); n++)
 		{
 			// Retrieve this Attribute
 			IAttributePtr ipOriginAttr = ipOrignAttributes->At(n);
-			ASSERT_RESOURCE_ALLOCATION("ELI15672", ipOriginAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15672", ipOriginAttr != __nullptr);
 
 			// Check remaining Attributes in the vector
 			// If any duplicates are found, discard them
@@ -77,7 +77,7 @@ STDMETHODIMP CEliminateDuplicates::raw_ProcessOutput(IIUnknownVector* pAttribute
 			{
 				// Retrieve this Attribute
 				IAttributePtr ipNextAttr = ipOrignAttributes->At( i );
-				ASSERT_RESOURCE_ALLOCATION("ELI15673", ipNextAttr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15673", ipNextAttr != __nullptr);
 
 				// Check for duplicate
 				if (ipNextAttr->IsNonSpatialMatch( ipOriginAttr ) == VARIANT_TRUE)
@@ -103,7 +103,7 @@ STDMETHODIMP CEliminateDuplicates::raw_GetComponentDescription(BSTR * pstrCompon
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19542", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19542", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Eliminate duplicates").Detach();
 	}
@@ -257,7 +257,7 @@ STDMETHODIMP CEliminateDuplicates::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_EliminateDuplicates);
-		ASSERT_RESOURCE_ALLOCATION("ELI05265", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05265", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

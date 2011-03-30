@@ -328,7 +328,7 @@ STDMETHODIMP CInputEntity::GetOCRZones(IIUnknownVector **pRasterZones)
 		if (m_ipEntityMgr)
 		{
 			IIUnknownVectorPtr ipRasterZones = m_ipEntityMgr->GetOCRZones(m_bstrEntityID);
-			ASSERT_RESOURCE_ALLOCATION("ELI18105", ipRasterZones != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18105", ipRasterZones != __nullptr);
 
 			*pRasterZones = ipRasterZones.Detach();
 		}

@@ -27,7 +27,7 @@ STDMETHODIMP CLongPoint::CopyFrom(IUnknown *pObject)
 
 		// Ensure that the object is a Vector
 		UCLID_COMUTILSLib::ILongPointPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI10019", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10019", ipSource != __nullptr);
 
 		m_nX = ipSource->X;
 		m_nY = ipSource->Y;
@@ -48,7 +48,7 @@ STDMETHODIMP CLongPoint::Clone(IUnknown* *pObject)
 		// create a new variant vector
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_LongPoint);
-		ASSERT_RESOURCE_ALLOCATION("ELI10022", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10022", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

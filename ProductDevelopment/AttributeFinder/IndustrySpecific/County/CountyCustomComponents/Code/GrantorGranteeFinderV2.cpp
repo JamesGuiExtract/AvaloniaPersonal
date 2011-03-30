@@ -57,9 +57,9 @@ CGrantorGranteeFinderV2::CGrantorGranteeFinderV2()
 	try
 	{
 		// Instantiate the settings object
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrCOUNTY_CUSTOM_COMPONENTS_KEY));
-		ASSERT_RESOURCE_ALLOCATION( "ELI09217", ma_pUserCfgMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09217", ma_pUserCfgMgr.get() != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI09218")
 }
@@ -111,7 +111,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		validateLicense();
 
 		// ensure pre-requisites
-		ASSERT_ARGUMENT("ELI09219", pAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI09219", pAFDoc != __nullptr);
 
 		// first process the AFDocument to get proper tags for the document
 		IAFDocumentPtr ipAFDoc(pAFDoc);
@@ -122,7 +122,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		// the DOC PROBABILITY tag, otherwise something's wrong with
 		// our logic.
 		IStrToStrMapPtr ipStringTags(ipAFDoc->StringTags);
-		ASSERT_RESOURCE_ALLOCATION("ELI09220", ipStringTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09220", ipStringTags != __nullptr);
 		if (ipStringTags->Contains(DOC_PROBABILITY.c_str()) == VARIANT_FALSE)
 		{
 			// something wrong in our program logic
@@ -131,7 +131,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_ParseText(IAFDocument* pAFDoc, IProgre
 
 		// get the spatial string from the AFDocument
 		ISpatialStringPtr ipInputText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI09222", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09222", ipInputText != __nullptr);
 
 		// the vector for IAttribute
 		IIUnknownVectorPtr ipAttributes(NULL);
@@ -143,7 +143,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		{
 			// create an empty vector
 			ipAttributes.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI09671", ipAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09671", ipAttributes != __nullptr);
 			*pAttributes = ipAttributes.Detach();
 			return S_OK;
 		}
@@ -185,7 +185,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		{
 			// Load the Rule Set object
 			IRuleSetPtr ipRuleSet( CLSID_RuleSet );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10503", ipRuleSet != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10503", ipRuleSet != __nullptr );
 			ipRuleSet->LoadFrom( _bstr_t( strRSDFile.c_str() ), VARIANT_FALSE );
 
 			// Exercise the rules - for all attributes
@@ -201,14 +201,14 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		{
 			// Get the finder
 			IAttributeFindingRulePtr ipFinder = vecFinders[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI09252", ipFinder != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09252", ipFinder != __nullptr );
 
 			// Get the attributes
 			IIUnknownVectorPtr ipTempAttrs = ipFinder->ParseText(ipAFDoc, NULL);
-			ASSERT_RESOURCE_ALLOCATION("ELI09251", ipTempAttrs != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09251", ipTempAttrs != __nullptr );
 			
 			// Add the found attributes to the list of all found attributes
-			if ( ipAttributes == NULL )
+			if ( ipAttributes == __nullptr )
 			{
 				// if ipTempAttrs is NULL ipAttributes will still be NULL and handled on the next pass
 				ipAttributes = ipTempAttrs;
@@ -226,11 +226,11 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_ParseText(IAFDocument* pAFDoc, IProgre
 			getEntityFinder()->FindEntitiesInAttributes(ipAttributes);
 		}
 
-		if (ipAttributes == NULL)
+		if (ipAttributes == __nullptr)
 		{
 			// create an empty vector
 			ipAttributes.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI09224", ipAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09224", ipAttributes != __nullptr);
 		}
 		else
 		{
@@ -286,10 +286,10 @@ STDMETHODIMP CGrantorGranteeFinderV2::get_DocTypeToFileMap(/*[out, retval]*/ ISt
 	try
 	{
 		// if value is null create it and return the new value
-		if ( m_ipDocTypeToFileMap == NULL )
+		if ( m_ipDocTypeToFileMap == __nullptr )
 		{
 			m_ipDocTypeToFileMap.CreateInstance(CLSID_StrToObjectMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI09322", m_ipDocTypeToFileMap != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09322", m_ipDocTypeToFileMap != __nullptr );
 		}
 		IStrToObjectMapPtr ipShallowCopy = m_ipDocTypeToFileMap;
 		*pVal = ipShallowCopy.Detach();
@@ -342,7 +342,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_GetComponentDescription(BSTR * pstrCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19609", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19609", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Grantor-Grantee finder version 2").Detach();
 	}
@@ -394,15 +394,15 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_CopyFrom(IUnknown *pObject)
 
 		// Copy GrantorGranteeFinderV2 objects
 		UCLID_COUNTYCUSTOMCOMPONENTSLib::IGrantorGranteeFinderV2Ptr ipSourceV2(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI09324", ipSourceV2 != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09324", ipSourceV2 != __nullptr );
 
 		ICopyableObjectPtr ipCopyableObj;
 		ipCopyableObj = ipSourceV2->DocTypeToFileMap;
-		ASSERT_RESOURCE_ALLOCATION("ELI09323", ipCopyableObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09323", ipCopyableObj != __nullptr );
 
 		// create clone of list and copy it
 		m_ipDocTypeToFileMap = ipCopyableObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI09325", m_ipDocTypeToFileMap != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09325", m_ipDocTypeToFileMap != __nullptr );
 		// set the value of UseSelectedDatFiles
 		m_bUseSelectedDatFiles = ipSourceV2->UseSelectedDatFiles == VARIANT_TRUE;
 		
@@ -430,7 +430,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_GrantorGranteeFinderV2);
-		ASSERT_RESOURCE_ALLOCATION("ELI09235", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09235", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -480,7 +480,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::Load(IStream *pStream)
 		validateLicense();
 		
 		m_bUseSelectedDatFiles = false;
-		m_ipDocTypeToFileMap = NULL;
+		m_ipDocTypeToFileMap = __nullptr;
 		m_mapStringToVecSPMFinders.clear();
 
 		// Read the bytestream data from the IStream object
@@ -514,7 +514,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::Load(IStream *pStream)
 			// read the list of preprocessors
 			IPersistStreamPtr ipObj;
 			::readObjectFromStream(ipObj, pStream, "ELI09974");
-			ASSERT_RESOURCE_ALLOCATION("ELI09238", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09238", ipObj != __nullptr);
 			// ignore the pre-processors...it is no longer used by the
 			// current version of the object file anyway.
 		}
@@ -525,7 +525,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::Load(IStream *pStream)
 			// Save list of Selected dat files to use for doctypes
 			IPersistStreamPtr ipObj;
 			::readObjectFromStream(ipObj, pStream, "ELI09975");
-			ASSERT_RESOURCE_ALLOCATION("ELI09353", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09353", ipObj != __nullptr);
 			m_ipDocTypeToFileMap = ipObj;
 			
 			removeInvalidDocMappings();
@@ -574,7 +574,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			IPersistStreamPtr ipObj = m_ipDocTypeToFileMap;
 			
-			if ( ipObj == NULL )
+			if ( ipObj == __nullptr )
 			{
 				throw UCLIDException("ELI09352", "StrToObjectMap object does not support persistence.");
 			}
@@ -603,10 +603,10 @@ STDMETHODIMP CGrantorGranteeFinderV2::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 IAFUtilityPtr CGrantorGranteeFinderV2::getAFUtility()
 {
-	if (m_ipAFUtility == NULL)
+	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI09242", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09242", m_ipAFUtility != __nullptr);
 	}
 
 	return m_ipAFUtility;
@@ -614,10 +614,10 @@ IAFUtilityPtr CGrantorGranteeFinderV2::getAFUtility()
 //-------------------------------------------------------------------------------------------------
 IEntityFinderPtr CGrantorGranteeFinderV2::getEntityFinder()
 {
-	if (m_ipEntityFinder == NULL)
+	if (m_ipEntityFinder == __nullptr)
 	{
 		m_ipEntityFinder.CreateInstance(CLSID_EntityFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI09243", m_ipEntityFinder != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09243", m_ipEntityFinder != __nullptr);
 	}
 
 	return m_ipEntityFinder;
@@ -641,10 +641,10 @@ void CGrantorGranteeFinderV2::processAFDcoument(IAFDocumentPtr ipAFDoc)
 		||ipStringTags->Contains(_bstr_t(DOC_PROBABILITY.c_str())) == VARIANT_FALSE)
 	{
 		// use county document classifier to distinguish the document type
-		if (m_ipDocPreprocessor == NULL)
+		if (m_ipDocPreprocessor == __nullptr)
 		{
 			m_ipDocPreprocessor.CreateInstance(CLSID_DocumentClassifier);
-			ASSERT_RESOURCE_ALLOCATION("ELI09247", m_ipDocPreprocessor != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09247", m_ipDocPreprocessor != __nullptr);
 			// set industry category name
 			IDocumentClassifierPtr ipDocClassifier(m_ipDocPreprocessor);
 			ipDocClassifier->IndustryCategoryName = "County Document";
@@ -744,7 +744,7 @@ vector<ISPMFinderPtr> CGrantorGranteeFinderV2::getDocTypeSPMFinders(const string
 	{
 		// Get List of files for the document type
 		IVariantVectorPtr ipDatFiles = m_ipDocTypeToFileMap->GetValue( strTemp.c_str() );
-		ASSERT_RESOURCE_ALLOCATION("ELI09360", ipDatFiles != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09360", ipDatFiles != __nullptr );
 
 		long nNumDatFiles = ipDatFiles->Size;
 		// 11/1/07 SNK [P16:2499] Removed "ELI09263","No Rules Files Found." 
@@ -758,7 +758,7 @@ vector<ISPMFinderPtr> CGrantorGranteeFinderV2::getDocTypeSPMFinders(const string
 		{
 			// Create SPMFinder
 			ISPMFinderPtr ipSPMFinder(CLSID_SPMFinder );
-			ASSERT_RESOURCE_ALLOCATION("ELI09249", ipSPMFinder != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09249", ipSPMFinder != __nullptr );
 	
 			// Get file Name for dat file list
 			string strFileName = asString(_bstr_t(ipDatFiles->GetItem(i)));
@@ -800,7 +800,7 @@ vector<ISPMFinderPtr> CGrantorGranteeFinderV2::getDocTypeSPMFinders(const string
 			// find-best-match and a minimum score of 5.
 			IObjectWithDescriptionPtr ipDataScorerObjWithDesc = 
 				ipSPMFinder->DataScorer;
-			ASSERT_RESOURCE_ALLOCATION("ELI09245", ipDataScorerObjWithDesc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09245", ipDataScorerObjWithDesc != __nullptr);
 			
 			// set the data scorer
 			ipDataScorerObjWithDesc->Object = getDataScorer();
@@ -831,10 +831,10 @@ vector<ISPMFinderPtr> CGrantorGranteeFinderV2::getDocTypeSPMFinders(const string
 //-------------------------------------------------------------------------------------------------
 IDataScorerPtr CGrantorGranteeFinderV2::getDataScorer()
 {
-	if (m_ipDataScorer == NULL )
+	if (m_ipDataScorer == __nullptr )
 	{
 		m_ipDataScorer.CreateInstance(CLSID_EntityNameDataScorer);
-		ASSERT_RESOURCE_ALLOCATION("ELI09250", m_ipDataScorer != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09250", m_ipDataScorer != __nullptr );
 	}
 	return m_ipDataScorer;
 }
@@ -843,7 +843,7 @@ bool CGrantorGranteeFinderV2::getDocSubType(IAFDocumentPtr ipAFDoc, string& strD
 {
 	// get the object tags associated with the document
 	IStrToObjectMapPtr ipObjTags(ipAFDoc->ObjectTags);
-	ASSERT_RESOURCE_ALLOCATION("ELI09344", ipObjTags != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09344", ipObjTags != __nullptr);
 	
 	// check to see if a string tag for the document type exists.
 	if (ipObjTags->Contains(DOC_TYPE.c_str()) == VARIANT_FALSE)
@@ -853,7 +853,7 @@ bool CGrantorGranteeFinderV2::getDocSubType(IAFDocumentPtr ipAFDoc, string& strD
 	
 	// get the vector of document type names
 	IVariantVectorPtr ipVecDocTypes = ipObjTags->GetValue(_bstr_t(DOC_TYPE.c_str()));
-	ASSERT_RESOURCE_ALLOCATION("ELI09346", ipVecDocTypes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09346", ipVecDocTypes != __nullptr);
 	
 	// If there's no doc type found or there are more than one 
 	// type found, throw an exception
@@ -888,7 +888,7 @@ bool CGrantorGranteeFinderV2::getDocType(IAFDocumentPtr ipAFDoc, string& strDocT
 {
 	// get the object tags associated with the document
 	IStrToObjectMapPtr ipObjTags(ipAFDoc->ObjectTags);
-	ASSERT_RESOURCE_ALLOCATION("ELI19362", ipObjTags != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19362", ipObjTags != __nullptr);
 	
 	// check to see if a string tag for the document type exists.
 	if (ipObjTags->Contains(DOC_TYPE.c_str()) == VARIANT_FALSE)
@@ -898,7 +898,7 @@ bool CGrantorGranteeFinderV2::getDocType(IAFDocumentPtr ipAFDoc, string& strDocT
 	
 	// get the vector of document type names
 	IVariantVectorPtr ipVecDocTypes = ipObjTags->GetValue(_bstr_t(DOC_TYPE.c_str()));
-	ASSERT_RESOURCE_ALLOCATION("ELI19363", ipVecDocTypes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19363", ipVecDocTypes != __nullptr);
 	
 	// If there's no doc type found or there are more than one 
 	// type found, throw an exception
@@ -966,10 +966,10 @@ vector< stringCSIS > &CGrantorGranteeFinderV2::getValidDocTypes()
 void CGrantorGranteeFinderV2::initDocTypeToFileMap()
 {
 	// Create new list if doesn't already exist
-	if ( m_ipDocTypeToFileMap == NULL )
+	if ( m_ipDocTypeToFileMap == __nullptr )
 	{
 		m_ipDocTypeToFileMap.CreateInstance(CLSID_StrToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI09356", m_ipDocTypeToFileMap != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09356", m_ipDocTypeToFileMap != __nullptr );
 	}
 	m_ipDocTypeToFileMap->Clear();
 	m_ipDocTypeToFileMap->CaseSensitive = VARIANT_FALSE;
@@ -988,7 +988,7 @@ void CGrantorGranteeFinderV2::initDocTypeToFileMap()
 	{
 		// Store dat files in variant vector
 		IVariantVectorPtr ipDatFiles(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI09357", ipDatFiles != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09357", ipDatFiles != __nullptr);
 
 		// Get all the dat files for this doc type
 		DatFileIterator datFileIter(strDatFolder, *iterCurr);
@@ -1021,7 +1021,7 @@ bool CGrantorGranteeFinderV2::isValidDocType ( stringCSIS strDocType )
 void CGrantorGranteeFinderV2::removeInvalidDocMappings()
 {
 	IStrToObjectMapPtr ipNewMap( CLSID_StrToObjectMap );
-	ASSERT_RESOURCE_ALLOCATION ("ELI10479", ipNewMap != NULL );
+	ASSERT_RESOURCE_ALLOCATION ("ELI10479", ipNewMap != __nullptr );
 	
 	ipNewMap->CaseSensitive = VARIANT_FALSE;
 	

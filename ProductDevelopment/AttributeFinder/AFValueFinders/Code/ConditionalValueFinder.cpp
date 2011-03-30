@@ -87,7 +87,7 @@ STDMETHODIMP CConditionalValueFinder::raw_GetCondition(IAFCondition** ppConditio
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI10721", ppCondition != NULL);
+		ASSERT_ARGUMENT("ELI10721", ppCondition != __nullptr);
 
 		CComQIPtr<IAFCondition> ipTemp = m_ipCondition;
 		ipTemp.CopyTo(ppCondition);
@@ -104,7 +104,7 @@ STDMETHODIMP CConditionalValueFinder::raw_SetCondition(IAFCondition* pCondition)
 	try
 	{
 		IAFConditionPtr ipTmp(pCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI10719", ipTmp != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10719", ipTmp != __nullptr);
 		m_ipCondition = ipTmp;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10722")
@@ -118,7 +118,7 @@ STDMETHODIMP CConditionalValueFinder::raw_GetRule(IUnknown** ppRule)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI10723", ppRule != NULL);
+		ASSERT_ARGUMENT("ELI10723", ppRule != __nullptr);
 
 		CComPtr<IUnknown> ipTemp;
 		ipTemp = m_ipRule;
@@ -136,7 +136,7 @@ STDMETHODIMP CConditionalValueFinder::raw_SetRule(IUnknown* pRule)
 	try
 	{
 		IUnknownPtr ipTmp(pRule);
-		ASSERT_RESOURCE_ALLOCATION("ELI10725", ipTmp != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10725", ipTmp != __nullptr);
 
 		ipTmp->QueryInterface(IID_IAttributeFindingRule, (void**)&pRule);
 		if(pRule == NULL)
@@ -204,10 +204,10 @@ STDMETHODIMP CConditionalValueFinder::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI10733", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10733", ipAFDoc != __nullptr);
 
 		// pass the value into the rule set for further extraction
-		IIUnknownVectorPtr ipAttributes = NULL;
+		IIUnknownVectorPtr ipAttributes = __nullptr;
 
 		// use a smart pointer for the progress status object
 		IProgressStatusPtr ipProgressStatus = pProgressStatus;
@@ -348,11 +348,11 @@ STDMETHODIMP CConditionalValueFinder::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( data.getData(), nDataLength, NULL );
 
 		IPersistStreamPtr ipObj = m_ipCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI10739", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10739", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI10740", fClearDirty);
 
 		ipObj = m_ipRule;
-		ASSERT_RESOURCE_ALLOCATION("ELI10741", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10741", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI10742", fClearDirty);
 
 		// Clear the flag as specified
@@ -381,7 +381,7 @@ STDMETHODIMP CConditionalValueFinder::raw_GetComponentDescription(BSTR * pstrCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19576", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19576", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Conditionally find value").Detach();
 	}
@@ -409,8 +409,8 @@ STDMETHODIMP CConditionalValueFinder::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		validateLicense();
 		bool bConfigured = true;
 
-		if (m_ipRule == NULL ||
-			m_ipCondition == NULL)
+		if (m_ipRule == __nullptr ||
+			m_ipCondition == __nullptr)
 		{
 			bConfigured = false;
 		}
@@ -464,7 +464,7 @@ STDMETHODIMP CConditionalValueFinder::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		IConditionalRulePtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI10734", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10734", ipSource != __nullptr);
 
 		m_bInvertCondition = asCppBool(ipSource->InvertCondition);
 
@@ -487,7 +487,7 @@ STDMETHODIMP CConditionalValueFinder::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_ConditionalValueFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI10736", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10736", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

@@ -46,7 +46,7 @@ CESPrintManagerApp::CESPrintManagerApp()
 {
 	try
 	{
-		m_apUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		m_apUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE, gstrESPRINTMANAGER_SETTINGS_KEY_PATH));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI22139");
@@ -183,11 +183,11 @@ void CESPrintManagerApp::launchApplication(const PrintedImageResults& results)
 
 		// Fill the SHELLEXECUTEINFO struct
 		shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		shellExecuteInfo.hwnd = NULL;
+		shellExecuteInfo.hwnd = __nullptr;
 		shellExecuteInfo.lpVerb = "open";
 		shellExecuteInfo.lpFile = m_strLaunchApplication.c_str();
 		shellExecuteInfo.lpParameters = strCommandLine.c_str();
-		shellExecuteInfo.lpDirectory = NULL;
+		shellExecuteInfo.lpDirectory = __nullptr;
 		shellExecuteInfo.nShow = SW_SHOWNORMAL;
 
 		// Launch the application

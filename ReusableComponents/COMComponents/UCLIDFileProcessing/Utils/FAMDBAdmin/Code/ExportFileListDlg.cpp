@@ -32,7 +32,7 @@ m_ipFAMDB(ipFAMDB)
 	//{{AFX_DATA_INIT(CExportFileListDlg)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
-	ASSERT_ARGUMENT("ELI31250", ipFAMDB != NULL);
+	ASSERT_ARGUMENT("ELI31250", ipFAMDB != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CExportFileListDlg::CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
@@ -41,14 +41,14 @@ CExportFileListDlg::CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingD
 , m_ipFAMDB(ipFAMDB)
 , m_settings(selectSettings)
 {
-	ASSERT_ARGUMENT("ELI31251", ipFAMDB != NULL);
+	ASSERT_ARGUMENT("ELI31251", ipFAMDB != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CExportFileListDlg::~CExportFileListDlg()
 {
 	try
 	{
-		m_ipFAMDB = NULL;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27682");
 }

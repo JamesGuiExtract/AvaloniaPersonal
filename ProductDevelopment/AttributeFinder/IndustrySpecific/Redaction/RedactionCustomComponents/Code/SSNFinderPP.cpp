@@ -72,7 +72,7 @@ STDMETHODIMP CSSNFinderPP::Apply()
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_REDACTIONCUSTOMCOMPONENTSLib::ISSNFinderPtr ipSSNFinder(m_ppUnk[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI18168", ipSSNFinder != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18168", ipSSNFinder != __nullptr);
 
 			ipSSNFinder->SetOptions(bstrSubattributeName, asVariantBool(bSpatialSubattribute),
 				asVariantBool(bClearIfNoneFound));
@@ -93,7 +93,7 @@ STDMETHODIMP CSSNFinderPP::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// check parameter
-		ASSERT_ARGUMENT("ELI18258", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18258", pbValue != __nullptr);
 
 		try
 		{
@@ -125,7 +125,7 @@ LRESULT CSSNFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 		// get the SSNFinder associated with this property page
 		// NOTE: this assumes only one coclass is associated with this property page
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::ISSNFinderPtr ipSSNFinder(m_ppUnk[0]);
-		ASSERT_RESOURCE_ALLOCATION("ELI18169", ipSSNFinder != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18169", ipSSNFinder != __nullptr);
 
 		// get the dialog items
 		m_editSubattributeName = GetDlgItem(IDC_SSNFINDER_EDIT_SUBATTRIBUTE_NAME);

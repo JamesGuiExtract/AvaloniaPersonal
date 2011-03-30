@@ -79,7 +79,7 @@ AttributeTester::~AttributeTester()
 //-------------------------------------------------------------------------------------------------
 void AttributeTester::addTester(IAttributeTester* pTester)
 {
-	ASSERT_ARGUMENT("ELI25146", pTester != NULL);
+	ASSERT_ARGUMENT("ELI25146", pTester != __nullptr);
 
 	m_vecTesters.push_back(pTester);
 }

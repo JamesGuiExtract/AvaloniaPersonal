@@ -33,7 +33,7 @@ CTagCondition::~CTagCondition()
 {
 	try
 	{
-		m_ipVecTags = NULL;
+		m_ipVecTags = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27518");
 }
@@ -47,7 +47,7 @@ void CTagCondition::FinalRelease()
 {
 	try
 	{
-		m_ipVecTags = NULL;
+		m_ipVecTags = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27519");
 }
@@ -63,7 +63,7 @@ STDMETHODIMP CTagCondition::get_ConsiderMet(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27520", pVal != NULL);
+		ASSERT_ARGUMENT("ELI27520", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bConsiderMet);
 
@@ -97,7 +97,7 @@ STDMETHODIMP CTagCondition::get_AnyTags(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27523", pVal != NULL);
+		ASSERT_ARGUMENT("ELI27523", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bAnyTags);
 
@@ -131,7 +131,7 @@ STDMETHODIMP CTagCondition::get_Tags(IVariantVector **ppVecTags)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27526", ppVecTags != NULL);
+		ASSERT_ARGUMENT("ELI27526", ppVecTags != __nullptr);
 
 		IVariantVectorPtr ipShallowCopy = m_ipVecTags;
 
@@ -176,21 +176,21 @@ STDMETHODIMP CTagCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecord
 		string strSourceFileName = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI27529", !strSourceFileName.empty());
 		IFileProcessingDBPtr ipFPDB(pFPDB);
-		ASSERT_ARGUMENT("ELI27530", ipFPDB != NULL);
-		ASSERT_ARGUMENT("ELI27531", pFAMTM != NULL);
-		ASSERT_ARGUMENT("ELI27532", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI27530", ipFPDB != __nullptr);
+		ASSERT_ARGUMENT("ELI27531", pFAMTM != __nullptr);
+		ASSERT_ARGUMENT("ELI27532", pRetVal != __nullptr);
 
 		validateLicense();
 
 		// Ensure the tags vector is not NULL
-		if (m_ipVecTags == NULL)
+		if (m_ipVecTags == __nullptr)
 		{
 			UCLIDException ue("ELI27533", "No tags set for condition to evaluate!");
 			throw ue;
 		}
 
 		IVariantVectorPtr ipTagsOnFile = ipFPDB->GetTagsOnFile(ipFileRecord->FileID);
-		ASSERT_RESOURCE_ALLOCATION("ELI27534", ipTagsOnFile != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27534", ipTagsOnFile != __nullptr);
 
 		// Iterate through all of the tags
 		long lSize = m_ipVecTags->Size;
@@ -280,7 +280,7 @@ STDMETHODIMP CTagCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27537", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27537", pbValue != __nullptr);
 
 		try
 		{
@@ -309,7 +309,7 @@ STDMETHODIMP CTagCondition::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27539", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI27539", pClassID != __nullptr);
 
 		*pClassID = CLSID_TagCondition;
 
@@ -336,7 +336,7 @@ STDMETHODIMP CTagCondition::Load(IStream *pStream)
 	try
 	{
 		IStreamPtr ipStream(pStream);
-		ASSERT_ARGUMENT("ELI27542", ipStream != NULL);
+		ASSERT_ARGUMENT("ELI27542", ipStream != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -344,7 +344,7 @@ STDMETHODIMP CTagCondition::Load(IStream *pStream)
 		// Reset existing members
 		m_bConsiderMet = true;
 		m_bAnyTags = false;
-		m_ipVecTags = NULL;
+		m_ipVecTags = __nullptr;
 		
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -393,7 +393,7 @@ STDMETHODIMP CTagCondition::Save(IStream *pStream, BOOL fClearDirty)
 	try
 	{
 		IStreamPtr ipStream(pStream);
-		ASSERT_ARGUMENT("ELI27548", ipStream != NULL);
+		ASSERT_ARGUMENT("ELI27548", ipStream != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -419,7 +419,7 @@ STDMETHODIMP CTagCondition::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the vector of tags to the stream
 		IPersistStreamPtr ipTags = m_ipVecTags;
-		ASSERT_RESOURCE_ALLOCATION("ELI27551", ipTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27551", ipTags != __nullptr);
 		writeObjectToStream(ipTags, ipStream, "ELI27552", fClearDirty);
 
 		// Clear the flag as specified
@@ -449,29 +449,29 @@ STDMETHODIMP CTagCondition::raw_CopyFrom(IUnknown *pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27554", pObject != NULL);
+		ASSERT_ARGUMENT("ELI27554", pObject != __nullptr);
 			
 		// Validate license
 		validateLicense();
 
 		EXTRACT_FAMCONDITIONSLib::ITagConditionPtr ipCopyThis = pObject;
-		ASSERT_ARGUMENT("ELI27555", ipCopyThis != NULL);
+		ASSERT_ARGUMENT("ELI27555", ipCopyThis != __nullptr);
 
 		m_bConsiderMet = asCppBool(ipCopyThis->ConsiderMet);
 		m_bAnyTags = asCppBool(ipCopyThis->AnyTags);
 
 		// Get the tags as a copyable object
 		ICopyableObjectPtr ipCopier(ipCopyThis->Tags);
-		if (ipCopier == NULL)
+		if (ipCopier == __nullptr)
 		{
 			// Tags is NULL, so set to NULL
-			m_ipVecTags = NULL;
+			m_ipVecTags = __nullptr;
 		}
 		else
 		{
 			// Clone the tags
 			m_ipVecTags = ipCopier->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI27556", m_ipVecTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27556", m_ipVecTags != __nullptr);
 		}
 
 		return S_OK;
@@ -485,14 +485,14 @@ STDMETHODIMP CTagCondition::raw_Clone(IUnknown **pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27558", pObject != NULL);
+		ASSERT_ARGUMENT("ELI27558", pObject != __nullptr);
 
 		// Validate license
 		validateLicense();
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_TagCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI27559", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27559", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -515,7 +515,7 @@ STDMETHODIMP CTagCondition::raw_IsConfigured(VARIANT_BOOL *pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI27561", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27561", pbValue != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -523,7 +523,7 @@ STDMETHODIMP CTagCondition::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		// Configured if:
 		// 1. The tag vector is not NULL
 		// 2. The tag vector is not empty
-		bool bConfigured = m_ipVecTags != NULL && m_ipVecTags->Size > 0;
+		bool bConfigured = m_ipVecTags != __nullptr && m_ipVecTags->Size > 0;
 
 		*pbValue = asVariantBool(bConfigured);
 
@@ -541,7 +541,7 @@ STDMETHODIMP CTagCondition::raw_GetComponentDescription(BSTR *pbstrComponentDesc
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27563", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI27563", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Tag condition").Detach();
 	}

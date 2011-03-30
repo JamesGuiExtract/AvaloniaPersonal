@@ -174,7 +174,7 @@ void FileProcessingDlgActionPage::OnBnClickedBtnSelAction()
 
 		// Check if there is no action inside the datebase;
 		IStrToStrMapPtr ipMapActions = getDBPointer()->GetActions();
-		ASSERT_RESOURCE_ALLOCATION("ELI15021", ipMapActions != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI15021", ipMapActions != __nullptr );
 
 		// If there is no action inside database Prompt user to define an action first
 		// unless AutoCreateAction is TRUE [LRCAU #5650]
@@ -188,7 +188,7 @@ void FileProcessingDlgActionPage::OnBnClickedBtnSelAction()
 
 		// Create IFAMDBUtilsPtr object to bring the Select Action dialog
 		UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI14907", ipFAMDBUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14907", ipFAMDBUtils != __nullptr );
 
 		// Get the action's name from the dialog
 		string strActionName = ipFAMDBUtils->PromptForActionSelection( 
@@ -389,13 +389,13 @@ void FileProcessingDlgActionPage::refresh(bool bWarnIfActionNotFound)
 void FileProcessingDlgActionPage::setFPMgr(UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPMgr)
 {
 	m_pFPM = pFPMgr;
-	ASSERT_RESOURCE_ALLOCATION("ELI14137", m_pFPM != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14137", m_pFPM != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgActionPage::setFPMDB(UCLID_FILEPROCESSINGLib::IFileProcessingDB* pFPMDB)
 {
 	m_pFPMDB = pFPMDB;
-	ASSERT_RESOURCE_ALLOCATION("ELI14138", m_pFPMDB != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14138", m_pFPMDB != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgActionPage::setEnabled(bool bEnabled)
@@ -554,7 +554,7 @@ UCLID_FILEPROCESSINGLib::IFileSupplyingMgmtRolePtr FileProcessingDlgActionPage::
 {
 	// get the file supplying mgmt role
 	UCLID_FILEPROCESSINGLib::IFileSupplyingMgmtRolePtr ipFSMgmtRole = getFPM()->FileSupplyingMgmtRole;
-	ASSERT_RESOURCE_ALLOCATION("ELI14265", ipFSMgmtRole != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14265", ipFSMgmtRole != __nullptr);
 
 	return ipFSMgmtRole;
 }
@@ -562,7 +562,7 @@ UCLID_FILEPROCESSINGLib::IFileSupplyingMgmtRolePtr FileProcessingDlgActionPage::
 UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr FileProcessingDlgActionPage::getSupplyingActionMgmtRole()
 {
 	UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipMgmtRole = getFSMgmtRole();
-	ASSERT_RESOURCE_ALLOCATION("ELI14276", ipMgmtRole != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14276", ipMgmtRole != __nullptr);
 	return ipMgmtRole;
 }
 //-------------------------------------------------------------------------------------------------
@@ -570,7 +570,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr FileProcessingDlgActionPage:
 {
 	// get the file Processing mgmt role
 	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipFPMgmtRole = getFPM()->FileProcessingMgmtRole;
-	ASSERT_RESOURCE_ALLOCATION("ELI14292", ipFPMgmtRole != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14292", ipFPMgmtRole != __nullptr);
 
 	return ipFPMgmtRole;
 }
@@ -578,7 +578,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr FileProcessingDlgActionPage:
 UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr FileProcessingDlgActionPage::getProcessingActionMgmtRole()
 {
 	UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipMgmtRole = getFPMgmtRole();
-	ASSERT_RESOURCE_ALLOCATION("ELI14293", ipMgmtRole != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14293", ipMgmtRole != __nullptr);
 	return ipMgmtRole;
 }
 //-------------------------------------------------------------------------------------------------

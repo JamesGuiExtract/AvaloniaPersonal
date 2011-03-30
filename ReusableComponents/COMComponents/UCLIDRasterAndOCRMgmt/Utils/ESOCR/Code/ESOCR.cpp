@@ -146,15 +146,15 @@ BOOL CESOCRApp::InitInstance()
 			// OCR the image
 			ISpatialStringPtr ipText = m_ipOCRUtils->RecognizeTextInImageFile(
 				strImagePath.c_str(), 1, m_ipOCREngine, NULL);
-			ASSERT_RESOURCE_ALLOCATION("ELI16154", ipText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16154", ipText != __nullptr);
 
 			// Write the text to the output file
 			ipText->SaveTo( strTextPath.c_str(), VARIANT_TRUE, VARIANT_TRUE );
 		
 			// Cleanup objects
-			m_ipOCRUtils = NULL;
-			m_ipOCREngine = NULL;
-			ipText = NULL;
+			m_ipOCRUtils = __nullptr;
+			m_ipOCREngine = __nullptr;
+			ipText = __nullptr;
 		}
 		// Modified as per [LegacyRCAndUtils #4986]
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI21595");
@@ -164,8 +164,8 @@ BOOL CESOCRApp::InitInstance()
 		// set the no error flag to false
 		m_bNoError = false;
 
-		m_ipOCREngine = NULL;
-		m_ipOCRUtils = NULL;
+		m_ipOCREngine = __nullptr;
+		m_ipOCRUtils = __nullptr;
 
 		if (bDisplayExceptions)
 		{
@@ -202,7 +202,7 @@ void CESOCRApp::prepareOCREngine()
 {
 	// Create OCR engine object
 	m_ipOCREngine.CreateInstance( CLSID_ScansoftOCR );
-	ASSERT_RESOURCE_ALLOCATION( "ELI12648", m_ipOCREngine != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI12648", m_ipOCREngine != __nullptr );
 
 	// Initialize the private OCR engine license
 	_bstr_t _bstrPrivateLicenseCode = get_bstr_t(LICENSE_MGMT_PASSWORD.c_str());
@@ -211,7 +211,7 @@ void CESOCRApp::prepareOCREngine()
 
 	// Create OCRUtils object
 	m_ipOCRUtils.CreateInstance( CLSID_OCRUtils );
-	ASSERT_RESOURCE_ALLOCATION( "ELI12649", m_ipOCRUtils != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI12649", m_ipOCRUtils != __nullptr );
 }
 //-------------------------------------------------------------------------------------------------
 void CESOCRApp::validateImage(const string& strImagePath)

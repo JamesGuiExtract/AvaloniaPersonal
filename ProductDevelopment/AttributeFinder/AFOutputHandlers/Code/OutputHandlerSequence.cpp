@@ -68,13 +68,13 @@ STDMETHODIMP COutputHandlerSequence::raw_ProcessOutput(IIUnknownVector* pAttribu
 		validateLicense();
 
 		// if no output handlers exist, then throw an exception
-		if (m_ipOutputHandlers == NULL || m_ipOutputHandlers->Size() == 0)
+		if (m_ipOutputHandlers == __nullptr || m_ipOutputHandlers->Size() == 0)
 		{
 			throw UCLIDException("ELI08146", "No output handlers specified!");
 		}
 
 		IIUnknownVectorPtr ipReturnAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI08095", ipReturnAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08095", ipReturnAttributes != __nullptr);
 
 		// use a smart pointer for the progress status object
 		IProgressStatusPtr ipProgressStatus = pProgressStatus;
@@ -87,7 +87,7 @@ STDMETHODIMP COutputHandlerSequence::raw_ProcessOutput(IIUnknownVector* pAttribu
 		{
 			// count the number of enabled output handlers using a MiscUtils object
 			IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-			ASSERT_RESOURCE_ALLOCATION("ELI16263", ipMiscUtils != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16263", ipMiscUtils != __nullptr);
 			long lEnabledOutputHandlers = ipMiscUtils->CountEnabledObjectsIn(m_ipOutputHandlers);
 
 			// leave without processing if there are no output handlers to process
@@ -108,7 +108,7 @@ STDMETHODIMP COutputHandlerSequence::raw_ProcessOutput(IIUnknownVector* pAttribu
 			// get the outputhandler object-with-description 
 			// at the current position
 			IObjectWithDescriptionPtr ipObj = m_ipOutputHandlers->At(i);;
-			ASSERT_RESOURCE_ALLOCATION("ELI08447", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08447", ipObj != __nullptr);
 
 			// Check state and use this Output Handler only if Enabled
 			if ( asCppBool(ipObj->Enabled) )
@@ -123,13 +123,13 @@ STDMETHODIMP COutputHandlerSequence::raw_ProcessOutput(IIUnknownVector* pAttribu
 
 				// get the output handler inside the object-with-description
 				IOutputHandlerPtr ipOutputHandler = ipObj->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI08101", ipOutputHandler != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI08101", ipOutputHandler != __nullptr);
 
 				// process this output handler, passing in the 
 				// subprogress object if it is available
 				ipOutputHandler->ProcessOutput(ipReturnAttributes, pAFDoc, 
 					(ipProgressStatus ? ipProgressStatus->SubProgressStatus : NULL) );
-				ASSERT_RESOURCE_ALLOCATION("ELI08096", ipReturnAttributes != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI08096", ipReturnAttributes != __nullptr);
 			}
 		}
 
@@ -183,10 +183,10 @@ STDMETHODIMP COutputHandlerSequence::get_ObjectsVector(IIUnknownVector* *pVal)
 		validateLicense();
 
 		// if the output handlers vector has not yet been initialized, do so
-		if (m_ipOutputHandlers == NULL)
+		if (m_ipOutputHandlers == __nullptr)
 		{
 			m_ipOutputHandlers.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI08441", m_ipOutputHandlers != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08441", m_ipOutputHandlers != __nullptr);
 		}
 
 		// return a reference to the internal vector
@@ -209,7 +209,7 @@ STDMETHODIMP COutputHandlerSequence::put_ObjectsVector(IIUnknownVector *newVal)
 
 		// convert argument to smart pointer
 		IIUnknownVectorPtr ipOutputHandlers(newVal);
-		ASSERT_RESOURCE_ALLOCATION("ELI08442", ipOutputHandlers != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08442", ipOutputHandlers != __nullptr);
 
 		// ensure that each of the items in the vector is an object with description
 		// where the object is an output handler
@@ -217,7 +217,7 @@ STDMETHODIMP COutputHandlerSequence::put_ObjectsVector(IIUnknownVector *newVal)
 		for (int i = 0; i < nNumItems; i++)
 		{
 			IObjectWithDescriptionPtr ipObj = ipOutputHandlers->At(i);
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				UCLIDException ue("ELI08124", "Invalid object in vector - expecting vector of IObjectWithDescription objects!");
 				ue.addDebugInfo("index", i);
@@ -225,7 +225,7 @@ STDMETHODIMP COutputHandlerSequence::put_ObjectsVector(IIUnknownVector *newVal)
 			}
 
 			IOutputHandlerPtr ipOutputHandler = ipObj->Object;
-			if (ipOutputHandler == NULL)
+			if (ipOutputHandler == __nullptr)
 			{
 				UCLIDException ue("ELI08091", "Invalid object in ObjectWithDescription - expecting IOutputHandler object!");
 				ue.addDebugInfo("index", i);
@@ -315,7 +315,7 @@ STDMETHODIMP COutputHandlerSequence::Load(IStream *pStream)
 			IPersistStreamPtr ipObj;
 			::readObjectFromStream(ipObj, pStream, "ELI09958");
 			m_ipOutputHandlers = ipObj;
-			ASSERT_RESOURCE_ALLOCATION("ELI08128", m_ipOutputHandlers != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08128", m_ipOutputHandlers != __nullptr);
 		}
 
 		// Clear the dirty flag as we've loaded a fresh object
@@ -348,7 +348,7 @@ STDMETHODIMP COutputHandlerSequence::Save(IStream *pStream, BOOL fClearDirty)
 
 		// write the vector of output handlers to the stream
 		IPersistStreamPtr ipObj = m_ipOutputHandlers;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI08127", "IIUnknownVector component does not support persistence!");
 		}
@@ -382,15 +382,15 @@ STDMETHODIMP COutputHandlerSequence::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		IMultipleObjectHolderPtr ipObj = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08083", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08083", ipObj != __nullptr);
 
 		// get the vector of output handlers from the other object
 		IIUnknownVectorPtr ipOutputHandlers = ipObj->ObjectsVector;
-		ASSERT_RESOURCE_ALLOCATION("ELI08445", ipOutputHandlers != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08445", ipOutputHandlers != __nullptr);
 
 		// copy the vector of output handlers
 		m_ipOutputHandlers = ipOutputHandlers->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI08446", m_ipOutputHandlers != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08446", m_ipOutputHandlers != __nullptr);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08406")
 
@@ -409,7 +409,7 @@ STDMETHODIMP COutputHandlerSequence::raw_Clone(IUnknown **pObject)
 		// create another instance of this object
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_OutputHandlerSequence);
-		ASSERT_RESOURCE_ALLOCATION("ELI08084", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08084", ipObjCopy != __nullptr);
 
 		// ask the other object to copy itself from this object
 		IUnknownPtr ipUnk = this;
@@ -443,7 +443,7 @@ STDMETHODIMP COutputHandlerSequence::raw_IsConfigured(VARIANT_BOOL * pbValue)
 
 		// This object is considered configured if
 		// there's at least one object in the vector
-		*pbValue = asVariantBool(m_ipOutputHandlers != NULL && m_ipOutputHandlers->Size() != 0);
+		*pbValue = asVariantBool(m_ipOutputHandlers != __nullptr && m_ipOutputHandlers->Size() != 0);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08081");
 
@@ -459,7 +459,7 @@ STDMETHODIMP COutputHandlerSequence::raw_GetComponentDescription(BSTR * pstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19546", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19546", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Select multiple output handlers").Detach();
 	}

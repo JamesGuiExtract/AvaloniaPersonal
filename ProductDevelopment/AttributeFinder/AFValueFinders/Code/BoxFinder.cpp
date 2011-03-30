@@ -47,10 +47,10 @@ CBoxFinder::CBoxFinder() :
 		resetDataMembers();
 
 		m_ipClues.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI19742", m_ipClues != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19742", m_ipClues != __nullptr);
 
 		m_ipMisc.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22432", m_ipMisc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22432", m_ipMisc != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29473");
 }
@@ -59,10 +59,10 @@ CBoxFinder::~CBoxFinder()
 {
 	try
 	{
-		m_ipClues = NULL;
-		m_ipImageLineUtility = NULL;
-		m_ipSpatialStringSearcher = NULL;
-		m_ipMisc = NULL;
+		m_ipClues = __nullptr;
+		m_ipImageLineUtility = __nullptr;
+		m_ipSpatialStringSearcher = __nullptr;
+		m_ipMisc = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19219");
 }
@@ -85,7 +85,7 @@ STDMETHODIMP CBoxFinder::get_Clues(IUnknown **ppVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19694", ppVal != NULL);
+		ASSERT_ARGUMENT("ELI19694", ppVal != __nullptr);
 
 		validateLicense();
 
@@ -103,7 +103,7 @@ STDMETHODIMP CBoxFinder::put_Clues(IUnknown *pNewVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19909", pNewVal != NULL);
+		ASSERT_ARGUMENT("ELI19909", pNewVal != __nullptr);
 
 		validateLicense();
 
@@ -122,7 +122,7 @@ STDMETHODIMP CBoxFinder::get_CluesAreRegularExpressions(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19697", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19697", pVal != __nullptr);
 
 		validateLicense();
 		
@@ -156,7 +156,7 @@ STDMETHODIMP CBoxFinder::get_CluesAreCaseSensitive(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19700", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19700", pVal != __nullptr);
 
 		validateLicense();
 		
@@ -190,7 +190,7 @@ STDMETHODIMP CBoxFinder::get_ClueLocation(EClueLocation *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19703", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19703", pVal != __nullptr);
 
 		validateLicense();
 
@@ -224,7 +224,7 @@ STDMETHODIMP CBoxFinder::get_PageSelectionMode(EPageSelectionMode *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19706", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19706", pVal != __nullptr);
 
 		validateLicense();
 
@@ -258,7 +258,7 @@ STDMETHODIMP CBoxFinder::get_NumFirstPages(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19709", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19709", pVal != __nullptr);
 
 		validateLicense();
 
@@ -292,7 +292,7 @@ STDMETHODIMP CBoxFinder::get_NumLastPages(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19712", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19712", pVal != __nullptr);
 
 		validateLicense();
 
@@ -326,7 +326,7 @@ STDMETHODIMP CBoxFinder::get_SpecifiedPages(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19715", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19715", pVal != __nullptr);
 
 		validateLicense();
 
@@ -360,7 +360,7 @@ STDMETHODIMP CBoxFinder::get_BoxWidthMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19718", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19718", pVal != __nullptr);
 
 		validateLicense();
 
@@ -398,7 +398,7 @@ STDMETHODIMP CBoxFinder::get_BoxWidthMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19721", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19721", pVal != __nullptr);
 
 		validateLicense();
 
@@ -436,7 +436,7 @@ STDMETHODIMP CBoxFinder::get_BoxHeightMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19724", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19724", pVal != __nullptr);
 
 		validateLicense();
 
@@ -474,7 +474,7 @@ STDMETHODIMP CBoxFinder::get_BoxHeightMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19727", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19727", pVal != __nullptr);
 
 		validateLicense();
 
@@ -512,7 +512,7 @@ STDMETHODIMP CBoxFinder::get_FindType(EFindType *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19730", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19730", pVal != __nullptr);
 
 		validateLicense();
 
@@ -546,7 +546,7 @@ STDMETHODIMP CBoxFinder::get_AttributeText(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19733", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19733", pVal != __nullptr);
 
 		validateLicense();
 
@@ -580,7 +580,7 @@ STDMETHODIMP CBoxFinder::get_ExcludeClueArea(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19736", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19736", pVal != __nullptr);
 
 		validateLicense();
 
@@ -614,7 +614,7 @@ STDMETHODIMP CBoxFinder::get_IncludeClueText(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19739", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19739", pVal != __nullptr);
 
 		validateLicense();
 
@@ -648,7 +648,7 @@ STDMETHODIMP CBoxFinder::get_IncludeLines(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19234", pVal != NULL);
+		ASSERT_ARGUMENT("ELI19234", pVal != __nullptr);
 
 		validateLicense();
 
@@ -682,7 +682,7 @@ STDMETHODIMP CBoxFinder::get_FirstBoxOnly(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20209", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20209", pVal != __nullptr);
 
 		validateLicense();
 
@@ -724,11 +724,11 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI19220", ipAFDoc != NULL);
-		ASSERT_ARGUMENT("ELI19222", ppAttributes != NULL);
+		ASSERT_ARGUMENT("ELI19220", ipAFDoc != __nullptr);
+		ASSERT_ARGUMENT("ELI19222", ppAttributes != __nullptr);
 
 		ISpatialStringPtr ipDocText(ipAFDoc->Text);
-		ASSERT_RESOURCE_ALLOCATION("ELI20224", ipDocText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20224", ipDocText != __nullptr);
 
 		// The search should stop when this flag gets set to true
 		bool bEndSearch = false;
@@ -738,11 +738,11 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 
 		// Create an attribute vector to store the results
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI19223", ipAttributes != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI19223", ipAttributes != __nullptr );
 
 		// Get a regular expression parser
 		IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("BoxFinder");
-		ASSERT_RESOURCE_ALLOCATION("ELI22433", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22433", ipParser != __nullptr);
 
 		// Populate a vector of ints that indicates which pages
 		// to process
@@ -770,14 +770,14 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 
 			// Create an IUnknownVector to keep track of boxes that are found
 			IIUnknownVectorPtr ipFoundBoxes(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI19858", ipFoundBoxes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19858", ipFoundBoxes != __nullptr);
 
-			IIUnknownVectorPtr ipHorzLineRects = NULL;
-			IIUnknownVectorPtr ipVertLineRects = NULL;
+			IIUnknownVectorPtr ipHorzLineRects = __nullptr;
+			IIUnknownVectorPtr ipVertLineRects = __nullptr;
 
 			// Retrieve the page info to check the page's orientation
 			ISpatialPageInfoPtr ipPageInfo = ipDocText->GetPageInfo(nPageNum);
-			ASSERT_RESOURCE_ALLOCATION("ELI19992", ipPageInfo != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19992", ipPageInfo != __nullptr);
 
 			// Determine which way to orient the search based on the page text orientation.
 			double dRotation = ipPageInfo->Deskew;
@@ -816,7 +816,7 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 			if (m_bIncludeLines)
 			{
 				IIUnknownVectorPtr ipLineRects(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI19851", ipLineRects != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19851", ipLineRects != __nullptr);
 
 				// Include both horizontal and vertial lines in the same attribute.
 				ipLineRects->Append(ipHorzLineRects);
@@ -838,7 +838,7 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 			for (int i = 0; i < nNumClues && bEndSearch == false; i++)
 			{
 				ISpatialStringPtr ipFoundClue = ipFoundClues->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI20230", ipFoundClue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20230", ipFoundClue != __nullptr);
 
 				// [P16:3004] If the found clue doesn't have any spatial info, it is not valid
 				// to search for a box that contains it.  Ignore this clue.
@@ -861,10 +861,10 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 				}
 
 				// If we found a box that meets the required dimensions...
-				if (ipDataBox != NULL && 
+				if (ipDataBox != __nullptr && 
 					qualifyBox(ipDataBox, ipDocText->GetPageInfo(nPageNum), ipFoundBoxes))
 				{
-					IAttributePtr ipResult = NULL;
+					IAttributePtr ipResult = __nullptr;
 
 					if (m_eFindType == kImageRegion)
 					{
@@ -874,7 +874,7 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 							// Exclude the vertical extent of the clue from area the spatial string
 							// will occupy
 							ipDataBox = excludeVerticalSpatialAreaOfClue(ipDataBox, ipClueRect);
-							if (ipDataBox == NULL)
+							if (ipDataBox == __nullptr)
 							{
 								// If the exclusion process eliminated the found region entirely
 								// (if the clue is bigger than the found box itself) then don't return
@@ -897,7 +897,7 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 					}
 
 					// Add the resulting attribute to the the attribute list
-					ASSERT_RESOURCE_ALLOCATION("ELI20228", ipResult != NULL);					
+					ASSERT_RESOURCE_ALLOCATION("ELI20228", ipResult != __nullptr);					
 					ipAttributes->PushBack(ipResult);
 
 					// Stop searching if so configured
@@ -944,7 +944,7 @@ STDMETHODIMP CBoxFinder::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		validateLicense();
 
 		// Check parameter
-		ASSERT_ARGUMENT("ELI19225", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19225", pbValue != __nullptr);
 
 		// Ensure clues and attribute text is specified (if necessary).  All other settings will be
 		// validated as they are set.
@@ -976,7 +976,7 @@ STDMETHODIMP CBoxFinder::raw_GetComponentDescription(BSTR *pbstrComponentDescrip
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19227", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19227", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Box finder").Detach();
 	}
@@ -998,13 +998,13 @@ STDMETHODIMP CBoxFinder::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IBoxFinderPtr ipCopyThis = pObject;
-		ASSERT_ARGUMENT("ELI19229", ipCopyThis != NULL);
+		ASSERT_ARGUMENT("ELI19229", ipCopyThis != __nullptr);
 
 		// Clone the clue list member
 		ICopyableObjectPtr ipCopyableClues = ipCopyThis->Clues;
-		ASSERT_RESOURCE_ALLOCATION("ELI19693", ipCopyableClues != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19693", ipCopyableClues != __nullptr);
 		m_ipClues = ipCopyableClues->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI19910", m_ipClues != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19910", m_ipClues != __nullptr);
 
 		// Copy data members
 		m_bCluesAreRegularExpressions	= asCppBool(ipCopyThis->CluesAreRegularExpressions);
@@ -1039,11 +1039,11 @@ STDMETHODIMP CBoxFinder::raw_Clone(IUnknown **pObject)
 		// Validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI19238", pObject != NULL);
+		ASSERT_ARGUMENT("ELI19238", pObject != __nullptr);
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_BoxFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI19239", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19239", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -1065,7 +1065,7 @@ STDMETHODIMP CBoxFinder::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19241", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI19241", pClassID != __nullptr);
 
 		*pClassID = CLSID_BoxFinder;
 	}
@@ -1096,7 +1096,7 @@ STDMETHODIMP CBoxFinder::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20165", pStream != NULL);
+		ASSERT_ARGUMENT("ELI20165", pStream != __nullptr);
 
 		// Reset data members
 		resetDataMembers();
@@ -1178,7 +1178,7 @@ STDMETHODIMP CBoxFinder::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI19247", pStream != NULL);
+		ASSERT_ARGUMENT("ELI19247", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -1215,7 +1215,7 @@ STDMETHODIMP CBoxFinder::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the clues list to the stream
 		IPersistStreamPtr ipClueStream(m_ipClues);
-		ASSERT_RESOURCE_ALLOCATION("ELI19744", ipClueStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19744", ipClueStream != __nullptr);
 		writeObjectToStream(ipClueStream, pStream, "ELI19745", fClearDirty);
 
 		// Clear the flag as specified
@@ -1245,7 +1245,7 @@ STDMETHODIMP CBoxFinder::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19251", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19251", pbValue != __nullptr);
 
 		try
 		{
@@ -1301,10 +1301,10 @@ STDMETHODIMP CBoxFinder::InterfaceSupportsErrorInfo(REFIID riid)
 IImageLineUtilityPtr CBoxFinder::getImageLineUtility()
 {
 	// Create image Utils object if not already created
-	if (m_ipImageLineUtility == NULL)
+	if (m_ipImageLineUtility == __nullptr)
 	{
 		m_ipImageLineUtility.CreateInstance(CLSID_ImageLineUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI19254", m_ipImageLineUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19254", m_ipImageLineUtility != __nullptr);
 		
 		// Initialize the line utility with parameters geared toward finding boxes
 		m_ipImageLineUtility->ColumnCountMin			= gnLINEUTIL_COLUMN_COUNT_MIN;
@@ -1324,10 +1324,10 @@ IImageLineUtilityPtr CBoxFinder::getImageLineUtility()
 //-------------------------------------------------------------------------------------------------
 ISpatialStringSearcherPtr CBoxFinder::getSpatialStringSearcher()
 {
-	if (m_ipSpatialStringSearcher == NULL)
+	if (m_ipSpatialStringSearcher == __nullptr)
 	{
 		m_ipSpatialStringSearcher.CreateInstance(CLSID_SpatialStringSearcher);
-		ASSERT_RESOURCE_ALLOCATION("ELI19643", m_ipSpatialStringSearcher != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19643", m_ipSpatialStringSearcher != __nullptr);
 
 		// Set the string searcher to ignore data that intersects with 
 		// the boundary of the search area
@@ -1341,12 +1341,12 @@ IAttributePtr CBoxFinder::createAttributeFromRects(IIUnknownVectorPtr ipRects,
 		const string &strText, const string &strSourceDocName, ILongToObjectMapPtr ipPageInfoMap,
 		int nPageNum)
 {
-	ASSERT_ARGUMENT("ELI19255", ipRects != NULL);
+	ASSERT_ARGUMENT("ELI19255", ipRects != __nullptr);
 	ASSERT_ARGUMENT("ELI19256", !strText.empty());
 
 	// Create an IIUnknownVector to store the raster zones that will be used for the attribute
 	IIUnknownVectorPtr ipAttributeZones(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI19257", ipAttributeZones != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19257", ipAttributeZones != __nullptr);
 
 	// For each ipRect that is to be used
 	int nNumRects = ipRects->Size();
@@ -1354,10 +1354,10 @@ IAttributePtr CBoxFinder::createAttributeFromRects(IIUnknownVectorPtr ipRects,
 	{	
 		// Obtain a copy of the rect for the raster zone
 		ILongRectanglePtr ipRect = ipRects->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI19259", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19259", ipRect != __nullptr);
 
 		ILongRectanglePtr ipRectClone = ipRect->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI19260", ipRectClone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19260", ipRectClone != __nullptr);
 
 		// Ensure the each rect has a height of at least gnMIN_ZONE_HEIGHT to be sure it is noticeable
 		int nHeight = ipRectClone->Bottom - ipRectClone->Top;
@@ -1379,7 +1379,7 @@ IAttributePtr CBoxFinder::createAttributeFromRects(IIUnknownVectorPtr ipRects,
 
 		// Create the raster zone
 		IRasterZonePtr	ipZone(CLSID_RasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI19261", ipZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19261", ipZone != __nullptr);
 
 		ipZone->CreateFromLongRectangle(ipRectClone, nPageNum);
 
@@ -1389,14 +1389,14 @@ IAttributePtr CBoxFinder::createAttributeFromRects(IIUnknownVectorPtr ipRects,
 
 	// Build a SpatialString from the raster zone vector
 	ISpatialStringPtr ipValue(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI19262", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19262", ipValue != __nullptr);
 
 	ipValue->CreateHybridString(ipAttributeZones, strText.c_str(), 
 		strSourceDocName.c_str(), ipPageInfoMap);
 
 	// Assign the spatial string to the attribute
 	IAttributePtr ipAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI19263", ipAttribute != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI19263", ipAttribute != __nullptr );
 	ipAttribute->Value = ipValue;
 
 	return ipAttribute;
@@ -1407,16 +1407,16 @@ IIUnknownVectorPtr CBoxFinder::getCluesOnPage(IVariantVectorPtr ipClues, ISpatia
 											  IRegularExprParserPtr ipParser)
 {
 	ASSERT_ARGUMENT("ELI20221", ipClues);
-	ASSERT_ARGUMENT("ELI19833", ipDocText != NULL);
+	ASSERT_ARGUMENT("ELI19833", ipDocText != __nullptr);
 	ASSERT_ARGUMENT("ELI19834", nPageNum > 0);
 
 	// Allocate vector to receive the clues
 	IIUnknownVectorPtr ipFoundClues(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI19853", ipFoundClues != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19853", ipFoundClues != __nullptr);
 
 	// Retrieve the spatial string data for the specified page
 	ISpatialStringPtr ipPage = ipDocText->GetSpecifiedPages(nPageNum, nPageNum);
-	ASSERT_RESOURCE_ALLOCATION("ELI19830", ipPage != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19830", ipPage != __nullptr);
 
 	if (ipPage->String.length() == 0)
 	{
@@ -1451,7 +1451,7 @@ IIUnknownVectorPtr CBoxFinder::getCluesOnPage(IVariantVectorPtr ipClues, ISpatia
 			{
 				// If we found a clue, extract it from the page info and add it to the ipClues vector.
 				ISpatialStringPtr ipClue = ipPage->GetSubString(nStart, nEnd);
-				ASSERT_RESOURCE_ALLOCATION("ELI19831", ipClue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19831", ipClue != __nullptr);
 
 				ipFoundClues->PushBack(ipClue);
 			}
@@ -1474,12 +1474,12 @@ ILongRectanglePtr CBoxFinder::findBoxContainingClue(ILongRectanglePtr ipNativeCl
 													IIUnknownVectorPtr ipVertLineRects,
 													bool &rbIncompleteResult)
 {
-	ASSERT_ARGUMENT("ELI20234", ipNativeClueRect != NULL);
-	ASSERT_ARGUMENT("ELI20235", ipHorzLineRects != NULL);
-	ASSERT_ARGUMENT("ELI20236", ipVertLineRects != NULL);
+	ASSERT_ARGUMENT("ELI20234", ipNativeClueRect != __nullptr);
+	ASSERT_ARGUMENT("ELI20235", ipHorzLineRects != __nullptr);
+	ASSERT_ARGUMENT("ELI20236", ipVertLineRects != __nullptr);
 
 	// Initialize return value to NULL
-	ILongRectanglePtr ipDataBox = NULL;
+	ILongRectanglePtr ipDataBox = __nullptr;
 
 	VARIANT_BOOL bIncompleteResults;
 
@@ -1491,7 +1491,7 @@ ILongRectanglePtr CBoxFinder::findBoxContainingClue(ILongRectanglePtr ipNativeCl
 	rbIncompleteResult = asCppBool(bIncompleteResults);
 
 	// If we found a box containing the clue
-	if (ipClueBox != NULL)
+	if (ipClueBox != __nullptr)
 	{
 		if (m_eClueLocation == kSameBox)
 		{
@@ -1521,11 +1521,11 @@ ILongRectanglePtr CBoxFinder::findBoxContainingClue(ILongRectanglePtr ipNativeCl
 //-------------------------------------------------------------------------------------------------
 ILongRectanglePtr CBoxFinder::createDataSearchRect(ILongRectanglePtr ipClueRect)
 {
-	ASSERT_ARGUMENT("ELI19838", ipClueRect != NULL);
+	ASSERT_ARGUMENT("ELI19838", ipClueRect != __nullptr);
 
 	// Create an ILongRectangle
 	ILongRectanglePtr ipDataSearchRect(CLSID_LongRectangle);
-	ASSERT_RESOURCE_ALLOCATION("ELI19839", ipDataSearchRect != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19839", ipDataSearchRect != __nullptr);
 
 	// Set bounds to match clue rects bounds where appropriate.  On the other bounds, offset them
 	// from the ClueRect by gnDATA_SEARCH_RECT_SIZE pixels.
@@ -1605,9 +1605,9 @@ ILongRectanglePtr CBoxFinder::createDataSearchRect(ILongRectanglePtr ipClueRect)
 bool CBoxFinder::qualifyBox(ILongRectanglePtr ipRect, ISpatialPageInfoPtr ipPageInfo,
 							  IIUnknownVectorPtr &ripExistingBoxes)
 {
-	ASSERT_ARGUMENT("ELI19801", ipRect != NULL);
-	ASSERT_ARGUMENT("ELI19802", ipPageInfo != NULL);
-	ASSERT_ARGUMENT("ELI19859", ripExistingBoxes != NULL);
+	ASSERT_ARGUMENT("ELI19801", ipRect != __nullptr);
+	ASSERT_ARGUMENT("ELI19802", ipPageInfo != __nullptr);
+	ASSERT_ARGUMENT("ELI19859", ripExistingBoxes != __nullptr);
 
 	long nPageWidth(-1), nPageHeight(-1);
 	EOrientation eOrientation;
@@ -1685,12 +1685,12 @@ bool CBoxFinder::qualifyBox(ILongRectanglePtr ipRect, ISpatialPageInfoPtr ipPage
 ILongRectanglePtr CBoxFinder::excludeVerticalSpatialAreaOfClue(ILongRectanglePtr ipFoundBox, 
 															   ILongRectanglePtr ipClueBounds)
 {
-	ASSERT_ARGUMENT("ELI19779", ipFoundBox != NULL);
-	ASSERT_ARGUMENT("ELI19783", ipClueBounds != NULL);
+	ASSERT_ARGUMENT("ELI19779", ipFoundBox != __nullptr);
+	ASSERT_ARGUMENT("ELI19783", ipClueBounds != __nullptr);
 
 	// Create a copy of the passed in rect to return as the result;
 	ILongRectanglePtr ipResult = ipFoundBox->Clone();
-	ASSERT_RESOURCE_ALLOCATION("ELI19991", ipResult != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19991", ipResult != __nullptr);
 
 	if (m_eClueLocation == kSameBox ||
 		m_eClueLocation == kBoxToLeft || 
@@ -1736,13 +1736,13 @@ ILongRectanglePtr CBoxFinder::excludeVerticalSpatialAreaOfClue(ILongRectanglePtr
 IAttributePtr CBoxFinder::createRegionResult(ISpatialStringPtr ipDocText, int nPageNum,
 												ILongRectanglePtr ipRect)
 {
-	ASSERT_ARGUMENT("ELI19773", ipDocText != NULL);
-	ASSERT_ARGUMENT("ELI19774", ipRect != NULL);
+	ASSERT_ARGUMENT("ELI19773", ipDocText != __nullptr);
+	ASSERT_ARGUMENT("ELI19774", ipRect != __nullptr);
 	ASSERT_ARGUMENT("ELI19776", nPageNum >= 1);
 
 	// Create the raster zone
 	IRasterZonePtr	ipZone(CLSID_RasterZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI19771", ipZone != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19771", ipZone != __nullptr);
 
 	ipZone->CreateFromLongRectangle(ipRect, nPageNum);
 
@@ -1757,7 +1757,7 @@ IAttributePtr CBoxFinder::createRegionResult(ISpatialStringPtr ipDocText, int nP
 
 	// Create the attribute
 	IAttributePtr ipAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI19767", ipAttribute != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI19767", ipAttribute != __nullptr );
 
 	ipAttribute->Value = ipSpatialString;
 
@@ -1767,13 +1767,13 @@ IAttributePtr CBoxFinder::createRegionResult(ISpatialStringPtr ipDocText, int nP
 IAttributePtr CBoxFinder::createTextResult(IAFDocumentPtr ipAFDoc, ILongRectanglePtr ipBox, 
 										   ISpatialStringPtr ipClue, IRegularExprParserPtr ipParser)
 {
-	ASSERT_ARGUMENT("ELI20237", ipAFDoc != NULL);
-	ASSERT_ARGUMENT("ELI20226", ipBox != NULL);
-	ASSERT_ARGUMENT("ELI20227", ipClue != NULL);
+	ASSERT_ARGUMENT("ELI20237", ipAFDoc != __nullptr);
+	ASSERT_ARGUMENT("ELI20226", ipBox != __nullptr);
+	ASSERT_ARGUMENT("ELI20227", ipClue != __nullptr);
 
 	// Return the spatial string text found within the box
 	ISpatialStringPtr ipText =  getSpatialStringSearcher()->GetDataInRegion(ipBox, VARIANT_FALSE);
-	ASSERT_RESOURCE_ALLOCATION("ELI19785", ipText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19785", ipText != __nullptr);
 
 	// Expand clue list to replace any file names with the clues from the specified file
 	IVariantVectorPtr ipExpandedClues = getExpandedClueList(ipAFDoc);
@@ -1838,7 +1838,7 @@ IAttributePtr CBoxFinder::createTextResult(IAFDocumentPtr ipAFDoc, ILongRectangl
 
 	// Assign the resulting spatial string to the resulting attribute.
 	IAttributePtr ipResult(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI19786", ipResult != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19786", ipResult != __nullptr);
 
 	ipResult->Value = ipText;
 
@@ -1847,18 +1847,18 @@ IAttributePtr CBoxFinder::createTextResult(IAFDocumentPtr ipAFDoc, ILongRectangl
 //-------------------------------------------------------------------------------------------------
 IVariantVectorPtr CBoxFinder::getExpandedClueList(IAFDocumentPtr ipAFDoc)
 {
-	ASSERT_ARGUMENT("ELI20220", ipAFDoc != NULL);
+	ASSERT_ARGUMENT("ELI20220", ipAFDoc != __nullptr);
 
 	// Get a list of values that includes values from any specified files.
 	IVariantVectorPtr ipExpandedList = m_cachedListLoader.expandList(m_ipClues, ipAFDoc);
-	ASSERT_RESOURCE_ALLOCATION("ELI20217", ipExpandedList != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20217", ipExpandedList != __nullptr);
 
 	return ipExpandedList;
 }
 //-------------------------------------------------------------------------------------------------
 vector<int> CBoxFinder::getPagesToSearch(ISpatialStringPtr ipDocText)
 {
-	ASSERT_ARGUMENT("ELI20225", ipDocText != NULL);
+	ASSERT_ARGUMENT("ELI20225", ipDocText != __nullptr);
 
 	vector<int> vecPages;
 

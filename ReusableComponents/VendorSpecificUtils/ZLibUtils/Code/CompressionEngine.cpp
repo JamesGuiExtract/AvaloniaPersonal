@@ -38,12 +38,12 @@ void CompressionEngine::compressFile(const std::string& strInputFile,
 			infile.seekg(0, ios::end);
 
 			streampos endPos = infile.tellg();
-			pszData = new char[endPos];
-			ASSERT_RESOURCE_ALLOCATION("ELI06746", pszData != NULL);
+			unique_ptr<char[]> pszData(new char[(unsigned int)endPos]);
+			ASSERT_RESOURCE_ALLOCATION("ELI06746", pszData.get() != __nullptr);
 
 			infile.seekg(0, ios::beg);
 
-			if (!infile.read(pszData, endPos))
+			if (!infile.read(pszData.get(), endPos))
 			{
 				UCLIDException ue("ELI06755", "Unable to read compressed data from file!");
 				throw ue;
@@ -71,7 +71,7 @@ void CompressionEngine::compressFile(const std::string& strInputFile,
 			}
 
 			// write the compressed output to the file
-			if (!gzip.WriteBuffer(pszData, endPos))
+			if (!gzip.WriteBuffer(pszData.get(), (size_t) endPos))
 			{
 				UCLIDException ue("ELI06749", "Unable to write compressed data to file!");
 				throw ue;
@@ -86,25 +86,11 @@ void CompressionEngine::compressFile(const std::string& strInputFile,
 				// Wait for the output file to be readable
 				waitForFileToBeReadable(strOutputFile);
 			}
-
-			// Delete the buffer if it was allocated
-			if(pszData != NULL)
-			{
-				delete [] pszData;
-				pszData = NULL;
-			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28329");
 	}
 	catch(UCLIDException& uex)
 	{
-		// Ensure the buffer gets cleaned up
-		if(pszData != NULL)
-		{
-			delete [] pszData;
-			pszData = NULL;
-		}
-
 		// Add the input and output file information
 		uex.addDebugInfo("File To Compress", strInputFile);
 		uex.addDebugInfo("File To Output", strOutputFile);
@@ -115,7 +101,6 @@ void CompressionEngine::compressFile(const std::string& strInputFile,
 void CompressionEngine::decompressFile(const std::string& strInputFile, 
 									   const std::string& strOutputFile)
 {
-	unsigned char* pszBuffer = NULL;
 	try
 	{
 		try
@@ -185,8 +170,12 @@ void CompressionEngine::decompressFile(const std::string& strInputFile,
 			}
 
 			// read the contents of the compressed file and decompress it
+			unique_ptr<char[]> pszBuffer(__nullptr);
+			char* pszTemp = __nullptr;
 			size_t nSize = 0;
-			if (!gzip.ReadBuffer((void **) &pszBuffer, nSize))
+			bool bSuccess = gzip.ReadBuffer((void **) &pszTemp, nSize) != 0;
+			pszBuffer.reset(pszTemp); // Make unique pointer owner of the allocated data
+			if (!bSuccess)
 			{
 				UCLIDException ue("ELI06752", "Unable to decompress data!");
 				ue.addDebugInfo("nSize", nSize);
@@ -203,7 +192,7 @@ void CompressionEngine::decompressFile(const std::string& strInputFile,
 			}
 
 			// write the decompressed contents to the specified file
-			if (!outfile.write((char *)pszBuffer, nSize))
+			if (!outfile.write(pszBuffer.get(), nSize))
 			{
 				UCLIDException ue("ELI06754", "Unable to write decompressed data to file!");
 				throw ue;
@@ -213,25 +202,11 @@ void CompressionEngine::decompressFile(const std::string& strInputFile,
 				outfile.close();
 				waitForFileToBeReadable(strOutputFile);
 			}
-
-			// Delete the buffer if it was allocated
-			if(pszBuffer != NULL)
-			{
-				delete [] pszBuffer;
-				pszBuffer = NULL;
-			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28319");
 	}
 	catch(UCLIDException& uex)
 	{
-		// Ensure the buffer is cleaned up
-		if (pszBuffer != NULL)
-		{
-			delete [] pszBuffer;
-			pszBuffer = NULL;
-		}
-
 		// Add the file to decompress and the output file info
 		uex.addDebugInfo("File To Decompress", strInputFile);
 		uex.addDebugInfo("File To Output", strOutputFile);

@@ -42,7 +42,7 @@ STDMETHODIMP CSpatialString::IsSpatiallyLessThan(ISpatialString* pSS, VARIANT_BO
 		// From here on the suffix S0 on variable will mean it applies to this string
 		// and the suffix S1 on a string will mean it applies to the input string
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipS1(pSS);
-		ASSERT_RESOURCE_ALLOCATION("ELI11250", ipS1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11250", ipS1 != __nullptr);
 
 		// Make sure that the other spatial string has spatial info
 		if( ipS1->HasSpatialInfo() != VARIANT_TRUE )
@@ -71,21 +71,21 @@ STDMETHODIMP CSpatialString::IsSpatiallyLessThan(ISpatialString* pSS, VARIANT_BO
 		}
 
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipS0(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI11251", ipS0 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11251", ipS0 != __nullptr);
 
 		// now we know that both strings start on the same page
 		// so we will get their bounding boxes on that page
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFirstPageS0 =
 			ipS0->GetSpecifiedPages(nFirstPageS0, nFirstPageS0);
-		ASSERT_RESOURCE_ALLOCATION("ELI25970", ipFirstPageS0 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25970", ipFirstPageS0 != __nullptr);
 		ILongRectanglePtr ipRectS0 = ipFirstPageS0->GetOriginalImageBounds();
-		ASSERT_RESOURCE_ALLOCATION("ELI25971", ipRectS0 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25971", ipRectS0 != __nullptr);
 		
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFirstPageS1 =
 			ipS1->GetSpecifiedPages(nFirstPageS1, nFirstPageS1);
-		ASSERT_RESOURCE_ALLOCATION("ELI25972", ipFirstPageS1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25972", ipFirstPageS1 != __nullptr);
 		ILongRectanglePtr ipRectS1 = ipFirstPageS1->GetOriginalImageBounds();
-		ASSERT_RESOURCE_ALLOCATION("ELI25973", ipRectS1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25973", ipRectS1 != __nullptr);
 
 		// Get the values from the rectangles
 		long nLeftS0, nLeftS1, nTopS0, nTopS1, nRightTemp, nBottomS0, nBottomS1;
@@ -192,7 +192,7 @@ STDMETHODIMP CSpatialString::Offset(long nX, long nY)
 			{
 				// Make a RasterZone and get a RZ to work with
 				UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = m_vecRasterZones[i];
-				ASSERT_RESOURCE_ALLOCATION("ELI19465", ipZone != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19465", ipZone != __nullptr);
 				
 				long lStartX, lStartY, lEndX, lEndY, lHeight, lPageNumber;
 				ipZone->GetData(&lStartX, &lStartY, &lEndX, &lEndY, &lHeight, &lPageNumber);
@@ -286,7 +286,7 @@ STDMETHODIMP CSpatialString::UpdatePageNumber(long nPageNumber)
 			long nCurrentPageNumber = 0;
 			UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo;
 			m_ipPageInfoMap->GetKeyValue(0, &nCurrentPageNumber, (IUnknown**)&ipPageInfo);
-			ASSERT_RESOURCE_ALLOCATION("ELI15257", ipPageInfo != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15257", ipPageInfo != __nullptr);
 
 			// If the keys do not match, set the current page number to the new page number
 			if( nCurrentPageNumber != nPageNumber )
@@ -391,7 +391,7 @@ STDMETHODIMP CSpatialString::SelectWithFontSize(VARIANT_BOOL bInclude, long nMin
 		}
 
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipNewString(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI10615", ipNewString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10615", ipNewString != __nullptr);
 
 		if (vecNewLetters.size() > 0)
 		{

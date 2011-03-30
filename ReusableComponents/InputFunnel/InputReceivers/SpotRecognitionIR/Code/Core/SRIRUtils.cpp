@@ -57,7 +57,7 @@ STDMETHODIMP CSRIRUtils::GetSRIRWithImage(BSTR strImageFileName,
 	try
 	{
 		IInputManagerPtr ipInputManager(pInputManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI06994", ipInputManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06994", ipInputManager != __nullptr);
 
 		// if the file passed in is actually a GDD file, then get the
 		// name of the image file referenced by the GDD file
@@ -70,7 +70,7 @@ STDMETHODIMP CSRIRUtils::GetSRIRWithImage(BSTR strImageFileName,
 		// iterate through all the input receivers, and check to see if there 
 		// is a spot recognition window already open with the specified image
 		IIUnknownVectorPtr ipIRs = ipInputManager->GetInputReceivers();
-		ASSERT_RESOURCE_ALLOCATION("ELI06992", ipIRs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06992", ipIRs != __nullptr);
 
 		// try to find the spot recognition window that may already have
 		// the image open
@@ -106,7 +106,7 @@ STDMETHODIMP CSRIRUtils::GetSRIRWithImage(BSTR strImageFileName,
 		// if there is no spot recognition window with the desired image
 		// open, then create a new  spot recognition window, and connect 
 		// it to the input manager
-		if (ipSRIR == NULL && bAutoCreate == VARIANT_TRUE)
+		if (ipSRIR == __nullptr && bAutoCreate == VARIANT_TRUE)
 		{
 			// if the image is no longer available or readable, and it is
 			// not the empty string then throw an exception
@@ -121,7 +121,7 @@ STDMETHODIMP CSRIRUtils::GetSRIRWithImage(BSTR strImageFileName,
 			// create new spot recognition window
 			long nID = ipInputManager->CreateNewInputReceiver("Image viewer");
 			ipSRIR = ipInputManager->GetInputReceiver(nID);
-			ASSERT_RESOURCE_ALLOCATION("ELI06995", ipSRIR != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06995", ipSRIR != __nullptr);
 
 			// check for empty string before attempting to open the file
 			if (strImage != "")
@@ -155,7 +155,7 @@ STDMETHODIMP CSRIRUtils::IsExactlyOneImageOpen(IInputManager *pInputMgr,
 	try
 	{
 		IInputManagerPtr ipInputManager(pInputMgr);
-		ASSERT_RESOURCE_ALLOCATION("ELI07008", ipInputManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07008", ipInputManager != __nullptr);
 
 		*pbExactOneFileOpen = VARIANT_FALSE;
 		*pstrCurrentOpenImageName = _bstr_t("").copy();
@@ -166,7 +166,7 @@ STDMETHODIMP CSRIRUtils::IsExactlyOneImageOpen(IInputManager *pInputMgr,
 		// iterate through all the input receivers, and check to see if there 
 		// is only one spot recognition window open
 		IIUnknownVectorPtr ipIRs = ipInputManager->GetInputReceivers();
-		ASSERT_RESOURCE_ALLOCATION("ELI19118", ipIRs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19118", ipIRs != __nullptr);
 
 		// try to find the spot recognition window
 		long nNumIRs = ipIRs->Size();
@@ -202,7 +202,7 @@ STDMETHODIMP CSRIRUtils::IsExactlyOneImageOpen(IInputManager *pInputMgr,
 			}
 		}
 
-		if (bExactlyOneImageFile && ipSRIR != NULL && !strImageFileName.empty())
+		if (bExactlyOneImageFile && ipSRIR != __nullptr && !strImageFileName.empty())
 		{
 			*pbExactOneFileOpen = VARIANT_TRUE;
 			*pstrCurrentOpenImageName = _bstr_t(strImageFileName.c_str()).copy();

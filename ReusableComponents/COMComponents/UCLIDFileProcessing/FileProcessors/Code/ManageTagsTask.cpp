@@ -96,7 +96,7 @@ STDMETHODIMP CManageTagsTask::get_Operation(EManageTagsOperationType* pVal)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27444", pVal != NULL);
+		ASSERT_ARGUMENT("ELI27444", pVal != __nullptr);
 
 		// Get the operation type
 		*pVal = m_operationType;
@@ -134,7 +134,7 @@ STDMETHODIMP CManageTagsTask::get_Tags(BSTR* pbstrTags)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27448", pbstrTags != NULL);
+		ASSERT_ARGUMENT("ELI27448", pbstrTags != __nullptr);
 
 
 		// Return the variant vector
@@ -154,7 +154,7 @@ STDMETHODIMP CManageTagsTask::raw_GetComponentDescription(BSTR* pstrComponentDes
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27451", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI27451", pstrComponentDescription != __nullptr);
 		
 		*pstrComponentDescription = 
 			_bstr_t(gstrMANAGE_TAGS_COMPONENT_DESCRIPTION.c_str()).Detach();
@@ -205,15 +205,15 @@ STDMETHODIMP CManageTagsTask::raw_Clone(IUnknown** ppObject)
 		validateLicense();
 
 		// Ensure that the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI27456", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI27456", ppObject != __nullptr);
 
 		// Get the copyable object interface
 		ICopyableObjectPtr ipObjCopy(CLSID_ManageTagsTask);
-		ASSERT_RESOURCE_ALLOCATION("ELI27457", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27457", ipObjCopy != __nullptr);
 
 		// Create a shallow copy
 		IUnknownPtr ipUnknown(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI27458", ipUnknown != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27458", ipUnknown != __nullptr);
 		ipObjCopy->CopyFrom(ipUnknown);
 
 		// Return the new ManageTagsTask to the caller
@@ -364,7 +364,7 @@ STDMETHODIMP CManageTagsTask::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// Ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI27467", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27467", pbValue != __nullptr);
 
 		try
 		{
@@ -397,7 +397,7 @@ STDMETHODIMP CManageTagsTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
 		validateLicense();
 
 		// Ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI27469", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27469", pbValue != __nullptr);
 
 		// Configured if:
 		// 1. The tag vector is not empty
@@ -417,7 +417,7 @@ STDMETHODIMP CManageTagsTask::GetClassID(CLSID* pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27471", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI27471", pClassID != __nullptr);
 
 		*pClassID = CLSID_ManageTagsTask;
 	}
@@ -448,7 +448,7 @@ STDMETHODIMP CManageTagsTask::Load(IStream* pStream)
 		
 		// use a smart pointer for the IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI27473", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27473", ipStream != __nullptr);
 
 		// read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -528,7 +528,7 @@ STDMETHODIMP CManageTagsTask::Save(IStream* pStream, BOOL fClearDirty)
 
 		// use a smart pointer for IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI27478", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27478", ipStream != __nullptr);
 
 		// write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
@@ -607,7 +607,7 @@ void CManageTagsTask::validateAndAddTags(const vector<string>& vecTags,
 
 		// Get the list of tags from the database
 		IVariantVectorPtr ipVecTags = ipDB->GetTagNames();
-		ASSERT_RESOURCE_ALLOCATION("ELI27703", ipVecTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27703", ipVecTags != __nullptr);
 
 		for(vector<string>::const_iterator it = vecTags.begin(); it != vecTags.end(); it++)
 		{
@@ -636,7 +636,7 @@ void CManageTagsTask::addTagsToFile(const vector<string>& vecTags,
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI27486", ipDB != NULL);
+		ASSERT_ARGUMENT("ELI27486", ipDB != __nullptr);
 
 		if (m_vecTags.empty())
 		{

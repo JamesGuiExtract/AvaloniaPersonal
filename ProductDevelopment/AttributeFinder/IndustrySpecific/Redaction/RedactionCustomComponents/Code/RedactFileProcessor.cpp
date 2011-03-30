@@ -33,7 +33,7 @@ CRedactFileProcessor::CRedactFileProcessor()
 
 	// Create the Attribute Names collection
 	m_ipAttributeNames.CreateInstance(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI28238", m_ipAttributeNames != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI28238", m_ipAttributeNames != __nullptr);
 
 	// Add the default selected Attributes to the collection (P16 #2751)
 	m_ipAttributeNames->PushBack("HCData");
@@ -45,7 +45,7 @@ CRedactFileProcessor::~CRedactFileProcessor()
 {
 	try
 	{
-		m_ipAttributeNames = NULL;
+		m_ipAttributeNames = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28239");
 }
@@ -159,7 +159,7 @@ STDMETHODIMP CRedactFileProcessor::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI28242", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI28242", pbValue != __nullptr);
 
 		try
 		{
@@ -188,7 +188,7 @@ STDMETHODIMP CRedactFileProcessor::raw_GetComponentDescription(BSTR * pstrCompon
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28244", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI28244", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Redaction: Redact image without verification (legacy)").Detach();
 	}
@@ -211,7 +211,7 @@ STDMETHODIMP CRedactFileProcessor::raw_Clone(IUnknown * * pObject)
 
 		// create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_RedactFileProcessor);
-		ASSERT_RESOURCE_ALLOCATION("ELI28246", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28246", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk(this);
 		ipObjCopy->CopyFrom(ipUnk);
@@ -233,7 +233,7 @@ STDMETHODIMP CRedactFileProcessor::raw_CopyFrom(IUnknown * pObject)
 		// validate license first
 		validateLicense();
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IRedactFileProcessorPtr ipSource( pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI28248", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28248", ipSource != __nullptr);
 
 		m_strRuleFileName = asString(ipSource->RuleFileName);
 		m_strOutputFileName = asString(ipSource->OutputFileName);
@@ -242,14 +242,14 @@ STDMETHODIMP CRedactFileProcessor::raw_CopyFrom(IUnknown * pObject)
 		// Clear the Attributes set
 		m_setAttributeNames.clear();
 
-		if (ipSource->AttributeNames != NULL)
+		if (ipSource->AttributeNames != __nullptr)
 		{
 			m_ipAttributeNames = ipSource->AttributeNames;
 			fillAttributeSet(m_ipAttributeNames, m_setAttributeNames);
 		}
 		else
 		{
-			m_ipAttributeNames = NULL;
+			m_ipAttributeNames = __nullptr;
 		}
 
 		// Retrieve setting for CreateOutputFile
@@ -331,7 +331,7 @@ STDMETHODIMP CRedactFileProcessor::put_RuleFileName(BSTR newVal)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI28252", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28252", ipFAMTagManager != __nullptr);
 
 		// Make sure the file name contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strFileName.c_str()) == VARIANT_TRUE)
@@ -379,7 +379,7 @@ STDMETHODIMP CRedactFileProcessor::put_OutputFileName(BSTR newVal)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI28256", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28256", ipFAMTagManager != __nullptr);
 
 		// Make sure the file name contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strFileName.c_str()) == VARIANT_TRUE)
@@ -435,20 +435,20 @@ STDMETHODIMP CRedactFileProcessor::get_AttributeNames(IVariantVector **pVal)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI28261", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28261", pVal != __nullptr);
 
 		validateLicense();
 		
 		*pVal = NULL;
-		if (m_ipAttributeNames != NULL)
+		if (m_ipAttributeNames != __nullptr)
 		{
 			// Get a ShallowCopyableObject ptr for the current name list
 			IShallowCopyablePtr ipObjSource = m_ipAttributeNames;
-			ASSERT_RESOURCE_ALLOCATION("ELI28262", ipObjSource != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28262", ipObjSource != __nullptr);
 
 			// Shallow copy the attribute names
 			IVariantVectorPtr ipObjCloned = ipObjSource->ShallowCopy();
-			ASSERT_RESOURCE_ALLOCATION("ELI28263", ipObjCloned != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28263", ipObjCloned != __nullptr);
 
 			// set the return value to the shallow copied object
 			*pVal = ipObjCloned.Detach();
@@ -468,7 +468,7 @@ STDMETHODIMP CRedactFileProcessor::put_AttributeNames(IVariantVector *newVal)
 		
 		m_ipAttributeNames = newVal;
 		
-		if (m_ipAttributeNames != NULL)
+		if (m_ipAttributeNames != __nullptr)
 		{
 			fillAttributeSet(m_ipAttributeNames, m_setAttributeNames);
 		}
@@ -569,7 +569,7 @@ STDMETHODIMP CRedactFileProcessor::put_VOAFileName(BSTR newVal)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI28271", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28271", ipFAMTagManager != __nullptr);
 
 		// Make sure the file name contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strFileName.c_str()) == VARIANT_TRUE)
@@ -665,7 +665,7 @@ STDMETHODIMP CRedactFileProcessor::get_UseRedactedImage(VARIANT_BOOL* pvbUseReda
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28278", pvbUseRedactedImage != NULL);
+		ASSERT_ARGUMENT("ELI28278", pvbUseRedactedImage != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -702,7 +702,7 @@ STDMETHODIMP CRedactFileProcessor::get_RedactionText(BSTR* pbstrRedactionText)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28281", pbstrRedactionText != NULL);
+		ASSERT_ARGUMENT("ELI28281", pbstrRedactionText != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -739,7 +739,7 @@ STDMETHODIMP CRedactFileProcessor::get_BorderColor(long* plBorderColor)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28284", plBorderColor != NULL);
+		ASSERT_ARGUMENT("ELI28284", plBorderColor != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -776,7 +776,7 @@ STDMETHODIMP CRedactFileProcessor::get_FillColor(long* plFillColor)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28287", plFillColor != NULL);
+		ASSERT_ARGUMENT("ELI28287", plFillColor != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -813,7 +813,7 @@ STDMETHODIMP CRedactFileProcessor::get_FontName(BSTR* pbstrFontName)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28290", pbstrFontName != NULL);
+		ASSERT_ARGUMENT("ELI28290", pbstrFontName != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -850,7 +850,7 @@ STDMETHODIMP CRedactFileProcessor::get_IsBold(VARIANT_BOOL* pvbBold)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28293", pvbBold != NULL);
+		ASSERT_ARGUMENT("ELI28293", pvbBold != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -887,7 +887,7 @@ STDMETHODIMP CRedactFileProcessor::get_IsItalic(VARIANT_BOOL* pvbItalic)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28296", pvbItalic != NULL);
+		ASSERT_ARGUMENT("ELI28296", pvbItalic != __nullptr);
 		
 		// Check license state
 		validateLicense();
@@ -924,7 +924,7 @@ STDMETHODIMP CRedactFileProcessor::get_FontSize(long* plFontSize)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28299", plFontSize != NULL);
+		ASSERT_ARGUMENT("ELI28299", plFontSize != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -1076,7 +1076,7 @@ STDMETHODIMP CRedactFileProcessor::Load(IStream* pStream)
 			}
 			else
 			{
-				m_ipAttributeNames = NULL;
+				m_ipAttributeNames = __nullptr;
 			}
 		}
 
@@ -1141,7 +1141,7 @@ STDMETHODIMP CRedactFileProcessor::Save(IStream* pStream, BOOL fClearDirty)
 		dataWriter << m_bApplyRedactionsAsAnnotations;
 
 		// Save flag indicating AttributeNames stored in stream
-		bool bAttributeNames = (m_ipAttributeNames != NULL);
+		bool bAttributeNames = (m_ipAttributeNames != __nullptr);
 		dataWriter << bAttributeNames;
 
 		// Legislation guard

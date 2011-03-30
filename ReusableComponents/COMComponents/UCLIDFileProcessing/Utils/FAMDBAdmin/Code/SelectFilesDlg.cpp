@@ -41,7 +41,7 @@ CSelectFilesDlg::~CSelectFilesDlg()
 {
 	try
 	{
-		m_ipFAMDB = NULL;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27325");
 }
@@ -118,7 +118,7 @@ BOOL CSelectFilesDlg::OnInitDialog()
 
 		// Read all actions from the DB
 		IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
-		ASSERT_RESOURCE_ALLOCATION("ELI26985", ipMapActions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26985", ipMapActions != __nullptr);
 
 		// Insert actions into combo box
 		long lSize = ipMapActions->Size;
@@ -728,7 +728,7 @@ void CSelectFilesDlg::fillSkippedUsers()
 
 		// Get the user list from the database
 		ADODB::_RecordsetPtr ipRecords = m_ipFAMDB->GetResultsForQuery(strSQL.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI27001", ipRecords != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27001", ipRecords != __nullptr);
 
 		// Loop through each result and add the user names to the vector
 		while (ipRecords->adoEOF == VARIANT_FALSE)
@@ -770,7 +770,7 @@ void CSelectFilesDlg::configureAndPopulateTagList()
 
 		// Get the list of tag names
 		IVariantVectorPtr ipVecTagNames = m_ipFAMDB->GetTagNames();
-		ASSERT_RESOURCE_ALLOCATION("ELI27423", ipVecTagNames != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27423", ipVecTagNames != __nullptr);
 
 		// Get the count of items
 		long nSize = ipVecTagNames->Size;
@@ -812,7 +812,7 @@ void CSelectFilesDlg::fillPriorities()
 	try
 	{
 		IVariantVectorPtr ipVecPriority = m_ipFAMDB->GetPriorities();
-		ASSERT_RESOURCE_ALLOCATION("ELI27678", ipVecPriority != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27678", ipVecPriority != __nullptr);
 
 		// Add each priority to the combo box
 		long lSize = ipVecPriority->Size;

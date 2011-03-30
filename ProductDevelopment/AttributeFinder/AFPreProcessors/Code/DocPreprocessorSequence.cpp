@@ -66,7 +66,7 @@ STDMETHODIMP CDocPreprocessorSequence::raw_Process(IAFDocument* pDocument, IProg
 		validateLicense();
 
 		// if no document preprocessors exist, then throw an exception
-		if (m_ipDocPreprocessors == NULL || m_ipDocPreprocessors->Size() == 0)
+		if (m_ipDocPreprocessors == __nullptr || m_ipDocPreprocessors->Size() == 0)
 		{
 			throw UCLIDException("ELI08147", "No document preprocessors specified!");
 		}
@@ -82,7 +82,7 @@ STDMETHODIMP CDocPreprocessorSequence::raw_Process(IAFDocument* pDocument, IProg
 		{
 			// count the number of enabled preprocessors using a MiscUtils object
 			IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-			ASSERT_RESOURCE_ALLOCATION("ELI16262", ipMiscUtils != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16262", ipMiscUtils != __nullptr);
 			long lEnabledPreprocessors = ipMiscUtils->CountEnabledObjectsIn(m_ipDocPreprocessors);
 
 			// leave without processing if there are no preprocessors to process
@@ -103,7 +103,7 @@ STDMETHODIMP CDocPreprocessorSequence::raw_Process(IAFDocument* pDocument, IProg
 			// get the DocPreprocessor object-with-description 
 			// at the current position
 			IObjectWithDescriptionPtr ipObj = m_ipDocPreprocessors->At(i);;
-			ASSERT_RESOURCE_ALLOCATION("ELI08448", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08448", ipObj != __nullptr);
 
 			// Check state and use this Preprocessor only if Enabled
 			if ( asCppBool(ipObj->Enabled) )
@@ -118,7 +118,7 @@ STDMETHODIMP CDocPreprocessorSequence::raw_Process(IAFDocument* pDocument, IProg
 
 				// get the DocPreprocessor at the current position
 				IDocumentPreprocessorPtr ipDP = ipObj->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI08449", ipDP != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI08449", ipDP != __nullptr);
 
 				// execute the document preprocessor & pass in the 
 				// sub progress object if progress status updates were requested
@@ -177,10 +177,10 @@ STDMETHODIMP CDocPreprocessorSequence::get_ObjectsVector(IIUnknownVector* *pVal)
 		validateLicense();
 
 		// if the document preprocessors vector has not yet been initialized, do so
-		if (m_ipDocPreprocessors == NULL)
+		if (m_ipDocPreprocessors == __nullptr)
 		{
 			m_ipDocPreprocessors.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI08154", m_ipDocPreprocessors != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08154", m_ipDocPreprocessors != __nullptr);
 		}
 
 		// return a reference to the internal vector
@@ -203,14 +203,14 @@ STDMETHODIMP CDocPreprocessorSequence::put_ObjectsVector(IIUnknownVector *newVal
 
 		// convert argument to smart pointer
 		IIUnknownVectorPtr ipDocPreprocessors(newVal);
-		ASSERT_RESOURCE_ALLOCATION("ELI08155", ipDocPreprocessors != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08155", ipDocPreprocessors != __nullptr);
 
 		// ensure that each of the items in the vector is a document preprocessor
 		long nNumItems = ipDocPreprocessors->Size();
 		for (int i = 0; i < nNumItems; i++)
 		{
 			IObjectWithDescriptionPtr ipObj = ipDocPreprocessors->At(i);
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				UCLIDException ue("ELI08156", "Invalid object in vector - expecting vector of IObjectWithDescription objects!");
 				ue.addDebugInfo("index", i);
@@ -218,7 +218,7 @@ STDMETHODIMP CDocPreprocessorSequence::put_ObjectsVector(IIUnknownVector *newVal
 			}
 
 			IDocumentPreprocessorPtr ipDP = ipObj->Object;
-			if (ipDP == NULL)
+			if (ipDP == __nullptr)
 			{
 				UCLIDException ue("ELI08157", "Invalid object in ObjectWithDescription - expecting IDocumentPreprocessor object!");
 				ue.addDebugInfo("index", i);
@@ -308,7 +308,7 @@ STDMETHODIMP CDocPreprocessorSequence::Load(IStream *pStream)
 			IPersistStreamPtr ipObj;
 			::readObjectFromStream(ipObj, pStream, "ELI09961");
 			m_ipDocPreprocessors = ipObj;
-			ASSERT_RESOURCE_ALLOCATION("ELI08159", m_ipDocPreprocessors != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08159", m_ipDocPreprocessors != __nullptr);
 		}
 
 		// Clear the dirty flag as we've loaded a fresh object
@@ -341,7 +341,7 @@ STDMETHODIMP CDocPreprocessorSequence::Save(IStream *pStream, BOOL fClearDirty)
 
 		// write the vector of document preprocessors to the stream
 		IPersistStreamPtr ipObj = m_ipDocPreprocessors;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI08161", "IIUnknownVector component does not support persistence!");
 		}
@@ -375,15 +375,15 @@ STDMETHODIMP CDocPreprocessorSequence::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		IMultipleObjectHolderPtr ipObj = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08163", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08163", ipObj != __nullptr);
 
 		// get the vector of doc preprocessors from the other object
 		IIUnknownVectorPtr ipDocPreprocessors = ipObj->ObjectsVector;
-		ASSERT_RESOURCE_ALLOCATION("ELI08429", ipDocPreprocessors != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08429", ipDocPreprocessors != __nullptr);
 
 		// get a copy of the vector of doc preprocessors
 		m_ipDocPreprocessors = ipDocPreprocessors->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI08430", m_ipDocPreprocessors != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08430", m_ipDocPreprocessors != __nullptr);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08431")
 
@@ -402,7 +402,7 @@ STDMETHODIMP CDocPreprocessorSequence::raw_Clone(IUnknown **pObject)
 		// create another instance of this object
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_DocPreprocessorSequence);
-		ASSERT_RESOURCE_ALLOCATION("ELI08427", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08427", ipObjCopy != __nullptr);
 
 		// ask the other object to copy itself from this object
 		IUnknownPtr ipUnk = this;
@@ -437,7 +437,7 @@ STDMETHODIMP CDocPreprocessorSequence::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		// This object is considered configured if 
 		// there is at least one object in the vector
 		*pbValue = asVariantBool(
-			m_ipDocPreprocessors != NULL && m_ipDocPreprocessors->Size() != 0 );
+			m_ipDocPreprocessors != __nullptr && m_ipDocPreprocessors->Size() != 0 );
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08169");
 
@@ -453,7 +453,7 @@ STDMETHODIMP CDocPreprocessorSequence::raw_GetComponentDescription(BSTR * pstrCo
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19559", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19559", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Select multiple document preprocessors").Detach();
 	}

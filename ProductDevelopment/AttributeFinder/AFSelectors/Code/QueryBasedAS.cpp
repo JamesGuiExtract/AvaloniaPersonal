@@ -24,7 +24,7 @@ CQueryBasedAS::CQueryBasedAS()
 	try
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI13315", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13315", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13316")
 }
@@ -166,7 +166,7 @@ STDMETHODIMP CQueryBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn, IAFD
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(pAttrIn);
-		ASSERT_RESOURCE_ALLOCATION("ELI13318", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13318", ipAttributes != __nullptr);
 
 		// Query the attributes
 		IIUnknownVectorPtr ipFoundAttributes = m_ipAFUtility->QueryAttributes(ipAttributes, 
@@ -189,7 +189,7 @@ STDMETHODIMP CQueryBasedAS::raw_GetComponentDescription(BSTR * pstrComponentDesc
 	
 	try
 	{
-		ASSERT_ARGUMENT("ELI19631", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19631", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Query attribute selector").Detach();
 	}
@@ -213,7 +213,7 @@ STDMETHODIMP CQueryBasedAS::raw_Clone(IUnknown * * pObject)
 		// create a new instance of the EntityNameDataScorer
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_QueryBasedAS);
-		ASSERT_RESOURCE_ALLOCATION("ELI13275", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13275", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -235,7 +235,7 @@ STDMETHODIMP CQueryBasedAS::raw_CopyFrom(IUnknown * pObject)
 		// validate license
 		validateLicense();
 		UCLID_AFSELECTORSLib::IQueryBasedASPtr ipFrom(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI13310", ipFrom != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13310", ipFrom != __nullptr );
 
 		m_strQueryText = asString( ipFrom->QueryText );
 	}

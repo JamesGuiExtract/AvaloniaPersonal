@@ -90,7 +90,7 @@ bool FPRecordManager::processingQueueIsDiscarded()
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::discardProcessingQueue()
 {
-	ASSERT_ARGUMENT("ELI14002", m_ipFPMDB != NULL);
+	ASSERT_ARGUMENT("ELI14002", m_ipFPMDB != __nullptr);
 
 	// If the queue has already been discarded just return [FlexIDSCore #3738]
 	if (processingQueueIsDiscarded())
@@ -274,7 +274,7 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::clear(bool bClearUI)
 {
-	if(m_hDlg != NULL && bClearUI)
+	if(m_hDlg != __nullptr && bClearUI)
 	{
 		::SendMessage(m_hDlg, FP_CLEAR_UI, 0, 0);
 	}
@@ -520,7 +520,7 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 				m_queFinishedTasks.push_back(nTaskID);
 				_lastCodePos = "200";
 
-				ASSERT_ARGUMENT("ELI14003", m_ipFPMDB != NULL);
+				ASSERT_ARGUMENT("ELI14003", m_ipFPMDB != __nullptr);
 				// Notify the database of the processed state
 				if ( eNewStatus == kRecordComplete )
 				{
@@ -598,7 +598,7 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 		}
 
 		_lastCodePos = "340";
-		if(m_hDlg != NULL)
+		if(m_hDlg != __nullptr)
 		{
 			_lastCodePos = "350";
 			SendStatusMessage(m_hDlg, nTaskID, eOldStatus, eNewStatus);
@@ -681,7 +681,7 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 //-------------------------------------------------------------------------------------------------
 long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 {
-	ASSERT_ARGUMENT("ELI14004", m_ipFPMDB != NULL);
+	ASSERT_ARGUMENT("ELI14004", m_ipFPMDB != __nullptr);
 
 	// Get the list of file records
 	string strSkippedUser = 
@@ -695,7 +695,7 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 	for ( long n = 0; n < nNumFiles; n++ )
 	{
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipRecord = ipFileList->At(n);
-		ASSERT_RESOURCE_ALLOCATION("ELI14205", ipRecord != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14205", ipRecord != __nullptr );
 
 		// Create task with File ID and name
 		FileProcessingRecord fpTask( ipRecord );
@@ -718,7 +718,7 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::setFPMDB(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFPMDB)
 {
-	ASSERT_ARGUMENT("ELI14005", ipFPMDB != NULL);
+	ASSERT_ARGUMENT("ELI14005", ipFPMDB != __nullptr);
 	// Set the database object
 	m_ipFPMDB = ipFPMDB;
 }
@@ -735,7 +735,7 @@ void FPRecordManager::setActionID(long nActionID)
 		}
 
 		// Check for no defined database
-		if ( m_ipFPMDB == NULL )
+		if ( m_ipFPMDB == __nullptr )
 		{
 			UCLIDException ue("ELI14110", "The database has not been set.");
 			throw ue;

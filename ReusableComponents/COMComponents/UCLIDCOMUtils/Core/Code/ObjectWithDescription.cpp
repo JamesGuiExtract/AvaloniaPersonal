@@ -57,7 +57,7 @@ STDMETHODIMP CObjectWithDescription::get_Object(IUnknown **pVal)
 		// Check license state
 		validateLicense();
 
-		if (m_ipObj != NULL)
+		if (m_ipObj != __nullptr)
 		{
 			// Do a shallow copy of the smart pointer
 			IUnknownPtr ipShallowCopy = m_ipObj;
@@ -85,9 +85,9 @@ STDMETHODIMP CObjectWithDescription::put_Object(IUnknown *newVal)
 		validateLicense();
 
 		// Release current object
-		if (m_ipObj != NULL)
+		if (m_ipObj != __nullptr)
 		{
-			m_ipObj = NULL;
+			m_ipObj = __nullptr;
 		}
 
 		// Store the object pointer
@@ -181,7 +181,7 @@ STDMETHODIMP CObjectWithDescription::CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08313", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08313", ipSource != __nullptr);
 		
 		// set the other object's description to this object's description
 		m_strDescription = asString(ipSource->GetDescription());
@@ -192,19 +192,19 @@ STDMETHODIMP CObjectWithDescription::CopyFrom(IUnknown *pObject)
 		// set the other object's object to be a clone of this object's object.
 		// while doing so, make sure that the object we are holding is copyable
 		IUnknownPtr ipUnk = ipSource->GetObject();
-		if(ipUnk == NULL)
+		if(ipUnk == __nullptr)
 		{
 			// 1/28/08 SNK Added this block to fix [P13:4791]. If we are copying from an OWD with
 			// a NULL object, this OWD's object should be set to NULL as well. In the case of
 			// [P13:4791], if a user selects "<NONE>" for the skip condition, the skip condition
 			// object should be removed.  If we keep the old object, it will continue to be
 			// used despite the user selecting "<NONE>"
-			m_ipObj = NULL;
+			m_ipObj = __nullptr;
 		}
 		else
 		{
 			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyableObject = ipUnk;
-			ASSERT_RESOURCE_ALLOCATION("ELI08314", ipCopyableObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08314", ipCopyableObject != __nullptr);
 			
 			m_ipObj = ipCopyableObject->Clone();
 		}
@@ -226,7 +226,7 @@ STDMETHODIMP CObjectWithDescription::Clone(IUnknown* *pObject)
 		// create a new IObjectWithDescription object
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI19353", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19353", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -262,7 +262,7 @@ STDMETHODIMP CObjectWithDescription::IsDirty(void)
 		if (!m_bDirty)
 		{
 			IPersistStreamPtr ipPersistStream(m_ipObj);
-			if (m_ipObj != NULL && ipPersistStream == NULL)
+			if (m_ipObj != __nullptr && ipPersistStream == __nullptr)
 			{
 				UCLIDException ue("ELI04782", "Object does not support persistence!");
 				ue.addDebugInfo("Description", m_strDescription);
@@ -291,7 +291,7 @@ STDMETHODIMP CObjectWithDescription::Load(IStream *pStream)
 
 		// reset member variables
 		m_strDescription = "";
-		m_ipObj = NULL;
+		m_ipObj = __nullptr;
 		m_bEnabled = true;
 
 		// read from the stream a flag indicating whether an object exists
@@ -335,7 +335,7 @@ STDMETHODIMP CObjectWithDescription::Load(IStream *pStream)
 			IPersistStreamPtr ipObj;
 			readObjectFromStream(ipObj, pStream, "ELI09981");
 			
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException("ELI04629", "Unable to read object from stream!");
 			}
@@ -372,7 +372,7 @@ STDMETHODIMP CObjectWithDescription::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_strDescription;
 
 		// write to the stream a flag indicating whether an object exists
-		bool bObjectExists = (m_ipObj != NULL);
+		bool bObjectExists = (m_ipObj != __nullptr);
 		dataWriter << bObjectExists;
 
 		// write the enabled/disabled state to the stream
@@ -389,7 +389,7 @@ STDMETHODIMP CObjectWithDescription::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			// write the object to the stream
 			IPersistStreamPtr ipObj = m_ipObj;
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException("ELI04628", "Object does not support persistence!");
 			}

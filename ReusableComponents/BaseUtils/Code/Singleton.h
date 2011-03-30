@@ -56,12 +56,12 @@ private:
 	// public static methods.
 	static T* sGetOrDeleteInstance(bool bGet = true)
 	{
-		// This is an auto_ptr so that it will always be deleted
-		static std::auto_ptr<T> sapInstance(NULL);
+		// This is an unique_ptr so that it will always be deleted
+		static std::unique_ptr<T> sapInstance(__nullptr);
 
 		if (sapInstance.get() == NULL && bGet)
 		{
-			sapInstance = std::auto_ptr<T>(new T());
+			sapInstance = std::unique_ptr<T>(new T());
 		}
 		else if (sapInstance.get() && !bGet)
 		{
@@ -69,7 +69,7 @@ private:
 			// Calling sDeleteInstance after using the pointer is not required unless
 			// a COM object pointer is saved in the derived class in which case 
 			// the object will need to deleted before the call to CoUninitialize
-			sapInstance.reset(NULL);
+			sapInstance.reset(__nullptr);
 		}
 
 		return sapInstance.get();
@@ -83,5 +83,5 @@ private:
 // expose public constructors, etc.
 #define ALLOW_SINGLETON_ACCESS(SomeClass) \
 		friend class Singleton<##SomeClass>; \
-		friend class std::auto_ptr<##SomeClass>;
+		friend class std::unique_ptr<##SomeClass>;
 

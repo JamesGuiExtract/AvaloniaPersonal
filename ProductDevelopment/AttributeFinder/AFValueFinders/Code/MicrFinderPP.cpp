@@ -125,7 +125,7 @@ STDMETHODIMP CMicrFinderPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI24370", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI24370", pbValue != __nullptr);
 
 		try
 		{

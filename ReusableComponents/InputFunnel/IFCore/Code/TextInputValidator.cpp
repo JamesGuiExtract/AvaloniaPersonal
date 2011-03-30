@@ -73,7 +73,7 @@ STDMETHODIMP CTextInputValidator::ValidateInput(ITextInput *pTextInput, VARIANT_
 
 		// wrap pTextInput in a smart pointer
 		UCLID_INPUTFUNNELLib::ITextInputPtr ipTextInput(pTextInput);
-		ASSERT_RESOURCE_ALLOCATION("ELI16897", ipTextInput != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16897", ipTextInput != __nullptr);
 
 		// check if the input text is empty
 		_bstr_t bstrText = ipTextInput->GetText();
@@ -94,7 +94,7 @@ STDMETHODIMP CTextInputValidator::GetInputType(BSTR *pstrInputType)
 	HRESULT ret = S_OK;
 	try
 	{
-		ASSERT_ARGUMENT("ELI19627", pstrInputType != NULL)
+		ASSERT_ARGUMENT("ELI19627", pstrInputType != __nullptr)
 
 		// Return this input validator description
 		ret = raw_GetComponentDescription(pstrInputType);
@@ -111,7 +111,7 @@ STDMETHODIMP CTextInputValidator::raw_GetComponentDescription(BSTR * pbstrCompon
 {	
 	try
 	{
-		ASSERT_ARGUMENT("ELI19626", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19626", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Text").Detach();
 	}

@@ -101,8 +101,8 @@ private:
 	DWORD m_dwSelDst;
 
 	// Configuration managers to get and save the history for the source and destination file names
-	std::auto_ptr<RegistryPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<FileProcessorsConfigMgr> ma_pCfgMgr;
+	std::unique_ptr<RegistryPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<FileProcessorsConfigMgr> ma_pCfgMgr;
 
 	///////////
 	// Methods

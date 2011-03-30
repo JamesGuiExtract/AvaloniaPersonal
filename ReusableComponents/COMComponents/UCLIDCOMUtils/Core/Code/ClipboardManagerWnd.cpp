@@ -75,7 +75,7 @@ void ClipboardManagerWnd::copyObjectToClipboard(IUnknownPtr ipObj)
 {
 	// ensure first that the object supports persistence
 	IPersistStreamPtr ipPersistObj = ipObj;
-	if (ipPersistObj == NULL)
+	if (ipPersistObj == __nullptr)
 	{
 		throw UCLIDException("ELI05539", "Object cannot be copied to clipboard "
 			"because it does not support persistence!");
@@ -127,7 +127,7 @@ IUnknownPtr ClipboardManagerWnd::getObjectFromClipboard()
 {
 	try
 	{
-		IUnknownPtr ipObj = NULL;
+		IUnknownPtr ipObj = __nullptr;
 
 		// open the clipboard
 		ClipboardOpenerCloser clipboardOpener(this);
@@ -174,11 +174,11 @@ bool ClipboardManagerWnd::objectIsIUnknownVectorOfType(REFIID riid)
 	getObjectFromClipboard();
 
 	// Object must be defined
-	if (m_ipObj != NULL)
+	if (m_ipObj != __nullptr)
 	{
 		// Check to see if object is IIUnknownVector
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipVector = m_ipObj;
-		if (ipVector != NULL)
+		if (ipVector != __nullptr)
 		{
 			// Retrieve number of items in vector
 			long lSize = ipVector->Size();
@@ -189,7 +189,7 @@ bool ClipboardManagerWnd::objectIsIUnknownVectorOfType(REFIID riid)
 			{
 				// Retrieve this item
 				IUnknownPtr	ipItem = ipVector->At( i );
-				if (ipItem == NULL)
+				if (ipItem == __nullptr)
 				{
 					// Throw exception
 					UCLIDException	ue( "ELI05485", 
@@ -202,7 +202,7 @@ bool ClipboardManagerWnd::objectIsIUnknownVectorOfType(REFIID riid)
 				IUnknownPtr	ipTest;
 				ipItem.QueryInterface( riid, &ipTest );
 
-				if (ipTest == NULL)
+				if (ipTest == __nullptr)
 				{
 					// Object does not support the desired interface
 					bItemsMatch = false;
@@ -218,7 +218,7 @@ bool ClipboardManagerWnd::objectIsIUnknownVectorOfType(REFIID riid)
 				bResult = true;
 			}
 		}			// end if object is IIUnknownVector
-	}				// end if object != NULL
+	}				// end if object != __nullptr
 
 	return bResult;
 }
@@ -229,11 +229,11 @@ bool ClipboardManagerWnd::vectorIsOWDOfType(REFIID riid)
 
 	getObjectFromClipboard();
 
-	if (m_ipObj != NULL)
+	if (m_ipObj != __nullptr)
 	{
 		// check to make sure the object is an IUnknownVector
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipVector = m_ipObj;
-		if (ipVector != NULL)
+		if (ipVector != __nullptr)
 		{
 			bool bItemsMatch = true;
 
@@ -245,7 +245,7 @@ bool ClipboardManagerWnd::vectorIsOWDOfType(REFIID riid)
 			{
 				// retrieve the item
 				IUnknownPtr ipItem = ipVector->At(i);
-				if (ipItem == NULL)
+				if (ipItem == __nullptr)
 				{
 					UCLIDException ue("ELI17578", 
 						"Unable to retrieve IUnknown pointer from the vector!");
@@ -255,7 +255,7 @@ bool ClipboardManagerWnd::vectorIsOWDOfType(REFIID riid)
 
 				// check to make sure the item is an object with description
 				UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipOWD(ipItem);
-				if (ipOWD == NULL)
+				if (ipOWD == __nullptr)
 				{
 					// if it is not an ObjectWithDescription then set
 					// bItemsMatch to false and exit loop
@@ -265,13 +265,13 @@ bool ClipboardManagerWnd::vectorIsOWDOfType(REFIID riid)
 
 				// get the object from the ObjectWithDescription
 				IUnknownPtr ipObject = ipOWD->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI17579", ipObject != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI17579", ipObject != __nullptr);
 
 				// call the query interface on the object
 				IUnknownPtr ipTest;
 				ipObject.QueryInterface(riid, &ipTest);
 
-				if (ipTest == NULL)
+				if (ipTest == __nullptr)
 				{
 					// the object does not support the desired interface,
 					// set bItemsMatch to false and exit loop
@@ -298,13 +298,13 @@ bool ClipboardManagerWnd::objectIsOfType(REFIID riid)
 	getObjectFromClipboard();
 
 	// Object must be defined
-	if (m_ipObj != NULL)
+	if (m_ipObj != __nullptr)
 	{
 		// Call QueryInterface on data member
 		IUnknownPtr	ipTest;
 		m_ipObj.QueryInterface( riid, &ipTest );
 
-		if (ipTest != NULL)
+		if (ipTest != __nullptr)
 		{
 			// Object supports the desired interface
 			bResult = true;
@@ -321,65 +321,32 @@ bool ClipboardManagerWnd::objectIsTypeWithDescription(REFIID riid)
 	getObjectFromClipboard();
 
 	// Object must be defined
-	if (m_ipObj != NULL)
+	if (m_ipObj != __nullptr)
 	{
 		// Check to see if object is IObjectWithDescription
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObject = m_ipObj;
-		if (ipObject != NULL)
+		if (ipObject != __nullptr)
 		{
 			// Retrieve the embedded object
 			IUnknownPtr ipEmbedded = ipObject->GetObject();
 
 			// Check to see if the embedded object is of specified type
-			if (ipEmbedded != NULL)
+			if (ipEmbedded != __nullptr)
 			{
 				IUnknownPtr ipTest;
 				ipEmbedded.QueryInterface( riid, &ipTest );
 
-				if (ipTest != NULL)
+				if (ipTest != __nullptr)
 				{
 					// Object supports the desired interface
 					bResult = true;
 				}
-			}		// end if embedded object != NULL
+			}		// end if embedded object != __nullptr
 		}			// end if data member is IObjectWithDescription
-	}				// end if data member != NULL
+	}				// end if data member != __nullptr
 
 	return bResult;
 }
-
-//-------------------------------------------------------------------------------------------------
-// Clipboard related message handlers
-//-------------------------------------------------------------------------------------------------
-/*
-//-------------------------------------------------------------------------------------------------
-void ClipboardManagerWnd::OnClipChange()
-{
-//	m_ipObj = NULL; // in case the next line fails
-//	m_ipObj = getObjectFromClipboard();
-
-	// if there is another clipboard viewer in the chain, pass on the message
-	if (m_hNextClipboardViewer)
-	{
-		::SendMessage(m_hNextClipboardViewer, WM_DRAWCLIPBOARD, NULL, NULL);
-	}
-}
-//-------------------------------------------------------------------------------------------------
-void ClipboardManagerWnd::OnChangeCbChain(HWND hWndRemove, HWND hWndAfter)
-{
-	// update the handle to the next window in the chain
-	if (m_hNextClipboardViewer == hWndRemove)
-	{
-		m_hNextClipboardViewer = hWndAfter;
-	}
-
-	// if there is another clipboard viewer in the chain, pass on the message
-	if (m_hNextClipboardViewer)
-	{
-		::SendMessage(m_hNextClipboardViewer, WM_CHANGECBCHAIN, 
-			(WPARAM) hWndRemove, (LPARAM) hWndAfter);
-	}
-}*/
 
 //-------------------------------------------------------------------------------------------------
 // Private methods

@@ -50,7 +50,7 @@ class CRuleSetEditor : public CDialog
 
 // Construction
 public:
-	CRuleSetEditor(const string& strFileName = "", const string& strProductRootDir = "", CWnd* pParent = NULL);
+	CRuleSetEditor(const string& strFileName = "", const string& strProductRootDir = "", CWnd* pParent = __nullptr);
 
 // Dialog Data
 	//{{AFX_DATA(CRuleSetEditor)
@@ -186,7 +186,7 @@ private:
 	// object that manages file recovery related functionality
 	FileRecoveryManager m_FRM;
 
-	auto_ptr<RuleTesterDlg> m_apRuleTesterDlg;
+	unique_ptr<RuleTesterDlg> m_apRuleTesterDlg;
 
 	// Which control owns the context menu
 	EEditorControlSelected	m_eContextMenuCtrl;
@@ -209,8 +209,8 @@ private:
 	CStatusBar m_statusBar;
 
 	// persistent manager
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	auto_ptr<MRUList> ma_pMRUList;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	unique_ptr<MRUList> ma_pMRUList;
 
 	//////////
 	// Methods

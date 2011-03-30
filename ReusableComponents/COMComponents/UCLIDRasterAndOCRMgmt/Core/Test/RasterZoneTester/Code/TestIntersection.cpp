@@ -106,7 +106,7 @@ STDMETHODIMP CTestIntersection::raw_RunAutomatedTests(IVariantVector* pParams, B
 			throw;			
 		}
 
-		if (m_ipResultLogger == NULL)
+		if (m_ipResultLogger == __nullptr)
 		{
 			throw UCLIDException("ELI15197", "Please set ResultLogger before proceeding.");
 		}
@@ -261,7 +261,7 @@ IRasterZonePtr CTestIntersection::asRasterZone(const std::string& strRect)
 	// Create IRasterZone obj and push the start, 
 	// end points and height into ipRaster
 	IRasterZonePtr ipRaster(CLSID_RasterZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI15253", ipRaster != NULL)
+	ASSERT_RESOURCE_ALLOCATION("ELI15253", ipRaster != __nullptr)
 	ipRaster->StartX = asLong(vecPoly[0]);
 	ipRaster->StartY = asLong(vecPoly[1]);
 	ipRaster->EndX = asLong(vecPoly[2]);
@@ -279,13 +279,13 @@ bool CTestIntersection::testIntersection(const std::string & strRect1,
 	// Parse the string to get the start points, end points and height
 	// and convert that to a raster zone and get its area
 	IRasterZonePtr ipRaster1 = asRasterZone(strRect1);
-	ASSERT_RESOURCE_ALLOCATION("ELI15200", ipRaster1 != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15200", ipRaster1 != __nullptr);
 	double dAreaFirst = ipRaster1->Area;
 
 	// Parse the second string to get the start points, end points and height
 	// and convert that to a raster zone and get its area
 	IRasterZonePtr  ipRaster2 = asRasterZone(strRect2);
-	ASSERT_RESOURCE_ALLOCATION("ELI15201", ipRaster2 != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15201", ipRaster2 != __nullptr);
 	double dAreaSecond = ipRaster2->Area;
 
 	// Get the smaller area of the two rectangles

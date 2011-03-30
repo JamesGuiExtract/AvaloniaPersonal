@@ -98,7 +98,7 @@ void TesterDlgRulesetPage::OnSize(UINT nType, int cx, int cy)
 {
 	CPropertyPage::OnSize(nType, cx, cy);
 
-	if ( GetDlgItem(IDC_RULESET) != NULL )
+	if ( GetDlgItem(IDC_RULESET) != __nullptr )
 	{
 		CRect rectDlg;
 		GetClientRect(&rectDlg);

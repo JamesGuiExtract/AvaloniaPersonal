@@ -70,7 +70,7 @@ STDMETHODIMP CImageCleanupSettings::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17831", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI17831", pClassID != __nullptr);
 
 		*pClassID = CLSID_ImageCleanupSettings;
 	}
@@ -90,7 +90,7 @@ STDMETHODIMP CImageCleanupSettings::Load(IStream * pStream)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17542", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17542", pStream != __nullptr);
 
 		// read the signature from the file
 		CComBSTR bstrSignature;
@@ -143,14 +143,14 @@ STDMETHODIMP CImageCleanupSettings::Load(IStream * pStream)
 		// create IPersistStream object and fill from the opened stream
 		IPersistStreamPtr ipObj;
 		readObjectFromStream(ipObj, pStream, "ELI17119");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI17120", "Image Cleanup Operations could not be read from stream!");
 		}
 
 		// set our internal cleanup operations vector
 		m_ipImageCleanupOperationsVector = ipObj;
-		ASSERT_RESOURCE_ALLOCATION("ELI17224", m_ipImageCleanupOperationsVector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17224", m_ipImageCleanupOperationsVector != __nullptr);
 
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
@@ -166,7 +166,7 @@ STDMETHODIMP CImageCleanupSettings::Save(IStream * pStream, BOOL fClearDirty)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17777", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17777", pStream != __nullptr);
 
 		// write the signature to the file
 		CComBSTR bstrSignature(gstrIMAGE_CLEANUP_SETTINGS_SIGNATURE.c_str());
@@ -199,7 +199,7 @@ STDMETHODIMP CImageCleanupSettings::Save(IStream * pStream, BOOL fClearDirty)
 
 		// get the IPersistStream associated with our cleanup operations vector
 		IPersistStreamPtr ipObj = m_ipImageCleanupOperationsVector;
-		ASSERT_RESOURCE_ALLOCATION("ELI17122", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17122", ipObj != __nullptr);
 
 		// write the cleanup operations to the stream
 		writeObjectToStream(ipObj, pStream, "ELI17123", fClearDirty);
@@ -251,7 +251,7 @@ STDMETHODIMP CImageCleanupSettings::LoadFrom(BSTR strFullFileName, VARIANT_BOOL 
 
 		// Get the IPersistStream object
 		IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
-		ASSERT_RESOURCE_ALLOCATION("ELI17130", ipPersistStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17130", ipPersistStream != __nullptr);
 
 		// Load the settings from the file
 		readObjectFromFile(ipPersistStream, strFullFileName, m_bstrStreamName, bEncrypted);
@@ -320,10 +320,10 @@ STDMETHODIMP CImageCleanupSettings::get_ImageCleanupOperations(IIUnknownVector**
 		}
 
 		// if the operations vector has not been instantiated yet, instantiate it
-		if (m_ipImageCleanupOperationsVector == NULL)
+		if (m_ipImageCleanupOperationsVector == __nullptr)
 		{
 			m_ipImageCleanupOperationsVector.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI17139", m_ipImageCleanupOperationsVector != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17139", m_ipImageCleanupOperationsVector != __nullptr);
 		}
 
 		// make a copy of the vector and return it
@@ -376,7 +376,7 @@ STDMETHODIMP CImageCleanupSettings::get_SpecifiedPages(BSTR* pstrSpecifiedPages)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17511", pstrSpecifiedPages != NULL);
+		ASSERT_ARGUMENT("ELI17511", pstrSpecifiedPages != __nullptr);
 
 		*pstrSpecifiedPages = get_bstr_t(m_strSpecifiedPages).Detach();
 	}
@@ -407,7 +407,7 @@ STDMETHODIMP CImageCleanupSettings::get_ICPageRangeType(EICPageRangeType *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17513", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17513", pVal != __nullptr);
 
 		*pVal = (EICPageRangeType) m_eICPageRangeType;
 	}
@@ -442,7 +442,7 @@ ESImageCleanupLib::IImageCleanupSettingsPtr CImageCleanupSettings::getThisAsCOMP
 	try
 	{
 		ESImageCleanupLib::IImageCleanupSettingsPtr ipThis(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI17143", ipThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17143", ipThis != __nullptr);
 
 		return ipThis;
 	}
@@ -456,10 +456,10 @@ IMiscUtilsPtr CImageCleanupSettings::getMiscUtils()
 	try
 	{
 		// if the MiscUtils pointer has not been instantiated, instantiate it
-		if (m_ipMiscUtils == NULL)
+		if (m_ipMiscUtils == __nullptr)
 		{
 			m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-			ASSERT_RESOURCE_ALLOCATION("ELI17145", m_ipMiscUtils != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17145", m_ipMiscUtils != __nullptr);
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI17544");
@@ -475,7 +475,7 @@ void CImageCleanupSettings::clearSettings()
 	try
 	{
 		// clear the elements in the vector if the vector exists
-		if (m_ipImageCleanupOperationsVector != NULL)
+		if (m_ipImageCleanupOperationsVector != __nullptr)
 		{
 			m_ipImageCleanupOperationsVector->Clear();
 		}

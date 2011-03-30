@@ -69,7 +69,7 @@ STDMETHODIMP CModulusEqualsMathCondition::get_Modulus(long* pnVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27182", pnVal != NULL);
+		ASSERT_ARGUMENT("ELI27182", pnVal != __nullptr);
 
 		*pnVal = m_nModulus;
 
@@ -106,7 +106,7 @@ STDMETHODIMP CModulusEqualsMathCondition::get_ModEquals(long* pnVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27186", pnVal != NULL);
+		ASSERT_ARGUMENT("ELI27186", pnVal != __nullptr);
 
 		*pnVal = m_nModEquals;
 
@@ -144,7 +144,7 @@ STDMETHODIMP CModulusEqualsMathCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27190", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27190", pbValue != __nullptr);
 
 		try
 		{
@@ -172,7 +172,7 @@ STDMETHODIMP CModulusEqualsMathCondition::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		IModulusEqualsMathConditionPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI27192", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27192", ipCopyThis != __nullptr);
 		
 		// Copy the values from another object
 		m_nModulus = ipCopyThis->Modulus;
@@ -194,10 +194,10 @@ STDMETHODIMP CModulusEqualsMathCondition::raw_Clone(IUnknown **pObject)
 		// Validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27194", pObject != NULL);
+		ASSERT_ARGUMENT("ELI27194", pObject != __nullptr);
 
 		ICopyableObjectPtr ipCopy(CLSID_ModulusEqualsMathCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI27195", ipCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27195", ipCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipCopy->CopyFrom(ipUnk);
@@ -222,7 +222,7 @@ STDMETHODIMP CModulusEqualsMathCondition::raw_IsConfigured(VARIANT_BOOL *pbValue
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27197", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27197", pbValue != __nullptr);
 
 		// Configured if:
 		// 1. Modulus > 1

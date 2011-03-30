@@ -90,7 +90,7 @@ END_MESSAGE_MAP()
 void TesterDlgInputPage::resizeControls()
 {
 	// only do resizing if the controls have been initialized
-	if (GetDlgItem(IDC_EDIT_TESTINPUT) != NULL)
+	if (GetDlgItem(IDC_EDIT_TESTINPUT) != __nullptr)
 	{
 		// get the client coords of the dialog
 		CRect rectDlg;
@@ -335,7 +335,7 @@ void TesterDlgInputPage::OnSelchangeComboInput()
 			m_strCurrentInputType != strNewInputType)
 		{
 			ISpatialStringPtr ipText(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI06510", ipText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06510", ipText != __nullptr);
 			ipText->CreateNonSpatialString(get_bstr_t(zInputText), "");
 			m_mapInputTypeToText[m_strCurrentInputType] = ipText;
 		}
@@ -355,14 +355,14 @@ void TesterDlgInputPage::OnSelchangeComboInput()
 			m_mapInputTypeToText.end())
 		{
 			ISpatialStringPtr ipText(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI06799", ipText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06799", ipText != __nullptr);
 			m_mapInputTypeToText[m_strCurrentInputType] = ipText;
 		}
 
 		// get the spatial text associated with the current input type
 		// if our logic is current, the pointer should never be NULL
 		ISpatialStringPtr ipSpatialText = m_mapInputTypeToText[m_strCurrentInputType];
-		if (ipSpatialText == NULL)
+		if (ipSpatialText == __nullptr)
 		{
 			THROW_LOGIC_ERROR_EXCEPTION("ELI06800");
 		}
@@ -427,7 +427,7 @@ ISpatialStringPtr TesterDlgInputPage::openFile(const string& strFileName)
 
 	// create the spatial string to be returned
 	ISpatialStringPtr ipText(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI06801", ipText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06801", ipText != __nullptr);
 
 	// Get the extension of the file to be opened.
 	string strExtension = getExtensionFromFullPath(strFileName);
@@ -585,10 +585,10 @@ ISpatialStringPtr TesterDlgInputPage::getText()
 
 		// associate the text with the current input type
 		ISpatialStringPtr ipText = m_mapInputTypeToText[m_strCurrentInputType];
-		if (ipText == NULL)
+		if (ipText == __nullptr)
 		{
 			ipText.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI06812", ipText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06812", ipText != __nullptr);
 			m_mapInputTypeToText[m_strCurrentInputType] = ipText;
 		}
 
@@ -611,14 +611,14 @@ ISpatialStringPtr TesterDlgInputPage::getText()
 		!= m_mapInputTypeToText.end())
 	{
 		ISpatialStringPtr ipString = m_mapInputTypeToText[m_strCurrentInputType];
-		ASSERT_RESOURCE_ALLOCATION("ELI06810", ipString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06810", ipString != __nullptr);
 		return ipString;
 	}
 	else
 	{
 		// create an empty string and return
 		ISpatialStringPtr ipText(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI06549", ipText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06549", ipText != __nullptr);
 
 		return ipText;
 	}
@@ -695,19 +695,19 @@ IOCREnginePtr TesterDlgInputPage::getOCREngine()
 	{
 		// create an instance of the OCR engine
 		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR);
-		ASSERT_RESOURCE_ALLOCATION("ELI09543", m_ipOCREngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09543", m_ipOCREngine != __nullptr);
 
 		// initialize the private license
 		IPrivateLicensedComponentPtr ipScansoftEngine = m_ipOCREngine;
-		ASSERT_RESOURCE_ALLOCATION("ELI10565", ipScansoftEngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10565", ipScansoftEngine != __nullptr);
 		ipScansoftEngine->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
 
 		// set this instance of the OCR engine as the default
 		// OCR engine for the input manager
 		IInputManagerSingletonPtr ipInputMgrSingleton(CLSID_InputManagerSingleton);
-		ASSERT_RESOURCE_ALLOCATION("ELI19131", ipInputMgrSingleton != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19131", ipInputMgrSingleton != __nullptr);
 		IInputManagerPtr ipInputManager = ipInputMgrSingleton->GetInstance();
-		ASSERT_RESOURCE_ALLOCATION("ELI10566", ipInputMgrSingleton != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10566", ipInputMgrSingleton != __nullptr);
 		ipInputManager->SetOCREngine(m_ipOCREngine);
 	}
 

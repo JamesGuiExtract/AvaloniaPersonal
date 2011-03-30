@@ -55,7 +55,7 @@ STDMETHODIMP CActionStatistics::get_NumDocuments(/*[out, retval]*/ long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26808", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26808", pVal != __nullptr);
 
 		*pVal = m_nNumDocuments;
 
@@ -83,7 +83,7 @@ STDMETHODIMP CActionStatistics::get_NumDocumentsPending(/*[out, retval]*/ long *
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI30725", pVal != NULL);
+		ASSERT_ARGUMENT("ELI30725", pVal != __nullptr);
 
 		*pVal = m_nNumDocumentsPending;
 
@@ -111,7 +111,7 @@ STDMETHODIMP CActionStatistics::get_NumDocumentsComplete(/*[out, retval]*/ long 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26809", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26809", pVal != __nullptr);
 
 		*pVal = m_nNumDocumentsComplete;
 
@@ -139,7 +139,7 @@ STDMETHODIMP CActionStatistics::get_NumDocumentsFailed(/*[out, retval]*/ long *p
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26810", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26810", pVal != __nullptr);
 
 		*pVal = m_nNumDocumentsFailed;
 
@@ -167,7 +167,7 @@ STDMETHODIMP CActionStatistics::get_NumDocumentsSkipped(/*[out, retval]*/ long *
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26811", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26811", pVal != __nullptr);
 
 		*pVal = m_nNumDocumentsSkipped;
 
@@ -195,7 +195,7 @@ STDMETHODIMP CActionStatistics::get_NumPages(/*[out, retval]*/ long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26819", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26819", pVal != __nullptr);
 
 		*pVal = m_nNumPages;
 	}
@@ -223,7 +223,7 @@ STDMETHODIMP CActionStatistics::get_NumPagesPending(/*[out, retval]*/ long *pVal
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI30728", pVal != NULL);
+		ASSERT_ARGUMENT("ELI30728", pVal != __nullptr);
 
 		*pVal = m_nNumPagesPending;
 
@@ -251,7 +251,7 @@ STDMETHODIMP CActionStatistics::get_NumPagesComplete(/*[out, retval]*/ long *pVa
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26818", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26818", pVal != __nullptr);
 
 		*pVal = m_nNumPagesComplete;
 
@@ -279,7 +279,7 @@ STDMETHODIMP CActionStatistics::get_NumPagesFailed(/*[out, retval]*/ long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26817", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26817", pVal != __nullptr);
 
 		*pVal = m_nNumPagesFailed;
 
@@ -307,7 +307,7 @@ STDMETHODIMP CActionStatistics::get_NumPagesSkipped(/*[out, retval]*/ long *pVal
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26820", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26820", pVal != __nullptr);
 
 		*pVal = m_nNumPagesSkipped;
 
@@ -335,7 +335,7 @@ STDMETHODIMP CActionStatistics::get_NumBytes(/*[out, retval]*/ LONGLONG *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26816", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26816", pVal != __nullptr);
 
 		*pVal = m_llNumBytes;
 
@@ -363,7 +363,7 @@ STDMETHODIMP CActionStatistics::get_NumBytesPending(/*[out, retval]*/ LONGLONG *
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI30731", pVal != NULL);
+		ASSERT_ARGUMENT("ELI30731", pVal != __nullptr);
 
 		*pVal = m_llNumBytesPending;
 
@@ -390,7 +390,7 @@ STDMETHODIMP CActionStatistics::get_NumBytesComplete(/*[out, retval]*/ LONGLONG 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26815", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26815", pVal != __nullptr);
 
 		*pVal = m_llNumBytesComplete;
 
@@ -418,7 +418,7 @@ STDMETHODIMP CActionStatistics::get_NumBytesFailed(/*[out, retval]*/ LONGLONG *p
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26814", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26814", pVal != __nullptr);
 
 		*pVal = m_llNumBytesFailed;
 
@@ -446,7 +446,7 @@ STDMETHODIMP CActionStatistics::get_NumBytesSkipped(/*[out, retval]*/ LONGLONG *
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26823", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26823", pVal != __nullptr);
 
 		*pVal = m_llNumBytesSkipped;
 
@@ -480,63 +480,63 @@ STDMETHODIMP CActionStatistics::GetAllStatistics(long *plNumDocs, long *plNumDoc
 	try
 	{
 		// Copy the statistics data to non null parameters
-		if (plNumDocs != NULL)
+		if (plNumDocs != __nullptr)
 		{
 			*plNumDocs = m_nNumDocuments;
 		}
-		if (plNumDocsPending != NULL)
+		if (plNumDocsPending != __nullptr)
 		{
 			*plNumDocsPending = m_nNumDocumentsPending;
 		}
-		if (plNumDocsComplete != NULL)
+		if (plNumDocsComplete != __nullptr)
 		{
 			*plNumDocsComplete = m_nNumDocumentsComplete;
 		}
-		if (plNumDocsFailed != NULL)
+		if (plNumDocsFailed != __nullptr)
 		{
 			*plNumDocsFailed = m_nNumDocumentsFailed;
 		}
-		if (plNumDocsSkipped != NULL)
+		if (plNumDocsSkipped != __nullptr)
 		{
 			*plNumDocsSkipped = m_nNumDocumentsSkipped;
 		}
-		if (plNumPages != NULL)
+		if (plNumPages != __nullptr)
 		{
 			*plNumPages = m_nNumPages;
 		}
-		if (plNumPagesPending != NULL)
+		if (plNumPagesPending != __nullptr)
 		{
 			*plNumPagesPending = m_nNumPagesPending;
 		}
-		if (plNumPagesComplete != NULL)
+		if (plNumPagesComplete != __nullptr)
 		{
 			*plNumPagesComplete = m_nNumPagesComplete;
 		}
-		if (plNumPagesFailed != NULL)
+		if (plNumPagesFailed != __nullptr)
 		{
 			*plNumPagesFailed = m_nNumPagesFailed;
 		}
-		if (plNumPagesSkipped != NULL)
+		if (plNumPagesSkipped != __nullptr)
 		{
 			*plNumPagesSkipped = m_nNumPagesSkipped;
 		}
-		if (pllNumBytes != NULL)
+		if (pllNumBytes != __nullptr)
 		{
 			*pllNumBytes = m_llNumBytes;
 		}
-		if (pllNumBytes != NULL)
+		if (pllNumBytes != __nullptr)
 		{
 			*pllNumBytesPending = m_llNumBytesPending;
 		}
-		if (pllNumBytesComplete != NULL)
+		if (pllNumBytesComplete != __nullptr)
 		{
 			*pllNumBytesComplete = m_llNumBytesComplete;
 		}
-		if (pllNumBytesFailed != NULL)
+		if (pllNumBytesFailed != __nullptr)
 		{
 			*pllNumBytesFailed = m_llNumBytesFailed;
 		}
-		if (pllNumBytesSkipped != NULL)
+		if (pllNumBytesSkipped != __nullptr)
 		{
 			*pllNumBytesSkipped = m_llNumBytesSkipped;
 		}
@@ -585,9 +585,9 @@ STDMETHODIMP CActionStatistics::GetTotals(long *plNumDocs, long *plNumPages, LON
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI26842", plNumDocs != NULL);
-		ASSERT_ARGUMENT("ELI26843", plNumPages != NULL);
-		ASSERT_ARGUMENT("ELI26844", pllNumBytes != NULL);
+		ASSERT_ARGUMENT("ELI26842", plNumDocs != __nullptr);
+		ASSERT_ARGUMENT("ELI26843", plNumPages != __nullptr);
+		ASSERT_ARGUMENT("ELI26844", pllNumBytes != __nullptr);
 
 		*plNumDocs = m_nNumDocuments;
 		*plNumPages = m_nNumPages;
@@ -621,9 +621,9 @@ STDMETHODIMP CActionStatistics::GetComplete(long *plNumDocsComplete, long *plNum
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI26847", plNumDocsComplete != NULL);
-		ASSERT_ARGUMENT("ELI26848", plNumPagesComplete != NULL);
-		ASSERT_ARGUMENT("ELI26849", pllNumBytesComplete != NULL);
+		ASSERT_ARGUMENT("ELI26847", plNumDocsComplete != __nullptr);
+		ASSERT_ARGUMENT("ELI26848", plNumPagesComplete != __nullptr);
+		ASSERT_ARGUMENT("ELI26849", pllNumBytesComplete != __nullptr);
 
 		*plNumDocsComplete = m_nNumDocumentsComplete;
 		*plNumPagesComplete = m_nNumPagesComplete;
@@ -658,9 +658,9 @@ STDMETHODIMP CActionStatistics::GetFailed(long *plNumDocsFailed, long *plNumPage
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI26852", plNumDocsFailed != NULL);
-		ASSERT_ARGUMENT("ELI26853", plNumPagesFailed != NULL);
-		ASSERT_ARGUMENT("ELI26854", pllNumBytesFailed != NULL);
+		ASSERT_ARGUMENT("ELI26852", plNumDocsFailed != __nullptr);
+		ASSERT_ARGUMENT("ELI26853", plNumPagesFailed != __nullptr);
+		ASSERT_ARGUMENT("ELI26854", pllNumBytesFailed != __nullptr);
 
 		*plNumDocsFailed = m_nNumDocumentsFailed;
 		*plNumPagesFailed = m_nNumPagesFailed;
@@ -695,9 +695,9 @@ STDMETHODIMP CActionStatistics::GetSkipped(long *plNumDocsSkipped, long *plNumPa
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI26857", plNumDocsSkipped != NULL);
-		ASSERT_ARGUMENT("ELI26858", plNumPagesSkipped != NULL);
-		ASSERT_ARGUMENT("ELI26859", pllNumBytesSkipped != NULL);
+		ASSERT_ARGUMENT("ELI26857", plNumDocsSkipped != __nullptr);
+		ASSERT_ARGUMENT("ELI26858", plNumPagesSkipped != __nullptr);
+		ASSERT_ARGUMENT("ELI26859", pllNumBytesSkipped != __nullptr);
 
 		*plNumDocsSkipped = m_nNumDocumentsSkipped;
 		*plNumPagesSkipped = m_nNumPagesSkipped;
@@ -732,9 +732,9 @@ STDMETHODIMP CActionStatistics::GetPending(long *plNumDocsPending, long *plNumPa
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI30737", plNumDocsPending != NULL);
-		ASSERT_ARGUMENT("ELI30738", plNumPagesPending != NULL);
-		ASSERT_ARGUMENT("ELI30739", pllNumBytesPending != NULL);
+		ASSERT_ARGUMENT("ELI30737", plNumDocsPending != __nullptr);
+		ASSERT_ARGUMENT("ELI30738", plNumPagesPending != __nullptr);
+		ASSERT_ARGUMENT("ELI30739", pllNumBytesPending != __nullptr);
 
 		*plNumDocsPending = m_nNumDocumentsPending;
 		*plNumPagesPending = m_nNumPagesPending;
@@ -772,7 +772,7 @@ STDMETHODIMP CActionStatistics::raw_Clone(IUnknown * * pObject)
 	{
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_ActionStatistics );
-		ASSERT_RESOURCE_ALLOCATION("ELI14068", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14068", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -792,7 +792,7 @@ STDMETHODIMP CActionStatistics::raw_CopyFrom(IUnknown * pObject)
 	try
 	{
 		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI14031", ipActionStats != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14031", ipActionStats != __nullptr);
 
 		// Get the stats from the other statistics object
 		ipActionStats->GetAllStatistics(&m_nNumDocuments, &m_nNumDocumentsPending, 

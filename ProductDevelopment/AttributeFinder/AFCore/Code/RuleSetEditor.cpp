@@ -60,14 +60,14 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 							   CWnd* pParent /*=NULL*/)
 :CDialog(CRuleSetEditor::IDD, pParent), 
  m_pParentWnd(pParent),
- m_apRuleTesterDlg(NULL), 
+ m_apRuleTesterDlg(__nullptr), 
  m_strLastFileOpened(""),
  m_eContextMenuCtrl(kNoControl),
  m_strCurrentFileName(""),
  m_FRM(".tmp"),
  m_iDESC_LIST_COLUMN(1),
  m_strBinFolder(strBinFolder),
- m_pMRUFilesMenu(NULL)
+ m_pMRUFilesMenu(__nullptr)
 {
 	try
 	{
@@ -92,23 +92,22 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 		// create an instance of the RuleSet object that can be used
 		// for editing purposes for the lifetime of this dialog
 		m_ipRuleSet.CreateInstance(CLSID_RuleSet);
-		ASSERT_RESOURCE_ALLOCATION("ELI04495", m_ipRuleSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI04495", m_ipRuleSet != __nullptr);
 
 		// create an instance of the rule tester dialog
-		m_apRuleTesterDlg = auto_ptr<RuleTesterDlg>(new RuleTesterDlg(&m_FRM, m_ipRuleSet, this));
-		ASSERT_RESOURCE_ALLOCATION("ELI04815", m_apRuleTesterDlg.get() != NULL);
+		m_apRuleTesterDlg = unique_ptr<RuleTesterDlg>(new RuleTesterDlg(&m_FRM, m_ipRuleSet, this));
+		ASSERT_RESOURCE_ALLOCATION("ELI04815", m_apRuleTesterDlg.get() != __nullptr);
 
 		// create an instance of the clipboard object manager
 		m_ipClipboardMgr.CreateInstance(CLSID_ClipboardObjectManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI05554", m_ipClipboardMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05554", m_ipClipboardMgr != __nullptr);
 			
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI07842", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07842", m_ipMiscUtils != __nullptr);
 
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-			new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_AFCORE_KEY_PATH));
+		ma_pUserCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_AFCORE_KEY_PATH));
 		
-		ma_pMRUList = auto_ptr<MRUList>(new MRUList(ma_pUserCfgMgr.get(), "\\RuleSetEditor\\MRUList", "File_%d", 5));
+		ma_pMRUList.reset(new MRUList(ma_pUserCfgMgr.get(), "\\RuleSetEditor\\MRUList", "File_%d", 5));
 
 		// display the wait cursor as it may take some time to
 		// open the .RSD file if we do end up attempting such
@@ -432,7 +431,7 @@ void CRuleSetEditor::enableEditFeatures(bool bEnable)
 	{
 		long nID = *iter;
 		CWnd*	pWnd = GetDlgItem( nID );
-		if (pWnd != NULL)
+		if (pWnd != __nullptr)
 		{
 			pWnd->ShowWindow( bEnable ? SW_SHOW : SW_HIDE );
 		}
@@ -442,7 +441,7 @@ void CRuleSetEditor::enableEditFeatures(bool bEnable)
 	// Hide/show the encrypted prompt
 	/////////////////////////////////
 	CWnd *pWnd = GetDlgItem( IDC_STATIC_PROMPT );
-	if (pWnd != NULL)
+	if (pWnd != __nullptr)
 	{
 		pWnd->ShowWindow( bEnable ? SW_HIDE : SW_SHOW );
 	}
@@ -522,7 +521,7 @@ bool CRuleSetEditor::promptForAttributeName(PromptDlg& promptDlg)
 				{
 					
 					UCLID_AFCORELib::IAttributePtr ipTmp(CLSID_Attribute);
-					ASSERT_RESOURCE_ALLOCATION("ELI09510", ipTmp != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI09510", ipTmp != __nullptr);
 					ipTmp->PutName( get_bstr_t(strInput) );
 				}
 				CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI09511");
@@ -611,7 +610,7 @@ void CRuleSetEditor::refreshUIFromAttribute()
 	if (m_ipInfo)
 	{
 		IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
-		if (ipRules == NULL)
+		if (ipRules == __nullptr)
 		{
 			// Create and throw exception
 			throw UCLIDException("ELI04584", "Unable to retrieve Attribute Rules.");
@@ -624,7 +623,7 @@ void CRuleSetEditor::refreshUIFromAttribute()
 		{
 			// Retrieve this rule
 			UCLID_AFCORELib::IAttributeRulePtr	ipRule = ipRules->At( i );
-			if (ipRule != NULL)
+			if (ipRule != __nullptr)
 			{
 				// Retrieve the Rule description
 				_bstr_t	bstrDescription = ipRule->GetDescription();
@@ -649,7 +648,7 @@ void CRuleSetEditor::refreshUIFromAttribute()
 
 		// Retrieve Input Validator
 		IObjectWithDescriptionPtr ipIV = m_ipInfo->InputValidator;
-		ASSERT_RESOURCE_ALLOCATION("ELI15505", ipIV != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15505", ipIV != __nullptr);
 
 		// Update Input Validator description
 		_bstr_t	bstrIVDesc = ipIV->Description;
@@ -680,7 +679,7 @@ void CRuleSetEditor::refreshUIFromAttribute()
 
 		// Retrieve Attribute Splitter
 		IObjectWithDescriptionPtr ipSplitter = m_ipInfo->AttributeSplitter;
-		ASSERT_RESOURCE_ALLOCATION("ELI15506", ipSplitter != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15506", ipSplitter != __nullptr);
 
 		// Update AttributeSplitter description
 		_bstr_t	bstrDesc = ipSplitter->Description;
@@ -742,7 +741,7 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 
 	// Retrieve Preprocessor
 	IObjectWithDescriptionPtr ipGDPP = m_ipRuleSet->GlobalDocPreprocessor;
-	ASSERT_RESOURCE_ALLOCATION("ELI15507", ipGDPP != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15507", ipGDPP != __nullptr);
 
 	// Update Document Preprocessor description
 	_bstr_t	bstrPreDesc = ipGDPP->Description;
@@ -773,7 +772,7 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 
 	// Retrieve Output Handler
 	IObjectWithDescriptionPtr ipOH = m_ipRuleSet->GlobalOutputHandler;
-	ASSERT_RESOURCE_ALLOCATION("ELI15508", ipOH != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15508", ipOH != __nullptr);
 
 	// Update Output Handler description
 	_bstr_t	bstrOHDesc = ipOH->Description;
@@ -805,7 +804,7 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 	// because we keep accessing the attribute name to attribute-find-info map
 	// many times during the scope of this window, keep cache a pointer to this map
 	m_ipAttributeNameToInfoMap = m_ipRuleSet->AttributeNameToInfoMap;
-	ASSERT_RESOURCE_ALLOCATION("ELI04543", m_ipAttributeNameToInfoMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI04543", m_ipAttributeNameToInfoMap != __nullptr);
 
 	// clear all the UI controls or bring them back to their default state
 	m_comboAttr.ResetContent();
@@ -813,7 +812,7 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 	// refresh the UI from the ruleset object
 	// first refresh the attributes list
 	IVariantVectorPtr ipKeys = m_ipAttributeNameToInfoMap->GetKeys();
-	ASSERT_RESOURCE_ALLOCATION("ELI15509", ipKeys != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15509", ipKeys != __nullptr);
 	long nNumkeys = ipKeys->Size;
 	for (int i = 0; i < nNumkeys; i++)
 	{
@@ -842,7 +841,7 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 		// let the Rule Tester dialog know what the current attribute is
 		m_apRuleTesterDlg->setCurrentAttributeName("");
 
-		m_ipInfo = NULL;
+		m_ipInfo = __nullptr;
 	}
 
 	// Update Status Bar Text
@@ -876,7 +875,7 @@ void CRuleSetEditor::setButtonStates()
 
 		// Disable check box
 		pButton = (CButton *)GetDlgItem( IDC_CHECK_STOP );
-		if (pButton != NULL)
+		if (pButton != __nullptr)
 		{
 			pButton->EnableWindow( FALSE );
 		}
@@ -925,12 +924,12 @@ void CRuleSetEditor::setButtonStates()
 	{
 		// Must be more than one rule for the checkbox
 		pButton = (CButton *)GetDlgItem(IDC_CHECK_STOP);
-		ASSERT_RESOURCE_ALLOCATION("ELI07395", pButton != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07395", pButton != __nullptr);
 		pButton->EnableWindow( asMFCBool(iCount > 1) );
 
 		// Next have to see if an item is selected
 		pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -990,11 +989,11 @@ bool CRuleSetEditor::clipboardObjectIsAttribute()
 	IUnknownPtr ipObj = m_ipClipboardMgr->GetObjectInClipboard();
 
 	// Object must be defined
-	if (ipObj != NULL)
+	if (ipObj != __nullptr)
 	{
 		// Check to see if object is IStrToObjectMap
 		UCLID_COMUTILSLib::IStrToObjectMapPtr ipMap = ipObj;
-		if (ipMap != NULL)
+		if (ipMap != __nullptr)
 		{
 			// Get map size
 			long lMapSize = ipMap->GetSize();
@@ -1007,16 +1006,16 @@ bool CRuleSetEditor::clipboardObjectIsAttribute()
 				CComBSTR bstrKey;
 				// Retrieve this item
 				ipMap->GetKeyValue( i, &bstrKey, &ipItem );
-				if (ipItem != NULL)
+				if (ipItem != __nullptr)
 				{
 					// Check to see if this item is an IAttributeFindInfo object
 					UCLID_AFCORELib::IAttributeFindInfoPtr ipInfo = ipItem;
-					if (ipInfo == NULL)
+					if (ipInfo == __nullptr)
 					{
 						bIsInfo = false;
 						break;
 					}
-				}				// end if map item != NULL
+				}				// end if map item != __nullptr
 			}					// end for each map item
 
 			// Check search result
@@ -1024,8 +1023,8 @@ bool CRuleSetEditor::clipboardObjectIsAttribute()
 			{
 				bResult = true;
 			}
-		}						// end if map != NULL
-	}							// end if data member != NULL
+		}						// end if map != __nullptr
+	}							// end if data member != __nullptr
 
 	return bResult;
 }
@@ -1041,7 +1040,7 @@ void CRuleSetEditor::deleteMarkedRules()
 
 	// Retrieve existing vector
 	IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
-	if (ipRules == NULL)
+	if (ipRules == __nullptr)
 	{
 		// Throw exception, unable to retrieve Attribute Rules
 		throw UCLIDException( "ELI05571", "Unable to retrieve Attribute Rules." );
@@ -1066,7 +1065,7 @@ void CRuleSetEditor::deleteMarkedRules()
 void CRuleSetEditor::markSelectedRules() 
 {
 	POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-	if (pos != NULL)
+	if (pos != __nullptr)
 	{
 		// Get index of first selection
 		int iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -1222,7 +1221,7 @@ void CRuleSetEditor::setStatusBarText()
 	{
 		// Create and retain a new ruleset object
 		UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
-		ASSERT_RESOURCE_ALLOCATION("ELI21506", ipRuleSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI21506", ipRuleSet != __nullptr);
 		m_ipRuleSet = ipRuleSet;
 
 		// Reset the UI

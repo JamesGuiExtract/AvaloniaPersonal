@@ -72,7 +72,7 @@ CUCDBitmapWindow::CUCDBitmapWindow()
 	//			pt = pAMP->pt;
 
 	//			// Fire a stock MouseMove event
-	//			if (m_pImageCtrl != NULL)
+	//			if (m_pImageCtrl != __nullptr)
 	//			{
 	//				m_pImageCtrl->FireMouseMove( 0, 0, pAMP->pt.x, pAMP->pt.y );
 	//			}
@@ -115,7 +115,7 @@ CUCDBitmapWindow::CUCDBitmapWindow()
 		}
 	case WM_MOUSEWHEEL:
 		{
-			if (m_pImageCtrl != NULL)
+			if (m_pImageCtrl != __nullptr)
 			{
 				m_pImageCtrl->FireMouseWheelFromCtrlClass((long) wParam, (long) lParam);
 			}
@@ -138,7 +138,7 @@ CUCDBitmapWindow::CUCDBitmapWindow()
 	case WM_HSCROLL:
 	case WM_VSCROLL:
 		{
-			if (m_pImageCtrl != NULL)
+			if (m_pImageCtrl != __nullptr)
 				m_pImageCtrl->FireScrollFromCtrlClass();
 		}
 		break;
@@ -151,7 +151,7 @@ CUCDBitmapWindow::CUCDBitmapWindow()
 			shiftState += (::GetKeyState(VK_CONTROL) == -127 || ::GetKeyState(VK_CONTROL) == -128) ? 2 : 0;
 			shiftState += (::GetKeyState(VK_MENU) == -127 || ::GetKeyState(VK_MENU) == -128) ? 4 : 0;
 
-			if (m_pImageCtrl != NULL)
+			if (m_pImageCtrl != __nullptr)
 			{
 				m_pImageCtrl->FireKeyUp((USHORT*)&wParam, shiftState);
 			}

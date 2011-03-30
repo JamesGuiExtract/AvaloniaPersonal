@@ -107,7 +107,7 @@ void CImageOutputDlg::OnOK()
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI15034", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15034", ipFAMTagManager != __nullptr);
 
 		// Make sure the file name contains valid string tags
 		_bstr_t bstrFileName = zOutputImageName;

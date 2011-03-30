@@ -39,7 +39,7 @@ STDMETHODIMP CFindFromRSDPP::Apply(void)
 			GetDlgItemText(IDC_EDIT_ATTRIBUTE_NAME, bstrName.m_str);
 			// Test if this is a valid attribute name
 			IAttributePtr ipTmpAttr(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI10248", ipTmpAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10248", ipTmpAttr != __nullptr);
 
 			ipTmpAttr->Name = _bstr_t(bstrName);
 			ipFinder->AttributeName = _bstr_t(bstrName);

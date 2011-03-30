@@ -61,9 +61,9 @@ STDMETHODIMP CSelectUsingMajority::raw_ProcessOutput(IIUnknownVector* pAttribute
 	{	
 		validateLicense();
 		IIUnknownVectorPtr ipOriginAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI10490", ipOriginAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10490", ipOriginAttributes != __nullptr);
 		IIUnknownVectorPtr ipReturnAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI10491", ipReturnAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10491", ipReturnAttributes != __nullptr);
 
 		// vector will contain unique attributes with number 
 		// of occurrence of same value. 
@@ -106,9 +106,9 @@ STDMETHODIMP CSelectUsingMajority::raw_ProcessOutput(IIUnknownVector* pAttribute
 			{
 				// Retrieve the strings
 				ISpatialStringPtr ipCurr = ipCurrentAttribute->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI15531", ipCurr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15531", ipCurr != __nullptr);
 				ISpatialStringPtr ipAttr = vecAttrAndNum[ui].ipAttribute->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI15532", ipAttr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15532", ipAttr != __nullptr);
 
 				string strCurName = ipCurrentAttribute->Name;
 				string strCurValue = ipCurr->String;
@@ -214,7 +214,7 @@ STDMETHODIMP CSelectUsingMajority::raw_GetComponentDescription(BSTR * pstrCompon
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19556", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19556", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Select using majority").Detach();
 	}
@@ -369,7 +369,7 @@ STDMETHODIMP CSelectUsingMajority::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_SelectUsingMajority);
-		ASSERT_RESOURCE_ALLOCATION("ELI05271", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05271", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

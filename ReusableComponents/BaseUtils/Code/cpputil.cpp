@@ -99,7 +99,7 @@ string getEnvironmentVariableValue(const string& strVarName)
 	}
 
 	// return the value after freeing the memory
-	if (pszValue != NULL)
+	if (pszValue != __nullptr)
 	{
 		strValue = pszValue;
 		free (pszValue);
@@ -258,7 +258,7 @@ string getFullUserName(bool bThrowExceptionIfNoFound)
 		waitForFileToBeReadable(tempFile.getName(), true, &pinFile);
 
 		// Create an auto pointer to manage the pinFile
-		auto_ptr<ifstream> apInFile(pinFile);
+		unique_ptr<ifstream> apInFile(pinFile);
 
 		// If pointer is null then file was not opened, make one more attempt to open the file
 		if (apInFile.get() == NULL)
@@ -669,13 +669,13 @@ DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractE
 			ASSERT_ARGUMENT("ELI28886", iIdleCheckInterval > 0);
 			ASSERT_ARGUMENT("ELI28887", iIdleTimeout >= iIdleCheckInterval);
 
-			auto_ptr<TemporaryFileName> apTempFile;
+			unique_ptr<TemporaryFileName> apTempFile;
 
 			// If running an extract exe, add the /ef <ExceptionFile> argument
 			if (bIsExtractExe)
 			{
 				apTempFile.reset(new TemporaryFileName( "", ".uex", true));
-				ASSERT_RESOURCE_ALLOCATION("ELI29399", apTempFile.get() != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29399", apTempFile.get() != __nullptr);
 
 				strParameters += " /ef \"";
 				strParameters += apTempFile->getName();
@@ -706,7 +706,7 @@ DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractE
 			}
 
 			// If there was a temp exception file, check if an exception was logged
-			if (apTempFile.get() != NULL && getSizeOfFile(apTempFile->getName()) > 0)
+			if (apTempFile.get() != __nullptr && getSizeOfFile(apTempFile->getName()) > 0)
 			{
 				// Exception file is non-empty, get contents as string
 				string strError = getTextFileContentsAsString(apTempFile->getName());

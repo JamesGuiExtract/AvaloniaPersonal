@@ -309,7 +309,7 @@ void BCMenu::DrawItem(LPDRAWITEMSTRUCT)
 
 void BCMenu::DrawItem (LPDRAWITEMSTRUCT lpDIS)
 {
-	ASSERT(lpDIS != NULL);
+	ASSERT(lpDIS != __nullptr);
 	CDC* pDC = CDC::FromHandle(lpDIS->hDC);
 	if(pDC->GetDeviceCaps(RASTERCAPS) & RC_PALETTE)DrawItem_Win9xNT2000(lpDIS);
 	else{
@@ -326,7 +326,7 @@ void BCMenu::DrawItem (LPDRAWITEMSTRUCT lpDIS)
 
 void BCMenu::DrawItem_Win9xNT2000 (LPDRAWITEMSTRUCT lpDIS)
 {
-	ASSERT(lpDIS != NULL);
+	ASSERT(lpDIS != __nullptr);
 	CDC* pDC = CDC::FromHandle(lpDIS->hDC);
 	CRect rect;
 	UINT state = (((BCMenuData*)(lpDIS->itemData))->nFlags);
@@ -616,7 +616,7 @@ COLORREF BCMenu::DarkenColor(COLORREF col,double factor)
 
 void BCMenu::DrawItem_WinXP (LPDRAWITEMSTRUCT lpDIS)
 {
-	ASSERT(lpDIS != NULL);
+	ASSERT(lpDIS != __nullptr);
 	CDC* pDC = CDC::FromHandle(lpDIS->hDC);
 #ifdef BCMENU_USE_MEMDC
 	BCMenuMemDC *pMemDC=NULL;
@@ -1429,9 +1429,9 @@ BOOL BCMenu::SetImageForPopupFromToolbarW (wchar_t *strPopUpText, UINT toolbarID
 
 	if(bar.LoadToolBar(toolbarID)){
 		BCMenuData *mdata = FindMenuOption(strPopUpText);
-		if (mdata != NULL)
+		if (mdata != __nullptr)
 		{
-			if (mdata->bitmap != NULL){
+			if (mdata->bitmap != __nullptr){
 				mdata->bitmap->DeleteImageList();
 				delete mdata->bitmap;
 				mdata->bitmap=NULL;
@@ -1685,7 +1685,7 @@ BOOL BCMenu::LoadMenu(int nResource)
 BOOL BCMenu::LoadMenu(LPCTSTR lpszResourceName)
 {
 	ASSERT_VALID(this);
-	ASSERT(lpszResourceName != NULL);
+	ASSERT(lpszResourceName != __nullptr);
 	
 	// Find the Menu Resource:
 	HINSTANCE hInst = AfxFindResourceHandle(lpszResourceName,RT_MENU);

@@ -34,7 +34,7 @@ HRESULT CFileProcessingManagerProcess::FinalConstruct()
 	try
 	{
 		m_ipFPM.CreateInstance(CLSID_FileProcessingManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI28463", m_ipFPM != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28463", m_ipFPM != __nullptr);
 
 		return CoCreateFreeThreadedMarshaler(
 			GetControllingUnknown(), &m_pUnkMarshaler.p);
@@ -46,7 +46,7 @@ void CFileProcessingManagerProcess::FinalRelease()
 {
 	try
 	{
-		if (m_ipFPM != NULL && m_ipFPM->ProcessingStarted == VARIANT_TRUE)
+		if (m_ipFPM != __nullptr && m_ipFPM->ProcessingStarted == VARIANT_TRUE)
 		{
 			m_ipFPM->StopProcessing();
 			long nCount = 0;
@@ -57,7 +57,7 @@ void CFileProcessingManagerProcess::FinalRelease()
 			}
 		}
 			
-		m_ipFPM = NULL;
+		m_ipFPM = __nullptr;
 		m_pUnkMarshaler.Release();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28465");
@@ -91,7 +91,7 @@ STDMETHODIMP CFileProcessingManagerProcess::raw_IsLicensed(VARIANT_BOOL* pbValue
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI28442", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI28442", pbValue != __nullptr);
 
 		try
 		{
@@ -204,7 +204,7 @@ STDMETHODIMP CFileProcessingManagerProcess::get_ProcessID(LONG* plPID)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28447", plPID != NULL);
+		ASSERT_ARGUMENT("ELI28447", plPID != __nullptr);
 
 		*plPID = (LONG) GetCurrentProcessId();
 
@@ -220,7 +220,7 @@ STDMETHODIMP CFileProcessingManagerProcess::get_IsRunning(VARIANT_BOOL* pvbRunni
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28458", pvbRunning != NULL);
+		ASSERT_ARGUMENT("ELI28458", pvbRunning != __nullptr);
 
 		*pvbRunning = m_ipFPM->ProcessingStarted;
 
@@ -236,7 +236,7 @@ STDMETHODIMP CFileProcessingManagerProcess::get_FPSFile(BSTR* pbstrFPSFile)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28460", pbstrFPSFile != NULL);
+		ASSERT_ARGUMENT("ELI28460", pbstrFPSFile != __nullptr);
 
 		*pbstrFPSFile = _bstr_t(m_strFPSFile.c_str()).Detach();
 
@@ -286,7 +286,7 @@ STDMETHODIMP CFileProcessingManagerProcess::get_AuthenticationRequired(VARIANT_B
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29192", pvbAuthenticationRequired != NULL);
+		ASSERT_ARGUMENT("ELI29192", pvbAuthenticationRequired != __nullptr);
 
 		// Authentication is required if either user authentication is required or if a db admin
 		// password is required (such as to process skipped files from all users).

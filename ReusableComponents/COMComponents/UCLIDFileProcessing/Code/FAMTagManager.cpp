@@ -59,7 +59,7 @@ STDMETHODIMP CFAMTagManager::get_FPSFileDir(BSTR *strFPSDir)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24981", strFPSDir != NULL);
+		ASSERT_ARGUMENT("ELI24981", strFPSDir != __nullptr);
 
 		*strFPSDir = _bstr_t(m_strFPSDir.c_str()).Detach();
 	}
@@ -86,7 +86,7 @@ STDMETHODIMP CFAMTagManager::ExpandTags(BSTR bstrInput, BSTR bstrSourceName, BST
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI20470", pbstrOutput != NULL);
+		ASSERT_ARGUMENT("ELI20470", pbstrOutput != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -147,7 +147,7 @@ STDMETHODIMP CFAMTagManager::GetBuiltInTags(IVariantVector* *ppTags)
 		validateLicense();
 
 		IVariantVectorPtr ipVec(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI14396", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14396", ipVec != __nullptr);
 
 		// Push the current tags into vector, currrently we
 		// only have <SourceDocName> and <FPSFileDir>
@@ -171,7 +171,7 @@ STDMETHODIMP CFAMTagManager::GetINIFileTags(IVariantVector* *ppTags)
 		validateLicense();
 
 		IVariantVectorPtr ipVec(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI19432", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19432", ipVec != __nullptr);
 
 		// Currently we do not have any INI file tags
 
@@ -192,7 +192,7 @@ STDMETHODIMP CFAMTagManager::GetAllTags(IVariantVector* *ppTags)
 		validateLicense();
 
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipThis(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI14397", ipThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14397", ipThis != __nullptr);
 
 		// Call GetBuiltInTags() and GetINIFileTags()
 		IVariantVectorPtr ipVec1 = ipThis->GetBuiltInTags();

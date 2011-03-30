@@ -30,7 +30,7 @@ CCreateValue::CCreateValue()
 	try
 	{
 		m_ipAFUtility.CreateInstance( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09837", m_ipAFUtility != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09837", m_ipAFUtility != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI09838")
 }
@@ -165,12 +165,12 @@ STDMETHODIMP CCreateValue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI09844", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09844", ipAttributes != __nullptr);
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 
 		IAttributePtr ipAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI09845", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09845", ipAttribute != __nullptr);
 		// Expand any tags in the string
 		// If any tags don't expand we will not add the attribute
 		bool bAdd = true;
@@ -187,7 +187,7 @@ STDMETHODIMP CCreateValue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		if(bAdd)
 		{
 			ISpatialStringPtr ipSS(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI09846", ipSS != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09846", ipSS != __nullptr);
 			ipSS->CreateNonSpatialString(strExpandedValue.c_str(), "");
 
 			ipAttribute->Value = ipSS;
@@ -298,7 +298,7 @@ STDMETHODIMP CCreateValue::raw_GetComponentDescription(BSTR * pstrComponentDescr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19577", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19577", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Create value").Detach();
 	}
@@ -381,7 +381,7 @@ STDMETHODIMP CCreateValue::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::ICreateValuePtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI09853", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09853", ipSource != __nullptr);
 
 		m_strValue = ipSource->ValueString;
 		m_strType = ipSource->TypeString;
@@ -401,7 +401,7 @@ STDMETHODIMP CCreateValue::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_CreateValue);
-		ASSERT_RESOURCE_ALLOCATION("ELI09854", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09854", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

@@ -105,7 +105,7 @@ UINT TRPThreadProc(LPVOID pParam)
 	try
 	{
 		// make sure the pParam is not null
-		ASSERT_ARGUMENT( "ELI12995", pParam != NULL );
+		ASSERT_ARGUMENT( "ELI12995", pParam != __nullptr );
 		TimeRollbackPreventer *trpInstance = (TimeRollbackPreventer *) pParam;
 
 		try
@@ -145,7 +145,7 @@ UINT TRPThreadProc(LPVOID pParam)
 TimeRollbackPreventer::TimeRollbackPreventer(Win32Event &rEventBadState)
 :	m_tmLastUpdate(-1),
 	m_rEventBadState(rEventBadState),
-	m_apThread(NULL)
+	m_apThread(__nullptr)
 {
 	try
 	{
@@ -166,7 +166,7 @@ TimeRollbackPreventer::TimeRollbackPreventer(Win32Event &rEventBadState)
 			}
 
 			// Setup Registry items
-			ma_pRollbackCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+			ma_pRollbackCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 				new RegistryPersistenceMgr( HKEY_CURRENT_USER, "" ));
 
 			// This try catch is just to give more trace information
@@ -182,7 +182,7 @@ TimeRollbackPreventer::TimeRollbackPreventer(Win32Event &rEventBadState)
 			{
 				m_eventKillThread.reset();
 				// Start the thread that handles updates
-				m_apThread = auto_ptr<CWinThread>(AfxBeginThread(TRPThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED));
+				m_apThread = unique_ptr<CWinThread>(AfxBeginThread(TRPThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED));
 				m_apThread.get()->m_bAutoDelete = FALSE;
 				m_apThread.get()->ResumeThread();
 			}
@@ -1227,10 +1227,10 @@ const ByteStream& TimeRollbackPreventer::getUnlockPassword()
 //-------------------------------------------------------------------------------------------------
 CMutex* TimeRollbackPreventer::getReadWriteMutex()
 {
-	if (m_apmutexReadWrite.get() == NULL)
+	if (m_apmutexReadWrite.get() == __nullptr)
 	{
 		m_apmutexReadWrite.reset(getGlobalNamedMutex("Global\\UCLID_Licensing"));
-		ASSERT_RESOURCE_ALLOCATION("ELI29993", m_apmutexReadWrite.get() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29993", m_apmutexReadWrite.get() != __nullptr);
 	}
 
 	return m_apmutexReadWrite.get();

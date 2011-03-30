@@ -70,7 +70,7 @@ STDMETHODIMP CAddWatermarkTaskPP::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// check parameter
-		ASSERT_ARGUMENT("ELI19977", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19977", pbValue != __nullptr);
 
 		try
 		{
@@ -105,7 +105,7 @@ STDMETHODIMP CAddWatermarkTaskPP::Apply()
 		// create a FAM tag manager object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI19979", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19979", ipFAMTagManager != __nullptr);
 
 		// get the input image filename from the edit box
 		_bstr_t bstrInputImage;
@@ -236,7 +236,7 @@ STDMETHODIMP CAddWatermarkTaskPP::Apply()
 		for(UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_FILEPROCESSORSLib::IAddWatermarkTaskPtr ipAddWatermark(m_ppUnk[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI19981", ipAddWatermark != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19981", ipAddWatermark != __nullptr);
 
 			ipAddWatermark->InputImageFile = bstrInputImage;
 			ipAddWatermark->StampImageFile = bstrStampImage;
@@ -262,7 +262,7 @@ LRESULT CAddWatermarkTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 		// get the AddWatermarkTask associated with this property page
 		// NOTE: this assumes only one coclass is associated with this property page
 		UCLID_FILEPROCESSORSLib::IAddWatermarkTaskPtr ipAddWatermarkTask(m_ppUnk[0]);
-		ASSERT_RESOURCE_ALLOCATION("ELI19983", ipAddWatermarkTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19983", ipAddWatermarkTask != __nullptr);
 
 		// create tooltip object
 		m_infoTip.Create(CWnd::FromHandle(m_hWnd));

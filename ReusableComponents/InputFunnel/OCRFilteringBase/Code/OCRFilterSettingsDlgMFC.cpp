@@ -408,7 +408,7 @@ void OCRFilterSettingsDlg::OnBTNRemoveChoice()
 	{
 		if (m_bEditFOD)
 		{
-			if (m_pCurrentFOD != NULL && m_chklistChoices.GetCount() > 0)
+			if (m_pCurrentFOD != __nullptr && m_chklistChoices.GetCount() > 0)
 			{
 				int nRes = MessageBox("Remove this Sub String Choice?", "Remove", MB_YESNO | MB_ICONWARNING);
 				if (nRes == IDNO)

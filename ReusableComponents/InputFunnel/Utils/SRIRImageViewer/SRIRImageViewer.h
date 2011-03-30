@@ -69,7 +69,7 @@ private:
 	///////////////
 	// Data
 	///////////////
-	auto_ptr<CSRIRImageViewerDlg> m_apDlg;
+	unique_ptr<CSRIRImageViewerDlg> m_apDlg;
 	UINT m_uiMsgLoadImage;
 	UINT m_uiMsgExecScript;
 	UINT m_uiMsgCloseViewer;

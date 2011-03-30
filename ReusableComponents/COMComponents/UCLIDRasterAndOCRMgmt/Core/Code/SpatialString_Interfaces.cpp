@@ -53,7 +53,7 @@ STDMETHODIMP CSpatialString::raw_CopyFrom(IUnknown * pObject)
 
 		// verify valid object
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08205", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08205", ipSource != __nullptr);
 
 		// Copy from the specified string
 		copyFromSpatialString(ipSource);
@@ -69,7 +69,7 @@ STDMETHODIMP CSpatialString::raw_Clone(IUnknown * * pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25779", pObject != NULL);
+		ASSERT_ARGUMENT("ELI25779", pObject != __nullptr);
 
 		// Validate license first
 		validateLicense();
@@ -77,7 +77,7 @@ STDMETHODIMP CSpatialString::raw_Clone(IUnknown * * pObject)
 		// Create a new ISpatialString object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI08372", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08372", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -99,9 +99,9 @@ STDMETHODIMP CSpatialString::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbVal
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25780", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI25780", pbValue != __nullptr);
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipObj(pObj);
-		ASSERT_ARGUMENT("ELI05878", ipObj != NULL);
+		ASSERT_ARGUMENT("ELI05878", ipObj != __nullptr);
 
 		validateLicense();
 
@@ -134,7 +134,7 @@ STDMETHODIMP CSpatialString::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbVal
 		{
 			// Compare raster zones vector
 			IIUnknownVectorPtr ipObjZones = ipObj->GetOCRImageRasterZones();
-			ASSERT_RESOURCE_ALLOCATION("ELI25781", ipObjZones != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25781", ipObjZones != __nullptr);
 
 			long lZonesSize = ipObjZones->Size();
 			
@@ -147,10 +147,10 @@ STDMETHODIMP CSpatialString::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbVal
 				for (long i=0; i < lZonesSize; i++)
 				{
 					UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipObjZone = ipObjZones->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI25782", ipObjZone != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25782", ipObjZone != __nullptr);
 
 					UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = m_vecRasterZones[i];
-					ASSERT_RESOURCE_ALLOCATION("ELI25783", ipZone != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25783", ipZone != __nullptr);
 
 					if (ipZone->Equals(ipObjZone) == VARIANT_FALSE)
 					{
@@ -183,7 +183,7 @@ STDMETHODIMP CSpatialString::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25784", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI25784", pbValue != __nullptr);
 
 		try
 		{
@@ -210,7 +210,7 @@ STDMETHODIMP CSpatialString::GetClassID(CLSID *pClassID)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI25786", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI25786", pClassID != __nullptr);
 
 		// Validate license first
 		validateLicense();
@@ -251,7 +251,7 @@ STDMETHODIMP CSpatialString::IsDirty(void)
 				it != m_vecRasterZones.end(); it++)
 			{
 				IPersistStreamPtr ipZone = (*it);
-				ASSERT_RESOURCE_ALLOCATION("ELI25788", ipZone != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25788", ipZone != __nullptr);
 				if (ipZone->IsDirty() == S_OK)
 				{
 					return S_OK;
@@ -262,7 +262,7 @@ STDMETHODIMP CSpatialString::IsDirty(void)
 		// The LongToObject map object will check each item's dirty flag and return 
 		// S_OK if any item is dirty.
 		IPersistStreamPtr ipPersistStream = getPageInfoMap();
-		ASSERT_RESOURCE_ALLOCATION("ELI15082", ipPersistStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15082", ipPersistStream != __nullptr);
 		
 		if( ipPersistStream->IsDirty() == S_OK )
 		{
@@ -595,14 +595,14 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 				::readObjectFromStream(ipObj, pStream, "ELI14802");
 
 				IIUnknownVectorPtr ipVecRasterZones = ipObj;
-				ASSERT_RESOURCE_ALLOCATION("ELI25789", ipVecRasterZones != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25789", ipVecRasterZones != __nullptr);
 
 				long lSize = ipVecRasterZones->Size();
 				m_vecRasterZones.reserve(lSize);
 				for (long i=0; i < lSize; i++)
 				{
 					UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipVecRasterZones->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI25790", ipZone != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25790", ipZone != __nullptr);
 
 					m_vecRasterZones.push_back(ipZone);
 				}
@@ -697,14 +697,14 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 				::readObjectFromStream(ipObj, pStream, "ELI15481");
 
 				IIUnknownVectorPtr ipVecRasterZones = ipObj;
-				ASSERT_RESOURCE_ALLOCATION("ELI25791", ipVecRasterZones != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25791", ipVecRasterZones != __nullptr);
 
 				long lSize = ipVecRasterZones->Size();
 				m_vecRasterZones.reserve(lSize);
 				for (long i=0; i < lSize; i++)
 				{
 					UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipVecRasterZones->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI25792", ipZone != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25792", ipZone != __nullptr);
 
 					m_vecRasterZones.push_back(ipZone);
 				}
@@ -723,7 +723,7 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 			::readObjectFromStream(ipObj, pStream, "ELI19468");
 
 			IIUnknownVectorPtr ipLetters = ipObj;
-			ASSERT_RESOURCE_ALLOCATION("ELI25793", ipLetters != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25793", ipLetters != __nullptr);
 
 			// NOTE: if the loaded letter objects were actually not spatial 
 			// (such as in versions 1 and 2), then this string will automatically
@@ -735,7 +735,7 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 			for(long i = 0; i < nSize; i++)
 			{
 				UCLID_RASTERANDOCRMGMTLib::ILetterPtr ipLetter = ipLetters->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI25794", ipLetter != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25794", ipLetter != __nullptr);
 
 				CPPLetter letter;
 				ipLetter->GetCppLetter(&letter);
@@ -758,7 +758,7 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 			IPersistStreamPtr ipObj;
 
 			::readObjectFromStream(ipObj, pStream, "ELI09984");
-			ASSERT_RESOURCE_ALLOCATION("ELI15279", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15279", ipObj != __nullptr);
 			m_ipPageInfoMap = ipObj;
 		}
 		
@@ -769,7 +769,7 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 		{
 			// Fake all of the page info data
 			m_ipPageInfoMap.CreateInstance(CLSID_LongToObjectMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI09163", m_ipPageInfoMap != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09163", m_ipPageInfoMap != __nullptr);
 
 			long nCurrPage = -1;
 
@@ -784,7 +784,7 @@ STDMETHODIMP CSpatialString::Load(IStream *pStream)
 					if (nPage != nCurrPage)
 					{
 						UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
-						ASSERT_RESOURCE_ALLOCATION("ELI19466", ipPageInfo != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI19466", ipPageInfo != __nullptr);
 						ipPageInfo->SetPageInfo(0, 0,
 							(UCLID_RASTERANDOCRMGMTLib::EOrientation)0, 0.0);
 
@@ -906,7 +906,7 @@ STDMETHODIMP CSpatialString::Save(IStream *pStream, BOOL fClearDirty)
 		if( m_eMode == kHybridMode )
 		{
 			IIUnknownVectorPtr ipZones(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI25795", ipZones != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25795", ipZones != __nullptr);
 
 			vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr>::iterator it = m_vecRasterZones.begin();
 			for(; it != m_vecRasterZones.end(); it++)
@@ -916,7 +916,7 @@ STDMETHODIMP CSpatialString::Save(IStream *pStream, BOOL fClearDirty)
 
 			// Save the page information to the stream
 			IPersistStreamPtr ipPIObj = ipZones;
-			ASSERT_RESOURCE_ALLOCATION("ELI14780", ipPIObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14780", ipPIObj != __nullptr);
 
 			writeObjectToStream(ipPIObj, pStream, "ELI14781", fClearDirty);
 		}
@@ -927,7 +927,7 @@ STDMETHODIMP CSpatialString::Save(IStream *pStream, BOOL fClearDirty)
 			// Save the page information to the stream
 			IPersistStreamPtr ipPIObj = getPageInfoMap();
 
-			ASSERT_RESOURCE_ALLOCATION("ELI09127", ipPIObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09127", ipPIObj != __nullptr);
 			writeObjectToStream(ipPIObj, pStream, "ELI09939", fClearDirty);
 		}
 

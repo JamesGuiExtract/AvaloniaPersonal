@@ -47,14 +47,14 @@ STDMETHODIMP CRuleExecutionSession::SetRSDFileName(BSTR strFileName, long *pnSta
 	try
 	{
 		// validate arguments
-		ASSERT_ARGUMENT("ELI11545", pnStackSize != NULL);
+		ASSERT_ARGUMENT("ELI11545", pnStackSize != __nullptr);
 
 		// if the rule execution environment object has not yet been
 		// created, create it
-		if (m_spRuleExecutionEnv == NULL)
+		if (m_spRuleExecutionEnv == __nullptr)
 		{
 			m_spRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
-			ASSERT_RESOURCE_ALLOCATION("ELI07487", m_spRuleExecutionEnv != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07487", m_spRuleExecutionEnv != __nullptr);
 		}
 
 		// push ipRuleSet's filename onto the rule execution environment's stack

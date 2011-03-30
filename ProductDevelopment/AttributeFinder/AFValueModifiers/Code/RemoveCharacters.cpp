@@ -29,7 +29,7 @@ CRemoveCharacters::CRemoveCharacters()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13056", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13056", m_ipMiscUtils != __nullptr );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06656")
 }
@@ -38,7 +38,7 @@ CRemoveCharacters::~CRemoveCharacters()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16363");
 }
@@ -79,10 +79,10 @@ STDMETHODIMP CRemoveCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 		validateLicense();
 		
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09289", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09289", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->GetValue();
-		ASSERT_RESOURCE_ALLOCATION( "ELI09290", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION( "ELI09290", ipInputText != __nullptr);
 		_bstr_t _bstrText(ipInputText->String);
 		
 		string strCharacters = translateToRegExString(m_strCharactersDefined);
@@ -91,20 +91,20 @@ STDMETHODIMP CRemoveCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 		// Get a regular expression parser
 		IRegularExprParserPtr ipParser =
 			m_ipMiscUtils->GetNewRegExpParserInstance("RemoveCharacters");
-		ASSERT_RESOURCE_ALLOCATION("ELI06655", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06655", ipParser != __nullptr);
 
 		if (m_bRemoveAll)
 		{
 			// remove all characters defined
 			IIUnknownVectorPtr ipVecInfo = findPatternInString(ipParser, _bstrText, 
 				_bstr_t(strPattern.c_str()), true);
-			while (ipVecInfo != NULL && ipVecInfo->Size()> 0)
+			while (ipVecInfo != __nullptr && ipVecInfo->Size()> 0)
 			{
 				// the first match
 				IObjectPairPtr ipObjPair = ipVecInfo->At(0);
-				ASSERT_RESOURCE_ALLOCATION("ELI06622", ipObjPair != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06622", ipObjPair != __nullptr);
 				ITokenPtr ipToken = ipObjPair->Object1;
-				ASSERT_RESOURCE_ALLOCATION("ELI06621", ipToken != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06621", ipToken != __nullptr);
 				
 				long nStart = ipToken->StartPosition;
 				long nEnd = ipToken->EndPosition;
@@ -159,9 +159,9 @@ STDMETHODIMP CRemoveCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 					// let's get the very first occurrence of 
 					// the character set defined if it's trimming leading
 					IObjectPairPtr ipObjPair = ipVecInfo->At(0);
-					ASSERT_RESOURCE_ALLOCATION("ELI06623", ipObjPair != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI06623", ipObjPair != __nullptr);
 					ITokenPtr ipToken = ipObjPair->Object1;
-					ASSERT_RESOURCE_ALLOCATION("ELI06624", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI06624", ipToken != __nullptr);
 					long nStart = ipToken->StartPosition;
 					if (nStart == 0)
 					{
@@ -183,9 +183,9 @@ STDMETHODIMP CRemoveCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 					// the character set defined if it's trimming trailing
 					long nIndex = ipVecInfo->Size()-1;
 					IObjectPairPtr ipObjPair = ipVecInfo->At(nIndex);
-					ASSERT_RESOURCE_ALLOCATION("ELI06625", ipObjPair != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI06625", ipObjPair != __nullptr);
 					ITokenPtr ipToken = ipObjPair->Object1;
-					ASSERT_RESOURCE_ALLOCATION("ELI06626", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI06626", ipToken != __nullptr);
 					long nEnd = ipToken->EndPosition;
 					if (nEnd == _bstrText.length()-1)
 					{
@@ -214,7 +214,7 @@ STDMETHODIMP CRemoveCharacters::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::IRemoveCharactersPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08283", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08283", ipSource != __nullptr);
 
 		m_bCaseSensitive = (ipSource->GetIsCaseSensitive()==VARIANT_TRUE) ? true : false;
 		m_bRemoveAll = (ipSource->GetRemoveAll()==VARIANT_TRUE) ? true : false;
@@ -238,7 +238,7 @@ STDMETHODIMP CRemoveCharacters::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_RemoveCharacters);
-		ASSERT_RESOURCE_ALLOCATION("ELI08359", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08359", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -260,7 +260,7 @@ STDMETHODIMP CRemoveCharacters::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19604", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19604", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Remove characters").Detach();
 	}
@@ -523,11 +523,11 @@ STDMETHODIMP CRemoveCharacters::raw_ProcessOutput(IIUnknownVector * pAttributes,
 
 		// Create AFUtility object
 		IAFUtilityPtr ipAFUtility( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI08716", ipAFUtility != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08716", ipAFUtility != __nullptr );
 
 		// Use Attributes as smart pointer
 		IIUnknownVectorPtr ipAttributes( pAttributes );
-		ASSERT_RESOURCE_ALLOCATION("ELI08717", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08717", ipAttributes != __nullptr);
 
 		// Apply Attribute Modification
 		ipAFUtility->ApplyAttributeModifier( ipAttributes, pDoc, this, VARIANT_TRUE );

@@ -53,20 +53,20 @@ STDMETHODIMP CToken::GetTokenInfo(long *pnTokenStart, long *pnTokenEnd, BSTR *pN
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22968", pnTokenStart != NULL);
-		ASSERT_ARGUMENT("ELI22969", pnTokenEnd != NULL);
+		ASSERT_ARGUMENT("ELI22968", pnTokenStart != __nullptr);
+		ASSERT_ARGUMENT("ELI22969", pnTokenEnd != __nullptr);
 
 		// Provide the start/end points
 		*pnTokenStart = m_nTokenStartPos;
 		*pnTokenEnd = m_nTokenEndPos;
 
 		// Provide the optional strings
-		if (pName != NULL)
+		if (pName != __nullptr)
 		{
 			*pName = _bstr_t( m_strName.c_str() ).copy();
 		}
 
-		if (pValue != NULL)
+		if (pValue != __nullptr)
 		{
 			*pValue = _bstr_t( m_strValue.c_str() ).copy();
 		}
@@ -82,7 +82,7 @@ STDMETHODIMP CToken::get_StartPosition(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22971", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22971", pVal != __nullptr);
 
 		*pVal = m_nTokenStartPos;
 	}
@@ -110,7 +110,7 @@ STDMETHODIMP CToken::get_EndPosition(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22972", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22972", pVal != __nullptr);
 
 		*pVal = m_nTokenEndPos;
 	}
@@ -138,7 +138,7 @@ STDMETHODIMP CToken::get_Name(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22973", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22973", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_strName.c_str()).copy();
 	}
@@ -166,7 +166,7 @@ STDMETHODIMP CToken::get_Value(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22974", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22974", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_strValue.c_str()).copy();
 	}
@@ -195,8 +195,8 @@ STDMETHODIMP CToken::GetStartAndEndPosition(long *plStartPos, long *plEndPos)
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI25733", plStartPos != NULL);
-		ASSERT_ARGUMENT("ELI25734", plEndPos != NULL);
+		ASSERT_ARGUMENT("ELI25733", plStartPos != __nullptr);
+		ASSERT_ARGUMENT("ELI25734", plEndPos != __nullptr);
 
 		// Set the return values
 		*plStartPos = m_nTokenStartPos;

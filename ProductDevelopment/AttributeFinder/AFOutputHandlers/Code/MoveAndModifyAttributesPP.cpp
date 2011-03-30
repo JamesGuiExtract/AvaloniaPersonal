@@ -31,7 +31,7 @@ STDMETHODIMP CMoveAndModifyAttributesPP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFOUTPUTHANDLERSLib::IMoveAndModifyAttributesPtr ipMMA = m_ppUnk[i];
-			if (ipMMA == NULL)
+			if (ipMMA == __nullptr)
 			{
 				THROW_LOGIC_ERROR_EXCEPTION("ELI09444");
 			}
@@ -190,7 +190,7 @@ LRESULT CMoveAndModifyAttributesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARA
 	try
 	{
 		UCLID_AFOUTPUTHANDLERSLib::IMoveAndModifyAttributesPtr ipMMA = m_ppUnk[0];
-		if (ipMMA != NULL)
+		if (ipMMA != __nullptr)
 		{
 
 			// "Create" all the controls

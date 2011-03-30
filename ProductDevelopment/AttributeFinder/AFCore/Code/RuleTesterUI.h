@@ -42,7 +42,7 @@ END_COM_MAP()
 public:
 
 private:
-	std::auto_ptr<RuleTesterDlg> m_apDlg;
+	std::unique_ptr<RuleTesterDlg> m_apDlg;
 
 	void validateLicense();
 

@@ -61,8 +61,8 @@ CStep1::CStep1(CLicenseRequest &licenseRequest)
 
 		// Initialize ma_pInstallRegistryMgr to the installation info area of the
 		// registry.
-		ma_pInstallRegistryMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-			new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE, gstrWINDOWS_INSTALL_INFO_KEY));
+		ma_pInstallRegistryMgr.reset(new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE,
+			gstrWINDOWS_INSTALL_INFO_KEY));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15276");
 }

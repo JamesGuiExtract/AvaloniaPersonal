@@ -60,7 +60,7 @@ void CRuleSetEditor::OnEditCopy()
 			// Retrieve the associated AttributeFindInfo object
 			IUnknownPtr	ipInfo = m_ipAttributeNameToInfoMap->GetValue( 
 				get_bstr_t( zName.operator LPCTSTR() ) );
-			if (ipInfo != NULL)
+			if (ipInfo != __nullptr)
 			{
 				// Add Name and Info object to local map
 				ipTempMap->Set( get_bstr_t( zName.operator LPCTSTR() ), ipInfo );
@@ -76,7 +76,7 @@ void CRuleSetEditor::OnEditCopy()
 			// Check for current rule selection
 			int iIndex = -1;
 			POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-			if (pos != NULL)
+			if (pos != __nullptr)
 			{
 				// Get index of first selection
 				iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -91,7 +91,7 @@ void CRuleSetEditor::OnEditCopy()
 
 			// Retrieve vector of existing rules
 			IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
-			if (ipRules == NULL)
+			if (ipRules == __nullptr)
 			{
 				// Create and throw exception
 				throw UCLIDException( "ELI05493", 
@@ -100,14 +100,14 @@ void CRuleSetEditor::OnEditCopy()
 
 			// Create a vector for selected rules
 			IIUnknownVectorPtr	ipCopiedRules( CLSID_IUnknownVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI05525", ipCopiedRules != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI05525", ipCopiedRules != __nullptr );
 
 			// Add each selected rule to vector
 			while (iIndex != -1)
 			{
 				// Retrieve the selected rule
 				IUnknownPtr	ipObject = ipRules->At( iIndex );
-				ASSERT_RESOURCE_ALLOCATION( "ELI05494", ipObject != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI05494", ipObject != __nullptr );
 
 				// Add the rule to the vector
 				ipCopiedRules->PushBack( ipObject );
@@ -125,7 +125,7 @@ void CRuleSetEditor::OnEditCopy()
 		{
 			// Retrieve existing Input Validator
 			IUnknownPtr	ipObject = m_ipInfo->InputValidator;
-			ASSERT_RESOURCE_ALLOCATION( "ELI05496", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI05496", ipObject != __nullptr );
 
 			// ClipboardManager will handle the Copy
 			m_ipClipboardMgr->CopyObjectToClipboard( ipObject );
@@ -136,7 +136,7 @@ void CRuleSetEditor::OnEditCopy()
 		{
 			// Retrieve existing Attribute Splitter
 			IUnknownPtr	ipObject = m_ipInfo->AttributeSplitter;
-			ASSERT_RESOURCE_ALLOCATION( "ELI05497", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI05497", ipObject != __nullptr );
 
 			// ClipboardManager will handle the Copy
 			m_ipClipboardMgr->CopyObjectToClipboard( ipObject );
@@ -147,7 +147,7 @@ void CRuleSetEditor::OnEditCopy()
 		{
 			// Retrieve existing Document Preprocessor
 			IUnknownPtr	ipObject = m_ipRuleSet->GlobalDocPreprocessor;
-			ASSERT_RESOURCE_ALLOCATION( "ELI06064", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI06064", ipObject != __nullptr );
 
 			// ClipboardManager will handle the Copy
 			m_ipClipboardMgr->CopyObjectToClipboard( ipObject );
@@ -158,7 +158,7 @@ void CRuleSetEditor::OnEditCopy()
 		{
 			// Retrieve existing Output Handler
 			IUnknownPtr	ipObject = m_ipRuleSet->GlobalOutputHandler;
-			ASSERT_RESOURCE_ALLOCATION( "ELI07732", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07732", ipObject != __nullptr );
 
 			// ClipboardManager will handle the Copy
 			m_ipClipboardMgr->CopyObjectToClipboard( ipObject );
@@ -194,7 +194,7 @@ void CRuleSetEditor::OnEditPaste()
 			{
 				// Retrieve object from ClipboardManager
 				ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-				ASSERT_RESOURCE_ALLOCATION( "ELI05500", ipObject != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI05500", ipObject != __nullptr );
 			}
 			else
 			{
@@ -204,7 +204,7 @@ void CRuleSetEditor::OnEditPaste()
 
 			// Retrieve collection of Attributes
 			IStrToObjectMapPtr ipMap = ipObject;
-			if (ipMap != NULL)
+			if (ipMap != __nullptr)
 			{
 				// Get map size
 				long lMapSize = ipMap->GetSize();
@@ -275,7 +275,7 @@ void CRuleSetEditor::OnEditPaste()
 			{
 				// Retrieve object from ClipboardManager
 				ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-				ASSERT_RESOURCE_ALLOCATION( "ELI05507", ipObject != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI05507", ipObject != __nullptr );
 			}
 			else
 			{
@@ -287,7 +287,7 @@ void CRuleSetEditor::OnEditPaste()
 			// Check for current rule selection
 			int iIndex = -1;
 			POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-			if (pos != NULL)
+			if (pos != __nullptr)
 			{
 				// Get index of first selection
 				iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -301,7 +301,7 @@ void CRuleSetEditor::OnEditPaste()
 
 			// Retrieve vector of existing Rules
 			IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
-			if (ipRules == NULL)
+			if (ipRules == __nullptr)
 			{
 				// Create and throw exception
 				throw UCLIDException("ELI19128", 
@@ -310,7 +310,7 @@ void CRuleSetEditor::OnEditPaste()
 
 			// Get count of Rules in Clipboard vector
 			IIUnknownVectorPtr	ipPastedRules = ipObject;
-			ASSERT_RESOURCE_ALLOCATION( "ELI05527", ipPastedRules != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI05527", ipPastedRules != __nullptr );
 			int iCount = ipPastedRules->Size();
 
 			clearListSelection();
@@ -319,7 +319,7 @@ void CRuleSetEditor::OnEditPaste()
 			{
 				// Retrieve rule description
 				UCLID_AFCORELib::IAttributeRulePtr	ipNewRule = ipPastedRules->At( i );
-				ASSERT_RESOURCE_ALLOCATION( "ELI19129", ipNewRule != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI19129", ipNewRule != __nullptr );
 				string	strDescription( ipNewRule->GetDescription() );
 
 				// Add the item without text in Enabled column
@@ -353,7 +353,7 @@ void CRuleSetEditor::OnEditPaste()
 			{
 				// Retrieve object from ClipboardManager
 				ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-				ASSERT_RESOURCE_ALLOCATION( "ELI05502", ipObject != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI05502", ipObject != __nullptr );
 			}
 			else
 			{
@@ -361,11 +361,11 @@ void CRuleSetEditor::OnEditPaste()
 				throw UCLIDException( "ELI05503", "Clipboard object is not an Input Validator." );
 			}
 
-			if (m_ipInfo != NULL)
+			if (m_ipInfo != __nullptr)
 			{
 				// Set Input Validator
 				IObjectWithDescriptionPtr	ipIV = ipObject;
-				if (ipIV != NULL)
+				if (ipIV != __nullptr)
 				{
 					m_ipInfo->InputValidator = ipIV;
 					
@@ -374,7 +374,7 @@ void CRuleSetEditor::OnEditPaste()
 
 					// Retrieve the Input Validator
 					IObjectWithDescriptionPtr ipOrigIV = m_ipInfo->InputValidator;
-					ASSERT_RESOURCE_ALLOCATION("ELI15514", ipOrigIV != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15514", ipOrigIV != __nullptr);
 
 					// enable and set the value of the checkbox
 					GetDlgItem( IDC_CHECK_INPUT_VALIDATOR )->EnableWindow( TRUE );
@@ -400,7 +400,7 @@ void CRuleSetEditor::OnEditPaste()
 			{
 				// Retrieve object from ClipboardManager
 				ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-				ASSERT_RESOURCE_ALLOCATION( "ELI05504", ipObject != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI05504", ipObject != __nullptr );
 			}
 			else
 			{
@@ -408,11 +408,11 @@ void CRuleSetEditor::OnEditPaste()
 				throw UCLIDException( "ELI05505", "Clipboard object is not an Attribute Splitter." );
 			}
 
-			if (m_ipInfo != NULL)
+			if (m_ipInfo != __nullptr)
 			{
 				// Set Attribute Splitter
 				IObjectWithDescriptionPtr	ipSplit = ipObject;
-				if (ipSplit != NULL)
+				if (ipSplit != __nullptr)
 				{
 					m_ipInfo->AttributeSplitter = ipSplit;
 					
@@ -421,7 +421,7 @@ void CRuleSetEditor::OnEditPaste()
 
 					// Retrieve the existing Splitter
 					IObjectWithDescriptionPtr ipSplitter = m_ipInfo->AttributeSplitter;
-					ASSERT_RESOURCE_ALLOCATION("ELI15515", ipSplitter != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15515", ipSplitter != __nullptr);
 
 					// enable and set the value of the checkbox
 					GetDlgItem( IDC_CHECK_ATT_SPLITTER )->EnableWindow( TRUE );
@@ -448,7 +448,7 @@ void CRuleSetEditor::OnEditPaste()
 			{
 				// Retrieve object from ClipboardManager
 				ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-				ASSERT_RESOURCE_ALLOCATION( "ELI06065", ipObject != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI06065", ipObject != __nullptr );
 			}
 			else
 			{
@@ -458,7 +458,7 @@ void CRuleSetEditor::OnEditPaste()
 
 			// Set Document Preprocessor
 			IObjectWithDescriptionPtr ipPreprocessor = ipObject;
-			if (ipPreprocessor != NULL)
+			if (ipPreprocessor != __nullptr)
 			{
 				m_ipRuleSet->GlobalDocPreprocessor = ipPreprocessor;
 
@@ -488,7 +488,7 @@ void CRuleSetEditor::OnEditPaste()
 			{
 				// Retrieve object from ClipboardManager
 				ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-				ASSERT_RESOURCE_ALLOCATION( "ELI07733", ipObject != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI07733", ipObject != __nullptr );
 			}
 			else
 			{
@@ -498,7 +498,7 @@ void CRuleSetEditor::OnEditPaste()
 
 			// Set Output Handlerr
 			IObjectWithDescriptionPtr ipOH = ipObject;
-			if (ipOH != NULL)
+			if (ipOH != __nullptr)
 			{
 				m_ipRuleSet->GlobalOutputHandler = ipOH;
 
@@ -553,7 +553,7 @@ void CRuleSetEditor::OnEditDelete()
 		{
 			// Retrieve Input Validator
 			IObjectWithDescriptionPtr ipIV = m_ipInfo->InputValidator;
-			ASSERT_RESOURCE_ALLOCATION("ELI15516", ipIV != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15516", ipIV != __nullptr);
 
 			// Retrieve existing IV description
 			CString	zDesc;
@@ -588,7 +588,7 @@ void CRuleSetEditor::OnEditDelete()
 		{
 			// Retrieve the Splitter
 			IObjectWithDescriptionPtr ipSplitter = m_ipInfo->AttributeSplitter;
-			ASSERT_RESOURCE_ALLOCATION("ELI15517", ipSplitter != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15517", ipSplitter != __nullptr);
 
 			// Retrieve existing Splitter description
 			CString	zDesc;

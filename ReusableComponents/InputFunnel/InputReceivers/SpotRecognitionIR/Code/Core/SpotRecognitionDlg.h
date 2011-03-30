@@ -298,7 +298,7 @@ protected:
 
 	HICON m_hIcon;						// icon for the dialog
 
-	std::auto_ptr<SpotRecDlgToolBar> m_apToolBar; // toolbar has buttons and a edit box in it
+	std::unique_ptr<SpotRecDlgToolBar> m_apToolBar; // toolbar has buttons and a edit box in it
 
 	bool m_bEnableTextSelection;		// whether or not text may selected from the image
 	bool m_bInitialized;				// whether or not the dialog has been initialized
@@ -315,7 +315,7 @@ protected:
 	// drag operation is currently in progress, then this variable should be set to NULL. Only
 	// one drag operation can be in progress at any given time.  To initialize a new drag 
 	// operation, use the initDragOperation() method
-	std::auto_ptr<DragOperation> m_apCurrentDragOperation;
+	std::unique_ptr<DragOperation> m_apCurrentDragOperation;
 
 	// to recognize a given image file and retrieve the output string
 	IOCREnginePtr m_ipOCREngine;
@@ -418,17 +418,17 @@ private:
 	// make the GDDFileManager as a friend class to be able to access
 	// all member methods and variables
 	friend class GDDFileManager;
-	std::auto_ptr<GDDFileManager> ma_pGDDFileManager;
+	std::unique_ptr<GDDFileManager> ma_pGDDFileManager;
 
-	std::auto_ptr<ConfigMgrSRIR> ma_pSRIRCfgMgr;
+	std::unique_ptr<ConfigMgrSRIR> ma_pSRIRCfgMgr;
 
 	std::string m_strLastZoneImageFile;
 
 	// config mgr to hold root key at 
 	//"Software\\UCLID Software\\InputReceivers"
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
-	std::auto_ptr<MRUList> ma_pRecentFiles;
+	std::unique_ptr<MRUList> ma_pRecentFiles;
 
 	// the training file (if any) to use for the RecognizeTextInWindow operation
 	CString m_zTrainingFile;
@@ -447,7 +447,7 @@ private:
 
 	// the CursorToolTipCtrl is used to display the most recently recognized text
 	// as a visual feedback at the current mouse cursor position
-	std::auto_ptr<CursorToolTipCtrl> m_apCursorToolTipCtrl;
+	std::unique_ptr<CursorToolTipCtrl> m_apCursorToolTipCtrl;
 	unsigned long m_ulLastCreatedEntity;
 
 	// will be used for all instances

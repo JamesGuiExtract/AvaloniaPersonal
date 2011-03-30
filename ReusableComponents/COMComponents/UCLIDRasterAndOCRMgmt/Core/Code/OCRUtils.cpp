@@ -75,7 +75,7 @@ STDMETHODIMP COCRUtils::BatchOCR(BSTR strRootDirOrFile,
 		validateLicense();
 
 		UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine(pEngine);
-		if (ipOCREngine == NULL)
+		if (ipOCREngine == __nullptr)
 		{
 			throw UCLIDException("ELI06056", "OCR Engine object shall not be null.");
 		}
@@ -158,7 +158,7 @@ STDMETHODIMP COCRUtils::RecognizeTextInImageFile(BSTR strImageFileName,
 	try
 	{
 		UCLID_RASTERANDOCRMGMTLib::IOCREnginePtr ipOCREngine(pOCREngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI06943", ipOCREngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06943", ipOCREngine != __nullptr);
 
 		// Retrieve the text from the image file
 		string	strFile = asString(strImageFileName);
@@ -359,7 +359,7 @@ void COCRUtils::processImageFile(const string& strImageFile, int nMaxNumOfPages,
 	if (bAppendOutput)
 	{
 		ipFinalString.CreateInstance(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI06737", ipFinalString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06737", ipFinalString != __nullptr);
 
 		ipFinalString->LoadFrom(get_bstr_t(strOutputFileName.c_str()), VARIANT_FALSE);
 		ipFinalString->AppendString(get_bstr_t("\r\n\r\n"));

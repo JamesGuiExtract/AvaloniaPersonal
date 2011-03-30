@@ -118,7 +118,7 @@ STDMETHODIMP CFileExistence::put_FileString(BSTR strFileString)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14419", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14419", ipFAMTagManager != __nullptr);
 
 		// make sure the file exists
 		// or that it contains valid string tags
@@ -171,7 +171,7 @@ STDMETHODIMP CFileExistence::raw_GetComponentDescription(BSTR * pstrComponentDes
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19636", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19636", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Match based upon file existence").Detach();
 	}
@@ -190,7 +190,7 @@ STDMETHODIMP CFileExistence::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		EXTRACT_FAMCONDITIONSLib::IFileExistenceFAMConditionPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI13564", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13564", ipCopyThis != __nullptr);
 		
 		m_bFileDoesExist = ((ipCopyThis->FileExists)==VARIANT_TRUE);
 		m_strFileName = asString(ipCopyThis->FileString);
@@ -211,7 +211,7 @@ STDMETHODIMP CFileExistence::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_FileExistence);
-		ASSERT_RESOURCE_ALLOCATION("ELI13566", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13566", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

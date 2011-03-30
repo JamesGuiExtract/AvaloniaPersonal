@@ -167,20 +167,20 @@ CImageCleanupSettingsEditorDlg::CImageCleanupSettingsEditorDlg(CWnd* pParent /*=
 		m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 		// create the Configuration Manager
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrIC_ICSETTINGS_KEY_PATH));
 		
 		// create the MRU List
-		ma_pMRUList = auto_ptr<MRUList>(new MRUList(ma_pUserCfgMgr.get(), 
+		ma_pMRUList = unique_ptr<MRUList>(new MRUList(ma_pUserCfgMgr.get(), 
 			"\\ImageCleanupSettings\\MRUList", "File_%d", 5));
 
 		// create an instance of the image cleanup settings object
 		m_ipSettings.CreateInstance(CLSID_ImageCleanupSettings);
-		ASSERT_RESOURCE_ALLOCATION("ELI17180", m_ipSettings != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17180", m_ipSettings != __nullptr);
 
 		// create an instance of the clipboard object manager
 		m_ipClipboardMgr.CreateInstance(CLSID_ClipboardObjectManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI17242", m_ipClipboardMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17242", m_ipClipboardMgr != __nullptr);
 
 		// check for recovery file
 		string strRecoveryFileName;
@@ -337,7 +337,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnAdd()
 	{
 		// create a new ObjectWithDescription
 		IObjectWithDescriptionPtr ipObject(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI17183", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17183", ipObject != __nullptr);
 
 		// allow the user to select and configure
 		VARIANT_BOOL vbDirty = getMiscUtils()->AllowUserToSelectAndConfigureObject(ipObject, 
@@ -352,7 +352,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnAdd()
 			// Get index of previously selected Image Cleanup Operation
 			int iIndex = -1;
 			POSITION pos = m_lstOperationList.GetFirstSelectedItemPosition();
-			if (pos != NULL)
+			if (pos != __nullptr)
 			{
 				// Get index of first selection
 				iIndex = m_lstOperationList.GetNextSelectedItem( pos );
@@ -395,7 +395,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnRemove()
 		// Check for current selection
 		int iIndex = -1;
 		POSITION pos = m_lstOperationList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_lstOperationList.GetNextSelectedItem( pos );
@@ -472,7 +472,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnConfig()
 		// Check for current cleanup operation selection
 		int iIndex = -1;
 		POSITION pos = m_lstOperationList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_lstOperationList.GetNextSelectedItem( pos );
@@ -485,7 +485,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnConfig()
 
 		// get the current cleanup operation
 		IObjectWithDescriptionPtr	ipCO = getImageCleanupOperations()->At( iIndex );
-		ASSERT_RESOURCE_ALLOCATION("ELI17186", ipCO != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17186", ipCO != __nullptr);
 		
 		// get the position and dimensions of the command button
 		RECT rectCommandButton;
@@ -525,7 +525,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnDown()
 		// Check for current cleanup operation selection
 		int iIndex = -1;
 		POSITION pos = m_lstOperationList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_lstOperationList.GetNextSelectedItem( pos );
@@ -568,7 +568,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnUp()
 		// Check for current cleanup operation selection
 		int iIndex = -1;
 		POSITION pos = m_lstOperationList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_lstOperationList.GetNextSelectedItem( pos );
@@ -820,7 +820,7 @@ void CImageCleanupSettingsEditorDlg::OnEditCopy()
 		// Check for current operation selection
 		int iIndex = -1;
 		POSITION pos = m_lstOperationList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_lstOperationList.GetNextSelectedItem( pos );
@@ -835,18 +835,18 @@ void CImageCleanupSettingsEditorDlg::OnEditCopy()
 
 		// Retrieve vector of existing operations
 		IIUnknownVectorPtr	ipOperations = getImageCleanupOperations();
-		ASSERT_RESOURCE_ALLOCATION("ELI17247", ipOperations != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17247", ipOperations != __nullptr);
 
 		// Create a vector for selected operations
 		IIUnknownVectorPtr	ipCopiedOperations( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION( "ELI17248", ipCopiedOperations != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI17248", ipCopiedOperations != __nullptr );
 
 		// Add each selected operation to vector
 		while (iIndex != -1)
 		{
 			// Retrieve the selected image cleanup operation
 			IUnknownPtr	ipObject = ipOperations->At(iIndex);
-			ASSERT_RESOURCE_ALLOCATION( "ELI17249", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI17249", ipObject != __nullptr );
 
 			// Add the operation to the vector
 			ipCopiedOperations->PushBack( ipObject );
@@ -873,7 +873,7 @@ void CImageCleanupSettingsEditorDlg::OnEditPaste()
 		{
 			// Retrieve object from ClipboardManager
 			ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-			ASSERT_RESOURCE_ALLOCATION("ELI17250", ipObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17250", ipObject != __nullptr);
 		}
 		else
 		{
@@ -885,7 +885,7 @@ void CImageCleanupSettingsEditorDlg::OnEditPaste()
 		// Check for current operation selection
 		int iIndex = -1;
 		POSITION pos = m_lstOperationList.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_lstOperationList.GetNextSelectedItem( pos );
@@ -899,11 +899,11 @@ void CImageCleanupSettingsEditorDlg::OnEditPaste()
 
 		// Retrieve vector of existing operations
 		IIUnknownVectorPtr	ipOperations = getImageCleanupOperations(); 
-		ASSERT_RESOURCE_ALLOCATION("ELI17252", ipOperations != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17252", ipOperations != __nullptr);
 
 		// Get count of Operations in Clipboard vector
 		IIUnknownVectorPtr	ipPastedOperations = ipObject;
-		ASSERT_RESOURCE_ALLOCATION( "ELI17253", ipPastedOperations != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI17253", ipPastedOperations != __nullptr );
 		int iCount = ipPastedOperations->Size();
 
 		// clear selections
@@ -914,7 +914,7 @@ void CImageCleanupSettingsEditorDlg::OnEditPaste()
 		{
 			// Retrieve the operation
 			IObjectWithDescriptionPtr ipNewOperation = ipPastedOperations->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI17254", ipNewOperation != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17254", ipNewOperation != __nullptr);
 
 			// insert the operation into the vector
 			getImageCleanupOperations()->Insert(iIndex, ipNewOperation);
@@ -1069,7 +1069,7 @@ void CImageCleanupSettingsEditorDlg::OnBtnTest()
 		CWaitCursor waitCursor;
 
 		IImageCleanupEnginePtr ipCleanEngine(CLSID_ImageCleanupEngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI17322", ipCleanEngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17322", ipCleanEngine != __nullptr);
 
 		// InternalUseOnly is not thread safe, but we only have one thread so its okay
 		ipCleanEngine->CleanupImageInternalUseOnly(m_strInImageFile.c_str(), m_strOutImageFile.c_str(), 
@@ -1383,7 +1383,7 @@ BOOL CImageCleanupSettingsEditorDlg::OnInitDialog()
 
 		// center the static prompt which shows the "The Image Cleanup Settings are encrypted" message
 		CWnd *pWnd = GetDlgItem( IDC_STATIC_PROMPT );
-		if (pWnd != NULL)
+		if (pWnd != __nullptr)
 		{
 			pWnd->CenterWindow();
 			pWnd->ShowWindow(SW_HIDE);
@@ -1477,7 +1477,7 @@ void CImageCleanupSettingsEditorDlg::OnDblclkListTasks(NMHDR* pNMHDR, LRESULT* p
 		{
 			// get the current cleanup operation
 			IObjectWithDescriptionPtr	ipCO = getImageCleanupOperations()->At( iIndex );
-			ASSERT_RESOURCE_ALLOCATION("ELI17239", ipCO != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17239", ipCO != __nullptr);
 			
 			// allow the user to modify the cleanup operation
 			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipCO, 
@@ -1551,12 +1551,12 @@ void CImageCleanupSettingsEditorDlg::OnLvnItemchangedListTsk(NMHDR *pNMHDR, LRES
 
 		// If this cleanup operation is already present
 		IIUnknownVectorPtr ipCollection = getImageCleanupOperations();
-		ASSERT_RESOURCE_ALLOCATION("ELI17203", ipCollection != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17203", ipCollection != __nullptr);
 		if (ipCollection->Size() > pNMLV->iItem)
 		{
 			// Retrieve affected cleanup operation
 			IObjectWithDescriptionPtr	ipCO = ipCollection->At( pNMLV->iItem );
-			ASSERT_RESOURCE_ALLOCATION("ELI17204", ipCO != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17204", ipCO != __nullptr);
 
 			// Retrieve existing state
 			VARIANT_BOOL vbExisting = ipCO->Enabled;
@@ -1589,7 +1589,7 @@ void CImageCleanupSettingsEditorDlg::OnRightClickTasks(NMHDR *pNMHDR, LRESULT *p
 		{
 			int iIndex = -1;
 			POSITION pos = m_lstOperationList.GetFirstSelectedItemPosition();
-			if (pos != NULL)
+			if (pos != __nullptr)
 			{
 				// Get index of first selection
 				iIndex = m_lstOperationList.GetNextSelectedItem( pos );
@@ -1695,7 +1695,7 @@ void CImageCleanupSettingsEditorDlg::setButtonStates()
 			// Next have to see if an item is selected
 			int iIndex = -1;
 			POSITION pos = m_lstOperationList.GetFirstSelectedItemPosition();
-			if (pos != NULL)
+			if (pos != __nullptr)
 			{
 				// Get index of first selection
 				iIndex = m_lstOperationList.GetNextSelectedItem( pos );
@@ -1980,7 +1980,7 @@ IIUnknownVectorPtr CImageCleanupSettingsEditorDlg::getImageCleanupOperations()
 {
 	// get the image cleanup operations vector
 	IIUnknownVectorPtr ipImageCleanupOperations = m_ipSettings->ImageCleanupOperations;
-	ASSERT_RESOURCE_ALLOCATION("ELI17206", ipImageCleanupOperations != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI17206", ipImageCleanupOperations != __nullptr);
 
 	return ipImageCleanupOperations;
 }
@@ -1992,7 +1992,7 @@ IMiscUtilsPtr CImageCleanupSettingsEditorDlg::getMiscUtils()
 	{
 		// create MiscUtils object
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI17207", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17207", m_ipMiscUtils != __nullptr);
 	}
 
 	return m_ipMiscUtils;
@@ -2006,7 +2006,7 @@ void CImageCleanupSettingsEditorDlg::addImageCleanupOperation(IObjectWithDescrip
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17208", ipObject != NULL);
+		ASSERT_ARGUMENT("ELI17208", ipObject != __nullptr);
 
 		CString zDescription = (char*)ipObject->Description;
 
@@ -2027,7 +2027,7 @@ void CImageCleanupSettingsEditorDlg::getDlgItemWindowRect(UINT uiDlgItemResource
 	{
 		// retrieve the dialog item using its resource ID
 		CWnd* cwndDlgItem = GetDlgItem(uiDlgItemResourceID);
-		ASSERT_RESOURCE_ALLOCATION("ELI17215", cwndDlgItem != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17215", cwndDlgItem != __nullptr);
 
 		// set the window rect to the appropriate position and dimensions
 		cwndDlgItem->GetWindowRect(&rectWindow);
@@ -2045,7 +2045,7 @@ bool CImageCleanupSettingsEditorDlg::checkModification()
 		if (m_ipSettings)
 		{
 			IPersistStreamPtr ipPersistStream(m_ipSettings);
-			ASSERT_RESOURCE_ALLOCATION("ELI17209", ipPersistStream != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17209", ipPersistStream != __nullptr);
 			if (ipPersistStream)
 			{
 				// if the image cleanup settings are modified, prompt for saving
@@ -2338,7 +2338,7 @@ void CImageCleanupSettingsEditorDlg::enableEditFeatures(bool bEnable)
 		{
 			long nID = *iter;
 			CWnd*	pWnd = GetDlgItem( nID );
-			if (pWnd != NULL)
+			if (pWnd != __nullptr)
 			{
 				pWnd->ShowWindow( bEnable ? SW_SHOW : SW_HIDE );
 			}
@@ -2348,7 +2348,7 @@ void CImageCleanupSettingsEditorDlg::enableEditFeatures(bool bEnable)
 		// Hide/show the encrypted prompt
 		/////////////////////////////////
 		CWnd *pWnd = GetDlgItem( IDC_STATIC_PROMPT );
-		if (pWnd != NULL)
+		if (pWnd != __nullptr)
 		{
 			pWnd->ShowWindow( bEnable ? SW_HIDE : SW_SHOW );
 		}
@@ -2382,7 +2382,7 @@ void CImageCleanupSettingsEditorDlg::updateComponentCacheFile()
 	{	
 		// create instance of the category manager
 		ICategoryManagerPtr ipCatMgr(CLSID_CategoryManager);
-		if (ipCatMgr == NULL)
+		if (ipCatMgr == __nullptr)
 		{
 			throw UCLIDException("ELI17212", "Unable to create instance of CategoryManager!");
 		}
@@ -2405,7 +2405,7 @@ void CImageCleanupSettingsEditorDlg::updateComponentCacheFile()
 
 			// recreate the cache file for the category
 			IStrToStrMapPtr ipMap = ipCatMgr->GetDescriptionToProgIDMap1(_bstrCategory);
-			ASSERT_RESOURCE_ALLOCATION("ELI17213", ipMap != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17213", ipMap != __nullptr);
 
 			// Store count of components found
 			vecCounts.push_back( ipMap->Size );
@@ -2420,7 +2420,7 @@ bool CImageCleanupSettingsEditorDlg::isVectorOfOWDOfCleanupOperations(IIUnknownV
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17227", ipVector != NULL);
+		ASSERT_ARGUMENT("ELI17227", ipVector != __nullptr);
 
 		bool bVectorIsOK = true;
 		// get vector size
@@ -2430,7 +2430,7 @@ bool CImageCleanupSettingsEditorDlg::isVectorOfOWDOfCleanupOperations(IIUnknownV
 		for (long i = 0; i < lSize; i++)
 		{
 			IObjectWithDescriptionPtr ipOWD = ipVector->At(i);
-			if (ipOWD == NULL)
+			if (ipOWD == __nullptr)
 			{
 				// object is not an ObjectWithDescription. set result to false and exit loop.
 				bVectorIsOK = false;
@@ -2439,11 +2439,11 @@ bool CImageCleanupSettingsEditorDlg::isVectorOfOWDOfCleanupOperations(IIUnknownV
 
 			// get the object from the ObjectWithDescription
 			IUnknownPtr ipObject = ipOWD->Object;
-			ASSERT_RESOURCE_ALLOCATION("ELI17574", ipObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17574", ipObject != __nullptr);
 
 			// check if the object is an ImageCleanupOperation
 			IImageCleanupOperationPtr ipICO = ipObject;
-			if (ipICO == NULL)
+			if (ipICO == __nullptr)
 			{
 				// object is not an ImageCleanupOperation. set result to false and exit loop.
 				bVectorIsOK = false;

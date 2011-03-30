@@ -277,7 +277,7 @@ private:
 	static CMutex ms_Mutex;
 
 	// Handles registry settings
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
 	// pointer to the utility object that deals with encryption
 	IMiscUtilsPtr m_ipMiscUtils;

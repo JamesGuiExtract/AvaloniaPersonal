@@ -655,7 +655,7 @@ RegistryPersistenceMgr* FileProcessingConfigMgr::getHKLM()
 	if (m_apHKLM.get() == NULL)
 	{
 		m_apHKLM.reset(new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE, ""));
-		ASSERT_RESOURCE_ALLOCATION("ELI30014", m_apHKLM.get() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30014", m_apHKLM.get() != __nullptr);
 	}
 
 	return m_apHKLM.get();
@@ -666,6 +666,6 @@ void FileProcessingConfigMgr::initHKCU()
 	if (m_apHKCU.get() == NULL)
 	{
 		m_apHKCU.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-		ASSERT_RESOURCE_ALLOCATION("ELI30015", m_apHKCU.get() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30015", m_apHKCU.get() != __nullptr);
 	}
 }

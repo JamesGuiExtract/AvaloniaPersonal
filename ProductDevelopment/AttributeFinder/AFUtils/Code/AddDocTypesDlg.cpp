@@ -139,10 +139,10 @@ void AddDocTypesDlg::OnSelchangeComboCategory()
 void AddDocTypesDlg::populateComboBox()
 {
 	// Create the Document Classification Utils object
-	if (m_ipDocUtils == NULL)
+	if (m_ipDocUtils == __nullptr)
 	{
 		m_ipDocUtils.CreateInstance( CLSID_DocumentClassifier );
-		ASSERT_RESOURCE_ALLOCATION("ELI11935", m_ipDocUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11935", m_ipDocUtils != __nullptr);
 	}
 
 	// Clear combo box before populating
@@ -206,7 +206,7 @@ void AddDocTypesDlg::populateListBox()
 
 	// Get vector of document types
 	IVariantVectorPtr ipTypes = m_ipDocUtils->GetDocumentTypes( _bstr_t( m_strCategory.c_str() ) );
-	ASSERT_RESOURCE_ALLOCATION("ELI11938", ipTypes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI11938", ipTypes != __nullptr);
 
 	// Get vector of Special types
 	int i;
@@ -215,7 +215,7 @@ void AddDocTypesDlg::populateListBox()
 	{
 		IVariantVectorPtr ipSpecial =
 			m_ipDocUtils->GetSpecialDocTypeTags(asVariantBool(m_bAllowMultiplyClassified));
-		ASSERT_RESOURCE_ALLOCATION("ELI11939", ipSpecial != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11939", ipSpecial != __nullptr);
 
 		lCount = ipSpecial->Size;
 		for (i = 0; i < lCount; i++)

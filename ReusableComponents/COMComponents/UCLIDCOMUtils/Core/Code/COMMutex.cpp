@@ -19,7 +19,7 @@ CCOMMutex::~CCOMMutex()
 {
 	try
 	{
-		if ( m_pMutex != NULL )
+		if ( m_pMutex != __nullptr )
 		{
 			delete m_pMutex;
 		}
@@ -53,7 +53,7 @@ STDMETHODIMP CCOMMutex::CreateNamed(BSTR bstrMutexName)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		if ( m_pMutex != NULL )
+		if ( m_pMutex != __nullptr )
 		{
 			// if this name is different from a previous call throw an exception
 			if ( m_strMutexName != asString(bstrMutexName) )
@@ -68,7 +68,7 @@ STDMETHODIMP CCOMMutex::CreateNamed(BSTR bstrMutexName)
 			if ( m_strMutexName != "" )
 			{
 				m_pMutex = getGlobalNamedMutex(m_strMutexName);
-				ASSERT_RESOURCE_ALLOCATION("ELI13245", m_pMutex != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI13245", m_pMutex != __nullptr );
 			}
 			else
 			{
@@ -89,7 +89,7 @@ STDMETHODIMP CCOMMutex::Acquire(void)
 	try
 	{
 		// if mutex object has not been initialized throw an exception
-		ASSERT_RESOURCE_ALLOCATION("ELI13244", m_pMutex != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13244", m_pMutex != __nullptr );
 
 		m_pMutex->Lock();
 	}
@@ -105,7 +105,7 @@ STDMETHODIMP CCOMMutex::ReleaseNamedMutex(void)
 	try
 	{
 		// if mutex object has not been initialize throw an exception
-		ASSERT_RESOURCE_ALLOCATION("ELI13246", m_pMutex != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13246", m_pMutex != __nullptr );
 
 		m_pMutex->Unlock();
 	}

@@ -43,13 +43,13 @@ CFeedbackMgr::CFeedbackMgr()
 	try
 	{
 		// Get Persistence Manager for dialog
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_REG_UTILS_FOLDER_PATH ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09154", ma_pUserCfgMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09154", ma_pUserCfgMgr.get() != __nullptr );
 
-		ma_pCfgFeedbackMgr = auto_ptr<PersistenceMgr>(new PersistenceMgr( 
+		ma_pCfgFeedbackMgr = unique_ptr<PersistenceMgr>(new PersistenceMgr( 
 			ma_pUserCfgMgr.get(), gstrAF_REG_FEEDBACK_FOLDER ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09155", ma_pCfgFeedbackMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09155", ma_pCfgFeedbackMgr.get() != __nullptr );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08476")
 }
@@ -63,7 +63,7 @@ CFeedbackMgr::~CFeedbackMgr()
 		{
 			// Clear the ADO connection
 			m_ipConnection->Close();
-			m_ipConnection = NULL;
+			m_ipConnection = __nullptr;
 			m_bConnectionOpen = false;
 		}
 	}
@@ -142,7 +142,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordCorrectData(BSTR bstrRuleExecutionID, IIUnk
 
 		// Create smart pointer for Data
 		IIUnknownVectorPtr	ipData( pData );
-		ASSERT_RESOURCE_ALLOCATION( "ELI08785", ipData != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08785", ipData != __nullptr );
 
 		// Write the vector of results to the file
 		ipData->SaveTo(strFile.c_str(), VARIANT_TRUE);
@@ -211,7 +211,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordFoundData(BSTR bstrRuleExecutionID, IIUnkno
 
 		// Create smart pointer for Data
 		IIUnknownVectorPtr	ipData( pData );
-		ASSERT_RESOURCE_ALLOCATION( "ELI08786", ipData != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08786", ipData != __nullptr );
 
 		// Write the vector of results to the file
 		ipData->SaveTo(strFile.c_str(), VARIANT_FALSE);
@@ -282,7 +282,7 @@ STDMETHODIMP CFeedbackMgr::raw_RecordRuleExecution(IAFDocument *pAFDoc, BSTR bst
 		validateLicense();
 
 		// Check parameter
-		ASSERT_ARGUMENT("ELI28091", pbstrRuleExecutionID != NULL);
+		ASSERT_ARGUMENT("ELI28091", pbstrRuleExecutionID != __nullptr);
 
 		////////////////////////////////////////////
 		// Default Rule Execution ID to empty string
@@ -603,7 +603,7 @@ STDMETHODIMP CFeedbackMgr::raw_GetFeedbackRecords(IUnknown** ppFeedbackRecords)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28092", ppFeedbackRecords != NULL);
+		ASSERT_ARGUMENT("ELI28092", ppFeedbackRecords != __nullptr);
 
 		// Default to NULL Recordset
 		*ppFeedbackRecords = NULL;
@@ -698,18 +698,18 @@ STDMETHODIMP CFeedbackMgr::raw_IsLicensed(VARIANT_BOOL * pbValue)
 void CFeedbackMgr::handleSourceDoc(long lRuleID, IAFDocument *pAFDoc)
 {
 	// Just return if connection is not already open
-	if (!m_bConnectionOpen || (m_ipConnection == NULL))
+	if (!m_bConnectionOpen || (m_ipConnection == __nullptr))
 	{
 		return;
 	}
 
 	// Get local AFDocument object pointer
 	IAFDocumentPtr	ipDoc( pAFDoc );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10175", ipDoc != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10175", ipDoc != __nullptr );
 
 	// Get document text
 	ISpatialStringPtr ipText = ipDoc->Text;
-	ASSERT_RESOURCE_ALLOCATION("ELI15607", ipText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15607", ipText != __nullptr);
 
 	// Source Document Name
 	string strSourceDocName = ipText->SourceDocName;
@@ -940,7 +940,7 @@ bool CFeedbackMgr::openDBConnection(const string& strFeedbackFolder)
 void CFeedbackMgr::writeComputerName(long lRuleID, const string& strName)
 {
 	// Just return if connection is not already open
-	if (!m_bConnectionOpen || (m_ipConnection == NULL))
+	if (!m_bConnectionOpen || (m_ipConnection == __nullptr))
 	{
 		return;
 	}
@@ -971,7 +971,7 @@ void CFeedbackMgr::writeComputerName(long lRuleID, const string& strName)
 void CFeedbackMgr::writeCorrectTime(long lRuleID, __time64_t t64Time)
 {
 	// Just return if connection is not already open
-	if (!m_bConnectionOpen || (m_ipConnection == NULL))
+	if (!m_bConnectionOpen || (m_ipConnection == __nullptr))
 	{
 		return;
 	}
@@ -1006,7 +1006,7 @@ void CFeedbackMgr::writeCorrectTime(long lRuleID, __time64_t t64Time)
 void CFeedbackMgr::writeDuration(long lRuleID, double dSeconds)
 {
 	// Just return if connection is not already open
-	if (!m_bConnectionOpen || (m_ipConnection == NULL))
+	if (!m_bConnectionOpen || (m_ipConnection == __nullptr))
 	{
 		return;
 	}
@@ -1039,7 +1039,7 @@ void CFeedbackMgr::writeDuration(long lRuleID, double dSeconds)
 long CFeedbackMgr::writeNewStartTime(__time64_t t64Time)
 {
 	// Just return if connection is not already open
-	if (!m_bConnectionOpen || (m_ipConnection == NULL))
+	if (!m_bConnectionOpen || (m_ipConnection == __nullptr))
 	{
 		return 0;
 	}
@@ -1081,7 +1081,7 @@ long CFeedbackMgr::writeNewStartTime(__time64_t t64Time)
 void CFeedbackMgr::writeRSDFileName(long lRuleID, const string& strRSDFileName)
 {
 	// Just return if connection is not already open
-	if (!m_bConnectionOpen || (m_ipConnection == NULL))
+	if (!m_bConnectionOpen || (m_ipConnection == __nullptr))
 	{
 		return;
 	}

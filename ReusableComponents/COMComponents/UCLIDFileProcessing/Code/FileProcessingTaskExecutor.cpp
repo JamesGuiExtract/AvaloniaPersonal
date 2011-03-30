@@ -39,9 +39,9 @@ void CFileProcessingTaskExecutor::FinalRelease()
 	{
 		// Release member interface pointers (just a precaution)
 		m_vecProcessingTasks.clear(); // This vector holds interface pointers
-		m_ipCurrentTask = NULL;
-		m_ipDB = NULL;
-		m_ipFAMTagManager = NULL;
+		m_ipCurrentTask = __nullptr;
+		m_ipDB = __nullptr;
+		m_ipFAMTagManager = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26736");
 }
@@ -62,13 +62,13 @@ STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingT
 		validateLicense();
 
 		IIUnknownVectorPtr ipFileProcessingTasks(pFileProcessingTasks);
-		ASSERT_ARGUMENT("ELI26780", ipFileProcessingTasks != NULL);
+		ASSERT_ARGUMENT("ELI26780", ipFileProcessingTasks != __nullptr);
 
 		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_ARGUMENT("ELI26781", ipDB != NULL);
+		ASSERT_ARGUMENT("ELI26781", ipDB != __nullptr);
 
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(pFAMTagManager);
-		ASSERT_ARGUMENT("ELI26782", ipFAMTagManager != NULL);
+		ASSERT_ARGUMENT("ELI26782", ipFAMTagManager != __nullptr);
 
 		// Call the init method
 		init(ipFileProcessingTasks, nActionID, ipDB, ipFAMTagManager);
@@ -95,7 +95,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(IFileRecord* pFileRecord,
 
 		// Assert required arguments
 		ASSERT_ARGUMENT("ELI31323", pFileRecord != __nullptr);
-		ASSERT_ARGUMENT("ELI17704", pResult != NULL);
+		ASSERT_ARGUMENT("ELI17704", pResult != __nullptr);
 
 		// ProgressStatus not required... don't use if NULL
 		IProgressStatusPtr ipProgressStatus(pProgressStatus);
@@ -215,7 +215,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::GetCurrentTask(IFileProcessingTask **p
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17859", ppCurrentTask != NULL);
+		ASSERT_ARGUMENT("ELI17859", ppCurrentTask != __nullptr);
 
 		*ppCurrentTask = (IFileProcessingTask*) getCurrentTask().Detach();
 	}
@@ -234,7 +234,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::get_IsInitialized(VARIANT_BOOL *pVal)
 		validateLicense();
 
 		// ensure and initialize the return value
-		ASSERT_ARGUMENT("ELI17898", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17898", pVal != __nullptr);
 		
 		*pVal = asVariantBool(m_bInitialized);
 	}
@@ -276,7 +276,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::raw_IsLicensed(VARIANT_BOOL *pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17875", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI17875", pbValue != __nullptr);
 
 		try
 		{
@@ -364,8 +364,8 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 
 						// Create a pointer to the Sub-ProgressStatus object, depending 
 						// upon whether the caller requested progress information
-						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
-							NULL : ipProgressStatus->SubProgressStatus;
+						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+							__nullptr : ipProgressStatus->SubProgressStatus;
 
 						// Ensure that in the case of an error that m_ipCurrentTask will be restored to NULL
 						ValueRestorer<UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr> restorer(m_ipCurrentTask, NULL);
@@ -375,7 +375,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 							// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
 							CSingleLock lock(&m_mutexCurrentTask, TRUE);
 							m_ipCurrentTask = task.Task;
-							ASSERT_RESOURCE_ALLOCATION("ELI17692", m_ipCurrentTask != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI17692", m_ipCurrentTask != __nullptr);
 						}
 
 						// Was cancel request either passed in or received via a call to Cancel?
@@ -390,7 +390,7 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						{
 							// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
 							CSingleLock lock(&m_mutexCurrentTask, TRUE);
-							m_ipCurrentTask = NULL;
+							m_ipCurrentTask = __nullptr;
 						}
 
 						// Check success flag
@@ -485,9 +485,9 @@ void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessin
 		m_eventCancelRequested.reset();
 
 		// Check arguments
-		ASSERT_ARGUMENT("ELI17698", ipFileProcessingTasks != NULL);
+		ASSERT_ARGUMENT("ELI17698", ipFileProcessingTasks != __nullptr);
 		m_ipFAMTagManager = ipFAMTagManager;
-		ASSERT_ARGUMENT("ELI17702", m_ipFAMTagManager != NULL);
+		ASSERT_ARGUMENT("ELI17702", m_ipFAMTagManager != __nullptr);
 
 		// Store database
 		m_ipDB = ipDB;
@@ -499,11 +499,11 @@ void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessin
 		{
 			// Retrieve specified file processor Object With Description
 			IObjectWithDescriptionPtr ipObject(ipFileProcessingTasks->At(i));
-			ASSERT_RESOURCE_ALLOCATION("ELI17848", ipObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17848", ipObject != __nullptr);
 
 			// Retrieve this file processor
 			UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProc(ipObject->Object);
-			ASSERT_RESOURCE_ALLOCATION("ELI17849", ipFileProc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17849", ipFileProc != __nullptr);
 
 			ProcessingTask task(ipFileProc, asString(ipObject->Description),
 				asCppBool(ipObject->Enabled));

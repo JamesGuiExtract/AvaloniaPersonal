@@ -181,10 +181,10 @@ private:
 	int m_nLineBottomOrRightEndId;
 
 	// A derivative group of lines (all within same column)
-	auto_ptr<LeadToolsLineGroup> m_apSubLineGroup;
+	unique_ptr<LeadToolsLineGroup> m_apSubLineGroup;
 
 	// A derivative column grouping
-	auto_ptr<LeadToolsLineGroup> m_apSubColumnGroup;
+	unique_ptr<LeadToolsLineGroup> m_apSubColumnGroup;
 
 	/////////////////
 	// Methods

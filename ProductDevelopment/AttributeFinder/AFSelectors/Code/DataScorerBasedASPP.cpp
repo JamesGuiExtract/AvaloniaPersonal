@@ -23,7 +23,7 @@ CDataScorerBasedASPP::CDataScorerBasedASPP()
 		m_dwDocStringID = IDS_DOCSTRINGDATASCORERBASEDASPP;
 
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI29301", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29301", m_ipMiscUtils != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI29302");
 }
@@ -36,7 +36,7 @@ STDMETHODIMP CDataScorerBasedASPP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFSELECTORSLib::IDataScorerBasedASPtr ipDSAS = m_ppUnk[i];
-			if ( ipDSAS != NULL )
+			if ( ipDSAS != __nullptr )
 			{
 				// Save the data scorer
 				ipDSAS->DataScorer = m_ipSelectedDataScorer;
@@ -133,7 +133,7 @@ LRESULT CDataScorerBasedASPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPar
 		validateLicense();
 
 		UCLID_AFSELECTORSLib::IDataScorerBasedASPtr ipDSAS = m_ppUnk[0];
-		if (ipDSAS != NULL)
+		if (ipDSAS != __nullptr)
 		{
 			// Attach the controls to the member variables
 			m_comboFirstCondition.Attach(GetDlgItem(IDC_COMBO_FIRST_CONDITION));
@@ -168,7 +168,7 @@ LRESULT CDataScorerBasedASPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPar
 
 			// Set data from object
 			m_ipSelectedDataScorer = ipDSAS->DataScorer;
-			ASSERT_RESOURCE_ALLOCATION("ELI29297", m_ipSelectedDataScorer != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29297", m_ipSelectedDataScorer != __nullptr);
 
 			// Update controls to contain properties data
 			m_staticDataScorer.SetWindowText(m_ipSelectedDataScorer->Description);

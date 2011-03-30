@@ -80,10 +80,10 @@ private:
 
 	// PROMISE: Retrieve an instantiation of the currently selected AttributeFindingRule
 	// ARGS:	For efficiency's sake, you can pass in an existing instance of the 
-	//			FindingRuleObject.  If NULL, getSelectedAFRule will obtain an instantiation
+	//			FindingRuleObject.  If __nullptr, getSelectedAFRule will obtain an instantiation
 	//			itself.
 	IAttributeFindingRulePtr getSelectedAFRule(
-		UCLID_AFCONDITIONSLib::IFindingRuleConditionPtr ipFindingRuleCondition = NULL);
+		UCLID_AFCONDITIONSLib::IFindingRuleConditionPtr ipFindingRuleCondition = __nullptr);
 
 	// PROMISE: Updates the configuration requirement message and configuration button enabled
 	//			status based on the currently selected rule.  

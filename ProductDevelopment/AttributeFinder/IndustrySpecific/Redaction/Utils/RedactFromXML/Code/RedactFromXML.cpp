@@ -213,7 +213,7 @@ string CRedactFromXMLApp::getAttributeAsString(MSXML::IXMLDOMNamedNodeMapPtr ipA
 	try
 	{
 		MSXML::IXMLDOMNodePtr ipAttribute = ipAttributes->getNamedItem(pszAttributeName);
-		ASSERT_RESOURCE_ALLOCATION("ELI18672", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18672", ipAttribute != __nullptr);
 		return asString(ipAttribute->text);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29850");
@@ -236,22 +236,22 @@ string CRedactFromXMLApp::getRedactionTextFromRedactionNode(MSXML::IXMLDOMNodePt
 	{
 		// Get the children of the redaction node
 		MSXML::IXMLDOMNodeListPtr ipChildren = ipRedaction->childNodes;
-		ASSERT_RESOURCE_ALLOCATION("ELI25123", ipChildren != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25123", ipChildren != __nullptr);
 
 		// Get the exemption code node under this redaction node
 		MSXML::IXMLDOMNodePtr ipExemptions = getFirstNodeNamed(ipChildren, "ExemptionCode");
 		string strExemptions;
-		if (ipExemptions != NULL)
+		if (ipExemptions != __nullptr)
 		{
 			// Get the exemption codes for this redaction
 			MSXML::IXMLDOMNamedNodeMapPtr ipExemptionAttributes = ipExemptions->attributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI25119", ipExemptionAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25119", ipExemptionAttributes != __nullptr);
 			strExemptions = getAttributeAsString(ipExemptionAttributes, "Code");
 		}
 
 		// Get the type of this redaction
 		MSXML::IXMLDOMNamedNodeMapPtr ipRedactionAttributes = ipRedaction->attributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI25121", ipRedactionAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25121", ipRedactionAttributes != __nullptr);
 		string strType = getAttributeAsString(ipRedactionAttributes, "Type");
 
 		// Replace the tags
@@ -339,7 +339,7 @@ MSXML::IXMLDOMNodePtr CRedactFromXMLApp::getFirstNodeNamed(MSXML::IXMLDOMNodeLis
 		{
 			// Get the ith node
 			MSXML::IXMLDOMNodePtr ipNode = ipNodes->item[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI25113", ipNode != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25113", ipNode != __nullptr);
 
 			// Return this node if it is a match
 			if (asString(ipNode->nodeName) == strName)
@@ -363,32 +363,32 @@ PageRasterZone CRedactFromXMLApp::getRasterZonePrototypeFromNode(MSXML::IXMLDOME
 		PageRasterZone prototype;
 		rstrTextFormat = "";
 
-		MSXML::IXMLDOMNodeListPtr ipSettings = NULL;
-		if (ipNode != NULL)
+		MSXML::IXMLDOMNodeListPtr ipSettings = __nullptr;
+		if (ipNode != __nullptr)
 		{
 			// Get the child nodes of the session
 			MSXML::IXMLDOMNodeListPtr ipChildren = ipNode->childNodes;
-			ASSERT_RESOURCE_ALLOCATION("ELI25111", ipChildren != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25111", ipChildren != __nullptr);
 
 			// Get the children of the output options node
 			MSXML::IXMLDOMNodePtr ipOutputNode = getFirstNodeNamed(ipChildren, "OutputOptions");
-			if (ipOutputNode != NULL)
+			if (ipOutputNode != __nullptr)
 			{
 				ipChildren = ipOutputNode->childNodes;
-				ASSERT_RESOURCE_ALLOCATION("ELI29902", ipChildren != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29902", ipChildren != __nullptr);
 			}
 
 			// Get the redaction appearance settings
 			MSXML::IXMLDOMNodePtr ipSettingsNode = 
 				getFirstNodeNamed(ipChildren, "RedactionTextAndColorSettings");
-			if (ipSettingsNode != NULL)
+			if (ipSettingsNode != __nullptr)
 			{
 				// Get the individual settings
 				ipSettings = ipSettingsNode->childNodes;
 			}
 		}
 
-		if (ipSettings == NULL)
+		if (ipSettings == __nullptr)
 		{
 			// No settings were found. Return default prototype.
 			return prototype;
@@ -399,7 +399,7 @@ PageRasterZone CRedactFromXMLApp::getRasterZonePrototypeFromNode(MSXML::IXMLDOME
 		for (long i = 0; i < lCount; i++)
 		{
 			MSXML::IXMLDOMNodePtr ipSetting = ipSettings->item[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI25114", ipSetting != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25114", ipSetting != __nullptr);
 
 			string strNodeName = asString(ipSetting->nodeName);
 			if (strNodeName == "TextFormat")
@@ -438,14 +438,14 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromNode(MSXML::IXMLDOME
 		vector<PageRasterZone> vecZones;
 
 		// If there are no raster zones, return an empty vector
-		if (ipNode == NULL)
+		if (ipNode == __nullptr)
 		{
 			return vecZones;
 		}
 
 		// Get the redactions
 		MSXML::IXMLDOMNodeListPtr ipRedactionList = ipNode->getElementsByTagName("Redaction");
-		ASSERT_RESOURCE_ALLOCATION("ELI18644", ipRedactionList != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18644", ipRedactionList != __nullptr);
 
 		// Iterate through each redaction
 		long lNumRedactions = ipRedactionList->length;
@@ -453,11 +453,11 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromNode(MSXML::IXMLDOME
 		{
 			// Get the ith redaction
 			MSXML::IXMLDOMNodePtr ipRedaction(ipRedactionList->item[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI18646", ipRedaction != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18646", ipRedaction != __nullptr);
 
 			// Get the attributes of this redaction
 			MSXML::IXMLDOMNamedNodeMapPtr ipRedactionAttributes(ipRedaction->attributes);
-			ASSERT_RESOURCE_ALLOCATION("ELI18647", ipRedactionAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18647", ipRedactionAttributes != __nullptr);
 
 			// Check if this redaction was correct
 			if (isRedactionEnabled(ipRedactionAttributes))
@@ -467,7 +467,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromNode(MSXML::IXMLDOME
 
 				// Get the lines associated with this redaction
 				MSXML::IXMLDOMNodeListPtr ipLines = ipRedaction->childNodes;
-				ASSERT_RESOURCE_ALLOCATION("ELI18649", ipLines != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18649", ipLines != __nullptr);
 
 				// Iterate through each line of this redaction
 				long lNumLines = ipLines->length;
@@ -475,7 +475,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromNode(MSXML::IXMLDOME
 				{
 					// Get the jth line
 					MSXML::IXMLDOMNodePtr ipLine = ipLines->item[j];
-					ASSERT_RESOURCE_ALLOCATION("ELI18650", ipLine != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI18650", ipLine != __nullptr);
 
 					string strNodeName = asString(ipLine->nodeName);
 
@@ -495,7 +495,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromNode(MSXML::IXMLDOME
 
 					// Get the zones associated with this line
 					MSXML::IXMLDOMNodeListPtr ipXMLZones = ipLine->childNodes;
-					ASSERT_RESOURCE_ALLOCATION("ELI18651", ipXMLZones != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI18651", ipXMLZones != __nullptr);
 
 					// Iterate through each zone of this line
 					long lNumXMLZones = ipXMLZones->length;
@@ -503,7 +503,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromNode(MSXML::IXMLDOME
 					{
 						// Get the kth zone
 						MSXML::IXMLDOMNodePtr ipXMLZone = ipXMLZones->item[k];
-						ASSERT_RESOURCE_ALLOCATION("ELI18652", ipXMLZone != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI18652", ipXMLZone != __nullptr);
 
 						// Add this zone to the list
 						if (asString(ipXMLZone->nodeName) == "Zone")
@@ -528,7 +528,7 @@ PageRasterZone CRedactFromXMLApp::getRasterZoneFromXML(MSXML::IXMLDOMNodePtr ipZ
 	{
 		// Get the attributes of this zone
 		MSXML::IXMLDOMNamedNodeMapPtr ipZoneAttributes(ipZone->attributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI18653", ipZoneAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18653", ipZoneAttributes != __nullptr);
 
 		// Store the zone
 		prototype.m_nStartX = getAttributeAsLong(ipZoneAttributes, "StartX");
@@ -549,7 +549,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 	{
 		// create an xml document object
 		MSXML::IXMLDOMDocumentPtr ipXMLDocument(CLSID_DOMDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI18640", ipXMLDocument != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18640", ipXMLDocument != __nullptr);
 
 		// ensure asynchronous processing is disabled
 		ipXMLDocument->async = VARIANT_FALSE;
@@ -564,7 +564,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 
 		// get the root element
 		MSXML::IXMLDOMElementPtr ipRoot = ipXMLDocument->documentElement; 
-		ASSERT_RESOURCE_ALLOCATION("ELI18642", ipRoot != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18642", ipRoot != __nullptr);
 
 		// get the root node's name
 		string strRootNodeName = asString(ipRoot->nodeName);
@@ -576,14 +576,14 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 		{
 			// get the attributes of the root node
 			MSXML::IXMLDOMNamedNodeMapPtr ipRootAttributes = ipRoot->attributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI19093", ipRootAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19093", ipRootAttributes != __nullptr);
 
 			// get the version attribute of this node
 			MSXML::IXMLDOMNodePtr ipAttribute = ipRootAttributes->getNamedItem("Version");
 
 			// set the version number if it was found
 			// NOTE: the first version had no version attribute, only the IDShieldMetaData tag
-			if (ipAttribute != NULL)
+			if (ipAttribute != __nullptr)
 			{
 				lVersionNumber = asLong( asString(ipAttribute->text) );
 			}
@@ -610,7 +610,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 		if (lVersionNumber != 3)
 		{
 			// Version 4+ gets the zone prototype from the last redaction session
-			MSXML::IXMLDOMElementPtr ipSession = NULL;
+			MSXML::IXMLDOMElementPtr ipSession = __nullptr;
 			if (lVersionNumber < 4)
 			{
 				ipSession = ipRoot;
@@ -621,7 +621,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 
 				// Only read the annotations settings if there is a last redaction session
 				// [LRCAU #5760]
-				if (ipSession != NULL)
+				if (ipSession != __nullptr)
 				{
 					// Read the annotation settings from the last redaction session 
 					// if not overridden by command-line parameters.
@@ -642,7 +642,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 
 		// Get the session nodes
 		MSXML::IXMLDOMNodeListPtr ipSessions = ipRoot->childNodes;
-		ASSERT_RESOURCE_ALLOCATION("ELI25124", ipSessions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25124", ipSessions != __nullptr);
 
 		// Iterate through the session node
 		vector<PageRasterZone> vecZones;
@@ -651,7 +651,7 @@ vector<PageRasterZone> CRedactFromXMLApp::getRasterZonesFromXML(const string& st
 		{
 			// Get the ith session
 			MSXML::IXMLDOMNodePtr ipSession = ipSessions->item[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI25125", ipSession != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25125", ipSession != __nullptr);
 
 			// Get the zone prototype and text format from this sessions redaction appearance settings
 			string strTextFormat;
@@ -677,24 +677,24 @@ MSXML::IXMLDOMElementPtr CRedactFromXMLApp::getLastRedactionSessionNode(
 	try
 	{
 		MSXML::IXMLDOMNodeListPtr ipSessions = ipRoot->getElementsByTagName("RedactedFileOutputSession");
-		ASSERT_RESOURCE_ALLOCATION("ELI29384", ipSessions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29384", ipSessions != __nullptr);
 
 		// Iterate over each automated redaction session
-		MSXML::IXMLDOMElementPtr ipLastSession = NULL;
+		MSXML::IXMLDOMElementPtr ipLastSession = __nullptr;
 		long lLastSessionId = 0;
 		long lCount = ipSessions->length;
 		for	(long i = 0; i < lCount; i++)
 		{
 			MSXML::IXMLDOMNodePtr ipSession = ipSessions->item[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI29385", ipSession != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29385", ipSession != __nullptr);
 
 			// Get the session's attributes
 			MSXML::IXMLDOMNamedNodeMapPtr ipAttributes(ipSession->attributes);
-			ASSERT_RESOURCE_ALLOCATION("ELI29386", ipAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29386", ipAttributes != __nullptr);
 
 			// Get the session id
 			MSXML::IXMLDOMNodePtr ipSessionId = ipAttributes->getNamedItem("ID");
-			ASSERT_RESOURCE_ALLOCATION("ELI29387", ipSessionId != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29387", ipSessionId != __nullptr);
 			long lSessionId = asLong( asString(ipSessionId->text) );
 
 			// The last session is the session with the largest session id
@@ -716,22 +716,22 @@ void CRedactFromXMLApp::updateAnnotationSettings(MSXML::IXMLDOMElementPtr ipSess
 	{
 		// Get the children of the session node
 		MSXML::IXMLDOMNodeListPtr ipSessionChildren = ipSession->childNodes;
-		ASSERT_RESOURCE_ALLOCATION("ELI29392", ipSessionChildren != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29392", ipSessionChildren != __nullptr);
 
 		// Get the output options
 		MSXML::IXMLDOMNodePtr ipOutputOptions = getFirstNodeNamed(ipSessionChildren, "OutputOptions");
-		ASSERT_RESOURCE_ALLOCATION("ELI29393", ipOutputOptions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29393", ipOutputOptions != __nullptr);
 
 		// Get the children of the output options
 		MSXML::IXMLDOMNodeListPtr ipOptionsChildren = ipOutputOptions->childNodes;
-		ASSERT_RESOURCE_ALLOCATION("ELI29394", ipOptionsChildren != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29394", ipOptionsChildren != __nullptr);
 
 		// Redact as annotations or burn in redactions?
 		if (!m_bRedactAsAnnotation && !m_bBurnInRedactions)
 		{
 			MSXML::IXMLDOMNodePtr ipRedactAsAnnotation = 
 				getFirstNodeNamed(ipOptionsChildren, "ApplyRedactionsAsAnnotations");
-			ASSERT_RESOURCE_ALLOCATION("ELI29388", ipRedactAsAnnotation != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29388", ipRedactAsAnnotation != __nullptr);
 
 			if (asString(ipRedactAsAnnotation->text) == "Yes")
 			{
@@ -748,7 +748,7 @@ void CRedactFromXMLApp::updateAnnotationSettings(MSXML::IXMLDOMElementPtr ipSess
 		{
 			MSXML::IXMLDOMNodePtr ipRetainAnnotations = 
 				getFirstNodeNamed(ipOptionsChildren, "RetainExistingAnnotations");
-			ASSERT_RESOURCE_ALLOCATION("ELI29389", ipRetainAnnotations != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29389", ipRetainAnnotations != __nullptr);
 
 			if (asString(ipRetainAnnotations->text) == "Yes")
 			{
@@ -766,10 +766,10 @@ void CRedactFromXMLApp::updateAnnotationSettings(MSXML::IXMLDOMElementPtr ipSess
 bool CRedactFromXMLApp::isRedactionEnabled(MSXML::IXMLDOMNamedNodeMapPtr ipAttributes)
 {
 	MSXML::IXMLDOMNodePtr ipEnabled = ipAttributes->getNamedItem("Enabled");
-	if (ipEnabled == NULL)
+	if (ipEnabled == __nullptr)
 	{
 		ipEnabled = ipAttributes->getNamedItem("Output");
-		ASSERT_RESOURCE_ALLOCATION("ELI29346", ipEnabled != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29346", ipEnabled != __nullptr);
 	}
 
 	return asString(ipEnabled->text) == "1";

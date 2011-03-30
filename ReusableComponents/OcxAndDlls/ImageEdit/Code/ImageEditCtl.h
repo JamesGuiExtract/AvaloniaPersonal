@@ -148,7 +148,7 @@ private:
 	double m_dZoomMagnifyFactor;
 
 	// Configuration object
-	std::auto_ptr<ImageEditCtrlCfg> m_apSettings;
+	std::unique_ptr<ImageEditCtrlCfg> m_apSettings;
 
 // Overrides
 	// ClassWizard generated virtual function overrides

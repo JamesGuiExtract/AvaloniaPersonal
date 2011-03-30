@@ -54,7 +54,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 	try
 	{
 		// Check test result logger
-		if (m_ipResultLogger == NULL)
+		if (m_ipResultLogger == __nullptr)
 		{
 			throw UCLIDException( "ELI07590", "Test Result Logger object not set!" );
 		}

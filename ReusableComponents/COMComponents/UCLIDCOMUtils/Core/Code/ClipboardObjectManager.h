@@ -47,7 +47,7 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 private:
-	std::auto_ptr<ClipboardManagerWnd> m_apCBMWnd;
+	std::unique_ptr<ClipboardManagerWnd> m_apCBMWnd;
 
 	// Checks if the object is an IClipboardCopyable or contains an IClipboardCopyable
 	// object.  In either case it will call the NotifyCopyFromClipboard method of the

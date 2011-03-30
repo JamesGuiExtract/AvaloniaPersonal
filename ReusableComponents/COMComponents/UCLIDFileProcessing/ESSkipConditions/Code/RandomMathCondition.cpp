@@ -69,7 +69,7 @@ STDMETHODIMP CRandomMathCondition::get_Percent(long* pnVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27231", pnVal != NULL);
+		ASSERT_ARGUMENT("ELI27231", pnVal != __nullptr);
 
 		*pnVal = m_nPercent;
 
@@ -106,7 +106,7 @@ STDMETHODIMP CRandomMathCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27235", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27235", pbValue != __nullptr);
 
 		try
 		{
@@ -134,7 +134,7 @@ STDMETHODIMP CRandomMathCondition::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		IRandomMathConditionPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI27237", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27237", ipCopyThis != __nullptr);
 		
 		// Copy the values from another object
 		m_nPercent = ipCopyThis->Percent;
@@ -158,10 +158,10 @@ STDMETHODIMP CRandomMathCondition::raw_Clone(IUnknown **pObject)
 		// Validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27239", pObject != NULL);
+		ASSERT_ARGUMENT("ELI27239", pObject != __nullptr);
 
 		ICopyableObjectPtr ipCopy(CLSID_RandomMathCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI27240", ipCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27240", ipCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipCopy->CopyFrom(ipUnk);
@@ -186,7 +186,7 @@ STDMETHODIMP CRandomMathCondition::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27242", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27242", pbValue != __nullptr);
 
 		// Configured if:
 		// 1. Percent > 0 && Percent < 100

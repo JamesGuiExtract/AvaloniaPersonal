@@ -42,7 +42,7 @@ STDMETHODIMP CStaticFileListFS::get_FileList(IVariantVector **pVal)
 		validateLicense();
 
 		IVariantVectorPtr ipFiles(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI13596", ipFiles != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13596", ipFiles != __nullptr);
 
 		for (unsigned int n = 0; n < m_vecFileList.size(); n++)
 		{
@@ -66,7 +66,7 @@ STDMETHODIMP CStaticFileListFS::put_FileList(IVariantVector *newVal)
 		validateLicense();
 
 		IVariantVectorPtr ipFiles(newVal);
-		ASSERT_ARGUMENT("ELI13598", ipFiles != NULL);
+		ASSERT_ARGUMENT("ELI13598", ipFiles != __nullptr);
 
 		m_vecFileList.clear();
 
@@ -140,7 +140,7 @@ STDMETHODIMP CStaticFileListFS::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19635", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19635", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Files from static list").Detach();
 	}
@@ -159,10 +159,10 @@ STDMETHODIMP CStaticFileListFS::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		EXTRACT_FILESUPPLIERSLib::IStaticFileListFSPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI13588", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13588", ipCopyThis != __nullptr);
 
 		IVariantVectorPtr ipList = ipCopyThis->FileList;
-		ASSERT_RESOURCE_ALLOCATION("ELI15643", ipList != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15643", ipList != __nullptr);
 		long lSize = ipList->GetSize();
 
 		_variant_t varType;
@@ -193,14 +193,14 @@ STDMETHODIMP CStaticFileListFS::raw_Clone(IUnknown **pObject)
 
 	try
 	{
-		if(pObject != NULL)
+		if(pObject != __nullptr)
 		{
 			// Validate license first
 			validateLicense();
 
 			ICopyableObjectPtr ipObjCopy;
 			ipObjCopy.CreateInstance(CLSID_StaticFileListFS);
-			ASSERT_RESOURCE_ALLOCATION("ELI13601", ipObjCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13601", ipObjCopy != __nullptr);
 
 			IUnknownPtr ipUnk = this;
 			ipObjCopy->CopyFrom(ipUnk);

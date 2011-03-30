@@ -87,7 +87,7 @@ STDMETHODIMP CFillStripesICO::raw_GetComponentDescription(BSTR * pstrComponentDe
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19048", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI19048", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Fill stripes").Detach();
 	}
@@ -118,15 +118,15 @@ STDMETHODIMP CFillStripesICO::raw_Clone(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19051", pObject != NULL);
+		ASSERT_ARGUMENT("ELI19051", pObject != __nullptr);
 
 		// create a copyable object pointer
 		ICopyableObjectPtr ipObjCopy(CLSID_FillStripesICO);
-		ASSERT_RESOURCE_ALLOCATION("ELI19052", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19052", ipObjCopy != __nullptr);
 
 		// set the IUnknownPtr to the current object
 		IUnknownPtr ipUnk = this;
-		ASSERT_RESOURCE_ALLOCATION("ELI19053", ipUnk != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19053", ipUnk != __nullptr);
 
 		// copy to the copyable object pointer
 		ipObjCopy->CopyFrom(ipUnk);
@@ -148,7 +148,7 @@ STDMETHODIMP CFillStripesICO::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19055", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19055", pbValue != __nullptr);
 
 		try
 		{
@@ -177,7 +177,7 @@ STDMETHODIMP CFillStripesICO::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19057", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI19057", pClassID != __nullptr);
 
 		*pClassID = CLSID_FillStripesICO;
 	}
@@ -199,7 +199,7 @@ STDMETHODIMP CFillStripesICO::Load(IStream * pStream)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19059", pStream != NULL);
+		ASSERT_ARGUMENT("ELI19059", pStream != __nullptr);
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -235,7 +235,7 @@ STDMETHODIMP CFillStripesICO::Save(IStream * pStream, BOOL fClearDirty)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19079", pStream != NULL);
+		ASSERT_ARGUMENT("ELI19079", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -267,7 +267,7 @@ STDMETHODIMP CFillStripesICO::GetSizeMax(_ULARGE_INTEGER * pcbSize)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19063", pcbSize != NULL);
+		ASSERT_ARGUMENT("ELI19063", pcbSize != __nullptr);
 
 		return E_NOTIMPL;
 	}
@@ -290,12 +290,12 @@ STDMETHODIMP CFillStripesICO::Perform(void* pciRepair)
 
 		// wrap the ClearImage repair pointer in smart pointer
 		ICiRepairPtr ipciRepair((ICiRepair*) pciRepair);
-		ASSERT_RESOURCE_ALLOCATION("ELI19065", ipciRepair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19065", ipciRepair != __nullptr);
 		_lastCodePos = "20";
 
 		// ensure that there is an image in the repair pointer
 		ICiImagePtr ipImage = ipciRepair->Image;
-		ASSERT_RESOURCE_ALLOCATION("ELI19066", ipImage != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19066", ipImage != __nullptr);
 		_lastCodePos = "30";
 
 		// only works for bitonal images
@@ -358,7 +358,7 @@ void CFillStripesICO::validateLicense()
 void CFillStripesICO::countBlackPixlesInColumns(vector<long>& rvecColumns, long lBytesPerLine, 
 										long lHeight, unsigned char* pImage)
 {
-	ASSERT_ARGUMENT("ELI19069", pImage != NULL);
+	ASSERT_ARGUMENT("ELI19069", pImage != __nullptr);
 
 	// loop through each byte in a line
 	for (long lByteInRow=0; lByteInRow < lBytesPerLine; lByteInRow++)
@@ -390,7 +390,7 @@ void CFillStripesICO::countBlackPixlesInColumns(vector<long>& rvecColumns, long 
 void CFillStripesICO::fillInStripedArea(vector<long> &rvecColumns, long lBytesPerLine, 
 										long lHeight, long lWidth, unsigned char *pImage)
 {
-	ASSERT_ARGUMENT("ELI19070", pImage != NULL);
+	ASSERT_ARGUMENT("ELI19070", pImage != __nullptr);
 
 	// ignore the first and last columns on the image
 	for (long lColumn=1; lColumn < lWidth-1; lColumn++)
@@ -432,7 +432,7 @@ void CFillStripesICO::fillInStripedArea(vector<long> &rvecColumns, long lBytesPe
 bool CFillStripesICO::isLeftPixelBlack(long lRow, long lColumn, long lBytesPerLine, 
 									   unsigned char *pImage)
 {
-	ASSERT_ARGUMENT("ELI19071", pImage != NULL);
+	ASSERT_ARGUMENT("ELI19071", pImage != __nullptr);
 	ASSERT_ARGUMENT("ELI19082", lColumn != 0); // cannot be leftmost column
 
 	bool bReturn = false;
@@ -468,7 +468,7 @@ bool CFillStripesICO::isLeftPixelBlack(long lRow, long lColumn, long lBytesPerLi
 bool CFillStripesICO::isRightPixelBlack(long lRow, long lColumn, long lBytesPerLine, 
 										unsigned char *pImage)
 {
-	ASSERT_ARGUMENT("ELI19072", pImage != NULL);
+	ASSERT_ARGUMENT("ELI19072", pImage != __nullptr);
 	ASSERT_ARGUMENT("ELI19083", lColumn != ((lBytesPerLine * 8) - 1)); // cannot be rightmost column
 
 	bool bReturn = false;
@@ -504,7 +504,7 @@ bool CFillStripesICO::isRightPixelBlack(long lRow, long lColumn, long lBytesPerL
 unsigned char CFillStripesICO::getByteFromImage(long lRow, long lByteInColumn, long lBytesPerLine, 
 												unsigned char *pImage)
 {
-	ASSERT_ARGUMENT("ELI19074", pImage != NULL);
+	ASSERT_ARGUMENT("ELI19074", pImage != __nullptr);
 
 	return *(pImage + (lByteInColumn + (lRow * lBytesPerLine)));
 }
@@ -512,7 +512,7 @@ unsigned char CFillStripesICO::getByteFromImage(long lRow, long lByteInColumn, l
 unsigned char* CFillStripesICO::getPointerToByteFromImage(long lRow, long lByteInColumn, 
 													  long lBytesPerLine, unsigned char *pImage)
 {
-	ASSERT_ARGUMENT("ELI19075", pImage != NULL);
+	ASSERT_ARGUMENT("ELI19075", pImage != __nullptr);
 
 	return (pImage + (lByteInColumn + (lRow * lBytesPerLine)));
 }

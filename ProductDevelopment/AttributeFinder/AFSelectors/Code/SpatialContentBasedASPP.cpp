@@ -29,7 +29,7 @@ STDMETHODIMP CSpatialContentBasedASPP::Apply()
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFSELECTORSLib::ISpatialContentBasedASPtr ipSBAS = m_ppUnk[i];
-			if ( ipSBAS != NULL )
+			if ( ipSBAS != __nullptr )
 			{
 				if ( m_cmbContains.GetCurSel() == 0 )
 				{
@@ -122,7 +122,7 @@ LRESULT CSpatialContentBasedASPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 		validateLicense();
 
 		UCLID_AFSELECTORSLib::ISpatialContentBasedASPtr ipSBAS = m_ppUnk[0];
-		if (ipSBAS != NULL)
+		if (ipSBAS != __nullptr)
 		{
 			m_cmbContains.Attach( GetDlgItem( IDC_COMBO_CONTAINS ));
 			m_editConsecutiveRows.Attach( GetDlgItem( IDC_EDIT_PIXEL_ROWS ));

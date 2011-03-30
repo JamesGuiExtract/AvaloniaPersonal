@@ -434,7 +434,7 @@ void UCLIDExceptionDetailsDlg::loadDebugInfoInListCtrls()
 		int iDebugIndex = 0;		//reset the index for getting debug information 
 
 		_lastCodePos = "20";
-		while (puexCurr != NULL)
+		while (puexCurr != __nullptr)
 		{
 			// Add the exception pointer to the Exception map
 			m_mapItemToException[iIndex] = puexCurr;
@@ -665,7 +665,7 @@ int UCLIDExceptionDetailsDlg::getSelectedDebugParamsIndex()
 	
 	// if the pos is valid and only one item is selected get the index otherwise will
 	// return the default (-1)
-	if (pos != NULL && iSelectionCount == 1)
+	if (pos != __nullptr && iSelectionCount == 1)
 	{
 		iIndex = m_debugParamsListCtrl.GetNextSelectedItem(pos);
 	}

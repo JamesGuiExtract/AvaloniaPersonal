@@ -140,7 +140,7 @@ private:
 	// REQUIRE:	InitDialog() has already been called and the control represented by uiControlID
 	//			is one of the child controls of this property page.
 	// PROMISE:	The returned CWnd will be a pointer to the control represented by uiControlID.
-	//			If pRect != NULL, the window coordinates of the control will be returned
+	//			If pRect != __nullptr, the window coordinates of the control will be returned
 	//			via pRect.
 	CWnd* getWindowAndRectInfo(UINT uiControlID, CRect *pRect);
 	//---------------------------------------------------------------------------------------------

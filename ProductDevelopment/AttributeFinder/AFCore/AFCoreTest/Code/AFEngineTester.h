@@ -91,7 +91,7 @@ private:
 	void runTest(ETestType eTestType, const std::string& strRSDFile, 
 		const std::string& strInputFileName, const std::string& strCaseNo,
 		IIUnknownVectorPtr ipExpectedAttr, const bool bValidateOutput = false,
-		int nSubCaseNumber = 1, IVariantVectorPtr ipAttributeNames = NULL,
+		int nSubCaseNumber = 1, IVariantVectorPtr ipAttributeNames = __nullptr,
 		bool bRecurse = true, int nPagesToRecognize = -1);
 
 	//---------------------------------------------------------------------------------------------

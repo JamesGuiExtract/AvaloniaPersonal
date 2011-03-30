@@ -28,7 +28,7 @@ void FailureDetectionAndReportingMgr::notifyExceptionLogged(const UCLIDException
 	{
 		// if the Failure Detection and Reporting System (FDRS) is available, 
 		// notify it of this logged exception
-		if (getFRDSWindow() != NULL)
+		if (getFRDSWindow() != __nullptr)
 		{
 			// write the exception to a temporary file
 			string strEx = pEx->asStringizedByteStream();
@@ -70,7 +70,7 @@ void FailureDetectionAndReportingMgr::notifyExceptionDisplayed(const UCLIDExcept
 	{
 		// if the Failure Detection and Reporting System (FDRS) is available, 
 		// notify it of this logged exception
-		if (getFRDSWindow() != NULL)
+		if (getFRDSWindow() != __nullptr)
 		{
 			// write the exception to a temporary file
 			string strEx = pEx->asStringizedByteStream();
@@ -149,7 +149,7 @@ void FailureDetectionAndReportingMgr::notifyApplicationRunning()
 	{
 		// if the Failure Detection and Reporting System (FDRS) is available, 
 		// notify it of this logged exception
-		if (getFRDSWindow() != NULL)
+		if (getFRDSWindow() != __nullptr)
 		{
 			sendMessageToFDRS(gNOTIFY_APPLICATION_RUNNING_MSG, 0);
 		}
@@ -174,7 +174,7 @@ void FailureDetectionAndReportingMgr::notifyApplicationNormallyExited()
 	{
 		// if the Failure Detection and Reporting System (FDRS) is available, 
 		// notify it of this event
-		if (getFRDSWindow() != NULL)
+		if (getFRDSWindow() != __nullptr)
 		{
 			sendMessageToFDRS(gNOTIFY_APPLICATION_NORMAL_EXIT_MSG, 0);
 			stopFDRSPingThread();
@@ -200,7 +200,7 @@ void FailureDetectionAndReportingMgr::notifyApplicationAbnormallyExited()
 	{
 		// if the Failure Detection and Reporting System (FDRS) is available, 
 		// notify it of this event
-		if (getFRDSWindow() != NULL)
+		if (getFRDSWindow() != __nullptr)
 		{
 			sendMessageToFDRS(gNOTIFY_APPLICATION_ABNORMAL_EXIT_MSG, 0);
 			stopFDRSPingThread();

@@ -36,7 +36,7 @@ CValueAfterClue::CValueAfterClue()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13047", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13047", m_ipMiscUtils != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13049")
 }
@@ -45,8 +45,8 @@ CValueAfterClue::~CValueAfterClue()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
-		m_ipClues = NULL;
+		m_ipMiscUtils = __nullptr;
+		m_ipClues = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16350");
 }
@@ -86,7 +86,7 @@ STDMETHODIMP CValueAfterClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI05876", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05876", ipAttributes != __nullptr);
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 		// Get the text out from the spatial string
@@ -124,7 +124,7 @@ STDMETHODIMP CValueAfterClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus
 		}
 
 		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("ValueAfterClue");
-		ASSERT_RESOURCE_ALLOCATION("ELI13048", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13048", ipParser != __nullptr);
 
 		// find all clues in the input string
 		ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
@@ -448,7 +448,7 @@ STDMETHODIMP CValueAfterClue::raw_GetComponentDescription(BSTR * pstrComponentDe
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19585", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19585", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Value after clue rule").Detach();
 	}
@@ -499,14 +499,14 @@ STDMETHODIMP CValueAfterClue::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IValueAfterCluePtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08262", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08262", ipSource != __nullptr);
 
 		m_bCaseSensitive = (ipSource->GetIsCaseSensitive()==VARIANT_TRUE) ? true : false;
 		m_bClueAsRegExpr = (ipSource->GetClueAsRegExpr()==VARIANT_TRUE) ? true : false;
 		m_bClueToStringAsRegExpr = (ipSource->GetClueToStringAsRegExpr()==VARIANT_TRUE) ? true : false;
 		
 		ICopyableObjectPtr ipCopyObj = ipSource->GetClues();
-		ASSERT_RESOURCE_ALLOCATION("ELI08263", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08263", ipCopyObj != __nullptr);
 		m_ipClues = ipCopyObj->Clone();
 
 		m_eRefiningType = ipSource->GetRefiningType();
@@ -544,7 +544,7 @@ STDMETHODIMP CValueAfterClue::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_ValueAfterClue);
-		ASSERT_RESOURCE_ALLOCATION("ELI08350", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08350", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -647,8 +647,6 @@ STDMETHODIMP CValueAfterClue::put_Clues(IVariantVector *newVal)
 	try
 	{
 		validateLicense();
-
-		if (m_ipClues) m_ipClues = NULL;
 
 		m_ipClues = newVal;
 
@@ -950,7 +948,7 @@ STDMETHODIMP CValueAfterClue::Load(IStream *pStream)
 		m_strLimitingString = "";
 //		m_strLimitingRegExpr = "";
 		m_bClueToStringAsRegExpr = false;
-		m_ipClues = NULL;
+		m_ipClues = __nullptr;
 
 		// Local variable to replace m_strLimitingRegExpr removed for Version 3
 		string strLimitingRegExpr( "" );
@@ -1020,7 +1018,7 @@ STDMETHODIMP CValueAfterClue::Load(IStream *pStream)
 		// Read the clue list
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI09967");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI04697", "Clue list could not be read from stream!");
 		}
@@ -1082,7 +1080,7 @@ STDMETHODIMP CValueAfterClue::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the clue list to the IStream object
 		IPersistStreamPtr ipObj( m_ipClues );
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04701", 
 				"Clues collection does not support persistence!" );

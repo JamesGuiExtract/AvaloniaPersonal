@@ -18,7 +18,7 @@ CAFUtilityTester::CAFUtilityTester()
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI06979", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06979", m_ipAFUtility != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06980")
 }
@@ -57,7 +57,7 @@ STDMETHODIMP CAFUtilityTester::raw_RunAutomatedTests(IVariantVector* pParams, BS
 
 	try
 	{
-		if (m_ipResultLogger == NULL)
+		if (m_ipResultLogger == __nullptr)
 		{
 			throw UCLIDException("ELI06981", "ResultLogger must be set before running the automated test.");
 		}
@@ -121,21 +121,21 @@ void CAFUtilityTester::test1()
 		vecValues.push_back("Clip");
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI06984", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06984", ipAttributes != __nullptr);
 		IStrToObjectMapPtr ipExpectedNameToAttributesMap(CLSID_StrToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI06988", ipExpectedNameToAttributesMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06988", ipExpectedNameToAttributesMap != __nullptr);
 
 		// create attributes
 		int nNumOfAttributes = vecNames.size();
 		for (int i=0; i<nNumOfAttributes; i++)
 		{
 			IAttributePtr ipAttr(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI06985", ipAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06985", ipAttr != __nullptr);
 			
 			_bstr_t _bstrAttrName(vecNames[i].c_str());
 			ipAttr->Name = _bstrAttrName;
 			ISpatialStringPtr ipValue(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI06986", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06986", ipValue != __nullptr);
 			ipValue->CreateNonSpatialString(vecValues[i].c_str(), "");
 
 			ipAttr->Value = ipValue;
@@ -153,7 +153,7 @@ void CAFUtilityTester::test1()
 			else
 			{
 				IIUnknownVectorPtr ipAttrsWithSameName(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI06989", ipAttrsWithSameName != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06989", ipAttrsWithSameName != __nullptr);
 				ipAttrsWithSameName->PushBack(ipAttr);
 				ipExpectedNameToAttributesMap->Set(_bstrAttrName, ipAttrsWithSameName);
 			}

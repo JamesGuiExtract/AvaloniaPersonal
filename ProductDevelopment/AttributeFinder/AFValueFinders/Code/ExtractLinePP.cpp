@@ -15,7 +15,7 @@ CExtractLinePP::CExtractLinePP()
 	try
 	{
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13041", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13041", ipMiscUtils != __nullptr );
 
 		// Check licensing
 		validateLicense();

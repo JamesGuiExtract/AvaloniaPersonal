@@ -61,16 +61,16 @@ STDMETHODIMP CCOMUCLIDException::CreateWithInnerException(BSTR strELICode, BSTR 
 
 	try
 	{	
-		if (m_pException != NULL)
+		if (m_pException != __nullptr)
 		{
 			delete m_pException;
 		}
 
 		// If there is an inner exception create a new exception object with an inner exception
-		if (pInnerException != NULL)
+		if (pInnerException != __nullptr)
 		{
 			// Convert the inner exception and make sure the memory gets released.
-			auto_ptr<UCLIDException> apueInner(createUCLIDException(pInnerException));
+			unique_ptr<UCLIDException> apueInner(createUCLIDException(pInnerException));
 
 			// Create a new exception object with the inner exception
 			m_pException = new UCLIDException(asString(strELICode), asString(strText), *apueInner);
@@ -106,7 +106,7 @@ STDMETHODIMP CCOMUCLIDException::GetStackTraceEntry(long nIndex, BSTR *pstrStack
 
 	try
 	{	
-		ASSERT_ARGUMENT("ELI25447", pstrStackTrace != NULL);
+		ASSERT_ARGUMENT("ELI25447", pstrStackTrace != __nullptr);
 
 		// Get the stack trace from the UCLIDException object.
 		const vector<string>& rvecStackTrace = m_pException->getStackTrace();
@@ -134,7 +134,7 @@ STDMETHODIMP CCOMUCLIDException::GetStackTraceCount(long *pnIndex)
 
 	try
 	{	
-		ASSERT_RESOURCE_ALLOCATION("ELI21263", pnIndex != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI21263", pnIndex != __nullptr);
 
 		// Set to the size of the StackTrace vector
 		*pnIndex = m_pException->getStackTrace().size();
@@ -150,8 +150,8 @@ STDMETHODIMP CCOMUCLIDException::GetDebugInfo(long nIndex, BSTR* pbstrKeyName, B
 
 	try
 	{	
-		ASSERT_ARGUMENT("ELI21286", pbstrKeyName != NULL);
-		ASSERT_ARGUMENT("ELI21287", pbstrStringizedValue != NULL);
+		ASSERT_ARGUMENT("ELI21286", pbstrKeyName != __nullptr);
+		ASSERT_ARGUMENT("ELI21287", pbstrStringizedValue != __nullptr);
 
 		// Get the debug info from the UCLIDException object.
 		const vector<NamedValueTypePair>& rvecDebugInfo = m_pException->getDebugVector();
@@ -180,7 +180,7 @@ STDMETHODIMP CCOMUCLIDException::GetDebugInfoCount(long *pnIndex)
 
 	try
 	{	
-		ASSERT_RESOURCE_ALLOCATION("ELI21281", pnIndex != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI21281", pnIndex != __nullptr);
 
 		// Set to the size of the debug vector
 		*pnIndex = m_pException->getDebugVector().size();
@@ -196,16 +196,16 @@ STDMETHODIMP CCOMUCLIDException::GetInnerException(ICOMUCLIDException **ppInnerE
 
 	try
 	{	
-		ASSERT_ARGUMENT("ELI21339", ppInnerException != NULL);
+		ASSERT_ARGUMENT("ELI21339", ppInnerException != __nullptr);
 
 		// Get the inner exception from the exception object
 		const UCLIDException *exInner = m_pException->getInnerException();
 
 		// If it is not null, convert to UCLID COM Exception.
-		if (exInner != NULL)
+		if (exInner != __nullptr)
 		{
 			UCLID_EXCEPTIONMGMTLib::ICOMUCLIDExceptionPtr ipCOMUCLIDException(CLSID_COMUCLIDException);
-			ASSERT_RESOURCE_ALLOCATION("ELI21240", ipCOMUCLIDException != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI21240", ipCOMUCLIDException != __nullptr);
 			ipCOMUCLIDException->CreateFromString("ELI21241", exInner->asStringizedByteStream().c_str());
 		
 			*ppInnerException = (ICOMUCLIDException *)ipCOMUCLIDException.Detach();
@@ -230,7 +230,7 @@ STDMETHODIMP CCOMUCLIDException::Display()
 		// Display the exception
 		UCLIDExceptionDlg dlg(CWnd::GetActiveWindow());
 
-		if ( m_pException != NULL )
+		if ( m_pException != __nullptr )
 		{		
 			m_pException->log();
 			dlg.display(*m_pException);
@@ -295,7 +295,7 @@ STDMETHODIMP CCOMUCLIDException::AsStringizedByteStream(BSTR *pbstrData)
 	
 	try
 	{
-		ASSERT_ARGUMENT("ELI25446", pbstrData != NULL);
+		ASSERT_ARGUMENT("ELI25446", pbstrData != __nullptr);
 
 		_bstr_t bstrData = m_pException->asStringizedByteStream().c_str();
 		*pbstrData = bstrData.Detach();
@@ -311,7 +311,7 @@ STDMETHODIMP CCOMUCLIDException::GetTopELICode(BSTR *pbstrCode)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25448", pbstrCode != NULL);
+		ASSERT_ARGUMENT("ELI25448", pbstrCode != __nullptr);
 
 		// Retrieve top ELI code from UCLID Exception member
 		_bstr_t bstrCode = m_pException->getTopELI().c_str();
@@ -328,7 +328,7 @@ STDMETHODIMP CCOMUCLIDException::GetTopText(BSTR *pbstrText)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25449", pbstrText != NULL);
+		ASSERT_ARGUMENT("ELI25449", pbstrText != __nullptr);
 
 		// Retrieve top text from UCLID Exception member
 		_bstr_t bstrText = m_pException->getTopText().c_str();
@@ -372,10 +372,10 @@ STDMETHODIMP CCOMUCLIDException::SaveTo(BSTR strFullFileName, VARIANT_BOOL bAppe
 UCLIDException *CCOMUCLIDException::createUCLIDException(
 	UCLID_EXCEPTIONMGMTLib::ICOMUCLIDExceptionPtr ipException)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI21236", ipException != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI21236", ipException != __nullptr);
 	
 	// Allocate memory and use auto pointer to cleanup if exception is thrown.
-	auto_ptr<UCLIDException> apException;
+	unique_ptr<UCLIDException> apException;
 
 	// Get the eli code of the exception to convert.
 	string strELI = asString(ipException->GetTopELICode());
@@ -387,9 +387,9 @@ UCLIDException *CCOMUCLIDException::createUCLIDException(
 	UCLID_EXCEPTIONMGMTLib::ICOMUCLIDExceptionPtr ipInner = ipException->GetInnerException();
 
 	// if there is an inner exception, convert the inner exception returned to UCLIDException.
-	if (ipInner != NULL)
+	if (ipInner != __nullptr)
 	{
-		auto_ptr<UCLIDException> apueInner(createUCLIDException(ipInner));
+		unique_ptr<UCLIDException> apueInner(createUCLIDException(ipInner));
 		
 		// Create new UCLIDException with inner exception.
 		apException.reset(new UCLIDException(strELI, strDescription, *apueInner));

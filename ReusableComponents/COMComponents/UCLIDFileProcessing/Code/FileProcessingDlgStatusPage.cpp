@@ -323,7 +323,7 @@ void FileProcessingDlgStatusPage::onStatusChange(long nFileId, ERecordStatus eOl
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::setRecordManager(FPRecordManager* pRecordMgr)
 {
-	ASSERT_ARGUMENT("ELI10174", pRecordMgr != NULL);
+	ASSERT_ARGUMENT("ELI10174", pRecordMgr != __nullptr);
 	m_pRecordMgr = pRecordMgr;
 }
 
@@ -464,10 +464,10 @@ void FileProcessingDlgStatusPage::OnBtnClickedProgressDetails()
 	try
 	{
 		// If the progress details dialog has not yet been created, create the object
-		if (m_ipProgressStatusDialog == NULL)
+		if (m_ipProgressStatusDialog == __nullptr)
 		{
 			m_ipProgressStatusDialog.CreateInstance(gzPROGRESS_STATUS_DIALOG_PROG_ID);
-			ASSERT_RESOURCE_ALLOCATION("ELI16257", m_ipProgressStatusDialog != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16257", m_ipProgressStatusDialog != __nullptr);
 		}
 
 		// Show the progress details as a modeless dialog
@@ -650,7 +650,7 @@ void FileProcessingDlgStatusPage::OnItemchangedFailedFilesList(NMHDR* pNMHDR, LR
 	{
 		// Enable the exception details button only if a row is selected in
 		// the failed files list
-		BOOL bEnable = asMFCBool(m_failedFilesList.GetFirstSelectedItemPosition() != NULL);
+		BOOL bEnable = asMFCBool(m_failedFilesList.GetFirstSelectedItemPosition() != __nullptr);
 		getWindowAndRectInfo(IDC_BUTTON_EXCEPTION_DETAILS, NULL)->EnableWindow(bEnable);
 		
 		*pResult = 0;
@@ -705,7 +705,7 @@ void FileProcessingDlgStatusPage::updateProgressDetailsDlg()
 {
 	// There's nothing to do if the progress details dialog is not
 	// being displayed
-	if (m_ipProgressStatusDialog == NULL)
+	if (m_ipProgressStatusDialog == __nullptr)
 	{
 		return;
 	}
@@ -759,7 +759,7 @@ void FileProcessingDlgStatusPage::updateProgressDetailsDlg()
 	// Determine the top level progress status object that should be 
 	// displayed in the detailed progress status window, and the window title
 	// for the detailed progress status window.
-	IProgressStatusPtr ipProgressStatus = NULL;
+	IProgressStatusPtr ipProgressStatus = __nullptr;
 	string strTitle;
 	if (nFileID != -1)
 	{
@@ -788,7 +788,7 @@ CWnd* FileProcessingDlgStatusPage::getWindowAndRectInfo(UINT uiControlID, CRect 
 {
 	// Get the window associated with the specified control
 	CWnd *pwndControl = GetDlgItem(uiControlID);
-	ASSERT_RESOURCE_ALLOCATION("ELI16571", pwndControl != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16571", pwndControl != __nullptr);
 
 	// If the caller wanted the window coordinates of the control, get that information
 	if (pRect)
@@ -806,7 +806,7 @@ void FileProcessingDlgStatusPage::repositionDetailsButton(UINT uiButtonID, UINT 
 	// Get the current coordinates of the button
 	CRect rectDetailsButton;
 	CWnd *pwndDetailsButton = GetDlgItem(uiButtonID);
-	ASSERT_RESOURCE_ALLOCATION("ELI16607", pwndDetailsButton != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16607", pwndDetailsButton != __nullptr);
 	pwndDetailsButton->GetWindowRect(&rectDetailsButton);
 
 	// Get the position of the list control
@@ -816,7 +816,7 @@ void FileProcessingDlgStatusPage::repositionDetailsButton(UINT uiButtonID, UINT 
 	// Get the position of the list label
 	CRect rectLabel;
 	CWnd *pwndLabel = GetDlgItem(uiLabelID);
-	ASSERT_RESOURCE_ALLOCATION("ELI16608", pwndLabel != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16608", pwndLabel != __nullptr);
 	pwndLabel->GetWindowRect(&rectLabel);
 
 	// Compute the new position of the details button

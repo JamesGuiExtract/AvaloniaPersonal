@@ -38,11 +38,11 @@ UINT ThreadFileDlg::LoadFileDlgThread(void* pData)
 	{
 		// Cast back to ThreadDataStruct pointer
 		ThreadFileDlg* pTD = (ThreadFileDlg *) pData;
-		ASSERT_ARGUMENT("ELI15482", pTD != NULL);
+		ASSERT_ARGUMENT("ELI15482", pTD != __nullptr);
 
 		// Get the file dialog pointer inside it
 		CFileDialog* pFileDlg = pTD->m_pFileDlg;
-		ASSERT_ARGUMENT("ELI15483", pFileDlg != NULL);
+		ASSERT_ARGUMENT("ELI15483", pFileDlg != __nullptr);
 
 		// Set the flag to true if OK is clicked
 		pTD->m_uiDlgResult = pFileDlg->DoModal();

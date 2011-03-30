@@ -44,15 +44,15 @@ m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
 	{
 		// create the file supplying mgmt role object
 		m_ipFSMgmtRole.CreateInstance(CLSID_FileSupplyingMgmtRole);
-		ASSERT_RESOURCE_ALLOCATION("ELI14213", m_ipFSMgmtRole != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14213", m_ipFSMgmtRole != __nullptr);
 
 		// create the file processing mgmt role object
 		m_ipFPMgmtRole.CreateInstance(CLSID_FileProcessingMgmtRole);
-		ASSERT_RESOURCE_ALLOCATION("ELI14311", m_ipFPMgmtRole != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14311", m_ipFPMgmtRole != __nullptr);
 
 		// create the FPMTagManager object
 		m_ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14398", m_ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14398", m_ipFAMTagManager != __nullptr);
 
 		// reset the state of this object
 		clear();
@@ -65,10 +65,10 @@ CFileProcessingManager::~CFileProcessingManager()
 	try
 	{
 		clear();
-		m_ipFPMDB = NULL;
-		m_ipFSMgmtRole = NULL;
-		m_ipFPMgmtRole = NULL;
-		m_ipFAMTagManager = NULL;
+		m_ipFPMDB = __nullptr;
+		m_ipFSMgmtRole = __nullptr;
+		m_ipFPMgmtRole = __nullptr;
+		m_ipFAMTagManager = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14256")
 }
@@ -105,7 +105,7 @@ STDMETHODIMP CFileProcessingManager::ShowUI(VARIANT_BOOL bRunOnInit, VARIANT_BOO
 		validateLicense();
 
 		UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFileProcMgr(this);
-		m_apDlg = auto_ptr<FileProcessingDlg>(new FileProcessingDlg(ipFileProcMgr, getFPMDB(), pFRM));
+		m_apDlg = unique_ptr<FileProcessingDlg>(new FileProcessingDlg(ipFileProcMgr, getFPMDB(), pFRM));
 
 		m_apDlg->setRecordManager(&m_recordMgr);
 
@@ -278,12 +278,12 @@ UINT CFileProcessingManager::handleStopRequestAsynchronously(void *pData)
 		{
 
 			CFileProcessingManager *pFPM = static_cast<CFileProcessingManager *>(pData);
-			ASSERT_ARGUMENT("ELI13900", pFPM != NULL);
+			ASSERT_ARGUMENT("ELI13900", pFPM != __nullptr);
 
 			// notify all file suppliers to stop supplying
 			UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipSupplyingActionMgmtRole =
 				pFPM->getActionMgmtRole(pFPM->m_ipFSMgmtRole);
-			ASSERT_RESOURCE_ALLOCATION("ELI14273", ipSupplyingActionMgmtRole != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14273", ipSupplyingActionMgmtRole != __nullptr);
 			if (ipSupplyingActionMgmtRole->Enabled == VARIANT_TRUE)
 			{
 				ipSupplyingActionMgmtRole->Stop();
@@ -292,7 +292,7 @@ UINT CFileProcessingManager::handleStopRequestAsynchronously(void *pData)
 			// notify all file processors to stop processing
 			UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipProcessingActionMgmtRole =
 				pFPM->getActionMgmtRole(pFPM->m_ipFPMgmtRole);
-			ASSERT_RESOURCE_ALLOCATION("ELI14312", ipProcessingActionMgmtRole != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14312", ipProcessingActionMgmtRole != __nullptr);
 			if (ipProcessingActionMgmtRole->Enabled == VARIANT_TRUE)
 			{
 				ipProcessingActionMgmtRole->Stop();
@@ -364,7 +364,7 @@ STDMETHODIMP CFileProcessingManager::LoadFrom(BSTR strFullFileName, VARIANT_BOOL
 
 		// Read the object from the file
 		IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
-		ASSERT_RESOURCE_ALLOCATION("ELI17794", ipPersistStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17794", ipPersistStream != __nullptr);
 		_bstr_t _bstrStreamName = get_bstr_t(gstrSTREAM_NAME);
 		readObjectFromFile(ipPersistStream, strFullFileName, _bstrStreamName);
 
@@ -421,7 +421,7 @@ STDMETHODIMP CFileProcessingManager::get_FPSFileName(BSTR *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17264", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17264", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_strFPSFileName.c_str()).Detach();
 	}
@@ -532,7 +532,7 @@ STDMETHODIMP CFileProcessingManager::PauseProcessing()
 		{
 			ProcessingThreadData *pData = *iter;
 			CWinThread* pThread = pData->m_pThread;
-			ASSERT_RESOURCE_ALLOCATION("ELI25248", pThread != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25248", pThread != __nullptr);
 			pThread->SuspendThread();
 		}
 
@@ -565,7 +565,7 @@ STDMETHODIMP CFileProcessingManager::get_ProcessingStarted(/*[out, retval]*/ VAR
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28476", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI28476", pbValue != __nullptr);
 	
 		*pbValue = asVariantBool(m_bProcessing || m_bSupplying);
 
@@ -613,7 +613,7 @@ STDMETHODIMP CFileProcessingManager::get_ActionName(BSTR *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17265", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17265", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_strAction.c_str()).copy();
 	}
@@ -742,7 +742,7 @@ STDMETHODIMP CFileProcessingManager::get_FileSupplyingMgmtRole(IFileSupplyingMgm
 		validateLicense();
 
 		CComQIPtr<IFileSupplyingMgmtRole> ipFSMgmtRole = m_ipFSMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION("ELI14266", ipFSMgmtRole != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14266", ipFSMgmtRole != __nullptr);
 
 		*pVal = ipFSMgmtRole.Detach();
 	}
@@ -761,7 +761,7 @@ STDMETHODIMP CFileProcessingManager::get_FileProcessingMgmtRole(IFileProcessingM
 		validateLicense();
 
 		CComQIPtr<IFileProcessingMgmtRole> ipFPMgmtRole = m_ipFPMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION("ELI14313", ipFPMgmtRole != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14313", ipFPMgmtRole != __nullptr);
 
 		*pVal = ipFPMgmtRole.Detach();
 	}
@@ -777,7 +777,7 @@ STDMETHODIMP CFileProcessingManager::GetActionIDFromName(BSTR bstrActionName, lo
 	try
 	{
 		// Make sure the pVal is not NULL
-		ASSERT_ARGUMENT("ELI18574", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18574", pVal != __nullptr);
 
 		// Check licensing
 		validateLicense();
@@ -809,7 +809,7 @@ STDMETHODIMP CFileProcessingManager::get_DatabaseServer(/*[out, retval]*/ BSTR *
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI17483", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17483", pVal != __nullptr);
 
 		*pVal = getFPMDB()->DatabaseServer.Detach();
 	}
@@ -851,7 +851,7 @@ STDMETHODIMP CFileProcessingManager::get_DatabaseName(/*[out, retval]*/ BSTR *pV
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI17480", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17480", pVal != __nullptr);
 
 		*pVal = getFPMDB()->DatabaseName.Detach();
 	}
@@ -896,28 +896,28 @@ STDMETHODIMP CFileProcessingManager::GetCounts(long *plNumFilesProcessedSuccessf
 
 	try
 	{
-		if (plNumFilesProcessedSuccessfully != NULL)
+		if (plNumFilesProcessedSuccessfully != __nullptr)
 		{
 			*plNumFilesProcessedSuccessfully = m_recordMgr.getNumberOfFilesProcessedSuccessfully();
 		}
-		if (plNumProcessingErrors != NULL)
+		if (plNumProcessingErrors != __nullptr)
 		{
 			*plNumProcessingErrors = m_recordMgr.getNumberOfFilesFailed();
 		}
 
 		// Check if there is a supplying manager
-		if (m_ipFSMgmtRole != NULL)
+		if (m_ipFSMgmtRole != __nullptr)
 		{
 			m_ipFSMgmtRole->GetSupplyingCounts(plNumFilesSupplied, plNumSupplyingErrors);
 		}
 		else
 		{
 			// No supplying manager so set supplying values to 0
-			if (plNumFilesSupplied != NULL)
+			if (plNumFilesSupplied != __nullptr)
 			{
 				plNumFilesSupplied = 0;
 			}
-			if (plNumSupplyingErrors != NULL)
+			if (plNumSupplyingErrors != __nullptr)
 			{
 				plNumSupplyingErrors = 0;
 			}
@@ -934,7 +934,7 @@ STDMETHODIMP CFileProcessingManager::get_IsDBPasswordRequired(VARIANT_BOOL* pvbI
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28473", pvbIsDBPasswordRequired != NULL);
+		ASSERT_ARGUMENT("ELI28473", pvbIsDBPasswordRequired != __nullptr);
 
 		*pvbIsDBPasswordRequired = asVariantBool(isDBPasswordRequired());
 
@@ -951,7 +951,7 @@ STDMETHODIMP CFileProcessingManager::GetExpandedActionName(BSTR *pbstrAction)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29117", pbstrAction != NULL);
+		ASSERT_ARGUMENT("ELI29117", pbstrAction != __nullptr);
 
 		*pbstrAction = _bstr_t(getExpandedActionName().c_str()).Detach();
 
@@ -984,7 +984,7 @@ STDMETHODIMP CFileProcessingManager::get_IsUserAuthenticationRequired(
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29190", pvbAuthenticationRequired != NULL);
+		ASSERT_ARGUMENT("ELI29190", pvbAuthenticationRequired != __nullptr);
 
 		// Set the return value
 		*pvbAuthenticationRequired = asVariantBool(isUserAuthenticationRequired());
@@ -1032,7 +1032,7 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				// Validate that the action name exists in the database (auto-create if that setting is set)
 				getFPMDB()->AutoCreateAction(bstrActionName);
 
-				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord = NULL;
+				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord = __nullptr;
 				if (bQueue)
 				{
 					// If queueing, attempt to add the file to the database.
@@ -1052,7 +1052,7 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 
 				if (bProcess)
 				{
-					if (ipFileRecord == NULL)
+					if (ipFileRecord == __nullptr)
 					{
 						UCLIDException ue("ELI29544", "The file cannot be processed because it has not "
 							"been queued!");
@@ -1096,7 +1096,7 @@ STDMETHODIMP CFileProcessingManager::AuthenticateForProcessing(VARIANT_BOOL* pvb
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29564", pvbAuthenticated != NULL);
+		ASSERT_ARGUMENT("ELI29564", pvbAuthenticated != __nullptr);
 
 		*pvbAuthenticated = asVariantBool(authenticateForProcessing());
 
@@ -1163,7 +1163,7 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCompleted(void)
 		logStatusInfo(eStatus);
 
 		// Only post a message to the dialog if it exists
-		if (m_apDlg.get() != NULL)
+		if (m_apDlg.get() != __nullptr)
 		{
 			::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
 		}
@@ -1185,7 +1185,7 @@ STDMETHODIMP CFileProcessingManager::NotifySupplyingCompleted(void)
 		logStatusInfo(eStatus);
 
 		// Only post a message to the dialog if it exists
-		if (m_apDlg.get() != NULL)
+		if (m_apDlg.get() != __nullptr)
 		{
 			::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_COMPLETE, 0, 0);
 		}
@@ -1205,7 +1205,7 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCancelling()
 	StopProcessing();
 
 	// Only post a message to the dialog if it exists
-	if (m_apDlg.get() != NULL)
+	if (m_apDlg.get() != __nullptr)
 	{
 		::PostMessage(m_apDlg->m_hWnd, FP_PROCESSING_CANCELLING, 0, 0);
 	}
@@ -1255,11 +1255,11 @@ void CFileProcessingManager::validateLicense()
 UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingManager::getFPMDB()
 {
 	// Create FAM Database object if needed
-	if ( m_ipFPMDB == NULL )
+	if ( m_ipFPMDB == __nullptr )
 	{
 		// Create the FPM Database object
 		m_ipFPMDB.CreateInstance(CLSID_FileProcessingDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI13982", m_ipFPMDB != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13982", m_ipFPMDB != __nullptr );
 
 		// Tell the Record Manager about the database
 		m_recordMgr.setFPMDB(m_ipFPMDB);
@@ -1270,7 +1270,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingManager::getFPMDB()
 UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr CFileProcessingManager::getActionMgmtRole(IUnknownPtr ipUnknown)
 {
 	UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipMgmtRole = ipUnknown;
-	ASSERT_RESOURCE_ALLOCATION("ELI14202", ipMgmtRole != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14202", ipMgmtRole != __nullptr);
 	return ipMgmtRole;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1293,7 +1293,7 @@ void CFileProcessingManager::clear()
 
 		// clear the file processing role
 		// it doesn't need to be an error if NULL
-		if ( m_ipFPMgmtRole != NULL )
+		if ( m_ipFPMgmtRole != __nullptr )
 		{
 			getActionMgmtRole(m_ipFPMgmtRole)->Clear();
 		}
@@ -1303,7 +1303,7 @@ void CFileProcessingManager::clear()
 
 		// clear the file supplying role
 		// it doesn't need to be an error if NULL
-		if ( m_ipFSMgmtRole != NULL )
+		if ( m_ipFSMgmtRole != __nullptr )
 		{
 			getActionMgmtRole(m_ipFSMgmtRole)->Clear();
 		}
@@ -1341,7 +1341,7 @@ IIUnknownVectorPtr CFileProcessingManager::getFileProcessorsData()
 {
 	// get the file supplying mgmt role
 	IIUnknownVectorPtr ipFileProcessorsData = m_ipFPMgmtRole->FileProcessors;
-	ASSERT_RESOURCE_ALLOCATION("ELI14346", ipFileProcessorsData != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14346", ipFileProcessorsData != __nullptr);
 
 	return ipFileProcessorsData;
 }
@@ -1350,7 +1350,7 @@ IIUnknownVectorPtr CFileProcessingManager::getFileSuppliersData()
 {
 	// get the file supplying mgmt role
 	IIUnknownVectorPtr ipFileSuppliersData = m_ipFSMgmtRole->FileSuppliers;
-	ASSERT_RESOURCE_ALLOCATION("ELI19430", ipFileSuppliersData != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19430", ipFileSuppliersData != __nullptr);
 
 	return ipFileSuppliersData;
 }
@@ -1499,7 +1499,7 @@ bool CFileProcessingManager::authenticateForProcessing()
 UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr CFileProcessingManager::getThisAsCOMPtr()
 {
 	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI17033", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI17033", ipThis != __nullptr);
 	return ipThis;
 }
 //-------------------------------------------------------------------------------------------------

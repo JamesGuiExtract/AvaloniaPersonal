@@ -15,12 +15,12 @@ ProcessInformationWrapper::~ProcessInformationWrapper()
 	try
 	{
 		// Close the handles
-		if (pi.hThread != NULL)
+		if (pi.hThread != __nullptr)
 		{
 			CloseHandle( pi.hThread );
 		}
 
-		if (pi.hProcess != NULL)
+		if (pi.hProcess != __nullptr)
 		{
 			CloseHandle( pi.hProcess );
 		}

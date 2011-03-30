@@ -33,7 +33,7 @@ CAFEngineFileProcessor::CAFEngineFileProcessor()
 	clear();
 
 	m_ipRuleSet.m_obj.CreateInstance( CLSID_RuleSet );
-	ASSERT_RESOURCE_ALLOCATION( "ELI11558", m_ipRuleSet.m_obj != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI11558", m_ipRuleSet.m_obj != __nullptr );
 }
 //-------------------------------------------------------------------------------------------------
 CAFEngineFileProcessor::~CAFEngineFileProcessor()
@@ -41,9 +41,9 @@ CAFEngineFileProcessor::~CAFEngineFileProcessor()
 	try
 	{
 		// Release COM objects
-		m_ipOCRUtils = NULL;
-		m_ipOCREngine = NULL;
-		m_ipAFEngine = NULL;
+		m_ipOCRUtils = __nullptr;
+		m_ipOCREngine = __nullptr;
+		m_ipAFEngine = __nullptr;
 
 		// Clear the rule set cache (releases the internal COM object)
 		m_ipRuleSet.Clear();
@@ -103,8 +103,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 		validateLicense();
 
 		IFAMTagManagerPtr ipTagManager(pTagManager);
-		ASSERT_ARGUMENT("ELI26658", ipTagManager != NULL);
-		ASSERT_ARGUMENT("ELI17935", pResult != NULL);
+		ASSERT_ARGUMENT("ELI26658", ipTagManager != __nullptr);
+		ASSERT_ARGUMENT("ELI17935", pResult != __nullptr);
 		
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31334", ipFileRecord != __nullptr);
@@ -127,7 +127,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 		// Create a new AFDoc pointer
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI19455", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19455", ipAFDoc != __nullptr);
 
 		// If reading the USS file from disk, check for USS file
 		// default the need to OCR to true
@@ -141,7 +141,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 			if (!strSpatialStringFile.empty() && isValidFile(strSpatialStringFile))
 			{
 				ISpatialStringPtr ipText = ipAFDoc->Text;
-				ASSERT_RESOURCE_ALLOCATION("ELI28088", ipText != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI28088", ipText != __nullptr);
 
 				// Load the spatial string from the file
 				ipText->LoadFrom(strSpatialStringFile.c_str(), VARIANT_FALSE);
@@ -163,7 +163,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 		// Since this object at runtime may only execute one sub task or more than one
 		// sub task, determine which progress status object should be passed to the sub tasks
-		IProgressStatusPtr ipProgressStatusToUseForSubTasks = NULL;
+		IProgressStatusPtr ipProgressStatusToUseForSubTasks = __nullptr;
 		if (ipProgressStatus)
 		{
 			if (nTOTAL_PROGRESS_ITEMS > 1)
@@ -237,7 +237,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 			if (m_bUseCleanedImage || m_eOCRPagesType == kNoOCR)
 			{
 				ISpatialStringPtr ipText = ipAFDoc->Text;
-				ASSERT_RESOURCE_ALLOCATION("ELI28151", ipText != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI28151", ipText != __nullptr);
 
 				ipText->SourceDocName = strInputFile.c_str();
 			}
@@ -246,7 +246,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, l
 			{
 				// Output the spatial string to a USS file
 				ISpatialStringPtr ipText = ipAFDoc->Text;
-				ASSERT_RESOURCE_ALLOCATION("ELI15524", ipText != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15524", ipText != __nullptr);
 				ipText->SaveTo(get_bstr_t(strInputFile + ".uss"), VARIANT_TRUE, VARIANT_TRUE);
 			}
 		}
@@ -490,7 +490,7 @@ STDMETHODIMP CAFEngineFileProcessor::get_UseCleanedImage(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28070", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28070", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bUseCleanedImage);
 
@@ -532,7 +532,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_GetComponentDescription(BSTR * pstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19540", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI19540", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Core: Execute rules").Detach();
 	}
@@ -554,7 +554,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI10991", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10991", ipSource != __nullptr);
 
 		m_strRuleFileNameForFileProcessing = ipSource->RuleSetFileName;
 		m_bReadUSSFileIfExist = ipSource->ReadUSSFile == VARIANT_TRUE;
@@ -582,7 +582,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_Clone(IUnknown* *pObject)
 
 		// create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_AFEngineFileProcessor);
-		ASSERT_RESOURCE_ALLOCATION("ELI10993", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10993", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk(this);
 		ipObjCopy->CopyFrom(ipUnk);
@@ -812,14 +812,14 @@ IRuleSetPtr CAFEngineFileProcessor::getRuleSet(const string& strRulesFile)
 //-------------------------------------------------------------------------------------------------
 IOCREnginePtr CAFEngineFileProcessor::getOCREngine()
 {
-	if (m_ipOCREngine == NULL)
+	if (m_ipOCREngine == __nullptr)
 	{
 		m_ipOCREngine.CreateInstance( CLSID_ScansoftOCR );
-		ASSERT_RESOURCE_ALLOCATION( "ELI19134", m_ipOCREngine != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI19134", m_ipOCREngine != __nullptr );
 		
 		_bstr_t _bstrPrivateLicenseCode = get_bstr_t(LICENSE_MGMT_PASSWORD.c_str());
 		IPrivateLicensedComponentPtr ipScansoftEngine(m_ipOCREngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI20468", ipScansoftEngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20468", ipScansoftEngine != __nullptr);
 		ipScansoftEngine->InitPrivateLicense( _bstrPrivateLicenseCode );
 	}
 
@@ -828,10 +828,10 @@ IOCREnginePtr CAFEngineFileProcessor::getOCREngine()
 //-------------------------------------------------------------------------------------------------
 IOCRUtilsPtr CAFEngineFileProcessor::getOCRUtils()
 {
-	if (m_ipOCRUtils == NULL)
+	if (m_ipOCRUtils == __nullptr)
 	{
 		m_ipOCRUtils.CreateInstance(CLSID_OCRUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI19135", m_ipOCRUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19135", m_ipOCRUtils != __nullptr);
 	}
 
 	return m_ipOCRUtils;
@@ -839,10 +839,10 @@ IOCRUtilsPtr CAFEngineFileProcessor::getOCRUtils()
 //-------------------------------------------------------------------------------------------------
 IAttributeFinderEnginePtr CAFEngineFileProcessor::getAFEngine()
 {
-	if (m_ipAFEngine == NULL)
+	if (m_ipAFEngine == __nullptr)
 	{
 		m_ipAFEngine.CreateInstance(CLSID_AttributeFinderEngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI11112", m_ipAFEngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11112", m_ipAFEngine != __nullptr);
 	}
 	return m_ipAFEngine;
 }

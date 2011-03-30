@@ -61,11 +61,11 @@ m_bInitialized(false)
 	try
 	{
 		// Make sure there is a FAMDB object
-		ASSERT_ARGUMENT("ELI17610", m_ipFAMDB != NULL);
+		ASSERT_ARGUMENT("ELI17610", m_ipFAMDB != __nullptr);
 
 		m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_FAMDBADMIN);
 
-		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new FileProcessingConfigMgr());
+		ma_pCfgMgr = unique_ptr<FileProcessingConfigMgr>(new FileProcessingConfigMgr());
 
 		// Set the Database Page notify to this object ( so the status can be updated )
 		m_propDatabasePage.setNotifyDBConfigChanged(this);
@@ -80,9 +80,9 @@ CFAMDBAdminDlg::~CFAMDBAdminDlg()
 {
 	try
 	{
-		m_ipFAMDB = NULL;
-		m_ipMiscUtils = NULL;
-		m_ipCategoryManager = NULL;
+		m_ipFAMDB = __nullptr;
+		m_ipMiscUtils = __nullptr;
+		m_ipCategoryManager = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18124")
 }
@@ -408,10 +408,10 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 			// Initialize the progress status.
 			m_ipSchemaUpdateProgressStatusDialog.CreateInstance(
 				"Extract.Utilties.Forms.ProgressStatusDialog");
-			ASSERT_RESOURCE_ALLOCATION("ELI31385", m_ipSchemaUpdateProgressStatusDialog != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI31385", m_ipSchemaUpdateProgressStatusDialog != __nullptr);
 
 			m_ipSchemaUpdateProgressStatus.CreateInstance(CLSID_ProgressStatus);
-			ASSERT_RESOURCE_ALLOCATION("ELI31386", m_ipSchemaUpdateProgressStatus != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI31386", m_ipSchemaUpdateProgressStatus != __nullptr);
 
 			m_ipSchemaUpdateProgressStatusDialog->Initialize(get_bstr_t("Schema Update"),
 				m_ipSchemaUpdateProgressStatus, 2, 100, VARIANT_FALSE, NULL);
@@ -443,16 +443,16 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 		}
 		CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31388");
 
-		if (m_ipSchemaUpdateProgressStatusDialog != NULL)
+		if (m_ipSchemaUpdateProgressStatusDialog != __nullptr)
 		{
 			m_ipSchemaUpdateProgressStatusDialog.Release();
-			m_ipSchemaUpdateProgressStatusDialog = NULL;
+			m_ipSchemaUpdateProgressStatusDialog = __nullptr;
 		}
 
-		if (m_ipSchemaUpdateProgressStatus != NULL)
+		if (m_ipSchemaUpdateProgressStatus != __nullptr)
 		{
 			m_ipSchemaUpdateProgressStatus.Release();
-			m_ipSchemaUpdateProgressStatus = NULL;
+			m_ipSchemaUpdateProgressStatus = __nullptr;
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31521");
@@ -727,7 +727,7 @@ void CFAMDBAdminDlg::OnToolsCheckForNewComponents()
 	{	
 		// create a vector of all categories we care about.
 		IVariantVectorPtr ipCategoryNames(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI18165", ipCategoryNames != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18165", ipCategoryNames != __nullptr);
 
 		ipCategoryNames->PushBack(get_bstr_t(FP_FILE_PROC_CATEGORYNAME.c_str()));
 		ipCategoryNames->PushBack(get_bstr_t(FP_FILE_SUPP_CATEGORYNAME.c_str()));
@@ -828,7 +828,7 @@ void CFAMDBAdminDlg::UpdateSummaryTab(long nActionID /*= -1*/)
 	try
 	{
 		// Update the summary tab
-		if (m_propSummaryPage.m_hWnd != NULL)
+		if (m_propSummaryPage.m_hWnd != __nullptr)
 		{
 			m_propSummaryPage.populatePage(nActionID);
 		}
@@ -898,7 +898,7 @@ void CFAMDBAdminDlg::loadMenu()
 void CFAMDBAdminDlg::enableMenus()
 {
 	CMenu *pMenu = GetMenu();
-	ASSERT_ARGUMENT("ELI18626", pMenu != NULL);
+	ASSERT_ARGUMENT("ELI18626", pMenu != __nullptr);
 
 	UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
 	UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
@@ -924,7 +924,7 @@ bool CFAMDBAdminDlg::notifyNoActions()
 {
 	// Check if there is no action inside the datebase;
 	IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
-	ASSERT_RESOURCE_ALLOCATION("ELI15255", ipMapActions != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15255", ipMapActions != __nullptr );
 
 	// If there is no action inside database
 	if (ipMapActions->GetSize() == 0)
@@ -952,7 +952,7 @@ IMiscUtilsPtr CFAMDBAdminDlg::getMiscUtils()
 	{
 		// create MiscUtils object
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI18035", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18035", m_ipMiscUtils != __nullptr);
 	}
 
 	return m_ipMiscUtils;
@@ -964,7 +964,7 @@ ICategoryManagerPtr CFAMDBAdminDlg::getCategoryManager()
 	{
 		// create category manager object
 		m_ipCategoryManager.CreateInstance(CLSID_CategoryManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI18038", m_ipCategoryManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18038", m_ipCategoryManager != __nullptr);
 	}
 
 	return m_ipCategoryManager;
@@ -978,7 +978,7 @@ ICategorizedComponentPtr CFAMDBAdminDlg::getCategorizedComponent(const std::stri
 		{
 			// instantiate the object via the ProgID value
 			ICategorizedComponentPtr ipObject(strProgID.c_str());
-			ASSERT_RESOURCE_ALLOCATION("ELI18157", ipObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18157", ipObject != __nullptr);
 
 			return ipObject;
 		}
@@ -1026,10 +1026,10 @@ UINT CFAMDBAdminDlg::upgradeToCurrentSchemaThread(LPVOID pParam)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI31384", pParam != NULL);
+		ASSERT_ARGUMENT("ELI31384", pParam != __nullptr);
 		CFAMDBAdminDlg *pFAMDBAdminDlg = (CFAMDBAdminDlg *)pParam;
 
-		ASSERT_ARGUMENT("ELI31448", pFAMDBAdminDlg->m_ipFAMDB != NULL);
+		ASSERT_ARGUMENT("ELI31448", pFAMDBAdminDlg->m_ipFAMDB != __nullptr);
 		
 		try
 		{

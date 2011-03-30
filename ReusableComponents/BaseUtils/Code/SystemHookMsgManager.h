@@ -26,7 +26,7 @@ EXPORT_BaseUtils LRESULT CALLBACK BaseUtilsDLL_CallWndProc(int nCode, WPARAM wPa
 //--------------------------------------------------------------------------------------------------
 #define DELETEHOOK_WH_CALLWNDPROC() \
 	{ \
-		if (SystemHookMsgManager::sGetInstance().hWH_CALLWNDPROC != NULL) \
+		if (SystemHookMsgManager::sGetInstance().hWH_CALLWNDPROC != __nullptr) \
 		{ \
 			UnhookWindowsHookEx(SystemHookMsgManager::sGetInstance().hWH_CALLWNDPROC); \
 			SystemHookMsgManager::sGetInstance().hWH_CALLWNDPROC = NULL; \

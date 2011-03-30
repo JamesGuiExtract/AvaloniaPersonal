@@ -332,7 +332,7 @@ void CRedactionAppearanceDlg::OnBnClickedButtonSelectFont()
 		}
 		catch (...)
 		{
-			if (pDC != NULL)
+			if (pDC != __nullptr)
 			{
 				ReleaseDC(pDC);
 			}

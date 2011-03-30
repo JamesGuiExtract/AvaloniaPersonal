@@ -29,11 +29,11 @@ CRSDFileCondition::CRSDFileCondition()
 	try
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI10918", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10918", m_ipAFUtility != __nullptr);
 
 		m_bCacheRSD = asCppBool(m_ipAFUtility->ShouldCacheRSD);
 
-		m_cachedRuleSet.m_obj = NULL;
+		m_cachedRuleSet.m_obj = __nullptr;
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI10891");
 }
@@ -133,11 +133,11 @@ STDMETHODIMP CRSDFileCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 
 		// create a copy of the document to run the rules on
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI10897", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10897", ipAFDoc != __nullptr);
 		ICopyableObjectPtr ipCopyObj = ipAFDoc;
-		ASSERT_RESOURCE_ALLOCATION("ELI10916", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10916", ipCopyObj != __nullptr);
 		IAFDocumentPtr ipDocCopy = ipCopyObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI10917", ipDocCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10917", ipDocCopy != __nullptr);
 
 		// the specified RSD file may contain tags that need to be
 		// expanded - so expand any tags therein
@@ -148,10 +148,10 @@ STDMETHODIMP CRSDFileCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 		// for instance can be caused by a RSD file using itself as the splitter
 		// ensure that the ruleset is not already executing by checking 
 		// in the Rule Execution Environment
-		if (m_ipRuleExecutionEnv == NULL)
+		if (m_ipRuleExecutionEnv == __nullptr)
 		{
 			m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
-			ASSERT_RESOURCE_ALLOCATION("ELI10242", m_ipRuleExecutionEnv != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10242", m_ipRuleExecutionEnv != __nullptr);
 		}
 
 		if (m_ipRuleExecutionEnv->IsRSDFileExecuting(strRSDFile.c_str()) ==
@@ -164,7 +164,7 @@ STDMETHODIMP CRSDFileCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 
 		// register a new rule execution session
 		IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
-		ASSERT_RESOURCE_ALLOCATION("ELI10244", ipSession != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10244", ipSession != __nullptr);
 		ipSession->SetRSDFileName(strRSDFile.c_str());
 
 		// init rule set from current rsd file, performing any auto-encrypt actions
@@ -173,17 +173,17 @@ STDMETHODIMP CRSDFileCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 		validateFileOrFolderExistence(strRSDFile);
 
 		// create the rule set if necessary
-		if(m_cachedRuleSet.m_obj == NULL)
+		if(m_cachedRuleSet.m_obj == __nullptr)
 		{
 			m_cachedRuleSet.m_obj.CreateInstance(CLSID_RuleSet);
-			ASSERT_RESOURCE_ALLOCATION("ELI10908", m_cachedRuleSet.m_obj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10908", m_cachedRuleSet.m_obj != __nullptr);
 		}
 		// reload the ruleset if necessary
 		m_cachedRuleSet.loadObjectFromFile(strRSDFile);
 
 		// pass the value into the rule set for further extraction
 		IIUnknownVectorPtr ipAttributes 
-			= m_cachedRuleSet.m_obj->ExecuteRulesOnText(ipDocCopy, NULL, NULL);
+			= m_cachedRuleSet.m_obj->ExecuteRulesOnText(ipDocCopy, __nullptr, __nullptr);
 
 		// Clear the cache if necessary
 		if (!m_bCacheRSD)
@@ -211,7 +211,7 @@ STDMETHODIMP CRSDFileCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		if (pbValue == NULL)
+		if (pbValue == __nullptr)
 		{
 			return E_POINTER;
 		}
@@ -240,7 +240,7 @@ STDMETHODIMP CRSDFileCondition::raw_IsConfigured(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		if (pbValue == NULL)
+		if (pbValue == __nullptr)
 		{
 			return E_POINTER;
 		}
@@ -269,7 +269,7 @@ STDMETHODIMP CRSDFileCondition::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19539", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19539", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("RSD file condition").Detach();
 	}
@@ -288,7 +288,7 @@ STDMETHODIMP CRSDFileCondition::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_AFCONDITIONSLib::IRSDFileConditionPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION( "ELI10901", ipSource != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10901", ipSource != __nullptr );
 		
 		string strNewVal = ipSource->RSDFileName;
 		if (strNewVal != m_strRSDFileName)
@@ -314,7 +314,7 @@ STDMETHODIMP CRSDFileCondition::raw_Clone(IUnknown **pObject)
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_RSDFileCondition );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10902", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10902", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom( ipUnk );
@@ -365,9 +365,9 @@ STDMETHODIMP CRSDFileCondition::Load(IStream *pStream)
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
-		pStream->Read(&nDataLength, sizeof(nDataLength), NULL);
+		pStream->Read(&nDataLength, sizeof(nDataLength), __nullptr);
 		ByteStream data(nDataLength);
-		pStream->Read(data.getData(), nDataLength, NULL);
+		pStream->Read(data.getData(), nDataLength, __nullptr);
 		ByteStreamManipulator dataReader(ByteStreamManipulator::kRead, data);
 
 		// Read the individual data items from the bytestream
@@ -414,8 +414,8 @@ STDMETHODIMP CRSDFileCondition::Save(IStream *pStream, BOOL fClearDirty)
 	
 		// Write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
-		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
-		pStream->Write( data.getData(), nDataLength, NULL );
+		pStream->Write( &nDataLength, sizeof(nDataLength), __nullptr );
+		pStream->Write( data.getData(), nDataLength, __nullptr );
 
 		// Clear the flag as specified
 		if (fClearDirty)

@@ -366,11 +366,11 @@ BOOL CSRIRImageViewerApp::InitInstance()
 			// These must be called in order
 			// create the spot recognition window
 			ISpotRecognitionWindowPtr m_ipSRIR(CLSID_SpotRecognitionWindow);
-			ASSERT_RESOURCE_ALLOCATION("ELI06300", m_ipSRIR != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06300", m_ipSRIR != __nullptr);
 
 			// Cast the SRIR to an InputReceiver
 			IInputReceiverPtr m_ipInputReceiver = m_ipSRIR;
-			ASSERT_RESOURCE_ALLOCATION("ELI06301", m_ipSRIR != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06301", m_ipSRIR != __nullptr);
 
 			// enable text input
 			m_ipInputReceiver->EnableInput("Text", "");
@@ -380,11 +380,11 @@ BOOL CSRIRImageViewerApp::InitInstance()
 
 			// create an instance of the OCR engine
 			IOCREnginePtr m_ipOCREngine(CLSID_ScansoftOCR);
-			ASSERT_RESOURCE_ALLOCATION("ELI06305", m_ipOCREngine != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06305", m_ipOCREngine != __nullptr);
 
 			// initialize the private license
 			IPrivateLicensedComponentPtr ipScansoftEngine = m_ipOCREngine;
-			ASSERT_RESOURCE_ALLOCATION("ELI06306", ipScansoftEngine != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06306", ipScansoftEngine != __nullptr);
 			ipScansoftEngine->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
 
 			// set the OCR engine in the SRIR
@@ -392,28 +392,28 @@ BOOL CSRIRImageViewerApp::InitInstance()
 
 			// Create input manager
 			IInputManagerSingletonPtr ipInputMgrSingleton(CLSID_InputManagerSingleton);
-			ASSERT_RESOURCE_ALLOCATION("ELI29665", ipInputMgrSingleton != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29665", ipInputMgrSingleton != __nullptr);
 			IInputManagerPtr ipInputManager = ipInputMgrSingleton->GetInstance();
-			ASSERT_RESOURCE_ALLOCATION("ELI29666", ipInputManager != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29666", ipInputManager != __nullptr);
 
 			// Create sub image handler
 			ISRWSubImageHandlerPtr ipSRWSubImageHandler(CLSID_SRWSubImageHandler);
-			ASSERT_RESOURCE_ALLOCATION("ELI29664", ipSRWSubImageHandler != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29664", ipSRWSubImageHandler != __nullptr);
 			ipSRWSubImageHandler->SetInputManager(ipInputManager);
 
 			// Set the sub image handler
 			ISubImageHandlerPtr ipSubImageHandler = ipSRWSubImageHandler;
-			ASSERT_RESOURCE_ALLOCATION("ELI29667", ipSubImageHandler != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29667", ipSubImageHandler != __nullptr);
 			m_ipSRIR->SetSubImageHandler(ipSubImageHandler, "Open subimage in new ImageViewer", "");
 
 			// Create a new SRIRImageViewer and display it
-			m_apDlg = auto_ptr<CSRIRImageViewerDlg>(new CSRIRImageViewerDlg(m_ipSRIR, bDisplaySearch));
+			m_apDlg = unique_ptr<CSRIRImageViewerDlg>(new CSRIRImageViewerDlg(m_ipSRIR, bDisplaySearch));
 			// Default to displaying text in a message box
 			m_apDlg->writeOCRTextToMessageBox();
 
 			// set this window as a paragraph text handler
 			IIUnknownVectorPtr ipvecPTHs(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI06332", ipvecPTHs != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06332", ipvecPTHs != __nullptr);
 			IParagraphTextHandlerPtr ipPTH = (IParagraphTextHandler*)m_apDlg.get();
 			ipvecPTHs->PushBack(ipPTH);
 			m_ipSRIR->SetParagraphTextHandlers(ipvecPTHs);
@@ -514,7 +514,7 @@ int CSRIRImageViewerApp::ExitInstance()
 		// created
 		if (m_bWindowCreated)
 		{
-			m_apDlg.reset(NULL);
+			m_apDlg.reset(__nullptr);
 			// These are unecessary for a reason to be determined but they do cause a beep
 	//		IInputManagerSingletonPtr ipInputMgrSingleton(CLSID_InputManagerSingleton);
 	//		ipInputMgrSingleton->DeleteInstance();
@@ -734,11 +734,11 @@ void CSRIRImageViewerApp::addToWindowHandleVector(HWND hWnd)
 //-------------------------------------------------------------------------------------------------
 BOOL CALLBACK CSRIRImageViewerApp::enumSRIRImageWindows(HWND hWnd, LPARAM lParam)
 {
-	char buf[gnMaxWindowNameSize];
+	char buf[gnMaxWindowNameSize] = {0};
 	long nRet = GetWindowText(hWnd, buf, gnMaxWindowNameSize);
 
 	// check if the title of this window matches the Spot Recognition Window's title [P16 #2930]
-	if (strstr(buf, gstrSPOT_RECOGNITION_WINDOW_TITLE.c_str()) != NULL)
+	if (strstr(buf, gstrSPOT_RECOGNITION_WINDOW_TITLE.c_str()) != __nullptr)
 	{
 		CSRIRImageViewerApp* pApp = (CSRIRImageViewerApp*)lParam;
 		pApp->addToWindowHandleVector(hWnd);

@@ -67,10 +67,10 @@ STDMETHODIMP CLimitAsLeftPart::raw_ModifyValue(IAttribute* pAttribute, IAFDocume
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09286", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09286", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->GetValue();
-		ASSERT_ARGUMENT("ELI06617", ipInputText != NULL);
+		ASSERT_ARGUMENT("ELI06617", ipInputText != __nullptr);
 
 		// Extract or Remove requires a number of characters
 		if (m_nNumOfChars > 0)
@@ -124,10 +124,10 @@ STDMETHODIMP CLimitAsLeftPart::raw_ModifyValue(IAttribute* pAttribute, IAFDocume
 			}
 
 			ISpatialStringPtr ipModifiedValue = ipInputText->GetSubString(nStart, nEnd);
-			ASSERT_RESOURCE_ALLOCATION("ELI25959", ipModifiedValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25959", ipModifiedValue != __nullptr);
 
 			ICopyableObjectPtr ipCopier = ipInputText;
-			ASSERT_RESOURCE_ALLOCATION("ELI25960", ipCopier != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25960", ipCopier != __nullptr);
 			ipCopier->CopyFrom(ipModifiedValue);
 		}
 	}
@@ -149,7 +149,7 @@ STDMETHODIMP CLimitAsLeftPart::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::ILimitAsLeftPartPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08277", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08277", ipSource != __nullptr);
 		
 		m_nNumOfChars = ipSource->GetNumberOfCharacters();
 		m_bAcceptSmallerLength = (ipSource->GetAcceptSmallerLength()==VARIANT_TRUE) ? true : false;
@@ -170,7 +170,7 @@ STDMETHODIMP CLimitAsLeftPart::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_LimitAsLeftPart);
-		ASSERT_RESOURCE_ALLOCATION("ELI08355", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08355", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -192,7 +192,7 @@ STDMETHODIMP CLimitAsLeftPart::raw_GetComponentDescription(BSTR * pstrComponentD
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19600", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19600", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Extract or remove leftmost characters").Detach();
 	}

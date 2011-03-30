@@ -161,12 +161,12 @@ private:
 	CStatusBarCtrl m_statusBar;
 
 	// an object that helps keep the database status icon updated
-	auto_ptr<DatabaseStatusIconUpdater> m_apDatabaseStatusIconUpdater;
+	unique_ptr<DatabaseStatusIconUpdater> m_apDatabaseStatusIconUpdater;
 
 	CSize m_sizeMinimumPropPage;
 	long m_nCurrentBottomOfPropPage;
 
-	auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
+	unique_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 	
 	CToolTipCtrl m_ToolTipCtrl;
 

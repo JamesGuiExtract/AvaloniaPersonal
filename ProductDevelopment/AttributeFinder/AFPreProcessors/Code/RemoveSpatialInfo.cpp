@@ -71,11 +71,11 @@ STDMETHODIMP CRemoveSpatialInfo::raw_Process(IAFDocument* pDocument, IProgressSt
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pDocument);
-		ASSERT_ARGUMENT("ELI08019", ipAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI08019", ipAFDoc != __nullptr);
 
 		// get the spatial string
 		ISpatialStringPtr ipInputText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI10041", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10041", ipInputText != __nullptr);
 
 		removeSpatialInfo(ipInputText);
 
@@ -99,13 +99,13 @@ STDMETHODIMP CRemoveSpatialInfo::raw_ProcessOutput(IIUnknownVector* pAttributes,
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI10053", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10053", ipAttributes != __nullptr);
 
 		int i;
 		for(i = 0; i < ipAttributes->Size(); i++)
 		{
 			IAttributePtr ipAttribute = ipAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI10059", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10059", ipAttribute != __nullptr);
 			removeSpatialInfo(ipAttribute);
 		}
 	}
@@ -128,7 +128,7 @@ STDMETHODIMP CRemoveSpatialInfo::raw_ModifyValue(IAttribute* pAttribute, IAFDocu
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI10055", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10055", ipAttribute != __nullptr );
 
 		removeSpatialInfo(ipAttribute);
 
@@ -240,7 +240,7 @@ STDMETHODIMP CRemoveSpatialInfo::raw_GetComponentDescription(BSTR * pstrComponen
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19560", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19560", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Remove spatial information").Detach();
 	}
@@ -302,7 +302,7 @@ STDMETHODIMP CRemoveSpatialInfo::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_RemoveSpatialInfo);
-		ASSERT_RESOURCE_ALLOCATION("ELI10049", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10049", ipObjCopy != __nullptr);
 		
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -325,7 +325,7 @@ void CRemoveSpatialInfo::validateLicense()
 //-------------------------------------------------------------------------------------------------
 void CRemoveSpatialInfo::removeSpatialInfo(ISpatialStringPtr ipSS)
 {
-	ASSERT_ARGUMENT("ELI25940", ipSS != NULL);
+	ASSERT_ARGUMENT("ELI25940", ipSS != __nullptr);
 
 	// Downgrade to non-spatial will remove all spatial info
 	ipSS->DowngradeToNonSpatialMode();
@@ -339,7 +339,7 @@ void CRemoveSpatialInfo::removeSpatialInfo(IAttributePtr ipAttribute)
 	for(i = 0; i < ipSubAttributes->Size(); i++)
 	{
 		IAttributePtr ipSubAttribute = ipSubAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI10058", ipSubAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10058", ipSubAttribute != __nullptr);
 		// recurse on sub attributes
 		removeSpatialInfo(ipSubAttribute);
 	}

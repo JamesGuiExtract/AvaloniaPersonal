@@ -25,7 +25,7 @@ DatabaseStatusIconUpdater::DatabaseStatusIconUpdater(CStatusBarCtrl& rCtrl, long
 	try
 	{
 		// verify parent window is valid
-		ASSERT_ARGUMENT("ELI15018", m_pParentWnd != NULL);
+		ASSERT_ARGUMENT("ELI15018", m_pParentWnd != __nullptr);
 
 		// create this window object
 		CRect rect(0, 0, 0, 0);
@@ -36,13 +36,13 @@ DatabaseStatusIconUpdater::DatabaseStatusIconUpdater(CStatusBarCtrl& rCtrl, long
 		// NOTE: the 4 IDI_ICON_* identifiers used below must have the exact same numeric value
 		// in the resource.h files of the UCLIDFileProcessing project as well as the FAMDBAdmin project
 		m_hConnectionEstablished = ::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_CONNECTION_ESTABLISHED));
-		ASSERT_RESOURCE_ALLOCATION("ELI14995", m_hConnectionEstablished != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14995", m_hConnectionEstablished != __nullptr);
 		m_hConnectionNotEstablished = ::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_CONNECTION_NOT_ESTABLISHED));
-		ASSERT_RESOURCE_ALLOCATION("ELI14996", m_hConnectionNotEstablished != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14996", m_hConnectionNotEstablished != __nullptr);
 		m_hConnectionBusy = ::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_CONNECTION_BUSY));
-		ASSERT_RESOURCE_ALLOCATION("ELI14997", m_hConnectionBusy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14997", m_hConnectionBusy != __nullptr);
 		m_hWaitingForLock = ::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_WAITING_FOR_LOCK));
-		ASSERT_RESOURCE_ALLOCATION("ELI14998", m_hWaitingForLock != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14998", m_hWaitingForLock != __nullptr);
 
 		// initiate the timer for the db status/access indicator
 		SetTimer(giDB_STATUS_INDICATOR_UPDATE_TIMER_ID, 

@@ -22,7 +22,7 @@ CTaskCondition::CTaskCondition() :
 	try
 	{
 		m_ipFAMTaskExecutor.CreateInstance(CLSID_FileProcessingTaskExecutor);
-		ASSERT_RESOURCE_ALLOCATION("ELI20159", m_ipFAMTaskExecutor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20159", m_ipFAMTaskExecutor != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI20160");
 }
@@ -31,8 +31,8 @@ CTaskCondition::~CTaskCondition()
 {
 	try
 	{
-		m_ipTask = NULL;
-		m_ipFAMTaskExecutor = NULL;
+		m_ipTask = __nullptr;
+		m_ipFAMTaskExecutor = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20076");
 }
@@ -55,7 +55,7 @@ STDMETHODIMP CTaskCondition::get_Task(IFileProcessingTask **ppVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20120", ppVal != NULL);
+		ASSERT_ARGUMENT("ELI20120", ppVal != __nullptr);
 
 		validateLicense();
 
@@ -73,7 +73,7 @@ STDMETHODIMP CTaskCondition::put_Task(IFileProcessingTask *pNewVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20121", pNewVal != NULL);
+		ASSERT_ARGUMENT("ELI20121", pNewVal != __nullptr);
 
 		validateLicense();
 
@@ -92,7 +92,7 @@ STDMETHODIMP CTaskCondition::get_LogExceptions(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20169", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20169", pVal != __nullptr);
 
 		validateLicense();
 
@@ -130,14 +130,14 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecor
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20082", pFAMTM != NULL);
-		ASSERT_ARGUMENT("ELI20083", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI20082", pFAMTM != __nullptr);
+		ASSERT_ARGUMENT("ELI20083", pRetVal != __nullptr);
 		ASSERT_ARGUMENT("ELI31354", pFileRecord != __nullptr);
 
 		validateLicense();
 
 		// Ensure the task to execute has been set
-		if (m_ipTask == NULL)
+		if (m_ipTask == __nullptr)
 		{
 			UCLIDException ue("ELI20157", "Task has not been configured for task condition to evaluate!");
 			throw ue;
@@ -145,10 +145,10 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecor
 
 		// Insert the task into a vector of object with description objects for processing
 		IIUnknownVectorPtr ipTasks(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI20161", ipTasks != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20161", ipTasks != __nullptr);
 
 		IObjectWithDescriptionPtr ipTaskOWD(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI20167", ipTaskOWD != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20167", ipTaskOWD != __nullptr);
 
 		ipTaskOWD->Object = m_ipTask;
 		ipTasks->PushBack(ipTaskOWD);
@@ -241,7 +241,7 @@ STDMETHODIMP CTaskCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20101", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI20101", pbValue != __nullptr);
 
 		try
 		{
@@ -270,7 +270,7 @@ STDMETHODIMP CTaskCondition::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20093", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI20093", pClassID != __nullptr);
 
 		*pClassID = CLSID_TaskCondition;
 	}
@@ -297,13 +297,13 @@ STDMETHODIMP CTaskCondition::Load(IStream *pStream)
 	try
 	{
 		IStreamPtr ipStream(pStream);
-		ASSERT_ARGUMENT("ELI20096", ipStream != NULL);
+		ASSERT_ARGUMENT("ELI20096", ipStream != __nullptr);
 
 		// Check license state
 		validateLicense();
 
 		// Reset existing members
-		m_ipTask = NULL;
+		m_ipTask = __nullptr;
 		m_bLogExceptions = true;
 		
 		// Read the bytestream data from the IStream object
@@ -352,7 +352,7 @@ STDMETHODIMP CTaskCondition::Save(IStream *pStream, BOOL fClearDirty)
 	try
 	{
 		IStreamPtr ipStream(pStream);
-		ASSERT_ARGUMENT("ELI20098", ipStream != NULL);
+		ASSERT_ARGUMENT("ELI20098", ipStream != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -377,7 +377,7 @@ STDMETHODIMP CTaskCondition::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the file processing task to the stream
 		IPersistStreamPtr ipTaskStream = m_ipTask;
-		ASSERT_RESOURCE_ALLOCATION("ELI20143", ipTaskStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20143", ipTaskStream != __nullptr);
 		writeObjectToStream(ipTaskStream, ipStream, "ELI20144", fClearDirty);
 
 		// Clear the flag as specified
@@ -407,27 +407,27 @@ STDMETHODIMP CTaskCondition::raw_CopyFrom(IUnknown *pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20090", pObject != NULL);
+		ASSERT_ARGUMENT("ELI20090", pObject != __nullptr);
 			
 		// Validate license
 		validateLicense();
 
 		EXTRACT_FAMCONDITIONSLib::ITaskConditionPtr ipCopyThis = pObject;
-		ASSERT_ARGUMENT("ELI20088", ipCopyThis != NULL);
+		ASSERT_ARGUMENT("ELI20088", ipCopyThis != __nullptr);
 
 		m_bLogExceptions = asCppBool(ipCopyThis->LogExceptions);
 
 		if (ipCopyThis->Task == NULL)
 		{
-			m_ipTask = NULL;
+			m_ipTask = __nullptr;
 		}
 		else
 		{
 			// If Task is not NULL, obtain a clone
 			ICopyableObjectPtr ipCopyableTask(ipCopyThis->Task);
-			ASSERT_RESOURCE_ALLOCATION("ELI20145", ipCopyableTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20145", ipCopyableTask != __nullptr);
 			m_ipTask = ipCopyableTask->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI20146", m_ipTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20146", m_ipTask != __nullptr);
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI20089");
@@ -441,14 +441,14 @@ STDMETHODIMP CTaskCondition::raw_Clone(IUnknown **pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20105", pObject != NULL);
+		ASSERT_ARGUMENT("ELI20105", pObject != __nullptr);
 
 		// Validate license
 		validateLicense();
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_TaskCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI20091", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20091", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -471,7 +471,7 @@ STDMETHODIMP CTaskCondition::raw_IsConfigured(VARIANT_BOOL *pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI20084", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI20084", pbValue != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -487,7 +487,7 @@ STDMETHODIMP CTaskCondition::raw_IsConfigured(VARIANT_BOOL *pbValue)
 			// If the task doesn't implement IMustBeConfiguredObject or if 
 			// IMustBeConfiguredObject::IsConfigured == VARIANT_TRUE, consider
 			// this condition configured
-			if (ipTaskConfig == NULL || ipTaskConfig->IsConfigured())
+			if (ipTaskConfig == __nullptr || ipTaskConfig->IsConfigured())
 			{
 				*pbValue = VARIANT_TRUE;
 			}
@@ -507,7 +507,7 @@ STDMETHODIMP CTaskCondition::raw_GetComponentDescription(BSTR *pbstrComponentDes
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20086", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI20086", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Task condition").Detach();
 	}

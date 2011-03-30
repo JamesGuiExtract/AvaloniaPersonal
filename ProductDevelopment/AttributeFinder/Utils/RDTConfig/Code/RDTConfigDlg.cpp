@@ -72,17 +72,17 @@ CRDTConfigDlg::CRDTConfigDlg(CWnd* pParent /*=NULL*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 	// Setup Registry persistence item
-	ma_pSettingsCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+	ma_pSettingsCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrREG_ROOT_KEY ) );
 
 	// Create the MRU List objects
-	ma_pRecentPrefixes = auto_ptr<MRUList>( new MRUList( ma_pSettingsCfgMgr.get(), 
+	ma_pRecentPrefixes = unique_ptr<MRUList>( new MRUList( ma_pSettingsCfgMgr.get(), 
 			"\\AttributeFinder\\Utils\\RDTConfig\\PrefixList", "Prefix_%d", 8 ));
 
-	ma_pRecentRootFolders = auto_ptr<MRUList>( new MRUList( ma_pSettingsCfgMgr.get(), 
+	ma_pRecentRootFolders = unique_ptr<MRUList>( new MRUList( ma_pSettingsCfgMgr.get(), 
 			"\\AttributeFinder\\Utils\\RDTConfig\\RootFolderList", "RFolder_%d", 8 ));
 
-	ma_pRecentDataFolders = auto_ptr<MRUList>( new MRUList( ma_pSettingsCfgMgr.get(), 
+	ma_pRecentDataFolders = unique_ptr<MRUList>( new MRUList( ma_pSettingsCfgMgr.get(), 
 			"\\AttributeFinder\\Utils\\RDTConfig\\DataFolderList", "DFolder_%d", 8 ));
 }
 //-------------------------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ BOOL CRDTConfigDlg::OnInitDialog()
 
 		// Constrain Root folder combo box to disallow manual editing
 		CEdit* pEdit = (CEdit*)(m_comboRoot.GetWindow( GW_CHILD ));
-		if (pEdit != NULL)
+		if (pEdit != __nullptr)
 		{
 			pEdit->EnableWindow( TRUE );
 			pEdit->SetReadOnly( TRUE );
@@ -149,7 +149,7 @@ BOOL CRDTConfigDlg::OnInitDialog()
 
 		// Constrain Data folder combo box to disallow manual editing
 		pEdit = (CEdit*)(m_comboData.GetWindow( GW_CHILD ));
-		if (pEdit != NULL)
+		if (pEdit != __nullptr)
 		{
 			pEdit->EnableWindow( TRUE );
 			pEdit->SetReadOnly( TRUE );
@@ -339,7 +339,7 @@ void CRDTConfigDlg::addDefaultItems()
 		// Create AFUtility object
 		IAFUtilityPtr	ipAFUtils;
 		ipAFUtils.CreateInstance( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07696", ipAFUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07696", ipAFUtils != __nullptr );
 
 		// Get default Component Data folder from AFUtils
 		string	strDataFolder = ipAFUtils->GetComponentDataFolder();
@@ -357,7 +357,7 @@ void CRDTConfigDlg::addDefaultItems()
 	m_comboRoot.SetCurSel( 0 );
 }
 //-------------------------------------------------------------------------------------------------
-void CRDTConfigDlg::addStringToMRUList(std::auto_ptr<MRUList> &ma_pList, 
+void CRDTConfigDlg::addStringToMRUList(std::unique_ptr<MRUList> &ma_pList, 
 									   const std::string& strNew)
 {
 	// Keep the list updated

@@ -106,7 +106,7 @@ private:
 	bool m_bBrowseEnabled;
 
 	// Registry Persistence managers
-	auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
+	unique_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 
 	////////////////////
 	// Methods

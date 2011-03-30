@@ -52,15 +52,15 @@ bool isOptionalProgressDlgLicensed()
 // CAttributeFinderEngine
 //-------------------------------------------------------------------------------------------------
 CAttributeFinderEngine::CAttributeFinderEngine()
-: m_ipOCREngine(NULL),
-  m_ipOCRUtils(NULL)
+: m_ipOCREngine(__nullptr),
+  m_ipOCRUtils(__nullptr)
 {
 	try
 	{
 		// create instance of the persistence mgr
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_REG_ROOT_FOLDER_PATH ));
-		ASSERT_RESOURCE_ALLOCATION("ELI07337", ma_pUserCfgMgr.get()!= NULL);
+		mu_pUserCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER,
+			gstrAF_REG_ROOT_FOLDER_PATH ));
+		ASSERT_RESOURCE_ALLOCATION("ELI07337", mu_pUserCfgMgr.get()!= __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13441")
 }
@@ -70,10 +70,10 @@ CAttributeFinderEngine::~CAttributeFinderEngine()
 	try
 	{
 		// Release COM objects
-		m_ipOCREngine = NULL;
-		m_ipOCRUtils = NULL;
-		m_ipInternals = NULL;
-		ma_pUserCfgMgr.reset();
+		m_ipOCREngine = __nullptr;
+		m_ipOCRUtils = __nullptr;
+		m_ipInternals = __nullptr;
+		mu_pUserCfgMgr.reset();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16300");
 }
@@ -122,14 +122,14 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		validateLicense();
 		_lastCodePos = "1";
 
-		ASSERT_ARGUMENT("ELI28077", ppAttributes != NULL);
+		ASSERT_ARGUMENT("ELI28077", ppAttributes != __nullptr);
 
 		// Convert the source document name from a BSTR to a STL string
 		string strInputFile = asString(strSrcDocFileName);
 
 		// get the document object
 		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pDoc);
-		ASSERT_ARGUMENT("ELI09173", ipAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI09173", ipAFDoc != __nullptr);
 
 		_lastCodePos = "2";
 
@@ -201,7 +201,7 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 	
 			// Get the spatial string from the document and load it from the file
 			ISpatialStringPtr ipInputText = ipAFDoc->Text;
-			ASSERT_RESOURCE_ALLOCATION("ELI07829", ipInputText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07829", ipInputText != __nullptr);
 
 			// Load the file
 			ipInputText->LoadFrom(strSrcDocFileName, VARIANT_FALSE);
@@ -233,10 +233,10 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			else
 			{
 				// Retrieve text from all pages of image, retaining spatial information
-				// pass in the SubProgressStatus, or NULL if ipProgressStatus is NULL
+				// pass in the SubProgressStatus, or __nullptr if ipProgressStatus is __nullptr
 				ipAFDoc->Text = getOCRUtils()->RecognizeTextInImageFile(strSrcDocFileName,
 					nNumOfPagesToRecognize, getOCREngine(),
-					ipProgressStatus ? ipProgressStatus->SubProgressStatus : NULL);
+					ipProgressStatus ? ipProgressStatus->SubProgressStatus : __nullptr);
 			}
 		}
 		_lastCodePos = "15";
@@ -251,7 +251,7 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 
 			// create new RuleSet object
 			ipRuleSet.CreateInstance( CLSID_RuleSet );
-			ASSERT_RESOURCE_ALLOCATION( "ELI07827", ipRuleSet != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07827", ipRuleSet != __nullptr );
 
 			// Load Rule Set from specified file
 			_bstrRSDFileName = _varRuleSet;
@@ -263,10 +263,10 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 
 			// Use the RuleSet that was passed in
 			IUnknownPtr ipUnknown = _varRuleSet;
-			ASSERT_RESOURCE_ALLOCATION( "ELI07912", ipUnknown != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07912", ipUnknown != __nullptr );
 			
 			ipRuleSet = ipUnknown;
-			ASSERT_RESOURCE_ALLOCATION( "ELI07910", ipRuleSet != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07910", ipRuleSet != __nullptr );
 		}
 		_lastCodePos = "18";
 
@@ -275,7 +275,7 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		/////////////////////////////////////
 
 		UCLID_AFCORELib::IFeedbackMgrInternalsPtr ipInternals = getInternals();
-		ASSERT_RESOURCE_ALLOCATION("ELI28078", ipInternals != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28078", ipInternals != __nullptr);
 
 		// Get RSD File from Rule Set
 		_bstr_t _bstrRSD = ipRuleSet->FileName;
@@ -292,7 +292,7 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 
 			// Retrieve existing String Tags from AFDocument
 			IStrToStrMapPtr	ipStringTags = ipAFDoc->StringTags;
-			ASSERT_RESOURCE_ALLOCATION("ELI09062", ipStringTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09062", ipStringTags != __nullptr);
 
 			// Add Rule ID tag to AFDocument
 			ipStringTags->Set(gstrRULE_EXEC_ID_TAG_NAME.c_str(), bstrID);
@@ -309,15 +309,15 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 
 		// Create a pointer to the Sub-ProgressStatus object, depending upon whether
 		// the caller requested progress information
-		IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
-			NULL : ipProgressStatus->SubProgressStatus;
+		IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+			__nullptr : ipProgressStatus->SubProgressStatus;
 		_lastCodePos = "27";
 
 		// Find the Attributes (wrap the attribute names vector in smart pointer)
 		IVariantVectorPtr ipvecAttributeNames(pvecAttributeNames);
 		IIUnknownVectorPtr ipAttributes =  findAttributesInText(ipAFDoc, ipRuleSet,
 			ipvecAttributeNames, ipSubProgressStatus);
-		ASSERT_RESOURCE_ALLOCATION("ELI28079", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28079", ipAttributes != __nullptr);
 
 		// Provide Found Data to Feedback
 		ipInternals->RecordFoundData(bstrID, ipAttributes);
@@ -348,7 +348,7 @@ STDMETHODIMP CAttributeFinderEngine::get_FeedbackManager(IFeedbackMgr **pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28080", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28080", pVal != __nullptr);
 
 		// Get the feedback manager and return it
 		UCLID_AFCORELib::IFeedbackMgrPtr ipManager = getFeedbackManager();
@@ -408,7 +408,7 @@ STDMETHODIMP CAttributeFinderEngine::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		if (pbValue == NULL)
+		if (pbValue == __nullptr)
 		{
 			return E_POINTER;
 		}
@@ -436,8 +436,8 @@ IIUnknownVectorPtr CAttributeFinderEngine::findAttributesInText(
 {
 	try
 	{
-		IIUnknownVectorPtr ipAttributes = NULL;
-		if (ipRuleSet != NULL)
+		IIUnknownVectorPtr ipAttributes = __nullptr;
+		if (ipRuleSet != __nullptr)
 		{		
 			// find all attributes' values through current rule set
 			ipAttributes = ipRuleSet->ExecuteRulesOnText(ipAFDoc, 
@@ -448,7 +448,7 @@ IIUnknownVectorPtr CAttributeFinderEngine::findAttributesInText(
 			// Just create an empty vector
 			ipAttributes.CreateInstance(CLSID_IUnknownVector);
 		}
-		ASSERT_RESOURCE_ALLOCATION("ELI28081", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28081", ipAttributes != __nullptr);
 
 		return ipAttributes;
 	}
@@ -457,10 +457,10 @@ IIUnknownVectorPtr CAttributeFinderEngine::findAttributesInText(
 //-------------------------------------------------------------------------------------------------
 IOCREnginePtr CAttributeFinderEngine::getOCREngine()
 {
-	if (m_ipOCREngine == NULL)
+	if (m_ipOCREngine == __nullptr)
 	{
 		m_ipOCREngine.CreateInstance( CLSID_ScansoftOCR );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07830", m_ipOCREngine != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07830", m_ipOCREngine != __nullptr );
 		
 		_bstr_t _bstrPrivateLicenseCode = get_bstr_t(LICENSE_MGMT_PASSWORD);
 		IPrivateLicensedComponentPtr ipScansoftEngine(m_ipOCREngine);
@@ -472,10 +472,10 @@ IOCREnginePtr CAttributeFinderEngine::getOCREngine()
 //-------------------------------------------------------------------------------------------------
 IOCRUtilsPtr CAttributeFinderEngine::getOCRUtils()
 {
-	if (m_ipOCRUtils == NULL)
+	if (m_ipOCRUtils == __nullptr)
 	{
 		m_ipOCRUtils.CreateInstance(CLSID_OCRUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI07831", m_ipOCRUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07831", m_ipOCRUtils != __nullptr);
 	}
 
 	return m_ipOCRUtils;
@@ -487,15 +487,15 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rFolder)
 	// the component data folder has been defined in the registry
 	// we should use that folder
 	// Check for key existence
-	if (!ma_pUserCfgMgr->keyExists( gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY ))
+	if (!mu_pUserCfgMgr->keyExists( gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY ))
 	{
 		// Default value for this key is an empty string
-		ma_pUserCfgMgr->createKey( gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY, 
+		mu_pUserCfgMgr->createKey( gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY, 
 			"");
 	};
 
 	// get the key value
-	rFolder = ma_pUserCfgMgr->getKeyValue( 
+	rFolder = mu_pUserCfgMgr->getKeyValue( 
 		gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY );
 	
 	// if the kay value is not empty, then it shall be assumed
@@ -535,7 +535,7 @@ UCLID_AFCORELib::IFeedbackMgrPtr CAttributeFinderEngine::getFeedbackManager()
 {
 	try
 	{
-		if (m_ipFeedbackMgr == NULL)
+		if (m_ipFeedbackMgr == __nullptr)
 		{
 			// Retrieve ProgID from Registry
 			RegistryPersistenceMgr	rpm( HKEY_LOCAL_MACHINE, 
@@ -547,7 +547,7 @@ UCLID_AFCORELib::IFeedbackMgrPtr CAttributeFinderEngine::getFeedbackManager()
 			if (strProgID.length() > 2)
 			{
 				m_ipFeedbackMgr.CreateInstance( strProgID.c_str() );
-				if (m_ipFeedbackMgr == NULL)
+				if (m_ipFeedbackMgr == __nullptr)
 				{
 					UCLIDException ue( "ELI28083", "Failed to create Feedback Manager." );
 					ue.addDebugInfo( "Prog ID", strProgID );
@@ -570,11 +570,11 @@ UCLID_AFCORELib::IFeedbackMgrInternalsPtr CAttributeFinderEngine::getInternals()
 {
 	try
 	{
-		if (m_ipInternals == NULL)
+		if (m_ipInternals == __nullptr)
 		{
 			// Get Internals interface from the feedback manager
 			m_ipInternals = getFeedbackManager();
-			ASSERT_RESOURCE_ALLOCATION( "ELI28086", m_ipInternals != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI28086", m_ipInternals != __nullptr );
 		}
 
 		return m_ipInternals;

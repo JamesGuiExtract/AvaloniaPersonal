@@ -40,7 +40,7 @@ STDMETHODIMP CRuleExecutionEnv::PushRSDFileName(BSTR strFileName, long *pnStackS
 	try
 	{
 		// validate arguments
-		ASSERT_ARGUMENT("ELI11543", pnStackSize != NULL);
+		ASSERT_ARGUMENT("ELI11543", pnStackSize != __nullptr);
 
 		// store the specified file as associated with
 		// the currently executing thread
@@ -76,7 +76,7 @@ STDMETHODIMP CRuleExecutionEnv::PopRSDFileName(long *pnStackSize)
 	try
 	{
 		// validate arguments
-		ASSERT_ARGUMENT("ELI11544", pnStackSize != NULL);
+		ASSERT_ARGUMENT("ELI11544", pnStackSize != __nullptr);
 
 		// get the stack associated with the current thread
 		stack<string>& rThisThreadRSDFileStack = getCurrentStack(true);

@@ -35,7 +35,7 @@ InteractiveTestDlg::InteractiveTestDlg(ITestResultLoggerPtr ipResultLogger,
 	m_zTestCaseID = _T("");
 	//}}AFX_DATA_INIT
 
-	ASSERT_ARGUMENT("ELI02260", pszITCFile != NULL);
+	ASSERT_ARGUMENT("ELI02260", pszITCFile != __nullptr);
 
 	// process the input file
 	processInputFile(pszITCFile);

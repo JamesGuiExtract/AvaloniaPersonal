@@ -117,11 +117,11 @@ STDMETHODIMP COCRArea::GetOptions(EFilterCharacters* peFilter, BSTR* pbstrCustom
 		validateLicense();
 
 		// ensure parameters are non-NULL
-		ASSERT_ARGUMENT("ELI18457", peFilter != NULL);
-		ASSERT_ARGUMENT("ELI18458", pbstrCustomFilterCharacters != NULL);
-		ASSERT_ARGUMENT("ELI18459", pvbDetectHandwriting != NULL);
-		ASSERT_ARGUMENT("ELI18460", pvbReturnUnrecognized != NULL);
-		ASSERT_ARGUMENT("ELI18495", pvbClearIfNoneFound != NULL);
+		ASSERT_ARGUMENT("ELI18457", peFilter != __nullptr);
+		ASSERT_ARGUMENT("ELI18458", pbstrCustomFilterCharacters != __nullptr);
+		ASSERT_ARGUMENT("ELI18459", pvbDetectHandwriting != __nullptr);
+		ASSERT_ARGUMENT("ELI18460", pvbReturnUnrecognized != __nullptr);
+		ASSERT_ARGUMENT("ELI18495", pvbClearIfNoneFound != __nullptr);
 
 		// set options
 		*peFilter = m_eFilter;
@@ -154,11 +154,11 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 
 		// get the attribute
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI18461", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18461", ipAttribute != __nullptr);
 
 		// get the attribute's spatial string value	
 		ISpatialStringPtr ipSpatialString(ipAttribute->Value);
-		ASSERT_RESOURCE_ALLOCATION("ELI18493", ipSpatialString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18493", ipSpatialString != __nullptr);
 
 		// check if this attribute is non-spatial
 		if(ipSpatialString->HasSpatialInfo() == VARIANT_FALSE)
@@ -180,15 +180,15 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 
 		// get the spatial page info map
 		ILongToObjectMapPtr ipPageInfoMap(ipSpatialString->SpatialPageInfos);
-		ASSERT_RESOURCE_ALLOCATION("ELI19866", ipPageInfoMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19866", ipPageInfoMap != __nullptr);
 
 		// get the raster zones of this attribute
 		IIUnknownVectorPtr ipZones( ipSpatialString->GetOriginalImageRasterZones() );
-		ASSERT_RESOURCE_ALLOCATION("ELI19571", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19571", ipZones != __nullptr);
 
 		// create a spatial string to hold the result
 		ISpatialStringPtr ipResult(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI19572", ipResult != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19572", ipResult != __nullptr);
 		
 		// set a flag to indicate ipResult is empty
 		bool bResultIsEmpty = true;
@@ -204,7 +204,7 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 		{
 			// get the ith raster zone
 			IRasterZonePtr ipZone = ipZones->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI19573", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19573", ipZone != __nullptr);
 
 			// Get the page number of this zone
 			long nPageNumber = ipZone->PageNumber;
@@ -214,7 +214,7 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 			{
 				mapPageBounds[nPageNumber] = ipSpatialString->GetOriginalImagePageBounds(nPageNumber);
 			}
-			ASSERT_RESOURCE_ALLOCATION("ELI30333", mapPageBounds[nPageNumber] != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30333", mapPageBounds[nPageNumber] != __nullptr);
 
 			// get the text inside this raster zone
 			ISpatialStringPtr ipZoneText = ipOCREngine->RecognizeTextInImageZone(
@@ -222,7 +222,7 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 				ipZone->GetRectangularBounds(mapPageBounds[nPageNumber]), 0, m_eFilter, 
 				m_strCustomFilterCharacters.c_str(), asVariantBool(m_bDetectHandwriting), 
 				asVariantBool(m_bReturnUnrecognized), VARIANT_TRUE, pProgressStatus);
-			ASSERT_RESOURCE_ALLOCATION("ELI19537", ipZoneText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19537", ipZoneText != __nullptr);
 	
 			// if any text was found, append it
 			if(ipZoneText->IsEmpty() == VARIANT_FALSE)
@@ -271,7 +271,7 @@ STDMETHODIMP COCRArea::raw_CopyFrom(IUnknown* pObject)
 
 		// get the OCRArea interface
 		UCLID_AFVALUEMODIFIERSLib::IOCRAreaPtr ipOCRArea(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI18464", ipOCRArea != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18464", ipOCRArea != __nullptr);
 
 		// get the options from the OCRArea object
 		EFilterCharacters eFilter; 
@@ -305,15 +305,15 @@ STDMETHODIMP COCRArea::raw_Clone(IUnknown** pObject)
 		validateLicense();
 
 		// ensure that the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI18466", pObject != NULL);
+		ASSERT_ARGUMENT("ELI18466", pObject != __nullptr);
 
 		// get the copyable object interface
 		ICopyableObjectPtr ipObjCopy(CLSID_OCRArea);
-		ASSERT_RESOURCE_ALLOCATION("ELI18467", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18467", ipObjCopy != __nullptr);
 
 		// create a shallow copy
 		IUnknownPtr ipUnknown(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI18534", ipUnknown != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18534", ipUnknown != __nullptr);
 		ipObjCopy->CopyFrom(ipUnknown);
 
 		// return the new OCRArea to the caller
@@ -352,7 +352,7 @@ STDMETHODIMP COCRArea::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI18471", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18471", pbValue != __nullptr);
 
 		try
 		{
@@ -385,7 +385,7 @@ STDMETHODIMP COCRArea::raw_IsConfigured(VARIANT_BOOL* pbValue)
 		validateLicense();
 
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI18473", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18473", pbValue != __nullptr);
 
 		// the OCRArea is configured if the custom filter option isn't set or
 		// if it is set AND the CustomCharacters are not empty.
@@ -405,7 +405,7 @@ STDMETHODIMP COCRArea::GetClassID(CLSID* pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18529", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI18529", pClassID != __nullptr);
 
 		*pClassID = CLSID_OCRArea;
 	}
@@ -442,7 +442,7 @@ STDMETHODIMP COCRArea::Load(IStream* pStream)
 		
 		// use a smart pointer for the IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI18475", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18475", ipStream != __nullptr);
 
 		// read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -506,7 +506,7 @@ STDMETHODIMP COCRArea::Save(IStream* pStream, BOOL fClearDirty)
 
 		// use a smart pointer for IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI18478", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18478", ipStream != __nullptr);
 
 		// write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
@@ -540,11 +540,11 @@ IOCREnginePtr COCRArea::getOCREngine()
 {
 	// instantiate a new OCR engine every time this function is called [P13 #2909]
 	IOCREnginePtr ipOCREngine(CLSID_ScansoftOCR);
-	ASSERT_RESOURCE_ALLOCATION("ELI18480", ipOCREngine != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18480", ipOCREngine != __nullptr);
 
 	// license the engine
 	IPrivateLicensedComponentPtr ipOCREngineLicense(ipOCREngine);
-	ASSERT_RESOURCE_ALLOCATION("ELI18481", ipOCREngineLicense != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18481", ipOCREngineLicense != __nullptr);
 	ipOCREngineLicense->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
 
 	return ipOCREngine;

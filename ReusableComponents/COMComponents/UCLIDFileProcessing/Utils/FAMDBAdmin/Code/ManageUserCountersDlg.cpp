@@ -180,7 +180,7 @@ CManageUserCountersDlg::CManageUserCountersDlg(const UCLID_FILEPROCESSINGLib::IF
 CDialog(CManageUserCountersDlg::IDD, pParent),
 m_ipFAMDB(ipFAMDB)
 {
-	ASSERT_ARGUMENT("ELI27791", ipFAMDB != NULL);
+	ASSERT_ARGUMENT("ELI27791", ipFAMDB != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CManageUserCountersDlg::~CManageUserCountersDlg()
@@ -188,7 +188,7 @@ CManageUserCountersDlg::~CManageUserCountersDlg()
 	try
 	{
 		// Ensure FamDB pointer is released
-		m_ipFAMDB = NULL;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27792");
 }
@@ -423,7 +423,7 @@ void CManageUserCountersDlg::OnBtnDelete()
 		// Build the list of tags to delete
 		vector<string> vecCountersToDelete;
 		POSITION pos = m_listCounters.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			int iIndex = m_listCounters.GetNextSelectedItem( pos );
@@ -574,7 +574,7 @@ void CManageUserCountersDlg::refreshCounterList(const string& strNameToSelect)
 		// Store the position of the first selected item
 		int nSelectedItem = 0;
 		POSITION pos = m_listCounters.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			nSelectedItem = m_listCounters.GetNextSelectedItem(pos);
 		}
@@ -585,7 +585,7 @@ void CManageUserCountersDlg::refreshCounterList(const string& strNameToSelect)
 		m_listCounters.DeleteAllItems();
 
 		IStrToStrMapPtr ipCounters = m_ipFAMDB->GetUserCounterNamesAndValues();
-		ASSERT_RESOURCE_ALLOCATION("ELI27809", ipCounters != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27809", ipCounters != __nullptr);
 
 		// Get the number of counters
 		long lSize = ipCounters->Size;

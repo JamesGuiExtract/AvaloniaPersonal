@@ -24,7 +24,7 @@ CDocTypeConditionPP::CDocTypeConditionPP()
 		m_dwHelpFileID = IDS_HELPFILEDocTypeConditionPP;
 		m_dwDocStringID = IDS_DOCSTRINGDocTypeConditionPP;
 
-		m_ipDocUtils = NULL;
+		m_ipDocUtils = __nullptr;
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI10787");
 }
@@ -43,10 +43,10 @@ STDMETHODIMP CDocTypeConditionPP::Apply(void)
 		for (unsigned int ui = 0; ui < m_nObjects; ui++)
 		{
 			UCLID_AFCONDITIONSLib::IDocTypeConditionPtr ipCondition = m_ppUnk[ui];
-			ASSERT_RESOURCE_ALLOCATION("ELI10788", ipCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10788", ipCondition != __nullptr);
 
 			IVariantVectorPtr ipVec(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI10804", ipVec != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10804", ipVec != __nullptr);
 
 			// At least 1 DocType must be specified
 			long nCount = m_listTypes.GetCount();
@@ -60,26 +60,12 @@ STDMETHODIMP CDocTypeConditionPP::Apply(void)
 			for (ui = 0; ui < (unsigned int)nCount; ui++)
 			{
 				long nLength = m_listTypes.GetTextLen(ui);
-				char *buf = new char[nLength+1];
-				ASSERT_RESOURCE_ALLOCATION("ELI12925", buf != NULL);
+				unique_ptr<char[]> pBuf(new char[nLength+1]);
+				ASSERT_RESOURCE_ALLOCATION("ELI12925", pBuf.get() != __nullptr);
 				
-				try
-				{
-					m_listTypes.GetText(ui, buf);
-					_bstr_t bstrType = buf;
-					ipVec->PushBack(bstrType);
-				}
-				catch(...)
-				{
-					delete [] buf;
-					buf = NULL;
-					throw;
-				}
-
-				if(buf != NULL)
-				{
-					delete [] buf;
-				}
+				m_listTypes.GetText(ui, pBuf.get());
+				_bstr_t bstrType(pBuf.get());
+				ipVec->PushBack(bstrType);
 			}
 
 			ipCondition->Types = ipVec;
@@ -125,7 +111,7 @@ LRESULT CDocTypeConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 	try
 	{
 		UCLID_AFCONDITIONSLib::IDocTypeConditionPtr ipCondition = m_ppUnk[0];
-		if (ipCondition != NULL)
+		if (ipCondition != __nullptr)
 		{
 			// Get controls
 			m_cmbMatch = GetDlgItem(IDC_CMB_MATCH);
@@ -145,7 +131,7 @@ LRESULT CDocTypeConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 
 			// Add any types that are already on the condition
 			IVariantVectorPtr ipTypes = ipCondition->Types;
-			if (ipTypes != NULL)
+			if (ipTypes != __nullptr)
 			{
 				int i;
 				long nNumTypes = ipTypes->Size;
@@ -199,10 +185,10 @@ LRESULT CDocTypeConditionPP::OnClickedBtnAddTypes(WORD wNotifyCode,
 	try
 	{
 		// Create a new Utils object if necessary
-		if (m_ipDocUtils == NULL)
+		if (m_ipDocUtils == __nullptr)
 		{
 			m_ipDocUtils.CreateInstance( CLSID_DocumentClassifier );
-			ASSERT_RESOURCE_ALLOCATION("ELI11927", m_ipDocUtils != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI11927", m_ipDocUtils != __nullptr);
 		}
 
 		// if the category is not set default it to the first in the industry list
@@ -210,7 +196,7 @@ LRESULT CDocTypeConditionPP::OnClickedBtnAddTypes(WORD wNotifyCode,
 		{
 			// Default it to the first industry category in the category list
 			IVariantVectorPtr ipIndustries = m_ipDocUtils->GetDocumentIndustries();
-			ASSERT_RESOURCE_ALLOCATION("ELI15716", ipIndustries != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15716", ipIndustries != __nullptr );
 
 			// Make sure there is at least one industry
 			if ( ipIndustries->Size > 0 )

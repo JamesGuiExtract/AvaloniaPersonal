@@ -254,12 +254,12 @@ library UCLID_SPOTRECOGNITIONIRLib
 		[id(41), helpstring("method EnableAutoOCR")] HRESULT EnableAutoOCR([in] VARIANT_BOOL bEnable);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return the postion of the SpotRecognitionWindow in screen coordinates
-		// REQUIRE: ppVal != NULL
+		// REQUIRE: ppVal != __nullptr
 		// PROMISE: NONE
 		[propget, id(42), helpstring("property WindowPos")] HRESULT WindowPos([out, retval] ILongRectangle **ppVal);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set the postion of the SpotRecognitionWindow in screen coordinates
-		// REQUIRE: pNewVal != NULL
+		// REQUIRE: pNewVal != __nullptr
 		// PROMISE: NONE
 		[propput, id(42), helpstring("property WindowPos")] HRESULT WindowPos([in] ILongRectangle *pNewVal);
 		//-----------------------------------------------------------------------------------------

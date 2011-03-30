@@ -48,8 +48,8 @@ CRegExprRule::~CRegExprRule()
 	try
 	{
 		// Set COM objects to NULL
-		m_ipAFUtility = NULL;
-		m_ipMiscUtils = NULL;
+		m_ipAFUtility = __nullptr;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16347");
 }
@@ -64,7 +64,7 @@ void CRegExprRule::FinalRelease()
 	try
 	{
 		// Set COM objects to NULL
-		m_ipAFUtility = NULL;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27092");
 }
@@ -258,7 +258,7 @@ STDMETHODIMP CRegExprRule::get_CreateSubAttributesFromNamedMatches(VARIANT_BOOL 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23028", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23028", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bAddCapturesAsSubAttributes);
 
@@ -445,13 +445,13 @@ STDMETHODIMP CRegExprRule::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		// validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29409", pAttributes != NULL);
+		ASSERT_ARGUMENT("ELI29409", pAttributes != __nullptr);
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI29410", ipAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI29410", ipAFDoc != __nullptr);
 
 		IIUnknownVectorPtr ipAttributes = parseText(ipAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI29408", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29408", ipAttributes != __nullptr);
 
 		// return the vector
 		*pAttributes = ipAttributes.Detach();
@@ -475,39 +475,39 @@ STDMETHODIMP CRegExprRule::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* 
 
 		// make up an AFDocument
 		IAttributePtr	ipAttr( pAttribute );
-		ASSERT_RESOURCE_ALLOCATION("ELI09302", ipAttr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09302", ipAttr != __nullptr);
 
 		ISpatialStringPtr ipAttrValue = ipAttr->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI06862", ipAttrValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06862", ipAttrValue != __nullptr);
 
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI06863", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06863", ipAFDoc != __nullptr);
 		ipAFDoc->Text = ipAttrValue;
 
 		IIUnknownVectorPtr ipAttributes = parseText(ipAFDoc);
-		if (ipAttributes != NULL && ipAttributes->Size() > 0)
+		if (ipAttributes != __nullptr && ipAttributes->Size() > 0)
 		{
 			// if more than one value is found, return the first match
 			IAttributePtr ipAttribute(ipAttributes->At(0));
-			ASSERT_RESOURCE_ALLOCATION("ELI25956", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25956", ipAttribute != __nullptr);
 
 			ISpatialStringPtr ipModifiedValue = ipAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI25957", ipModifiedValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25957", ipModifiedValue != __nullptr);
 
 			ICopyableObjectPtr ipCopier = ipAttrValue;
-			ASSERT_RESOURCE_ALLOCATION("ELI25958", ipCopier != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25958", ipCopier != __nullptr);
 			ipCopier->CopyFrom(ipModifiedValue);
 
 			// Add any new sub attributes that were added for the value
 			IIUnknownVectorPtr ipSubAttributes = ipAttr->SubAttributes;
 			IIUnknownVectorPtr ipNewSubAttributes = ipAttribute->SubAttributes;
 
-			if ( ipNewSubAttributes == NULL || ipNewSubAttributes->Size() == 0 )
+			if ( ipNewSubAttributes == __nullptr || ipNewSubAttributes->Size() == 0 )
 			{
 				// No new sub attributes so just return with the original
 				return S_OK;
 			}
-			if (ipSubAttributes == NULL || ipSubAttributes->Size() == 0)
+			if (ipSubAttributes == __nullptr || ipSubAttributes->Size() == 0)
 			{
 				// There were no sub attributes for the original attribute so set the 
 				// sub attributes to the new sub attributes.
@@ -538,7 +538,7 @@ STDMETHODIMP CRegExprRule::raw_GetComponentDescription(BSTR * pstrComponentDescr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19582", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19582", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Regular expression rule").Detach();
 	}
@@ -559,7 +559,7 @@ STDMETHODIMP CRegExprRule::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29407", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI29407", pbValue != __nullptr);
 
 		// This object is considered configured 
 		//	if m_bIsRegExpFromFile is true and m_strRegExpFileName is not empty
@@ -621,7 +621,7 @@ STDMETHODIMP CRegExprRule::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IRegExprRulePtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08256", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08256", ipSource != __nullptr);
 
 		m_bCaseSensitive = (ipSource->GetIsCaseSensitive()==VARIANT_TRUE) ? true : false;
 		m_bIsRegExpFromFile = (ipSource->GetIsRegExpFromFile()==VARIANT_TRUE) ? true : false;
@@ -645,7 +645,7 @@ STDMETHODIMP CRegExprRule::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_RegExprRule);
-		ASSERT_RESOURCE_ALLOCATION("ELI08347", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08347", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -668,10 +668,10 @@ void CRegExprRule::validateLicense()
 //-------------------------------------------------------------------------------------------------
 IAFUtilityPtr CRegExprRule::getAFUtility()
 {
-	if (m_ipAFUtility == NULL)
+	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07520", m_ipAFUtility != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07520", m_ipAFUtility != __nullptr );
 	}
 	
 	return m_ipAFUtility;
@@ -679,10 +679,10 @@ IAFUtilityPtr CRegExprRule::getAFUtility()
 //-------------------------------------------------------------------------------------------------
 IMiscUtilsPtr CRegExprRule::getMiscUtils()
 {
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI07639", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI07639", m_ipMiscUtils != __nullptr );
 	}
 
 	return m_ipMiscUtils;
@@ -738,27 +738,27 @@ std::string CRegExprRule::getRegExpFileName(IAFDocumentPtr ipAFDoc)
 //-------------------------------------------------------------------------------------------------	
 IAttributePtr CRegExprRule::createAttribute(ITokenPtr ipToken, ISpatialStringPtr ipInput)
 {
-	ASSERT_ARGUMENT("ELI22916", ipToken != NULL);
-	ASSERT_ARGUMENT("ELI22917", ipInput != NULL);
+	ASSERT_ARGUMENT("ELI22916", ipToken != __nullptr);
+	ASSERT_ARGUMENT("ELI22917", ipInput != __nullptr);
 
 	long nStart, nEnd;
 	ipToken->GetTokenInfo(&nStart, &nEnd, NULL, NULL);
 
 	// create an attribute to store the value
 	IAttributePtr ipAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI22926", ipAttribute != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22926", ipAttribute != __nullptr);
 
 	ISpatialStringPtr ipMatch;
 	if ( nStart != -1 && nEnd != -1 )
 	{
 		// create a spatial string representing the match
 		ipMatch = ipInput->GetSubString(nStart, nEnd);
-		ASSERT_RESOURCE_ALLOCATION("ELI22479", ipMatch != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22479", ipMatch != __nullptr);
 	}
 	else
 	{
 		ipMatch.CreateInstance(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI22485", ipMatch != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22485", ipMatch != __nullptr);
 		ipMatch->CreateNonSpatialString(ipToken->Value, "");
 	}
 
@@ -792,13 +792,13 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 	{
 		// Get the parser
 		IRegularExprParserPtr ipParser = getParser();
-		ASSERT_RESOURCE_ALLOCATION("ELI29403", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29403", ipParser != __nullptr);
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI04733", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI04733", ipAttributes != __nullptr);
 
 		ISpatialStringPtr ipInputText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI29406", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29406", ipInputText != __nullptr);
 
 		// Set the pattern and case values for the regular expression parser
 		ipParser->Pattern = getRegularExpr(ipAFDoc).c_str();
@@ -808,7 +808,7 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 		// matching the specified regular expression
 		IIUnknownVectorPtr ipMatches = ipParser->Find(ipInputText->String, VARIANT_FALSE, 
 			asVariantBool(m_bAddCapturesAsSubAttributes));
-		ASSERT_RESOURCE_ALLOCATION("ELI29404", ipMatches != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29404", ipMatches != __nullptr);
 
 		long nNumMatches = ipMatches->Size();
 		if (nNumMatches > 0)
@@ -825,21 +825,21 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 				{	
 					// create an attribute to store the value
 					IAttributePtr ipAttribute = createAttribute(ipToken, ipInputText);
-					ASSERT_RESOURCE_ALLOCATION("ELI06547", ipAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI06547", ipAttribute != __nullptr);
 
 					IIUnknownVectorPtr ipSubMatches = ipObjPair->Object2;
-					if ( m_bAddCapturesAsSubAttributes && ipSubMatches != NULL )
+					if ( m_bAddCapturesAsSubAttributes && ipSubMatches != __nullptr )
 					{
 						// Make any sub matches into sub attributes
 						IIUnknownVectorPtr ipSubAttributes(CLSID_IUnknownVector);
-						ASSERT_RESOURCE_ALLOCATION("ELI22476", ipSubAttributes != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI22476", ipSubAttributes != __nullptr);
 						
 						// Get number of sub matches
 						int iCount = ipSubMatches->Size();
 						for ( int s = 0; s < iCount; s++)
 						{
 							ITokenPtr ipSubToken = ipSubMatches->At(s);
-							ASSERT_RESOURCE_ALLOCATION("ELI22477", ipSubToken != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI22477", ipSubToken != __nullptr);
 							
 							// Don't create attributes if name begins with a number,
 							// an '_' [FlexIDSCore #4095]
@@ -849,7 +849,7 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 							if ( !isDigitChar(cFirstChar) && cFirstChar != '_' && !asString(ipSubToken->Value).empty() )
 							{
 								IAttributePtr ipSubAttribute = createAttribute(ipSubToken, ipInputText);
-								ASSERT_RESOURCE_ALLOCATION("ELI22478", ipSubAttribute != NULL);
+								ASSERT_RESOURCE_ALLOCATION("ELI22478", ipSubAttribute != __nullptr);
 
 								// Put the sub attribute on the list
 								ipSubAttributes->PushBack(ipSubAttribute);
@@ -877,7 +877,7 @@ IRegularExprParserPtr CRegExprRule::getParser()
 	{
 		// create the regular expression parser object
 		IRegularExprParserPtr ipParser = getMiscUtils()->GetNewRegExpParserInstance("RegExprRule");
-		ASSERT_RESOURCE_ALLOCATION("ELI04223",ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI04223",ipParser != __nullptr);
 
 		return ipParser;
 	}

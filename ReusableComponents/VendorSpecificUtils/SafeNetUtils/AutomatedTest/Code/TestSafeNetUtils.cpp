@@ -38,7 +38,7 @@ STDMETHODIMP CTestSafeNetUtils::raw_RunAutomatedTests(IVariantVector * pParams, 
 
 	try
 	{
-		if (m_ipResultLogger == NULL)
+		if (m_ipResultLogger == __nullptr)
 		{
 			throw UCLIDException("ELI11738", "Please set ResultLogger before proceeding.");
 		}
@@ -352,17 +352,17 @@ void CTestSafeNetUtils::runTestCase3()
 
 		// Begin each thread
 		tdcIncIndexing.m_pThread = AfxBeginThread(incrementThreadFunc, &tdcIncIndexing);
-		ASSERT_RESOURCE_ALLOCATION("ELI11748", tdcIncIndexing.m_pThread != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11748", tdcIncIndexing.m_pThread != __nullptr );
 		tdcDecIndexing.m_pThread = AfxBeginThread(decrementThreadFunc, &tdcDecIndexing);
-		ASSERT_RESOURCE_ALLOCATION("ELI11749", tdcDecIndexing.m_pThread != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11749", tdcDecIndexing.m_pThread != __nullptr );
 		tdcIncPagination.m_pThread = AfxBeginThread(incrementThreadFunc, &tdcIncPagination);
-		ASSERT_RESOURCE_ALLOCATION("ELI11750", tdcIncPagination.m_pThread != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11750", tdcIncPagination.m_pThread != __nullptr );
 		tdcDecPagination.m_pThread = AfxBeginThread(decrementThreadFunc, &tdcDecPagination);
-		ASSERT_RESOURCE_ALLOCATION("ELI11751", tdcDecPagination.m_pThread != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11751", tdcDecPagination.m_pThread != __nullptr );
 		tdcIncRedaction.m_pThread = AfxBeginThread(incrementThreadFunc, &tdcIncRedaction);
-		ASSERT_RESOURCE_ALLOCATION("ELI11752", tdcIncRedaction.m_pThread != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11752", tdcIncRedaction.m_pThread != __nullptr );
 		tdcDecRedaction.m_pThread = AfxBeginThread(decrementThreadFunc, &tdcDecRedaction);
-		ASSERT_RESOURCE_ALLOCATION("ELI11753", tdcDecRedaction.m_pThread != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11753", tdcDecRedaction.m_pThread != __nullptr );
 
 		// Wait for all threads to start
 		tdcIncIndexing.m_threadStartedEvent.wait();

@@ -43,7 +43,7 @@ private:
 	////////////////
 
 	// Clipboard manager to handle placing data into the clipboard
-	auto_ptr<ClipboardManager> m_apClipboardManager;
+	unique_ptr<ClipboardManager> m_apClipboardManager;
 
 	// The current license request information.
 	CLicenseRequest &m_licenseRequest;

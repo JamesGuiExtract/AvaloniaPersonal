@@ -37,7 +37,7 @@ namespace Extract
 
 						// Declare a char array to hold the converted string
 						zData = new char[length];
-						ExtractException::Assert("ELI21825", "Failed array allocation!", zData != NULL);
+						ExtractException::Assert("ELI21825", "Failed array allocation!", zData != __nullptr);
 
 						// Scope for pin_ptr
 						int result;
@@ -68,7 +68,7 @@ namespace Extract
 					finally
 					{
 						// Ensure the memory is cleaned up
-						if(zData != NULL)
+						if(zData != __nullptr)
 						{
 							delete [] zData;
 						}

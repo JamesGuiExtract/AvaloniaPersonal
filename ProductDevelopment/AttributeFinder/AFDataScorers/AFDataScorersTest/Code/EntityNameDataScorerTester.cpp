@@ -23,7 +23,7 @@ CEntityNameDataScorerTester::CEntityNameDataScorerTester()
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI09104", m_ipENDScorer != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09104", m_ipENDScorer != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09103")
 }
@@ -56,7 +56,7 @@ STDMETHODIMP CEntityNameDataScorerTester::raw_RunAutomatedTests(IVariantVector* 
 	{
 		// Check license
 		validateLicense();
-		if (m_ipResultLogger == NULL)
+		if (m_ipResultLogger == __nullptr)
 		{
 			throw UCLIDException("ELI09101", "Please set ResultLogger before proceeding.");
 		}
@@ -151,7 +151,7 @@ const std::string CEntityNameDataScorerTester::getMasterTestFileName(IVariantVec
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		// get the DAT filename
 		string strMasterDatFileName = ::getAbsoluteFileName(strTCLFile, asString(_bstr_t(ipParams->GetItem(1))), true);
@@ -387,14 +387,14 @@ void CEntityNameDataScorerTester::doSingleTest( long nExpectedScore, std::string
 	{
 		// Initialize objects
 		IDataScorerPtr ipENDS( CLSID_EntityNameDataScorer );
-		ASSERT_RESOURCE_ALLOCATION("ELI09112", ipENDS != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09112", ipENDS != __nullptr );
 
 		// Build attribute value from strAttributeValue
 		IAttributePtr ipAttr ( CLSID_Attribute );
-		ASSERT_RESOURCE_ALLOCATION("ELI09113", ipAttr != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09113", ipAttr != __nullptr );
 		
 		ISpatialStringPtr ipValue ( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION("ELI09114", ipValue != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09114", ipValue != __nullptr );
 		ipValue->CreateNonSpatialString(strAttributeValue.c_str(), "");
 
 		ipAttr->Value = ipValue;
@@ -436,11 +436,11 @@ void CEntityNameDataScorerTester::doGroupTest( long nExpectedGroupScore, vector<
 	{
 		// Initialize objects
 		IDataScorerPtr ipENDS( CLSID_EntityNameDataScorer );
-		ASSERT_RESOURCE_ALLOCATION("ELI09115", ipENDS != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09115", ipENDS != __nullptr );
 
 		// Create vector to hold attributes to test
 		IIUnknownVectorPtr ipAttributes ( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION("ELI09119", ipAttributes != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09119", ipAttributes != __nullptr );
 
 		// Declare string for individual attribute value
 		string strAttributeValue;
@@ -451,12 +451,12 @@ void CEntityNameDataScorerTester::doGroupTest( long nExpectedGroupScore, vector<
 		{
 			// Build the attribute
 			IAttributePtr ipAttr ( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION("ELI09116", ipAttr != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09116", ipAttr != __nullptr );
 		
 			strAttributeValue = vecAttrValues[i];
 
 			ISpatialStringPtr ipValue ( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION("ELI09117", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09117", ipValue != __nullptr );
 			ipValue->CreateNonSpatialString(strAttributeValue.c_str(), "");
 
 			ipAttr->Value = ipValue;

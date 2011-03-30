@@ -103,7 +103,7 @@ BOOL CRuleSetEditorApp::InitInstance()
 
 		// Create the IRuleSet object
 		IRuleSetUIPtr	ipRuleSetUI(CLSID_RuleSet);
-		ASSERT_RESOURCE_ALLOCATION( "ELI15789", ipRuleSetUI != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI15789", ipRuleSetUI != __nullptr );
 
 		// get the command line and see if there was an argument provided.
 		string strFileName = "";
@@ -119,7 +119,7 @@ BOOL CRuleSetEditorApp::InitInstance()
 		// delete the singleton input manager instance, which
 		// may be in existence
 		IInputManagerSingletonPtr ipInputMgrSingleton(CLSID_InputManagerSingleton);
-		ASSERT_RESOURCE_ALLOCATION( "ELI15790", ipInputMgrSingleton != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI15790", ipInputMgrSingleton != __nullptr );
 		ipInputMgrSingleton->DeleteInstance();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04921");

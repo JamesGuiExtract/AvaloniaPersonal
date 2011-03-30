@@ -28,7 +28,7 @@ CDataScorerBasedAS::~CDataScorerBasedAS()
 {
 	try
 	{
-		m_ipDataScorer = NULL;
+		m_ipDataScorer = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29332");
 }
@@ -85,7 +85,7 @@ STDMETHODIMP CDataScorerBasedAS::Load(IStream * pStream)
 		validateLicense();
 		
 		// Make sure there is a vaild argument
-		ASSERT_ARGUMENT("ELI29286", pStream != NULL);
+		ASSERT_ARGUMENT("ELI29286", pStream != __nullptr);
 
 		// Set the properties to default values
 		m_eFirstScoreCondition = kEQ;
@@ -132,7 +132,7 @@ STDMETHODIMP CDataScorerBasedAS::Load(IStream * pStream)
 		// read the data scorer object
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI29279");
-		ASSERT_RESOURCE_ALLOCATION("ELI29280", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29280", ipObj != __nullptr);
 		m_ipDataScorer = ipObj;
 
 		// Clear the dirty flag as we've loaded a fresh object
@@ -153,7 +153,7 @@ STDMETHODIMP CDataScorerBasedAS::Save(IStream * pStream, BOOL fClearDirty)
 		validateLicense();
 		
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29285", pStream != NULL);
+		ASSERT_ARGUMENT("ELI29285", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -176,15 +176,15 @@ STDMETHODIMP CDataScorerBasedAS::Save(IStream * pStream, BOOL fClearDirty)
 		pStream->Write( data.getData(), nDataLength, NULL );
 
 		// If the datascorer is not set need to create one
-		if (m_ipDataScorer == NULL)
+		if (m_ipDataScorer == __nullptr)
 		{
 			m_ipDataScorer.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI29284", m_ipDataScorer != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29284", m_ipDataScorer != __nullptr);
 		}
 
 		// write the data-scorer object to the stream
 		IPersistStreamPtr ipObj = m_ipDataScorer;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI29282", "Data Scorer object does not support persistence.");
 		}
@@ -222,17 +222,17 @@ STDMETHODIMP CDataScorerBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn,
 
 		// Put input vector into smart pointer and validate the arguments that are used.
 		IIUnknownVectorPtr ipIn( pAttrIn);
-		ASSERT_ARGUMENT("ELI29308", ipIn != NULL);
-		ASSERT_ARGUMENT("ELI29309", pAttrOut != NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI29333", m_ipDataScorer != NULL);
+		ASSERT_ARGUMENT("ELI29308", ipIn != __nullptr);
+		ASSERT_ARGUMENT("ELI29309", pAttrOut != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI29333", m_ipDataScorer != __nullptr);
 
 		// Create a vector for the found data
 		IIUnknownVectorPtr ipFound(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI29307", ipFound != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29307", ipFound != __nullptr);
 
 		// Create the Data score object to be used to get the score.
 		IDataScorerPtr ipDataScorer = m_ipDataScorer->Object;
-		ASSERT_RESOURCE_ALLOCATION("ELI29303", ipDataScorer != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29303", ipDataScorer != __nullptr);
 
 		// Step through the attributes
 		long lSize = ipIn->Size();
@@ -241,11 +241,11 @@ STDMETHODIMP CDataScorerBasedAS::raw_SelectAttributes(IIUnknownVector * pAttrIn,
 			// Assign the current attribute to ICopyableObject so that
 			// a clone can be made to use for the scoring 
 			ICopyableObjectPtr ipCurrentAttribute = ipIn->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI29304", ipCurrentAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29304", ipCurrentAttribute != __nullptr);
 
 			// Need to clone the attribute since data scorer can modify
 			IAttributePtr ipAttributeToScore = ipCurrentAttribute->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI29306", ipAttributeToScore != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29306", ipAttributeToScore != __nullptr);
 
 			// Get the score for the attribute
 			long nScore = ipDataScorer->GetDataScore1(ipAttributeToScore);
@@ -301,13 +301,13 @@ STDMETHODIMP CDataScorerBasedAS::raw_IsConfigured(VARIANT_BOOL * pbConfigured)
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29287", pbConfigured != NULL); 
+		ASSERT_ARGUMENT("ELI29287", pbConfigured != __nullptr); 
 
 		// Set output to default value
 		*pbConfigured = VARIANT_TRUE;
 
 		// Test that the properties are set to valid values
-		if (m_ipDataScorer == NULL || m_ipDataScorer->Object == NULL 
+		if (m_ipDataScorer == __nullptr || m_ipDataScorer->Object == NULL 
 			|| m_lFirstScoreToCompare < 0 || m_lFirstScoreToCompare > 100 
 			|| (m_bIsSecondCondition && (m_lSecondScoreToCompare < 0 
 			|| m_lSecondScoreToCompare > 100)))
@@ -329,7 +329,7 @@ STDMETHODIMP CDataScorerBasedAS::raw_GetComponentDescription(BSTR * pstrComponen
 	try
 	{
 		// Make sure the arguement is valid
-		ASSERT_ARGUMENT("ELI29251", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI29251", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Data scorer based attribute selector").Detach();
 		return S_OK;
@@ -352,7 +352,7 @@ STDMETHODIMP CDataScorerBasedAS::raw_Clone(IUnknown * * pObject)
 		// create a new instance of the DataScorerBasedAS
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_DataScorerBasedAS);
-		ASSERT_RESOURCE_ALLOCATION("ELI29253", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29253", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -375,11 +375,11 @@ STDMETHODIMP CDataScorerBasedAS::raw_CopyFrom(IUnknown * pObject)
 		validateLicense();
 
 		UCLID_AFSELECTORSLib::IDataScorerBasedASPtr ipFrom(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI29255", ipFrom != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI29255", ipFrom != __nullptr );
 		
 		// Clone the DataScorer object
 		ICopyableObjectPtr ipObjCopy = ipFrom->DataScorer;
-		ASSERT_RESOURCE_ALLOCATION("ELI29288", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29288", ipObjCopy != __nullptr);
 		m_ipDataScorer = ipObjCopy->Clone();
 
 		// Copy the properties
@@ -437,13 +437,13 @@ STDMETHODIMP CDataScorerBasedAS::get_DataScorer(IObjectWithDescription** ppVal)
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29289", ppVal != NULL);
+		ASSERT_ARGUMENT("ELI29289", ppVal != __nullptr);
 		
 		// if the DataScorer is NULL create a new ObjectWithDescription
-		if (m_ipDataScorer == NULL)
+		if (m_ipDataScorer == __nullptr)
 		{
 			m_ipDataScorer.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI29300", m_ipDataScorer != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29300", m_ipDataScorer != __nullptr);
 		}
 
 		// Return the DataScorer ObjectWithDiscription
@@ -488,7 +488,7 @@ STDMETHODIMP CDataScorerBasedAS::get_FirstScoreCondition(EConditionalOp* pVal)
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29291", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29291", pVal != __nullptr);
 
 		*pVal = m_eFirstScoreCondition;
 
@@ -526,7 +526,7 @@ STDMETHODIMP CDataScorerBasedAS::get_FirstScoreToCompare(long* pVal)
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29292", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29292", pVal != __nullptr);
 
 		*pVal = m_lFirstScoreToCompare;
 
@@ -564,7 +564,7 @@ STDMETHODIMP CDataScorerBasedAS::get_IsSecondCondition(VARIANT_BOOL* pVal)
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29293", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29293", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bIsSecondCondition);
 
@@ -602,7 +602,7 @@ STDMETHODIMP CDataScorerBasedAS::get_SecondScoreCondition(EConditionalOp* pVal)
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29294", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29294", pVal != __nullptr);
 
 		*pVal = m_eSecondScoreCondition;
 
@@ -640,7 +640,7 @@ STDMETHODIMP CDataScorerBasedAS::get_SecondScoreToCompare(long* pVal)
 		validateLicense();
 		
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29295", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29295", pVal != __nullptr);
 
 		*pVal = m_lSecondScoreToCompare;
 
@@ -678,7 +678,7 @@ STDMETHODIMP CDataScorerBasedAS::get_AndSecondCondition(VARIANT_BOOL* pVal)
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29296", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29296", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bAndConditions);
 

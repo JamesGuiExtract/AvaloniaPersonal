@@ -66,7 +66,7 @@ protected:
 
 private:
 	ITestHarnessPtr m_ipTestHarness;
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> m_apCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apCfgMgr;
 
 	CWinThread* m_pThread;
 

@@ -176,9 +176,9 @@ SupplierThreadData::SupplierThreadData(UCLID_FILEPROCESSINGLib::IFileSupplier *p
 	:m_ipFileSupplier(pFS), m_ipFileSupplierTarget(pFST),  m_ipFAMTagManager(pFAMTM)
 {
 	// verify non-NULL arguments
-	ASSERT_ARGUMENT("ELI13761", pFS != NULL);
-	ASSERT_ARGUMENT("ELI13762", pFST != NULL);
-	ASSERT_ARGUMENT("ELI14436", pFAMTM != NULL);
+	ASSERT_ARGUMENT("ELI13761", pFS != __nullptr);
+	ASSERT_ARGUMENT("ELI13762", pFST != __nullptr);
+	ASSERT_ARGUMENT("ELI14436", pFAMTM != __nullptr);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -202,7 +202,7 @@ UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void *pData)
 		{
 			// Get the File Supplier
 			UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipFS = pSupplierThreadData->m_ipFileSupplier;
-			ASSERT_RESOURCE_ALLOCATION("ELI15640", ipFS != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15640", ipFS != __nullptr );
 			ipFS->Start(pSupplierThreadData->m_ipFileSupplierTarget, 
 				pSupplierThreadData->m_ipFAMTagManager);
 		}
@@ -317,11 +317,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionI
 
 			// check pre-conditions
 			ASSERT_ARGUMENT("ELI14244", m_bEnabled == true);
-			ASSERT_ARGUMENT("ELI14245", m_ipFileSuppliers != NULL);
+			ASSERT_ARGUMENT("ELI14245", m_ipFileSuppliers != __nullptr);
 			ASSERT_ARGUMENT("ELI14246", m_ipFileSuppliers->Size() > 0);
 
 			m_ipRoleNotifyFAM = pRoleNotifyFAM;
-			ASSERT_RESOURCE_ALLOCATION("ELI14523", m_ipRoleNotifyFAM != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI14523", m_ipRoleNotifyFAM != __nullptr );
 
 			// release any memory that may have been allocated to managely previously spawned-off
 			// file supplier threads
@@ -353,24 +353,24 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionI
 			{
 				// get the nth file supplier data object
 				UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFileSupplierData = m_ipFileSuppliers->At(n);
-				ASSERT_RESOURCE_ALLOCATION("ELI13768", ipFileSupplierData != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI13768", ipFileSupplierData != __nullptr);
 
 				// get the object with description
 				IObjectWithDescriptionPtr ipFSObjWithDesc = ipFileSupplierData->FileSupplier;
-				ASSERT_RESOURCE_ALLOCATION("ELI13788", ipFSObjWithDesc != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI13788", ipFSObjWithDesc != __nullptr);
 
 				if (ipFSObjWithDesc->Enabled == VARIANT_TRUE)
 				{
 					// get the file supplier
 					UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipFileSupplier = ipFSObjWithDesc->Object;
-					ASSERT_RESOURCE_ALLOCATION("ELI13770", ipFileSupplier != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI13770", ipFileSupplier != __nullptr);
 
 					// get access to the IFileSupplierTarget interface on this object
 					UCLID_FILEPROCESSINGLib::IFileSupplierTargetPtr ipTarget = this;
 					ASSERT_RESOURCE_ALLOCATION("ELI13775", ipTarget);
 
 					// create the thread data structure
-					auto_ptr<SupplierThreadData> apThreadData(new SupplierThreadData(ipFileSupplier, ipTarget, getFAMTagManager()));
+					unique_ptr<SupplierThreadData> apThreadData(new SupplierThreadData(ipFileSupplier, ipTarget, getFAMTagManager()));
 
 					// start the file supplier thread
 					AfxBeginThread(fileSupplyingThreadProc, apThreadData.get());
@@ -385,7 +385,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionI
 					ipFileSupplierData->PutFileSupplierStatus( 
 						UCLID_FILEPROCESSINGLib::kActiveStatus );
 
-					if (m_hWndOfUI != NULL)
+					if (m_hWndOfUI != __nullptr)
 					{
 						::PostMessage( m_hWndOfUI, 
 							FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kActiveStatus, 
@@ -417,9 +417,9 @@ STDMETHODIMP CFileSupplyingMgmtRole::Stop(void)
 
 		// check pre-conditions
 		ASSERT_ARGUMENT("ELI14223", m_bEnabled == true);
-		ASSERT_ARGUMENT("ELI14224", m_ipFileSuppliers != NULL);
+		ASSERT_ARGUMENT("ELI14224", m_ipFileSuppliers != __nullptr);
 		ASSERT_ARGUMENT("ELI14247", m_ipFileSuppliers->Size() > 0);
-		ASSERT_ARGUMENT("ELI14524", m_ipRoleNotifyFAM != NULL );
+		ASSERT_ARGUMENT("ELI14524", m_ipRoleNotifyFAM != __nullptr );
 
 		// notify all file suppliers to stop supplying
 		long nNumFileSuppliers = m_ipFileSuppliers->Size();
@@ -427,11 +427,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::Stop(void)
 		{
 			// get the nth file supplier data object
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFileSupplierData = m_ipFileSuppliers->At(n);
-			ASSERT_RESOURCE_ALLOCATION("ELI13895", ipFileSupplierData != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13895", ipFileSupplierData != __nullptr);
 
 			// get the object with description
 			IObjectWithDescriptionPtr ipFSObjWithDesc = ipFileSupplierData->FileSupplier;
-			ASSERT_RESOURCE_ALLOCATION("ELI13896", ipFSObjWithDesc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13896", ipFSObjWithDesc != __nullptr);
 
 			// If the supplier is enabled and its status is not kDoneStatus
 			// (No need to update the status if one supplier is done)
@@ -440,14 +440,14 @@ STDMETHODIMP CFileSupplyingMgmtRole::Stop(void)
 			{
 				// get the file supplier
 				UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipFileSupplier = ipFSObjWithDesc->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI13897", ipFileSupplier != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI13897", ipFileSupplier != __nullptr);
 
 				ipFileSupplier->Stop();
 
 				// Update status and notify dialog
 				ipFileSupplierData->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kStoppedStatus );
 
-				if (m_hWndOfUI != NULL)
+				if (m_hWndOfUI != __nullptr)
 				{
 					::PostMessage( m_hWndOfUI, 
 						FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kStoppedStatus, 
@@ -473,7 +473,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Pause(void)
 
 		// check pre-conditions
 		ASSERT_ARGUMENT("ELI14225", m_bEnabled == true);
-		ASSERT_ARGUMENT("ELI14226", m_ipFileSuppliers != NULL);
+		ASSERT_ARGUMENT("ELI14226", m_ipFileSuppliers != __nullptr);
 		ASSERT_ARGUMENT("ELI14248", m_ipFileSuppliers->Size() > 0);
 
 		// Update status and notify dialog
@@ -482,11 +482,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::Pause(void)
 		{
 			// get the ith file supplier data object
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFileSupplierData = m_ipFileSuppliers->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI14237", ipFileSupplierData != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14237", ipFileSupplierData != __nullptr);
 
 			// get the object with description
 			IObjectWithDescriptionPtr ipFSObjWithDesc = ipFileSupplierData->FileSupplier;
-			ASSERT_RESOURCE_ALLOCATION("ELI14238", ipFSObjWithDesc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14238", ipFSObjWithDesc != __nullptr);
 
 			// If the supplier is enabled and its status is not kDoneStatus
 			// (No need to update the status if one supplier is done)
@@ -495,7 +495,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Pause(void)
 			{
 				// Retrieve this File Supplier object
 				UCLID_FILEPROCESSINGLib::IFileSupplierPtr	ipFS = ipFSObjWithDesc->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI14029", ipFS != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14029", ipFS != __nullptr);
 
 				// pause the file supplier
 				ipFS->Pause();
@@ -503,7 +503,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Pause(void)
 				// Set status to Paused
 				ipFileSupplierData->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kPausedStatus );
 
-				if (m_hWndOfUI != NULL)
+				if (m_hWndOfUI != __nullptr)
 				{
 					// Notify the dialog
 					::PostMessage( m_hWndOfUI, 
@@ -528,7 +528,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Resume(void)
 
 		// check pre-conditions
 		ASSERT_ARGUMENT("ELI14227", m_bEnabled == true);
-		ASSERT_ARGUMENT("ELI14228", m_ipFileSuppliers != NULL);
+		ASSERT_ARGUMENT("ELI14228", m_ipFileSuppliers != __nullptr);
 		ASSERT_ARGUMENT("ELI14249", m_ipFileSuppliers->Size() > 0);
 
 		// Update status and notify dialog
@@ -537,11 +537,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::Resume(void)
 		{
 			// get the ith file supplier data object
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFileSupplierData = m_ipFileSuppliers->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI14239", ipFileSupplierData != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14239", ipFileSupplierData != __nullptr);
 
 			// get the object with description
 			IObjectWithDescriptionPtr ipFSObjWithDesc = ipFileSupplierData->FileSupplier;
-			ASSERT_RESOURCE_ALLOCATION("ELI14240", ipFSObjWithDesc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14240", ipFSObjWithDesc != __nullptr);
 
 			// If the supplier is enabled and its status is not kDoneStatus
 			// (No need to update the status if one supplier is done)
@@ -550,7 +550,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Resume(void)
 			{
 				// Retrieve this File Supplier object
 				UCLID_FILEPROCESSINGLib::IFileSupplierPtr	ipFS = ipFSObjWithDesc->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI14241", ipFS != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14241", ipFS != __nullptr);
 
 				// pause the file supplier
 				ipFS->Resume();
@@ -558,7 +558,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Resume(void)
 				// Set status to Active
 				ipFileSupplierData->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kActiveStatus );
 
-				if (m_hWndOfUI != NULL)
+				if (m_hWndOfUI != __nullptr)
 				{
 					// Notify dialog of status change
 					::PostMessage( m_hWndOfUI, 
@@ -637,11 +637,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::ValidateStatus(void)
 				{
 					// get the nth file supplier data object
 					UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFileSupplierData = m_ipFileSuppliers->At(n);
-					ASSERT_RESOURCE_ALLOCATION("ELI14373", ipFileSupplierData != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI14373", ipFileSupplierData != __nullptr);
 
 					// get the object with description
 					IObjectWithDescriptionPtr ipFSObjWithDesc = ipFileSupplierData->FileSupplier;
-					ASSERT_RESOURCE_ALLOCATION("ELI14374", ipFSObjWithDesc != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI14374", ipFSObjWithDesc != __nullptr);
 
 					if (ipFSObjWithDesc->Enabled == VARIANT_TRUE)
 					{
@@ -673,10 +673,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::get_FileSuppliers(IIUnknownVector* *pVal)
 		validateLicense();
 
 		// Create collection, if needed
-		if (m_ipFileSuppliers == NULL)
+		if (m_ipFileSuppliers == __nullptr)
 		{
 			m_ipFileSuppliers.CreateInstance( CLSID_IUnknownVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI13699", m_ipFileSuppliers != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13699", m_ipFileSuppliers != __nullptr );
 		}
 
 		IIUnknownVectorPtr ipShallowCopy = m_ipFileSuppliers;
@@ -715,10 +715,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::get_FAMCondition(IObjectWithDescription* *p
 		// Check licensing
 		validateLicense();
 
-		if (m_ipFAMCondition == NULL)
+		if (m_ipFAMCondition == __nullptr)
 		{
 			m_ipFAMCondition.CreateInstance( CLSID_ObjectWithDescription );
-			ASSERT_RESOURCE_ALLOCATION( "ELI13532", m_ipFAMCondition != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13532", m_ipFAMCondition != __nullptr );
 		}
 
 		IObjectWithDescriptionPtr ipShallowCopy = m_ipFAMCondition;
@@ -767,11 +767,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::GetSupplyingCounts(long *plNumSupplied, lon
 	{
 		// Not validating license since this call is just grabbing statistics
 
-		if (plNumSupplied != NULL)
+		if (plNumSupplied != __nullptr)
 		{
 			*plNumSupplied = m_nFilesSupplied;
 		}
-		if (plNumSupplyingErrors != NULL)
+		if (plNumSupplyingErrors != __nullptr)
 		{
 			*plNumSupplyingErrors = m_nSupplyingErrors;
 		}
@@ -797,11 +797,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 
 		// Get the description that was entered in the FPM when the FileSupplier was added to the list of file suppliers
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSData = getFileSupplierData(pSupplier);
-		ASSERT_RESOURCE_ALLOCATION("ELI14006", ipFSData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14006", ipFSData != __nullptr);
 
 		// get the object with description
 		IObjectWithDescriptionPtr ipObjectWithDescription = ipFSData->FileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI14007", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14007", ipObjectWithDescription != __nullptr);
 		string strFSDescription = ipObjectWithDescription->Description;
 
 		// Get the file priority
@@ -855,11 +855,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 				m_nFilesSupplied++;
 			}
 
-			if (m_hWndOfUI != NULL)
+			if (m_hWndOfUI != __nullptr)
 			{
 				// Create and fill the FileSupplyingRecord to be passed to PostMessage
 				// Using an auto pointer in order to prevent a memory leak due to exceptions
-				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				unique_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
 				apFileSupRec->m_eFSRecordType = kFileAdded;
 				apFileSupRec->m_strFSDescription = strFSDescription;
 				apFileSupRec->m_strOriginalFileName = strFile;
@@ -895,11 +895,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRemoved(BSTR bstrFile, IFileSuppl
 		// Get the description that was entered in the FPM when the FileSupplier was 
 		// added to the list of file suppliers
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSData = getFileSupplierData(pSupplier);
-		ASSERT_RESOURCE_ALLOCATION("ELI14008", ipFSData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14008", ipFSData != __nullptr);
 
 		// get the object with description
 		IObjectWithDescriptionPtr ipObjectWithDescription = ipFSData->FileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI14009", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14009", ipObjectWithDescription != __nullptr);
 		string strFSDescription = ipObjectWithDescription->Description;
 
 		// Get the file priority
@@ -936,11 +936,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRemoved(BSTR bstrFile, IFileSuppl
 			// Remove the files from the database
 			getFPMDB()->RemoveFile(bstrSimplifiedName, m_strAction.c_str());
 		
-			if (m_hWndOfUI != NULL)
+			if (m_hWndOfUI != __nullptr)
 			{
 				// Create and fill the FileSupplyingRecord to be passed to PostMessage
 				// Using an auto pointer in order to prevent a memory leak due to exceptions
-				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				unique_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
 				apFileSupRec->m_eFSRecordType = kFileRemoved;
 				apFileSupRec->m_strFSDescription = strFSDescription;
 				apFileSupRec->m_strOriginalFileName = strFile;
@@ -976,11 +976,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 
 		// Get the description that was entered in the FPM when the FileSupplier was added to the list of file suppliers
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSData = getFileSupplierData(pSupplier);
-		ASSERT_RESOURCE_ALLOCATION("ELI14011", ipFSData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14011", ipFSData != __nullptr);
 
 		// get the object with description
 		IObjectWithDescriptionPtr ipObjectWithDescription = ipFSData->FileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI14012", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14012", ipObjectWithDescription != __nullptr);
 		string strFSDescription = ipObjectWithDescription->Description;
 
 		// Get the file priority
@@ -1044,11 +1044,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 				getFPMDB()->RemoveFile(bstrOldSimplifiedName, m_strAction.c_str());
 			}
 		
-			if (m_hWndOfUI != NULL)
+			if (m_hWndOfUI != __nullptr)
 			{
 				// Create and fill the FileSupplyingRecord to be passed to PostMessage
 				// Using an auto pointer in order to prevent a memory leak due to exceptions
-				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				unique_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
 				apFileSupRec->m_eFSRecordType = kFileRenamed;
 				apFileSupRec->m_strFSDescription = strFSDescription;
 				apFileSupRec->m_strOriginalFileName = strOldFile;
@@ -1089,11 +1089,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 
 		// Get the description that was entered in the FPM when the FileSupplier was added to the list of file suppliers
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSData = getFileSupplierData(pSupplier);
-		ASSERT_RESOURCE_ALLOCATION("ELI14014", ipFSData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14014", ipFSData != __nullptr);
 
 		// get the object with description
 		IObjectWithDescriptionPtr ipObjectWithDescription = ipFSData->FileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI14015", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14015", ipObjectWithDescription != __nullptr);
 		string strFSDescription = ipObjectWithDescription->Description;
 
 		// Get the file priority
@@ -1137,11 +1137,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 				ePriority, ipFSData->ForceProcessing, VARIANT_TRUE,
 				UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );
 		
-			if (m_hWndOfUI != NULL)
+			if (m_hWndOfUI != __nullptr)
 			{
 				// Create and fill the FileSupplyingRecord to be passed to PostMessage
 				// Using an auto pointer in order to prevent a memory leak due to exceptions
-				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				unique_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
 				apFileSupRec->m_bAlreadyExisted = (bAlreadyExists == VARIANT_TRUE);
 				apFileSupRec->m_eFSRecordType = kFileModified;
 				apFileSupRec->m_strFSDescription = strFSDescription;
@@ -1179,11 +1179,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderDeleted(BSTR bstrFolder, IFileS
 
 		// Get the description that was entered in the FPM when the FileSupplier was added to the list of file suppliers
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSData = getFileSupplierData(pSupplier);
-		ASSERT_RESOURCE_ALLOCATION("ELI19426", ipFSData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19426", ipFSData != __nullptr);
 
 		// get the object with description
 		IObjectWithDescriptionPtr ipObjectWithDescription = ipFSData->FileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI19427", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19427", ipObjectWithDescription != __nullptr);
 		string strFSDescription = ipObjectWithDescription->Description;
 
 		// Get the file priority
@@ -1208,11 +1208,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderDeleted(BSTR bstrFolder, IFileS
 			// remove the folder from the database
 			getFPMDB()->RemoveFolder(bstrFolder, m_strAction.c_str());
 
-			if (m_hWndOfUI != NULL)
+			if (m_hWndOfUI != __nullptr)
 			{
 				// Create and fill the FileSupplyingRecord to be passed to PostMessage
 				// Using an auto pointer in order to prevent a memory leak due to exceptions
-				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				unique_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
 				apFileSupRec->m_eFSRecordType = kFolderRemoved;
 				apFileSupRec->m_strFSDescription = asString(ipObjectWithDescription->Description);
 				apFileSupRec->m_strOriginalFileName = asString(bstrFolder);
@@ -1247,11 +1247,11 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderRenamed(BSTR bstrOldFolder, BST
 
 		// Get the description that was entered in the FPM when the FileSupplier was added to the list of file suppliers
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSData = getFileSupplierData(pSupplier);
-		ASSERT_RESOURCE_ALLOCATION("ELI14944", ipFSData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14944", ipFSData != __nullptr);
 
 		// get the object with description
 		IObjectWithDescriptionPtr ipObjectWithDescription = ipFSData->FileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI14945", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14945", ipObjectWithDescription != __nullptr);
 		string strFSDescription = ipObjectWithDescription->Description;
 
 		// Get the file priority
@@ -1277,12 +1277,12 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderRenamed(BSTR bstrOldFolder, BST
 			// TODO: Database end needs to be implemented
 			//		 This currently doesnt do anything
 
-			if (m_hWndOfUI != NULL)
+			if (m_hWndOfUI != __nullptr)
 			{
 				// TODO: Need to set-up like it was done in FileRename once implementation is done
 				// Create and fill the FileSupplyingRecord to be passed to PostMessage
 				// Using an auto pointer in order to prevent a memory leak due to exceptions
-				auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+				unique_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
 				apFileSupRec->m_eFSRecordType = kFolderRenamed;
 				apFileSupRec->m_strFSDescription = strFSDescription;
 				apFileSupRec->m_strOriginalFileName = asString(bstrOldFolder);
@@ -1306,11 +1306,11 @@ void CFileSupplyingMgmtRole::postQueueEventReceivedNotification(BSTR bstrFile,
 																const string& strPriority,
 																EFileSupplyingRecordType eFSRecordType)
 {
-	if (m_hWndOfUI != NULL)
+	if (m_hWndOfUI != __nullptr)
 	{
 		// Create and fill the FileSupplyingRecord to be passed to PostMessage
 		// Using an auto pointer in order to prevent a memory leak due to exceptions
-		auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+		unique_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
 		apFileSupRec->m_eFSRecordType = eFSRecordType;
 		apFileSupRec->m_strFSDescription = strFSDescription;
 		apFileSupRec->m_strOriginalFileName = asString(bstrFile);
@@ -1328,11 +1328,11 @@ void CFileSupplyingMgmtRole::postQueueEventFailedNotification(BSTR bstrFile,
 															  EFileSupplyingRecordType eFSRecordType,
 															  const UCLIDException& ue)
 {
-	if (m_hWndOfUI != NULL)
+	if (m_hWndOfUI != __nullptr)
 	{
 		// Create and fill the FileSupplyingRecord to be passed to PostMessage
 		// Using an auto pointer in order to prevent a memory leak due to exceptions
-		auto_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
+		unique_ptr<FileSupplyingRecord> apFileSupRec(new FileSupplyingRecord());
 		apFileSupRec->m_eFSRecordType = eFSRecordType;
 		apFileSupRec->m_strFSDescription = strFSDescription;
 		apFileSupRec->m_strOriginalFileName = asString(bstrFile);
@@ -1351,7 +1351,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingDone(IFileSupplier *pSup
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI14525", m_ipRoleNotifyFAM != NULL );
+		ASSERT_ARGUMENT("ELI14525", m_ipRoleNotifyFAM != __nullptr );
 
 		validateLicense();
 
@@ -1364,22 +1364,22 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingDone(IFileSupplier *pSup
 		{
 			// Retrieve this File Supplier Data object
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr	ipFSD = m_ipFileSuppliers->At( i );
-			ASSERT_RESOURCE_ALLOCATION("ELI13998", ipFSD != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13998", ipFSD != __nullptr);
 
 			// Retrieve Object With Description
 			IObjectWithDescriptionPtr ipOWD = ipFSD->GetFileSupplier();
-			ASSERT_RESOURCE_ALLOCATION("ELI15641", ipOWD != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15641", ipOWD != __nullptr);
 
 			// Retrieve File Supplier
 			UCLID_FILEPROCESSINGLib::IFileSupplierPtr	ipFS = ipOWD->GetObjectA();
-			ASSERT_RESOURCE_ALLOCATION("ELI13999", ipFS != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13999", ipFS != __nullptr);
 
 			// Compare File Supplier items
 			if (ipFS == pSupplier)
 			{
 				// Update status and notify dialog
 				ipFSD->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kDoneStatus );
-				if (m_hWndOfUI != NULL)
+				if (m_hWndOfUI != __nullptr)
 				{
 					::PostMessage( m_hWndOfUI, 
 						FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kDoneStatus, 
@@ -1409,7 +1409,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingFailed(IFileSupplier *pS
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI14526", m_ipRoleNotifyFAM != NULL );
+		ASSERT_ARGUMENT("ELI14526", m_ipRoleNotifyFAM != __nullptr );
 
 		validateLicense();
 
@@ -1422,22 +1422,22 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingFailed(IFileSupplier *pS
 		{
 			// Retrieve this File Supplier Data object
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr	ipFSD = m_ipFileSuppliers->At( i );
-			ASSERT_RESOURCE_ALLOCATION("ELI14125", ipFSD != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14125", ipFSD != __nullptr);
 
 			// Retrieve Object With Description
 			IObjectWithDescriptionPtr ipOWD = ipFSD->GetFileSupplier();
-			ASSERT_RESOURCE_ALLOCATION("ELI15642", ipOWD != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15642", ipOWD != __nullptr);
 
 			// Retrieve File Supplier
 			UCLID_FILEPROCESSINGLib::IFileSupplierPtr	ipFS = ipOWD->GetObjectA();
-			ASSERT_RESOURCE_ALLOCATION("ELI14124", ipFS != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14124", ipFS != __nullptr);
 
 			// Compare File Supplier items
 			if (ipFS == pSupplier)
 			{
 				// Update status and notify dialog
 				ipFSD->PutFileSupplierStatus( UCLID_FILEPROCESSINGLib::kDoneStatus );
-				if (m_hWndOfUI != NULL)
+				if (m_hWndOfUI != __nullptr)
 				{
 					::PostMessage( m_hWndOfUI, 
 						FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kDoneStatus, 
@@ -1489,10 +1489,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::IsDirty(void)
 		}
 
 		// check if the file suppliers vector object is dirty
-		if (m_ipFileSuppliers != NULL)
+		if (m_ipFileSuppliers != __nullptr)
 		{
 			IPersistStreamPtr ipFSStream = m_ipFileSuppliers;
-			ASSERT_RESOURCE_ALLOCATION("ELI14254", ipFSStream != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14254", ipFSStream != __nullptr);
 			if (ipFSStream->IsDirty() == S_OK)
 			{
 				return S_OK;
@@ -1500,10 +1500,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::IsDirty(void)
 		}
 
 		// check if the FAM condition obj-with-desc is dirty
-		if (m_ipFAMCondition != NULL)
+		if (m_ipFAMCondition != __nullptr)
 		{
 			IPersistStreamPtr ipFSStream = m_ipFAMCondition;
-			ASSERT_RESOURCE_ALLOCATION("ELI14255", ipFSStream != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14255", ipFSStream != __nullptr);
 			if (ipFSStream->IsDirty() == S_OK)
 			{
 				return S_OK;
@@ -1592,27 +1592,27 @@ STDMETHODIMP CFileSupplyingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write( data.getData(), nDataLength, NULL );
 
 		// Make sure that File Suppliers has been initialized
-		if ( m_ipFileSuppliers == NULL  )
+		if ( m_ipFileSuppliers == __nullptr  )
 		{
 			m_ipFileSuppliers.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI14585", m_ipFileSuppliers != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI14585", m_ipFileSuppliers != __nullptr );
 		}
 		
 		// Save the File Suppliers
 		IPersistStreamPtr ipFSObj = m_ipFileSuppliers;
-		ASSERT_RESOURCE_ALLOCATION( "ELI14449", ipFSObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14449", ipFSObj != __nullptr );
 		writeObjectToStream( ipFSObj, pStream, "ELI14450", fClearDirty );
 
 		// Make sure the FAMCondition has been allocated
-		if ( m_ipFAMCondition == NULL )
+		if ( m_ipFAMCondition == __nullptr )
 		{
 			m_ipFAMCondition.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI14584", m_ipFAMCondition != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI14584", m_ipFAMCondition != __nullptr );
 		}
 		
 		// Save the FAM Condition
 		IPersistStreamPtr ipFAMObj = m_ipFAMCondition;
-		ASSERT_RESOURCE_ALLOCATION( "ELI14451", ipFAMObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14451", ipFAMObj != __nullptr );
 		writeObjectToStream( ipFAMObj, pStream, "ELI14452", fClearDirty );
 
 		// Clear the flag as specified
@@ -1667,15 +1667,15 @@ UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr CFileSupplyingMgmtRole::getFileSup
 	{
 		// get the nth file supplier data object
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFileSupplierData = m_ipFileSuppliers->At(n);
-		ASSERT_RESOURCE_ALLOCATION("ELI13995", ipFileSupplierData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13995", ipFileSupplierData != __nullptr);
 
 		// get the object with description
 		IObjectWithDescriptionPtr ipObjectWithDescription = ipFileSupplierData->FileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI13996", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13996", ipObjectWithDescription != __nullptr);
 
 		// get the file supplier
 		UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipFileSupplier = ipObjectWithDescription->Object;
-		ASSERT_RESOURCE_ALLOCATION("ELI13997", ipFileSupplier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13997", ipFileSupplier != __nullptr);
 
 		if ( ipFileSupplier == ipFS )
 		{
@@ -1688,13 +1688,13 @@ UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr CFileSupplyingMgmtRole::getFileSup
 bool CFileSupplyingMgmtRole::fileMatchesFAMCondition(const string& strFile)
 {
 	// check to see if the file meets the FAM condition.  If so, ignore this notification
-	if (m_ipFAMCondition != NULL)
+	if (m_ipFAMCondition != __nullptr)
 	{
 		// get the FAM condition object
 		UCLID_FILEPROCESSINGLib::IFAMConditionPtr ipFAMCondition = m_ipFAMCondition->Object;
 
 		// check if a skip condition has been specified and is enabled
-		if (ipFAMCondition != NULL && m_ipFAMCondition->Enabled == VARIANT_TRUE)
+		if (ipFAMCondition != __nullptr && m_ipFAMCondition->Enabled == VARIANT_TRUE)
 		{
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 			ASSERT_RESOURCE_ALLOCATION("ELI31356", ipFileRecord != __nullptr);
@@ -1723,11 +1723,11 @@ long CFileSupplyingMgmtRole::getEnabledSupplierCount()
 	{
 		// Get the nth file supplier data object
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFileSupplierData = m_ipFileSuppliers->At(n);
-		ASSERT_RESOURCE_ALLOCATION("ELI15214", ipFileSupplierData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15214", ipFileSupplierData != __nullptr);
 
 		// Get the object with description
 		IObjectWithDescriptionPtr ipFSObjWithDesc = ipFileSupplierData->FileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI15215", ipFSObjWithDesc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15215", ipFSObjWithDesc != __nullptr);
 
 		if (ipFSObjWithDesc->Enabled == VARIANT_FALSE)
 		{
@@ -1761,7 +1761,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileSupplyingMgmtRole::getFPMDB()
 UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr CFileSupplyingMgmtRole::getFAMTagManager()
 {
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipTagManager = m_pFAMTagManager;
-	ASSERT_RESOURCE_ALLOCATION("ELI14402", ipTagManager != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14402", ipTagManager != __nullptr);
 	return ipTagManager;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1773,11 +1773,11 @@ void CFileSupplyingMgmtRole::clear()
 
 	m_pDB = NULL;
 
-	m_ipFAMCondition = NULL;
-	if (m_ipFileSuppliers != NULL)
+	m_ipFAMCondition = __nullptr;
+	if (m_ipFileSuppliers != __nullptr)
 	{
 		m_ipFileSuppliers->Clear();
-		m_ipFileSuppliers = NULL;
+		m_ipFileSuppliers = __nullptr;
 	}
 
 	m_bEnabled = false;
@@ -1785,7 +1785,7 @@ void CFileSupplyingMgmtRole::clear()
 	m_bDirty = false;
 
 	//  Initialize the RoleNotifyFam to NULL
-	m_ipRoleNotifyFAM = NULL;
+	m_ipRoleNotifyFAM = __nullptr;
 	
 	m_nFinishedSupplierCount = 0;
 
@@ -1795,7 +1795,7 @@ void CFileSupplyingMgmtRole::clear()
 UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr CFileSupplyingMgmtRole::getThisAsFileActionMgmtRole()
 {
 	UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI25313", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI25313", ipThis != __nullptr);
 
 	return ipThis;	
 }

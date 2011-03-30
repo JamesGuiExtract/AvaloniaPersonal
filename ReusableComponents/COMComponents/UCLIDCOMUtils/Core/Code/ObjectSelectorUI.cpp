@@ -207,15 +207,15 @@ void CObjectSelectorUI::showObjSelectDlg(string strTitleAfterSelect,
 	// Check license state
 	validateLicense();
 
-	ASSERT_ARGUMENT("ELI18148", ipObj != NULL);
-	ASSERT_ARGUMENT("ELI18130", pbOK != NULL);
+	ASSERT_ARGUMENT("ELI18148", ipObj != __nullptr);
+	ASSERT_ARGUMENT("ELI18130", pbOK != __nullptr);
 
 	// Since each call into here will need a CObjSelectDlg with unique parameters,
 	// don't maintain the CObjSelectDlg after this call
-	std::auto_ptr<CObjSelectDlg> apDlg( new CObjSelectDlg(strTitleAfterSelect, strPrompt1, strPrompt2,
+	std::unique_ptr<CObjSelectDlg> apDlg( new CObjSelectDlg(strTitleAfterSelect, strPrompt1, strPrompt2,
 		strCategory, ipObj, bAllowNone, nNumRequiredIIDs, pRequiredIIDs, pParent, bConfigureDescription));
 
-	ASSERT_RESOURCE_ALLOCATION("ELI18129", apDlg.get() != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18129", apDlg.get() != __nullptr);
 
 	// Show the dialog
 	*pbOK = asVariantBool(apDlg->DoModal() == IDOK);

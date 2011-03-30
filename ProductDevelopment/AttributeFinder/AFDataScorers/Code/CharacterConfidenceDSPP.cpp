@@ -29,7 +29,7 @@ STDMETHODIMP CCharacterConfidenceDSPP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFDATASCORERSLib::ICharacterConfidenceDSPtr ipCCDS = m_ppUnk[i];
-			if (ipCCDS != NULL)
+			if (ipCCDS != __nullptr)
 			{
 				// Save the new value for the aggregate function
 				ipCCDS->AggregateFunction = 
@@ -57,7 +57,7 @@ LRESULT CCharacterConfidenceDSPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 		validateLicense();
 
 		UCLID_AFDATASCORERSLib::ICharacterConfidenceDSPtr ipCCDS = m_ppUnk[0];
-		if (ipCCDS != NULL)
+		if (ipCCDS != __nullptr)
 		{
 			// Attach controls
 			m_comboAggregateFunction.Attach(GetDlgItem(IDC_COMBO_AGGREGATE_FUNCTION));

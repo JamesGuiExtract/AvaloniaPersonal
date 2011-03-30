@@ -57,7 +57,7 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 		
 		// Initiates the use of singleton input manager.
 		UseSingletonInputManager();
-		ASSERT_RESOURCE_ALLOCATION("ELI06190", getInputManager() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06190", getInputManager() != __nullptr);
 
 		// get registry persistance manager
 		RegistryPersistenceMgr rpmVOA(HKEY_CURRENT_USER, gstrREG_ROOT_KEY);
@@ -103,31 +103,31 @@ HRESULT CEAVGeneratorDlg::NotifyInputReceived(ITextInput* pTextInput)
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI06225", pTextInput != NULL);
+			ASSERT_ARGUMENT("ELI06225", pTextInput != __nullptr);
 			ITextInputPtr ipInput(pTextInput);
-			ASSERT_RESOURCE_ALLOCATION("ELI18086", ipInput != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18086", ipInput != __nullptr);
 
 			// create a new attribute
 			IAttributePtr ipNewAttribute(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI18112", ipNewAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18112", ipNewAttribute != __nullptr);
 
 			// set new attribute name to default value
 			ipNewAttribute->Name = gstrDEFAULT_NEW_SWIPE_NAME.c_str();
 
 			// Get the input entity
 			IInputEntityPtr ipInputEntity = ipInput->GetInputEntity();
-			ASSERT_RESOURCE_ALLOCATION("ELI18114", ipInputEntity != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18114", ipInputEntity != __nullptr);
 
 			// Get the raster zones from the input entity
 			IIUnknownVectorPtr ipRasterZoneVector = ipInputEntity->GetOCRZones();
-			ASSERT_RESOURCE_ALLOCATION("ELI18113", ipRasterZoneVector != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18113", ipRasterZoneVector != __nullptr);
 
 			// get the input text
 			string strInputText = asString(ipInput->GetText());
 
 			// create a new SpatialString
 			ISpatialStringPtr ipValue(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI18116", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18116", ipValue != __nullptr);
 			
 			// get the source doc name from the inputEntity
 			string strSourceDocName = "";
@@ -142,7 +142,7 @@ HRESULT CEAVGeneratorDlg::NotifyInputReceived(ITextInput* pTextInput)
 			
 			// Get the first raster zone
 			IRasterZonePtr ipRZone = ipRasterZoneVector->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI23799", ipRZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI23799", ipRZone != __nullptr);
 
 			// get the dimensions of the raster zone's page
 			long lPageNum = ipRZone->PageNumber;
@@ -151,12 +151,12 @@ HRESULT CEAVGeneratorDlg::NotifyInputReceived(ITextInput* pTextInput)
 
 			// create the spatial page info for this raster zone
 			ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
-			ASSERT_RESOURCE_ALLOCATION("ELI20246", ipPageInfo != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20246", ipPageInfo != __nullptr);
 			ipPageInfo->SetPageInfo(iWidth, iHeight, kRotNone, 0.0);
 			
 			// create the spatial page info map
 			ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI20245", ipPageInfoMap != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20245", ipPageInfoMap != __nullptr);
 			ipPageInfoMap->Set(lPageNum, ipPageInfo);
 
 			// build the spatial string from the raster zone vector and the text
@@ -269,7 +269,7 @@ STDMETHODIMP CEAVGeneratorDlg::QueryInterface( REFIID iid, void FAR* FAR* ppvObj
 	else
 		*ppvObj = NULL;
 
-	if (*ppvObj != NULL)
+	if (*ppvObj != __nullptr)
 	{
 		AddRef();
 		return S_OK;
@@ -293,11 +293,11 @@ STDMETHODIMP CEAVGeneratorDlg::raw_NotifyParagraphTextRecognized(
 	{
 		// check the argument
 		ISpatialStringPtr ipText(pText);
-		ASSERT_RESOURCE_ALLOCATION("ELI07356", ipText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07356", ipText != __nullptr);
 
 		// create a new attribute
 		IAttributePtr ipNewAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI18736", ipNewAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18736", ipNewAttribute != __nullptr);
 
 		// set new attribute name to default value
 		ipNewAttribute->Name = gstrDEFAULT_NEW_SWIPE_NAME.c_str();
@@ -319,7 +319,7 @@ STDMETHODIMP CEAVGeneratorDlg::raw_GetPTHDescription(BSTR *pstrDescription)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI30413", pstrDescription != NULL);
+		ASSERT_ARGUMENT("ELI30413", pstrDescription != __nullptr);
 		*pstrDescription = _bstr_t("Send text to VOA File Viewer window").Detach();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07370")
@@ -333,7 +333,7 @@ STDMETHODIMP CEAVGeneratorDlg::raw_IsPTHEnabled(VARIANT_BOOL *pbEnabled)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18727", pbEnabled != NULL);
+		ASSERT_ARGUMENT("ELI18727", pbEnabled != __nullptr);
 
 		// PTH is enabled if there is an attribute selected (P16 #2651)
 		if (m_listAttributes.GetSelectedCount() > 0)
@@ -355,7 +355,7 @@ STDMETHODIMP CEAVGeneratorDlg::raw_IsPTHEnabled(VARIANT_BOOL *pbEnabled)
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::addAttributeLevel(IAttributePtr ipNewAttribute, int iLevel)
 {
-	ASSERT_ARGUMENT("ELI18182", ipNewAttribute != NULL);
+	ASSERT_ARGUMENT("ELI18182", ipNewAttribute != __nullptr);
 
 	// Check existence of vector at specified level
 	long lSize = m_vecCurrentLevels.size();
@@ -369,7 +369,7 @@ void CEAVGeneratorDlg::addAttributeLevel(IAttributePtr ipNewAttribute, int iLeve
 
 	// Retrieve vector of Attributes or SubAttributes at specified level
 	IIUnknownVectorPtr	ipLevelVector = m_vecCurrentLevels.at( iLevel );
-	if (ipLevelVector == NULL)
+	if (ipLevelVector == __nullptr)
 	{
 		// Throw exception, Cannot retrieve specified Attribute collection
 		UCLIDException	ue( "ELI07908", "Unable to retrieve Attributes." );
@@ -407,12 +407,12 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
 										int iNumItemsUnderInsertionPoint, 
 										int iSubLevel)
 {
-	ASSERT_ARGUMENT("ELI18183", ipAttribute != NULL);
+	ASSERT_ARGUMENT("ELI18183", ipAttribute != __nullptr);
 
 	// Retrieve collection of sub-attributes
 	IIUnknownVectorPtr	ipSubAttributes = ipAttribute->GetSubAttributes();
 	long lCount = 0;
-	if (ipSubAttributes != NULL)
+	if (ipSubAttributes != __nullptr)
 	{
 		lCount = ipSubAttributes->Size();
 	}
@@ -425,7 +425,7 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
 
 		// Get Value
 		ISpatialStringPtr ipValue = ipThisSub->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI15605", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15605", ipValue != __nullptr);
 
 		// Get Name, Value, Type, and Mode
 		string	strName = asString(ipThisSub->Name);
@@ -457,7 +457,7 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
 
 		// get the attribute from the smart pointer
 		IAttribute* pipSubAttribute = ipThisSub.Detach();
-		ASSERT_RESOURCE_ALLOCATION("ELI18274", pipSubAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18274", pipSubAttribute != __nullptr);
 
 		// add the attribute to the list
 		m_listAttributes.SetItemData(nNewItemIndex, (DWORD_PTR)pipSubAttribute);
@@ -470,7 +470,7 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
 void CEAVGeneratorDlg::createToolBar()
 {
 	// Create the toolbar
-	m_apToolBar = auto_ptr<CToolBar>(new CToolBar());
+	m_apToolBar = unique_ptr<CToolBar>(new CToolBar());
 	if (m_apToolBar->CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
     | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) )
 	{
@@ -547,7 +547,7 @@ void CEAVGeneratorDlg::displayAttributes(IIUnknownVectorPtr ipAttributes)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI18205", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI18205", ipAttributes != __nullptr);
 		
 		// Clear the list box first
 		clearListControl();
@@ -559,11 +559,11 @@ void CEAVGeneratorDlg::displayAttributes(IIUnknownVectorPtr ipAttributes)
 		{
 			// Retrieve the Attribute object
 			IAttributePtr	ipAttribute = ipAttributes->At( i );
-			ASSERT_RESOURCE_ALLOCATION("ELI18142", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18142", ipAttribute != __nullptr);
 
 			// Get Value
 			ISpatialStringPtr ipValue = ipAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI19437", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19437", ipValue != __nullptr);
 
 			// Extract Name, Value, Type as STL strings
 			string strName = asString(ipAttribute->Name);
@@ -600,7 +600,7 @@ void CEAVGeneratorDlg::displayAttributes(IIUnknownVectorPtr ipAttributes)
 
 			// get the attribute pointer from the smartpointer
 			IAttribute* pipAttribute = ipAttribute.Detach();
-			ASSERT_RESOURCE_ALLOCATION("ELI18275", pipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18275", pipAttribute != __nullptr);
 
 			// store the attribute in the list
 			m_listAttributes.SetItemData(nNewItemIndex, (DWORD_PTR)pipAttribute);
@@ -627,7 +627,7 @@ int CEAVGeneratorDlg::getCurrentSelectedListItemIndex()
 
 	// default the selection to -1
 	int nSelectedItemIndex = -1;
-	if (pos != NULL)
+	if (pos != __nullptr)
 	{
 		// ensure pos is not NULL before calling GetNextSelectedItem
 		nSelectedItemIndex = m_listAttributes.GetNextSelectedItem(pos);
@@ -639,10 +639,10 @@ int CEAVGeneratorDlg::getCurrentSelectedListItemIndex()
 ISRIRUtilsPtr CEAVGeneratorDlg::getImageUtils()
 {
 	// Create a new SRIRUtils if not already created
-	if (m_ipSRIRUtils == NULL)
+	if (m_ipSRIRUtils == __nullptr)
 	{
 		m_ipSRIRUtils.CreateInstance(CLSID_SRIRUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI18083", m_ipSRIRUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18083", m_ipSRIRUtils != __nullptr);
 	}
 
 	return m_ipSRIRUtils;
@@ -703,7 +703,7 @@ bool CEAVGeneratorDlg::isSiblingsSelected()
 	unsigned int uiLevel = getAttributeLevel(iSelected);
 
 	// Check all the items between the first selected item and the last selected item
-	while (pos != NULL)
+	while (pos != __nullptr)
 	{
 		// Get the next selected item
 		int iNextSelected = m_listAttributes.GetNextSelectedItem(pos);
@@ -781,11 +781,11 @@ void CEAVGeneratorDlg::openEAVFile(const CString& zFileName)
 
 			// create a new attribute
 			IAttributePtr ipAttribute(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI18206", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18206", ipAttribute != __nullptr);
 
 			// get the new spatial string
 			ISpatialStringPtr ipValue = ipAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI18207", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18207", ipValue != __nullptr);
 
 			// add the data to the attribute
 			// NOTE: subattribute names are prepended with one or more periods. 
@@ -814,7 +814,7 @@ void CEAVGeneratorDlg::openEAVFile(const CString& zFileName)
 
 			// get the attribute from the smart pointer
 			IAttribute* pipAttribute = ipAttribute.Detach();
-			ASSERT_RESOURCE_ALLOCATION("ELI18276", pipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18276", pipAttribute != __nullptr);
 
 			m_listAttributes.SetItemData(nNewItemIndex, (DWORD_PTR)pipAttribute);
 		}
@@ -842,7 +842,7 @@ void CEAVGeneratorDlg::openVOAFile(const CString& zFileName)
 {
 	// Read the file into IUnknownVector object
 	IIUnknownVectorPtr	ipAttributes( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI07886", ipAttributes != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI07886", ipAttributes != __nullptr );
 	ipAttributes->LoadFrom( _bstr_t( LPCTSTR(zFileName) ), VARIANT_FALSE );
 
 	// Display the Attributes
@@ -861,10 +861,10 @@ void CEAVGeneratorDlg::openVOAFile(const CString& zFileName)
 		if (m_bAutoOpenImageEnabled)
 		{
 			IAttributePtr ipAttribute((IAttribute*) m_listAttributes.GetItemData(0));
-			ASSERT_RESOURCE_ALLOCATION("ELI18177", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18177", ipAttribute != __nullptr);
 
 			ISpatialStringPtr ipValue = ipAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI18178", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18178", ipValue != __nullptr);
 
 			// if the first attribute has spatial info then open the image
 			// in SRW and highlight the attribute
@@ -1009,7 +1009,7 @@ void CEAVGeneratorDlg::saveAttributesToVOA(const CString& zFileName)
 {
 	// Create the IIUnknownVector for Attributes
 	IIUnknownVectorPtr	ipAttributes( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI07905", ipAttributes != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI07905", ipAttributes != __nullptr );
 
 	// Retrieve each attribute to build vector
 	int nCount = m_listAttributes.GetItemCount();
@@ -1019,7 +1019,7 @@ void CEAVGeneratorDlg::saveAttributesToVOA(const CString& zFileName)
 		unsigned int uiLevel = getAttributeLevel(n);
 
 		IAttributePtr ipAttribute((IAttribute*) m_listAttributes.GetItemData(n));
-		ASSERT_RESOURCE_ALLOCATION( "ELI07906", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07906", ipAttribute != __nullptr );
 
 		// Skip nameless and all-period entries 
 		string strName = asString(ipAttribute->Name);
@@ -1031,7 +1031,7 @@ void CEAVGeneratorDlg::saveAttributesToVOA(const CString& zFileName)
 		}
 
 		IIUnknownVectorPtr ipSubAttributes = ipAttribute->GetSubAttributes();
-		ASSERT_RESOURCE_ALLOCATION("ELI29887", ipSubAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29887", ipSubAttributes != __nullptr);
 
 		// [LegacyRCAndUtils:5677]
 		// This method will be adding sub-attributes as necessary using the current list, but
@@ -1165,7 +1165,7 @@ void CEAVGeneratorDlg::updateList(int nColumnNumber, const CString& zText)
 
 	// check if there is an attribute associated with this entry
 	IAttributePtr ipAttribute((IAttribute*) m_listAttributes.GetItemData(nSelectedItemIndex));
-	ASSERT_RESOURCE_ALLOCATION("ELI18132", ipAttribute != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18132", ipAttribute != __nullptr);
 
 	switch(nColumnNumber)
 	{
@@ -1181,7 +1181,7 @@ void CEAVGeneratorDlg::updateList(int nColumnNumber, const CString& zText)
 			if (!ipValue)
 			{
 				ipValue.CreateInstance(CLSID_SpatialString);
-				ASSERT_RESOURCE_ALLOCATION("ELI18208", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18208", ipValue != __nullptr);
 				ipAttribute->Value = ipValue;
 			}
 			
@@ -1301,7 +1301,7 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 
 		// Iterate through the selected items
 		POSITION pos = m_listAttributes.GetFirstSelectedItemPosition();
-		while (pos != NULL)
+		while (pos != __nullptr)
 		{
 			// Get the next selected item index
 			int nSelectedItemIndex = m_listAttributes.GetNextSelectedItem(pos);
@@ -1309,11 +1309,11 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 			// Get pointer to associated Attribute
 			IAttributePtr ipAttribute( 
 				(IAttribute*) m_listAttributes.GetItemData(nSelectedItemIndex));
-			ASSERT_RESOURCE_ALLOCATION("ELI18081", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18081", ipAttribute != __nullptr);
 
 			// get the spatial string representing the attribute value
 			ISpatialStringPtr ipValue = ipAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI18082", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18082", ipValue != __nullptr);
 
 			// get the source image name
 			string strImage = getSourceImageName(ipValue);
@@ -1328,9 +1328,9 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 			// Clone the spatial string and set the source doc name to
 			// the computed source image name [FlexIDSCore #3497]
 			ICopyableObjectPtr ipCopy = ipValue;
-			ASSERT_RESOURCE_ALLOCATION("ELI25160", ipCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25160", ipCopy != __nullptr);
 			ISpatialStringPtr ipClone = ipCopy->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI25593", ipClone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25593", ipClone != __nullptr);
 			ipClone->SourceDocName = strImage.c_str();
 
 			// Check if a highlight from this image has already been added to the map
@@ -1344,7 +1344,7 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 			{
 				// It already exists. Append to it.
 				ISpatialStringPtr ipOldValue = iter->second;
-				ASSERT_RESOURCE_ALLOCATION("ELI25594", ipOldValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25594", ipOldValue != __nullptr);
 				ipOldValue->AppendString("\r\n");
 				
 				// [LegacyRCAndUtils:5361]
@@ -1378,7 +1378,7 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 				{
 					// if bOpenWindow is false then reset ipSRIR to NULL
 					// [P16 #2635] - JDS
-					ipSRIR = NULL;
+					ipSRIR = __nullptr;
 				}
 			}
 			else
@@ -1401,10 +1401,10 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 				// if we have a handle to the SRW then we need to make sure we have a paragraph text handler
 				// attached to the window
 				IIUnknownVectorPtr ipVecPTHs = ipSRIR->GetParagraphTextHandlers();
-				if (ipVecPTHs == NULL)
+				if (ipVecPTHs == __nullptr)
 				{
 					ipVecPTHs.CreateInstance(CLSID_IUnknownVector);
-					ASSERT_RESOURCE_ALLOCATION("ELI18084", ipVecPTHs != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI18084", ipVecPTHs != __nullptr);
 				}
 				if (ipVecPTHs->Size() == 0)
 				{
@@ -1425,7 +1425,7 @@ void CEAVGeneratorDlg::highlightAttributeInRow(bool bOpenWindow)
 //-------------------------------------------------------------------------------------------------
 string CEAVGeneratorDlg::getSourceImageName(ISpatialStringPtr ipValue)
 {
-	ASSERT_ARGUMENT("ELI18324", ipValue != NULL);
+	ASSERT_ARGUMENT("ELI18324", ipValue != __nullptr);
 
 	string strImageName = "";
 
@@ -1495,7 +1495,7 @@ HWND CEAVGeneratorDlg::getWindowHandleFromSRIR(ISpotRecognitionWindowPtr ipSRIR)
 {
 	// get the input receiver from the SRIR
 	IInputReceiverPtr ipReceiver = ipSRIR;
-	ASSERT_RESOURCE_ALLOCATION("ELI18176", ipReceiver != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18176", ipReceiver != __nullptr);
 
 	// get the HWND from the input receiver
 	HWND hWndSRIR = (HWND)ipReceiver->WindowHandle;
@@ -1542,10 +1542,10 @@ void CEAVGeneratorDlg::openSRWWithImage(const std::string &strImageFile)
 			IIUnknownVectorPtr ipVecPTHs = ipSRIR->GetParagraphTextHandlers();
 
 			// if no vector of paragraph handlers, then create one
-			if (ipVecPTHs == NULL)
+			if (ipVecPTHs == __nullptr)
 			{
 				ipVecPTHs.CreateInstance(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI06206", ipVecPTHs != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06206", ipVecPTHs != __nullptr);
 			}
 
 			// if the vector size is zero (we just created it),
@@ -1585,7 +1585,7 @@ void CEAVGeneratorDlg::clearListControl()
 		for (int i=0; i < nCount; i++)
 		{
 			IAttribute* pipAttribute = (IAttribute*) m_listAttributes.GetItemData(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI18181", pipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18181", pipAttribute != __nullptr);
 
 			// release the attribute pointer
 			pipAttribute->Release();
@@ -1608,11 +1608,11 @@ void CEAVGeneratorDlg::appendOrReplaceAttribute(IAttributePtr ipNewAttribute)
 		// get the current attribute data
 		IAttribute* pipOldAttribute = (IAttribute*) m_listAttributes.GetItemData(nSelectedItemIndex);
 		IAttributePtr ipOldAttribute(pipOldAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI18117", ipOldAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18117", ipOldAttribute != __nullptr);
 
 		// get the spatial string from the new attribute
 		ISpatialStringPtr ipNewValue = ipNewAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI18735", ipNewValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18735", ipNewValue != __nullptr);
 
 		// get the new input text from the new spatial string
 		string strInputText = asString(ipNewValue->String);
@@ -1656,7 +1656,7 @@ void CEAVGeneratorDlg::appendOrReplaceAttribute(IAttributePtr ipNewAttribute)
 
 			// get the attribute from the smart pointer
 			IAttribute* pipNewAttribute = ipNewAttribute.Detach();
-			ASSERT_RESOURCE_ALLOCATION("ELI18270", pipNewAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18270", pipNewAttribute != __nullptr);
 
 			// since we are replacing then we need to replace the attribute in list item
 			m_listAttributes.SetItemData(nSelectedItemIndex, 
@@ -1670,7 +1670,7 @@ void CEAVGeneratorDlg::appendOrReplaceAttribute(IAttributePtr ipNewAttribute)
 		{
 			// get the spatial string from the old attribute
 			ISpatialStringPtr ipOldValue = ipOldAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI18210", ipOldValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18210", ipOldValue != __nullptr);
 
 			// get the source doc names from the attributes
 			string strSourceDocName = asString(ipNewValue->SourceDocName);
@@ -1731,7 +1731,7 @@ void CEAVGeneratorDlg::appendOrReplaceAttribute(IAttributePtr ipNewAttribute)
 void CEAVGeneratorDlg::enableOrDisableInputManager()
 {
 	IInputManagerPtr ipInputManager = getInputManager();
-	ASSERT_RESOURCE_ALLOCATION("ELI18272", ipInputManager != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18272", ipInputManager != __nullptr);
 
 	// If exactly one item is selected then enable the input manager
 	if (m_listAttributes.GetSelectedCount() == 1)

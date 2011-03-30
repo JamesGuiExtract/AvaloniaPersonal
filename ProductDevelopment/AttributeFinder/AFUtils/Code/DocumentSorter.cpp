@@ -148,16 +148,16 @@ STDMETHODIMP CDocumentSorter::raw_IsLicensed(VARIANT_BOOL * pbValue)
 void CDocumentSorter::batchOCR(BSTR strInputFolder)
 {
 	// use OCRUtils to run the batch OCR first
-	if (m_ipOCRUtils == NULL)
+	if (m_ipOCRUtils == __nullptr)
 	{
 		m_ipOCRUtils.CreateInstance(CLSID_OCRUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI06277", m_ipOCRUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06277", m_ipOCRUtils != __nullptr);
 	}
 
 	if (!m_ipOCREngine)
 	{	
 		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR);
-		ASSERT_RESOURCE_ALLOCATION("ELI06278", m_ipOCREngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06278", m_ipOCREngine != __nullptr);
 		
 		_bstr_t _bstrPrivateLicenseCode = LICENSE_MGMT_PASSWORD.c_str();
 		IPrivateLicensedComponentPtr ipScansoftEngine(m_ipOCREngine);
@@ -202,15 +202,15 @@ void CDocumentSorter::sortFile(const string& strUSSFileName,
 {
 	// create a new AFDocument for holding the value and tags
 	IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-	ASSERT_RESOURCE_ALLOCATION("ELI06280", ipAFDoc != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06280", ipAFDoc != __nullptr);
 
 	ISpatialStringPtr ipText = ipAFDoc->Text;
 	ipText->LoadFrom(_bstr_t(strUSSFileName.c_str()), VARIANT_FALSE);
 	
-	if (m_ipDocClassifier == NULL)
+	if (m_ipDocClassifier == __nullptr)
 	{
 		m_ipDocClassifier.CreateInstance(CLSID_DocumentClassifier);
-		ASSERT_RESOURCE_ALLOCATION("ELI06281", m_ipDocClassifier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06281", m_ipDocClassifier != __nullptr);
 	}
 
 	m_ipDocClassifier->IndustryCategoryName = _bstr_t(strCategoryName.c_str());
@@ -225,7 +225,7 @@ void CDocumentSorter::sortFile(const string& strUSSFileName,
 
 	// analyze the tag
 	IStrToStrMapPtr ipStringTags = ipAFDoc->StringTags;
-	if (ipStringTags != NULL && ipStringTags->Size > 0)
+	if (ipStringTags != __nullptr && ipStringTags->Size > 0)
 	{
 		// the actual probability created by Document Classifier
 		string strActualProbability = asString(ipStringTags->GetValue(_bstr_t(DOC_PROBABILITY.c_str())));
@@ -236,11 +236,11 @@ void CDocumentSorter::sortFile(const string& strUSSFileName,
 		{	
 			// the actual document type name
 			IStrToObjectMapPtr ipObjTags = ipAFDoc->ObjectTags;
-			if (ipObjTags != NULL && ipObjTags->Size > 0)
+			if (ipObjTags != __nullptr && ipObjTags->Size > 0)
 			{
 				// get found document types
 				IVariantVectorPtr ipDocTypes = ipObjTags->GetValue(_bstr_t(DOC_TYPE.c_str()));
-				if (ipDocTypes != NULL && ipDocTypes->Size == 1)
+				if (ipDocTypes != __nullptr && ipDocTypes->Size == 1)
 				{
 					// if the actual document type is of one and only one type
 					// then we shall move the file to the folder has the name of

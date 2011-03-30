@@ -169,7 +169,7 @@ STDMETHODIMP CSpatialProximityASPP::Apply(void)
 		{
 			// Obtain interface pointer to the IImageRegionWithLines class
 			UCLID_AFSELECTORSLib::ISpatialProximityASPtr ipRule = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI22590", ipRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22590", ipRule != __nullptr);
 
 			// Apply settings to rule
 			CComBSTR bstrTargetQuery;
@@ -226,7 +226,7 @@ STDMETHODIMP CSpatialProximityASPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22592", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI22592", pbValue != __nullptr);
 
 		try
 		{
@@ -252,7 +252,7 @@ STDMETHODIMP CSpatialProximityASPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 void CSpatialProximityASPP::loadBorderSettings(EBorder eBorder,
 											   UCLID_AFSELECTORSLib::ISpatialProximityASPtr ipRule)
 {
-	ASSERT_ARGUMENT("ELI22653", ipRule != NULL);
+	ASSERT_ARGUMENT("ELI22653", ipRule != __nullptr);
 
 	// These are the settings pertaining to eBorder that need to be retrieved from the rule.
 	EBorderRelation eBorderRelation;
@@ -291,7 +291,7 @@ void CSpatialProximityASPP::loadBorderSettings(EBorder eBorder,
 void CSpatialProximityASPP::saveBorderSettings(EBorder eBorder,
 											   UCLID_AFSELECTORSLib::ISpatialProximityASPtr ipRule)
 {
-	ASSERT_ARGUMENT("ELI22656", ipRule != NULL);
+	ASSERT_ARGUMENT("ELI22656", ipRule != __nullptr);
 
 	// Retrive the settings from the combo boxes associated with eBorder.
 	CComBSTR bstrBorder;

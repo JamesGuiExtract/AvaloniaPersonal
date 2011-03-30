@@ -20,7 +20,7 @@ LRESULT CALLBACK BaseUtilsDLL_CallWndProc(int nCode, WPARAM wParam, LPARAM lPara
 		static map<HWND, vector<UINT> >::const_iterator iter;
 		
 		CWPSTRUCT *pData = (CWPSTRUCT *) lParam;
-		ASSERT_RESOURCE_ALLOCATION("ELI25241", pData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25241", pData != __nullptr);
 		
 		// first check whether the message is for one of the windows we care about
 		HWND& hwnd = pData->hwnd;
@@ -39,7 +39,7 @@ LRESULT CALLBACK BaseUtilsDLL_CallWndProc(int nCode, WPARAM wParam, LPARAM lPara
 					THROW_LOGIC_ERROR_EXCEPTION("ELI25243");
 				}
 				ISystemHookMsgHandler* pHandler = iter->second;
-				ASSERT_RESOURCE_ALLOCATION("ELI25244", pHandler != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25244", pHandler != __nullptr);
 				pHandler->onMsg(hwnd, message, pData->wParam, pData->lParam);
 			}
 		}

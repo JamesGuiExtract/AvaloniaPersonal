@@ -27,7 +27,7 @@ CValueFromListPP::CValueFromListPP()
 		// Check licensing
 		validateLicense();
 
-		ASSERT_RESOURCE_ALLOCATION("ELI04557", m_ipInternalObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI04557", m_ipInternalObject != __nullptr);
 		
 		m_dwTitleID = IDS_TITLEValueFromListPP;
 		m_dwHelpFileID = IDS_HELPFILEValueFromListPP;
@@ -58,7 +58,7 @@ STDMETHODIMP CValueFromListPP::Apply(void)
 		{	
 			// assign the value lst to the object
 			ICopyableObjectPtr ipValues = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI08380", ipValues != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08380", ipValues != __nullptr);
 			ICopyableObjectPtr ipCopyableObj(m_ipInternalObject);
 			if (ipCopyableObj)
 			{
@@ -126,7 +126,7 @@ LRESULT CValueFromListPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 		if (ipObject)
 		{	
 			ICopyableObjectPtr ipCopy = m_ipInternalObject;
-			ASSERT_RESOURCE_ALLOCATION("ELI08381", ipCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08381", ipCopy != __nullptr);
 			ipCopy->CopyFrom(ipObject);
 			// populate the dialog
 			loadListValues();

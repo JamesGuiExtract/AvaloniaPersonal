@@ -45,7 +45,7 @@ void EXPORT_BaseUtils clearDirtyFlag(IPersistStreamPtr& ipObj);
 // the cpputils waitForFileAccess but it uses the StgOpen call as opposed to _access
 // to check for file access. It will return the result of the StgOpen call (S_OK if it
 // was successful and the error code if it is unsuccessful after the retries).
-// If ppStorage != NULL and the StgOpen is successful, then ppStorage will contain
+// If ppStorage != __nullptr and the StgOpen is successful, then ppStorage will contain
 // the handle to the open storage object.
 // REQUIRE: strFileName must not be NULL or empty
 HRESULT EXPORT_BaseUtils waitForStgFileAccess(BSTR strFileName, IStorage** ppStorage = NULL);
@@ -55,7 +55,7 @@ HRESULT EXPORT_BaseUtils waitForStgFileAccess(BSTR strFileName, IStorage** ppSto
 // to StgOpen.  It will return the result of the StgCreateDocFile call (S_OK if it
 // was successful and the error code if it was unsuccessful after the retries).  Also
 // ppStorage will contain the open IStorage handle if the call was successful.
-// REQUIRE: ppStorage != NULL and strFileName is not NULL or empty
+// REQUIRE: ppStorage != __nullptr and strFileName is not NULL or empty
 HRESULT EXPORT_BaseUtils waitForStgFileCreate(BSTR strFileName, IStorage** ppStorage, DWORD dwMode);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: Reads the object in the specified file into the specified persist stream.

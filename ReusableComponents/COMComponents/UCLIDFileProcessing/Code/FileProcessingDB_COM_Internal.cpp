@@ -92,7 +92,7 @@ int UpdateToSchemaVersion101(_ConnectionPtr ipConnection, long* pnNumSteps,
 	{
 		int nNewSchemaVersion = 101;
 
-		if (pnNumSteps != NULL)
+		if (pnNumSteps != __nullptr)
 		{
 			// This update requires potentialy creating a new row in the FileActionStatus table for
 			// every row in the FAMFile table and is therefore O(n) relative to the number of files
@@ -104,7 +104,7 @@ int UpdateToSchemaVersion101(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vector<string> vecQueries;
 
 		_RecordsetPtr ipProcessingFAMCount(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI31446", ipProcessingFAMCount != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31446", ipProcessingFAMCount != __nullptr);
 
 		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [ProcessingFAM]",
 			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
@@ -211,7 +211,7 @@ int UpdateToSchemaVersion102(_ConnectionPtr ipConnection, long* pnNumSteps,
 	{
 		int nNewSchemaVersion = 102;
 
-		if (pnNumSteps != NULL)
+		if (pnNumSteps != __nullptr)
 		{
 			*pnNumSteps += 3;
 			return nNewSchemaVersion;
@@ -255,7 +255,7 @@ int  UpdateToSchemaVersion103(_ConnectionPtr ipConnection, long* pnNumSteps,
 	{
 		int nNewSchemaVersion = 103;
 
-		if (pnNumSteps != NULL)
+		if (pnNumSteps != __nullptr)
 		{
 			*pnNumSteps += 3;
 			return nNewSchemaVersion;
@@ -290,7 +290,7 @@ int UpdateToSchemaVersion104(_ConnectionPtr ipConnection, long* pnNumSteps,
 	{
 		int nNewSchemaVersion = 104;
 
-		if (pnNumSteps != NULL)
+		if (pnNumSteps != __nullptr)
 		{
 			*pnNumSteps += 3;
 			return nNewSchemaVersion;
@@ -376,7 +376,7 @@ bool CFileProcessingDB::DefineNewAction_Internal(bool bDBLocked, BSTR strAction,
 			validateNewActionName(strActionName);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -416,7 +416,7 @@ bool CFileProcessingDB::DeleteAction_Internal(bool bDBLocked, BSTR strAction)
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -466,7 +466,7 @@ bool CFileProcessingDB::GetActions_Internal(bool bDBLocked, IStrToStrMap * * pma
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -478,7 +478,7 @@ bool CFileProcessingDB::GetActions_Internal(bool bDBLocked, IStrToStrMap * * pma
 
 				// Create StrToStrMap to return the list of actions
 				IStrToStrMapPtr ipActions = getActions(ipConnection);
-				ASSERT_RESOURCE_ALLOCATION("ELI13529", ipActions != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI13529", ipActions != __nullptr);
 
 				// return the StrToStrMap containing all actions
 				*pmapActionNameToID = ipActions.Detach();
@@ -523,10 +523,10 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 			// Create the file record to return
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewFileRecord(CLSID_FileRecord);
-			ASSERT_RESOURCE_ALLOCATION("ELI30359", ipNewFileRecord != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30359", ipNewFileRecord != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -540,7 +540,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30360", ipFileSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30360", ipFileSet != __nullptr);
 
 				ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
 					adLockOptimistic, adCmdText);
@@ -624,7 +624,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 					// Get the fields from the file set
 					FieldsPtr ipFields = ipFileSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI30361", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI30361", ipFields != __nullptr);
 
 					// Set the fields from the new file record
 					setFieldsFromFileRecord(ipFields, ipNewFileRecord);
@@ -653,7 +653,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 					// Reset the ipFields to the requeried fields
 					ipFields = ipFileSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI31068", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI31068", ipFields != __nullptr);
 
 					_lastCodePos = "73";
 
@@ -687,11 +687,11 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				{
 					// Get the fields from the file set
 					FieldsPtr ipFields = ipFileSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI30362", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI30362", ipFields != __nullptr);
 
 					// Get the file record from the fields
 					UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord = getFileRecordFromFields(ipFields);
-					ASSERT_RESOURCE_ALLOCATION("ELI30363", ipOldRecord != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI30363", ipOldRecord != __nullptr);
 
 					// Set the Current file Records ID
 					nID = ipOldRecord->FileID;
@@ -847,7 +847,7 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 		{
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -859,7 +859,7 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30366", ipFileSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30366", ipFileSet != __nullptr);
 
 				// Replace any occurances of ' with '' this is because SQL Server use the ' to indicate the beginning and end of a string
 				string strFileName = asString(strFile);
@@ -882,7 +882,7 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 				{
 					// Get the fields from the file set
 					FieldsPtr ipFields = ipFileSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI30367", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI30367", ipFields != __nullptr);
 
 					// Get the old Record from the fields
 					UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord;
@@ -960,7 +960,7 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 			try
 			{
 				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-				ADODB::_ConnectionPtr ipConnection = NULL;
+				ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 				BEGIN_CONNECTION_RETRY();
 
@@ -1003,7 +1003,7 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1041,7 +1041,7 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1081,7 +1081,7 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1119,7 +1119,7 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 		try
 		{
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-		ADODB::_ConnectionPtr ipConnection = NULL;
+		ADODB::_ConnectionPtr ipConnection = __nullptr;
 		
 		BEGIN_CONNECTION_RETRY();
 		
@@ -1158,7 +1158,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1170,7 +1170,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30369", ipFileSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30369", ipFileSet != __nullptr);
 
 				// Set the action name from the parameter
 				string strActionName = asString(strAction);
@@ -1267,7 +1267,7 @@ bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
 			}
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1314,7 +1314,7 @@ bool CFileProcessingDB::SearchAndModifyFileStatus_Internal(bool bDBLocked,
 
 				// Get a recordset to fill with the File IDs
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30373", ipFileSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30373", ipFileSet != __nullptr);
 
 				// Open the recordset
 				ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -1373,7 +1373,7 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1495,7 +1495,7 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1579,7 +1579,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				+ " FAMFile.ID, FileName, Pages, FileSize, Priority, ActionStatus " + strFrom;
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1620,7 +1620,7 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1701,7 +1701,7 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1717,7 +1717,7 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 				// return a new object with the statistics
 				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =  
 					loadStats(ipConnection, nActionID, asCppBool(vbForceUpdate), bDBLocked);
-				ASSERT_RESOURCE_ALLOCATION("ELI14107", ipActionStats != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14107", ipActionStats != __nullptr);
 
 				// Commit any changes (could have recreated the stats)
 				tg.CommitTrans();
@@ -1748,7 +1748,7 @@ bool CFileProcessingDB::CopyActionStatusFromAction_Internal(bool bDBLocked, long
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1794,7 +1794,7 @@ bool CFileProcessingDB::RenameAction_Internal(bool bDBLocked, long nActionID, BS
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1864,7 +1864,7 @@ bool CFileProcessingDB::ExportFileList_Internal(bool bDBLocked, BSTR strQuery, B
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI23522", pnNumRecordsOutput != NULL);
+			ASSERT_ARGUMENT("ELI23522", pnNumRecordsOutput != __nullptr);
 
 			// check for empty query string
 			string strSQL = asString(strQuery);
@@ -1891,7 +1891,7 @@ bool CFileProcessingDB::ExportFileList_Internal(bool bDBLocked, BSTR strQuery, B
 			UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition(pRandomCondition);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -1903,7 +1903,7 @@ bool CFileProcessingDB::ExportFileList_Internal(bool bDBLocked, BSTR strQuery, B
 
 				// Recordset to contain the files to process
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI14725", ipFileSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14725", ipFileSet != __nullptr);
 
 				// get the recordset with the top nMaxFiles 
 				ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
@@ -1925,7 +1925,7 @@ bool CFileProcessingDB::ExportFileList_Internal(bool bDBLocked, BSTR strQuery, B
 				// Fill the ipFiles collection
 				while (ipFileSet->adoEOF == VARIANT_FALSE)
 				{
-					if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
+					if (ipRandomCondition == __nullptr || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
 					{
 						// Get the FileName
 						string strFile = getStringField(ipFileSet->Fields, "FileName");
@@ -1964,10 +1964,10 @@ bool CFileProcessingDB::GetActionID_Internal(bool bDBLocked, BSTR bstrActionName
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI24027", pnActionID != NULL);
+			ASSERT_ARGUMENT("ELI24027", pnActionID != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2009,7 +2009,7 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 			replaceVariable(strSQL, gstrSETTING_NAME, strSettingName);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2021,7 +2021,7 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI19792", ipDBInfoSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19792", ipDBInfoSet != __nullptr);
 
 				// Begin Transaction
 				TransactionGuard tg(ipConnection);
@@ -2077,7 +2077,7 @@ bool CFileProcessingDB::GetDBInfoSetting_Internal(bool bDBLocked, const string& 
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2112,10 +2112,10 @@ bool CFileProcessingDB::GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQue
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI31522", ppVal != NULL);
+			ASSERT_ARGUMENT("ELI31522", ppVal != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2124,7 +2124,7 @@ bool CFileProcessingDB::GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQue
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipResultSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI19876", ipResultSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19876", ipResultSet != __nullptr);
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -2156,10 +2156,10 @@ bool CFileProcessingDB::GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, lo
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI24028", pnFileID != NULL);
+			ASSERT_ARGUMENT("ELI24028", pnFileID != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2190,10 +2190,10 @@ bool CFileProcessingDB::GetActionName_Internal(bool bDBLocked, long nActionID, B
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI26769", pbstrActionName != NULL);
+			ASSERT_ARGUMENT("ELI26769", pbstrActionName != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2228,7 +2228,7 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2274,7 +2274,7 @@ bool CFileProcessingDB::SetFileActionComment_Internal(bool bDBLocked, long nFile
 			string strUserName = getCurrentUserName();
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2287,7 +2287,7 @@ bool CFileProcessingDB::SetFileActionComment_Internal(bool bDBLocked, long nFile
 					+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
 
 				_RecordsetPtr ipCommentSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI26788", ipCommentSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26788", ipCommentSet != __nullptr);
 
 				ipCommentSet->Open(strCommentSQL.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
 					adLockOptimistic, adCmdText);
@@ -2305,7 +2305,7 @@ bool CFileProcessingDB::SetFileActionComment_Internal(bool bDBLocked, long nFile
 
 						// Get the fields pointer
 						FieldsPtr ipFields = ipCommentSet->Fields;
-						ASSERT_RESOURCE_ALLOCATION("ELI26789", ipFields != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI26789", ipFields != __nullptr);
 
 						// Set the fields from the provided data
 						setStringField(ipFields, "UserName", strUserName);
@@ -2328,7 +2328,7 @@ bool CFileProcessingDB::SetFileActionComment_Internal(bool bDBLocked, long nFile
 					else
 					{
 						FieldsPtr ipFields = ipCommentSet->Fields;
-						ASSERT_RESOURCE_ALLOCATION("ELI26790", ipFields != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI26790", ipFields != __nullptr);
 
 						setStringField(ipFields, "UserName", strUserName);
 						setStringField(ipFields, "Comment", strComment);
@@ -2364,10 +2364,10 @@ bool CFileProcessingDB::GetFileActionComment_Internal(bool bDBLocked, long nFile
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI26792", pbstrComment != NULL);
+			ASSERT_ARGUMENT("ELI26792", pbstrComment != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			// Default the comment to empty string
 			string strComment = "";
@@ -2383,7 +2383,7 @@ bool CFileProcessingDB::GetFileActionComment_Internal(bool bDBLocked, long nFile
 					+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
 
 				_RecordsetPtr ipCommentSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI26793", ipCommentSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26793", ipCommentSet != __nullptr);
 
 				ipCommentSet->Open(strCommentSQL.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
 					adLockOptimistic, adCmdText);
@@ -2420,7 +2420,7 @@ bool CFileProcessingDB::ClearFileActionComment_Internal(bool bDBLocked, long nFi
 		{
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2473,7 +2473,7 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 			UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition(pRandomCondition);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2501,7 +2501,7 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				TransactionGuard tg(ipConnection);
 
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != __nullptr);
 
 				// Open the file set
 				ipFileSet->Open(strQueryFrom.c_str(), _variant_t((IDispatch*)ipConnection, true),
@@ -2517,7 +2517,7 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				vector<long> vecFileIds;
 				while (ipFileSet->adoEOF == VARIANT_FALSE)
 				{
-					if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
+					if (ipRandomCondition == __nullptr || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
 					{
 						// Get the file ID
 						vecFileIds.push_back(getLongField(ipFileSet->Fields, "ID"));
@@ -2573,7 +2573,7 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 					while (ipFileSet->adoEOF == VARIANT_FALSE)
 					{
 						FieldsPtr ipFields = ipFileSet->Fields;
-						ASSERT_RESOURCE_ALLOCATION("ELI30383", ipFields != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI30383", ipFields != __nullptr);
 
 						long nFileID = getLongField(ipFields, "ID");
 						EActionStatus oldStatus = asEActionStatus(getStringField(ipFields, "ToActionStatus"));
@@ -2603,7 +2603,7 @@ bool CFileProcessingDB::ModifyActionStatusForQuery_Internal(bool bDBLocked, BSTR
 				tg.CommitTrans();
 
 				// Set the return value if it is specified
-				if (pnNumRecordsModified != NULL)
+				if (pnNumRecordsModified != __nullptr)
 				{
 					*pnNumRecordsModified = nNumRecordsModified;
 				}
@@ -2629,17 +2629,17 @@ bool CFileProcessingDB::GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags)
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI27329", ppTags != NULL);
+			ASSERT_ARGUMENT("ELI27329", ppTags != __nullptr);
 
 			// Create a map to hold the return values
 			IStrToStrMapPtr ipTagToDesc(CLSID_StrToStrMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI27330", ipTagToDesc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27330", ipTagToDesc != __nullptr);
 
 			// Create query to get the tags and descriptions
 			string strQuery = "SELECT [TagName], [TagDescription] FROM [Tag]";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2650,7 +2650,7 @@ bool CFileProcessingDB::GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags)
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27331", ipTagSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27331", ipTagSet != __nullptr);
 
 				// Open Recordset that contains all the tags and their descriptions
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -2660,7 +2660,7 @@ bool CFileProcessingDB::GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags)
 				while (ipTagSet->adoEOF == VARIANT_FALSE)
 				{
 					FieldsPtr ipFields = ipTagSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI27332", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI27332", ipFields != __nullptr);
 
 					// Get the tag and description
 					string strTagName = getStringField(ipFields, "TagName");
@@ -2697,15 +2697,15 @@ bool CFileProcessingDB::GetTagNames_Internal(bool bDBLocked, IVariantVector **pp
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI27335", ppTagNames != NULL);
+			ASSERT_ARGUMENT("ELI27335", ppTagNames != __nullptr);
 
 			IVariantVectorPtr ipVecTags(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI27336", ipVecTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27336", ipVecTags != __nullptr);
 
 			string strQuery = "SELECT [TagName] FROM [Tag]";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2716,7 +2716,7 @@ bool CFileProcessingDB::GetTagNames_Internal(bool bDBLocked, IVariantVector **pp
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27337", ipTagSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27337", ipTagSet != __nullptr);
 
 				// Open Recordset that contains the tag names
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -2757,14 +2757,14 @@ bool CFileProcessingDB::HasTags_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal)
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI27340", pvbVal != NULL);
+			ASSERT_ARGUMENT("ELI27340", pvbVal != __nullptr);
 
 			bool bHasTags = false;
 
 			string strQuery = "SELECT TOP 1 [TagName] FROM [Tag]";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2775,7 +2775,7 @@ bool CFileProcessingDB::HasTags_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal)
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27341", ipTagSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27341", ipTagSet != __nullptr);
 
 				// Open Recordset that contains the tag names
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -2815,7 +2815,7 @@ bool CFileProcessingDB::TagFile_Internal(bool bDBLocked, long nFileID, BSTR bstr
 			replaceVariable(strQuery, gstrTAG_FILE_ID_VAR, asString(nFileID));
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2886,7 +2886,7 @@ bool CFileProcessingDB::UntagFile_Internal(bool bDBLocked, long nFileID, BSTR bs
 			replaceVariable(strQuery, gstrTAG_FILE_ID_VAR, asString(nFileID));
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -2975,7 +2975,7 @@ bool CFileProcessingDB::ToggleTagOnFile_Internal(bool bDBLocked, long nFileID, B
 			replaceVariable(strQuery, gstrTAG_FILE_ID_VAR, asString(nFileID));
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3043,7 +3043,7 @@ bool CFileProcessingDB::AddTag_Internal(bool bDBLocked, const string& strTagName
 				+ strTagName + "'";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3057,7 +3057,7 @@ bool CFileProcessingDB::AddTag_Internal(bool bDBLocked, const string& strTagName
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27355", ipTagSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27355", ipTagSet != __nullptr);
 
 				// Open Recordset that contains the tag names
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
@@ -3084,7 +3084,7 @@ bool CFileProcessingDB::AddTag_Internal(bool bDBLocked, const string& strTagName
 
 					// Get the fields
 					FieldsPtr ipFields = ipTagSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI27357", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI27357", ipFields != __nullptr);
 
 					// Set the fields
 					setStringField(ipFields, "TagName", strTagName);
@@ -3126,7 +3126,7 @@ bool CFileProcessingDB::DeleteTag_Internal(bool bDBLocked, BSTR bstrTagName)
 
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3140,7 +3140,7 @@ bool CFileProcessingDB::DeleteTag_Internal(bool bDBLocked, BSTR bstrTagName)
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27418", ipTagSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27418", ipTagSet != __nullptr);
 
 				// Open Recordset that contains the tag names
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
@@ -3202,7 +3202,7 @@ bool CFileProcessingDB::ModifyTag_Internal(bool bDBLocked, BSTR bstrOldTagName, 
 				throw ue;
 			}
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3222,7 +3222,7 @@ bool CFileProcessingDB::ModifyTag_Internal(bool bDBLocked, BSTR bstrOldTagName, 
 				{
 					string strTempQuery = strQueryBase + strNewTagName + "'";
 					_RecordsetPtr ipTemp(__uuidof(Recordset));
-					ASSERT_RESOURCE_ALLOCATION("ELI29225", ipTemp != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI29225", ipTemp != __nullptr);
 
 					ipTemp->Open(strTempQuery.c_str(), _variant_t((IDispatch*) ipConnection, true),
 						adOpenDynamic, adLockOptimistic, adCmdText);
@@ -3240,7 +3240,7 @@ bool CFileProcessingDB::ModifyTag_Internal(bool bDBLocked, BSTR bstrOldTagName, 
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27362", ipTagSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27362", ipTagSet != __nullptr);
 
 				// Open Recordset that contains the tag names
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
@@ -3258,7 +3258,7 @@ bool CFileProcessingDB::ModifyTag_Internal(bool bDBLocked, BSTR bstrOldTagName, 
 
 				// Get the fields pointer
 				FieldsPtr ipFields = ipTagSet->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI27364", ipFields != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27364", ipFields != __nullptr);
 
 				// Update the record with the new values
 				if (!strNewTagName.empty())
@@ -3298,12 +3298,12 @@ bool CFileProcessingDB::GetFilesWithTags_Internal(bool bDBLocked, IVariantVector
 		{
 			// Check arguments
 			IVariantVectorPtr ipVecTagNames(pvecTagNames);
-			ASSERT_ARGUMENT("ELI27367", ipVecTagNames != NULL);
-			ASSERT_ARGUMENT("ELI27368", ppvecFileIDs != NULL);
+			ASSERT_ARGUMENT("ELI27367", ipVecTagNames != __nullptr);
+			ASSERT_ARGUMENT("ELI27368", ppvecFileIDs != __nullptr);
 
 			// Create the vector to return the file IDs
 			IVariantVectorPtr ipVecFileIDs(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI27369", ipVecFileIDs != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27369", ipVecFileIDs != __nullptr);
 
 			// Get the size of the vector of tag names
 			long lSize = ipVecTagNames->Size;
@@ -3341,7 +3341,7 @@ bool CFileProcessingDB::GetFilesWithTags_Internal(bool bDBLocked, IVariantVector
 			}
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3352,7 +3352,7 @@ bool CFileProcessingDB::GetFilesWithTags_Internal(bool bDBLocked, IVariantVector
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27370", ipTagSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27370", ipTagSet != __nullptr);
 
 				// Open Recordset that contains the file IDs
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -3396,7 +3396,7 @@ bool CFileProcessingDB::GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVa
 		try
 		{
 			// Check argument
-			ASSERT_ARGUMENT("ELI27373", ppvecTagNames != NULL);
+			ASSERT_ARGUMENT("ELI27373", ppvecTagNames != __nullptr);
 
 			// Build the sql string
 			string strQuery = "SELECT DISTINCT [Tag].[TagName] FROM [FileTag] INNER JOIN "
@@ -3405,10 +3405,10 @@ bool CFileProcessingDB::GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVa
 
 			// Create the vector to return the tag names
 			IVariantVectorPtr ipVecTagNames(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI27374", ipVecTagNames != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27374", ipVecTagNames != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3419,7 +3419,7 @@ bool CFileProcessingDB::GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVa
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipTagSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27375", ipTagSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27375", ipTagSet != __nullptr);
 
 				// Open Recordset that contains the file IDs
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -3467,7 +3467,7 @@ bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVari
 		try
 		{
 			IVariantVectorPtr ipVecTagNames(pvecTagNames);
-			ASSERT_ARGUMENT("ELI30385", ipVecTagNames != NULL);
+			ASSERT_ARGUMENT("ELI30385", ipVecTagNames != __nullptr);
 
 			long lSize = ipVecTagNames->Size;
 
@@ -3495,7 +3495,7 @@ bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVari
 			}
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3529,7 +3529,7 @@ bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVari
 				TransactionGuard tg(ipConnection);
 
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30386", ipFileSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30386", ipFileSet != __nullptr);
 
 				// Open the file set
 				ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
@@ -3539,7 +3539,7 @@ bool CFileProcessingDB::SetStatusForFilesWithTags_Internal(bool bDBLocked, IVari
 				while (ipFileSet->adoEOF == VARIANT_FALSE)
 				{
 					FieldsPtr ipFields = ipFileSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI30387", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI30387", ipFields != __nullptr);
 
 					// Get the file ID
 					long nFileID = getLongField(ipFields, "ID");
@@ -3587,7 +3587,7 @@ bool CFileProcessingDB::ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQu
 			ASSERT_ARGUMENT("ELI27684", !strQuery.empty());
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3601,7 +3601,7 @@ bool CFileProcessingDB::ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQu
 				long nRecordsAffected = executeCmdQuery(ipConnection, strQuery);
 
 				// If user wants a count of affected records, return it
-				if (pnRecordsAffected != NULL)
+				if (pnRecordsAffected != __nullptr)
 				{
 					*pnRecordsAffected = nRecordsAffected;
 				}
@@ -3688,7 +3688,7 @@ bool CFileProcessingDB::SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSe
 			UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition(pRandomCondition);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3703,7 +3703,7 @@ bool CFileProcessingDB::SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSe
 
 				// Recordset to search for file IDs
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27711", ipFileSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27711", ipFileSet != __nullptr);
 
 				// Get the recordset for the specified select query
 				ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
@@ -3720,7 +3720,7 @@ bool CFileProcessingDB::SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSe
 				stack<string> stackIDs;
 				while (ipFileSet->adoEOF == VARIANT_FALSE)
 				{
-					if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
+					if (ipRandomCondition == __nullptr || ipRandomCondition->CheckCondition(ipFileRecord, 0) == VARIANT_TRUE)
 					{
 						// Get the file ID
 						stackIDs.push(asString(getLongField(ipFileSet->Fields, "ID")));
@@ -3757,7 +3757,7 @@ bool CFileProcessingDB::SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSe
 				tg.CommitTrans();
 
 				// If returning the number of modified records, set the return value
-				if (pnNumRecordsModified != NULL)
+				if (pnNumRecordsModified != __nullptr)
 				{
 					*pnNumRecordsModified = nNumRecords;
 				}
@@ -3794,7 +3794,7 @@ bool CFileProcessingDB::AddUserCounter_Internal(bool bDBLocked, BSTR bstrCounter
 				+ "', " + asString(llInitialValue) + ")";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3811,7 +3811,7 @@ bool CFileProcessingDB::AddUserCounter_Internal(bool bDBLocked, BSTR bstrCounter
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipCounter(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI29235", ipCounter != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29235", ipCounter != __nullptr);
 
 				// Open Recordset that contains the counter
 				ipCounter->Open(strCheckDuplicateCounter.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -3873,7 +3873,7 @@ bool CFileProcessingDB::RemoveUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 				+ " WHERE [CounterName] = '" + strCounterName + "'";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3933,7 +3933,7 @@ bool CFileProcessingDB::RenameUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 				+ strNewCounterName + "' WHERE [CounterName] = '" + strCounterName + "'";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -3952,7 +3952,7 @@ bool CFileProcessingDB::RenameUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipCounter(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI29233", ipCounter != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29233", ipCounter != __nullptr);
 
 				// Open Recordset that contains the counter
 				ipCounter->Open(strCounterExistsQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -4015,7 +4015,7 @@ bool CFileProcessingDB::SetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCo
 				+ asString(llNewValue) + " WHERE [CounterName] = '" + strCounterName + "'";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4061,7 +4061,7 @@ bool CFileProcessingDB::GetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCo
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI27766", pllValue != NULL);
+			ASSERT_ARGUMENT("ELI27766", pllValue != __nullptr);
 
 			// Get the counter name and ensure it is not empty
 			string strCounterName = asString(bstrCounterName);
@@ -4073,7 +4073,7 @@ bool CFileProcessingDB::GetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCo
 				+ " WHERE [CounterName] = '" + strCounterName + "'";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4085,7 +4085,7 @@ bool CFileProcessingDB::GetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCo
 
 				// Recordset to get the counter value from
 				_RecordsetPtr ipCounterSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27768", ipCounterSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27768", ipCounterSet != __nullptr);
 
 				// Get the recordset for the specified select query
 				ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
@@ -4125,16 +4125,16 @@ bool CFileProcessingDB::GetUserCounterNames_Internal(bool bDBLocked, IVariantVec
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI27772", ppvecNames != NULL);
+			ASSERT_ARGUMENT("ELI27772", ppvecNames != __nullptr);
 
 			// Build the query for getting the counter value
 			string strQuery = "SELECT [CounterName] FROM " + gstrUSER_CREATED_COUNTER;
 
 			IVariantVectorPtr ipVecNames(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI27774", ipVecNames != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27774", ipVecNames != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4146,7 +4146,7 @@ bool CFileProcessingDB::GetUserCounterNames_Internal(bool bDBLocked, IVariantVec
 
 				// Recordset to get the counters from
 				_RecordsetPtr ipCounterSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27775", ipCounterSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27775", ipCounterSet != __nullptr);
 
 				// Get the recordset for the specified select query
 				ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
@@ -4185,16 +4185,16 @@ bool CFileProcessingDB::GetUserCounterNamesAndValues_Internal(bool bDBLocked, IS
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI27778", ppmapUserCounters != NULL);
+			ASSERT_ARGUMENT("ELI27778", ppmapUserCounters != __nullptr);
 
 			// Build the query for getting the counter value
 			string strQuery = "SELECT * FROM " + gstrUSER_CREATED_COUNTER;
 
 			IStrToStrMapPtr ipmapUserCounters(CLSID_StrToStrMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI27780", ipmapUserCounters != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27780", ipmapUserCounters != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4206,7 +4206,7 @@ bool CFileProcessingDB::GetUserCounterNamesAndValues_Internal(bool bDBLocked, IS
 
 				// Recordset to get the counters and values from
 				_RecordsetPtr ipCounterSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27781", ipCounterSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27781", ipCounterSet != __nullptr);
 
 				// Get the recordset for the specified select query
 				ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
@@ -4216,7 +4216,7 @@ bool CFileProcessingDB::GetUserCounterNamesAndValues_Internal(bool bDBLocked, IS
 				while (ipCounterSet->adoEOF == VARIANT_FALSE)
 				{
 					FieldsPtr ipFields = ipCounterSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI27782", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI27782", ipFields != __nullptr);
 
 					// Get the name and value from the record
 					string strCounterName = getStringField(ipFields, "CounterName");
@@ -4253,7 +4253,7 @@ bool CFileProcessingDB::IsUserCounterValid_Internal(bool bDBLocked, BSTR bstrCou
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI27907", pbCounterValid != NULL);
+			ASSERT_ARGUMENT("ELI27907", pbCounterValid != __nullptr);
 
 			// Get the counter name and ensure it is not empty
 			string strCounterName = asString(bstrCounterName);
@@ -4264,7 +4264,7 @@ bool CFileProcessingDB::IsUserCounterValid_Internal(bool bDBLocked, BSTR bstrCou
 				+ " WHERE [CounterName] = '" + strCounterName + "'";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4276,7 +4276,7 @@ bool CFileProcessingDB::IsUserCounterValid_Internal(bool bDBLocked, BSTR bstrCou
 
 				// Recordset to get
 				_RecordsetPtr ipCounterSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27909", ipCounterSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27909", ipCounterSet != __nullptr);
 
 				// Get the recordset for the specified select query
 				ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
@@ -4307,7 +4307,7 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI27715", pllNewValue != NULL);
+			ASSERT_ARGUMENT("ELI27715", pllNewValue != __nullptr);
 
 			// Get the counter name and ensure it is not empty
 			string strCounterName = asString(bstrCounterName);
@@ -4319,7 +4319,7 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 				+ " WHERE [CounterName] = '" + strCounterName + "'";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4334,7 +4334,7 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 
 				// Recordset to get the counters and values from
 				_RecordsetPtr ipCounterSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI27717", ipCounterSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27717", ipCounterSet != __nullptr);
 
 				// Get the recordset for the specified select query
 				ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
@@ -4343,7 +4343,7 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 				if (ipCounterSet->adoEOF == VARIANT_FALSE)
 				{
 					FieldsPtr ipFields = ipCounterSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI27718", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI27718", ipFields != __nullptr);
 
 					// Get the counter value
 					LONGLONG llValue = getLongLongField(ipFields, "Value");
@@ -4396,7 +4396,7 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 			strFAMSessionQuery += "[FAMUserID], [UPI], [FPSFileID]) VALUES (";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4450,7 +4450,7 @@ bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 				"WHERE [" + gstrFAM_SESSION + "].[UPI] = '" + m_strUPI + "' AND [StopTime] IS NULL";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4492,7 +4492,7 @@ bool CFileProcessingDB::RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeS
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4527,7 +4527,7 @@ bool CFileProcessingDB::RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeS
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipSeconds(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI29144", ipSeconds != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29144", ipSeconds != __nullptr);
 
 				// Check if the record set already exists
 				ipSeconds->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
@@ -4549,7 +4549,7 @@ bool CFileProcessingDB::RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeS
 				{
 					// The record exists
 					FieldsPtr ipFields = ipSeconds->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI29150", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI29150", ipFields != __nullptr);
 
 					// Add the new second count
 					long lTotalCount = nEventCount + getLongField(ipFields, "SecondsWithInputEvents");
@@ -4592,7 +4592,7 @@ bool CFileProcessingDB::GetLoginUsers_Internal(bool bDBLocked, IStrToStrMap**  p
 		{
 			// Get the users from the database
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4604,7 +4604,7 @@ bool CFileProcessingDB::GetLoginUsers_Internal(bool bDBLocked, IStrToStrMap**  p
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipLoginSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI29040", ipLoginSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29040", ipLoginSet != __nullptr);
 
 				// SQL query to get the login users that are not admin
 				string strSQL = "SELECT UserName, Password FROM Login where UserName <> 'admin'";
@@ -4615,14 +4615,14 @@ bool CFileProcessingDB::GetLoginUsers_Internal(bool bDBLocked, IStrToStrMap**  p
 
 				// Create map to return results
 				IStrToStrMapPtr ipUsers(CLSID_StrToStrMap);
-				ASSERT_RESOURCE_ALLOCATION("ELI29039", ipUsers != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29039", ipUsers != __nullptr);
 
 				// Step through all records
 				while (ipLoginSet->adoEOF == VARIANT_FALSE)
 				{
 					// Get the fields from the action set
 					FieldsPtr ipFields = ipLoginSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI29041", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI29041", ipFields != __nullptr);
 
 					// Get the user
 					string strUser = getStringField(ipFields, "UserName");
@@ -4664,7 +4664,7 @@ bool CFileProcessingDB::AddLoginUser_Internal(bool bDBLocked, BSTR bstrUserName)
 			string strUserName = asString(bstrUserName);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4724,7 +4724,7 @@ bool CFileProcessingDB::RemoveLoginUser_Internal(bool bDBLocked, BSTR bstrUserNa
 			}
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4778,7 +4778,7 @@ bool CFileProcessingDB::RenameLoginUser_Internal(bool bDBLocked, BSTR bstrUserNa
 			}
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4839,7 +4839,7 @@ bool CFileProcessingDB::ClearLoginUserPassword_Internal(bool bDBLocked, BSTR bst
 			}
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4879,10 +4879,10 @@ bool CFileProcessingDB::GetAutoCreateActions_Internal(bool bDBLocked, VARIANT_BO
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI29118", pvbValue != NULL);
+			ASSERT_ARGUMENT("ELI29118", pvbValue != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4917,7 +4917,7 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI29795", plId != NULL);
+			ASSERT_ARGUMENT("ELI29795", plId != __nullptr);
 
 			// Get the action name as a string
 			string strActionName = asString(bstrActionName);
@@ -4926,7 +4926,7 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 			validateNewActionName(strActionName);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -4941,7 +4941,7 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 
 				// Create a pointer to a recordset containing the action
 				_RecordsetPtr ipActionSet = getActionSet(ipConnection, strActionName);
-				ASSERT_RESOURCE_ALLOCATION("ELI29177", ipActionSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29177", ipActionSet != __nullptr);
 
 				// Check if the action is not yet created
 				if (ipActionSet->adoEOF == VARIANT_TRUE)
@@ -4991,7 +4991,7 @@ bool CFileProcessingDB::GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BS
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI29546",  ppFileRecord != NULL);
+			ASSERT_ARGUMENT("ELI29546",  ppFileRecord != __nullptr);
 
 			// Replace any occurences of ' with '' this is because SQL Server use the ' to indicate the
 			// beginning and end of a string
@@ -5002,7 +5002,7 @@ bool CFileProcessingDB::GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BS
 			string strFileSQL = "SELECT * FROM FAMFile WHERE FileName = '" + strFileName + "'";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -5014,7 +5014,7 @@ bool CFileProcessingDB::GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BS
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI29547", ipFileSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29547", ipFileSet != __nullptr);
 
 				// Execute the query to find the file in the database
 				ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
@@ -5024,15 +5024,15 @@ bool CFileProcessingDB::GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BS
 				{
 					// Get the fields from the file set
 					FieldsPtr ipFields = ipFileSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI29548", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI29548", ipFields != __nullptr);
 
 					// Get the file record from the fields
 					UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
-					ASSERT_RESOURCE_ALLOCATION("ELI29549", ipFileRecord != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI29549", ipFileRecord != __nullptr);
 
 					// Get and return the appropriate file record
 					ipFileRecord = getFileRecordFromFields(ipFields);
-					ASSERT_RESOURCE_ALLOCATION("ELI29550", ipFileRecord != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI29550", ipFileRecord != __nullptr);
 
 					ipFileRecord->ActionID = getActionID(ipConnection, asString(bstrActionName));
 
@@ -5066,7 +5066,7 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -5113,7 +5113,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			ASSERT_ARGUMENT("ELI31401", bDBLocked == true);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			ipProgressStatus->InitProgressStatus("Inspecting schema...", 0, 0, VARIANT_TRUE);
 
@@ -5300,7 +5300,7 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 				"' WHERE FileName = '" + strCurrFileName + "' AND ID = " + strFileID;
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -5368,7 +5368,7 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 			ASSERT_RESOURCE_ALLOCATION("ELI31896", ipSettings != __nullptr);
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -5425,7 +5425,7 @@ bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, bool bUpdateH
 		try
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = NULL;
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
 

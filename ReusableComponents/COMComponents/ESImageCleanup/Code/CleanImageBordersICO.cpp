@@ -61,7 +61,7 @@ STDMETHODIMP CCleanImageBordersICO::raw_GetComponentDescription(BSTR * pstrCompo
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17768", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI17768", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Clean borders").Detach();
 	}
@@ -92,15 +92,15 @@ STDMETHODIMP CCleanImageBordersICO::raw_Clone(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17722", pObject != NULL);
+		ASSERT_ARGUMENT("ELI17722", pObject != __nullptr);
 
 		// create a copyable object pointer
 		ICopyableObjectPtr ipObjCopy(CLSID_CleanImageBordersICO);
-		ASSERT_RESOURCE_ALLOCATION("ELI17744", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17744", ipObjCopy != __nullptr);
 
 		// set the IUnknownPtr to the current object
 		IUnknownPtr ipUnk = this;
-		ASSERT_RESOURCE_ALLOCATION("ELI17745", ipUnk != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17745", ipUnk != __nullptr);
 
 		// copy to the copyable object pointer
 		ipObjCopy->CopyFrom(ipUnk);
@@ -122,7 +122,7 @@ STDMETHODIMP CCleanImageBordersICO::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17747", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI17747", pbValue != __nullptr);
 
 		try
 		{
@@ -151,7 +151,7 @@ STDMETHODIMP CCleanImageBordersICO::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17723", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI17723", pClassID != __nullptr);
 
 		*pClassID = CLSID_CleanImageBordersICO;
 	}
@@ -173,7 +173,7 @@ STDMETHODIMP CCleanImageBordersICO::Load(IStream * pStream)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17725", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17725", pStream != __nullptr);
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -244,7 +244,7 @@ STDMETHODIMP CCleanImageBordersICO::GetSizeMax(_ULARGE_INTEGER * pcbSize)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17726", pcbSize != NULL);
+		ASSERT_ARGUMENT("ELI17726", pcbSize != __nullptr);
 
 		return E_NOTIMPL;
 	}
@@ -268,10 +268,10 @@ STDMETHODIMP CCleanImageBordersICO::Perform(void* pciRepair)
 
 		// wrap the ClearImage repair pointer in smart pointer
 		ICiRepairPtr ipciRepair((ICiRepair*) pciRepair);
-		ASSERT_RESOURCE_ALLOCATION("ELI17752", ipciRepair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17752", ipciRepair != __nullptr);
 
 		ICiImagePtr ipciImage = ipciRepair->Image;
-		ASSERT_RESOURCE_ALLOCATION("ELI20321", ipciRepair->Image != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20321", ipciRepair->Image != __nullptr);
 		_lastCodePos = "20";
 
 		// the following code seems a bit convoluted but it is due to a problem with
@@ -439,12 +439,12 @@ STDMETHODIMP CCleanImageBordersICO::Perform(void* pciRepair)
 
 					// create a ClearImage server (we need this to create an image object)
 					ICiServerPtr ipciServer(CLSID_CiServer);
-					ASSERT_RESOURCE_ALLOCATION("ELI17795", ipciServer != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI17795", ipciServer != __nullptr);
 					_lastCodePos = "40_190";
 
 					// create the ClearImage image
 					ipciImage = ipciServer->CreateImage();
-					ASSERT_RESOURCE_ALLOCATION("ELI20343", ipciImage != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI20343", ipciImage != __nullptr);
 					ipciImage->CreateBpp(hNewImage.Width, hNewImage.Height, hNewImage.BitsPerPixel);
 					_lastCodePos = "40_200";
 

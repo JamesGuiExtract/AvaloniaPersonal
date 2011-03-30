@@ -20,7 +20,7 @@ public:
 			sp = m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IDispatch* pDispatch = reinterpret_cast<IDispatch*>(sp.p);
-			if (pDispatch != NULL)
+			if (pDispatch != __nullptr)
 			{
 				VariantClear(&varResult);
 				pvars[0] = pTextInput;

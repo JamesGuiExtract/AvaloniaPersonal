@@ -84,7 +84,7 @@ public:
 	void setPriority(EFilePriority ePriority) {
 		m_ePriority = ePriority;
 		IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI27675", ipDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27675", ipDB != __nullptr);
 		m_strPriority = asString(ipDB->AsPriorityString(ePriority));
 	}
 	EFilePriority getPriority() { return m_ePriority; }

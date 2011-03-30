@@ -81,8 +81,8 @@ private:
 	DWORD m_dwSel;
 
 	// Configuration managers to get and save the history for the folders and the file extensions
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<FileSupplierConfigMgr> ma_pCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<FileSupplierConfigMgr> ma_pCfgMgr;
 
 	///////////
 	// Methods

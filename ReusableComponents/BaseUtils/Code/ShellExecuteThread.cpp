@@ -40,10 +40,10 @@ UINT ShellExecuteThread::LoadShellExcuteThread(void* pData)
 	{
 		// Cast back to ThreadDataStruct pointer
 		ShellExecuteThread* pSET = (ShellExecuteThread *) pData;
-		ASSERT_ARGUMENT("ELI15691", pSET != NULL);
+		ASSERT_ARGUMENT("ELI15691", pSET != __nullptr);
 
 		ThreadDataStruct* pTDS = pSET->m_pThreadData;
-		ASSERT_ARGUMENT("ELI15693", pTDS != NULL);
+		ASSERT_ARGUMENT("ELI15693", pTDS != __nullptr);
 
 		// call ShellExecute function
 		ShellExecute(pTDS->m_hwnd, pTDS->m_lpOperation, pTDS->m_lpFile, 

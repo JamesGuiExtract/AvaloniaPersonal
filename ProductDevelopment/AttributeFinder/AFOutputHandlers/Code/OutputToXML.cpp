@@ -32,7 +32,7 @@ COutputToXML::COutputToXML()
 	try
 	{
 		m_ipAFUtils.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI07902", m_ipAFUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07902", m_ipAFUtils != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI07903")
 }
@@ -72,7 +72,7 @@ STDMETHODIMP COutputToXML::get_FileName(BSTR *pVal)
 	{
 		// validate license and arguments
 		validateLicense();
-		ASSERT_ARGUMENT("ELI07890", pVal != NULL);
+		ASSERT_ARGUMENT("ELI07890", pVal != __nullptr);
 
 		// return the filename
 		*pVal = _bstr_t(m_strFileName.c_str()).Detach();
@@ -145,7 +145,7 @@ STDMETHODIMP COutputToXML::get_Format(EXMLOutputFormat *pVal)
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI12895", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI12895", pVal != __nullptr );
 
 		*pVal = m_eOutputFormat;
 	}
@@ -177,7 +177,7 @@ STDMETHODIMP COutputToXML::get_NamedAttributes(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23636", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23636", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -215,7 +215,7 @@ STDMETHODIMP COutputToXML::get_UseSchemaName(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23635", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23635", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -255,7 +255,7 @@ STDMETHODIMP COutputToXML::get_SchemaName(BSTR *pVal)
 	{
 		// Validate license and argument
 		validateLicense();
-		ASSERT_ARGUMENT("ELI12912", pVal != NULL);
+		ASSERT_ARGUMENT("ELI12912", pVal != __nullptr);
 
 		// Return the schema name
 		*pVal = _bstr_t( m_strSchemaName.c_str() ).Detach();
@@ -288,7 +288,7 @@ STDMETHODIMP COutputToXML::get_FAMTags(VARIANT_BOOL *pVal)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI26323", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26323", pVal != __nullptr);
 
 		// Validate license
 		validateLicense();
@@ -327,7 +327,7 @@ STDMETHODIMP COutputToXML::get_RemoveSpatialInfo(VARIANT_BOOL *pVal)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI26325", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26325", pVal != __nullptr);
 
 		// Validate license
 		validateLicense();
@@ -374,10 +374,10 @@ STDMETHODIMP COutputToXML::raw_ProcessOutput(IIUnknownVector *pAttributes,
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI26298", ipAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI26298", ipAFDoc != __nullptr);
 
 		// ensure  valid parameters
-		ASSERT_ARGUMENT("ELI10489", pAttributes != NULL);
+		ASSERT_ARGUMENT("ELI10489", pAttributes != __nullptr);
 
 		// Expand the file name based on the Doc tags
 		string strFileName = expandFileName(ipAFDoc);
@@ -424,7 +424,7 @@ STDMETHODIMP COutputToXML::raw_IsConfigured(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23634", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI23634", pbValue != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -447,7 +447,7 @@ STDMETHODIMP COutputToXML::raw_GetComponentDescription(BSTR * pstrComponentDescr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19549", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19549", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Output data to XML file").Detach();
 	}
@@ -465,7 +465,7 @@ STDMETHODIMP COutputToXML::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23633", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI23633", pbValue != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -491,7 +491,7 @@ STDMETHODIMP COutputToXML::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_AFOUTPUTHANDLERSLib::IOutputToXMLPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI07898", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07898", ipSource != __nullptr);
 		
 		// Set filename
 		m_strFileName = asString(ipSource->FileName);
@@ -523,7 +523,7 @@ STDMETHODIMP COutputToXML::raw_Clone(IUnknown **pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23637", pObject != NULL);
+		ASSERT_ARGUMENT("ELI23637", pObject != __nullptr);
 
 		// Validate license first
 		validateLicense();
@@ -531,7 +531,7 @@ STDMETHODIMP COutputToXML::raw_Clone(IUnknown **pObject)
 		// create another instance of this object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_OutputToXML);
-		ASSERT_RESOURCE_ALLOCATION("ELI07858", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07858", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -734,7 +734,7 @@ string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI26300", ipDoc != NULL);
+		ASSERT_ARGUMENT("ELI26300", ipDoc != __nullptr);
 
 		string strFileName;
 
@@ -743,11 +743,11 @@ string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
 		{
 			// Get the FAM tag manager
 			IFAMTagManagerPtr ipFamTags(CLSID_FAMTagManager);
-			ASSERT_RESOURCE_ALLOCATION("ELI26301", ipFamTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26301", ipFamTags != __nullptr);
 
 			// Get the source doc name from the AF doc object
 			ISpatialStringPtr ipString = ipDoc->Text;
-			ASSERT_RESOURCE_ALLOCATION("ELI26302", ipString != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26302", ipString != __nullptr);
 			_bstr_t bstrSourceDoc = ipString->SourceDocName;
 
 			// Get the expanded file name
@@ -757,7 +757,7 @@ string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
 		{
 			// Get the AFUtils tag manager
 			IAFUtilityPtr ipAFTags(CLSID_AFUtility);
-			ASSERT_RESOURCE_ALLOCATION("ELI26303", ipAFTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26303", ipAFTags != __nullptr);
 
 			// Get the expanded file name
 			strFileName = asString(ipAFTags->ExpandTags(m_strFileName.c_str(), ipDoc));
@@ -784,7 +784,7 @@ pair<bool, bool> COutputToXML::getContainsTagsAndTagsAreValid(const string &strF
 		{
 			// Using FAM tags so check via FAM tag manager
 			IFAMTagManagerPtr ipFamTags(CLSID_FAMTagManager);
-			ASSERT_RESOURCE_ALLOCATION("ELI26311", ipFamTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26311", ipFamTags != __nullptr);
 
 			prResult.first = asCppBool(ipFamTags->StringContainsTags(strFileName.c_str()));
 			if (prResult.first)
@@ -797,7 +797,7 @@ pair<bool, bool> COutputToXML::getContainsTagsAndTagsAreValid(const string &strF
 		{
 			// Not FAM tags, use AF tag manager
 			IAFUtilityPtr ipAFTags(CLSID_AFUtility);
-			ASSERT_RESOURCE_ALLOCATION("ELI26312", ipAFTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26312", ipAFTags != __nullptr);
 
 			prResult.first = asCppBool(ipAFTags->StringContainsTags(strFileName.c_str()));
 			if (prResult.first)

@@ -48,7 +48,7 @@ CFileNamePattern::~CFileNamePattern()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16561");
 }
@@ -223,7 +223,7 @@ STDMETHODIMP CFileNamePattern::put_FileString(BSTR strFileString)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14421", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14421", ipFAMTagManager != __nullptr);
 
 		// make sure the file exists
 		// or that it contains valid string tags
@@ -269,7 +269,7 @@ STDMETHODIMP CFileNamePattern::put_RegExpFileName(BSTR strFileString)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14423", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14423", ipFAMTagManager != __nullptr);
 
 		// make sure the file exists
 		// or that it contains valid string tags
@@ -372,7 +372,7 @@ STDMETHODIMP CFileNamePattern::raw_GetComponentDescription(BSTR * pstrComponentD
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19637", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19637", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Match based upon file name pattern").Detach();
 	}
@@ -391,7 +391,7 @@ STDMETHODIMP CFileNamePattern::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		EXTRACT_FAMCONDITIONSLib::IFileNamePatternFAMConditionPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI13636", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13636", ipCopyThis != __nullptr);
 		
 		// Copy the variables from another object
 		m_bDoesDoesNot = ((ipCopyThis->DoesContainOrMatch)==VARIANT_TRUE);
@@ -419,7 +419,7 @@ STDMETHODIMP CFileNamePattern::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_FileNamePattern);
-		ASSERT_RESOURCE_ALLOCATION("ELI13638", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13638", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -611,11 +611,11 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(IFileRecord* pFileRec
 
 		// Get a regex parser
 		IRegularExprParserPtr ipParser = getMiscUtils()->GetNewRegExpParserInstance("FileNamePattern");
-		ASSERT_RESOURCE_ALLOCATION("ELI13647", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13647", ipParser != __nullptr);
 
 		// Get the FAMTagManager smart Pointer
 		IFAMTagManagerPtr ipTag = IFAMTagManagerPtr(pFAMTM);
-		ASSERT_RESOURCE_ALLOCATION("ELI14405", ipTag != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14405", ipTag != __nullptr);
 		
 		// Get the regular expression
 		if (m_bIsRegExpFromFile)
@@ -731,10 +731,10 @@ void CFileNamePattern::validateLicense()
 //-------------------------------------------------------------------------------------------------
 IMiscUtilsPtr CFileNamePattern::getMiscUtils()
 {
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13649", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13649", m_ipMiscUtils != __nullptr );
 	}
 	
 	return m_ipMiscUtils;

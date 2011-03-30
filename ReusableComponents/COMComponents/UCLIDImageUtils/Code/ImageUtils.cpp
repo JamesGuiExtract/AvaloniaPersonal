@@ -73,7 +73,7 @@ STDMETHODIMP CImageUtils::CreateMultiPageImage(IVariantVector *pvecSinglePageIma
 		validateLicense();
 
 		IVariantVectorPtr ipvecImages( pvecSinglePageImages );
-		ASSERT_RESOURCE_ALLOCATION("ELI09060", ipvecImages != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09060", ipvecImages != __nullptr );
 
 		// Copy Strings to vecImages;
 		vector<string> vecImages;
@@ -103,7 +103,7 @@ STDMETHODIMP CImageUtils::IsMultiPageImage( BSTR strImageFileName, VARIANT_BOOL 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20473", pResult != NULL);
+		ASSERT_ARGUMENT("ELI20473", pResult != __nullptr);
 
 		validateLicense();
 
@@ -147,7 +147,7 @@ STDMETHODIMP CImageUtils::GetImagePageNumbers(BSTR strImageFileName,
 		vector<int> vecPageNumbers = ::getPageNumbers(nTotalNumberOfPages, strDefinedPages);
 
 		IVariantVectorPtr ipVecPageNumbers(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI10269", ipVecPageNumbers != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10269", ipVecPageNumbers != __nullptr);
 
 		int nSize = vecPageNumbers.size();
 		for (int n=0; n<nSize; n++)
@@ -175,11 +175,11 @@ STDMETHODIMP CImageUtils::IsTextInZone( IImageStats *pImageStats, long nConsecut
 		// Setup result to be false;
 		*pResult = VARIANT_FALSE;
 		UCLID_IMAGEUTILSLib::IImageStatsPtr ipImageStats(pImageStats);
-		ASSERT_RESOURCE_ALLOCATION("ELI13300", ipImageStats != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13300", ipImageStats != __nullptr );
 
 		long nCurrConsecutiveRows = 0;
 		IVariantVectorPtr ipPixelCounts = ipImageStats->FGPixelsInRow;
-		ASSERT_RESOURCE_ALLOCATION("ELI13301", ipPixelCounts != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13301", ipPixelCounts != __nullptr );
 
 		long nWidth = ipImageStats->Width;
 
@@ -216,13 +216,13 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27291", ppImageStats != NULL);
+		ASSERT_ARGUMENT("ELI27291", ppImageStats != __nullptr);
 
 		BITMAPHANDLE bmPageBitmap;
 		LeadToolsBitmapFreeer freeerPage( bmPageBitmap, true );
 
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(pRaster);
-		ASSERT_RESOURCE_ALLOCATION("ELI13285", ipZone != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13285", ipZone != __nullptr );
 
 		string strImageName = asString(strImage);
 		
@@ -241,10 +241,10 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 			pRaster->EndX, pRaster->EndY, pRaster->Height, &bmZoneBitmap );
 
 		UCLID_IMAGEUTILSLib::IImageStatsPtr ipImageStats(CLSID_ImageStats);
-		ASSERT_RESOURCE_ALLOCATION("ELI13299", ipImageStats != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13299", ipImageStats != __nullptr );
 
 		IVariantVectorPtr ipVecFGPixelsInRow(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI13298", ipVecFGPixelsInRow != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13298", ipVecFGPixelsInRow != __nullptr );
 
 		ipImageStats->Height = bmZoneBitmap.Height;
 		ipImageStats->Width = bmZoneBitmap.Width;
@@ -284,7 +284,7 @@ STDMETHODIMP CImageUtils::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18693", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18693", pbValue != __nullptr);
 
 		try
 		{

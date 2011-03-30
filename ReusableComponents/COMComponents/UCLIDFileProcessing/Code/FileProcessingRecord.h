@@ -160,7 +160,7 @@ private:
 		{
 			try
 			{
-				ASSERT_ARGUMENT("ELI26742", ipRecord != NULL);
+				ASSERT_ARGUMENT("ELI26742", ipRecord != __nullptr);
 
 				// Get the data from the ipRecord object
 				_bstr_t bstrFileName;

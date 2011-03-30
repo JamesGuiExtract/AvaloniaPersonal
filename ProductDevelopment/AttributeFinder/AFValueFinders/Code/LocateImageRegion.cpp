@@ -52,10 +52,10 @@ CLocateImageRegion::CLocateImageRegion()
 		m_mapBoundaryToInfo[kLeft].m_eExpandDirection = kExpandLeft;
 		m_mapBoundaryToInfo[kRight].m_eExpandDirection = kExpandRight;
 
-		ASSERT_RESOURCE_ALLOCATION("ELI07919", m_ipSpatialStringSearcher != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07919", m_ipSpatialStringSearcher != __nullptr);
 
 		m_ipMisc.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22434", m_ipMisc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22434", m_ipMisc != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI07795")
 }
@@ -64,8 +64,8 @@ CLocateImageRegion::~CLocateImageRegion()
 {
 	 try
 	 {
-		 m_ipSpatialStringSearcher = NULL;
-		 m_ipMisc = NULL;
+		 m_ipSpatialStringSearcher = __nullptr;
+		 m_ipMisc = __nullptr;
 	 }
 	 CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16346");
 }
@@ -362,7 +362,7 @@ STDMETHODIMP CLocateImageRegion::SetClueList(EClueListIndex eIndex,
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI07800", pvecClues != NULL);
+		ASSERT_ARGUMENT("ELI07800", pvecClues != __nullptr);
 
 		ClueListInfo listInfo;
 		listInfo.m_ipClues = pvecClues;
@@ -437,11 +437,11 @@ STDMETHODIMP CLocateImageRegion::raw_Process(IAFDocument* pDocument, IProgressSt
 		validateLicense();
 
 		IAFDocumentPtr ipDoc(pDocument);
-		ASSERT_ARGUMENT("ELI07945", ipDoc != NULL);
+		ASSERT_ARGUMENT("ELI07945", ipDoc != __nullptr);
 
 		// input string
 		ISpatialStringPtr ipInputText = ipDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI16798", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16798", ipInputText != __nullptr);
 		
 		// get the image regions and combine them into a single spatial string
 		ipDoc->Text = combineRegions( findRegionContent(ipInputText, pDocument), 
@@ -629,7 +629,7 @@ STDMETHODIMP CLocateImageRegion::Load(IStream *pStream)
 			// Read the clue list
 			IPersistStreamPtr ipObj;
 			::readObjectFromStream(ipObj, pStream, "ELI09964");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException("ELI07802", "Variant Vector for Clue List object could not be read from stream!" );
 			}
@@ -731,7 +731,7 @@ STDMETHODIMP CLocateImageRegion::Save(IStream *pStream, BOOL fClearDirty)
 			
 			// store clue list first
 			IPersistStreamPtr ipPersistentObj(listInfo.m_ipClues);
-			if (ipPersistentObj == NULL)
+			if (ipPersistentObj == __nullptr)
 			{
 				throw UCLIDException("ELI07801", "Clue list doesn't support IPersistStream.");
 			}
@@ -769,17 +769,17 @@ STDMETHODIMP CLocateImageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressSta
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI07949", ipAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI07949", ipAFDoc != __nullptr);
 
 		ISpatialStringPtr ipInputText = ipAFDoc->Text;
 		
 		// find regions of text
 		IIUnknownVectorPtr ipVecFoundRegions = findRegionContent(ipInputText, pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI16816", ipVecFoundRegions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16816", ipVecFoundRegions != __nullptr);
 
 		// create the attribute vector to return
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI07950", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07950", ipAttributes != __nullptr);
 
 		// iterate through each found region
 		int iSize = ipVecFoundRegions->Size();
@@ -787,7 +787,7 @@ STDMETHODIMP CLocateImageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressSta
 		{
 			// put the region into an attribute
 			IAttributePtr ipAttribute(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI07951", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07951", ipAttribute != __nullptr);
 			ipAttribute->Value = (ISpatialStringPtr) ipVecFoundRegions->At(i);
 
 			// add the attribute to the vector of attributes
@@ -814,14 +814,14 @@ STDMETHODIMP CLocateImageRegion::raw_ModifyValue(IAttribute* pAttribute, IAFDocu
 		validateLicense();
 
 		IAttributePtr	ipAttr( pAttribute );
-		ASSERT_RESOURCE_ALLOCATION("ELI09303", ipAttr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09303", ipAttr != __nullptr);
 
 		ISpatialStringPtr ipInputText = ipAttr->Value;
-		ASSERT_ARGUMENT("ELI07946", ipInputText != NULL);
+		ASSERT_ARGUMENT("ELI07946", ipInputText != __nullptr);
 
 		// Get the input text as a copyable object
 		ICopyableObjectPtr ipCopier = ipInputText;
-		ASSERT_RESOURCE_ALLOCATION("ELI25955", ipCopier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25955", ipCopier != __nullptr);
 
 		// combine all the found regions into a single result string.
 		// store that result into ipInputText
@@ -841,7 +841,7 @@ STDMETHODIMP CLocateImageRegion::raw_GetComponentDescription(BSTR * pstrComponen
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19581", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19581", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Locate image region").Detach();
 	}
@@ -908,7 +908,7 @@ STDMETHODIMP CLocateImageRegion::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::ILocateImageRegionPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08250", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08250", ipSource != __nullptr);
 
 		// copy find type and image region text
 		m_eFindType = (EFindType)ipSource->FindType;
@@ -925,12 +925,12 @@ STDMETHODIMP CLocateImageRegion::raw_CopyFrom(IUnknown *pObject)
 		int i;
 		for (i = kList1; i <= kList4; i++)
 		{
-			IVariantVectorPtr ipClues = NULL;
+			IVariantVectorPtr ipClues = __nullptr;
 			VARIANT_BOOL bCaseSensitive = VARIANT_FALSE;
 			VARIANT_BOOL bAsRegExpr = VARIANT_FALSE;
 			VARIANT_BOOL bRestrictBoundary = VARIANT_FALSE;
 			ipSource->GetClueList((UCLID_AFVALUEFINDERSLib::EClueListIndex)i, &ipClues, &bCaseSensitive, &bAsRegExpr, &bRestrictBoundary);
-			if (ipClues == NULL)
+			if (ipClues == __nullptr)
 			{
 				continue;
 			}
@@ -938,7 +938,7 @@ STDMETHODIMP CLocateImageRegion::raw_CopyFrom(IUnknown *pObject)
 			ClueListInfo listInfo;
 			
 			IShallowCopyablePtr ipCopyObj = ipClues;
-			ASSERT_RESOURCE_ALLOCATION("ELI08251", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08251", ipCopyObj != __nullptr);
 			listInfo.m_ipClues = ipCopyObj->ShallowCopy();
 			listInfo.m_bCaseSensitive = asCppBool(bCaseSensitive);
 			listInfo.m_bAsRegExpr = asCppBool(bAsRegExpr);
@@ -980,7 +980,7 @@ STDMETHODIMP CLocateImageRegion::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_LocateImageRegion);
-		ASSERT_RESOURCE_ALLOCATION("ELI08346", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08346", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -1025,7 +1025,7 @@ bool CLocateImageRegion::calculateRoughBorderPosition(BoundaryToInfo mapBorderTo
 
 		// get bounding rect for the found string
 		ILongRectanglePtr ipFoundStringBound = listInfo.m_ipFoundString->GetOCRImageBounds();
-		ASSERT_RESOURCE_ALLOCATION("ELI07914", ipFoundStringBound != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07914", ipFoundStringBound != __nullptr);
 
 		// store this clue list's found string boundary
 		itBorderToInfo = mapBorderToInfo.begin();
@@ -1084,7 +1084,7 @@ long CLocateImageRegion::getPageBoundaryPosition(EBoundary eSide, ISpatialString
 			// Get the first spatial page info
 			long lPage = ipPageText->GetFirstPageNumber();
 			ISpatialPageInfoPtr ipPageInfo = ipPageText->GetPageInfo(lPage);
-			ASSERT_RESOURCE_ALLOCATION("ELI25679", ipPageInfo != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25679", ipPageInfo != __nullptr);
 
 			// Return the height and width of the OCR-rotated document [P16 #2659]
 			// NOTE: ipPageInfo's height and width are relative to the original, unrotated document
@@ -1105,18 +1105,18 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 														 IAFDocument* pDocument)
 {
 	IAFDocumentPtr ipAFDoc(pDocument);
-	ASSERT_RESOURCE_ALLOCATION("ELI14636", ipAFDoc != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14636", ipAFDoc != __nullptr);
 
 	// create an IIUnknownVector to hold the results
 	IIUnknownVectorPtr ipVecFoundRegions(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI16817", ipVecFoundRegions != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16817", ipVecFoundRegions != __nullptr);
 
 	// Create IVariantVectorPtr array to backup the clues strings.
 	IVariantVectorPtr ipCopy[4];
 	
 	// Create a regex parser
 	IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("LocateImageRegion");
-	ASSERT_RESOURCE_ALLOCATION("ELI22435", ipParser != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22435", ipParser != __nullptr);
 
 	// Loop through all items in the map of clue lists
 	IndexToClueListInfo::iterator itClueLists = m_mapIndexToClueListInfo.begin();
@@ -1128,7 +1128,7 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 		// and replace this file name. But this file name will be recovered as a clue from
 		// ipCopy when this method is finished.
 		IVariantVectorPtr ipClues = itClueLists->second.m_ipClues;
-		ASSERT_RESOURCE_ALLOCATION("ELI25235", ipClues != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25235", ipClues != __nullptr);
 		ipCopy[i] = ipClues;
 		
 		// Get a list of values that includes values from any specified files.
@@ -1156,7 +1156,7 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 	{
 		// instantiate the found text object
 		ipOuterRegion.CreateInstance(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI16777", ipOuterRegion != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16777", ipOuterRegion != __nullptr);
 	}
 
 	// instantiate the index of ipPages
@@ -1175,7 +1175,7 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 		if(m_bDataInsideBoundaries)
 		{
 			// if this page contained any text, add it to the list of found content
-			if(ipCurrentRegion != NULL && ipCurrentRegion->IsEmpty() == VARIANT_FALSE)
+			if(ipCurrentRegion != __nullptr && ipCurrentRegion->IsEmpty() == VARIANT_FALSE)
 			{
 				ipVecFoundRegions->PushBack(ipCurrentRegion);
 			}
@@ -1191,12 +1191,12 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 				ipOuterRegion->Append( (ISpatialStringPtr) ipPages->At(i) );
 			}
 
-			if (ipCurrentRegion == NULL)
+			if (ipCurrentRegion == __nullptr)
 			{
 				// Invalid region. Since we are excluding add the current page. 
 				// [FlexIDSCore #3165]
 				ipCurrentRegion = ipPages->At(nFoundIndex);
-				ASSERT_RESOURCE_ALLOCATION("ELI25676", ipCurrentRegion != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25676", ipCurrentRegion != __nullptr);
 			}
 			
 			if (ipCurrentRegion->IsEmpty() == VARIANT_FALSE)
@@ -1299,27 +1299,27 @@ ISpatialStringPtr CLocateImageRegion::getImageRegion(ISpatialStringPtr ipPageTex
 
 	// get the spatial page info for this page
 	ISpatialPageInfoPtr ipPageInfo( ipPageText->GetPageInfo(lPage) );
-	ASSERT_RESOURCE_ALLOCATION("ELI20413", ipPageInfo != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20413", ipPageInfo != __nullptr);
 
 	// convert the region into a rect
 	ILongRectanglePtr ipRegionBounds = getRegionBounds(ipPageText, ipPageInfo);
 
-	if (ipRegionBounds != NULL)
+	if (ipRegionBounds != __nullptr)
 	{
 		// Create a raster zone given the region bounds
 		IRasterZonePtr	ipZone(CLSID_RasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI19885", ipZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19885", ipZone != __nullptr);
 
 		ipZone->CreateFromLongRectangle(ipRegionBounds, lPage);
 
 		// Create the image region's spatial page info map
 		ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI20238", ipPageInfoMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20238", ipPageInfoMap != __nullptr);
 		ipPageInfoMap->Set(lPage, ipPageInfo);
 
 		// Create a spatial string that will fill the raster zone
 		ISpatialStringPtr ipRet(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI13175", ipRet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13175", ipRet != __nullptr);
 		ipRet->CreatePseudoSpatialString(ipZone, m_strImageRegionText.c_str(), 
 			ipPageText->SourceDocName, ipPageInfoMap);
 
@@ -1381,7 +1381,7 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 	{
 		// get each page content
 		ISpatialStringPtr ipPageText = ipPages->At(nIndex);
-		ASSERT_RESOURCE_ALLOCATION("ELI07889", ipPageText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07889", ipPageText != __nullptr);
 
 		long pageLen = (long)ipPageText->String.length();
 		
@@ -1439,7 +1439,7 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 					}
 
 					ISpatialStringPtr ipFound = ipPageText->GetSubString(nStart, nEnd);
-					ASSERT_RESOURCE_ALLOCATION("ELI27680", ipFound != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI27680", ipFound != __nullptr);
 
 					if (asCppBool(ipFound->HasSpatialInfo()))
 					{
@@ -1486,11 +1486,11 @@ bool CLocateImageRegion::findCluesWithinBoundary(ISpatialStringPtr ipPageText,
 {
 	if (!m_mapBorderToPosition.empty() && rlistInfo.m_bRestrictByBoundary)
 	{
-		if (rlistInfo.m_ipFoundString != NULL)
+		if (rlistInfo.m_ipFoundString != __nullptr)
 		{
 			// Get the bounds of the found clue
 			ILongRectanglePtr ipFoundClueBoundary = rlistInfo.m_ipFoundString->GetOCRImageBounds();
-			ASSERT_RESOURCE_ALLOCATION("ELI25632", ipFoundClueBoundary != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25632", ipFoundClueBoundary != __nullptr);
 
 			// check if the found clue is already within the boundaries
 			map<EBoundary, long>::iterator itBorderToPosition = m_mapBorderToPosition.begin();
@@ -1544,7 +1544,7 @@ bool CLocateImageRegion::findCluesWithinBoundary(ISpatialStringPtr ipPageText,
 
 		// get string within boundaries
 		ISpatialStringPtr ipStringInBound = getStringWithinBoundary(ipPageText);
-		ASSERT_RESOURCE_ALLOCATION("ELI25633", ipStringInBound != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25633", ipStringInBound != __nullptr);
 
 		// find the clue list in the provided string
 		long nStart, nEnd;
@@ -1574,7 +1574,7 @@ bool CLocateImageRegion::findCluesWithinBoundary(ISpatialStringPtr ipPageText,
 
 		// update the found string
 		rlistInfo.m_ipFoundString = ipStringInBound->GetSubString(nStart, nEnd);
-		ASSERT_RESOURCE_ALLOCATION("ELI25634", rlistInfo.m_ipFoundString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25634", rlistInfo.m_ipFoundString != __nullptr);
 		return true;
 	}
 
@@ -1662,7 +1662,7 @@ ISpatialStringPtr CLocateImageRegion::getFinalResultString(ISpatialStringPtr ipP
 	ILongRectanglePtr ipRegionBounds = getRegionBounds(ipPageText, 
 		ipPageText->GetPageInfo(nFirstPage));
 
-	if (ipRegionBounds != NULL)
+	if (ipRegionBounds != __nullptr)
 	{
 		// initialize the spatial searcher with found page text
 		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipPageText);
@@ -1691,9 +1691,9 @@ ISpatialStringPtr CLocateImageRegion::getFinalResultString(ISpatialStringPtr ipP
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CLocateImageRegion::getStringWithinBoundary(ISpatialStringPtr ipInput)
 {
-	ASSERT_ARGUMENT("ELI25635", ipInput != NULL);
+	ASSERT_ARGUMENT("ELI25635", ipInput != __nullptr);
 
-	ISpatialStringPtr ipRet = NULL;
+	ISpatialStringPtr ipRet = __nullptr;
 	if (!m_mapBorderToPosition.empty())
 	{
 		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipInput);
@@ -1703,7 +1703,7 @@ ISpatialStringPtr CLocateImageRegion::getStringWithinBoundary(ISpatialStringPtr 
 
 		// create a rectangular bound
 		ILongRectanglePtr ipRectBound(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI07923", ipRectBound != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07923", ipRectBound != __nullptr);
 
 		// first set this rect to the edges of the page
 		ipRectBound->SetBounds(-1, -1, -1, -1);
@@ -1748,11 +1748,11 @@ ILongRectanglePtr CLocateImageRegion::getRegionBounds(ISpatialStringPtr ipPageTe
 {
 	if (!m_mapBorderToPosition.empty())
 	{
-		ASSERT_ARGUMENT("ELI20414", ipPageInfo != NULL);
+		ASSERT_ARGUMENT("ELI20414", ipPageInfo != __nullptr);
 
 		// convert the region into a rect
 		ILongRectanglePtr ipRegionBounds(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI07970", ipRegionBounds != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07970", ipRegionBounds != __nullptr);
 
 		// get the height and width of the OCR-rotated document [P16 #2659]
 		// NOTE: ipPageInfo's height and width are relative to the original, unrotated document
@@ -1874,11 +1874,11 @@ void CLocateImageRegion::validateLicense()
 ISpatialStringPtr CLocateImageRegion::combineRegions(IIUnknownVectorPtr ipVecImageRegions, 
 													 _bstr_t bstrSourceDocName)
 {
-	ASSERT_ARGUMENT("ELI16818", ipVecImageRegions != NULL);
+	ASSERT_ARGUMENT("ELI16818", ipVecImageRegions != __nullptr);
 
 	// output string
 	ISpatialStringPtr ipResult(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI07948", ipResult != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI07948", ipResult != __nullptr);
 
 	// combine regions into single spatial string
 	int iSize = ipVecImageRegions->Size();

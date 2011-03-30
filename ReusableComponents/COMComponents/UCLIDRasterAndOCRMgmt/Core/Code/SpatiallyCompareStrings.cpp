@@ -45,9 +45,9 @@ STDMETHODIMP CSpatiallyCompareStrings::raw_LessThan(IUnknown * pObj1, IUnknown *
 		// Check license
 		validateLicense();
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipS1(pObj1);
-		ASSERT_RESOURCE_ALLOCATION("ELI11271", ipS1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11271", ipS1 != __nullptr);
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipS2(pObj2);
-		ASSERT_RESOURCE_ALLOCATION("ELI11272", ipS2 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11272", ipS2 != __nullptr);
 
 		*pbRetVal = ipS1->IsSpatiallyLessThan(ipS2);
 		return S_OK;

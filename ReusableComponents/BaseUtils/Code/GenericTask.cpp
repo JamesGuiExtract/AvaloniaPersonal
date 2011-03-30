@@ -72,7 +72,7 @@ UINT genericTaskRunnerThread(LPVOID pParam)
 
 void GenericTask::runAsynchronously(UCLIDExceptionHandler *_pExceptionHandler)
 {
-	ASSERT_ARGUMENT("ELI00516", _pExceptionHandler != NULL);
+	ASSERT_ARGUMENT("ELI00516", _pExceptionHandler != __nullptr);
 	pExceptionHandler = _pExceptionHandler;
 
 	try
@@ -94,7 +94,7 @@ void GenericTask::handleException(const UCLIDException& uclidException)
 
 void GenericTask::stop()
 {
-	if (pThread != NULL)
+	if (pThread != __nullptr)
 	{
 		pThread->SuspendThread();
 	}

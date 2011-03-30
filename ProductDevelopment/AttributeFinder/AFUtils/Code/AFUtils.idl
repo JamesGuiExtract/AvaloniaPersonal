@@ -423,7 +423,7 @@ library UCLID_AFUTILSLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To expand a format string into a spatial string based on an attribute
 		//			and its sub attributes
-		// REQUIRE:	pAttribute != NULL
+		// REQUIRE:	pAttribute != __nullptr
 		//			bstrFormat must be a valid Format String as defined by the format syntax
 		// FORMAT SYNTAX:
 		//			A format string is made up of TEXT, VARIABLES, and SCOPES

@@ -122,7 +122,7 @@ void WordLengthDistributionDlg::OnShowWindow(BOOL bShow, UINT nStatus)
 		{
 			// get the edit control from the spatial string dialog
 			CEdit* pEditCtl = (CEdit*) m_pSSVDlg->GetDlgItem(IDC_EDIT_TEXT); 
-			ASSERT_RESOURCE_ALLOCATION("ELI20635", pEditCtl != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20635", pEditCtl != __nullptr);
 
 			// get the start and end points of the selection
 			int nStart(0), nEnd(0);
@@ -141,7 +141,7 @@ void WordLengthDistributionDlg::refreshDistribution(int nStart, int nEnd)
 {
 	// get the spatial string from the dialog box
 	ISpatialStringPtr ipSS = m_pSSVDlg->getSpatialString();
-	ASSERT_RESOURCE_ALLOCATION("ELI20634", ipSS != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20634", ipSS != __nullptr);
 
 	// only refresh data if either the start or end value has changed
 	if ((nStart != m_nStart) || (nEnd != m_nEnd))
@@ -157,7 +157,7 @@ void WordLengthDistributionDlg::refreshDistribution(int nStart, int nEnd)
 		{
 			// since we have a selection, set our string to be a substring
 			ipSS = ipSS->GetSubString(nStart, nEnd-1);
-			ASSERT_RESOURCE_ALLOCATION("ELI20636", ipSS != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20636", ipSS != __nullptr);
 		}
 		
 		m_listWordLengthDistribution.DeleteAllItems();
@@ -165,7 +165,7 @@ void WordLengthDistributionDlg::refreshDistribution(int nStart, int nEnd)
 		// get the word length distribution and the total number of words
 		long nNumWords;
 		ILongToLongMapPtr ipMap = ipSS->GetWordLengthDist(&nNumWords);
-		ASSERT_RESOURCE_ALLOCATION("ELI20637", ipMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20637", ipMap != __nullptr);
 
 		CString zNumWords;
 		zNumWords.Format("Total Number of Words: %d", nNumWords);

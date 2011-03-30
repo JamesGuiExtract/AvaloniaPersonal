@@ -217,7 +217,7 @@ CImageEditCtrl::CImageEditCtrl()
 	m_dRectWidth = 0;
 
 	// Create the Configuration object
-	m_apSettings = auto_ptr<ImageEditCtrlCfg>(new ImageEditCtrlCfg());
+	m_apSettings = unique_ptr<ImageEditCtrlCfg>(new ImageEditCtrlCfg());
 
 	// Get initialized FILEINFO struct
 	m_fInfo = GetLeadToolsSizedStruct<FILEINFO>(0);

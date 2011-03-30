@@ -380,7 +380,7 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 		{
 			// Obtain interface pointer to the IMergeAttributes class
 			UCLID_AFOUTPUTHANDLERSLib::IMergeAttributesPtr ipRule = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI22785", ipRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22785", ipRule != __nullptr);
 
 			// Apply settings to rule
 			ipRule->AttributeQuery = verifyControlValueAsBSTR(m_editAttributeQuery,
@@ -479,7 +479,7 @@ STDMETHODIMP CMergeAttributesPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22787", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI22787", pbValue != __nullptr);
 
 		try
 		{
@@ -505,7 +505,7 @@ STDMETHODIMP CMergeAttributesPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 void CMergeAttributesPP::initializeList(ATLControls::CListViewCtrl &listControl,
 										IVariantVectorPtr ipEntries)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI22850", ipEntries != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22850", ipEntries != __nullptr);
 
 	listControl.SetExtendedListViewStyle(LVS_EX_GRIDLINES|LVS_EX_FULLROWSELECT);
 	CRect rect;			
@@ -529,7 +529,7 @@ void CMergeAttributesPP::initializeList(ATLControls::CListViewCtrl &listControl,
 IVariantVectorPtr CMergeAttributesPP::retrieveListValues(ATLControls::CListViewCtrl &listControl)
 {
 	IVariantVectorPtr ipEntries(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI22874", ipEntries != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22874", ipEntries != __nullptr);
 
 	// Retrieve the entries from listControl (validate each entry)
 	for (long i = 0; i < listControl.GetItemCount(); i++)

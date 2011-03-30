@@ -152,7 +152,7 @@ private:
 	IVariantVectorPtr	m_ipRelatedCompanyBranchList;
 
 	// DAT file reader
-	std::auto_ptr<KeywordListReader> m_apKlr;
+	std::unique_ptr<KeywordListReader> m_apKlr;
 
 	// Vector of Keywords as read from DAT file
 	std::vector<std::string>	m_vecKeywords;

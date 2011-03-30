@@ -190,7 +190,7 @@ void CAddressSplitterTester::addAttributeLevel(IAttributePtr ipNewAttribute, int
 
 	// Retrieve vector of Attributes or SubAttributes at specified level
 	IIUnknownVectorPtr	ipLevelVector = m_vecCurrentLevels.at( iLevel );
-	if (ipLevelVector == NULL)
+	if (ipLevelVector == __nullptr)
 	{
 		// Throw exception, Cannot retrieve specified Attribute collection
 		UCLIDException	ue( "ELI07243", "Unable to retrieve Attributes." );
@@ -229,7 +229,7 @@ string CAddressSplitterTester::attributeAsString(IAttributePtr ipAttribute, int 
 
 	// Retrieve Value
 	ISpatialStringPtr ipValue = ipAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION( "ELI15573", ipValue != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI15573", ipValue != __nullptr );
 	string strValue = ipValue->String;
 
 	// Convert any cpp string (ex. \r, \n, etc. )to normal string
@@ -248,7 +248,7 @@ string CAddressSplitterTester::attributeAsString(IAttributePtr ipAttribute, int 
 
 	// Retrieve collected sub-attributes
 	IIUnknownVectorPtr ipSubs = ipAttribute->SubAttributes;
-	ASSERT_RESOURCE_ALLOCATION("ELI15574", ipSubs != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15574", ipSubs != __nullptr);
 
 	// Handle each sub-attribute
 	long lSubCount = ipSubs->Size();
@@ -259,7 +259,7 @@ string CAddressSplitterTester::attributeAsString(IAttributePtr ipAttribute, int 
 
 		// Retrieve the sub-attribute
 		IAttributePtr ipSubAttribute = ipSubs->At( i );
-		ASSERT_RESOURCE_ALLOCATION("ELI15575", ipSubAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15575", ipSubAttribute != __nullptr);
 
 		// Add the stringized subattribute - with next child level
 		strAttribute += attributeAsString( ipSubAttribute, iChildLevel + 1 );
@@ -284,10 +284,10 @@ bool CAddressSplitterTester::checkTestResults(IAttributePtr ipTest, IAttributePt
 
 	// Get IComparableObject pointer from Test and Expected Attributes
 	IComparableObjectPtr	ipCompTest = ipTest;
-	ASSERT_RESOURCE_ALLOCATION( "ELI07240", ipCompTest != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI07240", ipCompTest != __nullptr );
 
 	IComparableObjectPtr	ipCompExp = ipExpected;
-	ASSERT_RESOURCE_ALLOCATION( "ELI07241", ipCompExp != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI07241", ipCompExp != __nullptr );
 
 	// Compare the Attributes
 	if (ipCompTest->IsEqualTo( ipCompExp ) == VARIANT_FALSE)
@@ -309,8 +309,8 @@ void CAddressSplitterTester::doTest(std::string strLabel, IAttributePtr ipTest,
 	bool bExceptionCaught = false;
 	try
 	{
-		ASSERT_ARGUMENT("ELI20475", ipTest != NULL);
-		ASSERT_ARGUMENT("ELI20476", ipExpected != NULL);
+		ASSERT_ARGUMENT("ELI20475", ipTest != __nullptr);
+		ASSERT_ARGUMENT("ELI20476", ipExpected != __nullptr);
 
 		// Call Address Splitter
 		try
@@ -325,7 +325,7 @@ void CAddressSplitterTester::doTest(std::string strLabel, IAttributePtr ipTest,
 		{
 			UCLIDException uexOuter("ELI07233", "Failed to split the Attribute.", ue);
 			ISpatialStringPtr ipValue = ipTest->Value;
-			if (ipValue != NULL)
+			if (ipValue != __nullptr)
 			{
 				uexOuter.addDebugInfo( "Input String", asString( ipValue->String ) );
 			}
@@ -342,7 +342,7 @@ IAttributePtr CAddressSplitterTester::getAttribute(std::ifstream &ifs)
 {
 	// Create the main Attribute
 	IAttributePtr	ipAttribute( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION( "ELI07237", ipAttribute != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI07237", ipAttribute != __nullptr );
 
 	// Read each line of the Attribute
 	bool	bDone = false;
@@ -412,7 +412,7 @@ IAttributePtr CAddressSplitterTester::getAttribute(std::ifstream &ifs)
 			{
 				// Create a new Attribute object for this Name/Value pair
 				IAttributePtr	ipNewAttribute( CLSID_Attribute );
-				if (ipNewAttribute == NULL)
+				if (ipNewAttribute == __nullptr)
 				{
 					// Throw exception
 					UCLIDException ue( "ELI07239", "Unable to create new Attribute object!" );
@@ -422,7 +422,7 @@ IAttributePtr CAddressSplitterTester::getAttribute(std::ifstream &ifs)
 				// Add Name, Value, Type information
 				ipNewAttribute->Name = _bstr_t( strName.c_str() );
 				ISpatialStringPtr ipValue = ipNewAttribute->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI25937", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25937", ipValue != __nullptr);
 				ipValue->CreateNonSpatialString(strValue.c_str(), "");
 				ipNewAttribute->Type = _bstr_t( strType.c_str() );
 
@@ -434,7 +434,7 @@ IAttributePtr CAddressSplitterTester::getAttribute(std::ifstream &ifs)
 				// Add Name, Value, Type information to Main Attribute
 				ipAttribute->Name = _bstr_t( strName.c_str() );
 				ISpatialStringPtr ipValue = ipAttribute->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI25942", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25942", ipValue != __nullptr);
 				ipValue->CreateNonSpatialString(strValue.c_str(), "");
 				ipAttribute->Type = _bstr_t( strType.c_str() );
 
@@ -486,7 +486,7 @@ const std::string CAddressSplitterTester::getMasterTestFileName(IVariantVectorPt
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		// get the DAT filename
 		string strMasterDatFileName = ::getAbsoluteFileName(strTCLFile, asString(_bstr_t(ipParams->GetItem(1))), true);
@@ -512,10 +512,10 @@ const std::string CAddressSplitterTester::getMasterTestFileName(IVariantVectorPt
 void CAddressSplitterTester::prepareTests()
 {
 	// Create a Name Splitter for testing
-	if (m_ipAddressSplitter == NULL)
+	if (m_ipAddressSplitter == __nullptr)
 	{
 		m_ipAddressSplitter.CreateInstance( CLSID_AddressSplitter );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07227", m_ipAddressSplitter != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07227", m_ipAddressSplitter != __nullptr );
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -617,7 +617,7 @@ void CAddressSplitterTester::processLine(std::string strLine, const std::string&
 				IAttributePtr	ipExpected = getAttribute( ifs );
 
 				// Check for valid Attribute
-				if (ipExpected == NULL)
+				if (ipExpected == __nullptr)
 				{
 					// Create and throw exception
 					UCLIDException ue( "ELI07228", "Unable to retrieve expected Attribute." );
@@ -628,12 +628,12 @@ void CAddressSplitterTester::processLine(std::string strLine, const std::string&
 
 				// Create the Attribute to be split
 				IAttributePtr	ipTest( CLSID_Attribute );
-				ASSERT_RESOURCE_ALLOCATION( "ELI07229", ipTest != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI07229", ipTest != __nullptr );
 
 				// Provide Name and Value for Attribute
 				ipTest->Name = "Address";
 				ISpatialStringPtr ipValue = ipTest->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI25943", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25943", ipValue != __nullptr);
 				ipValue->ReplaceAndDowngradeToNonSpatial(strText.c_str());
 
 				// Execute the test
@@ -674,7 +674,7 @@ void CAddressSplitterTester::processLine(std::string strLine, const std::string&
 
 					// Get pointer to IAddressSplitter object
 					IAddressSplitterPtr	ipSplitter = m_ipAddressSplitter;
-					ASSERT_RESOURCE_ALLOCATION( "ELI08501", ipSplitter != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI08501", ipSplitter != __nullptr );
 
 					// Apply the setting
 					ipSplitter->CombinedNameAddress = bCombinedAddress ? VARIANT_TRUE : VARIANT_FALSE;

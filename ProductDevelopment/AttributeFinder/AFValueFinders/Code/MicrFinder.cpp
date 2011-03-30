@@ -469,7 +469,7 @@ m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 		m_mapRotations[270] = true;
 
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI29475", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29475", m_ipMiscUtils != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29476");
 }
@@ -478,7 +478,7 @@ CMicrFinder::~CMicrFinder()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI24338");
 }
@@ -527,20 +527,20 @@ STDMETHODIMP CMicrFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus *p
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI24411", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24411", ipAFDoc != __nullptr);
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI24339", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24339", ipAttributes != __nullptr);
 
 		// Get the spatial string
 		ISpatialStringPtr ipSS = ipAFDoc->Text;
 
 		// Check that there is a spatial string and it has spatial info
-		if (ipSS != NULL && ipSS->HasSpatialInfo() == VARIANT_TRUE)
+		if (ipSS != __nullptr && ipSS->HasSpatialInfo() == VARIANT_TRUE)
 		{
 			// Get the pages from the spatial string [FlexIDSCore #3522]
 			IIUnknownVectorPtr ipPages = ipSS->GetPages();
-			ASSERT_RESOURCE_ALLOCATION("ELI25600", ipPages != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25600", ipPages != __nullptr);
 
 			// Build a vector of pages to process
 			long lSize = ipPages->Size();
@@ -549,7 +549,7 @@ STDMETHODIMP CMicrFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus *p
 			{
 				// Get the page
 				ISpatialStringPtr ipPage = ipPages->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI25601", ipPage != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25601", ipPage != __nullptr);
 
 				// Get the page number for the page
 				long lPageNum = ipPage->GetFirstPageNumber();
@@ -577,7 +577,7 @@ STDMETHODIMP CMicrFinder::raw_GetComponentDescription(BSTR * pstrComponentDescri
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24342", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI24342", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("MICR finder").Detach();
 	}
@@ -597,7 +597,7 @@ STDMETHODIMP CMicrFinder::raw_CopyFrom(IUnknown * pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IMicrFinderPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI24344", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24344", ipSource != __nullptr);
 
 		m_bSplitRoutingNumber = asCppBool(ipSource->SplitRoutingNumber);
 		m_bSplitAccountNumber = asCppBool(ipSource->SplitAccountNumber);
@@ -622,10 +622,10 @@ STDMETHODIMP CMicrFinder::raw_Clone(IUnknown * * pObject)
 		// validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24346", pObject != NULL);
+		ASSERT_ARGUMENT("ELI24346", pObject != __nullptr);
 
 		ICopyableObjectPtr ipObjCopy(CLSID_MicrFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI24347", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24347", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -774,7 +774,7 @@ STDMETHODIMP CMicrFinder::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI24352", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI24352", pbValue != __nullptr);
 
 		try
 		{
@@ -805,7 +805,7 @@ STDMETHODIMP CMicrFinder::get_SplitRoutingNumber(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24354", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24354", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bSplitRoutingNumber);
 
@@ -840,7 +840,7 @@ STDMETHODIMP CMicrFinder::get_SplitAccountNumber(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24357", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24357", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bSplitAccountNumber);
 
@@ -875,7 +875,7 @@ STDMETHODIMP CMicrFinder::get_SplitCheckNumber(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24360", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24360", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bSplitCheckNumber);
 
@@ -910,7 +910,7 @@ STDMETHODIMP CMicrFinder::get_SplitAmount(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24363", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24363", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bSplitAmount);
 
@@ -945,7 +945,7 @@ STDMETHODIMP CMicrFinder::get_Rotate0(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25010", pVal != NULL);
+		ASSERT_ARGUMENT("ELI25010", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_mapRotations[0]);
 
@@ -980,7 +980,7 @@ STDMETHODIMP CMicrFinder::get_Rotate90(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25013", pVal != NULL);
+		ASSERT_ARGUMENT("ELI25013", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_mapRotations[90]);
 
@@ -1015,7 +1015,7 @@ STDMETHODIMP CMicrFinder::get_Rotate180(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25016", pVal != NULL);
+		ASSERT_ARGUMENT("ELI25016", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_mapRotations[180]);
 
@@ -1050,7 +1050,7 @@ STDMETHODIMP CMicrFinder::get_Rotate270(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25019", pVal != NULL);
+		ASSERT_ARGUMENT("ELI25019", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_mapRotations[270]);
 
@@ -1086,8 +1086,8 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 	INIT_EXCEPTION_AND_TRACING("MLI02313");
 	try
 	{
-		ASSERT_ARGUMENT("ELI24941", ipSpatialString != NULL);
-		ASSERT_ARGUMENT("ELI24415", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI24941", ipSpatialString != __nullptr);
+		ASSERT_ARGUMENT("ELI24415", ipAttributes != __nullptr);
 
 		// Ensure the image exists
 		string strImageName = asString(ipSpatialString->SourceDocName);
@@ -1127,11 +1127,11 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 
 				// Create an inlite server for creating images
 				ICiServerPtr ipServer(CLSID_CiServer);
-				ASSERT_RESOURCE_ALLOCATION("ELI25053", ipServer != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25053", ipServer != __nullptr);
 
 				// Load the image (with no rotation)
 				ICiImagePtr ipImage = ipServer->CreateImage();
-				ASSERT_RESOURCE_ALLOCATION("ELI25022", ipImage != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25022", ipImage != __nullptr);
 				ipImage->Open(bstrImageName, *it);
 				_lastCodePos = "110_B_" + strCount;
 
@@ -1151,7 +1151,7 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 				if (m_mapRotations[90])
 				{
 					ICiImagePtr ipImage90 = ipServer->CreateImage();
-					ASSERT_RESOURCE_ALLOCATION("ELI25023", ipImage90 != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25023", ipImage90 != __nullptr);
 					ipImage90->Copy(ipImage);
 					ipImage90->RotateRight();
 					mapRotationToImage[90] = ipImage90;
@@ -1159,7 +1159,7 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 				if (m_mapRotations[180])
 				{
 					ICiImagePtr ipImage180 = ipServer->CreateImage();
-					ASSERT_RESOURCE_ALLOCATION("ELI25024", ipImage180 != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25024", ipImage180 != __nullptr);
 					ipImage180->Copy(ipImage);
 					ipImage180->RotateRight();
 					ipImage180->RotateRight();
@@ -1168,7 +1168,7 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 				if (m_mapRotations[270])
 				{
 					ICiImagePtr ipImage270 = ipServer->CreateImage();
-					ASSERT_RESOURCE_ALLOCATION("ELI25025", ipImage270 != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25025", ipImage270 != __nullptr);
 					ipImage270->Copy(ipImage);
 					ipImage270->RotateLeft();
 					mapRotationToImage[270] = ipImage270;
@@ -1177,7 +1177,7 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 
 				// Create the MICR reader
 				_CcMicrReaderPtr ipReader(CLSID_CcMicrReader);
-				ASSERT_RESOURCE_ALLOCATION("ELI24416", ipReader != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24416", ipReader != __nullptr);
 
 				// Get the finding flags value from the registry [FlexIDSCore #3490]
 				ipReader->Flags = getMicrReaderFlags();
@@ -1221,40 +1221,40 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 								{
 									// Get the MICR line
 									_CcMicrPtr ipMicrLine = ipReader->GetMicrLine(i);
-									ASSERT_RESOURCE_ALLOCATION("ELI25026", ipMicrLine != NULL);
+									ASSERT_RESOURCE_ALLOCATION("ELI25026", ipMicrLine != __nullptr);
 
 									// Build up the MicrLine object for this line
 									MicrLine micrLine;
 									_CcMicrInfoPtr ipInfo = ipMicrLine->Info;
-									if (ipInfo != NULL && ipInfo->IsRead == VARIANT_TRUE)
+									if (ipInfo != __nullptr && ipInfo->IsRead == VARIANT_TRUE)
 									{
 										// Set the has info line to true based on buildMicrZone results
 										micrLine.m_bHasInfo = buildMicrZone(ipInfo, mapIt->first,
 											lWidth, lHeight, micrLine.m_Info);
 									}
 									ipInfo = ipMicrLine->Routing;
-									if (ipInfo != NULL && ipInfo->IsRead == VARIANT_TRUE)
+									if (ipInfo != __nullptr && ipInfo->IsRead == VARIANT_TRUE)
 									{
 										// Set the has routing line to true based on buildMicrZone results
 										micrLine.m_bHasRouting = buildMicrZone(ipInfo, mapIt->first,
 											lWidth, lHeight, micrLine.m_Routing);
 									}
 									ipInfo = ipMicrLine->Account;
-									if (ipInfo != NULL && ipInfo->IsRead == VARIANT_TRUE)
+									if (ipInfo != __nullptr && ipInfo->IsRead == VARIANT_TRUE)
 									{
 										// Set the has account line to true based on buildMicrZone results
 										micrLine.m_bHasAccount = buildMicrZone(ipInfo, mapIt->first,
 											lWidth, lHeight, micrLine.m_Account);
 									}
 									ipInfo = ipMicrLine->CheckNumber;
-									if (ipInfo != NULL && ipInfo->IsRead == VARIANT_TRUE)
+									if (ipInfo != __nullptr && ipInfo->IsRead == VARIANT_TRUE)
 									{
 										// Set the has check number line to true based on buildMicrZone results
 										micrLine.m_bHasCheckNumber = buildMicrZone(ipInfo, mapIt->first,
 											lWidth, lHeight, micrLine.m_CheckNumber);
 									}
 									ipInfo = ipMicrLine->Amount;
-									if (ipInfo != NULL && ipInfo->IsRead == VARIANT_TRUE)
+									if (ipInfo != __nullptr && ipInfo->IsRead == VARIANT_TRUE)
 									{
 										// Set the has amount line to true based on buildMicrZone results
 										micrLine.m_bHasAmount = buildMicrZone(ipInfo, mapIt->first,
@@ -1293,7 +1293,7 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 					mapIt != mapRotationToImage.end(); mapIt++)
 				{
 					ICiImagePtr ipImage = mapIt->second;
-					if (ipImage != NULL && ipImage->IsValid == ciTrue)
+					if (ipImage != __nullptr && ipImage->IsValid == ciTrue)
 					{
 						ipImage->Close();
 					}
@@ -1309,7 +1309,7 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 						mapIt != mapRotationToImage.end(); mapIt++)
 					{
 						ICiImagePtr ipImage = mapIt->second;
-						if (ipImage != NULL && ipImage->IsValid == ciTrue)
+						if (ipImage != __nullptr && ipImage->IsValid == ciTrue)
 						{
 							ipImage->Close();
 						}
@@ -1324,7 +1324,7 @@ void CMicrFinder::findMICRZones(ISpatialStringPtr ipSpatialString, const vector<
 
 		IIUnknownVectorPtr ipNewAttributes =
 			buildAttributesFromPages(mapMicrPages, strImageName, ipSpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI25032", ipNewAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25032", ipNewAttributes != __nullptr);
 
 		// Append the new attributes
 		ipAttributes->Append(ipNewAttributes);
@@ -1341,17 +1341,17 @@ IAttributePtr CMicrFinder::buildAttribute(const RECT& recZone, ILongToObjectMapP
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI24424", ipMap != NULL);
+		ASSERT_ARGUMENT("ELI24424", ipMap != __nullptr);
 
 		// Create a new rectangle
 		ILongRectanglePtr ipRect(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI24426", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24426", ipRect != __nullptr);
 		ipRect->SetBounds(recZone.left, recZone.top, recZone.right, recZone.bottom);
 		_lastCodePos = "10";
 
 		// Create a new raster zone
 		IRasterZonePtr ipRasterZone(CLSID_RasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI24427", ipRasterZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24427", ipRasterZone != __nullptr);
 		ipRasterZone->CreateFromLongRectangle(ipRect, lPage);
 		_lastCodePos = "20";
 
@@ -1362,14 +1362,14 @@ IAttributePtr CMicrFinder::buildAttribute(const RECT& recZone, ILongToObjectMapP
 
 		// Create a spatial string
 		ISpatialStringPtr ipSS(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI24431", ipSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24431", ipSS != __nullptr);
 		ipSS->CreatePseudoSpatialString(ipRasterZone, strMicrText.c_str(),
 			strSourceImage.c_str(), ipMap);
 		_lastCodePos = "60";
 
 		// Create an attribute
 		IAttributePtr ipAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI24432", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24432", ipAttribute != __nullptr);
 		ipAttribute->Value = ipSS;
 		_lastCodePos = "70";
 		
@@ -1391,7 +1391,7 @@ bool CMicrFinder::buildMicrZone(_CcMicrInfoPtr ipMicrInfo, int nRotation,
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI25033", ipMicrInfo != NULL);
+		ASSERT_ARGUMENT("ELI25033", ipMicrInfo != __nullptr);
 
 		// Get the text and if empty return false [FlexIDSCore #3502]
 		string strText = asString(ipMicrInfo->TextRaw);
@@ -1430,10 +1430,10 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 	try
 	{
 		// Ensure the spatial string is not null
-		ASSERT_ARGUMENT("ELI25035", ipSS != NULL);
+		ASSERT_ARGUMENT("ELI25035", ipSS != __nullptr);
 
 		IIUnknownVectorPtr ipNewAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI25036", ipNewAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25036", ipNewAttributes != __nullptr);
 
 		for(map<long, MicrPage>::const_iterator mapIt = mapPages.begin();
 			mapIt != mapPages.end(); mapIt++)
@@ -1442,7 +1442,7 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 
 			// Set up the spatial page info
 			ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
-			ASSERT_RESOURCE_ALLOCATION("ELI25037", ipPageInfo != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25037", ipPageInfo != __nullptr);
 			ipPageInfo->Deskew = 0.0;
 			ipPageInfo->Width = micrPage.m_lWidth;
 			ipPageInfo->Height = micrPage.m_lHeight;
@@ -1450,7 +1450,7 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 
 			// Create a new Spatial Page Info map
 			ILongToObjectMapPtr ipMap(CLSID_LongToObjectMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI25038", ipMap != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25038", ipMap != __nullptr);
 			ipMap->Set(mapIt->first, ipPageInfo);
 
 			// Loop through each of the MICR lines for the page
@@ -1509,7 +1509,7 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 						micrZone.m_strMicrText, strImageName, "MICR");
 					ASSERT_RESOURCE_ALLOCATION("ELI25039", ipMain);
 					IIUnknownVectorPtr ipSubAttributes = ipMain->SubAttributes;
-					ASSERT_RESOURCE_ALLOCATION("ELI25040", ipSubAttributes != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25040", ipSubAttributes != __nullptr);
 
 					// Now check for sub attributes
 					if (m_bSplitRoutingNumber && micrLine.m_bHasRouting)
@@ -1517,7 +1517,7 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 						MicrZone& routingZone = micrLine.m_Routing;
 						IAttributePtr ipRouting = buildAttribute(routingZone.m_rectZone, ipMap,
 							mapIt->first, routingZone.m_strMicrText, strImageName, "Routing");
-						ASSERT_RESOURCE_ALLOCATION("ELI25041", ipRouting != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI25041", ipRouting != __nullptr);
 						ipSubAttributes->PushBack(ipRouting);
 
 						// ----------------------------------
@@ -1528,13 +1528,13 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 							ipSS->GetSpecifiedPages(mapIt->first, mapIt->first);
 
 						// Ensure the substring is spatial
-						if (ipSSTemp != NULL && ipSSTemp->HasSpatialInfo() == VARIANT_TRUE)
+						if (ipSSTemp != __nullptr && ipSSTemp->HasSpatialInfo() == VARIANT_TRUE)
 						{
 							// Create a bounding rectangle to search for the other routing number
 							RECT rectArea = getOtherRoutingSearchZone(vecLines, micrZone, micrPage);
 							IAttributePtr ipOtherRouting = findOtherRoutingNumber(ipSSTemp,
 								routingZone.m_strMicrText, rectArea);
-							if (ipOtherRouting != NULL)
+							if (ipOtherRouting != __nullptr)
 							{
 								ipSubAttributes->PushBack(ipOtherRouting);
 							}
@@ -1545,7 +1545,7 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 						MicrZone& micrAccount = micrLine.m_Account;
 						IAttributePtr ipAccount = buildAttribute(micrAccount.m_rectZone, ipMap,
 							mapIt->first, micrAccount.m_strMicrText, strImageName, "Account");
-						ASSERT_RESOURCE_ALLOCATION("ELI25042", ipAccount != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI25042", ipAccount != __nullptr);
 						ipSubAttributes->PushBack(ipAccount);
 					}
 					if(m_bSplitCheckNumber && micrLine.m_bHasCheckNumber)
@@ -1553,7 +1553,7 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 						MicrZone& micrCheck = micrLine.m_CheckNumber;
 						IAttributePtr ipCheck = buildAttribute(micrCheck.m_rectZone, ipMap,
 							mapIt->first, micrCheck.m_strMicrText, strImageName, "CheckNumber");
-						ASSERT_RESOURCE_ALLOCATION("ELI25043", ipCheck != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI25043", ipCheck != __nullptr);
 						ipSubAttributes->PushBack(ipCheck);
 					}
 					if (m_bSplitAmount && micrLine.m_bHasAmount)
@@ -1561,7 +1561,7 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 						MicrZone& micrAmount = micrLine.m_Amount;
 						IAttributePtr ipAmount = buildAttribute(micrAmount.m_rectZone, ipMap,
 							mapIt->first, micrAmount.m_strMicrText, strImageName, "Amount");
-						ASSERT_RESOURCE_ALLOCATION("ELI25044", ipAmount != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI25044", ipAmount != __nullptr);
 						ipSubAttributes->PushBack(ipAmount);
 					}
 
@@ -1579,12 +1579,12 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 												  const string &strRoutingNumber,
 												  const RECT& rectToSearch)
 {
-	ASSERT_ARGUMENT("ELI24944", ipSpatialString != NULL);
+	ASSERT_ARGUMENT("ELI24944", ipSpatialString != __nullptr);
 
 	try
 	{
 		// The attribute that will be returned
-		IAttributePtr ipNewAttribute = NULL;
+		IAttributePtr ipNewAttribute = __nullptr;
 
 		// Check for 8 digit routing number
 		if (strRoutingNumber.length() != 8)
@@ -1608,13 +1608,13 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 
 		// Create a long rectangle based on the rectangle to search
 		ILongRectanglePtr ipRect(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI24945", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24945", ipRect != __nullptr);
 		ipRect->SetBounds(rectToSearch.left, rectToSearch.top, rectToSearch.right,
 			rectToSearch.bottom);
 
 		// Create a spatial string searcher and initialize it
 		ISpatialStringSearcherPtr ipSSSearcher(CLSID_SpatialStringSearcher);
-		ASSERT_RESOURCE_ALLOCATION("ELI24946", ipSSSearcher != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24946", ipSSSearcher != __nullptr);
 		ipSSSearcher->InitSpatialStringSearcher(ipSpatialString);
 		ipSSSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
 
@@ -1625,7 +1625,7 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 		// 1. The spatial string is not null
 		// 2. The spatial string is not empty
 		// 3. The spatial string has spatial info
-		if (ipSS != NULL
+		if (ipSS != __nullptr
 			&& ipSS->IsEmpty() != VARIANT_TRUE
 			&& ipSS->HasSpatialInfo() == VARIANT_TRUE)
 		{
@@ -1646,15 +1646,15 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 				IIUnknownVectorPtr ipMatches =
 					getOtherRoutingNumberRegexParser()->Find(ipSS->String,
 					VARIANT_TRUE, VARIANT_TRUE);
-				ASSERT_RESOURCE_ALLOCATION("ELI24949", ipMatches != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24949", ipMatches != __nullptr);
 
 				if (ipMatches->Size() >= 1)
 				{
 					// Get the match object
 					IObjectPairPtr ipObject(ipMatches->At(0));
-					ASSERT_RESOURCE_ALLOCATION("ELI24950", ipObject != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24950", ipObject != __nullptr);
 					ITokenPtr ipToken(ipObject->Object1);
-					ASSERT_RESOURCE_ALLOCATION("ELI24951", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24951", ipToken != __nullptr);
 
 					// Get the start and end position
 					lStart = ipToken->StartPosition;
@@ -1663,7 +1663,7 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 			}
 				
 			// If a start and end were computed, attempt to get a sub string
-			ISpatialStringPtr ipSubString = NULL;
+			ISpatialStringPtr ipSubString = __nullptr;
 			if (lStart != -1 && lEnd != -1)
 			{
 				try
@@ -1677,12 +1677,12 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 				}
 			}
 
-			if (ipSubString != NULL)
+			if (ipSubString != __nullptr)
 			{
 				// Trim white space from the beginning and end of the string
 				ipSubString->Trim(" \r\n", " \r\n");
 				ipNewAttribute.CreateInstance(CLSID_Attribute);
-				ASSERT_RESOURCE_ALLOCATION("ELI24952", ipNewAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24952", ipNewAttribute != __nullptr);
 
 				ipNewAttribute->Value = ipSubString;
 				ipNewAttribute->Name = "OtherRouting";
@@ -1720,7 +1720,7 @@ IRegularExprParserPtr CMicrFinder::getOtherRoutingNumberRegexParser()
 
 		// Get a regular expression parser
 		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("");
-		ASSERT_RESOURCE_ALLOCATION("ELI24948", ipParser != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI24948", ipParser != __nullptr );
 
 		// Load the regex pattern into the parser
 		ipParser->Pattern = strOtherRoutingRegex.c_str();

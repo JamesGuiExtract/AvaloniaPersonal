@@ -26,7 +26,7 @@ CExtractLine::CExtractLine()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13040", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13040", m_ipMiscUtils != __nullptr );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05427")
 }
@@ -35,7 +35,7 @@ CExtractLine::~CExtractLine()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16343");
 }
@@ -112,7 +112,7 @@ STDMETHODIMP CExtractLine::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 
 					// Get the associated ISpatialString
 					ISpatialStringPtr	ipSingleLine = ipInputText->GetSubString( nStart, nEnd );
-					ASSERT_RESOURCE_ALLOCATION( "ELI06585", ipSingleLine != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI06585", ipSingleLine != __nullptr );
 
 					// Remove any line breaks
 					ipSingleLine->Replace("\n", "", VARIANT_FALSE, 0, NULL);
@@ -120,7 +120,7 @@ STDMETHODIMP CExtractLine::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 
 					// Create an attribute to store the value
 					IAttributePtr ipAttribute( CLSID_Attribute );
-					ASSERT_RESOURCE_ALLOCATION( "ELI06586", ipAttribute != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI06586", ipAttribute != __nullptr );
 					ipAttribute->Value = ipSingleLine;
 					// Add the Attribute to the vector
 					ipAttributes->PushBack( ipAttribute );
@@ -131,7 +131,7 @@ STDMETHODIMP CExtractLine::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		{
 			// combine all specified lines into one value with line breaks first
 			ISpatialStringPtr	ipCombined( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION( "ELI06587", ipCombined != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI06587", ipCombined != __nullptr );
 
 			for (unsigned int ui = 0; ui < m_vecLineNumbers.size(); ui++)
 			{
@@ -155,7 +155,7 @@ STDMETHODIMP CExtractLine::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 
 					// Get the associated ISpatialString
 					ISpatialStringPtr	ipEachLine = ipInputText->GetSubString( nStart, nEnd );
-					ASSERT_RESOURCE_ALLOCATION( "ELI06588", ipEachLine != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI06588", ipEachLine != __nullptr );
 
 					// Append this SpatialString to the others
 					ipCombined->Append( ipEachLine );
@@ -175,7 +175,7 @@ STDMETHODIMP CExtractLine::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 			{
 				// Create an Attribute to store the value
 				IAttributePtr ipAttribute( CLSID_Attribute );
-				ASSERT_RESOURCE_ALLOCATION( "ELI06589", ipAttribute != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI06589", ipAttribute != __nullptr );
 				ipAttribute->Value = ipCombined;
 
 				// Add the Attribute to the vector
@@ -229,7 +229,7 @@ STDMETHODIMP CExtractLine::raw_GetComponentDescription(BSTR * pstrComponentDescr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19578", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19578", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Extract lines").Detach();
 	}
@@ -309,7 +309,7 @@ STDMETHODIMP CExtractLine::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_ExtractLine);
-		ASSERT_RESOURCE_ALLOCATION("ELI08344", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08344", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -563,7 +563,7 @@ void CExtractLine::parseLineNumbers(const string& strLineNumbers)
 
 	IIUnknownVectorPtr ipNonDigitChars = 
 		ipParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_FALSE);
-	if (ipNonDigitChars != NULL && ipNonDigitChars->Size() > 0)
+	if (ipNonDigitChars != __nullptr && ipNonDigitChars->Size() > 0)
 	{
 		UCLIDException ue("ELI05834", "Invalid line numbers are defined.");
 		ue.addDebugInfo("Invalid line numbers", strLineNumbers);
@@ -575,7 +575,7 @@ void CExtractLine::parseLineNumbers(const string& strLineNumbers)
 	// get top matches, which might be some numbers and some number ranges
 	IIUnknownVectorPtr ipTopMatches = 
 		ipParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_TRUE);
-	if (ipTopMatches != NULL)
+	if (ipTopMatches != __nullptr)
 	{
 		// look at each top match's sub matches
 		long nNumOfTopMatches = ipTopMatches->Size();

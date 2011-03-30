@@ -47,7 +47,7 @@ DatabasePage::DatabasePage()
 {
 	try
 	{
-		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new
+		ma_pCfgMgr = unique_ptr<FileProcessingConfigMgr>(new
 			FileProcessingConfigMgr());
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI16730");
@@ -433,7 +433,7 @@ void DatabasePage::enableAllControls(bool bEnableAll)
 void DatabasePage::notifyObjects()
 {
 	// Notify the dbConfigChange object
-	if (m_pNotifyDBConfigChangedObject != NULL)
+	if (m_pNotifyDBConfigChangedObject != __nullptr)
 	{
 		m_pNotifyDBConfigChangedObject->OnDBConfigChanged(string(m_zServer), string(m_zDBName));
 	}

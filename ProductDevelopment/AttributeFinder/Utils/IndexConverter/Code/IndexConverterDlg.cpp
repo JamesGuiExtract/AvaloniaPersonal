@@ -716,7 +716,7 @@ void CIndexConverterDlg::OnButtonModify()
 		CString zTranslateFrom(""), zTranslateTo("");
 		int nIndex = -1;
 		POSITION pos = m_list.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			nIndex = m_list.GetNextSelectedItem(pos);

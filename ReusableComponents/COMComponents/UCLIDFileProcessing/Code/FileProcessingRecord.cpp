@@ -62,7 +62,7 @@ void FileProcessingRecord::reset()
 	m_stopWatch.reset();
 	m_stopWatchErrorTask.reset();
 	m_lfrFileRcd.reset();
-	m_ipProgressStatus = NULL;
+	m_ipProgressStatus = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::copyFrom(const FileProcessingRecord& task)
@@ -116,7 +116,7 @@ void FileProcessingRecord::markAsStarted()
 
 		// Create the progress status object
 		m_ipProgressStatus.CreateInstance(CLSID_ProgressStatus);
-		ASSERT_RESOURCE_ALLOCATION("ELI16075", m_ipProgressStatus != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16075", m_ipProgressStatus != __nullptr);
 
 		// Initialize the progress status object
 		m_ipProgressStatus->InitProgressStatus("Initializing processing...", 0, 1, VARIANT_TRUE);
@@ -136,7 +136,7 @@ void FileProcessingRecord::markAsCompleted()
 	
 	// Since this record has completed processing, the progress status object is not useful
 	// anyway.  Just release the associated memory.
-	m_ipProgressStatus = NULL;
+	m_ipProgressStatus = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsPending()
@@ -159,7 +159,7 @@ void FileProcessingRecord::markAsFailed(const string& strException)
 	
 	// Since this record has failed processing, the progress status object is not useful
 	// anyway.  Just release the associated memory.
-	m_ipProgressStatus = NULL;
+	m_ipProgressStatus = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsNone()
@@ -188,7 +188,7 @@ void FileProcessingRecord::markAsSkipped()
 	
 	// Since this record has completed processing, the progress status object is not useful
 	// anyway.  Just release the associated memory.
-	m_ipProgressStatus = NULL;
+	m_ipProgressStatus = __nullptr;
 }
 //---------------------------------------------------------------------------------------------
 void FileProcessingRecord::notifyRunningErrorTask()

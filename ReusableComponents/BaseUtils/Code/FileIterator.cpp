@@ -32,7 +32,7 @@ FileIterator::~FileIterator()
 //-------------------------------------------------------------------------------------------------
 void FileIterator::reset()
 {
-	if (m_hCurrent != NULL)
+	if (m_hCurrent != __nullptr)
 	{
 		if (m_hCurrent != INVALID_HANDLE_VALUE)
 		{

@@ -123,27 +123,9 @@ CCOMLicenseGeneratorDlg::CCOMLicenseGeneratorDlg(bool bEnableSDK /*= false*/,
 	m_bRandomPassword = m_bEnableSDK;
 	m_bSpecifiedPassword = false;
 
-	////////////////////////////////
-	// This test has been superseded by the Disk Serial Number 
-	// test in COMLicenseGenerator.cpp - WEL 06/08/04
-	////////////////////////////////
-//	// Test existence of network file
-//	// to make sure that utility can only be used within UCLID
-//	string strPath = 
-//		"\\\\Rover\\internal\\Common\\Engineering\\Tools\\SecureClients\\COMLicense\\sdklicense.bat";
-//	if (!isFileOrFolderValid( strPath ))
-//	{
-//		// File does not exist
-//		MessageBox( "Unable to run License Generator Utility", "Error", 
-//			MB_ICONSTOP );
-//		throw UCLIDException( "ELI03778", 
-//			"Unable to run License Generator Utility" );
-//	}
-
 #ifdef _DEBUG
 	// Create registry persistence object
-	ma_pSettingsCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-		new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrUTILITIES_FOLDER ) );
+	ma_pSettingsCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrUTILITIES_FOLDER));
 #endif
 }
 //-------------------------------------------------------------------------------------------------

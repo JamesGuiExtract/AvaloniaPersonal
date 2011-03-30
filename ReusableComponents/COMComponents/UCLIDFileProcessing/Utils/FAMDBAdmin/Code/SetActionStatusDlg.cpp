@@ -27,8 +27,8 @@ CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessin
 m_ipFAMDB(ipFAMDB),
 m_pFAMDBAdmin(pFAMDBAdmin)
 {
-	ASSERT_ARGUMENT("ELI31255", ipFAMDB != NULL);
-	ASSERT_ARGUMENT("ELI27697", pFAMDBAdmin != NULL);
+	ASSERT_ARGUMENT("ELI31255", ipFAMDB != __nullptr);
+	ASSERT_ARGUMENT("ELI27697", pFAMDBAdmin != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
@@ -38,15 +38,15 @@ CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessin
 , m_pFAMDBAdmin(pFAMDBAdmin)
 , m_settings(selectSettings)
 {
-	ASSERT_ARGUMENT("ELI31256", ipFAMDB != NULL);
-	ASSERT_ARGUMENT("ELI31257", pFAMDBAdmin != NULL);
+	ASSERT_ARGUMENT("ELI31256", ipFAMDB != __nullptr);
+	ASSERT_ARGUMENT("ELI31257", pFAMDBAdmin != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSetActionStatusDlg::~CSetActionStatusDlg()
 {
 	try
 	{
-		m_ipFAMDB = NULL;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27695");
 }
@@ -87,7 +87,7 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 
 		// Read all actions from the DB
 		IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
-		ASSERT_RESOURCE_ALLOCATION("ELI26879", ipMapActions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26879", ipMapActions != __nullptr);
 
 		// Insert actions into combo boxes
 		long lSize = ipMapActions->Size;

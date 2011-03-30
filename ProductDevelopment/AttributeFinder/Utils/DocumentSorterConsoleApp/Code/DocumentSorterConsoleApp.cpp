@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 
 				// Create the Document Sorter object
 				IDocumentSorterPtr ipDocSorter(CLSID_DocumentSorter);
-				ASSERT_RESOURCE_ALLOCATION("ELI06283", ipDocSorter != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06283", ipDocSorter != __nullptr);
 
 				// Do the sorting
 				ipDocSorter->SortDocuments(_bstr_t(strInputRootDir.c_str()),

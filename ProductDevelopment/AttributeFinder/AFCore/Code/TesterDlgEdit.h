@@ -12,7 +12,7 @@ class CTesterDlgEdit : public CDialog
 {
 // Construction
 public:
-	CTesterDlgEdit(CString zName, CString zValue, CString zType, CWnd* pParent = NULL);
+	CTesterDlgEdit(CString zName, CString zValue, CString zType, CWnd* pParent = __nullptr);
 
 	// Provide modified strings back to caller
 	CString	GetName();

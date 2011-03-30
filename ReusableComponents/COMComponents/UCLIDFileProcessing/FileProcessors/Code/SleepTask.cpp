@@ -78,7 +78,7 @@ STDMETHODIMP CSleepTask::get_SleepTime(long* plSleepTime)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29570", plSleepTime != NULL);
+		ASSERT_ARGUMENT("ELI29570", plSleepTime != __nullptr);
 
 		*plSleepTime = m_lSleepTime;
 
@@ -116,7 +116,7 @@ STDMETHODIMP CSleepTask::get_TimeUnits(ESleepTimeUnitType* peTimeUnits)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29573", peTimeUnits != NULL);
+		ASSERT_ARGUMENT("ELI29573", peTimeUnits != __nullptr);
 
 		// Get the operation type
 		*peTimeUnits = m_TimeUnits;
@@ -155,7 +155,7 @@ STDMETHODIMP CSleepTask::get_Random(VARIANT_BOOL *pbRandom)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29576", pbRandom != NULL);
+		ASSERT_ARGUMENT("ELI29576", pbRandom != __nullptr);
 
 		// Get the operation type
 		*pbRandom = asVariantBool(m_bRandom);
@@ -174,7 +174,7 @@ STDMETHODIMP CSleepTask::raw_GetComponentDescription(BSTR* pstrComponentDescript
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29578", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI29578", pstrComponentDescription != __nullptr);
 		
 		*pstrComponentDescription = 
 			_bstr_t(gstrSLEEP_COMPONENT_DESCRIPTION.c_str()).Detach();
@@ -198,7 +198,7 @@ STDMETHODIMP CSleepTask::raw_CopyFrom(IUnknown* pObject)
 
 		// get the SleepTask object
 		UCLID_FILEPROCESSORSLib::ISleepTaskPtr ipSleepTask(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI29580", ipSleepTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29580", ipSleepTask != __nullptr);
 
 		// Copy the object
 		m_lSleepTime = ipSleepTask->SleepTime;
@@ -223,15 +223,15 @@ STDMETHODIMP CSleepTask::raw_Clone(IUnknown** ppObject)
 		validateLicense();
 
 		// Ensure that the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI29582", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI29582", ppObject != __nullptr);
 
 		// Get the copyable object interface
 		ICopyableObjectPtr ipObjCopy(CLSID_SleepTask);
-		ASSERT_RESOURCE_ALLOCATION("ELI29583", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29583", ipObjCopy != __nullptr);
 
 		// Create a shallow copy
 		IUnknownPtr ipUnknown(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI29584", ipUnknown != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29584", ipUnknown != __nullptr);
 		ipObjCopy->CopyFrom(ipUnknown);
 
 		// Return the new SleepTask to the caller
@@ -270,14 +270,14 @@ STDMETHODIMP CSleepTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionI
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29587", pResult != NULL);
+		ASSERT_ARGUMENT("ELI29587", pResult != __nullptr);
 
 		// Compute the sleep time
 		DWORD dwSleepTime = computeSleepTime();
 
 		// Check for progress status
 		IProgressStatusPtr ipProgress(pProgressStatus);
-		if (ipProgress != NULL)
+		if (ipProgress != __nullptr)
 		{
 			int iNumItems = (dwSleepTime / 1000) + 1;
 			ipProgress->InitProgressStatus("Sleeping...", 0, iNumItems, VARIANT_TRUE);
@@ -299,14 +299,14 @@ STDMETHODIMP CSleepTask::raw_ProcessFile(IFileRecord* pFileRecord, long nActionI
 			dwSleepTime -= dwTemp;
 
 			// Update progress status if necessary
-			if (ipProgress != NULL)
+			if (ipProgress != __nullptr)
 			{
 				ipProgress->CompleteProgressItems("Sleeping...", 1);
 			}
 		}
 
 		// Ensure the last group gets completed
-		if (ipProgress != NULL && ipProgress->NumItemsInCurrentGroup > 0)
+		if (ipProgress != __nullptr && ipProgress->NumItemsInCurrentGroup > 0)
 		{
 			ipProgress->CompleteCurrentItemGroup();
 		}
@@ -374,7 +374,7 @@ STDMETHODIMP CSleepTask::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// Ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI29591", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI29591", pbValue != __nullptr);
 
 		try
 		{
@@ -407,7 +407,7 @@ STDMETHODIMP CSleepTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
 		validateLicense();
 
 		// Ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI29593", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI29593", pbValue != __nullptr);
 
 		// Configured if:
 		// 1. Sleep time is > 0
@@ -429,7 +429,7 @@ STDMETHODIMP CSleepTask::GetClassID(CLSID* pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29595", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI29595", pClassID != __nullptr);
 
 		*pClassID = CLSID_SleepTask;
 	}
@@ -461,7 +461,7 @@ STDMETHODIMP CSleepTask::Load(IStream* pStream)
 		
 		// use a smart pointer for the IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI29597", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29597", ipStream != __nullptr);
 
 		// read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -527,7 +527,7 @@ STDMETHODIMP CSleepTask::Save(IStream* pStream, BOOL fClearDirty)
 
 		// use a smart pointer for IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI29602", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29602", ipStream != __nullptr);
 
 		// write the bytestream data into the IStream object
 		long nDataLength = data.getLength();

@@ -72,7 +72,7 @@ STDMETHODIMP CLoopFinderPP::Apply(void)
 				}
 
 				// Set the FindingRule property if a Rule was selected
-				if (m_ipSelectedRule != NULL)
+				if (m_ipSelectedRule != __nullptr)
 				{
 					ipLoopFinder->FindingRule = m_ipSelectedRule;
 				}
@@ -87,7 +87,7 @@ STDMETHODIMP CLoopFinderPP::Apply(void)
 				}
 
 				// Set the Preprocessor if a Preprocessor was selected
-				if (m_ipSelectedPreprocessor != NULL)
+				if (m_ipSelectedPreprocessor != __nullptr)
 				{
 					ipLoopFinder->Preprocessor = m_ipSelectedPreprocessor;;
 				}
@@ -102,7 +102,7 @@ STDMETHODIMP CLoopFinderPP::Apply(void)
 				}
 
 				// Set the Condition if a Condition was selected
-				if (m_ipSelectedCondition != NULL)
+				if (m_ipSelectedCondition != __nullptr)
 				{
 					ipLoopFinder->Condition = m_ipSelectedCondition;
 				}
@@ -188,21 +188,21 @@ LRESULT CLoopFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
 				// Set the Finding rule and initialize the description if it exists
 				m_ipSelectedRule = ipLoopFinder->FindingRule;
-				if ( m_ipSelectedRule != NULL )
+				if ( m_ipSelectedRule != __nullptr )
 				{
 					m_editFindingRule.SetWindowTextA(m_ipSelectedRule->Description);
 				}
 
 				// Set the Preprocessor and initialize the description if it exists
 				m_ipSelectedPreprocessor = ipLoopFinder->Preprocessor;
-				if ( m_ipSelectedPreprocessor != NULL )
+				if ( m_ipSelectedPreprocessor != __nullptr )
 				{
 					m_editPreprocessor.SetWindowTextA(m_ipSelectedPreprocessor->Description);
 				}
 
 				// Set the Condition and initialize the description if it exists
 				m_ipSelectedCondition = ipLoopFinder->Condition;
-				if ( m_ipSelectedCondition != NULL )
+				if ( m_ipSelectedCondition != __nullptr )
 				{
 					m_editCondition.SetWindowTextA(m_ipSelectedCondition->Description);
 				}
@@ -409,11 +409,11 @@ void CLoopFinderPP::validateLicense()
 IMiscUtilsPtr CLoopFinderPP::getMiscUtils()
 {
 	// check if a MiscUtils object has all ready been created
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		// create MiscUtils object
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI23981", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23981", m_ipMiscUtils != __nullptr);
 	}
 
 	return m_ipMiscUtils;
@@ -586,7 +586,7 @@ IObjectWithDescriptionPtr CLoopFinderPP::updateUIForSelected(IObjectWithDescript
 {
 	// Convert selected object to Categorized component to get description
 	ICategorizedComponentPtr ipCategoryObj = ipSelected->Object;
-	ASSERT_RESOURCE_ALLOCATION("ELI23984", ipCategoryObj != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI23984", ipCategoryObj != __nullptr);
 
 	// Set the description for the object.
 	rEditControl.SetWindowTextA(ipSelected->Description);
@@ -603,10 +603,10 @@ void CLoopFinderPP::configureObject(IObjectWithDescriptionPtr &ipObject, ATLCont
 	IObjectWithDescriptionPtr ipSelectedObject = ipObject;
 
 	// If there is no selected object create it
-	if ( ipSelectedObject == NULL)
+	if ( ipSelectedObject == __nullptr)
 	{
 		ipSelectedObject.CreateInstance(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI23980", ipSelectedObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23980", ipSelectedObject != __nullptr);
 	}
 
 	// Get the configure button rect for positioning the Select menu
@@ -632,10 +632,10 @@ void CLoopFinderPP::configureObjectForDblClick(IObjectWithDescriptionPtr &ipObje
 	IObjectWithDescriptionPtr ipSelectedObject = ipObject;
 
 	// If there is no selected object create it
-	if ( ipSelectedObject == NULL)
+	if ( ipSelectedObject == __nullptr)
 	{
 		ipSelectedObject.CreateInstance(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI24768", ipSelectedObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24768", ipSelectedObject != __nullptr);
 	}
 
 	// allow the user to select and configure object

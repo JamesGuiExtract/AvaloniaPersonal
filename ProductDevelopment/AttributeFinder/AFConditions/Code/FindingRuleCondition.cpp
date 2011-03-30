@@ -18,7 +18,7 @@ const unsigned long gnCurrentVersion = 1;
 //--------------------------------------------------------------------------------------------------
 CFindingRuleCondition::CFindingRuleCondition() :
 	m_bDirty(false),
-	m_ipAFRule(NULL)
+	m_ipAFRule(__nullptr)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ CFindingRuleCondition::~CFindingRuleCondition()
 {
 	try
 	{
-		m_ipAFRule = NULL;
+		m_ipAFRule = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18214");
 }
@@ -52,7 +52,7 @@ STDMETHODIMP CFindingRuleCondition::get_AFRule(IAttributeFindingRule **ppRetVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18316", ppRetVal != NULL);
+		ASSERT_ARGUMENT("ELI18316", ppRetVal != __nullptr);
 
 		// Return a shallow copy
 		IAttributeFindingRulePtr ipAFRule(m_ipAFRule);
@@ -72,7 +72,7 @@ STDMETHODIMP CFindingRuleCondition::put_AFRule(IAttributeFindingRule *pNewVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18321", pNewVal != NULL);
+		ASSERT_ARGUMENT("ELI18321", pNewVal != __nullptr);
 
 		m_ipAFRule = pNewVal;
 
@@ -96,11 +96,11 @@ STDMETHODIMP CFindingRuleCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VA
 		validateLicense();
 
 		// Assert parameters and resources
-		ASSERT_ARGUMENT("ELI18216", pAFDoc != NULL);
-		ASSERT_ARGUMENT("ELI18217", pbRetVal != NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI18294", m_ipAFRule != NULL);
+		ASSERT_ARGUMENT("ELI18216", pAFDoc != __nullptr);
+		ASSERT_ARGUMENT("ELI18217", pbRetVal != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI18294", m_ipAFRule != __nullptr);
 		
-		if (m_ipAFRule == NULL)
+		if (m_ipAFRule == __nullptr)
 		{
 			UCLIDException ue("ELI18322", "Finding Rule Condition: No rule defined!");
 			throw ue;
@@ -108,13 +108,13 @@ STDMETHODIMP CFindingRuleCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VA
 
 		// Create a copy of the document to run the rules on
 		ICopyableObjectPtr ipCopyObj = pAFDoc;
-		ASSERT_RESOURCE_ALLOCATION("ELI18295", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18295", ipCopyObj != __nullptr);
 		IAFDocumentPtr ipDocCopy = ipCopyObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI18296", ipDocCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18296", ipDocCopy != __nullptr);
 		
 		// Parse the supplied document with the configured attribute finding rule
-		IIUnknownVectorPtr ipAttributes = m_ipAFRule->ParseText(ipDocCopy, NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI18297", ipAttributes != NULL);
+		IIUnknownVectorPtr ipAttributes = m_ipAFRule->ParseText(ipDocCopy, __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI18297", ipAttributes != __nullptr);
 		
 		// Return VARIANT_TRUE if the finding rule returned a vector with at least one value
 		*pbRetVal = asVariantBool(ipAttributes->Size() > 0);
@@ -137,7 +137,7 @@ STDMETHODIMP CFindingRuleCondition::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		validateLicense();
 
 		// Check parameter
-		ASSERT_ARGUMENT("ELI18317", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18317", pbValue != __nullptr);
 
 		// Default to unconfigured
 		*pbValue = VARIANT_FALSE;
@@ -150,7 +150,7 @@ STDMETHODIMP CFindingRuleCondition::raw_IsConfigured(VARIANT_BOOL *pbValue)
 			// If the rule doesn't implement IMustBeConfiguredObject or if 
 			// IMustBeConfiguredObject::IsConfigured == VARIANT_TRUE, consider
 			// this condition configured
-			if (ipRuleConfig == NULL || ipRuleConfig->IsConfigured())
+			if (ipRuleConfig == __nullptr || ipRuleConfig->IsConfigured())
 			{
 				*pbValue = VARIANT_TRUE;
 			}
@@ -170,7 +170,7 @@ STDMETHODIMP CFindingRuleCondition::raw_GetComponentDescription(BSTR * pbstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18222", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI18222", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Finding rule condition").Detach();
 	}
@@ -192,19 +192,19 @@ STDMETHODIMP CFindingRuleCondition::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFCONDITIONSLib::IFindingRuleConditionPtr ipCopyThis = pObject;
-		ASSERT_ARGUMENT("ELI18225", ipCopyThis != NULL);
+		ASSERT_ARGUMENT("ELI18225", ipCopyThis != __nullptr);
 		
-		if (ipCopyThis->AFRule == NULL)
+		if (ipCopyThis->AFRule == __nullptr)
 		{
-			m_ipAFRule = NULL;
+			m_ipAFRule = __nullptr;
 		}
 		else
 		{
-			// If AFRule is not NULL, obtain a clone
+			// If AFRule is not __nullptr, obtain a clone
 			ICopyableObjectPtr ipCopyableRule(ipCopyThis->AFRule);
-			ASSERT_RESOURCE_ALLOCATION("ELI18318", ipCopyableRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18318", ipCopyableRule != __nullptr);
 			m_ipAFRule = ipCopyableRule->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI18319", m_ipAFRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18319", m_ipAFRule != __nullptr);
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18248");
@@ -221,11 +221,11 @@ STDMETHODIMP CFindingRuleCondition::raw_Clone(IUnknown **pObject)
 		// Validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18229", pObject != NULL);
+		ASSERT_ARGUMENT("ELI18229", pObject != __nullptr);
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_FindingRuleCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI18227", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18227", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -247,7 +247,7 @@ STDMETHODIMP CFindingRuleCondition::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18231", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI18231", pClassID != __nullptr);
 
 		*pClassID = CLSID_FindingRuleCondition;
 	}
@@ -276,16 +276,16 @@ STDMETHODIMP CFindingRuleCondition::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18233", pStream != NULL);
+		ASSERT_ARGUMENT("ELI18233", pStream != __nullptr);
 
 		// Clear the existing rule
-		m_ipAFRule = NULL;
+		m_ipAFRule = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
-		pStream->Read(&nDataLength, sizeof(nDataLength), NULL);
+		pStream->Read(&nDataLength, sizeof(nDataLength), __nullptr);
 		ByteStream data(nDataLength);
-		pStream->Read(data.getData(), nDataLength, NULL);
+		pStream->Read(data.getData(), nDataLength, __nullptr);
 		ByteStreamManipulator dataReader(ByteStreamManipulator::kRead, data);
 
 		// Read the individual data items from the bytestream
@@ -324,7 +324,7 @@ STDMETHODIMP CFindingRuleCondition::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18236", pStream != NULL);
+		ASSERT_ARGUMENT("ELI18236", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -335,12 +335,12 @@ STDMETHODIMP CFindingRuleCondition::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
-		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
-		pStream->Write(data.getData(), nDataLength, NULL);
+		pStream->Write(&nDataLength, sizeof(nDataLength), __nullptr);
+		pStream->Write(data.getData(), nDataLength, __nullptr);
 
 		// Write the attribute finding rule to the stream
 		IPersistStreamPtr ipRuleStream = m_ipAFRule;
-		ASSERT_RESOURCE_ALLOCATION("ELI18264", ipRuleStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18264", ipRuleStream != __nullptr);
 		writeObjectToStream(ipRuleStream, pStream, "ELI18265", fClearDirty);
 
 		// Clear the flag as specified
@@ -371,7 +371,7 @@ STDMETHODIMP CFindingRuleCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18219", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18219", pbValue != __nullptr);
 
 		try
 		{

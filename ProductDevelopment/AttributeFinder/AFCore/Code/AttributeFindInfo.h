@@ -82,13 +82,13 @@ private:
 	//	PURPOSE: to return m_ipInputValidator
 	//
 	//	PROMISE: to create an instance of Input Validator and assign it to m_ipInputValidator if
-	//			 m_ipInputValidator is NULL
+	//			 m_ipInputValidator is __nullptr
 	IObjectWithDescriptionPtr getValidator();
 	//----------------------------------------------------------------------------------------------
 	//	PURPOSE: to return m_ipAttributeSplitter
 	//
 	//	PROMISE: to create an instance of Attribute Splitter and assign it to m_ipAttributeSplitter 
-	//			 if m_ipAttributeSplitter is NULL
+	//			 if m_ipAttributeSplitter is __nullptr
 	IObjectWithDescriptionPtr getSplitter();
 	//----------------------------------------------------------------------------------------------
 	void validateLicense();

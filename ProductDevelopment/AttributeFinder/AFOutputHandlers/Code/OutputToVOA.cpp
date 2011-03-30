@@ -27,7 +27,7 @@ COutputToVOA::COutputToVOA()
 	try
 	{
 		m_ipAFUtils.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI08881", m_ipAFUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08881", m_ipAFUtils != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI08882")
 }
@@ -67,7 +67,7 @@ STDMETHODIMP COutputToVOA::get_FileName(BSTR *pVal)
 	{
 		// validate license and arguments
 		validateLicense();
-		ASSERT_ARGUMENT("ELI08853", pVal != NULL);
+		ASSERT_ARGUMENT("ELI08853", pVal != __nullptr);
 
 		// return the filename
 		*pVal = _bstr_t(m_strFileName.c_str()).copy();
@@ -140,7 +140,7 @@ STDMETHODIMP COutputToVOA::raw_ProcessOutput(IIUnknownVector *pAttributes, IAFDo
 		string strFileName = tagMgr.expandTagsAndFunctions(m_strFileName, pAFDoc);
 
 		// ensure  valid parameters
-		ASSERT_ARGUMENT("ELI10488", pAttributes != NULL);
+		ASSERT_ARGUMENT("ELI10488", pAttributes != __nullptr);
 
 		// the output filename may be associated with a folder that does not
 		// exist.  If so, try to create that folder
@@ -196,7 +196,7 @@ STDMETHODIMP COutputToVOA::raw_GetComponentDescription(BSTR * pstrComponentDescr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19547", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19547", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Output data to VOA file").Detach();
 	}
@@ -216,7 +216,7 @@ STDMETHODIMP COutputToVOA::raw_CopyFrom(IUnknown *pObject)
 	{
 		
 		UCLID_AFOUTPUTHANDLERSLib::IOutputToVOAPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08861", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08861", ipSource != __nullptr);
 		
 		m_strFileName = asString(ipSource->GetFileName());
 	}
@@ -237,7 +237,7 @@ STDMETHODIMP COutputToVOA::raw_Clone(IUnknown **pObject)
 		// create another instance of this object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_OutputToVOA);
-		ASSERT_RESOURCE_ALLOCATION("ELI08862", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08862", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

@@ -36,7 +36,7 @@ CSetFilePriorityDlg::~CSetFilePriorityDlg()
 {
 	try
 	{
-		m_ipFAMDB = NULL;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27687");
 }
@@ -165,7 +165,7 @@ void CSetFilePriorityDlg::fillPriorityCombo()
 	{
 		// Get the list of priorities
 		IVariantVectorPtr ipVecPriority = m_ipFAMDB->GetPriorities();
-		ASSERT_RESOURCE_ALLOCATION("ELI27692", ipVecPriority != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27692", ipVecPriority != __nullptr);
 
 		// Add each priority to the combo box
 		long lSize = ipVecPriority->Size;

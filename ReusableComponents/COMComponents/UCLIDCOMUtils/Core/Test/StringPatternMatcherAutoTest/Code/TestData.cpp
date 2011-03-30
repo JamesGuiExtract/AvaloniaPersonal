@@ -17,17 +17,17 @@ TestCaseData::TestCaseData()
  m_ipExpectedMatches(CLSID_StrToStrMap),
  m_iCaseSensitive(-1), m_iTreatMultipleWSAsOne(-1), m_bGreedy(true)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI05969", m_ipExprMap != NULL);
-	ASSERT_RESOURCE_ALLOCATION("ELI05970", m_ipExpectedMatches != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI05969", m_ipExprMap != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI05970", m_ipExpectedMatches != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 TestCaseData::TestCaseData(const TestCaseData& objToCopy)
 {
 	m_ipExprMap.CreateInstance(CLSID_StrToStrMap);
-	ASSERT_RESOURCE_ALLOCATION("ELI05987", m_ipExprMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI05987", m_ipExprMap != __nullptr);
 
 	m_ipExpectedMatches.CreateInstance(CLSID_StrToStrMap);
-	ASSERT_RESOURCE_ALLOCATION("ELI05988", m_ipExpectedMatches != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI05988", m_ipExpectedMatches != __nullptr);
 
 	*this = objToCopy;
 }
@@ -106,7 +106,7 @@ void TestData::loadTestData()
 
 	// create an instance of the XML DOM parser
 	MSXML::IXMLDOMDocumentPtr ipDOMDocument(MSXML::CLSID_DOMDocument);
-	if (ipDOMDocument == NULL)
+	if (ipDOMDocument == __nullptr)
 	{
 		throw UCLIDException("ELI05973", "Unable to create instance of XML parser engine!.");
 	}
@@ -153,7 +153,7 @@ void TestData::loadTestCaseData(MSXML::IXMLDOMNodePtr ipTestCaseNode)
 	// check if the case-sensitivity (CS) attribute has been specified for
 	// the test case
 	MSXML::IXMLDOMNodePtr ipCSNode = ipTestCaseNode->selectSingleNode("@CaseSensitive");
-	if (ipCSNode != NULL)
+	if (ipCSNode != __nullptr)
 	{
 		string strCSValue = ipCSNode->text;
 		if (strCSValue == "0")
@@ -178,7 +178,7 @@ void TestData::loadTestCaseData(MSXML::IXMLDOMNodePtr ipTestCaseNode)
 	// the test case
 	MSXML::IXMLDOMNodePtr ipWSNode = ipTestCaseNode->selectSingleNode("@TreatMultipleWSAsOne");
 
-	if (ipWSNode != NULL)
+	if (ipWSNode != __nullptr)
 	{
 		string strValue = ipWSNode->text;
 		if (strValue == "0")
@@ -202,7 +202,7 @@ void TestData::loadTestCaseData(MSXML::IXMLDOMNodePtr ipTestCaseNode)
 	// check if the m_bGreedy attribute has been specified for
 	// the test case
 	MSXML::IXMLDOMNodePtr ipGreedyNode = ipTestCaseNode->selectSingleNode("@Greedy");
-	if (ipGreedyNode != NULL)
+	if (ipGreedyNode != __nullptr)
 	{
 		string strValue = ipGreedyNode->text;
 		if (strValue == "0")
@@ -233,7 +233,7 @@ void TestData::loadTestCaseData(MSXML::IXMLDOMNodePtr ipTestCaseNode)
 
 	// for this node, get the input
 	MSXML::IXMLDOMNodePtr ipInputNode = ipTestCaseNode->selectSingleNode("Input");
-	if (ipInputNode == NULL)
+	if (ipInputNode == __nullptr)
 	{
 		UCLIDException ue("ELI05976", "Unable to retrieve input information!");
 		string strXML = ipTestCaseNode->xml;
@@ -244,7 +244,7 @@ void TestData::loadTestCaseData(MSXML::IXMLDOMNodePtr ipTestCaseNode)
 
 	// for this node, get the pattern
 	MSXML::IXMLDOMNodePtr ipPatternNode = ipTestCaseNode->selectSingleNode("Pattern");
-	if (ipPatternNode == NULL)
+	if (ipPatternNode == __nullptr)
 	{
 		UCLIDException ue("ELI05977", "Unable to retrieve input information!");
 		string strXML = ipTestCaseNode->xml;
@@ -257,14 +257,14 @@ void TestData::loadTestCaseData(MSXML::IXMLDOMNodePtr ipTestCaseNode)
 	// NOTE: expression definition is optional, and so, if we can't find
 	// this node, it's OK
 	MSXML::IXMLDOMNodePtr ipExpressionsNode = ipTestCaseNode->selectSingleNode("Expressions");
-	if (ipExpressionsNode != NULL)
+	if (ipExpressionsNode != __nullptr)
 	{
 		loadExpressionMap(ipExpressionsNode, tc);
 	}
 
 	// find the expected matches encapsulating node
 	MSXML::IXMLDOMNodePtr ipMatchesNode = ipTestCaseNode->selectSingleNode("ExpectedMatches");
-	if (ipMatchesNode == NULL)
+	if (ipMatchesNode == __nullptr)
 	{
 		UCLIDException ue("ELI05980", "Unable to retrieve expected-matches information!");
 		string strXML = ipTestCaseNode->xml;
@@ -285,14 +285,14 @@ void TestData::loadExpressionMap(MSXML::IXMLDOMNodePtr ipExpressionsNode,
 {
 	// find all the expression sub nodes
 	MSXML::IXMLDOMNodeListPtr ipExpressionList = ipExpressionsNode->selectNodes("Expression");
-	if (ipExpressionList != NULL)
+	if (ipExpressionList != __nullptr)
 	{
 		for (int j = 0; j < ipExpressionList->length; j++)
 		{
 			// get the expression node
 			MSXML::IXMLDOMNodePtr ipExpressionNode;
 			ipExpressionList->get_item(j, &ipExpressionNode);
-			if (ipExpressionNode == NULL)
+			if (ipExpressionNode == __nullptr)
 			{
 				UCLIDException ue("ELI05978", "Unable to retrieve expression!");
 				string strXML = ipExpressionsNode->xml;
@@ -304,7 +304,7 @@ void TestData::loadExpressionMap(MSXML::IXMLDOMNodePtr ipExpressionsNode,
 			// get the name and value
 			MSXML::IXMLDOMNodePtr ipNameNode = ipExpressionNode->selectSingleNode("Name");
 			MSXML::IXMLDOMNodePtr ipValueNode = ipExpressionNode->selectSingleNode("Value");
-			if (ipNameNode == NULL || ipValueNode == NULL)
+			if (ipNameNode == __nullptr || ipValueNode == __nullptr)
 			{
 				UCLIDException ue("ELI05979", "Unable to retrieve expression!");
 				string strXML = ipExpressionsNode->xml;
@@ -336,7 +336,7 @@ void TestData::loadMatches(MSXML::IXMLDOMNodePtr ipMatchesNode, TestCaseData& rT
 		ipMatchesList->get_item(j, &ipMatchNode);
 		
 		// get the expected value of the match variable
-		if (ipMatchNode == NULL)
+		if (ipMatchNode == __nullptr)
 		{
 			UCLIDException ue("ELI05981", "Unable to retrieve expected-matches information!");
 			string strXML = ipMatchesNode->xml;
@@ -351,7 +351,7 @@ void TestData::loadMatches(MSXML::IXMLDOMNodePtr ipMatchesNode, TestCaseData& rT
 
 		// get the name of the match variable
 		MSXML::IXMLDOMNodePtr ipNameNode = ipMatchNode->selectSingleNode("@Name");
-		if (ipNameNode != NULL)
+		if (ipNameNode != __nullptr)
 		{
 			_bstrVariableName = ipNameNode->text;
 		}

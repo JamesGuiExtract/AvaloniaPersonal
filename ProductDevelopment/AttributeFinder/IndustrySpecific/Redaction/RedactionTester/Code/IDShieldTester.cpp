@@ -164,7 +164,7 @@ void buildConditionSet(const string& strConditions, set<string>& rsetConditions)
 bool testAttributeCondition(IIUnknownVectorPtr ipAttributes,
 											 AttributeTester* pTester)
 {
-	ASSERT_ARGUMENT("ELI25179", pTester != NULL);
+	ASSERT_ARGUMENT("ELI25179", pTester != __nullptr);
 
 	// Loop through each attribute and test it
 	long lAttributeCount = ipAttributes->Size();
@@ -172,14 +172,14 @@ bool testAttributeCondition(IIUnknownVectorPtr ipAttributes,
 	{
 		// Get next attribute
 		IAttributePtr ipAttribute = ipAttributes->At(l);
-		ASSERT_RESOURCE_ALLOCATION("ELI25165", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25165", ipAttribute != __nullptr);
 
 		// Get attribute name
 		string strName = asString(ipAttribute->GetName());
 
 		// Get attribute value
 		ISpatialStringPtr ipValue = ipAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI25166", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25166", ipValue != __nullptr);
 		string strValue = asString(ipValue->String);
 
 		// Test to see if this attribute fulfills the condition
@@ -203,10 +203,10 @@ m_ipTestOutputVOAVector(NULL)
 	try
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI15178", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15178", m_ipAFUtility != __nullptr);
 
 		m_ipAttrFinderEngine.CreateInstance(CLSID_AttributeFinderEngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI15206", m_ipAttrFinderEngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15206", m_ipAttrFinderEngine != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI15179");
 }
@@ -278,12 +278,12 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI14547", pParams != NULL);
+			ASSERT_ARGUMENT("ELI14547", pParams != __nullptr);
 
 			// Validate the license
 			validateLicense();
 
-			if (m_ipResultLogger == NULL)
+			if (m_ipResultLogger == __nullptr)
 			{
 				throw UCLIDException("ELI15166", "Please set ResultLogger before proceeding.");
 			}
@@ -387,7 +387,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			verificationStatistics.reset();
 
 			IVariantVectorPtr ipParams(pParams);
-			ASSERT_RESOURCE_ALLOCATION("ELI15258", ipParams != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15258", ipParams != __nullptr);
 
 			// The params vector should never be empty
 			if (ipParams->Size == 0)
@@ -444,7 +444,7 @@ STDMETHODIMP CIDShieldTester::raw_SetResultLogger(ITestResultLogger * pLogger)
 	try
 	{
 		m_ipResultLogger = pLogger;
-		ASSERT_RESOURCE_ALLOCATION("ELI15736", m_ipResultLogger != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15736", m_ipResultLogger != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14546");
 
@@ -680,7 +680,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 			if (vecTokens[1] == "1")
 			{
 				m_ipTestOutputVOAVector.CreateInstance(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI18360", m_ipTestOutputVOAVector != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18360", m_ipTestOutputVOAVector != __nullptr);
 			}
 		}
 		// [p16 #2552 - JDS]
@@ -909,7 +909,7 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 
 			// If the expected file exists, load the data from it
 			IIUnknownVectorPtr ipExpectedAttributes(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI15195", ipExpectedAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15195", ipExpectedAttributes != __nullptr);
 			if( ::isFileOrFolderValid( strExpectedVOAFile ) )
 			{
 				ipExpectedAttributes->LoadFrom( strExpectedVOAFile.c_str(), VARIANT_FALSE );
@@ -952,11 +952,11 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 
 			// Load the found attributes from the VOA file if it exists, otherwise run the rules to compute them
 			IIUnknownVectorPtr ipFoundAttributes(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI15196", ipFoundAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15196", ipFoundAttributes != __nullptr);
 
 			// This will be populated by the OCR engine during the call to FindAttributes
 			IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-			ASSERT_RESOURCE_ALLOCATION("ELI15205", ipAFDoc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15205", ipAFDoc != __nullptr);
 			bool bCalculatedFoundValues = false;
 
 			if ( ::isFileOrFolderValid( strFoundVOAFile ) )
@@ -976,7 +976,7 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 				// Get the attributes by running the rules on the OCR'd document.
 				ipFoundAttributes = m_ipAttrFinderEngine->FindAttributes(ipAFDoc, strSourceDoc.c_str(), 
 					-1, strRulesFile.c_str(), NULL, VARIANT_FALSE, NULL);
-				ASSERT_RESOURCE_ALLOCATION("ELI15204", ipFoundAttributes != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15204", ipFoundAttributes != __nullptr);
 
 				// This flag means that the AFDoc contains the document types for this file.
 				bCalculatedFoundValues = true;
@@ -1043,8 +1043,8 @@ bool CIDShieldTester::updateStatisticsAndDetermineTestCaseResult(IIUnknownVector
 																 IIUnknownVectorPtr ipFoundAttributes,
 																 const string& strSourceDoc)
 {
-	ASSERT_ARGUMENT("ELI19879", ipExpectedAttributes != NULL);
-	ASSERT_ARGUMENT("ELI19880", ipFoundAttributes != NULL);
+	ASSERT_ARGUMENT("ELI19879", ipExpectedAttributes != __nullptr);
+	ASSERT_ARGUMENT("ELI19880", ipFoundAttributes != __nullptr);
 
 	// increment the total number of files processed
 	m_ulTotalFilesProcessed++;
@@ -1187,8 +1187,8 @@ bool CIDShieldTester::analyzeDataForVerificationBasedRedaction(
 														bool bSelectedForVerification,
 														const string& strSourceDoc)
 {
-	ASSERT_ARGUMENT("ELI18507", ipExpectedAttributes != NULL);
-	ASSERT_ARGUMENT("ELI18508", ipFoundAttributes != NULL);
+	ASSERT_ARGUMENT("ELI18507", ipExpectedAttributes != __nullptr);
+	ASSERT_ARGUMENT("ELI18508", ipFoundAttributes != __nullptr);
 
 	// analyze the expected and found attributes 
 	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
@@ -1241,8 +1241,8 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 													   bool bSelectedForAutomatedProcess,
 													   const string& strSourceDoc)
 {
-	ASSERT_ARGUMENT("ELI18509", ipExpectedAttributes != NULL);
-	ASSERT_ARGUMENT("ELI18510", ipFoundAttributes != NULL);
+	ASSERT_ARGUMENT("ELI18509", ipExpectedAttributes != __nullptr);
+	ASSERT_ARGUMENT("ELI18510", ipFoundAttributes != __nullptr);
 
 	// analyze the expected and found attributes 
 	CIDShieldTester::TestCaseStatistics testCaseStatistics = analyzeExpectedAndFoundAttributes(
@@ -1309,7 +1309,7 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 	else
 	{
 		ipExpectedRasterZones = ipExpectedSS->GetOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI15186", ipExpectedRasterZones != NULL);		
+		ASSERT_RESOURCE_ALLOCATION("ELI15186", ipExpectedRasterZones != __nullptr);		
 	}
 
 	IIUnknownVectorPtr ipFoundRasterZones;
@@ -1320,7 +1320,7 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 	else
 	{
 		ipFoundRasterZones = ipFoundSS->GetOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI15187", ipFoundRasterZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15187", ipFoundRasterZones != __nullptr);
 	}
 
 	// For each expected raster zone in the vector, verify that there is some found
@@ -1330,7 +1330,7 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 	{
 		// Get each individual raster zone
 		IRasterZonePtr ipExpectedRZ = ipExpectedRasterZones->At( e );
-		ASSERT_RESOURCE_ALLOCATION("ELI15188", ipExpectedRZ != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15188", ipExpectedRZ != __nullptr);
 
 		bool bFoundMatch = false;
 		
@@ -1339,7 +1339,7 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 		for( int f = 0; f < lFoundSize; f++)
 		{
 			IRasterZonePtr ipFoundRZ = ipFoundRasterZones->At( f );
-			ASSERT_RESOURCE_ALLOCATION("ELI15189", ipFoundRZ != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15189", ipFoundRZ != __nullptr);
 
 			// Get the area of the overlap
 			double dOverlapArea = ipExpectedRZ->GetAreaOverlappingWith( ipFoundRZ );
@@ -1379,15 +1379,15 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 	IIUnknownVectorPtr ipExpectedAttributes, IIUnknownVectorPtr ipFoundAttributes,
 	bool bDocumentSelected, const string& strSourceDoc)
 {
-	ASSERT_ARGUMENT("ELI18511", ipExpectedAttributes != NULL);
-	ASSERT_ARGUMENT("ELI18512", ipFoundAttributes != NULL);
+	ASSERT_ARGUMENT("ELI18511", ipExpectedAttributes != __nullptr);
+	ASSERT_ARGUMENT("ELI18512", ipFoundAttributes != __nullptr);
 
 	CIDShieldTester::TestCaseStatistics testCaseStatistics;
 	testCaseStatistics.m_ulTotalExpectedRedactions = ipExpectedAttributes->Size();
 
 	// If the document was selected, find the attributes that would be redacted by default and use
 	// those attributes as the basis for the statistics.
-	IIUnknownVectorPtr ipAutoRedactedAttributes = NULL;
+	IIUnknownVectorPtr ipAutoRedactedAttributes = __nullptr;
 	if (bDocumentSelected)
 	{
 		// restrict the found attributes by the query that will be used for automated redaction
@@ -1404,7 +1404,7 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 		// Create an empty attribute vector, all expected attributes are a miss
 		ipAutoRedactedAttributes.CreateInstance(CLSID_IUnknownVector);
 	}
-	ASSERT_RESOURCE_ALLOCATION("ELI29334", ipAutoRedactedAttributes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI29334", ipAutoRedactedAttributes != __nullptr);
 	
 	if (testCaseStatistics.m_ulFoundRedactions != 0 &&
 		testCaseStatistics.m_ulTotalExpectedRedactions != 0)
@@ -1543,7 +1543,7 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 		testCaseStatistics.m_ulNumFalsePositives = testCaseStatistics.m_ulFoundRedactions;
 
 		// check for the CreateTestOutputVOAFile
-		if (m_ipTestOutputVOAVector != NULL)
+		if (m_ipTestOutputVOAVector != __nullptr)
 		{
 			// if lExpectedSize > 0 then all expected attributes are misses
 			for (unsigned long i = 0; i < testCaseStatistics.m_ulTotalExpectedRedactions; i++)
@@ -1600,7 +1600,7 @@ CIDShieldTester::TestCaseStatistics CIDShieldTester::analyzeExpectedAndFoundAttr
 	}
 
 	// check for output test voa file
-	if (m_ipTestOutputVOAVector != NULL)
+	if (m_ipTestOutputVOAVector != __nullptr)
 	{
 		// write the testoutput.voa file
 		string strTestOutputFile = strSourceDoc + ".testoutput.voa";
@@ -1677,7 +1677,7 @@ void CIDShieldTester::RecordStatistic(const string& strLabel, IAttributePtr ipRe
 									  const string &strSourceVOA, unsigned long& rulCount)
 {
 	// Output the provided attribute as long as an output vector and label are available.
-	if (m_ipTestOutputVOAVector != NULL && strLabel != "")
+	if (m_ipTestOutputVOAVector != __nullptr && strLabel != "")
 	{
 		addAttributeToTestOutputVOA(ipRelatedAttribute, strLabel, strSourceVOA);
 	}
@@ -1997,13 +1997,13 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 	// Get the document types from the found attributes vector
 	IIUnknownVectorPtr ipDocTypes= m_ipAFUtility->QueryAttributes( ipFoundAttributes, 
 								gstrDOCTYPEQUERY.c_str(), VARIANT_FALSE);
-	ASSERT_RESOURCE_ALLOCATION("ELI15769", ipDocTypes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15769", ipDocTypes != __nullptr);
 	
 	if( bCalculatedFoundValues && ipDocTypes->Size() == 0)
 	{	
 		// Get the doc types from the AFDoc and put them into attributes in the Found IIUnknownVectorPtr
 		IStrToObjectMapPtr ipObjMap = ipAFDoc->GetObjectTags();
-		ASSERT_RESOURCE_ALLOCATION("ELI15772", ipObjMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15772", ipObjMap != __nullptr);
 
 		// If there is at least one item in the obj map
 		if( ipObjMap->Size > 0 )
@@ -2012,7 +2012,7 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 			{
 				// Get the variant vector for all the doc types present
 				IVariantVectorPtr ipDocumentTypes = ipObjMap->GetValue(get_bstr_t(DOC_TYPE));
-				ASSERT_RESOURCE_ALLOCATION("ELI15771", ipDocumentTypes != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15771", ipDocumentTypes != __nullptr);
 
 				// Use the number of document types found to control the loop
 				long nDocTypes = ipDocumentTypes->Size;
@@ -2023,14 +2023,14 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 					
 					// Create an attribute for this doc type and put it into the found attributes vector
 					IAttributePtr ipAttr(CLSID_Attribute);
-					ASSERT_RESOURCE_ALLOCATION("ELI15767", ipAttr != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15767", ipAttr != __nullptr);
 
 					// Set the type of the attribute to doc type
 					ipAttr->Name = get_bstr_t( "DocumentType" );
 					
 					// Create a spatial string to use as the value of the attribute
 					ISpatialStringPtr ipSS(CLSID_SpatialString);
-					ASSERT_RESOURCE_ALLOCATION("ELI15768", ipSS != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15768", ipSS != __nullptr);
 					ipSS->CreateNonSpatialString(strDocTypeValue.c_str(), "");
 
 					// Apply the spatial string as the attribute's value
@@ -2046,7 +2046,7 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 	// Get the document types from the found attributes vector
 	ipDocTypes= m_ipAFUtility->QueryAttributes( ipFoundAttributes, 
 							gstrDOCTYPEQUERY.c_str(), VARIANT_FALSE);
-	ASSERT_RESOURCE_ALLOCATION("ELI15207", ipDocTypes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15207", ipDocTypes != __nullptr);
 
 	// Get the number of document types
 	long nDocTypes = ipDocTypes->Size();
@@ -2080,11 +2080,11 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 		{
 			// Get the attribute
 			IAttributePtr ipAtt = ipDocTypes->At( i );
-			ASSERT_RESOURCE_ALLOCATION("ELI15208", ipAtt != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15208", ipAtt != __nullptr);
 
 			// Get the spatial string that contains the doc type info
 			ISpatialStringPtr ipSpatial = ipAtt->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI15209", ipSpatial != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15209", ipSpatial != __nullptr);
 
 			// Get the string of the doc type
 			string strDocType = asString(ipSpatial->String);
@@ -2128,7 +2128,7 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 void CIDShieldTester::countExpectedOverlapsAndPages(IIUnknownVectorPtr ipExpectedAttributes,
 	unsigned long& rulOverlaps, unsigned long& rulNumPagesWithRedactions)
 {
-	ASSERT_ARGUMENT("ELI18361", ipExpectedAttributes != NULL);
+	ASSERT_ARGUMENT("ELI18361", ipExpectedAttributes != __nullptr);
 
 	// get the size of the vector
 	long nSize = ipExpectedAttributes->Size();
@@ -2141,22 +2141,22 @@ void CIDShieldTester::countExpectedOverlapsAndPages(IIUnknownVectorPtr ipExpecte
 	{
 		// get the attribute from the vector
 		IAttributePtr ipAttrib1 = ipExpectedAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI18362", ipAttrib1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18362", ipAttrib1 != __nullptr);
 
 		// get the spatial string associated with this attribute
 		ISpatialStringPtr ipSS1 = ipAttrib1->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI18363", ipSS1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18363", ipSS1 != __nullptr);
 
 		// now compare all of the other attributes to this attribute
 		for (long j = i+1; j < nSize; j++)
 		{
 			// get an attribute
 			IAttributePtr ipAttrib2 = ipExpectedAttributes->At(j);
-			ASSERT_RESOURCE_ALLOCATION("ELI18364", ipAttrib2 != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18364", ipAttrib2 != __nullptr);
 
 			// get the spatial string from the attribute
 			ISpatialStringPtr ipSS2 = ipAttrib2->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI18416", ipSS2 != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18416", ipSS2 != __nullptr);
 
 			// check if the spatial strings overlap
 			if (spatialStringsOverlap(ipSS1, ipSS2))
@@ -2171,7 +2171,7 @@ void CIDShieldTester::countExpectedOverlapsAndPages(IIUnknownVectorPtr ipExpecte
 		{
 			// Retrieve the specific page we need.
 			ISpatialStringPtr ipPage = ipSS1->GetSpecifiedPages(lPage, lPage);
-			ASSERT_RESOURCE_ALLOCATION("ELI29438", ipPage != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29438", ipPage != __nullptr);
 
 			if (!asCppBool(ipPage->HasSpatialInfo()))
 			{
@@ -2189,8 +2189,8 @@ void CIDShieldTester::countExpectedOverlapsAndPages(IIUnknownVectorPtr ipExpecte
 //-------------------------------------------------------------------------------------------------
 bool CIDShieldTester::spatialStringsOverlap(ISpatialStringPtr ipSS1, ISpatialStringPtr ipSS2)
 {
-	ASSERT_ARGUMENT("ELI18417", ipSS1 != NULL);
-	ASSERT_ARGUMENT("ELI18418", ipSS2 != NULL);
+	ASSERT_ARGUMENT("ELI18417", ipSS1 != __nullptr);
+	ASSERT_ARGUMENT("ELI18418", ipSS2 != __nullptr);
 
 	// make sure both strings are spatial, if not just return false since they cannot overlap
 	// if they are not spatial
@@ -2198,7 +2198,7 @@ bool CIDShieldTester::spatialStringsOverlap(ISpatialStringPtr ipSS1, ISpatialStr
 	if (asCppBool(ipSS1->HasSpatialInfo()))
 	{
 		ipRZones1 = ipSS1->GetOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI18419", ipRZones1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18419", ipRZones1 != __nullptr);
 	}
 	else
 	{
@@ -2209,7 +2209,7 @@ bool CIDShieldTester::spatialStringsOverlap(ISpatialStringPtr ipSS1, ISpatialStr
 	if (asCppBool(ipSS2->HasSpatialInfo()))
 	{
 		ipRZones2 = ipSS2->GetOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI18420", ipRZones2 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18420", ipRZones2 != __nullptr);
 	}
 	else
 	{
@@ -2223,12 +2223,12 @@ bool CIDShieldTester::spatialStringsOverlap(ISpatialStringPtr ipSS1, ISpatialStr
 	{
 		// get the first zone
 		IRasterZonePtr ipZone1 = ipRZones1->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI18421", ipZone1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18421", ipZone1 != __nullptr);
 
 		for (long j = 0; j < lRZones2Size; j++)
 		{
 			IRasterZonePtr ipZone2 = ipRZones2->At(j);
-			ASSERT_RESOURCE_ALLOCATION("ELI18422", ipZone2 != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18422", ipZone2 != __nullptr);
 
 			// check the area of overlap, it should be zero
 			// NOTE: GetAreaOverlappingWith checks the page number so no need to do it here
@@ -2254,8 +2254,8 @@ bool CIDShieldTester::spatialStringsOverlap(ISpatialStringPtr ipSS1, ISpatialStr
 void CIDShieldTester::getMatchInfo(MatchInfo& rMatchInfo, IAttributePtr ipExpected, 
 										IAttributePtr ipFound)
 {
-	ASSERT_ARGUMENT("ELI18423", ipExpected != NULL);
-	ASSERT_ARGUMENT("ELI18424", ipFound != NULL);
+	ASSERT_ARGUMENT("ELI18423", ipExpected != __nullptr);
+	ASSERT_ARGUMENT("ELI18424", ipFound != __nullptr);
 
 	// store the expected and found attribute pointers
 	rMatchInfo.m_ipExpectedAttribute = ipExpected;
@@ -2271,28 +2271,28 @@ void CIDShieldTester::getMatchInfo(MatchInfo& rMatchInfo, IAttributePtr ipExpect
 //-------------------------------------------------------------------------------------------------
 double CIDShieldTester::getTotalArea(IAttributePtr ipAttribute)
 {
-	ASSERT_ARGUMENT("ELI18425", ipAttribute != NULL);
+	ASSERT_ARGUMENT("ELI18425", ipAttribute != __nullptr);
 
 	// default total area to 0
 	double dArea = 0.0;
 
 	// get the spatial string for this attribute
 	ISpatialStringPtr ipSS = ipAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI18426", ipSS != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18426", ipSS != __nullptr);
 
 	// check for spatial info
 	if (asCppBool(ipSS->HasSpatialInfo()))
 	{
 		// get the vector of raster zones
 		IIUnknownVectorPtr ipVecRasterZones = ipSS->GetOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI18427", ipVecRasterZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18427", ipVecRasterZones != __nullptr);
 
 		// for each zone, get its area and add that to the total area
 		long lSize = ipVecRasterZones->Size();
 		for (long i = 0; i < lSize; i++)
 		{
 			IRasterZonePtr ipRZ = ipVecRasterZones->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI18428", ipRZ != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18428", ipRZ != __nullptr);
 
 			dArea += (double) ipRZ->Area;
 		}
@@ -2305,15 +2305,15 @@ double CIDShieldTester::getTotalArea(IAttributePtr ipAttribute)
 double CIDShieldTester::computeTotalAreaOfOverlap(IAttributePtr ipExpected, IAttributePtr ipFound)
 {
 	// check arguments
-	ASSERT_ARGUMENT("ELI18429", ipExpected != NULL);
-	ASSERT_ARGUMENT("ELI18430", ipFound != NULL);
+	ASSERT_ARGUMENT("ELI18429", ipExpected != __nullptr);
+	ASSERT_ARGUMENT("ELI18430", ipFound != __nullptr);
 
 	// get the spatial strings for each attribute
 	ISpatialStringPtr ipExpectedSS = ipExpected->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI18431", ipExpectedSS != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18431", ipExpectedSS != __nullptr);
 
 	ISpatialStringPtr ipFoundSS = ipFound->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI18432", ipFoundSS != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18432", ipFoundSS != __nullptr);
 
 	// default the overlap area to 0
 	double dAreaOfOverlap = 0.0;
@@ -2326,10 +2326,10 @@ double CIDShieldTester::computeTotalAreaOfOverlap(IAttributePtr ipExpected, IAtt
 	{
 		// get the vector of raster zones for both spatial strings
 		IIUnknownVectorPtr ipExpectedRZs = ipExpectedSS->GetOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI18433", ipExpectedRZs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18433", ipExpectedRZs != __nullptr);
 
 		IIUnknownVectorPtr ipFoundRZs = ipFoundSS->GetOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI18434", ipFoundRZs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18434", ipFoundRZs != __nullptr);
 
 		// loop through each of the raster zones and add the area of overlap
 		long lExpectedSize = ipExpectedRZs->Size();
@@ -2337,12 +2337,12 @@ double CIDShieldTester::computeTotalAreaOfOverlap(IAttributePtr ipExpected, IAtt
 		for (long i = 0; i < lExpectedSize; i++)
 		{
 			IRasterZonePtr ipERZ = ipExpectedRZs->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI18435", ipERZ != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18435", ipERZ != __nullptr);
 
 			for (long j = 0; j < lFoundSize; j++)
 			{
 				IRasterZonePtr ipFRZ = ipFoundRZs->At(j);
-				ASSERT_RESOURCE_ALLOCATION("ELI18436", ipFRZ != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18436", ipFRZ != __nullptr);
 
 				double dOverlap = ipERZ->GetAreaOverlappingWith(ipFRZ);
 
@@ -2374,15 +2374,15 @@ void CIDShieldTester::addAttributeToTestOutputVOA(IAttributePtr ipAttribute,
 												  const string &strPrefix,
 												  const string &strSourceVOA)
 {
-	ASSERT_ARGUMENT("ELI18437", ipAttribute != NULL);
+	ASSERT_ARGUMENT("ELI18437", ipAttribute != __nullptr);
 
 	// create a new attribute
 	IAttributePtr ipNewAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI18438", ipNewAttribute != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18438", ipNewAttribute != __nullptr);
 
 	// get the copyable object
 	ICopyableObjectPtr ipCopy = ipNewAttribute;
-	ASSERT_RESOURCE_ALLOCATION("ELI18439", ipCopy != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18439", ipCopy != __nullptr);
 
 	// copy the expected attribute to the new attribute
 	ipCopy->CopyFrom(ipAttribute);
@@ -2404,7 +2404,7 @@ void CIDShieldTester::countAttributeNames(IIUnknownVectorPtr ipFoundAttributes,
 										  unsigned long &rulHCData, unsigned long &rulMCData, 
 										  unsigned long &rulLCData, unsigned long &rulClues)
 {
-	ASSERT_ARGUMENT("ELI18504", ipFoundAttributes != NULL);
+	ASSERT_ARGUMENT("ELI18504", ipFoundAttributes != __nullptr);
 
 	// set all counts to 0
 	rulHCData = rulMCData = rulLCData = rulClues = 0;
@@ -2414,7 +2414,7 @@ void CIDShieldTester::countAttributeNames(IIUnknownVectorPtr ipFoundAttributes,
 	for (long i=0; i < lSize; i++)
 	{
 		IAttributePtr ipAttribute = ipFoundAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI18505", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18505", ipAttribute != __nullptr);
 
 		string strName = asString(ipAttribute->Name);
 
@@ -2439,11 +2439,11 @@ void CIDShieldTester::countAttributeNames(IIUnknownVectorPtr ipFoundAttributes,
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CIDShieldTester::filterAttributesByType(IIUnknownVectorPtr ipAttributeVector)
 {
-	ASSERT_ARGUMENT("ELI18513", ipAttributeVector != NULL);
+	ASSERT_ARGUMENT("ELI18513", ipAttributeVector != __nullptr);
 
 	// create a new vector
 	IIUnknownVectorPtr ipNewVector(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI18514", ipNewVector != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18514", ipNewVector != __nullptr);
 
 	// get the current vector size
 	long lSize = ipAttributeVector->Size();
@@ -2453,7 +2453,7 @@ IIUnknownVectorPtr CIDShieldTester::filterAttributesByType(IIUnknownVectorPtr ip
 	for (long i=0; i < lSize; i++)
 	{
 		IAttributePtr ipAttribute = ipAttributeVector->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI18515", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18515", ipAttribute != __nullptr);
 
 		// Always filter by document type [FlexIDSCore #3449]
 		string strName = asString(ipAttribute->Name);
@@ -2486,7 +2486,7 @@ IIUnknownVectorPtr CIDShieldTester::filterAttributesByType(IIUnknownVectorPtr ip
 void CIDShieldTester::updateVerificationAttributeTester()
 {
 	// If an attribute tester was already created, just reset it
-	if (m_apVerificationTester.get() != NULL)
+	if (m_apVerificationTester.get() != __nullptr)
 	{
 		m_apVerificationTester->reset();
 		return;
@@ -2537,7 +2537,7 @@ void CIDShieldTester::updateVerificationAttributeTester()
 void CIDShieldTester::updateRedactionAttributeTester()
 {
 	// If an attribute tester was already created, just reset it
-	if (m_apRedactionTester.get() != NULL)
+	if (m_apRedactionTester.get() != __nullptr)
 	{
 		m_apRedactionTester->reset();
 		return;

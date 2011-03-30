@@ -142,7 +142,7 @@ private:
 	bool m_bConfigureConditionsOnly;
 
 	// Tests if the attributes match the specified condition
-	auto_ptr<AttributeTester> m_apTester;
+	unique_ptr<AttributeTester> m_apTester;
 
 	/////////////
 	// Methods

@@ -62,7 +62,7 @@ STDMETHODIMP CLetter::raw_CopyFrom(IUnknown * pObject)
 
 		// verify valid object
 		UCLID_RASTERANDOCRMGMTLib::ILetterPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08311", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08311", ipSource != __nullptr);
 
 		// copy the information from this object to the other object
 		m_letter.m_ulLeft = ipSource->GetLeft();
@@ -101,7 +101,7 @@ STDMETHODIMP CLetter::raw_Clone(IUnknown * * pObject)
 		// Create a new ILetter object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_Letter);
-		ASSERT_RESOURCE_ALLOCATION("ELI08371", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08371", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -851,7 +851,7 @@ STDMETHODIMP CLetter::CreateFromCppLetter(void *pLetter)
 	
 	try
 	{
-		ASSERT_ARGUMENT("ELI25737", pLetter != NULL);
+		ASSERT_ARGUMENT("ELI25737", pLetter != __nullptr);
 
 		// validate license
 		validateLicense();
@@ -871,7 +871,7 @@ STDMETHODIMP CLetter::GetCppLetter(void *pLetter)
 	
 	try
 	{
-		ASSERT_ARGUMENT("ELI25739", pLetter != NULL);
+		ASSERT_ARGUMENT("ELI25739", pLetter != __nullptr);
 
 		// validate license
 		validateLicense();

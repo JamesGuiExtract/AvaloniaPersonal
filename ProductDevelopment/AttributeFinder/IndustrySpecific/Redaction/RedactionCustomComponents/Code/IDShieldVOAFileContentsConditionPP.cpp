@@ -59,7 +59,7 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnInitDialog(UINT uMsg, WPARAM wPar
 		m_btnUnsatisfiedOnMissingData	= GetDlgItem(IDC_CONDITION_UNSATISFIED);
 
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldVOAFileContentsConditionPtr ipVoaCondition = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI17430", ipVoaCondition != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17430", ipVoaCondition != __nullptr);
 
 		// Should we look for voa attributes?
 		bool bCheckDataContents = asCppBool(ipVoaCondition->CheckDataContents);
@@ -104,7 +104,7 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnInitDialog(UINT uMsg, WPARAM wPar
 
 		// Retrieve doc types setting
 		m_ipDocTypes = ipVoaCondition->DocTypes;
-		ASSERT_RESOURCE_ALLOCATION("ELI17455", m_ipDocTypes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17455", m_ipDocTypes != __nullptr);
 
 		// Populate doc type list UI element
 		loadDocTypesList();
@@ -163,7 +163,7 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnShowWindow(UINT uMsg, WPARAM wPar
 		}
 
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldVOAFileContentsConditionPtr ipVoaCondition = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI28650", ipVoaCondition != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28650", ipVoaCondition != __nullptr);
 
 		// Adjust the size of the screen to account for options that have been hidden.
 		if (asCppBool(ipVoaCondition->ConfigureConditionsOnly))
@@ -188,7 +188,7 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnShowWindow(UINT uMsg, WPARAM wPar
 
 			// Adjust the size/position all siblings of the property page (beneath the parent).
 			HWND hwndSibling = ::GetWindow(hwndParent, GW_CHILD);
-			while (hwndSibling != NULL)
+			while (hwndSibling != __nullptr)
 			{
 				::GetWindowRect(hwndSibling, &rect);
 				CPoint ptTopLeft(rect.left, rect.top);
@@ -269,14 +269,14 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnClickedDocType(WORD wNotifyCode, 
 
 		// Create a new Utils
 		IDocumentClassificationUtilsPtr ipDocUtils (CLSID_DocumentClassifier);
-		ASSERT_RESOURCE_ALLOCATION("ELI17442", ipDocUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17442", ipDocUtils != __nullptr);
 
 		// if the category is not set default it to the first in the industry list
 		if (m_strDocCategory.empty())
 		{
 			// Default it to the first industry category in the category list
 			IVariantVectorPtr ipIndustries = ipDocUtils->GetDocumentIndustries();
-			ASSERT_RESOURCE_ALLOCATION("ELI17443", ipIndustries != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17443", ipIndustries != __nullptr);
 
 			// Make sure there is at least one industry
 			if (ipIndustries->Size > 0)
@@ -300,7 +300,7 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnClickedDocType(WORD wNotifyCode, 
 			&(bstrIndustry.GetBSTR()), VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, VARIANT_FALSE);
 
 		// if cancel or nothing selected ipTypes will be NULL or have a size of zero 
-		if (ipTypes != NULL && ipTypes->Size > 0)
+		if (ipTypes != __nullptr && ipTypes->Size > 0)
 		{
 			m_ipDocTypes = ipTypes;
 		}
@@ -326,7 +326,7 @@ LRESULT CIDShieldVOAFileContentsConditionPP::OnClickedConfigDataFile(WORD wNotif
 	{
 		// Get SelectTargetFile object
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::ISelectTargetFileUIPtr ipFileSelector(CLSID_SelectTargetFileUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI17477", ipFileSelector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17477", ipFileSelector != __nullptr);
 
 		// Initialize parameters
 		ipFileSelector->Title = get_bstr_t("Customize ID Shield Data File Path");
@@ -402,7 +402,7 @@ STDMETHODIMP CIDShieldVOAFileContentsConditionPP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldVOAFileContentsConditionPtr ipVoaCondition = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI17402", ipVoaCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17402", ipVoaCondition != __nullptr);
 
 			// Set data contents conditions
 			ipVoaCondition->CheckDataContents = asVariantBool(m_checkContainsData.GetCheck() == BST_CHECKED);
@@ -459,7 +459,7 @@ STDMETHODIMP CIDShieldVOAFileContentsConditionPP::Apply(void)
 			}
 
 			// If CheckDocType but no doc types are selected, prompt
-			if (ipVoaCondition->CheckDocType == VARIANT_TRUE && (m_ipDocTypes == NULL || m_ipDocTypes->Size < 1))
+			if (ipVoaCondition->CheckDocType == VARIANT_TRUE && (m_ipDocTypes == __nullptr || m_ipDocTypes->Size < 1))
 			{
 				m_checkIndicatesDocType.SetFocus();	
 				UCLIDException ue("ELI17529", "There must be a document type selected.");

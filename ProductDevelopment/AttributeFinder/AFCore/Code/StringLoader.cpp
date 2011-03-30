@@ -7,10 +7,10 @@
 
 StringLoader::StringLoader()
 {
-	if(m_ipMiscUtils == NULL)
+	if(m_ipMiscUtils == __nullptr)
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI14616", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14616", m_ipMiscUtils != __nullptr );
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ StringLoader::~StringLoader()
 	try
 	{
 		// Reset the misc utils pointer
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27085");
 }

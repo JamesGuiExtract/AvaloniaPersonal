@@ -58,7 +58,7 @@ CTestHarnessDlg::CTestHarnessDlg(CWnd* pParent /*=NULL*/)
 		ASSERT_RESOURCE_ALLOCATION("ELI04907", m_ipTestHarness!=NULL);
 
 		// create an instance of the configuration persistence manager
-		m_apCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		m_apCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr(HKEY_CURRENT_USER,
 			gstrREG_ROOT_KEY + "\\TestingFramework\\TestHarness"));
 	}

@@ -82,7 +82,7 @@ void CFileProcessingDB::closeDBConnection()
 	{
 		// close the connection if it is open
 		_ConnectionPtr ipConnection = it->second;
-		if (ipConnection != NULL && ipConnection->State != adStateClosed)
+		if (ipConnection != __nullptr && ipConnection->State != adStateClosed)
 		{
 			// close the database connection
 			ipConnection->Close();
@@ -108,7 +108,7 @@ set<long> CFileProcessingDB::getSkippedFilesForAction(const _ConnectionPtr& ipCo
 		string strQuery = "SELECT FileID FROM SkippedFile WHERE ActionID = " + asString(nActionId);
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI30293", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30293", ipFileSet != __nullptr);
 
 		// Open the file set
 		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
@@ -247,7 +247,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI30390", ipConnection != NULL);
+		ASSERT_ARGUMENT("ELI30390", ipConnection != __nullptr);
 		ASSERT_ARGUMENT("ELI30391", !strAction.empty() || nActionID != -1);
 
 		_lastCodePos = "10";
@@ -283,7 +283,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		_lastCodePos = "70";
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI30392", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30392", ipFileSet != __nullptr);
 		_lastCodePos = "80";
 
 		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
@@ -299,7 +299,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		{
 			_lastCodePos = "120";
 			FieldsPtr ipFileSetFields = ipFileSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI30393", ipFileSetFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30393", ipFileSetFields != __nullptr);
 
 			_lastCodePos = "130";
 			// Get the previous state
@@ -538,7 +538,7 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 			_lastCodePos = "10";
 
 			_RecordsetPtr ipQueueEventSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI13591", ipQueueEventSet != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13591", ipQueueEventSet != __nullptr);
 
 			// Open the QueueEvent table
 			ipQueueEventSet->Open("QueueEvent", _variant_t((IDispatch *)ipConnection, true), 
@@ -550,7 +550,7 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 			_lastCodePos = "30";
 
 			FieldsPtr ipFields = ipQueueEventSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI26875", ipFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26875", ipFields != __nullptr);
 
 			//  add the field values to the new record
 			setLongField(ipFields, "FileID",  nFileID);
@@ -606,7 +606,7 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 		uex.addDebugInfo("File ID", nFileID);
 		uex.addDebugInfo("File To Add", strFileName);
 		uex.addDebugInfo("Queue Event Code", strQueueEventCode);
-		if (ipConnection == NULL)
+		if (ipConnection == __nullptr)
 		{
 			uex.addDebugInfo("ConnectionValue", "NULL");
 		}
@@ -678,7 +678,7 @@ string CFileProcessingDB::getActionName(_ConnectionPtr ipConnection, long nActio
 	try
 	{
 		_RecordsetPtr ipAction(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI14046", ipAction != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14046", ipAction != __nullptr);
 
 		// Oepn Action table
 		ipAction->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
@@ -707,7 +707,7 @@ _RecordsetPtr CFileProcessingDB::getActionSet(_ConnectionPtr ipConnection, const
 {
 	// Create a pointer to a recordset
 	_RecordsetPtr ipActionSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI29155", ipActionSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI29155", ipActionSet != __nullptr);
 
 	// Setup select statement to open Action Table
 	string strActionSelect = "SELECT ID, ASCName FROM Action WHERE ASCName = '" + strAction + "'";
@@ -795,7 +795,7 @@ _ConnectionPtr  CFileProcessingDB::getDBConnection()
 			// Get the current threads ID
 			DWORD dwThreadID = GetCurrentThreadId();
 
-			_ConnectionPtr ipConnection = NULL;
+			_ConnectionPtr ipConnection = __nullptr;
 
 			// Lock mutex to keep other instances from running code that may cause the
 			// connection to be reset
@@ -811,11 +811,11 @@ _ConnectionPtr  CFileProcessingDB::getDBConnection()
 			}
 
 			// check to see if the DB connection has been allocated
-			if (ipConnection == NULL)
+			if (ipConnection == __nullptr)
 			{
 				_lastCodePos = "10";
 				ipConnection.CreateInstance(__uuidof(Connection));
-				ASSERT_RESOURCE_ALLOCATION("ELI13650",  ipConnection != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI13650",  ipConnection != __nullptr);
 
 				// Reset the schema version to indicate that it needs to be read from DB
 				m_iDBSchemaVersion = 0;
@@ -1272,7 +1272,7 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 									bool bUpdateAndSaveStats)
 {
 	// Only time a ipOldRecord can be NULL is if the from status is kActionUnattempted
-	if (eFromStatus != kActionUnattempted && ipOldRecord == NULL)
+	if (eFromStatus != kActionUnattempted && ipOldRecord == __nullptr)
 	{
 		UCLIDException ue("ELI17029", "Must have an old record");
 		ue.addDebugInfo("FromStatus", eFromStatus);
@@ -1282,7 +1282,7 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 	}
 
 	// Only time a ipNewRecord can be NULL is if the to status is kActionUnattempted
-	if (eToStatus != kActionUnattempted && ipNewRecord == NULL)
+	if (eToStatus != kActionUnattempted && ipNewRecord == __nullptr)
 	{
 		UCLIDException ue("ELI17030", "Must have a new record");
 		ue.addDebugInfo("FromStatus", eFromStatus);
@@ -1297,12 +1297,12 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 	UCLID_FILEPROCESSINGLib::EFilePriority ePriority(
 		(UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault);
 	_bstr_t bstrTemp;
-	if (ipOldRecord != NULL)
+	if (ipOldRecord != __nullptr)
 	{
 		ipOldRecord->GetFileData(&lTempFileID, &lTempActionID, bstrTemp.GetAddress(),
 			&llOldFileSize, &lOldPages, &ePriority);
 	}
-	if (ipNewRecord != NULL)
+	if (ipNewRecord != __nullptr)
 	{
 		// If the records are the same, just copy the data that was already retrieved
 		if (ipNewRecord == ipOldRecord)
@@ -1323,7 +1323,7 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 		// If the to and from status is unattempted there is nothing to do
 		// Otherwise if the FileSize and the number Pages are the same there is nothing to do
 		if (eFromStatus == kActionUnattempted ||
-			(ipNewRecord != NULL && ipOldRecord != NULL &&
+			(ipNewRecord != __nullptr && ipOldRecord != __nullptr &&
 			llNewFileSize == llOldFileSize && 
 			lNewPages == lOldPages))
 		{
@@ -1450,7 +1450,7 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 {
 	// Create a pointer to a recordset
 	_RecordsetPtr ipActionStatSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI14099", ipActionStatSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14099", ipActionStatSet != __nullptr);
 
 	// Select the existing Statistics record if it exists
 	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
@@ -1485,11 +1485,11 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 
 	// Get the fields from the action stat set
 	FieldsPtr ipFields = ipActionStatSet->Fields;
-	ASSERT_RESOURCE_ALLOCATION("ELI26863", ipFields != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI26863", ipFields != __nullptr);
 
 	// Create an ActionStatistics pointer to return the values
 	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats(CLSID_ActionStatistics);
-	ASSERT_RESOURCE_ALLOCATION("ELI14101", ipActionStats != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14101", ipActionStats != __nullptr);
 
 	// Check the last updated time stamp 
 	CTime timeCurrent = getSQLServerDateTimeAsCTime(ipConnection);
@@ -1515,7 +1515,7 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 	ipActionStatSet->Requery(adOptionUnspecified);
 
 	ipFields = ipActionStatSet->Fields;
-	ASSERT_RESOURCE_ALLOCATION("ELI30751", ipFields != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30751", ipFields != __nullptr);
 
 	// Get all the data from the recordset
 	long lNumDocsFailed =  getLongField(ipFields, "NumDocumentsFailed");
@@ -1595,7 +1595,7 @@ void CFileProcessingDB::validateDBSchemaVersion()
 		{
 			// Get a list of all installed & licensed product-specific database managers.
 			IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
-			ASSERT_RESOURCE_ALLOCATION("ELI31433", ipProdSpecificMgrs != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI31433", ipProdSpecificMgrs != __nullptr);
 
 			// Loop through the managers and validate the schema of each.
 			long nCountProdSpecMgrs = ipProdSpecificMgrs->Size();
@@ -1603,7 +1603,7 @@ void CFileProcessingDB::validateDBSchemaVersion()
 			{
 				UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipProdSpecificDBMgr =
 					ipProdSpecificMgrs->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI31434", ipProdSpecificDBMgr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI31434", ipProdSpecificDBMgr != __nullptr);
 
 				try
 				{
@@ -1663,7 +1663,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipLockTable(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI14550", ipLockTable != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14550", ipLockTable != __nullptr);
 
 				// Open recordset with the locktime 
 				ipLockTable->Open(gstrDB_LOCK_QUERY.c_str(), 
@@ -1769,7 +1769,7 @@ bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseA
 
 		// Create a pointer to a recordset
 		_RecordsetPtr ipLoginSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI15103", ipLoginSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15103", ipLoginSet != __nullptr);
 
 		// setup the SQL Query to get the encrypted combo for admin or user
 		string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + 
@@ -1815,15 +1815,15 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strEncry
 
 	// Create a pointer to a recordset
 	_RecordsetPtr ipLoginSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI15722", ipLoginSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15722", ipLoginSet != __nullptr);
 
 
 	// Begin Transaction if needed
-	auto_ptr<TransactionGuard> apTg;
+	unique_ptr<TransactionGuard> apTg;
 	if (bCreateTransactionGuard)
 	{
 		apTg.reset(new TransactionGuard(getDBConnection()));
-		ASSERT_RESOURCE_ALLOCATION("ELI29896", apTg.get() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29896", apTg.get() != __nullptr);
 	}
 
 	// Retrieve records from Login table for the admin or current user
@@ -1853,7 +1853,7 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strEncry
 	ipLoginSet->Update();
 
 	// Commit the changes
-	if (apTg.get() != NULL)
+	if (apTg.get() != __nullptr)
 	{
 		apTg->CommitTrans();
 	}
@@ -1888,7 +1888,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingDB::getThisAsCOMPtr
 {
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipThis;
 	ipThis = this;
-	ASSERT_RESOURCE_ALLOCATION("ELI17015", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI17015", ipThis != __nullptr);
 	return ipThis;
 }
 //--------------------------------------------------------------------------------------------------
@@ -1896,10 +1896,10 @@ UCLID_FILEPROCESSINGLib::IFileRecordPtr CFileProcessingDB::getFileRecordFromFiel
 	const FieldsPtr& ipFields, bool bGetPriority)
 {
 	// Make sure the ipFields argument is not NULL
-	ASSERT_ARGUMENT("ELI17028", ipFields != NULL);
+	ASSERT_ARGUMENT("ELI17028", ipFields != __nullptr);
 
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
-	ASSERT_RESOURCE_ALLOCATION("ELI17027", ipFileRecord != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI17027", ipFileRecord != __nullptr);
 	
 	// Set the file data from the fields collection (set ActionID to 0)
 	ipFileRecord->SetFileData(getLongField(ipFields, "ID"), 0,
@@ -1914,10 +1914,10 @@ void CFileProcessingDB::setFieldsFromFileRecord(const FieldsPtr& ipFields,
 		const UCLID_FILEPROCESSINGLib::IFileRecordPtr& ipFileRecord, bool bSetPriority)
 {
 	// Make sure the ipFields argument is not NULL
-	ASSERT_ARGUMENT("ELI17031", ipFields != NULL);
+	ASSERT_ARGUMENT("ELI17031", ipFields != __nullptr);
 
 	// Make sure the ipFileRecord object is not NULL
-	ASSERT_ARGUMENT("ELI17032", ipFileRecord != NULL);
+	ASSERT_ARGUMENT("ELI17032", ipFileRecord != __nullptr);
 	
 	// Get the file data
 	long lFileID(-1), lActionID(-1), lNumPages(-1);
@@ -2125,7 +2125,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 		{
 			// Create a pointer to a recordset
 			_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI18171", ipDBInfoSet != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18171", ipDBInfoSet != __nullptr);
 
 			_lastCodePos = "10";
 
@@ -2138,7 +2138,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 			while (!asCppBool(ipDBInfoSet->adoEOF))
 			{
 				FieldsPtr ipFields = ipDBInfoSet->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI18172", ipFields != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18172", ipFields != __nullptr);
 
 				_lastCodePos = "30";
 
@@ -2355,16 +2355,16 @@ IIUnknownVectorPtr CFileProcessingDB::getLicensedProductSpecificMgrs()
 {
 	// Create the category manager instance
 	ICategoryManagerPtr ipCategoryMgr(CLSID_CategoryManager);
-	ASSERT_RESOURCE_ALLOCATION("ELI18948", ipCategoryMgr != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18948", ipCategoryMgr != __nullptr);
 
 	// Get map of licensed prog ids that belong to the product specific db managers category
 	IStrToStrMapPtr ipProductSpecMgrProgIDs = 
 		ipCategoryMgr->GetDescriptionToProgIDMap1(FP_FAM_PRODUCT_SPECIFIC_DB_MGRS.c_str());
-	ASSERT_RESOURCE_ALLOCATION("ELI18947", ipProductSpecMgrProgIDs != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18947", ipProductSpecMgrProgIDs != __nullptr);
 
 	// Create a vector to contain instances of DB managers to return
 	IIUnknownVectorPtr ipProdSpecMgrs(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI18949", ipProdSpecMgrs != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18949", ipProdSpecMgrs != __nullptr);
 
 	// Get the number of licensed product specific db managers
 	long nSize = ipProductSpecMgrProgIDs->Size;
@@ -2376,7 +2376,7 @@ IIUnknownVectorPtr CFileProcessingDB::getLicensedProductSpecificMgrs()
 		
 		// Create the object
 		ICategorizedComponentPtr ipComponent(asString(bstrValue).c_str());
-		if (ipComponent == NULL)
+		if (ipComponent == __nullptr)
 		{
 			UCLIDException ue("ELI18950", "Unable to create Product Specific DB Manager!");
 			ue.addDebugInfo("ObjectName", asString(bstrValue));
@@ -2397,14 +2397,14 @@ void CFileProcessingDB::removeProductSpecificDB()
 	{
 		// Get vector of all license product specific managers
 		IIUnknownVectorPtr ipProdSpecMgrs = getLicensedProductSpecificMgrs();
-		ASSERT_RESOURCE_ALLOCATION("ELI18951", ipProdSpecMgrs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18951", ipProdSpecMgrs != __nullptr);
 
 		// Loop through all of the objects and call the RemoveProductSpecificSchema 
 		long nSize = ipProdSpecMgrs->Size();
 		for (long n = 0; n < nSize; n++)
 		{
 			UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipMgr = ipProdSpecMgrs->At(n);
-			ASSERT_RESOURCE_ALLOCATION("ELI18952", ipMgr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18952", ipMgr != __nullptr);
 
 			// Remove the schema for the product specific manager
 			ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr());
@@ -2419,14 +2419,14 @@ void CFileProcessingDB::addProductSpecificDB()
 	{
 		// Get vector of all license product specific managers
 		IIUnknownVectorPtr ipProdSpecMgrs = getLicensedProductSpecificMgrs();
-		ASSERT_RESOURCE_ALLOCATION("ELI19790", ipProdSpecMgrs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19790", ipProdSpecMgrs != __nullptr);
 
 		// Loop through all of the objects and call the AddProductSpecificSchema
 		long nSize = ipProdSpecMgrs->Size();
 		for (long n = 0; n < nSize; n++)
 		{
 			UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipMgr = ipProdSpecMgrs->At(n);
-			ASSERT_RESOURCE_ALLOCATION("ELI19791", ipMgr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19791", ipMgr != __nullptr);
 
 			// Add the schema from the product specific db manager
 			ipMgr->AddProductSpecificSchema(getThisAsCOMPtr());
@@ -2439,7 +2439,7 @@ bool CFileProcessingDB::isConnectionAlive(_ConnectionPtr ipConnection)
 {
 	try
 	{
-		if (ipConnection != NULL)
+		if (ipConnection != __nullptr)
 		{
 			getSQLServerDateTime(ipConnection);
 			return true;
@@ -2508,7 +2508,7 @@ void CFileProcessingDB::addSkipFileRecord(const _ConnectionPtr &ipConnection,
 			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
 
 		_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26884", ipSkippedSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26884", ipSkippedSet != __nullptr);
 
 		ipSkippedSet->Open(strSkippedSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
 			adOpenDynamic, adLockOptimistic, adCmdText);
@@ -2530,7 +2530,7 @@ void CFileProcessingDB::addSkipFileRecord(const _ConnectionPtr &ipConnection,
 
 			// Get the fields pointer
 			FieldsPtr ipFields = ipSkippedSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI26807", ipFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26807", ipFields != __nullptr);
 
 			// Set the fields from the provided data
 			setStringField(ipFields, "UserName", strUserName);
@@ -2554,7 +2554,7 @@ void CFileProcessingDB::removeSkipFileRecord(const _ConnectionPtr &ipConnection,
 			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
 
 		_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26885", ipSkippedSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26885", ipSkippedSet != __nullptr);
 
 		ipSkippedSet->Open(strSkippedSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
 			adOpenDynamic, adLockOptimistic, adCmdText);
@@ -2622,7 +2622,7 @@ void CFileProcessingDB::closeAllDBConnections()
 				_lastCodePos = "25-" + asString(nCount);
 
 				// This will close the existing connection if not already closed
-				if (ipDBConnection != NULL && ipDBConnection->State != adStateClosed)
+				if (ipDBConnection != __nullptr && ipDBConnection->State != adStateClosed)
 				{
 					_lastCodePos = "30";
 
@@ -2678,9 +2678,9 @@ void CFileProcessingDB::clear(bool retainUserValues)
 		{
 			// Read all actions from the DB
 			IStrToStrMapPtr ipMapActions = getActions(ipConnection);
-			ASSERT_RESOURCE_ALLOCATION("ELI25184", ipMapActions != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25184", ipMapActions != __nullptr);
 			IVariantVectorPtr ipActions = ipMapActions->GetKeys();
-			ASSERT_RESOURCE_ALLOCATION("ELI25185", ipActions != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25185", ipActions != __nullptr);
 
 			// Iterate over the actions
 			long lSize = ipActions->Size;
@@ -2744,7 +2744,7 @@ IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection)
 	{
 		// Create a pointer to a recordset
 		_RecordsetPtr ipActionSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI13530", ipActionSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13530", ipActionSet != __nullptr);
 
 		// Open the Action table
 		ipActionSet->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
@@ -2752,14 +2752,14 @@ IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection)
 
 		// Create StrToStrMap to return the list of actions
 		IStrToStrMapPtr ipActions(CLSID_StrToStrMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI29687", ipActions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29687", ipActions != __nullptr);
 
 		// Step through all records
 		while (ipActionSet->adoEOF == VARIANT_FALSE)
 		{
 			// Get the fields from the action set
 			FieldsPtr ipFields = ipActionSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI26871", ipFields != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26871", ipFields != __nullptr);
 
 			// get the action name
 			string strActionName = getStringField(ipFields, "ASCName");
@@ -2786,7 +2786,7 @@ long CFileProcessingDB::defineNewAction(_ConnectionPtr ipConnection, const strin
 	{
 		// Create a pointer to a recordset containing the action
 		_RecordsetPtr ipActionSet = getActionSet(ipConnection, strActionName);
-		ASSERT_RESOURCE_ALLOCATION("ELI13517", ipActionSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13517", ipActionSet != __nullptr);
 
 		// Check to see if action exists
 		if (ipActionSet->adoEOF == VARIANT_FALSE)
@@ -2828,7 +2828,7 @@ void CFileProcessingDB::getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, 
 
 		// Recordset to contain the files to process
 		_RecordsetPtr ipFileIDSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26909", ipFileIDSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26909", ipFileIDSet != __nullptr);
 
 		// get the recordset with skipped file ID's
 		ipFileIDSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -2911,7 +2911,7 @@ void CFileProcessingDB::validateFileID(const _ConnectionPtr& ipConnection, long 
 			+ asString(nFileID);
 
 		_RecordsetPtr ipRecord(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI27385", ipRecord != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27385", ipRecord != __nullptr);
 
 		ipRecord->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 			adLockOptimistic, adCmdText);
@@ -2936,7 +2936,7 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 	{
 		// Create a pointer to a recordset
 		_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI19793", ipDBInfoSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19793", ipDBInfoSet != __nullptr);
 
 		// Setup Setting Query
 		string strSQL = gstrDBINFO_SETTING_QUERY;
@@ -2989,7 +2989,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 
 		// Open a recordset that has the action names that need to have files reset
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI27737", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27737", ipFileSet != __nullptr);
 
 		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
@@ -3023,7 +3023,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		executeCmdQuery(getDBConnection(), strQuery);
 
 		// Set up the logged exception if it is not null
-		if (pUE != NULL)
+		if (pUE != __nullptr)
 		{
 			bool bAtLeastOneReset = false;
 			string strEmailMessage = "";
@@ -3106,7 +3106,7 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 		CFileProcessingDB *pDB = static_cast<CFileProcessingDB *>(pData);
-		ASSERT_ARGUMENT("ELI27746", pDB != NULL);
+		ASSERT_ARGUMENT("ELI27746", pDB != __nullptr);
 
 		// Enclose so that the exited event can always be signaled if it can be.
 		try
@@ -3154,7 +3154,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 			"FROM [ProcessingFAM]";
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI27813", ipFileSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27813", ipFileSet != __nullptr);
 
 		ipFileSet->Open(strElapsedSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
@@ -3292,7 +3292,7 @@ IRegularExprParserPtr CFileProcessingDB::getParser()
 	try
 	{
 		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("");
-		ASSERT_RESOURCE_ALLOCATION("ELI27382", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27382", ipParser != __nullptr);
 
 		// Set the pattern
 		ipParser->Pattern = gstrTAG_REGULAR_EXPRESSION.c_str();
@@ -3313,8 +3313,8 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 	try
 	{
 		// Put the emailThreadData pointer passed in to an auto pointer.
-		auto_ptr<EmailThreadData> apEmailThreadData(static_cast<EmailThreadData *>(pData));
-		ASSERT_RESOURCE_ALLOCATION("ELI27999", apEmailThreadData.get() != NULL);
+		unique_ptr<EmailThreadData> apEmailThreadData(static_cast<EmailThreadData *>(pData));
+		ASSERT_RESOURCE_ALLOCATION("ELI27999", apEmailThreadData.get() != __nullptr);
 
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
@@ -3324,10 +3324,10 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 			{
 				// Email Settings
 				IEmailSettingsPtr ipEmailSettings(CLSID_EmailSettings);
-				ASSERT_RESOURCE_ALLOCATION("ELI27962", ipEmailSettings != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27962", ipEmailSettings != __nullptr);
 
 				IObjectSettingsPtr ipSettings = ipEmailSettings;
-				ASSERT_RESOURCE_ALLOCATION("ELI27963", ipSettings != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27963", ipSettings != __nullptr);
 
 				ipSettings->LoadFromRegistry(gstrEMAIL_REG_PATH.c_str());
 
@@ -3343,7 +3343,7 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 
 				// Email Message 
 				IESMessagePtr ipMessage(CLSID_ESMessage);
-				ASSERT_RESOURCE_ALLOCATION("ELI27964", ipMessage != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27964", ipMessage != __nullptr);
 
 				ipMessage->EmailSettings = ipEmailSettings;
 
@@ -3351,7 +3351,7 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 				StringTokenizer::sGetTokens(apEmailThreadData->m_strRecipients, ",;", vecRecipients, true);
 
 				IVariantVectorPtr ipRecipients(CLSID_VariantVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI27966", ipRecipients != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27966", ipRecipients != __nullptr);
 
 				for (unsigned int i = 0; i < vecRecipients.size(); i++)
 				{
@@ -3397,7 +3397,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 		{
 			// IUnknownVector to hold the FileRecords to return
 			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != __nullptr);
 
 			// Revert files before attempting to get the files to process
 			if (m_bAutoRevertLockedFiles && !m_bRevertInProgress)
@@ -3455,12 +3455,12 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						while (ipFileSet->adoEOF == VARIANT_FALSE)
 						{
 							FieldsPtr ipFields = ipFileSet->Fields;
-							ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != __nullptr);
 
 							// Get the file Record from the fields
 							UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
 								getFileRecordFromFields(ipFields);
-							ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != __nullptr);
 
 							// Put record in list of records to return
 							ipFiles->PushBack(ipFileRecord);
@@ -3529,7 +3529,7 @@ bool CFileProcessingDB::doesLoginUserNameExist(const _ConnectionPtr& ipConnectio
 {
 	// Create a pointer to a recordset
 	_RecordsetPtr ipLoginSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI29710", ipLoginSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI29710", ipLoginSet != __nullptr);
 
 	// Sql query that should either be empty if the passed in users is not in the table
 	// or will return the record with the given username
@@ -3555,7 +3555,7 @@ _RecordsetPtr CFileProcessingDB::getFileActionStatusSet(_ConnectionPtr& ipConnec
 	{
 		// Create a recordset
 		_RecordsetPtr ipFileActionStatus(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI30509", ipFileActionStatus != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30509", ipFileActionStatus != __nullptr);
 
 		EActionStatus eCurrentStatus = kActionUnattempted;
 
@@ -3594,7 +3594,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 
 	// Check for active processing for the action
 	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI31589", ipProcessingSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI31589", ipProcessingSet != __nullptr);
 
 	// Open recordset with ProcessingFAM records that show processing on the action
 	string strSQL = "SELECT UPI FROM ProcessingFAM WHERE ActionID = " + strActionID;
@@ -3608,7 +3608,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 		UCLIDException ue("ELI30547", "Processing is active for this action.");
 		ue.addDebugInfo("ActionID",strActionID);
 		FieldsPtr ipFields = ipProcessingSet->Fields;
-		if (ipFields != NULL)
+		if (ipFields != __nullptr)
 		{
 			string strUPI = getStringField(ipFields, "UPI");
 			ue.addDebugInfo("First UPI", strUPI.c_str());
@@ -3640,7 +3640,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 
 	// Check for active processing 
 	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI30609", ipProcessingSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30609", ipProcessingSet != __nullptr);
 
 	// Open recordset with ProcessingFAM records that show processing on the action
 	string strSQL = "SELECT UPI FROM ProcessingFAM";
@@ -3653,7 +3653,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 		// Since processing is occuring need to throw an exception.
 		UCLIDException ue("ELI30608", "Database has active processing.");
 		FieldsPtr ipFields = ipProcessingSet->Fields;
-		if (ipFields != NULL)
+		if (ipFields != __nullptr)
 		{
 			string strUPI = getStringField(ipFields, "UPI");
 			ue.addDebugInfo("First UPI", strUPI.c_str());
@@ -3669,7 +3669,7 @@ void CFileProcessingDB::updateActionStatisticsFromDelta(const _ConnectionPtr& ip
 	string strActionStatisticsDeltaSQL = 
 		"SELECT COALESCE(MAX(ID),0) AS LastDeltaID FROM ActionStatisticsDelta where ActionID = " + strActionID;
 	_RecordsetPtr ipActionStatisticsDeltaSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI30749", ipActionStatisticsDeltaSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30749", ipActionStatisticsDeltaSet != __nullptr);
 
 	// Open the set that will give the last id in the delta table for the action
 	ipActionStatisticsDeltaSet->Open(strActionStatisticsDeltaSQL.c_str(),
@@ -3686,7 +3686,7 @@ void CFileProcessingDB::updateActionStatisticsFromDelta(const _ConnectionPtr& ip
 
 	// get the fields
 	FieldsPtr ipFields = ipActionStatisticsDeltaSet->Fields;
-	ASSERT_RESOURCE_ALLOCATION("ELI30750", ipFields != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30750", ipFields != __nullptr);
 
 	// Get the last delta id to update ( need this so we know what to remove for Delta table
 	LONGLONG llLastDeltaID = getLongLongField(ipFields, "LastDeltaID");
@@ -3723,7 +3723,7 @@ set<string> getDBTableNames(const _ConnectionPtr& ipConnection)
 
 	// Retrieve the schema info for all tables in the database.
 	_RecordsetPtr ipTables = ipConnection->OpenSchema(adSchemaTables);
-	ASSERT_RESOURCE_ALLOCATION("ELI31391", ipTables != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI31391", ipTables != __nullptr);
 
 	// Loop through all tables to compile a list of all table names (in uppercase)
 	while (!asCppBool(ipTables->adoEOF))
@@ -3752,7 +3752,7 @@ set<string> getDBInfoRowNames(const _ConnectionPtr& ipConnection)
 	set<string> setDBInfoRows;
 
 	_RecordsetPtr ipResultSet(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI31392", ipResultSet != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI31392", ipResultSet != __nullptr);
 
 	// Query for all rows in the DBInfo table
 	string strDBInfoQuery = "SELECT [Name] FROM DBInfo";
@@ -3825,7 +3825,7 @@ vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _Connecti
 
 	// Get a list of all installed & licensed product-specific database managers.
 	IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
-	ASSERT_RESOURCE_ALLOCATION("ELI31394", ipProdSpecificMgrs != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI31394", ipProdSpecificMgrs != __nullptr);
 
 	// Loop through the managers asking them to remove from the list of existing tables and DBInfo
 	// rows the elements they have managed since FAM DB schema version 23.
@@ -3834,10 +3834,10 @@ vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _Connecti
 	{
 		UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipProdSpecificDBMgr =
 			ipProdSpecificMgrs->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI31395", ipProdSpecificDBMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31395", ipProdSpecificDBMgr != __nullptr);
 
 		IVariantVectorPtr ipVecProdSpecificDBInfoRows = ipProdSpecificDBMgr->GetDBInfoRows();
-		ASSERT_RESOURCE_ALLOCATION("ELI31396", ipVecProdSpecificDBInfoRows != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31396", ipVecProdSpecificDBInfoRows != __nullptr);
 
 		long nCountDBInfoRows = ipVecProdSpecificDBInfoRows->Size;
 		for (long j = 0; j < nCountDBInfoRows; j++)
@@ -3849,7 +3849,7 @@ vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _Connecti
 		}
 
 		IVariantVectorPtr ipVecProdSpecificTables = ipProdSpecificDBMgr->GetTables();
-		ASSERT_RESOURCE_ALLOCATION("ELI31397", ipVecProdSpecificTables != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31397", ipVecProdSpecificTables != __nullptr);
 
 		long nCountTables = ipVecProdSpecificTables->Size;
 		for (long j = 0; j < nCountTables; j++)
@@ -3885,7 +3885,7 @@ void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipCo
 	map<string, long> &rmapProductSpecificVersions)
 {
 	IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
-	ASSERT_RESOURCE_ALLOCATION("ELI31398", ipProdSpecificMgrs != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI31398", ipProdSpecificMgrs != __nullptr);
 
 	// Loop throught all installed & licensed product-specific DB managers and call
 	// UpdateSchemaForFAMDBVersion for each.
@@ -3894,10 +3894,10 @@ void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipCo
 	{
 		UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipProdSpecificDBMgr =
 			ipProdSpecificMgrs->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI31399", ipProdSpecificDBMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31399", ipProdSpecificDBMgr != __nullptr);
 
 		ICategorizedComponentPtr ipComponent(ipProdSpecificDBMgr);
-		ASSERT_RESOURCE_ALLOCATION("ELI31400", ipComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31400", ipComponent != __nullptr);
 
 		string strId = asString(ipComponent->GetComponentDescription());
 		

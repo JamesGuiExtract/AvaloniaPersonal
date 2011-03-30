@@ -86,7 +86,7 @@ bool CExeModule::StartMonitor()
 			return false;
 		DWORD dwThreadID;
 		HANDLE h = CreateThread(NULL, 0, MonitorProc, this, 0, &dwThreadID);
-		return (h != NULL);
+		return (h != __nullptr);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI12764");
 	return false;
@@ -100,10 +100,10 @@ END_OBJECT_MAP()
 //-------------------------------------------------------------------------------------------------
 LPCTSTR FindOneOf(LPCTSTR p1, LPCTSTR p2)
 {
-    while (p1 != NULL && *p1 != NULL)
+    while (p1 != __nullptr && *p1 != NULL)
     {
         LPCTSTR p = p2;
-        while (p != NULL && *p != NULL)
+        while (p != __nullptr && *p != NULL)
         {
             if (*p1 == *p)
                 return CharNext(p1);
@@ -144,7 +144,7 @@ BOOL CMyApp::InitInstance()
 		TCHAR szTokens[] = _T("-/");
 		m_bRun = TRUE;
 		LPCTSTR lpszToken = FindOneOf(m_lpCmdLine, szTokens);
-		while (lpszToken != NULL)
+		while (lpszToken != __nullptr)
 		{
 			// Register ATL and MFC class factories.
 			if (lstrcmpi(lpszToken, _T("Embedding"))==0 ||

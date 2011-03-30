@@ -151,7 +151,7 @@ STDMETHODIMP CFileRecord::get_ActionID(LONG* pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26739", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26739", pVal != __nullptr);
 
 		*pVal = m_lActionID;
 
@@ -182,12 +182,12 @@ STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pb
 	try
 	{
 		// Check the arguments
-		ASSERT_ARGUMENT("ELI26744", plFileID != NULL);
-		ASSERT_ARGUMENT("ELI26745", plActionID != NULL);
-		ASSERT_ARGUMENT("ELI26746", pbstrFileName != NULL);
-		ASSERT_ARGUMENT("ELI26747", pllFileSize != NULL);
-		ASSERT_ARGUMENT("ELI26748", plPages != NULL);
-		ASSERT_ARGUMENT("ELI27649", pePriority != NULL);
+		ASSERT_ARGUMENT("ELI26744", plFileID != __nullptr);
+		ASSERT_ARGUMENT("ELI26745", plActionID != __nullptr);
+		ASSERT_ARGUMENT("ELI26746", pbstrFileName != __nullptr);
+		ASSERT_ARGUMENT("ELI26747", pllFileSize != __nullptr);
+		ASSERT_ARGUMENT("ELI26748", plPages != __nullptr);
+		ASSERT_ARGUMENT("ELI27649", pePriority != __nullptr);
 
 		// Copy the values
 		*plFileID = m_lFileID;
@@ -228,7 +228,7 @@ STDMETHODIMP CFileRecord::get_Priority(EFilePriority* pePriority)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27651", pePriority != NULL);
+		ASSERT_ARGUMENT("ELI27651", pePriority != __nullptr);
 
 		*pePriority = (EFilePriority) m_ePriority;
 

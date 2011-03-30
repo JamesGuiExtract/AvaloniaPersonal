@@ -47,7 +47,7 @@ private:
 	// Variables
 	////////////
 	// Handles Registry items
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
 
 	////////////
 	// Methods

@@ -8,7 +8,7 @@ TimeRollbackPreventerWrapper::TimeRollbackPreventerWrapper(Win32Event& rStateIsI
 :m_pTRP(NULL)
 {
 	m_pTRP = new TimeRollbackPreventer(rStateIsInvalidEvent);
-	ASSERT_RESOURCE_ALLOCATION("ELI13018", m_pTRP != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI13018", m_pTRP != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 TimeRollbackPreventerWrapper::~TimeRollbackPreventerWrapper()

@@ -44,7 +44,7 @@ CRedactionTaskPP::~CRedactionTaskPP()
 {
 	try
 	{
-		m_ipPdfSettings = NULL;
+		m_ipPdfSettings = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29793");
 }
@@ -92,7 +92,7 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 		{
 			// Ensure at least one attribute type is selected for redaction
 			IVariantVectorPtr ipAttributeNames = getAttributeNames();
-			if (ipAttributeNames != NULL && ipAttributeNames->Size <= 0)
+			if (ipAttributeNames != __nullptr && ipAttributeNames->Size <= 0)
 			{
 				MessageBox("Please specify at least one data category to redact.",
 						"Select a data category", MB_YESNO | MB_ICONWARNING);
@@ -102,7 +102,7 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 
 			// Get Redaction File Processor object
 			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IRedactionTaskPtr ipRedactFileProc = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI28587", ipRedactFileProc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28587", ipRedactFileProc != __nullptr);
 
 			// Retrieve and store output filename
 			_bstr_t bstrFileName;
@@ -145,7 +145,7 @@ STDMETHODIMP CRedactionTaskPP::Apply()
 			if (m_chkPdfSecurity.GetCheck() == BST_CHECKED)
 			{
 				IMustBeConfiguredObjectPtr ipConfigure = m_ipPdfSettings;
-				if (ipConfigure == NULL || ipConfigure->IsConfigured() == VARIANT_FALSE)
+				if (ipConfigure == __nullptr || ipConfigure->IsConfigured() == VARIANT_FALSE)
 				{
 					MessageBox("Pdf security settings are not configured properly.",
 						"PDF Security Not Configured", MB_ICONERROR);
@@ -245,7 +245,7 @@ LRESULT CRedactionTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 
 		// Get Redaction File Processor object
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IRedactionTaskPtr ipRedactFileProc = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI28589", ipRedactFileProc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28589", ipRedactFileProc != __nullptr);
 
 		//////////////////////////
 		// Initialize data members
@@ -321,11 +321,11 @@ LRESULT CRedactionTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 		m_redactionAppearance.m_iPointSize = ipRedactFileProc->FontSize;
 
 		ICopyableObjectPtr ipCopy = ipRedactFileProc->PdfPasswordSettings;
-		bool bPdfSecurity = ipCopy != NULL;
+		bool bPdfSecurity = ipCopy != __nullptr;
 		if (bPdfSecurity)
 		{
 			m_ipPdfSettings = ipCopy->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI29783", m_ipPdfSettings != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29783", m_ipPdfSettings != __nullptr);
 		}
 		m_chkPdfSecurity.SetCheck(asBSTChecked(bPdfSecurity));
 		m_btnPdfSettings.EnableWindow(asMFCBool(bPdfSecurity));
@@ -468,7 +468,7 @@ LRESULT CRedactionTaskPP::OnClickedButtonDataFile(WORD wNotifyCode, WORD wID, HW
 	{
 		// Get SelectTargetFile object
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::ISelectTargetFileUIPtr ipFileSelector(CLSID_SelectTargetFileUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI28597", ipFileSelector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28597", ipFileSelector != __nullptr);
 
 		// Initialize parameters
 		ipFileSelector->Title = "Specify ID Shield data file path";
@@ -509,10 +509,10 @@ LRESULT CRedactionTaskPP::OnClickedBtnPdfSettings(WORD wNotifyCode, WORD wID, HW
 
 	try
 	{
-		if (m_ipPdfSettings == NULL)
+		if (m_ipPdfSettings == __nullptr)
 		{
 			m_ipPdfSettings.CreateInstance(CLSID_PdfPasswordSettings);
-			ASSERT_RESOURCE_ALLOCATION("ELI29779", m_ipPdfSettings != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29779", m_ipPdfSettings != __nullptr);
 
 			// Enforce setting both passwords due to Leadtools bug [LRCAU #5749]
 			m_ipPdfSettings->RequireUserAndOwnerPassword = VARIANT_TRUE;
@@ -520,7 +520,7 @@ LRESULT CRedactionTaskPP::OnClickedBtnPdfSettings(WORD wNotifyCode, WORD wID, HW
 
 		// Run the configuration for the PDF security settings
 		IConfigurableObjectPtr ipConfigure = m_ipPdfSettings;
-		ASSERT_RESOURCE_ALLOCATION("ELI29780", ipConfigure != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29780", ipConfigure != __nullptr);
 		ipConfigure->RunConfiguration();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29781");
@@ -573,7 +573,7 @@ void CRedactionTaskPP::updateDataFileDescription()
 //-------------------------------------------------------------------------------------------------
 IVariantVectorPtr CRedactionTaskPP::getAttributeNames()
 {
-	IVariantVectorPtr ipAttributeNames = NULL;
+	IVariantVectorPtr ipAttributeNames = __nullptr;
 	if (m_radioSelectAttributes.GetCheck() == 1)
 	{
 		vector<string> vecTokens;
@@ -614,7 +614,7 @@ IVariantVectorPtr CRedactionTaskPP::getAttributeNames()
 		}
 
 		ipAttributeNames.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI28599", ipAttributeNames != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28599", ipAttributeNames != __nullptr);
 
 		int nNumOfTokens = vecTokens.size();
 		for (int i = 0; i < nNumOfTokens; i++)
@@ -632,7 +632,7 @@ void CRedactionTaskPP::putAttributeNames(IVariantVectorPtr ipAttributeNames)
 
 	// as long as there is a valid attribute vector, set the check box
 	// and attribute edit box data according to the vector
-	if (ipAttributeNames != NULL)
+	if (ipAttributeNames != __nullptr)
 	{
 		m_radioSelectAttributes.SetCheck(TRUE);
 

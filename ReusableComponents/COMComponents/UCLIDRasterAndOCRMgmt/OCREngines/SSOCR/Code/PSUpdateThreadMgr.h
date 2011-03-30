@@ -19,8 +19,8 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To create a progress status update thread manager to manage the specified progress 
 	//          status object while the specified OCR engine is OCRing the specified number of pages.
-	// REQUIRE: (1) pProgressStatus != NULL
-	//          (2) pOCREngine != NULL
+	// REQUIRE: (1) pProgressStatus != __nullptr
+	//          (2) pOCREngine != __nullptr
 	//          (3) lPagesToOCR >= 0
 	// PROMISE: (1) A progress status update thread manager will be created and its progress status 
 	//          update thread will be initialized and immediately begin polling pOCREngine at 
@@ -47,8 +47,8 @@ private:
 	// PURPOSE: A private contructor used to create a copy of provided PSUpdateThreadManager
 	//			instance in a different thread than the original by marshalling the OCR engine and
 	//			progress status COM interfaces into the new thread.
-	// REQUIRE: (1) pThreadManager != NULL
-	//          (2) pThreadManager->m_ipInterfaceTablePtr != NULL
+	// REQUIRE: (1) pThreadManager != __nullptr
+	//          (2) pThreadManager->m_ipInterfaceTablePtr != __nullptr
 	// PROMISE: A copy of the supplied PSUpdateThreadManager instance will be created which can be
 	//			used in the current thread.
 	PSUpdateThreadManager(PSUpdateThreadManager *pThreadManager);

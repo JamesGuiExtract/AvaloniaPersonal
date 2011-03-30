@@ -51,7 +51,7 @@ STDMETHODIMP CTranslateToClosestValueInListPP::Apply(void)
 		{	
 			// assign the value lst to the object
 			ICopyableObjectPtr ipValues = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI08384", ipValues != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08384", ipValues != __nullptr);
 			ICopyableObjectPtr ipCopyableObj(m_ipInternalValueList);
 			if (ipCopyableObj)
 			{
@@ -122,7 +122,7 @@ LRESULT CTranslateToClosestValueInListPP::OnInitDialog(UINT uMsg, WPARAM wParam,
 			{
 				// copy all properies from that value lst to internal value lst object.
 				ICopyableObjectPtr ipCopy = m_ipInternalValueList;
-				ASSERT_RESOURCE_ALLOCATION("ELI08385", ipCopy != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI08385", ipCopy != __nullptr);
 				ipCopy->CopyFrom(ipCopyableObj);
 				loadListValues();
 			}

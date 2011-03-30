@@ -34,10 +34,10 @@ CCopyMoveDeleteFileProcessorPP::CCopyMoveDeleteFileProcessorPP()
 		m_dwDocStringID = IDS_DOCSTRINGCopyMoveDeleteFileProcessorPP;
 
 		// Create User confgure manager to get or set list history in the combo boxes
-		ma_pUserCfgMgr = auto_ptr<RegistryPersistenceMgr>( new RegistryPersistenceMgr(HKEY_CURRENT_USER, 
+		ma_pUserCfgMgr = unique_ptr<RegistryPersistenceMgr>( new RegistryPersistenceMgr(HKEY_CURRENT_USER, 
 			FileProcessorsConfigMgr::FP_REGISTRY_PATH));
 
-		ma_pCfgMgr = auto_ptr<FileProcessorsConfigMgr> (new FileProcessorsConfigMgr(ma_pUserCfgMgr.get(), "\\CopyMoveDeleteFile"));
+		ma_pCfgMgr = unique_ptr<FileProcessorsConfigMgr> (new FileProcessorsConfigMgr(ma_pUserCfgMgr.get(), "\\CopyMoveDeleteFile"));
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI12181")
 }
@@ -513,7 +513,7 @@ void CCopyMoveDeleteFileProcessorPP::setHistory(bool bIsSource)
 {
 	ATLControls::CComboBox * pCurComboBox;
 	pCurComboBox = bIsSource ? &m_cmbSrc : &m_cmbDst;
-	ASSERT_ARGUMENT("ELI15703", pCurComboBox != NULL);
+	ASSERT_ARGUMENT("ELI15703", pCurComboBox != __nullptr);
 
 	if (ma_pCfgMgr.get())
 	{
@@ -549,7 +549,7 @@ void CCopyMoveDeleteFileProcessorPP::saveHistory(bool bIsSource)
 {
 	ATLControls::CComboBox * pCurComboBox;
 	pCurComboBox = bIsSource ? &m_cmbSrc : &m_cmbDst;
-	ASSERT_ARGUMENT("ELI15702", pCurComboBox != NULL);
+	ASSERT_ARGUMENT("ELI15702", pCurComboBox != __nullptr);
 
 	vector<string> vecFiless;
 	for(int i = 0; i < (pCurComboBox->GetCount()) && (i < giMAX_FILE_HISTORY_SIZE); i++)
@@ -577,7 +577,7 @@ void CCopyMoveDeleteFileProcessorPP::pushCurrentFilesToHistory(bool bIsSource)
 {
 	ATLControls::CComboBox * pCurComboBox;
 	pCurComboBox = bIsSource ? &m_cmbSrc : &m_cmbDst;
-	ASSERT_ARGUMENT("ELI15700", pCurComboBox != NULL);
+	ASSERT_ARGUMENT("ELI15700", pCurComboBox != __nullptr);
 
 	CString zFile("");
 	// Get the current edit text in combo box

@@ -188,11 +188,11 @@ BOOL CRunRulesApp::InitInstance()
 					if (!isFileOrFolderValid(strUssFile))
 					{
 						IOCREnginePtr ipOCR(CLSID_ScansoftOCR);
-						ASSERT_RESOURCE_ALLOCATION("ELI12502", ipOCR != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI12502", ipOCR != __nullptr);
 						
 						// license OCR engine
 						IPrivateLicensedComponentPtr ipScansoftEngine(ipOCR);
-						ASSERT_RESOURCE_ALLOCATION("ELI16151", ipScansoftEngine != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI16151", ipScansoftEngine != __nullptr);
 						ipScansoftEngine->InitPrivateLicense( get_bstr_t(LICENSE_MGMT_PASSWORD) );
 
 						ISpatialStringPtr ipSS = ipOCR->RecognizeTextInImage(
@@ -228,11 +228,11 @@ BOOL CRunRulesApp::InitInstance()
 
 				// Create AFDocument for attribute finding
 				IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-				ASSERT_RESOURCE_ALLOCATION("ELI10110", ipAFDoc != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI10110", ipAFDoc != __nullptr);
 
 				// Create Attribute Finder Engine
 				IAttributeFinderEnginePtr ipAFEngine(CLSID_AttributeFinderEngine);
-				ASSERT_RESOURCE_ALLOCATION("ELI10109", ipAFEngine != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI10109", ipAFEngine != __nullptr);
 
 				// Find attributes from the source document
 				ipAFEngine->FindAttributes(ipAFDoc, strSourceFileName.c_str(),

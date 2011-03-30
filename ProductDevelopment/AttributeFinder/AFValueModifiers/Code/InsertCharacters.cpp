@@ -252,10 +252,10 @@ STDMETHODIMP CInsertCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09283", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09283", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->GetValue();
-		ASSERT_RESOURCE_ALLOCATION( "ELI09284", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION( "ELI09284", ipInputText != __nullptr);
 
 		long nInputLength = (ipInputText->String).length();
 
@@ -334,7 +334,7 @@ STDMETHODIMP CInsertCharacters::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::IInsertCharactersPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08275", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08275", ipSource != __nullptr);
 
 		m_eLengthType = (EInsertCharsLengthType)ipSource->GetLengthType();
 		m_nNumOfCharsLong = ipSource->GetNumOfCharsLong();
@@ -359,7 +359,7 @@ STDMETHODIMP CInsertCharacters::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_InsertCharacters);
-		ASSERT_RESOURCE_ALLOCATION("ELI08356", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08356", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -381,7 +381,7 @@ STDMETHODIMP CInsertCharacters::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19599", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19599", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Insert characters").Detach();
 	}

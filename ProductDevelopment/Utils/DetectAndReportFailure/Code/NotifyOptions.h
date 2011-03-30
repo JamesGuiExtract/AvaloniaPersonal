@@ -65,6 +65,6 @@ private:
 	const std::string& getSettingsFolderName(ENotificationEvent eEvent) const;
 	const std::string& getEnabledOrNotKeyName(ENotificationType eType) const;
 
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> m_apSettings;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apSettings;
 };
 //-------------------------------------------------------------------------------------------------

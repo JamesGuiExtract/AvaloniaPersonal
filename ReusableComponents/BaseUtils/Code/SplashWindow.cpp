@@ -78,7 +78,7 @@ BOOL SplashWindow::Create(CWnd *pParentWnd)
 void SplashWindow::HideSplashScreen () 
 {
 	DestroyWindow();
-	if (AfxGetMainWnd() != NULL)
+	if (AfxGetMainWnd() != __nullptr)
 		AfxGetMainWnd()->UpdateWindow();
 }
 //-----------------------------------------------------------------------------

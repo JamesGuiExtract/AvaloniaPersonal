@@ -74,7 +74,7 @@ bool CFeedbackDlg::isValidFeedbackDataFolder(const string& strFeedbackFolder)
 	
 	// Create a local IFAMTagManagerPtr object
 	IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-	ASSERT_RESOURCE_ALLOCATION("ELI15038", ipFAMTagManager != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15038", ipFAMTagManager != __nullptr);
 
 	// Ensure sure the folder name contains valid string tags
 	if(ipFAMTagManager->StringContainsInvalidTags(strFeedbackFolder.c_str()) == VARIANT_TRUE)

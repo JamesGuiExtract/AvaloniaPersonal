@@ -21,7 +21,7 @@ CTaskConditionPP::~CTaskConditionPP()
 {
 	try
 	{
-		m_ipTaskMap = NULL;
+		m_ipTaskMap = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20106");
 }
@@ -73,11 +73,11 @@ LRESULT CTaskConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 			m_cmbTasks.AddString(asString(bstrName).c_str());
 		}
 
-		if(ipTaskCondition->Task != NULL)
+		if(ipTaskCondition->Task != __nullptr)
 		{
 			// Select the currently configured task
 			ICategorizedComponentPtr ipObject(ipTaskCondition->Task);
-			ASSERT_RESOURCE_ALLOCATION("ELI20122", ipObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20122", ipObject != __nullptr);
 
 			_bstr_t bstrName = ipObject->GetComponentDescription();
 			m_cmbTasks.SelectString(-1, bstrName);
@@ -91,7 +91,7 @@ LRESULT CTaskConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 
 			// Get a pointer to the selected rule object
 			IFileProcessingTaskPtr ipNewTask = getSelectedTask();
-			ASSERT_RESOURCE_ALLOCATION("ELI20134", ipNewTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20134", ipNewTask != __nullptr);
 
 			// Update configuration message/button appropriately
 			updateRequiresConfig(ipNewTask);
@@ -116,7 +116,7 @@ LRESULT CTaskConditionPP::OnSelChangeTask(WORD wNotifyCode, WORD wID, HWND hWndC
 	{
 		// Get a pointer to the selected rule object
 		IFileProcessingTaskPtr ipNewTask = getSelectedTask();
-		ASSERT_RESOURCE_ALLOCATION("ELI20132", ipNewTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20132", ipNewTask != __nullptr);
 
 		// Update configuration message/button appropriately
 		updateRequiresConfig(ipNewTask);
@@ -142,11 +142,11 @@ LRESULT CTaskConditionPP::OnBnClickedBtnConfigure(WORD wNotifyCode, WORD wID, HW
 
 		// Create the ObjectPropertiesUI object
 		IObjectPropertiesUIPtr ipProperties(CLSID_ObjectPropertiesUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI20137", ipProperties != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20137", ipProperties != __nullptr);
 
 		// Create a copy of the object for configuration
 		ICopyableObjectPtr ipCopyObj(getSelectedTask());
-		ASSERT_RESOURCE_ALLOCATION("ELI20138", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20138", ipCopyObj != __nullptr);
 		ICategorizedComponentPtr ipCopy = ipCopyObj->Clone();
 		ASSERT_RESOURCE_ALLOCATION("ELI20139", ipCopy);
 
@@ -158,7 +158,7 @@ LRESULT CTaskConditionPP::OnBnClickedBtnConfigure(WORD wNotifyCode, WORD wID, HW
 		{
 			// Store the object now the user has applied configuration settings
 			IFileProcessingTaskPtr ipConfiguredTask(ipCopy);
-			ASSERT_RESOURCE_ALLOCATION("ELI20140", ipConfiguredTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20140", ipConfiguredTask != __nullptr);
 
 			ipTaskCondition->Task = ipConfiguredTask;
 
@@ -188,11 +188,11 @@ STDMETHODIMP CTaskConditionPP::Apply(void)
 		{
 			// Obtain interface pointer to the IImageRegionWithLines class
 			EXTRACT_FAMCONDITIONSLib::ITaskConditionPtr ipTaskCondition = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI20109", ipTaskCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20109", ipTaskCondition != __nullptr);
 		
 			// Obtain a pointer to the selected task
 			IFileProcessingTaskPtr ipNewTask = getSelectedTask();
-			ASSERT_RESOURCE_ALLOCATION("ELI20141", ipNewTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20141", ipNewTask != __nullptr);
 
 			// Check configuration state of the component
 			if (updateRequiresConfig(ipNewTask) == true)
@@ -231,7 +231,7 @@ STDMETHODIMP CTaskConditionPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20111", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI20111", pbValue != __nullptr);
 
 		try
 		{
@@ -260,7 +260,7 @@ IStrToStrMapPtr CTaskConditionPP::getTaskMap()
 	{
 		// Create a CategoryManager instance with which to build the task map
 		ICategoryManagerPtr ipCategoryManager(CLSID_CategoryManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI20177", ipCategoryManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20177", ipCategoryManager != __nullptr);
 
 		// Create array of required interfaces
 		static const long nIIDCount = 3;
@@ -275,7 +275,7 @@ IStrToStrMapPtr CTaskConditionPP::getTaskMap()
 		m_ipTaskMap = ipCategoryManager->GetDescriptionToProgIDMap2(FP_FILE_PROC_CATEGORYNAME.c_str(),
 			nIIDCount, pIIDs);
 
-		ASSERT_RESOURCE_ALLOCATION("ELI20124", m_ipTaskMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20124", m_ipTaskMap != __nullptr);
 	}
 
 	return m_ipTaskMap;
@@ -284,7 +284,7 @@ IStrToStrMapPtr CTaskConditionPP::getTaskMap()
 IFileProcessingTaskPtr CTaskConditionPP::getSelectedTask()
 {
 	EXTRACT_FAMCONDITIONSLib::ITaskConditionPtr ipTaskCondition = m_ppUnk[0];
-	ASSERT_RESOURCE_ALLOCATION("ELI20126", ipTaskCondition != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20126", ipTaskCondition != __nullptr);
 
 	// Get the currently selected rule
 	int nIndex = m_cmbTasks.GetCurSel();
@@ -302,7 +302,7 @@ IFileProcessingTaskPtr CTaskConditionPP::getSelectedTask()
 	// If so, just return the object we already have so that we don't throw
 	// away any configuration settings the user may have already applied.
 	ICategorizedComponentPtr ipCurrentTask = ipTaskCondition->Task;
-	if (ipCurrentTask != NULL && 
+	if (ipCurrentTask != __nullptr && 
 		bstrTaskName == ipCurrentTask->GetComponentDescription())
 	{
 		return ipCurrentTask;
@@ -313,23 +313,23 @@ IFileProcessingTaskPtr CTaskConditionPP::getSelectedTask()
 
 	// Create the object
 	IFileProcessingTaskPtr ipTask((const char *)bstrProgID);
-	ASSERT_RESOURCE_ALLOCATION("ELI20131", ipTask != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20131", ipTask != __nullptr);
 
 	return ipTask;
 }
 //-------------------------------------------------------------------------------------------------
 bool CTaskConditionPP::updateRequiresConfig(IFileProcessingTaskPtr ipTask)
 {
-	ASSERT_ARGUMENT("ELI20133", ipTask != NULL);
+	ASSERT_ARGUMENT("ELI20133", ipTask != __nullptr);
 
 	// Enable/Disable the configure button as necessary
 	ISpecifyPropertyPagesPtr ipPP(ipTask);
 	IConfigurableObjectPtr ipConfigurable(ipTask);
-	m_btnConfigure.EnableWindow((ipPP != NULL || ipConfigurable != NULL) ? TRUE : FALSE);
+	m_btnConfigure.EnableWindow((ipPP != __nullptr || ipConfigurable != __nullptr) ? TRUE : FALSE);
 
 	// Check configuration status
 	IMustBeConfiguredObjectPtr ipRuleConfig(ipTask);
-	if (ipRuleConfig != NULL && ipRuleConfig->IsConfigured() == VARIANT_FALSE)
+	if (ipRuleConfig != __nullptr && ipRuleConfig->IsConfigured() == VARIANT_FALSE)
 	{
 		// Show message to indicate the object needs configuration
 		m_txtMustConfigure.ShowWindow(SW_SHOW);	

@@ -48,7 +48,7 @@ CQueueGrid::CQueueGrid()
 		m_strPriorities = trim(m_strPriorities, "\n", "") + "\n";
 
 		HFONT hFont = (HFONT)GetStockObject(ANSI_VAR_FONT);
-		ASSERT_RESOURCE_ALLOCATION("ELI30499", hFont != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30499", hFont != __nullptr);
 
 		LOGFONT logfont;
 		if (GetObject(hFont, sizeof(logfont), &logfont) == 0)

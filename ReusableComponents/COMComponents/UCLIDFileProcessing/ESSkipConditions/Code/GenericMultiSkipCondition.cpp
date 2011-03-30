@@ -84,7 +84,7 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector*
 
 		IIUnknownVectorPtr ipMultiFAMConditions = pFAMConditions;
 		// If no FAM conditions exist, then throw an exception
-		if (ipMultiFAMConditions == NULL || ipMultiFAMConditions->Size() == 0)
+		if (ipMultiFAMConditions == __nullptr || ipMultiFAMConditions->Size() == 0)
 		{
 			throw UCLIDException("ELI13820", "No FAM conditions specified!");
 		}
@@ -129,14 +129,14 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector*
 			// Get the FAM conditon object-with-description 
 			// at the current position
 			IObjectWithDescriptionPtr ipObj = ipMultiFAMConditions->At(i);;
-			ASSERT_RESOURCE_ALLOCATION("ELI13824", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13824", ipObj != __nullptr);
 
 			// If the current FAM condition is enabled
 			if (ipObj->Enabled == VARIANT_TRUE)
 			{
 				// Get the FAM condition inside the object-with-description
 				IFAMConditionPtr ipFAMConditionHandler = ipObj->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI13825", ipFAMConditionHandler != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI13825", ipFAMConditionHandler != __nullptr);
 
 				// check if file matches FAM condition
 				VARIANT_BOOL bVal = ipFAMConditionHandler->FileMatchesFAMCondition(

@@ -134,7 +134,7 @@ void LeadToolsLineFinder::findLines(pBITMAPHANDLE pBitmap, L_UINT uFlags, vector
 
 	try
 	{	
-		ASSERT_ARGUMENT("ELI18846", pBitmap != NULL);
+		ASSERT_ARGUMENT("ELI18846", pBitmap != __nullptr);
 
 		m_bHorizontal = (uFlags == LINEREMOVE_HORIZONTAL);
 
@@ -828,8 +828,8 @@ L_INT EXT_FUNCTION lineRemoveCB(HRGN hRgn, L_INT32 nStartRow, L_INT32 nStartCol,
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI18372", hRgn != NULL);
-			ASSERT_ARGUMENT("ELI18373", pLineFinder != NULL);
+			ASSERT_ARGUMENT("ELI18372", hRgn != __nullptr);
+			ASSERT_ARGUMENT("ELI18373", pLineFinder != __nullptr);
 
 			// Obtain the CRect region of the line that was found
 			CRgn rgnLine;

@@ -77,7 +77,7 @@ STDMETHODIMP CAFEngineFileProcessorPP::Apply(void)
 		{
 			// get the output handler object
 			UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI09018", ipAFEFileProc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09018", ipAFEFileProc != __nullptr);
 
 			_bstr_t bstrRulesFileName;
 			m_editRuleFileName.GetWindowText(bstrRulesFileName.GetAddress());

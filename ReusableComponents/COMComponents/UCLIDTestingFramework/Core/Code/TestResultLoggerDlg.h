@@ -22,7 +22,7 @@ class TestResultLoggerDlg : public CDialog
 {
 // Construction
 public:
-	// PROMISE: if pOutputFile != NULL, then component and testharness
+	// PROMISE: if pOutputFile != __nullptr, then component and testharness
 	// level statistics will be written to the specified file using
 	// appropriate XML tags.
 	TestResultLoggerDlg(CWnd* pParent);
@@ -93,14 +93,14 @@ private:
 	// Variables
 	////////////
 	// bitmap objects for the various tree view icons
-	auto_ptr<CBitmap> m_apBmpHarness, m_apBmpComponent, m_apBmpTestCaseDoneGood,
+	unique_ptr<CBitmap> m_apBmpHarness, m_apBmpComponent, m_apBmpTestCaseDoneGood,
 		m_apBmpTestCaseDoneBad, m_apBmpTestCaseDoneOtherGood,
 		m_apBmpTestCaseDoneOtherBad, m_apBmpTestCaseInProgress, 
 		m_apBmpNote, m_apBmpDetailNote, m_apBmpMemo, m_apBmpFile, 
 		m_apBmpException;
 
 	// the image list and indexes of the various images
-	auto_ptr<CImageList> m_apImageList;
+	unique_ptr<CImageList> m_apImageList;
 	int m_iBitmapTestCaseDoneGood, m_iBitmapTestCaseDoneBad, 
 		m_iBitmapTestCaseDoneOtherGood, m_iBitmapTestCaseDoneOtherBad,
 		m_iBitmapTestCaseInProgress, m_iBitmapComponent, m_iBitmapHarness, 
@@ -134,7 +134,7 @@ private:
 	ETestCaseType m_eCurrentTestCaseType;
 
 	// For checking Scoll Logger flag	
-	auto_ptr<IConfigurationSettingsPersistenceMgr> m_apCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> m_apCfgMgr;
 
 	// Used to indicate the failed case should be collapsed when endTestCase is called
 	//		set to true in addTestCaseFile if file is .nte and exists

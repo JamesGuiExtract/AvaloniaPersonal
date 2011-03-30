@@ -44,7 +44,7 @@ STDMETHODIMP CManageTagsTaskPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI27494", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27494", pbValue != __nullptr);
 
 		try
 		{
@@ -81,7 +81,7 @@ STDMETHODIMP CManageTagsTaskPP::Apply()
 			// Get the ManageTagsTask associated with this property page
 			// NOTE: this assumes only one coclass is associated with this property page
 			UCLID_FILEPROCESSORSLib::IManageTagsTaskPtr ipManageTags(m_ppUnk[0]);
-			ASSERT_RESOURCE_ALLOCATION("ELI27496", ipManageTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27496", ipManageTags != __nullptr);
 
 			CString zTags;
 			m_comboTags.GetWindowText(zTags);
@@ -140,12 +140,12 @@ LRESULT CManageTagsTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		// Get the ManageTagsTask associated with this property page
 		// NOTE: this assumes only one coclass is associated with this property page
 		UCLID_FILEPROCESSORSLib::IManageTagsTaskPtr ipManageTags(m_ppUnk[0]);
-		ASSERT_RESOURCE_ALLOCATION("ELI27500", ipManageTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27500", ipManageTags != __nullptr);
 
 		// Create a database manager object so that we can retrieve
 		// the tags stored in the database
 		IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI27501", ipDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27501", ipDB != __nullptr);
 
 		// Connect database using last used settings in this instance
 		ipDB->ConnectLastUsedDBThisProcess();
@@ -234,7 +234,7 @@ void CManageTagsTaskPP::loadTagsFromDatabase(const IFileProcessingDBPtr& ipDB)
 	{
 		// Get the tags from the database
 		IVariantVectorPtr ipVecTags = ipDB->GetTagNames();
-		ASSERT_RESOURCE_ALLOCATION("ELI27503", ipVecTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27503", ipVecTags != __nullptr);
 
 		// Get the tag count
 		long lSize = ipVecTags->Size;

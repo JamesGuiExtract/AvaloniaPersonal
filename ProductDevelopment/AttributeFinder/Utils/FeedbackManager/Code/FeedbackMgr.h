@@ -63,8 +63,8 @@ private:
 	//////////////
 
 	// Handles settings persistence
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	auto_ptr<PersistenceMgr> ma_pCfgFeedbackMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	unique_ptr<PersistenceMgr> ma_pCfgFeedbackMgr;
 
 	// DB Connection is open
 	bool		m_bConnectionOpen;

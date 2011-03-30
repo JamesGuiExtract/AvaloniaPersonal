@@ -245,7 +245,7 @@ void CESConvertUSSToTXTApp::convertUSSFile(const string strInputFileName,
 	{
 		// Create the Spatial String object
 		ISpatialStringPtr ipSS( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION("ELI20372", ipSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20372", ipSS != __nullptr);
 
 		ofstream oFile;
 
@@ -287,7 +287,7 @@ void CESConvertUSSToTXTApp::convertUSSFile(const string strInputFileName,
 //-------------------------------------------------------------------------------------------------
 void CESConvertUSSToTXTApp::decrementCounter(ISpatialStringPtr ipText)
 {
-	ASSERT_ARGUMENT( "ELI20378", ipText != NULL );
+	ASSERT_ARGUMENT( "ELI20378", ipText != __nullptr );
 
 	// Check to see if USB Counters are to be ignored 
 	if (usbCountersDisabled())

@@ -23,7 +23,7 @@ Win32Event::~Win32Event()
 {
 	try
 	{
-		if (m_hEvent != NULL && CloseHandle(m_hEvent) == NULL)
+		if (m_hEvent != __nullptr && CloseHandle(m_hEvent) == FALSE)
 		{
 			UCLIDException ue("ELI09130", "Unable to close event handle!");
 			ue.addDebugInfo("Handle", (unsigned long) m_hEvent);
@@ -109,7 +109,7 @@ HANDLE Win32Event::getHandle()
 Win32Event& Win32Event::operator=(const Win32Event& event)
 {
 	// [LegacyRCAndUtils:5257] Close the existing handle before duplicating the source handle.
-	if (m_hEvent != NULL && CloseHandle(m_hEvent) == NULL)
+	if (m_hEvent != __nullptr && CloseHandle(m_hEvent) == FALSE)
 	{
 		UCLIDException ue("ELI25340", "Unable to close event handle!");
 		ue.addDebugInfo("Handle", (unsigned long) m_hEvent);

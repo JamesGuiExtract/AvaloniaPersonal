@@ -71,7 +71,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::raw_GetComponentDescription(BSTR * pstrCo
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17655", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI17655", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Delete lines and repair").Detach();
 	}
@@ -90,7 +90,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::raw_CopyFrom(IUnknown * pObject)
 	try
 	{
 		ESImageCleanupLib::IDeleteLinesAndRepairICOPtr ipCopyThis(pObject);	
-		ASSERT_RESOURCE_ALLOCATION("ELI17657", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17657", ipCopyThis != __nullptr);
 
 		// copy each of the data members
 		m_lLineLength = ipCopyThis->LineLength;
@@ -108,15 +108,15 @@ STDMETHODIMP CDeleteLinesAndRepairICO::raw_Clone(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17659", pObject != NULL);
+		ASSERT_ARGUMENT("ELI17659", pObject != __nullptr);
 
 		// create a copyable object pointer
 		ICopyableObjectPtr ipObjCopy(CLSID_DeleteLinesAndRepairICO);
-		ASSERT_RESOURCE_ALLOCATION("ELI17660", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17660", ipObjCopy != __nullptr);
 
 		// set the IUnknownPtr to the current object
 		IUnknownPtr ipUnk = this;
-		ASSERT_RESOURCE_ALLOCATION("ELI17661", ipUnk != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17661", ipUnk != __nullptr);
 
 		// copy to the copyable object pointer
 		ipObjCopy->CopyFrom(ipUnk);
@@ -139,7 +139,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI17663", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI17663", pbValue != __nullptr);
 
 		try
 		{
@@ -169,7 +169,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17664", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI17664", pClassID != __nullptr);
 
 		*pClassID = CLSID_DeleteLinesAndRepairICO;
 	}
@@ -190,7 +190,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::Load(IStream * pStream)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17665", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17665", pStream != __nullptr);
 
 		// reset member variables to unconfigured state
 		m_lLineLength = -1;
@@ -236,7 +236,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::Save(IStream * pStream, BOOL fClearDirty)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17668", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17668", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -312,7 +312,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::Perform(void* pciRepair)
 
 		// wrap the ClearImage repair pointer in smart pointer
 		ICiRepairPtr ipciRepair((ICiRepair*) pciRepair);
-		ASSERT_RESOURCE_ALLOCATION("ELI17670", ipciRepair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17670", ipciRepair != __nullptr);
 
 		// set the default settings
 		ipciRepair->pMaxLineAngle = gdMAX_LINE_ANGLE;
@@ -339,7 +339,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::get_LineLength(long* plLineLength)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17672", plLineLength != NULL);
+		ASSERT_ARGUMENT("ELI17672", plLineLength != __nullptr);
 
 		*plLineLength = m_lLineLength;
 	}
@@ -377,7 +377,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::get_LineGap(long* plLineGap)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17676", plLineGap != NULL);
+		ASSERT_ARGUMENT("ELI17676", plLineGap != __nullptr);
 
 		*plLineGap = m_lLineGap;
 	}
@@ -415,7 +415,7 @@ STDMETHODIMP CDeleteLinesAndRepairICO::get_LineDirection(unsigned long *pulLineD
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17680", pulLineDirection != NULL);
+		ASSERT_ARGUMENT("ELI17680", pulLineDirection != __nullptr);
 
 		*pulLineDirection = m_ulLineDirection;
 	}

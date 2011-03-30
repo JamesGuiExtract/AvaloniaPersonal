@@ -514,7 +514,7 @@ EXPORT_BaseUtils void waitForFileAccess(const string& strFileName, int iAccess);
 //			read, if bLogException == false no exception will be logged. (No exception
 //			will be thrown for either case, this method is simply a way to provide the OS time
 //			to free a file for reading). If the file is successfully opened for reading and
-//			ppinFile != NULL then ppinFile will point to the open ifstream object.
+//			ppinFile != __nullptr then ppinFile will point to the open ifstream object.
 EXPORT_BaseUtils void waitForFileToBeReadable(const string& strFileName,
 											  bool bLogException = true,
 											  ifstream** ppinFile = NULL,

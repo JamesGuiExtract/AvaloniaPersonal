@@ -68,16 +68,16 @@ private:
 	///////
 
 	// Handles Registry items
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
 
 	// Stores collection of most recently chosen DCC and DAT file prefixes
-	auto_ptr<MRUList>	ma_pRecentPrefixes;
+	unique_ptr<MRUList>	ma_pRecentPrefixes;
 
 	// Stores collection of most recently chosen Automated Testing root folders
-	auto_ptr<MRUList>	ma_pRecentRootFolders;
+	unique_ptr<MRUList>	ma_pRecentRootFolders;
 
 	// Stores collection of most recently chosen Component Data folders
-	auto_ptr<MRUList>	ma_pRecentDataFolders;
+	unique_ptr<MRUList>	ma_pRecentDataFolders;
 
 	// Flags to determine if editing is in progress in the Prefix combo box
 	bool	m_bEditingPrefix;
@@ -92,7 +92,7 @@ private:
 	void	addDefaultItems();
 
 	// Adds string to the specified MRU list
-	void	addStringToMRUList(auto_ptr<MRUList> &ma_pList, const string& strNew);
+	void	addStringToMRUList(unique_ptr<MRUList> &ma_pList, const string& strNew);
 
 	// Gets and sets AutoEncrypt registry entry
 	bool	getAutoEncrypt();

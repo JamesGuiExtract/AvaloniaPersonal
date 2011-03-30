@@ -204,7 +204,7 @@ void CConvertFPSFileDlg::OnBnClickedOk()
 			{
 				// Select entire text in output file edit box
 				CEdit	*pEdit = (CEdit *)GetDlgItem( IDC_EDIT_OUTPUT );
-				if (pEdit != NULL)
+				if (pEdit != __nullptr)
 				{
 					pEdit->SetSel( 0, -1 );
 					pEdit->SetFocus();
@@ -334,21 +334,21 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 			IPersistStreamPtr ipFSObj;
 			readObjectFromStream( ipFSObj, ipStream, "ELI14407" );
 			ipFileSupplier = ipFSObj;
-			ASSERT_RESOURCE_ALLOCATION( "ELI14408", ipFileSupplier != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI14408", ipFileSupplier != __nullptr );
 			bUseStreamedFileSuppliers = true;
 
 			// Read in the Skip Condition with its Description
 			IPersistStreamPtr ipSkipObj;
 			readObjectFromStream( ipSkipObj, ipStream, "ELI14409" );
 			ipSkipOWD = ipSkipObj;
-			ASSERT_RESOURCE_ALLOCATION( "ELI14410", ipSkipOWD != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI14410", ipSkipOWD != __nullptr );
 			bUseStreamedSkipCondition = true;
 
 			// Read in the file processors
 			IPersistStreamPtr ipObj;
 			readObjectFromStream( ipObj, ipStream, "ELI14411" );
 			ipFileProcessors = ipObj;
-			ASSERT_RESOURCE_ALLOCATION( "ELI14412", ipFileProcessors != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI14412", ipFileProcessors != __nullptr );
 		}
 
 		////////////////////////////
@@ -407,7 +407,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 				// Apply settings to Folder FS
 				/////////////////
 				ipFolderFS.CreateInstance( CLSID_FolderFS );
-				ASSERT_RESOURCE_ALLOCATION("ELI14166", ipFolderFS != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14166", ipFolderFS != __nullptr);
 
 				// Set folder name
 				ipFolderFS->FolderName = get_bstr_t( strFolderName );
@@ -432,7 +432,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 
 				// Create a VariantVector to hold the filenames
 				IVariantVectorPtr ipFileList( CLSID_VariantVector );
-				ASSERT_RESOURCE_ALLOCATION("ELI14207", ipFileList != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14207", ipFileList != __nullptr);
 
 				// Add each file to a VariantVector
 				int i;
@@ -450,7 +450,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 				// Apply settings to Static File List FS
 				/////////////////
 				ipStaticListFS.CreateInstance( CLSID_StaticFileListFS );
-				ASSERT_RESOURCE_ALLOCATION("ELI14206", ipStaticListFS != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14206", ipStaticListFS != __nullptr);
 
 				// Set the file list
 				ipStaticListFS->FileList = ipFileList;
@@ -475,7 +475,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 				// Apply setting to File Existence Skip Condition
 				/////////////////
 				ipSkipFile.CreateInstance( CLSID_FileExistence );
-				ASSERT_RESOURCE_ALLOCATION("ELI14208", ipSkipFile != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14208", ipSkipFile != __nullptr);
 
 				// Set the filename (tag may be included)
 				ipSkipFile->FileString = get_bstr_t( strSkipFile );
@@ -512,7 +512,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 				// Apply settings to File Name Pattern Skip Condition
 				/////////////////
 				ipSkipPattern.CreateInstance( CLSID_FileNamePattern );
-				ASSERT_RESOURCE_ALLOCATION("ELI14209", ipSkipPattern != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14209", ipSkipPattern != __nullptr);
 
 				// File to be tested against pattern is always the Source Document
 				// Always testing for Contains - either Does or Does Not
@@ -543,7 +543,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 				dataReader >> bProcessOnlyNewFiles;
 
 				// Apply this setting to Folder File Supplier
-				if (ipFolderFS != NULL)
+				if (ipFolderFS != __nullptr)
 				{
 					ipFolderFS->NoExistingFiles =
 						bProcessOnlyNewFiles ? VARIANT_TRUE : VARIANT_FALSE;
@@ -576,7 +576,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 				IPersistStreamPtr ipFSObj;
 				readObjectFromStream( ipFSObj, ipStream, "ELI14282" );
 				ipFileSupplier = ipFSObj;
-				ASSERT_RESOURCE_ALLOCATION( "ELI14283", ipFileSupplier != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI14283", ipFileSupplier != __nullptr );
 
 				// Set flag to use these File Suppliers instead of those built
 				// from Folder or File Scope information
@@ -590,7 +590,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 				IPersistStreamPtr ipSkipObj;
 				readObjectFromStream( ipSkipObj, ipStream, "ELI14284" );
 				ipSkipOWD = ipSkipObj;
-				ASSERT_RESOURCE_ALLOCATION( "ELI14285", ipSkipOWD != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI14285", ipSkipOWD != __nullptr );
 
 				// Set flag to use these File Suppliers instead of those built
 				// from Folder or File Scope information
@@ -607,7 +607,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 		// Create File Processing Manager object to save settings to current format
 		/////////////////
 		IFileProcessingManagerPtr	ipFPMgr( CLSID_FileProcessingManager );
-		ASSERT_RESOURCE_ALLOCATION("ELI14168", ipFPMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14168", ipFPMgr != __nullptr);
 
 		// Check to see if File Supplier creation is needed
 		if (!bUseStreamedFileSuppliers)
@@ -615,19 +615,19 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 			// Create File Supplier Data object
 			// - Not Force Processing, Inactive
 			IFileSupplierDataPtr ipFSD( CLSID_FileSupplierData );
-			ASSERT_RESOURCE_ALLOCATION("ELI14250", ipFSD != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14250", ipFSD != __nullptr);
 			ipFSD->ForceProcessing = VARIANT_FALSE;
 			ipFSD->FileSupplierStatus = kInactiveStatus;
 
 			// Create ObjectWithDescription to be associated with File Supplier Data
 			// - Enabled
 			IObjectWithDescriptionPtr ipOWD( CLSID_ObjectWithDescription );
-			ASSERT_RESOURCE_ALLOCATION("ELI14251", ipOWD != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14251", ipOWD != __nullptr);
 			ipOWD->Enabled = VARIANT_TRUE;
 
 			// Associate proper File Supplier to Object With Description
 			// - either FolderFS or StaticFileListFS
-			if (ipFolderFS != NULL)
+			if (ipFolderFS != __nullptr)
 			{
 				// Set File Supplier object in Object With Description, push into vector
 				ipOWD->Object = ipFolderFS;
@@ -636,7 +636,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 				// and surround text with <>
 				ipOWD->Description = get_bstr_t( makeDescription( ipFolderFS ) );
 			}
-			else if (ipStaticListFS != NULL)
+			else if (ipStaticListFS != __nullptr)
 			{
 				ipOWD->Object = ipStaticListFS;
 
@@ -650,7 +650,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 
 			// Build collection of one File Supplier Data object
 			ipFileSupplier.CreateInstance( CLSID_IUnknownVector );
-			ASSERT_RESOURCE_ALLOCATION("ELI14215", ipFileSupplier != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14215", ipFileSupplier != __nullptr);
 			ipFileSupplier->PushBack( ipFSD );
 		}
 
@@ -659,14 +659,14 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 		// OR
 		// - via constructed components and Folder Scope or File Scope settings
 		IFileSupplyingMgmtRolePtr	ipFSMgmt = ipFPMgr->FileSupplyingMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION("ELI14279", ipFSMgmt != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14279", ipFSMgmt != __nullptr);
 		ipFSMgmt->FileSuppliers = ipFileSupplier;
 
 		/////////////////
 		// Provide collected File Processors
 		/////////////////
 		IFileProcessingMgmtRolePtr	ipFPMgmt = ipFPMgr->FileProcessingMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION("ELI14349", ipFPMgmt != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14349", ipFPMgmt != __nullptr);
 		ipFPMgmt->FileProcessors = ipFileProcessors;
 
 		/////////////////
@@ -681,34 +681,34 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 		{
 			// Create an Object With Description for the combined Skip Condition
 			ipSkipOWD.CreateInstance( CLSID_ObjectWithDescription );
-			ASSERT_RESOURCE_ALLOCATION("ELI14220", ipSkipOWD != NULL);
-			if ((ipSkipFile != NULL) && (ipSkipPattern != NULL))
+			ASSERT_RESOURCE_ALLOCATION("ELI14220", ipSkipOWD != __nullptr);
+			if ((ipSkipFile != __nullptr) && (ipSkipPattern != __nullptr))
 			{
 				// Create the OR Skip Condition
 				ipSkipOR.CreateInstance( CLSID_MultiFAMConditionOR );
-				ASSERT_RESOURCE_ALLOCATION("ELI14217", ipSkipOR != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14217", ipSkipOR != __nullptr);
 
 				// Create an ObjectWithDescription for first Skip Condition
 				IObjectWithDescriptionPtr	ipOWD1( CLSID_ObjectWithDescription );
-				ASSERT_RESOURCE_ALLOCATION("ELI14269", ipOWD1 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14269", ipOWD1 != __nullptr);
 				ipOWD1->Object = ipSkipFile;
 				ipOWD1->Description = get_bstr_t( makeDescription( ipSkipFile ) );
 
 				// Create an ObjectWithDescription for second Skip Condition
 				IObjectWithDescriptionPtr	ipOWD2( CLSID_ObjectWithDescription );
-				ASSERT_RESOURCE_ALLOCATION("ELI14270", ipOWD2 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14270", ipOWD2 != __nullptr);
 				ipOWD2->Object = ipSkipPattern;
 				ipOWD2->Description = get_bstr_t( makeDescription( ipSkipPattern ) );
 
 				// Add each Skip Condition OWD to an IIUnknownVector
 				IIUnknownVectorPtr	ipCollection( CLSID_IUnknownVector );
-				ASSERT_RESOURCE_ALLOCATION("ELI14219", ipCollection != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14219", ipCollection != __nullptr);
 				ipCollection->PushBack( ipOWD1 );
 				ipCollection->PushBack( ipOWD2 );
 
 				// Retrieve contained Multiple Object Holder
 				IMultipleObjectHolderPtr ipMOH = ipSkipOR;
-				ASSERT_RESOURCE_ALLOCATION("ELI14218", ipMOH != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI14218", ipMOH != __nullptr);
 
 				// Provide the collected Skip Conditions to the Multiple Object Holder
 				ipMOH->ObjectsVector = ipCollection;
@@ -716,7 +716,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 				// Put the combined Skip Condition into the Object With Description
 				ipSkipOWD->PutObject( ipSkipOR );
 			}
-			else if (ipSkipFile != NULL)
+			else if (ipSkipFile != __nullptr)
 			{
 				// Put the Skip Condition into the Object With Description
 				ipSkipOWD->PutObject( ipSkipFile );
@@ -729,7 +729,7 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 
 			// Set OWD Description to description from Categorized Component of the Skip Condition
 			// and surround text with <>
-			if (ipSkipOWD->Object != NULL)
+			if (ipSkipOWD->Object != __nullptr)
 			{
 				ipSkipOWD->Description = get_bstr_t( makeDescription( ipSkipOWD->Object ) );
 			}
@@ -747,12 +747,12 @@ void CConvertFPSFileDlg::convertFPSFile(std::string strInput, std::string strOut
 
 		// Enable File Supplying
 		IFileActionMgmtRolePtr ipMgmtRole = ipFSMgmt;
-		ASSERT_RESOURCE_ALLOCATION( "ELI14430", ipMgmtRole != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14430", ipMgmtRole != __nullptr );
 		ipMgmtRole->Enabled = bSupplyingRoleEnabled ? VARIANT_TRUE : VARIANT_FALSE;
 
 		// Enable File Processing
 		ipMgmtRole = ipFPMgmt;
-		ASSERT_RESOURCE_ALLOCATION( "ELI14431", ipMgmtRole != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14431", ipMgmtRole != __nullptr );
 		ipMgmtRole->Enabled = bProcessingRoleEnabled ? VARIANT_TRUE : VARIANT_FALSE;
 
 		// Enable Statistics
@@ -775,7 +775,7 @@ std::string CConvertFPSFileDlg::makeDescription(IUnknownPtr ipObject)
 
 	// Get ICategorizedComponentPtr
 	ICategorizedComponentPtr ipComp = ipObject;
-	ASSERT_RESOURCE_ALLOCATION("ELI14268", ipComp != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14268", ipComp != __nullptr);
 
 	// Get object description
 	_bstr_t	bstrDesc = ipComp->GetComponentDescription();

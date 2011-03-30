@@ -77,7 +77,7 @@ STDMETHODIMP CArchiveRestoreTaskPP::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// check parameter
-		ASSERT_ARGUMENT("ELI24603", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI24603", pbValue != __nullptr);
 
 		try
 		{
@@ -113,7 +113,7 @@ STDMETHODIMP CArchiveRestoreTaskPP::Apply()
 		for(UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_FILEPROCESSORSLib::IArchiveRestoreTaskPtr ipArchiveRestore(m_ppUnk[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI24605", ipArchiveRestore != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24605", ipArchiveRestore != __nullptr);
 
 			// Store the operation type
 			ipArchiveRestore->Operation = (UCLID_FILEPROCESSORSLib::EArchiveRestoreOperationType)
@@ -168,7 +168,7 @@ LRESULT CArchiveRestoreTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPa
 		// get the ArchiveRestoreTask associated with this property page
 		// NOTE: this assumes only one coclass is associated with this property page
 		UCLID_FILEPROCESSORSLib::IArchiveRestoreTaskPtr ipArchiveRestoreTask(m_ppUnk[0]);
-		ASSERT_RESOURCE_ALLOCATION("ELI24607", ipArchiveRestoreTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24607", ipArchiveRestoreTask != __nullptr);
 
 		// Set the NOTE text
 		GetDlgItem(IDC_EDIT_ARCHIVE_NOTE).SetWindowText(gstrNOTE.c_str());

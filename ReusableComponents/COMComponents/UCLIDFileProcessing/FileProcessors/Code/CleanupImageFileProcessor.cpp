@@ -120,8 +120,8 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_ProcessFile(IFileRecord* pFileRecor
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17911", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI17902", pResult != NULL);
+		ASSERT_ARGUMENT("ELI17911", pTagManager != __nullptr);
+		ASSERT_ARGUMENT("ELI17902", pResult != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31336", ipFileRecord != __nullptr);
 
@@ -148,7 +148,7 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_ProcessFile(IFileRecord* pFileRecor
 
 		// get a pointer to an ImageCleanupEngine Object
 		IImageCleanupEnginePtr ipICEngine = getImageCleanupEngine();
-		ASSERT_RESOURCE_ALLOCATION("ELI17290", ipICEngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17290", ipICEngine != __nullptr);
 
 		// call the CleanupImage operation on the image file 
 		ipICEngine->CleanupImage(strImageFileName.c_str(), strOutputFileName.c_str(), strSettingsFileName.c_str());
@@ -214,7 +214,7 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_GetComponentDescription(BSTR * pstr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19610", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI19610", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Core: Cleanup image").Detach();
 	}
@@ -233,7 +233,7 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_FILEPROCESSORSLib::ICleanupImageFileProcessorPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI17297", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17297", ipCopyThis != __nullptr);
 
 		// get the settings file name
 		m_strImageCleanupSettingsFileName = asString(ipCopyThis->ImageCleanupSettingsFileName);
@@ -249,12 +249,12 @@ STDMETHODIMP CCleanupImageFileProcessor::raw_Clone(IUnknown **pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19911", pObject != NULL);
+		ASSERT_ARGUMENT("ELI19911", pObject != __nullptr);
 
 		// create an instance of the CleanupImageFileProcessor Object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_CleanupImageFileProcessor);
-		ASSERT_RESOURCE_ALLOCATION("ELI17300", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17300", ipObjCopy != __nullptr);
 
 		// copy from this to the new CleanupImageFileProcessor
 		IUnknownPtr ipUnk = this;
@@ -294,7 +294,7 @@ STDMETHODIMP CCleanupImageFileProcessor::Load(IStream *pStream)
 	{
 		// reset member variables
 		m_strImageCleanupSettingsFileName = "";
-		m_ipImageCleanupEngine = NULL;
+		m_ipImageCleanupEngine = __nullptr;
 		_lastCodePos = "10";
 
 		// Read the bytestream data from the IStream object
@@ -446,10 +446,10 @@ void CCleanupImageFileProcessor::validateLicense()
 //-------------------------------------------------------------------------------------------------
 IImageCleanupEnginePtr CCleanupImageFileProcessor::getImageCleanupEngine()
 {
-	if (m_ipImageCleanupEngine == NULL)
+	if (m_ipImageCleanupEngine == __nullptr)
 	{
 		m_ipImageCleanupEngine.CreateInstance(CLSID_ImageCleanupEngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI17282", m_ipImageCleanupEngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17282", m_ipImageCleanupEngine != __nullptr);
 	}
 
 	return m_ipImageCleanupEngine;
@@ -457,10 +457,10 @@ IImageCleanupEnginePtr CCleanupImageFileProcessor::getImageCleanupEngine()
 //-------------------------------------------------------------------------------------------------
 IMiscUtilsPtr CCleanupImageFileProcessor::getMiscUtils()
 {
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI17384", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI17384", m_ipMiscUtils != __nullptr );
 	}
 
 	return m_ipMiscUtils;

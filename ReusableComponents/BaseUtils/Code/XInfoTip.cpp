@@ -118,7 +118,7 @@ BOOL CXInfoTip::Create(CWnd* pParentWnd)
 	BOOL	bSuccess;
 
 	// Must have a parent
-	ASSERT(pParentWnd != NULL);
+	ASSERT(pParentWnd != __nullptr);
 
 	// BEGIN DUAN'S MODIFICATION 08/04/2003
 	// PURPOSE: To make this code work in ATL
@@ -154,7 +154,7 @@ BOOL CXInfoTip::Create(CWnd* pParentWnd)
 /////////////////////////////////////////////////////////////////////
 void CXInfoTip::Show(CString szText, CPoint *pt /* = NULL */)
 {
-	if (pt != NULL)
+	if (pt != __nullptr)
 		m_ptOrigin	= *pt;
 	else
 		GetCursorPos(&m_ptOrigin);
@@ -220,7 +220,7 @@ void CXInfoTip::OnPaint()
 
 	// Adjust the area for the icon
 	rc.DeflateRect(CX_ROUNDED, CY_ROUNDED, 0, 0);
-	if (m_hIcon != NULL)
+	if (m_hIcon != __nullptr)
 		rc.left = rc.left + m_IconSize.cx + CX_ICON_MARGIN;
 	
 	// Set the font
@@ -230,7 +230,7 @@ void CXInfoTip::OnPaint()
 	dc.DrawText(m_szText, &rc, DT_TOP | DT_LEFT);
 
 	// Draw the icon
-	if (m_hIcon != NULL)
+	if (m_hIcon != __nullptr)
 		DrawIconEx(dc.m_hDC, CX_ROUNDED, CY_ROUNDED, m_hIcon, m_IconSize.cx, m_IconSize.cy, 0, NULL, DI_NORMAL);
 
 	// Clean up GDI
@@ -267,8 +267,8 @@ BOOL CXInfoTip::GetWindowRegion(CDC* pDC, HRGN* hRegion, CSize *Size /* = NULL *
 	CRgn	CaptionRegion;
 	CFont	*pSysFont;
 	
-	ASSERT(pDC != NULL);
-	ASSERT(hRegion != NULL);
+	ASSERT(pDC != __nullptr);
+	ASSERT(hRegion != __nullptr);
 
 	// Calculate the are for the tip text
 	pSysFont = (CFont *)pDC->SelectObject(m_pFont);
@@ -279,7 +279,7 @@ BOOL CXInfoTip::GetWindowRegion(CDC* pDC, HRGN* hRegion, CSize *Size /* = NULL *
 	rcWnd.InflateRect(CX_ROUNDED, CY_ROUNDED);
 
 	// Adjust for icon
-	if (m_hIcon != NULL)
+	if (m_hIcon != __nullptr)
 		rcWnd.right = rcWnd.right + m_IconSize.cx + CX_ICON_MARGIN;
 	if (rcWnd.Height() < m_IconSize.cy)
 		rcWnd.bottom = rcWnd.top + m_IconSize.cy;
@@ -305,7 +305,7 @@ BOOL CXInfoTip::GetWindowRegion(CDC* pDC, HRGN* hRegion, CSize *Size /* = NULL *
 	CombineRgn(*hRegion, CaptionRegion.operator HRGN(), LeaderRegion.operator HRGN(), RGN_OR);
 
 	// Set the window size
-	if (Size != NULL)
+	if (Size != __nullptr)
 	{
 		Size->cx	= rcWnd.Width();
 		Size->cy	= rcWnd.Height() + CY_LEADER;
@@ -457,7 +457,7 @@ void CXInfoTip::RelayEvent(LPMSG lpMsg)
 		{
 			// Find the tool
 			pWindow = WindowFromPoint(point);
-			if (pWindow != NULL)
+			if (pWindow != __nullptr)
 			{
 				if (m_ToolMap.Lookup(pWindow->m_hWnd, Info))
 				{
@@ -543,7 +543,7 @@ void CXInfoTip::SetIcon(HICON hIcon)
 /////////////////////////////////////////////////////////////////////
 void CXInfoTip::AddTool(CWnd *pWnd, LPCTSTR szTooltipText, HICON hIcon /* = NULL */)
 {
-	ASSERT(pWnd != NULL);
+	ASSERT(pWnd != __nullptr);
 
 	// Store the tool information
 	TipToolInfo Info;

@@ -90,7 +90,7 @@ const std::string CFileSupplierUtils::ExpandTagsAndTFE(IFAMTagManager *pFAMTM, c
 	//////////////////////////////////////////////////////////////////////////
 
 	IFAMTagManagerPtr ipTag = IFAMTagManagerPtr(pFAMTM);
-	ASSERT_RESOURCE_ALLOCATION("ELI14406", ipTag != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14406", ipTag != __nullptr);
 
 	_bstr_t bstrFile = ipTag->ExpandTags(_bstr_t(strFile.c_str()), _bstr_t(strSourceDocName.c_str()));
 	string strExpandedFile = asString(bstrFile);
@@ -113,7 +113,7 @@ const std::string CFileSupplierUtils::ExpandTagsAndTFE(IFAMTagManager *pFAMTM, c
 IFAMTagManagerPtr CFileSupplierUtils::getFAMTagManager()
 {
 	IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-	ASSERT_RESOURCE_ALLOCATION("ELI14440", ipFAMTagManager != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14440", ipFAMTagManager != __nullptr);
 	return ipFAMTagManager;
 }
 //--------------------------------------------------------------------------------------------------

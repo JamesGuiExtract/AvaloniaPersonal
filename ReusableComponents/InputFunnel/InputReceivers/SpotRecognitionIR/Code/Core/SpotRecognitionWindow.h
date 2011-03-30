@@ -152,7 +152,7 @@ private:
 	// Gets a vector of zone entity ids from the specified input entity id. Clears the vector first.
 	void getIDs(BSTR bstrID, vector<long> &rvecIDs);
 	SpotRecognitionDlg* getSpotRecognitionDlg();
-	std::auto_ptr<SpotRecognitionDlg> m_apDlg;
+	std::unique_ptr<SpotRecognitionDlg> m_apDlg;
 
 	// Check general license state and OCR_ON_CLIENT license state
 	void validateLicense();

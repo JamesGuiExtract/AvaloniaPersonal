@@ -47,7 +47,7 @@ private:
 	string m_strCommandLineArgs;
 
 	string m_strPrintedINIFile;
-	auto_ptr<IConfigurationSettingsPersistenceMgr> m_apUserCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> m_apUserCfgMgr;
 
 	//----------------------------------------------------------------------------------------------
 	// methods

@@ -359,11 +359,11 @@ LRESULT CValueAfterCluePP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
 					// Get a regex parser
 					IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-					ASSERT_RESOURCE_ALLOCATION("ELI13050", ipMiscUtils != NULL );
+					ASSERT_RESOURCE_ALLOCATION("ELI13050", ipMiscUtils != __nullptr );
 
 					IRegularExprParserPtr ipRegExpParser =
 						ipMiscUtils->GetNewRegExpParserInstance("ValueAfterClue");
-					ASSERT_RESOURCE_ALLOCATION("ELI04586", ipRegExpParser != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI04586", ipRegExpParser != __nullptr);
 
 					// parse the available punctuations, into spaces and non-spaces chars
 					string strPunct = asString(bstrPunctuations);

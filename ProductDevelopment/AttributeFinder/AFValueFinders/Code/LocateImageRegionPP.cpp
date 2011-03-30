@@ -44,7 +44,7 @@ CLocateImageRegionPP::CLocateImageRegionPP()
 
 		// Create an IMiscUtilsPtr object
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI14590", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14590", ipMiscUtils != __nullptr );
 
 		// Get the file header string and its length from IMiscUtilsPtr object
 		m_strFileHeader = ipMiscUtils->GetFileHeader();
@@ -1285,7 +1285,7 @@ bool CLocateImageRegionPP::storeClueLists(UCLID_AFVALUEFINDERSLib::ILocateImageR
 			EClueListIndex eClueListIndex = itMap->first;
 			ListInfo listInfo = itMap->second;
 			IVariantVectorPtr ipClues(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI07839", ipClues != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07839", ipClues != __nullptr);
 			// populate the vector
 			for (unsigned int ui = 0; ui < listInfo.m_vecClues.size(); ui++)
 			{

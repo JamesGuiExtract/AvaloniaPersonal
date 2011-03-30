@@ -45,11 +45,11 @@ m_cachedRegExLoader(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str())
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI12971", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI12971", m_ipMiscUtils != __nullptr );
 
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_DATA_SCORERS_PATH ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09036", ma_pUserCfgMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09036", ma_pUserCfgMgr.get() != __nullptr );
 
 		m_bLoggingEnabled = getLoggingEnabled() == 1;
 		loadInvalidPersonVector();
@@ -61,8 +61,8 @@ CEntityNameDataScorer::~CEntityNameDataScorer()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
-		m_ipAFUtility = NULL;
+		m_ipMiscUtils = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29471");
 }
@@ -102,23 +102,23 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore1(IAttribute * pAttribute, L
 		// validate License
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI08597", pScore != NULL );
+		ASSERT_ARGUMENT("ELI08597", pScore != __nullptr );
 
 		ICopyableObjectPtr ipFrom ( pAttribute );
-		ASSERT_RESOURCE_ALLOCATION("ELI08646", ipFrom != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08646", ipFrom != __nullptr );
 
 		// Original Attribute for logging if required
 		IAttributePtr ipOriginal = ipFrom->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI09037", ipOriginal != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09037", ipOriginal != __nullptr );
 
 		IAttributePtr ipAttribute ( pAttribute );
-		ASSERT_ARGUMENT("ELI08598", ipAttribute != NULL );
+		ASSERT_ARGUMENT("ELI08598", ipAttribute != __nullptr );
 
 		*pScore = getAttrScore( ipAttribute );
 		if ( m_bLoggingEnabled )
 		{
 			ISpatialStringPtr ipValue = ipOriginal->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI09035", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09035", ipValue != __nullptr );
 			string strValue = ipValue->String;
 			logResults( *pScore, strValue, true );
 		}
@@ -137,23 +137,23 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore2(IIUnknownVector * pAttribu
 		// validate License
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI08599", pScore != NULL );
+		ASSERT_ARGUMENT("ELI08599", pScore != __nullptr );
 		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_ARGUMENT("ELI08600", ipAttributes != NULL );
+		ASSERT_ARGUMENT("ELI08600", ipAttributes != __nullptr );
 		
 		long nTotalScore = 0;
 		long nNumAttr = ipAttributes->Size();
 		for (int i = 0; i < nNumAttr; i++ )
 		{
 			ICopyableObjectPtr ipFrom = ipAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08647", ipFrom != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08647", ipFrom != __nullptr );
 			
 			IAttributePtr ipCurrAttr ( ipFrom );
-			ASSERT_RESOURCE_ALLOCATION("ELI08604", ipCurrAttr != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI08604", ipCurrAttr != __nullptr );
 
 			// Original attribute for logging if required
 			IAttributePtr ipOriginal = ipFrom->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI19132", ipOriginal != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI19132", ipOriginal != __nullptr );
 			
 			// Add Attributes score to total
 			long nAttrScore = getAttrScore( ipCurrAttr );
@@ -161,7 +161,7 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetDataScore2(IIUnknownVector * pAttribu
 			if ( m_bLoggingEnabled )
 			{
 				ISpatialStringPtr ipValue = ipOriginal->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI19133", ipValue != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI19133", ipValue != __nullptr );
 				string strValue = ipValue->String;
 				logResults( nAttrScore, strValue );
 			}
@@ -192,7 +192,7 @@ STDMETHODIMP CEntityNameDataScorer::raw_GetComponentDescription(BSTR * pstrCompo
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19538", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19538", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Entity name data scorer").Detach();
 	}
@@ -315,7 +315,7 @@ STDMETHODIMP CEntityNameDataScorer::raw_Clone(IUnknown **pObject)
 		// create a new instance of the EntityNameDataScorer
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_EntityNameDataScorer);
-		ASSERT_RESOURCE_ALLOCATION("ELI08656", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08656", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -362,7 +362,7 @@ STDMETHODIMP CEntityNameDataScorer::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 long CEntityNameDataScorer::getAttrScore( IAttributePtr ipAttribute )
 {
-	ASSERT_ARGUMENT("ELI08603", ipAttribute != NULL );
+	ASSERT_ARGUMENT("ELI08603", ipAttribute != __nullptr );
 
 	ISpatialStringPtr ipAttrValue = ipAttribute->Value;
 	// if there is no value return score of 0
@@ -399,21 +399,21 @@ long CEntityNameDataScorer::getAttrScore( IAttributePtr ipAttribute )
 	// If not already Split split the attribute
 	IIUnknownVectorPtr ipSubAttr = ipAttribute->SubAttributes;
 	IEntityFinderPtr ipEntityFinder(CLSID_EntityFinder);
-	ASSERT_RESOURCE_ALLOCATION("ELI08648", ipEntityFinder != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08648", ipEntityFinder != __nullptr );
 	
 	// Entity Splitter assumes previous call to EFA
 	ipEntityFinder->FindEntities( ipAttrValue );
 	
 	// Split the attribute value with Entity Splitter and score the results
 	IAttributeSplitterPtr ipEntitySplitter(CLSID_EntityNameSplitter);
-	ASSERT_RESOURCE_ALLOCATION("ELI08610", ipEntitySplitter != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08610", ipEntitySplitter != __nullptr );
 	IAFDocumentPtr ipAFDoc (CLSID_AFDocument );
-	ASSERT_RESOURCE_ALLOCATION("ELI08611", ipAFDoc != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08611", ipAFDoc != __nullptr );
 	ipAFDoc->Text = ipAttribute->Value;
 	ipEntitySplitter->SplitAttribute( ipAttribute, ipAFDoc, NULL );
 
 	// if no subattributes score is 0 or the size is 0
-	if (ipSubAttr == NULL )
+	if (ipSubAttr == __nullptr )
 	{
 		return 0;
 	}
@@ -527,7 +527,7 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 										   IRegularExprParserPtr ipParser)
 {
 
-	if (ipAttribute == NULL )
+	if (ipAttribute == __nullptr )
 	{
 		return 0;
 	}
@@ -537,9 +537,9 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 
 	// Get person subattribute
 	IIUnknownVectorPtr ipPersonSubAttr = ipAttribute->SubAttributes;
-	ASSERT_RESOURCE_ALLOCATION("ELI08707", ipPersonSubAttr != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08707", ipPersonSubAttr != __nullptr );
 	ISpatialStringPtr ipPerson = ipAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI09726", ipPerson != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI09726", ipPerson != __nullptr );
 
 	// Get local string for parsing
 	string strPerson = ipPerson->String;
@@ -593,11 +593,11 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 	for ( int i = 0; i < nNumPersonSubAttr; i++ )
 	{
 		IAttributePtr ipPersonSub = ipPersonSubAttr->At(i);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09710", ipPersonSub != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09710", ipPersonSub != __nullptr );
 
 		string strAttrName = ipPersonSub->Name;
 		ISpatialStringPtr ipValue = ipPersonSub->Value;
-		ASSERT_RESOURCE_ALLOCATION( "ELI09709", ipValue != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09709", ipValue != __nullptr );
 		string strValue = ipValue->String;
 		
 		// bAboveMinSize allows first last and title to be checked for min to be valid
@@ -654,9 +654,9 @@ long CEntityNameDataScorer::getPersonScore( IAttributePtr ipAttribute, string st
 
 	// Get Person Designators pattern
 	IEntityKeywordsPtr ipEntityKeywords ( CLSID_EntityKeywords );
-	ASSERT_RESOURCE_ALLOCATION("ELI08723", ipEntityKeywords != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08723", ipEntityKeywords != __nullptr );
 	IVariantVectorPtr ipPersonDesignators = ipEntityKeywords->PersonDesignators;
-	ASSERT_RESOURCE_ALLOCATION("ELI08725", ipPersonDesignators != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI08725", ipPersonDesignators != __nullptr );
 
 	// Search original string for Person designators
 	VARIANT_BOOL bFound = ipParser->StringContainsPatterns(strOriginal.c_str(), 
@@ -761,10 +761,10 @@ string &CEntityNameDataScorer::getCommonWordsPattern()
 //-------------------------------------------------------------------------------------------------
 IAFUtilityPtr CEntityNameDataScorer::getAFUtility()
 {
-	if (m_ipAFUtility == NULL)
+	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI08950", m_ipAFUtility != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08950", m_ipAFUtility != __nullptr );
 	}
 	
 	return m_ipAFUtility;
@@ -916,7 +916,7 @@ long CEntityNameDataScorer::countOfRegExpInInput( const string &strRegExpToFind,
 	IIUnknownVectorPtr ipFound;
 	ipFound =	ipParser->Find( strInput.c_str(), VARIANT_TRUE, VARIANT_FALSE );
 
-	if (ipFound != NULL )
+	if (ipFound != __nullptr )
 	{
 		return ipFound->Size();
 	}
@@ -929,7 +929,7 @@ IRegularExprParserPtr CEntityNameDataScorer::getParser()
 	{
 		IRegularExprParserPtr ipParser =
 			m_ipMiscUtils->GetNewRegExpParserInstance("EntityNameDataScorer");
-		ASSERT_RESOURCE_ALLOCATION("ELI08724", ipParser != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08724", ipParser != __nullptr );
 
 		return ipParser;
 	}

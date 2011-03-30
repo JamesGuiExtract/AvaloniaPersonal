@@ -36,7 +36,7 @@ CMoveAndModifyAttributes::CMoveAndModifyAttributes() :
 	try
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI09516", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09516", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI09565")
 }
@@ -90,7 +90,7 @@ STDMETHODIMP CMoveAndModifyAttributes::get_AttributeQuery(/*[out, retval]*/ BSTR
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI09410", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI09410", pVal != __nullptr );
 
 		// Return the Attribute Name
 		*pVal = _bstr_t( m_strQuery.c_str() ).copy();
@@ -185,7 +185,7 @@ STDMETHODIMP CMoveAndModifyAttributes::get_OverwriteAttributeName(/*[out, retval
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI09414", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI09414", pVal != __nullptr );
 
 		*pVal = m_eOverwriteAttributeName;
 	}
@@ -221,7 +221,7 @@ STDMETHODIMP CMoveAndModifyAttributes::get_SpecifiedAttributeName(/*[out, retval
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI09418", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI09418", pVal != __nullptr );
 
 		// Return the Attribute Name
 		*pVal = _bstr_t( m_strSpecifiedName.c_str() ).copy();
@@ -277,7 +277,7 @@ STDMETHODIMP CMoveAndModifyAttributes::get_RetainAttributeType(/*[out, retval]*/
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI09421", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI09421", pVal != __nullptr );
 
 		*pVal = m_bRetainCurrType ? VARIANT_TRUE : VARIANT_FALSE;
 	}
@@ -313,7 +313,7 @@ STDMETHODIMP CMoveAndModifyAttributes::get_AddRootOrParentAttributeType(/*[out, 
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI09424", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI09424", pVal != __nullptr );
 
 		*pVal = m_bAddRootOrParentType ? VARIANT_TRUE : VARIANT_FALSE;
 	}
@@ -349,7 +349,7 @@ STDMETHODIMP CMoveAndModifyAttributes::get_AddSpecifiedAttributeType(/*[out, ret
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI09427", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI09427", pVal != __nullptr );
 
 		*pVal = m_bAddSpecified ? VARIANT_TRUE : VARIANT_FALSE;
 	}
@@ -385,7 +385,7 @@ STDMETHODIMP CMoveAndModifyAttributes::get_SpecifiedAttributeType(/*[out, retval
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI09430", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI09430", pVal != __nullptr );
 
 		// Return the Attribute Name
 		*pVal = _bstr_t( m_strSpecifiedType.c_str() ).copy();
@@ -441,7 +441,7 @@ STDMETHODIMP CMoveAndModifyAttributes::get_DeleteRootOrParentIfAllChildrenMoved(
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI19138", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI19138", pVal != __nullptr );
 
 		*pVal = m_bDeleteRootOrParentIfAllChildrenMoved ? VARIANT_TRUE : VARIANT_FALSE;
 	}
@@ -477,7 +477,7 @@ STDMETHODIMP CMoveAndModifyAttributes::get_AddAttributeNameToType(/*[out, retval
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI19141", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI19141", pVal != __nullptr );
 
 		*pVal = m_bAddNameToType ? VARIANT_TRUE : VARIANT_FALSE;
 	}
@@ -519,7 +519,7 @@ STDMETHODIMP CMoveAndModifyAttributes::raw_ProcessOutput(IIUnknownVector* pAttri
 
 		// all root level attributes
 		IIUnknownVectorPtr ipRootLevelAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI09456", ipRootLevelAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09456", ipRootLevelAttributes != __nullptr);
 
 		// Query the attributes
 		IIUnknownVectorPtr ipFoundAttributes = m_ipAFUtility->QueryAttributes(ipRootLevelAttributes, 
@@ -540,10 +540,10 @@ STDMETHODIMP CMoveAndModifyAttributes::raw_ProcessOutput(IIUnknownVector* pAttri
 			for (i = 0; i < ipFoundAttributes->Size(); i++)
 			{
 				IAttributePtr ipAttr = ipFoundAttributes->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI09472", ipAttr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09472", ipAttr != __nullptr);
 				IAttributePtr ipRootOrParent 
 					= getRootOrParentAttribute(ipRootLevelAttributes, ipAttr);
-				if (ipRootOrParent == NULL)
+				if (ipRootOrParent == __nullptr)
 				{
 					continue;
 				}
@@ -565,11 +565,11 @@ STDMETHODIMP CMoveAndModifyAttributes::raw_ProcessOutput(IIUnknownVector* pAttri
 			{
 				// Retrieve this root node
 				IAttributePtr ipAttr = vecRootOrParentAttributesOfFoundAttributes[ui];
-				ASSERT_RESOURCE_ALLOCATION("ELI09473", ipAttr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09473", ipAttr != __nullptr);
 
 				// Check count of sub-attributes
 				IIUnknownVectorPtr ipSub = ipAttr->SubAttributes;
-				ASSERT_RESOURCE_ALLOCATION("ELI15526", ipSub != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15526", ipSub != __nullptr);
 				if (ipSub->Size() == 0)
 				{
 					// No sub-attributes so remove this attribute
@@ -648,7 +648,7 @@ STDMETHODIMP CMoveAndModifyAttributes::raw_GetComponentDescription(BSTR * pstrCo
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19545", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19545", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Move and modify attributes").Detach();
 	}
@@ -670,7 +670,7 @@ STDMETHODIMP CMoveAndModifyAttributes::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFOUTPUTHANDLERSLib::IMoveAndModifyAttributesPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION( "ELI09401", ipSource != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09401", ipSource != __nullptr );
 
 		m_strQuery = asString( ipSource->GetAttributeQuery() );
 
@@ -703,7 +703,7 @@ STDMETHODIMP CMoveAndModifyAttributes::raw_Clone(IUnknown **pObject)
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_MoveAndModifyAttributes );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09402", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09402", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom( ipUnk );
@@ -899,12 +899,12 @@ void CMoveAndModifyAttributes::modifyAttributeNames(IIUnknownVectorPtr ipTrees, 
 		for (ui = 0; ui < (unsigned int)ipAttributes->Size(); ui++)
 		{
 			IAttributePtr ipAttribute = ipAttributes->At(ui);
-			ASSERT_RESOURCE_ALLOCATION("ELI09457", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09457", ipAttribute != __nullptr);
 			vecAttrs.push_back(ipAttribute);
 
 			IAttributePtr ipRootOrParent = getRootOrParentAttribute(ipTrees, ipAttribute);
 			string strName;
-			if (ipRootOrParent != NULL)
+			if (ipRootOrParent != __nullptr)
 			{
 				strName = asString( ipRootOrParent->Name);
 			}
@@ -921,7 +921,7 @@ void CMoveAndModifyAttributes::modifyAttributeNames(IIUnknownVectorPtr ipTrees, 
 		for (i = 0; i < ipAttributes->Size(); i++)
 		{
 			IAttributePtr ipAttribute = ipAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI09524", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09524", ipAttribute != __nullptr);
 			
 			ipAttribute->Name = _bstr_t(m_strSpecifiedName.c_str());
 		}
@@ -948,7 +948,7 @@ void CMoveAndModifyAttributes::modifyAttributeTypes(IIUnknownVectorPtr ipTrees, 
 		string strNewType;
 
 		IAttributePtr ipAttribute = ipAttributes->At(ui);
-		ASSERT_RESOURCE_ALLOCATION("ELI09525", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09525", ipAttribute != __nullptr);
 		vecAttrs.push_back(ipAttribute);
 		
 		if (m_bRetainCurrType)
@@ -959,7 +959,7 @@ void CMoveAndModifyAttributes::modifyAttributeTypes(IIUnknownVectorPtr ipTrees, 
 		if (m_bAddRootOrParentType)
 		{
 			IAttributePtr ipRootOrParent = getRootOrParentAttribute(ipTrees, ipAttribute);
-			if (ipRootOrParent != NULL)
+			if (ipRootOrParent != __nullptr)
 			{
 
 				_bstr_t _bstrType = ipRootOrParent->Type;
@@ -1021,13 +1021,13 @@ void CMoveAndModifyAttributes::moveAttributes(IIUnknownVectorPtr ipRootLevelAttr
 			for (n = 0; n < nSize; n++)
 			{
 				IAttributePtr ipFoundAttribute = ipFoundAttributes->At(n);
-				ASSERT_RESOURCE_ALLOCATION("ELI10211", ipFoundAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI10211", ipFoundAttribute != __nullptr);
 				vecAttrs.push_back(ipFoundAttribute);
 
 				// get individual found attribute's parent
 				IAttributePtr ipParent = m_ipAFUtility->GetAttributeParent(
 										ipRootLevelAttributes, ipFoundAttribute);
-				ASSERT_RESOURCE_ALLOCATION("ELI10212", ipParent != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI10212", ipParent != __nullptr);
 
 				// get the parent's parent
 				IAttributePtr ipGrandParent = m_ipAFUtility->GetAttributeParent(
@@ -1035,7 +1035,7 @@ void CMoveAndModifyAttributes::moveAttributes(IIUnknownVectorPtr ipRootLevelAttr
 				// if the ipParent is at root level already, ipGrandParent could be null
 				// get the vector of sub attributes of the grand parent
 				IIUnknownVectorPtr ipGrandParentSubAttributes 
-					= ipGrandParent != NULL ? ipGrandParent->SubAttributes : ipRootLevelAttributes;
+					= ipGrandParent != __nullptr ? ipGrandParent->SubAttributes : ipRootLevelAttributes;
 
 				vecGrandParentsSubAttrs.push_back(ipGrandParentSubAttributes);
 			}

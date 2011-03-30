@@ -29,7 +29,7 @@ CStringTokenizerModifier::CStringTokenizerModifier()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13059", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13059", m_ipMiscUtils != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI05366")
 }
@@ -38,7 +38,7 @@ CStringTokenizerModifier::~CStringTokenizerModifier()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16365");
 }
@@ -270,10 +270,10 @@ STDMETHODIMP CStringTokenizerModifier::raw_ModifyValue(IAttribute* pAttribute, I
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09292", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09292", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION( "ELI09293", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION( "ELI09293", ipInputText != __nullptr);
 		
 		// tokenize the value
 		IIUnknownVectorPtr ipTokens = ipInputText->Tokenize(_bstr_t(m_strDelimiter.c_str()));
@@ -345,7 +345,7 @@ STDMETHODIMP CStringTokenizerModifier::raw_ModifyValue(IAttribute* pAttribute, I
 								
 				// now replace any place holders with actual tokens
 				IIUnknownVectorPtr ipSubMatches(ipMatches->Object2);
-				ASSERT_RESOURCE_ALLOCATION("ELI06636", ipSubMatches != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06636", ipSubMatches != __nullptr);
 				// only interested in submatch 2 and submatch 4
 				string strSubMatch2("");
 				string strSubMatch4("");
@@ -353,7 +353,7 @@ STDMETHODIMP CStringTokenizerModifier::raw_ModifyValue(IAttribute* pAttribute, I
 				// if the match has an odd number of slash (\) right ahead of it,
 				// then this match shall be skipped
 				ITokenPtr ipSubMatch1(ipSubMatches->At(0));
-				ASSERT_RESOURCE_ALLOCATION("ELI06637", ipSubMatch1 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06637", ipSubMatch1 != __nullptr);
 				// check submatch 1 if there are slashes
 				// If the number of slashes is an odd number, it means that
 				// the slashes are actually the escape characters
@@ -395,11 +395,11 @@ STDMETHODIMP CStringTokenizerModifier::raw_ModifyValue(IAttribute* pAttribute, I
 				
 				// each sub match is stored in a Token object
 				ITokenPtr ipSubMatch2(ipSubMatches->At(1));
-				ASSERT_RESOURCE_ALLOCATION("ELI06638", ipSubMatch2 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06638", ipSubMatch2 != __nullptr);
 				strSubMatch2 = ipSubMatch2->Value;
 				
 				ITokenPtr ipSubMatch4(ipSubMatches->At(3));
-				ASSERT_RESOURCE_ALLOCATION("ELI06639", ipSubMatch4 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06639", ipSubMatch4 != __nullptr);
 				strSubMatch4 = ipSubMatch4->Value;
 				
 				ISpatialStringPtr ipReplacedStr = getReplacement(ipTokens, strSubMatch2, strSubMatch4);
@@ -449,7 +449,7 @@ STDMETHODIMP CStringTokenizerModifier::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::IStringTokenizerModifierPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08287", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08287", ipSource != __nullptr);
 	
 		m_strDelimiter = asString(ipSource->GetDelimiter());
 		m_strResultExpression = asString(ipSource->GetResultExpression());
@@ -474,7 +474,7 @@ STDMETHODIMP CStringTokenizerModifier::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_StringTokenizerModifier);
-		ASSERT_RESOURCE_ALLOCATION("ELI08361", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08361", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -496,7 +496,7 @@ STDMETHODIMP CStringTokenizerModifier::raw_GetComponentDescription(BSTR * pstrCo
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19606", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19606", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("String tokenizer").Detach();
 	}
@@ -692,10 +692,10 @@ ISpatialStringPtr CStringTokenizerModifier::getReplacement(IIUnknownVectorPtr ip
 
 	for (long n=nStart; n<=nEnd; n++)
 	{
-		if (ipReturnString == NULL)
+		if (ipReturnString == __nullptr)
 		{
 			ipReturnString.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI06632", ipReturnString != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06632", ipReturnString != __nullptr);
 		}
 
 		if (n < ipTokens->Size())
@@ -719,7 +719,7 @@ IRegularExprParserPtr CStringTokenizerModifier::getRegexParser(const string& str
 	{
 		IRegularExprParserPtr ipParser =
 			m_ipMiscUtils->GetNewRegExpParserInstance("StringTokenizerModifier");
-		ASSERT_RESOURCE_ALLOCATION("ELI13061", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13061", ipParser != __nullptr);
 
 		if (!strPattern.empty())
 		{
@@ -746,7 +746,7 @@ bool CStringTokenizerModifier::validateExpression(const string& strExpr)
 	// set pattern
 	IRegularExprParserPtr ipParser = getRegexParser("(\\\\*)(%|-|\\\\)");
 	IIUnknownVectorPtr ipFound = ipParser->Find(strExpr.c_str(), VARIANT_FALSE, VARIANT_TRUE);
-	if (ipFound != NULL)
+	if (ipFound != __nullptr)
 	{
 		long nSize = ipFound->Size();
 		for (long n=0; n<nSize; n++)
@@ -755,7 +755,7 @@ bool CStringTokenizerModifier::validateExpression(const string& strExpr)
 			ITokenPtr ipTopMatch = ipObjectPair->Object1;
 			long nEndPos = ipTopMatch->EndPosition;
 			IIUnknownVectorPtr ipSubMatches = ipObjectPair->Object2;
-			if (ipSubMatches != NULL && ipSubMatches->Size() > 0)
+			if (ipSubMatches != __nullptr && ipSubMatches->Size() > 0)
 			{
 				// the token for slashes
 				ITokenPtr ipSlashes = ipSubMatches->At(0);

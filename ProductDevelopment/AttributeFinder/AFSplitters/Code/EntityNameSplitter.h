@@ -109,8 +109,8 @@ private:
 	EEntityAliasChoice	m_eAliasChoice;
 
 	// Handles configuration persistence
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<ENSConfigMgr> ma_pENSConfigMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<ENSConfigMgr> ma_pENSConfigMgr;
 
 	// Determines what should be done with Trust names
 	bool	m_bMoveTrustName;

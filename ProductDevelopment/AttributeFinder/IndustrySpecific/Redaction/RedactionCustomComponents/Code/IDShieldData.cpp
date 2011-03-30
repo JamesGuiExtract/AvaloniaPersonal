@@ -46,7 +46,7 @@ void IDShieldData::calculateFromVector(IIUnknownVectorPtr ipAttributes, const se
 	for (long n = 0; n < nSize; n++)
 	{
 		IAttributePtr ipAttr = ipAttributes->At(n);
-		ASSERT_RESOURCE_ALLOCATION("ELI19036", ipAttr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19036", ipAttr != __nullptr);
 
 		// Get the attribute name
 		string strName = asString(ipAttr->Name);
@@ -74,7 +74,7 @@ void IDShieldData::calculateFromVector(IIUnknownVectorPtr ipAttributes)
 //-------------------------------------------------------------------------------------------------
 void IDShieldData::countRedacted(IAttributePtr ipAttribute)
 {
-	ASSERT_ARGUMENT("ELI19113", ipAttribute != NULL);
+	ASSERT_ARGUMENT("ELI19113", ipAttribute != __nullptr);
 
 	// Get the attribute name
 	string strName = asString(ipAttribute->Name);
@@ -85,7 +85,7 @@ void IDShieldData::countRedacted(IAttributePtr ipAttribute)
 //-------------------------------------------------------------------------------------------------
 void IDShieldData::countNotRedacted(IAttributePtr ipAttribute)
 {
-	ASSERT_ARGUMENT("ELI19114", ipAttribute != NULL);
+	ASSERT_ARGUMENT("ELI19114", ipAttribute != __nullptr);
 
 	// Get the attribute name
 	string strName = asString(ipAttribute->Name);

@@ -16,7 +16,7 @@ const string ConfigMgrIF::DEFAULT_PROG_ID = "SSOCR.ScansoftOCR.1";
 ConfigMgrIF::ConfigMgrIF()
 {
 	string strRootFolder = gstrREG_ROOT_KEY + string("\\InputFunnel");
-	ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+	ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr(HKEY_CURRENT_USER, strRootFolder));
 }
 //--------------------------------------------------------------------------------------------------

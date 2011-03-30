@@ -42,10 +42,10 @@ STDMETHODIMP CImageStats::get_FGPixelsInRow(IVariantVector ** pVal)
 
 	try
 	{
-		if ( m_ipVecFGPixelsInRow == NULL )
+		if ( m_ipVecFGPixelsInRow == __nullptr )
 		{
 			m_ipVecFGPixelsInRow.CreateInstance(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI13289", m_ipVecFGPixelsInRow != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI13289", m_ipVecFGPixelsInRow != __nullptr );
 		}
 
 		IVariantVectorPtr ipShallowCopy = m_ipVecFGPixelsInRow;

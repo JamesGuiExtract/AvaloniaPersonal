@@ -78,7 +78,7 @@ void TesterDlgSettingsPage::OnSize(UINT nType, int cx, int cy)
 	}
 
 	// only do resizing if the controls have been initialized
-	if (GetDlgItem(IDC_STATIC_SCOPE) != NULL)
+	if (GetDlgItem(IDC_STATIC_SCOPE) != __nullptr)
 	{
 		// get the client coords of the dialog
 		CRect rectDlg;

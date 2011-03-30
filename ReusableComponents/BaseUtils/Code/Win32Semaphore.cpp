@@ -12,7 +12,7 @@ Win32Semaphore::Win32Semaphore(unsigned long ulInitialCount,
 	const char *pszName = strSemaphoreName == "" ? NULL : strSemaphoreName.c_str();
 
 	hSemaphore = CreateSemaphore(NULL, ulInitialCount, ulMaxCount, pszName);
-	ASSERT_RESOURCE_ALLOCATION("ELI00326", hSemaphore != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI00326", hSemaphore != __nullptr);
 }
 
 Win32Semaphore::Win32Semaphore(const string& strSemaphoreName)
@@ -21,7 +21,7 @@ Win32Semaphore::Win32Semaphore(const string& strSemaphoreName)
 	const char *pszName = strSemaphoreName == "" ? NULL : strSemaphoreName.c_str();
 
 	hSemaphore = OpenSemaphore(SEMAPHORE_ALL_ACCESS, TRUE, pszName);
-	ASSERT_RESOURCE_ALLOCATION("ELI00938", hSemaphore != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI00938", hSemaphore != __nullptr);
 	
 	// TODO: when we open a semaphore by name, how do we know its current
 	// count and maximum count?

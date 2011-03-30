@@ -639,7 +639,7 @@ library UCLID_AFCORELib
 	interface IAFCondition : IDispatch
 	{
 		//---------------------------------------------------------------------------------------------
-		// REQUIRE: pAFDoc != NULL
+		// REQUIRE: pAFDoc != __nullptr
 		// PROMISE: This method will return VARIANT_TRUE if the condition is met
 		[id(1), helpstring("method ProcessCondition")] HRESULT ProcessCondition([in] IAFDocument* pAFDoc, [out, retval] VARIANT_BOOL* pbRet);
 		//---------------------------------------------------------------------------------------------
@@ -660,21 +660,21 @@ library UCLID_AFCORELib
 		//---------------------------------------------------------------------------------------------
 		// Note: we use set and get here instead of a property because we 
 		// may change this signature to SetCondition(IIUnknown*, IID*)
-		// REQUIRE: ppCondition != NULL
+		// REQUIRE: ppCondition != __nullptr
 		// PROMISE: This method will return the conditional object that will be used by this
 		//			ConditionalRule to evaluate whether or not to run the rule returned by GetRule
 		[id(2), helpstring("method GetCondition")] HRESULT GetCondition([out, retval] IAFCondition** ppCondition);
-		// REQUIRE: pCondition != NULL
+		// REQUIRE: pCondition != __nullptr
 		// PROMISE: This method will set the conditional object that will be used by this
 		//			ConditionalRule to evaluate whether or not to run the rule returned by GetRule
 		[id(3), helpstring("method SetCondition")] HRESULT SetCondition([in] IAFCondition* pCondition);
 		//---------------------------------------------------------------------------------------------
-		// REQUIRE: ppRule != NULL
+		// REQUIRE: ppRule != __nullptr
 		// PROMISE: The rule returned by this method will implement the interface returned by GetRuleIID
 		//			or it will be NULL
 		[id(4), helpstring("method GetRule")] HRESULT GetRule([out, retval] IUnknown** ppRule);
 		// REQUIRE: pRule must implement the interface returned by GetRuleIID 
-		//			pRule != NULL
+		//			pRule != __nullptr
 		[id(5), helpstring("method SetRule")] HRESULT SetRule([in] IUnknown* pRule);
 		//---------------------------------------------------------------------------------------------
 		[propget, id(6), helpstring("property InvertCondition")] HRESULT InvertCondition([out, retval] VARIANT_BOOL * pbRetVal);

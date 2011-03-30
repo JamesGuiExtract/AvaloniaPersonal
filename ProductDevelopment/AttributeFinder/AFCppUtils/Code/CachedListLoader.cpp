@@ -24,7 +24,7 @@ CCachedListLoader::CCachedListLoader()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI30042", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30042", m_ipMiscUtils != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30043");
 }
@@ -33,7 +33,7 @@ CCachedListLoader::~CCachedListLoader()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 
 		CSingleLock lg(&ms_Mutex, TRUE);
 
@@ -64,7 +64,7 @@ IVariantVectorPtr CCachedListLoader::getList(const _bstr_t& bstrListSpecificatio
 		try
 		{
 			IVariantVectorPtr ipList(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI30045", ipList != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30045", ipList != __nullptr);
 
 			// Remove the header of the string if it is a file name,
 			// return the original string if it is not a file name
@@ -81,7 +81,7 @@ IVariantVectorPtr CCachedListLoader::getList(const _bstr_t& bstrListSpecificatio
 			{
 				string strAfterRemoveHeader = asString(bstrAfterRemoveHeader);
 				
-				if (pcDelimeter != NULL)
+				if (pcDelimeter != __nullptr)
 				{
 					int nIndexEndFileName = strAfterRemoveHeader.find_first_of(*pcDelimeter);
 
@@ -111,7 +111,7 @@ IVariantVectorPtr CCachedListLoader::getList(const _bstr_t& bstrListSpecificatio
 				}
 
 				// Expand tags and functions in the file name
-				if (ipAFDoc != NULL)
+				if (ipAFDoc != __nullptr)
 				{
 					strAfterRemoveHeader =
 						m_tagManager.expandTagsAndFunctions(strAfterRemoveHeader, ipAFDoc);
@@ -140,10 +140,10 @@ IVariantVectorPtr CCachedListLoader::expandList(IVariantVectorPtr ipSourceList,
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI30051", ipSourceList != NULL);
+			ASSERT_ARGUMENT("ELI30051", ipSourceList != __nullptr);
 
 			IVariantVectorPtr ipExpandedList(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI30052", ipExpandedList != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30052", ipExpandedList != __nullptr);
 
 			// Iterate each item in the list.
 			long nSize = ipSourceList->Size;
@@ -154,7 +154,7 @@ IVariantVectorPtr CCachedListLoader::expandList(IVariantVectorPtr ipSourceList,
 				// Attempt to load the entry as a list from file.
 				IVariantVectorPtr ipFileValues = getList(bstrCurrentEntry, ipAFDoc);
 
-				if (ipFileValues == NULL)
+				if (ipFileValues == __nullptr)
 				{
 					// Not a file; add this entry to the expanded list as is
 					ipExpandedList->PushBack(bstrCurrentEntry);
@@ -191,11 +191,11 @@ IIUnknownVectorPtr CCachedListLoader::expandTwoColumnList(IIUnknownVectorPtr ipS
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI30055", ipSourceList != NULL);
+			ASSERT_ARGUMENT("ELI30055", ipSourceList != __nullptr);
 
 			// Create IIUnknownVectorPtr object to put string pairs
 			IIUnknownVectorPtr ipExpandedList(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI30056", ipExpandedList != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30056", ipExpandedList != __nullptr);
 
 			set<_bstr_t> setStringKeys;
 
@@ -205,7 +205,7 @@ IIUnknownVectorPtr CCachedListLoader::expandTwoColumnList(IIUnknownVectorPtr ipS
 			{
 				// Get the string key value pair in the first row of the list box
 				IStringPairPtr ipKeyValuePair(ipSourceList->At(i));
-				ASSERT_RESOURCE_ALLOCATION("ELI30057", ipKeyValuePair != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30057", ipKeyValuePair != __nullptr);
 
 				bstrCurrentEntry = ipKeyValuePair->StringKey;
 
@@ -213,7 +213,7 @@ IIUnknownVectorPtr CCachedListLoader::expandTwoColumnList(IIUnknownVectorPtr ipS
 				char cColumnDelimeter = cDelimeter;
 				IVariantVectorPtr ipFileValues = getList(bstrCurrentEntry, ipAFDoc, &cColumnDelimeter);
 
-				if (ipFileValues == NULL)
+				if (ipFileValues == __nullptr)
 				{
 					checkForDuplicateKey(setStringKeys, bstrCurrentEntry);
 
@@ -247,7 +247,7 @@ IIUnknownVectorPtr CCachedListLoader::expandTwoColumnList(IIUnknownVectorPtr ipS
 						
 						// Create an IStringPairPtr object
 						IStringPairPtr ipReplacement(CLSID_StringPair);
-						ASSERT_RESOURCE_ALLOCATION("ELI30059", ipReplacement != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI30059", ipReplacement != __nullptr);
 
 						_bstr_t bstrStringKey = get_bstr_t(vecTokens[0]);
 
@@ -309,13 +309,13 @@ IVariantVectorPtr CCachedListLoader::getCachedList(const string& strFileName)
 		ms_mapReferenceCounts[strFileNameUpper]++;
 	}
 
-	ASSERT_RESOURCE_ALLOCATION("ELI30062", m_mapReferencedLists[strFileNameUpper] != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30062", m_mapReferencedLists[strFileNameUpper] != __nullptr);
 
 	// Load the list items
 	m_mapReferencedLists[strFileNameUpper]->loadObjectFromFile(strFileName);
 
 	IVariantVectorPtr ipList = m_mapReferencedLists[strFileNameUpper]->m_obj;
-	ASSERT_RESOURCE_ALLOCATION("ELI30048", ipList != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30048", ipList != __nullptr);
 
 	return ipList;
 }

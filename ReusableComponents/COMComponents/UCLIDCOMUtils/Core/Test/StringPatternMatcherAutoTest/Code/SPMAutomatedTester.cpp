@@ -48,7 +48,7 @@ STDMETHODIMP CSPMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		m_ipResultLogger->StartTestCase(_bstr_t("Initialization"), _bstr_t("Reading test data file"), kAutomatedTestCase); 
 		
 		// ensure that the test result logger has been set
-		if (m_ipResultLogger == NULL)
+		if (m_ipResultLogger == __nullptr)
 		{
 			throw UCLIDException("ELI05985", "Test Result Logger object not set!");
 		}
@@ -74,7 +74,7 @@ STDMETHODIMP CSPMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 			// the state of the string pattern matcher object for
 			// subsequent test cases)
 			IStringPatternMatcherPtr ipSPM(CLSID_StringPatternMatcher);
-			ASSERT_RESOURCE_ALLOCATION("ELI05986", ipSPM != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05986", ipSPM != __nullptr);
 
 			// retrieve the test case information
 			TestCaseData tc = td[i];
@@ -122,7 +122,7 @@ STDMETHODIMP CSPMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 					IUnknownPtr ipUnknown;
 					ipResults->GetKeyValue(j, &bstrVariableName, &ipUnknown);
 					ITokenPtr ipToken = ipUnknown;
-					ASSERT_RESOURCE_ALLOCATION("ELI06271", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI06271", ipToken != __nullptr);
 					_bstr_t _bstrMatch = ipToken->Value;
 					strMsg += asString(bstrVariableName);
 					strMsg += "> = <";
@@ -162,7 +162,7 @@ STDMETHODIMP CSPMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 
 					// get the actual match value
 					ITokenPtr ipToken = ipUnkMatchValue;
-					ASSERT_RESOURCE_ALLOCATION("ELI06273", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI06273", ipToken != __nullptr);
 					_bstr_t _bstrActualMatchValue = ipToken->Value;
 
 					// check if the actual match is found in the expected matches
@@ -270,7 +270,7 @@ void CSPMAutomatedTester::setTestFileFolder(IVariantVectorPtr ipParams, const st
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		std::string strTestFolder = asString(_bstr_t(ipParams->GetItem(1)));
 

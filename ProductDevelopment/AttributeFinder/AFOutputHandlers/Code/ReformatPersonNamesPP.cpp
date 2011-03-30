@@ -31,7 +31,7 @@ STDMETHODIMP CReformatPersonNamesPP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFOUTPUTHANDLERSLib::IReformatPersonNamesPtr ipRPN = m_ppUnk[i];
-			if(ipRPN == NULL)
+			if(ipRPN == __nullptr)
 			{
 				THROW_LOGIC_ERROR_EXCEPTION("ELI09588");
 			}
@@ -109,7 +109,7 @@ LRESULT CReformatPersonNamesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 	try
 	{
 		UCLID_AFOUTPUTHANDLERSLib::IReformatPersonNamesPtr ipRPN = m_ppUnk[0];
-		if (ipRPN != NULL)
+		if (ipRPN != __nullptr)
 		{
 
 			// create tooltip object

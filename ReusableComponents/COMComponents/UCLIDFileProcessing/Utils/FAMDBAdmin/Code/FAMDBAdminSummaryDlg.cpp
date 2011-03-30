@@ -309,7 +309,7 @@ void CFAMDBAdminSummaryDlg::OnContextSetFileActionStatus()
 //--------------------------------------------------------------------------------------------------
 void CFAMDBAdminSummaryDlg::setFAMDatabase(IFileProcessingDBPtr ipFAMDB)
 {
-	ASSERT_ARGUMENT("ELI19805", ipFAMDB != NULL);
+	ASSERT_ARGUMENT("ELI19805", ipFAMDB != __nullptr);
 	m_ipFAMDB = ipFAMDB;
 }
 
@@ -373,7 +373,7 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 	try
 	{
 		// ensure we have a database object
-		ASSERT_ARGUMENT("ELI30520", m_ipFAMDB != NULL);
+		ASSERT_ARGUMENT("ELI30520", m_ipFAMDB != __nullptr);
 
 		// Set the wait cursor
 		CWaitCursor wait;
@@ -393,7 +393,7 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 
 		// query database for total number of files in the FAMFile table
 		_RecordsetPtr ipRecordSet = m_ipFAMDB->GetResultsForQuery(gstrTOTAL_FAMFILE_QUERY.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI30525", ipRecordSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30525", ipRecordSet != __nullptr);
 
 		// there should only be 1 record returned
 		if (ipRecordSet->RecordCount == 1)
@@ -410,7 +410,7 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 
 		// get the list of actions from the database
 		IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
-		ASSERT_RESOURCE_ALLOCATION("ELI30521", ipMapActions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30521", ipMapActions != __nullptr);
 
 		// loop through each action and add the data to the list control
 		long lNumActions = ipMapActions->Size;

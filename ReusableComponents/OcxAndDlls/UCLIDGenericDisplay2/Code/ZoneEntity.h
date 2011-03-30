@@ -189,7 +189,7 @@ public:
 	void calculateZoneSelectionPoints();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To calculate the bounding rectangle for the zone entity
-	// REQUIRE: pzoneVertices != NULL and shoild point to an array of 4 points size
+	// REQUIRE: pzoneVertices != __nullptr and shoild point to an array of 4 points size
 	// PROMISE: returns the bounds of zone as a rectangle through rBoundingRectangle
 	void getZoneBoundingRect(GDRectangle& rBoundingRectangle);
 	//---------------------------------------------------------------------------------------------

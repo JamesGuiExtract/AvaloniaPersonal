@@ -24,10 +24,10 @@ CPersonNameSplitter::CPersonNameSplitter()
 	{
 		// Instantiate the Entity Keywords object
 		m_ipKeys.CreateInstance( CLSID_EntityKeywords );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06473", m_ipKeys != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06473", m_ipKeys != __nullptr );
 		
 		m_ipMisc.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22557", m_ipMisc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22557", m_ipMisc != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI06474")
 }
@@ -36,8 +36,8 @@ CPersonNameSplitter::~CPersonNameSplitter()
 {
 	try
 	{
-		m_ipKeys = NULL;
-		m_ipMisc = NULL;
+		m_ipKeys = __nullptr;
+		m_ipMisc = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29465");
 }
@@ -79,7 +79,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 		// Retrieve Attribute Value text
 		ISpatialStringPtr	ipEntity = pAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION( "ELI06756", ipEntity != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06756", ipEntity != __nullptr );
 
 		// Trim a leading "8"
 		// This was probably an OCR error and should have been an ampersand
@@ -93,7 +93,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 		// Create SpatialString object for pattern searches
 		ISpatialStringPtr	ipWord( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06475", ipWord != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06475", ipWord != __nullptr );
 
 		// Create local string to facilitate later searches
 		string	strEntity = ipEntity->String;
@@ -130,7 +130,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 				// Create and include a Title sub-attribute
 				IAttributePtr ipAttr( CLSID_Attribute );
-				ASSERT_RESOURCE_ALLOCATION( "ELI10338", ipAttr != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI10338", ipAttr != __nullptr );
 				ipAttr->Name = "Title";
 				ipAttr->Value = ipWord;
 				ipMainAttrSub->PushBack( ipAttr );
@@ -142,10 +142,10 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 		{
 			// Retrieve last "word"
 			IObjectPairPtr ipLastPair = ipMatches->At(ipMatches->Size() - 1);
-			ASSERT_RESOURCE_ALLOCATION( "ELI15561", ipLastPair != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI15561", ipLastPair != __nullptr );
 
 			ipToken = ITokenPtr(ipLastPair->Object1);
-			ASSERT_RESOURCE_ALLOCATION( "ELI15562", ipToken != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI15562", ipToken != __nullptr );
 			ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 			// Search the word for a Person Suffix
@@ -159,7 +159,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 				// Create and include a Suffix sub-attribute
 				IAttributePtr ipAttr( CLSID_Attribute );
-				ASSERT_RESOURCE_ALLOCATION( "ELI10339", ipAttr != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI10339", ipAttr != __nullptr );
 				ipAttr->Name = "Suffix";
 				ipAttr->Value = ipWord;
 				ipMainAttrSub->PushBack( ipAttr );			
@@ -175,10 +175,10 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			// Retrieve second-to-last "word"
 			/////////////////////////////////
 			IObjectPairPtr ipSecondLastPair = ipMatches->At(ipMatches->Size() - 2);
-			ASSERT_RESOURCE_ALLOCATION( "ELI15563", ipSecondLastPair != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI15563", ipSecondLastPair != __nullptr );
 
 			ipToken = ITokenPtr(ipSecondLastPair->Object1);
-			ASSERT_RESOURCE_ALLOCATION( "ELI15564", ipToken != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI15564", ipToken != __nullptr );
 			ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 			ipWord = ipEntity->GetSubString( lStartPos, lEndPos );
@@ -244,7 +244,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 			// Create and include a First sub-attribute
 			IAttributePtr ipAttr( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10340", ipAttr != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10340", ipAttr != __nullptr );
 			ipAttr->Name = "First";
 			ipAttr->Value = ipWord;
 			ipMainAttrSub->PushBack( ipAttr );	
@@ -266,7 +266,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			// Create and include a First sub-attribute
 			// or a Last sub-attribute if appropriate
 			IAttributePtr ipAttr1( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10341", ipAttr1 != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10341", ipAttr1 != __nullptr );
 			if (bLastNameFirst)
 			{
 				ipAttr1->Name = "Last";
@@ -312,7 +312,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			// Handle second word as Middle or Last
 			// or First if Last was already found
 			IAttributePtr ipAttr2( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10342", ipAttr2 != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10342", ipAttr2 != __nullptr );
 			if (bLastNameFirst)
 			{
 				ipAttr2->Name = "First";
@@ -372,7 +372,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 				// Create and include a First sub-attribute
 				IAttributePtr ipAttr1( CLSID_Attribute );
-				ASSERT_RESOURCE_ALLOCATION( "ELI10343", ipAttr1 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI10343", ipAttr1 != __nullptr );
 				ipAttr1->Name = "First";
 				ipAttr1->Value = ipWord;
 				ipMainAttrSub->PushBack( ipAttr1 );	
@@ -427,7 +427,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 				// Create and include a Last sub-attribute
 				IAttributePtr ipAttr2( CLSID_Attribute );
-				ASSERT_RESOURCE_ALLOCATION( "ELI10344", ipAttr2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI10344", ipAttr2 != __nullptr );
 				ipAttr2->Name = "Last";
 				ipAttr2->Value = ipWord;
 				ipMainAttrSub->PushBack( ipAttr2 );
@@ -471,10 +471,10 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 				{
 					// Retrieve only "word" in Middle name
 					IObjectPairPtr ipOnlyPair = ipMatches->At( lStartOfMiddle );
-					ASSERT_RESOURCE_ALLOCATION( "ELI15565", ipOnlyPair != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI15565", ipOnlyPair != __nullptr );
 
 					ipToken = ITokenPtr(ipOnlyPair->Object1);
-					ASSERT_RESOURCE_ALLOCATION( "ELI15566", ipToken != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI15566", ipToken != __nullptr );
 					ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 				}
 				// Multiple "word" middle name
@@ -482,18 +482,18 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 				{
 					// Retrieve first "word" in Middle name
 					IObjectPairPtr ipFirstPair = ipMatches->At( lStartOfMiddle );
-					ASSERT_RESOURCE_ALLOCATION( "ELI15567", ipFirstPair != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI15567", ipFirstPair != __nullptr );
 
 					ipToken = ITokenPtr(ipFirstPair->Object1);
-					ASSERT_RESOURCE_ALLOCATION( "ELI15568", ipToken != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI15568", ipToken != __nullptr );
 					ipToken->GetTokenInfo( &lStartPos, &lTempEndPos, NULL, NULL );
 
 					// Retrieve last "word" in Middle name
 					IObjectPairPtr ipLastPair = ipMatches->At( lEndOfMiddle );
-					ASSERT_RESOURCE_ALLOCATION( "ELI15569", ipLastPair != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI15569", ipLastPair != __nullptr );
 
 					ipToken = ITokenPtr(ipLastPair->Object1);
-					ASSERT_RESOURCE_ALLOCATION( "ELI15570", ipToken != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI15570", ipToken != __nullptr );
 					ipToken->GetTokenInfo( &lTempStartPos, &lEndPos, NULL, NULL );
 				}
 				// No middle name
@@ -508,7 +508,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 				// Create and include a Middle sub-attribute
 				IAttributePtr ipAttr3( CLSID_Attribute );
-				ASSERT_RESOURCE_ALLOCATION( "ELI10345", ipAttr3 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI10345", ipAttr3 != __nullptr );
 				ipAttr3->Name = "Middle";
 				ipAttr3->Value = ipWord;
 				ipMainAttrSub->PushBack( ipAttr3 );
@@ -529,7 +529,7 @@ STDMETHODIMP CPersonNameSplitter::raw_GetComponentDescription(BSTR * pstrCompone
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19565", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19565", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Split the name of a person").Detach();
 	}
@@ -559,7 +559,7 @@ STDMETHODIMP CPersonNameSplitter::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_PersonNameSplitter);
-		ASSERT_RESOURCE_ALLOCATION("ELI05354", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05354", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -710,11 +710,11 @@ STDMETHODIMP CPersonNameSplitter::BuildAttribute(BSTR strParentName, BSTR strTit
 	{
 		// Create Parent Attribute
 		IAttributePtr	ipParent( CLSID_Attribute );
-		ASSERT_RESOURCE_ALLOCATION( "ELI08519", ipParent != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08519", ipParent != __nullptr );
 
 		// Retrieve collection of sub-attributes
 		IIUnknownVectorPtr	ipSubs = ipParent->GetSubAttributes();
-		ASSERT_RESOURCE_ALLOCATION( "ELI08520", ipSubs != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08520", ipSubs != __nullptr );
 
 		// Create string for Parent Attribute
 		// to be populated depending on bAutoBuildParent
@@ -728,14 +728,14 @@ STDMETHODIMP CPersonNameSplitter::BuildAttribute(BSTR strParentName, BSTR strTit
 		{
 			// Create Attribute
 			IAttributePtr	ipTitleAttribute( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08521", ipTitleAttribute != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08521", ipTitleAttribute != __nullptr );
 
 			// Apply Name
 			ipTitleAttribute->PutName( _bstr_t( "Title" ) );
 
 			// Create and populate Spatial String object for Value
 			ISpatialStringPtr	ipValue( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08522", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08522", ipValue != __nullptr );
 			ipValue->CreateNonSpatialString(strTitle, "");
 
 			// Apply Value
@@ -759,14 +759,14 @@ STDMETHODIMP CPersonNameSplitter::BuildAttribute(BSTR strParentName, BSTR strTit
 		{
 			// Create Attribute
 			IAttributePtr	ipFirstAttribute( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08524", ipFirstAttribute != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08524", ipFirstAttribute != __nullptr );
 
 			// Apply Name
 			ipFirstAttribute->PutName( _bstr_t( "First" ) );
 
 			// Create and populate Spatial String object for Value
 			ISpatialStringPtr	ipValue( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08525", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08525", ipValue != __nullptr );
 			ipValue->CreateNonSpatialString(strFirst, "");
 
 			// Apply Value
@@ -796,14 +796,14 @@ STDMETHODIMP CPersonNameSplitter::BuildAttribute(BSTR strParentName, BSTR strTit
 		{
 			// Create Attribute
 			IAttributePtr	ipMiddleAttribute( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08526", ipMiddleAttribute != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08526", ipMiddleAttribute != __nullptr );
 
 			// Apply Name
 			ipMiddleAttribute->PutName( _bstr_t( "Middle" ) );
 
 			// Create and populate Spatial String object for Value
 			ISpatialStringPtr	ipValue( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08527", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08527", ipValue != __nullptr );
 			ipValue->CreateNonSpatialString(strMiddle, "");
 
 			// Apply Value
@@ -833,14 +833,14 @@ STDMETHODIMP CPersonNameSplitter::BuildAttribute(BSTR strParentName, BSTR strTit
 		{
 			// Create Attribute
 			IAttributePtr	ipLastAttribute( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08528", ipLastAttribute != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08528", ipLastAttribute != __nullptr );
 
 			// Apply Name
 			ipLastAttribute->PutName( _bstr_t( "Last" ) );
 
 			// Create and populate Spatial String object for Value
 			ISpatialStringPtr	ipValue( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08529", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08529", ipValue != __nullptr );
 			ipValue->CreateNonSpatialString(strLast, "");
 
 			// Apply Value
@@ -870,14 +870,14 @@ STDMETHODIMP CPersonNameSplitter::BuildAttribute(BSTR strParentName, BSTR strTit
 		{
 			// Create Attribute
 			IAttributePtr	ipSuffixAttribute( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08530", ipSuffixAttribute != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08530", ipSuffixAttribute != __nullptr );
 
 			// Apply Name
 			ipSuffixAttribute->PutName( _bstr_t( "Suffix" ) );
 
 			// Create and populate Spatial String object for Value
 			ISpatialStringPtr	ipValue( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08531", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08531", ipValue != __nullptr );
 			ipValue->CreateNonSpatialString(strSuffix, "");
 
 			// Apply Value
@@ -904,7 +904,7 @@ STDMETHODIMP CPersonNameSplitter::BuildAttribute(BSTR strParentName, BSTR strTit
 		{
 			// Create and populate Spatial String object for Value
 			ISpatialStringPtr	ipValue( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08532", ipValue != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08532", ipValue != __nullptr );
 			ipValue->CreateNonSpatialString(strParent.c_str(), "");
 
 			// Apply Value
@@ -927,7 +927,7 @@ IRegularExprParserPtr CPersonNameSplitter::getParser()
 	try
 	{
 		IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("PersonNameSplitter");
-		ASSERT_RESOURCE_ALLOCATION("ELI29467", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29467", ipParser != __nullptr);
 		
 		return ipParser;
 	}

@@ -80,7 +80,7 @@ const std::string CFAMConditionUtils::ExpandTagsAndTFE(IFAMTagManager *pFAMTM, c
 	//////////////////////////////////////////////////////////////////////////
 
 	IFAMTagManagerPtr ipTag = IFAMTagManagerPtr(pFAMTM);
-	ASSERT_RESOURCE_ALLOCATION("ELI14403", ipTag != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14403", ipTag != __nullptr);
 
 	// Pass the file name with the tags(strFile) and the source doc name(strSourceDocName) as parameters to Expandtags
 	// If file name contains <SourceDocName>, ExpandTags() will use strSourceDocName to expand it [P13: 3901]
@@ -105,7 +105,7 @@ const std::string CFAMConditionUtils::ExpandTagsAndTFE(IFAMTagManager *pFAMTM, c
 IFAMTagManagerPtr CFAMConditionUtils::getFAMTagManager()
 {
 	IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-	ASSERT_RESOURCE_ALLOCATION("ELI14404", ipFAMTagManager != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14404", ipFAMTagManager != __nullptr);
 	return ipFAMTagManager;
 }
 //--------------------------------------------------------------------------------------------------

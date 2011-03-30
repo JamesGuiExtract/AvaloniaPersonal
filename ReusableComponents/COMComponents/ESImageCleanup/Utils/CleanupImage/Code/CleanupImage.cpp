@@ -147,12 +147,12 @@ BOOL CCleanupImageApp::InitInstance()
 				// create an ImageCleanupEngine
 				ESImageCleanupLib::IImageCleanupEnginePtr 
 					ipCleanupEngine(CLSID_ImageCleanupEngine);
-				ASSERT_RESOURCE_ALLOCATION("ELI17837", ipCleanupEngine != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI17837", ipCleanupEngine != __nullptr);
 
 				// create an ImageCleanupSettings object
 				ESImageCleanupLib::IImageCleanupSettingsPtr
 					ipSettings(CLSID_ImageCleanupSettings);
-				ASSERT_RESOURCE_ALLOCATION("ELI17838", ipSettings != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI17838", ipSettings != __nullptr);
 
 				// load the image cleanup settings
 				ipSettings->LoadFrom(strSettingsFile.c_str(), VARIANT_FALSE);

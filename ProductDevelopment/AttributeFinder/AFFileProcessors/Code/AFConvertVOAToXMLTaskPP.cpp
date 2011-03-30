@@ -45,7 +45,7 @@ STDMETHODIMP CAFConvertVOAToXMLTaskPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI26245", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI26245", pbValue != __nullptr);
 
 		try
 		{
@@ -80,7 +80,7 @@ STDMETHODIMP CAFConvertVOAToXMLTaskPP::Apply(void)
 		{
 			// get the output handler object
 			UCLID_AFFILEPROCESSORSLib::IAFConvertVOAToXMLTaskPtr ipAFConvertTask = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI26444", ipAFConvertTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26444", ipAFConvertTask != __nullptr);
 
 			// Get the VOA file name and ensure it is at least 5 characters (smallest file name)
 			_bstr_t bstrVOAFileName;
@@ -96,7 +96,7 @@ STDMETHODIMP CAFConvertVOAToXMLTaskPP::Apply(void)
 
 			// Check if the XML output handler has been configured
 			IMustBeConfiguredObjectPtr ipOutputConfigured = m_ipOutputToXML;
-			if (ipOutputConfigured == NULL || ipOutputConfigured->IsConfigured() == VARIANT_FALSE)
+			if (ipOutputConfigured == __nullptr || ipOutputConfigured->IsConfigured() == VARIANT_FALSE)
 			{
 				MessageBox("XML Output handler has not been configured.",
 					"Must Configure XML Output", MB_OK | MB_ICONERROR);
@@ -141,12 +141,12 @@ LRESULT CAFConvertVOAToXMLTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 
 			// Get the XML output handler as a copyable object
 			ICopyableObjectPtr ipCopy = ipAFConvertTask->XMLOutputHandler;
-			ASSERT_RESOURCE_ALLOCATION("ELI26292", ipCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26292", ipCopy != __nullptr);
 
 			// Clone the XML output handler (this way if the user cancels any changes they
 			// will not be stored in the convert task object)
 			m_ipOutputToXML = (IOutputToXMLPtr) ipCopy->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI26293", m_ipOutputToXML != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26293", m_ipOutputToXML != __nullptr);
 		}
 	
 		SetDirty(FALSE);
@@ -219,10 +219,10 @@ LRESULT CAFConvertVOAToXMLTaskPP::OnClickedBtnConfigureXMLOutput(WORD wNotifyCod
 	try
 	{	
 		// Check if the XML output object has been created yet, if not, create one.
-		if (m_ipOutputToXML == NULL)
+		if (m_ipOutputToXML == __nullptr)
 		{
 			m_ipOutputToXML.CreateInstance(CLSID_OutputToXML);
-			ASSERT_RESOURCE_ALLOCATION("ELI26288", m_ipOutputToXML != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26288", m_ipOutputToXML != __nullptr);
 
 			// Set the doc tags drop down to restrict to FAM tags
 			m_ipOutputToXML->FAMTags = VARIANT_TRUE;
@@ -230,11 +230,11 @@ LRESULT CAFConvertVOAToXMLTaskPP::OnClickedBtnConfigureXMLOutput(WORD wNotifyCod
 
 		// Get a Misc utils pointer for configuring the xml output
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI26289", ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26289", ipMiscUtils != __nullptr);
 
 		// Create an object with description for configuration
 		IObjectWithDescriptionPtr ipOutput(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI26290", ipOutput != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26290", ipOutput != __nullptr);
 
 		// Set the XML output handler as the object
 		ipOutput->Object = m_ipOutputToXML;

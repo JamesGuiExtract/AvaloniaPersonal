@@ -66,7 +66,7 @@ BOOL CRuleTesterApp::InitInstance()
 
 		// Create the IRuleTesterUI object
 		IRuleTesterUIPtr	ipRuleTesterUI(CLSID_RuleTesterUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI08814", ipRuleTesterUI != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08814", ipRuleTesterUI != __nullptr );
 
 		// get the command line and see if there was an argument provided.
 		string strFileName = "";
@@ -83,7 +83,7 @@ BOOL CRuleTesterApp::InitInstance()
 		// delete the singleton input manager instance, which
 		// may be in existence
 		IInputManagerSingletonPtr ipInputMgrSingleton(CLSID_InputManagerSingleton);
-		ASSERT_RESOURCE_ALLOCATION("ELI15791", ipInputMgrSingleton != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI15791", ipInputMgrSingleton != __nullptr );
 		ipInputMgrSingleton->DeleteInstance();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08802");

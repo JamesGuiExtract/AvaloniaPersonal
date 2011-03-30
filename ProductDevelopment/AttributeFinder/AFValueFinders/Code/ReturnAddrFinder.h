@@ -97,7 +97,7 @@ private:
 	bool m_bFindNonReturnAddresses;
 
 	// used for checking registry entries
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
 	///////////
 	// Private Methods

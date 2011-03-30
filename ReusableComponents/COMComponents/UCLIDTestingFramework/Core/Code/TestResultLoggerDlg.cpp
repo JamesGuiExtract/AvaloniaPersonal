@@ -47,10 +47,10 @@ TestResultLoggerDlg::TestResultLoggerDlg(CWnd* pParent /*=NULL*/)
 	m_bTestCaseActive = false;
 
 	// create an instance of the configuration persistence manager
-	m_apCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(new 
+	m_apCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(new 
 		RegistryPersistenceMgr(HKEY_CURRENT_USER,
 		gstrREG_ROOT_KEY + "\\TestingFramework\\Settings"));
-	ASSERT_RESOURCE_ALLOCATION("ELI08575", m_apCfgMgr.get() != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08575", m_apCfgMgr.get() != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 TestResultLoggerDlg::~TestResultLoggerDlg()
@@ -94,57 +94,57 @@ BOOL TestResultLoggerDlg::OnInitDialog()
 	{
 		CDialog::OnInitDialog();
 		
-		m_apImageList = auto_ptr<CImageList>(new CImageList());
+		m_apImageList = unique_ptr<CImageList>(new CImageList());
 		m_apImageList->Create(16, 16, ILC_MASK, 0, 1);
 
 		//COLORREF mask = GetSysColor(COLOR_3DFACE);
 		COLORREF mask = RGB(192, 192, 192);
 
-		m_apBmpHarness = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpHarness = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpHarness->LoadBitmap(IDB_BITMAP_HARNESS);
 		m_iBitmapHarness = m_apImageList->Add(m_apBmpHarness.get(), mask);
 		
-		m_apBmpComponent = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpComponent = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpComponent->LoadBitmap(IDB_BITMAP_COMPONENT);
 		m_iBitmapComponent = m_apImageList->Add(m_apBmpComponent.get(), mask);
 		
-		m_apBmpTestCaseDoneGood = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpTestCaseDoneGood = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpTestCaseDoneGood->LoadBitmap(IDB_BITMAP_TEST_CASE_DONE_GOOD);
 		m_iBitmapTestCaseDoneGood = m_apImageList->Add(m_apBmpTestCaseDoneGood.get(), mask);
 
-		m_apBmpTestCaseDoneBad = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpTestCaseDoneBad = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpTestCaseDoneBad->LoadBitmap(IDB_BITMAP_TEST_CASE_DONE_BAD);
 		m_iBitmapTestCaseDoneBad = m_apImageList->Add(m_apBmpTestCaseDoneBad.get(), mask);
 
-		m_apBmpTestCaseInProgress = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpTestCaseInProgress = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpTestCaseInProgress->LoadBitmap(IDB_BITMAP_TEST_CASE_IN_PROGRESS);
 		m_iBitmapTestCaseInProgress = m_apImageList->Add(m_apBmpTestCaseInProgress.get(), mask);
 
-		m_apBmpTestCaseDoneOtherGood = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpTestCaseDoneOtherGood = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpTestCaseDoneOtherGood->LoadBitmap(IDB_BITMAP_TEST_CASE_DONE_OTHER_GOOD);
 		m_iBitmapTestCaseDoneOtherGood = m_apImageList->Add(m_apBmpTestCaseDoneOtherGood.get(), mask);
 
-		m_apBmpTestCaseDoneOtherBad = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpTestCaseDoneOtherBad = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpTestCaseDoneOtherBad->LoadBitmap(IDB_BITMAP_TEST_CASE_DONE_OTHER_BAD);
 		m_iBitmapTestCaseDoneOtherBad = m_apImageList->Add(m_apBmpTestCaseDoneOtherBad.get(), mask);
 
-		m_apBmpNote = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpNote = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpNote->LoadBitmap(IDB_BITMAP_NOTE);
 		m_iBitmapNote = m_apImageList->Add(m_apBmpNote.get(), mask);
 
-		m_apBmpDetailNote = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpDetailNote = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpDetailNote->LoadBitmap(IDB_DETAILED_NOTE);
 		m_iBitmapDetailNote = m_apImageList->Add(m_apBmpDetailNote.get(), mask);
 
-		m_apBmpMemo = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpMemo = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpMemo->LoadBitmap(IDB_BITMAP_MEMO);
 		m_iBitmapMemo = m_apImageList->Add(m_apBmpMemo.get(), mask);
 
-		m_apBmpFile = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpFile = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpFile->LoadBitmap(IDB_BITMAP_FILE);
 		m_iBitmapFile = m_apImageList->Add(m_apBmpFile.get(), mask);
 
-		m_apBmpException = auto_ptr<CBitmap>(new CBitmap());
+		m_apBmpException = unique_ptr<CBitmap>(new CBitmap());
 		m_apBmpException->LoadBitmap(IDB_BITMAP_EXCEPTION);
 		m_iBitmapException = m_apImageList->Add(m_apBmpException.get(), mask);
 
@@ -168,7 +168,7 @@ BOOL TestResultLoggerDlg::OnInitDialog()
 //-------------------------------------------------------------------------------------------------
 UINT messageBoxProc(LPVOID pData)
 {
-	auto_ptr<string> apString ((string *) pData);
+	unique_ptr<string> apString ((string *) pData);
 	AfxMessageBox(apString->c_str(), MB_ICONINFORMATION);
 	return 0;
 }
@@ -178,7 +178,7 @@ UINT notepadProc(LPVOID pData)
 	try
 	{
 		// output the memo text to a temp file in current dir
-		auto_ptr<string> apString ((string *) pData);
+		unique_ptr<string> apString ((string *) pData);
 
 		string strOutput = apString->c_str();
 		if (!strOutput.empty())

@@ -119,9 +119,9 @@ STDMETHODIMP CSSNFinder::GetOptions(BSTR* pbstrSubattributeName, VARIANT_BOOL* p
 		validateLicense();
 
 		// ensure parameters are non-NULL
-		ASSERT_ARGUMENT("ELI18300", pbstrSubattributeName != NULL);
-		ASSERT_ARGUMENT("ELI18301", pvbSpatialSubattribute != NULL);
-		ASSERT_ARGUMENT("ELI18302", pvbClearIfNoneFound != NULL);
+		ASSERT_ARGUMENT("ELI18300", pbstrSubattributeName != __nullptr);
+		ASSERT_ARGUMENT("ELI18301", pvbSpatialSubattribute != __nullptr);
+		ASSERT_ARGUMENT("ELI18302", pvbClearIfNoneFound != __nullptr);
 
 		// set options
 		*pbstrSubattributeName = _bstr_t(m_strSubattributeName.c_str()).Detach();
@@ -148,26 +148,26 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 
 		// get the attribute
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI17310", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17310", ipAttribute != __nullptr);
 
 		// get the attribute's spatial string value	
 		ISpatialStringPtr ipSpatialString(ipAttribute->Value);
-		ASSERT_RESOURCE_ALLOCATION("ELI17311", ipSpatialString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17311", ipSpatialString != __nullptr);
 
 		// get the source document name
 		string strSourceDocName = asString(ipSpatialString->SourceDocName);
 
 		// get the spatial page info map
 		ILongToObjectMapPtr ipPageInfoMap(ipSpatialString->SpatialPageInfos);
-		ASSERT_RESOURCE_ALLOCATION("ELI19867", ipPageInfoMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19867", ipPageInfoMap != __nullptr);
 
 		// get the raster zones of this attribute
 		IIUnknownVectorPtr ipZones( ipSpatialString->GetOriginalImageRasterZones() );
-		ASSERT_RESOURCE_ALLOCATION("ELI19688", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19688", ipZones != __nullptr);
 
 		// create a spatial string to hold the result
 		ISpatialStringPtr ipFoundText(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI19689", ipFoundText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19689", ipFoundText != __nullptr);
 		
 		// set a flag to indicate no text has been found yet
 		bool bFoundText = false;
@@ -183,7 +183,7 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 		{
 			// get the ith raster zone
 			IRasterZonePtr ipZone = ipZones->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI19690", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19690", ipZone != __nullptr);
 
 			// Get the page number of this raster zone
 			long lPage = ipZone->PageNumber;
@@ -193,14 +193,14 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 			{
 				mapPageBounds[lPage] = ipSpatialString->GetOriginalImagePageBounds(lPage);
 			}
-			ASSERT_RESOURCE_ALLOCATION("ELI30318", mapPageBounds[lPage] != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30318", mapPageBounds[lPage] != __nullptr);
 
 			// find handwritten numerals within the specified bounds of the spatial string
 			ISpatialStringPtr ipZoneText = ipOCREngine->RecognizeTextInImageZone(
 				strSourceDocName.c_str(), lPage, lPage, 
 				ipZone->GetRectangularBounds(mapPageBounds[lPage]), 0, eFILTER_CHARS, "", 
 				VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, pProgressStatus);
-			ASSERT_RESOURCE_ALLOCATION("ELI18063", ipZoneText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18063", ipZoneText != __nullptr);
 
 			// if any text was found, append it
 			if(ipZoneText->IsEmpty() == VARIANT_FALSE)
@@ -254,7 +254,7 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 		{
 			// create an IIUnknownVector to store the found subattributes
 			IIUnknownVectorPtr ipSubAttributes(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI18074", ipSubAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18074", ipSubAttributes != __nullptr);
 
 			// get the subattribute type
 			_bstr_t bstrSubattributeType = ipAttribute->Type;
@@ -263,7 +263,7 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 			{
 				// get the next found social security number
 				ISpatialStringPtr ipSSN = ipFoundText->GetSubString(segment.iStartIndex, segment.iEndIndex);
-				ASSERT_RESOURCE_ALLOCATION("ELI18075", ipSSN != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18075", ipSSN != __nullptr);
 
 				// if the subattributes should not be spatial, downgrade them to hybrid
 				if(!m_bSpatialSubattribute)
@@ -273,7 +273,7 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 
 				// create an attribute to store the current found subattribute
 				IAttributePtr ipSubAttribute(CLSID_Attribute);
-				ASSERT_RESOURCE_ALLOCATION("ELI18147", ipSubAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18147", ipSubAttribute != __nullptr);
 				ipSubAttribute->Name = m_strSubattributeName.c_str();
 				ipSubAttribute->Type = bstrSubattributeType;
 				ipSubAttribute->Value = ipSSN;
@@ -290,7 +290,7 @@ STDMETHODIMP CSSNFinder::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pO
 			// if no SSNs were found and the clear if none found option is set,
 			// clear the original attribute
 			ISpatialStringPtr ipEmptySpatialString(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI18077", ipEmptySpatialString != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18077", ipEmptySpatialString != __nullptr);
 			ipAttribute->Value = ipEmptySpatialString;
 		}	
 		// else no SSNs were found and the original attribute should be retained
@@ -314,7 +314,7 @@ STDMETHODIMP CSSNFinder::raw_CopyFrom(IUnknown* pObject)
 
 		// get the SSNFinder interface
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::ISSNFinderPtr ipSSNFinder(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI18174", ipSSNFinder != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18174", ipSSNFinder != __nullptr);
 
 		// get the options from the SSNFinder object
 		_bstr_t bstrSubattributeName;
@@ -345,11 +345,11 @@ STDMETHODIMP CSSNFinder::raw_Clone(IUnknown** pObject)
 		validateLicense();
 
 		// ensure that the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI18303", pObject != NULL);
+		ASSERT_ARGUMENT("ELI18303", pObject != __nullptr);
 
 		// get the copyable object interface
 		ICopyableObjectPtr ipObjCopy(CLSID_SSNFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI17276", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17276", ipObjCopy != __nullptr);
 
 		// create a shallow copy
 		IUnknownPtr ipUnknown(this);
@@ -391,7 +391,7 @@ STDMETHODIMP CSSNFinder::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI18306", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18306", pbValue != __nullptr);
 
 		try
 		{
@@ -424,7 +424,7 @@ STDMETHODIMP CSSNFinder::raw_IsConfigured(VARIANT_BOOL* pbValue)
 		validateLicense();
 
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI18307", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18307", pbValue != __nullptr);
 
 		// the SSNFinder is configured if it has a subattribute name
 		*pbValue = asVariantBool(!m_strSubattributeName.empty());
@@ -465,7 +465,7 @@ STDMETHODIMP CSSNFinder::Load(IStream* pStream)
 		validateLicense();
 		
 		// check parameter
-		ASSERT_RESOURCE_ALLOCATION("ELI17278", pStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17278", pStream != __nullptr);
 
 		// clear the options
 		m_strSubattributeName = "SSN";
@@ -519,7 +519,7 @@ STDMETHODIMP CSSNFinder::Save(IStream* pStream, BOOL fClearDirty)
 		validateLicense();
 
 		// check parameter
-		ASSERT_ARGUMENT("ELI17281", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17281", pStream != __nullptr);
 
 		// create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -558,11 +558,11 @@ IOCREnginePtr CSSNFinder::getOCREngine()
 {
 	// instantiate a new OCR engine every time this function is called [P13 #2909]
 	IOCREnginePtr ipOCREngine(CLSID_ScansoftOCR);
-	ASSERT_RESOURCE_ALLOCATION("ELI17313", ipOCREngine != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI17313", ipOCREngine != __nullptr);
 
 	// license the engine
 	IPrivateLicensedComponentPtr ipOCREngineLicense(ipOCREngine);
-	ASSERT_RESOURCE_ALLOCATION("ELI17314", ipOCREngineLicense != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI17314", ipOCREngineLicense != __nullptr);
 	ipOCREngineLicense->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
 
 	return ipOCREngine;

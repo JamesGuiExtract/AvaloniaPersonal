@@ -131,14 +131,14 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage(BSTR strImageFileName, long 
 		}
 
 		// ensure the return value is not NULL
-		ASSERT_ARGUMENT("ELI18184", pstrText != NULL);
+		ASSERT_ARGUMENT("ELI18184", pstrText != __nullptr);
 
 		// recognize the text - with auto-rotation
 		ISpatialStringPtr ipRecognizedText = recognizeText(strImageFileName, 
 			createPageNumberVector(strImageFileName, lStartPage, lEndPage), NULL, 0, eFilter, 
 			bstrCustomFilterCharacters, eTradeOff, VARIANT_FALSE, VARIANT_FALSE, 
 			bReturnSpatialInfo, pProgressStatus);
-		ASSERT_RESOURCE_ALLOCATION("ELI18355", ipRecognizedText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18355", ipRecognizedText != __nullptr);
 
 		// return the recognized text
 		*pstrText = ipRecognizedText.Detach();
@@ -180,12 +180,12 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage2(BSTR strImageFileName,
 		}
 
 		// ensure the return value is not NULL
-		ASSERT_ARGUMENT("ELI18185", pstrText != NULL);
+		ASSERT_ARGUMENT("ELI18185", pstrText != __nullptr);
 
 		// get a vector of specified page numbers
 		IVariantVectorPtr ipvecPageNumbers 
 			= getImageUtils()->GetImagePageNumbers(strImageFileName, strPageNumbers);
-		ASSERT_RESOURCE_ALLOCATION("ELI10272", ipvecPageNumbers != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10272", ipvecPageNumbers != __nullptr);
 
 		// the vector of page numbers must contain at least one page number
 		if (get_bstr_t(strPageNumbers).length() == 0)
@@ -197,7 +197,7 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImage2(BSTR strImageFileName,
 		ISpatialStringPtr ipRecognizedText = recognizeText(strImageFileName, ipvecPageNumbers, NULL, 
 			0, kNoFilter, NULL, kRegistry, VARIANT_FALSE, VARIANT_FALSE, bReturnSpatialInfo, 
 			pProgressStatus);
-		ASSERT_RESOURCE_ALLOCATION("ELI18356", ipRecognizedText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18356", ipRecognizedText != __nullptr);
 
 		*pstrText = ipRecognizedText.Detach();
 	}
@@ -257,7 +257,7 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImageZone(BSTR strImageFileName, l
 		Win32CriticalSectionLockGuard lg(m_cs);
 
 		// validate the retval
-		ASSERT_ARGUMENT("ELI18186", pstrText != NULL);
+		ASSERT_ARGUMENT("ELI18186", pstrText != __nullptr);
 		
 		// validate the license
 		validateLicense();
@@ -302,7 +302,7 @@ STDMETHODIMP CScansoftOCR::raw_RecognizeTextInImageZone(BSTR strImageFileName, l
 				lEndPage, pZone, nRotationInDegrees, eFilter, bstrCustomFilterCharacters, 
 				bReturnUnrecognized, bReturnSpatialInfo, pProgressStatus);
 		}
-		ASSERT_RESOURCE_ALLOCATION("ELI18354", ipRecognizedText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18354", ipRecognizedText != __nullptr);
 
 		// Return the final spatial string
 		*pstrText = ipRecognizedText.Detach();
@@ -342,7 +342,7 @@ STDMETHODIMP CScansoftOCR::raw_IsLicensed(VARIANT_BOOL * pbValue)
 		Win32CriticalSectionLockGuard lg(m_cs);
 		
 		// ensure the return value pointer is valid 
-		ASSERT_ARGUMENT("ELI18357", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18357", pbValue != __nullptr);
 
 		try
 		{
@@ -426,7 +426,7 @@ void CScansoftOCR::validateLicense()
 void CScansoftOCR::initOCREngineLicense(string strKey)
 {
 	IPrivateLicensedComponentPtr ipPLComponent = m_ipOCREngine;
-	ASSERT_RESOURCE_ALLOCATION("ELI11049", ipPLComponent != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI11049", ipPLComponent != __nullptr);
 	ipPLComponent->InitPrivateLicense(strKey.c_str());
 }
 //-------------------------------------------------------------------------------------------------
@@ -441,10 +441,10 @@ IScansoftOCR2Ptr CScansoftOCR::getOCREngine()
 		InterlockedExchange(&m_ulNumImagesProcessed, 0);
 	}
 
-	if (m_ipOCREngine == NULL)
+	if (m_ipOCREngine == __nullptr)
 	{
 		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR2);
-		ASSERT_RESOURCE_ALLOCATION("ELI11088", m_ipOCREngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11088", m_ipOCREngine != __nullptr);
 
 		m_pid = m_ipOCREngine->GetPID();
 
@@ -485,10 +485,10 @@ unsigned long CScansoftOCR::getMaxRecognitionsPerOCREngineInstance()
 		bool bUseDefault = true;
 
 		// create an instance of RegistryPersistenceMgr to query the registry
-		auto_ptr<IConfigurationSettingsPersistenceMgr> apSettings = 
-			auto_ptr<IConfigurationSettingsPersistenceMgr>(new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE,
+		unique_ptr<IConfigurationSettingsPersistenceMgr> apSettings = 
+			unique_ptr<IConfigurationSettingsPersistenceMgr>(new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE,
 			strREG_PATH_FOR_THIS_CLASS));
-		ASSERT_RESOURCE_ALLOCATION("ELI13194", apSettings.get() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13194", apSettings.get() != __nullptr);
 
 		if (apSettings->keyExists("", strREG_MAX_IMAGES_PER_INSTANCE_KEY_NAME))
 		{
@@ -514,11 +514,11 @@ unsigned long CScansoftOCR::getMaxRecognitionsPerOCREngineInstance()
 void CScansoftOCR::killOCREngine()
 {
 	// attempt to close SSOCR2 gracefully first. [P13 #4590]
-	m_ipOCREngine = NULL;
+	m_ipOCREngine = __nullptr;
 
 	// hard kill OCR engine
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_pid);
-	if ( hProcess != NULL )
+	if ( hProcess != __nullptr )
 	{
 		// terminate the process
 		TerminateProcess(hProcess, 0);
@@ -557,7 +557,7 @@ void CScansoftOCR::checkOCREngine()
 				// look for SSOCR2 application error dialogs
 				m_hwndErrorDialog = FindWindowEx(NULL, NULL, MAKEINTATOM(giWINDOWS_DIALOG_CLASSNUM), 
 					gpszSSOCR2_APP_ERROR_TITLE);
-				while(m_hwndErrorDialog != NULL)
+				while(m_hwndErrorDialog != __nullptr)
 				{
 					// auto-dismiss this window
 					dismissErrorDialog(m_hwndErrorDialog);
@@ -570,7 +570,7 @@ void CScansoftOCR::checkOCREngine()
 				// look for debugger error dialogs
 				m_hwndErrorDialog = FindWindowEx(NULL, NULL, MAKEINTATOM(giWINDOWS_DIALOG_CLASSNUM), 
 					gpszSSOCR2_DEBUGGER_ERROR_TITLE);
-				while(m_hwndErrorDialog != NULL)
+				while(m_hwndErrorDialog != __nullptr)
 				{
 					// if this window contains SSOCR2-related text, auto-dismiss it
 					EnumChildWindows(m_hwndErrorDialog, enumForSSOCR2Text, (LPARAM) this);
@@ -583,7 +583,7 @@ void CScansoftOCR::checkOCREngine()
 				// Look for Vista error dialogs
 				m_hwndErrorDialog = FindWindowEx(NULL, NULL, MAKEINTATOM(giWINDOWS_DIALOG_CLASSNUM), 
 					gpszSSOCR2_VISTA_ERROR_TITLE);
-				while(m_hwndErrorDialog != NULL)
+				while(m_hwndErrorDialog != __nullptr)
 				{
 					// if this window contains SSOCR2-related text, auto-dismiss it
 					EnumChildWindows(m_hwndErrorDialog, enumForSSOCR2Text, (LPARAM) this);
@@ -610,10 +610,10 @@ void CScansoftOCR::checkOCREngine()
 //-------------------------------------------------------------------------------------------------
 IImageUtilsPtr CScansoftOCR::getImageUtils()
 {
-	if (m_ipImageUtils == NULL)
+	if (m_ipImageUtils == __nullptr)
 	{
 		m_ipImageUtils.CreateInstance(CLSID_ImageUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI10274", m_ipImageUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10274", m_ipImageUtils != __nullptr);
 	}
 
 	return m_ipImageUtils;
@@ -629,7 +629,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	InterlockedIncrement(&m_ulNumImagesProcessed);
 
 	// create auto-pointer for progress status update thread manager
-	auto_ptr<PSUpdateThreadManager> apPSUpdateThread;
+	unique_ptr<PSUpdateThreadManager> apPSUpdateThread;
 
 	// initialize stream to hold OCR results
 	_bstr_t _bstrStream;
@@ -664,7 +664,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	
 	// Maintain an exception that aggregates together all exceptions generated by failed
 	// decomposition attempts.
-	auto_ptr<UCLIDException> apAggregateException;
+	unique_ptr<UCLIDException> apAggregateException;
 
 	// iterate through different decomposition methods until one works
 	bool bTryAgain = true;
@@ -679,7 +679,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 			{
 				// Get the OCR engine
 				IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
-				ASSERT_RESOURCE_ALLOCATION("ELI25216", ipOcrEngine != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25216", ipOcrEngine != __nullptr);
 
 				// check if the progress status object should be updated
 				if (pProgressStatus)
@@ -687,7 +687,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 					// create thread to handle progress status updates
 					apPSUpdateThread.reset(new PSUpdateThreadManager(pProgressStatus, ipOcrEngine, 
 						ipPageNumbers->Size));
-					ASSERT_RESOURCE_ALLOCATION("ELI16207", apPSUpdateThread.get() != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI16207", apPSUpdateThread.get() != __nullptr);
 				}
 
 				// Kill the process if it idles
@@ -697,10 +697,10 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 				_bstrStream = ipOcrEngine->RecognizeText(strImageFileName, ipPageNumbers, pZone, 
 					nRotationInDegrees, eFilter, bstrCustomFilterCharacters, eTradeOff, 
 					vbDetectHandwriting, vbReturnUnrecognized, bReturnSpatialInfo, 
-					asVariantBool(pProgressStatus != NULL), eDecompositionMethod[i]);
+					asVariantBool(pProgressStatus != __nullptr), eDecompositionMethod[i]);
 
 				// check if the progress status update thread still exists
-				if (apPSUpdateThread.get() != NULL)
+				if (apPSUpdateThread.get() != __nullptr)
 				{
 					// mark the progress status as complete
 					apPSUpdateThread->notifyOCRComplete();
@@ -775,7 +775,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 		throw *apAggregateException;
 	}
 	// ...or log the aggregate exception if at least one attempt failed before another succeeded.
-	else if (apAggregateException.get() != NULL)
+	else if (apAggregateException.get() != __nullptr)
 	{
 		apAggregateException.reset(new UCLIDException("ELI29014", 
 			"Application trace: At least one OCR decomposition methods failed.",
@@ -789,7 +789,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	// get the spatial string from the stream
 	IPersistStreamPtr ipObj;
 	readObjectFromBSTR(ipObj, _bstrStream);
-	ASSERT_RESOURCE_ALLOCATION("ELI18352", ipObj != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18352", ipObj != __nullptr);
 
 	// return the spatial string
 	return ipObj;
@@ -805,20 +805,20 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 
 	// create a variant vector array using the specified page number
 	IVariantVectorPtr ipPageNumbers = createPageNumberVector(strImageFileName, lStartPage, lEndPage);
-	ASSERT_RESOURCE_ALLOCATION("ELI18062", ipPageNumbers != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18062", ipPageNumbers != __nullptr);
 
 	// Get the OCR engine
 	IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
-	ASSERT_RESOURCE_ALLOCATION("ELI25217", ipOcrEngine != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI25217", ipOcrEngine != __nullptr);
 
 	// create thread to handle progress status updates
 	// if progress status updates were requested
-	auto_ptr<PSUpdateThreadManager> apPSUpdateThread;
+	unique_ptr<PSUpdateThreadManager> apPSUpdateThread;
 	if (pProgressStatus)
 	{
 		apPSUpdateThread.reset(new PSUpdateThreadManager(pProgressStatus, ipOcrEngine, 
 			ipPageNumbers->Size));
-		ASSERT_RESOURCE_ALLOCATION("ELI17315", apPSUpdateThread.get() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17315", apPSUpdateThread.get() != __nullptr);
 	}
 
 	// Kill the process if it idles
@@ -827,12 +827,12 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	// OCR the image and get the results
 	_bstr_t _bstrStream = ipOcrEngine->RecognizeText(strImageFileName, ipPageNumbers, pZone, 
 		nRotationInDegrees, eFilter, bstrCustomFilterCharacters, kRegistry, VARIANT_FALSE, 
-		bReturnUnrecognized, bReturnSpatialInfo, asVariantBool(pProgressStatus != NULL), 
+		bReturnUnrecognized, bReturnSpatialInfo, asVariantBool(pProgressStatus != __nullptr), 
 		kAutoDecomposition);
 
 	// mark the progress status as complete if the 
 	// progress status update thread still exists
-	if (apPSUpdateThread.get() != NULL)
+	if (apPSUpdateThread.get() != __nullptr)
 	{
 		apPSUpdateThread->notifyOCRComplete();
 	}
@@ -840,7 +840,7 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	// return the spatial string
 	IPersistStreamPtr ipStream;
 	readObjectFromBSTR(ipStream, _bstrStream);
-	ASSERT_RESOURCE_ALLOCATION("ELI18353", ipStream != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18353", ipStream != __nullptr);
 
 	// return the stream as a spatial string
 	return (ISpatialStringPtr) ipStream;
@@ -862,7 +862,7 @@ IVariantVectorPtr CScansoftOCR::createPageNumberVector(BSTR bstrImageFileName, l
 	else
 	{
 		ipPageNumbers.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI17316", ipPageNumbers != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17316", ipPageNumbers != __nullptr);
 
 		for (long i = lStartPage; i <= lEndPage; i++)
 		{
@@ -897,7 +897,7 @@ BOOL CALLBACK CScansoftOCR::enumForSSOCR2Text(HWND hWnd, LPARAM lParam)
 	GetWindowText(hWnd, buf, giMAX_ERROR_WINDOW_TEXT);
 
 	// check #1 if the text of this window contains SSOCR2 in the text
-	if (strstr(buf, gpszSSOCR2_DEBUGGER_ERROR_TEXT) != NULL)
+	if (strstr(buf, gpszSSOCR2_DEBUGGER_ERROR_TEXT) != __nullptr)
 	{
 		// auto-dismiss this error popup window
 		CScansoftOCR* pSSOCR = (CScansoftOCR*) lParam;
@@ -908,7 +908,7 @@ BOOL CALLBACK CScansoftOCR::enumForSSOCR2Text(HWND hWnd, LPARAM lParam)
 	}
 
 	// check #2 if the text of this window contains SSOCR2 in the text
-	if (strstr(buf, gpszSSOCR2_VISTA_ERROR_TEXT) != NULL)
+	if (strstr(buf, gpszSSOCR2_VISTA_ERROR_TEXT) != __nullptr)
 	{
 		// auto-dismiss this error popup window
 		CScansoftOCR* pSSOCR = (CScansoftOCR*) lParam;

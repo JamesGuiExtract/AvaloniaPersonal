@@ -75,17 +75,17 @@ STDMETHODIMP CTranslateValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI09295", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09295", ipAttribute != __nullptr );
 
 		IAFDocumentPtr ipAFDoc(pOriginInput);
-		ASSERT_RESOURCE_ALLOCATION("ELI30071", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30071", ipAFDoc != __nullptr);
 
 		ISpatialStringPtr ipInputText;
 		string strInputText;
 		if (m_eTranslateFieldType == kTranslateValue)
 		{
 			ipInputText = ipAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI09296", ipInputText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09296", ipInputText != __nullptr);
 			strInputText = asString(ipInputText->String);
 		}
 		else if (m_eTranslateFieldType == kTranslateType)
@@ -108,7 +108,7 @@ STDMETHODIMP CTranslateValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 				
 				IIUnknownVectorPtr ipExpandedTranslationPairs =
 					m_cachedListLoader.expandTwoColumnList(m_ipTranslationStringPairs, ';', ipAFDoc);
-				ASSERT_RESOURCE_ALLOCATION("ELI30072", ipExpandedTranslationPairs != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI30072", ipExpandedTranslationPairs != __nullptr);
 
 				long nSize = ipExpandedTranslationPairs->Size();
 				for (long n=0; n<nSize; n++)
@@ -175,7 +175,7 @@ STDMETHODIMP CTranslateValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 
 					IIUnknownVectorPtr ipExpandedTranslationPairs =
 						m_cachedListLoader.expandTwoColumnList(m_ipTranslationStringPairs, ';', ipAFDoc);
-					ASSERT_RESOURCE_ALLOCATION("ELI30073", ipExpandedTranslationPairs != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI30073", ipExpandedTranslationPairs != __nullptr);
 
 					long nSize = ipExpandedTranslationPairs->Size();
 					for (long n = 0; n < nSize; n++)
@@ -229,7 +229,7 @@ STDMETHODIMP CTranslateValue::raw_GetComponentDescription(BSTR * pstrComponentDe
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19608", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19608", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Translate values or types").Detach();
 	}
@@ -252,10 +252,10 @@ STDMETHODIMP CTranslateValue::raw_CopyFrom(IUnknown *pObject)
 
 		// get the str to str map out from the pass-in object
 		UCLID_AFVALUEMODIFIERSLib::ITranslateValuePtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08291", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08291", ipSource != __nullptr);
 		
 		ICopyableObjectPtr ipCopyObj = ipSource->GetTranslationStringPairs();
-		ASSERT_RESOURCE_ALLOCATION("ELI08292", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08292", ipCopyObj != __nullptr);
 		m_ipTranslationStringPairs = ipCopyObj->Clone();
 					
 		m_bCaseSensitive = (ipSource->GetIsCaseSensitive()==VARIANT_TRUE) ? true : false;
@@ -277,7 +277,7 @@ STDMETHODIMP CTranslateValue::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_TranslateValue);
-		ASSERT_RESOURCE_ALLOCATION("ELI08363", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08363", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -370,13 +370,13 @@ STDMETHODIMP CTranslateValue::put_TranslationStringPairs(IIUnknownVector *pVal)
 		// Need to validate the type identifiers
 		if (m_eTranslateFieldType == kTranslateType)
 		{
-			if (ipNewVal != NULL)
+			if (ipNewVal != __nullptr)
 			{
 				long nSize = ipNewVal->Size();
 				for (long i=0; i < nSize; i++)
 				{
 					IStringPairPtr ipPair = ipNewVal->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI28579", ipPair != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28579", ipPair != __nullptr);
 
 					// Only validate the type it is going to
 					string strTemp = asString(ipPair->StringValue);
@@ -390,9 +390,9 @@ STDMETHODIMP CTranslateValue::put_TranslationStringPairs(IIUnknownVector *pVal)
 			}
 		}
 
-		if (m_ipTranslationStringPairs != NULL)
+		if (m_ipTranslationStringPairs != __nullptr)
 		{
-			m_ipTranslationStringPairs = NULL;
+			m_ipTranslationStringPairs = __nullptr;
 		}
 
 		m_ipTranslationStringPairs = pVal;
@@ -526,13 +526,13 @@ STDMETHODIMP CTranslateValue::put_TranslateFieldType(ETranslateFieldType newVal)
 		// Need to validate the type identifiers
 		if (m_eTranslateFieldType == kTranslateType)
 		{
-			if (m_ipTranslationStringPairs != NULL)
+			if (m_ipTranslationStringPairs != __nullptr)
 			{
 				long nSize = m_ipTranslationStringPairs->Size();
 				for (long i=0; i < nSize; i++)
 				{
 					IStringPairPtr ipPair = m_ipTranslationStringPairs->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI28581", ipPair != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28581", ipPair != __nullptr);
 
 					// Only validate the type it is going to
 					string strTemp = asString(ipPair->StringValue);
@@ -566,11 +566,11 @@ STDMETHODIMP CTranslateValue::raw_ProcessOutput(IIUnknownVector * pAttributes, I
 
 		// Create AFUtility object
 		IAFUtilityPtr ipAFUtility( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09662", ipAFUtility != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09662", ipAFUtility != __nullptr );
 
 		// Use Attributes as smart pointer
 		IIUnknownVectorPtr ipAttributes( pAttributes );
-		ASSERT_RESOURCE_ALLOCATION("ELI09663", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09663", ipAttributes != __nullptr);
 
 		// Apply Attribute Modification
 		ipAFUtility->ApplyAttributeModifier( ipAttributes, pDoc, this, VARIANT_TRUE );
@@ -630,7 +630,7 @@ STDMETHODIMP CTranslateValue::Load(IStream *pStream)
 
 		// Clear the variables first
 		m_bCaseSensitive = false;
-		m_ipTranslationStringPairs = NULL;
+		m_ipTranslationStringPairs = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -668,7 +668,7 @@ STDMETHODIMP CTranslateValue::Load(IStream *pStream)
 		// Separately read in the translation pairs
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI09972");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04724", 
 				"Translation pairs could not be read from stream!" );
@@ -708,7 +708,7 @@ STDMETHODIMP CTranslateValue::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the Translation pairs to the IStream object
 		IPersistStreamPtr ipObj( m_ipTranslationStringPairs );
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04725", 
 				"Translation pairs object does not support persistence!" );

@@ -112,7 +112,7 @@ const std::string Win32GlobalAtom::getName() const
 
 	string strAtomName = buf;
 
-	if(buf != NULL)
+	if(buf != __nullptr)
 	{
 		delete [] buf;
 	}

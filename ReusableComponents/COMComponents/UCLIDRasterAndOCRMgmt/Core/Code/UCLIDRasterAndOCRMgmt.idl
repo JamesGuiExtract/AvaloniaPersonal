@@ -928,7 +928,7 @@ library UCLID_RASTERANDOCRMGMTLib
 			[in, out] VARIANT_BOOL* pbUnderline, [in, out] VARIANT_BOOL* pbSuperScript, [in, out] VARIANT_BOOL* pbSubScript);
 		//-----------------------------------------------------------------------------------------
 		// REQUIRE: GetMode() == kSpatialMode
-		//			pSS != NULL
+		//			pSS != __nullptr
 		//			pSS.GetMode() == kSpatialMode
 		// PROMISE: This method will return true iff this string is on a previous page to pSS or 
 		//			this string is above pSS or this string is to the left of pSS.  The concepts above/below
@@ -1027,7 +1027,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		// Added as per [p13 #4942] - 03/28/2008 - JDS
 		// PROMISE: To build and return a map of word count distributions where the
 		//			keys are the word length and the value is the count of words
-		//			of that length.  If plTotalWords != NULL then plTotalWords
+		//			of that length.  If plTotalWords != __nullptr then plTotalWords
 		//			will contain the total count of words found.
 		[id(83), helpstring("method GetWordLengthDist")] HRESULT GetWordLengthDist(
 			[out] long* plTotalWords, [out, retval] ILongToLongMap** ppWordLengthMap);
@@ -1205,7 +1205,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		//            (b) bReturnSpatialInfo == VARIANT_FALSE, pstrText will be non-spatial.
 		//          (8) pProgressStatus is an optional progress status object.
 		//            (a) pProgressStatus == NULL, no progress status updates will be available.
-		//            (b) pProgressStatus != NULL, it will be updated with the current status of the progress.
+		//            (b) pProgressStatus != __nullptr, it will be updated with the current status of the progress.
 		[id(1), helpstring("method RecognizeTextInImage")] HRESULT RecognizeTextInImage(
 									[in] BSTR strImageFileName, 
 									[in] long lStartPage, 

@@ -317,11 +317,11 @@ void CEAVGeneratorDlg::OnBtnAdd()
 
 		// create a new blank IAttribute and add it to the attribute vector
 		IAttributePtr ipNewAttrib(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI18133", ipNewAttrib != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18133", ipNewAttrib != __nullptr);
 
 		// get the attribute from the smart pointer
 		IAttribute* pipNewAttrib = ipNewAttrib.Detach();
-		ASSERT_RESOURCE_ALLOCATION("ELI18271", pipNewAttrib != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18271", pipNewAttrib != __nullptr);
 
 		// set the item data to be the empty attribute
 		m_listAttributes.SetItemData(nNewItemIndex, (DWORD_PTR)pipNewAttrib);
@@ -358,19 +358,19 @@ void CEAVGeneratorDlg::OnBtnCopy()
 		CString zMode = m_listAttributes.GetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN);
 		IAttributePtr ipOriginal(
 			(IAttribute*) m_listAttributes.GetItemData(nSelectedItemIndex));
-		ASSERT_RESOURCE_ALLOCATION("ELI18135", ipOriginal != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18135", ipOriginal != __nullptr);
 
 		// create a new IAttribute
 		IAttributePtr ipAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI18134", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18134", ipAttribute != __nullptr);
 
 		// copy the old attribute to the new attribute
 		ICopyableObjectPtr ipCopy = ipAttribute;
-		ASSERT_RESOURCE_ALLOCATION("ELI18203", ipCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18203", ipCopy != __nullptr);
 		ipCopy->CopyFrom(ipOriginal);
 
 		IAttribute* pipAttribute = ipAttribute.Detach();
-		ASSERT_RESOURCE_ALLOCATION("ELI18273", pipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18273", pipAttribute != __nullptr);
 
 		// Create a new record and insert the values
 		int nCount = m_listAttributes.GetItemCount();
@@ -416,7 +416,7 @@ void CEAVGeneratorDlg::OnBtnDelete()
 				// get the attribute pointer from the list
 				IAttribute* pipAttribute = 
 					(IAttribute*) m_listAttributes.GetItemData(nSelectedItemIndex);
-				ASSERT_RESOURCE_ALLOCATION("ELI18204", pipAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18204", pipAttribute != __nullptr);
 				
 				// release the attribute pointer
 				pipAttribute->Release();
@@ -469,11 +469,11 @@ void CEAVGeneratorDlg::OnBtnSplit()
 
 			// Create the IObjectSelectorUI object
 			IObjectSelectorUIPtr	ipObjSelect( CLSID_ObjectSelectorUI );
-			ASSERT_RESOURCE_ALLOCATION("ELI10317", ipObjSelect != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI10317", ipObjSelect != __nullptr );
 
 			// initialize private license for the object
 			IPrivateLicensedComponentPtr ipPLComponent = ipObjSelect;
-			ASSERT_RESOURCE_ALLOCATION("ELI10318", ipPLComponent != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10318", ipPLComponent != __nullptr);
 			_bstr_t _bstrKey = LICENSE_MGMT_PASSWORD.c_str();
 			ipPLComponent->InitPrivateLicense(_bstrKey);
 
@@ -495,11 +495,11 @@ void CEAVGeneratorDlg::OnBtnSplit()
 				// attribute to split
 				IAttributePtr ipAttribToSplit( 
 					(IAttribute*) m_listAttributes.GetItemData(nSelectedItemIndex));
-				ASSERT_RESOURCE_ALLOCATION("ELI07381",  ipAttribToSplit != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07381",  ipAttribToSplit != __nullptr);
 
 				// Get chosen Attribute Splitter and split the Attribute
 				IAttributeSplitterPtr ipSplitter = ipASWithDesc->GetObject();
-				ASSERT_RESOURCE_ALLOCATION("ELI18180", ipSplitter != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18180", ipSplitter != __nullptr);
 
 				ipSplitter->SplitAttribute(ipAttribToSplit, NULL, NULL);
 
@@ -880,14 +880,14 @@ void CEAVGeneratorDlg::OnBtnMerge()
 
 		// Get the first attribute to merge
 		IAttributePtr ipMainAttribute = (IAttribute*) m_listAttributes.GetItemData(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI25054", ipMainAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25054", ipMainAttribute != __nullptr);
 
 		// Get the level of this attribute
 		unsigned int uiLevel = getAttributeLevel(i);
 
 		// Get the main attributes' spatial string
 		ISpatialStringPtr ipMainString = ipMainAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI25055", ipMainString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25055", ipMainString != __nullptr);
 
 		// Get the computed source image name
 		string strMainSourceDoc = getSourceImageName(ipMainString);
@@ -918,10 +918,10 @@ void CEAVGeneratorDlg::OnBtnMerge()
 			// Get the next selected item
 			i = m_listAttributes.GetNextSelectedItem(pos);
 			IAttributePtr ipNextAttribute = (IAttribute*) m_listAttributes.GetItemData(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI25057", ipNextAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25057", ipNextAttribute != __nullptr);
 
 			ISpatialStringPtr ipNextSS = ipNextAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI25595", ipNextSS != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25595", ipNextSS != __nullptr);
 
 			// Get the computed source image name and ensure that both spatial strings
 			// point to the same "image"

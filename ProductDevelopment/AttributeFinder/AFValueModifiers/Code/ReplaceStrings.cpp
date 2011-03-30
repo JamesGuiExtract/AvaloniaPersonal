@@ -33,10 +33,10 @@ CReplaceStrings::CReplaceStrings()
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI06628", m_ipReplaceInfos != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06628", m_ipReplaceInfos != __nullptr);
 
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13085", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13085", m_ipMiscUtils != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06629")
 }
@@ -45,8 +45,8 @@ CReplaceStrings::~CReplaceStrings()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
-		m_ipReplaceInfos = NULL;
+		m_ipMiscUtils = __nullptr;
+		m_ipReplaceInfos = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16364");
 }
@@ -88,10 +88,10 @@ STDMETHODIMP CReplaceStrings::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09291", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09291", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->GetValue();
-		ASSERT_ARGUMENT("ELI06631", ipInputText != NULL);
+		ASSERT_ARGUMENT("ELI06631", ipInputText != __nullptr);
 
 		// Update the progress status if it exists
 		if (m_ipProgressStatus)
@@ -131,11 +131,11 @@ STDMETHODIMP CReplaceStrings::raw_ProcessOutput(IIUnknownVector * pAttributes, I
 
 		// Create AFUtility object
 		IAFUtilityPtr ipAFUtility( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI08697", ipAFUtility != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08697", ipAFUtility != __nullptr );
 
 		// Use Attributes as smart pointer
 		IIUnknownVectorPtr ipAttributes( pAttributes );
-		ASSERT_RESOURCE_ALLOCATION("ELI08698", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08698", ipAttributes != __nullptr);
 
 		// Store the progress status object
 		m_ipProgressStatus = pProgressStatus;
@@ -155,7 +155,7 @@ STDMETHODIMP CReplaceStrings::raw_ProcessOutput(IIUnknownVector * pAttributes, I
 			for (long i=0; i < lSize; i++)
 			{
 				IAttributePtr ipAttr = ipAttributes->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI26470", ipAttr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26470", ipAttr != __nullptr);
 
 				m_lAttributeCount += ipAttr->GetAttributeSize();
 			}
@@ -189,7 +189,7 @@ STDMETHODIMP CReplaceStrings::raw_GetComponentDescription(BSTR * pstrComponentDe
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19605", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19605", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Replace strings").Detach();
 	}
@@ -288,9 +288,6 @@ STDMETHODIMP CReplaceStrings::put_Replacements(IIUnknownVector *newVal)
 	try
 	{
 		validateLicense();
-
-		// release old address
-		if (m_ipReplaceInfos != NULL) m_ipReplaceInfos = NULL;
 
 		m_ipReplaceInfos = newVal;
 
@@ -413,10 +410,10 @@ STDMETHODIMP CReplaceStrings::raw_CopyFrom(IUnknown *pObject)
 		// validate license first
 		validateLicense();
 		UCLID_AFVALUEMODIFIERSLib::IReplaceStringsPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08285", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08285", ipSource != __nullptr);
 
 		ICopyableObjectPtr ipCopyObj = ipSource->GetReplacements();
-		ASSERT_RESOURCE_ALLOCATION("ELI08286", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08286", ipCopyObj != __nullptr);
 
 		m_ipReplaceInfos = ipCopyObj->Clone();
 		
@@ -438,7 +435,7 @@ STDMETHODIMP CReplaceStrings::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_ReplaceStrings);
-		ASSERT_RESOURCE_ALLOCATION("ELI08360", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08360", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -561,7 +558,7 @@ STDMETHODIMP CReplaceStrings::Load(IStream *pStream)
 		// Clear the variables first
 		m_bIsCaseSensitive = false;
 		m_bAsRegExpr = false;
-		m_ipReplaceInfos = NULL;
+		m_ipReplaceInfos = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -597,7 +594,7 @@ STDMETHODIMP CReplaceStrings::Load(IStream *pStream)
 		// Separately read in the replacement info
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI09970");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04716", 
 				"Replacement info could not be read from stream!" );
@@ -639,7 +636,7 @@ STDMETHODIMP CReplaceStrings::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the Replacements list to the IStream object
 		IPersistStreamPtr ipObj( m_ipReplaceInfos );
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04717", 
 				"Replacement info object does not support persistence!" );
@@ -677,7 +674,7 @@ STDMETHODIMP CReplaceStrings::raw_Process(IAFDocument* pDocument, IProgressStatu
 		validateLicense();
 
 		IAFDocumentPtr ipInputDoc(pDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI07437", ipInputDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07437", ipInputDoc != __nullptr);
 
 		// Call local method
 		modifyValue(ipInputDoc->Text, pDocument, pProgressStatus);
@@ -694,14 +691,14 @@ void CReplaceStrings::modifyValue(ISpatialString* pText, IAFDocument* pDocument,
 								  IProgressStatus* pProgressStatus)
 {
 	IAFDocumentPtr ipAFDoc(pDocument);
-	ASSERT_RESOURCE_ALLOCATION("ELI14638", ipAFDoc != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14638", ipAFDoc != __nullptr);
 
 	ISpatialStringPtr ipInputText(pText);
-	ASSERT_RESOURCE_ALLOCATION( "ELI09305", ipInputText != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09305", ipInputText != __nullptr );
 
 	IIUnknownVectorPtr ipExpandedReplaceList = m_cachedListLoader.expandTwoColumnList(
 		m_ipReplaceInfos, ';', ipAFDoc);
-	ASSERT_RESOURCE_ALLOCATION("ELI30068", ipExpandedReplaceList != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30068", ipExpandedReplaceList != __nullptr);
 
 	replaceValue(ipInputText, ipExpandedReplaceList, pProgressStatus);
 }
@@ -710,8 +707,8 @@ void CReplaceStrings::replaceValue(ISpatialStringPtr ipInputText, IIUnknownVecto
 								   IProgressStatus* pProgressStatus)
 {
 	// ensure valid arguments
-	ASSERT_ARGUMENT("ELI14560", ipInputText != NULL);
-	ASSERT_ARGUMENT("ELI14561", ipReplaceInfos != NULL);
+	ASSERT_ARGUMENT("ELI14560", ipInputText != __nullptr);
+	ASSERT_ARGUMENT("ELI14561", ipReplaceInfos != __nullptr);
 
 	// use a smart pointer for the progress status object
 	IProgressStatusPtr ipProgressStatus = pProgressStatus;
@@ -738,17 +735,17 @@ void CReplaceStrings::replaceValue(ISpatialStringPtr ipInputText, IIUnknownVecto
 
 		// get each string pair out from the vector
 		IStringPairPtr ipKeyValuePair(ipReplaceInfos->At(n));
-		ASSERT_RESOURCE_ALLOCATION("ELI14562", ipKeyValuePair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14562", ipKeyValuePair != __nullptr);
 		
 		// Assign the key and value of the pair
 		_bstr_t _bstrToBeReplace = ipKeyValuePair->StringKey;
 		_bstr_t _bstrReplacement = ipKeyValuePair->StringValue;
 
-		IRegularExprParserPtr ipParser = NULL;
+		IRegularExprParserPtr ipParser = __nullptr;
 		if (m_bAsRegExpr)
 		{
 			ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("ReplaceStrings");
-			ASSERT_RESOURCE_ALLOCATION("ELI06627", ipParser != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06627", ipParser != __nullptr);
 		}
 		ipInputText->Replace(_bstrToBeReplace, _bstrReplacement,
 			asVariantBool(m_bIsCaseSensitive), 0, ipParser);

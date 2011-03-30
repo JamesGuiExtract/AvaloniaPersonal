@@ -35,7 +35,7 @@ void TaskManager::run()
 		pNextTask = getNextTask();
 
 		// if the next task is available, then run it, otherwise, break from this loop.
-		if (pNextTask != NULL)
+		if (pNextTask != __nullptr)
 			pNextTask->runSynchronously();
 		else
 			break;

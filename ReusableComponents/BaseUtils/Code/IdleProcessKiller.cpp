@@ -48,7 +48,7 @@ UINT IdleProcessKiller::monitorProcessLoop(void* pData)
 	try
 	{
 		IdleProcessKiller* pIdleProcessKiller = (IdleProcessKiller*) pData;
-		ASSERT_RESOURCE_ALLOCATION("ELI25209", pIdleProcessKiller != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25209", pIdleProcessKiller != __nullptr);
 
 		INIT_EXCEPTION_AND_TRACING("MLI03273");
 		try

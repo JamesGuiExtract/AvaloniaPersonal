@@ -77,14 +77,14 @@ STDMETHODIMP CAttributeRule::raw_CopyFrom(IUnknown * pObject)
 
 		// Create the other AttributeRule object
 		UCLID_AFCORELib::IAttributeRulePtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08219", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08219", ipSource != __nullptr);
 
 		// Set this object's Enabled property
 		m_bIsEnabled = asCppBool( ipSource->GetIsEnabled() );
 
 		// Set this object's Value Finder Rule
 		ICopyableObjectPtr ipCopyableObject = ipSource->GetAttributeFindingRule();
-		ASSERT_RESOURCE_ALLOCATION("ELI08220", ipCopyableObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08220", ipCopyableObject != __nullptr);
 		m_ipAttributeFindingRule = ipCopyableObject->Clone();
 
 		// Set this object's Description
@@ -95,12 +95,12 @@ STDMETHODIMP CAttributeRule::raw_CopyFrom(IUnknown * pObject)
 
 		// Set this object's vector of Attribute Modifying Rules
 		ICopyableObjectPtr ipRulesTemp = ipSource->GetAttributeModifyingRuleInfos();
-		ASSERT_RESOURCE_ALLOCATION("ELI08221", ipRulesTemp != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08221", ipRulesTemp != __nullptr);
 		m_ipAttributeModifyingRuleInfos = ipRulesTemp->Clone();
 
 		// Set this object's Rule-Specific Document Preprocessor
 		IObjectWithDescriptionPtr ipPreTemp = ipSource->GetRuleSpecificDocPreprocessor();
-		ASSERT_RESOURCE_ALLOCATION("ELI08222", ipPreTemp != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08222", ipPreTemp != __nullptr);
 		m_ipDocPreprocessor = ipPreTemp->Clone();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08223");
@@ -120,7 +120,7 @@ STDMETHODIMP CAttributeRule::raw_Clone(IUnknown * * pObject)
 		// Create a new IAttributeRule object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_AttributeRule );
-		ASSERT_RESOURCE_ALLOCATION("ELI04686", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI04686", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -239,10 +239,10 @@ STDMETHODIMP CAttributeRule::get_AttributeModifyingRuleInfos(IIUnknownVector **p
 		validateLicense();
 
 		// if the AttributeModifyingRules vector object has not yet been created, create it.
-		if (m_ipAttributeModifyingRuleInfos == NULL)
+		if (m_ipAttributeModifyingRuleInfos == __nullptr)
 		{
 			m_ipAttributeModifyingRuleInfos.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI04573", m_ipAttributeModifyingRuleInfos != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI04573", m_ipAttributeModifyingRuleInfos != __nullptr);
 		}
 
 		CComQIPtr<IIUnknownVector> ipModifyingRuleInfos(m_ipAttributeModifyingRuleInfos);
@@ -316,7 +316,7 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 		// create a vector to hold values that have 
 		// been processed with modifying rules
 		IIUnknownVectorPtr ipResultingValues(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI06033", ipResultingValues != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06033", ipResultingValues != __nullptr);
 
 		if (m_bIsEnabled)
 		{
@@ -353,9 +353,9 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 				// to be local to this rule
 				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
 				ICopyableObjectPtr ipCopyObj = ipAFDoc;
-				ASSERT_RESOURCE_ALLOCATION("ELI15665", ipCopyObj != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15665", ipCopyObj != __nullptr);
 				UCLID_AFCORELib::IAFDocumentPtr ipAFDocCopy = ipCopyObj->Clone();
-				ASSERT_RESOURCE_ALLOCATION("ELI15666", ipAFDocCopy != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15666", ipAFDocCopy != __nullptr);
 
 				// Preprocess the doc if there's any preprocessor thats enabled
 				if (bEnabledAttributePreProcessorExists)
@@ -372,8 +372,8 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 
 						// Create a pointer to the Sub-ProgressStatus object, depending upon whether
 						// the caller requested progress information
-						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
-							NULL : ipProgressStatus->SubProgressStatus;
+						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+							__nullptr : ipProgressStatus->SubProgressStatus;
 
 						// Execute the local attribute-level pre-processor rule
 						ipDocPreprocessor->Process(ipAFDocCopy, ipSubProgressStatus);
@@ -390,8 +390,8 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 				// Find all possible values through current attribute finding rule,
 				// if the progress status is non-NULL pass in its sub progress object
 				IIUnknownVectorPtr ipOriginAttributes = m_ipAttributeFindingRule->ParseText(
-					ipAFDocCopy, (ipProgressStatus ? ipProgressStatus->SubProgressStatus : NULL) );
-				ASSERT_RESOURCE_ALLOCATION("ELI06034", ipOriginAttributes != NULL);
+					ipAFDocCopy, (ipProgressStatus ? ipProgressStatus->SubProgressStatus : __nullptr) );
+				ASSERT_RESOURCE_ALLOCATION("ELI06034", ipOriginAttributes != __nullptr);
 
 				// Start next item group if progress status was requested
 				if (ipProgressStatus)
@@ -405,7 +405,7 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 
 				// Create a sub progress status if caller requested progress status updates
 				IProgressStatusPtr ipSubProgressStatus = 
-					ipProgressStatus ? ipProgressStatus->SubProgressStatus : NULL;
+					ipProgressStatus ? ipProgressStatus->SubProgressStatus : __nullptr;
 
 				// Initialize the sub progress status if it exists
 				if (ipSubProgressStatus)
@@ -427,10 +427,10 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 					// get each attribute
 					UCLID_AFCORELib::IAttributePtr ipAttribute =
 						ipOriginAttributes->At(n);
-					ASSERT_RESOURCE_ALLOCATION("ELI06035", ipAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI06035", ipAttribute != __nullptr);
 
 					ISpatialStringPtr ipAttrValue = ipAttribute->Value;
-					ASSERT_RESOURCE_ALLOCATION("ELI15496", ipAttrValue != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15496", ipAttrValue != __nullptr);
 					if (ipAttrValue->IsEmpty() == VARIANT_TRUE)
 					{
 						// do not want any attribute with empty value
@@ -461,7 +461,7 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 				// Long term solution should involve making a separate hierarchical 
 				// <RuleTesterDebugInfo> tag proposed by Arvind
 				IStrToStrMapPtr ipStrMap = ipAFDoc->StringTags;
-				ASSERT_RESOURCE_ALLOCATION("ELI20203", ipStrMap != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20203", ipStrMap != __nullptr);
 				ipStrMap->Merge(ipAFDocCopy->StringTags, kAppend);
 			}
 		}
@@ -487,10 +487,10 @@ STDMETHODIMP CAttributeRule::get_RuleSpecificDocPreprocessor(IObjectWithDescript
 	{
 		validateLicense();
 
-		if (m_ipDocPreprocessor == NULL)
+		if (m_ipDocPreprocessor == __nullptr)
 		{
 			m_ipDocPreprocessor.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI05860", m_ipDocPreprocessor != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05860", m_ipDocPreprocessor != __nullptr);
 		}
 
 		IObjectWithDescriptionPtr ipShallowCopy = m_ipDocPreprocessor;
@@ -541,7 +541,7 @@ STDMETHODIMP CAttributeRule::IsDirty(void)
 		if (!m_bDirty)
 		{
 			IPersistStreamPtr ipPersistStream(m_ipAttributeFindingRule);
-			if (ipPersistStream==NULL)
+			if (ipPersistStream==__nullptr)
 			{
 				throw UCLIDException("ELI04788", "Object does not support persistence!");
 			}
@@ -551,9 +551,9 @@ STDMETHODIMP CAttributeRule::IsDirty(void)
 				return hr;
 			}
 
-			ipPersistStream = NULL;
+			ipPersistStream = __nullptr;
 			ipPersistStream = m_ipAttributeModifyingRuleInfos;
-			if (ipPersistStream==NULL)
+			if (ipPersistStream==__nullptr)
 			{
 				throw UCLIDException("ELI04789", "Object does not support persistence!");
 			}
@@ -595,18 +595,18 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 		// Reset all the member variables
 		m_bIsEnabled = false;
 		m_strAttributeRuleDescription = "";
-		m_ipAttributeFindingRule = NULL;
-		m_ipAttributeModifyingRuleInfos = NULL;
+		m_ipAttributeFindingRule = __nullptr;
+		m_ipAttributeModifyingRuleInfos = __nullptr;
 		// version 2 has m_bApplyModifyingRules
 		m_bApplyModifyingRules = false;
 		// Version 3 has a Document Preprocessor
-		m_ipDocPreprocessor = NULL;
+		m_ipDocPreprocessor = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
-		pStream->Read( &nDataLength, sizeof(nDataLength), NULL );
+		pStream->Read( &nDataLength, sizeof(nDataLength), __nullptr );
 		ByteStream data( nDataLength );
-		pStream->Read( data.getData(), nDataLength, NULL );
+		pStream->Read( data.getData(), nDataLength, __nullptr );
 		ByteStreamManipulator dataReader( ByteStreamManipulator::kRead, data );
 
 		// Read the individual data items from the bytestream
@@ -637,7 +637,7 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 		// Separately read the value finding rule object from the stream
 		IPersistStreamPtr ipObj;
 		readObjectFromStream(ipObj, pStream, "ELI09952");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04582", 
 				"Attribute Finding Rule object could not be read from stream!" );
@@ -645,9 +645,9 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 		m_ipAttributeFindingRule = ipObj;
 
 		// Separately read the attribute modifying rules from the stream
-		ipObj = NULL;
+		ipObj = __nullptr;
 		readObjectFromStream(ipObj, pStream, "ELI09953");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04583", 
 				"Attribute Modifying Rules collection could not be read from stream!" );
@@ -665,9 +665,9 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 		// DocumentPreprocessor object-with-description
 		if (nDataVersion >= 3)
 		{
-			ipObj = NULL;
+			ipObj = __nullptr;
 			readObjectFromStream(ipObj, pStream, "ELI09954");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException( "ELI06123", 
 					"DocumentPreprocessor object could not be read from stream!");
@@ -703,12 +703,12 @@ STDMETHODIMP CAttributeRule::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
-		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
-		pStream->Write( data.getData(), nDataLength, NULL );
+		pStream->Write( &nDataLength, sizeof(nDataLength), __nullptr );
+		pStream->Write( data.getData(), nDataLength, __nullptr );
 
 		// Separately write the value finding rule object to the stream
 		IPersistStreamPtr ipPersistentObj = m_ipAttributeFindingRule;
-		if (ipPersistentObj == NULL)
+		if (ipPersistentObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04580", 
 				"Attribute Finding Rule object does not support persistence!" );
@@ -719,7 +719,7 @@ STDMETHODIMP CAttributeRule::Save(IStream *pStream, BOOL fClearDirty)
 		}
 
 		ipPersistentObj = getAttribModifyRuleInfos();
-		if (ipPersistentObj == NULL)
+		if (ipPersistentObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04581", 
 				"Attribute Modifying Rules collection does not support persistence!" );
@@ -731,7 +731,7 @@ STDMETHODIMP CAttributeRule::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the DocumentPreprocessor object-with-description to the stream
 		ipPersistentObj = getDocPreprocessor();
-		if (ipPersistentObj == NULL)
+		if (ipPersistentObj == __nullptr)
 		{
 			throw UCLIDException( "ELI06124", 
 				"DocumentPreprocessor object does not support persistence!" );
@@ -765,7 +765,7 @@ STDMETHODIMP CAttributeRule::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		if (pbValue == NULL)
+		if (pbValue == __nullptr)
 		{
 			return E_POINTER;
 		}
@@ -791,10 +791,10 @@ IIUnknownVectorPtr CAttributeRule::getAttribModifyRuleInfos()
 {
 	try
 	{
-		if (m_ipAttributeModifyingRuleInfos == NULL)
+		if (m_ipAttributeModifyingRuleInfos == __nullptr)
 		{
 			m_ipAttributeModifyingRuleInfos.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI16930", m_ipAttributeModifyingRuleInfos != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16930", m_ipAttributeModifyingRuleInfos != __nullptr);
 		}
 
 		return m_ipAttributeModifyingRuleInfos;
@@ -806,10 +806,10 @@ IObjectWithDescriptionPtr CAttributeRule::getDocPreprocessor()
 {
 	try
 	{
-		if (m_ipDocPreprocessor == NULL)
+		if (m_ipDocPreprocessor == __nullptr)
 		{
 			m_ipDocPreprocessor.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI16928", m_ipDocPreprocessor != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16928", m_ipDocPreprocessor != __nullptr);
 		}
 
 		return m_ipDocPreprocessor;
@@ -824,7 +824,7 @@ void CAttributeRule::applyModifyingRulesOnAttribute(UCLID_AFCORELib::IAttributeP
 {
 	// Do not apply rules to an empty string
 	ISpatialStringPtr ipValue = ripAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI15497", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15497", ipValue != __nullptr);
 	if (ipValue->IsEmpty() == VARIANT_TRUE)
 	{
 		return;
@@ -834,7 +834,7 @@ void CAttributeRule::applyModifyingRulesOnAttribute(UCLID_AFCORELib::IAttributeP
 	if (bRecursive)
 	{
 		IIUnknownVectorPtr ipSubAttributes = ripAttribute->SubAttributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI18151", ipSubAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18151", ipSubAttributes != __nullptr);
 
 		// check if the attribute has any subattribute prior to applying modifying rules.
 		// NOTE: since some value modifiers create subattributes, recursion 
@@ -854,7 +854,7 @@ void CAttributeRule::applyModifyingRulesOnAttribute(UCLID_AFCORELib::IAttributeP
 			// NOTE: no progress information is available on the recursive aspect of
 			// running the modifying rules.
 			UCLID_AFCORELib::IAttributePtr ipSubAttr(ipSubAttributes->At(n));
-			applyModifyingRulesOnAttribute(ipSubAttr, pOriginInput, NULL, bRecursive);
+			applyModifyingRulesOnAttribute(ipSubAttr, pOriginInput, __nullptr, bRecursive);
 		}
 	}
 	else // no recursion was requested
@@ -873,7 +873,7 @@ void CAttributeRule::executeModifyingRulesOnAttribute(UCLID_AFCORELib::IAttribut
 
 		// if the progress status object exists initialize its sub progress object
 		IProgressStatusPtr ipSubProgressStatus = 
-			(ipProgressStatus ? ipProgressStatus->SubProgressStatus : NULL);
+			(ipProgressStatus ? ipProgressStatus->SubProgressStatus : __nullptr);
 
 		if (ipSubProgressStatus)
 		{
@@ -899,7 +899,7 @@ void CAttributeRule::executeModifyingRulesOnAttribute(UCLID_AFCORELib::IAttribut
 
 				// check to see if the text is empty, if it is, jump out of the loop
 				ISpatialStringPtr ipValue = ripAttribute->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI15498", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15498", ipValue != __nullptr);
 				if (ipValue->IsEmpty() == VARIANT_TRUE)
 				{
 					break;
@@ -907,7 +907,7 @@ void CAttributeRule::executeModifyingRulesOnAttribute(UCLID_AFCORELib::IAttribut
 
 				// Get the modifying rule object
 				UCLID_AFCORELib::IAttributeModifyingRulePtr ipModifyingRule(ipMRInfo->Object);
-				if (ipModifyingRule == NULL)
+				if (ipModifyingRule == __nullptr)
 				{
 					UCLIDException uclidException("ELI04165", "Failed to get valid ModifyingRule.");
 					uclidException.addDebugInfo("ModifyingRuleName", string(ipMRInfo->Description));
@@ -918,7 +918,7 @@ void CAttributeRule::executeModifyingRulesOnAttribute(UCLID_AFCORELib::IAttribut
 
 				// modify the value, passing the sub-sub progress status if SubProgressStatus exists
 				ipModifyingRule->ModifyValue(ripAttribute, ipOriginInput, 
-					(ipSubProgressStatus ? ipSubProgressStatus->SubProgressStatus : NULL) );
+					(ipSubProgressStatus ? ipSubProgressStatus->SubProgressStatus : __nullptr) );
 			}
 		}
 	}
@@ -931,7 +931,7 @@ void CAttributeRule::validateLicense()
 //-------------------------------------------------------------------------------------------------
 bool CAttributeRule::enabledAttributePreProcessorExists()
 {
-	return (m_ipDocPreprocessor != NULL) && (m_ipDocPreprocessor->Object != NULL) &&
+	return (m_ipDocPreprocessor != __nullptr) && (m_ipDocPreprocessor->Object != __nullptr) &&
 		asCppBool( m_ipDocPreprocessor->GetEnabled() );
 }
 //-------------------------------------------------------------------------------------------------
@@ -951,7 +951,7 @@ long CAttributeRule::getEnabledValueModifyingRulesCount()
 				// get individual AttributeModifyingRuleInfo
 				IObjectWithDescriptionPtr ipMRInfo = m_ipAttributeModifyingRuleInfos->At(i);
 
-				if ( ipMRInfo != NULL && asCppBool(ipMRInfo->Enabled) )
+				if ( ipMRInfo != __nullptr && asCppBool(ipMRInfo->Enabled) )
 				{
 					nCount++;
 				}

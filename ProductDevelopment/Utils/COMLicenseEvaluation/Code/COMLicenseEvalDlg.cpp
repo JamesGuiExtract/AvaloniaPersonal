@@ -111,8 +111,7 @@ CCOMLicenseEvalDlg::CCOMLicenseEvalDlg(CWnd* pParent /*=NULL*/)
 
 #ifdef _DEBUG
 	// Create registry persistence object
-	ma_pSettingsCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-		new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrUTILITIES_FOLDER ) );
+	ma_pSettingsCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrUTILITIES_FOLDER));
 #endif
 }
 //-------------------------------------------------------------------------------------------------

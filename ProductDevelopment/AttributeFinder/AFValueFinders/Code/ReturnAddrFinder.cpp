@@ -44,12 +44,12 @@ CReturnAddrFinder::CReturnAddrFinder()
 	reset();
 
 	m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-	ASSERT_RESOURCE_ALLOCATION("ELI08911", m_ipAFUtility != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08911", m_ipAFUtility != __nullptr);
 	m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI08912", m_ipMiscUtils != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08912", m_ipMiscUtils != __nullptr);
 
 	// Get Configuration Manager for dialog
-	ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+	ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_VALUE_FINDERS_KEY_PATH ));
 }
 //-------------------------------------------------------------------------------------------------
@@ -138,13 +138,13 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 
 		// wrap the AF document in a smart pointer
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI25636", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25636", ipAFDoc != __nullptr);
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI08659", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08659", ipAttributes != __nullptr);
 
 		IAttributeSplitterPtr ipSplitter(CLSID_AddressSplitter);
-		ASSERT_RESOURCE_ALLOCATION("ELI08730", ipSplitter != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08730", ipSplitter != __nullptr);
 		
 		// Load the body regular expression
 		string strRegExpBody =
@@ -166,13 +166,13 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 		// create regular expression parsers
 		IRegularExprParserPtr ipPrefixParser =
 			m_ipMiscUtils->GetNewRegExpParserInstance("ReturnAddrFinder");
-		ASSERT_RESOURCE_ALLOCATION("ELI08621", ipPrefixParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08621", ipPrefixParser != __nullptr);
 		IRegularExprParserPtr ipAddressParser =
 			m_ipMiscUtils->GetNewRegExpParserInstance("ReturnAddrFinder");
-		ASSERT_RESOURCE_ALLOCATION("ELI25637", ipAddressParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25637", ipAddressParser != __nullptr);
 		IRegularExprParserPtr ipSuffixParser =
 			m_ipMiscUtils->GetNewRegExpParserInstance("ReturnAddrFinder");
-		ASSERT_RESOURCE_ALLOCATION("ELI08942", ipSuffixParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08942", ipSuffixParser != __nullptr);
 
 		// Add the pattern to the suffix parser
 		ipSuffixParser->Pattern = strRegExpSuffix.c_str();
@@ -181,15 +181,15 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 
 		// Get the Spatial String that represents the entire document
 		ISpatialStringPtr ipTempSS = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI15600", ipTempSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15600", ipTempSS != __nullptr);
 
 		// Split the lines of the spatial string (removing unnecessary space)
 		IIUnknownVectorPtr ipTmpVec = ipTempSS->GetSplitLines(4);
-		ASSERT_RESOURCE_ALLOCATION("ELI15602", ipTmpVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15602", ipTmpVec != __nullptr);
 
 		// Build a new spatial string from the split lines
 		ISpatialStringPtr ipSS(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI23640", ipSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23640", ipSS != __nullptr);
 		ipSS->CreateFromLines(ipTmpVec);
 		bool bHasSpatialInfo = asCppBool(ipSS->HasSpatialInfo());
 
@@ -215,7 +215,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 				// Search the string for the address
 				IIUnknownVectorPtr ipFoundAddresses = ipAddressParser->Find(ipSS->String, 
 					VARIANT_FALSE, VARIANT_FALSE);
-				ASSERT_RESOURCE_ALLOCATION("ELI15398", ipFoundAddresses != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15398", ipFoundAddresses != __nullptr);
 
 				long lFoundSize = ipFoundAddresses->Size();
 				for (long i = 0; i < lFoundSize; i++)
@@ -230,12 +230,12 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 					
 					// Get the sub-string from the start and end points
 					ISpatialStringPtr ipAddressString = ipSS->GetSubString(nStart, nEnd);
-					ASSERT_RESOURCE_ALLOCATION("ELI15399", ipAddressString != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15399", ipAddressString != __nullptr);
 
 					// Now remove the prefix from the string
 					IIUnknownVectorPtr ipPrefixes = ipPrefixParser->Find(ipAddressString->GetString(),
 						VARIANT_TRUE, VARIANT_FALSE);
-					ASSERT_RESOURCE_ALLOCATION("ELI25638", ipPrefixes != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25638", ipPrefixes != __nullptr);
 
 					// Get the substing
 					long nPrefixStart;
@@ -245,10 +245,10 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 					// Now that we have the prefix, remove it from the found address
 					ipAddressString = ipAddressString->GetSubString(nPrefixEnd+1,
 						ipAddressString->Size-1);
-					ASSERT_RESOURCE_ALLOCATION("ELI25639", ipAddressString != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25639", ipAddressString != __nullptr);
 
 					IAttributePtr ipAttribute(CLSID_Attribute);
-					ASSERT_RESOURCE_ALLOCATION("ELI08960", ipAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI08960", ipAttribute != __nullptr);
 					ipAttribute->Name = "ReturnAddress";
 					ipAttribute->Value = ipAddressString;
 					ipAttributes->PushBack(ipAttribute);
@@ -258,29 +258,29 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 			{
 				// Create a spatial string searcher for the input text
 				ISpatialStringSearcherPtr ipSearcher(CLSID_SpatialStringSearcher);
-				ASSERT_RESOURCE_ALLOCATION("ELI08701", ipSearcher != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI08701", ipSearcher != __nullptr);
 				ipSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
 				ipSearcher->SetBoundaryResolution(kLine);
 
 				// get the pages of the spatial string
 				IIUnknownVectorPtr ipPages(ipSS->GetPages());
-				ASSERT_RESOURCE_ALLOCATION("ELI20429", ipPages != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20429", ipPages != __nullptr);
 
 				// find prefixes on each page of the document [P16 #2943]
 				IIUnknownVectorPtr ipFound(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI20432", ipFound != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20432", ipFound != __nullptr);
 				vector<long> vecPageNumbers;
 				long lSize = ipPages->Size();
 				for(long i=0; i < lSize; i++)
 				{
 					// get the ith page
 					ISpatialStringPtr ipPage(ipPages->At(i));
-					ASSERT_RESOURCE_ALLOCATION("ELI20428", ipPage != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI20428", ipPage != __nullptr);
 
 					// find the prefixes on this page
 					IIUnknownVectorPtr ipFoundOnPage = 
 						ipPrefixParser->Find(ipPage->String, VARIANT_FALSE, VARIANT_FALSE);
-					ASSERT_RESOURCE_ALLOCATION("ELI20433", ipFoundOnPage != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI20433", ipFoundOnPage != __nullptr);
 
 					// check if any prefixes were found
 					long lFoundSize = ipFoundOnPage->Size();
@@ -299,7 +299,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 				// so that if a second prefix is found on the same page we do not
 				// have to re-line twice or create a second spatial string searcher
 				long lCurrPage = -1;
-				ISpatialStringPtr ipPage = NULL;
+				ISpatialStringPtr ipPage = __nullptr;
 
 				// for each found address
 				long lFoundSize = ipFound->Size();
@@ -312,7 +312,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 					if (lPageNum != lCurrPage)
 					{
 						ipPage = ipSS->GetSpecifiedPages(lPageNum, lPageNum);
-						ASSERT_RESOURCE_ALLOCATION("ELI15601", ipPage != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15601", ipPage != __nullptr);
 
 						// prepare to extract a region of text from the page
 						ipSearcher->InitSpatialStringSearcher(ipPage);
@@ -324,24 +324,24 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 					long nTokEnd;
 					m_ipMiscUtils->GetRegExpData(ipFound, i, -1, &nTokStart, &nTokEnd);
 					ISpatialStringPtr ipPrefix = ipPage->GetSubString(nTokStart, nTokEnd);
-					ASSERT_RESOURCE_ALLOCATION("ELI15402", ipPrefix != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15402", ipPrefix != __nullptr);
 
-					ISpatialStringPtr ipAddressString = NULL;
+					ISpatialStringPtr ipAddressString = __nullptr;
 					ipAddressString = getAddressNearPrefix(ipSearcher, ipPrefix, ipAddressParser); 
 
-					if(ipAddressString == NULL)
+					if(ipAddressString == __nullptr)
 					{
 						continue;
 					}
 
-					ISpatialStringPtr ipNewBlock = NULL;
+					ISpatialStringPtr ipNewBlock = __nullptr;
 					if (bUseCreateBlocks)
 					{
 						//////////////////////////////////////////////////////////
 						// Now that we have found an address its time to repair it
 						//////////////////////////////////////////////////////////
 						IIUnknownVectorPtr ipTmpLines = ipAddressString->GetSplitLines(4);
-						ASSERT_RESOURCE_ALLOCATION("ELI15396", ipTmpLines != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15396", ipTmpLines != __nullptr);
 
 						// only build blocks if there are more than two lines
 						// a non-formatted address could begin at the end of a line
@@ -354,7 +354,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 							// want to think about it right now
 							ipAddressString->CreateFromLines(ipTmpLines);
 							IIUnknownVectorPtr ipBlocks = ipAddressString->GetBlocks(0);
-							ASSERT_RESOURCE_ALLOCATION("ELI15395", ipBlocks != NULL)
+							ASSERT_RESOURCE_ALLOCATION("ELI15395", ipBlocks != __nullptr)
 
 							// Now choose from among all the blocks, which is the most correct
 							ipNewBlock = chooseBlock(ipSuffixParser, ipBlocks);
@@ -373,7 +373,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 					// We only want the first match
 					IIUnknownVectorPtr ipPrefixes = ipPrefixParser->Find(ipNewBlock->GetString(), 
 						VARIANT_TRUE, VARIANT_FALSE);
-					ASSERT_RESOURCE_ALLOCATION("ELI15403", ipPrefixes != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15403", ipPrefixes != __nullptr);
 
 					if(ipPrefixes->Size() > 0)
 					{
@@ -392,7 +392,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 						// Create an attribute to store the data
 						///////////////////////////////////////////////////////////////
 						IAttributePtr ipAttribute(CLSID_Attribute);
-						ASSERT_RESOURCE_ALLOCATION("ELI08961", ipAttribute != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI08961", ipAttribute != __nullptr);
 						ipAttribute->Name = "ReturnAddress";
 						ipAttribute->Value = ipNewBlock;
 						ipAttributes->PushBack(ipAttribute);
@@ -416,9 +416,9 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 			bHasSpatialInfo) // this is a spatial string
 		{
 			IAttributeFindingRulePtr ipAddressFinder(CLSID_AddressFinder);
-			ASSERT_RESOURCE_ALLOCATION("ELI08934", ipAddressFinder != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08934", ipAddressFinder != __nullptr);
 			ipAttributes = ipAddressFinder->ParseText(ipAFDoc, NULL);
-			ASSERT_RESOURCE_ALLOCATION("ELI25640", ipAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25640", ipAttributes != __nullptr);
 		}
 
 		*pAttributes = ipAttributes.Detach();
@@ -437,7 +437,7 @@ STDMETHODIMP CReturnAddrFinder::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19583", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19583", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Return address finder").Detach();
 	}
@@ -458,7 +458,7 @@ STDMETHODIMP CReturnAddrFinder::raw_CopyFrom(IUnknown * pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IReturnAddrFinderPtr ipCopyObj(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08946", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08946", ipCopyObj != __nullptr);
 
 		m_bFindNonReturnAddresses = (ipCopyObj->GetFindNonReturnAddresses() == VARIANT_TRUE) ? true : false;
 
@@ -478,7 +478,7 @@ STDMETHODIMP CReturnAddrFinder::raw_Clone(IUnknown * * pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_ReturnAddrFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI08348", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08348", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -650,8 +650,8 @@ ISpatialStringPtr CReturnAddrFinder::chooseBlock(IRegularExprParserPtr ipSuffixP
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI25641", ipSuffixParser != NULL);
-		ASSERT_ARGUMENT("ELI25642", ipBlocks != NULL);
+		ASSERT_ARGUMENT("ELI25641", ipSuffixParser != __nullptr);
+		ASSERT_ARGUMENT("ELI25642", ipBlocks != __nullptr);
 
 		vector<ISpatialStringPtr> vecNewBlocks;
 		unsigned long ulBlockCount = ipBlocks->Size();
@@ -659,7 +659,7 @@ ISpatialStringPtr CReturnAddrFinder::chooseBlock(IRegularExprParserPtr ipSuffixP
 		for (uj = 0; uj < ulBlockCount; uj++)
 		{
 			ISpatialStringPtr ipBlock = ipBlocks->At(uj);
-			ASSERT_RESOURCE_ALLOCATION("ELI08929", ipBlock != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08929", ipBlock != __nullptr);
 			vecNewBlocks.push_back(ipBlock);
 		}
 
@@ -709,7 +709,7 @@ ISpatialStringPtr CReturnAddrFinder::chooseBlock(IRegularExprParserPtr ipSuffixP
 			ISpatialStringPtr ipSS = vecNewBlocks[uj];
 			IIUnknownVectorPtr ipTmpVec = ipSuffixParser->Find(ipSS->String, VARIANT_TRUE, 
 				VARIANT_FALSE);
-			ASSERT_RESOURCE_ALLOCATION("ELI25643", ipTmpVec != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25643", ipTmpVec != __nullptr);
 
 			if (ipTmpVec->Size() > 0)
 			{
@@ -751,16 +751,16 @@ ISpatialStringPtr CReturnAddrFinder::getAddressNearPrefix(ISpatialStringSearcher
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI25645", ipSearcher != NULL);
-		ASSERT_ARGUMENT("ELI25646", ipPrefix != NULL);
-		ASSERT_ARGUMENT("ELI25647", ipRegExpParser != NULL);
+		ASSERT_ARGUMENT("ELI25645", ipSearcher != __nullptr);
+		ASSERT_ARGUMENT("ELI25646", ipPrefix != __nullptr);
+		ASSERT_ARGUMENT("ELI25647", ipRegExpParser != __nullptr);
 
-		ISpatialStringPtr ipAddressString = NULL;
+		ISpatialStringPtr ipAddressString = __nullptr;
 
 		// Now build a spatial region based on the location of the 
 		// prefix
 		ILongRectanglePtr ipPrefixRect = ipPrefix->GetOriginalImageBounds();
-		ASSERT_RESOURCE_ALLOCATION("ELI25648", ipPrefixRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25648", ipPrefixRect != __nullptr);
 
 		long lPrefixCharWidth = ipPrefix->GetAverageCharWidth();
 		long lPrefixLineHeight = ipPrefix->GetAverageLineHeight();
@@ -780,13 +780,13 @@ ISpatialStringPtr CReturnAddrFinder::getAddressNearPrefix(ISpatialStringSearcher
 
 			// Do not rotate the rectangle per the OCR
 			ISpatialStringPtr ipRegion = ipSearcher->GetDataInRegion( ipPrefixRect, VARIANT_FALSE );
-			ASSERT_RESOURCE_ALLOCATION("ELI25649", ipRegion != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25649", ipRegion != __nullptr);
 
 			// Now that we have the region of the document where the address is likely to be 
 			// run the full address regexp on it
 			IIUnknownVectorPtr ipAddresses = ipRegExpParser->Find(ipRegion->String, 
 				VARIANT_TRUE, VARIANT_FALSE);
-			ASSERT_RESOURCE_ALLOCATION("ELI25650", ipAddresses != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25650", ipAddresses != __nullptr);
 
 			if (ipAddresses->Size() > 0)
 			{

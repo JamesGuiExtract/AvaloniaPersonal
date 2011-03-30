@@ -31,7 +31,7 @@ CSpatialString::~CSpatialString()
 	try
 	{
 		// Clear the page info map
-		m_ipPageInfoMap = NULL;
+		m_ipPageInfoMap = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16539");
 }
@@ -50,7 +50,7 @@ STDMETHODIMP CSpatialString::CreateFromLines(IIUnknownVector* pLines)
 		validateLicense();
 
 		IIUnknownVectorPtr ipLines(pLines);
-		ASSERT_RESOURCE_ALLOCATION("ELI15088", ipLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15088", ipLines != __nullptr);
 
 		// Reset everything
 		reset(true, true);
@@ -70,7 +70,7 @@ STDMETHODIMP CSpatialString::CreateFromLines(IIUnknownVector* pLines)
 		{
 			// Get each line
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine = ipLines->At(i);
-			ASSERT_RESOURCE_ALLOCATION( "ELI14777", ipLine != NULL);
+			ASSERT_RESOURCE_ALLOCATION( "ELI14777", ipLine != __nullptr);
 			
 			// Place each line in the vector of lines
 			vecLines.push_back(ipLine);
@@ -125,7 +125,7 @@ STDMETHODIMP CSpatialString::CreateFromLines(IIUnknownVector* pLines)
 		{
 			// Get each line
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine = vecLines[i];
-			ASSERT_RESOURCE_ALLOCATION( "ELI14804", ipLine != NULL);
+			ASSERT_RESOURCE_ALLOCATION( "ELI14804", ipLine != __nullptr);
 
 			// Append the line to this object
 			append(ipLine);
@@ -149,7 +149,7 @@ STDMETHODIMP CSpatialString::AddRasterZones(IIUnknownVector *pVal, ILongToObject
 	{
 		// Check arguments
 		IIUnknownVectorPtr ipVal(pVal);
-		ASSERT_ARGUMENT("ELI25769", ipVal != NULL);
+		ASSERT_ARGUMENT("ELI25769", ipVal != __nullptr);
 
 		// Validate license first
 		validateLicense();
@@ -180,10 +180,10 @@ STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR 
 		validateLicense();
 
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(pZone);
-		ASSERT_ARGUMENT("ELI19769", ipZone != NULL);
+		ASSERT_ARGUMENT("ELI19769", ipZone != __nullptr);
 		string strText = asString(bstrText);
 		ASSERT_ARGUMENT("ELI19907", !strText.empty());
-		ASSERT_ARGUMENT("ELI20241", pPageInfoMap != NULL);
+		ASSERT_ARGUMENT("ELI20241", pPageInfoMap != __nullptr);
 
 		// Reset everything
 		reset(true, true);
@@ -194,12 +194,12 @@ STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR 
 
 		// Get the page bounds (for use by GetRectangularBounds)
 		ILongRectanglePtr ipPageBounds = getPageBounds(ipZone->PageNumber, true);
-		ASSERT_RESOURCE_ALLOCATION("ELI30320", ipPageBounds != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30320", ipPageBounds != __nullptr);
 
 		// Calculate dimensions needed to generate the letter array
 		// [FlexIDSCore #3555] - Pass page info map so that bounds are clipped by page dimensions
 		ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(ipPageBounds);
-		ASSERT_RESOURCE_ALLOCATION("ELI19908", ipBounds != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19908", ipBounds != __nullptr);
 
 		long nTop, nBottom, nLeft, nRight;
 		ipBounds->GetBounds(&nLeft, &nTop, &nRight, &nBottom);
@@ -259,14 +259,14 @@ STDMETHODIMP CSpatialString::CreateHybridString(IIUnknownVector* pVecRasterZones
 		// Validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20253", pPageInfoMap != NULL);
+		ASSERT_ARGUMENT("ELI20253", pPageInfoMap != __nullptr);
 
 		// Reset everything except m_strSourceDocName
 		reset(false, true);
 
 		// Handle the raster zones parameter
 		IIUnknownVectorPtr ipRZones(pVecRasterZones);
-		ASSERT_RESOURCE_ALLOCATION( "ELI14814", ipRZones != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14814", ipRZones != __nullptr );
 
 		// Put the Raster Zones into this object's raster zone vector if one exists
 		long lSize = ipRZones->Size();
@@ -278,7 +278,7 @@ STDMETHODIMP CSpatialString::CreateHybridString(IIUnknownVector* pVecRasterZones
 			for (long i=0; i < lSize; i++)
 			{
 				UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipRZones->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI25770", ipZone != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25770", ipZone != __nullptr);
 
 				m_vecRasterZones.push_back(ipZone);
 			}
@@ -347,8 +347,8 @@ STDMETHODIMP CSpatialString::CreateFromLetterArray(long nNumLetters, void* pLett
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI25771", (pLetters != NULL) || (nNumLetters == 0));
-		ASSERT_ARGUMENT("ELI25772", pPageInfoMap != NULL);
+		ASSERT_ARGUMENT("ELI25771", (pLetters != __nullptr) || (nNumLetters == 0));
+		ASSERT_ARGUMENT("ELI25772", pPageInfoMap != __nullptr);
 		string strSourceDocName = asString(bstrSourceDocName);
 		ASSERT_ARGUMENT("ELI25773", !strSourceDocName.empty());
 
@@ -466,7 +466,7 @@ STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName,
 
 			// Load this object from the file
 			IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
-			ASSERT_RESOURCE_ALLOCATION("ELI16919", ipPersistStream != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16919", ipPersistStream != __nullptr);
 			readObjectFromFile(ipPersistStream, get_bstr_t(tmpFile.getName().c_str()), 
 				gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE);
 
@@ -629,7 +629,7 @@ STDMETHODIMP CSpatialString::LoadFromMultipleFiles(IVariantVector *pvecFiles, BS
 
 		// Wrap the vector in a smart pointer
 		IVariantVectorPtr ipvecFiles = pvecFiles;
-		ASSERT_RESOURCE_ALLOCATION( "ELI09067", ipvecFiles != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09067", ipvecFiles != __nullptr );
 
 		// Get the number of files and iterate over the vector
 		long nNumFiles = ipvecFiles->Size;
@@ -638,7 +638,7 @@ STDMETHODIMP CSpatialString::LoadFromMultipleFiles(IVariantVector *pvecFiles, BS
 			// Create a temporary spatial string to append onto the back of this
 			// object once it has been loaded from the file
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipText(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION( "ELI09072", ipText != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09072", ipText != __nullptr );
 
 			// Load the file
 			ipText->LoadFrom( _bstr_t(ipvecFiles->GetItem(i)), VARIANT_TRUE );

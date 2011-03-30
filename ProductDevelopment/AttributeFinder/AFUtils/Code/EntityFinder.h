@@ -97,8 +97,8 @@ private:
 	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Handles configuration persistence
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	auto_ptr<EntityFinderConfigMgr> ma_pEFConfigMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	unique_ptr<EntityFinderConfigMgr> ma_pEFConfigMgr;
 
 	// Use CachedObjectFromFile so that the regular expression is re-loaded from disk only when the
 	// RegEx file is modified.

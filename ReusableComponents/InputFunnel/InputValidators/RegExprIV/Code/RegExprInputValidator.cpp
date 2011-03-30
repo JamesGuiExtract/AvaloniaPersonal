@@ -20,7 +20,7 @@ CRegExprInputValidator::CRegExprInputValidator()
 	{
 		// Get a regular expression parser.
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22291", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22291", m_ipMiscUtils != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI22278");
 }
@@ -29,7 +29,7 @@ CRegExprInputValidator::~CRegExprInputValidator()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29484");
 }
@@ -101,7 +101,7 @@ STDMETHODIMP CRegExprInputValidator::raw_GetComponentDescription(BSTR * pbstrCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19629", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19629", pbstrComponentDescription != __nullptr)
 
 		// Retrieve definition
 		*pbstrComponentDescription = _bstr_t("Regular expression").Detach();
@@ -123,7 +123,7 @@ STDMETHODIMP CRegExprInputValidator::get_Pattern(BSTR *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29481", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29481", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_strPattern.c_str()).Detach();
 
@@ -159,7 +159,7 @@ STDMETHODIMP CRegExprInputValidator::get_IgnoreCase(VARIANT_BOOL *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29482", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29482", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bIgnoreCase);
 
@@ -213,7 +213,7 @@ STDMETHODIMP CRegExprInputValidator::GetInputType(BSTR* strInputTypeName)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29483", strInputTypeName != NULL);
+		ASSERT_ARGUMENT("ELI29483", strInputTypeName != __nullptr);
 
 		*strInputTypeName = _bstr_t(m_strInputTypeName.c_str()).Detach();
 
@@ -235,7 +235,7 @@ STDMETHODIMP CRegExprInputValidator::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_REGEXPRIVLib::IRegExprInputValidatorPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08303", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08303", ipSource != __nullptr);
 
 		m_bIgnoreCase = asCppBool(ipSource->IgnoreCase);
 		m_strPattern = asString(ipSource->Pattern);
@@ -258,7 +258,7 @@ STDMETHODIMP CRegExprInputValidator::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_RegExprInputValidator);
-		ASSERT_RESOURCE_ALLOCATION("ELI08370", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08370", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -462,7 +462,7 @@ STDMETHODIMP CRegExprInputValidator::raw_SetInteractiveTestExecuter(IInteractive
 UCLID_REGEXPRIVLib::IRegExprInputValidatorPtr CRegExprInputValidator::getThisAsCOMPtr()
 {
 	UCLID_REGEXPRIVLib::IRegExprInputValidatorPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16970", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16970", ipThis != __nullptr);
 
 	return ipThis;
 }
@@ -492,11 +492,11 @@ void CRegExprInputValidator::doTest1()
 	// Prepare ITextInput object with test string
 	/////////////////////////////////////////////
 	ITextInputPtr ipTextInput( CLSID_TextInput );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10483", ipTextInput != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10483", ipTextInput != __nullptr );
 	ipTextInput->InitTextInput( NULL, _bstr_t( "122569 with" ) );
 
 	IInputValidatorPtr ipThis = getThisAsCOMPtr();
-	ASSERT_RESOURCE_ALLOCATION("ELI22013", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22013", ipThis != __nullptr);
 
 	// Check validity - expect success
 	vbResult = ipThis->ValidateInput( ipTextInput );
@@ -530,7 +530,7 @@ void CRegExprInputValidator::doTest1()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	m_ipLogger->EndTestCase( bTestSuccess ? VARIANT_TRUE : VARIANT_FALSE );
 }
 //-------------------------------------------------------------------------------------------------
@@ -540,7 +540,7 @@ IRegularExprParserPtr CRegExprInputValidator::getParser()
 	{
 		IRegularExprParserPtr ipParser =
 			m_ipMiscUtils->GetNewRegExpParserInstance("RegExprInputValidator");
-		ASSERT_RESOURCE_ALLOCATION("ELI22277", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22277", ipParser != __nullptr);
 
 		// Set the case sensitivity and pattern
 		ipParser->IgnoreCase = asVariantBool(m_bIgnoreCase);

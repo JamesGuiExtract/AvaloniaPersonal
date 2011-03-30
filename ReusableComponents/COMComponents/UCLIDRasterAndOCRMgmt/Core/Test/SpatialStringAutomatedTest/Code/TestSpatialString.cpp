@@ -19,13 +19,13 @@ CTestSpatialString::CTestSpatialString()
 	try
 	{
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI12970", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI12970", ipMiscUtils != __nullptr );
 
 		m_ipRegExParser = ipMiscUtils->GetNewRegExpParserInstance("TestSpatialString");
-		ASSERT_RESOURCE_ALLOCATION("ELI06720", m_ipRegExParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06720", m_ipRegExParser != __nullptr);
 
 		m_ipSpatialString.CreateInstance(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI06683", m_ipSpatialString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06683", m_ipSpatialString != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06684")
 }
@@ -66,7 +66,7 @@ STDMETHODIMP CTestSpatialString::raw_RunAutomatedTests(IVariantVector* pParams, 
 	{
 		setTestFileFolder(pParams, asString(strTCLFile));
 
-		if (m_ipResultLogger == NULL)
+		if (m_ipResultLogger == __nullptr)
 		{
 			throw UCLIDException("ELI06682", "Please set ResultLogger before proceeding.");
 		}
@@ -244,7 +244,7 @@ void CTestSpatialString::runTestCase6()
 
 		// Create a spatial string
 		ISpatialStringPtr ipToBeInserted(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI06701", ipToBeInserted != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06701", ipToBeInserted != __nullptr);
 
 		// put the string
 		string strToBeInserted("n insertion");
@@ -299,7 +299,7 @@ void CTestSpatialString::runTestCase6()
 
 		// Create a spatial string
 		ISpatialStringPtr ipToBeInserted(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI19324", ipToBeInserted != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19324", ipToBeInserted != __nullptr);
 
 		// put the string
 		string strToBeInserted("Insert something in front of : ");
@@ -352,7 +352,7 @@ void CTestSpatialString::runTestCase7()
 
 		// Create a spatial string
 		ISpatialStringPtr ipToBeAppended(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI06704", ipToBeAppended != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06704", ipToBeAppended != __nullptr);
 
 		// put the string
 		string strToBeAppended("ABC");
@@ -403,7 +403,7 @@ void CTestSpatialString::runTestCase8()
 		long nStartPos = 9, nEndPos = 18;
 
 		ISpatialStringPtr ipSubString = m_ipSpatialString->GetSubString(nStartPos, nEndPos);
-		ASSERT_RESOURCE_ALLOCATION("ELI25896", ipSubString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25896", ipSubString != __nullptr);
 
 		// check the result
 		string strObtained = asString(ipSubString->String);
@@ -445,7 +445,7 @@ void CTestSpatialString::runTestCase8()
 		long nStartPos = 22;
 
 		ISpatialStringPtr ipSubString = m_ipSpatialString->GetSubString(nStartPos, -1);
-		ASSERT_RESOURCE_ALLOCATION("ELI25897", ipSubString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25897", ipSubString != __nullptr);
 
 		// check the result
 		string strObtained = asString(ipSubString->String);
@@ -1235,7 +1235,7 @@ void CTestSpatialString::runTestCase14()
 			for (long n=0; n<nObtainedTokensSize; n++)
 			{
 				ISpatialStringPtr ipToken = ipTokens->At(n);
-				ASSERT_RESOURCE_ALLOCATION("ELI25898", ipToken != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25898", ipToken != __nullptr);
 
 				string strObtained = asString(ipToken->String);
 				string strExpected = vecExpectedTokens[n];
@@ -1384,7 +1384,7 @@ void CTestSpatialString::runTestCase18()
 	char c = 'A';
 
 	ISpatialStringPtr ipFakeSpatial(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI06821", ipFakeSpatial != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06821", ipFakeSpatial != __nullptr);
 
 	string strUSSFile = m_strTestFilesFolder + "000008.TIF.uss";
 	// Load the spatial string with a spatial letter 'A'
@@ -1394,7 +1394,7 @@ void CTestSpatialString::runTestCase18()
 	long nSpot = ipFakeSpatial->FindFirstInstanceOfChar(c, 0);
 
 	ISpatialStringPtr ipWithSpatial( ipFakeSpatial->GetSubString(nSpot, nSpot ) );
-	ASSERT_RESOURCE_ALLOCATION("ELI19332", ipWithSpatial != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19332", ipWithSpatial != __nullptr);
 	
 	// the original string
 	string strOrigin("I'm  SpatialString.");
@@ -1495,7 +1495,7 @@ void CTestSpatialString::runTestCase18()
 		// get a sub string from the string 
 		long nStartPos = 6, nEndPos = 12;
 		ISpatialStringPtr ipSubString = m_ipSpatialString->GetSubString(nStartPos, nEndPos);
-		ASSERT_RESOURCE_ALLOCATION("ELI25899", ipSubString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25899", ipSubString != __nullptr);
 
 		// check if the sub string still retains the IsSpatial from original string
 		VARIANT_BOOL bIsSpatial = ipSubString->HasSpatialInfo();
@@ -1536,7 +1536,7 @@ void CTestSpatialString::runTestCase18()
 		// get a sub string from the string 
 		long nStartPos = 4, nEndPos = 12;
 		ISpatialStringPtr ipSubString = m_ipSpatialString->GetSubString(nStartPos, nEndPos);
-		ASSERT_RESOURCE_ALLOCATION("ELI25900", ipSubString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25900", ipSubString != __nullptr);
 
 		// check if the sub string still retains the IsSpatial from original string
 		VARIANT_BOOL bIsSpatial = ipSubString->HasSpatialInfo();
@@ -1663,16 +1663,16 @@ void CTestSpatialString::runTestCase19()
 	
 	// Create a spatial page info map for the string
 	ISpatialPageInfoPtr ipInfo(CLSID_SpatialPageInfo);
-	ASSERT_RESOURCE_ALLOCATION("ELI25901", ipInfo != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI25901", ipInfo != __nullptr);
 	ipInfo->SetPageInfo(2000, 3000, kRotNone, 0.0);
 
 	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
-	ASSERT_RESOURCE_ALLOCATION("ELI25902", ipPageInfoMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI25902", ipPageInfoMap != __nullptr);
 	ipPageInfoMap->Set(1, ipInfo);
 
 	// Create a spatial string from the letters
 	ISpatialStringPtr ipWithSpatial(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI06837", ipWithSpatial != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06837", ipWithSpatial != __nullptr);
 	ipWithSpatial->CreateFromLetterArray(vecLetters.size(), (void*)&(vecLetters[0]), "test.tif",
 		ipPageInfoMap);
 	
@@ -1880,11 +1880,11 @@ void CTestSpatialString::runTestCase21()
 
 	// Create a spatial page info map for the string
 	ISpatialPageInfoPtr ipInfo(CLSID_SpatialPageInfo);
-	ASSERT_RESOURCE_ALLOCATION("ELI25903", ipInfo != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI25903", ipInfo != __nullptr);
 	ipInfo->SetPageInfo(2000, 3000, kRotNone, 0.0);
 
 	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
-	ASSERT_RESOURCE_ALLOCATION("ELI25904", ipPageInfoMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI25904", ipPageInfoMap != __nullptr);
 	ipPageInfoMap->Set(1, ipInfo);
 
 	// assign the input letters to the spatial string
@@ -1905,7 +1905,7 @@ void CTestSpatialString::runTestCase21()
 	try
 	{
 		IIUnknownVectorPtr ipWords = m_ipSpatialString->GetWords();
-		ASSERT_RESOURCE_ALLOCATION("ELI25905", ipWords != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25905", ipWords != __nullptr);
 		
 		if ( vecExpectedWords.size() != ipWords->Size() ) 
 		{
@@ -1925,7 +1925,7 @@ void CTestSpatialString::runTestCase21()
 			for (unsigned int n = 0; n < vecExpectedWords.size() ; n++ )
 			{
 				ISpatialStringPtr ipWord = ipWords->At(n);
-				ASSERT_RESOURCE_ALLOCATION("ELI25906", ipWord != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25906", ipWord != __nullptr);
 				string strObtained = asString(ipWord->String);
 				string strExpected = vecExpectedWords[n];
 				zTemp.Format(" Expected : %s  Obtained : %s \r\n",
@@ -1965,7 +1965,7 @@ void CTestSpatialString::runTestCase21()
 	try
 	{
 		IIUnknownVectorPtr ipLines = m_ipSpatialString->GetLines();
-		ASSERT_RESOURCE_ALLOCATION("ELI25907", ipLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25907", ipLines != __nullptr);
 		
 		if ( vecExpectedLines.size() != ipLines->Size())
 		{
@@ -1984,7 +1984,7 @@ void CTestSpatialString::runTestCase21()
 			for (unsigned int n = 0; n < vecExpectedLines.size() ; n++ )
 			{
 				ISpatialStringPtr ipLine = ipLines->At(n);
-				ASSERT_RESOURCE_ALLOCATION("ELI25908", ipLine != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25908", ipLine != __nullptr);
 				
 				string strObtained = asString(ipLine->String);
 				string strExpected = vecExpectedLines[n];
@@ -2028,7 +2028,7 @@ void CTestSpatialString::runTestCase21()
 	try
 	{
 		IIUnknownVectorPtr ipParagraphs = m_ipSpatialString->GetParagraphs();
-		ASSERT_RESOURCE_ALLOCATION("ELI25909", ipParagraphs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25909", ipParagraphs != __nullptr);
 		
 		if ( vecExpectedParagraphs.size() != ipParagraphs->Size())
 		{
@@ -2047,7 +2047,7 @@ void CTestSpatialString::runTestCase21()
 			for (unsigned int n = 0; n < vecExpectedParagraphs.size(); n++)
 			{
 				ISpatialStringPtr ipParagraph = ipParagraphs->At(n);
-				ASSERT_RESOURCE_ALLOCATION("ELI25910", ipParagraph != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25910", ipParagraph != __nullptr);
 				
 				string strObtained = asString(ipParagraph->String);
 				string strExpected = vecExpectedParagraphs[n];
@@ -2096,7 +2096,7 @@ void CTestSpatialString::runTestCase22()
 		
 		// Build vector of files to load
 		IVariantVectorPtr ipvecFiles( CLSID_VariantVector );
-		ASSERT_RESOURCE_ALLOCATION("ELI25911", ipvecFiles != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25911", ipvecFiles != __nullptr);
 		string strFileName = m_strTestFilesFolder + "000008.tif.uss";
 		ipvecFiles->PushBack( strFileName.c_str() );
 		strFileName = m_strTestFilesFolder + "000009.tif.uss";
@@ -2106,15 +2106,15 @@ void CTestSpatialString::runTestCase22()
 		
 		// Load the files
 		ISpatialStringPtr ipMultipleSpatialString ( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION("ELI25912", ipMultipleSpatialString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25912", ipMultipleSpatialString != __nullptr);
 		ipMultipleSpatialString->LoadFromMultipleFiles( ipvecFiles,  m_ipSpatialString->SourceDocName );
 		
 		// Compare the data loaded
 		IComparableObjectPtr ipComplete = m_ipSpatialString;
-		ASSERT_RESOURCE_ALLOCATION( "ELI09073", ipComplete != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09073", ipComplete != __nullptr );
 		
 		IComparableObjectPtr ipMulti = ipMultipleSpatialString;
-		ASSERT_RESOURCE_ALLOCATION( "ELI09074", ipMulti != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09074", ipMulti != __nullptr );
 		
 		if ( m_ipSpatialString->SourceDocName == ipMultipleSpatialString->SourceDocName &&
 			ipComplete->IsEqualTo( ipMulti ) == VARIANT_TRUE )
@@ -2190,20 +2190,20 @@ void CTestSpatialString::runTestCase22()
 		
 		// Build vector of files to load
 		IVariantVectorPtr ipvecFiles(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI25913", ipvecFiles != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25913", ipvecFiles != __nullptr);
 		ipvecFiles->PushBack( strUSSFile.c_str() );
 
 		// Load the files
 		ISpatialStringPtr ipMultipleSpatialString ( CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI25914", ipMultipleSpatialString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25914", ipMultipleSpatialString != __nullptr);
 		ipMultipleSpatialString->LoadFromMultipleFiles( ipvecFiles, m_ipSpatialString->SourceDocName );
 		
 		// Compare the data loaded
 		IComparableObjectPtr ipComplete = m_ipSpatialString;
-		ASSERT_RESOURCE_ALLOCATION("ELI09076", ipComplete != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09076", ipComplete != __nullptr );
 		
 		IComparableObjectPtr ipMulti = ipMultipleSpatialString;
-		ASSERT_RESOURCE_ALLOCATION("ELI09077", ipMulti != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09077", ipMulti != __nullptr );
 
 		if ( m_ipSpatialString->SourceDocName == ipMultipleSpatialString->SourceDocName &&
 			ipComplete->IsEqualTo( ipMulti ) == VARIANT_TRUE )
@@ -2274,7 +2274,7 @@ void CTestSpatialString::runTestCase22()
 		
 		// Build vector of files to load
 		IVariantVectorPtr ipvecFiles(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI25915", ipvecFiles != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25915", ipvecFiles != __nullptr);
 		string strFileName = m_strTestFilesFolder + "000008.tif.txt";
 		ipvecFiles->PushBack( strFileName.c_str() );
 		strFileName = m_strTestFilesFolder + "000009.tif.txt";
@@ -2284,15 +2284,15 @@ void CTestSpatialString::runTestCase22()
 
 		// Load the files
 		ISpatialStringPtr ipMultipleSpatialString ( CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI25916", ipMultipleSpatialString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25916", ipMultipleSpatialString != __nullptr);
 		ipMultipleSpatialString->LoadFromMultipleFiles( ipvecFiles,  m_ipSpatialString->SourceDocName );
 		
 		// Compare the data loaded
 		IComparableObjectPtr ipComplete = m_ipSpatialString;
-		ASSERT_RESOURCE_ALLOCATION("ELI09085", ipComplete != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09085", ipComplete != __nullptr );
 		
 		IComparableObjectPtr ipMulti = ipMultipleSpatialString;
-		ASSERT_RESOURCE_ALLOCATION("ELI09086", ipMulti != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09086", ipMulti != __nullptr );
 
 		if ( m_ipSpatialString->SourceDocName == ipMultipleSpatialString->SourceDocName &&
 			ipComplete->IsEqualTo( ipMulti ) == VARIANT_TRUE  && !m_ipSpatialString->HasSpatialInfo() &&
@@ -2326,20 +2326,20 @@ void CTestSpatialString::runTestCase22()
 		
 		// Build vector of files to load
 		IVariantVectorPtr ipvecFiles(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI25917", ipvecFiles != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25917", ipvecFiles != __nullptr);
 		ipvecFiles->PushBack( strUSSFile.c_str() );
 
 		// Load the files
 		ISpatialStringPtr ipMultipleSpatialString ( CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI25918", ipMultipleSpatialString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25918", ipMultipleSpatialString != __nullptr);
 		ipMultipleSpatialString->LoadFromMultipleFiles( ipvecFiles, m_ipSpatialString->SourceDocName );
 		
 		// Compare the data loaded
 		IComparableObjectPtr ipComplete = m_ipSpatialString;
-		ASSERT_RESOURCE_ALLOCATION("ELI09088", ipComplete != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09088", ipComplete != __nullptr );
 		
 		IComparableObjectPtr ipMulti = ipMultipleSpatialString;
-		ASSERT_RESOURCE_ALLOCATION("ELI09089", ipMulti != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09089", ipMulti != __nullptr );
 
 		if ( m_ipSpatialString->SourceDocName == ipMultipleSpatialString->SourceDocName &&
 			ipComplete->IsEqualTo( ipMulti ) == VARIANT_TRUE  && !m_ipSpatialString->HasSpatialInfo() &&
@@ -2398,7 +2398,7 @@ void CTestSpatialString::runTestCase23()
 
 		// now get the WordDistCount
 		ILongToLongMapPtr ipWordCountMap = m_ipSpatialString->GetWordLengthDist(&lWordCount);
-		ASSERT_RESOURCE_ALLOCATION("ELI20624", ipWordCountMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20624", ipWordCountMap != __nullptr);
 
 		long lMapSize = ipWordCountMap->Size;
 
@@ -2479,7 +2479,7 @@ void CTestSpatialString::runTestCase24()
 
 		// get the lines from the spatial string
 		IIUnknownVectorPtr ipLines = m_ipSpatialString->GetLines();
-		ASSERT_RESOURCE_ALLOCATION("ELI21193", ipLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI21193", ipLines != __nullptr);
 
 		// get the line count
 		long lCount = ipLines->Size();
@@ -2491,7 +2491,7 @@ void CTestSpatialString::runTestCase24()
 		for (long i = 0; i < lCount && bSuccess; i++)
 		{
 			ISpatialStringPtr ipTemp = ipLines->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI21194", ipTemp != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI21194", ipTemp != __nullptr);
 
 			bSuccess = !asCppBool(ipTemp->IsMultiPage());
 		}
@@ -2505,7 +2505,7 @@ void CTestSpatialString::setTestFileFolder(IVariantVectorPtr ipParams, const std
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		std::string strTestFolder = asString(_bstr_t(ipParams->GetItem(1)));
 

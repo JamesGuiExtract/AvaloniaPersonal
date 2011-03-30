@@ -39,7 +39,7 @@ int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps,
 	{
 		int nNewSchemaVersion = 3;
 
-		if (pnNumSteps != NULL)
+		if (pnNumSteps != __nullptr)
 		{
 			*pnNumSteps += 3;
 			return nNewSchemaVersion;
@@ -115,7 +115,7 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_GetComponentDescription(BSTR * pstrCompo
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI18689", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI18689", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("ID Shield database manager").Detach();
 	}
@@ -133,7 +133,7 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_IsLicensed(VARIANT_BOOL  * pbValue)
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI19817", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19817", pbValue != __nullptr);
 
 		try
 		{
@@ -164,11 +164,11 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(IFileProcessing
 
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI18823", ipDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18823", ipDB != __nullptr);
 
 		// Create the connection object
 		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI18824", ipDBConnection != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18824", ipDBConnection != __nullptr);
 
 		string strDatabaseServer = asString(ipDB->DatabaseServer);
 		string strDatabaseName = asString(ipDB->DatabaseName);
@@ -220,11 +220,11 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcess
 
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI18956", ipDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18956", ipDB != __nullptr);
 
 		// Create the connection object
 		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI18957", ipDBConnection != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18957", ipDBConnection != __nullptr);
 		
 		string strDatabaseServer = asString(ipDB->DatabaseServer);
 		string strDatabaseName = asString(ipDB->DatabaseName);
@@ -257,7 +257,7 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_ValidateSchema(IFileProcessingDB* pDB)
 			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
 		
 			// Reset the database connection
-			m_ipDBConnection = NULL;
+			m_ipDBConnection = __nullptr;
 		}
 
 		validateIDShieldSchemaVersion(false);
@@ -276,7 +276,7 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_GetDBInfoRows(IVariantVector** ppDBInfoR
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		IVariantVectorPtr ipDBInfoRows(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI31418", ipDBInfoRows != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31418", ipDBInfoRows != __nullptr);
 
 		map<string, string> mapDBInfoValues = getDBInfoDefaultValues();
 		for (map<string, string>::iterator iterDBInfoValues = mapDBInfoValues.begin();
@@ -302,7 +302,7 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_GetTables(IVariantVector** ppTables)
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		IVariantVectorPtr ipTables(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI31419", ipTables != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31419", ipTables != __nullptr);
 
 		const vector<string> vecTableCreationQueries = getTableCreationQueries();
 		vector<string> vecTablesNames = getTableNamesFromCreationQueries(vecTableCreationQueries);
@@ -329,12 +329,12 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcess
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_ARGUMENT("ELI31409", ipDB != NULL);
+		ASSERT_ARGUMENT("ELI31409", ipDB != __nullptr);
 
 		_ConnectionPtr ipConnection(pConnection);
-		ASSERT_ARGUMENT("ELI31410", ipConnection != NULL);
+		ASSERT_ARGUMENT("ELI31410", ipConnection != __nullptr);
 
-		ASSERT_ARGUMENT("ELI31411", pnProdSchemaVersion != NULL);
+		ASSERT_ARGUMENT("ELI31411", pnProdSchemaVersion != __nullptr);
 
 		// If the schema version is not specified, use the current schema version as the starting
 		// point.
@@ -391,7 +391,7 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 		{
 			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipThis;
 			ipThis = this;
-			ASSERT_RESOURCE_ALLOCATION("ELI30712", ipThis != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30712", ipThis != __nullptr);
 			
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(ipThis);
@@ -411,7 +411,7 @@ STDMETHODIMP CIDShieldProductDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI19810", newVal != NULL);
+		ASSERT_ARGUMENT("ELI19810", newVal != __nullptr);
 
 		// Only update if it is a new value
 		if (m_ipFAMDB != newVal)
@@ -420,7 +420,7 @@ STDMETHODIMP CIDShieldProductDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
 		
 			// Reset the database connection
-			m_ipDBConnection = NULL;
+			m_ipDBConnection = __nullptr;
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19039");
@@ -434,7 +434,7 @@ STDMETHODIMP CIDShieldProductDBMgr::GetResultsForQuery(BSTR bstrQuery, _Recordse
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI19882", ppVal != NULL);
+		ASSERT_ARGUMENT("ELI19882", ppVal != __nullptr);
 
 		validateLicense();
 
@@ -442,7 +442,7 @@ STDMETHODIMP CIDShieldProductDBMgr::GetResultsForQuery(BSTR bstrQuery, _Recordse
 		validateIDShieldSchemaVersion(true);
 
 		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-		_ConnectionPtr ipConnection = NULL;
+		_ConnectionPtr ipConnection = __nullptr;
 
 		BEGIN_ADO_CONNECTION_RETRY();
 
@@ -451,7 +451,7 @@ STDMETHODIMP CIDShieldProductDBMgr::GetResultsForQuery(BSTR bstrQuery, _Recordse
 
 		// Create a pointer to a recordset
 		_RecordsetPtr ipResultSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI19531", ipResultSet != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI19531", ipResultSet != __nullptr );
 
 		// Open the Action table
 		ipResultSet->Open( bstrQuery, _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
@@ -474,7 +474,7 @@ STDMETHODIMP CIDShieldProductDBMgr::GetFileID(BSTR bstrFileName, long* plFileID)
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		// ensure plFileID is non-NULL
-		ASSERT_ARGUMENT("ELI20178", plFileID != NULL);
+		ASSERT_ARGUMENT("ELI20178", plFileID != __nullptr);
 
 		// validate the license
 		validateLicense();
@@ -483,7 +483,7 @@ STDMETHODIMP CIDShieldProductDBMgr::GetFileID(BSTR bstrFileName, long* plFileID)
 		validateIDShieldSchemaVersion(true);
 
 		// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-		_ConnectionPtr ipConnection = NULL;
+		_ConnectionPtr ipConnection = __nullptr;
 
 		BEGIN_ADO_CONNECTION_RETRY();
 
@@ -509,14 +509,14 @@ STDMETHODIMP CIDShieldProductDBMgr::GetFileID(BSTR bstrFileName, long* plFileID)
 ADODB::_ConnectionPtr CIDShieldProductDBMgr::getDBConnection()
 {
 	// Check if connection has been created
-	if (m_ipDBConnection == NULL)
+	if (m_ipDBConnection == __nullptr)
 	{
 		m_ipDBConnection.CreateInstance(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI19795", m_ipDBConnection != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19795", m_ipDBConnection != __nullptr);
 	}
 
 	// If the FAMDB is not set throw an exception
-	if (m_ipFAMDB == NULL)
+	if (m_ipFAMDB == __nullptr)
 	{
 		UCLIDException ue("ELI18935", "FAMDB pointer has not been initialized! Unable to open connection.");
 		throw ue;
@@ -569,7 +569,7 @@ void CIDShieldProductDBMgr::getIDShieldTables(vector<string>& rvecTables)
 //-------------------------------------------------------------------------------------------------
 void CIDShieldProductDBMgr::validateIDShieldSchemaVersion(bool bThrowIfMissing)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI19818", m_ipFAMDB != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19818", m_ipFAMDB != __nullptr);
 
 	// Get the Version from the FAMDB DBInfo table
 	string strValue = asString(m_ipFAMDB->GetDBInfoSetting(
@@ -597,13 +597,13 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileI
 	{
 		try
 		{
-			ASSERT_RESOURCE_ALLOCATION("ELI19096", m_ipFAMDB != NULL); 
+			ASSERT_RESOURCE_ALLOCATION("ELI19096", m_ipFAMDB != __nullptr); 
 
 			// Validate IDShield Schema
 			validateIDShieldSchemaVersion(true);
 
 			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-			_ConnectionPtr ipConnection = NULL;
+			_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_ADO_CONNECTION_RETRY();
 
@@ -626,7 +626,7 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long lFileI
 
 			// Create a pointer to a recordset
 			_RecordsetPtr ipSet( __uuidof( Recordset ));
-			ASSERT_RESOURCE_ALLOCATION("ELI28069", ipSet != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI28069", ipSet != __nullptr );
 
 			// Open the recordset
 			ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),

@@ -148,7 +148,7 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17923", pResult != NULL);
+		ASSERT_ARGUMENT("ELI17923", pResult != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31586", ipFileRecord != __nullptr);
 
@@ -163,14 +163,14 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		// append .uss to the image file name
 		string strOutputFileName = strInputFileName + ".uss";
 
-		ISpatialStringPtr ipSS = NULL;
+		ISpatialStringPtr ipSS = __nullptr;
 
 		EFileType eFileType = getFileType(strInputFileName);
 		if (eFileType == kTXTFile || eFileType == kXMLFile)
 		{
 			// If a text file, load as "indexed" text.
 			ipSS.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI31683", ipSS != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI31683", ipSS != __nullptr);
 
 			ipSS->LoadFrom(strInputFileName.c_str(), VARIANT_FALSE);
 		}
@@ -200,7 +200,7 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 				THROW_LOGIC_ERROR_EXCEPTION("ELI28161");
 				break;
 			}
-			ASSERT_RESOURCE_ALLOCATION("ELI28150", ipSS != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28150", ipSS != __nullptr);
 
 			// Ensure source doc name is original image file if a clean image was used
 			if (m_bUseCleanedImageIfAvailable)
@@ -236,7 +236,7 @@ STDMETHODIMP COCRFileProcessor::raw_Close()
 	try
 	{
 		// Free the OCR engine from memory
-		m_ipOCREngine = NULL;
+		m_ipOCREngine = __nullptr;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11139");
 	return S_OK;
@@ -269,7 +269,7 @@ STDMETHODIMP COCRFileProcessor::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19614", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI19614", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Core: OCR document").Detach();
 	}
@@ -288,7 +288,7 @@ STDMETHODIMP COCRFileProcessor::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_FILEPROCESSORSLib::IOCRFileProcessorPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI11032", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11032", ipCopyThis != __nullptr);
 		
 		// copy data members
 		m_eOCRPageRangeType = (UCLID_FILEPROCESSORSLib::EOCRFPPageRangeType)ipCopyThis->OCRPageRangeType;
@@ -311,7 +311,7 @@ STDMETHODIMP COCRFileProcessor::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_OCRFileProcessor);
-		ASSERT_RESOURCE_ALLOCATION("ELI11033", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11033", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -587,10 +587,10 @@ void COCRFileProcessor::validateLicense()
 //-------------------------------------------------------------------------------------------------
 IOCREnginePtr COCRFileProcessor::getOCREngine()
 {
-	if (m_ipOCREngine == NULL)
+	if (m_ipOCREngine == __nullptr)
 	{
 		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR);
-		ASSERT_RESOURCE_ALLOCATION("ELI11048", m_ipOCREngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11048", m_ipOCREngine != __nullptr);
 
 		_bstr_t _bstrPrivateLicenseCode = get_bstr_t(LICENSE_MGMT_PASSWORD.c_str());
 		IPrivateLicensedComponentPtr ipScansoftEngine(m_ipOCREngine);

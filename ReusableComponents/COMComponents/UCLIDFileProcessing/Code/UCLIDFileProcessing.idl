@@ -678,8 +678,8 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// REQUIRE:	straction is a valid action defined in the Action table
 		//			nID is a valid file ID defined in the FPMFile table
-		// PROMISE: If pOldStatus != NULL, then the old status associated with the file will be returned.
-		// NOTE:	If pOldStatus != NULL, then two database operations will need to performed (as opposed to
+		// PROMISE: If pOldStatus != __nullptr, then the old status associated with the file will be returned.
+		// NOTE:	If pOldStatus != __nullptr, then two database operations will need to performed (as opposed to
 		//			just one) in order to return the previous status
 		[id(13), helpstring("method SetStatusForFile")] HRESULT SetStatusForFile([in] long nID, [in] BSTR strAction, 
 			[in] EActionStatus eStatus, [out] EActionStatus* poldStatus);
@@ -722,7 +722,7 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To output all of the FileName values found by the query strQuery to a file named strOutputFileName
 		//			and return the number of records that were exported
 		//			If pRandomCondition == NULL then all files returned by the query will be exported,
-		//			if pRandomComdition != NULL then before each file is exported the condition
+		//			if pRandomComdition != __nullptr then before each file is exported the condition
 		//			will be checked and the file will only be exported if the condition returns true.
 		[id(23), helpstring("method ExportFileList")] HRESULT ExportFileList([in] BSTR strQuery, [in] BSTR strOutputFileName,
 			[in] IRandomMathCondition* pRandomCondition, [out,retval] long* pnNumRecordsOutput);
@@ -963,7 +963,7 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To set the priority of all files found by the query strSelectQuery to the specified
 		//			priority and return the number of records that were modified.
 		//			If pRandomCondition == NULL then all files returned by the query will be modified,
-		//			if pRandomComdition != NULL then before each file is modified the condition
+		//			if pRandomComdition != __nullptr then before each file is modified the condition
 		//			will be checked and the file will only be modified if the condition returns true.
 		[id(69), helpstring("method SetPriorityForFiles")] HRESULT SetPriorityForFiles([in] BSTR strSelectQuery,
 			[in] EFilePriority eNewPriority, [in] IRandomMathCondition* pRandomCondition, [out,retval] long* pnNumRecordsModified);

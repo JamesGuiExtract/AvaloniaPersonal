@@ -26,7 +26,7 @@ CRunObjectOnQuery::CRunObjectOnQuery()
 	try
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI10384", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10384", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI10433");
 }
@@ -80,7 +80,7 @@ STDMETHODIMP CRunObjectOnQuery::get_AttributeQuery(/*[out, retval]*/ BSTR *pVal)
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI10379", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI10379", pVal != __nullptr );
 
 		// Return the Attribute Name
 		*pVal = get_bstr_t( m_strAttributeQuery).Detach();
@@ -169,7 +169,7 @@ STDMETHODIMP CRunObjectOnQuery::SetObjectAndIID(IID newIID, ICategorizedComponen
 		}
 		
 		ICategorizedComponentPtr ipTmp(newObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI10414", ipTmp != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10414", ipTmp != __nullptr);
 
 		IUnknown* pUnknown;
 		ipTmp->QueryInterface(newIID, (void**)&pUnknown);
@@ -206,10 +206,10 @@ STDMETHODIMP CRunObjectOnQuery::raw_ProcessOutput(IIUnknownVector* pAttributes, 
 
 		// Local copy of original Attributes
 		IIUnknownVectorPtr ipOrigAttributes( pAttributes );
-		ASSERT_ARGUMENT("ELI10383", ipOrigAttributes != NULL);
+		ASSERT_ARGUMENT("ELI10383", ipOrigAttributes != __nullptr);
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI10423", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10423", ipAFDoc != __nullptr);
 
 		// use a smart pointer for the progress status object
 		IProgressStatusPtr ipProgressStatus = pProgressStatus;
@@ -323,7 +323,7 @@ STDMETHODIMP CRunObjectOnQuery::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		{
 			bIsConfigured = false;
 		}
-		else if(m_ipObject == NULL)
+		else if(m_ipObject == __nullptr)
 		{
 			bIsConfigured = false;
 		}
@@ -343,7 +343,7 @@ STDMETHODIMP CRunObjectOnQuery::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19554", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19554", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Run object on query").Detach();
 	}
@@ -362,20 +362,20 @@ STDMETHODIMP CRunObjectOnQuery::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_AFOUTPUTHANDLERSLib::IRunObjectOnQueryPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION( "ELI10388", ipSource != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10388", ipSource != __nullptr );
 		
 		// Copy Attribute query
 		m_strAttributeQuery = asString( ipSource->AttributeQuery );
 		
 		// Copy the IID and the Object
 		ICopyableObjectPtr ipCopyObj(ipSource->GetObjectAndIID(&m_objectIID));
-		if(ipCopyObj != NULL)
+		if(ipCopyObj != __nullptr)
 		{
 			m_ipObject = ipCopyObj->Clone();
 		}
 		else
 		{
-			m_ipObject = NULL;
+			m_ipObject = __nullptr;
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12820");
@@ -394,7 +394,7 @@ STDMETHODIMP CRunObjectOnQuery::raw_Clone(IUnknown **pObject)
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_RunObjectOnQuery );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10390", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10390", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom( ipUnk );
@@ -525,7 +525,7 @@ STDMETHODIMP CRunObjectOnQuery::Save(IStream *pStream, BOOL fClearDirty)
 
 		// write the object out
 		IPersistStreamPtr ipObj = m_ipObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI10417", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10417", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI10418", fClearDirty);
 
 		// Clear the flag as specified
@@ -558,7 +558,7 @@ void CRunObjectOnQuery::validateLicense()
 void CRunObjectOnQuery::runAttributeModifier(IIUnknownVectorPtr ipAttributes, IAFDocumentPtr ipAFDoc)
 {
 	IAttributeModifyingRulePtr ipModifier(m_ipObject);
-	ASSERT_RESOURCE_ALLOCATION("ELI10419", ipModifier != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10419", ipModifier != __nullptr);
 
 	long nNum = ipAttributes->Size();
 	int i;
@@ -572,7 +572,7 @@ void CRunObjectOnQuery::runAttributeModifier(IIUnknownVectorPtr ipAttributes, IA
 void CRunObjectOnQuery::runAttributeSplitter(IIUnknownVectorPtr ipAttributes, IAFDocumentPtr ipAFDoc)
 {
 	IAttributeSplitterPtr ipSplitter(m_ipObject);
-	ASSERT_RESOURCE_ALLOCATION("ELI10420", ipSplitter != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10420", ipSplitter != __nullptr);
 
 	long nNum = ipAttributes->Size();
 	int i;
@@ -587,7 +587,7 @@ void CRunObjectOnQuery::runOutputHandler(IIUnknownVectorPtr ipAttributesOut,
 										 IIUnknownVectorPtr ipAttributesSelected, IAFDocumentPtr ipAFDoc)
 {
 	IOutputHandlerPtr ipOH(m_ipObject);
-	ASSERT_RESOURCE_ALLOCATION("ELI10421", ipOH != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10421", ipOH != __nullptr);
 
 	// Save the original contents of the ipAttributesSelected so removed or added attributes can
 	// be added or removed from the ipAttributesOut vector

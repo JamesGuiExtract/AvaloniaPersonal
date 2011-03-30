@@ -160,7 +160,7 @@ private:
 	EDisplayCharsType m_eDisplayFilterCharsType;	
 
 	// For retrieving configuration settings
-	auto_ptr<ScansoftOCRCfg> m_apCfg;
+	unique_ptr<ScansoftOCRCfg> m_apCfg;
 
 	static string ms_strLastDisplayedFilterChars;
 
@@ -240,8 +240,8 @@ private:
 	//         (6) bReturnUnrecognized is true if unrecognized characters should be returned in
 	//             the final output, flase if unrecognized characters should be dropped.
 	//         (7) rstrText will contain the recognized text if pvecLetters == NULL, will not be
-	//             modified is pvecLetters != NULL.
-	//         (8) pvecLetters will contain the recognized text if pvecLetters != NULL, will not be
+	//             modified is pvecLetters != __nullptr.
+	//         (8) pvecLetters will contain the recognized text if pvecLetters != __nullptr, will not be
 	//             modified if pvecLetters == NULL.
 	//         (9) ipPageInfo will contain the spatial page info for the specified page.
 	void rotateAndRecognizeTextInImagePage(const string& strImageFileName, long nPageNum, 
@@ -281,7 +281,7 @@ private:
 	void removeLetter(const LETTER* pLetter, bool bIsBW);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Ensures the recently located zones of the current page are in top-down order.
-	// REQUIRE: m_hPage != NULL
+	// REQUIRE: m_hPage != __nullptr
 	// PROMISE: Checks the OCR zones of the current page are in top-down order. If they are
 	//          not in order, inserts them in order as user zones. If no zones have been OCRed,
 	//          this function does nothing. Top-down order means:
@@ -309,8 +309,8 @@ private:
 	//			ipLetters's contents are checked.
 	bool hasContent(const string& strText, const vector<CPPLetter>* pvecLetters);
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: To append ipLettersToAppend to ripLetters (if ripLetters != NULL) or
-	//			to append strTextToAppend to rstrText (if ripLetters == NULL)
+	// PROMISE: To append ipLettersToAppend to ripLetters (if ripLetters != __nullptr) or
+	//			to append strTextToAppend to rstrText (if ripLetters == __nullptr)
 	void appendContent(string& rstrText, vector<CPPLetter>* pvecLetters,
 		const string& strTextToAppend, 
 		const vector<CPPLetter>* pvecLettersToAppend);
@@ -321,7 +321,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Stores the most recently recognized text into rstrText. If bReturnUnrecognized is
 	//          true all found text will be returned, otherwise only recognized text will be returned.
-	// REQUIRE: rstrText != NULL. kRecRecognize must just have been successfully called.
+	// REQUIRE: rstrText != __nullptr. kRecRecognize must just have been successfully called.
 	// PROMISE: rstrText will contain the most recently recognized text from OCR engine.
 	void getRecognizedText(string& rstrText, bool bReturnUnrecognized);
 	//---------------------------------------------------------------------------------------------
@@ -344,7 +344,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Updates imgRotate if nRotationInDegrees != 0 and updates ipPageInfo with final
 	//			orientation value
-	// REQUIRE: ipPageInfo != NULL
+	// REQUIRE: ipPageInfo != __nullptr
 	//			nRotationInDegrees = 
 	//				  0 - retain automatic orientation from rimgRotate
 	//				 90 - update rimgRotate to ROT_RIGHT
@@ -393,7 +393,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To recognize text on the specified pages using the specified parameters and store
 	//          the result in:
-	//          A) pvecLetters, if pvecLetters != NULL
+	//          A) pvecLetters, if pvecLetters != __nullptr
 	//          B) rstrText, if pvecLetters == NULL
 	// PARAMS:  (1) vecPageNumbers - a vector of page numbers from which to recognize text
 	//          (2) See rotateAndRecognizeTextInImagePage for other parameter descriptions
@@ -405,11 +405,11 @@ private:
 	// PARAMS:  (1) strFileName - the source document name
 	//          (2) pvecLetters - the vector of spatial letters. if the resultant spatial string
 	//              should be:
-	//              (A) spatial, pvecLetters != NULL
+	//              (A) spatial, pvecLetters != __nullptr
 	//              (B) non-spatial, pvecLetters == NULL
 	//          (3) strText - letters from which to create a non-spatial string. used only if
 	//              pvecLetters is NULL.
-	//          (4) ipPageInfos - spatial page info map. used only if pvecLetters != NULL.
+	//          (4) ipPageInfos - spatial page info map. used only if pvecLetters != __nullptr.
 	void storeResultAsSpatialString(const string& strFileName, vector<CPPLetter>* pvecLetters, 
 		const string& strText, const ILongToObjectMapPtr& ipPageInfos);
 	//--------------------------------------------------------------------------------------------

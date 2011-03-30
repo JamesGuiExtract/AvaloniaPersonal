@@ -95,7 +95,7 @@ void CRuleSetEditor::OnFileNew()
 
 		// create a new ruleset object
 		UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
-		ASSERT_RESOURCE_ALLOCATION("ELI04735", ipRuleSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI04735", ipRuleSet != __nullptr);
 
 		// use the new/empty ruleset object as the object associated with
 		// this UI.
@@ -268,7 +268,7 @@ void CRuleSetEditor::OnToolsCheck()
 	{	
 		// create instance of the category manager
 		ICategoryManagerPtr ipCatMgr(CLSID_CategoryManager);
-		if (ipCatMgr == NULL)
+		if (ipCatMgr == __nullptr)
 		{
 			throw UCLIDException("ELI04327", "Unable to create instance of CategoryManager.");
 		}
@@ -300,7 +300,7 @@ void CRuleSetEditor::OnToolsCheck()
 
 			// recreate the cache file for the category
 			IStrToStrMapPtr ipMap = ipCatMgr->GetDescriptionToProgIDMap1(_bstrCategory);
-			ASSERT_RESOURCE_ALLOCATION("ELI12063", ipMap != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI12063", ipMap != __nullptr);
 
 			// Store count of components found
 			vecCounts.push_back( ipMap->Size );
@@ -418,7 +418,7 @@ void CRuleSetEditor::OnBtnAddAttribute()
 			// add the attribute entry to the map of 
 			// attribute name-to-attributeinfo objects
 			UCLID_AFCORELib::IAttributeFindInfoPtr ipAttrFindInfo(CLSID_AttributeFindInfo);
-			ASSERT_RESOURCE_ALLOCATION("ELI04502", ipAttrFindInfo != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI04502", ipAttrFindInfo != __nullptr);
 			m_ipAttributeNameToInfoMap->Set(get_bstr_t((LPCTSTR)zInput),
 				ipAttrFindInfo);
 			
@@ -503,7 +503,7 @@ void CRuleSetEditor::OnBtnDeleteAttribute()
 				else
 				{
 					// if there are no attributes, there is no attribute find info
-					m_ipInfo = NULL;
+					m_ipInfo = __nullptr;
 
 					// let the Rule Tester dialog know what the current attribute is
 					m_apRuleTesterDlg->setCurrentAttributeName("");
@@ -685,7 +685,7 @@ BOOL CRuleSetEditor::OnInitDialog()
 
 		// center the static prompt which shows the "ruleset is encrypted" message
 		CWnd *pWnd = GetDlgItem( IDC_STATIC_PROMPT );
-		if (pWnd != NULL)
+		if (pWnd != __nullptr)
 		{
 			pWnd->CenterWindow();
 		}
@@ -745,7 +745,7 @@ void CRuleSetEditor::OnBtnAddRule()
 			{
 				// Check for current rule selection
 				POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-				if (pos != NULL)
+				if (pos != __nullptr)
 				{
 					// Get index of first selection
 					nCurrentSelectedIndex = m_listRules.GetNextSelectedItem( pos );
@@ -775,7 +775,7 @@ void CRuleSetEditor::OnBtnAddRule()
 				///////////////////////////////
 				// Retrieve existing vector
 				IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
-				if (ipRules == NULL)
+				if (ipRules == __nullptr)
 				{
 					// Create and throw exception
 					throw UCLIDException("ELI04590", 
@@ -816,7 +816,7 @@ void CRuleSetEditor::OnBtnDeleteRule()
 		// Check for current rule selection
 		int iIndex = -1;
 		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -904,7 +904,7 @@ void CRuleSetEditor::OnBtnConfigureRule()
 		// Retrieve current selection index
 		iIndex = -1;
 		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -914,15 +914,15 @@ void CRuleSetEditor::OnBtnConfigureRule()
 		{
 			// Retrieve collected rules
 			IIUnknownVectorPtr ipRules = m_ipInfo->GetAttributeRules();
-			ASSERT_RESOURCE_ALLOCATION( "ELI15499", ipRules != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI15499", ipRules != __nullptr );
 
 			// Retrieve current rule
 			UCLID_AFCORELib::IAttributeRulePtr	ipRule = ipRules->At( iIndex );
-			ASSERT_RESOURCE_ALLOCATION( "ELI15500", ipRule != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI15500", ipRule != __nullptr );
 
 			// Make copy for configure purposes
 			ICopyableObjectPtr ipCopyableObject = ipRule;
-			if (ipCopyableObject == NULL)
+			if (ipCopyableObject == __nullptr)
 			{
 				throw UCLIDException( "ELI04715", 
 					"Attribute Rule does not support copying." );
@@ -930,7 +930,7 @@ void CRuleSetEditor::OnBtnConfigureRule()
 
 			UCLID_AFCORELib::IAttributeRulePtr	ipNewRule = 
 				ipCopyableObject->Clone();
-			if (ipNewRule == NULL)
+			if (ipNewRule == __nullptr)
 			{
 				// Create and throw exception
 				throw UCLIDException("ELI04592", 
@@ -964,7 +964,7 @@ void CRuleSetEditor::OnBtnConfigureRule()
 					//////////////////////////
 					// Retrieve existing vector
 					IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
-					if (ipRules == NULL)
+					if (ipRules == __nullptr)
 					{
 						// Create and throw exception
 						throw UCLIDException("ELI04593", 
@@ -1003,7 +1003,7 @@ void CRuleSetEditor::OnBtnRuleUp()
 		// Check for current rule selection
 		int iIndex = -1;
 		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -1037,7 +1037,7 @@ void CRuleSetEditor::OnBtnRuleUp()
 			//////////////////////////
 			// Retrieve existing vector
 			IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
-			if (ipRules == NULL)
+			if (ipRules == __nullptr)
 			{
 				// Create and throw exception
 				throw UCLIDException("ELI04594", 
@@ -1068,7 +1068,7 @@ void CRuleSetEditor::OnBtnRuleDown()
 		// Check for current rule selection
 		int iIndex = -1;
 		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -1103,7 +1103,7 @@ void CRuleSetEditor::OnBtnRuleDown()
 			//////////////////////////
 			// Retrieve existing vector
 			IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
-			if (ipRules == NULL)
+			if (ipRules == __nullptr)
 			{
 				// Create and throw exception
 				throw UCLIDException("ELI04595", 
@@ -1209,7 +1209,7 @@ void CRuleSetEditor::OnRclickListRules(NMHDR* pNMHDR, LRESULT* pResult)
 		{
 			int iIndex = -1;
 			POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-			if (pos != NULL)
+			if (pos != __nullptr)
 			{
 				// Get index of first selection
 				iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -1263,7 +1263,7 @@ void CRuleSetEditor::OnCheckStop()
 		UpdateData( TRUE );
 
 		// Apply the setting to the current Info object
-		if (m_ipInfo != NULL)
+		if (m_ipInfo != __nullptr)
 		{
 			m_ipInfo->PutStopSearchingWhenValueFound( asVariantBool(m_bStopWhenValueFound) );
 		}
@@ -1291,7 +1291,7 @@ void CRuleSetEditor::OnRclickValidatorText(NMHDR* pNMHDR, LRESULT* pResult)
 		//////////////////////////
 		UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
 		UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-		bool bEnable = m_ipInfo != NULL && !m_zIVDescription.IsEmpty();
+		bool bEnable = m_ipInfo != __nullptr && !m_zIVDescription.IsEmpty();
 
 			// No Attribute item selected
 		pContextMenu->EnableMenuItem(ID_EDIT_CUT, bEnable ? nEnable : nDisable);
@@ -1391,7 +1391,7 @@ void CRuleSetEditor::OnRclickSplitterText(NMHDR* pNMHDR, LRESULT* pResult)
 		//////////////////////////
 		// Enable or disable items
 		//////////////////////////
-		bool bEnable = m_ipInfo != NULL && !m_zAttributeSplitterDescription.IsEmpty();
+		bool bEnable = m_ipInfo != __nullptr && !m_zAttributeSplitterDescription.IsEmpty();
 		UINT nEnableValue = bEnable ? (MF_BYCOMMAND | MF_ENABLED) : (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 
 		pContextMenu->EnableMenuItem(ID_EDIT_CUT, nEnableValue);
@@ -1916,7 +1916,7 @@ void CRuleSetEditor::OnBnClickedCheckDocumentPp()
 
 	// Retrieve the Preprocessor
 	IObjectWithDescriptionPtr ipGDPP = m_ipRuleSet->GlobalDocPreprocessor;
-	ASSERT_RESOURCE_ALLOCATION("ELI15510", ipGDPP != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15510", ipGDPP != __nullptr);
 
 	// Check what the checkbox is set to and then
 	// Enable or Disable the PreProcessor accordingly
@@ -1936,7 +1936,7 @@ void CRuleSetEditor::OnBnClickedCheckOutputHandler()
 
 	// Retrieve the Output Handler
 	IObjectWithDescriptionPtr ipOH = m_ipRuleSet->GlobalOutputHandler;
-	ASSERT_RESOURCE_ALLOCATION("ELI15511", ipOH != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15511", ipOH != __nullptr);
 
 	// Check what the checkbox is set to and then
 	// Enable or Disable the Output Handler accordingly
@@ -1956,7 +1956,7 @@ void CRuleSetEditor::OnBnClickedCheckInputValidator()
 
 	// Retrieve the Input Validator
 	IObjectWithDescriptionPtr ipIV = m_ipInfo->InputValidator;
-	ASSERT_RESOURCE_ALLOCATION("ELI15512", ipIV != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15512", ipIV != __nullptr);
 
 	// Check what the checkbox is set to and then
 	// Enable or Disable the Input Validator accordingly
@@ -1976,7 +1976,7 @@ void CRuleSetEditor::OnBnClickedCheckAttSplitter()
 
 	// Retrieve the Splitter
 	IObjectWithDescriptionPtr ipSplitter = m_ipInfo->AttributeSplitter;
-	ASSERT_RESOURCE_ALLOCATION("ELI15513", ipSplitter != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15513", ipSplitter != __nullptr);
 
 	// Check what the checkbox is set to and then
 	// Enable or Disable the Attribute Splitter accordingly

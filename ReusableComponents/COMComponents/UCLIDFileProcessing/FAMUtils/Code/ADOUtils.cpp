@@ -32,13 +32,13 @@ long getLongField( const FieldsPtr& ipFields, const string& strFieldName )
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI15335", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI15335", ipFields != __nullptr );
 
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI15282", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15282", ipItem != __nullptr );
 
 			// get the value
 			variant_t vtItem = ipItem->Value;
@@ -70,13 +70,13 @@ long long getLongLongField( const FieldsPtr& ipFields, const string& strFieldNam
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI15336", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI15336", ipFields != __nullptr );
 
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI15285", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15285", ipItem != __nullptr );
 
 			// get the value
 			variant_t vtItem = ipItem->Value;
@@ -115,13 +115,13 @@ string getStringField( const FieldsPtr& ipFields, const string& strFieldName )
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI15331", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI15331", ipFields != __nullptr );
 
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI15288", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15288", ipItem != __nullptr );
 
 			// get the value
 			variant_t vtItem = ipItem->Value;
@@ -153,13 +153,13 @@ void setLongField( const FieldsPtr& ipFields, const string& strFieldName, const 
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI15332", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI15332", ipFields != __nullptr );
 
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI15292", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15292", ipItem != __nullptr );
 
 			// set the variant type to the given value
 			variant_t vtItem;
@@ -185,13 +185,13 @@ void setLongLongField( const FieldsPtr& ipFields, const string& strFieldName, co
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI15333", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI15333", ipFields != __nullptr );
 		
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI15294", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15294", ipItem != __nullptr );
 
 			// Set a variant to the long long value
 			variant_t vtItem;
@@ -218,13 +218,13 @@ void setStringField( const FieldsPtr& ipFields, const string& strFieldName, cons
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI15334", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI15334", ipFields != __nullptr );
 		
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI15296", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15296", ipItem != __nullptr );
 
 			variant_t vtItem;
 			
@@ -259,13 +259,13 @@ CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName )
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI15407", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI15407", ipFields != __nullptr );
 
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI15408", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15408", ipItem != __nullptr );
 
 			// get the value
 			variant_t vtItem = ipItem->Value;
@@ -301,13 +301,13 @@ void setTimeDateField( const FieldsPtr& ipFields, const string& strFieldName, co
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI15411", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI15411", ipFields != __nullptr );
 
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI15412", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI15412", ipItem != __nullptr );
 
 			// set the variant type to the given value
 			variant_t vtItem;
@@ -333,13 +333,13 @@ void setDoubleField( const FieldsPtr& ipFields, const string& strFieldName, cons
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI19671", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI19671", ipFields != __nullptr );
 
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI19672", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI19672", ipItem != __nullptr );
 
 			// set the variant type to the given value
 			variant_t vtItem;
@@ -365,13 +365,13 @@ double getDoubleField( const FieldsPtr& ipFields, const string& strFieldName )
 	try
 	{
 		// Make user ipFields is not NULL
-		ASSERT_ARGUMENT("ELI19668", ipFields != NULL );
+		ASSERT_ARGUMENT("ELI19668", ipFields != __nullptr );
 
 		try
 		{
 			// Get the Field from the fields list
 			FieldPtr ipItem = ipFields->Item[strFieldName.c_str()];
-			ASSERT_RESOURCE_ALLOCATION("ELI19674", ipItem != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI19674", ipItem != __nullptr );
 
 			// get the value
 			variant_t vtItem = ipItem->Value;
@@ -402,7 +402,7 @@ double getDoubleField( const FieldsPtr& ipFields, const string& strFieldName )
 //-------------------------------------------------------------------------------------------------
 long getLastTableID( const _ConnectionPtr& ipDBConnection, string strTableName )
 {
-	ASSERT_ARGUMENT("ELI18816", ipDBConnection != NULL);
+	ASSERT_ARGUMENT("ELI18816", ipDBConnection != __nullptr);
 
 	_RecordsetPtr ipRSet;
 	// Build SQL string to get the last ID for the given table
@@ -410,7 +410,7 @@ long getLastTableID( const _ConnectionPtr& ipDBConnection, string strTableName )
 
 	// Execute the command 
 	ipRSet = ipDBConnection->Execute( strGetIDSQL.c_str(), NULL, adCmdUnknown );
-	ASSERT_RESOURCE_ALLOCATION("ELI13525", ipRSet != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI13525", ipRSet != __nullptr );
 
 	// The ID field in all of the tables is a 32 bit int so
 	// the value returned by this function can be changed to type long
@@ -419,20 +419,20 @@ long getLastTableID( const _ConnectionPtr& ipDBConnection, string strTableName )
 //-------------------------------------------------------------------------------------------------
 string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection )
 {
-	ASSERT_ARGUMENT("ELI18817", ipDBConnection != NULL);
+	ASSERT_ARGUMENT("ELI18817", ipDBConnection != __nullptr);
 
 	// Get the current date time
 	_RecordsetPtr ipRSTime;
 	ipRSTime = ipDBConnection->Execute (gstrGET_SQL_SERVER_TIME.c_str(), NULL, adCmdText );
-	ASSERT_RESOURCE_ALLOCATION("ELI15326", ipRSTime != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15326", ipRSTime != __nullptr );
 	
 	// Get the fields pointer
 	FieldsPtr ipFields = ipRSTime->Fields;
-	ASSERT_RESOURCE_ALLOCATION("ELI15701", ipFields != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15701", ipFields != __nullptr );
 
 	// Get the CurrDateTime item
 	FieldPtr ipItem = ipFields->Item["CurrDateTime"];
-	ASSERT_RESOURCE_ALLOCATION("ELI15327", ipItem != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15327", ipItem != __nullptr );
 
 	// get the value
 	_variant_t vtTime;
@@ -448,16 +448,16 @@ string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection )
 //-------------------------------------------------------------------------------------------------
 CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection)
 {
-	ASSERT_ARGUMENT("ELI30822", ipDBConnection != NULL);
+	ASSERT_ARGUMENT("ELI30822", ipDBConnection != __nullptr);
 
 	// Get the current date time
 	_RecordsetPtr ipRSTime;
 	ipRSTime = ipDBConnection->Execute (gstrGET_SQL_SERVER_TIME.c_str(), NULL, adCmdText );
-	ASSERT_RESOURCE_ALLOCATION("ELI30823", ipRSTime != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI30823", ipRSTime != __nullptr );
 	
 	// Get the fields pointer
 	FieldsPtr ipFields = ipRSTime->Fields;
-	ASSERT_RESOURCE_ALLOCATION("ELI30824", ipFields != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI30824", ipFields != __nullptr );
 
 	return getTimeDateField(ipFields, "CurrDateTime");
 }
@@ -488,7 +488,7 @@ string createConnectionString(const string& strServer, const string& strDatabase
 //-------------------------------------------------------------------------------------------------
 long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQuery, bool bDisplayExceptions)
 {
-	ASSERT_ARGUMENT("ELI18818", ipDBConnection != NULL);
+	ASSERT_ARGUMENT("ELI18818", ipDBConnection != __nullptr);
 
 	variant_t vtRecordsAffected = 0L;
 	try
@@ -518,7 +518,7 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 //-------------------------------------------------------------------------------------------------
 long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, const string& strKeyCol, string& rstrKey, bool bAddKey)
 {
-	ASSERT_ARGUMENT("ELI18775", ipDBConnection != NULL);
+	ASSERT_ARGUMENT("ELI18775", ipDBConnection != __nullptr);
 
 	// Set ID to 0
 	long lID = 0;
@@ -529,7 +529,7 @@ long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, cons
 
 	// Allocate recordset
 	_RecordsetPtr ipKeySet(__uuidof( Recordset ));
-	ASSERT_RESOURCE_ALLOCATION("ELI18018", ipKeySet != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI18018", ipKeySet != __nullptr );
 
 	// Create Keys sql
 	string strKeySQL = "SELECT ID, " + strKeyCol + " FROM " + strTable + " WHERE " + strKeyCol + " = '" + strFileName + "'";
@@ -569,7 +569,7 @@ long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, cons
 //-------------------------------------------------------------------------------------------------
 void dropConstraint(const _ConnectionPtr& ipDBConnection, const string& strTableName, const string& strConstraint)
 {
-	ASSERT_ARGUMENT("ELI18819", ipDBConnection != NULL);
+	ASSERT_ARGUMENT("ELI18819", ipDBConnection != __nullptr);
 
 	// Build the drop SQL statement
 	string strDropSQL = "ALTER TABLE [" + strTableName + "] DROP CONSTRAINT [" + strConstraint + "]";
@@ -580,11 +580,11 @@ void dropConstraint(const _ConnectionPtr& ipDBConnection, const string& strTable
 //-------------------------------------------------------------------------------------------------
 void dropFKContraintsOnTables(const _ConnectionPtr& ipDBConnection, const vector<string>& vecTables)
 {
-	ASSERT_ARGUMENT("ELI18820", ipDBConnection != NULL);
+	ASSERT_ARGUMENT("ELI18820", ipDBConnection != __nullptr);
 
 	// Open recordset with all of the Foreign Key relationships
 	_RecordsetPtr ipConstraints = ipDBConnection->OpenSchema(adSchemaForeignKeys);
-	ASSERT_RESOURCE_ALLOCATION("ELI18017", ipConstraints != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI18017", ipConstraints != __nullptr );
 
 	// Loop through all constraints
 	while (!asCppBool(ipConstraints->adoEOF))
@@ -609,7 +609,7 @@ void dropFKContraintsOnTables(const _ConnectionPtr& ipDBConnection, const vector
 //-------------------------------------------------------------------------------------------------
 void dropTablesInVector(const _ConnectionPtr& ipDBConnection, const vector<string>& vecTables)
 {
-	ASSERT_ARGUMENT("ELI18821", ipDBConnection != NULL);
+	ASSERT_ARGUMENT("ELI18821", ipDBConnection != __nullptr);
 	
 	try
 	{
@@ -706,8 +706,8 @@ FAMUTILS_API void copyExistingFields(const FieldsPtr& ipSource, const FieldsPtr&
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20024", ipSource != NULL);
-		ASSERT_ARGUMENT("ELI20025", ipDest != NULL);
+		ASSERT_ARGUMENT("ELI20024", ipSource != __nullptr);
+		ASSERT_ARGUMENT("ELI20025", ipDest != __nullptr);
 
 		// Get the number of fields in the source fields list
 		long nSourceCount = ipSource->Count;
@@ -724,7 +724,7 @@ FAMUTILS_API void copyExistingFields(const FieldsPtr& ipSource, const FieldsPtr&
 
 			// Get field with that index
 			FieldPtr ipSourceField = ipSource->Item[variant_t(n)];
-			ASSERT_RESOURCE_ALLOCATION("ELI20029", ipSourceField != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20029", ipSourceField != __nullptr);
 
 			// Get the source field name
 			string strSourceFieldName = asString(ipSourceField->Name);
@@ -735,7 +735,7 @@ FAMUTILS_API void copyExistingFields(const FieldsPtr& ipSource, const FieldsPtr&
 			if (bCopyID || strSourceFieldName != "ID")
 			{
 				// Attempt to get the destination field
-				FieldPtr ipDestField = NULL;
+				FieldPtr ipDestField = __nullptr;
 				try
 				{
 					ipDestField = ipDest->Item[strSourceFieldName.c_str()];
@@ -746,7 +746,7 @@ FAMUTILS_API void copyExistingFields(const FieldsPtr& ipSource, const FieldsPtr&
 				}
 
 				// Only copy to the destination field if it exists
-				if (ipDestField != NULL)
+				if (ipDestField != __nullptr)
 				{
 					// Copy the source value into the destination
 					ipDestField->Value = ipSourceField->Value;
@@ -764,7 +764,7 @@ FieldPtr getNamedField(const FieldsPtr& ipFields, const string& strFieldName)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20052", ipFields != NULL);
+		ASSERT_ARGUMENT("ELI20052", ipFields != __nullptr);
 		ASSERT_ARGUMENT("ELI20053", !strFieldName.empty());
 
 		// Attempt to get the names field, if it does not exist, just return NULL
@@ -789,8 +789,8 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20054", ipDestDB != NULL);
-		ASSERT_ARGUMENT("ELI20055", ipDestFields != NULL);
+		ASSERT_ARGUMENT("ELI20054", ipDestDB != __nullptr);
+		ASSERT_ARGUMENT("ELI20055", ipDestFields != __nullptr);
 
 		string strIDColName = strKeyTable + "ID";
 		_lastCodePos = "10";
@@ -800,7 +800,7 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 		_lastCodePos = "20";
 
 		// if the field does not exist just return
-		if (ipField == NULL)
+		if (ipField == __nullptr)
 		{
 			return;
 		}

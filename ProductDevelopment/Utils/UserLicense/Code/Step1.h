@@ -66,7 +66,7 @@ private:
 	};
 
 	// Used to access Windows install information via the registry
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pInstallRegistryMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pInstallRegistryMgr;
 
 	// Used to keep track of the ProductInfo associated with each entry in the
 	// products drop-down

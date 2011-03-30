@@ -27,8 +27,8 @@ PSUpdateThreadManager::PSUpdateThreadManager(IProgressStatus* pProgressStatus, I
 	try
 	{
 		// ensure the progress status object and OCR Engine are non-NULL
-		ASSERT_ARGUMENT("ELI16163", m_ipProgressStatus != NULL);
-		ASSERT_ARGUMENT("ELI16201", m_ipOCREngine != NULL);
+		ASSERT_ARGUMENT("ELI16163", m_ipProgressStatus != __nullptr);
+		ASSERT_ARGUMENT("ELI16201", m_ipOCREngine != __nullptr);
 
 		// determine the number of recognition passes
 		// Two recognition passes are always made.  The third one is optional (and
@@ -109,8 +109,8 @@ PSUpdateThreadManager::PSUpdateThreadManager(PSUpdateThreadManager *pThreadManag
 
 		// For a private copy marshalled into a status update thread, the source instance must have
 		// a global interface table and cookies for the OCR manager and progress status objects.
-		ASSERT_ARGUMENT("ELI25289", pThreadManager != NULL);
-		ASSERT_ARGUMENT("ELI25298", pThreadManager->m_ipInterfaceTablePtr != NULL);
+		ASSERT_ARGUMENT("ELI25289", pThreadManager != __nullptr);
+		ASSERT_ARGUMENT("ELI25298", pThreadManager->m_ipInterfaceTablePtr != __nullptr);
 		ASSERT_ARGUMENT("ELI25296", pThreadManager->m_dwOCREngineCookie != 0);
 		ASSERT_ARGUMENT("ELI25297", pThreadManager->m_dwProgressStatusCookie != 0);
 
@@ -145,7 +145,7 @@ PSUpdateThreadManager::~PSUpdateThreadManager()
 	{
 		// Only if this instance has a m_ipInterfaceTablePtr defined (meaning it is the original
 		// copy and not a copy for the status update thread), does final cleanup need to occur.
-		if (m_ipInterfaceTablePtr != NULL)
+		if (m_ipInterfaceTablePtr != __nullptr)
 		{
 			// kill the progress status update thread
 			m_eventPSThreadStop.signal();
@@ -165,7 +165,7 @@ PSUpdateThreadManager::~PSUpdateThreadManager()
 				m_ipInterfaceTablePtr->RevokeInterfaceFromGlobal(m_dwProgressStatusCookie);
 			}
 
-			m_ipInterfaceTablePtr = NULL;
+			m_ipInterfaceTablePtr = __nullptr;
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16164");
@@ -198,7 +198,7 @@ UINT PSUpdateThreadManager::progressStatusUpdateLoop(void *pData)
 	{
 		// Get a copy of the progress status thread manager that is marshalled into this thread.
 		pThreadManager = new PSUpdateThreadManager((PSUpdateThreadManager*) pData);
-		ASSERT_RESOURCE_ALLOCATION("ELI25291", pThreadManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25291", pThreadManager != __nullptr);
 
 		// signal that the progress status thread has started
 		pThreadManager->m_eventPSThreadStarted.signal();
@@ -214,7 +214,7 @@ UINT PSUpdateThreadManager::progressStatusUpdateLoop(void *pData)
 		{
 			// mark the remaining progress status items as completed
 			IProgressStatusPtr ipProgressStatus = pThreadManager->m_ipProgressStatus;
-			ASSERT_RESOURCE_ALLOCATION("ELI25245", ipProgressStatus != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25245", ipProgressStatus != __nullptr);
 
 			ipProgressStatus->CompleteProgressItems("Finished OCR", 
 				pThreadManager->m_lTotalProgressItems - pThreadManager->m_lCompletedProgressItems);

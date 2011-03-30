@@ -218,11 +218,11 @@ private:
 	CString	m_zDirectory;
 
 	// Mutex for accessing the log file
-	auto_ptr<CMutex> m_apLogFileMutex;
+	unique_ptr<CMutex> m_apLogFileMutex;
 
 	// Modeless Find dialog
-	auto_ptr<CUEXFindDlg> ma_pFindDlg;
-	auto_ptr<CExportDebugDataDlg> ma_pExportDebugDataDlg;
+	unique_ptr<CUEXFindDlg> ma_pFindDlg;
+	unique_ptr<CExportDebugDataDlg> ma_pExportDebugDataDlg;
 
 	// Have the dialog's controls been instantiated yet - allows for resize
 	// and repositioning

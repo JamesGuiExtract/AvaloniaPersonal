@@ -92,7 +92,7 @@ STDMETHODIMP CStrToObjectMap::IsDirty(void)
 			for (; itMap != m_mapKeyToValue.end(); itMap++)
 			{
 				IPersistStreamPtr ipPersistStream(itMap->second);
-				if (ipPersistStream == NULL)
+				if (ipPersistStream == __nullptr)
 				{
 					UCLIDException ue("ELI19309", "Object does not support persistence!");
 					ue.addDebugInfo("Key", static_cast<string>(itMap->first));
@@ -123,7 +123,7 @@ STDMETHODIMP CStrToObjectMap::Load(IStream *pStream)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28408", pStream != NULL);
+		ASSERT_ARGUMENT("ELI28408", pStream != __nullptr);
 
 		// clear the internal map
 		m_mapKeyToValue.clear();
@@ -197,7 +197,7 @@ STDMETHODIMP CStrToObjectMap::Save(IStream *pStream, BOOL fClearDirty)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28409", pStream != NULL);
+		ASSERT_ARGUMENT("ELI28409", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -226,7 +226,7 @@ STDMETHODIMP CStrToObjectMap::Save(IStream *pStream, BOOL fClearDirty)
 
 			// write the the object to the stream
 			IPersistStreamPtr ipObj = iter->second;
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				UCLIDException ue("ELI19306", "Object does not support persistence!");
 				ue.addDebugInfo("Key", static_cast<string>(iter->first));
@@ -288,7 +288,7 @@ STDMETHODIMP CStrToObjectMap::GetValue(BSTR key, IUnknown **pObject)
 		// validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28410", pObject != NULL);
+		ASSERT_ARGUMENT("ELI28410", pObject != __nullptr);
 
 		// get value of specified entry in map
 		stringCSIS stdstrKey ( asString ( key ), m_bCaseSensitive );
@@ -317,7 +317,7 @@ STDMETHODIMP CStrToObjectMap::Contains(BSTR key, VARIANT_BOOL *bFound)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26041", bFound != NULL);
+		ASSERT_ARGUMENT("ELI26041", bFound != __nullptr);
 
 		// validate license
 		validateLicense();
@@ -379,14 +379,14 @@ STDMETHODIMP CStrToObjectMap::GetKeys(IVariantVector **pKeys)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26042", pKeys != NULL);
+		ASSERT_ARGUMENT("ELI26042", pKeys != __nullptr);
 
 		// validate license
 		validateLicense();
 
 		// create a variant vector of all the keys in the map
 		UCLID_COMUTILSLib::IVariantVectorPtr ipKeys(CLSID_VariantVector);
-		if (ipKeys == NULL)
+		if (ipKeys == __nullptr)
 		{
 			throw UCLIDException("ELI19296", "Unable to create VariantVector object!");
 		}
@@ -410,7 +410,7 @@ STDMETHODIMP CStrToObjectMap::get_Size(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26043", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26043", pVal != __nullptr);
 
 		// validate license and return size of current map
 		validateLicense();
@@ -427,8 +427,8 @@ STDMETHODIMP CStrToObjectMap::GetKeyValue(long nIndex, BSTR *pstrKey, IUnknown* 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26044", pstrKey != NULL);
-		ASSERT_ARGUMENT("ELI26045", pObject != NULL);
+		ASSERT_ARGUMENT("ELI26044", pstrKey != __nullptr);
+		ASSERT_ARGUMENT("ELI26045", pObject != __nullptr);
 
 		// validate license and return size of current map
 		validateLicense();
@@ -512,7 +512,7 @@ STDMETHODIMP CStrToObjectMap::get_CaseSensitive(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26046", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26046", pVal != __nullptr);
 
 		// validate license 
 		validateLicense();
@@ -553,7 +553,7 @@ STDMETHODIMP CStrToObjectMap::TryGetValue(BSTR bstrKey, IUnknown **ppObject)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI26398", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI26398", ppObject != __nullptr);
 
 		validateLicense();
 
@@ -611,7 +611,7 @@ STDMETHODIMP CStrToObjectMap::CopyFrom(IUnknown * pObject)
 
 		// Clear the other map object
 		UCLID_COMUTILSLib::IStrToObjectMapPtr ipSource( pObject );
-		ASSERT_RESOURCE_ALLOCATION("ELI19350", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19350", ipSource != __nullptr);
 		clear();
 
 		// Set Casesensitivity to same as source
@@ -625,11 +625,11 @@ STDMETHODIMP CStrToObjectMap::CopyFrom(IUnknown * pObject)
 			ipSource->GetKeyValue(i, &bstrKey, &ipUnk);
 
 			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopier(ipUnk);
-			ASSERT_RESOURCE_ALLOCATION("ELI26047", ipCopier != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26047", ipCopier != __nullptr);
 
 			// Create a deep copy of the objects
 			ipUnk = ipCopier->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI26048", ipUnk != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26048", ipUnk != __nullptr);
 
 			m_mapKeyToValue[ stringCSIS( asString(bstrKey), m_bCaseSensitive )] = ipUnk;
 		}
@@ -651,7 +651,7 @@ STDMETHODIMP CStrToObjectMap::Clone(IUnknown * * pObject)
 		// Create a new map
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_StrToObjectMap );
-		ASSERT_RESOURCE_ALLOCATION("ELI19354", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19354", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -673,13 +673,13 @@ STDMETHODIMP CStrToObjectMap::ShallowCopy(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26049", pObject != NULL);
+		ASSERT_ARGUMENT("ELI26049", pObject != __nullptr);
 
 		// Check license state
 		validateLicense();
 
 		UCLID_COMUTILSLib::IStrToObjectMapPtr ipNewMap(CLSID_StrToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI26050", ipNewMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26050", ipNewMap != __nullptr);
 
 		// Set Casesensitivity to same as this
 		ipNewMap->CaseSensitive = asVariantBool(m_bCaseSensitive);

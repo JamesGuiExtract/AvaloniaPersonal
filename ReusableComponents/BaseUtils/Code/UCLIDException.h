@@ -446,7 +446,7 @@ private:
 	string m_strDescription;
 
 	// Pointer to the inner exception if this is NULL there is no inner exception.
-	auto_ptr<UCLIDException> m_apueInnerException;
+	unique_ptr<UCLIDException> m_apueInnerException;
 
 	// Vector of stack trace items
 	vector<string> m_vecStackTrace;
@@ -1520,7 +1520,7 @@ private:
 	if (FAILED(hr)) \
 	{ \
 		CComQIPtr<ISupportErrorInfo> ipSupportErrorInfoPtr = interface_ptr; \
-		if (ipSupportErrorInfoPtr != NULL) \
+		if (ipSupportErrorInfoPtr != __nullptr) \
 		{ \
 			if (FAILED(ipSupportErrorInfoPtr->InterfaceSupportsErrorInfo(iid_interface_name))) \
 			{ \

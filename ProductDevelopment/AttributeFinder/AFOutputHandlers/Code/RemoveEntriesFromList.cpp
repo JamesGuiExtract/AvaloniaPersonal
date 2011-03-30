@@ -77,15 +77,15 @@ STDMETHODIMP CRemoveEntriesFromList::raw_ProcessOutput(IIUnknownVector* pAttribu
 		validateLicense();
 
 		IIUnknownVectorPtr ipOrignAttributes(pAttributes);
-		ASSERT_ARGUMENT("ELI06772", ipOrignAttributes != NULL);
+		ASSERT_ARGUMENT("ELI06772", ipOrignAttributes != __nullptr);
 		// create an empty vector
 		IIUnknownVectorPtr ipReturnAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI06770", ipReturnAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06770", ipReturnAttributes != __nullptr);
 
 		// Get a list of values that includes values from any specified files.
 		IVariantVectorPtr ipExpandedEntriesList =
 			m_cachedListLoader.expandList(m_ipEntriesList, pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI30064", ipExpandedEntriesList != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30064", ipExpandedEntriesList != __nullptr);
 
 		// go through all attributes and valid them
 		long nSize = ipOrignAttributes->Size();
@@ -93,11 +93,11 @@ STDMETHODIMP CRemoveEntriesFromList::raw_ProcessOutput(IIUnknownVector* pAttribu
 		{
 			bool bFoundMatch = false;
 			IAttributePtr ipAttr(ipOrignAttributes->At(n));
-			ASSERT_RESOURCE_ALLOCATION("ELI06771", ipAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06771", ipAttr != __nullptr);
 
 			// Retrieve the value
 			ISpatialStringPtr ipValue = ipAttr->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI15527", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15527", ipValue != __nullptr);
 
 			// if the attribute value is one of the entries
 			// in the list, do not add it to the return list
@@ -208,9 +208,9 @@ STDMETHODIMP CRemoveEntriesFromList::put_EntryList(IVariantVector *newVal)
 		validateLicense();
 
 		// Set old object to null
-		if (m_ipEntriesList != NULL) 
+		if (m_ipEntriesList != __nullptr) 
 		{
-			m_ipEntriesList = NULL;
+			m_ipEntriesList = __nullptr;
 		}
 
 		// Store new list
@@ -300,7 +300,7 @@ STDMETHODIMP CRemoveEntriesFromList::raw_GetComponentDescription(BSTR * pstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19551", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19551", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Remove entries from list").Detach();
 	}
@@ -369,7 +369,7 @@ STDMETHODIMP CRemoveEntriesFromList::Load(IStream *pStream)
 		// Read the Entries list
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI09959");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI07774", 
 				"Variant Vector for Entries List object could not be read from stream!" );
@@ -410,7 +410,7 @@ STDMETHODIMP CRemoveEntriesFromList::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the Entries list to the IStream object
 		IPersistStreamPtr ipPersistentObj( m_ipEntriesList );
-		if (ipPersistentObj == NULL)
+		if (ipPersistentObj == __nullptr)
 		{
 			throw UCLIDException( "ELI07775", 
 				"Remove Entries From List object does not support persistence!" );
@@ -480,7 +480,7 @@ STDMETHODIMP CRemoveEntriesFromList::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFOUTPUTHANDLERSLib::IRemoveEntriesFromListPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08229", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08229", ipSource != __nullptr);
 
 		// Copy list of strings
 		// Not sure if there should be an assert here

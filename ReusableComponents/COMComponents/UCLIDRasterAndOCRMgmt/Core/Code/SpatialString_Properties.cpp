@@ -24,7 +24,7 @@ STDMETHODIMP CSpatialString::get_String(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20672", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20672", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -44,7 +44,7 @@ STDMETHODIMP CSpatialString::get_Size(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20670", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20670", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -64,7 +64,7 @@ STDMETHODIMP CSpatialString::get_SourceDocName(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20669", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20669", pVal != __nullptr);
 
 		// validate license
 		validateLicense();
@@ -103,7 +103,7 @@ STDMETHODIMP CSpatialString::get_SpatialPageInfos(ILongToObjectMap** pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20668", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20668", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -118,7 +118,7 @@ STDMETHODIMP CSpatialString::get_SpatialPageInfos(ILongToObjectMap** pVal)
 
 		// Return a reference to the internal page map
 		ILongToObjectMapPtr ipShallowCopy = m_ipPageInfoMap;
-		ASSERT_RESOURCE_ALLOCATION("ELI26005", ipShallowCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26005", ipShallowCopy != __nullptr);
 
 		*pVal = ipShallowCopy.Detach();
 		
@@ -133,7 +133,7 @@ STDMETHODIMP CSpatialString::GetOCRImageLetter(long nIndex, ILetter **pLetter)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20667", pLetter != NULL);
+		ASSERT_ARGUMENT("ELI20667", pLetter != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -153,7 +153,7 @@ STDMETHODIMP CSpatialString::GetOCRImageLetter(long nIndex, ILetter **pLetter)
 
 		// create letter object at the specified index
 		UCLID_RASTERANDOCRMGMTLib::ILetterPtr ipLetter(CLSID_Letter);
-		ASSERT_RESOURCE_ALLOCATION("ELI25855", ipLetter != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25855", ipLetter != __nullptr);
 
 		ipLetter->CreateFromCppLetter((void*) &(m_vecLetters[nIndex]));
 		
@@ -171,7 +171,7 @@ STDMETHODIMP CSpatialString::GetChar(long nIndex, long *pChar)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20666", pChar != NULL);
+		ASSERT_ARGUMENT("ELI20666", pChar != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -236,8 +236,8 @@ STDMETHODIMP CSpatialString::GetOCRImageLetterArray(long* pnNumLetters, void** p
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20664", pnNumLetters != NULL);
-		ASSERT_ARGUMENT("ELI20665", ppLetters != NULL);
+		ASSERT_ARGUMENT("ELI20664", pnNumLetters != __nullptr);
+		ASSERT_ARGUMENT("ELI20665", ppLetters != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -259,7 +259,7 @@ STDMETHODIMP CSpatialString::GetOriginalImageBounds(ILongRectangle **pBounds)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20663", pBounds != NULL);
+		ASSERT_ARGUMENT("ELI20663", pBounds != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -279,16 +279,16 @@ STDMETHODIMP CSpatialString::GetOriginalImageBounds(ILongRectangle **pBounds)
 		}
 
 		// Declare the long rectangle to hold the return value
-		ILongRectanglePtr ipLongRectangle = NULL;
+		ILongRectanglePtr ipLongRectangle = __nullptr;
 
 		// Get the Raster zones for this spatial string
 		IIUnknownVectorPtr ipZones = getOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI25856", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25856", ipZones != __nullptr);
 		if (ipZones->Size() > 0)
 		{
 			// Get the first raster zone
 			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipZones->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI25659", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25659", ipZone != __nullptr);
 
 			// Get the spatial page info for this page.
 			// Although it is possible to pass NULL into GetBoundsFromMultipleRasterZones
@@ -296,18 +296,18 @@ STDMETHODIMP CSpatialString::GetOriginalImageBounds(ILongRectangle **pBounds)
 			// have a spatial page info object so ASSERT that condition.
 			UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo =
 				m_ipPageInfoMap->GetValue(ipZone->PageNumber);
-			ASSERT_RESOURCE_ALLOCATION("ELI25660", ipPageInfo != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25660", ipPageInfo != __nullptr);
 
 			// Get a bounding rectangle for the raster zones (restrict the bounding rectangle
 			// by the page dimensions)
 			ipLongRectangle = ipZone->GetBoundsFromMultipleRasterZones(ipZones, ipPageInfo);
-			ASSERT_RESOURCE_ALLOCATION("ELI25661", ipLongRectangle != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25661", ipLongRectangle != __nullptr);
 		}
 		else
 		{
 			// There are no raster zones, just return an empty rectangle
 			ipLongRectangle.CreateInstance(CLSID_LongRectangle);
-			ASSERT_RESOURCE_ALLOCATION("ELI25662", ipLongRectangle != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25662", ipLongRectangle != __nullptr);
 		}
 
 		// return the long rectangle
@@ -324,14 +324,14 @@ STDMETHODIMP CSpatialString::GetWords(IIUnknownVector **pvecWords)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20662", pvecWords != NULL);
+		ASSERT_ARGUMENT("ELI20662", pvecWords != __nullptr);
 
 		// Check license
 		validateLicense();
 
 		// Create vector for resulting ISpatialStrings
 		IIUnknownVectorPtr ipWords = getWords();
-		ASSERT_RESOURCE_ALLOCATION("ELI07144", ipWords != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07144", ipWords != __nullptr);
 
 		// Return the vector of word strings
 		*pvecWords = ipWords.Detach();
@@ -347,14 +347,14 @@ STDMETHODIMP CSpatialString::GetLines(IIUnknownVector **pvecLines)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20661", pvecLines != NULL);
+		ASSERT_ARGUMENT("ELI20661", pvecLines != __nullptr);
 
 		// Check license
 		validateLicense();
 
 		// Create vector for resulting ISpatialStrings
 		IIUnknownVectorPtr ipLines = getLinesUnknownVector();
-		ASSERT_RESOURCE_ALLOCATION("ELI07146", ipLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07146", ipLines != __nullptr);
 
 		// Return the vector of line  strings
 		*pvecLines = ipLines.Detach();
@@ -374,7 +374,7 @@ STDMETHODIMP CSpatialString::GetParagraphs(IIUnknownVector **pvecParagraphs)
 		// including non spatial strings, using double newlines or double \r\n as 
 		// paragraph separators.
 
-		ASSERT_ARGUMENT("ELI20660", pvecParagraphs != NULL);
+		ASSERT_ARGUMENT("ELI20660", pvecParagraphs != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -390,7 +390,7 @@ STDMETHODIMP CSpatialString::GetParagraphs(IIUnknownVector **pvecParagraphs)
 		
 		// Create vector for resulting ISpatialStrings
 		IIUnknownVectorPtr ipParagraphs = getParagraphs();
-		ASSERT_RESOURCE_ALLOCATION("ELI07148", ipParagraphs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07148", ipParagraphs != __nullptr);
 
 		// Return the vector of paragraph strings
 		*pvecParagraphs = ipParagraphs.Detach();
@@ -407,7 +407,7 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20659", ppResultString != NULL);
+		ASSERT_ARGUMENT("ELI20659", ppResultString != __nullptr);
 
 		validateLicense();
 
@@ -427,14 +427,14 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 
 		// The spatial string that will contain the specified pages
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipReturn(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI07418", ipReturn != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07418", ipReturn != __nullptr);
 
 		// If this is a hybrid mode, copy the raster zones that are on the specified
 		// pages. Also return spatial page info for the specified pages.
 		if(m_eMode == kHybridMode)
 		{
 			IIUnknownVectorPtr ipSpecifiedZones(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI15315", ipSpecifiedZones != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15315", ipSpecifiedZones != __nullptr);
 
 			// Keep track of whether any raster zones were found on any of the specified pages.
 			long qualifyingRasterZoneCount = 0;
@@ -445,7 +445,7 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 			for(size_t i = 0; i < nSourceRasterZoneCount; i++)
 			{
 				UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipRaster = m_vecRasterZones[i];
-				ASSERT_RESOURCE_ALLOCATION("ELI15313", ipRaster != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15313", ipRaster != __nullptr);
 
 				long nPage = ipRaster->PageNumber;
 				// If the page number is greater than or equal to the start number
@@ -564,7 +564,7 @@ STDMETHODIMP CSpatialString::GetRelativePages(long nStartPageNum, long nEndPageN
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20658", ppResultString != NULL);
+		ASSERT_ARGUMENT("ELI20658", ppResultString != __nullptr);
 
 		validateLicense();
 
@@ -575,20 +575,20 @@ STDMETHODIMP CSpatialString::GetRelativePages(long nStartPageNum, long nEndPageN
 		}
 
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipReturn(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI08569", ipReturn != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08569", ipReturn != __nullptr);
 
 		if( m_eMode == kHybridMode )
 		{
 			// Create an object that will store the relative raster zones as specified by the arguments
 			IIUnknownVectorPtr ipRelativeRasterZones(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI15301", ipRelativeRasterZones != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15301", ipRelativeRasterZones != __nullptr);
 
 			for(vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr>::iterator it = m_vecRasterZones.begin();
 				it != m_vecRasterZones.end(); it++)
 			{
 				// Get each raster zone
 				UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipRZ(*it);
-				ASSERT_RESOURCE_ALLOCATION("ELI15302", ipRZ != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15302", ipRZ != __nullptr);
 
 				// Get the raster zones page number
 				long nPageNumber = ipRZ->PageNumber;
@@ -724,7 +724,7 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20657", pvecPages != NULL);
+		ASSERT_ARGUMENT("ELI20657", pvecPages != __nullptr);
 
 		validateLicense();
 
@@ -737,7 +737,7 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 
 		// Create vector for resulting ISpatialStrings
 		IIUnknownVectorPtr ipPages(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI07482", ipPages != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07482", ipPages != __nullptr);
 
 		if (m_eMode == kHybridMode)
 		{
@@ -749,7 +749,7 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 			{
 				// Get the raster zone
 				UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(*it);
-				ASSERT_RESOURCE_ALLOCATION("ELI25862", ipZone != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25862", ipZone != __nullptr);
 
 				// Add this raster zone to the map of pages to zones
 				mapZonesToPages[ipZone->PageNumber].push_back(ipZone);
@@ -761,7 +761,7 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 			{
 				// Build the collection of raster zones for this page
 				IIUnknownVectorPtr ipPageZones(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI25863", ipPageZones != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25863", ipPageZones != __nullptr);
 				for (vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr>::iterator vecIt = it->second.begin();
 					vecIt != it->second.end(); vecIt++)
 				{
@@ -770,7 +770,7 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 
 				// Build a spatial string for the zones
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipString(CLSID_SpatialString);
-				ASSERT_RESOURCE_ALLOCATION("ELI25864", ipString != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25864", ipString != __nullptr);
 				ipString->CreateHybridString(ipPageZones, m_strString.c_str(),
 					m_strSourceDocName.c_str(), m_ipPageInfoMap);
 
@@ -809,7 +809,7 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 					// get the page beginning ending with current letter
 					UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipItem =
 						getSubString(nStartPos, i-1);
-					ASSERT_RESOURCE_ALLOCATION("ELI25865", ipItem != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25865", ipItem != __nullptr);
 
 					ipPages->PushBack( ipItem );
 
@@ -827,7 +827,7 @@ STDMETHODIMP CSpatialString::GetPages(IIUnknownVector **pvecPages)
 				// get the page beginning at nStartPos and ending with last letter
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipItem =
 					getSubString(nStartPos, nNumLetters - 1);
-				ASSERT_RESOURCE_ALLOCATION("ELI25866", ipItem != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25866", ipItem != __nullptr);
 				ipPages->PushBack( ipItem );
 			}
 		}
@@ -854,7 +854,7 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 	// average of all its paragraphs
 	try
 	{
-		ASSERT_ARGUMENT("ELI20416", lpHeight != NULL);
+		ASSERT_ARGUMENT("ELI20416", lpHeight != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -868,7 +868,7 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 
 		// Get all of the paragraphs
 		IIUnknownVectorPtr ipParagraphs = getParagraphs();
-		ASSERT_RESOURCE_ALLOCATION("ELI20417", ipParagraphs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20417", ipParagraphs != __nullptr);
 
 		long lParagraphCount = ipParagraphs->Size();
 
@@ -884,9 +884,9 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 
 			// Get all the lines in this string
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipParagraph = ipParagraphs->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI20418", ipParagraph != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20418", ipParagraph != __nullptr);
 			IIUnknownVectorPtr ipLines = ipParagraph->GetLines();
-			ASSERT_RESOURCE_ALLOCATION("ELI20419", ipLines != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20419", ipLines != __nullptr);
 			
 			unsigned int totalParagraphLineHeight = 0;
 			unsigned int numUsedLines = 0;
@@ -899,9 +899,9 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 			{
 				// Get the bounding boxes of the two lines
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine1 = ipLines->At(iLine);
-				ASSERT_RESOURCE_ALLOCATION("ELI20420", ipLine1 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20420", ipLine1 != __nullptr);
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine2 = ipLines->At(iLine + 1);
-				ASSERT_RESOURCE_ALLOCATION("ELI20421", ipLine2 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20421", ipLine2 != __nullptr);
 
 				// both must be spatial
 				if (ipLine1->GetMode() != kSpatialMode || ipLine2->GetMode() != kSpatialMode)
@@ -910,9 +910,9 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 				}
 
 				ILongRectanglePtr ipBounds1 = ipLine1->GetOCRImageBounds();
-				ASSERT_RESOURCE_ALLOCATION("ELI20422", ipBounds1 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20422", ipBounds1 != __nullptr);
 				ILongRectanglePtr ipBounds2 = ipLine2->GetOCRImageBounds();
-				ASSERT_RESOURCE_ALLOCATION("ELI20423", ipBounds2 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI20423", ipBounds2 != __nullptr);
 
 				// get the tops
 				long lTop1 = ipBounds1->Top;
@@ -1015,7 +1015,7 @@ STDMETHODIMP CSpatialString::GetAverageLineHeight(long *lpHeight)
 			for (iParagraph = 0; iParagraph < lParagraphCount; iParagraph++)
 			{
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipParagraph = ipParagraphs->At(iParagraph);
-				ASSERT_RESOURCE_ALLOCATION("ELI25867", ipParagraph != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25867", ipParagraph != __nullptr);
 				if(ipParagraph->GetMode() != kSpatialMode)
 				{
 					continue;
@@ -1038,7 +1038,7 @@ STDMETHODIMP CSpatialString::GetAverageCharWidth(long *lpWidth)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20656", lpWidth != NULL);
+		ASSERT_ARGUMENT("ELI20656", lpWidth != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1056,7 +1056,7 @@ STDMETHODIMP CSpatialString::GetAverageCharHeight(long *lpHeight)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28047", lpHeight != NULL);
+		ASSERT_ARGUMENT("ELI28047", lpHeight != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1074,7 +1074,7 @@ STDMETHODIMP CSpatialString::GetSplitLines(long nMaxSpace, IIUnknownVector** ppR
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20654", ppResultVector != NULL);
+		ASSERT_ARGUMENT("ELI20654", ppResultVector != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1083,18 +1083,18 @@ STDMETHODIMP CSpatialString::GetSplitLines(long nMaxSpace, IIUnknownVector** ppR
 		verifySpatialness();
 
 		IIUnknownVectorPtr ipNewLines(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI08818", ipNewLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08818", ipNewLines != __nullptr);
 
 		// TODO: Change code to use getLines(vector<pair<long, long>>) to reduce COM overhead
 		// Check each line for splits
 		IIUnknownVectorPtr ipLines = getLinesUnknownVector();
-		ASSERT_RESOURCE_ALLOCATION("ELI25868", ipLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25868", ipLines != __nullptr);
 
 		long lLineCount = ipLines->Size();
 		for (long i = 0; i < lLineCount; i++)
 		{
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine = ipLines->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08579", ipLine != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08579", ipLine != __nullptr);
 
 			// the line must be spatial in order to split it
 			if (ipLine->GetMode() != kSpatialMode)
@@ -1173,7 +1173,7 @@ STDMETHODIMP CSpatialString::GetSplitLines(long nMaxSpace, IIUnknownVector** ppR
 				{
 					UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLineSeg1 =
 						ipLine->GetSubString(lNewLineStartPos, end1);
-					ASSERT_RESOURCE_ALLOCATION("ELI25869", ipLineSeg1 != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25869", ipLineSeg1 != __nullptr);
 
 					// Add the new line segment	
 					ipNewLines->PushBack(ipLineSeg1);
@@ -1212,7 +1212,7 @@ STDMETHODIMP CSpatialString::GetJustifiedBlocks(long nMinLines, IIUnknownVector*
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20653", ppResultVector != NULL);
+		ASSERT_ARGUMENT("ELI20653", ppResultVector != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1223,7 +1223,7 @@ STDMETHODIMP CSpatialString::GetJustifiedBlocks(long nMinLines, IIUnknownVector*
 		// This Vector will hold the newly created blocks
 		// which will be returned to the user
 		IIUnknownVectorPtr ipNewBlocks(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI08870", ipNewBlocks != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08870", ipNewBlocks != __nullptr);
 		
 		// The will hold the unused lines as we process
 		// all the lines for addition into blocks
@@ -1236,7 +1236,7 @@ STDMETHODIMP CSpatialString::GetJustifiedBlocks(long nMinLines, IIUnknownVector*
 		for (long i = 0; i < lLineCount; i++)
 		{
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipTmpString = ipLines->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI15414", ipTmpString != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15414", ipTmpString != __nullptr);
 
 			if (ipTmpString->GetMode() != kSpatialMode)
 			{
@@ -1255,7 +1255,7 @@ STDMETHODIMP CSpatialString::GetJustifiedBlocks(long nMinLines, IIUnknownVector*
 
 			// create a new block
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipNewBlock(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI25870", ipNewBlock != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25870", ipNewBlock != __nullptr);
 
 			ipNewBlock->Append(ipTestLine);
 			ipNewBlock->AppendString(get_bstr_t("\r\n"));
@@ -1265,7 +1265,7 @@ STDMETHODIMP CSpatialString::GetJustifiedBlocks(long nMinLines, IIUnknownVector*
 			long nNumLinesInBlock = 1;
 
 			ILongRectanglePtr ipTestRect = ipTestLine->GetOCRImageBounds();
-			ASSERT_RESOURCE_ALLOCATION("ELI25871", ipTestRect != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25871", ipTestRect != __nullptr);
 
 			long lTestLeft, lTestTop, lTestRight, lTestBottom;
 			ipTestRect->GetBounds(&lTestLeft, &lTestTop, &lTestRight, &lTestBottom);
@@ -1292,7 +1292,7 @@ STDMETHODIMP CSpatialString::GetJustifiedBlocks(long nMinLines, IIUnknownVector*
 			for (size_t j = 1; j < vecUnusedLines.size(); j++)
 			{
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine = vecUnusedLines[j];
-				ASSERT_RESOURCE_ALLOCATION("ELI25872", ipLine != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25872", ipLine != __nullptr);
 
 				ILongRectanglePtr ipRect = ipLine->GetOCRImageBounds();
 				long lLeft, lTop, lBottom, lRight;
@@ -1370,7 +1370,7 @@ STDMETHODIMP CSpatialString::GetBlocks(long nMinLines, IIUnknownVector** ppResul
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20652", ppResultVector != NULL);
+		ASSERT_ARGUMENT("ELI20652", ppResultVector != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1381,7 +1381,7 @@ STDMETHODIMP CSpatialString::GetBlocks(long nMinLines, IIUnknownVector** ppResul
 		// This will hold all of the blocks we create
 		// And will eventually be returned to the caller
 		IIUnknownVectorPtr ipNewBlocks(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI08852", ipNewBlocks != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08852", ipNewBlocks != __nullptr);
 		
 		// These will be used to hold lines temporarily during block creation
 		vector<UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr> vecUnusedLines;
@@ -1389,7 +1389,7 @@ STDMETHODIMP CSpatialString::GetBlocks(long nMinLines, IIUnknownVector** ppResul
 	
 		// get the lines from this string
 		IIUnknownVectorPtr ipLines = getLinesUnknownVector();
-		ASSERT_RESOURCE_ALLOCATION("ELI15087", ipLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15087", ipLines != __nullptr);
 		
 		// Put the lines from this spatial string into the 
 		// unused lines Vector
@@ -1399,7 +1399,7 @@ STDMETHODIMP CSpatialString::GetBlocks(long nMinLines, IIUnknownVector** ppResul
 		for (long i = 0; i < lLineCount; i++)
 		{
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine = ipLines->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08932", ipLine != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08932", ipLine != __nullptr);
 			vecUnusedLines.push_back(ipLine);
 		}
 		vecTmpLines.clear();
@@ -1409,7 +1409,7 @@ STDMETHODIMP CSpatialString::GetBlocks(long nMinLines, IIUnknownVector** ppResul
 		{
 			// create a new block
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipNewBlock(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI25873", ipNewBlock != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25873", ipNewBlock != __nullptr);
 
 			long nNumLinesInBlock = 0;
 
@@ -1417,13 +1417,13 @@ STDMETHODIMP CSpatialString::GetBlocks(long nMinLines, IIUnknownVector** ppResul
 			// It will also be used to test which additional lines should 
 			// added to this block
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipTestLine = vecUnusedLines[0];
-			ASSERT_RESOURCE_ALLOCATION("ELI25874", ipTestLine != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25874", ipTestLine != __nullptr);
 			
 			ipNewBlock->Append(ipTestLine);
 			ipNewBlock->AppendString(get_bstr_t("\r\n"));
 
 			ILongRectanglePtr ipTestRect = ipTestLine->GetOCRImageBounds();
-			ASSERT_RESOURCE_ALLOCATION("ELI25875", ipTestRect != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25875", ipTestRect != __nullptr);
 			RECT rectTest;
 			ipTestRect->GetBounds(&(rectTest.left), &(rectTest.top),
 				&(rectTest.right), &(rectTest.bottom));
@@ -1498,7 +1498,7 @@ STDMETHODIMP CSpatialString::GetNextOCRImageSpatialLetter(long nStartPos, ILette
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20651", pIndex != NULL);
+		ASSERT_ARGUMENT("ELI20651", pIndex != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1506,11 +1506,11 @@ STDMETHODIMP CSpatialString::GetNextOCRImageSpatialLetter(long nStartPos, ILette
 		CPPLetter letter;
 		long nIndex = getNextOCRImageSpatialLetter(nStartPos, letter);
 
-		// If found the next spatial letter and pLetter != NULL then return the letter
-		if (nIndex != -1 && pLetter != NULL)
+		// If found the next spatial letter and pLetter != __nullptr then return the letter
+		if (nIndex != -1 && pLetter != __nullptr)
 		{
 			UCLID_RASTERANDOCRMGMTLib::ILetterPtr ipLetter(CLSID_Letter);
-			ASSERT_RESOURCE_ALLOCATION("ELI25876", ipLetter != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25876", ipLetter != __nullptr);
 
 			ipLetter->CreateFromCppLetter((void*)&letter);
 			*pLetter = (ILetter*) ipLetter.Detach();
@@ -1529,7 +1529,7 @@ STDMETHODIMP CSpatialString::GetNextNonSpatialLetter(long nStartPos, ILetter** p
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20649", pIndex != NULL);
+		ASSERT_ARGUMENT("ELI20649", pIndex != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1548,7 +1548,7 @@ STDMETHODIMP CSpatialString::GetNextNonSpatialLetter(long nStartPos, ILetter** p
 			{
 				CPPLetter letter(c, c, c, 0, 0, 0, 0, -1, false, false, false, 0, 100, 0);
 				UCLID_RASTERANDOCRMGMTLib::ILetterPtr ipLetter(CLSID_Letter);
-				ASSERT_RESOURCE_ALLOCATION("ELI25877", ipLetter != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25877", ipLetter != __nullptr);
 				ipLetter->CreateFromCppLetter(&letter);
 				*pLetter = (ILetter*) ipLetter.Detach();
 			}
@@ -1565,7 +1565,7 @@ STDMETHODIMP CSpatialString::GetNextNonSpatialLetter(long nStartPos, ILetter** p
 					if (pLetter)
 					{
 						UCLID_RASTERANDOCRMGMTLib::ILetterPtr ipLetter(CLSID_Letter);
-						ASSERT_RESOURCE_ALLOCATION("ELI25878", ipLetter != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI25878", ipLetter != __nullptr);
 						ipLetter->CreateFromCppLetter((void*) &letter);
 						*pLetter = (ILetter*)ipLetter.Detach();
 					}
@@ -1585,7 +1585,7 @@ STDMETHODIMP CSpatialString::GetIsEndOfWord(long nIndex, VARIANT_BOOL* pbIsEnd)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20647", pbIsEnd != NULL);
+		ASSERT_ARGUMENT("ELI20647", pbIsEnd != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1605,7 +1605,7 @@ STDMETHODIMP CSpatialString::GetIsEndOfLine(long nIndex, VARIANT_BOOL* pbIsEnd)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20646", pbIsEnd != NULL);
+		ASSERT_ARGUMENT("ELI20646", pbIsEnd != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1624,7 +1624,7 @@ STDMETHODIMP CSpatialString::GetPageInfo(long nPageNum, ISpatialPageInfo** ppPag
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	try
 	{
-		ASSERT_ARGUMENT("ELI20645", ppPageInfo != NULL);
+		ASSERT_ARGUMENT("ELI20645", ppPageInfo != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1647,7 +1647,7 @@ STDMETHODIMP CSpatialString::GetPageInfo(long nPageNum, ISpatialPageInfo** ppPag
 		// Return the specified page info
 		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo =
 			m_ipPageInfoMap->GetValue(nPageNum);
-		ASSERT_RESOURCE_ALLOCATION("ELI09125", ipPageInfo != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09125", ipPageInfo != __nullptr);
 		*ppPageInfo = (ISpatialPageInfo*)ipPageInfo.Detach();
 	
 		return S_OK;
@@ -1664,7 +1664,7 @@ STDMETHODIMP CSpatialString::SetPageInfo(long nPageNum, ISpatialPageInfo* pPageI
 		validateLicense();
 
 		// Verify that the page info is not null
-		ASSERT_ARGUMENT("ELI15318", pPageInfo != NULL );
+		ASSERT_ARGUMENT("ELI15318", pPageInfo != __nullptr );
 
 		// Verify that the page is valid
 		if (nPageNum < 1 )
@@ -1693,13 +1693,13 @@ STDMETHODIMP CSpatialString::GetOCRImageRasterZones(IIUnknownVector** ppRasterZo
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI25879", ppRasterZones != NULL);
+		ASSERT_ARGUMENT("ELI25879", ppRasterZones != __nullptr);
 
 		// Check license
 		validateLicense();
 
 		IIUnknownVectorPtr ipZones = getOCRImageRasterZonesUnknownVector();
-		ASSERT_RESOURCE_ALLOCATION("ELI25880", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25880", ipZones != __nullptr);
 
 		*ppRasterZones = ipZones.Detach();
 
@@ -1713,7 +1713,7 @@ STDMETHODIMP CSpatialString::GetOriginalImageRasterZones(IIUnknownVector** ppRas
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI20644", ppRasterZones != NULL);
+		ASSERT_ARGUMENT("ELI20644", ppRasterZones != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1727,7 +1727,7 @@ STDMETHODIMP CSpatialString::GetOriginalImageRasterZones(IIUnknownVector** ppRas
 
 		// This vector will hold the raster zones and be returned to the caller
 		IIUnknownVectorPtr ipZones = getOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI09137", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09137", ipZones != __nullptr);
 
 		// Detach the created vector of RasterZones and return.
 		*ppRasterZones = ipZones.Detach();
@@ -1742,10 +1742,10 @@ STDMETHODIMP CSpatialString::GetTranslatedImageRasterZones(ILongToObjectMap* pPa
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI28033", ppRasterZones != NULL);
+		ASSERT_ARGUMENT("ELI28033", ppRasterZones != __nullptr);
 		
 		ILongToObjectMapPtr ipPageInfoMap(pPageInfoMap);
-		ASSERT_ARGUMENT("ELI28034", ipPageInfoMap != NULL);
+		ASSERT_ARGUMENT("ELI28034", ipPageInfoMap != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1759,7 +1759,7 @@ STDMETHODIMP CSpatialString::GetTranslatedImageRasterZones(ILongToObjectMap* pPa
 
 		// This vector will hold the raster zones and be returned to the caller
 		IIUnknownVectorPtr ipZones = getTranslatedImageRasterZones(ipPageInfoMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI28036", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28036", ipZones != __nullptr);
 
 		// Detach the created vector of RasterZones and return.
 		*ppRasterZones = ipZones.Detach();
@@ -1773,7 +1773,7 @@ STDMETHODIMP CSpatialString::GetFirstPageNumber(long* pRet)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	try
 	{
-		ASSERT_ARGUMENT("ELI20643", pRet != NULL);
+		ASSERT_ARGUMENT("ELI20643", pRet != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1790,7 +1790,7 @@ STDMETHODIMP CSpatialString::GetLastPageNumber(long* pRet)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	try
 	{
-		ASSERT_ARGUMENT("ELI20642", pRet != NULL);
+		ASSERT_ARGUMENT("ELI20642", pRet != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1896,7 +1896,7 @@ STDMETHODIMP CSpatialString::GetFontSizeDistribution(ILongToLongMap** ppMap)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20638", ppMap != NULL);
+		ASSERT_ARGUMENT("ELI20638", ppMap != __nullptr);
 
 		// Validate license first
 		validateLicense();
@@ -1921,7 +1921,7 @@ STDMETHODIMP CSpatialString::GetFontSizeDistribution(ILongToLongMap** ppMap)
 
 		// Make a map
 		ILongToLongMapPtr ipMap(CLSID_LongToLongMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI10659", ipMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10659", ipMap != __nullptr);
 
 		map<long, long>::iterator it;
 
@@ -2010,12 +2010,12 @@ STDMETHODIMP CSpatialString::GetFontInfo(long nMinPercentage, VARIANT_BOOL* pbIt
 		}
 
 		// Use the above values and use the helper method to check for font info
-		if(pbItalic != NULL)
+		if(pbItalic != __nullptr)
 		{
 			checkForFontInfo( pbItalic, nNumItalic, nNumSpatialChars, nMinPercentage);
 		}
 
-		if(pbBold != NULL)
+		if(pbBold != __nullptr)
 		{
 			checkForFontInfo( pbBold, nNumBold, nNumSpatialChars, nMinPercentage);
 		}
@@ -2025,27 +2025,27 @@ STDMETHODIMP CSpatialString::GetFontInfo(long nMinPercentage, VARIANT_BOOL* pbIt
 			checkForFontInfo( pbSansSerif, nNumSansSerif, nNumSpatialChars, nMinPercentage);
 		}
 
-		if(pbSerif != NULL)
+		if(pbSerif != __nullptr)
 		{
 			checkForFontInfo( pbSerif, nNumSerif, nNumSpatialChars, nMinPercentage);
 		}
 
-		if(pbProportional != NULL)
+		if(pbProportional != __nullptr)
 		{
 			checkForFontInfo( pbProportional, nNumProportional, nNumSpatialChars, nMinPercentage);
 		}
 
-		if(pbUnderline != NULL)
+		if(pbUnderline != __nullptr)
 		{
 			checkForFontInfo( pbUnderline, nNumUnderline, nNumSpatialChars, nMinPercentage);
 		}
 
-		if(pbSuperScript != NULL)
+		if(pbSuperScript != __nullptr)
 		{
 			checkForFontInfo( pbSuperScript, nNumSuperScript, nNumSpatialChars, nMinPercentage);
 		}
 
-		if(pbSubScript != NULL)
+		if(pbSubScript != __nullptr)
 		{
 			checkForFontInfo( pbSubScript, nNumSubScript, nNumSpatialChars, nMinPercentage);
 		}
@@ -2061,7 +2061,7 @@ STDMETHODIMP CSpatialString::GetMode(/*[out, retval]*/ ESpatialStringMode *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20629", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20629", pVal != __nullptr);
 
 		// Validate license first
 		validateLicense();
@@ -2079,7 +2079,7 @@ STDMETHODIMP CSpatialString::HasSpatialInfo(VARIANT_BOOL *pbValue)
 
 	try
 	{		
-		ASSERT_ARGUMENT("ELI20628", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI20628", pbValue != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -2096,7 +2096,7 @@ STDMETHODIMP CSpatialString::IsMultiPage(VARIANT_BOOL* pbRet)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI20627", pbRet != NULL);
+		ASSERT_ARGUMENT("ELI20627", pbRet != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -2114,7 +2114,7 @@ STDMETHODIMP CSpatialString::IsEmpty(VARIANT_BOOL *pvbIsEmpty)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20626", pvbIsEmpty != NULL);
+		ASSERT_ARGUMENT("ELI20626", pvbIsEmpty != __nullptr);
 
 		validateLicense();
 
@@ -2131,7 +2131,7 @@ STDMETHODIMP CSpatialString::GetWordLengthDist(long* plTotalWords, ILongToLongMa
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20621", ppWordLengthMap != NULL);
+		ASSERT_ARGUMENT("ELI20621", ppWordLengthMap != __nullptr);
 
 		validateLicense();
 
@@ -2175,7 +2175,7 @@ STDMETHODIMP CSpatialString::GetWordLengthDist(long* plTotalWords, ILongToLongMa
 		}
 
 		ILongToLongMapPtr ipMapLngthToCount(CLSID_LongToLongMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI20622", ipMapLngthToCount != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20622", ipMapLngthToCount != __nullptr);
 
 		for (map<long, long>::iterator it = mapLngthToCount.begin();
 			it != mapLngthToCount.end(); it++)
@@ -2183,7 +2183,7 @@ STDMETHODIMP CSpatialString::GetWordLengthDist(long* plTotalWords, ILongToLongMa
 			ipMapLngthToCount->Set(it->first, it->second);
 		}
 
-		if (plTotalWords != NULL)
+		if (plTotalWords != __nullptr)
 		{
 			*plTotalWords = lTotalWords;
 		}
@@ -2205,21 +2205,21 @@ STDMETHODIMP CSpatialString::GetOCRImageRasterZonesGroupedByConfidence(
 	try
 	{
 		IVariantVectorPtr ipVecOCRConfidenceBoundaries(pVecOCRConfidenceBoundaries);
-		ASSERT_ARGUMENT("ELI25369", ipVecOCRConfidenceBoundaries != NULL);
-		ASSERT_ARGUMENT("ELI25370", ppZoneOCRConfidenceTiers != NULL);
-		ASSERT_ARGUMENT("ELI25371", ppRasterZones != NULL);
+		ASSERT_ARGUMENT("ELI25369", ipVecOCRConfidenceBoundaries != __nullptr);
+		ASSERT_ARGUMENT("ELI25370", ppZoneOCRConfidenceTiers != __nullptr);
+		ASSERT_ARGUMENT("ELI25371", ppRasterZones != __nullptr);
 
 		// Check license
 		validateLicense();
 
 		IVariantVectorPtr ipZoneOCRConfidenceTiers(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI25372", ipZoneOCRConfidenceTiers != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25372", ipZoneOCRConfidenceTiers != __nullptr);
 
 		// Retrieve a list like GetRasterZones, except that raster zones are split between letters
 		// on opposite sides of a specified OCR confidence boundary.
 		IIUnknownVectorPtr ipZones = getOCRImageRasterZonesGroupedByConfidence(
 			ipVecOCRConfidenceBoundaries, ipZoneOCRConfidenceTiers);
-		ASSERT_RESOURCE_ALLOCATION("ELI25367", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25367", ipZones != __nullptr);
 
 		// Return the raster zones as well as a vector specifying the OCR confidence tier of each
 		// zone.
@@ -2241,21 +2241,21 @@ STDMETHODIMP CSpatialString::GetOriginalImageRasterZonesGroupedByConfidence(
 	try
 	{
 		IVariantVectorPtr ipVecOCRConfidenceBoundaries(pVecOCRConfidenceBoundaries);
-		ASSERT_ARGUMENT("ELI25705", ipVecOCRConfidenceBoundaries != NULL);
-		ASSERT_ARGUMENT("ELI25706", ppZoneOCRConfidenceTiers != NULL);
-		ASSERT_ARGUMENT("ELI25707", ppRasterZones != NULL);
+		ASSERT_ARGUMENT("ELI25705", ipVecOCRConfidenceBoundaries != __nullptr);
+		ASSERT_ARGUMENT("ELI25706", ppZoneOCRConfidenceTiers != __nullptr);
+		ASSERT_ARGUMENT("ELI25707", ppRasterZones != __nullptr);
 
 		// Check license
 		validateLicense();
 
 		IVariantVectorPtr ipZoneOCRConfidenceTiers(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI25708", ipZoneOCRConfidenceTiers != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25708", ipZoneOCRConfidenceTiers != __nullptr);
 
 		// Retrieve a list like GetRasterZones, except that raster zones are split between letters
 		// on opposite sides of a specified OCR confidence boundary.
 		IIUnknownVectorPtr ipZones = getOriginalImageRasterZonesGroupedByConfidence(
 			ipVecOCRConfidenceBoundaries, ipZoneOCRConfidenceTiers);
-		ASSERT_RESOURCE_ALLOCATION("ELI25709", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25709", ipZones != __nullptr);
 
 		// Return the raster zones as well as a vector specifying the OCR confidence tier of each
 		// zone.
@@ -2273,7 +2273,7 @@ STDMETHODIMP CSpatialString::GetOCRImageBounds(ILongRectangle** ppBounds)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25711", ppBounds != NULL);
+		ASSERT_ARGUMENT("ELI25711", ppBounds != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -2293,26 +2293,26 @@ STDMETHODIMP CSpatialString::GetOCRImageBounds(ILongRectangle** ppBounds)
 		}
 
 		// Declare the long rectangle to hold the return value
-		ILongRectanglePtr ipLongRectangle = NULL;
+		ILongRectanglePtr ipLongRectangle = __nullptr;
 
 		// Get the Raster zones for this spatial string
 		IIUnknownVectorPtr ipZones = getOCRImageRasterZonesUnknownVector();
-		ASSERT_RESOURCE_ALLOCATION("ELI25882", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25882", ipZones != __nullptr);
 		if (ipZones->Size() > 0)
 		{
 			// Get the first raster zone
 			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipZones->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI25714", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25714", ipZone != __nullptr);
 
 			// Get a bounding rectangle for the raster zones (do not restrict the rectangle)
 			ipLongRectangle = ipZone->GetBoundsFromMultipleRasterZones(ipZones, NULL);
-			ASSERT_RESOURCE_ALLOCATION("ELI25716", ipLongRectangle != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25716", ipLongRectangle != __nullptr);
 		}
 		else
 		{
 			// There are no raster zones, just return an empty rectangle
 			ipLongRectangle.CreateInstance(CLSID_LongRectangle);
-			ASSERT_RESOURCE_ALLOCATION("ELI25717", ipLongRectangle != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25717", ipLongRectangle != __nullptr);
 		}
 
 		// return the long rectangle
@@ -2330,10 +2330,10 @@ STDMETHODIMP CSpatialString::GetTranslatedImageBounds(ILongToObjectMap* pPageInf
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28038", ppBounds != NULL);
+		ASSERT_ARGUMENT("ELI28038", ppBounds != __nullptr);
 
 		ILongToObjectMapPtr ipPageInfoMap(pPageInfoMap);
-		ASSERT_ARGUMENT("ELI28039", ipPageInfoMap != NULL);
+		ASSERT_ARGUMENT("ELI28039", ipPageInfoMap != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -2353,26 +2353,26 @@ STDMETHODIMP CSpatialString::GetTranslatedImageBounds(ILongToObjectMap* pPageInf
 		}
 
 		// Declare the long rectangle to hold the return value
-		ILongRectanglePtr ipLongRectangle = NULL;
+		ILongRectanglePtr ipLongRectangle = __nullptr;
 
 		// Get the Raster zones for this spatial string
 		IIUnknownVectorPtr ipZones = getTranslatedImageRasterZones(ipPageInfoMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI28042", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28042", ipZones != __nullptr);
 		if (ipZones->Size() > 0)
 		{
 			// Get the first raster zone
 			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipZones->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI28043", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28043", ipZone != __nullptr);
 
 			// Get a bounding rectangle for the raster zones (do not restrict the rectangle)
 			ipLongRectangle = ipZone->GetBoundsFromMultipleRasterZones(ipZones, NULL);
-			ASSERT_RESOURCE_ALLOCATION("ELI28044", ipLongRectangle != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28044", ipLongRectangle != __nullptr);
 		}
 		else
 		{
 			// There are no raster zones, just return an empty rectangle
 			ipLongRectangle.CreateInstance(CLSID_LongRectangle);
-			ASSERT_RESOURCE_ALLOCATION("ELI28045", ipLongRectangle != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28045", ipLongRectangle != __nullptr);
 		}
 
 		// return the long rectangle
@@ -2390,7 +2390,7 @@ STDMETHODIMP CSpatialString::get_OCREngineVersion(BSTR *pbstrOCREngine)
 	try
 	{
 		validateLicense();
-		ASSERT_ARGUMENT("ELI28308", pbstrOCREngine != NULL);
+		ASSERT_ARGUMENT("ELI28308", pbstrOCREngine != __nullptr);
 
 		*pbstrOCREngine = _bstr_t(m_strOCREngineVersion.c_str()).Detach();
 
@@ -2424,7 +2424,7 @@ STDMETHODIMP CSpatialString::MergeAsHybridString(ISpatialString* pStringToMerge)
 		validateLicense();
 
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStringToMerge(pStringToMerge);
-		ASSERT_ARGUMENT("ELI29868", ipStringToMerge != NULL);
+		ASSERT_ARGUMENT("ELI29868", ipStringToMerge != __nullptr);
 
 		mergeAsHybridString(ipStringToMerge);
 
@@ -2443,7 +2443,7 @@ STDMETHODIMP CSpatialString::GetOriginalImagePageBounds(long nPageNum, ILongRect
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI30331", ppBounds != NULL);
+		ASSERT_ARGUMENT("ELI30331", ppBounds != __nullptr);
 
 		ILongRectanglePtr ipBounds = getPageBounds(nPageNum, false);
 		
@@ -2462,7 +2462,7 @@ STDMETHODIMP CSpatialString::GetOCRImagePageBounds(long nPageNum, ILongRectangle
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI30332", ppBounds != NULL);
+		ASSERT_ARGUMENT("ELI30332", ppBounds != __nullptr);
 
 		ILongRectanglePtr ipBounds = getPageBounds(nPageNum, true);
 

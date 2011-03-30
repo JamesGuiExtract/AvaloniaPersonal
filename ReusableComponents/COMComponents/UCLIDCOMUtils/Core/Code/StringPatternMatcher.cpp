@@ -428,7 +428,7 @@ void CStringPatternMatcher::match(BSTR bstrText, BSTR bstrPattern,
 
 		// get the matches to return to the caller
 		ipMatches = getMatches();
-		ASSERT_RESOURCE_ALLOCATION("ELI09275", ipMatches != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09275", ipMatches != __nullptr);
 
 		*pnPatternStartPos = nStartPos;
 		*pnPatternEndPos = nEndPos;
@@ -437,7 +437,7 @@ void CStringPatternMatcher::match(BSTR bstrText, BSTR bstrPattern,
 	{
 		// create an empty map to return to the caller
 		ipMatches.CreateInstance(CLSID_StrToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI06268", ipMatches != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06268", ipMatches != __nullptr);
 
 		ipMatches->CaseSensitive = m_bCaseSensitive;
 	}
@@ -456,7 +456,7 @@ UCLID_COMUTILSLib::IStrToObjectMapPtr CStringPatternMatcher::getMatches() const
 {
 	// create the object to be returned
 	UCLID_COMUTILSLib::IStrToObjectMapPtr ipMatches(CLSID_StrToObjectMap);
-	ASSERT_RESOURCE_ALLOCATION("ELI09276", ipMatches != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09276", ipMatches != __nullptr);
 
 	ipMatches->CaseSensitive = m_bCaseSensitive;
 
@@ -471,7 +471,7 @@ UCLID_COMUTILSLib::IStrToObjectMapPtr CStringPatternMatcher::getMatches() const
 		{
 			// create a token object to represent the match
 			UCLID_COMUTILSLib::ITokenPtr ipToken(CLSID_Token);
-			ASSERT_RESOURCE_ALLOCATION("ELI05917", ipToken != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05917", ipToken != __nullptr);
 
 			// extract the match text and add to result vector
 			string strMatch(static_cast<string>(m_strText), tokenInfo.m_nMatchStartPos, 

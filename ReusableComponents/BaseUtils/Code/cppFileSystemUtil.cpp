@@ -922,7 +922,7 @@ string getTextFileContentsAsString(const string& strTextFileName)
 
 	// get length of file:
 	ifs.seekg (0, ios::end);
-	length = ifs.tellg();
+	length = (size_t) ifs.tellg();
 	ifs.seekg (0, ios::beg);
 
 	// allocate memory:
@@ -947,7 +947,7 @@ string getTextFileContentsAsString(const string& strTextFileName)
 		buffer = NULL;
 		throw;
 	}
-	if ( buffer != NULL )
+	if ( buffer != __nullptr )
 	{
 		delete [] buffer;
 	}
@@ -1980,9 +1980,9 @@ void waitForFileToBeReadable(const string& strFileName, bool bLogException, ifst
 	bool bOpen = false; // Default bOpen to false
 	do
 	{
-		// Scope for the auto_ptr
+		// Scope for the unique_ptr
 		{
-			auto_ptr<ifstream> apIn;
+			unique_ptr<ifstream> apIn;
 			apIn.reset(new ifstream(strFileName.c_str(), nOpenMode));
 
 			// Check if the file was successfully opened
@@ -1992,7 +1992,7 @@ void waitForFileToBeReadable(const string& strFileName, bool bLogException, ifst
 				bOpen = true;
 
 				// Check if looking for an ifstream pointer
-				if (ppinFile != NULL)
+				if (ppinFile != __nullptr)
 				{
 					// Store the ifstream pointer
 					*ppinFile = apIn.release();

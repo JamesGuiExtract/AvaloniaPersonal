@@ -311,13 +311,13 @@ bool FindRegExDlg::foundPatternsInText(const string& strInputText,
 									   int &nFoundStartPos,
 									   int &nFoundEndPos)
 {
-	if (m_ipRegExpr == NULL)
+	if (m_ipRegExpr == __nullptr)
 	{
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13066", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13066", ipMiscUtils != __nullptr );
 
 		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("FindRegExDlg");
-		ASSERT_RESOURCE_ALLOCATION("ELI07404", m_ipRegExpr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07404", m_ipRegExpr != __nullptr);
 	}
 
 	// if no patterns specified, return false
@@ -376,9 +376,9 @@ bool FindRegExDlg::foundPatternsInText(const string& strInputText,
 			else
 			{
 				IObjectPairPtr ipObjPair = ipMatches->At(0);
-				ASSERT_RESOURCE_ALLOCATION("ELI07409", ipObjPair != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07409", ipObjPair != __nullptr);
 				ITokenPtr ipMatch = ipObjPair->Object1;
-				ASSERT_RESOURCE_ALLOCATION("ELI07410", ipMatch != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07410", ipMatch != __nullptr);
 
 				// Check the font size constraint
 				if(m_chkFontSizeRange.GetCheck() == 1)
@@ -389,14 +389,14 @@ bool FindRegExDlg::foundPatternsInText(const string& strInputText,
 					// To ensure that if necessary this string meets our font constraints
 					// we will check the font size of each letter
 					ISpatialStringPtr ipTemp = m_pSSVDlg->getSpatialString();
-					ASSERT_RESOURCE_ALLOCATION("ELI15636", ipTemp != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15636", ipTemp != __nullptr);
 					ISpatialStringPtr ipSubStr = ipTemp->GetSubString(nStart, nEnd);
-					ASSERT_RESOURCE_ALLOCATION("ELI15637", ipSubStr != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15637", ipSubStr != __nullptr);
 
 					CPPLetter* pLetters = NULL;
 					long nNumLetters;
 					ipSubStr->GetOCRImageLetterArray(&nNumLetters, (void**)&pLetters);
-					ASSERT_RESOURCE_ALLOCATION("ELI25968", pLetters != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI25968", pLetters != __nullptr);
 					long i;
 					for (i = 0; i < nNumLetters; i++)
 					{
@@ -442,9 +442,9 @@ bool FindRegExDlg::foundPatternsInText(const string& strInputText,
 		{
 			// get the start and end position
 			IObjectPairPtr ipObjPair = ipMatches->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI19339", ipObjPair != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19339", ipObjPair != __nullptr);
 			ITokenPtr ipMatch = ipObjPair->Object1;
-			ASSERT_RESOURCE_ALLOCATION("ELI19340", ipMatch != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19340", ipMatch != __nullptr);
 
 			// start and end position must count the offset
 		//	nFoundStartPos = ipMatch->StartPosition + m_nOffSet + nLocalOffset;

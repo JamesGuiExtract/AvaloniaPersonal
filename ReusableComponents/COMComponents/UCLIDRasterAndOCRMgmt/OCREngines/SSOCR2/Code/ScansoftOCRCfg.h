@@ -53,5 +53,5 @@ public:
 	
 private:
 	// pointer to the persistence manager for registry access
-	auto_ptr<IConfigurationSettingsPersistenceMgr> m_pCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> m_pCfgMgr;
 };

@@ -90,12 +90,12 @@ STDMETHODIMP CSPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI07059", ipAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI07059", ipAFDoc != __nullptr);
 
-		if (m_ipSPM == NULL)
+		if (m_ipSPM == __nullptr)
 		{
 			m_ipSPM.CreateInstance(CLSID_StringPatternMatcher);
-			ASSERT_RESOURCE_ALLOCATION("ELI07028", m_ipSPM != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07028", m_ipSPM != __nullptr);
 		}
 
 		m_ipSPM->CaseSensitive = m_bCaseSensitive ? VARIANT_TRUE : VARIANT_FALSE;
@@ -103,7 +103,7 @@ STDMETHODIMP CSPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 
 		// return vec of attributes
 		IIUnknownVectorPtr ipRetAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI07061", ipRetAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07061", ipRetAttributes != __nullptr);
 
 		string strInput(m_strRulesFileName);
 		if (m_bIsPatternsFromFile)
@@ -142,7 +142,7 @@ STDMETHODIMP CSPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 		}
 
 		ISpatialStringPtr ipInputText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI07060", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07060", ipInputText != __nullptr);
 
 		PatternFileInterpreter patternInterpreter;
 		if (!m_bIsPatternsFromFile)
@@ -520,10 +520,10 @@ STDMETHODIMP CSPMFinder::get_DataScorer(IObjectWithDescription **ppObj)
 
 		// if the DataScorer object-with-description object has not yet
 		// been created, do so now..
-		if (m_ipDataScorer == NULL)
+		if (m_ipDataScorer == __nullptr)
 		{
 			m_ipDataScorer.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI08593", m_ipDataScorer != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08593", m_ipDataScorer != __nullptr);
 		}
 
 		CComQIPtr<IObjectWithDescription> ipObj = m_ipDataScorer;
@@ -640,10 +640,10 @@ STDMETHODIMP CSPMFinder::get_Preprocessors(IVariantVector **pVal)
 	{
 		validateLicense();
 
-		if (m_ipPreprocessors == NULL)
+		if (m_ipPreprocessors == __nullptr)
 		{
 			m_ipPreprocessors.CreateInstance(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI08756", m_ipPreprocessors != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08756", m_ipPreprocessors != __nullptr);
 		}
 
 		IVariantVectorPtr ipShallowCopy = m_ipPreprocessors;
@@ -762,7 +762,7 @@ STDMETHODIMP CSPMFinder::raw_GetComponentDescription(BSTR * pstrComponentDescrip
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19584", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19584", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("String pattern matcher finder").Detach();
 	}
@@ -830,11 +830,11 @@ STDMETHODIMP CSPMFinder::raw_CopyFrom(IUnknown *pObject)
 		}
 
 		// copy the data scorer object
-		m_ipDataScorer = NULL;
+		m_ipDataScorer = __nullptr;
 		m_ipDataScorer.CreateInstance(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI08631", m_ipDataScorer != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08631", m_ipDataScorer != __nullptr);
 		ICopyableObjectPtr ipCopyableObj = m_ipDataScorer;
-		ASSERT_RESOURCE_ALLOCATION("ELI08630", ipCopyableObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08630", ipCopyableObj != __nullptr);
 		ipCopyableObj->CopyFrom(ipSource->DataScorer);
 
 		// copy the return match type
@@ -850,11 +850,11 @@ STDMETHODIMP CSPMFinder::raw_CopyFrom(IUnknown *pObject)
 		m_bIgnoreInvalidTags = ipSource->IgnoreInvalidTags == VARIANT_TRUE;
 
 		// copy preprocessors
-		m_ipPreprocessors = NULL;
+		m_ipPreprocessors = __nullptr;
 		m_ipPreprocessors.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI08759", m_ipPreprocessors != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08759", m_ipPreprocessors != __nullptr);
 		ipCopyableObj = m_ipPreprocessors;
-		ASSERT_RESOURCE_ALLOCATION("ELI08760", ipCopyableObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08760", ipCopyableObj != __nullptr);
 		ipCopyableObj->CopyFrom(ipSource->Preprocessors);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08261");
@@ -871,7 +871,7 @@ STDMETHODIMP CSPMFinder::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_SPMFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI08349", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08349", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -920,8 +920,8 @@ STDMETHODIMP CSPMFinder::Load(IStream *pStream)
 		m_eReturnMatchType = eDEFAULT_RETURN_MATCH_TYPE;
 		m_nMinScoreToConsiderAsMatch = 0;
 		m_nMinFirstToConsiderAsMatch = 0;
-		m_ipDataScorer = NULL; // delete the current data scorer object
-		m_ipPreprocessors = NULL;
+		m_ipDataScorer = __nullptr; // delete the current data scorer object
+		m_ipPreprocessors = __nullptr;
 		
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -981,7 +981,7 @@ STDMETHODIMP CSPMFinder::Load(IStream *pStream)
 			// read the data scorer object
 			IPersistStreamPtr ipObj;
 			::readObjectFromStream(ipObj, pStream, "ELI09965");
-			ASSERT_RESOURCE_ALLOCATION("ELI08627", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08627", ipObj != __nullptr);
 			m_ipDataScorer = ipObj;
 		}
 
@@ -990,7 +990,7 @@ STDMETHODIMP CSPMFinder::Load(IStream *pStream)
 			// read the list of preprocessors
 			IPersistStreamPtr ipObj;
 			::readObjectFromStream(ipObj, pStream, "ELI09966");
-			ASSERT_RESOURCE_ALLOCATION("ELI08757", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08757", ipObj != __nullptr);
 			m_ipPreprocessors = ipObj;
 		}
 
@@ -1039,11 +1039,11 @@ STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Make sure DataScorer object-with-description exists
 		IObjectWithDescriptionPtr ipObjWithDesc = ipThis->DataScorer;
-		ASSERT_RESOURCE_ALLOCATION("ELI08624", ipObjWithDesc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08624", ipObjWithDesc != __nullptr);
 		
 		// write the data-scorer object to the stream
 		IPersistStreamPtr ipObj = ipObjWithDesc;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI08625", "DataScorer object does not support persistence.");
 		}
@@ -1054,7 +1054,7 @@ STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 		
 		// write the object to the stream
 		ipObj = ipPreprocessors;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI08758", "VariantVector object does not support persistence.");
 		}
@@ -1082,17 +1082,17 @@ STDMETHODIMP CSPMFinder::GetSizeMax(ULARGE_INTEGER *pcbSize)
 UCLID_AFVALUEFINDERSLib::ISPMFinderPtr CSPMFinder::getThisAsCOMPtr()
 {
 	UCLID_AFVALUEFINDERSLib::ISPMFinderPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16968", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16968", ipThis != __nullptr);
 
 	return ipThis;
 }
 //-------------------------------------------------------------------------------------------------
 IAFUtilityPtr CSPMFinder::getAFUtility()
 {
-	if (m_ipAFUtility == NULL)
+	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07324", m_ipAFUtility != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07324", m_ipAFUtility != __nullptr );
 	}
 	
 	return m_ipAFUtility;

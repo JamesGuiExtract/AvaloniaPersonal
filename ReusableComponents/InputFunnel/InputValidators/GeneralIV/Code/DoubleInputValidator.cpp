@@ -44,8 +44,8 @@ CDoubleInputValidator::~CDoubleInputValidator()
 	{
 		// Force destruction of member objects within this scope so that
 		// all destruction happens within the scope of the correct AFX state
-		m_ipLogger = NULL;
-		m_ipExecuter = NULL;
+		m_ipLogger = __nullptr;
+		m_ipExecuter = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16442");
 }
@@ -113,7 +113,7 @@ STDMETHODIMP CDoubleInputValidator::raw_GetComponentDescription(BSTR * pbstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19618", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19618", pbstrComponentDescription != __nullptr)
 
 		// Retrieve definition
 		*pbstrComponentDescription = _bstr_t(gstrDOUBLE_INPUT_TYPE.c_str()).Detach();
@@ -136,7 +136,7 @@ STDMETHODIMP CDoubleInputValidator::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_GENERALIVLib::IDoubleInputValidatorPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08298", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08298", ipSource != __nullptr);
 		
 		m_bIncludeMaximum = (ipSource->GetIncludeMaxInRange()==VARIANT_TRUE) ? true : false;
 		m_bIncludeMinimum = (ipSource->GetIncludeMinInRange()==VARIANT_TRUE) ? true : false;
@@ -164,7 +164,7 @@ STDMETHODIMP CDoubleInputValidator::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_DoubleInputValidator);
-		ASSERT_RESOURCE_ALLOCATION("ELI08366", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08366", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -196,7 +196,7 @@ STDMETHODIMP CDoubleInputValidator::raw_ValidateInput(ITextInput * pTextInput, V
 		validateLicense();
 
 		ITextInputPtr ipTextInput(pTextInput);
-		ASSERT_ARGUMENT("ELI10153", ipTextInput != NULL);
+		ASSERT_ARGUMENT("ELI10153", ipTextInput != __nullptr);
 
 		// Retrieve string
 		string	strInput = ipTextInput->GetText();
@@ -250,7 +250,7 @@ STDMETHODIMP CDoubleInputValidator::raw_GetInputType(BSTR * pstrInputType)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19619", pstrInputType != NULL)
+		ASSERT_ARGUMENT("ELI19619", pstrInputType != __nullptr)
 
 		// Check license
 		validateLicense();
@@ -1013,7 +1013,7 @@ void CDoubleInputValidator::doTest1()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10154", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10154", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput( NULL, _bstr_t("5.0") );
 
 	// Check validity - expect success
@@ -1048,7 +1048,7 @@ void CDoubleInputValidator::doTest1()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1097,7 +1097,7 @@ void CDoubleInputValidator::doTest2()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10156", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10156", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput( NULL, _bstr_t("15.0") );
 
 	// Check validity - expect success
@@ -1132,7 +1132,7 @@ void CDoubleInputValidator::doTest2()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1178,7 +1178,7 @@ void CDoubleInputValidator::doTest3()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10155", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10155", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput( NULL, _bstr_t("0.0") );
 
 	// Check validity - expect success
@@ -1213,7 +1213,7 @@ void CDoubleInputValidator::doTest3()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1259,7 +1259,7 @@ void CDoubleInputValidator::doTest4()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10157", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10157", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput( NULL, _bstr_t("-50.0") );
 
 	// Check validity - expect success
@@ -1294,7 +1294,7 @@ void CDoubleInputValidator::doTest4()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1346,7 +1346,7 @@ void CDoubleInputValidator::doTest5()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10159", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10159", ipTextInput != __nullptr);
 
 	ipTextInput->InitTextInput( NULL, _bstr_t("10.0") );
 
@@ -1382,7 +1382,7 @@ void CDoubleInputValidator::doTest5()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1434,7 +1434,7 @@ void CDoubleInputValidator::doTest6()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10160", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10160", ipTextInput != __nullptr);
 	
 	ipTextInput->InitTextInput( NULL, _bstr_t("10.0") );
 
@@ -1470,7 +1470,7 @@ void CDoubleInputValidator::doTest6()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1505,7 +1505,7 @@ void CDoubleInputValidator::doTest7()
 	_bstr_t	bstrTest( "-1.02E+04" );
 
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10158", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10158", ipTextInput != __nullptr);
 	
 	ipTextInput->InitTextInput(NULL, bstrTest);
 
@@ -1669,7 +1669,7 @@ void CDoubleInputValidator::doTest7()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1683,7 +1683,7 @@ void CDoubleInputValidator::doTest7()
 IInputValidatorPtr CDoubleInputValidator::getThisAsInputValidatorPtr()
 {
 	IInputValidatorPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI22010", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22010", ipThis != __nullptr);
 
 	return ipThis;
 }

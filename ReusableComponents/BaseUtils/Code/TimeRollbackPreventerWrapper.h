@@ -19,9 +19,9 @@ public:
 	~TimeRollbackPreventerWrapper();
 
 private:
-	// NOTE: auto_ptr was not used here because it caused the following warning in
+	// NOTE: unique_ptr was not used here because it caused the following warning in
 	// ExtractTRP project:
-	// warning C4251: 'TimeRollbackPreventerWrapper::m_apTRP' : class 'std::auto_ptr<_Ty>' 
+	// warning C4251: 'TimeRollbackPreventerWrapper::m_apTRP' : class 'std::unique_ptr<_Ty>' 
 	// needs to have dll-interface to be used by clients of class 'TimeRollbackPreventerWrapper'
 	TimeRollbackPreventer *m_pTRP;
 };

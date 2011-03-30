@@ -30,28 +30,28 @@ CEntityNameSplitter::CEntityNameSplitter()
 	{
 		// Instantiate the Entity Keywords object
 		m_ipKeys.CreateInstance( CLSID_EntityKeywords );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06023", m_ipKeys != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06023", m_ipKeys != __nullptr );
 
 		// Instantiate the Entity Finder object
 		m_ipFinder.CreateInstance( CLSID_EntityFinder );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06024", m_ipFinder != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06024", m_ipFinder != __nullptr );
 
 		// Create pointer to Registry Persistence Manager
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_SPLITTERS_PATH) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10459", ma_pUserCfgMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10459", ma_pUserCfgMgr.get() != __nullptr );
 
 		// Create pointer to Entity Name Splitter settings
-		ma_pENSConfigMgr = auto_ptr<ENSConfigMgr>(
+		ma_pENSConfigMgr = unique_ptr<ENSConfigMgr>(
 			new ENSConfigMgr( ma_pUserCfgMgr.get(), "\\EntityNameSplitter" ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10460", ma_pENSConfigMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10460", ma_pENSConfigMgr.get() != __nullptr );
 
 		// Check flag for moving Trust names
 		m_bMoveTrustName = (ma_pENSConfigMgr->getMoveNames() > 0) ? true : false;
 
 		// Get Misc Utils pointer to get an instance of the regular expression parser
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22438", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI22438", m_ipMiscUtils != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06028")
 }
@@ -60,10 +60,10 @@ CEntityNameSplitter::~CEntityNameSplitter()
 {
 	try
 	{
-		m_ipFinder = NULL;
-		m_ipKeys = NULL;
-		m_ipMiscUtils = NULL;
-		m_ipRegExprParser = NULL;
+		m_ipFinder = __nullptr;
+		m_ipKeys = __nullptr;
+		m_ipMiscUtils = __nullptr;
+		m_ipRegExprParser = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28855");
 }
@@ -131,11 +131,11 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			m_ipRegExprParser->IgnoreCase = VARIANT_TRUE;
 
 			ISpatialStringPtr	ipOriginal = pAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION( "ELI06000", ipOriginal != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI06000", ipOriginal != __nullptr );
 
 			// Make copy of text for later use
 			ICopyableObjectPtr	ipCopy = ipOriginal;
-			ASSERT_RESOURCE_ALLOCATION( "ELI06744", ipCopy != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI06744", ipCopy != __nullptr );
 			ISpatialStringPtr	ipEntity = ipCopy->Clone();
 
 			// Define pointer to parent Attribute - used for relationships with Alias subattributes
@@ -157,7 +157,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			// Retrieve list of EntityTrimAnyPhrases expressions
 			IVariantVectorPtr ipTrimAny = m_ipKeys->GetKeywordCollection( 
 				_bstr_t( "EntityTrimAnyPhrases" ) );
-			ASSERT_RESOURCE_ALLOCATION( "ELI26466", ipTrimAny != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI26466", ipTrimAny != __nullptr );
 
 			// Check string for Phrases
 			long lTrimStart = -1;
@@ -191,7 +191,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 			// Retrieve list of Trust Indicator expressions
 			IVariantVectorPtr ipTrustInd = m_ipKeys->GetKeywordCollection( _bstr_t( "TrustIndicators" ) );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10320", ipTrustInd != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10320", ipTrustInd != __nullptr );
 
 			// Check if string contains a Trust Indicator
 			if (asCppBool(ipEntity->ContainsStringInVector(
@@ -208,7 +208,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			// Retrieve list of Municipality Indicator expressions
 			IVariantVectorPtr ipMuniInd = m_ipKeys->GetKeywordCollection( 
 				_bstr_t( "MunicipalityIndicators" ) );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10526", ipMuniInd != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10526", ipMuniInd != __nullptr );
 
 			// Check if string contains a Muni Indicator
 			if (asCppBool(ipEntity->ContainsStringInVector(
@@ -368,7 +368,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 			// Create Person Splitter object
 			IAttributeSplitterPtr ipPersonSplitter( CLSID_PersonNameSplitter );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09377", ipPersonSplitter != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09377", ipPersonSplitter != __nullptr );
 
 			if (!bIsCompany && !bIsMunicipality)
 			{
@@ -414,7 +414,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 				// Divide text into multiple entities
 				IIUnknownVectorPtr ipMatches( CLSID_IUnknownVector );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09376", ipMatches != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09376", ipMatches != __nullptr );
 				findNameDelimiters( ipEntity, bSuffixFound, ipMatches );
 
 				// If the first person does not have a last name, we assume it is that
@@ -423,7 +423,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 				bool bNoLastName = true;
 
 				// Reset pointer to parent Attribute
-				ipParent = NULL;
+				ipParent = __nullptr;
 
 				// Process Person names
 				long	lSize = ipMatches->Size();
@@ -433,7 +433,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 				for (int i = 0; i <= lSize; i++)
 				{
 					ISpatialStringPtr	ipPerson( CLSID_SpatialString );
-					ASSERT_RESOURCE_ALLOCATION( "ELI06680", ipPerson != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI06680", ipPerson != __nullptr );
 
 					// Get the name as a string
 					if (lSize > 0)
@@ -455,7 +455,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 							// Create Spatial String for Alias information
 							// to be processed later
 							ISpatialStringPtr	ipExtra( CLSID_SpatialString );
-							ASSERT_RESOURCE_ALLOCATION("ELI08711", ipExtra != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI08711", ipExtra != __nullptr);
 
 							// Check Name for Person Alias
 							bool bContinue = handleAlias( ipPerson, ipExtra, eNextType, 
@@ -469,7 +469,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 							{
 								// Set Attribute Value field
 								IAttributePtr ipAttr( CLSID_Attribute );
-								ASSERT_RESOURCE_ALLOCATION("ELI09615", ipAttr != NULL);
+								ASSERT_RESOURCE_ALLOCATION("ELI09615", ipAttr != __nullptr);
 								ipAttr->Value = ipPerson;
 
 								// Provide debug output
@@ -524,12 +524,12 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 								{
 									// Retrieve collected sub-attributes
 									IIUnknownVectorPtr ipSub = ipAttr->SubAttributes;
-									ASSERT_RESOURCE_ALLOCATION("ELI15539", ipSub != NULL);
+									ASSERT_RESOURCE_ALLOCATION("ELI15539", ipSub != __nullptr);
 									for (int j = 0; j < ipSub->Size(); j++)
 									{
 										// Get the sub-attribute
 										IAttributePtr ipThis = ipSub->At( j );
-										ASSERT_RESOURCE_ALLOCATION("ELI15540", ipThis != NULL);
+										ASSERT_RESOURCE_ALLOCATION("ELI15540", ipThis != __nullptr);
 
 										// Compare the Names
 										if (_bstr_t(ipThis->Name) == _bstr_t("Last"))
@@ -552,7 +552,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 									{
 										// Get the sub-attributes
 										IIUnknownVectorPtr ipSub = ipParent->GetSubAttributes();
-										ASSERT_RESOURCE_ALLOCATION("ELI15541", ipSub != NULL);
+										ASSERT_RESOURCE_ALLOCATION("ELI15541", ipSub != __nullptr);
 										ipSub->PushBack( ipAttr );
 									}
 									else
@@ -586,7 +586,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 				if (bProcessed && bNoLastName && ipMainAttrSub->Size() > 1)
 				{
 					// Create new Attribute for the Last name
-					IAttributePtr ipAttr = NULL;
+					IAttributePtr ipAttr = __nullptr;
 
 					// Retrieve first person and second person
 					IAttributePtr ipAttr0 = ipMainAttrSub->At(0);
@@ -594,24 +594,24 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 					// Step through the sub-attributes of the 2nd person
 					IIUnknownVectorPtr ipSub = ipAttr1->SubAttributes;
-					ASSERT_RESOURCE_ALLOCATION("ELI15543", ipSub != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15543", ipSub != __nullptr);
 					for (int i = 0; i < ipSub->Size(); i++)
 					{
 						// Retrieve this sub-attribute, looking for "Last"
 						IAttributePtr ipAttrSub = ipSub->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI15676", ipAttrSub != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15676", ipAttrSub != __nullptr);
 
 						if (ipAttrSub->Name == _bstr_t("Last"))
 						{
 							// Provide clone of this Attribute to first person
 							ICopyableObjectPtr ipCopy = ipAttrSub;
-							ASSERT_RESOURCE_ALLOCATION("ELI15674", ipCopy != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI15674", ipCopy != __nullptr);
 							ipAttr = ipCopy->Clone();
-							ASSERT_RESOURCE_ALLOCATION("ELI15675", ipAttr != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI15675", ipAttr != __nullptr);
 
 							// Get the first Person string
 							ISpatialStringPtr ipFirstPerson = ipAttr0->Value;
-							ASSERT_RESOURCE_ALLOCATION("ELI15545", ipFirstPerson != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI15545", ipFirstPerson != __nullptr);
 
 							// Append a space to the first Person string
 							string strAppend = " ";
@@ -628,7 +628,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 					{
 						// Retrieve sub-attributes for first Person
 						IIUnknownVectorPtr ipFirstSub = ipAttr0->SubAttributes;
-						ASSERT_RESOURCE_ALLOCATION("ELI15546", ipFirstSub != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15546", ipFirstSub != __nullptr);
 
 						// Add the new "Last" attribute
 						ipFirstSub->PushBack( ipAttr );	
@@ -646,7 +646,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 					int iNameCount = ipNames->Size();
 
 					// Reset pointer to parent Attribute
-					ipParent = NULL;
+					ipParent = __nullptr;
 
 					// Create and split Attribute for each name
 					for (int j = 0; j < iNameCount; j++)
@@ -664,7 +664,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 							// Create Spatial String for Alias information
 							// to be processed later
 							ISpatialStringPtr	ipExtra( CLSID_SpatialString );
-							ASSERT_RESOURCE_ALLOCATION("ELI08714", ipExtra != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI08714", ipExtra != __nullptr);
 
 							// Check Name for Person Alias
 							bool bContinue = handleAlias( ipName, ipExtra, eNextType, lNextAliasItem );
@@ -676,7 +676,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 							if (isValidEntity( ipName, true ))
 							{
 								IAttributePtr ipAttr( CLSID_Attribute );
-								ASSERT_RESOURCE_ALLOCATION("ELI09617", ipAttr != NULL);
+								ASSERT_RESOURCE_ALLOCATION("ELI09617", ipAttr != __nullptr);
 								ipAttr->Value = ipName;
 
 								// Provide debug output
@@ -730,13 +730,13 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 								{
 									// Retrieve sub-attributes
 									IIUnknownVectorPtr ipSub = ipAttr->SubAttributes;
-									ASSERT_RESOURCE_ALLOCATION("ELI15547", ipSub != NULL);
+									ASSERT_RESOURCE_ALLOCATION("ELI15547", ipSub != __nullptr);
 
 									for (int k = 0; k < ipSub->Size(); k++)
 									{
 										// Retrieve this sub-attribute
 										IAttributePtr ipSubAttr = ipSub->At( k );
-										ASSERT_RESOURCE_ALLOCATION("ELI15548", ipSubAttr != NULL);
+										ASSERT_RESOURCE_ALLOCATION("ELI15548", ipSubAttr != __nullptr);
 
 										// Check for "Last"
 										if (_bstr_t(ipSubAttr->Name) == _bstr_t("Last"))
@@ -758,7 +758,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 									if (ipParent)
 									{
 										IIUnknownVectorPtr ipSub = ipParent->SubAttributes;
-										ASSERT_RESOURCE_ALLOCATION("ELI15549", ipSub != NULL);
+										ASSERT_RESOURCE_ALLOCATION("ELI15549", ipSub != __nullptr);
 										ipSub->PushBack( ipAttr );
 									}
 									else
@@ -792,11 +792,11 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 					{
 						// Create new Lastname Attribute with empty string Value
 						IAttributePtr ipAttr( CLSID_Attribute );
-						ASSERT_RESOURCE_ALLOCATION("ELI09618", ipAttr != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI09618", ipAttr != __nullptr);
 						ipAttr->Name = "Last";
 
 						ISpatialStringPtr ipValue = ipAttr->Value;
-						ASSERT_RESOURCE_ALLOCATION("ELI15550", ipValue != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15550", ipValue != __nullptr);
 
 						// Retrieve first person
 						IAttributePtr ipAttr0 = ipMainAttrSub->At(0);
@@ -805,7 +805,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 						// Retrieve sub-attributes from second person
 						IIUnknownVectorPtr ipSub1 = ipAttr1->SubAttributes;
-						ASSERT_RESOURCE_ALLOCATION("ELI15551", ipSub1 != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15551", ipSub1 != __nullptr);
 
 						// Examine each sub-attribute
 						long lSubSize = ipSub1->Size();
@@ -813,18 +813,18 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 						{
 							// Retrieve this sub-attribute
 							IAttributePtr ipAttrSub = ipSub1->At(i);
-							ASSERT_RESOURCE_ALLOCATION("ELI15552", ipAttrSub != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI15552", ipAttrSub != __nullptr);
 
 							// Check if this is a lastname sub-attribute
 							if (ipAttrSub->Name == _bstr_t("Last"))
 							{
 								// Save the actual last name
 								ipValue = ipAttrSub->Value;
-								ASSERT_RESOURCE_ALLOCATION("ELI25941", ipValue != NULL);
+								ASSERT_RESOURCE_ALLOCATION("ELI25941", ipValue != __nullptr);
 
 								// Get the first Person string
 								ISpatialStringPtr ipFirst = ipAttr0->Value;
-								ASSERT_RESOURCE_ALLOCATION("ELI15553", ipFirst != NULL);
+								ASSERT_RESOURCE_ALLOCATION("ELI15553", ipFirst != __nullptr);
 
 								// Append a space to the first Person string
 								ipFirst->AppendString( _bstr_t( " " ) );
@@ -840,7 +840,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 						{
 							// Retrieve sub-attributes from first person
 							IIUnknownVectorPtr ipSub0 = ipAttr0->SubAttributes;
-							ASSERT_RESOURCE_ALLOCATION("ELI15554", ipSub0 != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI15554", ipSub0 != __nullptr);
 
 							ipSub0->PushBack( ipAttr );	
 						}
@@ -868,18 +868,18 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 
 				// Treat semicolon as delimiter between Companies
 				IIUnknownVectorPtr ipMatches( CLSID_IUnknownVector );
-				ASSERT_RESOURCE_ALLOCATION( "ELI10539", ipMatches != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI10539", ipMatches != __nullptr );
 				processDelimiter( ipEntity, ";", ipMatches );
 
 				// Reset pointer to parent Attribute
-				ipParent = NULL;
+				ipParent = __nullptr;
 
 				// Process Company names
 				long	lSize = ipMatches->Size();
 				for (int iIndex = 0; iIndex <= lSize; iIndex++)
 				{
 					ISpatialStringPtr	ipCompany( CLSID_SpatialString );
-					ASSERT_RESOURCE_ALLOCATION( "ELI10540", ipCompany != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI10540", ipCompany != __nullptr );
 
 					// Retrieve this potential Entity
 					ipCompany = getEntityFromDelimiters( iIndex, ipEntity, ipMatches );
@@ -894,7 +894,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 						// Create Spatial String for Alias information
 						// to be processed later
 						ISpatialStringPtr	ipExtra( CLSID_SpatialString );
-						ASSERT_RESOURCE_ALLOCATION("ELI08715", ipExtra != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI08715", ipExtra != __nullptr);
 
 						// Check Entity for Company Alias
 						bool bContinue = handleAlias( ipCompany, ipExtra, eNextType, lNextAliasItem );
@@ -905,7 +905,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 						if (isValidEntity( ipCompany, false ))
 						{
 							IAttributePtr ipAttr( CLSID_Attribute );
-							ASSERT_RESOURCE_ALLOCATION("ELI09619", ipAttr != NULL);
+							ASSERT_RESOURCE_ALLOCATION("ELI09619", ipAttr != __nullptr);
 							ipAttr->Value = ipCompany;
 
 							// Prepare debug output
@@ -982,7 +982,7 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 								{
 									// Retrieve the sub-attributes
 									IIUnknownVectorPtr ipSub = ipParent->SubAttributes;
-									ASSERT_RESOURCE_ALLOCATION("ELI15555", ipSub != NULL);
+									ASSERT_RESOURCE_ALLOCATION("ELI15555", ipSub != __nullptr);
 
 									ipSub->PushBack( ipAttr );
 								}
@@ -1012,14 +1012,14 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 			}			// end else Company found
 
 			// Reset the regular expression parser
-			m_ipRegExprParser = NULL;
+			m_ipRegExprParser = __nullptr;
 		}
 		catch(...)
 		{
 			try
 			{
 				// Ensure the regular expression parser gets reset
-				m_ipRegExprParser = NULL;
+				m_ipRegExprParser = __nullptr;
 			}
 			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29461");
 
@@ -1073,7 +1073,7 @@ STDMETHODIMP CEntityNameSplitter::raw_GetComponentDescription(BSTR * pstrCompone
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19563", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19563", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Split the name of a company or a person").Detach();
 	}
@@ -1095,7 +1095,7 @@ STDMETHODIMP CEntityNameSplitter::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFSPLITTERSLib::IEntityNameSplitterPtr ipSource( pObject );
-		ASSERT_RESOURCE_ALLOCATION("ELI08682", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08682", ipSource != __nullptr);
 
 		// Retrieve Alias Choice setting
 		m_eAliasChoice = (EEntityAliasChoice) ipSource->GetEntityAliasChoice();
@@ -1116,7 +1116,7 @@ STDMETHODIMP CEntityNameSplitter::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_EntityNameSplitter );
-		ASSERT_RESOURCE_ALLOCATION( "ELI05348", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI05348", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -1195,7 +1195,7 @@ STDMETHODIMP CEntityNameSplitter::Load(IStream *pStream)
 		{
 			IPersistStreamPtr ipObj;
 			readObjectFromStream(ipObj, pStream, "ELI09985");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException( "ELI05468", 
 					"Company Clues vector could not be read from stream!" );

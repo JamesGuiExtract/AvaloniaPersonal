@@ -20,7 +20,7 @@ CShortInputValidator::CShortInputValidator()
 	{
 		// Create an instance of IntegerInputValidator
 		m_ipIIV.CreateInstance( __uuidof(IntegerInputValidator) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI03813", m_ipIIV != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI03813", m_ipIIV != __nullptr );
 		
 		// Set appropriate limits
 		setDefaults();
@@ -79,7 +79,7 @@ STDMETHODIMP CShortInputValidator::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_ShortInputValidator);
-		ASSERT_RESOURCE_ALLOCATION("ELI08369", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08369", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -130,7 +130,7 @@ STDMETHODIMP CShortInputValidator::raw_GetComponentDescription(BSTR * pstrCompon
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19624", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19624", pstrComponentDescription != __nullptr)
 
 		// Retrieve definition
 		*pstrComponentDescription = _bstr_t( 
@@ -170,7 +170,7 @@ STDMETHODIMP CShortInputValidator::raw_GetInputType(BSTR * pstrInputType)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19625", pstrInputType != NULL)
+		ASSERT_ARGUMENT("ELI19625", pstrInputType != __nullptr)
 
 		// Check license
 		validateLicense();
@@ -230,7 +230,7 @@ STDMETHODIMP CShortInputValidator::Load(IStream *pStream)
 		validateLicense();
 
 		// Reset member variables
-		m_ipIIV = NULL;
+		m_ipIIV = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -286,7 +286,7 @@ STDMETHODIMP CShortInputValidator::Save(IStream *pStream, BOOL fClearDirty)
 		// write the IntegerInputValidator member object to 
 		// the stream
 		IPersistStreamPtr ipObj = m_ipIIV;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI04693", "Integer InputValidator does not support persistence!");
 		}

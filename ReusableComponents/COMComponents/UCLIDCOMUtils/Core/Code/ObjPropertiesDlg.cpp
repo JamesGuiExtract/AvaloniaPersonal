@@ -71,14 +71,14 @@ void ObjPropertiesDlg::OnOK()
 		// The call to Apply() fails if the settings could not
 		// be validated.  If the settings could not be validated, then
 		// just return;
-		if (m_pCurrentPropPage != NULL && m_pCurrentPropPage->Apply() == S_FALSE)
+		if (m_pCurrentPropPage != __nullptr && m_pCurrentPropPage->Apply() == S_FALSE)
 			return;
 		
 		// check if the component implements IMustBeConfiguredObject
 		// if it does, make sure that the object has been configured successfully
 		// before dismissing the dialog
 		UCLID_COMUTILSLib::IMustBeConfiguredObjectPtr ipObj = m_ipObjWithPropPage;
-		if (ipObj != NULL)
+		if (ipObj != __nullptr)
 		{
 			if (ipObj->IsConfigured() == VARIANT_FALSE)
 			{
@@ -150,7 +150,7 @@ void ObjPropertiesDlg::SetCurrentPage(IUnknown * pUnknown)
   	ScreenToClient(&rect);
 
 	// hide previous page and release page pointer
-	if( m_pCurrentPropPage != NULL )
+	if( m_pCurrentPropPage != __nullptr )
 	{
 		m_pCurrentPropPage->Show(SW_HIDE);
 		m_pCurrentPropPage->Deactivate();
@@ -180,7 +180,7 @@ void ObjPropertiesDlg::SetCurrentPage(IUnknown * pUnknown)
 	// make sure that EXACTLY ONE property page is available
 	// NOTE: In the future, when this object supports displaying of multiple
 	// property pages for the same object, change ==1 in the code below to >= 1
-	if (!(pages.cElems == 1 && pages.pElems != NULL ))
+	if (!(pages.cElems == 1 && pages.pElems != __nullptr ))
 	{
 		throw UCLIDException("ELI04169", "Invalid number of property pages supported by the object!");	
 	}

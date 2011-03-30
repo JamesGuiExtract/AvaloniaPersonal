@@ -63,7 +63,7 @@ void CZoneHighlightThrd::SetStartPoint (int iEX, int iEY)
 	m_lstartY = iEY;
 
 	CGenericDisplayView* pView = m_pGenericDisplayCtrl->getUGDView();
-	if (pView != NULL)
+	if (pView != __nullptr)
 	{
 		pView->ClientWindowToImagePixelCoordinates(
 			(int*)&m_lstartX, (int*)&m_lstartY, m_pGenericDisplayCtrl->getCurrentPageNumber());
@@ -77,7 +77,7 @@ void CZoneHighlightThrd::SetEndPoint (int iEX, int iEY)
 	m_lendPtY = iEY;
 	
 	CGenericDisplayView* pView = m_pGenericDisplayCtrl->getUGDView();
-	if (pView != NULL)
+	if (pView != __nullptr)
 	{
 		pView->ClientWindowToImagePixelCoordinates(
 			(int*)&m_lendPtX, (int*)&m_lendPtY, m_pGenericDisplayCtrl->getCurrentPageNumber());
@@ -278,7 +278,7 @@ CPoint* CZoneHighlightThrd::getZoneBoundsForThisHeight(long lHeight)
 CPoint* CZoneHighlightThrd::getZoneBoundsForThisEndPoint(int x, int y)
 {
 	CGenericDisplayView* pView = m_pGenericDisplayCtrl->getUGDView();
-	if (pView != NULL)
+	if (pView != __nullptr)
 	{
 		pView->ClientWindowToImagePixelCoordinates(&x, &y, 
 			m_pGenericDisplayCtrl->getCurrentPageNumber());

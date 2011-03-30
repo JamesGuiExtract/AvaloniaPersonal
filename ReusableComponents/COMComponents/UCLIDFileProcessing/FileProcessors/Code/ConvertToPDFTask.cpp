@@ -50,7 +50,7 @@ CConvertToPDFTask::~CConvertToPDFTask()
 {
 	try
 	{
-		m_ipPdfPassSettings = NULL;
+		m_ipPdfPassSettings = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18738");
 }
@@ -92,9 +92,9 @@ STDMETHODIMP CConvertToPDFTask::GetOptions(BSTR *pbstrInputFile, VARIANT_BOOL* p
 		validateLicense();
 
 		// ensure parameters are non-NULL
-		ASSERT_ARGUMENT("ELI18740", pbstrInputFile != NULL);
-		ASSERT_ARGUMENT("ELI28585", pvbPDFA != NULL);
-		ASSERT_ARGUMENT("ELI29743", ppPdfSettings != NULL);
+		ASSERT_ARGUMENT("ELI18740", pbstrInputFile != __nullptr);
+		ASSERT_ARGUMENT("ELI28585", pvbPDFA != __nullptr);
+		ASSERT_ARGUMENT("ELI29743", ppPdfSettings != __nullptr);
 		
 		// set options
 		*pbstrInputFile = _bstr_t(m_strInputImage.c_str()).Detach();
@@ -140,12 +140,12 @@ STDMETHODIMP CConvertToPDFTask::raw_CopyFrom(IUnknown* pObject)
 
 		// get the ConvertToPDFTask interface
 		UCLID_FILEPROCESSORSLib::IConvertToPDFTaskPtr ipConvertToPDFTask(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI18745", ipConvertToPDFTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18745", ipConvertToPDFTask != __nullptr);
 
 		// get the options from the ConvertToPDFTask object 
 		_bstr_t bstrInputFile;
 		VARIANT_BOOL vbPDFA;
-		IPdfPasswordSettingsPtr ipSettings = NULL;
+		IPdfPasswordSettingsPtr ipSettings = __nullptr;
 		ipConvertToPDFTask->GetOptions( bstrInputFile.GetAddress(), &vbPDFA, &ipSettings );
 		
 		// store the found options
@@ -154,15 +154,15 @@ STDMETHODIMP CConvertToPDFTask::raw_CopyFrom(IUnknown* pObject)
 
 		// Clone the settings if they exist
 		ICopyableObjectPtr ipCopy = ipSettings;
-		if (ipCopy != NULL)
+		if (ipCopy != __nullptr)
 		{
 			m_ipPdfPassSettings = ipCopy->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI29748", m_ipPdfPassSettings != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29748", m_ipPdfPassSettings != __nullptr);
 		}
 		else
 		{
 			// No settings, clear any settings currently held by this object
-			m_ipPdfPassSettings = NULL;
+			m_ipPdfPassSettings = __nullptr;
 		}
 
 		// set the dirty flag
@@ -183,15 +183,15 @@ STDMETHODIMP CConvertToPDFTask::raw_Clone(IUnknown** ppObject)
 		validateLicense();
 
 		// ensure that the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI18747", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI18747", ppObject != __nullptr);
 
 		// get the copyable object interface
 		ICopyableObjectPtr ipObjCopy(CLSID_ConvertToPDFTask);
-		ASSERT_RESOURCE_ALLOCATION("ELI18748", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18748", ipObjCopy != __nullptr);
 
 		// create a shallow copy
 		IUnknownPtr ipUnknown(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI18749", ipUnknown != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18749", ipUnknown != __nullptr);
 		ipObjCopy->CopyFrom(ipUnknown);
 
 		// return the new ConvertToPDFTask to the caller
@@ -232,8 +232,8 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		validateLicense();
 
 		// check for NULL parameters
-		ASSERT_ARGUMENT("ELI18753", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI18754", pResult != NULL);
+		ASSERT_ARGUMENT("ELI18753", pTagManager != __nullptr);
+		ASSERT_ARGUMENT("ELI18754", pResult != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31338", ipFileRecord != __nullptr);
 
@@ -263,7 +263,7 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		}
 
 		// Check for security settings
-		if (!m_bPDFA && m_ipPdfPassSettings != NULL)
+		if (!m_bPDFA && m_ipPdfPassSettings != __nullptr)
 		{
 			// Get settings from the object
 			_bstr_t bstrUserPass;
@@ -295,7 +295,7 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		}
 
 		// Log an exception if both security and PDF/A defined
-		if (m_bPDFA && m_ipPdfPassSettings != NULL)
+		if (m_bPDFA && m_ipPdfPassSettings != __nullptr)
 		{
 			UCLIDException ue("ELI29767",
 				"Cannot create PDF/A and add security settings. Creating file as PDF/A.");
@@ -377,7 +377,7 @@ STDMETHODIMP CConvertToPDFTask::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI18758", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18758", pbValue != __nullptr);
 
 		try
 		{
@@ -410,13 +410,13 @@ STDMETHODIMP CConvertToPDFTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
 		validateLicense();
 
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI18760", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18760", pbValue != __nullptr);
 
 		// the ConvertToPDFTask is configured if it has an input image filename
 		// and if there are PdfPassword settings, they are configured
 		IMustBeConfiguredObjectPtr ipConfigured = m_ipPdfPassSettings;
 		*pbValue = asVariantBool( !m_strInputImage.empty()
-			&& (ipConfigured == NULL || ipConfigured->IsConfigured() == VARIANT_TRUE));
+			&& (ipConfigured == __nullptr || ipConfigured->IsConfigured() == VARIANT_TRUE));
 
 		return S_OK;
 	}
@@ -432,7 +432,7 @@ STDMETHODIMP CConvertToPDFTask::GetClassID(CLSID* pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18762", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI18762", pClassID != __nullptr);
 
 		*pClassID = CLSID_ConvertToPDFTask;
 
@@ -469,11 +469,11 @@ STDMETHODIMP CConvertToPDFTask::Load(IStream* pStream)
 		// clear the options
 		m_strInputImage = gstrDEFAULT_INPUT_IMAGE_FILENAME;
 		m_bPDFA = false;
-		m_ipPdfPassSettings = NULL;
+		m_ipPdfPassSettings = __nullptr;
 		
 		// use a smart pointer for the IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI18764", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18764", ipStream != __nullptr);
 
 		// read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -542,7 +542,7 @@ STDMETHODIMP CConvertToPDFTask::Load(IStream* pStream)
 					IPersistStreamPtr ipObj;
 					readObjectFromStream(ipObj, pStream, "ELI29749");
 					m_ipPdfPassSettings = ipObj;
-					ASSERT_RESOURCE_ALLOCATION("ELI29750", m_ipPdfPassSettings != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI29750", m_ipPdfPassSettings != __nullptr);
 				}
 			}
 		}
@@ -572,14 +572,14 @@ STDMETHODIMP CConvertToPDFTask::Save(IStream* pStream, BOOL fClearDirty)
 		dataWriter << m_bPDFA;
 
 		// Write a bool to indicate whether there is a Pdf password settings object
-		bool bSettings = m_ipPdfPassSettings != NULL;
+		bool bSettings = m_ipPdfPassSettings != __nullptr;
 		dataWriter << bSettings;
 
 		dataWriter.flushToByteStream();
 
 		// use a smart pointer for IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI18769", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18769", ipStream != __nullptr);
 
 		// write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
@@ -592,7 +592,7 @@ STDMETHODIMP CConvertToPDFTask::Save(IStream* pStream, BOOL fClearDirty)
 		if (bSettings)
 		{
 			IPersistStreamPtr ipObj = m_ipPdfPassSettings;
-			ASSERT_RESOURCE_ALLOCATION("ELI29744", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29744", ipObj != __nullptr);
 			writeObjectToStream(ipObj, pStream, "ELI29745", fClearDirty);
 		}
 

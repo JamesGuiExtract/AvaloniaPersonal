@@ -43,7 +43,7 @@ LRESULT CCharacterConfidenceConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 	{
 		// Obtain interface pointer to the IFindingRuleCondition class
 		UCLID_AFCONDITIONSLib::ICharacterConfidenceConditionPtr ipCharacterConfidencCondition = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI29376", ipCharacterConfidencCondition != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29376", ipCharacterConfidencCondition != __nullptr);
 
 		// Attach controls
 		m_comboAggregateFunction.Attach(GetDlgItem(IDC_COMBO_AGGREGATE_FUNCTION));
@@ -146,7 +146,7 @@ STDMETHODIMP CCharacterConfidenceConditionPP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFCONDITIONSLib::ICharacterConfidenceConditionPtr ipCCC = m_ppUnk[i];
-			if (ipCCC != NULL)
+			if (ipCCC != __nullptr)
 			{
 				// Save the first score condition
 				ipCCC->FirstScoreCondition = (EConditionalOp) m_comboFirstCondition.GetCurSel();
@@ -248,7 +248,7 @@ STDMETHODIMP CCharacterConfidenceConditionPP::raw_IsLicensed(VARIANT_BOOL * pbVa
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29378", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI29378", pbValue != __nullptr);
 
 		try
 		{

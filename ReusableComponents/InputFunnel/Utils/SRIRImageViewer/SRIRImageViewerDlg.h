@@ -33,7 +33,7 @@ class CSRIRImageViewerDlg : public CDialog,
 {
 // Construction
 public:
-	CSRIRImageViewerDlg(ISpotRecognitionWindowPtr ipSRIR, bool bShowSearch = false, CWnd* pParent = NULL);	// standard constructor
+	CSRIRImageViewerDlg(ISpotRecognitionWindowPtr ipSRIR, bool bShowSearch = false, CWnd* pParent = __nullptr);	// standard constructor
 
 	bool openImage(const std::string& strImageFileName);
 	void execScript(const std::string& strScriptFileName);
@@ -97,7 +97,7 @@ protected:
 private:
 
 	ISpotRecognitionWindowPtr m_ipSRIR;
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> m_apCfg;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apCfg;
 	
 	void loadSettingsFromRegistry();
 	void saveSettingsToRegistry();

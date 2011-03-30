@@ -88,7 +88,7 @@ private:
 	bool m_bIsDBGood;
 
 	// Registry Persistence managers
-	auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
+	unique_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 
 	// Misc utils object for calling AllowUserToSelectAndConfigureObject2
 	IMiscUtilsPtr m_ipMiscUtils;

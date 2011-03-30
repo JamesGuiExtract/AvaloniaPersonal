@@ -331,24 +331,24 @@ string COutputToXMLPP::chooseDocTag(HWND hWnd, long x, long y)
 {
 	try
 	{
-		IVariantVectorPtr ipVecBuiltInTags = NULL;
-		IVariantVectorPtr ipVecINITags = NULL;
+		IVariantVectorPtr ipVecBuiltInTags = __nullptr;
+		IVariantVectorPtr ipVecINITags = __nullptr;
 		if (m_bFAMTags)
 		{
 			IFAMTagManagerPtr ipFAMTags(CLSID_FAMTagManager);
-			ASSERT_RESOURCE_ALLOCATION("ELI26319", ipFAMTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26319", ipFAMTags != __nullptr);
 			ipVecBuiltInTags = ipFAMTags->GetBuiltInTags();
 			ipVecINITags = ipFAMTags->GetINIFileTags();
 		}
 		else
 		{
 			IAFUtilityPtr ipAFTags(CLSID_AFUtility);
-			ASSERT_RESOURCE_ALLOCATION("ELI26320", ipAFTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26320", ipAFTags != __nullptr);
 			ipVecBuiltInTags = ipAFTags->GetBuiltInTags();
 			ipVecINITags = ipAFTags->GetINIFileTags();
 		}
-		ASSERT_RESOURCE_ALLOCATION("ELI26321", ipVecBuiltInTags != NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI26322", ipVecINITags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26321", ipVecBuiltInTags != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI26322", ipVecINITags != __nullptr);
 
 
 		vector<string> vecChoices;

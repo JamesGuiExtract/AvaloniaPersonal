@@ -14,7 +14,7 @@ HINSTANCE TemporaryResourceOverride::m_hInstanceDefault = NULL;
 // Typically, you do this once in your DLLMain function....
 void TemporaryResourceOverride::sSetDefaultResource(HINSTANCE hInstDefault)
 {
-    ASSERT(hInstDefault != NULL);
+    ASSERT(hInstDefault != __nullptr);
 
     m_hInstanceDefault = hInstDefault;
 }
@@ -24,7 +24,7 @@ void TemporaryResourceOverride::sSetDefaultResource(HINSTANCE hInstDefault)
 TemporaryResourceOverride::TemporaryResourceOverride() 
 	:m_hInstanceOld(NULL)
 {
-    ASSERT(m_hInstanceDefault != NULL);
+    ASSERT(m_hInstanceDefault != __nullptr);
 
     Init(m_hInstanceDefault);
 }
@@ -33,7 +33,7 @@ TemporaryResourceOverride::TemporaryResourceOverride()
 TemporaryResourceOverride::TemporaryResourceOverride(HINSTANCE hInstNew)
 	:m_hInstanceOld(NULL)
 {
-    ASSERT(hInstNew != NULL);
+    ASSERT(hInstNew != __nullptr);
 
     Init(hInstNew);
 }

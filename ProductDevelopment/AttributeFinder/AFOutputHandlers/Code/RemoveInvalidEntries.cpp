@@ -62,20 +62,20 @@ STDMETHODIMP CRemoveInvalidEntries::raw_ProcessOutput(IIUnknownVector* pAttribut
 		validateLicense();
 
 		IIUnknownVectorPtr ipOrignAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI05046", ipOrignAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05046", ipOrignAttributes != __nullptr);
 		// create an empty vector
 		IIUnknownVectorPtr ipReturnAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI06734", ipReturnAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06734", ipReturnAttributes != __nullptr);
 
 		// go through all attributes and valid them
 		long nSize = ipOrignAttributes->Size();
 		// create a dummy ITextInput object
 		ITextInputPtr ipTextInput(CLSID_TextInput);
-		ASSERT_RESOURCE_ALLOCATION("ELI05047", ipTextInput != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05047", ipTextInput != __nullptr);
 		for (long n=0; n<nSize; n++)
 		{
 			IAttributePtr ipAttr(ipOrignAttributes->At(n));
-			ASSERT_RESOURCE_ALLOCATION("ELI06735", ipAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06735", ipAttr != __nullptr);
 
 			IInputValidatorPtr ipInputValidator = ipAttr->GetInputValidator();
 			// if the attribute has an input validator
@@ -83,7 +83,7 @@ STDMETHODIMP CRemoveInvalidEntries::raw_ProcessOutput(IIUnknownVector* pAttribut
 			{
 				// Get the attribute value
 				ISpatialStringPtr ipValue = ipAttr->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI15528", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15528", ipValue != __nullptr);
 
 				// init text input with the value of the attribute
 				ipTextInput->InitTextInput(NULL, ipValue->String);
@@ -125,7 +125,7 @@ STDMETHODIMP CRemoveInvalidEntries::raw_GetComponentDescription(BSTR * pstrCompo
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19552", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19552", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Remove invalid entries").Detach();
 	}
@@ -279,7 +279,7 @@ STDMETHODIMP CRemoveInvalidEntries::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_RemoveInvalidEntries);
-		ASSERT_RESOURCE_ALLOCATION("ELI05267", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05267", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

@@ -67,7 +67,7 @@ STDMETHODIMP CDespeckleICO::raw_GetComponentDescription(BSTR * pstrComponentDesc
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17489", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI17489", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Despeckle").Detach();
 	}
@@ -86,7 +86,7 @@ STDMETHODIMP CDespeckleICO::raw_CopyFrom(IUnknown * pObject)
 	try
 	{
 		ESImageCleanupLib::IDespeckleICOPtr ipCopyThis(pObject);	
-		ASSERT_RESOURCE_ALLOCATION("ELI17414", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17414", ipCopyThis != __nullptr);
 
 		m_lNoiseSize = ipCopyThis->NoiseSize;
 	}
@@ -101,15 +101,15 @@ STDMETHODIMP CDespeckleICO::raw_Clone(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19446", pObject != NULL);
+		ASSERT_ARGUMENT("ELI19446", pObject != __nullptr);
 
 		// create a copyable object pointer
 		ICopyableObjectPtr ipObjCopy(CLSID_DespeckleICO);
-		ASSERT_RESOURCE_ALLOCATION("ELI17415", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17415", ipObjCopy != __nullptr);
 
 		// set the IUnknownPtr to the current object
 		IUnknownPtr ipUnk = this;
-		ASSERT_RESOURCE_ALLOCATION("ELI17416", ipUnk != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17416", ipUnk != __nullptr);
 
 		// copy to the copyable object pointer
 		ipObjCopy->CopyFrom(ipUnk);
@@ -132,7 +132,7 @@ STDMETHODIMP CDespeckleICO::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI17490", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI17490", pbValue != __nullptr);
 
 		try
 		{
@@ -161,7 +161,7 @@ STDMETHODIMP CDespeckleICO::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17491", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI17491", pClassID != __nullptr);
 
 		*pClassID = CLSID_DespeckleICO;
 	}
@@ -183,7 +183,7 @@ STDMETHODIMP CDespeckleICO::Load(IStream * pStream)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17492", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17492", pStream != __nullptr);
 
 		// reset the noise size to default value
 		m_lNoiseSize = glDEFAULT_NOISE_SIZE;
@@ -225,7 +225,7 @@ STDMETHODIMP CDespeckleICO::Save(IStream * pStream, BOOL fClearDirty)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17493", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17493", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -277,7 +277,7 @@ STDMETHODIMP CDespeckleICO::Perform(void* pciRepair)
 
 		// wrap the ClearImage repair pointer in smart pointer
 		ICiRepairPtr ipciRepair((ICiRepair*) pciRepair);
-		ASSERT_RESOURCE_ALLOCATION("ELI17420", ipciRepair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17420", ipciRepair != __nullptr);
 
 		// perform the ClearImage CleanNoise method
 		ipciRepair->CleanNoise(m_lNoiseSize);
@@ -296,7 +296,7 @@ STDMETHODIMP CDespeckleICO::get_NoiseSize(long* plNoiseSize)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17494", plNoiseSize != NULL);
+		ASSERT_ARGUMENT("ELI17494", plNoiseSize != __nullptr);
 
 		*plNoiseSize = m_lNoiseSize;
 	}

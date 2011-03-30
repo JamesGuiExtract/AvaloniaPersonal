@@ -49,8 +49,8 @@ CIntegerInputValidator::~CIntegerInputValidator()
 	{
 		// Force destruction of member objects within this scope so that
 		// all destruction happens within the scope of the correct AFX state
-		m_ipLogger = NULL;
-		m_ipExecuter = NULL;
+		m_ipLogger = __nullptr;
+		m_ipExecuter = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16444");
 }
@@ -94,7 +94,7 @@ STDMETHODIMP CIntegerInputValidator::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_GENERALIVLib::IIntegerInputValidatorPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08300", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08300", ipSource != __nullptr);
 
 		m_bIncludeMaximum = (ipSource->GetIncludeMaxInRange()==VARIANT_TRUE) ? true : false;
 		m_bIncludeMinimum = (ipSource->GetIncludeMinInRange()==VARIANT_TRUE) ? true : false;
@@ -122,7 +122,7 @@ STDMETHODIMP CIntegerInputValidator::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_IntegerInputValidator);
-		ASSERT_RESOURCE_ALLOCATION("ELI08368", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08368", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -260,7 +260,7 @@ STDMETHODIMP CIntegerInputValidator::raw_GetComponentDescription(BSTR * pbstrCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19622", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19622", pbstrComponentDescription != __nullptr)
 
 		// Retrieve definition
 		*pbstrComponentDescription = _bstr_t( 
@@ -290,7 +290,7 @@ STDMETHODIMP CIntegerInputValidator::raw_ValidateInput(ITextInput * pTextInput, 
 		validateLicense();
 
 		ITextInputPtr ipTextInput(pTextInput);
-		ASSERT_ARGUMENT("ELI10161", ipTextInput != NULL);
+		ASSERT_ARGUMENT("ELI10161", ipTextInput != __nullptr);
 
 		// Retrieve string
 		string	strInput = ipTextInput->GetText();
@@ -356,7 +356,7 @@ STDMETHODIMP CIntegerInputValidator::raw_GetInputType(BSTR * pstrInputType)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19623", pstrInputType != NULL)
+		ASSERT_ARGUMENT("ELI19623", pstrInputType != __nullptr)
 
 		// Check license
 		validateLicense();
@@ -1087,7 +1087,7 @@ void CIntegerInputValidator::doTest1()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10162", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10162", ipTextInput != __nullptr);
 
 	ipTextInput->InitTextInput( NULL, _bstr_t("5") );
 
@@ -1123,7 +1123,7 @@ void CIntegerInputValidator::doTest1()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1172,7 +1172,7 @@ void CIntegerInputValidator::doTest2()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10163", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10163", ipTextInput != __nullptr);
 
 	ipTextInput->InitTextInput( NULL, _bstr_t("15") );
 
@@ -1208,7 +1208,7 @@ void CIntegerInputValidator::doTest2()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1254,7 +1254,7 @@ void CIntegerInputValidator::doTest3()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10164", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10164", ipTextInput != __nullptr);
 
 	ipTextInput->InitTextInput( NULL, _bstr_t("0") );
 
@@ -1290,7 +1290,7 @@ void CIntegerInputValidator::doTest3()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1336,7 +1336,7 @@ void CIntegerInputValidator::doTest4()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10165", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10165", ipTextInput != __nullptr);
 
 	ipTextInput->InitTextInput( NULL, _bstr_t("-50") );
 
@@ -1372,7 +1372,7 @@ void CIntegerInputValidator::doTest4()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1424,7 +1424,7 @@ void CIntegerInputValidator::doTest5()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10166", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10166", ipTextInput != __nullptr);
 	
 	ipTextInput->InitTextInput( NULL, _bstr_t("10") );
 
@@ -1460,7 +1460,7 @@ void CIntegerInputValidator::doTest5()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1512,7 +1512,7 @@ void CIntegerInputValidator::doTest6()
 
 	// Prepare ITextInput object with test string
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10167", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10167", ipTextInput != __nullptr);
 	
 	ipTextInput->InitTextInput( NULL, _bstr_t("10") );
 
@@ -1548,7 +1548,7 @@ void CIntegerInputValidator::doTest6()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1583,7 +1583,7 @@ void CIntegerInputValidator::doTest7()
 	_bstr_t	bstrTest( "-102" );
 
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10168", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10168", ipTextInput != __nullptr);
 	
 	ipTextInput->InitTextInput(NULL, bstrTest);
 
@@ -1793,7 +1793,7 @@ void CIntegerInputValidator::doTest7()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	if (bTestSuccess)
 	{
 		m_ipLogger->EndTestCase( VARIANT_TRUE );
@@ -1825,7 +1825,7 @@ void CIntegerInputValidator::setDefaults()
 IInputValidatorPtr CIntegerInputValidator::getThisAsInputValidatorPtr()
 {
 	IInputValidatorPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI22011", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22011", ipThis != __nullptr);
 
 	return ipThis;
 }

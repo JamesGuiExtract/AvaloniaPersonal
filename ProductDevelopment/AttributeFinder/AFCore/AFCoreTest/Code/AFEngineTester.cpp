@@ -42,8 +42,8 @@ CAFEngineTester::CAFEngineTester()
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI07196", m_ipAttrFinderEngine != NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI07365", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07196", m_ipAttrFinderEngine != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI07365", m_ipAFUtility != __nullptr);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07195")
 }
@@ -78,7 +78,7 @@ STDMETHODIMP CAFEngineTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 		// Check license
 		validateLicense();
 
-		if (m_ipResultLogger == NULL)
+		if (m_ipResultLogger == __nullptr)
 		{
 			throw UCLIDException("ELI07186", "Please set ResultLogger before proceeding.");
 		}
@@ -227,8 +227,8 @@ void CAFEngineTester::processResults(IIUnknownVectorPtr ipExpectedAttr,
 									 bool& rbSuccess)
 {
 	// ensure valid arguments
-	ASSERT_ARGUMENT("ELI07330", ipFoundAttr != NULL);
-	ASSERT_ARGUMENT("ELI07331", ipExpectedAttr != NULL);
+	ASSERT_ARGUMENT("ELI07330", ipFoundAttr != __nullptr);
+	ASSERT_ARGUMENT("ELI07331", ipExpectedAttr != __nullptr);
 
 	// handle the situation where no attributes are found
 	// handle case of no attributes found but some were expected
@@ -247,10 +247,10 @@ void CAFEngineTester::processResults(IIUnknownVectorPtr ipExpectedAttr,
 
 	// Get IComparableObject pointers for each vector
 	IComparableObjectPtr	ipFound = ipFoundAttr;
-	ASSERT_RESOURCE_ALLOCATION("ELI07325", ipFound != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI07325", ipFound != __nullptr);
 
 	IComparableObjectPtr	ipExpected = ipExpectedAttr;
-	ASSERT_RESOURCE_ALLOCATION("ELI07326", ipExpected != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI07326", ipExpected != __nullptr);
 	
 	// Do the comparison
 	// if not equal, list all expected and found attributes
@@ -312,11 +312,11 @@ void CAFEngineTester::runTest(ETestType eTestType, const string& strRSDFile,
 		nSubCaseNumber, bValidateOutput);
 	
 	// create the output handler, if desired by caller
-//	IOutputHandlerPtr ipOutputHandler = NULL;
+//	IOutputHandlerPtr ipOutputHandler = __nullptr;
 //	if ( bValidateOutput )
 //	{
 //		ipOutputHandler.CreateInstance(CLSID_RemoveInvalidEntries);
-//		ASSERT_RESOURCE_ALLOCATION( "ELI07272", ipOutputHandler != NULL );
+//		ASSERT_RESOURCE_ALLOCATION( "ELI07272", ipOutputHandler != __nullptr );
 //	}
 
 	bool bSuccess = false;
@@ -331,7 +331,7 @@ void CAFEngineTester::runTest(ETestType eTestType, const string& strRSDFile,
 		// Create AFDocument object
 		CComQIPtr<IAFDocument> ipAFDoc;
 		ipAFDoc.CoCreateInstance( CLSID_AFDocument );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07841", ipAFDoc != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07841", ipAFDoc != __nullptr );
 
 		// find the attributes
 		IIUnknownVectorPtr ipFoundAttr;
@@ -399,11 +399,11 @@ void CAFEngineTester::runTest(ETestType eTestType, const string& strRSDFile,
 	
 	// vector to contain the list of attributes to find
 	IVariantVectorPtr ipvecAttributes(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI07286", ipvecAttributes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI07286", ipvecAttributes != __nullptr);
 
 	// vector to contain the list of values expected
 	IIUnknownVectorPtr ipExpected(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI07219", ipExpected != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI07219", ipExpected != __nullptr );
 
 	string strLastAttributeName = "";
 
@@ -458,7 +458,7 @@ const std::string CAFEngineTester::getTestFileFullPath(const string& strFileName
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		// get the DAT filename
 		string strTestFileName = ::getAbsoluteFileName(strTCLFile, asString(_bstr_t(ipParams->GetItem(1))) + "\\" + strFileName, true);

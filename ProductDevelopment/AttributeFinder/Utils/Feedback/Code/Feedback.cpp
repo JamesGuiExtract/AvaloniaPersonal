@@ -94,7 +94,7 @@ BOOL CFeedbackApp::InitInstance()
 
 				// Create the IFeedbackMgrInternals object needed by the dialogs
 				IFeedbackMgrInternalsPtr	ipManager( CLSID_FeedbackMgr );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09152", ipManager != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09152", ipManager != __nullptr );
 
 				// Show the appropriate UI
 				switch (eDialogChoice)

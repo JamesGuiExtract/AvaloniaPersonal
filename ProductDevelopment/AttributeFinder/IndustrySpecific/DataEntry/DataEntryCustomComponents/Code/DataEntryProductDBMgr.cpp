@@ -51,9 +51,9 @@ CDataEntryProductDBMgr::~CDataEntryProductDBMgr()
 {
 	try
 	{
-		m_ipFAMDB = NULL;
-		m_ipDBConnection = NULL;
-		m_ipAFUtility = NULL;
+		m_ipFAMDB = __nullptr;
+		m_ipDBConnection = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28985");
 }
@@ -68,8 +68,8 @@ void CDataEntryProductDBMgr::FinalRelease()
 	try
 	{
 		// Release COM objects before the object is destructed
-		m_ipFAMDB = NULL;
-		m_ipDBConnection = NULL;
+		m_ipFAMDB = __nullptr;
+		m_ipDBConnection = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29010");
 }
@@ -103,7 +103,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_GetComponentDescription(BSTR * pstrComp
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI28986", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI28986", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t(gstrDESCRIPTION.c_str()).Detach();
 	
@@ -121,7 +121,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_IsLicensed(VARIANT_BOOL  * pbValue)
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI28988", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI28988", pbValue != __nullptr);
 
 		try
 		{
@@ -152,11 +152,11 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI28990", ipDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28990", ipDB != __nullptr);
 
 		// Create the connection object
 		_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI28991", ipDBConnection != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28991", ipDBConnection != __nullptr);
 
 		string strDatabaseServer = asString(ipDB->DatabaseServer);
 		string strDatabaseName = asString(ipDB->DatabaseName);
@@ -210,11 +210,11 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProces
 
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI28993", ipDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28993", ipDB != __nullptr);
 
 		// Create the connection object
 		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI28994", ipDBConnection != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28994", ipDBConnection != __nullptr);
 		
 		string strDatabaseServer = asString(ipDB->DatabaseServer);
 		string strDatabaseName = asString(ipDB->DatabaseName);
@@ -247,7 +247,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_ValidateSchema(IFileProcessingDB* pDB)
 			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
 		
 			// Reset the database connection
-			m_ipDBConnection = NULL;
+			m_ipDBConnection = __nullptr;
 		}
 
 		validateDataEntrySchemaVersion(false);
@@ -266,7 +266,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_GetDBInfoRows(IVariantVector** ppDBInfo
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		IVariantVectorPtr ipDBInfoRows(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI31424", ipDBInfoRows != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31424", ipDBInfoRows != __nullptr);
 
 		map<string, string> mapDBInfoValues = getDBInfoDefaultValues();
 		for (map<string, string>::iterator iterDBInfoValues = mapDBInfoValues.begin();
@@ -292,7 +292,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_GetTables(IVariantVector** ppTables)
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		IVariantVectorPtr ipTables(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI31426", ipTables != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI31426", ipTables != __nullptr);
 
 		const vector<string> vecTableCreationQueries = getTableCreationQueries();
 		vector<string> vecTablesNames = getTableNamesFromCreationQueries(vecTableCreationQueries);
@@ -319,12 +319,12 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_ARGUMENT("ELI31428", ipDB != NULL);
+		ASSERT_ARGUMENT("ELI31428", ipDB != __nullptr);
 
 		_ConnectionPtr ipConnection(pConnection);
-		ASSERT_ARGUMENT("ELI31429", ipConnection != NULL);
+		ASSERT_ARGUMENT("ELI31429", ipConnection != __nullptr);
 
-		ASSERT_ARGUMENT("ELI31430", pnProdSchemaVersion != NULL);
+		ASSERT_ARGUMENT("ELI31430", pnProdSchemaVersion != __nullptr);
 
 		if (*pnProdSchemaVersion == 0)
 		{
@@ -388,7 +388,7 @@ STDMETHODIMP CDataEntryProductDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-		ASSERT_ARGUMENT("ELI28996", newVal != NULL);
+		ASSERT_ARGUMENT("ELI28996", newVal != __nullptr);
 
 		// Only update if it is a new value
 		if (m_ipFAMDB != newVal)
@@ -397,7 +397,7 @@ STDMETHODIMP CDataEntryProductDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 			m_ipFAMDB->GetConnectionRetrySettings(&m_nNumberOfRetries, &m_dRetryTimeout);
 		
 			// Reset the database connection
-			m_ipDBConnection = NULL;
+			m_ipDBConnection = __nullptr;
 		}
 
 		return S_OK;
@@ -430,7 +430,7 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection()
 {
 	// If the FAMDB is not set throw an exception
-	if (m_ipFAMDB == NULL)
+	if (m_ipFAMDB == __nullptr)
 	{
 		UCLIDException ue("ELI29003",
 			"FAMDB pointer has not been initialized! Unable to open connection.");
@@ -438,10 +438,10 @@ ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection()
 	}
 
 	// Check if connection has been created
-	if (m_ipDBConnection == NULL)
+	if (m_ipDBConnection == __nullptr)
 	{
 		m_ipDBConnection.CreateInstance(__uuidof( Connection));
-		ASSERT_RESOURCE_ALLOCATION("ELI29002", m_ipDBConnection != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29002", m_ipDBConnection != __nullptr);
 	}
 
 	// if closed and Database server and database name are defined,  open the database connection
@@ -495,7 +495,7 @@ void CDataEntryProductDBMgr::getDataEntryTables(vector<string>& rvecTables)
 //-------------------------------------------------------------------------------------------------
 void CDataEntryProductDBMgr::validateDataEntrySchemaVersion(bool bThrowIfMissing)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI29005", m_ipFAMDB != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI29005", m_ipFAMDB != __nullptr);
 
 	// Get the Version from the FAMDB DBInfo table
 	string strValue = asString(m_ipFAMDB->GetDBInfoSetting(
@@ -527,10 +527,10 @@ bool CDataEntryProductDBMgr::areCountersEnabled()
 //-------------------------------------------------------------------------------------------------
 IAFUtilityPtr CDataEntryProductDBMgr::getAFUtility()
 {
-	if (m_ipAFUtility == NULL)
+	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI29060", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29060", m_ipAFUtility != __nullptr);
 	}
 	
 	return m_ipAFUtility;
@@ -539,7 +539,7 @@ UCLID_DATAENTRYCUSTOMCOMPONENTSLib::IDataEntryProductDBMgrPtr CDataEntryProductD
 {
 	UCLID_DATAENTRYCUSTOMCOMPONENTSLib::IDataEntryProductDBMgrPtr ipThis;
 	ipThis = this;
-	ASSERT_RESOURCE_ALLOCATION("ELI30713", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30713", ipThis != __nullptr);
 	return this;
 }
 //-------------------------------------------------------------------------------------------------
@@ -552,13 +552,13 @@ bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFil
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI29051", plInstanceID != NULL);
+			ASSERT_ARGUMENT("ELI29051", plInstanceID != __nullptr);
 
 			// Validate data entry schema
 			validateDataEntrySchemaVersion(true);
 
 			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-			_ConnectionPtr ipConnection = NULL;
+			_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_ADO_CONNECTION_RETRY();
 
@@ -580,7 +580,7 @@ bool CDataEntryProductDBMgr::AddDataEntryData_Internal(bool bDBLocked, long lFil
 
 			// Create a pointer to a recordset
 			_RecordsetPtr ipSet( __uuidof( Recordset ));
-			ASSERT_RESOURCE_ALLOCATION("ELI29009", ipSet != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI29009", ipSet != __nullptr );
 
 			// Open the recordset
 			ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -643,7 +643,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI29052", plInstanceToken != NULL);
+			ASSERT_ARGUMENT("ELI29052", plInstanceToken != __nullptr);
 
 			IIUnknownVectorPtr ipAttributes(pAttributes);
 
@@ -660,8 +660,8 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 			vector<string>& strQueries = m_mapVecCounterValueInsertionQueries[*plInstanceToken];
 
 			// If there is nothing to record, return now.
-			if ((bOnLoad && ipAttributes == NULL) ||
-				(!bOnLoad && ipAttributes == NULL && strQueries.empty()))
+			if ((bOnLoad && ipAttributes == __nullptr) ||
+				(!bOnLoad && ipAttributes == __nullptr && strQueries.empty()))
 			{
 				return S_OK;
 			}
@@ -684,7 +684,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 			validateDataEntrySchemaVersion(true);
 
 			// This needs to be allocated outside the BEGIN_ADO_CONNECTION_RETRY
-			_ConnectionPtr ipConnection = NULL;
+			_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_ADO_CONNECTION_RETRY();
 
@@ -698,7 +698,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 				throw UCLIDException("ELI29053", "Data entry counters are not currently enabled.");
 			}
 
-			if (ipAttributes != NULL)
+			if (ipAttributes != __nullptr)
 			{
 				// Query to find all counters a value needs to be recorded for.
 				string strSql = "SELECT [ID], [AttributeQuery] FROM [DataEntryCounterDefinition] WHERE " +
@@ -706,7 +706,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipRecordSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI29054", ipRecordSet != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29054", ipRecordSet != __nullptr);
 
 				// Open the recordset
 				ipRecordSet->Open( strSql.c_str(), _variant_t((IDispatch *)ipConnection, true),
@@ -715,7 +715,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 				while (ipRecordSet->adoEOF == VARIANT_FALSE)
 				{
 					FieldsPtr ipFields(ipRecordSet->Fields);
-					ASSERT_RESOURCE_ALLOCATION("ELI29066", ipFields != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI29066", ipFields != __nullptr);
 
 					// Get the counter ID and query used to count qualifying attributes
 					long lCounterID = getLongField(ipFields, "ID");
@@ -724,7 +724,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, long* 
 					// Query for all matching attributes
 					IIUnknownVectorPtr matchingAttributes = 
 						getAFUtility()->QueryAttributes(ipAttributes, strQuery.c_str(), false);
-					ASSERT_RESOURCE_ALLOCATION("ELI29055", matchingAttributes != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI29055", matchingAttributes != __nullptr);
 
 					// Insert a query that to record the counts into the vector of queries for the
 					// current data entry instance.

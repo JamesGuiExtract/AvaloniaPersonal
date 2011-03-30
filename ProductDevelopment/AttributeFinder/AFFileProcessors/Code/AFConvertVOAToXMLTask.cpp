@@ -85,8 +85,8 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(IFileRecord* pFileRecord, l
 	try
 	{
 		IFAMTagManagerPtr ipTagManager(pTagManager);
-		ASSERT_ARGUMENT("ELI26287", ipTagManager != NULL);
-		ASSERT_ARGUMENT("ELI26255", pResult != NULL);
+		ASSERT_ARGUMENT("ELI26287", ipTagManager != __nullptr);
+		ASSERT_ARGUMENT("ELI26255", pResult != __nullptr);
 
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31332", ipFileRecord != __nullptr);
@@ -106,20 +106,20 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(IFileRecord* pFileRecord, l
 
 		// Create a vector to hold the attributes and load them from the VOA file
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI26297", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26297", ipAttributes != __nullptr);
 		ipAttributes->LoadFrom(bstrVoaFile, VARIANT_FALSE);
 
 		// Create a fake AFDocument object for the output handler
 		ISpatialStringPtr ipString(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI26314", ipString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26314", ipString != __nullptr);
 		ipString->CreateNonSpatialString("Fake", strSourceDoc.c_str());
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI26315", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26315", ipAFDoc != __nullptr);
 		ipAFDoc->Text = ipString;
 
 		// Get the XML Output handler as an output handler
 		IOutputHandlerPtr ipOutput = getXMLOutputHandler();
-		ASSERT_RESOURCE_ALLOCATION("ELI26296", ipOutput != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26296", ipOutput != __nullptr);
 
 		// Write the XML file
 		ipOutput->ProcessOutput(ipAttributes, ipAFDoc, pProgressStatus);
@@ -182,7 +182,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::get_VOAFile(BSTR *pbstrVOAFile)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26262", pbstrVOAFile != NULL);
+		ASSERT_ARGUMENT("ELI26262", pbstrVOAFile != __nullptr);
 		validateLicense();
 
 		*pbstrVOAFile = _bstr_t(m_strVOAFile.c_str()).Detach();
@@ -215,7 +215,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::get_XMLOutputHandler(IUnknown **ppXMLOutput
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26268", ppXMLOutputHandler != NULL);
+		ASSERT_ARGUMENT("ELI26268", ppXMLOutputHandler != __nullptr);
 
 		validateLicense();
 		
@@ -235,7 +235,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::put_XMLOutputHandler(IUnknown *pXMLOutputHa
 	try
 	{
 		IOutputToXMLPtr ipOutputToXML = pXMLOutputHandler;
-		ASSERT_ARGUMENT("ELI26270", ipOutputToXML != NULL);
+		ASSERT_ARGUMENT("ELI26270", ipOutputToXML != __nullptr);
 		
 		validateLicense();
 		
@@ -260,7 +260,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_GetComponentDescription(BSTR * pstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26272", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI26272", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Core: Convert VOA to XML").Detach();
 	}
@@ -282,14 +282,14 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFFILEPROCESSORSLib::IAFConvertVOAToXMLTaskPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI26274", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26274", ipSource != __nullptr);
 
 		// Copy the file name from the source
 		m_strVOAFile = asString(ipSource->VOAFile);
 
 		// Get the XML Output handler as a copyable object and clone it
 		ICopyableObjectPtr ipCopy = ipSource->XMLOutputHandler;
-		ASSERT_RESOURCE_ALLOCATION("ELI26291", ipCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26291", ipCopy != __nullptr);
 		m_ipXMLOutputHandler = ipCopy->Clone();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26275");
@@ -303,14 +303,14 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_Clone(IUnknown* *pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26276", pObject != NULL);
+		ASSERT_ARGUMENT("ELI26276", pObject != __nullptr);
 
 		// Validate license first
 		validateLicense();
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_AFConvertVOAToXMLTask);
-		ASSERT_RESOURCE_ALLOCATION("ELI26277", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26277", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk(this);
 		ipObjCopy->CopyFrom(ipUnk);
@@ -347,7 +347,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_IsConfigured(VARIANT_BOOL *pbValue)
 			IMustBeConfiguredObjectPtr ipMustBeConfigured = getXMLOutputHandler();
 
 			// Check if it is not null and is configured
-			bConfigured = ipMustBeConfigured != NULL
+			bConfigured = ipMustBeConfigured != __nullptr
 				&& asCppBool(ipMustBeConfigured->IsConfigured());
 		}
 
@@ -369,7 +369,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI26280", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI26280", pbValue != __nullptr);
 
 		try
 		{
@@ -414,7 +414,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::IsDirty(void)
 		{
 			// Check the XML output handler
 			IPersistStreamPtr ipOutput = getXMLOutputHandler();
-			ASSERT_RESOURCE_ALLOCATION("ELI26294", ipOutput != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26294", ipOutput != __nullptr);
 
 			// Return the dirty state of the XML output handler
 			return ipOutput->IsDirty();
@@ -501,7 +501,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the xml output handler to the stream
 		IPersistStreamPtr ipOuputXmlStream = m_ipXMLOutputHandler;
-		ASSERT_RESOURCE_ALLOCATION("ELI26242", ipOuputXmlStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26242", ipOuputXmlStream != __nullptr);
 		writeObjectToStream(ipOuputXmlStream, pStream, "ELI26316", fClearDirty);
 
 		// Clear the flag as specified
@@ -533,10 +533,10 @@ void CAFConvertVOAToXMLTask::validateLicense()
 //-------------------------------------------------------------------------------------------------
 IOutputToXMLPtr CAFConvertVOAToXMLTask::getXMLOutputHandler()
 {
-	if (m_ipXMLOutputHandler == NULL)
+	if (m_ipXMLOutputHandler == __nullptr)
 	{
 		m_ipXMLOutputHandler.CreateInstance(CLSID_OutputToXML);
-		ASSERT_RESOURCE_ALLOCATION("ELI26286", m_ipXMLOutputHandler != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26286", m_ipXMLOutputHandler != __nullptr);
 
 		// Set the xml output handler tag set to FAM tags
 		m_ipXMLOutputHandler->FAMTags = VARIANT_TRUE;

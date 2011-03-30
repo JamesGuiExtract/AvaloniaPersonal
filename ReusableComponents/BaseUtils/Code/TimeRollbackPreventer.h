@@ -143,13 +143,13 @@ private:
 	///////
 
 	// Handles Date-Time Registry items
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pRollbackCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pRollbackCfgMgr;
 
 	// System time last used to update File and Registry items
 	CTime	m_tmLastUpdate;
 
 	// Mutex to protect reading and writing of licensing items
-	auto_ptr<CMutex> m_apmutexReadWrite;
+	unique_ptr<CMutex> m_apmutexReadWrite;
 
 	// Time to wait for mutex to read or write the file
 	unsigned long m_ulRWTimeout;
@@ -160,7 +160,7 @@ private:
 	Win32Event &m_rEventBadState;
 
 	// Pointer to thread that manages periodic updates
-	std::auto_ptr<CWinThread>	m_apThread;
+	std::unique_ptr<CWinThread>	m_apThread;
 
 private:
 	// Registry keys for information persistence

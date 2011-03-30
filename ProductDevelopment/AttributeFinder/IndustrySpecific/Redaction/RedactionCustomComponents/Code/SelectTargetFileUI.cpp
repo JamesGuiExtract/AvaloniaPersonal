@@ -51,7 +51,7 @@ STDMETHODIMP CSelectTargetFileUI::get_FileName(BSTR* pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17584", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17584", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_dlg.m_strFileName.c_str()).Detach();
 	}
@@ -85,7 +85,7 @@ STDMETHODIMP CSelectTargetFileUI::get_FileTypes(BSTR* pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17581", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17581", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_dlg.m_strFileTypes.c_str()).Detach();
 	}
@@ -119,7 +119,7 @@ STDMETHODIMP CSelectTargetFileUI::get_DefaultExtension(BSTR* pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17582", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17582", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_dlg.m_strDefaultExtension.c_str()).Detach();
 	}
@@ -153,7 +153,7 @@ STDMETHODIMP CSelectTargetFileUI::get_DefaultFileName(BSTR* pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17587", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17587", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_dlg.m_strDefaultFileName.c_str()).Detach();
 	}
@@ -187,7 +187,7 @@ STDMETHODIMP CSelectTargetFileUI::get_Title(BSTR* pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17589", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17589", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_dlg.m_strTitle.c_str()).Detach();
 	}
@@ -221,7 +221,7 @@ STDMETHODIMP CSelectTargetFileUI::get_Instructions(BSTR* pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17591", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17591", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_dlg.m_strInstructions.c_str()).Detach();
 	}
@@ -255,7 +255,7 @@ STDMETHODIMP CSelectTargetFileUI::PromptForFile(VARIANT_BOOL *pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17593", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17593", pVal != __nullptr);
 
 		if (m_dlg.DoModal() == IDOK)
 		{

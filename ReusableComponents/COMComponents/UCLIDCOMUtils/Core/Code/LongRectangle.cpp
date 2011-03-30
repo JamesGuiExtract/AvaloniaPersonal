@@ -22,7 +22,7 @@ STDMETHODIMP CLongRectangle::CopyFrom(IUnknown *pObject)
 	{
 		// Ensure that the object is a Vector
 		UCLID_COMUTILSLib::ILongRectanglePtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08391", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08391", ipSource != __nullptr);
 	
 		m_nLeft = ipSource->GetLeft();
 		m_nRight = ipSource->GetRight();
@@ -43,7 +43,7 @@ STDMETHODIMP CLongRectangle::Clone(IUnknown* *pObject)
 		// create a new variant vector
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI08396", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08396", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -229,10 +229,10 @@ STDMETHODIMP CLongRectangle::GetBounds(long *plLeft, long *plTop, long *plRight,
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI25726", plLeft != NULL);
-		ASSERT_ARGUMENT("ELI25727", plTop != NULL);
-		ASSERT_ARGUMENT("ELI25728", plRight != NULL);
-		ASSERT_ARGUMENT("ELI25729", plBottom != NULL);
+		ASSERT_ARGUMENT("ELI25726", plLeft != __nullptr);
+		ASSERT_ARGUMENT("ELI25727", plTop != __nullptr);
+		ASSERT_ARGUMENT("ELI25728", plRight != __nullptr);
+		ASSERT_ARGUMENT("ELI25729", plBottom != __nullptr);
 
 		// Set the return values
 		*plLeft = m_nLeft;

@@ -76,7 +76,7 @@ void CMergeAttributeTrees::FinalRelease()
 	try
 	{
 		// Ensure the AFUtils object is released before the object is destructed
-		m_ipAFUtils = NULL;
+		m_ipAFUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26396");
 }
@@ -90,7 +90,7 @@ STDMETHODIMP CMergeAttributeTrees::get_AttributesToBeMerged(BSTR* pbstrAttribute
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26339", pbstrAttributesToBeMerged != NULL);
+		ASSERT_ARGUMENT("ELI26339", pbstrAttributesToBeMerged != __nullptr);
 
 		validateLicense();
 		
@@ -129,7 +129,7 @@ STDMETHODIMP CMergeAttributeTrees::get_MergeAttributeTreesInto(EMergeAttributeTr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26342", peMergeInto != NULL);
+		ASSERT_ARGUMENT("ELI26342", peMergeInto != __nullptr);
 
 		validateLicense();
 		
@@ -163,7 +163,7 @@ STDMETHODIMP CMergeAttributeTrees::get_SubAttributesToCompare(BSTR* pbstrSubAttr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26345", pbstrSubAttributesToCompare != NULL);
+		ASSERT_ARGUMENT("ELI26345", pbstrSubAttributesToCompare != __nullptr);
 
 		validateLicense();
 
@@ -199,7 +199,7 @@ STDMETHODIMP CMergeAttributeTrees::get_DiscardNonMatchingComparisons(VARIANT_BOO
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26348", pvbDiscard != NULL);
+		ASSERT_ARGUMENT("ELI26348", pvbDiscard != __nullptr);
 
 		validateLicense();
 		
@@ -233,7 +233,7 @@ STDMETHODIMP CMergeAttributeTrees::get_CaseSensitive(VARIANT_BOOL* pvbCaseSensit
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26351", pvbCaseSensitive != NULL);
+		ASSERT_ARGUMENT("ELI26351", pvbCaseSensitive != __nullptr);
 
 		validateLicense();
 		
@@ -268,7 +268,7 @@ STDMETHODIMP CMergeAttributeTrees::get_CompareTypeInformation(
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26354", pvbCompareTypeInformation != NULL);
+		ASSERT_ARGUMENT("ELI26354", pvbCompareTypeInformation != __nullptr);
 
 		validateLicense();
 		
@@ -303,7 +303,7 @@ STDMETHODIMP CMergeAttributeTrees::get_CompareSubAttributes(VARIANT_BOOL* pvbCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26357", pvbCompareSubAttributes != NULL);
+		ASSERT_ARGUMENT("ELI26357", pvbCompareSubAttributes != __nullptr);
 
 		validateLicense();
 		
@@ -338,7 +338,7 @@ STDMETHODIMP CMergeAttributeTrees::get_RemoveEmptyHierarchy(VARIANT_BOOL* pvbRem
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26455", pvbRemoveEmptyHierarchy != NULL);
+		ASSERT_ARGUMENT("ELI26455", pvbRemoveEmptyHierarchy != __nullptr);
 
 		validateLicense();
 
@@ -376,10 +376,10 @@ STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttribute
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_ARGUMENT("ELI26360", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI26360", ipAttributes != __nullptr);
 
 		IAFDocumentPtr ipAFDocument(pAFDoc);
-		ASSERT_ARGUMENT("ELI26361", ipAFDocument != NULL);
+		ASSERT_ARGUMENT("ELI26361", ipAFDocument != __nullptr);
 
 		// Get an AFUtility object to query attributes
 		IAFUtilityPtr ipAFUtil = getAFUtility();
@@ -388,7 +388,7 @@ STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttribute
 		// from the original vector of attributes)
 		IIUnknownVectorPtr ipMatches = ipAFUtil->QueryAttributes(ipAttributes,
 			m_strAttributesToBeMerged.c_str(), VARIANT_FALSE);
-		ASSERT_RESOURCE_ALLOCATION("ELI26407", ipMatches != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26407", ipMatches != __nullptr);
 
 		// Loop through all matches, comparing sub attributes and add each attribute
 		// which matches other attributes to a collection of matches that will then be
@@ -399,11 +399,11 @@ STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttribute
 		{
 			// Get the first attribute
 			IAttributePtr ipAttribute1 = ipMatches->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI26408", ipAttribute1 != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26408", ipAttribute1 != __nullptr);
 
 			// Get the sub attributes for the comparison
 			IIUnknownVectorPtr ipSubAttributes1 = ipAttribute1->SubAttributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI26409", ipSubAttributes1 != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26409", ipSubAttributes1 != __nullptr);
 
 			// Vector to hold the list of attributes that need to be merged
 			// with the first attribute
@@ -412,11 +412,11 @@ STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttribute
 			{
 				// Get the next attribute
 				IAttributePtr ipAttribute2 = ipMatches->At(j);
-				ASSERT_RESOURCE_ALLOCATION("ELI26410", ipAttribute2 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26410", ipAttribute2 != __nullptr);
 
 				// Get the sub attributes for comparison
 				IIUnknownVectorPtr ipSubAttributes2 = ipAttribute2->SubAttributes;
-				ASSERT_RESOURCE_ALLOCATION("ELI26411", ipSubAttributes2 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26411", ipSubAttributes2 != __nullptr);
 
 				// Check if there is a match between these attributes
 				if (compareSubAttributes(ipSubAttributes1, ipSubAttributes2))
@@ -451,7 +451,7 @@ STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttribute
 				vecMatches[i].second.end());
 
 			// Find which attribute to keep (either first or one with the most children)
-			IAttributePtr ipKeep = NULL;
+			IAttributePtr ipKeep = __nullptr;
 			if (m_eMergeInto == kFirstAttribute)
 			{
 				ipKeep = vecNewMatch[0];
@@ -462,7 +462,7 @@ STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttribute
 				// Start with the first item
 				ipKeep = vecNewMatch[0];
 				IIUnknownVectorPtr ipSubs = ipKeep->SubAttributes;
-				ASSERT_RESOURCE_ALLOCATION("ELI26412", ipSubs != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26412", ipSubs != __nullptr);
 				long lCurrentMax = ipSubs->Size();
 
 				// Get the count of sub attributes and find the largest one
@@ -470,7 +470,7 @@ STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttribute
 				for(vector<IAttributePtr>::iterator it = biggest+1; it != vecNewMatch.end(); it++)
 				{
 					ipSubs = (*it)->SubAttributes;
-					ASSERT_RESOURCE_ALLOCATION("ELI26413", ipSubs != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI26413", ipSubs != __nullptr);
 
 					long lCount = ipSubs->Size();
 					if (lCount > lCurrentMax)
@@ -484,11 +484,11 @@ STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttribute
 				// Remove the largest item from the match vector
 				vecNewMatch.erase(biggest);
 			}
-			ASSERT_RESOURCE_ALLOCATION("ELI26414", ipKeep != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26414", ipKeep != __nullptr);
 
 			// Now combine the sub attributes from all other attributes into the keeper
 			IIUnknownVectorPtr ipKeepSubs = ipKeep->SubAttributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI26415", ipKeepSubs != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26415", ipKeepSubs != __nullptr);
 			vector<IAttributePtr> vecMoveRemove;
 			for(vector<IAttributePtr>::iterator it = vecNewMatch.begin();
 				it != vecNewMatch.end(); it++)
@@ -540,7 +540,7 @@ STDMETHODIMP CMergeAttributeTrees::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26363", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI26363", pClassID != __nullptr);
 
 		*pClassID = CLSID_MergeAttributeTrees;
 
@@ -570,7 +570,7 @@ STDMETHODIMP CMergeAttributeTrees::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI26366", pStream != NULL);
+		ASSERT_ARGUMENT("ELI26366", pStream != __nullptr);
 
 		// Reset values
 		m_strAttributesToBeMerged = "";
@@ -646,7 +646,7 @@ STDMETHODIMP CMergeAttributeTrees::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI26369", pStream != NULL);
+		ASSERT_ARGUMENT("ELI26369", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -699,7 +699,7 @@ STDMETHODIMP CMergeAttributeTrees::raw_GetComponentDescription(BSTR *pbstrCompon
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26371", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI26371", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Merge attribute trees").Detach();
 
@@ -717,7 +717,7 @@ STDMETHODIMP CMergeAttributeTrees::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26373", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI26373", pbValue != __nullptr);
 
 		try
 		{
@@ -750,7 +750,7 @@ STDMETHODIMP CMergeAttributeTrees::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFOUTPUTHANDLERSLib::IMergeAttributeTreesPtr ipSource = pObject;
-		ASSERT_ARGUMENT("ELI26375", ipSource != NULL);
+		ASSERT_ARGUMENT("ELI26375", ipSource != __nullptr);
 
 		// Copy members
 		m_strAttributesToBeMerged = asString(ipSource->AttributesToBeMerged);
@@ -777,11 +777,11 @@ STDMETHODIMP CMergeAttributeTrees::raw_Clone(IUnknown **pObject)
 		// Validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI26377", pObject != NULL);
+		ASSERT_ARGUMENT("ELI26377", pObject != __nullptr);
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_MergeAttributeTrees);
-		ASSERT_RESOURCE_ALLOCATION("ELI26378", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26378", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -807,7 +807,7 @@ STDMETHODIMP CMergeAttributeTrees::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		validateLicense();
 
 		// Check parameter
-		ASSERT_ARGUMENT("ELI26380", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI26380", pbValue != __nullptr);
 
 		// Object is configured if there is an attribute query defined and
 		// at least 1 sub attribute to compare
@@ -922,9 +922,9 @@ bool CMergeAttributeTrees::compareSubAttributes(IIUnknownVectorPtr ipSubAttribut
 
 		// Get the collection of sub attributes grouped by name
 		IStrToObjectMapPtr ipNames1 = ipAFUtil->GetNameToAttributesMap(ipSubAttributes1);
-		ASSERT_RESOURCE_ALLOCATION("ELI26400", ipNames1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26400", ipNames1 != __nullptr);
 		IStrToObjectMapPtr ipNames2 = ipAFUtil->GetNameToAttributesMap(ipSubAttributes2);
-		ASSERT_RESOURCE_ALLOCATION("ELI26401", ipNames2 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26401", ipNames2 != __nullptr);
 
 		// Loop through each of the comparison strings to find matches
 		bool bMatch = true;
@@ -938,7 +938,7 @@ bool CMergeAttributeTrees::compareSubAttributes(IIUnknownVectorPtr ipSubAttribut
 
 			// If either collection is NULL these attributes do not match
 			// set match to false and break
-			if (ipValues1 == NULL || ipValues2 == NULL)
+			if (ipValues1 == __nullptr || ipValues2 == __nullptr)
 			{
 				bMatch = false;
 				break;
@@ -962,11 +962,11 @@ bool CMergeAttributeTrees::compareSubAttributes(IIUnknownVectorPtr ipSubAttribut
 			{
 				// Get the attribute
 				IAttributePtr ipAttr1 = ipValues1->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI26402", ipAttr1 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26402", ipAttr1 != __nullptr);
 
 				// Get the value
 				ISpatialStringPtr ipString1 = ipAttr1->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI26403", ipString1 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26403", ipString1 != __nullptr);
 
 				// Get the strings and check case sensitivity
 				AttributeData attr1(asString(ipString1->String), asString(ipAttr1->Type));
@@ -988,11 +988,11 @@ bool CMergeAttributeTrees::compareSubAttributes(IIUnknownVectorPtr ipSubAttribut
 					{
 						// Build the value (get the attribute)
 						IAttributePtr ipAttr2 = ipValues2->At(j);
-						ASSERT_RESOURCE_ALLOCATION("ELI26404", ipAttr2 != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI26404", ipAttr2 != __nullptr);
 
 						// Get the value
 						ISpatialStringPtr ipString2 = ipAttr2->Value;
-						ASSERT_RESOURCE_ALLOCATION("ELI26405", ipString2 != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI26405", ipString2 != __nullptr);
 
 						// Get the strings and check case sensitivity
 						attr2.value = asString(ipString2->String);
@@ -1033,10 +1033,10 @@ bool CMergeAttributeTrees::compareSubAttributes(IIUnknownVectorPtr ipSubAttribut
 IAFUtilityPtr CMergeAttributeTrees::getAFUtility()
 {
 	// If the AFUtils object has not been created yet, create one
-	if (m_ipAFUtils == NULL)
+	if (m_ipAFUtils == __nullptr)
 	{
 		m_ipAFUtils.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI26397", m_ipAFUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26397", m_ipAFUtils != __nullptr);
 	}
 
 	// Return the AFUtils object
@@ -1052,9 +1052,9 @@ void CMergeAttributeTrees::getAttributesToMoveOrRemove(IIUnknownVectorPtr ipToKe
 		IAFUtilityPtr ipAFUtil = getAFUtility();
 
 		IStrToObjectMapPtr ipKeepMap = ipAFUtil->GetNameToAttributesMap(ipToKeep);
-		ASSERT_RESOURCE_ALLOCATION("ELI26416", ipKeepMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26416", ipKeepMap != __nullptr);
 		IStrToObjectMapPtr ipCheckMap = ipAFUtil->GetNameToAttributesMap(ipToCheck);
-		ASSERT_RESOURCE_ALLOCATION("ELI26417", ipCheckMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26417", ipCheckMap != __nullptr);
 
 		// Perform the comparison to find the matching attributes and the non-matching
 		// (since this function is called after attributes have already been compared and
@@ -1065,9 +1065,9 @@ void CMergeAttributeTrees::getAttributesToMoveOrRemove(IIUnknownVectorPtr ipToKe
 			// Get the collection of values that have this name
 			_bstr_t bstrName(it->c_str());
 			IIUnknownVectorPtr ipKeepList = ipKeepMap->TryGetValue(bstrName);
-			ASSERT_RESOURCE_ALLOCATION("ELI26418", ipKeepList != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26418", ipKeepList != __nullptr);
 			IIUnknownVectorPtr ipCheckList = ipCheckMap->TryGetValue(bstrName);
-			ASSERT_RESOURCE_ALLOCATION("ELI26419", ipCheckList != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26419", ipCheckList != __nullptr);
 
 			// Get the size of the collections
 			long lKeepSize = ipKeepList->Size();
@@ -1076,11 +1076,11 @@ void CMergeAttributeTrees::getAttributesToMoveOrRemove(IIUnknownVectorPtr ipToKe
 			{
 				// Get the first keep item from the list
 				IAttributePtr ipKeep = ipKeepList->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI26420", ipKeep != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26420", ipKeep != __nullptr);
 
 				// Get the first keep spatial string
 				ISpatialStringPtr ipKeepValue = ipKeep->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI26421", ipKeepValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26421", ipKeepValue != __nullptr);
 
 				// Get the strings and check case sensitivity
 				string strKeepType = asString(ipKeep->Type);
@@ -1097,11 +1097,11 @@ void CMergeAttributeTrees::getAttributesToMoveOrRemove(IIUnknownVectorPtr ipToKe
 				{
 					// Get the to check attribute
 					IAttributePtr ipCheck = ipCheckList->At(j);
-					ASSERT_RESOURCE_ALLOCATION("ELI26422", ipCheck != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI26422", ipCheck != __nullptr);
 
 					// Get the value
 					ISpatialStringPtr ipCheckValue = ipCheck->Value;
-					ASSERT_RESOURCE_ALLOCATION("ELI26423", ipCheckValue != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI26423", ipCheckValue != __nullptr);
 
 					// Get the strings and check case sensitivity
 					string strCheckType = asString(ipCheck->Type);
@@ -1147,7 +1147,7 @@ void CMergeAttributeTrees::removeMergedAttributes(IIUnknownVectorPtr ipAttribute
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI26458", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI26458", ipAttributes != __nullptr);
 
 		// Get an AFUtility pointer
 		IAFUtilityPtr ipAFUtils = getAFUtility();
@@ -1158,7 +1158,7 @@ void CMergeAttributeTrees::removeMergedAttributes(IIUnknownVectorPtr ipAttribute
 			it != vecMergedAttributes.end(); it++)
 		{
 			// Create a null parent attribute
-			IAttributePtr ipParent = NULL;
+			IAttributePtr ipParent = __nullptr;
 
 			// If removing empty hierarchy, check for a parent attribute
 			if (m_bRemoveEmptyHierarchy)
@@ -1169,7 +1169,7 @@ void CMergeAttributeTrees::removeMergedAttributes(IIUnknownVectorPtr ipAttribute
 			ipAFUtils->RemoveAttribute(ipAttributes, (*it));
 
 			// If the parent has been set then remove the hierarchy
-			if (ipParent != NULL)
+			if (ipParent != __nullptr)
 			{
 				removeEmptyAttributesFromHierarchy(ipAttributes, ipParent);
 			}
@@ -1183,12 +1183,12 @@ void CMergeAttributeTrees::removeEmptyAttributesFromHierarchy(IIUnknownVectorPtr
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI26451", ipAttributes != NULL);
-		ASSERT_ARGUMENT("ELI26452", ipParent != NULL);
+		ASSERT_ARGUMENT("ELI26451", ipAttributes != __nullptr);
+		ASSERT_ARGUMENT("ELI26452", ipParent != __nullptr);
 
 		// Get the sub attributes
 		IIUnknownVectorPtr ipSubs = ipParent->SubAttributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI26453", ipSubs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26453", ipSubs != __nullptr);
 
 		// If the sub attributes are empty then remove the parent
 		if (ipSubs->Size() == 0)
@@ -1201,7 +1201,7 @@ void CMergeAttributeTrees::removeEmptyAttributesFromHierarchy(IIUnknownVectorPtr
 			ipAFUtils->RemoveAttribute(ipAttributes, ipParent);
 
 			// If the grand parent is not null then check if this is now empty
-			if (ipGrandParent != NULL)
+			if (ipGrandParent != __nullptr)
 			{
 				removeEmptyAttributesFromHierarchy(ipAttributes, ipGrandParent);
 			}

@@ -26,9 +26,9 @@ ImageEditCtrlCfg::ImageEditCtrlCfg()
 	try
 	{
 		// Create an instance of the registry persistence manager
-		m_apCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		m_apCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-		ASSERT_RESOURCE_ALLOCATION("ELI13250", m_apCfgMgr.get() != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13250", m_apCfgMgr.get() != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13251")
 }

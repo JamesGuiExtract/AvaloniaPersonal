@@ -30,11 +30,11 @@ CMultipleObjSelectorPP::CMultipleObjSelectorPP()
 
 		// create an instance of the clipboard object manager
 		m_ipClipboardMgr.CreateInstance(CLSID_ClipboardObjectManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI09636", m_ipClipboardMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09636", m_ipClipboardMgr != __nullptr);
 
 		// instantiate MiscUtils object
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI16029", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16029", m_ipMiscUtils != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI08172")
 }
@@ -53,7 +53,7 @@ STDMETHODIMP CMultipleObjSelectorPP::Apply(void)
 		{
 			// get the multiple-object holder
 			UCLID_COMUTILSLib::IMultipleObjectHolderPtr ipMOH = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI08120", ipMOH != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08120", ipMOH != __nullptr);
 
 			// Apply the enabled / disabled settings to the collected objects
 			long lCount = m_ipObjects->Size();
@@ -64,7 +64,7 @@ STDMETHODIMP CMultipleObjSelectorPP::Apply(void)
 
 				// Retrieve this ObjectWithDescription
 				UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObj = m_ipObjects->At( j );
-				ASSERT_RESOURCE_ALLOCATION("ELI13616", ipObj != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI13616", ipObj != __nullptr);
 
 				// Apply state to this ObjectWithDescription
 				ipObj->Enabled = asVariantBool(bEnabled);
@@ -91,11 +91,11 @@ LRESULT CMultipleObjSelectorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		// get access to the underlying multiple-object-holder
 		UCLID_COMUTILSLib::IMultipleObjectHolderPtr ipMOH = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI08107", ipMOH != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08107", ipMOH != __nullptr);
 
 		// get a reference to the objects from the multiple-object-holder
 		m_ipObjects = ipMOH->ObjectsVector;
-		ASSERT_RESOURCE_ALLOCATION("ELI08122", m_ipObjects != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08122", m_ipObjects != __nullptr);
 
 		// get access the category name and object type
 		m_strCategoryName = ipMOH->GetObjectCategoryName();
@@ -134,7 +134,7 @@ LRESULT CMultipleObjSelectorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 		{
 			// get the description of the item at the current position
 			UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObj = m_ipObjects->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08119", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08119", ipObj != __nullptr);
 			CString zDescription = (LPCTSTR) ipObj->Description;
 
 			// update the description
@@ -176,7 +176,7 @@ LRESULT CMultipleObjSelectorPP::OnClickedButtonDown(WORD wNotifyCode, WORD wID, 
 			// get the selected item in local memory
 			UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObj = 
 				m_ipObjects->At(nSelectedItemIndex);
-			ASSERT_RESOURCE_ALLOCATION("ELI08136", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08136", ipObj != __nullptr);
 
 			// Retrieve current enabled/disabled state
 			BOOL bEnabled = m_listObjects.GetCheckState( nSelectedItemIndex );
@@ -221,7 +221,7 @@ LRESULT CMultipleObjSelectorPP::OnClickedButtonUp(WORD wNotifyCode, WORD wID, HW
 			// get the selected item in local memory
 			UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObj = 
 				m_ipObjects->At(nSelectedItemIndex);
-			ASSERT_RESOURCE_ALLOCATION("ELI19348", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19348", ipObj != __nullptr);
 
 			// Retrieve current enabled/disabled state
 			BOOL bEnabled = m_listObjects.GetCheckState( nSelectedItemIndex );
@@ -259,7 +259,7 @@ LRESULT CMultipleObjSelectorPP::OnClickedButtonInsert(WORD wNotifyCode, WORD wID
 	{
 		// create a new object-with-description object
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipNewObj(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI08117", ipNewObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08117", ipNewObj != __nullptr);
 
 		// create the dialog with the right parameters
 		string strPrompt1 = m_strObjectType + " Description";
@@ -376,7 +376,7 @@ LRESULT CMultipleObjSelectorPP::OnClickedButtonConfig(WORD wNotifyCode, WORD wID
 
 		// get the object-with-description at the current index
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObj = m_ipObjects->At(nSelectedItemIndex);
-		ASSERT_RESOURCE_ALLOCATION("ELI08125", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08125", ipObj != __nullptr);
 
 		// get the position of the command button
 		RECT rect;
@@ -424,7 +424,7 @@ LRESULT CMultipleObjSelectorPP::OnDblclkListObjects(int idCtrl, LPNMHDR pnmh, BO
 
 		// get the currently selected object
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObject = m_ipObjects->At(nSelectedItemIndex);
-		ASSERT_RESOURCE_ALLOCATION("ELI16032", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16032", ipObject != __nullptr);
 
 		// modify ipObject based on user input
 		VARIANT_BOOL vbDirty = m_ipMiscUtils->HandlePlugInObjectDoubleClick(ipObject, 
@@ -547,14 +547,14 @@ LRESULT CMultipleObjSelectorPP::OnEditCopy(WORD wNotifyCode, WORD wID, HWND hWnd
 
 		// Create a vector for selected objects
 		UCLID_COMUTILSLib::IIUnknownVectorPtr	ipCopiedObjects( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION( "ELI11119", ipCopiedObjects != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI11119", ipCopiedObjects != __nullptr );
 
 		// Add each selected object to vector
 		while (iIndex != -1)
 		{
 			// Retrieve the selected object
 			IUnknownPtr	ipObject = m_ipObjects->At(iIndex);
-			ASSERT_RESOURCE_ALLOCATION("ELI09638", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09638", ipObject != __nullptr );
 
 			// Add the object to the vector
 			ipCopiedObjects->PushBack( ipObject );
@@ -582,13 +582,13 @@ LRESULT CMultipleObjSelectorPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWn
 		{
 			// Object is a vector of ObjectWithDescription items of type m_iid
 			ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-			ASSERT_RESOURCE_ALLOCATION( "ELI11120", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI11120", ipObject != __nullptr );
 		}
 		else if (asCppBool(m_ipClipboardMgr->ObjectIsTypeWithDescription( m_iid )))
 		{
 			// Retrieve object from ClipboardManager
 			ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-			ASSERT_RESOURCE_ALLOCATION("ELI09639", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09639", ipObject != __nullptr );
 			bSingleObject = true;
 		}
 		else
@@ -614,7 +614,7 @@ LRESULT CMultipleObjSelectorPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWn
 		{
 			// Retrieve object and description
 			UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipNewObj = ipObject;
-			ASSERT_RESOURCE_ALLOCATION( "ELI11121", ipNewObj != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI11121", ipNewObj != __nullptr );
 			CString zText = (LPCTSTR) ipNewObj->Description;
 
 			// Insert new item before selection or at end of list
@@ -634,7 +634,7 @@ LRESULT CMultipleObjSelectorPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWn
 		{
 			// Get count of Objects in Clipboard vector
 			UCLID_COMUTILSLib::IIUnknownVectorPtr	ipPastedObjects = ipObject;
-			ASSERT_RESOURCE_ALLOCATION( "ELI11122", ipPastedObjects != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI11122", ipPastedObjects != __nullptr );
 			int iCount = ipPastedObjects->Size();
 
 			// Add each Object to the list and the vector
@@ -643,7 +643,7 @@ LRESULT CMultipleObjSelectorPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWn
 				// Retrieve object and description
 				UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipNewObj = 
 					ipPastedObjects->At( i );
-				ASSERT_RESOURCE_ALLOCATION( "ELI11123", ipNewObj != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI11123", ipNewObj != __nullptr );
 				CString zText = (LPCTSTR) ipNewObj->Description;
 
 				// Insert this item before selection or at end of list

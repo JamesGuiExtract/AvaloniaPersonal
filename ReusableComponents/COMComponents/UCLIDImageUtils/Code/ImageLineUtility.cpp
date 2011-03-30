@@ -97,18 +97,18 @@ STDMETHODIMP CImageLineUtility::FindLines(BSTR bstrImageFileName, long nPageNum,
 
 		// Process the page
 		findLines(strImageFileName, nPageNum, dRotation,
-				  (ppHorzLineRects != NULL) ? &vecHorzLineRects : NULL,
-				  (ppVertLineRects != NULL) ? &vecVertLineRects : NULL);
+				  (ppHorzLineRects != __nullptr) ? &vecHorzLineRects : NULL,
+				  (ppVertLineRects != __nullptr) ? &vecVertLineRects : NULL);
 
 		// If horizontal lines were requested, copy the resulting vector to ppHorzLineRects
-		if (ppHorzLineRects != NULL)
+		if (ppHorzLineRects != __nullptr)
 		{
 			IIUnknownVectorPtr ipHorzLineRects = lineRectVecToILongRectangleVec(vecHorzLineRects);
 			*ppHorzLineRects = ipHorzLineRects.Detach();
 		}
 
 		// If vertical lines were requested, copy the resulting vector to ppVertLineRects
-		if (ppVertLineRects != NULL)
+		if (ppVertLineRects != __nullptr)
 		{
 			IIUnknownVectorPtr ipVertLineRects = lineRectVecToILongRectangleVec(vecVertLineRects);
 			*ppVertLineRects = ipVertLineRects.Detach();
@@ -131,7 +131,7 @@ STDMETHODIMP CImageLineUtility::FindLineRegions(BSTR bstrImageFileName, long nPa
 		string strImageFileName = asString(bstrImageFileName);
 		ASSERT_ARGUMENT("ELI19021", !strImageFileName.empty());
 		ASSERT_ARGUMENT("ELI19022", nPageNum >= 0);
-		ASSERT_ARGUMENT("ELI18708", ppGroupRects != NULL);
+		ASSERT_ARGUMENT("ELI18708", ppGroupRects != __nullptr);
 
 		validateLicense();
 
@@ -153,7 +153,7 @@ STDMETHODIMP CImageLineUtility::FindLineRegions(BSTR bstrImageFileName, long nPa
 		// Line grouping is requested
 		vector<LineRect> vecGroupRects;
 
-		if (ppSubLineRects != NULL)
+		if (ppSubLineRects != __nullptr)
 		{
 			// Lines are requested with the groups
 			vector< vector<LineRect> > vecSubLineRects;
@@ -172,7 +172,7 @@ STDMETHODIMP CImageLineUtility::FindLineRegions(BSTR bstrImageFileName, long nPa
 
 			// Create a vector to store the lines
 			IIUnknownVectorPtr ipSubLineRects(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI18712", ipSubLineRects != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18712", ipSubLineRects != __nullptr);
 
 			for each (vector<LineRect> vecLineGroup in vecSubLineRects)
 			{
@@ -223,13 +223,13 @@ STDMETHODIMP CImageLineUtility::FindBoxContainingRect(ILongRectangle *pRect,
 	{
 		// Validate arguments
 		ILongRectanglePtr ipRect(pRect);
-		ASSERT_ARGUMENT("ELI19822", ipRect != NULL);
+		ASSERT_ARGUMENT("ELI19822", ipRect != __nullptr);
 		IIUnknownVectorPtr ipHorzLineRects(pHorzLineRects);
-		ASSERT_ARGUMENT("ELI19823", ipHorzLineRects != NULL);
+		ASSERT_ARGUMENT("ELI19823", ipHorzLineRects != __nullptr);
 		IIUnknownVectorPtr ipVertLineRects(pVertLineRects);
-		ASSERT_ARGUMENT("ELI19824", ipVertLineRects != NULL);
-		ASSERT_ARGUMENT("ELI19825", ppBoxRect != NULL);
-		ASSERT_ARGUMENT("ELI21529", pbIncompleteResult != NULL);
+		ASSERT_ARGUMENT("ELI19824", ipVertLineRects != __nullptr);
+		ASSERT_ARGUMENT("ELI19825", ppBoxRect != __nullptr);
+		ASSERT_ARGUMENT("ELI21529", pbIncompleteResult != __nullptr);
 
 		validateLicense();
 
@@ -252,7 +252,7 @@ STDMETHODIMP CImageLineUtility::FindBoxContainingRect(ILongRectangle *pRect,
 		{
 			// A qualifying box was found... copy the result to the ppBoxRect return value
 			ILongRectanglePtr ipReturnVal(CLSID_LongRectangle);
-			ASSERT_RESOURCE_ALLOCATION("ELI19828", ipReturnVal != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19828", ipReturnVal != __nullptr);
 
 			ipReturnVal->SetBounds(rectResult.left, rectResult.top, rectResult.right, rectResult.bottom);
 
@@ -276,7 +276,7 @@ STDMETHODIMP CImageLineUtility::get_LineLengthMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18825", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18825", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -314,7 +314,7 @@ STDMETHODIMP CImageLineUtility::get_LineThicknessMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18836", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18836", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -352,7 +352,7 @@ STDMETHODIMP CImageLineUtility::get_LineGapMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18847", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18847", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -390,7 +390,7 @@ STDMETHODIMP CImageLineUtility::get_LineVarianceMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18850", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18850", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -428,7 +428,7 @@ STDMETHODIMP CImageLineUtility::get_LineWall(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18853", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18853", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -466,7 +466,7 @@ STDMETHODIMP CImageLineUtility::get_LineWallPercentMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18856", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18856", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -504,7 +504,7 @@ STDMETHODIMP CImageLineUtility::get_LineBridgeGap(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18859", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18859", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -542,7 +542,7 @@ STDMETHODIMP CImageLineUtility::get_ExtendLineFragments(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18862", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18862", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -578,7 +578,7 @@ STDMETHODIMP CImageLineUtility::get_ExtensionScanWidth(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18865", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18865", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -622,7 +622,7 @@ STDMETHODIMP CImageLineUtility::get_ExtensionTelescoping(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18868", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18868", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -661,7 +661,7 @@ STDMETHODIMP CImageLineUtility::get_ExtensionGapAllowance(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18871", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18871", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -699,7 +699,7 @@ STDMETHODIMP CImageLineUtility::get_ExtensionConsecutiveMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18874", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18874", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -737,7 +737,7 @@ STDMETHODIMP CImageLineUtility::get_RowCountMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18877", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18877", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -775,7 +775,7 @@ STDMETHODIMP CImageLineUtility::get_RowCountMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18880", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18880", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -813,7 +813,7 @@ STDMETHODIMP CImageLineUtility::get_ColumnCountMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18883", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18883", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -851,7 +851,7 @@ STDMETHODIMP CImageLineUtility::get_ColumnCountMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18886", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18886", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -889,7 +889,7 @@ STDMETHODIMP CImageLineUtility::get_ColumnWidthMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18988", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18988", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -929,7 +929,7 @@ STDMETHODIMP CImageLineUtility::get_ColumnWidthMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18827", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18827", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -969,7 +969,7 @@ STDMETHODIMP CImageLineUtility::get_OverallWidthMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18889", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18889", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1009,7 +1009,7 @@ STDMETHODIMP CImageLineUtility::get_OverallWidthMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18892", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18892", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1049,7 +1049,7 @@ STDMETHODIMP CImageLineUtility::get_LineSpacingMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18895", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18895", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1089,7 +1089,7 @@ STDMETHODIMP CImageLineUtility::get_LineSpacingMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18898", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18898", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1129,7 +1129,7 @@ STDMETHODIMP CImageLineUtility::get_ColumnSpacingMax(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18901", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18901", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1169,7 +1169,7 @@ STDMETHODIMP CImageLineUtility::get_AlignmentScoreMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18904", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18904", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1208,7 +1208,7 @@ STDMETHODIMP CImageLineUtility::get_AlignmentScoreExact(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18907", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18907", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1247,7 +1247,7 @@ STDMETHODIMP CImageLineUtility::get_SpacingScoreMin(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18910", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18910", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1286,7 +1286,7 @@ STDMETHODIMP CImageLineUtility::get_SpacingScoreExact(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18913", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18913", pVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -1332,7 +1332,7 @@ STDMETHODIMP CImageLineUtility::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_IMAGEUTILSLib::IImageLineUtilityPtr ipCopyThis = pObject;
-		ASSERT_ARGUMENT("ELI18797", ipCopyThis != NULL);
+		ASSERT_ARGUMENT("ELI18797", ipCopyThis != __nullptr);
 
 		// copy member variables
 		m_nColumnWidthMin		= ipCopyThis->ColumnWidthMin;
@@ -1394,11 +1394,11 @@ STDMETHODIMP CImageLineUtility::raw_Clone(IUnknown **pObject)
 		// Validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18799", pObject != NULL);
+		ASSERT_ARGUMENT("ELI18799", pObject != __nullptr);
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_ImageLineUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI18800", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18800", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -1420,7 +1420,7 @@ STDMETHODIMP CImageLineUtility::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18802", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI18802", pClassID != __nullptr);
 
 		*pClassID = CLSID_ImageLineUtility;
 	}
@@ -1449,7 +1449,7 @@ STDMETHODIMP CImageLineUtility::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18805", pStream != NULL);
+		ASSERT_ARGUMENT("ELI18805", pStream != __nullptr);
 
 		// reset member variables
 		m_nColumnWidthMin		= gnDEFAULT_COLUMN_WIDTH_MIN;
@@ -1556,7 +1556,7 @@ STDMETHODIMP CImageLineUtility::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18808", pStream != NULL);
+		ASSERT_ARGUMENT("ELI18808", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -1641,7 +1641,7 @@ STDMETHODIMP CImageLineUtility::raw_IsLicensed(VARIANT_BOOL *pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18814", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18814", pbValue != __nullptr);
 
 		try
 		{
@@ -1767,7 +1767,7 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 	}
 
 	// Populate the page bounds rect (if provided).  
-	if (prectPageBounds != NULL)
+	if (prectPageBounds != __nullptr)
 	{
 		prectPageBounds->left = 0;
 		prectPageBounds->top = 0;
@@ -1776,7 +1776,7 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 		prectPageBounds->bottom = fileInfo.Height - 1;
 	}
 
-	if (pvecHorzLineRects != NULL)
+	if (pvecHorzLineRects != __nullptr)
 	{
 		// Convert units according to image dimensions and resolution
 		adjustSettingsForImage(fileInfo, true);
@@ -1785,7 +1785,7 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 		m_LineFinder.findLines(&hBitmap, LINEREMOVE_HORIZONTAL, *pvecHorzLineRects);
 	}
 
-	if (pvecVertLineRects != NULL)
+	if (pvecVertLineRects != __nullptr)
 	{
 		// Convert units according to image dimensions and resolution
 		adjustSettingsForImage(fileInfo, false);
@@ -1902,12 +1902,12 @@ IIUnknownVectorPtr CImageLineUtility::lineRectVecToILongRectangleVec(const vecto
 {
 	// Create the IUnknownVector to store the result
 	IIUnknownVectorPtr ipResult(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI19028", ipResult != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19028", ipResult != __nullptr);
 
 	for each (LineRect rect in vecRects)
 	{
 		ILongRectanglePtr ipRect(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI18703", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18703", ipRect != __nullptr);
 
 		// Set the bounds of  the rectangle
 		ipRect->SetBounds(rect.left, rect.top, rect.right, rect.bottom);
@@ -1921,12 +1921,12 @@ IIUnknownVectorPtr CImageLineUtility::lineRectVecToILongRectangleVec(const vecto
 void CImageLineUtility::longRectangleVecToLineRectVec(IIUnknownVectorPtr ipRects, bool bHorizontal,
 													  vector<LineRect> &rvecRects)
 {
-	ASSERT_ARGUMENT("ELI19842", ipRects != NULL);
+	ASSERT_ARGUMENT("ELI19842", ipRects != __nullptr);
 
 	for (int i = 0; i < ipRects->Size(); i++)
 	{
 		ILongRectanglePtr ipRect = ipRects->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI19841", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19841", ipRect != __nullptr);
 
 		LineRect rect(CRect(ipRect->Left, ipRect->Top, ipRect->Right, ipRect->Bottom), bHorizontal);
 

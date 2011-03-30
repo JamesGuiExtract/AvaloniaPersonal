@@ -247,8 +247,8 @@ private:
 	// PURPOSE: Sets m_mapBorderToPosition to the boundaries specified by mapBorderToInfo. Sets 
 	//          m_mapIndexToClueListInfo based on the specified region of ipPageText. If boundaries, 
 	//          are not able to be calculated, returns false.
-	// REQUIRE: mapBorderToInfo != NULL
-	//          ipPageText != NULL
+	// REQUIRE: mapBorderToInfo != __nullptr
+	//          ipPageText != __nullptr
 	// PROMISE: Result doesn't include any expansion. Returns true if it's possible to calculate 
 	//          the boundaries, false otherwise
 	bool calculateRoughBorderPosition(BoundaryToInfo mapBorderToInfo, ISpatialStringPtr ipPageText,
@@ -263,8 +263,8 @@ private:
 	// PURPOSE: Finds the contents of each requested region of ipInputText based on 
 	//          LocateImageRegion's settings and returns an IIUnknownVector containing a spatial 
 	//          string for each region found.
-	// REQUIRE: ipInputText != NULL
-	//          pDocument != NULL
+	// REQUIRE: ipInputText != __nullptr
+	//          pDocument != __nullptr
 	// PROMISE: Returns an IIUnknownVector containing a spatial string for each region found. If no 
 	//          regions are found the IIUnknownVector will be empty. The regions found are determined
 	//          by the region boundaries, tag expansion, find type, inside/outside region, 
@@ -291,7 +291,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the first page of ipPages after lStartPage that contains all the clues of 
 	//          m_mapIndexToClueListInfo. Stores the bounding rectangle of the clues found.
-	// REQUIRE: ipPages' elements implement single-paged spatial strings (ipPages != NULL)
+	// REQUIRE: ipPages' elements implement single-paged spatial strings (ipPages != __nullptr)
 	//          0 <= lStartPage < ipPages->Size()
 	// PROMISE: Returns the index of the first page of ipPages such that 
 	//          lStartPage <= returnValue < ipPages->Size(). If no such page is found, will return -1.
@@ -340,7 +340,7 @@ private:
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Combine the specified vector of image regions into a single spatial string.
-	// REQUIRE: vecImageRegions != NULL
+	// REQUIRE: vecImageRegions != __nullptr
 	// PROMISE: Each spatial string in vecImageRegions will be appended together to form
 	//          a single spatial string, which will be returned. If vecImageRegions is empty, an
 	//          empty spatial string will be returned. If bstrSourceDocName is not empty, its value

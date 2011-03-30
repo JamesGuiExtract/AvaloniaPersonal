@@ -1384,7 +1384,7 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 		//================================================
 
 		bSkip = TRUE;
-		lastSkipRow = NULL;
+		lastSkipRow = __nullptr;
 
 		//main loop to check an unsorted item against the sorted list
 		//NewListRowInfo = NewListStartRowInfo;

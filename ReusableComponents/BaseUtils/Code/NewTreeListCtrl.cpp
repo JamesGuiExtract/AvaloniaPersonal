@@ -176,7 +176,7 @@ HTREEITEM CNewTreeListCtrl::GetTreeItem(int nItem)
 	HTREEITEM m_ParentItem = GetRootItem();
 	int m_nCount = 0;
 
-	while ((m_ParentItem != NULL) && (m_nCount < nItem))
+	while ((m_ParentItem != __nullptr) && (m_nCount < nItem))
 	{
 		m_nCount ++ ;
 		GetNextSiblingItem(m_ParentItem);
@@ -190,7 +190,7 @@ int CNewTreeListCtrl::GetListItem(HTREEITEM hItem)
 	HTREEITEM m_ParentItem = GetRootItem();
 	int m_nCount = 0;
 
-	while ((m_ParentItem != NULL) && (m_ParentItem != hItem))
+	while ((m_ParentItem != __nullptr) && (m_ParentItem != hItem))
 	{
 		m_nCount ++ ;
 		GetNextSiblingItem(m_ParentItem);
@@ -412,7 +412,7 @@ void CNewTreeListCtrl::OnPaint()
 		pItem = (CTLItem *)CTreeCtrl::GetItemData(hItem);
 
 		HTREEITEM hParent = GetParentItem(hItem);
-		if (hParent != NULL)
+		if (hParent != __nullptr)
 		{
 			CTLItem *pParent = (CTLItem *)CTreeCtrl::GetItemData(hParent);
 		}
@@ -784,7 +784,7 @@ HTREEITEM CNewTreeListCtrl::CopyItem(HTREEITEM hItem, HTREEITEM hParent, HTREEIT
 	insStruct.hParent = hParent;
 	insStruct.hInsertAfter = hInsertAfter;
 
-	if ((hParent != NULL) && (hParent != TVI_ROOT))
+	if ((hParent != __nullptr) && (hParent != TVI_ROOT))
 	{
 		CTLItem *pParent = (CTLItem *)CTreeCtrl::GetItemData(hParent);
 		pParent->m_HasChildren = TRUE;
@@ -818,7 +818,7 @@ HTREEITEM CNewTreeListCtrl::MoveItem(HTREEITEM hItem, HTREEITEM hParent, HTREEIT
 	insStruct.hParent = hParent;
 	insStruct.hInsertAfter = hInsertAfter;
 
-	if ((hParent != NULL) && (hParent != TVI_ROOT))
+	if ((hParent != __nullptr) && (hParent != TVI_ROOT))
 	{
 		CTLItem *pParent = (CTLItem *)CTreeCtrl::GetItemData(hParent);
 		pParent->m_HasChildren = TRUE;
@@ -895,7 +895,7 @@ BOOL CNewTreeListCtrl::DeleteItem( HTREEITEM hItem )
 
 	if (m_bReturn)
 	{
-		if ((hOldParent != TVI_ROOT) && (hOldParent != NULL))
+		if ((hOldParent != TVI_ROOT) && (hOldParent != __nullptr))
 		{
 			CTLItem *pOldParent = (CTLItem *)CTreeCtrl::GetItemData(hOldParent);
 			pOldParent->m_HasChildren = ItemHasChildren(hOldParent);
@@ -999,7 +999,7 @@ HTREEITEM CNewTreeListCtrl::AlterDropTarget(HTREEITEM /*hSource*/, HTREEITEM hTa
 	else
 	{
 		HTREEITEM hParent = GetParentItem(hTarget);
-		if (hParent != NULL)
+		if (hParent != __nullptr)
 		{
 			return hParent;
 		}
@@ -1108,7 +1108,7 @@ void CNewTreeListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 		if (m_htiDrop != TVI_ROOT)
 		{
 			HTREEITEM htiParent = m_htiDrop;
-			while ((htiParent = GetParentItem(htiParent)) != NULL)
+			while ((htiParent = GetParentItem(htiParent)) != __nullptr)
 			{
 				if (htiParent == m_htiDrag)
 				{
@@ -1132,7 +1132,7 @@ void CNewTreeListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 			// remove the parent item, if there was one, 
 			// and we dragged out of it its last child
 			{
-				if (hDragParent != NULL)
+				if (hDragParent != __nullptr)
 				{
 					HTREEITEM hSecParent;
 					do
@@ -1143,7 +1143,7 @@ void CNewTreeListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 							DeleteItem(hDragParent);
 						}
 						hDragParent = hSecParent;
-					} while (hSecParent != NULL);
+					} while (hSecParent != __nullptr);
 				}
 			}
 		}
@@ -1165,7 +1165,7 @@ void CNewTreeListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 
 	// Get parent of parent
 	CWnd* pGrandparent = GetParent()->GetParent();
-	if (pGrandparent != NULL)
+	if (pGrandparent != __nullptr)
 	{
 		pGrandparent->SendMessage(WM_LBUTTONUP);
 	}
@@ -1199,7 +1199,7 @@ void CNewTreeListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 		CImageList::DragMove(pt);
 
 		hti = HitTest(point,&flags);
-//		if( hti != NULL )
+//		if( hti != __nullptr )
 		{
 			CImageList::DragShowNolock(FALSE);
 
@@ -1210,7 +1210,7 @@ void CNewTreeListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 
 			SelectDropTarget(hti);
 
-			if (hti != NULL)
+			if (hti != __nullptr)
 			{
 				m_htiDrop = hti;
 			}

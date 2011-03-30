@@ -220,7 +220,7 @@ BOOL FileProcessingDlgReportPage::OnInitDialog()
 		fillLabelColumn();		
 
 		// Verify that the config manager is initialized
-		ASSERT_RESOURCE_ALLOCATION( "ELI15689", m_pCfgMgr != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI15689", m_pCfgMgr != __nullptr );
 
 		// Add text to Interpret Cautiously help and initially hide the control
 		m_editCautiously.SetWindowTextA( 
@@ -407,7 +407,7 @@ void FileProcessingDlgReportPage::OnBnClickedBtnExport()
 void FileProcessingDlgReportPage::setRecordManager(FPRecordManager* pRecordMgr)
 {
 	
-	ASSERT_ARGUMENT("ELI10145", pRecordMgr != NULL);
+	ASSERT_ARGUMENT("ELI10145", pRecordMgr != __nullptr);
 	m_pRecordMgr = pRecordMgr;
 	
 }
@@ -421,7 +421,7 @@ void FileProcessingDlgReportPage::clear()
 		m_listLocalStats.DeleteAllItems();
 
 		// clear other variables
-		m_ipActionStatsOld = NULL;
+		m_ipActionStatsOld = __nullptr;
 		m_TimeOfLastProcess = CTime::GetCurrentTime();
 		m_vecSnapshots.clear();
 		m_vecCompletionRates.clear();
@@ -461,7 +461,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr FileProcessingDlgReportPage::
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgReportPage::setFPM( UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPM)
 {
-	ASSERT_ARGUMENT( "ELI14355",pFPM != NULL);
+	ASSERT_ARGUMENT( "ELI14355",pFPM != __nullptr);
 	m_pFPM = pFPM;
 }
 //-------------------------------------------------------------------------------------------------
@@ -473,7 +473,7 @@ void FileProcessingDlgReportPage::populateStats(StopWatch sWatch,
 	try 
 	{
 		// Make sure the ipActionStatsNew is valid
-		ASSERT_ARGUMENT("ELI15061", ipActionStatsNew != NULL );
+		ASSERT_ARGUMENT("ELI15061", ipActionStatsNew != __nullptr );
 
 		if(! getInit() )
 		{
@@ -486,7 +486,7 @@ void FileProcessingDlgReportPage::populateStats(StopWatch sWatch,
 
 		// Update the Global stats ListCtrl if the Stats have changed or this is the first
 		// time thru
-		if( m_ipActionStatsOld == NULL || setTimeRemainingRows() )
+		if( m_ipActionStatsOld == __nullptr || setTimeRemainingRows() )
 		{
 			// Update the "Bytes Processed" row
 			LONGLONG nBytes = ipActionStatsNew->GetNumBytes();
@@ -669,13 +669,13 @@ bool FileProcessingDlgReportPage::setTimeRemainingRows()
 		_lastCodePos = "20";
 		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStatsOld = 
 			rOldestSnapshotInVector.getActionStatistic();
-		ASSERT_RESOURCE_ALLOCATION("ELI15059", ipActionStatsOld != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15059", ipActionStatsOld != __nullptr);
 
 		Snapshot &rLatestSnapshot = m_vecSnapshots.back();
 		_lastCodePos = "40";
 		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStatsNew = 
 			rLatestSnapshot.getActionStatistic();
-		ASSERT_RESOURCE_ALLOCATION("ELI15350", ipActionStatsNew != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15350", ipActionStatsNew != __nullptr);
 
 		// First find out how many bytes have been completed since from oldest snapshot until now
 		LONGLONG nBytesDone = (ipActionStatsNew->NumBytesComplete + ipActionStatsNew->NumBytesFailed) 
@@ -860,7 +860,7 @@ bool FileProcessingDlgReportPage::setTimeRemainingRows()
 			_lastCodePos = "300";
 			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStatsRecent = 
 				rRecentSnapshot.getActionStatistic();
-			ASSERT_RESOURCE_ALLOCATION("ELI15690", ipActionStatsRecent != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15690", ipActionStatsRecent != __nullptr);
 
 			// Check if anything has changed between the recent and the last snapshots 
 			// in the vector. If no work has been done, add a note to inform the user. Then
@@ -1325,7 +1325,7 @@ void FileProcessingDlgReportPage::resizeListForHeader()
 		long lHeaderHeight(0), lDoubleHeight(0);
 
 		CHeaderCtrl* pHeader = m_listGlobalStats.GetHeaderCtrl();
-		if (pHeader != NULL)
+		if (pHeader != __nullptr)
 		{
 			// get the rectangle for the header
 			CRect rectHeader;

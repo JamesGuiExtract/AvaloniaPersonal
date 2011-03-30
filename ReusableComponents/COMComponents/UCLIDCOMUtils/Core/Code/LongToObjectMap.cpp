@@ -84,7 +84,7 @@ STDMETHODIMP CLongToObjectMap::IsDirty(void)
 			for (; itMap != m_mapKeyToValue.end(); itMap++)
 			{
 				IPersistStreamPtr ipPersistStream(itMap->second);
-				if (ipPersistStream == NULL)
+				if (ipPersistStream == __nullptr)
 				{
 					UCLIDException ue("ELI04776", "Object does not support persistence!");
 					ue.addDebugInfo("Key", itMap->first);
@@ -204,7 +204,7 @@ STDMETHODIMP CLongToObjectMap::Save(IStream *pStream, BOOL fClearDirty)
 			pStream->Write(&(iter->first), sizeof(iter->first), NULL);
 			// write the the object to the stream
 			IPersistStreamPtr ipObj = iter->second;
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				UCLIDException ue("ELI04702", "Object does not support persistence!");
 				ue.addDebugInfo("Key", iter->first);
@@ -243,7 +243,7 @@ STDMETHODIMP CLongToObjectMap::Set(long key, IUnknown *pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25998", pObject != NULL);
+		ASSERT_ARGUMENT("ELI25998", pObject != __nullptr);
 
 		// validate license
 		validateLicense();
@@ -264,7 +264,7 @@ STDMETHODIMP CLongToObjectMap::GetValue(long key, IUnknown **pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25999", pObject != NULL);
+		ASSERT_ARGUMENT("ELI25999", pObject != __nullptr);
 
 		// validate license
 		validateLicense();
@@ -294,7 +294,7 @@ STDMETHODIMP CLongToObjectMap::Contains(long key, VARIANT_BOOL *bFound)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26000", bFound != NULL);
+		ASSERT_ARGUMENT("ELI26000", bFound != __nullptr);
 
 		// validate license
 		validateLicense();
@@ -353,14 +353,14 @@ STDMETHODIMP CLongToObjectMap::GetKeys(IVariantVector **pKeys)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26004", pKeys != NULL);
+		ASSERT_ARGUMENT("ELI26004", pKeys != __nullptr);
 
 		// validate license
 		validateLicense();
 
 		// create a variant vector of all the keys in the map
 		UCLID_COMUTILSLib::IVariantVectorPtr ipKeys(CLSID_VariantVector);
-		if (ipKeys == NULL)
+		if (ipKeys == __nullptr)
 		{
 			throw UCLIDException("ELI04371", "Unable to create VariantVector object!");
 		}
@@ -399,8 +399,8 @@ STDMETHODIMP CLongToObjectMap::GetKeyValue(long nIndex, long *pstrKey, IUnknown*
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26002", pstrKey != NULL);
-		ASSERT_ARGUMENT("ELI26003", pObject != NULL);
+		ASSERT_ARGUMENT("ELI26002", pstrKey != __nullptr);
+		ASSERT_ARGUMENT("ELI26003", pObject != __nullptr);
 
 		// validate license and return size of current map
 		validateLicense();
@@ -507,7 +507,7 @@ STDMETHODIMP CLongToObjectMap::CopyFrom(IUnknown * pObject)
 		validateLicense();
 
 		UCLID_COMUTILSLib::ILongToObjectMapPtr ipSource( pObject );
-		ASSERT_RESOURCE_ALLOCATION("ELI08212", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08212", ipSource != __nullptr);
 
 		// Clear this map object
 		clear();
@@ -521,10 +521,10 @@ STDMETHODIMP CLongToObjectMap::CopyFrom(IUnknown * pObject)
 
 			// If this object can be cloned then clone it
 			UCLID_COMUTILSLib::ICopyableObjectPtr ipValue = ipUnk;
-			if (ipValue != NULL)
+			if (ipValue != __nullptr)
 			{
 				IUnknownPtr ipCopy = ipValue->Clone();
-				ASSERT_RESOURCE_ALLOCATION("ELI25893", ipCopy != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25893", ipCopy != __nullptr);
 				m_mapKeyToValue[key] = ipCopy;
 			}
 			else
@@ -545,14 +545,14 @@ STDMETHODIMP CLongToObjectMap::Clone(IUnknown * * pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26001", pObject != NULL);
+		ASSERT_ARGUMENT("ELI26001", pObject != __nullptr);
 
 		// Check license state
 		validateLicense();
 
 		// Create a new map
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy(CLSID_LongToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI08374", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08374", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -574,10 +574,10 @@ STDMETHODIMP CLongToObjectMap::ShallowCopy(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25919", pObject != NULL);
+		ASSERT_ARGUMENT("ELI25919", pObject != __nullptr);
 
 		UCLID_COMUTILSLib::ILongToObjectMapPtr ipNewMap(CLSID_LongToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI25920", ipNewMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25920", ipNewMap != __nullptr);
 
 		// Just copy the map values from this object to the new object
 		for (map<long, IUnknownPtr>::iterator it = m_mapKeyToValue.begin();

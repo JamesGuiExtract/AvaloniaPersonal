@@ -102,7 +102,7 @@ CUEXViewerDlg::CUEXViewerDlg(CWnd* pParent /*=NULL*/)
 		m_pCfgMgr = new RegistryPersistenceMgr( HKEY_CURRENT_USER, strRootFolder );
 
 		m_apLogFileMutex.reset(getGlobalNamedMutex(gstrLOG_FILE_MUTEX));
-		ASSERT_RESOURCE_ALLOCATION("ELI29995", m_apLogFileMutex.get() != NULL); 
+		ASSERT_RESOURCE_ALLOCATION("ELI29995", m_apLogFileMutex.get() != __nullptr); 
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29996");
 }
@@ -119,7 +119,7 @@ CUEXViewerDlg::~CUEXViewerDlg()
 			{
 				ma_pFindDlg->DestroyWindow();
 			}
-			ma_pFindDlg.reset(NULL);
+			ma_pFindDlg.reset(__nullptr);
 		}
 		
 		// Close and clean-up ExportDebug dialog
@@ -130,7 +130,7 @@ CUEXViewerDlg::~CUEXViewerDlg()
 			{
 				ma_pExportDebugDataDlg->DestroyWindow();
 			}
-			ma_pExportDebugDataDlg.reset(NULL);
+			ma_pExportDebugDataDlg.reset(__nullptr);
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16546");
@@ -193,7 +193,7 @@ int CUEXViewerDlg::GetFirstSelectionIndex()
 
 	// Find position of first selection
 	POSITION pos = m_listUEX.GetFirstSelectedItemPosition();
-	if (pos != NULL)
+	if (pos != __nullptr)
 	{
 		// Get index of selected item
 		iFirst = m_listUEX.GetNextSelectedItem( pos );
@@ -216,7 +216,7 @@ string CUEXViewerDlg::GetWholeExceptionString(int nIndex)
 
 	// Retrieve this data structure
 	ITEMINFO*	pData = (ITEMINFO *)m_listUEX.GetItemData( nIndex );
-	ASSERT_RESOURCE_ALLOCATION("ELI28706", pData != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI28706", pData != __nullptr);
 
 	// Create a UCLIDException object
 	// using new ELI code for this application
@@ -280,11 +280,11 @@ BOOL CUEXViewerDlg::OnInitDialog()
 		SetIcon( m_hIcon, FALSE );		// Set small icon
 
 		// Construct and create a modeless Find dialog
-		ma_pFindDlg = auto_ptr<CUEXFindDlg>(new CUEXFindDlg( m_pCfgMgr, this ));
+		ma_pFindDlg = unique_ptr<CUEXFindDlg>(new CUEXFindDlg( m_pCfgMgr, this ));
 		ma_pFindDlg->Create( CUEXFindDlg::IDD, NULL );
 
 		// Contruct and create a modeless export data dialog
-		ma_pExportDebugDataDlg = auto_ptr<CExportDebugDataDlg>(new CExportDebugDataDlg(this));
+		ma_pExportDebugDataDlg = unique_ptr<CExportDebugDataDlg>(new CExportDebugDataDlg(this));
 		ma_pExportDebugDataDlg->Create(CExportDebugDataDlg::IDD, NULL);
 
 		// Set flag
@@ -340,7 +340,7 @@ BOOL CUEXViewerDlg::DestroyWindow()
 			ITEMINFO*	pData = (ITEMINFO *)m_listUEX.GetItemData( i );
 
 			// Release the memory
-			if (pData != NULL)
+			if (pData != __nullptr)
 			{
 				delete pData;
 				pData = NULL;
@@ -472,7 +472,7 @@ void CUEXViewerDlg::OnSize(UINT nType, int cx, int cy)
 
 			// re-position the next-file button
 			CWnd *pNextButton = GetDlgItem(ID_BTN_NEXT_LOG_FILE);
-			ASSERT_RESOURCE_ALLOCATION("ELI14856", pNextButton != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14856", pNextButton != __nullptr);
 			CRect rectNextButton;
 			pNextButton->GetWindowRect(&rectNextButton);
 			ScreenToClient(rectNextButton);
@@ -482,7 +482,7 @@ void CUEXViewerDlg::OnSize(UINT nType, int cx, int cy)
 
 			// reposition the prev-file button
 			CWnd *pPrevButton = GetDlgItem(ID_BTN_PREV_LOG_FILE);
-			ASSERT_RESOURCE_ALLOCATION("ELI14857", pPrevButton != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14857", pPrevButton != __nullptr);
 			CRect rectPrevButton;
 			pPrevButton->GetWindowRect(&rectPrevButton);
 			ScreenToClient(rectPrevButton);
@@ -492,7 +492,7 @@ void CUEXViewerDlg::OnSize(UINT nType, int cx, int cy)
 
 			// reposition the drop-down list box with the exception file list
 			CWnd *pExList = GetDlgItem(IDC_COMBO_EXCEPTION_FILE_LIST);
-			ASSERT_RESOURCE_ALLOCATION("ELI14858", pExList != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14858", pExList != __nullptr);
 			CRect rectExList;
 			pExList->GetWindowRect(&rectExList);
 			ScreenToClient(rectExList);
@@ -502,7 +502,7 @@ void CUEXViewerDlg::OnSize(UINT nType, int cx, int cy)
 
 			// resposition the label above the exception file list dropdown
 			CWnd *pExListLabel = GetDlgItem(IDC_STATIC_EXCEPTION_FILE_LIST);
-			ASSERT_RESOURCE_ALLOCATION("ELI14859", pExListLabel != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14859", pExListLabel != __nullptr);
 			CRect rectExListLabel;
 			pExListLabel->GetWindowRect(&rectExListLabel);
 			ScreenToClient(rectExListLabel);
@@ -552,7 +552,7 @@ void CUEXViewerDlg::OnEditViewDetails()
 
 			// Retrieve this data structure
 			ITEMINFO*	pData = (ITEMINFO *)m_listUEX.GetItemData( iItem );
-			ASSERT_RESOURCE_ALLOCATION("ELI28707", pData != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28707", pData != __nullptr);
 
 			// Create a UCLIDException object
 			// using new ELI code for this application
@@ -729,7 +729,7 @@ void CUEXViewerDlg::OnEditClear()
 			ITEMINFO*	pData = (ITEMINFO *)m_listUEX.GetItemData( i );
 
 			// Release the memory
-			if (pData != NULL)
+			if (pData != __nullptr)
 			{
 				delete pData;
 				pData = NULL;
@@ -816,7 +816,7 @@ void CUEXViewerDlg::OnEditDeleteSelection()
 				ITEMINFO*	pData = (ITEMINFO *)m_listUEX.GetItemData( iItem );
 
 				// Release the memory
-				if (pData != NULL)
+				if (pData != __nullptr)
 				{
 					delete pData;
 					pData = NULL;
@@ -936,7 +936,7 @@ void CUEXViewerDlg::OnFileExport()
 
 					// Retrieve ItemData
 					pData = (ITEMINFO *)m_listUEX.GetItemData( i );
-					ASSERT_RESOURCE_ALLOCATION("ELI28708", pData != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28708", pData != __nullptr);
 
 					// Store time info as string
 					strTime = asString( pData->ulTime );
@@ -1311,7 +1311,7 @@ void CUEXViewerDlg::OnToolsExportDebugData()
 {
 	try
 	{
-		if (ma_pExportDebugDataDlg.get() != NULL && asCppBool(::IsWindow(ma_pExportDebugDataDlg->m_hWnd)))
+		if (ma_pExportDebugDataDlg.get() != __nullptr && asCppBool(::IsWindow(ma_pExportDebugDataDlg->m_hWnd)))
 		{
 			// Show the find dialog
 			ma_pExportDebugDataDlg->ShowWindow(SW_SHOW);
@@ -1527,7 +1527,7 @@ void CUEXViewerDlg::updateEnabledStateForControls()
 {
 	// get the current menu object
 	CMenu* pMenu = GetMenu();
-	ASSERT_RESOURCE_ALLOCATION("ELI14853", pMenu != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14853", pMenu != __nullptr);
 
 	// Enable/disable Clear List button
 	// Enable/disable save as button
@@ -1570,10 +1570,10 @@ void CUEXViewerDlg::updateEnabledStateForControls()
 	
 	// enable/disable the navigation buttons
 	CWnd *pPrevButton = GetDlgItem(ID_BTN_PREV_LOG_FILE);
-	ASSERT_RESOURCE_ALLOCATION("ELI14854", pPrevButton != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14854", pPrevButton != __nullptr);
 	pPrevButton->EnableWindow(bEnablePrevLogFileNavigation ? TRUE : FALSE);
 	CWnd *pNextButton = GetDlgItem(ID_BTN_NEXT_LOG_FILE);
-	ASSERT_RESOURCE_ALLOCATION("ELI14855", pNextButton != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14855", pNextButton != __nullptr);
 	pNextButton->EnableWindow(bEnableNextLogFileNavigation ? TRUE : FALSE);
 }
 //-------------------------------------------------------------------------------------------------
@@ -1815,7 +1815,7 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 
 		// Set all text items, now set the item data
 		ITEMINFO*	pData = new ITEMINFO;
-		ASSERT_RESOURCE_ALLOCATION("ELI29921", pData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29921", pData != __nullptr);
 
 		pData->iIndex = iIndex;
 		pData->ulTime = lTime;
@@ -1843,7 +1843,7 @@ void CUEXViewerDlg::refreshIndices()
 	{
 		// Retrieve ItemData
 		pData = (ITEMINFO *)m_listUEX.GetItemData( i );
-		ASSERT_RESOURCE_ALLOCATION("ELI28711", pData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28711", pData != __nullptr);
 
 		// Replace index item
 		pData->iIndex = i;
@@ -1882,7 +1882,7 @@ string CUEXViewerDlg::getItemELICodes(int iIndex, bool bIncludeInnerELICodes)
 {
 	// Retrieve this data structure
 	ITEMINFO* pData = (ITEMINFO *)m_listUEX.GetItemData(iIndex);
-	ASSERT_RESOURCE_ALLOCATION("ELI28709", pData != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI28709", pData != __nullptr);
 
 	// This ELI Code will only be used it the pData->strData value is not a stringized exception
 	string strELICode = "ELI28695";
@@ -1906,7 +1906,7 @@ string CUEXViewerDlg::getItemELICodes(int iIndex, bool bIncludeInnerELICodes)
 	if (bIncludeInnerELICodes)
 	{
 		for (UCLIDException *pueInner = (UCLIDException*)ue.getInnerException();
-			 pueInner != NULL;
+			 pueInner != __nullptr;
 			 pueInner = (UCLIDException*)pueInner->getInnerException())
 		{
 			strELICodes += "," + pueInner->getTopELI();

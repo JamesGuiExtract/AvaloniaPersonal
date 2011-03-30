@@ -173,7 +173,7 @@ private:
 	// Value for UseSelectedDatFiles
 	bool m_bUseSelectedDatFiles;
 
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
 	// Maps Document type string to the vector of string pattern finders to be used
 	// for that document type

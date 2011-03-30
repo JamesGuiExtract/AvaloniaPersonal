@@ -137,7 +137,7 @@ void CTestResultLogger::showTestResultLoggerWindow()
 		TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
 
 		m_pDlg = new TestResultLoggerDlg(NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI06357", m_pDlg != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06357", m_pDlg != __nullptr);
 		m_pDlg->Create(TestResultLoggerDlg::IDD);
 		m_pDlg->ShowWindow(SW_SHOW);
 		string strCaption = "Test Result Logger ";
@@ -826,7 +826,7 @@ STDMETHODIMP CTestResultLogger::get_AddEntriesToTestLogger(VARIANT_BOOL *pvbAddE
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26635", pvbAddEntries != NULL);
+		ASSERT_ARGUMENT("ELI26635", pvbAddEntries != __nullptr);
 		validateLicense();
 
 		*pvbAddEntries = asVariantBool(m_bAddEntriesInLogWindow);

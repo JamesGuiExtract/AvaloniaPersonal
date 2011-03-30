@@ -152,7 +152,7 @@ STDMETHODIMP CImageRegionWithLinesPP::Apply(void)
 		{
 			// Obtain interface pointer to the IImageRegionWithLines class
 			UCLID_AFVALUEFINDERSLib::IImageRegionWithLinesPtr ipImageRegionWithLines = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI18730", ipImageRegionWithLines != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18730", ipImageRegionWithLines != __nullptr);
 
 			IImageLineUtilityPtr ipLineUtil = ipImageRegionWithLines->LineUtil;
 			ASSERT_RESOURCE_ALLOCATION("ELI18943", ipLineUtil);
@@ -322,7 +322,7 @@ STDMETHODIMP CImageRegionWithLinesPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18732", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18732", pbValue != __nullptr);
 
 		try
 		{

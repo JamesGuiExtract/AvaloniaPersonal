@@ -46,7 +46,7 @@ STDMETHODIMP CGrantorGranteeFinderV2PP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_COUNTYCUSTOMCOMPONENTSLib::IGrantorGranteeFinderV2Ptr ipGGFinderV2(m_ppUnk[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI09311", ipGGFinderV2 != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09311", ipGGFinderV2 != __nullptr);
 
 			// whether or not to use specified entity types
 			bool bSpecifiedEntityTypes = m_radioSpecified.GetCheck()==1;
@@ -114,7 +114,7 @@ LRESULT CGrantorGranteeFinderV2PP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM
 
 			// Set AF Utility to GrantorGrantee finders AF Utility object
 			m_ipAFUtil = ipGGFinderV2->GetAFUtility();
-			ASSERT_RESOURCE_ALLOCATION("ELI09281", m_ipAFUtil != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09281", m_ipAFUtil != __nullptr);
 			
 			// Load DocTypes
 			loadDocTypeList();
@@ -309,7 +309,7 @@ void CGrantorGranteeFinderV2PP::loadDocTypeToVecFinderFile()
 void CGrantorGranteeFinderV2PP::saveSelDatFilesForDocType(UCLID_COUNTYCUSTOMCOMPONENTSLib::IGrantorGranteeFinderV2Ptr ipGGFinderV2)
 {
 	IStrToObjectMapPtr ipDocTypeToFileMap = ipGGFinderV2->DocTypeToFileMap;
-	ASSERT_RESOURCE_ALLOCATION("ELI09318", ipDocTypeToFileMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09318", ipDocTypeToFileMap != __nullptr);
 
 	ipDocTypeToFileMap->Clear();
 
@@ -329,7 +329,7 @@ void CGrantorGranteeFinderV2PP::saveSelDatFilesForDocType(UCLID_COUNTYCUSTOMCOMP
 		int nNumSelected = vecSelected.size();
 
 		IVariantVectorPtr ipDatFileName(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI09320", ipDatFileName != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09320", ipDatFileName != __nullptr);
 
 		for (int i = 0; i < nNumSelected; i++)
 		{
@@ -366,7 +366,7 @@ void CGrantorGranteeFinderV2PP::getSelectedFromList()
 void CGrantorGranteeFinderV2PP::loadSelDatFilesForDocType( UCLID_COUNTYCUSTOMCOMPONENTSLib::IGrantorGranteeFinderV2Ptr ipGGFinderV2 )
 {	
 	IStrToObjectMapPtr ipDocTypeToFileMap = ipGGFinderV2->DocTypeToFileMap;
-	ASSERT_RESOURCE_ALLOCATION("ELI09355", ipDocTypeToFileMap != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI09355", ipDocTypeToFileMap != __nullptr );
 
 	//TODO: make sure the cases of either a new doc type or removed doc type 
 

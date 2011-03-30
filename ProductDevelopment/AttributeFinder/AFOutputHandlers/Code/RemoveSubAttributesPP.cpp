@@ -29,10 +29,10 @@ CRemoveSubAttributesPP::CRemoveSubAttributesPP()
 		m_dwHelpFileID = IDS_HELPFILERemoveSubAttributesPP;
 		m_dwDocStringID = IDS_DOCSTRINGRemoveSubAttributesPP;
 
-		m_ipDataScorer = NULL;
+		m_ipDataScorer = __nullptr;
 
 		m_ipCategoryMgr.CreateInstance(CLSID_CategoryManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI13303", m_ipCategoryMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13303", m_ipCategoryMgr != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13302");
 
@@ -50,16 +50,16 @@ STDMETHODIMP CRemoveSubAttributesPP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFOUTPUTHANDLERSLib::IRemoveSubAttributesPtr ipRSA = m_ppUnk[i];
-			if (ipRSA == NULL)
+			if (ipRSA == __nullptr)
 			{
 				THROW_LOGIC_ERROR_EXCEPTION("ELI09560");
 			}
 			
 			IAttributeSelectorPtr ipAS = m_ipObject;
-			ASSERT_RESOURCE_ALLOCATION("ELI13355", ipAS != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI13355", ipAS != __nullptr );
 
 			IMustBeConfiguredObjectPtr ipCfgObj ( m_ipObject );
-			if ( ipCfgObj != NULL )
+			if ( ipCfgObj != __nullptr )
 			{
 				if ( ipCfgObj->IsConfigured() == VARIANT_FALSE )
 				{
@@ -150,7 +150,7 @@ LRESULT CRemoveSubAttributesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 	try
 	{
 		UCLID_AFOUTPUTHANDLERSLib::IRemoveSubAttributesPtr ipRSA = m_ppUnk[0];
-		if (ipRSA != NULL)
+		if (ipRSA != __nullptr)
 		{
 			// "Create" all the controls
 			m_cmbAttributeSelectors = GetDlgItem( IDC_COMBO_ATTRIBUTE_SELECTOR );
@@ -179,7 +179,7 @@ LRESULT CRemoveSubAttributesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 			OnClickedRemoveIfScore(0, 0, 0, nTmp);
 
 			m_ipDataScorer = ipRSA->DataScorer;
-			ASSERT_RESOURCE_ALLOCATION("ELI09798", m_ipDataScorer != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09798", m_ipDataScorer != __nullptr);
 	
 			// set the description of the data scorer object
 			string strDesc = m_ipDataScorer->Description;
@@ -207,18 +207,18 @@ LRESULT CRemoveSubAttributesPP::OnClickedChooseDataScorer(WORD wNotifyCode, WORD
 	{
 		// Create a copy of the DataScorer object-with-description
 		ICopyableObjectPtr ipCopyableObj = m_ipDataScorer;
-		ASSERT_RESOURCE_ALLOCATION( "ELI09791", ipCopyableObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09791", ipCopyableObj != __nullptr );
 		
 		IObjectWithDescriptionPtr ipDataScorerCopy = ipCopyableObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION( "ELI09792", ipDataScorerCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09792", ipDataScorerCopy != __nullptr );
 
 		// Create the IObjectSelectorUI object
 		IObjectSelectorUIPtr ipObjSelect( CLSID_ObjectSelectorUI );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09793", ipObjSelect != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09793", ipObjSelect != __nullptr );
 
 		// initialize private license for the object
 		IPrivateLicensedComponentPtr ipPLComponent = ipObjSelect;
-		ASSERT_RESOURCE_ALLOCATION("ELI10315", ipPLComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10315", ipPLComponent != __nullptr);
 		_bstr_t _bstrKey = LICENSE_MGMT_PASSWORD.c_str();
 		ipPLComponent->InitPrivateLicense(_bstrKey);
 
@@ -272,14 +272,14 @@ LRESULT CRemoveSubAttributesPP::OnBnClickedButtonConfigureSelector(WORD /*wNotif
 	try
 	{
 		// Must have a combo box selection
-		if (m_ipObject != NULL)
+		if (m_ipObject != __nullptr)
 		{
 			// Create the ObjectPropertiesUI object
 			IObjectPropertiesUIPtr	ipProperties( CLSID_ObjectPropertiesUI );
-			ASSERT_RESOURCE_ALLOCATION("ELI13306", ipProperties != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13306", ipProperties != __nullptr);
 
 			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyObj = m_ipObject;
-			ASSERT_RESOURCE_ALLOCATION("ELI13305", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13305", ipCopyObj != __nullptr);
 			UCLID_COMUTILSLib::ICategorizedComponentPtr ipCopy = ipCopyObj->Clone();
 
 			string strComponentDesc = ipCopy->GetComponentDescription();
@@ -341,7 +341,7 @@ void CRemoveSubAttributesPP::populateObjectCombo()
 	CString	zName;
 	long nNumEntries = m_ipObjectMap->GetSize();
 	UCLID_COMUTILSLib::IVariantVectorPtr ipKeys = m_ipObjectMap->GetKeys();
-	ASSERT_RESOURCE_ALLOCATION("ELI10403", ipKeys != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10403", ipKeys != __nullptr);
 	int i;
 	for (i = 0; i < nNumEntries; i++)
 	{
@@ -354,7 +354,7 @@ void CRemoveSubAttributesPP::populateObjectCombo()
 //-------------------------------------------------------------------------------------------------
 void CRemoveSubAttributesPP::updateComboSelection()
 {
-	if ( m_ipObject == NULL )
+	if ( m_ipObject == __nullptr )
 	{
 		m_cmbAttributeSelectors.SetCurSel(0);
 		createSelectedObject();

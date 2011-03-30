@@ -34,7 +34,7 @@ CAdvancedReplaceString::CAdvancedReplaceString()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13055", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13055", m_ipMiscUtils != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI06795")
 }
@@ -43,7 +43,7 @@ CAdvancedReplaceString::~CAdvancedReplaceString()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16353");
 }
@@ -300,15 +300,15 @@ string getActualReplacment(IRegularExprParser *pRegExpr,
 	// find the pattern to be replaced
 	IIUnknownVectorPtr ipMatches = ipRegExpr->Find(_bstr_t(strInput.c_str()), VARIANT_TRUE, 
 		VARIANT_FALSE);
-	if (ipMatches == NULL || ipMatches->Size() <= 0)
+	if (ipMatches == __nullptr || ipMatches->Size() <= 0)
 	{
 		return "";
 	}
 
 	IObjectPairPtr ipMatchInfo = ipMatches->At(0);
-	ASSERT_RESOURCE_ALLOCATION("ELI07313", ipMatchInfo != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI07313", ipMatchInfo != __nullptr);
 	ITokenPtr ipMatch = ipMatchInfo->Object1;
-	ASSERT_RESOURCE_ALLOCATION("ELI07314", ipMatch != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI07314", ipMatch != __nullptr);
 	// get the start and end positions for the match
 	long nStartPos = ipMatch->StartPosition;
 	long nEndPos = ipMatch->EndPosition;
@@ -347,10 +347,10 @@ STDMETHODIMP CAdvancedReplaceString::raw_ModifyValue(IAttribute* pAttribute, IAF
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09285", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09285", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->GetValue();
-		ASSERT_RESOURCE_ALLOCATION( "ELI09282", ipInputText != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09282", ipInputText != __nullptr );
 
 		// Call local method
 		modifyValue( ipInputText, pOriginInput );
@@ -373,7 +373,7 @@ STDMETHODIMP CAdvancedReplaceString::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::IAdvancedReplaceStringPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08271", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08271", ipSource != __nullptr);
 		m_strToBeReplaced = asString(ipSource->GetStrToBeReplaced());
 		m_strReplacement = asString(ipSource->GetReplacement());
 		m_bCaseSensitive = (ipSource->GetIsCaseSensitive()==VARIANT_TRUE) ? true : false;
@@ -396,7 +396,7 @@ STDMETHODIMP CAdvancedReplaceString::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_AdvancedReplaceString);
-		ASSERT_RESOURCE_ALLOCATION("ELI08358", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08358", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -418,7 +418,7 @@ STDMETHODIMP CAdvancedReplaceString::raw_GetComponentDescription(BSTR * pstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19596", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19596", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Advanced replace string").Detach();
 	}
@@ -493,7 +493,7 @@ STDMETHODIMP CAdvancedReplaceString::raw_Process(IAFDocument* pDocument, IProgre
 		validateLicense();
 
 		IAFDocumentPtr ipInputDoc(pDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI07433", ipInputDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07433", ipInputDoc != __nullptr);
 
 		// Call local method
 		modifyValue( ipInputDoc->Text, ipInputDoc );
@@ -626,7 +626,7 @@ STDMETHODIMP CAdvancedReplaceString::GetSizeMax(ULARGE_INTEGER *pcbSize)
 void CAdvancedReplaceString::modifyValue(ISpatialString* pText, IAFDocument* pAFDoc)
 {
 	ISpatialStringPtr ipInputText(pText);
-	ASSERT_RESOURCE_ALLOCATION( "ELI09304", ipInputText != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09304", ipInputText != __nullptr );
 
 	// Get the actual string from file if m_strToBeReplaced and m_strReplacement are valid file names
 	string strStringToBeReplaced = m_strToBeReplaced;
@@ -658,11 +658,11 @@ void CAdvancedReplaceString::modifyValue(ISpatialString* pText, IAFDocument* pAF
 		throw ue;
 	}
 
-	IRegularExprParserPtr ipParser = NULL;
+	IRegularExprParserPtr ipParser = __nullptr;
 	if (m_bAsRegularExpression)
 	{
 		ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("AdvancedReplaceString");
-		ASSERT_RESOURCE_ALLOCATION("ELI06796", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06796", ipParser != __nullptr);
 	}
 
 	// Replace specified occurrence(s) of the pattern string
@@ -673,14 +673,14 @@ void CAdvancedReplaceString::modifyValue(ISpatialString* pText, IAFDocument* pAF
 void CAdvancedReplaceString::getStringsFromFiles(IAFDocument* pAFDoc, std::string& strFind, std::string& strReplaced)
 {
 	IAFDocumentPtr ipAFDoc(pAFDoc);
-	ASSERT_RESOURCE_ALLOCATION("ELI14510", ipAFDoc != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14510", ipAFDoc != __nullptr);
 
 	// Define a tag manager object to expand tags
 	AFTagManager tagMgr;
 
 	// Define an IMiscUtilsPtr object used to get string from file
 	IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI14529", ipMiscUtils != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI14529", ipMiscUtils != __nullptr );
 
 	// Try to remove the header if the string is a file name, 
 	// otherwise simply return the original string.

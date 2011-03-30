@@ -31,7 +31,7 @@ STDMETHODIMP CQueryBasedASPP::Apply()
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFSELECTORSLib::IQueryBasedASPtr ipQBAS = m_ppUnk[i];
-			if ( ipQBAS != NULL )
+			if ( ipQBAS != __nullptr )
 			{
 				CString zQueryText;
 				m_editQuery.GetWindowTextA(zQueryText);
@@ -64,7 +64,7 @@ LRESULT CQueryBasedASPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 		validateLicense();
 
 		UCLID_AFSELECTORSLib::IQueryBasedASPtr ipQBAS = m_ppUnk[0];
-		if (ipQBAS != NULL)
+		if (ipQBAS != __nullptr)
 		{
 			// "Create" all the controls
 			m_editQuery.Attach( GetDlgItem( IDC_EDIT_QUERY ));

@@ -192,10 +192,10 @@ private:
 	CMenu* m_pMRUFilesMenu;
 
 	// recent used files list
-	auto_ptr<MRUList> ma_pMRUList;
+	unique_ptr<MRUList> ma_pMRUList;
 
 	// persistent manager
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
 	// clipboard manager
 	IClipboardObjectManagerPtr m_ipClipboardMgr;

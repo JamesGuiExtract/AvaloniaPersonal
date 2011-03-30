@@ -136,13 +136,13 @@ private:
 	{
 		// allocate first dimension
 		m_pArray = new ArrayType*[m_lRows];
-		ASSERT_RESOURCE_ALLOCATION("ELI18441", m_pArray != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18441", m_pArray != __nullptr);
 
 		// loop through the first dimension and allocate the second dimension
 		for (long i=0; i < m_lRows; i++)
 		{
 			m_pArray[i] = new ArrayType[m_lColumns];
-			ASSERT_RESOURCE_ALLOCATION("ELI18442", m_pArray[i] != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18442", m_pArray[i] != __nullptr);
 		}
 	}
 	//---------------------------------------------------------------------------------------------

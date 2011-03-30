@@ -63,8 +63,8 @@ FileProcessingDlgTaskPage::~FileProcessingDlgTaskPage()
 {
 	try
 	{
-		m_ipClipboardMgr = NULL;
-		m_ipMiscUtils = NULL;
+		m_ipClipboardMgr = __nullptr;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16529");
 }
@@ -163,7 +163,7 @@ BOOL FileProcessingDlgTaskPage::OnInitDialog()
 		
 		//create instances of necessary variables
 		m_ipClipboardMgr.CreateInstance(CLSID_ClipboardObjectManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI18616", m_ipClipboardMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18616", m_ipClipboardMgr != __nullptr);
 
 		// load icons for up and down buttons
 		m_btnUp.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_UP)));
@@ -211,7 +211,7 @@ void FileProcessingDlgTaskPage::OnBtnAdd()
 	{
 		// create a new ObjectWithDescription
 		IObjectWithDescriptionPtr ipObject(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI16051", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16051", ipObject != __nullptr);
 
 		// allow the user to select and configure
 		VARIANT_BOOL vbDirty = getMiscUtils()->AllowUserToSelectAndConfigureObject(ipObject, 
@@ -335,7 +335,7 @@ void FileProcessingDlgTaskPage::OnBtnModify()
 		{
 			// get the current file processor
 			IObjectWithDescriptionPtr	ipFP = getFileProcessorsData()->At( iIndex );
-			ASSERT_RESOURCE_ALLOCATION("ELI15896", ipFP != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15896", ipFP != __nullptr);
 			
 			// get the position and dimensions of the command button
 			RECT rectCommandButton;
@@ -563,7 +563,7 @@ void FileProcessingDlgTaskPage::OnBtnAddErrorTask()
 	{
 		// retrieve the error task
 		IObjectWithDescriptionPtr ipOWD = getFPMgmtRole()->ErrorTask;
-		ASSERT_RESOURCE_ALLOCATION("ELI16111", ipOWD != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16111", ipOWD != __nullptr);
 
 		// get position and dimensions of error task command button
 		RECT rectCommandButton;
@@ -880,7 +880,7 @@ LRESULT FileProcessingDlgTaskPage::OnGridDblClick(WPARAM wParam, LPARAM lParam)
 		{
 			// retrieve the selected file processor
 			IObjectWithDescriptionPtr ipObject = getFileProcessorsData()->At(iIndex);
-			ASSERT_RESOURCE_ALLOCATION("ELI16094", ipObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16094", ipObject != __nullptr);
 
 			// allow the user to modify ipObject
 			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(ipObject,
@@ -926,7 +926,7 @@ LRESULT FileProcessingDlgTaskPage::OnGridRightClick(WPARAM wParam, LPARAM lParam
 		pContextMenu->EnableMenuItem(ID_CONTEXT_DELETE, iIndex == -1 ? nDisable : nEnable );
 			
 		// Check Clipboard object type
-		if(m_ipClipboardMgr != NULL &&
+		if(m_ipClipboardMgr != __nullptr &&
 			(asCppBool(m_ipClipboardMgr->IUnknownVectorIsOWDOfType(IID_IFileProcessingTask)) ||
 			asCppBool(m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IFileProcessingTask))))
 		{
@@ -1000,14 +1000,14 @@ void FileProcessingDlgTaskPage::OnContextCopy()
 
 			// Create a vector for selected File Processors
 			IIUnknownVectorPtr	ipCopiedFPs( CLSID_IUnknownVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI13501", ipCopiedFPs != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13501", ipCopiedFPs != __nullptr );
 
 			// Add each selected to vector
 			do
 			{
 				// Retrieve the selected
 				IUnknownPtr	ipObject = getFileProcessorsData()->At( iIndex );
-				ASSERT_RESOURCE_ALLOCATION( "ELI13502", ipObject != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI13502", ipObject != __nullptr );
 
 				// Add the File Processor to the vector
 				ipCopiedFPs->PushBack( ipObject );
@@ -1042,7 +1042,7 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 			// Object is a vector of ObjectWithDescription items
 			// We expect each embedded object to be a File Processor
 			ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-			ASSERT_RESOURCE_ALLOCATION( "ELI13494", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13494", ipObject != __nullptr );
 		}
 		else if (m_ipClipboardMgr->ObjectIsTypeWithDescription( 
 			IID_IObjectWithDescription  ))
@@ -1050,7 +1050,7 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 			// Object is a single ObjectWithDescription item
 			// We expect the embedded object to be a File Processor
 			ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-			ASSERT_RESOURCE_ALLOCATION( "ELI13495", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13495", ipObject != __nullptr );
 			bSingleTask = true;
 		}
 		else
@@ -1077,7 +1077,7 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 		{
 			// Retrieve File Processor and description
 			IObjectWithDescriptionPtr	ipNewFP = ipObject;
-			ASSERT_RESOURCE_ALLOCATION( "ELI13497", ipNewFP != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13497", ipNewFP != __nullptr );
 			string	strDescription( ipNewFP->GetDescription() );
 
 			// Insert the new FP object-with-description into the vector
@@ -1099,7 +1099,7 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 		{
 			// Get count of File Processors in Clipboard vector
 			IIUnknownVectorPtr	ipPastedFPs = ipObject;
-			ASSERT_RESOURCE_ALLOCATION( "ELI13498", ipPastedFPs != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13498", ipPastedFPs != __nullptr );
 			int iCount = ipPastedFPs->Size();
 
 			// Add each File Processor to the list and the vector
@@ -1107,7 +1107,7 @@ void FileProcessingDlgTaskPage::OnContextPaste()
 			{
 				// Retrieve File Processor and description
 				IObjectWithDescriptionPtr	ipNewFP = ipPastedFPs->At( i );
-				ASSERT_RESOURCE_ALLOCATION( "ELI13499", ipNewFP != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI13499", ipNewFP != __nullptr );
 				string	strDescription( ipNewFP->GetDescription() );
 
 				// Insert the new File Processor object-with-description into the vector
@@ -1177,12 +1177,12 @@ LRESULT FileProcessingDlgTaskPage::OnCellValueChange(WPARAM wParam, LPARAM lPara
 
 		// If this file processor is already present
 		IIUnknownVectorPtr ipCollection = getFileProcessorsData();
-		ASSERT_RESOURCE_ALLOCATION("ELI15995", ipCollection != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15995", ipCollection != __nullptr);
 		if (ipCollection->Size() > nRow)
 		{
 			// Retrieve affected file processor
 			IObjectWithDescriptionPtr	ipFP = getFileProcessorsData()->At(nRow);
-			ASSERT_RESOURCE_ALLOCATION("ELI15983", ipFP != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15983", ipFP != __nullptr);
 
 			// Retrieve existing state
 			VARIANT_BOOL vbExisting = ipFP->Enabled;
@@ -1223,11 +1223,11 @@ void FileProcessingDlgTaskPage::OnLButtonDblClk(UINT nFlags, CPoint point)
 		CWnd *tmpChild = ChildWindowFromPoint(point, CWP_SKIPTRANSPARENT);
 
 		// if the child was returned check if it is the execute task control
-		if (tmpChild != NULL && tmpChild->GetDlgCtrlID() == IDC_EDIT_EXECUTE_TASK)
+		if (tmpChild != __nullptr && tmpChild->GetDlgCtrlID() == IDC_EDIT_EXECUTE_TASK)
 		{
 			// get the error task
 			IObjectWithDescriptionPtr ipErrorTask = getFPMgmtRole()->ErrorTask;
-			ASSERT_RESOURCE_ALLOCATION("ELI16114", ipErrorTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16114", ipErrorTask != __nullptr);
 
 			// select a file processor
 			VARIANT_BOOL vbDirty = getMiscUtils()->HandlePlugInObjectDoubleClick(
@@ -1335,7 +1335,7 @@ void FileProcessingDlgTaskPage::refresh()
 	m_bExecuteErrorTask = asMFCBool( ipMgmtRole->ExecuteErrorTask );
 
 	IObjectWithDescriptionPtr ipTask = ipMgmtRole->ErrorTask;
-	ASSERT_RESOURCE_ALLOCATION("ELI16093", ipTask != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16093", ipTask != __nullptr);
 	m_zErrorTaskDescription = asString( ipTask->Description ).c_str();
 
 	// Get the processing scope and update radio buttons
@@ -1348,7 +1348,7 @@ void FileProcessingDlgTaskPage::refresh()
 void FileProcessingDlgTaskPage::setFPMgr(UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPMgr)
 {
 	m_pFPM = pFPMgr;
-	ASSERT_RESOURCE_ALLOCATION("ELI14083", m_pFPM != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14083", m_pFPM != __nullptr);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1416,18 +1416,18 @@ bool FileProcessingDlgTaskPage::selectFileProcessor(IObjectWithDescriptionPtr ip
 {
 	// create the object selector UI object and license it
 	IObjectSelectorUIPtr ipObjSelect(CLSID_ObjectSelectorUI);
-	ASSERT_RESOURCE_ALLOCATION("ELI13511", ipObjSelect != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI13511", ipObjSelect != __nullptr);
 
 	// initialize private license for the object
 	IPrivateLicensedComponentPtr ipPLComponent = ipObjSelect;
-	ASSERT_RESOURCE_ALLOCATION("ELI10301", ipPLComponent != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10301", ipPLComponent != __nullptr);
 	_bstr_t _bstrKey = LICENSE_MGMT_PASSWORD.c_str();
 	ipPLComponent->InitPrivateLicense(_bstrKey);
 	
 	// first make a copy of the ObjectWithDescption in case 
 	// the user cancels out the dialog
 	IObjectWithDescriptionPtr ipObjectWithDescription(ipObjWithDesc->Clone());
-	ASSERT_RESOURCE_ALLOCATION("ELI13512", ipObjectWithDescription != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI13512", ipObjectWithDescription != __nullptr);
 
 	// Prepare the title and prompts
 	_bstr_t	bstrTitle("File Processor");
@@ -1461,7 +1461,7 @@ bool FileProcessingDlgTaskPage::selectFileProcessor(IObjectWithDescriptionPtr ip
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::addFileProcessor(IObjectWithDescriptionPtr ipObject)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI10973", ipObject != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10973", ipObject != __nullptr);
 	CString zDescription = (char*)ipObject->Description;
 
 	// Add item to end of list, set the text, set the checkbox
@@ -1672,7 +1672,7 @@ IIUnknownVectorPtr FileProcessingDlgTaskPage::getFileProcessorsData()
 {
 	// get the file supplying mgmt role
 	IIUnknownVectorPtr ipFileProcessorsData = getFPMgmtRole()->FileProcessors;
-	ASSERT_RESOURCE_ALLOCATION("ELI14310", ipFileProcessorsData != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14310", ipFileProcessorsData != __nullptr);
 
 	return ipFileProcessorsData;
 }
@@ -1684,7 +1684,7 @@ IMiscUtilsPtr FileProcessingDlgTaskPage::getMiscUtils()
 	{
 		// create MiscUtils object
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI16130", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16130", m_ipMiscUtils != __nullptr);
 	}
 
 	return m_ipMiscUtils;
@@ -1694,7 +1694,7 @@ void FileProcessingDlgTaskPage::getDlgItemWindowRect(UINT uiDlgItemResourceID, R
 {
 	// retrieve the dialog item using its resource ID
 	CWnd* cwndDlgItem = GetDlgItem(uiDlgItemResourceID);
-	ASSERT_RESOURCE_ALLOCATION("ELI16132", cwndDlgItem != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16132", cwndDlgItem != __nullptr);
 
 	// set the window rect to the appropriate position and dimensions
 	cwndDlgItem->GetWindowRect(&rectWindow);

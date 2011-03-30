@@ -141,7 +141,7 @@ BOOL SpotRecognitionDlg::OnInitDialog()
 			createSelectionToolMenu();
 
 			// create a new cursor tooltip ctrl associated with this window.
-			m_apCursorToolTipCtrl = auto_ptr<CursorToolTipCtrl>(new CursorToolTipCtrl(this));
+			m_apCursorToolTipCtrl = unique_ptr<CursorToolTipCtrl>(new CursorToolTipCtrl(this));
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI03008")
 	}
@@ -252,7 +252,7 @@ void SpotRecognitionDlg::OnBTNOpenImage()
 		CWaitCursor wait;
 
 		// Notify observers of the SpotRecognitionDlg that we want to open a file
-		if (m_ipSRWEventHandler != NULL)
+		if (m_ipSRWEventHandler != __nullptr)
 		{
 			VARIANT_BOOL	vbAllowOpen;
 			vbAllowOpen = m_ipSRWEventHandler->NotifyOpenToolbarButtonPressed();
@@ -735,7 +735,7 @@ void SpotRecognitionDlg::OnKeyDownGenericdisplayctrl(short FAR* KeyCode, short S
 	{
 		bool bHandled = handleShortCutKeys((long)*KeyCode);
 		// TODO: Add your control notification handler code here
-		if (!bHandled && m_ipSRWEventHandler != NULL)
+		if (!bHandled && m_ipSRWEventHandler != __nullptr)
 		{
 			m_ipSRWEventHandler->NotifyKeyPressed(*KeyCode, Shift);
 		}
@@ -1022,7 +1022,7 @@ ISpatialStringPtr SpotRecognitionDlg::getCurrentPageText()
 	// the usual procedure related to paragraph text recognition
 	ISpatialStringPtr ipText = recognizeParagraphTextInImage(stdstrImageFile, nCurrentPageNum, 
 		nCurrentPageNum);
-	ASSERT_RESOURCE_ALLOCATION("ELI06545", ipText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06545", ipText != __nullptr);
 
 	return ipText;
 }
@@ -1099,7 +1099,7 @@ void SpotRecognitionDlg::showPTHMenu(POINT menuPos)
 		// get the text description of the PTH
 		UCLID_SPOTRECOGNITIONIRLib::IParagraphTextHandlerPtr ipPTH;
 		ipPTH = m_ipParagraphTextHandlers->At(0);
-		ASSERT_RESOURCE_ALLOCATION("ELI19193", ipPTH != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19193", ipPTH != __nullptr);
 
 		if (ipPTH->IsPTHEnabled() == VARIANT_TRUE)
 		{
@@ -1129,7 +1129,7 @@ void SpotRecognitionDlg::showPTHMenu(POINT menuPos)
 			// get the text description of the PTH
 			UCLID_SPOTRECOGNITIONIRLib::IParagraphTextHandlerPtr ipPTH;
 			ipPTH = m_ipParagraphTextHandlers->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI19194", ipPTH != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19194", ipPTH != __nullptr);
 
 			if (ipPTH->IsPTHEnabled() == VARIANT_TRUE)
 			{
@@ -1286,7 +1286,7 @@ void SpotRecognitionDlg::OnEntitySelectedGenericDisplayCtrl(long ulEntityID)
 		}
 
 		// Send out Entity Selected event (if applicable)
-		if (m_ipSRWEventHandler != NULL)
+		if (m_ipSRWEventHandler != __nullptr)
 		{
 			m_ipSRWEventHandler->NotifyEntitySelected( ulEntityID );
 		}
@@ -1323,7 +1323,7 @@ string SpotRecognitionDlg::getZoneText(IRasterZonePtr& ripZone, IProgressStatus*
 		tempImgFile.getName().c_str());	
 	
 	// ensure that the OCR engine object pointer is not NULL
-	if (m_ipOCREngine == NULL)
+	if (m_ipOCREngine == __nullptr)
 	{
 		throw UCLIDException("ELI03591", "Missing OCR engine.");
 	}
@@ -1363,7 +1363,7 @@ string SpotRecognitionDlg::getZoneText(IRasterZonePtr& ripZone, IProgressStatus*
 			get_bstr_t(tempOutFile.getName()), 1, -1, kNoFilter, "", 
 			UCLID_RASTERANDOCRMGMTLib::kRegistry, VARIANT_TRUE, pProgressStatus);
 	}
-	ASSERT_RESOURCE_ALLOCATION("ELI06503", ipText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06503", ipText != __nullptr);
 
 	strRecognizedText = ipText->String;
 
@@ -1391,7 +1391,7 @@ string SpotRecognitionDlg::getBestTextAroundZone(IRasterZonePtr& ripZone, IProgr
 	
 	// if a line text evaluator has been defined, then
 	// do the automatic line text evaluation at multiple angles
-	bool bEvaluatorExists = m_ipLineTextEvaluator != NULL;
+	bool bEvaluatorExists = m_ipLineTextEvaluator != __nullptr;
 	if (bEvaluatorExists)
 	{
 		const int iStepSize = ma_pSRIRCfgMgr->getAutoRotateStepSize();
@@ -1403,7 +1403,7 @@ string SpotRecognitionDlg::getBestTextAroundZone(IRasterZonePtr& ripZone, IProgr
 			{
 				long lAngle;
 				IRasterZonePtr ipTempZone(CLSID_RasterZone);
-				ASSERT_RESOURCE_ALLOCATION("ELI03447", ipTempZone != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI03447", ipTempZone != __nullptr);
 
 				long lTextScore;
 				string strRecognizedText;
@@ -1485,7 +1485,7 @@ void SpotRecognitionDlg::OnZoneEntityMovedGenericDisplayCtrl(long ulEntityID)
 	try
 	{
 		// Send move event
-		if (m_ipSRWEventHandler != NULL)
+		if (m_ipSRWEventHandler != __nullptr)
 		{
 			m_ipSRWEventHandler->NotifyZoneEntityMoved(ulEntityID);
 		}
@@ -1498,7 +1498,7 @@ void SpotRecognitionDlg::OnZoneEntitiesCreatedGenericDisplayCtrl(IUnknown* pZone
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	IVariantVectorPtr ipZoneIDs(pZoneIDs);
-	ASSERT_RESOURCE_ALLOCATION("ELI23764", ipZoneIDs != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI23764", ipZoneIDs != __nullptr);
 
 	try
 	{
@@ -1519,7 +1519,7 @@ void SpotRecognitionDlg::OnZoneEntitiesCreatedGenericDisplayCtrl(IUnknown* pZone
 
 					// send out event (if applicable) to notify that we are about to
 					// recognize line text
-					if (m_ipSRWEventHandler != NULL)
+					if (m_ipSRWEventHandler != __nullptr)
 					{
 						m_ipSRWEventHandler->AboutToRecognizeLineText();
 					}
@@ -1629,7 +1629,7 @@ void SpotRecognitionDlg::OnZoneEntitiesCreatedGenericDisplayCtrl(IUnknown* pZone
 			}
 
 			// Send create event
-			if (m_ipSRWEventHandler != NULL)
+			if (m_ipSRWEventHandler != __nullptr)
 			{
 				m_ipSRWEventHandler->NotifyZoneEntitiesCreated(ipZoneIDs);
 			}
@@ -1690,7 +1690,7 @@ void SpotRecognitionDlg::OnClose()
 		// object
 		if (m_apCurrentDragOperation.get())
 		{
-			m_apCurrentDragOperation.reset(NULL);
+			m_apCurrentDragOperation.reset(__nullptr);
 		}
 
 		// remember current zone height
@@ -1704,7 +1704,7 @@ void SpotRecognitionDlg::OnClose()
 		// Allow the m_ipSubImageHandler to handle the pending destruction to ensure child
 		// subImage windows to ipReceiver are cleaned up to prevent memory leaks or a crash on
 		// close.
-		if (m_ipSubImageHandler != NULL)
+		if (m_ipSubImageHandler != __nullptr)
 		{
 			m_ipSubImageHandler->NotifyAboutToDestroy(ipReceiver);
 		}
@@ -1713,7 +1713,7 @@ void SpotRecognitionDlg::OnClose()
 		// telling it that the user wants to close the window.  Do not actually close the IR window
 		// the Window will automatically disappear when this dialog object is destructed by the 
 		// owning ATL object.
-		if (m_ipEventHandler != NULL)
+		if (m_ipEventHandler != __nullptr)
 		{
 			m_ipEventHandler->NotifyAboutToDestroy(ipReceiver);
 		}
@@ -1730,7 +1730,7 @@ void SpotRecognitionDlg::OnSelectMRUPopupMenu(UINT nID)
 		if (nID >= ID_MRU_FILE1 && nID <= ID_MRU_FILE8)
 		{
 			// Notify observers of the SpotRecognitionDlg that we want to open a file
-			if (m_ipSRWEventHandler != NULL)
+			if (m_ipSRWEventHandler != __nullptr)
 			{
 				VARIANT_BOOL	vbAllowOpen;
 				vbAllowOpen = m_ipSRWEventHandler->NotifyOpenToolbarButtonPressed();
@@ -1925,7 +1925,7 @@ void SpotRecognitionDlg::OnDestroy()
 	// object
 	if (m_apCurrentDragOperation.get())
 	{
-		m_apCurrentDragOperation.reset(NULL);
+		m_apCurrentDragOperation.reset(__nullptr);
 	}
 
 	CDialog::OnDestroy();
@@ -2034,7 +2034,7 @@ void SpotRecognitionDlg::OnDropFiles(HDROP hDropInfo)
 	try
 	{
 		// Notify observers of the SpotRecognitionDlg that we want to open a file
-		if (m_ipSRWEventHandler != NULL)
+		if (m_ipSRWEventHandler != __nullptr)
 		{
 			VARIANT_BOOL	vbAllowOpen;
 			vbAllowOpen = m_ipSRWEventHandler->NotifyOpenToolbarButtonPressed();

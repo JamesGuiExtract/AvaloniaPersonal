@@ -272,7 +272,7 @@ STDMETHODIMP CStringPair::CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_COMUTILSLib::IStringPairPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08316", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08316", ipSource != __nullptr);
 
 		_bstr_t bstrKey;
 		_bstr_t bstrValue;
@@ -299,7 +299,7 @@ STDMETHODIMP CStringPair::Clone(IUnknown* *pObject)
 
 		// create a new variant vector
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy(CLSID_StringPair);
-		ASSERT_RESOURCE_ALLOCATION("ELI08375", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08375", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

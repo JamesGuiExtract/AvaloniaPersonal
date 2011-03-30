@@ -79,10 +79,10 @@ void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* p
 							 bool bRandomFileName)
 {
 	string strSuffix = ".tmp";
-	string strPrefix = (pszPrefix != NULL ? pszPrefix : "");
+	string strPrefix = (pszPrefix != __nullptr ? pszPrefix : "");
 
 	// check for NULL suffix
-	if (pszSuffix != NULL)
+	if (pszSuffix != __nullptr)
 	{
 		strSuffix = pszSuffix;
 		makeLowerCase(strSuffix);
@@ -129,9 +129,9 @@ void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* p
 	// Modified as per [LegacyRCAndUtils #4975] changed to use a global named
 	// mutex rather than a static mutex which is only thread safe for a specific
 	// process.  This should make this thread safe system wide. - JDS - 10/03/2008
-	auto_ptr<CMutex> pMutex;
+	unique_ptr<CMutex> pMutex;
 	pMutex.reset(getGlobalNamedMutex(gmutMUTEX_NAME));
-	ASSERT_RESOURCE_ALLOCATION("ELI29992", pMutex.get() != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI29992", pMutex.get() != __nullptr);
 
 	CSingleLock lock(pMutex.get(), TRUE);
 

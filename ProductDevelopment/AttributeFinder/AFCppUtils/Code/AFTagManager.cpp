@@ -23,7 +23,7 @@ const std::string AFTagManager::displayTagsForSelection(CWnd* pWnd, long nLeft, 
 {
 	//add the functions
 	IAFUtilityPtr ipAFUtils(CLSID_AFUtility);
-	ASSERT_RESOURCE_ALLOCATION("ELI11999", ipAFUtils != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI11999", ipAFUtils != __nullptr);
 	
 	vector<string> vecChoices;
 	int i;
@@ -81,7 +81,7 @@ const std::string AFTagManager::expandTagsAndFunctions(const std::string& strTex
 IAFUtilityPtr AFTagManager::getAFUtility()
 {
 	IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
-	ASSERT_RESOURCE_ALLOCATION("ELI12004", ipAFUtility != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12004", ipAFUtility != __nullptr);
 	return ipAFUtility;
 	
 }

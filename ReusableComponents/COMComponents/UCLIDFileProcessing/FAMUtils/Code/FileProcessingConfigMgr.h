@@ -126,8 +126,8 @@ private:
 	static const int DLG_MIN_WIDTH;
 	static const int DLG_MIN_HEIGHT;
 
-	auto_ptr<RegistryPersistenceMgr> m_apHKLM;
-	auto_ptr<RegistryPersistenceMgr> m_apHKCU;
+	unique_ptr<RegistryPersistenceMgr> m_apHKLM;
+	unique_ptr<RegistryPersistenceMgr> m_apHKCU;
 
 	// Method for lazy instantiation of the HKLM registry persistence manager
 	RegistryPersistenceMgr* getHKLM();

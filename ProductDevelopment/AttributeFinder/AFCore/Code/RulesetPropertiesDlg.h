@@ -18,7 +18,7 @@ class CRuleSetPropertiesDlg : public CDialog
 public:
 	// PROMISE: The properties of ipRuleSet will be modified as specified by the
 	//			user ONLY if the user clicks the OK button to dismiss the dialog.
-	CRuleSetPropertiesDlg(UCLID_AFCORELib::IRuleSetPtr ipRuleSet, CWnd* pParent = NULL);   // standard constructor
+	CRuleSetPropertiesDlg(UCLID_AFCORELib::IRuleSetPtr ipRuleSet, CWnd* pParent = __nullptr);   // standard constructor
 
 // Dialog Data
 	enum { IDD = IDD_RULESET_PROPERTIES_DLG };

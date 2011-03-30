@@ -55,7 +55,7 @@ CVisualStylesXP::~CVisualStylesXP(void)
 void* CVisualStylesXP::GetProc(LPCSTR szProc, void* pfnFail)
 {
 	void* pRet = pfnFail;
-	if (m_hThemeDll != NULL)
+	if (m_hThemeDll != __nullptr)
 		pRet = GetProcAddress(m_hThemeDll, szProc);
 	return pRet;
 }

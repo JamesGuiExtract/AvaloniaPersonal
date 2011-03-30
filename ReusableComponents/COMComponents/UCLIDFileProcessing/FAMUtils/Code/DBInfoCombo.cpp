@@ -41,7 +41,7 @@ void DBInfoCombo::setSQLServer(const std::string strServer)
 		m_strServer = strServer;
 
 		// Only reset content if the window handle is not null
-		if ( m_hWnd != NULL )
+		if ( m_hWnd != __nullptr )
 		{
 			// Reset the items in the list
 			ResetContent();

@@ -144,7 +144,7 @@ int CCpuUsage::GetCpuUsage(DWORD dwProcessID, LPCTSTR pProcessName, bool bTotal)
 	LARGE_INTEGER	NewPerfTime100nSec = {0};
 
 	// check process name, if NULL then get data for specified PID
-	if (pProcessName != NULL)
+	if (pProcessName != __nullptr)
 	{
 		// initialize the instance string to empty string
 		char szInstance[256] = {0};

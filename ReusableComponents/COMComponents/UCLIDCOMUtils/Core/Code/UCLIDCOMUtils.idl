@@ -116,7 +116,7 @@ library UCLID_COMUTILSLib
 	]
 	interface ISortCompare : IDispatch
 	{
-		// REQUIRE: pObj1 != NULL and pObj2 != NULL
+		// REQUIRE: pObj1 != __nullptr and pObj2 != __nullptr
 		// PROMISE: This method will return VARIANT_TRUE if pObj1 is LessThan pObj2
 		//			where the meaning of LessThan is defined by the implementation of
 		//			this method
@@ -989,7 +989,7 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To return Enabled state of the specified ObjectWithDescription object in the 
 		//			specified IUnknownVector
-		// REQUIRE: pVector != NULL.
+		// REQUIRE: pVector != __nullptr.
 		//			0 <= nItemIndex < pVector->Size()
 		//			pVector->At( nItemIndex ) implements IObjectWithDescription
 		// PROMISE: Returns VARIANT_TRUE if the specified ObjectWithDescription is Enabled, 
@@ -999,7 +999,7 @@ library UCLID_COMUTILSLib
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set the Enabled state of the specified ObjectWithDescription object in the 
 		//			specified IUnknownVector
-		// REQUIRE: pVector != NULL.
+		// REQUIRE: pVector != __nullptr.
 		//			0 <= nItemIndex < pVector->Size()
 		//			pVector->At( nItemIndex ) implements IObjectWithDescription
 		// PROMISE: The Enabled state of the specified ObjectWithDescription = bEnabled.
@@ -1335,7 +1335,7 @@ library UCLID_COMUTILSLib
 			[out, retval] double *pVal);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: If SubProgressStatus == NULL, then this method does not do anything.
-		//			If SubProgressStatus != NULL, then this method will perform 4 operations on the
+		//			If SubProgressStatus != __nullptr, then this method will perform 4 operations on the
 		//			SubProgressStatus object:
 		//				(1) set the NumItemsTotal to 1
 		//				(2) set the NumItemsCompleted to 0

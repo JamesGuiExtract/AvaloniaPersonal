@@ -78,10 +78,10 @@ STDMETHODIMP CLegalDescriptionFinder::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		validateLicense();
 
 		// Check Block Finder
-		if (m_ipBlockFinder == NULL)
+		if (m_ipBlockFinder == __nullptr)
 		{
 			m_ipBlockFinder.CreateInstance( CLSID_BlockFinder );
-			ASSERT_RESOURCE_ALLOCATION("ELI12422", m_ipBlockFinder != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI12422", m_ipBlockFinder != __nullptr);
 
 			// clues to search in input text
 			IVariantVectorPtr ipClues(CLSID_VariantVector);
@@ -133,7 +133,7 @@ STDMETHODIMP CLegalDescriptionFinder::raw_ParseText(IAFDocument* pAFDoc, IProgre
 		IIUnknownVectorPtr ipAttributes(NULL);
 
 		IAttributeFindingRulePtr ipAttFinder(m_ipBlockFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI08064", ipAttFinder != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08064", ipAttFinder != __nullptr);
 		
 		// find the legal description blocks
 		ipAttributes = ipAttFinder->ParseText(ipAFDoc, NULL);
@@ -156,7 +156,7 @@ STDMETHODIMP CLegalDescriptionFinder::raw_GetComponentDescription(BSTR * pstrCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19580", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19580", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Legal description finder").Detach();
 	}
@@ -221,7 +221,7 @@ STDMETHODIMP CLegalDescriptionFinder::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_LegalDescriptionFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI08345", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08345", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -351,11 +351,11 @@ void CLegalDescriptionFinder::combineNearbyAttributes(ISpatialStringPtr ipOrigin
 	{
 		// Retrieve this Attribute
 		IAttributePtr ipAttr = ipAttributes->At(ul);
-		ASSERT_RESOURCE_ALLOCATION("ELI15598", ipAttr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15598", ipAttr != __nullptr);
 
 		// Retrieve the Value as a string
 		ISpatialStringPtr ipValue = ipAttr->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI15599", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15599", ipValue != __nullptr);
 
 		string strValue = ipValue->String;
 		Position position;

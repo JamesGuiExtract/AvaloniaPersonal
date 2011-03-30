@@ -60,14 +60,14 @@ string getEncryptedString(const string& strInput)
 EmailSettingsDlg::EmailSettingsDlg(ESMESSAGEUTILSLib::IEmailSettingsPtr ipEmailSettings, CWnd* pParent /*=NULL*/)
 	: CDialog(EmailSettingsDlg::IDD, pParent), m_ipEmailSettings(ipEmailSettings)
 {
-	ASSERT_ARGUMENT("ELI12279", ipEmailSettings != NULL );
+	ASSERT_ARGUMENT("ELI12279", ipEmailSettings != __nullptr );
 }
 //-------------------------------------------------------------------------------------------------
 EmailSettingsDlg::~EmailSettingsDlg()
 {
 	try
 	{
-		m_ipEmailSettings = NULL;
+		m_ipEmailSettings = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25194");
 }
@@ -189,14 +189,14 @@ void EmailSettingsDlg::OnBnClickedButtonSendTestEmail()
 
 			// Create EmailSettings object
 			ESMESSAGEUTILSLib::IEmailSettingsPtr ipEmailSettings(CLSID_EmailSettings);
-			ASSERT_RESOURCE_ALLOCATION("ELI25193", ipEmailSettings != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25193", ipEmailSettings != __nullptr);
 
 			// Get the settings from the controls
 			getSettingsFromDialog(ipEmailSettings);
 		
 			// Create a new message
 			ESMESSAGEUTILSLib::IESMessagePtr ipMessage(CLSID_ESMessage);
-			ASSERT_RESOURCE_ALLOCATION("ELI25190", ipMessage != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25190", ipMessage != __nullptr);
 
 			// Set the message settings
 			ipMessage->EmailSettings = ipEmailSettings;
@@ -239,7 +239,7 @@ void EmailSettingsDlg::getSettingsFromDialog(ESMESSAGEUTILSLib::IEmailSettingsPt
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI25204", ipEmailSettings != NULL);
+		ASSERT_ARGUMENT("ELI25204", ipEmailSettings != __nullptr);
 
 		CString szSMTPServer;
 		CString szUserName;
@@ -312,7 +312,7 @@ IVariantVectorPtr EmailSettingsDlg::parseRecipientAddress(const string &strEmail
 
 	// Put recipient on list of Recipients
 	IVariantVectorPtr ipRecipients(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI12605", ipRecipients != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI12605", ipRecipients != __nullptr );
 
 	// Put addresses in return VariantVector
 	int nSize = vecAddresses.size();

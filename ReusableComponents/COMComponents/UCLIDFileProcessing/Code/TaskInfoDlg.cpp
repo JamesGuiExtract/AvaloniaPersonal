@@ -25,7 +25,7 @@ static const int FIRST_COLUMN_WIDTH = 70;
 //-------------------------------------------------------------------------------------------------
 TaskInfoDlg::TaskInfoDlg(CWnd* pParent /*=NULL*/)
 : CDialog(TaskInfoDlg::IDD, pParent),
-  m_apUCLIDException(NULL),
+  m_apUCLIDException(__nullptr),
   m_bInitialized(false)
 {
 	// this is a modeless dialog box;
@@ -61,7 +61,7 @@ void TaskInfoDlg::setTask(const FileProcessingRecord& task)
 		}
 		else
 		{
-			m_apUCLIDException.reset(NULL);
+			m_apUCLIDException.reset(__nullptr);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09058")
@@ -174,13 +174,13 @@ void TaskInfoDlg::OnDblclkListDetail(NMHDR* pNMHDR, LRESULT* pResult)
 		// get current selected item
 		int nIndex = -1;
 		POSITION pos = m_listDetails.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			nIndex = m_listDetails.GetNextSelectedItem(pos);
 		}
 		
-		if (nIndex == EXCEPTION_ROW && m_apUCLIDException.get() != NULL)
+		if (nIndex == EXCEPTION_ROW && m_apUCLIDException.get() != __nullptr)
 		{
 			// display the exception if any
 			m_apUCLIDException->display();

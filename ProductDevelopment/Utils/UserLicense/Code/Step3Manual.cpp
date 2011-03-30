@@ -27,7 +27,7 @@ CStep3Manual::CStep3Manual(CLicenseRequest &licenseRequest)
 {
 	try
 	{
-		m_apClipboardManager = auto_ptr<ClipboardManager>(new ClipboardManager(this));
+		m_apClipboardManager.reset(new ClipboardManager(this));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23354");
 }

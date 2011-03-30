@@ -76,10 +76,10 @@ BOOL CEmailFileApp::InitInstance()
 
 			// Email Settings
 			IEmailSettingsPtr ipEmailSettings(CLSID_EmailSettings);
-			ASSERT_RESOURCE_ALLOCATION("ELI12601", ipEmailSettings != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI12601", ipEmailSettings != __nullptr );
 
 			IObjectSettingsPtr ipSettings = ipEmailSettings;
-			ASSERT_RESOURCE_ALLOCATION("ELI12602", ipSettings != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI12602", ipSettings != __nullptr );
 
 			ipSettings->LoadFromRegistry( gstrEMAIL_REG_PATH.c_str() );
 
@@ -89,7 +89,7 @@ BOOL CEmailFileApp::InitInstance()
 			{
 				// Get the UI Pointer
 				IObjectUserInterfacePtr ipUI = ipEmailSettings;
-				ASSERT_RESOURCE_ALLOCATION("ELI12606", ipUI != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI12606", ipUI != __nullptr );
 
 				ipUI->DisplayReadWrite();
 
@@ -105,13 +105,13 @@ BOOL CEmailFileApp::InitInstance()
 
 			// Email Message 
 			IESMessagePtr ipMessage(CLSID_ESMessage);
-			ASSERT_RESOURCE_ALLOCATION("ELI12603", ipMessage != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI12603", ipMessage != __nullptr );
 
 			ipMessage->EmailSettings = ipEmailSettings;
 
 			// Put file to send on list of files to be sent
 			IVariantVectorPtr ipFiles(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI12604", ipFiles != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI12604", ipFiles != __nullptr );
 			if (m_bZipFile)
 			{
 				strZipFileName = m_strFileToEmail + ".zip";
@@ -329,7 +329,7 @@ IVariantVectorPtr CEmailFileApp::parseRecipientAddress()
 {
 	// Put recipient on list of Recipients
 	IVariantVectorPtr ipRecipients(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI25348", ipRecipients != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI25348", ipRecipients != __nullptr );
 
 	// Parse the email address for ,; separated email addresses
 	int iStart = 0;

@@ -171,7 +171,7 @@ STDMETHODIMP CRedactionVerificationUI::put_OutputImageName(BSTR newVal)
 
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI24871", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24871", ipFAMTagManager != __nullptr);
 
 		// Make sure the file name contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strFileName.c_str()) == VARIANT_TRUE)
@@ -249,7 +249,7 @@ STDMETHODIMP CRedactionVerificationUI::put_MetaOutputName(BSTR newVal)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI15036", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15036", ipFAMTagManager != __nullptr);
 
 		// Make sure the file name contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strFileName.c_str()) == VARIANT_TRUE)
@@ -349,7 +349,7 @@ STDMETHODIMP CRedactionVerificationUI::get_CollectFeedback(VARIANT_BOOL* pvbColl
 		validateLicense();
 
 		// ensure the argument is non-NULL
-		ASSERT_ARGUMENT("ELI20026", pvbCollectFeedback != NULL);
+		ASSERT_ARGUMENT("ELI20026", pvbCollectFeedback != __nullptr);
 
 		// Return setting to caller
 		*pvbCollectFeedback = asVariantBool( m_UISettings.getCollectFeedback() );
@@ -389,7 +389,7 @@ STDMETHODIMP CRedactionVerificationUI::get_FeedbackCollectOption(
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20040", peFeedbackCollectOption != NULL);
+		ASSERT_ARGUMENT("ELI20040", peFeedbackCollectOption != __nullptr);
 
 		// get the output version
 		*peFeedbackCollectOption = 
@@ -428,7 +428,7 @@ STDMETHODIMP CRedactionVerificationUI::get_FeedbackDataFolder(BSTR *pbstrFeedbac
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20043", pbstrFeedbackDataFolder != NULL);
+		ASSERT_ARGUMENT("ELI20043", pbstrFeedbackDataFolder != __nullptr);
 		
 		// get the output version
 		*pbstrFeedbackDataFolder = get_bstr_t( m_UISettings.getFeedbackDataFolder() ).Detach();
@@ -465,7 +465,7 @@ STDMETHODIMP CRedactionVerificationUI::get_CollectFeedbackImage(
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20051", pvbCollectFeedbackImage != NULL);
+		ASSERT_ARGUMENT("ELI20051", pvbCollectFeedbackImage != __nullptr);
 
 		// get the output version
 		*pvbCollectFeedbackImage = asVariantBool( m_UISettings.getCollectFeedbackImage() );
@@ -503,7 +503,7 @@ STDMETHODIMP CRedactionVerificationUI::get_FeedbackOriginalFilenames(
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20048", pvbFeedbackOriginalFilenames != NULL);
+		ASSERT_ARGUMENT("ELI20048", pvbFeedbackOriginalFilenames != __nullptr);
 
 		// get the output version
 		*pvbFeedbackOriginalFilenames = 
@@ -539,7 +539,7 @@ STDMETHODIMP CRedactionVerificationUI::get_RequireRedactionTypes(
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20266", pvbRequireRedactionTypes != NULL);
+		ASSERT_ARGUMENT("ELI20266", pvbRequireRedactionTypes != __nullptr);
 
 		// Check licensing
 		validateLicense();
@@ -571,7 +571,7 @@ STDMETHODIMP CRedactionVerificationUI::get_InputDataFile(BSTR *pbstrInputDataFil
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24649", pbstrInputDataFile != NULL);
+		ASSERT_ARGUMENT("ELI24649", pbstrInputDataFile != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -603,7 +603,7 @@ STDMETHODIMP CRedactionVerificationUI::get_InputRedactedImage(VARIANT_BOOL *pvbI
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24652", pvbInputRedactedImage != NULL);
+		ASSERT_ARGUMENT("ELI24652", pvbInputRedactedImage != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -635,7 +635,7 @@ STDMETHODIMP CRedactionVerificationUI::get_RequireExemptionCodes(VARIANT_BOOL *p
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24655", pvbRequireExemptionCodes != NULL);
+		ASSERT_ARGUMENT("ELI24655", pvbRequireExemptionCodes != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -667,7 +667,7 @@ STDMETHODIMP CRedactionVerificationUI::get_RedactionText(BSTR *pbstrRedactionTex
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24658", pbstrRedactionText != NULL);
+		ASSERT_ARGUMENT("ELI24658", pbstrRedactionText != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -699,7 +699,7 @@ STDMETHODIMP CRedactionVerificationUI::get_BorderColor(long *plBorderColor)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24661", plBorderColor != NULL);
+		ASSERT_ARGUMENT("ELI24661", plBorderColor != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -731,7 +731,7 @@ STDMETHODIMP CRedactionVerificationUI::get_FillColor(long *plFillColor)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24664", plFillColor != NULL);
+		ASSERT_ARGUMENT("ELI24664", plFillColor != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -763,7 +763,7 @@ STDMETHODIMP CRedactionVerificationUI::get_FontName(BSTR *pbstrFontName)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24667", pbstrFontName != NULL);
+		ASSERT_ARGUMENT("ELI24667", pbstrFontName != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -802,7 +802,7 @@ STDMETHODIMP CRedactionVerificationUI::get_IsBold(VARIANT_BOOL *pvbBold)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24670", pvbBold != NULL);
+		ASSERT_ARGUMENT("ELI24670", pvbBold != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -841,7 +841,7 @@ STDMETHODIMP CRedactionVerificationUI::get_IsItalic(VARIANT_BOOL *pvbItalic)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24673", pvbItalic != NULL);
+		ASSERT_ARGUMENT("ELI24673", pvbItalic != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -880,7 +880,7 @@ STDMETHODIMP CRedactionVerificationUI::get_FontSize(long *plFontSize)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24676", plFontSize != NULL);
+		ASSERT_ARGUMENT("ELI24676", plFontSize != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -916,7 +916,7 @@ STDMETHODIMP CRedactionVerificationUI::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT( "ELI18329", pbValue != NULL );
+		ASSERT_ARGUMENT( "ELI18329", pbValue != __nullptr );
 
 		try
 		{
@@ -1042,7 +1042,7 @@ STDMETHODIMP CRedactionVerificationUI::raw_Clone(IUnknown * * pObject)
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy( CLSID_RedactionVerificationUI );
-		ASSERT_RESOURCE_ALLOCATION( "ELI11285", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI11285", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk(this);
 		ipObjCopy->CopyFrom(ipUnk);
@@ -1065,7 +1065,7 @@ STDMETHODIMP CRedactionVerificationUI::raw_CopyFrom(IUnknown * pObject)
 		validateLicense();
 
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IRedactionVerificationUIPtr ipSource( pObject );
-		ASSERT_RESOURCE_ALLOCATION( "ELI11287", ipSource != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI11287", ipSource != __nullptr );
 
 		m_UISettings.setReviewAllPages( ipSource->ReviewAllPages == VARIANT_TRUE );
 

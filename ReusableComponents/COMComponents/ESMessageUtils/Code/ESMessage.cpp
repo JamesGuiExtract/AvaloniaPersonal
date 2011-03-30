@@ -51,10 +51,10 @@ CESMessage::CESMessage()
 	try
 	{
 		m_ipFileAttachments.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI12424", m_ipFileAttachments != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12424", m_ipFileAttachments != __nullptr);
 
 		m_ipRecipients.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI12425", m_ipRecipients != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12425", m_ipRecipients != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI12423")
 }
@@ -271,7 +271,7 @@ STDMETHODIMP CESMessage::put_EmailSettings(IEmailSettings * newVal)
 	{
 		CSingleLock slg(&ms_mutex, TRUE );
 		m_ipEmailSettings = newVal;
-		m_ipltSMTP = NULL;
+		m_ipltSMTP = __nullptr;
 
 		return S_OK;
 	}
@@ -453,12 +453,12 @@ STDMETHODIMP CESMessage::Clear()
 ILEADSmtpPtr CESMessage::getLtSMTP()
 {
 	CSingleLock slg(&ms_mutex, TRUE );
-	if ( m_ipltSMTP == NULL )
+	if ( m_ipltSMTP == __nullptr )
 	{
 		m_ipltSMTP.CreateInstance(__uuidof(LEADSmtp));
-		ASSERT_RESOURCE_ALLOCATION("ELI12362", m_ipltSMTP != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI12362", m_ipltSMTP != __nullptr );
 
-		if ( m_ipEmailSettings == NULL )
+		if ( m_ipEmailSettings == __nullptr )
 		{
 			UCLIDException ue("ELI12363", "Invalid Email Settings." );
 			throw ue;

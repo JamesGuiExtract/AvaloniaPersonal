@@ -248,7 +248,7 @@ void AdvancedTaskSettingsDlg::OnBnClickedButtonSetSchedule()
 
 		// Get the set schedule COM object
 		UCLID_FILEPROCESSINGLib::ISetProcessingSchedulePtr ipSet(gstrSET_SCHEDULE_PROG_ID.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI32129", ipSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI32129", ipSet != __nullptr);
 
 		// Prompt the user to set the new schedule
 		IVariantVectorPtr ipSchedule = ipSet->PromptForSchedule(m_ipSchedule);

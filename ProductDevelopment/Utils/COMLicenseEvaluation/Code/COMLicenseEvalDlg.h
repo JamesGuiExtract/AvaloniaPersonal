@@ -98,7 +98,7 @@ protected:
 
 #ifdef _DEBUG
 	// Handles Registry items
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
 #endif
 
 private:

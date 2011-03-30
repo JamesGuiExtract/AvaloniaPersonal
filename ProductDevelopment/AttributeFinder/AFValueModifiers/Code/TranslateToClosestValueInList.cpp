@@ -83,10 +83,10 @@ STDMETHODIMP CTranslateToClosestValueInList::raw_ModifyValue(IAttribute* pAttrib
 		validateLicense();
 		
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09294", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09294", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->GetValue();
-		ASSERT_RESOURCE_ALLOCATION("ELI06642", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06642", ipInputText != __nullptr);
 
 		LevenshteinDistance editDistance;
 		editDistance.SetFlags(false, m_bCaseSensitive);
@@ -94,7 +94,7 @@ STDMETHODIMP CTranslateToClosestValueInList::raw_ModifyValue(IAttribute* pAttrib
 		// Get a list of values that includes values from any specified files.
 		IVariantVectorPtr ipExpandedValuesList =
 				m_cachedListLoader.expandList(m_ipClosestValuesList, pOriginInput);
-			ASSERT_RESOURCE_ALLOCATION("ELI30069", ipExpandedValuesList != NULL)
+			ASSERT_RESOURCE_ALLOCATION("ELI30069", ipExpandedValuesList != __nullptr)
 		
 		string strInput = asString(ipInputText->String);
 		string strToMatch = asString(ipExpandedValuesList->GetItem(0).bstrVal);
@@ -150,7 +150,7 @@ STDMETHODIMP CTranslateToClosestValueInList::raw_GetComponentDescription(BSTR * 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19607", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19607", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Translate to closest value in list").Detach();
 	}
@@ -217,9 +217,6 @@ STDMETHODIMP CTranslateToClosestValueInList::put_ClosestValueList(IVariantVector
 	try
 	{
 		validateLicense();
-
-		// set old object to null
-		if (m_ipClosestValuesList != NULL) m_ipClosestValuesList = NULL;
 
 		m_ipClosestValuesList = newVal;
 
@@ -343,7 +340,7 @@ STDMETHODIMP CTranslateToClosestValueInList::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::ITranslateToClosestValueInListPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08289", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08289", ipSource != __nullptr);
 		
 		// Copy list of strings
 		ICopyableObjectPtr ipCopyObj = ipSource->ClosestValueList;
@@ -373,7 +370,7 @@ STDMETHODIMP CTranslateToClosestValueInList::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_TranslateToClosestValueInList);
-		ASSERT_RESOURCE_ALLOCATION("ELI08362", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08362", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -495,7 +492,7 @@ STDMETHODIMP CTranslateToClosestValueInList::Load(IStream *pStream)
 
 		// Clear the variables first
 		m_bCaseSensitive = false;
-		m_ipClosestValuesList = NULL;
+		m_ipClosestValuesList = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -532,7 +529,7 @@ STDMETHODIMP CTranslateToClosestValueInList::Load(IStream *pStream)
 		// Separately read in the closest value list
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI09971");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04720", 
 				"Closest value list could not be read from stream!" );
@@ -574,7 +571,7 @@ STDMETHODIMP CTranslateToClosestValueInList::Save(IStream *pStream, BOOL fClearD
 
 		// Separately write the Closest Values list to the IStream object
 		IPersistStreamPtr ipObj( m_ipClosestValuesList );
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04721", 
 				"Closest value list object does not support persistence!" );

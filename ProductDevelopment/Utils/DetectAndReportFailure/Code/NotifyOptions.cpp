@@ -16,9 +16,8 @@ NotifyOptions::NotifyOptions()
 	try
 	{
 		// initialize the INI file persistence manager
-		m_apSettings = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-			new INIFilePersistenceMgr(getINIFileName()));
-		ASSERT_RESOURCE_ALLOCATION("ELI12374", m_apSettings.get() != NULL);
+		m_apSettings.reset(new INIFilePersistenceMgr(getINIFileName()));
+		ASSERT_RESOURCE_ALLOCATION("ELI12374", m_apSettings.get() != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI12433")
 }

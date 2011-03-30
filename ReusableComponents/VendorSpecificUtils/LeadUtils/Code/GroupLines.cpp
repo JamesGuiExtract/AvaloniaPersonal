@@ -53,8 +53,8 @@ LeadToolsLineGroup::LeadToolsLineGroup() :
 	m_nColumnSpacing(gnDEFAULT_MAX_COLUMN_SPACING / 2),
 	m_nLineMinimum(0),
 	m_bIsFourSidedBox(false),
-	m_apSubLineGroup(NULL),
-	m_apSubColumnGroup(NULL),
+	m_apSubLineGroup(__nullptr),
+	m_apSubColumnGroup(__nullptr),
 	m_LineRect(true),
 	m_Rect(true),
 	m_nLineTopOrLeftEndId(gnUNSPECIFIED),
@@ -93,8 +93,8 @@ LeadToolsLineGroup::LeadToolsLineGroup(LineRect rectLine, const Settings &settin
 	m_bIsFourSidedBox(false),
 	m_nLineTopOrLeftEndId(gnUNSPECIFIED),
 	m_nLineBottomOrRightEndId(gnUNSPECIFIED),
-	m_apSubLineGroup(NULL),
-	m_apSubColumnGroup(NULL),
+	m_apSubLineGroup(__nullptr),
+	m_apSubColumnGroup(__nullptr),
 	m_Settings(settings)
 {
 }
@@ -110,24 +110,24 @@ LeadToolsLineGroup::LeadToolsLineGroup(const LeadToolsLineGroup &group) :
 	m_bIsFourSidedBox(false),
 	m_nLineTopOrLeftEndId(group.m_nLineTopOrLeftEndId),
 	m_nLineBottomOrRightEndId(group.m_nLineBottomOrRightEndId),
-	m_apSubLineGroup(NULL),
-	m_apSubColumnGroup(NULL),
+	m_apSubLineGroup(__nullptr),
+	m_apSubColumnGroup(__nullptr),
 	m_Settings(group.m_Settings)
 {
 	// Settings copied from source group
 
 	// Create a copy of the sub-line group if it exists
-	if (group.m_apSubLineGroup.get() != NULL)
+	if (group.m_apSubLineGroup.get() != __nullptr)
 	{
 		m_apSubLineGroup = 
-			auto_ptr<LeadToolsLineGroup>(new LeadToolsLineGroup(*group.m_apSubLineGroup));
+			unique_ptr<LeadToolsLineGroup>(new LeadToolsLineGroup(*group.m_apSubLineGroup));
 	}
 
 	// Create a copy of the sub-column group if it exists
-	if (group.m_apSubColumnGroup.get() != NULL)
+	if (group.m_apSubColumnGroup.get() != __nullptr)
 	{
 		m_apSubColumnGroup = 
-			auto_ptr<LeadToolsLineGroup>(new LeadToolsLineGroup(*group.m_apSubColumnGroup));
+			unique_ptr<LeadToolsLineGroup>(new LeadToolsLineGroup(*group.m_apSubColumnGroup));
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -146,11 +146,11 @@ LeadToolsLineGroup& LeadToolsLineGroup::operator =(LeadToolsLineGroup &group)
 
 	m_Settings			= group.m_Settings;
 
-	if (group.m_apSubLineGroup.get() != NULL)
+	if (group.m_apSubLineGroup.get() != __nullptr)
 	{
 		// Create a copy of the sub-line group if it exists
 		m_apSubLineGroup = 
-			auto_ptr<LeadToolsLineGroup>(new LeadToolsLineGroup(*group.m_apSubLineGroup));
+			unique_ptr<LeadToolsLineGroup>(new LeadToolsLineGroup(*group.m_apSubLineGroup));
 	}
 	else
 	{
@@ -158,11 +158,11 @@ LeadToolsLineGroup& LeadToolsLineGroup::operator =(LeadToolsLineGroup &group)
 		m_apSubLineGroup.reset();
 	}
 
-	if (group.m_apSubColumnGroup.get() != NULL)
+	if (group.m_apSubColumnGroup.get() != __nullptr)
 	{
 		// Create a copy of the sub-column group if it exists
 		m_apSubColumnGroup = 
-			auto_ptr<LeadToolsLineGroup>(new LeadToolsLineGroup(*group.m_apSubColumnGroup));
+			unique_ptr<LeadToolsLineGroup>(new LeadToolsLineGroup(*group.m_apSubColumnGroup));
 	}
 	else
 	{
@@ -234,7 +234,7 @@ bool LeadToolsLineGroup::groupLines(vector<LineRect> &rvecLineRects,
 
 		rvecGroupRects.push_back(rect);
 
-		if (pvecSubLineRects != NULL)
+		if (pvecSubLineRects != __nullptr)
 		{
 			// If requested, also return the lines that comprise each group
 			vector<LineRect> vecLineRects;
@@ -386,7 +386,7 @@ bool LeadToolsLineGroup::assimilateLine(LeadToolsLineGroup *pGroupCandidate,
 										bool bRequireExact/* = false*/,
 										set< pair<long, long> > *psetExistingPairs/* = NULL*/)
 {
-	ASSERT_ARGUMENT("ELI18724", pGroupCandidate != NULL);
+	ASSERT_ARGUMENT("ELI18724", pGroupCandidate != __nullptr);
 
 	// Only attempt to assimilate individual lines
 	if (pGroupCandidate->m_nLineCount > 1)
@@ -400,7 +400,7 @@ bool LeadToolsLineGroup::assimilateLine(LeadToolsLineGroup *pGroupCandidate,
 	// these two lines into a new group-- assume the new group would have been a subset of
 	// the existing group.
 	pair<long, long> pairIDs(pGroupCandidate->m_LineRect.GetID(), m_LineRect.GetID());
-	if (psetExistingPairs != NULL && m_nLineCount == 1 &&
+	if (psetExistingPairs != __nullptr && m_nLineCount == 1 &&
 		psetExistingPairs->find(pairIDs) != psetExistingPairs->end())
 	{
 			return false;
@@ -427,9 +427,9 @@ bool LeadToolsLineGroup::assimilateLine(LeadToolsLineGroup *pGroupCandidate,
 	}
 
 	// At this point, create composite group so we can execute more sophisticated checks
-	auto_ptr<LeadToolsLineGroup> apNewSubGroup(new LeadToolsLineGroup(*this));
+	unique_ptr<LeadToolsLineGroup> apNewSubGroup(new LeadToolsLineGroup(*this));
 	*this = LeadToolsLineGroup(*pGroupCandidate);
-	m_apSubLineGroup = apNewSubGroup;
+	m_apSubLineGroup = move(apNewSubGroup);
 
 	// Assign new line count
 	m_nLineCount = m_apSubLineGroup->m_nLineCount + 1;
@@ -499,7 +499,7 @@ bool LeadToolsLineGroup::assimilateLine(LeadToolsLineGroup *pGroupCandidate,
 	m_Rect.m_nLineBottomOrRightEdge = m_LineRect.LinePosition();
 
 	// If psetExistingPairs was provided, keep track of the lines that have been paired.
-	if (psetExistingPairs != NULL)
+	if (psetExistingPairs != __nullptr)
 	{
 		psetExistingPairs->insert(pairIDs);
 	}
@@ -509,7 +509,7 @@ bool LeadToolsLineGroup::assimilateLine(LeadToolsLineGroup *pGroupCandidate,
 //-------------------------------------------------------------------------------------------------
 bool LeadToolsLineGroup::assimilateColumn(LeadToolsLineGroup *pGroupCandidate)
 {
-	ASSERT_ARGUMENT("ELI19497", pGroupCandidate != NULL);
+	ASSERT_ARGUMENT("ELI19497", pGroupCandidate != __nullptr);
 
 	// Require that a "column" consist of at least 2 lines
 	if (m_nLineCount < 2)
@@ -555,9 +555,9 @@ bool LeadToolsLineGroup::assimilateColumn(LeadToolsLineGroup *pGroupCandidate)
 	int nAverageSpacing = pGroupCandidate->getAverageSpacing();
 
 	// At this point, create composite group so we can execute more sophisticated checks
-	auto_ptr<LeadToolsLineGroup> apNewSubGroup(new LeadToolsLineGroup(*this));
+	unique_ptr<LeadToolsLineGroup> apNewSubGroup(new LeadToolsLineGroup(*this));
 	*this = LeadToolsLineGroup(*pGroupCandidate);
-	m_apSubColumnGroup = apNewSubGroup;
+	m_apSubColumnGroup = move(apNewSubGroup);
 	m_nColumnCount = m_apSubColumnGroup->m_nColumnCount + 1;
 
 	// Obtain the space between columns
@@ -672,7 +672,7 @@ int LeadToolsLineGroup::scoreAlignment(int nTopOrLeftEnd, int nBottomOrRightEnd)
 	int nNewTopOrLeftEndId = gnUNSPECIFIED;
 	int nNewBottomOrRightEndId = gnUNSPECIFIED;
 
-	if (m_apSubLineGroup.get() != NULL)
+	if (m_apSubLineGroup.get() != __nullptr)
 	{
 		int nSubAlignmentScore = m_apSubLineGroup->scoreAlignment(nTopOrLeftEnd, nBottomOrRightEnd);
 
@@ -767,13 +767,13 @@ bool LeadToolsLineGroup::qualified(bool bMinimally/* = false*/)
 //-------------------------------------------------------------------------------------------------
 void LeadToolsLineGroup::getLineRects(vector<LineRect> &rvecLineRects) const
 {
-	if (m_apSubColumnGroup.get() != NULL)
+	if (m_apSubColumnGroup.get() != __nullptr)
 	{
 		// Add line rects from any sub-columns
 		m_apSubColumnGroup->getLineRects(rvecLineRects);
 	}
 	
-	if (m_apSubLineGroup.get() != NULL)
+	if (m_apSubLineGroup.get() != __nullptr)
 	{
 		// Add line rects from sub groups within this column
 		m_apSubLineGroup->getLineRects(rvecLineRects);
@@ -803,7 +803,7 @@ int LeadToolsLineGroup::getTotalLineCount()
 	int nTotal = m_nLineCount;
 
 	// Combine line count for this column with sub columns
-	if (m_apSubColumnGroup.get() != NULL)
+	if (m_apSubColumnGroup.get() != __nullptr)
 	{
 		nTotal += m_apSubColumnGroup->getTotalLineCount();
 	}

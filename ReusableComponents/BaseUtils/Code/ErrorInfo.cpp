@@ -32,10 +32,10 @@ STDMETHODIMP ErrorInfo::QueryInterface(REFIID riid, void **ppv)
 	}
 	else
 	{
-		*ppv = NULL;
+		*ppv = __nullptr;
 	}
 	
-	if (*ppv != NULL)
+	if (*ppv != __nullptr)
 	{
 		static_cast<IUnknown *>(*ppv)->AddRef();
 		return S_OK;
@@ -75,7 +75,7 @@ STDMETHODIMP ErrorInfo::GetSource(/* [out] */ BSTR __RPC_FAR *pBstrSource)
     
 STDMETHODIMP ErrorInfo::GetDescription(/* [out] */ BSTR __RPC_FAR *pBstrDescription)
 {
-	*pBstrDescription = _bstr_t(m_strDescription.c_str()).copy();
+	*pBstrDescription = _bstr_t(m_strDescription.c_str()).Detach();
 	return S_OK;
 }
     

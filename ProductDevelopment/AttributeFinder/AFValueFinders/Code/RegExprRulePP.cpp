@@ -22,7 +22,7 @@ CRegExprRulePP::CRegExprRulePP()
 		validateLicense();
 
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13043", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13043", ipMiscUtils != __nullptr );
 
 		m_dwTitleID = IDS_TITLERegExprRulePP;
 		m_dwHelpFileID = IDS_HELPFILERegExprRulePP;

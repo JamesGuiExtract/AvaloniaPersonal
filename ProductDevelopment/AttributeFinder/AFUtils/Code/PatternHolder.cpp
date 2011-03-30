@@ -26,7 +26,7 @@ PatternHolder::PatternHolder()
 
 		// Create the misc utils pointer
 		m_ipMisc.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI29444", m_ipMisc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29444", m_ipMisc != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29445");
 }
@@ -51,7 +51,7 @@ PatternHolder::PatternHolder(const PatternHolder& objToCopy)
 
 		// Create the misc utils pointer
 		m_ipMisc.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI29446", m_ipMisc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29446", m_ipMisc != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29447");
 }
@@ -74,9 +74,9 @@ PatternHolder& PatternHolder::operator=(const PatternHolder& objToAssign)
 		m_strSubType = objToAssign.m_strSubType;
 
 		// Clear the misc utils pointer and create a new one
-		m_ipMisc = NULL;
+		m_ipMisc = __nullptr;
 		m_ipMisc.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI29448", m_ipMisc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29448", m_ipMisc != __nullptr);
 
 		return *this;
 	}
@@ -88,7 +88,7 @@ PatternHolder::~PatternHolder()
 	try
 	{
 		// Release the COM pointers
-		m_ipMisc = NULL;
+		m_ipMisc = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28218");
 }
@@ -100,7 +100,7 @@ bool PatternHolder::foundPatternsInText(const ISpatialStringPtr& ipInputText, Do
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI07423", ipInputText != NULL);
+		ASSERT_ARGUMENT("ELI07423", ipInputText != __nullptr);
 
 		// if there's no pattern defined, return false
 		if (m_vecPatterns.empty())
@@ -232,7 +232,7 @@ std::string PatternHolder::getInputText(const ISpatialStringPtr& ipInputText, Do
 	// The page range is not cached
 	// get input text from the specified range of pages
 	ISpatialStringPtr ipInputOnPages = ipInputText->GetRelativePages(m_nStartPage, m_nEndPage);
-	ASSERT_RESOURCE_ALLOCATION("ELI07424", ipInputOnPages != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI07424", ipInputOnPages != __nullptr);
 	strInputText = asString(ipInputOnPages->String);
 
 	// add the page range to the cache
@@ -247,7 +247,7 @@ IRegularExprParserPtr PatternHolder::getParser()
 		// Create a new parser (this object is held inside the document classifier so get
 		// the parser for the classifier)
 		IRegularExprParserPtr ipParser = m_ipMisc->GetNewRegExpParserInstance("DocumentClassifier");
-		ASSERT_RESOURCE_ALLOCATION("ELI29452", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29452", ipParser != __nullptr);
 
 		// Set the case sensitivity flag
 		ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);

@@ -141,7 +141,7 @@ private:
 	bool m_bReplaceValueText;
 
 	// Toolbar
-	auto_ptr<CToolBar> m_apToolBar;
+	unique_ptr<CToolBar> m_apToolBar;
 
 	// Manages tooltips
 	CToolTipCtrl m_ToolTipCtrl;

@@ -22,7 +22,7 @@ m_strFileNameOld(strFileNameOld)
 //-------------------------------------------------------------------------------------------------
 FolderEventsListener::FolderEventsListener() 
 {
-	ma_pCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+	ma_pCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr(HKEY_LOCAL_MACHINE, gstrBASEUTILS_REG_PATH ));
 
 }
@@ -128,7 +128,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 		// the Listener is the caller and will still be a valid pointer after the try...catch
 		// this will be used to set the thread exit event
 		fl = (FolderEventsListener *)pParam;
-		ASSERT_RESOURCE_ALLOCATION("ELI25256", fl != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25256", fl != __nullptr);
 
 		_lastCodePos = "20";
 
@@ -146,7 +146,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 		
 		// Allocate buffers for the change operations
 		lpFileBuffer = new BYTE[gulFOLDER_LISTENER_BUF_SIZE];
-		ASSERT_RESOURCE_ALLOCATION("ELI30306", lpFileBuffer != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30306", lpFileBuffer != __nullptr);
 		_lastCodePos = "70";
 
 		do
@@ -254,7 +254,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 			// Clean up
 			//Check to make sure the hFile was opened before trying to close it
 			// Cancel any pending overlapped operations
-			if (hFile != NULL)
+			if (hFile != __nullptr)
 			{
 				CancelIo( hFile );
 				_lastCodePos = "200";
@@ -279,7 +279,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 	// deallocate the file buffer
 	try
 	{
-		if (lpFileBuffer != NULL)
+		if (lpFileBuffer != __nullptr)
 		{
 			// Delete the file buffer
 			delete [] lpFileBuffer;
@@ -291,7 +291,7 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 	try
 	{
 		// this could be NULL if it was not set before starting the thread 
-		if ( fl != NULL )
+		if ( fl != __nullptr )
 		{
 			fl->m_eventListeningExited.signal();
 		}
@@ -308,7 +308,7 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 	{
 
 		FolderEventsListener* fl = (FolderEventsListener*)pParam;
-		ASSERT_RESOURCE_ALLOCATION("ELI30301", fl != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI30301", fl != __nullptr);
 
 		fl->m_eventDispatchThreadStarted.signal();
 		try
@@ -465,7 +465,7 @@ void FolderEventsListener::processChanges(string strBaseDir, Win32Event &eventKi
 			// get the name of the affected file
 			int len = WideCharToMultiByte(CP_ACP, 0, pFileInfo->FileName, pFileInfo->FileNameLength / sizeof(WCHAR), 0, 0, 0, 0);
 			LPSTR result = new char[len+1];
-			ASSERT_RESOURCE_ALLOCATION("ELI12935", result != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI12935", result != __nullptr);
 
 			try
 			{

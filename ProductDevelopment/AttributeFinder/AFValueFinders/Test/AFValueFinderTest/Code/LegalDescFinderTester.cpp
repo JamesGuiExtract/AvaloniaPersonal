@@ -102,13 +102,13 @@ STDMETHODIMP CLegalDescFinderTester::raw_RunAutomatedTests(IVariantVector* pPara
 				ISpatialStringPtr ipText;
 				ipText = ipOCREngine->RecognizeTextInImage(
 					strImageFileName.c_str(), 1, -1, kNoFilter, "", kRegistry, VARIANT_TRUE, NULL);
-				ASSERT_RESOURCE_ALLOCATION("ELI06788", ipText != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06788", ipText != __nullptr);
 				_bstr_t _bstrOutput = ipText->String;
 				
 				m_ipResultLogger->AddTestCaseMemo(_bstr_t("Recognized text"), _bstrOutput);
 				IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
 				ISpatialStringPtr ipInputText(CLSID_SpatialString);
-				ASSERT_RESOURCE_ALLOCATION("ELI25938", ipInputText != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25938", ipInputText != __nullptr);
 				ipInputText->CreateNonSpatialString(_bstrOutput, "");
 				ipAFDoc->Text = ipInputText;
 				// use legal description finder to get the legal description
@@ -120,11 +120,11 @@ STDMETHODIMP CLegalDescFinderTester::raw_RunAutomatedTests(IVariantVector* pPara
 					{
 						// Retrieve this Attribute
 						IAttributePtr ipAttr = ipLegalDescriptions->At(n);
-						ASSERT_RESOURCE_ALLOCATION("ELI15585", ipAttr != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15585", ipAttr != __nullptr);
 
 						// Retrieve the Value
 						ISpatialStringPtr ipValue = ipAttr->Value;
-						ASSERT_RESOURCE_ALLOCATION("ELI15586", ipValue != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15586", ipValue != __nullptr);
 						_bstr_t _bstrLegalDesc = ipValue->String;
 						
 						// add the found legal descriptions to the detail note
@@ -207,7 +207,7 @@ const std::string CLegalDescFinderTester::getMasterTestFileName(IVariantVectorPt
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		// get the DAT filename
 		string strMasterDatFileName = ::getAbsoluteFileName(strTCLFile, asString(_bstr_t(ipParams->GetItem(1))), true);
@@ -234,11 +234,11 @@ IOCREnginePtr CLegalDescFinderTester::getOCREngine()
 {
 	// create a new instance of the SSOCR recognition engine [P13 #2909]
 	IOCREnginePtr ipOCREngine(CLSID_ScansoftOCR);
-	ASSERT_RESOURCE_ALLOCATION("ELI16149", ipOCREngine != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16149", ipOCREngine != __nullptr);
 
 	// license the OCR engine
 	IPrivateLicensedComponentPtr ipScansoftOCREngine = ipOCREngine;
-	ASSERT_RESOURCE_ALLOCATION("ELI16150", ipScansoftOCREngine != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16150", ipScansoftOCREngine != __nullptr);
 	ipScansoftOCREngine->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
 
 	return ipOCREngine;

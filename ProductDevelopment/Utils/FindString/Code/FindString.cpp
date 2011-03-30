@@ -214,7 +214,7 @@ void FindVariableInFile(const string& strFileName, const string& strSearchString
 		{
 			// create a new spatial string
 			ISpatialStringPtr ipSS(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI20685", ipSS != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI20685", ipSS != __nullptr);
 
 			// now load the spatial string from the file
 			ipSS->LoadFrom(strFileName.c_str(), VARIANT_FALSE);
@@ -241,17 +241,17 @@ void FindVariableInFile(const string& strFileName, const string& strSearchString
 	{
 		IIUnknownVectorPtr ipMatches = 
 			ipRegExParser->Find(strFileContents.c_str(), VARIANT_FALSE, VARIANT_FALSE);
-		ASSERT_RESOURCE_ALLOCATION("ELI20687", ipMatches != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20687", ipMatches != __nullptr);
 
 		long lSize = ipMatches->Size();
 		for(long i = 0; i < lSize; i++)
 		{
 			// get the object pair from the match
 			IObjectPairPtr ipObjPair = ipMatches->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08576", ipObjPair != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08576", ipObjPair != __nullptr);
 
 			ITokenPtr ipMatch = ipObjPair->Object1;
-			ASSERT_RESOURCE_ALLOCATION("ELI08577", ipMatch != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08577", ipMatch != __nullptr);
 			vecMatches.push_back(MatchData(strFileName, asString(ipMatch->Value),
 				ipMatch->StartPosition, ipMatch->EndPosition));
 			g_ulNumMatches++;
@@ -378,14 +378,14 @@ long performSearch(string& rstrSearchString)
 		rstrSearchString = trim(rstrSearchString, "\r\n", "\r\n");
 	}
 
-	IRegularExprParserPtr ipRegExParser = NULL;
+	IRegularExprParserPtr ipRegExParser = __nullptr;
 	if(g_bUseRegExp)
 	{
 		// Get a regular expression parser.
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI22292", ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22292", ipMiscUtils != __nullptr);
 		ipRegExParser = ipMiscUtils->GetNewRegExpParserInstance("FindStringApp");
-		ASSERT_RESOURCE_ALLOCATION("ELI20688", ipRegExParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20688", ipRegExParser != __nullptr);
 
 		ipRegExParser->Pattern = rstrSearchString.c_str();
 		ipRegExParser->IgnoreCase = asVariantBool(!g_bCaseSensitive);

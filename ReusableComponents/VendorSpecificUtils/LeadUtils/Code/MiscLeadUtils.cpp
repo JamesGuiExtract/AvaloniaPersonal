@@ -495,14 +495,14 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 									"Could not load annotations.", strImageFileName);
 
 								// Check for NULL or empty container
-								if (hFileContainer != NULL)
+								if (hFileContainer != __nullptr)
 								{
 									HANNOBJECT hFirst;
 									nRet = L_AnnGetItem(hFileContainer, &hFirst);
 									throwExceptionIfNotSuccess(nRet, "ELI14631", 
 										"Could not get item from annotation container.");
 
-									if (hFirst != NULL)
+									if (hFirst != __nullptr)
 									{
 										// Insert the existing annotations from File Container
 										// into the main container. This destroys the File Container.
@@ -525,7 +525,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 							}
 							catch(...)
 							{
-								if (hFileContainer != NULL)
+								if (hFileContainer != __nullptr)
 								{
 									try
 									{
@@ -658,7 +658,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						_lastCodePos = "70_H_Page#" + strPageNumber;
 
 						// Destroy the annotation container
-						if (hContainer != NULL)
+						if (hContainer != __nullptr)
 						{
 							nRet = L_AnnDestroy(hContainer, ANNFLAG_RECURSE);
 							throwExceptionIfNotSuccess(nRet, "ELI15361",
@@ -686,7 +686,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 				}
 
 				// Destroy the annotation containers
-				if (hContainer != NULL)
+				if (hContainer != __nullptr)
 				{
 					try
 					{
@@ -1449,7 +1449,7 @@ void addTextToImage(HDC hDC, const PageRasterZone &rZone, int iVerticalDpi)
 	}
 	catch (...)
 	{
-		if (hFont != NULL)
+		if (hFont != __nullptr)
 		{
 			DeleteObject(hFont);
 			hFont = NULL;
@@ -1782,14 +1782,14 @@ void calculateFontThatFits(HDC hDC, const PageRasterZone& zone, int iVerticalDpi
 		}
 
 		// Check whether the font size should be returned
-		if (piFontSize != NULL)
+		if (piFontSize != __nullptr)
 		{
 			*piFontSize = -lf.lfHeight;
 		}
 	}
 	catch(...)
 	{
-		if (hFont != NULL)
+		if (hFont != __nullptr)
 		{
 			DeleteObject(hFont);
 		}
@@ -1996,7 +1996,7 @@ void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap)
 //-------------------------------------------------------------------------------------------------
 void deleteLeadDC(HDC& hDC)
 {
-	if (hDC != NULL)
+	if (hDC != __nullptr)
 	{
 		if (L_DeleteLeadDC(hDC) == L_FALSE)
 		{

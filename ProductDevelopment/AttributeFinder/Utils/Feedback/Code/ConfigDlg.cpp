@@ -48,13 +48,13 @@ CConfigDlg::CConfigDlg(IFeedbackMgrInternalsPtr ipFBMgr, CWnd* pParent /*=NULL*/
 	//}}AFX_DATA_INIT
 
 		// Get Persistence Manager for dialog
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER,gstrAF_UTILS_KEY ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09156", ma_pUserCfgMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09156", ma_pUserCfgMgr.get() != __nullptr );
 		
-		ma_pCfgFeedbackMgr = auto_ptr<PersistenceMgr>(new PersistenceMgr( 
+		ma_pCfgFeedbackMgr = unique_ptr<PersistenceMgr>(new PersistenceMgr( 
 			ma_pUserCfgMgr.get(), "\\FeedbackManager" ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09157", ma_pCfgFeedbackMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09157", ma_pCfgFeedbackMgr.get() != __nullptr );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08025")
 }

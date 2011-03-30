@@ -153,7 +153,7 @@ STDMETHODIMP CMergeAttributeTreesPP::Apply(void)
 		{
 			// Obtain interface pointer to the IMergeAttributeTrees class
 			UCLID_AFOUTPUTHANDLERSLib::IMergeAttributeTreesPtr ipRule = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI26391", ipRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26391", ipRule != __nullptr);
 
 			// Get and validate the values in the control
 			_bstr_t bstrAttributesToMerge;
@@ -218,7 +218,7 @@ STDMETHODIMP CMergeAttributeTreesPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26393", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI26393", pbValue != __nullptr);
 
 		try
 		{

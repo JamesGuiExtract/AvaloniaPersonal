@@ -29,7 +29,7 @@ CDocTypeCondition::CDocTypeCondition()
 		clear();
 
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI10826", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10826", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI10772");
 }
@@ -38,8 +38,8 @@ CDocTypeCondition::~CDocTypeCondition()
 {
 	try
 	{
-		m_ipTypes = NULL;
-		m_ipAFUtility = NULL;
+		m_ipTypes = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16296");
 }
@@ -81,7 +81,7 @@ STDMETHODIMP CDocTypeCondition::get_Types(IVariantVector **ppVec)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26040", ppVec != NULL);
+		ASSERT_ARGUMENT("ELI26040", ppVec != __nullptr);
 
 		// Check licensing
 		validateLicense();
@@ -103,7 +103,7 @@ STDMETHODIMP CDocTypeCondition::put_Types(IVariantVector *pVec)
 		// Check licensing
 		validateLicense();
 		m_ipTypes = pVec;
-		ASSERT_RESOURCE_ALLOCATION("ELI10802", m_ipTypes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10802", m_ipTypes != __nullptr);
 
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10796")
@@ -147,7 +147,7 @@ STDMETHODIMP CDocTypeCondition::get_MinConfidence(EDocumentConfidenceLevel* pVal
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26062", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26062", pVal != __nullptr);
 
 		// Check licensing
 		validateLicense();
@@ -179,7 +179,7 @@ STDMETHODIMP CDocTypeCondition::get_Category(BSTR* pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26063", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26063", pVal != __nullptr);
 
 		// Check licensing
 		validateLicense();
@@ -228,7 +228,7 @@ STDMETHODIMP CDocTypeCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI10825", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10825", ipAFDoc != __nullptr);
 
 		// Check the document probability
 		EDocumentConfidenceLevel eConfidence = kSureLevel;
@@ -248,11 +248,11 @@ STDMETHODIMP CDocTypeCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 		if (eConfidence >= m_eMinConfidence)
 		{
 			IStrToObjectMapPtr ipDocTags(ipAFDoc->ObjectTags);
-			ASSERT_RESOURCE_ALLOCATION("ELI30096", ipDocTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30096", ipDocTags != __nullptr);
 
 			// get the vector of document type names
 			IVariantVectorPtr ipVecDocTypes = ipDocTags->TryGetValue(DOC_TYPE.c_str());
-			if (ipVecDocTypes != NULL)
+			if (ipVecDocTypes != __nullptr)
 			{
 				// See if any of the document types are in our list
 				long nDocTypeCount = ipVecDocTypes->Size;
@@ -319,7 +319,7 @@ STDMETHODIMP CDocTypeCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		if (pbValue == NULL)
+		if (pbValue == __nullptr)
 		{
 			return E_POINTER;
 		}
@@ -347,13 +347,13 @@ STDMETHODIMP CDocTypeCondition::raw_IsConfigured(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26064", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI26064", pbValue != __nullptr);
 
 		// Check license
 		validateLicense();
 		bool bIsConfigured = true;
 
-		if(m_ipTypes == NULL || m_ipTypes->Size <= 0)
+		if(m_ipTypes == __nullptr || m_ipTypes->Size <= 0)
 		{
 			bIsConfigured = false;
 		}
@@ -374,7 +374,7 @@ STDMETHODIMP CDocTypeCondition::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19590", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19590", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Document type condition").Detach();
 	}
@@ -394,7 +394,7 @@ STDMETHODIMP CDocTypeCondition::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_AFCONDITIONSLib::IDocTypeConditionPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION( "ELI10776", ipSource != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10776", ipSource != __nullptr );
 		
 		m_ipTypes = ipSource->Types;
 		
@@ -420,7 +420,7 @@ STDMETHODIMP CDocTypeCondition::raw_Clone(IUnknown **pObject)
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_DocTypeCondition);
-		ASSERT_RESOURCE_ALLOCATION( "ELI10777", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10777", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom( ipUnk );
@@ -442,7 +442,7 @@ STDMETHODIMP CDocTypeCondition::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26065", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI26065", pClassID != __nullptr);
 		*pClassID = CLSID_DocTypeCondition;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12856");
@@ -475,9 +475,9 @@ STDMETHODIMP CDocTypeCondition::Load(IStream *pStream)
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
-		pStream->Read(&nDataLength, sizeof(nDataLength), NULL);
+		pStream->Read(&nDataLength, sizeof(nDataLength), __nullptr);
 		ByteStream data(nDataLength);
-		pStream->Read(data.getData(), nDataLength, NULL);
+		pStream->Read(data.getData(), nDataLength, __nullptr);
 		ByteStreamManipulator dataReader(ByteStreamManipulator::kRead, data);
 
 		// Read the individual data items from the bytestream
@@ -544,12 +544,12 @@ STDMETHODIMP CDocTypeCondition::Save(IStream *pStream, BOOL fClearDirty)
 	
 		// Write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
-		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
-		pStream->Write( data.getData(), nDataLength, NULL );
+		pStream->Write( &nDataLength, sizeof(nDataLength), __nullptr );
+		pStream->Write( data.getData(), nDataLength, __nullptr );
 
 		// Write the document types directly to the stream
 		IPersistStreamPtr ipObj = m_ipTypes;
-		ASSERT_RESOURCE_ALLOCATION("ELI10822", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10822", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI19123", fClearDirty);
 
 		// Clear the flag as specified
@@ -584,7 +584,7 @@ void CDocTypeCondition::validateLicense()
 void CDocTypeCondition::clear()
 {
 	m_bAllowTypes = true;
-	m_ipTypes = NULL;
+	m_ipTypes = __nullptr;
 	m_eMinConfidence = kMaybeLevel;
 	m_strCategory = "";
 }

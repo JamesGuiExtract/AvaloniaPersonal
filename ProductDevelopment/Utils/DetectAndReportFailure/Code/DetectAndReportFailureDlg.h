@@ -45,7 +45,7 @@ public:
 protected:
 	HICON m_hIcon;
 
-	std::auto_ptr<ExceptionDlg> m_apExceptionDlg;
+	std::unique_ptr<ExceptionDlg> m_apExceptionDlg;
 
 	// exception records vector and a lock for it
 	CMutex m_exceptionDataLock;

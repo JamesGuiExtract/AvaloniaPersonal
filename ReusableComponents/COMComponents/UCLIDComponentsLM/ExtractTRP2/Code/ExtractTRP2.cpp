@@ -91,7 +91,7 @@ BOOL CExtractTRPApp::InitInstance()
 		bool bAlreadyRunning = (GetLastError() == ERROR_ALREADY_EXISTS);
 
 		// release the mutex
-		if (hMutexOneInstance != NULL)
+		if (hMutexOneInstance != __nullptr)
 		{
 			::ReleaseMutex(hMutexOneInstance);
 		}
@@ -113,7 +113,7 @@ BOOL CExtractTRPApp::InitInstance()
 			}
 
 			// Ask current instance to close (P13 #4354)
-			if (hwndCurrent != NULL)
+			if (hwndCurrent != __nullptr)
 			{
 				PostMessage( hwndCurrent, WM_CLOSE, 0, 0 );
 			}

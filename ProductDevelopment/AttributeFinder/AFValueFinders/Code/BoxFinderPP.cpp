@@ -529,7 +529,7 @@ STDMETHODIMP CBoxFinderPP::Apply(void)
 		{
 			// Obtain interface pointer to the IImageRegionWithLines class
 			UCLID_AFVALUEFINDERSLib::IBoxFinderPtr ipBoxFinder = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI19680", ipBoxFinder != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19680", ipBoxFinder != __nullptr);
 
 			// Store clue settings
 			ipBoxFinder->Clues = retrieveAndValidateClues();
@@ -671,7 +671,7 @@ STDMETHODIMP CBoxFinderPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19682", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19682", pbValue != __nullptr);
 
 		try
 		{
@@ -696,7 +696,7 @@ STDMETHODIMP CBoxFinderPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 void CBoxFinderPP::initializeClueList(IVariantVectorPtr ipClues)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI19746", ipClues != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19746", ipClues != __nullptr);
 
 	m_listClues.SetExtendedListViewStyle(LVS_EX_GRIDLINES|LVS_EX_FULLROWSELECT);
 	CRect rect;			

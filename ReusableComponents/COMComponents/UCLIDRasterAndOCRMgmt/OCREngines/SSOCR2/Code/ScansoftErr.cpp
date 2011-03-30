@@ -20,22 +20,20 @@ void loadScansoftRecErrInfo(UCLIDException& ue, RECERR rc)
 	// get the symbolic name of the error
 	kRecGetErrorInfo(rc, &pszSymbolicErrorName);
 
-	char *pszErrorDescription = NULL;
-	int iErrorDescriptionLength = 0;
-
 	// get length of the error description
+	int iErrorDescriptionLength = 0;
 	kRecGetErrorUIText(rc, lExtendedErrorCode, pszExtendedErrorDescription, 
-		pszErrorDescription, &iErrorDescriptionLength);
+		__nullptr, &iErrorDescriptionLength);
 
 	// allocate space for the error description
-	pszErrorDescription = new char[iErrorDescriptionLength];
+	unique_ptr<char[]> pHelper(new char[iErrorDescriptionLength]);
 
 	// get the error description
 	kRecGetErrorUIText(rc, lExtendedErrorCode, pszExtendedErrorDescription, 
-		pszErrorDescription, &iErrorDescriptionLength);
+		pHelper.get(), &iErrorDescriptionLength);
 
 	// add the debug info
-	ue.addDebugInfo("Error description", pszErrorDescription);
+	ue.addDebugInfo("Error description", pHelper.get());
 	ue.addDebugInfo("Error code", pszSymbolicErrorName);
 	
 	// add extended debug information if it is available
@@ -44,9 +42,6 @@ void loadScansoftRecErrInfo(UCLIDException& ue, RECERR rc)
 		ue.addDebugInfo("Extended error description", pszExtendedErrorDescription);
 		ue.addDebugInfo("Extended error code", lExtendedErrorCode);
 	}
-
-	// free the allocated space
-	delete [] pszErrorDescription;
 }
 //--------------------------------------------------------------------------------------------------
 void addPageSizeDebugInfo(UCLIDException& ue, const IMG_INFO& info)

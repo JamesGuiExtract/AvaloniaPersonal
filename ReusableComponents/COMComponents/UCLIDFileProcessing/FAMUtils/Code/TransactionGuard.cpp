@@ -12,7 +12,7 @@
 TransactionGuard::TransactionGuard(ADODB::_ConnectionPtr ipConnection)
 : m_ipConnection(ipConnection)
 {
-	ASSERT_ARGUMENT("ELI14624", ipConnection != NULL );
+	ASSERT_ARGUMENT("ELI14624", ipConnection != __nullptr );
 	
 	// Start a transaction
 	ipConnection->BeginTrans();
@@ -32,7 +32,7 @@ TransactionGuard::~TransactionGuard()
 			m_ipConnection->RollbackTrans();
 		}
 
-		m_ipConnection = NULL;
+		m_ipConnection = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14980");
 }

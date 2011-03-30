@@ -55,14 +55,14 @@ CSelectPageRegion::CSelectPageRegion()
   m_nRegionRotation(-1)
 {
 	m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-	ASSERT_RESOURCE_ALLOCATION("ELI09753", m_ipAFUtility != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09753", m_ipAFUtility != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSelectPageRegion::~CSelectPageRegion()
 {
 	try
 	{
-		m_ipSpatialStringSearcher = NULL;
+		m_ipSpatialStringSearcher = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16326");
 }
@@ -134,7 +134,7 @@ STDMETHODIMP CSelectPageRegion::get_SpecificPages(BSTR *pbstrSpecificPages)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28104", pbstrSpecificPages != NULL);
+		ASSERT_ARGUMENT("ELI28104", pbstrSpecificPages != __nullptr);
 
 		*pbstrSpecificPages = _bstr_t(m_strSpecificPages.c_str()).Detach();
 
@@ -192,8 +192,8 @@ STDMETHODIMP CSelectPageRegion::GetHorizontalRestriction(long *pnStartPercentage
 	try
 	{
 		validateLicense();
-		ASSERT_ARGUMENT("ELI28107", pnStartPercentage != NULL);
-		ASSERT_ARGUMENT("ELI28108", pnEndPercentage != NULL);
+		ASSERT_ARGUMENT("ELI28107", pnStartPercentage != __nullptr);
+		ASSERT_ARGUMENT("ELI28108", pnEndPercentage != __nullptr);
 
 		*pnStartPercentage = m_nHorizontalStartPercentage;
 		*pnEndPercentage = m_nHorizontalEndPercentage;
@@ -230,8 +230,8 @@ STDMETHODIMP CSelectPageRegion::GetVerticalRestriction(long *pnStartPercentage, 
 	try
 	{
 		validateLicense();
-		ASSERT_ARGUMENT("ELI28109", pnStartPercentage != NULL);
-		ASSERT_ARGUMENT("ELI28110", pnEndPercentage != NULL);
+		ASSERT_ARGUMENT("ELI28109", pnStartPercentage != __nullptr);
+		ASSERT_ARGUMENT("ELI28110", pnEndPercentage != __nullptr);
 
 		*pnStartPercentage = m_nVerticalStartPercentage;
 		*pnEndPercentage = m_nVerticalEndPercentage;
@@ -248,7 +248,7 @@ STDMETHODIMP CSelectPageRegion::get_PageSelectionType(EPageSelectionType *pVal)
 	try
 	{
 		validateLicense();
-		ASSERT_ARGUMENT("ELI28111", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28111", pVal != __nullptr);
 
 		*pVal = m_ePageSelectionType;
 
@@ -282,7 +282,7 @@ STDMETHODIMP CSelectPageRegion::get_Pattern(BSTR *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28112", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28112", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_strPattern.c_str()).Detach();
 
@@ -323,7 +323,7 @@ STDMETHODIMP CSelectPageRegion::get_IsRegExp(VARIANT_BOOL *pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28113", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28113", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bIsRegExp);
 
@@ -356,7 +356,7 @@ STDMETHODIMP CSelectPageRegion::get_IsCaseSensitive(VARIANT_BOOL *pVal)
 	try
 	{
 		validateLicense();
-		ASSERT_ARGUMENT("ELI28114", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28114", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bIsCaseSensitive);
 
@@ -390,7 +390,7 @@ STDMETHODIMP CSelectPageRegion::get_RegExpPageSelectionType(ERegExpPageSelection
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28115", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28115", pVal != __nullptr);
 
 		*pVal = m_eRegExpPageSelectionType;
 
@@ -424,7 +424,7 @@ STDMETHODIMP CSelectPageRegion::get_SelectPageRegionReturnType(ESelectPageRegion
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28116", pReturnType != NULL);
+		ASSERT_ARGUMENT("ELI28116", pReturnType != __nullptr);
 
 		*pReturnType = m_eReturnType;
 
@@ -459,7 +459,7 @@ STDMETHODIMP CSelectPageRegion::get_SelectedRegionRotation(long *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28119", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28119", pVal != __nullptr);
 
 		// Provide setting
 		*pVal = m_nRegionRotation;
@@ -506,7 +506,7 @@ STDMETHODIMP CSelectPageRegion::get_IncludeIntersectingText(VARIANT_BOOL* pVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28093", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28093", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bIncludeIntersectingText);
 
@@ -540,7 +540,7 @@ STDMETHODIMP CSelectPageRegion::get_TextIntersectionType(ESpatialEntity* pInters
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28096", pIntersectionType != NULL);
+		ASSERT_ARGUMENT("ELI28096", pIntersectionType != __nullptr);
 
 		*pIntersectionType = m_eTextIntersectionType;
 
@@ -574,7 +574,7 @@ STDMETHODIMP CSelectPageRegion::get_TextToAssignToRegion(BSTR* pbstrTextToAssign
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28099", pbstrTextToAssign != NULL);
+		ASSERT_ARGUMENT("ELI28099", pbstrTextToAssign != __nullptr);
 
 		*pbstrTextToAssign = _bstr_t(m_strTextToAssign.c_str()).Detach();
 
@@ -614,15 +614,15 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 		validateLicense();
 
 		// Check the arguments
-		ASSERT_ARGUMENT("ELI23900", pAttributes != NULL);
+		ASSERT_ARGUMENT("ELI23900", pAttributes != __nullptr);
 
 		// Create local Document pointer
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI18452", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18452", ipAFDoc != __nullptr);
 
 		// Get the spatial string
 		ISpatialStringPtr ipInputText(ipAFDoc->Text);
-		ASSERT_RESOURCE_ALLOCATION("ELI18453", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18453", ipInputText != __nullptr);
 
 		// Get the source document name from the spatial string
 		string strSourceDoc = asString(ipInputText->SourceDocName);
@@ -642,7 +642,7 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 
 		// Create collection of Attributes to return
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI18451", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18451", ipAttributes != __nullptr);
 
 		// Get the last page number
 		long nLastPageNumber = eMode == kNonSpatialMode ?
@@ -669,11 +669,11 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 					bPageSpecified, bRestrictionDefined, i, nWidth, nHeight);
 
 				// Provide non-NULL content to an Attribute to be included in the collection
-				if (ipContentFromThisPage != NULL)
+				if (ipContentFromThisPage != __nullptr)
 				{
 					// Create an Attribute
 					IAttributePtr ipNewAttribute( CLSID_Attribute );
-					ASSERT_RESOURCE_ALLOCATION("ELI28166", ipNewAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28166", ipNewAttribute != __nullptr);
 
 					// Update the SourceDocName of the Spatial String
 					ipContentFromThisPage->SourceDocName = strSourceDoc.c_str();
@@ -689,7 +689,7 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 		else
 		{
 			IIUnknownVectorPtr ipPages = ipInputText->GetPages();
-			ASSERT_RESOURCE_ALLOCATION("ELI28167", ipPages != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28167", ipPages != __nullptr);
 
 			int nCount = ipPages->Size();
 
@@ -699,7 +699,7 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 			{
 				// Get this page
 				ISpatialStringPtr ipPage = ipPages->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI18572", ipPage != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18572", ipPage != __nullptr);
 				long nPageNum = ipPage->GetFirstPageNumber();
 
 				// Check the page specification
@@ -711,11 +711,11 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 					bPageSpecified, bRestrictionDefined );
 
 				// Provide non-NULL content to an Attribute to be included in the collection
-				if (ipContentFromThisPage != NULL)
+				if (ipContentFromThisPage != __nullptr)
 				{
 					// Create an Attribute
 					IAttributePtr ipNewAttribute( CLSID_Attribute );
-					ASSERT_RESOURCE_ALLOCATION("ELI18570", ipNewAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI18570", ipNewAttribute != __nullptr);
 
 					// Update the SourceDocName of the Spatial String
 					ipContentFromThisPage->SourceDocName = strSourceDoc.c_str();
@@ -749,11 +749,11 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI19148", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19148", ipAFDoc != __nullptr);
 
 		// get the spatial string
 		ISpatialStringPtr ipInputText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI08020", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08020", ipInputText != __nullptr);
 
 		// Get the source doc name
 		string strSourceDoc = asString(ipInputText->SourceDocName);
@@ -782,7 +782,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 		bool bRestrictionDefined = isRestrictionDefined();
 
 		ISpatialStringPtr ipResult( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION("ELI18561", ipResult != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18561", ipResult != __nullptr);
 		// Step through each page of the document
 		if (eMode == kNonSpatialMode)
 		{
@@ -799,7 +799,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 					bPageSpecified, bRestrictionDefined, i, nWidth, nHeight);
 
 				// Append non-NULL content to the result string
-				if (ipContentFromThisPage != NULL)
+				if (ipContentFromThisPage != __nullptr)
 				{
 					ipResult->Append( ipContentFromThisPage );
 				}
@@ -817,7 +817,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 			{
 				// Get this page
 				ISpatialStringPtr ipPage = ipPages->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI18562", ipPage != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18562", ipPage != __nullptr);
 				long nPageNum = ipPage->GetFirstPageNumber();
 
 				// If the page is specifed
@@ -829,7 +829,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 					bPageSpecified, bRestrictionDefined );
 
 				// Append non-NULL content to the result string
-				if (ipContentFromThisPage != NULL)
+				if (ipContentFromThisPage != __nullptr)
 				{
 					ipResult->Append( ipContentFromThisPage );
 				}
@@ -841,7 +841,7 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 		{
 			// Retrieve the text from the AFDocument
 			ISpatialStringPtr ipText = ipAFDoc->Text;
-			ASSERT_RESOURCE_ALLOCATION("ELI15537", ipText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15537", ipText != __nullptr);
 
 			// if the returned string is empty
 			// clear the text but leave the source document name
@@ -1127,7 +1127,7 @@ STDMETHODIMP CSelectPageRegion::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19561", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19561", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Select page region").Detach();
 	}
@@ -1288,10 +1288,10 @@ STDMETHODIMP CSelectPageRegion::raw_Clone(IUnknown** ppObject)
 		// validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28121", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI28121", ppObject != __nullptr);
 
 		ICopyableObjectPtr ipObjCopy(CLSID_SelectPageRegion);
-		ASSERT_RESOURCE_ALLOCATION("ELI08338", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08338", ipObjCopy != __nullptr);
 		
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -1340,18 +1340,18 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 		{
 			// Get the collection of pages and the count
 			IIUnknownVectorPtr ipPages = ipInputText->GetPages();
-			ASSERT_RESOURCE_ALLOCATION("ELI28168", ipPages != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28168", ipPages != __nullptr);
 			long lSize = ipPages->Size();
 
 			if (m_bIsRegExp)
 			{
 				IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-				ASSERT_RESOURCE_ALLOCATION("ELI13023", ipMiscUtils != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI13023", ipMiscUtils != __nullptr );
 
 				// Find with a regular expression pattern
 				IRegularExprParserPtr ipRegExpParser =
 					ipMiscUtils->GetNewRegExpParserInstance("SelectPageRegion");
-				ASSERT_RESOURCE_ALLOCATION("ELI09378", ipRegExpParser != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09378", ipRegExpParser != __nullptr);
 
 				string strRootFolder = "";
 
@@ -1377,10 +1377,10 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 					for (long i = 0; i < lSize; i++)
 					{
 						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI09379", ipPage != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI09379", ipPage != __nullptr);
 						IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->String, 
 							VARIANT_TRUE, VARIANT_FALSE);
-						ASSERT_RESOURCE_ALLOCATION("ELI28169", ipFound != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI28169", ipFound != __nullptr);
 						if (ipFound->Size() > 0)
 						{
 							vecPages.push_back(ipPage->GetFirstPageNumber());
@@ -1392,10 +1392,10 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 					for (long i = 0; i < lSize; i++)
 					{
 						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI19149", ipPage != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI19149", ipPage != __nullptr);
 						IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->String, 
 							VARIANT_TRUE, VARIANT_FALSE);
-						ASSERT_RESOURCE_ALLOCATION("ELI28170", ipFound != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI28170", ipFound != __nullptr);
 						if (ipFound->Size() > 0)
 						{
 							vecPages.push_back(ipPage->GetFirstPageNumber());
@@ -1411,10 +1411,10 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 					for (long i = lSize - 1; i >= 0; i--)
 					{
 						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI19150", ipPage != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI19150", ipPage != __nullptr);
 						IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->GetString(), 
 							VARIANT_TRUE, VARIANT_FALSE);
-						ASSERT_RESOURCE_ALLOCATION("ELI28171", ipFound != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI28171", ipFound != __nullptr);
 						if (ipFound->Size() > 0)
 						{
 							vecPages.insert(vecPages.begin(), ipPage->GetFirstPageNumber());
@@ -1433,7 +1433,7 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 					for (long i = 0; i < lSize; i++)
 					{
 						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI09380", ipPage != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI09380", ipPage != __nullptr);
 						string strPage = asString(ipPage->String);
 
 						string strTmpPattern = m_strPattern;
@@ -1454,7 +1454,7 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 					for (long i = 0; i < lSize; i++)
 					{
 						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI19151", ipPage != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI19151", ipPage != __nullptr);
 						string strPage = asString(ipPage->String);
 
 						string strTmpPattern = m_strPattern;
@@ -1479,7 +1479,7 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 					for (long i = lSize - 1; i >= 0; i--)
 					{
 						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI19152", ipPage != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI19152", ipPage != __nullptr);
 						string strPage = asString(ipPage->String);
 
 						string strTmpPattern = m_strPattern;
@@ -1517,10 +1517,10 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 {
 	try
 	{
-		if (m_ipSpatialStringSearcher == NULL)
+		if (m_ipSpatialStringSearcher == __nullptr)
 		{
 			m_ipSpatialStringSearcher.CreateInstance(CLSID_SpatialStringSearcher);
-			ASSERT_RESOURCE_ALLOCATION("ELI08022", m_ipSpatialStringSearcher != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08022", m_ipSpatialStringSearcher != __nullptr);
 		}
 
 		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipOriginPage);
@@ -1538,7 +1538,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 			// this will give us the real page boundaries as they relate to letter positions
 			nPageNum = ipOriginPage->GetFirstPageNumber();
 			ISpatialPageInfoPtr ipPageInfo = ipOriginPage->GetPageInfo(nPageNum);
-			if(ipPageInfo == NULL)
+			if(ipPageInfo == __nullptr)
 			{
 				UCLIDException ue("ELI10502", "Unable to obtain spatial page info.");
 				ue.addDebugInfo("Page Number", nPageNum);
@@ -1569,7 +1569,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 		}
 		// Set a long rectangle with the boundaries
 		ILongRectanglePtr ipRect( CLSID_LongRectangle );
-		ASSERT_RESOURCE_ALLOCATION("ELI08021", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08021", ipRect != __nullptr);
 		ipRect->SetBounds(nLeft, nTop, nRight, nBottom);
 
 		// Get extension of source file
@@ -1602,7 +1602,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 				{
 					ipResult = ipOriginPage;
 				}
-				ASSERT_RESOURCE_ALLOCATION( "ELI28124", ipResult != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI28124", ipResult != __nullptr );
 			}
 			break;
 
@@ -1632,7 +1632,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					ipResult = getOCREngine()->RecognizeTextInImageZone(strTempFileName2.c_str(), 1, 1, 
 						NULL, nActualRotation, kNoFilter, "", VARIANT_FALSE, VARIANT_FALSE, VARIANT_TRUE, 
 						NULL);
-					ASSERT_RESOURCE_ALLOCATION( "ELI28127", ipResult != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI28127", ipResult != __nullptr );
 
 					// Assign original filename to Spatial String
 					ipResult->SourceDocName = strPath.c_str();
@@ -1655,7 +1655,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 					ipResult = getOCREngine()->RecognizeTextInImageZone(strPath.c_str(), 
 						nPageNum, nPageNum, ipRect, nActualRotation, kNoFilter, "", VARIANT_FALSE, 
 						VARIANT_FALSE, VARIANT_TRUE, NULL );
-					ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != __nullptr );
 				}
 			}
 			break;
@@ -1664,26 +1664,26 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 			{
 				// Create the new spatial string
 				ipResult.CreateInstance(CLSID_SpatialString);
-				ASSERT_RESOURCE_ALLOCATION( "ELI28125", ipResult != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI28125", ipResult != __nullptr );
 
-				ILongToObjectMapPtr ipPageInfos = NULL;
+				ILongToObjectMapPtr ipPageInfos = __nullptr;
 				if (bHasSpatialInfo)
 				{
 					// Clone the page infos for the original object
 					ICopyableObjectPtr ipCopier = ipOriginPage->SpatialPageInfos;
-					ASSERT_RESOURCE_ALLOCATION("ELI28134", ipCopier != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28134", ipCopier != __nullptr);
 					ipPageInfos = ipCopier->Clone();
-					ASSERT_RESOURCE_ALLOCATION("ELI28135", ipPageInfos != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28135", ipPageInfos != __nullptr);
 				}
 				else
 				{
 					// Create a spatial page info for this page
 					ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
-					ASSERT_RESOURCE_ALLOCATION("ELI28173", ipPageInfo != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28173", ipPageInfo != __nullptr);
 					ipPageInfo->SetPageInfo(nWidth, nHeight, kRotNone, 0.0);
 
 					ipPageInfos.CreateInstance(CLSID_LongToObjectMap);
-					ASSERT_RESOURCE_ALLOCATION("ELI28174", ipPageInfos != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28174", ipPageInfos != __nullptr);
 					ipPageInfos->Set(nPageNum, ipPageInfo);
 				}
 
@@ -1700,7 +1700,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 
 					// Create a pseudo-spatial string
 					IRasterZonePtr ipZone(CLSID_RasterZone);
-					ASSERT_RESOURCE_ALLOCATION("ELI28136", ipZone != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28136", ipZone != __nullptr);
 					ipZone->CreateFromLongRectangle(ipRect, nPageNum);
 					ipResult->CreatePseudoSpatialString(ipZone, m_strTextToAssign.c_str(),
 						strPath.c_str(), ipPageInfos);
@@ -1711,14 +1711,14 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 				{
 					IIUnknownVectorPtr ipZones = buildRasterZonesForExcludedRegion(nLeft,
 						nTop, nRight, nBottom, nWidth, nHeight, nPageNum);
-					ASSERT_RESOURCE_ALLOCATION("ELI28137", ipZones != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI28137", ipZones != __nullptr);
 
 					// If only 1 zone create a pseudo-spatial string
 					long lSize = ipZones->Size();
 					if (lSize == 1)
 					{
 						IRasterZonePtr ipZone = ipZones->At(0);
-						ASSERT_RESOURCE_ALLOCATION("ELI28162", ipZone != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI28162", ipZone != __nullptr);
 						ipResult->CreatePseudoSpatialString(ipZone,
 							m_strTextToAssign.c_str(), strPath.c_str(), ipPageInfos);
 					}
@@ -1747,11 +1747,11 @@ IOCREnginePtr CSelectPageRegion::getOCREngine()
 {
 	// create a new OCR engine every time this function is called [P13 #2909]
 	IOCREnginePtr ipOCREngine( CLSID_ScansoftOCR );
-	ASSERT_RESOURCE_ALLOCATION( "ELI12688", ipOCREngine != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI12688", ipOCREngine != __nullptr );
 
 	// license OCR engine
 	IPrivateLicensedComponentPtr ipScansoftEngine(ipOCREngine);
-	ASSERT_RESOURCE_ALLOCATION("ELI20469", ipScansoftEngine != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20469", ipScansoftEngine != __nullptr);
 	ipScansoftEngine->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
 
 	return ipOCREngine;
@@ -1765,7 +1765,7 @@ ISpatialStringPtr CSelectPageRegion::getRegionContent(const ISpatialStringPtr& i
 	//	bRestrictionDefined - whether or not a subregion has been defined
 	//	m_bIncludeRegion - this page or region is being included or excluded
 	//	bPageSpecified - this page has been chosen by the caller
-	ISpatialStringPtr ipSS = NULL;
+	ISpatialStringPtr ipSS = __nullptr;
 
 	// Get the individual page contents based on the current settings if at least one
 	// of the following is true:
@@ -1878,18 +1878,18 @@ IIUnknownVectorPtr CSelectPageRegion::buildRasterZonesForExcludedRegion(long nLe
 
 		// Vector of zones to be returned
 		IIUnknownVectorPtr ipZones(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI28138", ipZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28138", ipZones != __nullptr);
 
 		// Need to build raster zones surrounding the excluded region
 		ILongRectanglePtr ipZoneRect(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI28139", ipZoneRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28139", ipZoneRect != __nullptr);
 
 		// Build the top rectangle
 		if (nTop > 0)
 		{
 			ipZoneRect->SetBounds(0, 0, nWidth, nTop);
 			IRasterZonePtr ipZone(CLSID_RasterZone);
-			ASSERT_RESOURCE_ALLOCATION("ELI28140", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28140", ipZone != __nullptr);
 			ipZone->CreateFromLongRectangle(ipZoneRect, nPageNum);
 			ipZones->PushBack(ipZone);
 		}
@@ -1898,7 +1898,7 @@ IIUnknownVectorPtr CSelectPageRegion::buildRasterZonesForExcludedRegion(long nLe
 		{
 			ipZoneRect->SetBounds(0, nBottom, nWidth, nHeight);
 			IRasterZonePtr ipZone(CLSID_RasterZone);
-			ASSERT_RESOURCE_ALLOCATION("ELI28141", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28141", ipZone != __nullptr);
 			ipZone->CreateFromLongRectangle(ipZoneRect, nPageNum);
 			ipZones->PushBack(ipZone);
 		}
@@ -1907,7 +1907,7 @@ IIUnknownVectorPtr CSelectPageRegion::buildRasterZonesForExcludedRegion(long nLe
 		{
 			ipZoneRect->SetBounds(0, nTop, nLeft, nBottom);
 			IRasterZonePtr ipZone(CLSID_RasterZone);
-			ASSERT_RESOURCE_ALLOCATION("ELI28142", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28142", ipZone != __nullptr);
 			ipZone->CreateFromLongRectangle(ipZoneRect, nPageNum);
 			ipZones->PushBack(ipZone);
 		}
@@ -1916,7 +1916,7 @@ IIUnknownVectorPtr CSelectPageRegion::buildRasterZonesForExcludedRegion(long nLe
 		{
 			ipZoneRect->SetBounds(nRight, nTop, nWidth, nBottom);
 			IRasterZonePtr ipZone(CLSID_RasterZone);
-			ASSERT_RESOURCE_ALLOCATION("ELI28143", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28143", ipZone != __nullptr);
 			ipZone->CreateFromLongRectangle(ipZoneRect, nPageNum);
 			ipZones->PushBack(ipZone);
 		}

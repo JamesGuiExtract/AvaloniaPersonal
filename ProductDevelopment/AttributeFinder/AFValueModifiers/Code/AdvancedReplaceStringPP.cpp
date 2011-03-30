@@ -24,7 +24,7 @@ CAdvancedReplaceStringPP::CAdvancedReplaceStringPP()
 
 		// Create an IMiscUtilsPtr object
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI19434", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI19434", ipMiscUtils != __nullptr );
 
 		// Get the file header string and its length from IMiscUtilsPtr object
 		m_strFileHeader = ipMiscUtils->GetFileHeader();

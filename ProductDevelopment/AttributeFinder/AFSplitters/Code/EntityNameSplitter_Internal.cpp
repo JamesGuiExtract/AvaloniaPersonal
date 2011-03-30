@@ -18,21 +18,21 @@ bool CEntityNameSplitter::doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocumen
 {
 	// Find delimiters between potential Entities
 	IIUnknownVectorPtr ipDelimiters( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10325", ipDelimiters != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10325", ipDelimiters != __nullptr );
 	findNameDelimiters( ipGroup, true, ipDelimiters );
 	long	lSize = ipDelimiters->Size();
 
 	// Local collection of Trust expressions
 	IVariantVectorPtr ipTrustInd = m_ipKeys->GetKeywordCollection( _bstr_t( "TrustIndicators" ) );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10331", ipTrustInd != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10331", ipTrustInd != __nullptr );
 
 	// Local collection of Non Trust expressions
 	IVariantVectorPtr ipNonTrust = m_ipKeys->GetKeywordCollection( _bstr_t( "NonTrust" ) );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10486", ipNonTrust != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10486", ipNonTrust != __nullptr );
 
 	// Create collection of valid Entities
 	IIUnknownVectorPtr ipEntities( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10330", ipEntities != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10330", ipEntities != __nullptr );
 
 	long	lEntityCount = 0;
 	long	lLastTrustIndex = -1;
@@ -71,7 +71,7 @@ bool CEntityNameSplitter::doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocumen
 	{
 		// Retrieve the Trust Entity
 		ISpatialStringPtr ipTrust = ipEntities->At( lLastTrustIndex );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10332", ipTrust != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10332", ipTrust != __nullptr );
 
 		// Trim leading THE from Trust text
 		string strStart = ipTrust->String;
@@ -84,7 +84,7 @@ bool CEntityNameSplitter::doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocumen
 
 		// Create the Trust attribute
 		IAttributePtr ipTrustAttr( CLSID_Attribute );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10333", ipTrustAttr != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10333", ipTrustAttr != __nullptr );
 
 		// Move name(s), if desired
 		if (m_bMoveTrustName)
@@ -97,11 +97,11 @@ bool CEntityNameSplitter::doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocumen
 
 		// Retrieve collection of Trustees
 		IIUnknownVectorPtr ipTrustees = ipTrustAttr->SubAttributes;
-		ASSERT_RESOURCE_ALLOCATION( "ELI10336", ipTrustees != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10336", ipTrustees != __nullptr );
 
 		// Create Person Splitter object
 		IAttributeSplitterPtr ipPersonSplitter( CLSID_PersonNameSplitter );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10337", ipPersonSplitter != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10337", ipPersonSplitter != __nullptr );
 
 		// Add each remaining Entity as a sub-attribute under the Trust
 		for (i = 0; i < lEntityCount; i++)
@@ -114,11 +114,11 @@ bool CEntityNameSplitter::doTrustSplitting(ISpatialStringPtr ipGroup, IAFDocumen
 
 			// Retrieve this Trustee Entity
 			ISpatialStringPtr ipTrustee = ipEntities->At( i );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10334", ipTrustee != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10334", ipTrustee != __nullptr );
 
 			// Create the Trustee attribute
 			IAttributePtr ipTrusteeAttr( CLSID_Attribute );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10335", ipTrusteeAttr != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10335", ipTrusteeAttr != __nullptr );
 
 			// Judge Person vs. Company
 			if (entityIsCompany( ipTrustee ))
@@ -199,9 +199,9 @@ bool CEntityNameSplitter::entityIsCompany(ISpatialStringPtr ipEntity)
 	// Retrieve collection of Company Suffixes
 	// Add collection of Company Designators
 	IShallowCopyablePtr ipCopier = m_ipKeys->GetKeywordCollection("CompanySuffixes");
-	ASSERT_RESOURCE_ALLOCATION("ELI26067", ipCopier != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI26067", ipCopier != __nullptr);
 	IVariantVectorPtr ipIndicators = ipCopier->ShallowCopy();
-	ASSERT_RESOURCE_ALLOCATION("ELI10536", ipIndicators != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10536", ipIndicators != __nullptr);
 	ipIndicators->Append(m_ipKeys->GetKeywordCollection("CompanyDesignators"));
 
 	// Check for Company indication
@@ -217,7 +217,7 @@ bool CEntityNameSplitter::entityIsCompany(ISpatialStringPtr ipEntity)
 	{
 		// Retrieve Municiaplity patterns
 		ipCopier = m_ipKeys->GetKeywordCollection("MunicipalityIndicators");
-		ASSERT_RESOURCE_ALLOCATION("ELI26068", ipCopier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26068", ipCopier != __nullptr);
 		ipIndicators = ipCopier->ShallowCopy();
 
 		// Test
@@ -251,7 +251,7 @@ void CEntityNameSplitter::moveTrustNames(ISpatialStringPtr &ripTrust)
 
 	// Divide Trust text into words
 	IIUnknownVectorPtr	ipWords( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10446", ipWords != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10446", ipWords != __nullptr );
 	long lCount = getWordsFromString( strOriginal, ipWords );
 
 	// Continue processing only if at least three words
@@ -260,9 +260,9 @@ void CEntityNameSplitter::moveTrustNames(ISpatialStringPtr &ripTrust)
 		// Retrieve collection of Trust flags
 		// Add collection of Person Suffixes
 		IShallowCopyablePtr ipCopier = m_ipKeys->GetKeywordCollection("TrustFlags");
-		ASSERT_RESOURCE_ALLOCATION("ELI26069", ipCopier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26069", ipCopier != __nullptr);
 		IVariantVectorPtr ipFlags = ipCopier->ShallowCopy();
-		ASSERT_RESOURCE_ALLOCATION( "ELI10447", ipFlags != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10447", ipFlags != __nullptr );
 		ipFlags->Append(m_ipKeys->GetKeywordCollection("PersonSuffixes"));
 
 		///////////////////////////////////////////
@@ -274,10 +274,10 @@ void CEntityNameSplitter::moveTrustNames(ISpatialStringPtr &ripTrust)
 		ITokenPtr	ipToken;
 		CComBSTR	bstrValue;
 		ipToken = ITokenPtr( IObjectPairPtr( ipWords->At(0) )->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10448", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10448", ipToken != __nullptr );
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrValue );
 
-		ISpatialStringPtr ipDate = NULL;
+		ISpatialStringPtr ipDate = __nullptr;
 
 		// Convert token to word and convert it to a number
 		string strWord = asString( bstrValue );
@@ -288,7 +288,7 @@ void CEntityNameSplitter::moveTrustNames(ISpatialStringPtr &ripTrust)
 			lDate = asLong(strWord);
 			lDateLength = strWord.length();
 			ipDate = ripTrust->GetSubString(lStartPos, lEndPos + 1);
-			ASSERT_RESOURCE_ALLOCATION( "ELI10453", ipDate != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10453", ipDate != __nullptr );
 		}
 		catch (...)
 		{
@@ -306,7 +306,7 @@ void CEntityNameSplitter::moveTrustNames(ISpatialStringPtr &ripTrust)
 			long		lEndPos = -1;
 			ITokenPtr	ipToken;
 			ipToken = ITokenPtr( IObjectPairPtr( ipWords->At(i) )->Object1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI19157", ipToken != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI19157", ipToken != __nullptr );
 			ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 			// Extract the word as a Spatial String from the original
@@ -316,7 +316,7 @@ void CEntityNameSplitter::moveTrustNames(ISpatialStringPtr &ripTrust)
 				lEndPos++;
 			}
 			ISpatialStringPtr ipSpatial = ripTrust->GetSubString( lStartPos, lEndPos );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10449", ipSpatial != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10449", ipSpatial != __nullptr );
 
 			// Check if this word contains a Trust Flag
 			if (asCppBool(ipSpatial->ContainsStringInVector(
@@ -331,14 +331,14 @@ void CEntityNameSplitter::moveTrustNames(ISpatialStringPtr &ripTrust)
 				// assumed to be a last name
 
 				// Move Date word
-				if ((lDate != -1) && (lDateLength > 0) && ipDate != NULL)
+				if ((lDate != -1) && (lDateLength > 0) && ipDate != __nullptr)
 				{
 					// Insert Date word
 					ripTrust->Insert( lStartPos, ipDate );
 
 					// Remove leading Date
 					ripTrust = ripTrust->GetSubString( lDateLength, -1 );
-					ASSERT_RESOURCE_ALLOCATION("ELI26070", ripTrust != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI26070", ripTrust != __nullptr);
 				}
 
 				// Get length of word
@@ -382,7 +382,7 @@ void CEntityNameSplitter::handleCompanySlash(ISpatialStringPtr &ripCompany)
 	{
 		// Local copy of SpatialString for testing
 		ISpatialStringPtr	ipLocal = ripCompany;
-		ASSERT_RESOURCE_ALLOCATION("ELI10496", ipLocal != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10496", ipLocal != __nullptr);
 
 		bool bDone = false;
 		long lFoundLocal = lFound;
@@ -565,7 +565,7 @@ ISpatialStringPtr CEntityNameSplitter::getEntityFromDelimiters(int iEntity,
 
 	// Create the output SpatialString
 	ISpatialStringPtr ipEntity( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10326", ipEntity != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10326", ipEntity != __nullptr );
 
 	// Check for single Entity case
 	if (iSize == 0)
@@ -588,7 +588,7 @@ ISpatialStringPtr CEntityNameSplitter::getEntityFromDelimiters(int iEntity,
 		long		lEndPos = -1;
 		ITokenPtr	ipToken;
 		ipToken = ITokenPtr( IObjectPairPtr( ipDelimiters->At(iDesiredToken) )->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10328", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10328", ipToken != __nullptr );
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 		// Initial Entity desired?
@@ -619,7 +619,7 @@ ISpatialStringPtr CEntityNameSplitter::getEntityFromDelimiters(int iEntity,
 			long		lPreEndPos = -1;
 			ITokenPtr	ipPreToken;
 			ipPreToken = ITokenPtr( IObjectPairPtr( ipDelimiters->At(iDesiredToken-1) )->Object1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10329", ipPreToken != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10329", ipPreToken != __nullptr );
 			ipPreToken->GetTokenInfo( &lPreStartPos, &lPreEndPos, NULL, NULL );
 
 			// Entity is after ipPreToken and before ipToken
@@ -639,7 +639,7 @@ void CEntityNameSplitter::processDelimiter(ISpatialStringPtr ipEntity, string st
 {
 	// Create local collection for interim results
 	IIUnknownVectorPtr ipResults( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI09308", ipResults != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09308", ipResults != __nullptr );
 
 	// Provide delimiter to parser
 	m_ipRegExprParser->Pattern = _bstr_t( strDelimiter.c_str() );
@@ -655,7 +655,7 @@ void CEntityNameSplitter::processDelimiter(ISpatialStringPtr ipEntity, string st
 		long		lEndPos = -1;
 		ITokenPtr	ipToken;
 		ISpatialStringPtr	ipSubstring( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09309", ipSubstring != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09309", ipSubstring != __nullptr );
 
 		////////////////////
 		// Get the substring
@@ -666,7 +666,7 @@ void CEntityNameSplitter::processDelimiter(ISpatialStringPtr ipEntity, string st
 		{
 			// Get token information
 			ipToken = ITokenPtr( IObjectPairPtr( ripMatches->At(i+lAddedTokens) )->Object1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09334", ipToken != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09334", ipToken != __nullptr );
 			ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 			if (lStartPos > 0)
@@ -770,7 +770,7 @@ void CEntityNameSplitter::processDelimiter(ISpatialStringPtr ipEntity, string st
 		bool		bTrailingToken = false;
 		ITokenPtr	ipToken;
 		ISpatialStringPtr	ipSubstring( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09897", ipSubstring != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09897", ipSubstring != __nullptr );
 
 		////////////////////
 		// Get the substring
@@ -781,11 +781,11 @@ void CEntityNameSplitter::processDelimiter(ISpatialStringPtr ipEntity, string st
 		{
 			// Get this ObjectPair
 			IObjectPairPtr	ipObjPair( ripMatches->At( i ) );
-			ASSERT_RESOURCE_ALLOCATION( "ELI12908", ipObjPair != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI12908", ipObjPair != __nullptr );
 
 			// Get token information
 			ipToken = ITokenPtr( ipObjPair->Object1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09898", ipToken != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09898", ipToken != __nullptr );
 			ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 			if (lStartPos == 0)
@@ -886,9 +886,9 @@ void CEntityNameSplitter::validateAmpersandTokens(ISpatialStringPtr ipEntity,
 
 		// Get token information
 		ipMatch = IObjectPairPtr( ripMatches->At(i) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI23647", ipMatch != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI23647", ipMatch != __nullptr );
 		ipToken = ITokenPtr( ipMatch->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09381", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09381", ipToken != __nullptr );
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrValue );
 
 		// Convert token and delimiter to upper case
@@ -915,9 +915,9 @@ void CEntityNameSplitter::validateAmpersandTokens(ISpatialStringPtr ipEntity,
 				// Preceding substring is in between two tokens
 				// so get information about preceding token
 				ipMatch = IObjectPairPtr( ripMatches->At(i-1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23648", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23648", ipMatch != __nullptr );
 				ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09382", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09382", ipToken2 != __nullptr );
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, NULL );
 
 				// Extract the substring
@@ -937,9 +937,9 @@ void CEntityNameSplitter::validateAmpersandTokens(ISpatialStringPtr ipEntity,
 				// Next substring is in between two tokens
 				// so get information about next token
 				ipMatch = IObjectPairPtr( ripMatches->At(i+1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23649", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23649", ipMatch != __nullptr );
 				ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09383", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09383", ipToken2 != __nullptr );
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, NULL );
 
 				// Extract the substring
@@ -1056,9 +1056,9 @@ void CEntityNameSplitter::validateBlankLineTokens(ISpatialStringPtr ipEntity,
 
 		// Get token information
 		ipMatch = IObjectPairPtr( ripMatches->At(i) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI23650", ipMatch != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI23650", ipMatch != __nullptr );
 		ipToken = ITokenPtr( ipMatch->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10541", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10541", ipToken != __nullptr );
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrValue );
 
 		string stdstrValue = asString(bstrValue);
@@ -1082,9 +1082,9 @@ void CEntityNameSplitter::validateBlankLineTokens(ISpatialStringPtr ipEntity,
 				// Preceding substring is in between two tokens
 				// so get information about preceding token
 				ipMatch = IObjectPairPtr( ripMatches->At(i-1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23651", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23651", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI10542", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI10542", ipToken2 != __nullptr );
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, NULL );
 
 				// Extract the substring
@@ -1093,7 +1093,7 @@ void CEntityNameSplitter::validateBlankLineTokens(ISpatialStringPtr ipEntity,
 
 			// Get count of words within this substring
 			IIUnknownVectorPtr	ipWords( CLSID_IUnknownVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09338", ipWords != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09338", ipWords != __nullptr );
 			long lWordCount = getWordsFromString( strSubstring, ipWords );
 
 			if (lWordCount == 1)
@@ -1120,9 +1120,9 @@ void CEntityNameSplitter::validateBlankLineTokens(ISpatialStringPtr ipEntity,
 				// Subsequent substring is in between two tokens
 				// so get information about subsequent token
 				ipMatch = IObjectPairPtr( ripMatches->At(i+1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23652", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23652", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI10543", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI10543", ipToken2 != __nullptr );
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, NULL );
 
 				// Extract the substring
@@ -1167,9 +1167,9 @@ void CEntityNameSplitter::validateCommaTokens(ISpatialStringPtr ipEntity,
 
 		// Get token information
 		ipMatch = IObjectPairPtr( ripMatches->At(i) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI23653", ipMatch != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI23653", ipMatch != __nullptr );
 		ipToken = ITokenPtr( ipMatch->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09326", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09326", ipToken != __nullptr );
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrValue );
 
 		string stdstrValue = asString(bstrValue);
@@ -1193,9 +1193,9 @@ void CEntityNameSplitter::validateCommaTokens(ISpatialStringPtr ipEntity,
 				// Preceding substring is in between two tokens
 				// so get information about preceding token
 				ipMatch = IObjectPairPtr( ripMatches->At(i-1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23654", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23654", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09327", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09327", ipToken2 != __nullptr );
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, NULL );
 
 				// Extract the substring
@@ -1204,7 +1204,7 @@ void CEntityNameSplitter::validateCommaTokens(ISpatialStringPtr ipEntity,
 
 			// Get count of words within this substring
 			IIUnknownVectorPtr	ipWords( CLSID_IUnknownVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI19158", ipWords != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI19158", ipWords != __nullptr );
 			long lWordCount = getWordsFromString( strSubstring, ipWords );
 
 			if (lWordCount == 1)
@@ -1225,9 +1225,9 @@ void CEntityNameSplitter::validateCommaTokens(ISpatialStringPtr ipEntity,
 
 				// Retrieve token
 				ipMatch = IObjectPairPtr( ipWords->At(0) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23655", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23655", ipMatch != __nullptr );
 				ITokenPtr ipToken1 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09340", ipToken1 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09340", ipToken1 != __nullptr );
 				bstrValue.Empty();
 				ipToken1->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, &bstrValue );
 
@@ -1249,11 +1249,11 @@ void CEntityNameSplitter::validateCommaTokens(ISpatialStringPtr ipEntity,
 			bool	bFoundAlias = false;
 			IVariantVectorPtr ipAliasRE = 
 				m_ipKeys->GetKeywordCollection( _bstr_t( "PersonAlias" ) );
-			ASSERT_RESOURCE_ALLOCATION( "ELI11399", ipAliasRE != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI11399", ipAliasRE != __nullptr );
 
 			// Create temporary Spatial String to facilitate the search (P16 #2049)
 			ISpatialStringPtr ipTemp( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION( "ELI15709", ipTemp != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI15709", ipTemp != __nullptr );
 			ipTemp->CreateNonSpatialString(strSubstring.c_str(), "");
 
 			// Check for an Alias pattern
@@ -1296,9 +1296,9 @@ void CEntityNameSplitter::validateCommaTokens(ISpatialStringPtr ipEntity,
 				// Subsequent substring is in between two tokens
 				// so get information about subsequent token
 				ipMatch = IObjectPairPtr( ripMatches->At(i+1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23656", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23656", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09362", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09362", ipToken2 != __nullptr );
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, NULL );
 
 				// Extract the substring
@@ -1313,16 +1313,16 @@ void CEntityNameSplitter::validateCommaTokens(ISpatialStringPtr ipEntity,
 			{
 				// Retrieve first word
 				ipMatch = IObjectPairPtr( ipWords->At(0) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI24215", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI24215", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09373", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09373", ipToken2 != __nullptr );
 				bstrValue.Empty();
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, &bstrValue );
 
 				// Check word for Suffix
 				bool	bFoundSuffix = false;
 				IVariantVectorPtr ipSuffixRE = m_ipKeys->PersonSuffixes;
-				ASSERT_RESOURCE_ALLOCATION( "ELI09363", ipSuffixRE != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09363", ipSuffixRE != __nullptr );
 
 				// Check each Suffix pattern
 				int j;
@@ -1343,7 +1343,7 @@ void CEntityNameSplitter::validateCommaTokens(ISpatialStringPtr ipEntity,
 				bFoundAlias = false;
 				IVariantVectorPtr ipAliasRE = 
 					m_ipKeys->GetKeywordCollection( _bstr_t( "PersonAlias" ) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI11400", ipAliasRE != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI11400", ipAliasRE != __nullptr );
 
 				// Check each Alias pattern
 				for (j = 0; j < ipAliasRE->Size; j++)
@@ -1394,9 +1394,9 @@ void CEntityNameSplitter::validateSemicolonTokens(ISpatialStringPtr ipEntity,
 
 		// Get token information
 		ipMatch = IObjectPairPtr( ripMatches->At(i) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI23645", ipMatch != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI23645", ipMatch != __nullptr );
 		ipToken = ITokenPtr( ipMatch->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI23642", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI23642", ipToken != __nullptr );
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrValue );
 
 		string stdstrValue = asString(bstrValue);
@@ -1419,9 +1419,9 @@ void CEntityNameSplitter::validateSemicolonTokens(ISpatialStringPtr ipEntity,
 				// Preceding substring is in between two tokens
 				// so get information about preceding token
 				ipMatch = IObjectPairPtr( ripMatches->At(i-1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23646", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23646", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23643", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23643", ipToken2 != __nullptr );
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, NULL );
 
 				// Extract the substring
@@ -1432,7 +1432,7 @@ void CEntityNameSplitter::validateSemicolonTokens(ISpatialStringPtr ipEntity,
 			bool bFoundAlias = false;
 			IVariantVectorPtr ipAliasRE = 
 				m_ipKeys->GetKeywordCollection( _bstr_t( "PersonAlias" ) );
-			ASSERT_RESOURCE_ALLOCATION( "ELI23644", ipAliasRE != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI23644", ipAliasRE != __nullptr );
 
 			// Check each Alias pattern
 			int nCollectionSize = ipAliasRE->Size;
@@ -1486,9 +1486,9 @@ void CEntityNameSplitter::validateSlashTokens(ISpatialStringPtr ipEntity,
 
 		// Get token information
 		ipMatch = IObjectPairPtr( ripMatches->At(i) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI23657", ipMatch != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI23657", ipMatch != __nullptr );
 		ipToken = ITokenPtr( ipMatch->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09673", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09673", ipToken != __nullptr );
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrValue );
 
 		string stdstrValue = asString(bstrValue);
@@ -1515,9 +1515,9 @@ void CEntityNameSplitter::validateSlashTokens(ISpatialStringPtr ipEntity,
 				// Preceding substring is in between two tokens
 				// so get information about preceding token
 				ipMatch = IObjectPairPtr( ripMatches->At(i-1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23658", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23658", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09674", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09674", ipToken2 != __nullptr );
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, NULL );
 
 				// Extract the substring
@@ -1526,7 +1526,7 @@ void CEntityNameSplitter::validateSlashTokens(ISpatialStringPtr ipEntity,
 
 			// Get count of words within this substring
 			IIUnknownVectorPtr	ipWords( CLSID_IUnknownVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09675", ipWords != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09675", ipWords != __nullptr );
 			long lWordCount = getWordsFromString( strPrevious, ipWords );
 
 			if (lWordCount <= 1)
@@ -1539,9 +1539,9 @@ void CEntityNameSplitter::validateSlashTokens(ISpatialStringPtr ipEntity,
 			{
 				// Retrieve last word
 				ipMatch = IObjectPairPtr( ipWords->At(lWordCount-1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23659", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23659", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09679", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09679", ipToken2 != __nullptr );
 				bstrValue.Empty();
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, &bstrValue );
 
@@ -1561,9 +1561,9 @@ void CEntityNameSplitter::validateSlashTokens(ISpatialStringPtr ipEntity,
 				// Subsequent substring is in between two tokens
 				// so get information about subsequent token
 				ipMatch = IObjectPairPtr( ripMatches->At(i+1) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23660", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23660", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09678", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09678", ipToken2 != __nullptr );
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, NULL );
 
 				// Extract the substring
@@ -1587,9 +1587,9 @@ void CEntityNameSplitter::validateSlashTokens(ISpatialStringPtr ipEntity,
 			{
 				// Retrieve first word
 				ipMatch = IObjectPairPtr( ipWords->At(0) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23661", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23661", ipMatch != __nullptr );
 				ITokenPtr ipToken2 = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09680", ipToken2 != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09680", ipToken2 != __nullptr );
 				bstrValue.Empty();
 				ipToken2->GetTokenInfo( &lStartPos2, &lEndPos2, NULL, &bstrValue );
 
@@ -1643,9 +1643,9 @@ void CEntityNameSplitter::updateTokenPositions(IIUnknownVectorPtr &ripMatches, l
 	{
 		// Retrieve token
 		IObjectPairPtr ipMatch = IObjectPairPtr( ripMatches->At(i) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI23662", ipMatch != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI23662", ipMatch != __nullptr );
 		ITokenPtr ipToken = ITokenPtr( ipMatch->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09315", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09315", ipToken != __nullptr );
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 		// Update positions
@@ -1701,7 +1701,7 @@ int CEntityNameSplitter::getDuplicateWordFirstIndex(IIUnknownVectorPtr ipMatches
 	{
 		// Retrieve this token
 		ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At(i) )->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09328", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09328", ipToken != __nullptr );
 		bstrWord.Empty();
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrWord );
 
@@ -1802,7 +1802,7 @@ int CEntityNameSplitter::getWordBreakIndex(IIUnknownVectorPtr ipMatches)
 	{
 		// Retrieve this token
 		ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At(iWordBreak - 1) )->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09329", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09329", ipToken != __nullptr );
 		bstrWord.Empty();
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrWord );
 
@@ -1862,7 +1862,7 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 
 	// Get the collection of words
 	IIUnknownVectorPtr ipMatches( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI09336", ipMatches != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09336", ipMatches != __nullptr );
 
 	////////////////////////////////////////
 	// Replace alias strings with label text
@@ -1977,7 +1977,7 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 
 	// Create the vector to hold stringized names
 	IIUnknownVectorPtr	ipNames( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI06686", ipNames != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI06686", ipNames != __nullptr );
 
 	// Confirm that vector of words is non-empty
 	long	lSize = ipMatches->Size();
@@ -1990,7 +1990,7 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 
 	// Create an object for internal Keyword searching
 	ISpatialStringPtr	ipWord( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI06508", ipWord != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI06508", ipWord != __nullptr );
 
 	////////////////////////////////////////////////////////////////////////
 	// Step through collection of words checking for Titles, Suffixes, Other
@@ -2005,9 +2005,9 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 	{
 		// Retrieve this token
 		ipMatch = IObjectPairPtr( ipMatches->At(i) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI23688", ipMatch != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI23688", ipMatch != __nullptr );
 		ipToken = ITokenPtr( ipMatch->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09330", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09330", ipToken != __nullptr );
 		bstrWord.Empty();
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrWord );
 
@@ -2170,16 +2170,16 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 			{
 				// Retrieve the first copy of the duplicate word
 				ipMatch = IObjectPairPtr( ipMatches->At(iDuplicateWordIndex) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23687", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23687", ipMatch != __nullptr );
 				ipToken = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09331", ipToken != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09331", ipToken != __nullptr );
 				ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 				// Matching words were found, treat the duplicates as last names and
 				// divide the pending name into two parts
 				ISpatialStringPtr	ipFirst = ipText->GetSubString( 
 					iLastCharUsed + 1, lEndPos );
-				ASSERT_RESOURCE_ALLOCATION( "ELI09332", ipFirst != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI09332", ipFirst != __nullptr );
 
 				// Store the index of the duplicate word
 				lSecondDuplicateWordIndex = i;
@@ -2212,9 +2212,9 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 
 			// Check second word
 			ipMatch = IObjectPairPtr( ipMatches->At(1) );
-			ASSERT_RESOURCE_ALLOCATION( "ELI23681", ipMatch != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI23681", ipMatch != __nullptr );
 			ipToken = ITokenPtr( ipMatch->Object1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI23682", ipToken != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI23682", ipToken != __nullptr );
 			bstrWord.Empty();
 			ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrWord );
 			string strWord = asString( bstrWord );
@@ -2232,9 +2232,9 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 
 			// Check fifth word
 			ipMatch = IObjectPairPtr( ipMatches->At(4) );
-			ASSERT_RESOURCE_ALLOCATION( "ELI23683", ipMatch != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI23683", ipMatch != __nullptr );
 			ipToken = ITokenPtr( ipMatch->Object1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI23684", ipToken != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI23684", ipToken != __nullptr );
 			bstrWord.Empty();
 			ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrWord );
 			strWord = asString( bstrWord );
@@ -2250,9 +2250,9 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 			{
 				// Find starting position of fourth word
 				ipMatch = IObjectPairPtr( ipMatches->At(3) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23685", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23685", ipMatch != __nullptr );
 				ipToken = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23686", ipToken != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23686", ipToken != __nullptr );
 				bstrWord.Empty();
 				ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrWord );
 
@@ -2281,9 +2281,9 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 			{
 				// Retrieve the second copy of the duplicate word
 				ipMatch = IObjectPairPtr( ipMatches->At(lSecondDuplicateWordIndex) );
-				ASSERT_RESOURCE_ALLOCATION( "ELI24014", ipMatch != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI24014", ipMatch != __nullptr );
 				ipToken = ITokenPtr( ipMatch->Object1 );
-				ASSERT_RESOURCE_ALLOCATION( "ELI24015", ipToken != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI24015", ipToken != __nullptr );
 				ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, NULL );
 
 				if (iLastCharUsed < lEndPos)
@@ -2292,7 +2292,7 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 					// divide the pending name into two parts
 					ISpatialStringPtr	ipSecond = ipText->GetSubString( 
 						iLastCharUsed + 1, lEndPos );
-					ASSERT_RESOURCE_ALLOCATION( "ELI24016", ipSecond != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI24016", ipSecond != __nullptr );
 
 					// Trim leading and trailing whitespace
 					ipSecond->Trim( _bstr_t( " " ), _bstr_t( " " ) );
@@ -2313,7 +2313,7 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 				// Build the complete name string
 				ISpatialStringPtr	ipName = ipText->GetSubString( 
 					iLastCharUsed + 1, lTextEndPos );
-				ASSERT_RESOURCE_ALLOCATION( "ELI24019", ipName != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI24019", ipName != __nullptr );
 
 				// Trim leading and trailing whitespace
 				ipName->Trim( _bstr_t( " " ), _bstr_t( " " ) );
@@ -2669,9 +2669,9 @@ bool CEntityNameSplitter::isValidEntity(ISpatialStringPtr& ripEntity, bool bIsPe
 		// Retrieve collection of Number Words
 		// Add collection of Invalid Persons
 		IShallowCopyablePtr ipCopier = m_ipKeys->GetKeywordCollection("NumberWords");
-		ASSERT_RESOURCE_ALLOCATION("ELI26071", ipCopier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26071", ipCopier != __nullptr);
 		IVariantVectorPtr ipUnwanted = ipCopier->ShallowCopy();
-		ASSERT_RESOURCE_ALLOCATION( "ELI10497", ipUnwanted != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10497", ipUnwanted != __nullptr );
 		ipUnwanted->Append(m_ipKeys->GetKeywordCollection("InvalidPersons"));
 
 		if (bValid && asCppBool(ripEntity->ContainsStringInVector(
@@ -2711,7 +2711,7 @@ bool CEntityNameSplitter::isValidEntity(ISpatialStringPtr& ripEntity, bool bIsPe
 	{
 		// Create SpatialString for testing
 		ISpatialStringPtr	ipTest( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10101", ipTest != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10101", ipTest != __nullptr );
 
 		// Temporary replacement of carriage-return characters with spaces 
 		// to avoid discarding an otherwise valid entity (P16 #2048)
@@ -2721,7 +2721,7 @@ bool CEntityNameSplitter::isValidEntity(ISpatialStringPtr& ripEntity, bool bIsPe
 
 		// Retrieve list of invalid entity expressions
 		IVariantVectorPtr ipInvalid = m_ipKeys->GetKeywordCollection( _bstr_t( "InvalidEntities" ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10102", ipInvalid != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10102", ipInvalid != __nullptr );
 
 		// Check for invalid pattern
 		if (asCppBool(ipTest->ContainsStringInVector(
@@ -2939,7 +2939,7 @@ void CEntityNameSplitter::trimTrailingLowerCaseWords(ISpatialStringPtr& ripEntit
 	}
 
 	IIUnknownVectorPtr ipWords( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI09804", ipWords != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09804", ipWords != __nullptr );
 
 	// Get the collection of words
 	long lCount = getWordsFromString( strTest, ipWords );
@@ -2954,7 +2954,7 @@ void CEntityNameSplitter::trimTrailingLowerCaseWords(ISpatialStringPtr& ripEntit
 	{
 		// Retrieve this token
 		ipToken = ITokenPtr( IObjectPairPtr( ipWords->At(i) )->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09805", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09805", ipToken != __nullptr );
 		bstrWord.Empty();
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrWord );
 
@@ -3011,7 +3011,7 @@ void CEntityNameSplitter::trimTrailingWord(ISpatialStringPtr& ripEntity, string 
 	}
 
 	IIUnknownVectorPtr ipWords( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10538", ipWords != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10538", ipWords != __nullptr );
 
 	// Get the collection of words
 	long lCount = getWordsFromString( strTest, ipWords );
@@ -3028,7 +3028,7 @@ void CEntityNameSplitter::trimTrailingWord(ISpatialStringPtr& ripEntity, string 
 	{
 		// Retrieve this token
 		ipToken = ITokenPtr( IObjectPairPtr( ipWords->At(i) )->Object1 );
-		ASSERT_RESOURCE_ALLOCATION( "ELI19130", ipToken != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI19130", ipToken != __nullptr );
 		bstrWord.Empty();
 		ipToken->GetTokenInfo( &lStartPos, &lEndPos, NULL, &bstrWord );
 
@@ -3072,7 +3072,7 @@ IRegularExprParserPtr CEntityNameSplitter::getParser()
 		// Get a regular expression parser
 		IRegularExprParserPtr ipParser =
 			m_ipMiscUtils->GetNewRegExpParserInstance("EntityNameSplitter");
-		ASSERT_RESOURCE_ALLOCATION( "ELI22439", ipParser != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI22439", ipParser != __nullptr );
 
 		return ipParser;
 	}

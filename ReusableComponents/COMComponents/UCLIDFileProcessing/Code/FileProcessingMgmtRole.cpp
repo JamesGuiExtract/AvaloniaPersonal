@@ -46,10 +46,10 @@ ProcessingThreadData::ProcessingThreadData()
 	try
 	{
 		m_ipTaskExecutor.CreateInstance(CLSID_FileProcessingTaskExecutor);
-		ASSERT_RESOURCE_ALLOCATION("ELI17845", m_ipTaskExecutor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17845", m_ipTaskExecutor != __nullptr);
 
 		m_ipErrorTaskExecutor.CreateInstance(CLSID_FileProcessingTaskExecutor);
-		ASSERT_RESOURCE_ALLOCATION("ELI18006", m_ipErrorTaskExecutor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18006", m_ipErrorTaskExecutor != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI17942");
 }
@@ -59,7 +59,7 @@ ProcessingThreadData::~ProcessingThreadData()
 	try
 	{
 		// Release the file processing tasks
-		m_ipTaskExecutor = NULL;
+		m_ipTaskExecutor = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI12958");
 }
@@ -164,9 +164,9 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB* pDB, long lAction
 
 		// check pre-conditions
 		ASSERT_ARGUMENT("ELI14296", m_bEnabled == true);
-		ASSERT_ARGUMENT("ELI14301", m_ipFileProcessingTasks != NULL);
+		ASSERT_ARGUMENT("ELI14301", m_ipFileProcessingTasks != __nullptr);
 		ASSERT_ARGUMENT("ELI14302", m_ipFileProcessingTasks->Size() > 0);
-		ASSERT_ARGUMENT("ELI14344", m_pRecordMgr != NULL);
+		ASSERT_ARGUMENT("ELI14344", m_pRecordMgr != __nullptr);
 
 		m_strFpsFile = asString(bstrFpsFileName);
 
@@ -179,7 +179,7 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB* pDB, long lAction
 
 		// Set the File Action manager pointer
 		m_ipRoleNotifyFAM = pRoleNotifyFAM;
-		ASSERT_RESOURCE_ALLOCATION("ELI14531", m_ipRoleNotifyFAM != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14531", m_ipRoleNotifyFAM != __nullptr );
 
 		// store the pointer to the DB so that subsequent calls to getFPDB() will work correctly
 		m_pDB = pDB;
@@ -343,7 +343,7 @@ STDMETHODIMP CFileProcessingMgmtRole::ValidateStatus(void)
 			{
 				// Retrieve this Object With Description
 				IObjectWithDescriptionPtr ipOWD = m_ipFileProcessingTasks->At( i );
-				ASSERT_RESOURCE_ALLOCATION("ELI16007", ipOWD != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI16007", ipOWD != __nullptr);
 
 				// Check the Enabled flag
 				if (asCppBool( ipOWD->Enabled ))
@@ -382,7 +382,7 @@ STDMETHODIMP CFileProcessingMgmtRole::ValidateStatus(void)
 			if (asCppBool(getErrorHandlingTask()->Enabled))
 			{
 				UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipErrorTask(getErrorHandlingTask()->Object);
-				if (ipErrorTask == NULL)
+				if (ipErrorTask == __nullptr)
 				{
 					UCLIDException ue("ELI18059", "An error task must be specified!");
 					throw ue;
@@ -436,10 +436,10 @@ STDMETHODIMP CFileProcessingMgmtRole::get_FileProcessors(IIUnknownVector ** pVal
 	{
 		validateLicense();
 
-		if (m_ipFileProcessingTasks == NULL)
+		if (m_ipFileProcessingTasks == __nullptr)
 		{
 			m_ipFileProcessingTasks.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI08936", m_ipFileProcessingTasks != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08936", m_ipFileProcessingTasks != __nullptr);
 		}
 
 		IIUnknownVectorPtr ipShallowCopy = m_ipFileProcessingTasks;
@@ -519,7 +519,7 @@ STDMETHODIMP CFileProcessingMgmtRole::SetRecordMgr(void *pRecordMgr)
 		validateLicense();
 		
 		// verify args
-		ASSERT_ARGUMENT("ELI14286", pRecordMgr != NULL);
+		ASSERT_ARGUMENT("ELI14286", pRecordMgr != __nullptr);
 
 		// update internal ptr
 		m_pRecordMgr = static_cast<FPRecordManager *> (pRecordMgr);
@@ -535,7 +535,7 @@ STDMETHODIMP CFileProcessingMgmtRole::get_KeepProcessingAsAdded(VARIANT_BOOL* pV
 	{
 		validateLicense();
 		// verify args
-		ASSERT_ARGUMENT("ELI14518", pVal != NULL );
+		ASSERT_ARGUMENT("ELI14518", pVal != __nullptr );
 		
 		*pVal = (m_bKeepProcessingAsAdded) ? VARIANT_TRUE : VARIANT_FALSE;
 	}
@@ -570,7 +570,7 @@ STDMETHODIMP CFileProcessingMgmtRole::put_OkToStopWhenQueueIsEmpty(VARIANT_BOOL 
 		validateLicense();
 		m_bOkToStopWhenQueueIsEmpty = newVal == VARIANT_TRUE;
 
-		if (m_pRecordMgr != NULL )
+		if (m_pRecordMgr != __nullptr )
 		{
 			if ( m_bOkToStopWhenQueueIsEmpty )
 			{
@@ -595,7 +595,7 @@ STDMETHODIMP CFileProcessingMgmtRole::get_OkToStopWhenQueueIsEmpty(VARIANT_BOOL*
 	{
 		validateLicense();
 		// verify args
-		ASSERT_ARGUMENT("ELI14521", pVal != NULL );
+		ASSERT_ARGUMENT("ELI14521", pVal != __nullptr );
 		
 		*pVal = (m_bOkToStopWhenQueueIsEmpty) ? VARIANT_TRUE : VARIANT_FALSE;
 	}
@@ -612,7 +612,7 @@ STDMETHODIMP CFileProcessingMgmtRole::get_LogErrorDetails(VARIANT_BOOL* pVal)
 	{
 		// Check license and verify argument
 		validateLicense();
-		ASSERT_ARGUMENT("ELI16060", pVal != NULL );
+		ASSERT_ARGUMENT("ELI16060", pVal != __nullptr );
 
 		*pVal = asVariantBool( m_bLogErrorDetails );
 	}
@@ -683,7 +683,7 @@ STDMETHODIMP CFileProcessingMgmtRole::get_ExecuteErrorTask(VARIANT_BOOL* pVal)
 	{
 		// Check license and verify argument
 		validateLicense();
-		ASSERT_ARGUMENT("ELI16063", pVal != NULL );
+		ASSERT_ARGUMENT("ELI16063", pVal != __nullptr );
 
 		*pVal = asVariantBool( isErrorHandlingTaskEnabled() );
 	}
@@ -758,7 +758,7 @@ STDMETHODIMP CFileProcessingMgmtRole::get_ProcessSkippedFiles(VARIANT_BOOL *pbVa
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI26916", pbVal != NULL);
+		ASSERT_ARGUMENT("ELI26916", pbVal != __nullptr);
 
 		// Get the skipped files value
 		*pbVal = asVariantBool(m_bProcessSkippedFiles);
@@ -795,7 +795,7 @@ STDMETHODIMP CFileProcessingMgmtRole::get_SkippedForAnyUser(VARIANT_BOOL* pbVal)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI26919", pbVal != NULL);
+		ASSERT_ARGUMENT("ELI26919", pbVal != __nullptr);
 
 		// Get the skipped user name
 		*pbVal = asVariantBool(m_bSkippedForAnyUser);
@@ -849,10 +849,10 @@ STDMETHODIMP CFileProcessingMgmtRole::IsDirty(void)
 		}
 
 		// check if the file processors vector object is dirty
-		if (m_ipFileProcessingTasks != NULL)
+		if (m_ipFileProcessingTasks != __nullptr)
 		{
 			IPersistStreamPtr ipFPStream = m_ipFileProcessingTasks;
-			ASSERT_RESOURCE_ALLOCATION("ELI14333", ipFPStream != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14333", ipFPStream != __nullptr);
 			if (ipFPStream->IsDirty() == S_OK)
 			{
 				return S_OK;
@@ -860,10 +860,10 @@ STDMETHODIMP CFileProcessingMgmtRole::IsDirty(void)
 		}
 
 		// check if the error task is dirty
-		if (m_ipErrorTask != NULL)
+		if (m_ipErrorTask != __nullptr)
 		{
 			IPersistStreamPtr ipFPStream = m_ipErrorTask;
-			ASSERT_RESOURCE_ALLOCATION("ELI18064", ipFPStream != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18064", ipFPStream != __nullptr);
 			if (ipFPStream->IsDirty() == S_OK)
 			{
 				return S_OK;
@@ -1056,19 +1056,19 @@ STDMETHODIMP CFileProcessingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Save the error handling task
 		IPersistStreamPtr ipErrorTaskObj = getErrorHandlingTask();
-		ASSERT_RESOURCE_ALLOCATION( "ELI16055", ipErrorTaskObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI16055", ipErrorTaskObj != __nullptr );
 		writeObjectToStream( ipErrorTaskObj, pStream, "ELI16056", fClearDirty );
 
 		// Make sure the FileProcessingTasks vector has been created
-		if ( m_ipFileProcessingTasks == NULL )
+		if ( m_ipFileProcessingTasks == __nullptr )
 		{
 			m_ipFileProcessingTasks.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI14586", m_ipFileProcessingTasks != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI14586", m_ipFileProcessingTasks != __nullptr );
 		}
 		
 		// Save the File Processors
 		IPersistStreamPtr ipFPObj = m_ipFileProcessingTasks;
-		ASSERT_RESOURCE_ALLOCATION( "ELI14455", ipFPObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14455", ipFPObj != __nullptr );
 		writeObjectToStream( ipFPObj, pStream, "ELI14456", fClearDirty );
 
 		// Clear the flag as specified
@@ -1096,11 +1096,11 @@ STDMETHODIMP CFileProcessingMgmtRole::get_ProcessingSchedule(IVariantVector** pp
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28157", ppHoursSchedule != NULL);
+		ASSERT_ARGUMENT("ELI28157", ppHoursSchedule != __nullptr);
 
 		// Create the return variant vector
 		IVariantVectorPtr ipHours(CLSID_VariantVector);
-		ASSERT_ARGUMENT("ELI28159", ipHours != NULL);
+		ASSERT_ARGUMENT("ELI28159", ipHours != __nullptr);
 
 		// Copy data from the STL vector to the variant vector
 		int nSize = m_vecScheduledHours.size();
@@ -1126,7 +1126,7 @@ STDMETHODIMP CFileProcessingMgmtRole::put_ProcessingSchedule(IVariantVector* pHo
 		validateLicense();
 
 		IVariantVectorPtr ipHoursSchedule(pHoursSchedule);
-		ASSERT_ARGUMENT("ELI28160", ipHoursSchedule != NULL);
+		ASSERT_ARGUMENT("ELI28160", ipHoursSchedule != __nullptr);
 
 		// Clear the scheduled hours vector
 		m_vecScheduledHours.clear();
@@ -1163,7 +1163,7 @@ STDMETHODIMP CFileProcessingMgmtRole::get_LimitProcessingToSchedule(VARIANT_BOOL
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28177", pbVal != NULL);
+		ASSERT_ARGUMENT("ELI28177", pbVal != __nullptr);
 
 		*pbVal = asVariantBool(m_bLimitProcessingToSchedule);
 	}
@@ -1214,13 +1214,13 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		}
 
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(pFileRecord);
-		ASSERT_ARGUMENT("ELI29536", ipFileRecord != NULL);
+		ASSERT_ARGUMENT("ELI29536", ipFileRecord != __nullptr);
 
 		m_pDB = pFPDB;
-		ASSERT_ARGUMENT("ELI29552", m_pDB != NULL);
+		ASSERT_ARGUMENT("ELI29552", m_pDB != __nullptr);
 
 		m_pFAMTagManager = pFAMTagManager;
-		ASSERT_ARGUMENT("ELI29553", m_pFAMTagManager != NULL);
+		ASSERT_ARGUMENT("ELI29553", m_pFAMTagManager != __nullptr);
 
 		// Ensure m_bProcessingSingleFile will be reset to false.
 		ValueRestorer<volatile bool> restorer(m_bProcessingSingleFile, false);
@@ -1270,7 +1270,7 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		// Initialize the task executor
 		UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
 			threadData.m_ipTaskExecutor;
-		ASSERT_RESOURCE_ALLOCATION("ELI29555", ipExecutor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29555", ipExecutor != __nullptr);
 		ipExecutor->Init(m_ipFileProcessingTasks, m_pRecordMgr->getActionID(), getFPMDB(),
 			getFAMTagManager());
 
@@ -1311,7 +1311,7 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr CFileProcessingMgmtRole::getThisAsCOMPtr()
 {
 	UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16976", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16976", ipThis != __nullptr);
 
 	return ipThis;
 }
@@ -1322,7 +1322,7 @@ long CFileProcessingMgmtRole::getEnabledFileProcessingTasksCount(IIUnknownVector
 
 	// Iterate through the IIUnknownVector of IObjectWithDescription of IFileProcessingTask objects
 	// and determine the count of enabled file processors
-	if (ipFileProcessingTasks != NULL)
+	if (ipFileProcessingTasks != __nullptr)
 	{
 		for (int i = 0; i < ipFileProcessingTasks->Size(); i++)
 		{
@@ -1330,7 +1330,7 @@ long CFileProcessingMgmtRole::getEnabledFileProcessingTasksCount(IIUnknownVector
 			IObjectWithDescriptionPtr ipObjWithDesc = ipFileProcessingTasks->At(i);
 
 			// Increment the count if the object is defined and is enabled for use
-			if (ipObjWithDesc->Enabled == VARIANT_TRUE && ipObjWithDesc->Object != NULL)
+			if (ipObjWithDesc->Enabled == VARIANT_TRUE && ipObjWithDesc->Object != __nullptr)
 			{
 				nCount++;
 			}
@@ -1344,7 +1344,7 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadProc(void *pData)
 {
 	// cast argument into thread data structure pointer
 	ProcessingThreadData *pThreadData = static_cast<ProcessingThreadData *>(pData);
-	ASSERT_ARGUMENT("ELI11107", pThreadData != NULL);
+	ASSERT_ARGUMENT("ELI11107", pThreadData != __nullptr);
 
 	// notify interested parties that the thread has started
 	pThreadData->m_threadStartedEvent.signal();
@@ -1353,7 +1353,7 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadProc(void *pData)
 	{
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		CFileProcessingMgmtRole *pFPMgmtRole = pThreadData->m_pFPMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION("ELI11108", pFPMgmtRole != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11108", pFPMgmtRole != __nullptr);
 		pFPMgmtRole->processFiles2(pThreadData);
 		CoUninitialize();
 	}
@@ -1370,9 +1370,9 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData)
 	try
 	{
 		CFileProcessingMgmtRole *pFPM = static_cast<CFileProcessingMgmtRole *>(pData);
-		ASSERT_ARGUMENT("ELI13893", pFPM != NULL);
-		ASSERT_ARGUMENT("ELI14348", pFPM->m_pRecordMgr != NULL);
-		ASSERT_ARGUMENT("ELI14532", pFPM->m_ipRoleNotifyFAM != NULL );
+		ASSERT_ARGUMENT("ELI13893", pFPM != __nullptr);
+		ASSERT_ARGUMENT("ELI14348", pFPM->m_pRecordMgr != __nullptr);
+		ASSERT_ARGUMENT("ELI14532", pFPM->m_ipRoleNotifyFAM != __nullptr );
 
 		try
 		{
@@ -1410,11 +1410,11 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData)
 					for (unsigned long i = 0; i < ulNumThreads; i++)
 					{
 						ProcessingThreadData* pThreadData = rvecProcessingThreadData[i];
-						ASSERT_RESOURCE_ALLOCATION("ELI17950", pThreadData != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI17950", pThreadData != __nullptr);
 
 						UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
 							pThreadData->m_ipTaskExecutor;
-						ASSERT_RESOURCE_ALLOCATION("ELI17951", ipExecutor != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI17951", ipExecutor != __nullptr);
 
 						ipExecutor->Close();
 					}
@@ -1456,11 +1456,11 @@ UINT CFileProcessingMgmtRole::handleStopRequestAsynchronously(void *pData)
 	try
 	{
 		CFileProcessingMgmtRole *pFPM = static_cast<CFileProcessingMgmtRole *>(pData);
-		ASSERT_RESOURCE_ALLOCATION("ELI19422", pFPM != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19422", pFPM != __nullptr);
 
 		FPRecordManager* pRecordManager = pFPM->m_pRecordMgr;
-		ASSERT_RESOURCE_ALLOCATION("ELI19431", pRecordManager != NULL);
-		ASSERT_ARGUMENT("ELI19433", pFPM->m_ipRoleNotifyFAM != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI19431", pRecordManager != __nullptr);
+		ASSERT_ARGUMENT("ELI19433", pFPM->m_ipRoleNotifyFAM != __nullptr );
 		
 		// Notify the queue that processing is stopping so it will no longer satisfy file
 		// requests
@@ -1535,7 +1535,7 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI17943", pThreadData != NULL);
+			ASSERT_ARGUMENT("ELI17943", pThreadData != __nullptr);
 
 			task.markAsStarted();
 			m_pRecordMgr->updateTask(task);
@@ -1582,11 +1582,11 @@ EFileProcessingResult CFileProcessingMgmtRole::startFileProcessingChain(FileProc
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI17944", pThreadData != NULL);
+		ASSERT_ARGUMENT("ELI17944", pThreadData != __nullptr);
 
 		UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
 			pThreadData->m_ipTaskExecutor;
-		ASSERT_RESOURCE_ALLOCATION("ELI17945", ipExecutor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17945", ipExecutor != __nullptr);
 
 		// If m_bProcessing is false it means processing has been stopped.
 		if (!m_bProcessing && !m_bProcessingSingleFile)
@@ -1650,17 +1650,17 @@ void CFileProcessingMgmtRole::handleProcessingError(FileProcessingRecord &task,
 			// Should error task be executed
 			if (isErrorHandlingTaskEnabled())
 			{
-				ASSERT_ARGUMENT("ELI18007", pThreadData != NULL);
+				ASSERT_ARGUMENT("ELI18007", pThreadData != __nullptr);
 
 				UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
 					pThreadData->m_ipErrorTaskExecutor;
-				ASSERT_RESOURCE_ALLOCATION("ELI18008", ipExecutor != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI18008", ipExecutor != __nullptr);
 
 				task.notifyRunningErrorTask();
 
 				// Create an error task "list" that contains the error task to run
 				IIUnknownVectorPtr ipErrorTaskList(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI17993", ipErrorTaskList != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI17993", ipErrorTaskList != __nullptr);
 
 				ipErrorTaskList->PushBack(getErrorHandlingTask());
 
@@ -1731,10 +1731,10 @@ void CFileProcessingMgmtRole::clear()
 	m_pDB = NULL;
 
 	// Release the processing tasks
-	if (m_ipFileProcessingTasks != NULL)
+	if (m_ipFileProcessingTasks != __nullptr)
 	{
 		m_ipFileProcessingTasks->Clear();
-		m_ipFileProcessingTasks = NULL;
+		m_ipFileProcessingTasks = __nullptr;
 	}
 
 	// Reset the number of threads
@@ -1752,7 +1752,7 @@ void CFileProcessingMgmtRole::clear()
 	m_strErrorLogFile.clear();
 
 	// Clear the error task
-	m_ipErrorTask = NULL;
+	m_ipErrorTask = __nullptr;
 
 	// Clear the checkbox for the Processing tabs and the dirty flag
 	m_bEnabled = false;
@@ -1785,7 +1785,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingMgmtRole::getFPMDB(
 UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr CFileProcessingMgmtRole::getFAMTagManager()
 {
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipTagManager = m_pFAMTagManager;
-	ASSERT_RESOURCE_ALLOCATION("ELI14401", ipTagManager != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14401", ipTagManager != __nullptr);
 	return ipTagManager;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1825,7 +1825,7 @@ void CFileProcessingMgmtRole::releaseProcessingThreadDataObjects()
 IIUnknownVectorPtr CFileProcessingMgmtRole::copyFileProcessingTasks(IIUnknownVectorPtr ipFileProcessingTasks)
 {
 	IIUnknownVectorPtr ipNewProcessors(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI11151", ipNewProcessors != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI11151", ipNewProcessors != __nullptr);
 
 	long nSize = ipFileProcessingTasks->Size();
 	int i;
@@ -1833,17 +1833,17 @@ IIUnknownVectorPtr CFileProcessingMgmtRole::copyFileProcessingTasks(IIUnknownVec
 	{
 		// Retrieve the Object With Description
 		IObjectWithDescriptionPtr ipObject(ipFileProcessingTasks->At(i));
-		ASSERT_RESOURCE_ALLOCATION("ELI11148", ipObject != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11148", ipObject != __nullptr );
 
 		// Retrieve the associated file processor
 		UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProc(ipObject->Object);
-		ASSERT_RESOURCE_ALLOCATION("ELI11149", ipFileProc != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11149", ipFileProc != __nullptr );
 
 		// Make separate copy of this file processor for the thread.
 		// If the task cannot be run multithreaded, the task is required to 
 		// control processing via mutexs as necessary to make it thread-safe
 		ICopyableObjectPtr ipCopyObj = ipObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI11150", ipObject != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11150", ipObject != __nullptr );
 		ipNewProcessors->PushBack(ipCopyObj->Clone());
 	}
 
@@ -1868,10 +1868,10 @@ DWORD CFileProcessingMgmtRole::getActionID(const string & strAct)
 IObjectWithDescriptionPtr CFileProcessingMgmtRole::getErrorHandlingTask()
 {
 	// Make sure the Error Task ObjectWithDescription has been created
-	if (m_ipErrorTask == NULL)
+	if (m_ipErrorTask == __nullptr)
 	{
 		m_ipErrorTask.CreateInstance(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI16106", m_ipErrorTask != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI16106", m_ipErrorTask != __nullptr );
 
 		// By default, an error task should not be enabled.
 		m_ipErrorTask->Enabled = VARIANT_FALSE;
@@ -1886,7 +1886,7 @@ IObjectWithDescriptionPtr CFileProcessingMgmtRole::getErrorHandlingTask()
 bool CFileProcessingMgmtRole::isErrorHandlingTaskEnabled()
 {
 	// Check to see if an actual task is defined
-	if (getErrorHandlingTask()->Object != NULL)
+	if (getErrorHandlingTask()->Object != __nullptr)
 	{
 		// Provide actual Enabled setting
 		return asCppBool( getErrorHandlingTask()->Enabled );
@@ -1918,15 +1918,15 @@ void CFileProcessingMgmtRole::notifyFileProcessingTasksOfStopRequest()
 		{
 			// Get the file processor that is currently running
 			ProcessingThreadData* pThreadData = m_vecProcessingThreadData[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI17946", pThreadData != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17946", pThreadData != __nullptr);
 
 			UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipTaskExecutor = 
 				pThreadData->m_ipTaskExecutor;
-			ASSERT_RESOURCE_ALLOCATION("ELI17947", ipTaskExecutor != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17947", ipTaskExecutor != __nullptr);
 
 			UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipErrorExecutor = 
 				pThreadData->m_ipErrorTaskExecutor;
-			ASSERT_RESOURCE_ALLOCATION("ELI18009", ipErrorExecutor != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18009", ipErrorExecutor != __nullptr);
 
 			ipTaskExecutor->Cancel();
 			ipErrorExecutor->Cancel();
@@ -1943,9 +1943,9 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 		CFileProcessingMgmtRole *pFPM = static_cast<CFileProcessingMgmtRole *>(pData);
 
 		// Validate that the FPM is setup properly
-		ASSERT_RESOURCE_ALLOCATION("ELI28202", pFPM != NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI28203", pFPM->m_pRecordMgr != NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI28204", pFPM->m_ipRoleNotifyFAM != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI28202", pFPM != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI28203", pFPM->m_pRecordMgr != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI28204", pFPM->m_ipRoleNotifyFAM != __nullptr );
 
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
@@ -1969,7 +1969,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 
 			// Wrap the FAMDB as a smart pointer
 			UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFamDB(pFPM->m_pDB);
-			ASSERT_RESOURCE_ALLOCATION("ELI29886", ipFamDB != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29886", ipFamDB != __nullptr);
 
 			// Set up what the current running state should be
 			if (pFPM->m_bLimitProcessingToSchedule)
@@ -2008,7 +2008,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28507")
 
 				// Post Schedule Inactive messag to the UI
-				if ( eNextRunningState == kScheduleStop && pFPM->m_hWndOfUI != NULL)
+				if ( eNextRunningState == kScheduleStop && pFPM->m_hWndOfUI != __nullptr)
 				{
 					::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_INACTIVE, 0, 0);
 				}
@@ -2118,7 +2118,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 								ue.log();
 
 								// Notify the UI of processing inactive
-								if (pFPM->m_hWndOfUI != NULL)
+								if (pFPM->m_hWndOfUI != __nullptr)
 								{
 									::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_INACTIVE, 0, 0);
 								}
@@ -2145,7 +2145,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 						ue.log();
 
 						// Notify UI that processing is running
-						if (pFPM->m_hWndOfUI != NULL)
+						if (pFPM->m_hWndOfUI != __nullptr)
 						{
 							::PostMessage( pFPM->m_hWndOfUI, FP_SCHEDULE_ACTIVE, 0, 0);
 
@@ -2166,7 +2166,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 
 			// Post message to UI that the schedule is active so the Processing Inactive 
 			// message is removed
-			if (pFPM->m_hWndOfUI != NULL)
+			if (pFPM->m_hWndOfUI != __nullptr)
 			{
 				// Do not log the schedule active trace here as processing has stopped
 				// this is just to ensure the inactive message is cleared out
@@ -2175,7 +2175,7 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 
 			// Notify the FAM that processing is complete
 			UCLID_FILEPROCESSINGLib::IRoleNotifyFAMPtr ipRoleNotifyFAM = pFPM->m_ipRoleNotifyFAM;
-			ASSERT_RESOURCE_ALLOCATION("ELI28315", ipRoleNotifyFAM != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28315", ipRoleNotifyFAM != __nullptr);
 			ipRoleNotifyFAM->NotifyProcessingCompleted();
 
 			pFPM->m_eventProcessManagerExited.signal();
@@ -2261,7 +2261,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 			}
 
 			// create the data structs for each of the threads
-			// Note: that an auto_ptr cannot be used here because an
+			// Note: that an unique_ptr cannot be used here because an
 			// array must be deleted specially with delete []
 			// Note: a vector cannot be used here because all the members of
 			// ProcessingThreadData do not have correct copy -constructors and
@@ -2282,7 +2282,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 				{
 					// Create a thread data struct and add it to the vector
 					ProcessingThreadData* pThreadData = new ProcessingThreadData();
-					ASSERT_RESOURCE_ALLOCATION("ELI17948", pThreadData != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI17948", pThreadData != __nullptr);
 					m_vecProcessingThreadData.push_back(pThreadData);
 
 					// Update the thread data members
@@ -2291,7 +2291,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 					// Initialize executor with a new copy of the file processors for the thread
 					UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipExecutor = 
 						pThreadData->m_ipTaskExecutor;
-					ASSERT_RESOURCE_ALLOCATION("ELI17949", ipExecutor != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI17949", ipExecutor != __nullptr);
 					ipExecutor->Init(copyFileProcessingTasks(m_ipFileProcessingTasks),
 						m_pRecordMgr->getActionID(), getFPMDB(), getFAMTagManager());
 				}
@@ -2312,7 +2312,7 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 
 					// begin the thread
 					pThreadData->m_pThread = AfxBeginThread(fileProcessingThreadProc, pThreadData);
-					ASSERT_RESOURCE_ALLOCATION("ELI11075", pThreadData->m_pThread != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI11075", pThreadData->m_pThread != __nullptr);
 
 					// wait for the thread to start
 					pThreadData->m_threadStartedEvent.wait();
@@ -2344,9 +2344,9 @@ void CFileProcessingMgmtRole::stopProcessing()
 	{
 		// check pre-conditions
 		ASSERT_ARGUMENT("ELI28207", m_bEnabled == true);
-		ASSERT_ARGUMENT("ELI28208", m_ipFileProcessingTasks != NULL);
+		ASSERT_ARGUMENT("ELI28208", m_ipFileProcessingTasks != __nullptr);
 		ASSERT_ARGUMENT("ELI28209", m_ipFileProcessingTasks->Size() > 0);
-		ASSERT_ARGUMENT("ELI28210", m_pRecordMgr != NULL);
+		ASSERT_ARGUMENT("ELI28210", m_pRecordMgr != __nullptr);
 
 		// The Processing needs to be stopped asynchronously
 		// to keep the UI from being blocked

@@ -93,11 +93,11 @@ STDMETHODIMP CEntityKeywords::get_PersonTitles(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipPersonTitleList == NULL)
+		if (m_ipPersonTitleList == __nullptr)
 		{
 			// Object creation
 			m_ipPersonTitleList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI05840", m_ipPersonTitleList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI05840", m_ipPersonTitleList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipPersonTitleList, "PersonTitles" );
@@ -122,11 +122,11 @@ STDMETHODIMP CEntityKeywords::get_PersonSuffixes(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipPersonSuffixList == NULL)
+		if (m_ipPersonSuffixList == __nullptr)
 		{
 			// Object creation
 			m_ipPersonSuffixList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI05946", m_ipPersonSuffixList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI05946", m_ipPersonSuffixList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipPersonSuffixList, "PersonSuffixes" );
@@ -148,11 +148,11 @@ STDMETHODIMP CEntityKeywords::get_PersonDesignators(IVariantVector **pVal)
 	try
 	{
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipPersonDesignatorList == NULL)
+		if (m_ipPersonDesignatorList == __nullptr)
 		{
 			// Object creation
 			m_ipPersonDesignatorList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI06360", m_ipPersonDesignatorList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI06360", m_ipPersonDesignatorList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipPersonDesignatorList, "PersonDesignators" );
@@ -177,11 +177,11 @@ STDMETHODIMP CEntityKeywords::get_CompanySuffixes(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipCompanySuffixList == NULL)
+		if (m_ipCompanySuffixList == __nullptr)
 		{
 			// Object creation
 			m_ipCompanySuffixList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI05949", m_ipCompanySuffixList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI05949", m_ipCompanySuffixList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipCompanySuffixList, "CompanySuffixes" );
@@ -206,11 +206,11 @@ STDMETHODIMP CEntityKeywords::get_CompanyDesignators(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipCompanyDesignatorList == NULL)
+		if (m_ipCompanyDesignatorList == __nullptr)
 		{
 			// Object creation
 			m_ipCompanyDesignatorList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI05951", m_ipCompanyDesignatorList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI05951", m_ipCompanyDesignatorList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipCompanyDesignatorList, "CompanyDesignators" );
@@ -235,11 +235,11 @@ STDMETHODIMP CEntityKeywords::get_CompanyAssignors(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipCompanyAssignorList == NULL)
+		if (m_ipCompanyAssignorList == __nullptr)
 		{
 			// Object creation
 			m_ipCompanyAssignorList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI06345", m_ipCompanyAssignorList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI06345", m_ipCompanyAssignorList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipCompanyAssignorList, "CompanyAssignors" );
@@ -327,11 +327,11 @@ STDMETHODIMP CEntityKeywords::get_EntityTrimTrailingPhrases(IVariantVector **pVa
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipEntityTrimTrailingPhraseList == NULL)
+		if (m_ipEntityTrimTrailingPhraseList == __nullptr)
 		{
 			// Object creation
 			m_ipEntityTrimTrailingPhraseList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI06378", m_ipEntityTrimTrailingPhraseList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI06378", m_ipEntityTrimTrailingPhraseList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipEntityTrimTrailingPhraseList, "EntityTrimTrailingPhrases" );
@@ -356,11 +356,11 @@ STDMETHODIMP CEntityKeywords::get_PersonTrimIdentifiers(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipPersonTrimIdentifierList == NULL)
+		if (m_ipPersonTrimIdentifierList == __nullptr)
 		{
 			// Object creation
 			m_ipPersonTrimIdentifierList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI06394", m_ipPersonTrimIdentifierList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI06394", m_ipPersonTrimIdentifierList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipPersonTrimIdentifierList, "PersonTrimIdentifiers" );
@@ -385,11 +385,11 @@ STDMETHODIMP CEntityKeywords::get_StreetNames(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipStreetNameList == NULL)
+		if (m_ipStreetNameList == __nullptr)
 		{
 			// Object creation
 			m_ipStreetNameList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI07189", m_ipStreetNameList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07189", m_ipStreetNameList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipStreetNameList, "StreetNames" );
@@ -414,11 +414,11 @@ STDMETHODIMP CEntityKeywords::get_StreetAbbreviations(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipStreetAbbreviationList == NULL)
+		if (m_ipStreetAbbreviationList == __nullptr)
 		{
 			// Object creation
 			m_ipStreetAbbreviationList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI07199", m_ipStreetAbbreviationList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07199", m_ipStreetAbbreviationList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipStreetAbbreviationList, "StreetAbbreviations" );
@@ -443,11 +443,11 @@ STDMETHODIMP CEntityKeywords::get_BuildingNames(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipBuildingNameList == NULL)
+		if (m_ipBuildingNameList == __nullptr)
 		{
 			// Object creation
 			m_ipBuildingNameList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI07205", m_ipBuildingNameList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07205", m_ipBuildingNameList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipBuildingNameList, "BuildingNames" );
@@ -472,11 +472,11 @@ STDMETHODIMP CEntityKeywords::get_BuildingAbbreviations(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipBuildingAbbreviationList == NULL)
+		if (m_ipBuildingAbbreviationList == __nullptr)
 		{
 			// Object creation
 			m_ipBuildingAbbreviationList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI07207", m_ipBuildingAbbreviationList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07207", m_ipBuildingAbbreviationList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipBuildingAbbreviationList, "BuildingAbbreviations" );
@@ -501,11 +501,11 @@ STDMETHODIMP CEntityKeywords::get_DirectionIndicators(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipDirectionIndicatorList == NULL)
+		if (m_ipDirectionIndicatorList == __nullptr)
 		{
 			// Object creation
 			m_ipDirectionIndicatorList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI07212", m_ipDirectionIndicatorList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07212", m_ipDirectionIndicatorList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipDirectionIndicatorList, "DirectionIndicators" );
@@ -632,11 +632,11 @@ STDMETHODIMP CEntityKeywords::get_NumberWords(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipNumberWordList == NULL)
+		if (m_ipNumberWordList == __nullptr)
 		{
 			// Object creation
 			m_ipNumberWordList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08747", m_ipNumberWordList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08747", m_ipNumberWordList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipNumberWordList, "NumberWords" );
@@ -661,11 +661,11 @@ STDMETHODIMP CEntityKeywords::get_MonthWords(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipMonthWordList == NULL)
+		if (m_ipMonthWordList == __nullptr)
 		{
 			// Object creation
 			m_ipMonthWordList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08752", m_ipMonthWordList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08752", m_ipMonthWordList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipMonthWordList, "MonthWords" );
@@ -690,11 +690,11 @@ STDMETHODIMP CEntityKeywords::get_AddressIndicators(IVariantVector **pVal)
 		validateLicense();
 
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipAddressIndicatorList == NULL)
+		if (m_ipAddressIndicatorList == __nullptr)
 		{
 			// Object creation
 			m_ipAddressIndicatorList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09460", m_ipAddressIndicatorList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09460", m_ipAddressIndicatorList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipAddressIndicatorList, "AddressIndicators" );
@@ -920,7 +920,7 @@ STDMETHODIMP CEntityKeywords::get_KeywordCollection(BSTR strKeyword, IVariantVec
 
 		// Create VariantVector for collection
 		IVariantVectorPtr ipCollection( CLSID_VariantVector );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10103", ipCollection != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10103", ipCollection != __nullptr );
 
 		// Collection is dependent on requested Type
 		string strLocalKey = asString( strKeyword );
@@ -951,7 +951,7 @@ STDMETHODIMP CEntityKeywords::get_KeywordPattern(BSTR strKeyword, BSTR* pstrPatt
 
 		// Create VariantVector for collection
 		IVariantVectorPtr ipCollection( CLSID_VariantVector );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10106", ipCollection != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10106", ipCollection != __nullptr );
 
 		// Collection is dependent on requested Type
 		string strLocalKey = asString( strKeyword );
@@ -1034,11 +1034,11 @@ void CEntityKeywords::makeCompanyAliasList(ECompanyAliasType eType)
 
 	case kCompanyAliasDBA:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipCompanyAliasDBAList == NULL)
+		if (m_ipCompanyAliasDBAList == __nullptr)
 		{
 			// Object creation
 			m_ipCompanyAliasDBAList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09622", m_ipCompanyAliasDBAList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09622", m_ipCompanyAliasDBAList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipCompanyAliasDBAList, "CompanyAliasDBA" );
@@ -1047,11 +1047,11 @@ void CEntityKeywords::makeCompanyAliasList(ECompanyAliasType eType)
 
 	case kCompanyAliasSBM:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipCompanyAliasSBMList == NULL)
+		if (m_ipCompanyAliasSBMList == __nullptr)
 		{
 			// Object creation
 			m_ipCompanyAliasSBMList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09623", m_ipCompanyAliasSBMList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09623", m_ipCompanyAliasSBMList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipCompanyAliasSBMList, "CompanyAliasSBM" );
@@ -1060,11 +1060,11 @@ void CEntityKeywords::makeCompanyAliasList(ECompanyAliasType eType)
 
 	case kCompanyAliasSII:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipCompanyAliasSIIList == NULL)
+		if (m_ipCompanyAliasSIIList == __nullptr)
 		{
 			// Object creation
 			m_ipCompanyAliasSIIList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09624", m_ipCompanyAliasSIIList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09624", m_ipCompanyAliasSIIList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipCompanyAliasSIIList, "CompanyAliasSII" );
@@ -1073,11 +1073,11 @@ void CEntityKeywords::makeCompanyAliasList(ECompanyAliasType eType)
 
 	case kCompanyAliasBMW:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipCompanyAliasBMWList == NULL)
+		if (m_ipCompanyAliasBMWList == __nullptr)
 		{
 			// Object creation
 			m_ipCompanyAliasBMWList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09625", m_ipCompanyAliasBMWList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09625", m_ipCompanyAliasBMWList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipCompanyAliasBMWList, "CompanyAliasBMW" );
@@ -1086,11 +1086,11 @@ void CEntityKeywords::makeCompanyAliasList(ECompanyAliasType eType)
 
 	case kCompanyAliasAll:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipCompanyAliasList == NULL)
+		if (m_ipCompanyAliasList == __nullptr)
 		{
 			// Object creation
 			m_ipCompanyAliasList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09626", m_ipCompanyAliasList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09626", m_ipCompanyAliasList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipCompanyAliasList, "CompanyAlias" );
@@ -1112,11 +1112,11 @@ void CEntityKeywords::makePersonAliasList(EPersonAliasType eType)
 	{
 	case kPersonAliasAKA:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipPersonAliasAKAList == NULL)
+		if (m_ipPersonAliasAKAList == __nullptr)
 		{
 			// Object creation
 			m_ipPersonAliasAKAList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09604", m_ipPersonAliasAKAList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09604", m_ipPersonAliasAKAList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipPersonAliasAKAList, "PersonAliasAKA" );
@@ -1125,11 +1125,11 @@ void CEntityKeywords::makePersonAliasList(EPersonAliasType eType)
 
 	case kPersonAliasFKA:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipPersonAliasFKAList == NULL)
+		if (m_ipPersonAliasFKAList == __nullptr)
 		{
 			// Object creation
 			m_ipPersonAliasFKAList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09605", m_ipPersonAliasFKAList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09605", m_ipPersonAliasFKAList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipPersonAliasFKAList, "PersonAliasFKA" );
@@ -1138,11 +1138,11 @@ void CEntityKeywords::makePersonAliasList(EPersonAliasType eType)
 
 	case kPersonAliasNKA:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipPersonAliasNKAList == NULL)
+		if (m_ipPersonAliasNKAList == __nullptr)
 		{
 			// Object creation
 			m_ipPersonAliasNKAList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09606", m_ipPersonAliasNKAList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09606", m_ipPersonAliasNKAList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipPersonAliasNKAList, "PersonAliasNKA" );
@@ -1151,11 +1151,11 @@ void CEntityKeywords::makePersonAliasList(EPersonAliasType eType)
 
 	case kPersonAliasAll:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipPersonAliasList == NULL)
+		if (m_ipPersonAliasList == __nullptr)
 		{
 			// Object creation
 			m_ipPersonAliasList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09607", m_ipPersonAliasList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09607", m_ipPersonAliasList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipPersonAliasList, "PersonAlias" );
@@ -1177,11 +1177,11 @@ void CEntityKeywords::makeRelatedCompanyList(ERelatedCompanyType eType)
 	{
 	case kRelatedCompanyDivision:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipRelatedCompanyDivisionList == NULL)
+		if (m_ipRelatedCompanyDivisionList == __nullptr)
 		{
 			// Object creation
 			m_ipRelatedCompanyDivisionList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09651", m_ipRelatedCompanyDivisionList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09651", m_ipRelatedCompanyDivisionList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipRelatedCompanyDivisionList, "RelatedCompanyDivision" );
@@ -1190,11 +1190,11 @@ void CEntityKeywords::makeRelatedCompanyList(ERelatedCompanyType eType)
 
 	case kRelatedCompanySubdivision:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipRelatedCompanySubdivisionList == NULL)
+		if (m_ipRelatedCompanySubdivisionList == __nullptr)
 		{
 			// Object creation
 			m_ipRelatedCompanySubdivisionList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09652", m_ipRelatedCompanySubdivisionList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09652", m_ipRelatedCompanySubdivisionList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipRelatedCompanySubdivisionList, "RelatedCompanySubdivision" );
@@ -1203,11 +1203,11 @@ void CEntityKeywords::makeRelatedCompanyList(ERelatedCompanyType eType)
 
 	case kRelatedCompanySubsidiary:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipRelatedCompanySubsidiaryList == NULL)
+		if (m_ipRelatedCompanySubsidiaryList == __nullptr)
 		{
 			// Object creation
 			m_ipRelatedCompanySubsidiaryList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09653", m_ipRelatedCompanySubsidiaryList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09653", m_ipRelatedCompanySubsidiaryList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipRelatedCompanySubsidiaryList, "RelatedCompanySubsidiary" );
@@ -1216,11 +1216,11 @@ void CEntityKeywords::makeRelatedCompanyList(ERelatedCompanyType eType)
 
 	case kRelatedCompanyBranch:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipRelatedCompanyBranchList == NULL)
+		if (m_ipRelatedCompanyBranchList == __nullptr)
 		{
 			// Object creation
 			m_ipRelatedCompanyBranchList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09697", m_ipRelatedCompanyBranchList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09697", m_ipRelatedCompanyBranchList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipRelatedCompanyBranchList, "RelatedCompanyBranch" );
@@ -1229,11 +1229,11 @@ void CEntityKeywords::makeRelatedCompanyList(ERelatedCompanyType eType)
 
 	case kRelatedCompanyAll:
 		// If the list object has not yet been created, create it and populate it.
-		if (m_ipRelatedCompanyList == NULL)
+		if (m_ipRelatedCompanyList == __nullptr)
 		{
 			// Object creation
 			m_ipRelatedCompanyList.CreateInstance( CLSID_VariantVector );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09649", m_ipRelatedCompanyList != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09649", m_ipRelatedCompanyList != __nullptr );
 
 			// Populate IVariantVector
 			buildVariantVector( m_ipRelatedCompanyList, "RelatedCompany" );
@@ -1255,7 +1255,7 @@ void CEntityKeywords::readKeywordsFile()
 
 	// Determine path to DAT file
 	UCLID_AFUTILSLib::IAFUtilityPtr ipAFUtility( CLSID_AFUtility );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10038", ipAFUtility != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10038", ipAFUtility != __nullptr );
 	string strComponentDataDir = ipAFUtility->GetComponentDataFolder();
 	string strFileName =  strComponentDataDir + "\\AFUtility\\" + "Keywords.dat.etf";
 
@@ -1264,7 +1264,7 @@ void CEntityKeywords::readKeywordsFile()
 
 	// Create List Reader
 	vector<string> vecLines = convertFileToLines( strFileName );
-	m_apKlr = auto_ptr<KeywordListReader>( new KeywordListReader(vecLines) );
+	m_apKlr = unique_ptr<KeywordListReader>( new KeywordListReader(vecLines) );
 
 	// Read DAT file and retain list of defined Keywords
 	m_apKlr->ReadKeywords( m_vecKeywords );

@@ -29,5 +29,5 @@ private:
 	void	validateAALicense();
 
 	// Pointer to the persistence manager for registry access
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> m_apCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apCfgMgr;
 };

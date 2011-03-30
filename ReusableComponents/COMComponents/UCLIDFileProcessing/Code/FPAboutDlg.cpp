@@ -64,7 +64,7 @@ BOOL CFPAboutDlg::OnInitDialog(void)
 		CDialog::OnInitDialog();
 		
 		// Setup Registry persistence item
-		ma_pSettingsCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pSettingsCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrREG_ROOT_KEY ) );
 
 		// Set the Version string

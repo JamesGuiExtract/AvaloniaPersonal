@@ -57,7 +57,7 @@ void CImageButtonWithStyle::OnNotifyCustomDraw ( NMHDR * pNotifyStruct, LRESULT*
 		{
 			// get theme handle
 			HTHEME hTheme = g_xpStyle.OpenThemeData (m_hWnd, L"BUTTON");
-			ASSERT_RESOURCE_ALLOCATION("ELI18197", hTheme != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18197", hTheme != __nullptr);
 			if (hTheme == NULL)
 			{
 				// fail gracefully
@@ -186,7 +186,7 @@ void CImageButtonWithStyle::draw_icon (HDC hDC, const CRect& Rect, DWORD style)
 	bmi.bmiHeader.biSize = sizeof (BITMAPINFOHEADER);
 	int cx = 0;
 	int cy = 0;
-	if (ii.hbmColor != NULL)
+	if (ii.hbmColor != __nullptr)
 	{
 		// icon has separate image and mask bitmaps - use size directly
 		GetDIBits(hDC, ii.hbmColor, 0, 0, NULL, &bmi, DIB_RGB_COLORS);

@@ -332,7 +332,7 @@ public:
     // constructor sets up the memory DC
     BCMenuMemDC(CDC* pDC,LPCRECT lpSrcRect) : CDC()
     {
-        ASSERT(pDC != NULL);
+        ASSERT(pDC != __nullptr);
 
 		m_rect.CopyRect(lpSrcRect);
         m_pDC = pDC;

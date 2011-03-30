@@ -283,7 +283,7 @@ LRESULT CSPMFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 			// determine if a data scorer has been specified and if so
 			// update the various controls
 			m_ipDataScorer = ipSPMFinder->DataScorer;
-			ASSERT_RESOURCE_ALLOCATION("ELI08606", m_ipDataScorer != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08606", m_ipDataScorer != __nullptr);
 
 			// update the data scorer description and the min-match-score
 			// set the description of the data scorer object
@@ -596,18 +596,18 @@ LRESULT CSPMFinderPP::OnClickedButtonSelectDataScorer(WORD wNotifyCode, WORD wID
 	{
 		// Create a copy of the DataScorer object-with-description
 		ICopyableObjectPtr ipCopyableObj = m_ipDataScorer;
-		ASSERT_RESOURCE_ALLOCATION( "ELI08633", ipCopyableObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08633", ipCopyableObj != __nullptr );
 		
 		IObjectWithDescriptionPtr ipDataScorerCopy = ipCopyableObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION( "ELI08634", ipDataScorerCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08634", ipDataScorerCopy != __nullptr );
 
 		// Create the IObjectSelectorUI object
 		IObjectSelectorUIPtr ipObjSelect( CLSID_ObjectSelectorUI );
-		ASSERT_RESOURCE_ALLOCATION( "ELI08635", ipObjSelect != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08635", ipObjSelect != __nullptr );
 
 		// initialize private license for the object
 		IPrivateLicensedComponentPtr ipPLComponent = ipObjSelect;
-		ASSERT_RESOURCE_ALLOCATION("ELI10316", ipPLComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10316", ipPLComponent != __nullptr);
 		_bstr_t _bstrKey = LICENSE_MGMT_PASSWORD.c_str();
 		ipPLComponent->InitPrivateLicense(_bstrKey);
 
@@ -1038,7 +1038,7 @@ void CSPMFinderPP::updateControls()
 	
 	// the return best match radio button should only be enabled
 	// if a data scorer is available
-	if (m_ipDataScorer != NULL && m_ipDataScorer->Object != NULL)
+	if (m_ipDataScorer != __nullptr && m_ipDataScorer->Object != __nullptr)
 	{
 		// enable the "return best matches" option
 		m_radioReturnBestMatch.EnableWindow(TRUE);
@@ -1076,7 +1076,7 @@ void CSPMFinderPP::updateControls()
 //-------------------------------------------------------------------------------------------------
 bool CSPMFinderPP::usingDataScorer()
 {
-	return (m_ipDataScorer == NULL || m_ipDataScorer->Object == NULL) ? false : true;
+	return (m_ipDataScorer == __nullptr || m_ipDataScorer->Object == NULL) ? false : true;
 }
 //-------------------------------------------------------------------------------------------------
 void CSPMFinderPP::validateLicense()

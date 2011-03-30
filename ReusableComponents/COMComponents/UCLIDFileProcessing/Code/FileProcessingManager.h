@@ -138,7 +138,7 @@ private:
 	// vector of thread data objects containing data for each of the processing threads
 	vector<ProcessingThreadData *> m_vecProcessingThreadData;
 
-	auto_ptr<FileProcessingDlg> m_apDlg;
+	unique_ptr<FileProcessingDlg> m_apDlg;
 
 	// The filename that this manager was most recently
 	// loaded from or saved to

@@ -77,10 +77,10 @@ STDMETHODIMP CImageCleanupEngine::CleanupImageInternalUseOnly(BSTR bstrInputFile
 
 		// wrap the image cleanup settings as a smart pointer
 		ESImageCleanupLib::IImageCleanupSettingsPtr ipImageCleanupSettings(pImageCleanupSettings);
-		ASSERT_RESOURCE_ALLOCATION("ELI17090", ipImageCleanupSettings != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17090", ipImageCleanupSettings != __nullptr);
 
 		IIUnknownVectorPtr ipOperations = ipImageCleanupSettings->ImageCleanupOperations;
-		ASSERT_RESOURCE_ALLOCATION("ELI27417", ipOperations != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27417", ipOperations != __nullptr);
 
 		vector<ESImageCleanupLib::IImageCleanupOperationPtr> vecEnabledCleanupOperations;
 		getEnabledCleanupOperations(vecEnabledCleanupOperations, ipOperations);
@@ -153,12 +153,12 @@ STDMETHODIMP CImageCleanupEngine::CleanupImageInternalUseOnly(BSTR bstrInputFile
 
 		// get the clear image server
 		ICiServerPtr ipciServer(CLSID_CiServer);
-		ASSERT_RESOURCE_ALLOCATION("ELI17099", ipciServer != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17099", ipciServer != __nullptr);
 		_lastCodePos = "40";
 
 		// get a repair image pointer
 		ICiRepairPtr ipciRepair = ipciServer->CreateRepair();
-		ASSERT_RESOURCE_ALLOCATION("ELI17100", ipciRepair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17100", ipciRepair != __nullptr);
 
 		// Need to process each page individually
 		_lastCodePos = "50";
@@ -272,7 +272,7 @@ void CImageCleanupEngine::cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServer
 		L_AccessBitmap(&rhBitmap);
 
 		// Ensure the bitmap is unlocked and the image is closed if an exception is thrown
-		ICiImagePtr ipciImage = NULL;
+		ICiImagePtr ipciImage = __nullptr;
 		try
 		{
 			// get the size of the memory chunk for the bitmap
@@ -298,7 +298,7 @@ void CImageCleanupEngine::cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServer
 
 			// Create the image and load it from memory
 			ipciImage = ipciServer->CreateImage();
-			ASSERT_RESOURCE_ALLOCATION("ELI17101", ipciImage != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17101", ipciImage != __nullptr);
 			ipciImage->CreateBpp(rhBitmap.Width, rhBitmap.Height, rhBitmap.BitsPerPixel);
 			ipciImage->LoadFromMemory(vFileInMemory);
 			_lastCodePos = "40";
@@ -313,7 +313,7 @@ void CImageCleanupEngine::cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServer
 			{
 				// Get the clean up operation
 				ESImageCleanupLib::IImageCleanupOperationPtr ipOp = vecOperations[i];
-				ASSERT_RESOURCE_ALLOCATION("ELI17102", ipOp != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI17102", ipOp != __nullptr);
 
 				// Perform the operation
 				ipOp->Perform((void*) ipciRepair);
@@ -351,7 +351,7 @@ void CImageCleanupEngine::cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServer
 
 			// close the image to release the memory held by it
 			ipciImage->Close();
-			ipciImage = NULL;
+			ipciImage = __nullptr;
 			_lastCodePos = "100";
 
 			// Unlock the bitmap
@@ -360,12 +360,12 @@ void CImageCleanupEngine::cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServer
 		catch(...)
 		{
 			// Close the image if it has been allocated and has not been closed
-			if (ipciImage != NULL && ipciImage->IsValid == ciTrue)
+			if (ipciImage != __nullptr && ipciImage->IsValid == ciTrue)
 			{
 				try
 				{
 					ipciImage->Close();
-					ipciImage = NULL;
+					ipciImage = __nullptr;
 				}
 				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27311");
 			}
@@ -383,7 +383,7 @@ void CImageCleanupEngine::getSetOfPages(set<int>& rsetPageNumbers,
 							const ESImageCleanupLib::IImageCleanupSettingsPtr& ipSettings,
 							int nPageCount)
 {
-	ASSERT_ARGUMENT("ELI17523", ipSettings != NULL);
+	ASSERT_ARGUMENT("ELI17523", ipSettings != __nullptr);
 
 	try
 	{
@@ -497,7 +497,7 @@ void CImageCleanupEngine::getEnabledCleanupOperations(
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI27304", ipOperations != NULL);
+		ASSERT_ARGUMENT("ELI27304", ipOperations != __nullptr);
 
 		// Clear the vector
 		rvecOperations.clear();
@@ -507,13 +507,13 @@ void CImageCleanupEngine::getEnabledCleanupOperations(
 		{
 			// Get the object with description from the vector
 			IObjectWithDescriptionPtr ipOWD = ipOperations->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI27305", ipOWD != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27305", ipOWD != __nullptr);
 
 			if (ipOWD->Enabled == VARIANT_TRUE)
 			{
 				// Get the cleanup operation
 				ESImageCleanupLib::IImageCleanupOperationPtr ipOperation = ipOWD->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI27306", ipOperation != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27306", ipOperation != __nullptr);
 
 				// Add the operation to the vector
 				rvecOperations.push_back(ipOperation);

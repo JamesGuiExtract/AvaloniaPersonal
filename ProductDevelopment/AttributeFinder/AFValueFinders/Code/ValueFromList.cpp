@@ -74,7 +74,7 @@ STDMETHODIMP CValueFromList::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus 
 
 		// Create a vector for storing all attribute values
 		IIUnknownVectorPtr ipAttributes( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION( "ELI04562", ipAttributes != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI04562", ipAttributes != __nullptr );
 
 		// Create local Document pointer
 		IAFDocumentPtr ipAFDoc( pAFDoc );
@@ -100,7 +100,7 @@ STDMETHODIMP CValueFromList::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus 
 
 			// Get a list of values that includes values from any specified files.
 			IVariantVectorPtr ipExpandedList = m_cachedListLoader.expandList(m_ipValueList, ipAFDoc);
-			ASSERT_RESOURCE_ALLOCATION("ELI30066", ipExpandedList != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30066", ipExpandedList != __nullptr);
 
 			// Check each item in list
 			long nSize = ipExpandedList->Size;
@@ -149,7 +149,7 @@ STDMETHODIMP CValueFromList::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus 
 					// from the original ISpatialString
 					ISpatialStringPtr	ipText = ipInputText->GetSubString( nFoundPos, 
 						nFoundPos + strItem.length() - 1 );
-					ASSERT_RESOURCE_ALLOCATION( "ELI06590", ipText != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI06590", ipText != __nullptr );
 					ipAttribute->Value = ipText;
 
 					// Put the new Attribute into the return vector
@@ -194,7 +194,7 @@ STDMETHODIMP CValueFromList::raw_GetComponentDescription(BSTR * pstrComponentDes
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19587", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19587", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Value from list").Detach();
 	}
@@ -295,12 +295,12 @@ STDMETHODIMP CValueFromList::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IValueFromListPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08268", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08268", ipSource != __nullptr);
 
 		m_bCaseSensitive = (ipSource->GetIsCaseSensitive()==VARIANT_TRUE) ? true : false;
 
 		ICopyableObjectPtr ipCopyObj = ipSource->GetValueList();
-		ASSERT_RESOURCE_ALLOCATION("ELI08269", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08269", ipCopyObj != __nullptr);
 		m_ipValueList = ipCopyObj->Clone();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08270");
@@ -318,7 +318,7 @@ STDMETHODIMP CValueFromList::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_ValueFromList);
-		ASSERT_RESOURCE_ALLOCATION("ELI19352", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19352", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -389,8 +389,6 @@ STDMETHODIMP CValueFromList::put_ValueList(IVariantVector *newVal)
 	try
 	{
 		validateLicense();
-
-		if (m_ipValueList) m_ipValueList = NULL;
 
 		m_ipValueList = newVal;
 
@@ -528,7 +526,7 @@ STDMETHODIMP CValueFromList::Load(IStream *pStream)
 
 		// Clear the variables first
 		m_bCaseSensitive = false;
-		m_ipValueList = NULL;
+		m_ipValueList = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -559,7 +557,7 @@ STDMETHODIMP CValueFromList::Load(IStream *pStream)
 		// Read the clue list
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream(ipObj, pStream, "ELI09969");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04680", 
 				"Variant Vector for Value List object could not be read from stream!" );
@@ -600,7 +598,7 @@ STDMETHODIMP CValueFromList::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the Value list to the IStream object
 		IPersistStreamPtr ipPersistentObj( m_ipValueList );
-		if (ipPersistentObj == NULL)
+		if (ipPersistentObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04681", 
 				"Value From List object does not support persistence!" );

@@ -106,7 +106,7 @@ private:
 	// The currently loaded spatial information
 	ISpatialStringPtr m_ipSpatialString;
 
-	std::auto_ptr<SpatialStringViewerCfg> m_apSettings;
+	std::unique_ptr<SpatialStringViewerCfg> m_apSettings;
 
 	// boolean variable to keep track of whether this dialog has
 	// already been initialized.
@@ -118,11 +118,11 @@ private:
 	// The file name of the USS file that is opened
 	std::string m_strUSSFileName;
 
-	std::auto_ptr<FindRegExDlg> ma_pFindRegExDlg;
+	std::unique_ptr<FindRegExDlg> ma_pFindRegExDlg;
 
-	std::auto_ptr<FontSizeDistributionDlg> ma_pFontSizeDistDlg;
-	std::auto_ptr<CharInfoDlg> ma_pCharInfoDlg;
-	std::auto_ptr<WordLengthDistributionDlg> ma_pWordLengthDistDlg;
+	std::unique_ptr<FontSizeDistributionDlg> ma_pFontSizeDistDlg;
+	std::unique_ptr<CharInfoDlg> ma_pCharInfoDlg;
+	std::unique_ptr<WordLengthDistributionDlg> ma_pWordLengthDistDlg;
 
 	CStatusBar m_statusBar;
 

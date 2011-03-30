@@ -81,7 +81,7 @@ library UCLID_SSOCR2Lib
 		//          vbUpdateProgressStatus - updates progress status if VARIANT_TRUE, otherwise it
 		//            does not. May be slightly faster if VARIANT_FALSE.
 		//          eDecompMethod - decomposition method to use when locating zones automatically.
-		//            This is only used if pZone != NULL or if vbDetectHandwriting == VARIANT_TRUE.
+		//            This is only used if pZone != __nullptr or if vbDetectHandwriting == VARIANT_TRUE.
 		// PROMISE: Returns the text as a spatial string in a BSTR stream.
 		[id(1), helpstring("method RecognizeText")] HRESULT RecognizeText([in] BSTR bstrImageFileName, 
 			[in] IVariantVector* pPageNumbers, [in] ILongRectangle* pZone, [in] long lRotationInDegrees,

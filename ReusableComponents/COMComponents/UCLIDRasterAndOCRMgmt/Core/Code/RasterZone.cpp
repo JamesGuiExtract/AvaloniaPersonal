@@ -61,7 +61,7 @@ STDMETHODIMP CRasterZone::get_StartX(long *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18349", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18349", pVal != __nullptr);
 
 		*pVal = m_nStartX;
 	}
@@ -99,7 +99,7 @@ STDMETHODIMP CRasterZone::get_StartY(long *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18348", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18348", pVal != __nullptr);
 
 		*pVal = m_nStartY;
 	}
@@ -136,7 +136,7 @@ STDMETHODIMP CRasterZone::get_EndX(long *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18347", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18347", pVal != __nullptr);
 
 		*pVal = m_nEndX;
 	}
@@ -173,7 +173,7 @@ STDMETHODIMP CRasterZone::get_EndY(long *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18346", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18346", pVal != __nullptr);
 
 		*pVal = m_nEndY;
 	}
@@ -210,7 +210,7 @@ STDMETHODIMP CRasterZone::get_Height(long *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18345", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18345", pVal != __nullptr);
 
 		*pVal = m_nHeight;
 	}
@@ -247,7 +247,7 @@ STDMETHODIMP CRasterZone::get_PageNumber(long *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18334", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18334", pVal != __nullptr);
 
 		*pVal = m_nPage;
 	}
@@ -285,7 +285,7 @@ STDMETHODIMP CRasterZone::CopyDataTo(IRasterZone *pRasterZone)
 		validateLicense();
 
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipRasterZone(pRasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI18333", ipRasterZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18333", ipRasterZone != __nullptr);
 
 		ipRasterZone->StartX = m_nStartX;
 		ipRasterZone->StartY = m_nStartY;
@@ -327,11 +327,11 @@ STDMETHODIMP CRasterZone::Equals(IRasterZone *pRasterZone, VARIANT_BOOL *pbValue
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18332", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18332", pbValue != __nullptr);
 
 		// wrap raster zone in smart pointer
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipRasterZone(pRasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI18331", pRasterZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18331", pRasterZone != __nullptr);
 
 		// Return the result of the equals comparison
 		*pbValue = asVariantBool(equals(ipRasterZone));
@@ -402,12 +402,12 @@ STDMETHODIMP CRasterZone::GetData(long *pStartX, long *pStartY, long *pEndX,
 		validateLicense();
 
 		// validate arguments
-		ASSERT_ARGUMENT("ELI06561", pStartX != NULL);
-		ASSERT_ARGUMENT("ELI06562", pStartY != NULL);
-		ASSERT_ARGUMENT("ELI06563", pEndX != NULL);
-		ASSERT_ARGUMENT("ELI06564", pEndY != NULL);
-		ASSERT_ARGUMENT("ELI06565", pHeight != NULL);
-		ASSERT_ARGUMENT("ELI06566", pPageNum != NULL);
+		ASSERT_ARGUMENT("ELI06561", pStartX != __nullptr);
+		ASSERT_ARGUMENT("ELI06562", pStartY != __nullptr);
+		ASSERT_ARGUMENT("ELI06563", pEndX != __nullptr);
+		ASSERT_ARGUMENT("ELI06564", pEndY != __nullptr);
+		ASSERT_ARGUMENT("ELI06565", pHeight != __nullptr);
+		ASSERT_ARGUMENT("ELI06566", pPageNum != __nullptr);
 
 		// copy data for caller
 		*pStartX = m_nStartX;
@@ -433,7 +433,7 @@ STDMETHODIMP CRasterZone::CreateFromLongRectangle(ILongRectangle *pRectangle, lo
 
 		// validate arguments
 		ILongRectanglePtr ipLongRectangle(pRectangle);
-		ASSERT_ARGUMENT("ELI06571", ipLongRectangle != NULL);
+		ASSERT_ARGUMENT("ELI06571", ipLongRectangle != __nullptr);
 
 		long lLeft(-1), lTop(-1), lRight(-1), lBottom(-1);
 		ipLongRectangle->GetBounds(&lLeft, &lTop, &lRight, &lBottom);
@@ -472,7 +472,7 @@ STDMETHODIMP CRasterZone::GetRectangularBounds(ILongRectangle *pPageBounds,
 		// validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18335", pRectangle != NULL);
+		ASSERT_ARGUMENT("ELI18335", pRectangle != __nullptr);
 
 		// calculate the 4 corner points of the raster zone;
 		// p1 = point above start point
@@ -505,11 +505,11 @@ STDMETHODIMP CRasterZone::GetRectangularBounds(ILongRectangle *pPageBounds,
 		rect.right = max(p1.x, max(p2.x, max(p3.x, p4.x)));
 
 		// fit the rectangular bounds within the page if page info map was specified
-		if(pPageBounds != NULL)
+		if(pPageBounds != __nullptr)
 		{
 			// usa a smart pointer for the spatial page info
 			ILongRectanglePtr ipPageBounds(pPageBounds);
-			ASSERT_RESOURCE_ALLOCATION("ELI30334", ipPageBounds != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30334", ipPageBounds != __nullptr);
 
 			long lLeftBound(-1), lTopBound(-1), lRightBound(-1), lBottomBound(-1);
 			ipPageBounds->GetBounds(&lLeftBound, &lTopBound, &lRightBound, &lBottomBound);
@@ -537,7 +537,7 @@ STDMETHODIMP CRasterZone::GetRectangularBounds(ILongRectangle *pPageBounds,
 
 		// create a long rectangle object to return to the caller
 		ILongRectanglePtr ipLongRectangle(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI06577", ipLongRectangle != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06577", ipLongRectangle != __nullptr);
 
 		// populate the long rectangle object
 		ipLongRectangle->SetBounds(rect.left, rect.top, rect.right, rect.bottom);
@@ -559,10 +559,10 @@ STDMETHODIMP CRasterZone::GetBoundaryPoints(IIUnknownVector** pRetVal)
 		// validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18336", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI18336", pRetVal != __nullptr);
 
 		IIUnknownVectorPtr ipPoints(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI10033", ipPoints != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10033", ipPoints != __nullptr);
 
 		// calculate the 4 corner points of the raster zone;
 		// p1 = point above start point
@@ -570,13 +570,13 @@ STDMETHODIMP CRasterZone::GetBoundaryPoints(IIUnknownVector** pRetVal)
 		// p3 = point below end point
 		// p4 = point below start point
 		IDoublePointPtr ipP1(CLSID_DoublePoint);
-		ASSERT_RESOURCE_ALLOCATION("ELI10028", ipP1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10028", ipP1 != __nullptr);
 		IDoublePointPtr ipP2(CLSID_DoublePoint);
-		ASSERT_RESOURCE_ALLOCATION("ELI10029", ipP2 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10029", ipP2 != __nullptr);
 		IDoublePointPtr ipP3(CLSID_DoublePoint);
-		ASSERT_RESOURCE_ALLOCATION("ELI10031", ipP3 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10031", ipP3 != __nullptr);
 		IDoublePointPtr ipP4(CLSID_DoublePoint);
-		ASSERT_RESOURCE_ALLOCATION("ELI10032", ipP4 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10032", ipP4 != __nullptr);
 
 		// calculate the angle of the line dy/dx
 		double dAngle = atan2((double) (m_nEndY - m_nStartY), (double) (m_nEndX  - m_nStartX));
@@ -615,7 +615,7 @@ STDMETHODIMP CRasterZone::get_Area(long *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18337", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18337", pVal != __nullptr);
 
 		long dX = m_nEndX - m_nStartX;
 		long dY = m_nEndY - m_nStartY;
@@ -640,15 +640,15 @@ STDMETHODIMP CRasterZone::GetAreaOverlappingWith(IRasterZone *pRasterZone, doubl
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18338", pVal != NULL);
+		ASSERT_ARGUMENT("ELI18338", pVal != __nullptr);
 
 		// Create IIUnknownVectorPtr to hold the corners of this zone
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipThis(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI15084", ipThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15084", ipThis != __nullptr);
 
 		// wrap the other raster zone in a smart pointer object
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipSecond(pRasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI15085", ipSecond != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15085", ipSecond != __nullptr);
 
 		// default overlap to 0
 		*pVal = 0.0;
@@ -658,7 +658,7 @@ STDMETHODIMP CRasterZone::GetAreaOverlappingWith(IRasterZone *pRasterZone, doubl
 		{
 			// Get the boundary points
 			IIUnknownVectorPtr ipPoints = ipThis->GetBoundaryPoints();
-			ASSERT_RESOURCE_ALLOCATION("ELI18498", ipPoints != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18498", ipPoints != __nullptr);
 
 			// Create a polygon describing this raster zone
 			TPPolygon polyFirst;
@@ -667,7 +667,7 @@ STDMETHODIMP CRasterZone::GetAreaOverlappingWith(IRasterZone *pRasterZone, doubl
 			{
 				// Get the point out of the IIUnknownVector
 				IDoublePointPtr ipP1 = ipPoints->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI15070", ipP1 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15070", ipP1 != __nullptr);
 
 				// Create the TPPoint and push into the polygon
 				TPPoint p1(ipP1->X, ipP1->Y);
@@ -675,12 +675,12 @@ STDMETHODIMP CRasterZone::GetAreaOverlappingWith(IRasterZone *pRasterZone, doubl
 			}
 
 			// clear the points vector
-			ipPoints = NULL;
+			ipPoints = __nullptr;
 
 			// Create IIUnknownVectorPtr hold all the points inside the zone
 			// pointed by pRasterZone
 			ipPoints = ipSecond->GetBoundaryPoints();
-			ASSERT_RESOURCE_ALLOCATION("ELI18499", ipPoints != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18499", ipPoints != __nullptr);
 
 			// Create a polygon describe the zone pointed by pRasterZone
 			TPPolygon polySecond;
@@ -689,7 +689,7 @@ STDMETHODIMP CRasterZone::GetAreaOverlappingWith(IRasterZone *pRasterZone, doubl
 			{
 				// Get the point out of the IIUnknownVector
 				IDoublePointPtr ipP2 = ipPoints->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI15071", ipP2 != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15071", ipP2 != __nullptr);
 
 				// Create the TPPoint and push into the polygon
 				TPPoint p2(ipP2->X, ipP2->Y);
@@ -715,8 +715,8 @@ STDMETHODIMP CRasterZone::GetBoundsFromMultipleRasterZones(IIUnknownVector *pZon
 	{
 		// Wrap the IUnknownVector in a smart pointer
 		IIUnknownVectorPtr ipZones(pZones);
-		ASSERT_ARGUMENT("ELI25652", ipZones != NULL);
-		ASSERT_ARGUMENT("ELI25653", ppRectangle != NULL);
+		ASSERT_ARGUMENT("ELI25652", ipZones != __nullptr);
+		ASSERT_ARGUMENT("ELI25653", ppRectangle != __nullptr);
 
 		// Validate the license
 		validateLicense();
@@ -732,7 +732,7 @@ STDMETHODIMP CRasterZone::GetBoundsFromMultipleRasterZones(IIUnknownVector *pZon
 		for(long i=0; i < lSize; i++)
 		{
 			UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipZones->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI25654", ipZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25654", ipZone != __nullptr);
 
 			if (lPageNumber == -1)
 			{
@@ -750,7 +750,7 @@ STDMETHODIMP CRasterZone::GetBoundsFromMultipleRasterZones(IIUnknownVector *pZon
 
 			// Get the associated bounding rectangle
 			ILongRectanglePtr ipLongRectangle = ipZone->GetRectangularBounds(NULL);
-			ASSERT_RESOURCE_ALLOCATION("ELI25656", ipLongRectangle != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25656", ipLongRectangle != __nullptr);
 
 			// Get the bounds
 			long lLeft, lTop, lRight, lBottom;
@@ -784,7 +784,7 @@ STDMETHODIMP CRasterZone::GetBoundsFromMultipleRasterZones(IIUnknownVector *pZon
 
 		// Wrap spatial page info in a smart pointer and check for NULL
 		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo(pPageInfo);
-		if (ipPageInfo != NULL)
+		if (ipPageInfo != __nullptr)
 		{
 			// Page info is not null, restrict the bounds of the returned rectangle
 			// by page dimensions
@@ -812,7 +812,7 @@ STDMETHODIMP CRasterZone::GetBoundsFromMultipleRasterZones(IIUnknownVector *pZon
 
 		// Create the return rectangle
 		ILongRectanglePtr ipRect(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI25657", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25657", ipRect != __nullptr);
 		ipRect->SetBounds(rect.left, rect.top, rect.right, rect.bottom);
 
 		// Return the bounding rectangle
@@ -852,7 +852,7 @@ STDMETHODIMP CRasterZone::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18350", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18350", pbValue != __nullptr);
 
 		try
 		{
@@ -882,7 +882,7 @@ STDMETHODIMP CRasterZone::raw_CopyFrom(IUnknown * pObject)
 	{
 		// Verify a valid IRasterZone
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI15162", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15162", ipSource != __nullptr);
 
 		// Load each member variable
 		m_nStartX = ipSource->StartX;
@@ -903,11 +903,11 @@ STDMETHODIMP CRasterZone::raw_Clone(IUnknown * * pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18339", pObject != NULL);
+		ASSERT_ARGUMENT("ELI18339", pObject != __nullptr);
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_RasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI15163", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15163", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -931,10 +931,10 @@ STDMETHODIMP CRasterZone::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18340", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18340", pbValue != __nullptr);
 
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipObj( pObj );
-		ASSERT_RESOURCE_ALLOCATION("ELI15299", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15299", ipObj != __nullptr);
 
 		// Return the result of the equals comparison
 		*pbValue = asVariantBool(equals(ipObj));
@@ -952,7 +952,7 @@ STDMETHODIMP CRasterZone::GetClassID(CLSID *pClassID)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI18342", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI18342", pClassID != __nullptr);
 		*pClassID = CLSID_RasterZone;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18341");
@@ -987,7 +987,7 @@ STDMETHODIMP CRasterZone::Load(IStream *pStream)
 		// validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18343", pStream != NULL);
+		ASSERT_ARGUMENT("ELI18343", pStream != __nullptr);
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -1039,7 +1039,7 @@ STDMETHODIMP CRasterZone::Save(IStream *pStream, BOOL fClearDirty)
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18344", pStream != NULL);
+		ASSERT_ARGUMENT("ELI18344", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -1101,7 +1101,7 @@ bool CRasterZone::equals(UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI25742", ipZone != NULL);
+		ASSERT_ARGUMENT("ELI25742", ipZone != __nullptr);
 
 		// Get the data from the provided raster zone
 		long lStartX, lStartY, lEndX, lEndY, lHeight, lPageNumber;

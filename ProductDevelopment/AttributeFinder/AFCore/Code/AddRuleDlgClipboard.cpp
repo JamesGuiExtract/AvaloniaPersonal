@@ -51,7 +51,7 @@ void CAddRuleDlg::OnEditCopy()
 				// Check for current rule selection
 				int iIndex = -1;
 				POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-				if (pos != NULL)
+				if (pos != __nullptr)
 				{
 					// Get index of first selection
 					iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -66,14 +66,14 @@ void CAddRuleDlg::OnEditCopy()
 
 				// Create a vector for selected rules
 				IIUnknownVectorPtr	ipCopiedRules( CLSID_IUnknownVector );
-				ASSERT_RESOURCE_ALLOCATION( "ELI05529", ipCopiedRules != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI05529", ipCopiedRules != __nullptr );
 
 				// Add each selected rule to vector
 				while (iIndex != -1)
 				{
 					// Retrieve the selected rule
 					IUnknownPtr	ipObject = m_ipAMRulesVector->At( iIndex );
-					ASSERT_RESOURCE_ALLOCATION( "ELI05576", ipObject != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI05576", ipObject != __nullptr );
 
 					// Add the rule to the vector
 					ipCopiedRules->PushBack( ipObject );
@@ -92,7 +92,7 @@ void CAddRuleDlg::OnEditCopy()
 			{
 				// Retrieve existing Document Preprocessor
 				IUnknownPtr	ipObject = m_ipDocPreprocessor;
-				ASSERT_RESOURCE_ALLOCATION( "ELI06116", ipObject != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI06116", ipObject != __nullptr );
 
 				// ClipboardManager will handle the Copy
 				m_ipClipboardMgr->CopyObjectToClipboard( ipObject );
@@ -124,7 +124,7 @@ void CAddRuleDlg::OnEditPaste()
 			case kRulesList:
 			{
 				// Test ClipboardManager object
-				IUnknownPtr	ipObject( NULL );
+				IUnknownPtr	ipObject( __nullptr );
 				bool	bSingleRule = false;
 				if (m_ipClipboardMgr->ObjectIsIUnknownVectorOfType( 
 					IID_IObjectWithDescription ))
@@ -132,7 +132,7 @@ void CAddRuleDlg::OnEditPaste()
 					// Object is a vector of ObjectWithDescription items
 					// We expect each embedded object to be an AM Rule
 					ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-					ASSERT_RESOURCE_ALLOCATION( "ELI05523", ipObject != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI05523", ipObject != __nullptr );
 				}
 				else if (m_ipClipboardMgr->ObjectIsTypeWithDescription( 
 					IID_IAttributeModifyingRule ))
@@ -140,7 +140,7 @@ void CAddRuleDlg::OnEditPaste()
 					// Object is a single ObjectWithDescription item
 					// We expect the embedded object to be an AM Rule
 					ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-					ASSERT_RESOURCE_ALLOCATION( "ELI08068", ipObject != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI08068", ipObject != __nullptr );
 					bSingleRule = true;
 				}
 				else
@@ -153,7 +153,7 @@ void CAddRuleDlg::OnEditPaste()
 				// Check for current rule selection
 				int iIndex = -1;
 				POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-				if (pos != NULL)
+				if (pos != __nullptr)
 				{
 					// Get index of first selection
 					iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -172,7 +172,7 @@ void CAddRuleDlg::OnEditPaste()
 				{
 					// Retrieve rule and description
 					IObjectWithDescriptionPtr	ipNewRule = ipObject;
-					ASSERT_RESOURCE_ALLOCATION( "ELI08069", ipNewRule != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI08069", ipNewRule != __nullptr );
 					string	strDescription( ipNewRule->GetDescription() );
 
 					// Insert the text into the list
@@ -205,7 +205,7 @@ void CAddRuleDlg::OnEditPaste()
 				{
 					// Get count of Rules in Clipboard vector
 					IIUnknownVectorPtr	ipPastedRules = ipObject;
-					ASSERT_RESOURCE_ALLOCATION( "ELI05520", ipPastedRules != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI05520", ipPastedRules != __nullptr );
 					int iCount = ipPastedRules->Size();
 
 					// Add each Rule to the list and the vector
@@ -213,7 +213,7 @@ void CAddRuleDlg::OnEditPaste()
 					{
 						// Retrieve rule and description
 						IObjectWithDescriptionPtr	ipNewRule = ipPastedRules->At( i );
-						ASSERT_RESOURCE_ALLOCATION( "ELI05577", ipNewRule != NULL );
+						ASSERT_RESOURCE_ALLOCATION( "ELI05577", ipNewRule != __nullptr );
 						string	strDescription( ipNewRule->GetDescription() );
 
 						// Insert the text into the list
@@ -256,12 +256,12 @@ void CAddRuleDlg::OnEditPaste()
 			case kPreprocessor:
 			{
 				// Test ClipboardManager object to see if it is an Document Preprocessor
-				IUnknownPtr	ipObject( NULL );
+				IUnknownPtr	ipObject( __nullptr );
 				if (m_ipClipboardMgr->ObjectIsTypeWithDescription( IID_IDocumentPreprocessor ))
 				{
 					// Retrieve object from ClipboardManager
 					ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-					ASSERT_RESOURCE_ALLOCATION( "ELI06117", ipObject != NULL );
+					ASSERT_RESOURCE_ALLOCATION( "ELI06117", ipObject != __nullptr );
 				}
 				else
 				{
@@ -270,11 +270,11 @@ void CAddRuleDlg::OnEditPaste()
 						"Clipboard object is not an Document Preprocessor." );
 				}
 
-				if (m_ipRule != NULL)
+				if (m_ipRule != __nullptr)
 				{
 					// Set Document Preprocessor
 					IObjectWithDescriptionPtr	ipPre = ipObject;
-					if (ipPre != NULL)
+					if (ipPre != __nullptr)
 					{
 						m_ipDocPreprocessor = ipPre;
 						
@@ -344,8 +344,8 @@ void CAddRuleDlg::OnEditDelete()
 				if (iResult == IDYES)
 				{
 					// Clear Document Preprocessor object
-					m_ipDocPreprocessor = NULL;
-					m_ipRule->RuleSpecificDocPreprocessor = NULL;
+					m_ipDocPreprocessor = __nullptr;
+					m_ipRule->RuleSpecificDocPreprocessor = __nullptr;
 						
 					// Display the empty Document Preprocessor description
 					m_zPPDescription = "";

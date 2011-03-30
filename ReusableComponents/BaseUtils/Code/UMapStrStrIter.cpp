@@ -26,7 +26,7 @@ bool UMapStrStrIter::FetchValuePair(std::string* pKey,std::string* pValue)
 	{
 		bSuccess = true;
 		*pKey = (*m_iter).first;
-		if (pValue != NULL)
+		if (pValue != __nullptr)
 		{
 			*pValue = (*m_iter).second;
 		}

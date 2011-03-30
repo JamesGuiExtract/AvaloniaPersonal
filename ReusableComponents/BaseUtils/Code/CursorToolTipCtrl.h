@@ -14,7 +14,7 @@ public:
 	~CursorToolTipCtrl();
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: update the text associated with the tooltip
-	// REQUIRE: strText != NULL
+	// REQUIRE: strText != __nullptr
 	//			If specified, nClientX and nClientY are in client window positions, relative to
 	//			the specified parent window.
 	// PROMISE:	To display the specified tooltip text at the current cursor position for a duration

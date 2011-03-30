@@ -15,7 +15,7 @@ CfgOCRFiltering::CfgOCRFiltering()
 {
 	// root folder 
 	string strRootFolder = gstrREG_ROOT_KEY + "\\InputFunnel";
-	ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+	ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 		new RegistryPersistenceMgr(HKEY_CURRENT_USER, strRootFolder));
 }
 //---------------------------------------------------------------------------

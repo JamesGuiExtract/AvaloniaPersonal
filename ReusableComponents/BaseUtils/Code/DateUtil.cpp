@@ -511,17 +511,17 @@ bool isValidDate(string strDate, long *plMonth, long *plDay, long *plYear, bool 
 		if (tmStop.GetStatus() == COleDateTime::valid)
 		{
 			// Provide date components to caller
-			if (plMonth != NULL)
+			if (plMonth != __nullptr)
 			{
 				*plMonth = lMonth;
 			}
 
-			if (plDay != NULL)
+			if (plDay != __nullptr)
 			{
 				*plDay = lDay;
 			}
 
-			if (plYear != NULL)
+			if (plYear != __nullptr)
 			{
 				*plYear = lYear;
 			}

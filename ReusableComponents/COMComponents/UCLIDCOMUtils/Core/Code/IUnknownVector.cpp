@@ -77,7 +77,7 @@ STDMETHODIMP CIUnknownVector::Size(long *plSize)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26018", plSize != NULL);
+		ASSERT_ARGUMENT("ELI26018", plSize != __nullptr);
 
 		validateLicense();
 
@@ -95,7 +95,7 @@ STDMETHODIMP CIUnknownVector::At(long lPos, IUnknown **pObj)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26019", pObj != NULL);
+		ASSERT_ARGUMENT("ELI26019", pObj != __nullptr);
 
 		validateLicense();
 
@@ -154,7 +154,7 @@ STDMETHODIMP CIUnknownVector::PushBack(IUnknown *pObj)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	try
 	{
-		ASSERT_ARGUMENT("ELI26020", pObj != NULL);
+		ASSERT_ARGUMENT("ELI26020", pObj != __nullptr);
 
 		validateLicense();
 
@@ -212,7 +212,7 @@ STDMETHODIMP CIUnknownVector::Front(IUnknown **pObj)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI26021", pObj != NULL);
+		ASSERT_ARGUMENT("ELI26021", pObj != __nullptr);
 
 		validateLicense();
 
@@ -237,7 +237,7 @@ STDMETHODIMP CIUnknownVector::Back(IUnknown **pObj)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI26022", pObj != NULL);
+		ASSERT_ARGUMENT("ELI26022", pObj != __nullptr);
 
 		validateLicense();
 
@@ -299,7 +299,7 @@ STDMETHODIMP CIUnknownVector::Append(IIUnknownVector *pVector)
 	try
 	{
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipVector(pVector);
-		ASSERT_ARGUMENT("ELI26023", ipVector != NULL);
+		ASSERT_ARGUMENT("ELI26023", ipVector != __nullptr);
 
 		validateLicense();
 
@@ -361,7 +361,7 @@ STDMETHODIMP CIUnknownVector::InsertVector(long lPos, IIUnknownVector *pObj)
 	try
 	{
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipVector(pObj);
-		ASSERT_ARGUMENT("ELI26024", ipVector != NULL);
+		ASSERT_ARGUMENT("ELI26024", ipVector != __nullptr);
 
 		// Check license state
 		validateLicense();
@@ -389,7 +389,7 @@ STDMETHODIMP CIUnknownVector::InsertVector(long lPos, IIUnknownVector *pObj)
 			{
 				// get the object to insert
 				IUnknownPtr ipUnknown = ipVector->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI06455", ipUnknown != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06455", ipUnknown != __nullptr);
 
 				// insert the object at the correct position
 				iter = m_vecIUnknowns.insert(iter, ipUnknown);
@@ -496,7 +496,7 @@ STDMETHODIMP CIUnknownVector::Set(long lPos, IUnknown *pObj)
 		IUnknownPtr ipObj(pObj);
 
 		// Check new object
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			// Create and throw exception
 			UCLIDException	ue( "ELI04765", "Cannot insert NULL object!" );
@@ -528,9 +528,9 @@ STDMETHODIMP CIUnknownVector::Swap(long lPos1, long lPos2)
 		validateIndex(lPos2);
 
 		IUnknownPtr ipTemp1 = m_vecIUnknowns[lPos1];
-		ASSERT_RESOURCE_ALLOCATION("ELI26025", ipTemp1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26025", ipTemp1 != __nullptr);
 		IUnknownPtr ipTemp2 = m_vecIUnknowns[lPos2];
-		ASSERT_RESOURCE_ALLOCATION("ELI26026", ipTemp2 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26026", ipTemp2 != __nullptr);
 
 		m_vecIUnknowns[lPos1] = ipTemp2;
 		m_vecIUnknowns[lPos2] = ipTemp1;
@@ -551,13 +551,13 @@ STDMETHODIMP CIUnknownVector::IsOrderFreeEqualTo(IIUnknownVector *pVector, VARIA
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI06308", pVector != NULL);
+		ASSERT_ARGUMENT("ELI06308", pVector != __nullptr);
 
 		// default the value to false
 		*pbValue = VARIANT_FALSE;
 
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipOtherVec(pVector);
-		if (ipOtherVec == NULL)
+		if (ipOtherVec == __nullptr)
 		{
 			// if pVector is not of type IIUnknownVector, then return false
 			return S_OK;
@@ -582,9 +582,9 @@ STDMETHODIMP CIUnknownVector::IsOrderFreeEqualTo(IIUnknownVector *pVector, VARIA
 		// make a copy of these two vectors
 		vector<IUnknownPtr> vecCopyThisVec = m_vecIUnknowns;
 		UCLID_COMUTILSLib::IShallowCopyablePtr ipCopier = ipOtherVec;
-		ASSERT_RESOURCE_ALLOCATION("ELI26027", ipCopier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26027", ipCopier != __nullptr);
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipCopyOtherVec = ipCopier->ShallowCopy();
-		ASSERT_RESOURCE_ALLOCATION("ELI26028", ipCopyOtherVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26028", ipCopyOtherVec != __nullptr);
 		
 		long nTotalSize = vecCopyThisVec.size();
 
@@ -593,7 +593,7 @@ STDMETHODIMP CIUnknownVector::IsOrderFreeEqualTo(IIUnknownVector *pVector, VARIA
 		{
 			// get the first item of the other vector
 			UCLID_COMUTILSLib::IComparableObjectPtr ipOtherObj(ipCopyOtherVec->At(0));
-			if (ipOtherObj == NULL)
+			if (ipOtherObj == __nullptr)
 			{
 				throw UCLIDException("ELI06310", "Object in IUnknownVector must implement IComparableObject in order to make the comparison.");
 			}
@@ -602,7 +602,7 @@ STDMETHODIMP CIUnknownVector::IsOrderFreeEqualTo(IIUnknownVector *pVector, VARIA
 			for (long n = 0; n < nTotalSize; n++)
 			{
 				UCLID_COMUTILSLib::IComparableObjectPtr ipThisObj(vecCopyThisVec[n]);
-				if (ipThisObj == NULL)
+				if (ipThisObj == __nullptr)
 				{
 					throw UCLIDException("ELI06309", "Object in IUnknownVector must implement IComparableObject in order to make the comparison.");
 				}
@@ -661,7 +661,7 @@ STDMETHODIMP CIUnknownVector::FindByValue(IUnknown *pObj, long nStartIndex, long
 
 		// Test object must implement IComparableObject to be found
 		UCLID_COMUTILSLib::IComparableObjectPtr ipTestObj( pObj );
-		if (ipTestObj == NULL)
+		if (ipTestObj == __nullptr)
 		{
 			throw UCLIDException( "ELI06426", 
 				"Object must implement IComparableObject in order to be found." );
@@ -673,7 +673,7 @@ STDMETHODIMP CIUnknownVector::FindByValue(IUnknown *pObj, long nStartIndex, long
 		{
 			// Retrieve this item
 			UCLID_COMUTILSLib::IComparableObjectPtr ipMyObj( m_vecIUnknowns[i] );
-			if (ipMyObj == NULL)
+			if (ipMyObj == __nullptr)
 			{
 				throw UCLIDException( "ELI06415", 
 					"Object in IUnknownVector must implement IComparableObject in order to be found." );
@@ -745,7 +745,7 @@ STDMETHODIMP CIUnknownVector::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDi
 
 		// Load the vector from the file
 		IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
-		ASSERT_RESOURCE_ALLOCATION("ELI16908", ipPersistStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16908", ipPersistStream != __nullptr);
 		readObjectFromFile(ipPersistStream, strFullFileName, m_bstrStreamName, false, 
 			gstrIUNKOWNVECTOR_FILE_SIGNATURE);
 
@@ -820,7 +820,7 @@ STDMETHODIMP CIUnknownVector::CopyFrom(IUnknown *pObject)
 
 		// Ensure that the object is a Vector
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08207", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08207", ipSource != __nullptr);
 	
 		// Clear this vector
 		clear();
@@ -831,7 +831,7 @@ STDMETHODIMP CIUnknownVector::CopyFrom(IUnknown *pObject)
 			// if this method is being called, it is expected that the IUnknowns
 			// stored in the input vector implement ICopyableObject
 			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyableObject = ipSource->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI08208", ipCopyableObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08208", ipCopyableObject != __nullptr);
 			
 			IUnknownPtr ipUnknownClone = ipCopyableObject->Clone();
 
@@ -855,7 +855,7 @@ STDMETHODIMP CIUnknownVector::Clone(IUnknown* *pObject)
 		// create a new variant vector
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI19454", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19454", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -877,11 +877,11 @@ STDMETHODIMP CIUnknownVector::ShallowCopy(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25983", pObject != NULL);
+		ASSERT_ARGUMENT("ELI25983", pObject != __nullptr);
 
 		// Create a new vector to hold the objects
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipNewVector(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI25982", ipNewVector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25982", ipNewVector != __nullptr);
 
 		// Place a shallow copy of each object in the new vector
 		for (vector<IUnknownPtr>::iterator it = m_vecIUnknowns.begin();
@@ -990,7 +990,7 @@ STDMETHODIMP CIUnknownVector::Load(IStream *pStream)
 		{
 			IPersistStreamPtr ipObj;
 			readObjectFromStream(ipObj, pStream, "ELI09979");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException("ELI04630", "Unable to read object from stream!");
 			}
@@ -1037,7 +1037,7 @@ STDMETHODIMP CIUnknownVector::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			// make sure the object supports persistence
 			IPersistStreamPtr ipObj = *iter;
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException("ELI04572", "Object in vector does not support persistence!");
 			}
@@ -1096,14 +1096,14 @@ STDMETHODIMP CIUnknownVector::IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 		// Validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI06311", pObj != NULL);
+		ASSERT_ARGUMENT("ELI06311", pObj != __nullptr);
 
 		// default to false
 		*pbValue = VARIANT_FALSE;
 
 		// Comparison object must be an IIUnknownVector
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipOtherVector = pObj;
-		if (ipOtherVector == NULL)
+		if (ipOtherVector == __nullptr)
 		{
 			// if pObj is not of type IIUnknownVector, return false
 			return S_OK;
@@ -1135,7 +1135,7 @@ STDMETHODIMP CIUnknownVector::IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 			UCLID_COMUTILSLib::IComparableObjectPtr ipOtherObj(ipOtherVector->At(n));
 			
 			// Make sure that both elements were retrieved
-			if ((ipThisObj == NULL) || (ipOtherObj == NULL))
+			if ((ipThisObj == __nullptr) || (ipOtherObj == __nullptr))
 			{
 				throw UCLIDException("ELI06312", "Object in IUnknownVector must implement IComparableObject in order to make the comparison.");
 			}
@@ -1162,7 +1162,7 @@ STDMETHODIMP CIUnknownVector::IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 UCLID_COMUTILSLib::IIUnknownVectorPtr CIUnknownVector::getThisAsCOMPtr()
 {
 	UCLID_COMUTILSLib::IIUnknownVectorPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16972", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16972", ipThis != __nullptr);
 
 	return ipThis;
 }
@@ -1197,14 +1197,14 @@ void CIUnknownVector::append(UCLID_COMUTILSLib::IIUnknownVectorPtr ipVector)
 	try
 	{
 		// Check the argument
-		ASSERT_ARGUMENT("ELI26029", ipVector != NULL);
+		ASSERT_ARGUMENT("ELI26029", ipVector != __nullptr);
 
 		// Add each item from the vector to this vector
 		long nNumItems = ipVector->Size();
 		for (long i = 0; i < nNumItems; i++)
 		{
 			IUnknownPtr ipUnknown = ipVector->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI16938", ipUnknown != NULL)
+			ASSERT_RESOURCE_ALLOCATION("ELI16938", ipUnknown != __nullptr)
 
 			m_vecIUnknowns.push_back(ipUnknown);
 		}

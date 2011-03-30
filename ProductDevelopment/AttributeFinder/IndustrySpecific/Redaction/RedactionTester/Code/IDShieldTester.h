@@ -157,14 +157,14 @@ private:
 	string m_strVerificationQuantifier;
 	set<string> m_setVerificationCondition;
 	EAttributeQuantifier m_eaqVerificationQuantifier;
-	auto_ptr<AttributeTester> m_apVerificationTester;
+	unique_ptr<AttributeTester> m_apVerificationTester;
 
 	// Redaction conditions
 	string m_strRedactionCondition;
 	string m_strRedactionQuantifier;
 	set<string> m_setRedactionCondition;
 	EAttributeQuantifier m_eaqRedactionQuantifier;
-	auto_ptr<AttributeTester> m_apRedactionTester;
+	unique_ptr<AttributeTester> m_apRedactionTester;
 
 	// Redaction query
 	string m_strRedactionQuery;

@@ -104,7 +104,7 @@ private:
 	
 	IStrToObjectMapPtr m_ipAttributeNameToInfoMap;
 
-	auto_ptr<CRuleSetEditor> m_apDlg;
+	unique_ptr<CRuleSetEditor> m_apDlg;
 
 	// Global Document Preprocessor
 	IObjectWithDescriptionPtr m_ipDocPreprocessor;
@@ -128,7 +128,7 @@ private:
 
 	// The should be only one SafeNetLicenseMgr object
 	// protected by ms_mutexLM
-	static auto_ptr<SafeNetLicenseMgr> m_apSafeNetMgr;
+	static unique_ptr<SafeNetLicenseMgr> m_apSafeNetMgr;
 	
 	// This is need to to keep track of the number of RuleSet intances that are active so it will
 	// be possible to know when the m_apSafeNetMgr object can safely be deleted 
@@ -166,13 +166,13 @@ private:
 	//	PURPOSE: to return m_ipDocPreprocessor
 	//
 	//	PROMISE: to create an instance of DocumentPreprocessor and assign it to m_ipDocPreprocessor 
-	//			if m_ipDocPreprocessor is NULL
+	//			if m_ipDocPreprocessor is __nullptr
 	IObjectWithDescriptionPtr getDocPreprocessor();
 	//----------------------------------------------------------------------------------------------
 	//	PURPOSE: to return m_ipOutputHandler
 	//
 	//	PROMISE: to create an instance of OutputHandler and assign it to m_ipOutputHandler 
-	//			 if m_ipOutputHandler is NULL
+	//			 if m_ipOutputHandler is __nullptr
 	IObjectWithDescriptionPtr getOutputHandler();
 	//----------------------------------------------------------------------------------------------
 	// Validates Rule Set license

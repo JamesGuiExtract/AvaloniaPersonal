@@ -43,7 +43,7 @@ CRedactionTask::CRedactionTask()
     m_ipPdfSettings(NULL),
     m_bUseRedactedImage(false)
 {
-    ASSERT_RESOURCE_ALLOCATION("ELI19993", m_ipAttributeNames != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI19993", m_ipAttributeNames != __nullptr);
 
     // set members to their inital states
     clear();
@@ -59,10 +59,10 @@ CRedactionTask::~CRedactionTask()
 {
     try
     {
-        m_ipAFUtility = NULL;
-        m_ipAttributeNames = NULL;
-        m_ipIDShieldDB = NULL;
-        m_ipPdfSettings = NULL;
+        m_ipAFUtility = __nullptr;
+        m_ipAttributeNames = __nullptr;
+        m_ipIDShieldDB = __nullptr;
+        m_ipPdfSettings = __nullptr;
     }
     CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16479");
 }
@@ -76,10 +76,10 @@ void CRedactionTask::FinalRelease()
 {
     try
     {
-        m_ipAFUtility = NULL;
-        m_ipAttributeNames = NULL;
-        m_ipIDShieldDB = NULL;
-        m_ipPdfSettings = NULL;
+        m_ipAFUtility = __nullptr;
+        m_ipAttributeNames = __nullptr;
+        m_ipIDShieldDB = __nullptr;
+        m_ipPdfSettings = __nullptr;
     }
     CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28331");
 }
@@ -148,13 +148,13 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         swProcessingTime.start();
         _lastCodePos = "20";
 
-        ASSERT_ARGUMENT("ELI17929", pResult != NULL);
+        ASSERT_ARGUMENT("ELI17929", pResult != __nullptr);
         IFileRecordPtr ipFileRecord(pFileRecord);
         ASSERT_ARGUMENT("ELI31344", ipFileRecord != __nullptr);
 
         // Create an smart FAM Tag Pointer
         IFAMTagManagerPtr ipFAMTagManager = pTagManager;
-        ASSERT_RESOURCE_ALLOCATION("ELI15012", ipFAMTagManager != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI15012", ipFAMTagManager != __nullptr);
         _lastCodePos = "30";
 
         // input file for processing
@@ -233,11 +233,11 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         _lastCodePos = "110";
         // Create Found attributes vector
         IIUnknownVectorPtr ipFoundAttr (CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI08997", ipFoundAttr != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI08997", ipFoundAttr != __nullptr);
         _lastCodePos = "120";
 
         IIUnknownVectorPtr ipVOAAttr(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI12718", ipVOAAttr != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI12718", ipVOAAttr != __nullptr);
 
         // Expand tags and text functions to get the VOA file name
         string strVOAFileName = CRedactionCustomComponentsUtils::ExpandTagsAndTFE(
@@ -258,7 +258,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 
         // Calculate the counts from the loaded voa file
         IDShieldData idsData;
-        if (m_ipAttributeNames == NULL)
+        if (m_ipAttributeNames == __nullptr)
         {
             // Count all the attributes
             idsData.calculateFromVector(ipVOAAttr);
@@ -271,7 +271,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         _lastCodePos = "150";
 
         // check to see if all of the loaded attributes will be used
-        if (m_ipAttributeNames != NULL)
+        if (m_ipAttributeNames != __nullptr)
         {
             _lastCodePos = "160";
             long nNumAttr = m_ipAttributeNames->Size;
@@ -309,11 +309,11 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         {
             _lastCodePos = "250-" + asString(i);
             IAttributePtr ipAttr = ipFoundAttr->At(i);
-            ASSERT_RESOURCE_ALLOCATION("ELI09001", ipAttr != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI09001", ipAttr != __nullptr);
 
             // Get the found value
             ISpatialStringPtr ipValue = ipAttr->Value;
-            ASSERT_RESOURCE_ALLOCATION("ELI09002", ipValue != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI09002", ipValue != __nullptr);
             _lastCodePos = "260";
 
             // Only cover area if value is spatial
@@ -353,7 +353,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 
                 // Get the Raster zones to redact
                 IIUnknownVectorPtr ipRasterZones = ipValue->GetOriginalImageRasterZones();
-                ASSERT_RESOURCE_ALLOCATION("ELI09180", ipRasterZones != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI09180", ipRasterZones != __nullptr);
                 _lastCodePos = "280";
 
 				IIUnknownVectorPtr ipOcrZones = __nullptr;
@@ -369,7 +369,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
                 {
 					// Get the raster zone
                     IRasterZonePtr ipRasterZone = ipRasterZones->At(j);
-                    ASSERT_RESOURCE_ALLOCATION("ELI24862", ipRasterZone != NULL);
+                    ASSERT_RESOURCE_ALLOCATION("ELI24862", ipRasterZone != __nullptr);
 
 					// Store the text value locally (this value may be changed
 					// if auto-adjust case is true)
@@ -554,7 +554,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         string strUser = "";
         string strOwner = "";
         int nPermissions = 0;
-        if (m_ipPdfSettings != NULL)
+        if (m_ipPdfSettings != __nullptr)
         {
             _bstr_t bstrUserPass, bstrOwnerPass;
             PdfOwnerPermissions permissions;
@@ -582,7 +582,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 
         // Add ID Shield data if a database is provided
         IFileProcessingDBPtr ipFAMDB(pDB);
-        if (ipFAMDB != NULL)
+        if (ipFAMDB != __nullptr)
         {
             // Set the FAMDB pointer
             UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipIDSDB = getIDShieldDBPtr();
@@ -650,7 +650,7 @@ STDMETHODIMP CRedactionTask::raw_IsLicensed(VARIANT_BOOL* pbValue)
     try
     {
         // Check parameter
-        ASSERT_ARGUMENT("ELI19820", pbValue != NULL);
+        ASSERT_ARGUMENT("ELI19820", pbValue != __nullptr);
 
         try
         {
@@ -679,7 +679,7 @@ STDMETHODIMP CRedactionTask::raw_GetComponentDescription(BSTR* pstrComponentDesc
 
     try
     {
-        ASSERT_ARGUMENT("ELI28222", pstrComponentDescription != NULL);
+        ASSERT_ARGUMENT("ELI28222", pstrComponentDescription != __nullptr);
 
         *pstrComponentDescription = _bstr_t("Redaction: Create redacted image").Detach();
 
@@ -698,14 +698,14 @@ STDMETHODIMP CRedactionTask::raw_Clone(IUnknown** pObject)
     try
     {
         // Check parameter
-        ASSERT_ARGUMENT("ELI28321", pObject != NULL);
+        ASSERT_ARGUMENT("ELI28321", pObject != __nullptr);
 
         // validate license first
         validateLicense();
 
         // create another instance of this object
         ICopyableObjectPtr ipObjCopy(CLSID_RedactionTask);
-        ASSERT_RESOURCE_ALLOCATION("ELI09864", ipObjCopy != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI09864", ipObjCopy != __nullptr);
 
         IUnknownPtr ipUnk(this);
         ipObjCopy->CopyFrom(ipUnk);
@@ -727,21 +727,21 @@ STDMETHODIMP CRedactionTask::raw_CopyFrom(IUnknown* pObject)
         // validate license first
         validateLicense();
         UCLID_REDACTIONCUSTOMCOMPONENTSLib::IRedactionTaskPtr ipSource(pObject);
-        ASSERT_RESOURCE_ALLOCATION("ELI09876", ipSource != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI09876", ipSource != __nullptr);
 
         m_strOutputFileName = asString(ipSource->OutputFileName);
 
         // Clear the Attributes set
         m_setAttributeNames.clear();
 
-        if (ipSource->AttributeNames != NULL)
+        if (ipSource->AttributeNames != __nullptr)
         {
             m_ipAttributeNames = ipSource->AttributeNames;
             fillAttributeSet(m_ipAttributeNames, m_setAttributeNames);
         }
         else
         {
-            m_ipAttributeNames = NULL;
+            m_ipAttributeNames = __nullptr;
         }
 
         // Retrieve VOA file name
@@ -784,14 +784,14 @@ STDMETHODIMP CRedactionTask::raw_CopyFrom(IUnknown* pObject)
 
         // Retrieve PDF settings
         ICopyableObjectPtr ipCopy = ipSource->PdfPasswordSettings;
-        if (ipCopy != NULL)
+        if (ipCopy != __nullptr)
         {
             m_ipPdfSettings = ipCopy->Clone();
-            ASSERT_RESOURCE_ALLOCATION("ELI29770", m_ipPdfSettings != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI29770", m_ipPdfSettings != __nullptr);
         }
         else
         {
-            m_ipPdfSettings = NULL;
+            m_ipPdfSettings = __nullptr;
         }
 
         return S_OK;
@@ -809,7 +809,7 @@ STDMETHODIMP CRedactionTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
     try
     {
         // Check parameter
-        ASSERT_ARGUMENT("ELI28322", pbValue != NULL);
+        ASSERT_ARGUMENT("ELI28322", pbValue != __nullptr);
 
         // Check license
         validateLicense();
@@ -819,7 +819,7 @@ STDMETHODIMP CRedactionTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
         // 2. Pdf settings are either NULL or properly configured
         IMustBeConfiguredObjectPtr ipConfigure = m_ipPdfSettings;
         bool bConfigured = !m_strOutputFileName.empty()
-            && (ipConfigure == NULL || ipConfigure->IsConfigured() == VARIANT_TRUE);
+            && (ipConfigure == __nullptr || ipConfigure->IsConfigured() == VARIANT_TRUE);
         *pbValue = asVariantBool(bConfigured);
 
         return S_OK;
@@ -837,7 +837,7 @@ STDMETHODIMP CRedactionTask::get_OutputFileName(BSTR* pVal)
     try
     {
         // Check parameter
-        ASSERT_ARGUMENT("ELI28324", pVal != NULL);
+        ASSERT_ARGUMENT("ELI28324", pVal != __nullptr);
 
         validateLicense();
 
@@ -859,7 +859,7 @@ STDMETHODIMP CRedactionTask::put_OutputFileName(BSTR newVal)
 
         // Create a local IFAMTagManagerPtr object
         UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-        ASSERT_RESOURCE_ALLOCATION("ELI15030", ipFAMTagManager != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI15030", ipFAMTagManager != __nullptr);
 
         // Make sure the file name contains valid string tags
         if (ipFAMTagManager->StringContainsInvalidTags(strFileName.c_str()) == VARIANT_TRUE)
@@ -884,20 +884,20 @@ STDMETHODIMP CRedactionTask::get_AttributeNames(IVariantVector** ppVal)
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
     try
     {
-        ASSERT_ARGUMENT("ELI26085", ppVal != NULL);
+        ASSERT_ARGUMENT("ELI26085", ppVal != __nullptr);
 
         validateLicense();
         
         *ppVal = NULL;
-        if (m_ipAttributeNames != NULL)
+        if (m_ipAttributeNames != __nullptr)
         {
             // Get a ShallowCopyableObject ptr for the current name list
             IShallowCopyablePtr ipObjSource = m_ipAttributeNames;
-            ASSERT_RESOURCE_ALLOCATION("ELI15339", ipObjSource != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI15339", ipObjSource != __nullptr);
 
             // Shallow copy the attribute names
             IVariantVectorPtr ipObjCloned = ipObjSource->ShallowCopy();
-            ASSERT_RESOURCE_ALLOCATION("ELI15340", ipObjCloned != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI15340", ipObjCloned != __nullptr);
 
             // set the return value to the shallow copied object
             *ppVal = ipObjCloned.Detach();
@@ -918,7 +918,7 @@ STDMETHODIMP CRedactionTask::put_AttributeNames(IVariantVector *pVal)
         m_ipAttributeNames = pVal;
         
         m_setAttributeNames.clear();
-        if (m_ipAttributeNames != NULL)
+        if (m_ipAttributeNames != __nullptr)
         {
             fillAttributeSet(m_ipAttributeNames, m_setAttributeNames);
         }
@@ -936,7 +936,7 @@ STDMETHODIMP CRedactionTask::get_VOAFileName(BSTR* pVal)
 
     try
     {
-        ASSERT_ARGUMENT("ELI28326", pVal != NULL);
+        ASSERT_ARGUMENT("ELI28326", pVal != __nullptr);
 
         validateLicense();
 
@@ -959,7 +959,7 @@ STDMETHODIMP CRedactionTask::put_VOAFileName(BSTR newVal)
 
         // Create a local IFAMTagManagerPtr object
         UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-        ASSERT_RESOURCE_ALLOCATION("ELI15032", ipFAMTagManager != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI15032", ipFAMTagManager != __nullptr);
 
         // Make sure the file name contains valid string tags
         if (ipFAMTagManager->StringContainsInvalidTags(strFileName.c_str()) == VARIANT_TRUE)
@@ -985,7 +985,7 @@ STDMETHODIMP CRedactionTask::get_CarryForwardAnnotations(VARIANT_BOOL* pVal)
 
     try
     {
-        ASSERT_ARGUMENT("ELI28327", pVal != NULL);
+        ASSERT_ARGUMENT("ELI28327", pVal != __nullptr);
 
         // Check license state
         validateLicense();
@@ -1022,7 +1022,7 @@ STDMETHODIMP CRedactionTask::get_ApplyRedactionsAsAnnotations(VARIANT_BOOL* pVal
 
     try
     {
-        ASSERT_ARGUMENT("ELI28328", pVal != NULL);
+        ASSERT_ARGUMENT("ELI28328", pVal != __nullptr);
 
         // Check license state
         validateLicense();
@@ -1059,7 +1059,7 @@ STDMETHODIMP CRedactionTask::get_UseRedactedImage(VARIANT_BOOL* pvbUseRedactedIm
 
     try
     {
-        ASSERT_ARGUMENT("ELI24751", pvbUseRedactedImage != NULL);
+        ASSERT_ARGUMENT("ELI24751", pvbUseRedactedImage != __nullptr);
 
         // Check license state
         validateLicense();
@@ -1096,7 +1096,7 @@ STDMETHODIMP CRedactionTask::get_RedactionText(BSTR* pbstrRedactionText)
 
     try
     {
-        ASSERT_ARGUMENT("ELI24752", pbstrRedactionText != NULL);
+        ASSERT_ARGUMENT("ELI24752", pbstrRedactionText != __nullptr);
 
         // Check license state
         validateLicense();
@@ -1133,7 +1133,7 @@ STDMETHODIMP CRedactionTask::get_BorderColor(long* plBorderColor)
 
     try
     {
-        ASSERT_ARGUMENT("ELI24753", plBorderColor != NULL);
+        ASSERT_ARGUMENT("ELI24753", plBorderColor != __nullptr);
 
         // Check license state
         validateLicense();
@@ -1170,7 +1170,7 @@ STDMETHODIMP CRedactionTask::get_FillColor(long* plFillColor)
 
     try
     {
-        ASSERT_ARGUMENT("ELI24754", plFillColor != NULL);
+        ASSERT_ARGUMENT("ELI24754", plFillColor != __nullptr);
 
         // Check license state
         validateLicense();
@@ -1207,7 +1207,7 @@ STDMETHODIMP CRedactionTask::get_FontName(BSTR* pbstrFontName)
 
     try
     {
-        ASSERT_ARGUMENT("ELI24755", pbstrFontName != NULL);
+        ASSERT_ARGUMENT("ELI24755", pbstrFontName != __nullptr);
 
         // Check license state
         validateLicense();
@@ -1253,7 +1253,7 @@ STDMETHODIMP CRedactionTask::get_IsBold(VARIANT_BOOL* pvbBold)
 
     try
     {
-        ASSERT_ARGUMENT("ELI24867", pvbBold != NULL);
+        ASSERT_ARGUMENT("ELI24867", pvbBold != __nullptr);
 
         // Check license state
         validateLicense();
@@ -1290,7 +1290,7 @@ STDMETHODIMP CRedactionTask::get_IsItalic(VARIANT_BOOL* pvbItalic)
 
     try
     {
-        ASSERT_ARGUMENT("ELI24868", pvbItalic != NULL);
+        ASSERT_ARGUMENT("ELI24868", pvbItalic != __nullptr);
         
         // Check license state
         validateLicense();
@@ -1327,7 +1327,7 @@ STDMETHODIMP CRedactionTask::get_FontSize(long* plFontSize)
 
     try
     {
-        ASSERT_ARGUMENT("ELI24869", plFontSize != NULL);
+        ASSERT_ARGUMENT("ELI24869", plFontSize != __nullptr);
 
         // Check license state
         validateLicense();
@@ -1386,7 +1386,7 @@ STDMETHODIMP CRedactionTask::get_PdfPasswordSettings(IPdfPasswordSettings** ppPd
         // Check license state
         validateLicense();
 
-        ASSERT_RESOURCE_ALLOCATION("ELI29785", ppPdfSettings != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI29785", ppPdfSettings != __nullptr);
 
         IPdfPasswordSettingsPtr ipShallowCopy = m_ipPdfSettings;
 
@@ -1407,10 +1407,10 @@ STDMETHODIMP CRedactionTask::GetFontData(BSTR* pbstrFontName, VARIANT_BOOL* pvbI
         // Check license state
         validateLicense();
 
-        ASSERT_ARGUMENT("ELI29787", pbstrFontName != NULL);
-        ASSERT_ARGUMENT("ELI29788", pvbIsBold != NULL);
-        ASSERT_ARGUMENT("ELI29789", pvbIsItalic != NULL);
-        ASSERT_ARGUMENT("ELI29790", plFontSize != NULL);
+        ASSERT_ARGUMENT("ELI29787", pbstrFontName != __nullptr);
+        ASSERT_ARGUMENT("ELI29788", pvbIsBold != __nullptr);
+        ASSERT_ARGUMENT("ELI29789", pvbIsItalic != __nullptr);
+        ASSERT_ARGUMENT("ELI29790", plFontSize != __nullptr);
 
         // Return the font data
         _bstr_t bstrFontName(m_redactionAppearance.m_lgFont.lfFaceName);
@@ -1430,7 +1430,7 @@ STDMETHODIMP CRedactionTask::get_AutoAdjustTextCasing(VARIANT_BOOL* pvbAdjustCas
 
     try
     {
-        ASSERT_ARGUMENT("ELI32029", pvbAdjustCasing != NULL);
+        ASSERT_ARGUMENT("ELI32029", pvbAdjustCasing != __nullptr);
         
         // Check license state
         validateLicense();
@@ -1643,7 +1643,7 @@ STDMETHODIMP CRedactionTask::Load(IStream* pStream)
         }
         else
         {
-            m_ipAttributeNames = NULL;
+            m_ipAttributeNames = __nullptr;
         }
 
         // Legislation guard
@@ -1714,7 +1714,7 @@ STDMETHODIMP CRedactionTask::Load(IStream* pStream)
                 IPersistStreamPtr ipObj;
                 readObjectFromStream(ipObj, pStream, "ELI29774");
                 m_ipPdfSettings = ipObj;
-                ASSERT_RESOURCE_ALLOCATION("ELI29775", m_ipPdfSettings != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI29775", m_ipPdfSettings != __nullptr);
 
                 // Ensure the require passwords value is set [LRCAU #5749]
                 m_ipPdfSettings->RequireUserAndOwnerPassword = VARIANT_TRUE;
@@ -1752,7 +1752,7 @@ STDMETHODIMP CRedactionTask::Save(IStream* pStream, BOOL fClearDirty)
         dataWriter << m_bApplyRedactionsAsAnnotations;
 
         // Attribute names
-        bool bAttributeNames = (m_ipAttributeNames != NULL);
+        bool bAttributeNames = (m_ipAttributeNames != __nullptr);
         dataWriter << bAttributeNames;
 
         // Legislation guard
@@ -1786,7 +1786,7 @@ STDMETHODIMP CRedactionTask::Save(IStream* pStream, BOOL fClearDirty)
 
 
         // Write a bool to indicate whether there is a Pdf password settings object
-        bool bSettings = m_ipPdfSettings != NULL;
+        bool bSettings = m_ipPdfSettings != __nullptr;
         dataWriter << bSettings;
 
         dataWriter.flushToByteStream();
@@ -1807,7 +1807,7 @@ STDMETHODIMP CRedactionTask::Save(IStream* pStream, BOOL fClearDirty)
         if (bSettings)
         {
             IPersistStreamPtr ipObj = m_ipPdfSettings;
-            ASSERT_RESOURCE_ALLOCATION("ELI29776", ipObj != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI29776", ipObj != __nullptr);
             writeObjectToStream(ipObj, pStream, "ELI29777", fClearDirty);
         }
 
@@ -1847,15 +1847,15 @@ void CRedactionTask::clear()
     m_setAttributeNames.clear();
 
     // Clear PDF settings
-    m_ipPdfSettings = NULL;
+    m_ipPdfSettings = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 IAFUtilityPtr CRedactionTask::getAFUtility()
 {
-    if (m_ipAFUtility == NULL)
+    if (m_ipAFUtility == __nullptr)
     {
         m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-        ASSERT_RESOURCE_ALLOCATION("ELI09877", m_ipAFUtility != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI09877", m_ipAFUtility != __nullptr);
     }
     return m_ipAFUtility;
 }
@@ -1864,19 +1864,19 @@ string CRedactionTask::getExemptionCodes(IAttributePtr ipAttribute)
 {
     // Iterate over each sub attribute
     IIUnknownVectorPtr subAttributes = ipAttribute->SubAttributes;
-    if (subAttributes != NULL)
+    if (subAttributes != __nullptr)
     {
         int count = subAttributes->Size();
         for (int i = 0; i < count; i++)
         {
             // Find the exemption codes attribute
             IAttributePtr subAttribute = subAttributes->At(i);
-            ASSERT_RESOURCE_ALLOCATION("ELI28802", subAttribute != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28802", subAttribute != __nullptr);
             if (asString(subAttribute->Name) == "ExemptionCodes")
             {
                 // Get the exemption codes value
                 ISpatialStringPtr ipValue = subAttribute->Value;
-                ASSERT_RESOURCE_ALLOCATION("ELI28801", ipValue != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI28801", ipValue != __nullptr);
 
                 return asString(ipValue->String);
             }
@@ -1893,7 +1893,7 @@ void CRedactionTask::storeMetaData(const string& strVoaFile, IIUnknownVectorPtr 
 {
     try
     {
-        ASSERT_ARGUMENT("ELI28429", ipAttributes != NULL);
+        ASSERT_ARGUMENT("ELI28429", ipAttributes != __nullptr);
 
         // Calculate the next id
         long lNextId = getNextId(ipAttributes);
@@ -1906,7 +1906,7 @@ void CRedactionTask::storeMetaData(const string& strVoaFile, IIUnknownVectorPtr 
         IAttributePtr ipMetaData = createMetaDataAttribute(lNextSession, strVoaFile, 
             ipRedactedAttributes, tStartTime, dSeconds, strSourceDocument, strRedactedImage, 
             bOverwroteOutput);
-        ASSERT_RESOURCE_ALLOCATION("ELI28349", ipMetaData != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28349", ipMetaData != __nullptr);
         ipAttributes->PushBack(ipMetaData);
 
         // Save the voa with the new metadata
@@ -1919,7 +1919,7 @@ long CRedactionTask::getNextId(IIUnknownVectorPtr ipAttributes)
 {
     try
     {
-        ASSERT_ARGUMENT("ELI28430", ipAttributes != NULL);
+        ASSERT_ARGUMENT("ELI28430", ipAttributes != __nullptr);
 
         // Iterate over each attribute, looking for the largest id
         long lMaxId = 0;
@@ -1927,7 +1927,7 @@ long CRedactionTask::getNextId(IIUnknownVectorPtr ipAttributes)
         for	(int i = 0; i < count; i++)
         {
             IAttributePtr ipAttribute = ipAttributes->At(i);
-            ASSERT_RESOURCE_ALLOCATION("ELI28355", ipAttribute != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28355", ipAttribute != __nullptr);
 
             string strName = asString(ipAttribute->Name);
             makeUpperCase(strName);
@@ -1967,10 +1967,10 @@ long CRedactionTask::getAttributeId(IAttributePtr ipAttribute)
         
         // Get the value of the id attribute if it exists
         IAttributePtr ipIdAttribute = getIdAttribute(ipAttribute);
-        if (ipIdAttribute != NULL)
+        if (ipIdAttribute != __nullptr)
         {
             ISpatialStringPtr ipValue = ipIdAttribute->Value;
-            ASSERT_RESOURCE_ALLOCATION("ELI28358", ipValue != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28358", ipValue != __nullptr);
             
             string strId = asString(ipValue->String);
             lId = asLong(strId);
@@ -1985,17 +1985,17 @@ IAttributePtr CRedactionTask::getIdAttribute(IAttributePtr ipAttribute)
 {
     try
     {
-        ASSERT_ARGUMENT("ELI28431", ipAttribute != NULL);
+        ASSERT_ARGUMENT("ELI28431", ipAttribute != __nullptr);
 
         IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-        ASSERT_RESOURCE_ALLOCATION("ELI28360", ipSubAttributes != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28360", ipSubAttributes != __nullptr);
 
         // Iterate over the sub attributes of the attribute
         int count = ipSubAttributes->Size();
         for (int i = 0; i < count; i++)
         {
             IAttributePtr ipSubAttribute = ipSubAttributes->At(i);
-            ASSERT_RESOURCE_ALLOCATION("ELI28361", ipSubAttribute != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28361", ipSubAttribute != __nullptr);
 
             string strName = asString(ipSubAttribute->Name);
             makeUpperCase(strName);
@@ -2018,7 +2018,7 @@ void CRedactionTask::assignIds(IIUnknownVectorPtr ipAttributes, long lNextId,
 {
     try
     {
-        ASSERT_ARGUMENT("ELI28432", ipAttributes != NULL);
+        ASSERT_ARGUMENT("ELI28432", ipAttributes != __nullptr);
 
         // Iterate over each attribute
         int count = ipAttributes->Size();
@@ -2029,15 +2029,15 @@ void CRedactionTask::assignIds(IIUnknownVectorPtr ipAttributes, long lNextId,
 
             // Check if this attribute already has an attribute id
             IAttributePtr ipIdAttribute = getIdAttribute(ipAttribute);
-            if (ipIdAttribute == NULL)
+            if (ipIdAttribute == __nullptr)
             {
                 // Create an attribute id for this attribute
                 ipIdAttribute = createIdAttribute(strSourceDocument, lNextId);
-                ASSERT_RESOURCE_ALLOCATION("ELI28421", ipIdAttribute != NULL)
+                ASSERT_RESOURCE_ALLOCATION("ELI28421", ipIdAttribute != __nullptr)
                 
                 // Add the id attribute
                 IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-                ASSERT_RESOURCE_ALLOCATION("ELI28423", ipSubAttributes != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI28423", ipSubAttributes != __nullptr);
                 ipSubAttributes->PushBack(ipIdAttribute);
 
                 // Increment the next id
@@ -2058,7 +2058,7 @@ IAttributePtr CRedactionTask::createIdAttribute(const string& strSourceDocument,
         // Create the id attribute
         IAttributePtr ipIdAttribute = 
             createAttribute(strSourceDocument, "_IDAndRevision", strId, "_1");
-        ASSERT_RESOURCE_ALLOCATION("ELI28422", ipIdAttribute != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28422", ipIdAttribute != __nullptr);
 
         return ipIdAttribute;
     }
@@ -2069,7 +2069,7 @@ long CRedactionTask::getNextSessionId(IIUnknownVectorPtr ipAttributes)
 {
     try
     {
-        ASSERT_ARGUMENT("ELI28433", ipAttributes != NULL);
+        ASSERT_ARGUMENT("ELI28433", ipAttributes != __nullptr);
 
         // Iterate over each attribute, looking for the largest redaction session id
         long lMaxSession = 0;
@@ -2077,7 +2077,7 @@ long CRedactionTask::getNextSessionId(IIUnknownVectorPtr ipAttributes)
         for	(int i = 0; i < count; i++)
         {
             IAttributePtr ipAttribute = ipAttributes->At(i);
-            ASSERT_RESOURCE_ALLOCATION("ELI28603", ipAttribute != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28603", ipAttribute != __nullptr);
 
             string strName = asString(ipAttribute->Name);
             makeUpperCase(strName);
@@ -2115,49 +2115,49 @@ IAttributePtr CRedactionTask::createMetaDataAttribute(long lSession, const strin
     {
         // User information
         IAttributePtr ipUserInfo = createUserInfoAttribute(strSourceDocument);
-        ASSERT_RESOURCE_ALLOCATION("ELI28369", ipUserInfo != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28369", ipUserInfo != __nullptr);
 
         // Time and duration
         IAttributePtr ipTimeInfo = 
             createTimeInfoAttribute(strSourceDocument, tStartTime, dElapsedSeconds);
-        ASSERT_RESOURCE_ALLOCATION("ELI28370", ipTimeInfo != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28370", ipTimeInfo != __nullptr);
 
         // Source document
         IAttributePtr ipSourceDocument = 
             createAttribute(strSourceDocument, "_SourceDocName", strSourceDocument);
-        ASSERT_RESOURCE_ALLOCATION("ELI28371", ipSourceDocument != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28371", ipSourceDocument != __nullptr);
 
         // Data file (VOA)
         IAttributePtr ipDataFile = 
             createAttribute(strSourceDocument, "_IDShieldDataFile", strVoaFile);
-        ASSERT_RESOURCE_ALLOCATION("ELI28372", ipDataFile != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28372", ipDataFile != __nullptr);
 
         // Output image
         IAttributePtr ipOutputFile = 
             createAttribute(strSourceDocument, "_OutputFile", strRedactedImage);
-        ASSERT_RESOURCE_ALLOCATION("ELI28373", ipOutputFile != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28373", ipOutputFile != __nullptr);
 
         // Attribute types redacted
         IAttributePtr ipRedactedCategories = createRedactedCategoriesAttribute(strSourceDocument);
-        ASSERT_RESOURCE_ALLOCATION("ELI28374", ipRedactedCategories != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28374", ipRedactedCategories != __nullptr);
 
         // Output options
         IAttributePtr ipOptions = createOptionsAttribute(strSourceDocument, bOverwroteOutput);
-        ASSERT_RESOURCE_ALLOCATION("ELI28375", ipOptions != NULL); 
+        ASSERT_RESOURCE_ALLOCATION("ELI28375", ipOptions != __nullptr); 
 
         // Attributes redacted
         IAttributePtr ipRedactedEntries = 
             createRedactedEntriesAttribute(strSourceDocument, ipRedactedAttributes);
-        ASSERT_RESOURCE_ALLOCATION("ELI28376", ipRedactedEntries != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28376", ipRedactedEntries != __nullptr);
 
         // Metadata attribute
         string strValue = asString(lSession);
         IAttributePtr ipMetaData = 
             createAttribute(strSourceDocument, "_RedactedFileOutputSession", strValue);
-        ASSERT_RESOURCE_ALLOCATION("ELI28377", ipMetaData != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28377", ipMetaData != __nullptr);
 
         IIUnknownVectorPtr ipSubAttributes = ipMetaData->SubAttributes;
-        ASSERT_RESOURCE_ALLOCATION("ELI28424", ipSubAttributes != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28424", ipSubAttributes != __nullptr);
 
         // Append the attributes that belong to the metadata attribute
         ipSubAttributes->PushBack(ipUserInfo);
@@ -2181,19 +2181,19 @@ IAttributePtr CRedactionTask::createUserInfoAttribute(const string& strSourceDoc
         // User name
         string strUserName = getCurrentUserName();
         IAttributePtr ipLogin = createAttribute(strSourceDocument, "_LoginID", strUserName);
-        ASSERT_RESOURCE_ALLOCATION("ELI28386", ipLogin != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28386", ipLogin != __nullptr);
 
         // Computer name
         string strComputerName = getComputerName();
         IAttributePtr ipComputer = createAttribute(strSourceDocument, "_Computer", strComputerName);
-        ASSERT_RESOURCE_ALLOCATION("ELI28387", ipComputer != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28387", ipComputer != __nullptr);
 
         // User information
         IAttributePtr ipUserInfo = createAttribute(strSourceDocument, "_UserInfo");
-        ASSERT_RESOURCE_ALLOCATION("ELI28389", ipUserInfo != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28389", ipUserInfo != __nullptr);
 
         IIUnknownVectorPtr ipSubAttributes = ipUserInfo->SubAttributes;
-        ASSERT_RESOURCE_ALLOCATION("ELI28425", ipUserInfo != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28425", ipUserInfo != __nullptr);
 
         // Append subattributes
         ipSubAttributes->PushBack(ipLogin);
@@ -2212,24 +2212,24 @@ IAttributePtr CRedactionTask::createTimeInfoAttribute(const string& strSourceDoc
         // Start date
         string strDate = tStartTime.Format("%#m/%#d/%Y");
         IAttributePtr ipDate = createAttribute(strSourceDocument, "_Date", strDate);
-        ASSERT_RESOURCE_ALLOCATION("ELI28390", ipDate != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28390", ipDate != __nullptr);
 
         // Start time
         string strTimeStarted = tStartTime.Format("%I:%M:%S %p");
         IAttributePtr ipTime = createAttribute(strSourceDocument, "_TimeStarted", strTimeStarted);
-        ASSERT_RESOURCE_ALLOCATION("ELI28391", ipTime != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28391", ipTime != __nullptr);
 
         // Elapsed seconds
         string strSeconds = asString(dElapsedSeconds, 3);
         IAttributePtr ipSeconds = createAttribute(strSourceDocument, "_TotalSeconds", strSeconds);
-        ASSERT_RESOURCE_ALLOCATION("ELI28392", ipSeconds != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28392", ipSeconds != __nullptr);
 
         // Time info attribute
         IAttributePtr ipTimeInfo = createAttribute(strSourceDocument, "_TimeInfo");
-        ASSERT_RESOURCE_ALLOCATION("ELI28393", ipTimeInfo != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28393", ipTimeInfo != __nullptr);
 
         IIUnknownVectorPtr ipSubAttributes = ipTimeInfo->SubAttributes;
-        ASSERT_RESOURCE_ALLOCATION("ELI28426", ipSubAttributes != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28426", ipSubAttributes != __nullptr);
 
         // Append subattributes
         ipSubAttributes->PushBack(ipDate);
@@ -2275,36 +2275,36 @@ IAttributePtr CRedactionTask::createOptionsAttribute(const string& strSourceDocu
         string strRetainRedactions = m_bUseRedactedImage ? "Yes" : "No";
         IAttributePtr ipRetainRedactions = createAttribute(strSourceDocument, 
             "_RetainExistingRedactionsInOutputFile", strRetainRedactions);
-        ASSERT_RESOURCE_ALLOCATION("ELI28394", ipRetainRedactions != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28394", ipRetainRedactions != __nullptr);
 
         // Overwrote output file
         string strOverwrote = bOverwroteOutput ? "Yes" : "No";
         IAttributePtr ipOverwrote = createAttribute(strSourceDocument, 
             "_OutputFileExistedPriorToOutputOperation", strOverwrote);
-        ASSERT_RESOURCE_ALLOCATION("ELI28395", ipOverwrote != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28395", ipOverwrote != __nullptr);
 
         // Retain annotations
         string strRetainAnnotations = m_bCarryForwardAnnotations ? "Yes" : "No";
         IAttributePtr ipRetainAnnotations = 
             createAttribute(strSourceDocument, "_RetainExistingAnnotations", strRetainAnnotations);
-        ASSERT_RESOURCE_ALLOCATION("ELI28396", ipRetainAnnotations != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28396", ipRetainAnnotations != __nullptr);
 
         // Apply as annotations
         string strApplyAsAnnotations = m_bApplyRedactionsAsAnnotations ? "Yes" : "No";
         IAttributePtr ipApplyAsAnnotations = createAttribute(strSourceDocument, 
             "_ApplyRedactionsAsAnnotations", strApplyAsAnnotations);
-        ASSERT_RESOURCE_ALLOCATION("ELI28397", ipApplyAsAnnotations != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28397", ipApplyAsAnnotations != __nullptr);
 
         // Redaction appearance settings
         IAttributePtr ipRedactionAppearance = createRedactionAppearanceAttribute(strSourceDocument);
-        ASSERT_RESOURCE_ALLOCATION("ELI28398", ipRedactionAppearance != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28398", ipRedactionAppearance != __nullptr);
 
         // Output options
         IAttributePtr ipOutputOptions = createAttribute(strSourceDocument, "_OutputOptions");
-        ASSERT_RESOURCE_ALLOCATION("ELI28400", ipOutputOptions != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28400", ipOutputOptions != __nullptr);
 
         IIUnknownVectorPtr ipSubAttributes = ipOutputOptions->SubAttributes;
-        ASSERT_RESOURCE_ALLOCATION("ELI28427", ipSubAttributes != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28427", ipSubAttributes != __nullptr);
 
         // Append sub attributes
         ipSubAttributes->PushBack(ipRetainRedactions);
@@ -2325,32 +2325,32 @@ IAttributePtr CRedactionTask::createRedactionAppearanceAttribute(const string& s
         // Text format
         IAttributePtr ipTextFormat = 
             createAttribute(strSourceDocument, "_TextFormat", m_redactionAppearance.m_strText);
-        ASSERT_RESOURCE_ALLOCATION("ELI28411", ipTextFormat != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28411", ipTextFormat != __nullptr);
 
         // Fill color
         string strFillColor = getColorAsString(m_redactionAppearance.m_crFillColor);
         IAttributePtr ipFillColor = 
             createAttribute(strSourceDocument, "_FillColor", strFillColor);
-        ASSERT_RESOURCE_ALLOCATION("ELI28412", ipFillColor != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28412", ipFillColor != __nullptr);
 
         // Border color
         string strBorderColor = getColorAsString(m_redactionAppearance.m_crBorderColor);
         IAttributePtr ipBorderColor = 
             createAttribute(strSourceDocument, "_BorderColor", strBorderColor);
-        ASSERT_RESOURCE_ALLOCATION("ELI28413", ipBorderColor != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28413", ipBorderColor != __nullptr);
 
         // Font
         string strFont = m_redactionAppearance.getFontAsString();
         IAttributePtr ipFont = createAttribute(strSourceDocument, "_Font", strFont);
-        ASSERT_RESOURCE_ALLOCATION("ELI28414", ipFont != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28414", ipFont != __nullptr);
 
         // Redaction appearance attribute
         IAttributePtr ipRedactionAppearance = 
             createAttribute(strSourceDocument, "_RedactionTextAndColorSettings");
-        ASSERT_RESOURCE_ALLOCATION("ELI28415", ipRedactionAppearance != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28415", ipRedactionAppearance != __nullptr);
 
         IIUnknownVectorPtr ipSubAttributes = ipRedactionAppearance->SubAttributes;
-        ASSERT_RESOURCE_ALLOCATION("ELI28428", ipSubAttributes != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28428", ipSubAttributes != __nullptr);
 
         // Append sub attributes
         ipSubAttributes->PushBack(ipTextFormat);
@@ -2368,24 +2368,24 @@ IAttributePtr CRedactionTask::createRedactedEntriesAttribute(const string& strSo
 {
     try
     {
-        ASSERT_ARGUMENT("ELI28434", ipRedactedAttributes != NULL);
+        ASSERT_ARGUMENT("ELI28434", ipRedactedAttributes != __nullptr);
 
         // Redacted entries attribute
         IAttributePtr ipRedacted = createAttribute(strSourceDocument, "_EntriesRedacted");
-        ASSERT_RESOURCE_ALLOCATION("ELI28416", ipRedacted != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28416", ipRedacted != __nullptr);
 
         IIUnknownVectorPtr ipSubAttributes = ipRedacted->SubAttributes;
-        ASSERT_RESOURCE_ALLOCATION("ELI28419", ipSubAttributes != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28419", ipSubAttributes != __nullptr);
 
         // Iterate over each redacted attribute
         int count = ipRedactedAttributes->Size();
         for (int i = 0; i < count; i++)
         {
             IAttributePtr ipAttribute = ipRedactedAttributes->At(i);
-            ASSERT_RESOURCE_ALLOCATION("ELI28417", ipAttribute != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28417", ipAttribute != __nullptr);
 
             IAttributePtr ipIdAttribute = getIdAttribute(ipAttribute);
-            ASSERT_RESOURCE_ALLOCATION("ELI28418", ipIdAttribute != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28418", ipIdAttribute != __nullptr);
 
             // Append the ID attribute
             ipSubAttributes->PushBack(ipIdAttribute);
@@ -2403,12 +2403,12 @@ IAttributePtr CRedactionTask::createAttribute(const string& strSourceDocument,
     {
         // Create a non spatial string to represent the value
         ISpatialStringPtr ipValue(CLSID_SpatialString);
-        ASSERT_RESOURCE_ALLOCATION("ELI28363", ipValue != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28363", ipValue != __nullptr);
         ipValue->CreateNonSpatialString(strValue.c_str(), strSourceDocument.c_str());
 
         // Create an attribute with the specified name and value
         IAttributePtr ipAttribute(CLSID_Attribute);
-        ASSERT_RESOURCE_ALLOCATION("ELI28364", ipAttribute != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28364", ipAttribute != __nullptr);
         ipAttribute->Name = strName.c_str();
         ipAttribute->Value = ipValue;
 
@@ -2459,10 +2459,10 @@ void CRedactionTask::fillAttributeSet(IVariantVectorPtr ipAttributeNames, set<st
 //-------------------------------------------------------------------------------------------------
 UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr CRedactionTask::getIDShieldDBPtr()
 {
-    if (m_ipIDShieldDB == NULL)
+    if (m_ipIDShieldDB == __nullptr)
     {
         m_ipIDShieldDB.CreateInstance(CLSID_IDShieldProductDBMgr);
-        ASSERT_RESOURCE_ALLOCATION("ELI19794", m_ipIDShieldDB != NULL);		
+        ASSERT_RESOURCE_ALLOCATION("ELI19794", m_ipIDShieldDB != __nullptr);		
     }
     return m_ipIDShieldDB;
 }

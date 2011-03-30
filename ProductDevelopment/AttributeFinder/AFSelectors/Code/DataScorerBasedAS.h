@@ -62,7 +62,7 @@ public:
 
 	void FinalRelease()
 	{
-		m_ipDataScorer = NULL;
+		m_ipDataScorer = __nullptr;
 	}
 
 public:

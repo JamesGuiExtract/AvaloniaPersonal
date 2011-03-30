@@ -48,10 +48,10 @@ CUSBLicenseKeyManagerDlg::CUSBLicenseKeyManagerDlg(CWnd* pParent /*=NULL*/)
 {
 	try
 	{
-	ASSERT_RESOURCE_ALLOCATION("ELI12318", m_ipEmailSettings != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI12318", m_ipEmailSettings != __nullptr );
 	
 	IObjectSettingsPtr ipSettings = m_ipEmailSettings;
-	ASSERT_RESOURCE_ALLOCATION("ELI12324", ipSettings != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI12324", ipSettings != __nullptr );
 	
 	ipSettings->LoadFromRegistry( gstrEMAIL_REG_PATH.c_str() );
 
@@ -343,13 +343,13 @@ void CUSBLicenseKeyManagerDlg::OnEmailsettings()
 	try
 	{
 		IObjectUserInterfacePtr ipSettingsUI = m_ipEmailSettings;
-		ASSERT_RESOURCE_ALLOCATION("ELI12325", ipSettingsUI != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12325", ipSettingsUI != __nullptr);
 		
 		ipSettingsUI->DisplayReadWrite();
 
 		// Save settings to registry
 		IObjectSettingsPtr ipSettings = m_ipEmailSettings;
-		ASSERT_RESOURCE_ALLOCATION("ELI25261", ipSettings != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25261", ipSettings != __nullptr);
 
 		ipSettings->SaveToRegistry(gstrEMAIL_REG_PATH.c_str());
 	}
@@ -523,7 +523,7 @@ void CUSBLicenseKeyManagerDlg::applyNewValues()
 		m_snlcSafeNetCfg.setSendToExtract(false);
 	}
 	IObjectSettingsPtr ipSettings = m_ipEmailSettings;
-	ASSERT_RESOURCE_ALLOCATION("ELI12326", ipSettings != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI12326", ipSettings != __nullptr );
 	
 	ipSettings->SaveToRegistry( gstrEMAIL_REG_PATH.c_str() );
 	

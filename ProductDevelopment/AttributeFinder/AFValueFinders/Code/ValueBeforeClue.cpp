@@ -36,7 +36,7 @@ CValueBeforeClue::CValueBeforeClue()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13051", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13051", m_ipMiscUtils != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI13053")
 }
@@ -45,8 +45,8 @@ CValueBeforeClue::~CValueBeforeClue()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
-		m_ipClues = NULL;
+		m_ipMiscUtils = __nullptr;
+		m_ipClues = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16351");
 }
@@ -86,7 +86,7 @@ STDMETHODIMP CValueBeforeClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatu
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI05877", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05877", ipAttributes != __nullptr);
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
 		// Get the text out from the spatial string
@@ -125,7 +125,7 @@ STDMETHODIMP CValueBeforeClue::raw_ParseText(IAFDocument* pAFDoc, IProgressStatu
 
 		// Get the regex parser
 		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("ValueBeforeClue");
-		ASSERT_RESOURCE_ALLOCATION("ELI13052", ipParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13052", ipParser != __nullptr);
 
 		// find all clues in the input string
 		ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
@@ -445,7 +445,7 @@ STDMETHODIMP CValueBeforeClue::raw_GetComponentDescription(BSTR * pstrComponentD
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19586", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19586", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Value before clue rule").Detach();
 	}
@@ -496,14 +496,14 @@ STDMETHODIMP CValueBeforeClue::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IValueBeforeCluePtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08265", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08265", ipSource != __nullptr);
 
 		m_bCaseSensitive = (ipSource->GetIsCaseSensitive()==VARIANT_TRUE) ? true : false;
 		m_bClueAsRegExpr = (ipSource->GetClueAsRegExpr()==VARIANT_TRUE) ? true : false;
 		m_bClueToStringAsRegExpr = (ipSource->GetClueToStringAsRegExpr()==VARIANT_TRUE) ? true : false;
 		
 		ICopyableObjectPtr ipCopyObj = ipSource->GetClues();
-		ASSERT_RESOURCE_ALLOCATION("ELI08266", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08266", ipCopyObj != __nullptr);
 		m_ipClues = ipCopyObj->Clone();
 
 		m_eRefiningType = ipSource->GetRefiningType();
@@ -541,7 +541,7 @@ STDMETHODIMP CValueBeforeClue::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_ValueBeforeClue);
-		ASSERT_RESOURCE_ALLOCATION("ELI08351", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08351", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -643,8 +643,6 @@ STDMETHODIMP CValueBeforeClue::put_Clues(IVariantVector *newVal)
 	try
 	{
 		validateLicense();
-
-		if (m_ipClues) m_ipClues = NULL;
 
 		m_ipClues = newVal;
 
@@ -944,7 +942,7 @@ STDMETHODIMP CValueBeforeClue::Load(IStream *pStream)
 		m_strLimitingString = "";
 //		m_strLimitingRegExpr = "";
 		m_bClueToStringAsRegExpr = false;
-		m_ipClues = NULL;
+		m_ipClues = __nullptr;
 
 		// Local variable to replace m_strLimitingRegExpr removed for Version 3
 		string strLimitingRegExpr( "" );
@@ -1014,7 +1012,7 @@ STDMETHODIMP CValueBeforeClue::Load(IStream *pStream)
 		// Read the clue list
 		IPersistStreamPtr ipObj;
 		::readObjectFromStream( ipObj, pStream, "ELI09968" );
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04703", 
 				"Clues collection could not be read from stream!" );
@@ -1077,7 +1075,7 @@ STDMETHODIMP CValueBeforeClue::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the clue list to the IStream object
 		IPersistStreamPtr ipObj( m_ipClues );
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI04704", 
 				"Clues collection does not support persistence!" );

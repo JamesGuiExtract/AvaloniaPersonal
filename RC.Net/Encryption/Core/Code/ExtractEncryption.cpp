@@ -140,7 +140,7 @@ void modifyData(unsigned char* dest)
 	}
 	catch(...)
 	{
-		if (source != NULL)
+		if (source != __nullptr)
 		{
 			free(source);
 		}

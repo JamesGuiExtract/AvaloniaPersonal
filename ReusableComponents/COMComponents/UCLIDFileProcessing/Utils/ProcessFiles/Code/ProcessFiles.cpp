@@ -97,12 +97,12 @@ void usage()
 //-------------------------------------------------------------------------------------------------
 IFileSupplierPtr getFileSupplier(IFileSupplyingMgmtRolePtr ipSuppyingRole )
 {
-	ASSERT_ARGUMENT("ELI15393", ipSuppyingRole != NULL );
+	ASSERT_ARGUMENT("ELI15393", ipSuppyingRole != __nullptr );
 
 	// The supplierMgmt role must have a folder FS in it to work
 	//Get the list of file suppliers
 	IIUnknownVectorPtr ipSuppliers = ipSuppyingRole->FileSuppliers;
-	ASSERT_RESOURCE_ALLOCATION("ELI15384", ipSuppliers != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15384", ipSuppliers != __nullptr );
 
 	long nSuppliers = ipSuppliers->Size();
 	if ( nSuppliers != 1 )
@@ -113,27 +113,27 @@ IFileSupplierPtr getFileSupplier(IFileSupplyingMgmtRolePtr ipSuppyingRole )
 	}
 
 	IFileSupplierDataPtr ipSupplierData = ipSuppliers->At(0);
-	ASSERT_RESOURCE_ALLOCATION("ELI15391", ipSupplierData != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15391", ipSupplierData != __nullptr );
 
 	// Get the file supplier in the list
 	IObjectWithDescriptionPtr ipObjFS = ipSupplierData->FileSupplier;
-	ASSERT_RESOURCE_ALLOCATION("ELI15394", ipObjFS != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15394", ipObjFS != __nullptr );
 
 	return ipObjFS->GetObjectA();
 }
 //-------------------------------------------------------------------------------------------------
 void setupFolderSupplier ( IFileProcessingManagerPtr ipFPM, std::string strFolder )
 {
-	ASSERT_ARGUMENT("ELI15381", ipFPM != NULL );
+	ASSERT_ARGUMENT("ELI15381", ipFPM != __nullptr );
 	
 	// Get the supplying management role
 	IFileSupplyingMgmtRolePtr ipSupplierRole = ipFPM->FileSupplyingMgmtRole;
-	ASSERT_RESOURCE_ALLOCATION("ELI15382", ipSupplierRole != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15382", ipSupplierRole != __nullptr );
 
 	// Get the file supplier in the list
 	IFolderFSPtr ipFolderFS = getFileSupplier(ipSupplierRole);
 
-	if ( ipFolderFS == NULL )
+	if ( ipFolderFS == __nullptr )
 	{
 		UCLIDException ue("ELI15383", "There must be only a 'Files from folder' file supplier defined in the FPS file.");
 		throw ue;
@@ -145,16 +145,16 @@ void setupFolderSupplier ( IFileProcessingManagerPtr ipFPM, std::string strFolde
 //-------------------------------------------------------------------------------------------------
 void setupDynamicListSupplier(IFileProcessingManagerPtr ipFPM, std::string strFileName )
 {
-	ASSERT_ARGUMENT("ELI15386", ipFPM != NULL );
+	ASSERT_ARGUMENT("ELI15386", ipFPM != __nullptr );
 	
 	// Get the supplying management role
 	IFileSupplyingMgmtRolePtr ipSupplierRole = ipFPM->FileSupplyingMgmtRole;
-	ASSERT_RESOURCE_ALLOCATION("ELI15387", ipSupplierRole != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15387", ipSupplierRole != __nullptr );
 
 	// Get the file supplier in the list
 	IDynamicFileListFSPtr ipDynamicFS = getFileSupplier(ipSupplierRole);
 
-	if ( ipDynamicFS == NULL )
+	if ( ipDynamicFS == __nullptr )
 	{
 		UCLIDException ue("ELI15390", "There must be only a 'Files from dynamic list' file supplier defined in the FPS file.");
 		throw ue;
@@ -424,7 +424,7 @@ BOOL CProcessFilesApp::InitInstance()
 			validateLicense();
 
 			IFileProcessingManagerPtr ipFileProcMgr(CLSID_FileProcessingManager);
-			ASSERT_RESOURCE_ALLOCATION("ELI08894", ipFileProcMgr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08894", ipFileProcMgr != __nullptr);
 
 			// Create an FileRecoveryManager object
 			unique_ptr<FileRecoveryManager> apFRM(__nullptr);

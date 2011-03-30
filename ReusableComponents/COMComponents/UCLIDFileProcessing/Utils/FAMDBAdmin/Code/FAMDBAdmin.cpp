@@ -101,7 +101,7 @@ BOOL CFAMDBAdminApp::InitInstance()
 
 		// Create a database object
 		IFileProcessingDBPtr ipFAMDB(CLSID_FileProcessingDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI17526", ipFAMDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17526", ipFAMDB != __nullptr);
 
 		// Check for Server and database selected
 		if ( __argc == 3)

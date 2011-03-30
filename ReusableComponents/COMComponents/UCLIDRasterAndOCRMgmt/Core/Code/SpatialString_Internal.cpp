@@ -25,7 +25,7 @@ const double gfCharWidthToAvgCharRatio = 1.1;
 UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialString::getThisAsCOMPtr()
 {
     UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipThis(this);
-    ASSERT_RESOURCE_ALLOCATION("ELI16977", ipThis != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI16977", ipThis != __nullptr);
 
     return ipThis;
 }
@@ -46,7 +46,7 @@ void CSpatialString::insert(long nPos,
     try
     {
         // verify valid argument sent in
-        ASSERT_ARGUMENT("ELI25797", ipStringToInsert != NULL);
+        ASSERT_ARGUMENT("ELI25797", ipStringToInsert != __nullptr);
 
         // Verify that nPos is a valid index
         // If nPos < 0 or nPos is out of bounds on the string, throw an exception
@@ -86,7 +86,7 @@ void CSpatialString::insert(long nPos,
                 {
                     // Get each zone present
                     UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = (*it);
-                    ASSERT_RESOURCE_ALLOCATION("ELI15308", ipZone != NULL);
+                    ASSERT_RESOURCE_ALLOCATION("ELI15308", ipZone != __nullptr);
 
                     // Add the raster zone if not already present
                     if (!isRasterZoneInVector(ipZone, vecCombinedZones))
@@ -99,14 +99,14 @@ void CSpatialString::insert(long nPos,
             if (eSourceMode != kNonSpatialMode)
             {
                 IIUnknownVectorPtr ipZones = ipStringToInsert->GetOCRImageRasterZones();
-                ASSERT_RESOURCE_ALLOCATION("ELI15309", ipZones != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI15309", ipZones != __nullptr);
 
                 long lSize = ipZones->Size();
                 for (long i = 0; i < lSize; i++)
                 {
                     // Get each zone present
                     UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipZones->At(i);
-                    ASSERT_RESOURCE_ALLOCATION("ELI15310", ipZone != NULL);
+                    ASSERT_RESOURCE_ALLOCATION("ELI15310", ipZone != __nullptr);
 
                     // Add the raster zone if not already present
                     if (!isRasterZoneInVector(ipZone, vecCombinedZones))
@@ -316,7 +316,7 @@ void CSpatialString::addRasterZones(IIUnknownVectorPtr ipRasterZones,
 {
     try
     {
-        ASSERT_ARGUMENT("ELI25803", ipRasterZones != NULL);
+        ASSERT_ARGUMENT("ELI25803", ipRasterZones != __nullptr);
 
         // Get the size and assert that there is at least 1 raster zone to append
         long lSize = ipRasterZones->Size();
@@ -335,7 +335,7 @@ void CSpatialString::addRasterZones(IIUnknownVectorPtr ipRasterZones,
         for (long i=0; i < lSize; i++)
         {
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipRasterZones->At(i);
-            ASSERT_RESOURCE_ALLOCATION("ELI25805", ipZone != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25805", ipZone != __nullptr);
 
             m_vecRasterZones.push_back(ipZone);
         }
@@ -352,14 +352,14 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
 {
     try
     {
-        if (ipPageInfoMap == NULL)
+        if (ipPageInfoMap == __nullptr)
         {
             // Nothing to add, just return
             return;
         }
 
         // If the current page info map is NULL just replace it
-        if (m_ipPageInfoMap == NULL)
+        if (m_ipPageInfoMap == __nullptr)
         {
             m_ipPageInfoMap = ipPageInfoMap;
         }
@@ -369,7 +369,7 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
             // the target already has a spatial page info map, compare source's
             // keys one at a time and add any that the target is missing. [P13 #4728]
             IVariantVectorPtr ipKeys( ipPageInfoMap->GetKeys() );
-            ASSERT_RESOURCE_ALLOCATION("ELI25807", ipKeys != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25807", ipKeys != __nullptr);
 
             // iterate through each of source's keys
             long lSize = ipKeys->Size;
@@ -380,7 +380,7 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
 
                 UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipSourceInfo =
                     ipPageInfoMap->GetValue(lKey);
-                ASSERT_RESOURCE_ALLOCATION("ELI25808", ipSourceInfo != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI25808", ipSourceInfo != __nullptr);
 
                 // if the target doesn't have this key, add it
                 if(m_ipPageInfoMap->Contains(lKey) == VARIANT_FALSE)
@@ -392,7 +392,7 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
                 {
                     UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipCurrentInfo =
                         m_ipPageInfoMap->GetValue(lKey);
-                    ASSERT_RESOURCE_ALLOCATION("ELI25809", ipCurrentInfo != NULL);
+                    ASSERT_RESOURCE_ALLOCATION("ELI25809", ipCurrentInfo != __nullptr);
 
                     // Check that the spatial page infos are compatible
                     if (ipCurrentInfo->Equal(ipSourceInfo) == VARIANT_FALSE)
@@ -458,7 +458,7 @@ bool CSpatialString::isMultiPage()
                 {
                     // Get the RasterZone from the IUnknownVector of raster zones
                     UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipRZone = (*it);
-                    ASSERT_RESOURCE_ALLOCATION("ELI14763", ipRZone != NULL);
+                    ASSERT_RESOURCE_ALLOCATION("ELI14763", ipRZone != __nullptr);
                     
                     if( nCurrPage < 0 )
                     {
@@ -554,7 +554,7 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialString::getSubString(long n
 
         // create new spatial string
         UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSpatialString(CLSID_SpatialString);
-        ASSERT_RESOURCE_ALLOCATION("ELI06458", ipSpatialString != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI06458", ipSpatialString != __nullptr);
 
         //Get the substring of the object
         string strSubStr = m_strString.substr(nStart, nEnd - nStart + 1);
@@ -603,7 +603,7 @@ void CSpatialString::performReplace(const string& stdstrToFind, const string& st
         {
             IIUnknownVectorPtr ipMatches = getReplacements(stdstrToFind, stdstrReplacement, 
                 asCppBool(vbCaseSensitive), lOccurrence, ipRegExpr);
-            if (ipMatches == NULL || ipMatches->Size() <= 0)
+            if (ipMatches == __nullptr || ipMatches->Size() <= 0)
             {
                 // no matches found
                 return;
@@ -611,7 +611,7 @@ void CSpatialString::performReplace(const string& stdstrToFind, const string& st
 
             // a final string after replacement
             UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFinal(CLSID_SpatialString);
-            ASSERT_RESOURCE_ALLOCATION("ELI06792", ipFinal != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI06792", ipFinal != __nullptr);
 
             // Get the number of matches
             long nSize = ipMatches->Size();
@@ -622,7 +622,7 @@ void CSpatialString::performReplace(const string& stdstrToFind, const string& st
             {
                 // Get the info of the match
                 ITokenPtr ipMatch = ipMatches->At(n);
-                ASSERT_RESOURCE_ALLOCATION("ELI06820", ipMatch != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI06820", ipMatch != __nullptr);
 
                 // Get the start and end position of the match
                 unsigned long ulStartPos, ulEndPos;
@@ -639,7 +639,7 @@ void CSpatialString::performReplace(const string& stdstrToFind, const string& st
                         // get the sub string after the match and before the next match
                         UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipTempStr = 
                             getSubString(nNonMatchStart, nNonMatchEnd);
-                        ASSERT_RESOURCE_ALLOCATION("ELI06824", ipTempStr != NULL);
+                        ASSERT_RESOURCE_ALLOCATION("ELI06824", ipTempStr != __nullptr);
 
                         // append it to the final string
                         ipFinal->Append(ipTempStr);
@@ -651,7 +651,7 @@ void CSpatialString::performReplace(const string& stdstrToFind, const string& st
 
                 // now create a spatial string that has the replacement string
                 UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipReplacement(CLSID_SpatialString);
-                ASSERT_RESOURCE_ALLOCATION("ELI06793", ipReplacement != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI06793", ipReplacement != __nullptr);
 
                 // Make sure the replacement string is actually replacing the found value with something
                 if( strActualReplacement.length() > 0 )
@@ -707,7 +707,7 @@ void CSpatialString::performReplace(const string& stdstrToFind, const string& st
                         // Get the substring for the match
                         UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipTempStr =
                             getSubString(ulStartPos, ulEndPos);
-                        ASSERT_RESOURCE_ALLOCATION("ELI15097", ipTempStr != NULL);
+                        ASSERT_RESOURCE_ALLOCATION("ELI15097", ipTempStr != __nullptr);
 
                         // Build the replacement spatial string from the substring's raster zones
                         // and use the replacement string for the text.
@@ -742,7 +742,7 @@ void CSpatialString::performReplace(const string& stdstrToFind, const string& st
                 {
                     UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipTempStr =
                         getSubString(ulEndPos+1, -1);
-                    ASSERT_RESOURCE_ALLOCATION("ELI06825", ipTempStr != NULL);
+                    ASSERT_RESOURCE_ALLOCATION("ELI06825", ipTempStr != __nullptr);
 
                     // append it to the final string
                     ipFinal->Append(ipTempStr);
@@ -822,12 +822,12 @@ IIUnknownVectorPtr CSpatialString::getReplacements(const string& strFind,
 
             // Return no matches if the limit has been exceeded
             ipResult.CreateInstance(CLSID_IUnknownVector);
-            ASSERT_RESOURCE_ALLOCATION("ELI25278", ipResult != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25278", ipResult != __nullptr);
             if (lOccurrenceIndex >= 0)
             {
                 // Return the specified match
                 ITokenPtr ipMatch = ipMatches->At(lOccurrenceIndex);
-                ASSERT_RESOURCE_ALLOCATION("ELI25279", ipMatch != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI25279", ipMatch != __nullptr);
                 ipResult->PushBack(ipMatch);
             }
         }
@@ -836,7 +836,7 @@ IIUnknownVectorPtr CSpatialString::getReplacements(const string& strFind,
     {
         // Default to an empty result
         ipResult.CreateInstance(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI25282", ipResult != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25282", ipResult != __nullptr);
 
         // Get the string to search and the string to search for in the appropriate casing
         string strString = m_strString;
@@ -858,7 +858,7 @@ IIUnknownVectorPtr CSpatialString::getReplacements(const string& strFind,
 
                 // Create the specified match
                 ITokenPtr ipMatch(CLSID_Token);
-                ASSERT_RESOURCE_ALLOCATION("ELI25284", ipMatch != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI25284", ipMatch != __nullptr);
                 ipMatch->StartPosition = ulStart;
                 ipMatch->EndPosition = ulEnd - 1;
                 ipMatch->Value = strReplacement.c_str();
@@ -897,7 +897,7 @@ IIUnknownVectorPtr CSpatialString::getReplacements(const string& strFind,
             {
                 // Create the specified match
                 ITokenPtr ipMatch(CLSID_Token);
-                ASSERT_RESOURCE_ALLOCATION("ELI25283", ipMatch != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI25283", ipMatch != __nullptr);
                 ipMatch->StartPosition = ulStart;
                 ipMatch->EndPosition = ulEnd - 1;
                 ipMatch->Value = strReplacement.c_str();
@@ -914,10 +914,10 @@ IIUnknownVectorPtr CSpatialString::getReplacements(const string& strFind,
 ILongToObjectMapPtr CSpatialString::getPageInfoMap()
 {
     // if the page info map object does not exist, create an empty one
-    if (m_ipPageInfoMap == NULL)
+    if (m_ipPageInfoMap == __nullptr)
     {
         m_ipPageInfoMap.CreateInstance(CLSID_LongToObjectMap);
-        ASSERT_RESOURCE_ALLOCATION("ELI15648", m_ipPageInfoMap != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI15648", m_ipPageInfoMap != __nullptr);
     }
 
     // return the page info map
@@ -1035,7 +1035,7 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName)
 		// last non-spatial character the end of a zone or the end of a paragraph.
 		if (isWhitespaceChar(c))
 		{
-			if (plastSpatialLetter != NULL)
+			if (plastSpatialLetter != __nullptr)
 			{
 				// If there is more than one consecutive non-spatial char, ensure the last spatial
 				// char is treated as end-of-zone.
@@ -1077,7 +1077,7 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName)
 	// The page info should be as many pixels wide as there are characters in the file and 1 pixel
 	// high.
 	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
-	ASSERT_RESOURCE_ALLOCATION("ELI31685", ipPageInfo != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI31685", ipPageInfo != __nullptr);
 	ipPageInfo->Width = length;
 	ipPageInfo->Height = 1;
 	ipPageInfo->Deskew = 0.0;
@@ -1085,7 +1085,7 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName)
 
 	// Create a spatial page info map
 	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
-	ASSERT_RESOURCE_ALLOCATION("ELI31686", ipPageInfoMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI31686", ipPageInfoMap != __nullptr);
 	ipPageInfoMap->Set(1, ipPageInfo);
 
 	getThisAsCOMPtr()->CreateFromLetterArray(length, &(vecLetters[0]), strFileName.c_str(),
@@ -1201,10 +1201,10 @@ void CSpatialString::reset(bool bResetSourceDocName, bool bResetPageInfoMap)
         m_vecRasterZones.clear();
 
         // Clear the spatial page info map
-        if( m_ipPageInfoMap != NULL && bResetPageInfoMap)
+        if( m_ipPageInfoMap != __nullptr && bResetPageInfoMap)
         {
             // Clear the reference, do not remove the SpatialPageInfo objects
-            m_ipPageInfoMap = NULL;
+            m_ipPageInfoMap = __nullptr;
         }
 
         // Set the mode to non-spatial
@@ -1503,7 +1503,7 @@ void CSpatialString::updateLetters(CPPLetter* letters, long nNumLetters)
     // verify that pointer is specified if letters exist
     if (nNumLetters > 0)
     {
-        ASSERT_ARGUMENT("ELI10464", (letters != NULL));
+        ASSERT_ARGUMENT("ELI10464", (letters != __nullptr));
     }
 
     // recompute this object's attributes from the letters
@@ -1607,14 +1607,14 @@ bool CSpatialString::isRasterZoneInVector(UCLID_RASTERANDOCRMGMTLib::IRasterZone
                                           const vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr>& vecZones)
 {
     // Check parameters
-    ASSERT_ARGUMENT("ELI15421", ipNewZone != NULL);
+    ASSERT_ARGUMENT("ELI15421", ipNewZone != __nullptr);
 
     for (vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr>::const_iterator it = vecZones.begin();
         it != vecZones.end(); it++)
     {
         // Retrieve the Ith zone
         UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipThisZone = (*it);
-        ASSERT_RESOURCE_ALLOCATION("ELI15423", ipThisZone != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI15423", ipThisZone != __nullptr);
 
         // Check data members
         if (ipThisZone->Equals( ipNewZone ) == VARIANT_TRUE)
@@ -1755,7 +1755,7 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 {
     try
     {
-        ASSERT_ARGUMENT("ELI25396", ipVecOCRConfidenceBoundaries != NULL);
+        ASSERT_ARGUMENT("ELI25396", ipVecOCRConfidenceBoundaries != __nullptr);
 
         if (m_eMode != kSpatialMode)
         {
@@ -1766,7 +1766,7 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
         }
 
         IIUnknownVectorPtr ipZones(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI25364", ipZones != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25364", ipZones != __nullptr);
 
         // Verify the boundaries and place them into a vector for more efficient access.
         vector<unsigned char> vecBoundaries;
@@ -1966,7 +1966,7 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
             long lEndY = lStartY;
 
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(CLSID_RasterZone);
-            ASSERT_RESOURCE_ALLOCATION("ELI25386", ipZone != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25386", ipZone != __nullptr);
 
             // Build the raster zone
             ipZone->CreateFromData(lStartX, lStartY, lEndX, lEndY, lHeight, zone.first);
@@ -1987,21 +1987,21 @@ IIUnknownVectorPtr CSpatialString::getOriginalImageRasterZonesGroupedByConfidenc
         // Get the untranslated zones (OCR image zones)
         IIUnknownVectorPtr ipZones = getOCRImageRasterZonesGroupedByConfidence(
             ipVecOCRConfidenceBoundaries, ipZoneOCRConfidenceTiers);
-        ASSERT_RESOURCE_ALLOCATION("ELI25817", ipZones != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25817", ipZones != __nullptr);
 
         // Create a new return vector
         IIUnknownVectorPtr ipNewZones(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI25818", ipNewZones != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25818", ipNewZones != __nullptr);
 
         // Iterate through each of the found zones and translate them to original image coordinates
         long lSize = ipZones->Size();
         for (long i=0; i < lSize; i++)
         {
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipZones->At(i);
-            ASSERT_RESOURCE_ALLOCATION("ELI25819", ipZone != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25819", ipZone != __nullptr);
 
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone = translateToOriginalImageZone(ipZone);
-            ASSERT_RESOURCE_ALLOCATION("ELI25820", ipNewZone != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25820", ipNewZone != __nullptr);
 
             ipNewZones->PushBack(ipNewZone);
         }
@@ -2017,7 +2017,7 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
     try
     {
         ASSERT_ARGUMENT("ELI25387", m_eMode != kNonSpatialMode);
-        ASSERT_ARGUMENT("ELI25397", ipZone != NULL);
+        ASSERT_ARGUMENT("ELI25397", ipZone != __nullptr);
 
         // Get the data from the raster zone
         long lStartX, lStartY, lEndX, lEndY, lHeight, lPageNum;
@@ -2045,17 +2045,17 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
     try
     {
         ASSERT_ARGUMENT("ELI28025", m_eMode != kNonSpatialMode);
-        ASSERT_ARGUMENT("ELI28026", ipZone != NULL);
+        ASSERT_ARGUMENT("ELI28026", ipZone != __nullptr);
 
         // Get the data from the raster zone
         long lStartX, lStartY, lEndX, lEndY, lHeight, lPageNum;
         ipZone->GetData(&lStartX, &lStartY, &lEndX, &lEndY, &lHeight, &lPageNum);
         
-        UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo = NULL;
-        if (ipNewPageInfoMap != NULL)
+        UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo = __nullptr;
+        if (ipNewPageInfoMap != __nullptr)
         {
             ipNewPageInfo = ipNewPageInfoMap->GetValue(lPageNum);
-            ASSERT_RESOURCE_ALLOCATION("ELI28027", ipNewPageInfo != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28027", ipNewPageInfo != __nullptr);
         }
 
         // Return the a new raster zone containing the translated data
@@ -2075,7 +2075,7 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
 
         // Now build the raster zone for this page
         UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone(CLSID_RasterZone);
-        ASSERT_RESOURCE_ALLOCATION("ELI25390", ipNewZone != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25390", ipNewZone != __nullptr);
 
         // Ensure some height conditions are met (don't ask me)
         if (lHeight < 5)
@@ -2097,7 +2097,7 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
         // Obtain the original page info associated with this spatial string.
         UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipOrigPageInfo =
             m_ipPageInfoMap->GetValue(nPage);
-        ASSERT_RESOURCE_ALLOCATION("ELI28028", ipOrigPageInfo != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28028", ipOrigPageInfo != __nullptr);
 
         // Get the page information
         long lOriginalHeight, lOriginalWidth;
@@ -2127,7 +2127,7 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
         double dOrigTheta = ipOrigPageInfo->GetTheta();
 
         // The angle associated with the coordinate system we are converting to.
-        double dNewTheta = (ipNewPageInfo == NULL) ? 0 : ipNewPageInfo->GetTheta();
+        double dNewTheta = (ipNewPageInfo == __nullptr) ? 0 : ipNewPageInfo->GetTheta();
 
         // The angle difference between the new and old coordinate systems.
         double theta = dNewTheta - dOrigTheta;
@@ -2144,7 +2144,7 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
         // need to invert the x and y coordinates of the center if the new image coordinate system is
         // rotated to the left or right.
         bool invertFinalCoordinates = false;
-        if (ipNewPageInfo != NULL)
+        if (ipNewPageInfo != __nullptr)
         {
             invertFinalCoordinates =
                     (ipNewPageInfo->Orientation == kRotLeft || 
@@ -2239,7 +2239,7 @@ void CSpatialString::downgradeToNonSpatial()
         m_eMode = kNonSpatialMode;
 
         // Clear the Spatial Page Info pointer
-        m_ipPageInfoMap = NULL;
+        m_ipPageInfoMap = __nullptr;
 
         m_bDirty = true;
     }
@@ -2267,7 +2267,7 @@ long CSpatialString::getFirstPageNumber()
             for(size_t i = 0; i < nSize; i++)
             {
                 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipRZone = m_vecRasterZones[i];
-                ASSERT_RESOURCE_ALLOCATION("ELI19471", ipRZone != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI19471", ipRZone != __nullptr);
 
                 // If the raster zone's page is before the current first page, replace the current 
                 // page with the raster zone's page value.
@@ -2332,7 +2332,7 @@ long CSpatialString::getLastPageNumber()
             for(size_t i = 0; i < nSize; i++)
             {
                 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipRZone = m_vecRasterZones[i];
-                ASSERT_RESOURCE_ALLOCATION("ELI15093", ipRZone != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI15093", ipRZone != __nullptr);
 
                 long nPageNum = ipRZone->PageNumber;
 
@@ -2402,7 +2402,7 @@ IIUnknownVectorPtr CSpatialString::getWords()
     {
         // Create vector for resulting ISpatialStrings
         IIUnknownVectorPtr ipWords(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI25829", ipWords != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25829", ipWords != __nullptr);
 
         long nStartPos = 0;
         long nNumLetters = m_strString.size();
@@ -2412,7 +2412,7 @@ IIUnknownVectorPtr CSpatialString::getWords()
             {
                 // get the word beginning at nStartPos and ending with current letter
                 UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipItem = getSubString(nStartPos, i);
-                ASSERT_RESOURCE_ALLOCATION("ELI15371", ipItem != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI15371", ipItem != __nullptr);
 
                 // Add this word to the return vector
                 ipWords->PushBack(ipItem);
@@ -2444,7 +2444,7 @@ IIUnknownVectorPtr CSpatialString::getWords()
             // get the word beginning at nStartPos and ending with last letter
             UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipItem =
                 getSubString(nStartPos, nNumLetters - 1);
-            ASSERT_RESOURCE_ALLOCATION("ELI16914", ipItem != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI16914", ipItem != __nullptr);
 
             ipWords->PushBack(ipItem);
         }
@@ -2501,7 +2501,7 @@ IIUnknownVectorPtr CSpatialString::getLinesUnknownVector()
     {
         // Create an IUnknownVector to be returned
         IIUnknownVectorPtr ipLines(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI26015", ipLines != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI26015", ipLines != __nullptr);
 
         // Get the start and end position for each line
         vector<pair<long, long>> vecLines;
@@ -2511,7 +2511,7 @@ IIUnknownVectorPtr CSpatialString::getLinesUnknownVector()
         for (vector<pair<long, long>>::iterator it = vecLines.begin(); it != vecLines.end(); it++)
         {
             UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine = getSubString(it->first, it->second);
-            ASSERT_RESOURCE_ALLOCATION("ELI26016", ipLine != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI26016", ipLine != __nullptr);
 
             ipLines->PushBack(ipLine);
         }
@@ -2536,7 +2536,7 @@ IIUnknownVectorPtr CSpatialString::getParagraphs()
         
         // Create vector for resulting ISpatialStrings
         IIUnknownVectorPtr ipParagraphs(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI25834", ipParagraphs != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25834", ipParagraphs != __nullptr);
 
         long nStartPos = 0;
         long nNumLetters = m_vecLetters.size();
@@ -2549,7 +2549,7 @@ IIUnknownVectorPtr CSpatialString::getParagraphs()
             {
                 // get the paragraph beginning ending with current letter
                 UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipItem = getSubString(nStartPos, i);
-                ASSERT_RESOURCE_ALLOCATION("ELI16916", ipItem != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI16916", ipItem != __nullptr);
 
                 ipParagraphs->PushBack(ipItem);
 
@@ -2564,7 +2564,7 @@ IIUnknownVectorPtr CSpatialString::getParagraphs()
             // get the paragraph beginning at nStartPos and ending with last letter
             UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipItem =
                 getSubString(nStartPos, nNumLetters - 1);
-            ASSERT_RESOURCE_ALLOCATION("ELI16917", ipItem != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI16917", ipItem != __nullptr);
 
             ipParagraphs->PushBack(ipItem);
         }
@@ -2633,12 +2633,12 @@ long CSpatialString::getAverageCharWidth()
 
         // Get all of the Words
         IIUnknownVectorPtr ipWords = getWords();
-        ASSERT_RESOURCE_ALLOCATION("ELI25836", ipWords != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25836", ipWords != __nullptr);
         long lSize = ipWords->Size();
         for (long iWord = 0; iWord < lSize; iWord++)
         {
             UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipWord = ipWords->At(iWord);
-            ASSERT_RESOURCE_ALLOCATION("ELI25837", ipWord != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25837", ipWord != __nullptr);
             
             if(ipWord->GetMode() != kSpatialMode)
             {
@@ -2738,11 +2738,11 @@ vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> CSpatialString::getOCRImageRas
             {
                 // Get the raster zone as a copyable object
                 ICopyableObjectPtr ipCopyable(*it);
-                ASSERT_RESOURCE_ALLOCATION("ELI25840", ipCopyable != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI25840", ipCopyable != __nullptr);
 
                 // Clone the raster zone
                 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipCopyable->Clone();
-                ASSERT_RESOURCE_ALLOCATION("ELI25841", ipZone != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI25841", ipZone != __nullptr);
 
                 // Add the copy to the vector of zones
                 vecZones.push_back(ipZone);
@@ -2790,12 +2790,12 @@ vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> CSpatialString::getOCRImageRas
 
                 // Create a long rectangle from the CRect
                 ILongRectanglePtr ipRect(CLSID_LongRectangle);
-                ASSERT_RESOURCE_ALLOCATION("ELI26006", ipRect != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI26006", ipRect != __nullptr);
                 ipRect->SetBounds(rect.left, rect.top, rect.right, rect.bottom);
 
                 // Create a new raster zone from the rectangle
                 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone(CLSID_RasterZone);
-                ASSERT_RESOURCE_ALLOCATION("ELI26007", ipNewZone != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI26007", ipNewZone != __nullptr);
                 ipNewZone->CreateFromLongRectangle(ipRect, letter.m_usPageNumber);
 
                 // Add the new raster zone to the vector
@@ -2820,7 +2820,7 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesUnknownVector()
         }
 
         IIUnknownVectorPtr ipZones(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI25845", ipZones != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25845", ipZones != __nullptr);
 
         // Get the vector of zones
         vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> vecZones = getOCRImageRasterZones();
@@ -2849,7 +2849,7 @@ IIUnknownVectorPtr CSpatialString::getOriginalImageRasterZones()
         }
 
         IIUnknownVectorPtr ipZones(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI25848", ipZones != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI25848", ipZones != __nullptr);
 
         // Get the OCR image raster zones
         vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> vecZones = getOCRImageRasterZones();
@@ -2857,10 +2857,10 @@ IIUnknownVectorPtr CSpatialString::getOriginalImageRasterZones()
             it != vecZones.end(); it++)
         {
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(*it);
-            ASSERT_RESOURCE_ALLOCATION("ELI25849", ipZone != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25849", ipZone != __nullptr);
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone =
                 translateToOriginalImageZone(ipZone);
-            ASSERT_RESOURCE_ALLOCATION("ELI25850", ipNewZone != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25850", ipNewZone != __nullptr);
 
             ipZones->PushBack(ipNewZone);
         }
@@ -2883,7 +2883,7 @@ IIUnknownVectorPtr CSpatialString::getTranslatedImageRasterZones(
         }
 
         IIUnknownVectorPtr ipZones(CLSID_IUnknownVector);
-        ASSERT_RESOURCE_ALLOCATION("ELI28024", ipZones != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI28024", ipZones != __nullptr);
 
         // Get the OCR image raster zones
         vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> vecZones = getOCRImageRasterZones();
@@ -2891,11 +2891,11 @@ IIUnknownVectorPtr CSpatialString::getTranslatedImageRasterZones(
             it != vecZones.end(); it++)
         {
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(*it);
-            ASSERT_RESOURCE_ALLOCATION("ELI28179", ipZone != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28179", ipZone != __nullptr);
 
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone =
                 translateToNewPageInfo(ipZone, ipNewPageInfoMap);
-            ASSERT_RESOURCE_ALLOCATION("ELI28180", ipNewZone != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI28180", ipNewZone != __nullptr);
 
             ipZones->PushBack(ipNewZone);
         }
@@ -2909,13 +2909,13 @@ ILongRectanglePtr CSpatialString::getPageBounds(long nPage, bool bUseOCRImageCoo
 {
     try
     {
-        if (m_ipPageInfoMap == NULL)
+        if (m_ipPageInfoMap == __nullptr)
         {
             throw UCLIDException("ELI30321", "Page info missing, failed to get page bounds!");
         }
 
         UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = m_ipPageInfoMap->GetValue(nPage);
-        ASSERT_RESOURCE_ALLOCATION("ELI30322", ipPageInfo != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI30322", ipPageInfo != __nullptr);
 
         long nWidth(-1), nHeight(-1);
         UCLID_RASTERANDOCRMGMTLib::EOrientation ePageOrientation;
@@ -2939,7 +2939,7 @@ ILongRectanglePtr CSpatialString::getPageBounds(long nPage, bool bUseOCRImageCoo
         }
 
         ILongRectanglePtr ipRect(CLSID_LongRectangle);
-        ASSERT_RESOURCE_ALLOCATION("ELI30323", ipRect != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI30323", ipRect != __nullptr);
         ipRect->SetBounds(0, 0, nWidth, nHeight);
 
         return ipRect;
@@ -3044,7 +3044,7 @@ void CSpatialString::findFirstItemInVector(IVariantVectorPtr ipList, bool bCaseS
     try
     {
         // Ensure the vector is not null
-        ASSERT_ARGUMENT("ELI07695", ipList != NULL);
+        ASSERT_ARGUMENT("ELI07695", ipList != __nullptr);
 
         // Ensure the start position is valid
         if (lStartSearchPos < 0)
@@ -3143,8 +3143,8 @@ void CSpatialString::findFirstItemInRegExpVector(IVariantVectorPtr ipList, bool 
     try
     {
         // Make sure the parser passed and vector passed are not NULL
-        ASSERT_ARGUMENT("ELI22329", ipRegExprParser != NULL );
-        ASSERT_ARGUMENT("ELI07698", ipList != NULL);
+        ASSERT_ARGUMENT("ELI22329", ipRegExprParser != __nullptr );
+        ASSERT_ARGUMENT("ELI07698", ipList != __nullptr);
 
         // Ensure the start position is valid
         if (lStartSearchPos < 0)
@@ -3183,16 +3183,16 @@ void CSpatialString::findFirstItemInRegExpVector(IVariantVectorPtr ipList, bool 
             // Search for the item
             IIUnknownVectorPtr ipMatches = ipRegExprParser->Find( 
                 get_bstr_t( strSearch.c_str() ), VARIANT_TRUE, VARIANT_FALSE );
-            ASSERT_RESOURCE_ALLOCATION("ELI06827", ipMatches != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI06827", ipMatches != __nullptr);
 
             // If match is found
             if (ipMatches->Size() > 0)
             {
                 // Retrieve the match
                 IObjectPairPtr ipObjectPair = ipMatches->At(0);
-                ASSERT_RESOURCE_ALLOCATION("ELI06828", ipObjectPair != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI06828", ipObjectPair != __nullptr);
                 ITokenPtr ipToken = ipObjectPair->Object1;
-                ASSERT_RESOURCE_ALLOCATION("ELI06829", ipToken != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI06829", ipToken != __nullptr);
                 long lStartPos, lEndPos;
                 ipToken->GetStartAndEndPosition(&lStartPos, &lEndPos);
 
@@ -3234,7 +3234,7 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
 {
     try
     {
-        ASSERT_ARGUMENT("ELI25996", ipSource != NULL);
+        ASSERT_ARGUMENT("ELI25996", ipSource != __nullptr);
         
         // Reset all member variables
         reset(true, true);
@@ -3270,13 +3270,13 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
             m_eMode = kHybridMode;
 
             IIUnknownVectorPtr ipZones = ipSource->GetOCRImageRasterZones();
-            ASSERT_RESOURCE_ALLOCATION("ELI25775", ipZones != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25775", ipZones != __nullptr);
 
             long lSize = ipZones->Size();
             for (long i=0; i < lSize; i++)
             {
                 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipZones->At(i);
-                ASSERT_RESOURCE_ALLOCATION("ELI25776", ipZone != NULL);
+                ASSERT_RESOURCE_ALLOCATION("ELI25776", ipZone != __nullptr);
 
                 m_vecRasterZones.push_back(ipZone);
             }
@@ -3300,10 +3300,10 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
         if (eSourceMode != kNonSpatialMode)
         {
             ICopyableObjectPtr ipCopyObj = ipSource->SpatialPageInfos;
-            ASSERT_RESOURCE_ALLOCATION("ELI25777", ipCopyObj != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25777", ipCopyObj != __nullptr);
 
             m_ipPageInfoMap = ipCopyObj->Clone();
-            ASSERT_RESOURCE_ALLOCATION("ELI25778", m_ipPageInfoMap != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI25778", m_ipPageInfoMap != __nullptr);
         }
 
         // Downgrade the spatial mode if needed
@@ -3318,14 +3318,14 @@ void CSpatialString::autoConvertLegacyHybridString()
 {
     // Make a copy of the original page infos (OCR coordinates)
     ICopyableObjectPtr ipCopyObj = m_ipPageInfoMap;
-    ASSERT_RESOURCE_ALLOCATION("ELI29753", ipCopyObj != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29753", ipCopyObj != __nullptr);
 
     ILongToObjectMapPtr ipPageInfoMap = ipCopyObj->Clone();
-    ASSERT_RESOURCE_ALLOCATION("ELI29754", ipPageInfoMap != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29754", ipPageInfoMap != __nullptr);
 
     // Remove the any skew or rotation from m_ipPageInfoMap. (image coordinates)
     IVariantVectorPtr ipKeys = m_ipPageInfoMap->GetKeys();
-    ASSERT_RESOURCE_ALLOCATION("ELI29755", ipKeys != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29755", ipKeys != __nullptr);
 
     // Check for empty PageInfoMap (Hybrid strings created in 5.0 have an empty info map)
     // [FlexIDSCore #4281]
@@ -3346,7 +3346,7 @@ void CSpatialString::autoConvertLegacyHybridString()
         for (size_t i = 0; i < m_vecRasterZones.size(); i++)
         {
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = m_vecRasterZones[i];
-            ASSERT_RESOURCE_ALLOCATION("ELI30134", ipZone != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI30134", ipZone != __nullptr);
 
             setPageNumbers.insert(ipZone->PageNumber);
         }
@@ -3357,7 +3357,7 @@ void CSpatialString::autoConvertLegacyHybridString()
         {
             // Create a new spatial page info
             UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipInfo(CLSID_SpatialPageInfo);
-            ASSERT_RESOURCE_ALLOCATION("ELI30135", ipInfo != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI30135", ipInfo != __nullptr);
 
             // Get the image dimensions and set the page info
             int nWidth(0), nHeight(0);
@@ -3379,7 +3379,7 @@ void CSpatialString::autoConvertLegacyHybridString()
         {
             UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo =
                 m_ipPageInfoMap->GetValue(ipKeys->GetItem(i));
-            ASSERT_RESOURCE_ALLOCATION("ELI29756", ipPageInfo != NULL);
+            ASSERT_RESOURCE_ALLOCATION("ELI29756", ipPageInfo != __nullptr);
 
             ipPageInfo->Deskew = 0;
             ipPageInfo->Orientation = (UCLID_RASTERANDOCRMGMTLib::EOrientation)0;
@@ -3390,7 +3390,7 @@ void CSpatialString::autoConvertLegacyHybridString()
     // (since the page infos currently represent the image coordinate system, the SpatialString
     // currently represents the opposite skew/rotation that it originally did.
     IIUnknownVectorPtr ipZones = getTranslatedImageRasterZones(ipPageInfoMap);
-    ASSERT_RESOURCE_ALLOCATION("ELI29757", ipZones != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29757", ipZones != __nullptr);
     
     // Re-create the string with the original page infos, but with the translated zones which will
     // cancel out the skew/rotation of the OCR coordinate system (ie, will translate it into the
@@ -3411,11 +3411,11 @@ void CSpatialString::mergeAsHybridString(UCLID_RASTERANDOCRMGMTLib::ISpatialStri
 
     // Clone ipStringToMerge so that the source is not modified in any way. 
     ICopyableObjectPtr ipCopyObj = ipStringToMerge;
-    ASSERT_RESOURCE_ALLOCATION("ELI29870", ipCopyObj != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29870", ipCopyObj != __nullptr);
 
     UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipStringToMergeCopy =
         (UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr)ipCopyObj->Clone();
-    ASSERT_RESOURCE_ALLOCATION("ELI29871", ipStringToMergeCopy != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29871", ipStringToMergeCopy != __nullptr);
 
     // Translating raster zones only works on a hybrid string.
     ipStringToMergeCopy->DowngradeToHybridMode();
@@ -3423,13 +3423,13 @@ void CSpatialString::mergeAsHybridString(UCLID_RASTERANDOCRMGMTLib::ISpatialStri
     // A unified spatial page infos needs to be created. Start with ipStringToMerge's
     // spatial page infos, and replace any shared pages with this string's page info.
     ipCopyObj = ipStringToMergeCopy->SpatialPageInfos;
-    ASSERT_RESOURCE_ALLOCATION("ELI29872", ipCopyObj != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29872", ipCopyObj != __nullptr);
 
     ILongToObjectMapPtr ipUnifiedPageInfoMap = (ILongToObjectMapPtr)ipCopyObj->Clone();
-    ASSERT_RESOURCE_ALLOCATION("ELI29873", ipUnifiedPageInfoMap != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29873", ipUnifiedPageInfoMap != __nullptr);
 
     IVariantVectorPtr ipExistingSpatialPages = m_ipPageInfoMap->GetKeys();
-    ASSERT_RESOURCE_ALLOCATION("ELI29874", ipExistingSpatialPages != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29874", ipExistingSpatialPages != __nullptr);
 
     long nPageCount = ipExistingSpatialPages->Size;
     for (long i = 0; i < nPageCount; i++)
@@ -3437,7 +3437,7 @@ void CSpatialString::mergeAsHybridString(UCLID_RASTERANDOCRMGMTLib::ISpatialStri
         long nPage = (long)ipExistingSpatialPages->Item[i];
 
         UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo = m_ipPageInfoMap->GetValue(nPage);
-        ASSERT_RESOURCE_ALLOCATION("ELI29875", ipPageInfo != NULL);
+        ASSERT_RESOURCE_ALLOCATION("ELI29875", ipPageInfo != __nullptr);
 
         ipUnifiedPageInfoMap->Set(nPage, ipPageInfo);
     }
@@ -3447,7 +3447,7 @@ void CSpatialString::mergeAsHybridString(UCLID_RASTERANDOCRMGMTLib::ISpatialStri
     // ipUnifiedPageInfoMap coordinate system.
     IIUnknownVectorPtr ipTranslatedRasterZones =
         ipStringToMergeCopy->GetTranslatedImageRasterZones(ipUnifiedPageInfoMap);
-    ASSERT_RESOURCE_ALLOCATION("ELI29876", ipTranslatedRasterZones != NULL);
+    ASSERT_RESOURCE_ALLOCATION("ELI29876", ipTranslatedRasterZones != __nullptr);
 
     // Recreate ipStringToMergeCopy using the translated raster zones and
     // unifiedSpatialPageInfos. The two spatial strings are now able to be

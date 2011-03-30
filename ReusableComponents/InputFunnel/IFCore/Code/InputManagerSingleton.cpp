@@ -55,10 +55,10 @@ STDMETHODIMP CInputManagerSingleton::GetInstance(IInputManager **pInputManager)
 	try
 	{
 		// create the singleton instance if it has not yet been created
-		if (m_ipInputManager == NULL)
+		if (m_ipInputManager == __nullptr)
 		{
 			m_ipInputManager.CreateInstance(CLSID_InputManager);
-			ASSERT_RESOURCE_ALLOCATION("ELI03684", m_ipInputManager != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI03684", m_ipInputManager != __nullptr);
 
 			// by default, for the singleton input manager, make the main application
 			// window as the parent window
@@ -85,9 +85,9 @@ STDMETHODIMP CInputManagerSingleton::DeleteInstance()
 	try
 	{
 		// delete instance if the instance exists
-		if (m_ipInputManager != NULL)
+		if (m_ipInputManager != __nullptr)
 		{
-			m_ipInputManager = NULL;
+			m_ipInputManager = __nullptr;
 		}	
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04358")

@@ -50,8 +50,8 @@ CTestHarness::~CTestHarness()
 	try
 	{
 		// destruct the test result logger and the interactive test executer
-		m_ipInteractiveTestExecuter = NULL;
-		m_ipTestResultLogger = NULL;
+		m_ipInteractiveTestExecuter = __nullptr;
+		m_ipTestResultLogger = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16542");
 }
@@ -354,7 +354,7 @@ void CTestHarness::runAutoTests()
 		verifyValidProgID(strProgID);
 		// create the testable component from the prog id
 		ITestableComponentPtr ipComponent(strProgID.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI02304", ipComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI02304", ipComponent != __nullptr);
 
 		ipComponent->SetInteractiveTestExecuter(m_ipInteractiveTestExecuter);
 		ipComponent->SetResultLogger(m_ipTestResultLogger);
@@ -393,7 +393,7 @@ void CTestHarness::runInteractiveTests()
 		string strProgID(component.m_strProgID);
 		verifyValidProgID(strProgID);
 		ITestableComponentPtr ipComponent(strProgID.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI02303", ipComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI02303", ipComponent != __nullptr);
 
 		// mark the start of the component test
 		startComponentTest(strProgID, getOutputFileName(component));
@@ -422,7 +422,7 @@ void CTestHarness::runAllTests()
 		string strProgID(component.m_strProgID);
 		verifyValidProgID(strProgID);
 		ITestableComponentPtr ipComponent(strProgID.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI02302", ipComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI02302", ipComponent != __nullptr);
 		
 		// mark the start of the component test
 		startComponentTest(strProgID, getOutputFileName(component));

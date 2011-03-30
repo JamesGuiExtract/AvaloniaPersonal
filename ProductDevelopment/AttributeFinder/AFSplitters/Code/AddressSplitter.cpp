@@ -30,11 +30,11 @@ CAddressSplitter::CAddressSplitter()
 	try
 	{
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13024", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13024", ipMiscUtils != __nullptr );
 
 		// Instantiate the Entity Keywords object
 		m_ipKeys.CreateInstance( CLSID_EntityKeywords );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07210", m_ipKeys != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07210", m_ipKeys != __nullptr );
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI07167")
 }
@@ -86,7 +86,7 @@ STDMETHODIMP CAddressSplitter::raw_SplitAttribute(IAttribute * pAttribute, IAFDo
 		m_lNumRecipientLines = 0;
 		m_lNumAddressLines = 0;
 
-		if (m_ipTrailingLines != NULL)
+		if (m_ipTrailingLines != __nullptr)
 		{
 			m_ipTrailingLines->Clear();
 		}
@@ -94,13 +94,13 @@ STDMETHODIMP CAddressSplitter::raw_SplitAttribute(IAttribute * pAttribute, IAFDo
 		// Create local copies of specified Attribute
 		// and collection of associated SubAttributes
 		IAttributePtr ipMainAttribute( pAttribute );
-		ASSERT_RESOURCE_ALLOCATION("ELI24892", ipMainAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24892", ipMainAttribute != __nullptr);
 		IIUnknownVectorPtr ipMainAttrSub = ipMainAttribute->SubAttributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI24893", ipMainAttrSub != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24893", ipMainAttrSub != __nullptr);
 
 		// Retrieve Attribute Value text
 		ISpatialStringPtr	ipAddress = pAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION( "ELI07174", ipAddress != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07174", ipAddress != __nullptr );
 
 		// Find city, state and zip code sub-attributes from end of text
 		long lCityStart = doCityStateZip( ipAddress, ipMainAttrSub );
@@ -109,7 +109,7 @@ STDMETHODIMP CAddressSplitter::raw_SplitAttribute(IAttribute * pAttribute, IAFDo
 		if (lCityStart > 0)
 		{
 			ISpatialStringPtr	ipFirstPart = ipAddress->GetSubString( 0, lCityStart - 1 );
-			ASSERT_RESOURCE_ALLOCATION( "ELI07185", ipFirstPart != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07185", ipFirstPart != __nullptr );
 
 			// Find name and address sub-attributes from beginning of text
 			doNameAddress( ipFirstPart, ipMainAttrSub );
@@ -161,7 +161,7 @@ STDMETHODIMP CAddressSplitter::raw_GetComponentDescription(BSTR * pstrComponentD
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19562", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19562", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Split an address").Detach();
 	}
@@ -204,7 +204,7 @@ STDMETHODIMP CAddressSplitter::raw_Clone(IUnknown * * pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_AddressSplitter );
-		ASSERT_RESOURCE_ALLOCATION( "ELI19156", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI19156", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -364,7 +364,7 @@ void CAddressSplitter::addSubAttribute(ISpatialStringPtr ipText, std::string str
 {
 	// Create the Attribute
 	IAttributePtr ipNewAttribute( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION( "ELI07176", ipNewAttribute != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI07176", ipNewAttribute != __nullptr );
 
 	// Trim leading spaces and carriage returns and trailing
 	// spaces, commas, and carriage returns from Value text
@@ -505,7 +505,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 	// "Tokenize" the string, i.e. find all "whole lines"	
 	m_ipParser->Pattern = "[^\\r\\n]+";
 	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipText->String, VARIANT_FALSE, VARIANT_FALSE );
-	ASSERT_RESOURCE_ALLOCATION("ELI24894", ipMatches != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI24894", ipMatches != __nullptr);
 
 	long lLastLineFullyProcessed = ipMatches->Size();
 	if (lLastLineFullyProcessed > 0)
@@ -518,7 +518,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 			// Retrieve last line not fully processed
 			ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At( 
 				lLastLineFullyProcessed - 1 ) )->Object1 );
-			ASSERT_RESOURCE_ALLOCATION("ELI24895", ipToken != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24895", ipToken != __nullptr);
 			bstrValue.Empty();
 			ipToken->GetTokenInfo( &lLineStart, &lLineEnd, NULL, &bstrValue );
 
@@ -546,7 +546,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 					// Retrieve last line not fully processed
 					ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At( 
 						lLastLineFullyProcessed - 1 ) )->Object1 );
-					ASSERT_RESOURCE_ALLOCATION("ELI24906", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24906", ipToken != __nullptr);
 					bstrValue.Empty();
 					ipToken->GetTokenInfo( &lLineStart, &lLineEnd, NULL, &bstrValue );
 
@@ -560,7 +560,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 				{
 					ISpatialStringPtr	ipZip = ipText->GetSubString( 
 						lLineStart + lStartPos, lLineStart + lEndPos );
-					ASSERT_RESOURCE_ALLOCATION("ELI24896", ipZip != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24896", ipZip != __nullptr);
 
 					// Add the SubAttribute
 					addSubAttribute( ipZip, "ZipCode", -1, ipSubAttr );
@@ -574,7 +574,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 						// Retrieve last line not fully processed
 						ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At( 
 							lLastLineFullyProcessed - 1 ) )->Object1 );
-						ASSERT_RESOURCE_ALLOCATION("ELI24897", ipToken != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI24897", ipToken != __nullptr);
 						bstrValue.Empty();
 						ipToken->GetTokenInfo( &lLineStart, &lLineEnd, NULL, &bstrValue );
 
@@ -604,13 +604,13 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 				{
 					// Store the unprocessed line
 					ISpatialStringPtr	ipExtra = ipText->GetSubString( lLineStart, lLineEnd );
-					ASSERT_RESOURCE_ALLOCATION("ELI24898", ipExtra != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24898", ipExtra != __nullptr);
 					storeUnprocessedLine( ipExtra );
 
 					// Retrieve last line not fully processed
 					ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At( 
 						lLastLineFullyProcessed - 1 ) )->Object1 );
-					ASSERT_RESOURCE_ALLOCATION("ELI24899", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24899", ipToken != __nullptr);
 					bstrValue.Empty();
 					ipToken->GetTokenInfo( &lLineStart, &lLineEnd, NULL, &bstrValue );
 
@@ -647,7 +647,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 				// Get state as Spatial String
 				ISpatialStringPtr	ipState = ipText->GetSubString( 
 					lLineStart + lStartPos, lLineStart + lEndPos );
-				ASSERT_RESOURCE_ALLOCATION("ELI24900", ipState != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24900", ipState != __nullptr);
 
 				// Make state code upper case
 				if (lEndPos == lStartPos + 1)
@@ -670,7 +670,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 					{
 						ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At( 
 							lLastLineFullyProcessed - 1 ) )->Object1 );
-						ASSERT_RESOURCE_ALLOCATION("ELI24901", ipToken != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI24901", ipToken != __nullptr);
 						bstrValue.Empty();
 						ipToken->GetTokenInfo( &lLineStart, &lLineEnd, NULL, &bstrValue );
 
@@ -701,7 +701,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 				{
 					ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At( 
 						lLastLineFullyProcessed - 1 ) )->Object1 );
-					ASSERT_RESOURCE_ALLOCATION("ELI24902", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24902", ipToken != __nullptr);
 					bstrValue.Empty();
 					ipToken->GetTokenInfo( &lLineStart, &lLineEnd, NULL, &bstrValue );
 
@@ -738,7 +738,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 				// Get city as Spatial String
 				ISpatialStringPtr	ipCity = ipText->GetSubString( 
 					lLineStart + lStartPos, lLineStart + lEndPos );
-				ASSERT_RESOURCE_ALLOCATION("ELI24903", ipCity != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI24903", ipCity != __nullptr);
 
 				// Remove any trailing punctuation
 				ipCity->Trim( _bstr_t(""), _bstr_t( ",." ) );
@@ -759,7 +759,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 				{
 					ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At( 
 						lLastLineFullyProcessed - 1 ) )->Object1 );
-					ASSERT_RESOURCE_ALLOCATION("ELI24904", ipToken != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI24904", ipToken != __nullptr);
 					bstrValue.Empty();
 					ipToken->GetTokenInfo( &lLineStart, &lLineEnd, NULL, &bstrValue );
 
@@ -781,7 +781,7 @@ void CAddressSplitter::doNameAddress(ISpatialStringPtr ipText, IIUnknownVectorPt
 {
 	// Create SpatialString object for pattern searches
 	ISpatialStringPtr	ipLine( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI07175", ipLine != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI07175", ipLine != __nullptr );
 
 	long		lLineStart = -1;
 	long		lLineEnd = -1;
@@ -1193,7 +1193,7 @@ long CAddressSplitter::evaluateStringForAddress(std::string strTest, long *plSta
 
 	// Create ISpatialString object for searches
 	ISpatialStringPtr	ipLine( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI07209", ipLine != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI07209", ipLine != __nullptr );
 	ipLine->CreateNonSpatialString(strTest.c_str(), "");
 
 	///////////////////////////////////////////
@@ -1347,11 +1347,11 @@ bool CAddressSplitter::evaluateStringForCity(std::string strText, long *plStartP
 		ITokenPtr	ipToken;
 
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13025", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13025", ipMiscUtils != __nullptr );
 
 		// Create a local parser object
 		IRegularExprParserPtr ipLocalParser = ipMiscUtils->GetNewRegExpParserInstance("AddressSplitter");
-		ASSERT_RESOURCE_ALLOCATION( "ELI07349", ipLocalParser != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07349", ipLocalParser != __nullptr );
 
 		// Parse the string into words
 		ipLocalParser->Pattern = "\\S+";
@@ -1470,7 +1470,7 @@ long CAddressSplitter::evaluateStringForRecipient(std::string strTest, long *plS
 
 	// Create ISpatialString object for searches
 	ISpatialStringPtr	ipLine( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI07211", ipLine != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI07211", ipLine != __nullptr );
 	ipLine->CreateNonSpatialString(strTest.c_str(), "");
 
 	////////////////////////////
@@ -1667,7 +1667,7 @@ bool CAddressSplitter::evaluateStringForZipCode(std::string strText, long *plSta
 void CAddressSplitter::handleUnprocessedLines(IIUnknownVectorPtr ipSubAttr)
 {
 	// Any unprocessed lines?
-	if (m_ipTrailingLines == NULL)
+	if (m_ipTrailingLines == __nullptr)
 	{
 		return;
 	}
@@ -1822,10 +1822,10 @@ bool CAddressSplitter::isWordAddressIndicator(std::string strWord, std::string s
 void CAddressSplitter::storeUnprocessedLine(ISpatialStringPtr ipExtra)
 {
 	// Create collection
-	if (m_ipTrailingLines == NULL)
+	if (m_ipTrailingLines == __nullptr)
 	{
 		m_ipTrailingLines.CreateInstance( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07373", m_ipTrailingLines != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07373", m_ipTrailingLines != __nullptr );
 	}
 
 	// Push this Spatial String into collection

@@ -72,7 +72,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_CheckDataContents(VARIANT_BO
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17549", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17549", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bCheckDataContents);
 	}
@@ -108,7 +108,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_LookForHCData(VARIANT_BOOL* 
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17550", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17550", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bLookForHCData);
 		
@@ -145,7 +145,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_LookForMCData(VARIANT_BOOL* 
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17594", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17594", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bLookForMCData);
 		
@@ -182,7 +182,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_LookForLCData(VARIANT_BOOL* 
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17597", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17597", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bLookForLCData);
 		
@@ -219,7 +219,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_LookForManualData(VARIANT_BO
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17600", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17600", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bLookForManualData);
 		
@@ -256,7 +256,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_LookForClues(VARIANT_BOOL* p
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17603", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17603", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bLookForClues);
 		
@@ -293,7 +293,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_CheckDocType(VARIANT_BOOL* p
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17547", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17547", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bCheckDocType);
 	}
@@ -329,7 +329,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_DocCategory(BSTR* pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17551", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17551", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_strDocCategory.c_str()).Detach();
 	}
@@ -365,10 +365,10 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_DocTypes(IVariantVector** pV
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17552", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17552", pVal != __nullptr);
 		
 		IVariantVectorPtr ipDocTypes(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI17448", ipDocTypes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17448", ipDocTypes != __nullptr);
 
 		for (set<string>::iterator i = m_setDocTypes.begin(); i != m_setDocTypes.end(); i++)
 		{
@@ -391,10 +391,10 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::put_DocTypes(IVariantVector* new
 		validateLicense();
 		
 		m_setDocTypes.clear();
-		if (newVal != NULL)
+		if (newVal != __nullptr)
 		{
 			IVariantVectorPtr ipDocTypes(newVal);
-			ASSERT_RESOURCE_ALLOCATION("ELI17446", ipDocTypes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17446", ipDocTypes != __nullptr);
 
 			unsigned long nSize = ipDocTypes->Size;
 			for (unsigned long ul = 0; ul < nSize; ul++)
@@ -420,7 +420,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_TargetFileName(BSTR* pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17553", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17553", pVal != __nullptr);
 
 		*pVal = _bstr_t(m_strTargetFileName.c_str()).Detach();
 	}
@@ -453,7 +453,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_MissingFileBehavior(EMissing
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17624", pVal != NULL);
+		ASSERT_ARGUMENT("ELI17624", pVal != __nullptr);
 
 		*pVal = (EMissingVOAFileBehavior)m_eMissingFileBehavior;
 		
@@ -490,7 +490,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_AttributeQuantifier(EAttribu
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25130", pVal != NULL);
+		ASSERT_ARGUMENT("ELI25130", pVal != __nullptr);
 
 		*pVal = (EAttributeQuantifier)m_eAttributeQuantifier;
 		
@@ -527,7 +527,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::get_ConfigureConditionsOnly(VARI
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28670", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28670", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bConfigureConditionsOnly);
 
@@ -620,7 +620,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_GetComponentDescription(BSTR
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19628", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19628", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("ID Shield data file contents condition").Detach();
 	}
@@ -642,7 +642,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldVOAFileContentsConditionPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI17390", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17390", ipCopyThis != __nullptr);
 		
 		// copy member variables
 		m_bCheckDataContents		= asCppBool(ipCopyThis->CheckDataContents);
@@ -677,7 +677,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_IDShieldVOAFileContentsCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI17388", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17388", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -919,8 +919,8 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(IFil
 	INIT_EXCEPTION_AND_TRACING("MLI02005");
 	try
 	{
-		ASSERT_ARGUMENT("ELI17606", pFAMTM != NULL);
-		ASSERT_ARGUMENT("ELI17607", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI17606", pFAMTM != __nullptr);
+		ASSERT_ARGUMENT("ELI17607", pRetVal != __nullptr);
 		ASSERT_ARGUMENT("ELI31355", pFileRecord != __nullptr);
 
 		// default to condition failed, set to TRUE once condition has been satisfied
@@ -959,7 +959,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(IFil
 
 		// Read the file into a vector
 		IIUnknownVectorPtr	ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI17440", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17440", ipAttributes != __nullptr);
 		ipAttributes->LoadFrom(get_bstr_t(strTarget.c_str()), VARIANT_FALSE);
 		_lastCodePos = "40";
 
@@ -975,7 +975,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(IFil
 
 			// Get next attribute
 			IAttributePtr ipAttribute = ipAttributes->At(l);
-			ASSERT_RESOURCE_ALLOCATION("ELI17441", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI17441", ipAttribute != __nullptr);
 
 			// Get attribute name
 			string strName = asString(ipAttribute->GetName());
@@ -983,7 +983,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_FileMatchesFAMCondition(IFil
 			
 			// Get attribute value
 			ISpatialStringPtr ipValue = ipAttribute->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI15606", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15606", ipValue != __nullptr);
 			string strValue = asString(ipValue->String);
 			_lastCodePos = "50_B_" + strCount;
 
@@ -1026,7 +1026,7 @@ STDMETHODIMP CIDShieldVOAFileContentsCondition::raw_RequiresAdminAccess(VARIANT_
 UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldVOAFileContentsConditionPtr CIDShieldVOAFileContentsCondition::getThisAsCOMPtr()
 {
 	UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldVOAFileContentsConditionPtr ipThis = this;
-	ASSERT_RESOURCE_ALLOCATION("ELI17560", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI17560", ipThis != __nullptr);
 	return ipThis;
 }
 //-------------------------------------------------------------------------------------------------
@@ -1043,7 +1043,7 @@ void CIDShieldVOAFileContentsCondition::setDirty(bool bIsDirty)
 void CIDShieldVOAFileContentsCondition::updateAttributeTester()
 {
 	// Check if the tester is already initialized
-	if (m_apTester.get() != NULL)
+	if (m_apTester.get() != __nullptr)
 	{
 		// Reset the tester
 		m_apTester->reset();

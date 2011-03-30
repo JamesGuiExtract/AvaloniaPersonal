@@ -63,9 +63,9 @@ CSplitRegionIntoContentAreas::~CSplitRegionIntoContentAreas()
 {
 	try
 	{
-		m_ipCurrentDoc = NULL;
-		m_ipCurrentPageText = NULL;
-		m_ipSpatialStringSearcher = NULL;
+		m_ipCurrentDoc = __nullptr;
+		m_ipCurrentPageText = __nullptr;
+		m_ipSpatialStringSearcher = __nullptr;
 		m_apPageBitmap.reset();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI22067");
@@ -89,7 +89,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_DefaultAttributeText(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22096", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22096", pVal != __nullptr);
 
 		validateLicense();
 
@@ -123,7 +123,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_AttributeName(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22355", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22355", pVal != __nullptr);
 
 		validateLicense();
 
@@ -157,7 +157,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_MinimumWidth(double *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22297", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22297", pVal != __nullptr);
 
 		validateLicense();
 
@@ -193,7 +193,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_MinimumHeight(double *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22509", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22509", pVal != __nullptr);
 
 		validateLicense();
 
@@ -229,7 +229,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_IncludeGoodOCR(VARIANT_BOOL *pVal
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22301", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22301", pVal != __nullptr);
 
 		validateLicense();
 
@@ -263,7 +263,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_IncludePoorOCR(VARIANT_BOOL *pVal
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22304", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22304", pVal != __nullptr);
 
 		validateLicense();
 
@@ -297,7 +297,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_GoodOCRType(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22513", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22513", pVal != __nullptr);
 
 		validateLicense();
 
@@ -331,7 +331,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_PoorOCRType(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22516", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22516", pVal != __nullptr);
 
 		validateLicense();
 
@@ -365,7 +365,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_OCRThreshold(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22307", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22307", pVal != __nullptr);
 
 		validateLicense();
 
@@ -401,7 +401,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_UseLines(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22326", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22326", pVal != __nullptr);
 
 		validateLicense();
 
@@ -435,7 +435,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_ReOCRWithHandwriting(VARIANT_BOOL
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22311", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22311", pVal != __nullptr);
 
 		validateLicense();
 
@@ -469,7 +469,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_IncludeOCRAsTrueSpatialString(VAR
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22545", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22545", pVal != __nullptr);
 
 		validateLicense();
 
@@ -503,7 +503,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::get_RequiredHorizontalSeparation(long
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI28020", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28020", pVal != __nullptr);
 
 		validateLicense();
 
@@ -548,7 +548,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::raw_ModifyValue(IAttribute* pAttribut
 		validateLicense();
 		
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_ARGUMENT("ELI22103", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI22103", ipAttribute != __nullptr);
 
 		IAFDocumentPtr ipDocument(pOriginInput);
 		ASSERT_ARGUMENT("ELI22109", ipDocument);
@@ -573,7 +573,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::raw_SplitAttribute(IAttribute * pAttr
 		validateLicense();
 
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_ARGUMENT("ELI22364", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI22364", ipAttribute != __nullptr);
 
 		IAFDocumentPtr ipDocument(pAFDoc);
 		ASSERT_ARGUMENT("ELI22365", ipDocument);
@@ -598,7 +598,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::raw_IsConfigured(VARIANT_BOOL *pbValu
 		validateLicense();
 
 		// Check parameter
-		ASSERT_ARGUMENT("ELI22070", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI22070", pbValue != __nullptr);
 
 		*pbValue = asVariantBool(!m_strDefaultAttributeText.empty() &&
 								  m_dMinimumWidth >= 0 && m_dMinimumHeight >= 0 && 
@@ -619,7 +619,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::raw_GetComponentDescription(BSTR *pbs
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22072", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI22072", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Split region into content areas").Detach();
 
@@ -641,7 +641,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::ISplitRegionIntoContentAreasPtr ipCopyThis = pObject;
-		ASSERT_ARGUMENT("ELI22074", ipCopyThis != NULL);
+		ASSERT_ARGUMENT("ELI22074", ipCopyThis != __nullptr);
 
 		m_strDefaultAttributeText			= asString(ipCopyThis->DefaultAttributeText);
 		m_strAttributeName					= asString(ipCopyThis->AttributeName);
@@ -671,11 +671,11 @@ STDMETHODIMP CSplitRegionIntoContentAreas::raw_Clone(IUnknown **pObject)
 		// Validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI22076", pObject != NULL);
+		ASSERT_ARGUMENT("ELI22076", pObject != __nullptr);
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_SplitRegionIntoContentAreas);
-		ASSERT_RESOURCE_ALLOCATION("ELI22077", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22077", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -697,7 +697,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22079", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI22079", pClassID != __nullptr);
 
 		*pClassID = CLSID_SplitRegionIntoContentAreas;
 	}
@@ -745,7 +745,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI22082", pStream != NULL);
+		ASSERT_ARGUMENT("ELI22082", pStream != __nullptr);
 
 		// Reset data members
 		reset();
@@ -823,7 +823,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::Save(IStream *pStream, BOOL fClearDir
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI22085", pStream != NULL);
+		ASSERT_ARGUMENT("ELI22085", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -881,7 +881,7 @@ STDMETHODIMP CSplitRegionIntoContentAreas::raw_IsLicensed(VARIANT_BOOL * pbValue
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22066", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI22066", pbValue != __nullptr);
 
 		try
 		{
@@ -1237,7 +1237,7 @@ CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const ISpatialStr
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI22173", ipString != NULL);
+		ASSERT_ARGUMENT("ELI22173", ipString != __nullptr);
 
 		if (asCppBool(ipString->HasSpatialInfo()))
 		{
@@ -1247,7 +1247,7 @@ CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const ISpatialStr
 			// specific attributes so that they no longer match the page.
 			ILongRectanglePtr ipRect = ipString->GetTranslatedImageBounds(ipSpatialPageInfos);
 
-			ASSERT_RESOURCE_ALLOCATION("ELI22174", ipRect != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22174", ipRect != __nullptr);
 			long lLeft, lTop, lRight, lBottom;
 			ipRect->GetBounds(&lLeft, &lTop, &lRight, &lBottom);
 
@@ -1321,8 +1321,8 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI22115", ipDoc != NULL);
-		ASSERT_ARGUMENT("ELI22116", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI22115", ipDoc != __nullptr);
+		ASSERT_ARGUMENT("ELI22116", ipAttribute != __nullptr);
 
 		// Checks the for the handwriting OCR license if m_bReOCRWithHandwriting is true.  If the
 		// license is neede but missing, and exception is logged and m_bReOCRWithHandwriting is
@@ -1331,7 +1331,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 
 		// Get the spatial string from the document
 		ISpatialStringPtr ipDocText = ipDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI22114", ipDocText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22114", ipDocText != __nullptr);
 
 		// Get the spatial string from the attribute
 		ISpatialStringPtr ipValue = ipAttribute->Value;
@@ -1339,7 +1339,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 		// If this attribute doesn't have a value or the value doesn't have any spatial information
 		// or the AFDocument string does not have any spatial information,
 		// there is nothing to process. [FlexIDSCore #4049]
-		if (ipValue == NULL
+		if (ipValue == __nullptr
 			|| !asCppBool(ipValue->HasSpatialInfo())
 			|| !asCppBool(ipDocText->HasSpatialInfo()))
 		{
@@ -1352,13 +1352,13 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 		m_setPreviouslyAddedAreas.clear();
 
 		IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI22104", ipSubAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22104", ipSubAttributes != __nullptr);
 
 		ILongToObjectMapPtr ipSpatialPageInfos = ipDocText->SpatialPageInfos;
-		ASSERT_RESOURCE_ALLOCATION("ELI28052", ipSpatialPageInfos != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI28052", ipSpatialPageInfos != __nullptr);
 
 		IIUnknownVectorPtr ipAttributeLines = ipValue->GetLines();
-		ASSERT_RESOURCE_ALLOCATION("ELI22228", ipAttributeLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22228", ipAttributeLines != __nullptr);
 
 		// Process the attribute line-by-line if there is more than 1 so that
 		// all pages of a given attribute are processed.
@@ -1366,7 +1366,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 		for (long i = 0; i < nAttributeLineCount; i++)
 		{
 			ISpatialStringPtr ipAttributeLine = ipAttributeLines->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI22112", ipAttributeLine != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22112", ipAttributeLine != __nullptr);
 
 			// Skip this line if it is non-spatial [FlexIDSCore #3143]
 			if (ipAttributeLine->HasSpatialInfo() == VARIANT_FALSE)
@@ -1395,7 +1395,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 				// specific attributes so that they no longer match the page.
 				ILongRectanglePtr ipRect =
 					ipAttributeLine->GetTranslatedImageBounds(ipSpatialPageInfos);
-				ASSERT_RESOURCE_ALLOCATION("ELI22107", ipRect != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI22107", ipRect != __nullptr);
 
 				CRect rectRegion;
 				ipRect->GetBounds(&(rectRegion.left), &(rectRegion.top),
@@ -1403,7 +1403,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 
 				// Pass VARIANT_FALSE so the rectangle does not get rotated before searching
 				ISpatialStringPtr ipText = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-				ASSERT_RESOURCE_ALLOCATION("ELI22101", ipText != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI22101", ipText != __nullptr);
 
 				if (m_ipCurrentPageText->Size > gnMIN_CHARS_NEEDED_FOR_SIZE)
 				{
@@ -1422,7 +1422,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 
 				// Get a vector of the lines of text from the region.
 				IIUnknownVectorPtr ipLines = ipText->GetLines();
-				ASSERT_RESOURCE_ALLOCATION("ELI22229", ipLines != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI22229", ipLines != __nullptr);
 
 				// Split these lines so that lines that are separated by enough white-space
 				// are considered separate lines.
@@ -1434,7 +1434,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 				for (long i = 0; i < nLineCount; i++)
 				{
 					ISpatialStringPtr ipLine = ipLines->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI22102", ipLine != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI22102", ipLine != __nullptr);
 
 					ContentAreaInfo area(ipLine, ipSpatialPageInfos);
 					if (!area.IsRectNull())
@@ -1459,7 +1459,7 @@ void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc
 				{
 					IAttributePtr ipNewSubAttribute = createResult(ipDoc, nPage, area,
 						ipSpatialPageInfos);
-					ASSERT_RESOURCE_ALLOCATION("ELI22230", ipNewSubAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI22230", ipNewSubAttribute != __nullptr);
 
 					ipSubAttributes->PushBack(ipNewSubAttribute);
 				}
@@ -1473,10 +1473,10 @@ void CSplitRegionIntoContentAreas::splitLineFragments(IIUnknownVectorPtr ipLines
 {
 	try
 	{
-		ASSERT_RESOURCE_ALLOCATION("ELI22178", ipLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22178", ipLines != __nullptr);
 
 		IIUnknownVectorPtr ipReturnValue(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI22179", ipReturnValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22179", ipReturnValue != __nullptr);
 
 		// The maximum distance one character can be from another
 		int maxGapBetweenChars = m_nRequiredHorizontalSeparation * m_sizeAvgChar.cx;
@@ -1486,7 +1486,7 @@ void CSplitRegionIntoContentAreas::splitLineFragments(IIUnknownVectorPtr ipLines
 		for (int i = 0; i < nLineCount; i++)
 		{
 			ISpatialStringPtr ipLine = ipLines->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI22180", ipLine != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22180", ipLine != __nullptr);
 
 			// If this line doesn't have spatial info, there's nothing to do.
 			if (!asCppBool(ipLine->HasSpatialInfo()))
@@ -1506,7 +1506,7 @@ void CSplitRegionIntoContentAreas::splitLineFragments(IIUnknownVectorPtr ipLines
 			{
 				// If the line is true-spatial, use the letters to split the line as appropriate.
 				ipLine->GetOCRImageLetterArray(&nLetterCount, (void**)&pLetters);
-				ASSERT_RESOURCE_ALLOCATION("ELI22198", pLetters != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI22198", pLetters != __nullptr);
 			}
 
 			// Cycle through each letter of the line and make sure it within maxGapBetweenChars of
@@ -1542,12 +1542,12 @@ void CSplitRegionIntoContentAreas::splitLineFragments(IIUnknownVectorPtr ipLines
 						rectLetter.top > rectBounds.bottom || rectLetter.bottom < rectBounds.top)
 					{
 						ISpatialStringPtr ipBegin = ipLine->GetSubString(0, k - 1);
-						ASSERT_RESOURCE_ALLOCATION("ELI22199", ipBegin != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI22199", ipBegin != __nullptr);
 						ipReturnValue->PushBack(ipBegin);
 
 						// Start over with the remaining characters in the line.
 						ipLine = ipLine->GetSubString(k, nLetterCount - 1);
-						ASSERT_RESOURCE_ALLOCATION("ELI22200", ipLine != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI22200", ipLine != __nullptr);
 						nLetterCount -= k;
 						k = 1;
 
@@ -1883,11 +1883,11 @@ long CSplitRegionIntoContentAreas::getOcrConfidenceForRegion(const CRect& rectRe
 															 ISpatialStringSearcherPtr ipSearcher)
 {
 	ILongRectanglePtr ipRect(CLSID_LongRectangle);
-	ASSERT_RESOURCE_ALLOCATION("ELI30329", ipRect != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30329", ipRect != __nullptr);
 	ipRect->SetBounds(rectRegion.left, rectRegion.top, rectRegion.right, rectRegion.bottom);
 
 	ISpatialStringPtr ipString = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-	ASSERT_RESOURCE_ALLOCATION("ELI30330", ipString != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30330", ipString != __nullptr);
 
 	long nAvgConfidence = 0;
 	ipString->GetCharConfidence(NULL, NULL, &nAvgConfidence);
@@ -2733,7 +2733,7 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 	{
 		// Determine the name of the source document.
 		ISpatialStringPtr ipDocText = ipDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI22429", ipDocText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22429", ipDocText != __nullptr);
 
 		string strSourceDocName = asString(ipDocText->SourceDocName);
 
@@ -2745,22 +2745,22 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 
 		// Create a new ILongRectanglePtr based on this rect
 		ILongRectanglePtr ipRect(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI22153", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22153", ipRect != __nullptr);
 
 		ipRect->SetBounds(area.left, area.top, area.right, area.bottom);
 
 		// Search for OCR'd text within this region.
 		ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher(ipDoc, nPage);
-		ASSERT_RESOURCE_ALLOCATION("ELI22182", ipSearcher != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22182", ipSearcher != __nullptr);
 
 		ipSearcher->SetIncludeDataOnBoundary(VARIANT_FALSE);
 
 		ISpatialStringPtr ipValue = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-		ASSERT_RESOURCE_ALLOCATION("ELI22183", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22183", ipValue != __nullptr);
 
 		// Create a raster zone representing the entire area of the area.
 		IRasterZonePtr ipNewRasterZone(CLSID_RasterZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI22185", ipNewRasterZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22185", ipNewRasterZone != __nullptr);
 		ipNewRasterZone->CreateFromLongRectangle(ipRect, m_nCurrentPage);
 
 		// Create a ContentAreaInfo based on the found text in order to assess the OCR confidence
@@ -2810,7 +2810,7 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 
 		// If a sub attribute containing the true attribute spatial info is requested, this
 		// variable will store it.
-		IAttributePtr ipSpatialStringSubAttribute = NULL;
+		IAttributePtr ipSpatialStringSubAttribute = __nullptr;
 
 		// Check to see if the string value of the attribute is empty
 		string strValueText = asString(ipValue->String);
@@ -2828,7 +2828,7 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 			{
 				// Create the attribute to contain the spatial string
 				ipSpatialStringSubAttribute.CreateInstance(CLSID_Attribute);
-				ASSERT_RESOURCE_ALLOCATION("ELI22549", ipSpatialStringSubAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI22549", ipSpatialStringSubAttribute != __nullptr);
 
 				// Create and use a copy of the originally found value.
 				ICopyableObjectPtr ipCopyThis = ipValue;
@@ -2859,7 +2859,7 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 
 		// Create the new attribute and assign the newly created value.
 		IAttributePtr ipNewAttribute(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI22184", ipNewAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22184", ipNewAttribute != __nullptr);
 
 		ipNewAttribute->Value = ipValue;
 		ipNewAttribute->Name = m_strAttributeName.c_str();
@@ -2871,10 +2871,10 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 
 		// If an attribute containing the original spatial string result is available, add it
 		// as a sub-attribute.
-		if (ipSpatialStringSubAttribute != NULL)
+		if (ipSpatialStringSubAttribute != __nullptr)
 		{
 			IIUnknownVectorPtr ipSubAttributes = ipNewAttribute->SubAttributes;
-			ASSERT_RESOURCE_ALLOCATION("ELI22550", ipSubAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22550", ipSubAttributes != __nullptr);
 
 			ipSubAttributes->PushBack(ipSpatialStringSubAttribute);
 		}
@@ -2896,7 +2896,7 @@ bool CSplitRegionIntoContentAreas::loadPageBitmap(IAFDocumentPtr ipDoc, long nPa
 		{
 			// If this page doesn't have any text, skip it. (It would be possible to handle it, but 
 			// its not worth the benefit at this point.
-			if (ipPageText == NULL || !asCppBool(ipPageText->HasSpatialInfo()))
+			if (ipPageText == __nullptr || !asCppBool(ipPageText->HasSpatialInfo()))
 			{
 				// Reset any previously loaded bitmap
 				m_apPageBitmap.reset();
@@ -2910,7 +2910,7 @@ bool CSplitRegionIntoContentAreas::loadPageBitmap(IAFDocumentPtr ipDoc, long nPa
 
 			// The page bitmap needs to be loaded. Load the bitmap deskewed.
 			ISpatialPageInfoPtr ipPageInfo = ipPageText->GetPageInfo(nPage);
-			ASSERT_RESOURCE_ALLOCATION("ELI22125", ipPageInfo != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22125", ipPageInfo != __nullptr);
 
 			double dRotation = ipPageInfo->Deskew;
 
@@ -2925,7 +2925,7 @@ bool CSplitRegionIntoContentAreas::loadPageBitmap(IAFDocumentPtr ipDoc, long nPa
 
 			m_apPageBitmap.reset(new LeadToolsBitmap(asString(ipPageText->SourceDocName), nPage, 
 				-dRotation));
-			ASSERT_RESOURCE_ALLOCATION("ELI22124", m_apPageBitmap.get() != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22124", m_apPageBitmap.get() != __nullptr);
 
 			m_rectCurrentPage.SetRect(0, 0,
 				m_apPageBitmap->m_hBitmap.Width, m_apPageBitmap->m_hBitmap.Height);
@@ -2982,10 +2982,10 @@ ISpatialStringSearcherPtr CSplitRegionIntoContentAreas::getSpatialStringSearcher
 	// Lazy instantiation and initiation of a SpatialString searcher for the current page.
 	ISpatialStringPtr ipPageText = setCurrentPage(ipDoc, nPage);
 
-	if (m_ipSpatialStringSearcher == NULL && ipPageText != NULL)
+	if (m_ipSpatialStringSearcher == __nullptr && ipPageText != __nullptr)
 	{
 		m_ipSpatialStringSearcher.CreateInstance(CLSID_SpatialStringSearcher);
-		ASSERT_RESOURCE_ALLOCATION("ELI22100", m_ipSpatialStringSearcher != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22100", m_ipSpatialStringSearcher != __nullptr);
 
 		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipPageText);
 	}
@@ -2995,13 +2995,13 @@ ISpatialStringSearcherPtr CSplitRegionIntoContentAreas::getSpatialStringSearcher
 //-------------------------------------------------------------------------------------------------
 IOCREnginePtr CSplitRegionIntoContentAreas::getOCREngine()
 {
-	if (m_ipOCREngine == NULL)
+	if (m_ipOCREngine == __nullptr)
 	{
 		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR);
-		ASSERT_RESOURCE_ALLOCATION("ELI22253", m_ipOCREngine != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI22253", m_ipOCREngine != __nullptr );
 		
 		IPrivateLicensedComponentPtr ipOCREngineLicense(m_ipOCREngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI22240", ipOCREngineLicense != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22240", ipOCREngineLicense != __nullptr);
 		ipOCREngineLicense->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
 	}
 
@@ -3010,25 +3010,25 @@ IOCREnginePtr CSplitRegionIntoContentAreas::getOCREngine()
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSplitRegionIntoContentAreas::setCurrentPage(IAFDocumentPtr ipDoc, long nPage)
 {
-	ASSERT_ARGUMENT("ELI22235", ipDoc != NULL);
+	ASSERT_ARGUMENT("ELI22235", ipDoc != __nullptr);
 
 	// Lazy initiation of data for the current page.
 	if (ipDoc != m_ipCurrentDoc || nPage != m_nCurrentPage)
 	{
 		// We're using a different page than before. Reset any loaded bitmap or spatial string
 		// searcher to force them to be re-loaded for the current page.
-		m_ipSpatialStringSearcher = NULL;
+		m_ipSpatialStringSearcher = __nullptr;
 		m_apPageBitmap.reset();
 
 		m_ipCurrentDoc = ipDoc;
 		m_nCurrentPage = nPage;
-		m_ipCurrentPageText = NULL;
+		m_ipCurrentPageText = __nullptr;
 
 		ISpatialStringPtr ipDocText = ipDoc->Text;
 		if (ipDocText)
 		{
 			m_ipCurrentPageText = ipDocText->GetSpecifiedPages(m_nCurrentPage, m_nCurrentPage);
-			ASSERT_RESOURCE_ALLOCATION("ELI22111", m_ipCurrentPageText != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22111", m_ipCurrentPageText != __nullptr);
 		}
 	}
 

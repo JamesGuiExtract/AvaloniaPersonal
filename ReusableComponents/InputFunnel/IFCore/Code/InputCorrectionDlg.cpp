@@ -156,7 +156,7 @@ BOOL InputCorrectionDlg::OnInitDialog()
 		// first check if there's any image needs to be displayed.
 		CComQIPtr<IInputEntity> ipInputEntity;
 		hr = m_ipTextInput->GetInputEntity(&ipInputEntity);
-		if (SUCCEEDED(hr) && ipInputEntity != NULL)
+		if (SUCCEEDED(hr) && ipInputEntity != __nullptr)
 		{	
 			bstrInput.Empty();
 			ipInputEntity->GetOCRImage(&bstrInput);

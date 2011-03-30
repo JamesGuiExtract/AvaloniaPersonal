@@ -34,7 +34,7 @@ CDocumentClassifier::~CDocumentClassifier()
 	try
 	{
 		// Ensure COM objects are released
-		m_ipAFUtility = NULL;
+		m_ipAFUtility = __nullptr;
 
 		// Clear the maps
 		m_mapNameToVecDocTypes.clear();
@@ -53,7 +53,7 @@ void CDocumentClassifier::FinalRelease()
 	try
 	{
 		// Ensure COM objects are released
-		m_ipAFUtility = NULL;
+		m_ipAFUtility = __nullptr;
 
 		// Clear the maps
 		m_mapNameToVecDocTypes.clear();
@@ -147,7 +147,7 @@ STDMETHODIMP CDocumentClassifier::raw_Process(IAFDocument* pDocument, IProgressS
 		try
 		{
 			IAFDocumentPtr ipDocument(pDocument);
-			ASSERT_RESOURCE_ALLOCATION("ELI29402", ipDocument != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29402", ipDocument != __nullptr);
 
 			try
 			{
@@ -212,7 +212,7 @@ STDMETHODIMP CDocumentClassifier::raw_GetComponentDescription(BSTR * pstrCompone
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19568", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19568", pstrComponentDescription != __nullptr)
 
 		// Provide description
 		*pstrComponentDescription = bstr_t("Document classifier").Detach();
@@ -236,7 +236,7 @@ STDMETHODIMP CDocumentClassifier::raw_CopyFrom(IUnknown *pObject)
 
 		// Get Document Classifier interface on target object
 		UCLID_AFUTILSLib::IDocumentClassifierPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08240", ipSource != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08240", ipSource != __nullptr );
 
 		// Copy industry category name
 		m_strIndustryCategoryName = asString(ipSource->IndustryCategoryName);
@@ -257,7 +257,7 @@ STDMETHODIMP CDocumentClassifier::raw_Clone(IUnknown* *pObject)
 
 		// Create a new object
 		ICopyableObjectPtr ipObjCopy(CLSID_DocumentClassifier);
-		ASSERT_RESOURCE_ALLOCATION("ELI08340", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08340", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -434,7 +434,7 @@ STDMETHODIMP CDocumentClassifier::GetDocumentIndustries(IVariantVector** ppIndus
 
 		// Create the VariantVector to contain industries
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
-		ASSERT_RESOURCE_ALLOCATION("ELI11917", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11917", ipVec != __nullptr);
 
 		// Add the industries
 		ipVec->PushBack( get_bstr_t( gstrCOUNTY_DOC_INDUSTRY ) );
@@ -464,7 +464,7 @@ STDMETHODIMP CDocumentClassifier::GetSpecialDocTypeTags(VARIANT_BOOL bAllowMulti
 
 		// Create the VariantVector to contain tags
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
-		ASSERT_RESOURCE_ALLOCATION("ELI11918", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11918", ipVec != __nullptr);
 
 		// Add the tags
 		unsigned int ui;
@@ -499,7 +499,7 @@ STDMETHODIMP CDocumentClassifier::GetDocumentTypes(BSTR strIndustry, IVariantVec
 
 		// Create the VariantVector to contain document types
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
-		ASSERT_RESOURCE_ALLOCATION("ELI11920", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11920", ipVec != __nullptr);
 
 		// Retrieve the industry-specific collection of document types
 		vector<string>	vecTypes = m_mapNameToVecDocTypes[strName];
@@ -540,7 +540,7 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 
 		// Create the VariantVector to contain selected document type(s)
 		IVariantVectorPtr ipVec( CLSID_VariantVector );
-		ASSERT_RESOURCE_ALLOCATION("ELI11925", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11925", ipVec != __nullptr);
 
 		// Create the selection dialog with multi-selection parameter
 		// Provide list of available types
@@ -614,20 +614,20 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 
 	vector<DocTypeInterpreter> vecDocTypeInterpreters = itMap->second;
 
-	ASSERT_ARGUMENT("ELI05886", ipAFDoc != NULL);
+	ASSERT_ARGUMENT("ELI05886", ipAFDoc != __nullptr);
 
 	int nConfidenceLevel = 0;
 	// the vector that stores all document types (in string) at the same level
 	IVariantVectorPtr ipVecDocTypes(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI06030", ipVecDocTypes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06030", ipVecDocTypes != __nullptr);
 
 	// the vector that stores all Block IDs (in string) at the same level
 	IVariantVectorPtr ipVecBlockIDs( CLSID_VariantVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10978", ipVecBlockIDs != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10978", ipVecBlockIDs != __nullptr );
 
 	// the vector that stores all Rule IDs (in string) at the same level
 	IVariantVectorPtr ipVecRuleIDs( CLSID_VariantVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10987", ipVecRuleIDs != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10987", ipVecRuleIDs != __nullptr );
 
 	// Create a cache for document page ranges.
 	// Pattern holders often use the same page range i.e. 1, 1
@@ -689,7 +689,7 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 	// let's update the AFDocument
 	// store the confidence level in StringTags
 	IStrToStrMapPtr ipStringTags(ipAFDoc->StringTags);
-	if (ipStringTags != NULL)
+	if (ipStringTags != __nullptr)
 	{
 		CString zConfidenceLevel("");
 		zConfidenceLevel.Format("%d", nConfidenceLevel);
@@ -697,7 +697,7 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 	}
 
 	IStrToObjectMapPtr ipObjectTags(ipAFDoc->ObjectTags);
-	if (ipObjectTags != NULL)
+	if (ipObjectTags != __nullptr)
 	{
 		// Store the doc types, block IDs, and rule IDs in ObjectTags 
 		// An assumption is made here that since we add to each vector
@@ -715,10 +715,10 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 //-------------------------------------------------------------------------------------------------
 void CDocumentClassifier::loadDocTypeFiles(const string& strSpecificIndustryName)
 {
-	if (m_ipAFUtility == NULL)
+	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI07125", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07125", m_ipAFUtility != __nullptr);
 	}
 	
 	// look for the industry name entry

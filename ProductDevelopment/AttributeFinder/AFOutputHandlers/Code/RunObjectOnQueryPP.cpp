@@ -30,7 +30,7 @@ CRunObjectOnQueryPP::CRunObjectOnQueryPP()
 		m_dwDocStringID = IDS_DOCSTRINGRunObjectOnQueryPP;	
 
 		m_ipCategoryMgr.CreateInstance(CLSID_CategoryManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI10404", m_ipCategoryMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10404", m_ipCategoryMgr != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI10405");
 }
@@ -179,7 +179,7 @@ LRESULT CRunObjectOnQueryPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			// If object we are loading has an object already (it this is not a new RunObjectOnQuery object)
 			// select the appropriate object in the combo box
 			m_cmbObject = GetDlgItem( IDC_CMB_OBJECT );
-			if(m_ipObject != NULL)
+			if(m_ipObject != __nullptr)
 			{
 				_bstr_t	bstrCompDesc = m_ipObject->GetComponentDescription();
 				std::string	strActualName( bstrCompDesc );
@@ -217,14 +217,14 @@ LRESULT CRunObjectOnQueryPP::OnClickedBtnConfigure(WORD wNotifyCode, WORD wID,
 	try
 	{
 		// Must have a combo box selection
-		if (m_ipObject != NULL)
+		if (m_ipObject != __nullptr)
 		{
 			// Create the ObjectPropertiesUI object
 			IObjectPropertiesUIPtr	ipProperties( CLSID_ObjectPropertiesUI );
-			ASSERT_RESOURCE_ALLOCATION("ELI10409", ipProperties != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10409", ipProperties != __nullptr);
 
 			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyObj = m_ipObject;
-			ASSERT_RESOURCE_ALLOCATION("ELI10410", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10410", ipCopyObj != __nullptr);
 			UCLID_COMUTILSLib::ICategorizedComponentPtr ipCopy = ipCopyObj->Clone();
 
 			string strComponentDesc = ipCopy->GetComponentDescription();
@@ -329,7 +329,7 @@ void CRunObjectOnQueryPP::populateObjectCombo()
 	CString	zName;
 	long nNumEntries = m_ipObjectMap->GetSize();
 	UCLID_COMUTILSLib::IVariantVectorPtr ipKeys = m_ipObjectMap->GetKeys();
-	ASSERT_RESOURCE_ALLOCATION("ELI19192", ipKeys != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19192", ipKeys != __nullptr);
 	int i;
 	for (i = 0; i < nNumEntries; i++)
 	{

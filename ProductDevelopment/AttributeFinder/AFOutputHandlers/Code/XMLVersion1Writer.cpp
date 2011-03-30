@@ -31,11 +31,11 @@ void XMLVersion1Writer::WriteFile(const string& strFile, IIUnknownVector *pAttri
 	{
 		// Create XML document object and populate nodes
 		MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument( CLSID_DOMDocument );
-		ASSERT_RESOURCE_ALLOCATION("ELI12866", ipXMLDOMDocument != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12866", ipXMLDOMDocument != __nullptr);
 
 		// Create "Attributes" Element
 		MSXML::IXMLDOMNodePtr ipAttributesNode = ipXMLDOMDocument->createElement("Attributes");
-		ASSERT_RESOURCE_ALLOCATION("ELI12867", ipAttributesNode != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12867", ipAttributesNode != __nullptr);
 
 		// Populate Attribute nodes
 		addNodesForAttributes( ipXMLDOMDocument, ipAttributesNode, pAttributes );
@@ -72,9 +72,9 @@ void XMLVersion1Writer::addNodesForAttributes(MSXML::IXMLDOMDocumentPtr ipXMLDOM
 											  IIUnknownVectorPtr ipAttributes)
 {
 	// Ensure proper arguments passed in
-	ASSERT_ARGUMENT("ELI12869", ipXMLDOMDocument != NULL);
-	ASSERT_ARGUMENT("ELI12870", ipNode != NULL);
-	ASSERT_ARGUMENT("ELI12871", ipAttributes != NULL);
+	ASSERT_ARGUMENT("ELI12869", ipXMLDOMDocument != __nullptr);
+	ASSERT_ARGUMENT("ELI12870", ipNode != __nullptr);
+	ASSERT_ARGUMENT("ELI12871", ipAttributes != __nullptr);
 
 	// Iterate through each of the attributes and handle them
 	long nNumAttributes = ipAttributes->Size();
@@ -82,11 +82,11 @@ void XMLVersion1Writer::addNodesForAttributes(MSXML::IXMLDOMDocumentPtr ipXMLDOM
 	{
 		// Get the current attribute
 		UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI12872", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12872", ipAttribute != __nullptr);
 
 		// Create an element node for the current attribute
 		MSXML::IXMLDOMNodePtr ipAttributeNode = ipXMLDOMDocument->createElement("Attribute");
-		ASSERT_RESOURCE_ALLOCATION("ELI12873", ipAttributeNode != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12873", ipAttributeNode != __nullptr);
 		
 		// Set the name attribute for the element
 		MSXML::IXMLDOMElementPtr ipAttr = ipAttributeNode;
@@ -110,7 +110,7 @@ void XMLVersion1Writer::addNodesForAttributes(MSXML::IXMLDOMDocumentPtr ipXMLDOM
 
 		// Create nodes for the sub-attributes if they exist
 		IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-		if (ipSubAttributes != NULL && ipSubAttributes->Size() > 0)
+		if (ipSubAttributes != __nullptr && ipSubAttributes->Size() > 0)
 		{
 			MSXML::IXMLDOMNodePtr ipSubAttributesNode = ipXMLDOMDocument->createElement("SubAttributes");
 			addNodesForAttributes(ipXMLDOMDocument, ipSubAttributesNode, ipSubAttributes);
@@ -124,11 +124,11 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getValueElement(MSXML::IXMLDOMDocume
 {
 	// Create the attribute value node
 	MSXML::IXMLDOMNodePtr ipValueNode = ipXMLDOMDocument->createElement("Value");
-	ASSERT_RESOURCE_ALLOCATION("ELI12874", ipValueNode != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12874", ipValueNode != __nullptr);
 
 	// Get the attribute and its value into local vars
 	ISpatialStringPtr ipValue = ipAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI12875", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12875", ipValue != __nullptr);
 
 	// Create a text node with the actual attribute value's text
 	// removing any unprintable characters (P16 #1413)
@@ -136,13 +136,13 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getValueElement(MSXML::IXMLDOMDocume
 	string strValue = removeUnprintableCharacters( strTest );
 	MSXML::IXMLDOMNodePtr ipValueNodeText = ipXMLDOMDocument->createTextNode( 
 		strValue.c_str() );
-	ASSERT_RESOURCE_ALLOCATION("ELI12876", ipValueNodeText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12876", ipValueNodeText != __nullptr);
 	ipValueNode->appendChild(ipValueNodeText);
 	
 	// Set the spatial bounds-attributes on the value element if the attribute's
 	// value is spatial
 	MSXML::IXMLDOMElementPtr ipValueElement = ipValueNode;
-	ASSERT_RESOURCE_ALLOCATION("ELI12877", ipValueElement != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12877", ipValueElement != __nullptr);
 
 	// Only add the spatial information if not removing spatial information
 	// and it has spatial info [FlexIDSCore #3557]
@@ -166,7 +166,7 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getValueElement(MSXML::IXMLDOMDocume
 		// that a "Line" node can be created underneath the value
 		// for each line of text in the value
 		IIUnknownVectorPtr ipLines = ipValue->GetLines();
-		ASSERT_RESOURCE_ALLOCATION("ELI12878", ipLines != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12878", ipLines != __nullptr);
 
 		// Create Line XML nodes for each line in the value
 		long nNumLines = ipLines->Size();
@@ -174,11 +174,11 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getValueElement(MSXML::IXMLDOMDocume
 		{
 			// Get the spatial string on the line
 			ISpatialStringPtr ipLine = ipLines->At(nLineNum);
-			ASSERT_RESOURCE_ALLOCATION("ELI12879", ipLine != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI12879", ipLine != __nullptr);
 
 			MSXML::IXMLDOMElementPtr ipLineElement = getLineElement(ipXMLDOMDocument,
 				ipAttribute, ipLine, nLineNum);
-			ASSERT_RESOURCE_ALLOCATION("ELI12880", ipLineElement != NULL)
+			ASSERT_RESOURCE_ALLOCATION("ELI12880", ipLineElement != __nullptr)
 
 			// Append the line node as a child of the value node
 			ipValueElement->appendChild(ipLineElement);
@@ -200,7 +200,7 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getLineElement(MSXML::IXMLDOMDocumen
 {
 	// Create the SpatialLine element
 	MSXML::IXMLDOMNodePtr ipLineNode = ipXMLDOMDocument->createElement("Line");
-	ASSERT_RESOURCE_ALLOCATION("ELI12881", ipLineNode != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12881", ipLineNode != __nullptr);
 
 	// Create a text node with the actual line's text
 	// removing any unprintable characters (P16 #1413)
@@ -208,12 +208,12 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getLineElement(MSXML::IXMLDOMDocumen
 	string strValue = removeUnprintableCharacters( strLine );
 	MSXML::IXMLDOMNodePtr ipLineNodeText = ipXMLDOMDocument->
 		createTextNode( strValue.c_str() );
-	ASSERT_RESOURCE_ALLOCATION("ELI12882", ipLineNodeText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12882", ipLineNodeText != __nullptr);
 	ipLineNode->appendChild(ipLineNodeText);
 	
 	// Get access to the XML element interface of the line node
 	MSXML::IXMLDOMElementPtr ipLineElement = ipLineNode;
-	ASSERT_RESOURCE_ALLOCATION("ELI12883", ipLineElement != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12883", ipLineElement != __nullptr);
 
 	if (ipLine->HasSpatialInfo() == VARIANT_TRUE)
 	{
@@ -235,26 +235,26 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getLineElement(MSXML::IXMLDOMDocumen
 MSXML::IXMLDOMElementPtr XMLVersion1Writer::getRectBoundsElement(MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument, 
 		IRasterZonePtr ipZone, ILongToObjectMapPtr ipPageInfoMap)
 {
-	ASSERT_ARGUMENT("ELI19197", ipXMLDOMDocument != NULL);
-	ASSERT_ARGUMENT("ELI19198", ipZone != NULL);
-	ASSERT_ARGUMENT("ELI19868", ipPageInfoMap != NULL);
+	ASSERT_ARGUMENT("ELI19197", ipXMLDOMDocument != __nullptr);
+	ASSERT_ARGUMENT("ELI19198", ipZone != __nullptr);
+	ASSERT_ARGUMENT("ELI19868", ipPageInfoMap != __nullptr);
 
 	// Create the rectangular boundary element
 	MSXML::IXMLDOMElementPtr ipRectBoundsElement = ipXMLDOMDocument->
 		createElement("RectBounds");
-	ASSERT_RESOURCE_ALLOCATION("ELI12886", ipRectBoundsElement != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12886", ipRectBoundsElement != __nullptr);
 
 	ISpatialPageInfoPtr ipPageInfo = ipPageInfoMap->GetValue(ipZone->PageNumber);
-	ASSERT_RESOURCE_ALLOCATION("ELI30327", ipPageInfo != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30327", ipPageInfo != __nullptr);
 
 	// Get the page bounds (for use by GetRectangularBounds)
 	ILongRectanglePtr ipPageBounds(CLSID_LongRectangle);
-	ASSERT_RESOURCE_ALLOCATION("ELI30313", ipPageBounds != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI30313", ipPageBounds != __nullptr);
 	ipPageBounds->SetBounds(0, 0, ipPageInfo->Width, ipPageInfo->Height);
 
 	// Get the rectangular bounds
 	ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(ipPageBounds);
-	ASSERT_RESOURCE_ALLOCATION("ELI12887", ipBounds != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12887", ipBounds != __nullptr);
 	
 	// Set the attributes of the rectangular bounds element
 	string strPage = asString(ipZone->PageNumber);
@@ -274,13 +274,13 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getRectBoundsElement(MSXML::IXMLDOMD
 MSXML::IXMLDOMElementPtr XMLVersion1Writer::getZoneElement(MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument, 
 		IRasterZonePtr ipZone)
 {
-	ASSERT_ARGUMENT("ELI19199", ipXMLDOMDocument != NULL);
-	ASSERT_ARGUMENT("ELI19200", ipZone != NULL);
+	ASSERT_ARGUMENT("ELI19199", ipXMLDOMDocument != __nullptr);
+	ASSERT_ARGUMENT("ELI19200", ipZone != __nullptr);
 
 	// Create a new zone element
 	MSXML::IXMLDOMElementPtr ipZoneElement = ipXMLDOMDocument->
 		createElement("Zone");
-	ASSERT_RESOURCE_ALLOCATION("ELI12888", ipZoneElement != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12888", ipZoneElement != __nullptr);
 
 	// Set the attributes of the rectangular bounds element				
 	string strStartX = asString(ipZone->StartX);
@@ -303,18 +303,18 @@ void XMLVersion1Writer::appendSpatialElements(MSXML::IXMLDOMNodePtr ipLineElemen
 		MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument,	IAttributePtr ipAttribute, 
 		ISpatialStringPtr ipLine, long nLineNum)
 {
-	ASSERT_ARGUMENT("ELI19201", ipLineElement != NULL);
-	ASSERT_ARGUMENT("ELI19202", ipXMLDOMDocument != NULL);
-	ASSERT_ARGUMENT("ELI19203", ipAttribute != NULL);
-	ASSERT_ARGUMENT("ELI19204", ipLine != NULL);
+	ASSERT_ARGUMENT("ELI19201", ipLineElement != __nullptr);
+	ASSERT_ARGUMENT("ELI19202", ipXMLDOMDocument != __nullptr);
+	ASSERT_ARGUMENT("ELI19203", ipAttribute != __nullptr);
+	ASSERT_ARGUMENT("ELI19204", ipLine != __nullptr);
 
 	// get the raster zones of the specified line
 	IIUnknownVectorPtr ipZones = ipLine->GetOriginalImageRasterZones();
-	ASSERT_RESOURCE_ALLOCATION("ELI12889", ipZones != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12889", ipZones != __nullptr);
 
 	// get the attribute value
 	ISpatialStringPtr ipValue = ipAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI12890", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12890", ipValue != __nullptr);
 
 	// there should be at least one zone. Verify that.
 	long nNumZones = ipZones->Size();
@@ -336,24 +336,24 @@ void XMLVersion1Writer::appendSpatialElements(MSXML::IXMLDOMNodePtr ipLineElemen
 
 	// get the page info map
 	ILongToObjectMapPtr ipPageInfoMap(ipValue->SpatialPageInfos);
-	ASSERT_RESOURCE_ALLOCATION("ELI19871", ipPageInfoMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19871", ipPageInfoMap != __nullptr);
 
 	// iterate through each zone
 	for(long i=0; i<nNumZones; i++)
 	{
 		// Get the zone
 		IRasterZonePtr ipZone = ipZones->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI12892", ipZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12892", ipZone != __nullptr);
 
 		// Create the rectangular boundary element and append as child to line element
 		MSXML::IXMLDOMElementPtr ipRectBoundsElement = getRectBoundsElement(
 			ipXMLDOMDocument, ipZone, ipPageInfoMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI12884", ipRectBoundsElement != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12884", ipRectBoundsElement != __nullptr);
 		ipLineElement->appendChild(ipRectBoundsElement);
 		
 		// Create the zone element and append as child to line element
 		MSXML::IXMLDOMElementPtr ipZoneElement = getZoneElement(ipXMLDOMDocument, ipZone);
-		ASSERT_RESOURCE_ALLOCATION("ELI12885", ipZoneElement != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12885", ipZoneElement != __nullptr);
 		ipLineElement->appendChild(ipZoneElement);
 	}
 }

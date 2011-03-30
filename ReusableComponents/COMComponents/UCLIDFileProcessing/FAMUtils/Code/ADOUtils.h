@@ -54,7 +54,7 @@ using namespace std;
 				\
 				try \
 				{ \
-					if (ipRetryConnection != NULL) \
+					if (ipRetryConnection != __nullptr) \
 					{ \
 						getSQLServerDateTime(ipRetryConnection); \
 						bConnectionIsAlive = true; \
@@ -85,7 +85,7 @@ using namespace std;
 							/* opening will put it in a good state */ \
 							try \
 							{ \
-								if (ipRetryConnection != NULL && ipRetryConnection->State != adStateClosed) \
+								if (ipRetryConnection != __nullptr && ipRetryConnection->State != adStateClosed) \
 								{ \
 									ipRetryConnection->Close(); \
 								} \

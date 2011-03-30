@@ -46,16 +46,16 @@ const bstr_t gbstrRULE_SPECIFIC_DOCUMENT_PREPROCESSOR_DISPLAY_NAME = "Rule-Speci
 //-------------------------------------------------------------------------------------------------
 CAddRuleDlg::CAddRuleDlg(IClipboardObjectManagerPtr ipCBMgr,
 						 UCLID_AFCORELib::IAttributeRulePtr ipRule, 
-						 CWnd* pParent /*=NULL*/)
+						 CWnd* pParent /*=__nullptr*/)
 	: CDialog(CAddRuleDlg::IDD, pParent),
 	m_eContextMenuCtrl(kNoControl),
-	m_ipDocPreprocessor(NULL),
+	m_ipDocPreprocessor(__nullptr),
 	m_bInitialized(false), 
 	m_ipRule(ipRule), m_ipClipboardMgr(ipCBMgr)
 {
 	// create MiscUtils object
 	m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI16009", m_ipMiscUtils != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16009", m_ipMiscUtils != __nullptr);
 
 	//{{AFX_DATA_INIT(CAddRuleDlg)
 	m_bApplyMod = FALSE;
@@ -181,17 +181,17 @@ void CAddRuleDlg::OnBtnConfigureRule2()
 	{	
 		// Make sure an Attribute Finding Rule is selected
 		ICopyableObjectPtr ipCopy = m_ipAFRule;
-		if (ipCopy != NULL)
+		if (ipCopy != __nullptr)
 		{
 			// Clone the rule
 			UCLID_AFCORELib::IAttributeFindingRulePtr ipRule = ipCopy->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI28512", ipRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI28512", ipRule != __nullptr);
 
 			// Create the ObjectPropertiesUI object
 			IObjectPropertiesUIPtr	ipProperties( CLSID_ObjectPropertiesUI );
 
 			// Show the UI
-			if (ipProperties != NULL)
+			if (ipProperties != __nullptr)
 			{
 				// Get combo box text
 				int iIndex = m_comboRule.GetCurSel();
@@ -244,7 +244,7 @@ void CAddRuleDlg::OnBtnAddRule()
 		// Create the IObjectWithDescription 
 		// without description and without object pointer
 		IObjectWithDescriptionPtr	ipObject( CLSID_ObjectWithDescription );
-		ASSERT_RESOURCE_ALLOCATION("ELI10303", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10303", ipObject != __nullptr);
 
 		// Allow the user to select and configure the object
 		VARIANT_BOOL vbResult = m_ipMiscUtils->AllowUserToSelectAndConfigureObject(ipObject, 
@@ -262,7 +262,7 @@ void CAddRuleDlg::OnBtnAddRule()
 			int iIndex = -1;
 			int iNewIndex = -1;
 			POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-			if (pos != NULL)
+			if (pos != __nullptr)
 			{
 				// Get index of first selection
 				iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -327,7 +327,7 @@ void CAddRuleDlg::OnBtnDeleteRule()
 		// Check for current rule selection
 		int iIndex = -1;
 		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -399,7 +399,7 @@ void CAddRuleDlg::OnBtnConfigureRule()
 		// Check for current rule selection
 		int iIndex = -1;
 		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -410,7 +410,7 @@ void CAddRuleDlg::OnBtnConfigureRule()
 			// Retrieve current rule
 			UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipRule = 
 				m_ipAMRulesVector->At(iIndex);
-			ASSERT_RESOURCE_ALLOCATION("ELI16073", ipRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16073", ipRule != __nullptr);
 
 			// get the position of the button
 			RECT rect;
@@ -419,7 +419,7 @@ void CAddRuleDlg::OnBtnConfigureRule()
 			// show context menu and allow user to modify ipRule
 			VARIANT_BOOL vbDirty = m_ipMiscUtils->HandlePlugInObjectCommandButtonClick(
 				ipRule,	"Attribute Modifier", get_bstr_t(AFAPI_VALUE_MODIFIERS_CATEGORYNAME), 
-				VARIANT_FALSE, 0, NULL, rect.right, rect.top);
+				VARIANT_FALSE, 0, __nullptr, rect.right, rect.top);
 
 			// check if ipRule was modified
 			if (vbDirty == VARIANT_TRUE)
@@ -445,7 +445,7 @@ void CAddRuleDlg::OnBtnRuleUp()
 		// Check for current rule selection
 		int iIndex = -1;
 		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -503,7 +503,7 @@ void CAddRuleDlg::OnBtnRuleDown()
 		// Check for current rule selection
 		int iIndex = -1;
 		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -560,7 +560,7 @@ void CAddRuleDlg::OnBtnSelectPreprocessor()
 	try
 	{
 		// make sure the doc preprocessor is non-null
-		if (m_ipDocPreprocessor == NULL)
+		if (m_ipDocPreprocessor == __nullptr)
 		{
 			setPreprocessor();
 		}
@@ -615,7 +615,7 @@ void CAddRuleDlg::OnClickListRules(NMHDR* pNMHDR, LRESULT* pResult)
 			// Get a pointer to the rule we checked / unchecked
 			IObjectWithDescriptionPtr	ipObject;
 			ipObject = m_ipAMRulesVector->At(iIndex);
-			ASSERT_RESOURCE_ALLOCATION( "ELI13729", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13729", ipObject != __nullptr );
 
 			// Get the old state of the checkbox
 			BOOL bChecked = m_listRules.GetCheck(iIndex);
@@ -638,7 +638,7 @@ void CAddRuleDlg::OnDblclkListRules(NMHDR* pNMHDR, LRESULT* pResult)
 	{	
 		// check for current rule selection
 		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// get index of first selection
 			int iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -647,7 +647,7 @@ void CAddRuleDlg::OnDblclkListRules(NMHDR* pNMHDR, LRESULT* pResult)
 			{
 				// retrieve current rule
 				IObjectWithDescriptionPtr ipRule = m_ipAMRulesVector->At(iIndex);
-				ASSERT_RESOURCE_ALLOCATION("ELI16037", ipRule != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI16037", ipRule != __nullptr);
 
 				// handle the double click
 				VARIANT_BOOL vbDirty = m_ipMiscUtils->HandlePlugInObjectDoubleClick(ipRule,
@@ -741,7 +741,7 @@ void CAddRuleDlg::OnOK()
 		// First check to see that if the Attribute Finding Rule needs to be 
 		// configured, it has been configured
 		IMustBeConfiguredObjectPtr	ipConfiguredObj = m_ipAFRule;
-		if (ipConfiguredObj != NULL)
+		if (ipConfiguredObj != __nullptr)
 		{
 			// Has object been configured yet?
 			if (ipConfiguredObj->IsConfigured() == VARIANT_FALSE)
@@ -782,7 +782,7 @@ void CAddRuleDlg::OnOK()
 		////////////////////
 		// Save the settings
 		////////////////////
-		if (m_ipRule != NULL)
+		if (m_ipRule != __nullptr)
 		{
 			// Store the rule description
 			_bstr_t	bstrDesc = LPCTSTR(m_zDescription);
@@ -887,7 +887,7 @@ void CAddRuleDlg::OnRclickListRules(NMHDR* pNMHDR, LRESULT* pResult)
 		{
 			int iIndex = -1;
 			POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-			if (pos != NULL)
+			if (pos != __nullptr)
 			{
 				// Get index of first selection
 				iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -969,7 +969,7 @@ void CAddRuleDlg::OnRclickEditPreprocessor(NMHDR* pNMHDR, LRESULT* pResult)
 		UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
 		UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 
-		if (m_ipDocPreprocessor == NULL)
+		if (m_ipDocPreprocessor == __nullptr)
 		{
 			// No Rule defined, therefore no Preprocessor
 			pContextMenu->EnableMenuItem(ID_EDIT_CUT, nDisable);
@@ -1199,7 +1199,7 @@ void CAddRuleDlg::deleteMarkedRules()
 	}
 
 	// Check vector of AM Rules
-	if (m_ipAMRulesVector == NULL)
+	if (m_ipAMRulesVector == __nullptr)
 	{
 		// Throw exception, AM Rules not defined
 		throw UCLIDException( "ELI05521", "Attribute Modifying Rules are not defined!" );
@@ -1236,14 +1236,14 @@ UCLID_AFCORELib::IAttributeFindingRulePtr CAddRuleDlg::getObjectFromName(string 
 		return ipComponent;
 	}
 	
-	// Not found in map, just return NULL
-	return NULL;
+	// Not found in map, just return __nullptr
+	return __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::markSelectedRules() 
 {
 	POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-	if (pos != NULL)
+	if (pos != __nullptr)
 	{
 		// Get index of first selection
 		int iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -1266,7 +1266,7 @@ void CAddRuleDlg::populateCombo()
 	UCLID_COMUTILSLib::ICategoryManagerPtr ipCategoryMgr( 
 		__uuidof(CategoryManager) );
 
-	if (ipCategoryMgr != NULL)
+	if (ipCategoryMgr != __nullptr)
 	{
 		_bstr_t	bstrCategory( AFAPI_VALUE_FINDERS_CATEGORYNAME.c_str() );
 		m_ipAFRulesMap = ipCategoryMgr->GetDescriptionToProgIDMap2( bstrCategory, 
@@ -1326,7 +1326,7 @@ void CAddRuleDlg::setButtonStates()
 {
 	// Check modify flag
 	CButton*	pButton = (CButton *)GetDlgItem( IDC_CHECK_MODIFY );
-	if (pButton != NULL)
+	if (pButton != __nullptr)
 	{
 		if (pButton->GetCheck() != 1)
 		{
@@ -1360,7 +1360,7 @@ void CAddRuleDlg::setButtonStates()
 				// Next have to see if an item is selected
 				int iIndex = -1;
 				POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-				if (pos != NULL)
+				if (pos != __nullptr)
 				{
 					// Get index of first selection
 					iIndex = m_listRules.GetNextSelectedItem( pos );
@@ -1436,7 +1436,7 @@ void CAddRuleDlg::setButtonStates()
 	ISpecifyPropertyPagesPtr ipConfiguredObj(m_ipAFRule);
 
 	// Check for selected Value Finding Rule
-	if (m_comboRule.GetCurSel() == -1 || ipConfiguredObj == NULL)
+	if (m_comboRule.GetCurSel() == -1 || ipConfiguredObj == __nullptr)
 	{
 		// Disable this Configure button
 		m_btnConRule2.EnableWindow(FALSE);
@@ -1454,7 +1454,7 @@ void CAddRuleDlg::setButtonStates()
 void CAddRuleDlg::setDescription() 
 {
 	// Retrieve description from AttributeRule
-	if (m_ipRule != NULL)
+	if (m_ipRule != __nullptr)
 	{
 		_bstr_t	bstrDesc = m_ipRule->GetDescription();
 
@@ -1468,11 +1468,11 @@ void CAddRuleDlg::setDescription()
 void CAddRuleDlg::setPreprocessor() 
 {
 	// Retrieve Document Preprocessor from Rule
-	if (m_ipRule != NULL)
+	if (m_ipRule != __nullptr)
 	{
 		// Retrieve Object With Description
 		m_ipDocPreprocessor = m_ipRule->RuleSpecificDocPreprocessor;
-		ASSERT_RESOURCE_ALLOCATION( "ELI13947", m_ipDocPreprocessor != NULL)
+		ASSERT_RESOURCE_ALLOCATION( "ELI13947", m_ipDocPreprocessor != __nullptr)
 
 		// update controls
 		updatePreprocessorCheckBoxAndEditControl();
@@ -1482,17 +1482,17 @@ void CAddRuleDlg::setPreprocessor()
 void CAddRuleDlg::setAFRule() 
 {
 	// Retrieve the Attribute Finding Rule
-	if (m_ipRule != NULL)
+	if (m_ipRule != __nullptr)
 	{
 		m_ipAFRule = m_ipRule->GetAttributeFindingRule();
 	}
 
 	// Set the combo box selection
-	if (m_ipAFRule != NULL)
+	if (m_ipAFRule != __nullptr)
 	{
 		// Get Component Description of the rule
 		ICategorizedComponentPtr	ipComponent( m_ipAFRule );
-		if (ipComponent != NULL)
+		if (ipComponent != __nullptr)
 		{
 			_bstr_t	bstrCompDesc = ipComponent->GetComponentDescription();
 			string	strActualName( bstrCompDesc );
@@ -1514,7 +1514,7 @@ void CAddRuleDlg::setAFRule()
 			m_comboRule.GetLBText( 0, zName );
 
 			m_ipAFRule = getObjectFromName( LPCTSTR(zName) );
-			if (m_ipAFRule == NULL)
+			if (m_ipAFRule == __nullptr)
 			{
 				// Create and throw an exception
 				UCLIDException	ue( "ELI04360", "Cannot find Attribute Finding Rule!");
@@ -1531,7 +1531,7 @@ void CAddRuleDlg::setAFRule()
 void CAddRuleDlg::setAMRules() 
 {
 	// First make sure that the Attribute Rule is defined
-	if (m_ipRule == NULL)
+	if (m_ipRule == __nullptr)
 	{
 		return;
 	}
@@ -1542,7 +1542,7 @@ void CAddRuleDlg::setAMRules()
 
 	int iCount = 0;
 	int iIndex = -1;
-	if (m_ipAMRulesVector != NULL)
+	if (m_ipAMRulesVector != __nullptr)
 	{
 		// Get count
 		iCount = m_ipAMRulesVector->Size();
@@ -1554,7 +1554,7 @@ void CAddRuleDlg::setAMRules()
 			IObjectWithDescriptionPtr ipObj = 
 				m_ipAMRulesVector->At( i );
 
-			if (ipObj != NULL)
+			if (ipObj != __nullptr)
 			{
 				// Get the description
 				_bstr_t	bstrText = ipObj->GetDescription();
@@ -1595,7 +1595,7 @@ void CAddRuleDlg::showReminder()
 
 	// Check configured state of Attribute Finding Rule
 	IMustBeConfiguredObjectPtr	ipConfiguredObj = m_ipAFRule;
-	if (ipConfiguredObj != NULL)
+	if (ipConfiguredObj != __nullptr)
 	{
 		// Has object been configured yet?
 		if (ipConfiguredObj->IsConfigured() == VARIANT_FALSE)

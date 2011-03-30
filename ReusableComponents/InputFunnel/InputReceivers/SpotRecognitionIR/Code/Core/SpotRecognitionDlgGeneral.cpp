@@ -99,21 +99,21 @@ SpotRecognitionDlg::SpotRecognitionDlg(IInputEntityManager *pInputEntityManager,
 		m_mapPageToViews.clear();
 
 		m_ipTempRasterZone.CreateInstance(__uuidof(RasterZone));
-		ASSERT_RESOURCE_ALLOCATION("ELI03392", m_ipTempRasterZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI03392", m_ipTempRasterZone != __nullptr);
 
 		// create a registry config mgr
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr(HKEY_CURRENT_USER,
 			gstrREG_ROOT_KEY + "\\InputFunnel\\InputReceivers"));
 
 		// create config mgr to store SRIR stuff
-		ma_pSRIRCfgMgr = auto_ptr<ConfigMgrSRIR>(new ConfigMgrSRIR(ma_pUserCfgMgr.get(), "\\SpotRecIR"));
+		ma_pSRIRCfgMgr = unique_ptr<ConfigMgrSRIR>(new ConfigMgrSRIR(ma_pUserCfgMgr.get(), "\\SpotRecIR"));
 
 		// Create the MRU List object
-		ma_pRecentFiles = auto_ptr<MRUList>(new MRUList(ma_pUserCfgMgr.get(), "\\SpotRecIR\\MRUList", "File_%d", 8));
+		ma_pRecentFiles = unique_ptr<MRUList>(new MRUList(ma_pUserCfgMgr.get(), "\\SpotRecIR\\MRUList", "File_%d", 8));
 
 		// create GDDFileManager
-		ma_pGDDFileManager = auto_ptr<GDDFileManager>(new GDDFileManager(this));
+		ma_pGDDFileManager = unique_ptr<GDDFileManager>(new GDDFileManager(this));
 		
 		// add this instance of the dialog to the list of alive instances
 		ms_vecInstances.push_back(this);
@@ -258,7 +258,7 @@ void SpotRecognitionDlg::addCurrentViewToStack(bool bRightBeforeRotation)
 //-------------------------------------------------------------------------------------------------
 void SpotRecognitionDlg::createToolBar()
 {
-	m_apToolBar = auto_ptr<SpotRecDlgToolBar>(new SpotRecDlgToolBar());
+	m_apToolBar = unique_ptr<SpotRecDlgToolBar>(new SpotRecDlgToolBar());
 
 	if (m_apToolBar->CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
     | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) )
@@ -421,12 +421,12 @@ void SpotRecognitionDlg::configureToolBarButtonsAndUGD()
 	// enable the recognize-paragraph-text button only if at least one
 	// paragraph text handler has been specified
 	m_apToolBar->GetToolBarCtrl().EnableButton(IDC_BTN_RecognizeTextAndProcess,
-		bEnableImageDependentButtons && m_ipParagraphTextHandlers != NULL &&
+		bEnableImageDependentButtons && m_ipParagraphTextHandlers != __nullptr &&
 		m_ipParagraphTextHandlers->Size() > 0 && m_bAutoOCR);
 
 	// enable the open sub image button if sub image handler has been set
 	m_apToolBar->GetToolBarCtrl().EnableButton(IDC_BTN_OPENSUBIMAGE, 
-		bEnableImageDependentButtons && m_ipSubImageHandler != NULL);
+		bEnableImageDependentButtons && m_ipSubImageHandler != __nullptr);
 
 	// enable the page navigation buttons only if the currently loaded image is a multi-page
 	// image.
@@ -912,7 +912,7 @@ void SpotRecognitionDlg::setCurrentTool(ETool eTool)
 			m_apToolBar->GetToolBarCtrl().PressButton(IDC_BTN_RecognizeTextAndProcess, TRUE);
 
 			// ensure that an OCR engine object has been associated with this window
-			if (m_ipOCREngine == NULL)
+			if (m_ipOCREngine == __nullptr)
 			{
 				// reset the tool to be the previous tool, and throw an exception
 				m_eCurrentTool = m_ePreviousTool;
@@ -933,7 +933,7 @@ void SpotRecognitionDlg::setCurrentTool(ETool eTool)
 			m_apToolBar->GetToolBarCtrl().PressButton(IDC_BTN_RecognizeTextAndProcess, TRUE);
 
 			// ensure that an OCR engine object has been associated with this window
-			if (m_ipOCREngine == NULL)
+			if (m_ipOCREngine == __nullptr)
 			{
 				// reset the tool to be the previous tool, and throw an exception
 				m_eCurrentTool = m_ePreviousTool;
@@ -1004,7 +1004,7 @@ void SpotRecognitionDlg::openFile(const string& strFileName)
 			// tiff image (P13 #4416)
 			// first get a spatial string
 			ISpatialStringPtr ipSpatial(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI16813", ipSpatial != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16813", ipSpatial != __nullptr);
 
 			// load the spatial string from the file
 			ipSpatial->LoadFrom(get_bstr_t(strFileName), VARIANT_FALSE);
@@ -1031,7 +1031,7 @@ void SpotRecognitionDlg::openFile(const string& strFileName)
 				m_strFileToBeDeleted = m_strSubImageFileName;
 				m_strSubImageFileName = "";
 				m_bIsCurrentImageAnImagePortion = false;
-				m_ipSubImageZone = NULL;
+				m_ipSubImageZone = __nullptr;
 			}
 
 			// retrieve the name of the file to load, and load the file in the
@@ -1096,7 +1096,7 @@ void SpotRecognitionDlg::openFile(const string& strFileName)
 				}
 
 				// Notify observers of the SpotRecognitionDlg that we opened a file
-				if (m_ipSRWEventHandler != NULL)
+				if (m_ipSRWEventHandler != __nullptr)
 				{
 					// the file we wanted to open is strFileName, what we actually
 					// opened is strFileToOpenName (which is the same, unless strFileName
@@ -1299,7 +1299,7 @@ void SpotRecognitionDlg::initDragOperation(DragOperation *pNewDragOperation)
 //-------------------------------------------------------------------------------------------------
 void SpotRecognitionDlg::releaseCurrentDragOperationMemory()
 {
-	m_apCurrentDragOperation.reset(NULL);
+	m_apCurrentDragOperation.reset(__nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 void SpotRecognitionDlg::gotoPage(long lPageNum)
@@ -1469,12 +1469,12 @@ void SpotRecognitionDlg::fireOnInputReceived(const vector<unsigned long> &vecZon
 
 	// create input entity object
 	IInputEntityPtr ipInputEntity(CLSID_InputEntity);
-	ASSERT_RESOURCE_ALLOCATION("ELI23767", ipInputEntity != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI23767", ipInputEntity != __nullptr);
 	ipInputEntity->InitInputEntity(m_pInputEntityManager, strInputID.c_str());
 
 	// create text input object
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI23768", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI23768", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput(ipInputEntity, strText.c_str());
 
 	// fire the event
@@ -1682,7 +1682,7 @@ BOOL SpotRecognitionDlg::OnToolTipNotify(UINT id, NMHDR *pNMHDR, LRESULT *pResul
 	ASSERT(pNMHDR->code == TTN_NEEDTEXTA || pNMHDR->code == TTN_NEEDTEXTW);
 
      // if there is a top level routing frame then let it handle the message
-     if (GetRoutingFrame() != NULL) return FALSE;
+     if (GetRoutingFrame() != __nullptr) return FALSE;
 
      // to be thorough we will need to handle UNICODE versions of the message also !!
      TOOLTIPTEXTA* pTTTA = (TOOLTIPTEXTA*)pNMHDR;
@@ -1730,7 +1730,7 @@ BOOL SpotRecognitionDlg::OnToolTipNotify(UINT id, NMHDR *pNMHDR, LRESULT *pResul
 //-------------------------------------------------------------------------------------------------
 void SpotRecognitionDlg::getLineTextEvaluator(UCLID_SPOTRECOGNITIONIRLib::ILineTextEvaluator **pLineTextEvaluator)
 {
-	if (m_ipLineTextEvaluator == NULL)
+	if (m_ipLineTextEvaluator == __nullptr)
 	{
 		*pLineTextEvaluator = NULL;
 		return;
@@ -1742,7 +1742,7 @@ void SpotRecognitionDlg::getLineTextEvaluator(UCLID_SPOTRECOGNITIONIRLib::ILineT
 //-------------------------------------------------------------------------------------------------
 void SpotRecognitionDlg::getLineTextCorrector(UCLID_SPOTRECOGNITIONIRLib::ILineTextCorrector **pLineTextCorrector)
 {
-	if (m_ipLineTextCorrector == NULL)
+	if (m_ipLineTextCorrector == __nullptr)
 	{
 		*pLineTextCorrector = NULL;
 		return;
@@ -1754,7 +1754,7 @@ void SpotRecognitionDlg::getLineTextCorrector(UCLID_SPOTRECOGNITIONIRLib::ILineT
 //-------------------------------------------------------------------------------------------------
 void SpotRecognitionDlg::getParagraphTextCorrector(UCLID_SPOTRECOGNITIONIRLib::IParagraphTextCorrector **pParagraphTextCorrector)
 {
-	if (m_ipParagraphTextCorrector == NULL)
+	if (m_ipParagraphTextCorrector == __nullptr)
 	{
 		*pParagraphTextCorrector = NULL;
 		return;
@@ -1766,7 +1766,7 @@ void SpotRecognitionDlg::getParagraphTextCorrector(UCLID_SPOTRECOGNITIONIRLib::I
 //-------------------------------------------------------------------------------------------------
 void SpotRecognitionDlg::getParagraphTextHandlers(IIUnknownVector **pParagraphTextHandlers)
 {
-	if (m_ipParagraphTextHandlers == NULL)
+	if (m_ipParagraphTextHandlers == __nullptr)
 	{
 		*pParagraphTextHandlers = NULL;
 		return;
@@ -1778,7 +1778,7 @@ void SpotRecognitionDlg::getParagraphTextHandlers(IIUnknownVector **pParagraphTe
 //-------------------------------------------------------------------------------------------------
 void SpotRecognitionDlg::getSRWEventHandler(UCLID_SPOTRECOGNITIONIRLib::ISRWEventHandler **pHandler)
 {
-	if (m_ipSRWEventHandler == NULL)
+	if (m_ipSRWEventHandler == __nullptr)
 	{
 		*pHandler = NULL;
 		return;
@@ -1792,7 +1792,7 @@ void SpotRecognitionDlg::getSubImageHandler(UCLID_SPOTRECOGNITIONIRLib::ISubImag
 											BSTR *pstrToolbarBtnTooltip,
 											BSTR *pstrTrainingFile)
 {
-	if (m_ipSubImageHandler == NULL)
+	if (m_ipSubImageHandler == __nullptr)
 	{
 		*pHandler = NULL;
 		return;
@@ -1821,7 +1821,7 @@ void SpotRecognitionDlg::setParagraphTextCorrector(IParagraphTextCorrector *pPar
 //-------------------------------------------------------------------------------------------------
 void SpotRecognitionDlg::clearParagraphTextHandlers()
 {
-	m_ipParagraphTextHandlers = NULL;
+	m_ipParagraphTextHandlers = __nullptr;
 	configureToolBarButtonsAndUGD();
 }
 //-------------------------------------------------------------------------------------------------
@@ -1870,13 +1870,13 @@ void SpotRecognitionDlg::setSubImageHandler(ISubImageHandler *pHandler,
 void SpotRecognitionDlg::getImagePortion(IRasterZone **pRasterZone)
 {
 	// if current image is not a portion of an image
-	if (!m_bIsCurrentImageAnImagePortion || m_ipSubImageZone == NULL)
+	if (!m_bIsCurrentImageAnImagePortion || m_ipSubImageZone == __nullptr)
 	{
 		throw UCLIDException("ELI03288", "Current image is not a portion of a image.");
 	}
 
 	IRasterZonePtr ipRasterZone(m_ipSubImageZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI17022", ipRasterZone != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI17022", ipRasterZone != __nullptr);
 	*pRasterZone = ipRasterZone.Detach();
 }
 //-------------------------------------------------------------------------------------------------
@@ -1959,7 +1959,7 @@ void SpotRecognitionDlg::openFile2(const std::string& strFileToOpen)
 	// make sure that the image is not already open in another ImageRecognitionDlg window
 /*
 	SpotRecognitionDlg *pDlgInstance = getDlgInstanceWithImage(strFileToOpen);
-	if (pDlgInstance != NULL)
+	if (pDlgInstance != __nullptr)
 	{
 		// force a repaint of the window as it may need repainting
 		pDlgInstance->RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW 
@@ -2079,7 +2079,7 @@ ISpatialStringPtr SpotRecognitionDlg::recognizeParagraphTextInImage(
 	{
 		// create the ipProgressStatus object
 		ipProgressStatus.CreateInstance(CLSID_ProgressStatus);
-		ASSERT_RESOURCE_ALLOCATION("ELI16823", ipProgressStatus != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16823", ipProgressStatus != __nullptr);
 	}
 /*	
 	// create the progress status dialog object
@@ -2090,7 +2090,7 @@ ISpatialStringPtr SpotRecognitionDlg::recognizeParagraphTextInImage(
 	{
 		// create a progress status dialog object
 		ipProgressStatusDlg.CreateInstance(CLSID_ProgressStatusDialog);
-		ASSERT_RESOURCE_ALLOCATION("ELI16824", ipProgressStatusDlg != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16824", ipProgressStatusDlg != __nullptr);
 
 		// show the progress status dialog
 		ipProgressStatusDlg->ShowModelessDialog((long)m_hWnd, 
@@ -2107,12 +2107,12 @@ ISpatialStringPtr SpotRecognitionDlg::recognizeParagraphTextInImage(
 	// if the method call returns a FAILED HRESULT or if the method throws
 	// an exception, we are to understand that paragraph text recognition is not
 	// to be performed.
-	if (m_ipSRWEventHandler != NULL && FAILED(m_ipSRWEventHandler->AboutToRecognizeParagraphText()))
+	if (m_ipSRWEventHandler != __nullptr && FAILED(m_ipSRWEventHandler->AboutToRecognizeParagraphText()))
 	{
 		throw UCLIDException("ELI06542", "Cannot perform paragraph text recognition!");
 	}
 
-	ISpatialStringPtr ipText = NULL;
+	ISpatialStringPtr ipText = __nullptr;
 	if(!pRect)
 	{
 		// perform recognition and get spatial information
@@ -2124,14 +2124,14 @@ ISpatialStringPtr SpotRecognitionDlg::recognizeParagraphTextInImage(
 	else
 	{
 		ILongRectanglePtr ipRect(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI10667", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10667", ipRect != __nullptr);
 		ipRect->SetBounds(pRect->left, pRect->top, pRect->right, pRect->bottom);
 
 		ipText = m_ipOCREngine->RecognizeTextInImageZone(_bstr_t(strImageFileName.c_str()), 
 			lStartPage, lEndPage, ipRect, 0, kNoFilter, "", VARIANT_FALSE, VARIANT_FALSE, 
 			VARIANT_TRUE, ipProgressStatus);
 	}
-	ASSERT_RESOURCE_ALLOCATION("ELI06541", ipText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06541", ipText != __nullptr);
 
 	// if a paragraph text corrector has been specified, use it to
 	// correct the recognized text.
@@ -2180,7 +2180,7 @@ void SpotRecognitionDlg::processImageForParagraphText(const string& strImageFile
 	ipPTH = m_ipParagraphTextHandlers->At(m_nLastSelectedPTHIndex);
 	
 	// If we wrote the code correctly, ipPTH should never be NULL
-	if (ipPTH == NULL)
+	if (ipPTH == __nullptr)
 	{
 		THROW_LOGIC_ERROR_EXCEPTION("ELI06540");
 	}
@@ -2188,7 +2188,7 @@ void SpotRecognitionDlg::processImageForParagraphText(const string& strImageFile
 	// get access to the COM object wrapping this CDialog class
 	UCLID_SPOTRECOGNITIONIRLib::ISpotRecognitionWindowPtr ipSRIR;
 	ipSRIR = m_pInputEntityManager;
-	ASSERT_RESOURCE_ALLOCATION("ELI06543", ipSRIR != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06543", ipSRIR != __nullptr);
 
 	// send the recognized text to the paragraph text handler
 	ipPTH->NotifyParagraphTextRecognized(ipSRIR, ipText);
@@ -2210,7 +2210,7 @@ string SpotRecognitionDlg::createSubImage(const std::string& strOriginalImageFil
 										  IRasterZone* pImagePortionInfo, double dRotationAngle)
 {
 	// Validate Raster Zone
-	ASSERT_ARGUMENT("ELI15837", pImagePortionInfo != NULL);
+	ASSERT_ARGUMENT("ELI15837", pImagePortionInfo != __nullptr);
 
 	// Make sure that if the original image is pdf, PDF support is licensed
 	LicenseManagement::sGetInstance().verifyFileTypeLicensed( strOriginalImageFileName );
@@ -2355,7 +2355,7 @@ IRasterZonePtr SpotRecognitionDlg::getOCRZone(long lID)
 
 	// determine offset in the current image if the current image is a subimage
 	long nOffsetX = 0, nOffsetY = 0;
-	if (m_bIsCurrentImageAnImagePortion && m_ipSubImageZone != NULL)
+	if (m_bIsCurrentImageAnImagePortion && m_ipSubImageZone != __nullptr)
 	{
 		nOffsetX = m_ipSubImageZone->StartX;
 		nOffsetY = m_ipSubImageZone->StartY - m_ipSubImageZone->Height / 2;
@@ -2363,7 +2363,7 @@ IRasterZonePtr SpotRecognitionDlg::getOCRZone(long lID)
 
 	// create a new raster zone object
 	IRasterZonePtr ipRasterZone(CLSID_RasterZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI03324", ipRasterZone != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI03324", ipRasterZone != __nullptr);
 
 	// populate the raster zone object with the parameters
 	ipRasterZone->StartX = nStartPosX + nOffsetX;
@@ -2384,7 +2384,7 @@ long SpotRecognitionDlg::createZoneEntity(IRasterZone *pZone, long nColor)
 {
 	// ensure proper argument
 	IRasterZonePtr ipZone(pZone);
-	ASSERT_ARGUMENT("ELI06559", ipZone != NULL);
+	ASSERT_ARGUMENT("ELI06559", ipZone != __nullptr);
 
 	// get the individual attributes of the raster zone into long's
 	long nStartX, nStartY, nEndX, nEndY, nHeight, nPageNum;
@@ -2431,7 +2431,7 @@ void SpotRecognitionDlg::zoomAroundZoneEntity(long nID)
 
 	// build a rasterzone object corresponding to the entity
 	IRasterZonePtr ipZone(CLSID_RasterZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI06575", ipZone != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06575", ipZone != __nullptr);
 	ipZone->StartX = nStartX;
 	ipZone->StartY = nStartY;
 	ipZone->EndX = nEndX;
@@ -2446,7 +2446,7 @@ void SpotRecognitionDlg::zoomAroundZoneEntity(long nID)
 	// is always contained on the page. Therefore, the rectangular bounds don't need
 	// to be validated.
 	ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(NULL);
-	ASSERT_RESOURCE_ALLOCATION("ELI06578", ipBounds != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06578", ipBounds != __nullptr);
 
 	long nCenterX = (ipBounds->Left + ipBounds->Right) / 2;
 	long nCenterY = (ipBounds->Top + ipBounds->Bottom) / 2;
@@ -2462,7 +2462,7 @@ void SpotRecognitionDlg::createTemporaryHighlight(ISpatialString *pText)
 {
 	// verify valid argument
 	ISpatialStringPtr ipText(pText);
-	ASSERT_RESOURCE_ALLOCATION("ELI06580", ipText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06580", ipText != __nullptr);
 
 	// delete the previously created zone entity if any
 	deleteTemporaryHighlight();
@@ -2483,20 +2483,20 @@ void SpotRecognitionDlg::createTemporaryHighlight(ISpatialString *pText)
 
 	// divide the text into multiple lines
 	IIUnknownVectorPtr ipLines = ipText->GetLines();
-	ASSERT_RESOURCE_ALLOCATION("ELI09210", ipLines != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09210", ipLines != __nullptr);
 
 	// Create temporary highlights for the lines
 	createTemporaryHighlightsForLines( ipLines );
 
 	// Get a raster Zone for the Entire Text that we can zoom around
 	IIUnknownVectorPtr ipZones = ipText->GetOriginalImageRasterZones();
-	ASSERT_RESOURCE_ALLOCATION("ELI09307", ipZones != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09307", ipZones != __nullptr);
 
 	if(ipZones->Size() > 0)
 	{
 		
 		IRasterZonePtr ipZone = ipZones->At(0);
-		ASSERT_RESOURCE_ALLOCATION("ELI09535", ipZone != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09535", ipZone != __nullptr);
 
 		// get the rectangular bounds of the raster zone and the
 		// center of the rectangle
@@ -2505,7 +2505,7 @@ void SpotRecognitionDlg::createTemporaryHighlight(ISpatialString *pText)
 		// is always contained on the page. Therefore, the rectangular bounds don't need
 		// to be validated.
 		ILongRectanglePtr ipRect = ipZone->GetRectangularBounds(NULL);
-		ASSERT_RESOURCE_ALLOCATION("ELI19888", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19888", ipRect != __nullptr);
 		long lLeft, lTop, lRight, lBottom;
 		ipRect->GetBounds(&lLeft, &lTop, &lRight, &lBottom);
 		
@@ -2527,7 +2527,7 @@ void SpotRecognitionDlg::addTemporaryHighlight( long nStartX, long nStartY,
 	BOOL bDocModified = m_UCLIDGenericDisplayCtrl.documentIsModified();
 
 	IRasterZonePtr ipRasterZone(CLSID_RasterZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI12077", ipRasterZone != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI12077", ipRasterZone != __nullptr);
 
 	ipRasterZone->StartX = nStartX;
 	ipRasterZone->StartY = nStartY;
@@ -2739,7 +2739,7 @@ IProgressStatusPtr SpotRecognitionDlg::getShowOCRProgress(long nRecArea)
 	if (nPercent > gnNoProgessDisplayPercentageThreshold)
 	{
 		ipProgress.CreateInstance(CLSID_ProgressStatus);
-		ASSERT_RESOURCE_ALLOCATION("ELI16825", ipProgress != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16825", ipProgress != __nullptr);
 	}
 	
 	return ipProgress;
@@ -2918,7 +2918,7 @@ void SpotRecognitionDlg::createTemporaryHighlightsForLines(IIUnknownVectorPtr ip
 	for (long n=0; n<nSize; n++)
 	{
 		ISpatialStringPtr ipLine = ipLines->At(n);
-		ASSERT_RESOURCE_ALLOCATION("ELI09211", ipLine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09211", ipLine != __nullptr);
 
 		// only get bounds on the string that's spatial
 		if (ipLine->HasSpatialInfo() == VARIANT_FALSE)
@@ -2930,7 +2930,7 @@ void SpotRecognitionDlg::createTemporaryHighlightsForLines(IIUnknownVectorPtr ip
 
 		// Get the raster Zone(s) for this line
 		IIUnknownVectorPtr ipRasterZones = ipLine->GetOriginalImageRasterZones();
-		ASSERT_RESOURCE_ALLOCATION("ELI09212", ipRasterZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09212", ipRasterZones != __nullptr);
 
 		if(ipRasterZones->Size() <= 0)
 		{
@@ -2945,7 +2945,7 @@ void SpotRecognitionDlg::createTemporaryHighlightsForLines(IIUnknownVectorPtr ip
 		for (long x = 0; x < nZones; x++)
 		{
 			IRasterZonePtr ipRasterZone = ipRasterZones->At(x);
-			ASSERT_RESOURCE_ALLOCATION("ELI09213", ipRasterZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09213", ipRasterZone != __nullptr);
 
 			// create the zone entity
 			long nTempHighlightEntityID = createZoneEntity(

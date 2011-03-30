@@ -488,7 +488,7 @@ bool windowIsAncestorWindowOf(HWND hPotentialChild, HWND hParent)
 		else
 			hPotentialChild = hTemp;
 	}
-	while (hTemp != NULL);
+	while (hTemp != __nullptr);
 
 	// none of the ancestor windows is the specified parent window
 	return false;
@@ -518,7 +518,7 @@ HWND windowHasAncestorOfClass(HWND hChild, const char *pszWindowClassName)
 		else
 			hChild = hTemp;
 	}
-	while (hTemp != NULL);
+	while (hTemp != __nullptr);
 
 	// none of the ancestor windows was of the given class name, so return NULL.
 	return NULL;
@@ -1081,7 +1081,7 @@ void DragDropFinisher::finish()
 WindowDisabler::WindowDisabler(HWND hWnd)
 : m_hWnd(hWnd)
 {
-	if (m_hWnd != NULL)
+	if (m_hWnd != __nullptr)
 	{
 		::EnableWindow(m_hWnd, FALSE);
 	}
@@ -1091,7 +1091,7 @@ WindowDisabler::~WindowDisabler()
 {
 	try
 	{
-		if (m_hWnd != NULL)
+		if (m_hWnd != __nullptr)
 		{
 			::EnableWindow(m_hWnd, TRUE);
 		}

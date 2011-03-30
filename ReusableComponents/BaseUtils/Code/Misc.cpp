@@ -249,12 +249,12 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 				static CMutex mutex;
 				CSingleLock lg(&mutex, TRUE );
 
-				static auto_ptr<IConfigurationSettingsPersistenceMgr> pSettings(NULL);
-				if (pSettings.get() == NULL)
+				static unique_ptr<IConfigurationSettingsPersistenceMgr> pSettings(__nullptr);
+				if (pSettings.get() == __nullptr)
 				{
-					pSettings = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+					pSettings = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 						new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-					ASSERT_RESOURCE_ALLOCATION("ELI08827", pSettings.get() != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI08827", pSettings.get() != __nullptr);
 				}
 
 				// check if the registry key for auto-encrypt exists.
@@ -299,7 +299,7 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 			// Use a temporary file alongside the target etf file to use a flag that the file is currently
 			// being encrypted.
 			{
-				auto_ptr<TemporaryFileName> apTempFile(NULL);
+				unique_ptr<TemporaryFileName> upTempFile(__nullptr);
 
 				// If there is a temporary encryption file it means the file is currently being encrypted.
 				// Wait up to 20 seconds for the file to go away.
@@ -312,7 +312,7 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 						try
 						{
 							// Create the temporary file
-							apTempFile.reset(new TemporaryFileName(strTempEncryptionFile));
+							upTempFile.reset(new TemporaryFileName(strTempEncryptionFile));
 
 							// Temporary file was created, break from the loop
 							// (this skips the sleep statement below)
@@ -320,7 +320,7 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 						}
 						catch (...)
 						{
-							apTempFile.reset(NULL);
+							upTempFile.reset(__nullptr);
 						}
 					}
 

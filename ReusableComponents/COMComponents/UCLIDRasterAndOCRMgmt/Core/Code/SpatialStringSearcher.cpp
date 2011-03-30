@@ -191,7 +191,7 @@ STDMETHODIMP CSpatialStringSearcher::InitSpatialStringSearcher(ISpatialString* p
 	{
 		// Ensure the new spatial string is not NULL
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSpatialString(pSpatialString);
-		ASSERT_ARGUMENT("ELI25663", ipSpatialString != NULL);
+		ASSERT_ARGUMENT("ELI25663", ipSpatialString != __nullptr);
 
 		validateLicense();
 
@@ -230,7 +230,7 @@ STDMETHODIMP CSpatialStringSearcher::GetDataInRegion(ILongRectangle *ipRect,
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25606", ipReturnString != NULL);
+		ASSERT_ARGUMENT("ELI25606", ipReturnString != __nullptr);
 
 		validateLicense();
 
@@ -251,7 +251,7 @@ STDMETHODIMP CSpatialStringSearcher::GetDataInRegion(ILongRectangle *ipRect,
 		// Build the SpatialString
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipNewStr =
 			createStringFromLetterIndexes(inLetters);
-		ASSERT_RESOURCE_ALLOCATION("ELI19896", ipNewStr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19896", ipNewStr != __nullptr);
 
 		// Return the string
 		*ipReturnString = (ISpatialString*) ipNewStr.Detach();
@@ -267,8 +267,8 @@ STDMETHODIMP CSpatialStringSearcher::GetDataOutOfRegion(ILongRectangle *ipRect, 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25890", ipRect != NULL);
-		ASSERT_ARGUMENT("ELI25891", ipReturnString != NULL);
+		ASSERT_ARGUMENT("ELI25890", ipRect != __nullptr);
+		ASSERT_ARGUMENT("ELI25891", ipReturnString != __nullptr);
 
 		validateLicense();
 
@@ -307,7 +307,7 @@ STDMETHODIMP CSpatialStringSearcher::GetDataOutOfRegion(ILongRectangle *ipRect, 
 		// Build the SpatialString
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipNewStr =
 			createStringFromLetterIndexes(outLetters);
-		ASSERT_RESOURCE_ALLOCATION("ELI25892", ipNewStr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25892", ipNewStr != __nullptr);
 
 		*ipReturnString = (ISpatialString*) ipNewStr.Detach();
 
@@ -323,12 +323,12 @@ STDMETHODIMP CSpatialStringSearcher::ExtendDataInRegion(ILongRectangle *pRect,
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29540", ppFound != NULL);
+		ASSERT_ARGUMENT("ELI29540", ppFound != __nullptr);
 
 		validateLicense();
 
 		ILongRectanglePtr ipRect(pRect);
-		ASSERT_RESOURCE_ALLOCATION("ELI29541", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29541", ipRect != __nullptr);
 
 		// Get a vector of all the letters that fall in the region
 		vector<int> vecLetters;		
@@ -357,7 +357,7 @@ STDMETHODIMP CSpatialStringSearcher::ExtendDataInRegion(ILongRectangle *pRect,
 		// Build the SpatialString
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFound =	
 			createStringFromLetterIndexes(vecLetters, asCppBool(vbExtendHeight));
-		ASSERT_RESOURCE_ALLOCATION("ELI29542", ipFound != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29542", ipFound != __nullptr);
 
 		// Return the string
 		*ppFound = (ISpatialString*) ipFound.Detach();
@@ -373,9 +373,9 @@ STDMETHODIMP CSpatialStringSearcher::GetLeftWord(ILongRectangle *pRect, ISpatial
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI31665", ppReturnString != NULL);
+		ASSERT_ARGUMENT("ELI31665", ppReturnString != __nullptr);
 		ILongRectanglePtr ipRect(pRect);
-		ASSERT_ARGUMENT("ELI31666", ipRect != NULL);
+		ASSERT_ARGUMENT("ELI31666", ipRect != __nullptr);
 
 		validateLicense();
 
@@ -449,9 +449,9 @@ STDMETHODIMP CSpatialStringSearcher::GetRightWord(ILongRectangle *pRect, ISpatia
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI31672", ppReturnString != NULL);
+		ASSERT_ARGUMENT("ELI31672", ppReturnString != __nullptr);
 		ILongRectanglePtr ipRect(pRect);
-		ASSERT_ARGUMENT("ELI31673", ipRect != NULL);
+		ASSERT_ARGUMENT("ELI31673", ipRect != __nullptr);
 
 		validateLicense();
 
@@ -622,7 +622,7 @@ void CSpatialStringSearcher::createLocalLetters()
 		long numLetters;
 		CPPLetter* pLetters = NULL;
 		m_ipSpatialString->GetOCRImageLetterArray(&numLetters, (void**)&pLetters);
-		ASSERT_RESOURCE_ALLOCATION("ELI25990", pLetters != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25990", pLetters != __nullptr);
 
 		// Copy the letters to a local vector
 		vecCppLetters.resize(numLetters);
@@ -845,7 +845,7 @@ void CSpatialStringSearcher::getUnsortedLettersInRegion(ILongRectanglePtr ipRect
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI25615", ipRect != NULL);
+		ASSERT_ARGUMENT("ELI25615", ipRect != __nullptr);
 		long lLeft, lTop, lRight, lBottom;
 		ipRect->GetBounds(&lLeft, &lTop, &lRight, &lBottom);
 		LocalEntity region(lLeft, lTop, lRight, lBottom);
@@ -1077,7 +1077,7 @@ void CSpatialStringSearcher::insertNonSpatialCharacter(char c, long flags, vecto
 void CSpatialStringSearcher::rotateRectangle(ILongRectanglePtr ipRect)
 {
 	// Validate smart pointer
-	ASSERT_ARGUMENT("ELI16739", ipRect != NULL);
+	ASSERT_ARGUMENT("ELI16739", ipRect != __nullptr);
 
 	if (m_ipSpatialString->HasSpatialInfo())
 	{
@@ -1085,7 +1085,7 @@ void CSpatialStringSearcher::rotateRectangle(ILongRectanglePtr ipRect)
 		// and associated SpatialPageInfo
 		long nPageNum = m_ipSpatialString->GetFirstPageNumber();
 		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipInfo = m_ipSpatialString->GetPageInfo(nPageNum);
-		ASSERT_RESOURCE_ALLOCATION("ELI16740", ipInfo != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16740", ipInfo != __nullptr);
 
 		// Get the page info
 		UCLID_RASTERANDOCRMGMTLib::EOrientation eOrientation;
@@ -1132,7 +1132,7 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialStringSearcher::createStrin
 {
 	// Create a new spatial string that will contain all the data in the region
 	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipNewStr(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI08026", ipNewStr != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08026", ipNewStr != __nullptr);
 
 	// Create a vector of letters that we will use to fill our new spatial string
 	vector<CPPLetter> vecNewLetters;

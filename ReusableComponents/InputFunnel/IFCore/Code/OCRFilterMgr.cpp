@@ -37,7 +37,7 @@ STDMETHODIMP COCRFilterMgr::InterfaceSupportsErrorInfo(REFIID riid)
 // IOCRFilterMgr
 //-------------------------------------------------------------------------------------------------
 COCRFilterMgr::COCRFilterMgr()
-: m_apFilterSchemeDlg(NULL)
+: m_apFilterSchemeDlg(__nullptr)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ OCRFilterSchemesDlg* COCRFilterMgr::getFilterSchemeDlg()
 
 	if (m_apFilterSchemeDlg.get() == NULL)
 	{
-		m_apFilterSchemeDlg = auto_ptr<OCRFilterSchemesDlg>(new OCRFilterSchemesDlg);
+		m_apFilterSchemeDlg = unique_ptr<OCRFilterSchemesDlg>(new OCRFilterSchemesDlg);
 	}
 
 	return m_apFilterSchemeDlg.get();

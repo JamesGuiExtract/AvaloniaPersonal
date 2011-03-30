@@ -68,7 +68,7 @@ STDMETHODIMP CIRUIDisabler::SetInputManager(IInputManager *pInputManager)
 
 		UCLID_INPUTFUNNELLib::IInputManagerPtr ipInputManager(pInputManager);
 		// if the input manager is null, then use the singleton input manager
-		if (ipInputManager == NULL)
+		if (ipInputManager == __nullptr)
 		{
 			// get signleton input manager
 			UCLID_INPUTFUNNELLib::IInputManagerSingletonPtr ipSingleton;

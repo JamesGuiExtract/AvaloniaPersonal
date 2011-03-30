@@ -34,14 +34,14 @@ m_dwSelectedActionID(0),
 m_dwActionSel(0),
 m_ipFPMDB(ipFPMDB)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI29107", m_ipFPMDB != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI29107", m_ipFPMDB != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 SelectActionDlg::~SelectActionDlg()
 {
 	try
 	{
-		m_ipFPMDB = NULL;
+		m_ipFPMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16536");
 }
@@ -114,7 +114,7 @@ BOOL SelectActionDlg::OnInitDialog()
 
 		// Read all actions from the DB
 		IStrToStrMapPtr ipMapActions = m_ipFPMDB->GetActions();
-		ASSERT_RESOURCE_ALLOCATION("ELI29106", ipMapActions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29106", ipMapActions != __nullptr);
 
 		int iSize = ipMapActions->Size;
 		if (iSize > 0)

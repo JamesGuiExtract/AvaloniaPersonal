@@ -13,8 +13,8 @@
 // CFindingRuleConditionPP
 //-------------------------------------------------------------------------------------------------
 CFindingRuleConditionPP::CFindingRuleConditionPP() :
-	m_ipCategoryManager(NULL),
-	m_ipRuleMap(NULL)
+	m_ipCategoryManager(__nullptr),
+	m_ipRuleMap(__nullptr)
 {
 	m_dwTitleID = IDS_TITLEFINDINGRULECONDITIONPP;
 	m_dwHelpFileID = IDS_HELPFILEFINDINGRULECONDITIONPP;
@@ -25,8 +25,8 @@ CFindingRuleConditionPP::~CFindingRuleConditionPP()
 {
 	try
 	{
-		m_ipCategoryManager = NULL;
-		m_ipRuleMap = NULL;
+		m_ipCategoryManager = __nullptr;
+		m_ipRuleMap = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18242");
 }
@@ -51,7 +51,7 @@ LRESULT CFindingRuleConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		// Obtain interface pointer to the IFindingRuleCondition class
 		UCLID_AFCONDITIONSLib::IFindingRuleConditionPtr ipFindingRuleCondition = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI18266", ipFindingRuleCondition != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18266", ipFindingRuleCondition != __nullptr);
 
 		// Initialize controls
 		m_cmbRules = GetDlgItem(IDC_COMBO_OBJ);
@@ -78,10 +78,10 @@ LRESULT CFindingRuleConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM l
 
 		// Select the currently configure rule, if there is one.
 		_bstr_t bstrRuleName;
-		if (ipFindingRuleCondition->AFRule != NULL)
+		if (ipFindingRuleCondition->AFRule != __nullptr)
 		{
 			ICategorizedComponentPtr ipComponent = ipFindingRuleCondition->AFRule;
-			ASSERT_RESOURCE_ALLOCATION("ELI18267", ipComponent != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18267", ipComponent != __nullptr);
 
 			bstrRuleName = ipComponent->GetComponentDescription();
 			m_cmbRules.SelectString(-1, asString(bstrRuleName).c_str());
@@ -96,7 +96,7 @@ LRESULT CFindingRuleConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM l
 
 			// Get a pointer to the selected rule object
 			IAttributeFindingRulePtr ipNewRule = getSelectedAFRule();
-			ASSERT_RESOURCE_ALLOCATION("ELI18310", ipNewRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18310", ipNewRule != __nullptr);
 
 			// Update configuration message/button appropriately
 			updateRequiresConfig(ipNewRule);
@@ -115,7 +115,7 @@ LRESULT CFindingRuleConditionPP::OnSelChangeCombo(WORD wNotifyCode, WORD wID, HW
 	{
 		// Get a pointer to the selected rule object
 		IAttributeFindingRulePtr ipNewRule = getSelectedAFRule();
-		ASSERT_RESOURCE_ALLOCATION("ELI18311", ipNewRule != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18311", ipNewRule != __nullptr);
 
 		// Update configuration message/button appropriately
 		updateRequiresConfig(ipNewRule);
@@ -137,15 +137,15 @@ LRESULT CFindingRuleConditionPP::OnConfigure(WORD wNotifyCode, WORD wID, HWND hW
 	{
 		// Obtain interface pointer to the IFindingRuleCondition class
 		UCLID_AFCONDITIONSLib::IFindingRuleConditionPtr ipFindingRuleCondition = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI18290", ipFindingRuleCondition != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18290", ipFindingRuleCondition != __nullptr);
 
 		// Create the ObjectPropertiesUI object
 		IObjectPropertiesUIPtr ipProperties(CLSID_ObjectPropertiesUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI18286", ipProperties != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18286", ipProperties != __nullptr);
 
 		// Create a copy of the object for configuration
 		ICopyableObjectPtr ipCopyObj(getSelectedAFRule(ipFindingRuleCondition));
-		ASSERT_RESOURCE_ALLOCATION("ELI18287", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18287", ipCopyObj != __nullptr);
 		ICategorizedComponentPtr ipCopy = ipCopyObj->Clone();
 		ASSERT_RESOURCE_ALLOCATION("ELI18314", ipCopy);
 
@@ -156,7 +156,7 @@ LRESULT CFindingRuleConditionPP::OnConfigure(WORD wNotifyCode, WORD wID, HWND hW
 		{
 			// Store the object now the user has applied configuration settings
 			IAttributeFindingRulePtr ipConfiguredRule(ipCopy);
-			ASSERT_RESOURCE_ALLOCATION("ELI18292", ipConfiguredRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18292", ipConfiguredRule != __nullptr);
 
 			ipFindingRuleCondition->AFRule = ipConfiguredRule;
 
@@ -184,10 +184,10 @@ STDMETHODIMP CFindingRuleConditionPP::Apply(void)
 		{
 			// Obtain interface pointer to the IFindingRuleCondition class
 			UCLID_AFCONDITIONSLib::IFindingRuleConditionPtr ipFindingRuleCondition = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI18268", ipFindingRuleCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18268", ipFindingRuleCondition != __nullptr);
 			
 			IAttributeFindingRulePtr ipNewRule = getSelectedAFRule(ipFindingRuleCondition);
-			ASSERT_RESOURCE_ALLOCATION("ELI18313", ipNewRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18313", ipNewRule != __nullptr);
 
 			// Check configuration state of the component
 			if (updateRequiresConfig(ipNewRule) == true)
@@ -222,7 +222,7 @@ STDMETHODIMP CFindingRuleConditionPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI18246", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18246", pbValue != __nullptr);
 
 		try
 		{
@@ -251,7 +251,7 @@ ICategoryManagerPtr CFindingRuleConditionPP::getCategoryManager()
 	{
 		// create category manager object
 		m_ipCategoryManager.CreateInstance(CLSID_CategoryManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI18249", m_ipCategoryManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18249", m_ipCategoryManager != __nullptr);
 	}
 
 	return m_ipCategoryManager;
@@ -273,20 +273,20 @@ IStrToStrMapPtr CFindingRuleConditionPP::getRuleMap()
 		m_ipRuleMap = getCategoryManager()->GetDescriptionToProgIDMap2(AFAPI_VALUE_FINDERS_CATEGORYNAME.c_str(),
 			nIIDCount, pIIDs);
 
-		ASSERT_RESOURCE_ALLOCATION("ELI18250", m_ipRuleMap != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18250", m_ipRuleMap != __nullptr);
 	}
 
 	return m_ipRuleMap;
 }
 //-------------------------------------------------------------------------------------------------
 IAttributeFindingRulePtr CFindingRuleConditionPP::getSelectedAFRule(
-	UCLID_AFCONDITIONSLib::IFindingRuleConditionPtr ipFindingRuleCondition/*= NULL*/)
+	UCLID_AFCONDITIONSLib::IFindingRuleConditionPtr ipFindingRuleCondition/*= __nullptr*/)
 {
-	if (ipFindingRuleCondition == NULL)
+	if (ipFindingRuleCondition == __nullptr)
 	{
 		// If no IFindingRuleConditionPtr was provided, obtain one
 		ipFindingRuleCondition = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI18289", ipFindingRuleCondition != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18289", ipFindingRuleCondition != __nullptr);
 	}
 
 	// Get the currently selected rule
@@ -308,7 +308,7 @@ IAttributeFindingRulePtr CFindingRuleConditionPP::getSelectedAFRule(
 	// If so, just return the object we already have so that we don't throw
 	// away any configuration settings the user may have already applied.
 	ICategorizedComponentPtr ipCurrentComponent = ipFindingRuleCondition->AFRule;
-	if (ipCurrentComponent != NULL && 
+	if (ipCurrentComponent != __nullptr && 
 		strRuleName == asString(ipCurrentComponent->GetComponentDescription()))
 	{
 		return ipFindingRuleCondition->AFRule;
@@ -319,14 +319,14 @@ IAttributeFindingRulePtr CFindingRuleConditionPP::getSelectedAFRule(
 
 	// Create the object
 	IAttributeFindingRulePtr ipAFRule((const char *)bstrProgID);
-	ASSERT_RESOURCE_ALLOCATION("ELI18262", ipAFRule != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI18262", ipAFRule != __nullptr);
 
 	return ipAFRule;
 }
 //-------------------------------------------------------------------------------------------------
 bool CFindingRuleConditionPP::updateRequiresConfig(IAttributeFindingRulePtr ipRule)
 {
-	ASSERT_ARGUMENT("ELI18315", ipRule != NULL);
+	ASSERT_ARGUMENT("ELI18315", ipRule != __nullptr);
 
 	// Enable/Disable the configure button as necessary
 	ISpecifyPropertyPagesPtr ipPP(ipRule);
@@ -334,7 +334,7 @@ bool CFindingRuleConditionPP::updateRequiresConfig(IAttributeFindingRulePtr ipRu
 
 	// Check configuration status
 	IMustBeConfiguredObjectPtr ipRuleConfig(ipRule);
-	if (ipRuleConfig != NULL && ipRuleConfig->IsConfigured() == VARIANT_FALSE)
+	if (ipRuleConfig != __nullptr && ipRuleConfig->IsConfigured() == VARIANT_FALSE)
 	{
 		// Show message to indicate the object needs configuration
 		m_txtMustBeConfigured.ShowWindow(SW_SHOW);	

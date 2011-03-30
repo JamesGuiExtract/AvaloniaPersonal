@@ -65,10 +65,10 @@ STDMETHODIMP CPadValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOr
 		validateLicense();
 
 		IAttributePtr ipAttribute ( pAttribute );
-		ASSERT_RESOURCE_ALLOCATION("ELI09689", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09689", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipValue = ipAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI09690", ipValue!= NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09690", ipValue!= __nullptr );
 
 		long nValueSize = ipValue->Size;
 		if ( nValueSize < m_nRequiredSize )
@@ -107,7 +107,7 @@ STDMETHODIMP CPadValue::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 		
 		UCLID_AFVALUEMODIFIERSLib::IPadValuePtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI09701", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09701", ipSource != __nullptr);
 
 		m_nRequiredSize = ipSource->RequiredSize;
 		m_nPaddingCharacter = ipSource->PaddingCharacter;
@@ -129,7 +129,7 @@ STDMETHODIMP CPadValue::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_PadValue);
-		ASSERT_RESOURCE_ALLOCATION("ELI09683", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09683", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -150,7 +150,7 @@ STDMETHODIMP CPadValue::raw_GetComponentDescription(BSTR * pstrComponentDescript
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19603", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19603", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Pad value").Detach();
 	}

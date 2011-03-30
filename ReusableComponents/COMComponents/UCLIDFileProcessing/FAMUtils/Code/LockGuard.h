@@ -10,7 +10,7 @@ public:
 	// PROMISE: To lock the database. This will call ipDB->LockDB() 
 	LockGuard(T ipDB)
 	{
-		ASSERT_ARGUMENT("ELI19755", ipDB != NULL );
+		ASSERT_ARGUMENT("ELI19755", ipDB != __nullptr );
 		m_ipDB = ipDB;
 
 		// lock the database

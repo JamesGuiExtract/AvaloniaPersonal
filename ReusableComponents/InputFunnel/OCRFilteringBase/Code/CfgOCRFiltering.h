@@ -26,7 +26,7 @@ private:
 	// key name
 	static const std::string LAST_USED_SCHEME;
 
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
 	// gets the current application name. The storage for current ocr
 	// filtering scheme is per-user, per-application base

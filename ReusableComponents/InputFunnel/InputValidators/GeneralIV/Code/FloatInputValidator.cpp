@@ -19,7 +19,7 @@ CFloatInputValidator::CFloatInputValidator()
 	{
 		// Create an instance of DoubleInputValidator
 		m_ipDIV.CreateInstance( __uuidof(DoubleInputValidator) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI03815", m_ipDIV != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI03815", m_ipDIV != __nullptr );
 		
 		// Set appropriate limits
 		setDefaults();
@@ -78,7 +78,7 @@ STDMETHODIMP CFloatInputValidator::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_FloatInputValidator);
-		ASSERT_RESOURCE_ALLOCATION("ELI08367", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08367", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -138,7 +138,7 @@ STDMETHODIMP CFloatInputValidator::Load(IStream *pStream)
 		validateLicense();
 
 		// Reset member variables
-		m_ipDIV = NULL;
+		m_ipDIV = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -194,7 +194,7 @@ STDMETHODIMP CFloatInputValidator::Save(IStream *pStream, BOOL fClearDirty)
 		// write the DoubleInputValidator member object to 
 		// the stream
 		IPersistStreamPtr ipObj = m_ipDIV;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI04684", "Double InputValidator does not support persistence!");
 		}
@@ -258,7 +258,7 @@ STDMETHODIMP CFloatInputValidator::raw_GetComponentDescription(BSTR * pstrCompon
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19620", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19620", pstrComponentDescription != __nullptr)
 
 		// Retrieve definition
 		*pstrComponentDescription = _bstr_t( 
@@ -298,7 +298,7 @@ STDMETHODIMP CFloatInputValidator::raw_GetInputType(BSTR * pstrInputType)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19621", pstrInputType != NULL)
+		ASSERT_ARGUMENT("ELI19621", pstrInputType != __nullptr)
 
 		// Check license
 		validateLicense();

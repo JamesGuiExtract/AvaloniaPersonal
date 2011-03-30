@@ -103,7 +103,7 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
  m_bForceCloseOnComplete(false),
  m_bExceededExecCount(false),
  m_bDBConnectionReady(true),
- m_apDatabaseStatusIconUpdater(NULL),
+ m_apDatabaseStatusIconUpdater(__nullptr),
  m_bStatsOnlyRunning(false),
  m_bProcessingSkippedFiles(false),
  m_bPaused(false),
@@ -116,13 +116,13 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
 		//}}AFX_DATA_INIT
 
 		// check pre-conditions
-		ASSERT_ARGUMENT("ELI15053", pFPMDB != NULL );
-		ASSERT_RESOURCE_ALLOCATION("ELI08925", m_pFileProcMgr != NULL);
+		ASSERT_ARGUMENT("ELI15053", pFPMDB != __nullptr );
+		ASSERT_RESOURCE_ALLOCATION("ELI08925", m_pFileProcMgr != __nullptr);
 
 		m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_PROCESS);
-		ASSERT_RESOURCE_ALLOCATION("ELI14999", m_hIcon != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14999", m_hIcon != __nullptr);
 
-		ma_pCfgMgr = auto_ptr<FileProcessingConfigMgr>(new
+		ma_pCfgMgr = unique_ptr<FileProcessingConfigMgr>(new
 			FileProcessingConfigMgr());
 
 		// create a registry config mgr for the MRU list settings
@@ -150,7 +150,7 @@ FileProcessingDlg::~FileProcessingDlg()
 	try
 	{
 		// delete icon updater
-		m_apDatabaseStatusIconUpdater.reset(NULL);
+		m_apDatabaseStatusIconUpdater.reset(__nullptr);
 
 		// delete other allocated handles
 		if (m_hIcon)
@@ -253,7 +253,7 @@ BOOL FileProcessingDlg::OnInitDialog()
 			createPropertyPages();
 
 			// create the database status icon updater object
-			m_apDatabaseStatusIconUpdater = auto_ptr<DatabaseStatusIconUpdater> 
+			m_apDatabaseStatusIconUpdater = unique_ptr<DatabaseStatusIconUpdater> 
 				(new DatabaseStatusIconUpdater(m_statusBar, gnDB_CONNECTION_STATUS_PANE_ID, this));
 
 			// set the database status icon updater window as the window to receive database status
@@ -405,7 +405,7 @@ void FileProcessingDlg::OnBtnRun()
 
 		// Check whether we are processing skipped files or not
 		UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipRole = ipFPM->FileProcessingMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION("ELI26941", ipRole != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26941", ipRole != __nullptr);
 		m_bProcessingSkippedFiles = asCppBool(ipRole->ProcessSkippedFiles);
 
 		// If the current tab is not one of the log tab or the statistics tab
@@ -607,7 +607,7 @@ void FileProcessingDlg::OnBtnStop()
 
 			// Log a FAM has stopped processing message [LRCAU #5302]
 			UCLID_FILEPROCESSINGLib::IRoleNotifyFAMPtr ipRole(getFPM());
-			ASSERT_RESOURCE_ALLOCATION("ELI25564", ipRole != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25564", ipRole != __nullptr);
 			ipRole->NotifyProcessingCompleted();
 		}
 		else
@@ -830,7 +830,7 @@ void FileProcessingDlg::OnClose()
 		// we are exiting the application at the user's request, regardless
 		// of whether they are saving the current FAM or not. 
 		// it is OK to delete the recovery file
-		if ( m_pFRM != NULL )
+		if ( m_pFRM != __nullptr )
 		{
 			m_pFRM->deleteRecoveryFile();
 		}
@@ -950,7 +950,7 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 		// Cast the wParam objects
 		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStatsNew;
 		ipActionStatsNew.Attach((UCLID_FILEPROCESSINGLib::IActionStatistics *) wParam);
-		ASSERT_RESOURCE_ALLOCATION("ELI15050", ipActionStatsNew != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI15050", ipActionStatsNew != __nullptr );
 
 		// Make sure the Stats page is initialized and enabled
 		if (isPageDisplayed(kStatisticsPage) && m_propStatisticsPage.getInit() )
@@ -963,7 +963,7 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 
 		// If we have new stats, update the status bar and make the new stats the old stats for the
 		// next time the function is called.
-		if( ipActionStatsNew != NULL )
+		if( ipActionStatsNew != __nullptr )
 		{
 			ipActionStatsNew->GetAllStatistics(&m_nNumTotalDocs, &m_nNumPending, 
 				&m_nNumCompletedProcessing, &m_nNumFailed, &m_nNumSkipped,
@@ -1113,7 +1113,7 @@ LRESULT FileProcessingDlg::OnProcessingComplete(WPARAM wParam, LPARAM lParam)
 		{
 			// Since we are exiting the application automatically
 			// it is OK to delete the recovery file
-			if ( m_pFRM != NULL )
+			if ( m_pFRM != __nullptr )
 			{
 				m_pFRM->deleteRecoveryFile();
 			}
@@ -1342,7 +1342,7 @@ void FileProcessingDlg::OnFileExit()
 		// we are exiting the application at the user's request, regardless
 		// of whether they are saving the current FAM or not. 
 		// it is OK to delete the recovery file
-		if ( m_pFRM != NULL )
+		if ( m_pFRM != __nullptr )
 		{
 			m_pFRM->deleteRecoveryFile();
 		}
@@ -1376,11 +1376,11 @@ void FileProcessingDlg::OnToolsCheckfornewcomponents()
 	{	
 		// create instance of the category manager
 		ICategoryManagerPtr ipCatMgr(CLSID_CategoryManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI09397", ipCatMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09397", ipCatMgr != __nullptr);
 
 		// create a vector of all categories we care about.
 		IVariantVectorPtr ipCategoryNames(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI18166", ipCategoryNames != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18166", ipCategoryNames != __nullptr);
 
 		ipCategoryNames->PushBack(get_bstr_t(FP_FILE_PROC_CATEGORYNAME.c_str()));
 		ipCategoryNames->PushBack(get_bstr_t(FP_FILE_SUPP_CATEGORYNAME.c_str()));
@@ -1684,7 +1684,7 @@ void FileProcessingDlg::OnDBConfigChanged(const std::string& strServer,
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::setRecordManager(FPRecordManager* pRecordMgr)
 {
-	ASSERT_ARGUMENT("ELI10146", pRecordMgr != NULL);
+	ASSERT_ARGUMENT("ELI10146", pRecordMgr != __nullptr);
 	m_pRecordMgr = pRecordMgr;
 
 	m_propStatisticsPage.setRecordManager(pRecordMgr);
@@ -1841,7 +1841,7 @@ void FileProcessingDlg::updateMenuAndToolbar()
 
 	// Enable/disable the controls on the database page based on whether
 	// we are currently processing or not
-	if (m_propDatabasePage.m_hWnd != NULL)
+	if (m_propDatabasePage.m_hWnd != __nullptr)
 	{
 		m_propDatabasePage.enableAllControls(!m_bRunning);
 	}
@@ -2278,7 +2278,7 @@ bool FileProcessingDlg::checkForSave()
 {
 	// get access to the IPersistStream interface on the FPM
 	IPersistStreamPtr ipStream = getFPM();
-	ASSERT_RESOURCE_ALLOCATION("ELI14154", ipStream != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14154", ipStream != __nullptr);
 
 	// Check if there is any change in the FPM
 	if (ipStream->IsDirty() == S_OK)
@@ -2325,13 +2325,13 @@ bool FileProcessingDlg::checkForSave()
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr FileProcessingDlg::getDBPointer()
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI15055", m_pFPMDB != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15055", m_pFPMDB != __nullptr );
 	return UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr( m_pFPMDB );
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr FileProcessingDlg::getFPM()
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI15056", m_pFileProcMgr != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI15056", m_pFileProcMgr != __nullptr );
 	return UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr( m_pFileProcMgr );
 }
 //-------------------------------------------------------------------------------------------------
@@ -2539,11 +2539,11 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI15045", pParam != NULL );
+		ASSERT_ARGUMENT("ELI15045", pParam != __nullptr );
 	
 		// Set the StatisticsMgr *
 		pFPDlg = (static_cast<FileProcessingDlg *> (pParam));
-		ASSERT_RESOURCE_ALLOCATION("ELI25246", pFPDlg != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25246", pFPDlg != __nullptr);
 
 		_lastCodePos = "10";
 
@@ -2553,20 +2553,20 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 		_lastCodePos = "20";
 
 		FileProcessingConfigMgr* pCfgMgr = pFPDlg->ma_pCfgMgr.get();
-		ASSERT_RESOURCE_ALLOCATION("ELI25247", pCfgMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25247", pCfgMgr != __nullptr);
 		unsigned int uiTickSpeed = pCfgMgr->getTimerTickSpeed();
 
 		_lastCodePos = "30";
 
 		// Get the DB pointer
 		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFPMDB = pFPDlg->getDBPointer();
-		ASSERT_RESOURCE_ALLOCATION("ELI14509", ipFPMDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14509", ipFPMDB != __nullptr);
 
 		_lastCodePos = "40";
 
 		// Get action must be done in the thread so that the UI doesn't get blocked if DB is locked
 		UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPMgr = pFPDlg->getFPM();
-		ASSERT_RESOURCE_ALLOCATION("ELI15638", ipFPMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15638", ipFPMgr != __nullptr);
 
 		_lastCodePos = "50";
 
@@ -2595,7 +2595,7 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 					// Get the stats from the db in a temp object so that the UI will not be blocked
 					UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipNewActionStats = 
 						ipFPMDB->GetStats(nActionID, VARIANT_FALSE);
-					ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != __nullptr);
 				
 					_lastCodePos = "70";
 
@@ -2622,7 +2622,7 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15001");
 
 	// Signal that the thread has exited
-	if ( pFPDlg != NULL )
+	if ( pFPDlg != __nullptr )
 	{
 		pFPDlg->m_eventStatsThreadExited.signal();
 	}

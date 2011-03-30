@@ -32,7 +32,7 @@ CManageActionsDlg::CManageActionsDlg(const UCLID_FILEPROCESSINGLib::IFileProcess
 CDialog(CManageActionsDlg::IDD, pParent),
 m_ipFAMDB(ipFAMDB)
 {
-	ASSERT_ARGUMENT("ELI29084", ipFAMDB != NULL);
+	ASSERT_ARGUMENT("ELI29084", ipFAMDB != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CManageActionsDlg::~CManageActionsDlg()
@@ -40,7 +40,7 @@ CManageActionsDlg::~CManageActionsDlg()
 	try
 	{
 		// Ensure FamDB pointer is released
-		m_ipFAMDB = NULL;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29085");
 }
@@ -203,7 +203,7 @@ void CManageActionsDlg::OnBtnRename()
 
 		// Get the selected action to rename
 		POSITION pos = m_listActions.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Display the wait cursor wheil action is deleted
 			CWaitCursor cursor;
@@ -277,11 +277,11 @@ void CManageActionsDlg::OnBtnRemove()
 
 		// Create IFAMDBUtilsPtr used to bring up select action dialog
 		UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI14914", ipFAMDBUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14914", ipFAMDBUtils != __nullptr );
 
 		// Get the selected action to remove
 		POSITION pos = m_listActions.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Display the wait cursor wheil action is deleted
 			CWaitCursor cursor;
@@ -448,7 +448,7 @@ void CManageActionsDlg::refreshActionList()
 		// Store the position of the first selected item
 		int nSelectedItem = 0;
 		POSITION pos = m_listActions.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			nSelectedItem = m_listActions.GetNextSelectedItem(pos);
 		}
@@ -459,7 +459,7 @@ void CManageActionsDlg::refreshActionList()
 		m_listActions.DeleteAllItems();
 
 		IStrToStrMapPtr ipActions = m_ipFAMDB->GetActions();
-		ASSERT_RESOURCE_ALLOCATION("ELI29100", ipActions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29100", ipActions != __nullptr);
 
 		// Get the number of Actions
 		long lSize = ipActions->Size;

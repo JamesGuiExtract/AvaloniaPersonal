@@ -63,8 +63,8 @@ CFrameWnd* CActiveXDocTemplate::CreateNewFrame(CDocument* pDoc,
         CFrameWnd* pOther)
 {
     ASSERT(pOther == NULL);
-    ASSERT(m_pFrameClass != NULL);
-    if (pDoc != NULL)
+    ASSERT(m_pFrameClass != __nullptr);
+    if (pDoc != __nullptr)
         ASSERT_VALID(pDoc);
 
     // Create a frame wired to the specified document
@@ -137,7 +137,7 @@ CDocument* CActiveXDocTemplate::OpenDocumentFileInternal(LPCTSTR lpszPathName,
 	BOOL bCreated = FALSE;      // => doc and frame created
 	BOOL bWasModified = FALSE;
 
-	if (m_pOnlyDoc != NULL)
+	if (m_pOnlyDoc != __nullptr)
 	{
 		// already have a document - reinit it
 		pDocument = m_pOnlyDoc;
@@ -145,7 +145,7 @@ CDocument* CActiveXDocTemplate::OpenDocumentFileInternal(LPCTSTR lpszPathName,
 			return NULL;        // leave the original one
 
 		pFrame = (CFrameWnd*)AfxGetMainWnd();
-		ASSERT(pFrame != NULL);
+		ASSERT(pFrame != __nullptr);
 		ASSERT_KINDOF(CFrameWnd, pFrame);
 		ASSERT_VALID(pFrame);
 	}
@@ -266,7 +266,7 @@ CDocument* CActiveXDocTemplate::OpenDocumentFileInternal(LPCTSTR lpszPathName,
 //==========================================================================================
 void CActiveXDocTemplate::SaveDocumentFile()
 {
-    if (m_pOnlyDoc != NULL)
+    if (m_pOnlyDoc != __nullptr)
     {
         if (!m_docFile.IsEmpty())
 			//	save document file
@@ -374,7 +374,7 @@ void CActiveXDocControl::OnSize(UINT nType, int cx, int cy)
     // The CFrameWnd should always fill up the entire client
     // area of the control.
 
-    if (m_pFrameWnd != NULL)
+    if (m_pFrameWnd != __nullptr)
     {
         ASSERT(IsWindow(*m_pFrameWnd));
         CRect area;

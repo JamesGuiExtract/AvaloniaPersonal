@@ -82,7 +82,7 @@ const string CRedactionCustomComponentsUtils::ChooseDocTag(HWND hwnd, long x, lo
 const string CRedactionCustomComponentsUtils::ExpandTagsAndTFE(IFAMTagManagerPtr ipFAMTM, const string& strFile, const string& strSourceDocName)
 {
 	// verify valid arguments
-	ASSERT_ARGUMENT("ELI15152", ipFAMTM != NULL);
+	ASSERT_ARGUMENT("ELI15152", ipFAMTM != __nullptr);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Get the FAMTagManager Pointer and expand tags in m_strFileName, 
@@ -142,7 +142,7 @@ const string CRedactionCustomComponentsUtils::ExpandRedactionTags(const string& 
 IFAMTagManagerPtr CRedactionCustomComponentsUtils::getFAMTagManager()
 {
 	IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-	ASSERT_RESOURCE_ALLOCATION("ELI15010", ipFAMTagManager != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15010", ipFAMTagManager != __nullptr);
 	return ipFAMTagManager;
 }
 //-------------------------------------------------------------------------------------------------

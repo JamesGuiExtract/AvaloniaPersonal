@@ -22,7 +22,7 @@ CRuleTesterUI::~CRuleTesterUI()
 	{
 		// clean up the dialog resource in this scope so that the
 		// code executes in the correct AFX state
-		m_apDlg.reset(NULL);
+		m_apDlg.reset(__nullptr);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI08816")
 }
@@ -61,7 +61,7 @@ STDMETHODIMP CRuleTesterUI::ShowUI(BSTR strFileName)
 
 		// Allocate Ruleset object
 		UCLID_AFCORELib::IRuleSetPtr ipRuleSet(CLSID_RuleSet);
-		ASSERT_RESOURCE_ALLOCATION("ELI08804", ipRuleSet != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08804", ipRuleSet != __nullptr );
 
 		// if a file name is given load it into the ruleset
 		string strRSDFile = bstr_t(strFileName);
@@ -70,7 +70,7 @@ STDMETHODIMP CRuleTesterUI::ShowUI(BSTR strFileName)
 			ipRuleSet->LoadFrom( strFileName, VARIANT_FALSE);
 		}
 
-		m_apDlg = auto_ptr<RuleTesterDlg>(new RuleTesterDlg(NULL, ipRuleSet));
+		m_apDlg = unique_ptr<RuleTesterDlg>(new RuleTesterDlg(NULL, ipRuleSet));
 
 		m_apDlg->DoModal();
 	}

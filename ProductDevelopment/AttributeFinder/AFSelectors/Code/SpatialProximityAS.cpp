@@ -29,7 +29,7 @@ CSpatialProximityAS::CSpatialProximityAS()
 		reset();
 
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI22706", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22706", m_ipAFUtility != __nullptr);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI22560");
 }
@@ -38,8 +38,8 @@ CSpatialProximityAS::~CSpatialProximityAS()
 {
 	try
 	{
-		m_ipDocText = NULL;
-		m_ipAFUtility = NULL;
+		m_ipDocText = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI22561");
 }
@@ -62,7 +62,7 @@ STDMETHODIMP CSpatialProximityAS::get_TargetQuery(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22603", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22603", pVal != __nullptr);
 
 		validateLicense();
 
@@ -96,7 +96,7 @@ STDMETHODIMP CSpatialProximityAS::get_ReferenceQuery(BSTR *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22607", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22607", pVal != __nullptr);
 
 		validateLicense();
 
@@ -130,7 +130,7 @@ STDMETHODIMP CSpatialProximityAS::get_RequireCompleteInclusion(VARIANT_BOOL *pVa
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22610", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22610", pVal != __nullptr);
 
 		validateLicense();
 
@@ -164,7 +164,7 @@ STDMETHODIMP CSpatialProximityAS::get_TargetsMustContainReferences(VARIANT_BOOL 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23493", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23493", pVal != __nullptr);
 
 		validateLicense();
 
@@ -198,7 +198,7 @@ STDMETHODIMP CSpatialProximityAS::get_CompareLinesSeparately(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22613", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22613", pVal != __nullptr);
 
 		validateLicense();
 
@@ -260,11 +260,11 @@ STDMETHODIMP CSpatialProximityAS::GetRegionBorder(EBorder eRegionBorder, EBorder
 		validateLicense();
 
 		ASSERT_ARGUMENT("ELI22620", eRegionBorder != kNoBorder);
-		ASSERT_ARGUMENT("ELI22621", peRelation != NULL);
-		ASSERT_ARGUMENT("ELI22622", peRelationBorder != NULL);
-		ASSERT_ARGUMENT("ELI22644", peExpandDirection != NULL);
-		ASSERT_ARGUMENT("ELI22645", pdExpandAmount != NULL);
-		ASSERT_ARGUMENT("ELI22646", peUnits != NULL);
+		ASSERT_ARGUMENT("ELI22621", peRelation != __nullptr);
+		ASSERT_ARGUMENT("ELI22622", peRelationBorder != __nullptr);
+		ASSERT_ARGUMENT("ELI22644", peExpandDirection != __nullptr);
+		ASSERT_ARGUMENT("ELI22645", pdExpandAmount != __nullptr);
+		ASSERT_ARGUMENT("ELI22646", peUnits != __nullptr);
 
 		*peRelation			= m_mapBorderInfo[eRegionBorder].m_eRelation;
 		*peRelationBorder	= m_mapBorderInfo[eRegionBorder].m_eBorder;
@@ -283,7 +283,7 @@ STDMETHODIMP CSpatialProximityAS::get_IncludeDebugAttributes(VARIANT_BOOL *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22694", pVal != NULL);
+		ASSERT_ARGUMENT("ELI22694", pVal != __nullptr);
 
 		validateLicense();
 
@@ -325,10 +325,10 @@ STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn,
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(pAttrIn);
-		ASSERT_ARGUMENT("ELI22562", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI22562", ipAttributes != __nullptr);
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI22563", ipAFDoc != NULL);
-		ASSERT_ARGUMENT("ELI22564", pAttrOut != NULL);
+		ASSERT_ARGUMENT("ELI22563", ipAFDoc != __nullptr);
+		ASSERT_ARGUMENT("ELI22564", pAttrOut != __nullptr);
 
 		// Reset the resolution.  These will be recalculated when needed.
 		m_nXResolution = 0;
@@ -336,22 +336,22 @@ STDMETHODIMP CSpatialProximityAS::raw_SelectAttributes(IIUnknownVector *pAttrIn,
 
 		// Store the document text so it can be used during processing.
 		m_ipDocText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI22685", m_ipDocText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22685", m_ipDocText != __nullptr);
 
 		// Obtain the set of attributes available for selection
 		IIUnknownVectorPtr ipTargetAttributes = 
 			m_ipAFUtility->QueryAttributes(ipAttributes, m_strTargetQuery.c_str(), VARIANT_FALSE);
-		ASSERT_RESOURCE_ALLOCATION("ELI22707", ipTargetAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22707", ipTargetAttributes != __nullptr);
 
 		// Obtain the set of attributes to be used to describe the location selected attributes
 		// must occupy.
 		IIUnknownVectorPtr ipReferenceAttributes = 
 			m_ipAFUtility->QueryAttributes(ipAttributes, m_strReferenceQuery.c_str(), VARIANT_FALSE);
-		ASSERT_RESOURCE_ALLOCATION("ELI22708", ipReferenceAttributes  != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22708", ipReferenceAttributes  != __nullptr);
 
 		// Create the collection of selected attributes that will be returned as the final result.
 		IIUnknownVectorPtr ipSelectedAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI22667", ipSelectedAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22667", ipSelectedAttributes != __nullptr);
 
 		// Create a vector to store each pair of attributes where one is contained within the other.
 		vector< pair<IAttributePtr, IAttributePtr> > vecContainmentPairs;
@@ -399,7 +399,7 @@ STDMETHODIMP CSpatialProximityAS::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22566", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI22566", pClassID != __nullptr);
 
 		*pClassID = CLSID_SpatialProximityAS;
 
@@ -429,7 +429,7 @@ STDMETHODIMP CSpatialProximityAS::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI22569", pStream != NULL);
+		ASSERT_ARGUMENT("ELI22569", pStream != __nullptr);
 
 		// Reset data members
 		reset();
@@ -500,7 +500,7 @@ STDMETHODIMP CSpatialProximityAS::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI22572", pStream != NULL);
+		ASSERT_ARGUMENT("ELI22572", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -562,7 +562,7 @@ STDMETHODIMP CSpatialProximityAS::raw_GetComponentDescription(BSTR *pbstrCompone
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22577", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI22577", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Spatial proximity attribute selector").Detach();
 
@@ -580,7 +580,7 @@ STDMETHODIMP CSpatialProximityAS::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22574", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI22574", pbValue != __nullptr);
 
 		try
 		{
@@ -613,7 +613,7 @@ STDMETHODIMP CSpatialProximityAS::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFSELECTORSLib::ISpatialProximityASPtr ipCopyThis = pObject;
-		ASSERT_ARGUMENT("ELI22579", ipCopyThis != NULL);
+		ASSERT_ARGUMENT("ELI22579", ipCopyThis != __nullptr);
 
 		// Copy members
 		m_strTargetQuery				= asString(ipCopyThis->TargetQuery);
@@ -650,11 +650,11 @@ STDMETHODIMP CSpatialProximityAS::raw_Clone(IUnknown **pObject)
 		// Validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI22581", pObject != NULL);
+		ASSERT_ARGUMENT("ELI22581", pObject != __nullptr);
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_SpatialProximityAS);
-		ASSERT_RESOURCE_ALLOCATION("ELI22582", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22582", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -680,7 +680,7 @@ STDMETHODIMP CSpatialProximityAS::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		validateLicense();
 
 		// Check parameter
-		ASSERT_ARGUMENT("ELI22584", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI22584", pbValue != __nullptr);
 
 		*pbValue = VARIANT_TRUE;
 
@@ -723,15 +723,15 @@ STDMETHODIMP CSpatialProximityAS::InterfaceSupportsErrorInfo(REFIID riid)
 vector< pair<CRect, long> > CSpatialProximityAS::getAttributeRects(IAttributePtr ipAttribute,
 																   bool bSeparateLines)
 {
-	ASSERT_ARGUMENT("ELI22668", ipAttribute != NULL);
+	ASSERT_ARGUMENT("ELI22668", ipAttribute != __nullptr);
 
 	// Retrive the attribute's spatial string
 	ISpatialStringPtr ipValue = ipAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI22669", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22669", ipValue != __nullptr);
 
 	// Get the collection of lines comprising the spatial string.
 	IIUnknownVectorPtr ipLines = ipValue->GetLines();
-	ASSERT_RESOURCE_ALLOCATION("ELI22670", ipLines != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22670", ipLines != __nullptr);
 
 	// Cycle through each line to obtain the rect & pagenum pairs needed to describe the attribute.
 	vector< pair<CRect, long> > vecAttributeRects;
@@ -741,7 +741,7 @@ vector< pair<CRect, long> > CSpatialProximityAS::getAttributeRects(IAttributePtr
 	for (long i = 0; i < nLineCount; i++)
 	{
 		ISpatialStringPtr ipLine = ipLines->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI22671", ipLine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22671", ipLine != __nullptr);
 
 		// If the line does not have any spatial information, skip it.
 		if (!asCppBool(ipLine->HasSpatialInfo()))
@@ -754,7 +754,7 @@ vector< pair<CRect, long> > CSpatialProximityAS::getAttributeRects(IAttributePtr
 
 		// Obtain a rect describing the location of this line.
 		ILongRectanglePtr ipRect = ipLine->GetOCRImageBounds();
-		ASSERT_RESOURCE_ALLOCATION("ELI22674", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22674", ipRect != __nullptr);
 
 		// Copy the rect to a CRect to make rect comparisons easier.
 		CRect rectBounds;
@@ -807,13 +807,13 @@ bool CSpatialProximityAS::convertToTargetRegion(CRect &rrect, long nPage)
 	// Test to see if there is text on the specified page.  If there isn't any text on this page, 
 	// fail the conversion (it is possible, but too complicated for the benefit at this point.)
 	ISpatialStringPtr ipPageText = m_ipDocText->GetSpecifiedPages(nPage, nPage);
-	if (ipPageText == NULL || !asCppBool(ipPageText->HasSpatialInfo()))
+	if (ipPageText == __nullptr || !asCppBool(ipPageText->HasSpatialInfo()))
 	{
 		return false;
 	}
 
 	ISpatialPageInfoPtr ipPageInfo = m_ipDocText->GetPageInfo(nPage);
-	ASSERT_RESOURCE_ALLOCATION("ELI22684", ipPageInfo != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22684", ipPageInfo != __nullptr);
 
 	// Create a rect to repersent the coordinates of the page as a whole
 	CRect rectPage(0, 0, ipPageInfo->Width, ipPageInfo->Height);
@@ -897,7 +897,7 @@ long CSpatialProximityAS::getExpansionOffset(const BorderInfo &borderInfo, long 
 	{
 		// Convert from the page's average character width to pixels
 		ISpatialStringPtr ipPageText = m_ipDocText->GetSpecifiedPages(nPage, nPage);
-		ASSERT_RESOURCE_ALLOCATION("ELI22687", ipPageText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22687", ipPageText != __nullptr);
 
 		dExpansionOffset *= ipPageText->GetAverageCharWidth();
 	}
@@ -905,7 +905,7 @@ long CSpatialProximityAS::getExpansionOffset(const BorderInfo &borderInfo, long 
 	{
 		// Convert from the page's average line height to pixels
 		ISpatialStringPtr ipPageText = m_ipDocText->GetSpecifiedPages(nPage, nPage);
-		ASSERT_RESOURCE_ALLOCATION("ELI22688", ipPageText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22688", ipPageText != __nullptr);
 
 		dExpansionOffset *= ipPageText->GetAverageLineHeight();
 	}
@@ -920,8 +920,8 @@ long CSpatialProximityAS::getExpansionOffset(const BorderInfo &borderInfo, long 
 vector< pair<IAttributePtr, IAttributePtr> > CSpatialProximityAS::findContainmentPairs(
 	IIUnknownVectorPtr ipContainerAttributes, IIUnknownVectorPtr ipContainedAttributes)
 {
-	ASSERT_ARGUMENT("ELI23498", ipContainerAttributes != NULL);
-	ASSERT_ARGUMENT("ELI23499", ipContainedAttributes != NULL);
+	ASSERT_ARGUMENT("ELI23498", ipContainerAttributes != __nullptr);
+	ASSERT_ARGUMENT("ELI23499", ipContainedAttributes != __nullptr);
 
 	vector< pair<IAttributePtr, IAttributePtr> > vecContainmentPairs;
 
@@ -931,7 +931,7 @@ vector< pair<IAttributePtr, IAttributePtr> > CSpatialProximityAS::findContainmen
 	for (long i = 0; i < nContainerAttributesCount; i++)
 	{
 		IAttributePtr ipContainerAttribute = ipContainerAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI22675", ipContainerAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22675", ipContainerAttribute != __nullptr);
 		
 		// Get a rect and pagenum for each area needed to describe the container attribute's
 		// location.
@@ -953,7 +953,7 @@ vector< pair<IAttributePtr, IAttributePtr> > CSpatialProximityAS::findContainmen
 				for (int i = 0; i < nAttributeCount; i++)
 				{
 					IAttributePtr ipContainedAttribute = ipContainedAttributes->At(i);
-					ASSERT_RESOURCE_ALLOCATION("ELI22704", ipContainedAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI22704", ipContainedAttribute != __nullptr);
 
 					// Don't allow an attribute to be selected based on itself.
 					if (ipContainedAttribute == ipContainerAttribute)
@@ -980,7 +980,7 @@ vector< pair<IAttributePtr, IAttributePtr> > CSpatialProximityAS::findContainmen
 bool CSpatialProximityAS::isAttributeContainedIn(IAttributePtr ipContainedAttribute,
 												 const CRect &rectContainerArea, long nPage)
 {
-	ASSERT_ARGUMENT("ELI22702", ipContainedAttribute != NULL);
+	ASSERT_ARGUMENT("ELI22702", ipContainedAttribute != __nullptr);
 
 	// Obtain a rect describing the area of each of the attribute's lines.
 	vector< pair<CRect, long> > vecContainedAttributeRects = 
@@ -1051,13 +1051,13 @@ bool CSpatialProximityAS::isAttributeContainedIn(IAttributePtr ipContainedAttrib
 //--------------------------------------------------------------------------------------------------
 void CSpatialProximityAS::createDebugAttributes(IIUnknownVectorPtr ipReferenceAttributes)
 {
-	ASSERT_ARGUMENT("ELI23500", ipReferenceAttributes != NULL);
+	ASSERT_ARGUMENT("ELI23500", ipReferenceAttributes != __nullptr);
 
 	long nReferenceAttributesCount = ipReferenceAttributes->Size();
 	for (long i = 0; i < nReferenceAttributesCount; i++)
 	{
 		IAttributePtr ipReferenceAttribute = ipReferenceAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI23501", ipReferenceAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23501", ipReferenceAttribute != __nullptr);
 		
 		// Get a rect and pagenum for each area needed to describe the reference attribute's
 		// location.
@@ -1079,14 +1079,14 @@ void CSpatialProximityAS::createDebugAttributes(IIUnknownVectorPtr ipReferenceAt
 void CSpatialProximityAS::createDebugAttributes(IAttributePtr ipAttribute, 
 												const CRect &rectReference, long nPage)
 {
-	ASSERT_ARGUMENT("ELI22700", ipAttribute != NULL);
+	ASSERT_ARGUMENT("ELI22700", ipAttribute != __nullptr);
 
 	// Create a new raster zone based on the specified image area.
 	IRasterZonePtr ipRasterZone(CLSID_RasterZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI22690", ipRasterZone != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22690", ipRasterZone != __nullptr);
 
 	ILongRectanglePtr ipZoneRect(CLSID_LongRectangle);
-	ASSERT_RESOURCE_ALLOCATION("ELI22691", ipZoneRect != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22691", ipZoneRect != __nullptr);
 	ipZoneRect->SetBounds(rectReference.left, rectReference.top,
 		rectReference.right, rectReference.bottom);
 
@@ -1094,7 +1094,7 @@ void CSpatialProximityAS::createDebugAttributes(IAttributePtr ipAttribute,
 
 	// Build a spatial string using this raster zone.
 	ISpatialStringPtr ipDebugString(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI22689", ipDebugString != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22689", ipDebugString != __nullptr);
 
 	ipDebugString->CreatePseudoSpatialString(ipRasterZone, "Spatial Proximity Selector", 
 									   m_ipDocText->SourceDocName, 
@@ -1102,14 +1102,14 @@ void CSpatialProximityAS::createDebugAttributes(IAttributePtr ipAttribute,
 
 	// Use this spatial string as the value for a debug attribute. 
 	IAttributePtr ipDebugAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI22692", ipDebugAttribute != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22692", ipDebugAttribute != __nullptr);
 
 	ipDebugAttribute->Value = ipDebugString;
 	ipDebugAttribute->Name  = "Debug";
 
 	// Add the debug attribute as a sub-attribute of the reference attribute it is associated with.
 	IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-	ASSERT_RESOURCE_ALLOCATION("ELI22693", ipSubAttributes != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22693", ipSubAttributes != __nullptr);
 
 	ipSubAttributes->PushBack(ipDebugAttribute);
 }

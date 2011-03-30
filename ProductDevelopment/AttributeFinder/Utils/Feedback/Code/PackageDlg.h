@@ -48,8 +48,8 @@ private:
 	///////
 
 	// Handles configuration persistence
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<PersistenceMgr> ma_pCfgFeedbackMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<PersistenceMgr> ma_pCfgFeedbackMgr;
 
 	// Read database only once
 	bool	m_bReadDatabase;

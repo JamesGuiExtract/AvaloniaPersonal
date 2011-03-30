@@ -67,7 +67,7 @@ private:
 	UCLID_AFCORELib::IFeedbackMgrInternalsPtr	m_ipInternals;
 
 	// Handles registry settings
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> mu_pUserCfgMgr;
 
 	//////////////
 	// Methods

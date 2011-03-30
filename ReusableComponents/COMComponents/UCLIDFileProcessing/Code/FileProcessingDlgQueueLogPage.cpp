@@ -166,7 +166,7 @@ BOOL FileProcessingDlgQueueLogPage::OnInitDialog()
 		getWindowAndRectInfo(IDC_BUTTON_QUEUE_EXCEPTION_DETAILS, NULL)->EnableWindow(FALSE);
 		
 		// Verify that the config manager is initialized
-		ASSERT_RESOURCE_ALLOCATION( "ELI14278", m_pCfgMgr != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14278", m_pCfgMgr != __nullptr );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14039")
 	
@@ -261,7 +261,7 @@ void FileProcessingDlgQueueLogPage::OnLvnItemchangedListFailedQueing(NMHDR *pNMH
 	{
 		// Enable the exception details button only if a row is selected in
 		// the failed files list
-		BOOL bEnable = asMFCBool(m_listFailedQueing.GetFirstSelectedItemPosition() != NULL);
+		BOOL bEnable = asMFCBool(m_listFailedQueing.GetFirstSelectedItemPosition() != __nullptr);
 		getWindowAndRectInfo(IDC_BUTTON_QUEUE_EXCEPTION_DETAILS, NULL)->EnableWindow(bEnable);
 		
 		*pResult = 0;
@@ -380,11 +380,11 @@ void FileProcessingDlgQueueLogPage::addEvent(FileSupplyingRecord* pFileSupRec)
 	try
 	{
 		// verify arguments
-		ASSERT_ARGUMENT("ELI14923", pFileSupRec != NULL);
+		ASSERT_ARGUMENT("ELI14923", pFileSupRec != __nullptr);
 
 		// we are responsible for deleting the memory associated with pFileSupRec.
 		// So, attach it to an auto-pointer.
-		auto_ptr<FileSupplyingRecord> apFileSupRec(pFileSupRec);
+		unique_ptr<FileSupplyingRecord> apFileSupRec(pFileSupRec);
 
 		// depending upon what type of event was received, call 
 		// appropriate methods to handle the event
@@ -428,7 +428,7 @@ void FileProcessingDlgQueueLogPage::onQueueEventReceived(FileSupplyingRecord* pF
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgQueueLogPage::onQueueEventHandled(FileSupplyingRecord* pFileSupRec)
 {
-	ASSERT_ARGUMENT("ELI27640", pFileSupRec != NULL);
+	ASSERT_ARGUMENT("ELI27640", pFileSupRec != __nullptr);
 
 	// limit the list size
 	limitListSizeIfNeeded(m_listQueueLog, m_pCfgMgr);
@@ -484,7 +484,7 @@ void FileProcessingDlgQueueLogPage::onQueueEventHandled(FileSupplyingRecord* pFi
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgQueueLogPage::onQueueEventFailed(FileSupplyingRecord* pFileSupRec)
 {
-	ASSERT_ARGUMENT("ELI27641", pFileSupRec != NULL);
+	ASSERT_ARGUMENT("ELI27641", pFileSupRec != __nullptr);
 
 	// limit the list size.  If a record was deleted, delete the corresponding record
 	// from the internal member variable also
@@ -505,7 +505,7 @@ void FileProcessingDlgQueueLogPage::onQueueEventFailed(FileSupplyingRecord* pFil
 long FileProcessingDlgQueueLogPage::appendNewRecord(CListCtrl& rListCtrl, 
 													FileSupplyingRecord* pFileSupRec)
 {
-	ASSERT_ARGUMENT("ELI27639", pFileSupRec != NULL);
+	ASSERT_ARGUMENT("ELI27639", pFileSupRec != __nullptr);
 
 	// create a new record in the list control and set the leftmost column to the current date
 	long nNewItemIndex = rListCtrl.GetItemCount();
@@ -850,7 +850,7 @@ CWnd* FileProcessingDlgQueueLogPage::getWindowAndRectInfo(UINT uiControlID, CRec
 {
 	// Get the window associated with the specified control
 	CWnd *pwndControl = GetDlgItem(uiControlID);
-	ASSERT_RESOURCE_ALLOCATION("ELI16801", pwndControl != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16801", pwndControl != __nullptr);
 
 	// If the caller wanted the window coordinates of the control, get that information
 	if (pRect)
@@ -868,7 +868,7 @@ void FileProcessingDlgQueueLogPage::repositionButton(UINT uiButtonID, UINT uiLab
 	// Get the current coordinates of the button
 	CRect rectDetailsButton;
 	CWnd *pwndDetailsButton = GetDlgItem(uiButtonID);
-	ASSERT_RESOURCE_ALLOCATION("ELI16809", pwndDetailsButton != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16809", pwndDetailsButton != __nullptr);
 	pwndDetailsButton->GetWindowRect(&rectDetailsButton);
 
 	// Get the position of the list control
@@ -878,7 +878,7 @@ void FileProcessingDlgQueueLogPage::repositionButton(UINT uiButtonID, UINT uiLab
 	// Get the position of the list label
 	CRect rectLabel;
 	CWnd *pwndLabel = GetDlgItem(uiLabelID);
-	ASSERT_RESOURCE_ALLOCATION("ELI16802", pwndLabel != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16802", pwndLabel != __nullptr);
 	pwndLabel->GetWindowRect(&rectLabel);
 
 	// Compute the new position of the details button

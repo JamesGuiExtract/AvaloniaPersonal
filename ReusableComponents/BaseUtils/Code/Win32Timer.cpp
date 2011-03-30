@@ -47,7 +47,12 @@ bool Win32Timer::Start(
 	if (bSuccess)
 	{
 		UINT nTimerID = ::SetTimer(0,0,nMilliseconds,TimerProc);
-		ASSERT_RESOURCE_ALLOCATION("ELI00980", nTimerID != NULL);
+		if (nTimerID == 0)
+		{
+			UCLIDException ue("ELI00980", "Unable to create new timer.");
+			ue.addWin32ErrorInfo();
+			throw ue;
+		}
 		m_nTimerID = nTimerID;
 		m_mapTimers[nTimerID] = this;
 	}

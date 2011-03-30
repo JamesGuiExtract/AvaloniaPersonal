@@ -383,7 +383,7 @@ CGenericDisplayCtrl::~CGenericDisplayCtrl()
 		deleteAllEntities();
 
 		// destroy the icon to release memory, loaded from files if any
-		if (m_hIcon != NULL)
+		if (m_hIcon != __nullptr)
 		{
 			// destroys an icon and frees any memory the icon occupied
 			DestroyIcon(m_hIcon);
@@ -434,21 +434,21 @@ int CGenericDisplayCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// link this control object to its rubberband objects
 	CRubberBandThrd* pRBThread = m_pUGDView->getRubberBandThread();
-	if (pRBThread != NULL)
+	if (pRBThread != __nullptr)
 	{
 		pRBThread->setGenericDisplayCtrl(this);
 	}
 
 	// link this control object to its zone objects
 	CZoneHighlightThrd* pZHThread = m_pUGDView->getZoneObjectOfView();
-	if (pZHThread != NULL)
+	if (pZHThread != __nullptr)
 	{
 		pZHThread->setGenericDisplayCtrl(this);
 	}
 
 	// Link this control object to its zone adjustment object
 	CZoneAdjustmentThrd* pZAThread = m_pUGDView->getZoneAdjustmentThread();
-	if (pZAThread != NULL)
+	if (pZAThread != __nullptr)
 	{
 		pZAThread->setGenericDisplayCtrl(this);
 	}

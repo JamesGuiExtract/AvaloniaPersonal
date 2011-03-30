@@ -35,7 +35,7 @@ class CAddRuleDlg : public CDialog
 // Construction
 public:
 	CAddRuleDlg(IClipboardObjectManagerPtr ipClipboardMgr,
-		UCLID_AFCORELib::IAttributeRulePtr ipRule, CWnd* pParent = NULL);
+		UCLID_AFCORELib::IAttributeRulePtr ipRule, CWnd* pParent = __nullptr);
 
 	// Set the prompt text
 	void	SetPromptText(string strPrompt);

@@ -173,7 +173,7 @@ STDMETHODIMP CLongToLongMap::GetKeys(IVariantVector **pKeys)
 		validateLicense();
 		
 		UCLID_COMUTILSLib::IVariantVectorPtr ipKeys(CLSID_VariantVector);
-		if (ipKeys == NULL)
+		if (ipKeys == __nullptr)
 		{
 			throw UCLIDException("ELI10644", "Unable to create VariantVector object!");
 		}
@@ -454,7 +454,7 @@ STDMETHODIMP CLongToLongMap::CopyFrom(IUnknown * pObject)
 
 		// Clear the other map object
 		UCLID_COMUTILSLib::ILongToLongMapPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08210", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08210", ipSource != __nullptr);
 
 		Clear();
 
@@ -483,7 +483,7 @@ STDMETHODIMP CLongToLongMap::Clone(IUnknown * * pObject)
 		// Create a new map
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_LongToLongMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI08376", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08376", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

@@ -177,7 +177,7 @@ LRESULT CStaticFileListFSPP::OnBnClickedBtnAdd(WORD /*wNotifyCode*/, WORD /*wID*
 			// Get an iterator for the file(s) that were chosen
 			POSITION pos = fileDlg.GetStartPosition();
 			std::string strFile = "";
-			while(pos != NULL)
+			while(pos != __nullptr)
 			{
 				//Get the pathname(s)
 				strFile = fileDlg.GetNextPathName(pos);

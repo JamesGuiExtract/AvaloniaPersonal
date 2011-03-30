@@ -83,7 +83,7 @@ STDMETHODIMP CRedactFileProcessorPP::Apply(void)
 		{
 			// Get Redaction File Processor object
 			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IRedactFileProcessorPtr ipRedactFileProc = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI09868", ipRedactFileProc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09868", ipRedactFileProc != __nullptr);
 
 			// Retrieve and store RSD filename
 			_bstr_t bstrFileName;
@@ -244,7 +244,7 @@ LRESULT CRedactFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 
 		// Get Redaction File Processor object
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IRedactFileProcessorPtr ipRedactFileProc = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI09875", ipRedactFileProc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09875", ipRedactFileProc != __nullptr);
 
 		//////////////////////////
 		// Initialize data members
@@ -605,7 +605,7 @@ void CRedactFileProcessorPP::updateAttributeGroup()
 //-------------------------------------------------------------------------------------------------
 IVariantVectorPtr CRedactFileProcessorPP::getAttributeNames()
 {
-	IVariantVectorPtr ipAttributeNames = NULL;
+	IVariantVectorPtr ipAttributeNames = __nullptr;
 	if ( m_radioSelectAttributes.GetCheck() == 1 )
 	{
 		vector<string> vecTokens;
@@ -642,7 +642,7 @@ IVariantVectorPtr CRedactFileProcessorPP::getAttributeNames()
 		}
 
 		ipAttributeNames.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI11782", ipAttributeNames != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI11782", ipAttributeNames != __nullptr );
 
 		int nNumOfTokens = vecTokens.size();
 		for ( int i = 0; i < nNumOfTokens; i++ )
@@ -660,7 +660,7 @@ void CRedactFileProcessorPP::putAttributeNames(IVariantVectorPtr ipAttributeName
 
 	// as long as there is a valid attribute vector, set the check box
 	// and attribute edit box data according to the vector
-	if ( ipAttributeNames != NULL )
+	if ( ipAttributeNames != __nullptr )
 	{
 		m_radioSelectAttributes.SetCheck(TRUE);
 

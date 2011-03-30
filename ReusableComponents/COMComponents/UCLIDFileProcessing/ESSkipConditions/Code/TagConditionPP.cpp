@@ -74,7 +74,7 @@ LRESULT CTagConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 		m_cmbAnyAll.InsertString(giALL_TAGS, "all");
 
 		IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI27568", ipDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27568", ipDB != __nullptr);
 
 		// Connect to the last used DB
 		ipDB->ConnectLastUsedDBThisProcess();
@@ -109,10 +109,10 @@ STDMETHODIMP CTagConditionPP::Apply(void)
 		{
 			// Obtain interface pointer to the ITagCondition class
 			EXTRACT_FAMCONDITIONSLib::ITagConditionPtr ipTagCondition = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI27570", ipTagCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27570", ipTagCondition != __nullptr);
 
 			IVariantVectorPtr ipVecTags(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI27571", ipVecTags != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI27571", ipVecTags != __nullptr);
 
 			// Loop through each item in the list and add all checked
 			// items to the vector of tags
@@ -162,7 +162,7 @@ STDMETHODIMP CTagConditionPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27573", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27573", pbValue != __nullptr);
 
 		try
 		{
@@ -196,7 +196,7 @@ void CTagConditionPP::setUpListContrl(const IFileProcessingDBPtr& ipDB)
 	{
 		// Get the list of tags from the database
 		IVariantVectorPtr ipVecTags = ipDB->GetTagNames();
-		ASSERT_RESOURCE_ALLOCATION("ELI27576", ipVecTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27576", ipVecTags != __nullptr);
 
 		// Get the size of the tags vector
 		long lSize = ipVecTags->Size;
@@ -247,7 +247,7 @@ void CTagConditionPP::updateUIFromTagCondition(
 
 		// Get the tags from the object
 		IVariantVectorPtr ipVecTags = ipTagCondition->Tags;
-		if (ipVecTags != NULL)
+		if (ipVecTags != __nullptr)
 		{
 			// Get the size
 			long lSize = ipVecTags->Size;

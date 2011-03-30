@@ -31,9 +31,9 @@ CMathematicalCondition::~CMathematicalCondition()
 	try
 	{
 		// Ensure the condition checker is set to NULL
-		if (m_ipConditionChecker != NULL)
+		if (m_ipConditionChecker != __nullptr)
 		{
-			m_ipConditionChecker = NULL;
+			m_ipConditionChecker = __nullptr;
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27138");
@@ -44,7 +44,7 @@ void CMathematicalCondition::FinalRelease()
 	try
 	{
 		// Ensure condition checker is set to NULL
-		m_ipConditionChecker = NULL;
+		m_ipConditionChecker = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27139");
 }
@@ -87,7 +87,7 @@ STDMETHODIMP CMathematicalCondition::get_ConsiderMet(VARIANT_BOOL* pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27140", pVal != NULL);
+		ASSERT_ARGUMENT("ELI27140", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bConsiderConditionMet);
 
@@ -122,7 +122,7 @@ STDMETHODIMP CMathematicalCondition::get_MathematicalCondition(IMathConditionChe
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27143", ppCondition != NULL);
+		ASSERT_ARGUMENT("ELI27143", ppCondition != __nullptr);
 
 		IMathConditionCheckerPtr ipShallowCopy = m_ipConditionChecker;
 
@@ -160,7 +160,7 @@ STDMETHODIMP CMathematicalCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27146", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27146", pbValue != __nullptr);
 
 		try
 		{
@@ -187,7 +187,7 @@ STDMETHODIMP CMathematicalCondition::raw_GetComponentDescription(BSTR * pstrComp
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27148", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI27148", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Match based upon mathematical condition").Detach();
 
@@ -206,7 +206,7 @@ STDMETHODIMP CMathematicalCondition::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		EXTRACT_FAMCONDITIONSLib::IMathematicalFAMConditionPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI27150", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27150", ipCopyThis != __nullptr);
 		
 		// Copy the values from another object
 		m_bConsiderConditionMet = asCppBool(ipCopyThis->ConsiderMet);
@@ -215,7 +215,7 @@ STDMETHODIMP CMathematicalCondition::raw_CopyFrom(IUnknown *pObject)
 		ICopyableObjectPtr ipConditionCopier = ipCopyThis->MathematicalCondition;
 
 		// Clone the math condition object
-		m_ipConditionChecker = ipConditionCopier != NULL ? ipConditionCopier->Clone() : NULL;
+		m_ipConditionChecker = ipConditionCopier != __nullptr ? ipConditionCopier->Clone() : NULL;
 
 		return S_OK;
 	}
@@ -231,10 +231,10 @@ STDMETHODIMP CMathematicalCondition::raw_Clone(IUnknown **pObject)
 		// Validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27152", pObject != NULL);
+		ASSERT_ARGUMENT("ELI27152", pObject != __nullptr);
 
 		ICopyableObjectPtr ipCopy(CLSID_MathematicalCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI27153", ipCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27153", ipCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipCopy->CopyFrom(ipUnk);
@@ -261,7 +261,7 @@ STDMETHODIMP CMathematicalCondition::raw_NotifyCopiedFromClipboard()
 
 		// Get the math condition as a clipboard copyable object
 		IClipboardCopyablePtr ipClip = m_ipConditionChecker;
-		if (ipClip != NULL)
+		if (ipClip != __nullptr)
 		{
 			// If the condition object implements the interface, call the notify method
 			ipClip->NotifyCopiedFromClipboard();
@@ -284,7 +284,7 @@ STDMETHODIMP CMathematicalCondition::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27155", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27155", pbValue != __nullptr);
 
 		*pbValue = isConfigured();
 
@@ -317,7 +317,7 @@ STDMETHODIMP CMathematicalCondition::Load(IStream *pStream)
 	{
 		// reset member variables
 		m_bConsiderConditionMet = true;
-		m_ipConditionChecker = NULL;
+		m_ipConditionChecker = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -414,7 +414,7 @@ STDMETHODIMP CMathematicalCondition::raw_FileMatchesFAMCondition(IFileRecord* pF
 		validateLicense();
 
 		// Check the arguments
-		ASSERT_ARGUMENT("ELI27163", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI27163", pRetVal != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31359", ipFileRecord != __nullptr);
 
@@ -477,7 +477,7 @@ VARIANT_BOOL CMathematicalCondition::isConfigured()
 		IMustBeConfiguredObjectPtr ipConfigure = m_ipConditionChecker;
 		
 		// Return the result of the IsConfigured if ipConfigure is not null, otherwise return false
-		return (ipConfigure != NULL ? ipConfigure->IsConfigured() : VARIANT_FALSE);
+		return (ipConfigure != __nullptr ? ipConfigure->IsConfigured() : VARIANT_FALSE);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27167");
 }

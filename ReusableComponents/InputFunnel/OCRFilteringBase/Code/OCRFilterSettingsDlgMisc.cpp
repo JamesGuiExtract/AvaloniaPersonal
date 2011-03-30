@@ -312,7 +312,7 @@ void OCRFilterSettingsDlg::initDialogState()
 	}
 
 	string strCurrentFSDName("");
-	if (!m_bEditFOD && m_pCurrentFSD != NULL)
+	if (!m_bEditFOD && m_pCurrentFSD != __nullptr)
 	{
 		strCurrentFSDName = m_pCurrentFSD->getFSDFileName();
 	}
@@ -693,7 +693,7 @@ void OCRFilterSettingsDlg::updateCaseSensitivities()
 	m_bAllUpper = 0;
 	m_bAllLower = 0;
 
-	if (!m_bEditFOD && m_pCurrentFSD != NULL)
+	if (!m_bEditFOD && m_pCurrentFSD != __nullptr)
 	{
 		
 		bool bExactCase, bAllUpper, bAllLower;
@@ -774,7 +774,7 @@ void OCRFilterSettingsDlg::updateCurrentFOD()
 //--------------------------------------------------------------------------------------------------
 void OCRFilterSettingsDlg::updateDisableFilteringState()
 {
-	if (!m_bEditFOD && m_pCurrentFSD != NULL)
+	if (!m_bEditFOD && m_pCurrentFSD != __nullptr)
 	{
 		m_chkDisableFiltering = m_pCurrentFSD->isFilteringEnabled() ? FALSE : TRUE;
 		// enable/disable other controls

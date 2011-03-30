@@ -91,13 +91,13 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(IFileRecord* pFileReco
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24785", pResult != NULL);
+		ASSERT_ARGUMENT("ELI24785", pResult != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31343", ipFileRecord != __nullptr);
 
 		// Get the tag manager
 		IFAMTagManagerPtr ipFamTagManager(pTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI24787", ipFamTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24787", ipFamTagManager != __nullptr);
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
@@ -128,12 +128,12 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(IFileRecord* pFileReco
 
 		// Load the attibutes from the VOA file
 		IIUnknownVectorPtr ipAttributesToFilter(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI24789", ipAttributesToFilter != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24789", ipAttributesToFilter != __nullptr);
 		ipAttributesToFilter->LoadFrom(strVOAToRead.c_str(), VARIANT_FALSE);
 
 		// Create a new collection of attributes to hold the filtered set
 		IIUnknownVectorPtr ipNewAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI24790", ipNewAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24790", ipNewAttributes != __nullptr);
 
 		// Loop through each attribute and add it to the new collection if it matches
 		// a data type in the filter
@@ -141,7 +141,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(IFileRecord* pFileReco
 		for (long i=0; i < lNumberOfAttributes; i++)
 		{
 			IAttributePtr ipAttribute = ipAttributesToFilter->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI24791", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24791", ipAttribute != __nullptr);
 
 			// Get the type as a lower case string (case insensitive compare)
 			string strType = asString(ipAttribute->Type);
@@ -220,7 +220,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI24795", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI24795", pbValue != __nullptr);
 
 		try
 		{
@@ -272,7 +272,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_Clone(IUnknown * * pObject)
 
 		// create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_FilterIDShieldDataFileTask);
-		ASSERT_RESOURCE_ALLOCATION("ELI24799", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24799", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk(this);
 		ipObjCopy->CopyFrom(ipUnk);
@@ -294,7 +294,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_CopyFrom(IUnknown * pObject)
 		// validate license first
 		validateLicense();
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IFilterIDShieldDataFileTaskPtr ipSource(  pObject );
-		ASSERT_RESOURCE_ALLOCATION("ELI24801", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24801", ipSource != __nullptr);
 
 		// Copy data from the source
 		m_strVOAFileToRead = asString(ipSource->VOAFileToRead);
@@ -318,7 +318,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_IsConfigured(VARIANT_BOOL *pbValue
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24803", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI24803", pbValue != __nullptr);
 
 		// Configured if:
 		// 1. an input file
@@ -350,7 +350,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::put_VOAFileToRead(BSTR bstrVOAFileName
 
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI24805", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24805", ipFAMTagManager != __nullptr);
 
 		// Make sure the file name contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strFileName.c_str()) == VARIANT_TRUE)
@@ -379,7 +379,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::get_VOAFileToRead(BSTR *pbstrVOAFileNa
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24808", pbstrVOAFileName != NULL);
+		ASSERT_ARGUMENT("ELI24808", pbstrVOAFileName != __nullptr);
 
 		*pbstrVOAFileName = _bstr_t(m_strVOAFileToRead.c_str()).Detach();
 	}
@@ -398,7 +398,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::put_DataTypes(IVariantVector* pDataTyp
 
 		// Get the data types vector
 		IVariantVectorPtr ipDataTypes(pDataTypes);
-		ASSERT_RESOURCE_ALLOCATION("ELI24810", ipDataTypes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24810", ipDataTypes != __nullptr);
 
 		// Fill the internal set with the data types
 		fillDataTypeSet(ipDataTypes);
@@ -418,7 +418,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::get_DataTypes(IVariantVector** ppDataT
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24812", ppDataTypes != NULL);
+		ASSERT_ARGUMENT("ELI24812", ppDataTypes != __nullptr);
 
 		// Get the data types as a variant vector and return it
 		*ppDataTypes = getDataTypesAsVariantVector().Detach();
@@ -440,7 +440,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::put_VOAFileToWrite(BSTR bstrVOAFileNam
 
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI24814", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24814", ipFAMTagManager != __nullptr);
 
 		// Make sure the file name contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strFileName.c_str()) == VARIANT_TRUE)
@@ -469,7 +469,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::get_VOAFileToWrite(BSTR *pbstrVOAFileN
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24817", pbstrVOAFileName != NULL);
+		ASSERT_ARGUMENT("ELI24817", pbstrVOAFileName != __nullptr);
 
 		*pbstrVOAFileName = _bstr_t(m_strVOAFileToWrite.c_str()).Detach();
 	}
@@ -646,7 +646,7 @@ IVariantVectorPtr CFilterIDShieldDataFileTask::getDataTypesAsVariantVector()
 	try
 	{
 		IVariantVectorPtr ipVarTemp(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI24824", ipVarTemp != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24824", ipVarTemp != __nullptr);
 
 		// Loop through the set of data types and add them to the variant vector
 		for (set<string>::iterator it = m_setDataTypes.begin(); it != m_setDataTypes.end(); it++)
@@ -664,7 +664,7 @@ void CFilterIDShieldDataFileTask::fillDataTypeSet(IVariantVectorPtr ipDataTypes)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24826", ipDataTypes != NULL);
+		ASSERT_ARGUMENT("ELI24826", ipDataTypes != __nullptr);
 
 		// Reset the set of data types
 		m_setDataTypes.clear();

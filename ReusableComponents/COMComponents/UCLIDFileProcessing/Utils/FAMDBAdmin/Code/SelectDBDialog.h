@@ -54,7 +54,7 @@ private:
 	// FAMDB pointer to perform operations on the database
 	IFileProcessingDBPtr m_ipFAMDB;
 
-	auto_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
+	unique_ptr<FileProcessingConfigMgr> ma_pCfgMgr;
 public:
 	afx_msg void OnCbnKillfocusComboSelectDbServer();
 };

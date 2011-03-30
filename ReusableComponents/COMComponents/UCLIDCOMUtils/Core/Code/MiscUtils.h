@@ -104,6 +104,6 @@ private:
 	void validateETFEngineLicense(); // validate license for encryption component
 
 	// persistence mgr
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> m_apSettings;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apSettings;
 	CMutex m_mutex;
 };

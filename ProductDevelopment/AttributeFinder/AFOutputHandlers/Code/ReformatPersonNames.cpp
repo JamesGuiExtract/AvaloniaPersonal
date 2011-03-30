@@ -28,7 +28,7 @@ CReformatPersonNames::CReformatPersonNames()
 	try
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI09569", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09569", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI09570")
 }
@@ -70,7 +70,7 @@ STDMETHODIMP CReformatPersonNames::get_PersonAttributeQuery(/*[out, retval]*/ BS
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT("ELI09571", pVal != NULL );
+		ASSERT_ARGUMENT("ELI09571", pVal != __nullptr );
 
 		// Return the Attribute Name
 		*pVal = _bstr_t( m_strQuery.c_str() ).copy();
@@ -125,7 +125,7 @@ STDMETHODIMP CReformatPersonNames::get_ReformatPersonSubAttributes(/*[out, retva
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT( "ELI09597", pVal != NULL );
+		ASSERT_ARGUMENT( "ELI09597", pVal != __nullptr );
 
 		*pVal = m_bReformatPersonSubAttributes ? VARIANT_TRUE : VARIANT_FALSE;
 	}
@@ -161,7 +161,7 @@ STDMETHODIMP CReformatPersonNames::get_FormatString(/*[out, retval]*/ BSTR *pVal
 		validateLicense();
 
 		// Validate argument
-		ASSERT_ARGUMENT("ELI09593", pVal != NULL );
+		ASSERT_ARGUMENT("ELI09593", pVal != __nullptr );
 
 		// Return the Attribute Name
 		*pVal = _bstr_t( m_strFormat.c_str() ).copy();
@@ -216,7 +216,7 @@ STDMETHODIMP CReformatPersonNames::raw_ProcessOutput(IIUnknownVector* pAttribute
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI09575", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09575", ipAttributes != __nullptr);
 
 		// Query the attributes
 		IIUnknownVectorPtr ipFoundAttributes = m_ipAFUtility->QueryAttributes(ipAttributes, 
@@ -226,7 +226,7 @@ STDMETHODIMP CReformatPersonNames::raw_ProcessOutput(IIUnknownVector* pAttribute
 		for (i = 0; i < ipFoundAttributes->Size(); i++)
 		{
 			IAttributePtr ipAttr = ipFoundAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI09577", ipAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09577", ipAttr != __nullptr);
 
 			reformatAttribute(ipAttr);
 		}
@@ -301,7 +301,7 @@ STDMETHODIMP CReformatPersonNames::raw_GetComponentDescription(BSTR * pstrCompon
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19550", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19550", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Reformat person names").Detach();
 	}
@@ -320,7 +320,7 @@ STDMETHODIMP CReformatPersonNames::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_AFOUTPUTHANDLERSLib::IReformatPersonNamesPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI09581", ipSource != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09581", ipSource != __nullptr );
 		
 		m_strQuery = asString( ipSource->PersonAttributeQuery );
 		
@@ -345,7 +345,7 @@ STDMETHODIMP CReformatPersonNames::raw_Clone(IUnknown **pObject)
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_ReformatPersonNames );
-		ASSERT_RESOURCE_ALLOCATION("ELI09582", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI09582", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom( ipUnk );
@@ -475,7 +475,7 @@ void CReformatPersonNames::validateLicense()
 //-------------------------------------------------------------------------------------------------
 void CReformatPersonNames::reformatAttribute(IAttributePtr ipAttribute)
 {
-	if (ipAttribute == NULL)
+	if (ipAttribute == __nullptr)
 	{
 		THROW_LOGIC_ERROR_EXCEPTION("ELI09603");
 	}
@@ -488,7 +488,7 @@ void CReformatPersonNames::reformatAttribute(IAttributePtr ipAttribute)
 	for (i = 0; i < ipSubAttributes->Size(); i++)
 	{
 		IAttributePtr ipAttr = ipSubAttributes->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI09602", ipAttr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09602", ipAttr != __nullptr);
 
 		// if we are supposed to process PersonSubAttributes
 		// then we recurse on each sub attribute
@@ -521,7 +521,7 @@ void CReformatPersonNames::reformatAttribute(IAttributePtr ipAttribute)
 ISpatialStringPtr CReformatPersonNames::getReformattedName(	string strFormat, VariableMap& varmap)
 {
 	ISpatialStringPtr ipNewName(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI09608", ipNewName != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09608", ipNewName != __nullptr);
 
 	unsigned int ui;
 	unsigned int uiLength = strFormat.length();
@@ -546,7 +546,7 @@ ISpatialStringPtr CReformatPersonNames::getReformattedName(	string strFormat, Va
 			long nLength = (nClosePos - 1) - nStart;
 			string strNewFormat = strFormat.substr(ui+1, nLength);
 			ISpatialStringPtr ipScopeStr = getReformattedName(strNewFormat, varmap);
-			if (ipScopeStr != NULL)
+			if (ipScopeStr != __nullptr)
 			{
 				ipNewName->Append(ipScopeStr);
 			}
@@ -588,7 +588,7 @@ ISpatialStringPtr CReformatPersonNames::getReformattedName(	string strFormat, Va
 
 			// Get the value of the %variable
 			// if the %variable is available
-			ISpatialStringPtr ipText = NULL;
+			ISpatialStringPtr ipText = __nullptr;
 			VariableMap::iterator it = varmap.find(strIdent);
 			if (it != varmap.end())
 			{
@@ -602,7 +602,7 @@ ISpatialStringPtr CReformatPersonNames::getReformattedName(	string strFormat, Va
 				ipText = it->second[0];
 			}
 
-			if (ipText == NULL)
+			if (ipText == __nullptr)
 			{
 				// If the %var has no value we can either ignore it and continue
 				// or invalidate the enitire scope

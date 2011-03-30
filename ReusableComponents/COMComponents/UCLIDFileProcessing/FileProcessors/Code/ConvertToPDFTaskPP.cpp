@@ -35,9 +35,9 @@ CConvertToPDFTaskPP::~CConvertToPDFTaskPP()
 {
 	try
 	{
-		if (m_ipSettings != NULL)
+		if (m_ipSettings != __nullptr)
 		{
-			m_ipSettings = NULL;
+			m_ipSettings = __nullptr;
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18777");
@@ -53,7 +53,7 @@ STDMETHODIMP CConvertToPDFTaskPP::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// check parameter
-		ASSERT_ARGUMENT("ELI18778", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18778", pbValue != __nullptr);
 
 		try
 		{
@@ -99,7 +99,7 @@ STDMETHODIMP CConvertToPDFTaskPP::Apply()
 		// create a FAM tag manager object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI18780", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18780", ipFAMTagManager != __nullptr);
 
 		// ensure the input image file is in a valid format
 		if(ipFAMTagManager->StringContainsInvalidTags(bstrInputImage) == VARIANT_TRUE)
@@ -113,7 +113,7 @@ STDMETHODIMP CConvertToPDFTaskPP::Apply()
 		if (bSecurityChecked)
 		{
 			IMustBeConfiguredObjectPtr ipConfigured = m_ipSettings;
-			if (ipConfigured == NULL || ipConfigured->IsConfigured() == VARIANT_FALSE)
+			if (ipConfigured == __nullptr || ipConfigured->IsConfigured() == VARIANT_FALSE)
 			{
 				AfxMessageBox("Pdf security settings are not properly configured.",
 					MB_ICONWARNING);
@@ -125,7 +125,7 @@ STDMETHODIMP CConvertToPDFTaskPP::Apply()
 		for(UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_FILEPROCESSORSLib::IConvertToPDFTaskPtr ipConvertToPDFTask(m_ppUnk[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI18781", ipConvertToPDFTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18781", ipConvertToPDFTask != __nullptr);
 
 			IPdfPasswordSettingsPtr ipTemp = bSecurityChecked ? m_ipSettings : NULL;
 
@@ -150,7 +150,7 @@ LRESULT CConvertToPDFTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 		// get the ConvertToPDFTask associated with this property page
 		// NOTE: this assumes only one coclass is associated with this property page
 		UCLID_FILEPROCESSORSLib::IConvertToPDFTaskPtr ipConvertToPDFTask(m_ppUnk[0]);
-		ASSERT_RESOURCE_ALLOCATION("ELI18783", ipConvertToPDFTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18783", ipConvertToPDFTask != __nullptr);
 
 		// get the input image file controls and the PDF/A check box
 		m_editInputImage = GetDlgItem(IDC_EDIT_CONVERT_TO_PDF_INPUT_IMAGE);
@@ -166,7 +166,7 @@ LRESULT CConvertToPDFTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 		// get the Convert to PDF task's options
 		_bstr_t bstrInputImage;
 		VARIANT_BOOL vbPDFA;
-		IPdfPasswordSettingsPtr ipPdfSettings = NULL;
+		IPdfPasswordSettingsPtr ipPdfSettings = __nullptr;
 		ipConvertToPDFTask->GetOptions( bstrInputImage.GetAddress(), &vbPDFA, &ipPdfSettings );
 
 
@@ -178,13 +178,13 @@ LRESULT CConvertToPDFTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			// Check for PDF password settings object (if it exists, clone it)
 			// Check/uncheck the check box based on presence of settings object
 			ICopyableObjectPtr ipCopy = ipPdfSettings;
-			if (ipCopy != NULL)
+			if (ipCopy != __nullptr)
 			{
 				m_checkPDFA.EnableWindow(FALSE);
 				m_checkPDFSecurity.SetCheck(BST_CHECKED);
 				m_btnPDFSecuritySettings.EnableWindow(TRUE);
 				m_ipSettings = ipCopy->Clone();
-				ASSERT_RESOURCE_ALLOCATION("ELI29739", m_ipSettings != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI29739", m_ipSettings != __nullptr);
 			}
 			else
 			{
@@ -302,15 +302,15 @@ LRESULT CConvertToPDFTaskPP::OnClickedBtnPdfSecuritySettings(WORD wNotifyCode, W
 
 	try
 	{
-		if (m_ipSettings == NULL)
+		if (m_ipSettings == __nullptr)
 		{
 			m_ipSettings.CreateInstance(CLSID_PdfPasswordSettings);
-			ASSERT_RESOURCE_ALLOCATION("ELI29746", m_ipSettings != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29746", m_ipSettings != __nullptr);
 		}
 
 		// Show the configuration dialog for the PDF password settings
 		IConfigurableObjectPtr ipConfigure = m_ipSettings;
-		ASSERT_RESOURCE_ALLOCATION("ELI29741", ipConfigure != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29741", ipConfigure != __nullptr);
 		ipConfigure->RunConfiguration();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29742");

@@ -74,24 +74,24 @@ STDMETHODIMP CCharacterConfidenceCondition::raw_ProcessCondition(IAFDocument *pA
 		IAFDocumentPtr ipDoc(pAFDoc);
 
 		// Assert parameters and resources
-		ASSERT_ARGUMENT("ELI29352", ipDoc != NULL);
-		ASSERT_ARGUMENT("ELI29353", pbRetVal != NULL);
+		ASSERT_ARGUMENT("ELI29352", ipDoc != __nullptr);
+		ASSERT_ARGUMENT("ELI29353", pbRetVal != __nullptr);
 		
 		long nConfidence;
 		ISpatialStringPtr ipValue = ipDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI29451", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29451", ipValue != __nullptr);
 
 		// Get the Confidence
 		switch (m_eAggregateFunction)
 		{
 		case kAverage:
-			ipValue->GetCharConfidence(NULL, NULL, &nConfidence);
+			ipValue->GetCharConfidence(__nullptr, __nullptr, &nConfidence);
 			break;
 		case kMinimum:
-			ipValue->GetCharConfidence(&nConfidence, NULL, NULL);
+			ipValue->GetCharConfidence(&nConfidence, __nullptr, __nullptr);
 			break;
 		case kMaximum:
-			ipValue->GetCharConfidence(NULL, &nConfidence, NULL);
+			ipValue->GetCharConfidence(__nullptr, &nConfidence, __nullptr);
 			break;
 		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI29439");
@@ -138,7 +138,7 @@ STDMETHODIMP CCharacterConfidenceCondition::raw_IsConfigured(VARIANT_BOOL *pbVal
 		validateLicense();
 
 		// Check parameter
-		ASSERT_ARGUMENT("ELI29356", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI29356", pbValue != __nullptr);
 
 		// Always configured
 		*pbValue = VARIANT_TRUE;
@@ -157,7 +157,7 @@ STDMETHODIMP CCharacterConfidenceCondition::raw_GetComponentDescription(BSTR * p
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29358", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI29358", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Character confidence condition").Detach();
 
@@ -179,7 +179,7 @@ STDMETHODIMP CCharacterConfidenceCondition::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFCONDITIONSLib::ICharacterConfidenceConditionPtr ipCopyThis = pObject;
-		ASSERT_ARGUMENT("ELI29360", ipCopyThis != NULL);
+		ASSERT_ARGUMENT("ELI29360", ipCopyThis != __nullptr);
 		
 		// Copy the properties
 		m_eFirstScoreCondition = ipCopyThis->FirstScoreCondition;
@@ -206,11 +206,11 @@ STDMETHODIMP CCharacterConfidenceCondition::raw_Clone(IUnknown **pObject)
 		// Validate license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29362", pObject != NULL);
+		ASSERT_ARGUMENT("ELI29362", pObject != __nullptr);
 
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy(CLSID_CharacterConfidenceCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI29363", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29363", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -232,7 +232,7 @@ STDMETHODIMP CCharacterConfidenceCondition::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29365", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI29365", pClassID != __nullptr);
 
 		*pClassID = CLSID_CharacterConfidenceCondition;
 
@@ -261,7 +261,7 @@ STDMETHODIMP CCharacterConfidenceCondition::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29368", pStream != NULL);
+		ASSERT_ARGUMENT("ELI29368", pStream != __nullptr);
 		
 		// Set the properties to default values
 		m_eFirstScoreCondition = kEQ;
@@ -275,9 +275,9 @@ STDMETHODIMP CCharacterConfidenceCondition::Load(IStream *pStream)
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
-		pStream->Read(&nDataLength, sizeof(nDataLength), NULL);
+		pStream->Read(&nDataLength, sizeof(nDataLength), __nullptr);
 		ByteStream data(nDataLength);
-		pStream->Read(data.getData(), nDataLength, NULL);
+		pStream->Read(data.getData(), nDataLength, __nullptr);
 		ByteStreamManipulator dataReader(ByteStreamManipulator::kRead, data);
 
 		// Read the individual data items from the bytestream
@@ -326,7 +326,7 @@ STDMETHODIMP CCharacterConfidenceCondition::Save(IStream *pStream, BOOL fClearDi
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI29371", pStream != NULL);
+		ASSERT_ARGUMENT("ELI29371", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -348,8 +348,8 @@ STDMETHODIMP CCharacterConfidenceCondition::Save(IStream *pStream, BOOL fClearDi
 
 		// Write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
-		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
-		pStream->Write(data.getData(), nDataLength, NULL);
+		pStream->Write(&nDataLength, sizeof(nDataLength), __nullptr);
+		pStream->Write(data.getData(), nDataLength, __nullptr);
 
 
 		// Clear the flag as specified
@@ -378,7 +378,7 @@ STDMETHODIMP CCharacterConfidenceCondition::raw_IsLicensed(VARIANT_BOOL * pbValu
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29373", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI29373", pbValue != __nullptr);
 
 		try
 		{
@@ -410,7 +410,7 @@ STDMETHODIMP CCharacterConfidenceCondition::get_AggregateFunction(EAggregateFunc
 		// validate License
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI29411", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29411", pVal != __nullptr);
 
 		*pVal = m_eAggregateFunction;
 
@@ -449,7 +449,7 @@ STDMETHODIMP CCharacterConfidenceCondition::get_FirstScoreCondition(EConditional
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29413", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29413", pVal != __nullptr);
 
 		*pVal = m_eFirstScoreCondition;
 
@@ -487,7 +487,7 @@ STDMETHODIMP CCharacterConfidenceCondition::get_FirstScoreToCompare(long* pVal)
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29416", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29416", pVal != __nullptr);
 
 		*pVal = m_lFirstScoreToCompare;
 
@@ -525,7 +525,7 @@ STDMETHODIMP CCharacterConfidenceCondition::get_IsSecondCondition(VARIANT_BOOL* 
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29419", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29419", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bIsSecondCondition);
 
@@ -563,7 +563,7 @@ STDMETHODIMP CCharacterConfidenceCondition::get_SecondScoreCondition(EConditiona
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29422", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29422", pVal != __nullptr);
 
 		*pVal = m_eSecondScoreCondition;
 
@@ -601,7 +601,7 @@ STDMETHODIMP CCharacterConfidenceCondition::get_SecondScoreToCompare(long* pVal)
 		validateLicense();
 		
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29425", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29425", pVal != __nullptr);
 
 		*pVal = m_lSecondScoreToCompare;
 
@@ -639,7 +639,7 @@ STDMETHODIMP CCharacterConfidenceCondition::get_AndSecondCondition(VARIANT_BOOL*
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29428", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29428", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bAndConditions);
 
@@ -677,7 +677,7 @@ STDMETHODIMP CCharacterConfidenceCondition::get_IsMet(VARIANT_BOOL* pVal)
 		validateLicense();
 
 		// Make sure the argument is valid
-		ASSERT_ARGUMENT("ELI29431", pVal != NULL);
+		ASSERT_ARGUMENT("ELI29431", pVal != __nullptr);
 
 		*pVal = asVariantBool(m_bIsMet);
 

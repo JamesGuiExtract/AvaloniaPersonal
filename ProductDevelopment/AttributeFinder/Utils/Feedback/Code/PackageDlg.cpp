@@ -47,13 +47,13 @@ CPackageDlg::CPackageDlg(IFeedbackMgrInternalsPtr ipFBMgr, CWnd* pParent /*=NULL
 		//}}AFX_DATA_INIT
 
 		// Get Persistence Manager for dialog
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_UTILS_KEY ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09158", ma_pUserCfgMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09158", ma_pUserCfgMgr.get() != __nullptr );
 		
-		ma_pCfgFeedbackMgr = auto_ptr<PersistenceMgr>(new PersistenceMgr( 
+		ma_pCfgFeedbackMgr = unique_ptr<PersistenceMgr>(new PersistenceMgr( 
 			ma_pUserCfgMgr.get(), "\\FeedbackManager" ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09159", ma_pCfgFeedbackMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09159", ma_pCfgFeedbackMgr.get() != __nullptr );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08474")
 }
@@ -213,7 +213,7 @@ void CPackageDlg::OnOK()
 					///////////////////////
 					// Clear Feedback files
 					///////////////////////
-					if ((iResult == IDYES) && (m_ipFBMgr != NULL))
+					if ((iResult == IDYES) && (m_ipFBMgr != __nullptr))
 					{
 						// Call method on interface
 						m_ipFBMgr->ClearFeedbackData( VARIANT_FALSE );
@@ -419,8 +419,7 @@ void CPackageDlg::readDatabase()
 
 		// Get Recordset
 		_RecordsetPtr	ipRS = m_ipFBMgr->GetFeedbackRecords();
-//		ASSERT_RESOURCE_ALLOCATION( "ELI10186", ipRS != NULL );
-		if (ipRS == NULL)
+		if (ipRS == __nullptr)
 		{
 			// Display message to user and return
 			MessageBox( "Unable to retrieve Feedback records!  Either database is locked by another application or no Feedback information is available for packaging.", 

@@ -117,7 +117,7 @@ bool CStringTokenizerSplitterPP::storeAttributeNameValues(
 		else
 		{
 			ipVecAttributeNameAndValue.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI05377", ipVecAttributeNameAndValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05377", ipVecAttributeNameAndValue != __nullptr);
 			for (int n = 0; n < nTotalItems; n++)
 			{
 				// get item texts from list
@@ -329,7 +329,7 @@ LRESULT CStringTokenizerSplitterPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARA
 		// get access to the underlying object who's property's are being
 		// exposed by this property page
 		UCLID_AFSPLITTERSLib::IStringTokenizerSplitterPtr ipObj = m_ppUnk[0];
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI05358", "No object associated with this property page!");
 		}
@@ -381,7 +381,7 @@ LRESULT CStringTokenizerSplitterPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARA
 
 				// update the list box
 				IIUnknownVectorPtr ipVec= ipObj->AttributeNameAndValueExprVector;
-				if (ipVec == NULL)
+				if (ipVec == __nullptr)
 				{
 					throw UCLIDException("ELI05359", "Unable to retrieve AttributeName-and-ValueExpression vector!");
 				}

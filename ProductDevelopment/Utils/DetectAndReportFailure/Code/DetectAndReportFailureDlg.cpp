@@ -48,8 +48,7 @@ CDetectAndReportFailureDlg::CDetectAndReportFailureDlg(CWnd* pParent /*=NULL*/)
 	validateFileOrFolderExistence(m_options.getINIFileName());
 
 	// create an instance of the exception dialog
-	m_apExceptionDlg = auto_ptr<ExceptionDlg>(
-		new ExceptionDlg(m_vecExceptions, m_exceptionDataLock, m_options));
+	m_apExceptionDlg.reset(new ExceptionDlg(m_vecExceptions, m_exceptionDataLock, m_options));
 }
 //-------------------------------------------------------------------------------------------------
 void CDetectAndReportFailureDlg::DoDataExchange(CDataExchange* pDX)
@@ -721,7 +720,7 @@ UINT asyncNotificationThread(LPVOID pData)
 		// get access to the thread data structure
 		AsyncNotificationThreadData *pThreadData = 
 			static_cast<AsyncNotificationThreadData *> (pData);
-		auto_ptr<AsyncNotificationThreadData> apThreadData(pThreadData);
+		unique_ptr<AsyncNotificationThreadData> apThreadData(pThreadData);
 
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 

@@ -189,7 +189,7 @@ void CEntityNameSplitterTester::addAttributeLevel(IAttributePtr ipNewAttribute, 
 	// Retrieve vector of Attributes or SubAttributes at specified level
 	IIUnknownVectorPtr	ipLevelVector = m_vecCurrentLevels.at( iLevel );
 
-	if (ipLevelVector == NULL)
+	if (ipLevelVector == __nullptr)
 	{
 		// Throw exception, Cannot retrieve specified Attribute collection
 		UCLIDException	ue( "ELI06481", "Unable to retrieve Attributes." );
@@ -229,7 +229,7 @@ string CEntityNameSplitterTester::attributeAsString(IAttributePtr ipAttribute, i
 
 	// Add Value
 	ISpatialStringPtr ipValue = ipAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI15576", ipValue != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15576", ipValue != __nullptr);
 	string strValue = ipValue->String;
 
 	// convert any cpp string (ex. \r, \n, etc. )to normal string
@@ -247,7 +247,7 @@ string CEntityNameSplitterTester::attributeAsString(IAttributePtr ipAttribute, i
 
 	// Retrieve collected sub-attributes
 	IIUnknownVectorPtr ipSubs = ipAttribute->SubAttributes;
-	ASSERT_RESOURCE_ALLOCATION("ELI15577", ipSubs != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15577", ipSubs != __nullptr);
 
 	// Handle each sub-attribute
 	long lSubCount = ipSubs->Size();
@@ -258,7 +258,7 @@ string CEntityNameSplitterTester::attributeAsString(IAttributePtr ipAttribute, i
 
 		// Retrieve the sub-attribute
 		IAttributePtr ipSubAttribute = ipSubs->At( i );
-		ASSERT_RESOURCE_ALLOCATION("ELI15578", ipSubs != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15578", ipSubs != __nullptr);
 
 		// Add the stringized subattribute - with next child level
 		strAttribute += attributeAsString( ipSubAttribute, iChildLevel + 1 );
@@ -282,10 +282,10 @@ bool CEntityNameSplitterTester::checkTestResults(IAttributePtr ipTest, IAttribut
 											 "Test Attributes", _bstr_t( strTestAttr.c_str() ));
 	// Get IComparableObject pointer from Test and Expected Attributes
 	IComparableObjectPtr	ipCompTest = ipTest;
-	ASSERT_RESOURCE_ALLOCATION( "ELI06482", ipCompTest != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI06482", ipCompTest != __nullptr );
 
 	IComparableObjectPtr	ipCompExp = ipExpected;
-	ASSERT_RESOURCE_ALLOCATION( "ELI06483", ipCompExp != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI06483", ipCompExp != __nullptr );
 
 	// Compare the Attributes
 	if (ipCompTest->IsEqualTo( ipCompExp ) == VARIANT_FALSE)
@@ -306,8 +306,8 @@ void CEntityNameSplitterTester::doTest(std::string strLabel, IAttributePtr ipTes
 	bool bExceptionCaught = false;
 	try
 	{
-		ASSERT_ARGUMENT("ELI20477", ipTest != NULL);
-		ASSERT_ARGUMENT("ELI20478", ipExpected != NULL);
+		ASSERT_ARGUMENT("ELI20477", ipTest != __nullptr);
+		ASSERT_ARGUMENT("ELI20478", ipExpected != __nullptr);
 
 		// Call Entity Name Splitter
 		try
@@ -322,7 +322,7 @@ void CEntityNameSplitterTester::doTest(std::string strLabel, IAttributePtr ipTes
 		{
 			UCLIDException uexOuter( "ELI06485", "Failed to split the Attribute.", ue );
 			ISpatialStringPtr ipValue = ipTest->Value;
-			if (ipValue != NULL)
+			if (ipValue != __nullptr)
 			{
 				uexOuter.addDebugInfo( "Input String", asString( ipValue->String ) );
 			}
@@ -339,7 +339,7 @@ IAttributePtr CEntityNameSplitterTester::getAttribute(std::ifstream &ifs)
 {
 	// Create the main Attribute
 	IAttributePtr	ipAttribute( CLSID_Attribute );
-	ASSERT_RESOURCE_ALLOCATION( "ELI06489", ipAttribute != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI06489", ipAttribute != __nullptr );
 
 	// Read each line of the Attribute
 	bool	bDone = false;
@@ -411,7 +411,7 @@ IAttributePtr CEntityNameSplitterTester::getAttribute(std::ifstream &ifs)
 			{
 				// Create a new Attribute object for this Name/Value pair
 				IAttributePtr	ipNewAttribute( CLSID_Attribute );
-				if (ipNewAttribute == NULL)
+				if (ipNewAttribute == __nullptr)
 				{
 					// Throw exception
 					UCLIDException ue( "ELI06491", "Unable to create new Attribute object!" );
@@ -421,7 +421,7 @@ IAttributePtr CEntityNameSplitterTester::getAttribute(std::ifstream &ifs)
 				// Add Name, Value, Type information
 				ipNewAttribute->Name = _bstr_t( strName.c_str() );
 				ISpatialStringPtr ipValue = ipNewAttribute->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI25944", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25944", ipValue != __nullptr);
 				ipValue->CreateNonSpatialString(strValue.c_str(), "");
 				ipNewAttribute->Type = _bstr_t( strType.c_str() );
 
@@ -433,7 +433,7 @@ IAttributePtr CEntityNameSplitterTester::getAttribute(std::ifstream &ifs)
 				// Add Name, Value, Type information to Main Attribute
 				ipAttribute->Name = _bstr_t( strName.c_str() );
 				ISpatialStringPtr ipValue = ipAttribute->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI25945", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25945", ipValue != __nullptr);
 				ipValue->ReplaceAndDowngradeToNonSpatial(strValue.c_str());
 				ipAttribute->Type = _bstr_t( strType.c_str() );
 
@@ -486,7 +486,7 @@ const std::string CEntityNameSplitterTester::getMasterTestFileName(IVariantVecto
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		// get the DAT filename
 		string strMasterDatFileName = ::getAbsoluteFileName(strTCLFile, asString(_bstr_t(ipParams->GetItem(1))), true);
@@ -513,7 +513,7 @@ void CEntityNameSplitterTester::prepareTests()
 {
 	// Create a Name Splitter for testing
 	m_ipNameSplitter.CreateInstance( CLSID_EntityNameSplitter );
-	ASSERT_RESOURCE_ALLOCATION( "ELI06494", m_ipNameSplitter != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI06494", m_ipNameSplitter != __nullptr );
 }
 //-------------------------------------------------------------------------------------------------
 void CEntityNameSplitterTester::processFile(std::string strFile)
@@ -613,7 +613,7 @@ void CEntityNameSplitterTester::processLine(std::string strLine, const std::stri
 				IAttributePtr	ipExpected = getAttribute( ifs );
 
 				// Check for valid Attribute
-				if (ipExpected == NULL)
+				if (ipExpected == __nullptr)
 				{
 					// Create and throw exception
 					UCLIDException ue( "ELI06495", "Unable to retrieve expected Attribute." );
@@ -624,12 +624,12 @@ void CEntityNameSplitterTester::processLine(std::string strLine, const std::stri
 
 				// Create the Attribute to be split
 				IAttributePtr	ipTest( CLSID_Attribute );
-				ASSERT_RESOURCE_ALLOCATION( "ELI06496", ipTest != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI06496", ipTest != __nullptr );
 
 				// Provide Name and Value for Attribute
 				ipTest->Name = "Names";
 				ISpatialStringPtr ipValue = ipTest->Value;
-				ASSERT_RESOURCE_ALLOCATION("ELI25946", ipValue != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25946", ipValue != __nullptr);
 				ipValue->ReplaceAndDowngradeToNonSpatial(strText.c_str());
 
 				// Execute the test

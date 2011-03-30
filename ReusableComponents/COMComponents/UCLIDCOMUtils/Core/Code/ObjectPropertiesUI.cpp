@@ -40,14 +40,14 @@ STDMETHODIMP CObjectPropertiesUI::DisplayProperties1(IUnknown *pObj, BSTR strTit
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29891", pAppliedChanges != NULL);
+		ASSERT_ARGUMENT("ELI29891", pAppliedChanges != __nullptr);
 
 		// validate license
 		validateLicense();
 
 		// Check to see if configuration is supported via IConfigurableObject.
 		UCLID_COMUTILSLib::IConfigurableObjectPtr ipConfigurableObject(pObj);
-		if (ipConfigurableObject != NULL)
+		if (ipConfigurableObject != __nullptr)
 		{
 			// If so, run the configuration.
 			bool bSettingsApplied = asCppBool(ipConfigurableObject->RunConfiguration());
@@ -55,7 +55,7 @@ STDMETHODIMP CObjectPropertiesUI::DisplayProperties1(IUnknown *pObj, BSTR strTit
 			// If settings were applied and the object implements IMustBeConfiguredObject,
 			// ensure that the object is now properly configured.
 			UCLID_COMUTILSLib::IMustBeConfiguredObjectPtr ipMustBeConfiguredObject(pObj);
-			while (bSettingsApplied && ipMustBeConfiguredObject != NULL)
+			while (bSettingsApplied && ipMustBeConfiguredObject != __nullptr)
 			{
 				// Allow the UI to update to avoid any artifacts from the closed config screen.
 				emptyWindowsMessageQueue();

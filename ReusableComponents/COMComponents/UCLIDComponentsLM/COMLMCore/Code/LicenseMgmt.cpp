@@ -737,7 +737,7 @@ void LicenseManagement::validateState()
 	}
 
 	// If the time rollback preventer has been initialized, then check its state
-	if (m_hwndTRP != NULL)
+	if (m_hwndTRP != __nullptr)
 	{
 		const unsigned long ulMIN_TIME_BETWEEN_CHECKS = 60; // seconds
 		static time_t ls_lastCheckTime = 0;

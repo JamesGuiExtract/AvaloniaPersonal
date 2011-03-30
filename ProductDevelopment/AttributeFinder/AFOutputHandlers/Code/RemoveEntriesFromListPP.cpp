@@ -24,7 +24,7 @@ CRemoveEntriesFromListPP::CRemoveEntriesFromListPP()
 		// Check licensing
 		validateLicense();
 
-		ASSERT_RESOURCE_ALLOCATION("ELI07308", m_ipInternalObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07308", m_ipInternalObject != __nullptr);
 		
 		m_dwTitleID = IDS_TITLERemoveEntriesFromListPP;
 		m_dwHelpFileID = IDS_HELPFILERemoveEntriesFromListPP;
@@ -68,7 +68,7 @@ STDMETHODIMP CRemoveEntriesFromListPP::Apply(void)
 		{	
 			// assign the value lst to the object
 			ICopyableObjectPtr ipValues = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI08378", ipValues != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08378", ipValues != __nullptr);
 			ICopyableObjectPtr ipCopyableObj(m_ipInternalObject);
 			if (ipCopyableObj)
 			{
@@ -133,7 +133,7 @@ LRESULT CRemoveEntriesFromListPP::OnInitDialog(UINT uMsg, WPARAM wParam,
 		if (ipObject)
 		{	
 			ICopyableObjectPtr ipCopy = m_ipInternalObject;
-			ASSERT_RESOURCE_ALLOCATION("ELI08379", ipCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08379", ipCopy != __nullptr);
 			ipCopy->CopyFrom(ipObject);
 			
 			// populate the dialog

@@ -80,7 +80,7 @@ STDMETHODIMP CDateInputValidator::raw_GetComponentDescription(BSTR * pstrCompone
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19616", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19616", pstrComponentDescription != __nullptr)
 
 		// Retrieve definition
 		*pstrComponentDescription = _bstr_t( 
@@ -110,7 +110,7 @@ STDMETHODIMP CDateInputValidator::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_DateInputValidator);
-		ASSERT_RESOURCE_ALLOCATION("ELI08365", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08365", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -231,7 +231,7 @@ STDMETHODIMP CDateInputValidator::raw_ValidateInput(ITextInput * pTextInput,
 		validateLicense();
 
 		ITextInputPtr ipTextInput(pTextInput);
-		ASSERT_ARGUMENT("ELI10152", ipTextInput != NULL);
+		ASSERT_ARGUMENT("ELI10152", ipTextInput != __nullptr);
 
 		// Retrieve string
 		string	strInput = ipTextInput->GetText();;
@@ -282,7 +282,7 @@ STDMETHODIMP CDateInputValidator::raw_GetInputType(BSTR * pstrInputType)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19617", pstrInputType != NULL)
+		ASSERT_ARGUMENT("ELI19617", pstrInputType != __nullptr)
 
 		// Check license
 		validateLicense();
@@ -373,7 +373,7 @@ void CDateInputValidator::doTest1()
 	// Prepare ITextInput object with test string
 	/////////////////////////////////////////////
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10472", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10472", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput( NULL, _bstr_t( "12/25/69" ) );
 
 	// Check validity - expect success
@@ -472,7 +472,7 @@ void CDateInputValidator::doTest1()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	m_ipLogger->EndTestCase( bTestSuccess ? VARIANT_TRUE : VARIANT_FALSE );
 }
 //-------------------------------------------------------------------------------------------------
@@ -495,7 +495,7 @@ void CDateInputValidator::doTest2()
 	// Prepare ITextInput object with test string
 	/////////////////////////////////////////////
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10473", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10473", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput( NULL, _bstr_t( "December 25, 1969" ) );
 
 	// Check validity - expect success
@@ -594,7 +594,7 @@ void CDateInputValidator::doTest2()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	m_ipLogger->EndTestCase( bTestSuccess ? VARIANT_TRUE : VARIANT_FALSE );
 }
 //-------------------------------------------------------------------------------------------------
@@ -617,7 +617,7 @@ void CDateInputValidator::doTest3()
 	// Prepare ITextInput object with test string
 	/////////////////////////////////////////////
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10474", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10474", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput( NULL, _bstr_t( "25 May 1969" ) );
 
 	// Check validity - expect success
@@ -716,7 +716,7 @@ void CDateInputValidator::doTest3()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	m_ipLogger->EndTestCase( bTestSuccess ? VARIANT_TRUE : VARIANT_FALSE );
 }
 //-------------------------------------------------------------------------------------------------
@@ -739,7 +739,7 @@ void CDateInputValidator::doTest4()
 	// Prepare ITextInput object with test string
 	/////////////////////////////////////////////
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10477", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10477", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput( NULL, _bstr_t( "29 February 2004" ) );
 
 	// Check validity - expect success
@@ -822,7 +822,7 @@ void CDateInputValidator::doTest4()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	m_ipLogger->EndTestCase( bTestSuccess ? VARIANT_TRUE : VARIANT_FALSE );
 }
 //-------------------------------------------------------------------------------------------------
@@ -845,7 +845,7 @@ void CDateInputValidator::doTest5()
 	// Prepare ITextInput object with test string
 	/////////////////////////////////////////////
 	ITextInputPtr ipTextInput(CLSID_TextInput);
-	ASSERT_RESOURCE_ALLOCATION("ELI10478", ipTextInput != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10478", ipTextInput != __nullptr);
 	ipTextInput->InitTextInput( NULL, _bstr_t( "05-25-69" ) );
 
 	// Check validity - expect success
@@ -928,14 +928,14 @@ void CDateInputValidator::doTest5()
 	/////////////////////
 	// End this test case
 	/////////////////////
-	ipTextInput = NULL;
+	ipTextInput = __nullptr;
 	m_ipLogger->EndTestCase( bTestSuccess ? VARIANT_TRUE : VARIANT_FALSE );
 }
 //-------------------------------------------------------------------------------------------------
 IInputValidatorPtr CDateInputValidator::getThisAsInputValidatorPtr()
 {
 	IInputValidatorPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI22009", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI22009", ipThis != __nullptr);
 
 	return ipThis;
 }

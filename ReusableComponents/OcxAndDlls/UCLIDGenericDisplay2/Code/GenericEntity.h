@@ -86,7 +86,7 @@ public:
 	// PURPOSE:	To modify a specific attribute associated with this entity.
 	// REQUIRE: An attribute with the specified attribute name (strAttributeName) will already
 	//			be associated with this entity.
-	//			strNewValue != NULL.
+	//			strNewValue != __nullptr.
 	// PROMISE: To modify the value of the specified attribute to the specified new value.  Any
 	//			functionality of associated with the entity that depends upon the value of a certain
 	//			attribute will operate based upon the new value of the attribute.  For instance,

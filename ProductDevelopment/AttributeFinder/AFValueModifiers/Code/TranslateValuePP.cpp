@@ -38,7 +38,7 @@ CTranslateValuePP::CTranslateValuePP()
 
 		// Create an IMiscUtilsPtr object
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI30074", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI30074", ipMiscUtils != __nullptr );
 
 		// Get the file header string and its length from IMiscUtilsPtr object
 		m_strFileHeader = ipMiscUtils->GetFileHeader();
@@ -65,22 +65,22 @@ STDMETHODIMP CTranslateValuePP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			ICopyableObjectPtr ipTranslateValue = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI08387", ipTranslateValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08387", ipTranslateValue != __nullptr);
 
 			if(m_ipInternalTransValue->TranslateFieldType == UCLID_AFVALUEMODIFIERSLib::kTranslateType)
 			{
 				// Test to ensure all the strings are valid types
 				IIUnknownVectorPtr ipTransPairs = m_ipInternalTransValue->TranslationStringPairs;
-				ASSERT_RESOURCE_ALLOCATION("ELI09667", ipTransPairs != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09667", ipTransPairs != __nullptr);
 			
 				// A temporary attribute for type validation
 				IAttributePtr ipAttr(CLSID_Attribute);
-				ASSERT_RESOURCE_ALLOCATION("ELI09666", ipAttr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09666", ipAttr != __nullptr);
 				int j;
 				for(j = 0; j < ipTransPairs->Size(); j++)
 				{
 					IStringPairPtr ipPair = ipTransPairs->At(j);
-					ASSERT_RESOURCE_ALLOCATION("ELI09668", ipPair != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI09668", ipPair != __nullptr);
 					_bstr_t bstrKey(ipPair->StringKey);
 					_bstr_t bstrValue(ipPair->StringValue);
 					string strKey = asString(bstrKey);
@@ -178,7 +178,7 @@ LRESULT CTranslateValuePP::OnInitDialog(UINT uMsg, WPARAM wParam,
 			{
 				// copy all properies from that translate value to internal translate value object.
 				ICopyableObjectPtr ipCopy = m_ipInternalTransValue;
-				ASSERT_RESOURCE_ALLOCATION("ELI08386", ipCopy != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI08386", ipCopy != __nullptr);
 				ipCopy->CopyFrom(ipCopyableObj);
 				loadTranslations();
 			}

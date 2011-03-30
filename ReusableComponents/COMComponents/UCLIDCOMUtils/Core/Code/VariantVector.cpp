@@ -65,7 +65,7 @@ STDMETHODIMP CVariantVector::get_Item(long nIndex, VARIANT *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26052", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26052", pVal != __nullptr);
 
 		validateLicense();
 		
@@ -87,7 +87,7 @@ STDMETHODIMP CVariantVector::get_Size(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26053", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26053", pVal != __nullptr);
 
 		validateLicense();
 
@@ -167,7 +167,7 @@ STDMETHODIMP CVariantVector::Contains(VARIANT vtItem, VARIANT_BOOL *bValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26054", bValue != NULL);
+		ASSERT_ARGUMENT("ELI26054", bValue != __nullptr);
 
 		std::vector<_variant_t>::const_iterator iter;
 		iter = find(m_vecVarCollection.begin(), m_vecVarCollection.end(), vtItem);
@@ -184,7 +184,7 @@ STDMETHODIMP CVariantVector::Find(VARIANT vtItem, long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26055", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26055", pVal != __nullptr);
 
 		// Get item as _variant_t
 		_variant_t vtTestItem(vtItem);
@@ -270,7 +270,7 @@ STDMETHODIMP CVariantVector::Append(IVariantVector *pVector)
 
 		// wrap pVector as smart pointer
 		UCLID_COMUTILSLib::IVariantVectorPtr ipVector(pVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI16911", ipVector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16911", ipVector != __nullptr);
 
 		// Get count of objects to be appended
 		long lNumItems = ipVector->Size;
@@ -382,7 +382,7 @@ STDMETHODIMP CVariantVector::CopyFrom(IUnknown *pObject)
 		m_vecVarCollection.clear();
 
 		UCLID_COMUTILSLib::IVariantVectorPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08318", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08318", ipSource != __nullptr);
 
 		long lSize = ipSource->Size;
 		for(long i = 0; i < lSize; i++)
@@ -394,10 +394,10 @@ STDMETHODIMP CVariantVector::CopyFrom(IUnknown *pObject)
 			if (varType == VT_UNKNOWN || varType == VT_DISPATCH)
 			{
 				UCLID_COMUTILSLib::ICopyableObjectPtr ipCopier(vtTemp.punkVal);
-				ASSERT_RESOURCE_ALLOCATION("ELI26056", ipCopier != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26056", ipCopier != __nullptr);
 
 				IUnknownPtr ipCopy = ipCopier->Clone();
-				ASSERT_RESOURCE_ALLOCATION("ELI26057", ipCopy != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI26057", ipCopy != __nullptr);
 				vtTemp = ipCopy.Detach();
 			}
 			
@@ -421,7 +421,7 @@ STDMETHODIMP CVariantVector::Clone(IUnknown* *pObject)
 		// create a new variant vector
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI08377", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08377", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -443,13 +443,13 @@ STDMETHODIMP CVariantVector::ShallowCopy(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26058", pObject != NULL);
+		ASSERT_ARGUMENT("ELI26058", pObject != __nullptr);
 
 		// validate license first
 		validateLicense();
 
 		UCLID_COMUTILSLib::IVariantVectorPtr ipNewVector(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI26059", ipNewVector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26059", ipNewVector != __nullptr);
 
 		// Copy each item into the new vector (for reference types this will be a shallow copy)
 		for (vector<_variant_t>::iterator it = m_vecVarCollection.begin();
@@ -643,7 +643,7 @@ STDMETHODIMP CVariantVector::GetSizeMax(ULARGE_INTEGER *pcbSize)
 UCLID_COMUTILSLib::IVariantVectorPtr CVariantVector::getThisAsCOMPtr()
 {
 	UCLID_COMUTILSLib::IVariantVectorPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16975", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16975", ipThis != __nullptr);
 
 	return ipThis;
 }

@@ -170,7 +170,7 @@ public :
 
 		CFAMProcessModule* pT = static_cast<CFAMProcessModule*>(this);
 		LPCTSTR lpszToken = FindOneOf(lpCmdLine, szTokens);
-		while (lpszToken != NULL)
+		while (lpszToken != __nullptr)
 		{
 			if (WordCmpI(lpszToken, _T("UnregServer"))==0)
 			{

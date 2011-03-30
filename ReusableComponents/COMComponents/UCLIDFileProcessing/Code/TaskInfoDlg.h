@@ -51,7 +51,7 @@ private:
 	// Variables
 	/////////////
 	FileProcessingRecord m_taskFileProcessing;
-	std::auto_ptr<UCLIDException> m_apUCLIDException;
+	std::unique_ptr<UCLIDException> m_apUCLIDException;
 
 	// dialog minimum width
 	int m_nDlgMinWidth;

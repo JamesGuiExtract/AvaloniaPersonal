@@ -17,18 +17,18 @@ CAddressFinder::CAddressFinder()
 :	m_bDirty(false), m_ipRegExpParser(NULL)
 {
 	m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-	ASSERT_RESOURCE_ALLOCATION("ELI08823", m_ipAFUtility != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08823", m_ipAFUtility != __nullptr);
 	
 	m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI08824", m_ipMiscUtils != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08824", m_ipMiscUtils != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CAddressFinder::~CAddressFinder()
 {
 	try
 	{
-		m_ipAFUtility = NULL;
-		m_ipMiscUtils = NULL;
+		m_ipAFUtility = __nullptr;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16338");
 }
@@ -73,18 +73,18 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 
 		// Wrap the AFDoc in a smart pointer
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI25631", ipAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI25631", ipAFDoc != __nullptr);
 
 		// Validate the license [FlexIDSCore #3534]
 		validateLicense();
 
 		// Create the return vector
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI08883", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08883", ipAttributes != __nullptr);
 
 		// Create a spatial string searcher for later use
 		ISpatialStringSearcherPtr ipSearcher(CLSID_SpatialStringSearcher);
-		ASSERT_RESOURCE_ALLOCATION("ELI08710", ipSearcher != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08710", ipSearcher != __nullptr);
 		ipSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
 		ipSearcher->SetBoundaryResolution(kLine);
 
@@ -95,12 +95,12 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 
 		// Retrieve the AFDocument text
 		ISpatialStringPtr ipText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI15587", ipText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15587", ipText != __nullptr);
 
 		// Find all the suffixes
 		IIUnknownVectorPtr ipSuffixes = m_ipRegExpParser->Find(ipText->String, VARIANT_FALSE, 
 			VARIANT_FALSE);
-		ASSERT_RESOURCE_ALLOCATION("ELI15588", ipSuffixes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15588", ipSuffixes != __nullptr);
 
 		long lSize = ipSuffixes->Size();
 		for (long i = 0; i < lSize; i++)
@@ -110,7 +110,7 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 			long nTokEnd;
 			m_ipMiscUtils->GetRegExpData(ipSuffixes, i, -1, &nTokStart, &nTokEnd);
 			ISpatialStringPtr ipSuffixString = ipText->GetSubString(nTokStart, nTokEnd);
-			ASSERT_RESOURCE_ALLOCATION("ELI15589", ipSuffixString != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15589", ipSuffixString != __nullptr);
 
 			// Use the suffix to build a region that could contain an address
 			long lLineHeight = ipSuffixString->GetAverageLineHeight();
@@ -118,18 +118,18 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 
 			long lPageNum = ipSuffixString->GetFirstPageNumber();
 			ISpatialStringPtr ipPage = ipText->GetSpecifiedPages(lPageNum, lPageNum);
-			ASSERT_RESOURCE_ALLOCATION("ELI15590", ipPage != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15590", ipPage != __nullptr);
 
 			// re-line the page
 			IIUnknownVectorPtr ipTmpLines = ipPage->GetSplitLines(4);
-			ASSERT_RESOURCE_ALLOCATION("ELI15591", ipTmpLines != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15591", ipTmpLines != __nullptr);
 			ipPage->CreateFromLines(ipTmpLines);
 			
 			ipSearcher->InitSpatialStringSearcher(ipPage);
 
 			// Get the bounds of the state and zip code
 			ILongRectanglePtr ipRect = ipSuffixString->GetOCRImageBounds();
-			ASSERT_RESOURCE_ALLOCATION("ELI15592", ipRect != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15592", ipRect != __nullptr);
 			long lLeft, lTop, lRight, lBottom;
 			ipRect->GetBounds(&lLeft, &lTop, &lRight, &lBottom);
 
@@ -140,14 +140,14 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 
 			// Rotate the rectangle per the OCR
 			ISpatialStringPtr ipRegion = ipSearcher->GetDataInRegion(ipRect, VARIANT_TRUE);
-			ASSERT_RESOURCE_ALLOCATION("ELI15593", ipRegion != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15593", ipRegion != __nullptr);
 
 			// Only work on strings in kSpatialMode
 			// [FlexIDSCore #3589]
 			if (ipRegion->GetMode() == kSpatialMode)
 			{
 				IIUnknownVectorPtr ipBlocks = ipRegion->GetJustifiedBlocks(3);
-				ASSERT_RESOURCE_ALLOCATION("ELI15594", ipBlocks != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15594", ipBlocks != __nullptr);
 
 				ipBlocks = chooseAddressBlocks(m_ipRegExpParser, ipBlocks);
 
@@ -156,12 +156,12 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 				{
 					// Create a ReturnAddress Attribute
 					IAttributePtr ipAttribute(CLSID_Attribute);
-					ASSERT_RESOURCE_ALLOCATION("ELI15595", ipAttribute != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15595", ipAttribute != __nullptr);
 
 					// Add Name and Value
 					ipAttribute->Name = "ReturnAddress";
 					ISpatialStringPtr ipTmpString = ipBlocks->At(j);
-					ASSERT_RESOURCE_ALLOCATION("ELI15596", ipTmpString != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15596", ipTmpString != __nullptr);
 					ipAttribute->Value = ipTmpString;
 
 					// Add to Attributes collection
@@ -186,7 +186,7 @@ STDMETHODIMP CAddressFinder::raw_GetComponentDescription(BSTR * pstrComponentDes
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19574", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19574", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Address finder").Detach();
 	}
@@ -221,7 +221,7 @@ STDMETHODIMP CAddressFinder::raw_Clone(IUnknown * * pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_AddressFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI08808", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08808", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -372,7 +372,7 @@ IIUnknownVectorPtr CAddressFinder::chooseAddressBlocks(IRegularExprParserPtr ipS
 {
 	// This vector will hold the address blocks that will be returned
 	IIUnknownVectorPtr ipRetVec(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI08935", ipRetVec != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08935", ipRetVec != __nullptr);
 
 	vector<ISpatialStringPtr> vecNewBlocks;
 	int j;
@@ -380,7 +380,7 @@ IIUnknownVectorPtr CAddressFinder::chooseAddressBlocks(IRegularExprParserPtr ipS
 	for (j = 0; j < ipBlocks->Size(); j++)
 	{
 		ISpatialStringPtr ipBlock = ipBlocks->At( j );
-		ASSERT_RESOURCE_ALLOCATION("ELI08933", ipBlock != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08933", ipBlock != __nullptr);
 		vecNewBlocks.push_back(ipBlock);
 	}
 
@@ -451,7 +451,7 @@ IIUnknownVectorPtr CAddressFinder::chooseAddressBlocks(IRegularExprParserPtr ipS
 	{
 		// Get this block
 		ISpatialStringPtr ipSS = vecNewBlocks[uj];
-		ASSERT_RESOURCE_ALLOCATION("ELI15597", ipSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15597", ipSS != __nullptr);
 
 		IIUnknownVectorPtr ipTmpVec = ipSuffixParser->Find(ipSS->GetString(), VARIANT_TRUE, 
 			VARIANT_FALSE);

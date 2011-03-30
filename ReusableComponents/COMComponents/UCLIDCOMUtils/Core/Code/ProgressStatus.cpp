@@ -83,11 +83,11 @@ STDMETHODIMP CProgressStatus::InitProgressStatus(/*[in]*/ BSTR strText,
 		// create the sub progress status object, or reset it if it already exists.
 		if (bCreateOrResetSubProgressStatus == VARIANT_TRUE)
 		{
-			if (m_ipSubProgressStatus == NULL)
+			if (m_ipSubProgressStatus == __nullptr)
 			{
 				// The sub progress status object does not exist.  So, create it.
 				m_ipSubProgressStatus.CreateInstance(CLSID_ProgressStatus);
-				ASSERT_RESOURCE_ALLOCATION("ELI15973", m_ipSubProgressStatus != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15973", m_ipSubProgressStatus != __nullptr);
 			}
 			else
 			{
@@ -210,7 +210,7 @@ STDMETHODIMP CProgressStatus::get_SubProgressStatus(/*[out, retval]*/ IProgressS
 	{
 		// whatever the SubProgress object pointer is (regardless of null or not), return
 		// it to the caller
-		if (m_ipSubProgressStatus != NULL)
+		if (m_ipSubProgressStatus != __nullptr)
 		{
 			// return a shallow copy of the smart pointer
 			CComQIPtr<IProgressStatus> ipShallowCopy = m_ipSubProgressStatus;
@@ -262,7 +262,7 @@ STDMETHODIMP CProgressStatus::GetProgressPercent(/*[out, retval]*/ double *pVal)
 		double dProgressPercent = m_nNumItemsCompleted / dNumItemsTotal;
 		
 		// if there is a SubProgressStatus, then add on the progress represented by the sub progress
-		if (m_ipSubProgressStatus != NULL)
+		if (m_ipSubProgressStatus != __nullptr)
 		{
 			dProgressPercent += m_ipSubProgressStatus->GetProgressPercent() * 
 				m_nNumItemsInCurrentGroup / dNumItemsTotal;
@@ -300,7 +300,7 @@ STDMETHODIMP CProgressStatus::ResetSubProgressStatus()
 	{
 		// if the sub progress status object pointer is not null, then reset its counts, and also
 		// ask it to reset all its child progress status objects that exist
-		if (m_ipSubProgressStatus != NULL)
+		if (m_ipSubProgressStatus != __nullptr)
 		{
 			// reset the main members of the sub progress status object
 			// passing in VARIANT_FALSE as the last argument ensures that a sub progress status
@@ -366,7 +366,7 @@ void CProgressStatus::validateItemCounts()
 UCLID_COMUTILSLib::IProgressStatusPtr CProgressStatus::getThisAsCOMPtr()
 {
 	UCLID_COMUTILSLib::IProgressStatusPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16974", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16974", ipThis != __nullptr);
 
 	return ipThis;
 }

@@ -47,13 +47,13 @@ CAFUtility::CAFUtility()
 	try
 	{
 		// create instance of the persistence mgr
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_REG_ROOT_FOLDER_PATH ));
-		ASSERT_RESOURCE_ALLOCATION( "ELI19181", ma_pUserCfgMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI19181", ma_pUserCfgMgr.get() != __nullptr );
 
 		// create instance of the misc utils object
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI07623", m_ipMiscUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07623", m_ipMiscUtils != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI07338")
 }
@@ -62,7 +62,7 @@ CAFUtility::~CAFUtility()
 {
 	try
 	{
-		m_ipMiscUtils = NULL;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20389")
 }
@@ -98,12 +98,12 @@ STDMETHODIMP CAFUtility::GetNameToAttributesMap(IIUnknownVector *pVecAttributes,
 		validateLicense();
 
 		IIUnknownVectorPtr ipVecAttributes(pVecAttributes);
-		ASSERT_ARGUMENT("ELI06973", ipVecAttributes != NULL);
-		ASSERT_ARGUMENT("ELI26567", ppMapNameToAttributes != NULL);
+		ASSERT_ARGUMENT("ELI06973", ipVecAttributes != __nullptr);
+		ASSERT_ARGUMENT("ELI26567", ppMapNameToAttributes != __nullptr);
 
 		// create the map for returning
 		IStrToObjectMapPtr ipNameToAttributes(CLSID_StrToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI06974", ipNameToAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06974", ipNameToAttributes != __nullptr);
 
 		// go through the attributes
 		long nSize = ipVecAttributes->Size();
@@ -111,7 +111,7 @@ STDMETHODIMP CAFUtility::GetNameToAttributesMap(IIUnknownVector *pVecAttributes,
 		{
 			// get each attribute from ipVecAttributes
 			IAttributePtr ipAttr = ipVecAttributes->At(n);
-			ASSERT_RESOURCE_ALLOCATION("ELI06975", ipAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI06975", ipAttr != __nullptr);
 
 			// Get the attribute name
 			_bstr_t bstrAttrName = ipAttr->Name;
@@ -119,7 +119,7 @@ STDMETHODIMP CAFUtility::GetNameToAttributesMap(IIUnknownVector *pVecAttributes,
 			// If the attribute name already exists in the map
 			IIUnknownVectorPtr ipAttributesWithNameName =
 				ipNameToAttributes->TryGetValue(bstrAttrName);
-			if (ipAttributesWithNameName != NULL)
+			if (ipAttributesWithNameName != __nullptr)
 			{
 				// Add this attribute to the vector
 				ipAttributesWithNameName->PushBack(ipAttr);
@@ -128,7 +128,7 @@ STDMETHODIMP CAFUtility::GetNameToAttributesMap(IIUnknownVector *pVecAttributes,
 			{
 				// If the name entry doesn't exist yet, create an entry
 				IIUnknownVectorPtr ipAttributesWithSameName(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI06976", ipAttributesWithSameName != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06976", ipAttributesWithSameName != __nullptr);
 				ipAttributesWithSameName->PushBack(ipAttr);
 
 				// Add to the map
@@ -270,10 +270,10 @@ STDMETHODIMP CAFUtility::GenerateAttributesFromEAVFile(BSTR strEAVFileName,
 	try
 	{
 		validateLicense();
-		ASSERT_ARGUMENT("ELI26568", ppAttributes != NULL);
+		ASSERT_ARGUMENT("ELI26568", ppAttributes != __nullptr);
 
 		IIUnknownVectorPtr ipRetAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI07362", ipRetAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07362", ipRetAttributes != __nullptr);
 
 		// Fill the vector with the attributes loaded from the file
 		generateAttributesFromEAVFile(asString(strEAVFileName), ipRetAttributes);
@@ -295,10 +295,10 @@ STDMETHODIMP CAFUtility::GetAttributesFromDelimitedString(BSTR bstrAttributes, B
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI26569", ppAttributes != NULL);
+		ASSERT_ARGUMENT("ELI26569", ppAttributes != __nullptr);
 
 		IIUnknownVectorPtr ipRetAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI19182", ipRetAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19182", ipRetAttributes != __nullptr);
 
 		string strDelimiter = asString(bstrDelimiter);
 		string strAttributes = asString(bstrAttributes);
@@ -324,10 +324,10 @@ STDMETHODIMP CAFUtility::GetAttributesAsString(IIUnknownVector *pAttributes, BST
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI26570", pAttributesInString != NULL);
+		ASSERT_ARGUMENT("ELI26570", pAttributesInString != __nullptr);
 
 		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI07361", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07361", ipAttributes != __nullptr);
 
 		// Get the count of attributes
 		long nSize = ipAttributes->Size();
@@ -339,7 +339,7 @@ STDMETHODIMP CAFUtility::GetAttributesAsString(IIUnknownVector *pAttributes, BST
 		if (nSize > 0)
 		{
 			IAttributePtr ipAttribute = ipAttributes->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI26573", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26573", ipAttribute != __nullptr);
 
 			strAttributeString = buildAttributeString(ipAttribute);
 		}
@@ -351,7 +351,7 @@ STDMETHODIMP CAFUtility::GetAttributesAsString(IIUnknownVector *pAttributes, BST
 			
 			// Retrieve this Attribute
 			IAttributePtr ipAttribute = ipAttributes->At(n);
-			ASSERT_RESOURCE_ALLOCATION("ELI15579", ipAttribute != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15579", ipAttribute != __nullptr);
 			
 			strAttributeString += buildAttributeString(ipAttribute);
 		}
@@ -374,7 +374,7 @@ STDMETHODIMP CAFUtility::ExpandTags(BSTR strInput, IAFDocument *pDoc, BSTR *pstr
 
 		// get the document as a smart pointer
 		IAFDocumentPtr ipDoc(pDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI07464", ipDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07464", ipDoc != __nullptr);
 
 		// Get the string from the input
 		string stdstrInput = asString(strInput);
@@ -396,7 +396,7 @@ STDMETHODIMP CAFUtility::StringContainsTags(BSTR strInput, VARIANT_BOOL *pbValue
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26574", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI26574", pbValue != __nullptr);
 
 		validateLicense();
 
@@ -457,12 +457,12 @@ STDMETHODIMP CAFUtility::GetAttributesFromFile(BSTR strFileName, IIUnknownVector
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26575", ppAttributes != NULL);
+		ASSERT_ARGUMENT("ELI26575", ppAttributes != __nullptr);
 
 		validateLicense();
 
 		IIUnknownVectorPtr ipRetAttributes( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07854", ipRetAttributes != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI07854", ipRetAttributes != __nullptr );
 
 		// Get file type
 		string strFile = asString( strFileName );
@@ -483,7 +483,7 @@ STDMETHODIMP CAFUtility::GetAttributesFromFile(BSTR strFileName, IIUnknownVector
 			{
 				// Check for IAttribute support
 				IAttributePtr ipAttr = ipRetAttributes->At( i );
-				if (ipAttr == NULL)
+				if (ipAttr == __nullptr)
 				{
 					// Throw exception
 					UCLIDException ue( "ELI07871", 
@@ -521,9 +521,9 @@ STDMETHODIMP CAFUtility::ApplyAttributeModifier(IIUnknownVector *pvecAttributes,
 
 		// Check arguments
 		IIUnknownVectorPtr ipAttributes(pvecAttributes);
-		ASSERT_ARGUMENT("ELI08688", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI08688", ipAttributes != __nullptr);
 		IAttributeModifyingRulePtr ipModifier(pAM);
-		ASSERT_ARGUMENT("ELI08691", ipModifier != NULL);
+		ASSERT_ARGUMENT("ELI08691", ipModifier != __nullptr);
 
 		// Wrap document in smart pointer
 		IAFDocumentPtr ipDoc(pDoc);
@@ -546,17 +546,17 @@ STDMETHODIMP CAFUtility::ExpandFormatString(IAttribute *pAttribute, BSTR bstrFor
 
 		// use a smart pointer for the attribute
 		IAttributePtr ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI09669", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09669", ipAttribute != __nullptr);
 
 		// create a copy of the attribute's original value
 		ICopyableObjectPtr ipCopy(ipAttribute->Value);
-		ASSERT_RESOURCE_ALLOCATION("ELI17021", ipCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17021", ipCopy != __nullptr);
 		ISpatialStringPtr ipOutputSS = ipCopy->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI17019", ipOutputSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17019", ipOutputSS != __nullptr);
 
 		// get the expanded string
 		ISpatialStringPtr ipExpandedSS = getReformattedName(asString(bstrFormat), ipAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI17020", ipExpandedSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17020", ipExpandedSS != __nullptr);
 
 		// replace the original string's value with the expanded string's value
 		if (ipExpandedSS->HasSpatialInfo() == VARIANT_TRUE)
@@ -594,10 +594,10 @@ STDMETHODIMP CAFUtility::SortAttributesSpatially(IIUnknownVector* pAttributes)
 		validateLicense();
 		
 		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI11293", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11293", ipAttributes != __nullptr);
 
 		ISortComparePtr ipCompare(CLSID_SpatiallyCompareAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI11292", ipCompare != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11292", ipCompare != __nullptr);
 		
 		ipAttributes->Sort(ipCompare);
 	}	
@@ -612,12 +612,12 @@ STDMETHODIMP CAFUtility::GetBuiltInTags(IVariantVector** ppTags)
 
 	try
 	{	
-		ASSERT_ARGUMENT("ELI26578", ppTags != NULL);
+		ASSERT_ARGUMENT("ELI26578", ppTags != __nullptr);
 
 		validateLicense();
 
 		IVariantVectorPtr ipVec = getBuiltInTags();
-		ASSERT_RESOURCE_ALLOCATION("ELI11773", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11773", ipVec != __nullptr);
 
 		*ppTags = ipVec.Detach();
 	}	
@@ -635,7 +635,7 @@ STDMETHODIMP CAFUtility::GetINIFileTags(IVariantVector** ppTags)
 		validateLicense();
 
 		IVariantVectorPtr ipVec = getINIFileTags();
-		ASSERT_RESOURCE_ALLOCATION("ELI11774", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI11774", ipVec != __nullptr);
 
 		*ppTags = ipVec.Detach();
 	}	
@@ -650,17 +650,17 @@ STDMETHODIMP CAFUtility::GetAllTags(IVariantVector** ppTags)
 
 	try
 	{	
-		ASSERT_ARGUMENT("ELI26585", ppTags != NULL);
+		ASSERT_ARGUMENT("ELI26585", ppTags != __nullptr);
 
 		validateLicense();
 
 		// Get the built in tags
 		IVariantVectorPtr ipVec1 = getBuiltInTags();
-		ASSERT_RESOURCE_ALLOCATION("ELI26583", ipVec1 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26583", ipVec1 != __nullptr);
 
 		// Get the INI tags
 		IVariantVectorPtr ipVec2 = getINIFileTags();
-		ASSERT_RESOURCE_ALLOCATION("ELI26584", ipVec2 != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26584", ipVec2 != __nullptr);
 
 		// Append the INI tags to the built in tags
 		ipVec1->Append(ipVec2);
@@ -709,7 +709,7 @@ STDMETHODIMP CAFUtility::ExpandTagsAndFunctions(BSTR bstrInput, IAFDocument *pDo
 
 		// get the document as a smart pointer
 		IAFDocumentPtr ipDoc(pDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI26443", ipDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26443", ipDoc != __nullptr);
 
 		// Get the string from the input
 		string strInput = asString(bstrInput);
@@ -738,7 +738,7 @@ STDMETHODIMP CAFUtility::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26586", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI26586", pbValue != __nullptr);
 
 		try
 		{
@@ -769,7 +769,7 @@ void CAFUtility::expandRSDFileDirTag(string& rstrInput)
 	{
 		// Get the rule execution environment
 		IRuleExecutionEnvPtr ipREE(CLSID_RuleExecutionEnv);
-		ASSERT_RESOURCE_ALLOCATION("ELI07461", ipREE != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07461", ipREE != __nullptr);
 
 		// get the currently executing rule file's directory
 		string strDir = asString(ipREE->GetCurrentRSDFileDir());
@@ -797,7 +797,7 @@ void CAFUtility::expandRuleExecIDTag(string& rstrInput,
 	{
 		// Retrieve existing String Tags from AFDocument
 		IStrToStrMapPtr	ipStringTags = ripDoc->StringTags;
-		ASSERT_RESOURCE_ALLOCATION("ELI09834", ipStringTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09834", ipStringTags != __nullptr);
 
 		// ensure that the rule execution ID tag exists
 		if (ipStringTags->Contains(gstrRULE_EXEC_ID_TAG_NAME.c_str()) == VARIANT_FALSE)
@@ -842,7 +842,7 @@ void CAFUtility::expandSourceDocNameTag(string& rstrInput,
 
 	// get the spatial string from the document
 	ISpatialStringPtr ipDocText = ripDoc->Text;
-	ASSERT_RESOURCE_ALLOCATION("ELI09070", ipDocText != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI09070", ipDocText != __nullptr);
 
 	// get the source document name from the spatial string
 	string strSourceDocName = asString(ipDocText->SourceDocName);
@@ -935,14 +935,14 @@ void CAFUtility::expandDocTypeTag(string& rstrInput,
 	{
 		// get the object tags associated with the document
 		IStrToObjectMapPtr ipObjTags(ripDoc->ObjectTags);
-		ASSERT_RESOURCE_ALLOCATION("ELI07465", ipObjTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07465", ipObjTags != __nullptr);
 
 		// get the vector of document type names
 		IVariantVectorPtr ipVecDocTypes = ipObjTags->TryGetValue(DOC_TYPE.c_str());
 
 		// check to see if a string tag for the document type
 		// exists.  If not, throw an exception
-		if (ipVecDocTypes == NULL)
+		if (ipVecDocTypes == __nullptr)
 		{
 			throw UCLIDException("ELI07466", "Document was not successfully classified.");
 		}
@@ -1222,7 +1222,7 @@ void CAFUtility::getComponentDataFolder(string& rFolder)
 	{
 		// create an instance of the attribute finder engine
 		IAttributeFinderEnginePtr ipEngine(CLSID_AttributeFinderEngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI13444", ipEngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13444", ipEngine != __nullptr);
 	
 		ls_strComponentDataFolder = ipEngine->GetComponentDataFolder();
 	}
@@ -1250,7 +1250,7 @@ void CAFUtility::loadAttributesFromEavFile(const IIUnknownVectorPtr& ipAttribute
 										   unsigned long ulCurrLevel, 
 										   unsigned int& uiCurrLine, vector<string> vecLines)
 {
-	IAttributePtr ipNewAttr = NULL;
+	IAttributePtr ipNewAttr = __nullptr;
 	while (uiCurrLine < vecLines.size())
 	{
 		string strLine = vecLines[uiCurrLine];
@@ -1264,7 +1264,7 @@ void CAFUtility::loadAttributesFromEavFile(const IIUnknownVectorPtr& ipAttribute
 		if (uiLevel == ulCurrLevel)
 		{
 			ipNewAttr.CreateInstance(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI09538", ipNewAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09538", ipNewAttr != __nullptr);
 			removeDots(strLine);
 			vector<string> vecTokens;
 			StringTokenizer::sGetTokens(strLine, "|", vecTokens);
@@ -1278,7 +1278,7 @@ void CAFUtility::loadAttributesFromEavFile(const IIUnknownVectorPtr& ipAttribute
 			string strValue = vecTokens[1];
 			::convertNormalStringToCppString(strValue);
 			ISpatialStringPtr ipValue = ipNewAttr->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI25947", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI25947", ipValue != __nullptr);
 			ipValue->ReplaceAndDowngradeToNonSpatial(strValue.c_str());
 
 			if (vecTokens.size() > 2)
@@ -1311,7 +1311,7 @@ ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat,
 												 const IAttributePtr& ipAttribute)
 {
 	ISpatialStringPtr ipNewName(CLSID_SpatialString);
-	ASSERT_RESOURCE_ALLOCATION("ELI19187", ipNewName != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI19187", ipNewName != __nullptr);
 
 	unsigned int ui;
 	unsigned int uiLength = strFormat.length();
@@ -1339,7 +1339,7 @@ ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat,
 			string strNewFormat = strFormat.substr( ui+1, ulLength );
 			ISpatialStringPtr ipScopeStr = getReformattedName(strNewFormat, ipAttribute);
 
-			if (ipScopeStr != NULL)
+			if (ipScopeStr != __nullptr)
 			{
 				ipNewName->Append(ipScopeStr);
 			}
@@ -1390,12 +1390,12 @@ ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat,
 			string strIdent = strFormat.substr( ulIdentStartPos, ulLength );
 			ISpatialStringPtr ipText = getVariableValue(strIdent, ipAttribute);
 
-			if (ipText == NULL)
+			if (ipText == __nullptr)
 			{
 				// If the %var has no value we can either ignore it and continue
 				// or invalidate the entire scope and return an empty string
 				ISpatialStringPtr ipEmpty( CLSID_SpatialString );
-				ASSERT_RESOURCE_ALLOCATION("ELI17546", ipEmpty != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI17546", ipEmpty != __nullptr);
 				return ipEmpty;
 			}
 			else
@@ -1461,13 +1461,13 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strVariable,
 			throw ue;
 		}
 	}
-	ISpatialStringPtr ipNewString = NULL;
+	ISpatialStringPtr ipNewString = __nullptr;
 	if(strQuery == "Type")
 	{
 		// This means that the variable is %Type which is just the Type of the
 		// Selected Attribute
 		ipNewString.CreateInstance(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI09707", ipNewString != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09707", ipNewString != __nullptr);
 		string str = asString(ipAttribute->Type);
 		if(str == "")
 		{
@@ -1485,7 +1485,7 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strVariable,
 	{
 		IIUnknownVectorPtr ipSubAttributes = getCandidateAttributes(ipAttribute->SubAttributes,
 			strQuery, false);
-		ASSERT_RESOURCE_ALLOCATION("ELI25948", ipSubAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25948", ipSubAttributes != __nullptr);
 
 		// Now we will just arbitrarily choose the first match
 		if(ipSubAttributes->Size() <= 0)
@@ -1494,12 +1494,12 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strVariable,
 		}
 		
 		IAttributePtr ipFoundAttr = ipSubAttributes->At(0);
-		ASSERT_RESOURCE_ALLOCATION("ELI09706", ipFoundAttr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09706", ipFoundAttr != __nullptr);
 		
 		if(bGetType)
 		{
 			ipNewString.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI19189", ipNewString != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19189", ipNewString != __nullptr);
 			ipNewString->CreateNonSpatialString(ipFoundAttr->Type, "");
 		}
 		else
@@ -1514,7 +1514,7 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI26167", ipDoc != NULL);
+		ASSERT_ARGUMENT("ELI26167", ipDoc != __nullptr);
 
 		// expand the INI file tags first, because the INI file tag
 		// may use one or more of the other tags
@@ -1545,7 +1545,7 @@ string CAFUtility::buildAttributeString(const IAttributePtr& ipAttribute)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI26571", ipAttribute != NULL);
+		ASSERT_ARGUMENT("ELI26571", ipAttribute != __nullptr);
 
 		// Append the Name
 		string strAttribute = asString(ipAttribute->Name);
@@ -1553,7 +1553,7 @@ string CAFUtility::buildAttributeString(const IAttributePtr& ipAttribute)
 
 		// Retrieve the Value
 		ISpatialStringPtr ipValue = ipAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI15580", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15580", ipValue != __nullptr);
 		string strValue = asString(ipValue->String);
 
 		// convert any cpp string (ex. \r, \n, etc. )to normal string
@@ -1627,7 +1627,7 @@ void CAFUtility::applyAttributeModifier(const IIUnknownVectorPtr &ipAttributes,
 		{
 			// Retrieve this Attribute
 			IAttributePtr ipAttribute = ipAttributes->At( i );
-			ASSERT_RESOURCE_ALLOCATION( "ELI08689", ipAttribute != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI08689", ipAttribute != __nullptr );
 
 			// "Modify" the Attribute
 			ipModifier->ModifyValue( ipAttribute, ipAFDoc, NULL );
@@ -1637,7 +1637,7 @@ void CAFUtility::applyAttributeModifier(const IIUnknownVectorPtr &ipAttributes,
 			{
 				// Get the sub attributes
 				IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-				if (ipSubAttributes != NULL)
+				if (ipSubAttributes != __nullptr)
 				{
 					applyAttributeModifier(ipSubAttributes, ipAFDoc, ipModifier, true);
 				}
@@ -1653,7 +1653,7 @@ IVariantVectorPtr CAFUtility::getBuiltInTags()
 	{
 		// Get the built in tags as a variant vector
 		IVariantVectorPtr ipVec(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI26582", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26582", ipVec != __nullptr);
 
 		// Add the tags to the vector
 		ipVec->PushBack(get_bstr_t(strRSD_FILE_DIR_TAG));
@@ -1674,7 +1674,7 @@ IVariantVectorPtr CAFUtility::getINIFileTags()
 	{
 		// Create a new Variant vector
 		IVariantVectorPtr ipVec(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI26581", ipVec != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26581", ipVec != __nullptr);
 
 		// Get the INI file
 		static string ls_strINIFileName;

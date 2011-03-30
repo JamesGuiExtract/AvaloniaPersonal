@@ -34,7 +34,7 @@ CFindFromRSD::CFindFromRSD()
 		m_cachedRuleSet.m_obj = NULL;
 
 		IAFUtilityPtr ipAFUtility(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI10241", ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10241", ipAFUtility != __nullptr);
 
 		m_bCacheRSD = asCppBool(ipAFUtility->ShouldCacheRSD);
 	}
@@ -265,10 +265,10 @@ STDMETHODIMP CFindFromRSD::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		// for instance can be caused by a RSD file using itself as the splitter
 		// ensure that the ruleset is not already executing by checking 
 		// in the Rule Execution Environment
-		if (m_ipRuleExecutionEnv == NULL)
+		if (m_ipRuleExecutionEnv == __nullptr)
 		{
 			m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
-			ASSERT_RESOURCE_ALLOCATION("ELI19382", m_ipRuleExecutionEnv != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19382", m_ipRuleExecutionEnv != __nullptr);
 		}
 
 		if (m_ipRuleExecutionEnv->IsRSDFileExecuting(strRSDFile.c_str()) ==
@@ -281,28 +281,28 @@ STDMETHODIMP CFindFromRSD::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 
 		// register a new rule execution session
 		IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
-		ASSERT_RESOURCE_ALLOCATION("ELI19384", ipSession != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19384", ipSession != __nullptr);
 		ipSession->SetRSDFileName(strRSDFile.c_str());
 	
 		// Create the ruleset if necessary
 		if(m_cachedRuleSet.m_obj == NULL)
 		{	
 			m_cachedRuleSet.m_obj.CreateInstance(CLSID_RuleSet);
-			ASSERT_RESOURCE_ALLOCATION("ELI10957", m_cachedRuleSet.m_obj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI10957", m_cachedRuleSet.m_obj != __nullptr);
 		}
 		// load/reload the ruleset if necessary
 		m_cachedRuleSet.loadObjectFromFile(strRSDFile);
 
 		// make a copy of the AFDocument for the doc to run on
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI10921", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10921", ipAFDoc != __nullptr);
 		ICopyableObjectPtr ipCopyObj = ipAFDoc;
-		ASSERT_RESOURCE_ALLOCATION("ELI10922", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10922", ipCopyObj != __nullptr);
 		IAFDocumentPtr ipDocCopy = ipCopyObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI10923", ipDocCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10923", ipDocCopy != __nullptr);
 
 		IVariantVectorPtr ipAttributeNames(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI10245", ipAttributeNames != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10245", ipAttributeNames != __nullptr);
 
 		_bstr_t _bstrAttributeName(m_strAttributeName.c_str());
 		ipAttributeNames->PushBack(_bstrAttributeName);
@@ -334,7 +334,7 @@ STDMETHODIMP CFindFromRSD::raw_GetComponentDescription(BSTR * pstrComponentDescr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19579", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19579", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Find from RSD file").Detach();
 	}
@@ -423,7 +423,7 @@ STDMETHODIMP CFindFromRSD::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_AFVALUEFINDERSLib::IFindFromRSDPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI10235", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10235", ipSource != __nullptr);
 
 		m_strAttributeName = asString(ipSource->AttributeName);
 		m_strRSDFileName = asString(ipSource->RSDFileName);
@@ -443,7 +443,7 @@ STDMETHODIMP CFindFromRSD::raw_Clone(IUnknown* *pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_FindFromRSD);
-		ASSERT_RESOURCE_ALLOCATION("ELI10239", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI10239", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

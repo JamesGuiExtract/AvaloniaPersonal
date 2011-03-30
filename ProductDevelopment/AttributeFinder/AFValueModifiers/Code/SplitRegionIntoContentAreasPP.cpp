@@ -136,7 +136,7 @@ STDMETHODIMP CSplitRegionIntoContentAreasPP::Apply(void)
 		{
 			// Obtain interface pointer to the IImageRegionWithLines class
 			UCLID_AFVALUEMODIFIERSLib::ISplitRegionIntoContentAreasPtr ipRule = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI22092", ipRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI22092", ipRule != __nullptr);
 
 			ipRule->MinimumWidth = verifyControlValueAsDouble(m_editMinimumWidth, 0, 99999,
 				"The minimum width value must be a positive number.", 3.0);
@@ -222,7 +222,7 @@ STDMETHODIMP CSplitRegionIntoContentAreasPP::raw_IsLicensed(VARIANT_BOOL * pbVal
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22093", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI22093", pbValue != __nullptr);
 
 		try
 		{

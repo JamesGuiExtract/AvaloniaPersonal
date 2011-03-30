@@ -56,7 +56,7 @@ DocTypeInterpreter::~DocTypeInterpreter()
 {
 	try
 	{
-		m_ipUtils = NULL;
+		m_ipUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI28219");
 }
@@ -155,11 +155,11 @@ void DocTypeInterpreter::loadDocTypeFile(const string& strDocTypeFile, bool bCle
 	{
 		try
 		{
-			if (m_ipUtils == NULL)
+			if (m_ipUtils == __nullptr)
 			{
 				// Instantiate the AF Utils object
 				m_ipUtils.CreateInstance(CLSID_MiscUtils);
-				ASSERT_RESOURCE_ALLOCATION("ELI07624", m_ipUtils != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07624", m_ipUtils != __nullptr);
 			}
 
 			// before loading the file, if AutoEncrypt is on, and the file has

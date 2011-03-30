@@ -63,7 +63,7 @@ STDMETHODIMP CSelectOnlyUniqueValues::raw_ProcessOutput(IIUnknownVector* pAttrib
 
 		IIUnknownVectorPtr ipOriginAttributes(pAttributes);
 
-		if (ipOriginAttributes != NULL && ipOriginAttributes->Size() > 0)
+		if (ipOriginAttributes != __nullptr && ipOriginAttributes->Size() > 0)
 		{
 			// the vector that stores indices of non-unique values 
 			// in the original attributes vector
@@ -102,9 +102,9 @@ STDMETHODIMP CSelectOnlyUniqueValues::raw_ProcessOutput(IIUnknownVector* pAttrib
 					{
 						// Retrieve the values
 						ISpatialStringPtr ipCurrent = ipCurrentAttr->Value;
-						ASSERT_RESOURCE_ALLOCATION("ELI15529", ipCurrent != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15529", ipCurrent != __nullptr);
 						ISpatialStringPtr ipNext = ipNextAttr->Value;
-						ASSERT_RESOURCE_ALLOCATION("ELI15530", ipNext != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15530", ipNext != __nullptr);
 
 						// Compare the strings
 						vecIndices.push_back(nIndex);
@@ -159,7 +159,7 @@ STDMETHODIMP CSelectOnlyUniqueValues::raw_GetComponentDescription(BSTR * pstrCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19555", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19555", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Select only unique attributes").Detach();
 	}
@@ -314,7 +314,7 @@ STDMETHODIMP CSelectOnlyUniqueValues::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_SelectOnlyUniqueValues);
-		ASSERT_RESOURCE_ALLOCATION("ELI05269", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05269", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

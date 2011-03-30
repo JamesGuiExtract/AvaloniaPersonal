@@ -71,7 +71,7 @@ STDMETHODIMP CFolderFS::raw_GetComponentDescription(BSTR * pstrComponentDescript
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19634", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19634", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Files from folder").Detach();
 	}
@@ -89,14 +89,14 @@ STDMETHODIMP CFolderFS::raw_Clone(IUnknown * * pObject)
 
 	try
 	{
-		if(pObject != NULL)
+		if(pObject != __nullptr)
 		{
 			// Validate license first
 			validateLicense();
 
 			ICopyableObjectPtr ipObjCopy;
 			ipObjCopy.CreateInstance(CLSID_FolderFS);
-			ASSERT_RESOURCE_ALLOCATION("ELI13746", ipObjCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13746", ipObjCopy != __nullptr);
 
 			IUnknownPtr ipUnk = this;
 			ipObjCopy->CopyFrom(ipUnk);
@@ -119,7 +119,7 @@ STDMETHODIMP CFolderFS::raw_CopyFrom(IUnknown * pObject)
 		// Check license
 		validateLicense();
 		EXTRACT_FILESUPPLIERSLib::IFolderFSPtr ipFolderFS(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI13769", ipFolderFS != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13769", ipFolderFS != __nullptr );
 
 		m_strFolderName = ipFolderFS->FolderName;
 
@@ -154,8 +154,8 @@ STDMETHODIMP CFolderFS::raw_Start(IFileSupplierTarget * pTarget, IFAMTagManager 
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20453", pTarget != NULL);
-		ASSERT_ARGUMENT("ELI20454", pFAMTM != NULL);
+		ASSERT_ARGUMENT("ELI20453", pTarget != __nullptr);
+		ASSERT_ARGUMENT("ELI20454", pFAMTM != __nullptr);
 
 		try
 		{
@@ -258,7 +258,7 @@ STDMETHODIMP CFolderFS::raw_Stop()
 		// If this is the search thread, run this method in a new thread to avoid deadlock.
 		// [FlexIDSCore #3463]
 		_lastCodePos = "10";
-		if (m_pSearchThread != NULL && m_pSearchThread->m_nThreadID == GetCurrentThreadId())
+		if (m_pSearchThread != __nullptr && m_pSearchThread->m_nThreadID == GetCurrentThreadId())
 		{
 			AfxBeginThread(stopSearchFileThread, this);
 			return S_OK;
@@ -537,7 +537,7 @@ STDMETHODIMP CFolderFS::put_FolderName(BSTR newVal)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14442", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14442", ipFAMTagManager != __nullptr);
 
 		// make sure the file exists
 		// or that it contains valid string tags
@@ -799,7 +799,7 @@ void CFolderFS::addFile( const std::string &strFile )
 	{
 		// Wait for Resume event to be signaled
 		m_eventResume.wait();
-		if ( m_ipTarget != NULL )
+		if ( m_ipTarget != __nullptr )
 		{
 			m_ipTarget->NotifyFileAdded( strFile.c_str(), this );
 		}
@@ -820,7 +820,7 @@ void CFolderFS::onFileAdded(const std::string& strFileName)
 	try
 	{
 		// if processing added files
-		if ( m_ipTarget != NULL && m_bAddedFiles)
+		if ( m_ipTarget != __nullptr && m_bAddedFiles)
 		{
 			string strTmp = getFileNameFromFullPath(strFileName);
 			// Only Notify target if the file has an extension should be processed
@@ -837,7 +837,7 @@ void CFolderFS::onFileRemoved(const std::string& strFileName)
 {
 	try
 	{
-		if ( m_ipTarget != NULL  )
+		if ( m_ipTarget != __nullptr  )
 		{
 			string strTmp = getFileNameFromFullPath(strFileName);
 			// Only Notify target if the file has an extension should be processed
@@ -854,7 +854,7 @@ void CFolderFS::onFileRenamed(const std::string& strOldName, const std::string s
 {
 	try
 	{
-		if ( m_ipTarget != NULL )
+		if ( m_ipTarget != __nullptr )
 		{
 			// determine if old file has extension should be processed
 			string strTmp = getFileNameFromFullPath(strOldName);
@@ -889,7 +889,7 @@ void CFolderFS::onFileModified(const std::string& strFileName)
 	try
 	{
 		// Only process if looking for modified files
-		if ( m_ipTarget != NULL && m_bModifiedFiles )
+		if ( m_ipTarget != __nullptr && m_bModifiedFiles )
 		{
 			string strTmp = getFileNameFromFullPath(strFileName);
 			// Only Notify target if the file has an extension should be processed
@@ -906,7 +906,7 @@ void CFolderFS::onFolderRemoved(const std::string& strFolderName)
 {
 	try
 	{
-		if (m_ipTarget != NULL)
+		if (m_ipTarget != __nullptr)
 		{
 			m_ipTarget->NotifyFolderDeleted( strFolderName.c_str(), this);
 		}
@@ -918,7 +918,7 @@ void CFolderFS::onFolderRenamed(const std::string& strOldName, const std::string
 {
 	try
 	{
-		if (m_ipTarget != NULL)
+		if (m_ipTarget != __nullptr)
 		{
 			m_ipTarget->NotifyFolderRenamed(strOldName.c_str(), strNewName.c_str(), this);
 		}
@@ -943,10 +943,10 @@ UINT CFolderFS::searchFileThread(LPVOID pParam )
 	try
 	{
 		CFolderFS *pFolderFS = static_cast<CFolderFS *> (pParam);
-		ASSERT_RESOURCE_ALLOCATION("ELI25250", pFolderFS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25250", pFolderFS != __nullptr);
 
 		IFileSupplierTargetPtr ipTarget = pFolderFS->m_ipTarget;
-		ASSERT_RESOURCE_ALLOCATION("ELI25252", ipTarget != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25252", ipTarget != __nullptr);
 
 		try
 		{
@@ -986,7 +986,7 @@ UINT CFolderFS::stopSearchFileThread(LPVOID pParam)
 	try
 	{
 		IFileSupplierPtr ipSupplier = static_cast<CFolderFS *>(pParam);
-		ASSERT_RESOURCE_ALLOCATION("ELI25499", ipSupplier != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25499", ipSupplier != __nullptr);
 
 		// Stop searching for files
 		ipSupplier->Stop();

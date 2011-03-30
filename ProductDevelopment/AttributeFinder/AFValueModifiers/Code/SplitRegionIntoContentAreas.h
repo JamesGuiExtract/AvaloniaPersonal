@@ -322,7 +322,7 @@ private:
 	CSize m_sizeAvgChar;
 
 	// The bitmap for the current document page being processed.
-	auto_ptr<LeadToolsBitmap> m_apPageBitmap;
+	unique_ptr<LeadToolsBitmap> m_apPageBitmap;
 
 	// Specifies the bounds of the currently loaded page.
 	CRect m_rectCurrentPage;

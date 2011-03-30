@@ -115,7 +115,7 @@ STDMETHODIMP COCRAreaPP::Apply()
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_AFVALUEMODIFIERSLib::IOCRAreaPtr ipOCRArea(m_ppUnk[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI18485", ipOCRArea != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI18485", ipOCRArea != __nullptr);
 
 			ipOCRArea->SetOptions(eFilter, bstrCustomFilterCharacters, asVariantBool(bDetectHandwriting), 
 				asVariantBool(bReturnUnrecognized), asVariantBool(bClearIfNoneFound));
@@ -136,7 +136,7 @@ STDMETHODIMP COCRAreaPP::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// check parameter
-		ASSERT_ARGUMENT("ELI18487", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI18487", pbValue != __nullptr);
 
 		try
 		{
@@ -183,7 +183,7 @@ LRESULT COCRAreaPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 		// get the OCRArea associated with this property page
 		// NOTE: this assumes only one coclass is associated with this property page
 		UCLID_AFVALUEMODIFIERSLib::IOCRAreaPtr ipOCRArea(m_ppUnk[0]);
-		ASSERT_RESOURCE_ALLOCATION("ELI18489", ipOCRArea != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18489", ipOCRArea != __nullptr);
 
 		// get the filter options dialog items
 		m_chkAlphaFilter = GetDlgItem(IDC_OCRAREA_CHECK_ALPHA);

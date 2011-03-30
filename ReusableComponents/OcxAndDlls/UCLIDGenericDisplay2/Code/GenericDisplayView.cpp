@@ -2240,7 +2240,7 @@ void CGenericDisplayView::addZoneEntity(int iStartX, int iStartY, int iEndX, int
 	if (lEntityID != 0)
 	{
 		IVariantVectorPtr ipVariantVector(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI23769", ipVariantVector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23769", ipVariantVector != __nullptr);
 		_variant_t var(lEntityID);
 		ipVariantVector->PushBack(var);
 		m_pGenericDisplayCtrl->FireZoneEntitiesCreated(ipVariantVector);
@@ -2369,7 +2369,7 @@ void CGenericDisplayView::lineFit(int iStartX, int iStartY, int iEndX, int iEndY
 
 	// Create a variant vector with the zone ids
 	IVariantVectorPtr ipZoneIDs(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI23765", ipZoneIDs != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI23765", ipZoneIDs != __nullptr);
 	for (unsigned int i = 0; i < entityIDs.size(); i++)
 	{
 		_variant_t id(entityIDs[i]);

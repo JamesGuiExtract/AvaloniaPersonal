@@ -55,21 +55,21 @@ STDMETHODIMP CSRWSubImageHandler::raw_NotifySubImageCreated(ISpotRecognitionWind
 		// ensure that this component is licensed.
 		validateLicense();
 
-		if (m_ipInputManager == NULL)
+		if (m_ipInputManager == __nullptr)
 		{
 			throw UCLIDException("ELI03254", "InputManager reference has not been specified!");
 		}
 
 		// get the source SRW
 		ISpotRecognitionWindowPtr ipSourceSRWindow(pSourceSRWindow);
-		if (ipSourceSRWindow == NULL)
+		if (ipSourceSRWindow == __nullptr)
 		{
 			throw UCLIDException("ELI03279", "Parent spot recognition window is NULL.");
 		}
 
 		// create an instance of the Spot rec window
 		ISpotRecognitionWindowPtr ipSRWindow(CLSID_SpotRecognitionWindow);
-		if (ipSRWindow == NULL)
+		if (ipSRWindow == __nullptr)
 		{
 			throw UCLIDException("ELI03255", "Unable to create an instance of the SpotRecognition Window!");
 		}
@@ -80,7 +80,7 @@ STDMETHODIMP CSRWSubImageHandler::raw_NotifySubImageCreated(ISpotRecognitionWind
 		long lHandle = m_ipInputManager->ConnectInputReceiver(ipIR);
 		
 		ILineTextEvaluatorPtr ipLineTextEvaluator(ipSourceSRWindow->GetLineTextEvaluator());
-		if (ipLineTextEvaluator != NULL)
+		if (ipLineTextEvaluator != __nullptr)
 		{
 			if (FAILED(ipSRWindow->SetLineTextEvaluator(ipLineTextEvaluator)))
 			{
@@ -89,13 +89,13 @@ STDMETHODIMP CSRWSubImageHandler::raw_NotifySubImageCreated(ISpotRecognitionWind
 		}
 		
 		ILineTextCorrectorPtr ipLineTextCorrector(ipSourceSRWindow->GetLineTextCorrector());
-		if (ipLineTextCorrector != NULL)
+		if (ipLineTextCorrector != __nullptr)
 		{
 			ipSRWindow->SetLineTextCorrector(ipLineTextCorrector);
 		}
 		
 		IParagraphTextCorrectorPtr ipParagraphTextCorrector(ipSourceSRWindow->GetParagraphTextCorrector());
-		if (ipParagraphTextCorrector != NULL)
+		if (ipParagraphTextCorrector != __nullptr)
 		{
 			ipSRWindow->SetParagraphTextCorrector(ipParagraphTextCorrector);
 		}
@@ -103,13 +103,13 @@ STDMETHODIMP CSRWSubImageHandler::raw_NotifySubImageCreated(ISpotRecognitionWind
 		CComBSTR bstrTooltip, bstrTrainingFile;
 		IIUnknownVectorPtr ipPTHs;
 		ipPTHs = ipSourceSRWindow->GetParagraphTextHandlers();
-		if (ipPTHs != NULL)
+		if (ipPTHs != __nullptr)
 		{
 			ipSRWindow->SetParagraphTextHandlers(ipPTHs);
 		}
 
 		ISRWEventHandlerPtr ipSRWEventHandler(ipSourceSRWindow->GetSRWEventHandler());
-		if (ipSRWEventHandler != NULL)
+		if (ipSRWEventHandler != __nullptr)
 		{
 			ipSRWindow->SetSRWEventHandler(ipSRWEventHandler);
 		}
@@ -137,7 +137,7 @@ STDMETHODIMP CSRWSubImageHandler::raw_NotifyAboutToDestroy(IInputReceiver* pIR)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29927", pIR != NULL);
+		ASSERT_ARGUMENT("ELI29927", pIR != __nullptr);
 
 		// ensure that this component is licensed.
 		validateLicense();
@@ -201,7 +201,7 @@ STDMETHODIMP CSRWSubImageHandler::raw_IsLicensed(VARIANT_BOOL * pbValue)
 void CSRWSubImageHandler::notifyAboutToDestroy(IInputReceiver* pIR)
 {
 	IIREventHandlerPtr ipEventHandler = m_ipInputManager;
-	ASSERT_RESOURCE_ALLOCATION("ELI29928", ipEventHandler != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI29928", ipEventHandler != __nullptr);
 
 	// Inform all child windows (input receivers) of their impending destruction.
 	// (maniacal laughter ensues...)

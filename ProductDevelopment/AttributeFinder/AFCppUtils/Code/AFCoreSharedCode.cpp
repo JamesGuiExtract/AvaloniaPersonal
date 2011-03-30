@@ -21,7 +21,7 @@ void addCurrentRSDFileToDebugInfo(UCLIDException &ue)
 		UCLID_AFCORELib::IRuleExecutionEnvPtr ipRuleEnv(CLSID_RuleExecutionEnv);
 		
 		// Only add the debug info if the RuleExecutionEnv was successfully created
-		if (ipRuleEnv != NULL)
+		if (ipRuleEnv != __nullptr)
 		{
 			ue.addDebugInfo("RuleFileName", asString(ipRuleEnv->GetCurrentRSDFileName()), true);
 		}

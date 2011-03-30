@@ -40,7 +40,7 @@ CReplaceStringsPP::CReplaceStringsPP()
 
 		// Create an IMiscUtilsPtr object
 		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI14563", ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI14563", ipMiscUtils != __nullptr );
 
 		// Get the file header string and its length from IMiscUtilsPtr object
 		m_strFileHeader = ipMiscUtils->GetFileHeader();
@@ -73,7 +73,7 @@ STDMETHODIMP CReplaceStringsPP::Apply(void)
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			ICopyableObjectPtr ipReplacementPairs = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI08382", ipReplacementPairs != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08382", ipReplacementPairs != __nullptr);
 			// copy all contents from internal object to the 
 			// translate value object that associated with this property page
 			ICopyableObjectPtr ipCopyableObj(m_ipInternalReplacements);
@@ -174,7 +174,7 @@ LRESULT CReplaceStringsPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			{
 				// copy all properies into internal replacement object.
 				ICopyableObjectPtr ipCopy = m_ipInternalReplacements;
-				ASSERT_RESOURCE_ALLOCATION("ELI08383", ipCopy != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI08383", ipCopy != __nullptr);
 				ipCopy->CopyFrom(ipCopyableObj);
 				loadReplacements();
 

@@ -136,7 +136,7 @@ BOOL CConvertFAMDBDlg::OnInitDialog()
 		ASSERT(IDM_ABOUTBOX < 0xF000);
 
 		CMenu* pSysMenu = GetSystemMenu(FALSE);
-		if (pSysMenu != NULL)
+		if (pSysMenu != __nullptr)
 		{
 			CString strAboutMenu;
 			strAboutMenu.LoadString(IDS_ABOUTBOX);
@@ -332,7 +332,7 @@ void CConvertFAMDBDlg::convertDatabase()
 		
 		// Create a FAMDB object for creating the new database and adding the actions
 		IFileProcessingDBPtr ipFAMDB(CLSID_FileProcessingDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI19889", ipFAMDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19889", ipFAMDB != __nullptr);
 
 		// Set the Database Server
 		ipFAMDB->DatabaseServer = (LPCSTR) m_zToServer;
@@ -344,12 +344,12 @@ void CConvertFAMDBDlg::convertDatabase()
 
 		// Create the connection object for new database
 		_ConnectionPtr ipNewDB = getConnection ( (LPCSTR) m_zToServer, (LPCSTR) m_zToDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI19961", ipNewDB != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI19961", ipNewDB != __nullptr );
 		_lastCodePos = "30";
 
 		// Create the connection object for the old database
 		_ConnectionPtr ipOldDB = getConnection ( (LPCSTR) m_zFromServer, (LPCSTR) m_zFromDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI20014", ipOldDB != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI20014", ipOldDB != __nullptr );
 		_lastCodePos = "40";
 
 		// Need to determine the number of steps for the progress
@@ -374,7 +374,7 @@ void CConvertFAMDBDlg::convertDatabase()
 		_lastCodePos = "55";
 
 		// Done with the FAMDB object so set to NULL
-		ipFAMDB = NULL;
+		ipFAMDB = __nullptr;
 
 		updateCurrentStep("Copying FAMUser table", nCurrentStep, nNumberOfSteps);
 
@@ -480,7 +480,7 @@ _ConnectionPtr CConvertFAMDBDlg::getConnection(const string& strServer, const st
 
 		// Create the connection object
 		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI20015", ipDBConnection != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI20015", ipDBConnection != __nullptr);
 
 		// create the connection string
 		string strConnectionString = createConnectionString(strServer, strDatabase);
@@ -504,12 +504,12 @@ void CConvertFAMDBDlg::addActionsToNewDB(IFileProcessingDBPtr ipFAMDB, _Connecti
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20034", ipFAMDB != NULL);
-		ASSERT_ARGUMENT("ELI20035", ipSourceDBConnection != NULL);
+		ASSERT_ARGUMENT("ELI20034", ipFAMDB != __nullptr);
+		ASSERT_ARGUMENT("ELI20035", ipSourceDBConnection != __nullptr);
 
 		// Create the source action set
 		_RecordsetPtr ipSourceActionSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI20013", ipSourceActionSet != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI20013", ipSourceActionSet != __nullptr );
 
 		// Open the Action set table in the source DB database
 		ipSourceActionSet->Open( "Action", _variant_t((IDispatch *)ipSourceDBConnection, true), adOpenStatic, 
@@ -561,16 +561,16 @@ void CConvertFAMDBDlg::addFKData(_ConnectionPtr ipDestDBConnection, FieldsPtr ip
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20036", ipDestDBConnection != NULL);
-		ASSERT_ARGUMENT("ELI20037", ipSourceFields != NULL);
-		ASSERT_ARGUMENT("ELI20147", ipDestFields != NULL);
+		ASSERT_ARGUMENT("ELI20036", ipDestDBConnection != __nullptr);
+		ASSERT_ARGUMENT("ELI20037", ipSourceFields != __nullptr);
+		ASSERT_ARGUMENT("ELI20147", ipDestFields != __nullptr);
 
 		// Check for ASCName Field
 		FieldPtr ipField = getNamedField(ipSourceFields, "ASCName");
 		_lastCodePos = "10";
 
 		// If the ASCName field was found set the ActionID in the Destination fields
-		if ( ipField != NULL )
+		if ( ipField != __nullptr )
 		{
 			// Set the ActionID value
 			copyIDValue(ipDestDBConnection, ipDestFields, "Action", "ASCName", 
@@ -592,12 +592,12 @@ void CConvertFAMDBDlg::copyRecords(_ConnectionPtr ipSourceDBConnection, _Connect
 		m_staticCurrentRecord.SetWindowText("Calculating...");
 		_lastCodePos = "10";
 
-		ASSERT_ARGUMENT("ELI20020", ipSourceDBConnection != NULL);
-		ASSERT_ARGUMENT("ELI20021", ipDestDBConnection != NULL);
+		ASSERT_ARGUMENT("ELI20020", ipSourceDBConnection != __nullptr);
+		ASSERT_ARGUMENT("ELI20021", ipDestDBConnection != __nullptr);
 
 		// Create the source ActionStatistics recordset
 		_RecordsetPtr ipSourceSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI20022", ipSourceSet != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI20022", ipSourceSet != __nullptr );
 		_lastCodePos = "20";
 
 		// Source could be a Select statement
@@ -614,7 +614,7 @@ void CConvertFAMDBDlg::copyRecords(_ConnectionPtr ipSourceDBConnection, _Connect
 
 		// Create the destination ActionStatistics recordset
 		_RecordsetPtr ipDestSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI20023", ipDestSet != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI20023", ipDestSet != __nullptr );
 		
 		// Turn IDENTITY_INSERT option on if required
 		if (bCopyID && !bSourceIsQuery)
@@ -693,12 +693,12 @@ void CConvertFAMDBDlg::copyDBInfoSettings(IFileProcessingDBPtr ipFAMDB, _Connect
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI28607", ipFAMDB != NULL);
+		ASSERT_ARGUMENT("ELI28607", ipFAMDB != __nullptr);
 		ASSERT_ARGUMENT("ELI28608", ipSourceDBConnection);
 
 		// Create the source DBInfo set
 		_RecordsetPtr ipSourceDBInfoSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI28609", ipSourceDBInfoSet != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI28609", ipSourceDBInfoSet != __nullptr );
 
 		// Open the DBInfo set table in the source DB database
 		ipSourceDBInfoSet->Open( "DBInfo", _variant_t((IDispatch *)ipSourceDBConnection, true), adOpenStatic, 
@@ -771,7 +771,7 @@ bool CConvertFAMDBDlg::isInputDataValid()
 
 	// Create a FAMDB object to check the schema version of the database to convert from
 	IFileProcessingDBPtr ipFAMDB(CLSID_FileProcessingDB);
-	ASSERT_RESOURCE_ALLOCATION("ELI20386", ipFAMDB != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20386", ipFAMDB != __nullptr);
 
 	// Set to the from database
 	ipFAMDB->DatabaseServer = (LPCSTR) m_zFromServer;
@@ -815,7 +815,7 @@ UINT CConvertFAMDBDlg::convertDatabaseInThread(void *pData)
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	try
 	{
-		ASSERT_ARGUMENT("ELI28617" ,pDlg != NULL);
+		ASSERT_ARGUMENT("ELI28617" ,pDlg != __nullptr);
 
 		// Convert the database
 		pDlg->convertDatabase();

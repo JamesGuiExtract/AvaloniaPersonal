@@ -154,8 +154,8 @@ string DataCell::getCellName()
 //-------------------------------------------------------------------------------------------------
 QueryResponsePair::QueryResponsePair( unsigned char *pczQuery, unsigned char *pczResponse)
 {
-	ASSERT_ARGUMENT("ELI12136", pczQuery != NULL );
-	ASSERT_ARGUMENT("ELI12137", pczResponse != NULL );
+	ASSERT_ARGUMENT("ELI12136", pczQuery != __nullptr );
+	ASSERT_ARGUMENT("ELI12137", pczResponse != __nullptr );
 	// Set Query data
 	memset(czQuery, 0, SP_LEN_OF_QR + 1);
 	memmove(czQuery, pczQuery, SP_LEN_OF_QR );
@@ -181,8 +181,8 @@ USBLicense::USBLicense( SP_DWORD dwLicenseAddr,  SP_DWORD dwUserLimitAddr,
 	m_pszResponseArray(pszResponseArray ),
 	m_iNumQrys(iNumQrys)
 {
-	ASSERT_ARGUMENT("ELI12138", pszQueryArray != NULL );
-	ASSERT_ARGUMENT("ELI12139", pszResponseArray != NULL );
+	ASSERT_ARGUMENT("ELI12138", pszQueryArray != __nullptr );
+	ASSERT_ARGUMENT("ELI12139", pszResponseArray != __nullptr );
 }
 //-------------------------------------------------------------------------------------------------
 QueryResponsePair USBLicense::getQRPair( int iQryNumber )
@@ -621,7 +621,7 @@ void SafeNetLicenseMgr::getLicense()
 							// only need to do this if setting the key heartbeat is a valid operation
 							m_htdData.m_pThread = AfxBeginThread(heartbeatThreadProc, &m_htdData,
 								THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
-							ASSERT_RESOURCE_ALLOCATION("ELI11556", m_htdData.m_pThread != NULL );
+							ASSERT_RESOURCE_ALLOCATION("ELI11556", m_htdData.m_pThread != __nullptr );
 
 							// Save the thread's handle
 							m_htdData.m_hThreadHandle = m_htdData.m_pThread->m_hThread;
@@ -1074,18 +1074,18 @@ void SafeNetLicenseMgr::sendAlert(string strAlert)
 	{
 		// if the email settings has not been setup then the email settings and Message need to 
 		// be initialized
-		if ( m_ipEmailSettings == NULL )
+		if ( m_ipEmailSettings == __nullptr )
 		{
 			m_ipEmailSettings.CreateInstance(CLSID_EmailSettings);
-			ASSERT_RESOURCE_ALLOCATION("ELI12307", m_ipEmailSettings != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI12307", m_ipEmailSettings != __nullptr );
 		
 			IObjectSettingsPtr ipSettings = m_ipEmailSettings;
-			ASSERT_RESOURCE_ALLOCATION("ELI12400", ipSettings != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI12400", ipSettings != __nullptr );
 	
 			ipSettings->LoadFromRegistry( gstrEMAIL_REG_PATH.c_str() );
 			
 			m_ipMessage.CreateInstance(CLSID_ESMessage );
-			ASSERT_RESOURCE_ALLOCATION("ELI12401", m_ipMessage!= NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI12401", m_ipMessage!= __nullptr );
 		
 			m_ipMessage->EmailSettings = m_ipEmailSettings;
 		}
@@ -1093,7 +1093,7 @@ void SafeNetLicenseMgr::sendAlert(string strAlert)
 
 		// Setup message to send
 		IObjectUserInterfacePtr ipUI = m_ipMessage;
-		ASSERT_RESOURCE_ALLOCATION("ShowSendFailed", ipUI != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ShowSendFailed", ipUI != __nullptr );
 		m_ipMessage->Subject = "Extract Systems LM USB Key Counter value is low";
 		m_ipMessage->BodyText = strAlert.c_str();
 		m_ipMessage->Send();
@@ -1161,7 +1161,7 @@ void SafeNetLicenseMgr::addRecipients( IESMessagePtr ipMessage, const string &st
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24890", ipMessage != NULL);
+		ASSERT_ARGUMENT("ELI24890", ipMessage != __nullptr);
 
 		CSingleLock slg(&ms_mutex, TRUE );
 
@@ -1171,7 +1171,7 @@ void SafeNetLicenseMgr::addRecipients( IESMessagePtr ipMessage, const string &st
 		StringTokenizer::sGetTokens(strRecipients, ';', vecTokens);
 		int nNumRecipients =  vecTokens.size();
 		IVariantVectorPtr ipRecipients(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI12402", ipRecipients != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI12402", ipRecipients != __nullptr );
 		for ( int i = 0; i < nNumRecipients; i++ )
 		{
 			// Trim spaces
@@ -1195,7 +1195,7 @@ void SafeNetLicenseMgr::resetHeartBeatThread()
 {
 	// need to stop the heartbeat thread
 	// Don't need to protect this with the ms_mutex 
-	if ( m_htdData.m_pThread != NULL )
+	if ( m_htdData.m_pThread != __nullptr )
 	{
 		// Make sure the thread is still running
 		if (isHeartBeatThreadRunning())

@@ -31,7 +31,7 @@ CLoopPreprocessor::~CLoopPreprocessor()
 {
 	try
 	{
-		m_ipPreprocessor = NULL;
+		m_ipPreprocessor = __nullptr;
 		m_ipCondition	 = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI24114");
@@ -93,18 +93,18 @@ STDMETHODIMP CLoopPreprocessor::raw_Process(IAFDocument * pDocument, IProgressSt
 		IAFDocumentPtr ipAFDoc( pDocument );
 
 		// Assert arguments
-		ASSERT_ARGUMENT("ELI24116", ipAFDoc != NULL);
+		ASSERT_ARGUMENT("ELI24116", ipAFDoc != __nullptr);
 
 		// Set the Pre Processor from the Object with description
 		IDocumentPreprocessorPtr ipPreProcessor = m_ipPreprocessor->Object;
-		ASSERT_RESOURCE_ALLOCATION("ELI24117", ipPreProcessor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24117", ipPreProcessor != __nullptr);
 
 		// Set the Condition from the Object with descripiton if not kForLoop
-		IAFConditionPtr ipCondition = NULL;
+		IAFConditionPtr ipCondition = __nullptr;
 		if (m_eLoopType != kForLoop)
 		{
 			ipCondition = m_ipCondition->Object;
-			ASSERT_RESOURCE_ALLOCATION("ELI24118", ipCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24118", ipCondition != __nullptr);
 		}
 
 		// Initialize the number of iterations through the loop
@@ -159,7 +159,7 @@ STDMETHODIMP CLoopPreprocessor::raw_Process(IAFDocument * pDocument, IProgressSt
 			IRuleExecutionEnvPtr ipRuleEnv(CLSID_RuleExecutionEnv);
 			
 			// Only add the debug info if the RuleExecutionEnv was successfully created
-			if (ipRuleEnv != NULL)
+			if (ipRuleEnv != __nullptr)
 			{
 				ue.addDebugInfo("RuleFile", asString(ipRuleEnv->GetCurrentRSDFileName()));
 			}
@@ -168,7 +168,7 @@ STDMETHODIMP CLoopPreprocessor::raw_Process(IAFDocument * pDocument, IProgressSt
 			ISpatialStringPtr ipText = ipAFDoc->Text;
 
 			// Get the current file being processed
-			if ( ipText != NULL )
+			if ( ipText != __nullptr )
 			{
 				ue.addDebugInfo("InputFile", asString(ipText->SourceDocName));
 			}
@@ -189,7 +189,7 @@ STDMETHODIMP CLoopPreprocessor::raw_GetComponentDescription(BSTR * pstrComponent
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24121", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI24121", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Loop preprocessor").Detach();
 
@@ -210,10 +210,10 @@ STDMETHODIMP CLoopPreprocessor::raw_Clone(LPUNKNOWN * pObject)
 		// validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24123", pObject != NULL);
+		ASSERT_ARGUMENT("ELI24123", pObject != __nullptr);
 
 		ICopyableObjectPtr ipObjCopy(CLSID_LoopPreprocessor);
-		ASSERT_RESOURCE_ALLOCATION("ELI24124", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24124", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -235,7 +235,7 @@ STDMETHODIMP CLoopPreprocessor::raw_CopyFrom(LPUNKNOWN pObject)
 		// validate license first
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI24126", pObject != NULL);
+		ASSERT_ARGUMENT("ELI24126", pObject != __nullptr);
 
 		UCLID_AFPREPROCESSORSLib::ILoopPreprocessorPtr ipSource(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI24127", ipSource!=NULL);
@@ -250,7 +250,7 @@ STDMETHODIMP CLoopPreprocessor::raw_CopyFrom(LPUNKNOWN pObject)
 		ICopyableObjectPtr ipCopyObj = ipSource->Condition;
 		if (m_eLoopType != kForLoop)
 		{
-			if (ipCopyObj != NULL)
+			if (ipCopyObj != __nullptr)
 			{
 				m_ipCondition = ipCopyObj->Clone();
 			}
@@ -258,7 +258,7 @@ STDMETHODIMP CLoopPreprocessor::raw_CopyFrom(LPUNKNOWN pObject)
 
 		// Clone the preprocessor.
 		ipCopyObj = ipSource->Preprocessor;
-		if (ipCopyObj != NULL)
+		if (ipCopyObj != __nullptr)
 		{
 			m_ipPreprocessor = ipCopyObj->Clone();
 		}
@@ -309,7 +309,7 @@ STDMETHODIMP CLoopPreprocessor::raw_IsConfigured(VARIANT_BOOL * pbConfigured)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24129", pbConfigured != NULL);
+		ASSERT_ARGUMENT("ELI24129", pbConfigured != __nullptr);
 
 		bool bConfigured;
 		
@@ -322,14 +322,14 @@ STDMETHODIMP CLoopPreprocessor::raw_IsConfigured(VARIANT_BOOL * pbConfigured)
 		if (bConfigured && m_eLoopType != kForLoop)
 		{
 			// Condition has been set
-			if (m_ipCondition != NULL)
+			if (m_ipCondition != __nullptr)
 			{
 				ipConfigObj = m_ipCondition->Object;
 
 				// Is configured only if the Condition object is not null and if the 
 				// it implements IMustBeConfiguredObject and it is configured
-				bConfigured = m_ipCondition->Object != NULL;
-				bConfigured = bConfigured && (ipConfigObj == NULL || 
+				bConfigured = m_ipCondition->Object != __nullptr;
+				bConfigured = bConfigured && (ipConfigObj == __nullptr || 
 					asCppBool(ipConfigObj->IsConfigured()));
 			}
 			else
@@ -339,15 +339,15 @@ STDMETHODIMP CLoopPreprocessor::raw_IsConfigured(VARIANT_BOOL * pbConfigured)
 		}
 		
 		// Check if the preprocessor is configured
-		if (bConfigured && m_ipPreprocessor != NULL)
+		if (bConfigured && m_ipPreprocessor != __nullptr)
 		{
 			// Get the IMustBeConfigured object
 			ipConfigObj = m_ipPreprocessor->Object;
 			
 			// Is configured only if the Preprocessor object is not null and if the 
 			// it implements IMustBeConfiguredObject and it is configured
-			bConfigured = m_ipPreprocessor->Object != NULL;
-			bConfigured = bConfigured && (ipConfigObj == NULL || 
+			bConfigured = m_ipPreprocessor->Object != __nullptr;
+			bConfigured = bConfigured && (ipConfigObj == __nullptr || 
 				asCppBool(ipConfigObj->IsConfigured()));
 		}
 		else 
@@ -370,7 +370,7 @@ STDMETHODIMP CLoopPreprocessor::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24131", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI24131", pClassID != __nullptr);
 
 		*pClassID = CLSID_LoopPreprocessor;
 
@@ -395,11 +395,11 @@ STDMETHODIMP CLoopPreprocessor::Load(IStream *pStream)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24133", pStream != NULL);
+		ASSERT_ARGUMENT("ELI24133", pStream != __nullptr);
 		
 		// Reset all of the values
-		m_ipCondition = NULL;
-		m_ipPreprocessor = NULL;
+		m_ipCondition = __nullptr;
+		m_ipPreprocessor = __nullptr;
 		m_nIterations = 0;
 		m_bLogExceptionForMaxIterations = false;
 
@@ -437,14 +437,14 @@ STDMETHODIMP CLoopPreprocessor::Load(IStream *pStream)
 
 		readObjectFromStream(ipObj, pStream, "ELI24135");
 		m_ipPreprocessor = ipObj;
-		ASSERT_RESOURCE_ALLOCATION("ELI24136", m_ipPreprocessor != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24136", m_ipPreprocessor != __nullptr);
 		
 		// Only get the Condition if the loop type is not for
 		if (m_eLoopType != kForLoop)
 		{
 			readObjectFromStream(ipObj, pStream, "ELI24137");
 			m_ipCondition = ipObj;
-			ASSERT_RESOURCE_ALLOCATION("ELI24138", m_ipCondition != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24138", m_ipCondition != __nullptr);
 		}
 
 		// Clear the dirty flag as we've loaded a fresh object
@@ -463,7 +463,7 @@ STDMETHODIMP CLoopPreprocessor::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24140", pStream != NULL);
+		ASSERT_ARGUMENT("ELI24140", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -486,7 +486,7 @@ STDMETHODIMP CLoopPreprocessor::Save(IStream *pStream, BOOL fClearDirty)
 		
 		// Write PreProcessor
 		IPersistStreamPtr ipObj = m_ipPreprocessor;
-		ASSERT_RESOURCE_ALLOCATION("ELI24141", ipObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24141", ipObj != __nullptr);
 		writeObjectToStream(ipObj, pStream, "ELI24142", fClearDirty);
 
 		// Only write the condition if the value is valid
@@ -494,7 +494,7 @@ STDMETHODIMP CLoopPreprocessor::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			// Write Condition
 			ipObj = m_ipCondition;
-			ASSERT_RESOURCE_ALLOCATION("ELI24143", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24143", ipObj != __nullptr);
 			writeObjectToStream(ipObj, pStream, "ELI24144", fClearDirty);
 		}
 
@@ -525,10 +525,10 @@ STDMETHODIMP CLoopPreprocessor::get_Preprocessor(IObjectWithDescription ** pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24146", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24146", pVal != __nullptr);
 
 		// If Preprocessor is NULL return NULL otherwise return a shallow copy
-		if (m_ipPreprocessor == NULL)
+		if (m_ipPreprocessor == __nullptr)
 		{
 			*pVal = NULL;
 		}
@@ -571,10 +571,10 @@ STDMETHODIMP CLoopPreprocessor::get_Condition(IObjectWithDescription ** pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24149", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24149", pVal != __nullptr);
 
 		// If the condition is null return the null value
-		if ( m_ipCondition == NULL )
+		if ( m_ipCondition == __nullptr )
 		{
 			*pVal = NULL;
 		}
@@ -616,7 +616,7 @@ STDMETHODIMP CLoopPreprocessor::get_ConditionValue( VARIANT_BOOL *pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24152", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24152", pVal != __nullptr);
 
 		// Return the Conditon Value
 		*pVal = asVariantBool(m_bConditionValue);
@@ -658,7 +658,7 @@ STDMETHODIMP CLoopPreprocessor::get_LogExceptionForMaxIterations( VARIANT_BOOL *
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24155", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24155", pVal != __nullptr);
 
 		// Return the Log exception flag
 		*pVal = asVariantBool(m_bLogExceptionForMaxIterations);
@@ -700,7 +700,7 @@ STDMETHODIMP CLoopPreprocessor::get_Iterations( long *pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24158", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24158", pVal != __nullptr);
 
 		// Return the number of iterations
 		*pVal = m_nIterations;
@@ -739,7 +739,7 @@ STDMETHODIMP CLoopPreprocessor::get_LoopType( ELoopType *pVal)
 		// Check licensing
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24161", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24161", pVal != __nullptr);
 
 		// Return the loop type
 		*pVal = m_eLoopType;
@@ -767,7 +767,7 @@ STDMETHODIMP CLoopPreprocessor::put_LoopType( ELoopType newVal)
 		// If loop type is kForLoop reset the condition
 		if (m_eLoopType == kForLoop)
 		{
-			m_ipCondition = NULL;
+			m_ipCondition = __nullptr;
 
 			// Log Exception for max iterations should be false if loop type is for
 			m_bLogExceptionForMaxIterations = false;

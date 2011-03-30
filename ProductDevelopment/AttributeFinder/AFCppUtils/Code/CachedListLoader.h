@@ -32,7 +32,7 @@ public:
 	//			loaded into a list. If the "file://" designation is not used, NULL will be returned
 	//			to indicate a file was not specified.
 	// REQUIRES: Any specified file must be compatible with StringLoader.
-	IVariantVectorPtr getList(const _bstr_t& bstrListSpecification, IAFDocumentPtr ipAFDoc = NULL,
+	IVariantVectorPtr getList(const _bstr_t& bstrListSpecification, IAFDocumentPtr ipAFDoc = __nullptr,
 		char* pcDelimeter = NULL);
 
 	// PROMISE: Given the specified list of values, any included value that specifies a file will be
@@ -41,7 +41,7 @@ public:
 	// RETURNS: A VariantVector list where any item that begins with "file://" is replaced with the
 	//			values in the specified file.
 	// REQUIRES: Any specified file must be compatible with StringLoader.
-	IVariantVectorPtr expandList(IVariantVectorPtr ipSourceList, IAFDocumentPtr ipAFDoc = NULL);
+	IVariantVectorPtr expandList(IVariantVectorPtr ipSourceList, IAFDocumentPtr ipAFDoc = __nullptr);
 
 	// PROMISE: Given the specified two column list of values, any included item where the first
 	//			column specifies a file will be replaced with the values in that file. If ipAFDoc is
@@ -54,7 +54,7 @@ public:
 	//			replaced with the values in the specified file.
 	// REQUIRES: Any specified file must be compatible with StringLoader.
 	IIUnknownVectorPtr expandTwoColumnList(IIUnknownVectorPtr ipSourceList, char cDelimeter,
-		IAFDocumentPtr ipAFDoc = NULL);
+		IAFDocumentPtr ipAFDoc = __nullptr);
 
 private:
 

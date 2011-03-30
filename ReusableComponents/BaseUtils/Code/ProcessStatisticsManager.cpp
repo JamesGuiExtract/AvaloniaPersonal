@@ -160,12 +160,12 @@ ProcessStatisticsManager::~ProcessStatisticsManager()
 {
 	try
 	{
-		if (m_pEnum != NULL)
+		if (m_pEnum != __nullptr)
 		{
 			m_pEnum->Release();
 			m_pEnum = NULL;
 		}
-		if (m_pRefresher != NULL)
+		if (m_pRefresher != __nullptr)
 		{
 			m_pRefresher->Release();
 			m_pRefresher = NULL;
@@ -212,7 +212,7 @@ __time64_t ProcessStatisticsManager::getProcessStatistics(
 		{
 			// allocate the correct amount of space for the call to GetObjects
 			apEnumAccess = new IWbemObjectAccess*[dwNumReturned];
-			ASSERT_RESOURCE_ALLOCATION("ELI16689", apEnumAccess != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16689", apEnumAccess != __nullptr);
 
 			// here we just make sure that the memory we have allocated is all set to zeroes
 			SecureZeroMemory(apEnumAccess, dwNumReturned*sizeof(IWbemObjectAccess*));
@@ -367,7 +367,7 @@ __time64_t ProcessStatisticsManager::getProcessStatistics(
 	}
 	catch(...)
 	{
-		if (apEnumAccess != NULL)
+		if (apEnumAccess != __nullptr)
 		{
 			for (DWORD i = 0; i < dwNumReturned; i++)
 			{
@@ -376,7 +376,7 @@ __time64_t ProcessStatisticsManager::getProcessStatistics(
 				// fails we at least attempt to clean up the rest
 				try
 				{
-					if (apEnumAccess[i] != NULL)
+					if (apEnumAccess[i] != __nullptr)
 					{
 						apEnumAccess[i]->Release();
 						apEnumAccess[i] = NULL;

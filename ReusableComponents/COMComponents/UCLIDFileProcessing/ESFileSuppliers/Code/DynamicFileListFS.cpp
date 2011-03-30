@@ -62,7 +62,7 @@ STDMETHODIMP CDynamicFileListFS::put_FileName(BSTR strFileName)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14437", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14437", ipFAMTagManager != __nullptr);
 
 		// make sure the file name contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strFile.c_str()) == VARIANT_TRUE)
@@ -140,7 +140,7 @@ STDMETHODIMP CDynamicFileListFS::raw_GetComponentDescription(BSTR * pstrComponen
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19633", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19633", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Files from dynamic list").Detach();
 	}
@@ -159,7 +159,7 @@ STDMETHODIMP CDynamicFileListFS::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		EXTRACT_FILESUPPLIERSLib::IDynamicFileListFSPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI13952", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13952", ipCopyThis != __nullptr);
 
 		// Get the file name string
 		m_strFileName = asString(ipCopyThis->FileName);
@@ -175,14 +175,14 @@ STDMETHODIMP CDynamicFileListFS::raw_Clone(IUnknown **pObject)
 
 	try
 	{
-		if(pObject != NULL)
+		if(pObject != __nullptr)
 		{
 			// Validate license first
 			validateLicense();
 
 			ICopyableObjectPtr ipObjCopy;
 			ipObjCopy.CreateInstance(CLSID_DynamicFileListFS);
-			ASSERT_RESOURCE_ALLOCATION("ELI13954", ipObjCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13954", ipObjCopy != __nullptr);
 
 			IUnknownPtr ipUnk = this;
 			ipObjCopy->CopyFrom(ipUnk);
@@ -329,7 +329,7 @@ STDMETHODIMP CDynamicFileListFS::raw_Start( IFileSupplierTarget *pTarget, IFAMTa
 
 		// Wrap the file supplying target in a smart pointer
 		IFileSupplierTargetPtr ipTarget(pTarget);
-		ASSERT_RESOURCE_ALLOCATION("ELI13960", ipTarget != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13960", ipTarget != __nullptr );
 
 		// reset events
 		m_stopEvent.reset();

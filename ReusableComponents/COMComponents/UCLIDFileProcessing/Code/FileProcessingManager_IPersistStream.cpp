@@ -41,10 +41,10 @@ STDMETHODIMP CFileProcessingManager::IsDirty(void)
 		}
 
 		// check if the file supplying role object is dirty
-		if (m_ipFSMgmtRole != NULL)
+		if (m_ipFSMgmtRole != __nullptr)
 		{
 			IPersistStreamPtr ipFSStream = m_ipFSMgmtRole;
-			ASSERT_RESOURCE_ALLOCATION("ELI14197", ipFSStream != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14197", ipFSStream != __nullptr);
 			if (ipFSStream->IsDirty() == S_OK)
 			{
 				return S_OK;
@@ -53,10 +53,10 @@ STDMETHODIMP CFileProcessingManager::IsDirty(void)
 
 		// if the file processors container is dirty, then indicate to the caller that
 		// this object is dirty
-		if (m_ipFPMgmtRole != NULL)
+		if (m_ipFPMgmtRole != __nullptr)
 		{
 			IPersistStreamPtr ipFPStream = m_ipFPMgmtRole;
-			ASSERT_RESOURCE_ALLOCATION("ELI14159", ipFPStream != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI14159", ipFPStream != __nullptr);
 			if (ipFPStream->IsDirty() == S_OK)
 			{
 				return S_OK;
@@ -183,13 +183,13 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 		// Read in the collected File Supplying Management Role
 		IPersistStreamPtr ipFSObj;
 		readObjectFromStream( ipFSObj, pStream, "ELI14399" );
-		ASSERT_RESOURCE_ALLOCATION( "ELI14400", ipFSObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14400", ipFSObj != __nullptr );
 		m_ipFSMgmtRole = ipFSObj;
 
 		// Read in the collected File Processing Management Role
 		IPersistStreamPtr ipFPObj;
 		readObjectFromStream( ipFPObj, pStream, "ELI17362" );
-		ASSERT_RESOURCE_ALLOCATION( "ELI17363", ipFPObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI17363", ipFPObj != __nullptr );
 		m_ipFPMgmtRole = ipFPObj;
 
 		// Check the Action Name for result of recent File Conversion
@@ -247,12 +247,12 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write out the collected File Supplying Management Role
 		IPersistStreamPtr ipFSObj = m_ipFSMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION( "ELI14426", ipFSObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14426", ipFSObj != __nullptr );
 		writeObjectToStream( ipFSObj, pStream, "ELI14427", fClearDirty );
 
 		// Write out the collected File Processing Management Role
 		IPersistStreamPtr ipFPObj = m_ipFPMgmtRole;
-		ASSERT_RESOURCE_ALLOCATION( "ELI14428", ipFPObj != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI14428", ipFPObj != __nullptr );
 		writeObjectToStream( ipFPObj, pStream, "ELI14429", fClearDirty );
 
 		// Clear the flag as specified

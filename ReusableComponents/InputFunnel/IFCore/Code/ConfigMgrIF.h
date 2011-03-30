@@ -20,5 +20,5 @@ private:
 	static const std::string OCR_ENGINE_PROG_ID_KEY_NAME;
 	static const std::string DEFAULT_PROG_ID;
 
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 };

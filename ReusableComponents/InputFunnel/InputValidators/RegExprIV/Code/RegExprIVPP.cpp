@@ -69,7 +69,7 @@ LRESULT CRegExprIVPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 		if (ipRegExprIV)
 		{	
 			IInputValidatorPtr ipInputValidator(ipRegExprIV);
-			ASSERT_RESOURCE_ALLOCATION("ELI30077", ipInputValidator != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI30077", ipInputValidator != __nullptr);
 
 			// pattern string
 			_bstr_t _bstrPattern(ipRegExprIV->Pattern);

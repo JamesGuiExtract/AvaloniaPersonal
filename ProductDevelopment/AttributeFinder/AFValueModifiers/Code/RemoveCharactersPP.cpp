@@ -174,11 +174,11 @@ LRESULT CRemoveCharactersPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 				}
 
 				IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-				ASSERT_RESOURCE_ALLOCATION("ELI13057", ipMiscUtils != NULL );
+				ASSERT_RESOURCE_ALLOCATION("ELI13057", ipMiscUtils != __nullptr );
 
 				// look for non-space characters
 				IRegularExprParserPtr ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("RemoveCharacters");
-				ASSERT_RESOURCE_ALLOCATION("ELI04359", ipRegExpr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI04359", ipRegExpr != __nullptr);
 
 				ipRegExpr->Pattern = "[\\S]+";
 				IIUnknownVectorPtr ipFoundStringInfos(ipRegExpr->Find(_bstrCharactersDefined, 

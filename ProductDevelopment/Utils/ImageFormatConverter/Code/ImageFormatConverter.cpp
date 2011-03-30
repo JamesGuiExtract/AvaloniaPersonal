@@ -310,7 +310,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 				// Check for NULL or empty container
 				bool bSavedTag = false;
-				if (hFileContainer != NULL)
+				if (hFileContainer != __nullptr)
 				{
 					// Retrieve the first annotation item
 					HANNOBJECT	hFirst = NULL;
@@ -318,7 +318,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 					throwExceptionIfNotSuccess( nRet, "ELI23585", 
 						"Could not get item from annotation container." );
 
-					if (hFirst != NULL)
+					if (hFirst != __nullptr)
 					{
 
 						if (bBurnAnnotations)
@@ -446,12 +446,12 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 	catch(UCLIDException& uex)
 	{
 		// Clean up resources
-		if (pfnCallBack != NULL)
+		if (pfnCallBack != __nullptr)
 		{
 			// Free the callback proc instance
 			FreeProcInstance((FARPROC) BurnRedactions);
 		}
-		if (hFileContainer != NULL)
+		if (hFileContainer != __nullptr)
 		{
 			try
 			{

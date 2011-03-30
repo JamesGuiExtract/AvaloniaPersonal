@@ -39,7 +39,7 @@ m_iLastClickedResourceID(-1)
 
 		// create an instance of the clipboard object manager
 		m_ipClipboardMgr.CreateInstance(CLSID_ClipboardObjectManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI23615", m_ipClipboardMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23615", m_ipClipboardMgr != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI16196")
 }
@@ -48,7 +48,7 @@ CConditionalTaskPP::~CConditionalTaskPP()
 {
 	try
 	{
-		m_ipClipboardMgr = NULL;
+		m_ipClipboardMgr = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16611")
 }
@@ -107,7 +107,7 @@ STDMETHODIMP CConditionalTaskPP::Apply()
 		{
 			// Retrieve the Conditional Task object
 			UCLID_FILEPROCESSORSLib::IConditionalTaskPtr ipFP(m_ppUnk[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI16199", ipFP != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16199", ipFP != __nullptr);
 
 			// Validate object settings as appropriate
 			validateSettings();
@@ -133,14 +133,14 @@ LRESULT CConditionalTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam
 	{
 		// Get the underlying objet
 		m_ipConditionalTaskFP = m_ppUnk[0];
-		ASSERT_RESOURCE_ALLOCATION("ELI19459", m_ipConditionalTaskFP != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19459", m_ipConditionalTaskFP != __nullptr);
 
 		// Prepare controls
 		prepareControls();
 
 		// Retrieve the FAM Condition
 		IObjectWithDescriptionPtr ipFAMCondition = m_ipConditionalTaskFP->FAMCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI16268", ipFAMCondition != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16268", ipFAMCondition != __nullptr);
 
 		// Display the FAM Condition
 		CString zText = (LPCSTR) ipFAMCondition->Description;
@@ -176,7 +176,7 @@ LRESULT CConditionalTaskPP::OnBtnSelectCondition(WORD wNotifyCode, WORD wID, HWN
 		{
 			// Retrieve FAM Condition
 			IObjectWithDescriptionPtr ipOWD = m_ipConditionalTaskFP->FAMCondition;
-			if (ipOWD == NULL)
+			if (ipOWD == __nullptr)
 			{
 				// Clear description if no FAM Condition object
 				m_editConditionDescription.SetWindowText( "" );
@@ -223,7 +223,7 @@ LRESULT CConditionalTaskPP::OnLButtonDblClk(UINT uMsg, WPARAM wParam, LPARAM lPa
 			{
 				// Retrieve FAM Condition
 				IObjectWithDescriptionPtr ipOWD = m_ipConditionalTaskFP->FAMCondition;
-				if (ipOWD == NULL)
+				if (ipOWD == __nullptr)
 				{
 					// Clear description if no FAM Condition object
 					m_editConditionDescription.SetWindowText( "" );
@@ -252,7 +252,7 @@ LRESULT CConditionalTaskPP::OnClickedBtnAdd(WORD wNotifyCode, WORD wID, HWND hWn
 	{
 		// Create a new ObjectWithDescription
 		IObjectWithDescriptionPtr ipObject(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI16272", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16272", ipObject != __nullptr);
 
 		// Allow the user to select and configure
 		VARIANT_BOOL vbDirty = getMiscUtils()->AllowUserToSelectAndConfigureObject( ipObject, 
@@ -263,7 +263,7 @@ LRESULT CConditionalTaskPP::OnClickedBtnAdd(WORD wNotifyCode, WORD wID, HWND hWn
 		{
 			// Validate ID and get appropriate list and tasks collection
 			ATLControls::CListViewCtrl rList;
-			IIUnknownVectorPtr ipCollection = NULL;
+			IIUnknownVectorPtr ipCollection = __nullptr;
 			getListAndTasks( wID, IDC_BTN_ADD, IDC_BTN_ADD2, rList, ipCollection );
 
 			// Retrieve the insert position
@@ -288,7 +288,7 @@ LRESULT CConditionalTaskPP::OnClickedBtnRemove(WORD wNotifyCode, WORD wID, HWND 
 	{
 		// Validate ID and get appropriate list and tasks collection
 		ATLControls::CListViewCtrl rList;
-		IIUnknownVectorPtr ipCollection = NULL;
+		IIUnknownVectorPtr ipCollection = __nullptr;
 		getListAndTasks( wID, IDC_BTN_REMOVE, IDC_BTN_REMOVE2, rList, ipCollection );
 
 		// Remove the selected items from the list
@@ -308,14 +308,14 @@ LRESULT CConditionalTaskPP::OnClickedBtnModify(WORD wNotifyCode, WORD wID, HWND 
 	{
 		// Validate ID and get appropriate list and tasks collection
 		ATLControls::CListViewCtrl rList;
-		IIUnknownVectorPtr ipCollection = NULL;
+		IIUnknownVectorPtr ipCollection = __nullptr;
 		getListAndTasks( wID, IDC_BTN_MODIFY, IDC_BTN_MODIFY2, rList, ipCollection );
 
 		// Get index of current selection and retrieve the associated task
 		int nSelectedItemIndex = rList.GetNextItem( -1, LVNI_ALL | LVNI_SELECTED );
 		ASSERT_ARGUMENT( "ELI16289", nSelectedItemIndex >= 0 );
 		IObjectWithDescriptionPtr ipObject = ipCollection->At( nSelectedItemIndex );
-		ASSERT_RESOURCE_ALLOCATION("ELI16290", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16290", ipObject != __nullptr);
 
 		// Get the position and dimensions of the command button
 		RECT rectCommandButton;
@@ -350,7 +350,7 @@ LRESULT CConditionalTaskPP::OnClickedBtnUp(WORD wNotifyCode, WORD wID, HWND hWnd
 	{
 		// Validate ID and get appropriate list and tasks collection
 		ATLControls::CListViewCtrl rList;
-		IIUnknownVectorPtr ipCollection = NULL;
+		IIUnknownVectorPtr ipCollection = __nullptr;
 		getListAndTasks( wID, IDC_BTN_UP, IDC_BTN_UP2, rList, ipCollection );
 
 		// Get index of current selection
@@ -378,7 +378,7 @@ LRESULT CConditionalTaskPP::OnClickedBtnDown(WORD wNotifyCode, WORD wID, HWND hW
 	{
 		// Validate ID and get appropriate list and tasks collection
 		ATLControls::CListViewCtrl rList;
-		IIUnknownVectorPtr ipCollection = NULL;
+		IIUnknownVectorPtr ipCollection = __nullptr;
 		getListAndTasks( wID, IDC_BTN_DOWN, IDC_BTN_DOWN2, rList, ipCollection );
 
 		// Get item count
@@ -412,7 +412,7 @@ LRESULT CConditionalTaskPP::OnItemChangedList(int idCtrl, LPNMHDR pnmh, BOOL& bH
 
 		// Validate ID and get appropriate list and tasks collection
 		ATLControls::CListViewCtrl rList;
-		IIUnknownVectorPtr ipCollection = NULL;
+		IIUnknownVectorPtr ipCollection = __nullptr;
 		getListAndTasks( idCtrl, IDC_LIST_TRUE, IDC_LIST_FALSE, rList, ipCollection );
 
 		// Get item number
@@ -451,7 +451,7 @@ LRESULT CConditionalTaskPP::OnDblclkList(int idCtrl, LPNMHDR pnmh, BOOL& bHandle
 
 		// Validate ID and get appropriate list and tasks collection
 		ATLControls::CListViewCtrl rList;
-		IIUnknownVectorPtr ipCollection = NULL;
+		IIUnknownVectorPtr ipCollection = __nullptr;
 		getListAndTasks( idCtrl, IDC_LIST_TRUE, IDC_LIST_FALSE, rList, ipCollection );
 
 		// Get item number
@@ -464,7 +464,7 @@ LRESULT CConditionalTaskPP::OnDblclkList(int idCtrl, LPNMHDR pnmh, BOOL& bHandle
 
 		// Retrieve the task
 		IObjectWithDescriptionPtr ipTask = ipCollection->At( iItem );
-		ASSERT_RESOURCE_ALLOCATION("ELI16287", ipTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16287", ipTask != __nullptr);
 
 		// Allow the user to modify the task
 		VARIANT_BOOL vbOK = getMiscUtils()->HandlePlugInObjectDoubleClick( ipTask, 
@@ -581,7 +581,7 @@ LRESULT CConditionalTaskPP::OnEditCopy(WORD wNotifyCode, WORD wID, HWND hWndCtl,
 	{
 		// Validate ID and get appropriate list and tasks collection
 		ATLControls::CListViewCtrl rList;
-		IIUnknownVectorPtr ipCollection = NULL;
+		IIUnknownVectorPtr ipCollection = __nullptr;
 		getListAndTasks( m_iLastClickedResourceID, IDC_LIST_TRUE, IDC_LIST_FALSE,
 			rList, ipCollection );
 
@@ -596,14 +596,14 @@ LRESULT CConditionalTaskPP::OnEditCopy(WORD wNotifyCode, WORD wID, HWND hWndCtl,
 
 		// Create a vector for selected objects
 		UCLID_COMUTILSLib::IIUnknownVectorPtr	ipCopiedObjects( CLSID_IUnknownVector );
-		ASSERT_RESOURCE_ALLOCATION( "ELI23620", ipCopiedObjects != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI23620", ipCopiedObjects != __nullptr );
 
 		// Add each selected object to vector
 		while (iIndex != -1)
 		{
 			// Retrieve the selected object
 			IUnknownPtr	ipObject = ipCollection->At(iIndex);
-			ASSERT_RESOURCE_ALLOCATION("ELI23621", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI23621", ipObject != __nullptr );
 
 			// Add the object to the vector
 			ipCopiedObjects->PushBack( ipObject );
@@ -629,12 +629,12 @@ LRESULT CConditionalTaskPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl
 	{
 		// Validate ID and get appropriate list and tasks collection
 		ATLControls::CListViewCtrl rList;
-		IIUnknownVectorPtr ipCollection = NULL;
+		IIUnknownVectorPtr ipCollection = __nullptr;
 		getListAndTasks( m_iLastClickedResourceID, IDC_LIST_TRUE, IDC_LIST_FALSE,
 			rList, ipCollection );
 
 		// Test ClipboardManager object
-		IUnknownPtr	ipObject = NULL;
+		IUnknownPtr	ipObject = __nullptr;
 		bool	bSingleObject = false;
 		if (m_ipClipboardMgr->IUnknownVectorIsOWDOfType( 
 			IID_IFileProcessingTask ))
@@ -642,13 +642,13 @@ LRESULT CConditionalTaskPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl
 			// Object is a vector of ObjectWithDescription items
 			// We expect each embedded object to be of type IFileProcessingTask
 			ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-			ASSERT_RESOURCE_ALLOCATION( "ELI23623", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI23623", ipObject != __nullptr );
 		}
 		else if (m_ipClipboardMgr->ObjectIsTypeWithDescription(IID_IFileProcessingTask))
 		{
 			// Retrieve object from ClipboardManager
 			ipObject = m_ipClipboardMgr->GetObjectInClipboard();
-			ASSERT_RESOURCE_ALLOCATION("ELI23624", ipObject != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI23624", ipObject != __nullptr );
 			bSingleObject = true;
 		}
 		else
@@ -667,7 +667,7 @@ LRESULT CConditionalTaskPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl
 		{
 			// Retrieve object and description
 			UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipNewObj = ipObject;
-			ASSERT_RESOURCE_ALLOCATION( "ELI23626", ipNewObj != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI23626", ipNewObj != __nullptr );
 
 			// Insert into the collection vector
 			ipCollection->Insert(nSelectedItemIndex, ipObject);
@@ -677,7 +677,7 @@ LRESULT CConditionalTaskPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl
 		{
 			// Get count of Objects in Clipboard vector
 			UCLID_COMUTILSLib::IIUnknownVectorPtr	ipPastedObjects = ipObject;
-			ASSERT_RESOURCE_ALLOCATION( "ELI23627", ipPastedObjects != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI23627", ipPastedObjects != __nullptr );
 			long iCount = ipPastedObjects->Size();
 
 			// Add each Object to the vector
@@ -686,7 +686,7 @@ LRESULT CConditionalTaskPP::OnEditPaste(WORD wNotifyCode, WORD wID, HWND hWndCtl
 				// Retrieve object and description
 				UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipNewObj = 
 					ipPastedObjects->At( i );
-				ASSERT_RESOURCE_ALLOCATION( "ELI23628", ipNewObj != NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI23628", ipNewObj != __nullptr );
 
 				// Insert into the collection vector
 				ipCollection->Insert(nSelectedItemIndex, ipNewObj);
@@ -714,7 +714,7 @@ LRESULT CConditionalTaskPP::OnEditDelete(WORD wNotifyCode, WORD wID, HWND hWndCt
 	{
 		// Validate ID and get appropriate list and tasks collection
 		ATLControls::CListViewCtrl rList;
-		IIUnknownVectorPtr ipCollection = NULL;
+		IIUnknownVectorPtr ipCollection = __nullptr;
 		getListAndTasks( m_iLastClickedResourceID, IDC_LIST_TRUE, IDC_LIST_FALSE,
 			rList, ipCollection );
 
@@ -756,7 +756,7 @@ void CConditionalTaskPP::getDlgItemWindowRect(UINT uiDlgItemResourceID, RECT &re
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CConditionalTaskPP::getFalseTasks()
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI16275", m_ipConditionalTaskFP != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI16275", m_ipConditionalTaskFP != __nullptr );
 	return m_ipConditionalTaskFP->TasksForConditionFalse;
 }
 //-------------------------------------------------------------------------------------------------
@@ -796,15 +796,15 @@ void CConditionalTaskPP::getListAndTasks(WORD wID, int nID1, int nID2,
 	// Get appropriate list and tasks collection
 	rList = (wID == nID1) ? m_listTrueTasks : m_listFalseTasks;
 	ripCollection = (wID == nID1) ? getTrueTasks() : getFalseTasks();
-	ASSERT_RESOURCE_ALLOCATION("ELI16403", ripCollection != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16403", ripCollection != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 IMiscUtilsPtr CConditionalTaskPP::getMiscUtils()
 {
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI16266", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI16266", m_ipMiscUtils != __nullptr );
 	}
 	
 	return m_ipMiscUtils;
@@ -812,7 +812,7 @@ IMiscUtilsPtr CConditionalTaskPP::getMiscUtils()
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CConditionalTaskPP::getTrueTasks()
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI16274", m_ipConditionalTaskFP != NULL );
+	ASSERT_RESOURCE_ALLOCATION("ELI16274", m_ipConditionalTaskFP != __nullptr );
 	return m_ipConditionalTaskFP->TasksForConditionTrue;
 }
 //-------------------------------------------------------------------------------------------------
@@ -870,7 +870,7 @@ void CConditionalTaskPP::prepareControls()
 void CConditionalTaskPP::refreshTasks(ATLControls::CListViewCtrl &rList, 
 									  IIUnknownVectorPtr ipCollection, int iTaskForSelection)
 {
-	ASSERT_ARGUMENT( "ELI16637", ipCollection != NULL );
+	ASSERT_ARGUMENT( "ELI16637", ipCollection != __nullptr );
 
 	// Clear the list
 	rList.DeleteAllItems();
@@ -881,7 +881,7 @@ void CConditionalTaskPP::refreshTasks(ATLControls::CListViewCtrl &rList,
 	{
 		// Retrieve this ObjectWithDescription
 		IObjectWithDescriptionPtr ipOWD = ipCollection->At( i );
-		ASSERT_RESOURCE_ALLOCATION("ELI16277", ipOWD != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16277", ipOWD != __nullptr);
 
 		// Retrieve associated description and enabled flag
 		string strDescription = asString( ipOWD->Description );
@@ -990,9 +990,9 @@ void CConditionalTaskPP::validateSettings()
 {
 	// Confirm valid FAM Condition object
 	IObjectWithDescriptionPtr ipOWD = m_ipConditionalTaskFP->FAMCondition;
-	ASSERT_RESOURCE_ALLOCATION("ELI16533", ipOWD != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16533", ipOWD != __nullptr);
 	IFAMConditionPtr ipObject = ipOWD->Object;
-	if (ipObject == NULL)
+	if (ipObject == __nullptr)
 	{
 		UCLIDException ue("ELI16292", "A Condition object must be defined!");
 		throw ue;

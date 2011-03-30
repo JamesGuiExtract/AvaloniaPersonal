@@ -20,7 +20,7 @@ CSpotRecIRTester::CSpotRecIRTester()
 	{
 		// create an instance of the spot-rec IR
 		m_ipSpotRecIR.CreateInstance(__uuidof(SpotRecognitionWindow));
-		ASSERT_RESOURCE_ALLOCATION("ELI12321", m_ipSpotRecIR != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12321", m_ipSpotRecIR != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI12323");
 }
@@ -749,7 +749,7 @@ void CSpotRecIRTester::setTestFileFolder(IVariantVectorPtr ipParams, const std::
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		std::string strTestFolder = asString(_bstr_t(ipParams->GetItem(1)));
 

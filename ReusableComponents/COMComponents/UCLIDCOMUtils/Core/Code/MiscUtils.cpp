@@ -42,11 +42,10 @@ CMiscUtils::CMiscUtils()
 	try
 	{
 		// create instance of the registry persistence mgr
-		m_apSettings = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-			new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
-		ASSERT_RESOURCE_ALLOCATION("ELI07621", m_apSettings.get() != NULL);
+		m_apSettings.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
+		ASSERT_RESOURCE_ALLOCATION("ELI07621", m_apSettings.get() != __nullptr);
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI07620")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI07620");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -108,15 +107,15 @@ STDMETHODIMP CMiscUtils::GetRegExpData(IIUnknownVector* pFoundData,
 		validateLicense();
 
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipFoundData(pFoundData);
-		ASSERT_RESOURCE_ALLOCATION("ELI08917", ipFoundData != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08917", ipFoundData != __nullptr);
 
 		UCLID_COMUTILSLib::IObjectPairPtr ipObjPair = ipFoundData->At(nIndex);
-		ASSERT_RESOURCE_ALLOCATION("ELI08923", ipObjPair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08923", ipObjPair != __nullptr);
 
 		if(nSubIndex < 0)
 		{
 			UCLID_COMUTILSLib::ITokenPtr ipTok = ipObjPair->GetObject1();
-			ASSERT_RESOURCE_ALLOCATION("ELI08922", ipTok != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08922", ipTok != __nullptr);
 
 			*pnStartPos = ipTok->GetStartPosition();
 			*pnEndPos = ipTok->GetEndPosition();
@@ -124,10 +123,10 @@ STDMETHODIMP CMiscUtils::GetRegExpData(IIUnknownVector* pFoundData,
 		else
 		{
 			UCLID_COMUTILSLib::IIUnknownVectorPtr ipTmpVec = ipObjPair->GetObject2();
-			ASSERT_RESOURCE_ALLOCATION("ELI08920", ipTmpVec != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08920", ipTmpVec != __nullptr);
 
 			UCLID_COMUTILSLib::ITokenPtr ipTok = ipTmpVec->At(nSubIndex);
-			ASSERT_RESOURCE_ALLOCATION("ELI08921", ipTok != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08921", ipTok != __nullptr);
 
 			*pnStartPos = ipTok->GetStartPosition();
 			*pnEndPos = ipTok->GetEndPosition();
@@ -153,23 +152,23 @@ STDMETHODIMP CMiscUtils::AllowUserToSelectAndConfigureObject(IObjectWithDescript
 
 		// use smart pointer
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObjectWithDescription = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI16010", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16010", ipObjectWithDescription != __nullptr);
 
 		// access the CopyableObject interface
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyableObj = ipObjectWithDescription;
-		ASSERT_RESOURCE_ALLOCATION("ELI16011", ipCopyableObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16011", ipCopyableObj != __nullptr);
 		
 		// copy the ObjectWithDescription to prevent corruption of original
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObjectWithDescriptionCopy = ipCopyableObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI16012", ipObjectWithDescriptionCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16012", ipObjectWithDescriptionCopy != __nullptr);
 
 		// create the IObjectSelectorUI object
 		UCLID_COMUTILSLib::IObjectSelectorUIPtr ipObjectSelectorUI(CLSID_ObjectSelectorUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI16013", ipObjectSelectorUI != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16013", ipObjectSelectorUI != __nullptr);
 
 		// access licensing interface of ObjectSelectorUI
 		UCLID_COMLMLib::IPrivateLicensedComponentPtr ipPLComponent = ipObjectSelectorUI;
-		ASSERT_RESOURCE_ALLOCATION("ELI16014", ipPLComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16014", ipPLComponent != __nullptr);
 
 		// initialize private license for the ObjectSelectorUI
 		_bstr_t _bstrKey = LICENSE_MGMT_PASSWORD.c_str();
@@ -210,22 +209,22 @@ STDMETHODIMP CMiscUtils::AllowUserToSelectAndConfigureObject2(BSTR bstrTitleAfte
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI18092", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI18092", ppObject != __nullptr);
 
 		// Initialize return value to NULL
 		*ppObject = NULL;
 
 		// Create an ObjectWithDescription object to use to collect the selected object from IObjectSelectorUI
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObjectWithDescription(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI18091", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18091", ipObjectWithDescription != __nullptr);
 
 		// create the IObjectSelectorUI object
 		UCLID_COMUTILSLib::IObjectSelectorUIPtr ipObjectSelectorUI(CLSID_ObjectSelectorUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI18094", ipObjectSelectorUI != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18094", ipObjectSelectorUI != __nullptr);
 
 		// access licensing interface of ObjectSelectorUI
 		UCLID_COMLMLib::IPrivateLicensedComponentPtr ipPLComponent = ipObjectSelectorUI;
-		ASSERT_RESOURCE_ALLOCATION("ELI18095", ipPLComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18095", ipPLComponent != __nullptr);
 
 		// initialize private license for the ObjectSelectorUI
 		_bstr_t _bstrKey = LICENSE_MGMT_PASSWORD.c_str();
@@ -271,12 +270,12 @@ STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectProperties(IObjectWithDescrip
 
 		// convert argument to a smart pointer
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObjectWithDescription = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI15977", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15977", ipObjectWithDescription != __nullptr);
 
 		// get CategorizedComponent from ObjectWithDescription
 		UCLID_COMUTILSLib::ICategorizedComponentPtr	
 			ipCategorizedComponent = ipObjectWithDescription->Object;
-		ASSERT_RESOURCE_ALLOCATION("ELI16024", ipCategorizedComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16024", ipCategorizedComponent != __nullptr);
 
 		// Ensure the object is configurable
 		if (!SupportsConfiguration(ipCategorizedComponent))
@@ -288,11 +287,11 @@ STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectProperties(IObjectWithDescrip
 
 		// access CopyableObject interface
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyableObject = ipCategorizedComponent;
-		ASSERT_RESOURCE_ALLOCATION("ELI15978", ipCopyableObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15978", ipCopyableObject != __nullptr);
 
 		// make a copy for the user to modify without corrupting the original
 		UCLID_COMUTILSLib::ICategorizedComponentPtr ipCopy = ipCopyableObject->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI15979", ipCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15979", ipCopy != __nullptr);
 
 		// initialize title string
 		string strComponentDesc = ipCategorizedComponent->GetComponentDescription();
@@ -300,7 +299,7 @@ STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectProperties(IObjectWithDescrip
 
 		// create IObjectPropertiesUI object
 		UCLID_COMUTILSLib::IObjectPropertiesUIPtr ipPropertiesUI(CLSID_ObjectPropertiesUI);
-		ASSERT_RESOURCE_ALLOCATION("ELI15980", ipPropertiesUI != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15980", ipPropertiesUI != __nullptr);
 
 		// Display UI using the copy of the categorized component and retain changes if OK was
 		// selected.
@@ -333,12 +332,12 @@ STDMETHODIMP CMiscUtils::AllowUserToConfigureObjectDescription(IObjectWithDescri
 
 		// use smart pointer
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObjectWithDescription = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI15994", ipObjectWithDescription != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15994", ipObjectWithDescription != __nullptr);
 
 		// get object that ObjectWithDescription contains (must implement CategorizedComponent)
 		UCLID_COMUTILSLib::ICategorizedComponentPtr 
 			ipComponent = ipObjectWithDescription->Object;
-		ASSERT_RESOURCE_ALLOCATION("ELI16025", ipComponent != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16025", ipComponent != __nullptr);
 
 		// get ObjectWithDescription's description
 		CString zDescription = static_cast<const char*> (ipObjectWithDescription->Description);
@@ -397,7 +396,7 @@ STDMETHODIMP CMiscUtils::HandlePlugInObjectDoubleClick(IObjectWithDescription* p
 
 		// use smart pointer
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObject = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI16036", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16036", ipObject != __nullptr);
 
 		// get pObject's description and convert to a string
 		string strDescription = asString(ipObject->Description);
@@ -455,7 +454,7 @@ STDMETHODIMP CMiscUtils::HandlePlugInObjectCommandButtonClick(IObjectWithDescrip
 
 		// use a smart pointer
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipObject = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI16059", ipObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16059", ipObject != __nullptr);
 
 		// get the object's description string
 		string strDescription = asString(ipObject->Description);
@@ -525,7 +524,7 @@ STDMETHODIMP CMiscUtils::GetNewRegExpParserInstance(BSTR strComponentName,
 
 		// Create the Regular expression parser
 		UCLID_COMUTILSLib::IRegularExprParserPtr ipTempRegExpParser(gstrDEFAULT_PARSER_PROG_ID.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI12966", ipTempRegExpParser != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12966", ipTempRegExpParser != __nullptr);
 
 		*pRegExpParser = (IRegularExprParser *)ipTempRegExpParser.Detach();
 
@@ -621,7 +620,7 @@ STDMETHODIMP CMiscUtils::GetColumnStringsOptionallyFromFile(BSTR bstrFileName, I
 		validateLicense();
 
 		UCLID_COMUTILSLib::IVariantVectorPtr ipVector(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI14591", ipVector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14591", ipVector != __nullptr);
 
 		string strFileName = asString(bstrFileName);
 
@@ -726,7 +725,7 @@ STDMETHODIMP CMiscUtils::CountEnabledObjectsIn(IIUnknownVector* pVector, long* l
 
 		// use a smart pointer for the IUnknownVector
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipVector = pVector;
-		ASSERT_RESOURCE_ALLOCATION("ELI16264", ipVector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16264", ipVector != __nullptr);
 
 		// initialize the count of enabled objects
 		long lEnabledObjectsCount = 0;
@@ -764,7 +763,7 @@ STDMETHODIMP CMiscUtils::GetEnabledState(IIUnknownVector* pVector, LONG nItemInd
 
 		// Convert IUnknownVector to a smart pointer
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipVector = pVector;
-		ASSERT_RESOURCE_ALLOCATION("ELI16614", ipVector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16614", ipVector != __nullptr);
 
 		// Validate index
 		long lCount = ipVector->Size();
@@ -772,7 +771,7 @@ STDMETHODIMP CMiscUtils::GetEnabledState(IIUnknownVector* pVector, LONG nItemInd
 
 		// Retrieve specified item
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipOWD = ipVector->At( nItemIndex );
-		ASSERT_RESOURCE_ALLOCATION("ELI16616", ipOWD != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16616", ipOWD != __nullptr);
 
 		// Provide Enabled setting
 		*pvbEnabled = ipOWD->Enabled;
@@ -793,7 +792,7 @@ STDMETHODIMP CMiscUtils::SetEnabledState(IIUnknownVector* pVector, LONG nItemInd
 
 		// Convert IUnknownVector to a smart pointer
 		UCLID_COMUTILSLib::IIUnknownVectorPtr ipVector = pVector;
-		ASSERT_RESOURCE_ALLOCATION("ELI16617", ipVector != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16617", ipVector != __nullptr);
 
 		// Validate index
 		long lCount = ipVector->Size();
@@ -801,7 +800,7 @@ STDMETHODIMP CMiscUtils::SetEnabledState(IIUnknownVector* pVector, LONG nItemInd
 
 		// Retrieve specified item
 		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipOWD = ipVector->At( nItemIndex );
-		ASSERT_RESOURCE_ALLOCATION("ELI16619", ipOWD != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16619", ipOWD != __nullptr);
 
 		// Apply the Enabled setting
 		ipOWD->Enabled = bEnabled;
@@ -821,7 +820,7 @@ STDMETHODIMP CMiscUtils::IsAnyObjectDirty1(IUnknown* pObject, VARIANT_BOOL* pvbD
 
 		// Get persistence object
 		IPersistStreamPtr ipPersistStream = pObject;
-		if (ipPersistStream == NULL)
+		if (ipPersistStream == __nullptr)
 		{
 			throw UCLIDException("ELI16632", "Object does not support persistence!");
 		}
@@ -922,12 +921,12 @@ STDMETHODIMP CMiscUtils::GetObjectAsStringizedByteStream(IUnknown *pObject, BSTR
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22016", pObject != NULL);
-		ASSERT_ARGUMENT("ELI22022", pbstrByteStream != NULL);
+		ASSERT_ARGUMENT("ELI22016", pObject != __nullptr);
+		ASSERT_ARGUMENT("ELI22022", pbstrByteStream != __nullptr);
 
 		// ensure first that the object supports persistence
 		IPersistStreamPtr ipPersistObj = pObject;
-		if (ipPersistObj == NULL)
+		if (ipPersistObj == __nullptr)
 		{
 			throw UCLIDException("ELI22017", "Object cannot be copied to byte stream "
 				"because it does not support persistence!");
@@ -948,39 +947,19 @@ STDMETHODIMP CMiscUtils::GetObjectAsStringizedByteStream(IUnknown *pObject, BSTR
 		ipStream->Seek(zeroOffset, STREAM_SEEK_END, &length);
 
 		// Allocate memory to read stream
-		unsigned char* pszBuffer = new unsigned char[length.LowPart];
-		ASSERT_RESOURCE_ALLOCATION("ELI22020", pszBuffer != NULL);
-		memset(pszBuffer, 0, length.LowPart);
+		unique_ptr<unsigned char[]> pszBuffer(new unsigned char[length.LowPart]);
+		ASSERT_RESOURCE_ALLOCATION("ELI22020", pszBuffer.get() != __nullptr);
+		memset(pszBuffer.get(), 0, length.LowPart);
 
-		try
-		{
-			try
-			{
-				// copy the data in the stream to the buffer
-				ipStream->Seek(zeroOffset, STREAM_SEEK_SET, NULL);
-				ipStream->Read(pszBuffer, length.LowPart, NULL);
+		// copy the data in the stream to the buffer
+		ipStream->Seek(zeroOffset, STREAM_SEEK_SET, NULL);
+		ipStream->Read(pszBuffer.get(), length.LowPart, NULL);
 
-				ByteStream byteStream(pszBuffer, length.LowPart);
-				string strTemp = byteStream.asString();
+		ByteStream byteStream(pszBuffer.get(), length.LowPart);
+		string strTemp = byteStream.asString();
 
-				// Delete the memory allocated for the buffer
-				delete [] pszBuffer;
-
-				// return the byte stream
-				*pbstrByteStream = get_bstr_t(strTemp).Detach();
-			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI22021");
-		}
-		catch(UCLIDException& uex)
-		{
-			// Need to clean up allocated memory
-			if (pszBuffer != NULL)
-			{
-				delete [] pszBuffer;
-			}
-
-			throw uex;
-		}
+		// return the byte stream
+		*pbstrByteStream = _bstr_t(strTemp.c_str()).Detach();
 
 		return S_OK;
 	}
@@ -993,7 +972,7 @@ STDMETHODIMP CMiscUtils::GetObjectFromStringizedByteStream(BSTR bstrByteStream, 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22024", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI22024", ppObject != __nullptr);
 
 		// create a byte stream from the BSTR
 		ByteStream byteStream(asString(bstrByteStream));
@@ -1031,8 +1010,8 @@ STDMETHODIMP CMiscUtils::GetExpandedTags(BSTR bstrString, BSTR bstrSourceDocName
 	try
 	{
 		// Check parameters
-		ASSERT_ARGUMENT("ELI22713", bstrString != NULL);
-		ASSERT_ARGUMENT("ELI22714", bstrSourceDocName != NULL);
+		ASSERT_ARGUMENT("ELI22713", bstrString != __nullptr);
+		ASSERT_ARGUMENT("ELI22714", bstrSourceDocName != __nullptr);
 
 		// Convert to std strings
 		string strString = asString(bstrString);
@@ -1077,7 +1056,7 @@ STDMETHODIMP CMiscUtils::GetExpansionFunctionNames(IVariantVector** ppFunctionNa
 		
 		// Populate an IVariantVector of BSTRs
 		UCLID_COMUTILSLib::IVariantVectorPtr ipFunctions(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI22717", ipFunctions != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22717", ipFunctions != __nullptr);
 		for each (string function in vecFunctions)
 		{
 			ipFunctions->PushBack(function.c_str());
@@ -1122,11 +1101,11 @@ bool CMiscUtils::SupportsConfiguration(IUnknown *pObject)
 		bool bConfigurable = false;
 
 		// Do not ASSERT if pObject is NULL [FlexIDSCore #3554]
-		if (pObject != NULL)
+		if (pObject != __nullptr)
 		{
 			// Check to see if pObject is configurable via ISpecifyPropertyPages
 			ISpecifyPropertyPagesPtr ipSpecifyPropertyPages(pObject);
-			if (ipSpecifyPropertyPages != NULL)
+			if (ipSpecifyPropertyPages != __nullptr)
 			{
 				bConfigurable = true;
 			}
@@ -1134,7 +1113,7 @@ bool CMiscUtils::SupportsConfiguration(IUnknown *pObject)
 			else
 			{
 				UCLID_COMUTILSLib::IConfigurableObjectPtr ipConfigurableObject(pObject);
-				if (ipConfigurableObject != NULL) 
+				if (ipConfigurableObject != __nullptr) 
 				{
 					bConfigurable = true;
 				}
@@ -1152,7 +1131,7 @@ bool CMiscUtils::SupportsConfiguration(IUnknown *pObject)
 UCLID_COMUTILSLib::IMiscUtilsPtr CMiscUtils::getThisAsCOMPtr()
 {
 	UCLID_COMUTILSLib::IMiscUtilsPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16973", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16973", ipThis != __nullptr);
 
 	return ipThis;
 }

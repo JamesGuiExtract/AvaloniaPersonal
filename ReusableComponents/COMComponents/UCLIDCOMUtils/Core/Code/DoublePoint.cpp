@@ -28,7 +28,7 @@ STDMETHODIMP CDoublePoint::CopyFrom(IUnknown *pObject)
 
 		// Ensure that the object is a Vector
 		UCLID_COMUTILSLib::IDoublePointPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI15238", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15238", ipSource != __nullptr);
 
 		m_dX = ipSource->X;
 		m_dY = ipSource->Y;
@@ -49,7 +49,7 @@ STDMETHODIMP CDoublePoint::Clone(IUnknown* *pObject)
 		// create a new variant vector
 		UCLID_COMUTILSLib::ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_DoublePoint);
-		ASSERT_RESOURCE_ALLOCATION("ELI15240", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15240", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

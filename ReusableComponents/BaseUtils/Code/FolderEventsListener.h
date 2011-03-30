@@ -87,7 +87,7 @@ private:
 
 	// used to get the time between restarts of the listening if an exception
 	// is thrown in the listening thread
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pCfgMgr;
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pCfgMgr;
 
 	// The listen thread adds events to this queue and the 
 	// and the dispatch queue removes them and sends them to the 

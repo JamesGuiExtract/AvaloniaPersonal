@@ -27,14 +27,14 @@ const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Defin
 CMutex CRuleSet::ms_mutexLM;
 
 // License manager instance
-auto_ptr<SafeNetLicenseMgr> CRuleSet::m_apSafeNetMgr(NULL);
+unique_ptr<SafeNetLicenseMgr> CRuleSet::m_apSafeNetMgr(__nullptr);
 int CRuleSet::m_iSNMRefCount = 0;
 
 //-------------------------------------------------------------------------------------------------
 // CRuleSet
 //-------------------------------------------------------------------------------------------------
 CRuleSet::CRuleSet()
-:m_ipAttributeNameToInfoMap(NULL), 
+:m_ipAttributeNameToInfoMap(__nullptr), 
 m_bstrStreamName("RuleSet"),
 m_bDirty(false),
 m_bIsEncrypted(false),
@@ -53,9 +53,9 @@ m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current v
 		CSingleLock lg( &ms_mutexLM, TRUE );
 
 		// if this is the first instance of RuleSet will need to allocate the pointer
-		if ( m_apSafeNetMgr.get() == NULL )
+		if ( m_apSafeNetMgr.get() == __nullptr )
 		{
-			m_apSafeNetMgr = auto_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
+			m_apSafeNetMgr = unique_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
 		}
 		// Increment the Reference count
 		m_iSNMRefCount++;
@@ -98,12 +98,12 @@ CRuleSet::~CRuleSet()
 		// If no more instances of RuleSet exist release the SafeNetMgr ( license )
 		if ( m_iSNMRefCount <= 0 )
 		{
-			m_apSafeNetMgr.reset(NULL);
+			m_apSafeNetMgr.reset(__nullptr);
 		}
 
 		// clean up the dialog resource in this scope so that the
 		// code executes in the correct AFX state
-		m_apDlg.reset( NULL );
+		m_apDlg.reset( __nullptr );
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI05534")
 }
@@ -155,7 +155,7 @@ STDMETHODIMP CRuleSet::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlag
 		}
 
 		IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
-		ASSERT_RESOURCE_ALLOCATION("ELI16904", ipPersistStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16904", ipPersistStream != __nullptr);
 
 		// Load the ruleset
 		readObjectFromFile(ipPersistStream, strFullFileName, m_bstrStreamName, bIsEncrypted);
@@ -235,7 +235,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 				// Get access to the names of attributes in the ruleset
 				IVariantVectorPtr ipAttributeNames = m_ipAttributeNameToInfoMap->GetKeys();
-				if (ipAttributeNames == NULL)
+				if (ipAttributeNames == __nullptr)
 				{
 					throw UCLIDException("ELI04375", "Unable to retrieve names of attributes from ruleset.");
 				}
@@ -243,7 +243,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// Determine the total number of attributes for which rules will need to be run
 				// The number of attributes need to be known now so that we can do a good job
 				// of providing progress information.
-				long nNumAttributesToRunRulesFor = (ipvecAttributeNames != NULL) ?
+				long nNumAttributesToRunRulesFor = (ipvecAttributeNames != __nullptr) ?
 					ipvecAttributeNames->Size : ipAttributeNames->Size;
 
 				// Wrap the progress status object in a smart pointer
@@ -286,7 +286,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 				// Record a new rule execution session
 				UCLID_AFCORELib::IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
-				ASSERT_RESOURCE_ALLOCATION("ELI07493", ipSession != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI07493", ipSession != __nullptr);
 				long nStackSize = ipSession->SetRSDFileName(m_strFileName.c_str());
 
 				// If the ruleset is marked as an to-be-used-internally ruleset, then ensure 
@@ -301,7 +301,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 				// Create an AFDocument and pass it along to the attribute rule info
 				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
-				ASSERT_ARGUMENT("ELI05874", ipAFDoc != NULL);
+				ASSERT_ARGUMENT("ELI05874", ipAFDoc != __nullptr);
 
 				// If any counters are set decrement them here
 				decrementCounters(ipAFDoc->Text);
@@ -317,8 +317,8 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 					// Create a pointer to the Sub-ProgressStatus object, depending upon whether
 					// the caller requested progress information
-					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
-						NULL : ipProgressStatus->SubProgressStatus;
+					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+						__nullptr : ipProgressStatus->SubProgressStatus;
 
 					// Execute the document preprocessor
 					UCLID_AFCORELib::IDocumentPreprocessorPtr ipDocPreprocessor(m_ipDocPreprocessor->Object);
@@ -330,7 +330,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 				// Create a vector to keep all the attribute search results to return to caller later
 				IIUnknownVectorPtr ipFoundAttributes(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI04374", ipFoundAttributes != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI04374", ipFoundAttributes != __nullptr);
 
 				// Iterate through all the attributes and execute their associated rules
 				int iNumAttributeNames = ipAttributeNames->Size;
@@ -342,7 +342,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					// Before continuing, make sure that either all the attributes were
 					// requested to be processed, or that the current attribute is one 
 					// among the list of attributes requested to be processed.
-					if (pvecAttributeNames != NULL && 
+					if (pvecAttributeNames != __nullptr && 
 						pvecAttributeNames->Contains(_bstrAttributeName) == VARIANT_FALSE)
 					{
 						// skip processing this attribute
@@ -359,7 +359,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					// get the attribute finding information for the current attribute
 					UCLID_AFCORELib::IAttributeFindInfoPtr ipAttributeFindInfo = 
 						m_ipAttributeNameToInfoMap->GetValue(_bstrAttributeName);
-					if (ipAttributeFindInfo == NULL)
+					if (ipAttributeFindInfo == __nullptr)
 					{
 						UCLIDException ue("ELI04376", "Unable to retrieve attribute rules info.");
 						string stdstrAttribute = _bstrAttributeName;
@@ -369,8 +369,8 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 					// Create a pointer to the Sub-ProgressStatus object, depending upon whether
 					// the caller requested progress information
-					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
-						NULL : ipProgressStatus->SubProgressStatus;
+					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+						__nullptr : ipProgressStatus->SubProgressStatus;
 
 					// find all attributes values for the current attribute
 					IIUnknownVectorPtr ipAttributes = 
@@ -404,8 +404,8 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					{
 						// Create a pointer to the Sub-ProgressStatus object, depending upon whether
 						// the caller requested progress information
-						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
-							NULL : ipProgressStatus->SubProgressStatus;
+						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+							__nullptr : ipProgressStatus->SubProgressStatus;
 
 						ipOH->ProcessOutput( ipFoundAttributes, ipAFDoc, ipSubProgressStatus );
 					}
@@ -448,10 +448,10 @@ STDMETHODIMP CRuleSet::get_AttributeNameToInfoMap(IStrToObjectMap **pVal)
 		}
 
 		// if the map object has not yet been created, create it
-		if (m_ipAttributeNameToInfoMap == NULL)
+		if (m_ipAttributeNameToInfoMap == __nullptr)
 		{
 			m_ipAttributeNameToInfoMap.CreateInstance(CLSID_StrToObjectMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI04383", m_ipAttributeNameToInfoMap != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI04383", m_ipAttributeNameToInfoMap != __nullptr);
 		}
 
 		IStrToObjectMapPtr ipShallowCopy = m_ipAttributeNameToInfoMap;
@@ -501,10 +501,10 @@ STDMETHODIMP CRuleSet::get_GlobalDocPreprocessor(IObjectWithDescription **pVal)
 				"Cannot retrieve requested information - RuleSet object is encrypted." );
 		}
 
-		if (m_ipDocPreprocessor == NULL)
+		if (m_ipDocPreprocessor == __nullptr)
 		{
 			m_ipDocPreprocessor.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI07390", m_ipDocPreprocessor != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07390", m_ipDocPreprocessor != __nullptr);
 		}
 
 		IObjectWithDescriptionPtr ipShallowCopy = m_ipDocPreprocessor;
@@ -547,10 +547,10 @@ STDMETHODIMP CRuleSet::get_GlobalOutputHandler(IObjectWithDescription **pVal)
 				"Cannot retrieve requested information - RuleSet object is encrypted." );
 		}
 
-		if (m_ipOutputHandler == NULL)
+		if (m_ipOutputHandler == __nullptr)
 		{
 			m_ipOutputHandler.CreateInstance( CLSID_ObjectWithDescription );
-			ASSERT_RESOURCE_ALLOCATION( "ELI07724", m_ipOutputHandler != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI07724", m_ipOutputHandler != __nullptr );
 		}
 
 		IObjectWithDescriptionPtr ipShallowCopy = m_ipOutputHandler;
@@ -950,9 +950,9 @@ STDMETHODIMP CRuleSet::IsDirty(void)
 			if (m_ipDocPreprocessor)
 			{
 				// Check Document Preprocessor
-				ipPersistStream = NULL;
+				ipPersistStream = __nullptr;
 				ipPersistStream = m_ipDocPreprocessor;
-				if (ipPersistStream == NULL)
+				if (ipPersistStream == __nullptr)
 				{
 					throw UCLIDException( "ELI06130", "Object does not support persistence." );
 				}
@@ -967,9 +967,9 @@ STDMETHODIMP CRuleSet::IsDirty(void)
 			if (m_ipOutputHandler)
 			{
 				// Check Output Handler
-				ipPersistStream = NULL;
+				ipPersistStream = __nullptr;
 				ipPersistStream = m_ipOutputHandler;
-				if (ipPersistStream == NULL)
+				if (ipPersistStream == __nullptr)
 				{
 					throw UCLIDException( "ELI07928", "Object does not support persistence." );
 				}
@@ -1007,7 +1007,7 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 		// Check license
 		validateLicense();
 
-		m_ipDocPreprocessor = NULL;
+		m_ipDocPreprocessor = __nullptr;
 
 		// Set all counters to default of false
 		m_bUseIndexingCounter = false;
@@ -1114,9 +1114,9 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 		// DocumentPreprocessor object-with-description in
 		if (m_nVersionNumber >= 2)
 		{
-			ipObj = NULL;
+			ipObj = __nullptr;
 			readObjectFromStream(ipObj, pStream, "ELI09956");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException("ELI07391", 
 					"DocumentPreprocessor object could not be read from stream.");
@@ -1128,9 +1128,9 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 		// OutputHandler object-with-description
 		if (m_nVersionNumber >= 3)
 		{
-			ipObj = NULL;
+			ipObj = __nullptr;
 			readObjectFromStream( ipObj, pStream, "ELI09957" );
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException( "ELI07736", 
 					"Output Handler object could not be read from stream.");
@@ -1207,7 +1207,7 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		// save the string-to-object map (attribute name to attribute find info map)
 		// to the stream
 		IPersistStreamPtr ipObj = m_ipAttributeNameToInfoMap;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI04700", "String-To-Object Map component does not support persistence.");
 		}
@@ -1215,7 +1215,7 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the DocumentPreprocessor object-with-description to the stream
 		ipObj = getDocPreprocessor();
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI07392", "DocumentPreprocessor object does not support persistence.");
 		}
@@ -1223,7 +1223,7 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the Output Handler object-with-description to the stream
 		ipObj = getOutputHandler();
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI07737", 
 				"Output Handler object does not support persistence." );
@@ -1268,7 +1268,7 @@ STDMETHODIMP CRuleSet::ShowUIForEditing(BSTR strFileName, BSTR strBinFolder)
 			string stdstrFileName = asString(strFileName);
 			string stdstrFolder = asString(strBinFolder);
 
-			m_apDlg = std::auto_ptr<CRuleSetEditor>( 
+			m_apDlg = std::unique_ptr<CRuleSetEditor>( 
 				new CRuleSetEditor( stdstrFileName, stdstrFolder ) );
 		}
 
@@ -1323,11 +1323,11 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 
 		// Create the other RuleSet object
 		UCLID_AFCORELib::IRuleSetPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08224", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08224", ipSource != __nullptr);
 
 		// Set this object's map of Attribute Names to Infos
 		ICopyableObjectPtr ipCopyableObject = ipSource->AttributeNameToInfoMap;
-		ASSERT_RESOURCE_ALLOCATION("ELI08225", ipCopyableObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08225", ipCopyableObject != __nullptr);
 
 		m_ipAttributeNameToInfoMap = ipCopyableObject->Clone();
 
@@ -1336,12 +1336,12 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 
 		// Set the other object's global pre-processor
 		ipCopyableObject = ipSource->GlobalDocPreprocessor;
-		ASSERT_RESOURCE_ALLOCATION("ELI08226", ipCopyableObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08226", ipCopyableObject != __nullptr);
 		m_ipDocPreprocessor = ipCopyableObject->Clone();
 
 		// Set the other object's global output handler
 		ipCopyableObject = ipSource->GlobalOutputHandler;
-		ASSERT_RESOURCE_ALLOCATION("ELI08227", ipCopyableObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08227", ipCopyableObject != __nullptr);
 		m_ipOutputHandler = ipCopyableObject->Clone();
 
 		// Copy Counter flags
@@ -1379,7 +1379,7 @@ STDMETHODIMP CRuleSet::raw_Clone(IUnknown * * pObject)
 		// Create a new IRuleSet object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_RuleSet );
-		ASSERT_RESOURCE_ALLOCATION( "ELI05022", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI05022", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -1398,7 +1398,7 @@ STDMETHODIMP CRuleSet::raw_Clone(IUnknown * * pObject)
 UCLID_AFCORELib::IRuleSetPtr CRuleSet::getThisAsCOMPtr()
 {
 	UCLID_AFCORELib::IRuleSetPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16963", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16963", ipThis != __nullptr);
 
 	return ipThis;
 }
@@ -1415,10 +1415,10 @@ IObjectWithDescriptionPtr CRuleSet::getDocPreprocessor()
 				"Cannot retrieve requested information - RuleSet object is encrypted." );
 		}
 
-		if (m_ipDocPreprocessor == NULL)
+		if (m_ipDocPreprocessor == __nullptr)
 		{
 			m_ipDocPreprocessor.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI16932", m_ipDocPreprocessor != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16932", m_ipDocPreprocessor != __nullptr);
 		}
 
 		return m_ipDocPreprocessor;
@@ -1437,10 +1437,10 @@ IObjectWithDescriptionPtr CRuleSet::getOutputHandler()
 				"Cannot retrieve requested information - RuleSet object is encrypted." );
 		}
 
-		if (m_ipOutputHandler == NULL)
+		if (m_ipOutputHandler == __nullptr)
 		{
 			m_ipOutputHandler.CreateInstance( CLSID_ObjectWithDescription );
-			ASSERT_RESOURCE_ALLOCATION( "ELI16935", m_ipOutputHandler != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI16935", m_ipOutputHandler != __nullptr );
 		}
 
 		return m_ipOutputHandler;
@@ -1460,10 +1460,10 @@ void CRuleSet::validateUILicense()
 //-------------------------------------------------------------------------------------------------
 IMiscUtilsPtr CRuleSet::getMiscUtils()
 {
-	if (m_ipMiscUtils == NULL)
+	if (m_ipMiscUtils == __nullptr)
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI08484", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI08484", m_ipMiscUtils != __nullptr );
 	}
 
 	return m_ipMiscUtils;
@@ -1579,13 +1579,13 @@ bool CRuleSet::isRuleExecutionAllowed()
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::enabledDocumentPreprocessorExists()
 {
-	return (m_ipDocPreprocessor != NULL) && (m_ipDocPreprocessor->Object != NULL) &&
+	return (m_ipDocPreprocessor != __nullptr) && (m_ipDocPreprocessor->Object != __nullptr) &&
 		(m_ipDocPreprocessor->GetEnabled() == VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::enabledOutputHandlerExists()
 {
-	return (m_ipOutputHandler) && (m_ipOutputHandler->Object != NULL) && 
+	return (m_ipOutputHandler) && (m_ipOutputHandler->Object != __nullptr) && 
 		(m_ipOutputHandler->GetEnabled() == VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------

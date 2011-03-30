@@ -102,10 +102,10 @@ STDMETHODIMP CChangeCase::raw_ModifyValue(IAttribute * pAttribute, IAFDocument* 
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09279", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09279", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipValue = ipAttribute->GetValue();
-		ASSERT_ARGUMENT("ELI06611", ipValue != NULL);
+		ASSERT_ARGUMENT("ELI06611", ipValue != __nullptr);
 
 		// Modify string based on case type
 		switch (m_eCaseType)
@@ -151,11 +151,11 @@ STDMETHODIMP CChangeCase::raw_ProcessOutput(IIUnknownVector * pAttributes, IAFDo
 
 		// Create AFUtility object
 		IAFUtilityPtr ipAFUtility( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI08690", ipAFUtility != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI08690", ipAFUtility != __nullptr );
 
 		// Use Attributes as smart pointer
 		IIUnknownVectorPtr ipAttributes( pAttributes );
-		ASSERT_RESOURCE_ALLOCATION("ELI08693", ipAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08693", ipAttributes != __nullptr);
 
 		// Apply Attribute Modification
 		ipAFUtility->ApplyAttributeModifier( ipAttributes, pDoc, this, VARIANT_TRUE );
@@ -203,7 +203,7 @@ STDMETHODIMP CChangeCase::raw_GetComponentDescription(BSTR * pstrComponentDescri
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19597", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19597", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Change case").Detach();
 	}
@@ -225,7 +225,7 @@ STDMETHODIMP CChangeCase::raw_CopyFrom(IUnknown * pObject)
 		validateLicense();
 
 		UCLID_AFVALUEMODIFIERSLib::IChangeCasePtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08273", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08273", ipSource != __nullptr);
 
 		m_eCaseType = (EChangeCaseType)ipSource->GetCaseType();
 	}
@@ -245,7 +245,7 @@ STDMETHODIMP CChangeCase::raw_Clone(IUnknown * * pObject)
 
 		// Create a new ChangeCase object
 		ICopyableObjectPtr ipObjCopy( CLSID_ChangeCase );
-		ASSERT_RESOURCE_ALLOCATION("ELI08357", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08357", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

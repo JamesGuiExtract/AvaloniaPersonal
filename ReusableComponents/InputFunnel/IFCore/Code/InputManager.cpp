@@ -82,7 +82,7 @@ CInputManager::CInputManager()
 	{
 		// create an instance of the OCR filter manager
 		m_ipOCRFilterMgr.CreateInstance(CLSID_OCRFilterMgr);
-		ASSERT_RESOURCE_ALLOCATION("ELI03472", m_ipOCRFilterMgr != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI03472", m_ipOCRFilterMgr != __nullptr);
 
 		// get current ocr engine prog id
 		m_strDefaultOCREngineProgID = m_ConfigMgr.getOCREngineProgID();
@@ -99,10 +99,10 @@ CInputManager::~CInputManager()
 		Destroy();
 
 		// destroy the window manager object
-		m_apWindowIRManager.reset(NULL);
+		m_apWindowIRManager.reset(__nullptr);
 
 		// force the OCR engine object to go out of scope here
-		m_ipOCREngine = NULL;
+		m_ipOCREngine = __nullptr;
 
 		// Free SSOCR library if it's still loaded
 		if (m_hModuleSSOCR)
@@ -207,11 +207,11 @@ STDMETHODIMP CInputManager::EnableInput1(BSTR strInputValidatorName, BSTR strPro
 		
 		// if the input validator description to progid map has not yet been
 		// initialized, initialize it.
-		if (m_ipIVDescriptionToProgIDMap == NULL)
+		if (m_ipIVDescriptionToProgIDMap == __nullptr)
 		{
 			// create an instance of the category manager
 			ICategoryManagerPtr ipCatMgr(CLSID_CategoryManager);
-			if (ipCatMgr == NULL)
+			if (ipCatMgr == __nullptr)
 			{
 				throw UCLIDException("ELI04278", "Unable to create instance of Category Manager!");
 			}
@@ -221,7 +221,7 @@ STDMETHODIMP CInputManager::EnableInput1(BSTR strInputValidatorName, BSTR strPro
 			m_ipIVDescriptionToProgIDMap = ipCatMgr->GetDescriptionToProgIDMap1(
 				_bstr_t(INPUTFUNNEL_IV_CATEGORYNAME.c_str()));
 
-			if (m_ipIVDescriptionToProgIDMap == NULL)
+			if (m_ipIVDescriptionToProgIDMap == __nullptr)
 			{
 				UCLIDException ue("ELI04279", "Unable to retrieve components registered in specified category!");
 				ue.addDebugInfo("Category", INPUTFUNNEL_IV_CATEGORYNAME);
@@ -280,7 +280,7 @@ STDMETHODIMP CInputManager::EnableInput2(IInputValidator* pInputValidator, BSTR 
 		
 		// compare the pInputContext with current input context
 		// if not same, reset the input context
-		if (pInputContext != NULL)
+		if (pInputContext != __nullptr)
 		{
 			UCLID_INPUTFUNNELLib::IInputContextPtr ipInputContext(pInputContext);
 			if (m_ipCurrentInputContext != ipInputContext)
@@ -308,7 +308,7 @@ STDMETHODIMP CInputManager::EnableInput2(IInputValidator* pInputValidator, BSTR 
 			{
 				// Retrieve the Input Receiver
 				UCLID_INPUTFUNNELLib::IInputReceiverPtr pIR = iter->second;
-				ASSERT_RESOURCE_ALLOCATION("ELI15629", pIR != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15629", pIR != __nullptr);
 
 				// Enable input
 				pIR->EnableInput(bstrInputType, get_bstr_t(strPrompt));
@@ -347,7 +347,7 @@ STDMETHODIMP CInputManager::DisableInput()
 		{
 			// Retrieve the Input Receiver
 			UCLID_INPUTFUNNELLib::IInputReceiverPtr pIR = iter->second;
-			ASSERT_RESOURCE_ALLOCATION("ELI15630", pIR != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15630", pIR != __nullptr);
 
 			// Disable input
 			pIR->DisableInput();
@@ -371,11 +371,11 @@ STDMETHODIMP CInputManager::CreateNewInputReceiver(BSTR strInputReceiverName, lo
 		
 		// if the input receiver description to progid map has not yet been
 		// initialized, initialize it.
-		if (m_ipIRDescriptionToProgIDMap == NULL)
+		if (m_ipIRDescriptionToProgIDMap == __nullptr)
 		{
 			// create an instance of the category manager
 			ICategoryManagerPtr ipCatMgr(CLSID_CategoryManager);
-			if (ipCatMgr == NULL)
+			if (ipCatMgr == __nullptr)
 			{
 				throw UCLIDException("ELI04280", "Unable to create instance of Category Manager!");
 			}
@@ -385,7 +385,7 @@ STDMETHODIMP CInputManager::CreateNewInputReceiver(BSTR strInputReceiverName, lo
 			m_ipIRDescriptionToProgIDMap = ipCatMgr->GetDescriptionToProgIDMap1(
 				_bstr_t(INPUTFUNNEL_IR_CATEGORYNAME.c_str()));
 
-			if (m_ipIRDescriptionToProgIDMap == NULL)
+			if (m_ipIRDescriptionToProgIDMap == __nullptr)
 			{
 				UCLIDException ue("ELI04281", "Unable to retrieve components registered in specified category!");
 				ue.addDebugInfo("Category", INPUTFUNNEL_IR_CATEGORYNAME);
@@ -414,7 +414,7 @@ STDMETHODIMP CInputManager::CreateNewInputReceiver(BSTR strInputReceiverName, lo
 		// found the registered input receiver component's prog ID
 		// Create it
 		UCLID_INPUTFUNNELLib::IInputReceiverPtr ipInputReceiver(stdstrIRProgID.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI16958", ipInputReceiver != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16958", ipInputReceiver != __nullptr);
 
 		// connect the input receiver to the input manager
 		*pnIRHandle = getThisAsCOMPtr()->ConnectInputReceiver(ipInputReceiver);
@@ -449,7 +449,7 @@ STDMETHODIMP CInputManager::ConnectInputReceiver(IInputReceiver* pInputReceiver,
 				ipInputReceiver->ParentWndHandle = m_lParentWndHandle;
 			}
 			UCLID_INPUTFUNNELLib::IIREventHandlerPtr ipEventHandler(this);
-			ASSERT_RESOURCE_ALLOCATION("ELI16984", ipEventHandler != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16984", ipEventHandler != __nullptr);
 
 			// set event handler for the input receiver
 			ipInputReceiver->SetEventHandler(ipEventHandler);
@@ -483,7 +483,7 @@ STDMETHODIMP CInputManager::ConnectInputReceiver(IInputReceiver* pInputReceiver,
 				//    before the code below executes.  If an OCR engine has already been
 				//	  associated with the InputFunnel when this code runs, the default OCR
 				//	  engine is then not initialized.
-				if (m_ipOCREngine == NULL)
+				if (m_ipOCREngine == __nullptr)
 				{
 					if (FAILED(m_ipOCREngine.CreateInstance(m_strDefaultOCREngineProgID.c_str())))
 					{
@@ -512,7 +512,7 @@ STDMETHODIMP CInputManager::ConnectInputReceiver(IInputReceiver* pInputReceiver,
 				ipInputReceiver->SetOCREngine(m_ipOCREngine);
 
 				UCLID_INPUTFUNNELLib::IOCRFilterPtr ipOCRFilter = m_ipOCRFilterMgr;
-				ASSERT_RESOURCE_ALLOCATION("ELI16985", ipOCRFilter != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI16985", ipOCRFilter != __nullptr);
 
 				// specify the OCRFilter object to the input receiver
 				ipInputReceiver->SetOCRFilter(ipOCRFilter);
@@ -532,7 +532,7 @@ STDMETHODIMP CInputManager::ConnectInputReceiver(IInputReceiver* pInputReceiver,
 			}
 
 			// notify input context about the newly connected input receiver
-			if (m_ipCurrentInputContext != NULL)
+			if (m_ipCurrentInputContext != __nullptr)
 			{
 				m_ipCurrentInputContext->NotifyNewIRConnected(ipInputReceiver);
 			}
@@ -615,7 +615,7 @@ STDMETHODIMP CInputManager::ShowWindows(VARIANT_BOOL bShow)
 		{
 			// Retrieve the Input Receiver
 			UCLID_INPUTFUNNELLib::IInputReceiverPtr pIR = iter->second;
-			ASSERT_RESOURCE_ALLOCATION("ELI15631", pIR != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15631", pIR != __nullptr);
 
 			// Check if window exists
 			bHasWindow = pIR->HasWindow;
@@ -681,12 +681,12 @@ STDMETHODIMP CInputManager::ProcessTextInput(BSTR strInput)
 
 		// create a text input object with the given text and simulate an input-received event
 		UCLID_INPUTFUNNELLib::ITextInputPtr ipTextInput(CLSID_TextInput);
-		ASSERT_RESOURCE_ALLOCATION("ELI16959", ipTextInput != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16959", ipTextInput != __nullptr);
 		ipTextInput->InitTextInput(NULL, get_bstr_t(strInput));
 
 		// get event handler and notify input received
 		UCLID_INPUTFUNNELLib::IIREventHandlerPtr ipEventHandler = getThisAsCOMPtr();
-		ASSERT_RESOURCE_ALLOCATION("ELI16961",ipEventHandler != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16961",ipEventHandler != __nullptr);
 		ipEventHandler->NotifyInputReceived(ipTextInput);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04108")
@@ -788,11 +788,11 @@ STDMETHODIMP CInputManager::NotifyInputReceived(ITextInput * pTextInput)
 		validateLicense();
 
 		UCLID_INPUTFUNNELLib::ITextInputPtr ipTextInput(pTextInput);
-		ASSERT_RESOURCE_ALLOCATION("ELI16986", ipTextInput != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16986", ipTextInput != __nullptr);
 
 		// get input entity
 		UCLID_INPUTFUNNELLib::IInputEntityPtr ipEntity = ipTextInput->GetInputEntity();
-		ASSERT_RESOURCE_ALLOCATION("ELI16987", ipEntity != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16987", ipEntity != __nullptr);
 
 		VARIANT_BOOL bRet = VARIANT_FALSE;
 		if (bLocked)
@@ -824,7 +824,7 @@ STDMETHODIMP CInputManager::NotifyInputReceived(ITextInput * pTextInput)
 		{
 			// bring up the input correction
 			UCLID_INPUTFUNNELLib::IInputCorrectionUIPtr ipInputCorrection(CLSID_InputCorrectionUI);
-			ASSERT_RESOURCE_ALLOCATION("ELI16960", ipInputCorrection != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16960", ipInputCorrection != __nullptr);
 			
 			// set the parent window attribute of the input correction UI
 			ipInputCorrection->ParentWndHandle = m_lParentWndHandle;
@@ -836,7 +836,7 @@ STDMETHODIMP CInputManager::NotifyInputReceived(ITextInput * pTextInput)
 			if (bSuccess == VARIANT_FALSE)
 			{
 				// if there is an input entity object, delete it
-				if (ipEntity != NULL)
+				if (ipEntity != __nullptr)
 				{
 					bRet = ipEntity->CanBeDeleted();
 					if (asCppBool(bRet))
@@ -906,7 +906,7 @@ STDMETHODIMP CInputManager::NotifyAboutToDestroy(IInputReceiver * pInputReceiver
 UCLID_INPUTFUNNELLib::IInputManagerPtr CInputManager::getThisAsCOMPtr()
 {
 	UCLID_INPUTFUNNELLib::IInputManagerPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16969", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16969", ipThis != __nullptr);
 
 	return ipThis;
 }
@@ -917,7 +917,7 @@ WindowIRManager* CInputManager::getWindowIRManager()
 	// create it now.
 	if (m_apWindowIRManager.get() == NULL)
 	{
-		m_apWindowIRManager = auto_ptr<WindowIRManager>(new WindowIRManager(this));
+		m_apWindowIRManager = unique_ptr<WindowIRManager>(new WindowIRManager(this));
 	}
 
 	return m_apWindowIRManager.get();

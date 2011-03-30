@@ -24,11 +24,11 @@ const unsigned long gnCurrentVersion = 2;
 CAttribute::CAttribute()
 : m_strAttributeName(""),
   m_strAttributeType(""),
-  m_ipAttributeValue(NULL),
-  m_ipInputValidator(NULL),
-  m_ipAttributeSplitter(NULL),
-  m_ipSubAttributes(NULL),
-  m_ipDataObject(NULL),
+  m_ipAttributeValue(__nullptr),
+  m_ipInputValidator(__nullptr),
+  m_ipAttributeSplitter(__nullptr),
+  m_ipSubAttributes(__nullptr),
+  m_ipDataObject(__nullptr),
   m_bDirty(false)
 {
 }
@@ -51,11 +51,11 @@ void CAttribute::FinalRelease()
 	try
 	{
 		// Release COM objects before the object is destructed
-		m_ipSubAttributes = NULL;
-		m_ipAttributeValue = NULL;
-		m_ipAttributeSplitter = NULL;
-		m_ipInputValidator = NULL;
-		m_ipDataObject = NULL;
+		m_ipSubAttributes = __nullptr;
+		m_ipAttributeValue = __nullptr;
+		m_ipAttributeSplitter = __nullptr;
+		m_ipInputValidator = __nullptr;
+		m_ipDataObject = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26474");
 }
@@ -133,10 +133,10 @@ STDMETHODIMP CAttribute::get_Value(ISpatialString **pVal)
 	{
 		validateLicense();
 
-		if (m_ipAttributeValue==NULL)
+		if (m_ipAttributeValue==__nullptr)
 		{
 			m_ipAttributeValue.CreateInstance(CLSID_SpatialString);
-			ASSERT_RESOURCE_ALLOCATION("ELI05863", m_ipAttributeValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05863", m_ipAttributeValue != __nullptr);
 		}
 
 		ISpatialStringPtr ipShallowCopy = m_ipAttributeValue;
@@ -169,16 +169,16 @@ STDMETHODIMP CAttribute::get_InputValidator(IInputValidator **pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26476", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26476", pVal != __nullptr);
 		validateLicense();
 
-		// Default to NULL
-		*pVal = NULL;
+		// Default to __nullptr
+		*pVal = __nullptr;
 
 		if (m_ipInputValidator)
 		{
 			IInputValidatorPtr ipShallowCopy = m_ipInputValidator;
-			ASSERT_RESOURCE_ALLOCATION("ELI26475", ipShallowCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26475", ipShallowCopy != __nullptr);
 
 			*pVal = ipShallowCopy.Detach();
 		}
@@ -210,7 +210,7 @@ STDMETHODIMP CAttribute::get_SubAttributes(IIUnknownVector **pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26472", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26472", pVal != __nullptr);
 
 		validateLicense();
 
@@ -245,16 +245,16 @@ STDMETHODIMP CAttribute::get_AttributeSplitter(IAttributeSplitter **pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26478", pVal != NULL);
+		ASSERT_ARGUMENT("ELI26478", pVal != __nullptr);
 
 		validateLicense();
 
-		*pVal = NULL;
+		*pVal = __nullptr;
 
 		if (m_ipAttributeSplitter)
 		{
 			UCLID_AFCORELib::IAttributeSplitterPtr ipShallowCopy = m_ipAttributeSplitter;
-			ASSERT_RESOURCE_ALLOCATION("ELI26477", ipShallowCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26477", ipShallowCopy != __nullptr);
 
 			*pVal = (IAttributeSplitter*) ipShallowCopy.Detach();
 		}
@@ -429,7 +429,7 @@ STDMETHODIMP CAttribute::IsNonSpatialMatch(IAttribute* pTest, VARIANT_BOOL *pVal
 
 		// Convert test Attribute into smart pointer
 		UCLID_AFCORELib::IAttributePtr ipTest( pTest );
-		ASSERT_RESOURCE_ALLOCATION("ELI15661", ipTest != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15661", ipTest != __nullptr);
 
 		// Default the return to non-match
 		*pVal = VARIANT_FALSE;
@@ -451,7 +451,7 @@ STDMETHODIMP CAttribute::IsNonSpatialMatch(IAttribute* pTest, VARIANT_BOOL *pVal
 
 		// Retrieve Value string from test Attribute
 		ISpatialStringPtr ipValue = ipTest->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI15662", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15662", ipValue != __nullptr);
 		string	strTestValue = asString(ipValue->String);
 
 		// Compare Value strings
@@ -470,15 +470,15 @@ STDMETHODIMP CAttribute::IsNonSpatialMatch(IAttribute* pTest, VARIANT_BOOL *pVal
 		}
 
 		IIUnknownVectorPtr ipTestSub = ipTest->SubAttributes;
-		long lThisCount = m_ipSubAttributes != NULL ? m_ipSubAttributes->Size() : -1;
-		long lTestCount = ipTestSub != NULL ? ipTestSub->Size() : -1;
+		long lThisCount = m_ipSubAttributes != __nullptr ? m_ipSubAttributes->Size() : -1;
+		long lTestCount = ipTestSub != __nullptr ? ipTestSub->Size() : -1;
 
 		// Compare collection of Sub-Attributes
 		if (lThisCount > 0 || lTestCount > 0)
 		{
-			// If neither collection is NULL and both have a count > 0 then compare
+			// If neither collection is __nullptr and both have a count > 0 then compare
 			// both collections of sub attributes
-			if (m_ipSubAttributes != NULL && ipTestSub != NULL)
+			if (m_ipSubAttributes != __nullptr && ipTestSub != __nullptr)
 			{
 				// Both collections exist, now check counts
 				if (lThisCount != lTestCount)
@@ -489,9 +489,9 @@ STDMETHODIMP CAttribute::IsNonSpatialMatch(IAttribute* pTest, VARIANT_BOOL *pVal
 
 				// Make extra, disposable shallow copy of local sub-attributes
 				IShallowCopyablePtr ipExtraCopy = m_ipSubAttributes;
-				ASSERT_RESOURCE_ALLOCATION("ELI15669", ipExtraCopy != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15669", ipExtraCopy != __nullptr);
 				IIUnknownVectorPtr ipExtra = ipExtraCopy->ShallowCopy();
-				ASSERT_RESOURCE_ALLOCATION("ELI15670", ipExtra != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI15670", ipExtra != __nullptr);
 
 				// Store the size of the extra clone.
 				// The clone is the same size as the m_ipSubAttributes at this point.
@@ -502,7 +502,7 @@ STDMETHODIMP CAttribute::IsNonSpatialMatch(IAttribute* pTest, VARIANT_BOOL *pVal
 				{
 					// Retrieve this sub-attribute
 					UCLID_AFCORELib::IAttributePtr ipTestSubAttr = ipTestSub->At( i );
-					ASSERT_RESOURCE_ALLOCATION("ELI15654", ipTestSubAttr != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI15654", ipTestSubAttr != __nullptr);
 
 					// Check against updated (extra) set of local sub-attributes
 					bool bFoundMatch = false;
@@ -510,7 +510,7 @@ STDMETHODIMP CAttribute::IsNonSpatialMatch(IAttribute* pTest, VARIANT_BOOL *pVal
 					{
 						// Retrieve this sub-attribute
 						UCLID_AFCORELib::IAttributePtr ipExtraSubAttr = ipExtra->At( j );
-						ASSERT_RESOURCE_ALLOCATION("ELI15671", ipExtraSubAttr != NULL);
+						ASSERT_RESOURCE_ALLOCATION("ELI15671", ipExtraSubAttr != __nullptr);
 
 						// Do a non-spatial comparison of these two items
 						if (ipTestSubAttr->IsNonSpatialMatch( ipExtraSubAttr ) == VARIANT_TRUE)
@@ -558,13 +558,13 @@ STDMETHODIMP CAttribute::get_DataObject(IUnknown **pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24400", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24400", pVal != __nullptr);
 
 		validateLicense();
 
-		if (m_ipDataObject == NULL)
+		if (m_ipDataObject == __nullptr)
 		{
-			*pVal = NULL;
+			*pVal = __nullptr;
 		}
 		else
 		{
@@ -599,7 +599,7 @@ STDMETHODIMP CAttribute::GetAttributeSize(long* plAttributeSize)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI26467", plAttributeSize != NULL);
+		ASSERT_ARGUMENT("ELI26467", plAttributeSize != __nullptr);
 
 		validateLicense();
 
@@ -612,7 +612,7 @@ STDMETHODIMP CAttribute::GetAttributeSize(long* plAttributeSize)
 		for (long i = 0; i < lSize; i++)
 		{
 			UCLID_AFCORELib::IAttributePtr ipAttr = ipSubAttributes->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI26468", ipAttr != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26468", ipAttr != __nullptr);
 
 			lCount += ipAttr->GetAttributeSize();
 		}
@@ -632,7 +632,7 @@ STDMETHODIMP CAttribute::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		if (pbValue == NULL)
+		if (pbValue == __nullptr)
 		{
 			return E_POINTER;
 		}
@@ -664,56 +664,56 @@ STDMETHODIMP CAttribute::raw_CopyFrom(IUnknown * pObject)
 		validateLicense();
 
 		UCLID_AFCORELib::IAttributePtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08214", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08214", ipSource != __nullptr);
 
 		m_strAttributeName = asString(ipSource->Name);
 
 		ICopyableObjectPtr ipAttrSS(ipSource->Value);
-		ASSERT_RESOURCE_ALLOCATION("ELI08215", ipAttrSS != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08215", ipAttrSS != __nullptr);
 
 		m_ipAttributeValue = ipAttrSS->Clone();
 
 		m_strAttributeType = asString(ipSource->Type);
 
-		m_ipInputValidator = NULL;
+		m_ipInputValidator = __nullptr;
 		IInputValidatorPtr ipIV = ipSource->InputValidator;
-		if (ipIV != NULL)
+		if (ipIV != __nullptr)
 		{
 			// only make a copy if the input validator is not null
 			ICopyableObjectPtr ipCopyableIV = ipIV;
-			ASSERT_RESOURCE_ALLOCATION("ELI08216", ipCopyableIV != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08216", ipCopyableIV != __nullptr);
 
 			m_ipInputValidator = ipCopyableIV->Clone();
 		}
 
-		m_ipAttributeSplitter = NULL;
+		m_ipAttributeSplitter = __nullptr;
 		UCLID_AFCORELib::IAttributeSplitterPtr ipAS = ipSource->AttributeSplitter;
-		if (ipAS != NULL)
+		if (ipAS != __nullptr)
 		{
 			// only make a copy if the splitter is not null
 			ICopyableObjectPtr ipCopyableSplitter = ipAS;
-			ASSERT_RESOURCE_ALLOCATION("ELI08217", ipCopyableSplitter != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08217", ipCopyableSplitter != __nullptr);
 
 			m_ipAttributeSplitter = ipCopyableSplitter->Clone();
 		}
 
-		m_ipSubAttributes = NULL;
+		m_ipSubAttributes = __nullptr;
 		IIUnknownVectorPtr ipSub = ipSource->SubAttributes;
-		if (ipSub != NULL)
+		if (ipSub != __nullptr)
 		{
 			ICopyableObjectPtr ipCopyableSubAttributes = ipSub; 
-			ASSERT_RESOURCE_ALLOCATION("ELI19119", ipCopyableSubAttributes != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19119", ipCopyableSubAttributes != __nullptr);
 
 			m_ipSubAttributes = ipCopyableSubAttributes->Clone();
 		}
 
-		m_ipDataObject = NULL;
+		m_ipDataObject = __nullptr;
 		IUnknownPtr ipDataObject = ipSource->DataObject;
-		if (ipDataObject != NULL)
+		if (ipDataObject != __nullptr)
 		{
 			// only make a copy if the data object is not null
 			ICopyableObjectPtr ipCopyableDataObject = ipDataObject;
-			ASSERT_RESOURCE_ALLOCATION("ELI24913", ipCopyableDataObject != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24913", ipCopyableDataObject != __nullptr);
 
 			m_ipDataObject = ipCopyableDataObject->Clone();
 		}
@@ -735,7 +735,7 @@ STDMETHODIMP CAttribute::raw_Clone(IUnknown * * pObject)
 		// Create a new IAttribute object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_Attribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI05280", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05280", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -769,7 +769,7 @@ STDMETHODIMP CAttribute::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 
 		// Comparison object must be an IAttribute
 		UCLID_AFCORELib::IAttributePtr ipTest = pObj;
-		if (ipTest == NULL)
+		if (ipTest == __nullptr)
 		{
 			// Objects obviously do not match
 			bAllPartsMatch = false;
@@ -792,7 +792,7 @@ STDMETHODIMP CAttribute::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 			///////////////////////
 			// Retrieve Value from Test attribute
 			ISpatialStringPtr ipTestValue = ipTest->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI15368", ipTestValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15368", ipTestValue != __nullptr);
 
 			// Special comparison available for EAV file attributes (P16 #2215)
 			// where SourceDocName == "" && m_eMode == kNonSpatial
@@ -814,7 +814,7 @@ STDMETHODIMP CAttribute::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 			else
 			{
 				IComparableObjectPtr ipThis(m_ipAttributeValue);
-				if (ipThis == NULL)
+				if (ipThis == __nullptr)
 				{
 					throw UCLIDException("ELI05868", 
 						"SpatialString doesn't implement IComparableObject.");
@@ -840,13 +840,13 @@ STDMETHODIMP CAttribute::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 
 			// Compare collection of Sub-Attributes
 			IIUnknownVectorPtr	ipTestSub = ipTest->GetSubAttributes();
-			if ((m_ipSubAttributes == NULL) && (ipTestSub == NULL))
+			if ((m_ipSubAttributes == __nullptr) && (ipTestSub == __nullptr))
 			{
 				// Neither Attribute object has a defined sub-attribute vector
 
 				// This is okay, both objects may still match
 			}
-			else if ((m_ipSubAttributes == NULL) && (ipTestSub != NULL) && 
+			else if ((m_ipSubAttributes == __nullptr) && (ipTestSub != __nullptr) && 
 				(ipTestSub->Size() == 0))
 			{
 				// Local Attribute object has no sub-attribute vector defined, 
@@ -854,7 +854,7 @@ STDMETHODIMP CAttribute::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 
 				// This is okay, both objects may still match
 			}
-			else if ((ipTestSub == NULL) && (m_ipSubAttributes != NULL) && 
+			else if ((ipTestSub == __nullptr) && (m_ipSubAttributes != __nullptr) && 
 				(m_ipSubAttributes->Size() == 0))
 			{
 				// Test Attribute object has no sub-attribute vector defined, 
@@ -862,21 +862,21 @@ STDMETHODIMP CAttribute::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 
 				// This is okay, both objects may still match
 			}
-			else if (m_ipSubAttributes != NULL && (m_ipSubAttributes->Size() == 0) && ipTestSub != NULL && (ipTestSub->Size() == 0))
+			else if (m_ipSubAttributes != __nullptr && (m_ipSubAttributes->Size() == 0) && ipTestSub != __nullptr && (ipTestSub->Size() == 0))
 			{
 				// Local Attribute object has sub-attribute vector of size 0
 				// Test Attribute object has sub-attribute vector of size 0
 
 				// This is okay, both objects may still match
 			}
-			else if ((m_ipSubAttributes != NULL) && (ipTestSub != NULL))
+			else if ((m_ipSubAttributes != __nullptr) && (ipTestSub != __nullptr))
 			{
 				// Both collections exist, now check for IComparableObject support
 				IComparableObjectPtr ipComp1 = m_ipSubAttributes;
 				IComparableObjectPtr ipComp2 = ipTestSub;
 
 				// Make sure that both elements implement IComparableObject
-				if ((ipComp1 == NULL) || (ipComp2 == NULL))
+				if ((ipComp1 == __nullptr) || (ipComp2 == __nullptr))
 				{
 					bAllPartsMatch = false;
 					goto stop_checking;
@@ -901,16 +901,16 @@ STDMETHODIMP CAttribute::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 			// TODO: Compare Input Validator object
 			///////////////////////////////////////
 //			IInputValidatorPtr	ipTestIV = ipTest->GetInputValidator();
-//			if ((m_ipInputValidator == NULL) && (ipTestIV == NULL))
+//			if ((m_ipInputValidator == __nullptr) && (ipTestIV == __nullptr))
 //			{
 //				// This is okay, both objects may still match
 //			}
-//			else if ((m_ipInputValidator != NULL) && (ipTestIV != NULL))
+//			else if ((m_ipInputValidator != __nullptr) && (ipTestIV != __nullptr))
 //			{
 //				// Both objects exist, now compare them
 //				IComparableObjectPtr	ipCompTest1 = m_ipInputValidator;
 //				IComparableObjectPtr	ipCompTest2 = ipTestIV;
-//				if ((ipCompTest1 == NULL) || (ipCompTest2 == NULL))
+//				if ((ipCompTest1 == __nullptr) || (ipCompTest2 == __nullptr))
 //				{
 //					// One or the other does not implement IComparableObject
 //					bAllPartsMatch = false;
@@ -938,16 +938,16 @@ STDMETHODIMP CAttribute::raw_IsEqualTo(IUnknown * pObj, VARIANT_BOOL * pbValue)
 			// TODO: Compare Attribute Splitter object
 			//////////////////////////////////////////
 //			IAttributeSplitterPtr	ipTestSplit = ipTest->GetAttributeSplitter();
-//			if ((m_ipAttributeSplitter == NULL) && (ipTestSplit == NULL))
+//			if ((m_ipAttributeSplitter == __nullptr) && (ipTestSplit == __nullptr))
 //			{
 //				// This is okay, both objects may still match
 //			}
-//			else if ((m_ipAttributeSplitter != NULL) && (ipTestSplit != NULL))
+//			else if ((m_ipAttributeSplitter != __nullptr) && (ipTestSplit != __nullptr))
 //			{
 //				// Both objects exist, now compare them
 //				IComparableObjectPtr	ipCompTest1 = m_ipAttributeSplitter;
 //				IComparableObjectPtr	ipCompTest2 = ipTestSplit;
-//				if ((ipCompTest1 == NULL) || (ipCompTest2 == NULL))
+//				if ((ipCompTest1 == __nullptr) || (ipCompTest2 == __nullptr))
 //				{
 //					// One or the other does not implement IComparableObject
 //					bAllPartsMatch = false;
@@ -1011,10 +1011,10 @@ STDMETHODIMP CAttribute::IsDirty()
 		if (!m_bDirty)
 		{
 			IPersistStreamPtr ipPersistStream;
-			if ( m_ipAttributeSplitter != NULL )
+			if ( m_ipAttributeSplitter != __nullptr )
 			{
 				ipPersistStream = m_ipAttributeSplitter;
-				if (ipPersistStream==NULL)
+				if (ipPersistStream==__nullptr)
 				{
 					throw UCLIDException("ELI07564", "Object does not support persistence!");
 				}
@@ -1026,16 +1026,16 @@ STDMETHODIMP CAttribute::IsDirty()
 			}
 			
 			ipPersistStream = m_ipAttributeValue;
-			if (ipPersistStream==NULL)
+			if (ipPersistStream==__nullptr)
 			{
 				throw UCLIDException("ELI07565", "Object does not support persistence!");
 			}
 			hr = ipPersistStream->IsDirty();
 			
-			if ( m_ipInputValidator != NULL )
+			if ( m_ipInputValidator != __nullptr )
 			{
 				ipPersistStream = m_ipInputValidator;
-				if (ipPersistStream==NULL)
+				if (ipPersistStream==__nullptr)
 				{
 					throw UCLIDException("ELI07566", "Object does not support persistence!");
 				}
@@ -1046,10 +1046,10 @@ STDMETHODIMP CAttribute::IsDirty()
 				}
 			}
 			
-			if ( m_ipSubAttributes != NULL )
+			if ( m_ipSubAttributes != __nullptr )
 			{
 				ipPersistStream = m_ipSubAttributes;
-				if (ipPersistStream==NULL)
+				if (ipPersistStream==__nullptr)
 				{
 					throw UCLIDException("ELI07567", "Object does not support persistence!");
 				}
@@ -1074,9 +1074,9 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 		
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
-		pStream->Read(&nDataLength, sizeof(nDataLength), NULL);
+		pStream->Read(&nDataLength, sizeof(nDataLength), __nullptr);
 		ByteStream data(nDataLength);
-		pStream->Read(data.getData(), nDataLength, NULL);
+		pStream->Read(data.getData(), nDataLength, __nullptr);
 		ByteStreamManipulator dataReader(ByteStreamManipulator::kRead, data);
 
 		// Read the individual data items from the bytestream
@@ -1119,11 +1119,11 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 		// Separately read the value finding rule object from the stream
 
 		IPersistStreamPtr ipObj;
-		// Read Splitter from stream if not NULL
+		// Read Splitter from stream if not __nullptr
 		if ( !bIsSplitterNull )
 		{
 			readObjectFromStream(ipObj, pStream, "ELI09943");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException( "ELI07575", 
 					"Splitter object could not be read from stream!" );
@@ -1132,23 +1132,23 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 		}
 		else
 		{
-			m_ipAttributeSplitter = NULL;
+			m_ipAttributeSplitter = __nullptr;
 		}
 
 		// Read Attribute Value from stream
 		readObjectFromStream(ipObj, pStream, "ELI09944");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException( "ELI07576", 
 				"Attribute Value object could not be read from stream!" );
 		}
 		m_ipAttributeValue = ipObj;
 
-		// Read Input Validator from stream if not NULL
+		// Read Input Validator from stream if not __nullptr
 		if ( !bIsValidatorNull )
 		{
 			readObjectFromStream(ipObj, pStream, "ELI09945");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException( "ELI07577", 
 					"Input Validator object could not be read from stream!" );
@@ -1157,14 +1157,14 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 		}
 		else
 		{
-			m_ipInputValidator = NULL;
+			m_ipInputValidator = __nullptr;
 		}
 
-		// Read Sub Attributes from stream not NULL
+		// Read Sub Attributes from stream not __nullptr
 		if ( !bIsSubAttributesNull )
 		{
 			readObjectFromStream(ipObj, pStream, "ELI09946");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException( "ELI07578", 
 					"Value Finding Rule object could not be read from stream!" );
@@ -1173,14 +1173,14 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 		}
 		else
 		{
-			m_ipSubAttributes = NULL;
+			m_ipSubAttributes = __nullptr;
 		}
 
-		// Read the data object from the stream if not NULL
+		// Read the data object from the stream if not __nullptr
 		if ( !bIsDataObjectNull )
 		{
 			readObjectFromStream(ipObj, pStream, "ELI24403");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException( "ELI24404", 
 					"Attribute data object could not be read from stream!");
@@ -1190,7 +1190,7 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 		}
 		else
 		{
-			m_ipDataObject = NULL;
+			m_ipDataObject = __nullptr;
 		}
 
 		// Clear the dirty flag as we've loaded a fresh object
@@ -1221,44 +1221,44 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 
 		// Write flags to stream to indicated if object is null
 		bool bIsObjectNull = false;
-		if ( m_ipAttributeSplitter == NULL )
+		if ( m_ipAttributeSplitter == __nullptr )
 		{
 			bIsObjectNull = true;
 		}
 		dataWriter << bIsObjectNull;
 
 		bIsObjectNull = false;
-		if ( m_ipInputValidator == NULL )
+		if ( m_ipInputValidator == __nullptr )
 		{
 			bIsObjectNull = true;
 		}
 		dataWriter << bIsObjectNull;
 
 		bIsObjectNull = false;
-		if ( m_ipSubAttributes == NULL )
+		if ( m_ipSubAttributes == __nullptr )
 		{
 			bIsObjectNull = true;
 		}
 		dataWriter << bIsObjectNull;
 
-		bool bIsDataObjectNull = (m_ipDataObject == NULL);
+		bool bIsDataObjectNull = (m_ipDataObject == __nullptr);
 		dataWriter << bIsDataObjectNull;
 
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
-		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
-		pStream->Write(data.getData(), nDataLength, NULL);
+		pStream->Write(&nDataLength, sizeof(nDataLength), __nullptr);
+		pStream->Write(data.getData(), nDataLength, __nullptr);
 
 		// Write each of the objects to the stream separately
 		IPersistStreamPtr ipPersistentObj;
 
-		// Write splitter to stream if not NULL
-		if ( m_ipAttributeSplitter != NULL )
+		// Write splitter to stream if not __nullptr
+		if ( m_ipAttributeSplitter != __nullptr )
 		{
 			ipPersistentObj = m_ipAttributeSplitter;
-			if (ipPersistentObj == NULL)
+			if (ipPersistentObj == __nullptr)
 			{
 				throw UCLIDException( "ELI07572", 
 					"Attribute Splitter object could not be saved!" );
@@ -1268,18 +1268,18 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 
 		// Write Attribute Value to stream, this should always hava a value
 		ipPersistentObj = m_ipAttributeValue;
-		if (ipPersistentObj == NULL)
+		if (ipPersistentObj == __nullptr)
 		{
 			throw UCLIDException( "ELI07573", 
 				"Attribute Value object could not be saved!" );
 		}
 		writeObjectToStream(ipPersistentObj, pStream, "ELI09901", fClearDirty);
 
-		// Write Input Validator to stream if not NULL
-		if ( m_ipInputValidator != NULL )
+		// Write Input Validator to stream if not __nullptr
+		if ( m_ipInputValidator != __nullptr )
 		{
 			ipPersistentObj = m_ipInputValidator;
-			if (ipPersistentObj == NULL)
+			if (ipPersistentObj == __nullptr)
 			{
 				throw UCLIDException( "ELI07574", 
 					"Input Validator object could not be saved!" );
@@ -1287,11 +1287,11 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 			writeObjectToStream(ipPersistentObj, pStream, "ELI09902", fClearDirty);
 		}
 
-		// Write Sub Attributes to stream if not NULL
-		if ( m_ipSubAttributes != NULL )
+		// Write Sub Attributes to stream if not __nullptr
+		if ( m_ipSubAttributes != __nullptr )
 		{
 			ipPersistentObj = m_ipSubAttributes;
-			if (ipPersistentObj == NULL)
+			if (ipPersistentObj == __nullptr)
 			{
 				throw UCLIDException( "ELI07579", 
 					"Sub Attributes object could not be saved!" );
@@ -1300,11 +1300,11 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 			writeObjectToStream(ipPersistentObj, pStream, "ELI09903", fClearDirty);
 		}
 
-		// Write the data object to the stream if not NULL.
+		// Write the data object to the stream if not __nullptr.
 		if (!bIsDataObjectNull)
 		{
 			ipPersistentObj = m_ipDataObject;
-			if (ipPersistentObj == NULL)
+			if (ipPersistentObj == __nullptr)
 			{
 				throw UCLIDException("ELI24405", 
 					"Attribute data object could not be saved!" );
@@ -1326,7 +1326,7 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttribute::GetSizeMax(ULARGE_INTEGER * pcbSize)
 {
-	if (pcbSize == NULL)
+	if (pcbSize == __nullptr)
 		return E_POINTER;
 		
 	return E_NOTIMPL;
@@ -1422,10 +1422,10 @@ void CAttribute::validateIdentifier(const string& strName)
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CAttribute::getSubAttributes()
 {
-	if (m_ipSubAttributes == NULL)
+	if (m_ipSubAttributes == __nullptr)
 	{
 		m_ipSubAttributes.CreateInstance(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI26471", m_ipSubAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26471", m_ipSubAttributes != __nullptr);
 	}
 
 	return m_ipSubAttributes;

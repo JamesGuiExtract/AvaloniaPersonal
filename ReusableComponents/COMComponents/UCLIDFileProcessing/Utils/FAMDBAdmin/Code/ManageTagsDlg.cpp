@@ -142,7 +142,7 @@ CManageTagsDlg::CManageTagsDlg(const UCLID_FILEPROCESSINGLib::IFileProcessingDBP
 CDialog(CManageTagsDlg::IDD, pParent),
 m_ipFAMDB(ipFAMDB)
 {
-	ASSERT_ARGUMENT("ELI27390", ipFAMDB != NULL);
+	ASSERT_ARGUMENT("ELI27390", ipFAMDB != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CManageTagsDlg::~CManageTagsDlg()
@@ -150,7 +150,7 @@ CManageTagsDlg::~CManageTagsDlg()
 	try
 	{
 		// Ensure FamDB pointer is released
-		m_ipFAMDB = NULL;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27391");
 }
@@ -372,7 +372,7 @@ void CManageTagsDlg::OnBtnDelete()
 		// Build the list of tags to delete
 		vector<string> vecTagsToDelete;
 		POSITION pos = m_listTags.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			int iIndex = m_listTags.GetNextSelectedItem( pos );
@@ -522,7 +522,7 @@ void CManageTagsDlg::refreshTagList()
 		// Store the position of the first selected item
 		int nSelectedItem = 0;
 		POSITION pos = m_listTags.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			nSelectedItem = m_listTags.GetNextSelectedItem(pos);
 		}
@@ -533,7 +533,7 @@ void CManageTagsDlg::refreshTagList()
 		m_listTags.DeleteAllItems();
 
 		IStrToStrMapPtr ipTags = m_ipFAMDB->GetTags();
-		ASSERT_RESOURCE_ALLOCATION("ELI27404", ipTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27404", ipTags != __nullptr);
 
 		// Get the number of tags
 		long lSize = ipTags->Size;

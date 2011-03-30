@@ -141,8 +141,8 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(IFileRecord* pFileRec
 		// Check license
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI17904", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI17903", pResult != NULL);
+		ASSERT_ARGUMENT("ELI17904", pTagManager != __nullptr);
+		ASSERT_ARGUMENT("ELI17903", pResult != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31341", ipFileRecord != __nullptr);
 
@@ -373,7 +373,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_GetComponentDescription(BSTR * ps
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19612", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI19612", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Core: Copy, move or delete file").Detach();
 	}
@@ -392,7 +392,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_FILEPROCESSORSLib::ICopyMoveDeleteFileProcessorPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI12161", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12161", ipCopyThis != __nullptr);
 		
 		m_eOperation = (ECopyMoveDeleteOperationType)ipCopyThis->Operation;
 		m_strSrc = ipCopyThis->SourceFileName;
@@ -419,7 +419,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_Clone(IUnknown **pObject)
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_CopyMoveDeleteFileProcessor);
-		ASSERT_RESOURCE_ALLOCATION("ELI12162", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12162", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -653,7 +653,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::SetMoveFiles(BSTR bstrSrcDoc, BSTR bs
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14467", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14467", ipFAMTagManager != __nullptr);
 
 		// make sure the file contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strSrc.c_str()) == VARIANT_TRUE)
@@ -706,7 +706,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::SetCopyFiles(BSTR bstrSrcDoc, BSTR bs
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14470", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14470", ipFAMTagManager != __nullptr);
 
 		// make sure the file contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strSrc.c_str()) == VARIANT_TRUE)
@@ -753,7 +753,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::SetDeleteFiles(BSTR bstrSrcDoc)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14473", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14473", ipFAMTagManager != __nullptr);
 
 		// make sure the file contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strSrc.c_str()) == VARIANT_TRUE)
@@ -924,7 +924,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::get_AllowReadonly(VARIANT_BOOL *pRetV
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23605", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI23605", pRetVal != __nullptr);
 
 		// Check license
 		validateLicense();
@@ -958,7 +958,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::get_ModifySourceDocName(VARIANT_BOOL 
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI31276", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI31276", pRetVal != __nullptr);
 
 		// Check license
 		validateLicense();

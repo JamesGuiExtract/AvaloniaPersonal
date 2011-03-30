@@ -81,7 +81,7 @@ private:
 	bool m_bDirty; // dirty flag to indicate modified state of this object
 
 	// Handles configuration persistence
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
 	// if m_bLoggingEnabled is true the scores should be logged
 	bool m_bLoggingEnabled;

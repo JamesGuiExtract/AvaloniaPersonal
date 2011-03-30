@@ -25,7 +25,7 @@ CSpotRecognitionWindow::CSpotRecognitionWindow()
 	try
 	{
 		// do not create the spot rec dialog here.
-		m_apDlg.reset(NULL);
+		m_apDlg.reset(__nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI03172")
 }
@@ -38,7 +38,7 @@ CSpotRecognitionWindow::~CSpotRecognitionWindow()
 	{
 		// force deletion of the dialog object within the scope of this destructor
 		// so that we know the destruction is happening with the correct AFX module state
-		m_apDlg.reset(NULL);
+		m_apDlg.reset(__nullptr);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16501");
 }
@@ -154,7 +154,7 @@ STDMETHODIMP CSpotRecognitionWindow::IsModified(VARIANT_BOOL *pbIsModified)
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23839", pbIsModified != NULL);
+		ASSERT_ARGUMENT("ELI23839", pbIsModified != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -171,7 +171,7 @@ STDMETHODIMP CSpotRecognitionWindow::GetCurrentPageNumber(long *plPageNum)
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23840", plPageNum != NULL);
+		ASSERT_ARGUMENT("ELI23840", plPageNum != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -203,7 +203,7 @@ STDMETHODIMP CSpotRecognitionWindow::GetTotalPages(long *plTotalPages)
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23841", plTotalPages != NULL);
+		ASSERT_ARGUMENT("ELI23841", plTotalPages != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -333,7 +333,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_GetText(BSTR strID, BSTR *pstrText)
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23829", pstrText != NULL);
+		ASSERT_ARGUMENT("ELI23829", pstrText != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -361,7 +361,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_CanBeMarkedAsUsed(BSTR strID, VARIANT_B
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23830", pbCanBeMarkedAsUsed != NULL);
+		ASSERT_ARGUMENT("ELI23830", pbCanBeMarkedAsUsed != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -404,7 +404,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_IsMarkedAsUsed(BSTR strID, VARIANT_BOOL
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23831", pbIsMarkedAsUsed != NULL);
+		ASSERT_ARGUMENT("ELI23831", pbIsMarkedAsUsed != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -435,7 +435,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_IsFromPersistentSource(BSTR strID, VARI
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23832", pbIsFromPersistentSource != NULL);
+		ASSERT_ARGUMENT("ELI23832", pbIsFromPersistentSource != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -454,7 +454,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_GetPersistentSourceName(BSTR strID, BST
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23833", pstrSourceName != NULL);
+		ASSERT_ARGUMENT("ELI23833", pstrSourceName != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -491,7 +491,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_HasBeenOCRed(BSTR strID, VARIANT_BOOL *
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23834", pbHasBeenOCRed != NULL);
+		ASSERT_ARGUMENT("ELI23834", pbHasBeenOCRed != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -542,10 +542,10 @@ STDMETHODIMP CSpotRecognitionWindow::raw_GetOCRZones(BSTR strID, IIUnknownVector
 		// Confirm that component is licensed
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23846", pRasterZones != NULL);
+		ASSERT_ARGUMENT("ELI23846", pRasterZones != __nullptr);
 
 		IIUnknownVectorPtr ipRasterZones(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI23797", ipRasterZones != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI23797", ipRasterZones != __nullptr);
 
 		// Get the zone entity ids from the input entity id
 		vector<long> ids;
@@ -554,7 +554,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_GetOCRZones(BSTR strID, IIUnknownVector
 		for (unsigned int i = 0; i < ids.size(); i++)
 		{
 			IRasterZonePtr ipRasterZone = getSpotRecognitionDlg()->getOCRZone(ids[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI23798", ipRasterZone != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI23798", ipRasterZone != __nullptr);
 			ipRasterZones->PushBack(ipRasterZone);
 		}
 
@@ -571,7 +571,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_get_WindowShown(VARIANT_BOOL * pVal)
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23835", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23835", pVal != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -595,7 +595,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_get_InputIsEnabled(VARIANT_BOOL * pVal)
 		// try to ensure that this component is licensed.
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23836", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23836", pVal != __nullptr);
 			
 		*pVal = getSpotRecognitionDlg()->inputIsEnabled() ? VARIANT_TRUE : VARIANT_FALSE;
 
@@ -613,7 +613,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_get_HasWindow(VARIANT_BOOL * pVal)
 		// try to ensure that this component is licensed.
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23837", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23837", pVal != __nullptr);
 		
 		// this method will always return true, as the spot recognition window
 		// in the context of an input receiver always has a window
@@ -633,7 +633,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_get_WindowHandle(LONG * pVal)
 		// try to ensure that this component is licensed.
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI23838", pVal != NULL);
+		ASSERT_ARGUMENT("ELI23838", pVal != __nullptr);
 		
 		HWND hWnd = getSpotRecognitionDlg()->m_hWnd;
 		*pVal = (long) hWnd;
@@ -811,7 +811,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_GetComponentDescription(BSTR * pbstrCom
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI19630", pbstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19630", pbstrComponentDescription != __nullptr)
 
 		*pbstrComponentDescription = _bstr_t("Image viewer").Detach();
 
@@ -831,7 +831,7 @@ SpotRecognitionDlg* CSpotRecognitionWindow::getSpotRecognitionDlg()
 		
 		// create the dialog object, and bring it up in a modeless fashion
 		// Provide OCR license status
-		m_apDlg = auto_ptr<SpotRecognitionDlg>( new SpotRecognitionDlg( this, isOCRLicensed()) );
+		m_apDlg = unique_ptr<SpotRecognitionDlg>( new SpotRecognitionDlg( this, isOCRLicensed()) );
 		if (!m_lParentWndHandle)
 		{
 			CWnd *pParentWnd = m_lParentWndHandle == NULL ? NULL : CWnd::FromHandle((HWND) m_lParentWndHandle);
@@ -853,7 +853,7 @@ STDMETHODIMP CSpotRecognitionWindow::GetImageFileName(BSTR *pstrImageFileName)
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23842", pstrImageFileName != NULL);
+		ASSERT_ARGUMENT("ELI23842", pstrImageFileName != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -874,7 +874,7 @@ STDMETHODIMP CSpotRecognitionWindow::GetGDDFileName(BSTR *pstrGDDFileName)
 		
 	try
 	{
-		ASSERT_ARGUMENT("ELI23843", pstrGDDFileName != NULL);
+		ASSERT_ARGUMENT("ELI23843", pstrGDDFileName != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();
@@ -1433,7 +1433,7 @@ STDMETHODIMP CSpotRecognitionWindow::get_WindowPos(ILongRectangle **ppVal)
 		RECT rect;
 		getSpotRecognitionDlg()->GetWindowRect(&rect);
 		ILongRectanglePtr ipRect(CLSID_LongRectangle);
-		ASSERT_RESOURCE_ALLOCATION("ELI12058", ipRect != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12058", ipRect != __nullptr);
 
 		ipRect->Left = rect.left;
 		ipRect->Right = rect.right;
@@ -1457,7 +1457,7 @@ STDMETHODIMP CSpotRecognitionWindow::put_WindowPos(ILongRectangle *pNewVal)
 		validateLicense();
 
 		ILongRectanglePtr ipRect(pNewVal);
-		if (ipRect == NULL)
+		if (ipRect == __nullptr)
 		{
 			UCLIDException ue("ELI12056", "Window postion rectangle must not be NULL.");
 			throw ue;
@@ -1568,7 +1568,7 @@ STDMETHODIMP CSpotRecognitionWindow::IsOCRLicensed(VARIANT_BOOL *pbLicensed)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23844", pbLicensed != NULL);
+		ASSERT_ARGUMENT("ELI23844", pbLicensed != __nullptr);
 
 		// Return response from local method
 		*pbLicensed = isOCRLicensed() ? VARIANT_TRUE : VARIANT_FALSE;
@@ -1698,7 +1698,7 @@ STDMETHODIMP CSpotRecognitionWindow::get_FittingMode(long* peFittingMode)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI23788", peFittingMode != NULL);
+		ASSERT_ARGUMENT("ELI23788", peFittingMode != __nullptr);
 
 		*peFittingMode = getSpotRecognitionDlg()->getFittingMode();
 	}
@@ -1723,7 +1723,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_IsLicensed(VARIANT_BOOL * pbValue)
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI23845", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI23845", pbValue != __nullptr);
 
 		// try to ensure that this component is licensed.
 		validateLicense();

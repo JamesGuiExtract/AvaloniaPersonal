@@ -33,7 +33,7 @@ CManageUsersDlg::CManageUsersDlg(const UCLID_FILEPROCESSINGLib::IFileProcessingD
 CDialog(CManageUsersDlg::IDD, pParent),
 m_ipFAMDB(ipFAMDB)
 {
-	ASSERT_ARGUMENT("ELI29015", ipFAMDB != NULL);
+	ASSERT_ARGUMENT("ELI29015", ipFAMDB != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CManageUsersDlg::~CManageUsersDlg()
@@ -41,7 +41,7 @@ CManageUsersDlg::~CManageUsersDlg()
 	try
 	{
 		// Ensure FamDB pointer is released
-		m_ipFAMDB = NULL;
+		m_ipFAMDB = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29016");
 }
@@ -162,7 +162,7 @@ void CManageUsersDlg::OnBtnRename()
 		}
 
 		POSITION pos = m_listUsers.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			int iIndex = m_listUsers.GetNextSelectedItem( pos );
@@ -218,7 +218,7 @@ void CManageUsersDlg::OnBtnRemove()
 		// Build the list of tags to delete
 		vector<string> vecUsersToDelete;
 		POSITION pos = m_listUsers.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			int iIndex = m_listUsers.GetNextSelectedItem( pos );
@@ -286,7 +286,7 @@ void CManageUsersDlg::OnBtnClearPassword()
 		refreshUserList();
 		
 		POSITION pos = m_listUsers.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			// Get index of first selection
 			int iIndex = m_listUsers.GetNextSelectedItem( pos );
@@ -405,7 +405,7 @@ void CManageUsersDlg::refreshUserList()
 		// Store the position of the first selected item
 		int nSelectedItem = 0;
 		POSITION pos = m_listUsers.GetFirstSelectedItemPosition();
-		if (pos != NULL)
+		if (pos != __nullptr)
 		{
 			nSelectedItem = m_listUsers.GetNextSelectedItem(pos);
 		}
@@ -416,7 +416,7 @@ void CManageUsersDlg::refreshUserList()
 		m_listUsers.DeleteAllItems();
 
 		IStrToStrMapPtr ipUsers = m_ipFAMDB->GetLoginUsers();
-		ASSERT_RESOURCE_ALLOCATION("ELI29033", ipUsers != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29033", ipUsers != __nullptr);
 
 		// Get the number of Users
 		long lSize = ipUsers->Size;

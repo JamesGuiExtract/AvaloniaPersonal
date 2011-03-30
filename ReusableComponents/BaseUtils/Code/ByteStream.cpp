@@ -228,7 +228,7 @@ string ByteStream::asString() const
 void ByteStream::setSize(unsigned long _ulLength)
 {
 	// delete previously allocated memory
-	if (m_pszData != NULL && m_bIsOwnerOfMemory)
+	if (m_pszData != __nullptr && m_bIsOwnerOfMemory)
 	{
 		delete[] m_pszData;
 	}
@@ -286,7 +286,7 @@ void ByteStream::loadFrom(const string& strFileName)
 			waitForFileToBeReadable(strFileName, true, &pinFile, ios::in | ios::binary);
 
 			// Create an auto pointer to manage the pinFile
-			auto_ptr<ifstream> apInFile(pinFile);
+			unique_ptr<ifstream> apInFile(pinFile);
 
 			// If pointer is null then file was not opened, make one more attempt to open the file
 			if (apInFile.get() == NULL)
@@ -306,7 +306,7 @@ void ByteStream::loadFrom(const string& strFileName)
 			streampos nFileSize = apInFile->tellg();
 
 			// read the bytes from the file
-			setSize(nFileSize);
+			setSize((unsigned long) nFileSize);
 			apInFile->seekg(0, ios::beg);
 
 			if(nFileSize > 0)

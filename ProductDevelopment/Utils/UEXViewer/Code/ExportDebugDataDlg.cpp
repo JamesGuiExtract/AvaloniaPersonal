@@ -112,7 +112,7 @@ void CExportDebugDataDlg::OnBnClickedOk()
 			// Find position of first selection
 			POSITION pos = m_pUEXDlg->m_listUEX.GetFirstSelectedItemPosition();
 			int nCurrSelected;
-			while(pos != NULL)
+			while(pos != __nullptr)
 			{
 				// Get index of selected item
 				nCurrSelected = m_pUEXDlg->m_listUEX.GetNextSelectedItem( pos );
@@ -251,7 +251,7 @@ void CExportDebugDataDlg::getDebugDataFromException(vector<string> &rvecDebugPar
 	}
 
 	// If there is an inner exception call this function recursively
-	if (ueDebug.getInnerException() != NULL)
+	if (ueDebug.getInnerException() != __nullptr)
 	{
 		// Call this recursively for each inner exception
 		getDebugDataFromException(rvecDebugParams, *ueDebug.getInnerException());
@@ -262,7 +262,7 @@ void CExportDebugDataDlg::getExceptionDataFromUEXList(int nItemNumber, vector<st
 {
 	// Retrieve this data structure
 	ITEMINFO*	pData = (ITEMINFO *)m_pUEXDlg->m_listUEX.GetItemData( nItemNumber );
-	ASSERT_RESOURCE_ALLOCATION("ELI28766", pData != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI28766", pData != __nullptr);
 
 	// Create a UCLIDException object
 	// using new ELI code for this application

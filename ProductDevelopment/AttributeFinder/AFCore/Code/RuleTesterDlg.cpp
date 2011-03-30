@@ -59,13 +59,11 @@ RuleTesterDlg::RuleTesterDlg(FileRecoveryManager *pFRM,
 		//}}AFX_DATA_INIT
 
 		// Get Configuration Manager for dialog
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
-			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_AFCORE_KEY_PATH ) );
+		ma_pUserCfgMgr.reset(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_AFCORE_KEY_PATH));
 		
-		ma_pCfgTesterMgr = auto_ptr<TesterConfigMgr>(new TesterConfigMgr( 
-			ma_pUserCfgMgr.get(), "\\RuleTester" ) );
+		ma_pCfgTesterMgr.reset(new TesterConfigMgr(ma_pUserCfgMgr.get(), "\\RuleTester"));
 
-		if ( pFRM == NULL )
+		if ( pFRM == __nullptr )
 		{
 			m_eMode = kWithRulesetTab;
 		}
@@ -87,7 +85,7 @@ RuleTesterDlg::~RuleTesterDlg()
 			DestroyWindow();
 		}
 
-		ma_pCfgTesterMgr.reset(NULL);
+		ma_pCfgTesterMgr.reset(__nullptr);
 
 		// if we have successfully connected to the input manager,
 		// release the reference and also destroy all currently open input receivers.
@@ -393,7 +391,7 @@ void RuleTesterDlg::OnButtonExecute()
 		// if no input text is available, clear the results grid, and return
 		// Allow processing even if ipInputText->IsEmpty() == VARIANT_TRUE
 		// [FlexIDSCore #3716]
-		if (ipInputText == NULL)
+		if (ipInputText == __nullptr)
 		{
 			OnButtonClear();
 			return;
@@ -408,7 +406,7 @@ void RuleTesterDlg::OnButtonExecute()
 		if (!m_testerDlgSettingsPage.isAllAttributesScopeSet() && m_eMode != kWithRulesetTab )
 		{
 			ipVecAttributeNames.CreateInstance(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI04811", ipVecAttributeNames != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI04811", ipVecAttributeNames != __nullptr);
 
 			const string& strAttributeName = 
 				m_testerDlgSettingsPage.getCurrentAttributeName();
@@ -423,7 +421,7 @@ void RuleTesterDlg::OnButtonExecute()
 		// here because we don't want the internal dirty flag to be
 		// effected by this SaveTo() call.
 
-		if (m_pFRM != NULL && m_ipRuleSet->CanSave == VARIANT_TRUE)
+		if (m_pFRM != __nullptr && m_ipRuleSet->CanSave == VARIANT_TRUE)
 		{
 			m_ipRuleSet->SaveTo(get_bstr_t(m_pFRM->getRecoveryFileName().c_str()), VARIANT_FALSE);
 		}
@@ -431,19 +429,19 @@ void RuleTesterDlg::OnButtonExecute()
 		// make a copy of the input text in case the string will be
 		// modified by the following rules
 		ICopyableObjectPtr ipCopyObj(ipInputText);
-		ASSERT_RESOURCE_ALLOCATION("ELI18406", ipCopyObj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18406", ipCopyObj != __nullptr);
 		ISpatialStringPtr ipCopyInputText = ipCopyObj->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI06671", ipCopyInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06671", ipCopyInputText != __nullptr);
 		UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI18407", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI18407", ipAFDoc != __nullptr);
 		ipAFDoc->Text = ipCopyInputText;
 
 		// Use temporary Vector to hold the attributes that are currently being displayed
 		IIUnknownVectorPtr ipTmpAttrs(NULL);
-		if ( m_ipAttributes != NULL )
+		if ( m_ipAttributes != __nullptr )
 		{
 			ipTmpAttrs.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI09754" , ipTmpAttrs != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI09754" , ipTmpAttrs != __nullptr );
 			// Temporarly hold the attributes for the last run;
 			ipTmpAttrs->Append( m_ipAttributes );
 		}
@@ -454,10 +452,10 @@ void RuleTesterDlg::OnButtonExecute()
 		if (!asCppBool(m_ipRuleSet->IsEncrypted))
 		{
 			ICopyableObjectPtr ipCopy(m_ipRuleSet);
-			ASSERT_RESOURCE_ALLOCATION("ELI19588", ipCopy != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19588", ipCopy != __nullptr);
 
 			ipTempRuleSet = ipCopy->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI19589", ipTempRuleSet != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI19589", ipTempRuleSet != __nullptr);
 		}
 		else
 		{
@@ -672,7 +670,7 @@ void RuleTesterDlg::OnButtonFeedback()
 	{
 		// Get Feedback Manager from Attribute Finder Engine
 		UCLID_AFCORELib::IFeedbackMgrPtr ipFeedback = getAFEngine()->FeedbackManager;
-		ASSERT_RESOURCE_ALLOCATION("ELI09056", ipFeedback != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09056", ipFeedback != __nullptr);
 
 		// Provide modified results to the Feedback Manager
 		ipFeedback->RecordCorrectData(get_bstr_t(m_strRuleID.c_str()), m_ipAttributes);
@@ -755,7 +753,7 @@ STDMETHODIMP RuleTesterDlg::QueryInterface( REFIID iid, void FAR* FAR* ppvObj)
 	else
 		*ppvObj = NULL;
 
-	if (*ppvObj != NULL)
+	if (*ppvObj != __nullptr)
 	{
 		AddRef();
 		return S_OK;
@@ -781,7 +779,7 @@ STDMETHODIMP RuleTesterDlg::raw_NotifyParagraphTextRecognized(
 
 		// get the spatial text
 		ISpatialStringPtr ipText(pText);
-		ASSERT_RESOURCE_ALLOCATION("ELI06546", ipText != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06546", ipText != __nullptr);
 
 		m_testerDlgInputPage.notifyImageWindowInputReceived(ipText);
 	}
@@ -826,7 +824,7 @@ ISpotRecognitionWindowPtr RuleTesterDlg::openImageOrGDDFile(char *pszFile,
 	// the user dropped a file that is an image or a gdd file
 	// so open it in the image window
 	ISRIRUtilsPtr ipSRIRUtils(CLSID_SRIRUtils);
-	ASSERT_RESOURCE_ALLOCATION("ELI07998", ipSRIRUtils != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI07998", ipSRIRUtils != __nullptr);
 
 	// try to get access to any spot recognition windows
 	// that may already have the specified image or gdd file open
@@ -840,7 +838,7 @@ ISpotRecognitionWindowPtr RuleTesterDlg::openImageOrGDDFile(char *pszFile,
 	{
 		// flash the window
 		IInputReceiverPtr ipIR = ipSRIR;
-		ASSERT_RESOURCE_ALLOCATION("ELI08013", ipIR != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08013", ipIR != __nullptr);
 		flashWindow((HWND) ipIR->WindowHandle, true);
 
 		// display error message
@@ -908,10 +906,10 @@ ISpotRecognitionWindowPtr RuleTesterDlg::createNewSRIRWindow()
 	// create new spot recognition window
 	long nID = getInputManager()->CreateNewInputReceiver("Image viewer");
 	ipSRIR = getInputManager()->GetInputReceiver(nID);
-	ASSERT_RESOURCE_ALLOCATION("ELI06555", ipSRIR != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI06555", ipSRIR != __nullptr);
 	
 	IIUnknownVectorPtr ipVecPTHs(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI04760", ipVecPTHs != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI04760", ipVecPTHs != __nullptr);
 	
 	// this tester dialog is a paragraph text handler
 	IParagraphTextHandler *pPTH = this;
@@ -923,7 +921,7 @@ ISpotRecognitionWindowPtr RuleTesterDlg::createNewSRIRWindow()
 //-------------------------------------------------------------------------------------------------
 void RuleTesterDlg::createToolBar()
 {
-	m_apToolBar = auto_ptr<CToolBar>(new CToolBar());
+	m_apToolBar = unique_ptr<CToolBar>(new CToolBar());
 	if (m_apToolBar->CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
     | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) )
 	{
@@ -1001,7 +999,7 @@ void RuleTesterDlg::updateList(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 	// Before any attributes in the grid, add a record 
 	// to display the document probability, if any
 	IStrToStrMapPtr ipStrMap = ipAFDoc->StringTags;
-	ASSERT_RESOURCE_ALLOCATION("ELI20193", ipStrMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20193", ipStrMap != __nullptr);
 
 	long lStrMapSize = ipStrMap->Size;
 	for (long i = 0; i < lStrMapSize; i++)
@@ -1028,7 +1026,7 @@ void RuleTesterDlg::updateList(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 
 	// Display desired Object Tags
 	IStrToObjectMapPtr ipObjMap = ipAFDoc->ObjectTags;
-	ASSERT_RESOURCE_ALLOCATION("ELI20201", ipObjMap != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI20201", ipObjMap != __nullptr);
 
 	long lObjMapSize = ipObjMap->Size;
 	for (long i = 0; i < lObjMapSize; i++)
@@ -1078,7 +1076,7 @@ void RuleTesterDlg::updateList(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 		{
 			// Retrieve Value object
 			ISpatialStringPtr ipValue = ipAttr->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI15518", ipValue != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15518", ipValue != __nullptr);
 
 			// Retrieve Name, Value and Type strings
 			strKey = asString(ipAttr->Name);
@@ -1160,7 +1158,7 @@ void RuleTesterDlg::addSubAttributes(UCLID_AFCORELib::IAttributePtr ipAttribute,
 	// Retrieve collection of sub-attributes
 	IIUnknownVectorPtr	ipSubAttributes = ipAttribute->GetSubAttributes();
 	long lCount = 0;
-	if (ipSubAttributes != NULL)
+	if (ipSubAttributes != __nullptr)
 	{
 		lCount = ipSubAttributes->Size();
 	}
@@ -1172,11 +1170,11 @@ void RuleTesterDlg::addSubAttributes(UCLID_AFCORELib::IAttributePtr ipAttribute,
 		// Retrieve this sub-attribute
 		//////////////////////////////
 		UCLID_AFCORELib::IAttributePtr	ipThisSub = ipSubAttributes->At( i );
-		ASSERT_RESOURCE_ALLOCATION("ELI26066", ipThisSub != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26066", ipThisSub != __nullptr);
 
 		// Retrieve Value object
 		ISpatialStringPtr ipValue = ipThisSub->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI15519", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15519", ipValue != __nullptr);
 
 		// Get Name, Value (converted to Cpp-style), and Type strings
 		string	strName = asString(ipThisSub->Name);
@@ -1304,7 +1302,7 @@ void RuleTesterDlg::doResize()
 
 		// Resize the Picture control around the Grid
 		CWnd*	pPicture = GetDlgItem( IDC_PICTURE );
-		if (pPicture != NULL)
+		if (pPicture != __nullptr)
 		{
 			// Get the Tree List dimensions
 			CRect	rectGrid;
@@ -1401,7 +1399,7 @@ void RuleTesterDlg::editSelectedAttribute()
 				// Retrieve Attribute
 				IAttribute	*pAttr = (IAttribute *)dwTemp;
 				UCLID_AFCORELib::IAttributePtr ipAttribute( pAttr );
-				ASSERT_RESOURCE_ALLOCATION("ELI09254", ipAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09254", ipAttribute != __nullptr);
 
 				// Update Name and/or Type information
 				if (bUpdated)
@@ -1420,7 +1418,7 @@ void RuleTesterDlg::editSelectedAttribute()
 				{
 					// Update SpatialString
 					ISpatialStringPtr ipValue = ipAttribute->GetValue();
-					ASSERT_RESOURCE_ALLOCATION("ELI09255", ipValue != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI09255", ipValue != __nullptr);
 					ipValue->Replace(ipValue->String, get_bstr_t( LPCTSTR(zValue) ), VARIANT_FALSE, 
 						0, NULL);
 
@@ -1439,10 +1437,10 @@ void RuleTesterDlg::editSelectedAttribute()
 //-------------------------------------------------------------------------------------------------
 UCLID_AFCORELib::IAttributeFinderEnginePtr RuleTesterDlg::getAFEngine()
 {
-	if (m_ipEngine == NULL)
+	if (m_ipEngine == __nullptr)
 	{
 		m_ipEngine.CreateInstance(CLSID_AttributeFinderEngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI04738", m_ipEngine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI04738", m_ipEngine != __nullptr);
 	}
 	
 	return m_ipEngine;
@@ -1468,17 +1466,17 @@ void RuleTesterDlg::highlightAttributeInRow()
 		// Get pointer to associated Attribute
 		IAttribute	*pAttr = (IAttribute *)dwTemp;
 		UCLID_AFCORELib::IAttributePtr ipAttribute( pAttr );
-		ASSERT_RESOURCE_ALLOCATION("ELI06567", ipAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06567", ipAttribute != __nullptr);
 
 		// get the spatial string representing the attribute value
 		ISpatialStringPtr ipValue = ipAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION("ELI06568", ipValue != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06568", ipValue != __nullptr);
 
 		string strImage = ipValue->SourceDocName;
 		
 
 		ISRIRUtilsPtr ipSRIRUtils(CLSID_SRIRUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI06996", ipSRIRUtils != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI06996", ipSRIRUtils != __nullptr);
 
 		ISpotRecognitionWindowPtr ipSRIR(NULL);
 
@@ -1509,10 +1507,10 @@ void RuleTesterDlg::highlightAttributeInRow()
 			ipSRIR->CreateTemporaryHighlight(ipValue);
 
 			IIUnknownVectorPtr ipVecPTHs = ipSRIR->GetParagraphTextHandlers();
-			if (ipVecPTHs == NULL)
+			if (ipVecPTHs == __nullptr)
 			{
 				ipVecPTHs.CreateInstance(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI06997", ipVecPTHs != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI06997", ipVecPTHs != __nullptr);
 			}
 			if (ipVecPTHs->Size() == 0)
 			{
@@ -1565,7 +1563,7 @@ void RuleTesterDlg::updateButtonStates(bool bRulesExecuting)
 		// and a ruleID
 		if (!bRulesExecuting)
 		{
-			if (m_ipAttributes != NULL && m_ipAttributes->Size() > 0)
+			if (m_ipAttributes != __nullptr && m_ipAttributes->Size() > 0)
 			{
 				bEnableVOA = TRUE;
 
@@ -1594,7 +1592,7 @@ void RuleTesterDlg::updateButtonStates(bool bRulesExecuting)
 IInputManagerPtr RuleTesterDlg::getInputManager()
 {
 	IInputManagerSingletonPtr ipInputMgrSingleton(CLSID_InputManagerSingleton);
-	ASSERT_RESOURCE_ALLOCATION("ELI10376", ipInputMgrSingleton != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI10376", ipInputMgrSingleton != __nullptr);
 	return ipInputMgrSingleton->GetInstance();
 }
 //-------------------------------------------------------------------------------------------------

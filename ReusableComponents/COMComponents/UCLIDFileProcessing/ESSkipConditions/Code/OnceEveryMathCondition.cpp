@@ -76,7 +76,7 @@ STDMETHODIMP COnceEveryMathCondition::get_NumberOfTimes(long* pnVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27207", pnVal != NULL);
+		ASSERT_ARGUMENT("ELI27207", pnVal != __nullptr);
 
 		*pnVal = m_nNumberOfTimes;
 
@@ -113,7 +113,7 @@ STDMETHODIMP COnceEveryMathCondition::get_UsageID(BSTR* pbstrUsageID)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27211", pbstrUsageID != NULL);
+		ASSERT_ARGUMENT("ELI27211", pbstrUsageID != __nullptr);
 
 		*pbstrUsageID = _bstr_t(m_strUsageID.c_str()).Detach();
 
@@ -152,7 +152,7 @@ STDMETHODIMP COnceEveryMathCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI27215", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27215", pbValue != __nullptr);
 
 		try
 		{
@@ -180,7 +180,7 @@ STDMETHODIMP COnceEveryMathCondition::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		IOnceEveryMathConditionPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI27217", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27217", ipCopyThis != __nullptr);
 		
 		// Copy the values from another object
 		m_nNumberOfTimes = ipCopyThis->NumberOfTimes;
@@ -202,10 +202,10 @@ STDMETHODIMP COnceEveryMathCondition::raw_Clone(IUnknown **pObject)
 		// Validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27219", pObject != NULL);
+		ASSERT_ARGUMENT("ELI27219", pObject != __nullptr);
 
 		ICopyableObjectPtr ipCopy(CLSID_OnceEveryMathCondition);
-		ASSERT_RESOURCE_ALLOCATION("ELI27220", ipCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27220", ipCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipCopy->CopyFrom(ipUnk);
@@ -260,7 +260,7 @@ STDMETHODIMP COnceEveryMathCondition::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27222", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI27222", pbValue != __nullptr);
 
 		// Configured if:
 		// 1. NumberOfTimes > 1

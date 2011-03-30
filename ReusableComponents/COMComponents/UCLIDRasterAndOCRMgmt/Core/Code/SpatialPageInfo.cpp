@@ -52,7 +52,7 @@ STDMETHODIMP CSpatialPageInfo::get_Deskew(double *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25744", pVal != NULL);
+		ASSERT_ARGUMENT("ELI25744", pVal != __nullptr);
 
 		*pVal = m_fDeskew;
 		return S_OK;
@@ -79,7 +79,7 @@ STDMETHODIMP CSpatialPageInfo::get_Orientation(EOrientation *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25747", pVal != NULL);
+		ASSERT_ARGUMENT("ELI25747", pVal != __nullptr);
 
 		*pVal = (EOrientation) m_eOrientation;
 		return S_OK;
@@ -106,7 +106,7 @@ STDMETHODIMP CSpatialPageInfo::get_Width(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25750", pVal != NULL);
+		ASSERT_ARGUMENT("ELI25750", pVal != __nullptr);
 
 		*pVal = m_nWidth;
 		return S_OK;
@@ -133,7 +133,7 @@ STDMETHODIMP CSpatialPageInfo::get_Height(long *pVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25753", pVal != NULL);
+		ASSERT_ARGUMENT("ELI25753", pVal != __nullptr);
 
 		*pVal = m_nHeight;
 		return S_OK;
@@ -181,8 +181,8 @@ STDMETHODIMP CSpatialPageInfo::GetWidthAndHeight(long* plWidth, long* plHeight)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25757", plWidth != NULL);
-		ASSERT_ARGUMENT("ELI25758", plHeight != NULL);
+		ASSERT_ARGUMENT("ELI25757", plWidth != __nullptr);
+		ASSERT_ARGUMENT("ELI25758", plHeight != __nullptr);
 
 		// Set the return values
 		*plWidth = m_nWidth;
@@ -201,10 +201,10 @@ STDMETHODIMP CSpatialPageInfo::GetPageInfo(long* plWidth, long* plHeight,
 	try
 	{
 		// Check arguments
-		ASSERT_ARGUMENT("ELI25760", plWidth != NULL);
-		ASSERT_ARGUMENT("ELI25761", plHeight != NULL);
-		ASSERT_ARGUMENT("ELI25762", peOrientation != NULL);
-		ASSERT_ARGUMENT("ELI25763", pdDeskew != NULL);
+		ASSERT_ARGUMENT("ELI25760", plWidth != __nullptr);
+		ASSERT_ARGUMENT("ELI25761", plHeight != __nullptr);
+		ASSERT_ARGUMENT("ELI25762", peOrientation != __nullptr);
+		ASSERT_ARGUMENT("ELI25763", pdDeskew != __nullptr);
 
 		// Set the return values
 		*plWidth = m_nWidth;
@@ -226,7 +226,7 @@ STDMETHODIMP CSpatialPageInfo::Equal(ISpatialPageInfo *pPageInfo, VARIANT_BOOL *
 		// Check arguments
 		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo(pPageInfo);
 		ASSERT_ARGUMENT("ELI25765", ipPageInfo);
-		ASSERT_ARGUMENT("ELI25766", pEqual != NULL);
+		ASSERT_ARGUMENT("ELI25766", pEqual != __nullptr);
 
 		long lWidth, lHeight;
 		UCLID_RASTERANDOCRMGMTLib::EOrientation eOrient;
@@ -249,7 +249,7 @@ STDMETHODIMP CSpatialPageInfo::GetTheta(double* pdTheta)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI29948", pdTheta != NULL);
+		ASSERT_ARGUMENT("ELI29948", pdTheta != __nullptr);
 
 		// Determine theta (ie. rotation + deskew)
 		// NOTE: A positive deskew means the original image was rotated counter-clockwise.
@@ -306,7 +306,7 @@ STDMETHODIMP CSpatialPageInfo::raw_CopyFrom(IUnknown * pObject)
 	{
 		// verify valid object
 		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI09148", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09148", ipSource != __nullptr);
 
 		// Get the values from the source object
 		ipSource->GetPageInfo(&m_nWidth, &m_nHeight, &m_eOrientation, &m_fDeskew);
@@ -324,11 +324,11 @@ STDMETHODIMP CSpatialPageInfo::raw_Clone(IUnknown * * pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25768", pObject != NULL);
+		ASSERT_ARGUMENT("ELI25768", pObject != __nullptr);
 
 		// Create a new ISpatialString object
 		ICopyableObjectPtr ipObjCopy(CLSID_SpatialPageInfo);
-		ASSERT_RESOURCE_ALLOCATION("ELI09150", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09150", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk(this);
 		ipObjCopy->CopyFrom(ipUnk);

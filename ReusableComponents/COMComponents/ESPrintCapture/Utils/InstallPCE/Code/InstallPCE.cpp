@@ -104,9 +104,9 @@ BOOL CInstallPCEApp::InitInstance()
 			_lastCodePos = "20";
 
 			// attempt to instantiate the printer capture engine specified
-			IPrintCaptureEnginePtr ipPCEngine = NULL;
+			IPrintCaptureEnginePtr ipPCEngine = __nullptr;
 			ipPCEngine.CreateInstance(strProgID.c_str());
-			if (ipPCEngine == NULL)
+			if (ipPCEngine == __nullptr)
 			{
 				UCLIDException ue("ELI20738", "PCEProgID is not a valid ESPrintCaptureEngine!");
 				ue.addDebugInfo("PCEProgID", strProgID);
@@ -175,7 +175,7 @@ UINT CInstallPCEApp::closeDefaultPrinterPrompt(LPVOID pData)
 	{
 		// Search for a window with the title "Setup"
 		HWND hwnd = ::FindWindow(NULL, "Setup");
-		if (hwnd != NULL)
+		if (hwnd != __nullptr)
 		{
 			// If we found such a window, search for two immediate children-- one that contains
 			// "default printer" (the message box's prompt) and another whose text is "No" (the 
@@ -184,7 +184,7 @@ UINT CInstallPCEApp::closeDefaultPrinterPrompt(LPVOID pData)
 			HWND hwndNoButton = NULL;
 
 			for (HWND hwndChild = ::GetWindow(hwnd, GW_CHILD); 
-				hwndChild != NULL;  
+				hwndChild != __nullptr;  
 				hwndChild = ::GetWindow(hwndChild, GW_HWNDNEXT))
 			{
 				// Retrieve the text of the child window (control).
@@ -205,7 +205,7 @@ UINT CInstallPCEApp::closeDefaultPrinterPrompt(LPVOID pData)
 
 			// If we found both the child controls we were looking for, simulate the pressing of
 			// the no button and exit the thread.
-			if (hwndPrompt != NULL && hwndNoButton != NULL)
+			if (hwndPrompt != __nullptr && hwndNoButton != __nullptr)
 			{
 				::PostMessage(hwndNoButton, WM_LBUTTONDOWN, 0, 0);
 				::PostMessage(hwndNoButton, WM_LBUTTONUP, 0, 0);

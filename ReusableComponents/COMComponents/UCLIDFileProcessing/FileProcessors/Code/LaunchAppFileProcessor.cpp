@@ -135,8 +135,8 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, 
 	{
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI17918", pFAMTM != NULL);
-		ASSERT_ARGUMENT("ELI17919", pResult != NULL);
+		ASSERT_ARGUMENT("ELI17918", pFAMTM != __nullptr);
+		ASSERT_ARGUMENT("ELI17919", pResult != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31340", ipFileRecord != __nullptr);
 
@@ -234,7 +234,7 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_GetComponentDescription(BSTR * pstrCom
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19613", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI19613", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Core: Launch application").Detach();
 	}
@@ -253,7 +253,7 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_FILEPROCESSORSLib::ILaunchAppFileProcessorPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI12205", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12205", ipCopyThis != __nullptr);
 		
 		m_strCmdLine = asString(ipCopyThis->CommandLine);
 		m_strWorkingDir = asString(ipCopyThis->WorkingDirectory);
@@ -279,11 +279,11 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_Clone(IUnknown **pObject)
 		// Validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25463", pObject != NULL);
+		ASSERT_ARGUMENT("ELI25463", pObject != __nullptr);
 
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance(CLSID_LaunchAppFileProcessor);
-		ASSERT_RESOURCE_ALLOCATION("ELI12203", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12203", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -304,7 +304,7 @@ STDMETHODIMP CLaunchAppFileProcessor::GetClassID(CLSID *pClassID)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	try
 	{
-		ASSERT_ARGUMENT("ELI25462", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI25462", pClassID != __nullptr);
 
 		*pClassID = CLSID_LaunchAppFileProcessor;
 		return S_OK;
@@ -325,7 +325,7 @@ STDMETHODIMP CLaunchAppFileProcessor::Load(IStream *pStream)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25460", pStream != NULL);
+		ASSERT_ARGUMENT("ELI25460", pStream != __nullptr);
 
 		// reset member variables
 		m_bBlocking = true;
@@ -412,7 +412,7 @@ STDMETHODIMP CLaunchAppFileProcessor::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25459", pStream != NULL);
+		ASSERT_ARGUMENT("ELI25459", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -461,7 +461,7 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25458", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI25458", pbValue != __nullptr);
 
 		// Both command-line and working directory must be defined
 		bool bConfigured = !(m_strCmdLine.empty() || m_strWorkingDir.empty());
@@ -485,7 +485,7 @@ STDMETHODIMP CLaunchAppFileProcessor::get_CommandLine(BSTR *pRetVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25464", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI25464", pRetVal != __nullptr);
 
 		*pRetVal = _bstr_t(m_strCmdLine.c_str()).Detach();
 	}
@@ -513,7 +513,7 @@ STDMETHODIMP CLaunchAppFileProcessor::put_CommandLine(BSTR newVal)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14475", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14475", ipFAMTagManager != __nullptr);
 
 		// make sure the file contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strCmdLine.c_str()) == VARIANT_TRUE)
@@ -542,7 +542,7 @@ STDMETHODIMP CLaunchAppFileProcessor::get_WorkingDirectory(BSTR *pRetVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25465", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI25465", pRetVal != __nullptr);
 
 		*pRetVal = _bstr_t(m_strWorkingDir.c_str()).Detach();
 	}
@@ -570,7 +570,7 @@ STDMETHODIMP CLaunchAppFileProcessor::put_WorkingDirectory(BSTR newVal)
 		// Create a local IFAMTagManagerPtr object
 		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager;
 		ipFAMTagManager.CreateInstance(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI14477", ipFAMTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14477", ipFAMTagManager != __nullptr);
 
 		// make sure the file contains valid string tags
 		if (ipFAMTagManager->StringContainsInvalidTags(strWorkingDir.c_str()) == VARIANT_TRUE)
@@ -599,7 +599,7 @@ STDMETHODIMP CLaunchAppFileProcessor::get_Parameters(BSTR* pRetVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25474", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI25474", pRetVal != __nullptr);
 
 		*pRetVal = _bstr_t(m_strParameters.c_str()).Detach();
 	}
@@ -631,7 +631,7 @@ STDMETHODIMP CLaunchAppFileProcessor::get_IsBlocking(VARIANT_BOOL *pRetVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI25466", pRetVal != NULL);
+		ASSERT_ARGUMENT("ELI25466", pRetVal != __nullptr);
 
 		*pRetVal = asVariantBool(m_bBlocking);
 	}
@@ -667,7 +667,7 @@ STDMETHODIMP CLaunchAppFileProcessor::get_PropagateErrors(VARIANT_BOOL* pbVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28973", pbVal != NULL);
+		ASSERT_ARGUMENT("ELI28973", pbVal != __nullptr);
 
 		*pbVal = asVariantBool(m_bPropagateErrors);
 

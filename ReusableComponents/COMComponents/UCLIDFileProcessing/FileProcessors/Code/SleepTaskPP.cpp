@@ -41,7 +41,7 @@ STDMETHODIMP CSleepTaskPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI29611", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI29611", pbValue != __nullptr);
 
 		try
 		{
@@ -78,7 +78,7 @@ STDMETHODIMP CSleepTaskPP::Apply()
 			// Get the SleepTask associated with this property page
 			// NOTE: this assumes only one coclass is associated with this property page
 			UCLID_FILEPROCESSORSLib::ISleepTaskPtr ipSleep(m_ppUnk[0]);
-			ASSERT_RESOURCE_ALLOCATION("ELI29613", ipSleep != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI29613", ipSleep != __nullptr);
 
 			CString zText;
 			m_editSleepTime.GetWindowText(zText);
@@ -122,7 +122,7 @@ LRESULT CSleepTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 		// Get the SleepTask associated with this property page
 		// NOTE: this assumes only one coclass is associated with this property page
 		UCLID_FILEPROCESSORSLib::ISleepTaskPtr ipSleep(m_ppUnk[0]);
-		ASSERT_RESOURCE_ALLOCATION("ELI29615", ipSleep != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29615", ipSleep != __nullptr);
 
 		// Prepare controls
 		prepareControls();

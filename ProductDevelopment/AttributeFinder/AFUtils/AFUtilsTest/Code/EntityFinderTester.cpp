@@ -36,7 +36,7 @@ CEntityFinderTester::CEntityFinderTester()
 	{
 		// Create the Entity Finder object
 		m_ipEntityFinder.CreateInstance( CLSID_EntityFinder );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06172", m_ipEntityFinder != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06172", m_ipEntityFinder != __nullptr );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06179")
 }
@@ -267,11 +267,11 @@ void CEntityFinderTester::prepareTests()
 {
 	// Create a string for testing
 	m_ipTestString.CreateInstance( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI06160", m_ipTestString != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI06160", m_ipTestString != __nullptr );
 
 	// Create a string for comparison
 	m_ipExpectedString.CreateInstance( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI06164", m_ipExpectedString != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI06164", m_ipExpectedString != __nullptr );
 }
 //-------------------------------------------------------------------------------------------------
 void CEntityFinderTester::processFile(const std::string& strFile)
@@ -407,7 +407,7 @@ const std::string CEntityFinderTester::getMasterTestFileName(IVariantVectorPtr i
 {
 	// if pParams is not empty and the second item is specified,
 	// then the second item is the master dat file
-	if ((ipParams != NULL) && (ipParams->Size > 1))
+	if ((ipParams != __nullptr) && (ipParams->Size > 1))
 	{
 		// get the DAT filename
 		string strMasterDatFileName = ::getAbsoluteFileName(strTCLFile, asString(_bstr_t(ipParams->GetItem(1))), true);

@@ -53,7 +53,7 @@ public:
 private:
 	std::map<std::string, std::string> m_mapInputTypeToValidChars;
 
-	std::auto_ptr<OCRFilterSchemesDlg> m_apFilterSchemeDlg;
+	std::unique_ptr<OCRFilterSchemesDlg> m_apFilterSchemeDlg;
 
 	OCRFilterSchemesDlg* getFilterSchemeDlg();
 

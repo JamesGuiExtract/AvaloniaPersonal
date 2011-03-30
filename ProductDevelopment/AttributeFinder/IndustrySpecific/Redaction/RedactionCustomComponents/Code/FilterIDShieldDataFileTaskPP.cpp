@@ -55,7 +55,7 @@ STDMETHODIMP CFilterIDShieldDataFileTaskPP::raw_IsLicensed(VARIANT_BOOL * pbValu
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI24830", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI24830", pbValue != __nullptr);
 
 		try
 		{
@@ -90,7 +90,7 @@ STDMETHODIMP CFilterIDShieldDataFileTaskPP::Apply(void)
 		{
 			// Get the filter task object
 			UCLID_REDACTIONCUSTOMCOMPONENTSLib::IFilterIDShieldDataFileTaskPtr ipFilterTask(m_ppUnk[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI24832", ipFilterTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI24832", ipFilterTask != __nullptr);
 
 			// Get the VOA file to read
 			_bstr_t bstrVOAFileToRead;
@@ -184,7 +184,7 @@ LRESULT CFilterIDShieldDataFileTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LP
 
 		// Get Redaction File Processor object
 		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IFilterIDShieldDataFileTaskPtr ipFilterTask(m_ppUnk[0]);
-		ASSERT_RESOURCE_ALLOCATION("ELI24835", ipFilterTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24835", ipFilterTask != __nullptr);
 
 		//////////////////////////
 		// Initialize data members
@@ -205,7 +205,7 @@ LRESULT CFilterIDShieldDataFileTaskPP::OnInitDialog(UINT uMsg, WPARAM wParam, LP
 
 		// Get the data types
 		IVariantVectorPtr ipVarDataTypes = ipFilterTask->DataTypes;
-		ASSERT_RESOURCE_ALLOCATION("ELI24836", ipVarDataTypes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24836", ipVarDataTypes != __nullptr);
 		setDataTypeCheckBoxes(ipVarDataTypes);
 
 		// VOA file to write
@@ -350,7 +350,7 @@ void CFilterIDShieldDataFileTaskPP::setDataTypeCheckBoxes(IVariantVectorPtr ipVa
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI24845", ipVarDataTypes != NULL);
+		ASSERT_ARGUMENT("ELI24845", ipVarDataTypes != __nullptr);
 
 		// Set the appropriate check boxes (and the other text field)
 		string strOther = "";
@@ -418,7 +418,7 @@ IVariantVectorPtr CFilterIDShieldDataFileTaskPP::getDataTypeCheckBoxes()
 	{
 		// Create a variant vector to hold the return values
 		IVariantVectorPtr ipVarDataTypes(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI24847", ipVarDataTypes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24847", ipVarDataTypes != __nullptr);
 
 		// Add data type for each check box that is checked
 		if (m_checkSSN.GetCheck() == BST_CHECKED)
@@ -484,7 +484,7 @@ bool CFilterIDShieldDataFileTaskPP::doInputOutputFilesMatch(const string &strInp
 	{
 		// Get a FAM tag manager and set the FPS file directory
 		IFAMTagManagerPtr ipFamTagManager(CLSID_FAMTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI24850", ipFamTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24850", ipFamTagManager != __nullptr);
 		ipFamTagManager->FPSFileDir = "C:\\Validation";
 		
 		// Create a fake source doc name

@@ -28,21 +28,21 @@ CEntityFinder::CEntityFinder()
 	try
 	{
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13036", m_ipMiscUtils != NULL );
+		ASSERT_RESOURCE_ALLOCATION("ELI13036", m_ipMiscUtils != __nullptr );
 
 		// Instantiate the Entity Keywords object
 		m_ipKeys.CreateInstance( CLSID_EntityKeywords );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06027", m_ipKeys != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06027", m_ipKeys != __nullptr );
 
 		// Create pointer to Registry Persistence Manager
-		ma_pUserCfgMgr = auto_ptr<IConfigurationSettingsPersistenceMgr>(
+		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAFUTILS_KEY_PATH ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06162", ma_pUserCfgMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06162", ma_pUserCfgMgr.get() != __nullptr );
 
 		// Create pointer to Entity Finder settings
-		ma_pEFConfigMgr = auto_ptr<EntityFinderConfigMgr>(
+		ma_pEFConfigMgr = unique_ptr<EntityFinderConfigMgr>(
 			new EntityFinderConfigMgr( ma_pUserCfgMgr.get(), "\\EntityFinder" ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06163", ma_pEFConfigMgr.get() != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06163", ma_pEFConfigMgr.get() != __nullptr );
 
 		// Check logging flag
 		m_bLoggingEnabled = (ma_pEFConfigMgr->getLoggingEnabled() > 0) ? true : false;
@@ -54,8 +54,8 @@ CEntityFinder::~CEntityFinder()
 {
 	try
 	{
-		m_ipKeys = NULL;
-		m_ipMiscUtils = NULL;
+		m_ipKeys = __nullptr;
+		m_ipMiscUtils = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29442");
 }
@@ -95,7 +95,7 @@ STDMETHODIMP CEntityFinder::FindEntities(ISpatialString* pText)
 
 		// Copy text to local SpatialString and string
 		ISpatialStringPtr ipInputText( pText );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09399", ipInputText != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09399", ipInputText != __nullptr );
 
 		findEntities(ipInputText);
 	}
@@ -112,7 +112,7 @@ STDMETHODIMP CEntityFinder::FindEntitiesInAttributes(IIUnknownVector *pAttribute
 	{
 		// make sure the vec of attributes are not null
 		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_ARGUMENT("ELI07081", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI07081", ipAttributes != __nullptr);
 
 		// go through all attributes in the vec
 		long nSize = ipAttributes->Size();
@@ -120,14 +120,14 @@ STDMETHODIMP CEntityFinder::FindEntitiesInAttributes(IIUnknownVector *pAttribute
 		{
 			IAttributePtr ipAttr = ipAttributes->At(n);
 			// make sure the vector contains IAttribute
-			if (ipAttr == NULL)
+			if (ipAttr == __nullptr)
 			{
 				throw UCLIDException("ELI07082", "The IUnknownVector shall contain objects of IAttribute.");
 			}
 
 			// get spatial string from each attribute
 			ISpatialStringPtr ipSpatialString = ipAttr->Value;
-			ASSERT_RESOURCE_ALLOCATION("ELI26596", ipSpatialString != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26596", ipSpatialString != __nullptr);
 
 			// find proper entity from the string
 			findEntities(ipSpatialString);
@@ -181,10 +181,10 @@ STDMETHODIMP CEntityFinder::raw_ModifyValue(IAttribute * pAttribute, IAFDocument
 		validateLicense();
 
 		IAttributePtr	ipAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION( "ELI09297", ipAttribute != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09297", ipAttribute != __nullptr );
 
 		ISpatialStringPtr ipInputText = ipAttribute->Value;
-		ASSERT_RESOURCE_ALLOCATION( "ELI09298", ipInputText != NULL);
+		ASSERT_RESOURCE_ALLOCATION( "ELI09298", ipInputText != __nullptr);
 
 		findEntities(ipInputText);
 	}
@@ -202,7 +202,7 @@ STDMETHODIMP CEntityFinder::raw_GetComponentDescription(BSTR * pstrComponentDesc
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19569", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19569", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Find company or person(s)").Detach();
 	}
@@ -239,7 +239,7 @@ STDMETHODIMP CEntityFinder::raw_Clone(IUnknown **pObject)
 
 		// Create a new EntityFinder object
 		ICopyableObjectPtr ipObjCopy(CLSID_EntityFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI08341", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08341", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);

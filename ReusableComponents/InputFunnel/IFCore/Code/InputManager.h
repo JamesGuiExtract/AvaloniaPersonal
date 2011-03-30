@@ -216,7 +216,7 @@ private:
 	// WindowIRManager object below is used to keep track of
 	// InputReceivers from external applications, where each
 	// InputReceiver is a window represented by an HWND
-	std::auto_ptr<WindowIRManager> m_apWindowIRManager;
+	std::unique_ptr<WindowIRManager> m_apWindowIRManager;
 
 	// module handles after loading the libraries
 	HMODULE m_hModuleSSOCR;

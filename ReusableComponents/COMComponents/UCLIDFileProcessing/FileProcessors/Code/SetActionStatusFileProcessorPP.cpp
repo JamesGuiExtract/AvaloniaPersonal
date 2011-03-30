@@ -60,7 +60,7 @@ STDMETHODIMP CSetActionStatusFileProcessorPP::Apply()
 		for (UINT i = 0; i < m_nObjects; i++)
 		{
 			UCLID_FILEPROCESSORSLib::ISetActionStatusFileProcessorPtr ipFP(m_ppUnk[i]);
-			ASSERT_RESOURCE_ALLOCATION("ELI15141", ipFP != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15141", ipFP != __nullptr);
 
 			string strActionName = getActionName();
 
@@ -114,7 +114,7 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 		// get the underlying objet
 		UCLID_FILEPROCESSORSLib::ISetActionStatusFileProcessorPtr ipSetActionStatusFP = m_ppUnk[0];
 
-		if (ipSetActionStatusFP != NULL)
+		if (ipSetActionStatusFP != __nullptr)
 		{
 			// bind the combo box controls to the UI controls
 			m_cmbActionName = GetDlgItem(IDC_COMBO_ACTION);
@@ -147,14 +147,14 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 			// create a database manager object so that we can retrieve
 			// the actions stored in the database
 			IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-			ASSERT_RESOURCE_ALLOCATION("ELI15131", ipDB != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15131", ipDB != __nullptr);
 
 			// Connect database using last used settings in this instance
 			ipDB->ConnectLastUsedDBThisProcess();
 
 			// add entries to the combo box for actions
 			IStrToStrMapPtr ipActionIDToNameMap = ipDB->GetActions();
-			ASSERT_RESOURCE_ALLOCATION("ELI15132", ipActionIDToNameMap != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI15132", ipActionIDToNameMap != __nullptr);
 
 			long lSize = ipActionIDToNameMap->Size;
 			for (long i = 0; i < lSize; i++)

@@ -59,7 +59,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 
 		// Instantiate the Regular Expression parser
 		IRegularExprParserPtr ipParser = m_ipMiscUtils->GetNewRegExpParserInstance("EntityFinder");
-		ASSERT_RESOURCE_ALLOCATION( "ELI06026", ipParser != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06026", ipParser != __nullptr );
 
 		///////////////////////////////////////////////////
 		// Step 0A: Remove any embedded Address information
@@ -92,7 +92,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 
 		// Create local ISpatialString
 		ISpatialStringPtr	ipSpatial( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06159", ipSpatial != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06159", ipSpatial != __nullptr );
 
 		// Final string as collection of portions
 		string strFinal;
@@ -108,7 +108,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		// Retrieve list of EntityTrimLeadingPhrases expressions
 		IVariantVectorPtr ipTrimLeading = m_ipKeys->GetKeywordCollection( 
 			_bstr_t( "EntityTrimLeadingPhrases" ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI26463", ipTrimLeading != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI26463", ipTrimLeading != __nullptr );
 
 		// Check string for Phrases
 		long	lTrimStart = -1;
@@ -150,7 +150,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		// Retrieve list of Municipality Indicator expressions
 		IVariantVectorPtr ipMuniInd = m_ipKeys->GetKeywordCollection( 
 			_bstr_t( "MunicipalityIndicators" ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10527", ipMuniInd != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10527", ipMuniInd != __nullptr );
 
 		// Check string for Muni Indicators
 		long	lMuniStart = -1;
@@ -472,7 +472,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 		/////////////////////////////////////////////////
 
 		ISpatialStringPtr	ipResult( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06673", ipResult != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06673", ipResult != __nullptr );
 
 		iLength = strLocal.length();
 		if (iLength > 0)
@@ -482,7 +482,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 			{
 				// Trim the carriage returns and succeeding text
 				ipResult = ipText->GetSubString( lTrimPos, lTrimPos + iLength - 1 );
-				ASSERT_RESOURCE_ALLOCATION("ELI25949", ipResult != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI25949", ipResult != __nullptr);
 			}
 			else
 			{
@@ -529,7 +529,7 @@ void CEntityFinder::findEntities(const ISpatialStringPtr& ipText)
 
 		// Store the trimmed string
 		ICopyableObjectPtr ipInput = ipText;
-		ASSERT_RESOURCE_ALLOCATION("ELI25950", ipInput != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI25950", ipInput != __nullptr);
 		ipInput->CopyFrom(ipResult);
 
 #ifdef _DEBUG
@@ -1288,7 +1288,7 @@ string CEntityFinder::doGeneralTrimming(string strInput, bool bPersonFound,
 	{
 		// Create local ISpatialString
 		ISpatialStringPtr	ipSpatial( CLSID_SpatialString );
-		ASSERT_RESOURCE_ALLOCATION( "ELI06379", ipSpatial != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI06379", ipSpatial != __nullptr );
 		ipSpatial->CreateNonSpatialString(strInput.c_str(), "");
 
 		long	lStartPos = -1;
@@ -1302,9 +1302,9 @@ string CEntityFinder::doGeneralTrimming(string strInput, bool bPersonFound,
 			// Create a composite collection of Alias items
 			IShallowCopyablePtr ipCopier = m_ipKeys->GetCompanyAlias( 
 				(UCLID_AFUTILSLib::ECompanyAliasType)kCompanyAliasAll );
-			ASSERT_RESOURCE_ALLOCATION("ELI26072", ipCopier != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26072", ipCopier != __nullptr);
 			IVariantVectorPtr	ipAliases = ipCopier->ShallowCopy();
-			ASSERT_RESOURCE_ALLOCATION( "ELI10561", ipAliases != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI10561", ipAliases != __nullptr );
 			ipAliases->Append( m_ipKeys->GetRelatedCompany( 
 				(UCLID_AFUTILSLib::ERelatedCompanyType)kRelatedCompanyAll ) );
 
@@ -1356,13 +1356,13 @@ bool CEntityFinder::findCompanyEnd(ISpatialStringPtr ipText, IRegularExprParserP
 	// Create a composite collection of Company Alias items
 	IShallowCopyablePtr ipCopier = m_ipKeys->GetCompanyAlias( 
 		(UCLID_AFUTILSLib::ECompanyAliasType)kCompanyAliasAll );
-	ASSERT_RESOURCE_ALLOCATION("ELI26073", ipCopier != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI26073", ipCopier != __nullptr);
 	IVariantVectorPtr	ipAliases = ipCopier->ShallowCopy();
-	ASSERT_RESOURCE_ALLOCATION( "ELI10562", ipAliases != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10562", ipAliases != __nullptr );
 	ipAliases->Append( m_ipKeys->GetRelatedCompany( 
 		(UCLID_AFUTILSLib::ERelatedCompanyType)kRelatedCompanyAll ) );
 
-	ASSERT_ARGUMENT( "ELI08868", ipText != NULL );
+	ASSERT_ARGUMENT( "ELI08868", ipText != __nullptr );
 
 	string	strLocal = asString(ipText->String);
 	long	lLength = strLocal.length();
@@ -1743,9 +1743,9 @@ long CEntityFinder::findFirstCaseWord(const string& strText, int iStartPos, bool
 	// Separate string into individual words
 	UCLID_COMUTILSLib::IRegularExprParserPtr ipParser = 
 		m_ipMiscUtils->GetNewRegExpParserInstance("EntityFinder");
-	ASSERT_RESOURCE_ALLOCATION("ELI13038", ipParser != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI13038", ipParser != __nullptr);
 
-	if (ipParser != NULL)
+	if (ipParser != __nullptr)
 	{
 		ipParser->IgnoreCase = VARIANT_TRUE;
 
@@ -1923,9 +1923,9 @@ long CEntityFinder::findSeparatorWordEnd(const string& strText, IRegularExprPars
 	////////////////////////////////////////
 	IShallowCopyablePtr ipCopier = m_ipKeys->GetPersonAlias( 
 		(UCLID_AFUTILSLib::EPersonAliasType)kPersonAliasAll );
-	ASSERT_RESOURCE_ALLOCATION("ELI26074", ipCopier != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI26074", ipCopier != __nullptr);
 	IVariantVectorPtr	ipSeparators = ipCopier->ShallowCopy();
-	ASSERT_RESOURCE_ALLOCATION( "ELI09394", ipSeparators != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09394", ipSeparators != __nullptr );
 	long lSize = ipSeparators->Size;
 
 	// Add "&", "and", "etux"
@@ -1950,7 +1950,7 @@ long CEntityFinder::findSeparatorWordEnd(const string& strText, IRegularExprPars
 
 	// Create local SpatialString for testing
 	ISpatialStringPtr	ipLocal( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI09395", ipLocal != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09395", ipLocal != __nullptr );
 	ipLocal->CreateNonSpatialString(strText.c_str(), "");
 
 	// Find earliest separator
@@ -1994,14 +1994,14 @@ bool CEntityFinder::foundKeywordPhraseOverlap(const string& strText1, const stri
 	//   - PersonDesignators
 	//   - PersonTrimIdentifiers
 	IShallowCopyablePtr	ipPD = m_ipKeys->PersonDesignators;
-	ASSERT_RESOURCE_ALLOCATION( "ELI15581", ipPD != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI15581", ipPD != __nullptr );
 	IVariantVectorPtr	ipPhrases = ipPD->ShallowCopy();
-	ASSERT_RESOURCE_ALLOCATION( "ELI10256", ipPhrases != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10256", ipPhrases != __nullptr );
 	ipPhrases->Append( m_ipKeys->PersonTrimIdentifiers );
 
 	// Create SpatialString for testing
 	ISpatialStringPtr	ipSpatial( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10257", ipSpatial != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10257", ipSpatial != __nullptr );
 	ipSpatial->CreateNonSpatialString(strTest.c_str(), "");
 
 	// Check test string for any overlapping phrase
@@ -2049,7 +2049,7 @@ string CEntityFinder::getAddressSuffixPattern()
 
 	// Get path to file
 	UCLID_AFUTILSLib::IAFUtilityPtr ipAFUtils( CLSID_AFUtility );
-	ASSERT_RESOURCE_ALLOCATION( "ELI09474", ipAFUtils != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09474", ipAFUtils != __nullptr );
 
 	_bstr_t bstrFolder = ipAFUtils->GetComponentDataFolder();
 	string strPatternFile = bstrFolder.operator const char *();
@@ -2091,23 +2091,23 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText, IRegularExprPa
 
 	// Get the collection of regular expressions for the existence of states [P16 2051]
 	IShallowCopyablePtr ipStateList = m_ipKeys->GetKeywordCollection( "StateList" );
-	ASSERT_RESOURCE_ALLOCATION("ELI15730", ipStateList != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI15730", ipStateList != __nullptr);
 	IVariantVectorPtr	ipSearchStates = ipStateList->ShallowCopy();
 
 	// Create IMiscUtil object to process results
 	IMiscUtilsPtr ipMiscUtils( CLSID_MiscUtils );
-	ASSERT_RESOURCE_ALLOCATION( "ELI09387", ipMiscUtils != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09387", ipMiscUtils != __nullptr );
 
 	// Create object to hold found patterns
 	IIUnknownVectorPtr ipFound( CLSID_IUnknownVector );
-	ASSERT_RESOURCE_ALLOCATION( "ELI09388", ipFound != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09388", ipFound != __nullptr );
 
 	// Define collection of regular expressions for Person Alias, Person Designator, and states
 	IShallowCopyablePtr ipCopier = m_ipKeys->GetPersonAlias( 
 		(UCLID_AFUTILSLib::EPersonAliasType)kPersonAliasAll );
-	ASSERT_RESOURCE_ALLOCATION("ELI26082", ipCopier != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI26082", ipCopier != __nullptr);
 	IVariantVectorPtr	ipSearchRE = ipCopier->ShallowCopy();
-	ASSERT_RESOURCE_ALLOCATION( "ELI09389", ipSearchRE != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09389", ipSearchRE != __nullptr );
 	ipSearchRE->Append( m_ipKeys->PersonDesignators );
 	ipSearchRE->Append( ipSearchStates );
 
@@ -2131,7 +2131,7 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText, IRegularExprPa
 			ipMiscUtils->GetRegExpData( ipFound, 0, -1, &nStart, &nEnd );
 
 			ISpatialStringPtr	ipResult = ripText->GetSubString( nStart, nEnd );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09390", ipResult != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09390", ipResult != __nullptr );
 
 			// Check result for desired pattern (Alias or Designator)
 			if (!asCppBool(ipResult->ContainsStringInVector(
@@ -2174,7 +2174,7 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText, IRegularExprPa
 			ipMiscUtils->GetRegExpData( ipFound, 0, -1, &nStart, &nEnd );
 
 			ISpatialStringPtr	ipResult = ripText->GetSubString( nStart, nEnd );
-			ASSERT_RESOURCE_ALLOCATION( "ELI09391", ipResult != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI09391", ipResult != __nullptr );
 
 			// Check result for desired pattern (Alias or Designator)
 			if (!asCppBool(ipResult->ContainsStringInVector(
@@ -2211,7 +2211,7 @@ bool CEntityFinder::doTrustTrimming(ISpatialStringPtr &ripSpatial, IRegularExprP
 
 	// Retrieve list of Trust Indicator expressions
 	IVariantVectorPtr ipTrustInd = m_ipKeys->GetKeywordCollection( _bstr_t( "TrustIndicators" ) );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10347", ipTrustInd != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10347", ipTrustInd != __nullptr );
 
 	// Local string for searches and trimming
 	string strTrust = asString(ripSpatial->String);
@@ -2277,7 +2277,7 @@ bool CEntityFinder::doTrustTrimming(ISpatialStringPtr &ripSpatial, IRegularExprP
 	{
 		// Retrieve list of Non Trust Indicator expressions
 		IVariantVectorPtr ipNonTrust = m_ipKeys->GetKeywordCollection( _bstr_t( "NonTrust" ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI10485", ipNonTrust != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI10485", ipNonTrust != __nullptr );
 
 		// Continue only if a Non-Trust Indicator was not found
 		if (!asCppBool(ripSpatial->ContainsStringInVector(
@@ -2455,7 +2455,7 @@ bool CEntityFinder::hasDateText(const string& strText, IRegularExprParserPtr ipP
 
 	// Create SpatialString for testing
 	ISpatialStringPtr	ipSpatial( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI08751", ipSpatial != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI08751", ipSpatial != __nullptr );
 	ipSpatial->CreateNonSpatialString(strLocal.c_str(), "");
 
 	// Check string for Month Word
@@ -2522,14 +2522,14 @@ bool CEntityFinder::isKeywordPhrase(const string& strText, IRegularExprParserPtr
 	//   - PersonDesignators
 	//   - PersonTrimIdentifiers
 	IShallowCopyablePtr	ipPD = m_ipKeys->PersonDesignators;
-	ASSERT_RESOURCE_ALLOCATION( "ELI15582", ipPD != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI15582", ipPD != __nullptr );
 	IVariantVectorPtr	ipPhrases = ipPD->ShallowCopy();
-	ASSERT_RESOURCE_ALLOCATION( "ELI10258", ipPhrases != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10258", ipPhrases != __nullptr );
 	ipPhrases->Append( m_ipKeys->PersonTrimIdentifiers );
 
 	// Create SpatialString for testing
 	ISpatialStringPtr	ipSpatial( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10259", ipSpatial != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10259", ipSpatial != __nullptr );
 	ipSpatial->CreateNonSpatialString(strTest.c_str(), "");
 
 	// Check test string for an exact match
@@ -2584,7 +2584,7 @@ long CEntityFinder::makeSpaceForAnd(ISpatialStringPtr ipText, IRegularExprParser
 
 	// Locate match
 	IIUnknownVectorPtr	ipMatch1 = ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10532", ipMatch1 != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10532", ipMatch1 != __nullptr );
 
 	long		lStartPos, lEndPos;
 	ITokenPtr	ipToken;
@@ -2608,7 +2608,7 @@ long CEntityFinder::makeSpaceForAnd(ISpatialStringPtr ipText, IRegularExprParser
 
 	// Locate match
 	IIUnknownVectorPtr	ipMatch2 = ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE );
-	ASSERT_RESOURCE_ALLOCATION( "ELI10533", ipMatch2 != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI10533", ipMatch2 != __nullptr );
 
 	// Retrieve this token
 	if (ipMatch2->Size() > 0)
@@ -2845,9 +2845,9 @@ bool CEntityFinder::removeAddressText(const ISpatialStringPtr& ripText,
 
 	// Retrieve collection of Address Indicator items
 	IShallowCopyablePtr	ipAI = m_ipKeys->AddressIndicators;
-	ASSERT_RESOURCE_ALLOCATION( "ELI15583", ipAI != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI15583", ipAI != __nullptr );
 	IVariantVectorPtr	ipAddress = ipAI->ShallowCopy();
-	ASSERT_RESOURCE_ALLOCATION( "ELI09464", ipAddress != NULL );
+	ASSERT_RESOURCE_ALLOCATION( "ELI09464", ipAddress != __nullptr );
 
 	// Get Address Suffix pattern
 	string strAddressSuffix = getAddressSuffixPattern();

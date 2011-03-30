@@ -33,7 +33,7 @@ m_ipAS(NULL)
 	try
 	{
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI09563", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI09563", m_ipAFUtility != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI09564")
 }
@@ -74,10 +74,10 @@ STDMETHODIMP CRemoveSubAttributes::get_DataScorer(IObjectWithDescription** pVal)
 		// Check licensing
 		validateLicense();
 
-		if(m_ipDataScorer == NULL)
+		if(m_ipDataScorer == __nullptr)
 		{
 			m_ipDataScorer.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI09797", m_ipDataScorer != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09797", m_ipDataScorer != __nullptr);
 		}
 
 		CComQIPtr<IObjectWithDescription> ipDataScorer(m_ipDataScorer);
@@ -96,7 +96,7 @@ STDMETHODIMP CRemoveSubAttributes::put_DataScorer(IObjectWithDescription* newVal
 	{
 		// Check licensing
 		validateLicense();
-		ASSERT_ARGUMENT("ELI09789", newVal != NULL);
+		ASSERT_ARGUMENT("ELI09789", newVal != __nullptr);
 
 		m_ipDataScorer = newVal;
 		m_bDirty = true;
@@ -230,7 +230,7 @@ STDMETHODIMP CRemoveSubAttributes::put_AttributeSelector(IAttributeSelector * ne
 	{
 		// Check licensing
 		validateLicense();
-		ASSERT_ARGUMENT("ELI13314", newVal != NULL);
+		ASSERT_ARGUMENT("ELI13314", newVal != __nullptr);
 
 		m_ipAS = newVal;
 		m_bDirty = true;
@@ -254,8 +254,8 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 		validateLicense();
 
 		IIUnknownVectorPtr ipAttributes(pAttributes);
-		ASSERT_RESOURCE_ALLOCATION("ELI09544", ipAttributes != NULL);
-		IIUnknownVectorPtr ipFoundAttributes = NULL;
+		ASSERT_RESOURCE_ALLOCATION("ELI09544", ipAttributes != __nullptr);
+		IIUnknownVectorPtr ipFoundAttributes = __nullptr;
 
 		if(m_bConditionalRemove)
 		{
@@ -264,13 +264,13 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 
 			// Get the Data scorer object
 			IDataScorerPtr ipDataScorer = m_ipDataScorer->GetObject();
-			ASSERT_RESOURCE_ALLOCATION("ELI09802", ipDataScorer != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09802", ipDataScorer != __nullptr);
 
 			long lSize = ipFoundAttributes->Size();
 			for (long i = 0; i < lSize; i++)
 			{
 				IAttributePtr ipAttr = ipFoundAttributes->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI09566", ipAttr != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09566", ipAttr != __nullptr);
 
 				long nScore = ipDataScorer->GetDataScore1(ipAttr);
 				bool bRemove = false;
@@ -313,7 +313,7 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 			ipFoundAttributes = m_ipAS->SelectAttributes( ipAttributes, pAFDoc );
 		}
 		// if attributes were found(selected) remove them form the source vector
-		if ( ipFoundAttributes != NULL && ipFoundAttributes->Size() > 0 )
+		if ( ipFoundAttributes != __nullptr && ipFoundAttributes->Size() > 0 )
 		{
 			m_ipAFUtility->RemoveAttributes(ipAttributes, ipFoundAttributes); 
 		}
@@ -370,10 +370,10 @@ STDMETHODIMP CRemoveSubAttributes::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		// Check license
 		validateLicense();
 
-		if ( m_ipAS != NULL )
+		if ( m_ipAS != __nullptr )
 		{
 			IMustBeConfiguredObjectPtr ipCfgObj ( m_ipAS );
-			if ( m_ipAS == NULL )
+			if ( m_ipAS == __nullptr )
 			{
 				UCLIDException ue("ELI13347", "Attribute Selector Object must support IMustBeConfiguredObject.");
 				throw ue;
@@ -399,7 +399,7 @@ STDMETHODIMP CRemoveSubAttributes::raw_GetComponentDescription(BSTR * pstrCompon
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19553", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19553", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Remove attributes").Detach();
 	}
@@ -418,7 +418,7 @@ STDMETHODIMP CRemoveSubAttributes::raw_CopyFrom(IUnknown *pObject)
 	try
 	{
 		UCLID_AFOUTPUTHANDLERSLib::IRemoveSubAttributesPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION( "ELI09548", ipSource != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09548", ipSource != __nullptr );
 		
 		m_bConditionalRemove = ipSource->ConditionalRemove == VARIANT_TRUE ? true : false;
 		m_ipDataScorer = ipSource->DataScorer;
@@ -444,7 +444,7 @@ STDMETHODIMP CRemoveSubAttributes::raw_Clone(IUnknown **pObject)
 		// Create another instance of this object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_RemoveSubAttributes );
-		ASSERT_RESOURCE_ALLOCATION( "ELI09549", ipObjCopy != NULL );
+		ASSERT_RESOURCE_ALLOCATION( "ELI09549", ipObjCopy != __nullptr );
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom( ipUnk );
@@ -517,11 +517,11 @@ STDMETHODIMP CRemoveSubAttributes::Load(IStream *pStream)
 			string strQuery;
 			dataReader >> strQuery;
 			IQueryBasedASPtr ipQS(CLSID_QueryBasedAS);
-			ASSERT_RESOURCE_ALLOCATION("ELI13319", ipQS != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI13319", ipQS != __nullptr );
 
 			ipQS->QueryText = strQuery.c_str();
 			m_ipAS = ipQS;
-			ASSERT_RESOURCE_ALLOCATION("ELI13320", m_ipAS != NULL );
+			ASSERT_RESOURCE_ALLOCATION("ELI13320", m_ipAS != __nullptr );
 		}
 		
 		if(nDataVersion >= 2)
@@ -544,7 +544,7 @@ STDMETHODIMP CRemoveSubAttributes::Load(IStream *pStream)
 				// read the data scorer object
 				IPersistStreamPtr ipObj;
 				::readObjectFromStream(ipObj, pStream, "ELI09960");
-				ASSERT_RESOURCE_ALLOCATION("ELI09794", ipObj != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI09794", ipObj != __nullptr);
 				m_ipDataScorer = ipObj;
 			}
 		}
@@ -552,7 +552,7 @@ STDMETHODIMP CRemoveSubAttributes::Load(IStream *pStream)
 		{
 			IPersistStreamPtr ipObj;
 			::readObjectFromStream(ipObj, pStream, "ELI13321");
-			ASSERT_RESOURCE_ALLOCATION("ELI13322", ipObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI13322", ipObj != __nullptr);
 			m_ipAS = ipObj;
 		}
 
@@ -594,22 +594,22 @@ STDMETHODIMP CRemoveSubAttributes::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			// Make sure DataScorer object-with-description exists
 			IObjectWithDescriptionPtr ipObjWithDesc = getThisAsCOMPtr()->DataScorer;
-			ASSERT_RESOURCE_ALLOCATION("ELI09795", ipObjWithDesc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI09795", ipObjWithDesc != __nullptr);
 			
 			// write the data-scorer object to the stream
 			IPersistStreamPtr ipObj = ipObjWithDesc;
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException("ELI09796", "DataScorer object does not support persistence.");
 			}
 			writeObjectToStream(ipObj, pStream, "ELI09915", fClearDirty);
 		}
-		if ( m_ipAS == NULL )
+		if ( m_ipAS == __nullptr )
 		{
 			throw UCLIDException("ELI13323", "Attribute Selector is not set.");
 		}
 		IPersistStreamPtr ipObj = m_ipAS;
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI13324", "Attribute Selector object does not support persistence.");
 		}
@@ -639,7 +639,7 @@ STDMETHODIMP CRemoveSubAttributes::GetSizeMax(ULARGE_INTEGER *pcbSize)
 UCLID_AFOUTPUTHANDLERSLib::IRemoveSubAttributesPtr CRemoveSubAttributes::getThisAsCOMPtr()
 {
 	UCLID_AFOUTPUTHANDLERSLib::IRemoveSubAttributesPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16964", ipThis != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI16964", ipThis != __nullptr);
 	
 	return ipThis;
 }

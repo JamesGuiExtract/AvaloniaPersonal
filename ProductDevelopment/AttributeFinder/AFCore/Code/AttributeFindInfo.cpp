@@ -19,8 +19,8 @@ const unsigned long gnCurrentVersion = 5;
 // CAttributeFindInfo
 //-------------------------------------------------------------------------------------------------
 CAttributeFindInfo::CAttributeFindInfo()
-:m_bStopSearchingWhenValueFound(false), m_ipAttributeRules(NULL),
-m_ipInputValidator(NULL), m_bDirty(false)
+:m_bStopSearchingWhenValueFound(false), m_ipAttributeRules(__nullptr),
+m_ipInputValidator(__nullptr), m_bDirty(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -65,10 +65,10 @@ STDMETHODIMP CAttributeFindInfo::get_InputValidator(IObjectWithDescription **pVa
 
 		// if the InputValidator object-with-description object has not yet
 		// been created, do so now..
-		if (m_ipInputValidator == NULL)
+		if (m_ipInputValidator == __nullptr)
 		{
 			m_ipInputValidator.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI04617", m_ipInputValidator != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI04617", m_ipInputValidator != __nullptr);
 		}
 
 		IObjectWithDescriptionPtr ipShallowCopy = m_ipInputValidator;
@@ -104,10 +104,10 @@ STDMETHODIMP CAttributeFindInfo::get_AttributeRules(IIUnknownVector **pVal)
 		validateLicense();
 
 		// if the AttributeRules object has not yet been created, create it.
-		if (m_ipAttributeRules == NULL)
+		if (m_ipAttributeRules == __nullptr)
 		{
 			m_ipAttributeRules.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI04394", m_ipAttributeRules != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI04394", m_ipAttributeRules != __nullptr);
 		}
 
 		IIUnknownVectorPtr ipShallowCopy = m_ipAttributeRules;
@@ -126,8 +126,8 @@ STDMETHODIMP CAttributeFindInfo::put_AttributeRules(IIUnknownVector *newVal)
 	{
 		validateLicense();
 
-		// update the internal value as long as newVal != NULL
-		if (newVal == NULL)
+		// update the internal value as long as newVal != __nullptr
+		if (newVal == __nullptr)
 		{
 			throw UCLIDException("ELI04395", "Invalid object!");
 		}
@@ -209,14 +209,14 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 		// create a vector object to store all the found attributes
 		IIUnknownVectorPtr ipFoundAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI04397", ipFoundAttributes != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI04397", ipFoundAttributes != __nullptr);
 
 		int nNumAttributeRules = m_ipAttributeRules->Size();
 		for (int i = 0; i < nNumAttributeRules; i++)
 		{
 			// get the attribute rule object
 			UCLID_AFCORELib::IAttributeRulePtr ipAttributeRule = m_ipAttributeRules->At(i);
-			ASSERT_RESOURCE_ALLOCATION("ELI04398", ipAttributeRule != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI04398", ipAttributeRule != __nullptr);
 
 			// If the attribute rule is not enabled, just continue the loop, and skip 
 			// processing the current attribute rule
@@ -235,7 +235,7 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 
 			// create a smart pointer to the document
 			UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
-			ASSERT_RESOURCE_ALLOCATION("ELI07483", ipAFDoc != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07483", ipAFDoc != __nullptr);
 
 			// execute the attribute rule
 			// if the rule throws an exception we don't want to halt processing of this document all
@@ -248,19 +248,19 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				{
 					// Create a pointer to the Sub-ProgressStatus object, depending upon whether
 					// the caller requested progress information
-					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
-						NULL : ipProgressStatus->SubProgressStatus;
+					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+						__nullptr : ipProgressStatus->SubProgressStatus;
 
 					// Execute the attribute rule
 					ipAttributes = ipAttributeRule->ExecuteRuleOnText(ipAFDoc, ipSubProgressStatus);
-					ASSERT_RESOURCE_ALLOCATION("ELI04399", ipAttributes != NULL);
+					ASSERT_RESOURCE_ALLOCATION("ELI04399", ipAttributes != __nullptr);
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10544");
 			}
 			catch(UCLIDException ue)
 			{
 				ISpatialStringPtr ipText = ipAFDoc->Text;
-				if (ipText != NULL)
+				if (ipText != __nullptr)
 				{
 					string strSourceDoc = ipText->SourceDocName;
 					ue.addDebugInfo("File", strSourceDoc);
@@ -288,7 +288,7 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// is no attribute name or maybe temp attribute name for
 				// the attribute at this time
 				UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(j);
-				ASSERT_RESOURCE_ALLOCATION("ELI19120", ipAttribute != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI19120", ipAttribute != __nullptr);
 
 				// get attribute value as a spatial string first
 				// and then get the string value for the attribute
@@ -306,7 +306,7 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				}
 				else
 				{
-					ipAttribute->InputValidator = NULL;
+					ipAttribute->InputValidator = __nullptr;
 				}
 
 				// if an attribute splitter has been specified for this
@@ -329,15 +329,15 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					// the progress status, we can't know that we have an accurate number
 					// steps initialized and therefore don't have enough info to allow splitters
 					// to update progress status info
-					//IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
-					//	NULL : ipProgressStatus->SubProgressStatus;
+					//IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+					//	__nullptr : ipProgressStatus->SubProgressStatus;
 
 					// Get the splitter object
 					UCLID_AFCORELib::IAttributeSplitterPtr ipSplitter =
 						m_ipAttributeSplitter->Object;
 
 					// Execute the split operation
-					ipSplitter->SplitAttribute(ipAttribute, ipAFDoc, NULL/*ipSubProgressStatus*/);
+					ipSplitter->SplitAttribute(ipAttribute, ipAFDoc, __nullptr/*ipSubProgressStatus*/);
 				}
 
 				// add the attribute to the vector of found attributes
@@ -376,10 +376,10 @@ STDMETHODIMP CAttributeFindInfo::get_AttributeSplitter(IObjectWithDescription* *
 
 		// if the AttributeSplitter object-with-description object has not yet
 		// been created, do so now..
-		if (m_ipAttributeSplitter == NULL)
+		if (m_ipAttributeSplitter == __nullptr)
 		{
 			m_ipAttributeSplitter.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI05285", m_ipAttributeSplitter != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI05285", m_ipAttributeSplitter != __nullptr);
 		}
 
 		IObjectWithDescriptionPtr ipShallowCopy = m_ipAttributeSplitter;
@@ -431,7 +431,7 @@ STDMETHODIMP CAttributeFindInfo::IsDirty(void)
 		{
 			// Check collection of Attribute Rules
 			IPersistStreamPtr ipPersistStream(m_ipAttributeRules);
-			if (ipPersistStream==NULL)
+			if (ipPersistStream==__nullptr)
 			{
 				throw UCLIDException("ELI04785", "Object does not support persistence!");
 			}
@@ -442,9 +442,9 @@ STDMETHODIMP CAttributeFindInfo::IsDirty(void)
 			}
 
 			// Check Input Validator
-			ipPersistStream = NULL;
+			ipPersistStream = __nullptr;
 			ipPersistStream = m_ipInputValidator;
-			if (ipPersistStream==NULL)
+			if (ipPersistStream==__nullptr)
 			{
 				throw UCLIDException("ELI04787", "Object does not support persistence!");
 			}
@@ -455,9 +455,9 @@ STDMETHODIMP CAttributeFindInfo::IsDirty(void)
 			}
 
 			// Check Attribute Splitter
-			ipPersistStream = NULL;
+			ipPersistStream = __nullptr;
 			ipPersistStream = m_ipAttributeSplitter;
-			if (ipPersistStream == NULL)
+			if (ipPersistStream == __nullptr)
 			{
 				throw UCLIDException( "ELI06129", "Object does not support persistence!" );
 			}
@@ -503,15 +503,15 @@ STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 
 		// Reset all the member variables
 		m_bStopSearchingWhenValueFound = false;
-		m_ipAttributeRules = NULL;
-		m_ipInputValidator = NULL;
-		m_ipAttributeSplitter = NULL;
+		m_ipAttributeRules = __nullptr;
+		m_ipInputValidator = __nullptr;
+		m_ipAttributeSplitter = __nullptr;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
-		pStream->Read( &nDataLength, sizeof(nDataLength), NULL );
+		pStream->Read( &nDataLength, sizeof(nDataLength), __nullptr );
 		ByteStream data( nDataLength );
-		pStream->Read( data.getData(), nDataLength, NULL );
+		pStream->Read( data.getData(), nDataLength, __nullptr );
 		ByteStreamManipulator dataReader( ByteStreamManipulator::kRead, data );
 
 		// Read the individual data items from the bytestream
@@ -536,7 +536,7 @@ STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 		// Separately read attribute rules from the stream
 		IPersistStreamPtr ipObj;
 		readObjectFromStream(ipObj, pStream, "ELI09947");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI04575", "Attribute Rules collection could not be read from stream!");
 		}
@@ -545,9 +545,9 @@ STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 		if (nDataVersion < 4)
 		{
 			// Separately read ignore values list from the stream
-			ipObj = NULL;
+			ipObj = __nullptr;
 			readObjectFromStream(ipObj, pStream, "ELI09948");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException( "ELI04576", 
 					"Ignore Values list could not be read from stream!" );
@@ -585,9 +585,9 @@ STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 		}
 
 		// Separately read the input validator object-with-description from the stream
-		ipObj = NULL;
+		ipObj = __nullptr;
 		readObjectFromStream(ipObj, pStream, "ELI09949");
-		if (ipObj == NULL)
+		if (ipObj == __nullptr)
 		{
 			throw UCLIDException("ELI04577", "Input Validator object could not be read from stream!");
 		}
@@ -597,9 +597,9 @@ STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 		// AttributeSplitter object-with-description in
 		if (nDataVersion >= 2)
 		{
-			ipObj = NULL;
+			ipObj = __nullptr;
 			readObjectFromStream(ipObj, pStream, "ELI09950");
-			if (ipObj == NULL)
+			if (ipObj == __nullptr)
 			{
 				throw UCLIDException("ELI05287", "AttributeSplitter object could not be read from stream!");
 			}
@@ -610,7 +610,7 @@ STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 		{
 			// have a dummy object to read the doc preprocessor, which
 			// was removed from version 5 and beyond
-			ipObj = NULL;
+			ipObj = __nullptr;
 			readObjectFromStream(ipObj, pStream, "ELI09951");
 		}
 
@@ -640,13 +640,13 @@ STDMETHODIMP CAttributeFindInfo::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write the bytestream data into the IStream object
 		long nDataLength = data.getLength();
-		pStream->Write( &nDataLength, sizeof(nDataLength), NULL );
-		pStream->Write( data.getData(), nDataLength, NULL );
+		pStream->Write( &nDataLength, sizeof(nDataLength), __nullptr );
+		pStream->Write( data.getData(), nDataLength, __nullptr );
 
 		// Separately write attribute rules to the stream
 		IPersistStreamPtr ipPersistentObj;
 		ipPersistentObj = m_ipAttributeRules;
-		if (ipPersistentObj == NULL)
+		if (ipPersistentObj == __nullptr)
 		{
 			throw UCLIDException("ELI04403", "Attribute Rules collection does not support persistence!");
 		}
@@ -654,7 +654,7 @@ STDMETHODIMP CAttributeFindInfo::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the input validator object-with-description to the stream
 		ipPersistentObj = getValidator();
-		if (ipPersistentObj == NULL)
+		if (ipPersistentObj == __nullptr)
 		{
 			throw UCLIDException("ELI04565", "Input Validator object does not support persistence!");
 		}
@@ -662,7 +662,7 @@ STDMETHODIMP CAttributeFindInfo::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Separately write the AttributeSplitter object-with-description to the stream
 		ipPersistentObj = getSplitter();
-		if (ipPersistentObj == NULL)
+		if (ipPersistentObj == __nullptr)
 		{
 			throw UCLIDException("ELI05286", "AttributeSplitter object does not support persistence!");
 		}
@@ -699,33 +699,33 @@ STDMETHODIMP CAttributeFindInfo::raw_CopyFrom(IUnknown * pObject)
 
 		// Create the other AttributeFindInfo object
 		UCLID_AFCORELib::IAttributeFindInfoPtr ipSource = pObject;
-		ASSERT_RESOURCE_ALLOCATION("ELI08331", ipSource != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI08331", ipSource != __nullptr);
 
 		// Set this object's StopSearchingWhenValueFound property
 		m_bStopSearchingWhenValueFound = asCppBool(ipSource->GetStopSearchingWhenValueFound());
 
 		// Set the other object's Input Validator
 		IObjectWithDescriptionPtr ipIVTemp = ipSource->GetInputValidator();
-		if (ipIVTemp != NULL)
+		if (ipIVTemp != __nullptr)
 		{
 			ICopyableObjectPtr ipCopyObj(ipIVTemp);
-			ASSERT_RESOURCE_ALLOCATION("ELI08332", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08332", ipCopyObj != __nullptr);
 			m_ipInputValidator = ipCopyObj->Clone();
 		}
 
 		IObjectWithDescriptionPtr ipAttributeSplitterTemp = ipSource->GetAttributeSplitter();
-		if (ipAttributeSplitterTemp != NULL)
+		if (ipAttributeSplitterTemp != __nullptr)
 		{
 			ICopyableObjectPtr ipCopyObj(ipAttributeSplitterTemp);
-			ASSERT_RESOURCE_ALLOCATION("ELI08333", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08333", ipCopyObj != __nullptr);
 			m_ipAttributeSplitter = ipCopyObj->Clone();
 		}
 
 		IIUnknownVectorPtr ipRulesTemp = ipSource->GetAttributeRules();
-		if (ipRulesTemp != NULL)
+		if (ipRulesTemp != __nullptr)
 		{
 			ICopyableObjectPtr ipCopyObj(ipRulesTemp);
-			ASSERT_RESOURCE_ALLOCATION("ELI08334", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08334", ipCopyObj != __nullptr);
 			m_ipAttributeRules = ipCopyObj->Clone();
 		}
 	}
@@ -746,7 +746,7 @@ STDMETHODIMP CAttributeFindInfo::raw_Clone(IUnknown * * pObject)
 		// Create a new IAttributeFindInfo object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_AttributeFindInfo );
-		ASSERT_RESOURCE_ALLOCATION("ELI04666", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI04666", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -769,7 +769,7 @@ STDMETHODIMP CAttributeFindInfo::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		if (pbValue == NULL)
+		if (pbValue == __nullptr)
 		{
 			return E_POINTER;
 		}
@@ -797,10 +797,10 @@ IObjectWithDescriptionPtr CAttributeFindInfo::getValidator()
 	{
 		// if the InputValidator object-with-description object has not yet
 		// been created, do so now..
-		if (m_ipInputValidator == NULL)
+		if (m_ipInputValidator == __nullptr)
 		{
 			m_ipInputValidator.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI16926", m_ipInputValidator != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16926", m_ipInputValidator != __nullptr);
 		}
 
 		return m_ipInputValidator;
@@ -814,10 +814,10 @@ IObjectWithDescriptionPtr CAttributeFindInfo::getSplitter()
 	{
 		// if the AttributeSplitter object-with-description object has not yet
 		// been created, do so now..
-		if (m_ipAttributeSplitter == NULL)
+		if (m_ipAttributeSplitter == __nullptr)
 		{
 			m_ipAttributeSplitter.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI16925", m_ipInputValidator != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI16925", m_ipInputValidator != __nullptr);
 		}
 
 		return m_ipAttributeSplitter;
@@ -840,7 +840,7 @@ long CAttributeFindInfo::getNumEnabledAttributeRules()
 	{
 		// get the attribute rule object
 		UCLID_AFCORELib::IAttributeRulePtr ipAttributeRule = m_ipAttributeRules->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI16104", ipAttributeRule != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI16104", ipAttributeRule != __nullptr);
 
 		// If the attribute rule is not enabled, just continue the loop, and skip 
 		// processing the current attribute rule
@@ -855,7 +855,7 @@ long CAttributeFindInfo::getNumEnabledAttributeRules()
 //-------------------------------------------------------------------------------------------------
 bool CAttributeFindInfo::enabledSplitterExists()
 {
-	return (m_ipAttributeSplitter != NULL) && (m_ipAttributeSplitter->Object != NULL) &&
+	return (m_ipAttributeSplitter != __nullptr) && (m_ipAttributeSplitter->Object != __nullptr) &&
 		(m_ipAttributeSplitter->GetEnabled() == VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------

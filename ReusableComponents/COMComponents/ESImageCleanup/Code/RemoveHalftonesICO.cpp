@@ -60,7 +60,7 @@ STDMETHODIMP CRemoveHalftonesICO::raw_GetComponentDescription(BSTR * pstrCompone
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17739", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI17739", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Remove halftones").Detach();
 	}
@@ -91,15 +91,15 @@ STDMETHODIMP CRemoveHalftonesICO::raw_Clone(IUnknown** pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17740", pObject != NULL);
+		ASSERT_ARGUMENT("ELI17740", pObject != __nullptr);
 
 		// create a copyable object pointer
 		ICopyableObjectPtr ipObjCopy(CLSID_RemoveHalftonesICO);
-		ASSERT_RESOURCE_ALLOCATION("ELI17149", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17149", ipObjCopy != __nullptr);
 
 		// set the IUnknownPtr to the current object
 		IUnknownPtr ipUnk = this;
-		ASSERT_RESOURCE_ALLOCATION("ELI17218", ipUnk != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17218", ipUnk != __nullptr);
 
 		// copy to the copyable object pointer
 		ipObjCopy->CopyFrom(ipUnk);
@@ -121,7 +121,7 @@ STDMETHODIMP CRemoveHalftonesICO::raw_IsLicensed(VARIANT_BOOL * pbValue)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17640", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI17640", pbValue != __nullptr);
 
 		try
 		{
@@ -150,7 +150,7 @@ STDMETHODIMP CRemoveHalftonesICO::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17735", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI17735", pClassID != __nullptr);
 
 		*pClassID = CLSID_RemoveHalftonesICO;
 	}
@@ -172,7 +172,7 @@ STDMETHODIMP CRemoveHalftonesICO::Load(IStream * pStream)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17737", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17737", pStream != __nullptr);
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -208,7 +208,7 @@ STDMETHODIMP CRemoveHalftonesICO::Save(IStream * pStream, BOOL fClearDirty)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI17738", pStream != NULL);
+		ASSERT_ARGUMENT("ELI17738", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -256,7 +256,7 @@ STDMETHODIMP CRemoveHalftonesICO::Perform(void* pciRepair)
 
 		// wrap the ClearImage repair pointer in smart pointer
 		ICiRepairPtr ipciRepair((ICiRepair*) pciRepair);
-		ASSERT_RESOURCE_ALLOCATION("ELI17154", ipciRepair != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI17154", ipciRepair != __nullptr);
 
 		// perform the ClearImage RemoveHalftone method
 		ipciRepair->RemoveHalftone();

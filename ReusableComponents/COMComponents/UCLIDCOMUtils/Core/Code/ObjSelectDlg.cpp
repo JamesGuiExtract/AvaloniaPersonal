@@ -55,7 +55,7 @@ CObjSelectDlg::CObjSelectDlg(std::string strTitleAfterSelect,
 	// Check Category Manager with user-supplied category name
 	UCLID_COMUTILSLib::ICategoryManagerPtr ipCategoryMgr( 
 		__uuidof(CategoryManager) );
-	if (ipCategoryMgr != NULL)
+	if (ipCategoryMgr != __nullptr)
 	{
 		_bstr_t	bstrCategory( m_strCategoryName.c_str() );
 		m_ipObjectMap = ipCategoryMgr->GetDescriptionToProgIDMap2( bstrCategory,
@@ -153,7 +153,7 @@ BOOL CObjSelectDlg::OnInitDialog()
 		///////////////////////////////////////////
 		// Set the actual description, if available
 		///////////////////////////////////////////
-		if (m_ipObject != NULL)
+		if (m_ipObject != __nullptr)
 		{			
 			// Set the description
 			string strDescription = m_ipObject->Description;
@@ -206,7 +206,7 @@ BOOL CObjSelectDlg::OnInitDialog()
 			// Shift all controls on the dialog up. (It doesn't matter that this moves the description 
 			// controls offscreen since they are hidden anyway)
 			for (CWnd *pwndControl = GetWindow(GW_CHILD); 
-				 pwndControl != NULL; 
+				 pwndControl != __nullptr; 
 				 pwndControl = pwndControl->GetNextWindow())
 			{
 				CRect rectControl;
@@ -290,7 +290,7 @@ void CObjSelectDlg::OnOK()
 		////////////////////////////////
 		// Update the object information
 		////////////////////////////////
-		if (m_ipObject != NULL)
+		if (m_ipObject != __nullptr)
 		{
 			// Set object pointer
 			m_ipObject->Object = m_ipComponent;
@@ -316,15 +316,15 @@ void CObjSelectDlg::OnBtnConfigure()
 	try
 	{
 		// Must have a combo box selection
-		if (m_ipComponent != NULL)
+		if (m_ipComponent != __nullptr)
 		{
 			// Create the ObjectPropertiesUI object
 			UCLID_COMUTILSLib::IObjectPropertiesUIPtr	ipProperties( 
 				CLSID_ObjectPropertiesUI );
-			ASSERT_RESOURCE_ALLOCATION("ELI08453", ipProperties != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08453", ipProperties != __nullptr);
 
 			UCLID_COMUTILSLib::ICopyableObjectPtr ipCopyObj = m_ipComponent;
-			ASSERT_RESOURCE_ALLOCATION("ELI08454", ipCopyObj != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI08454", ipCopyObj != __nullptr);
 			UCLID_COMUTILSLib::ICategorizedComponentPtr ipCopy = ipCopyObj->Clone();
 
 			string strComponentDesc = ipCopy->GetComponentDescription();
@@ -357,7 +357,7 @@ void CObjSelectDlg::OnSelchangeComboObj()
 		
 		// Get the object
 		// if previous component is same as current component, then no change
-		if ((m_ipComponent != NULL) && 
+		if ((m_ipComponent != __nullptr) && 
 			(m_ipComponent->GetComponentDescription() == _bstr_t(zText)))
 		{
 			return;
@@ -369,7 +369,7 @@ void CObjSelectDlg::OnSelchangeComboObj()
 		m_zDescription = m_strUserDescription.c_str();
 		
 		// Enable or disable the Edit box
-		if (m_ipComponent != NULL)
+		if (m_ipComponent != __nullptr)
 		{
 			// Component selected, enable the edit box
 			GetDlgItem( IDC_EDIT_DESC )->EnableWindow( TRUE );
@@ -443,7 +443,7 @@ void CObjSelectDlg::populateCombo()
 	CString	zName;
 	long nNumEntries = m_ipObjectMap->GetSize();
 	UCLID_COMUTILSLib::IVariantVectorPtr ipKeys = m_ipObjectMap->GetKeys();
-	ASSERT_RESOURCE_ALLOCATION("ELI08139", ipKeys != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI08139", ipKeys != __nullptr);
 
 	for (int i = 0; i < nNumEntries; i++)
 	{
@@ -461,11 +461,11 @@ void CObjSelectDlg::populateCombo()
 void CObjSelectDlg::setCombo() 
 {
 	// Only act if object is available
-	if (m_ipObject != NULL)
+	if (m_ipObject != __nullptr)
 	{
 		// Object needs a pointer, too
 		UCLID_COMUTILSLib::ICategorizedComponentPtr	ipComponent = m_ipObject->Object;
-		if (ipComponent != NULL)
+		if (ipComponent != __nullptr)
 		{
 			// Get Component Description of the object
 			_bstr_t	bstrCompDesc = ipComponent->GetComponentDescription();
@@ -500,7 +500,7 @@ void CObjSelectDlg::setCombo()
 				m_comboObject.GetLBText( iFirst, zName );
 
 				m_ipComponent = getObjectFromName( zName.operator LPCTSTR() );
-				if (m_ipComponent == NULL)
+				if (m_ipComponent == __nullptr)
 				{
 					// Create and throw an exception
 					UCLIDException	ue( "ELI04275", "Cannot find object.");

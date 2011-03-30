@@ -29,7 +29,7 @@ CFileSupplierData::~CFileSupplierData()
 {
 	try
 	{
-		m_ipFileSupplier = NULL;
+		m_ipFileSupplier = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16530");
 }
@@ -38,7 +38,7 @@ void CFileSupplierData::FinalRelease()
 {
 	try
 	{
-		m_ipFileSupplier = NULL;
+		m_ipFileSupplier = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27589");
 }
@@ -74,7 +74,7 @@ STDMETHODIMP CFileSupplierData::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI20450", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI20450", pbValue != __nullptr);
 
 		try
 		{
@@ -108,7 +108,7 @@ STDMETHODIMP CFileSupplierData::raw_CopyFrom(IUnknown *pObject)
 
 		// Create local smart pointer
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipCopyThis(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI13704", ipCopyThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13704", ipCopyThis != __nullptr);
 
 		// Save File Supplier object-with-description
 		m_ipFileSupplier = ipCopyThis->FileSupplier;
@@ -133,12 +133,12 @@ STDMETHODIMP CFileSupplierData::raw_Clone(IUnknown **pObject)
 		// Validate license first
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20452", pObject != NULL);
+		ASSERT_ARGUMENT("ELI20452", pObject != __nullptr);
 
 		// Create new object
 		ICopyableObjectPtr ipObjCopy;
 		ipObjCopy.CreateInstance( CLSID_FileSupplierData );
-		ASSERT_RESOURCE_ALLOCATION("ELI13706", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13706", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -163,13 +163,13 @@ STDMETHODIMP CFileSupplierData::get_FileSupplier(IObjectWithDescription **pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20455", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20455", pVal != __nullptr);
 
 		// Create File Supplier, if needed
-		if (m_ipFileSupplier == NULL)
+		if (m_ipFileSupplier == __nullptr)
 		{
 			m_ipFileSupplier.CreateInstance( CLSID_ObjectWithDescription );
-			ASSERT_RESOURCE_ALLOCATION( "ELI13709", m_ipFileSupplier != NULL );
+			ASSERT_RESOURCE_ALLOCATION( "ELI13709", m_ipFileSupplier != __nullptr );
 		}
 
 		// Provide reference to File Supplier
@@ -208,7 +208,7 @@ STDMETHODIMP CFileSupplierData::get_ForceProcessing(VARIANT_BOOL *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20456", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20456", pVal != __nullptr);
 
 		// Return setting
 		*pVal = m_bForceProcessing ? VARIANT_TRUE : VARIANT_FALSE;
@@ -245,7 +245,7 @@ STDMETHODIMP CFileSupplierData::get_FileSupplierStatus(EFileSupplierStatus *pVal
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20457", pVal != NULL);
+		ASSERT_ARGUMENT("ELI20457", pVal != __nullptr);
 
 		// Return status
 		*pVal = m_eSupplierStatus;
@@ -284,7 +284,7 @@ STDMETHODIMP CFileSupplierData::get_Priority(EFilePriority *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI28015", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28015", pVal != __nullptr);
 
 		// Return priority
 		*pVal = m_ePriority;
@@ -323,7 +323,7 @@ STDMETHODIMP CFileSupplierData::GetClassID(CLSID *pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20458", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI20458", pClassID != __nullptr);
 
 		*pClassID = CLSID_FileSupplierData;
 	}
@@ -346,7 +346,7 @@ STDMETHODIMP CFileSupplierData::IsDirty(void)
 
 		// check if any of the container objects are dirty
 		IPersistStreamPtr ipStream = m_ipFileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI14170", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI14170", ipStream != __nullptr);
 		if (ipStream->IsDirty() == S_OK)
 		{
 			return S_OK;
@@ -364,10 +364,10 @@ STDMETHODIMP CFileSupplierData::Load(IStream *pStream)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI20460", pStream != NULL);
+		ASSERT_ARGUMENT("ELI20460", pStream != __nullptr);
 
 		// Reset member variables
-		m_ipFileSupplier = NULL;
+		m_ipFileSupplier = __nullptr;
 		m_bForceProcessing = false;
 		m_eSupplierStatus = kInactiveStatus;
 		m_ePriority = kPriorityDefault;
@@ -429,7 +429,7 @@ STDMETHODIMP CFileSupplierData::Save(IStream *pStream, BOOL fClearDirty)
 		// Check license state
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI20461", pStream != NULL);
+		ASSERT_ARGUMENT("ELI20461", pStream != __nullptr);
 
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
@@ -450,7 +450,7 @@ STDMETHODIMP CFileSupplierData::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Write out the File Supplier
 		IPersistStreamPtr ipFSObject = m_ipFileSupplier;
-		ASSERT_RESOURCE_ALLOCATION("ELI13738", ipFSObject != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI13738", ipFSObject != __nullptr);
 		writeObjectToStream( ipFSObject, pStream, "ELI13739", fClearDirty );
 
 		// Clear the flag as specified

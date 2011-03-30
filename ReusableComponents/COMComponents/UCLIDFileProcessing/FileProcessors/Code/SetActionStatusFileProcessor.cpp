@@ -188,14 +188,14 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17927", pResult != NULL);
+		ASSERT_ARGUMENT("ELI17927", pResult != __nullptr);
 		
 		// wrap the database pointer in a smart pointer object
 		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI15146", ipDB != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15146", ipDB != __nullptr);
 
 		IFAMTagManagerPtr ipTagManager(pTagManager);
-		ASSERT_RESOURCE_ALLOCATION("ELI29126", ipTagManager != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI29126", ipTagManager != __nullptr);
 
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31342", ipFileRecord != __nullptr);
@@ -337,7 +337,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_GetComponentDescription(BSTR *ps
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19615", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI19615", pstrComponentDescription != __nullptr);
 
 		*pstrComponentDescription = _bstr_t("Core: Set file-action status in database").Detach();
 	}
@@ -359,7 +359,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		validateLicense();
 
 		UCLID_FILEPROCESSORSLib::ISetActionStatusFileProcessorPtr ipCopyFrom(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI15107", ipCopyFrom != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15107", ipCopyFrom != __nullptr);
 		
 		// copy the action name
 		m_strActionName = ipCopyFrom->ActionName;
@@ -383,11 +383,11 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_Clone(IUnknown **pObject)
 
 		// create a new instance of this object and get the ICopyableObject interface 
 		ICopyableObjectPtr ipObjCopy(CLSID_SetActionStatusFileProcessor);
-		ASSERT_RESOURCE_ALLOCATION("ELI15109", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15109", ipObjCopy != __nullptr);
 
 		// wrap this object in an IUnknown
 		IUnknownPtr ipThis = this;
-		ASSERT_RESOURCE_ALLOCATION("ELI15110", ipThis != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI15110", ipThis != __nullptr);
 
 		// ask the new object to copy itself from this object
 		ipObjCopy->CopyFrom(ipThis);

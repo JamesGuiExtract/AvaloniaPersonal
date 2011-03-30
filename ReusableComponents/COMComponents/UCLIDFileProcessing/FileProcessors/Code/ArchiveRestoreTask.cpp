@@ -90,7 +90,7 @@ STDMETHODIMP CArchiveRestoreTask::get_Operation(EArchiveRestoreOperationType* pV
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24552", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24552", pVal != __nullptr);
 
 		// Get the operation type
 		*pVal = m_operationType;
@@ -125,7 +125,7 @@ STDMETHODIMP CArchiveRestoreTask::get_ArchiveFolder(BSTR* pbstrArchiveFolder)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24555", pbstrArchiveFolder != NULL);
+		ASSERT_ARGUMENT("ELI24555", pbstrArchiveFolder != __nullptr);
 
 		// Get the archive folder
 		*pbstrArchiveFolder = _bstr_t(m_strArchiveFolder.c_str()).Detach();
@@ -160,7 +160,7 @@ STDMETHODIMP CArchiveRestoreTask::get_FileTag(BSTR* pbstrFileTag)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24558", pbstrFileTag != NULL);
+		ASSERT_ARGUMENT("ELI24558", pbstrFileTag != __nullptr);
 
 		// Get the file tag
 		*pbstrFileTag = _bstr_t(m_strFileTag.c_str()).Detach();
@@ -195,7 +195,7 @@ STDMETHODIMP CArchiveRestoreTask::get_AllowOverwrite(VARIANT_BOOL* pVal)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24561", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24561", pVal != __nullptr);
 
 		// Get the overwrite value
 		*pVal = asVariantBool(m_bAllowOverwrite);
@@ -230,7 +230,7 @@ STDMETHODIMP CArchiveRestoreTask::get_FileToArchive(BSTR* pbstrFileToArchive)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24564", pbstrFileToArchive != NULL);
+		ASSERT_ARGUMENT("ELI24564", pbstrFileToArchive != __nullptr);
 
 		// Get the file to archive
 		*pbstrFileToArchive = _bstr_t(m_strFileToArchive.c_str()).Detach();
@@ -265,7 +265,7 @@ STDMETHODIMP CArchiveRestoreTask::get_DeleteFileAfterArchive(VARIANT_BOOL* pVal)
 		// Validate the license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24567", pVal != NULL);
+		ASSERT_ARGUMENT("ELI24567", pVal != __nullptr);
 
 		// Get the delete file value
 		*pVal = asVariantBool(m_bDeleteFileAfterArchiving);
@@ -282,7 +282,7 @@ STDMETHODIMP CArchiveRestoreTask::raw_GetComponentDescription(BSTR* pstrComponen
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24569", pstrComponentDescription != NULL);
+		ASSERT_ARGUMENT("ELI24569", pstrComponentDescription != __nullptr);
 		
 		*pstrComponentDescription = 
 			_bstr_t(gstrARCHIVE_RESTORE_COMPONENT_DESCRIPTION.c_str()).Detach();
@@ -306,7 +306,7 @@ STDMETHODIMP CArchiveRestoreTask::raw_CopyFrom(IUnknown* pObject)
 
 		// get the ArchiveRestoreTask object
 		UCLID_FILEPROCESSORSLib::IArchiveRestoreTaskPtr ipArchiveRestoreTask(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI24571", ipArchiveRestoreTask != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24571", ipArchiveRestoreTask != __nullptr);
 
 		// Copy the values from the object
 		m_operationType = (EArchiveRestoreOperationType) ipArchiveRestoreTask->Operation;
@@ -334,15 +334,15 @@ STDMETHODIMP CArchiveRestoreTask::raw_Clone(IUnknown** ppObject)
 		validateLicense();
 
 		// ensure that the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI24573", ppObject != NULL);
+		ASSERT_ARGUMENT("ELI24573", ppObject != __nullptr);
 
 		// get the copyable object interface
 		ICopyableObjectPtr ipObjCopy(CLSID_ArchiveRestoreTask);
-		ASSERT_RESOURCE_ALLOCATION("ELI24574", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24574", ipObjCopy != __nullptr);
 
 		// create a shallow copy
 		IUnknownPtr ipUnknown(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI24575", ipUnknown != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24575", ipUnknown != __nullptr);
 		ipObjCopy->CopyFrom(ipUnknown);
 
 		// return the new ArchiveRestoreTask to the caller
@@ -383,8 +383,8 @@ STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(IFileRecord* pFileRecord, long
 		validateLicense();
 
 		// check for NULL parameters
-		ASSERT_ARGUMENT("ELI24579", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI24580", pResult != NULL);
+		ASSERT_ARGUMENT("ELI24579", pTagManager != __nullptr);
+		ASSERT_ARGUMENT("ELI24580", pResult != __nullptr);
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31335", ipFileRecord != __nullptr);
 
@@ -534,7 +534,7 @@ STDMETHODIMP CArchiveRestoreTask::raw_IsLicensed(VARIANT_BOOL* pbValue)
 	try
 	{
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI24584", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI24584", pbValue != __nullptr);
 
 		try
 		{
@@ -567,7 +567,7 @@ STDMETHODIMP CArchiveRestoreTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
 		validateLicense();
 
 		// ensure the return value pointer is non-NULL
-		ASSERT_ARGUMENT("ELI24586", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI24586", pbValue != __nullptr);
 
 		// Configured if:
 		// 1. There is an archive folder defined
@@ -593,7 +593,7 @@ STDMETHODIMP CArchiveRestoreTask::GetClassID(CLSID* pClassID)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI24588", pClassID != NULL);
+		ASSERT_ARGUMENT("ELI24588", pClassID != __nullptr);
 
 		*pClassID = CLSID_ArchiveRestoreTask;
 	}
@@ -628,7 +628,7 @@ STDMETHODIMP CArchiveRestoreTask::Load(IStream* pStream)
 		
 		// use a smart pointer for the IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI24590", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24590", ipStream != __nullptr);
 
 		// read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -696,7 +696,7 @@ STDMETHODIMP CArchiveRestoreTask::Save(IStream* pStream, BOOL fClearDirty)
 
 		// use a smart pointer for IStream interface
 		IStreamPtr ipStream(pStream);
-		ASSERT_RESOURCE_ALLOCATION("ELI24595", ipStream != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI24595", ipStream != __nullptr);
 
 		// write the bytestream data into the IStream object
 		long nDataLength = data.getLength();

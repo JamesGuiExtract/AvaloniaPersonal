@@ -375,14 +375,14 @@ void ZoneEntity::EntDraw(BOOL bDraw)
 	}
 	catch(...)
 	{
-		if (pDC != NULL)
+		if (pDC != __nullptr)
 		{
 			pView->m_ImgEdit.ReleaseDC(pDC);
 		}
 		throw;
 	}
 
-	if (pDC != NULL)
+	if (pDC != __nullptr)
 	{
 		pView->m_ImgEdit.ReleaseDC(pDC);
 	}

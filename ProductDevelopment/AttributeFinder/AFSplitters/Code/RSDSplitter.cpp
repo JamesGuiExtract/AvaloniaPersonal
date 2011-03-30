@@ -30,10 +30,10 @@ CRSDSplitter::CRSDSplitter()
 		m_ipRuleSet.m_obj = NULL;
 
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI07847", m_ipMiscUtils!=NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07847", m_ipMiscUtils!= __nullptr);
 
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
-		ASSERT_RESOURCE_ALLOCATION("ELI07495", m_ipAFUtility != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07495", m_ipAFUtility != __nullptr);
 
 		m_bCacheRSD = asCppBool(m_ipAFUtility->ShouldCacheRSD);
 	}
@@ -165,10 +165,10 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 		// for instance can be caused by a RSD file using itself as the splitter
 		// ensure that the ruleset is not already executing by checking 
 		// in the Rule Execution Environment
-		if (m_ipRuleExecutionEnv == NULL)
+		if (m_ipRuleExecutionEnv == __nullptr)
 		{
 			m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
-			ASSERT_RESOURCE_ALLOCATION("ELI07489", m_ipRuleExecutionEnv != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI07489", m_ipRuleExecutionEnv != __nullptr);
 		}
 
 		if (m_ipRuleExecutionEnv->IsRSDFileExecuting(strRSDFile.c_str()) ==
@@ -181,14 +181,14 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 
 		// register a new rule execution session
 		IRuleExecutionSessionPtr ipSession(CLSID_RuleExecutionSession);
-		ASSERT_RESOURCE_ALLOCATION("ELI07494", ipSession != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07494", ipSession != __nullptr);
 		ipSession->SetRSDFileName(strRSDFile.c_str());
 
 		// get current attribute's value
 		IAttributePtr ipTopLevelAttribute(pAttribute);
-		ASSERT_RESOURCE_ALLOCATION("ELI19104", ipTopLevelAttribute != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19104", ipTopLevelAttribute != __nullptr);
 		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI07618", ipAFDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI07618", ipAFDoc != __nullptr);
 		ipAFDoc->Text = ipTopLevelAttribute->Value;
 
 		// pass the value into the rule set for further extraction
@@ -221,7 +221,7 @@ STDMETHODIMP CRSDSplitter::raw_GetComponentDescription(BSTR * pstrComponentDescr
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19566", pstrComponentDescription != NULL)
+		ASSERT_ARGUMENT("ELI19566", pstrComponentDescription != __nullptr)
 
 		*pstrComponentDescription = _bstr_t("Split attributes using RSD file").Detach();
 	}
@@ -262,7 +262,7 @@ STDMETHODIMP CRSDSplitter::raw_Clone(IUnknown **pObject)
 		validateLicense();
 
 		ICopyableObjectPtr ipObjCopy(CLSID_RSDSplitter);
-		ASSERT_RESOURCE_ALLOCATION("ELI05762", ipObjCopy != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05762", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -287,7 +287,7 @@ STDMETHODIMP CRSDSplitter::raw_IsConfigured(VARIANT_BOOL * pbValue)
 		validateLicense();
 
 		// Check parameter
-		ASSERT_ARGUMENT("ELI19115", pbValue != NULL)
+		ASSERT_ARGUMENT("ELI19115", pbValue != __nullptr)
 		
 		*pbValue = m_strRSDFileName.empty() ? VARIANT_FALSE : VARIANT_TRUE;
 	}
@@ -407,7 +407,7 @@ STDMETHODIMP CRSDSplitter::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	try
 	{
 		// Check parameter
-		ASSERT_ARGUMENT("ELI19116", pbValue != NULL);
+		ASSERT_ARGUMENT("ELI19116", pbValue != __nullptr);
 		
 		try
 		{
@@ -436,7 +436,7 @@ IRuleSetPtr CRSDSplitter::getRuleSet(string strRSDFile)
 	if (m_ipRuleSet.m_obj == NULL)
 	{
 		m_ipRuleSet.m_obj.CreateInstance(CLSID_RuleSet);
-		ASSERT_RESOURCE_ALLOCATION("ELI05779", m_ipRuleSet.m_obj != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI05779", m_ipRuleSet.m_obj != __nullptr);
 	}
 
 	// init rule set from current rsd file, performing any auto-encrypt actions

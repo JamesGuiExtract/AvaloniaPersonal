@@ -43,11 +43,11 @@ static string getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority
 
 				// Get a DB pointer
 				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-				ASSERT_RESOURCE_ALLOCATION("ELI27633", ipDB != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27633", ipDB != __nullptr);
 
 				// Get the priorities
 				IVariantVectorPtr ipVecPriorities = ipDB->GetPriorities();
-				ASSERT_RESOURCE_ALLOCATION("ELI27634", ipVecPriorities != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27634", ipVecPriorities != __nullptr);
 
 				// Add each priority to the map
 				long lSize = ipVecPriorities->Size;
@@ -101,11 +101,11 @@ static UCLID_FILEPROCESSINGLib::EFilePriority getPriorityFromString(const string
 
 				// Get a DB pointer
 				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-				ASSERT_RESOURCE_ALLOCATION("ELI27660", ipDB != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27660", ipDB != __nullptr);
 
 				// Get the priorities
 				IVariantVectorPtr ipVecPriorities = ipDB->GetPriorities();
-				ASSERT_RESOURCE_ALLOCATION("ELI27661", ipVecPriorities != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27661", ipVecPriorities != __nullptr);
 
 				// Add each priority to the map
 				long lSize = ipVecPriorities->Size;
@@ -166,11 +166,11 @@ static void getPrioritiesVector(vector<string>& rvecPriorities)
 
 				// Get a DB pointer
 				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-				ASSERT_RESOURCE_ALLOCATION("ELI27665", ipDB != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27665", ipDB != __nullptr);
 
 				// Get the priorities
 				IVariantVectorPtr ipVecPriorities = ipDB->GetPriorities();
-				ASSERT_RESOURCE_ALLOCATION("ELI27666", ipVecPriorities != NULL);
+				ASSERT_RESOURCE_ALLOCATION("ELI27666", ipVecPriorities != __nullptr);
 
 				// Add each priority to the map
 				long lSize = ipVecPriorities->Size;

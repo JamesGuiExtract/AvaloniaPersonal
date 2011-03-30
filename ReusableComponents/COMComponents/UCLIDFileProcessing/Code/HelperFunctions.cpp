@@ -18,11 +18,11 @@ void resize3LabelsAndLists(CPropertyPage *pPropPage, CListCtrl& rList1, CListCtr
 						   const int iMinHeightOfLabelArea2, const int iMinHeightOfLabelArea3)
 {
 	// Verify valid property page
-	ASSERT_ARGUMENT("ELI14891", pPropPage != NULL);
+	ASSERT_ARGUMENT("ELI14891", pPropPage != __nullptr);
 
 	// Verify the property sheet pointer is available
 	CWnd *pParent = pPropPage->GetParent();
-	ASSERT_RESOURCE_ALLOCATION("ELI14892", pParent != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14892", pParent != __nullptr);
 
 	CRect rectPage;
 	pPropPage->GetWindowRect(rectPage);
@@ -45,15 +45,15 @@ void resize3LabelsAndLists(CPropertyPage *pPropPage, CListCtrl& rList1, CListCtr
 
 	// Get the label controls and their associated window coordinates
 	CWnd *pWndLabel1 = pPropPage->GetDlgItem(nLabel1ID);
-	ASSERT_RESOURCE_ALLOCATION("ELI14895", pWndLabel1 != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14895", pWndLabel1 != __nullptr);
 	pWndLabel1->GetWindowRect(&rectStatic1);
 
 	CWnd *pWndLabel2 = pPropPage->GetDlgItem(nLabel2ID);
-	ASSERT_RESOURCE_ALLOCATION("ELI14894", pWndLabel2 != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14894", pWndLabel2 != __nullptr);
 	pWndLabel2->GetWindowRect(&rectStatic2);
 
 	CWnd *pWndLabel3 = pPropPage->GetDlgItem(nLabel3ID);
-	ASSERT_RESOURCE_ALLOCATION("ELI14893", pWndLabel3 != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI14893", pWndLabel3 != __nullptr);
 	pWndLabel3->GetWindowRect(&rectStatic3);
 
 	// Determine the total height of all the label areas above the list
