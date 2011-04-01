@@ -87,7 +87,7 @@ namespace Extract.Redaction
         public string DataFile1
         {
             get;
-            private set;
+            protected set;
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Extract.Redaction
         public string DataFile2
         {
             get;
-            private set;
+            protected set;
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Extract.Redaction
         public int OverlapThreshold
         {
             get;
-            private set;
+            protected set;
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Extract.Redaction
         public string OutputFile
         {
             get;
-            private set;
+            protected set;
         }
 
         #endregion Properties
@@ -160,7 +160,7 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="writer">The writer into which the 
         /// <see cref="VOAFileMergeTaskSettings"/> will be written.</param>
-        public void WriteTo(IStreamWriter writer)
+        public virtual void WriteTo(IStreamWriter writer)
         {
             try
             {

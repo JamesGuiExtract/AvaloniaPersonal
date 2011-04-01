@@ -230,7 +230,7 @@ namespace Extract.Redaction
         {
             // Create an attribute with the specified name
             ComAttribute attribute = new ComAttribute();
-            attribute.Name = "_IDAndRevision";
+            attribute.Name = Constants.IDAndRevisionMetadata;
             attribute.Value = CreateNonSpatialString(id, sourceDocument);
             attribute.Type = "_1";
 
@@ -301,7 +301,8 @@ namespace Extract.Redaction
         /// <returns>The id attribute associated with the <see cref="RedactionItem"/>.</returns>
         internal ComAttribute GetIdAttribute()
         {
-            return AttributeMethods.GetSingleAttributeByName(_attribute.SubAttributes, "_IDAndRevision");
+            return AttributeMethods.GetSingleAttributeByName(_attribute.SubAttributes,
+                Constants.IDAndRevisionMetadata);
         }
 
         /// <summary>

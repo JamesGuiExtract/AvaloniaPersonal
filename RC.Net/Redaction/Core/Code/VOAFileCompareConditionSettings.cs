@@ -9,7 +9,7 @@ namespace Extract.Redaction
     /// <summary>
     /// Represents the settings used for the compare ID Shield data file condition.
     /// </summary>
-    public class VOAFileCompareConditionSettings
+    public class VOAFileCompareConditionSettings : VOAFileMergeTaskSettings
     {
         #region Constructors
 
@@ -18,15 +18,12 @@ namespace Extract.Redaction
         /// class.
         /// </summary>
         public VOAFileCompareConditionSettings()
+            : base()
         {
             try
             {
                 ConditionMetIfMatching = true;
-                DataFile1 = "<SourceDocName>.session1.voa";
-                DataFile2 = "<SourceDocName>.session2.voa";
-                OverlapThreshold = 75;
                 CreateOutput = false;
-                OutputFile = "<SourceDocName>.merged.voa";
                 CreateOutputOnlyOnCondition = true;
             }
             catch (Exception ex)
@@ -39,18 +36,36 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="VOAFileCompareConditionSettings"/>
         /// class.
         /// </summary>
+        /// <param name="settings">The <see cref="VOAFileMergeTaskSettings"/> to copy
+        /// settings from.</param>
+        public VOAFileCompareConditionSettings(VOAFileMergeTaskSettings settings)
+            : base(settings)
+        {
+            try
+            {
+                ConditionMetIfMatching = true;
+                CreateOutput = false;
+                CreateOutputOnlyOnCondition = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32278");
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VOAFileCompareConditionSettings"/>
+        /// class.
+        /// </summary>
         /// <param name="settings">The <see cref="VOAFileCompareConditionSettings"/> to copy
         /// settings from.</param>
         public VOAFileCompareConditionSettings(VOAFileCompareConditionSettings settings)
+            : base(settings)
         {
             try
             {
                 ConditionMetIfMatching = settings.ConditionMetIfMatching;
-                DataFile1 = settings.DataFile1;
-                DataFile2 = settings.DataFile2;
-                OverlapThreshold = settings.OverlapThreshold;
                 CreateOutput = settings.CreateOutput;
-                OutputFile = settings.OutputFile;
                 CreateOutputOnlyOnCondition = settings.CreateOutputOnlyOnCondition;
             }
             catch (Exception ex)
@@ -79,15 +94,12 @@ namespace Extract.Redaction
         public VOAFileCompareConditionSettings(bool conditionMetIfMatching, string dataFile1,
             string dataFile2, int overlapThreshold, bool createOutput, string outputFile,
             bool createOutputOnlyOnCondition)
+            : base(dataFile1, dataFile2, overlapThreshold, outputFile)
         {
             try 
 	        {	        
 		        ConditionMetIfMatching = conditionMetIfMatching;
-                DataFile1 = dataFile1;
-                DataFile2 = dataFile2;
-                OverlapThreshold = overlapThreshold;
                 CreateOutput = createOutput;
-                OutputFile = outputFile;
                 CreateOutputOnlyOnCondition = createOutputOnlyOnCondition;
 	        }
 	        catch (Exception ex)
@@ -115,33 +127,6 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// The first data file to compare.
-        /// </summary>
-        public string DataFile1
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// The second data file to compare.
-        /// </summary>
-        public string DataFile2
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets the percentage of mutual overlap required to consider two redactions as equivalent.
-        /// </summary>
-        public int OverlapThreshold
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
         /// Gets a value indicating whether to generate merged output.
         /// </summary>
         /// <value>
@@ -149,15 +134,6 @@ namespace Extract.Redaction
         /// should be created; <see langword="false"/> otherwise.
         /// </value>
         public bool CreateOutput
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// The filename where merged output should be written.
-        /// </summary>
-        public string OutputFile
         {
             get;
             private set;
@@ -188,7 +164,7 @@ namespace Extract.Redaction
         /// <see cref="VOAFileCompareConditionSettings"/>.</param>
         /// <returns>A <see cref="VOAFileCompareConditionSettings"/> created from the
         /// specified <see cref="IStreamReader"/>.</returns>
-        public static VOAFileCompareConditionSettings ReadFrom(IStreamReader reader)
+        public static new VOAFileCompareConditionSettings ReadFrom(IStreamReader reader)
         {
             try
             {
@@ -196,15 +172,11 @@ namespace Extract.Redaction
                     VOAFileCompareCondition._COMPONENT_DESCRIPTION + ".",
                     reader.Version <= VOAFileCompareCondition._CURRENT_VERSION);
 
-                VOAFileCompareConditionSettings settings =
-                    new VOAFileCompareConditionSettings();
+                VOAFileCompareConditionSettings settings = new VOAFileCompareConditionSettings(
+                    VOAFileMergeTaskSettings.ReadFrom(reader));
 
                 settings.ConditionMetIfMatching = reader.ReadBoolean();
-                settings.DataFile1 = reader.ReadString();
-                settings.DataFile2 = reader.ReadString();
-                settings.OverlapThreshold = reader.ReadInt32();
                 settings.CreateOutput = reader.ReadBoolean();
-                settings.OutputFile = reader.ReadString();
                 settings.CreateOutputOnlyOnCondition = reader.ReadBoolean();
 
                 return settings;
@@ -222,16 +194,14 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="writer">The writer into which the 
         /// <see cref="VOAFileCompareConditionSettings"/> will be written.</param>
-        public void WriteTo(IStreamWriter writer)
+        public new void WriteTo(IStreamWriter writer)
         {
             try
             {
+                base.WriteTo(writer);
+
                 writer.Write(ConditionMetIfMatching);
-                writer.Write(DataFile1);
-                writer.Write(DataFile2);
-                writer.Write(OverlapThreshold);
                 writer.Write(CreateOutput);
-                writer.Write(OutputFile);
                 writer.Write(CreateOutputOnlyOnCondition);
             }
             catch (Exception ex)

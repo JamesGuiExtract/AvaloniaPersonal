@@ -1,4 +1,5 @@
-﻿using Extract.Interop;
+﻿using Extract.AttributeFinder;
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
@@ -13,6 +14,8 @@ using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
+
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.Redaction
 {
@@ -57,19 +60,9 @@ namespace Extract.Redaction
         InitializationSettings _idShieldSettings = new InitializationSettings();
 
         /// <summary>
-        /// Used to remove metadata attributes from the merged result.
-        /// </summary>
-        AFUtility _afUtility = new AFUtility();
-
-        /// <summary>
         /// The settings for this object.
         /// </summary>
         VOAFileCompareConditionSettings _settings;
-
-        /// <summary>
-        /// Used to compare and merge the files.
-        /// </summary>
-        SpatialAttributeMergeUtils _attributeMerger;
 
         #endregion Fields
 
@@ -125,72 +118,13 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI31775",
                     _COMPONENT_DESCRIPTION);
 
-                InitializeAttributeMerger();
+                SpatialAttributeMergeUtils attributeMerger = VOAFileMergeTask.InitializeAttributeMerger(
+                    _idShieldSettings, _settings.OverlapThreshold);
 
-                // Load the redactions
-                FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTagManager.FPSFileDir);
-                string dataFile1 = pathTags.Expand(_settings.DataFile1);
-                string dataFile2 = pathTags.Expand(_settings.DataFile2);
-
-                // Create a RedactionFileLoader to load redactions from the data files.
-                RedactionFileLoader voaLoader =
-                    new RedactionFileLoader(
-                        new ConfidenceLevelsCollection(_idShieldSettings.ConfidenceLevels));
-
-                // Load spatial & redacted attributes from dataFile1
-                voaLoader.LoadFrom(dataFile1, pFileRecord.Name);
-                IUnknownVector attributeSet1 = voaLoader.Items
-                    .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
-                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute)
-                    .Where(attribute => attribute.Value.HasSpatialInfo())
-                    .ToIUnknownVector<IAttribute>();
-
-                // Load spatial & redacted attributes from dataFile2
-                voaLoader.LoadFrom(dataFile2, pFileRecord.Name);
-                IUnknownVector attributeSet2 = voaLoader.Items
-                    .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
-                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute)
-                    .Where(attribute => attribute.Value.HasSpatialInfo())
-                    .ToIUnknownVector<IAttribute>();
-
-                // Load spatial info (used to normalize the attribute raster zones into the same
-                // coordinate system for comparison).
-                SpatialString docText = new SpatialString();
-                docText.LoadFrom(pFileRecord.Name + ".uss", false);
-
-                bool attributeSetsMatch =
-                    _attributeMerger.CompareAttributeSets(attributeSet1, attributeSet2, docText);
-
-                bool conditionResult = (attributeSetsMatch == _settings.ConditionMetIfMatching);
-
-                // Create the output file if applicable.
-                if (_settings.CreateOutput &&
-                    (conditionResult || !_settings.CreateOutputOnlyOnCondition))
-                {
-                    // Apply the merges to both sets. The output will be the merged redactions plus
-                    // any un-merged redactions from either set.
-                    _attributeMerger.ApplyMerges(attributeSet1);
-                    _attributeMerger.ApplyMerges(attributeSet2);
-
-                    // To get all un-merged redactions into the ouput, select all attributes unique
-                    // to set2 and add them to set1.
-                    IEnumerable<IAttribute> set1Enumerable = attributeSet1.ToIEnumerable<IAttribute>();
-                    attributeSet1.Append(attributeSet2
-                        .ToIEnumerable<IAttribute>()
-                        .Where(attribute => !set1Enumerable.Contains(attribute))
-                        .ToIUnknownVector<IAttribute>());
-
-                    // Strip out the metadata attributes which won't be meaningful in the merged
-                    // output.
-                    _afUtility.RemoveMetadataAttributes(attributeSet1);
-
-                    // Save set 1 as the merged output.
-                    string outputFile = pathTags.Expand(_settings.OutputFile);
-                    attributeSet1.SaveTo(outputFile, false);
-                }
-
-                return (attributeSetsMatch == _settings.ConditionMetIfMatching);
+                bool conditionResult = VOAFileMergeTask.CompareMergeFiles(
+                    _settings, _idShieldSettings, attributeMerger, pFileRecord.Name, pFAMTagManager);
+                
+                return conditionResult;
             }
             catch (Exception ex)
             {
@@ -384,9 +318,6 @@ namespace Extract.Redaction
                     _settings = VOAFileCompareConditionSettings.ReadFrom(reader);
                 }
 
-                // Reset _attributeMerger to force it to be re-loaded next time the condition is run.
-                _attributeMerger = null;
-
                 // Freshly loaded object is no longer dirty
                 _dirty = false;
             }
@@ -420,9 +351,6 @@ namespace Extract.Redaction
 
                 if (clearDirty)
                 {
-                    // Reset _attributeMerger to force it to be re-loaded next time the condition is run.
-                    _attributeMerger = null;
-
                     _dirty = false;
                 }
             }
@@ -493,43 +421,6 @@ namespace Extract.Redaction
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32136");
-            }
-        }
-
-        /// <summary>
-        /// Initializes the attribute merger.
-        /// </summary>
-        void InitializeAttributeMerger()
-        {
-            if (_attributeMerger == null || _dirty)
-            {
-                _attributeMerger = new SpatialAttributeMergeUtils();
-
-                _attributeMerger.OverlapPercent = _settings.OverlapThreshold;
-                _attributeMerger.UseMutualOverlap = true;
-                _attributeMerger.NameMergeMode = EFieldMergeMode.kPreserveField;
-                _attributeMerger.TypeMergeMode = EFieldMergeMode.kCombineField;
-                _attributeMerger.SpecifiedValue = "Merged";
-                _attributeMerger.PreserveAsSubAttributes = false;
-                _attributeMerger.CreateMergedRegion = false;
-
-                // Add the standard confidence levels to the name merge priority.
-                VariantVector nameMergePriority = new VariantVector();
-                nameMergePriority.PushBack("Manual");
-                nameMergePriority.PushBack("HCData");
-                nameMergePriority.PushBack("MCData");
-                nameMergePriority.PushBack("LCData");
-                nameMergePriority.PushBack("Clues");
-                
-                // And any non-standard confidence level query from the ini file.
-                foreach (string name in _idShieldSettings.ConfidenceLevels
-                    .Select(confidenceLevel => confidenceLevel.Query)
-                    .Where(name => nameMergePriority.Find(name) == -1))
-                {
-                     nameMergePriority.PushBack(name);
-                } 
-
-                _attributeMerger.NameMergePriority = nameMergePriority;
             }
         }
 

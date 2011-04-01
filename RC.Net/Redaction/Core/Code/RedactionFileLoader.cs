@@ -4,8 +4,12 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 
@@ -241,11 +245,22 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets the id to be assigned to the next attribute created.
+        /// </summary>
+        public long NextId
+        {
+            get
+            {
+                return _nextId;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
 
-        /// <overloads>Loads the contents of the voa file from the specified file.</overloads>
+        /// <overloads>Loads voa file data.</overloads>
         /// <summary>
         /// Loads the contents of the voa file from the specified file.
         /// </summary>
@@ -268,7 +283,10 @@ namespace Extract.Redaction
                 if (File.Exists(fileName))
                 {
                     // Load the attributes from the file
-                    LoadVoa(fileName);
+                    IUnknownVector attributes = new IUnknownVector();
+                    attributes.LoadFrom(fileName, false);
+
+                    LoadData(attributes);
                 }
             }
             catch (Exception ex)
@@ -283,13 +301,39 @@ namespace Extract.Redaction
         /// <summary>
         /// Loads the contents of the voa file from the specified file.
         /// </summary>
-        /// <param name="fileName">The vector of attributes (VOA) file to load.</param>
-        void LoadVoa(string fileName)
+        /// <param name="attributes">The attribute heirarchy to load.</param>
+        /// <param name="sourceDocument">The source document corresponding to the 
+        /// <paramref name="attributes"/>.</param>
+        [CLSCompliant(false)]
+        public void LoadFrom(IUnknownVector attributes, string sourceDocument)
         {
-            // Load the attributes from the file
-            IUnknownVector attributes = new IUnknownVector();
-            attributes.LoadFrom(fileName, false);
+            try
+            {
+                _sensitiveItems = new List<SensitiveItem>();
+                _metadata = new List<ComAttribute>();
+                _verificationSessionId = 0;
+                _nextId = 1;
 
+                _fileName = string.Empty;
+                _sourceDocument = sourceDocument;
+                _comAttribute = new AttributeCreator(sourceDocument);
+
+                LoadData(attributes);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI32267",
+                    "Unable to load voa file data.", ex);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Loads the data from the specified <see paramref="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">The attributes.</param>
+        void LoadData(IUnknownVector attributes)
+        {
             // Ensure the schema of this VOA file is accurate
             ValidateSchema(attributes);
 
@@ -698,6 +742,114 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Saves the <see cref="RedactionFileLoader"/> with the information about a VOA file merge
+        /// operation.
+        /// </summary>
+        /// <param name="sessionName">The name of the session (compare or merge).</param>
+        /// <param name="fileName">The full path to location where the file should be saved.</param>
+        /// <param name="sourceFile1">The name of the first VOA file whose data was merged into
+        /// <see paramref="fileName"/>.</param>
+        /// <param name="sourceFile2">The name of the second VOA file whose data was merged into
+        /// <see paramref="fileName"/>.</param>
+        /// <param name="set1Mappings">The keys of this dictionary are the original IDs of
+        /// each attribute from <see paramref="sourceFile1"/> while the values are a list of
+        /// <see cref="ComAttribute"/>s that associate the attribute with the ID of an attribute in
+        /// <see paramref="fileName"/>.</param>
+        /// <param name="set2Mappings">The keys of this dictionary are the original IDs of
+        /// each attribute from <see paramref="sourceFile2"/> while the values are a list of
+        /// <see cref="ComAttribute"/>s that associate the attribute with the ID of an attribute in
+        /// <see paramref="fileName"/>.</param>
+        /// <param name="time">The interval of time spent comparing an merging the source files.
+        /// </param>
+        /// <param name="settings">The settings used during the compare/merge operation.</param>
+        [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public void SaveVOAFileMergeSession(string sessionName, string fileName, string sourceFile1,
+            string sourceFile2, Dictionary<string, List<ComAttribute>> set1Mappings,
+            Dictionary<string, List<ComAttribute>> set2Mappings, TimeInterval time,
+            VOAFileMergeTaskSettings settings)
+        {
+            try
+            {
+                // Create session attribute
+                // (This will always be the one and only session, so the last session ID is 0).
+                ComAttribute session = CreateSessionAttribute(sessionName, 0, time);
+
+                // Rename _IDShieldDataFile to _OutputFile
+                ComAttribute outputFile = AttributeMethods.GetSingleAttributeByName(
+                    session.SubAttributes, Constants.IDShieldDataFileMetadata);
+                outputFile.Name = Constants.OutputFileMetadata;
+
+                // Create an attribute containing the session's settings.
+                ComAttribute sessionSettings = CreateGenericOptionsAttribute(settings);
+
+                AttributeMethods.AppendChildren(session, sessionSettings);
+
+                // Add the metadata from each of the source data files.
+                AddSourceMetadata(session, sourceFile1, set1Mappings);
+                AddSourceMetadata(session, sourceFile2, set2Mappings);
+
+                // The session will be the one and only attribute to add alongside the result's
+                // sensitive data.
+                IUnknownVector attributes = new IUnknownVector();
+                attributes.PushBack(session);
+
+                // Save the attributes
+                SaveAttributesTo(_sensitiveItems, attributes, fileName);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI32268",
+                    "Unable to save updated VOA file.", ex);
+                ee.AddDebugData("Voa file", fileName, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Adds to the <see paramref="session"/> metadata for the specified
+        /// <see paramref="sourceFile"/>.
+        /// </summary>
+        /// <param name="session">The session to which the metadata should be added.</param>
+        /// <param name="sourceFile">Name of the source file for which metadata should be added.
+        /// </param>
+        /// <param name="attributeMappings">The keys of this dictionary are the original IDs of
+        /// each attribute from <see paramref="sourceFile"/> while the values are a list of
+        /// <see cref="ComAttribute"/>s that associate the attribute with the ID of an attribute in
+        /// the output.</param>
+        void AddSourceMetadata(ComAttribute session, string sourceFile,
+            Dictionary<string, List<ComAttribute>> attributeMappings)
+        {
+            ComAttribute sourceData = _comAttribute.Create(Constants.IDShieldDataFileMetadata, sourceFile);
+
+            IUnknownVector sourceAttributes = new IUnknownVector();
+            sourceAttributes.LoadFrom(sourceFile, false);
+
+            // Iterate all current sensitive items (all non-metadata attributes) from the source in
+            // order to apply all mapping metadata from attributeMappings that applies to the items.
+            foreach (ComAttribute attribute in sourceAttributes
+                .ToIEnumerable<ComAttribute>()
+                .Where(attribute => !attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase)))
+            {
+                ComAttribute idRevision = AttributeMethods.GetSingleAttributeByName(
+                    attribute.SubAttributes, Constants.IDAndRevisionMetadata);
+                if (idRevision != null)
+                {
+                    List<ComAttribute> mappings;
+                    if (attributeMappings.TryGetValue(idRevision.Value.String, out mappings))
+                    {
+                        AttributeMethods.AppendChildren(attribute, mappings.ToArray());
+                    }
+                }
+            }
+
+            AttributeMethods.AppendChildren(sourceData,
+                sourceAttributes.ToIEnumerable<ComAttribute>().ToArray());
+
+            AttributeMethods.AppendChildren(session, sourceData);
+        }
+
+        /// <summary>
         /// Modifies the VOA file and appends a session metadata COM attribute.
         /// </summary>
         /// <param name="sessionName">The name of the session metadata COM attribute.</param>
@@ -942,8 +1094,8 @@ namespace Extract.Redaction
             ComAttribute time = CreateScreenTimeAttribute(screenTime);
 
             // File information
-            ComAttribute source = _comAttribute.Create("_SourceDocName", _sourceDocument);
-            ComAttribute data = _comAttribute.Create("_IDShieldDataFile", _fileName);
+            ComAttribute source = _comAttribute.Create(Constants.SourceDocNameMetadata, _sourceDocument);
+            ComAttribute data = _comAttribute.Create(Constants.IDShieldDataFileMetadata, _fileName);
 
             // Session attribute
             ComAttribute session = _comAttribute.Create(sessionName, lastSessionId + 1);
@@ -1020,7 +1172,7 @@ namespace Extract.Redaction
         /// </returns>
         ComAttribute CreateSurroundContextOptionsAttribute(SurroundContextSettings settings)
         {
-            ComAttribute options = _comAttribute.Create("_Options");
+            ComAttribute options = _comAttribute.Create(Constants.OptionsMetadata);
             ComAttribute typesToExtend = _comAttribute.Create("_TypesToExtend",
                 GetTypesToExtend(settings));
 
@@ -1033,6 +1185,31 @@ namespace Extract.Redaction
             AttributeMethods.AppendChildren(options, typesToExtend, wordsToExtend, extendHeight);
 
             return options;
+        }
+
+        /// <summary>
+        /// Creates a metadata attribute with the value of all properties in
+        /// <see paramref="settings"/>.
+        /// </summary>
+        /// <param name="settings">The settings object whose values should be written to a
+        /// metadata <see cref="ComAttribute"/>.</param>
+        /// <returns>A metadata attribute describing the <see paramref="settings"/>.
+        /// </returns>
+        ComAttribute CreateGenericOptionsAttribute(object settings)
+        {
+            ComAttribute optionsAttribute = _comAttribute.Create(Constants.OptionsMetadata);
+
+            List<ComAttribute> options = new List<ComAttribute>();
+            foreach (PropertyInfo property in (settings.GetType().GetProperties()))
+            {
+                ComAttribute attribute = _comAttribute.Create("_" + property.Name,
+                    property.GetValue(settings, null).AsString());
+                options.Add(attribute);
+            }
+
+            AttributeMethods.AppendChildren(optionsAttribute, options.ToArray());
+
+            return optionsAttribute;
         }
 
         /// <summary>
@@ -1135,13 +1312,11 @@ namespace Extract.Redaction
         {
             // Add the verified attributes to the output vector
             IUnknownVector output = new IUnknownVector();
-            foreach (SensitiveItem item in verified)
+            foreach (ComAttribute attribute in verified
+                .Where(redactionItem => redactionItem.Attribute.Redacted)                
+                .Select(redactionItem => redactionItem.Attribute.ComAttribute))
             {
-                RedactionItem redactionItem = item.Attribute;
-                if (redactionItem.Redacted)
-                {
-                    output.PushBack(redactionItem.ComAttribute);
-                }
+                output.PushBack(attribute);
             }
 
             // Append the metadata attributes

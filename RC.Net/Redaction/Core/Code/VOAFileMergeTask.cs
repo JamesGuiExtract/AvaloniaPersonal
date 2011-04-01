@@ -1,18 +1,21 @@
-﻿using Extract.Interop;
+﻿using Extract.AttributeFinder;
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
-using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
+
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.Redaction
 {
@@ -52,11 +55,6 @@ namespace Extract.Redaction
         /// The ID Shield ini settings.
         /// </summary>
         InitializationSettings _idShieldSettings = new InitializationSettings();
-
-        /// <summary>
-        /// Used to remove metadata attributes from the merged result.
-        /// </summary>
-        AFUtility _afUtility = new AFUtility();
 
         /// <summary>
         /// The settings for this object.
@@ -112,7 +110,8 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI32041",
                     _COMPONENT_DESCRIPTION);
 
-                InitializeAttributeMerger();
+                _attributeMerger =
+                    InitializeAttributeMerger(_idShieldSettings, _settings.OverlapThreshold);
             }
             catch (Exception ex)
             {
@@ -139,73 +138,22 @@ namespace Extract.Redaction
         public EFileProcessingResult ProcessFile(FileRecord pFileRecord, int nActionID,
             FAMTagManager pFAMTM, FileProcessingDB pDB, ProgressStatus pProgressStatus, bool bCancelRequested)
         {
+
             try
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI32043",
                     _COMPONENT_DESCRIPTION);
 
-                // Load the redactions
-                FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFileRecord.Name, pFAMTM.FPSFileDir);
-                string dataFile1 = pathTags.Expand(_settings.DataFile1);
-                string dataFile2 = pathTags.Expand(_settings.DataFile2);
-
-                // Create a RedactionFileLoader to load redactions from the data files.
-                RedactionFileLoader voaLoader =
-                    new RedactionFileLoader(
-                        new ConfidenceLevelsCollection(_idShieldSettings.ConfidenceLevels));
-
-                // Load spatial & redacted attributes from dataFile1
-                voaLoader.LoadFrom(dataFile1, pFileRecord.Name);
-                IUnknownVector attributeSet1 = voaLoader.Items
-                    .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
-                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute)
-                    .Where(attribute => attribute.Value.HasSpatialInfo())
-                    .ToIUnknownVector<IAttribute>();
-
-                // Load spatial & redacted attributes from dataFile2
-                voaLoader.LoadFrom(dataFile2, pFileRecord.Name);
-                IUnknownVector attributeSet2 = voaLoader.Items
-                    .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
-                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute)
-                    .Where(attribute => attribute.Value.HasSpatialInfo())
-                    .ToIUnknownVector<IAttribute>();
-
-                // Load spatial info (used to normalize the attribute raster zones into the same
-                // coordinate system for comparison).
-                SpatialString docText = new SpatialString();
-                docText.LoadFrom(pFileRecord.Name + ".uss", false);
-
-                _attributeMerger.CompareAttributeSets(attributeSet1, attributeSet2, docText);
-
-                // Apply the merges to both sets. The output will be the merged redactions plus
-                // any un-merged redactions from either set.
-                _attributeMerger.ApplyMerges(attributeSet1);
-                _attributeMerger.ApplyMerges(attributeSet2);
-
-                // To get all un-merged redactions into the ouput, select all attributes unique
-                // to set2 and add them to set1.
-                IEnumerable<IAttribute> set1Enumerable = attributeSet1.ToIEnumerable<IAttribute>();
-                attributeSet1.Append(attributeSet2
-                    .ToIEnumerable<IAttribute>()
-                    .Where(attribute => !set1Enumerable.Contains(attribute))
-                    .ToIUnknownVector<IAttribute>());
-
-                // Strip out the metadata attributes which won't be meaningful in the merged
-                // output.
-                _afUtility.RemoveMetadataAttributes(attributeSet1);
-
-                // Save set 1 as the merged output.
-                string outputFile = pathTags.Expand(_settings.OutputFile);
-                attributeSet1.SaveTo(outputFile, false);
+                CompareMergeFiles(_settings, _idShieldSettings, _attributeMerger, pFileRecord.Name,
+                    pFAMTM);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI32044",
-                    "Unable to extend redactions to cover surrounding context.", ex);
+                    "Failed to merge ID Shield data files.", ex);
             }
         }
 
@@ -486,6 +434,171 @@ namespace Extract.Redaction
 
         #endregion IPersistStream Members
 
+        #region Internal Members
+
+        /// <summary>
+        /// Compares and, depending on the <see paramref="settings"/>, merges the VOA files
+        /// specified in <see paramref="settings"/>.
+        /// </summary>
+        /// <param name="settings">The <see cref="VOAFileMergeTaskSettings"/> that describe how the
+        /// source files should be compared/merged. This may be a
+        /// <see cref="VOAFileCompareConditionSettings"/> instace if the purpose of the call is a
+        /// comparsion of the source files.</param>
+        /// <param name="idShieldSettings">The ID shield ini settings to use.</param>
+        /// <param name="attributeMerger">The <see cref="SpatialAttributeMergeUtils"/> to use to
+        /// compare and merge the source files.</param>
+        /// <param name="sourceDocName">The source document name.</param>
+        /// <param name="pFAMTM">A <see cref="FAMTagManager"/> for expanding tags.</param>
+        static internal bool CompareMergeFiles(VOAFileMergeTaskSettings settings,
+            InitializationSettings idShieldSettings, SpatialAttributeMergeUtils attributeMerger,
+            string sourceDocName, FAMTagManager pFAMTM)
+        {
+            string dataFile1 = null;
+            string dataFile2 = null;
+            string outputFile = null;
+
+            try
+            {
+                // Start the timer
+                IntervalTimer timer = IntervalTimer.StartNew();
+
+                // Load the redactions
+                FileActionManagerPathTags pathTags =
+                    new FileActionManagerPathTags(sourceDocName, pFAMTM.FPSFileDir);
+                dataFile1 = pathTags.Expand(settings.DataFile1);
+                dataFile2 = pathTags.Expand(settings.DataFile2);
+
+                // Create a RedactionFileLoader to load redactions from the data files.
+                RedactionFileLoader voaLoader =
+                    new RedactionFileLoader(
+                        new ConfidenceLevelsCollection(idShieldSettings.ConfidenceLevels));
+
+                // Load spatial & redacted attributes from dataFile1
+                voaLoader.LoadFrom(dataFile1, sourceDocName);
+                IEnumerable<ComAttribute> set1OriginalAttributes = voaLoader.Items
+                    .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
+                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute)
+                    .Where(attribute => attribute.Value.HasSpatialInfo());
+                IUnknownVector attributeVector1 = set1OriginalAttributes.ToIUnknownVector();
+
+                long nextId = voaLoader.NextId;
+
+                // Load spatial & redacted attributes from dataFile2
+                voaLoader.LoadFrom(dataFile2, sourceDocName);
+                IUnknownVector attributeVector2 = voaLoader.Items
+                    .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
+                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute)
+                    .Where(attribute => attribute.Value.HasSpatialInfo())
+                    .ToIUnknownVector();
+
+                // The IDs of the output items will start with the next higher number than any
+                // existing item id in either of the two source files.
+                nextId = Math.Max(nextId, voaLoader.NextId);
+
+                // Load spatial info (used to normalize the attribute raster zones into the same
+                // coordinate system for comparison).
+                SpatialString docText = new SpatialString();
+                docText.LoadFrom(sourceDocName + ".uss", false);
+
+                // Use a unique value that allows attributes merged this session to be identified.
+                string mergedValue =
+                    string.Format(CultureInfo.CurrentCulture, "_{0}_", DateTime.Now.Ticks);
+                attributeMerger.SpecifiedValue = mergedValue;
+
+                bool attributeSetsMatch =
+                    attributeMerger.CompareAttributeSets(attributeVector1, attributeVector2, docText);
+
+                // If the provided settings object is an VOAFileCompareConditionSettings instance,
+                // whether we merge will depend on the settings. Otherwise this is a merge task and,
+                // thus, we will merge.
+                VOAFileCompareConditionSettings compareSettings =
+                    settings as VOAFileCompareConditionSettings;
+
+                bool conditionResult = false;
+                bool mergeFiles = true;
+                if (compareSettings != null)
+                {
+                    conditionResult = (attributeSetsMatch == compareSettings.ConditionMetIfMatching);
+                    mergeFiles = compareSettings.CreateOutput &&
+                        (conditionResult || !compareSettings.CreateOutputOnlyOnCondition);
+                }
+
+                // Create the output file if applicable.
+                if (mergeFiles)
+                {
+                    AttributeCreator attributeCreator = new AttributeCreator(sourceDocName);
+                    outputFile = pathTags.Expand(settings.OutputFile);
+
+                    // Apply the merges to both sets. The output will be the merged redactions plus
+                    // any un-merged redactions from either set.
+                    attributeMerger.ApplyMerges(attributeVector1);
+                    attributeMerger.ApplyMerges(attributeVector2);
+
+                    // Convert the resulting vectors to IEnumerables for more efficient iteration.
+                    IEnumerable<ComAttribute> set1Attributes =
+                        attributeVector1.ToIEnumerable<ComAttribute>();
+                    IEnumerable<ComAttribute> set2Attributes =
+                        attributeVector2.ToIEnumerable<ComAttribute>();
+
+                    // Create collections to store the final output as well as attributes to map each
+                    // source attribute to an attribute in the output (merged or not).
+                    IUnknownVector outputAttributes = new IUnknownVector();
+                    Dictionary<string, List<ComAttribute>> set1Mappings =
+                        new Dictionary<string, List<ComAttribute>>();
+                    Dictionary<string, List<ComAttribute>> set2Mappings =
+                        new Dictionary<string, List<ComAttribute>>();
+
+                    // Find all sensitive items from either file that haven't been merged and add them
+                    // to the output attributes while adding a mapping entry that ties the item from the
+                    // original file to the corresponding item in the output file.
+                    AddUnmergedAttributes(attributeCreator, set1Attributes, mergedValue, set1Mappings,
+                        outputAttributes, ref nextId);
+                    AddUnmergedAttributes(attributeCreator, set2Attributes, mergedValue, set2Mappings,
+                        outputAttributes, ref nextId);
+
+                    // Find all sensitive items have been merged and add them to the output attributes
+                    // while adding a mapping entries that tie original items to the merged item.
+                    AddMergedAttributes(attributeCreator, set1Attributes, set1OriginalAttributes,
+                        mergedValue, set1Mappings, set2Mappings, outputAttributes, ref nextId);
+
+                    // Replace all attributes with the unique value with "Merged" in the final output.
+                    foreach (ComAttribute mergedAttribute in attributeVector1
+                        .ToIEnumerable<ComAttribute>()
+                        .Where(attribute => attribute.Value.String == mergedValue))
+                    {
+                        mergedAttribute.Value.ReplaceAndDowngradeToHybrid("Merged");
+                    }
+
+                    outputAttributes.SaveTo(outputFile, false);
+
+                    // Load the output using the RedactionFileLoader in order to add the metadata for
+                    // this session.
+                    voaLoader.LoadFrom(outputFile, sourceDocName);
+
+                    TimeInterval interval = timer.Stop();
+
+                    string sessionName = (compareSettings == null) 
+                        ? Constants.VOAFileMergeSessionMetaDataName
+                        : Constants.VOAFileCompareSessionMetaDataName;
+
+                    voaLoader.SaveVOAFileMergeSession(sessionName, outputFile, dataFile1, dataFile2,
+                        set1Mappings, set2Mappings, interval, settings);
+                }
+
+                return conditionResult;
+            }
+            catch (Exception ex)
+            {
+                var ee = ExtractException.AsExtractException("ELI32270", ex);
+                ee.AddDebugData("Data File 1", dataFile1, false);
+                ee.AddDebugData("Data File 2", dataFile2, false);
+                ee.AddDebugData("Output File", outputFile, false);
+                throw ee;
+            }
+        }
+
+        #endregion Internal Members
+
         #region Private Members
 
         /// <summary>
@@ -540,35 +653,169 @@ namespace Extract.Redaction
         /// <summary>
         /// Initializes the attribute merger.
         /// </summary>
-        void InitializeAttributeMerger()
+        /// <param name="idShieldSettings">The ID shield ini settings to use.</param>
+        /// <param name="overlapThreshold">The percentage of mutual overlap required to consider
+        /// two redactions as equivalent.</param>
+        internal static SpatialAttributeMergeUtils InitializeAttributeMerger(
+            InitializationSettings idShieldSettings, double overlapThreshold)
         {
-            _attributeMerger = new SpatialAttributeMergeUtils();
-
-            _attributeMerger.OverlapPercent = _settings.OverlapThreshold;
-            _attributeMerger.UseMutualOverlap = true;
-            _attributeMerger.NameMergeMode = EFieldMergeMode.kPreserveField;
-            _attributeMerger.TypeMergeMode = EFieldMergeMode.kCombineField;
-            _attributeMerger.SpecifiedValue = "Merged";
-            _attributeMerger.PreserveAsSubAttributes = false;
-            _attributeMerger.CreateMergedRegion = false;
-
-            // Add the standard confidence levels to the name merge priority.
-            VariantVector nameMergePriority = new VariantVector();
-            nameMergePriority.PushBack("Manual");
-            nameMergePriority.PushBack("HCData");
-            nameMergePriority.PushBack("MCData");
-            nameMergePriority.PushBack("LCData");
-            nameMergePriority.PushBack("Clues");
-
-            // And any non-standard confidence level query from the ini file.
-            foreach (string name in _idShieldSettings.ConfidenceLevels
-                .Select(confidenceLevel => confidenceLevel.Query)
-                .Where(name => nameMergePriority.Find(name) == -1))
+            try
             {
-                nameMergePriority.PushBack(name);
-            }
+                SpatialAttributeMergeUtils attributeMerger = new SpatialAttributeMergeUtils();
 
-            _attributeMerger.NameMergePriority = nameMergePriority;
+                attributeMerger.OverlapPercent = overlapThreshold;
+                attributeMerger.UseMutualOverlap = true;
+                attributeMerger.NameMergeMode = EFieldMergeMode.kPreserveField;
+                attributeMerger.TypeMergeMode = EFieldMergeMode.kCombineField;
+                attributeMerger.PreserveAsSubAttributes = true;
+                attributeMerger.CreateMergedRegion = false;
+
+                // Add the standard confidence levels to the name merge priority.
+                VariantVector nameMergePriority = new VariantVector();
+                nameMergePriority.PushBack("Manual");
+                nameMergePriority.PushBack("HCData");
+                nameMergePriority.PushBack("MCData");
+                nameMergePriority.PushBack("LCData");
+                nameMergePriority.PushBack("Clues");
+
+                // And any non-standard confidence level query from the ini file.
+                foreach (string name in idShieldSettings.ConfidenceLevels
+                    .Select(confidenceLevel => confidenceLevel.Query)
+                    .Where(name => nameMergePriority.Find(name) == -1))
+                {
+                    nameMergePriority.PushBack(name);
+                }
+
+                attributeMerger.NameMergePriority = nameMergePriority;
+
+                return attributeMerger;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32277");
+            }
+        }
+
+        /// <summary>
+        /// Adds all unmerged <see cref="ComAttribute"/>s from <see paramref="sourceAttributes"/> to
+        /// <see paramref="outputAttributes"/> while adding any relevant mapping data to
+        /// <see paramref="attributeMappings"/>.
+        /// </summary>
+        /// <param name="attributeCreator">The <see cref="AttributeCreator"/> to use when creating
+        /// new <see cref="ComAttribute"/>s (for metadata).</param>
+        /// <param name="sourceAttributes">The enumerable of <see cref="ComAttribute"/>s from which
+        /// the unmerged results should be extracted.</param>
+        /// <param name="mergedValue">The value by which merged attributes can be identified.</param>
+        /// <param name="attributeMappings">The keys of this dictionary are the original IDs of each
+        /// attribute from <see paramref="sourceAttributes"/> while the values are a list of
+        /// <see cref="ComAttribute"/>s that associate the attribute with the ID of an attribute in
+        /// <see paramref="outputAttributes"/>.</param>
+        /// <param name="outputAttributes">The <see cref="IUnknownVector"/> of
+        /// <see cref="ComAttribute"/>s to which the unmerged attributes should be added.</param>
+        /// <param name="nextId">The id to be assigned to the next <see cref="ComAttribute"/>
+        /// created.</param>
+        static void AddUnmergedAttributes(AttributeCreator attributeCreator,
+            IEnumerable<ComAttribute> sourceAttributes, string mergedValue,
+            Dictionary<string, List<ComAttribute>> attributeMappings,
+            IUnknownVector outputAttributes, ref long nextId)
+        {
+            foreach (ComAttribute sourceAttribute in sourceAttributes
+                .Where(attribute => attribute.Value.String != mergedValue))
+            {
+                outputAttributes.PushBack(sourceAttribute);
+
+                ComAttribute idAndRevisionAttribute = sourceAttribute.SubAttributes
+                    .ToIEnumerable<ComAttribute>()
+                    .Where(attribute => attribute.Name == Constants.IDAndRevisionMetadata)
+                    .Single();
+
+                string oldID = idAndRevisionAttribute.Value.String;
+                string newId = nextId++.ToString(CultureInfo.InvariantCulture);
+                ComAttribute mappingAttribute =
+                    attributeCreator.Create(Constants.ImportedToIDMetadata, newId);
+
+                idAndRevisionAttribute.Value.ReplaceAndDowngradeToNonSpatial(newId);
+                idAndRevisionAttribute.Type = "_1";
+
+                List<ComAttribute> mappings;
+                if (!attributeMappings.TryGetValue(oldID, out mappings))
+                {
+                    mappings = new List<ComAttribute>();
+                    attributeMappings[oldID] = mappings;
+                }
+                mappings.Add(mappingAttribute);
+            }
+        }
+
+        /// <summary>
+        /// Adds all merged <see cref="ComAttribute"/>s from <see paramref="set1Attributes"/> to
+        /// <see paramref="outputAttributes"/> while adding any relevant mapping data to
+        /// <see paramref="set1AttributeMappings"/> and <see paramref="set2AttributeMappings"/>.
+        /// </summary>
+        /// <param name="attributeCreator">The <see cref="AttributeCreator"/> to use when creating
+        /// new <see cref="ComAttribute"/>s (for metadata).</param>
+        /// <param name="set1Attributes">The enumerable of <see cref="ComAttribute"/>s from which
+        /// the merged results should be extracted.</param>
+        /// <param name="set1OriginalAttributes">The enumerable of <see cref="ComAttribute"/>s
+        /// representing the original contents of set 1. Used to check whether a contributing
+        /// attribute to a merged result is from set 1 or set 2.</param>
+        /// <param name="mergedValue">The value by which merged attributes can be identified.</param>
+        /// <param name="set1AttributeMappings">The keys of this dictionary are the original IDs of
+        /// each attribute from <see paramref="set1Attributes"/> while the values are a list of
+        /// <see cref="ComAttribute"/>s that associate the attribute with the ID of an attribute in
+        /// <see paramref="outputAttributes"/>.</param>
+        /// <param name="set2AttributeMappings">Like <see paramref="set2AttributeMappings"/>, but
+        /// for the attributes from set 2.</param>
+        /// <param name="outputAttributes">The <see cref="IUnknownVector"/> of
+        /// <see cref="ComAttribute"/>s to which the unmerged attributes should be added.</param>
+        /// <param name="nextId">The id to be assigned to the next <see cref="ComAttribute"/>
+        /// created.</param>
+        static void AddMergedAttributes(AttributeCreator attributeCreator,
+            IEnumerable<ComAttribute> set1Attributes,
+            IEnumerable<ComAttribute> set1OriginalAttributes, string mergedValue,
+            Dictionary<string, List<ComAttribute>> set1AttributeMappings,
+            Dictionary<string, List<ComAttribute>> set2AttributeMappings,
+            IUnknownVector outputAttributes, ref long nextId)
+        {
+            foreach (ComAttribute mergedAttribute in set1Attributes
+                .Where(attribute => attribute.Value.String == mergedValue))
+            {
+                string newId = nextId++.ToString(CultureInfo.InvariantCulture);
+
+                foreach (ComAttribute sourceAttribute in mergedAttribute.SubAttributes
+                    .ToIEnumerable<ComAttribute>())
+                {
+                    ComAttribute oldIdRevision = sourceAttribute.SubAttributes
+                        .ToIEnumerable<ComAttribute>()
+                        .Where(attribute => attribute.Name == Constants.IDAndRevisionMetadata)
+                        .Single();
+
+                    string oldID = oldIdRevision.Value.String;
+                    ComAttribute mappingAttribute = attributeCreator.Create(Constants.MergedToIDMetadata, newId);
+
+                    Dictionary<string, List<ComAttribute>> sourceMappings =
+                        set1OriginalAttributes.Contains(sourceAttribute)
+                            ? set1AttributeMappings : set2AttributeMappings;
+
+                    List<ComAttribute> mappings;
+                    if (!sourceMappings.TryGetValue(oldID, out mappings))
+                    {
+                        mappings = new List<ComAttribute>();
+                        sourceMappings[oldID] = mappings;
+                    }
+                    mappings.Add(mappingAttribute);
+                }
+
+                // Remove the sub-attributes now that we have loaded all mapping data from them.
+                mergedAttribute.SubAttributes = null;
+
+                // Generate a new IDAndRevision attribute using the new id.
+                ComAttribute newIdRevision =
+                    attributeCreator.Create(Constants.IDAndRevisionMetadata, newId, "_1");
+                AttributeMethods.AppendChildren(mergedAttribute, newIdRevision);
+
+                outputAttributes.PushBack(mergedAttribute);
+            }
         }
 
         #endregion Private Members

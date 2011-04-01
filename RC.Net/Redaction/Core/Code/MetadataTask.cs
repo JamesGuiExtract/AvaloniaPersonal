@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
@@ -34,7 +35,7 @@ namespace Extract.Redaction
 
         const int _TASK_VERSION = 2;
 
-        const int _METADATA_VERSION = 4;
+        const int _METADATA_VERSION = 5;
         
         #endregion Constants
 
@@ -291,9 +292,11 @@ namespace Extract.Redaction
             // Exemption codes
             WriteExemptions(writer, item);
 
+            // Metadata the maps the ID in the source file to the ID the item was merged
+            WriteMappings(writer, item);
+
             writer.WriteEndElement();
         }
-
         /// <summary>
         /// Writes the attribute ID and revision ID to xml.
         /// </summary>
@@ -302,7 +305,7 @@ namespace Extract.Redaction
         static void WriteRevisionId(XmlWriter writer, RedactionItem item)
         {
             long id = item.GetId();
-            writer.WriteAttributeString("ID", id.ToString(CultureInfo.CurrentCulture));
+            writer.WriteAttributeString(Constants.ID, id.ToString(CultureInfo.CurrentCulture));
             int revision = item.GetRevision();
             writer.WriteAttributeString("Revision", revision.ToString(CultureInfo.CurrentCulture));
         }
@@ -353,11 +356,30 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Writes the elements that map attributes from source data files to the output data file.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="item">The item containing to the mapping(s) to write.</param>
+        static void WriteMappings(XmlWriter writer, RedactionItem item)
+        {
+            foreach (ComAttribute mapping in item.ComAttribute.SubAttributes
+                .ToIEnumerable<ComAttribute>())
+            {
+                string name = mapping.Name;
+                if (name == Constants.ImportedToIDMetadata ||
+                    name == Constants.MergedToIDMetadata)
+                {
+                    writer.WriteElementString(name.Substring(1), mapping.Value.String);
+                }
+            }
+        }
+
+        /// <summary>
         /// Writes all sessions to xml
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="sessions"></param>
-        static void WriteSessions(XmlWriter writer, IEnumerable<ComAttribute> sessions)
+        void WriteSessions(XmlWriter writer, IEnumerable<ComAttribute> sessions)
         {
             foreach (ComAttribute session in sessions)
             {
@@ -378,6 +400,13 @@ namespace Extract.Redaction
                 {
                     WriteSurroundContextSession(writer, session);
                 }
+                else if (sessionName.Equals(Constants.VOAFileMergeSessionMetaDataName,
+                    StringComparison.OrdinalIgnoreCase) ||
+                         sessionName.Equals(Constants.VOAFileCompareSessionMetaDataName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    WriteVOAFileMergeSession(writer, session);
+                }
                 else
                 {
                     ExtractException.ThrowLogicException("ELI30095");
@@ -393,7 +422,7 @@ namespace Extract.Redaction
         static void WriteVerificationSession(XmlWriter writer, ComAttribute session)
         {
             writer.WriteStartElement("IDShieldVerificationSession");
-            writer.WriteAttributeString("ID", session.Value.String);
+            writer.WriteAttributeString(Constants.ID, session.Value.String);
 
             IUnknownVector subAttributes = session.SubAttributes;
 
@@ -421,10 +450,10 @@ namespace Extract.Redaction
         /// </param>
         static void WriteVerificationFileInfo(XmlWriter writer, IUnknownVector attributes)
         {
-            writer.WriteStartElement("FileInfo");
+            writer.WriteStartElement(Constants.FileInfo);
 
-            WriteValueByName(writer, attributes, "SourceDocName");
-            WriteValueByName(writer, attributes, "IDShieldDataFile");
+            WriteValueByName(writer, attributes, Constants.SourceDocName);
+            WriteValueByName(writer, attributes, Constants.IDShieldDataFile);
 
             writer.WriteEndElement();
         }
@@ -437,7 +466,7 @@ namespace Extract.Redaction
         static void WriteRedactionSession(XmlWriter writer, ComAttribute session)
         {
             writer.WriteStartElement("RedactedFileOutputSession");
-            writer.WriteAttributeString("ID", session.Value.String);
+            writer.WriteAttributeString(Constants.ID, session.Value.String);
 
             IUnknownVector subAttributes = session.SubAttributes;
 
@@ -465,7 +494,7 @@ namespace Extract.Redaction
         static void WriteSurroundContextSession(XmlWriter writer, ComAttribute session)
         {
             writer.WriteStartElement("SurroundContextSession");
-            writer.WriteAttributeString("ID", session.Value.String);
+            writer.WriteAttributeString(Constants.ID, session.Value.String);
 
             IUnknownVector subAttributes = session.SubAttributes;
 
@@ -475,12 +504,75 @@ namespace Extract.Redaction
 
             // File Info and Options
             WriteVerificationFileInfo(writer, subAttributes);
-            WriteAttributeAsXml(writer, subAttributes, "Options", 
+            WriteAttributeAsXml(writer, subAttributes, Constants.Options, 
                 "TypesToExtend", "WordsToExtend", "ExtendHeight");
 
             // Entries Modified
             WriteEntries(writer, subAttributes, "EntriesModified");
 
+            writer.WriteEndElement();
+        }
+
+        
+        /// <summary>
+        /// Writes the VOA file merge or compare session to xml.
+        /// </summary>
+        /// <param name="writer">The writer to write the xml.</param>
+        /// <param name="session">The attribute containing the surround context data.</param>
+        void WriteVOAFileMergeSession(XmlWriter writer, ComAttribute session)
+        {
+            writer.WriteStartElement(session.Name.Substring(1));
+            writer.WriteAttributeString(Constants.ID, session.Value.String);
+
+            IUnknownVector subAttributes = session.SubAttributes;
+
+            // User Info and Time Info
+            WriteUserInfo(writer, subAttributes);
+            WriteTimeInfo(writer, subAttributes);
+
+            // Options
+            WriteAttributeAsXml(writer, subAttributes, Constants.Options);
+
+            // File Info
+            writer.WriteStartElement(Constants.FileInfo);
+
+            WriteValueByName(writer, subAttributes, Constants.SourceDocName);
+            WriteValueByName(writer, subAttributes, Constants.OutputFile);
+
+            // For each source data file, output all data nested under an _IDShieldDataFile
+            // attribute. For each current attribute, an element will be included to map it to an
+            // redaction in the output file.
+            foreach (ComAttribute sourceFileAttribute in subAttributes
+                .ToIEnumerable<ComAttribute>()
+                .Where(attribute => attribute.Name == Constants.IDShieldDataFileMetadata))
+            {
+                writer.WriteStartElement(Constants.IDShieldDataFile);
+                writer.WriteAttributeString("Name", sourceFileAttribute.Value.String);
+
+                // Load the sub-attribute heirarchy as if it were a separate file.
+                RedactionFileLoader voaLoader = new RedactionFileLoader(_voaFile.ConfidenceLevels);
+                voaLoader.LoadFrom(sourceFileAttribute.SubAttributes, sourceFileAttribute.Value.String);
+
+                // Document Info
+                WriteDocumentType(writer, voaLoader.DocumentType);
+
+                // Current and previous revisions (includes mapping elements)
+                WriteCurrentItems(writer, voaLoader.Items);
+                WriteRevisions(writer, voaLoader.RevisionsAttribute);
+
+                // Verification, redaction and surround context sessions
+                if (voaLoader.AllSessions.Count > 0)
+                {
+                    WriteSessions(writer, voaLoader.AllSessions);
+                }
+
+                writer.WriteEndElement();
+            }
+
+            // FileInfo
+            writer.WriteEndElement();
+
+            // VOAFileMergeSession
             writer.WriteEndElement();
         }
 
@@ -492,11 +584,11 @@ namespace Extract.Redaction
         /// </param>
         static void WriteRedactionFileInfo(XmlWriter writer, IUnknownVector attributes)
         {
-            writer.WriteStartElement("FileInfo");
+            writer.WriteStartElement(Constants.FileInfo);
 
-            WriteValueByName(writer, attributes, "SourceDocName");
-            WriteValueByName(writer, attributes, "IDShieldDataFile");
-            WriteValueByName(writer, attributes, "OutputFile");
+            WriteValueByName(writer, attributes, Constants.SourceDocName);
+            WriteValueByName(writer, attributes, Constants.IDShieldDataFile);
+            WriteValueByName(writer, attributes, Constants.OutputFile);
 
             writer.WriteEndElement();
         }
@@ -558,7 +650,8 @@ namespace Extract.Redaction
         /// <param name="attributes">A collection of attributes containing the attribute to write.
         /// </param>
         /// <param name="name">The name of the attribute to write.</param>
-        /// <param name="subAttributeNames">The names of the subattributes to write.</param>
+        /// <param name="subAttributeNames">The names of the subattributes to write.
+        /// If no attribute names are specified, all sub-attributes will be written.</param>
         static void WriteAttributeAsXml(XmlWriter writer, IUnknownVector attributes, string name,
             params string[] subAttributeNames)
         {
@@ -569,9 +662,20 @@ namespace Extract.Redaction
             if (attribute != null)
             {
                 IUnknownVector subAttributes = attribute.SubAttributes;
-                foreach (string subAttributeName in subAttributeNames)
+                if (subAttributeNames.Length > 0)
                 {
-                    WriteValueByName(writer, subAttributes, subAttributeName);
+                    foreach (string subAttributeName in subAttributeNames)
+                    {
+                        WriteValueByName(writer, subAttributes, subAttributeName);
+                    }
+                }
+                else
+                {
+                    foreach (ComAttribute subAttribute in subAttributes.ToIEnumerable<ComAttribute>())
+                    {
+                        writer.WriteElementString(subAttribute.Name.Substring(1),
+                            subAttribute.Value.String);
+                    }
                 }
             }
 
@@ -616,11 +720,11 @@ namespace Extract.Redaction
                 for (int i = 0; i < size; i++)
                 {
                     ComAttribute idRevision = (ComAttribute)subAttributes.At(i);
-                    if (idRevision.Name == "_IDAndRevision")
+                    if (idRevision.Name == Constants.IDAndRevisionMetadata)
                     {
                         writer.WriteStartElement("Entry");
 
-                        writer.WriteAttributeString("ID", idRevision.Value.String);
+                        writer.WriteAttributeString(Constants.ID, idRevision.Value.String);
 
                         string revision = idRevision.Type.Substring(1);
                         writer.WriteAttributeString("Revision", revision);

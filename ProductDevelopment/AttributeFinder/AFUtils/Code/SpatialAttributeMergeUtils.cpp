@@ -453,7 +453,6 @@ STDMETHODIMP CSpatialAttributeMergeUtils::CompareAttributeSets(IIUnknownVector* 
 
 		// Compare for qualified merges.
 		findQualifiedMerges(ipAttributeSet1, ipAttributeSet2);
-		//findQualifiedMerges(ipAttributeSet2, ipAttributeSet1);
 
 		// The attribute sets match if every spatial attribute in both sets have an associated
 		// merge result.
