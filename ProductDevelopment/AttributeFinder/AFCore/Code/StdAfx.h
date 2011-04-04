@@ -40,8 +40,9 @@ using namespace UCLID_RASTERANDOCRMGMTLib;
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.tlb" named_guids
 using namespace UCLID_SSOCRLib;
 
-#import "..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.tlb" named_guids
-using namespace ESMESSAGEUTILSLib;
+#import "..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.tlb" named_guids
+using namespace Extract_Utilities_Email;
+
 
 #import "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
 using namespace UCLID_INPUTFUNNELLib;

@@ -184,10 +184,10 @@ private:
 	USBLicense& m_rusblLicense;
 
 	// Email Settings
-	IEmailSettingsPtr m_ipEmailSettings;
+	ISmtpEmailSettingsPtr m_ipEmailSettings;
 	
 	// Email Message 
-	IESMessagePtr m_ipMessage;
+	IExtractEmailMessagePtr m_ipMessage;
 
 	// Flag for license retry, if this is true an attempt to get a license will
 	// keep retrying until the timeout otherwise there will be no retry
@@ -201,10 +201,10 @@ private:
 
 	// Looks up the alert value for the given data cell and compare against the given value
 	// if == alert value alert will be sent
-	void checkAlert(string strCounterName, SP_DWORD dwCounterValue, SP_DWORD dwNewValue );
-	void sendAlert(string strAlert);
+	void checkAlert(const string& strCounterName, SP_DWORD dwCounterValue, SP_DWORD dwNewValue );
+	void sendAlert(const string& strAlert);
 
-	void addRecipients( IESMessagePtr ipMessage, const string &strRecipients );
+	void addRecipients( IExtractEmailMessagePtr ipMessage, const string &strRecipients );
 
 	// This method will check if the heartbeat thread is running and stop it if it is.
 	// After this method is called all of the heartbeat thread events will be in non signaled state.

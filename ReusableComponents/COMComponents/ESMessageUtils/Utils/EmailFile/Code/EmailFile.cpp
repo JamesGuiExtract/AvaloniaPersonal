@@ -11,6 +11,7 @@
 #include <LicenseMgmt.h>
 #include <zipper.h>
 #include <ComponentLicenseIDs.h>
+#include <COMUtils.h>
 
 #include <iostream>
 #include <string>
@@ -75,26 +76,28 @@ BOOL CEmailFileApp::InitInstance()
 			validateLicense();
 
 			// Email Settings
-			IEmailSettingsPtr ipEmailSettings(CLSID_EmailSettings);
+			ISmtpEmailSettingsPtr ipEmailSettings(CLSID_SmtpEmailSettings);
 			ASSERT_RESOURCE_ALLOCATION("ELI12601", ipEmailSettings != __nullptr );
-
-			IObjectSettingsPtr ipSettings = ipEmailSettings;
-			ASSERT_RESOURCE_ALLOCATION("ELI12602", ipSettings != __nullptr );
-
-			ipSettings->LoadFromRegistry( gstrEMAIL_REG_PATH.c_str() );
+			ipEmailSettings->LoadSettings(VARIANT_FALSE);
 
 			// If there is no SMTP server set the UI needs to be displayed to enter that information
-			string strServer = ipEmailSettings->SMTPServer;
+			string strServer = asString(ipEmailSettings->Server);
 			if ( strServer.empty() || m_bConfigureSettings)
 			{
 				// Get the UI Pointer
-				IObjectUserInterfacePtr ipUI = ipEmailSettings;
+				IConfigurableObjectPtr ipUI = ipEmailSettings;
 				ASSERT_RESOURCE_ALLOCATION("ELI12606", ipUI != __nullptr );
 
-				ipUI->DisplayReadWrite();
-
-				// Save the modified settings to the registry
-				ipSettings->SaveToRegistry( gstrEMAIL_REG_PATH.c_str() );
+				if (ipUI->RunConfiguration() == VARIANT_TRUE)
+				{
+					// Reload the settings if configuration was successful
+					ipEmailSettings->LoadSettings(VARIANT_FALSE);
+				}
+				else
+				{
+					// If the settings window was cancelled then just return
+					return FALSE;
+				}
 
 				// if the File or address were not defined there is nothing to do
 				if (m_strFileToEmail.empty() || m_strEmailAddress.empty())
@@ -104,7 +107,7 @@ BOOL CEmailFileApp::InitInstance()
 			}
 
 			// Email Message 
-			IESMessagePtr ipMessage(CLSID_ESMessage);
+			IExtractEmailMessagePtr ipMessage(CLSID_ExtractEmailMessage);
 			ASSERT_RESOURCE_ALLOCATION("ELI12603", ipMessage != __nullptr );
 
 			ipMessage->EmailSettings = ipEmailSettings;
@@ -126,7 +129,7 @@ BOOL CEmailFileApp::InitInstance()
 			}
 
 			// Add file list to message
-			ipMessage->FileAttachments = ipFiles;
+			ipMessage->Attachments = ipFiles;
 
 			// Add Recipients list to email message
 			ipMessage->Recipients = parseRecipientAddress();

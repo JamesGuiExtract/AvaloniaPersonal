@@ -54,8 +54,8 @@
 #import "..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
-#import "..\..\..\Code\ESMessageUtils.tlb" named_guids
-using namespace ESMESSAGEUTILSLib;
+#import "..\..\..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.tlb" named_guids
+using namespace Extract_Utilities_Email;
 
 
 

@@ -78,8 +78,9 @@ private:
 	// will be true if the specified server has a obtainable key on it
 	bool m_bIsKeyServerValid;
 	SafeNetLicenseCfg m_snlcSafeNetCfg;
+
 	// For the Email Settings
-	IEmailSettingsPtr m_ipEmailSettings;
+	ISmtpEmailSettingsPtr m_ipEmailSettings;
 	
 	CListCtrl m_listCounterValues;
 };

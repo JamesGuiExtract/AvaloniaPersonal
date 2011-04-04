@@ -35,8 +35,8 @@ using namespace UCLID_COMLMLib;
 #import "..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
-#import "..\..\ESMESSAGEUtils\Code\ESMessageUtils.tlb" named_guids 
-using namespace ESMESSAGEUTILSLib;
+#import "..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.tlb" named_guids 
+using namespace Extract_Utilities_Email;
 
 #import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")

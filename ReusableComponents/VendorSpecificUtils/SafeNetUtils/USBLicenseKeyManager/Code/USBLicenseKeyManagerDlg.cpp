@@ -14,6 +14,7 @@
 #include <ShellExecuteThread.h>
 #include <ComponentLicenseIDs.h>
 #include <cppUtil.h>
+#include <COMUtils.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -44,25 +45,17 @@ const double gdWAIT_SECONDS_RESET = 30;
 CUSBLicenseKeyManagerDlg::CUSBLicenseKeyManagerDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CUSBLicenseKeyManagerDlg::IDD, pParent),
 	m_bIsKeyServerValid(false),
-	m_ipEmailSettings(CLSID_EmailSettings)
+	m_ipEmailSettings(CLSID_SmtpEmailSettings)
 {
 	try
 	{
-	ASSERT_RESOURCE_ALLOCATION("ELI12318", m_ipEmailSettings != __nullptr );
-	
-	IObjectSettingsPtr ipSettings = m_ipEmailSettings;
-	ASSERT_RESOURCE_ALLOCATION("ELI12324", ipSettings != __nullptr );
-	
-	ipSettings->LoadFromRegistry( gstrEMAIL_REG_PATH.c_str() );
+		ASSERT_RESOURCE_ALLOCATION("ELI12318", m_ipEmailSettings != __nullptr );
+		
+		m_ipEmailSettings->LoadSettings(VARIANT_FALSE);
 
-	//{{AFX_DATA_INIT(CUSBLicenseKeyManagerDlg)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
-	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_USBKEY_ICON);
+		m_hIcon = AfxGetApp()->LoadIcon(IDR_USBKEY_ICON);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12327");
-	
 }
 //--------------------------------------------------------------------------------------------------
 void CUSBLicenseKeyManagerDlg::DoDataExchange(CDataExchange* pDX)
@@ -342,19 +335,16 @@ void CUSBLicenseKeyManagerDlg::OnEmailsettings()
 
 	try
 	{
-		IObjectUserInterfacePtr ipSettingsUI = m_ipEmailSettings;
+		IConfigurableObjectPtr ipSettingsUI = m_ipEmailSettings;
 		ASSERT_RESOURCE_ALLOCATION("ELI12325", ipSettingsUI != __nullptr);
 		
-		ipSettingsUI->DisplayReadWrite();
-
-		// Save settings to registry
-		IObjectSettingsPtr ipSettings = m_ipEmailSettings;
-		ASSERT_RESOURCE_ALLOCATION("ELI25261", ipSettings != __nullptr);
-
-		ipSettings->SaveToRegistry(gstrEMAIL_REG_PATH.c_str());
+		// Display configuration dialog
+		if (ipSettingsUI->RunConfiguration() == VARIANT_TRUE)
+		{
+			MessageBox("Email settings updated.", "Settings Updated", MB_OK | MB_ICONINFORMATION);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12319");
-	
 }
 //--------------------------------------------------------------------------------------------------
 void CUSBLicenseKeyManagerDlg::OnEmailAlert() 
@@ -486,7 +476,7 @@ void CUSBLicenseKeyManagerDlg::applyNewValues()
 		strServerName = czServerName;
 	}
 	m_snlcSafeNetCfg.setServerName(strServerName);
-	string strSMTPServer = m_ipEmailSettings->SMTPServer;
+	string strSMTPServer = asString(m_ipEmailSettings->Server);
 	if ( m_checkEmailAlert.GetCheck() == BST_CHECKED)
 	{
 		if ( strSMTPServer.empty())

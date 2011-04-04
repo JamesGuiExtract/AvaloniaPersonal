@@ -369,6 +369,14 @@
     <ClInclude Include="TaskInfoDlg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj">
+      <Project>{1b3ded27-dbf9-478a-9e31-ffa479621f5c}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\BaseUtils\Code\BaseUtils.vcxproj">
       <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -383,10 +391,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\VendorSpecificUtils\UltimateGrid\BuildDLL\UltimateGrid.vcxproj">
       <Project>{5c786bc2-6c22-4a5c-9c41-30f49780d966}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ESMessageUtils\Code\ESMessageUtils.vcxproj">
-      <Project>{d026cb45-dfa8-4fd7-ae12-c6f05978187a}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj">
       <Project>{6fa06b83-ac26-49b7-8138-9342792eacc4}</Project>

@@ -43,5 +43,5 @@ using namespace UCLID_COMLMLib;
 	rename("LoadImage", "LoadRasterImage")
 using namespace UCLID_RASTERANDOCRMGMTLib;
 
-#import "..\..\..\..\ESMessageUtils\Code\ESMessageUtils.tlb" named_guids
-using namespace ESMESSAGEUTILSLib;
+#import "..\..\..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.tlb" named_guids
+using namespace Extract_Utilities_Email;

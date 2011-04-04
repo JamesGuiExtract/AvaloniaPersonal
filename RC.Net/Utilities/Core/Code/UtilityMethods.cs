@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Extract.Utilities
@@ -22,6 +23,25 @@ namespace Extract.Utilities
         readonly static string _OBJECT_NAME = typeof(UtilityMethods).ToString();
 
         #endregion Constants
+
+        #region Fields
+
+        /// <summary>
+        /// Used to validate names for XML elements.
+        /// </summary>
+        static RegexStringValidator _xmlNameValidator;
+
+        /// <summary>
+        /// Used to validate email addresses.
+        /// </summary>
+        static Regex _emailValidator;
+
+        /// <summary>
+        /// Mutex used for regex creation
+        /// </summary>
+        static object _lock = new object();
+
+        #endregion Fields
 
         /// <summary>
         /// Swaps two value types in place.
@@ -208,11 +228,6 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Used to validate names for XML elements.
-        /// </summary>
-        static RegexStringValidator _xmlNameValidator;
-
-        /// <summary>
         /// Validates an XML name element name per the specifications here:
         /// http://www.w3.org/TR/REC-xml/#NT-S
         /// </summary>
@@ -226,13 +241,59 @@ namespace Extract.Utilities
 
                 if (_xmlNameValidator == null)
                 {
-                    string nameStartChar = @":A-Z_a-z\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD";
-                    string nameChar = @"-.0-9\xB7\u0300-\u036F\u203F-\u2040" + nameStartChar;
+                    lock (_lock)
+                    {
+                        if (_xmlNameValidator == null)
+                        {
+                            string nameStartChar = @":A-Z_a-z\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD";
+                            string nameChar = @"-.0-9\xB7\u0300-\u036F\u203F-\u2040" + nameStartChar;
 
-                    _xmlNameValidator = new RegexStringValidator("^[" + nameStartChar + "][" + nameChar + "]+$");
+                            _xmlNameValidator = new RegexStringValidator("^[" + nameStartChar
+                                + "][" + nameChar + "]+$");
+                        }
+                    }
                 }
 
                 _xmlNameValidator.Validate(name);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI31702");
+            }
+        }
+
+        /// <summary>
+        /// Determines whether <paramref name="emailAddress"/> is a valid email address.
+        /// <para>
+        /// The email validation regex is a modified form of the RFC 2822 standard for internet
+        /// email addresses from http://www.regular-expressions.info/email.html
+        /// </para>
+        /// </summary>
+        /// <param name="emailAddress">The email address to validate.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="emailAddress"/> is a valid email address;
+        /// <see langword="false"/> otherwise.
+        /// </returns>
+        public static bool IsValidEmailAddress(string emailAddress)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI31717", _OBJECT_NAME);
+
+                if (_emailValidator == null)
+                {
+                    lock (_lock)
+                    {
+                        if (_emailValidator == null)
+                        {
+                            _emailValidator = new Regex(@"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+                                RegexOptions.IgnoreCase);
+                        }
+                    }
+                }
+
+                return _emailValidator.IsMatch(emailAddress);
             }
             catch (Exception ex)
             {

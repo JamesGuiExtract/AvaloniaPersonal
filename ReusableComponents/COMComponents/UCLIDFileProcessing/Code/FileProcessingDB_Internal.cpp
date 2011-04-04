@@ -3323,16 +3323,12 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 			try
 			{
 				// Email Settings
-				IEmailSettingsPtr ipEmailSettings(CLSID_EmailSettings);
+				ISmtpEmailSettingsPtr ipEmailSettings(CLSID_SmtpEmailSettings);
 				ASSERT_RESOURCE_ALLOCATION("ELI27962", ipEmailSettings != __nullptr);
+				ipEmailSettings->LoadSettings(VARIANT_FALSE);
 
-				IObjectSettingsPtr ipSettings = ipEmailSettings;
-				ASSERT_RESOURCE_ALLOCATION("ELI27963", ipSettings != __nullptr);
-
-				ipSettings->LoadFromRegistry(gstrEMAIL_REG_PATH.c_str());
-
-				// If there is no SMTP server set the UI needs to be displayed to enter that information
-				string strServer = ipEmailSettings->SMTPServer;
+				// If there is no SMTP server set log an exception and return
+				string strServer = asString(ipEmailSettings->Server);
 				if (strServer.empty())
 				{
 					UCLIDException ue("ELI27969", 
@@ -3342,7 +3338,7 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 				}
 
 				// Email Message 
-				IESMessagePtr ipMessage(CLSID_ESMessage);
+				IExtractEmailMessagePtr ipMessage(CLSID_ExtractEmailMessage);
 				ASSERT_RESOURCE_ALLOCATION("ELI27964", ipMessage != __nullptr);
 
 				ipMessage->EmailSettings = ipEmailSettings;
@@ -3363,7 +3359,7 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 
 				ipMessage->Subject = "Files were reverted to previous status."; 
 
-				ipMessage->BodyText = apEmailThreadData->m_strMessage.c_str();
+				ipMessage->Body = apEmailThreadData->m_strMessage.c_str();
 
 				// Send  the message
 				ipMessage->Send();

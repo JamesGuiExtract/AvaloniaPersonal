@@ -17,7 +17,6 @@
 #include <UCLIDException.h>
 #include <StopWatch.h>
 #include <RegConstants.h>
-#include <LTEmailErr.h>
 #include <TimedRetryDlg.h>
 
 #include <fstream>
@@ -420,8 +419,8 @@ SafeNetLicenseMgr::SafeNetLicenseMgr( USBLicense & rusblLicense, bool bObtainLic
 	m_htdData(m_Packet),
 	m_dwSN(0),
 	m_rusblLicense(rusblLicense),
-	m_ipEmailSettings(NULL),
-	m_ipMessage(NULL),
+	m_ipEmailSettings(__nullptr),
+	m_ipMessage(__nullptr),
 	m_bLicenseRetry(bNoLicenseRetry),
 	m_bLicenseHasBeenObtained(false)
 {
@@ -436,7 +435,7 @@ UINT heartbeatThreadProc(void *pData)
 	SafeNetLicenseMgr::HeartbeatThreadData *htd = (SafeNetLicenseMgr::HeartbeatThreadData *)pData;
 
 	// Verify the thread data was passed.
-	if (htd == NULL)
+	if (htd == __nullptr)
 	{
 		// Log an exception to indicate that thread data was null.
 		UCLIDException ue("ELI24879", "Heartbeat thread data was NULL.");
@@ -457,7 +456,7 @@ UINT heartbeatThreadProc(void *pData)
 			while ( htd->m_threadStopRequest.wait(gdwHEART_BEAT_REFRESH_TIME) == WAIT_TIMEOUT )
 			{
 				SafeNetLicenseMgr* pLicenseMgr = htd->m_psnlmMgr;
-				if (pLicenseMgr == NULL)
+				if (pLicenseMgr == __nullptr)
 				{
 					UCLIDException ue("ELI11557", "No USB Key License Manager.");
 					throw ue;
@@ -1068,7 +1067,7 @@ void SafeNetLicenseMgr::validateHeartbeatActive()
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-void SafeNetLicenseMgr::sendAlert(string strAlert)
+void SafeNetLicenseMgr::sendAlert(const string& strAlert)
 {
 	try
 	{
@@ -1076,32 +1075,26 @@ void SafeNetLicenseMgr::sendAlert(string strAlert)
 		// be initialized
 		if ( m_ipEmailSettings == __nullptr )
 		{
-			m_ipEmailSettings.CreateInstance(CLSID_EmailSettings);
+			m_ipEmailSettings.CreateInstance(CLSID_SmtpEmailSettings);
 			ASSERT_RESOURCE_ALLOCATION("ELI12307", m_ipEmailSettings != __nullptr );
 		
-			IObjectSettingsPtr ipSettings = m_ipEmailSettings;
-			ASSERT_RESOURCE_ALLOCATION("ELI12400", ipSettings != __nullptr );
-	
-			ipSettings->LoadFromRegistry( gstrEMAIL_REG_PATH.c_str() );
+			m_ipEmailSettings->LoadSettings(VARIANT_FALSE);
 			
-			m_ipMessage.CreateInstance(CLSID_ESMessage );
+			m_ipMessage.CreateInstance(CLSID_ExtractEmailMessage);
 			ASSERT_RESOURCE_ALLOCATION("ELI12401", m_ipMessage!= __nullptr );
 		
 			m_ipMessage->EmailSettings = m_ipEmailSettings;
 		}
 		addRecipients( m_ipMessage, m_snlcConfig.getAlertToList());
 
-		// Setup message to send
-		IObjectUserInterfacePtr ipUI = m_ipMessage;
-		ASSERT_RESOURCE_ALLOCATION("ShowSendFailed", ipUI != __nullptr );
 		m_ipMessage->Subject = "Extract Systems LM USB Key Counter value is low";
-		m_ipMessage->BodyText = strAlert.c_str();
+		m_ipMessage->Body = strAlert.c_str();
 		m_ipMessage->Send();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI11873");
 }
 //-------------------------------------------------------------------------------------------------
-void SafeNetLicenseMgr::checkAlert(string strCounterName, SP_DWORD dwCounterValue, SP_DWORD dwNewValue )
+void SafeNetLicenseMgr::checkAlert(const string& strCounterName, SP_DWORD dwCounterValue, SP_DWORD dwNewValue )
 {
 	try
 	{
@@ -1157,7 +1150,8 @@ void SafeNetLicenseMgr::checkAlert(string strCounterName, SP_DWORD dwCounterValu
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI24888");
 }
 //-------------------------------------------------------------------------------------------------
-void SafeNetLicenseMgr::addRecipients( IESMessagePtr ipMessage, const string &strRecipients )
+void SafeNetLicenseMgr::addRecipients( IExtractEmailMessagePtr ipMessage,
+	const string &strRecipients )
 {
 	try
 	{
@@ -1180,7 +1174,7 @@ void SafeNetLicenseMgr::addRecipients( IESMessagePtr ipMessage, const string &st
 			ipRecipients->PushBack( strRecipient.c_str());
 
 		}
-		// Add Extract Systems as recipient if requrested
+		// Add Extract Systems as recipient if requested
 		if ( m_snlcConfig.getSendToExtract() )
 		{
 			ipRecipients->PushBack( "support@extractsystems.com" );

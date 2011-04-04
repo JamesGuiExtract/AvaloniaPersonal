@@ -26,8 +26,8 @@ using namespace UCLID_COMUTILSLib;
 #import "..\..\..\..\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" named_guids 
 using namespace UCLID_TESTINGFRAMEWORKINTERFACESLib;
 
-#import "..\..\..\..\COMComponents\ESMessageUtils\Code\ESMessageUtils.tlb" named_guids
-using namespace ESMESSAGEUTILSLib;
+#import "..\..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.tlb" named_guids
+using namespace Extract_Utilities_Email;
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
