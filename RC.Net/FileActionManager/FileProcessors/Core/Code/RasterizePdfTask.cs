@@ -176,8 +176,16 @@ namespace Extract.FileActionManager.FileProcessors
             }
             set
             {
-                _dirty |= !_pdfFile.Equals(value, StringComparison.OrdinalIgnoreCase);
-                _pdfFile = value;
+                try
+                {
+                    _dirty |= _pdfFile == null
+                        || !_pdfFile.Equals(value, StringComparison.OrdinalIgnoreCase);
+                    _pdfFile = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI32281", "Unable to set PDF file.");
+                }
             }
         }
 
@@ -195,8 +203,16 @@ namespace Extract.FileActionManager.FileProcessors
             }
             set
             {
-                _dirty |= !_destinationFile.Equals(value, StringComparison.OrdinalIgnoreCase);
-                _destinationFile = value;
+                try
+                {
+                    _dirty |= _destinationFile == null
+                        || !_destinationFile.Equals(value, StringComparison.OrdinalIgnoreCase);
+                    _destinationFile = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI32282", "Unable to set destination file.");
+                }
             }
         }
 

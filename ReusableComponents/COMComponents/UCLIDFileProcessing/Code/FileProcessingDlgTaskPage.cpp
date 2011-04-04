@@ -1382,6 +1382,9 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_btnExecuteErrorTask.EnableWindow(FALSE);
 		m_btnSelectErrorTask.EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_EXECUTE_TASK)->EnableWindow(FALSE);
+
+		// Advanced setting controls
+		m_btnAdvancedSettings.EnableWindow(FALSE);
 	}
 	else
 	{
@@ -1618,6 +1621,9 @@ void FileProcessingDlgTaskPage::setButtonStates()
 	// Enable / disable error task controls
 	GetDlgItem(IDC_EDIT_EXECUTE_TASK)->EnableWindow(m_bExecuteErrorTask);
 	m_btnSelectErrorTask.EnableWindow(m_bExecuteErrorTask);
+
+	// Advanced settings
+	m_btnAdvancedSettings.EnableWindow(TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::updateUI()

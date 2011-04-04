@@ -20,7 +20,7 @@ static const long gnSTOP_PROCESSING_TIMEOUT = 60000;
 // CFileProcessingManagerProcess
 //--------------------------------------------------------------------------------------------------
 CFileProcessingManagerProcess::CFileProcessingManagerProcess() :
-m_pUnkMarshaler(NULL)
+m_pUnkMarshaler(__nullptr)
 {
 	try
 	{
