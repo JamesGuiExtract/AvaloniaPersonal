@@ -928,7 +928,9 @@ void SpotRecognitionDlg::OnBTNSelectText()
 			{
 				// Set the current select text tool as the current tool
 				// if the select text button is not pressed
-				setCurrentTool(m_eCurrSelectionTool);
+				// [LRCAU #5959] - Add special handling for word selection tool.
+				setCurrentTool(
+					m_eCurrSelectionTool == kSelectWordText ? kSelectRectText : m_eCurrSelectionTool);
 			}
 			else
 			{
