@@ -157,6 +157,7 @@ begin
 	//if ( RegDBKeyExist ( REG_PATH_SQL_NATIVE_CLIENT ) < 0) then
 		// Install SQL Native Client
 		szProgram = "msiexec";
+		SdShowMsg("Setup is Installing SQL Native Client", TRUE);
 		if ( SYSINFO.bIsWow64 ) then
 			szCmdLine = " /i " + SUPPORTDIR ^ "\\sqlncli_x64.msi /passive";
 		else
