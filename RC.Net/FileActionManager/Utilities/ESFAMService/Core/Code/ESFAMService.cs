@@ -173,7 +173,7 @@ namespace Extract.FileActionManager.Utilities
                 ee2.Log();
 
                 // Create the sleep thread and start it
-                new Thread(SleepAndCheckDependentServices).Start();
+                new Thread(SleepAndCheckDependentServices).Start(dbManager);
 
                 lock (_lock)
                 {

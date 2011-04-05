@@ -10,6 +10,15 @@ namespace Extract.Imaging
     /// </summary>
     public sealed class PixelProbe : IDisposable
     {
+        #region Constants
+
+        /// <summary>
+        /// Object name.
+        /// </summary>
+        static readonly string _OBJECT_NAME = typeof(PixelProbe).ToString();
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -27,6 +36,21 @@ namespace Extract.Imaging
         /// </summary>
         int _height;
 
+        /// <summary>
+        /// The number of references to the object.
+        /// </summary>
+        volatile int _referenceCount;
+
+        /// <summary>
+        /// Mutex object used when incrementing and decrementing.
+        /// </summary>
+        object _lock = new object();
+
+        /// <summary>
+        /// Indicates the object has been disposed.
+        /// </summary>
+        bool _disposed;
+
         #endregion Fields
 
         #region Constructors
@@ -36,6 +60,8 @@ namespace Extract.Imaging
         /// </summary>
         internal PixelProbe(RasterImage image)
         {
+            _referenceCount = 1;
+
             // Must be top-left view perspective to access pixel data accurately
             if (image.ViewPerspective != RasterViewPerspective.TopLeft)
             {
@@ -127,6 +153,36 @@ namespace Extract.Imaging
             }
         }
 
+        /// <summary>
+        /// Returns a reference to this object.
+        /// <para><b>Note:</b></para>
+        /// This object includes a reference count. In order to safely get a
+        /// reference to this object you need to call the Copy method. Just using
+        /// a reference copy will not increment the reference count.
+        /// </summary>
+        /// <returns>A reference to this object.</returns>
+        public PixelProbe Copy()
+        {
+            try
+            {
+                lock (_lock)
+                {
+                    if (_disposed)
+                    {
+                        throw new ObjectDisposedException(_OBJECT_NAME);
+                    }
+
+                    _referenceCount++;
+
+                    return this;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32285");
+            }
+        }
+
         #endregion Methods
 
         #region IDisposable Members
@@ -136,8 +192,15 @@ namespace Extract.Imaging
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            lock (_lock)
+            {
+                _referenceCount--;
+                if (_referenceCount == 0)
+                {
+                    Dispose(true);
+                    GC.SuppressFinalize(this);
+                }
+            }
         }
 
         /// <overloads>Releases resources used by the <see cref="PixelProbe"/>.</overloads>
@@ -150,6 +213,8 @@ namespace Extract.Imaging
         {
             if (disposing)
             {
+                _disposed = true;
+
                 // Dispose of managed objects
                 if (_image != null)
                 {
@@ -159,6 +224,19 @@ namespace Extract.Imaging
             }
 
             // Dispose of unmanaged resources
+        }
+
+        /// <summary>
+        /// Releases unmanaged resources and performs other cleanup operations before the
+        /// <see cref="PixelProbe"/> is reclaimed by garbage collection.
+        /// </summary>
+        // FxCop is complaining about the ExtractException created here. We are not raising
+        // the exception though, just logging it.
+        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
+        ~PixelProbe()
+        {
+            // If this is being called then there is a missing dispose call on PixelProbe
+            new ExtractException("ELI32286", "Missing dispose call on PixelProbe.").Log();
         }
 
         #endregion IDisposable Members

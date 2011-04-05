@@ -75,6 +75,11 @@ namespace Extract.Imaging
         /// </summary>
         object _lock = new object();
 
+        /// <summary>
+        /// Stores the last loaded pixel probe and its page number.
+        /// </summary>
+        Tuple<int, PixelProbe> _currentProbe = new Tuple<int,PixelProbe>(-1, null);
+
         #endregion Fields
 
         #region Constructors
@@ -390,10 +395,20 @@ namespace Extract.Imaging
             {
                 lock(_lock)
                 {
-                    image = _codecs.Load(_stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber); 
-                }
+                    if (_currentProbe.Item1 != pageNumber)
+                    {
+                        if (_currentProbe.Item2 != null)
+                        {
+                            _currentProbe.Item2.Dispose();
+                        }
+                        image = _codecs.Load(_stream, 1, CodecsLoadByteOrder.BgrOrGray, pageNumber, pageNumber);
+                        var probe = new PixelProbe(image);
+                        image = null;
+                        _currentProbe = new Tuple<int, PixelProbe>(pageNumber, probe);
+                    }
 
-                return new PixelProbe(image);
+                    return _currentProbe.Item2.Copy(); ;
+                }
             }
             catch (Exception ex)
             {
@@ -449,6 +464,11 @@ namespace Extract.Imaging
                 {
                     _codecs.Dispose();
                     _codecs = null;
+                }
+                if (_currentProbe != null && _currentProbe.Item2 != null)
+                {
+                    _currentProbe.Item2.Dispose();
+                    _currentProbe = null;
                 }
 
                 // Log that the lock was released if necessary
