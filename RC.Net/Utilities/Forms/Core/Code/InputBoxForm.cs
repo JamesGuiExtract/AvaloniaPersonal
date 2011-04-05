@@ -13,16 +13,6 @@ namespace Extract.Utilities.Forms
     /// </summary>
     internal class InputBoxForm : Form
     {
-        #region Constants
-
-        /// <summary>
-        /// The name of the object to be used in the validate license calls.
-        /// </summary>
-        static readonly string _OBJECT_NAME =
-           typeof(InputBoxForm).ToString();
-
-        #endregion Constants
-
         #region Fields
 
         /// <summary>
@@ -68,14 +58,10 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Initializes a new <see cref="InputBoxForm"/> class.
         /// </summary>
-        public InputBoxForm()
+        internal InputBoxForm()
         {
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23145",
-                    _OBJECT_NAME);
-
                 // Required for Windows Form Designer support
                 InitializeComponent();
                 returnValue = "";

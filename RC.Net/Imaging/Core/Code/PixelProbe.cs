@@ -17,6 +17,16 @@ namespace Extract.Imaging
         /// </summary>
         RasterImage _image;
 
+        /// <summary>
+        /// The width of the image.
+        /// </summary>
+        int _width;
+
+        /// <summary>
+        /// The height of the image.
+        /// </summary>
+        int _height;
+
         #endregion Fields
 
         #region Constructors
@@ -33,6 +43,8 @@ namespace Extract.Imaging
             }
 
             _image = image;
+            _width = _image.ImageWidth;
+            _height = _image.ImageHeight;
         }
 
         #endregion Constructors
@@ -103,7 +115,7 @@ namespace Extract.Imaging
         {
             try
             {
-                return x >= 0 && y >= 0 && x < _image.ImageWidth && y < _image.ImageHeight;
+                return x >= 0 && y >= 0 && x < _width && y < _height;
             }
             catch (Exception ex)
             {

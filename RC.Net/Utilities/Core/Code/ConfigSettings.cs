@@ -160,9 +160,14 @@ namespace Extract.Utilities
         {
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI30041", this.GetType().ToString());
+                // Validate that the calling assembly is an extract assembly
+                if(!LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()))
+                {
+                    var ee = new ExtractException("ELI30041",
+                        "Object is not usable in current configuration.");
+                    ee.AddDebugData("Object Name", this.GetType().ToString(), false);
+                    throw ee;
+                }
 
                 // Create a new instance (will have the default settings)
                 _settings = new T();

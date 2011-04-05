@@ -278,9 +278,6 @@ namespace Extract.Utilities
         {
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI31717", _OBJECT_NAME);
-
                 if (_emailValidator == null)
                 {
                     lock (_lock)

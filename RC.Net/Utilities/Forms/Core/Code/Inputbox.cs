@@ -5,6 +5,7 @@ using Extract.Licensing;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.Forms
@@ -79,9 +80,14 @@ namespace Extract.Utilities.Forms
 
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23171",
-                    _OBJECT_NAME);
+                // Verify this object is called from Extract code
+                if (!LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()))
+                {
+                    var ee = new ExtractException("ELI23171",
+                        "Object is not usable in current configuration.");
+                    ee.AddDebugData("Object Name", _OBJECT_NAME, false);
+                    throw ee;
+                }
 
                 // Get the screen rectangle of the owner window
                 Rectangle ownerRectangle = NativeMethods.GetWindowScreenRectangle(owner);
@@ -153,9 +159,14 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23256",
-                    _OBJECT_NAME);
+                // Verify this object is called from Extract code
+                if (!LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()))
+                {
+                    var ee = new ExtractException("ELI23256",
+                        "Object is not usable in current configuration.");
+                    ee.AddDebugData("Object Name", _OBJECT_NAME, false);
+                    throw ee;
+                }
 
                 // Create a new input box dialog
                 using (InputBoxForm inputBox = new InputBoxForm())

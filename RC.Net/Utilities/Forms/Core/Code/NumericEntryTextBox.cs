@@ -12,15 +12,6 @@ namespace Extract.Utilities.Forms
     /// </summary>
     public partial class NumericEntryTextBox : TextBox
     {
-        #region Constants
-
-        /// <summary>
-        /// The name of the object to be used in the validate license calls.
-        /// </summary>
-        static readonly string _OBJECT_NAME = typeof(NumericEntryTextBox).ToString();
-
-        #endregion Constants
-
         #region Fields
 
         /// <summary>
@@ -62,17 +53,6 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                // Load licenses in design mode
-                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
-                {
-                    // Load the license files from folder
-                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-                }
-
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI31048",
-                    _OBJECT_NAME);
-
                 InitializeComponent();
                 _allowDecimal = allowDecimal;
                 _displayExceptions = displayExceptions;
