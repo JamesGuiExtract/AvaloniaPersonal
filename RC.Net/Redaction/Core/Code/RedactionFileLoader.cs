@@ -62,6 +62,12 @@ namespace Extract.Redaction
         List<SensitiveItem> _sensitiveItems;
 
         /// <summary>
+        /// Non-metadata attributes that are non-spatial or that are of a type not defined in
+        /// _levels (HCData, MCData, ...)
+        /// </summary>
+        List<ComAttribute> _insensitiveAttributes;
+
+        /// <summary>
         /// The old revisions COM attribute.
         /// </summary>
         ComAttribute _revisionsAttribute;
@@ -139,6 +145,20 @@ namespace Extract.Redaction
             get
             {
                 return _sensitiveItems.AsReadOnly();
+            }
+        }
+
+        /// <summary>
+        /// Gets all non-metadata attributes that are non-spatial or that are of a type not defined
+        /// in _levels (HCData, MCData, ...)
+        /// </summary>
+        /// <value>The clues and redactions.</value>
+        [CLSCompliant(false)]
+        public ReadOnlyCollection<ComAttribute> InsensitiveAttributes
+        {
+            get
+            {
+                return _insensitiveAttributes.AsReadOnly();
             }
         }
 
@@ -271,14 +291,7 @@ namespace Extract.Redaction
         {
             try
             {
-                _sensitiveItems = new List<SensitiveItem>();
-                _metadata = new List<ComAttribute>();
-                _verificationSessionId = 0;
-                _nextId = 1;
-
-                _fileName = fileName;
-                _sourceDocument = sourceDocument;
-                _comAttribute = new AttributeCreator(sourceDocument);
+                Initialize(fileName, sourceDocument);
 
                 if (File.Exists(fileName))
                 {
@@ -309,14 +322,7 @@ namespace Extract.Redaction
         {
             try
             {
-                _sensitiveItems = new List<SensitiveItem>();
-                _metadata = new List<ComAttribute>();
-                _verificationSessionId = 0;
-                _nextId = 1;
-
-                _fileName = string.Empty;
-                _sourceDocument = sourceDocument;
-                _comAttribute = new AttributeCreator(sourceDocument);
+                Initialize(string.Empty, sourceDocument);
 
                 LoadData(attributes);
             }
@@ -326,6 +332,26 @@ namespace Extract.Redaction
                     "Unable to load voa file data.", ex);
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// Initializes fields prior to loading new data for the specified
+        /// <see paramref="fileName"/> and <see paramref="sourceDocument"/>.
+        /// </summary>
+        /// <param name="fileName">Name of the VOA file from which data will be loaded.</param>
+        /// <param name="sourceDocument">The source document (image) the <see paramref="fileName"/>
+        /// pertains to.</param>
+        void Initialize(string fileName, string sourceDocument)
+        {
+            _sensitiveItems = new List<SensitiveItem>();
+            _insensitiveAttributes = new List<ComAttribute>();
+            _metadata = new List<ComAttribute>();
+            _verificationSessionId = 0;
+            _nextId = 1;
+
+            _fileName = fileName;
+            _sourceDocument = sourceDocument;
+            _comAttribute = new AttributeCreator(sourceDocument);
         }
 
         /// <summary>
@@ -341,7 +367,7 @@ namespace Extract.Redaction
             _documentType = GetDocumentType(attributes);
 
             // Get the previous revision
-            _revisionsAttribute = GetRevisionsAttribute(attributes);
+            _revisionsAttribute = GetRevisionsAttribute(attributes, _comAttribute);
             IUnknownVector revisions = _revisionsAttribute.SubAttributes;
 
             // Query and add attributes at each confidence level
@@ -386,6 +412,11 @@ namespace Extract.Redaction
             {
                 ComAttribute attribute = (ComAttribute)attributes.At(i);
                 _metadata.Add(attribute);
+
+                if (!attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase))
+                {
+                    _insensitiveAttributes.Add(attribute);
+                }
             }
         }
 
@@ -492,6 +523,7 @@ namespace Extract.Redaction
                 }
                 else
                 {
+                    _insensitiveAttributes.Add(attribute);
                     _metadata.Add(attribute);
                 }
             }
@@ -514,15 +546,9 @@ namespace Extract.Redaction
             {
                 ComAttribute attribute = (ComAttribute) attributes.At(i);
 
-                // This is a non output attribute if its archive action is turned off.
-                IUnknownVector subAttributes = attribute.SubAttributes;
-                ComAttribute[] archiveAction = 
-                    AttributeMethods.GetAttributesByName(subAttributes, "ArchiveAction");
-                if (archiveAction.Length == 1 && IsTurnedOffArchiveAction(archiveAction[0]))
+                // Check to see if this is a non-output attribute.
+                if (IsTurnedOffAttribute(attribute, true))
                 {
-                    // Remove the archive action
-                    subAttributes.RemoveValue(archiveAction[0]);
-
                     // Add this non output attribute to the collection of sensitive items
                     SensitiveItem item = new SensitiveItem(level, attribute);
                     item.Attribute.Redacted = false;
@@ -535,21 +561,41 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Determines whether the specified archive action is marked as 'turned off'.
+        /// Determines whether the specified <see paramref="attribute"/> is turned-off attribute.
         /// </summary>
-        /// <param name="archiveAction">The archive action attribute to test.</param>
-        /// <returns><see langword="true"/> if <paramref name="archiveAction"/> is marked as 
-        /// 'turned off'; <see langword="false"/> if <paramref name="archiveAction"/> is not 
-        /// marked as 'turned off'.</returns>
-        static bool IsTurnedOffArchiveAction(ComAttribute archiveAction)
+        /// <param name="attribute">The <see cref="ComAttribute"/> to test.</param>
+        /// <param name="removeArchiveAction"><see langword="true"/> to remove the 'ArchiveAction'
+        /// attribute if it is a turned-off attribute; otherwise <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if the <paramref name="attribute"/> has an 'AchiveAction'
+        /// sub-attribute with the value 'turned off'; otherwise <see langword="false"/>.
+        /// </returns>
+        static bool IsTurnedOffAttribute(ComAttribute attribute, bool removeArchiveAction)
         {
-            if (archiveAction == null)
+            IUnknownVector subAttributes = attribute.SubAttributes;
+            ComAttribute archiveActionAttribute = null;
+
+            ComAttribute[] archiveActionAttributes = 
+                AttributeMethods.GetAttributesByName(subAttributes, Constants.ArchiveAction);
+            if (archiveActionAttributes.Length == 1)
             {
-                return false;
+                archiveActionAttribute = archiveActionAttributes[0];
             }
 
-            SpatialString value = archiveAction.Value;
-            return string.Equals(value.String, "TurnedOff", StringComparison.OrdinalIgnoreCase);
+            if (archiveActionAttribute != null)
+            {
+                SpatialString value = archiveActionAttribute.Value;
+                if (string.Equals(value.String, Constants.TurnedOff, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (removeArchiveAction)
+                    {
+                        subAttributes.RemoveValue(archiveActionAttribute);
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -633,16 +679,20 @@ namespace Extract.Redaction
         /// Gets or creates the revisions attribute for the specified vector.
         /// </summary>
         /// <param name="vector">The vector to search for a revisions attribute.</param>
+        /// <param name="attributeCreator">If not <see langword="null"/> and a revisions attribute
+        /// does not already exist, this <see cref="AttributeCreator"/> will be used to create one.
+        /// </param>
         /// <returns>The revisions attribute for <paramref name="vector"/>; if no such attribute 
-        /// exists, it is created and added to <paramref name="vector"/>.</returns>
-        ComAttribute GetRevisionsAttribute(IUnknownVector vector)
+        /// exists and <see paramref="attributeCreator"/> was provided, it is created and added to
+        /// <paramref name="vector"/>.</returns>
+        static ComAttribute GetRevisionsAttribute(IUnknownVector vector, AttributeCreator attributeCreator)
         {
             // Look for an existing revisions attribute
             ComAttribute revisionsAttribute = AttributeMethods.GetSingleAttributeByName(vector, "_OldRevisions");
-            if (revisionsAttribute == null)
+            if (revisionsAttribute == null && attributeCreator != null)
             {
                 // Create a new revisions attribute
-                revisionsAttribute = _comAttribute.Create("_OldRevisions");
+                revisionsAttribute = attributeCreator.Create("_OldRevisions");
                 vector.PushBack(revisionsAttribute);
             }
 
@@ -789,9 +839,10 @@ namespace Extract.Redaction
                 AddSourceMetadata(session, sourceFile1, set1Mappings);
                 AddSourceMetadata(session, sourceFile2, set2Mappings);
 
-                // The session will be the one and only attribute to add alongside the result's
-                // sensitive data.
-                IUnknownVector attributes = new IUnknownVector();
+                // Organize the metadata attributes for output.
+                IUnknownVector attributes = PrepareOutput(_sensitiveItems, null);
+
+                // Add merge session metadata
                 attributes.PushBack(session);
 
                 // Save the attributes
@@ -811,25 +862,36 @@ namespace Extract.Redaction
         /// <see paramref="sourceFile"/>.
         /// </summary>
         /// <param name="session">The session to which the metadata should be added.</param>
-        /// <param name="sourceFile">Name of the source file for which metadata should be added.
+        /// <param name="sourceDataFile">Name of the source file for which metadata should be added.
         /// </param>
         /// <param name="attributeMappings">The keys of this dictionary are the original IDs of
         /// each attribute from <see paramref="sourceFile"/> while the values are a list of
         /// <see cref="ComAttribute"/>s that associate the attribute with the ID of an attribute in
         /// the output.</param>
-        void AddSourceMetadata(ComAttribute session, string sourceFile,
+        void AddSourceMetadata(ComAttribute session, string sourceDataFile,
             Dictionary<string, List<ComAttribute>> attributeMappings)
         {
-            ComAttribute sourceData = _comAttribute.Create(Constants.IDShieldDataFileMetadata, sourceFile);
+            ComAttribute sourceData =
+                _comAttribute.Create(Constants.IDShieldDataFileMetadata, sourceDataFile);
 
             IUnknownVector sourceAttributes = new IUnknownVector();
-            sourceAttributes.LoadFrom(sourceFile, false);
+            sourceAttributes.LoadFrom(sourceDataFile, false);
 
-            // Iterate all current sensitive items (all non-metadata attributes) from the source in
-            // order to apply all mapping metadata from attributeMappings that applies to the items.
+            // Find all turned-off attributes from the old revisions attribute.
+            ComAttribute revisionsAttribute = GetRevisionsAttribute(sourceAttributes, null);
+            IEnumerable<ComAttribute> turnedOffAttributes = (revisionsAttribute == null)
+                ? new List<ComAttribute>()
+                : revisionsAttribute.SubAttributes
+                    .ToIEnumerable<ComAttribute>()
+                    .Where(attribute => IsTurnedOffAttribute(attribute, false));
+
+            // Iterate all current sensitive items (including turned-off attributes) from the source
+            // in order to apply all mapping metadata from attributeMappings that applies to the
+            // items.
             foreach (ComAttribute attribute in sourceAttributes
                 .ToIEnumerable<ComAttribute>()
-                .Where(attribute => !attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase)))
+                .Where(attribute => !attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase))
+                .Union(turnedOffAttributes))
             {
                 ComAttribute idRevision = AttributeMethods.GetSingleAttributeByName(
                     attribute.SubAttributes, Constants.IDAndRevisionMetadata);
@@ -864,7 +926,7 @@ namespace Extract.Redaction
             List<SensitiveItem> sensitiveItems = new List<SensitiveItem>(_sensitiveItems);
 
             // Update any changed items (deleted, modified, and added)
-            IUnknownVector attributes = GetChangedAttributes(sensitiveItems, changes);
+            IUnknownVector attributes = PrepareOutput(sensitiveItems, changes);
 
             // Create session attribute
             ComAttribute session = 
@@ -882,16 +944,30 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets the changes made to the VOA file.
+        /// Prepares the attributes to be output to a VOA file by filing changes under added,
+        /// modified and deleted attributes as well as archiving disabled (turned-off) attributes
+        /// to the revisions attribute.
         /// </summary>
         /// <param name="sensitiveItems">The sensitive items after changes were made.</param>
-        /// <param name="changes">The changes that were made.</param>
+        /// <param name="changes">The changes that were made. (Can be <see langword="null"/>
+        /// if there are no changes).</param>
         /// <returns>The attributes after changes are made.</returns>
-        IUnknownVector GetChangedAttributes(List<SensitiveItem> sensitiveItems, RedactionFileChanges changes)
+        IUnknownVector PrepareOutput(List<SensitiveItem> sensitiveItems, RedactionFileChanges changes)
         {
-            RedactionItem[] oldDeleted = UpdateDeletedItems(sensitiveItems, changes.Deleted);
-            RedactionItem[] oldModified = UpdateModifiedItems(sensitiveItems, changes.Modified);
-            UpdateAddedItems(sensitiveItems, changes.Added);
+            RedactionItem[] oldDeleted;
+            RedactionItem[] oldModified;
+
+            if (changes == null)
+            {
+                oldDeleted = new RedactionItem[] { };
+                oldModified = new RedactionItem[] { };
+            }
+            else
+            {
+                oldDeleted = UpdateDeletedItems(sensitiveItems, changes.Deleted);
+                oldModified = UpdateModifiedItems(sensitiveItems, changes.Modified);
+                UpdateAddedItems(sensitiveItems, changes.Added);
+            }
 
             // Get the non output redactions
             RedactionItem[] oldNonOutput = GetNonOutputRedactions(sensitiveItems);
@@ -900,7 +976,7 @@ namespace Extract.Redaction
             IUnknownVector attributes = CopyMetadataAttributes();
 
             // Update the revisions attribute
-            ComAttribute revisions = GetRevisionsAttribute(attributes);
+            ComAttribute revisions = GetRevisionsAttribute(attributes, _comAttribute);
             AddRevisions(revisions, oldDeleted, oldModified, oldNonOutput);
             return attributes;
         }
@@ -1293,7 +1369,8 @@ namespace Extract.Redaction
             ComAttribute result = (ComAttribute) copy.Clone();
 
             // Append the archive action attribute to this attribute
-            ComAttribute archiveAction = _comAttribute.Create("ArchiveAction", "TurnedOff");
+            ComAttribute archiveAction =
+                _comAttribute.Create(Constants.ArchiveAction, Constants.TurnedOff);
             AttributeMethods.AppendChildren(result, archiveAction);
 
             return result;

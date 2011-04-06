@@ -119,5 +119,15 @@ namespace Extract.Redaction
         /// The names for ID elements.
         /// </summary>
         public static readonly string ID = "ID";
+
+        /// <summary>
+        /// The names for ArchiveAction elements.
+        /// </summary>
+        public static readonly string ArchiveAction = "ArchiveAction";
+
+        /// <summary>
+        /// The ArchiveAction value to indicate a redaction has been turned off.
+        /// </summary>
+        public static readonly string TurnedOff = "TurnedOff";
     }
 }

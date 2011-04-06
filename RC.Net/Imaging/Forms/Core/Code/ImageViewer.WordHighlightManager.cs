@@ -98,7 +98,7 @@ namespace Extract.Imaging.Forms
             /// <summary>
             /// Indicates the number of outstanding calls scheduled to run via the UI message queue.
             /// </summary>
-            volatile int _executeInUIReferenceCount = 0;
+            long _executeInUIReferenceCount = 0;
 
             /// <summary>
             /// The <see cref="ImageViewer"/> for which word highlights are being managed.
@@ -941,7 +941,7 @@ namespace Extract.Imaging.Forms
                             // In case of a cancelled operation, give any pending UI operations every
                             // opportunity possible to cancel. (We cannot call DoEvents or wait
                             // indefinetly since that could cause a deadlock).
-                            for (int i = 0; _executeInUIReferenceCount > 0; i++)
+                            for (int i = 0; Interlocked.Read(ref _executeInUIReferenceCount) > 0; i++)
                             {
                                 Thread.Sleep(50);
 
@@ -993,7 +993,7 @@ namespace Extract.Imaging.Forms
                             {
                                 string ocrFileName = string.Empty;
 
-                                ExecuteInUI(() => ocrFileName = _imageViewer._imageFile + ".uss");
+                                ExecuteInUIThread(() => ocrFileName = _imageViewer._imageFile + ".uss");
 
                                 if (File.Exists(ocrFileName))
                                 {
@@ -1083,11 +1083,18 @@ namespace Extract.Imaging.Forms
 
                 try
                 {
+                    // NOTE:
+                    // This method executes on a background thread. While it is guaranted that only
+                    // one instance of this method will run at any given time, any operations that
+                    // occur in this method should be thread-safe with respect to the UI thread and
+                    // should be tolerant to document/page changes that could occur in the UI thread.
+                    // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
+
                     // Attempt to retrieve the image page currently being displayed and a PixelProbe
                     // for it. If unable to, an image isn't currently available and the operation
                     // should be aborted.
                     int page = -1;
-                    ExecuteInUI(() =>
+                    ExecuteInUIThread(() =>
                     {
                         page = _imageViewer.PageNumber;
                         probe = _imageViewer._reader.CreatePixelProbe(page);
@@ -1155,7 +1162,7 @@ namespace Extract.Imaging.Forms
                             highlight.Inflate((double)_config.Settings.AutoFitZonePadding + 1, false);
 
                             // Add the new auto-fit highlight
-                            ExecuteInUI(() =>
+                            ExecuteInUIThread(() =>
                             {
                                 RemoveAutoFitHighlight();
                                 AddAutoFitHighlight(highlight);
@@ -1174,7 +1181,7 @@ namespace Extract.Imaging.Forms
                             new FittingData(_autoFitHighlight.ToRasterZone());
                         if (!autoZoneFittingData.LinePassesThrough(startPoint, endPoint))
                         {
-                            ExecuteInUI(() => RemoveAutoFitHighlight());
+                            ExecuteInUIThread(() => RemoveAutoFitHighlight());
                         }
                     }
                 }
@@ -1205,6 +1212,13 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
+                    // NOTE:
+                    // This method executes on a background thread. While it is guaranted that only
+                    // one instance of this method will run at any given time, any operations that
+                    // occur in this method should be thread-safe with respect to the UI thread and
+                    // should be tolerant to document/page changes that could occur in the UI thread.
+                    // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
+
                     // If there is no OCR data, there is nothing more to be done.
                     if (_ocrData == null)
                     {
@@ -1216,7 +1230,7 @@ namespace Extract.Imaging.Forms
                     // operation should be aborted.
                     int startingPage = -1;
                     int pageCount = -1;
-                    ExecuteInUI(() =>
+                    ExecuteInUIThread(() =>
                     {
                         startingPage = _imageViewer.PageNumber;
                         pageCount = _imageViewer.PageCount;
@@ -1237,7 +1251,7 @@ namespace Extract.Imaging.Forms
                         // been created).
                         HashSet<LayerObject> wordHighlights = LoadWordHighlightsForPage(page);
 
-                        ExecuteInUI(() =>
+                        ExecuteInUIThread(() =>
                         {
                             if (page == startingPage)
                             {
@@ -1284,6 +1298,13 @@ namespace Extract.Imaging.Forms
             /// words on the specified page.</returns>
             HashSet<LayerObject> LoadWordHighlightsForPage(int page)
             {
+                // NOTE:
+                // This method executes on a background thread. While it is guaranted that only
+                // one instance of this method will run at any given time, any operations that
+                // occur in this method should be thread-safe with respect to the UI thread and
+                // should be tolerant to document/page changes that could occur in the UI thread.
+                // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
+
                 // Retrieve an IUnknownVector of SpatialStrings representing the words on the page.
                 ISpatialString pageData = (ISpatialString)_ocrData.GetSpecifiedPages(page, page);
 
@@ -1387,13 +1408,13 @@ namespace Extract.Imaging.Forms
             /// thread (ie, it must adhere to _cancelToken).
             /// </summary>
             /// <param name="method">The <see cref="Action"/> to execute in the UI thread.</param>
-            void ExecuteInUI(Action method)
+            void ExecuteInUIThread(Action method)
             {
                 // To avoid scheduling to the UI unnecessarilly, check cancelation token first.
                 _cancelToken.ThrowIfCancellationRequested();
 
                 // Keep track of the fact that the method was scheduled to execute.
-                _executeInUIReferenceCount++;
+                Interlocked.Increment(ref _executeInUIReferenceCount);
 
                 // Assign a local copy of the _cancelToken to check inside the invoke call so that
                 // even if the worker thread is running a different operation by the time occurs
@@ -1424,7 +1445,7 @@ namespace Extract.Imaging.Forms
                             // By decrementing _UIOperationReferenceCount as part of the invoke, we'll
                             // have record of whether the method was called, even if the blocking here
                             // was cancelled.
-                            _executeInUIReferenceCount--;
+                            Interlocked.Decrement(ref _executeInUIReferenceCount);
                         }
                     }));
 

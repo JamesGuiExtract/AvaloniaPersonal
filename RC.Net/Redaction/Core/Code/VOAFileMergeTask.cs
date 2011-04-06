@@ -5,6 +5,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
@@ -468,28 +469,53 @@ namespace Extract.Redaction
                 dataFile1 = pathTags.Expand(settings.DataFile1);
                 dataFile2 = pathTags.Expand(settings.DataFile2);
 
+                ExtractException.Assert("ELI32280", "Source ID Shield data file does not exist.",
+                    File.Exists(dataFile1) && File.Exists(dataFile2));
+
                 // Create a RedactionFileLoader to load redactions from the data files.
                 RedactionFileLoader voaLoader =
                     new RedactionFileLoader(
                         new ConfidenceLevelsCollection(idShieldSettings.ConfidenceLevels));
 
-                // Load spatial & redacted attributes from dataFile1
+                // Load spatial attributes from dataFile1
                 voaLoader.LoadFrom(dataFile1, sourceDocName);
                 IEnumerable<ComAttribute> set1OriginalAttributes = voaLoader.Items
-                    .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
-                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute)
-                    .Where(attribute => attribute.Value.HasSpatialInfo());
+                    .Select(item => item.Attribute.ComAttribute)
+                    .Union(voaLoader.InsensitiveAttributes
+                        .Where(attribute => attribute.Value.HasSpatialInfo()));
                 IUnknownVector attributeVector1 = set1OriginalAttributes.ToIUnknownVector();
+
+                // Find attributes from dataFile1 that have been turned off and archived under the
+                // revisions attribute.
+                HashSet<ComAttribute> turnedOffAttributes = new HashSet<ComAttribute>(
+                    voaLoader.Items
+                        .Where(item => !item.Attribute.Redacted)
+                        .Select(item => item.Attribute.ComAttribute));
+
+                IEnumerable<ComAttribute> set1NonSpatial = voaLoader.InsensitiveAttributes
+                    .Where(attribute => !attribute.Value.HasSpatialInfo());
 
                 long nextId = voaLoader.NextId;
 
-                // Load spatial & redacted attributes from dataFile2
+                // Load spatial attributes from dataFile2
                 voaLoader.LoadFrom(dataFile2, sourceDocName);
-                IUnknownVector attributeVector2 = voaLoader.Items
-                    .Where(sensitiveItem => sensitiveItem.Attribute.Redacted)
-                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute)
-                    .Where(attribute => attribute.Value.HasSpatialInfo())
-                    .ToIUnknownVector();
+                IEnumerable<ComAttribute> set2OriginalAttributes = voaLoader.Items
+                    .Select(item => item.Attribute.ComAttribute)
+                    .Union(voaLoader.InsensitiveAttributes
+                        .Where(attribute => attribute.Value.HasSpatialInfo()));
+                IUnknownVector attributeVector2 = set2OriginalAttributes.ToIUnknownVector();
+
+                // Find attributes from dataFile2 that have been turned off and archived under the
+                // revisions attribute.
+                foreach (ComAttribute turnedOffAttribute in voaLoader.Items
+                    .Where(item => !item.Attribute.Redacted)
+                    .Select(item => item.Attribute.ComAttribute))
+                {
+                    turnedOffAttributes.Add(turnedOffAttribute);
+                }
+
+                IEnumerable<ComAttribute> set2NonSpatial = voaLoader.InsensitiveAttributes
+                    .Where(attribute => !attribute.Value.HasSpatialInfo());
 
                 // The IDs of the output items will start with the next higher number than any
                 // existing item id in either of the two source files.
@@ -548,18 +574,22 @@ namespace Extract.Redaction
                     Dictionary<string, List<ComAttribute>> set2Mappings =
                         new Dictionary<string, List<ComAttribute>>();
 
+                    // The IDS of items that should be turned off in the output file.
+                    HashSet<string> turnedOffIDs = new HashSet<string>();
+
                     // Find all sensitive items from either file that haven't been merged and add them
                     // to the output attributes while adding a mapping entry that ties the item from the
                     // original file to the corresponding item in the output file.
                     AddUnmergedAttributes(attributeCreator, set1Attributes, mergedValue, set1Mappings,
-                        outputAttributes, ref nextId);
+                        turnedOffAttributes, turnedOffIDs, outputAttributes, ref nextId);
                     AddUnmergedAttributes(attributeCreator, set2Attributes, mergedValue, set2Mappings,
-                        outputAttributes, ref nextId);
+                        turnedOffAttributes, turnedOffIDs, outputAttributes, ref nextId);
 
                     // Find all sensitive items have been merged and add them to the output attributes
                     // while adding a mapping entries that tie original items to the merged item.
                     AddMergedAttributes(attributeCreator, set1Attributes, set1OriginalAttributes,
-                        mergedValue, set1Mappings, set2Mappings, outputAttributes, ref nextId);
+                        mergedValue, set1Mappings, set2Mappings, turnedOffAttributes, turnedOffIDs,
+                        outputAttributes, ref nextId);
 
                     // Replace all attributes with the unique value with "Merged" in the final output.
                     foreach (ComAttribute mergedAttribute in attributeVector1
@@ -569,11 +599,30 @@ namespace Extract.Redaction
                         mergedAttribute.Value.ReplaceAndDowngradeToHybrid("Merged");
                     }
 
+                    // Merge all non-spatial attributes.
+                    List<ComAttribute> mergedNonSpatialAttributes = MergeNonSpatialAttributes(
+                        new List<ComAttribute>(set1NonSpatial), new List<ComAttribute>(set2NonSpatial));
+                    outputAttributes.Append(mergedNonSpatialAttributes.ToIUnknownVector<ComAttribute>());
+
                     outputAttributes.SaveTo(outputFile, false);
 
                     // Load the output using the RedactionFileLoader in order to add the metadata for
                     // this session.
                     voaLoader.LoadFrom(outputFile, sourceDocName);
+
+                    // Turn off any items that need to be turned off.
+                    foreach (SensitiveItem item in voaLoader.Items)
+                    {
+                        string id = item.Attribute.ComAttribute.SubAttributes
+                            .ToIEnumerable<ComAttribute>()
+                            .Where(subattribute => subattribute.Name == Constants.IDAndRevisionMetadata)
+                            .Single().Value.String;
+
+                        if (turnedOffIDs.Contains(id))
+                        {
+                            item.Attribute.Redacted = false;
+                        }
+                    }
 
                     TimeInterval interval = timer.Stop();
 
@@ -710,6 +759,10 @@ namespace Extract.Redaction
         /// attribute from <see paramref="sourceAttributes"/> while the values are a list of
         /// <see cref="ComAttribute"/>s that associate the attribute with the ID of an attribute in
         /// <see paramref="outputAttributes"/>.</param>
+        /// <param name="turnedOffAttributes">A <see cref="HashSet{T}"/> of
+        /// <see cref="ComAttribute"/>s that were turned off in the source files.</param>
+        /// <param name="turnedOffIDs">A <see cref="HashSet{T}"/> of attribute IDs that should be
+        /// turned off in the output.</param>
         /// <param name="outputAttributes">The <see cref="IUnknownVector"/> of
         /// <see cref="ComAttribute"/>s to which the unmerged attributes should be added.</param>
         /// <param name="nextId">The id to be assigned to the next <see cref="ComAttribute"/>
@@ -717,6 +770,7 @@ namespace Extract.Redaction
         static void AddUnmergedAttributes(AttributeCreator attributeCreator,
             IEnumerable<ComAttribute> sourceAttributes, string mergedValue,
             Dictionary<string, List<ComAttribute>> attributeMappings,
+            HashSet<ComAttribute> turnedOffAttributes, HashSet<string> turnedOffIDs,
             IUnknownVector outputAttributes, ref long nextId)
         {
             foreach (ComAttribute sourceAttribute in sourceAttributes
@@ -744,6 +798,11 @@ namespace Extract.Redaction
                     attributeMappings[oldID] = mappings;
                 }
                 mappings.Add(mappingAttribute);
+
+                if (turnedOffAttributes.Contains(sourceAttribute))
+                {
+                    turnedOffIDs.Add(newId);
+                }
             }
         }
 
@@ -766,6 +825,10 @@ namespace Extract.Redaction
         /// <see paramref="outputAttributes"/>.</param>
         /// <param name="set2AttributeMappings">Like <see paramref="set2AttributeMappings"/>, but
         /// for the attributes from set 2.</param>
+        /// <param name="turnedOffAttributes">A <see cref="HashSet{T}"/> of
+        /// <see cref="ComAttribute"/>s that were turned off in the source files.</param>
+        /// <param name="turnedOffIDs">A <see cref="HashSet{T}"/> of attribute IDs that should be
+        /// turned off in the output.</param>
         /// <param name="outputAttributes">The <see cref="IUnknownVector"/> of
         /// <see cref="ComAttribute"/>s to which the unmerged attributes should be added.</param>
         /// <param name="nextId">The id to be assigned to the next <see cref="ComAttribute"/>
@@ -775,12 +838,14 @@ namespace Extract.Redaction
             IEnumerable<ComAttribute> set1OriginalAttributes, string mergedValue,
             Dictionary<string, List<ComAttribute>> set1AttributeMappings,
             Dictionary<string, List<ComAttribute>> set2AttributeMappings,
+            HashSet<ComAttribute> turnedOffAttributes, HashSet<string> turnedOffIDs,
             IUnknownVector outputAttributes, ref long nextId)
         {
             foreach (ComAttribute mergedAttribute in set1Attributes
                 .Where(attribute => attribute.Value.String == mergedValue))
             {
                 string newId = nextId++.ToString(CultureInfo.InvariantCulture);
+                bool turnedOff = true;
 
                 foreach (ComAttribute sourceAttribute in mergedAttribute.SubAttributes
                     .ToIEnumerable<ComAttribute>())
@@ -804,6 +869,11 @@ namespace Extract.Redaction
                         sourceMappings[oldID] = mappings;
                     }
                     mappings.Add(mappingAttribute);
+
+                    if (!turnedOffAttributes.Contains(sourceAttribute))
+                    {
+                        turnedOff = false;
+                    }
                 }
 
                 // Remove the sub-attributes now that we have loaded all mapping data from them.
@@ -814,8 +884,71 @@ namespace Extract.Redaction
                     attributeCreator.Create(Constants.IDAndRevisionMetadata, newId, "_1");
                 AttributeMethods.AppendChildren(mergedAttribute, newIdRevision);
 
+                if (turnedOff)
+                {
+                    turnedOffIDs.Add(newId);
+                }
+
                 outputAttributes.PushBack(mergedAttribute);
             }
+        }
+
+        /// <summary>
+        /// Merges the non spatial attributes by combining identical attributes while adding all
+        /// other attributes to the output verbatim (could result in multiple DocumentTypes,
+        /// for example).
+        /// </summary>
+        /// <param name="set1NonSpatial">The non-spatial <see cref="ComAttribute"/>s from the first
+        /// source file.</param>
+        /// <param name="set2NonSpatial">The non-spatial <see cref="ComAttribute"/>s from the second
+        /// source file.</param>
+        /// <returns>The merged collection of non-spatial attributes.</returns>
+        static List<ComAttribute> MergeNonSpatialAttributes(List<ComAttribute> set1NonSpatial,
+            List<ComAttribute> set2NonSpatial)
+        {
+            List<ComAttribute> mergedNonSpatialAttributes = new List<ComAttribute>();
+
+            // Loop to look for any identical attributes in set2NonSpatial for each attribute in
+            // set1NonSpatial.
+            for (int i = 0; i < set1NonSpatial.Count; i++)
+            {
+                ComAttribute attribute1 = set1NonSpatial[i];
+                bool merged = false;
+
+                for (int j = 0; j < set2NonSpatial.Count; j++)
+                {
+                    ComAttribute attribute2 = set2NonSpatial[j];
+
+                    if (attribute1.Name.Equals(
+                            attribute2.Name, StringComparison.OrdinalIgnoreCase) &&
+                        attribute1.Value.String.Equals(
+                            attribute2.Value.String, StringComparison.OrdinalIgnoreCase) &&
+                        attribute1.Type.Equals(
+                            attribute2.Type, StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!merged)
+                        {
+                            merged = true;
+                            mergedNonSpatialAttributes.Add(attribute1);
+                        }
+
+                        set2NonSpatial.RemoveAt(j);
+                        j--;
+                    }
+                }
+
+                if (merged)
+                {
+                    set1NonSpatial.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            // Add all unmerged attributes to the results and return.
+            mergedNonSpatialAttributes.AddRange(set1NonSpatial);
+            mergedNonSpatialAttributes.AddRange(set2NonSpatial);
+
+            return mergedNonSpatialAttributes;
         }
 
         #endregion Private Members
