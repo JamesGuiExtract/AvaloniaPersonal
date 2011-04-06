@@ -74,7 +74,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <summary>
         /// The OCR manager to use when performing OCR of highlights
         /// </summary>
-        SynchronousOcrManager _ocrManager = new SynchronousOcrManager(OcrTradeoff.Accurate);
+        SynchronousOcrManager _ocrManager = null;
 
         /// <summary>
         /// Whether OCR text should be sent to the clipboard or not.
@@ -299,6 +299,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                 InitializeComponent();
 
+                // If OCR on client is licensed, then create the OCR manager
+                if (LicenseUtilities.IsLicensed(LicenseIdName.OcrOnClientFeature))
+                {
+                    _ocrManager = new SynchronousOcrManager(OcrTradeoff.Accurate);
+                }
+
                 _subImageHandler = subImageHandler;
                 if (!subImageHandler)
                 {
@@ -506,6 +512,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                         // Do not allow the highlight to be selected
                         highlight.Selectable = false;
 
+                        // No other work to do if there is no OCR manager.
+                        if (_ocrManager == null)
+                        {
+                            return;
+                        }
+
                         // Check the restrictions if not sending to message box
                         if (!_sendOcrToMessageBox)
                         {
@@ -532,7 +544,6 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                                 throw ee;
                             }
                         }
-
 
                         // Get the OCR text as a string.  Pass in a bounding rectangle
                         // with the dimensions of the image to ensure that no illegal
