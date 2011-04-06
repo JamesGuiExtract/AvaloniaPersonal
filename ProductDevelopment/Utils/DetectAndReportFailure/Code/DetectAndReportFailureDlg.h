@@ -72,7 +72,7 @@ protected:
 	// get a default message object, pre-populated with the email settings,
 	// on which further actions can be taken (such as displaying the UI, setting
 	// other properties, and sending the email message.
-	IESMessagePtr getMessageObject();
+	IExtractEmailMessagePtr getMessageObject();
 
 	// get the full path to the exception log file
 	const std::string& getExceptionLogFile() const;

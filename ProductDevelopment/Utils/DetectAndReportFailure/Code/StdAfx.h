@@ -22,8 +22,8 @@
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
-#import "..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.tlb" named_guids
-using namespace ESMESSAGEUTILSLib;
+#import "..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.tlb" named_guids
+using namespace Extract_Utilities_Email;
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

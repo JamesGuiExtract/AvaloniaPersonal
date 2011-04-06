@@ -342,7 +342,7 @@ void CDetectAndReportFailureDlg::OnFileExit()
 			"Extract Systems Failure Detection and Reporting System (FDRS)?", 
 			"Confirmation", MB_YESNO) == IDYES)
 		{
-			m_apExceptionDlg.reset(NULL);
+			m_apExceptionDlg.reset(__nullptr);
 			SendMessage(WM_CLOSE);
 		}
 	}
@@ -372,21 +372,15 @@ void CDetectAndReportFailureDlg::OnFileConfigureEmailSettings()
 	try
 	{
 		// create the email settings object
-		IEmailSettingsPtr ipEmailSettings(CLSID_EmailSettings);
-		ASSERT_RESOURCE_ALLOCATION("ELI12429", ipEmailSettings != NULL);
+		ISmtpEmailSettingsPtr ipEmailSettings(CLSID_SmtpEmailSettings);
+		ASSERT_RESOURCE_ALLOCATION("ELI12429", ipEmailSettings != __nullptr);
 
-		// load the current settings from the registry
-		IObjectSettingsPtr ipEmailSettingsMgr = ipEmailSettings;
-		ASSERT_RESOURCE_ALLOCATION("ELI12431", ipEmailSettingsMgr != NULL);
-		ipEmailSettingsMgr->LoadFromRegistry(gstrEMAIL_REG_PATH.c_str());
-		
-		// display the user interface for viewing/editing
-		IObjectUserInterfacePtr ipEmailSettingsUI = ipEmailSettings;
-		ASSERT_RESOURCE_ALLOCATION("ELI12430", ipEmailSettingsUI != NULL);
-		ipEmailSettingsUI->DisplayReadWrite();
+		// Load the current settings and display the configuration UI
+		ipEmailSettings->LoadSettings(VARIANT_FALSE);
 
-		// save the updated settings to the registry
-		ipEmailSettingsMgr->SaveToRegistry(gstrEMAIL_REG_PATH.c_str());
+		IConfigurableObjectPtr ipConfigure = ipEmailSettings;
+		ASSERT_RESOURCE_ALLOCATION("ELI32287", ipConfigure != __nullptr);
+		ipConfigure->RunConfiguration();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12432")
 }
@@ -398,30 +392,33 @@ void CDetectAndReportFailureDlg::OnFileSendExceptionLog()
 		CWaitCursor waitCursor;
 
 		// get the default message object
-		IESMessagePtr ipMsg = getMessageObject();
-		ASSERT_RESOURCE_ALLOCATION("ELI12440", ipMsg != NULL);
+		IExtractEmailMessagePtr ipMsg = getMessageObject();
+		ASSERT_RESOURCE_ALLOCATION("ELI12440", ipMsg != __nullptr);
 
 		// populate the message object
-		ipMsg->BodyText = "[Please enter your custom message here if applicable...]";
+		ipMsg->Body= "[Please enter your custom message here if applicable...]";
 		ipMsg->Subject = "[FDRS] Exception log";
 
 		// set the FDRS email as the default recipient
 		IVariantVectorPtr ipRecipients(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI12442", ipRecipients != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12442", ipRecipients != __nullptr);
 		ipRecipients->PushBack(_bstr_t("fdrs@ExtractSystems.com"));
 		ipMsg->Recipients = ipRecipients;
 
 		// set the attachments list
 		IVariantVectorPtr ipAttachments(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI12443", ipAttachments != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12443", ipAttachments != __nullptr);
 		ipAttachments->PushBack(_bstr_t(getExceptionLogFile().c_str()));
-		ipMsg->FileAttachments = ipAttachments;
+		ipMsg->Attachments = ipAttachments;
 
+		ipMsg->Send();
+
+		// TODO: Make this display using the new email interface
 		// display the message user interface
-		IObjectUserInterfacePtr ipEmailUI = ipMsg;
-		ASSERT_RESOURCE_ALLOCATION("ELI12419", ipEmailUI != NULL);
-		waitCursor.Restore();
-		ipEmailUI->DisplayReadWrite();
+		//IObjectUserInterfacePtr ipEmailUI = ipMsg;
+		//ASSERT_RESOURCE_ALLOCATION("ELI12419", ipEmailUI != NULL);
+		//waitCursor.Restore();
+		//ipEmailUI->DisplayReadWrite();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12438")
 }
@@ -433,24 +430,27 @@ void CDetectAndReportFailureDlg::OnFileSendCustomMessage()
 		CWaitCursor waitCursor;
 
 		// get the default message object
-		IESMessagePtr ipMsg = getMessageObject();
-		ASSERT_RESOURCE_ALLOCATION("ELI19412", ipMsg != NULL);
+		IExtractEmailMessagePtr ipMsg = getMessageObject();
+		ASSERT_RESOURCE_ALLOCATION("ELI19412", ipMsg != __nullptr);
 
 		// populate the message object
-		ipMsg->BodyText = "[Please enter your custom message here...]";
+		ipMsg->Body = "[Please enter your custom message here...]";
 		ipMsg->Subject = "[FDRS] Custom message";
 
 		// set the FDRS email as the default recipient
 		IVariantVectorPtr ipRecipients(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI12441", ipRecipients != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI12441", ipRecipients != __nullptr);
 		ipRecipients->PushBack(_bstr_t("fdrs@ExtractSystems.com"));
 		ipMsg->Recipients = ipRecipients;
 
+		ipMsg->Send();
+
+		// TODO: Make this display using the new email interface
 		// display the message user interface
-		IObjectUserInterfacePtr ipEmailUI = ipMsg;
-		ASSERT_RESOURCE_ALLOCATION("ELI19411", ipEmailUI != NULL);
-		waitCursor.Restore();
-		ipEmailUI->DisplayReadWrite();
+		//IObjectUserInterfacePtr ipEmailUI = ipMsg;
+		//ASSERT_RESOURCE_ALLOCATION("ELI19411", ipEmailUI != NULL);
+		//waitCursor.Restore();
+		//ipEmailUI->DisplayReadWrite();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12439")
 }
@@ -700,7 +700,7 @@ public:
 		CDetectAndReportFailureDlg *pDlg)
 		: m_eEvent(eEvent), m_strMsg(strMsg), m_pDlg(pDlg)
 	{
-		ASSERT_ARGUMENT("ELI12460", pDlg != NULL);
+		ASSERT_ARGUMENT("ELI12460", pDlg != __nullptr);
 	}
 
 private:
@@ -788,13 +788,13 @@ void CDetectAndReportFailureDlg::sendNotification(const ENotificationEvent eEven
 												  const string& strMsg)
 {
 	// get the default message object
-	IESMessagePtr ipMsg = getMessageObject();
-	ASSERT_RESOURCE_ALLOCATION("ELI19413", ipMsg != NULL);
+	IExtractEmailMessagePtr ipMsg = getMessageObject();
+	ASSERT_RESOURCE_ALLOCATION("ELI19413", ipMsg != __nullptr);
 
 	// prepend a computer/date/time stamp to the message
 	string strNewMsg = getEmailTimeStamp() + strMsg;
 
-	ipMsg->BodyText = strNewMsg.c_str();
+	ipMsg->Body = strNewMsg.c_str();
 	ipMsg->Subject = getEmailSubjectText(eEvent).c_str();
 	ipMsg->Recipients = m_options.getEmailRecipients();
 
@@ -808,20 +808,18 @@ void CDetectAndReportFailureDlg::sendNotification(const ENotificationEvent eEven
 	m_mapEventTypeToLastEmailTime[eEvent] = time(NULL);
 }
 //-------------------------------------------------------------------------------------------------
-IESMessagePtr CDetectAndReportFailureDlg::getMessageObject()
+IExtractEmailMessagePtr CDetectAndReportFailureDlg::getMessageObject()
 {
 	// create the message object
-	IESMessagePtr ipMsg(CLSID_ESMessage);
-	ASSERT_RESOURCE_ALLOCATION("ELI12417", ipMsg != NULL);
+	IExtractEmailMessagePtr ipMsg(CLSID_ExtractEmailMessage);
+	ASSERT_RESOURCE_ALLOCATION("ELI12417", ipMsg != __nullptr);
 
 	// create the email settings object
-	IEmailSettingsPtr ipEmailSettings(CLSID_EmailSettings);
-	ASSERT_RESOURCE_ALLOCATION("ELI12418", ipEmailSettings != NULL);
+	ISmtpEmailSettingsPtr ipEmailSettings(CLSID_SmtpEmailSettings);
+	ASSERT_RESOURCE_ALLOCATION("ELI12418", ipEmailSettings != __nullptr);
 
-	// load the email settings from the registry
-	IObjectSettingsPtr ipEmailSettingsMgr = ipEmailSettings;
-	ASSERT_RESOURCE_ALLOCATION("ELI12427", ipEmailSettingsMgr != NULL);
-	ipEmailSettingsMgr->LoadFromRegistry(gstrEMAIL_REG_PATH.c_str());
+	// load the email settings
+	ipEmailSettings->LoadSettings(VARIANT_FALSE);
 
 	// populate the message object
 	ipMsg->EmailSettings = ipEmailSettings;
@@ -837,7 +835,7 @@ const string& CDetectAndReportFailureDlg::getExceptionLogFile() const
 	{
 		// ensure that we can access the CWinApp object
 		CWinApp *pApp = AfxGetApp();
-		ASSERT_ARGUMENT("ELI12444", pApp != NULL);
+		ASSERT_ARGUMENT("ELI12444", pApp != __nullptr);
 
 		// get the coommon Application Data folder [LegacyRC #5216]
 		string strDir;
@@ -916,7 +914,7 @@ bool CDetectAndReportFailureDlg::checkIniFileExistence()
 			"File Not Found", MB_OK|MB_ICONERROR);
 
 		// Close the dialog and return false
-		m_apExceptionDlg.reset(NULL);
+		m_apExceptionDlg.reset(__nullptr);
 		PostMessage(WM_CLOSE);
 		return false;
 	}
