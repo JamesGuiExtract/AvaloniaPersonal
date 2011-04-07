@@ -259,6 +259,8 @@ namespace Extract.Redaction
                 // list is the starting index of the zone and Item2 is the ending index of the zone.
                 List<Tuple<int, int>> redactionZones = new List<Tuple<int, int>>();
 
+                var bounds = source.GetOCRImageBounds();
+
                 // Loop through each attribute to redact
                 foreach (SpatialString value in _voaLoader.Items
                     .Where(sensitiveItem =>
@@ -273,7 +275,7 @@ namespace Extract.Redaction
                         // Text is "indexed" by storing the index of each character as the "left"
                         // coordinate in the attribute's spatial string.
                         ILongRectangle boundingRect =
-                            rasterZone.GetRectangularBounds(source.GetOCRImageBounds());
+                            rasterZone.GetRectangularBounds(bounds);
                         int startIndex = boundingRect.Left;
                         int endIndex = boundingRect.Right;
 
@@ -281,6 +283,9 @@ namespace Extract.Redaction
                         MergeWithExistingRedactionZones(redactionZones, startIndex, endIndex);
                     }
                 }
+
+                // Sort the redaction zones by starting index
+                redactionZones.Sort(SortZones);
 
                 // Create a redacted version of source.String using the calculated redaction zones.
                 string redactedString = CreateRedactions(source.String, redactionZones);
@@ -610,6 +615,9 @@ namespace Extract.Redaction
         /// <summary>
         /// Creates a copy of <see paramref="sourceString"/> where the text of each specified
         /// <see paramref="redactionZones"/> has been redacted.
+        /// <para><b>Note:</b></para>
+        /// This method requires that the <paramref name="redactionZones"/> do not overlap and
+        /// are sorted.
         /// </summary>
         /// <param name="sourceString">The <see cref="string"/> to redact.</param>
         /// <param name="redactionZones">The character indexes to redact where Item1 of each
@@ -618,22 +626,23 @@ namespace Extract.Redaction
         /// <returns>A redacted version of <see paramref="sourceString"/>.</returns>
         string CreateRedactions(string sourceString, List<Tuple<int, int>> redactionZones)
         {
-            StringBuilder outputString = new StringBuilder(sourceString);
-
-            // Initialize a list to map charater indexes in outputString back to the corresponding
-            // index of sourceString. (The indexes of charIndexes are the character indexes in
-            // outputString while the values of charIndexes are the character indexes in
-            // sourceString).
-            List<int> charIndexes = new List<int>(Enumerable.Range(0, sourceString.Length));
+            // Set the initial capacity of the SB to the 110% of the source string length. This
+            // will reduce the number of times the SB needs to increase its length
+            StringBuilder outputString = new StringBuilder(
+                (int) Math.Round(sourceString.Length * 1.10));
 
             // Loop through each redactionZone to redact the text in outputString.
+            int nextSourceIndex = 0;
             foreach (Tuple<int, int> redactionZone in redactionZones)
             {
-                int outputIndex = charIndexes.FindIndex((index) => redactionZone.Item1 == index);
-                ExtractException.Assert("ELI31693", "Missing text file index.", outputIndex != -1);
+                int length = redactionZone.Item1 - nextSourceIndex;
+                outputString.Append(sourceString.Substring(nextSourceIndex,
+                    length));
+                nextSourceIndex += length;
 
                 // Calculate the text to replace.
                 int lengthToReplace = redactionZone.Item2 - redactionZone.Item1 + 1;
+                nextSourceIndex += lengthToReplace;
                 string textToReplace = sourceString.Substring(redactionZone.Item1, lengthToReplace);
                 string replacementText = string.Empty;
 
@@ -688,13 +697,11 @@ namespace Extract.Redaction
                 }
 
                 // Replace the text
-                outputString.Remove(outputIndex, lengthToReplace);
-                outputString.Insert(outputIndex, replacementText);
-
-                // Update charIndexes to reflect the updated outputString.
-                charIndexes.RemoveRange(outputIndex, lengthToReplace);
-                charIndexes.InsertRange(outputIndex,
-                    Enumerable.Repeat<int>(-1, replacementText.Length));
+                outputString.Append(replacementText);
+            }
+            if (nextSourceIndex < sourceString.Length)
+            {
+                outputString.Append(sourceString.Substring(nextSourceIndex));
             }
 
             return outputString.ToString();
@@ -714,6 +721,38 @@ namespace Extract.Redaction
             }
 
             return _randomNumberGenerator.Next(_settings.MaxNumberAddedCharacters + 1);
+        }
+
+        /// <summary>
+        /// Sort function for the redaction zones
+        /// </summary>
+        /// <param name="left">The left zone.</param>
+        /// <param name="right">The right zone.</param>
+        /// <returns>The result of comparing the left and right zones.</returns>
+        static int SortZones(Tuple<int, int> left, Tuple<int, int> right)
+        {
+            if (left == null)
+            {
+                if (right == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else
+            {
+                if (right == null)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return left.Item1.CompareTo(right.Item1);
+                }
+            }
         }
 
         #endregion Private Members
