@@ -10,6 +10,8 @@
 #include "resource.h"		// main symbols
 
 #include <string>
+#include <vector>
+#include <MAPI.h>
 
 using namespace std;
 // CEmailFileApp:
@@ -44,15 +46,19 @@ private:
 	// Email address to send to
 	string m_strEmailAddress;
 
+	string m_strBody;
+
 	bool m_bZipFile;
 
 	bool m_bConfigureSettings;
+
+	bool m_bShowInClient;
 
 	// Methods
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Displays usage information for this executable.
-	void displayUsage(const string& strErrorMessage);
+	void displayUsage(const string& strErrorMessage = "");
 	
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Sets the member variables based on the command line arguments. If there are missing
@@ -61,9 +67,31 @@ private:
 	bool getAndValidateArguments(int argc, char* argv[]);
 	
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: Returns IVariantVectorPtr that contains all of the Email addresses in the
-	// m_strEmailAddress member variable.
-	IVariantVectorPtr CEmailFileApp::parseRecipientAddress();
+	// PROMISE: Fills the vector with all of the Email addresses in the
+	// m_strEmailAddress member variable. The addresses will be validated to contain '@' symbol.
+	void parseRecipientAddress(vector<string>& rvecRecipients);
+
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To add each entry in the recipient vector to an IVariantVector and return it
+	IVariantVectorPtr getRecipientsAsVariantVector(const vector<string>& vecRecipients);
+
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To send an email using the IExtractEmailMessage object
+	void sendEmail(ISmtpEmailSettingsPtr ipEmailSettings,
+		const vector<string>& vecRecipients, const string& strFile);
+
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To build an email structure using Mapi32.dll structures and display in client
+	void showInClient(ISmtpEmailSettingsPtr ipEmailSettings,
+		const vector<string>& vecRecipients, const string& strFile);
+
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To fill the MapiRecipDesc struct with the recipient data and return it
+	MapiRecipDesc buildMapiRecipient(bool bSender, const string& strName, const string& strAddress);
+
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To convert the mapi error code to a the string representation of the value.
+	string getMapiErrorCodeAsString(ULONG ulErrorCode);
 
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Throws an exception if this executable is unlicensed. Returns true otherwise.
