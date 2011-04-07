@@ -1013,8 +1013,14 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked,long nFileID,  
 				// Begin a transaction
 				TransactionGuard tg(ipConnection);
 
+				// [LegacyRCAndUtils:6054]
+				// Store the full log string which contains additional info which may be useful.
+				UCLIDException ue;
+				ue.createFromString("ELI32298", asString(strException));
+				string strLogString = ue.createLogString();
+
 				// change the given files state to Failed
-				setFileActionState(ipConnection, nFileID, asString(strAction), "F", asString(strException));
+				setFileActionState(ipConnection, nFileID, asString(strAction), "F", strLogString);
 
 				tg.CommitTrans();
 

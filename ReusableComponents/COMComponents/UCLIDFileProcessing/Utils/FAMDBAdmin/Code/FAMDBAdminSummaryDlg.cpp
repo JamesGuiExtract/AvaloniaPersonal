@@ -8,6 +8,7 @@
 #include <cpputil.h>
 #include <ComUtils.h>
 #include <ADOUtils.h>
+#include <TemporaryFileName.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
@@ -43,6 +44,25 @@ const string gmapCOLUMN_STATUS[][2] =
 const string gstrTOTAL_FILECOUNT_FIELD = "FileCount";
 const string gstrTOTAL_FAMFILE_QUERY = "SELECT COUNT(ID) as " +
 	gstrTOTAL_FILECOUNT_FIELD + " FROM FAMFile";
+
+// Query to retrieve the last 1000 exceptions for failed files on the specified action.
+const string gstrFAILED_FILES_EXCEPTIONS_QUERY =
+	"SELECT TOP 1000 MachineName, UserName, DateTimeStamp, Exception FROM FAMFile"
+	"	INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID"
+	"	INNER JOIN FileActionStateTransition"
+	"		ON FileActionStateTransition.ID ="
+	"		("
+	"			SELECT MAX(ID) FROM FileActionStateTransition"
+	"				WHERE FAMFile.ID = FileActionStateTransition.FileID"
+	"					AND ActionID = <ActionID>"
+	"		)"
+	"	INNER JOIN Machine ON FileActionStateTransition.MachineID = Machine.ID"
+	"	INNER JOIN FAMUser ON FileActionStateTransition.FAMUserID = FAMUser.ID"
+	"	WHERE FileActionStatus.ActionStatus = 'F'"
+	"		AND FileActionStatus.ActionID = <ActionID>"
+	"		AND FileActionStateTransition.Asc_To = 'F'"
+	"		AND FileActionStateTransition.Exception IS NOT NULL"
+	"	ORDER BY DateTimeStamp DESC";
 
 //--------------------------------------------------------------------------------------------------
 // FAMDBAdminSummary dialog
@@ -87,7 +107,8 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminSummaryDlg, CPropertyPage)
 	ON_WM_SIZE()
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_ACTIONS, &CFAMDBAdminSummaryDlg::OnNMRClickListActions)
 	ON_COMMAND(ID_SUMMARY_MENU_EXPORT_LIST, &OnContextExportFileList)
-	ON_COMMAND(ID_SUMMARY_MENU_SET_ACTION_STATUS,  &OnContextSetFileActionStatus)
+	ON_COMMAND(ID_SUMMARY_MENU_SET_ACTION_STATUS, &OnContextSetFileActionStatus)
+	ON_COMMAND(ID_SUMMARY_MENU_VIEW_FAILED, &OnContextViewFailed)
 END_MESSAGE_MAP()
 //--------------------------------------------------------------------------------------------------
 
@@ -256,6 +277,8 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 				// Prepare file selection info based on the selected action and actions status
 				string strContextActionStatusName = gmapCOLUMN_STATUS[pNMItemActivate->iSubItem][1];
 				string strContextActionName = m_listActions.GetItemText(pNMItemActivate->iItem, 0);
+				string strFailedFileCount =
+					(LPCTSTR)m_listActions.GetItemText(pNMItemActivate->iItem, giFAILED_COLUMN);
 
 				m_contextMenuFileSelection.setScope(eAllFilesForWhich);
 				m_contextMenuFileSelection.setStatus(m_ipFAMDB->AsEActionStatus(strActionStatus.c_str()));
@@ -267,7 +290,14 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 				CMenu menu;
 				menu.LoadMenu(IDR_MENU_SUMMARY_CONTEXT);
 				CMenu *pContextMenu = menu.GetSubMenu(0);
-			
+
+				// Enable "View exceptions for failed files" only when there are failed files for
+				// the action.
+				UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
+				UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+				pContextMenu->EnableMenuItem(ID_SUMMARY_MENU_VIEW_FAILED,
+					(strFailedFileCount != "0") ? nEnable : nDisable);
+
 				// Get the cursor position
 				CPoint point;
 				GetCursorPos(&point);
@@ -300,6 +330,103 @@ void CFAMDBAdminSummaryDlg::OnContextSetFileActionStatus()
 		CFAMDBAdminDlg *pFAMDBAdminDlg = (CFAMDBAdminDlg*)AfxGetMainWnd();
 		CSetActionStatusDlg dlgSetActionStatus(m_ipFAMDB, pFAMDBAdminDlg, m_contextMenuFileSelection);
 		dlgSetActionStatus.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31254");
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::OnContextViewFailed()
+{
+	try
+	{
+		CWaitCursor wait;
+
+		// Get the stats for the current action both to trigger a stats update to ensure the most
+		// recent failures will be displayed, and also to warn the user if there are too many
+		// exceptions to display them all.
+		IActionStatisticsPtr ipActionStats = m_ipFAMDB->GetStats(
+			m_contextMenuFileSelection.getActionID(), VARIANT_TRUE);
+
+		long nFailedCount = ipActionStats->GetNumDocumentsFailed();
+		if (nFailedCount > 1000)
+		{
+			int nResult = MessageBox("Since there are a very large number of failures for this "
+				"action, only the last 1000 will be displayed.",
+				"View exceptions for failed files", MB_OKCANCEL | MB_ICONINFORMATION );
+			if (nResult == IDCANCEL)
+			{
+				return;
+			}
+		}
+
+		// Build and execute the query to retrieve the exceptions
+		string strQuery = gstrFAILED_FILES_EXCEPTIONS_QUERY;
+		replaceVariable(strQuery, "<ActionID>", asString(m_contextMenuFileSelection.getActionID()));
+
+		_RecordsetPtr ipRecordSet = m_ipFAMDB->GetResultsForQuery(strQuery.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI32291", ipRecordSet != __nullptr);
+
+		// The results are ordered newest to oldest. To have the UEX viewer display them in that
+		// order, the temp .uex file needs to be in the opposite order. Compile the exceptions
+		// in a stack, then output from the stack to reverse the order.
+		stack<string> outputLines;
+		while (ipRecordSet->adoEOF == VARIANT_FALSE)
+		{
+			string strException = getStringField(ipRecordSet->Fields, "Exception");
+			if (strException.find(',') != string::npos)
+			{
+				// The full log string was logged; no further info is needed.
+				outputLines.push(strException);
+			}
+			else
+			{
+				// The exception was not stored with the log string data.
+				// We can add the machine, user and timestamp from the DB.
+				// (There is not info in the DB regarding serial #, process ID or application)
+				string strMachine = getStringField(ipRecordSet->Fields, "MachineName");
+				string strUser = getStringField(ipRecordSet->Fields, "UserName");
+				CTime timeStamp = getTimeDateField(ipRecordSet->Fields, "DateTimeStamp");
+				char pszTime[20];
+				sprintf_s(pszTime, sizeof(pszTime), "%ld", timeStamp.GetTime());
+
+				outputLines.push(
+					",," + strMachine + "," + strUser + ",," + string(pszTime) +"," + strException);
+			}
+
+			ipRecordSet->MoveNext();
+		}
+
+		// Generate the temporary .uex file and open it with the UEX viewer.
+		if (outputLines.size() > 0)
+		{
+			TemporaryFileName tempFile(__nullptr, ".uex", false);
+			ofstream outputStream(tempFile.getName(), ios::out | ios::trunc);
+
+			bool firstLine = true;
+			while (outputLines.size() > 0)
+			{
+				if (firstLine)
+				{
+					firstLine = false;
+				}
+				else
+				{
+					outputStream << endl;
+				}
+
+				outputStream << outputLines.top();
+
+				outputLines.pop();
+			}
+
+			outputStream.close();
+
+			runEXE("UEXViewer.exe", "\"" + tempFile.getName() + "\" /temp");
+		}
+		else
+		{
+			MessageBox("There were no exceptions logged for any of the failed files.",
+				"No exceptions", MB_OK | MB_ICONINFORMATION);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31254");
 }

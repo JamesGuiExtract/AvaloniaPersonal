@@ -575,6 +575,7 @@ BEGIN
     BEGIN
         MENUITEM "Manually set action status...", ID_SUMMARY_MENU_SET_ACTION_STATUS
         MENUITEM "Export file list...",         ID_SUMMARY_MENU_EXPORT_LIST
+		MENUITEM "View exceptions for failed files...", ID_SUMMARY_MENU_VIEW_FAILED
         MENUITEM SEPARATOR
         MENUITEM "Cancel",                      ID_SUMMARY_MENU_CANCEL
     END

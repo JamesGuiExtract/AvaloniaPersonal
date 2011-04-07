@@ -14,6 +14,9 @@
 
 #include "resource.h"		// main symbols
 
+#include <string>
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CUEXViewerApp:
 // See UEXViewer.cpp for the implementation of this class
@@ -29,6 +32,7 @@ public:
 	//{{AFX_VIRTUAL(CUEXViewerApp)
 	public:
 	virtual BOOL InitInstance();
+	virtual int ExitInstance();
 	//}}AFX_VIRTUAL
 
 // Implementation
@@ -38,6 +42,11 @@ public:
 		//    DO NOT EDIT what you see in these blocks of generated code !
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+
+private:
+
+	// A temporary .uex file that should be deleted on exit.
+	string m_strTemporaryFile;
 };
 
 

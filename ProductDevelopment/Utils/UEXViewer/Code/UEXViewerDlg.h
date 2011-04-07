@@ -40,7 +40,9 @@ public:
 	// REQUIRE: Nothing
 	// PROMISE: None.
 	// ARGS:	pParent - pointer to parent window 
-	CUEXViewerDlg(CWnd* pParent = NULL);	// standard constructor
+	//			strFileName - The filename to open right away
+	//			bShowFileName - Whether to show the filename in the title bar
+	CUEXViewerDlg(CWnd* pParent = NULL, string strFileName = "", bool bShowFileName = true);
 	~CUEXViewerDlg();
 
 	// Returns number of Exceptions in list
@@ -223,6 +225,12 @@ private:
 	// Modeless Find dialog
 	unique_ptr<CUEXFindDlg> ma_pFindDlg;
 	unique_ptr<CExportDebugDataDlg> ma_pExportDebugDataDlg;
+
+	// The .uex file that should be opened when the UEX viewer is opened.
+	string m_strFileName;
+
+	// Whether to show the filename in the title bar and populate the files in folder combo box.
+	bool m_bShowFileName;
 
 	// Have the dialog's controls been instantiated yet - allows for resize
 	// and repositioning

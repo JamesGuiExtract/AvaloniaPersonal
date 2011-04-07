@@ -96,15 +96,16 @@ void usage()
 						"/r - register .uex files to open by default with UEXViewer.exe then exit\n"
 						"/u - unregister .uex files to not open with UEXViewer.exe then exit\n"
 						"/? - display usage information\n"
-						"<filename> - open UEXViewer.exe with the specified file\n";
+						"<filename> [/temp] - open UEXViewer.exe with the specified file\n";
+						"	/temp - The .uex file is temporary; delete it when the application is closed";
 	AfxMessageBox(strUsage.c_str());
 }
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To display the UEX Viewer dialog
-void openUexDialog(CWnd* pMainWnd)
+void openUexDialog(CWnd* pMainWnd, string strFileName = "", bool showFileName = true)
 {
 	// Create and run the main dialog window
-	CUEXViewerDlg dlg;
+	CUEXViewerDlg dlg(NULL, strFileName, showFileName);
 	pMainWnd = &dlg;
 	dlg.DoModal();
 }
@@ -120,6 +121,7 @@ END_MESSAGE_MAP()
 // CUEXViewerApp construction
 //-------------------------------------------------------------------------------------------------
 CUEXViewerApp::CUEXViewerApp()
+:	m_strTemporaryFile("")
 {
 	// Place all significant initialization in InitInstance
 }
@@ -138,29 +140,8 @@ BOOL CUEXViewerApp::InitInstance()
 	{
 		AfxEnableControlContainer();
 
-		// Retrieve any command line items that follow application path
-		CString zItem = m_lpCmdLine;
-
-		// Retrieve full path to application and any items
-		CString zPath = GetCommandLine();
-
-		// Extract just the EXE path
-		if (!zItem.IsEmpty())
-		{
-			// Find start to possible command-line file
-			int iPos = zPath.Find( zItem );
-
-			// Keep just the EXE part
-			zPath = zPath.Left( iPos - 1 );
-		}
-
-		// Remove quotes
-		string	strPath = (LPCTSTR) zPath;
-		replaceVariable( strPath, "\"", "" );
-
 		// Get version number as a string
-		string	strVersion;
-		strVersion = getVersion( strPath );
+		string strVersion = getVersion(__argv[0]);
 
 		// Set application name and version information
 		string	strApp = AfxGetAppName();
@@ -184,7 +165,7 @@ BOOL CUEXViewerApp::InitInstance()
 			getAppFullPath(), true );
 
 		// Check for a command line item
-		if (!zItem.IsEmpty())
+		if (__argc > 1)
 		{
 			/////////////////////////////////
 			// Check for command-line options
@@ -223,14 +204,15 @@ BOOL CUEXViewerApp::InitInstance()
 			CString		zLine2;
 
 			// Remove quotes from path
-			zItem.Replace( "\"", "" );
+			string strFileName = __argv[1];
+			replaceVariable(strFileName, "\"", "");
 
 			// Check for file existence
-			if (isValidFile((LPCTSTR) zItem))
+			if (isValidFile(strFileName))
 			{
 				// Open the file
 				CFileException	e;
-				if (file.Open( zItem.operator LPCTSTR(), CFile::modeRead, &e ))
+				if (file.Open(strFileName.c_str(), CFile::modeRead, &e))
 				{
 					// Read the first line
 					file.ReadString( zLine );
@@ -241,6 +223,11 @@ BOOL CUEXViewerApp::InitInstance()
 					// Close the file
 					file.Close();
 
+					if (__argc > 2 && _stricmp(__argv[2], "/temp") == 0)
+					{
+						m_strTemporaryFile = strFileName;
+					}
+
 					/////////////////////////////////////////////////
 					// If only one line in the input file, 
 					// then just display the exception in normal form
@@ -250,8 +237,8 @@ BOOL CUEXViewerApp::InitInstance()
 						// Parse the data
 						vector<string> vecTokens;
 						StringTokenizer	s;
-						string	strText( zLine.operator LPCTSTR() );
-						s.parse( strText, vecTokens );
+						string strText((LPCTSTR)zLine);
+						s.parse(strText, vecTokens);
 
 						// Check the number of tokens
 						if (vecTokens.size() == 7)
@@ -261,38 +248,36 @@ BOOL CUEXViewerApp::InitInstance()
 							////////////////////////////////////////////////
 							UCLIDException ue;
 							string	strData = vecTokens[6];
-							ue.createFromString( "ELI14359", strData );
+							ue.createFromString("ELI14359", strData);
 							// Do not add this exception to the log
-							ue.display( false );
+							ue.display(false);
 
 						}	// end if right number of tokens
 						else
 						{
 							// Format error message
 							CString zError;
-							zError.Format( "Parsing error (only %d tokens) on first line of file \"%s\"", 
-								vecTokens.size(), zItem );
+							zError.Format("Parsing error (only %d tokens) on first line of file \"%s\"", 
+								vecTokens.size(), strFileName);
 
 							// Display error message
-							::MessageBox( NULL, zError.operator LPCTSTR(), "Error", 
-								MB_ICONSTOP | MB_OK );
+							::MessageBox(NULL, (LPCTSTR)zError, "Error", MB_ICONSTOP | MB_OK);
 
 						}	// end else wrong number of tokens
 					}		// end if single-line input file
 					else
 					{
-						openUexDialog(m_pMainWnd);
+						openUexDialog(m_pMainWnd, strFileName, m_strTemporaryFile.empty());
 					}		// end else multiple-line input file
 				}			// end if file open
 				else
 				{
 					// Format error message
 					CString zError;
-					zError.Format( "Error: %d, Could not open file \"%s\"", e.m_cause, zItem );
+					zError.Format("Error: %d, Could not open file \"%s\"", e.m_cause, strFileName);
 
 					// Display error message
-					::MessageBox( NULL, zError.operator LPCTSTR(), "Error", 
-						MB_ICONSTOP | MB_OK );
+					::MessageBox(NULL, (LPCTSTR)zError, "Error", MB_ICONSTOP | MB_OK);
 
 				}			// end else could not open file
 			}			// end if file on command line exists
@@ -313,3 +298,16 @@ BOOL CUEXViewerApp::InitInstance()
 	return FALSE;
 }
 //-------------------------------------------------------------------------------------------------
+int CUEXViewerApp::ExitInstance() 
+{
+	try
+	{
+		if (!m_strTemporaryFile.empty())
+		{
+			deleteFile(m_strTemporaryFile);
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI32289");
+
+   return CWinApp::ExitInstance();
+}

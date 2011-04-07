@@ -4,6 +4,7 @@
 #include "SelectFilesDlg.h"
 
 #include <string>
+#include <stack>
 using namespace std;
 
 class CFAMDBAdminSummaryDlg :
@@ -42,6 +43,7 @@ protected:
 	afx_msg void OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnContextExportFileList();
 	afx_msg void OnContextSetFileActionStatus();
+	afx_msg void OnContextViewFailed();
 	virtual BOOL OnInitDialog();
 
 private:

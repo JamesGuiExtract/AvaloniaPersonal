@@ -78,7 +78,8 @@ const string EXCEPTION_WIDTH	= "ExceptionWidth";
 //-------------------------------------------------------------------------------------------------
 // CUEXViewerDlg dialog
 //-------------------------------------------------------------------------------------------------
-CUEXViewerDlg::CUEXViewerDlg(CWnd* pParent /*=NULL*/)
+CUEXViewerDlg::CUEXViewerDlg(CWnd* pParent /*=NULL*/, string strFileName /*= ""*/,
+							 bool bShowFileName /*= true*/)
 	: CDialog(CUEXViewerDlg::IDD, pParent),
 	m_iSerialColumnWidth(80),
 	m_iELIColumnWidth(60),
@@ -88,6 +89,8 @@ CUEXViewerDlg::CUEXViewerDlg(CWnd* pParent /*=NULL*/)
 	m_iUserColumnWidth(100),
 	m_iPidColumnWidth(80),
 	m_iTimeColumnWidth(130),
+	m_strFileName(strFileName),
+	m_bShowFileName(bShowFileName),
 	m_bInitialized(false)
 {
 	try
@@ -299,26 +302,21 @@ BOOL CUEXViewerDlg::OnInitDialog()
 		// by default, open the window as if it was just cleared
 		OnEditClear();
 
-		// Check for command line entry
-		CString	zCommand;
-		zCommand = AfxGetApp()->m_lpCmdLine;
-		if (zCommand.GetLength() > 0)
+		// Check for a file that should be opened right away.
+		if (!m_strFileName.empty())
 		{
-			// Remove quotes from path
-			zCommand.Replace( "\"", "" );
-
 			// Only load exceptions if the file exists (do not throw an exception
 			// if the file does not exist) [LRCAU #5530]
-			if (isValidFile((LPCTSTR) zCommand))
+			if (isValidFile(m_strFileName))
 			{
 				// Load this file
-				addExceptions( (LPCTSTR) zCommand, true );
+				addExceptions(m_strFileName, true);
 			}
 			else
 			{
 				string strMessage = "The specified exception file does not exist. It may have "
 					"been moved, deleted, or not created yet.\nFile Name: ";
-				strMessage += (LPCTSTR)zCommand;
+				strMessage += m_strFileName;
 				AfxMessageBox(strMessage.c_str(), MB_OK | MB_ICONINFORMATION);
 			}
 		}
@@ -587,6 +585,10 @@ void CUEXViewerDlg::OnFileOpen()
 			CString	zPath = openFileDlg.GetPathName();
 			m_zDirectory = getDirectoryFromFullPath( (LPCTSTR) zPath ).c_str();
 
+			// If we are explicitly opening a file, we want to show the file name if we weren't
+			// already.
+			m_bShowFileName = true;
+
 			// Add exceptions from selected file to UEX list
 			addExceptions( (LPCTSTR) zPath, true );
 		}
@@ -705,6 +707,10 @@ void CUEXViewerDlg::OnFileStartNewLogFile()
 			// Rename the log file
 			UCLIDException::renameLogFile(UCLIDException::getDefaultLogFileFullPath(),
 				true, (LPCTSTR) dlg.m_zInput, true);
+
+			// If we are explicitly starting a new file, we want to show the file name if we weren't
+			// already.
+			m_bShowFileName = true;
 
 			// Open the new log file
 			addExceptions(m_strCurrentFile, true);
@@ -1095,6 +1101,10 @@ void CUEXViewerDlg::OnDropFiles(HDROP hDropInfo)
 			char pszFile[MAX_PATH+1];
 			DragQueryFile(hDropInfo, ui, pszFile, MAX_PATH);
 			
+			// If we are explicitly opening a file, we want to show the file name if we weren't
+			// already.
+			m_bShowFileName = true;
+
 			// when a file is dragged and dropped, assume that the file should be
 			// appeneded to the existing contents if the CTRL key is currently pressed
 			// and that if the CTRL key is not currently pressed, the file's contents should
@@ -1667,7 +1677,7 @@ void CUEXViewerDlg::setNewCurrentFile(string strNewCurrentFile)
 	// Update the window caption
 	static const string strCAPTION = "UEX Viewer";
 	CString zTitle;
-	if (m_strCurrentFile.empty())
+	if (m_strCurrentFile.empty() || !m_bShowFileName)
 	{
 		zTitle = strCAPTION.c_str();
 	}
@@ -1682,7 +1692,7 @@ void CUEXViewerDlg::setNewCurrentFile(string strNewCurrentFile)
 	m_comboExceptionsList.ResetContent();
 
 	// find the filename, extension and folder associated with the current file
-	if (!m_strCurrentFile.empty())
+	if (!m_strCurrentFile.empty() && m_bShowFileName)
 	{
 		string strCurrentFolder = getDirectoryFromFullPath(m_strCurrentFile);
 		string strCurrentFile = getFileNameFromFullPath(m_strCurrentFile);
