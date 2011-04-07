@@ -28,6 +28,7 @@ ReusableComponentsRootDirectory=$(EngineeringRootDirectory)\ReusableComponents
 CommonDirectory=$(EngineeringRootDirectory)\ProductDevelopment\Common
 FXCopAppDirectory=C:\Program Files\Microsoft FxCop 1.36
 MergeModuleDir=C:\InstallShield 2010 Projects\MergeModules
+StrongNameKeyDir=P:\StrongNameKey
 
 # Create macros for the Visual C++ include and lib directories
 VcppIncludeDirs=$(VCPP_DIR)\ATLMFC\INCLUDE;$(VCPP_DIR)\INCLUDE;$(WINDOWS_SDK)\include;

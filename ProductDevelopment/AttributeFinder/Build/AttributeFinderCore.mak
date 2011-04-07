@@ -49,8 +49,6 @@ ClearImageInstallFilesDir=P:\AttributeFinder\ClearImageFiles
 
 InternalUseBuildFilesArchive=P:\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
 
-StrongNameKeyDir=P:\StrongNameKey
-
 # determine the name of the release output directory based upon the build
 # configuration that is being built
 !IF "$(BuildConfig)" == "Release"
