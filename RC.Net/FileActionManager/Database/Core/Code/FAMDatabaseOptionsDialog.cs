@@ -362,6 +362,7 @@ namespace Extract.FileActionManager.Database
             dictionary[_REQUIRE_PASSWORD_TO_PROCESS_SKIPPED] = _checkRequirePasswordForSkipped;
             dictionary[_REQUIRE_AUTHENTICATION_BEFORE_RUN] = _checkRequireAuthenticationToRun;
             dictionary[_STORE_DB_INFO_HISTORY] = _checkStoreDBSettingsChangeHistory;
+            dictionary[_STORE_FAM_SESSION_HISTORY] = _checkStoreFAMSessionHistory;
 
             return dictionary;
         }
