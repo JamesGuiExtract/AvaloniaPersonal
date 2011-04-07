@@ -13,6 +13,7 @@
 #include <Zipper.h>
 #include <RegConstants.h>
 #include <CpuUsage.h>
+#include <MutexUtils.h>
 
 #include <fstream>
 using namespace std;
@@ -38,17 +39,19 @@ CDetectAndReportFailureDlg::CDetectAndReportFailureDlg(CWnd* pParent /*=NULL*/)
 	m_lastExceptionFrequencyMetTime(time(NULL)),
 	m_ulCPUUsageBelowThresholdForSeconds(0)
 {
-	//{{AFX_DATA_INIT(CDetectAndReportFailureDlg)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
-	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	try
+	{
+		// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
+		m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	// Validate the ini file existence
-	validateFileOrFolderExistence(m_options.getINIFileName());
+		// Validate the ini file existence
+		validateFileOrFolderExistence(m_options.getINIFileName());
 
-	// create an instance of the exception dialog
-	m_apExceptionDlg.reset(new ExceptionDlg(m_vecExceptions, m_exceptionDataLock, m_options));
+		// create an instance of the exception dialog
+		m_apExceptionDlg.reset(new ExceptionDlg(m_vecExceptions, m_exceptionDataLock, m_options));
+		m_upLogMutex.reset(getGlobalNamedMutex(gstrLOG_FILE_MUTEX));
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32292");
 }
 //-------------------------------------------------------------------------------------------------
 void CDetectAndReportFailureDlg::DoDataExchange(CDataExchange* pDX)
@@ -411,14 +414,10 @@ void CDetectAndReportFailureDlg::OnFileSendExceptionLog()
 		ipAttachments->PushBack(_bstr_t(getExceptionLogFile().c_str()));
 		ipMsg->Attachments = ipAttachments;
 
-		ipMsg->Send();
+		waitCursor.Restore();
 
-		// TODO: Make this display using the new email interface
-		// display the message user interface
-		//IObjectUserInterfacePtr ipEmailUI = ipMsg;
-		//ASSERT_RESOURCE_ALLOCATION("ELI12419", ipEmailUI != NULL);
-		//waitCursor.Restore();
-		//ipEmailUI->DisplayReadWrite();
+		// Show in client (pass false to indicate no zipping of attachment)
+		ipMsg->ShowInClient(VARIANT_FALSE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12438")
 }
@@ -443,14 +442,10 @@ void CDetectAndReportFailureDlg::OnFileSendCustomMessage()
 		ipRecipients->PushBack(_bstr_t("fdrs@ExtractSystems.com"));
 		ipMsg->Recipients = ipRecipients;
 
-		ipMsg->Send();
-
-		// TODO: Make this display using the new email interface
-		// display the message user interface
-		//IObjectUserInterfacePtr ipEmailUI = ipMsg;
-		//ASSERT_RESOURCE_ALLOCATION("ELI19411", ipEmailUI != NULL);
-		//waitCursor.Restore();
-		//ipEmailUI->DisplayReadWrite();
+		waitCursor.Restore();
+		
+		// Show in client (pass false to indicate no zipping of attachment)
+		ipMsg->ShowInClient(VARIANT_FALSE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12439")
 }
@@ -833,16 +828,8 @@ const string& CDetectAndReportFailureDlg::getExceptionLogFile() const
 	static string strLogFile;
 	if (strLogFile.empty())
 	{
-		// ensure that we can access the CWinApp object
-		CWinApp *pApp = AfxGetApp();
-		ASSERT_ARGUMENT("ELI12444", pApp != __nullptr);
-
-		// get the coommon Application Data folder [LegacyRC #5216]
-		string strDir;
-		getSpecialFolderPath(CSIDL_COMMON_APPDATA, strDir);
-
-		// compute the name of the log file
-		strLogFile = strDir + string("\\Extract Systems\\LogFiles\\Misc\\ExtractException.uex");
+		// Get the default log file path
+		strLogFile = UCLIDException::getDefaultLogFileFullPath();
 	}
 
 	// compute the name of the zip file
@@ -850,7 +837,13 @@ const string& CDetectAndReportFailureDlg::getExceptionLogFile() const
 
 	// zip the exception log file and return the name of the zip file
 	CZipper z(strZipFile.c_str());
-	z.AddFileToZip(strLogFile.c_str());
+
+	// Mutex around access to the log file
+	{
+		CSingleLock lg(m_upLogMutex.get(), TRUE);
+		z.AddFileToZip(strLogFile.c_str());
+	}
+
 	z.CloseZip();
 
 	return strZipFile;
