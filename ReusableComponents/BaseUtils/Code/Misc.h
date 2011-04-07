@@ -9,7 +9,8 @@
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
-EXPORT_BaseUtils vector<string> convertFileToLines(const string& strFilename);
+EXPORT_BaseUtils vector<string> convertFileToLines(const string& strFilename,
+	bool bIgnoreBlankLines = true);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To write a vector of lines to a file.  If bAppend == true will just append the
 //			lines to the end of the file, if bAppend == false will overwrite the file.

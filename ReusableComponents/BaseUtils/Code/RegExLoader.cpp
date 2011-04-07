@@ -14,7 +14,8 @@ const static string gstrIMPORT = "#import";
 //--------------------------------------------------------------------------------------------------
 // Local Methods
 //--------------------------------------------------------------------------------------------------
-void convertFileToLines(const string& strInput, bool bIsFilename, vector<string>& rvecLines)
+void convertFileToLines(const string& strInput, bool bIsFilename, vector<string>& rvecLines,
+	bool bIgnoreBlankLines = true)
 {
 	if (bIsFilename)
 	{
@@ -46,7 +47,7 @@ void convertFileToLines(const string& strInput, bool bIsFilename, vector<string>
 
 				getline(ifs, strLine);
 
-				if (strLine.empty())
+				if (strLine.empty() && bIgnoreBlankLines)
 				{
 					continue;
 				}
@@ -63,10 +64,10 @@ void convertFileToLines(const string& strInput, bool bIsFilename, vector<string>
 	}
 }
 //-------------------------------------------------------------------------------------------------
-vector<string> convertFileToLines(const string& strFilename)
+vector<string> convertFileToLines(const string& strFilename, bool bIgnoreBlankLines)
 {
 	vector<string> vecLines;
-	convertFileToLines( strFilename, true, vecLines );
+	convertFileToLines( strFilename, true, vecLines, bIgnoreBlankLines );
 	return vecLines;
 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using UCLID_COMUTILSLib;
@@ -29,6 +30,13 @@ namespace Extract.Utilities.Email
         /// Clears the message.
         /// </summary>
         void Clear();
+
+        /// <summary>
+        /// Shows the email message in the local client mail application (if one is configured).
+        /// </summary>
+        /// <param name="zipAttachments">If <see langword="true"/> then any file attachments
+        /// should be zipped.</param>
+        void ShowInClient(bool zipAttachments);
 
         #endregion Methods
 
@@ -96,6 +104,17 @@ namespace Extract.Utilities.Email
     [ClassInterface(ClassInterfaceType.None)]
     public class ExtractEmailMessage : IExtractEmailMessage
     {
+        #region Constants
+
+        /// <summary>
+        /// Path to the EmailFile.exe
+        /// </summary>
+        static readonly string _EMAIL_FILE_EXE = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase),
+            "EmailFile.exe");
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -112,11 +131,6 @@ namespace Extract.Utilities.Email
         /// Mutex used to synchronize calls to Send();
         /// </summary>
         object _lock = new object();
-
-        ///// <summary>
-        ///// Error that occurred while sending mail.
-        ///// </summary>
-        //Exception _sendMailError;
 
         #endregion Fields
 
@@ -195,6 +209,49 @@ namespace Extract.Utilities.Email
             catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI32257", "Unable to clear message.");
+            }
+        }
+
+        /// <summary>
+        /// Shows the email message in the local client mail application (if one is configured).
+        /// </summary>
+        /// <param name="zipAttachments">If <see langword="true"/> then any file attachments
+        /// should be zipped.</param>
+        public void ShowInClient(bool zipAttachments)
+        {
+            try
+            {
+                using (var tempBody = new TemporaryFile())
+                {
+                    var arguments = new List<string>();
+                    arguments.Add("\"" + string.Join(";", _recipients) + "\"");
+                    arguments.Add("/client");
+                    if (zipAttachments)
+                    {
+                        arguments.Add("/z");
+                    }
+                    if (!string.IsNullOrWhiteSpace(Subject))
+                    {
+                        arguments.Add("/subject \"" + Subject + "\"");
+                    }
+                    if (!string.IsNullOrWhiteSpace(Body))
+                    {
+                        File.WriteAllText(tempBody.FileName, Body);
+                        arguments.Add("/body \"" + tempBody.FileName + "\"");
+                    }
+
+                    // Currently this only supports adding the first attachment
+                    if (_fileAttachements.Count > 0)
+                    {
+                        arguments.Add("\"" + _fileAttachements[0] + "\"");
+                    }
+
+                    SystemMethods.RunExtractExecutable(_EMAIL_FILE_EXE, arguments);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI32290", "Unable to open message in email client.");
             }
         }
 
