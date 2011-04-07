@@ -150,6 +150,7 @@
             this._dataFile2PathTagsButton.Name = "_dataFile2PathTagsButton";
             this._dataFile2PathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._dataFile2PathTagsButton.TabIndex = 7;
+            this._dataFile2PathTagsButton.TextControl = _dataFile2TextBox;
             this._dataFile2PathTagsButton.UseVisualStyleBackColor = true;
             // 
             // _dataFile1PathTagsButton
@@ -160,6 +161,7 @@
             this._dataFile1PathTagsButton.Name = "_dataFile1PathTagsButton";
             this._dataFile1PathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._dataFile1PathTagsButton.TabIndex = 4;
+            this._dataFile1PathTagsButton.TextControl = _dataFile1TextBox;
             this._dataFile1PathTagsButton.UseVisualStyleBackColor = true;
             // 
             // groupBox1
@@ -213,6 +215,7 @@
             this._outputFilePathTagsButton.Name = "_outputFilePathTagsButton";
             this._outputFilePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._outputFilePathTagsButton.TabIndex = 11;
+            this._outputFilePathTagsButton.TextControl = _outputFileTextBox;
             this._outputFilePathTagsButton.UseVisualStyleBackColor = true;
             // 
             // _outputFileTextBox
