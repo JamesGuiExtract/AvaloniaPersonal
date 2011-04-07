@@ -53,7 +53,7 @@ ObfuscateFiles:
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Encryption.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Encryption.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Interop.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Interop.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	
-CopyExtractCommonFiles: CleanupExtractCommonFiles
+CopyExtractCommonFiles: CleanupExtractCommonFiles ObfuscateFiles
     @ECHO Copying the ExtractCommon files to installation directory...
 	@COPY /v  "$(BinariesFolder)\Obfuscated\*.dll" "$(ExtractCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /v  "$(BinariesFolder)\UGMFC.dll" "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles"
