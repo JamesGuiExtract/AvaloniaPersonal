@@ -2725,32 +2725,10 @@ namespace Extract.Imaging.Forms
                 case CursorTool.DeleteLayerObjects:
                 case CursorTool.ExtractImage:
 
-                    // Erase the previous frame if it exists
-                    Rectangle rectangle = _trackingData.Rectangle;
-                    if (rectangle.Width == 0)
-                    {
-                        rectangle.Width = 1;
-                    }
-                    if (rectangle.Height == 0)
-                    {
-                        rectangle.Height = 1;
-                    }
-                    ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
-                        Color.Black, FrameStyle.Thick);
-
                     // Recalculate and redraw the new frame
                     _trackingData.UpdateRectangle(mouseX, mouseY);
-                    rectangle = _trackingData.Rectangle;
-                    if (rectangle.Width == 0)
-                    {
-                        rectangle.Width = 1;
-                    }
-                    if (rectangle.Height == 0)
-                    {
-                        rectangle.Height = 1;
-                    }
-                    ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
-                        Color.Black, FrameStyle.Thick);
+
+                    DrawTrackingRectangleBorder(e, Color.Black);
                     break;
 
                 case CursorTool.RectangularHighlight:
@@ -3535,16 +3513,13 @@ namespace Extract.Imaging.Forms
         /// <see langword="false"/> if the event is to be completed.</param>
         void EndDeleteLayerObjects(int mouseX, int mouseY, bool cancel)
         {
-            // Erase the previous frame if it exists
-            Rectangle rectangle = _trackingData.Rectangle;
-            ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
-                Color.Black, FrameStyle.Thick);
-
             // If the event was canceled, there is nothing more to do.
             if (cancel)
             {
                 return;
             }
+
+            Rectangle rectangle = _trackingData.Rectangle;
 
             // Recalculate the new line
             _trackingData.UpdateRectangle(mouseX, mouseY);
@@ -3705,11 +3680,6 @@ namespace Extract.Imaging.Forms
         /// <see langword="false"/> if the event is to be completed.</param>
         void EndExtractImageRegion(int mouseX, int mouseY, bool cancel)
         {
-            // Erase the previous frame if it exists
-            Rectangle rectangle = _trackingData.Rectangle;
-            ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
-                Color.Black, FrameStyle.Thick);
-
             // Invalidate the image viewer so that the frame is erased even
             // if an exception is thrown by the image extraction
             // [DNRCAU #489]
