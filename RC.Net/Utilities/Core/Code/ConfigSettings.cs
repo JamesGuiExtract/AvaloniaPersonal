@@ -608,10 +608,16 @@ namespace Extract.Utilities
                     if (xmlSetting == null)
                     {
                         // [DotNetRCAndUtils:635]
-                        // If there is no settings specified in the xml file, treat the setting as
-                        // if it were modifed. This ensures all unspecified settings will be
-                        // explicitly written to the config file to make modifying the values easier.
-                        HandlePropertyChanged(this, new PropertyChangedEventArgs(settingName));
+                        // If there is no settings specified in the xml file, this is a user scoped
+                        // setting and we are currently looking at the target config file (rather
+                        // than a default config file), treat the setting as if it were modifed.
+                        // This ensures all unspecified settings will be explicitly written to the
+                        // config file to make modifying the values easier.
+                        if (_configFileName == _configFileMap.ExeConfigFilename &&
+                            setting.Attributes.ContainsKey(typeof(UserScopedSettingAttribute)))
+                        {
+                            HandlePropertyChanged(this, new PropertyChangedEventArgs(settingName));
+                        }
                     }
                     else
                     {
