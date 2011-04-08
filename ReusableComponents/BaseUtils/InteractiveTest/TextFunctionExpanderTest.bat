@@ -83,12 +83,12 @@ dir /B /S "h:\Test  Image.tif.xml" >> testResults.txt
 if errorlevel 1 echo "h:\Test  Image.tif.xml not created" >> testResults.txt
 echo. >> testResults.txt
 
-dir /B /S "\\fnp2\internal\users\wayne_lenius\Public\Write\Test  Image.tif.xml" >> testResults.txt
-if errorlevel 1 echo "\\fnp2\internal\users\wayne_lenius\Public\Write\Test  Image.tif.xml not created" >> testResults.txt
+dir /B /S "\\fnp2\internal\Common\Testing\product testing\TestTextFunctionExpander\Test  Image.tif.xml" >> testResults.txt
+if errorlevel 1 echo "\\fnp2\internal\Common\Testing\product testing\TestTextFunctionExpander\Test  Image.tif.xml not created" >> testResults.txt
 echo. >> testResults.txt
 
-dir /B /S "\\fnp2\internal\users\wayne_lenius\Public\Write\ABC\Test  Image.tif.xml" >> testResults.txt
-if errorlevel 1 echo "\\fnp2\internal\users\wayne_lenius\Public\Write\ABC\Test  Image.tif.xml not created" >> testResults.txt
+dir /B /S "\\fnp2\internal\Common\Testing\product testing\TestTextFunctionExpander\ABC\Test  Image.tif.xml" >> testResults.txt
+if errorlevel 1 echo "\\fnp2\internal\Common\Testing\product testing\TestTextFunctionExpander\ABC\Test  Image.tif.xml not created" >> testResults.txt
 echo. >> testResults.txt
 
 dir /B "%userdomain%.xml" >> testResults.txt
