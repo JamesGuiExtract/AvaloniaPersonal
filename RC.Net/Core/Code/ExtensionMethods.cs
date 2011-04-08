@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
@@ -82,6 +84,26 @@ namespace Extract
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI31803");
+            }
+        }
+
+        /// <summary>
+        /// Performs a string comparison using glob pattern mathing.
+        /// </summary>
+        /// <param name="value">The value to check.</param>
+        /// <param name="globPattern">The pattern to match.</param>
+        /// <param name="caseSensitive">Whether the comparison should be case sensitive or not.</param>
+        /// <returns><see langword="true"/> if the value matches the pattern.</returns>
+        public static bool Like(this string value, string globPattern, bool caseSensitive)
+        {
+            try
+            {
+                return LikeOperator.LikeString(value, globPattern,
+                       caseSensitive ? CompareMethod.Binary : CompareMethod.Text);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32299");
             }
         }
 

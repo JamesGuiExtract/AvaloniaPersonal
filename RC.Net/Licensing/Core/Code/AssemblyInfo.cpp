@@ -22,3 +22,18 @@ using namespace System::Runtime::InteropServices;
 // to ignore this warning.
 [module: System::Diagnostics::CodeAnalysis::SuppressMessage("Microsoft.Design",
 	"CA1020:AvoidNamespacesWithFewTypes", Scope="namespace", Target="Extract.Licensing")];
+
+// These suppress messages are added due to the need to suppress errors coming from
+// the CLR/std::cpp library interop marshaling code in the StringHelperFinctions.h file
+[module: System::Diagnostics::CodeAnalysis::SuppressMessage("Microsoft.Performance",
+	"CA1823:AvoidUnusedPrivateFields", Scope="member",
+	Target="msclr.interop.context_node_base.#_Needs_Context")];
+[module: System::Diagnostics::CodeAnalysis::SuppressMessage("Microsoft.Performance",
+	"CA1812:AvoidUninstantiatedInternalClasses", Scope="type",
+	Target="msclr.interop.marshal_context")];
+[module: System::Diagnostics::CodeAnalysis::SuppressMessage("Microsoft.Performance",
+	"CA1812:AvoidUninstantiatedInternalClasses", Scope="type",
+	Target="msclr.interop.context_node<char const *,System::String ^>")];
+[module: System::Diagnostics::CodeAnalysis::SuppressMessage("Microsoft.Performance",
+	"CA1812:AvoidUninstantiatedInternalClasses", Scope="type",
+	Target="msclr.interop.context_node<wchar_t const *,System::String ^>")];

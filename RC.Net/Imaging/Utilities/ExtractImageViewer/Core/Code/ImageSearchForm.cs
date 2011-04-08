@@ -106,24 +106,33 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                     // Build the search pattern
                     string extension = _comboImageExtension.Text;
-                    StringBuilder searchPattern = new StringBuilder("*");
-                    searchPattern.Append(_textImageNameEnd.Text);
                     if (extension[0] != '.')
                     {
-                        searchPattern.Append(".");
+                        extension = "." + extension;
                     }
-                    searchPattern.Append(extension);
+                    string end = _textImageNameEnd.Text;
+                    string pattern = "*" + end + extension;
+                    string fileNamePattern = "*" + end;
 
                     // Recursively get all files that match the pattern
-                    string[] files = Directory.GetFiles(_textRootFolder.Text,
-                        searchPattern.ToString(), SearchOption.AllDirectories);
+                    var files = new List<string>();
+                    foreach (string file in Directory.EnumerateFiles(
+                        _textRootFolder.Text, pattern, SearchOption.AllDirectories))
+                    {
+                        // Only add files that end with the appropriate character
+                        if (Path.GetFileNameWithoutExtension(file)
+                            .Like(fileNamePattern, false))
+                        {
+                            files.Add(file);
+                        }
+                    }
 
-                    if (files.Length == 1)
+                    if (files.Count == 1)
                     {
                         // Open the image in the image viewer
                         _imageViewer.OpenImage(files[0], true);
                     }
-                    else if (files.Length > 1)
+                    else if (files.Count > 1)
                     {
                         StringBuilder sb = new StringBuilder("Multiple files found:");
                         sb.AppendLine();
