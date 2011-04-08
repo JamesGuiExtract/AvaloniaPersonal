@@ -834,7 +834,9 @@ namespace Extract.FileActionManager.Database
                 currentDb.ExecuteCommand("DROP TABLE [FPSFile]");
 
                 // Create the version 6 FPS file table
-                currentDb.ExecuteCommand("CREATE TABLE FPSFile ([FileName] NVARCHAR(512), "
+                currentDb.ExecuteCommand("CREATE TABLE FPSFile ("
+                    + "[ID] INT IDENTITY (1,1) PRIMARY KEY,"
+                    + "[FileName] NVARCHAR(512), "
                     + "[NumberOfFilesToProcess] INT DEFAULT -1 NOT NULL, "
                     + "[NumberOfInstances] INT DEFAULT 1 NOT NULL)");
 
