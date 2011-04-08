@@ -198,7 +198,7 @@ namespace Extract.Redaction.Verification
             this._magnifierControl = new Extract.Imaging.Forms.MagnifierControl();
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
-            this._timerBarControl = new Extract.Utilities.Forms.TimerBarControl();
+            this._slideShowTimerBarControl = new Extract.Utilities.Forms.TimerBarControl();
             this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._imageViewerContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._zoomPreviousToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomPreviousToolStripMenuItem();
@@ -1176,8 +1176,8 @@ namespace Extract.Redaction.Verification
             // 
             // imageViewerToolStripContainer.ContentPanel
             // 
-            imageViewerToolStripContainer.ContentPanel.Controls.Add(this._timerBarControl);
             imageViewerToolStripContainer.ContentPanel.Controls.Add(this._imageViewer);
+            imageViewerToolStripContainer.ContentPanel.Controls.Add(this._slideShowTimerBarControl);
             imageViewerToolStripContainer.ContentPanel.Size = new System.Drawing.Size(857, 863);
             imageViewerToolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             imageViewerToolStripContainer.Location = new System.Drawing.Point(531, 0);
@@ -1200,26 +1200,28 @@ namespace Extract.Redaction.Verification
             this._imageViewerStatusStrip.Size = new System.Drawing.Size(857, 24);
             this._imageViewerStatusStrip.TabIndex = 0;
             // 
-            // _timerBarControl
+            // _slideShowTimerBarControl
             // 
-            this._timerBarControl.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this._timerBarControl.Cursor = System.Windows.Forms.Cursors.No;
-            this._timerBarControl.Dock = System.Windows.Forms.DockStyle.Top;
-            this._timerBarControl.ForeColor = System.Drawing.Color.GreenYellow;
-            this._timerBarControl.Location = new System.Drawing.Point(0, 0);
-            this._timerBarControl.Name = "_timerBarControl";
-            this._timerBarControl.Size = new System.Drawing.Size(857, 2);
-            this._timerBarControl.TabIndex = 1;
-            this._timerBarControl.Visible = false;
+            this._slideShowTimerBarControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._slideShowTimerBarControl.Cursor = System.Windows.Forms.Cursors.No;
+            this._slideShowTimerBarControl.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this._slideShowTimerBarControl.Location = new System.Drawing.Point(0, 861);
+            this._slideShowTimerBarControl.Name = "_slideShowTimerBarControl";
+            this._slideShowTimerBarControl.Size = new System.Drawing.Size(857, 2);
+            this._slideShowTimerBarControl.TabIndex = 1;
+            this._slideShowTimerBarControl.Visible = false;
             // 
             // _imageViewer
             // 
             this._imageViewer.ContextMenuStrip = this._imageViewerContextMenu;
-            this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            //this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._imageViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right) | System.Windows.Forms.AnchorStyles.Bottom)));
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
             this._imageViewer.MinimumAngularHighlightHeight = 1;
             this._imageViewer.Name = "_imageViewer";
-            this._imageViewer.Size = new System.Drawing.Size(857, 863);
+            this._imageViewer.Size = new System.Drawing.Size(857, 861);
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
             this._imageViewer.UseDefaultShortcuts = true;
@@ -1922,6 +1924,6 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.StatusStrip _dataWindowStatusStrip;
         private Extract.Redaction.Verification.VerificationTimeStatusStripLabel _verificationRateStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel _pagesPerHourStatusLabel;
-        private Utilities.Forms.TimerBarControl _timerBarControl;
+        private Utilities.Forms.TimerBarControl _slideShowTimerBarControl;
     }
 }

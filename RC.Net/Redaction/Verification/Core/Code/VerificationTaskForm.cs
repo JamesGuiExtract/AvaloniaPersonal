@@ -3041,8 +3041,8 @@ namespace Extract.Redaction.Verification
         void StartSlideshowTimer()
         {
             ExtractException.Assert("ELI32180", "Slideshow error.", _slideshowRunning);
-            _timerBarControl.Visible = true;
-            _timerBarControl.StartTimer(_slideshowTimer.Interval);
+            _slideShowTimerBarControl.Visible = true;
+            _slideShowTimerBarControl.StartTimer(_slideshowTimer.Interval);
             _slideshowTimer.Enabled = true;
 
             if (_slideshowTimerLastStopTime.HasValue && 
@@ -3062,14 +3062,14 @@ namespace Extract.Redaction.Verification
         void StopSlideshowTimer()
         {
             _slideshowTimer.Enabled = false;
-            _timerBarControl.StopTimer(true);
+            _slideShowTimerBarControl.StopTimer(true);
             if (_slideshowRunning)
             {
                 _slideshowTimerLastStopTime = DateTime.Now;
             }
             else
             {
-                _timerBarControl.Visible = false;
+                _slideShowTimerBarControl.Visible = false;
             }
         }
 
