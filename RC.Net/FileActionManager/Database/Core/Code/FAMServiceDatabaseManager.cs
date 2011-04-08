@@ -76,6 +76,11 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         public static readonly string DependentServicesKey = "DependentServices";
 
+        /// <summary>
+        /// Array used to trim quotes from file names in the FPS file table.
+        /// </summary>
+        static readonly char[] _TRIM_QUOTES = new char[] { '"' };
+
         #endregion Constants
 
         #region Fields
@@ -310,7 +315,8 @@ namespace Extract.FileActionManager.Database
 
                 var returnList = new List<FpsFileTableData>();
                 var fpsFiles = db.FpsFile.Select(f =>
-                        new FpsFileTableData(f.FileName, f.NumberOfInstances,
+                        new FpsFileTableData(f.FileName.Trim(_TRIM_QUOTES),
+                            f.NumberOfInstances,
                             f.NumberOfFilesToProcess));
 
                 if (fpsFiles.Count() > 0)
