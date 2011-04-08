@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -235,6 +236,11 @@ namespace Extract.Utilities
                     // Keep track of the config file last modified time so we know when the _config
                     // instance needs to be refreshed from disk.
                      _configFileLastModified = File.GetLastWriteTime(_config.FilePath);
+
+                     // [DotNetRCAndUtils:635]
+                     // Call save to ensure any settings that do not yet exist in the config file
+                     // are written out.
+                     Save();
 
                     _settings.PropertyChanged += HandlePropertyChanged;
                 }
@@ -592,26 +598,51 @@ namespace Extract.Utilities
                 ClientSettingsSection configSection =
                     (ClientSettingsSection)configSectionGroup.Sections[settingsType];
 
-                // Loop through each setting and apply the value from the config file. 
-                foreach (SettingElement setting in configSection.Settings)
+                ValidateSettings(configSection);
+
+                // Loop through all SettingsProperty to load any specified values from disk.
+                foreach (SettingsProperty setting in _settings.Properties)
                 {
-                    object settingObject = _settings[setting.Name];
-                    if (settingObject == null)
+                    string settingName = setting.Name;
+                    SettingElement xmlSetting = configSection.Settings.Get(settingName);
+                    if (xmlSetting == null)
                     {
-                        ExtractException ee = new ExtractException("ELI28826",
-                            "Invalid Application Setting");
-                        ee.AddDebugData("Setting name", setting.Name, false);
-                        throw ee;
+                        // [DotNetRCAndUtils:635]
+                        // If there is no settings specified in the xml file, treat the setting as
+                        // if it were modifed. This ensures all unspecified settings will be
+                        // explicitly written to the config file to make modifying the values easier.
+                        HandlePropertyChanged(this, new PropertyChangedEventArgs(settingName));
                     }
-
-                    // Check the type of the setting
-                    Type settingType = settingObject.GetType();
-
-                    // Convert the string XML value to the appropriate type.
-                    _settings[setting.Name] =
-                        TypeDescriptor.GetConverter(settingType).ConvertFromString(
-                            setting.Value.ValueXml.InnerXml);
+                    else
+                    {
+                        // Convert the string XML value to the appropriate type and apply the value.
+                        _settings[settingName] =
+                            TypeDescriptor.GetConverter(setting.PropertyType).ConvertFromString(
+                                xmlSetting.Value.ValueXml.InnerXml);
+                    }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Validates that all settings in the supplied <see cref="ClientSettingsSection"/> are
+        /// valid for the current _setting type.
+        /// </summary>
+        /// <param name="configSection">The <see cref="ClientSettingsSection"/> to validate.</param>
+        void ValidateSettings(ClientSettingsSection configSection)
+        {
+            IEnumerable<SettingElement> invalidXmlSettings = configSection.Settings
+                .Cast<SettingElement>()
+                .Where(setting => _settings.Properties[setting.Name] == null);
+            if (invalidXmlSettings.Any())
+            {
+                ExtractException ee = new ExtractException("ELI28826",
+                    "Invalid Application Setting(s)");
+                foreach (SettingElement invalidXmlSetting in invalidXmlSettings)
+                {
+                    ee.AddDebugData("Setting name", invalidXmlSetting.Name, false);
+                }
+                throw ee;
             }
         }
 
