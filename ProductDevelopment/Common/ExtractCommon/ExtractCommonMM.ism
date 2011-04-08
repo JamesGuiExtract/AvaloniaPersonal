@@ -748,7 +748,7 @@
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectDataFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
-		<row><td>PATH_TO_DOTNETFILES_FILES</td><td>P:\ExtractCommon\\DotNetFiles</td><td/><td>2</td></row>
+		<row><td>PATH_TO_DOTNETFILES_FILES</td><td>P:\ExtractCommon\DotNetFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGFILES_FI</td><td>P:\ExtractCommon\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGCOMMONCO_FI</td><td>P:\ExtractCommon\SelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGFILES_FILES</td><td>P:\ExtractFlexCommon\SelfRegFiles</td><td/><td>2</td></row>
