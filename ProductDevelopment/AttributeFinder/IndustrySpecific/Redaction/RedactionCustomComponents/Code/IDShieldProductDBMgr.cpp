@@ -394,7 +394,7 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 			ASSERT_RESOURCE_ALLOCATION("ELI30712", ipThis != __nullptr);
 			
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(ipThis);
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(ipThis, gstrMAIN_DB_LOCK);
 			
 			AddIDShieldData_Internal(true, lFileID, vbVerified, lDuration, lNumHCDataFound, 
 				lNumMCDataFound, lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, 

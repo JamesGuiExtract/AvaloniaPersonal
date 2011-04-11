@@ -60,9 +60,6 @@ static const string gstrSOURCE_DOC_CHANGE_HISTORY = "SourceDocChangeHistory";
 static const string gstrDOC_TAG_HISTORY = "DocTagHistory";
 static const string gstrDB_INFO_HISTORY = "DBInfoChangeHistory";
 
-static const string gstrMAIN_DB_LOCK = "Main";
-static const string gstrUSER_COUNTER_DB_LOCK = "UserCounter";
-
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
 //-------------------------------------------------------------------------------------------------

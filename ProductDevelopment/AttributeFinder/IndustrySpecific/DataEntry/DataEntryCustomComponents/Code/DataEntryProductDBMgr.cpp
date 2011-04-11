@@ -372,7 +372,8 @@ STDMETHODIMP CDataEntryProductDBMgr::AddDataEntryData(long lFileID, long nAction
 		if (!AddDataEntryData_Internal(false, lFileID, nActionID, lDuration, plInstanceID))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
 
 			AddDataEntryData_Internal(true, lFileID, nActionID, lDuration, plInstanceID);
 		}
@@ -415,7 +416,8 @@ STDMETHODIMP CDataEntryProductDBMgr::RecordCounterValues(long* plInstanceToken,
 		if (!RecordCounterValues_Internal(false, plInstanceToken, lDataEntryDataInstanceID, pAttributes))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
 			RecordCounterValues_Internal(true, plInstanceToken,	lDataEntryDataInstanceID, pAttributes);
 		}
 
