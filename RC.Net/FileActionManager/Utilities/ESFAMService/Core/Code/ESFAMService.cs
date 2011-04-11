@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
@@ -391,15 +392,22 @@ namespace Extract.FileActionManager.Utilities
             Process process = null;
             try
             {
+                // Get the processing thread arguments
+                ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
+                int numberOfFilesToProcess = arguments.NumberOfFilesToProcess;
+
+                if (!File.Exists(arguments.FpsFileName))
+                {
+                    var ee = new ExtractException("ELI32302", "Cannot find FPS file.");
+                    ee.AddDebugData("FPS File Name", arguments.FpsFileName, false);
+                    throw ee;
+                }
+
                 // Wait for the sleep time to expire
                 if (_startThreads != null)
                 {
                     _startThreads.WaitOne();
                 }
-
-                // Get the processing thread arguments
-                ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
-                int numberOfFilesToProcess = arguments.NumberOfFilesToProcess;
 
                 // Run FAMProcesses in a loop respawning them if needed
                 do
@@ -408,6 +416,9 @@ namespace Extract.FileActionManager.Utilities
                     famProcess = new FileProcessingManagerProcessClass();
                     int pid = famProcess.ProcessID;
                     process = Process.GetProcessById(pid);
+
+                    // Provide the service authentication
+                    famProcess.AuthenticateService(LicenseUtilities.GetMapLabelValue(new MapLabel()));
 
                     // Set the FPS file name
                     famProcess.FPSFile = arguments.FpsFileName;

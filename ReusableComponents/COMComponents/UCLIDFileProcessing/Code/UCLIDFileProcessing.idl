@@ -428,6 +428,11 @@ library UCLID_FILEPROCESSINGLib
 			MaxFilesFromDB([out, retval] long* pVal);
 		[propput, id(54), helpstring("property MaxFilesFromDB")] HRESULT
 			MaxFilesFromDB([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To authenticate that the FileProcessingManager is being started
+		//			from a valid Extract service.
+		[id(55), helpstring("method AuthenticateService")] HRESULT AuthenticateService(
+			[in] BSTR bstrValue);
 	};
 
 	[

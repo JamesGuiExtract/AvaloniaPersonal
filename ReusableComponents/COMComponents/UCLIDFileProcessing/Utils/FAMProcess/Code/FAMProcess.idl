@@ -48,6 +48,10 @@ interface IFileProcessingManagerProcess : IDispatch
 	[propget, id(8), helpstring("property AuthenticationRequired")] HRESULT
 		AuthenticationRequired([out, retval] VARIANT_BOOL* vbAuthenticationRequired);
 	//----------------------------------------------------------------------------------------------
+	// Provides the authentication code needed to run administrative tasks without a password
+	[id(9), helpstring("method AuthenticateService")] HRESULT AuthenticateService(
+		[in] BSTR bstrValue);
+	//----------------------------------------------------------------------------------------------
 };
 
 [

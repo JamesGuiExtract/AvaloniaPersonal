@@ -22,6 +22,8 @@
 
 using namespace ADODB;
 
+DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
+
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
@@ -38,6 +40,7 @@ m_isDBConnectionReady(false),
 m_nNumberOfFilesToExecute(0),
 m_bCancelling(false),
 m_bRecordFAMSessions(false),
+m_bIsAuthenticated(false),
 m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
 {
 	try
@@ -1146,6 +1149,19 @@ STDMETHODIMP CFileProcessingManager::put_MaxFilesFromDB(long newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32145");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::AuthenticateService(BSTR bstrValue)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		m_bIsAuthenticated = IS_VALID_PRIVATE_LICENSE(asString(bstrValue));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32145");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRoleNotifyFAM Methods
@@ -1425,7 +1441,7 @@ bool CFileProcessingManager::isUserAuthenticationRequired()
 
 	if (bRequire)
 	{
-		bRequire = !asCppBool(getFPMDB()->CanSkipAuthenticationOnThisMachine());
+		bRequire = !(m_bIsAuthenticated && asCppBool(getFPMDB()->CanSkipAuthenticationOnThisMachine()));
 	}
 
 	return bRequire;
@@ -1433,6 +1449,11 @@ bool CFileProcessingManager::isUserAuthenticationRequired()
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingManager::isDBPasswordRequired()
 {
+	if (m_bIsAuthenticated && getFPMDB()->CanSkipAuthenticationOnThisMachine())
+	{
+		return false;
+	}
+
 	// Get the AccessRequires interface for the management role to check if Admin access is required
 	IAccessRequiredPtr ipAccess(m_ipFPMgmtRole);
 	ASSERT_RESOURCE_ALLOCATION("ELI31274", ipAccess != __nullptr);

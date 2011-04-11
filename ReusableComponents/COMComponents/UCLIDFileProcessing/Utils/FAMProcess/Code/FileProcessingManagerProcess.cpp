@@ -297,6 +297,16 @@ STDMETHODIMP CFileProcessingManagerProcess::get_AuthenticationRequired(VARIANT_B
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29194");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManagerProcess::AuthenticateService(BSTR bstrValue)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	try
+	{
+		m_ipFPM->AuthenticateService(bstrValue);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32301");
+}
 
 //--------------------------------------------------------------------------------------------------
 // Private helper methods

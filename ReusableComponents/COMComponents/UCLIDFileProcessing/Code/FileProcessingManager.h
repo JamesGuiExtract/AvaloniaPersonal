@@ -95,6 +95,7 @@ public:
 	STDMETHOD(AuthenticateForProcessing)(VARIANT_BOOL* pvbAuthenticated);
 	STDMETHOD(get_MaxFilesFromDB)(long* pVal);
 	STDMETHOD(put_MaxFilesFromDB)(long newVal);
+	STDMETHOD(AuthenticateService)(BSTR bstrValue);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -199,6 +200,11 @@ private:
 
 	// The max number of files to grab from the DB when processing
 	long m_nMaxFilesFromDB;
+
+	// Indicates whether the proper authentication code has been provided. If it has
+	// and password validation can be skipped for the current machine, then any
+	// tasks that require admin access will be able to run without providing the admin password.
+	bool m_bIsAuthenticated;
 
 	///////////
 	// Methods
