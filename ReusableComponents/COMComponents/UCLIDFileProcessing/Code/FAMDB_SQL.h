@@ -16,7 +16,7 @@ static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [Action] ([ID] [int]
 	"[ASCName] [nvarchar](50) NOT NULL,	[Description] [nvarchar](255) NULL)";
 
 static const string gstrCREATE_LOCK_TABLE = 
-	"CREATE TABLE [LockTable]([LockID] [int] NOT NULL CONSTRAINT [PK_LockTable] PRIMARY KEY CLUSTERED,"
+	"CREATE TABLE [LockTable]([LockName] [nvarchar](50) NOT NULL CONSTRAINT [PK_LockTable] PRIMARY KEY CLUSTERED,"
 	"[UPI] [nvarchar](512), "
 	"[LockTime] datetime NOT NULL CONSTRAINT [DF_LockTable_LockTime]  DEFAULT (GETDATE()))";
 
@@ -572,12 +572,14 @@ static const string gstrADD_DB_INFO_HISTORY_DB_INFO_FK =
 	"ON DELETE CASCADE";
 
 // Query for obtaining the current db lock record with the time it has been locked
+static const string gstrDB_LOCK_NAME_VAL = "<LockName>";
 static const string gstrDB_LOCK_QUERY = 
-	"SELECT LockID, UPI, LockTime, DATEDIFF(second, LockTime, GETDATE()) AS TimeLocked "
-	"FROM LockTable";
+	"SELECT LockName, UPI, LockTime, DATEDIFF(second, LockTime, GETDATE()) AS TimeLocked "
+	"FROM LockTable WHERE LockName = '" + gstrDB_LOCK_NAME_VAL + "'";
 
-// Query for deleting all locks from the lock table
-static const string gstrDELETE_DB_LOCK = "DELETE FROM LockTable";
+// Query for deleting specific locks from the lock table
+static const string gstrDELETE_DB_LOCK = "DELETE FROM LockTable WHERE [LockName] = '"
+	+ gstrDB_LOCK_NAME_VAL + "'";
 
 // Query to shrink the current database
 static const string gstrSHRINK_DATABASE = "DBCC SHRINKDATABASE (0)";

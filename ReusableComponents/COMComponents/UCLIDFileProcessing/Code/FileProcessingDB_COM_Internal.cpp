@@ -359,7 +359,41 @@ int UpdateToSchemaVersion105(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32167");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion106(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		const int nNewSchemaVersion = 106;
 
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		// Drop the LockTable and recreate it with the new schema version
+		vector<string> vecQueries;
+		vecQueries.push_back("DROP TABLE [LockTable]");
+		vecQueries.push_back(gstrCREATE_LOCK_TABLE);
+
+		// Add the new schema version number
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '106' WHERE [Name] = '" + 
+			gstrFAMDB_SCHEMA_VERSION + "'");
+
+		// Add default value for last DB info change
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '"
+			+ getSQLServerDateTime(ipConnection) + "' WHERE [Name] = '"
+			+ gstrLAST_DB_INFO_CHANGE + "'");
+
+		// Execute the queries
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32300");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -5164,7 +5198,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 102:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion103);
 				case 103:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion104);
 				case 104:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion105);
-				case 105:	break;
+				case 105:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion106);
+				case 106:	break;
 
 				default:
 					{
@@ -5205,7 +5240,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				// schema update steps corresponding to the FAM DB nSchemaVersion. 
 				nStepCount = 0;
 				executeProdSpecificSchemaUpdateFuncs(ipConnection, nSchemaVersion, &nStepCount,
-					NULL, mapProductSpecificVersions);
+					__nullptr, mapProductSpecificVersions);
 
 				if (iterFunc != vecUpdateFuncs.end())
 				{

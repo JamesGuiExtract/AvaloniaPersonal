@@ -789,15 +789,15 @@ library UCLID_FILEPROCESSINGLib
 		[id(38), helpstring("method GetDBInfoSetting")] HRESULT GetDBInfoSetting(
 			[in] BSTR bstrSettingName, [in] VARIANT_BOOL vbThrowIfMissing, [out, retval] BSTR* pbstrSettingValue);
 
-		// PROMISE: To lock the database 
+		// PROMISE: To lock the specified database lock
 		// NOTE:	This method locks the mutex, adds lock record to the database and sends 
 		//			notification messages to the UI window if it has been set
-		[id(39), helpstring("method LockDB")] HRESULT LockDB();
+		[id(39), helpstring("method LockDB")] HRESULT LockDB([in] BSTR bstrLockName);
 
-		// PROMISE: To unlock the database
+		// PROMISE: To unlock the specified database lock
 		// NOTE:	This method unlocks the mutex, removes lock record from the database and sends 
 		//			notification messages to the UI window if it has been set
-		[id(40), helpstring("method UnlockDB")] HRESULT UnlockDB();
+		[id(40), helpstring("method UnlockDB")] HRESULT UnlockDB([in] BSTR bstrLockName);
 		
 		// PROMISE: To return a recordset opened with the results of the query in bstrQuery
 		[id(41), helpstring("method GetResultsForQuery")] HRESULT GetResultsForQuery([in] BSTR bstrQuery, 

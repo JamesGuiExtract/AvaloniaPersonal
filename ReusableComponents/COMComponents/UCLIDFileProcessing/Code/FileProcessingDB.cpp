@@ -91,7 +91,8 @@ std::string CFileProcessingDB::ms_strCurrDBName = "";
 //-------------------------------------------------------------------------------------------------
 CFileProcessingDB::CFileProcessingDB()
 : m_iDBSchemaVersion(0),
-m_bDBLocked(false),
+m_bMainLock(false),
+m_bUserCounterLock(false),
 m_hUIWindow(NULL),
 m_strCurrentConnectionStatus(gstrNOT_CONNECTED),
 m_strDatabaseServer(""),
@@ -129,6 +130,10 @@ m_bRevertInProgress(false)
 		m_strMachineName = getComputerName();
 		m_strFAMUserName = getCurrentUserName();
 		m_lDBLockTimeout = m_regFPCfgMgr.getDBLockTimeout();
+
+		// Store pointers to the db lock variables
+		m_mapDbLocks[gstrMAIN_DB_LOCK] = &m_bMainLock;
+		m_mapDbLocks[gstrUSER_COUNTER_DB_LOCK] = &m_bUserCounterLock;
 
 		// If PDF support is licensed initialize support
 		// NOTE: no exception is thrown or logged if PDF support is not licensed.
@@ -194,7 +199,7 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction(BSTR strAction, long* pnID)
 		if (!DefineNewAction_Internal(false, strAction, pnID))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			DefineNewAction_Internal(true, strAction, pnID);
 		}
@@ -215,7 +220,7 @@ STDMETHODIMP CFileProcessingDB::DeleteAction(BSTR strAction)
 		if (!DeleteAction_Internal(false, strAction))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			DeleteAction_Internal(true, strAction);
 		}
@@ -236,7 +241,7 @@ STDMETHODIMP CFileProcessingDB::GetActions(IStrToStrMap * * pmapActionNameToID)
 		if (!GetActions_Internal(false, pmapActionNameToID))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			GetActions_Internal(true, pmapActionNameToID);
 		}
@@ -261,7 +266,7 @@ STDMETHODIMP CFileProcessingDB::AddFile(BSTR strFile,  BSTR strAction, EFilePrio
 			eNewStatus, pbAlreadyExists, pPrevStatus, ppFileRecord))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			AddFile_Internal(true, strFile, strAction, ePriority, bForceStatusChange, bFileModified,
 				eNewStatus, pbAlreadyExists, pPrevStatus, ppFileRecord);
@@ -283,7 +288,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 		if (!RemoveFile_Internal(false, strFile, strAction))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			RemoveFile_Internal(true, strFile, strAction);
 		}
@@ -304,7 +309,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileProcessed(long nFileID,  BSTR strActio
 		if (!NotifyFileProcessed_Internal(false, nFileID, strAction))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			NotifyFileProcessed_Internal(true, nFileID, strAction);
 		}
@@ -325,7 +330,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileFailed(long nFileID,  BSTR strAction, 
 		if (!NotifyFileFailed_Internal(false, nFileID, strAction, strException))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			NotifyFileFailed_Internal(true, nFileID, strAction, strException);
 		}
@@ -345,7 +350,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToPending(long nFileID,  BSTR strAc
 		if (!SetFileStatusToPending_Internal(false, nFileID,  strAction))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			SetFileStatusToPending_Internal(true, nFileID,  strAction);
 		}
@@ -367,7 +372,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted(long nFileID,  BSTR s
 		if (!SetFileStatusToUnattempted_Internal(false, nFileID, strAction))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			SetFileStatusToUnattempted_Internal(true, nFileID, strAction);
 		}
@@ -389,7 +394,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAct
 		if (!SetFileStatusToSkipped_Internal(false, nFileID, strAction, bRemovePreviousSkipped))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			SetFileStatusToSkipped_Internal(true, nFileID, strAction, bRemovePreviousSkipped);
 		}
@@ -412,7 +417,7 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 		if (!GetFileStatus_Internal(false, nFileID,  strAction, vbAttemptRevertIfLocked, pStatus))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			GetFileStatus_Internal(true, nFileID,  strAction, vbAttemptRevertIfLocked, pStatus);
 		}
@@ -437,7 +442,7 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus(long nWhereActionID,  
 			bstrSkippedFromUserName, nFromActionID, pnNumRecordsModified))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			SearchAndModifyFileStatus_Internal(true, nWhereActionID, eWhereStatus, nToActionID, eToStatus,
 				bstrSkippedFromUserName, nFromActionID, pnNumRecordsModified);
@@ -459,7 +464,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 		if (!SetStatusForAllFiles_Internal(false, strAction,  eStatus))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			SetStatusForAllFiles_Internal(true, strAction, eStatus);
 		}
@@ -481,7 +486,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID,  BSTR strAction,  EAc
 		if (!SetStatusForFile_Internal(false, nID, strAction, eStatus, poldStatus))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			SetStatusForFile_Internal(true, nID, strAction, eStatus, poldStatus);
 		}
@@ -506,7 +511,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 				bstrSkippedForUserName, pvecFileRecords))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			GetFilesToProcess_Internal(true, strAction, nMaxFiles, bGetSkippedFiles, 
 				bstrSkippedForUserName, pvecFileRecords);
 		}
@@ -527,7 +532,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 		if (!RemoveFolder_Internal(false, strFolder, strAction))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			RemoveFolder_Internal(true, strFolder, strAction);
 		}
@@ -548,7 +553,7 @@ STDMETHODIMP CFileProcessingDB::GetStats(long nActionID, VARIANT_BOOL vbForceUpd
 		if (!GetStats_Internal(false, nActionID, vbForceUpdate, pStats))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			GetStats_Internal(true, nActionID, vbForceUpdate, pStats);
 		}
@@ -568,7 +573,7 @@ STDMETHODIMP CFileProcessingDB::CopyActionStatusFromAction(long  nFromAction, lo
 		if (!CopyActionStatusFromAction_Internal(false, nFromAction, nToAction))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			CopyActionStatusFromAction_Internal(true, nFromAction, nToAction);
 		}
@@ -588,7 +593,7 @@ STDMETHODIMP CFileProcessingDB::RenameAction(long nActionID, BSTR strNewActionNa
 		if (!RenameAction_Internal(false, nActionID, strNewActionName))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			RenameAction_Internal(true, nActionID, strNewActionName);
 		}
@@ -610,7 +615,7 @@ STDMETHODIMP CFileProcessingDB::Clear(VARIANT_BOOL vbRetainUserValues)
 		if (!Clear_Internal(false, vbRetainUserValues))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			Clear_Internal(true, vbRetainUserValues);
 		}
@@ -633,7 +638,7 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 			pnNumRecordsOutput))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			ExportFileList_Internal(true, strQuery, strOutputFileName, pRandomCondition, 
 			pnNumRecordsOutput);
@@ -670,7 +675,9 @@ STDMETHODIMP CFileProcessingDB::ResetDBLock(void)
 		TransactionGuard tg(ipConnection);
 
 		// Delete all Lock records
-		executeCmdQuery(ipConnection, gstrDELETE_DB_LOCK);
+		string strDelete = gstrDELETE_DB_LOCK;
+		replaceVariable(strDelete, gstrDB_LOCK_NAME_VAL, gstrMAIN_DB_LOCK);
+		executeCmdQuery(ipConnection, strDelete);
 		
 		// Commit the changes
 		tg.CommitTrans();
@@ -691,7 +698,7 @@ STDMETHODIMP CFileProcessingDB::GetActionID(BSTR bstrActionName, long* pnActionI
 		if (!GetActionID_Internal(false, bstrActionName, pnActionID))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			GetActionID_Internal(true, bstrActionName, pnActionID);
 		}
@@ -1097,7 +1104,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 		if (!SetDBInfoSetting_Internal(false, bstrSettingName, bstrSettingValue, vbSetIfExists))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			SetDBInfoSetting_Internal(true, bstrSettingName, bstrSettingValue, vbSetIfExists);
 		}
@@ -1124,7 +1131,7 @@ STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, VARIANT_B
 		if (!GetDBInfoSetting_Internal(false, strSettingName, bThrowIfMissing, strVal))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			GetDBInfoSetting_Internal(true, strSettingName, bThrowIfMissing, strVal);
 		}
@@ -1138,7 +1145,7 @@ STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, VARIANT_B
 }
 
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::LockDB()
+STDMETHODIMP CFileProcessingDB::LockDB(BSTR bstrLockName)
 {
 	try
 	{
@@ -1148,7 +1155,7 @@ STDMETHODIMP CFileProcessingDB::LockDB()
 		postStatusUpdateNotification(kWaitingForLock);
 
 		// lock the database
-		lockDB(getDBConnection());
+		lockDB(getDBConnection(), asString(bstrLockName));
 
 		// Post message indicating that the database is now busy
 		postStatusUpdateNotification(kConnectionBusy);
@@ -1158,7 +1165,7 @@ STDMETHODIMP CFileProcessingDB::LockDB()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::UnlockDB()
+STDMETHODIMP CFileProcessingDB::UnlockDB(BSTR bstrLockName)
 {
 	try
 	{
@@ -1169,7 +1176,7 @@ STDMETHODIMP CFileProcessingDB::UnlockDB()
 		try
 		{
 			// Unlock the DB
-			unlockDB(getDBConnection());
+			unlockDB(getDBConnection(), asString(bstrLockName));
 		}
 		catch(...)
 		{
@@ -1200,7 +1207,7 @@ STDMETHODIMP CFileProcessingDB::GetResultsForQuery(BSTR bstrQuery, _Recordset** 
 		if (!GetResultsForQuery_Internal(false, bstrQuery, ppVal))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			GetResultsForQuery_Internal(true, bstrQuery, ppVal);
 		}
 		return S_OK;
@@ -1253,7 +1260,7 @@ STDMETHODIMP CFileProcessingDB::GetFileID(BSTR bstrFileName, long *pnFileID)
 		if (!GetFileID_Internal(false, bstrFileName, pnFileID))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			GetFileID_Internal(true, bstrFileName, pnFileID);
 		}
@@ -1273,7 +1280,7 @@ STDMETHODIMP CFileProcessingDB::GetActionName(long nActionID, BSTR *pbstrActionN
 		if (!GetActionName_Internal(false, nActionID, pbstrActionName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			GetActionName_Internal(true, nActionID, pbstrActionName);
 		}
@@ -1294,7 +1301,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID)
 		if (!NotifyFileSkipped_Internal(false, nFileID, nActionID))
 		{
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			NotifyFileSkipped_Internal(true, nFileID, nActionID);
 		}
@@ -1314,7 +1321,7 @@ STDMETHODIMP CFileProcessingDB::SetFileActionComment(long nFileID, long nActionI
 		if (!SetFileActionComment_Internal(false, nFileID, nActionID, bstrComment))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			SetFileActionComment_Internal(true, nFileID, nActionID, bstrComment);
 		}
@@ -1336,7 +1343,7 @@ STDMETHODIMP CFileProcessingDB::GetFileActionComment(long nFileID, long nActionI
 		if (!GetFileActionComment_Internal(false, nFileID, nActionID, pbstrComment))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			GetFileActionComment_Internal(true, nFileID, nActionID, pbstrComment);
 		}
 
@@ -1356,7 +1363,7 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 		if (!ClearFileActionComment_Internal(false, nFileID, nActionID))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			ClearFileActionComment_Internal(true, nFileID, nActionID);
 		}
@@ -1380,7 +1387,7 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 			bstrFromAction, pRandomCondition, pnNumRecordsModified))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			ModifyActionStatusForQuery_Internal(true, bstrQueryFrom, bstrToAction, eaStatus, 
 				bstrFromAction, pRandomCondition, pnNumRecordsModified);
 		}
@@ -1400,7 +1407,7 @@ STDMETHODIMP CFileProcessingDB::GetTags(IStrToStrMap **ppTags)
 		if (!GetTags_Internal(false, ppTags))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			GetTags_Internal(true, ppTags);
 		}
@@ -1420,7 +1427,7 @@ STDMETHODIMP CFileProcessingDB::GetTagNames(IVariantVector **ppTagNames)
 		if (!GetTagNames_Internal(false, ppTagNames))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			GetTagNames_Internal(true, ppTagNames);
 		}
@@ -1441,7 +1448,7 @@ STDMETHODIMP CFileProcessingDB::HasTags(VARIANT_BOOL* pvbVal)
 		if (!HasTags_Internal(false, pvbVal))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			HasTags_Internal(true, pvbVal);
 		}
@@ -1461,7 +1468,7 @@ STDMETHODIMP CFileProcessingDB::TagFile(long nFileID, BSTR bstrTagName)
 		if (!TagFile_Internal(false, nFileID, bstrTagName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			TagFile_Internal(true, nFileID, bstrTagName);
 		}
@@ -1481,7 +1488,7 @@ STDMETHODIMP CFileProcessingDB::UntagFile(long nFileID, BSTR bstrTagName)
 		if (!UntagFile_Internal(false, nFileID, bstrTagName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			UntagFile_Internal(true, nFileID, bstrTagName);
 		}
 
@@ -1501,7 +1508,7 @@ STDMETHODIMP CFileProcessingDB::ToggleTagOnFile(long nFileID, BSTR bstrTagName)
 		if (!ToggleTagOnFile_Internal(false, nFileID, bstrTagName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			ToggleTagOnFile_Internal(true, nFileID, bstrTagName);
 		}
@@ -1538,7 +1545,7 @@ STDMETHODIMP CFileProcessingDB::AddTag(BSTR bstrTagName, BSTR bstrTagDescription
 		if (!AddTag_Internal(false, strTagName, strDescription, bFailIfExists))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			AddTag_Internal(true, strTagName, strDescription, bFailIfExists);
 		}
@@ -1558,7 +1565,7 @@ STDMETHODIMP CFileProcessingDB::DeleteTag(BSTR bstrTagName)
 		if (!DeleteTag_Internal(false, bstrTagName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			DeleteTag_Internal(true, bstrTagName);
 		}
@@ -1580,7 +1587,7 @@ STDMETHODIMP CFileProcessingDB::ModifyTag(BSTR bstrOldTagName, BSTR bstrNewTagNa
 		if (!ModifyTag_Internal(false, bstrOldTagName, bstrNewTagName,bstrNewTagDescription))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			ModifyTag_Internal(true, bstrOldTagName, bstrNewTagName,bstrNewTagDescription);
 		}
 		return S_OK;
@@ -1601,7 +1608,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesWithTags(IVariantVector* pvecTagNames,
 		if (!GetFilesWithTags_Internal(false, pvecTagNames, vbAndOperation, ppvecFileIDs))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			GetFilesWithTags_Internal(true, pvecTagNames, vbAndOperation, ppvecFileIDs);
 		}
 		return S_OK;
@@ -1620,7 +1627,7 @@ STDMETHODIMP CFileProcessingDB::GetTagsOnFile(long nFileID, IVariantVector** ppv
 		if (!GetTagsOnFile_Internal(false, nFileID, ppvecTagNames))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			GetTagsOnFile_Internal(true, nFileID, ppvecTagNames);
 		}
 
@@ -1662,7 +1669,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 			nToActionID, eaNewStatus, nFromActionID))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			
 			SetStatusForFilesWithTags_Internal(true, pvecTagNames, vbAndOperation, 
 			nToActionID, eaNewStatus, nFromActionID);
@@ -1747,7 +1754,7 @@ STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnReco
 		if (!ExecuteCommandQuery_Internal(false, bstrQuery, pnRecordsAffected))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			ExecuteCommandQuery_Internal(true, bstrQuery, pnRecordsAffected);
 		}
 		return S_OK;
@@ -1793,7 +1800,7 @@ STDMETHODIMP CFileProcessingDB::UnregisterProcessingFAM()
 		if (!UnregisterProcessingFAM_Internal(false))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			UnregisterProcessingFAM_Internal(true);
 		}
 	}
@@ -1815,7 +1822,7 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 			pnNumRecordsModified))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			SetPriorityForFiles_Internal(true, bstrSelectQuery, eNewPriority,
 				pRandomCondition, pnNumRecordsModified);
 		}
@@ -1833,13 +1840,14 @@ STDMETHODIMP CFileProcessingDB::AddUserCounter(BSTR bstrCounterName, LONGLONG ll
 	{
 		validateLicense();
 
-
 		if (!AddUserCounter_Internal(false, bstrCounterName, llInitialValue))
 		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			// Lock the user counter table
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrUSER_COUNTER_DB_LOCK);
 			AddUserCounter_Internal(true, bstrCounterName, llInitialValue);
 		}
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27752");
@@ -1853,13 +1861,14 @@ STDMETHODIMP CFileProcessingDB::RemoveUserCounter(BSTR bstrCounterName)
 	{
 		validateLicense();
 
-
 		if (!RemoveUserCounter_Internal(false, bstrCounterName))
 		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			// Lock the user counter table
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrUSER_COUNTER_DB_LOCK);
 			RemoveUserCounter_Internal(true, bstrCounterName);
 		}
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27756");
@@ -1873,12 +1882,11 @@ STDMETHODIMP CFileProcessingDB::RenameUserCounter(BSTR bstrCounterName, BSTR bst
 	{
 		validateLicense();
 
-		if (!RenameUserCounter_Internal(false, bstrCounterName, bstrNewCounterName))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-			RenameUserCounter_Internal(true, bstrCounterName, bstrNewCounterName);
-		}
+		// Any access that will update a row in the user counter table
+		// needs to be exclusively locked
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+			gstrUSER_COUNTER_DB_LOCK);
+		RenameUserCounter_Internal(true, bstrCounterName, bstrNewCounterName);
 
 		return S_OK;
 	}
@@ -1893,12 +1901,12 @@ STDMETHODIMP CFileProcessingDB::SetUserCounterValue(BSTR bstrCounterName, LONGLO
 	{
 		validateLicense();
 
-		if (!SetUserCounterValue_Internal(false, bstrCounterName, llNewValue))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-			SetUserCounterValue_Internal(true , bstrCounterName, llNewValue);
-		}
+		// Any access that will update a row in the user counter table
+		// needs to be exclusively locked
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+			gstrUSER_COUNTER_DB_LOCK);
+
+		SetUserCounterValue_Internal(true , bstrCounterName, llNewValue);
 
 		return S_OK;
 	}
@@ -1915,8 +1923,9 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterValue(BSTR bstrCounterName, LONGLO
 
 		if (!GetUserCounterValue_Internal(false, bstrCounterName, pllValue))
 		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			// Lock the user counter table
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrUSER_COUNTER_DB_LOCK);
 			GetUserCounterValue_Internal(true, bstrCounterName, pllValue);
 		}
 		return S_OK;
@@ -1934,8 +1943,9 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterNames(IVariantVector** ppvecNames)
 		
 		if (!GetUserCounterNames_Internal(false , ppvecNames))
 		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			// Lock the user counter table
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrUSER_COUNTER_DB_LOCK);
 			GetUserCounterNames_Internal(true, ppvecNames);
 		}
 		return S_OK;
@@ -1953,8 +1963,9 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterNamesAndValues(IStrToStrMap** ppma
 
 		if (!GetUserCounterNamesAndValues_Internal(false, ppmapUserCounters))
 		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			// Lock the user counter table
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrUSER_COUNTER_DB_LOCK);
 			GetUserCounterNamesAndValues_Internal(true, ppmapUserCounters);
 		}
 
@@ -1974,8 +1985,9 @@ STDMETHODIMP CFileProcessingDB::IsUserCounterValid(BSTR bstrCounterName,
 
 		if (!IsUserCounterValid_Internal(false, bstrCounterName, pbCounterValid))
 		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			// Lock the user counter table
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrUSER_COUNTER_DB_LOCK);
 			IsUserCounterValid_Internal(true, bstrCounterName, pbCounterValid);
 		}
 		return S_OK;
@@ -1992,12 +2004,13 @@ STDMETHODIMP CFileProcessingDB::OffsetUserCounter(BSTR bstrCounterName, LONGLONG
 	{
 		validateLicense();
 
-		if (!OffsetUserCounter_Internal(false, bstrCounterName, llOffsetValue, pllNewValue))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-			OffsetUserCounter_Internal(true, bstrCounterName, llOffsetValue, pllNewValue);
-		}
+		// Any access that will update a row in the user counter table
+		// needs to be exclusively locked
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+			gstrUSER_COUNTER_DB_LOCK);
+
+		OffsetUserCounter_Internal(true, bstrCounterName, llOffsetValue, pllNewValue);
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27817");
@@ -2012,7 +2025,7 @@ STDMETHODIMP CFileProcessingDB::RecordFAMSessionStart(BSTR bstrFPSFileName)
 		if (!RecordFAMSessionStart_Internal(false, bstrFPSFileName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			RecordFAMSessionStart_Internal(true, bstrFPSFileName);
 		}
 
@@ -2030,7 +2043,7 @@ STDMETHODIMP CFileProcessingDB::RecordFAMSessionStop()
 		if (!RecordFAMSessionStop_Internal(false))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			RecordFAMSessionStop_Internal(true);
 		}
 
@@ -2050,7 +2063,7 @@ STDMETHODIMP CFileProcessingDB::RecordInputEvent(BSTR bstrTimeStamp, long nActio
 		if (!RecordInputEvent_Internal(false, bstrTimeStamp, nActionID, nEventCount, nProcessID))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			RecordInputEvent_Internal(true, bstrTimeStamp, nActionID, nEventCount, nProcessID);
 		}
 		return S_OK;
@@ -2068,7 +2081,7 @@ STDMETHODIMP CFileProcessingDB::GetLoginUsers(IStrToStrMap**  ppUsers)
 		if (!GetLoginUsers_Internal(false, ppUsers))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			GetLoginUsers_Internal(true, ppUsers);
 		}
 	}
@@ -2087,7 +2100,7 @@ STDMETHODIMP CFileProcessingDB::AddLoginUser(BSTR bstrUserName)
 		if (!AddLoginUser_Internal(false, bstrUserName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			AddLoginUser_Internal(true, bstrUserName);
 		}
 		return S_OK;
@@ -2106,7 +2119,7 @@ STDMETHODIMP CFileProcessingDB::RemoveLoginUser(BSTR bstrUserName)
 		if (!RemoveLoginUser_Internal(false, bstrUserName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			RemoveLoginUser_Internal(true, bstrUserName);
 		}
 		return S_OK;
@@ -2126,7 +2139,7 @@ STDMETHODIMP CFileProcessingDB::RenameLoginUser(BSTR bstrUserNameToRename, BSTR 
 		if (!RenameLoginUser_Internal(false, bstrUserNameToRename, bstrNewUserName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			RenameLoginUser_Internal(true, bstrUserNameToRename, bstrNewUserName);
 		}
 		return S_OK;
@@ -2146,7 +2159,7 @@ STDMETHODIMP CFileProcessingDB::ClearLoginUserPassword(BSTR bstrUserName)
 		if (!ClearLoginUserPassword_Internal(false, bstrUserName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			ClearLoginUserPassword_Internal(true, bstrUserName);
 		}
 		return S_OK;
@@ -2165,7 +2178,7 @@ STDMETHODIMP CFileProcessingDB::GetAutoCreateActions(VARIANT_BOOL* pvbValue)
 		if (!GetAutoCreateActions_Internal(false, pvbValue))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			GetAutoCreateActions_Internal(true, pvbValue);
 		}
 		return S_OK;
@@ -2184,7 +2197,7 @@ STDMETHODIMP CFileProcessingDB::AutoCreateAction(BSTR bstrActionName, long* plId
 		if (!AutoCreateAction_Internal(false, bstrActionName, plId))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			AutoCreateAction_Internal(true, bstrActionName, plId);
 		}
 		return S_OK;
@@ -2237,7 +2250,7 @@ STDMETHODIMP CFileProcessingDB::GetFileRecord(BSTR bstrFile, BSTR bstrActionName
 		if (!GetFileRecord_Internal(false, bstrFile, bstrActionName, ppFileRecord))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			GetFileRecord_Internal(true, bstrFile, bstrActionName, ppFileRecord);
 		}
 
@@ -2257,7 +2270,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToProcessing(long nFileId, long nAc
 		if (!SetFileStatusToProcessing_Internal(false, nFileId, nActionID))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			SetFileStatusToProcessing_Internal(true, nFileId, nActionID);
 		}
 		return S_OK;
@@ -2295,12 +2308,8 @@ STDMETHODIMP CFileProcessingDB::UpgradeToCurrentSchema(IProgressStatus *pProgres
 
 		IProgressStatusPtr ipProgressStatus(pProgressStatus);
 
-		if (!UpgradeToCurrentSchema_Internal(false, ipProgressStatus))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-			UpgradeToCurrentSchema_Internal(true, ipProgressStatus);
-		}
+		UpgradeToCurrentSchema_Internal(true, ipProgressStatus);
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI31390");
@@ -2318,7 +2327,7 @@ STDMETHODIMP CFileProcessingDB::RenameFile(IFileRecord* pFileRecord, BSTR bstrNe
 		if (!RenameFile_Internal(false, pFileRecord, bstrNewName))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			RenameFile_Internal(true, pFileRecord, bstrNewName);
 		}
 		return S_OK;
@@ -2338,7 +2347,7 @@ STDMETHODIMP CFileProcessingDB::get_DBInfoSettings(IStrToStrMap** ppSettings)
 		if (!get_DBInfoSettings_Internal(false, ppSettings))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			get_DBInfoSettings_Internal(true, ppSettings);
 		}
 
@@ -2363,7 +2372,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 		if (!GetDBInfoSetting_Internal(false, gstrSTORE_DB_INFO_HISTORY, true, strSettingVal))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			GetDBInfoSetting_Internal(true, gstrSTORE_DB_INFO_HISTORY, true, strSettingVal);
 		}
 
@@ -2398,7 +2407,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 		if (!SetDBInfoSettings_Internal(false, bUpdateHistory, vecQueries, nNumRowsUpdated))
 		{
 			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			SetDBInfoSettings_Internal(true, bUpdateHistory, vecQueries, nNumRowsUpdated);
 		}
 

@@ -8,13 +8,14 @@ template<class T> class LockGuard
 {
 public:
 	// PROMISE: To lock the database. This will call ipDB->LockDB() 
-	LockGuard(T ipDB)
+	LockGuard(T ipDB, const string& strLockName)
+		: m_strLockName(strLockName)
 	{
 		ASSERT_ARGUMENT("ELI19755", ipDB != __nullptr );
 		m_ipDB = ipDB;
 
 		// lock the database
-		m_ipDB->LockDB();
+		m_ipDB->LockDB(m_strLockName.c_str());
 	}
 
 	// PROMISE: To unlock the database. This will call m_ipDB->unlockDB() and unlock the m_ipDB->m_mutex
@@ -26,11 +27,12 @@ public:
 		try
 		{
 			// Unlock the DB
-			m_ipDB->UnlockDB();
+			m_ipDB->UnlockDB(m_strLockName.c_str());
 		}
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19754");
 	}
 
 private:
 	T m_ipDB;	
+	string m_strLockName;
 };

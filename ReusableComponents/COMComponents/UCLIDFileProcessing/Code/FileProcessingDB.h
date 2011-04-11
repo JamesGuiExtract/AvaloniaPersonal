@@ -60,6 +60,9 @@ static const string gstrSOURCE_DOC_CHANGE_HISTORY = "SourceDocChangeHistory";
 static const string gstrDOC_TAG_HISTORY = "DocTagHistory";
 static const string gstrDB_INFO_HISTORY = "DBInfoChangeHistory";
 
+static const string gstrMAIN_DB_LOCK = "Main";
+static const string gstrUSER_COUNTER_DB_LOCK = "UserCounter";
+
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
 //-------------------------------------------------------------------------------------------------
@@ -146,8 +149,8 @@ public:
 	STDMETHOD(SetDBInfoSetting)(BSTR bstrSettingName, BSTR bstrSettingValue, VARIANT_BOOL vbSetIfExists);
 	STDMETHOD(GetDBInfoSetting)(BSTR bstrSettingName, VARIANT_BOOL vbThrowIfMissing,
 		BSTR* pbstrSettingValue);
-	STDMETHOD(LockDB)();
-	STDMETHOD(UnlockDB)();
+	STDMETHOD(LockDB)(BSTR bstrLockName);
+	STDMETHOD(UnlockDB)(BSTR bstrLockName);
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
 	STDMETHOD(AsStatusString)(EActionStatus eaStatus, BSTR* pbstrStatusString);
 	STDMETHOD(AsEActionStatus)(BSTR bstrStatus, EActionStatus* peaStatus);
@@ -273,8 +276,12 @@ private:
 	// If 0 there is not a registered UPI
 	int m_nUPIID;
 
-	// Flag indicating that this instance has the lock on the DB
-	volatile bool m_bDBLocked;
+	// Flags indicating that this instance has the specified lock on the DB
+	// NOTE: If other locks are added, be sure to add the map entry in the
+	// constructor for the new lock.
+	bool m_bMainLock;
+	bool m_bUserCounterLock;
+	map<string, bool*> m_mapDbLocks;
 
 	// Machine username
 	string m_strFAMUserName;
@@ -545,10 +552,10 @@ private:
 	int getDBSchemaVersion();
 
 	// Locks the db for use using the connection provided.
-	void lockDB(_ConnectionPtr ipConnection);
+	void lockDB(_ConnectionPtr ipConnection, const string& strLockName);
 	
 	// unlocks db using the connection provided.
-	void unlockDB(_ConnectionPtr ipConnection);
+	void unlockDB(_ConnectionPtr ipConnection, const string& strLockName);
 
 	// Looks up the current username in the Login table if bUseAdmin is false
 	// and looks up the admin username if bUseAdmin is true

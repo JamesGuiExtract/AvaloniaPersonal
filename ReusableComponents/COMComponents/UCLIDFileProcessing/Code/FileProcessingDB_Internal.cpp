@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 105;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 106;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -1624,20 +1624,27 @@ void CFileProcessingDB::validateDBSchemaVersion()
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
+void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLockName)
 {
-	// If DB is already locked return
-	if (m_bDBLocked)
+	// Get the lock variable for the specified lock name
+	bool* pLocked = m_mapDbLocks[strLockName];
+
+	if (*pLocked)
 	{
 		return;
 	}
 
 	// Lock insertion string for this process
-	string strAddLockSQL = "INSERT INTO LockTable (LockID, UPI) VALUES (1, '" 
+	string strAddLockSQL = "INSERT INTO LockTable (LockName, UPI) VALUES ('"
+		+ strLockName + "', '" 
 		+  m_strUPI + "')";
+	string strDeleteLock = gstrDELETE_DB_LOCK;
+	string strGetLock = gstrDB_LOCK_QUERY;
+	replaceVariable(strDeleteLock, gstrDB_LOCK_NAME_VAL, strLockName);
+	replaceVariable(strGetLock, gstrDB_LOCK_NAME_VAL, strLockName);
 				
 	// Keep trying to lock the DB until it is locked
-	while (!m_bDBLocked)
+	while (!(*pLocked))
 	{
 		// Flag to indicate if the connection is in a good state
 		// this will be determined if the TransactionGuard does not throw an exception
@@ -1654,7 +1661,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 				CSingleLock lock(&m_mutex, TRUE);
 
 				// Check again to ensure no one else set the m_bDBLocked to true
-				if (m_bDBLocked)
+				if (*pLocked)
 				{
 					break;
 				}
@@ -1666,7 +1673,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 				ASSERT_RESOURCE_ALLOCATION("ELI14550", ipLockTable != __nullptr);
 
 				// Open recordset with the locktime 
-				ipLockTable->Open(gstrDB_LOCK_QUERY.c_str(), 
+				ipLockTable->Open(strGetLock.c_str(), 
 					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 					adLockReadOnly, adCmdText);
 
@@ -1683,7 +1690,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 					{
 						// Delete the lock record since it has been in the db for
 						// more than the lock period
-						executeCmdQuery(ipConnection, gstrDELETE_DB_LOCK);
+						executeCmdQuery(ipConnection, strDeleteLock);
 
 						// commit the changes
 						// this may throw an exception if another instance gets here
@@ -1692,6 +1699,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 
 						// log an exception that the lock has been reset
 						UCLIDException ue("ELI15406", "Lock timed out. Lock has been reset.");
+						ue.addDebugInfo("Lock Name", strLockName);
 						ue.addDebugInfo ("Lock Timeout", m_lDBLockTimeout);
 						ue.addDebugInfo ("Actual Lock Time", asString(nSecondsLocked));
 						ue.log();
@@ -1710,7 +1718,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 				tg.CommitTrans();
 
 				// Update the lock flag to indicate the DB is locked
-				m_bDBLocked = true;
+				*pLocked = true;
 
 				// Lock obtained, break from the loop to avoid sleep call below
 				break;
@@ -1735,10 +1743,12 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection)
+void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection, const string& strLockName)
 {
+	bool* pbLocked = m_mapDbLocks[strLockName];
+
 	// if DB is already unlocked return
-	if (!m_bDBLocked)
+	if (!(*pbLocked))
 	{
 		return;
 	}
@@ -1746,17 +1756,18 @@ void CFileProcessingDB::unlockDB(_ConnectionPtr ipConnection)
 	CSingleLock lock(&m_mutex, TRUE);
 
 	// Check unlocked status again after getting the mutex
-	if (!m_bDBLocked)
+	if (!(*pbLocked))
 	{
 		return;
 	}
 
 	// Delete the Lock record
-	string strDeleteSQL = gstrDELETE_DB_LOCK + " WHERE UPI = '" + m_strUPI + "'";
+	string strDeleteSQL = gstrDELETE_DB_LOCK + " AND UPI = '" + m_strUPI + "'";
+	replaceVariable(strDeleteSQL, gstrDB_LOCK_NAME_VAL, strLockName);
 	executeCmdQuery(ipConnection, strDeleteSQL);
 
 	// Mark DB as unlocked
-	m_bDBLocked = false;
+	*pbLocked = false;
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseAdmin)
@@ -2659,7 +2670,8 @@ void CFileProcessingDB::clear(bool retainUserValues)
 			// timed out FAM's as part of the check for active processing
 
 			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
 
 			// since we are clearing the database locking
 			// it will really have no effect so pass true so we
