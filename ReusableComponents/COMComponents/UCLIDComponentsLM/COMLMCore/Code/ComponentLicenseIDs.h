@@ -224,6 +224,9 @@ const unsigned int gnMICR_FINDING_ENGINE_FEATURE		= gnBASE_OFFSET + 81;
 // modify PDF files (currently only using to remove PDF annotations)
 const unsigned int gnPEGASUS_PDFXPRESS_MODIFY_PDF		= gnBASE_OFFSET + 82;
 
+// Special ID for the FTP/SFTP file transfer features that use edtFTPnet/PRO SDK
+const unsigned int gnFTP_SFTP_FILE_TRANSFER				= gnBASE_OFFSET + 83;
+
 //-------------------------------------------------------------------------------------------------
 // Constants for items licensed for FLEX Index / ID Shield integration
 //-------------------------------------------------------------------------------------------------

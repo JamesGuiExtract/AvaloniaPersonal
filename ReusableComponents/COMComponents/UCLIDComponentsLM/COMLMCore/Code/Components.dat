@@ -67,6 +67,7 @@
 5080,Scansoft_OEM_OCR_Feature
 5081,MICR_Finding_Engine_Feature
 5082,Pegasus_PdfXpress_Modify_Pdf
+5083,FTP_SFTP_File_Transfer
 
 // IDs for FLEX Index / ID Shield integration efforts
 5101,Laserfiche_Integration_Verification

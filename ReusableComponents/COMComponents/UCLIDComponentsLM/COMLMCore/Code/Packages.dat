@@ -96,6 +96,7 @@ FLEX Index / ID Shield Utilities,0
 -    MICR Finding Engine,5081
 -    Modify PDF (Pegasus PDF Annotation Removal),5082:5073
 -    PDF Read+Write,5073
+-    FTP/SFTP file transfer,5083
 
 ID Shield Office 1.0,0
 -    ID Shield Office,$IDShieldOffice
