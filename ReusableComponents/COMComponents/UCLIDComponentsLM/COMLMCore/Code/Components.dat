@@ -18,58 +18,59 @@
 //   FLEX Index & ID Shield 7.0             3000
 //   LabDE 1.0                              4000
 //   FLEX Index & ID Shield 8.0             5000
+//   FLEX Index & ID Shield 9.0/LabDE 2.0   6000
 //
 
 // IDs for core objects and collections
-5000,Unused object
-5001,Extract_Systems_Core_Objects
-5002,Input_Funnel_Core_Objects
-5003,FlexIndex_IDShield_Core_Objects
-5004,FlexIndex_Core_Objects
-5005,IDShield_Core_Objects
-5006,Rule_Development_Toolkit_Objects
-5007,IcoMap_Core_Objects
-5008,IcoMap_ArcGIS_Objects
-5010,Redaction_Core_Objects
+6000,Unused object
+6001,Extract_Systems_Core_Objects
+6002,Input_Funnel_Core_Objects
+6003,FlexIndex_IDShield_Core_Objects
+6004,FlexIndex_Core_Objects
+6005,IDShield_Core_Objects
+6006,Rule_Development_Toolkit_Objects
+6007,IcoMap_Core_Objects
+6008,IcoMap_ArcGIS_Objects
+6010,Redaction_Core_Objects
 
 // IDs for core features
-5021,OCR_On_Server_Feature
-5022,OCR_On_Client_Feature
-5023,FlexIndex_Server_Objects
-5024,Rule_Writing_Core_Objects
-5025,FlexIndex_IDShield_Server_Core
-5026,IDShield_Rule_Writing_Objects
-5027,FlexIndex_Rule_Writing_Objects
-5028,LabDE_Core_Objects
-5029,DataEntry_Core_Components
+6021,OCR_On_Server_Feature
+6022,OCR_On_Client_Feature
+6023,FlexIndex_Server_Objects
+6024,Rule_Writing_Core_Objects
+6025,FlexIndex_IDShield_Server_Core
+6026,IDShield_Rule_Writing_Objects
+6027,FlexIndex_Rule_Writing_Objects
+6028,LabDE_Core_Objects
+6029,DataEntry_Core_Components
 
 // IDs for special individual components
-5043,Pagination_FileProcessor_Object
-5044,IDShield_AutoRedaction_Object
-5045,IDShield_Verification_Object
-5046,RuleSet_Editor_UI_Object
-5047,File_Action_Manager_Object
-5048,Run_Rules_Object
-5049,IDShield_Office_Object
-5050,LabDE_Verification_UI_Object
+6043,Pagination_FileProcessor_Object
+6044,IDShield_AutoRedaction_Object
+6045,IDShield_Verification_Object
+6046,RuleSet_Editor_UI_Object
+6047,File_Action_Manager_Object
+6048,Run_Rules_Object
+6049,IDShield_Office_Object
+6050,LabDE_Verification_UI_Object
 
 // IDs for individually licensed features
-5070,Anti_Aliasing_Feature
-5071,IgnoreUSB_IDCheck_Feature
-5072,IgnoreUSB_Decrement_Feature
-5073,PDF_ReadWrite_Feature
-5074,GridTool_Query_Feature
-5075,GridTool_Draw_Feature
-5076,RotatedImages_And_Annotation_Feature
-5077,Image_Cleanup_Engine_Feature
-5078,Handwriting_Recognition_Feature
-5079,Create_Searchable_PDF_Feature
-5080,Scansoft_OEM_OCR_Feature
-5081,MICR_Finding_Engine_Feature
-5082,Pegasus_PdfXpress_Modify_Pdf
-5083,FTP_SFTP_File_Transfer
+6070,Anti_Aliasing_Feature
+6071,IgnoreUSB_IDCheck_Feature
+6072,IgnoreUSB_Decrement_Feature
+6073,PDF_ReadWrite_Feature
+6074,GridTool_Query_Feature
+6075,GridTool_Draw_Feature
+6076,RotatedImages_And_Annotation_Feature
+6077,Image_Cleanup_Engine_Feature
+6078,Handwriting_Recognition_Feature
+6079,Create_Searchable_PDF_Feature
+6080,Scansoft_OEM_OCR_Feature
+6081,MICR_Finding_Engine_Feature
+6082,Pegasus_PdfXpress_Modify_Pdf
+6083,FTP_SFTP_File_Transfer
 
 // IDs for FLEX Index / ID Shield integration efforts
-5101,Laserfiche_Integration_Verification
-5102,Laserfiche_Integration_Desktop
-5103,Laserfiche_Integration_Server
+6101,Laserfiche_Integration_Verification
+6102,Laserfiche_Integration_Desktop
+6103,Laserfiche_Integration_Server
