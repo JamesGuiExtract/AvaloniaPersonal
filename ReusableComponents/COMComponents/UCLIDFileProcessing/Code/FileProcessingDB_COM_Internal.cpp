@@ -394,6 +394,42 @@ int UpdateToSchemaVersion106(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32300");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion107(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		const int nNewSchemaVersion = 107;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		// Update the name of the DBInfo setting for SkipAuthenticationOnMachines
+		vector<string> vecQueries;
+		vecQueries.push_back("UPDATE [DBInfo] SET [Name] = '"
+			+ gstrSKIP_AUTHENTICATION_ON_MACHINES
+			+ "' WHERE [Name] = 'SkipAuthenticationOnMachines'");
+
+		// Add the new schema version number
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '107' WHERE [Name] = '" + 
+			gstrFAMDB_SCHEMA_VERSION + "'");
+
+		// Update the value for last DB info change
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '"
+			+ getSQLServerDateTime(ipConnection) + "' WHERE [Name] = '"
+			+ gstrLAST_DB_INFO_CHANGE + "'");
+
+		// Execute the queries
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32304");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -5199,7 +5235,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 103:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion104);
 				case 104:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion105);
 				case 105:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion106);
-				case 106:	break;
+				case 106:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion107);
+				case 107:	break;
 
 				default:
 					{

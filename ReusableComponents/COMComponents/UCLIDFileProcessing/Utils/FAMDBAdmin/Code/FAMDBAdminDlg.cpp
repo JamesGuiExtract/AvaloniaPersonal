@@ -911,11 +911,13 @@ void CFAMDBAdminDlg::enableMenus()
 	pMenu->EnableMenuItem(ID_DATABASE_RESETLOCK, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_DATABASE_UPDATE_SCHEMA, m_bDBSchemaIsNotCurrent ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_DATABASE_CHANGEPASSWORD, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_DATABASE_SET_OPTIONS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_TAGS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_COUNTERS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_ACTIONS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_MANAGE_USERS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_MANUALLYSETACTIONSTATUS, m_bIsDBGood ? nEnable : nDisable);
+	pMenu->EnableMenuItem(ID_TOOLS_SETPRIORITY, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_EXPORTFILELISTS, m_bIsDBGood ? nEnable : nDisable);
 	pMenu->EnableMenuItem(ID_TOOLS_REPORTS, m_bIsDBGood ? nEnable : nDisable);
 }

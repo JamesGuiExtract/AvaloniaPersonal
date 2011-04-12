@@ -512,15 +512,10 @@ void CUSBLicenseKeyManagerDlg::applyNewValues()
 	{
 		m_snlcSafeNetCfg.setSendToExtract(false);
 	}
-	IObjectSettingsPtr ipSettings = m_ipEmailSettings;
-	ASSERT_RESOURCE_ALLOCATION("ELI12326", ipSettings != __nullptr );
-	
-	ipSettings->SaveToRegistry( gstrEMAIL_REG_PATH.c_str() );
 	
 	applyAlertValues( gwINDEXING_COUNTER, gdcellFlexIndexingCounter );
 	applyAlertValues( gwPAGINATION_COUNTER, gdcellFlexPaginationCounter );
 	applyAlertValues( gwREDACTION_COUNTER, gdcellIDShieldRedactionCounter );
-
 }
 //--------------------------------------------------------------------------------------------------
 void CUSBLicenseKeyManagerDlg::clearCounterValuesList()

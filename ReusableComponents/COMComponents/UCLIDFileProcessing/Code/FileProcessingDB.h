@@ -760,6 +760,10 @@ private:
 	// managed by the FAM DB itself or by one of the installed product-specific DBs
 	vector<string> findUnrecognizedSchemaElements(const _ConnectionPtr& ipConnection);
 
+	// Adds any old DB info values into the list of current db info values so that
+	// findUnrecognizedSchemaElements does not fail
+	void addOldDBInfoValues(map<string, string>& mapValues);
+
 	// Runs the UpdateSchemaForFAMDBVersion function for each installed product-specific database.
 	void executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection, int nFAMSchemaVersion,
 		long *pnStepCount, IProgressStatusPtr ipProgressStatus,

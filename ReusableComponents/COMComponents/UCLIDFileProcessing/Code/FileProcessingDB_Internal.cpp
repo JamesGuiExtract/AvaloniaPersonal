@@ -34,7 +34,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 106;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 107;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -3812,6 +3812,8 @@ vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _Connecti
 
 	// Retrieve a list of all DBInfo rows the FAM DB has managed since version 23
 	map<string, string> mapDBInfoValues = getDBInfoDefaultValues();
+	addOldDBInfoValues(mapDBInfoValues);
+
 	long nDBInfoValueCount = mapDBInfoValues.size();
 
 	// Remove all rows known to the FAM DB from the names of DBINfo rows found in the DB to leave a
@@ -3886,6 +3888,15 @@ vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _Connecti
 	}
 
 	return vecUnrecognizedElements;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::addOldDBInfoValues(map<string, string>& mapOldValues)
+{
+	// Version 107 - Changed the name of the SkipAuthenticationOnMachines to
+	//		SkipAuthenticationForServiceOnMachines, need to add the old name
+	//		to the map so that a database that still contains the old name
+	//		is not treated as an unrecognized element
+	mapOldValues["SkipAuthenticationOnMachines"] = "";
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection,

@@ -667,10 +667,27 @@ namespace Extract.Utilities
 
                 // Check the type of the setting
                 Type settingType = settingObject.GetType();
+                string value = string.Empty;
+                if (settingType == typeof(string))
+                {
+                    value = (string)settingObject;
+                }
+                else
+                {
+                    value = TypeDescriptor.GetConverter(settingType)
+                        .ConvertToString(settingObject);
+                }
 
-                setting.Value.ValueXml.InnerText =
-                    TypeDescriptor.GetConverter(settingType).ConvertToString(
-                        _settings[setting.Name]);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    setting.Value.ValueXml.InnerText = value;
+                }
+                else
+                {
+                    // Create an empty value element and add it to the setting
+                    var doc = new XmlDocument();
+                    setting.Value.ValueXml = doc.CreateElement("value");
+                }
             }
             catch (Exception ex)
             {

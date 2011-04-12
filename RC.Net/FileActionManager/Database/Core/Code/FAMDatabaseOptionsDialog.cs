@@ -44,7 +44,7 @@ namespace Extract.FileActionManager.Database
         // Constants for Security tab
         const string _REQUIRE_PASSWORD_TO_PROCESS_SKIPPED = "RequirePasswordToProcessAllSkippedFiles";
         const string _REQUIRE_AUTHENTICATION_BEFORE_RUN = "RequireAuthenticationBeforeRun";
-        const string _SKIP_AUTHENTICATION_ON_MACHINES = "SkipAuthenticationOnMachines";
+        const string _SKIP_AUTHENTICATION_ON_MACHINES = "SkipAuthenticationForServiceOnMachines";
 
         // Constants for Product Specific tab
         const string _ID_SHIELD_SCHEMA_VERSION_NAME = "IDShieldSchemaVersion";
@@ -333,11 +333,9 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         void UpdateSkipMachinesEnabledState()
         {
-            bool requireAuthentication = _checkRequireAuthenticationToRun.Checked;
-            int count = requireAuthentication ?
-                _listMachinesToAuthenticate.SelectedItems.Count : 0;
-            _listMachinesToAuthenticate.Enabled = requireAuthentication;
-            _buttonAddMachine.Enabled = requireAuthentication;
+            _listMachinesToAuthenticate.Enabled = true;
+            _buttonAddMachine.Enabled = true;
+            int count = _listMachinesToAuthenticate.SelectedItems.Count;
             _buttonModifyMachine.Enabled = count == 1;
             _buttonRemoveMachine.Enabled = count > 0;
         }
@@ -523,23 +521,6 @@ namespace Extract.FileActionManager.Database
         }
 
         /// <summary>
-        /// Handles the require authentication check changed event.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void HandleRequireAuthenticationCheckChangedEvent(object sender, EventArgs e)
-        {
-            try
-            {
-                UpdateSkipMachinesEnabledState();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI31922");
-            }
-        }
-
-        /// <summary>
         /// Handles the ok clicked.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -571,13 +552,11 @@ namespace Extract.FileActionManager.Database
                     map.Set(_INPUT_EVENT_HISTORY_SIZE,
                         _upDownInputEventHistory.Value.ToString(CultureInfo.InvariantCulture));
                 }
-                if (_checkRequireAuthenticationToRun.Checked)
-                {
-                    string value = _listMachinesToAuthenticate.Items.Count > 0 ?
-                        string.Join(";", _listMachinesToAuthenticate.Items.Cast<string>())
-                        : string.Empty;
-                    map.Set(_SKIP_AUTHENTICATION_ON_MACHINES, value);
-                }
+
+                string machines = _listMachinesToAuthenticate.Items.Count > 0 ?
+                    string.Join(";", _listMachinesToAuthenticate.Items.Cast<string>()) :
+                    string.Empty;
+                map.Set(_SKIP_AUTHENTICATION_ON_MACHINES, machines);
 
                 // Add product specific data if the group boxes are visible
                 if (_groupIDShield.Visible)

@@ -90,11 +90,11 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(25, 50);
+            label2.Location = new System.Drawing.Point(6, 50);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(226, 13);
+            label2.Size = new System.Drawing.Size(353, 13);
             label2.TabIndex = 2;
-            label2.Text = "Skip authentication on the following machines:";
+            label2.Text = "Skip authentication when running as a service on the following machines:";
             // 
             // label4
             // 
@@ -134,9 +134,9 @@
             // 
             // _tabControlSettings
             // 
-            this._tabControlSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._tabControlSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._tabControlSettings.Controls.Add(this._tabGeneral);
             this._tabControlSettings.Controls.Add(this._tabHistory);
             this._tabControlSettings.Controls.Add(this._tabSecurity);
@@ -228,8 +228,8 @@
             // 
             // _listAutoRevertEmailList
             // 
-            this._listAutoRevertEmailList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._listAutoRevertEmailList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._listAutoRevertEmailList.FormattingEnabled = true;
             this._listAutoRevertEmailList.Location = new System.Drawing.Point(26, 132);
             this._listAutoRevertEmailList.Name = "_listAutoRevertEmailList";
@@ -446,13 +446,13 @@
             // 
             // _listMachinesToAuthenticate
             // 
-            this._listMachinesToAuthenticate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._listMachinesToAuthenticate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._listMachinesToAuthenticate.FormattingEnabled = true;
-            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(28, 66);
+            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(9, 66);
             this._listMachinesToAuthenticate.Name = "_listMachinesToAuthenticate";
             this._listMachinesToAuthenticate.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this._listMachinesToAuthenticate.Size = new System.Drawing.Size(343, 95);
+            this._listMachinesToAuthenticate.Size = new System.Drawing.Size(362, 95);
             this._listMachinesToAuthenticate.TabIndex = 2;
             this._listMachinesToAuthenticate.SelectedIndexChanged += new System.EventHandler(this.HandleMachineToSkipSelectionChanged);
             // 
@@ -465,7 +465,6 @@
             this._checkRequireAuthenticationToRun.TabIndex = 1;
             this._checkRequireAuthenticationToRun.Text = "Require authentication to run";
             this._checkRequireAuthenticationToRun.UseVisualStyleBackColor = true;
-            this._checkRequireAuthenticationToRun.CheckedChanged += new System.EventHandler(this.HandleRequireAuthenticationCheckChangedEvent);
             // 
             // _checkRequirePasswordForSkipped
             // 
