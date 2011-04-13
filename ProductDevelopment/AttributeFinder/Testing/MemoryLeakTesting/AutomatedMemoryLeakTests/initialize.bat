@@ -12,11 +12,13 @@ set initdir=%cd%\initialfiles
 set workdir=%cd%\workingfiles
 set dbname=Memory_Leak
 
-:: find log file directory
+:: find log file and service database directory
 if defined ProgramData (
 set logdir=%ProgramData%\Extract Systems\LogFiles\Misc
+set dbdir=%ProgramData%\Extract Systems\ESFAMService
 ) else (
 set logdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\LogFiles\Misc
+set dbdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\ESFAMService
 )
 
 :: -----------------------------------------------------------------------------
@@ -25,16 +27,16 @@ set logdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\
 
 :: replace service db
 echo.Replacing Fam Service DB...
-for %%i in ("%cd%\*.sdf") do copy "%%i" "%ccdir%\ESFAMService.sdf"
+for %%i in ("%cd%\*.sdf") do copy "%%i" "%dbdir%\ESFAMService.sdf"
 
 :: update .fps file paths for 64-bit systems
-if defined programfiles(x86) "%ccdir%\sqlcompactexporter" "%ccdir%\ESFAMService.sdf" "update fpsfile set filename=replace(filename,'Program Files\','Program Files (x86)\')" ""
+if defined programfiles(x86) "%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set filename=replace(filename,'Program Files\','Program Files (x86)\')" ""
 
 :: set all entries to not auto-start
-"%ccdir%\sqlcompactexporter" "%ccdir%\ESFAMService.sdf" "update fpsfile set autostart = 'false'" ""
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set autostart = 'false'" ""
 
 :: set the first entry to auto-start
-"%ccdir%\sqlcompactexporter" "%ccdir%\ESFAMService.sdf" "update fpsfile set autostart = 'true' where id in (select top (1) id from fpsfile)" ""
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set autostart = 'true' where id in (select top (1) id from fpsfile)" ""
 
 
 :: -----------------------------------------------------------------------------

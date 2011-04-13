@@ -10,15 +10,17 @@ set initdir=%cd%\initialfiles
 set workdir=%cd%\workingfiles
 set dbname=MEMORY_LEAK
 
-:: find log file directory
+:: find log file and service database directory
 if defined ProgramData (
 set logdir=%ProgramData%\Extract Systems\LogFiles\Misc
+set dbdir=%ProgramData%\Extract Systems\ESFAMService
 ) else (
 set logdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\LogFiles\Misc
+set dbdir=C:\Documents and Settings\All Users\Application Data\Extract Systems\ESFAMService
 )
 
 :: Write .fps file path to tmp file, save value to variable, delete tmp file
-"%ccdir%\sqlcompactexporter" "%ccdir%\ESFAMService.sdf" "select top(1) filename from fpsfile" "%cd%\tmp.txt"
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "select top(1) filename from fpsfile" "%cd%\tmp.txt"
 set /p fpspath=<"%cd%\tmp.txt"
 del "%cd%\tmp.txt"
 
@@ -72,12 +74,12 @@ net stop ESFamService
 :: -----------------------------------------------------------------------------
 
 :: email summary report
-:: DOES NOT WORK IN CURRENT INTERNAL BUILD (8.1.0.82)
+:: DOES NOT WORK IN CURRENT INTERNAL BUILD (9.0.0.1)
 "%ccdir%\ReportViewer.exe" (local) MEMORY_LEAK "Summary of Actions and Associated Document Counts" /mailto %recipients% /subject "%testobject% - %testname% has completed"
 
 :: email testdetails.bat
 call "%cd%\testdetails.bat"
-"%ccdir%\EmailFile.exe" /subject "%testobject% - %testname% testdetails.txt" "%workdir%\testdetails.txt" %recipients%
+"%ccdir%\EmailFile.exe" %recipients% "%workdir%\testdetails.txt" /subject "%testobject% - %testname% testdetails.txt" 
 del "%workdir%\testdetails.txt"
 
 :: wait another minute
@@ -111,13 +113,13 @@ if exist "%logdir%\*.uex" move "%logdir%\*.uex" "%testdir%\UEX_Logs"
 :: -----------------------------------------------------------------------------
 
 :: remove an entry from the service DB
-"%ccdir%\sqlcompactexporter" "%ccdir%\ESFAMService.sdf" "delete fpsfile where id in (select top (1) id from fpsfile)" ""
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "delete fpsfile where id in (select top (1) id from fpsfile)" ""
 
 :: set the first remaining entry to auto-start
-"%ccdir%\sqlcompactexporter" "%ccdir%\ESFAMService.sdf" "update fpsfile set autostart = 'true' where id in (select top (1) id from fpsfile)" ""
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set autostart = 'true' where id in (select top (1) id from fpsfile)" ""
 
 :: write out temp file if there is another .fps file in the database
-"%ccdir%\sqlcompactexporter" "%ccdir%\ESFAMService.sdf" "select top(1) filename from fpsfile" "%cd%\continue.txt"
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "select top(1) filename from fpsfile" "%cd%\continue.txt"
 
 :: wait a min
 "%ccdir%\sleep" 1m
