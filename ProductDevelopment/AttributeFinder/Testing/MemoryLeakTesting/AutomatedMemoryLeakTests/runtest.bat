@@ -116,7 +116,7 @@ if exist "%logdir%\*.uex" move "%logdir%\*.uex" "%testdir%\UEX_Logs"
 "%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "delete fpsfile where id in (select top (1) id from fpsfile)" ""
 
 :: set the first remaining entry to auto-start
-"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set autostart = 'true' where id in (select top (1) id from fpsfile)" ""
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set NumberOfInstances = 1 where id in (select top (1) id from fpsfile)" ""
 
 :: write out temp file if there is another .fps file in the database
 "%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "select top(1) filename from fpsfile" "%cd%\continue.txt"

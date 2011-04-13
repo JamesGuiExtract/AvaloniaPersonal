@@ -33,10 +33,10 @@ for %%i in ("%cd%\*.sdf") do copy "%%i" "%dbdir%\ESFAMService.sdf"
 if defined programfiles(x86) "%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set filename=replace(filename,'Program Files\','Program Files (x86)\')" ""
 
 :: set all entries to not auto-start
-"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set autostart = 'false'" ""
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set NumberOfInstances = 0" ""
 
 :: set the first entry to auto-start
-"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set autostart = 'true' where id in (select top (1) id from fpsfile)" ""
+"%ccdir%\sqlcompactexporter" "%dbdir%\ESFAMService.sdf" "update fpsfile set NumberOfInstances = 1 where id in (select top (1) id from fpsfile)" ""
 
 
 :: -----------------------------------------------------------------------------
