@@ -403,5 +403,107 @@ namespace Extract.Encryption
                     && decryptedText2 == text);
             }
         }
+
+        /// <summary>
+        /// Tests encrypting a stream.
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public static void Automated_TestEncryptingStream()
+        {
+            string textToEncrypt = "This is the text to encrypt.";
+            string password = "abcABC123;";
+            var encoding = new UnicodeEncoding();
+            using (MemoryStream plainStream = new MemoryStream(encoding.GetBytes(textToEncrypt)),
+                cipherStream = new MemoryStream())
+            {
+                ExtractEncryption.EncryptStream(plainStream, cipherStream, password);
+                cipherStream.Flush();
+                var result = encoding.GetString(cipherStream.ToArray());
+
+                Assert.That(!textToEncrypt.Equals(result, StringComparison.Ordinal));
+            }
+        }
+
+        /// <summary>
+        /// Tests encrypting a stream via the extension method.
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public static void Automated_TestEncryptingStreamExtension()
+        {
+            string textToEncrypt = "This is the text to encrypt.";
+            string password = "abcABC123;";
+            var encoding = new UnicodeEncoding();
+            using (MemoryStream plainStream = new MemoryStream(encoding.GetBytes(textToEncrypt)),
+                cipherStream = new MemoryStream())
+            {
+                plainStream.ExtractEncrypt(cipherStream, password);
+                cipherStream.Flush();
+                var result = encoding.GetString(cipherStream.ToArray());
+
+                Assert.That(!textToEncrypt.Equals(result, StringComparison.Ordinal));
+            }
+        }
+
+        /// <summary>
+        /// Tests decrypting a stream.
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public static void Automated_TestDecryptingStream()
+        {
+            string textToEncrypt = "This is the text to encrypt.";
+            string password = "abcABC123;";
+            var encoding = new UnicodeEncoding();
+            byte[] cipher = null;
+            using (MemoryStream plainStream = new MemoryStream(encoding.GetBytes(textToEncrypt)),
+                cipherStream = new MemoryStream())
+            {
+                ExtractEncryption.EncryptStream(plainStream, cipherStream, password);
+                cipherStream.Flush();
+                cipher = cipherStream.ToArray();
+            }
+
+            using (MemoryStream plainStream = new MemoryStream(),
+                cipherStream = new MemoryStream(cipher))
+            {
+                ExtractEncryption.DecryptStream(cipherStream, plainStream, password);
+                plainStream.Flush();
+
+                var result = encoding.GetString(plainStream.ToArray());
+                Assert.That(textToEncrypt.Equals(result, StringComparison.Ordinal));
+            }
+        }
+
+        /// <summary>
+        /// Tests decrypting a stream via the extension method.
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public static void Automated_TestDecryptingStreamExtension()
+        {
+            string textToEncrypt = "This is the text to encrypt.";
+            string password = "abcABC123;";
+            var encoding = new UnicodeEncoding();
+            byte[] cipher = null;
+            using (MemoryStream plainStream = new MemoryStream(encoding.GetBytes(textToEncrypt)),
+                cipherStream = new MemoryStream())
+            {
+                plainStream.ExtractEncrypt(cipherStream, password);
+                cipherStream.Flush();
+                cipher = cipherStream.ToArray();
+            }
+
+            using (MemoryStream plainStream = new MemoryStream(),
+                cipherStream = new MemoryStream(cipher))
+            {
+                cipherStream.ExtractDecrypt(plainStream, password);
+                plainStream.Flush();
+
+                var result = encoding.GetString(plainStream.ToArray());
+                Assert.That(textToEncrypt.Equals(result, StringComparison.Ordinal));
+            }
+        }
     }
 }

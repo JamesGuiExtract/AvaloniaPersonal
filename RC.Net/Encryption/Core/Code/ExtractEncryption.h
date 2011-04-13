@@ -5,6 +5,7 @@
 using namespace Extract::Licensing;
 using namespace System;
 using namespace System::Diagnostics::CodeAnalysis;
+using namespace System::IO;
 using namespace System::Reflection;
 using namespace System::Security::Cryptography;
 using namespace System::Text;
@@ -71,6 +72,15 @@ namespace Extract
 			static void EncryptTextFile(String^ data, String^ encryptedFileName, bool overwrite,
 				MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
+			// PURPOSE: To encrypt the bytes contained in the input stream and place them in
+			//			the cipher data stream. The encryption key will be generated from
+			//			the provided password.
+			//
+			// ARGS:	plainData - The input stream to read the data from
+			//			cipherData - The output stream to write the encrypted bytes to
+			//			password - The password used to generate the encryption key
+			static void EncryptStream(Stream^ plainData, Stream^ cipherData, String^ password);
+            //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt the specified binary file
 			//
 			// ARGS:	fileName - The file to be decrypted
@@ -102,8 +112,21 @@ namespace Extract
 			//					   signed by Extract Systems
 			// RETURNS:	A string containing the decrypted data
 			static String^ DecryptString(String^ data, MapLabel^ mapLabel);
+            //--------------------------------------------------------------------------------------
+			// PURPOSE: To decrypt the bytes contained in the input stream and place them in
+			//			the plain data stream. The decryption key will be generated from
+			//			the provided password.
+			//
+			// ARGS:	cipherData - The input stream to read the encrypted bytes from
+			//			plainData - The output stream to write the decrypted data to
+			//			password - The password used to generate the decryption key
+			static void DecryptStream(Stream^ cipherData, Stream^ plainData, String^ password);
 
 		private:
+
+			// Tag prepended to a stream that will be password encrypted
+			static System::String^ _STREAM_ENCRYPT_TAG = "ExtractPasswordStreamEncryption";
+
             //--------------------------------------------------------------------------------------
 			// Private variables
             //--------------------------------------------------------------------------------------
@@ -131,6 +154,10 @@ namespace Extract
 			// PURPOSE: To return a new instance of the RijndaelManaged encryption object.
 			static RijndaelManaged^ GetRijndael();
             //--------------------------------------------------------------------------------------
+			// PURPOSE: To return a new instance of the RijndaelManaged encryption object,
+			//			with its key initialized by the specified password.
+			static RijndaelManaged^ GetRijndael(System::String^ password);
+            //--------------------------------------------------------------------------------------
 			// PURPOSE: To return a new instance of the RSA encryption object.
 			static RSACryptoServiceProvider^ GetRSA();
             //--------------------------------------------------------------------------------------
@@ -153,6 +180,18 @@ namespace Extract
 			static String^ ExtractDecrypt(String^ value, MapLabel^ mapLabel)
 			{
 				return ExtractEncryption::DecryptString(value, mapLabel);
+			}
+
+			[System::Runtime::CompilerServices::Extension]
+			static void ExtractEncrypt(Stream^ plainData, Stream^ cipherData, String^ password)
+			{
+				ExtractEncryption::EncryptStream(plainData, cipherData, password);
+			}
+
+			[System::Runtime::CompilerServices::Extension]
+			static void ExtractDecrypt(Stream^ cipherData, Stream^ plainData, String^ password)
+			{
+				ExtractEncryption::DecryptStream(cipherData, plainData, password);
 			}
 		};
 	};

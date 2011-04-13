@@ -8,6 +8,7 @@
 using namespace Extract;
 using namespace Extract::Encryption;
 using namespace System;
+using namespace System::Collections::Generic;
 using namespace System::IO;
 using namespace System::Reflection;
 using namespace System::Security::Cryptography;
@@ -51,9 +52,14 @@ const size_t _LENGTH = 2344;
 
 const int _KEY_SIZE = 256;
 const int _IV_LENGTH = 32;
+const int _BUFFER_SIZE = 1024;
 
-// Current version
+// Current versions
 const int _VERSION = 1;
+
+// Version 1 - Makes use of the version RSA key
+const int _PASSWORD_ENCRYPT_VERSION = 1;
+
 //--------------------------------------------------------------------------------------------------
 // Local methods
 //--------------------------------------------------------------------------------------------------
@@ -283,6 +289,50 @@ void ExtractEncryption::EncryptTextFile(System::String ^data, System::String ^en
 	}
 }
 //--------------------------------------------------------------------------------------------------
+void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, String^ password)
+{
+	RijndaelManaged^ rjndl = nullptr;
+	CryptoStream^ cryptoStream = nullptr;
+	try
+	{
+		// Write the tag and version number to the stream
+		auto encoding = gcnew UnicodeEncoding();
+		auto name = encoding->GetBytes(_STREAM_ENCRYPT_TAG);
+		auto length = name->Length;
+		cipherData->Write(BitConverter::GetBytes(length), 0, 4);
+		cipherData->Write(name, 0, length);
+		cipherData->Write(BitConverter::GetBytes(_PASSWORD_ENCRYPT_VERSION), 0, 4);
+
+		rjndl = GetRijndael(password);
+		cryptoStream = gcnew CryptoStream(cipherData, rjndl->CreateEncryptor(),
+			CryptoStreamMode::Write);
+		auto buffer = gcnew array<Byte>(_BUFFER_SIZE);
+		auto bytes = plainData->Read(buffer, 0, _BUFFER_SIZE);
+		while (bytes > 0)
+		{
+			cryptoStream->Write(buffer, 0, bytes);
+			bytes = plainData->Read(buffer, 0, _BUFFER_SIZE);
+		}
+		cryptoStream->FlushFinalBlock();
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI32306", ex);
+	}
+	finally
+	{
+		// Close the streams and clear the encryption objects
+		if (cryptoStream != nullptr)
+		{
+			cryptoStream->Close();
+		}
+		if (rjndl != nullptr)
+		{
+			rjndl->Clear();
+		}
+	}
+}
+//--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
 array<Byte>^ ExtractEncryption::DecryptBinaryFile(String^ fileName, MapLabel^ mapLabel)
 {
@@ -369,6 +419,74 @@ String^ ExtractEncryption::DecryptString(String^ data, MapLabel^ mapLabel)
 	catch(Exception^ ex)
 	{
 		throw ExtractException::AsExtractException("ELI22639", ex);
+	}
+}
+//--------------------------------------------------------------------------------------------------
+void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, String^ password)
+{
+	RijndaelManaged^ rjndl = nullptr;
+	CryptoStream^ cryptoStream = nullptr;
+	try
+	{
+		auto encoding = gcnew UnicodeEncoding();
+		auto data = gcnew array<Byte>(4);
+
+		// Read the tag from the stream
+		cipherData->Read(data, 0, 4);
+		auto length = BitConverter::ToInt32(data, 0);
+		auto tag = gcnew array<Byte>(length);
+		cipherData->Read(tag, 0, length);
+
+		// Validate the tag
+		if (!_STREAM_ENCRYPT_TAG->Equals(encoding->GetString(tag), StringComparison::Ordinal))
+		{
+			// Throw an exception
+			auto ee = gcnew ExtractException("ELI32309", "Unrecognized tag in stream.");
+			ee->AddDebugData("Tag Loaded", encoding->GetString(tag), true);
+			ee->AddDebugData("Tag Expected", _STREAM_ENCRYPT_TAG, true);
+			throw ee;
+		}
+
+		// Check the version
+		Array::Clear(data, 0, 4);
+		cipherData->Read(data, 0, 4);
+		auto version = BitConverter::ToInt32(data, 0);
+		if (version > _PASSWORD_ENCRYPT_VERSION)
+		{
+			// Throw an exception
+			auto ee = gcnew ExtractException("ELI32310", "Unrecognized version number.");
+			ee->AddDebugData("Current version", _PASSWORD_ENCRYPT_VERSION, false);
+			ee->AddDebugData("Version to load", version, false);
+			throw ee;
+		}
+
+		rjndl = GetRijndael(password);
+		cryptoStream = gcnew CryptoStream(plainData, rjndl->CreateDecryptor(),
+			CryptoStreamMode::Write);
+		auto buffer = gcnew array<Byte>(_BUFFER_SIZE);
+		auto bytes = cipherData->Read(buffer, 0, _BUFFER_SIZE);
+		while (bytes > 0)
+		{
+			cryptoStream->Write(buffer, 0, bytes);
+			bytes = cipherData->Read(buffer, 0, _BUFFER_SIZE);
+		}
+		cryptoStream->FlushFinalBlock();
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI32307", ex);
+	}
+	finally
+	{
+		// Close the streams and clear the encryption objects
+		if (cryptoStream != nullptr)
+		{
+			cryptoStream->Close();
+		}
+		if (rjndl != nullptr)
+		{
+			rjndl->Clear();
+		}
 	}
 }
 
@@ -602,6 +720,59 @@ RijndaelManaged^ ExtractEncryption::GetRijndael()
 	rjndl->BlockSize = _KEY_SIZE;
 	rjndl->Mode = CipherMode::CBC;
 	rjndl->Padding = PaddingMode::ISO10126;
+
+	// Return the new object
+	return rjndl;
+}
+//--------------------------------------------------------------------------------------------------
+RijndaelManaged^ ExtractEncryption::GetRijndael(System::String^ password)
+{
+	auto encoding = gcnew UnicodeEncoding();
+	auto sha = gcnew SHA512Managed();
+	auto passHash = sha->ComputeHash(encoding->GetBytes(password));
+	array<Byte>^ otherHash = nullptr;
+
+	// Create an array to hold the modified key
+	array<Byte>^ keyBytes = gcnew array<Byte>(getDestinationLength());
+
+	// Scope for pin_ptr
+	{
+		// Pin the array so we can pass it to the unmanaged code
+		pin_ptr<Byte> p = &keyBytes[0];
+
+		// Copy the data into the array
+		modifyData((unsigned char*)p);
+
+		// Get the hash of the key data
+		otherHash = sha->ComputeHash(keyBytes);
+
+		// Clear the array
+		Array::Clear(keyBytes,0, keyBytes->Length);
+	}
+
+	auto combined = gcnew List<Byte>();
+	auto iv = gcnew List<Byte>();
+	for(int i=0; i < otherHash->Length; i ++)
+	{
+		auto value = (Byte)(passHash[i] ^ otherHash[i]);
+		if (i % 2 == 0)
+		{
+			combined->Add(value);
+		}
+		else
+		{
+			iv->Add((Byte)(value ^ 42));
+		}
+	}
+
+	// Create the Rijndael encryption object and set the properties
+	RijndaelManaged^ rjndl = gcnew RijndaelManaged();
+	rjndl->KeySize = _KEY_SIZE;
+	rjndl->BlockSize = _KEY_SIZE;
+	rjndl->Mode = CipherMode::CBC;
+	rjndl->Padding = PaddingMode::ISO10126;
+	rjndl->Key = combined->ToArray();
+	rjndl->IV = iv->ToArray();
 
 	// Return the new object
 	return rjndl;

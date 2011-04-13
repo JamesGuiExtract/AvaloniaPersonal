@@ -113,13 +113,20 @@ namespace Extract.FileActionManager.Database
         /// <param name="database">The database.</param>
         public FAMDatabaseOptionsDialog(string server, string database)
         {
-            LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-            InitializeComponent();
+            try
+            {
+                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                InitializeComponent();
 
-            _server = server;
-            _database = database;
+                _server = server;
+                _database = database;
 
-            _keysToCheckBox = BuildListOfKeysToCheckBoxes();
+                _keysToCheckBox = BuildListOfKeysToCheckBoxes();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32308");
+            }
         }
 
         #endregion Constructors
