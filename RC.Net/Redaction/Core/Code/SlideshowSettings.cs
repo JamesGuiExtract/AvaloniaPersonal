@@ -18,8 +18,11 @@ namespace Extract.Redaction
 
         /// <summary>
         /// The current version number for this object
+        /// <para>Version 2</para>
+        /// Added "Confirm slideshow operator alertness" options.
+        /// Added "Set full-page view mode when slideshow is started" option.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -76,6 +79,31 @@ namespace Extract.Redaction
         /// </summary>
         readonly ObjectWithDescription _documentCondition;
 
+        /// <summary>
+        /// Indicates whether fit-to-page mode should be applied automatically when the slideshow
+        /// starts.
+        /// </summary>
+        readonly bool _forceFitToPageMode;
+
+        /// <summary>
+        /// Indicates whether the user should be prompted at random intervals to provide a simple
+        /// reply to ensure documents are not being commited without being reviewed.
+        /// </summary>
+        readonly bool _promptRandomly;
+
+        /// <summary>
+        /// Indicates the maximum number of pages the slideshow can automatically advance without
+        /// prompting the user. Applies only when <see cref="_promptRandomly"/> is
+        /// <see langword="true"/>.
+        /// </summary>
+        readonly int _promptInterval;
+
+        /// <summary>
+        /// Indicates whether the user should be required to hold the run key to run the slideshow
+        /// to help ensure documents are not being commited without being reviewed.
+        /// </summary>
+        readonly bool _requireRunKey;
+
         #endregion Fields
 
         #region Constructors
@@ -85,7 +113,7 @@ namespace Extract.Redaction
         /// </summary>
         public SlideshowSettings()
             : this(true, false, string.Empty, false, string.Empty, EActionStatus.kActionPending,
-                false, new ObjectWithDescriptionClass())
+                false, new ObjectWithDescriptionClass(), true, true, 25, false)
         {
         }
 
@@ -107,11 +135,23 @@ namespace Extract.Redaction
         /// slideshow for documents which match <see paramref="documentCondition"/>.</param>
         /// <param name="documentCondition">The <see cref="IFAMCondition"/> that determines for
         /// which documents the slideshow should be paused.</param>
+        /// <param name="forceFitToPageMode">Indicates whether fit-to-page mode should be applied
+        /// automatically when the slideshow starts.</param>
+        /// <param name="promptRandomly">Indicates whether the user should be prompted at random
+        /// intervals to provide a simple reply to ensure documents are not being commited without
+        /// being reviewed.</param>
+        /// <param name="promptInterval">Indicates the maximum number of pages the slideshow can
+        /// automatically advance without prompting the user. Applies only when
+        /// <see paramref="promptRandomly"/> is <see langword="true"/>.</param>
+        /// <param name="requireRunKey">Indicates whether the user should be required to hold the
+        /// run key to run the slideshow to help ensure documents are not being commited without
+        /// being reviewed.</param>
         [CLSCompliant(false)]
         public SlideshowSettings(bool slideshowEnabled, bool applyAutoAdvanceTag,
             string autoAdvanceTag, bool applyAutoAdvanceActionStatus, string autoAdvanceActionName,
             EActionStatus autoAdvanceActionStatus, bool checkDocTypeCondition,
-            ObjectWithDescription documentCondition)
+            ObjectWithDescription documentCondition, bool forceFitToPageMode, bool promptRandomly,
+            int promptInterval, bool requireRunKey)
         {
             try
             {
@@ -124,6 +164,10 @@ namespace Extract.Redaction
                 _checkDocumentCondition = checkDocTypeCondition;
                 ICopyableObject copyableDocumentCondition = (ICopyableObject)documentCondition;
                 _documentCondition = (ObjectWithDescription)copyableDocumentCondition.Clone();
+                _forceFitToPageMode = forceFitToPageMode;
+                _promptRandomly = promptRandomly;
+                _promptInterval = promptInterval;
+                _requireRunKey = requireRunKey;
             }
             catch (Exception ex)
             {
@@ -272,6 +316,68 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether fit-to-page page mode should be applied automatically
+        /// when the slideshow starts.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if fit-to-page should be applied automatically;
+        /// <see langword="false"/> otherwise.
+        /// </value>
+        public bool ForceFitToPageMode
+        {
+            get
+            {
+                return _forceFitToPageMode;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the user should be prompted at random intervals to
+        /// provide a simple reply to ensure documents are not being commited without being
+        /// reviewed.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to prompt the operator at random intervals while the slideshow is
+        /// running;<see langword="false"/> otherwise.
+        /// </value>
+        public bool PromptRandomly
+        {
+            get
+            {
+                return _promptRandomly;
+            }
+        }
+
+        /// <summary>
+        /// Indicates the maximum number of pages the slideshow can automatically advance without
+        /// prompting the user. Applies only when <see cref="PromptRandomly"/> is
+        /// <see langword="true"/>.
+        /// </summary>
+        public int PromptInterval
+        {
+            get
+            {
+                return _promptInterval;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the user should be required to hold the run key to run
+        /// the slideshow to help ensure documents are not being commited without being reviewed.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the user is required to use the run key to run the slideshow;
+        /// <see langword="false"/> otherwise.
+        /// </value>
+        public bool RequireRunKey
+        {
+            get
+            {
+                return _requireRunKey;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -307,10 +413,15 @@ namespace Extract.Redaction
                 bool applyDocTypeCondition = reader.ReadBoolean();
                 ObjectWithDescription documentCondition =
                     (ObjectWithDescription)reader.ReadIPersistStream();
+                bool forceFitToPageMode = (version < 2) ? true : reader.ReadBoolean();
+                bool promptRandomly = (version < 2) ? true : reader.ReadBoolean();
+                int promptInterval = (version < 2) ? 25 : reader.ReadInt32();
+                bool requireRunKey = (version < 2) ? false : reader.ReadBoolean();
 
                 return new SlideshowSettings(slideshowEnabled, applyAutoAdvanceTag, autoAdvanceTag,
                     applyAutoAdvanceActionStatus, autoAdvanceActionName, autoAdvanceActionStatus,
-                    applyDocTypeCondition, documentCondition);
+                    applyDocTypeCondition, documentCondition, forceFitToPageMode, promptRandomly,
+                    promptInterval, requireRunKey);
             }
             catch (Exception ex)
             {
@@ -337,6 +448,10 @@ namespace Extract.Redaction
                 writer.Write((int)_autoAdvanceActionStatus);
                 writer.Write(_checkDocumentCondition);
                 writer.Write((IPersistStream)_documentCondition, true);
+                writer.Write(_forceFitToPageMode);
+                writer.Write(_promptRandomly);
+                writer.Write(_promptInterval);
+                writer.Write(_requireRunKey);
             }
             catch (Exception ex)
             {

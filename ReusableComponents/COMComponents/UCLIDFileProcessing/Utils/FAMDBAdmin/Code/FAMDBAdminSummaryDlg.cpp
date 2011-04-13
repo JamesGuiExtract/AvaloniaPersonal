@@ -428,7 +428,7 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 				"No exceptions", MB_OK | MB_ICONINFORMATION);
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31254");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32305");
 }
 
 //--------------------------------------------------------------------------------------------------

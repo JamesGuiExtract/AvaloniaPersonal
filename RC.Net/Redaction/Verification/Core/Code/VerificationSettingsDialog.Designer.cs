@@ -41,9 +41,11 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.GroupBox groupBox1;
             System.Windows.Forms.GroupBox groupBox2;
             System.Windows.Forms.Label label1;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationSettingsDialog)); 
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationSettingsDialog));
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox4;
+            this._seamlessNavigationCheckBox = new System.Windows.Forms.CheckBox();
+            this._verifyAllItemsCheckBox = new System.Windows.Forms.CheckBox();
             this._launchFullScreenCheckBox = new System.Windows.Forms.CheckBox();
             this._enableInputEventTrackingCheckBox = new System.Windows.Forms.CheckBox();
             this._feedbackSettingsButton = new System.Windows.Forms.Button();
@@ -51,13 +53,14 @@ namespace Extract.Redaction.Verification
             this._requireExemptionsCheckBox = new System.Windows.Forms.CheckBox();
             this._requireTypeCheckBox = new System.Windows.Forms.CheckBox();
             this._verifyAllPagesCheckBox = new System.Windows.Forms.CheckBox();
+            this._promptForSaveUntilCommit = new System.Windows.Forms.CheckBox();
             this._actionNamePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._actionStatusComboBox = new System.Windows.Forms.ComboBox();
             this._actionNameComboBox = new Extract.Utilities.Forms.BetterComboBox();
             this._fileActionCheckBox = new System.Windows.Forms.CheckBox();
             this._backdropImagePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._backdropImageBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._backdropImageTextBox = new System.Windows.Forms.TextBox();
+            this._backdropImageBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._backdropImageCheckBox = new System.Windows.Forms.CheckBox();
             this._slideshowSettingsButton = new System.Windows.Forms.Button();
             this._enableSlideshowCheckBox = new System.Windows.Forms.CheckBox();
@@ -77,6 +80,10 @@ namespace Extract.Redaction.Verification
             // 
             // groupBox1
             // 
+            groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            groupBox1.Controls.Add(this._seamlessNavigationCheckBox);
+            groupBox1.Controls.Add(this._verifyAllItemsCheckBox);
             groupBox1.Controls.Add(this._launchFullScreenCheckBox);
             groupBox1.Controls.Add(this._enableInputEventTrackingCheckBox);
             groupBox1.Controls.Add(this._feedbackSettingsButton);
@@ -84,39 +91,60 @@ namespace Extract.Redaction.Verification
             groupBox1.Controls.Add(this._requireExemptionsCheckBox);
             groupBox1.Controls.Add(this._requireTypeCheckBox);
             groupBox1.Controls.Add(this._verifyAllPagesCheckBox);
+            groupBox1.Controls.Add(this._promptForSaveUntilCommit);
             groupBox1.Location = new System.Drawing.Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(369, 163);
+            groupBox1.Size = new System.Drawing.Size(429, 228);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "General";
             // 
+            // _seamlessNavigationCheckBox
+            // 
+            this._seamlessNavigationCheckBox.AutoSize = true;
+            this._seamlessNavigationCheckBox.Location = new System.Drawing.Point(7, 112);
+            this._seamlessNavigationCheckBox.Name = "_seamlessNavigationCheckBox";
+            this._seamlessNavigationCheckBox.Size = new System.Drawing.Size(283, 17);
+            this._seamlessNavigationCheckBox.TabIndex = 4;
+            this._seamlessNavigationCheckBox.Text = "Enable seamless page navigation between documents";
+            this._seamlessNavigationCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _verifyAllItemsCheckBox
+            // 
+            this._verifyAllItemsCheckBox.AutoSize = true;
+            this._verifyAllItemsCheckBox.Location = new System.Drawing.Point(7, 43);
+            this._verifyAllItemsCheckBox.Name = "_verifyAllItemsCheckBox";
+            this._verifyAllItemsCheckBox.Size = new System.Drawing.Size(300, 17);
+            this._verifyAllItemsCheckBox.TabIndex = 1;
+            this._verifyAllItemsCheckBox.Text = "Require users to review every suggested redaction or clue";
+            this._verifyAllItemsCheckBox.UseVisualStyleBackColor = true;
+            // 
             // _launchFullScreenCheckBox
             // 
             this._launchFullScreenCheckBox.AutoSize = true;
-            this._launchFullScreenCheckBox.Location = new System.Drawing.Point(7, 139);
+            this._launchFullScreenCheckBox.Location = new System.Drawing.Point(7, 183);
             this._launchFullScreenCheckBox.Name = "_launchFullScreenCheckBox";
             this._launchFullScreenCheckBox.Size = new System.Drawing.Size(236, 17);
-            this._launchFullScreenCheckBox.TabIndex = 6;
+            this._launchFullScreenCheckBox.TabIndex = 8;
             this._launchFullScreenCheckBox.Text = "Open verification window in full screen mode";
             this._launchFullScreenCheckBox.UseVisualStyleBackColor = true;
             // 
             // _enableInputEventTrackingCheckBox
             // 
             this._enableInputEventTrackingCheckBox.AutoSize = true;
-            this._enableInputEventTrackingCheckBox.Location = new System.Drawing.Point(7, 115);
+            this._enableInputEventTrackingCheckBox.Location = new System.Drawing.Point(7, 159);
             this._enableInputEventTrackingCheckBox.Name = "_enableInputEventTrackingCheckBox";
             this._enableInputEventTrackingCheckBox.Size = new System.Drawing.Size(156, 17);
-            this._enableInputEventTrackingCheckBox.TabIndex = 5;
+            this._enableInputEventTrackingCheckBox.TabIndex = 7;
             this._enableInputEventTrackingCheckBox.Text = "Enable input event tracking";
             this._enableInputEventTrackingCheckBox.UseVisualStyleBackColor = true;
             // 
             // _feedbackSettingsButton
             // 
-            this._feedbackSettingsButton.Location = new System.Drawing.Point(274, 88);
+            this._feedbackSettingsButton.Location = new System.Drawing.Point(274, 132);
             this._feedbackSettingsButton.Name = "_feedbackSettingsButton";
             this._feedbackSettingsButton.Size = new System.Drawing.Size(75, 23);
-            this._feedbackSettingsButton.TabIndex = 4;
+            this._feedbackSettingsButton.TabIndex = 6;
             this._feedbackSettingsButton.Text = "Settings...";
             this._feedbackSettingsButton.UseVisualStyleBackColor = true;
             this._feedbackSettingsButton.Click += new System.EventHandler(this.HandleFeedbackSettingsButtonClick);
@@ -124,10 +152,10 @@ namespace Extract.Redaction.Verification
             // _collectFeedbackCheckBox
             // 
             this._collectFeedbackCheckBox.AutoSize = true;
-            this._collectFeedbackCheckBox.Location = new System.Drawing.Point(7, 92);
+            this._collectFeedbackCheckBox.Location = new System.Drawing.Point(7, 136);
             this._collectFeedbackCheckBox.Name = "_collectFeedbackCheckBox";
             this._collectFeedbackCheckBox.Size = new System.Drawing.Size(261, 17);
-            this._collectFeedbackCheckBox.TabIndex = 3;
+            this._collectFeedbackCheckBox.TabIndex = 5;
             this._collectFeedbackCheckBox.Text = "Enable collection of redaction accuracy feedback";
             this._collectFeedbackCheckBox.UseVisualStyleBackColor = true;
             this._collectFeedbackCheckBox.CheckedChanged += new System.EventHandler(this.HandleCollectFeedbackCheckBoxCheckedChanged);
@@ -135,20 +163,20 @@ namespace Extract.Redaction.Verification
             // _requireExemptionsCheckBox
             // 
             this._requireExemptionsCheckBox.AutoSize = true;
-            this._requireExemptionsCheckBox.Location = new System.Drawing.Point(7, 68);
+            this._requireExemptionsCheckBox.Location = new System.Drawing.Point(7, 89);
             this._requireExemptionsCheckBox.Name = "_requireExemptionsCheckBox";
             this._requireExemptionsCheckBox.Size = new System.Drawing.Size(289, 17);
-            this._requireExemptionsCheckBox.TabIndex = 2;
+            this._requireExemptionsCheckBox.TabIndex = 3;
             this._requireExemptionsCheckBox.Text = "Require users to specify exemption codes for redactions";
             this._requireExemptionsCheckBox.UseVisualStyleBackColor = true;
             // 
             // _requireTypeCheckBox
             // 
             this._requireTypeCheckBox.AutoSize = true;
-            this._requireTypeCheckBox.Location = new System.Drawing.Point(7, 44);
+            this._requireTypeCheckBox.Location = new System.Drawing.Point(7, 66);
             this._requireTypeCheckBox.Name = "_requireTypeCheckBox";
             this._requireTypeCheckBox.Size = new System.Drawing.Size(276, 17);
-            this._requireTypeCheckBox.TabIndex = 1;
+            this._requireTypeCheckBox.TabIndex = 2;
             this._requireTypeCheckBox.Text = "Require users to specify redaction type for redactions";
             this._requireTypeCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -157,22 +185,34 @@ namespace Extract.Redaction.Verification
             this._verifyAllPagesCheckBox.AutoSize = true;
             this._verifyAllPagesCheckBox.Location = new System.Drawing.Point(7, 20);
             this._verifyAllPagesCheckBox.Name = "_verifyAllPagesCheckBox";
-            this._verifyAllPagesCheckBox.Size = new System.Drawing.Size(198, 17);
+            this._verifyAllPagesCheckBox.Size = new System.Drawing.Size(239, 17);
             this._verifyAllPagesCheckBox.TabIndex = 0;
-            this._verifyAllPagesCheckBox.Text = "Include all pages in redaction review";
+            this._verifyAllPagesCheckBox.Text = "Require users to visit all pages in a document";
             this._verifyAllPagesCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _promptForSaveUntilCommit
+            // 
+            this._promptForSaveUntilCommit.AutoSize = true;
+            this._promptForSaveUntilCommit.Location = new System.Drawing.Point(7, 205);
+            this._promptForSaveUntilCommit.Name = "_promptForSaveUntilCommit";
+            this._promptForSaveUntilCommit.Size = new System.Drawing.Size(398, 17);
+            this._promptForSaveUntilCommit.TabIndex = 9;
+            this._promptForSaveUntilCommit.Text = "Prompt to save changes before navigating away from un-commited documents.";
+            this._promptForSaveUntilCommit.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
+            groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             groupBox2.Controls.Add(label1);
             groupBox2.Controls.Add(this._actionNamePathTagsButton);
             groupBox2.Controls.Add(this._actionStatusComboBox);
             groupBox2.Controls.Add(this._actionNameComboBox);
             groupBox2.Controls.Add(this._fileActionCheckBox);
-            groupBox2.Location = new System.Drawing.Point(12, 383);
+            groupBox2.Location = new System.Drawing.Point(12, 448);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new System.Drawing.Size(369, 78);
-            groupBox2.TabIndex = 3;
+            groupBox2.Size = new System.Drawing.Size(429, 78);
+            groupBox2.TabIndex = 4;
             groupBox2.TabStop = false;
             groupBox2.Text = "After committing a document";
             // 
@@ -198,6 +238,8 @@ namespace Extract.Redaction.Verification
             // 
             // _actionStatusComboBox
             // 
+            this._actionStatusComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._actionStatusComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._actionStatusComboBox.FormattingEnabled = true;
             this._actionStatusComboBox.Items.AddRange(new object[] {
@@ -208,7 +250,7 @@ namespace Extract.Redaction.Verification
             "Unattempted"});
             this._actionStatusComboBox.Location = new System.Drawing.Point(243, 43);
             this._actionStatusComboBox.Name = "_actionStatusComboBox";
-            this._actionStatusComboBox.Size = new System.Drawing.Size(120, 21);
+            this._actionStatusComboBox.Size = new System.Drawing.Size(179, 21);
             this._actionStatusComboBox.TabIndex = 4;
             // 
             // _actionNameComboBox
@@ -233,48 +275,54 @@ namespace Extract.Redaction.Verification
             // 
             // groupBox3
             // 
+            groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             groupBox3.Controls.Add(this._backdropImagePathTagsButton);
             groupBox3.Controls.Add(this._backdropImageBrowseButton);
             groupBox3.Controls.Add(this._backdropImageTextBox);
             groupBox3.Controls.Add(this._backdropImageCheckBox);
-            groupBox3.Location = new System.Drawing.Point(11, 248);
+            groupBox3.Location = new System.Drawing.Point(11, 313);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new System.Drawing.Size(369, 76);
+            groupBox3.Size = new System.Drawing.Size(429, 76);
             groupBox3.TabIndex = 2;
             groupBox3.TabStop = false;
             groupBox3.Text = "Image location";
             // 
             // _backdropImagePathTagsButton
             // 
+            this._backdropImagePathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._backdropImagePathTagsButton.Enabled = false;
             this._backdropImagePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_backdropImagePathTagsButton.Image")));
-            this._backdropImagePathTagsButton.Location = new System.Drawing.Point(311, 41);
+            this._backdropImagePathTagsButton.Location = new System.Drawing.Point(372, 41);
             this._backdropImagePathTagsButton.Name = "_backdropImagePathTagsButton";
             this._backdropImagePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._backdropImagePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._backdropImagePathTagsButton.TabIndex = 2;
-            this._backdropImagePathTagsButton.TextControl = _backdropImageTextBox;
+            this._backdropImagePathTagsButton.TextControl = this._backdropImageTextBox;
             this._backdropImagePathTagsButton.UseVisualStyleBackColor = true;
+            // 
+            // _backdropImageTextBox
+            // 
+            this._backdropImageTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._backdropImageTextBox.Enabled = false;
+            this._backdropImageTextBox.HideSelection = false;
+            this._backdropImageTextBox.Location = new System.Drawing.Point(6, 42);
+            this._backdropImageTextBox.Name = "_backdropImageTextBox";
+            this._backdropImageTextBox.Size = new System.Drawing.Size(360, 20);
+            this._backdropImageTextBox.TabIndex = 1;
             // 
             // _backdropImageBrowseButton
             // 
+            this._backdropImageBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._backdropImageBrowseButton.Enabled = false;
-            this._backdropImageBrowseButton.Location = new System.Drawing.Point(335, 41);
+            this._backdropImageBrowseButton.Location = new System.Drawing.Point(396, 41);
             this._backdropImageBrowseButton.Name = "_backdropImageBrowseButton";
             this._backdropImageBrowseButton.Size = new System.Drawing.Size(27, 20);
             this._backdropImageBrowseButton.TabIndex = 3;
             this._backdropImageBrowseButton.Text = "...";
             this._backdropImageBrowseButton.UseVisualStyleBackColor = true;
             this._backdropImageBrowseButton.PathSelected += new System.EventHandler<Extract.Utilities.Forms.PathSelectedEventArgs>(this.HandleBackdropImageBrowseButtonPathSelected);
-            // 
-            // _backdropImageTextBox
-            // 
-            this._backdropImageTextBox.Enabled = false;
-            this._backdropImageTextBox.HideSelection = false;
-            this._backdropImageTextBox.Location = new System.Drawing.Point(6, 42);
-            this._backdropImageTextBox.Name = "_backdropImageTextBox";
-            this._backdropImageTextBox.Size = new System.Drawing.Size(298, 20);
-            this._backdropImageTextBox.TabIndex = 1;
             // 
             // _backdropImageCheckBox
             // 
@@ -289,21 +337,24 @@ namespace Extract.Redaction.Verification
             // 
             // groupBox4
             // 
+            groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             groupBox4.Controls.Add(this._slideshowSettingsButton);
             groupBox4.Controls.Add(this._enableSlideshowCheckBox);
-            groupBox4.Location = new System.Drawing.Point(12, 330);
+            groupBox4.Location = new System.Drawing.Point(12, 395);
             groupBox4.Name = "groupBox4";
-            groupBox4.Size = new System.Drawing.Size(369, 47);
-            groupBox4.TabIndex = 4;
+            groupBox4.Size = new System.Drawing.Size(429, 47);
+            groupBox4.TabIndex = 3;
             groupBox4.TabStop = false;
             groupBox4.Text = "Slideshow";
             // 
             // _slideshowSettingsButton
             // 
-            this._slideshowSettingsButton.Location = new System.Drawing.Point(286, 15);
+            this._slideshowSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._slideshowSettingsButton.Location = new System.Drawing.Point(348, 15);
             this._slideshowSettingsButton.Name = "_slideshowSettingsButton";
             this._slideshowSettingsButton.Size = new System.Drawing.Size(75, 23);
-            this._slideshowSettingsButton.TabIndex = 19;
+            this._slideshowSettingsButton.TabIndex = 1;
             this._slideshowSettingsButton.Text = "Settings...";
             this._slideshowSettingsButton.UseVisualStyleBackColor = true;
             this._slideshowSettingsButton.Click += new System.EventHandler(this.HandleSlideshowSettingsButtonClick);
@@ -316,7 +367,7 @@ namespace Extract.Redaction.Verification
             this._enableSlideshowCheckBox.Location = new System.Drawing.Point(6, 19);
             this._enableSlideshowCheckBox.Name = "_enableSlideshowCheckBox";
             this._enableSlideshowCheckBox.Size = new System.Drawing.Size(187, 17);
-            this._enableSlideshowCheckBox.TabIndex = 18;
+            this._enableSlideshowCheckBox.TabIndex = 0;
             this._enableSlideshowCheckBox.Text = "Enable slideshow in verification UI";
             this._enableSlideshowCheckBox.UseVisualStyleBackColor = true;
             this._enableSlideshowCheckBox.CheckedChanged += new System.EventHandler(this.HandleEnableSlideshowCheckBoxCheckedChanged);
@@ -325,29 +376,31 @@ namespace Extract.Redaction.Verification
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(305, 469);
+            this._cancelButton.Location = new System.Drawing.Point(366, 532);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 5;
+            this._cancelButton.TabIndex = 6;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(224, 469);
+            this._okButton.Location = new System.Drawing.Point(285, 532);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 4;
+            this._okButton.TabIndex = 5;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
             // 
             // _dataFileControl
             // 
-            this._dataFileControl.Location = new System.Drawing.Point(11, 181);
+            this._dataFileControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._dataFileControl.Location = new System.Drawing.Point(11, 246);
             this._dataFileControl.Name = "_dataFileControl";
-            this._dataFileControl.Size = new System.Drawing.Size(369, 60);
+            this._dataFileControl.Size = new System.Drawing.Size(429, 60);
             this._dataFileControl.TabIndex = 1;
             // 
             // VerificationSettingsDialog
@@ -356,7 +409,7 @@ namespace Extract.Redaction.Verification
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(392, 504);
+            this.ClientSize = new System.Drawing.Size(453, 567);
             this.Controls.Add(groupBox4);
             this.Controls.Add(groupBox3);
             this.Controls.Add(groupBox2);
@@ -405,5 +458,8 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.CheckBox _launchFullScreenCheckBox;
         private System.Windows.Forms.Button _slideshowSettingsButton;
         private System.Windows.Forms.CheckBox _enableSlideshowCheckBox;
+        private System.Windows.Forms.CheckBox _seamlessNavigationCheckBox;
+        private System.Windows.Forms.CheckBox _verifyAllItemsCheckBox;
+        private System.Windows.Forms.CheckBox _promptForSaveUntilCommit;
     }
 }

@@ -201,9 +201,10 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets the [SlideshowSettings].
+        /// Gets the slideshow settings.
         /// </summary>
-        /// <value>The [SlideshowSettings].</value>
+        /// <value>An <see cref="SlideshowSettings"/> instance containing the settings for the
+        /// slideshow.</value>
         public SlideshowSettings SlideshowSettings
         {
             get

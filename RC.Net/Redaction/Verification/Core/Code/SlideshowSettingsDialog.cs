@@ -1,4 +1,5 @@
-﻿using Extract.Utilities.Forms;
+﻿using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -168,9 +169,38 @@ namespace Extract.Redaction.Verification
                 _pauseOnDocumentConditionCheckBox.Checked = _settings.CheckDocumentCondition;
                 _documentCondition = _settings.DocumentCondition;
 
+                _forceFitToPageModeCheckBox.Checked = _settings.ForceFitToPageMode;
+                _promptRandomlyRadioButton.Checked = _settings.PromptRandomly;
+                _promptIntervalUpDown.Value = _settings.PromptInterval;
+                _requireRunKeyRadioButton.Checked = _settings.RequireRunKey;
+
                 _loaded = true;
 
                 UpdateControls();
+
+                _promptRandomlyRadioButton.CheckedChanged += ((sender, eventArgs) =>
+                    {
+                        _promptIntervalUpDown.Enabled = _promptRandomlyRadioButton.Checked;
+                    });
+
+                _applyDocumentTagCheckBox.CheckedChanged += ((sender, eventArgs) =>
+                    {
+                        _tagNameComboBox.Enabled = _applyDocumentTagCheckBox.Checked;
+                    });
+
+                _setFileActionStatusCheckBox.CheckedChanged += ((sender, eventArgs) =>
+                    {
+                        bool enabled = _setFileActionStatusCheckBox.Checked;
+                        _actionNameComboBox.Enabled = enabled;
+                        _actionNamePathTagsButton.Enabled = enabled;
+                        _actionStatusComboBox.Enabled = enabled;
+                    });
+
+                _pauseOnDocumentConditionCheckBox.CheckedChanged += ((sender, eventArgs) =>
+                    {
+                        _documentConditionButton.Enabled = _pauseOnDocumentConditionCheckBox.Checked;
+                        _documentConditionTextBox.Enabled  = _pauseOnDocumentConditionCheckBox.Checked;
+                    });
             }
             catch (Exception ex)
             {
@@ -202,59 +232,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the document tag check box checked changed.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleDocumentTagCheckBoxCheckedChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                UpdateControls();
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI31041", ex);
-            }
-        }
-
-        /// <summary>
-        /// Handles the set file action status check box checked changed.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleSetFileActionStatusCheckBoxCheckedChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                UpdateControls();
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI31042", ex);
-            }
-        }
-
-        /// <summary>
-        /// Handles the check document condition check changed.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleCheckDocumentConditionCheckChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                UpdateControls();
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI31060", ex);
-            }
-        }
-
-        /// <summary>
         /// Handles the ok button click.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -273,7 +250,9 @@ namespace Extract.Redaction.Verification
                 _settings = new SlideshowSettings(true, _applyDocumentTagCheckBox.Checked,
                     _tagNameComboBox.Text, _setFileActionStatusCheckBox.Checked,
                     _actionNameComboBox.Text, GetActionStatusFromString(_actionStatusComboBox.Text),
-                    _pauseOnDocumentConditionCheckBox.Checked, _documentCondition);
+                    _pauseOnDocumentConditionCheckBox.Checked, _documentCondition,
+                    _forceFitToPageModeCheckBox.Checked, _promptRandomlyRadioButton.Checked,
+                    (int)_promptIntervalUpDown.Value, _requireRunKeyRadioButton.Checked);
 
                 this.DialogResult = DialogResult.OK;
             }
@@ -331,6 +310,27 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the case that the user entered an invalid value which was corrected.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandlePromptIntervalTextCorrected(object sender, EventArgs e)
+        {
+            try
+            {
+                UtilityMethods.ShowMessageBox(
+                    "The alertness prompt interval must be between 1 and 9999 pages.",
+                    "Invalid alertness prompt interval", true);
+                _promptIntervalUpDown.Focus();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI31125", ex);
+            }
+        }
+
         #endregion Event handlers
 
         #region Private members
@@ -357,6 +357,8 @@ namespace Extract.Redaction.Verification
                 {
                     _documentConditionTextBox.Text = _documentCondition.Description;
                 }
+
+                _promptIntervalUpDown.Enabled = _promptRandomlyRadioButton.Checked;
             }
         }
 

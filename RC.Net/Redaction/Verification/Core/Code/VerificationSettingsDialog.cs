@@ -119,10 +119,14 @@ namespace Extract.Redaction.Verification
         {
             // Get the settings
             bool verifyAllPages = _verifyAllPagesCheckBox.Checked;
+            bool verifyAllItems = _verifyAllItemsCheckBox.Checked;
             bool requireTypes = _requireTypeCheckBox.Checked;
             bool requireExemptions = _requireExemptionsCheckBox.Checked;
+            bool seamlessNavigation = _seamlessNavigationCheckBox.Checked;
+            bool promptForSaveUntilCommit = _promptForSaveUntilCommit.Checked;
 
-            return new GeneralVerificationSettings(verifyAllPages, requireTypes, requireExemptions);
+            return new GeneralVerificationSettings(verifyAllPages, verifyAllItems, requireTypes,
+                requireExemptions, seamlessNavigation, promptForSaveUntilCommit);
         }
 
         /// <summary>
@@ -173,10 +177,15 @@ namespace Extract.Redaction.Verification
             EActionStatus autoAdvanceActionStatus = _slideshowSettings.AutoAdvanceActionStatus;
             bool checkDocTypeConditon = _slideshowSettings.CheckDocumentCondition;
             ObjectWithDescription documentCondition = _slideshowSettings.DocumentCondition;
+            bool forcefitToPageMode = _slideshowSettings.ForceFitToPageMode;
+            bool promptRandomly = _slideshowSettings.PromptRandomly;
+            int promptInterval = _slideshowSettings.PromptInterval;
+            bool requireRunKey = _slideshowSettings.RequireRunKey;
 
             return new SlideshowSettings(enabled, applyAutoAdvanceTag, autoAdvanceTag,
                 applyAutoAdvanceActionStatus, autoAdvanceActionName, autoAdvanceActionStatus,
-                checkDocTypeConditon, documentCondition);
+                checkDocTypeConditon, documentCondition, forcefitToPageMode, promptRandomly,
+                promptInterval, requireRunKey);
         }
 
         /// <summary>
@@ -328,12 +337,15 @@ namespace Extract.Redaction.Verification
             {
                 // General settings
                 _verifyAllPagesCheckBox.Checked = _settings.General.VerifyAllPages;
+                _verifyAllItemsCheckBox.Checked = _settings.General.VerifyAllItems;
+                _requireExemptionsCheckBox.Checked = _settings.General.RequireExemptions;                
                 _requireTypeCheckBox.Checked = _settings.General.RequireTypes;
-                _requireExemptionsCheckBox.Checked = _settings.General.RequireExemptions;
-
-                // Feedback settings
+                _seamlessNavigationCheckBox.Checked = _settings.General.SeamlessNavigation;
                 _feedback = _settings.Feedback;
                 _collectFeedbackCheckBox.Checked = _feedback.Collect;
+                _enableInputEventTrackingCheckBox.Checked = _settings.EnableInputTracking;
+                _launchFullScreenCheckBox.Checked = _settings.LaunchInFullScreenMode;
+                _promptForSaveUntilCommit.Checked = _settings.General.PromptForSaveUntilCommit;
 
                 // ID Shield data file
                 _dataFileControl.DataFile = _settings.InputFile;
@@ -342,20 +354,14 @@ namespace Extract.Redaction.Verification
                 _backdropImageCheckBox.Checked = _settings.UseBackdropImage;
                 _backdropImageTextBox.Text = _settings.BackdropImage;
 
+                // Slideshow settings
+                _slideshowSettings = _settings.SlideshowSettings;
+                _enableSlideshowCheckBox.Checked = _slideshowSettings.SlideshowEnabled;
+
                 // Action status settings
                 _fileActionCheckBox.Checked = _settings.ActionStatusSettings.Enabled;
                 _actionNameComboBox.Text = GetInitialActionName();
                 _actionStatusComboBox.Text = GetStringFromActionStatus(_settings.ActionStatusSettings.ActionStatus);
-                
-                // Input tracking
-                _enableInputEventTrackingCheckBox.Checked = _settings.EnableInputTracking;
-
-                // Full screen mode
-                _launchFullScreenCheckBox.Checked = _settings.LaunchInFullScreenMode;
-
-                // Slideshow settings
-                _slideshowSettings = _settings.SlideshowSettings;
-                _enableSlideshowCheckBox.Checked = _slideshowSettings.SlideshowEnabled;
 
                 // Update the UI
                 UpdateControls();

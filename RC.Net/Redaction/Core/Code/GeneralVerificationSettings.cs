@@ -17,6 +17,12 @@ namespace Extract.Redaction
         readonly bool _verifyAllPages;
 
         /// <summary>
+        /// <see langword="true"/> if all suggested redactons and clues must be visted;
+        /// <see langword="false"/> otherwise. 
+        /// </summary>
+        readonly bool _verifyAllItems;
+
+        /// <summary>
         /// <see langword="true"/> if all redactions require a redaction type; 
         /// <see langword="false"/> if redactions can be saved without a redaction type.
         /// </summary>
@@ -28,6 +34,20 @@ namespace Extract.Redaction
         /// </summary>
         readonly bool _requireExemptions;
 
+        /// <summary>
+        /// <see langword="true"/> if all forward/backward navigation controls are permitted to move
+        /// to the previous/next document; <see langword="false"/> if only document navigation
+        /// controls are permitted to change documents.
+        /// </summary>
+        readonly bool _seamlessNavigation;
+
+        /// <summary>
+        /// <see langword="true"/> if the user should be prompted to save documents that have not
+        /// yet been committed when navigating away; <see langword="false"/> if the document should
+        /// be saved (and committed if appropriate) without prompting.
+        /// </summary>
+        readonly bool _promptForSaveUntilCommit;
+
         #endregion GeneralVerificationSettings Fields
 
         #region GeneralVerificationSettings Constructors
@@ -36,7 +56,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="GeneralVerificationSettings"/> class 
         /// with default settings.
         /// </summary>
-        public GeneralVerificationSettings() : this(true, true, false)
+        public GeneralVerificationSettings() : this(true, true, true, false, true, false)
         {
 
         }
@@ -44,12 +64,16 @@ namespace Extract.Redaction
         /// <summary>
         /// Initializes a new instance of the <see cref="GeneralVerificationSettings"/> class.
         /// </summary>
-        public GeneralVerificationSettings(bool verifyAllPages, bool requireTypes, 
-            bool requireExemptions)
+        public GeneralVerificationSettings(bool verifyAllPages, bool verifyAllItems,
+            bool requireTypes, bool requireExemptions, bool seamlessNavigation,
+            bool promptForSaveUntilCommit)
         {
             _verifyAllPages = verifyAllPages;
+            _verifyAllItems = verifyAllItems;
             _requireTypes = requireTypes;
             _requireExemptions = requireExemptions;
+            _seamlessNavigation = seamlessNavigation;
+            _promptForSaveUntilCommit = promptForSaveUntilCommit;
         }
 
         #endregion GeneralVerificationSettings Constructors
@@ -67,6 +91,20 @@ namespace Extract.Redaction
             get
             {
                 return _verifyAllPages;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether what all redactons and clues must be visted.
+        /// </summary>
+        /// <returns><see langword="true"/> if all suggested redactons and clues must be visted;
+        /// <see langword="false"/> otherwise. 
+        /// </returns>
+        public bool VerifyAllItems
+        {
+            get
+            {
+                return _verifyAllItems;
             }
         }
 
@@ -96,6 +134,40 @@ namespace Extract.Redaction
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether navigation controls can move seamlessly between
+        /// documents.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if all forward/backward navigation controls are permitted to move
+        /// to the previous/next document; <see langword="false"/> if only document navigation
+        /// controls are permitted to change documents.
+        /// </value>
+        public bool SeamlessNavigation
+        {
+            get
+            {
+                return _seamlessNavigation;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether to prompt to save documents that haven't been committed
+        /// before navigating away.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the user should be prompted to save documents that have not
+        /// yet been committed when navigating away; <see langword="false"/> if the document should
+        /// be saved (and committed if appropriate) without prompting.
+        /// </value>
+        public bool PromptForSaveUntilCommit
+        {
+            get
+            {
+                return _promptForSaveUntilCommit;
+            }
+        }
+
         #endregion GeneralVerificationSettings Properties
 
         #region GeneralVerificationSettings Methods
@@ -112,11 +184,16 @@ namespace Extract.Redaction
         {
             try
             {
+                // The version number used here is the VerificationTask's version number.
                 bool verifyAllPages = reader.ReadBoolean();
+                bool verifyAllItems = (reader.Version < 8) ? true : reader.ReadBoolean();
                 bool requireTypes = reader.ReadBoolean();
                 bool requireExemptions = reader.ReadBoolean();
+                bool seamlessNavigation = (reader.Version < 8) ? true : reader.ReadBoolean();
+                bool promptForSaveUntilCommit = (reader.Version < 8) ? false : reader.ReadBoolean();
 
-                return new GeneralVerificationSettings(verifyAllPages, requireTypes, requireExemptions);
+                return new GeneralVerificationSettings(verifyAllPages, verifyAllItems, requireTypes,
+                    requireExemptions, seamlessNavigation, promptForSaveUntilCommit);
             }
             catch (Exception ex)
             {
@@ -136,8 +213,11 @@ namespace Extract.Redaction
             try
             {
                 writer.Write(_verifyAllPages);
+                writer.Write(_verifyAllItems);
                 writer.Write(_requireTypes);
                 writer.Write(_requireExemptions);
+                writer.Write(_seamlessNavigation);
+                writer.Write(_promptForSaveUntilCommit);
             }
             catch (Exception ex)
             {
