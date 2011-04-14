@@ -36,8 +36,14 @@ namespace Extract.Redaction.Verification
         /// Added full screen mode setting.
         /// <para>Version 7</para>
         /// Added slideshow settings.
+        /// <para>Version 8</para>
+        /// Added "Require users to review every suggested redaction or clue" option.
+        /// Added "Enable seamless page navigation between documents" option.
+        /// Added "Prompt to save changes before navigating away from un-commited documents.
+        /// Added "Confirm slideshow operator alertness" options.
+        /// Added "Set full-page view mode when slideshow is started" option.
         /// </summary>
-        const int _CURRENT_VERSION = 7;
+        const int _CURRENT_VERSION = 8;
         
         #endregion Constants
 
