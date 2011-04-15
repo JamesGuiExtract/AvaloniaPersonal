@@ -42,8 +42,13 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label3;
+            System.Windows.Forms.GroupBox groupBox2;
+            System.Windows.Forms.TextBox textBox1;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationOptionsDialog));
             this._autoZoomScaleTrackBar = new System.Windows.Forms.TrackBar();
             this._autoZoomScaleTextBox = new System.Windows.Forms.TextBox();
+            this._slideshowRunKeyComboBox = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._tabControl = new System.Windows.Forms.TabControl();
@@ -60,8 +65,11 @@ namespace Extract.Redaction.Verification
             label2 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
+            groupBox2 = new System.Windows.Forms.GroupBox();
+            textBox1 = new System.Windows.Forms.TextBox();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._autoZoomScaleTrackBar)).BeginInit();
+            groupBox2.SuspendLayout();
             this._tabControl.SuspendLayout();
             this._generalTabPage.SuspendLayout();
             this._slideshowTabPage.SuspendLayout();
@@ -128,6 +136,51 @@ namespace Extract.Redaction.Verification
             label3.Size = new System.Drawing.Size(90, 13);
             label3.TabIndex = 9;
             label3.Text = "tool after highlight";
+            // 
+            // groupBox2
+            // 
+            groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            groupBox2.Controls.Add(this._slideshowRunKeyComboBox);
+            groupBox2.Controls.Add(this.label6);
+            groupBox2.Controls.Add(textBox1);
+            groupBox2.Location = new System.Drawing.Point(6, 60);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new System.Drawing.Size(376, 102);
+            groupBox2.TabIndex = 23;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Run key";
+            // 
+            // _slideshowRunKeyComboBox
+            // 
+            this._slideshowRunKeyComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._slideshowRunKeyComboBox.FormattingEnabled = true;
+            this._slideshowRunKeyComboBox.Location = new System.Drawing.Point(110, 68);
+            this._slideshowRunKeyComboBox.Name = "_slideshowRunKeyComboBox";
+            this._slideshowRunKeyComboBox.Size = new System.Drawing.Size(253, 21);
+            this._slideshowRunKeyComboBox.TabIndex = 2;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 71);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(96, 13);
+            this.label6.TabIndex = 1;
+            this.label6.Text = "Slideshow run key:";
+            // 
+            // textBox1
+            // 
+            textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            textBox1.BackColor = System.Drawing.SystemColors.Control;
+            textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            textBox1.Location = new System.Drawing.Point(6, 19);
+            textBox1.Multiline = true;
+            textBox1.Name = "textBox1";
+            textBox1.Size = new System.Drawing.Size(357, 45);
+            textBox1.TabIndex = 0;
+            textBox1.Text = resources.GetString("textBox1.Text");
             // 
             // _cancelButton
             // 
@@ -211,6 +264,7 @@ namespace Extract.Redaction.Verification
             // 
             // _slideshowTabPage
             // 
+            this._slideshowTabPage.Controls.Add(groupBox2);
             this._slideshowTabPage.Controls.Add(this._slideshowAutoStartCheckBox);
             this._slideshowTabPage.Controls.Add(this.label4);
             this._slideshowTabPage.Controls.Add(this._slideshowIntervalUpDown);
@@ -291,10 +345,13 @@ namespace Extract.Redaction.Verification
             this.MinimizeBox = false;
             this.Name = "VerificationOptionsDialog";
             this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Verification options";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._autoZoomScaleTrackBar)).EndInit();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             this._tabControl.ResumeLayout(false);
             this._generalTabPage.ResumeLayout(false);
             this._generalTabPage.PerformLayout();
@@ -321,5 +378,7 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.Label label4;
         private Extract.Utilities.Forms.BetterNumericUpDown _slideshowIntervalUpDown;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ComboBox _slideshowRunKeyComboBox;
     }
 }

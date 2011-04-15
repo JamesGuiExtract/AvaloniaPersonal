@@ -50,6 +50,15 @@ namespace Extract.Utilities.Forms
 
         #endregion
 
+        #region Events
+
+        /// <summary>
+        /// Occurs when a key is pressed while the message box is displayed.
+        /// </summary>
+        public event EventHandler<KeyEventArgs> KeyPress;
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -535,6 +544,23 @@ namespace Extract.Utilities.Forms
                 throw ExtractException.AsExtractException("ELI21934", ex);
             }
         }
+
+        /// <summary>
+        /// Closes the message box with the specified result.
+        /// </summary>
+        /// <param name="result">The value to set as the message box result.</param>
+        public void Close(string result)
+        {
+            try
+            {
+                _msgBox.SetResultAndClose(result);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32353");
+            }
+        }
+        
         /// <summary>
         /// Add a custom button to the message box.
         /// <para><b>Note:</b></para>
@@ -734,6 +760,8 @@ namespace Extract.Utilities.Forms
             {
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23137",
                     _OBJECT_NAME);
+
+                _msgBox.KeyPress += HandleMsgBoxKeyPress;
             }
             catch (Exception ex)
             {
@@ -771,5 +799,36 @@ namespace Extract.Utilities.Forms
         }
 
         #endregion
+
+        /// <summary>
+        /// Handles the case that a key is press while the _msgBox has focus.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing
+        /// the event data.</param>
+        void HandleMsgBoxKeyPress(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                OnKeyPress(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32349");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:KeyPress"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing
+        /// the event data.</param>
+        void OnKeyPress(KeyEventArgs e)
+        {
+            if (KeyPress != null)
+            {
+                KeyPress(this, e);
+            }
+        }
     }
 }

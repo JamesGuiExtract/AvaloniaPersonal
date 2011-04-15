@@ -247,6 +247,32 @@ namespace Extract.Redaction.Verification
         HashSet<int> _setSlideshowAdvancedPages = new HashSet<int>();
 
         /// <summary>
+        /// Generates random numbers for use by the slideshow random prompt user alertness feature.
+        /// </summary>
+        Random _slideshowRandomGenerator = new Random((int)DateTime.Now.Ticks);
+
+        /// <summary>
+        /// The probability of a random prompt appearing for any particular slideshow advanced page.
+        /// </summary>
+        double _slideshowPromptProbability;
+
+        /// <summary>
+        /// The number of pages that have been advanced by the slideshow without prompting.
+        /// </summary>
+        int _slideshowUnpromptedPageCount;
+
+        /// <summary>
+        /// The last key to be released. Used for tracking whether the slideshow run key has been
+        /// double-tapped.
+        /// </summary>
+        Keys _lastKey;
+
+        /// <summary>
+        /// The time the _lastKey was released.
+        /// </summary>
+        DateTime _timeLastKey = DateTime.Now;
+
+        /// <summary>
         /// The start slideshow command
         /// </summary>
         // Include so that the shortcut is disabled when the feature is not enabled.
@@ -1960,26 +1986,26 @@ namespace Extract.Redaction.Verification
                 }
                 _fullScreenToolStripMenuItem.Checked = _formStateManager.FullScreen;
 
+                bool slideshowEnabled = _settings.SlideshowSettings.SlideshowEnabled &&
+                                        !_settings.SlideshowSettings.RequireRunKey;
                 _startSlideshowCommand = new ApplicationCommand(_imageViewer.Shortcuts,
                     new Keys[] { Keys.F5 }, StartSlideshow,
                     new ToolStripItem[] { _slideshowPlayToolStripButton, _slideshowPlayToolStripMenuItem },
-                    _settings.SlideshowSettings.SlideshowEnabled, true,
-                    _settings.SlideshowSettings.SlideshowEnabled);
+                    slideshowEnabled, true, slideshowEnabled);
 
                 _stopSlideshowCommand = new ApplicationCommand(null, null, null,
                     new ToolStripItem[] { _slideshowStopToolStripButton, _slideshowStopToolStripMenuItem },
                     false, true, false);
 
-                _slideShowToolStrip.Visible = _settings.SlideshowSettings.SlideshowEnabled;
-                _slideshowToolStripMenuItemSeparator.Visible = _settings.SlideshowSettings.SlideshowEnabled;
-                _slideshowToolStripMenuItem.Visible = _settings.SlideshowSettings.SlideshowEnabled;
+                _slideShowToolStrip.Visible = slideshowEnabled;
+                _slideshowToolStripMenuItemSeparator.Visible = slideshowEnabled;
+                _slideshowToolStripMenuItem.Visible = slideshowEnabled;
 
-                if (_settings.SlideshowSettings.SlideshowEnabled && 
-                    _config.Settings.AutoStartSlideshow)
+                if (slideshowEnabled && _config.Settings.AutoStartSlideshow)
                 {
                     if (_config.Settings.AutoStartSlideshow)
                     {
-                        StartSlideshow(true);
+                        StartSlideshow();
 
                         // Start the slideshow, but disable the timer until the first document is loaded.
                         StopSlideshowTimer();
@@ -2408,7 +2434,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                VerificationOptionsDialog dialog = new VerificationOptionsDialog(_options);
+                VerificationOptionsDialog dialog = new VerificationOptionsDialog(_options, _settings);
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     SetVerificationOptions(dialog.VerificationOptions);
@@ -2758,6 +2784,17 @@ namespace Extract.Redaction.Verification
                 }
 
                 _setSlideshowAdvancedPages.Add(GetCurrentPage());
+                                
+                if (_settings.SlideshowSettings.PromptRandomly)
+                {
+                    // Display prompts at random times per the task configuration.
+                    if (!PromptRandomly())
+                    {
+                        // The user didn't respond correctly to the prompt; don't advance and keep
+                        // the slideshow stopped.
+                        return;
+                    }
+                }
 
                 int nextPage = _imageViewer.PageNumber + 1;
                 if (nextPage <= _imageViewer.PageCount)
@@ -2792,7 +2829,7 @@ namespace Extract.Redaction.Verification
             {
                 try
                 {
-                    StartSlideshow(false);
+                    StopSlideshow(false);
                 }
                 catch (Exception ex2)
                 {
@@ -2904,23 +2941,39 @@ namespace Extract.Redaction.Verification
                 if (_slideshowRunning)
                 {
                     bool stopSlideshow = false;
+                    bool showStopSlideshowMessage = true;
 
                     switch (m.Msg)
                     {
                         case WindowsMessage.KeyDown:
                         case WindowsMessage.SystemKeyDown:
                             {
-                                Keys key = (Keys)m.WParam.ToInt32();
+                                Keys key = KeyMethods.GetKeyFromMessage(m, true);
 
                                 // Unless the key is related to starting the slideshow or advancing,
                                 // stop the slideshow.
                                 if (key != Keys.F5 &&
                                     key != Keys.PageDown &&
                                     key != Keys.Tab &&
-                                    key != Keys.ControlKey &&
-                                    (key != Keys.S || Control.ModifierKeys != Keys.Control))
+                                    key != Keys.LControlKey &&
+                                    key != Keys.RControlKey &&
+                                    (key != Keys.S || Control.ModifierKeys != Keys.Control) &&
+                                    key != _config.Settings.SlideshowRunKey)
                                 {
                                     stopSlideshow = true;
+                                }
+                            }
+                            break;
+
+                        case WindowsMessage.KeyUp:
+                        case WindowsMessage.SystemKeyUp:
+                            {
+                                // If the slideshow run key has been released, stop the slideshow.
+                                if (KeyMethods.GetKeyFromMessage(m, true) ==
+                                    _config.Settings.SlideshowRunKey)
+                                {
+                                    stopSlideshow = true;
+                                    showStopSlideshowMessage = false;
                                 }
                             }
                             break;
@@ -2959,7 +3012,40 @@ namespace Extract.Redaction.Verification
 
                     if (stopSlideshow)
                     {
-                        StopSlideshow(true);
+                        StopSlideshow(showStopSlideshowMessage);
+                    }
+                }
+                else if (_settings.SlideshowSettings.SlideshowEnabled)
+                {
+                    // Keep track of whether the slide show run key has been double-tapped.
+                    // If so, start the slideshow.
+                    switch (m.Msg)
+                    {
+                        case WindowsMessage.KeyDown:
+                        case WindowsMessage.SystemKeyDown:
+                            {
+                                Keys key = KeyMethods.GetKeyFromMessage(m, true);
+                                if (key == _lastKey)
+                                {
+                                    // Check if the slideshow run key is being pressed after having
+                                    // been released in the previous 1/2 second.
+                                    if (_lastKey == _config.Settings.SlideshowRunKey &&
+                                        DateTime.Now < _timeLastKey.AddMilliseconds(500))
+                                    {
+                                        StartSlideshow();
+                                        return true;
+                                    }
+                                }  
+                            }
+                            break;
+
+                        case WindowsMessage.KeyUp:
+                        case WindowsMessage.SystemKeyUp:
+                            {
+                                _lastKey = KeyMethods.GetKeyFromMessage(m, true);
+                                _timeLastKey = DateTime.Now;
+                            }
+                            break;
                     }
                 }
             }
@@ -2980,14 +3066,36 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="start"><see langword="true"/> to start the slideshow, <see langword="false"/>
         /// to stop it.</param>
-        void StartSlideshow(bool start)
+        void StartSlideshowHelper(bool start)
         {
             if (!start || _slideshowRunning != start)
             {
-                if (start && _slideshowMessageCanceler != null)
+                if (start)
                 {
-                    // If the slideshow is being started, ensure the "Slideshow Paused" is closed.
-                    _slideshowMessageCanceler.Cancel();
+                    if (_slideshowMessageCanceler != null)
+                    {
+                        // If the slideshow is being started, ensure the "Slideshow Paused" is
+                        // closed.
+                        _slideshowMessageCanceler.Cancel();
+                    }
+
+                    // Set fit-to-page mode if so configured.
+                    if (_settings.SlideshowSettings.ForceFitToPageMode &&
+                        _imageViewer.FitMode != FitMode.FitToPage)
+                    {
+                        _imageViewer.FitMode = FitMode.FitToPage;
+                    }
+
+                    // Set the probability that a prompt should display on any particular page change.
+                    // This probability will be such that as the PromptInterval goes to infinity, the
+                    // probability of a prompt having been displayed by the time PromptInterval is
+                    // reached is slightly less than 2 out of 3.
+                    if (_settings.SlideshowSettings.PromptRandomly)
+                    {
+                        _slideshowPromptProbability =
+                            1.0 / (double)_settings.SlideshowSettings.PromptInterval;
+                        _slideshowUnpromptedPageCount = 0;
+                    }
                 }
 
                 _slideshowRunning = start;
@@ -3012,7 +3120,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void StartSlideshow()
         {
-            StartSlideshow(true);
+            StartSlideshowHelper(true);
         }
 
         /// <summary>
@@ -3023,7 +3131,7 @@ namespace Extract.Redaction.Verification
         /// </param>
         void StopSlideshow(bool showMessage)
         {
-            StartSlideshow(false);
+            StartSlideshowHelper(false);
 
             if (showMessage)
             {
@@ -3071,6 +3179,80 @@ namespace Extract.Redaction.Verification
             {
                 _slideShowTimerBarControl.Visible = false;
             }
+        }
+
+        /// <summary>
+        /// Displays the slideshow user alertness prompt at random times per the task configuration.
+        /// </summary>
+        /// <returns><see langword="true"/> if the slideshow should continue, <see langword="false"/>
+        /// if the slideshow should stop due to the fact that the prompt wasn't responded to
+        /// correctly.</returns>
+        bool PromptRandomly()
+        {
+            _slideshowUnpromptedPageCount++;
+
+            // Prompt if the run key isn't depressed and a random double is by chance less than
+            // _slideshowPromptProbability or if the unprompted page count has reached
+            // PromptInterval.
+            if (!KeyMethods.IsKeyPressed(_config.Settings.SlideshowRunKey) &&
+                (_slideshowUnpromptedPageCount >= _settings.SlideshowSettings.PromptInterval ||
+                _slideshowRandomGenerator.NextDouble() <= _slideshowPromptProbability))
+            {
+                StopSlideshow(false);
+                char randomLetter = Convert.ToChar(_slideshowRandomGenerator.Next(65, 90));
+                char response = '\0';
+
+                using (CustomizableMessageBox prompt = new CustomizableMessageBox())
+                {
+                    // Create the prompt.
+                    prompt.StandardIcon = MessageBoxIcon.Warning;
+                    prompt.Caption = "Confirm alertness";
+                    prompt.Text = "Press the " + randomLetter + " key to continue.";
+                    // If the user doesn't respond withing 5 seconds, just stop the slideshow.
+                    prompt.Timeout = 5000;
+                    prompt.PlayAlertSound = false;
+                    prompt.KeyPress += ((sender2, e2) =>
+                    {
+                        try
+                        {
+                            response = Convert.ToChar(e2.KeyValue);
+                            if (response == randomLetter)
+                            {
+                                prompt.Close(CustomizableMessageBoxResult.Ok);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractDisplay("ELI32362");
+                        }
+                    });
+                    // Add a cancel button that can be used to stop the slideshow immediately.
+                    prompt.AddButton(CustomizableMessageBoxResult.Cancel,
+                        CustomizableMessageBoxResult.Cancel, true);
+
+                    prompt.Show(this);
+                }
+
+                // If the correct response was entered. Continue the slideshow.
+                if (response == randomLetter)
+                {
+                    StartSlideshow();
+                }
+                else
+                {
+                    StopSlideshow(true);
+
+                    // Hack: There seems to be to be a scenario here where sometimes the
+                    // invalidate call associated with as part of the stop slideshow message
+                    // happens in the wrong order and the message doesn't get displayed.
+                    // At this point, the time to investigate doesn't seem worth it; just
+                    // invoke another invalidate to ensure it is displayed.
+                    BeginInvoke((MethodInvoker)(() => Invalidate()));
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         #endregion Private Members

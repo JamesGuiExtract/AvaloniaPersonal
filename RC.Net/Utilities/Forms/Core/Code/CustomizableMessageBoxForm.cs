@@ -26,80 +26,80 @@ namespace Extract.Utilities.Forms
     {
         #region Constants
 
-        private const int LEFT_PADDING = 12;
-        private const int RIGHT_PADDING = 12;
-        private const int TOP_PADDING = 12;
-        private const int BOTTOM_PADDING = 12;
+        const int LEFT_PADDING = 12;
+        const int RIGHT_PADDING = 12;
+        const int TOP_PADDING = 12;
+        const int BOTTOM_PADDING = 12;
 
-        private const int BUTTON_LEFT_PADDING = 4;
-        private const int BUTTON_RIGHT_PADDING = 4;
-        private const int BUTTON_TOP_PADDING = 4;
-        private const int BUTTON_BOTTOM_PADDING = 4;
+        const int BUTTON_LEFT_PADDING = 4;
+        const int BUTTON_RIGHT_PADDING = 4;
+        const int BUTTON_TOP_PADDING = 4;
+        const int BUTTON_BOTTOM_PADDING = 4;
 
-        private const int MIN_BUTTON_HEIGHT = 23;
-        private const int MIN_BUTTON_WIDTH = 74;
+        const int MIN_BUTTON_HEIGHT = 23;
+        const int MIN_BUTTON_WIDTH = 74;
 
-        private const int ITEM_PADDING = 10;
-        private const int ICON_MESSAGE_PADDING = 15;
+        const int ITEM_PADDING = 10;
+        const int ICON_MESSAGE_PADDING = 15;
 
-        private const int BUTTON_PADDING = 5;
+        const int BUTTON_PADDING = 5;
 
-        private const int CHECKBOX_WIDTH = 20;
+        const int CHECKBOX_WIDTH = 20;
 
-        private const int IMAGE_INDEX_EXCLAMATION = 0;
-        private const int IMAGE_INDEX_QUESTION = 1;
-        private const int IMAGE_INDEX_STOP = 2;
-        private const int IMAGE_INDEX_INFORMATION = 3;
+        const int IMAGE_INDEX_EXCLAMATION = 0;
+        const int IMAGE_INDEX_QUESTION = 1;
+        const int IMAGE_INDEX_STOP = 2;
+        const int IMAGE_INDEX_INFORMATION = 3;
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
+        static readonly string _OBJECT_NAME =
             typeof(CustomizableMessageBoxForm).ToString();
 
-        #endregion
+        #endregion Constants
 
         #region Fields
 
-        private System.ComponentModel.IContainer components;
-        private System.Windows.Forms.CheckBox chbSaveResponse;
-        private System.Windows.Forms.ImageList imageListIcons;
-        private System.Windows.Forms.ToolTip buttonToolTip;
+        System.ComponentModel.IContainer components;
+        System.Windows.Forms.CheckBox chbSaveResponse;
+        System.Windows.Forms.ImageList imageListIcons;
+        System.Windows.Forms.ToolTip buttonToolTip;
 
-        private List<CustomizableMessageBoxButton> _buttons = 
+        List<CustomizableMessageBoxButton> _buttons = 
             new List<CustomizableMessageBoxButton>();
-        private bool _allowSaveResponse;
-        private bool _playAlert = true;
-        private CustomizableMessageBoxButton _cancelButton;
-        private Button _defaultButtonControl;
+        bool _allowSaveResponse;
+        bool _playAlert = true;
+        CustomizableMessageBoxButton _cancelButton;
+        Button _defaultButtonControl;
 
-        private int _maxLayoutWidth;
+        int _maxLayoutWidth;
 
-        private int _maxWidth;
-        private int _maxHeight;
+        int _maxWidth;
+        int _maxHeight;
 
-        private bool _allowCancel = true;
-        private string _result;
+        bool _allowCancel = true;
+        string _result;
 
         /// <summary>
         /// Used to determine the alert sound to play
         /// </summary>
-        private MessageBoxIcon _standardIcon = MessageBoxIcon.None;
-        private Icon _iconImage;
+        MessageBoxIcon _standardIcon = MessageBoxIcon.None;
+        Icon _iconImage;
 
-        private Timer _timerTimeout;
-        private int _timeout;
-        private TimeoutResult _timeoutResult = TimeoutResult.Default;
-        private System.Windows.Forms.Panel _panelIcon;
-        private Extract.Utilities.Forms.BetterRichTextBox _rtbMessage;
+        Timer _timeoutTimer;
+        int _timeout;
+        TimeoutResult _timeoutResult = TimeoutResult.Default;
+        System.Windows.Forms.Panel _panelIcon;
+        Extract.Utilities.Forms.BetterRichTextBox _rtbMessage;
 
         /// <summary>
         /// Maps CustomizableMessageBox buttons to Button controls
         /// </summary>
-        private Dictionary<CustomizableMessageBoxButton, Button> _buttonControlsTable =
+        Dictionary<CustomizableMessageBoxButton, Button> _buttonControlsTable =
             new Dictionary<CustomizableMessageBoxButton, Button>();
 
-        #endregion
+        #endregion Fields
 
         #region Properties
 
@@ -122,7 +122,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI21655", ex);
+                    ExtractException ee = ex.AsExtract("ELI21655");
                     ee.AddDebugData("Message box text", value, false);
 
                     throw ee;
@@ -149,7 +149,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI21656", ex);
+                    ExtractException ee = ex.AsExtract("ELI21656");
                     ee.AddDebugData("Message box caption", value, false);
 
                     throw ee;
@@ -176,7 +176,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI21657", ex);
+                    ExtractException ee = ex.AsExtract("ELI21657");
                     if (value != null)
                     {
                         ee.AddDebugData("Message box font", Font.Name, false);
@@ -221,7 +221,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI21660", ex);
+                    ExtractException ee = ex.AsExtract("ELI21660");
                     ee.AddDebugData("Message box AllowSaveResponse", value, false);
 
                     throw ee;
@@ -243,7 +243,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI21661", ex);
+                    throw ex.AsExtract("ELI21661");
                 }
             }
         }
@@ -263,7 +263,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI21708", ex);
+                    throw ex.AsExtract("ELI21708");
                 }
             }
             set
@@ -274,7 +274,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI21662", ex);
+                    ExtractException ee = ex.AsExtract("ELI21662");
                     ee.AddDebugData("Message box SaveResponseText", value, false);
 
                     throw ee;
@@ -301,7 +301,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI21663", ex);
+                    ExtractException ee = ex.AsExtract("ELI21663");
                     ee.AddDebugData("Message box standard icon", value.ToString(), false);
 
                     throw ee;
@@ -343,7 +343,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI21664", ex);
+                    throw ex.AsExtract("ELI21664");
                 }
             }
         }
@@ -373,7 +373,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI21665", ex);
+                    throw ex.AsExtract("ELI21665");
                 }
             }
         }
@@ -409,7 +409,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI21669", ex);
+                    ExtractException ee = ex.AsExtract("ELI21669");
                     ee.AddDebugData("Messagbox PlayAlertSound", value, false);
 
                     throw ee;
@@ -436,7 +436,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI21671", ex);
+                    ExtractException ee = ex.AsExtract("ELI21671");
                     ee.AddDebugData("Message box timeout", value, false);
 
                     throw ee;
@@ -463,7 +463,7 @@ namespace Extract.Utilities.Forms
                 }
                 catch (Exception ex)
                 {
-                    ExtractException ee = ExtractException.AsExtractException("ELI21674", ex);
+                    ExtractException ee = ex.AsExtract("ELI21674");
                     ee.AddDebugData("Message box timeout result", value, false);
 
                     throw ee;
@@ -471,9 +471,33 @@ namespace Extract.Utilities.Forms
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Gets/sets whether selection is allowed in the <see cref="RichTextBox"/> control.
+        /// </summary>
+        internal bool AllowSelection
+        {
+            get
+            {
+                return _rtbMessage.AllowSelection;
+            }
+            set
+            {
+                _rtbMessage.AllowSelection = value;
+            }
+        }
 
-        #region Ctor/Dtor
+        #endregion Properties
+
+        #region Events
+
+        /// <summary>
+        /// Occurs when a key is pressed.
+        /// </summary>
+        public new event EventHandler<KeyEventArgs> KeyPress;
+
+        #endregion Events 
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="CustomizableMessageBoxForm"/> class.
@@ -500,29 +524,15 @@ namespace Extract.Utilities.Forms
             }
         }
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (components != null)
-                {
-                    components.Dispose();
-                }
-            }
-            base.Dispose(disposing);
-        }
-
-        #endregion
+        #endregion Constructors
 
         #region Windows Form Designer generated code
+
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
             System.Resources.ResourceManager resources = new System.Resources.ResourceManager(typeof(CustomizableMessageBoxForm));
@@ -587,9 +597,11 @@ namespace Extract.Utilities.Forms
             this.ResumeLayout(false);
 
         }
-        #endregion
+
+        #endregion Windows Form Designer generated code
 
         #region Overrides
+
         /// <summary>
         /// This will get called everytime we call ShowDialog on the form
         /// </summary>
@@ -629,9 +641,7 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI21675", ex);
-                ee.AddDebugData("Event Args", e, false);
-                ee.Display();
+                ex.ExtractDisplay("ELI21675");
             }
         }
 
@@ -659,7 +669,7 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI21678", ex);
+                ExtractException ee = ex.AsExtract("ELI21678");
                 ee.AddDebugData("KeyData", keyData.ToString(), false);
 
                 if (msg != null)
@@ -695,18 +705,16 @@ namespace Extract.Utilities.Forms
                     }
                 }
 
-                if (_timerTimeout != null)
+                if (_timeoutTimer != null)
                 {
-                    _timerTimeout.Stop();
+                    _timeoutTimer.Stop();
                 }
 
                 base.OnClosing(e);
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI21681", ex);
-                ee.AddDebugData("Event Args", e, false);
-                ee.Display();
+                ex.ExtractDisplay("ELI21681");
             }
         }
 
@@ -728,15 +736,78 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI21682", ex);
-                ee.AddDebugData("Event Args", e, false);
-                ee.Display();
+                ex.ExtractDisplay("ELI21682");
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Processes a dialog box key.
+        /// </summary>
+        /// <param name="keyData">One of the <see cref="T:System.Windows.Forms.Keys"/> values that
+        /// represents the key to process.</param>
+        /// <returns>
+        /// <see langword="true"/> if the keystroke was processed and consumed by the control;
+        /// otherwise, <see langword="true"/> to allow further processing.
+        /// </returns>
+        protected override bool ProcessDialogKey(Keys keyData)
+        {
+            bool result = false;
+
+            try
+            {
+                if (!IsInputKey(keyData))
+                {
+                    OnKeyPress(new KeyEventArgs(keyData));
+                }
+
+                result = base.ProcessDialogKey(keyData);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32355");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.KeyDown"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.KeyEventArgs"/> that contains the
+        /// event data.</param>
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            try
+            {
+                OnKeyPress(e);
+
+                base.OnKeyDown(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32354");
+            }
+        }
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null)
+                {
+                    components.Dispose();
+                }
+            }
+            base.Dispose(disposing);
+        }
+
+        #endregion Overrides
 
         #region Methods
+
         /// <summary>
         /// Measures a string using the Graphics object for this form with
         /// the specified font
@@ -747,7 +818,7 @@ namespace Extract.Utilities.Forms
         /// <returns>The <see cref="Size"/> needed to contain the
         /// <paramref name="stringToMeasure"/> when drawn with the specified <see cref="Font"/>.
         /// </returns>
-        private Size MeasureString(string stringToMeasure, int maxWidth, Font font)
+        Size MeasureString(string stringToMeasure, int maxWidth, Font font)
         {
             using (Graphics g = this.CreateGraphics())
             {
@@ -768,7 +839,7 @@ namespace Extract.Utilities.Forms
         /// <paramref name="stringToMeasure"/> when drawn with the currently selected
         /// message box <see cref="Font"/>.
         /// </returns>
-        private Size MeasureString(string stringToMeasure, int maxWidth)
+        Size MeasureString(string stringToMeasure, int maxWidth)
         {
             return MeasureString(stringToMeasure, maxWidth, this.Font);
         }
@@ -778,7 +849,7 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <returns>The longest <see cref="string"/> from the <see cref="List{T}"/>
         /// of <see cref="CustomizableMessageBoxButton"/></returns>
-        private string GetLongestButtonText()
+        string GetLongestButtonText()
         {
             int maxLen = 0;
             string maxStr = null;
@@ -797,7 +868,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Sets the size and visibility of the Message
         /// </summary>
-        private void SetMessageSizeAndVisibility()
+        void SetMessageSizeAndVisibility()
         {
             if (_rtbMessage.Text == null || _rtbMessage.Text.Trim().Length == 0)
             {
@@ -830,7 +901,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Sets the size and visibility of the Icon
         /// </summary>
-        private void SetIconSizeAndVisibility()
+        void SetIconSizeAndVisibility()
         {
             if (_iconImage == null)
             {
@@ -847,7 +918,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Sets the size and visibility of the save response checkbox
         /// </summary>
-        private void SetCheckboxSizeAndVisibility()
+        void SetCheckboxSizeAndVisibility()
         {
             if (!AllowSaveResponse)
             {
@@ -868,7 +939,7 @@ namespace Extract.Utilities.Forms
         /// button text
         /// </summary>
         /// <returns></returns>
-        private Size GetButtonSize()
+        Size GetButtonSize()
         {
             // If GetLongestButtonText() returns null then set the text string to "Ok"
             string longestButtonText = GetLongestButtonText() ?? "Ok";
@@ -892,7 +963,7 @@ namespace Extract.Utilities.Forms
         /// display in this message box.</param>
         /// <exception cref="ExtractException">Thrown if unrecognized
         /// <see cref="MessageBoxIcon"/> value is passed in.</exception>
-        private void SetStandardIcon(MessageBoxIcon icon)
+        void SetStandardIcon(MessageBoxIcon icon)
         {
             _standardIcon = icon;
 
@@ -927,7 +998,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Will ensure that there is at least one button on the message box.
         /// </summary>
-        private void AddOkButtonIfNoButtonsPresent()
+        void AddOkButtonIfNoButtonsPresent()
         {
             if (_buttons.Count == 0)
             {
@@ -943,7 +1014,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Centers the form on the screen
         /// </summary>
-        private void CenterForm()
+        void CenterForm()
         {
             int x = (SystemInformation.WorkingArea.Width - this.Width) / 2;
             int y = (SystemInformation.WorkingArea.Height - this.Height) / 2;
@@ -955,7 +1026,7 @@ namespace Extract.Utilities.Forms
         /// Sets the optimum size for the form based on the controls that
         /// need to be displayed
         /// </summary>
-        private void SetOptimumSize()
+        void SetOptimumSize()
         {
             int ncWidth = this.Width - this.ClientSize.Width;
             int ncHeight = this.Height - this.ClientSize.Height;
@@ -1003,7 +1074,7 @@ namespace Extract.Utilities.Forms
         /// the inter-button padding
         /// </summary>
         /// <returns>The total width required for the buttons along with padding.</returns>
-        private int GetWidthOfAllButtons()
+        int GetWidthOfAllButtons()
         {
             Size buttonSize = GetButtonSize();
             int allButtonsWidth = buttonSize.Width * _buttons.Count 
@@ -1015,7 +1086,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Gets the width of the caption
         /// </summary>
-        private Size GetCaptionSize()
+        Size GetCaptionSize()
         {
             Font captionFont = NativeMethods.GetCaptionFont();
             if (captionFont == null)
@@ -1036,7 +1107,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Layout all the controls 
         /// </summary>
-        private void LayoutControls()
+        void LayoutControls()
         {
             // Layout the icon panel
             _panelIcon.Location = new Point(LEFT_PADDING, TOP_PADDING);
@@ -1106,7 +1177,7 @@ namespace Extract.Utilities.Forms
         /// <param name="location">The location on the form for this button.</param>
         /// <returns>The <see cref="Button"/> described by the <see cref="CustomizableMessageBoxButton"/>
         /// struct.</returns>
-        private Button GetButton(CustomizableMessageBoxButton button, Size size, Point location)
+        Button GetButton(CustomizableMessageBoxButton button, Size size, Point location)
         {
             // Try to get the button from the list, if it is not there then create a new button
             Button buttonCtrl = null;
@@ -1134,7 +1205,7 @@ namespace Extract.Utilities.Forms
         /// <param name="location">The location on the form for this button.</param>
         /// <returns>The <see cref="Button"/> described by the <see cref="CustomizableMessageBoxButton"/>
         /// struct.</returns>
-        private Button CreateButton(CustomizableMessageBoxButton button, Size size, Point location)
+        Button CreateButton(CustomizableMessageBoxButton button, Size size, Point location)
         {
             // Create a new button with the specified size and text
             Button buttonCtrl = new Button();
@@ -1158,7 +1229,7 @@ namespace Extract.Utilities.Forms
             buttonCtrl.Tag = button.Value;
 
             // Add the event handler to the button
-            buttonCtrl.Click += new EventHandler(OnButtonClicked);
+            buttonCtrl.Click += HandleButtonClicked;
 
             return buttonCtrl;
         }
@@ -1166,7 +1237,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Will disable the close event if there are multiple buttons and no cancel button.
         /// </summary>
-        private void DisableCloseIfMultipleButtonsAndNoCancelButton()
+        void DisableCloseIfMultipleButtonsAndNoCancelButton()
         {
             if (_buttons.Count > 1)
             {
@@ -1204,7 +1275,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Plays the alert sound based on the icon set for the message box
         /// </summary>
-        private void PlayAlert()
+        void PlayAlert()
         {
             if (_playAlert)
             {
@@ -1222,7 +1293,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Sets the default button control to the selected state.
         /// </summary>
-        private void SelectDefaultButton()
+        void SelectDefaultButton()
         {
             if (_defaultButtonControl != null)
             {
@@ -1234,21 +1305,34 @@ namespace Extract.Utilities.Forms
         /// If the timeout value has been set greater than 0 then this function will
         /// start a timer and add the event handler to handle the timeout event.
         /// </summary>
-        private void StartTimerIfTimeoutGreaterThanZero()
+        void StartTimerIfTimeoutGreaterThanZero()
         {
             if (_timeout > 0)
             {
-                if (_timerTimeout == null)
+                if (_timeoutTimer == null)
                 {
-                    _timerTimeout = new Timer(this.components);
-                    _timerTimeout.Tick += new EventHandler(timerTimeout_Tick);
+                    _timeoutTimer = new Timer(this.components);
+                    _timeoutTimer.Tick += HandleTimeoutTimerTick;
                 }
 
-                if (!_timerTimeout.Enabled)
+                if (!_timeoutTimer.Enabled)
                 {
-                    _timerTimeout.Interval = _timeout;
-                    _timerTimeout.Start();
+                    _timeoutTimer.Interval = _timeout;
+                    _timeoutTimer.Start();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:KeyPress"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.Windows.Forms.KeyEventArgs"/> instance containing
+        /// the event data.</param>
+        void OnKeyPress(KeyEventArgs e)
+        {
+            if (KeyPress != null)
+            {
+                KeyPress(this, e);
             }
         }
 
@@ -1256,13 +1340,20 @@ namespace Extract.Utilities.Forms
         /// Will set the result value for the message box and close it.
         /// </summary>
         /// <param name="result">The value to set as the message box result.</param>
-        private void SetResultAndClose(string result)
+        internal void SetResultAndClose(string result)
         {
-            _result = result;
-            this.Close();
+            try
+            {
+                _result = result;
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32350");
+            }
         }
 
-        #endregion
+        #endregion Methods
 
         #region Event Handlers
 
@@ -1272,7 +1363,7 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <param name="sender">The sender of this event.</param>
         /// <param name="e">The data associated with this event.</param>
-        private void OnButtonClicked(object sender, EventArgs e)
+        void HandleButtonClicked(object sender, EventArgs e)
         {
             try
             {
@@ -1287,9 +1378,7 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI21686", ex);
-                ee.AddDebugData("EventArgs", e, false);
-                ee.Display();
+                ex.ExtractDisplay("ELI21686");
             }
         }
 
@@ -1298,11 +1387,11 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <param name="sender">The object that triggered the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        private void timerTimeout_Tick(object sender, EventArgs e)
+        void HandleTimeoutTimerTick(object sender, EventArgs e)
         {
             try
             {
-                _timerTimeout.Stop();
+                _timeoutTimer.Stop();
 
                 switch (_timeoutResult)
                 {
@@ -1332,31 +1421,10 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI21690", ex);
-                ee.AddDebugData("EventArgs", e, false);
-                ee.Display();
+                ex.ExtractDisplay("ELI21690");
             }
         }
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets/sets whether selection is allowed in the <see cref="RichTextBox"/> control.
-        /// </summary>
-        internal bool AllowSelection
-        {
-            get
-            {
-                return _rtbMessage.AllowSelection;
-            }
-            set
-            {
-                _rtbMessage.AllowSelection = value;
-            }
-        }
-
-        #endregion Properties
+        #endregion Event Handlers
     }
 }

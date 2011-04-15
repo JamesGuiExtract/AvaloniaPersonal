@@ -133,6 +133,35 @@ namespace Extract.Utilities.Forms
         static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
         /// <summary>
+        /// Maps a virtual-key code into a scan code or character value, or translates a scan code
+        /// into a virtual-key code. The function translates the codes using the input language and
+        /// an input locale identifier.
+        /// </summary>
+        /// <param name="uCode">Specifies the virtual-key code or scan code for a key. How this
+        /// value is interpreted depends on the value of the uMapType parameter.</param>
+        /// <param name="uMapType">Specifies the translation to perform.</param>
+        /// <param name="dwhkl">(optional) Input locale identifier to use for translating the
+        /// specified code.</param>
+        /// <returns>The return value is either a scan code, a virtual-key code, or a character
+        /// value, depending on the value of uCode and uMapType. If there is no translation, the
+        /// return value is zero.
+        /// </returns>
+        [DllImport("user32.dll")]
+        static extern uint MapVirtualKeyEx(uint uCode, uint uMapType, IntPtr dwhkl);
+
+        /// <summary>
+        /// Determines whether a key is up or down at the time the function is called, and whether
+        /// the key was pressed after a previous call to GetAsyncKeyState.
+        /// </summary>
+        /// <param name="vKey">The virtual-key code. For more information, see Virtual Key Codes.
+        /// You can use left- and right-distinguishing constants to specify certain keys.</param>
+        /// <returns>If the most significant bit is set, the key is down, and if the least
+        /// significant bit is set, the key was pressed after the previous call to
+        /// GetAsyncKeyState. </returns>
+        [DllImport("user32.dll")]
+        static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey); 
+
+        /// <summary>
         /// Places (posts) a message in the message queue associated with the thread that created 
         /// the specified window and returns without waiting for the thread to process the message.
         /// </summary>
@@ -207,7 +236,11 @@ namespace Extract.Utilities.Forms
         const int _MF_BYCOMMAND  = 0x0;
         const int _MF_GRAYED  = 0x1;
 
+        const uint _MAPVK_VK_TO_VSC = 0x00;
+        const uint _MAPVK_VSC_TO_VK = 0x01;
         const uint _MAPVK_VK_TO_CHAR = 0x02;
+        const uint _MAPVK_VSC_TO_VK_EX = 0x03;
+        const uint _MAPVK_VK_TO_VSC_EX = 0x04;
 
         const int _GWL_STYLE = -16;
         const int _GWL_EXSTYLE = -20;
@@ -399,6 +432,52 @@ namespace Extract.Utilities.Forms
             {
                 throw ExtractException.AsExtractException("ELI25607", ex);
             }
+        }
+
+        /// <summary>
+        /// Converts scan codes to virtual key codes and vice-versa.
+        /// </summary>
+        /// <param name="toScanCode"><see langword="true"/> to map a virtual key code to a scan code,
+        /// <see langword="false"/> to map a scan code to a virtual key.</param>
+        /// <param name="code">The code to map.</param>
+        /// <param name="distinguishLeftRight"><see langword="true"/> to distinguish between left
+        /// and right-hand keys where applicable, <see langword="false"/> to use the generic code.</param>
+        /// <returns>The mapped code if found, 0 otherwise.</returns>
+        public static uint ConvertKeyCode(uint code, bool toScanCode, bool distinguishLeftRight)
+        {
+            uint mapType;
+            if (toScanCode)
+            {
+                if (System.Environment.OSVersion.Version.Major < 6)
+                {
+                    // OS's prior to Vista are not able to map a virtual key to an extended scan code.
+                    mapType = _MAPVK_VK_TO_VSC;
+                }
+                else
+                {
+                    mapType = distinguishLeftRight ? _MAPVK_VK_TO_VSC_EX : _MAPVK_VK_TO_VSC;
+                }
+            }
+            else
+            {
+                mapType = distinguishLeftRight ? _MAPVK_VSC_TO_VK_EX : _MAPVK_VSC_TO_VK;
+            }
+
+            return MapVirtualKeyEx(code, mapType, IntPtr.Zero);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see paramref="key"/> is pressed.
+        /// </summary>
+        /// <param name="key">The <see cref="Keys"/> value to test.</param>
+        /// <returns>
+        /// <see langword="true"/> if the <see paramref="key"/> is pressed; <see langword="false"/>
+        /// otherwise.
+        /// </returns>
+        public static bool IsKeyPressed(Keys key)
+        {
+            short result = GetAsyncKeyState(key);
+            return (result & 0x8000) != 0;
         }
 
         /// <summary>

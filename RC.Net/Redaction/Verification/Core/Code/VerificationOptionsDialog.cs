@@ -1,8 +1,10 @@
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Extract.Redaction.Verification
@@ -20,34 +22,34 @@ namespace Extract.Redaction.Verification
         VerificationOptions _options;
 
         /// <summary>
+        /// Settings for the verification task.
+        /// </summary>
+        VerificationSettings _taskSettings;
+
+        /// <summary>
         /// The config file used to retrieve/store the options for the slideshow.
         /// </summary>
         readonly ConfigSettings<Properties.Settings> _config =
             new ConfigSettings<Properties.Settings>();
+
+        /// <summary>
+        /// The set of keys that should be available for the user to select as the slideshow run key.
+        /// </summary>
+        static readonly Dictionary<Keys, string> _runKeyOptions = InitializeRunKeyOptions();
 
         #endregion VerificationOptionsDialog Fields
 
         #region VerificationOptionsDialog Constructors
 
         /// <summary>
-        /// Initializes a new <see cref="VerificationOptionsDialog"/> class.
-        /// </summary>
-        // Don't fight with auto-generated code.
-        //[SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
-        public VerificationOptionsDialog()
-            : this(null)
-        {
-
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="VerificationOptionsDialog"/> class.
         /// </summary>
-        public VerificationOptionsDialog(VerificationOptions options)
+        public VerificationOptionsDialog(VerificationOptions options, VerificationSettings taskSettings)
         {
             InitializeComponent();
 
-            _options = options ?? new VerificationOptions();
+            _options = options;
+            _taskSettings = taskSettings;
 
             // Fill the tool combo box from the enum
             var autoToolType = typeof(AutoTool);
@@ -55,10 +57,10 @@ namespace Extract.Redaction.Verification
             names.Remove(Enum.GetName(autoToolType, AutoTool.None));
             _autoToolComboBox.Items.AddRange(names.ToArray());
 
+            _slideshowAutoStartCheckBox.Enabled = !_taskSettings.SlideshowSettings.RequireRunKey;
             _slideshowAutoStartCheckBox.Checked = _config.Settings.AutoStartSlideshow;
             _slideshowIntervalUpDown.Value = _config.Settings.SlideshowInterval;
             _slideshowIntervalUpDown.UserTextCorrected += HandleSlideshowIntervalCorrected;
-
         }
 
         #endregion VerificationOptionsDialog Constructors
@@ -168,6 +170,23 @@ namespace Extract.Redaction.Verification
                     _autoZoomScaleTrackBar.BackColor = _generalTabPage.BackColor;
                 }
 
+                // If the slideshow is enabled, populate all _runKeyOptions which can be recognized
+                // on this system.
+                if (_taskSettings.SlideshowSettings.SlideshowEnabled)
+                {
+                    foreach (string value in _runKeyOptions.Values)
+                    {
+                        _slideshowRunKeyComboBox.Items.Add(value);
+                    }
+
+                    _slideshowRunKeyComboBox.Text = _runKeyOptions[_config.Settings.SlideshowRunKey];
+                }
+                // If the slideshow is not enabled, remove the slideshow settings tab.
+                else
+                {
+                    this._tabControl.TabPages.Remove(_slideshowTabPage);
+                }
+
                 UpdateControls();
             }
             catch (Exception ex)
@@ -230,6 +249,15 @@ namespace Extract.Redaction.Verification
                 _slideshowIntervalUpDown.UserTextCorrected += handleUserTextCorrected;
                 _config.Settings.AutoStartSlideshow = _slideshowAutoStartCheckBox.Checked;
                 _config.Settings.SlideshowInterval = (int)_slideshowIntervalUpDown.Value;
+
+                // Apply any newly selected slideshow run key.
+                if (_slideshowRunKeyComboBox.Text != _runKeyOptions[_config.Settings.SlideshowRunKey])
+                {
+                    _config.Settings.SlideshowRunKey = _runKeyOptions
+                        .Where(option => option.Value == _slideshowRunKeyComboBox.Text)
+                        .Single()
+                        .Key;
+                }
 
                 // Store settings and close the dialog only if slideshowIntervalValid.
                 if (slideshowIntervalValid)
@@ -316,5 +344,31 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion VerificationOptionsDialog Event Handlers
+
+        #region Private Members
+
+        static Dictionary<Keys, string> InitializeRunKeyOptions()
+        {
+            Dictionary<Keys, string> runKeyOptions = new Dictionary<Keys, string>();
+
+            runKeyOptions[Keys.LShiftKey] = "Left shift key";
+            runKeyOptions[Keys.RShiftKey] = "Right shift key";
+            runKeyOptions[Keys.LControlKey] = "Left control key";
+            runKeyOptions[Keys.RControlKey] = "Right control key";
+            runKeyOptions[Keys.LMenu] = "Left alt key";
+            runKeyOptions[Keys.RMenu] = "Right alt key";
+
+            Dictionary<Keys, string> result = new Dictionary<Keys, string>();
+
+            foreach (var option in runKeyOptions
+                        .Where(option => KeyMethods.IsRecognizedKey(option.Key, true)))
+            {
+                result[option.Key] = option.Value;
+            }
+
+            return result;
+        }
+
+        #endregion Private Members
     }
 }
