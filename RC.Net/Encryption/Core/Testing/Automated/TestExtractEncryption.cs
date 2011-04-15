@@ -409,7 +409,7 @@ namespace Extract.Encryption
         /// </summary>
         [Test, Category("Automated")]
         [CLSCompliant(false)]
-        public static void Automated_TestEncryptingStream()
+        public static void Automated_TestEncryptingStreamStringPassword()
         {
             string textToEncrypt = "This is the text to encrypt.";
             string password = "abcABC123;";
@@ -418,6 +418,31 @@ namespace Extract.Encryption
                 cipherStream = new MemoryStream())
             {
                 ExtractEncryption.EncryptStream(plainStream, cipherStream, password);
+                cipherStream.Flush();
+                var result = encoding.GetString(cipherStream.ToArray());
+
+                Assert.That(!textToEncrypt.Equals(result, StringComparison.Ordinal));
+            }
+        }
+
+        /// <summary>
+        /// Tests encrypting a stream.
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public static void Automated_TestEncryptingStreamBytePassword()
+        {
+            string textToEncrypt = "This is the text to encrypt.";
+            string password = "abcABC123;";
+            var encoding = new UnicodeEncoding();
+
+            using (MemoryStream plainStream = new MemoryStream(encoding.GetBytes(textToEncrypt)),
+                cipherStream = new MemoryStream())
+            {
+                var hash = ExtractEncryption.GetHashedBytes(password,
+                    ExtractEncryption.HashVersion, new MapLabel());
+                ExtractEncryption.EncryptStream(plainStream, cipherStream, hash,
+                    new MapLabel());
                 cipherStream.Flush();
                 var result = encoding.GetString(cipherStream.ToArray());
 
@@ -469,6 +494,41 @@ namespace Extract.Encryption
                 cipherStream = new MemoryStream(cipher))
             {
                 ExtractEncryption.DecryptStream(cipherStream, plainStream, password);
+                plainStream.Flush();
+
+                var result = encoding.GetString(plainStream.ToArray());
+                Assert.That(textToEncrypt.Equals(result, StringComparison.Ordinal));
+            }
+        }
+
+        /// <summary>
+        /// Tests decrypting a stream.
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        public static void Automated_TestDecryptingStreamBytePassword()
+        {
+            string textToEncrypt = "This is the text to encrypt.";
+            string password = "abcABC123;";
+            var hash = ExtractEncryption.GetHashedBytes(password,
+                ExtractEncryption.HashVersion, new MapLabel());
+
+            var encoding = new UnicodeEncoding();
+            byte[] cipher = null;
+            using (MemoryStream plainStream = new MemoryStream(encoding.GetBytes(textToEncrypt)),
+                cipherStream = new MemoryStream())
+            {
+                ExtractEncryption.EncryptStream(plainStream, cipherStream, hash,
+                    new MapLabel());
+                cipherStream.Flush();
+                cipher = cipherStream.ToArray();
+            }
+
+            using (MemoryStream plainStream = new MemoryStream(),
+                cipherStream = new MemoryStream(cipher))
+            {
+                ExtractEncryption.DecryptStream(cipherStream, plainStream, hash,
+                    new MapLabel());
                 plainStream.Flush();
 
                 var result = encoding.GetString(plainStream.ToArray());

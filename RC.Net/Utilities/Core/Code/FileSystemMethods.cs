@@ -966,6 +966,30 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Validates a files existence. Throws an exception if the file is not found.
+        /// </summary>
+        /// <param name="fileName">The name of the file to validate.</param>
+        /// <param name="eliCode">The eli code to associate with the exception if the
+        /// file is not found.</param>
+        public static void ValidateFileExistence(string fileName, string eliCode)
+        {
+            try
+            {
+                if (!File.Exists(fileName))
+                {
+                    var ee = new ExtractException(eliCode, "File cannot be found.",
+                        new FileNotFoundException());
+                    ee.AddDebugData("File Name", fileName, false);
+                    throw ee;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32325");
+            }
+        }
+
         #endregion Methods
     }
 }

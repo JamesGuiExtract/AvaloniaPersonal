@@ -291,45 +291,31 @@ void ExtractEncryption::EncryptTextFile(System::String ^data, System::String ^en
 //--------------------------------------------------------------------------------------------------
 void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, String^ password)
 {
-	RijndaelManaged^ rjndl = nullptr;
-	CryptoStream^ cryptoStream = nullptr;
 	try
 	{
-		// Write the tag and version number to the stream
-		auto encoding = gcnew UnicodeEncoding();
-		auto name = encoding->GetBytes(_STREAM_ENCRYPT_TAG);
-		auto length = name->Length;
-		cipherData->Write(BitConverter::GetBytes(length), 0, 4);
-		cipherData->Write(name, 0, length);
-		cipherData->Write(BitConverter::GetBytes(_PASSWORD_ENCRYPT_VERSION), 0, 4);
-
-		rjndl = GetRijndael(password);
-		cryptoStream = gcnew CryptoStream(cipherData, rjndl->CreateEncryptor(),
-			CryptoStreamMode::Write);
-		auto buffer = gcnew array<Byte>(_BUFFER_SIZE);
-		auto bytes = plainData->Read(buffer, 0, _BUFFER_SIZE);
-		while (bytes > 0)
-		{
-			cryptoStream->Write(buffer, 0, bytes);
-			bytes = plainData->Read(buffer, 0, _BUFFER_SIZE);
-		}
-		cryptoStream->FlushFinalBlock();
+		Encrypt(plainData, cipherData, ComputeHash(password, HashVersion));
 	}
 	catch(Exception^ ex)
 	{
-		throw ExtractException::AsExtractException("ELI32306", ex);
+		throw ExtractException::AsExtractException("ELI32315", ex);
 	}
-	finally
+}
+//--------------------------------------------------------------------------------------------------
+[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
+void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
+	MapLabel^ mapLabel)
+{
+	try
 	{
-		// Close the streams and clear the encryption objects
-		if (cryptoStream != nullptr)
-		{
-			cryptoStream->Close();
-		}
-		if (rjndl != nullptr)
-		{
-			rjndl->Clear();
-		}
+		// Ensure calling assembly is signed by Extract
+		ExtractException::Assert("ELI32363", "Failed internal data check.",
+			CheckData(Assembly::GetCallingAssembly()));
+
+		Encrypt(plainData, cipherData, password);
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI32316", ex);
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -424,69 +410,51 @@ String^ ExtractEncryption::DecryptString(String^ data, MapLabel^ mapLabel)
 //--------------------------------------------------------------------------------------------------
 void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, String^ password)
 {
-	RijndaelManaged^ rjndl = nullptr;
-	CryptoStream^ cryptoStream = nullptr;
 	try
 	{
-		auto encoding = gcnew UnicodeEncoding();
-		auto data = gcnew array<Byte>(4);
-
-		// Read the tag from the stream
-		cipherData->Read(data, 0, 4);
-		auto length = BitConverter::ToInt32(data, 0);
-		auto tag = gcnew array<Byte>(length);
-		cipherData->Read(tag, 0, length);
-
-		// Validate the tag
-		if (!_STREAM_ENCRYPT_TAG->Equals(encoding->GetString(tag), StringComparison::Ordinal))
-		{
-			// Throw an exception
-			auto ee = gcnew ExtractException("ELI32309", "Unrecognized tag in stream.");
-			ee->AddDebugData("Tag Loaded", encoding->GetString(tag), true);
-			ee->AddDebugData("Tag Expected", _STREAM_ENCRYPT_TAG, true);
-			throw ee;
-		}
-
-		// Check the version
-		Array::Clear(data, 0, 4);
-		cipherData->Read(data, 0, 4);
-		auto version = BitConverter::ToInt32(data, 0);
-		if (version > _PASSWORD_ENCRYPT_VERSION)
-		{
-			// Throw an exception
-			auto ee = gcnew ExtractException("ELI32310", "Unrecognized version number.");
-			ee->AddDebugData("Current version", _PASSWORD_ENCRYPT_VERSION, false);
-			ee->AddDebugData("Version to load", version, false);
-			throw ee;
-		}
-
-		rjndl = GetRijndael(password);
-		cryptoStream = gcnew CryptoStream(plainData, rjndl->CreateDecryptor(),
-			CryptoStreamMode::Write);
-		auto buffer = gcnew array<Byte>(_BUFFER_SIZE);
-		auto bytes = cipherData->Read(buffer, 0, _BUFFER_SIZE);
-		while (bytes > 0)
-		{
-			cryptoStream->Write(buffer, 0, bytes);
-			bytes = cipherData->Read(buffer, 0, _BUFFER_SIZE);
-		}
-		cryptoStream->FlushFinalBlock();
+		Decrypt(cipherData, plainData, password);
 	}
 	catch(Exception^ ex)
 	{
-		throw ExtractException::AsExtractException("ELI32307", ex);
+		throw ExtractException::AsExtractException("ELI32313", ex);
 	}
-	finally
+}
+//--------------------------------------------------------------------------------------------------
+[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
+void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
+	MapLabel^ mapLabel)
+{
+	try
 	{
-		// Close the streams and clear the encryption objects
-		if (cryptoStream != nullptr)
-		{
-			cryptoStream->Close();
-		}
-		if (rjndl != nullptr)
-		{
-			rjndl->Clear();
-		}
+		// Ensure calling assembly is signed by Extract
+		ExtractException::Assert("ELI32326", "Failed internal data check.",
+			CheckData(Assembly::GetCallingAssembly()));
+
+		// Get the version number from the stream
+		auto version = GetEncryptedStreamVersion(cipherData);
+
+		Decrypt(cipherData, plainData, version, password);
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI32314", ex);
+	}
+}
+//--------------------------------------------------------------------------------------------------
+[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
+array<Byte>^ ExtractEncryption::GetHashedBytes(String^ value, int version, MapLabel^ mapLabel)
+{
+	try
+	{
+		// Ensure calling assembly is signed by Extract
+		ExtractException::Assert("ELI22638", "Failed internal data check.",
+			CheckData(Assembly::GetCallingAssembly()));
+
+		return ComputeHash(value, version);
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI22639", ex);
 	}
 }
 
@@ -561,6 +529,50 @@ array<Byte>^ ExtractEncryption::Encrypt(array<Byte>^ plainBytes)
 		if (rsa != nullptr)
 		{
 			rsa->Clear();
+		}
+		if (rjndl != nullptr)
+		{
+			rjndl->Clear();
+		}
+	}
+}
+//--------------------------------------------------------------------------------------------------
+void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ passwordHash)
+{
+	RijndaelManaged^ rjndl = nullptr;
+	CryptoStream^ cryptoStream = nullptr;
+	try
+	{
+		// Write the tag and version number to the stream
+		auto encoding = gcnew UnicodeEncoding();
+		auto name = encoding->GetBytes(_STREAM_ENCRYPT_TAG);
+		auto length = name->Length;
+		cipher->Write(BitConverter::GetBytes(length), 0, 4);
+		cipher->Write(name, 0, length);
+		cipher->Write(BitConverter::GetBytes(_PASSWORD_ENCRYPT_VERSION), 0, 4);
+
+		rjndl = GetRijndael(passwordHash, HashVersion);
+		cryptoStream = gcnew CryptoStream(cipher, rjndl->CreateEncryptor(),
+			CryptoStreamMode::Write);
+		auto buffer = gcnew array<Byte>(_BUFFER_SIZE);
+		auto bytes = plain->Read(buffer, 0, _BUFFER_SIZE);
+		while (bytes > 0)
+		{
+			cryptoStream->Write(buffer, 0, bytes);
+			bytes = plain->Read(buffer, 0, _BUFFER_SIZE);
+		}
+		cryptoStream->FlushFinalBlock();
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI32306", ex);
+	}
+	finally
+	{
+		// Close the streams and clear the encryption objects
+		if (cryptoStream != nullptr)
+		{
+			cryptoStream->Close();
 		}
 		if (rjndl != nullptr)
 		{
@@ -669,6 +681,122 @@ array<Byte>^ ExtractEncryption::Decrypt(array<Byte>^ cipherBytes)
 	}
 }
 //--------------------------------------------------------------------------------------------------
+void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, String^ password)
+{
+	try
+	{
+		auto version = GetEncryptedStreamVersion(cipher);
+		switch(version)
+		{
+		case 1:
+			Decrypt(cipher, plain, version, ComputeHash(password, 1));
+			break;
+
+		default:
+			auto ee = gcnew ExtractException("ELI32320", "Unrecognized version.");
+			ee->AddDebugData("Version Specified", version, false);
+			throw ee;
+		}
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI32319", ex);
+	}
+}
+//--------------------------------------------------------------------------------------------------
+void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
+	array<Byte>^ passwordHash)
+{
+	switch(version)
+	{
+	case 1:
+		{
+			RijndaelManaged^ rjndl = nullptr;
+			CryptoStream^ cryptoStream = nullptr;
+			try
+			{
+				rjndl = GetRijndael(passwordHash, 1);
+				cryptoStream = gcnew CryptoStream(plain, rjndl->CreateDecryptor(),
+					CryptoStreamMode::Write);
+				auto buffer = gcnew array<Byte>(_BUFFER_SIZE);
+				auto bytes = cipher->Read(buffer, 0, _BUFFER_SIZE);
+				while (bytes > 0)
+				{
+					cryptoStream->Write(buffer, 0, bytes);
+					bytes = cipher->Read(buffer, 0, _BUFFER_SIZE);
+				}
+				cryptoStream->FlushFinalBlock();
+			}
+			catch(Exception^ ex)
+			{
+				throw ExtractException::AsExtractException("ELI32307", ex);
+			}
+			finally
+			{
+				// Close the streams and clear the encryption objects
+				if (cryptoStream != nullptr)
+				{
+					cryptoStream->Close();
+				}
+				if (rjndl != nullptr)
+				{
+					rjndl->Clear();
+				}
+			}
+		}
+		break;
+
+	default:
+		auto ee = gcnew ExtractException("ELI32321", "Unrecognized version.");
+		ee->AddDebugData("Version Number", version, false);
+		throw ee;
+	}
+}
+//--------------------------------------------------------------------------------------------------
+int ExtractEncryption::GetEncryptedStreamVersion(Stream^ cipherStream)
+{
+	try
+	{
+		auto encoding = gcnew UnicodeEncoding();
+		auto data = gcnew array<Byte>(4);
+
+		// Read the tag from the stream
+		cipherStream->Read(data, 0, 4);
+		auto length = BitConverter::ToInt32(data, 0);
+		auto tag = gcnew array<Byte>(length);
+		cipherStream->Read(tag, 0, length);
+
+		// Validate the tag
+		if (!_STREAM_ENCRYPT_TAG->Equals(encoding->GetString(tag), StringComparison::Ordinal))
+		{
+			// Throw an exception
+			auto ee = gcnew ExtractException("ELI32309", "Unrecognized tag in stream.");
+			ee->AddDebugData("Tag Loaded", encoding->GetString(tag), true);
+			ee->AddDebugData("Tag Expected", _STREAM_ENCRYPT_TAG, true);
+			throw ee;
+		}
+
+		// Check the version
+		Array::Clear(data, 0, 4);
+		cipherStream->Read(data, 0, 4);
+		auto version = BitConverter::ToInt32(data, 0);
+		if (version > _PASSWORD_ENCRYPT_VERSION)
+		{
+			// Throw an exception
+			auto ee = gcnew ExtractException("ELI32310", "Unrecognized version number.");
+			ee->AddDebugData("Current version", _PASSWORD_ENCRYPT_VERSION, false);
+			ee->AddDebugData("Version to load", version, false);
+			throw ee;
+		}
+
+		return version;
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI32318", ex);
+	}
+}
+//--------------------------------------------------------------------------------------------------
 array<Byte>^ ExtractEncryption::CreateInternalArray()
 {
 	try
@@ -725,11 +853,15 @@ RijndaelManaged^ ExtractEncryption::GetRijndael()
 	return rjndl;
 }
 //--------------------------------------------------------------------------------------------------
-RijndaelManaged^ ExtractEncryption::GetRijndael(System::String^ password)
+RijndaelManaged^ ExtractEncryption::GetRijndael(array<Byte>^ passwordHash, int hashVersion)
 {
-	auto encoding = gcnew UnicodeEncoding();
-	auto sha = gcnew SHA512Managed();
-	auto passHash = sha->ComputeHash(encoding->GetBytes(password));
+	if (passwordHash->Length != 64)
+	{
+		auto ee = gcnew ExtractException("ELI32312", "Invalid array length.");
+		ee->AddDebugData("Array Length", passwordHash->Length, false);
+		ee->AddDebugData("Required Length", 64, false);
+	}
+
 	array<Byte>^ otherHash = nullptr;
 
 	// Create an array to hold the modified key
@@ -744,7 +876,7 @@ RijndaelManaged^ ExtractEncryption::GetRijndael(System::String^ password)
 		modifyData((unsigned char*)p);
 
 		// Get the hash of the key data
-		otherHash = sha->ComputeHash(keyBytes);
+		otherHash = ComputeHash(keyBytes, hashVersion);
 
 		// Clear the array
 		Array::Clear(keyBytes,0, keyBytes->Length);
@@ -754,7 +886,7 @@ RijndaelManaged^ ExtractEncryption::GetRijndael(System::String^ password)
 	auto iv = gcnew List<Byte>();
 	for(int i=0; i < otherHash->Length; i ++)
 	{
-		auto value = (Byte)(passHash[i] ^ otherHash[i]);
+		auto value = (Byte)(passwordHash[i] ^ otherHash[i]);
 		if (i % 2 == 0)
 		{
 			combined->Add(value);
@@ -808,5 +940,28 @@ RSACryptoServiceProvider^ ExtractEncryption::GetRSA()
 
 	// Return the new object
 	return rsa;
+}
+//--------------------------------------------------------------------------------------------------
+array<Byte>^ ExtractEncryption::ComputeHash(String^ value, int version)
+{
+	auto encoding = gcnew UnicodeEncoding();
+	return ComputeHash(encoding->GetBytes(value), version);
+}
+//--------------------------------------------------------------------------------------------------
+array<Byte>^ ExtractEncryption::ComputeHash(array<Byte>^ value, int version)
+{
+	switch(version)
+	{
+	case 1:
+		{
+			auto sha = gcnew SHA512Managed();
+			return sha->ComputeHash(value);
+		}
+
+	default:
+		auto ee =  gcnew ExtractException("ELI32317", "Invalid version specified.");
+		ee->AddDebugData("Version Specified", version, false);
+		throw ee;
+	}
 }
 //--------------------------------------------------------------------------------------------------

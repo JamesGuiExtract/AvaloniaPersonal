@@ -310,6 +310,15 @@ namespace Extract.FileActionManager.FileProcessors
                     throw ee;
                 }
 
+                // Ensure the database counter exists
+                if (!pDB.IsUserCounterValid(_format.DatabaseCounter))
+                {
+                    var ee2 = new ExtractException("ELI27986",
+                        "The user counter specified no longer exists in the database.");
+                    ee2.AddDebugData("Counter Name", _format.DatabaseCounter, false);
+                    throw ee2;
+                }
+
                 if (_codecs == null)
                 {
                     lock (_lock)
@@ -356,15 +365,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Create a tag manager and expand the tags in the file name
                 FileActionManagerPathTags tags = new FileActionManagerPathTags(
                     Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir);
-                fileName = tags.Expand(_fileName);
-
-                // Ensure the database counter exists
-                if (!pDB.IsUserCounterValid(_format.DatabaseCounter))
-                {
-                    ExtractException ee = new ExtractException("ELI27986",
-                        "The user counter specified no longer exists in the database.");
-                    throw ee;
-                }
+                fileName = Path.GetFullPath(tags.Expand(_fileName));
 
                 // Apply the bates number based on the format settings
                 using (BatesNumberGeneratorWithDatabase generator =
@@ -590,8 +591,8 @@ namespace Extract.FileActionManager.FileProcessors
                         (pageCount / 4) + 1, true);
                 }
 
-                // Create a temporary file to apply the Bates number to
-                // and wrap it in a PDF manager
+                // Create a temporary file to apply the Bates number to, copy back after
+                // number is applied
                 outputFile = new TemporaryFile(Path.GetExtension(fileName));
 
                 // Generate bates numbers
@@ -612,6 +613,9 @@ namespace Extract.FileActionManager.FileProcessors
                 reader.Dispose();
                 reader = null;
                 writer.Commit(true);
+
+                // Copy the output file to the destination
+                File.Copy(outputFile.FileName, fileName, true);
 
                 // Ensure if progress status is being updated
                 // that the last item is completed

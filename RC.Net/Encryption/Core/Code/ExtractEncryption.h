@@ -25,6 +25,9 @@ namespace Extract
 		public ref class ExtractEncryption sealed
 		{
 		public:
+			// Hash Version 1 - uses SHA512 to compute the hash
+			literal int HashVersion = 1;
+
             //--------------------------------------------------------------------------------------
 			// Public methods
             //--------------------------------------------------------------------------------------
@@ -81,6 +84,20 @@ namespace Extract
 			//			password - The password used to generate the encryption key
 			static void EncryptStream(Stream^ plainData, Stream^ cipherData, String^ password);
             //--------------------------------------------------------------------------------------
+			// PURPOSE: To encrypt the bytes contained in the input stream and place them in
+			//			the cipher data stream. The encryption key will be generated from
+			//			the provided password.
+			//
+			// ARGS:	plainData - The input stream to read the data from
+			//			cipherData - The output stream to write the encrypted bytes to
+			//			password - The hash of the password used to generate the encryption key
+			//			mapLabel - Used to prevent calling this method as a delegate or
+			//					   event handler which could potentially circumvent the
+			//					   check used to determine if the calling assembly was
+			//					   signed by Extract Systems
+			static void EncryptStream(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
+				MapLabel^ mapLabel);
+            //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt the specified binary file
 			//
 			// ARGS:	fileName - The file to be decrypted
@@ -121,6 +138,29 @@ namespace Extract
 			//			plainData - The output stream to write the decrypted data to
 			//			password - The password used to generate the decryption key
 			static void DecryptStream(Stream^ cipherData, Stream^ plainData, String^ password);
+            //--------------------------------------------------------------------------------------
+			// PURPOSE: To decrypt the bytes contained in the input stream and place them in
+			//			the plain data stream. The decryption key will be generated from
+			//			the provided password.
+			//
+			// ARGS:	cipherData - The input stream to read the encrypted bytes from
+			//			plainData - The output stream to write the decrypted data to
+			//			password - The hash of the password used to generate the encryption key
+			//			mapLabel - Used to prevent calling this method as a delegate or
+			//					   event handler which could potentially circumvent the
+			//					   check used to determine if the calling assembly was
+			//					   signed by Extract Systems
+			static void DecryptStream(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
+				MapLabel^ mapLabel);
+            //--------------------------------------------------------------------------------------
+			// PURPOSE: To convert the specified string to the specified hash version
+			// ARGS:	value - The string to compute the hash for.
+			//			version - The version to compute the hash for
+			//			mapLabel - Used to prevent calling this method as a delegate or
+			//					   event handler which could potentially circumvent the
+			//					   check used to determine if the calling assembly was
+			//					   signed by Extract Systems
+			static array<Byte>^ GetHashedBytes(String^ value, int version, MapLabel^ mapLabel);
 
 		private:
 
@@ -139,8 +179,20 @@ namespace Extract
 			// PURPOSE: To encrypt and array of bytes.
 			static array<Byte>^ Encrypt(array<Byte>^ plainBytes);
             //--------------------------------------------------------------------------------------
+			// PURPOSE: To encrypt a stream with a key generated from the specified password hash
+			static void Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ passwordHash);
+            //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt an array of bytes.
 			static array<Byte>^ Decrypt(array<Byte>^ cipherBytes);
+            //--------------------------------------------------------------------------------------
+			// PURPOSE: To decrypt a stream with a key generated from the specified password
+			static void Decrypt(Stream^ cipher, Stream^ plain, String^ password);
+            //--------------------------------------------------------------------------------------
+			// PURPOSE: To decrypt a stream with a key generated from the specified password hash
+			static void Decrypt(Stream^ cipher, Stream^ plain, int version, array<Byte>^ passwordHash);
+            //--------------------------------------------------------------------------------------
+			// PURPOSE: To get the version number from the encrypted stream
+			static int GetEncryptedStreamVersion(Stream^ cipher);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To create an array containing the public key data for this assembly
 			static array<Byte>^ CreateInternalArray();
@@ -155,11 +207,25 @@ namespace Extract
 			static RijndaelManaged^ GetRijndael();
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To return a new instance of the RijndaelManaged encryption object,
-			//			with its key initialized by the specified password.
-			static RijndaelManaged^ GetRijndael(System::String^ password);
+			//			with its key initialized by the specified password hash.
+			// 
+			// ARGS:	passwordHash - The hash value of the password to use in key generation
+			//			hashVersion - The version of the ComputeHash to use to generate other data
+			// NOTE:	The password hash must have a length of 64.
+			static RijndaelManaged^ GetRijndael(array<Byte>^ passwordHash, int hashVersion);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To return a new instance of the RSA encryption object.
 			static RSACryptoServiceProvider^ GetRSA();
+            //--------------------------------------------------------------------------------------
+			// PURPOSE: To compute the hash value of the specified string
+			// ARGS:	data - The string to be decrypted
+			//			version - The version of the hashcode to produce
+			static array<Byte>^ ComputeHash(String^ value, int version);
+            //--------------------------------------------------------------------------------------
+			// PURPOSE: To compute the hash value of the specified byte array
+			// ARGS:	data - The string to be decrypted
+			//			version - The version of the hashcode to produce
+			static array<Byte>^ ComputeHash(array<Byte>^ value, int version);
             //--------------------------------------------------------------------------------------
 			// PURPOSE:	Added to remove FxCop error - http://msdn.microsoft.com/en-us/ms182169.aspx
 			//			Microsoft.Design::CA1053 - Static holder types should not have constructors
@@ -192,6 +258,20 @@ namespace Extract
 			static void ExtractDecrypt(Stream^ cipherData, Stream^ plainData, String^ password)
 			{
 				ExtractEncryption::DecryptStream(cipherData, plainData, password);
+			}
+
+			[System::Runtime::CompilerServices::Extension]
+			static void ExtractEncrypt(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
+				MapLabel^ mapLabel)
+			{
+				ExtractEncryption::EncryptStream(plainData, cipherData, password, mapLabel);
+			}
+
+			[System::Runtime::CompilerServices::Extension]
+			static void ExtractDecrypt(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
+				MapLabel^ mapLabel)
+			{
+				ExtractEncryption::DecryptStream(cipherData, plainData, password, mapLabel);
 			}
 		};
 	};
