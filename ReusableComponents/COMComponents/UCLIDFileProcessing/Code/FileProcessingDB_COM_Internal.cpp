@@ -77,6 +77,20 @@ using namespace ADODB;
 		while (!bRetrySuccess);
 
 //-------------------------------------------------------------------------------------------------
+// Define constant for the current DB schema version
+// This must be updated when the DB schema changes
+// !!!ATTENTION!!!
+// An UpdateToSchemaVersion method must be added when checking in a new schema version.
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 108;
+//-------------------------------------------------------------------------------------------------
+string buildUpdateSchemaVersionQuery(int nSchemaVersion)
+{
+	string strQuery = "UPDATE [DBInfo] SET [Value] = '" + asString(nSchemaVersion)
+		+ "' WHERE [Name] = '" + gstrFAMDB_SCHEMA_VERSION + "'";
+
+	return strQuery;
+}
+//-------------------------------------------------------------------------------------------------
 // Schema update functions
 // 
 // NOTE TO IMPLEMENTERS: If pnNumSteps is not null, rather than performing a schema update,
@@ -194,8 +208,7 @@ int UpdateToSchemaVersion101(_ConnectionPtr ipConnection, long* pnNumSteps,
 			"	RAISERROR (@error_message, @error_severity, @error_state)\r\n"
 			"END CATCH\r\n");
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '101' WHERE [Name] = '" + 
-			gstrFAMDB_SCHEMA_VERSION + "'");
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -238,8 +251,7 @@ int UpdateToSchemaVersion102(_ConnectionPtr ipConnection, long* pnNumSteps,
 		replaceVariable(strCreateActionStatsSQL, "<ActionIDWhereClause>", "");
 		vecQueries.push_back(strCreateActionStatsSQL);
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '102' WHERE [Name] = '" + 
-			gstrFAMDB_SCHEMA_VERSION + "'");
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -273,8 +285,7 @@ int  UpdateToSchemaVersion103(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 				+ gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY + "', '1')");
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '103' WHERE [Name] = '" + 
-			gstrFAMDB_SCHEMA_VERSION + "'");
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -309,8 +320,7 @@ int UpdateToSchemaVersion104(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 				+ gstrSTORE_DOC_TAG_HISTORY + "', '1')");
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '104' WHERE [Name] = '" + 
-			gstrFAMDB_SCHEMA_VERSION + "'");
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -346,12 +356,10 @@ int UpdateToSchemaVersion105(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
 				+ gstrSTORE_DB_INFO_HISTORY + "', '1')");
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '105' WHERE [Name] = '" + 
-			gstrFAMDB_SCHEMA_VERSION + "'");
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		// Add default value for last DB info change
-		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-				+ gstrLAST_DB_INFO_CHANGE + "', '" + getSQLServerDateTime(ipConnection) + "')");
+		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -378,14 +386,9 @@ int UpdateToSchemaVersion106(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("DROP TABLE [LockTable]");
 		vecQueries.push_back(gstrCREATE_LOCK_TABLE);
 
-		// Add the new schema version number
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '106' WHERE [Name] = '" + 
-			gstrFAMDB_SCHEMA_VERSION + "'");
-
-		// Add default value for last DB info change
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '"
-			+ getSQLServerDateTime(ipConnection) + "' WHERE [Name] = '"
-			+ gstrLAST_DB_INFO_CHANGE + "'");
+		// Update schema version and dbinfo update time
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
 		// Execute the queries
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -414,14 +417,40 @@ int UpdateToSchemaVersion107(_ConnectionPtr ipConnection, long* pnNumSteps,
 			+ gstrSKIP_AUTHENTICATION_ON_MACHINES
 			+ "' WHERE [Name] = 'SkipAuthenticationOnMachines'");
 
-		// Add the new schema version number
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '107' WHERE [Name] = '" + 
-			gstrFAMDB_SCHEMA_VERSION + "'");
+		// Update schema version and dbinfo update time
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
-		// Update the value for last DB info change
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '"
-			+ getSQLServerDateTime(ipConnection) + "' WHERE [Name] = '"
-			+ gstrLAST_DB_INFO_CHANGE + "'");
+		// Execute the queries
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32304");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion108(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		const int nNewSchemaVersion = 108;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Fix the spelling error for the user created counter
+		vecQueries.push_back("EXEC sp_rename 'dbo.UserCreatedCounter.PK_UserCreatedConter', "
+			"'PK_UserCreatedCounter', 'INDEX'");
+
+		// Update schema version and dbinfo update time
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
 
 		// Execute the queries
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -5236,7 +5265,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 104:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion105);
 				case 105:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion106);
 				case 106:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion107);
-				case 107:	break;
+				case 107:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion108);
+				case 108:	break;
 
 				default:
 					{

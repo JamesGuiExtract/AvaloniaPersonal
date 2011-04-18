@@ -164,7 +164,7 @@ static const string gstrCREATE_LOCKED_FILE_TABLE =
 
 static const string gstrCREATE_USER_CREATED_COUNTER_TABLE =
 	"CREATE TABLE [UserCreatedCounter] ("
-	"[CounterName] [nvarchar](50) NOT NULL CONSTRAINT [PK_UserCreatedConter] PRIMARY KEY CLUSTERED,"
+	"[CounterName] [nvarchar](50) NOT NULL CONSTRAINT [PK_UserCreatedCounter] PRIMARY KEY CLUSTERED,"
 	"[Value] [bigint] NOT NULL CONSTRAINT [DF_UserCreatedCounter_Value] DEFAULT((0)))";
 
 static const string gstrCREATE_FPS_FILE_TABLE =

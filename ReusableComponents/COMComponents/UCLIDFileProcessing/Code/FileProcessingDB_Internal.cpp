@@ -30,12 +30,6 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-// Define constant for the current DB schema version
-// This must be updated when the DB schema changes
-// !!!ATTENTION!!!
-// An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 107;
-
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
 //		 no user of this class needs to know that these passwords exist
