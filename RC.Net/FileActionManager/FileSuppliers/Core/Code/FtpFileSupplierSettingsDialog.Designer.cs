@@ -51,6 +51,8 @@
             this._fileExtensionSpecificationTextBox = new System.Windows.Forms.TextBox();
             this._remoteDownloadFolderTextBox = new System.Windows.Forms.TextBox();
             this._connectionSettingsTabPage = new System.Windows.Forms.TabPage();
+            this._numberConnections = new Extract.Utilities.Forms.BetterNumericUpDown();
+            this.label5 = new System.Windows.Forms.Label();
             this._testConnectionButton = new System.Windows.Forms.Button();
             this._ftpConnectionEditor = new EnterpriseDT.Net.Ftp.Forms.FTPConnectionEditor();
             this._secureFTPConnection = new EnterpriseDT.Net.Ftp.SecureFTPConnection(this.components);
@@ -61,6 +63,7 @@
             this._afterDownloadGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._pollingIntervalNumericUpDown)).BeginInit();
             this._connectionSettingsTabPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._numberConnections)).BeginInit();
             this.SuspendLayout();
             // 
             // _settingsTabControl
@@ -280,6 +283,8 @@
             // 
             // _connectionSettingsTabPage
             // 
+            this._connectionSettingsTabPage.Controls.Add(this._numberConnections);
+            this._connectionSettingsTabPage.Controls.Add(this.label5);
             this._connectionSettingsTabPage.Controls.Add(this._testConnectionButton);
             this._connectionSettingsTabPage.Controls.Add(this._ftpConnectionEditor);
             this._connectionSettingsTabPage.Location = new System.Drawing.Point(4, 22);
@@ -289,6 +294,38 @@
             this._connectionSettingsTabPage.TabIndex = 1;
             this._connectionSettingsTabPage.Text = "Connection Settings";
             this._connectionSettingsTabPage.UseVisualStyleBackColor = true;
+            // 
+            // _numberConnections
+            // 
+            this._numberConnections.Location = new System.Drawing.Point(315, 317);
+            this._numberConnections.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this._numberConnections.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._numberConnections.Name = "_numberConnections";
+            this._numberConnections.Size = new System.Drawing.Size(36, 20);
+            this._numberConnections.TabIndex = 4;
+            this._numberConnections.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._numberConnections.UserTextCorrected += new System.EventHandler<System.EventArgs>(this.HandleNumberConnectionsNumericUpDownUserTextCorrected);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 321);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(288, 13);
+            this.label5.TabIndex = 3;
+            this.label5.Text = "Maximum number of simultaneous connections to the server";
             // 
             // _testConnectionButton
             // 
@@ -310,7 +347,7 @@
             this._ftpConnectionEditor.Location = new System.Drawing.Point(3, 3);
             this._ftpConnectionEditor.Name = "_ftpConnectionEditor";
             this._ftpConnectionEditor.Properties = ftpConnectionProperties1;
-            this._ftpConnectionEditor.Size = new System.Drawing.Size(443, 330);
+            this._ftpConnectionEditor.Size = new System.Drawing.Size(443, 279);
             this._ftpConnectionEditor.TabIndex = 0;
             this._ftpConnectionEditor.ViewBackColor = System.Drawing.SystemColors.Window;
             this._ftpConnectionEditor.ViewForeColor = System.Drawing.SystemColors.WindowText;
@@ -375,6 +412,8 @@
             this._afterDownloadGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._pollingIntervalNumericUpDown)).EndInit();
             this._connectionSettingsTabPage.ResumeLayout(false);
+            this._connectionSettingsTabPage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._numberConnections)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -406,5 +445,7 @@
         private System.Windows.Forms.Button _testConnectionButton;
         private Utilities.Forms.BrowseButton _browseButton;
         private Utilities.Forms.PathTagsButton _pathTagsButton;
+        private Utilities.Forms.BetterNumericUpDown _numberConnections;
+        private System.Windows.Forms.Label label5;
     }
 }

@@ -78,6 +78,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 _recursiveDownloadCheckBox.Checked = _settings.RecursivelyDownload;
                 _pollRemoteCheckBox.Checked = _settings.PollRemoteLocation;
                 _pollingIntervalNumericUpDown.Value = _settings.PollingIntervalInMinutes;
+                _numberConnections.Value = _settings.NumberOfConnections;
 
                 // Set the AfterDownloadAction radio buttons
                 switch (_settings.AfterDownloadAction)
@@ -139,6 +140,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 _settings.RecursivelyDownload = _recursiveDownloadCheckBox.Checked;
                 _settings.PollRemoteLocation = _pollRemoteCheckBox.Checked;
                 _settings.PollingIntervalInMinutes = (int)_pollingIntervalNumericUpDown.Value;
+                _settings.NumberOfConnections = (int)_numberConnections.Value;
 
                 if (_doNothingRadioButton.Checked)
                 {
@@ -250,6 +252,40 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
+        /// <summary>
+        /// Handles the UserTextCorrected event for the number of connections control
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void HandleNumberConnectionsNumericUpDownUserTextCorrected(object sender, EventArgs e)
+        {
+            try
+            {
+                UtilityMethods.ShowMessageBox(
+                    "The number of connections must be between 1 and 10.",
+                    "Invalid number of connections", true);
+
+                // Re-select the _numberConnections control, but only after any other events
+                // in the message queue have been processed so those event don't undo this selection.
+                BeginInvoke((MethodInvoker)(() =>
+                {
+                    try
+                    {
+                        _settingsTabControl.SelectedTab = _connectionSettingsTabPage;
+                        _numberConnections.Focus();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractDisplay("ELI32251");
+                    }
+                }));
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32252");
+            }
+        }
+
         #endregion
 
         #region Helper functions
@@ -260,9 +296,9 @@ namespace Extract.FileActionManager.FileSuppliers
         void UpdateControlState()
         {
             _pollingIntervalNumericUpDown.Enabled = _pollRemoteCheckBox.Checked;
-            _doNothingRadioButton.Enabled = _pollRemoteCheckBox.Checked;
+            _doNothingRadioButton.Enabled = !_pollRemoteCheckBox.Checked;
             _newExtensionTextBox.Enabled = _changeRemoteExtensionRadioButton.Checked;
-            if (_doNothingRadioButton.Checked && !_pollRemoteCheckBox.Checked)
+            if (_doNothingRadioButton.Checked && _pollRemoteCheckBox.Checked)
             {
                 _deleteRemoteFileRadioButton.Checked = true;
             }

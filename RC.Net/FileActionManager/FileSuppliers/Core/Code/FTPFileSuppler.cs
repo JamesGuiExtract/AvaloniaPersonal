@@ -4,8 +4,10 @@ using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -60,24 +62,39 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <summary>
         /// Current file supplier version.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
+
+        /// <summary>
+        /// License owner for the edtftpnetpro library
+        /// </summary>
+        static readonly string _FTP_API_LICENSE_OWNER = "ExtractSystems";
+
+        /// <summary>
+        /// License key for the edtftpnetpro library
+        /// </summary>
+        static readonly string _FTP_API_LICENSE_KEY = "064-7556-4340-7862";
 
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
-        static readonly LicenseIdName _licenseId = LicenseIdName.FileActionManagerObjects;
+        static readonly LicenseIdName _licenseId = LicenseIdName.FtpSftpFileTransfer;
+
+        /// <summary>
+        /// Number of milliseconds to wait between checking the <see cref="_filesToDownload"/> 
+        /// for more files.
+        /// This is used to wait on the <see cref="_stopSupplying"/> and <see cref="_pauseEvent"/> 
+        /// when there are no more files in the <see cref="_filesToDownload"/>
+        /// </summary>
+        const int _WAIT_TIME_FOR_MORE_FILES_TO_BE_ADDED = 200;
 
         #endregion
 
         #region Fields
 
-        /// <summary>
-        /// Whether the object is dirty or not.
-        /// </summary>
+        // Whether the object is dirty or not.
         bool _dirty;
 
-        // Target for the files that are being supplied
-        // this will be set in the Start method
+        // Target for the files that are being supplier
         IFileSupplierTarget _fileTarget;
 
         // Field for the FileExtensionsToDownload property
@@ -93,10 +110,21 @@ namespace Extract.FileActionManager.FileSuppliers
         // on one thread and Stop can be called on another thread
         // so need to make sure processing has actually started
         // before stopping it.
-        EventWaitHandle _supplyingStarted;
+        AutoResetEvent _supplyingStarted = new AutoResetEvent(false);
 
-        // flag to indicate that supplying should be stopped
-        bool _stopSupplying;
+        // Event used for controlling a pause.  If the event is NOT signaled supplying will
+        // pause until it is signaled.  Its initial state should be set to signaled.
+        ManualResetEvent _pauseEvent = new ManualResetEvent(true);
+
+        // Event to indicate supplying should stop
+        ManualResetEvent _stopSupplying = new ManualResetEvent(false);
+
+        // Event to indicate the FTP Server should be checked for more files
+        ManualResetEvent _pollFtpServerForFiles = new ManualResetEvent(false);
+       
+        // Event to indicate that all files have been added to the queue for the current
+        // poll of the ftp server.
+        ManualResetEvent _doneAddingFilesToQueue = new ManualResetEvent(false);
 
         // Thread that has been created to manage the download of files
         // from the ftp server
@@ -104,6 +132,12 @@ namespace Extract.FileActionManager.FileSuppliers
 
         // LocalWorkingFolder with tags expanded
         string _expandedLocalWorkingFolder;
+
+        // Queue of files to be downloaded.
+        ConcurrentQueue<FTPFile> _filesToDownload = new ConcurrentQueue<FTPFile>();
+
+         // Timer used to poll the ftp site if polling is enabled.
+        System.Threading.Timer _pollingTimer;
 
         #endregion
 
@@ -185,9 +219,13 @@ namespace Extract.FileActionManager.FileSuppliers
         [CLSCompliant(false)]
         public SecureFTPConnection ConfiguredFtpConnection { get; set; }
 
-        #endregion
-  
+        /// <summary>
+        /// Number of connections used to download files
+        /// </summary>
+        public int NumberOfConnections { get; set; }
         
+        #endregion
+          
         #region Constructors
 
         /// <summary>
@@ -196,14 +234,10 @@ namespace Extract.FileActionManager.FileSuppliers
         public FtpFileSupplier()
         {
             ConfiguredFtpConnection = new SecureFTPConnection();
-            ConfiguredFtpConnection.LicenseOwner = "trialuser";
-            ConfiguredFtpConnection.LicenseKey = "701-9435-3077-362";
-            AfterDownloadAction = AfterDownloadRemoteFileActon.DeleteRemoteFile;
-            _supplyingStarted = new EventWaitHandle(false, EventResetMode.AutoReset);
-            _stopSupplying = false;
             
-            // Set Polling IntervalInMinutes to the default
-            PollingIntervalInMinutes = 1;
+            InitializeFtpApiLicense(ConfiguredFtpConnection);
+
+            InitializeDefaults();
         }
 
         /// <summary>
@@ -217,8 +251,6 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 CopyFrom(ftpFileSupplier);
             }
-            _supplyingStarted = new EventWaitHandle(false, EventResetMode.AutoReset);
-            _stopSupplying = false;
         }
 
         #endregion
@@ -355,6 +387,11 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
+                // Stop the polling threads
+                StopPolling();
+
+                // Pause the suppling
+                _pauseEvent.Reset();
             }
             catch (Exception ex)
             {
@@ -369,6 +406,10 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
+                // Resume supplying 
+                _pauseEvent.Set();
+
+                StartPolling();
             }
             catch (Exception ex)
             {
@@ -390,22 +431,16 @@ namespace Extract.FileActionManager.FileSuppliers
                 LicenseUtilities.ValidateLicense(_licenseId,
                    "ELI32216", _COMPONENT_DESCRIPTION);
 
-                FileActionManagerSupplierPathTags pathTags = 
-                    new FileActionManagerSupplierPathTags(pFAMTM.FPSFileDir);
+                InitializeEventsForStart();
 
-                _expandedLocalWorkingFolder = pathTags.Expand(LocalWorkingFolder);
+                ExpandLocalWorkingFolder(pFAMTM.FPSFileDir);
 
                 // Set the file target
                 _fileTarget = pTarget;
 
-                // Set the stop supplying flag to false
-                _stopSupplying = false;
+                StartFileDownloadManagementThread();
                 
-                // Start the supplying thread
-                _ftpDownloadManagerThread = new Thread(ManageFileDownload);
-                _ftpDownloadManagerThread.Start();
-
-                _supplyingStarted.Set();
+                StartPolling();
             }
             catch (Exception ex)
             {
@@ -420,13 +455,16 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                _supplyingStarted.WaitOne();
-                _stopSupplying = true;
+                StopPolling();
 
-                // Will need to put cancel logic in here
-                // Wait for the thread to stop
+                StopThreads();
+
+                // Wait for the DownloadManagerThread to stop
                 _ftpDownloadManagerThread.Join();
                 _ftpDownloadManagerThread = null;
+
+                // Clear out any remaining files in the files to download queue
+                _filesToDownload = new ConcurrentQueue<FTPFile>();
             }
             catch (Exception ex)
             {
@@ -505,6 +543,8 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
+                    InitializeDefaults();
+
                     RemoteDownloadFolder = reader.ReadString();
                     FileExtensionsToDownload = reader.ReadString();
                     RecursivelyDownload = reader.ReadBoolean();
@@ -514,14 +554,22 @@ namespace Extract.FileActionManager.FileSuppliers
                     NewExtensionForRemoteFile = reader.ReadString();
                     LocalWorkingFolder = reader.ReadString();
 
+                    if (reader.Version == 2)
+                    {
+                        NumberOfConnections = reader.ReadInt32();
+                    }
+                    else
+                    {
+                        NumberOfConnections = 1;
+                    }
+
                     string hexString = reader.ReadString();
                     using (MemoryStream ftpDataStream = new MemoryStream(hexString.ToByteArray()))
                     {
                         ConfiguredFtpConnection = new SecureFTPConnection();
                         ConfiguredFtpConnection.Load(ftpDataStream);
                     }
-                    ConfiguredFtpConnection.LicenseOwner = "trialuser";
-                    ConfiguredFtpConnection.LicenseKey = "701-9435-3077-362";
+                    InitializeFtpApiLicense(ConfiguredFtpConnection);
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -557,6 +605,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     writer.Write((int)AfterDownloadAction);
                     writer.Write(NewExtensionForRemoteFile);
                     writer.Write(LocalWorkingFolder);
+                    writer.Write(NumberOfConnections);
 
                     // Write the Ftp connection settings to the steam
                     using (MemoryStream ftpDataStream = new MemoryStream())
@@ -616,8 +665,36 @@ namespace Extract.FileActionManager.FileSuppliers
                 {
                     ConfiguredFtpConnection.Dispose();
                     ConfiguredFtpConnection = null;
+                }
+                if (_supplyingStarted != null)
+                {
                     _supplyingStarted.Dispose();
                     _supplyingStarted = null;
+                }
+                if (_pauseEvent != null)
+                {
+                    _pauseEvent.Dispose();
+                    _pauseEvent = null;
+                }
+                if (_stopSupplying != null)
+                {
+                    _stopSupplying.Dispose();
+                    _stopSupplying = null;
+                }
+                if(_pollFtpServerForFiles != null)
+                {
+                    _pollFtpServerForFiles.Dispose();
+                    _pollFtpServerForFiles = null;
+                }
+                if (_pollingTimer != null)
+                {
+                    _pollingTimer.Dispose();
+                    _pollingTimer = null;
+                }
+                if (_doneAddingFilesToQueue != null)
+                {
+                    _doneAddingFilesToQueue.Dispose();
+                    _doneAddingFilesToQueue = null;
                 }
             }
 
@@ -625,7 +702,6 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         #endregion IDisposable
-
 
         #region EventHandlers
 
@@ -645,8 +721,19 @@ namespace Extract.FileActionManager.FileSuppliers
                 SecureFTPConnection runningConnection = (SecureFTPConnection)sender;
                 if (e.Succeeded)
                 {
-                    // Add the local file that was just downloaded to the database
-                    _fileTarget.NotifyFileAdded(e.LocalPath, this);
+                    // Verify that the files is exists localy
+                    if (File.Exists(e.LocalPath))
+                    {
+                        // Add the local file that was just downloaded to the database
+                        _fileTarget.NotifyFileAdded(e.LocalPath, this);
+                    }
+                    else
+                    {
+                        ExtractException ee = new ExtractException("ELI32311", "File was not downloaded.");
+                        ee.AddDebugData("LocalFile", e.LocalPath, false);
+                        ee.AddDebugData("RemoteFile", e.RemoteFile, false);
+                        throw ee;
+                    }
                     
                     // Perform the after download action
                     switch (AfterDownloadAction)
@@ -664,7 +751,11 @@ namespace Extract.FileActionManager.FileSuppliers
                     // If the file was partially copied need to delete the file
                     if (File.Exists(e.LocalPath))
                     {
-                        File.Delete(e.LocalPath);
+                        ExtractException ee = new ExtractException("ELI32323",
+                            "File may have been partially downloaded");
+                        ee.AddDebugData("Local File", e.LocalPath, false);
+                        ee.AddDebugData("Remote File", e.RemoteFile, false);
+                        ee.Log();
                     }
                 }
             }
@@ -676,8 +767,19 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Handles the PollingTimer timeout event, it will cause the ManageFileDownload thread
+        /// to connect to the ftp server and get a listing of files to download.  If the 
+        /// ManageFileDownload thread is already connected to the ftp server this will cause it
+        /// to connect to the server again when ever it finishes.
+        /// </summary>
+        /// <param name="o">Object the triggered the event</param>
+        void HandlePollingTimerTimeout(object o)
+        {
+            _pollFtpServerForFiles.Set();
+        }
 
+        #endregion
 
         #region Thread Functions
         
@@ -690,57 +792,18 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                using (SecureFTPConnection runningConnection = (SecureFTPConnection)ConfiguredFtpConnection.Clone())
+                do
                 {
-                    // Add event handler for when files are down downloading.
-                    runningConnection.Downloaded += new FTPFileTransferEventHandler(HandleFileDownloaded);
-
-                    // Get the list of files from the ftp server
-                    runningConnection.Connect();
+                    _doneAddingFilesToQueue.Reset();
                     
-                    // Get all the files and directories in the working folder and subfolders if required
-                    FTPFile[] directoryContents = runningConnection.GetFileInfos(RemoteDownloadFolder, RecursivelyDownload);
+                    // Start the file download threads
+                    List<Task> downloadThreads = StartFileDownloadThreads();
 
-                    // Create list to contain all of the files to be downloaded
-                    List<FTPFile> filesToDownload = new List<FTPFile>();
-                    
-                    // Fill the filesToDownload list
-                    DetermineFilesToDownload(runningConnection, directoryContents, filesToDownload, RecursivelyDownload);
-                    
-                    // Download the files
-                    foreach (FTPFile f in filesToDownload)
-                    {
-                        // Check if suppling should be stopped
-                        if (_stopSupplying)
-                        {
-                            return;
-                        }
+                    GetFilesToDownload();
 
-                        // Determine the current working folder on the ftp server
-                        string currentWorkingDir = f.Path.Remove(f.Path.Length - f.Name.Length);
-
-                        // Only change the working directory if it needs to be changed.
-                        if (currentWorkingDir != runningConnection.ServerDirectory)
-                        {
-                            runningConnection.ChangeWorkingDirectory(currentWorkingDir);
-                        }
-
-                        // make sure the path exists on the local machine
-                        string pathForFile = _expandedLocalWorkingFolder + "\\" + 
-                            currentWorkingDir.Remove(0, RemoteDownloadFolder.Length);
-                        pathForFile = pathForFile.Replace('/', '\\');
-                        pathForFile = pathForFile.Replace("\\\\", "\\"); 
-                        if (!Directory.Exists(pathForFile))
-                        {
-                            Directory.CreateDirectory(pathForFile);
-                        }
-
-                        // Determine the full name of the local file
-                        string localFile = pathForFile + "\\" + f.Name;
-                        localFile = localFile.Replace("\\\\", "\\");
-                        runningConnection.DownloadFile(localFile, f.Name);
-                    }
+                    WaitForDownloadThreadsToFinish(downloadThreads);
                 }
+                while (!ExitManageFileDownload());
             }
             catch (Exception ex)
             {
@@ -748,12 +811,121 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             finally
             {
-                // Suppling is finished
                 _fileTarget.NotifyFileSupplyingDone(this);
             }
         }
 
-       
+        /// <summary>
+        /// Starts <see cref="NumberOfConnections"/> file download threads.
+        /// </summary>
+        /// <returns>List containing the Delegate and the IAsynResult for each thread started for
+        /// downloading files</returns>
+        List<Task> StartFileDownloadThreads()
+        {
+            // Set up the download connections
+            List<Task> downloadThreads =
+                new List<Task>(NumberOfConnections);
+
+            // Start the download threads
+            for (int i = 0; i < NumberOfConnections; i++)
+            {
+                downloadThreads.Add(Task.Factory.StartNew(DownloadFiles));
+            }
+            return downloadThreads;
+        }
+
+        /// <summary>
+        /// Determines if the ftp server should be checked again for files
+        /// </summary>
+        /// <returns><see lang="true"/> if Polling is enabled and it is time to check for files
+        /// <see lang="false"/> if polling is not enabled or supplying should stop</returns>
+        bool ExitManageFileDownload()
+        {
+            try
+            {
+                // If not polling, should exit if done adding files
+                if (!PollRemoteLocation)
+                {
+                    return true;
+                }
+
+                // Wait for either stop suppling event or for a poll FTP server event
+                WaitHandle[] handlesToWaitFor = new WaitHandle[]
+                {
+                    _stopSupplying,
+                    _pollFtpServerForFiles
+                };
+                
+                // Return false if result is index of pollFtpServerForFiles
+                return WaitHandle.WaitAny(handlesToWaitFor) != 1;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32288");
+            }
+        }
+
+        /// <summary>
+        /// Downloads files from the <see cref="_filesToDownload"/> queue until it is empty or
+        /// <see cref="_stopSupplying"/> is signaled.
+        /// </summary>
+        void DownloadFiles()
+        {
+            try
+            {
+                using (SecureFTPConnection runningConnection = (SecureFTPConnection)ConfiguredFtpConnection.Clone())
+                {
+                    InitializeFtpApiLicense(runningConnection);
+
+                    // Add event handler for when files are down downloading.
+                    runningConnection.Downloaded += new FTPFileTransferEventHandler(HandleFileDownloaded);
+
+                    FTPFile currentFtpFile;
+                    string localFile = "";
+
+                    // Download the files
+                    while (GetNextFileToDownload(out currentFtpFile))
+                    {
+                        try
+                        {
+                            // If not already connected connect to the FTP Server
+                            if (!runningConnection.IsConnected)
+                            {
+                                runningConnection.Connect();
+                            }
+
+                            SetCurrentFtpWorkingFolder(runningConnection, currentFtpFile);
+                            string localFilePath = GenerateLocalPathCreateIfNotExists(runningConnection.ServerDirectory);
+
+                            // Determine the full name of the local file
+                            localFile = Path.Combine(localFilePath, currentFtpFile.Name);
+                            runningConnection.DownloadFile(localFile, currentFtpFile.Name);
+                        }
+                        catch (Exception ex)
+                        {
+                            ExtractException ee = new ExtractException("ELI32303", "Unable to download file.", ex);
+
+                            if (currentFtpFile != null)
+                            {
+                                ee.AddDebugData("Source on FTP Server", currentFtpFile.Name, false);
+                            }
+                            ee.AddDebugData("Local File", localFile, false);
+                            ee.AddDebugData("Current FTP working folder", runningConnection.ServerDirectory, false);
+                            ee.Log();
+                        }
+                        finally
+                        {
+                            CloseConnectionIfPausedAndWaitForResume(runningConnection);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI32371");
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -799,7 +971,9 @@ namespace Extract.FileActionManager.FileSuppliers
                 NewExtensionForRemoteFile = fileSupplier.NewExtensionForRemoteFile;
                 LocalWorkingFolder = fileSupplier.LocalWorkingFolder;
                 ConfiguredFtpConnection = (SecureFTPConnection)fileSupplier.ConfiguredFtpConnection.Clone();
+                NumberOfConnections = fileSupplier.NumberOfConnections;
 
+                InitializeFtpApiLicense(ConfiguredFtpConnection);
                 _dirty = true;
             }
             catch (Exception ex)
@@ -810,27 +984,27 @@ namespace Extract.FileActionManager.FileSuppliers
 
         /// <summary>
         /// Determines which files in the dirContents should be downloaded and puts 
-        /// them in the files list.
+        /// them in <see cref="_filesToDownload"/> queue
         /// </summary>
-        /// <param name="runningConnection">Connection to the FTPp server</param>
+        /// <param name="runningConnection">Connection to the FTP server</param>
         /// <param name="dirContents">Contents of a directory on the FTP server</param>
-        /// <param name="files">List of files to download</param>
-        /// <param name="recurseDir">if <see lang="true"/> directories will be recursed</param>
-        void DetermineFilesToDownload(SecureFTPConnection runningConnection, FTPFile[] dirContents, 
-            List<FTPFile> files, bool recurseDir)
+        void DetermineFilesToDownload(SecureFTPConnection runningConnection, FTPFile[] dirContents)
         {
             // Filter the directory contents for files and sub directories
-            foreach (FTPFile f in dirContents)
+            foreach (FTPFile file in dirContents)
             {
-                // if the FTPFile is a file add it to the files list
-                if (FilesToDownloadFilter(f))
+                if (_stopSupplying.WaitOne(0))
                 {
-                    files.Add(f);
+                    return;
                 }
-                // if the recursing directories and FTPFile is a directory
-                else if (recurseDir && f.Dir  )
+
+                if (FilesToDownloadFilter(file))
                 {
-                    DetermineFilesToDownload(runningConnection, f.Children, files, recurseDir);
+                    _filesToDownload.Enqueue(file);
+                }
+                else if (RecursivelyDownload && file.Dir  )
+                {
+                    DetermineFilesToDownload(runningConnection, file.Children);
                 }
             }
         }
@@ -851,6 +1025,243 @@ namespace Extract.FileActionManager.FileSuppliers
 
             return Regex.IsMatch(file.Name, _fileExtensionsToDownloadRegEx,
                 RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        }
+
+        /// <summary>
+        /// Waits for all of the download threads to exit.
+        /// </summary>
+        /// <param name="downloadThreads">List of download threads</param>
+        static void WaitForDownloadThreadsToFinish(List<Task> downloadThreads)
+        {
+            // Wait for download threads to finish
+            foreach (var t in downloadThreads)
+            {
+                t.Wait();
+            }
+
+            // Clear the list
+            downloadThreads.Clear();
+        }
+
+        /// <summary>
+        /// Get the files to download from the ftp server and put them the filesToDownload queue
+        /// </summary>
+        void GetFilesToDownload()
+        {
+            try
+            {
+                using (SecureFTPConnection runningConnection = (SecureFTPConnection)ConfiguredFtpConnection.Clone())
+                {
+                    InitializeFtpApiLicense(runningConnection);
+
+                    // Connect to the ftp server
+                    runningConnection.Connect();
+
+                    // Get all the files and directories in the working folder and subfolders if required
+                    FTPFile[] directoryContents = runningConnection.GetFileInfos(RemoteDownloadFolder, RecursivelyDownload);
+
+                    // Fill the filesToDownload list
+                    DetermineFilesToDownload(runningConnection, directoryContents);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32324");
+            }
+            finally
+            {
+                _doneAddingFilesToQueue.Set();
+            }
+        }
+
+        /// <summary>
+        /// Returns the local path for the file being downloaded 
+        /// </summary>
+        /// <param name="currentRemoteWorkingFolder">Current working folder on the ftp server</param>
+        /// <returns>The local path rooted to the _expandedLocalWorkingFolder </returns>
+        string GenerateLocalPathCreateIfNotExists(string currentRemoteWorkingFolder)
+        {
+            // Generate the path so that the directory structure rooted to 
+            // the expanded local working folder will be the same as the 
+            // current ftp working folder rooted to the RemoteDownloadFolder.
+            string pathForFile = Path.Combine(_expandedLocalWorkingFolder,
+                currentRemoteWorkingFolder.Remove(0, RemoteDownloadFolder.Length));
+
+            // Convert / to \ since the ftp server path char may be different that windows
+            pathForFile = pathForFile.Replace('/', '\\');
+
+            // Make sure the local folder exists
+            if (!Directory.Exists(pathForFile))
+            {
+                Directory.CreateDirectory(pathForFile);
+            }
+            return pathForFile;
+        }
+
+        /// <summary>
+        /// Gets the next file to download from the <see cref="_filesToDownload"/> Queue
+        /// </summary>
+        /// <param name="nextFile">Next file to download from the queue</param>
+        /// <returns><see lang="true"/> if nextFile contains the next file
+        /// and <see lang="false"/> if there are no more files to download or if supplying should 
+        /// stop</returns>
+        bool GetNextFileToDownload(out FTPFile nextFile)
+        {
+            // Loop until a file is removed from the queue or supplying is done
+            while (!_stopSupplying.WaitOne(0))
+            {
+                if (_filesToDownload.TryDequeue(out nextFile))
+                {
+                    return true;
+                }
+
+                // If done adding files to the queue need to exit this loop
+                if (_doneAddingFilesToQueue.WaitOne(0))
+                {
+                    if (_filesToDownload.IsEmpty)
+                    {
+                        break;
+                    }
+                    
+                    continue;
+                }
+
+                // Wait on the stop supplying event for a set time before checking the queue
+                // for files.
+                _stopSupplying.WaitOne(_WAIT_TIME_FOR_MORE_FILES_TO_BE_ADDED);
+            }
+
+            nextFile = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Sets the current working folder on the FTP server if it is not the same as the currentFile
+        /// </summary>
+        /// <param name="runningConnection">Connection to the FTP server</param>
+        /// <param name="currentFile">Current file that will be downloaded next</param>
+        static void SetCurrentFtpWorkingFolder(SecureFTPConnection runningConnection, FTPFile currentFile)
+        {
+            // Determine the current working folder on the ftp server 
+            string currentFileDir = currentFile
+                .Path
+                .Remove(currentFile.Path.Length - currentFile.Name.Length);
+
+            // Only change the working directory if it needs to be changed.
+            if (currentFileDir != runningConnection.ServerDirectory)
+            {
+                runningConnection.ChangeWorkingDirectory(currentFileDir);
+            }
+            return;
+        }
+        
+        /// <summary>
+        /// Sets up and starts the download manager thread.
+        /// </summary>
+        void StartFileDownloadManagementThread()
+        {
+            // Start the supplying thread
+            _ftpDownloadManagerThread = new Thread(ManageFileDownload);
+            _ftpDownloadManagerThread.Start();
+
+            _supplyingStarted.Set();
+        }
+
+        /// <summary>
+        /// Sets the LicenseOwner and LicenseKey properties for the ftpConnection
+        /// </summary>
+        /// <param name="ftpConnection">Connection to be initialized</param>
+        static void InitializeFtpApiLicense(SecureFTPConnection ftpConnection)
+        {
+            ftpConnection.LicenseOwner = _FTP_API_LICENSE_OWNER;
+            ftpConnection.LicenseKey = _FTP_API_LICENSE_KEY;
+        }
+
+        /// <summary>
+        /// Intializes properties and fields to initial default values
+        /// </summary>
+        void InitializeDefaults()
+        {
+            AfterDownloadAction = AfterDownloadRemoteFileActon.DeleteRemoteFile;
+
+            // Set Polling IntervalInMinutes to the default
+            PollingIntervalInMinutes = 1;
+            NumberOfConnections = 1;
+        }
+
+        /// <summary>
+        /// Stops polling if polling is active
+        /// </summary>
+        void StopPolling()
+        {
+            if (PollRemoteLocation)
+            {
+                _pollingTimer.Dispose();
+                _pollingTimer = null;
+            }
+        }
+
+        /// <summary>
+        /// Starts a polling timer if polling is enabled
+        /// </summary>
+        void StartPolling()
+        {
+            if (PollRemoteLocation)
+            {
+                Int64 timeoutValue = (Int64)PollingIntervalInMinutes * 60 * 1000;
+                _pollingTimer = new System.Threading.Timer(HandlePollingTimerTimeout, null,
+                    timeoutValue, timeoutValue);
+            }
+        }
+
+        /// <summary>
+        /// Sets _expandedLocalWorkingFolder by expanding the tags in LocalWorking folder
+        /// </summary>
+        /// <param name="FPSFileDir">The FPS file directory needed to expand the LocalWorking Folder</param>
+        void ExpandLocalWorkingFolder(string FPSFileDir)
+        {
+            FileActionManagerSupplierPathTags pathTags =
+                new FileActionManagerSupplierPathTags(FPSFileDir);
+
+            _expandedLocalWorkingFolder = pathTags.Expand(LocalWorkingFolder);
+        }
+
+        /// <summary>
+        /// Resets or Sets events and flags to the starting state
+        /// </summary>
+        void InitializeEventsForStart()
+        {
+            _stopSupplying.Reset();
+            _pollFtpServerForFiles.Reset();
+            _pauseEvent.Set();
+            _doneAddingFilesToQueue.Reset();
+        }
+
+        /// <summary>
+        /// Sets events that will cause the ManageFileDownload and File downloading threads to exit
+        /// </summary>
+        void StopThreads()
+        {
+            _supplyingStarted.WaitOne();
+            _stopSupplying.Set();
+        }
+
+        /// <summary>
+        /// Checks if supplying should be paused and if it is closes the runningConnection and
+        /// waits for supplying to resume
+        /// </summary>
+        /// <param name="runningConnection">FTP connection to close if supplying is paused</param>
+        void CloseConnectionIfPausedAndWaitForResume(SecureFTPConnection runningConnection)
+        {
+            if (!_pauseEvent.WaitOne(0))
+            {
+                // Don't leave the connection open while pausing
+                if (runningConnection.IsConnected)
+                {
+                    runningConnection.Close();
+                }
+                _pauseEvent.WaitOne();
+            }
         }
 
         #endregion

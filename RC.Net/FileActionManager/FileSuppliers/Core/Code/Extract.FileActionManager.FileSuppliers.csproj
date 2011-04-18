@@ -68,7 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FTPFileSuppler.cs" />
+    <Compile Include="FTPFileSupplier.cs" />
     <Compile Include="FtpFileSupplierSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
