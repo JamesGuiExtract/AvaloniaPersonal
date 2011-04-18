@@ -449,6 +449,9 @@ BOOL CProcessFilesApp::InitInstance()
 						// so that the user is prompted for saving when they try
 						// to close the FAM window
 						ipFileProcMgr->LoadFrom(strRecoveryFileName.c_str(), VARIANT_TRUE);
+
+						// Clear the FPS file name
+						ipFileProcMgr->FPSFileName = "";
 					}
 					else if ( strFileName != "" )
 					{

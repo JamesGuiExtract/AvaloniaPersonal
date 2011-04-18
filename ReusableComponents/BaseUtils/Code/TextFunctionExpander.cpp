@@ -64,8 +64,8 @@ TextFunctionExpander::TextFunctionExpander()
 			g_vecFunctions.push_back(gstrFUNC_FILE_NO_EXT_OF);
 			g_vecFunctions.push_back(gstrFUNC_FILE_OF);
 			g_vecFunctions.push_back(gstrFUNC_FULL_USER_NAME);
-			g_vecFunctions.push_back(gstrFUNC_LEFT);
 			g_vecFunctions.push_back(gstrFUNC_INSERT_BEFORE_EXT);
+			g_vecFunctions.push_back(gstrFUNC_LEFT);
 			g_vecFunctions.push_back(gstrFUNC_MID);
 			g_vecFunctions.push_back(gstrFUNC_NOW);
 			g_vecFunctions.push_back(gstrFUNC_OFFSET);
