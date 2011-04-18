@@ -327,7 +327,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI31125", ex);
+                ExtractException.Display("ELI32368", ex);
             }
         }
 

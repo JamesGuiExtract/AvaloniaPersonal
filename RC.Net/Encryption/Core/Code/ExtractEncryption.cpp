@@ -447,14 +447,14 @@ array<Byte>^ ExtractEncryption::GetHashedBytes(String^ value, int version, MapLa
 	try
 	{
 		// Ensure calling assembly is signed by Extract
-		ExtractException::Assert("ELI22638", "Failed internal data check.",
+		ExtractException::Assert("ELI32369", "Failed internal data check.",
 			CheckData(Assembly::GetCallingAssembly()));
 
 		return ComputeHash(value, version);
 	}
 	catch(Exception^ ex)
 	{
-		throw ExtractException::AsExtractException("ELI22639", ex);
+		throw ExtractException::AsExtractException("ELI32370", ex);
 	}
 }
 

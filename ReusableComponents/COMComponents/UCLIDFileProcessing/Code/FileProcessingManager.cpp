@@ -1160,7 +1160,7 @@ STDMETHODIMP CFileProcessingManager::AuthenticateService(BSTR bstrValue)
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32145");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32366");
 }
 
 //-------------------------------------------------------------------------------------------------
