@@ -63,13 +63,13 @@ void addPageSizeDebugInfo(UCLIDException& ue, HIMGFILE hImgFile, int iPageIndex)
 		{
 			UCLIDException ue2("ELI29880", "Unable to get page size information.");
 			loadScansoftRecErrInfo(ue2, rc);
-			throw ue;
+			throw ue2;
 		}
 
 		// add page size bounds in pixels
 		ue.addDebugInfo("X,Y Pixels", asString(imgInfo.Size.cx) + ", " + asString(imgInfo.Size.cy));
 	}
-	catch(UCLIDException ue2)
+	catch(UCLIDException& ue2)
 	{
 		// unable to determine image size info
 		ue.addDebugInfo("X,Y Pixels", "Unable to determine.");
