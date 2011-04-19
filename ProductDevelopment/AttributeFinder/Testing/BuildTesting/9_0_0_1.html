@@ -1,0 +1,267 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.1 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.1 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>EmailFile</b>
+        <ul>
+            <li><b>[LegacyRC #5230]</b> Confirm that if you try to use EmailFile to send a file
+            that doesn't exist, and error is displayed.</li>
+            <li><b>[LegacyRC #5355]</b> Confirm that /? is a supported flag.</li>
+            <li><b>[LegacyRC #6049]</b> Confirm that EmailFile can launch the installed email
+            client.</li>
+            <li><b>[LegacyRC #6060]</b> Save settings with a blank signature and confirm that the
+            signature is still completely blank (i.e., doesn't contain random whitespace) when you
+            reopen.</li>
+        </ul></li>
+    <p>
+        <li><b>FAM stuff</b>
+        <ul>
+            <li><b>[LegacyRC #5935]</b> Apply Bates Number
+            <ul>
+                <li>Queue a large number of files and add a counter to the database.</li>
+                <li>Configure an .fps file with an Apply Bates Number task.</li>
+                <li>Run several instances of the .fps file simultaneously.</li>
+                <li>Confirm that no database-related errors are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5979]</b> 
+            <ul>
+                <li>Configure a database to require authentication to run.</li>
+                <li>Confirm that the FAM requires the admin password to run.</li>
+                <li>Confirm that the service also requires the admin password.</li>
+                <li>Add the machine name to the SkipAuthenticationOnMachines dbinfo setting.</li>
+                <li>Confirm that the FAM still requires the admin password.</li>
+                <li>Confirm that the service no longer requires the admin password.</li>
+                <li>Confirm that the same behavior occurs with tasks that require administrative
+                priveleges to run (e.g., Modify SourceDocName).</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6022]</b> Confirm that the <b>Advanced</b> button in the Processing
+            Setup tab is disabled while processing.</li>
+        <p>
+            <li><b>[LegacyRC #6025, #6034]</b> Rasterize PDF - confirm that the task can be 
+            configured and run without error.</li>
+        
+            
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5959]</b>
+        <ul>
+            <li>Open ID Shield verification; select and use the new word redaction tool.</li>
+            <li>Close verification.</li>
+            <li>Open an image in the legacy image viewer.</li>
+            <li>Press the H key.</li>
+            <li>Confirm that a valid highlight tool is selected and no errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>DB and DB Admin stuff</b>
+        <ul>
+            <li><b>[LegacyRC #6024]</b> Confirm that the StoreFAMSessionHistory setting is
+            persisted when set from the database options dialog of the DB Admin.</li>
+        <p>
+            <li><b>[LegacyRC #6032]</b>
+            <ul>
+                <li>In the DB Admin, connect to a database with an invalid schema version.</li>
+                <li>Do not auto-update the schema.</li>
+                <li>Confirm that the Database options and Manually set file processing priority
+                menu items are disabled.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6048]</b> Confirm the presence and functionality of a "View
+            exceptions for failed files" context menu option in the DB Admin.</li>
+        <p>
+            <li><b>[LegacyRC #6054]</b> Confirm that exceptions in the FAST table are stored as the
+            full log string (not just the sstringized exception).</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6035]</b> Confirm that ESMessageUtils.dll is not present in the
+        CommonComponents directory.</li>
+    <p>
+        <li><b>[LegacyRC #6056]</b> Confirm that the USB License Key Manager can be opened.</li>
+        <li><b>[LegacyRC #6059]</b> Confirm that there are no errors on OK/Apply in the USB License
+        Key Manager.</li>
+    <p>
+        <li><b>Verification</b>
+        <ul>
+            <li><b>[FlexIDSCore #4397]</b>
+            <ul>
+                <li>Start verifying some documents.</li>
+                <li>Go to the FAM and hit stop.</li>
+                <li>Confirm that no exceptions are logged.</li>
+            </uL></li>
+        <p>
+            <li><b>[FlexIDSCore #4610]</b>
+            <ul>
+                <li>Verify a bunch of PDFs that have associated .uss files.</li>
+                <li>Confirm that word redaction tool highlights appear without unreasonable
+                delay.</li>
+                <li>Confirm that attributes are drawn on the image without unreasonable
+                delay.</li>
+            </uL></li>
+        <p>
+            <li><b>[FlexIDSCore #4635]</b> Confirm that the verification slideshow progress
+            bar is at the bottom of the image viewer and in a color that fits in with the
+            general theme.</li>
+        </ul></li>
+    <p>
+        <li><b>VOA file merge/compare</b>
+        <ul>
+            <li><b>[FlexIDSCore #4604]</b>
+            <ul>
+                <li>Run the ID Shield demo rules on the demo images.</li>
+                <li>With feedback collection turned on, verify the images. Make no changes
+                before saving.</li>
+                <li>Use the Compare condition to compare the .found and .expected VOAs. Confirm
+                that you get reasonable results regarding clues.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4605]</b> Confirm that the condition/task fail if either VOA
+            file is missing.</li>
+        <p>
+            <li><b>[FlexIDSCore #4620, #4621, #4623, #4629]</b>
+            <ul>
+                <li>Confirm that the doc tags in the config pages work appropriately.</li>
+                <li>Use the Merge task to create a data file with a _VOAFileMergeSession
+                attribute.</li>
+                <li>Confirm that the merge session includes all data from both source files as
+                well as metadata to map attributes from source files to the ones in the
+                output.</li>
+                <li>Confirm that non-spatial attributes are preserved.</li>
+                <li>Merge that data file with a third data file.</li>
+                <li>Confirm that the metadata is nested correctly.</Li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4617]</b>
+        <ul>
+            <li>Grab the .txt and .voa file from 
+            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4617</b>.</li>
+            <li>Run them through the Create redacted text task.</li>
+            <li>Confirm that it doesn't take an unreasonable length of time (for reference, in
+            the original SCR, it took about an hour).</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4640]</b> Confirm that 9.0 licenses are necessary and sufficient to
+        run our software.</li>
+    <p>
+        <li><b>[DotNetRC #426]</b> Confirm that ESFAMService can handle quoted FPS file paths.</li>
+    <p>
+        <li><b>[DotNetRC #442]</b>
+        <ul>
+            <li>Configure an ESFAMService database to point to nonexistant FPS files.</li>
+            <li>Start the service.</li>
+            <li>Confirm that you don't see an access violation from FAMProcess.exe.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #638]</b> Confirm that the service can be run without error.</li>
+    <p>
+        <li><b>[DotNetRC #640]</b> Confirm that the FAM service database schema can be
+        auto-updated without dropping the ID column from the FPS file table.</li>
+    <p>
+        <li><b>[DotNetRC #524]</b>
+        <ul>
+            <li>Run the Demo_IDShield install for the "verify all interesting docs" demo; confirm
+            that the only images under Demo_IDShield are the 30 in the install folder and 14 in the
+            Input folder.</li>
+            <li>Open the image search form in the Extract Image Viewer (File &lt; Search for
+            images).</li>
+            <li>Set the root folder to "C:\Demo_IDShield", the image extension to ".tif", and the
+            image name end to "1".</li>
+            <li>Click the "Find & Open Image" button.</li>
+            <li>Confirm that all provided filenames end in 1 and that all filenames ending in 1 are
+            provided.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #634]</b> 
+        <ul>
+            <li>Open an image in the Extract Image Viewer and select the subimage tool.</li>
+            <li>Click and drag to select a region.</li>
+            <li>Confirm that the selection region is visible.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #639]</b> Confirm that ExtractImageViewer can be opened with just a client
+        license.</li>
+    <p> 
+        <li><b>FTP File Supplier</b>
+        <ul>
+            <li><b>[DotNetRC #627]</b> Confirm that the FTP file supplier shows up in the FAM's
+            list of file suppliers.</li>
+        <p>
+            <li><b>[DotNetRC #629]</b> Confirm that with valid settings, the file supplier can
+            connect to the FTP server.</li>
+        <p>
+            <li><b>[DotNetRC #630]</b> Confirm that the configuration dialog includes browse and
+            tag buttons to specify the local working folder.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #635]</b> Confirm that .config files for .Net applications are 
+        auto-populated with default settings. The .config files in question can be found in the
+        user's local appdata folder.</li>
+    <p>
+        <li><b>[DotNetRC #637]</b> Confirm that Extract.Utilities.Email.dll is installed and
+        registered.</li>
+    <p>
+        <li><b>[DataEntry #1048]</b>
+        <ul>
+            <li>Open a document with an associated VOA file in the standalone data entry
+            application.</li>
+            <li>Close the document.</li>
+            <li>Confirm that the data in the DEP is cleared.</li>
+        </ul></li>
+    </ul></li>
+    
+<p>
+    <LI><h3>Automated Testing</h3>
+    <ul>
+        <LI>Automated Tests
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Document Classification
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Redaction
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Indexing
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+    </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+<p>
+        <li>64-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+    </ul></LI>
+</OL>
+</BODY>
+</HTML>

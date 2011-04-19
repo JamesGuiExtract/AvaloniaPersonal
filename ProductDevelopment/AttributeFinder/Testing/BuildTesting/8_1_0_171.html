@@ -1,0 +1,266 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.171 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.171 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>[LegacyRC #3307]</b> FAM toolbar
+        <ul>
+            <li>Confirm the presence and correct behavior of an open button in the toolbar of the
+            FAM.</li>
+            <li>Confirm that it includes a dropdown MRU list.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5100]</b>
+        <ul>
+            <li>Confirm that the FAM's Error Details button is not completely useless.</li>
+        </ul></li>
+    <p>
+        <li>SetOperations
+        <ul>
+            <li><b>[LegacyRC #4990]</b> Confirm that SetOperations.exe can be run with large input
+            files.</li>
+            <li><b>[LegacyRC #5956]</b> Confirm that the /i flag can be set to ignore duplicates
+            in the list files. Confirm that a list of all duplicate files is printed in the 
+            console when the /i flag is set.</li>
+            <li><b>[LegacyRC #5980]</b> Confirm that SetOp is no longer installed with the
+            RDT.</li>
+            <li><b>[DotNetRC #617]</b> Confirm that the usage message is correct.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5841, #5986]</b> Confirm that .lst files are no longer located in the 
+        CommonComponents directory and are instead in Application Data</li>
+    <p>
+        <li>DB Admin
+        <ul>
+            <li><b>[LegacyRC #5957]</b>
+            <ul>
+                <li>Use the context menu option to set the action status for some files.</li>
+                <li>Immediately and quickly repeat step 1.</li>
+                <li>Confirm that in both cases, the summary tab of the DB Admin automatically
+                refreshes.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5973]</b>
+            <ul>
+                <li>Open the DB Admin and connect to a database with an out-of-date schema.</li>
+                <li>When prompted to update, say yes.</li>
+                <li>Confirm that no errors are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5976, #5977]</b> Confirm that a database can be cleared with no
+            errors regardless of whether or not you are retaining actions, etc.</li>
+        <p>
+            <li><b>[DotNetRC #612]</b> Play with the database configuration dialog.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5959]</b>
+        <ul>
+            <li>Open the verification interface and select the word redaction tool.</li>
+            <li>Close the verification interface and open the legacy image viewer.</li>
+            <li>Confirm that no exception is thrown.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5974]</b> Confirm that the Processing Setup tab of the FAM looks fine
+        regardless of what Windows theme is in use.</li>
+    <p>
+        <li><b>[LegacyRC #5982]</b>
+        <ul>
+            <li>Configure a FAM to use an empty DB with two actions, A and B.</li>
+            <li>Configure the FAM with a file supplier to queue one file to A and a set action
+            status task to set B to pending.</li>
+            <li>Start processing. When it stops, confirm that the file counts in the status bar
+            are all correct.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5983]</b>
+        <ul>
+            <li>Start a FAM processing some files.</li>
+            <li>While it's processing, kill the FAM.</li>
+            <li>Remove the database lock.</li>
+            <li>Start processing again.</li>
+            <li>Confirm that files are autoreverted and that there is no lockup when 
+            reverting.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5987]</b>
+        <ul>
+            <li>Run the Create redacted text task on a .txt file that does not have an associated
+            .voa.</li>
+            <li>Confirm that the related exception "Unable to open file storage object" provides
+            a clear description of the problem.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5989]</b> Confirm that PDF input is not serialized.</li>
+    <p>
+        <li><b>[LegacyRC #5992, 5993, 5994, 5995]</b> Create File task
+        <ul>
+            <li>Confirm that the config dialog is not resizable.</li>
+            <li>Confirm that it can be closed with the ESC key.</li>
+            <li>Confirm that the File contents text box gets scroll bars as needed.</li>
+            <li>Confirm that the Ctrl+A shortcut selects all text in the File contents box.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5996]</b> Confirm that the Manage tags task can add dynamically created
+        tags.</li>
+    <p>
+        <li><b>[LegacyRC #5999]</b> Confirm the presence in the database of a DocTagHistory
+        table.</li>
+    <p>
+        <li><b>[LegacyRC #6001]</b> Confirm that the StoreDocTagHistory setting can be controlled
+        in the history tab of the database options menu.</li>
+    <p>
+        <li><b>[FlexIDSCore #4526]</b>
+        <ul>
+            <li>Confirm that the ExecuteRules task can use previously saved OCR results when
+            processing images with numerica extensions, regardless of extension length.</li>
+        </ul></li>
+    <p>
+        <li>Verification
+        <ul>
+            <li><b>[FlexIDSCore #4495]</b> Word redaction tool - redaction in wrong place</li>
+        <p>
+            <li><b>[FlexIDSCore #4535]</b>
+            <ul>
+                <li>Open TestImage001.tif in the verification UI.</li>
+                <li>Use the word redaction tool to redact the case number line.</li>
+                <li>Confirm that the redaction is created correctly.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4540]</b> Test the new context menu options in the verification
+            UI.</li>
+            <li><b>[FlexIDSCore #4541]</b> Confirm that angled redaction can be shrunk.</li>
+            <li><b>[FlexIDSCore #4550]</b> Confirm that there are limits to the shrink/enlarge
+            functionality.</li>
+            <li><b>[FlexIDSCore #4562]</b> Confirm that the angle of a redaction does not change
+            when the size is adjusted.</li>
+        <p>
+            <li><b>[FlexIDSCore #4543]</b> Test word redaction tool in pixel-fitting mode swiping
+            off the edge of an image.</li>
+        <p>
+            <li><b>[FlexIDSCore #4556]</b> Confirm that you cannot get a null object exception
+            playing around with the slideshow feature.</li>
+        <p>
+            <li><b>[FlexIDSCore #4557]</b>
+            <ul>
+                <li>Set the zoom fit-to-width.</li>
+                <li>Select the angled redaction tool.</li>
+                <li>While drawing a redaction, confirm that the region is sized appropriately in
+                the magnifier window.</li>
+                <li>Repeat the test while fit-to-page.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4571]</b> Play around with the status strip timer that shows time
+            spent verifying.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4539]</b> Test functionality of "modify redaction text" feature.</li>
+    <p>
+        <li><b>[FlexIDSCore #4545]</b> Test functionality of auto-adjust case feature for redaction
+        text.</li>
+        <li><b>[FlexIDSCore #4549]</b> Confirm that it works even with redactions over empty space
+        in the image.</li>
+    <p>
+        <li><b>[FlexIDSCore #4546]</b> Confirm that the make DEPs Compatible script is installed
+        with FlexIndex.</li>
+    <p>
+        <li><b>[FlexIDSCore #4559]</b> Play with the Create redacted text task.</li>
+        <li><b>[FlexIDSCore #4560]</b> Play with OCRing text files.</li>
+        <li><b>[FlexIDSCore #4566]</b> Confirm that the config dialog can be navigated using only
+        the keyboard.</li>
+        <li><b>[FlexIDSCore #4567]</b> Confirm that the task defaults to redacting HC, MC, LC, and
+        Manual data (but not clues).</li>
+    <p>
+        <li><b>[FlexIDSCore #4569]</b> Run both of the rules in the PVCS testing folder for this
+        SCR on the image in that folder. Confirm that the resulting redactions are appropriately 
+        sized.</li>
+    <p>
+        <li><b>[FlexIDSCore #4570]</b> Run each of the rules in the PVCS testing folder for this
+        SCR on the relevant image. Confirm that the rule finishes executing within a reasonable
+        time.</li>
+    <p>
+        <li><b>[FlexIDSCore #4585]</b> Confirm that the Configure FAM Service start menu shortcut
+        is correct.</li>
+    <p>
+        <li><b>[DotNetRC #427]</b> Confirm that the Modify PDF task does not leak memory.</li>
+        <li><b>[DotNetRC #597]</b> Confirm that the Modify PDF task can be run in a multi-threaded
+        FAM.</li>
+    <p>
+        <li><b>[DotNetRC #599]</b> Confirm that SQL Compact 3.5 SP2 is installed correctly.</li>
+        <li><b>[DotNetRC #600]</b> Confirm that SetOperations is part of the general install.</li>
+        <li><b>[DotNetRC #601]</b> Confirm that the FDRS service is uninstalled correctly.</li>
+        <li><b>[DotNetRC #602]</b> Confirm that the FAM service database is installed to the 
+        common application data folder (not commoncomponents).</li>
+    <p>
+        <li>Create file task
+        <ul>
+            <li><b>[DotNetRC #605]</b> Confirm the existence of the create file task.</li>
+            <li><b>[DotNetRC #609]</b> Confirm that the task will create a containing folder if
+            necessary.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #606, 607]</b> Confirm that ModifyPdfFile.exe exists and is 
+        installed.</li>
+    <p>
+        <li>Delete empty folder task
+        <ul>
+            <li><b>[DotNetRC #608]</b> Confirm the existence of the delete empty folder task.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #618, 619]</b> Confirm that the service database does not allow null in
+        the NumberOfFilesToProcess column.</li>
+    </ul></li>
+    
+<p>
+    <LI><h3>Automated Testing</h3>
+    <ul>
+        <LI>Automated Tests
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Document Classification
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Redaction
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Indexing
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+    </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+<p>
+        <li>64-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+    </ul></LI>
+</OL>
+</BODY>
+</HTML>

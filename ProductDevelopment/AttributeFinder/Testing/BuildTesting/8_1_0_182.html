@@ -1,0 +1,319 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.1.0.182 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.1.0.171 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>FAM</b>
+        <ul>
+            <li><b>[LegacyRC #6003]</b> 
+            <ul>
+                <li>Open a new FAM instance.</li>
+                <li>Use logprocessstats to monitor the FAM instance.</li>
+                <li>Process some files (ensure that you do not save the FAM).</li>
+                <li>Leave the FAM open (not running) for a few hours.</li>
+                <li>Confirm that the logged statistics do not show any unexpected activity.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6004]</b>
+            <ul>
+                <li>Confirm that for each grid in the FAM, there is a context menu that allows the
+                user to:
+                <ul>
+                    <li>Copy the filename of the selected item to the clipboard.</li>
+                    <li>Open the file in the locally registered application.</li>
+                    <li>Open the file's location on the disk.</li>
+                </ul></li>
+                <li>Confirm that all functions behave reasonably in many circumstances.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6005, #6006]</b>
+            <ul>
+                <li>Confirm that the processing setup tab contains a button for an advanced dialog
+                that includes the following settings:
+                <ul>
+                    <li>Continuous processing</li>
+                    <li>Number of threads</li>
+                    <li>Processing schedule</li>
+                    <li>Retrieve X files from the queue</li>
+                </ul></li>
+                <li>Confirm that all settings work as expected.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6007]</b> Confirm that the open and save buttons are disabled while
+            processing.</li>
+        <p>
+            <li><b>[LegacyRC #6008]</b>
+            <ul>
+                <li>Create a new .fps file with a unique name.</li>
+                <li>Double-click on the .fps file.</li>
+                <li>Confirm that the filename has been added to the FAM MRU list.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6011, #6012, #6013]</b>
+            <ul>
+                <li>Create a new FAM instance. Wait a minute, making no changes.</li>
+                <li>Confirm that no recovery file is saved.</li>
+                <li>Make a change; wait a minute.</li>
+                <li>Confirm that a recovery file is created.</li>
+                <li>Confirm that the recovery file is deleted with the following actions:
+                <ul>
+                    <li>Open</li>
+                    <li>Save</li>
+                    <li>New</li>
+                </ul></li>
+                <li>Confirm that the recovery dialog presented when opening the FAM with a
+                recovery file existant is not scary.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6014]</b>
+            <ul>
+                <li>Confirm that the option exists to auto-save the FPS file on run.</li>
+                <li>Confirm that it works as expected.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6017]</b>
+            <ul>
+                <li>Create a new local Demo_IDShield database. Do not add any actions.</li>
+                <li>Open the Compute .fps file from the demo. It will complain about the missing
+                action.</li>
+                <li>Before dismissing the error dialog, add the Compute and Verify actions to the
+                database.</li>
+                <li>Dismiss the FAM dialog.</li>
+                <li>Confirm that the FAM connects to the database successfully and displays all
+                appropriate tabs.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6018]</b>
+            <ul>
+                <li>Open the Options dialog.</li>
+                <li>Delete the value in the completed records text box.</li>
+                <li>Hit OK.</li>
+                <li>Confirm that you are prompted to fill in a value.</li>
+                <li>Confirm that the max files from DB setting in the advanced dialog of the
+                processing setup tab also behaves correctly.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6019]</b> Confirm that the maximum number of records to display in
+            FAM grids in 9999.</li>
+        <p>
+            <li><b>[LegacyRC #6020]</b> Confirm that all digits of the max files to retrieve
+            setting are always visible.</li>
+        </ul></li>
+    <p>
+        <li><b>DB Admin</b>
+        <ul>
+            <li><b>[LegacyRC #6009]</b> Confirm that the "minutes of inactivity" text box in the
+            General tab of the Database Options dialog neither allows nor inserts commas in
+            four-digit numbers.</li>
+        <p>
+            <li><b>[LegacyRC #6010]</b> Confirm that the Database Options dialog does not get its
+            own task bar entry separate from the DB Admin's.</li>
+        <p>
+            <li><b>[LegacyRC #6015]</b> Confirm that an application trace is logged when modifying
+            DB settings.</li>
+        </ul></li>
+    <p>
+        <li><b>Verification slideshow</b>
+        <ul>
+            <li><b>[FlexIDSCore #4475, #4572]</b>
+            <ul>
+                <li>Confirm that the pause button and auto-resume functionality have been removed
+                from the slideshow.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4477]</b>
+            <ul>
+                <li>Confirm that the play button is disabled when the slideshow is running.</li>
+                <li>Confirm that the stop button is disabled when it's not.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4478]</b> Confirm that the slideshow stops on these actions:
+            <ul>
+                <li>keypresses:
+                <ul>
+                    <li>F10</li>
+                    <li>Anything involving the Alt key</li>
+                </ul></li>
+                <li>Mouse clicks:
+                <ul>
+                    <li>in the arrows of the scrollbar of the image viewer</li>
+                    <li>clicking and dragging the slideshow toolstrip to a new location</li>
+                    <li>in the application title bar</li>
+                    <li>repositioning undocked windows</li>
+                </ul></li>
+                <li>Scrollwheel:
+                <ul>
+                    <li>Zoom in a bit</li>
+                    <li>Confirm that focus is in the image viewer</li>
+                    <li>Start the slideshow with the F5 key</li>
+                    <li>Use the scroll wheel</li>
+                </ul></li>
+                <li>When the IDS verification window loses focus.</li>
+                <li>When the screensaver kicks in.</li>
+                <li>After the last file in the queue is verified.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4587]</b> Confirm that it does not stop when you press PgDn.</li>
+        <p>
+            <li><b>[FlexIDSCore #4480]</b> Confirm that the text box to set the number of seconds
+            between pages in the slideshow does not allow decimals to be entered.</li>
+        <p>
+            <li><b>[FlexIDSCore #4482]</b> Confirm that all shortcuts work even when focus is in
+            an undocked data window.</li>
+        <p>
+            <li><b>[FlexIDSCore #4483]</b> Confirm that the slideshow-related toolstrip buttons all
+            have appropriate tooltips.</li>
+        <p>
+            <li><b>[FlexIDSCore #4484]</b>
+            <ul>
+                <li>Open the FAM. Add a new verification task.</li>
+                <li>Click the Settings button for the slideshow feature.</li>
+                <li>Click the "Stop slideshow..." checkbox.</li>
+                <li>Double-click in the associated edit box.</li>
+                <li>Confirm that the configuration dialog does not appear (?).</li>
+                <li>Configure a condition and hit OK.</li>
+                <li>Confirm that the edit box shows the condition description.</li>
+                <li>Confirm that the text box is read-only and text in the box cannot be 
+                selected.</li>
+                <li>Hit cancel</li>
+                <li>Reopen the settings dialog.</li>
+                <li>Confirm that the condition is not configured.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4607]</b> Confirm the presence of a progress bar at the top of 
+            the image viewer to indicate when you are using the slideshow feature.</li>
+            
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4563]</b> Confirm that text files with lengths greater than 65537 can
+        be redacted correctly.</li>
+    <p>
+        <li><b>[FlexIDSCore #4583]</b>
+        <ul>
+            <li>Ensure that the image viewer is set to include percentages in the cursor location
+            display.</li>
+            <li>Open a document for verification and confirm that the location in the status bar
+            is completely visible.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4591]</b>
+        <ul>
+            <li>Exercise the rule at I:\Common\Testing\PVCS_Testing\FlexIDSCore\4591 on the image
+            in the same folder.</li>
+            <li>Confirm that the resulting attributes all have appropriate spatial data.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4594]</b> Confirm that there is a Compare ID Shield data files
+        FAM condition and that it works as expected.</li>
+        <li><b>[FlexIDSCore #4596]</b> Confirm that there is a Merge ID Shield data files FAM task
+        and that it works as expected.</li>
+    <p>
+        <li><b>[FlexIDSCore #4597]</b>
+        <ul>
+            <li>Add a new Create redacted text task.</li>
+            <li>Without configuring the task, hit the OK button.</li>
+            <li>Confirm that you can save the file.</li>
+        </ul></li>
+        <li><b>[FlexIDSCore #4598]</b> Confirm that the Create redacted text task fails when run
+        on images.</li>
+        <li><b>[FlexIDSCore #4599]</b> Confirm that it also fails when there is no related .voa
+        file.</li>
+    <p>
+        <li><b>[FlexIDSCore #4601]</b> Confirm that the word highlight tool:
+        <ul>
+            <li>Provides grey highlights when hovering over words.</li>
+            <li>Uses the NotXORPen for the rubber band selection box.</li>
+            <li>Pads preview highlights by 1 pixel in each direction.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4603]</b>
+        <ul>
+            <li>Start verification in the ID Shield demo.</li>
+            <li>In TestImage001.tif, use the word redaction tool to redact the first word of the
+            second line ("Manatee").</li>
+            <li>Look at the redacted output image and confirm that no part of the word leaks out
+            beyond the redaction.</li>            
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4608]</b> Confirm that the magnifier window is blank when the cursor
+        is not over the image.</li>
+    <p>
+        <li><b>[FlexIDSCore #4609]</b>
+        <ul>
+            <li>In the ID Shield, run the Compute .fps file.</li>
+            <li>Run a Create Redacted Image task on all the images.</li>
+            <li>Verify the images.</li>
+            <li>Open the .voa file for an image that contains both a clue and some redacted data
+            and confirm that all attributes have different IDs.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #614]</b> Test the new FTP file supplier.</li>
+    <p>
+        <li><b>[DotNetRC #620]</b> Confirm that SetOperations work properly with large (1 million+)
+        list files.</li>
+        <li><b>[DotNetRC #621]</b> Confirm that no temporary database files are leaked when
+        SetOperations is canceled via Ctrl+C or Ctrl+Break.</li>
+    <p>
+        <li><b>[DotNetRC #622]</b> Confirm the existence and functionality of a remote desktop
+        button in the FAM Network Manager.</li>
+        <li><b>[DotNetRC #623]</b> Confirm that the FAM Network Manager can open remote .sdf files
+        correctly.</li>
+    <p>
+        <li><b>[DotNetRC #624]</b> Confirm the existence and functionality of an AutoFitZonePadding
+        setting in the ImageViewer config file in the appdata folder.</li>
+    </ul></li>
+    
+<p>
+    <LI><h3>Automated Testing</h3>
+    <ul>
+        <LI>Automated Tests
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Document Classification
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Redaction
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Indexing
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+    </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+<p>
+        <li>64-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+    </ul></LI>
+</OL>
+</BODY>
+</HTML>
