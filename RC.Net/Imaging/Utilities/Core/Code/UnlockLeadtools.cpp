@@ -17,11 +17,11 @@ using namespace System;
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-// To reconstruct the license strings take every third character
-// Example: string "abcdefghijk" translates to "cfi"
-static string _DOCUMENT_SUPPORT_KEY = "a7vF&hzlG9e42520ptm.y2wuArhl;9_s";
-static string _PDF_SAVE_SUPPORT_KEY = ";98sPkm#sq1iBnHu7ntTP90ymrmI5rE=";
-static string _PDF_READ_SUPPORT_KEY = "lMx75r=DzcvGo8P.qkfPmtsYx0u%gihJ";
+// To reconstruct the license strings take every fourth character
+// Example: string "abcdefghijklmno" translates to "dhl"
+static string _DOCUMENT_SUPPORT_KEY = "m6$HzSMbB:tQ4}cRC&r9xeANV|lScf1X;U9QPC[3bUv";
+static string _PDF_SAVE_SUPPORT_KEY = "hu,tefav9wl4*ZUCg[sJkqms1FYaSk05H27aNW0JY3H";
+static string _PDF_READ_SUPPORT_KEY = "R,qWTs8vAVfuaBpzg=[2QF=WsjoC:yk3D:nrdw*XuH6";
 
 //--------------------------------------------------------------------------------------------------
 // Unmanaged methods
@@ -30,7 +30,7 @@ static string _PDF_READ_SUPPORT_KEY = "lMx75r=DzcvGo8P.qkfPmtsYx0u%gihJ";
 string getUnmangledString(const string& mangledString)
 {
 	string returnVal;
-	for (size_t i=2; i < mangledString.length(); i += 3)
+	for (size_t i=3; i < mangledString.length(); i += 4)
 	{
 		returnVal += mangledString.at(i);
 	}
