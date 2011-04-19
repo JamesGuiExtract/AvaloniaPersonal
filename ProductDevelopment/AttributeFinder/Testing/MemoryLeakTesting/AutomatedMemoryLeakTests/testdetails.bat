@@ -45,3 +45,5 @@ echo.>>%td%
 echo Test Number:        %testname%>>%td%
 echo.>>%td%
 echo Notes:>>%td%
+echo - ran as service>>%td%
+echo - no failures>>%td%
