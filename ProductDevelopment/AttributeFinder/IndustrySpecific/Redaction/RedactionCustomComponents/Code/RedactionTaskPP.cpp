@@ -513,9 +513,6 @@ LRESULT CRedactionTaskPP::OnClickedBtnPdfSettings(WORD wNotifyCode, WORD wID, HW
 		{
 			m_ipPdfSettings.CreateInstance(CLSID_PdfPasswordSettings);
 			ASSERT_RESOURCE_ALLOCATION("ELI29779", m_ipPdfSettings != __nullptr);
-
-			// Enforce setting both passwords due to Leadtools bug [LRCAU #5749]
-			m_ipPdfSettings->RequireUserAndOwnerPassword = VARIANT_TRUE;
 		}
 
 		// Run the configuration for the PDF security settings

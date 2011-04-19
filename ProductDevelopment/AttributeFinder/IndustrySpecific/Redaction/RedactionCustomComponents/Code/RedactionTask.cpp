@@ -28,7 +28,10 @@ using namespace std;
 // Version 4 - Changed replace text from single replacement to group of replacement settings,
 //		moved advanced text settings to seperate dialog, added settings for prefix and suffix
 //		text for the first instance of a type
-const unsigned long gnCurrentVersion = 4;
+// Version 5 - After upgrade to LT 17, the bug that forced setting both owner and user passwords
+//		when applying PDF security has been fixed. Any settings object that had the enforce
+//		flag set to true can be set back to false
+const unsigned long gnCurrentVersion = 5;
 
 //-------------------------------------------------------------------------------------------------
 // CRedactionTask
@@ -1716,8 +1719,13 @@ STDMETHODIMP CRedactionTask::Load(IStream* pStream)
                 m_ipPdfSettings = ipObj;
                 ASSERT_RESOURCE_ALLOCATION("ELI29775", m_ipPdfSettings != __nullptr);
 
-                // Ensure the require passwords value is set [LRCAU #5749]
-                m_ipPdfSettings->RequireUserAndOwnerPassword = VARIANT_TRUE;
+				// Version 5 corresponds with upgrade to LT 17 which no longer requires setting
+				// both owner and user passwords. Older versions forced this value to true,
+				// force the value to false for those cases.
+				if (nDataVersion < 5)
+				{
+	                m_ipPdfSettings->RequireUserAndOwnerPassword = VARIANT_FALSE;
+				}
             }
         }
 
