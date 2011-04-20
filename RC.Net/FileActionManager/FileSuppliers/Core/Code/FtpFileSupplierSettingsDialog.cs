@@ -1,7 +1,5 @@
 ﻿using EnterpriseDT.Net.Ftp;
-using EnterpriseDT.Net.Ftp.Forms;
 using Extract.Utilities;
-using Extract.Utilities.Forms;
 using System;
 using System.Windows.Forms;
 
@@ -67,18 +65,13 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 base.OnLoad(e);
 
-                // The properties to display in the connection editor control may
-                // be changed when setting the inital values so save the properties so 
-                // they can be restored later.
-                FTPConnectionProperties saveProperties = _ftpConnectionEditor.Properties;
-
                 // Set the initial values for the controls
                 _remoteDownloadFolderTextBox.Text = _settings.RemoteDownloadFolder;
                 _fileExtensionSpecificationTextBox.Text = _settings.FileExtensionsToDownload;
                 _recursiveDownloadCheckBox.Checked = _settings.RecursivelyDownload;
                 _pollRemoteCheckBox.Checked = _settings.PollRemoteLocation;
                 _pollingIntervalNumericUpDown.Value = _settings.PollingIntervalInMinutes;
-                _numberConnections.Value = _settings.NumberOfConnections;
+                _ftpConnectionSettingsControl.NumberOfConnections = _settings.NumberOfConnections;
 
                 // Set the AfterDownloadAction radio buttons
                 switch (_settings.AfterDownloadAction)
@@ -102,10 +95,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 _secureFTPConnection = _settings.ConfiguredFtpConnection ?? new SecureFTPConnection();
                 
                 // Set the ftp connection editor connection
-                _ftpConnectionEditor.Connection = _secureFTPConnection;
-
-                // Reset the properties that should be displayed by the connection editor
-                _ftpConnectionEditor.Properties = saveProperties;
+                _ftpConnectionSettingsControl.FtpConnection = _secureFTPConnection;
                 
                 UpdateControlState();
             }
@@ -140,7 +130,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 _settings.RecursivelyDownload = _recursiveDownloadCheckBox.Checked;
                 _settings.PollRemoteLocation = _pollRemoteCheckBox.Checked;
                 _settings.PollingIntervalInMinutes = (int)_pollingIntervalNumericUpDown.Value;
-                _settings.NumberOfConnections = (int)_numberConnections.Value;
+                _settings.NumberOfConnections = _ftpConnectionSettingsControl.NumberOfConnections;
 
                 if (_doNothingRadioButton.Checked)
                 {
@@ -158,7 +148,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 _settings.NewExtensionForRemoteFile = _newExtensionTextBox.Text;
                 _settings.LocalWorkingFolder = _localWorkingFolderTextBox.Text;
 
-                _settings.ConfiguredFtpConnection = (SecureFTPConnection) _ftpConnectionEditor.Connection;
+                _settings.ConfiguredFtpConnection = _ftpConnectionSettingsControl.FtpConnection;
 
                 // Still need to verify settings
                 DialogResult = DialogResult.OK;
@@ -168,36 +158,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 ex.ExtractDisplay("ELI32019");
             }
 
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.Click"/> event for the Test Connection button
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>        
-        void HandleTestConnection(object sender, EventArgs e)
-        {
-            try
-            {
-                _ftpConnectionEditor.Connection.Connect();
-                if (_ftpConnectionEditor.Connection.IsConnected)
-                {
-                    MessageBox.Show("Connection was successful", "Test Connection", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0 );
-                }
-                else
-                {
-                    MessageBox.Show("Connection attempt was unsuccessful", "Test Connection",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
-                }
-                _ftpConnectionEditor.Connection.Close();
-            }
-            catch (Exception ex)
-            {
-                // Wrap the exception so that it is clear the connection was unsuccessful
-                ExtractException ee = new ExtractException("ELI32037", "Connection attempt was unsuccessful.", ex);
-                ee.Display();
-            }
         }
 
         /// <summary>
@@ -252,41 +212,7 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        /// <summary>
-        /// Handles the UserTextCorrected event for the number of connections control
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void HandleNumberConnectionsNumericUpDownUserTextCorrected(object sender, EventArgs e)
-        {
-            try
-            {
-                UtilityMethods.ShowMessageBox(
-                    "The number of connections must be between 1 and 10.",
-                    "Invalid number of connections", true);
-
-                // Re-select the _numberConnections control, but only after any other events
-                // in the message queue have been processed so those event don't undo this selection.
-                BeginInvoke((MethodInvoker)(() =>
-                {
-                    try
-                    {
-                        _settingsTabControl.SelectedTab = _connectionSettingsTabPage;
-                        _numberConnections.Focus();
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.ExtractDisplay("ELI32251");
-                    }
-                }));
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI32252");
-            }
-        }
-
-        #endregion
+       #endregion
 
         #region Helper functions
         
@@ -344,23 +270,10 @@ namespace Extract.FileActionManager.FileSuppliers
                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
                 _localWorkingFolderTextBox.Focus();
             }
-            else if (string.IsNullOrWhiteSpace(_ftpConnectionEditor.Connection.ServerAddress))
+            else if (!_ftpConnectionSettingsControl.IsConfigurationValid())
             {
-                MessageBox.Show("Server address must be specified for ftp connection.", "Configuration error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
-                _ftpConnectionEditor.Focus();
-            }
-            else if (string.IsNullOrWhiteSpace(_ftpConnectionEditor.Connection.UserName))
-            {
-                MessageBox.Show("UserName must be specified for the ftp connection.", "Configuration error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
-                _ftpConnectionEditor.Focus();
-            }
-            else if (string.IsNullOrWhiteSpace(_ftpConnectionEditor.Connection.Password))
-            {
-                MessageBox.Show("Password must be specified for the ftp connection.", "Configuration error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
-                _ftpConnectionEditor.Focus();
+                _settingsTabControl.SelectTab(_connectionSettingsTabPage);
+                _ftpConnectionSettingsControl.Focus();
             }
             else
             {

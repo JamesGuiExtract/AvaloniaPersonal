@@ -67,6 +67,9 @@
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="edtFTPnetPRO, Version=7.3.1.20, Culture=neutral, PublicKeyToken=0dce1ad63760d80b, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\EnterpriseDT\Bin\edtFTPnetPRO.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -89,6 +92,12 @@
     </Compile>
     <Compile Include="FileTagDropDown.Designer.cs">
       <DependentUpon>FileTagDropDown.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FtpConnectionSettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FtpConnectionSettingsControl.Designer.cs">
+      <DependentUpon>FtpConnectionSettingsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="InputEventTracker.cs" />
     <Compile Include="IVerificationForm.cs" />
@@ -120,6 +129,10 @@
     <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
@@ -165,6 +178,9 @@
     <EmbeddedResource Include="FileTagDialog.resx">
       <DependentUpon>FileTagDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FtpConnectionSettingsControl.resx">
+      <DependentUpon>FtpConnectionSettingsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SetProcessingScheduleForm.resx">
       <DependentUpon>SetProcessingScheduleForm.cs</DependentUpon>
