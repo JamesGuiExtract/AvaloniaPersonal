@@ -137,7 +137,7 @@
             // 
             this._promptIntervalUpDown.Location = new System.Drawing.Point(404, 32);
             this._promptIntervalUpDown.Maximum = new decimal(new int[] {
-            9999,
+            1000,
             0,
             0,
             0});

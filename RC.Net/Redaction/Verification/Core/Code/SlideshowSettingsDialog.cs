@@ -321,7 +321,7 @@ namespace Extract.Redaction.Verification
             try
             {
                 UtilityMethods.ShowMessageBox(
-                    "The alertness prompt interval must be between 1 and 9999 pages.",
+                    "The alertness prompt interval must be between 1 and 1000 pages.",
                     "Invalid alertness prompt interval", true);
                 _promptIntervalUpDown.Focus();
             }
