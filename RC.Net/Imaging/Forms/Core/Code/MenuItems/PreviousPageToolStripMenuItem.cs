@@ -46,7 +46,7 @@ namespace Extract.Imaging.Forms
 
             // Enable this button if an image is open and it is not on the first page.
             base.Enabled = imageViewer != null && imageViewer.IsImageAvailable &&
-                imageViewer.PageNumber > 1;
+                !imageViewer.IsFirstPage;
         }
 
         /// <summary>

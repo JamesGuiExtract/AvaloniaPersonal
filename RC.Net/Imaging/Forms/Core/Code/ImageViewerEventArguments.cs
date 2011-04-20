@@ -445,4 +445,132 @@ namespace Extract.Imaging.Forms
             }
         }
     }
+
+    /// <summary>
+    /// Provides data for the <see cref="ImageViewer.ExtendedNavigationCheck"/> event.
+    /// </summary>
+    public class ExtendedNavigationCheckEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExtendedNavigationCheckEventArgs"/> class.
+        /// </summary>
+        /// <param name="forward"><see langword="true"/> if this instance involves forward navigation;
+        /// otherwise, <see langword="false"/>.</param>
+        /// <param name="tileNavigation">see langword="true"/> if this instance involves tile
+        /// navigation; <see langword="false"/> if page navigation.</param>
+        public ExtendedNavigationCheckEventArgs(bool forward, bool tileNavigation)
+        {
+            try
+            {
+                Forward = forward;
+                TileNavigation = tileNavigation;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32382");
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ExtendedNavigationCheckEventArgs"/> involves
+        /// forward navigation.
+        /// </summary>
+        /// <value><see langword="true"/> if forward navigation; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Forward
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ExtendedNavigationCheckEventArgs"/> involves
+        /// tile navigation.
+        /// </summary>
+        /// <value><see langword="true"/> if tile navigation; <see langword="false"/> if page
+        /// navigation.
+        /// </value>
+        public bool TileNavigation
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the specified navigation is available.
+        /// </summary>
+        /// <value><see langword="true"/> if the specified navigation is available;
+        /// otherwise, <see langword="false"/>.
+        /// <para><b>Note</b></para>
+        /// Use the |= operator to set this value so as not not to override any other handler that
+        /// had set this property to <see langword="true"/>.
+        /// </value>
+        public bool IsAvailable
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
+    /// Provides data for the <see cref="ImageViewer.ExtendedNavigation"/> event.
+    /// </summary>
+    public class ExtendedNavigationEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExtendedNavigationEventArgs"/> class.
+        /// </summary>
+        /// <param name="forward"><see langword="true"/> if this instance involves forward navigation;
+        /// otherwise, <see langword="false"/>.</param>
+        /// <param name="tileNavigation">see langword="true"/> if this instance involves tile
+        /// navigation; <see langword="false"/> if page navigation.</param>
+        public ExtendedNavigationEventArgs(bool forward, bool tileNavigation)
+        {
+            try
+            {
+                Forward = forward;
+                TileNavigation = tileNavigation;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32390");
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ExtendedNavigationCheckEventArgs"/> involves
+        /// forward navigation.
+        /// </summary>
+        /// <value><see langword="true"/> if forward navigation; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Forward
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="ExtendedNavigationCheckEventArgs"/> involves
+        /// tile navigation.
+        /// </summary>
+        /// <value><see langword="true"/> if tile navigation; <see langword="false"/> if page
+        /// navigation.
+        /// </value>
+        public bool TileNavigation
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the event was handled.
+        /// </summary>
+        /// <value><see langword="true"/> if the event was handled; otherwise,
+        /// <see langword="false"/>.</value>
+        public bool Handled
+        {
+            get;
+            set;
+        }
+    }
 }

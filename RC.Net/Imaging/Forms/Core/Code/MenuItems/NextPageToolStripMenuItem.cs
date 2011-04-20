@@ -46,7 +46,7 @@ namespace Extract.Imaging.Forms
 
             // Enable this button if an image is open and it is not on the last page.
             base.Enabled = imageViewer != null && imageViewer.IsImageAvailable &&
-                imageViewer.PageNumber < imageViewer.PageCount;
+                !imageViewer.IsLastPage;
         }
 
         /// <summary>

@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
@@ -176,6 +177,11 @@ namespace Extract.Redaction.Verification
         /// The cell style for the page cell of visited rows.
         /// </summary>
         DataGridViewCellStyle _visitedPageCellStyle;
+
+        /// <summary>
+        /// Indicates whether the grid is actively tracking data.
+        /// </summary>
+        bool _active;
 
         #endregion Fields
 
@@ -1176,65 +1182,52 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // As layer objects are added to the image viewer, don't handle the event.
-                // Otherwise two rows will be added for each attribute.
-                _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
-                _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
-                _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
-                _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
-                _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
-                _dataGridView.SelectionChanged -= HandleDataGridViewSelectionChanged;
+                // Disable handling of all events relating to changing data until the file has
+                // finished loading.
+                Active = false;
 
-                try
+                // Reset the attributes
+                _redactions.Clear();
+                _imageViewer.LayerObjects.Clear();
+                _deletedItems.Clear();
+                for (int i = 0; i < _deletedCategoryCounts.Length; i++)
                 {
-                    // Reset the attributes
-                    _redactions.Clear();
-                    _imageViewer.LayerObjects.Clear();
-                    _deletedItems.Clear();
-                    for (int i = 0; i < _deletedCategoryCounts.Length; i++)
+                    _deletedCategoryCounts[i] = 0;
+                }
+
+                // Add attributes at each confidence level
+                AddAttributesFromFile(file);
+
+                // Sort the redactions spatially
+                ArrayList adapter = ArrayList.Adapter(_redactions);
+                adapter.Sort(new RedactionGridViewRowComparer());
+
+                // Set viewed rows
+                if (visitedRows != null)
+                {
+                    DataGridViewRowCollection rows = _dataGridView.Rows;
+                    foreach (int i in visitedRows)
                     {
-                        _deletedCategoryCounts[i] = 0;
-                    }
-
-                    // Add attributes at each confidence level
-                    AddAttributesFromFile(file);
-
-                    // Sort the redactions spatially
-                    ArrayList adapter = ArrayList.Adapter(_redactions);
-                    adapter.Sort(new RedactionGridViewRowComparer());
-
-                    // Set viewed rows
-                    if (visitedRows != null)
-                    {
-                        DataGridViewRowCollection rows = _dataGridView.Rows;
-                        foreach (int i in visitedRows)
+                        if (i >= rows.Count)
                         {
-                            if (i >= rows.Count)
-                            {
-                                break;
-                            }
-
-                            MarkAsVisited(rows[i]);
+                            break;
                         }
+
+                        MarkAsVisited(rows[i]);
                     }
-
-                    // Clear the selection
-                    _dataGridView.ClearSelection();
-
-                    // Invalidate the image viewer
-                    _imageViewer.Invalidate();
-
-                    _dirty = false;
                 }
-                finally
-                {
-                    _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
-                    _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
-                    _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
-                    _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
-                    _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
-                    _dataGridView.SelectionChanged += HandleDataGridViewSelectionChanged;
-                }
+
+                // Clear the selection
+                _dataGridView.ClearSelection();
+
+                // Invalidate the image viewer
+                _imageViewer.Invalidate();
+
+                // Re-enable handling of all events relating to changing data now that the file is
+                // loaded.
+                Active = true;
+
+                _dirty = false;
             }
             catch (Exception ex)
             {
@@ -1520,64 +1513,6 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets the index of the first unviewed row that occurs at or before the specified row.
-        /// </summary>
-        /// <param name="startIndex">The first index to check for being unviewed.</param>
-        /// <returns>The index of the first unviewed row that occurs at or before 
-        /// <paramref name="startIndex"/>; or -1 if no such row exists.</returns>
-        public int GetPreviousUnviewedRowIndex(int startIndex)
-        {
-            try
-            {
-                // Iterate backwards starting at the specified row
-                for (int i = startIndex; i >= 0; i--)
-                {
-                    // Return to the first row that is unvisited
-                    if (!_redactions[i].Visited)
-                    {
-                        return i;
-                    }
-                }
-
-                return -1;
-            }
-            catch (Exception ex)
-            {
-                throw new ExtractException("ELI27670",
-                    "Unable to determine previous unviewed row.", ex);
-            }
-        }
-
-        /// <summary>
-        /// Gets the index of the first unviewed row that occurs at or after the specified row.
-        /// </summary>
-        /// <param name="startIndex">The first index to check for being unviewed.</param>
-        /// <returns>The index of the first unviewed row that occurs at or after 
-        /// <paramref name="startIndex"/>; or -1 if no such row exists.</returns>
-        public int GetNextUnviewedRowIndex(int startIndex)
-        {
-            try
-            {
-                // Iterate starting at the specified row
-                for (int i = startIndex; i < _dataGridView.Rows.Count; i++)
-                {
-                    // Return to the first row that is unvisited
-                    if (!_redactions[i].Visited)
-                    {
-                        return i;
-                    }
-                }
-
-                return -1;
-            }
-            catch (Exception ex)
-            {
-                throw new ExtractException("ELI27645",
-                    "Unable to determine next unviewed row.", ex);
-            }
-        }
-
-        /// <summary>
         /// Determines the index of the row before the currently selected row.
         /// </summary>
         /// <returns>The index of the row before the currently selected row.</returns>
@@ -1669,20 +1604,12 @@ namespace Extract.Redaction.Verification
             {
                 if (_dataGridView.SelectedRows.Count > 0)
                 {
-                    int index = int.MaxValue;
-                    foreach (DataGridViewRow row in _dataGridView.SelectedRows)
-                    {
-                        int temp = row.Index;
-                        if (temp < index)
-                        {
-                            index = temp;
-                        }
-                    }
-
-                    return index;
+                    return SelectedRowIndexes.Min();
                 }
-
-                return -1;
+                else
+                {
+                    return -1;
+                }
             }
             catch (Exception ex)
             {
@@ -1701,28 +1628,39 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                int count = _dataGridView.SelectedRows.Count;
-                if (count > 0)
+                if (_dataGridView.SelectedRows.Count > 0)
                 {
-                    int index = int.MinValue;
-                    foreach (DataGridViewRow row in _dataGridView.SelectedRows)
-                    {
-                        int temp = row.Index;
-                        if (temp > index)
-                        {
-                            index = temp;
-                        }
-                    }
-
-                    return index;
+                    return SelectedRowIndexes.Max();
                 }
-
-                return -1;
+                else
+                {
+                    return -1;
+                }
             }
             catch (Exception ex)
             {
                 throw new ExtractException("ELI27644",
                     "Unable to determine last selected row.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the currently selected row indicies.
+        /// </summary>
+        public IEnumerable<int> SelectedRowIndexes
+        {
+            get
+            {
+                try
+                {
+                    return _dataGridView.SelectedRows
+                                .Cast<DataGridViewRow>()
+                                .Select(row => row.Index);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32383");
+                }
             }
         }
 
@@ -1737,6 +1675,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                _dataGridView.ClearSelection();
                 _dataGridView.CurrentCell = _dataGridView.Rows[index].Cells[0];
 
                 if (!_dataGridView.CurrentCell.Selected)
@@ -1750,6 +1689,26 @@ namespace Extract.Redaction.Verification
                     "Unable to select row.", ex);
                 ee.AddDebugData("Row index", index, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Selects the specified indicies.
+        /// </summary>
+        /// <param name="indexes">The indicies.</param>
+        public void Select(IEnumerable<int> indexes)
+        {
+            try
+            {
+                _dataGridView.ClearSelection();
+                foreach (int index in indexes)
+                {
+                    _dataGridView.Rows[index].Selected = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32384");
             }
         }
 
@@ -1907,6 +1866,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                // Until the next file is opened disable handling of all events relating to
+                // changing data.
+                Active = false;
+
                 // Deselect layer objects before image closes [FIDSC #4002]
                 _imageViewer.LayerObjects.Selection.Clear();
             }
@@ -2234,14 +2197,9 @@ namespace Extract.Redaction.Verification
                     // Unregister from previously subscribed-to events
                     if (_imageViewer != null)
                     {
+                        Active = false;
                         _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                         _imageViewer.ImageFileClosing -= HandleImageFileClosing;
-                        _imageViewer.LayerObjects.DeletingLayerObjects -= HandleDeletingLayerObjects;
-                        _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
-                        _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
-                        _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
-                        _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
-                        _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
                         _imageViewer.Shortcuts[Keys.T] = null;
                     }
 
@@ -2253,12 +2211,6 @@ namespace Extract.Redaction.Verification
                     {
                         _imageViewer.ImageFileChanged += HandleImageFileChanged;
                         _imageViewer.ImageFileClosing += HandleImageFileClosing;
-                        _imageViewer.LayerObjects.DeletingLayerObjects += HandleDeletingLayerObjects;
-                        _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
-                        _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
-                        _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
-                        _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
-                        _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
                         _imageViewer.Shortcuts[Keys.T] = SelectDropDownTypeList;
                     }
                 }
@@ -2271,6 +2223,58 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion IImageViewerControl Members
+
+        #region Private Members
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RedactionGridView"/> is actively
+        /// tracking data.
+        /// </summary>
+        /// <value><see langword="true"/> if active; otherwise, <see langword="false"/>.
+        /// </value>
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        bool Active
+        {
+            get
+            {
+                return _active;
+            }
+
+            set
+            {
+                if (value != _active)
+                {
+                    _active = value;
+
+                    if (_active)
+                    {
+                        ExtractException.Assert("ELI32394",
+                            "Redaction grid cannot be activated without an ImageViewer.",
+                            _imageViewer != null);
+
+                        _imageViewer.LayerObjects.DeletingLayerObjects += HandleDeletingLayerObjects;
+                        _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+                        _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
+                        _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
+                        _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
+                        _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
+                        _dataGridView.SelectionChanged += HandleDataGridViewSelectionChanged;
+                    }
+                    else if (_imageViewer != null)
+                    {
+                        _imageViewer.LayerObjects.DeletingLayerObjects += HandleDeletingLayerObjects;
+                        _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
+                        _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
+                        _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
+                        _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
+                        _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
+                        _dataGridView.SelectionChanged -= HandleDataGridViewSelectionChanged;
+                    }
+                }
+            }
+        }
+
+        #endregion Private Members
     }
 
     /// <summary>

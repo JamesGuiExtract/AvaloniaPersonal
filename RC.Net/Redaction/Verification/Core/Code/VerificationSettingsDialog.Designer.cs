@@ -197,7 +197,7 @@ namespace Extract.Redaction.Verification
             this._promptForSaveUntilCommit.Name = "_promptForSaveUntilCommit";
             this._promptForSaveUntilCommit.Size = new System.Drawing.Size(398, 17);
             this._promptForSaveUntilCommit.TabIndex = 9;
-            this._promptForSaveUntilCommit.Text = "Prompt to save changes before navigating away from un-commited documents.";
+            this._promptForSaveUntilCommit.Text = "Prompt to save changes before navigating away from uncommitted documents.";
             this._promptForSaveUntilCommit.UseVisualStyleBackColor = true;
             // 
             // groupBox2

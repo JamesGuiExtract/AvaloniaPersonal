@@ -716,6 +716,62 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Selects the first tile in the document using the specified <see paramref="scaleFactor"/>.
+        /// </summary>
+        /// <param name="scaleFactor">The factor of zoom where 1F = 1 image pixel to 1 screen pixel,
+        /// 5F = 1 image pixel to 5 screen pixels, etc.</param>
+        public void SelectFirstDocumentTile(double scaleFactor)
+        {
+            try
+            {
+                // Go to the first page and set the specified zoom factor.
+                SetPageNumber(1, false, true);
+                ScaleFactor = scaleFactor;
+
+                // Get the visible image area
+                Rectangle tileArea = GetVisibleImageArea();
+
+                // Move the tile area to the top-left of the page.
+                tileArea.Offset(PhysicalViewRectangle.Location);
+
+                // Zoom to the tile, add to the zoom history, and raise ZoomChanged event
+                ZoomToRectangle(tileArea, true, true, false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32380");
+            }
+        }
+
+        /// <summary>
+        /// Selects the last tile in the document using the specified <see paramref="scaleFactor"/>.
+        /// </summary>
+        /// <param name="scaleFactor">The factor of zoom where 1F = 1 image pixel to 1 screen pixel,
+        /// 5F = 1 image pixel to 5 screen pixels, etc.</param>
+        public void SelectLastDocumentTile(double scaleFactor)
+        {
+            try
+            {
+                // Go to the last page and set the specified zoom factor.
+                SetPageNumber(PageCount, false, true);
+                ScaleFactor = scaleFactor;
+
+                // Get the visible image area
+                Rectangle tileArea = GetVisibleImageArea();
+
+                // Move the tile area to the bottom-right of the page.
+                tileArea.Offset(PhysicalViewRectangle.Right, PhysicalViewRectangle.Bottom);
+
+                // Zoom to the tile, add to the zoom history, and raise ZoomChanged event
+                ZoomToRectangle(tileArea, true, true, false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32381");
+            }
+        }
+
+        /// <summary>
         /// Goes to the previous zoom tile.
         /// </summary>
         /// <event cref="ZoomChanged">The method is successful.</event>
@@ -5151,11 +5207,19 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 if (base.Image != null)
                 {
-                    // Ensure this is not the first page
+                    // If this is not the first page
                     if (_pageNumber > 1)
                     {
                         // Go to the previous page
                         PageNumber = _pageNumber - 1;
+                    }
+                    // Else use extended navigation to navigate back to a previous document (if
+                    // available).
+                    else
+                    {
+                        ExtendedNavigationEventArgs eventArgs =
+                            new ExtendedNavigationEventArgs(false, false);
+                        OnExtendedNavigation(eventArgs);
                     }
                 }
             }
@@ -5175,11 +5239,19 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 if (base.Image != null)
                 {
-                    // Ensure this is not the last page
+                    // If this is not the last page
                     if (_pageNumber < _pageCount)
                     {
                         // Go to the next page
                         PageNumber = _pageNumber + 1;
+                    }
+                    // Else use extended navigation to navigate to a another document (if
+                    // available).
+                    else
+                    {
+                        ExtendedNavigationEventArgs eventArgs =
+                            new ExtendedNavigationEventArgs(true, false);
+                        OnExtendedNavigation(eventArgs);
                     }
                 }
             }
@@ -5620,10 +5692,21 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                // Go to the next zone if an image is open and this is not the last tile
-                if (base.Image != null && !IsLastTile)
+                // If an image is open
+                if (IsImageAvailable)
                 {
-                    NextTile();
+                    // Go to the next zone if an image is open and this is not the last tile
+                    if (!IsLastDocumentTile)
+                    {
+                        NextTile();
+                    }
+                    // Else use extended navigation to navigate to a another document (if available).
+                    else
+                    {
+                        ExtendedNavigationEventArgs eventArgs =
+                            new ExtendedNavigationEventArgs(true, true);
+                        OnExtendedNavigation(eventArgs);
+                    }
                 }
             }
             catch (Exception ex)
@@ -5639,10 +5722,21 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                // Go to the next zone if an image is open and this is not the first tile
-                if (base.Image != null && !IsFirstTile)
+                if (IsImageAvailable)
                 {
-                    PreviousTile();
+                    // Go to the next zone if an image is open and this is not the last tile
+                    if (!IsFirstDocumentTile)
+                    {
+                        PreviousTile();
+                    }
+                    // Else use extended navigation to navigate back to a previous document (if
+                    // available).
+                    else
+                    {
+                        ExtendedNavigationEventArgs eventArgs =
+                            new ExtendedNavigationEventArgs(false, true);
+                        OnExtendedNavigation(eventArgs);
+                    }
                 }
             }
             catch (Exception ex)

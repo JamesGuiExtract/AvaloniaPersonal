@@ -39,7 +39,7 @@ namespace Extract.Redaction.Verification
         /// <para>Version 8</para>
         /// Added "Require users to review every suggested redaction or clue" option.
         /// Added "Enable seamless page navigation between documents" option.
-        /// Added "Prompt to save changes before navigating away from un-commited documents.
+        /// Added "Prompt to save changes before navigating away from uncommitted documents.
         /// Added "Confirm slideshow operator alertness" options.
         /// Added "Set full-page view mode when slideshow is started" option.
         /// </summary>

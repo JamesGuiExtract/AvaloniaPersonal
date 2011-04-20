@@ -14,6 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -96,6 +97,59 @@ namespace Extract.Redaction.Verification
         static readonly int _SC_MONITORPOWER = 0xF170;
 
         #endregion Constants
+
+        #region Enums
+
+        /// <summary>
+        /// Indicates a point in a document to be displayed when the document is loaded.
+        /// </summary>
+        enum DocumentNavigationTarget
+        {
+            /// <summary>
+            /// Display the portion of the document that was visible the last time the document was
+            /// opened. Otherwise, the first page of the document is displayed and the first
+            /// sensitive will be selected if it falls on the first page.
+            /// </summary>
+            LastView = 0,
+
+            /// <summary>
+            /// Display the first page or sensitive item depending upon the value of
+            /// <see cref="GeneralVerificationSettings.VerifyAllPages"/> and
+            /// <see cref="GeneralVerificationSettings.VerifyAllItems"/>.
+            /// </summary>
+            FirstItem = 1,
+
+            /// <summary>
+            /// Display the last page or sensitive item depending upon the value of
+            /// <see cref="GeneralVerificationSettings.VerifyAllPages"/> and
+            /// <see cref="GeneralVerificationSettings.VerifyAllItems"/>.
+            /// </summary>
+            LastItem = 2,
+
+            /// <summary>
+            /// Display the first page and select the first item if it falls on the first page.
+            /// </summary>
+            FirstPage = 3,
+
+            /// <summary>
+            /// Display the last page and select the last item if it falls on the last page.
+            /// </summary>
+            LastPage = 4,
+
+            /// <summary>
+            /// Display the first document tile using the scale factor from the last displayed image
+            /// page.
+            /// </summary>
+            FirstTile = 5,
+
+            /// <summary>
+            /// Display the last document tile using the scale factor from the last displayed image
+            /// page.
+            /// </summary>
+            LastTile = 6
+        }
+
+        #endregion Enums
 
         #region Fields
 
@@ -296,6 +350,16 @@ namespace Extract.Redaction.Verification
         /// To allow shortcut keys to be handled when focus is in an undocked sanddock pane.
         /// </summary>
         ShortcutsMessageFilter _shortcutsMessageFilter;
+
+        /// <summary>
+        /// The <see cref="DocumentNavigationTarget"/> to use when opening the next document.
+        /// </summary>
+        DocumentNavigationTarget _navigationTarget = DocumentNavigationTarget.LastView;
+
+        /// <summary>
+        /// The scale factor in use when the last document was closed.
+        /// </summary>
+        double _previousDocumentScaleFactor;
 
         #endregion Fields
 
@@ -614,6 +678,12 @@ namespace Extract.Redaction.Verification
                 memento.PageCount = _imageViewer.PageCount;
                 memento.VisitedPages = _pageSummaryView.GetVisitedPages();
                 memento.VisitedRedactions = _redactionGridView.GetVisitedRows();
+                memento.Selection = _redactionGridView.SelectedRowIndexes;
+
+                // Keep track of the scale factor in use for this document in case the next document
+                // is being loaded loaded in tile mode and, therefore, should share the same
+                // scale factor.
+                _previousDocumentScaleFactor = _imageViewer.ZoomInfo.ScaleFactor;
             }
         }
 
@@ -662,6 +732,9 @@ namespace Extract.Redaction.Verification
             // Ensure HasContainedRedactions is set to true if the _redactionGridView was saved with
             // redactions present.
             memento.HasContainedRedactions |= _redactionGridView.HasRedactions;
+
+            memento.Selection = _redactionGridView.SelectedRowIndexes;
+            _previousDocumentScaleFactor = _imageViewer.ZoomInfo.ScaleFactor;
         }
 
         /// <summary>
@@ -805,6 +878,17 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void AdvanceToNextDocument()
         {
+            AdvanceToNextDocument(DocumentNavigationTarget.LastView);
+        }
+
+        /// <summary>
+        /// Moves to the next document either in the history queue or the next document to be 
+        /// processed.
+        /// </summary>
+        /// <param name="navigationTarget">The <see cref="DocumentNavigationTarget"/> to use when
+        /// the next document is opened.</param>
+        void AdvanceToNextDocument(DocumentNavigationTarget navigationTarget)
+        {
             TimeInterval screenTime = StopScreenTimeTimer();
             SaveRedactionCounts(screenTime);
 
@@ -815,6 +899,8 @@ namespace Extract.Redaction.Verification
             }
 
             CommitComment();
+
+            _navigationTarget = navigationTarget;
 
             if (IsInHistory)
             {
@@ -995,6 +1081,13 @@ namespace Extract.Redaction.Verification
             // Check if the viewed document is dirty
             if (_redactionGridView.Dirty)
             {
+                // Stop the slideshow until we get the user's response.
+                bool slideshowRunning = _slideshowRunning;
+                if (_slideshowRunning)
+                {
+                    StopSlideshow(false);
+                }
+
                 using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
                 {
                     messageBox.Caption = "Save changes?";
@@ -1006,9 +1099,15 @@ namespace Extract.Redaction.Verification
                     messageBox.AddButton("Discard changes", "Discard", false);
                     messageBox.AddButton("Cancel", "Cancel", true);
 
-                    string result = messageBox.Show();
+                    string result = messageBox.Show(this);
                     if (result == "Cancel")
                     {
+                        if (slideshowRunning)
+                        {
+                            // Display the Slideshow Stopped message
+                            StopSlideshow(true);
+                        }
+
                         return true;
                     }
                     else if (result == "Save")
@@ -1028,6 +1127,12 @@ namespace Extract.Redaction.Verification
                             TimeInterval screenTime = StopScreenTimeTimer();
                             Save(screenTime);
                         }
+
+                        if (slideshowRunning)
+                        {
+                            // Resume the slideshow
+                            StartSlideshow();
+                        }
                     }
                 }
             }
@@ -1041,11 +1146,12 @@ namespace Extract.Redaction.Verification
 
         /// <summary>
         /// Displays a warning message indicating the current document will be saved and the user 
-        /// is navigating to next document. Allows the user to cancel.
+        /// is navigating to next document without explicity saving/committing the document. Allows
+        /// the user to cancel.
         /// </summary>
         /// <returns><see langword="true"/> if there is invalid data or the user chose to cancel; 
         /// <see langword="false"/> if the data is valid and the user chose to continue.</returns>
-        bool WarnBeforeTabCommit()
+        bool WarnBeforeAutoCommit()
         {
             bool continueSlideshow = false;
 
@@ -1057,18 +1163,17 @@ namespace Extract.Redaction.Verification
                     return true;
                 }
 
+                // If a prompt is not required for auto-committed documents, just move on.
+                if (!_settings.General.PromptForSaveUntilCommit)
+                {
+                    return false;
+                }
+
+                // Stop the slideshow until we get the user's response.
+                bool slideshowRunning = _slideshowRunning;
                 if (_slideshowRunning)
                 {
-                    // Set _slideshowRunning = false so that it doesn't get automatically stopped
-                    // when the message box displays.
-                    _slideshowRunning = false;
-
-                    // Disable the timer so that it doesn't advance in the background while the
-                    // message box is displayed.
-                    StopSlideshowTimer();
-
-                    // Indicate that the slideshow should be allowed to continue after saving.
-                    continueSlideshow = true;
+                    StopSlideshow(false);
                 }
 
                 // Indicate that all sensitive data has been reviewed
@@ -1102,11 +1207,20 @@ namespace Extract.Redaction.Verification
                 DialogResult result = MessageBox.Show(message.ToString(), "Save document?",
                     MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
 
-                // If cancelled, stop the slideshow.
-                if (continueSlideshow && result == DialogResult.Cancel)
+                // If the slideshow was previously running, either display the stopped message or
+                // resume the slideshow.
+                if (slideshowRunning)
                 {
-                    continueSlideshow = false;
-                    StopSlideshow(true);
+                    if (result == DialogResult.Cancel)
+                    {
+                        // Display the stopped message.
+                        StopSlideshow(true);
+                    }
+                    else
+                    {
+                        // Resume the slideshow
+                        StartSlideshow();
+                    }
                 }
 
                 return result == DialogResult.Cancel;
@@ -1147,23 +1261,42 @@ namespace Extract.Redaction.Verification
             // If data is invalid, warn immediately.
             if (WarnIfInvalid())
             {
+                StopSlideshow(false);
                 return true;
             }
+            // If the user has changed something and a prompt is required, prompt.
+            else if (_redactionGridView.Dirty &&
+                     _settings.General.PromptForSaveUntilCommit)
+            {
+                // Stop the slideshow until we get the user's response.
+                StopSlideshow(false);
 
-            // If the user hasn't changed anything, don't prompt. Just move on.
-            if (!_redactionGridView.Dirty)
+                string message = "Corrections have been made to this document.\r\n\r\n" +
+                    "Save this document and advance to the next?";
+
+                // Display the message box
+                DialogResult result = MessageBox.Show(message, "Save document?",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
+                bool stopped = (result == DialogResult.Cancel);
+                if (stopped)
+                {
+                    // Display the stopped message.
+                    StopSlideshow(true);
+                }
+                else
+                {
+                    // Resume the slideshow
+                    StartSlideshow();
+                }
+
+                return stopped;
+            }
+            // Just move on.
+            else
             {
                 return false;
             }
-
-            string message = "Corrections have been made to this document.\r\n\r\n" +
-                "Save this document and advance to the next?";
-
-            // Display the message box
-            DialogResult result = MessageBox.Show(message, "Save document?",
-                MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-
-            return result == DialogResult.Cancel;
         }
 
         /// <summary>
@@ -1328,19 +1461,15 @@ namespace Extract.Redaction.Verification
                 // Determine whether to verify all pages
                 bool verifyAllPages = _settings.General.VerifyAllPages;
 
-                // Go to the previous unviewed row (or page) if it exists
+                // Go to the previous row (or page) if it exists
                 int previousRow = _redactionGridView.GetPreviousRowIndex();
                 int previousPage = verifyAllPages ? GetPreviousPage() : -1;
-                if (GoToPreviousUnviewed(previousRow, previousPage))
+                if (GoToPreviousRowOrPage(previousRow, previousPage))
                 {
                     return;
                 }
 
-                // Go to the previous row if it exists
-                if (previousRow >= 0)
-                {
-                    _redactionGridView.SelectOnly(previousRow);
-                }
+                GoToPreviousDocument(DocumentNavigationTarget.LastItem);
             }
             catch (Exception ex)
             {
@@ -1364,43 +1493,16 @@ namespace Extract.Redaction.Verification
                 // Determine whether to verify all pages
                 bool verifyAllPages = _settings.General.VerifyAllPages;
 
-                // Go to the next unviewed row (or page) if it exists
+                // Go to the next row (or page) if it exists
                 int nextRow = _redactionGridView.GetNextRowIndex();
                 int nextPage = verifyAllPages ? GetNextPage() : -1;
-                if (GoToNextUnviewed(nextRow, nextPage))
+                if (GoToNextRowOrPage(nextRow, nextPage))
                 {
-                    return;
-                }
-
-                // Go to the first unviewed row (or page) if it exists
-                if (GoToNextUnviewed(0, verifyAllPages ? 1 : -1))
-                {
-                    return;
-                }
-
-                // Go to the next row
-                if (nextRow >= 0)
-                {
-                    _redactionGridView.SelectOnly(nextRow);
                     return;
                 }
 
                 // Go to next document
-                if (IsInHistory)
-                {
-                    GoToNextDocument();
-                }
-                else
-                {
-                    _redactionGridView.CommitChanges();
-
-                    if (!WarnBeforeTabCommit())
-                    {
-                        Commit();
-
-                        AdvanceToNextDocument();
-                    }
-                }
+                GoToNextDocument(false, DocumentNavigationTarget.FirstItem);
             }
             catch (Exception ex)
             {
@@ -1458,37 +1560,35 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Goes to the first unviewed redaction or the first unvisited page at or before the 
-        /// specified redaction and page, whichever comes last. 
+        /// Goes to the first redaction or page at or before the specified redaction and page,
+        /// whichever comes last. 
         /// </summary>
-        /// <param name="startIndex">The first redaction to check if is unviewed; or -1 to only 
-        /// check for pages.</param>
-        /// <param name="startPage">The first page to check for being unvisited; or -1 to only 
-        /// check for redactions.</param>
-        /// <returns><see langword="true"/> if there is an unviewed redaction on or before 
-        /// <paramref name="startIndex"/> or an unvisited page at or before 
-        /// <paramref name="startPage"/>; <see langword="false"/> otherwise.</returns>
-        bool GoToPreviousUnviewed(int startIndex, int startPage)
+        /// <param name="rowIndex">The previous redaction grid row index or -1 to advance to the
+        /// specified page.</param>
+        /// <param name="page">The previous page index or -1 to advance to the next specified
+        /// index in the redaction grid.</param>
+        /// <returns><see langword="true"/> if there is a redaction on or before 
+        /// <paramref name="rowIndex"/> or a page at or before <paramref name="page"/>;
+        /// <see langword="false"/> otherwise.</returns>
+        bool GoToPreviousRowOrPage(int rowIndex, int page)
         {
             // Get the next unviewed row
-            int unviewedRow =
-                startIndex < 0 ? -1 : _redactionGridView.GetPreviousUnviewedRowIndex(startIndex);
+            rowIndex = rowIndex < 0 ? -1 : rowIndex;
 
             // Get the next unvisited page
-            int unvisitedPage = 
-                startPage < 0 ? -1 : _pageSummaryView.GetPreviousUnvisitedPage(startPage);
+            page = page < 0 ? -1 : page;
 
             // Visit the unvisited page if it comes after the unviewed redaction
-            if (IsPageAfterRedactionAtIndex(unvisitedPage, unviewedRow))
+            if (IsPageAfterRedactionAtIndex(page, rowIndex))
             {
-                VisitPage(unvisitedPage);
+                VisitPage(page);
                 return true;
             }
 
             // If there is a valid redaction to select, select it.
-            if (unviewedRow >= 0)
+            if (rowIndex >= 0)
             {
-                _redactionGridView.SelectOnly(unviewedRow);
+                _redactionGridView.SelectOnly(rowIndex);
                 return true;
             }
 
@@ -1496,37 +1596,29 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Goes to the first unviewed redaction or the first unvisited page at or after the 
-        /// specified redaction and page, whichever comes first.
+        /// Goes to the next redaction or page at or after the specified redaction and page,
+        /// whichever comes first.
         /// </summary>
-        /// <param name="startIndex">The first redaction to check if is unviewed; or -1 to only 
-        /// check for pages.</param>
-        /// <param name="startPage">The first page to check for being unvisited; or -1 to only 
-        /// check for redactions.</param>
-        /// <returns><see langword="true"/> if there is an unviewed redaction on or after 
-        /// <paramref name="startIndex"/> or an unvisited page at or after 
-        /// <paramref name="startPage"/>; <see langword="false"/> otherwise.</returns>
-        bool GoToNextUnviewed(int startIndex, int startPage)
+        /// <param name="rowIndex">The next redaction grid row index or -1 to advance to the
+        /// specified page.</param>
+        /// <param name="page">The next page index or -1 to advance to the next specified
+        /// index in the redaction grid.</param>
+        /// <returns><see langword="true"/> if there is a redaction on or after
+        /// <paramref name="rowIndex"/> or a page at or after <paramref name="page"/>;
+        /// <see langword="false"/> otherwise.</returns>
+        bool GoToNextRowOrPage(int rowIndex, int page)
         {
-            // Get the next unviewed row
-            int unviewedRow = 
-                startIndex < 0 ? -1 : _redactionGridView.GetNextUnviewedRowIndex(startIndex);
-
-            // Get the next unvisited page
-            int unvisitedPage = 
-                startPage < 0 ? -1 : _pageSummaryView.GetNextUnvisitedPage(startPage);
-
             // Visit the unvisited page if it comes before the unviewed redaction
-            if (IsPageBeforeRedactionAtIndex(unvisitedPage, unviewedRow))
+            if (IsPageBeforeRedactionAtIndex(page, rowIndex))
             {
-                VisitPage(unvisitedPage);
+                VisitPage(page);
                 return true;
             }
 
             // If there is a valid redaction to select, select it.
-            if (unviewedRow >= 0)
+            if (rowIndex >= 0)
             {
-                _redactionGridView.SelectOnly(unviewedRow);
+                _redactionGridView.SelectOnly(rowIndex);
                 return true;
             }
 
@@ -1584,6 +1676,16 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void GoToPreviousDocument()
         {
+            GoToPreviousDocument(DocumentNavigationTarget.LastView);
+        }
+
+        /// <summary>
+        /// Moves to the previous document.
+        /// </summary>
+        /// <param name="navigationTarget">The <see cref="DocumentNavigationTarget"/> to use when
+        /// the previous document is opened.</param>
+        void GoToPreviousDocument(DocumentNavigationTarget navigationTarget)
+        {
             if (_imageViewer.IsImageAvailable && _historyIndex > 0)
             {
                 _redactionGridView.CommitChanges();
@@ -1614,6 +1716,8 @@ namespace Extract.Redaction.Verification
                         }
                     }
 
+                    _navigationTarget = navigationTarget;
+
                     // Go to the previous document
                     IncrementHistory(false);
                 }
@@ -1625,14 +1729,41 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void GoToNextDocument()
         {
-            if (IsInHistory)
-            {
-                _redactionGridView.CommitChanges();
+            GoToNextDocument(false, DocumentNavigationTarget.LastView);
+        }
 
-                if (!WarnIfDirty())
+        /// <summary>
+        /// Moves to the next document.
+        /// </summary>
+        /// <param name="promptForSlideshowAdvance">If <see langword="true"/>, prompt for a
+        /// slideshow commit if applicable for under the current configuration;
+        /// <see langword="false"/> otherwise.</param>
+        /// <param name="navigationTarget">The <see cref="DocumentNavigationTarget"/> to use when
+        /// the next document is opened.</param>
+        void GoToNextDocument(bool promptForSlideshowAdvance, DocumentNavigationTarget navigationTarget)
+        {
+            _redactionGridView.CommitChanges();
+
+            // If the advancing from a document that has not yet been committed.
+            if (!IsInHistory)
+            {
+                // If the slideshow is advancing, warns only if dirty and
+                // GeneralVerificationSettings.PromptForSaveUntilCommit is true.
+                // Otherwise, the user is advancing without explicitly hitting the commit button
+                // (Tab, seamless navigation, etc). In this case, warns as long as
+                // GeneralVerificationSettings.PromptForSaveUntilCommit is true.
+                if ((promptForSlideshowAdvance && !WarnBeforeSlideshowAutoAdvance()) ||
+                    (!promptForSlideshowAdvance && !WarnBeforeAutoCommit()))
                 {
-                    AdvanceToNextDocument();
+                    Commit();
+
+                    AdvanceToNextDocument(navigationTarget);
                 }
+            }
+            // If the user is advancing past a previously committed document.
+            else if (!WarnIfDirty())
+            {
+                AdvanceToNextDocument(navigationTarget);
             }
         }
 
@@ -1645,6 +1776,7 @@ namespace Extract.Redaction.Verification
         {
             // Prevent write access to the current image 
             VerificationMemento oldMemento = GetCurrentDocument();
+
             using (File.Open(oldMemento.DisplayImage, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 // Increment the history
@@ -1794,7 +1926,8 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Loads the verification user interface state from the current memento.
         /// </summary>
-        void LoadCurrentMemento()
+        /// <returns>The <see cref="VerificationMemento"/> for the current document.</returns>
+        VerificationMemento LoadCurrentMemento()
         {
             // Load the voa
             VerificationMemento memento = GetCurrentDocument();
@@ -1802,11 +1935,14 @@ namespace Extract.Redaction.Verification
 
             // Set the controls
             _redactionGridView.LoadFrom(_currentVoa, memento.VisitedRedactions);
+
             _pageSummaryView.SetVisitedPages(memento.VisitedPages);
 
             // Ensure HasContainedRedactions is set to true if the _redactionGridView was loaded
             // with redactions present.
             memento.HasContainedRedactions |= _redactionGridView.HasRedactions;
+
+            return memento;
         }
 
         /// <summary>
@@ -1933,6 +2069,12 @@ namespace Extract.Redaction.Verification
 
                 // So that PreFilterMessage is called.
                 Application.AddMessageFilter(this);
+
+                if (_settings.General.AllowSeamlessNavigation)
+                {
+                    _imageViewer.ExtendedNavigationCheck += HandleExtendedNavigationCheck;
+                    _imageViewer.ExtendedNavigation += HandleExtendedNavigation;
+                }
 
                 // Set the dockable window that the thumbnail and magnifier toolstrip button control.
                 _thumbnailsToolStripButton.DockableWindow = _thumbnailDockableWindow;
@@ -2517,6 +2659,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                // In case the zoom needs to be adjusted on the new document, lock updating of the
+                // image viewer until the image change is complete.
+                FormsMethods.LockControlUpdate(_imageViewer, true);
+
                 // Ensure slideshow timer is not running until the next document is completely loaded.
                 if (_slideshowTimer.Enabled)
                 {
@@ -2528,19 +2674,10 @@ namespace Extract.Redaction.Verification
                 if (_imageViewer.IsImageAvailable)
                 {
                     // Load the voa, if it exists
-                    LoadCurrentMemento();
+                    VerificationMemento memento = LoadCurrentMemento();
 
-                    // Go to the first redaction iff:
-                    // 1) We are not verifying all pages OR
-                    // 2) We are verifying all pages and there is a redaction on page 1
-                    if (_redactionGridView.Rows.Count > 0)
-                    {
-                        if (!_settings.General.VerifyAllPages ||
-                            _redactionGridView.Rows[0].PageNumber == 1)
-                        {
-                            _redactionGridView.SelectOnly(0);
-                        }
-                    }
+                    // Set the appropriate page, zoom & position, and selected sensitive item.
+                    InitializeNavigation(memento);
 
                     if (_slideshowRunning)
                     {
@@ -2549,7 +2686,6 @@ namespace Extract.Redaction.Verification
 
                         if (_settings.SlideshowSettings.CheckDocumentCondition)
                         {
-                            VerificationMemento memento = GetCurrentDocument();
                             IFAMCondition condition =
                                 _settings.SlideshowSettings.DocumentCondition.Object as IFAMCondition;
 
@@ -2592,6 +2728,136 @@ namespace Extract.Redaction.Verification
             {
                 ExtractException.Display("ELI26760", ex);
             }
+            finally
+            {
+                FormsMethods.LockControlUpdate(_imageViewer, false);
+                _imageViewer.Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// Sets the appropriate page, zoom and position, and selected sensitive item based on
+        /// _navigationTarget
+        /// </summary>
+        /// <param name="memento">The <see cref="VerificationMemento"/> for the document. (includes
+        /// the sensitive items selected the last time the document was viewed)</param>
+        void InitializeNavigation(VerificationMemento memento)
+        {
+            // Restore selection of any sensitive items that were selected if the document was
+            // previously viewed.
+            _redactionGridView.Select(memento.Selection);
+
+            if (memento.ImagePageData == null)
+            {
+                // If the document was not previously viewed, get the ImagePageData (ZoomInfo,
+                // history) for the document.
+                memento.ImagePageData = _imageViewer.ImagePageData;
+                if (_navigationTarget == DocumentNavigationTarget.LastView)
+                {
+                    // In the case that the document was not previously viewed, initialize selection
+                    // for LastView as if FirstPage was being used.
+                    _navigationTarget = DocumentNavigationTarget.FirstPage;
+                }
+            }
+            else
+            {
+                // Restore zoom history for the document.
+                _imageViewer.ImagePageData = memento.ImagePageData;
+            }
+
+            switch (_navigationTarget)
+            {
+                case DocumentNavigationTarget.FirstItem:
+                    {
+                        // Go to the first redaction iff:
+                        // 1) We are not verifying all pages OR
+                        // 2) We are verifying all pages and there is a redaction on page 1
+                        if (_redactionGridView.Rows.Count > 0 &&
+                                (!_settings.General.VerifyAllPages ||
+                                 _redactionGridView.Rows[0].PageNumber == 1))
+                        {
+                            _redactionGridView.SelectOnly(0);
+                        }
+                        else
+                        {
+                            _imageViewer.PageNumber = 1;
+                        }
+                    }
+                    break;
+
+                case DocumentNavigationTarget.FirstPage:
+                    {
+                        // Go to the first redaction iff:
+                        // 1) There is not any previously selected redactions AND
+                        // 2) The first redaction is on the first page.
+                        if (!memento.Selection.Any() &&
+                            _redactionGridView.Rows.Count > 0 &&
+                            _redactionGridView.Rows[0].PageNumber == 1)
+                        {
+                            _redactionGridView.SelectOnly(0);
+                        }
+                        else
+                        {
+                            _imageViewer.PageNumber = 1;
+                        }
+                    }
+                    break;
+
+                case DocumentNavigationTarget.LastItem:
+                    {
+                        // Go to the last redaction iff:
+                        // 1) We are not verifying all pages OR
+                        // 2) We are verifying all pages and there is a redaction on the last page
+                        int lastRow = _redactionGridView.Rows.Count - 1;
+                        int lastPage = _imageViewer.PageCount;
+                        if (_redactionGridView.Rows.Count > 0 &&
+                                (!_settings.General.VerifyAllPages ||
+                                 _redactionGridView.Rows[lastRow].PageNumber == lastPage))
+                        {
+                            _redactionGridView.SelectOnly(lastRow);
+                        }
+                        else
+                        {
+                            _imageViewer.PageNumber = lastPage;
+                        }
+                    }
+                    break;
+
+                case DocumentNavigationTarget.LastPage:
+                    {
+                        // Go to the last redaction iff:
+                        // 1) There is not any previously selected redactions AND
+                        // 2) The last redaction is on the first page.
+                        int lastRow = _redactionGridView.Rows.Count - 1;
+                        int lastPage = _imageViewer.PageCount;
+                        if (!memento.Selection.Any() &&
+                            _redactionGridView.Rows.Count > 0 &&
+                            _redactionGridView.Rows[lastRow].PageNumber == lastPage)
+                        {
+                            _redactionGridView.SelectOnly(lastRow);
+                        }
+                        else
+                        {
+                            _imageViewer.PageNumber = lastPage;
+                        }
+                    }
+                    break;
+
+                case DocumentNavigationTarget.FirstTile:
+                    {
+                        _imageViewer.SelectFirstDocumentTile(_previousDocumentScaleFactor);
+                    }
+                    break;
+
+                case DocumentNavigationTarget.LastTile:
+                    {
+                        _imageViewer.SelectLastDocumentTile(_previousDocumentScaleFactor);
+                    }
+                    break;
+            }
+
+            // After the navigation as been initialized, revert _navigationTarget to the default.
+            _navigationTarget = DocumentNavigationTarget.LastView;
         }
 
         /// <summary>
@@ -2804,25 +3070,7 @@ namespace Extract.Redaction.Verification
                 }
                 else
                 {
-                    if (IsInHistory)
-                    {
-                        GoToNextDocument();
-                    }
-                    else
-                    {
-                        _redactionGridView.CommitChanges();
-
-                        if (WarnBeforeSlideshowAutoAdvance())
-                        {
-                            StopSlideshow(false);
-                        }
-                        else
-                        {
-                            Commit();
-
-                            AdvanceToNextDocument();
-                        }
-                    }
+                    GoToNextDocument(true, DocumentNavigationTarget.FirstPage);
                 }
             }
             catch (Exception ex)
@@ -2837,6 +3085,57 @@ namespace Extract.Redaction.Verification
                 }
 
                 ExtractException.Display("ELI31122", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the extended navigation.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.ExtendedNavigationEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleExtendedNavigation(object sender, ExtendedNavigationEventArgs e)
+        {
+            try
+            {
+                if (e.Forward)
+                {
+                    e.Handled = true;
+
+                    GoToNextDocument(false, e.TileNavigation
+                        ? DocumentNavigationTarget.FirstTile
+                        : DocumentNavigationTarget.FirstPage);
+                }
+                else if (_historyIndex > 0)
+                {
+                    e.Handled = true;
+
+                    GoToPreviousDocument(e.TileNavigation
+                        ? DocumentNavigationTarget.LastTile
+                        : DocumentNavigationTarget.LastPage);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32385");
+            }
+        }
+
+        /// <summary>
+        /// Handles the extended navigation check.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.ExtendedNavigationCheckEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleExtendedNavigationCheck(object sender, ExtendedNavigationCheckEventArgs e)
+        {
+            try
+            {
+                e.IsAvailable |= (e.Forward || _historyIndex > 0);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32386");
             }
         }
 

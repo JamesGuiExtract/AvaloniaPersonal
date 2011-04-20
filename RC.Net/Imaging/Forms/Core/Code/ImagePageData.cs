@@ -9,7 +9,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents data associated with a single page of an image.
     /// </summary>
-    internal class ImagePageData
+    public class ImagePageData
     {
         #region ImagePageData Constants
 
@@ -17,7 +17,6 @@ namespace Extract.Imaging.Forms
         /// The maximum number of entries in the zoom history.
         /// </summary>
         private static readonly int _MAX_ZOOM_HISTORY_COUNT = 20;
-
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -98,7 +97,7 @@ namespace Extract.Imaging.Forms
             {
                 return _currentZoom.Value;
             }
-            set
+            internal set
             {
                 // Don't add a zoom history if current zoom is the same as the zoom value to be
                 // added.
@@ -173,7 +172,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="angle">The number of degrees to rotate the page orientation clockwise.
         /// </param>
-        public void RotateOrientation(int angle)
+        internal void RotateOrientation(int angle)
         {
             _orientation += angle;
             _orientation %= 360;
@@ -188,7 +187,7 @@ namespace Extract.Imaging.Forms
         /// Retreats to the previous entry in the zoom history.
         /// </summary>
         /// <returns>The previous entry in the zoom history.</returns>
-        public ZoomInfo ZoomPrevious()
+        internal ZoomInfo ZoomPrevious()
         {
             _currentZoom = _currentZoom.Previous;
             return _currentZoom.Value;
@@ -198,7 +197,7 @@ namespace Extract.Imaging.Forms
         /// Advance to the next entry in the zoom history.
         /// </summary>
         /// <returns>The next entry in the zoom history.</returns>
-        public ZoomInfo ZoomNext()
+        internal ZoomInfo ZoomNext()
         {
             _currentZoom = _currentZoom.Next;
             return _currentZoom.Value;

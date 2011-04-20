@@ -8,6 +8,7 @@ using Leadtools.Drawing;
 using Leadtools.WinForms;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -569,6 +570,17 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public event EventHandler<EventArgs> AllowHighlightStatusChanged;
 
+        /// <summary>
+        /// Raised when the <see cref="ImageViewer"/> needs to know whether navigations across
+        /// document boundaries is available.
+        /// </summary>
+        public event EventHandler<ExtendedNavigationCheckEventArgs> ExtendedNavigationCheck;
+
+        /// <summary>
+        /// Raised when the <see cref="ImageViewer"/> requests navigation across document boundaries.
+        /// </summary>
+        public event EventHandler<ExtendedNavigationEventArgs> ExtendedNavigation;
+
         #endregion
 
         #region Image Viewer Constructors
@@ -946,58 +958,206 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Gets whether the current zoom region is at the top left of the first page.
+        /// Gets a value indicating whether the first available page is being displayed. This will
+        /// take into account navigation across document boundaries if there are extended navigation
+        /// event handlers.
         /// </summary>
-        /// <value><see langword="true"/> if the current zoom region is at the top left of the 
-        /// first page; <see langword="false"/> if it is not.</value>
-        public bool IsFirstTile
+        /// <value><see langword="true"/> if this is the first available page; otherwise,
+        /// <see langword="false"/>.</value>
+        public bool IsFirstPage
         {
             get
             {
-                // The first page must be visible for this to be the first zone
-                if (base.Image == null || _pageNumber != 1)
+                try
                 {
-                    return false;
+                    if (IsImageAvailable && PageNumber == 1)
+                    {
+                        ExtendedNavigationCheckEventArgs eventArgs =
+                            new ExtendedNavigationCheckEventArgs(false, false);
+                        OnExtendedNavigationCheck(eventArgs);
+
+                        return !eventArgs.IsAvailable;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-
-                // Get the visible image area
-                Rectangle tileArea = GetVisibleImageArea();
-
-                // Get the viewing rectangle in physical (client) coordinates
-                Rectangle imageArea = PhysicalViewRectangle;
-
-                // Determine whether the bottom right point of 
-                // tile area is within the margin of error.
-                return (tileArea.Left - imageArea.Left) < _TILE_EDGE_DISTANCE &&
-                    (tileArea.Top - imageArea.Top) < _TILE_EDGE_DISTANCE;
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32372");
+                }
             }
         }
 
         /// <summary>
-        /// Gets whether the current zoom region is at the bottom right of the last page.
+        /// Gets a value indicating whether the last available page is being displayed. This will
+        /// take into account navigation across document boundaries if there are extended navigation
+        /// event handlers.
+        /// </summary>
+        /// <value><see langword="true"/> if this is the last available page; otherwise,
+        /// <see langword="false"/>.</value>
+        public bool IsLastPage
+        {
+            get
+            {
+                try
+                {
+                    if (IsImageAvailable && PageNumber == PageCount)
+                    {
+                        ExtendedNavigationCheckEventArgs eventArgs =
+                            new ExtendedNavigationCheckEventArgs(true, false);
+                        OnExtendedNavigationCheck(eventArgs);
+
+                        return !eventArgs.IsAvailable;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32373");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the current zoom region is at the top left of the first page. This will
+        /// take into account navigation across document boundaries if there are extended navigation
+        /// event handlers.
+        /// </summary>
+        /// <value><see langword="true"/> if the current zoom region is at the top left of the 
+        /// first available page; <see langword="false"/> if it is not.</value>
+        public bool IsFirstTile
+        {
+            get
+            {
+                try
+                {
+                    if (IsImageAvailable && IsFirstDocumentTile)
+                    {
+                        ExtendedNavigationCheckEventArgs eventArgs =
+                            new ExtendedNavigationCheckEventArgs(false, true);
+                        OnExtendedNavigationCheck(eventArgs);
+
+                        return !eventArgs.IsAvailable;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32374");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the current zoom region is at the top left of the first page in the current
+        /// document.
+        /// </summary>
+        /// <value><see langword="true"/> if the current zoom region is at the top left of the 
+        /// first page in the current document; <see langword="false"/> if it is not.</value>
+        public bool IsFirstDocumentTile
+        {
+            get
+            {
+                try
+                {
+                    // The first page must be visible for this to be the first zone
+                    if (base.Image == null || _pageNumber != 1)
+                    {
+                        return false;
+                    }
+
+                    // Get the visible image area
+                    Rectangle tileArea = GetVisibleImageArea();
+
+                    // Get the viewing rectangle in physical (client) coordinates
+                    Rectangle imageArea = PhysicalViewRectangle;
+
+                    // Determine whether the bottom right point of 
+                    // tile area is within the margin of error.
+                    return (tileArea.Left - imageArea.Left) < _TILE_EDGE_DISTANCE &&
+                        (tileArea.Top - imageArea.Top) < _TILE_EDGE_DISTANCE;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32375");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the current zoom region is at the bottom right of the last page. This will
+        /// take into account navigation across document boundaries if there are extended navigation
+        /// event handlers.
         /// </summary>
         /// <returns><see langword="true"/> if the current zoom region is at the bottom right of the 
-        /// last page; <see langword="false"/> if it is not.</returns>
+        /// last available page; <see langword="false"/> if it is not.</returns>
         public bool IsLastTile
         {
             get
             {
-                // The last page must be visible for this to be the last zone
-                if (base.Image == null || _pageNumber != _pageCount)
+                try
                 {
-                    return false;
+                    if (IsImageAvailable && IsLastDocumentTile)
+                    {
+                        ExtendedNavigationCheckEventArgs eventArgs =
+                            new ExtendedNavigationCheckEventArgs(true, true);
+                        OnExtendedNavigationCheck(eventArgs);
+
+                        return !eventArgs.IsAvailable;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32376");
+                }
+            }
+        }
 
-                // Get the visible image area
-                Rectangle tileArea = GetVisibleImageArea();
+        /// <summary>
+        /// Gets whether the current zoom region is at the bottom right of the last page in the current
+        /// document.
+        /// </summary>
+        /// <returns><see langword="true"/> if the current zoom region is at the bottom right of the 
+        /// last page in the current document; <see langword="false"/> if it is not.</returns>
+        public bool IsLastDocumentTile
+        {
+            get
+            {
+                try
+                {
+                    // The last page must be visible for this to be the last zone
+                    if (base.Image == null || _pageNumber != _pageCount)
+                    {
+                        return false;
+                    }
 
-                // Get the viewing rectangle in physical (client) coordinates
-                Rectangle imageArea = PhysicalViewRectangle;
+                    // Get the visible image area
+                    Rectangle tileArea = GetVisibleImageArea();
 
-                // Determine whether the bottom right point of 
-                // tile area is within the margin of error.
-                return (imageArea.Right - tileArea.Right) < _TILE_EDGE_DISTANCE &&
-                    (imageArea.Bottom - tileArea.Bottom) < _TILE_EDGE_DISTANCE;
+                    // Get the viewing rectangle in physical (client) coordinates
+                    Rectangle imageArea = PhysicalViewRectangle;
+
+                    // Determine whether the bottom right point of 
+                    // tile area is within the margin of error.
+                    return (imageArea.Right - tileArea.Right) < _TILE_EDGE_DISTANCE &&
+                        (imageArea.Bottom - tileArea.Bottom) < _TILE_EDGE_DISTANCE;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32377");
+                }
             }
         }
 
@@ -1054,6 +1214,42 @@ namespace Extract.Imaging.Forms
             get
             {
                 return base.Image != null && _imagePages[_pageNumber - 1].CanZoomNext;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the collection of <see cref="ImagePageData"/> instances for the current
+        /// document.
+        /// <para><b>Note</b></para>
+        /// An image must be opened and there must be an <see cref="ImagePageData"/> instance for
+        /// each page in the document.
+        /// </summary>
+        /// <value>The <see cref="ReadOnlyCollection{T}"/> of <see cref="ImagePageData"/> instances
+        /// for each page of the current document.</value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public ReadOnlyCollection<ImagePageData> ImagePageData
+        {
+            get
+            {
+                return _imagePages.AsReadOnly();
+            }
+
+            set
+            {
+                try
+                {
+                    ExtractException.Assert("ELI32378", "Unable to set ImagePageData.",
+                        IsImageAvailable && value.Count == PageCount);
+
+                    _imagePages = new List<ImagePageData>(value);
+                    SetZoomInfo(_imagePages[PageNumber - 1].ZoomInfo, false);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32379");
+                }
             }
         }
 
@@ -3005,6 +3201,43 @@ namespace Extract.Imaging.Forms
             if (AllowHighlightStatusChanged != null)
             {
                 AllowHighlightStatusChanged(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:ExtendedNavigationCheck"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.ExtendedNavigationCheckEventArgs"/>
+        /// instance containing the event data.</param>
+        void OnExtendedNavigationCheck(ExtendedNavigationCheckEventArgs e)
+        {
+            if (ExtendedNavigationCheck != null)
+            {
+                ExtendedNavigationCheck(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:ExtendedNavigation"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.ExtendedNavigationCheckEventArgs"/>
+        /// instance containing the event data.</param>
+        void OnExtendedNavigation(ExtendedNavigationEventArgs e)
+        {
+            if (ExtendedNavigation != null)
+            {
+                foreach (EventHandler<ExtendedNavigationEventArgs> handler
+                    in ExtendedNavigation.GetInvocationList())
+                {
+                    handler(this, e);
+                    
+                    // Allow only one handler to navigate. If this handler has navigated, don't call
+                    // any additional handlers.
+                    if (e.Handled)
+                    {
+                        break;
+                    }
+                }
             }
         }
 

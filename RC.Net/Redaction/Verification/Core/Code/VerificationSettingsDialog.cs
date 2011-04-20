@@ -122,11 +122,11 @@ namespace Extract.Redaction.Verification
             bool verifyAllItems = _verifyAllItemsCheckBox.Checked;
             bool requireTypes = _requireTypeCheckBox.Checked;
             bool requireExemptions = _requireExemptionsCheckBox.Checked;
-            bool seamlessNavigation = _seamlessNavigationCheckBox.Checked;
+            bool allowSeamlessNavigation = _seamlessNavigationCheckBox.Checked;
             bool promptForSaveUntilCommit = _promptForSaveUntilCommit.Checked;
 
             return new GeneralVerificationSettings(verifyAllPages, verifyAllItems, requireTypes,
-                requireExemptions, seamlessNavigation, promptForSaveUntilCommit);
+                requireExemptions, allowSeamlessNavigation, promptForSaveUntilCommit);
         }
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace Extract.Redaction.Verification
                 _verifyAllItemsCheckBox.Checked = _settings.General.VerifyAllItems;
                 _requireExemptionsCheckBox.Checked = _settings.General.RequireExemptions;                
                 _requireTypeCheckBox.Checked = _settings.General.RequireTypes;
-                _seamlessNavigationCheckBox.Checked = _settings.General.SeamlessNavigation;
+                _seamlessNavigationCheckBox.Checked = _settings.General.AllowSeamlessNavigation;
                 _feedback = _settings.Feedback;
                 _collectFeedbackCheckBox.Checked = _feedback.Collect;
                 _enableInputEventTrackingCheckBox.Checked = _settings.EnableInputTracking;

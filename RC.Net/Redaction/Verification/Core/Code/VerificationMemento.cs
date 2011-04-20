@@ -1,5 +1,6 @@
 using Extract.Imaging.Forms;
-using Extract.Utilities;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Extract.Redaction.Verification
 {
@@ -80,6 +81,11 @@ namespace Extract.Redaction.Verification
         /// The number of seconds the document has been displayed for verification this session.
         /// </summary>
         double _screenTimeThisSession;
+
+        /// <summary>
+        /// The selected redaction grid rows for the document.
+        /// </summary>
+        HashSet<int> _selection = new HashSet<int>();
 
         #endregion Fields
 
@@ -264,6 +270,17 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Gets or sets the collection of <see cref="ImagePageData"/> instances for the document.
+        /// </summary>
+        /// <value>The <see cref="ReadOnlyCollection{T}"/> of <see cref="ImagePageData"/> instances
+        /// for each page of the document.</value>
+        public ReadOnlyCollection<ImagePageData> ImagePageData
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the 0-based visited page numbers.
         /// </summary>
         /// <value>The 0-based visited page numbers.</value>
@@ -311,6 +328,25 @@ namespace Extract.Redaction.Verification
             set
             {
                 _screenTimeThisSession = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected redaction grid rows for the document.
+        /// </summary>
+        /// <value>
+        /// The selected redaction grid rows for the document.
+        /// </value>
+        public IEnumerable<int> Selection
+        {
+            get
+            {
+                return _selection;
+            }
+
+            set
+            {
+                _selection = new HashSet<int>(value);
             }
         }
 

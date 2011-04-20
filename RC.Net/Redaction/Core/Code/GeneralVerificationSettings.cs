@@ -39,7 +39,7 @@ namespace Extract.Redaction
         /// to the previous/next document; <see langword="false"/> if only document navigation
         /// controls are permitted to change documents.
         /// </summary>
-        readonly bool _seamlessNavigation;
+        readonly bool _allowSeamlessNavigation;
 
         /// <summary>
         /// <see langword="true"/> if the user should be prompted to save documents that have not
@@ -65,14 +65,14 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="GeneralVerificationSettings"/> class.
         /// </summary>
         public GeneralVerificationSettings(bool verifyAllPages, bool verifyAllItems,
-            bool requireTypes, bool requireExemptions, bool seamlessNavigation,
+            bool requireTypes, bool requireExemptions, bool allowSeamlessNavigation,
             bool promptForSaveUntilCommit)
         {
             _verifyAllPages = verifyAllPages;
             _verifyAllItems = verifyAllItems;
             _requireTypes = requireTypes;
             _requireExemptions = requireExemptions;
-            _seamlessNavigation = seamlessNavigation;
+            _allowSeamlessNavigation = allowSeamlessNavigation;
             _promptForSaveUntilCommit = promptForSaveUntilCommit;
         }
 
@@ -143,11 +143,11 @@ namespace Extract.Redaction
         /// to the previous/next document; <see langword="false"/> if only document navigation
         /// controls are permitted to change documents.
         /// </value>
-        public bool SeamlessNavigation
+        public bool AllowSeamlessNavigation
         {
             get
             {
-                return _seamlessNavigation;
+                return _allowSeamlessNavigation;
             }
         }
 
@@ -189,11 +189,11 @@ namespace Extract.Redaction
                 bool verifyAllItems = (reader.Version < 8) ? true : reader.ReadBoolean();
                 bool requireTypes = reader.ReadBoolean();
                 bool requireExemptions = reader.ReadBoolean();
-                bool seamlessNavigation = (reader.Version < 8) ? true : reader.ReadBoolean();
+                bool allowSeamlessNavigation = (reader.Version < 8) ? true : reader.ReadBoolean();
                 bool promptForSaveUntilCommit = (reader.Version < 8) ? false : reader.ReadBoolean();
 
                 return new GeneralVerificationSettings(verifyAllPages, verifyAllItems, requireTypes,
-                    requireExemptions, seamlessNavigation, promptForSaveUntilCommit);
+                    requireExemptions, allowSeamlessNavigation, promptForSaveUntilCommit);
             }
             catch (Exception ex)
             {
@@ -216,7 +216,7 @@ namespace Extract.Redaction
                 writer.Write(_verifyAllItems);
                 writer.Write(_requireTypes);
                 writer.Write(_requireExemptions);
-                writer.Write(_seamlessNavigation);
+                writer.Write(_allowSeamlessNavigation);
                 writer.Write(_promptForSaveUntilCommit);
             }
             catch (Exception ex)
