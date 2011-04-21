@@ -15,6 +15,8 @@ namespace Extract.FileActionManager.FileProcessors
     /// Specifies a the resolution <see cref="CreateFileTask"/> should take when the target file
     /// already exists.
     /// </summary>
+    [ComVisible(true)]
+    [Guid("CDE405F7-803B-45C1-BD36-4D53C589DC56")]
     public enum CreateFileConflictResolution
     {
         /// <summary>
@@ -39,14 +41,48 @@ namespace Extract.FileActionManager.FileProcessors
     }
 
     /// <summary>
+    /// Interface definition for the Create File Task
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("A569A02E-8498-44BA-B007-0961ED223B98")]
+    [CLSCompliant(false)]
+    public interface ICreateFileTask : ICategorizedComponent, IConfigurableObject,
+        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask,
+        ILicensedComponent, IPersistStream
+    {
+        /// <summary>
+        /// Gets or sets the name of the target file.
+        /// </summary>
+        /// <value>
+        /// The name of the file.
+        /// </value>
+        string FileName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file contents. This may be <see cref="String.Empty"/>
+        /// or <see langword="null"/> to produce an empty file.
+        /// </summary>
+        /// <value>
+        /// The file contents.
+        /// </value>
+        string FileContents { get; set; }
+
+        /// <summary>
+        /// Gets or sets the behavior of the task when the target file exists.
+        /// </summary>
+        /// <value>
+        /// The task behavior when the target file exists.
+        /// </value>
+        CreateFileConflictResolution FileExistsBehavior { get; set; }
+    }
+
+    /// <summary>
     /// An <see cref="IFileProcessingTask"/> which generates a file.
     /// </summary>
     [ComVisible(true)]
     [Guid("4D7F59D3-ECD2-46F0-8750-71194A131777")]
     [ProgId("Extract.FileActionManager.FileProcessors.CreateFileTask")]
-    public class CreateFileTask : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask,
-        ILicensedComponent, IPersistStream
+    public class CreateFileTask : ICreateFileTask
     {
         #region Constants
 
@@ -114,6 +150,99 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion Constructors
+
+        #region ICreateFileTask Members
+
+        /// <summary>
+        /// Gets or sets the name of the target file.
+        /// </summary>
+        /// <value>
+        /// The name of the file.
+        /// </value>
+        public string FileName
+        {
+            get
+            {
+                return _fileName;
+            }
+            set
+            {
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        throw new ArgumentNullException("value");
+                    }
+                    else if (value.Equals("<SourceDocName>", StringComparison.Ordinal))
+                    {
+                        throw new ExtractException("ELI32393",
+                            "Cannot overwrite source document.");
+                    }
+
+                    _dirty |= !string.Equals(_fileName, value, StringComparison.OrdinalIgnoreCase);
+                    _fileName = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI32391", "Unable to set file name.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the file contents. This may be <see cref="String.Empty"/>
+        /// or <see langword="null"/> to produce an empty file.
+        /// </summary>
+        /// <value>
+        /// The file contents.
+        /// </value>
+        public string FileContents
+        {
+            get
+            {
+                return _fileContents;
+            }
+            set
+            {
+                _dirty |= !string.Equals(_fileContents, value, StringComparison.Ordinal);
+                _fileContents = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the behavior of the task when the target file exists.
+        /// </summary>
+        /// <value>
+        /// The task behavior when the target file exists.
+        /// </value>
+        public CreateFileConflictResolution FileExistsBehavior
+        {
+            get
+            {
+                return _conflictResolution;
+            }
+            set
+            {
+                try
+                {
+                    if (!Enum.IsDefined(typeof(CreateFileConflictResolution), value))
+                    {
+                        throw new ArgumentOutOfRangeException("value", value,
+                            "Invalid value specified.");
+                    }
+
+                    _dirty |= _conflictResolution != value;
+                    _conflictResolution = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI32392",
+                        "Unable to set behavior when target file exists.");
+                }
+            }
+        }
+
+        #endregion
 
         #region ICategorizedComponent Members
 
@@ -325,7 +454,9 @@ namespace Extract.FileActionManager.FileProcessors
 
                 if (_conflictResolution == CreateFileConflictResolution.Append)
                 {
-                    File.AppendAllText(fileName, fileContents);
+                    // Perform the append operation in a retry block
+                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(
+                        () => { File.AppendAllText(fileName, fileContents); });
                 }
                 else
                 {

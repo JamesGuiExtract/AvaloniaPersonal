@@ -11,6 +11,7 @@ using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 
 namespace Extract
 {
@@ -1568,6 +1569,17 @@ namespace Extract
         public static ExtractException CreateComVisible(this Exception ex, string eliCode, string message)
         {
             return ExtractException.CreateComVisible(eliCode, message, ex);
+        }
+
+        /// <summary>
+        /// Extension method that gets the HRESULT from the specified exception.
+        /// </summary>
+        /// <param name="ex">The exception to get the HRESULT for.</param>
+        /// <returns>The HRESULT.</returns>
+        public static Win32ErrorCode GetWindowsErrorCode(this Exception ex)
+        {
+            int hresult = Marshal.GetHRForException(ex);
+            return (Win32ErrorCode)(hresult & 0xFFFF);
         }
     }
 }

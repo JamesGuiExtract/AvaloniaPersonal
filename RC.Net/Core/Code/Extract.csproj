@@ -85,6 +85,7 @@
     <Compile Include="StringMethods.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Win32ErrorCode.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_EXCEPTIONMGMTLib">

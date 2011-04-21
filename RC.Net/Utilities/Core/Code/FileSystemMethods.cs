@@ -60,6 +60,29 @@ namespace Extract.Utilities
         static readonly string _REG_SUBKEY_SHELL_FOLDERS =
             @"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders";
 
+        /// <summary>
+        /// The registry sub key path for the file access retry values (this key is under HKLM)
+        /// </summary>
+        static readonly string _FILE_ACCESS_KEY =
+            @"Software\Extract Systems\ReusableComponents\BaseUtils";
+
+        /// <summary>
+        /// The number of times to retry a file access operation if the operation
+        /// fails due to a sharing violation.
+        /// </summary>
+        static int _fileAccessRetries = -1;
+
+        /// <summary>
+        /// The amount of time to sleep between file access retries.
+        /// </summary>
+        static int _fileAccessRetrySleepTime = -1;
+
+        /// <summary>
+        /// Mutex used to prevent multiple threads from trying to update the file access
+        /// retry values.
+        /// </summary>
+        static object _fileAccessLock = new object();
+
         #endregion Fields
 
         /// <summary>
@@ -987,6 +1010,79 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32325");
+            }
+        }
+
+        /// <summary>
+        /// Gets the count of retries and the time to sleep in between attempts for
+        /// file access sharing violations.
+        /// </summary>
+        /// <returns>The retry count and sleep time.</returns>
+        static Tuple<int, int> GetRetryCountAndSleepTime()
+        {
+            if (_fileAccessRetries == -1 || _fileAccessRetrySleepTime == -1)
+            {
+                lock (_fileAccessLock)
+                {
+                    if (_fileAccessRetries == -1)
+                    {
+                        // Get the values from the registry
+                        var key = Registry.LocalMachine.OpenSubKey(_FILE_ACCESS_KEY);
+                        var accessRetries = key.GetValue("FileAccessRetries", "50").ToString();
+                        _fileAccessRetries = int.Parse(accessRetries, CultureInfo.InvariantCulture);
+                        var sleepTime = key.GetValue("FileAccessTimeout", "250").ToString();
+                        _fileAccessRetrySleepTime = int.Parse(sleepTime, CultureInfo.InvariantCulture);
+                    }
+                }
+            }
+
+            return new Tuple<int, int>(_fileAccessRetries, _fileAccessRetrySleepTime);
+        }
+
+        /// <summary>
+        /// Performs the specified file operation within a looping structure to retry the operation
+        /// if the failure is due to a sharing violation.
+        /// </summary>
+        /// <param name="fileOperation">The operation to perform.</param>
+        public static void PerformFileOperationWithRetryOnSharingViolation(Action fileOperation)
+        {
+            try
+            {
+                var retryCountAndSleepTime = GetRetryCountAndSleepTime();
+                int maxAttempts = retryCountAndSleepTime.Item1;
+                int sleepTime = retryCountAndSleepTime.Item2;
+                int attempts = 1;
+                do
+                {
+                    try
+                    {
+                        fileOperation();
+                        break;
+                    }
+                    catch (IOException ex)
+                    {
+                        if (ex.GetWindowsErrorCode() != Win32ErrorCode.SharingViolation)
+                        {
+                            throw ex.AsExtract("ELI32411");
+                        }
+                        else if (attempts >= maxAttempts)
+                        {
+                            var ee = new ExtractException("ELI32412",
+                                "File operation failed after retries.", ex);
+                            ee.AddDebugData("Number Of Attempts", attempts, false);
+                            ee.AddDebugData("Max Number Of Attempts", maxAttempts, false);
+                            throw ee;
+                        }
+                    }
+
+                    attempts++;
+                    Thread.Sleep(sleepTime);
+                }
+                while (true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32413");
             }
         }
 
