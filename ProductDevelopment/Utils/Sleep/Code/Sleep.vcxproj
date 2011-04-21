@@ -88,6 +88,7 @@
       <ValidateAllParameters>false</ValidateAllParameters>
     </Midl>
     <ClCompile>
+	  <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>

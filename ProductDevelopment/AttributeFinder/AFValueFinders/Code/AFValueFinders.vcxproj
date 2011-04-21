@@ -77,11 +77,11 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\ReusableComponents\APIs\Inlite_5_7\include;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\AFCore\Code;..\..\AFCppUtils\Code;..\..\AFUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>

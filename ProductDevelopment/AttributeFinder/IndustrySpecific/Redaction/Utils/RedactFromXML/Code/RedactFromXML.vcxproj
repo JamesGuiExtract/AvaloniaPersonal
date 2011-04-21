@@ -76,11 +76,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>..\..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code;..\..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\RedactionCustomComponents\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>.\..\release\$(TargetName).pch</PrecompiledHeaderOutputFile>

@@ -79,13 +79,13 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code;..\..\..\..\AFCore\Code;..\..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\AFUtils\Code;..\..\..\..\AFCppUtils\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_GXDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>

@@ -67,11 +67,11 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>..\..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code;..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include\ClassLib;..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\..\..\ReusableComponents\MFCClasses\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
