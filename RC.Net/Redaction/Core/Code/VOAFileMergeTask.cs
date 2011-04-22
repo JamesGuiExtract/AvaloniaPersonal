@@ -76,6 +76,7 @@ namespace Extract.Redaction
         /// </summary>
         public VOAFileMergeTask()
         {
+            _settings = new VOAFileMergeTaskSettings();
         }
 
         /// <summary>
@@ -96,6 +97,39 @@ namespace Extract.Redaction
         }
 
         #endregion Constructors
+
+        #region Properties
+
+        /// <summary>
+        /// Gets/sets the settings for the task.
+        /// </summary>
+        [ComVisible(false)]
+        public VOAFileMergeTaskSettings TaskSettings
+        {
+            get
+            {
+                return _settings;
+            }
+            set
+            {
+                try
+                {
+                    if (value == null)
+                    {
+                        throw new ArgumentNullException("value");
+                    }
+
+                    _settings = value;
+                    _dirty = true;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32431");
+                }
+            }
+        }
+
+        #endregion Properties
 
         #region IFileProcessingTask Members
 

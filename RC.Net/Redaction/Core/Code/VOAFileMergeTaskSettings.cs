@@ -129,7 +129,7 @@ namespace Extract.Redaction
         /// <see cref="VOAFileMergeTaskSettings"/>.</param>
         /// <returns>A <see cref="VOAFileMergeTaskSettings"/> created from the
         /// specified <see cref="IStreamReader"/>.</returns>
-        public static VOAFileMergeTaskSettings ReadFrom(IStreamReader reader)
+        internal static VOAFileMergeTaskSettings ReadFrom(IStreamReader reader)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="writer">The writer into which the 
         /// <see cref="VOAFileMergeTaskSettings"/> will be written.</param>
-        public virtual void WriteTo(IStreamWriter writer)
+        internal virtual void WriteTo(IStreamWriter writer)
         {
             try
             {

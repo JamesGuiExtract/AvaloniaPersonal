@@ -21,13 +21,34 @@ using ComAttribute = UCLID_AFCORELib.Attribute;
 namespace Extract.Redaction
 {
     /// <summary>
+    /// Interface definition for the Meta data task
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("4C969864-74F1-4C2E-8253-4D8EAC3D0041")]
+    [CLSCompliant(false)]
+    public interface IMetadataTask : ICategorizedComponent, IConfigurableObject, ICopyableObject,
+                                IFileProcessingTask, ILicensedComponent, IPersistStream
+    {
+        /// <summary>
+        /// Gets the the path to the input ID Shield data file. May contain tags.
+        /// </summary>
+        /// <value>The the path to the input ID Shield data file. May contain tags.</value>
+        string DataFile { get; set; }
+
+        /// <summary>
+        /// Gets the path to the verification metadata xml file. May contain tags.
+        /// </summary>
+        /// <returns>The path to the verification metadata xml file. May contain tags.</returns>
+        string MetadataFile { get; set; }
+    }
+
+    /// <summary>
     /// Represents a file processing task that performs verification of redactions.
     /// </summary>
     [ComVisible(true)]
     [Guid("7F567E34-CEBA-4C50-B2C9-B53BD13784FA")]
     [ProgId("Extract.Redaction.MetadataTask")]
-    public class MetadataTask : ICategorizedComponent, IConfigurableObject, ICopyableObject,
-                                IFileProcessingTask, ILicensedComponent, IPersistStream
+    public class MetadataTask : IMetadataTask
     {
         #region Constants
 
@@ -84,7 +105,64 @@ namespace Extract.Redaction
         }
         
         #endregion Constructors
-        
+
+        #region IMetadatTask Members
+
+        /// <summary>
+        /// Gets the the path to the input ID Shield data file. May contain tags.
+        /// </summary>
+        /// <value>
+        /// The the path to the input ID Shield data file. May contain tags.
+        /// </value>
+        public string DataFile
+        {
+            get
+            {
+                return _settings.DataFile;
+            }
+            set
+            {
+                try
+                {
+                    bool dirty = !string.Equals(_settings.DataFile, value, StringComparison.Ordinal);
+                    _settings.DataFile = value;
+                    _dirty |= dirty;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI32414", "Unable to update data file.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the path to the verification metadata xml file. May contain tags.
+        /// </summary>
+        /// <returns>The path to the verification metadata xml file. May contain tags.</returns>
+        public string MetadataFile
+        {
+            get
+            {
+                return _settings.MetadataFile;
+            }
+            set
+            {
+                try
+                {
+                    bool dirty = !string.Equals(_settings.MetadataFile, value,
+                        StringComparison.Ordinal);
+                    _settings.MetadataFile = value;
+                    _dirty |= dirty;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI32415", "Unable to update metadata file.");
+                }
+            }
+        }
+
+        #endregion IMetadatTask Members
+
         #region Methods
 
         /// <summary>

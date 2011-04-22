@@ -80,6 +80,39 @@ namespace Extract.Redaction
         
         #endregion Constructors
 
+        #region Properties
+
+        /// <summary>
+        /// Gets/sets the settings for the task.
+        /// </summary>
+        [ComVisible(false)]
+        public SurroundContextSettings TaskSettings
+        {
+            get
+            {
+                return _settings;
+            }
+            set
+            {
+                try
+                {
+                    if (value == null)
+                    {
+                        throw new ArgumentNullException("value");
+                    }
+
+                    _settings = value;
+                    _dirty = true;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32430");
+                }
+            }
+        }
+
+        #endregion Properties
+
         #region Methods
 
         /// <summary>
@@ -349,7 +382,7 @@ namespace Extract.Redaction
                     _COMPONENT_DESCRIPTION);
 
                 // Allow the user to configure the settings
-                using (SurroundContextSettingsDialog dialog = new SurroundContextSettingsDialog(_settings))
+                using (var dialog = new SurroundContextSettingsDialog(_settings))
                 {
                     bool result = dialog.ShowDialog() == DialogResult.OK;
 

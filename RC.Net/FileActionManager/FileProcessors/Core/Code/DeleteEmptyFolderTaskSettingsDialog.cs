@@ -10,15 +10,6 @@ namespace Extract.FileActionManager.FileProcessors
     /// </summary>
     public partial class DeleteEmptyFolderTaskSettingsDialog : Form
     {
-        #region Constants
-
-        /// <summary>
-        /// The default folder to delete.
-        /// </summary>
-        static readonly string _DEFAULT_FOLDER = "$DirOf(<SourceDocName>)";
-
-        #endregion Constants
-
         #region Constructors
 
         /// <summary>
@@ -118,8 +109,8 @@ namespace Extract.FileActionManager.FileProcessors
 
             set
             {
-                _folderNameTextBox.Text =
-                    string.IsNullOrWhiteSpace(value) ? _DEFAULT_FOLDER : value;
+                _folderNameTextBox.Text = string.IsNullOrWhiteSpace(value) ?
+                    DeleteEmptyFolderTask.DefaultFolder : value;
             }
         }
 

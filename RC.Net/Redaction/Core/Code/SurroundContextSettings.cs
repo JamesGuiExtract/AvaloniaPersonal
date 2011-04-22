@@ -207,7 +207,7 @@ namespace Extract.Redaction
         /// <see cref="SurroundContextSettings"/>.</param>
         /// <returns>A <see cref="SurroundContextSettings"/> created from the specified 
         /// <see cref="IStreamReader"/>.</returns>
-        public static SurroundContextSettings ReadFrom(IStreamReader reader)
+        internal static SurroundContextSettings ReadFrom(IStreamReader reader)
         {
             try
             {
@@ -239,7 +239,7 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="writer">The writer into which the 
         /// <see cref="SurroundContextSettings"/> will be written.</param>
-        public void WriteTo(IStreamWriter writer)
+        internal void WriteTo(IStreamWriter writer)
         {
             try
             {

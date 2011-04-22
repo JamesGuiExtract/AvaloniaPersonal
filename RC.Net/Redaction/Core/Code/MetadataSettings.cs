@@ -13,12 +13,12 @@ namespace Extract.Redaction
         /// <summary>
         /// The path to the input ID Shield data file (VOA). May contain tags.
         /// </summary>
-        readonly string _dataFile;
+        string _dataFile;
 
         /// <summary>
         /// The path to the output verification metadata xml file. May contain tags.
         /// </summary>
-        readonly string _metadataFile;
+        string _metadataFile;
 
         #endregion Fields
 
@@ -56,6 +56,15 @@ namespace Extract.Redaction
             {
                 return _dataFile;
             }
+            internal set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentNullException("value");
+                }
+
+                _dataFile = value;
+            }
         }
 
         /// <summary>
@@ -67,6 +76,15 @@ namespace Extract.Redaction
             get
             {
                 return _metadataFile;
+            }
+            internal set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentNullException("value");
+                }
+
+                _metadataFile = value;
             }
         }
 
@@ -82,7 +100,7 @@ namespace Extract.Redaction
         /// <see cref="MetadataSettings"/>.</param>
         /// <returns>A <see cref="MetadataSettings"/> created from the specified 
         /// <see cref="IStreamReader"/>.</returns>
-        public static MetadataSettings ReadFrom(IStreamReader reader)
+        internal static MetadataSettings ReadFrom(IStreamReader reader)
         {
             try
             {
@@ -104,7 +122,7 @@ namespace Extract.Redaction
         /// </summary>
         /// <param name="writer">The writer into which the 
         /// <see cref="MetadataSettings"/> will be written.</param>
-        public void WriteTo(IStreamWriter writer)
+        internal void WriteTo(IStreamWriter writer)
         {
             try
             {

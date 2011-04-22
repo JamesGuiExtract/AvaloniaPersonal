@@ -13,15 +13,46 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileProcessors
 {
     /// <summary>
+    /// Interface definition for the delete empty folder task
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("B2C70A40-2760-41BB-88FF-C6AC850ABE29")]
+    [CLSCompliant(false)]
+    public interface IDeleteEmptyFolderTask : ICategorizedComponent, IConfigurableObject,
+        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask,
+        ILicensedComponent, IPersistStream
+    {
+        /// <summary>
+        /// Gets or sets the name of the folder to delete if empty.
+        /// </summary>
+        /// <value>
+        /// The name of the folder.
+        /// </value>
+        string FolderName { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether or not empty folders should recursively be deleted.
+        /// </summary>
+        /// <value>If <see langword="true"/> then folder deletion will occurr recursively.</value>
+        bool DeleteRecursively { get; set; }
+
+        /// <summary>
+        /// Gets or sets a limit on the recursive delete. If a folder is specified, then
+        /// recursive deletion will only occur up to this folder.
+        /// </summary>
+        /// <value>The folder to limit recursion at. If <see langword="null"/>
+        /// or <see cref="String.Empty"/> then no limit will take place.</value>
+        string RecursionLimit { get; set; }
+    }
+
+    /// <summary>
     /// An <see cref="IFileProcessingTask"/> which deletes a specified directory so long as it is
     /// empty.
     /// </summary>
     [ComVisible(true)]
     [Guid("A697CE90-5D82-4674-98C4-181BF46846B0")]
     [ProgId("Extract.FileActionManager.FileProcessors.DeleteEmptyFolderTask")]
-    public class DeleteEmptyFolderTask : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask,
-        ILicensedComponent, IPersistStream
+    public class DeleteEmptyFolderTask : IDeleteEmptyFolderTask
     {
         #region Constants
 
@@ -35,6 +66,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         const int _CURRENT_VERSION = 1;
 
+        /// <summary>
+        /// The default folder to delete.
+        /// </summary>
+        internal static readonly string DefaultFolder = "$DirOf(<SourceDocName>)";
+
         #endregion Constants
 
         #region Fields
@@ -42,7 +78,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The name of the folder to be deleted (if empty).
         /// </summary>
-        string _folderName;
+        string _folderName = DefaultFolder;
 
         /// <summary>
         /// Indicates whether any root folder which end up empty as well should be deleted too.
@@ -93,6 +129,97 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion Constructors
+
+        #region IDeleteEmptyFolder Members
+
+        /// <summary>
+        /// Gets or sets the name of the folder to delete if empty.
+        /// </summary>
+        /// <value>
+        /// The name of the folder.
+        /// </value>
+        public string FolderName
+        {
+            get
+            {
+                return _folderName;
+            }
+            set
+            {
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        throw new ArgumentNullException("value");
+                    }
+
+                    _dirty |= !_folderName.Equals(value, StringComparison.OrdinalIgnoreCase);
+                    _folderName = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI32387", "Unable to set folder name.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether or not empty folders should recursively be deleted.
+        /// </summary>
+        /// <value>
+        /// If <see langword="true"/> then folder deletion will occurr recursively.
+        /// </value>
+        public bool DeleteRecursively
+        {
+            get
+            {
+                return _deleteRecursively;
+            }
+            set
+            {
+                try
+                {
+                    _dirty |= value != _deleteRecursively;
+                    _deleteRecursively = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI32388", "Unable set recursion option.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a limit on the recursive delete. If a folder is specified, then
+        /// recursive deletion will only occur up to this folder.
+        /// </summary>
+        /// <value>
+        /// The folder to limit recursion at. If <see langword="null"/>
+        /// or <see cref="String.Empty"/> then no limit will take place.
+        /// </value>
+        public string RecursionLimit
+        {
+            get
+            {
+                return _recursionLimit;
+            }
+            set
+            {
+                try
+                {
+                    _dirty |= !string.Equals(_recursionLimit, value,
+                        StringComparison.OrdinalIgnoreCase);
+                    _recursionLimit = value;
+                    _limitRecursion = !string.IsNullOrWhiteSpace(_recursionLimit);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.CreateComVisible("ELI32389", "Unable to set recursion limit.");
+                }
+            }
+        }
+
+        #endregion IDeleteEmptyFolder Members
 
         #region ICategorizedComponent Members
 
