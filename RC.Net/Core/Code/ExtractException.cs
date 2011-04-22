@@ -1,17 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
 
 namespace Extract
 {
@@ -717,15 +718,21 @@ namespace Extract
                 }
 
                 // Parse the stack trace and update the internal stack trace variable.
-                string[] stackTraceEntries = stackTrace.Split(new char[] { '\r', '\n' },
-                    StringSplitOptions.RemoveEmptyEntries);
+                var stackTraceEntries = stackTrace.Split(new char[] { '\r', '\n' },
+                    StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim());
                 foreach (string s in stackTraceEntries)
                 {
-                    if (s.Length != 0)
+                    if (s.Length > 0)
                     {
-                        // Trim leading and trailing spaces, encrypt and push the
-                        // stack trace entry onto our stack
-                        _stackTrace.Push(_ENCRYPTED_PREFIX + NativeMethods.EncryptString(s.Trim()));
+                        // Check if the value is already encrypted, encrypt if needed
+                        if (!s.StartsWith(_ENCRYPTED_PREFIX, StringComparison.Ordinal))
+                        {
+                            _stackTrace.Push(_ENCRYPTED_PREFIX + NativeMethods.EncryptString(s));
+                        }
+                        else
+                        {
+                            _stackTrace.Push(s);
+                        }
                     }
                 }
             }

@@ -12,7 +12,7 @@
 //-------------------------------------------------------------------------------------------------
 // CCOMUCLIDException
 //-------------------------------------------------------------------------------------------------
-CCOMUCLIDException::CCOMUCLIDException()
+CCOMUCLIDException::CCOMUCLIDException() : m_pException(__nullptr)
 {
 	m_pException = new UCLIDException();
 }
@@ -21,10 +21,10 @@ CCOMUCLIDException::~CCOMUCLIDException()
 {
 	try
 	{
-		if (m_pException)
+		if (m_pException != __nullptr)
 		{
 			delete m_pException;
-			m_pException = NULL;
+			m_pException = __nullptr;
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20395");
@@ -64,6 +64,7 @@ STDMETHODIMP CCOMUCLIDException::CreateWithInnerException(BSTR strELICode, BSTR 
 		if (m_pException != __nullptr)
 		{
 			delete m_pException;
+			m_pException = __nullptr;
 		}
 
 		// If there is an inner exception create a new exception object with an inner exception
@@ -274,10 +275,10 @@ STDMETHODIMP CCOMUCLIDException::CreateFromString(BSTR bstrELICode, BSTR bstrDat
 		string strELICode = asString( bstrELICode );
 		
 		// if an exception object exists, delete it
-		if (m_pException)
+		if (m_pException != __nullptr)
 		{
 			delete m_pException;
-			m_pException = NULL;
+			m_pException = __nullptr;
 		}
 		
 		// create a new exception object from the given string
