@@ -22,6 +22,12 @@ namespace Extract.Office.Utilities.OfficeToTif
         static readonly string _OFFICE_2007_CONVERTER = Path.Combine(_APPLICATION_PATH,
             "Office2007ToTif.exe");
 
+        ///// <summary>
+        ///// The path to the office 2010 tif converter.
+        ///// </summary>
+        //static readonly string _OFFICE_2010_CONVERTER = Path.Combine(_APPLICATION_PATH,
+        //    "Office2010ToTif.exe");
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -84,34 +90,33 @@ namespace Extract.Office.Utilities.OfficeToTif
 
                 using (TemporaryFile tempUex = new TemporaryFile("uex"),
                     tempArgs = new TemporaryFile(),
-                    tempDocument = new TemporaryFile(".tif"))
+                    tempResult = new TemporaryFile(".tif"))
                 using (Process process = new Process())
                 {
                     // Build the arguments for the process
                     StringBuilder arguments = new StringBuilder();
                     arguments.AppendLine(sourceDocument);
-                    arguments.AppendLine(tempDocument.FileName);
+                    arguments.AppendLine(tempResult.FileName);
                     arguments.AppendLine(application.ToString("d"));
                     arguments.AppendLine(tempUex.FileName);
                     File.WriteAllText(tempArgs.FileName, arguments.ToString());
 
                     process.StartInfo.Arguments = "\"" + tempArgs.FileName + "\"";
-                    switch (OfficeMethods.CheckOfficeVersion())
+                    var version = OfficeMethods.CheckOfficeVersion();
+                    switch (version)
                     {
                         case -1:
                             throw new ExtractException("ELI31102", "Office is not installed.");
 
                         case 12:
+                        case 14:
                             process.StartInfo.FileName = _OFFICE_2007_CONVERTER;
                             break;
 
-                        case 13:
-                            // Perform office to Tif conversion with office 2010
-                            throw new NotSupportedException("Office 2010 is not currently supported.");
-
                         default:
-                            ExtractException.ThrowLogicException("ELI31101");
-                            break;
+                            var ee = new ExtractException("ELI31101", "Unrecognized office version.");
+                            ee.AddDebugData("Office Version", version, false);
+                            throw ee;
                     }
                     process.Start();
                     process.WaitForExit();
@@ -134,7 +139,7 @@ namespace Extract.Office.Utilities.OfficeToTif
                     }
 
                     // Copy the file to the destination
-                    File.Copy(tempDocument.FileName, destinationDocument, true);
+                    File.Copy(tempResult.FileName, destinationDocument, true);
                 }
             }
             catch (Exception ex)
