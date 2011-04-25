@@ -9,7 +9,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="SlideshowRunKey" Type="System.Windows.Forms.Keys" Scope="User">
-      <Value Profile="(Default)">LShiftKey</Value>
+      <Value Profile="(Default)">LMenu</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -49,7 +49,7 @@ namespace Extract.Redaction.Verification.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("LShiftKey")]
+        [global::System.Configuration.DefaultSettingValueAttribute("LMenu")]
         public global::System.Windows.Forms.Keys SlideshowRunKey {
             get {
                 return ((global::System.Windows.Forms.Keys)(this["SlideshowRunKey"]));
