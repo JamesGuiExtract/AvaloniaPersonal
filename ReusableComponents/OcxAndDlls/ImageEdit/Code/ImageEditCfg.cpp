@@ -95,7 +95,7 @@ bool ImageEditCtrlCfg::isAnnotationEnabled()
 	if (!strSetting.empty() && strSetting == "1")
 	{
 		// Check annotation license
-		if ( LicenseManagement::sGetInstance().isAnnotationLicensed() )
+		if ( LicenseManagement::isAnnotationLicensed() )
 		{
 			bIsEnabled = true;
 		}

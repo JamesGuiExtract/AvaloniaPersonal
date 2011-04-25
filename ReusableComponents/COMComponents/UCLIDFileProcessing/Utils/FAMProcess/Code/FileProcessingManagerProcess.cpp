@@ -24,7 +24,7 @@ m_pUnkMarshaler(__nullptr)
 {
 	try
 	{
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28441");
 }

@@ -35,7 +35,7 @@ void LicenseUtilities::LoadLicenseFilesFromFolder(int licenseType, MapLabel^ map
             }
 
             // Load the license file(s)
-            LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(
+            LicenseManagement::loadLicenseFilesFromFolder(
                 LICENSE_MGMT_PASSWORD, licenseType);
 
             _licensesLoaded = true;
@@ -58,7 +58,7 @@ bool LicenseUtilities::IsLicensed(LicenseIdName id)
     try
     {
         // Check if the particular component ID is licensed
-        return LicenseManagement::sGetInstance().isLicensed(
+        return LicenseManagement::isLicensed(
             ValueMapConversion::getConversion(static_cast<unsigned int>(id)));
     }
     catch(UCLIDException& uex)
@@ -153,7 +153,7 @@ void LicenseUtilities::ResetCache()
 {
     try
     {
-        LicenseManagement::sGetInstance().resetCache();
+        LicenseManagement::resetCache();
 
         ResetLicenseCache();
     }
@@ -174,7 +174,7 @@ void LicenseUtilities::EnableAll()
 {
     try
     {
-        LicenseManagement::sGetInstance().enableAll();
+        LicenseManagement::enableAll();
 
         ResetLicenseCache();
     }
@@ -195,7 +195,7 @@ void LicenseUtilities::EnableId(LicenseIdName id)
 {
     try
     {
-        LicenseManagement::sGetInstance().enableId(
+        LicenseManagement::enableId(
             ValueMapConversion::getConversion(static_cast<unsigned long>(id)));
 
         ResetLicenseCache(id);
@@ -222,7 +222,7 @@ void LicenseUtilities::DisableAll()
 {
     try
     {
-        LicenseManagement::sGetInstance().disableAll();
+        LicenseManagement::disableAll();
 
         ResetLicenseCache();
     }
@@ -243,7 +243,7 @@ void LicenseUtilities::DisableId(LicenseIdName id)
 {
     try
     {
-        LicenseManagement::sGetInstance().disableId(
+        LicenseManagement::disableId(
             ValueMapConversion::getConversion(static_cast<unsigned long>(id)));
 
         ResetLicenseCache(id);

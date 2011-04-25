@@ -38,7 +38,7 @@ void LicenseStateCache::Validate(String^ eliCode, String^ componentName)
 		if (tickCount != _lastTickCount)
 		{
 			// Validate the license ID
-			LicenseManagement::sGetInstance().validateLicense(_valueToCheck,
+			LicenseManagement::validateLicense(_valueToCheck,
 				StringHelpers::AsSTLString(eliCode), StringHelpers::AsSTLString(componentName));
 
 			// Store the last tick count
@@ -72,7 +72,7 @@ bool LicenseStateCache::IsTemporaryLicense()
 		try
 		{
 			// Check if the specified component id is temporarily licensed
-			_temporaryLicense = LicenseManagement::sGetInstance().isTemporaryLicense(_valueToCheck);
+			_temporaryLicense = LicenseManagement::isTemporaryLicense(_valueToCheck);
 			_temporaryLicenseChecked = true;
 		}
 		catch(UCLIDException& uex)
@@ -127,7 +127,7 @@ DateTime LicenseStateCache::InternalGetExpirationDate()
 				IsTemporaryLicense());
 
 			// Get the expiration date
-			CTime time = LicenseManagement::sGetInstance().getExpirationDate(_valueToCheck);
+			CTime time = LicenseManagement::getExpirationDate(_valueToCheck);
 
 			// Convert the date to a DateTime object
 			_expirationDate = DateTime(time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(),

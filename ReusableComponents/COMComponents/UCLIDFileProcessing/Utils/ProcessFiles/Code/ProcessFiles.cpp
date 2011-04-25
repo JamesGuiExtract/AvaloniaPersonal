@@ -420,7 +420,7 @@ BOOL CProcessFilesApp::InitInstance()
 			FailureDetectionAndReportingMgr::startFDRSPingThread();
 
 			// Load license file(s)
-			LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 			validateLicense();
 
 			IFileProcessingManagerPtr ipFileProcMgr(CLSID_FileProcessingManager);

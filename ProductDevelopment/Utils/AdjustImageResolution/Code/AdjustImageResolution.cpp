@@ -283,7 +283,7 @@ BOOL CAdjustImageResolutionApp::InitInstance()
 		::validateFileOrFolderExistence( strImageName );
 
 		// Load license files and validate the license
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		validateLicense();
 
 		// Set the image resolution

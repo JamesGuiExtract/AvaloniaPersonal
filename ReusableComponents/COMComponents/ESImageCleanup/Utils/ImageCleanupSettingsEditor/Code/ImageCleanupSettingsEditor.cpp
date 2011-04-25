@@ -132,7 +132,7 @@ BOOL CImageCleanupSettingsEditorApp::InitInstance()
 			try
 			{
 				// init license
-				LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 				// check license
 				validateLicense();

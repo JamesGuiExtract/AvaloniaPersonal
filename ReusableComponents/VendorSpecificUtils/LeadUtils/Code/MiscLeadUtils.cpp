@@ -334,7 +334,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		// Check if an annotation license is required
 		if (bRetainAnnotations || bApplyAsAnnotations)
 		{
-			if (!LicenseManagement::sGetInstance().isAnnotationLicensed())
+			if (!LicenseManagement::isAnnotationLicensed())
 			{
 				UCLIDException ue("ELI24863", "Saving redactions as annotations is not licensed.");
 				ue.addDebugInfo("Redaction Source", strImageFileName);
@@ -348,8 +348,8 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		_lastCodePos = "10";
 
 		// Make sure that if the file being opened/saved is a pdf file that PDF support is licensed
-		LicenseManagement::sGetInstance().verifyFileTypeLicensed(strImageFileName);
-		LicenseManagement::sGetInstance().verifyFileTypeLicensed(strOutputImageName);
+		LicenseManagement::verifyFileTypeLicensed(strImageFileName);
+		LicenseManagement::verifyFileTypeLicensed(strOutputImageName);
 
 		// Sort the vector of zones by page
 		sort(rvecZones.begin(), rvecZones.end(), compareZoneByPage);
@@ -968,7 +968,7 @@ void initPDFSupport()
 	int iOpenXRes(giDEFAULT_PDF_RESOLUTION), iOpenYRes(giDEFAULT_PDF_RESOLUTION);
 
 	// check if PDF is licensed to initialize support
-	if ( !LicenseManagement::sGetInstance().isPDFLicensed() )
+	if ( !LicenseManagement::isPDFLicensed() )
 	{
 		// pdf support is not licensed
 		return;
@@ -1070,7 +1070,7 @@ int getImageViewPerspective(const string& strImageFileName, int nPageNum)
 void unlockDocumentSupport()
 {
 	// Unlock support for Document toolkit for annotations
-	if (LicenseManagement::sGetInstance().isAnnotationLicensed())
+	if (LicenseManagement::isAnnotationLicensed())
 	{
 		// Unlock Document/Medical support only if 
 		// Annotation package is licensed (P13 #4499)

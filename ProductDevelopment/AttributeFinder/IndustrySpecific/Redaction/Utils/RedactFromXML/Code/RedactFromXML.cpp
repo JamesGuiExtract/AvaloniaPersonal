@@ -62,9 +62,9 @@ BOOL CRedactFromXMLApp::InitInstance()
 		}
 
 		// License this EXE
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		validateLicense();
-		if (m_bRedactAsAnnotation && !LicenseManagement::sGetInstance().isAnnotationLicensed())
+		if (m_bRedactAsAnnotation && !LicenseManagement::isAnnotationLicensed())
 		{
 			// create and throw exception
 			throw UCLIDException("ELI18675", "Annotation support is not licensed.");

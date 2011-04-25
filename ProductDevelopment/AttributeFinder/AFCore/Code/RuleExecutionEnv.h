@@ -67,6 +67,6 @@ private:
 
 	// This Mutex will guard against simultaneous accesses (read or write)
 	// to the stack (m_mapThreadIDToRSDFileStack)
-	CMutex m_mutex;
+	static CMutex m_mutex;
 
 };

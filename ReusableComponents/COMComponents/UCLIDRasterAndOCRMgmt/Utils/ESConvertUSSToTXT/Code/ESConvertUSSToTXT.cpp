@@ -191,7 +191,7 @@ BOOL CESConvertUSSToTXTApp::InitInstance()
 				}
 
 				// Load license files and validate the license
-				LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 				validateLicense();
 
 				// Make sure the input file exists
@@ -325,7 +325,7 @@ bool CESConvertUSSToTXTApp::usbCountersDisabled()
 {
 	static const unsigned long DISABLE_USB_COUNTERS = gnIGNORE_USB_DECREMENT_FEATURE;
 
-	return LicenseManagement::sGetInstance().isLicensed( DISABLE_USB_COUNTERS ); 
+	return LicenseManagement::isLicensed( DISABLE_USB_COUNTERS ); 
 }
 //-------------------------------------------------------------------------------------------------
 void CESConvertUSSToTXTApp::validateLicense()

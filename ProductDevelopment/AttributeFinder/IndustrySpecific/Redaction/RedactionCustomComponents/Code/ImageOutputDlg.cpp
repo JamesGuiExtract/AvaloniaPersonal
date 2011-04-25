@@ -71,7 +71,7 @@ BOOL CImageOutputDlg::OnInitDialog()
 		m_chkRedactionAsAnnotation.SetCheck(asBSTChecked(m_options.bApplyAsAnnotations));
 
 		// Disable the checkboxes if not licensed
-		if (!LicenseManagement::sGetInstance().isAnnotationLicensed() )
+		if (!LicenseManagement::isAnnotationLicensed() )
 		{
 			m_chkCarryAnnotation.EnableWindow( FALSE );
 			m_chkRedactionAsAnnotation.EnableWindow( FALSE );

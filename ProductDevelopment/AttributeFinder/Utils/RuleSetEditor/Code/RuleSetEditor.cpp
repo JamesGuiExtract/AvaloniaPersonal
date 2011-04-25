@@ -90,14 +90,14 @@ BOOL CRuleSetEditorApp::InitInstance()
 		}
 
 		// Load license file(s) using Special Simple Rule Writing passwords
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
+		LicenseManagement::loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
 			gnSIMPLE_RULE_WRITING_PASSWORDS );
 
 		// Check to see if a license file was loaded that licenses the Rule Set Editor
-		if (!LicenseManagement::sGetInstance().isLicensed( gnRULESET_EDITOR_UI_OBJECT ))
+		if (!LicenseManagement::isLicensed( gnRULESET_EDITOR_UI_OBJECT ))
 		{
 			// Try again with default passwords
-			LicenseManagement::sGetInstance().loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
+			LicenseManagement::loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
 				gnDEFAULT_PASSWORDS );
 		}
 

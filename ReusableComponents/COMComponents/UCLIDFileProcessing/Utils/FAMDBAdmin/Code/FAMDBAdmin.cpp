@@ -85,7 +85,7 @@ BOOL CFAMDBAdminApp::InitInstance()
 		InitCommonControlsEx(&InitCtrls);
 
 		// Load license file(s)
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		validateLicense();
 
 		CWinApp::InitInstance();

@@ -51,7 +51,7 @@ BOOL CImageEditApp::InitInstance()
 		LBase::LoadLibraries(LT_FIL|LT_KRN|LT_DIS|LT_IMG|LT_ANN);
 
 		// Unlock support for Document toolkit for annotations
-		if (LicenseManagement::sGetInstance().isAnnotationLicensed())
+		if (LicenseManagement::isAnnotationLicensed())
 		{
 			// Unlock Document/Medical support only if 
 			// Annotation package is licensed (P13 #4499)

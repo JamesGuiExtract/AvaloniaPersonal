@@ -64,7 +64,7 @@ void printUsage()
 void checkLicensing()
 {
 	// Load license file(s) with default passwords
-	LicenseManagement::sGetInstance().loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
+	LicenseManagement::loadLicenseFilesFromFolder( LICENSE_MGMT_PASSWORD,
 		gnDEFAULT_PASSWORDS );
 
 	// Check the license one last time

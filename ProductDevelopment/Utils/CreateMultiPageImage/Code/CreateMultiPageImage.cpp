@@ -588,7 +588,7 @@ int main(int argc, char *argv[])
 		cout << endl;
 
 		// Load license files ( this is need for IVariantVector )
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		validateLicense();
 
 		// check for correct # of arguments

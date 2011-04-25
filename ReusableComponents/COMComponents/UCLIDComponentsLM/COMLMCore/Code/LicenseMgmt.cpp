@@ -36,37 +36,26 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-static const string g_strLicenseExtension = ".lic";
-
-LicenseManagement* LicenseManagement::ms_pLM;
-
-// add license management functions
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 //-------------------------------------------------------------------------------------------------
+// Statics
+//-------------------------------------------------------------------------------------------------
+static const string g_strLicenseExtension = ".lic";
+
+CMutex LicenseManagement::m_lock;
+bool LicenseManagement::m_bErrorInitializingTRP = false;
+bool LicenseManagement::m_bUserLicenseFailure = false;
+long LicenseManagement::m_lOEMPassword = 0;
+bool LicenseManagement::m_bOEMPasswordOK = false;
+bool LicenseManagement::m_bFilesLoadedFromFolder = false;
+LMData LicenseManagement::m_LicenseData;
+HWND LicenseManagement::m_hwndTRP;
+map<unsigned long, int> LicenseManagement::m_mapIdToDayLicensed;
+map<unsigned long, bool> LicenseManagement::m_mapIdToLicensed;
+
+//-------------------------------------------------------------------------------------------------
 // LicenseManagement
-//-------------------------------------------------------------------------------------------------
-LicenseManagement::LicenseManagement()
-:	m_bErrorInitializingTRP(false),
-	m_bFilesLoadedFromFolder(false)
-{
-	m_bUserLicenseFailure = false;
-	m_lOEMPassword = 0;
-	m_bOEMPasswordOK = false;
-	m_hwndTRP = NULL;
-}
-//-------------------------------------------------------------------------------------------------
-LicenseManagement::LicenseManagement(const LicenseManagement& toCopy)
-{
-	throw UCLIDException("ELI02640", 
-		"Internal error: copy constructor of singleton class called!");
-}
-//-------------------------------------------------------------------------------------------------
-LicenseManagement& LicenseManagement::sGetInstance()
-{
-	static LicenseManagement lm;
-	return lm;
-}
 //-------------------------------------------------------------------------------------------------
 bool LicenseManagement::getBadState()
 {
@@ -89,20 +78,6 @@ bool LicenseManagement::getBadState()
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI15439")
 
 	return bStateIsBad;
-}
-//-------------------------------------------------------------------------------------------------
-LicenseManagement& LicenseManagement::operator = (const LicenseManagement& toAssign)
-{
-	throw UCLIDException("ELI02641", 
-		"Internal error: assignment operator of singleton class called!");
-}
-//-------------------------------------------------------------------------------------------------
-LicenseManagement::~LicenseManagement()
-{
-	try
-	{
-	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16431");
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::ignoreLockConstraints(long lKey)
@@ -582,11 +557,42 @@ void LicenseManagement::validateLicense(unsigned long ulLicenseID, string strELI
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::resetCache()
 {
+	// prevent simultaneous access to this object from multiple threads
+	CSingleLock guard(&m_lock, TRUE);
+
 	for(map<unsigned long, bool>::iterator it = m_mapIdToLicensed.begin();
 		it != m_mapIdToLicensed.end(); it++)
 	{
 		it->second = false;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::enableAll()
+{
+	CSingleLock guard(&m_lock, TRUE);
+
+	m_LicenseData.enableAll();
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::enableId(unsigned long ulComponentID)
+{
+	CSingleLock guard(&m_lock, TRUE);
+
+	m_LicenseData.enableId(ulComponentID);
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::disableAll()
+{
+	CSingleLock guard(&m_lock, TRUE);
+
+	m_LicenseData.disableAll();
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::disableId(unsigned long ulComponentID)
+{
+	CSingleLock guard(&m_lock, TRUE);
+
+	m_LicenseData.disableId(ulComponentID);
 }
 
 //-------------------------------------------------------------------------------------------------

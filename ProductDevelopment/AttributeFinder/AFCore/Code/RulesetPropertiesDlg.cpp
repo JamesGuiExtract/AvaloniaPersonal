@@ -367,7 +367,7 @@ void CRuleSetPropertiesDlg::setupCounterList()
 	// Determine if FLEX Index rules are licensed - requires FLEX Index Rule Writing license
 	// [FlexIDSCore #3059]
 	int nCounterItemPosition = giINDEXING_ITEM;
-	if (LicenseManagement::sGetInstance().isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ))
+	if (LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ))
 	{
 		// Add this item at the top of the list
 		nCounterItemPosition = m_CounterList.InsertItem( giINDEXING_ITEM, "" );
@@ -393,7 +393,7 @@ void CRuleSetPropertiesDlg::setupCounterList()
 	}
 
 	// Determine if Redaction By Pages rules are licensed - requires ID Shield Rule Writing license
-	if (LicenseManagement::sGetInstance().isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
+	if (LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
 	{
 		// Add this item next
 		nCounterItemPosition = m_CounterList.InsertItem( nCounterItemPosition + 1, "" );
@@ -448,6 +448,6 @@ void CRuleSetPropertiesDlg::validateSerialList( const string &strSerialList )
 //-------------------------------------------------------------------------------------------------
 bool CRuleSetPropertiesDlg::isRdtLicensed()
 {
-	return LicenseManagement::sGetInstance().isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS);
+	return LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS);
 }
 //-------------------------------------------------------------------------------------------------

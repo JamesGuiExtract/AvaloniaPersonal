@@ -131,13 +131,13 @@ CScansoftOCR2::CScansoftOCR2()
 		// not support private licensing.  Hence, we have to load all license
 		// files from this EXE so that those supporting COM objects will be 
 		// operational (assuming a valid license file is found).
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 		try
 		{
 			// Initialize licensed components inside the special IcoMap Components license file
 			// using unique passwords as applied to the UCLID String
-			LicenseManagement::sGetInstance().initializeLicenseFromFile( 
+			LicenseManagement::initializeLicenseFromFile( 
 				g_strIcoMapComponentsLicenseName, gulIcoMapKey1, gulIcoMapKey2, 
 				gulIcoMapKey3, gulIcoMapKey4, false);
 		}

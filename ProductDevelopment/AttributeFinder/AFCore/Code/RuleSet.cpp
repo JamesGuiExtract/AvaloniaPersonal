@@ -64,16 +64,16 @@ m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current v
 		if (!isRdtLicensed())
 		{
 			// If FLEX Index rule writing is licensed and not ID Shield rule writing
-			if (LicenseManagement::sGetInstance().isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ) && 
-				!LicenseManagement::sGetInstance().isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
+			if (LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ) && 
+				!LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
 			{
 				// Can preset Indexing USB counter
 				m_bUseIndexingCounter = true;
 			}
 
 			// If ID Shield rule writing is licensed and not FLEX Index rule writing
-			if (!LicenseManagement::sGetInstance().isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ) && 
-				LicenseManagement::sGetInstance().isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
+			if (!LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ) && 
+				LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
 			{
 				// Can preset Redaction By Pages USB counter
 				m_bUsePagesRedactionCounter = true;
@@ -1559,12 +1559,12 @@ void CRuleSet::validateKeySerialNumber()
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::usbCountersDisabled()
 {
-	return LicenseManagement::sGetInstance().isLicensed(gnIGNORE_USB_DECREMENT_FEATURE); 
+	return LicenseManagement::isLicensed(gnIGNORE_USB_DECREMENT_FEATURE); 
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::usbSerialNumbersDisabled()
 {
-	return LicenseManagement::sGetInstance().isLicensed(gnIGNORE_USB_IDCHECK_FEATURE); 
+	return LicenseManagement::isLicensed(gnIGNORE_USB_IDCHECK_FEATURE); 
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::isRuleExecutionAllowed()
@@ -1591,7 +1591,7 @@ bool CRuleSet::enabledOutputHandlerExists()
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::isRdtLicensed()
 {
-	return LicenseManagement::sGetInstance().isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS);
+	return LicenseManagement::isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS);
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::isUsingCounter()

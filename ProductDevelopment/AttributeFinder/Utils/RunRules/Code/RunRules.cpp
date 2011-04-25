@@ -178,7 +178,7 @@ BOOL CRunRulesApp::InitInstance()
 				string strSourceFileName = getAbsoluteFileName(strDummyFileInCurrentDir, vecParams[2]);
 
 				// Initialize license
-				LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 				validateLicense();
 
 				string strUssFile = strSourceFileName + ".uss";

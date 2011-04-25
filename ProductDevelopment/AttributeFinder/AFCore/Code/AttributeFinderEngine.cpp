@@ -43,7 +43,7 @@ bool isOptionalProgressDlgLicensed()
 		return true;
 	}
 
-	bLicensed = LicenseManagement::sGetInstance().isLicensed(OPTIONAL_PROGRESS_ID);
+	bLicensed = LicenseManagement::isLicensed(OPTIONAL_PROGRESS_ID);
 
 	return bLicensed;
 }

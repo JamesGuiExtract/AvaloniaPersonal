@@ -845,7 +845,7 @@ bool CSPMFinderPP::isRDTLicensed()
 	static bool bLicensed = false;
 	if (!bLicensed)
 	{
-		bLicensed = LicenseManagement::sGetInstance().isLicensed(COMP_RDT_ID);
+		bLicensed = LicenseManagement::isLicensed(COMP_RDT_ID);
 	}
 
 	return bLicensed;

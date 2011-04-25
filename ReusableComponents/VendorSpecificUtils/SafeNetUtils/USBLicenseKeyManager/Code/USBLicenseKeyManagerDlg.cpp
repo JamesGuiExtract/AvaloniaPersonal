@@ -144,7 +144,7 @@ BOOL CUSBLicenseKeyManagerDlg::OnInitDialog()
 		updateControls();	
 		prepareCounterList();
 
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 		ShowWindow(SW_SHOW);
 		try

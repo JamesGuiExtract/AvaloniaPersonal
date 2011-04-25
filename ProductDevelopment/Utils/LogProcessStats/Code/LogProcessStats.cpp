@@ -341,7 +341,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 					UCLIDException::setExceptionHandler( &exceptionDlg );
 
 					// init license management [p13 #4882]
-					LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(
+					LicenseManagement::loadLicenseFilesFromFolder(
 						LICENSE_MGMT_PASSWORD);
 
 					// check license

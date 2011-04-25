@@ -25,7 +25,7 @@ void initialize()
 	// Removed this requirement per P13 #3494 - WEL 09/16/05
 	// Replaced this requirement per P13 #4243 - WEL 01/30/07
 	// Read license files
-	LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+	LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 }
 //-------------------------------------------------------------------------------------------------
 void printUsage()

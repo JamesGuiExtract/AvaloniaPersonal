@@ -253,7 +253,7 @@ vector<string> COCRUtils::getImageFilesInDir(const string& strDirectory, bool bR
 			if (isPDFFile( strFileName ))
 			{
 				// Check to see if PDF support is licensed
-				if ( LicenseManagement::sGetInstance().isPDFLicensed() )
+				if ( LicenseManagement::isPDFLicensed() )
 				{
 					vecImageFiles.push_back( strFileName );
 				}
@@ -275,7 +275,7 @@ void COCRUtils::processImageFile(const string& strImageFile, int nMaxNumOfPages,
 								 IProgressStatus* pProgressStatus)
 {
 	// Make sure that if the image is a pdf that PDF support is licensed
-	LicenseManagement::sGetInstance().verifyFileTypeLicensed( strImageFile );
+	LicenseManagement::verifyFileTypeLicensed( strImageFile );
 
 	// define a string to store the output file name without extension
 	// by default it is the name of the input image file

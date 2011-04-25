@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 			try
 			{
 				// Load license file(s)
-				LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 				// Check license
 				validateLicense();

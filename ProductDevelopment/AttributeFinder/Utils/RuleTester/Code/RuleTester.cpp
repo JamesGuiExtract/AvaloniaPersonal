@@ -62,7 +62,7 @@ BOOL CRuleTesterApp::InitInstance()
 		UCLIDException::setExceptionHandler( &exceptionDlg );
 
 		// Load license file(s)
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 		// Create the IRuleTesterUI object
 		IRuleTesterUIPtr	ipRuleTesterUI(CLSID_RuleTesterUI);

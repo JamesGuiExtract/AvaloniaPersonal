@@ -11,6 +11,7 @@
 
 // allocate static variables
 map<DWORD, stack<string> > CRuleExecutionEnv::m_mapThreadIDToRSDFileStack;
+CMutex CRuleExecutionEnv::m_mutex;
 
 //-------------------------------------------------------------------------------------------------
 // CRuleExecutionEnv

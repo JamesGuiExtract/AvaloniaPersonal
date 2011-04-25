@@ -72,7 +72,7 @@ BOOL CConvertFPSFileApp::InitInstance()
 			UCLIDException::setExceptionHandler( &exceptionDlg );			
 
 			// Initialize the license
-			LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 			try
 			{

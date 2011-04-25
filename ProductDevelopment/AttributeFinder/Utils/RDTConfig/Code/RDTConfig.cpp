@@ -67,7 +67,7 @@ BOOL CRDTConfigApp::InitInstance()
 			UCLIDException::setExceptionHandler( &exceptionDlg );			
 
 			// Initialize and validate license
-			LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 			validateLicense();
 
 			// Construct and display the dialog

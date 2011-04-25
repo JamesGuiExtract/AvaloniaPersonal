@@ -75,7 +75,7 @@ BOOL CConvertFAMDBApp::InitInstance()
 		//SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
 		// Load license file(s)
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 		// Validate the license [LRCAU #5277]
 		validateLicense();

@@ -705,7 +705,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 				::validateFileOrFolderExistence( strInputName );
 
 				// Load license files and validate the license
-				LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 				validateLicense();
 
 				if (bRetainAnnotations)

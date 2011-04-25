@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 		}
 
 		// Initialize license
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		validateLicense();
 
 		string strInputFile = argv[1];

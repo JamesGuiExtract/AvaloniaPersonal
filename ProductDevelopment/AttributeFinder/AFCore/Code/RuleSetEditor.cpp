@@ -1162,7 +1162,7 @@ void CRuleSetEditor::setStatusBarText()
 		strSelectedCounters = "Indexing";
 
 		// Requires special licensing - FLEX Index Rule Writing license
-		if (!LicenseManagement::sGetInstance().isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ))
+		if (!LicenseManagement::isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ))
 		{
 			bValidLicensing = false;
 		}
@@ -1178,7 +1178,7 @@ void CRuleSetEditor::setStatusBarText()
 		strSelectedCounters = strSelectedCounters + "Pagination";
 
 		// Requires special licensing - full RDT license
-		if (!LicenseManagement::sGetInstance().isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
+		if (!LicenseManagement::isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
 		{
 			bValidLicensing = false;
 		}
@@ -1194,7 +1194,7 @@ void CRuleSetEditor::setStatusBarText()
 		strSelectedCounters = strSelectedCounters + "Redaction (pages)";
 
 		// Requires special licensing - ID Shield Rule Writing license
-		if (!LicenseManagement::sGetInstance().isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
+		if (!LicenseManagement::isLicensed( gnIDSHIELD_RULE_WRITING_OBJECTS ))
 		{
 			bValidLicensing = false;
 		}
@@ -1210,7 +1210,7 @@ void CRuleSetEditor::setStatusBarText()
 		strSelectedCounters = strSelectedCounters + "Redaction (docs)";
 
 		// Requires special licensing - full RDT license
-		if (!LicenseManagement::sGetInstance().isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
+		if (!LicenseManagement::isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
 		{
 			bValidLicensing = false;
 		}
@@ -1230,9 +1230,9 @@ void CRuleSetEditor::setStatusBarText()
 		// Create and throw exception - invalid combination
 		UCLIDException ue( "ELI21502", "Invalid USB counter and licensing combination." );
 		ue.addDebugInfo( "Selected Counters", strSelectedCounters );
-		ue.addDebugInfo( "FLEX Index Rule Writing", LicenseManagement::sGetInstance().isLicensed( 
+		ue.addDebugInfo( "FLEX Index Rule Writing", LicenseManagement::isLicensed( 
 			gnFLEXINDEX_RULE_WRITING_OBJECTS ) ? "1" : "0" );
-		ue.addDebugInfo( "ID Shield Rule Writing", LicenseManagement::sGetInstance().isLicensed( 
+		ue.addDebugInfo( "ID Shield Rule Writing", LicenseManagement::isLicensed( 
 			gnIDSHIELD_RULE_WRITING_OBJECTS ) ? "1" : "0" );
 		throw ue;
 	}

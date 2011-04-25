@@ -361,7 +361,7 @@ BOOL CSRIRImageViewerApp::InitInstance()
 			CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 
 			// initialize license
-			LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 			// These must be called in order
 			// create the spot recognition window

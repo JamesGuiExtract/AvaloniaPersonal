@@ -57,7 +57,7 @@ STDMETHODIMP CUCLIDComponentLM::InitializeFromFile(BSTR bstrLicenseFile,
 		
 		// Initialize the license management singleton
 		// using the User String
-		LicenseManagement::sGetInstance().initializeLicenseFromFile( 
+		LicenseManagement::initializeLicenseFromFile( 
 			strLicenseFile, ulKey1, ulKey2, ulKey3, ulKey4, true );
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03768")
@@ -72,7 +72,7 @@ STDMETHODIMP CUCLIDComponentLM::IgnoreLockConstraints(long lKey)
 	try
 	{
 		// Pass the key to License Management
-		LicenseManagement::sGetInstance().ignoreLockConstraints( lKey );
+		LicenseManagement::ignoreLockConstraints( lKey );
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI03775")
 
@@ -86,7 +86,7 @@ STDMETHODIMP CUCLIDComponentLM::IsLicensed(long ulComponentID, VARIANT_BOOL *pbV
 
 	try
 	{
-		*pbValue = LicenseManagement::sGetInstance().isLicensed( ulComponentID ) ? VARIANT_TRUE : VARIANT_FALSE;
+		*pbValue = LicenseManagement::isLicensed( ulComponentID ) ? VARIANT_TRUE : VARIANT_FALSE;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10637")
 

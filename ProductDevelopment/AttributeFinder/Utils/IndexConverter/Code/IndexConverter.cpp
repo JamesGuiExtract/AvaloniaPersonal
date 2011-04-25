@@ -58,7 +58,7 @@ BOOL CIndexConverterApp::InitInstance()
 		UCLIDException::setExceptionHandler(&exceptionDlg);
 
 		// init license
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		
 		// Check license
 		validateLicense();

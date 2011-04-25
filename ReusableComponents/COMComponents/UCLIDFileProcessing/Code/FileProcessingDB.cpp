@@ -116,10 +116,10 @@ m_bRevertInProgress(false)
 	{
 		// Check if license files have been loaded - this is here to so that
 		// the Database config COM object can be used from C#
-		if (!LicenseManagement::sGetInstance().filesLoadedFromFolder())
+		if (!LicenseManagement::filesLoadedFromFolder())
 		{
 			// Load the license files
-			LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		}
 
 		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);

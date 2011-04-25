@@ -306,7 +306,7 @@ LRESULT CRedactFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 			asBSTChecked(ipRedactFileProc->ApplyRedactionsAsAnnotations));
 
 		// Disable the checkboxes if not licensed
-		if (!LicenseManagement::sGetInstance().isAnnotationLicensed() )
+		if (!LicenseManagement::isAnnotationLicensed() )
 		{
 			m_chkCarryAnnotation.EnableWindow( FALSE );
 			m_chkRedactionAsAnnotation.EnableWindow( FALSE );

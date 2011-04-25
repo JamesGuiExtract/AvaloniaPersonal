@@ -125,7 +125,7 @@ BOOL CSpatialStringViewerApp::InitInstance()
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 		// Initialize and check licensing for UCLID components
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		validateLicense();
 				
 		{

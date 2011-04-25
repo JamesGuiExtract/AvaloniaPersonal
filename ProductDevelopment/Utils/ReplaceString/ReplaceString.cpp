@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
 	{
 		if( g_bUseRegExp )
 		{
-			LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 			// Get a regular expression parser.
 			IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);

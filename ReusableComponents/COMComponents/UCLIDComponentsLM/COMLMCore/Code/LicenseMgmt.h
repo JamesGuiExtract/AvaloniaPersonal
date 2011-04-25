@@ -43,26 +43,11 @@ public:
     friend class LicenseCounter;
 
     //=======================================================================
-    // PURPOSE: Destructor for the LicenseManagement object.
-    // REQUIRE: Nothing
-    // PROMISE: Clears the vector of data structures containing component 
-    //				license information.
-    // ARGS:	None
-    ~LicenseManagement();
-
-    //=======================================================================
-    // PURPOSE: Return a reference to the static instance
-    // REQUIRE: Nothing
-    // PROMISE: To return a reference to the static class instance.
-    // ARGS:	None
-    static LicenseManagement& sGetInstance();
-
-    //=======================================================================
     // PURPOSE: Query if the license state is corrupt
     // REQUIRE: Nothing
     // PROMISE: Return true if the license state is invalid(corrupt)
     // ARGS:	None
-    bool getBadState();
+    static bool getBadState();
 
     //=======================================================================
     // PURPOSE: Initializes a license information object from a license file 
@@ -72,7 +57,7 @@ public:
     //				cannot be zero.
     // PROMISE: Nothing
     // ARGS:	lKey - OEM password
-    void ignoreLockConstraints(long lKey);
+    static void ignoreLockConstraints(long lKey);
 
     //=======================================================================
     // PURPOSE: Initializes a license information object from a license file 
@@ -85,7 +70,7 @@ public:
     //			strValue - The encrypted day code string
     //			iType - type of passwords to be used in the UCLID String
     //			   0 = Regular UCLID passwords
-    void initializeLicenseFromFile(const string& strLicenseFile, const string& strValue,
+    static void initializeLicenseFromFile(const string& strLicenseFile, const string& strValue,
         int iType = 0);
 
     //=======================================================================
@@ -103,7 +88,7 @@ public:
     //			ulKey4 - fourth part of encryption password
     //			bUserString - use User String portion from file, 
     //			    otherwise use UCLID String from file
-    void initializeLicenseFromFile(const string& strLicenseFile, 
+    static void initializeLicenseFromFile(const string& strLicenseFile, 
         unsigned long ulKey1, unsigned long ulKey2, unsigned long ulKey3, 
         unsigned long ulKey4, bool bUserString);
 
@@ -115,7 +100,7 @@ public:
     //				passed), otherwise false.
     // ARGS:	ulComponentID - ID of component whose license state is being
     //				questioned
-    bool isLicensed(unsigned long ulComponentID);
+    static bool isLicensed(unsigned long ulComponentID);
 
     //=======================================================================
     // PURPOSE: Checks to see if the specified licensed component is
@@ -124,13 +109,13 @@ public:
     //			structure has been initialized
     // PROMISE: Returns true if the specified component is temporarily licensed
     //			and returns false if it is permanently licensed.
-    bool isTemporaryLicense(unsigned long ulComponentID);
+    static bool isTemporaryLicense(unsigned long ulComponentID);
 
     //=======================================================================
     // PURPOSE: Returns the expiration date of the specified component ID
     // REQUIRE: ulComponentID is a temporarily licensed component
     // PROMISE: Returns the expiration date of the specified component
-    CTime getExpirationDate(unsigned long ulComponentID);
+    static CTime getExpirationDate(unsigned long ulComponentID);
 
     //=======================================================================
     // PURPOSE: Initializes a license information object from all license 
@@ -142,7 +127,7 @@ public:
     // ARGS:	strValue - The encrypted day code string
     //			iType - type of passwords to be used in the UCLID String
     //			   0 = Regular UCLID passwords
-    void loadLicenseFilesFromFolder(const string& strValue, int iType = 0);
+    static void loadLicenseFilesFromFolder(const string& strValue, int iType = 0);
 
     //=======================================================================
     // PURPOSE: Initializes a license information object from all license 
@@ -155,25 +140,25 @@ public:
     //			strValue - The encrypted day code string
     //			iType - type of passwords to be used in the UCLID String
     //			   0 = Regular UCLID passwords
-    void loadLicenseFilesFromFolder(string strDirectory, const string& strValue,
+    static void loadLicenseFilesFromFolder(string strDirectory, const string& strValue,
         int iType = 0);
 
     //=======================================================================
     // PURPOSE: This function checks for licensing of PDF Functionality
-    bool isPDFLicensed();
+    static bool isPDFLicensed();
 
     //=======================================================================
     // PURPOSE: This function checks the extension of the filename and throws
     //			an UCLIDException if the file type is not licensed
-    void verifyFileTypeLicensed(string strFileName );
+    static void verifyFileTypeLicensed(string strFileName );
 
     //=======================================================================
     // PURPOSE: This function checks licensing of Annotation functionality
-    bool isAnnotationLicensed();
+    static bool isAnnotationLicensed();
 
     //=======================================================================
     // PURPOSE: To validate the license state of a particular licenseId
-    void validateLicense(unsigned long ulLicenseID, string strELICode, string strComponentName);
+    static void validateLicense(unsigned long ulLicenseID, string strELICode, string strComponentName);
 
     //=======================================================================
     // PURPOSE: To reset the cached licensed state which will force the
@@ -183,12 +168,12 @@ public:
     //			we can reset the cached license state of components so that
     //			the next call to validateLicense will force a call to
     //			isLicensed.
-    void resetCache();
+    static void resetCache();
 
     //=======================================================================
     // PURPOSE: This function returns true if there has been a call to 
     //			loadLicenseFilesFromFolder has been called.
-    bool filesLoadedFromFolder()
+    static bool filesLoadedFromFolder()
     {
         return m_bFilesLoadedFromFolder;
     }
@@ -196,47 +181,24 @@ public:
     //=======================================================================
     // PURPOSE: To enable all currently licensed component IDs
     // Added as per [LegacyRCAndUtils #4993]
-    void enableAll() { m_LicenseData.enableAll(); }
+    static void enableAll();
 
     //=======================================================================
     // PURPOSE: To enable the specified licensed component ID
     // Added as per [LegacyRCAndUtils #4993]
-    void enableId(unsigned long ulComponentID) { m_LicenseData.enableId(ulComponentID); }
+    static void enableId(unsigned long ulComponentID);
 
     //=======================================================================
     // PURPOSE: To disable all currently licensed component IDs
     // Added as per [LegacyRCAndUtils #4993]
-    void disableAll() { m_LicenseData.disableAll(); }
+    static void disableAll();
 
     //=======================================================================
     // PURPOSE: To disable the specified licensed component ID
     // Added as per [LegacyRCAndUtils #4993]
-    void disableId(unsigned long ulComponentID) { m_LicenseData.disableId(ulComponentID); }
+    static void disableId(unsigned long ulComponentID);
 
 protected:
-    //=======================================================================
-    // PURPOSE: Constructs a LicenseManagement object.  The next step is to 
-    //				initialize it with a license key.
-    // REQUIRE: Nothing
-    // PROMISE: Nothing
-    // ARGS:	None
-    LicenseManagement();
-    // following required for all singletons in general
-    //=======================================================================
-    // PURPOSE: For any singleton object, there's one and only one object
-    //			exist the life time of the application
-    // REQUIRE: No one should call this method
-    // PROMISE: Throw exception
-    // ARGS:	None
-    LicenseManagement(const LicenseManagement& toCopy);
-    //=======================================================================
-    // PURPOSE: For any singleton object, there's one and only one object
-    //			exist the life time of the application
-    // REQUIRE: No one should call this method
-    // PROMISE: Throw exception
-    // ARGS:	None
-    LicenseManagement& operator = (const LicenseManagement& toAssign);
-
     //=======================================================================
     // PURPOSE: Updates the m_LicenseData object with later expiration dates
     //              or by setting the fully licensed flag.  The "best" 
@@ -245,9 +207,9 @@ protected:
     // PROMISE: Each component ID in rData will be checked against the 
     //              same ID in m_LicenseData.
     // ARGS:	rData - source of update information
-    void	updateLicenseData( LMData& rData );
+    static void	updateLicenseData( LMData& rData );
 
-    void validateState();
+    static void validateState();
 
 private:
 
@@ -256,17 +218,17 @@ private:
     //////////
 
     // Throws exception if the Annotation support is not licensed
-    void validateAnnotationLicense();
+    static void validateAnnotationLicense();
 
     // Throws exception if the PDF Read-Write is not licensed
-    void validatePDFLicense();
+    static void validatePDFLicense();
 
     // Create the TRP object.  Will throw exception if unsuccessful.
-    void createTRPObject();
+    static void createTRPObject();
 
     // Returns the HWND of the hidden TRP window.  
     // Starts ExtractTRP2.exe if not yet running.
-    HWND getTRPWindow();
+    static HWND getTRPWindow();
 
     // Checks whether a component ID is licensed or not
     // NOTE: This method expects that the caller has protected this call
@@ -276,45 +238,42 @@ private:
     //		 and thus required validateLicense and isLicensed
     //		 to use the same logic to check the licensed state of a
     //		 component.
-    bool internalIsLicensed(unsigned long ulLicenseID);
+    static bool internalIsLicensed(unsigned long ulLicenseID);
 
     ///////
     // Data
     ///////
 
     // mutex to prevent simultaneous access to this object
-    CMutex m_lock;
+    static CMutex m_lock;
 
     // flag to indicate that the time rollback preventer was attempted to be initialized, but
     // couldn't be, and therefore the system should automatically be assumed to be in a
     // invalid license state
-    bool m_bErrorInitializingTRP;
+    static bool m_bErrorInitializingTRP;
 
     // Did the User License checking indicate invalid license
-    bool	m_bUserLicenseFailure;
+    static bool	m_bUserLicenseFailure;
     
     // OEM password associated with passwords provided in InitializeFromFile()
-    long	m_lOEMPassword;
+    static long	m_lOEMPassword;
 
     // Has the OEM password been successfully provided
-    bool	m_bOEMPasswordOK;
+    static bool	m_bOEMPasswordOK;
 
     // Flag to indicate that files have been loaded from folder
-    bool m_bFilesLoadedFromFolder;
+    static bool m_bFilesLoadedFromFolder;
 
     // Collected license information
-//	std::vector<LMData> m_vecLicenseData;
-    LMData	m_LicenseData;
+    static LMData	m_LicenseData;
 
     // Time Rollback Preventer window handle
-    HWND	m_hwndTRP;
-
-    static LicenseManagement* ms_pLM;
+    static  HWND	m_hwndTRP;
 
     // maps that are used by the validateLicense function to cache
     // the licensed state values for components that have already been validated
-    map<unsigned long, int> m_mapIdToDayLicensed;
-    map<unsigned long, bool> m_mapIdToLicensed;
+    static map<unsigned long, int> m_mapIdToDayLicensed;
+    static map<unsigned long, bool> m_mapIdToLicensed;
 
 };
 //============================================================================
@@ -338,7 +297,7 @@ private:
         if (gbVALIDATE_LICENSE || (GetTickCount() / 1000) != gdwLAST_VALIDATE_CALL_TIME) \
         { \
             gbVALIDATE_LICENSE = true; \
-            LicenseManagement::sGetInstance().validateLicense(ulCompID, strELICode, strComponentName); \
+            LicenseManagement::validateLicense(ulCompID, strELICode, strComponentName); \
 \
             gbVALIDATE_LICENSE = false; \
             gdwLAST_VALIDATE_CALL_TIME = (GetTickCount() / 1000); \

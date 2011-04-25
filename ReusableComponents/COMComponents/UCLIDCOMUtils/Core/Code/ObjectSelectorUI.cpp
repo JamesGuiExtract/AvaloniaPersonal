@@ -186,7 +186,7 @@ void CObjectSelectorUI::validateLicense()
 	static const unsigned long OBJECT_SELECTOR_UI_COMPONENT_ID = gnEXTRACT_CORE_OBJECTS;
 
 	// Check license state
-	static bool	bLicensed1 = LicenseManagement::sGetInstance().isLicensed( 
+	static bool	bLicensed1 = LicenseManagement::isLicensed( 
 		OBJECT_SELECTOR_UI_COMPONENT_ID );
 
 	// either one will do

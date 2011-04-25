@@ -131,7 +131,7 @@ BOOL CEAVGeneratorApp::InitInstance()
 			try
 			{
 				// init license
-				LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 				// Check license
 				validateLicense();

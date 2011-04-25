@@ -1498,7 +1498,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 					map<L_INT, map<L_INT, long>> mapFileTypeCount;
 
 					// init license management
-					LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(
+					LicenseManagement::loadLicenseFilesFromFolder(
 						LICENSE_MGMT_PASSWORD);
 
 					// check license

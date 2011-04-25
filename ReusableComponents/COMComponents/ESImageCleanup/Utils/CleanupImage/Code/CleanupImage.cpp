@@ -139,7 +139,7 @@ BOOL CCleanupImageApp::InitInstance()
 				validateFileOrFolderExistence(strSettingsFile);
 
 				// init license management
-				LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 				// check license
 				validateLicense();

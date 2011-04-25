@@ -53,7 +53,7 @@ BOOL CDetectAndReportFailureApp::InitInstance()
 	try
 	{
 		// load license files
-		LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 		static UCLIDExceptionDlg exceptionDlg;
 		UCLIDException::setExceptionHandler(&exceptionDlg);

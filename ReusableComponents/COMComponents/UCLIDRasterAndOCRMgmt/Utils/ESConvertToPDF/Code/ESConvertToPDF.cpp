@@ -862,7 +862,7 @@ bool CESConvertToPDFApp::isPdfSecuritySettingEnabled(int nSetting)
 void CESConvertToPDFApp::validateLicense()
 {
 	// load the license files
-	LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+	LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 
 	// ensure this feature is licensed
 	VALIDATE_LICENSE(gnCREATE_SEARCHABLE_PDF_FEATURE, "ELI18710", "ESConvertToPDF");

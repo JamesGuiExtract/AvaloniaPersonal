@@ -223,7 +223,7 @@ CImageEditCtrl::CImageEditCtrl()
 	m_fInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
 	// if PDF is licensed initialize support
-	if ( LicenseManagement::sGetInstance().isPDFLicensed() )
+	if ( LicenseManagement::isPDFLicensed() )
 	{
 		// Init pdf support (use default PDF initialization settings)
 		initPDFSupport();
@@ -277,7 +277,7 @@ void CImageEditCtrl::SetImage(LPCTSTR szImagePath)
 	// if file is pdf make sure PDF Support is enabled
 	try
 	{
-		LicenseManagement::sGetInstance().verifyFileTypeLicensed( szImagePath );
+		LicenseManagement::verifyFileTypeLicensed( szImagePath );
 	}
 	catch(...)
 	{

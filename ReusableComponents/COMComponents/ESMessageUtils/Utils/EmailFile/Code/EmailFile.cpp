@@ -75,7 +75,7 @@ BOOL CEmailFileApp::InitInstance()
 			}
 
 			// Load license files ( this is need for IVariantVector )
-			LicenseManagement::sGetInstance().loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 			validateLicense();
 
 			// Email Settings
