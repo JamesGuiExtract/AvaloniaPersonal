@@ -108,6 +108,10 @@ del "%workdir%\sql.sql"
 md "%testdir%\UEX_Logs"
 if exist "%logdir%\*.uex" move "%logdir%\*.uex" "%testdir%\UEX_Logs"
 
+:: move Source images off of C: drive
+md "%testdir%\Source"
+if exist "%testpath%\Source" move "%testpath%\Source\*.*" "%testdir%\Source"
+
 :: -----------------------------------------------------------------------------
 :: Set up next iteration of the test
 :: -----------------------------------------------------------------------------
