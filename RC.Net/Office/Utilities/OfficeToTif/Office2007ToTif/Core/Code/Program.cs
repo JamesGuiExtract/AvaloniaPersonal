@@ -1,31 +1,19 @@
+using Extract.Imaging;
 using Extract.Licensing;
-using Extract.Office;
 using Extract.Utilities;
-using Microsoft.Office.Interop;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Printing;
 using System.IO;
-using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
 
-using MSWord = Microsoft.Office.Interop.Word;
 using MSExcel = Microsoft.Office.Interop.Excel;
 using MSPowerPoint = Microsoft.Office.Interop.PowerPoint;
+using MSWord = Microsoft.Office.Interop.Word;
 using MSTriState = Microsoft.Office.Core.MsoTriState;
 
 namespace Extract.Office.Utilities.OfficeToTif.Office2007ToTif
 {
     static class Program
     {
-        /// <summary>
-        /// The path to the image format converter
-        /// </summary>
-        static readonly string _IMAGE_CONVERTER = Path.Combine(
-            Path.GetDirectoryName(Application.ExecutablePath), "imageformatconverter.exe");
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -45,37 +33,17 @@ namespace Extract.Office.Utilities.OfficeToTif.Office2007ToTif
             TemporaryFile tempPdf = null;
             try
             {
-                // Get the arguments from the file
-                string[] args2 =
-                    args.Length == 1 ? File.ReadAllLines(Path.GetFullPath(args[0])) : null;
-                
-                // Ensure there is the proper number of arguments and that the
-                // fifth argument matches the LicenseUtilities.MapLabelValue
-                if (args2 == null || args2.Length != 4)
-                {
-                    ExtractException ee = new ExtractException("ELI30263",
-                        "Invalid command line.");
-                    throw ee;
-                }
+                var settings = OfficeMethods.ParseOfficeToTifApplicationArguments(args[0]);
+                exceptionFile = settings.ExceptionFile;
 
                 // Load and validate the license
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI30287", Path.GetFileNameWithoutExtension(Application.ExecutablePath));
 
-                // Get the arguments
-                // 1. File name
-                // 2. The name of the destination file
-                // 3. The office application value (from the OfficeApplication enum)
-                // 4. The exception file to log exceptions to if an exception occurs
-                string fileName = Path.GetFullPath(args2[0]);
-                string outputFile = Path.GetFullPath(args2[1]);
-                OfficeApplication application = (OfficeApplication) Enum.Parse(
-                    typeof(OfficeApplication), args2[2]);
-                exceptionFile = Path.GetFullPath(args2[3]);
                 tempPdf = new TemporaryFile(".pdf");
-
-                switch (application)
+                string fileName = settings.OfficeDocumentName;
+                switch (settings.OfficeApplication)
                 {
                     case OfficeApplication.Word:
                         {
@@ -91,7 +59,7 @@ namespace Extract.Office.Utilities.OfficeToTif.Office2007ToTif
                             object outFile = tempPdf.FileName;
                             object fileFormat = MSWord.WdSaveFormat.wdFormatPDF;
                             doc.SaveAs(ref outFile, ref fileFormat, ref missing, ref missing,
-                                ref missing, ref missing, ref missing, ref missing,
+                                ref oFalse, ref missing, ref missing, ref missing,
                                 ref missing, ref missing, ref missing, ref missing,
                                 ref missing, ref missing, ref missing, ref missing);
 
@@ -107,7 +75,7 @@ namespace Extract.Office.Utilities.OfficeToTif.Office2007ToTif
                             excel = new MSExcel.Application();
                             MSExcel._Workbook wb = excel.Workbooks.Open(fileName,
                                 missing, missing, missing, missing, missing, missing, missing,
-                                missing, missing, missing, missing, missing, missing, missing);
+                                missing, missing, missing, missing, false, missing, missing);
 
                             // Save to pdf
                             wb.ExportAsFixedFormat(MSExcel.XlFixedFormatType.xlTypePDF,
@@ -143,38 +111,18 @@ namespace Extract.Office.Utilities.OfficeToTif.Office2007ToTif
                 }
 
                 // Now convert the temporary PDF to a tif and copy to the output file
-                using (TemporaryFile tempUex = new TemporaryFile(".uex"))
-                using (Process process = new Process())
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append('"');
-                    sb.Append(tempPdf.FileName);
-                    sb.Append("\" \"");
-                    sb.Append(outputFile);
-                    sb.Append("\" /tif /ef \"");
-                    sb.Append(tempUex.FileName);
-                    sb.Append('"');
-                    process.StartInfo.FileName = _IMAGE_CONVERTER;
-                    process.StartInfo.Arguments = sb.ToString();
-                    process.Start();
-                    process.WaitForExit();
-
-                    FileInfo info = new FileInfo(tempUex.FileName);
-                    if (info.Length > 0)
-                    {
-                        throw ExtractException.LoadFromFile("ELI30286", tempUex.FileName);
-                    }
-                }
+                ImageMethods.ConvertPdfToTif(tempPdf.FileName, settings.DestinationFileName);
             }
             catch (Exception ex)
             {
+                var ee = ex.AsExtract("ELI32432");
                 if (!string.IsNullOrEmpty(exceptionFile))
                 {
-                    ExtractException.Log(exceptionFile, "ELI30265", ex);
+                    ee.Log(exceptionFile);
                 }
                 else
                 {
-                    ExtractException.Display("ELI30266", ex);
+                    ee.Display();
                 }
             }
             finally

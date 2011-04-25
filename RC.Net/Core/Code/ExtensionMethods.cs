@@ -107,6 +107,25 @@ namespace Extract
             }
         }
 
+        /// <summary>
+        /// Returns a quoted version of the supplied string.
+        /// <example>If the input value is 'Hello World' then the result
+        /// will be '"Hello World"'.</example>
+        /// </summary>
+        /// <param name="value">The <see cref="String"/> to quote.</param>
+        /// <returns>A quoted version of the input string.</returns>
+        public static string Quote(this string value)
+        {
+            try
+            {
+                return "\"" + (value ?? string.Empty) + "\"";
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32437");
+            }
+        }
+
         #endregion String Methods
 
         #region Byte Array Methods

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -40,9 +38,3 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
-
-// Suppress this message, this namespace holds .Net File Processing Task, these
-// types belong in this namespace and so it is okay that the namespace only
-// contains a few types
-[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes",
-    Scope="namespace", Target="Extract.FileActionManager.FileProcessors")]

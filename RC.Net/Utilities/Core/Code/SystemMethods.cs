@@ -296,7 +296,10 @@ namespace Extract.Utilities
                 using (var process = new Process())
                 {
                     process.StartInfo = new ProcessStartInfo(exeFile,
-                        string.Join(" ", arguments.ToArray()));
+                        string.Join(" ", arguments
+                        .Where(s => !string.IsNullOrWhiteSpace(s))
+                        .Select(s => (s.Contains(' ') && s[0] != '"') ? s.Quote() : s)
+                        .ToArray()));
                     process.Start();
                     process.WaitForExit(timeToWait);
                 }
@@ -324,7 +327,8 @@ namespace Extract.Utilities
                 using (var tempFile = new TemporaryFile(".uex"))
                 {
                     var args = new List<string>(arguments);
-                    args.Add(string.Concat("/ef \"", tempFile.FileName, "\""));
+                    args.Add("/ef");
+                    args.Add(tempFile.FileName);
 
                     // Run the executable and wait for it to exit
                     RunExecutable(exeFile, args);

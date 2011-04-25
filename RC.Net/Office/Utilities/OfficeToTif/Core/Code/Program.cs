@@ -22,12 +22,6 @@ namespace Extract.Office.Utilities.OfficeToTif
         static readonly string _OFFICE_2007_CONVERTER = Path.Combine(_APPLICATION_PATH,
             "Office2007ToTif.exe");
 
-        ///// <summary>
-        ///// The path to the office 2010 tif converter.
-        ///// </summary>
-        //static readonly string _OFFICE_2010_CONVERTER = Path.Combine(_APPLICATION_PATH,
-        //    "Office2010ToTif.exe");
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -101,13 +95,14 @@ namespace Extract.Office.Utilities.OfficeToTif
                     arguments.AppendLine(tempUex.FileName);
                     File.WriteAllText(tempArgs.FileName, arguments.ToString());
 
-                    process.StartInfo.Arguments = "\"" + tempArgs.FileName + "\"";
+                    process.StartInfo.Arguments = tempArgs.FileName.Quote();
                     var version = OfficeMethods.CheckOfficeVersion();
                     switch (version)
                     {
                         case -1:
                             throw new ExtractException("ELI31102", "Office is not installed.");
 
+                            // Office 2007 - 12, Office 2010 - 14
                         case 12:
                         case 14:
                             process.StartInfo.FileName = _OFFICE_2007_CONVERTER;
