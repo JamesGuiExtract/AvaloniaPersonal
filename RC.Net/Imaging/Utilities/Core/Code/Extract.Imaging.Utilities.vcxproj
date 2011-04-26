@@ -85,7 +85,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;CODE_ANALYSIS;_ATL_MIXED;%(PreprocessorDefinitions)</PreprocessorDefinitions>

@@ -118,10 +118,10 @@
       </HeaderFileName>
     </Midl>
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_AFXEXT;EXPORT_BASEUTILS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>.\..\Release/BaseUtils.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\..\Release/</AssemblerListingLocation>
