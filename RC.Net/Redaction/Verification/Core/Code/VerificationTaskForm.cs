@@ -1028,6 +1028,22 @@ namespace Extract.Redaction.Verification
 
                 return true;
             }
+
+            // Prompt for verification of all sensitive items.
+            if (_settings.General.VerifyAllItems)
+            {
+                int rowIndex = _redactionGridView.GetNextUnviewedRowIndex(0);
+                if (rowIndex >= 0)
+                {
+                    _redactionGridView.SelectOnly(rowIndex);
+
+                    MessageBox.Show("Must visit all sensitive items and clues before saving.",
+                        "Must visit all items",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
+                    return true;
+                }
+            }
             
             // Prompt for requiring all redactions to have a type
             if (_settings.General.RequireTypes)
@@ -1458,12 +1474,16 @@ namespace Extract.Redaction.Verification
                     return;
                 }
 
-                // Determine whether to verify all pages
-                bool verifyAllPages = _settings.General.VerifyAllPages;
+                // Determine whether to visit all redactions/pages. If neither option is turned on,
+                // navigate as if both are turned on.
+                bool visitAllRedactions =
+                    _settings.General.VerifyAllItems || !_settings.General.VerifyAllPages;
+                bool visitAllPages =
+                    _settings.General.VerifyAllPages || !_settings.General.VerifyAllItems;
 
                 // Go to the previous row (or page) if it exists
-                int previousRow = _redactionGridView.GetPreviousRowIndex();
-                int previousPage = verifyAllPages ? GetPreviousPage() : -1;
+                int previousRow = visitAllRedactions ? _redactionGridView.GetPreviousRowIndex() : -1;
+                int previousPage = visitAllPages ? GetPreviousPage() : -1;
                 if (GoToPreviousRowOrPage(previousRow, previousPage))
                 {
                     return;
@@ -1490,12 +1510,16 @@ namespace Extract.Redaction.Verification
                     return;
                 }
                 
-                // Determine whether to verify all pages
-                bool verifyAllPages = _settings.General.VerifyAllPages;
+                // Determine whether to visit all redactions/pages. If neither option is turned on,
+                // navigate as if both are turned on.
+                bool visitAllRedactions =
+                    _settings.General.VerifyAllItems || !_settings.General.VerifyAllPages;
+                bool visitAllPages =
+                    _settings.General.VerifyAllPages || !_settings.General.VerifyAllItems;
 
                 // Go to the next row (or page) if it exists
-                int nextRow = _redactionGridView.GetNextRowIndex();
-                int nextPage = verifyAllPages ? GetNextPage() : -1;
+                int nextRow = visitAllRedactions ? _redactionGridView.GetNextRowIndex() : -1;
+                int nextPage = visitAllPages ? GetNextPage() : -1;
                 if (GoToNextRowOrPage(nextRow, nextPage))
                 {
                     return;
@@ -2765,16 +2789,20 @@ namespace Extract.Redaction.Verification
                 _imageViewer.ImagePageData = memento.ImagePageData;
             }
 
+            // Determine whether to visit all pages. If neither option is turned on, navigate as if
+            // both are turned on.
+            bool visitAllPages =
+                _settings.General.VerifyAllPages || !_settings.General.VerifyAllItems;
+
             switch (_navigationTarget)
             {
                 case DocumentNavigationTarget.FirstItem:
                     {
                         // Go to the first redaction iff:
-                        // 1) We are not verifying all pages OR
-                        // 2) We are verifying all pages and there is a redaction on page 1
+                        // 1) We are not visiting all pages OR
+                        // 2) We are visiting all pages and there is a redaction on page 1
                         if (_redactionGridView.Rows.Count > 0 &&
-                                (!_settings.General.VerifyAllPages ||
-                                 _redactionGridView.Rows[0].PageNumber == 1))
+                                (!visitAllPages || _redactionGridView.Rows[0].PageNumber == 1))
                         {
                             _redactionGridView.SelectOnly(0);
                         }
@@ -2806,13 +2834,12 @@ namespace Extract.Redaction.Verification
                 case DocumentNavigationTarget.LastItem:
                     {
                         // Go to the last redaction iff:
-                        // 1) We are not verifying all pages OR
-                        // 2) We are verifying all pages and there is a redaction on the last page
+                        // 1) We are not visiting all pages OR
+                        // 2) We are visiting all pages and there is a redaction on the last page.
                         int lastRow = _redactionGridView.Rows.Count - 1;
                         int lastPage = _imageViewer.PageCount;
                         if (_redactionGridView.Rows.Count > 0 &&
-                                (!_settings.General.VerifyAllPages ||
-                                 _redactionGridView.Rows[lastRow].PageNumber == lastPage))
+                                (!visitAllPages || _redactionGridView.Rows[lastRow].PageNumber == lastPage))
                         {
                             _redactionGridView.SelectOnly(lastRow);
                         }

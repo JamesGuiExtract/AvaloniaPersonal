@@ -1513,6 +1513,35 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Gets the index of the first unviewed row that occurs at or after the specified row.
+        /// </summary>
+        /// <param name="startIndex">The first index to check for being unviewed.</param>
+        /// <returns>The index of the first unviewed row that occurs at or after 
+        /// <paramref name="startIndex"/>; or -1 if no such row exists.</returns>
+        public int GetNextUnviewedRowIndex(int startIndex)
+        {
+            try
+            {
+                // Iterate starting at the specified row
+                for (int i = startIndex; i < _dataGridView.Rows.Count; i++)
+                {
+                    // Return to the first row that is unvisited
+                    if (!_redactions[i].Visited)
+                    {
+                        return i;
+                    }
+                }
+
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27645",
+                    "Unable to determine next unviewed row.", ex);
+            }
+        }
+
+        /// <summary>
         /// Determines the index of the row before the currently selected row.
         /// </summary>
         /// <returns>The index of the row before the currently selected row.</returns>
@@ -2262,7 +2291,7 @@ namespace Extract.Redaction.Verification
                     }
                     else if (_imageViewer != null)
                     {
-                        _imageViewer.LayerObjects.DeletingLayerObjects += HandleDeletingLayerObjects;
+                        _imageViewer.LayerObjects.DeletingLayerObjects -= HandleDeletingLayerObjects;
                         _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                         _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
                         _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
