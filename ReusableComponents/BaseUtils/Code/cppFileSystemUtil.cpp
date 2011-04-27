@@ -906,52 +906,35 @@ string buildAbsolutePath(const string& strFileOrDirPath)
 //--------------------------------------------------------------------------------------------------
 string getTextFileContentsAsString(const string& strTextFileName)
 {
-	string strRet;
-
-	size_t length;
-	char *buffer = NULL;
-	ifstream ifs;
-	// if we dont read as binary the newlines will get screwed up
-	ifs.open (strTextFileName.c_str(), ifstream::in | ifstream::binary);
-	if (!ifs) 
-	{
-		UCLIDException ue("ELI03544", "Unable to open specified file.");
-		ue.addDebugInfo("FileName", strTextFileName);
-		throw ue;
-	}
-
-	// get length of file:
-	ifs.seekg (0, ios::end);
-	length = (size_t) ifs.tellg();
-	ifs.seekg (0, ios::beg);
-
-	// allocate memory:
-	buffer = new char[length + 1];
-	ZeroMemory(buffer, length+1);
 	try
 	{
+		// if we dont read as binary the newlines will get screwed up
+		ifstream ifs(strTextFileName.c_str(), ifstream::in | ifstream::binary);
+		if (!ifs) 
+		{
+			UCLIDException ue("ELI03544", "Unable to open specified file.");
+			ue.addDebugInfo("FileName", strTextFileName);
+			throw ue;
+		}
+
+		// get length of file:
+		ifs.seekg (0, ios::end);
+		size_t length = (size_t) ifs.tellg();
+		ifs.seekg (0, ios::beg);
+
+		unique_ptr<char[]> buffer(new char[length+1]);
+		memset((void*)&buffer[0], 0, length+1);
+
 		// read data as a block:
-		ifs.read (buffer, length);
+		ifs.read (&buffer[0], length);
+
 		// close the file
 		ifs.close();
 
-		// append a NULL
-		buffer[length] = '\0';
-
 		// return the string
-		strRet = buffer;
+		return string(&buffer[0]);
 	}
-	catch (...)
-	{
-		delete [] buffer;
-		buffer = NULL;
-		throw;
-	}
-	if ( buffer != __nullptr )
-	{
-		delete [] buffer;
-	}
-	return strRet;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32445");
 }
 //--------------------------------------------------------------------------------------------------
 string getModuleDirectory(HMODULE hModule)
@@ -2247,6 +2230,14 @@ string getExtractApplicationDataPath()
 	strApplicationDataPath += "\\Extract Systems";
 
 	return strApplicationDataPath;
+}
+//--------------------------------------------------------------------------------------------------
+string getExtractLicenseFilesPath()
+{
+	string strLicensePath = getExtractApplicationDataPath();
+	strLicensePath += "\\LicenseFiles";
+
+	return strLicensePath;
 }
 //--------------------------------------------------------------------------------------------------
 void setFileAttributes(const string& strFileName, DWORD dwFileAttributes,

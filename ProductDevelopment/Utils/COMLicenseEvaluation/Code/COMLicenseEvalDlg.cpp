@@ -748,48 +748,16 @@ void CCOMLicenseEvalDlg::evaluateUnlockFile()
 	m_zIssueDate = "";
 
 	// Retrieve unlock code from file
-	string strCode = getTextFileContentsAsString( m_zFile.operator LPCTSTR() );
-
-	//////////////////////
-	// Decrypt unlock code
-	//////////////////////
-	string			strUserComputerName;
-	unsigned long	ulUserSerialNumber;
-	string			strUserMACAddress;
-	CTime			tmExpires;
-	bool			bSuccess = true;
-
-	try
-	{
-		ByteStream		bytes( strCode );
-		ByteStream		decryptedBS;
-
-		EncryptionEngine ee;
-		ee.decrypt( decryptedBS, bytes, TimeRollbackPreventer::getUnlockPassword() );
-
-		ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
-
-		// Extract User computer name
-		bsm >> strUserComputerName;
-
-		// Extract User disk serial number
-		bsm >> ulUserSerialNumber;
-
-		// Extract User MAC address
-		bsm >> strUserMACAddress;
-
-		// Extract Expiration Date
-		bsm >> tmExpires;
-	}
-	catch(...)
-	{
-		bSuccess = false;
-	}
+	string strCode = getTextFileContentsAsString((LPCTSTR) m_zFile);
+	string strUserComputerName(""), strUserMACAddress("");
+	unsigned long ulUserSerialNumber;
+	CTime tmExpires;
 
 	///////////////////////////////
 	// Set meaningful dialog fields
 	///////////////////////////////
-	if (bSuccess)
+	if (TimeRollbackPreventer::getIdentityDataFromUnlockStream(strCode,
+		strUserComputerName, ulUserSerialNumber, strUserMACAddress, tmExpires))
 	{
 		// Computer name
 		m_zComputerName = strUserComputerName.c_str();

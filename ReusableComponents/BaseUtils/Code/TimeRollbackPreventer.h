@@ -29,7 +29,7 @@ using namespace std;
 
 // Define the filename for Date-Time encryption unlock file
 // read from the CommonComponents folder
-const char gpszDateTimeUnlockFile[] = "Extract_UnlockLicense.txt";
+const char gpszDateTimeUnlockFile[] = "\\Extract_UnlockLicense.txt";
 
 class EXPORT_BaseUtils TimeRollbackPreventer
 {
@@ -47,12 +47,19 @@ public:
 	// ARGS:	None
 	~TimeRollbackPreventer();
 	//=======================================================================
-	// PURPOSE: Creates a unique password to be used in encryption and 
-	//				decryption of Unlock License data.
+	// PURPOSE: To encrypt the provided bytes.
 	// REQUIRE: Nothing
-	// PROMISE: Provides a 16-byte password.
-	// ARGS:	None
-	static const ByteStream& getUnlockPassword();
+	// PROMISE: To return an encrypted stringized version of the supplied bytes, this string
+	//			will have each pair of characters swapped. To get the correct
+	//			string back, you need to swap string[i] and string[i+1]
+	// ARGS:	bytes - the bytes to be encrypted
+	static string encryptUnlockStream(const ByteStream& bytes);
+	//=======================================================================
+	// PURPOSE: To get the identification data from the the unlock stream. Returns
+	//			true if successfully decoded and false otherwise
+	static bool getIdentityDataFromUnlockStream(string strCode,
+		string& rstrUserComputerName, unsigned long& rulUserSerialNumber,
+		string& rstrUserMACAddress, CTime& rtmExpires);
 	//=======================================================================
 	// PURPOSE: Examines file and registry entries and compares decrypted 
 	//          time against system time.  Check is successful if 
@@ -73,32 +80,32 @@ private:
 	// Decrypts specified Date-Time string using specified byte stream password
 	// Results are provided in specified CTime object
 	// Returns true if decryption was sucessful, false otherwise
-	bool decryptDateTimeString(std::string strEncryptedDT, const ByteStream& bsPassword, 
+	bool decryptDateTimeString(const string& strEncryptedDT, const ByteStream& bsPassword, 
 		CTime* ptmResult);
 
 	// Encrypts specified date and time using specified byte stream password
 	// Results are provided in specified string
 	// Returns true if encryption was sucessful, false otherwise
 	bool encryptDateTime(CTime tmTime, const ByteStream& bsPassword, 
-		std::string &strEncryptedDT);
+		string &strEncryptedDT);
 
 	// Decrypts specified Unlock string, checks user computer name, disk serial
 	// number, and MAC address. Also compares expiration time against system
 	// time.
 	// Returns true if checks matched and system time < expiration time, 
 	// false otherwise
-	bool evaluateUnlockCode(std::string strCode);
+	bool evaluateUnlockCode(string strCode);
 
 	// Retrieve fully qualified path to Date-Time file.
 	// Presence or absence of file is not tested
-	std::string getDateTimeFilePath() const;
+	string getDateTimeFilePath() const;
 
 	// Retrieve encrypted string from Date-Time file and registry items.
 	// Returns empty string if Date-Time item is not found.
-	std::string getLocalDateTimeString(std::string strFileName) const;
-	std::string getRemoteDateTimeString(std::string strPath, std::string strKey) const;
-	void deleteLocalDateTimeString(std::string strFileName) const;
-	void deleteRemoteDateTimeString(std::string strPath, std::string strKey) const;
+	string getLocalDateTimeString(const string& strFileName) const;
+	string getRemoteDateTimeString(const string& strPath, const string& strKey) const;
+	void deleteLocalDateTimeString(const string& strFileName) const;
+	void deleteRemoteDateTimeString(const string& strPath) const;
 
 	// Retrieves encryption/decryption passwords
 	// 1: for Date-Time file
@@ -121,16 +128,19 @@ private:
 	// file is deleted and the Date-Time items are unchanged.
 	void handleUnlockCode();
 
+	// Swaps each pair of characters in the unlock code
+	static void swapUnlockCodeChars(string& rstrCode);
+
 	// Friend function definition
 	// The TRPThreadProc requires the "this" pointer of the TimeRollBackPreventer instance passed as pParm
 	friend UINT TRPThreadProc(LPVOID pParam);
 
-	void writeDateTime(std::string strLocal, std::string strRemote, bool bForceCreation);
+	void writeDateTime(const string& strLocal, const string& strRemote, bool bForceCreation);
 
 	// Stores encrypted string to Date-Time location
 	// Returns false if item is not found unless bForceCreation = true
-	bool putLocalDateTimeString(std::string strFileName, std::string strEncrypted, bool bForceCreation = false);
-	bool putRemoteDateTimeString(std::string strPath, std::string strKey, std::string strEncrypted, bool bForceCreation = false);
+	bool putLocalDateTimeString(const string& strDTFile, const string& strEncrypted, bool bForceCreation = false);
+	bool putRemoteDateTimeString(const string& strPath, const string& strKey, const string& strEncrypted, bool bForceCreation = false);
 
 	// Updates file and registry entries with encrypted current system time
 	// Update is successful if 
@@ -138,18 +148,28 @@ private:
 	// 2. bForceCreation = true and new strings were stored
 	void updateDateTimeItems(bool bForceCreation = false);
 
+	// PURPOSE: Creates a unique password to be used in encryption and 
+	//				decryption of Unlock License data.
+	// REQUIRE: Nothing
+	// PROMISE: Provides a 16-byte password.
+	// ARGS:	None
+	static ByteStream getUnlockPassword();
+
 	///////
 	// Data
 	///////
 
 	// Handles Date-Time Registry items
-	std::unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pRollbackCfgMgr;
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pRollbackCfgMgr;
 
 	// System time last used to update File and Registry items
 	CTime	m_tmLastUpdate;
 
 	// Mutex to protect reading and writing of licensing items
-	unique_ptr<CMutex> m_apmutexReadWrite;
+	unique_ptr<CMutex> m_upmutexReadWrite;
+
+	// Mutex to protect reading and processing unlock file
+	unique_ptr<CMutex> m_upmutexUnlock;
 
 	// Time to wait for mutex to read or write the file
 	unsigned long m_ulRWTimeout;
@@ -160,16 +180,8 @@ private:
 	Win32Event &m_rEventBadState;
 
 	// Pointer to thread that manages periodic updates
-	std::unique_ptr<CWinThread>	m_apThread;
-
-private:
-	// Registry keys for information persistence
-	static const std::string ITEM_SECTION_NAME1;
-	static const std::string ITEM_SECTION_NAME2;
-	static const std::string COUNT_SECTION_NAME;
-	static const std::string UNLOCK_SECTION_NAME;
-	static const std::string LAST_TIME_USED;
-	static const std::string COUNT;
+	unique_ptr<CWinThread>	m_apThread;
 
 	CMutex* getReadWriteMutex();
+	CMutex* getUnlockFileMutex();
 };

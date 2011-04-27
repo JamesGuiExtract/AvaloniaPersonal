@@ -23,6 +23,7 @@
 #include "cpputil.h"
 #include "RegConstants.h"
 #include "MutexUtils.h"
+#include "Random.h"
 
 #include <shlobj.h>
 #include <iostream>
@@ -43,28 +44,24 @@ static char THIS_FILE[]=__FILE__;
 // Registry keys for Date-Time items
 //   NOTE: Each key is under HKEY_CURRENT_USER
 //const string TimeRollbackPreventer::ITEM_SECTION_NAME = "\\Windows\\System32";	// Old location
-const string TimeRollbackPreventer::ITEM_SECTION_NAME1 = "Identities\\{7FEF3749-A8CC-4CD0-9CEB-E6D267FA524E}";
-const string TimeRollbackPreventer::ITEM_SECTION_NAME2 = "Identities\\{526988F0-27BE-4451-B741-D8614827B838}";
+const string ITEM_SECTION_NAME1 = "Identities\\{7FEF3749-A8CC-4CD0-9CEB-E6D267FA524E}";
+const string ITEM_SECTION_NAME2 = "Identities\\{526988F0-27BE-4451-B741-D8614827B838}";
 
-const string TimeRollbackPreventer::COUNT_SECTION_NAME = "Software\\Windows";
-const string TimeRollbackPreventer::UNLOCK_SECTION_NAME = "Software\\Classes\\Code";
+const string COUNT_SECTION_NAME = "Software\\Windows";
+const string UNLOCK_SECTION_NAME = "Software\\Classes\\Code";
 
 // Registry keys
-const string TimeRollbackPreventer::LAST_TIME_USED = "LTUSWU";
-const string TimeRollbackPreventer::COUNT = "Count";
-
-// Define the Windows subfolder and filename for Date-Time encryption
-//   i.e. full path will be $(System) + gpszDateTimeSubfolderFile
-//   NOTE: This file is out-of-date as of 07/20/2004 P13 #3000
-//const char gpszDateTimeSubfolderFile[] = 
-//	"\\spool\\prtprocs\\w32x86\\tlsuuw.dll";
+const string LAST_TIME_USED = "LTUSWU";
+const string COUNT = "Count";
 
 // Define the user-specific subfolder and filename for Date-Time encryption
-//   i.e. full path will be $(Documents and Settings\Username\Application Data) + gpszDateTimeSubfolderFile
-const char gpszDateTimeSubfolderFile[] = "\\Windows\\tlsuuw_DO_NOT_DELETE.dll";
+//   i.e. full path will be $(Documents and Settings\Username\Application Data) + gstrDateTimeSubfolderFile
+const string gstrDateTimeSubfolderFile = "\\Windows\\{EFF9AEFC-3046-48BC-84D1-E9862F9D1E22}\\estrpmfc.dll";
 
-// Polling interval for Date-Time updates
-const unsigned long gulTRP_TIMER_MS = 30000;
+// Min and max for the polling interval range, polling will occur at a random number
+// of minutes between min and max
+const unsigned long gulTRP_TIMER_MIN = 5;
+const unsigned long gulTRP_TIMER_MAX = 60;
 
 // Modulo constant for random additions to DT strings
 const unsigned short gusMODULO_CONSTANT = 17;
@@ -101,7 +98,7 @@ const unsigned long	gulUCLIDDateTimeKeyC = 0x7D1C1047;
 // This requires the TimeRollbackPreventer "this" pointer to be passed as pParam
 UINT TRPThreadProc(LPVOID pParam)
 {
-	bool bExceptionCaught = false;
+	Random random;
 	try
 	{
 		// make sure the pParam is not null
@@ -113,7 +110,8 @@ UINT TRPThreadProc(LPVOID pParam)
 			try
 			{
 				// Continuous updates
-				while (trpInstance->m_eventKillThread.wait( gulTRP_TIMER_MS ) == WAIT_TIMEOUT)
+				while (trpInstance->m_eventKillThread.wait(
+					random.uniform(gulTRP_TIMER_MIN, gulTRP_TIMER_MAX+1) * 60000 ) == WAIT_TIMEOUT)
 				{
 					// Update the Date-Time items
 					trpInstance->updateDateTimeItems();
@@ -130,7 +128,6 @@ UINT TRPThreadProc(LPVOID pParam)
 	}
 	catch (UCLIDException& ue)
 	{
-		bExceptionCaught = true;
 		UCLIDException uexOuter("ELI07616", "Error in maintaining licensed state!", ue);
 		
 		// Force display (and logging) of exception
@@ -144,6 +141,7 @@ UINT TRPThreadProc(LPVOID pParam)
 //-------------------------------------------------------------------------------------------------
 TimeRollbackPreventer::TimeRollbackPreventer(Win32Event &rEventBadState)
 :	m_tmLastUpdate(-1),
+	m_ulRWTimeout(ulDEFAULT_RW_TIME0UT),
 	m_rEventBadState(rEventBadState),
 	m_apThread(__nullptr)
 {
@@ -151,23 +149,25 @@ TimeRollbackPreventer::TimeRollbackPreventer(Win32Event &rEventBadState)
 	{
 		try
 		{
-			// Get Read Write mutex timeout value from the registry
-			RegistryPersistenceMgr rpmLocalMachine ( HKEY_LOCAL_MACHINE, "" );
-			if ( rpmLocalMachine.keyExists( strCOMLM_CORE_SETTINGS, strTRP_RW_TIMEOUT_KEY ) )
-			{
-				m_ulRWTimeout = asUnsignedLong( rpmLocalMachine.getKeyValue( strCOMLM_CORE_SETTINGS, strTRP_RW_TIMEOUT_KEY ));
-			}
-			else
-			{
-				// Create the key with the default value
-				string strDefaultValue = asString ( ulDEFAULT_RW_TIME0UT );
-				rpmLocalMachine.createKey( strCOMLM_CORE_SETTINGS, strTRP_RW_TIMEOUT_KEY, strDefaultValue );
-				m_ulRWTimeout = ulDEFAULT_RW_TIME0UT;
-			}
-
 			// Setup Registry items
 			ma_pRollbackCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 				new RegistryPersistenceMgr( HKEY_CURRENT_USER, "" ));
+
+			try
+			{
+				// Attempt to get the TRP RW value from the registry, if the value is not
+				// there or invalid, just use the default value
+				string strTimeOut = ma_pRollbackCfgMgr->getKeyValue(
+					strCOMLM_CORE_SETTINGS, strTRP_RW_TIMEOUT_KEY);
+				if (!strTimeOut.empty())
+				{
+					m_ulRWTimeout = asUnsignedLong(strTimeOut);
+				}
+			}
+			catch(...)
+			{
+				// Just eat the exception, and use default RW timeout value
+			}
 
 			// This try catch is just to give more trace information
 			try
@@ -181,10 +181,11 @@ TimeRollbackPreventer::TimeRollbackPreventer(Win32Event &rEventBadState)
 			try
 			{
 				m_eventKillThread.reset();
+
 				// Start the thread that handles updates
-				m_apThread = unique_ptr<CWinThread>(AfxBeginThread(TRPThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED));
-				m_apThread.get()->m_bAutoDelete = FALSE;
-				m_apThread.get()->ResumeThread();
+				m_apThread.reset(AfxBeginThread(TRPThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED));
+				m_apThread->m_bAutoDelete = FALSE;
+				m_apThread->ResumeThread();
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10711")
 		}
@@ -219,8 +220,9 @@ TimeRollbackPreventer::~TimeRollbackPreventer()
 			m_apThread.reset();
 		}
 
-		// Reset the read/write mutex auto pointer
-		m_apmutexReadWrite.reset();
+		// Reset the auto pointers
+		m_upmutexReadWrite.reset();
+		m_upmutexUnlock.reset();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16412");
 }
@@ -269,10 +271,11 @@ void TimeRollbackPreventer::checkDateTimeItems()
 			m_rEventBadState.signal();
 			throw ue;
 		}
-		strLocalData1 = getLocalDateTimeString(getDateTimeFilePath());
+		string strDateTimeFilePath = getDateTimeFilePath();
+		strLocalData1 = getLocalDateTimeString(strDateTimeFilePath);
 		strRemoteData1 = getRemoteDateTimeString(ITEM_SECTION_NAME1, LAST_TIME_USED);
 
-		strLocalData2 = getLocalDateTimeString(getDateTimeFilePath() + ".old");
+		strLocalData2 = getLocalDateTimeString(strDateTimeFilePath + ".old");
 		strRemoteData2 = getRemoteDateTimeString(ITEM_SECTION_NAME2, LAST_TIME_USED);
 	}
 
@@ -444,7 +447,7 @@ void TimeRollbackPreventer::checkDateTimeItems()
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-bool TimeRollbackPreventer::decryptDateTimeString(std::string strEncryptedDT, 
+bool TimeRollbackPreventer::decryptDateTimeString(const string& strEncryptedDT, 
 												  const ByteStream& bsPassword, 
 												  CTime* ptmResult)
 {
@@ -505,7 +508,7 @@ bool TimeRollbackPreventer::decryptDateTimeString(std::string strEncryptedDT,
 }
 //-------------------------------------------------------------------------------------------------
 bool TimeRollbackPreventer::encryptDateTime(CTime tmTime, const ByteStream& bsPassword, 
-											std::string &strEncryptedDT)
+											string &strEncryptedDT)
 {
 	bool	bResult = true;
 
@@ -557,7 +560,7 @@ bool TimeRollbackPreventer::encryptDateTime(CTime tmTime, const ByteStream& bsPa
 	return bResult;
 }
 //-------------------------------------------------------------------------------------------------
-bool TimeRollbackPreventer::evaluateUnlockCode(std::string strCode)
+bool TimeRollbackPreventer::evaluateUnlockCode(string strCode)
 {
 	bool bReturn = true;
 
@@ -674,57 +677,52 @@ bool TimeRollbackPreventer::evaluateUnlockCode(std::string strCode)
 	return bReturn;
 }
 //-------------------------------------------------------------------------------------------------
-std::string TimeRollbackPreventer::getDateTimeFilePath() const
+string TimeRollbackPreventer::getDateTimeFilePath() const
 {
-	string	strDTFile;
 
-	// This try catch is just to give more trace information
+	// Need a try catch so that a bad state can be signaled if an exception is thrown
 	try
 	{
-		// Get path to special user-specific folder
-		char pszDir[MAX_PATH];
-		if (SUCCEEDED (SHGetSpecialFolderPath( NULL, pszDir, CSIDL_APPDATA, 0 ))) 
+		try
 		{
-			// Add path and filename for DT file
-			strDTFile = string( pszDir ) + string( gpszDateTimeSubfolderFile );
-		}
-		else
-		{
-			// Build and log the exception before signalling a bad state
-			UCLIDException ue( "ELI07448", "Unable to get path to Special folder." );
-			ue.addDebugInfo( "Last Error", GetLastError() );
-			ue.log();
+			string strDTFile;
 
-			// Signal a bad state
-			m_rEventBadState.signal();
-			throw ue;
+			// Get path to special user-specific folder
+			getSpecialFolderPath(CSIDL_APPDATA, strDTFile);
+
+			// Add the extra path
+			strDTFile += gstrDateTimeSubfolderFile;
+
+			return strDTFile;
 		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10708")
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10708")
+	catch(UCLIDException& uex)
+	{
+		// Ensure the exception is logged and signal bad state
+		uex.log();
+		m_rEventBadState.signal();
 
-	// Return results
-	return strDTFile;
+		throw uex;
+	}
 }
 //-------------------------------------------------------------------------------------------------
-std::string TimeRollbackPreventer::getLocalDateTimeString(std::string strFileName) const
+string TimeRollbackPreventer::getLocalDateTimeString(const string& strDTFile) const
 {
-	string	strData;
-
 	// This try catch is just to give more trace information
 	try
 	{
-		// Get path and filename for DT file
-		string	strDTFile = strFileName;
+		string strData("");
+
 		if (isFileOrFolderValid( strDTFile ))
 		{
 			// Read the string
 			strData = getTextFileContentsAsString( strDTFile );
 		}
+
+		return strData;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10702")
-
-	// Return results
-	return strData;
 }
 //-------------------------------------------------------------------------------------------------
 const ByteStream& TimeRollbackPreventer::getPassword1() const
@@ -809,10 +807,8 @@ const ByteStream& TimeRollbackPreventer::getPassword2() const
 	return passwordBytes2;
 }
 //-------------------------------------------------------------------------------------------------
-std::string TimeRollbackPreventer::getRemoteDateTimeString(std::string strPath, std::string strKey) const
+string TimeRollbackPreventer::getRemoteDateTimeString(const string& strPath, const string& strKey) const
 {
-	string	strData;
-
 	// This try catch is just to give more trace information
 	try
 	{
@@ -821,26 +817,39 @@ std::string TimeRollbackPreventer::getRemoteDateTimeString(std::string strPath, 
 			ma_pRollbackCfgMgr->createKey( strPath, strKey, "" );
 			return "";
 		}
+
+		return ma_pRollbackCfgMgr->getKeyValue( strPath, strKey );
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10703")
-
-	return ma_pRollbackCfgMgr->getKeyValue( strPath, strKey );
 }
 //-------------------------------------------------------------------------------------------------
 void TimeRollbackPreventer::handleUnlockCode()
 {
 	// Get fully qualified path to unlock file
-	string strUnlockFile = ::getModuleDirectory("BaseUtils.dll") + "\\" + gpszDateTimeUnlockFile;
+	string strUnlockFile = getExtractLicenseFilesPath() + gpszDateTimeUnlockFile;
 
 	// Find the file
 	if (isFileOrFolderValid( strUnlockFile ))
 	{
+		// Mutex around unlock file access
+		CSingleLock lg(getUnlockFileMutex(), TRUE);
+
+		// Ensure the unlock file is still there
+		if (!isFileOrFolderValid(strUnlockFile))
+		{
+			return;
+		}
+
 		// Read the string
 		string strUnlockCode = getTextFileContentsAsString( strUnlockFile );
 
 		// Continue only if a code was read
 		if (!strUnlockCode.empty())
 		{
+			// Unroll the character swapping in the unlock code (the swapping takes place
+			// in the encryptUnlockStream)
+			swapUnlockCodeChars(strUnlockCode);
+
 			// Get count of previous unlock codes from registry
 			long lUpdateCount = 0;
 			if (ma_pRollbackCfgMgr->keyExists( COUNT_SECTION_NAME, COUNT ))
@@ -917,6 +926,10 @@ void TimeRollbackPreventer::handleUnlockCode()
 						}
 						writeDateTime(strDTLocal, strDTRemote, true);
 
+						// Since the unlock codes where valid and the time has been reset,
+						// reset the bad state signal
+						m_rEventBadState.reset();
+
 					}	// end if successful Date-Time strings creation
 					else if (!bLocal && !bRemote)
 					{
@@ -965,7 +978,19 @@ void TimeRollbackPreventer::handleUnlockCode()
 	}					// end if strUnlockFile is valid
 }
 //--------------------------------------------------------------------------------------------------
-bool TimeRollbackPreventer::putLocalDateTimeString(std::string strFileName, std::string strEncrypted, bool bForceCreation)
+void TimeRollbackPreventer::swapUnlockCodeChars(string& rstrCode)
+{
+	size_t length = rstrCode.length() - 1;
+	for (size_t i=0; i < length; i += 2)
+	{
+		char temp = rstrCode[i];
+		rstrCode[i] = rstrCode[i+1];
+		rstrCode[i+1] = temp;
+	}
+}
+//--------------------------------------------------------------------------------------------------
+bool TimeRollbackPreventer::putLocalDateTimeString(const string& strDTFile,
+	const string& strEncrypted, bool bForceCreation)
 {
 	bool	bResult = true;
 
@@ -973,9 +998,6 @@ bool TimeRollbackPreventer::putLocalDateTimeString(std::string strFileName, std:
 	{
 		try
 		{
-			// Get path and filename for DT file
-			string	strDTFile = strFileName;
-
 			CStdioFile fileDT2;
 			CFileException	e;
 
@@ -1039,7 +1061,8 @@ bool TimeRollbackPreventer::putLocalDateTimeString(std::string strFileName, std:
 	return bResult;
 }
 //--------------------------------------------------------------------------------------------------
-bool TimeRollbackPreventer::putRemoteDateTimeString(std::string strPath, std::string strKey, std::string strEncrypted, bool bForceCreation)
+bool TimeRollbackPreventer::putRemoteDateTimeString(const string& strPath, const string& strKey,
+	const string& strEncrypted, bool bForceCreation)
 {
 	bool	bResult = true;
 
@@ -1080,14 +1103,22 @@ bool TimeRollbackPreventer::putRemoteDateTimeString(std::string strPath, std::st
 	return bResult;
 }
 //--------------------------------------------------------------------------------------------------
-void TimeRollbackPreventer::deleteLocalDateTimeString(std::string strFileName) const
+void TimeRollbackPreventer::deleteLocalDateTimeString(const string& strFileName) const
 {
-	CFile::Remove(strFileName.c_str());
+	try
+	{
+		CFile::Remove(strFileName.c_str());
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32455");
 }
 //--------------------------------------------------------------------------------------------------
-void TimeRollbackPreventer::deleteRemoteDateTimeString(std::string strPath, std::string strKey) const
+void TimeRollbackPreventer::deleteRemoteDateTimeString(const string& strPath) const
 {
-	ma_pRollbackCfgMgr->deleteFolder(strPath);
+	try
+	{
+		ma_pRollbackCfgMgr->deleteFolder(strPath);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32454");
 }
 //--------------------------------------------------------------------------------------------------
 void TimeRollbackPreventer::updateDateTimeItems(bool bForceCreation)
@@ -1164,11 +1195,11 @@ void TimeRollbackPreventer::updateDateTimeItems(bool bForceCreation)
 	m_tmLastUpdate = currentTime;
 }
 //-------------------------------------------------------------------------------------------------
-void TimeRollbackPreventer::writeDateTime(std::string strLocal, std::string strRemote, bool bForceCreation)
+void TimeRollbackPreventer::writeDateTime(const string& strLocal, const string& strRemote, bool bForceCreation)
 {
 	// Get the paths to the two files
 	string strOutFile1 = getDateTimeFilePath();
-	string strOutFile2 = getDateTimeFilePath() + ".old";
+	string strOutFile2 = strOutFile1 + ".old";
 	
 	// Write to the backup locations
 	putLocalDateTimeString(strOutFile2, strLocal, true);
@@ -1182,19 +1213,84 @@ void TimeRollbackPreventer::writeDateTime(std::string strLocal, std::string strR
 	try
 	{
 		deleteLocalDateTimeString(strOutFile2);
-		deleteRemoteDateTimeString(ITEM_SECTION_NAME2, LAST_TIME_USED);
+		deleteRemoteDateTimeString(ITEM_SECTION_NAME2);
 	}
 	catch(...)
 	{
 	}
 }
 //-------------------------------------------------------------------------------------------------
-const ByteStream& TimeRollbackPreventer::getUnlockPassword()
+string TimeRollbackPreventer::encryptUnlockStream(const ByteStream& bytes)
 {
-	static ByteStream passwordBytes3;
-	static bool bAlreadyInitialized3 = false;
-	if (!bAlreadyInitialized3)
+	try
 	{
+		ByteStream			encryptedByteStream;
+		EncryptionEngine	ee;
+		ee.encrypt( encryptedByteStream, bytes, getUnlockPassword() );
+
+		// Convert the encrypted stream of bytes to a string
+		string strResult = encryptedByteStream.asString();
+		makeUpperCase( strResult );
+
+		// Manipulate the letters in the string
+		swapUnlockCodeChars(strResult);
+
+		return strResult;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32446");
+}
+//-------------------------------------------------------------------------------------------------
+bool TimeRollbackPreventer::getIdentityDataFromUnlockStream(string strCode,
+	string& rstrUserComputerName, unsigned long& rulUserSerialNumber,
+	string& rstrUserMACAddress, CTime& rtmExpires)
+{
+	try
+	{
+		swapUnlockCodeChars(strCode);
+		ByteStream bytes(strCode);
+
+		EncryptionEngine ee;
+		ByteStream decryptedBS;
+		ee.decrypt( decryptedBS, bytes, TimeRollbackPreventer::getUnlockPassword() );
+
+		ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
+
+		// Extract User computer name
+		string strUserComputerName;
+		bsm >> strUserComputerName;
+
+		// Extract User disk serial number
+		unsigned long ulUserSerialNumber;
+		bsm >> ulUserSerialNumber;
+
+		// Extract User MAC address
+		string strUserMACAddress;
+		bsm >> strUserMACAddress;
+
+		// Extract Expiration Date
+		CTime tmExpires;
+		bsm >> tmExpires;
+
+		// Only copy back the data if all was successful
+		rstrUserComputerName = strUserComputerName;
+		rulUserSerialNumber = ulUserSerialNumber;
+		rstrUserMACAddress = strUserMACAddress;
+		rtmExpires = tmExpires;
+
+		return true;
+	}
+	catch(...)
+	{
+		return false;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+ByteStream TimeRollbackPreventer::getUnlockPassword()
+{
+	try
+	{
+		ByteStream passwordBytes3;
+
 		// Create a 16 byte password from LMData constants
 		passwordBytes3.setSize( 16 );
 		unsigned char* pData = passwordBytes3.getData();
@@ -1207,32 +1303,43 @@ const ByteStream& TimeRollbackPreventer::getUnlockPassword()
 		pData[5]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKeyA)));
 		pData[6]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKeyA)));
 		pData[7]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKeyA)));
-		
+
 		pData[8]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKeyB)));
 		pData[9]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKeyB)));
 		pData[10]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKeyB)));
 		pData[11]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKeyB)));
-		
+
 		pData[12]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKeyC)));
 		pData[13]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKeyC)));
 		pData[14]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKeyC)));
 		pData[15]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKeyC)));
 
-		// Set flag
-		bAlreadyInitialized3 = true;
+		return passwordBytes3;
 	}
-
-	return passwordBytes3;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32447");
 }
 //-------------------------------------------------------------------------------------------------
 CMutex* TimeRollbackPreventer::getReadWriteMutex()
 {
-	if (m_apmutexReadWrite.get() == __nullptr)
+	if (m_upmutexReadWrite.get() == __nullptr)
 	{
-		m_apmutexReadWrite.reset(getGlobalNamedMutex("Global\\UCLID_Licensing"));
-		ASSERT_RESOURCE_ALLOCATION("ELI29993", m_apmutexReadWrite.get() != __nullptr);
+		m_upmutexReadWrite.reset(getLocalNamedMutex(
+			"Local\\UCLID_Licensing_F01E2C82-5091-4C36-905D-0C219C89CA47"));
+		ASSERT_RESOURCE_ALLOCATION("ELI29993", m_upmutexReadWrite.get() != __nullptr);
 	}
 
-	return m_apmutexReadWrite.get();
+	return m_upmutexReadWrite.get();
+}
+//-------------------------------------------------------------------------------------------------
+CMutex* TimeRollbackPreventer::getUnlockFileMutex()
+{
+	if (m_upmutexUnlock.get() == __nullptr)
+	{
+		m_upmutexUnlock.reset(getGlobalNamedMutex(
+			"Global\\UCLID_Unlock_BDDD1127-65B9-450C-BE70-21D10D4C7B1E"));
+		ASSERT_RESOURCE_ALLOCATION("ELI32444", m_upmutexUnlock.get() != __nullptr);
+	}
+
+	return m_upmutexUnlock.get();
 }
 //-------------------------------------------------------------------------------------------------

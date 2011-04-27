@@ -884,13 +884,8 @@ void CCOMLicenseGeneratorDlg::OnButtonUnlock()
 		// Encrypt the byte stream
 		try
 		{
-			ByteStream			encryptedByteStream;
-			EncryptionEngine	ee;
-			ee.encrypt( encryptedByteStream, bytes, TimeRollbackPreventer::getUnlockPassword() );
-
-			// Convert the encrypted stream of bytes to a string
-			string strResult = encryptedByteStream.asString();
-			makeUpperCase( strResult );
+			// Get the encrypted unlock stream
+			string strResult = TimeRollbackPreventer::encryptUnlockStream(bytes);
 
 			// Write the encrypted data to the Unlock file, 
 			// overwriting an existing file

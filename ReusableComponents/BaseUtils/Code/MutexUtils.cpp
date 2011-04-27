@@ -6,24 +6,18 @@
 
 using namespace std;
 
+//-------------------------------------------------------------------------------------------------
+// Non-exported helper methods
+//-------------------------------------------------------------------------------------------------
 // This code is based on code from:
 //	http://www.unixwiz.net/tools/dbmutex-1.0.1.cpp
 // This code was referenced on the following website:
 //	http://www.eggheadcafe.com/software/aspnet/33838244/create-a-global-mutex-on.aspx
 //
-// This method will create a global named mutex and set the security such that all
-// users will have access to the mutex.
-CMutex* getGlobalNamedMutex(string strMutexName)
+// Gets a named mutex with its security setting such that all users have
+// synchronize and modify access to it.
+CMutex* getNamedMutex(const string& strMutexName)
 {
-	try
-	{
-		ASSERT_ARGUMENT("ELI29990", !strMutexName.empty());
-
-		if (strMutexName.find("Global\\") != 0)
-		{
-			strMutexName = "Global\\" + strMutexName;
-		}
-
 		// Initialize a security descriptor
 		SECURITY_DESCRIPTOR sd;
 		InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
@@ -41,6 +35,50 @@ CMutex* getGlobalNamedMutex(string strMutexName)
 		sa.bInheritHandle = FALSE;
 
 		return new CMutex(FALSE, strMutexName.c_str(), &sa);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Exported methods
+//-------------------------------------------------------------------------------------------------
+CMutex* getGlobalNamedMutex(string strMutexName)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI29990", !strMutexName.empty());
+
+		// If defined as a local mutex, make it a global mutex
+		if (strMutexName.find("Local\\") == 0)
+		{
+			strMutexName.replace(0,6, "Global\\");
+		}
+		else if (strMutexName.find("Global\\") != 0)
+		{
+			strMutexName = "Global\\" + strMutexName;
+		}
+
+		return getNamedMutex(strMutexName);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29991");
 }
+//-------------------------------------------------------------------------------------------------
+CMutex* getLocalNamedMutex(string strMutexName)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI32451", !strMutexName.empty());
+
+		// If defined as a global mutex, make it a local mutex
+		if (strMutexName.find("Global\\") == 0)
+		{
+			strMutexName.replace(0,7, "Local\\");
+		}
+		else if (strMutexName.find("Local\\") != 0)
+		{
+			strMutexName = "Local\\" + strMutexName;
+		}
+
+		return getNamedMutex(strMutexName);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32452");
+}
+//-------------------------------------------------------------------------------------------------

@@ -385,6 +385,10 @@ EXPORT_BaseUtils void getSpecialFolderPath(int CSIDL, string& rstrPath);
 //		   path. The returned path will not contain a trailing slash.
 EXPORT_BaseUtils string getExtractApplicationDataPath();
 //-------------------------------------------------------------------------------------------------
+// POMISE: To return the path to the extract systems license folder in the common application data
+//		   path. The returned path will not contain a trailing slash.
+EXPORT_BaseUtils string getExtractLicenseFilesPath();
+//-------------------------------------------------------------------------------------------------
 // PROMISE: To attempt to create a temporary file in the folder specified (or
 //			in the case of a file being specified, the folder of the file specified)
 //			and to return true if it is successful or false if not

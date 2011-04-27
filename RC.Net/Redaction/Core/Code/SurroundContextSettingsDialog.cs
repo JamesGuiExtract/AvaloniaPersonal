@@ -1,6 +1,6 @@
+using Extract.Utilities;
 using System;
 using System.Windows.Forms;
-using System.Text.RegularExpressions;
 
 namespace Extract.Redaction
 {
@@ -111,22 +111,15 @@ namespace Extract.Redaction
                 }
                 else
                 {
-                    // TODO: Move the identifier validation to Extract.Utilities so it is reusable
-                    // [DNRCAU #433]
-                    Regex regex = new Regex(@"^[_a-zA-Z]\w*$");
-
                     // Need to validate that the specified data types are valid identifiers
-                    foreach (string dataType in dataTypes)
+                    if (!UtilityMethods.IsValidIdentifier(dataTypes))
                     {
-                        if (!regex.IsMatch(dataType))
-                        {
-                            _dataTypesTextBox.Focus();
-                            MessageBox.Show("Data types must be valid identifiers. "
-                                + @"Valid identifers must match the pattern ^[_a-zA-Z]\w*$",
-                                "Invalid data types", MessageBoxButtons.OK, MessageBoxIcon.None,
-                                MessageBoxDefaultButton.Button1, 0);
-                            return true;
-                        }
+                        _dataTypesTextBox.Focus();
+                        MessageBox.Show("Data types must be valid identifiers. "
+                            + @"Valid identifers must match the pattern ^[_a-zA-Z]\w*$",
+                            "Invalid data types", MessageBoxButtons.OK, MessageBoxIcon.None,
+                            MessageBoxDefaultButton.Button1, 0);
+                        return true;
                     }
                 }
             }

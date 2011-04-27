@@ -37,6 +37,12 @@ namespace Extract.Utilities
         static Regex _emailValidator;
 
         /// <summary>
+        /// Used to validate identifiers (identifiers must start with either an underscore
+        /// or a letter and can be followed by 0 or more underscores, letters or numbers).
+        /// </summary>
+        static Regex _identifierValidator;
+
+        /// <summary>
         /// Mutex used for regex creation
         /// </summary>
         static object _lock = new object();
@@ -295,6 +301,39 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32367");
+            }
+        }
+
+        /// <summary>
+        /// Determines whether all of the specified identifiers are valid.
+        /// <para>Note:</para>
+        /// A valid identifier must be of the form '[_a-zA-Z]\w*'
+        /// </summary>
+        /// <param name="identifiers">The identifiers.</param>
+        /// <returns>
+        /// <see langword="true"/> if all of the identifiers are valid;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool IsValidIdentifier(params string[] identifiers)
+        {
+            try
+            {
+                if (_identifierValidator == null)
+                {
+                    lock (_lock)
+                    {
+                        if (_identifierValidator == null)
+                        {
+                            _identifierValidator = new Regex(@"^[_a-zA-Z]\w*$");
+                        }
+                    }
+                }
+
+                return identifiers.All(s => !_identifierValidator.IsMatch(s));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32441");
             }
         }
 

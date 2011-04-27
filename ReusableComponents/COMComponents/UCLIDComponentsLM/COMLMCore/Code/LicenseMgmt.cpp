@@ -44,15 +44,15 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 static const string g_strLicenseExtension = ".lic";
 
 CMutex LicenseManagement::m_lock;
-bool LicenseManagement::m_bErrorInitializingTRP = false;
 bool LicenseManagement::m_bUserLicenseFailure = false;
 long LicenseManagement::m_lOEMPassword = 0;
 bool LicenseManagement::m_bOEMPasswordOK = false;
 bool LicenseManagement::m_bFilesLoadedFromFolder = false;
 LMData LicenseManagement::m_LicenseData;
-HWND LicenseManagement::m_hwndTRP;
 map<unsigned long, int> LicenseManagement::m_mapIdToDayLicensed;
 map<unsigned long, bool> LicenseManagement::m_mapIdToLicensed;
+Win32Event LicenseManagement::m_licenseStateIsInvalidEvent;
+unique_ptr<TimeRollbackPreventer> LicenseManagement::m_upTRP(__nullptr);
 
 //-------------------------------------------------------------------------------------------------
 // LicenseManagement
@@ -129,74 +129,40 @@ void LicenseManagement::initializeLicenseFromFile(const std::string& strLicenseF
 												  unsigned long ulKey4, 
 												  bool bUserString /*= true*/)
 {
-	// prevent simultaneous access to this object from multiple threads
-	CSingleLock guard(&m_lock, TRUE);
-
 	// Check for bad license state
 	validateState();
 
 	string	strFQPath = strLicenseFile;
 
 	// Check file name for backslash indicating fully qualified path
-	if (strLicenseFile.find( '\\' ) == -1)
+	if (strLicenseFile.find( '\\' ) == string::npos)
 	{
-		// Not found, append filename to path from bin folder
-		strFQPath = getModuleDirectory(COMLMCoreDLL.hModule) + "\\" + strLicenseFile;
+		// Not found, append filename to path from license folder
+		strFQPath = getExtractLicenseFilesPath() + "\\" + strLicenseFile;
 	}
 
 	// Retrieve the specified String from the license file
 	LMData	Data;
-	string	strUserData;
-	strUserData = Data.unzipStringFromFile( strFQPath, bUserString );
+	string strUserData = Data.unzipStringFromFile( strFQPath, bUserString );
 
 	// Extract license data from the User String
 	Data.extractDataFromString( strUserData, ulKey1, ulKey2, ulKey3, ulKey4 );
 
 	// Determine the associated OEM password
-	m_lOEMPassword = Data.generateOEMPassword( ulKey1, ulKey2, ulKey3, 
+	long lOEMPassword = Data.generateOEMPassword( ulKey1, ulKey2, ulKey3, 
 		ulKey4 );
 
 	///////////////////////////
 	// Check User License items
 	///////////////////////////
 
-	// Check Computer Name
-	if (Data.getUseComputerName())
+	// Check computer name, disk serial number and MAC address
+	if ((Data.getUseComputerName() && !Data.checkUserComputerName())
+		|| (Data.getUserSerialNumber() && !Data.checkUserSerialNumber())
+		|| (Data.getUseMACAddress() && !Data.checkUserMACAddress()))
 	{
-		// Compare computer names
-		string strName;
-		strName = getComputerName();
-		if (strName.compare( Data.getUserComputerName() ) != 0)
-		{
-			// No need to keep checking
-			return;
-		}
-	}
-
-	// Check Disk Serial Number
-	if (Data.getUseSerialNumber())
-	{
-		// Compare disk serial numbers
-		unsigned long ulNumber;
-		ulNumber = getDiskSerialNumber();
-		if (ulNumber != Data.getUserSerialNumber())
-		{
-			// No need to keep checking
-			return;
-		}
-	}
-
-	// Check MAC Address
-	if (Data.getUseMACAddress())
-	{
-		// Compare addresses
-		string strAddress;
-		strAddress = getMACAddress();
-		if (strAddress.compare( Data.getUserMACAddress() ) != 0)
-		{
-			// No need to keep checking
-			return;
-		}
+		// No need to keep checking
+		return;
 	}
 
 	/////////////////////
@@ -206,33 +172,60 @@ void LicenseManagement::initializeLicenseFromFile(const std::string& strLicenseF
 	{
 		try
 		{
-			// Check for an expiring component
-			if (Data.containsExpiringComponent())
+			if (Data.containsExpiringComponent() && Data.isFirstComponentExpired())
 			{
-				// Check if first component is already expired
-				if (!Data.isLicensed( Data.getFirstComponentID() ))
+				// Attempt to rename the license file to expired
+				try
 				{
-					// Force license file to Normal
-					SetFileAttributes( strLicenseFile.c_str(), FILE_ATTRIBUTE_NORMAL );
-
-					// New filename just appends ".expired"
-					string strNew = strLicenseFile.c_str() + string( ".expired" );
-
-					// Rename the license file
-					CFile::Rename( strLicenseFile.c_str(), strNew.c_str() );
+					moveFile(strFQPath, strFQPath + ".expired", true, true);
 				}
-				else if (m_hwndTRP == NULL)
+				catch(UCLIDException& uex)
 				{
-					createTRPObject();
+					uex.log();
 				}
+
+				// Log an application trace about the expired file
+				UCLIDException uex("ELI32449", "Application Trace: License file is expired.");
+				uex.addDebugInfo("License File Name", strFQPath);
+				uex.log();
+
+				// Do not do anything else with this license data since it is expired
+				return;
 			}
+
+			// prevent simultaneous access to this object from multiple threads
+			CSingleLock guard(&m_lock, TRUE);
 
 			// Update data member with this object
 			updateLicenseData( Data );
+
+			// Update the OEM password (log a trace if the password was previously set and
+			// it has changed)
+			if (m_lOEMPassword != 0 && m_lOEMPassword != lOEMPassword)
+			{
+				UCLIDException ue("ELI32456", "Application Trace: OEM sdk mismatch.");
+				ue.addDebugInfo("Previous OEM", m_lOEMPassword, true);
+				ue.addDebugInfo("New OEM", lOEMPassword, true);
+				ue.log();
+			}
+			m_lOEMPassword = lOEMPassword;
+
+			// Now check if we have any expiring components and launch TRP if necessary
+			if (m_LicenseData.containsExpiringComponent())
+			{
+				// Create call does nothing if TRP is already running
+				createTRPObject();
+			}
+			// If no expiring components then close TRP if it is running
+			else if (m_upTRP.get() != __nullptr)
+			{
+				// Ensure the TRP is not running since there are no expiring components
+				m_upTRP.reset(__nullptr);
+			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10682")
 	}
-	catch (UCLIDException ue)
+	catch (UCLIDException& ue)
 	{
 		ue.log();
 	}
@@ -346,9 +339,8 @@ void LicenseManagement::loadLicenseFilesFromFolder(const std::string& strValue, 
 	// Check for bad license state
 	validateState();
 
-	// Find and use the Common Components folder that contains COMLMCore.dll
-	string strLocal = getModuleDirectory( COMLMCoreDLL.hModule );
-	loadLicenseFilesFromFolder( strLocal, strValue, iType );
+	// Use the default extract license folder path
+	loadLicenseFilesFromFolder( getExtractLicenseFilesPath(), strValue, iType );
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::loadLicenseFilesFromFolder(std::string strDirectory,
@@ -600,76 +592,23 @@ void LicenseManagement::disableId(unsigned long ulComponentID)
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::createTRPObject()
 {
-	// Unless this method completely executes, we want this object to
-	// work as if TRP initialization failed.
-	m_bErrorInitializingTRP = true;
-
-	// Find the window associated with the Time Rollback Preventer
-	// and run the EXE if it is not yet running
-	m_hwndTRP = getTRPWindow();
-
-	// Authenticate the TRP object to make sure it is our object
-	LRESULT authCode = SendMessage( m_hwndTRP, gGET_AUTHENTICATION_CODE_MSG, 0, 0 );
-	if (authCode != asUnsignedLong(LICENSE_MGMT_PASSWORD))
+	try
 	{
-		throw UCLIDException("ELI15469", "Unable to authenticate TRP object!");
-	}
-
-	// If we got here, then the TRP was succesfully initialized
-	m_bErrorInitializingTRP = false;
-}
-//-------------------------------------------------------------------------------------------------
-HWND LicenseManagement::getTRPWindow()
-{
-	// "#32770" is the WNDCLASS name of a dialog and that is what we 
-	// are looking for
-	HWND hWnd = ::FindWindow( MAKEINTATOM(32770), gstrTRP_WINDOW_TITLE.c_str() );
-
-	// If window is not found, start the EXE associated with the Time Rollback Preventer
-	if (hWnd == NULL)
-	{
-		// Compute the path to the EXE
-		string strEXEPath = getModuleDirectory(COMLMCoreDLL.hModule);
-		strEXEPath += "\\";
-		strEXEPath += gstrTRP_EXE_NAME.c_str();
-
-		// Run the EXE
-		ProcessInformationWrapper piw;
-		runEXE( strEXEPath, "", 0, &piw );
-
-		// Wait for EXE to come up.  If the window is not findable within
-		// the maximum allowable time, throw an exception
-		const unsigned long ulMAX_WAIT_TIME_IN_SECONDS = 10;
-		time_t startTime = time(NULL);
-		time_t endTime = time(NULL);
-		bool bTRPProcessStillRunning = false;
-		do
+		// Check for TRP already running
+		if (m_upTRP.get() == __nullptr)
 		{
-			// check if the TRP process is still running
-			bTRPProcessStillRunning = (WaitForSingleObject(piw.pi.hProcess, 0) == WAIT_TIMEOUT);
+			// Lock around TRP initialization
+			CSingleLock guard(&m_lock, TRUE);
 
-			// Find the dialog window with expected title
-			hWnd = ::FindWindow( MAKEINTATOM(32770), gstrTRP_WINDOW_TITLE.c_str() );
-			if (hWnd == NULL)
+			if (m_upTRP.get() == __nullptr)
 			{
-				// Not found, update time and sleep before next attempt
-				endTime = time(NULL);
-				Sleep(50);
+				// Ensure the license state is valid
+				m_licenseStateIsInvalidEvent.reset();
+				m_upTRP.reset(new TimeRollbackPreventer(m_licenseStateIsInvalidEvent));
 			}
 		}
-		while (bTRPProcessStillRunning && hWnd == NULL &&
-			endTime - startTime <= ulMAX_WAIT_TIME_IN_SECONDS);
-
-		// Throw an exception if not found
-		if (hWnd == NULL)
-		{
-			throw UCLIDException("ELI15470", 
-				"Unable to establish connection with TRP object!");
-		}
 	}
-
-	// At this point we are guaranteed that hWnd is not NULL
-	return hWnd;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32448");
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::updateLicenseData( LMData& rData )
@@ -735,35 +674,11 @@ void LicenseManagement::updateLicenseData( LMData& rData )
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::validateState()
 {
-	// If the TRP initialization failed, throw an exception
-	if (m_bErrorInitializingTRP)
-	{
-		throw UCLIDException("ELI13092", 
-			"Extract Systems license state is assumed to be corrupted - unable to initialize TRP!");
-	}
-
 	// If the time rollback preventer has been initialized, then check its state
-	if (m_hwndTRP != __nullptr)
+	if (m_upTRP.get() != __nullptr)
 	{
-		const unsigned long ulMIN_TIME_BETWEEN_CHECKS = 60; // seconds
-		static time_t ls_lastCheckTime = 0;
-		static bool ls_bStateIsValid = false;
-
-		// If the number of seconds elapsed since the last check is more 
-		// than ulMIN_TIME_BETWEEN_CHECKS seconds, then check again.
-		time_t currentTime = time(NULL);
-		time_t timeDelta = currentTime - ls_lastCheckTime;
-		if (timeDelta >= ulMIN_TIME_BETWEEN_CHECKS || timeDelta < 0)
-		{
-			ls_lastCheckTime = currentTime;
-
-			// Check the state of the licensing
-			LRESULT returnCode = ::SendMessage(m_hwndTRP, gSTATE_IS_VALID_MSG, 0, 0);
-			ls_bStateIsValid = (returnCode == guiVALID_STATE_CODE);
-		}
-		
-		// If the most reecntly checked state is not valid, then throw an exception
-		if (!ls_bStateIsValid)
+		// Check if the license state invalid event is signaled
+		if (m_licenseStateIsInvalidEvent.isSignaled())
 		{
 			throw UCLIDException("ELI13089", "Extract Systems license state has been corrupted!");
 		}
@@ -794,17 +709,7 @@ bool LicenseManagement::internalIsLicensed(unsigned long ulComponentID)
 	// Check components
 	///////////////////
 
-	// Component is not licensed if not found
-	bool	bResult = false;
-
-	// Check the master LMData object
-	if (m_LicenseData.isLicensed( ulComponentID ))
-	{
-		bResult = true;
-	}
-
-	// Return the search result
-	return bResult;
+	return m_LicenseData.isLicensed(ulComponentID);
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::validateAnnotationLicense()

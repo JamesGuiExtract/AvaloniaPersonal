@@ -20,6 +20,7 @@
 
 #include <Win32Event.h>
 #include <UCLIDException.h>
+#include <TimeRollbackPreventer.h>
 
 #include <afxmt.h>
 #include <string>
@@ -123,7 +124,7 @@ public:
     //				decrypted using UCLID-specific passwords.  Adds the 
     //				objects to a vector.
     // REQUIRE: Nothing
-    // PROMISE: The Common Components folder will be searched.
+    // PROMISE: The Extract license file folder will be searched.
     // ARGS:	strValue - The encrypted day code string
     //			iType - type of passwords to be used in the UCLID String
     //			   0 = Regular UCLID passwords
@@ -217,18 +218,14 @@ private:
     // Methods
     //////////
 
+    // Create the TRP object.  Will throw exception if unsuccessful.
+    static void createTRPObject();
+
     // Throws exception if the Annotation support is not licensed
     static void validateAnnotationLicense();
 
     // Throws exception if the PDF Read-Write is not licensed
     static void validatePDFLicense();
-
-    // Create the TRP object.  Will throw exception if unsuccessful.
-    static void createTRPObject();
-
-    // Returns the HWND of the hidden TRP window.  
-    // Starts ExtractTRP2.exe if not yet running.
-    static HWND getTRPWindow();
 
     // Checks whether a component ID is licensed or not
     // NOTE: This method expects that the caller has protected this call
@@ -247,11 +244,6 @@ private:
     // mutex to prevent simultaneous access to this object
     static CMutex m_lock;
 
-    // flag to indicate that the time rollback preventer was attempted to be initialized, but
-    // couldn't be, and therefore the system should automatically be assumed to be in a
-    // invalid license state
-    static bool m_bErrorInitializingTRP;
-
     // Did the User License checking indicate invalid license
     static bool	m_bUserLicenseFailure;
     
@@ -267,14 +259,16 @@ private:
     // Collected license information
     static LMData	m_LicenseData;
 
-    // Time Rollback Preventer window handle
-    static  HWND	m_hwndTRP;
+	// Event that is signaled by the TRP if there is a license validation issue
+	static Win32Event m_licenseStateIsInvalidEvent;
+
+	// The TRP object initialized if there is a temporary license
+	static unique_ptr<TimeRollbackPreventer> m_upTRP;
 
     // maps that are used by the validateLicense function to cache
     // the licensed state values for components that have already been validated
     static map<unsigned long, int> m_mapIdToDayLicensed;
     static map<unsigned long, bool> m_mapIdToLicensed;
-
 };
 //============================================================================
 // PURPOSE: Use the following macro as a general way to check if a particular

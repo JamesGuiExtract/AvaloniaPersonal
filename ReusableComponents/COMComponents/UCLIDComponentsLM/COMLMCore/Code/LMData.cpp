@@ -720,6 +720,13 @@ bool LMData::isTemporaryLicense(unsigned long ulComponentID)
 	return !(m_mapCompIDToData[ulComponentID].isPermanent());
 }
 //-------------------------------------------------------------------------------------------------
+bool LMData::isFirstComponentExpired()
+{
+	auto id = getFirstComponentID();
+
+	return !isLicensed(id);
+}
+//-------------------------------------------------------------------------------------------------
 void LMData::setIssuerName(std::string strName)
 {
 	m_strIssuerName = strName;

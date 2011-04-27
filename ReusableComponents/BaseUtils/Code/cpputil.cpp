@@ -83,7 +83,7 @@ string getHumanTimeAsString(CTime tmInput)
 string getEnvironmentVariableValue(const string& strVarName)
 {
 	string strValue = "";
-	char *pszValue = NULL;
+	char *pszValue = __nullptr;
 
 	// TESTTHIS: usage of dupenv
 	errno_t err = _dupenv_s(&pszValue, NULL, strVarName.c_str());
@@ -111,7 +111,8 @@ string getEnvironmentVariableValue(const string& strVarName)
 // This code was derived from Microsoft Knowledge Base Article Q118623
 string getMACAddress()
 {
-	string strTemp = "";
+	// Default the value to: Address N/A [LRCAU #5475]
+	string strTemp = "Address N/A";
 
 	ASTAT Adapter;
 	NCB Ncb;
@@ -161,13 +162,6 @@ string getMACAddress()
 
 			strTemp = pszAddress;
 		}
-	}
-
-	// If no address was found, set the value to Address N/A
-	// [LRCAU #5475]
-	if (strTemp.length() == 0)
-	{
-		strTemp = "Address N/A";
 	}
 
 	return strTemp;

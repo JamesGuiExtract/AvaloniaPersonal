@@ -18,6 +18,7 @@
 #include "COMLMCore.h"
 #include "ComponentData.h"
 #include <RegConstants.h>
+#include <cpputil.h>
 
 #include <string>
 #include <map>
@@ -272,6 +273,10 @@ public:
 	// PROMISE: Nothing
 	// ARGS:	None
 	std::string getUserMACAddress();
+	//=======================================================================
+	// Returns true if the stored MAC address matches the current MAC address
+	inline bool checkUserMACAddress()
+	{ return getUserMACAddress() == ::getMACAddress(); }
 
 	//=======================================================================
 	// PURPOSE: Provides the computer name from the decrypted User License
@@ -280,6 +285,10 @@ public:
 	// PROMISE: Nothing
 	// ARGS:	None
 	std::string getUserComputerName();
+	//=======================================================================
+	// Returns true if the stored computer name matches the current computer name
+	inline bool checkUserComputerName()
+	{ return getUserComputerName() == ::getComputerName(); }
 
 	//=======================================================================
 	// PURPOSE: Provides the disk serial number from the decrypted User 
@@ -288,6 +297,10 @@ public:
 	// PROMISE: Nothing
 	// ARGS:	None
 	unsigned long getUserSerialNumber();
+	//=======================================================================
+	// Returns true if the stored disk serial number current disk serial number
+	inline bool checkUserSerialNumber()
+	{ return getUserSerialNumber() == ::getDiskSerialNumber(); }
 
 	//=======================================================================
 	// PURPOSE: Provides the version number from the most recent license 
@@ -331,6 +344,11 @@ public:
 	// ARGS:	ulComponentID - ID of component whose license is being
 	//			questioned.
 	bool isTemporaryLicense(unsigned long ulComponentID);
+
+	//=======================================================================
+	// PURPOSE: Checks to see if the first component in the collection
+	//			is expired or not
+	bool isFirstComponentExpired();
 
 	//=======================================================================
 	// PURPOSE: Sets the issue date as specified.
