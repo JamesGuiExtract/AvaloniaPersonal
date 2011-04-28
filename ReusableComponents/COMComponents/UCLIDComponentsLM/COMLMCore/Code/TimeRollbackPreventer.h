@@ -15,11 +15,11 @@
 
 #pragma once
 
-#include "BaseUtils.h"
-#include "IConfigurationSettingsPersistenceMgr.h"
-#include "Win32Event.h"
-#include "ByteStream.h"
-#include "ByteStreamManipulator.h"
+#include <IConfigurationSettingsPersistenceMgr.h>
+#include <Win32Event.h>
+#include <ByteStream.h>
+#include <ByteStreamManipulator.h>
+#include <Random.h>
 
 #include <afxmt.h>
 #include <memory>
@@ -31,7 +31,7 @@ using namespace std;
 // read from the CommonComponents folder
 const char gpszDateTimeUnlockFile[] = "\\Extract_UnlockLicense.txt";
 
-class EXPORT_BaseUtils TimeRollbackPreventer
+class TimeRollbackPreventer
 {
 public:
 	//=======================================================================
@@ -181,6 +181,9 @@ private:
 
 	// Pointer to thread that manages periodic updates
 	unique_ptr<CWinThread>	m_apThread;
+
+	// Class used to generate random numbers
+	Random m_random;
 
 	CMutex* getReadWriteMutex();
 	CMutex* getUnlockFileMutex();

@@ -31,12 +31,38 @@ static char THIS_FILE[]=__FILE__;
 #endif
 
 // Define the current (and any past) version string
-const std::string	strCURRENT_VERSION = "1";
+const string	strCURRENT_VERSION = "1";
+
+//-------------------------------------------------------------------------------------------------
+// Non-exported helper functions
+//-------------------------------------------------------------------------------------------------
+ByteStream getUserLicensePassword()
+{
+	// Create a 16 digit password.
+	ByteStream	passwordBytes(16);
+	auto pData = passwordBytes.getData();
+
+	int i;
+	for (i = 0; i < 8; i++)
+	{
+		pData[i] = i * 4 + 23 - i * 2;
+	}
+	for (int j = 0; j < 8; j++)
+	{
+		pData[i+j] = (2*i+j) * 7 + 31 - (i+2*j) * 3;
+	}
+
+	return passwordBytes;
+}
 
 //-------------------------------------------------------------------------------------------------
 // LMData
 //-------------------------------------------------------------------------------------------------
-LMData::LMData()
+LMData::LMData(const string& strComputerName, unsigned long ulSerialNumber,
+	const string& strMACAddress)
+	: m_strUserComputerName(strComputerName),
+	m_ulUserSerialNumber(ulSerialNumber),
+	m_strUserMACAddress(strMACAddress)
 {
 	m_strIssuerName = "";
 	m_strLicenseeName = "";
@@ -44,11 +70,9 @@ LMData::LMData()
 	m_IssueDate = CTime::GetCurrentTime();
 
 	// User License items
-	m_bUseComputerName = false;
-	m_bUseSerialNumber = false;
+	m_bUseComputerName = !m_strUserComputerName.empty();
+	m_bUseSerialNumber = m_ulUserSerialNumber != 0;
 	m_strUserString = "";
-	m_strUserComputerName = "";
-	m_ulUserSerialNumber = 0;
 	m_strActualComputerName = "";
 	m_ulActualSerialNumber = 0;
 }
@@ -94,7 +118,7 @@ void LMData::addUnlicensedComponent(unsigned long ulComponentID,
 	m_mapCompIDToData[ulComponentID] = CD;
 }
 //-------------------------------------------------------------------------------------------------
-std::string LMData::compressData(bool bAddDashes)
+string LMData::compressData(bool bAddDashes)
 {
 	string strResult;
 
@@ -160,7 +184,7 @@ std::string LMData::compressData(bool bAddDashes)
 	// Encrypt the byte stream
 	ByteStream			encryptedByteStream;
 	EncryptionEngine	ee;
-	ee.encrypt( encryptedByteStream, bytes, getPassword() );
+	ee.encrypt( encryptedByteStream, bytes, getUserLicensePassword() );
 
 	// Convert the encrypted stream of bytes to a string
 	strResult = encryptedByteStream.asString();
@@ -240,7 +264,6 @@ string LMData::compressDataToString(unsigned long ulKey1, unsigned long ulKey2,
 	ByteStream			encryptedByteStream;
 	EncryptionEngine	ee;
 	ee.encrypt( encryptedByteStream, bytesLicense, bytesKey );
-//	ee.encrypt( encryptedByteStream, bytesLicense, getPassword() );
 
 	// Convert the encrypted stream of bytes to a string
 	strOutput = encryptedByteStream.asString();
@@ -277,7 +300,7 @@ bool LMData::containsExpiringComponent()
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-void LMData::extractData(std::string strLicenseKey)
+void LMData::extractData(string strLicenseKey)
 {
 	// Remove any spaces or dashes
 	replaceVariable( strLicenseKey, " ", "" );
@@ -291,7 +314,7 @@ void LMData::extractData(std::string strLicenseKey)
 
 		// Decrypt the string here
 		EncryptionEngine ee;
-		ee.decrypt( decryptedBS, bytes, getPassword() );
+		ee.decrypt( decryptedBS, bytes, getUserLicensePassword() );
 
 		ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
 
@@ -372,7 +395,7 @@ void LMData::extractData(std::string strLicenseKey)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void LMData::extractDataFromString(std::string strLicenseString, 
+void LMData::extractDataFromString(const string& strLicenseString, 
 								   unsigned long ulKey1, unsigned long ulKey2, 
 								   unsigned long ulKey3, unsigned long ulKey4)
 {
@@ -427,7 +450,6 @@ void LMData::extractDataFromString(std::string strLicenseString,
 	// Decrypt and convert to string
 	EncryptionEngine ee;
 	ee.decrypt( decryptedBS, bytes, bytesKey );
-//	ee.decrypt( decryptedBS, bytes, getPassword() );
 
 	// Extract the original license string
 	ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
@@ -479,7 +501,7 @@ long LMData::getFirstComponentID()
 	long	lID = -1;
 
 	// Locate beginning of map
-	std::map<unsigned long, ComponentData>::iterator mapIter = 
+	map<unsigned long, ComponentData>::iterator mapIter = 
 		m_mapCompIDToData.begin();
 
 	// Check that iterator is valid
@@ -496,7 +518,7 @@ long LMData::getNextComponentID(long lID)
 	long	lNextID = -1;
 
 	// Locate specified ID in map
-	std::map<unsigned long, ComponentData>::iterator mapIter = 
+	map<unsigned long, ComponentData>::iterator mapIter = 
 		m_mapCompIDToData.find(lID);
 
 	// Check that ID was found
@@ -535,12 +557,12 @@ const ComponentData & LMData::getComponentData(unsigned long ulID)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-std::string LMData::getComputerName()
+string LMData::getComputerName()
 {
 	return m_strUserComputerName;
 }
 //-------------------------------------------------------------------------------------------------
-std::string LMData::getCurrentVersion()
+string LMData::getCurrentVersion()
 {
 	return strCURRENT_VERSION;
 }
@@ -550,17 +572,17 @@ CTime & LMData::getIssueDate()
 	return m_IssueDate;
 }
 //-------------------------------------------------------------------------------------------------
-std::string LMData::getIssuerName()
+string LMData::getIssuerName()
 {
 	return m_strIssuerName;
 }
 //-------------------------------------------------------------------------------------------------
-std::string LMData::getLicenseeName()
+string LMData::getLicenseeName()
 {
 	return m_strLicenseeName;
 }
 //-------------------------------------------------------------------------------------------------
-std::string LMData::getOrganizationName()
+string LMData::getOrganizationName()
 {
 	return m_strOrganizationName;
 }
@@ -580,12 +602,12 @@ bool LMData::getUseSerialNumber()
 	return m_bUseSerialNumber;
 }
 //-------------------------------------------------------------------------------------------------
-std::string LMData::getUserComputerName()
+string LMData::getUserComputerName()
 {
 	return m_strUserComputerName;
 }
 //-------------------------------------------------------------------------------------------------
-std::string LMData::getUserMACAddress()
+string LMData::getUserMACAddress()
 {
 	return m_strUserMACAddress;
 }
@@ -595,7 +617,7 @@ unsigned long LMData::getUserSerialNumber()
 	return m_ulUserSerialNumber;
 }
 //-------------------------------------------------------------------------------------------------
-std::string LMData::getVersion()
+string LMData::getVersion()
 {
 	return m_strVersion;
 }
@@ -673,7 +695,7 @@ bool LMData::isLicensed(unsigned long ulComponentID)
 	bool	bResult = false;
 
 	// Locate component ID within map
-	std::map<unsigned long, ComponentData>::iterator mapIter = 
+	map<unsigned long, ComponentData>::iterator mapIter = 
 		m_mapCompIDToData.find(ulComponentID);
 
 	// Was this ID found in the map?
@@ -727,17 +749,17 @@ bool LMData::isFirstComponentExpired()
 	return !isLicensed(id);
 }
 //-------------------------------------------------------------------------------------------------
-void LMData::setIssuerName(std::string strName)
+void LMData::setIssuerName(const string& strName)
 {
 	m_strIssuerName = strName;
 }
 //-------------------------------------------------------------------------------------------------
-void LMData::setLicenseeName(std::string strName)
+void LMData::setLicenseeName(const string& strName)
 {
 	m_strLicenseeName = strName;
 }
 //-------------------------------------------------------------------------------------------------
-void LMData::setOrganizationName(std::string strName)
+void LMData::setOrganizationName(const string& strName)
 {
 	m_strOrganizationName = strName;
 }
@@ -752,7 +774,7 @@ void LMData::setUseMACAddress(bool bUseAddress)
 	m_bUseMACAddress = bUseAddress;
 }
 //-------------------------------------------------------------------------------------------------
-void LMData::setUserString(std::string strData)
+void LMData::setUserString(const string& strData)
 {
 	// Store the string
 	m_strUserString = strData;
@@ -767,7 +789,7 @@ void LMData::setUserString(std::string strData)
 
 		// Decrypt the string here
 		EncryptionEngine ee;
-		ee.decrypt( decryptedBS, bytes, getPassword() );
+		ee.decrypt( decryptedBS, bytes, getUserLicensePassword() );
 
 		ByteStreamManipulator bsm( ByteStreamManipulator::kRead, decryptedBS );
 
@@ -788,6 +810,28 @@ void LMData::setUserString(std::string strData)
 		uexOuter.addDebugInfo("User License String", strData); 
 		throw uexOuter;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+string LMData::getUserLicenseString()
+{
+	ByteStream bytes;
+	ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bytes);
+	bsm >> m_strUserComputerName;
+	bsm >> m_ulUserSerialNumber;
+	bsm >> m_strUserMACAddress;
+	bsm.flushToByteStream(8);
+
+	ByteStream encrypted;
+	EncryptionEngine ee;
+	ee.encrypt(encrypted, bytes, getUserLicensePassword());
+
+	// Convert the encrypted stream of bytes to a string
+	string strResult = encrypted.asString();
+
+	// Convert the string to upper case
+	makeUpperCase( strResult );
+
+	return strResult;
 }
 //-------------------------------------------------------------------------------------------------
 void LMData::setUseSerialNumber(bool bUseNumber)
@@ -814,7 +858,7 @@ void LMData::setIssueDateToToday()
 // encrypted strings: User String and UCLID String.  Each string contains 
 // identical licensing information.  This method retrieves the specified 
 // string.
-string LMData::unzipStringFromFile(std::string strLicenseFile, bool bUserString)
+string LMData::unzipStringFromFile(const string& strLicenseFile, bool bUserString)
 {
 	CStdioFile		fileIn;
 	CFileException	e;
@@ -887,10 +931,10 @@ string LMData::unzipStringFromFile(std::string strLicenseFile, bool bUserString)
 // encrypted strings: User String and UCLID String.  Each string contains 
 // identical licensing information.  This method interlaces the given strings 
 // and writes the result to the specified file.
-bool LMData::zipStringsToFile(std::string strLicenseFile, 
-							  std::string strVersion, 
-							  std::string strData1, 
-							  std::string strData2)
+bool LMData::zipStringsToFile(const string& strLicenseFile, 
+							  const string& strVersion, 
+							  const string& strData1, 
+							  const string& strData2)
 {
 	bool	bSuccess = false;
 	string	strFinal;
@@ -985,7 +1029,7 @@ void LMData::enableAll()
 {
 	// Go through the map of component data objects setting the disabled flag
 	// for each component to false
-	for (std::map<unsigned long, ComponentData>::iterator it = m_mapCompIDToData.begin();
+	for (map<unsigned long, ComponentData>::iterator it = m_mapCompIDToData.begin();
 		it != m_mapCompIDToData.end(); it++)
 	{
 		it->second.m_bDisabled = false;
@@ -995,7 +1039,7 @@ void LMData::enableAll()
 void LMData::enableId(unsigned long ulComponentID)
 {
 	// Look for the specified component in the map
-	std::map<unsigned long, ComponentData>::iterator it = m_mapCompIDToData.find(ulComponentID);
+	map<unsigned long, ComponentData>::iterator it = m_mapCompIDToData.find(ulComponentID);
 
 	// If the component was found, set its disabled flag to false
 	if (it != m_mapCompIDToData.end())
@@ -1008,7 +1052,7 @@ void LMData::disableAll()
 {
 	// Go through the map of component data objects setting the disabled flag
 	// for each component to true
-	for (std::map<unsigned long, ComponentData>::iterator it = m_mapCompIDToData.begin();
+	for (map<unsigned long, ComponentData>::iterator it = m_mapCompIDToData.begin();
 		it != m_mapCompIDToData.end(); it++)
 	{
 		it->second.m_bDisabled = true;
@@ -1018,7 +1062,7 @@ void LMData::disableAll()
 void LMData::disableId(unsigned long ulComponentID)
 {
 	// Look for the specified component in the map
-	std::map<unsigned long, ComponentData>::iterator it = m_mapCompIDToData.find(ulComponentID);
+	map<unsigned long, ComponentData>::iterator it = m_mapCompIDToData.find(ulComponentID);
 
 	// If the component was found, set its disabled flag to true
 	if (it != m_mapCompIDToData.end())
@@ -1026,37 +1070,3 @@ void LMData::disableId(unsigned long ulComponentID)
 		it->second.m_bDisabled = true;
 	}
 }
-
-//-------------------------------------------------------------------------------------------------
-// Private method
-//-------------------------------------------------------------------------------------------------
-const ByteStream& LMData::getPassword() const
-{
-	static ByteStream	passwordBytes;
-	static bool			bAlreadyInitialized = false;
-
-	// Only create the password once
-	if (!bAlreadyInitialized)
-	{
-		// Create a 16 digit password.
-		passwordBytes.setSize( 16 );
-
-		unsigned char* pData = passwordBytes.getData();
-
-		int i;
-		for (i = 0; i < 8; i++)
-		{
-			pData[i] = i * 4 + 23 - i * 2;
-		}
-
-		for (int j = 0; j < 8; j++)
-		{
-			pData[i + j] = (2 * i + j) * 7 + 31 - ( i + 2 * j) * 3;
-		}
-
-		bAlreadyInitialized = true;
-	}
-
-	return passwordBytes;
-}
-//-------------------------------------------------------------------------------------------------

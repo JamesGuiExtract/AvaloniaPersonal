@@ -7,14 +7,16 @@
 
 #include <UCLIDExceptionDlg.h>
 #include <UCLIDException.h>
-#include <TimeRollbackPreventer.h>
 #include <cpputil.h>
+#include <LicenseMgmt.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 /////////////////////////////////////////////////////////////////////////////
 // CUserLicenseApp
@@ -88,10 +90,7 @@ BOOL CUserLicenseApp::InitInstance()
 					// Create file and registry items only if neither are present
 					try
 					{
-						// this is for initialization of trp
-						Win32Event eventBadState;
-						TimeRollbackPreventer	trp(eventBadState);
-						trp.checkDateTimeItems();
+						LicenseManagement::initTrpData(LICENSE_MGMT_PASSWORD);
 					}
 					catch(UCLIDException& ue)
 					{
@@ -109,6 +108,13 @@ BOOL CUserLicenseApp::InitInstance()
 
 				return FALSE;
 			}
+		}
+
+		// Ensure the license folder exists
+		string strLicense = getExtractLicenseFilesPath();
+		if (!isValidFolder(strLicense))
+		{
+			createDirectory(strLicense);
 		}
 
 		// Run the user license wizard

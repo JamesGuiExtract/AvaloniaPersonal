@@ -87,14 +87,6 @@ private:
 	//////////////
 
 	//=======================================================================
-	// PURPOSE: Creates a unique password to be used in encryption and 
-	//				decryption.
-	// REQUIRE: Nothing
-	// PROMISE: Provides a 16-byte password.
-	// ARGS:	None
-	const ByteStream& getPassword() const;
-
-	//=======================================================================
 	// PURPOSE: Validates the Name, Company Name, Phone Number, and Email
 	//			edit boxes. In order to be valid, the edit box must contain
 	//			non-empty data. Registration Key is optional and not validated.

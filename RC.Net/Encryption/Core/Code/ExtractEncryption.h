@@ -227,6 +227,9 @@ namespace Extract
 			//			version - The version of the hashcode to produce
 			static array<Byte>^ ComputeHash(array<Byte>^ value, int version);
             //--------------------------------------------------------------------------------------
+			// PURPOSE: To compute a checksum for the specified value
+			static int ComputeCheckSum(array<Byte>^ value);
+            //--------------------------------------------------------------------------------------
 			// PURPOSE:	Added to remove FxCop error - http://msdn.microsoft.com/en-us/ms182169.aspx
 			//			Microsoft.Design::CA1053 - Static holder types should not have constructors
 			ExtractEncryption(void) {};

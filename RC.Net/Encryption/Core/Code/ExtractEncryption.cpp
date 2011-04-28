@@ -58,7 +58,9 @@ const int _BUFFER_SIZE = 1024;
 const int _VERSION = 1;
 
 // Version 1 - Makes use of the version RSA key
-const int _PASSWORD_ENCRYPT_VERSION = 1;
+// Version 2 - Same algorithm but adds a checksum of the password hash into the stream
+//			   to better be able to check if the password provided is valid for the encrypted file
+const int _PASSWORD_ENCRYPT_VERSION = 2;
 
 //--------------------------------------------------------------------------------------------------
 // Local methods
@@ -551,6 +553,9 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 		cipher->Write(name, 0, length);
 		cipher->Write(BitConverter::GetBytes(_PASSWORD_ENCRYPT_VERSION), 0, 4);
 
+		// Write the checksum for the password
+		cipher->Write(BitConverter::GetBytes(ComputeCheckSum(passwordHash)), 0, 4);
+
 		rjndl = GetRijndael(passwordHash, HashVersion);
 		cryptoStream = gcnew CryptoStream(cipher, rjndl->CreateEncryptor(),
 			CryptoStreamMode::Write);
@@ -689,6 +694,7 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, String^ password)
 		switch(version)
 		{
 		case 1:
+		case 2:
 			Decrypt(cipher, plain, version, ComputeHash(password, 1));
 			break;
 
@@ -710,11 +716,26 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
 	switch(version)
 	{
 	case 1:
+	case 2:
 		{
 			RijndaelManaged^ rjndl = nullptr;
 			CryptoStream^ cryptoStream = nullptr;
 			try
 			{
+				// Compare password checksum value
+				if (version == 2)
+				{
+					// Read the password check sum and validate it
+					auto data = gcnew array<Byte>(4);
+					cipher->Read(data, 0, 4);
+					auto checkSum = BitConverter::ToInt32(data, 0);
+					if (ComputeCheckSum(passwordHash) != checkSum)
+					{
+						throw gcnew ExtractException("ELI32466",
+							"The decryption password is not valid.");
+					}
+				}
+
 				rjndl = GetRijndael(passwordHash, 1);
 				cryptoStream = gcnew CryptoStream(plain, rjndl->CreateDecryptor(),
 					CryptoStreamMode::Write);
@@ -758,15 +779,24 @@ int ExtractEncryption::GetEncryptedStreamVersion(Stream^ cipherStream)
 	try
 	{
 		auto encoding = gcnew UnicodeEncoding();
-		auto data = gcnew array<Byte>(4);
+		auto expectedTag = encoding->GetBytes(_STREAM_ENCRYPT_TAG);
+		auto expectedEncodingLength = expectedTag->Length;
 
-		// Read the tag from the stream
+		// Read the tag length from the stream
+		auto data = gcnew array<Byte>(4);
 		cipherStream->Read(data, 0, 4);
 		auto length = BitConverter::ToInt32(data, 0);
+		if (length != expectedEncodingLength)
+		{
+			auto ee = gcnew ExtractException("ELI32465", "Invalid tag length.");
+			ee->AddDebugData("Tag Length Expected", expectedEncodingLength, true);
+			ee->AddDebugData("Tag Length Read", length, true);
+			throw ee;
+		}
+
+		// Read and validate the tag
 		auto tag = gcnew array<Byte>(length);
 		cipherStream->Read(tag, 0, length);
-
-		// Validate the tag
 		if (!_STREAM_ENCRYPT_TAG->Equals(encoding->GetString(tag), StringComparison::Ordinal))
 		{
 			// Throw an exception
@@ -962,6 +992,28 @@ array<Byte>^ ExtractEncryption::ComputeHash(array<Byte>^ value, int version)
 		auto ee =  gcnew ExtractException("ELI32317", "Invalid version specified.");
 		ee->AddDebugData("Version Specified", version, false);
 		throw ee;
+	}
+}
+//--------------------------------------------------------------------------------------------------
+int ExtractEncryption::ComputeCheckSum(array<Byte>^ hash)
+{
+	try
+	{
+		auto checkHash = (gcnew MD5Cng())->ComputeHash(hash);
+		unsigned int checkSum = 0;
+		for(int i=0; i < checkHash->Length; i++)
+		{
+			// There is no special meaning to the number 42 (other than the reference to HHGU)
+			// it is simply used to mix the values from the computed hash bytes
+			checkSum += ((int)checkHash[i] ^ 42);
+			checkSum %= UInt32::MaxValue;
+		}
+
+		return Convert::ToInt32(checkSum);
+	}
+	catch(Exception^ ex)
+	{
+		throw ExtractException::AsExtractException("ELI32467", ex);
 	}
 }
 //--------------------------------------------------------------------------------------------------

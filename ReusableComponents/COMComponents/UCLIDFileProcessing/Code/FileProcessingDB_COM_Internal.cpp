@@ -457,7 +457,7 @@ int UpdateToSchemaVersion108(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32304");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32470");
 }
 
 //-------------------------------------------------------------------------------------------------

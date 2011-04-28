@@ -309,7 +309,6 @@
     </ClCompile>
     <ClCompile Include="TimedRetryDlg.cpp" />
     <ClCompile Include="TimeIntervalMerger.cpp" />
-    <ClCompile Include="TimeRollbackPreventer.cpp" />
     <ClCompile Include="UCLIDException.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -473,7 +472,6 @@
     <ClInclude Include="ThreadSafeLogFile.h" />
     <ClInclude Include="TimedRetryDlg.h" />
     <ClInclude Include="TimeIntervalMerger.h" />
-    <ClInclude Include="TimeRollbackPreventer.h" />
     <ClInclude Include="TSSingleton.h" />
     <ClInclude Include="UCLIDException.h" />
     <ClInclude Include="UCLIDExceptionDetailsDlg.h" />

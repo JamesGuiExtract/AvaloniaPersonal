@@ -21,6 +21,7 @@
 #include "ExtractTRP2Constants.h"
 
 #include <UCLIDException.h>
+#include <EncryptionEngine.h>
 #include <cpputil.h>
 #include <COMUtils.h>
 
@@ -479,12 +480,9 @@ bool LicenseManagement::isAnnotationLicensed()
 	return bLicensed;
 }
 //-------------------------------------------------------------------------------------------------
-void LicenseManagement::validateLicense(unsigned long ulLicenseID, string strELICode,
-										string strComponentName)
+void LicenseManagement::validateLicense(unsigned long ulLicenseID, const string& strELICode,
+										const string& strComponentName)
 {
-	// prevent simultaneous access to this object from multiple threads
-	CSingleLock guard(&m_lock, TRUE);
-
 	// Check if license management is in a bad state
 	try
 	{
@@ -501,8 +499,10 @@ void LicenseManagement::validateLicense(unsigned long ulLicenseID, string strELI
 	}
 
 	// Get the current day
-	CTime tmNow = CTime::GetCurrentTime();
-	int nThisDay = tmNow.GetDay();
+	int nThisDay = CTime::GetCurrentTime().GetDay();
+
+	// prevent simultaneous access to this object from multiple threads
+	CSingleLock guard(&m_lock, TRUE);
 
 	// Check if we have a stored day value for this license ID
 	map<unsigned long, int>::iterator it = m_mapIdToDayLicensed.find(ulLicenseID);
@@ -545,6 +545,40 @@ void LicenseManagement::validateLicense(unsigned long ulLicenseID, string strELI
 	ee.addDebugInfo("Component Name", strComponentName);
 	ee.addDebugInfo("Component ID", ulLicenseID, true);
 	throw ee;
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::initTrpData(const string& strLicenseCode)
+{
+	try
+	{
+		if (!IS_VALID_PRIVATE_LICENSE(strLicenseCode))
+		{
+			throw UCLIDException("ELI32462", "Unable to initialize data.");
+		}
+
+		CSingleLock guard(&m_lock, TRUE);
+
+		Win32Event winEvent;
+		TimeRollbackPreventer trp(winEvent);
+		trp.checkDateTimeItems();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32461");
+}
+//-------------------------------------------------------------------------------------------------
+string LicenseManagement::getUserLicense(const string& strLicenseCode)
+{
+	try
+	{
+		if (!IS_VALID_PRIVATE_LICENSE(strLicenseCode))
+		{
+			throw UCLIDException("ELI32468", "Unable to initialize data.");
+		}
+
+		// Use the LM structure to generate the user string
+		LMData lm(getComputerName(), getDiskSerialNumber(), getMACAddress());
+		return lm.getUserLicenseString();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32469");
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::resetCache()

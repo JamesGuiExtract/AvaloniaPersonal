@@ -87,9 +87,14 @@ void getFileAccessRetryCountAndTimeout(int& riRetryCount, int& riRetryTimeout)
 //--------------------------------------------------------------------------------------------------
 unsigned long getDiskSerialNumber()
 {
-	unsigned long	ulTemp = 0;
-	string			strPath( "C:\\" );
+	// Get the path to the windows directory
+	string strPath;
+	getSpecialFolderPath(CSIDL_WINDOWS, strPath);
 
+	// Get the drive letter from the windows directory path
+	strPath = getDriveFromFullPath(strPath, false);
+
+	unsigned long	ulTemp = 0;
 	GetVolumeInformation( strPath.c_str(), NULL, NULL, &ulTemp, NULL, NULL, NULL, NULL );
 
 	return ulTemp;
@@ -939,7 +944,7 @@ string getTextFileContentsAsString(const string& strTextFileName)
 //--------------------------------------------------------------------------------------------------
 string getModuleDirectory(HMODULE hModule)
 {
-	char pszModuleFile[MAX_PATH];
+	char pszModuleFile[MAX_PATH] = {0};
 	int ret = ::GetModuleFileName(hModule, pszModuleFile, MAX_PATH);
 	if (ret == 0)
 	{
@@ -965,7 +970,7 @@ string getModuleDirectory(const string& strModuleShortFileName)
 //--------------------------------------------------------------------------------------------------
 string getCurrentProcessEXEFullPath()
 {
-	char pszModuleFile[MAX_PATH];
+	char pszModuleFile[MAX_PATH] = {0};
 	int ret = ::GetModuleFileName(NULL, pszModuleFile, MAX_PATH);
 	if (ret == 0)
 	{

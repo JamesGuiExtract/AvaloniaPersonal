@@ -15,20 +15,18 @@
 
 #include "stdafx.h"
 #include "TimeRollbackPreventer.h"
-#include "RegistryPersistenceMgr.h"
-#include "EncryptionEngine.h"
-#include "FileDateTimeRestorer.h"
-#include "UCLIDException.h"
-#include "ExtractMFCUtils.h"
-#include "cpputil.h"
-#include "RegConstants.h"
-#include "MutexUtils.h"
-#include "Random.h"
+
+#include <RegistryPersistenceMgr.h>
+#include <EncryptionEngine.h>
+#include <FileDateTimeRestorer.h>
+#include <UCLIDException.h>
+#include <ExtractMFCUtils.h>
+#include <cpputil.h>
+#include <RegConstants.h>
+#include <MutexUtils.h>
 
 #include <shlobj.h>
 #include <iostream>
-
-extern AFX_EXTENSION_MODULE BaseUtilsDLL;
 
 using namespace std;
 
@@ -64,7 +62,7 @@ const unsigned long gulTRP_TIMER_MIN = 5;
 const unsigned long gulTRP_TIMER_MAX = 60;
 
 // Modulo constant for random additions to DT strings
-const unsigned short gusMODULO_CONSTANT = 17;
+const unsigned long gulMODULO_CONSTANT = 53;
 
 // Standard ELI error message indicating license corruption
 const char gpszLicenseIsCorrupt[] = 
@@ -232,9 +230,9 @@ void TimeRollbackPreventer::checkDateTimeItems()
 	////////////////////////////////////////////
 	// Check for system time already rolled back
 	////////////////////////////////////////////
-	string strDLL = getModuleDirectory( BaseUtilsDLL.hModule );
+	string strDLL = getModuleDirectory("COMLMCore.dll");
 	strDLL += "\\";
-	strDLL += "BaseUtils.dll";
+	strDLL += "COMLMCore.dll";
 	CTime tmDLL = getFileModificationTimeStamp( strDLL );
 	CTime tmNow = CTime::GetCurrentTime();
 	if (tmNow < tmDLL)
@@ -451,8 +449,6 @@ bool TimeRollbackPreventer::decryptDateTimeString(const string& strEncryptedDT,
 												  const ByteStream& bsPassword, 
 												  CTime* ptmResult)
 {
-	bool bReturn = true;
-
 	try
 	{
 		try
@@ -466,34 +462,31 @@ bool TimeRollbackPreventer::decryptDateTimeString(const string& strEncryptedDT,
 			// Extract CTime data from the bytes
 			ByteStreamManipulator bsm( ByteStreamManipulator::kRead, bsUnencrypted );
 
-			// Get first random unsigned short
-			unsigned short usTemp1;
-			bsm >> usTemp1;
-
-			// Confirm divisibility by modulo constant
-			unsigned short usExtra = usTemp1 % gusMODULO_CONSTANT;
-			if (usExtra != 0)
+			// Get first random unsigned short and modulo and confirm divisibility by modulo constant
+			unsigned long val(0), mod(0);
+			bsm >> val;
+			bsm >> mod;
+			if (val % gulMODULO_CONSTANT != mod)
 			{
-				bReturn = false;
+				return false;
 			}
 
 			// Retrieve CTime data
 			CTime	tmTemp;
 			bsm >> tmTemp;
 
-			// Get second random unsigned short
-			unsigned short usTemp2;
-			bsm >> usTemp2;
-
-			// Confirm divisibility by modulo constant
-			usExtra = usTemp2 % gusMODULO_CONSTANT;
-			if (usExtra != 0)
+			// Get second random unsigned short and confirm divisibility by modulo constant
+			bsm >> val;
+			bsm >> mod;
+			if (val % gulMODULO_CONSTANT != mod)
 			{
-				bReturn = false;
+				return false;
 			}
 
 			// Provide CTime to caller
 			*ptmResult = tmTemp;
+
+			return true;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10700")
 	}
@@ -501,10 +494,8 @@ bool TimeRollbackPreventer::decryptDateTimeString(const string& strEncryptedDT,
 	{
 		// Make sure that the exception is logged
 		ue.log();
-		bReturn = false;
+		return false;
 	}
-
-	return bReturn;
 }
 //-------------------------------------------------------------------------------------------------
 bool TimeRollbackPreventer::encryptDateTime(CTime tmTime, const ByteStream& bsPassword, 
@@ -521,20 +512,19 @@ bool TimeRollbackPreventer::encryptDateTime(CTime tmTime, const ByteStream& bsPa
 			ByteStreamManipulator bsm( ByteStreamManipulator::kWrite, unencryptedByteStream );
 
 			// Add first random unsigned short with specific modulus
-			srand( (unsigned)time( NULL ) );
-			unsigned short usTemp1 = (unsigned short)rand();
-			unsigned short usExtra = usTemp1 % gusMODULO_CONSTANT;
-			usTemp1 -= usExtra;
-			bsm << usTemp1;
+			auto val = m_random.uniform(gulMODULO_CONSTANT + 1, ULONG_MAX);
+			auto mod = val % gulMODULO_CONSTANT;
+			bsm << val;
+			bsm << mod;
 
 			// Add the time
 			bsm << tmTime;
 
 			// Add second random unsigned short with specific modulus
-			unsigned short usTemp2 = (unsigned short)rand();
-			usExtra = usTemp2 % gusMODULO_CONSTANT;
-			usTemp2 -= usExtra;
-			bsm << usTemp2;
+			val = m_random.uniform(gulMODULO_CONSTANT + 1, ULONG_MAX);
+			mod = val % gulMODULO_CONSTANT;
+			bsm << val;
+			bsm << mod;
 
 			// Ensure 8-byte boundary for encryption
 			bsm.flushToByteStream( 8 );

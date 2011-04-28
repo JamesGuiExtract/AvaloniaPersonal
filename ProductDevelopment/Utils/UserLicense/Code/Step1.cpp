@@ -10,6 +10,9 @@
 #include <ByteStreamManipulator.h>
 #include <EncryptionEngine.h>
 #include <RegistryPersistenceMgr.h>
+#include <LicenseMgmt.h>
+
+DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -268,81 +271,8 @@ BOOL CStep1::OnSetActive()
 //--------------------------------------------------------------------------------------------------
 void CStep1::updateUserLicenseKeyInUI() 
 {
-	// Retrieve computer name
-	string	strName = getComputerName();
-	if (strName.length() == 0)
-	{
-		strName = "Name N/A";
-	}
-
-	// Retrieve hard drive serial number
-	unsigned long	ulSerial = getDiskSerialNumber();
-
-	// Retrieve MAC address
-	string	strAddress = getMACAddress();
-
-	/////////////////////////////////////
-	// Add license information to the bsm
-	/////////////////////////////////////
-	ByteStream bytes;
-	ByteStreamManipulator bytesManipulator(ByteStreamManipulator::kWrite, bytes);
-
-	// Add computer name
-	bytesManipulator << strName;
-
-	// Add serial number
-	bytesManipulator << ulSerial;
-
-	// Add MAC Address
-	bytesManipulator << strAddress;
-
-	// Convert information to a stream of bytes
-	// with length divisible by 8
-	bytesManipulator.flushToByteStream( 8 );
-
-	// Encrypt the byte stream
-	ByteStream			encryptedByteStream;
-	EncryptionEngine	ee;
-	ee.encrypt( encryptedByteStream, bytes, getPassword() );
-
-	// Convert the encrypted stream of bytes to a string
-	string strResult;
-	strResult = encryptedByteStream.asString();
-
-	// Convert the string to upper case
-	makeUpperCase( strResult );
-
-	m_licenseRequest.m_zKey = strResult.c_str();
+	m_licenseRequest.m_zKey = LicenseManagement::getUserLicense(LICENSE_MGMT_PASSWORD).c_str();
 	UpdateData(FALSE);
-}
-//--------------------------------------------------------------------------------------------------
-const ByteStream& CStep1::getPassword() const
-{
-	static ByteStream	passwordBytes;
-	static bool			bAlreadyInitialized = false;
-
-	// Only create the password once
-	if (!bAlreadyInitialized)
-	{
-		// Create a 16 digit password.
-		passwordBytes.setSize( 16 );
-
-		unsigned char* pData = passwordBytes.getData();
-		int i;
-		for ( i = 0; i < 8; i++)
-		{
-			pData[i] = i * 4 + 23 - i * 2;
-		}
-
-		for (int j = 0; j < 8; j++)
-		{
-			pData[i+j] = (2*i+j) * 7 + 31 - (i+2*j) * 3;
-		}
-
-		bAlreadyInitialized = true;
-	}
-
-	return passwordBytes;
 }
 //--------------------------------------------------------------------------------------------------
 bool CStep1::isValidInput()

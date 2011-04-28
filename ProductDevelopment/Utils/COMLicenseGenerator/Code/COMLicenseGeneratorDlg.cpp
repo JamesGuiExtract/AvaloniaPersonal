@@ -21,6 +21,7 @@
 #include "Shlobj.h"
 #include "SpecialIcoMap.h"
 #include "SpecialSimpleRules.h"
+#include "TImeRollbackPreventer.h"
 
 #include <cpputil.h>
 #include <io.h>
@@ -31,7 +32,7 @@
 #include <StringTokenizer.h>
 #include <XBrowseForFolder.h>
 #include <RegistryPersistenceMgr.h>
-#include <TImeRollbackPreventer.h>
+#include <LicenseMgmt.h>
 
 using namespace std;
 
@@ -40,6 +41,8 @@ using namespace std;
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 //-------------------------------------------------------------------------------------------------
 // CAboutDlg dialog used for App About
@@ -324,8 +327,8 @@ void CCOMLicenseGeneratorDlg::OnButtonPaste()
 			// Paste from the clipboard
 			pEdit->Paste();	
 
-			// Copy text to data member
-			pEdit->GetWindowText( m_zUser );
+			// Get the data from the edit control
+			UpdateData(TRUE);
 
 			// Set selection to nothing
 			pEdit->SetSel( -1, -1 );
@@ -335,7 +338,7 @@ void CCOMLicenseGeneratorDlg::OnButtonPaste()
 		try
 		{
 			LMData	lmTemp;
-			lmTemp.setUserString( m_zUser.operator LPCTSTR() );
+			lmTemp.setUserString((LPCTSTR)m_zUser);
 
 			// Retrieve computer name
 			m_zComputer = lmTemp.getComputerName().c_str();
@@ -1059,26 +1062,37 @@ void CCOMLicenseGeneratorDlg::OnChangeEditOrganization()
 //-------------------------------------------------------------------------------------------------
 void CCOMLicenseGeneratorDlg::OnButtonUserlicense() 
 {
-	// Find folder for EXE
-	string	strFQPath = getCurrentProcessEXEDirectory();
-
-	// Append UserLicense.exe
-	strFQPath += "\\UserLicense.exe";
-
-	// Verify that EXE is present
-	if (isFileOrFolderValid( strFQPath ))
+	try
 	{
-		// Run the utility
-		::runEXE( strFQPath );
+		// Get the user license string
+		auto userLicense = LicenseManagement::getUserLicense(LICENSE_MGMT_PASSWORD);
+
+		// Add quick validation of user license string
+		try
+		{
+			LMData	lmTemp;
+			lmTemp.setUserString(userLicense);
+
+			// Retrieve computer name
+			m_zComputer = lmTemp.getComputerName().c_str();
+			m_zUser = userLicense.c_str();
+		}
+		catch(...)
+		{
+			// Display message to user
+			MessageBox( 
+				"The User License string you have provided is not a valid license string!",
+				"Error",
+				MB_OK | MB_ICONERROR );
+
+			// Clear the user license and computer name strings
+			m_zUser = "";
+			m_zComputer = "";
+		}
+
+		UpdateData(FALSE);
 	}
-	else
-	{
-		// Display error message
-		CString	zPrompt;
-		zPrompt.Format( "User License utility is not found\r\nPath = \"%s\"", 
-			strFQPath.c_str() );
-		MessageBox( zPrompt.operator LPCTSTR(), "Error", MB_OK | MB_ICONINFORMATION );
-	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32464");
 }
 
 //-------------------------------------------------------------------------------------------------

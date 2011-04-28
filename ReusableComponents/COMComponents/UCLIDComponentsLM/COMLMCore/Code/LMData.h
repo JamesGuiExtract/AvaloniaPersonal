@@ -22,6 +22,7 @@
 
 #include <string>
 #include <map>
+
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
@@ -78,11 +79,16 @@ public:
 	//=======================================================================
 	// PURPOSE: Constructs an LMData object.  The default state includes 
 	//				blank names and an issue date set to the current system
-	//				time.  The component map is empty.
+	//				time.  The component map is empty. If names and values
+	//				are specified, they will override the defaults
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
-	// ARGS:	None
-	LMData();
+	// ARGS:	strComputerName - the computer name
+	//			ulSerialNumber - the disk serial number
+	//			strMACAddress - the MAC address
+	LMData(const string& strComputerName = "", unsigned long ulSerialNumber = 0,
+		const string& strMACAddress = "");
+
 
 	//=======================================================================
 	// PURPOSE: Destroys an LMData object.
@@ -116,7 +122,7 @@ public:
 	// PROMISE: Returns string of variable length depending on the number of 
 	//				components are in the map.
 	// ARGS:	bAddDashes - inserts dashes after every four characters
-	std::string compressData(bool bAddDashes=false);
+	string compressData(bool bAddDashes=false);
 
 	//=======================================================================
 	// PURPOSE: Converts data into encrypted string of printable characters.
@@ -128,7 +134,7 @@ public:
 	//				ulKey2 - second part of encryption password
 	//				ulKey3 - third part of encryption password
 	//				ulKey4 - fourth part of encryption password
-	std::string compressDataToString(unsigned long ulKey1, unsigned long ulKey2, 
+	string compressDataToString(unsigned long ulKey1, unsigned long ulKey2, 
 		unsigned long ulKey3, unsigned long ulKey4);
 
 	//=======================================================================
@@ -143,7 +149,7 @@ public:
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	strLicenseKey - encrypted string of printable characters
-	void extractData(std::string strLicenseKey);
+	void extractData(string strLicenseKey);
 
 	//=======================================================================
 	// PURPOSE: Converts encrypted license information from the specified 
@@ -155,7 +161,7 @@ public:
 	//				ulKey2 - second part of encryption password
 	//				ulKey3 - third part of encryption password
 	//				ulKey4 - fourth part of encryption password
-	void extractDataFromString(std::string strLicenseString, 
+	void extractDataFromString(const string& strLicenseString, 
 		unsigned long ulKey1, unsigned long ulKey2, unsigned long ulKey3, 
 		unsigned long ulKey4);
 
@@ -198,14 +204,14 @@ public:
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	None
-	std::string getComputerName();
+	string getComputerName();
 
 	//=======================================================================
 	// PURPOSE: Provides the current version number in string form.
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	None
-	std::string getCurrentVersion();
+	string getCurrentVersion();
 
 	//=======================================================================
 	// PURPOSE: Retrieves the first component ID in the map.
@@ -226,21 +232,21 @@ public:
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	None
-	std::string getIssuerName();
+	string getIssuerName();
 
 	//=======================================================================
 	// PURPOSE: Provides the licensee name.
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	None
-	std::string getLicenseeName();
+	string getLicenseeName();
 
 	//=======================================================================
 	// PURPOSE: Provides the organization name.
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	None
-	std::string getOrganizationName();
+	string getOrganizationName();
 
 	//=======================================================================
 	// PURPOSE: Provides the flag describing use of computer name from the 
@@ -272,7 +278,7 @@ public:
 	// REQUIRE: setUserString() must be called first
 	// PROMISE: Nothing
 	// ARGS:	None
-	std::string getUserMACAddress();
+	string getUserMACAddress();
 	//=======================================================================
 	// Returns true if the stored MAC address matches the current MAC address
 	inline bool checkUserMACAddress()
@@ -284,7 +290,7 @@ public:
 	// REQUIRE: setUserString() must be called first
 	// PROMISE: Nothing
 	// ARGS:	None
-	std::string getUserComputerName();
+	string getUserComputerName();
 	//=======================================================================
 	// Returns true if the stored computer name matches the current computer name
 	inline bool checkUserComputerName()
@@ -308,7 +314,7 @@ public:
 	// REQUIRE: unzipStringFromFile() must be called first
 	// PROMISE: Nothing
 	// ARGS:	None
-	std::string getVersion();
+	string getVersion();
 
 	//=======================================================================
 	// PURPOSE: Provides the expiration date for a specific component ID
@@ -369,21 +375,21 @@ public:
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	strName - desired issuer name
-	void setIssuerName(std::string strName);
+	void setIssuerName(const string& strName);
 
 	//=======================================================================
 	// PURPOSE: Sets the licensee name as specified.
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	strName - desired licensee name
-	void setLicenseeName(std::string strName);
+	void setLicenseeName(const string& strName);
 
 	//=======================================================================
 	// PURPOSE: Sets the organization name as specified.
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	strName - desired organization name
-	void setOrganizationName(std::string strName);
+	void setOrganizationName(const string& strName);
 
 	//=======================================================================
 	// PURPOSE: Sets the flag for use of User License Computer Name.
@@ -406,7 +412,11 @@ public:
 	// REQUIRE: Nothing
 	// PROMISE: Nothing
 	// ARGS:	strData - User License string
-	void setUserString(std::string strData);
+	void setUserString(const string& strData);
+
+	//=======================================================================
+	// PURPOSE: Gets a user license string from the specified data
+	string getUserLicenseString();
 
 	//=======================================================================
 	// PURPOSE: Sets the flag for use of User License Disk Serial Number.
@@ -422,7 +432,7 @@ public:
 	// PROMISE: Returns the specified string
 	// ARGS:	strLicenseFile - file containing encrypted license data
 	//				bUserString - True for User String, False for UCLID String
-	string unzipStringFromFile(std::string strLicenseFile, bool bUserString);
+	string unzipStringFromFile(const string& strLicenseFile, bool bUserString);
 
 	//=======================================================================
 	// PURPOSE: Converts two doubly-encrypted strings into a single string
@@ -434,8 +444,8 @@ public:
 	// ARGS:	strLicenseFile - output filename
 	//				strData1 - first doubly-encrypted string
 	//				strData2 - second doubly-encrypted string
-	bool zipStringsToFile(std::string strLicenseFile, std::string strVersion, 
-		std::string strData1, std::string strData2);
+	bool zipStringsToFile(const string& strLicenseFile, const string& strVersion, 
+		const string& strData1, const string& strData2);
 
 	//=======================================================================
 	// PURPOSE: Sets the disabled flag to false for each of the
@@ -463,27 +473,19 @@ public:
 
 private:
 
-	//=======================================================================
-	// PURPOSE: Creates a unique password to be used in encryption and 
-	//				decryption.
-	// REQUIRE: Nothing
-	// PROMISE: Provides a 16-byte password.
-	// ARGS:	None
-	const ByteStream& getPassword() const;
-
 ///////////////
 // DATA MEMBERS
 ///////////////
 private:
 
 	// Name of person who creates and packages the component data
-	std::string		m_strIssuerName;
+	string		m_strIssuerName;
 
 	// Name of person to whom the license is sent
-	std::string		m_strLicenseeName;
+	string		m_strLicenseeName;
 
 	// Name of organization/company to whom the license is sent
-	std::string		m_strOrganizationName;
+	string		m_strOrganizationName;
 
 	// Date (and time) that license was created and packaged
 	CTime			m_IssueDate;
@@ -492,16 +494,16 @@ private:
 	bool			m_bUseComputerName;
 	bool			m_bUseMACAddress;
 	bool			m_bUseSerialNumber;
-	std::string		m_strUserString;
-	std::string		m_strUserComputerName;
+	string		m_strUserString;
+	string		m_strUserComputerName;
 	unsigned long	m_ulUserSerialNumber;
-	std::string		m_strUserMACAddress;
-	std::string		m_strActualComputerName;
+	string		m_strUserMACAddress;
+	string		m_strActualComputerName;
 	unsigned long	m_ulActualSerialNumber;
-	std::string		m_strActualMACAddress;
-	std::string		m_strVersion;
+	string		m_strActualMACAddress;
+	string		m_strVersion;
 
 	// Collection of component IDs and associated license flags and 
 	// expiration dates
-	std::map<unsigned long, ComponentData> m_mapCompIDToData;
+	map<unsigned long, ComponentData> m_mapCompIDToData;
 };

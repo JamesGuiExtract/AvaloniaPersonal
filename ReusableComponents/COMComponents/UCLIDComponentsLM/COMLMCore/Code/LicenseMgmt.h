@@ -17,10 +17,10 @@
 
 #include "COMLMCore.h"
 #include "LMData.h"
+#include "TimeRollbackPreventer.h"
 
 #include <Win32Event.h>
 #include <UCLIDException.h>
-#include <TimeRollbackPreventer.h>
 
 #include <afxmt.h>
 #include <string>
@@ -159,7 +159,18 @@ public:
 
     //=======================================================================
     // PURPOSE: To validate the license state of a particular licenseId
-    static void validateLicense(unsigned long ulLicenseID, string strELICode, string strComponentName);
+    static void validateLicense(unsigned long ulLicenseID, const string& strELICode,
+		const string& strComponentName);
+
+    //=======================================================================
+	// PURPOSE: To initialize the TRP date/time values
+	// ARGS:	strLicenseCode - the encrypted day code
+	static void initTrpData(const string& strLicenseCode);
+
+    //=======================================================================
+	// PURPOSE: To generate the user license string for this machine
+	// ARGS:	strLicenseCode - the encrypted day code
+	static string getUserLicense(const string& strLicenseCode);
 
     //=======================================================================
     // PURPOSE: To reset the cached licensed state which will force the
