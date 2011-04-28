@@ -816,9 +816,9 @@ string LMData::getUserLicenseString()
 {
 	ByteStream bytes;
 	ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bytes);
-	bsm >> m_strUserComputerName;
-	bsm >> m_ulUserSerialNumber;
-	bsm >> m_strUserMACAddress;
+	bsm << m_strUserComputerName;
+	bsm << m_ulUserSerialNumber;
+	bsm << m_strUserMACAddress;
 	bsm.flushToByteStream(8);
 
 	ByteStream encrypted;
