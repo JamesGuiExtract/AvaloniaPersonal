@@ -2,6 +2,7 @@
 #include "UserLicense.h"
 #include "LicenseRequest.h"
 
+#include <UCLIDException.h>
 #include <cpputil.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -12,10 +13,7 @@ const string gstrUNKNOWN = "(unknown)";
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-static const string gstrEMAIL_ADDRESS_URL_PREFIX = "mailto:";
-static const string gstrEMAIL_SUBJECT_PREFIX = "?subject=";
 static const string gstrEMAIL_SUBJECT = "License Request";
-static const string gstrEMAIL_BODY_PREFIX = "&body=";
 static const CString gzNEWLINE = "\r\n";
 
 //--------------------------------------------------------------------------------------------------
@@ -73,20 +71,22 @@ string CLicenseRequest::createLicenseRequestText()
 //-------------------------------------------------------------------------------------------------
 void CLicenseRequest::createLicenseRequestEmail()
 {
-	// Generate the license request
-	CString zLicenseRequest = createLicenseRequestText().c_str();
+	try
+	{
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+		{
+			IExtractEmailMessagePtr ipMessage(CLSID_ExtractEmailMessage);
+			ASSERT_RESOURCE_ALLOCATION("ELI32457", ipMessage != __nullptr);
 
-	// URL-encode newline characters.
-	zLicenseRequest.Replace(gzNEWLINE, "%0D%0A");
+			ipMessage->Subject = gstrEMAIL_SUBJECT.c_str();
+			ipMessage->Body = createLicenseRequestText().c_str();
+			ipMessage->AddRecipient(m_strLicenseEmailAddress.c_str());
+			ipMessage->ShowInClient(VARIANT_FALSE);
 
-	// Create a command to create an email to the appropriate email addres with the license 
-	// request text as the email body.
-	string strCommand = gstrEMAIL_ADDRESS_URL_PREFIX + m_strLicenseEmailAddress +
-		gstrEMAIL_SUBJECT_PREFIX + gstrEMAIL_SUBJECT + gstrEMAIL_BODY_PREFIX + 
-		zLicenseRequest.GetString();
-
-	// As long as "mailto" is associated with an install email application, this will create the
-	// email.
-	shellOpenDocument(strCommand);
+			ipMessage = __nullptr;
+		}
+		CoUninitialize();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32459");
 }
 //-------------------------------------------------------------------------------------------------

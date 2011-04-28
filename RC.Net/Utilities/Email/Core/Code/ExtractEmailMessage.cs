@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Reflection;
@@ -91,6 +92,12 @@ namespace Extract.Utilities.Email
         /// The sender name.
         /// </value>
         string Sender { get; set; }
+
+        /// <summary>
+        /// Allows the adding of a single recipient to the recipients list.
+        /// </summary>
+        /// <param name="recipient">The recipient to add to the list.</param>
+        void AddRecipient(string recipient);
 
         #endregion Properties
     }
@@ -232,12 +239,14 @@ namespace Extract.Utilities.Email
                     }
                     if (!string.IsNullOrWhiteSpace(Subject))
                     {
-                        arguments.Add("/subject \"" + Subject + "\"");
+                        arguments.Add("/subject");
+                        arguments.Add(Subject.Quote());
                     }
                     if (!string.IsNullOrWhiteSpace(Body))
                     {
                         File.WriteAllText(tempBody.FileName, Body);
-                        arguments.Add("/body \"" + tempBody.FileName + "\"");
+                        arguments.Add("/body");
+                        arguments.Add(tempBody.FileName.Quote());
                     }
 
                     // Currently this only supports adding the first attachment
@@ -252,6 +261,27 @@ namespace Extract.Utilities.Email
             catch (Exception ex)
             {
                 throw ex.CreateComVisible("ELI32290", "Unable to open message in email client.");
+            }
+        }
+
+        /// <summary>
+        /// Allows the adding of a single recipient to the recipients list.
+        /// </summary>
+        /// <param name="recipient">The recipient to add to the list.</param>
+        public void AddRecipient(string recipient)
+        {
+            try
+            {
+                // Add the recipient if they are not in the list already
+                if (!_recipients
+                    .Any(s => s.Equals(recipient, StringComparison.OrdinalIgnoreCase)))
+                {
+                    _recipients.Add(recipient);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI32460", "Unable to add single recipient.");
             }
         }
 

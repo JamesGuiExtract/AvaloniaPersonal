@@ -1,6 +1,7 @@
 using Extract.Licensing;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Extract.Utilities
 {
@@ -66,9 +67,16 @@ namespace Extract.Utilities
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI30260", _OBJECT_NAME);
-
+                // Verify this object is either licensed OR
+                // is called from Extract code
+                if (!LicenseUtilities.IsLicensed(LicenseIdName.ExtractCoreObjects)
+                    && !LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()))
+                {
+                    var ee = new ExtractException("ELI30260", "Object is not licensed.");
+                    ee.AddDebugData("Object Name", _OBJECT_NAME, false);
+                    throw ee;
+                }
+                
                 _fileName = FileSystemMethods.GetTemporaryFileName(folder, extension);
             }
             catch (Exception ex)
@@ -87,9 +95,16 @@ namespace Extract.Utilities
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI30261", _OBJECT_NAME);
-
+                // Verify this object is either licensed OR
+                // is called from Extract code
+                if (!LicenseUtilities.IsLicensed(LicenseIdName.ExtractCoreObjects)
+                    && !LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()))
+                {
+                    var ee = new ExtractException("ELI30261", "Object is not licensed.");
+                    ee.AddDebugData("Object Name", _OBJECT_NAME, false);
+                    throw ee;
+                }
+                
                 _fileName = fileInfo.FullName;
             }
             catch (Exception ex)

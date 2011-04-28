@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Management;
+using System.Reflection;
 using System.ServiceProcess;
 
 namespace Extract.Utilities
@@ -290,8 +291,15 @@ namespace Extract.Utilities
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI32158", _OBJECT_NAME);
+                // Verify this object is either licensed OR
+                // is called from Extract code
+                if (!LicenseUtilities.IsLicensed(LicenseIdName.ExtractCoreObjects)
+                    && !LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()))
+                {
+                    var ee = new ExtractException("ELI32158", "Object is not licensed.");
+                    ee.AddDebugData("Object Name", _OBJECT_NAME, false);
+                    throw ee;
+                }
 
                 using (var process = new Process())
                 {
@@ -321,9 +329,6 @@ namespace Extract.Utilities
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI31884", _OBJECT_NAME);
-
                 using (var tempFile = new TemporaryFile(".uex"))
                 {
                     var args = new List<string>(arguments);
