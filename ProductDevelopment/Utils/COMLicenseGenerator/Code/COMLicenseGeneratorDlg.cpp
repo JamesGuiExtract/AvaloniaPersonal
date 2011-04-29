@@ -1091,6 +1091,7 @@ void CCOMLicenseGeneratorDlg::OnButtonUserlicense()
 		}
 
 		UpdateData(FALSE);
+		updateButtons();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32464");
 }
