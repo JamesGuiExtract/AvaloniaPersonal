@@ -110,13 +110,6 @@ BOOL CUserLicenseApp::InitInstance()
 			}
 		}
 
-		// Ensure the license folder exists
-		string strLicense = getExtractLicenseFilesPath();
-		if (!isValidFolder(strLicense))
-		{
-			createDirectory(strLicense);
-		}
-
 		// Run the user license wizard
 		CLicenseWizard wizard("User License");
 		wizard.DoModal();
