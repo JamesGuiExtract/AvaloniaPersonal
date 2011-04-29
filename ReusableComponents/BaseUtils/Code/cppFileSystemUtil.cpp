@@ -2242,6 +2242,12 @@ string getExtractLicenseFilesPath()
 	string strLicensePath = getExtractApplicationDataPath();
 	strLicensePath += "\\LicenseFiles";
 
+	// [LRCAU #6078] - Create the folder if it doesn't exist
+	if (!isValidFolder(strLicensePath))
+	{
+		createDirectory(strLicensePath);
+	}
+
 	return strLicensePath;
 }
 //--------------------------------------------------------------------------------------------------

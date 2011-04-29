@@ -1,5 +1,6 @@
 using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +9,6 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 using System.Xml;
 
 namespace Extract.ReportViewer
@@ -24,33 +24,20 @@ namespace Extract.ReportViewer
         /// <summary>
         /// Relative path to the reports folder (relative to the current applications directory).
         /// </summary>
-        private static readonly string _RELATIVE_PATH_TO_REPORT =
-            @"\FileProcessingComponents\Reports\";
+        private static readonly string _REPORT_FOLDER_PATH =
+            Path.Combine(FileSystemMethods.CommonApplicationDataPath, "Reports");
 
         /// <summary>
         /// Folder which contains the standard reports
         /// </summary>
-        private static readonly string _STANDARD_REPORT_FOLDER = @"Standard reports\";
+        private static readonly string _STANDARD_REPORT_FOLDER =
+            Path.Combine(_REPORT_FOLDER_PATH, "Standard reports");
 
         /// <summary>
         /// Folder which contains the saved reports
         /// </summary>
-        private static readonly string _SAVED_REPORT_FOLDER = @"Saved reports\";
-
-        /// <summary>
-        /// The directory for the current application.
-        /// </summary>
-        private static string _applicationDirectory = Path.GetDirectoryName(Application.ExecutablePath);
-
-        /// <summary>
-        /// The directory containing the saved reports.
-        /// </summary>
-        private static string _savedReportFolder;
-
-        /// <summary>
-        /// The directory containing the standard reports.
-        /// </summary>
-        private static string _standardReportFolder;
+        private static readonly string _SAVED_REPORT_FOLDER =
+            Path.Combine(_REPORT_FOLDER_PATH, "Saved reports");
 
         /// <summary>
         /// The current version of the <see cref="ExtractReport"/> object.
@@ -212,28 +199,22 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
-        /// Gets the absolute path to the saved report folder (will end in '\').
+        /// Gets the absolute path to the saved report folder (will not end in '\').
         /// </summary>
-        /// <returns>The absolute path to the saved report folder (will end in '\').</returns>
+        /// <returns>The absolute path to the saved report folder (will not end in '\').</returns>
         public static string SavedReportFolder
         {
             get
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(_savedReportFolder))
+                    // Ensure the directory exists, if not create it
+                    if (!Directory.Exists(_SAVED_REPORT_FOLDER))
                     {
-                        _savedReportFolder = Path.GetFullPath(_applicationDirectory
-                            + _RELATIVE_PATH_TO_REPORT + _SAVED_REPORT_FOLDER);
-
-                        // Ensure the directory exists, if not create it
-                        if (!Directory.Exists(_savedReportFolder))
-                        {
-                            Directory.CreateDirectory(_savedReportFolder);
-                        }
+                        Directory.CreateDirectory(_SAVED_REPORT_FOLDER);
                     }
 
-                    return _savedReportFolder;
+                    return _SAVED_REPORT_FOLDER;
                 }
                 catch (Exception ex)
                 {
@@ -243,28 +224,22 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
-        /// Gets the absolute path to the standard report folder (will end in '\').
+        /// Gets the absolute path to the standard report folder (will not end in '\').
         /// </summary>
-        /// <returns>The absolute path to the standard report folder (will end in '\').</returns>
+        /// <returns>The absolute path to the standard report folder (will not end in '\').</returns>
         public static string StandardReportFolder
         {
             get
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(_standardReportFolder))
+                    // Ensure the directory exists, if not create it
+                    if (!Directory.Exists(_STANDARD_REPORT_FOLDER))
                     {
-                        _standardReportFolder = Path.GetFullPath(_applicationDirectory
-                            + _RELATIVE_PATH_TO_REPORT + _STANDARD_REPORT_FOLDER);
-
-                        // Ensure the directory exists, if not create it
-                        if (!Directory.Exists(_standardReportFolder))
-                        {
-                            Directory.CreateDirectory(_standardReportFolder);
-                        }
+                        Directory.CreateDirectory(_STANDARD_REPORT_FOLDER);
                     }
 
-                    return _standardReportFolder;
+                    return _STANDARD_REPORT_FOLDER;
                 }
                 catch (Exception ex)
                 {

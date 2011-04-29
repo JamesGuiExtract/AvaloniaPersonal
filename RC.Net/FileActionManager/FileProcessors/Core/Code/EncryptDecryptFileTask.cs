@@ -533,25 +533,60 @@ namespace Extract.FileActionManager.FileProcessors
                     throw new ExtractException("ELI32364", "Destination file already exists.");
                 }
 
-                using (var tempOut = new TemporaryFile())
+                TemporaryFile tempOut = null;
+                FileStream inputStream = null;
+                FileStream outputStream = null;
+                try
                 {
-                    using (var inputStream =
-                        File.Open(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    using (var outputStream =
-                        File.Open(tempOut.FileName, FileMode.Create,
-                        FileAccess.ReadWrite, FileShare.None))
+                    tempOut = new TemporaryFile();
+                    outputStream = File.Open(tempOut.FileName, FileMode.Create,
+                        FileAccess.ReadWrite, FileShare.None);
+
+                    // Open the input stream
+                    FileSystemMethods.PerformFileOperationWithRetryOnSharingViolation(() =>
                     {
-                        if (_encryptFile)
+                        try
                         {
-                            inputStream.ExtractEncrypt(outputStream, _passwordHash, _label);
+                            inputStream = File.Open(sourceFile, FileMode.Open,
+                                FileAccess.Read, FileShare.Read);
                         }
-                        else
+                        catch
                         {
-                            inputStream.ExtractDecrypt(outputStream, _passwordHash, _label);
+                            if (inputStream != null)
+                            {
+                                inputStream.Dispose();
+                                inputStream = null;
+                            }
+
+                            throw;
                         }
+                    });
+
+                    if (_encryptFile)
+                    {
+                        inputStream.ExtractEncrypt(outputStream, _passwordHash, _label);
+                    }
+                    else
+                    {
+                        inputStream.ExtractDecrypt(outputStream, _passwordHash, _label);
                     }
 
                     File.Copy(tempOut.FileName, destinationFile, true);
+                }
+                finally
+                {
+                    if (tempOut != null)
+                    {
+                        tempOut.Dispose();
+                    }
+                    if (inputStream != null)
+                    {
+                        inputStream.Dispose();
+                    }
+                    if (outputStream != null)
+                    {
+                        outputStream.Dispose();
+                    }
                 }
 
                 // Ensure the directory exists

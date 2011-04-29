@@ -34,22 +34,36 @@ namespace Extract.ReportViewer
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+            System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReportViewerForm));
             this._crystalReportViewer = new CrystalDecisions.Windows.Forms.CrystalReportViewer();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveReportTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._exportReportToPDFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._exportReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._aboutReportViewerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._pleaseWaitLabel = new System.Windows.Forms.Label();
             this._progressBar = new System.Windows.Forms.ProgressBar();
+            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new System.Drawing.Size(229, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new System.Drawing.Size(229, 6);
             // 
             // _crystalReportViewer
             // 
@@ -82,27 +96,40 @@ namespace Extract.ReportViewer
             // 
             this._fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._openReportToolStripMenuItem,
+            this._refreshToolStripMenuItem,
+            toolStripSeparator1,
             this._saveReportTemplateToolStripMenuItem,
             this._exportReportToPDFToolStripMenuItem,
             this._exportReportToolStripMenuItem,
-            this.toolStripSeparator1,
+            toolStripSeparator2,
             this._exitToolStripMenuItem});
             this._fileToolStripMenuItem.Name = "_fileToolStripMenuItem";
-            this._fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this._fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this._fileToolStripMenuItem.Text = "&File";
             // 
             // _openReportToolStripMenuItem
             // 
             this._openReportToolStripMenuItem.Name = "_openReportToolStripMenuItem";
-            this._openReportToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this._openReportToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+            this._openReportToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this._openReportToolStripMenuItem.Text = "&Open report...";
             this._openReportToolStripMenuItem.Click += new System.EventHandler(this.HandleFileOpenReportClick);
+            // 
+            // _refreshToolStripMenuItem
+            // 
+            this._refreshToolStripMenuItem.Enabled = false;
+            this._refreshToolStripMenuItem.Name = "_refreshToolStripMenuItem";
+            this._refreshToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this._refreshToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this._refreshToolStripMenuItem.Text = "&Refresh";
+            this._refreshToolStripMenuItem.Click += new System.EventHandler(this.HandleRefreshOpenDocument);
             // 
             // _saveReportTemplateToolStripMenuItem
             // 
             this._saveReportTemplateToolStripMenuItem.Enabled = false;
             this._saveReportTemplateToolStripMenuItem.Name = "_saveReportTemplateToolStripMenuItem";
-            this._saveReportTemplateToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this._saveReportTemplateToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this._saveReportTemplateToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this._saveReportTemplateToolStripMenuItem.Text = "&Save report template...";
             this._saveReportTemplateToolStripMenuItem.Click += new System.EventHandler(this.HandleFileSaveReportTemplateClick);
             // 
@@ -110,7 +137,7 @@ namespace Extract.ReportViewer
             // 
             this._exportReportToPDFToolStripMenuItem.Enabled = false;
             this._exportReportToPDFToolStripMenuItem.Name = "_exportReportToPDFToolStripMenuItem";
-            this._exportReportToPDFToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this._exportReportToPDFToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this._exportReportToPDFToolStripMenuItem.Text = "Export to &PDF...";
             this._exportReportToPDFToolStripMenuItem.Click += new System.EventHandler(this.HandleFileExportReportToPdfClick);
             // 
@@ -118,19 +145,15 @@ namespace Extract.ReportViewer
             // 
             this._exportReportToolStripMenuItem.Enabled = false;
             this._exportReportToolStripMenuItem.Name = "_exportReportToolStripMenuItem";
-            this._exportReportToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this._exportReportToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this._exportReportToolStripMenuItem.Text = "Expo&rt...";
             this._exportReportToolStripMenuItem.Click += new System.EventHandler(this.HandleFileExportReportClick);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(196, 6);
             // 
             // _exitToolStripMenuItem
             // 
             this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
-            this._exitToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this._exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+            this._exitToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this._exitToolStripMenuItem.Text = "E&xit";
             this._exitToolStripMenuItem.Click += new System.EventHandler(this.HandleFileExitClick);
             // 
@@ -139,13 +162,13 @@ namespace Extract.ReportViewer
             this._helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._aboutReportViewerToolStripMenuItem});
             this._helpToolStripMenuItem.Name = "_helpToolStripMenuItem";
-            this._helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this._helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this._helpToolStripMenuItem.Text = "Help";
             // 
             // _aboutReportViewerToolStripMenuItem
             // 
             this._aboutReportViewerToolStripMenuItem.Name = "_aboutReportViewerToolStripMenuItem";
-            this._aboutReportViewerToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this._aboutReportViewerToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this._aboutReportViewerToolStripMenuItem.Text = "About Report Viewer...";
             this._aboutReportViewerToolStripMenuItem.Click += new System.EventHandler(this.HandleHelpAboutClick);
             // 
@@ -157,13 +180,13 @@ namespace Extract.ReportViewer
             this._pleaseWaitLabel.Size = new System.Drawing.Size(560, 13);
             this._pleaseWaitLabel.TabIndex = 2;
             this._pleaseWaitLabel.Text = "Please wait while the specified report is loaded (this may take several minutes d" +
-                "epending on the size of the database).";
+    "epending on the size of the database).";
             this._pleaseWaitLabel.Visible = false;
             // 
             // _progressBar
             // 
-            this._progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._progressBar.Location = new System.Drawing.Point(114, 277);
             this._progressBar.MarqueeAnimationSpeed = 40;
             this._progressBar.Name = "_progressBar";
@@ -204,10 +227,10 @@ namespace Extract.ReportViewer
         private System.Windows.Forms.ToolStripMenuItem _openReportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _saveReportTemplateToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _exportReportToPDFToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem _helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _aboutReportViewerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _exportReportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _refreshToolStripMenuItem;
 
     }
 }

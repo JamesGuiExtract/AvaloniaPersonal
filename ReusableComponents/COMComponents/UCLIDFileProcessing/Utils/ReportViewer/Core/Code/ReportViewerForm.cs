@@ -411,10 +411,8 @@ namespace Extract.ReportViewer
                 try
                 {
                     // Copy the report and preview file (overwriting if necessary)
-                    string previewName = FileSystemMethods.PathCombine(
-                        ExtractReport.StandardReportFolder,
-                        Path.GetFileNameWithoutExtension(_report.FileName),
-                        _PREVIEW_EXTENSION);
+                    string previewName = Path.Combine(ExtractReport.StandardReportFolder,
+                        Path.GetFileNameWithoutExtension(_reportFileName) + _PREVIEW_EXTENSION);
                     File.Copy(_report.FileName, baseSavedName + ".rpt", true);
                     if (File.Exists(previewName))
                     {
@@ -534,6 +532,26 @@ namespace Extract.ReportViewer
             }
         }
 
+        /// <summary>
+        /// Handles the refresh open document.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        private void HandleRefreshOpenDocument(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_report != null)
+                {
+                    AttachReportToReportViewer();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32487");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Methods
@@ -573,6 +591,7 @@ namespace Extract.ReportViewer
             // Enable the export buttons
             _exportReportToPDFToolStripMenuItem.Enabled = true;
             _exportReportToolStripMenuItem.Enabled = true;
+            _refreshToolStripMenuItem.Enabled = true;
 
             // Invalidate the form
             this.Invalidate();

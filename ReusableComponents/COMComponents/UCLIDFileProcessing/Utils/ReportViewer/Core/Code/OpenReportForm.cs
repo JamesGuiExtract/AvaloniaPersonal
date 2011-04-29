@@ -537,9 +537,9 @@ namespace Extract.ReportViewer
                 !string.IsNullOrEmpty(reportName));
 
              // Build main file name
-            string selectedReport =
-                (standard ? ExtractReport.StandardReportFolder : ExtractReport.SavedReportFolder)
-                + reportName;
+            string selectedReport = Path.Combine(
+                (standard ? ExtractReport.StandardReportFolder : ExtractReport.SavedReportFolder),
+                reportName);
 
             return selectedReport;
         }
@@ -560,14 +560,14 @@ namespace Extract.ReportViewer
 
             // Get a list of files in the standard report directory that have a .rpt extension
             foreach (string fileName in
-                Directory.GetFiles(standardReportDir, "*.rpt", SearchOption.TopDirectoryOnly))
+                Directory.EnumerateFiles(standardReportDir, "*.rpt", SearchOption.TopDirectoryOnly))
             {
                 _standardReportList.Items.Add(Path.GetFileNameWithoutExtension(fileName));
             }
 
             // Get a list of files in the saved report directory that have a .rpt extension
             foreach (string fileName in
-                Directory.GetFiles(savedReportDir, "*.rpt", SearchOption.TopDirectoryOnly))
+                Directory.EnumerateFiles(savedReportDir, "*.rpt", SearchOption.TopDirectoryOnly))
             {
                 _savedReportList.Items.Add(Path.GetFileNameWithoutExtension(fileName));
             }
