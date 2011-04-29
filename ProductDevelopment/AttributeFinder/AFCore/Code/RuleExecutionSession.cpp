@@ -18,9 +18,9 @@ CRuleExecutionSession::~CRuleExecutionSession()
 	try
 	{
 		// pop the filename on the rule execution environment's stack
-		if (m_spRuleExecutionEnv)
+		if (m_ipRuleExecutionEnv)
 		{
-			m_spRuleExecutionEnv->PopRSDFileName();
+			m_ipRuleExecutionEnv->PopRSDFileName();
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI07491")
@@ -40,7 +40,7 @@ STDMETHODIMP CRuleExecutionSession::InterfaceSupportsErrorInfo(REFIID riid)
 	return S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRuleExecutionSession::SetRSDFileName(BSTR strFileName, long *pnStackSize)
+STDMETHODIMP CRuleExecutionSession::SetRSDFileName(BSTR bstrFileName, long *pnStackSize)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -49,20 +49,38 @@ STDMETHODIMP CRuleExecutionSession::SetRSDFileName(BSTR strFileName, long *pnSta
 		// validate arguments
 		ASSERT_ARGUMENT("ELI11545", pnStackSize != __nullptr);
 
-		// if the rule execution environment object has not yet been
-		// created, create it
-		if (m_spRuleExecutionEnv == __nullptr)
-		{
-			m_spRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
-			ASSERT_RESOURCE_ALLOCATION("ELI07487", m_spRuleExecutionEnv != __nullptr);
-		}
-
-		// push ipRuleSet's filename onto the rule execution environment's stack
+		// Push ipRuleSet's filename onto the rule execution environment's stack
 		// and return the size of the rule execution stack after the push operation
-		*pnStackSize = m_spRuleExecutionEnv->PushRSDFileName(strFileName);
+		*pnStackSize = getRuleExecutionEnv()->PushRSDFileName(bstrFileName);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07492")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionSession::SetFKBVersion(BSTR bstrFKBVersion)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-	return S_OK;
+	try
+	{
+		// push ipRuleSet's filename onto the rule execution environment's stack
+		// and return the size of the rule execution stack after the push operation
+		getRuleExecutionEnv()->FKBVersion = bstrFKBVersion;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32480")
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_AFCORELib::IRuleExecutionEnvPtr CRuleExecutionSession::getRuleExecutionEnv()
+{
+	if (m_ipRuleExecutionEnv == __nullptr)
+	{
+		m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
+		ASSERT_RESOURCE_ALLOCATION("ELI32481", m_ipRuleExecutionEnv != __nullptr);
+	}
+
+	return m_ipRuleExecutionEnv;
 }
 //-------------------------------------------------------------------------------------------------

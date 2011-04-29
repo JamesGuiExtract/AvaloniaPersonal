@@ -27,6 +27,14 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 static const string COMPONENT_DATA_FOLDER_KEY = "ComponentDataFolder";
 
 //-------------------------------------------------------------------------------------------------
+// Statics
+//-------------------------------------------------------------------------------------------------
+unique_ptr<IConfigurationSettingsPersistenceMgr> CAttributeFinderEngine::mu_spUserCfgMgr(
+		new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_REG_ROOT_FOLDER_PATH));
+string CAttributeFinderEngine::ms_strLegacyFKBVersion = "_uninitialized_";
+CMutex CAttributeFinderEngine::m_mutex;
+
+//-------------------------------------------------------------------------------------------------
 // Global function
 //-------------------------------------------------------------------------------------------------
 bool isOptionalProgressDlgLicensed()
@@ -353,10 +361,10 @@ STDMETHODIMP CAttributeFinderEngine::get_FeedbackManager(IFeedbackMgr **pVal)
 		// Get the feedback manager and return it
 		UCLID_AFCORELib::IFeedbackMgrPtr ipManager = getFeedbackManager();
 		*pVal = (IFeedbackMgr*) ipManager.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09052")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeFinderEngine::ShowHelpAboutBox(EHelpAboutType eType, BSTR strProductVersion)
@@ -370,13 +378,12 @@ STDMETHODIMP CAttributeFinderEngine::ShowHelpAboutBox(EHelpAboutType eType, BSTR
 
 		// Display the About box with version information
 		std::string strProduct = asString( strProductVersion );
-		UCLID_AFCORELib::IAttributeFinderEnginePtr ipEngine(this);
-		CAFAboutDlg dlgAbout( eType, strProduct, ipEngine );
+		CAFAboutDlg dlgAbout( eType, strProduct );
 		dlgAbout.DoModal();
+
+		return S_OK;
 	}	
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11641");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeFinderEngine::GetComponentDataFolder(BSTR *pstrComponentDataFolder)
@@ -392,10 +399,10 @@ STDMETHODIMP CAttributeFinderEngine::GetComponentDataFolder(BSTR *pstrComponentD
 		getComponentDataFolder(strFolder);
 
 		*pstrComponentDataFolder = _bstr_t(strFolder.c_str()).Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13440");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -425,6 +432,58 @@ STDMETHODIMP CAttributeFinderEngine::raw_IsLicensed(VARIANT_BOOL * pbValue)
 	}
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// Public functions
+//-------------------------------------------------------------------------------------------------
+string CAttributeFinderEngine::getLegacyFKBVersion()
+{
+	if (ms_strLegacyFKBVersion == "_uninitialized_")
+	{
+		// To avoid the need to recalculate the legacy version multiple times, this is a static
+		// method that requires locking.
+		CSingleLock lg(&m_mutex, TRUE);
+
+		if (ms_strLegacyFKBVersion == "_uninitialized_")
+		{
+			// get the component data folder
+			string strComponentDataFolder;
+			bool bOverriden;
+			getRootComponentDataFolder(strComponentDataFolder, bOverriden);
+			string strFKBVersionFile = strComponentDataFolder + string("\\FKBVersion.txt");
+
+			// open the FKB version file
+			ifstream infile(strFKBVersionFile.c_str());
+			if (infile.good())
+			{
+				// read the version line
+				string strVersionLine;
+				getline(infile, strVersionLine);
+
+				// ensure that the version information is in the expected format
+				if (strVersionLine.find("FKB Ver.") == 0)
+				{
+					ms_strLegacyFKBVersion = strVersionLine.substr(9);
+				}
+				else
+				{
+					// version file was found, but content is not as excepted
+					UCLIDException ue("ELI32472", "Unexpected FKB version information in FKB version file!");
+					ue.addDebugInfo("VersionLine", strVersionLine);
+					ue.log();
+
+					ms_strLegacyFKBVersion = "[Unexpected FKB version]";
+				}
+			}
+			else
+			{
+				ms_strLegacyFKBVersion = "";
+			}
+		}
+	}
+
+	return ms_strLegacyFKBVersion;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -481,51 +540,98 @@ IOCRUtilsPtr CAttributeFinderEngine::getOCRUtils()
 	return m_ipOCRUtils;
 }
 //-------------------------------------------------------------------------------------------------
-void CAttributeFinderEngine::getComponentDataFolder(string& rFolder)
+void CAttributeFinderEngine::getRootComponentDataFolder(string& rstrFolder, bool& rbOverridden)
 {
-	// no matter whether we are in debug or release mode, if 
-	// the component data folder has been defined in the registry
-	// we should use that folder
-	// Check for key existence
-	if (!mu_pUserCfgMgr->keyExists( gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY ))
+	// Lock to protect access to a static registry manager instance for this method.
+	CSingleLock lg(&m_mutex, TRUE);
+
+	// No matter whether we are in debug or release mode, if the component data folder has been
+	// defined in the registry we should use that folder
+	if (!mu_spUserCfgMgr->keyExists( gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY ))
 	{
 		// Default value for this key is an empty string
-		mu_pUserCfgMgr->createKey( gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY, 
-			"");
+		mu_spUserCfgMgr->createKey( gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY, "");
 	};
 
-	// get the key value
-	rFolder = mu_pUserCfgMgr->getKeyValue( 
-		gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY );
+	// Get the key value
+	rstrFolder = mu_spUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY);
 	
-	// if the kay value is not empty, then it shall be assumed
-	// that that's the component data folder that we should use
-	if (!rFolder.empty())
+	// If the key value is not empty, then it shall be assumed it's the component data folder that
+	// we should use.
+	if (rstrFolder.empty())
+	{
+		rbOverridden = false;
+	}
+	else
+	{
+		rbOverridden = true;
+		return;
+	}
+
+	// The registry key was not defined - so, use the default definition of the component data folder.
+	const string COMPONENT_DATA = "ComponentData";
+
+	string strThisModulePath = ::getModuleDirectory(_Module.m_hInst);
+
+	// Go up one level 
+	int nLastSlash = strThisModulePath.find_last_of("\\");
+	rstrFolder = strThisModulePath.substr(0, nLastSlash+1);
+	
+	// Append the FlexIndexComponents and ComponentData folder names (FlexIDSCore #3198)
+	rstrFolder += "FlexIndexComponents\\" + COMPONENT_DATA;
+
+	if (!isValidFolder(rstrFolder))
+	{
+		UCLIDException ue("ELI32473", "ComponentData folder doesn't exist.");
+		ue.addDebugInfo("ComponentData Folder", rstrFolder);
+		ue.addWin32ErrorInfo();
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
+{
+	bool bOverriden = false;
+	getRootComponentDataFolder(rstrFolder, bOverriden);
+
+	// It the path has been overridden, don't take the FKB version into account; just return.
+	if (bOverriden)
 	{
 		return;
 	}
 
-	// the registry key was not defined - so, use the default
-	// definition of the component data folder depending upon
-	// whether we are in debug mode or release mode
-	const string COMPONENT_DATA = "ComponentData";
-
-	// else look for this component's location on the machine
-	// It is always under FlexIndexComponents\Bin
-	string strThisModulePath = ::getModuleDirectory(_Module.m_hInst);
-	// go up one level 
-	int nLastSlash = strThisModulePath.find_last_of("\\");
-	rFolder = strThisModulePath.substr(0, nLastSlash+1);
-	
-	// append the ComponentData folder name
-	// This module changed location and is now in the CommonComponents folder per FlexIDSCore #3198
-	// so the folder FlexIndexComponents needs to be added before the ComponentData
-	rFolder += "FlexIndexComponents\\" + COMPONENT_DATA;
-
-	if (!isValidFolder(rFolder))
+	// Use the RuleExecutionEnv to find any FKB version that should be used to resolve the path.
+	if (m_ipRuleExecutionEnv == __nullptr)
 	{
-		UCLIDException ue("ELI07102", "ComponentData folder doesn't exist.");
-		ue.addDebugInfo("ComponentData Folder", rFolder);
+		m_ipRuleExecutionEnv.CreateInstance(CLSID_RuleExecutionEnv);
+		ASSERT_RESOURCE_ALLOCATION("ELI32474", m_ipRuleExecutionEnv != __nullptr);
+	}
+
+	string strFKBVersion = asString(m_ipRuleExecutionEnv->FKBVersion);
+	string strLegacyFKBVersion = getLegacyFKBVersion();
+
+	// If no FKB version has been assigned for this thread, but a legacy FKB version has been
+	// installed to the root of the component data folder, assume that FKB version is to be used for
+	// backward compatibility.
+	if (strFKBVersion.empty())
+	{
+		if (!strLegacyFKBVersion.empty() && isValidFolder(rstrFolder))
+		{
+			m_ipRuleExecutionEnv->FKBVersion = strLegacyFKBVersion.c_str();
+		}
+	}
+	// Otherwise, use the version number to build the version specific component data path (as long
+	// its not a legacy FKB version).
+	else if (strFKBVersion != getLegacyFKBVersion())
+	{
+		rstrFolder += "\\" + strFKBVersion;
+	}
+	
+	if (!isValidFolder(rstrFolder))
+	{
+		UCLIDException ue("ELI32475", "Version specific componentData folder doesn't exist.");
+		ue.addDebugInfo("ComponentData Folder", rstrFolder);
+		ue.addDebugInfo("FKB Version", strFKBVersion);
 		ue.addWin32ErrorInfo();
 		throw ue;
 	}

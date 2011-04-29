@@ -31,10 +31,14 @@ public:
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IRuleExecutionSession
-	STDMETHOD(SetRSDFileName)(/*[in]*/ BSTR strFileName,
+	STDMETHOD(SetRSDFileName)(/*[in]*/ BSTR bstrFileName,
 		/*[out, retval]*/ long *pnStackSize);
+
+	STDMETHOD (SetFKBVersion)(/*[in]*/ BSTR bstrFKBVersion);
 
 private:
 	// pointer to the singleton rule execution environment object
-	UCLID_AFCORELib::IRuleExecutionEnvPtr m_spRuleExecutionEnv;
+	UCLID_AFCORELib::IRuleExecutionEnvPtr m_ipRuleExecutionEnv;
+
+	UCLID_AFCORELib::IRuleExecutionEnvPtr getRuleExecutionEnv();
 };

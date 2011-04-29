@@ -165,7 +165,8 @@
 #define IDC_CHECK_OUTPUT_HANDLER        326
 #define IDC_CHECK_AFRULE_DOC_PP         327
 #define IDC_CHECK_SWIPING_RULE          328
-#define IDC_CHECK_PERFORM_OCR			329
+#define IDC_CHECK_PERFORM_OCR           329
+#define IDC_FKB_VERSION                 330
 #define ID_FILE_SAVEAS                  32768
 #define ID_FILE_EXIT                    32769
 #define ID_TOOLS_TEST                   32770
@@ -211,7 +212,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        309
 #define _APS_NEXT_COMMAND_VALUE         32800
-#define _APS_NEXT_CONTROL_VALUE         330
+#define _APS_NEXT_CONTROL_VALUE         331
 #define _APS_NEXT_SYMED_VALUE           134
 #endif
 #endif

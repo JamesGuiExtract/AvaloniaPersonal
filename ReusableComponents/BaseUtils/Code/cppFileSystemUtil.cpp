@@ -1126,6 +1126,47 @@ void getFilesInDir(vector<string>& rvecFiles,
 	}
 }
 //--------------------------------------------------------------------------------------------------
+vector<string> getSubDirectories(string strDirectory, bool bRecursive)
+{
+	unsigned int uiPos = strDirectory.find_last_not_of(" \t");
+	if (uiPos != string::npos)
+	{
+		if (strDirectory[uiPos] != '\\')
+		{
+			strDirectory += "\\";
+		}
+	}
+	else
+	{
+		UCLIDException ue("ELI32486", "Invalid Directory.");
+		ue.addDebugInfo("Path", strDirectory);
+		throw ue;
+	}
+
+	// Put all found directories into a vector.
+	vector<string> vecDirectories;
+	FileIterator iter(strDirectory + "*");
+	while (iter.moveNext())
+	{
+		// Check that the result is a non-system directory and not "." or ".."
+		string strFileName = iter.getFileName();
+		if (strFileName != "." && strFileName != ".." && iter.isDirectory() && !iter.isSystemFile())
+		{
+			// Return the full path.
+			string strFullPath = strDirectory + strFileName;
+			vecDirectories.push_back(strFullPath);
+
+			// Recurs if specified.
+			if (bRecursive)
+			{
+				addVectors(vecDirectories, getSubDirectories(strFullPath, bRecursive));
+			}
+		}
+	}
+
+	return vecDirectories;
+}
+//--------------------------------------------------------------------------------------------------
 string getUNCPath(const string& strLocalPath)
 {
 	// if strLocalPath is already a valid UNC path, simply return it

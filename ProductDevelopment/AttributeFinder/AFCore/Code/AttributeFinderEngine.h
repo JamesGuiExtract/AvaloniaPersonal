@@ -54,6 +54,16 @@ public:
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
+
+	// If there is a "legacy" FKB installation (installed to root of ComponentData rather than under
+	// a version-specific folder), returns the version via the FKBVersion text file or empty if
+	// there is no legacy FKB installation.
+	static string getLegacyFKBVersion();
+
+	// Calculates the root (not FKB version specific) component data folder. rbOverridden indicates
+	// if the path has been overridden via registry key.
+	static void getRootComponentDataFolder(string& rstrFolder, bool& rbOverridden);
+
 private:
 	//////////////
 	// Variables
@@ -69,6 +79,17 @@ private:
 	// Handles registry settings
 	unique_ptr<IConfigurationSettingsPersistenceMgr> mu_pUserCfgMgr;
 
+	// Used to get the FKBVersion for getComponentDataFolder
+	UCLID_AFCORELib::IRuleExecutionEnvPtr m_ipRuleExecutionEnv;
+
+	// Handles registry calls for the static getRootComponentDataFolder method.
+	static unique_ptr<IConfigurationSettingsPersistenceMgr> mu_spUserCfgMgr;
+
+	// Persists any value calculated by getLegacyFKBVersion()
+	static string ms_strLegacyFKBVersion;
+
+	static CMutex m_mutex;
+
 	//////////////
 	// Methods
 	//////////////
@@ -81,6 +102,7 @@ private:
 	//----------------------------------------------------------------------------------------------
 	IOCRUtilsPtr getOCRUtils();
 	//----------------------------------------------------------------------------------------------
+	// Gets the FKB version specific (or registry overridden) component data folder
 	void getComponentDataFolder(string& rFolder);
 	//----------------------------------------------------------------------------------------------
 	UCLID_AFCORELib::IFeedbackMgrPtr getFeedbackManager();

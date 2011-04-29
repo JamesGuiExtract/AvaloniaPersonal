@@ -11,6 +11,7 @@
 
 // allocate static variables
 map<DWORD, stack<string> > CRuleExecutionEnv::m_mapThreadIDToRSDFileStack;
+map<DWORD, string> CRuleExecutionEnv::m_mapThreadIDToFKBVersion;
 CMutex CRuleExecutionEnv::m_mutex;
 
 //-------------------------------------------------------------------------------------------------
@@ -169,6 +170,51 @@ STDMETHODIMP CRuleExecutionEnv::IsRSDFileExecuting(BSTR bstrFileName,
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionEnv::get_FKBVersion(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI32476", pVal != __nullptr);
+
+		*pVal = _bstr_t(getFKBVersionString().c_str()).Detach();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32477")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleExecutionEnv::put_FKBVersion(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		string newFKBVersion = asString(newVal);
+		string& rstrFKBVerson = getFKBVersionString();
+
+		// If this it the top-level rule, apply the FKB version (no questions asked)
+		if (getCurrentStack().size() == 1)
+		{
+			rstrFKBVerson = newFKBVersion;
+		}
+		// If this is a nested ruleset, ensure it is not a different FKB version than that which
+		// has already been specified.
+		else if (!rstrFKBVerson.empty() &&
+				 _strcmpi(newFKBVersion.c_str(), rstrFKBVerson.c_str()) != 0)
+		{
+			UCLIDException ue("ELI32478", "Conflicting FKB version numbers!");
+			ue.addDebugInfo("Original version", rstrFKBVerson);
+			ue.addDebugInfo("Conflicting version", newFKBVersion);
+			throw ue;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32479")
+}
+//-------------------------------------------------------------------------------------------------
 stack<string>& CRuleExecutionEnv::getCurrentStack(bool bThrowExceptionIfStackEmpty)
 {
 	// protect the stack against simultaneous access
@@ -189,5 +235,16 @@ stack<string>& CRuleExecutionEnv::getCurrentStack(bool bThrowExceptionIfStackEmp
 
 	// return the stack
 	return rThisThreadStack;
+}
+//-------------------------------------------------------------------------------------------------
+string& CRuleExecutionEnv::getFKBVersionString()
+{
+	CSingleLock lg( &m_mutex, TRUE );
+
+	// Get the FKB version string for the current thread.
+	DWORD dwThreadID = GetCurrentThreadId();
+	string& rFKBVersion = m_mapThreadIDToFKBVersion[dwThreadID];
+
+	return rFKBVersion;
 }
 //-------------------------------------------------------------------------------------------------

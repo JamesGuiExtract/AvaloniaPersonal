@@ -26,8 +26,7 @@ class CAFAboutDlg : public CDialog
 {
 // Construction
 public:
-	CAFAboutDlg(EHelpAboutType eHelpAboutType, std::string strProduct, 
-		UCLID_AFCORELib::IAttributeFinderEnginePtr ipEngine);
+	CAFAboutDlg(EHelpAboutType eHelpAboutType, std::string strProduct);
 
 // Dialog Data
 	//{{AFX_DATA(CAFAboutDlg)
@@ -59,8 +58,6 @@ protected:
 private:
 	// get the FKB version by looking at the version information file in the ComponentData folder
 	std::string getFKBVersion();
-
-	UCLID_AFCORELib::IAttributeFinderEnginePtr m_ipEngine;
 
 	std::string	m_strProduct;
 	EHelpAboutType m_eType;

@@ -719,7 +719,7 @@ void RuleTesterDlg::OnButtonAbout()
 	try
 	{
 		// Display the About box with version information
-		CAFAboutDlg dlgAbout( kRuleTesterHelpAbout, "", getAFEngine() );
+		CAFAboutDlg dlgAbout( kRuleTesterHelpAbout, "" );
 		dlgAbout.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14545")

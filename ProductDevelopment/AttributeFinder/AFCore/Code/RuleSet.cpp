@@ -4,6 +4,7 @@
 #include "RuleSet.h"
 #include "EditorLicenseID.h"
 #include "Common.h"
+#include "AttributeFinderEngine.h"
 
 #include <UCLIDException.h>
 #include <COMUtils.h>
@@ -16,7 +17,16 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 8;
+const unsigned long gnCurrentVersion = 9;
+// Version 3:
+//   Added Output Handler persistence
+// Version 7:
+//	 Added ability to decrement the redaction counter per document. Modified existing decrement 
+//   method to be called pages to distinguish between the two.
+// Version 8:
+//   Added swiping rule flag
+// Vertion 9:
+//	 Added FKB version
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
@@ -45,6 +55,7 @@ m_bUseDocsRedactionCounter(false),
 m_bRuleSetOnlyForInternalUse(false),
 m_bSwipingRule(false),
 m_strKeySerialNumbers(""),
+m_strFKBVersion(""),
 m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current version number
 {
 	try
@@ -169,10 +180,10 @@ STDMETHODIMP CRuleSet::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlag
 
 		// Wait for the file to be accessible
 		waitForFileAccess(m_strFileName, giMODE_READ_ONLY);
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04155");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty)
@@ -200,10 +211,10 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty)
 
 		// Wait until the file is readable
 		waitForStgFileAccess(strFullFileName);
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04156");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc, 
@@ -297,6 +308,20 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				{
 					UCLIDException ue("ELI11546", "This ruleset cannot be used directly by an application.");
 					throw ue;
+				}
+
+				// If an FKB version is specified, apply it.
+				if (!m_strFKBVersion.empty())
+				{
+					ipSession->SetFKBVersion(m_strFKBVersion.c_str());
+				}
+				// If an FKB version is not specified, but this is a top level rule, clear any
+				// previously assigned FKB version on this thread. If there is a legacy FKB version
+				// installed and the component data directory is needed by the rule the legacy
+				// version will be implicitly assigned at that time.
+				else if (nStackSize == 1)
+				{
+					ipSession->SetFKBVersion("");
 				}
 
 				// Create an AFDocument and pass it along to the attribute rule info
@@ -456,10 +481,10 @@ STDMETHODIMP CRuleSet::get_AttributeNameToInfoMap(IStrToObjectMap **pVal)
 
 		IStrToObjectMapPtr ipShallowCopy = m_ipAttributeNameToInfoMap;
 		*pVal = ipShallowCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04377")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_AttributeNameToInfoMap(IStrToObjectMap *newVal)
@@ -479,10 +504,10 @@ STDMETHODIMP CRuleSet::put_AttributeNameToInfoMap(IStrToObjectMap *newVal)
 		m_ipAttributeNameToInfoMap = newVal;
 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04378")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_GlobalDocPreprocessor(IObjectWithDescription **pVal)
@@ -509,10 +534,10 @@ STDMETHODIMP CRuleSet::get_GlobalDocPreprocessor(IObjectWithDescription **pVal)
 
 		IObjectWithDescriptionPtr ipShallowCopy = m_ipDocPreprocessor;
 		*pVal = ipShallowCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07388")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_GlobalDocPreprocessor(IObjectWithDescription *newVal)
@@ -525,10 +550,10 @@ STDMETHODIMP CRuleSet::put_GlobalDocPreprocessor(IObjectWithDescription *newVal)
 
 		m_ipDocPreprocessor = newVal;
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07389")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_GlobalOutputHandler(IObjectWithDescription **pVal)
@@ -555,10 +580,10 @@ STDMETHODIMP CRuleSet::get_GlobalOutputHandler(IObjectWithDescription **pVal)
 
 		IObjectWithDescriptionPtr ipShallowCopy = m_ipOutputHandler;
 		*pVal = ipShallowCopy.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07725")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_GlobalOutputHandler(IObjectWithDescription *newVal)
@@ -572,10 +597,10 @@ STDMETHODIMP CRuleSet::put_GlobalOutputHandler(IObjectWithDescription *newVal)
 
 		m_ipOutputHandler = newVal;
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07726")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_FileName(BSTR *pVal)
@@ -587,10 +612,10 @@ STDMETHODIMP CRuleSet::get_FileName(BSTR *pVal)
 		validateLicense();
 
 		*pVal = get_bstr_t(m_strFileName.c_str()).copy();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07477")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_FileName(BSTR newVal)
@@ -606,10 +631,10 @@ STDMETHODIMP CRuleSet::put_FileName(BSTR newVal)
 		// NOTE: we don't need to set the dirty flag because the filename
 		// property is a "dynamic" and "non-persitent" property, and therefore
 		// doesn't affect the dirty flag of this object
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07478")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_IsEncrypted(VARIANT_BOOL *pVal)
@@ -621,10 +646,10 @@ STDMETHODIMP CRuleSet::get_IsEncrypted(VARIANT_BOOL *pVal)
 		validateLicense();
 
 		*pVal = asVariantBool(m_bIsEncrypted);
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15159")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_UseIndexingCounter(VARIANT_BOOL *pVal)
@@ -636,10 +661,10 @@ STDMETHODIMP CRuleSet::get_UseIndexingCounter(VARIANT_BOOL *pVal)
 		validateLicense();
 
 		*pVal = m_bUseIndexingCounter ? VARIANT_TRUE : VARIANT_FALSE;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11354")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_UseIndexingCounter(VARIANT_BOOL newVal)
@@ -654,10 +679,10 @@ STDMETHODIMP CRuleSet::put_UseIndexingCounter(VARIANT_BOOL newVal)
 
 		m_bUseIndexingCounter = newVal == VARIANT_TRUE;
 		m_bDirty = true;
+		
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11355")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_UsePagesRedactionCounter(VARIANT_BOOL *pVal)
@@ -669,10 +694,10 @@ STDMETHODIMP CRuleSet::get_UsePagesRedactionCounter(VARIANT_BOOL *pVal)
 		validateLicense();
 
 		*pVal = m_bUsePagesRedactionCounter ? VARIANT_TRUE : VARIANT_FALSE;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11356")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_UsePagesRedactionCounter(VARIANT_BOOL newVal)
@@ -687,10 +712,10 @@ STDMETHODIMP CRuleSet::put_UsePagesRedactionCounter(VARIANT_BOOL newVal)
 
 		m_bUsePagesRedactionCounter = newVal == VARIANT_TRUE; 
 		m_bDirty = true;
+		
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11357")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_UseDocsRedactionCounter(VARIANT_BOOL *pVal)
@@ -702,10 +727,10 @@ STDMETHODIMP CRuleSet::get_UseDocsRedactionCounter(VARIANT_BOOL *pVal)
 		validateLicense();
 
 		*pVal = m_bUseDocsRedactionCounter ? VARIANT_TRUE : VARIANT_FALSE;
+		
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14494")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_UseDocsRedactionCounter(VARIANT_BOOL newVal)
@@ -720,10 +745,10 @@ STDMETHODIMP CRuleSet::put_UseDocsRedactionCounter(VARIANT_BOOL newVal)
 
 		m_bUseDocsRedactionCounter = newVal == VARIANT_TRUE; 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14495")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_UsePaginationCounter(VARIANT_BOOL *pVal)
@@ -735,10 +760,10 @@ STDMETHODIMP CRuleSet::get_UsePaginationCounter(VARIANT_BOOL *pVal)
 		validateLicense();
 
 		*pVal = m_bUsePaginationCounter ? VARIANT_TRUE : VARIANT_FALSE;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11358")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_UsePaginationCounter(VARIANT_BOOL newVal)
@@ -753,10 +778,10 @@ STDMETHODIMP CRuleSet::put_UsePaginationCounter(VARIANT_BOOL newVal)
 
 		m_bUsePaginationCounter = newVal == VARIANT_TRUE; 
 		m_bDirty = true;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11359")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_ForInternalUseOnly(VARIANT_BOOL *pVal)
@@ -768,10 +793,10 @@ STDMETHODIMP CRuleSet::get_ForInternalUseOnly(VARIANT_BOOL *pVal)
 		validateLicense();
 
 		*pVal = m_bRuleSetOnlyForInternalUse ? VARIANT_TRUE : VARIANT_FALSE;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11547")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_ForInternalUseOnly(VARIANT_BOOL newVal)
@@ -799,10 +824,10 @@ STDMETHODIMP CRuleSet::put_ForInternalUseOnly(VARIANT_BOOL newVal)
 			m_bRuleSetOnlyForInternalUse = bNewValue;
 			m_bDirty = true;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11548")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_KeySerialList(BSTR *pVal)
@@ -814,10 +839,10 @@ STDMETHODIMP CRuleSet::get_KeySerialList(BSTR *pVal)
 		validateLicense();
 
 		*pVal = _bstr_t(m_strKeySerialNumbers.c_str()).copy();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11631")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::put_KeySerialList(BSTR newVal)
@@ -831,10 +856,10 @@ STDMETHODIMP CRuleSet::put_KeySerialList(BSTR newVal)
 		void validateUILicense();
 
 		m_strKeySerialNumbers = asString(newVal);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11632")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_VersionNumber(long *nVersion)
@@ -846,10 +871,10 @@ STDMETHODIMP CRuleSet::get_VersionNumber(long *nVersion)
 		validateLicense();
 
 		*nVersion = m_nVersionNumber;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11651")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::get_IsSwipingRule(VARIANT_BOOL *pVal)
@@ -910,6 +935,36 @@ STDMETHODIMP CRuleSet::get_CanSave(VARIANT_BOOL *pVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27019")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_FKBVersion(BSTR *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI32471", pVal != __nullptr);
+
+		validateLicense();
+
+		*pVal = _bstr_t(m_strFKBVersion.c_str()).Detach();
+	
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32482")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_FKBVersion(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_strFKBVersion = asString(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32483")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -985,17 +1040,8 @@ STDMETHODIMP CRuleSet::IsDirty(void)
 		return hr;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04768");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// Version 3:
-//   Added Output Handler persistence
-// Version 7:
-//	 Added ability to decrement the redaction counter per document. Modified existing decrement 
-//   method to be called pages to distinguish between the two.
-// Version 8:
-//   Added swiping rule flag
 STDMETHODIMP CRuleSet::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -1020,6 +1066,8 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 
 		// By default rulesets are not swiping rules
 		m_bSwipingRule = false;
+
+		m_strFKBVersion = "";
 
 		// whether or not this is a version 2 and beyond
 		bool bVersion2AndBeyond = false;
@@ -1102,6 +1150,11 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 				// Read USB serial numbers
 				dataReader >> m_strKeySerialNumbers;
 			}
+
+			if (m_nVersionNumber >= 9)
+			{
+				dataReader >> m_strFKBVersion;
+			}
 		}
 
 		// load the string-to-object map (attribute name to attribute find info map)
@@ -1144,10 +1197,10 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 		// if we just finished loading this object from a stream,
 		// reset the filename field to ""
 		m_strFileName = "";
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04770");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
@@ -1169,6 +1222,12 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		if (!isLicensedToSave())
 		{
 			throw UCLIDException("ELI21505", "A USB counter must be selected.");
+		}
+
+		if (m_strFKBVersion.empty() && (isUsingCounter() || m_bSwipingRule))
+		{
+			throw UCLIDException("ELI32484", "An FKB version must be specified for a swiping rule or a "
+				"ruleset that decrements counters.");
 		}
 
 		// write signature to stream
@@ -1195,6 +1254,8 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bSwipingRule;
 
 		dataWriter << m_strKeySerialNumbers;
+
+		dataWriter << m_strFKBVersion;
 
 		// flush bytes
 		dataWriter.flushToByteStream();
@@ -1235,10 +1296,10 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			m_bDirty = false;
 		}
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04769");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::GetSizeMax(ULARGE_INTEGER *pcbSize)
@@ -1274,10 +1335,10 @@ STDMETHODIMP CRuleSet::ShowUIForEditing(BSTR strFileName, BSTR strBinFolder)
 
 		// Show the Rule Set Editor dialog
 		m_apDlg->DoModal();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04159");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1359,12 +1420,14 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		m_strKeySerialNumbers = asString(ipSource->KeySerialList);
 		m_vecSerialNumbers.clear();
 
+		m_strFKBVersion = asString(ipSource->FKBVersion);
+
 		// copy the version number
 		m_nVersionNumber = ipSource->VersionNumber;
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08228");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CRuleSet::raw_Clone(IUnknown * * pObject)
@@ -1386,10 +1449,10 @@ STDMETHODIMP CRuleSet::raw_Clone(IUnknown * * pObject)
 
 		// Return the new object to the caller
 		*pObject = ipObjCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05023");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------

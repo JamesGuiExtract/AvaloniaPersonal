@@ -43,17 +43,15 @@ CMutex CAFUtility::ms_Mutex;
 // CAFUtility
 //-------------------------------------------------------------------------------------------------
 CAFUtility::CAFUtility()
+: ma_pUserCfgMgr(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_REG_ROOT_FOLDER_PATH))
+, m_ipMiscUtils(CLSID_MiscUtils)
+, m_ipEngine(CLSID_AttributeFinderEngine)
 {
 	try
 	{
-		// create instance of the persistence mgr
-		ma_pUserCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
-			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrAF_REG_ROOT_FOLDER_PATH ));
 		ASSERT_RESOURCE_ALLOCATION( "ELI19181", ma_pUserCfgMgr.get() != __nullptr );
-
-		// create instance of the misc utils object
-		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI07623", m_ipMiscUtils != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI32488", m_ipEngine != __nullptr);
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI07338")
 }
@@ -63,6 +61,7 @@ CAFUtility::~CAFUtility()
 	try
 	{
 		m_ipMiscUtils = __nullptr;
+		m_ipEngine = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20389")
 }
@@ -1214,20 +1213,7 @@ void CAFUtility::validateLicense()
 //-------------------------------------------------------------------------------------------------
 void CAFUtility::getComponentDataFolder(string& rFolder)
 {
-	// this method gets called quite often - so cache the results
-	// NOTE: This means that the component data folder cannot be effectively changed while
-	// FlexIndex components are running
-	static string ls_strComponentDataFolder;
-	if (ls_strComponentDataFolder.empty())
-	{
-		// create an instance of the attribute finder engine
-		IAttributeFinderEnginePtr ipEngine(CLSID_AttributeFinderEngine);
-		ASSERT_RESOURCE_ALLOCATION("ELI13444", ipEngine != __nullptr);
-	
-		ls_strComponentDataFolder = ipEngine->GetComponentDataFolder();
-	}
-
-	rFolder = ls_strComponentDataFolder;
+	rFolder = m_ipEngine->GetComponentDataFolder();
 }
 //-------------------------------------------------------------------------------------------------
 unsigned int CAFUtility::getAttributeLevel(const string& strName)

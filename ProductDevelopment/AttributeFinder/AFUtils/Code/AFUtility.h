@@ -274,6 +274,7 @@ private:
 
 	// cache of tag name/value read from the INI file and mutex for reading/writing it
 	static map<string, string> ms_mapINIFileTagNameToValue;
+
 	static CMutex ms_Mutex;
 
 	// Handles registry settings
@@ -281,4 +282,7 @@ private:
 
 	// pointer to the utility object that deals with encryption
 	IMiscUtilsPtr m_ipMiscUtils;
+
+	// Engine instance used to retrieve component data folder.
+	IAttributeFinderEnginePtr m_ipEngine;
 };

@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "AFCore.h"
 #include "AFAboutDlg.h"
+#include "AttributeFinderEngine.h"
 
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
@@ -83,10 +84,8 @@ std::string getAttributeFinderEngineVersion(EHelpAboutType eType)
 //-------------------------------------------------------------------------------------------------
 // CAFAboutDlg dialog
 //-------------------------------------------------------------------------------------------------
-CAFAboutDlg::CAFAboutDlg(EHelpAboutType eHelpAboutType, std::string strProduct, 
-						 UCLID_AFCORELib::IAttributeFinderEnginePtr ipEngine)
+CAFAboutDlg::CAFAboutDlg(EHelpAboutType eHelpAboutType, std::string strProduct)
 	: CDialog(CAFAboutDlg::IDD),
-	  m_ipEngine(ipEngine),
 	  m_strProduct(strProduct),
 	  m_eType(eHelpAboutType)
 {
@@ -181,42 +180,72 @@ BOOL CAFAboutDlg::OnInitDialog()
 //-------------------------------------------------------------------------------------------------
 string CAFAboutDlg::getFKBVersion()
 {
-	string strResult = "FKB Version: ";
+	vector<string> vecVersions;
 
-	// get the component data folder
-	string strComponentDataFolder = m_ipEngine->GetComponentDataFolder();
+	// Get the non FKB version specific component data folder
+	string strComponentDataFolder;
+	bool bOverridden;
+	CAttributeFinderEngine::getRootComponentDataFolder(strComponentDataFolder, bOverridden);
+	
+	// First, attempt to retrieve the FKB version of any installation at the root of the directory.	
 	string strFKBVersionFile = strComponentDataFolder + string("\\FKBVersion.txt");
 
-	// open the FKB version file
 	ifstream infile(strFKBVersionFile.c_str());
 	if (infile.good())
 	{
-		// read the version line
+		// Read the version line
 		string strVersionLine;
 		getline(infile, strVersionLine);
 
-		// ensure that the version information is in the expected format
+		// Ensure that the version information is in the expected format
 		if (strVersionLine.find("FKB Ver.") == 0)
 		{
-			return strVersionLine;
+			vecVersions.push_back(strVersionLine.substr(9));
 		}
 		else
 		{
-			// version file was found, but content is not as excepted
+			// Version file was found, but content is not as excepted
 			UCLIDException ue("ELI13443", "Unexpected FKB version information in FKB version file!");
 			ue.addDebugInfo("VersionLine", strVersionLine);
 			ue.log();
 
-			return string("ERROR: Unexpected FKB version!");
+			vecVersions.push_back("[Unexpected FKB version]");
 		}
 	}
-	else
+
+	if (!bOverridden)
 	{
-		// version file not found.  Log exception, and return appropriate message
+		// Now iterate the subdirectories and assume any sub-directory that does not contain an alpha
+		// character in the name is another FKB installation where the folder name is the version number.
+		vector<string> vecSubFolders = getSubDirectories(strComponentDataFolder, false);
+		for (vector<string>::iterator iter = vecSubFolders.begin(); iter != vecSubFolders.end(); iter++)
+		{
+			string strFolderName = getFileNameFromFullPath(*iter);
+			bool containsAlphaChars = false;
+
+			if (strFolderName.find_first_of(gstrALPHA) == string::npos)
+			{
+				vecVersions.push_back(strFolderName);
+			}
+		}
+	}
+
+	if (vecVersions.size() == 0)
+	{
 		UCLIDException ue("ELI13442", "Unable to detect FKB version!");
 		ue.log();
 
-		return string("ERROR: Unknown FKB version!");
+		return "ERROR: Unknown FKB version!";
 	}
+	
+	string strResult = (vecVersions.size() == 1) ? "FKB Version: " : "FKB Versions: ";
+	if (bOverridden)
+	{
+		// Indicate the component directory location has been overridden via registry key.
+		strResult += "(overridden location) ";
+	}
+	strResult += asString(vecVersions, true, ",").substr(1);
+
+	return strResult;
 }
 //-------------------------------------------------------------------------------------------------

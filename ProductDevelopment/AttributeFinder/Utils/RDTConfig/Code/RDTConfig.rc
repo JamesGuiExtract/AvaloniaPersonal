@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -97,16 +95,16 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,113,228,12
     CONTROL         "Display X, Y percentages in Image Viewer",IDC_CHECK_SRW_PERCENT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,127,188,12
-	CONTROL			"Automatically open image in VOA File Viewer", IDC_CHECK_AUTOOPENIMAGE,
-					"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,141,188,12
-	CONTROL			"Automatically expand attributes in Rule Tester", IDC_CHECK_AUTOEXPAND,
-					"Button", BS_AUTOCHECKBOX | WS_TABSTOP,7,155,188,12
+    CONTROL         "Automatically open image in VOA File Viewer",IDC_CHECK_AUTOOPENIMAGE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,141,188,12
+    CONTROL         "Automatically expand attributes in Rule Tester",IDC_CHECK_AUTOEXPAND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,155,188,12
     LTEXT           "Optional prefix for .dcc and .dat files",IDC_STATIC,7,173,145,10
     COMBOBOX        IDC_COMBO_PREFIX,7,186,184,60,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Root folder for automated testing files",IDC_STATIC,7,206,145,10
     COMBOBOX        IDC_COMBO_ROOT,7,219,184,60,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Browse...",IDC_BROWSE_ROOT,198,219,50,14
-    LTEXT           "Full path to component data folder",IDC_STATIC,7,239,145,10
+    LTEXT           "Full path to component data (override of normal location)",IDC_STATIC,7,239,181,10
     COMBOBOX        IDC_COMBO_COMPONENT,7,252,184,60,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Browse...",IDC_BROWSE_COMPONENT,198,252,50,14
     EDITTEXT        IDC_EDIT_DIFF_COMMAND_LINE,6,281,240,12,ES_AUTOHSCROLL
@@ -159,7 +157,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_RDTCONFIG_DIALOG, DIALOG
     BEGIN
@@ -171,7 +169,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

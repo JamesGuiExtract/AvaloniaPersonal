@@ -81,6 +81,8 @@ public:
 	STDMETHOD(get_IsSwipingRule)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_IsSwipingRule)(VARIANT_BOOL newVal);
 	STDMETHOD(get_CanSave)(VARIANT_BOOL *pVal);
+	STDMETHOD(get_FKBVersion)(BSTR *pVal);
+	STDMETHOD(put_FKBVersion)(BSTR newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -153,6 +155,9 @@ private:
 
 	// Indicates whether this rule is a swiping rule
 	bool m_bSwipingRule;
+
+	// The FKB version to use for this ruleset.
+	string m_strFKBVersion;
 
 	// version number of the ruleset
 	long m_nVersionNumber;

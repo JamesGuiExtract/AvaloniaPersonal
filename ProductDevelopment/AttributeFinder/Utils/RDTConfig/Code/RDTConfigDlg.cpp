@@ -138,22 +138,6 @@ BOOL CRDTConfigDlg::OnInitDialog()
 
 		// Read current settings from registry
 		getRegistrySettings();
-
-		// Constrain Root folder combo box to disallow manual editing
-		CEdit* pEdit = (CEdit*)(m_comboRoot.GetWindow( GW_CHILD ));
-		if (pEdit != __nullptr)
-		{
-			pEdit->EnableWindow( TRUE );
-			pEdit->SetReadOnly( TRUE );
-		}
-
-		// Constrain Data folder combo box to disallow manual editing
-		pEdit = (CEdit*)(m_comboData.GetWindow( GW_CHILD ));
-		if (pEdit != __nullptr)
-		{
-			pEdit->EnableWindow( TRUE );
-			pEdit->SetReadOnly( TRUE );
-		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15358")
 
@@ -342,15 +326,22 @@ void CRDTConfigDlg::addDefaultItems()
 		ASSERT_RESOURCE_ALLOCATION( "ELI07696", ipAFUtils != __nullptr );
 
 		// Get default Component Data folder from AFUtils
-		string	strDataFolder = ipAFUtils->GetComponentDataFolder();
-		m_comboData.AddString( strDataFolder.c_str() );
-		m_comboData.SetCurSel( 0 );
+		try
+		{
+			string	strDataFolder = ipAFUtils->GetComponentDataFolder();
+			m_comboData.AddString( strDataFolder.c_str() );
+			m_comboData.SetCurSel( 0 );
+		}
+		// For the purposes of populating the combo, its okay if we couldn't find the component data
+		// folder
+		catch(...) {}  
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15359")
 
 	// Add default string to each combo box
 	m_comboPrefix.AddString( gstrEMPTY_DEFAULT.c_str() );
 	m_comboRoot.AddString( gstrEMPTY_DEFAULT.c_str() );
+	m_comboData.AddString( gstrEMPTY_DEFAULT.c_str() );
 
 	// Default to selection of each default item
 	m_comboPrefix.SetCurSel( 0 );
@@ -753,39 +744,29 @@ void CRDTConfigDlg::saveRegistrySettings()
 	}
 
 	// Set Root folder item
-	iIndex = m_comboRoot.GetCurSel();
-	if (iIndex > -1)
+	m_comboRoot.GetWindowText(zText);
+	if (zText.Compare( gstrEMPTY_DEFAULT.c_str() ) == 0)
 	{
-		m_comboRoot.GetLBText( iIndex, zText );
+		setRootFolder( "" );
+	}
+	else
+	{
+		setRootFolder( zText.operator LPCTSTR() );
 
-		if (zText.Compare( gstrEMPTY_DEFAULT.c_str() ) == 0)
-		{
-			setRootFolder( "" );
-		}
-		else
-		{
-			setRootFolder( zText.operator LPCTSTR() );
-
-			addStringToMRUList( ma_pRecentRootFolders, zText.operator LPCTSTR() );
-		}
+		addStringToMRUList( ma_pRecentRootFolders, zText.operator LPCTSTR() );
 	}
 
 	// Save Data folder items
-	iIndex = m_comboData.GetCurSel();
-	if (iIndex > -1)
+	m_comboData.GetWindowText(zText);
+	if (zText.Compare( gstrEMPTY_DEFAULT.c_str() ) == 0)
 	{
-		m_comboData.GetLBText( iIndex, zText );
+		setDataFolder( "" );
+	}
+	else
+	{
+		setDataFolder( zText.operator LPCTSTR() );
 
-		if (zText.Compare( gstrEMPTY_DEFAULT.c_str() ) == 0)
-		{
-			setDataFolder( "" );
-		}
-		else
-		{
-			setDataFolder( zText.operator LPCTSTR() );
-
-			addStringToMRUList( ma_pRecentDataFolders, zText.operator LPCTSTR() );
-		}
+		addStringToMRUList( ma_pRecentDataFolders, zText.operator LPCTSTR() );
 	}
 
 	// Save the diff command line editbox to the registry

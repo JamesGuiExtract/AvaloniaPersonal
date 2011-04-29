@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include <stack>
+using namespace std;
 
 #include <afxmt.h>
 
@@ -45,6 +46,8 @@ public:
 	STDMETHOD(PopRSDFileName)(/*[out, retval]*/ long *pnStackSize);
 	STDMETHOD(IsRSDFileExecuting)(/*[in]*/ BSTR bstrFileName, 
 		/*[out, retval]*/ VARIANT_BOOL *pbValue);
+	STDMETHOD(get_FKBVersion)(BSTR *pVal);
+	STDMETHOD(put_FKBVersion)(BSTR newVal);
 
 private:
 	// member variable to keep track of which thread is
@@ -56,14 +59,20 @@ private:
 	// that multiple instances of this object are not created, 
 	// we can't be sure about when the COM framework will 
 	// delete the singleton object)
-	static std::map<DWORD, std::stack<std::string> > m_mapThreadIDToRSDFileStack;
+	static map<DWORD, stack<string> > m_mapThreadIDToRSDFileStack;
+
+	// The FKB version in use (per thread).
+	static map<DWORD, string> m_mapThreadIDToFKBVersion;
 
 	// method to get the RSD file stack associated with the current thread
 	// If no stack is associated with the current thread, an exception will
 	// be thrown
 	// if bThrowExceptionIfStackEmpty == true, and the stack associated with the
 	// current thread is empty, an exception will be thrown.
-	std::stack<std::string>& getCurrentStack(bool bThrowExceptionIfStackEmpty = false);
+	stack<string>& getCurrentStack(bool bThrowExceptionIfStackEmpty = false);
+
+	// Gets the FKB version to use for the current thread.
+	string& getFKBVersionString();
 
 	// This Mutex will guard against simultaneous accesses (read or write)
 	// to the stack (m_mapThreadIDToRSDFileStack)

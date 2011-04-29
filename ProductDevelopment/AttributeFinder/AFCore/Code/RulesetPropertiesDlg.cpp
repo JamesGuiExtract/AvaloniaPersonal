@@ -45,6 +45,7 @@ void CRuleSetPropertiesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_INTERNAL_USE_ONLY, m_checkboxForInternalUseOnly);
 	DDX_Control(pDX, IDC_SERIAL_NUMBERS, m_editKeySerialNumbers);
 	DDX_Control(pDX, IDC_CHECK_SWIPING_RULE, m_checkSwipingRule);
+	DDX_Control(pDX, IDC_FKB_VERSION, m_editFKBVersion);
 	DDX_Control(pDX, IDOK, m_buttonOk);
 	DDX_Control(pDX, IDCANCEL, m_buttonCancel);
 }
@@ -165,6 +166,9 @@ BOOL CRuleSetPropertiesDlg::OnInitDialog()
 		// Update the USB counter serial number edit box
 		m_editKeySerialNumbers.SetWindowText(m_ipRuleSet->KeySerialList);
 
+		// Update the FKB version.
+		m_editFKBVersion.SetWindowText(m_ipRuleSet->FKBVersion);
+
 		// Update the checkboxes
 		m_checkboxForInternalUseOnly.SetCheck( asBSTChecked(m_ipRuleSet->ForInternalUseOnly) );
 		m_checkSwipingRule.SetCheck( asBSTChecked(m_ipRuleSet->IsSwipingRule) );
@@ -185,28 +189,40 @@ void CRuleSetPropertiesDlg::OnOK()
 {
 	try
 	{
-		int iCheckBoxState;
+		CString zFKBVersion;
+		m_editFKBVersion.GetWindowText(zFKBVersion);
+		m_ipRuleSet->FKBVersion = _bstr_t(zFKBVersion);
 
-		// update the state of the Indexing and Pagination counters
-		if (m_iIndexingCounterItem != -1)
+		bool bChecked;
+
+		// Require the FKB verson to be set if 
+		if (asCppBool(zFKBVersion.IsEmpty()) &&
+				((isCounterAvailable(m_iIndexingCounterItem, bChecked) && bChecked) ||
+				 (isCounterAvailable(m_iPaginationCounterItem, bChecked) && bChecked) ||
+				 (isCounterAvailable(m_iRedactPagesCounterItem, bChecked) && bChecked) ||
+				 (isCounterAvailable(m_iRedactDocsCounterItem, bChecked) && bChecked) ||
+				 m_CounterList.GetCheck( m_iRedactDocsCounterItem ) == BST_CHECKED))
 		{
-			iCheckBoxState = m_CounterList.GetCheck( m_iIndexingCounterItem );
-			m_ipRuleSet->UseIndexingCounter = (iCheckBoxState == BST_CHECKED) 
-				? VARIANT_TRUE : VARIANT_FALSE;
+			UCLIDException ue("ELI32485", "An FKB version must be specified for a swiping rule or "
+				"a ruleset that decrements counters.");
+			ue.display();
+			return;
 		}
 
-		if (m_iPaginationCounterItem != -1)
+		// update the state of the Indexing and Pagination counters
+		if (isCounterAvailable(m_iIndexingCounterItem, bChecked))
 		{
-			iCheckBoxState = m_CounterList.GetCheck( m_iPaginationCounterItem );
-			m_ipRuleSet->UsePaginationCounter = (iCheckBoxState == BST_CHECKED) 
-				? VARIANT_TRUE : VARIANT_FALSE;
+			m_ipRuleSet->UseIndexingCounter = asVariantBool(bChecked);
+		}
+
+		if (isCounterAvailable(m_iPaginationCounterItem, bChecked))
+		{
+			m_ipRuleSet->UsePaginationCounter = asVariantBool(bChecked);
 		}
 
 		// Validate one or the other of the redaction checkboxes (P16 #2198)
-		if( m_iRedactPagesCounterItem != -1 && 
-			m_iRedactDocsCounterItem != -1 && 
-			m_CounterList.GetCheck( m_iRedactPagesCounterItem ) == BST_CHECKED && 
-			m_CounterList.GetCheck( m_iRedactDocsCounterItem ) == BST_CHECKED )
+		if ((isCounterAvailable(m_iRedactPagesCounterItem, bChecked) && bChecked) &&
+		    (isCounterAvailable(m_iRedactDocsCounterItem, bChecked) && bChecked))
 		{
 			UCLIDException ue("ELI14499", "Cannot select redaction by pages and documents!");
 			ue.display();
@@ -214,33 +230,29 @@ void CRuleSetPropertiesDlg::OnOK()
 		}
 
 		// Update state of the appropriate Redaction counter
-		if (m_iRedactPagesCounterItem != -1)
+		if (isCounterAvailable(m_iRedactPagesCounterItem, bChecked))
 		{
-			iCheckBoxState = m_CounterList.GetCheck( m_iRedactPagesCounterItem );
-			m_ipRuleSet->UsePagesRedactionCounter = (iCheckBoxState == BST_CHECKED) 
-				? VARIANT_TRUE : VARIANT_FALSE;
+			m_ipRuleSet->UsePagesRedactionCounter = asVariantBool(bChecked);
 		}
 
-		if (m_iRedactDocsCounterItem != -1)
+		if (isCounterAvailable(m_iRedactDocsCounterItem, bChecked))
 		{
-			iCheckBoxState = m_CounterList.GetCheck( m_iRedactDocsCounterItem );
-			m_ipRuleSet->UseDocsRedactionCounter = (iCheckBoxState == BST_CHECKED) 
-				? VARIANT_TRUE : VARIANT_FALSE;
+			m_ipRuleSet->UseDocsRedactionCounter = asVariantBool(bChecked);
 		}
-		
+
 		// Get the serial number list
-		CString czSerialText;
-		m_editKeySerialNumbers.GetWindowText(czSerialText);
+		CString zSerialText;
+		m_editKeySerialNumbers.GetWindowText(zSerialText);
 
 		// Set focus to serial number list so if list not valid it will have the focus
 		m_editKeySerialNumbers.SetFocus();
-		validateSerialList( LPCTSTR(czSerialText) );
+		validateSerialList(LPCTSTR(zSerialText));
 
 		// Serial number list is valid so save in the ruleset
-		m_ipRuleSet->KeySerialList = _bstr_t(czSerialText);
+		m_ipRuleSet->KeySerialList = _bstr_t(zSerialText);
 		
 		// update the value related to the checkbox for internal use
-		bool bChecked = m_checkboxForInternalUseOnly.GetCheck() == BST_CHECKED;
+		bChecked = m_checkboxForInternalUseOnly.GetCheck() == BST_CHECKED;
 		m_ipRuleSet->ForInternalUseOnly = asVariantBool(bChecked);
 
 		// Store whether this is a swiping rule
@@ -444,6 +456,17 @@ void CRuleSetPropertiesDlg::validateSerialList( const string &strSerialList )
 		// if any exceptions are thrown it is because a serial number is not valid
 	}
 	// no exceptions means serial numbers are valid
+}
+//-------------------------------------------------------------------------------------------------
+bool CRuleSetPropertiesDlg::isCounterAvailable(int nCounterItem, bool &rbIsCounterChecked)
+{
+	if (nCounterItem != -1)
+	{
+		rbIsCounterChecked = (m_CounterList.GetCheck(nCounterItem) == BST_CHECKED);
+		return true;
+	}
+	
+	return false;
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSetPropertiesDlg::isRdtLicensed()

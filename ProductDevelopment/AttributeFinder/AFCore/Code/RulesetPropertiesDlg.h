@@ -44,6 +44,10 @@ private:
 	// throws and exception if an invalid serial number is found ( non numeric )
 	void validateSerialList(const string &strSerialList);
 
+	// Checks whether the specified check box counter item is available, and if so sets
+	// rbIsCounterChecked accordingly.
+	bool isCounterAvailable(int nCounterItem, bool &rbIsCounterChecked);
+
 	// Returns true if the Rule Development Toolkit is licensed; false otherwise.
 	bool isRdtLicensed();
 
@@ -61,6 +65,7 @@ private:
 	CEdit m_editKeySerialNumbers;
 	CButton m_buttonOk;
 	CButton m_buttonCancel;
+	CEdit m_editFKBVersion;
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -222,7 +222,7 @@ void CRuleSetEditor::OnHelpAbout()
 	try
 	{
 		// Display the About box with version information
-		CAFAboutDlg dlgAbout( kFlexIndexHelpAbout, "", m_apRuleTesterDlg->getAFEngine() );
+		CAFAboutDlg dlgAbout( kFlexIndexHelpAbout, "" );
 		dlgAbout.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04441")

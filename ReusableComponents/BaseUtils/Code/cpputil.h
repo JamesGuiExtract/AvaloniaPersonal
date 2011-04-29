@@ -289,6 +289,12 @@ EXPORT_BaseUtils void  getFilesInDir(vector<string>& rvecFiles,
 									 const string& strFileExtension = "*.*",
 									 bool bRecursive = false);
 //-------------------------------------------------------------------------------------------------
+// Returns all subdirectories under the provided strDirectory (full paths, not just the directory
+// name).
+// bRecursive- true to return all descendant directories recursively. false to return only the
+//		immediate sub-directories.
+EXPORT_BaseUtils vector<string> getSubDirectories(string strDirectory, bool bRecursive);
+//-------------------------------------------------------------------------------------------------
 // PROMISE:	Converts a fully qualified file/path name to UNC path
 // Example:	I:\Common\Engineering\Tools\Utils\grep.txt  ==> 
 //			\\frank\internal\Common\Engineering\Tools\Utils\grep.txt
