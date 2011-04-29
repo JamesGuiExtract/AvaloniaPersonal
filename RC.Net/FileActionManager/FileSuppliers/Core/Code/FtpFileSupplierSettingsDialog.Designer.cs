@@ -343,7 +343,7 @@
             this.Name = "FtpFileSupplierSettingsDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Files from FTP site";
+            this.Text = "Configure Files from FTP site";
             this._settingsTabControl.ResumeLayout(false);
             this._generalSettingsTabPage.ResumeLayout(false);
             this._generalSettingsTabPage.PerformLayout();

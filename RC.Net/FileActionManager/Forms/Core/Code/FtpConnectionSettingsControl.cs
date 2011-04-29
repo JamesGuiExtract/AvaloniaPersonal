@@ -61,6 +61,23 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
+        /// <summary>
+        /// Indicates if the "number of connections" control should be displayed
+        /// </summary>
+        public bool ShowConnectionsControl
+        {
+            set
+            {
+                _numberConnections.Visible = value;
+                _connectionsLabel.Visible = value;
+            }
+            get
+            {
+                return _numberConnections.Visible;
+            }
+        }
+                
+
         #endregion
 
         #region Constructors
@@ -151,8 +168,7 @@ namespace Extract.FileActionManager.Forms
         }
 
         #endregion
-
-
+        
         #region Public methods
 
         /// <summary>

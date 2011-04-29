@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             EnterpriseDT.Net.Ftp.Forms.FTPConnectionProperties ftpConnectionProperties1 = new EnterpriseDT.Net.Ftp.Forms.FTPConnectionProperties();
             this._numberConnections = new Extract.Utilities.Forms.BetterNumericUpDown();
-            this.label5 = new System.Windows.Forms.Label();
+            this._connectionsLabel = new System.Windows.Forms.Label();
             this._ftpConnectionEditor = new EnterpriseDT.Net.Ftp.Forms.FTPConnectionEditor();
             this._secureFTPConnection = new EnterpriseDT.Net.Ftp.SecureFTPConnection(this.components);
             this._testConnectionButton = new System.Windows.Forms.Button();
@@ -40,7 +40,7 @@
             // 
             // _numberConnections
             // 
-            this._numberConnections.Location = new System.Drawing.Point(315, 317);
+            this._numberConnections.Location = new System.Drawing.Point(315, 251);
             this._numberConnections.Maximum = new decimal(new int[] {
             10,
             0,
@@ -61,14 +61,14 @@
             0});
             this._numberConnections.UserTextCorrected += new System.EventHandler<System.EventArgs>(this.HandleNumberConnectionsNumericUpDownUserTextCorrected);
             // 
-            // label5
+            // _connectionsLabel
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(8, 321);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(288, 13);
-            this.label5.TabIndex = 3;
-            this.label5.Text = "Maximum number of simultaneous connections to the server";
+            this._connectionsLabel.AutoSize = true;
+            this._connectionsLabel.Location = new System.Drawing.Point(3, 255);
+            this._connectionsLabel.Name = "_connectionsLabel";
+            this._connectionsLabel.Size = new System.Drawing.Size(288, 13);
+            this._connectionsLabel.TabIndex = 3;
+            this._connectionsLabel.Text = "Maximum number of simultaneous connections to the server";
             // 
             // _ftpConnectionEditor
             // 
@@ -80,7 +80,7 @@
             this._ftpConnectionEditor.Location = new System.Drawing.Point(3, 3);
             this._ftpConnectionEditor.Name = "_ftpConnectionEditor";
             this._ftpConnectionEditor.Properties = ftpConnectionProperties1;
-            this._ftpConnectionEditor.Size = new System.Drawing.Size(444, 279);
+            this._ftpConnectionEditor.Size = new System.Drawing.Size(354, 215);
             this._ftpConnectionEditor.TabIndex = 0;
             this._ftpConnectionEditor.ViewBackColor = System.Drawing.SystemColors.Window;
             this._ftpConnectionEditor.ViewForeColor = System.Drawing.SystemColors.WindowText;
@@ -96,11 +96,13 @@
             // 
             this._secureFTPConnection.ClientPrivateKeyBytes = null;
             this._secureFTPConnection.DefaultSyncRules.FilterCallback = null;
+            this._secureFTPConnection.LicenseKey = "701-9435-3077-0362";
+            this._secureFTPConnection.LicenseOwner = "trialuser";
             this._secureFTPConnection.ParentControl = this;
             // 
             // _testConnectionButton
             // 
-            this._testConnectionButton.Location = new System.Drawing.Point(3, 339);
+            this._testConnectionButton.Location = new System.Drawing.Point(3, 273);
             this._testConnectionButton.Name = "_testConnectionButton";
             this._testConnectionButton.Size = new System.Drawing.Size(116, 23);
             this._testConnectionButton.TabIndex = 2;
@@ -108,17 +110,17 @@
             this._testConnectionButton.UseVisualStyleBackColor = true;
             this._testConnectionButton.Click += new System.EventHandler(this.HandleTestConnection);
             // 
-            // FtpConnectionSettingsTabPage
+            // FtpConnectionSettingsControl
             // 
             this.Controls.Add(this._numberConnections);
-            this.Controls.Add(this.label5);
+            this.Controls.Add(this._connectionsLabel);
             this.Controls.Add(this._testConnectionButton);
             this.Controls.Add(this._ftpConnectionEditor);
             this.Location = new System.Drawing.Point(4, 22);
-            this.MinimumSize = new System.Drawing.Size(450, 370);
-            this.Name = "FtpConnectionSettingsTabPage";
+            this.MinimumSize = new System.Drawing.Size(360, 300);
+            this.Name = "FtpConnectionSettingsControl";
             this.Padding = new System.Windows.Forms.Padding(3);
-            this.Size = new System.Drawing.Size(450, 370);
+            this.Size = new System.Drawing.Size(360, 300);
             ((System.ComponentModel.ISupportInitialize)(this._numberConnections)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -130,7 +132,7 @@
         private EnterpriseDT.Net.Ftp.Forms.FTPConnectionEditor _ftpConnectionEditor;
         private EnterpriseDT.Net.Ftp.SecureFTPConnection _secureFTPConnection;
         private Utilities.Forms.BetterNumericUpDown _numberConnections; 
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label _connectionsLabel;
         private System.Windows.Forms.Button _testConnectionButton;
     }
 }

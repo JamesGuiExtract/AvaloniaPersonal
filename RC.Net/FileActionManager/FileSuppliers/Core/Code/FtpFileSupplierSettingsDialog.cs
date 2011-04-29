@@ -243,12 +243,14 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 MessageBox.Show("Remote download folder must be specified.", "Configuration error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _remoteDownloadFolderTextBox.Focus();
             }
             else if (string.IsNullOrWhiteSpace(_fileExtensionSpecificationTextBox.Text))
             {
                 MessageBox.Show("Extensions to download must be specified", "Configuration error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _fileExtensionSpecificationTextBox.Focus();
             }
             else if (_pollRemoteCheckBox.Checked &&
@@ -256,18 +258,21 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 MessageBox.Show("Polling interval must be greater than 0.", "Configuration error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _pollingIntervalNumericUpDown.Focus();
             }
             else if (_changeRemoteExtensionRadioButton.Checked && string.IsNullOrWhiteSpace(_newExtensionTextBox.Text))
             {
                 MessageBox.Show("New extension for remote file must be specified.", "Configuration error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _newExtensionTextBox.Focus();
             }
             else if (string.IsNullOrWhiteSpace(_localWorkingFolderTextBox.Text))
             {
                 MessageBox.Show("Local working folder must be specified.", "Configuration error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _localWorkingFolderTextBox.Focus();
             }
             else if (!_ftpConnectionSettingsControl.IsConfigurationValid())

@@ -489,12 +489,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Email", "..\..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj", "{1B3DED27-DBF9-478A-9E31-FFA479621F5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Ftp", "..\..\..\..\..\RC.Net\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj", "{D2DD8D8F-E632-429E-8646-B9489D21295F}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 150
+		ProjectCount = 151
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -645,6 +647,7 @@ Global
 		ProjectRelativeDiskPath148 = ..\..\..\..\..\RC.Net\FileActionManager\FileSuppliers\Core\Code\Extract.FileActionManager.FileSuppliers.csproj
 		ProjectRelativeDiskPath149 = ..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj
 		ProjectRelativeDiskPath150 = ..\..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj
+		ProjectRelativeDiskPath151 = ..\..\..\..\..\RC.Net\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2161,6 +2164,16 @@ Global
 		{1B3DED27-DBF9-478A-9E31-FFA479621F5C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1B3DED27-DBF9-478A-9E31-FFA479621F5C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1B3DED27-DBF9-478A-9E31-FFA479621F5C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

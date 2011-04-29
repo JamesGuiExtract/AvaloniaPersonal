@@ -69,6 +69,9 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="edtFTPnetPRO, Version=7.3.1.20, Culture=neutral, PublicKeyToken=0dce1ad63760d80b, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\EnterpriseDT\Bin\edtFTPnetPRO.dll</HintPath>
+    </Reference>
     <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.dll</HintPath>
     </Reference>
@@ -117,6 +120,13 @@
     <Compile Include="EncryptDecryptFileTaskSettingsDialog.Designer.cs">
       <DependentUpon>EncryptDecryptFileTaskSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="FtpFileTransferSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FtpFileTransferSettingsDialog.Designer.cs">
+      <DependentUpon>FtpFileTransferSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FtpFileTransferTask.cs" />
     <Compile Include="ModifyPdfFileSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -185,6 +195,10 @@
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj">
+      <Project>{D2DD8D8F-E632-429E-8646-B9489D21295F}</Project>
+      <Name>Extract.Utilities.Ftp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
       <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
       <Name>Extract.FileActionManager.Forms</Name>
@@ -237,6 +251,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EncryptDecryptFileTaskSettingsDialog.resx">
       <DependentUpon>EncryptDecryptFileTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FtpFileTransferSettingsDialog.resx">
+      <DependentUpon>FtpFileTransferSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ModifyPdfFileSettingsDialog.resx">
       <SubType>Designer</SubType>

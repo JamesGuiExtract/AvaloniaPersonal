@@ -2,6 +2,7 @@
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
+using Extract.Utilities.Ftp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -65,16 +66,6 @@ namespace Extract.FileActionManager.FileSuppliers
         const int _CURRENT_VERSION = 2;
 
         /// <summary>
-        /// License owner for the edtftpnetpro library
-        /// </summary>
-        static readonly string _FTP_API_LICENSE_OWNER = "ExtractSystems";
-
-        /// <summary>
-        /// License key for the edtftpnetpro library
-        /// </summary>
-        static readonly string _FTP_API_LICENSE_KEY = "064-7556-4340-7862";
-
-        /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
         static readonly LicenseIdName _licenseId = LicenseIdName.FtpSftpFileTransfer;
@@ -120,7 +111,7 @@ namespace Extract.FileActionManager.FileSuppliers
         ManualResetEvent _stopSupplying = new ManualResetEvent(false);
 
         // Event to indicate the FTP Server should be checked for more files
-        ManualResetEvent _pollFtpServerForFiles = new ManualResetEvent(false);
+        AutoResetEvent _pollFtpServerForFiles = new AutoResetEvent(false);
        
         // Event to indicate that all files have been added to the queue for the current
         // poll of the ftp server.
@@ -234,8 +225,8 @@ namespace Extract.FileActionManager.FileSuppliers
         public FtpFileSupplier()
         {
             ConfiguredFtpConnection = new SecureFTPConnection();
-            
-            InitializeFtpApiLicense(ConfiguredFtpConnection);
+
+            FtpMethods.InitializeFtpApiLicense(ConfiguredFtpConnection);
 
             InitializeDefaults();
         }
@@ -569,7 +560,7 @@ namespace Extract.FileActionManager.FileSuppliers
                         ConfiguredFtpConnection = new SecureFTPConnection();
                         ConfiguredFtpConnection.Load(ftpDataStream);
                     }
-                    InitializeFtpApiLicense(ConfiguredFtpConnection);
+                    FtpMethods.InitializeFtpApiLicense(ConfiguredFtpConnection);
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -875,7 +866,7 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 using (SecureFTPConnection runningConnection = (SecureFTPConnection)ConfiguredFtpConnection.Clone())
                 {
-                    InitializeFtpApiLicense(runningConnection);
+                    FtpMethods.InitializeFtpApiLicense(runningConnection);
 
                     // Add event handler for when files are down downloading.
                     runningConnection.Downloaded += new FTPFileTransferEventHandler(HandleFileDownloaded);
@@ -894,8 +885,11 @@ namespace Extract.FileActionManager.FileSuppliers
                                 runningConnection.Connect();
                             }
 
-                            SetCurrentFtpWorkingFolder(runningConnection, currentFtpFile);
-                            string localFilePath = GenerateLocalPathCreateIfNotExists(runningConnection.ServerDirectory);
+                            FtpMethods.SetCurrentFtpWorkingFolder(runningConnection, currentFtpFile.Path);
+                            string localFilePath = FtpMethods.GenerateLocalPathCreateIfNotExists(
+                                runningConnection.ServerDirectory,
+                                _expandedLocalWorkingFolder,
+                                RemoteDownloadFolder);
 
                             // Determine the full name of the local file
                             localFile = Path.Combine(localFilePath, currentFtpFile.Name);
@@ -973,7 +967,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 ConfiguredFtpConnection = (SecureFTPConnection)fileSupplier.ConfiguredFtpConnection.Clone();
                 NumberOfConnections = fileSupplier.NumberOfConnections;
 
-                InitializeFtpApiLicense(ConfiguredFtpConnection);
+                FtpMethods.InitializeFtpApiLicense(ConfiguredFtpConnection);
                 _dirty = true;
             }
             catch (Exception ex)
@@ -1052,7 +1046,7 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 using (SecureFTPConnection runningConnection = (SecureFTPConnection)ConfiguredFtpConnection.Clone())
                 {
-                    InitializeFtpApiLicense(runningConnection);
+                    FtpMethods.InitializeFtpApiLicense(runningConnection);
 
                     // Connect to the ftp server
                     runningConnection.Connect();
@@ -1072,30 +1066,6 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 _doneAddingFilesToQueue.Set();
             }
-        }
-
-        /// <summary>
-        /// Returns the local path for the file being downloaded 
-        /// </summary>
-        /// <param name="currentRemoteWorkingFolder">Current working folder on the ftp server</param>
-        /// <returns>The local path rooted to the _expandedLocalWorkingFolder </returns>
-        string GenerateLocalPathCreateIfNotExists(string currentRemoteWorkingFolder)
-        {
-            // Generate the path so that the directory structure rooted to 
-            // the expanded local working folder will be the same as the 
-            // current ftp working folder rooted to the RemoteDownloadFolder.
-            string pathForFile = Path.Combine(_expandedLocalWorkingFolder,
-                currentRemoteWorkingFolder.Remove(0, RemoteDownloadFolder.Length));
-
-            // Convert / to \ since the ftp server path char may be different that windows
-            pathForFile = pathForFile.Replace('/', '\\');
-
-            // Make sure the local folder exists
-            if (!Directory.Exists(pathForFile))
-            {
-                Directory.CreateDirectory(pathForFile);
-            }
-            return pathForFile;
         }
 
         /// <summary>
@@ -1136,26 +1106,6 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// Sets the current working folder on the FTP server if it is not the same as the currentFile
-        /// </summary>
-        /// <param name="runningConnection">Connection to the FTP server</param>
-        /// <param name="currentFile">Current file that will be downloaded next</param>
-        static void SetCurrentFtpWorkingFolder(SecureFTPConnection runningConnection, FTPFile currentFile)
-        {
-            // Determine the current working folder on the ftp server 
-            string currentFileDir = currentFile
-                .Path
-                .Remove(currentFile.Path.Length - currentFile.Name.Length);
-
-            // Only change the working directory if it needs to be changed.
-            if (currentFileDir != runningConnection.ServerDirectory)
-            {
-                runningConnection.ChangeWorkingDirectory(currentFileDir);
-            }
-            return;
-        }
-        
-        /// <summary>
         /// Sets up and starts the download manager thread.
         /// </summary>
         void StartFileDownloadManagementThread()
@@ -1165,16 +1115,6 @@ namespace Extract.FileActionManager.FileSuppliers
             _ftpDownloadManagerThread.Start();
 
             _supplyingStarted.Set();
-        }
-
-        /// <summary>
-        /// Sets the LicenseOwner and LicenseKey properties for the ftpConnection
-        /// </summary>
-        /// <param name="ftpConnection">Connection to be initialized</param>
-        static void InitializeFtpApiLicense(SecureFTPConnection ftpConnection)
-        {
-            ftpConnection.LicenseOwner = _FTP_API_LICENSE_OWNER;
-            ftpConnection.LicenseKey = _FTP_API_LICENSE_KEY;
         }
 
         /// <summary>
