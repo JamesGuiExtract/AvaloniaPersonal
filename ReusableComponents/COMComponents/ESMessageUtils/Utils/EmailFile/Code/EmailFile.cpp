@@ -227,9 +227,9 @@ void CEmailFileApp::displayUsage(const string &strErrorMessage)
 	strUsage += "This application requires 1 argument\r\n";
 	strUsage += "SYNTAX: EmailFile <Address(es)|/?> [FileToSend] [options] \r\n";
 	strUsage += "Address(es): Email address(es) to send the file.\r\n";
+	strUsage += "    Multiple addresses should be separated by either ';' or ','\r\n";
 	strUsage += "/? - Display the usage message.\r\n";
-	strUsage += "    Multiple addresses should be separated by either ; or ,\r\n";
-	strUsage += " <options>:\r\n";
+	strUsage += "<options>:\r\n";
 	strUsage += "    /c - Configure email settings\r\n";
 	strUsage += "    /subject <subject line> - Subject line for the email.\r\n";
 	strUsage += "    /body <FileContainingText> - The file containing the body of the message.\r\n";
@@ -237,7 +237,7 @@ void CEmailFileApp::displayUsage(const string &strErrorMessage)
 	strUsage += "    /z - Zip the file that is being sent before emailing\r\n";
 	strUsage += "        Note: This is ignored if no file is specified.\r\n";
 	strUsage += "    /ef <exception log file> - File for logging exceptions.\r\n";
-	strUsage +=  "\r\n";	
+	strUsage += "\r\n";	
 	strUsage += "FileToSend: Name of the file to send by email.\r\n";
 	strUsage +=  "\r\n";
 	strUsage += "If this application is run and the SMTP server has not been setup,\r\n";

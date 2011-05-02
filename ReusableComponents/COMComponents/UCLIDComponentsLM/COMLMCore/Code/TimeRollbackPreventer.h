@@ -81,13 +81,13 @@ private:
 	// Results are provided in specified CTime object
 	// Returns true if decryption was sucessful, false otherwise
 	bool decryptDateTimeString(const string& strEncryptedDT, const ByteStream& bsPassword, 
-		CTime* ptmResult);
+		CTime* ptmResult, const string& strELITraceCode);
 
 	// Encrypts specified date and time using specified byte stream password
 	// Results are provided in specified string
 	// Returns true if encryption was sucessful, false otherwise
 	bool encryptDateTime(CTime tmTime, const ByteStream& bsPassword, 
-		string &strEncryptedDT);
+		string &strEncryptedDT, const string& strELITraceCode);
 
 	// Decrypts specified Unlock string, checks user computer name, disk serial
 	// number, and MAC address. Also compares expiration time against system
@@ -110,8 +110,8 @@ private:
 	// Retrieves encryption/decryption passwords
 	// 1: for Date-Time file
 	// 2: for Date-Time registry key
-	const ByteStream& getPassword1() const;
-	const ByteStream& getPassword2() const;
+	ByteStream getPassword1() const;
+	ByteStream getPassword2() const;
 
 	// Checks for UCLID_UnlockLicense.txt file in CommonComponents folder.
 	// If file is found, decrypts text to retrieve:

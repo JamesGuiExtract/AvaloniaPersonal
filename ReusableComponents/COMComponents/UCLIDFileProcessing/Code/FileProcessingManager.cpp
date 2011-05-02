@@ -60,7 +60,7 @@ m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
 		// reset the state of this object
 		clear();
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI10662")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10662");
 }
 //-------------------------------------------------------------------------------------------------
 CFileProcessingManager::~CFileProcessingManager()

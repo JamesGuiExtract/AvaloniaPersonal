@@ -227,158 +227,77 @@ TimeRollbackPreventer::~TimeRollbackPreventer()
 //-------------------------------------------------------------------------------------------------
 void TimeRollbackPreventer::checkDateTimeItems()
 {
-	////////////////////////////////////////////
-	// Check for system time already rolled back
-	////////////////////////////////////////////
-	string strDLL = getModuleDirectory("COMLMCore.dll");
-	strDLL += "\\";
-	strDLL += "COMLMCore.dll";
-	CTime tmDLL = getFileModificationTimeStamp( strDLL );
-	CTime tmNow = CTime::GetCurrentTime();
-	if (tmNow < tmDLL)
-	{
-		// Signal BAD STATE event and throw exception
-		// This Exception and ELI code will be seen in UEX log file
-		UCLIDException ue( "ELI11549", gpszLicenseIsCorrupt );
-		ue.log();
-		m_rEventBadState.signal();
-		throw ue;
-	}
-
-	// Check for unlock code found
-	// This try catch is just to give more trace information
 	try
 	{
-		handleUnlockCode();
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10705");
-
-	// Get the encrypted data from (local) DT file and registry
-	string	strLocalData1;
-	string	strRemoteData1;
-	string	strLocalData2;
-	string	strRemoteData2;
-	{
-		// Protect the read accesses
-		CSingleLock lg( getReadWriteMutex() );
-		if ( lg.Lock(m_ulRWTimeout) == 0 )
+		////////////////////////////////////////////
+		// Check for system time already rolled back
+		////////////////////////////////////////////
+		string strDLL = getModuleDirectory("COMLMCore.dll");
+		strDLL += "\\";
+		strDLL += "COMLMCore.dll";
+		CTime tmDLL = getFileModificationTimeStamp( strDLL );
+		CTime tmNow = CTime::GetCurrentTime();
+		if (tmNow < tmDLL)
 		{
-			// unable to lock the mutex signal bad state and throw exception
-			UCLIDException ue( "ELI12996", gpszLicenseIsCorrupt );
+			// Signal BAD STATE event and throw exception
+			// This Exception and ELI code will be seen in UEX log file
+			UCLIDException ue( "ELI11549", gpszLicenseIsCorrupt );
 			ue.log();
 			m_rEventBadState.signal();
 			throw ue;
 		}
-		string strDateTimeFilePath = getDateTimeFilePath();
-		strLocalData1 = getLocalDateTimeString(strDateTimeFilePath);
-		strRemoteData1 = getRemoteDateTimeString(ITEM_SECTION_NAME1, LAST_TIME_USED);
 
-		strLocalData2 = getLocalDateTimeString(strDateTimeFilePath + ".old");
-		strRemoteData2 = getRemoteDateTimeString(ITEM_SECTION_NAME2, LAST_TIME_USED);
-	}
-
-	// Convert the encrypted Date-Time strings into CTime objects
-	CTime	tmLocal;
-	CTime	tmRemote;
-	bool	bLocal = decryptDateTimeString( strLocalData1, getPassword1(), &tmLocal );
-	bool	bRemote = decryptDateTimeString( strRemoteData1, getPassword2(), &tmRemote );
-
-	////////////////
-	// Check results
-	////////////////
-
-	bool bFail = false;
-	bool bTryBackup = false;
-	string strELI = "ELI00000";
-
-	// Try to compare the date/time from the primary locations
-
-	// Both encrypted strings were found AND
-	// both Date-Time values were decrypted
-	if (bLocal && bRemote)
-	{
-		// Compare decrypted times
-		if (tmLocal == tmRemote)
-		{
-			// Current time must be greater than saved times
-			CTime currentTime = CTime::GetCurrentTime();
-			if (currentTime < tmLocal)
-			{
-				strELI = "ELI07444";
-				bFail = true;
-				bTryBackup = false;
-			}
-			else
-			{
-				bFail = false;
-				bTryBackup = false;
-			}
-		}
-		// Primary: File time is before Registry time ---> ERROR
-		else if (tmLocal < tmRemote)
-		{
-			strELI = "ELI12748";
-			bFail = true;
-			bTryBackup = true;
-		}
-		// Stored times do not match ---> ERROR
-		// Primary: Registry time is before File time ---> ERROR
-		else
-		{
-			strELI = "ELI07443";
-			bFail = true;
-			bTryBackup = true;
-		}
-	}
-	// Both encrypted strings were missing
-	else if (strLocalData1.empty() && strRemoteData1.empty())
-	{
+		// Check for unlock code found
 		// This try catch is just to give more trace information
 		try
 		{
-			// Force creation of the local and remote items
-			updateDateTimeItems( true );
+			handleUnlockCode();
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10704");
-	}
-	// Remote item is missing or corrupt ---> ERROR
-	else if (bLocal && !bRemote)
-	{
-		// Throw exception
-		strELI = "ELI07408";
-		bFail = true;
-		bTryBackup = true;
-	}
-	// Local item is missing or string is corrupt ---> ERROR
-	else if (!bLocal && bRemote)
-	{
-		strELI = "ELI07441";
-		bFail = true;
-		bTryBackup = true;
-	}
-	// Both items found and both failed decryption ---> ERROR
-	else
-	{
-		strELI = "ELI08393";
-		bFail = true;
-		bTryBackup = true;
-	}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10705");
 
-	// This exception will only be thrown if the backup location check fails
-	// It is created here to preserve the ELI code from the failure of the 
-	// first exception
-	UCLIDException ue(strELI, gpszLicenseIsCorrupt);
-	
-	// If the data from the primary location is missing or corrupt it 
-	// could be the result of an unexpected program failure last time 
-	// the TRLP was run.  In that case we will try to comapre data from the backup
-	// location
-	if (bTryBackup)
-	{
+		// Get the encrypted data from (local) DT file and registry
+		string	strLocalData1;
+		string	strRemoteData1;
+		string	strLocalData2;
+		string	strRemoteData2;
+		{
+			// Protect the read accesses
+			CSingleLock lg( getReadWriteMutex() );
+			if ( lg.Lock(m_ulRWTimeout) == 0 )
+			{
+				// unable to lock the mutex signal bad state and throw exception
+				UCLIDException ue( "ELI12996", gpszLicenseIsCorrupt );
+				ue.log();
+				m_rEventBadState.signal();
+				throw ue;
+			}
+
+			string strDateTimeFilePath = getDateTimeFilePath();
+			strLocalData1 = getLocalDateTimeString(strDateTimeFilePath);
+			strRemoteData1 = getRemoteDateTimeString(ITEM_SECTION_NAME1, LAST_TIME_USED);
+
+			strLocalData2 = getLocalDateTimeString(strDateTimeFilePath + ".old");
+			strRemoteData2 = getRemoteDateTimeString(ITEM_SECTION_NAME2, LAST_TIME_USED);
+		}
+
 		// Convert the encrypted Date-Time strings into CTime objects
-		bLocal = decryptDateTimeString( strLocalData2, getPassword1(), &tmLocal );
-		bRemote = decryptDateTimeString( strRemoteData2, getPassword2(), &tmRemote );
+		CTime	tmLocal;
+		CTime	tmRemote;
+		bool	bLocal = decryptDateTimeString( strLocalData1, getPassword1(), &tmLocal, "ELI32494" );
+		bool	bRemote = decryptDateTimeString( strRemoteData1, getPassword2(), &tmRemote, "ELI32495" );
 
+		////////////////
+		// Check results
+		////////////////
+
+		bool bFail = false;
+		bool bTryBackup = false;
+		string strELI = "ELI00000";
+
+		// Try to compare the date/time from the primary locations
+
+		// Both encrypted strings were found AND
+		// both Date-Time values were decrypted
 		if (bLocal && bRemote)
 		{
 			// Compare decrypted times
@@ -388,58 +307,144 @@ void TimeRollbackPreventer::checkDateTimeItems()
 				CTime currentTime = CTime::GetCurrentTime();
 				if (currentTime < tmLocal)
 				{
-					ue.addDebugInfo("Trace", "ELI10985");
+					strELI = "ELI07444";
 					bFail = true;
+					bTryBackup = false;
 				}
 				else
 				{
 					bFail = false;
+					bTryBackup = false;
 				}
 			}
-			// Stored times do not match ---> ERROR
+			// Primary: File time is before Registry time ---> ERROR
 			else if (tmLocal < tmRemote)
 			{
-				ue.addDebugInfo("Trace", "ELI12749");
+				strELI = "ELI12748";
 				bFail = true;
+				bTryBackup = true;
 			}
 			// Stored times do not match ---> ERROR
+			// Primary: Registry time is before File time ---> ERROR
 			else
 			{
-				ue.addDebugInfo("Trace", "ELI10983");
+				strELI = "ELI07443";
+				bFail = true;
+				bTryBackup = true;
+			}
+		}
+		// Both encrypted strings were missing
+		else if (strLocalData1.empty() && strRemoteData1.empty())
+		{
+			// This try catch is just to give more trace information
+			try
+			{
+				// Force creation of the local and remote items
+				updateDateTimeItems( true );
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10704");
+		}
+		// Remote item is missing or corrupt ---> ERROR
+		else if (bLocal && !bRemote)
+		{
+			// Throw exception
+			strELI = "ELI07408";
+			bFail = true;
+			bTryBackup = true;
+		}
+		// Local item is missing or string is corrupt ---> ERROR
+		else if (!bLocal && bRemote)
+		{
+			strELI = "ELI07441";
+			bFail = true;
+			bTryBackup = true;
+		}
+		// Both items found and both failed decryption ---> ERROR
+		else
+		{
+			strELI = "ELI08393";
+			bFail = true;
+			bTryBackup = true;
+		}
+
+		// This exception will only be thrown if the backup location check fails
+		// It is created here to preserve the ELI code from the failure of the 
+		// first exception
+		UCLIDException ue(strELI, gpszLicenseIsCorrupt);
+
+		// If the data from the primary location is missing or corrupt it 
+		// could be the result of an unexpected program failure last time 
+		// the TRLP was run.  In that case we will try to comapre data from the backup
+		// location
+		if (bTryBackup)
+		{
+			// Convert the encrypted Date-Time strings into CTime objects
+			bLocal = decryptDateTimeString( strLocalData2, getPassword1(), &tmLocal, "ELI32496" );
+			bRemote = decryptDateTimeString( strRemoteData2, getPassword2(), &tmRemote, "ELI32497" );
+
+			if (bLocal && bRemote)
+			{
+				// Compare decrypted times
+				if (tmLocal == tmRemote)
+				{
+					// Current time must be greater than saved times
+					CTime currentTime = CTime::GetCurrentTime();
+					if (currentTime < tmLocal)
+					{
+						ue.addDebugInfo("Trace", "ELI10985");
+						bFail = true;
+					}
+					else
+					{
+						bFail = false;
+					}
+				}
+				// Stored times do not match ---> ERROR
+				else if (tmLocal < tmRemote)
+				{
+					ue.addDebugInfo("Trace", "ELI12749");
+					bFail = true;
+				}
+				// Stored times do not match ---> ERROR
+				else
+				{
+					ue.addDebugInfo("Trace", "ELI10983");
+					bFail = true;
+				}
+			}
+			else if (!bLocal && !bRemote)
+			{
+				// Both decryptions failed
+				ue.addDebugInfo("Trace", "ELI12750");
+				bFail = true;
+			}
+			else if (!bLocal)
+			{
+				// Local decryption failed
+				ue.addDebugInfo("Trace", "ELI12751");
+				bFail = true;
+			}
+			else
+			{
+				// Remote decryption failed
+				ue.addDebugInfo("Trace", "ELI10984");
 				bFail = true;
 			}
 		}
-		else if (!bLocal && !bRemote)
+
+		// If both the primary and backup comparisons fail
+		// the we will invalidate the license state.
+		if (bFail)
 		{
-			// Both decryptions failed
-			ue.addDebugInfo("Trace", "ELI12750");
-			bFail = true;
-		}
-		else if (!bLocal)
-		{
-			// Local decryption failed
-			ue.addDebugInfo("Trace", "ELI12751");
-			bFail = true;
-		}
-		else
-		{
-			// Remote decryption failed
-			ue.addDebugInfo("Trace", "ELI10984");
-			bFail = true;
+			// Make sure that the exception gets logged
+			ue.log();
+
+			// Signal a badstate
+			m_rEventBadState.signal();
+			throw ue;
 		}
 	}
-
-	// If both the primary and backup comparisons fail
-	// the we will invalidate the license state.
-	if (bFail)
-	{
-		// Make sure that the exception gets logged
-		ue.log();
-
-		// Signal a badstate
-		m_rEventBadState.signal();
-		throw ue;
-	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32493");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -447,7 +452,8 @@ void TimeRollbackPreventer::checkDateTimeItems()
 //-------------------------------------------------------------------------------------------------
 bool TimeRollbackPreventer::decryptDateTimeString(const string& strEncryptedDT, 
 												  const ByteStream& bsPassword, 
-												  CTime* ptmResult)
+												  CTime* ptmResult,
+												  const string& strELITraceCode)
 {
 	try
 	{
@@ -485,24 +491,24 @@ bool TimeRollbackPreventer::decryptDateTimeString(const string& strEncryptedDT,
 
 			// Provide CTime to caller
 			*ptmResult = tmTemp;
-
-			return true;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10700")
 	}
-	catch(UCLIDException ue)
+	catch(UCLIDException& ue)
 	{
-		// Make sure that the exception is logged
-		ue.log();
+		UCLIDException uex(strELITraceCode, "Unable to read data.", ue);
+		uex.addDebugInfo("Initial String", strEncryptedDT, true);
+		uex.log();
+
 		return false;
 	}
+
+	return true;
 }
 //-------------------------------------------------------------------------------------------------
 bool TimeRollbackPreventer::encryptDateTime(CTime tmTime, const ByteStream& bsPassword, 
-											string &strEncryptedDT)
+											string &strEncryptedDT, const string& strELITraceCode)
 {
-	bool	bResult = true;
-
 	try
 	{
 		try
@@ -512,8 +518,8 @@ bool TimeRollbackPreventer::encryptDateTime(CTime tmTime, const ByteStream& bsPa
 			ByteStreamManipulator bsm( ByteStreamManipulator::kWrite, unencryptedByteStream );
 
 			// Add first random unsigned short with specific modulus
-			auto val = m_random.uniform(gulMODULO_CONSTANT + 1, ULONG_MAX);
-			auto mod = val % gulMODULO_CONSTANT;
+			unsigned long val = m_random.uniform(gulMODULO_CONSTANT + 1, ULONG_MAX);
+			unsigned long mod = val % gulMODULO_CONSTANT;
 			bsm << val;
 			bsm << mod;
 
@@ -540,14 +546,15 @@ bool TimeRollbackPreventer::encryptDateTime(CTime tmTime, const ByteStream& bsPa
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10696")
 	}
-	catch(UCLIDException ue)
+	catch(UCLIDException& ue)
 	{
-		// Make sure that the exception is logged
-		ue.log();
-		bResult = false;
+		UCLIDException uex(strELITraceCode, "Unable to write data.", ue);
+		uex.log();
+
+		return false;
 	}
 
-	return bResult;
+	return true;
 }
 //-------------------------------------------------------------------------------------------------
 bool TimeRollbackPreventer::evaluateUnlockCode(string strCode)
@@ -715,86 +722,75 @@ string TimeRollbackPreventer::getLocalDateTimeString(const string& strDTFile) co
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10702")
 }
 //-------------------------------------------------------------------------------------------------
-const ByteStream& TimeRollbackPreventer::getPassword1() const
+ByteStream TimeRollbackPreventer::getPassword1() const
 {
-	static ByteStream passwordBytes1;
-	static bool bAlreadyInitialized1 = false;
+
 	// This try catch is just to give more trace information
 	try
 	{
-		if (!bAlreadyInitialized1)
-		{
-			// Create a 16 byte password from LMData constants
-			passwordBytes1.setSize( 16 );
-			unsigned char* pData = passwordBytes1.getData();
-			pData[0]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey1)));
-			pData[1]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey1)));
-			pData[2]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey1)));
-			pData[3]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey1)));
-			
-			pData[4]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey2)));
-			pData[5]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey2)));
-			pData[6]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey2)));
-			pData[7]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey2)));
-			
-			pData[8]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey3)));
-			pData[9]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey3)));
-			pData[10]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey3)));
-			pData[11]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey3)));
-			
-			pData[12]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey4)));
-			pData[13]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey4)));
-			pData[14]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey4)));
-			pData[15]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey4)));
+		ByteStream passwordBytes1;
 
-			// Set flag
-			bAlreadyInitialized1 = true;
-		}
+		// Create a 16 byte password from LMData constants
+		passwordBytes1.setSize( 16 );
+		unsigned char* pData = passwordBytes1.getData();
+		pData[0]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey1)));
+		pData[1]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey1)));
+		pData[2]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey1)));
+		pData[3]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey1)));
+
+		pData[4]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey2)));
+		pData[5]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey2)));
+		pData[6]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey2)));
+		pData[7]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey2)));
+
+		pData[8]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey3)));
+		pData[9]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey3)));
+		pData[10]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey3)));
+		pData[11]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey3)));
+
+		pData[12]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey4)));
+		pData[13]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey4)));
+		pData[14]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey4)));
+		pData[15]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey4)));
+
+		return passwordBytes1;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10706")
-
-	return passwordBytes1;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10706");
 }
 //--------------------------------------------------------------------------------------------------
-const ByteStream& TimeRollbackPreventer::getPassword2() const
+ByteStream TimeRollbackPreventer::getPassword2() const
 {
-	static ByteStream passwordBytes2;
-	static bool bAlreadyInitialized2 = false;
 	// This try catch is just to give more trace information
 	try
 	{
-		if (!bAlreadyInitialized2)
-		{
-			// Create a 16 byte password from LMData constants
-			passwordBytes2.setSize( 16 );
-			unsigned char* pData = passwordBytes2.getData();
-			pData[0]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey5)));
-			pData[1]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey5)));
-			pData[2]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey5)));
-			pData[3]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey5)));
+		ByteStream passwordBytes2;
 
-			pData[4]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey6)));
-			pData[5]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey6)));
-			pData[6]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey6)));
-			pData[7]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey6)));
-			
-			pData[8]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey7)));
-			pData[9]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey7)));
-			pData[10]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey7)));
-			pData[11]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey7)));
-			
-			pData[12]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey8)));
-			pData[13]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey8)));
-			pData[14]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey8)));
-			pData[15]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey8)));
+		// Create a 16 byte password from LMData constants
+		passwordBytes2.setSize( 16 );
+		unsigned char* pData = passwordBytes2.getData();
+		pData[0]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey5)));
+		pData[1]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey5)));
+		pData[2]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey5)));
+		pData[3]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey5)));
 
-			// Set flag
-			bAlreadyInitialized2 = true;
-		}
+		pData[4]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey6)));
+		pData[5]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey6)));
+		pData[6]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey6)));
+		pData[7]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey6)));
+
+		pData[8]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey7)));
+		pData[9]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey7)));
+		pData[10]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey7)));
+		pData[11]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey7)));
+
+		pData[12]  = (unsigned char)(LOBYTE(LOWORD(gulUCLIDDateTimeKey8)));
+		pData[13]  = (unsigned char)(HIBYTE(LOWORD(gulUCLIDDateTimeKey8)));
+		pData[14]  = (unsigned char)(LOBYTE(HIWORD(gulUCLIDDateTimeKey8)));
+		pData[15]  = (unsigned char)(HIBYTE(HIWORD(gulUCLIDDateTimeKey8)));
+
+		return passwordBytes2;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10707")
-
-	return passwordBytes2;
 }
 //-------------------------------------------------------------------------------------------------
 string TimeRollbackPreventer::getRemoteDateTimeString(const string& strPath, const string& strKey) const
@@ -897,8 +893,8 @@ void TimeRollbackPreventer::handleUnlockCode()
 					// Create encrypted Date-Time strings for file and registry
 					string	strDTLocal;
 					string	strDTRemote;
-					bool	bLocal = encryptDateTime( tmNow, getPassword1(), strDTLocal );
-					bool	bRemote = encryptDateTime( tmNow, getPassword2(), strDTRemote );
+					bool	bLocal = encryptDateTime( tmNow, getPassword1(), strDTLocal, "ELI32504" );
+					bool	bRemote = encryptDateTime( tmNow, getPassword2(), strDTRemote, "ELI32505" );
 
 					// Store encrypted strings
 					if (bLocal && bRemote)
@@ -1137,11 +1133,11 @@ void TimeRollbackPreventer::updateDateTimeItems(bool bForceCreation)
 	
 	// Encrypt current time for local registry item
 	string	strDTLocalEncrypted;
-	bool bLocal = encryptDateTime( currentTime, getPassword1(), strDTLocalEncrypted );
+	bool bLocal = encryptDateTime( currentTime, getPassword1(), strDTLocalEncrypted, "ELI32506" );
 
 	// Encrypt current time for remote registry item
 	string	strDTRemoteEncrypted;
-	bool bRemote = encryptDateTime( currentTime, getPassword2(), strDTRemoteEncrypted );
+	bool bRemote = encryptDateTime( currentTime, getPassword2(), strDTRemoteEncrypted, "ELI32507" );
 
 	if (bLocal && bRemote)
 	{
@@ -1313,8 +1309,8 @@ CMutex* TimeRollbackPreventer::getReadWriteMutex()
 {
 	if (m_upmutexReadWrite.get() == __nullptr)
 	{
-		m_upmutexReadWrite.reset(getLocalNamedMutex(
-			"Local\\UCLID_Licensing_F01E2C82-5091-4C36-905D-0C219C89CA47"));
+		m_upmutexReadWrite.reset(getGlobalNamedMutex(
+			"Global\\UCLID_Licensing_F01E2C82-5091-4C36-905D-0C219C89CA47"));
 		ASSERT_RESOURCE_ALLOCATION("ELI29993", m_upmutexReadWrite.get() != __nullptr);
 	}
 
