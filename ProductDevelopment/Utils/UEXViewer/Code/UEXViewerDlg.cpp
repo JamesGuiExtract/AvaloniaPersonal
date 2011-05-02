@@ -66,6 +66,7 @@ const string PID_WIDTH			= "PidWidth";
 const string TIME_WIDTH			= "TimeWidth";
 const string ELI_WIDTH			= "ELICodeWidth";
 const string EXCEPTION_WIDTH	= "ExceptionWidth";
+const string SHOW_TRACES		= "ShowApplicationTraces";
 
 // Window Size Bounds
 #define	MIN_WINDOW_X				731
@@ -74,6 +75,8 @@ const string EXCEPTION_WIDTH	= "ExceptionWidth";
 // Column Width Bounds
 #define	MIN_WIDTH					0
 #define	MAX_WIDTH					400
+
+const char *gszAPP_TRACE_TAG	= "application trace";
 
 //-------------------------------------------------------------------------------------------------
 // CUEXViewerDlg dialog
@@ -91,6 +94,7 @@ CUEXViewerDlg::CUEXViewerDlg(CWnd* pParent /*=NULL*/, string strFileName /*= ""*
 	m_iTimeColumnWidth(130),
 	m_strFileName(strFileName),
 	m_bShowFileName(bShowFileName),
+	m_bShowTraces(true),
 	m_bInitialized(false)
 {
 	try
@@ -179,6 +183,7 @@ BEGIN_MESSAGE_MAP(CUEXViewerDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_EXPORTDEBUGDATA, &CUEXViewerDlg::OnToolsExportDebugData)
 	ON_COMMAND(ID_ELILISTCONTEXT_MATCHING_TOPLEVEL, &CUEXViewerDlg::OnSelectMatchingTopLevelExceptions)
 	ON_COMMAND(ID_ELILISTCONTEXT_MATCHING_HIERARCHIES, &CUEXViewerDlg::OnSelectMatchingExceptionHierarchies)
+	ON_COMMAND(ID_VIEW_SHOW_TRACES, &CUEXViewerDlg::OnToggleShowTraces)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -295,6 +300,12 @@ BOOL CUEXViewerDlg::OnInitDialog()
 
 		// Retrieve settings
 		initPersistent();
+		
+		// Set the initial state of the "Show application traces" option.
+		CMenu* pMenu = GetMenu();
+		ASSERT_RESOURCE_ALLOCATION("ELI32492", pMenu != __nullptr);
+		pMenu->CheckMenuItem(ID_VIEW_SHOW_TRACES,
+			MF_BYCOMMAND | (m_bShowTraces ? MF_CHECKED : MF_UNCHECKED));
 
 		// Setup list for UEX files
 		prepareList();
@@ -1146,6 +1157,8 @@ void CUEXViewerDlg::OnClose()
 		strKey = (LPCTSTR) m_zDirectory;
 		m_pCfgMgr->setKeyValue( GENERAL, DIRECTORY, strKey, true );
 
+		m_pCfgMgr->setKeyValue(GENERAL, SHOW_TRACES, m_bShowTraces ? "1" : "0", true);
+
 		// ELI Code column width
 		(m_listUEX.GetHeaderCtrl())->GetItemRect( TOP_ELI_COLUMN, &rect );
 		m_iELIColumnWidth = rect.Width();
@@ -1351,7 +1364,23 @@ void CUEXViewerDlg::OnSelectMatchingExceptionHierarchies()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31272");
 }
+//-------------------------------------------------------------------------------------------------
+void CUEXViewerDlg::OnToggleShowTraces()
+{
+	try
+	{
+		CMenu* pMenu = GetMenu();
+		ASSERT_RESOURCE_ALLOCATION("ELI32490", pMenu != __nullptr);
 
+		m_bShowTraces = !m_bShowTraces;
+		pMenu->CheckMenuItem(ID_VIEW_SHOW_TRACES,
+			MF_BYCOMMAND | (m_bShowTraces ? MF_CHECKED : MF_UNCHECKED));
+
+		// Call addExceptions with replace mode true to refresh
+		addExceptions(m_strCurrentFile, true);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32491");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
@@ -1483,6 +1512,12 @@ void CUEXViewerDlg::initPersistent()
 	{
 		// Default to C drive
 		m_zDirectory = "C:\\";
+	}
+
+	// Set the initial state of the "Show application traces" option.
+	if (m_pCfgMgr->keyExists(GENERAL, SHOW_TRACES))
+	{
+		m_bShowTraces = (m_pCfgMgr->getKeyValue(GENERAL, SHOW_TRACES) == "1");
 	}
 
 	// Retrieve column widths
@@ -1742,13 +1777,57 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 		unsigned long ulCount = vecTokens.size();
 		string	strToken;
 
-		// Dummy text for 0-width column
-		iIndex = m_listUEX.InsertItem( 0, "a" );
 		long lTime = 0;
 
 		// Only parse lines with expected number of tokens
 		if (ulCount == OLD_UEX_TOKEN_COUNT)
 		{
+			// Retrieve exception string for storage in ItemData
+			strToken = vecTokens[EXCEPTION_VALUE];
+
+			// Create local UCLIDException object
+			UCLIDException ue;
+			try
+			{
+				// make sure there is a valid string
+				ue.createFromString( "ELI12736", strToken, false );
+
+				// Check that the top text is not just the token passed in
+				// if it is, then this line could not be parsed
+				if (ue.getTopText() == strToken || ue.getTopELI().empty())
+				{
+					UCLIDException uex("ELI29918", "*Unparsable exception*");
+					uex.addDebugInfo("Exception String",
+						strToken.empty() ? "<Empty String>" : strToken);
+					strToken = uex.asStringizedByteStream();
+					ue = uex;
+				}
+			}
+			catch (...)
+			{
+				// Create a row to add the unparsable exception to
+				iIndex = m_listUEX.InsertItem( 0, "a" );
+
+				UCLIDException uex("ELI29919", "*Unparsable exception*");
+				uex.addDebugInfo("Exception String",
+					strToken.empty() ? "<Empty String>" : strToken);
+				strToken = uex.asStringizedByteStream();
+				ue = uex;
+			}
+
+			// If not showing application traces 
+			if (!m_bShowTraces)
+			{
+				static size_t nLength = strlen(gszAPP_TRACE_TAG);
+				if (_strnicmp(gszAPP_TRACE_TAG, ue.getTopText().c_str(), nLength) == 0)
+				{
+					return true;
+				}
+			}
+
+			// Now that we know the exception isn't to be filtered out, create a row for it.
+			iIndex = m_listUEX.InsertItem( 0, "a" );
+
 			// Set the serial column
 			setItemText(iIndex, SERIAL_LIST_COLUMN, vecTokens[SERIAL_VALUE]);
 
@@ -1776,42 +1855,15 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 			CString	zTime = lTime > 0 ? time.Format("%m/%d/%Y %H:%M:%S") : "N/A";
 			setItemText( iIndex, TIME_LIST_COLUMN, (LPCTSTR) zTime );
 
-			// Retrieve exception string for storage in ItemData
-			strToken = vecTokens[EXCEPTION_VALUE];
-
-			// Create local UCLIDException object
-			UCLIDException ue;
-			try
-			{
-				// make sure there is a valid string
-				ue.createFromString( "ELI12736", strToken, false );
-
-				// Check that the top text is not just the token passed in
-				// if it is, then this line could not be parsed
-				if (ue.getTopText() == strToken || ue.getTopELI().empty())
-				{
-					UCLIDException uex("ELI29918", "*Unparsable exception*");
-					uex.addDebugInfo("Exception String",
-						strToken.empty() ? "<Empty String>" : strToken);
-					strToken = uex.asStringizedByteStream();
-					ue = uex;
-				}
-			}
-			catch (...)
-			{
-				UCLIDException uex("ELI29919", "*Unparsable exception*");
-				uex.addDebugInfo("Exception String",
-					strToken.empty() ? "<Empty String>" : strToken);
-				strToken = uex.asStringizedByteStream();
-				ue = uex;
-			}
-
 			// Display Top ELI code and Top Exception
 			setItemText( iIndex, TOP_ELI_COLUMN, ue.getTopELI() );
 			setItemText( iIndex, TOP_EXCEPTION_COLUMN, ue.getTopText() );
 		}
 		else
 		{
+			// Create a row to add the invalid exception to
+			iIndex = m_listUEX.InsertItem( 0, "a" );
+
 			// Invalid number of tokens, set the exception text to invalid token count
 			UCLIDException ue("ELI29920", "*Exception line had invalid number of tokens.*");
 			ue.addDebugInfo("Exception Line", strText);

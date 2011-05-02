@@ -118,6 +118,7 @@ protected:
 	afx_msg void OnFileStartNewLogFile();
 	afx_msg void OnSelectMatchingTopLevelExceptions();
 	afx_msg void OnSelectMatchingExceptionHierarchies();
+	afx_msg void OnToggleShowTraces();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -231,6 +232,9 @@ private:
 
 	// Whether to show the filename in the title bar and populate the files in folder combo box.
 	bool m_bShowFileName;
+
+	// Indicates whether application trace exceptions should be filtered out.
+	bool m_bShowTraces;
 
 	// Have the dialog's controls been instantiated yet - allows for resize
 	// and repositioning

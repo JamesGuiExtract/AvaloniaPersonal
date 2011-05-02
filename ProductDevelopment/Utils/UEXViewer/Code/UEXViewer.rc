@@ -250,9 +250,10 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Clear",                      ID_EDIT_CLEAR
     END
-    POPUP "Exception"
+    POPUP "View"
     BEGIN
         MENUITEM "Vie&w details...\tCtrl+D",    ID_EXCEPTION_VIEW_DETAILS
+        MENUITEM "Show application traces",     ID_VIEW_SHOW_TRACES
     END
     POPUP "Tools"
     BEGIN
@@ -269,7 +270,7 @@ BEGIN
     POPUP "ELIListContext"
     BEGIN
         MENUITEM "Select all matching top-level exceptions", ID_ELILISTCONTEXT_MATCHING_TOPLEVEL
-		MENUITEM "Select all matching exception hierarchies", ID_ELILISTCONTEXT_MATCHING_HIERARCHIES
+        MENUITEM "Select all matching exception hierarchies", ID_ELILISTCONTEXT_MATCHING_HIERARCHIES
         MENUITEM "Copy top ELI code",           ID_ELILISTCONTEXT_COPYELICODE
         MENUITEM SEPARATOR
         MENUITEM "Cancel",                      ID_ELILISTCONTEXT_CANCEL
