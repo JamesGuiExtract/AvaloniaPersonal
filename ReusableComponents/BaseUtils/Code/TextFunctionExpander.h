@@ -100,6 +100,8 @@ private:
 	const string expandUserName(const string& str) const;
 	const string expandFullUserName(const string& str) const;
 	const string expandTrimAndConsolidateWS(const string& str) const;
+	const string expandThreadId(const string& str) const;
+	const string expandProcessId(const string& str) const;
 
 	// Random object used for "$RandomAlphaNumeric()" calls
 	static Random ms_Rand;

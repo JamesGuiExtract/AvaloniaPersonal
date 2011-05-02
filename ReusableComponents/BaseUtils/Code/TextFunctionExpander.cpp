@@ -38,6 +38,8 @@ const string gstrFUNC_REPLACE = "Replace";
 const string gstrFUNC_RIGHT = "Right";
 const string gstrFUNC_TRIM_AND_CONSOLIDATE_WS = "TrimAndConsolidateWS";
 const string gstrFUNC_USER_NAME = "UserName";
+const string gstrFUNC_THREAD_ID = "ThreadId";
+const string gstrFUNC_PROCESS_ID = "ProcessId";
 
 //-------------------------------------------------------------------------------------------------
 // Static initialization
@@ -70,9 +72,11 @@ TextFunctionExpander::TextFunctionExpander()
 			g_vecFunctions.push_back(gstrFUNC_NOW);
 			g_vecFunctions.push_back(gstrFUNC_OFFSET);
 			g_vecFunctions.push_back(gstrFUNC_PAD_VALUE);
+			g_vecFunctions.push_back(gstrFUNC_PROCESS_ID);
 			g_vecFunctions.push_back(gstrFUNC_RANDOM_ALPHA_NUMERIC);
 			g_vecFunctions.push_back(gstrFUNC_REPLACE);
 			g_vecFunctions.push_back(gstrFUNC_RIGHT);
+			g_vecFunctions.push_back(gstrFUNC_THREAD_ID);
 			g_vecFunctions.push_back(gstrFUNC_TRIM_AND_CONSOLIDATE_WS);
 			g_vecFunctions.push_back(gstrFUNC_USER_NAME);
 
@@ -290,6 +294,14 @@ const string TextFunctionExpander::expandFunctions(const string& str) const
 		else if (strFunction == gstrFUNC_FULL_USER_NAME)
 		{
 			strRet += expandFullUserName(strArg);
+		}
+		else if (strFunction == gstrFUNC_THREAD_ID)
+		{
+			strRet += expandThreadId(strArg);
+		}
+		else if (strFunction == gstrFUNC_PROCESS_ID)
+		{
+			strRet += expandProcessId(strArg);
 		}
 		else
 		{
@@ -983,5 +995,29 @@ const string TextFunctionExpander::expandChangeExt(const string& str, const stri
 		ue.addDebugInfo("NumOfArgs", vecTokens.size());
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandThreadId(const string& str) const
+{
+	if (!str.empty())
+	{
+		UCLIDException uex("ELI32498", "$ThreadId() does not accept arguments.");
+		uex.addDebugInfo("Argument", str);
+		throw uex;
+	}
+
+	return asString(GetCurrentThreadId());
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandProcessId(const string& str) const
+{
+	if (!str.empty())
+	{
+		UCLIDException uex("ELI32499", "$ProcessId() does not accept arguments.");
+		uex.addDebugInfo("Argument", str);
+		throw uex;
+	}
+
+	return asString(GetCurrentProcessId());
 }
 //-------------------------------------------------------------------------------------------------
