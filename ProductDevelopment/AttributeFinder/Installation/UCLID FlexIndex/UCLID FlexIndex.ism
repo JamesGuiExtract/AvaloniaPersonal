@@ -227,7 +227,7 @@
 		<row><td>OfficeToTif.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{1C7B3428-7CA8-4FD9-A3D1-769ED53DD0DB}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>officetotif.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>PegasusImaging.WinForms.PdfX.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{436CB31C-F706-4F25-8F41-C3EA42805E2F}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>pegasusimaging.winforms.pdfx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RegExprIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{BF89DE2D-966E-4A35-82EC-678EC366C642}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>regexpriv.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{14CB5FC3-E5F2-4793-8E2F-A452B33B01A5}</td><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>detailed_report_for_.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{14CB5FC3-E5F2-4793-8E2F-A452B33B01A5}</td><td>REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>detailed_report_for_.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RunFPSFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{970A05B7-73AB-4075-9520-19866FE2A656}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>runfpsfile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SQLCDBEditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{3CC22EF6-5665-4E49-B71E-A9A9C187DF66}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>sqlcdbeditor.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SQLCompactExporter.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{CED61982-2155-4CBD-ADB0-5A33FFBB1DAB}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>sqlcompactexporter.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -252,6 +252,7 @@
 		<row><td>UCLIDGenericDisplay2.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{0BB37FBF-9FD9-4DF7-B370-1D9A0E8A70C3}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>uclidgenericdisplay2.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a custom control.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDTestingFramework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{A8BC2B5F-20B3-465D-AB1B-EB428B53B5F6}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>uclidtestingframework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDTestingFrameworkCore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{3B36BC3E-5A44-42D5-84A7-59621FD055FD}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>uclidtestingframeworkcore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{9FFFEE35-4077-4559-B3D8-4026DB2B4492}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -350,8 +351,11 @@
 		<row><td>CommonFiles64Folder</td><td>TARGETDIR</td><td>.:Common64</td><td/><td>0</td><td/></row>
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
 		<row><td>DIRPROPERTY1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>TARGETDIR</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>DIRPROPERTY2.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>TARGETDIR</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>DIRPROPERTY3.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>TARGETDIR</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>FILE_PROCESSING_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FILEPR~1|FileProcessingComponents</td><td/><td>0</td><td/></row>
 		<row><td>FLEXINDEX.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FLEXIN~1|FlexIndex</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_BIN.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FLEXINDEX.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Bin</td><td/><td>0</td><td/></row>
@@ -369,9 +373,8 @@
 		<row><td>ProgramFiles64Folder</td><td>TARGETDIR</td><td>.:Prog64~1|Program Files 64</td><td/><td>0</td><td/></row>
 		<row><td>ProgramFilesFolder</td><td>TARGETDIR</td><td>.:PROGRA~1|program files</td><td/><td>0</td><td/></row>
 		<row><td>ProgramMenuFolder</td><td>TARGETDIR</td><td>.:Programs</td><td/><td>3</td><td/></row>
-		<row><td>REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FILE_PROCESSING_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports</td><td/><td>0</td><td/></row>
+		<row><td>REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports</td><td/><td>0</td><td/></row>
 		<row><td>SDK_BIN.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FLEXIN~1|FLEX Index SDK</td><td/><td>0</td><td/></row>
-		<row><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>STANDA~1|Standard reports</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
 		<row><td>StartupFolder</td><td>TARGETDIR</td><td>.:StartUp</td><td/><td>3</td><td/></row>
@@ -460,6 +463,7 @@
 		<row><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDA~1.DLL|UCLIDAFValueModifiers.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\UCLIDAFValueModifiers.dll</td><td>17</td><td/></row>
 		<row><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDF~1.DLL|UCLIDFileProcessing.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\UCLIDFileProcessing.dll</td><td>17</td><td/></row>
 		<row><td>_11111111.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>_11111~1.DLL|_11111111.Dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;CLEAR_IMAGE_PATH&gt;\_11111111.Dll</td><td>17</td><td/></row>
+		<row><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>adodb.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\microsoft.net\primary interop assemblies\adodb.dll</td><td>1</td><td/></row>
 		<row><td>detailed_report_for_.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DETAIL~1.RPT|Detailed report for specific document.rpt</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;SDK_REPORT_PATH&gt;\Detailed report for specific document.rpt</td><td>17</td><td/></row>
 		<row><td>esfamconditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMC~1.DLL|ESFAMConditions.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ESFAMConditions.dll</td><td>17</td><td/></row>
 		<row><td>esfamservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMS~1.EXE|ESFAMService.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\ESFAMService.exe</td><td>17</td><td/></row>
@@ -689,6 +693,7 @@
 		<row><td>UCLIDGenericDisplay2.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_24211E31_8A9E_4117_9EE9_79B9B93504D5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDTestingFramework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_28D65F4F_B664_4280_9B77_CFD00BC89B2E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDTestingFrameworkCore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_6064F27F_884F_4617_9897_A0DD1C40F9B4_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_ADF22E05_CAFB_4BC9_99CD_7841298D73FB_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -1356,6 +1361,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>UCLIDGenericDisplay2.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>UCLIDTestingFramework.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>UCLIDTestingFrameworkCore.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 	</table>
 
 	<table name="ModuleConfiguration">
@@ -1615,6 +1621,8 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="L0">Value</col>
 		<col def="S255">ISComments</col>
 		<row><td>DIRPROPERTY1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>COMMON_COMPONENTS</td><td/></row>
+		<row><td>DIRPROPERTY2.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>REPORTS</td><td/></row>
+		<row><td>DIRPROPERTY3.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td/></row>
 		<row><td>IS_COMPLUS_PROGRESSTEXT_COST</td><td>##IDS_COMPLUS_PROGRESSTEXT_COST##</td><td/></row>
 		<row><td>IS_COMPLUS_PROGRESSTEXT_INSTALL</td><td>##IDS_COMPLUS_PROGRESSTEXT_INSTALL##</td><td/></row>
 		<row><td>IS_COMPLUS_PROGRESSTEXT_UNINSTALL</td><td>##IDS_COMPLUS_PROGRESSTEXT_UNINSTALL##</td><td/></row>

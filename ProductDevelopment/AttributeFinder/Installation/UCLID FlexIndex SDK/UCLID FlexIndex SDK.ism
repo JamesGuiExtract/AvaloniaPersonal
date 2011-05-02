@@ -4386,6 +4386,8 @@
 		<row><td>ID_STRING39</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>555642703</td></row>
 		<row><td>ID_STRING4</td><td>0</td><td>FEEDBA~1|FeedBack Manager</td><td>0</td><td/><td>178112137</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>FEEDBA~1|FeedBack Manager</td><td>0</td><td/><td>1830330511</td></row>
+		<row><td>ID_STRING40</td><td>0</td><td>NEWSHO~1|NewShortcut16</td><td>0</td><td/><td>312434409</td></row>
+		<row><td>ID_STRING40</td><td>1033</td><td>FAMNET~1|FAM Network Manager</td><td>0</td><td/><td>312442601</td></row>
 		<row><td>ID_STRING5</td><td>0</td><td>FEEDBA~1|FeedBack Manager</td><td>0</td><td/><td>178112137</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>FEEDBA~1|Feedback Manager</td><td>0</td><td/><td>2040452583</td></row>
 		<row><td>ID_STRING6</td><td>0</td><td>FILEPR~1|File Action Manager</td><td>0</td><td/><td>178112137</td></row>
@@ -5073,6 +5075,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut14</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut141</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut1411</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut16</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut2</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut3</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut4</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
@@ -5175,6 +5178,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut141</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING31##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1411</td><td>newfolder1</td><td>##ID_STRING34##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td>"[COMMON_COMPONENTS]ESFAMService.sdf"</td><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut15</td><td>newfolder1</td><td>##ID_STRING39##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]SQLCDBEditor</td><td>"[CommonAppDataFolder]Extract Systems\ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut16</td><td>newfolder1</td><td>##ID_STRING40##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]FAMNetworkManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>newfolder1</td><td>##ID_STRING5##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]Feedback.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING6##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder1</td><td>##ID_STRING7##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>

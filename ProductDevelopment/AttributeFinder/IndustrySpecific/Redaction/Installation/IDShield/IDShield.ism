@@ -320,7 +320,7 @@
 		<row><td>FlexIndexComponents</td><td>{964AC833-306B-4B9B-9FFC-C7E885AB040B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td>This is for shortcuts to files installed with Flex Index Merge Module</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{D0D6E5DA-8D44-45F0-8FDD-325E3C7EE9D6}</td><td>HELP</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldComponents</td><td>{0B818341-9DC6-4923-B336-2FBC659BCF44}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>IDShieldReports</td><td>{EBD8982B-68E8-41A2-AF73-CC50371C0B4B}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>IDShieldReports</td><td>{EBD8982B-68E8-41A2-AF73-CC50371C0B4B}</td><td>REPORTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldStatisticsReporter.exe</td><td>{E4593422-EE49-4A44-94A0-0FC9C230817E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldstatisticsreporter.e</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISRegistryComponent</td><td>{BB5CF529-C4A7-46DD-AC5A-F35EB2E1E0E6}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>{B8FF0255-1CA6-48A0-8BD5-3CFB7A976086}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.extractredactiontest</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -455,9 +455,8 @@
 		<row><td>ProgramFiles64Folder</td><td>TARGETDIR</td><td>.:Prog64~1|Program Files 64</td><td/><td>0</td><td/></row>
 		<row><td>ProgramFilesFolder</td><td>TARGETDIR</td><td>.:PROGRA~1|program files</td><td/><td>0</td><td/></row>
 		<row><td>ProgramMenuFolder</td><td>TARGETDIR</td><td>.:Programs</td><td/><td>3</td><td/></row>
-		<row><td>REPORTS</td><td>FILE_PROCESSING_COMPONENTS</td><td>Reports</td><td/><td>0</td><td/></row>
+		<row><td>REPORTS</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>Reports</td><td/><td>0</td><td/></row>
 		<row><td>SQL_CE_EDITOR</td><td>ProgramFilesFolder</td><td>SQLCEE~1|SQL CE Editor</td><td/><td>0</td><td/></row>
-		<row><td>STANDARD_REPORTS</td><td>REPORTS</td><td>STANDA~1|Standard reports</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
 		<row><td>StartupFolder</td><td>TARGETDIR</td><td>.:StartUp</td><td/><td>3</td><td/></row>
@@ -3230,6 +3229,7 @@
 		<row><td>ID_STRING32</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>-1331770293</td></row>
 		<row><td>ID_STRING33</td><td>1033</td><td>CONFIG~1|Configure FAM Service</td><td>0</td><td/><td>555630608</td></row>
 		<row><td>ID_STRING34</td><td>1033</td><td>IDSHIE~1|ID Shield Statistics Reporter</td><td>0</td><td/><td>1100908813</td></row>
+		<row><td>ID_STRING35</td><td>1033</td><td>FAMNET~1|FAM Network Manager</td><td>0</td><td/><td>312411849</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>IDShieldMain</td><td>0</td><td/><td>-216429071</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>EXTRAC~1|Extract Systems ID Shield</td><td>0</td><td/><td>564036847</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>NEWSHO~1|NewShortcut1</td><td>0</td><td/><td>194593546</td></row>
@@ -3870,6 +3870,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut121</td><td>FlexIndexComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut1211</td><td>FlexIndexComponents</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut13</td><td>UtilitiesShortCuts</td><td/><td>newfolder2</td><td>2</td></row>
+		<row><td>NewShortcut14</td><td>FlexIndexComponents</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut2</td><td>FlexIndexComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut3</td><td>FlexIndexComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut4</td><td>FlexIndexComponents</td><td/><td>newfolder2</td><td>2</td></row>
@@ -3971,6 +3972,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut121</td><td>newfolder1</td><td>##ID_STRING23##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut1211</td><td>newfolder2</td><td>##ID_STRING28##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut13</td><td>newfolder2</td><td>##ID_STRING34##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]IDShieldStatisticsReporter.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut14</td><td>newfolder2</td><td>##ID_STRING35##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]FAMNetworkManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>newfolder1</td><td>##ID_STRING7##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>newfolder1</td><td>##ID_STRING8##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]USBLicenseKeyManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder2</td><td>##ID_STRING13##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]UEXViewer.exe</td><td>"[CommonAppDataFolder]Extract Systems\LogFiles\Misc\ExtractException.UEX"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>

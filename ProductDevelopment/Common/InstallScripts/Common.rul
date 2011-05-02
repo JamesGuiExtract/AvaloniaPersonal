@@ -159,9 +159,9 @@ begin
 		szProgram = "msiexec";
 		SdShowMsg("Setup is Installing SQL Native Client", TRUE);
 		if ( SYSINFO.bIsWow64 ) then
-			szCmdLine = " /i " + SUPPORTDIR ^ "\\sqlncli_x64.msi /passive";
+			szCmdLine = " /i " + SUPPORTDIR ^ "\\sqlncli_x64.msi /passive IACCEPTSQLNCLILICENSETERMS=YES";
 		else
-			szCmdLine = " /i " + SUPPORTDIR ^ "\\sqlncli.msi /passive";
+			szCmdLine = " /i " + SUPPORTDIR ^ "\\sqlncli.msi /passive IACCEPTSQLNCLILICENSETERMS=YES";
 		endif;
 		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
 		SdShowMsg("Setup is Installing SQL Native Client", FALSE);
