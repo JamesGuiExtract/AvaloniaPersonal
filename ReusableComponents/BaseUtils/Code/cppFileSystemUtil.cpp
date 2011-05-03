@@ -18,6 +18,7 @@
 #include "FileIterator.h"
 #include "UCLIDException.h"
 #include "TemporaryFileName.h"
+#include "VectorOperations.h"
 
 #include <Shlwapi.h>
 #include <io.h>

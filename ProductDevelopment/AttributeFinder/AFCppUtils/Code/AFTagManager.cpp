@@ -5,6 +5,7 @@
 #include <QuickMenuChooser.h>
 #include <cpputil.h>
 #include <ComUtils.h>
+#include <VectorOperations.h>
 
 //-------------------------------------------------------------------------------------------------
 AFTagManager::AFTagManager()

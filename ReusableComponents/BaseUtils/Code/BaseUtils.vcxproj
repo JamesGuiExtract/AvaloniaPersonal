@@ -383,6 +383,7 @@
     <ClInclude Include="CpuUsage.h" />
     <ClInclude Include="CursorToolTipCtrl.h" />
     <ClInclude Include="DateUtil.h" />
+    <ClInclude Include="VectorOperations.h" />
     <ClInclude Include="WindowPersistenceMgr.h" />
     <ClInclude Include="EncryptedFileManager.h" />
     <ClInclude Include="EncryptionEngine.h" />

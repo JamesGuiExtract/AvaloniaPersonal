@@ -11,6 +11,7 @@
 #include <ComponentLicenseIDs.h>
 #include <ComUtils.h>
 #include <TextFunctionExpander.h>
+#include <VectorOperations.h>
 
 //-------------------------------------------------------------------------------------------------
 // COutputToXMLPP

@@ -9,6 +9,7 @@
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <cpputil.h>
+#include <VectorOperations.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants

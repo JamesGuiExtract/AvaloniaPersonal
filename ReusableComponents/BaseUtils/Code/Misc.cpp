@@ -10,6 +10,7 @@
 #include "UCLIDException.h"
 #include "stringCSIS.h"
 #include "TemporaryFileName.h"
+#include "VectorOperations.h"
 
 #include <io.h>
 #include <fstream>

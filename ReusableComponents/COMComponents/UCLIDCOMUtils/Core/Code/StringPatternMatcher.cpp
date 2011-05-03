@@ -10,6 +10,7 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <VectorOperations.h>
 
 #include <map>
 #include <algorithm>

@@ -838,63 +838,6 @@ void validateRemoveCommaInteger(string& str);
 void validateRemoveCommaDouble(string& str);
 
 //-------------------------------------------------------------------------------------------------
-// ********** Vector Operations ***********
-//-------------------------------------------------------------------------------------------------
-template <class T>
-bool vectorContainsElement(const vector<T>& vec, 
-						   const T& elemToFind)
-{
-	//return find(vec.begin(), vec.end(), elemToFind) != vec.end();
-	for (unsigned int i = 0; i < vec.size(); i++)
-	{
-		T t1 = vec[i];
-		T t2 = elemToFind;
-
-		if(t1 == t2)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-//-------------------------------------------------------------------------------------------------
-template <class T>
-void vectorPushBackIfNotContained(vector<T>& vec, 
-								  const T& elemToPush)
-{
-	if(!vectorContainsElement(vec, elemToPush))
-	{
-		vec.push_back(elemToPush);
-	}
-}
-//-------------------------------------------------------------------------------------------------
-template <class T>
-void eraseFromVector(vector<T>& rVector, 
-					 const T& item)
-{
-	// try to find the item in the vector
-	vector<T>::iterator iter = find(rVector.begin(), rVector.end(), item);
-	
-	// if the item was found, erase all instances of it from the vector
-	if (iter != rVector.end())
-	{
-		rVector.erase(iter);
-	}
-}
-//-------------------------------------------------------------------------------------------------
-template <class T> void
-addVectors(vector<T>& rvecSource, 
-		   const vector<T>& vecToAdd)
-{
-	vector<T>::const_iterator iter;
-
-	for (iter = vecToAdd.begin(); iter != vecToAdd.end(); iter++)
-	{
-		rvecSource.push_back(*iter);
-	}
-}
-
-//-------------------------------------------------------------------------------------------------
 // ********* File I/O *********
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils void writeToFile(const string& strData, 

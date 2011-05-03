@@ -6,6 +6,7 @@
 #include <cpputil.h>
 #include <QuickMenuChooser.h>
 #include <ComUtils.h>
+#include <VectorOperations.h>
 
 //-------------------------------------------------------------------------------------------------
 // Public Methods

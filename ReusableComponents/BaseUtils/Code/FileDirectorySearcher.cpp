@@ -20,6 +20,7 @@
 #include "cpputil.h"
 #include "FileIterator.h"
 #include "UCLIDException.h"
+#include "VectorOperations.h"
 
 using namespace std;
 

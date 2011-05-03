@@ -19,6 +19,7 @@
 #include <StringTokenizer.h>
 #include <stringCSIS.h>
 #include <ValueRestorer.h>
+#include <VectorOperations.h>
 
 #include <string>
 #include <memory>

@@ -8,6 +8,7 @@
 #include <cpputil.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <VectorOperations.h>
 
 #include <vector>
 using std::vector;

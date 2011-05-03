@@ -10,6 +10,7 @@
 #include <cpputil.h>
 #include <UCLIDException.h>
 #include <ComponentLicenseIDs.h>
+#include <VectorOperations.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -321,7 +322,7 @@ void CRuleSetPropertiesDlg::hideCheckboxes()
 	// Get the dimensions of the key serial numbers edit box 
 	// (ie. the control immediately above the check boxes)
 	RECT editRect = {0};
-	m_editKeySerialNumbers.GetWindowRect(&editRect);
+	m_editFKBVersion.GetWindowRect(&editRect);
 	ScreenToClient(&editRect);
 
 	// Calculate the distance of empty space that should be removed
@@ -433,27 +434,18 @@ void CRuleSetPropertiesDlg::setupCounterList()
 //-------------------------------------------------------------------------------------------------
 void CRuleSetPropertiesDlg::validateSerialList( const string &strSerialList )
 {
-	
-	vector<string> vecTokens;
-	StringTokenizer::sGetTokens(strSerialList, ',', vecTokens);
-	
-	long i;
 	try	
 	{
-		long nNumSerials = vecTokens.size();
-		for ( i = 0; i < nNumSerials; i++ )
-		{
-			DWORD dwSN;
-			dwSN = asUnsignedLong(trim(vecTokens[i], " ", " "));
-		}
+		// Attempt to convert strSerialList to a range on numbers in the same way CRuleSet will to
+		// ensure a valid list.
+		vector<DWORD> vecSerialNumbers;
+		addRangeToVector(vecSerialNumbers, strSerialList);
 	}
-	catch (...)
+	catch (UCLIDException &ue)
 	{
-		UCLIDException ue("ELI12020", "Invalid Serial Number in list.");
-		ue.addDebugInfo( "Serial Number List", strSerialList );
-		ue.addDebugInfo( "Invalid Item", vecTokens[i] );
-		throw ue;
-		// if any exceptions are thrown it is because a serial number is not valid
+		UCLIDException uex2("ELI12020", "Invalid Serial Number list.", ue);
+		throw uex2;
+		// if any exceptions are thrown it is because a serial number list is not valid.
 	}
 	// no exceptions means serial numbers are valid
 }

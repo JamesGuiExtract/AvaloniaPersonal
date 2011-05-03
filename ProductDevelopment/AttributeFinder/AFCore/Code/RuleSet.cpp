@@ -13,6 +13,7 @@
 #include <EncryptedFileManager.h>
 #include <StringTokenizer.h>
 #include <ComponentLicenseIDs.h>
+#include <VectorOperations.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -1586,16 +1587,9 @@ void CRuleSet::decrementCounters( ISpatialStringPtr ipText )
 //-------------------------------------------------------------------------------------------------
 std::vector<DWORD>& CRuleSet::getSerialListAsDWORDS()
 {
-
-	vector<string> vecTokens;
-	StringTokenizer::sGetTokens(m_strKeySerialNumbers, ',', vecTokens);
-
 	m_vecSerialNumbers.clear();
-	long nNumSerials = vecTokens.size();
-	for ( long i = 0; i < nNumSerials; i++ )
-	{
-		m_vecSerialNumbers.push_back( asUnsignedLong(trim(vecTokens[i], " ", " ")));
-	}
+	addRangeToVector(m_vecSerialNumbers, m_strKeySerialNumbers);
+
 	return m_vecSerialNumbers;
 }
 //-------------------------------------------------------------------------------------------------

@@ -15,6 +15,7 @@
 #include <COMUtils.h>
 #include <ExtractMFCUtils.h>
 #include <ClipboardManager.h>
+#include <VectorOperations.h>
 
 #include <string>
 #include <vector>

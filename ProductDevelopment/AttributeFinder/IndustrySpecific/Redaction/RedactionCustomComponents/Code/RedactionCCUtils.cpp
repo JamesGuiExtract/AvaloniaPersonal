@@ -8,6 +8,7 @@
 #include <cpputil.h>
 #include <QuickMenuChooser.h>
 #include <ComUtils.h>
+#include <VectorOperations.h>
 
 #include <string>
 #include <vector>

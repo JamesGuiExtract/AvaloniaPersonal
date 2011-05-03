@@ -6,6 +6,7 @@
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <COMUtils.h>
+#include <VectorOperations.h>
 
 using namespace ADODB;
 using namespace std;
