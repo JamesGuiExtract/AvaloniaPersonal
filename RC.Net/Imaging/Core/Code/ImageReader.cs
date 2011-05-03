@@ -1,4 +1,3 @@
-using Extract.Imaging.Utilities;
 using Extract.Licensing;
 using Extract.Utilities;
 using Leadtools;
@@ -8,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Threading;
 
 namespace Extract.Imaging
 {
@@ -19,6 +19,12 @@ namespace Extract.Imaging
         #region Constants
 
         static readonly string _OBJECT_NAME = typeof(ImageReader).ToString();
+
+        /// <summary>
+        /// Number of retries to perform if the GetInformation call fails with
+        /// a BadPdfContent exception. This can be removed when [DNRCAU #662] is patched.
+        /// </summary>
+        const int _MAX_RETRIES = 3;
 
         #endregion Constants
 
@@ -116,11 +122,34 @@ namespace Extract.Imaging
                 }
 
                 // Get file information
-                using (CodecsImageInfo info = _codecs.GetInformation(_stream, true))
+                // TODO: Remove this retry code once the bug in leadtools referenced by
+                // [DNRCAU #662] is officially fixed.
+                int retryCount = 0;
+                do
                 {
-                    _pageCount = info.TotalPages;
-                    _format = info.Format;
-                }
+                    try
+                    {
+                        using (CodecsImageInfo info = _codecs.GetInformation(_stream, true))
+                        {
+                            _pageCount = info.TotalPages;
+                            _format = info.Format;
+                            break;
+                        }
+                    }
+                    catch (RasterException re)
+                    {
+                        // If the raster exception is Bad PDF content, then just retry
+                        // the check (after sleeping for a random amount of time). Any
+                        // other exception just throw it out
+                        if (re.Code != RasterExceptionCode.PdfBadContent
+                            || (++retryCount) > _MAX_RETRIES)
+                        {
+                            throw;
+                        }
+                    }
+
+                    Thread.Sleep((new Random().Next(100, 500)));
+                } while (true);
 
                 IsPdf = ImageMethods.IsPdf(_format);
             }
