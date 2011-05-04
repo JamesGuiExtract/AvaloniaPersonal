@@ -131,4 +131,34 @@ function handleDebug() {
     (new ActiveXObject("WScript.Shell")).
         popup(pairs.join("\n"), 0, "Script Debug Information");
 }
+
+//--------------------------------------------------------------------------------------------------
+// Save an XML document with pretty indentation
+//--------------------------------------------------------------------------------------------------
+function prettyXMLSave(xDoc, strFileName) {
+    handleDebug("Entering prettyXMLSave()", strFileName);
+
+    var rdr = new ActiveXObject("MSXML2.SAXXMLReader");
+    var wrt = new ActiveXObject("MSXML2.MXXMLWriter");
+    var oStream = new ActiveXObject("ADODB.STREAM");
+    oStream.open();
+    oStream.charset = "ISO-8859-1";
+
+    wrt.indent = true;
+    wrt.omitXMLDeclaration = true;
+    wrt.encoding = "ISO-8859-1";
+    wrt.output = oStream;
+    rdr.contentHandler = wrt;
+    rdr.errorHandler = wrt;
+    rdr.parse(xDoc);
+    wrt.flush();
+
+    try {
+        // Save, overwriting if present, creating if not
+        oStream.saveToFile(strFileName, 2);
+    }
+    catch(err) {
+        handleScriptError("ELI32526", "Unable to save XML file!", err, "XML Path", strFileName);
+    }
+}
 //--------------------------------------------------------------------------------------------------
