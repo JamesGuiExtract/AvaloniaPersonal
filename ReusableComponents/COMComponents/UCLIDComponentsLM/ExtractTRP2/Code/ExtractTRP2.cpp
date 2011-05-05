@@ -5,7 +5,7 @@
 #include "ExtractTRP2.h"
 #include "ExtractTRPDlg.h"
 
-#include <ExtractTRP2Constants.h>
+#include <MutexUtils.h>
 #include <UCLIDException.h>
 #include <UCLIDExceptionDlg.h>
 #include <cpputil.h>
@@ -13,17 +13,6 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
-//-------------------------------------------------------------------------------------------------
-// Constants
-//-------------------------------------------------------------------------------------------------
-// unique mutex name
-// This is a global mutex.  You will not be able to run via terminal services with
-// a temporary license due to this global mutex.  This is a known issue and if we
-// need to support running under terminal services with a temporary license we will
-// need to change this mutex and also test what happens if the license state gets
-// corrupt and multiple people are running and we drop in an unlock file, etc.
-const string gstrMUTEX_NAME = "Global\\" + gstrTRP_WINDOW_TITLE + "{AC2EA0A5-312D-4251-BEAB-1AAB9A8FB738}";
 
 //-------------------------------------------------------------------------------------------------
 // CExtractTRPApp
@@ -70,8 +59,6 @@ BOOL CExtractTRPApp::InitInstance()
 		string strArg = m_lpCmdLine;
 		makeLowerCase(strArg);
 
-		// Check for help option
-//		else if (strArg == "/?")
 		if (strArg != "" && strArg != "/exit")
 		{
 			usage();
@@ -83,19 +70,6 @@ BOOL CExtractTRPApp::InitInstance()
 		// to create mutex
 		SetLastError(0);
 
-		// create a new named mutex (P13 #4690)
-		HANDLE hMutexOneInstance = ::CreateMutex(NULL, TRUE, gstrMUTEX_NAME.c_str());
-
-		// if the mutex already exists then the last error will be ERROR_ALREADY_EXISTS
-		// if the mutex exists then an instance of ExtractTRP is already running
-		bool bAlreadyRunning = (GetLastError() == ERROR_ALREADY_EXISTS);
-
-		// release the mutex
-		if (hMutexOneInstance != __nullptr)
-		{
-			::ReleaseMutex(hMutexOneInstance);
-		}
-		
 		// Check for auto-exit option (P13 #4414)
 		if (strArg == "/exit" )
 		{
@@ -105,28 +79,32 @@ BOOL CExtractTRPApp::InitInstance()
 			HWND hwndCurrent = ::FindWindow( MAKEINTATOM(32770), gstrTRP_WINDOW_TITLE.c_str() );
 
 			// if we didn't find the window handle on the first attempt it may be that the
-			// instance is still initializing, sleep for 5 seconds and try again
-			if (hwndCurrent == NULL)
+			// instance is still initializing, sleep for 3 seconds and try again
+			int sleepCount = 0;
+			while (hwndCurrent == NULL && sleepCount < 3000)
 			{
-				Sleep(5000);
+				Sleep(500);
+				sleepCount += 500;
 				hwndCurrent = ::FindWindow( MAKEINTATOM(32770), gstrTRP_WINDOW_TITLE.c_str() );
 			}
 
 			// Ask current instance to close (P13 #4354)
-			if (hwndCurrent != __nullptr)
+			if (hwndCurrent != NULL)
 			{
 				PostMessage( hwndCurrent, WM_CLOSE, 0, 0 );
 			}
-
-			// close the handle to the mutex now that we are done with it
-			CloseHandle(hMutexOneInstance);
 
 			// Exit this instance every time for the /exit option
 			return FALSE;
 		}
 
+		// create a new named mutex (P13 #4690)
+		unique_ptr<CMutex> pRunning(getGlobalNamedMutex(gpszTrpRunning));
+		ASSERT_RESOURCE_ALLOCATION("ELI32539", pRunning.get() != __nullptr);
+		CSingleLock lRunning(pRunning.get(), FALSE);
+
 		// Only allow one instance of ExtractTRP2 (P13 #4353) and (P13 #4690)
-		if (!bAlreadyRunning)
+		if (lRunning.Lock(1000) == TRUE)
 		{
 			// Add exception handling
 			static UCLIDExceptionDlg exceptionDlg;
@@ -156,12 +134,12 @@ BOOL CExtractTRPApp::InitInstance()
 			CExtractTRPDlg dlg;
 			m_pMainWnd = &dlg;
 			dlg.DoModal();
-		}
 
-		// close the handle to the mutex now that we are done with it
-		CloseHandle(hMutexOneInstance);
+			// Unlock as soon as the dialog exits
+			lRunning.Unlock();
+		}
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI15480")
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI15480");
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.

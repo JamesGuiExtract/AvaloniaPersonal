@@ -31,15 +31,17 @@ using namespace std;
 // read from the CommonComponents folder
 const char gpszDateTimeUnlockFile[] = "\\Extract_UnlockLicense.txt";
 
+// Mutex names for TRP checks
+const char gpszTrpRunning[] = "Global\\35B5705B-5454-4480-A047-1758143D6737";
+const char gpszGoodStateMutex[] = "Global\\61593BF3-DDAC-4688-8252-AFFA0F5F5661";
+
 class TimeRollbackPreventer
 {
 public:
 	//=======================================================================
 	// PURPOSE: Constructs a TimeRollbackPreventer object.
-	// REQUIRE: Reference to manually reset event to signal a bad state
-	// PROMISE: If a bad license state is detect the rEventBadState event will be signaled
-	// ARGS:	None
-	TimeRollbackPreventer(Win32Event &rEventBadState );
+	// ARGS:	bLaunchThread - if true then the TRP thread will be created
+	TimeRollbackPreventer(bool bLaunchThread = true);
 	//=======================================================================
 	// PURPOSE: Destructor for the TimeRollbackPreventer object.
 	// REQUIRE: Nothing
@@ -69,7 +71,7 @@ public:
 	// PROMISE: Nothing
 	// ARGS:	None
 	// This is public because it is used in UserLicense Utility
-	void	checkDateTimeItems();
+	void checkDateTimeItems();
 	//=======================================================================
 
 private:
@@ -155,6 +157,9 @@ private:
 	// ARGS:	None
 	static ByteStream getUnlockPassword();
 
+	void startTrpThread();
+	void endTrpThread();
+
 	///////
 	// Data
 	///////
@@ -175,9 +180,6 @@ private:
 	unsigned long m_ulRWTimeout;
 
 	Win32Event m_eventKillThread;
-
-	// Pointer to a event indicating a bad state
-	Win32Event &m_rEventBadState;
 
 	// Pointer to thread that manages periodic updates
 	unique_ptr<CWinThread>	m_apThread;

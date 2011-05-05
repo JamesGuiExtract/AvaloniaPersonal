@@ -5,7 +5,6 @@
 #include "ExtractTRP2.h"
 #include "ExtractTRPDlg.h"
 
-#include <ExtractTRP2Constants.h>
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <LicenseMgmt.h>
@@ -21,8 +20,7 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 // CExtractTRPDlg dialog
 //-------------------------------------------------------------------------------------------------
 CExtractTRPDlg::CExtractTRPDlg(CWnd* pParent /*=NULL*/)
-: CDialog(CExtractTRPDlg::IDD, pParent),
-  m_TRP(m_stateIsInvalidEvent)
+: CDialog(CExtractTRPDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -35,8 +33,6 @@ void CExtractTRPDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CExtractTRPDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_MESSAGE(gGET_AUTHENTICATION_CODE_MSG, OnGetAuthenticationCode)
-	ON_MESSAGE(gSTATE_IS_VALID_MSG, OnStateIsValid)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -101,48 +97,5 @@ void CExtractTRPDlg::OnPaint()
 HCURSOR CExtractTRPDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
-}
-
-//-------------------------------------------------------------------------------------------------
-// Custom TRP message handlers
-//-------------------------------------------------------------------------------------------------
-LRESULT CExtractTRPDlg::OnGetAuthenticationCode(WPARAM wParam, LPARAM lParam)
-{
-	try
-	{
-		// Return encrypted day code
-		return (LRESULT) asUnsignedLong(LICENSE_MGMT_PASSWORD);
-	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI15472");
-
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-LRESULT CExtractTRPDlg::OnStateIsValid(WPARAM wParam, LPARAM lParam)
-{
-	try
-	{
-		// Check the state
-		if (stateIsValid())
-		{
-			// If we have reached here, state is valid
-			return (LRESULT) guiVALID_STATE_CODE;
-		}
-		// else just return the invalid state return code below
-	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI15473");
-
-	// This is an invalid state return code
-	return 0;
-}
-
-//-------------------------------------------------------------------------------------------------
-// Private methods
-//-------------------------------------------------------------------------------------------------
-bool CExtractTRPDlg::stateIsValid()
-{
-	// return the state of the licensing depending upon
-	// whether the event has been signaled
-	return m_stateIsInvalidEvent.isSignaled() ? false : true;
 }
 //-------------------------------------------------------------------------------------------------

@@ -57,9 +57,9 @@ const string COUNT = "Count";
 const string gstrDateTimeSubfolderFile = "\\Windows\\{EFF9AEFC-3046-48BC-84D1-E9862F9D1E22}\\estrpmfc.dll";
 
 // Min and max for the polling interval range, polling will occur at a random number
-// of minutes between min and max
-const unsigned long gulTRP_TIMER_MIN = 5;
-const unsigned long gulTRP_TIMER_MAX = 60;
+// of seconds between 30 and 300
+const unsigned long gulTRP_TIMER_MIN = 30;
+const unsigned long gulTRP_TIMER_MAX = 300;
 
 // Modulo constant for random additions to DT strings
 const unsigned long gulMODULO_CONSTANT = 53;
@@ -96,31 +96,38 @@ const unsigned long	gulUCLIDDateTimeKeyC = 0x7D1C1047;
 // This requires the TimeRollbackPreventer "this" pointer to be passed as pParam
 UINT TRPThreadProc(LPVOID pParam)
 {
-	Random random;
 	try
 	{
 		// make sure the pParam is not null
 		ASSERT_ARGUMENT( "ELI12995", pParam != __nullptr );
 		TimeRollbackPreventer *trpInstance = (TimeRollbackPreventer *) pParam;
 
+		unique_ptr<CMutex> pValidState(getGlobalNamedMutex(gpszGoodStateMutex));
+		ASSERT_RESOURCE_ALLOCATION("ELI32540", pValidState != __nullptr);
+
 		try
 		{
-			try
+			Random random;
+
+			// Set the state to valid
+			CSingleLock lValid(pValidState.get(), FALSE);
+			while (!trpInstance->m_eventKillThread.isSignaled()
+				&& lValid.Lock(1000) == FALSE);
+
+			// Check if end thread is signaled
+			if (trpInstance->m_eventKillThread.isSignaled())
 			{
-				// Continuous updates
-				while (trpInstance->m_eventKillThread.wait(
-					random.uniform(gulTRP_TIMER_MIN, gulTRP_TIMER_MAX+1) * 60000 ) == WAIT_TIMEOUT)
-				{
-					// Update the Date-Time items
-					trpInstance->updateDateTimeItems();
-				}
+				return 0;
 			}
-			catch (...)
+
+			// Continuous updates
+			do
 			{
-				// If any exceptions put licensing in a bad state
-				trpInstance->m_rEventBadState.signal();
-				throw;
+				// Update the Date-Time items
+				trpInstance->updateDateTimeItems();
 			}
+			while (trpInstance->m_eventKillThread.wait(
+				random.uniform(gulTRP_TIMER_MIN, gulTRP_TIMER_MAX+1) * 1000 ) == WAIT_TIMEOUT);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10692");
 	}
@@ -137,10 +144,9 @@ UINT TRPThreadProc(LPVOID pParam)
 //-------------------------------------------------------------------------------------------------
 // TimeRollbackPreventer
 //-------------------------------------------------------------------------------------------------
-TimeRollbackPreventer::TimeRollbackPreventer(Win32Event &rEventBadState)
+TimeRollbackPreventer::TimeRollbackPreventer(bool bLaunchThread)
 :	m_tmLastUpdate(-1),
 	m_ulRWTimeout(ulDEFAULT_RW_TIME0UT),
-	m_rEventBadState(rEventBadState),
 	m_apThread(__nullptr)
 {
 	try
@@ -173,23 +179,16 @@ TimeRollbackPreventer::TimeRollbackPreventer(Win32Event &rEventBadState)
 				// Check license items
 				checkDateTimeItems();
 			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10709")
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10709");
 
-			// This try catch is just to give more trace information
-			try
+			if (bLaunchThread)
 			{
-				m_eventKillThread.reset();
-
-				// Start the thread that handles updates
-				m_apThread.reset(AfxBeginThread(TRPThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED));
-				m_apThread->m_bAutoDelete = FALSE;
-				m_apThread->ResumeThread();
+				startTrpThread();
 			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10711")
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10693");
 	}
-	catch(UCLIDException ue)
+	catch(UCLIDException& ue)
 	{
 #ifdef _DEBUG
 		ue.log();
@@ -202,21 +201,7 @@ TimeRollbackPreventer::~TimeRollbackPreventer()
 {
 	try
 	{
-		// Kill the thread if it exists
-		if (m_apThread.get())
-		{
-			m_eventKillThread.signal();
-
-			DWORD dwRet = WaitForSingleObject(m_apThread->m_hThread, 2000);
-			if(dwRet == WAIT_TIMEOUT)
-			{
-				UCLIDException ue("ELI10940", "Licensing system unable to shutdown correctly.");
-				throw ue;
-			}
-
-			// delete the thread
-			m_apThread.reset();
-		}
+		endTrpThread();
 
 		// Reset the auto pointers
 		m_upmutexReadWrite.reset();
@@ -232,7 +217,7 @@ void TimeRollbackPreventer::checkDateTimeItems()
 		////////////////////////////////////////////
 		// Check for system time already rolled back
 		////////////////////////////////////////////
-		string strDLL = getModuleDirectory("COMLMCore.dll");
+		string strDLL = getModuleDirectory("BaseUtils.dll");
 		strDLL += "\\";
 		strDLL += "COMLMCore.dll";
 		CTime tmDLL = getFileModificationTimeStamp( strDLL );
@@ -243,7 +228,6 @@ void TimeRollbackPreventer::checkDateTimeItems()
 			// This Exception and ELI code will be seen in UEX log file
 			UCLIDException ue( "ELI11549", gpszLicenseIsCorrupt );
 			ue.log();
-			m_rEventBadState.signal();
 			throw ue;
 		}
 
@@ -268,7 +252,6 @@ void TimeRollbackPreventer::checkDateTimeItems()
 				// unable to lock the mutex signal bad state and throw exception
 				UCLIDException ue( "ELI12996", gpszLicenseIsCorrupt );
 				ue.log();
-				m_rEventBadState.signal();
 				throw ue;
 			}
 
@@ -440,7 +423,6 @@ void TimeRollbackPreventer::checkDateTimeItems()
 			ue.log();
 
 			// Signal a badstate
-			m_rEventBadState.signal();
 			throw ue;
 		}
 	}
@@ -652,8 +634,8 @@ bool TimeRollbackPreventer::evaluateUnlockCode(string strCode)
 
 				// Create and log UCLID Exception
 				UCLIDException ex("ELI18123", "Unlock file has expired!");
-				ex.addDebugInfo( "Actual Item", zNow.operator LPCTSTR(), true );
-				ex.addDebugInfo( "Unlock Item", zExp.operator LPCTSTR(), true );
+				ex.addDebugInfo( "Actual Item", (LPCTSTR) zNow, true );
+				ex.addDebugInfo( "Unlock Item", (LPCTSTR) zExp, true );
 				ex.log();
 
 				bComparisonOK = false;
@@ -698,7 +680,6 @@ string TimeRollbackPreventer::getDateTimeFilePath() const
 	{
 		// Ensure the exception is logged and signal bad state
 		uex.log();
-		m_rEventBadState.signal();
 
 		throw uex;
 	}
@@ -907,14 +888,24 @@ void TimeRollbackPreventer::handleUnlockCode()
 							// log exception, signal bad state and throw exception
 							UCLIDException ue( "ELI12997", gpszLicenseIsCorrupt );
 							ue.log();
-							m_rEventBadState.signal();
 							throw ue;
 						}
 						writeDateTime(strDTLocal, strDTRemote, true);
 
 						// Since the unlock codes where valid and the time has been reset,
-						// reset the bad state signal
-						m_rEventBadState.reset();
+						// if the trp thread is running, reset it
+						if (m_apThread.get() != __nullptr)
+						{
+							// Just log any exceptions that occur attempting to restart
+							// the thread, the user can close the app and reopen to run
+							// again
+							try
+							{
+								endTrpThread();
+								startTrpThread();
+							}
+							CATCH_AND_LOG_ALL_EXCEPTIONS("ELI32532");
+						}
 
 					}	// end if successful Date-Time strings creation
 					else if (!bLocal && !bRemote)
@@ -1125,8 +1116,6 @@ void TimeRollbackPreventer::updateDateTimeItems(bool bForceCreation)
 			ue.addDebugInfo( "Span", (long)spanTime.GetTotalSeconds() );
 			ue.log();
 
-			// Signal a bad state and throw the exception
-			m_rEventBadState.signal();
 			throw ue;
 		}
 	}
@@ -1148,7 +1137,6 @@ void TimeRollbackPreventer::updateDateTimeItems(bool bForceCreation)
 			// Unable to lock the mutex, signal bad state and throw exception
 			UCLIDException ue( "ELI12998", gpszLicenseIsCorrupt );
 			ue.log();
-			m_rEventBadState.signal();
 			throw ue;
 		}
 		// Write local and remote Date-Time strings
@@ -1163,7 +1151,6 @@ void TimeRollbackPreventer::updateDateTimeItems(bool bForceCreation)
 		ue.log();
 
 		// Signal Bad state and throw the exception
-		m_rEventBadState.signal();
 		throw ue;
 	}
 	else if (!bRemote)
@@ -1173,7 +1160,6 @@ void TimeRollbackPreventer::updateDateTimeItems(bool bForceCreation)
 		ue.log();
 
 		// Signal Bad state and throw the exception
-		m_rEventBadState.signal();
 		throw ue;
 	}
 
@@ -1327,5 +1313,46 @@ CMutex* TimeRollbackPreventer::getUnlockFileMutex()
 	}
 
 	return m_upmutexUnlock.get();
+}
+//-------------------------------------------------------------------------------------------------
+void TimeRollbackPreventer::startTrpThread()
+{
+	// This try catch is just to give more trace information
+	try
+	{
+		// Ensure the thread is stopped first
+		endTrpThread();
+
+		m_eventKillThread.reset();
+
+		// Start the thread that handles updates
+		m_apThread.reset(AfxBeginThread(TRPThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED));
+		m_apThread->m_bAutoDelete = FALSE;
+		m_apThread->ResumeThread();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10711");
+}
+//-------------------------------------------------------------------------------------------------
+void TimeRollbackPreventer::endTrpThread()
+{
+	try
+	{
+		// Kill the thread if it exists
+		if (m_apThread.get() != __nullptr)
+		{
+			m_eventKillThread.signal();
+
+			DWORD dwRet = WaitForSingleObject(m_apThread->m_hThread, 2000);
+			if(dwRet == WAIT_TIMEOUT)
+			{
+				UCLIDException ue("ELI10940", "Licensing system unable to shutdown correctly.");
+				throw ue;
+			}
+
+			// delete the thread
+			m_apThread.reset();
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32531");
 }
 //-------------------------------------------------------------------------------------------------

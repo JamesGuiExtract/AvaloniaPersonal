@@ -231,6 +231,7 @@ private:
 
     // Create the TRP object.  Will throw exception if unsuccessful.
     static void createTRPObject();
+	static void closeTRPObject();
 
     // Throws exception if the Annotation support is not licensed
     static void validateAnnotationLicense();
@@ -274,7 +275,8 @@ private:
 	static Win32Event m_licenseStateIsInvalidEvent;
 
 	// The TRP object initialized if there is a temporary license
-	static unique_ptr<TimeRollbackPreventer> m_upTRP;
+	static unique_ptr<CMutex> m_upTrpRunning;
+	static unique_ptr<CMutex> m_upValidState;
 
     // maps that are used by the validateLicense function to cache
     // the licensed state values for components that have already been validated

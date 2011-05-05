@@ -2,8 +2,15 @@
 //
 #pragma once
 
-#include <TimeRollbackPreventer.h>
+#include "TimeRollbackPreventer.h"
+
 #include <Win32Event.h>
+#include <string>
+
+using namespace std;
+
+// Title of the window that receives the time rollback prevention & licensing related messages
+const std::string gstrTRP_WINDOW_TITLE = "Extract Systems TRP Window";
 
 // CExtractTRPDlg dialog
 class CExtractTRPDlg : public CDialog
@@ -25,16 +32,10 @@ protected:
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
-	afx_msg LRESULT OnGetAuthenticationCode(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnStateIsValid(WPARAM wParam, LPARAM lParam);
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 
 private:
 	// Time Rollback Preventor object and associated event
-	Win32Event m_stateIsInvalidEvent;
 	TimeRollbackPreventer m_TRP;
-
-	// Returns true if TRP state is valid, false otherwise
-	bool	stateIsValid();
 };

@@ -116,6 +116,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\COMLMCore\Code\TimeRollbackPreventer.cpp" />
     <ClCompile Include="ExtractTRP2.cpp" />
     <ClCompile Include="ExtractTRPDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -124,6 +125,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\COMLMCore\Code\TimeRollbackPreventer.h" />
     <ClInclude Include="ExtractTRP2.h" />
     <ClInclude Include="ExtractTRPDlg.h" />
     <ClInclude Include="Resource.h" />

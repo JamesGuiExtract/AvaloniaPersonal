@@ -24,6 +24,7 @@
 #include <EncryptionEngine.h>
 #include <cpputil.h>
 #include <COMUtils.h>
+#include <MutexUtils.h>
 
 #include <io.h>
 
@@ -53,7 +54,8 @@ LMData LicenseManagement::m_LicenseData;
 map<unsigned long, int> LicenseManagement::m_mapIdToDayLicensed;
 map<unsigned long, bool> LicenseManagement::m_mapIdToLicensed;
 Win32Event LicenseManagement::m_licenseStateIsInvalidEvent;
-unique_ptr<TimeRollbackPreventer> LicenseManagement::m_upTRP(__nullptr);
+unique_ptr<CMutex> LicenseManagement::m_upTrpRunning(__nullptr);
+unique_ptr<CMutex> LicenseManagement::m_upValidState(getGlobalNamedMutex(gpszGoodStateMutex));
 
 //-------------------------------------------------------------------------------------------------
 // LicenseManagement
@@ -218,10 +220,9 @@ void LicenseManagement::initializeLicenseFromFile(const std::string& strLicenseF
 				createTRPObject();
 			}
 			// If no expiring components then close TRP if it is running
-			else if (m_upTRP.get() != __nullptr)
+			else if (m_upTrpRunning.get() != __nullptr)
 			{
-				// Ensure the TRP is not running since there are no expiring components
-				m_upTRP.reset(__nullptr);
+				closeTRPObject();
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10682")
@@ -558,8 +559,7 @@ void LicenseManagement::initTrpData(const string& strLicenseCode)
 
 		CSingleLock guard(&m_lock, TRUE);
 
-		Win32Event winEvent;
-		TimeRollbackPreventer trp(winEvent);
+		TimeRollbackPreventer trp(false);
 		trp.checkDateTimeItems();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32461");
@@ -629,20 +629,55 @@ void LicenseManagement::createTRPObject()
 	try
 	{
 		// Check for TRP already running
-		if (m_upTRP.get() == __nullptr)
+		if (m_upTrpRunning.get() == __nullptr)
 		{
 			// Lock around TRP initialization
 			CSingleLock guard(&m_lock, TRUE);
 
-			if (m_upTRP.get() == __nullptr)
+			if (m_upTrpRunning.get() == __nullptr)
 			{
-				// Ensure the license state is valid
-				m_licenseStateIsInvalidEvent.reset();
-				m_upTRP.reset(new TimeRollbackPreventer(m_licenseStateIsInvalidEvent));
+				m_upTrpRunning.reset(getGlobalNamedMutex(gpszTrpRunning));
+				ASSERT_RESOURCE_ALLOCATION("ELI32536", m_upTrpRunning.get() != __nullptr);
+
+				// Compute the path to the EXE
+				string strEXEPath = getModuleDirectory(COMLMCoreDLL.hModule);
+				strEXEPath += "\\";
+				strEXEPath += gstrTRP_EXE_NAME.c_str();
+
+				// Launch the exe and sleep for a second to let it initialize
+				runEXE(strEXEPath);
+				Sleep(1000);
 			}
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32448");
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::closeTRPObject()
+{
+	try
+	{
+		// Check for TRP already launched
+		if (m_upTrpRunning.get() != __nullptr)
+		{
+			// Lock around TRP initialization
+			CSingleLock guard(&m_lock, TRUE);
+
+			if (m_upTrpRunning.get() != __nullptr)
+			{
+				// Compute the path to the EXE
+				string strEXEPath = getModuleDirectory(COMLMCoreDLL.hModule);
+				strEXEPath += "\\";
+				strEXEPath += gstrTRP_EXE_NAME.c_str();
+
+				// Run the EXE with the exit flag
+				runEXE(strEXEPath, "/exit");
+
+				m_upTrpRunning.reset(__nullptr);
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32538");
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::updateLicenseData( LMData& rData )
@@ -709,12 +744,20 @@ void LicenseManagement::updateLicenseData( LMData& rData )
 void LicenseManagement::validateState()
 {
 	// If the time rollback preventer has been initialized, then check its state
-	if (m_upTRP.get() != __nullptr)
+	if (m_upTrpRunning.get() != __nullptr)
 	{
-		// Check if the license state invalid event is signaled
-		if (m_licenseStateIsInvalidEvent.isSignaled())
+		CSingleLock (&m_lock, TRUE);
+
+		if (m_upTrpRunning.get() != __nullptr)
 		{
-			throw UCLIDException("ELI13089", "Extract Systems license state has been corrupted!");
+			// Check that both TRP is running and the valid handle is set
+			CSingleLock lRunning(m_upTrpRunning.get(), FALSE);
+			CSingleLock lValid(m_upValidState.get(), FALSE);
+
+			if (lRunning.Lock(0) == TRUE || lValid.Lock(0) == TRUE)
+			{
+				throw UCLIDException("ELI13089", "Extract Systems license state has been corrupted!");
+			}
 		}
 	}
 }
