@@ -10,6 +10,7 @@
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
 #include <XBrowseForFolder.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // CMetadataDlg dialog
@@ -150,19 +151,8 @@ void CMetadataDlg::OnBnClickedButtonSelectMetaTag()
 {
 	try
 	{
-		// Get the position and dimensions of the button
-		RECT rect;
-		m_btnSelectMetaTag.GetWindowRect(&rect);
-
-		// Get the user selection
-		string strChoice = CRedactionCustomComponentsUtils::ChooseDocTag(m_hWnd, 
-			rect.right, rect.top);
-
-		// Set the corresponding edit box if the user selected a tag
-		if(strChoice != "")
-		{
-			m_editMetaOutputName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectMetaTag,
+			m_editMetaOutputName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24537")
 }

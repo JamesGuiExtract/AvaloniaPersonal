@@ -9,6 +9,7 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <AFTagManager.h>
+#include <DocTagUtils.h>
 
 #include <io.h>
 
@@ -141,19 +142,7 @@ LRESULT CRSDFileConditionPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, H
 
 	try
 	{
-		// Get position of doc tag button
-		RECT rect;
-		m_btnSelectDocTag.GetWindowRect(&rect);
-		CRect rc(rect);
-		
-		// Display appropriate drop-down menu
-		AFTagManager tagMgr;
-		string strChoice = tagMgr.displayTagsForSelection(CWnd::FromHandle(m_hWnd), rc.right, rc.top);
-		if (strChoice != "")
-		{
-			// Replace selected text with tag text
-			m_editRSDFileName.ReplaceSel( strChoice.c_str(), TRUE );
-		}
+		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editRSDFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15715");
 

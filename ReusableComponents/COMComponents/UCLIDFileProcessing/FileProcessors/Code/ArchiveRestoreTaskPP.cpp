@@ -24,6 +24,7 @@
 #include <Misc.h>
 #include <ComUtils.h>
 #include <StringCSIS.h>
+#include <DocTagUtils.h>
 
 #include <algorithm>
 
@@ -265,13 +266,8 @@ LRESULT CArchiveRestoreTaskPP::OnClickedBtnArchiveDocTag(WORD wNotifyCode, WORD 
 		m_btnArchiveFolderDocTags.GetWindowRect(&rect);
 
 		// Display the doc tag menu without the SourceDocName [LRCAU #5242]
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top, false);
-
-		// If the user selected a tag, add it to the corresponding edit control
-		if (!strChoice.empty())
-		{
-			m_editArchiveFolder.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnArchiveFolderDocTags,
+			m_editArchiveFolder, false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24610");
 
@@ -309,18 +305,9 @@ LRESULT CArchiveRestoreTaskPP::OnClickedBtnFileDocTag(WORD wNotifyCode, WORD wID
 
 	try
 	{
-		// get the position of the input image doc tag button
-		RECT rect;
-		m_btnSourceFileDoctTags.GetWindowRect(&rect);
-
 		// display the doc tag menu and get the user's selection
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-		// if the user selected a tag, add it to the input image filename edit control
-		if (strChoice != "")
-		{
-			m_editSourceFile.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSourceFileDoctTags,
+			m_editSourceFile);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24613");
 

@@ -11,6 +11,7 @@
 #include <RegConstants.h>
 #include <RegistryPersistenceMgr.h>
 #include <ComponentLicenseIDs.h>
+#include <DocTagUtils.h>
 
 #include <Mmc.h>
 #include <io.h>
@@ -210,21 +211,9 @@ LRESULT CFolderFSPP::OnBnClickedBtnSelectFolderTag(WORD /*wNotifyCode*/, WORD /*
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 
-	RECT rect;
-	
-	// Display the Select Folder tag popup
-	m_btnSelectFolderDocTag.GetWindowRect(&rect);
-	string str = CFileSupplierUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-	if (str != "")
+	if (ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectFolderDocTag,
+			m_cmbFolder, m_dwSel, false))
 	{
-		// if a tag was selected insert at the current selection
-		m_cmbFolder.Clear();
-		CString zWindowText;
-		m_cmbFolder.GetWindowText(zWindowText);
-		zWindowText.Delete(LOWORD(m_dwSel), HIWORD(m_dwSel) - LOWORD(m_dwSel) );
-		zWindowText.Insert(LOWORD(m_dwSel), str.c_str());
-		m_cmbFolder.SetWindowText(zWindowText);
 		m_bDirty = true;
 	}
 

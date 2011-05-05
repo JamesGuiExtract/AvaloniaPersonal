@@ -22,6 +22,7 @@
 #include <LicenseMgmt.h>
 #include <Misc.h>
 #include <ComUtils.h>
+#include <DocTagUtils.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
@@ -342,18 +343,9 @@ LRESULT CAddWatermarkTaskPP::OnClickedBtnInputImageDocTag(WORD wNotifyCode, WORD
 
 	try
 	{
-		// get the position of the input image doc tag button
-		RECT rect;
-		m_btnInputImageDocTag.GetWindowRect(&rect);
-
 		// display the doc tag menu and get the user's selection
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-		// if the user selected a tag, add it to the input image filename edit control
-		if (strChoice != "")
-		{
-			m_editInputImage.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnInputImageDocTag,
+			m_editInputImage);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19985");
 
@@ -392,18 +384,9 @@ LRESULT CAddWatermarkTaskPP::OnClickedBtnStampImageDocTag(WORD wNotifyCode, WORD
 
 	try
 	{
-		// get the position of the input image doc tag button
-		RECT rect;
-		m_btnStampImageDocTag.GetWindowRect(&rect);
-
 		// display the doc tag menu and get the user's selection
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-		// if the user selected a tag, add it to the input image filename edit control
-		if (strChoice != "")
-		{
-			m_editStampImage.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnStampImageDocTag,
+			m_editStampImage);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19987");
 

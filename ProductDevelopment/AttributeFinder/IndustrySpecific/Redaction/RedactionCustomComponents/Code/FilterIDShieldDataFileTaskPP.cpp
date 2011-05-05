@@ -12,6 +12,7 @@
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
+#include <DocTagUtils.h>
 
 #include <string>
 
@@ -252,15 +253,8 @@ LRESULT CFilterIDShieldDataFileTaskPP::OnClickedButtonInputTags(WORD wNotifyCode
 
 	try
 	{
-		// Display the tags and set the selected to the edit box
-		RECT rect;
-		m_btnInputTags.GetWindowRect(&rect);
-		string strChoice = CRedactionCustomComponentsUtils::ChooseDocTag(m_hWnd,
-			rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editVOAFileToRead.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnInputTags,
+			m_editVOAFileToRead);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24839");
 
@@ -300,15 +294,8 @@ LRESULT CFilterIDShieldDataFileTaskPP::OnClickedButtonOutputTags(WORD wNotifyCod
 
 	try
 	{
-		// Display the tags and set the selected to the edit box
-		RECT rect;
-		m_btnOutputTags.GetWindowRect(&rect);
-		string strChoice = CRedactionCustomComponentsUtils::ChooseDocTag(m_hWnd,
-			rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editVOAFileToWrite.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnOutputTags,
+			m_editVOAFileToWrite);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24841");
 

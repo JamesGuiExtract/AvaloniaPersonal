@@ -2,11 +2,7 @@
 #include "FileProcessorsUtils.h"
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
-#include <TextFunctionExpander.h>
 #include <cpputil.h>
-#include <QuickMenuChooser.h>
-#include <ComUtils.h>
-#include <VectorOperations.h>
 
 //-------------------------------------------------------------------------------------------------
 // Public Methods
@@ -21,59 +17,6 @@ CFileProcessorsUtils::~CFileProcessorsUtils()
 	{
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16439");
-}
-//--------------------------------------------------------------------------------------------------
-const string CFileProcessorsUtils::ChooseDocTag(HWND hwnd, long x, long y, 
-													 bool bIncludeSourceDocName)
-{
-	vector<string> vecChoices;
-
-	// Add the built in tags
-	IVariantVectorPtr ipVecBuiltInTags = getFAMTagManager()->GetBuiltInTags();
-	long lBuiltInSize = ipVecBuiltInTags->Size;
-	for (long i = 0; i < lBuiltInSize; i++)
-	{
-		_variant_t var = ipVecBuiltInTags->Item[i];
-		string str = asString(var.bstrVal);
-		if (bIncludeSourceDocName || str != "<SourceDocName>")
-		{
-			vecChoices.push_back(str);
-		}
-	}
-
-	// Add a separator if there is at
-	// least one built in tag
-	if (lBuiltInSize > 0)
-	{
-		vecChoices.push_back(""); // Separator
-	}
-
-	// Add tags in specified ini file
-	IVariantVectorPtr ipVecIniTags = getFAMTagManager()->GetINIFileTags();
-	long lIniSize = ipVecIniTags->Size;
-	for (long i = 0; i < lIniSize; i++)
-	{
-		_variant_t var = ipVecIniTags->Item[i];
-		string str = asString(var.bstrVal);
-		vecChoices.push_back(str);
-	}
-	// Add a separator if there is
-	// at least one tags from INI file
-	if (lIniSize > 0)
-	{
-		vecChoices.push_back(""); // Separator
-	}
-
-	// Add utility functions
-	TextFunctionExpander tfe;
-	vector<string> vecFunctions = tfe.getAvailableFunctions();
-	tfe.formatFunctions(vecFunctions);
-	addVectors(vecChoices, vecFunctions); // add the functions
-
-	QuickMenuChooser qmc;
-	qmc.setChoices(vecChoices);
-
-	return qmc.getChoiceString(CWnd::FromHandle(hwnd), x, y);
 }
 //--------------------------------------------------------------------------------------------------
 const string CFileProcessorsUtils::ExpandTagsAndTFE(IFAMTagManager *pFAMTM, const string& strFile, const string& strSourceDocName)
@@ -104,14 +47,3 @@ const string CFileProcessorsUtils::ExpandTagsAndTFE(IFAMTagManager *pFAMTM, cons
 
 	return strExpandedFile;
 }
-
-//-------------------------------------------------------------------------------------------------
-// Private Methods
-//-------------------------------------------------------------------------------------------------
-IFAMTagManagerPtr CFileProcessorsUtils::getFAMTagManager()
-{
-	IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-	ASSERT_RESOURCE_ALLOCATION("ELI14416", ipFAMTagManager != __nullptr);
-	return ipFAMTagManager;
-}
-//--------------------------------------------------------------------------------------------------

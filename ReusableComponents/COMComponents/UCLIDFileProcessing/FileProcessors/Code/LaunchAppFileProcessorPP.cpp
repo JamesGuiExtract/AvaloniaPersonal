@@ -10,6 +10,7 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
+#include <DocTagUtils.h>
 
 #include <vector>
 #include <string>
@@ -181,14 +182,8 @@ LRESULT CLaunchAppFileProcessorPP::OnClickedBtnCmdLineSelectTag(WORD wNotifyCode
 
 	try
 	{
-		RECT rect;
-		m_btnCmdLineSelectTag.GetWindowRect(&rect);
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editCmdLine.ReplaceSel(strChoice.c_str(), TRUE);
-		}
-		
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnCmdLineSelectTag,
+			m_editCmdLine);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12209");
 
@@ -219,13 +214,8 @@ LRESULT CLaunchAppFileProcessorPP::OnClickedBtnWorkingDirSelectTag(WORD wNotifyC
 
 	try
 	{
-		RECT rect;
-		m_btnWorkingDirSelectTag.GetWindowRect(&rect);
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editWorkingDir.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnWorkingDirSelectTag,
+			m_editWorkingDir);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12211");
 
@@ -276,13 +266,8 @@ LRESULT CLaunchAppFileProcessorPP::OnClickedBtnParametersSelectTag(WORD wNotifyC
 
 	try
 	{
-		RECT rect;
-		m_btnParametersSelectTag.GetWindowRect(&rect);
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editParameters.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnParametersSelectTag,
+			m_editParameters);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI25467");
 

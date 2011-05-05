@@ -10,6 +10,7 @@
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
 #include <XBrowseForFolder.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // CFeedbackDlg dialog
@@ -264,18 +265,8 @@ void CFeedbackDlg::OnBnClickedButtonSelectFeedbackFolderTag()
 {
 	try
 	{
-		// Get the position and dimensions of the button
-		RECT rect;
-		m_btnFeedbackFolderTag.GetWindowRect(&rect);
-
-		// Get the user selection
-		string strChoice = CRedactionCustomComponentsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-		// Set the corresponding edit box if the user selected a tag
-		if(strChoice != "")
-		{
-			m_editFeedbackFolder.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnFeedbackFolderTag,
+			m_editFeedbackFolder);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24545")
 }

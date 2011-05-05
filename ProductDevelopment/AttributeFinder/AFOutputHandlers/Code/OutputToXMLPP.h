@@ -81,7 +81,4 @@ private:
 
 	// helper functions
 	void validateLicense();
-
-	// helper function to display the appropriate doc tags list when the doc tag button is clicked
-	string chooseDocTag(HWND hWnd, long x, long y);
 };

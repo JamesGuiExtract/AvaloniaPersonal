@@ -13,6 +13,7 @@
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
+#include <DocTagUtils.h>
 
 #include <string>
 
@@ -427,14 +428,8 @@ LRESULT CRedactionTaskPP::OnClickedSelectImageFileTag(WORD wNotifyCode, WORD wID
 
 	try
 	{
-		// Display the tags and set the selected to the edit box
-		RECT rect;
-		m_btnSelectImageFileTag.GetWindowRect(&rect);
-		string strChoice = CRedactionCustomComponentsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editOutputFileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectImageFileTag,
+			m_editOutputFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28595");
 

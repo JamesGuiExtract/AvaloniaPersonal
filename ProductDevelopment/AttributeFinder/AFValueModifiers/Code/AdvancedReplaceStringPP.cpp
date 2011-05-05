@@ -7,6 +7,7 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <AFTagManager.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // CAdvancedReplaceStringPP
@@ -268,16 +269,7 @@ LRESULT CAdvancedReplaceStringPP::OnClickedSelectFindDocTag(WORD wNotifyCode, WO
 
 	try
 	{
-		RECT rect;
-		m_btnSelectFindDocTag.GetWindowRect(&rect);
-		CRect rc(rect);
-		
-		AFTagManager tagMgr;
-		string strChoice = tagMgr.displayTagsForSelection(CWnd::FromHandle(m_hWnd), rc.right, rc.top);
-		if (strChoice != "")
-		{
-			m_editFindString.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectFindDocTag, m_editFindString);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14511");
 
@@ -290,16 +282,7 @@ LRESULT CAdvancedReplaceStringPP::OnClickedSelectReplaceDocTag(WORD wNotifyCode,
 
 	try
 	{
-		RECT rect;
-		m_btnSelectFindDocTag.GetWindowRect(&rect);
-		CRect rc(rect);
-		
-		AFTagManager tagMgr;
-		string strChoice = tagMgr.displayTagsForSelection(CWnd::FromHandle(m_hWnd), rc.right, rc.top);
-		if (strChoice != "")
-		{
-			m_editReplaceString.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectFindDocTag, m_editReplaceString);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14512");
 

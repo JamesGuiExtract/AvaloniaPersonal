@@ -13,6 +13,7 @@
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
+#include <DocTagUtils.h>
 
 #include <string>
 
@@ -454,14 +455,8 @@ LRESULT CRedactFileProcessorPP::OnClickedSelectRulesFileTag(WORD wNotifyCode, WO
 
 	try
 	{
-		// Display the tags and set the selected to the edit box
-		RECT rect;
-		m_btnSelectRulesFileTag.GetWindowRect(&rect);
-		string strChoice = CRedactionCustomComponentsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editRuleFileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectRulesFileTag,
+			m_editRuleFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12010");
 
@@ -474,14 +469,8 @@ LRESULT CRedactFileProcessorPP::OnClickedSelectImageFileTag(WORD wNotifyCode, WO
 
 	try
 	{
-		// Display the tags and set the selected to the edit box
-		RECT rect;
-		m_btnSelectImageFileTag.GetWindowRect(&rect);
-		string strChoice = CRedactionCustomComponentsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editOutputFileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectImageFileTag,
+			m_editOutputFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12011");
 
@@ -494,14 +483,8 @@ LRESULT CRedactFileProcessorPP::OnClickedSelectVOAFileTag(WORD wNotifyCode, WORD
 
 	try
 	{
-		// Display the tags and set the selected to the edit box
-		RECT rect;
-		m_btnSelectVOAFileTag.GetWindowRect(&rect);
-		string strChoice = CRedactionCustomComponentsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editVOAFileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectVOAFileTag,
+			m_editVOAFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12711");
 

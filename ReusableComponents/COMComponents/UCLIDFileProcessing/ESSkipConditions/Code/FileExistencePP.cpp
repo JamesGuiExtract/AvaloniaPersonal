@@ -9,6 +9,7 @@
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
 #include <cpputil.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // CFileExistencePP
@@ -133,16 +134,7 @@ LRESULT CFileExistencePP::OnBnClickedBtnSelectDocTag(WORD wNotifyCode, WORD wID,
 
 	try
 	{
-		RECT rect;
-		m_btnSelectDocTag.GetWindowRect(&rect);
-		
-		// Choose the needed tags
-		std::string strChoice = CFAMConditionUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-		if (strChoice != "")
-		{
-			m_FileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag, m_FileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13577");
 

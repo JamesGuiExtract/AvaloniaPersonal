@@ -7,11 +7,10 @@
 #include <LicenseMgmt.h>
 #include <UCLIDException.h>
 #include <AFTagManager.h>
-#include <QuickMenuChooser.h>
 #include <ComponentLicenseIDs.h>
 #include <ComUtils.h>
 #include <TextFunctionExpander.h>
-#include <VectorOperations.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // COutputToXMLPP
@@ -248,14 +247,15 @@ LRESULT COutputToXMLPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND h
 
 	try
 	{
-		RECT rect;
-		m_btnSelectDocTag.GetWindowRect(&rect);
-
-		string strChoice = chooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
+		if (m_bFAMTags)
 		{
-			m_editFileName.ReplaceSel(strChoice.c_str(), TRUE);
+			ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag, m_editFileName);
 		}
+		else
+		{
+			ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editFileName);
+		}
+		
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12005");
 
@@ -326,75 +326,5 @@ void COutputToXMLPP::validateLicense()
 	// FAM ConvertVOAToXML task.
 	VALIDATE_LICENSE( gnFILE_ACTION_MANAGER_OBJECTS, "ELI07913", 
 		"OutputToXML PP" );
-}
-//-------------------------------------------------------------------------------------------------
-string COutputToXMLPP::chooseDocTag(HWND hWnd, long x, long y)
-{
-	try
-	{
-		IVariantVectorPtr ipVecBuiltInTags = __nullptr;
-		IVariantVectorPtr ipVecINITags = __nullptr;
-		if (m_bFAMTags)
-		{
-			IFAMTagManagerPtr ipFAMTags(CLSID_FAMTagManager);
-			ASSERT_RESOURCE_ALLOCATION("ELI26319", ipFAMTags != __nullptr);
-			ipVecBuiltInTags = ipFAMTags->GetBuiltInTags();
-			ipVecINITags = ipFAMTags->GetINIFileTags();
-		}
-		else
-		{
-			IAFUtilityPtr ipAFTags(CLSID_AFUtility);
-			ASSERT_RESOURCE_ALLOCATION("ELI26320", ipAFTags != __nullptr);
-			ipVecBuiltInTags = ipAFTags->GetBuiltInTags();
-			ipVecINITags = ipAFTags->GetINIFileTags();
-		}
-		ASSERT_RESOURCE_ALLOCATION("ELI26321", ipVecBuiltInTags != __nullptr);
-		ASSERT_RESOURCE_ALLOCATION("ELI26322", ipVecINITags != __nullptr);
-
-
-		vector<string> vecChoices;
-
-		// Add the built in tags
-		long lBuiltInSize = ipVecBuiltInTags->Size;
-		for (long i = 0; i < lBuiltInSize; i++)
-		{
-			_variant_t var = ipVecBuiltInTags->Item[i];
-			vecChoices.push_back(asString(var.bstrVal));
-		}
-
-		// Add a separator if there is at
-		// least one built in tags
-		if (lBuiltInSize > 0)
-		{
-			vecChoices.push_back(""); // Separator
-		}
-
-		// Add tags in specified ini file
-		long lIniSize = ipVecINITags->Size;
-		for (long i = 0; i < lIniSize; i++)
-		{
-			_variant_t var = ipVecINITags->Item[i];
-			vecChoices.push_back(asString(var.bstrVal));
-		}
-
-		// Add a separator if there is
-		// at least one tag from INI file
-		if (lIniSize > 0)
-		{
-			vecChoices.push_back(""); // Separator
-		}
-
-		// Add utility functions
-		TextFunctionExpander tfe;
-		std::vector<std::string> vecFunctions = tfe.getAvailableFunctions();
-		tfe.formatFunctions(vecFunctions);
-		addVectors(vecChoices, vecFunctions); // add the functions
-
-		QuickMenuChooser qmc;
-		qmc.setChoices(vecChoices);
-
-		return qmc.getChoiceString(CWnd::FromHandle(hWnd), x, y);
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26317");
 }
 //-------------------------------------------------------------------------------------------------

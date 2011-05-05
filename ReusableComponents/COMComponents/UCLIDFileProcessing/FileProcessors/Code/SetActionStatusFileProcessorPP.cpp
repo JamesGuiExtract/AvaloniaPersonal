@@ -5,6 +5,7 @@
 
 #include <UCLIDException.h>
 #include <COMUtils.h>
+#include <DocTagUtils.h>
 
 // other constants
 const int giNUM_VALID_STATUSES = 5;
@@ -233,23 +234,8 @@ LRESULT CSetActionStatusFileProcessorPP::OnClickedBtnActionTag(WORD wNotifyCode,
 
 	try
 	{
-		RECT rect;
-		m_btnActionTag.GetWindowRect(&rect);
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			// Replace the previously selected combobox text with the selected tag
-			int iStart = LOWORD(m_dwActionSel);
-			int iEnd = HIWORD(m_dwActionSel);
-
-			string strText = getActionName();
-
-			string strResult = strText.substr(0, iStart) + strChoice + strText.substr(iEnd);
-			m_cmbActionName.SetWindowText(strResult.c_str());
-
-			// Reset the selection
-			m_dwActionSel = MAKELONG(strResult.length(), strResult.length());
-		}
+		ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnActionTag,
+			m_cmbActionName, m_dwActionSel);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29124")
 

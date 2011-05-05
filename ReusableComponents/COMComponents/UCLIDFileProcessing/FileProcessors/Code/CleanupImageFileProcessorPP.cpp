@@ -5,6 +5,7 @@
 #include <UCLIDException.h>
 #include <LoadFileDlgThread.h>
 #include <ComUtils.h>
+#include <DocTagUtils.h>
 
 #include <string>
 
@@ -122,24 +123,8 @@ LRESULT CCleanupImageFileProcessorPP::OnClickedBtnFileSelectTag(WORD wNotifyCode
 
 	try
 	{
-		RECT rect;
-		m_btnSelectTag.GetWindowRect(&rect);
-		std::string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			int nStartChar(0), nEndChar(0);
-
-			// check for selection
-			getEditBoxSelection(nStartChar, nEndChar);
-
-			// if a tag was selected insert at the current selection
-			CString zWindowText;
-			m_edtSettingsFileName.GetWindowText(zWindowText);
-			zWindowText.Delete(nStartChar, nEndChar - nStartChar );
-			zWindowText.Insert(nStartChar, strChoice.c_str());
-			m_edtSettingsFileName.SetWindowText(zWindowText);
-		}
-		
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectTag,
+			m_edtSettingsFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17353");
 

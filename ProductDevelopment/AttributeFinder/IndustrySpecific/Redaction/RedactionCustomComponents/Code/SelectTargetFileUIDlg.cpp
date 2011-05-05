@@ -7,6 +7,7 @@
 #include <UCLIDException.h>
 #include <LoadFileDlgThread.h>
 #include <ComUtils.h>
+#include <DocTagUtils.h>
 
 //--------------------------------------------------------------------------------------------------
 // CSelectTargetFileUIDlg
@@ -105,14 +106,8 @@ LRESULT CSelectTargetFileUIDlg::OnBnClickedBtnSelectDocTag(WORD wNotifyCode, WOR
 
 	try
 	{
-		// Display doc tags menu
-		RECT rect;
-		m_btnSelectDocTag.GetWindowRect(&rect);
-		string strChoice = CRedactionCustomComponentsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			m_editFileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag,
+			m_editFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17506");
 

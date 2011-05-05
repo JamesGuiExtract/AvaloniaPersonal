@@ -11,6 +11,7 @@
 #include <Misc.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
+#include <DocTagUtils.h>
 
 #include <string>
 
@@ -330,17 +331,8 @@ LRESULT CAFEngineFileProcessorPP::OnClickedBtnRulesFileDocTags(WORD wNotifyCode,
 
 	try
 	{
-		// Get the rectangle for the doc tag button
-		RECT rect;
-		m_btnRuleFileSelectTag.GetWindowRect(&rect);
-
-		// Get the doc tag choice
-		string strChoice = CAFFileProcessorsUtils::ChooseDocTag(hWndCtl, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			// Replace the selection
-			m_editRuleFileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnRuleFileSelectTag,
+			m_editRuleFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26657");
 

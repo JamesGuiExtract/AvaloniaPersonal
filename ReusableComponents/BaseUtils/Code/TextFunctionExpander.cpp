@@ -14,32 +14,76 @@ using namespace std;
 bool g_bInit = false;
 Win32CriticalSection g_cs;
 vector<string> g_vecFunctions;
+map<string, string> g_mapParameters;
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
 const string gstrFUNC_CHANGE_EXT = "ChangeExt";
+const string gstrFUNC_CHANGE_EXT_PARAMS = "source, extension";
+
 const string gstrFUNC_DIR_NO_DRIVE_OF = "DirNoDriveOf";
+const string gstrFUNC_DIR_NO_DRIVE_OF_PARAMS = "source";
+
 const string gstrFUNC_DIR_OF = "DirOf";
+const string gstrFUNC_DIR_OF_PARAMS = "source";
+
 const string gstrFUNC_DRIVE_OF = "DriveOf";
+const string gstrFUNC_DRIVE_OF_PARAMS = "source";
+
 const string gstrFUNC_ENV = "Env";
+const string gstrFUNC_ENV_PARAMS = "environment variable";
+
 const string gstrFUNC_EXT_OF = "ExtOf";
+const string gstrFUNC_EXT_OF_PARAMS = "source";
+
 const string gstrFUNC_FILE_NO_EXT_OF = "FileNoExtOf";
+const string gstrFUNC_FILE_NO_EXT_OF_PARAMS = "source";
+
 const string gstrFUNC_FILE_OF = "FileOf";
+const string gstrFUNC_FILE_OF_PARAMS = "source";
+
 const string gstrFUNC_FULL_USER_NAME = "FullUserName";
+const string gstrFUNC_FULL_USER_NAME_PARAMS = "1 = use $UserName as fall back";
+
 const string gstrFUNC_LEFT = "Left";
+const string gstrFUNC_LEFT_PARAMS = "source, count";
+
 const string gstrFUNC_INSERT_BEFORE_EXT = "InsertBeforeExt";
+const string gstrFUNC_INSERT_BEFORE_EXT_PARAMS = "source, text to insert";
+
 const string gstrFUNC_MID = "Mid";
+const string gstrFUNC_MID_PARAMS = "source, index, count (optional)";
+
 const string gstrFUNC_NOW = "Now";
+const string gstrFUNC_NOW_PARAMS = "format (optional)";
+
 const string gstrFUNC_OFFSET = "Offset";
+const string gstrFUNC_OFFSET_PARAMS = "number, offset";
+
 const string gstrFUNC_PAD_VALUE = "PadValue";
+const string gstrFUNC_PAD_VALUE_PARAMS = "source,character,length";
+
 const string gstrFUNC_RANDOM_ALPHA_NUMERIC = "RandomAlphaNumeric";
+const string gstrFUNC_RANDOM_ALPHA_NUMERIC_PARAMS = "num digits";
+
 const string gstrFUNC_REPLACE = "Replace";
+const string gstrFUNC_REPLACE_PARAMS = "source, search, replacement";
+
 const string gstrFUNC_RIGHT = "Right";
+const string gstrFUNC_RIGHT_PARAMS = "source, count";
+
 const string gstrFUNC_TRIM_AND_CONSOLIDATE_WS = "TrimAndConsolidateWS";
+const string gstrFUNC_TRIM_AND_CONSOLIDATE_WS_PARAMS = "source";
+
 const string gstrFUNC_USER_NAME = "UserName";
+const string gstrFUNC_USER_NAME_PARAMS = "";
+
 const string gstrFUNC_THREAD_ID = "ThreadId";
+const string gstrFUNC_THREAD_ID_PARAMS = "";
+
 const string gstrFUNC_PROCESS_ID = "ProcessId";
+const string gstrFUNC_PROCESS_ID_PARAMS = "";
 
 //-------------------------------------------------------------------------------------------------
 // Static initialization
@@ -58,27 +102,49 @@ TextFunctionExpander::TextFunctionExpander()
 		{
 			// Add the functions in alphabetical order
 			g_vecFunctions.push_back(gstrFUNC_CHANGE_EXT);
+			g_mapParameters[gstrFUNC_CHANGE_EXT] = gstrFUNC_CHANGE_EXT_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_DIR_NO_DRIVE_OF);
+			g_mapParameters[gstrFUNC_DIR_NO_DRIVE_OF] = gstrFUNC_DIR_NO_DRIVE_OF_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_DIR_OF);
+			g_mapParameters[gstrFUNC_DIR_OF] = gstrFUNC_DIR_OF_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_DRIVE_OF);
+			g_mapParameters[gstrFUNC_DRIVE_OF] = gstrFUNC_DRIVE_OF_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_ENV);
+			g_mapParameters[gstrFUNC_ENV] = gstrFUNC_ENV_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_EXT_OF);
+			g_mapParameters[gstrFUNC_EXT_OF] = gstrFUNC_EXT_OF_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_FILE_NO_EXT_OF);
+			g_mapParameters[gstrFUNC_FILE_NO_EXT_OF] = gstrFUNC_FILE_NO_EXT_OF_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_FILE_OF);
+			g_mapParameters[gstrFUNC_FILE_OF] = gstrFUNC_FILE_OF_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_FULL_USER_NAME);
+			g_mapParameters[gstrFUNC_FULL_USER_NAME] = gstrFUNC_FULL_USER_NAME_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_INSERT_BEFORE_EXT);
+			g_mapParameters[gstrFUNC_INSERT_BEFORE_EXT] = gstrFUNC_INSERT_BEFORE_EXT_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_LEFT);
+			g_mapParameters[gstrFUNC_LEFT] = gstrFUNC_LEFT_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_MID);
+			g_mapParameters[gstrFUNC_MID] = gstrFUNC_MID_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_NOW);
+			g_mapParameters[gstrFUNC_NOW] = gstrFUNC_NOW_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_OFFSET);
+			g_mapParameters[gstrFUNC_OFFSET] = gstrFUNC_OFFSET_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_PAD_VALUE);
+			g_mapParameters[gstrFUNC_PAD_VALUE] = gstrFUNC_PAD_VALUE_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_PROCESS_ID);
+			g_mapParameters[gstrFUNC_PROCESS_ID] = gstrFUNC_PROCESS_ID_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_RANDOM_ALPHA_NUMERIC);
+			g_mapParameters[gstrFUNC_RANDOM_ALPHA_NUMERIC] = gstrFUNC_RANDOM_ALPHA_NUMERIC_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_REPLACE);
+			g_mapParameters[gstrFUNC_REPLACE] = gstrFUNC_REPLACE_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_RIGHT);
+			g_mapParameters[gstrFUNC_RIGHT] = gstrFUNC_RIGHT_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_THREAD_ID);
+			g_mapParameters[gstrFUNC_THREAD_ID] = gstrFUNC_THREAD_ID_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_TRIM_AND_CONSOLIDATE_WS);
+			g_mapParameters[gstrFUNC_TRIM_AND_CONSOLIDATE_WS] = gstrFUNC_TRIM_AND_CONSOLIDATE_WS_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_USER_NAME);
+			g_mapParameters[gstrFUNC_USER_NAME] = gstrFUNC_USER_NAME_PARAMS;
 
 			g_bInit = true;
 		}
@@ -87,7 +153,6 @@ TextFunctionExpander::TextFunctionExpander()
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandFunctions(const string& str) const
 {
-	
 	string strRet;
 
 	unsigned long ulSearchPos = 0;
@@ -335,7 +400,7 @@ void TextFunctionExpander::formatFunctions(vector<string>& vecFunctions) const
 	for (unsigned int i = 0; i < vecFunctions.size(); i++)
 	{
 		string& str = vecFunctions[i];
-		str = "$" + str + "()";
+		str = "$" + str + "(" + g_mapParameters[str] + ")";
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -829,7 +894,8 @@ const string TextFunctionExpander::expandMid(const string& str, const string& st
 	const string& strTemp = vecTokens[0];
 
 	// Check for appropriate number of tokens
-	if (vecTokens.size() == 3)
+	size_t nParamCount = vecTokens.size();
+	if (nParamCount == 2 || nParamCount == 3)
 	{
 		// Get the start character
 		long lStart = 1;
@@ -852,20 +918,23 @@ const string TextFunctionExpander::expandMid(const string& str, const string& st
 		}
 
 		// Get the count of characters
-		long lCount = 0;
-		try
+		long lCount = -1;
+		if (nParamCount == 3)
 		{
-			lCount = asLong(vecTokens[2]);
-			if (lCount <= -2 || lCount == 0)
+			try
 			{
-				throw 42;
+				lCount = asLong(vecTokens[2]);
+				if (lCount <= -2 || lCount == 0)
+				{
+					throw 42;
+				}
 			}
-		}
-		catch(...)
-		{
-			UCLIDException ue("ELI29960", "Invalid count value specified for $Mid().");
-			ue.addDebugInfo("Count", vecTokens[2]);
-			throw ue;
+			catch(...)
+			{
+				UCLIDException ue("ELI29960", "Invalid count value specified for $Mid().");
+				ue.addDebugInfo("Count", vecTokens[2]);
+				throw ue;
+			}
 		}
 
 		// If the count is -1, then return from the start to the end of the string
@@ -882,9 +951,9 @@ const string TextFunctionExpander::expandMid(const string& str, const string& st
 	else
 	{
 		// Create and throw exception
-		UCLIDException ue( "ELI29961", "Mid function has invalid number of arguments!");
+		UCLIDException ue("ELI29961", "Mid function has invalid number of arguments!");
 		ue.addDebugInfo("Arguments", str);
-		ue.addDebugInfo("NumOfArgs", vecTokens.size());
+		ue.addDebugInfo("NumOfArgs", nParamCount);
 		throw ue;
 	}
 }

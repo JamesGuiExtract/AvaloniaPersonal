@@ -9,6 +9,7 @@
 #include <LoadFileDlgThread.h>
 #include <ComponentLicenseIDs.h>
 #include <LicenseMgmt.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -217,18 +218,8 @@ LRESULT CConvertToPDFTaskPP::OnClickedBtnInputImageDocTag(WORD wNotifyCode, WORD
 
 	try
 	{
-		// get the position of the input image doc tag button
-		RECT rect;
-		m_btnInputImageDocTag.GetWindowRect(&rect);
-
-		// display the doc tag menu and get the user's selection
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-		// if the user selected a tag, add it to the input image filename edit control
-		if (strChoice != "")
-		{
-			m_editInputImage.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnInputImageDocTag,
+			m_editInputImage);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19217");
 

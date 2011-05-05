@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "UCLIDFileProcessing.h"
 #include "SelectActionDlg.h"
 #include "FileProcessingUtils.h"
 
@@ -9,6 +10,7 @@
 #include <UCLIDException.h>
 #include <ComUtils.h>
 #include <cpputil.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -281,28 +283,8 @@ void SelectActionDlg::OnBnClickActionTag()
 
 	try
 	{
-		// Retrieve position of doc tag button
-		CRect rect;
-		m_btnActionTag.GetWindowRect(&rect);
-		
-		// Display menu and make selection
-		string strChoice = CFileProcessingUtils::ChooseDocTag(m_hWnd, rect.right, rect.top, false);
-
-		// Replace text if selection was made
-		if (strChoice != "")
-		{
-			// Replace the previously selected combobox text with the selected tag
-			int iStart = LOWORD(m_dwActionSel);
-			int iEnd = HIWORD(m_dwActionSel);
-
-			string strText = getActionName();
-
-			string strResult = strText.substr(0, iStart) + strChoice + strText.substr(iEnd);
-			m_cmbAction.SetWindowText(strResult.c_str());
-
-			// Reset the selection
-			m_dwActionSel = MAKELONG(strResult.length(), strResult.length());
-		}
+		ChooseDocTagForComboBox(UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr(CLSID_FAMTagManager),
+			m_btnActionTag, m_cmbAction, m_dwActionSel, false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29111")
 }

@@ -9,6 +9,7 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <AFTagManager.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // CRegExprRulePP
@@ -294,16 +295,7 @@ LRESULT CRegExprRulePP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND h
 
 	try
 	{
-		RECT rect;
-		m_btnSelectDocTag.GetWindowRect(&rect);
-		CRect rc(rect);
-		
-		AFTagManager tagMgr;
-		string strChoice = tagMgr.displayTagsForSelection(CWnd::FromHandle(m_hWnd), rc.right, rc.top);
-		if (strChoice != "")
-		{
-			m_editRegExpFile.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editRegExpFile);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12008");
 

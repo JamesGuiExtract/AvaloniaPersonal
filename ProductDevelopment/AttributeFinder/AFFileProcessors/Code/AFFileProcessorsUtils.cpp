@@ -1,12 +1,8 @@
 #include "stdafx.h"
 #include "AFFileProcessorsUtils.h"
-#include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <TextFunctionExpander.h>
-#include <cpputil.h>
-#include <QuickMenuChooser.h>
 #include <ComUtils.h>
-#include <VectorOperations.h>
 
 //-------------------------------------------------------------------------------------------------
 // Public Methods
@@ -21,56 +17,6 @@ CAFFileProcessorsUtils::~CAFFileProcessorsUtils()
 	{
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16309");
-}
-//--------------------------------------------------------------------------------------------------
-const std::string CAFFileProcessorsUtils::ChooseDocTag(HWND hwnd, long x, long y)
-{
-	std::vector<std::string> vecChoices;
-
-	// Add the built in tags
-	IVariantVectorPtr ipVecBuiltInTags = getFAMTagManager()->GetBuiltInTags();
-	long lBuiltInSize = ipVecBuiltInTags->Size;
-	for (long i = 0; i < lBuiltInSize; i++)
-	{
-		_variant_t var = ipVecBuiltInTags->Item[i];
-		std::string str = asString(var.bstrVal);
-		vecChoices.push_back(str);
-	}
-
-	// Add a separator if there is at
-	// least one build in tags
-	if (lBuiltInSize > 0)
-	{
-		vecChoices.push_back(""); // Separator
-	}
-
-	// Add tags in specified ini file
-	IVariantVectorPtr ipVecIniTags = getFAMTagManager()->GetINIFileTags();
-	long lIniSize = ipVecIniTags->Size;
-	for (long i = 0; i < lIniSize; i++)
-	{
-		_variant_t var = ipVecIniTags->Item[i];
-		std::string str = asString(var.bstrVal);
-		vecChoices.push_back(str);
-	}
-
-	// Add a separator if there is
-	// at least one tags from INI file
-	if (lIniSize > 0)
-	{
-		vecChoices.push_back(""); // Separator
-	}
-
-	// Add utility functions
-	TextFunctionExpander tfe;
-	std::vector<std::string> vecFunctions = tfe.getAvailableFunctions();
-	tfe.formatFunctions(vecFunctions);
-	addVectors(vecChoices, vecFunctions); // add the functions
-
-	QuickMenuChooser qmc;
-	qmc.setChoices(vecChoices);
-
-	return qmc.getChoiceString(CWnd::FromHandle(hwnd), x, y);
 }
 //--------------------------------------------------------------------------------------------------
 const std::string CAFFileProcessorsUtils::ExpandTagsAndTFE(IFAMTagManagerPtr ipFAMTM, const string& strFile, const std::string& strSourceDocName)
@@ -98,14 +44,3 @@ const std::string CAFFileProcessorsUtils::ExpandTagsAndTFE(IFAMTagManagerPtr ipF
 
 	return strExpandedFile;
 }
-
-//-------------------------------------------------------------------------------------------------
-// Private Methods
-//-------------------------------------------------------------------------------------------------
-IFAMTagManagerPtr CAFFileProcessorsUtils::getFAMTagManager()
-{
-	IFAMTagManagerPtr ipFAMTagManager(CLSID_FAMTagManager);
-	ASSERT_RESOURCE_ALLOCATION("ELI15002", ipFAMTagManager != __nullptr);
-	return ipFAMTagManager;
-}
-//--------------------------------------------------------------------------------------------------

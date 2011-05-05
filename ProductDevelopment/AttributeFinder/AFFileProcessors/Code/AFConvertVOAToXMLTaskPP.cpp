@@ -10,6 +10,7 @@
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
 #include <ComUtils.h>
+#include <DocTagUtils.h>
 
 #include <string>
 
@@ -193,17 +194,8 @@ LRESULT CAFConvertVOAToXMLTaskPP::OnClickedBtnDocTags(WORD wNotifyCode,
 
 	try
 	{	
-		// Get the rectangle for the appropriate button
-		RECT rect;
-		m_btnVOAFileSelectTag.GetWindowRect(&rect);
-
-		// Get the doc tag choice
-		string strChoice = CAFFileProcessorsUtils::ChooseDocTag(hWndCtl, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			// Replace the selection
-			m_editVOAFileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnVOAFileSelectTag,
+			m_editVOAFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26250");
 

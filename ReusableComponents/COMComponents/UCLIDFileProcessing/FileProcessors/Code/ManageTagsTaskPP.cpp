@@ -12,6 +12,7 @@
 #include <COMUtils.h>
 #include <cpputil.h>
 #include <StringTokenizer.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // CManageTagsTaskPP
@@ -190,24 +191,8 @@ LRESULT CManageTagsTaskPP::OnClickedBtnTagsDocTags(WORD wNotifyCode, WORD wID,
 
 	try
 	{
-		// get the position of the input image doc tag button
-		RECT rect;
-		m_btnTagsDocTags.GetWindowRect(&rect);
-
-		// display the doc tag menu and get the user's selection
-		string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-		// if the user selected a tag, add it to the input image filename edit control
-		if (strChoice != "")
-		{
-			m_comboTags.Clear();
-			CString zText;
-			m_comboTags.GetWindowText(zText);
-			zText.Delete(LOWORD(m_dwComboTagsSel),
-				HIWORD(m_dwComboTagsSel) - LOWORD(m_dwComboTagsSel));
-			zText.Insert(LOWORD(m_dwComboTagsSel), strChoice.c_str());
-			m_comboTags.SetWindowText(zText);
-		}
+		ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager),m_btnTagsDocTags,
+			m_comboTags, m_dwComboTagsSel);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31988");
 

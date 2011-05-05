@@ -8,6 +8,7 @@
 #include <UCLIDException.h>
 #include <AFTagManager.h>
 #include <ComponentLicenseIDs.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // COutputToVOAPP
@@ -155,16 +156,7 @@ LRESULT COutputToVOAPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND h
 
 	try
 	{
-		RECT rect;
-		m_btnSelectDocTag.GetWindowRect(&rect);
-		CRect rc(rect);
-		
-		AFTagManager tagMgr;
-		string strChoice = tagMgr.displayTagsForSelection(CWnd::FromHandle(m_hWnd), rc.right, rc.top);
-		if (strChoice != "")
-		{
-			m_editFileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IAFUtilityPtr(CLSID_AFUtility), m_btnSelectDocTag, m_editFileName);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12009");
 

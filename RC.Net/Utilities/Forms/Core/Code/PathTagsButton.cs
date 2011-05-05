@@ -423,17 +423,31 @@ namespace Extract.Utilities.Forms
                 {
                     if (TextControl != null)
                     {
-                        TextControl.SelectedText = tagName;
+                        int originalSelectionStart = TextControl.SelectionStart;
+                        string originalSelectedText = TextControl.SelectedText;
 
                         // If a tag function has been selected, automatically position the cursor
                         // between the parentheses
                         if (tagName.StartsWith("$", StringComparison.OrdinalIgnoreCase) &&
-                            tagName.EndsWith("()", StringComparison.OrdinalIgnoreCase))
+                            tagName.EndsWith(")", StringComparison.OrdinalIgnoreCase))
                         {
-                            TextControl.SelectionStart -= 1;
-                            TextControl.SelectionLength = 0;
-                            TextControl.Focus();
+                            int parameterInsertIndex = tagName.IndexOf('(') + 1;
+                            tagName = tagName.Substring(0, parameterInsertIndex);
+
+                            tagName += originalSelectedText + ")";
+                            TextControl.SelectionLength = TextControl.SelectedText.Length;
+
+                            TextControl.SelectedText = tagName;
+                            TextControl.SelectionStart = originalSelectionStart + parameterInsertIndex;
+                            TextControl.SelectionLength = originalSelectedText.Length;
                         }
+                        else
+                        {
+                            TextControl.SelectedText = tagName;
+                            TextControl.SelectionLength = 0;
+                        }
+
+                        TextControl.Focus();
                     }
 
                     // Raise the TagSelected event

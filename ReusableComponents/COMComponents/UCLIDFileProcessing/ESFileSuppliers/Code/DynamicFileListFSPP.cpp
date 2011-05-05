@@ -8,6 +8,7 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
+#include <DocTagUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // CDynamicFileListFSPP
@@ -126,16 +127,8 @@ LRESULT CDynamicFileListFSPP::OnBnClickedBtnSelectDocTag(WORD wNotifyCode, WORD 
 
 	try
 	{
-		RECT rect;
-		m_btnSelectDocTag.GetWindowRect(&rect);
-		
-		// Choose the needed tags
-		std::string strChoice =  CFileSupplierUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-		if (strChoice != "")
-		{
-			m_editFileName.ReplaceSel(strChoice.c_str(), TRUE);
-		}
+		ChooseDocTagForEditBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSelectDocTag,
+			m_editFileName, false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13970");
 

@@ -10,6 +10,7 @@
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <LoadFileDlgThread.h>
+#include <DocTagUtils.h>
 
 #include <vector>
 #include <string>
@@ -346,20 +347,8 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnClickedBtnSrcSelectTag(WORD wNotifyCod
 
 	try
 	{
-		RECT rect;
-		m_btnSrcSelectTag.GetWindowRect(&rect);
-		std::string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			// if a tag was selected insert at the current selection
-			m_cmbSrc.Clear();
-			CString zWindowText;
-			m_cmbSrc.GetWindowText(zWindowText);
-			zWindowText.Delete(LOWORD(m_dwSelSrc), HIWORD(m_dwSelSrc) - LOWORD(m_dwSelSrc) );
-			zWindowText.Insert(LOWORD(m_dwSelSrc), strChoice.c_str());
-			m_cmbSrc.SetWindowText(zWindowText);
-		}
-		
+		ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnSrcSelectTag, m_cmbSrc,
+			m_dwSelSrc);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12189");
 
@@ -391,19 +380,8 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnClickedBtnDstSelectTag(WORD wNotifyCod
 
 	try
 	{
-		RECT rect;
-		m_btnDstSelectTag.GetWindowRect(&rect);
-		std::string strChoice = CFileProcessorsUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-		if (strChoice != "")
-		{
-			// if a tag was selected insert at the current selection
-			m_cmbDst.Clear();
-			CString zWindowText;
-			m_cmbDst.GetWindowText(zWindowText);
-			zWindowText.Delete(LOWORD(m_dwSelDst), HIWORD(m_dwSelDst) - LOWORD(m_dwSelDst) );
-			zWindowText.Insert(LOWORD(m_dwSelDst), strChoice.c_str());
-			m_cmbDst.SetWindowText(zWindowText);
-		}
+		ChooseDocTagForComboBox(IFAMTagManagerPtr(CLSID_FAMTagManager), m_btnDstSelectTag, m_cmbDst,
+			m_dwSelDst);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12191");
 

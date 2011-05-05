@@ -22,6 +22,7 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <LicenseMgmt.h>
+#include <DocTagUtils.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -481,27 +482,8 @@ void FileProcessingDlgTaskPage::OnBtnErrorSelectDocTag()
 
 	try
 	{
-		// Retrieve position of doc tag button
-		RECT rect;
-		m_btnErrorSelectTag.GetWindowRect(&rect);
-
-		// Save the location of the current edit selection
-		m_dwSel = m_editErrorLog.GetSel();
-
-		// Display menu and make selection
-		std::string strChoice = CFileProcessingUtils::ChooseDocTag(m_hWnd, rect.right, rect.top);
-
-		if (strChoice != "")
-		{
-			// Retrieve current text in error log edit box
-			CString zWindowText;
-			m_editErrorLog.GetWindowText( zWindowText );
-
-			// Remove any selected text and replace with selected doc tag string
-			zWindowText.Delete(LOWORD(m_dwSel), HIWORD(m_dwSel) - LOWORD(m_dwSel) );
-			zWindowText.Insert(LOWORD(m_dwSel), strChoice.c_str());
-			m_editErrorLog.SetWindowText(zWindowText);
-		}
+		ChooseDocTagForEditBox(UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr(CLSID_FAMTagManager),
+			m_btnErrorSelectTag, m_editErrorLog);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16079")
 }
