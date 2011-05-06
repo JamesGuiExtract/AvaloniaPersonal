@@ -266,7 +266,7 @@
             this._checkAutoCreateActions.Name = "_checkAutoCreateActions";
             this._checkAutoCreateActions.Size = new System.Drawing.Size(264, 17);
             this._checkAutoCreateActions.TabIndex = 1;
-            this._checkAutoCreateActions.Text = "Automactically create actions specified in FPS files";
+            this._checkAutoCreateActions.Text = "Automatically create actions specified in FPS files";
             this._checkAutoCreateActions.UseVisualStyleBackColor = true;
             // 
             // _checkAllowdynamicTagCreation

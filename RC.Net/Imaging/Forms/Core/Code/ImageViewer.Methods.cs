@@ -334,7 +334,7 @@ namespace Extract.Imaging.Forms
                 catch (Exception ex)
                 {
                     ExtractException ee = new ExtractException("ELI21588",
-                        "Unable to remove file from MRU list.", ex);
+                        "Application trace: Unable to remove file from MRU list.", ex);
                     ee.AddDebugData("File to remove", fileName, false);
                     ee.Log();
                 }

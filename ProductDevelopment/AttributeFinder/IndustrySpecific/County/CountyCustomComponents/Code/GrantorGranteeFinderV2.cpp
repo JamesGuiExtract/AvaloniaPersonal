@@ -1045,7 +1045,7 @@ void CGrantorGranteeFinderV2::removeInvalidDocMappings()
 			}
 			else
 			{
-				UCLIDException ue("ELI10480", "Duplicate Document type Removed." );
+				UCLIDException ue("ELI10480", "Application trace: Duplicate Document type Removed." );
 				ue.addDebugInfo( "Document Type", static_cast<string>(strDocType) );
 				ue.log();
 			}

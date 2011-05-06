@@ -119,6 +119,7 @@ protected:
 	afx_msg void OnSelectMatchingTopLevelExceptions();
 	afx_msg void OnSelectMatchingExceptionHierarchies();
 	afx_msg void OnToggleShowTraces();
+	afx_msg void OnToggleShowDisplayedExceptions();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -235,6 +236,9 @@ private:
 
 	// Indicates whether application trace exceptions should be filtered out.
 	bool m_bShowTraces;
+
+	// Indicates whether exceptions that were originally displayed to the user should be filtered out.
+	bool m_bShowDisplayedExceptions;
 
 	// Have the dialog's controls been instantiated yet - allows for resize
 	// and repositioning

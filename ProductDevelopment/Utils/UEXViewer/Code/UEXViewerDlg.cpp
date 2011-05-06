@@ -67,6 +67,7 @@ const string TIME_WIDTH			= "TimeWidth";
 const string ELI_WIDTH			= "ELICodeWidth";
 const string EXCEPTION_WIDTH	= "ExceptionWidth";
 const string SHOW_TRACES		= "ShowApplicationTraces";
+const string SHOW_DISPLAYED_EXCEPTIONS = "ShowDisplayedExceptions";
 
 // Window Size Bounds
 #define	MIN_WINDOW_X				731
@@ -76,7 +77,8 @@ const string SHOW_TRACES		= "ShowApplicationTraces";
 #define	MIN_WIDTH					0
 #define	MAX_WIDTH					400
 
-const char *gszAPP_TRACE_TAG	= "application trace";
+const char *gszAPP_TRACE_TAG		= "application trace";
+const char *gszAPP_DISPLAYED_TAG	= "displayed:";
 
 //-------------------------------------------------------------------------------------------------
 // CUEXViewerDlg dialog
@@ -95,6 +97,7 @@ CUEXViewerDlg::CUEXViewerDlg(CWnd* pParent /*=NULL*/, string strFileName /*= ""*
 	m_strFileName(strFileName),
 	m_bShowFileName(bShowFileName),
 	m_bShowTraces(true),
+	m_bShowDisplayedExceptions(true),
 	m_bInitialized(false)
 {
 	try
@@ -184,6 +187,7 @@ BEGIN_MESSAGE_MAP(CUEXViewerDlg, CDialog)
 	ON_COMMAND(ID_ELILISTCONTEXT_MATCHING_TOPLEVEL, &CUEXViewerDlg::OnSelectMatchingTopLevelExceptions)
 	ON_COMMAND(ID_ELILISTCONTEXT_MATCHING_HIERARCHIES, &CUEXViewerDlg::OnSelectMatchingExceptionHierarchies)
 	ON_COMMAND(ID_VIEW_SHOW_TRACES, &CUEXViewerDlg::OnToggleShowTraces)
+	ON_COMMAND(ID_VIEW_SHOW_DISPLAYED_EXCEPTIONS, &CUEXViewerDlg::OnToggleShowDisplayedExceptions)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -306,6 +310,10 @@ BOOL CUEXViewerDlg::OnInitDialog()
 		ASSERT_RESOURCE_ALLOCATION("ELI32492", pMenu != __nullptr);
 		pMenu->CheckMenuItem(ID_VIEW_SHOW_TRACES,
 			MF_BYCOMMAND | (m_bShowTraces ? MF_CHECKED : MF_UNCHECKED));
+
+		// Set the initial state of the "Show displayed exceptions" option.
+		pMenu->CheckMenuItem(ID_VIEW_SHOW_DISPLAYED_EXCEPTIONS,
+			MF_BYCOMMAND | (m_bShowDisplayedExceptions ? MF_CHECKED : MF_UNCHECKED));
 
 		// Setup list for UEX files
 		prepareList();
@@ -1158,6 +1166,9 @@ void CUEXViewerDlg::OnClose()
 		m_pCfgMgr->setKeyValue( GENERAL, DIRECTORY, strKey, true );
 
 		m_pCfgMgr->setKeyValue(GENERAL, SHOW_TRACES, m_bShowTraces ? "1" : "0", true);
+		m_pCfgMgr->setKeyValue(GENERAL, SHOW_DISPLAYED_EXCEPTIONS,
+			m_bShowDisplayedExceptions ? "1" : "0", true);
+
 
 		// ELI Code column width
 		(m_listUEX.GetHeaderCtrl())->GetItemRect( TOP_ELI_COLUMN, &rect );
@@ -1381,6 +1392,23 @@ void CUEXViewerDlg::OnToggleShowTraces()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32491");
 }
+//-------------------------------------------------------------------------------------------------
+void CUEXViewerDlg::OnToggleShowDisplayedExceptions()
+{
+	try
+	{
+		CMenu* pMenu = GetMenu();
+		ASSERT_RESOURCE_ALLOCATION("ELI32557", pMenu != __nullptr);
+
+		m_bShowDisplayedExceptions = !m_bShowDisplayedExceptions;
+		pMenu->CheckMenuItem(ID_VIEW_SHOW_DISPLAYED_EXCEPTIONS,
+			MF_BYCOMMAND | (m_bShowDisplayedExceptions ? MF_CHECKED : MF_UNCHECKED));
+
+		// Call addExceptions with replace mode true to refresh
+		addExceptions(m_strCurrentFile, true);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32558");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
@@ -1518,6 +1546,13 @@ void CUEXViewerDlg::initPersistent()
 	if (m_pCfgMgr->keyExists(GENERAL, SHOW_TRACES))
 	{
 		m_bShowTraces = (m_pCfgMgr->getKeyValue(GENERAL, SHOW_TRACES) == "1");
+	}
+
+	// Set the initial state of the "Show displayed exceptions" option.
+	if (m_pCfgMgr->keyExists(GENERAL, SHOW_DISPLAYED_EXCEPTIONS))
+	{
+		m_bShowDisplayedExceptions =
+			(m_pCfgMgr->getKeyValue(GENERAL, SHOW_DISPLAYED_EXCEPTIONS) == "1");
 	}
 
 	// Retrieve column widths
@@ -1820,6 +1855,16 @@ bool CUEXViewerDlg::parseLine(const string& strText)
 			{
 				static size_t nLength = strlen(gszAPP_TRACE_TAG);
 				if (_strnicmp(gszAPP_TRACE_TAG, ue.getTopText().c_str(), nLength) == 0)
+				{
+					return true;
+				}
+			}
+
+			// If not showing exceptions that were originally displayed to the user.
+			if (!m_bShowDisplayedExceptions)
+			{
+				static size_t nLength = strlen(gszAPP_DISPLAYED_TAG);
+				if (_strnicmp(gszAPP_DISPLAYED_TAG, ue.getTopText().c_str(), nLength) == 0)
 				{
 					return true;
 				}

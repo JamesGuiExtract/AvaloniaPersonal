@@ -96,7 +96,7 @@ namespace Extract.Utilities.Forms
                     if (result != 0)
                     {
                         ExtractException ee = new ExtractException("ELI30513",
-                            "Failed to modify theme to allow for continuous progress bar style.");
+                            "Application trace: Failed to modify theme to allow for continuous progress bar style.");
                         ee.AddDebugData("HRESULT", result, false);
                         ee.Log();
                     }

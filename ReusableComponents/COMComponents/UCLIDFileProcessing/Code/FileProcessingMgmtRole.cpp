@@ -1673,7 +1673,7 @@ void CFileProcessingMgmtRole::handleProcessingError(FileProcessingRecord &task,
 				// Log a cancellation during error task execution
 				if (eResult == kProcessingCancelled)
 				{
-					UCLIDException ue("ELI18060","Processing cancelled while executing error task!");
+					UCLIDException ue("ELI18060","Application trace: Processing cancelled while executing error task.");
 					ue.addDebugInfo("File", task.getFileName());
 					ue.addDebugInfo("Task", asString(getErrorHandlingTask()->Description));
 					ue.log();

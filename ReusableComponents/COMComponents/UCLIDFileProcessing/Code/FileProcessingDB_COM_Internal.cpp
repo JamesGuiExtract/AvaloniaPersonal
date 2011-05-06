@@ -66,7 +66,8 @@ using namespace ADODB;
 				}\
 				if (!bRetryExceptionLogged) \
 				{ \
-					UCLIDException uex("ELI32030", "Database connection failed. Attempting to reconnect.", ue); \
+					UCLIDException uex("ELI32030", \
+						"Application trace: Database connection failed. Attempting to reconnect.", ue); \
 					uex.log(); \
 					bRetryExceptionLogged = true; \
 				} \
@@ -5254,7 +5255,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			// components.
 			vector<DB_SCHEMA_UPDATE_FUNC> vecUpdateFuncs;
 
-			int nCurrentSchemaVersion = getDBSchemaVersion();
+			int nOriginalSchemaVersion = getDBSchemaVersion();
 			int nSchemaVersion = getDBSchemaVersion();
 			switch (nSchemaVersion)
 			{
@@ -5334,7 +5335,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 
 			// After a valid upgrade path has been verified and the number of progress steps has
 			// been initialized, loop through the upgrade methods, this time performing upgrade.
-			nSchemaVersion = nCurrentSchemaVersion;
+			nSchemaVersion = nOriginalSchemaVersion;
 			mapProductSpecificVersions.clear();
 
 			ipProgressStatus->InitProgressStatus(
@@ -5359,6 +5360,11 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			}
 
 			tg.CommitTrans();
+
+			UCLIDException ue("ELI32551", "Application Trace: Database schema updated.");
+			ue.addDebugInfo("Old version", nOriginalSchemaVersion);
+			ue.addDebugInfo("New version", nSchemaVersion);
+			ue.log();
 
 			// Force the DBInfo values (including schema version) to be reloaded on the next call to
 			// validateDBSchemaVersion

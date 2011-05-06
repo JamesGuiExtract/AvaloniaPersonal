@@ -715,7 +715,7 @@ namespace Extract.FileActionManager.Forms
                     if (!_closedEvent.WaitOne(_THREAD_TIMEOUT, false))
                     {
                         new ExtractException("ELI24036",
-                            "Timeout waiting for verification form to close.").Log();
+                            "Application trace: Timeout waiting for verification form to close.").Log();
                     }
 
                     return;

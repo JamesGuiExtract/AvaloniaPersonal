@@ -358,7 +358,8 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 			// log any errors
 			if (rc != REC_OK)
 			{
-				UCLIDException ue2("ELI18629", "Unable to release page image. Possible memory leak.");
+				UCLIDException ue2("ELI18629", "Application trace: Unable to release page image. "
+					"Possible memory leak.");
 				loadScansoftRecErrInfo(ue2, rc);
 				ue2.addDebugInfo("Input filename", m_strInputFile);
 				ue2.addDebugInfo("Page number", i+1);

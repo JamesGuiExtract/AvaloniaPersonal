@@ -506,7 +506,7 @@ void SafeNetLicenseMgr::getLicense()
 		// If this is a retry attempt log an exception
 		if ( bIsReconnectAttempt )
 		{
-			UCLIDException ue("ELI25006", "Attempting to reconnect to USB Key.");
+			UCLIDException ue("ELI25006", "Application trace: Attempting to reconnect to USB Key.");
 			ue.log();
 		}
 
@@ -636,7 +636,8 @@ void SafeNetLicenseMgr::getLicense()
 						// to indicate it has been reconnected
 						if (bIsReconnectAttempt)
 						{
-							UCLIDException ue("ELI24844", "USB License reconnection successful.");
+							UCLIDException ue("ELI24844",
+								"Application trace: USB License reconnection successful.");
 							ue.log();
 						}
 
@@ -721,7 +722,7 @@ void SafeNetLicenseMgr::releaseLicense(const string& strELICode, bool bLogReleas
 
 			if ( spsStatus != SP_ERR_SUCCESS && bLogReleaseException )
 			{
-				UCLIDException ue("ELI11302", "Unable to release USB Key License.");
+				UCLIDException ue("ELI11302", "Application trace: Unable to release USB Key License.");
 				loadSafeNetErrInfo(ue, spsStatus);
 
 				string	strServerName = m_snlcConfig.getContactServerName();
@@ -886,7 +887,7 @@ SP_DWORD SafeNetLicenseMgr::decreaseCellValue( DataCell &rCell, SP_DWORD dwAmoun
 			// Check new counter value and possibly add item to exception log
 			if (dwCurrValue % gnLOG_FREQUENCY == 0)
 			{
-				UCLIDException ue("ELI15935", "Application trace information.");
+				UCLIDException ue("ELI15935", "Application trace: debug information");
 				ue.addDebugInfo( "Item 1", getKeySN(), true );
 				ue.addDebugInfo( "Item 2", dwCurrValue, true );
 				ue.log();

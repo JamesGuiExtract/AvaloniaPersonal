@@ -174,7 +174,7 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(IFileRecord* pFileRecor
 			if (m_bLogExceptions)
 			{
 				UCLIDException uexOuter("ELI20173", 
-					"Application trace information: Task condition executed and evaluated as false", ue);
+					"Application trace: Task condition executed and evaluated as false", ue);
 				uexOuter.log();
 			}
 		}

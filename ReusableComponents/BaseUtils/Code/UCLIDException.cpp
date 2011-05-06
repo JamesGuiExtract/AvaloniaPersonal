@@ -868,7 +868,7 @@ void UCLIDException::renameLogFile(const string& strFileName, bool bUserRenamed,
 		if (MoveFile(strFileName.c_str(), strRenameFileTo.c_str()) != 0)
 		{
 			string strELICode = "ELI14818";
-			string strMessage = "Current log file was time stamped and renamed.";
+			string strMessage = "Application trace: Current log file was time stamped and renamed.";
 			if (bUserRenamed)
 			{
 				strELICode = "ELI29952";
@@ -904,7 +904,7 @@ void UCLIDException::renameLogFile(const string& strFileName, bool bUserRenamed,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent) const
+void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent, bool bAddDisplayedTag) const
 {
 	// Use try/catch block to trap any exception
 	try
@@ -920,8 +920,18 @@ void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent) cons
 			// Make sure that the directory exists
 			createDirectory( strFolder );
 
-			// Write to output file
-			saveTo(strOutputLogFile, true);
+			// Prefix "Displayed:" if requested and write it to the output file.
+			if (bAddDisplayedTag)
+			{
+				UCLIDException ue2(*this);
+				ue2.m_strDescription = "Displayed: " + ue2.m_strDescription;
+
+				ue2.saveTo(strOutputLogFile, true);
+			}
+			else
+			{
+				saveTo(strOutputLogFile, true);
+			}
 
 			// notify the Failure Detection & Reporting system that
 			// an exception was logged
@@ -1083,7 +1093,7 @@ void UCLIDException::display(bool bLogException, bool bForceDisplay) const
 		if (bLogException)
 		{
 			// Do not send NotifyExceptionEvent
-			log( "", false );
+			log("", false, true);
 		}
 
 		// notify the Failure Detection And Reporting system

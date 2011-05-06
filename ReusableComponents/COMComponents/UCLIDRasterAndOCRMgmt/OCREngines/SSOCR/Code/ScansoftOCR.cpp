@@ -882,7 +882,8 @@ void CScansoftOCR::dismissErrorDialog(HWND hWnd)
 	::SendMessage(hWnd, WM_CLOSE, 0, 0);
 
 	// log an exception indicating that the SSOCR2 error message was auto-dismissed
-	UCLIDException ue("ELI13198", "SSOCR2.exe Application Error message box auto dismissed.");
+	UCLIDException ue("ELI13198",
+		"Application trace: SSOCR2.exe Application Error message box auto dismissed.");
 	ue.log();
 
 	// dismissing the error dialog sometimes causes more error dialogs to pop up.

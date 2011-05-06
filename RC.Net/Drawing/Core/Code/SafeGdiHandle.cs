@@ -54,7 +54,7 @@ namespace Extract.Drawing
             catch (Exception ex)
             {
                 ExtractException ee = new ExtractException("ELI27855",
-                    "Unable to release GDI handle.", ex);
+                    "Application trace: Unable to release GDI handle.", ex);
                 ee.Log();
             }
 

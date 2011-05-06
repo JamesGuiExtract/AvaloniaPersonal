@@ -338,7 +338,9 @@ public:
 	//				system should be notified of this exception being logged.  In general, 
 	//				the FailureDetectionAndReporting system should be notified of all logged 
 	//				exceptions that are not displayed to the user.
-	void log(const string& strFile = "", bool bNotifyFDRS = true) const;
+	//			bAddDisplayedTag: Prefix the description with "Displayed: " to indicated the
+	//				exception was originally displayed to the user.
+	void log(const string& strFile = "", bool bNotifyFDRS = true, bool bAddDisplayedTag = false) const;
 	//----------------------------------------------------------------------------------------------	
 	// PURPOSE: To save the contents of vectors into file strFile
 	// REQUIRE: all parameters should contain valid information.

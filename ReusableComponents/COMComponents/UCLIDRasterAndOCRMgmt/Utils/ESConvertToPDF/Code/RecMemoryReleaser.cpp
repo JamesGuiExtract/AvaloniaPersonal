@@ -29,7 +29,8 @@ RecMemoryReleaser<tagRECDOCSTRUCT>::~RecMemoryReleaser()
 		// log any errors
 		if (rc != REC_OK)
 		{
-			UCLIDException ue("ELI18584", "Unable to close document. Possible memory leak.");
+			UCLIDException ue("ELI18584",
+				"Application trace: Unable to close document. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}
@@ -47,7 +48,8 @@ RecMemoryReleaser<tagIMGFILEHANDLE>::~RecMemoryReleaser()
 		// log any errors
 		if (rc != REC_OK)
 		{
-			UCLIDException ue("ELI18593", "Unable to close image file. Possible memory leak.");
+			UCLIDException ue("ELI18593",
+				"Application trace: Unable to close image file. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}
@@ -66,7 +68,7 @@ RecMemoryReleaser<tagRECPAGESTRUCT>::~RecMemoryReleaser()
 		if (rc != REC_OK)
 		{
 			UCLIDException ue("ELI18581", 
-				"Unable to release recognition data. Possible memory leak.");
+				"Application trace: Unable to release recognition data. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}
@@ -76,7 +78,8 @@ RecMemoryReleaser<tagRECPAGESTRUCT>::~RecMemoryReleaser()
 		// log any errors
 		if (rc != REC_OK)
 		{
-			UCLIDException ue("ELI18582", "Unable to release page image. Possible memory leak.");
+			UCLIDException ue("ELI18582", 
+				"Application trace: Unable to release page image. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}
@@ -100,7 +103,7 @@ MainRecMemoryReleaser::~MainRecMemoryReleaser()
 		if(rc != REC_OK)
 		{
 			UCLIDException ue("ELI18604", 
-				"Unable to free OCR engine resources. Possible memory leak.");
+				"Application trace: Unable to free OCR engine resources. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}

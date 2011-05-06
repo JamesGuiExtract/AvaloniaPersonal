@@ -1678,7 +1678,7 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 			// log an error, unless no zones were found at all (eg. the image contained no text)
 			if (rc != ZONE_NOTFOUND_ERR && rc != ZONE_NOTFOUND_WARN)
 			{
-				UCLIDException ue("ELI16769", "Unable to locate zones.");
+				UCLIDException ue("ELI16769", "Unable to locate zones. OCR aborted.");
 				loadScansoftRecErrInfo(ue, rc);
 				ue.addDebugInfo("Image Name", strImageFileName);
 				ue.addDebugInfo("Page Number", nPageNum);
@@ -2347,7 +2347,7 @@ void CScansoftOCR2::freeZoneLayoutMemory()
 			if (rc != REC_OK)
 			{
 				UCLIDException ue("ELI16869", 
-					"Unable to release zone. Possible memory leak.");
+					"Application trace: Unable to release zone. Possible memory leak.");
 				loadScansoftRecErrInfo(ue, rc);
 				ue.log();
 			}
@@ -2437,7 +2437,7 @@ CScansoftOCR2::RecMemoryReleaser<tagIMGFILEHANDLE>::~RecMemoryReleaser()
 		if (rc != REC_OK)
 		{
 			UCLIDException ue("ELI16944", 
-				"Unable to close image file. Possible memory leak.");
+				"Application trace: Unable to close image file. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}
@@ -2456,7 +2456,7 @@ CScansoftOCR2::RecMemoryReleaser<tagRECPAGESTRUCT>::~RecMemoryReleaser()
 		if (rc != REC_OK)
 		{
 			UCLIDException ue("ELI16942", 
-				"Unable to release recognition data. Possible memory leak.");
+				"Application trace: Unable to release recognition data. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}
@@ -2467,7 +2467,7 @@ CScansoftOCR2::RecMemoryReleaser<tagRECPAGESTRUCT>::~RecMemoryReleaser()
 		if (rc != REC_OK)
 		{
 			UCLIDException ue("ELI16943", 
-				"Unable to release page image. Possible memory leak.");
+				"Application trace: Unable to release page image. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}
@@ -2486,7 +2486,7 @@ CScansoftOCR2::RecMemoryReleaser<LETTER>::~RecMemoryReleaser()
 		if (rc != REC_OK)
 		{
 			UCLIDException ue("ELI16941", 
-				"Unable to release letter data. Possible memory leak.");
+				"Application trace: Unable to release letter data. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}

@@ -320,7 +320,7 @@ bool CStaticFileListFSPP::addFile(std::string strFileName)
 		if (!isFileOrFolderValid(strFileName))
 		{
 			// Log an exception
-			UCLIDException ue("ELI15698", "A File in the loading list does not exist!");
+			UCLIDException ue("ELI15698", "Application trace: A File in the loading list does not exist!");
 			ue.addDebugInfo("Missing File", strFileName);
 			ue.log();
 

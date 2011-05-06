@@ -531,7 +531,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 									{
 										// Destroy the annotation container
 										throwExceptionIfNotSuccess(L_AnnDestroy(hFileContainer, ANNFLAG_RECURSE), 
-											"ELI23567",	"Unable to destroy annotation container.");
+											"ELI23567",	"Application trace: Unable to destroy annotation container.");
 									}
 									catch(UCLIDException& ex)
 									{
@@ -692,7 +692,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 					{
 						// Destroy the annotation container
 						throwExceptionIfNotSuccess(L_AnnDestroy(hContainer, ANNFLAG_RECURSE), 
-							"ELI27297",	"Unable to destroy annotation container.");
+							"ELI27297",	"Application trace: Unable to destroy annotation container.");
 					}
 					catch(UCLIDException& ex)
 					{

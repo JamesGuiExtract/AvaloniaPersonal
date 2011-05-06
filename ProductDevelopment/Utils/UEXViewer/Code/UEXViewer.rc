@@ -254,6 +254,7 @@ BEGIN
     BEGIN
         MENUITEM "Vie&w details...\tCtrl+D",    ID_EXCEPTION_VIEW_DETAILS
         MENUITEM "Show application traces",     ID_VIEW_SHOW_TRACES
+        MENUITEM "Show displayed exceptions",   ID_VIEW_SHOW_DISPLAYED_EXCEPTIONS
     END
     POPUP "Tools"
     BEGIN

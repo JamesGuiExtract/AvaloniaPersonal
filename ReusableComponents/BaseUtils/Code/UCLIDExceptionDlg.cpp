@@ -406,7 +406,7 @@ void UCLIDExceptionDlg::updateCountdown()
 	if (m_lTimeoutCount <= 0)
 	{
 		// Log an exception before close
-		UCLIDException ue( "ELI12965", "Automatic close of Exception dialog." );
+		UCLIDException ue( "ELI12965", "Application trace: Automatic close of Exception dialog." );
 		ue.log();
 
 		PostMessage( WM_CLOSE );

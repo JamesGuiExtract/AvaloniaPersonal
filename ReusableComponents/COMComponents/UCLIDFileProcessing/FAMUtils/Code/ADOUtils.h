@@ -67,7 +67,8 @@ using namespace std;
 				}\
 				if (!bRetryExceptionLogged) \
 				{ \
-					UCLIDException uex("ELI29853", "Database connection failed. Attempting to reconnect.", ue); \
+					UCLIDException uex("ELI29853", \
+						"Application trace: Database connection failed. Attempting to reconnect.", ue); \
 					uex.log(); \
 					bRetryExceptionLogged = true; \
 				} \
@@ -96,7 +97,7 @@ using namespace std;
 							/* the schema */ \
 							ipRetryConnection = getDBConnection(); \
 							\
-							UCLIDException ueConnected("ELI29854", "Connection retry successful."); \
+							UCLIDException ueConnected("ELI29854", "Application trace: Connection retry successful."); \
 							ueConnected.log(); \
 							\
 							break; \

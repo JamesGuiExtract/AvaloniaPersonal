@@ -2047,8 +2047,7 @@ void waitForFileToBeReadable(const string& strFileName, bool bLogException, ifst
 				if (bLogException)
 				{
 					// Have checked the access rights the required number of times so log exception
-					UCLIDException ue("ELI24024",
-						"Application Trace: File cannot be opened for reading.");
+					UCLIDException ue("ELI24024", "File cannot be opened for reading.");
 					ue.addDebugInfo("File Name", strFileName);
 					ue.addDebugInfo("Number of retries", iRetries);
 

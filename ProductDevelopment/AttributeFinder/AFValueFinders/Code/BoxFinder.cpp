@@ -910,7 +910,7 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 
 			if (bPageResultsIncomplete)
 			{
-				UCLIDException ue("ELI21528", "Box search aborted! Too many potential boxes " 
+				UCLIDException ue("ELI21528", "Application trace: Box search aborted! Too many potential boxes " 
 					"found; results may not be accurate.");
 				ue.addDebugInfo("Filename", asString(ipDocText->SourceDocName));
 				ue.addDebugInfo("Page", nPageNum);

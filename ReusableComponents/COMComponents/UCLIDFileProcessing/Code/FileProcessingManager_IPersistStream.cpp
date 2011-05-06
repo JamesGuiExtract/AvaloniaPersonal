@@ -197,7 +197,8 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 		{
 			// Create and log an exception
 			UCLIDException ue( "ELI14962", 
-				"The FPS file has been recently converted from a previous version.  An Action must be selected." );
+				"Application trace: The FPS file has been recently converted from a previous version. "
+				"An Action must be selected.");
 			ue.log();
 		}
 

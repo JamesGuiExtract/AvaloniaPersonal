@@ -1693,7 +1693,8 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 						tg.CommitTrans();
 
 						// log an exception that the lock has been reset
-						UCLIDException ue("ELI15406", "Lock timed out. Lock has been reset.");
+						UCLIDException ue("ELI15406",
+							"Application trace: Lock timed out. Lock has been reset.");
 						ue.addDebugInfo("Lock Name", strLockName);
 						ue.addDebugInfo ("Lock Timeout", m_lDBLockTimeout);
 						ue.addDebugInfo ("Actual Lock Time", asString(nSecondsLocked));
@@ -2472,7 +2473,8 @@ bool CFileProcessingDB::reConnectDatabase()
 				resetDBConnection();
 
 				// Exception logged to indicate the retry was successful.
-				UCLIDException ueConnected("ELI23614", "Connection retry successful.");
+				UCLIDException ueConnected("ELI23614",
+					"Application trace: Connection retry successful.");
 				ueConnected.log();
 
 				return true;

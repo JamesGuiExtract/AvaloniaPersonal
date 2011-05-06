@@ -232,14 +232,14 @@ STDMETHODIMP CCOMUCLIDException::Display()
 		UCLIDExceptionDlg dlg(CWnd::GetActiveWindow());
 
 		if ( m_pException != __nullptr )
-		{		
-			m_pException->log();
+		{	
+			m_pException->log("", true, true);
 			dlg.display(*m_pException);
 		}
 		else
 		{
 			UCLIDException ue("ELI17159", "Encapsulated exception object is NULL!");
-			ue.log();
+			ue.log("", true, true);
 			dlg.display(ue);
 		}
 	}
