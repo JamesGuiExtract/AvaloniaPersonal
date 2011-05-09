@@ -18,9 +18,9 @@ namespace Extract.Utilities.Forms
         #region Constants
 
         /// <summary>
-        /// The maximum height the form can grow to.
+        /// The maximum height the scroll bar panel can grow to.
         /// </summary>
-        const int _MAX_FORM_HEIGHT = 400;
+        const int _MAX_CONTENT_HEIGHT = 350;
 
         /// <summary>
         /// Default message for the progress status.
@@ -123,6 +123,9 @@ namespace Extract.Utilities.Forms
                 }
 
                 InitializeComponent();
+
+                // 1000 should be well beyond the width needed.
+                _topPanel.MaximumSize = new Size(1000, _MAX_CONTENT_HEIGHT);
 
                 if (showCloseButton)
                 {
@@ -290,9 +293,6 @@ namespace Extract.Utilities.Forms
                 AddControlToPanel(bar, ref nextControlLocation);
             }
 
-            // Set the height for the top panel
-            _topPanel.Height = nextControlLocation.Y;
-
             // Add the stop button if required
             if (_stopEventHandle != IntPtr.Zero)
             {
@@ -308,18 +308,11 @@ namespace Extract.Utilities.Forms
                 nextControlLocation.Offset(0, _stop.Height + Padding.Bottom);
             }
 
-            int newHeight = nextControlLocation.Y;
-
-            if (newHeight < _MAX_FORM_HEIGHT)
+            // If a vertical scroll bar is necessary, add horizontal space for it so the horizontal
+            // scroll bar doesn't show up.
+            if (_topPanel.VerticalScroll.Visible)
             {
-                Height = newHeight;
-            }
-            else
-            {
-                // If reached max height then the scroll bar will show up, need to make room
-                // for it
-                this.Width = this.Width + SystemInformation.VerticalScrollBarWidth;
-                this.Height = _MAX_FORM_HEIGHT;
+                Width += SystemInformation.VerticalScrollBarWidth;
             }
         }
 

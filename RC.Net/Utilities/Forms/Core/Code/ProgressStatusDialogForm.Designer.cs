@@ -57,9 +57,10 @@
             // 
             // _topPanel
             // 
-            this._topPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._topPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._topPanel.AutoScroll = true;
+            this._topPanel.AutoSize = true;
             this._topPanel.Location = new System.Drawing.Point(12, 12);
             this._topPanel.Name = "_topPanel";
             this._topPanel.Size = new System.Drawing.Size(353, 12);
@@ -73,6 +74,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(377, 36);
             this.ControlBox = false;
             this.Controls.Add(this._topPanel);
@@ -84,6 +86,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Progress Status";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 

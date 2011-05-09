@@ -1976,7 +1976,8 @@ void waitForFileAccess(const string& strFileName, int iAccess)
 			if ( iRetries > iRetryCount)
 			{
 				// Have checked the access rights the required number of times so log exception
-				UCLIDException ue("ELI20618", "File cannot be accessed with requested access!");
+				UCLIDException ue("ELI20618",
+					"Application trace: File cannot be accessed with requested access.");
 				ue.addDebugInfo("File Name", strFileName);
 				ue.addDebugInfo("Access", iAccess);
 				ue.addDebugInfo("Number of retries", iRetries);
@@ -2047,7 +2048,8 @@ void waitForFileToBeReadable(const string& strFileName, bool bLogException, ifst
 				if (bLogException)
 				{
 					// Have checked the access rights the required number of times so log exception
-					UCLIDException ue("ELI24024", "File cannot be opened for reading.");
+					UCLIDException ue("ELI24024",
+						"Application trace: File cannot be opened for reading.");
 					ue.addDebugInfo("File Name", strFileName);
 					ue.addDebugInfo("Number of retries", iRetries);
 
