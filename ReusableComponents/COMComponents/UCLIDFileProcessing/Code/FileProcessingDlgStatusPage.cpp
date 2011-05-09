@@ -146,11 +146,13 @@ void FileProcessingDlgStatusPage::clear()
 	m_completedFilesList.DeleteAllItems();
 	m_failedFilesList.DeleteAllItems();
 
-	// Clear vectors
+	// Clear vectors and the file id map
 	m_vecCurrFileIds.clear();
 	m_vecCompFileIds.clear();
 	m_vecFailFileIds.clear();
 	m_vecFailedUEXCodes.clear();
+	m_mapFileIdToFileName.clear();
+
 
 	// Clear the processing time
 	m_completedFailedOrCurrentTime.clear();
@@ -586,9 +588,13 @@ void FileProcessingDlgStatusPage::OnNMRclkFileLists(NMHDR* pNMHDR, LRESULT* pRes
 		vector<string> vecFileNames;
 		for(vector<int>::iterator it = vecSelected.begin(); it != vecSelected.end(); it++)
 		{
+			// Get the file names for each of the file id's
 			long nFileId = pvecListItems->at(*it);
-			const FileProcessingRecord& record = m_pRecordMgr->getTask(nFileId);
-			vecFileNames.push_back(record.getFileName());
+			string fileName = getFileNameForFileId(nFileId);
+			if (!fileName.empty())
+			{
+				vecFileNames.push_back(fileName);
+			}
 		}
 
 		CMenu menu;
@@ -889,19 +895,27 @@ void FileProcessingDlgStatusPage::limitListSizeAndUpdateVars(CListCtrl& rListCtr
 		return;
 	}
 
+	long lId = 0;
+
 	// delete the associated data in other vectors, depending upon 
 	// which list control we are deleting data from
 	if (&rListCtrl == &m_currentFilesList)
 	{
-		m_vecCurrFileIds.erase(m_vecCurrFileIds.begin());
+		auto it = m_vecCurrFileIds.begin();
+		lId = *it;
+		m_vecCurrFileIds.erase(it);
 	}
 	else if (&rListCtrl == &m_completedFilesList)
 	{
-		m_vecCompFileIds.erase(m_vecCompFileIds.begin());
+		auto it = m_vecCompFileIds.begin();
+		lId = *it;
+		m_vecCompFileIds.erase(it);
 	}
 	else if (&rListCtrl == &m_failedFilesList)
 	{
-		m_vecFailFileIds.erase(m_vecFailFileIds.begin());
+		auto it = m_vecFailFileIds.begin();
+		lId = *it;
+		m_vecFailFileIds.erase(it);
 		m_vecFailedUEXCodes.erase(m_vecFailedUEXCodes.begin());
 	}
 	else
@@ -909,6 +923,8 @@ void FileProcessingDlgStatusPage::limitListSizeAndUpdateVars(CListCtrl& rListCtr
 		// we should never reach here
 		THROW_LOGIC_ERROR_EXCEPTION("ELI14919")
 	}
+
+	removeFileNameForFileId(lId);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::moveTaskFromPendingToCurrent(long nFileID)
@@ -1036,6 +1052,11 @@ long FileProcessingDlgStatusPage::appendNewRecord(CListCtrl& rListCtrl,
 	int iNewItemIndex = rListCtrl.InsertItem(rListCtrl.GetItemCount(),
 		getMonthDayDateString().c_str());
 
+	// Add the name data to the file name map
+	long fileId = task.getFileID();
+	string strFileName = task.getFileName();
+	addFileNameToFileIdMap(fileId, strFileName);
+
 	// Get the start time.
 	// for the current-files list, the time is the current time.
 	// for the other two lists, the time is the start time associated with
@@ -1061,11 +1082,11 @@ long FileProcessingDlgStatusPage::appendNewRecord(CListCtrl& rListCtrl,
 
 	// update the ID column
 	rListCtrl.SetItemText(iNewItemIndex, giALL_LISTS_FILE_ID_COLUMN, 
-		asString(task.getFileID()).c_str());
+		asString(fileId).c_str());
 
 	// update the filename column
 	rListCtrl.SetItemText(iNewItemIndex, giALL_LISTS_FILE_NAME_COLUMN, 
-		getFileNameFromFullPath(task.getFileName()).c_str());
+		getFileNameFromFullPath(strFileName).c_str());
 
 	// update the pages column
 	rListCtrl.SetItemText(iNewItemIndex, giALL_LISTS_NUM_PAGES_COLUMN, 
@@ -1081,15 +1102,15 @@ long FileProcessingDlgStatusPage::appendNewRecord(CListCtrl& rListCtrl,
 	// which list control we are appending data to
 	if (&rListCtrl == &m_currentFilesList)
 	{
-		m_vecCurrFileIds.push_back(task.getFileID());
+		m_vecCurrFileIds.push_back(fileId);
 	}
 	else if (&rListCtrl == &m_completedFilesList)
 	{
-		m_vecCompFileIds.push_back(task.getFileID());
+		m_vecCompFileIds.push_back(fileId);
 	}
 	else if (&rListCtrl == &m_failedFilesList)
 	{
-		m_vecFailFileIds.push_back(task.getFileID());
+		m_vecFailFileIds.push_back(fileId);
 		
 		if (bErrorTaskEntry)
 		{
@@ -1275,6 +1296,34 @@ void FileProcessingDlgStatusPage::stopProgressUpdates()
 	if (m_ipProgressStatusDialog)
 	{
 		m_ipProgressStatusDialog->ProgressStatusObject = NULL;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+string FileProcessingDlgStatusPage::getFileNameForFileId(long fileId)
+{
+	CSingleLock lg(&m_mutexFileNameMap, TRUE);
+	auto it = m_mapFileIdToFileName.find(fileId);
+	if (it != m_mapFileIdToFileName.end())
+	{
+		return it->second;
+	}
+
+	return "";
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgStatusPage::addFileNameToFileIdMap(long fileId, const string& strFileName)
+{
+	CSingleLock lg(&m_mutexFileNameMap, TRUE);
+	m_mapFileIdToFileName[fileId] = strFileName;
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgStatusPage::removeFileNameForFileId(long fileId)
+{
+	CSingleLock lg(&m_mutexFileNameMap, TRUE);
+	auto it = m_mapFileIdToFileName.find(fileId);
+	if (it != m_mapFileIdToFileName.end())
+	{
+		m_mapFileIdToFileName.erase(it);
 	}
 }
 //-------------------------------------------------------------------------------------------------

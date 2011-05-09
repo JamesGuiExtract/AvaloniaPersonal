@@ -311,7 +311,7 @@ const FileProcessingRecord& FPRecordManager::getTask(long nTaskID)
 	TaskMap::iterator it = m_mapTasks.find(nTaskID);
 	if(it != m_mapTasks.end())
 	{
-		return m_mapTasks[nTaskID];
+		return it->second;
 	}
 	else
 	{

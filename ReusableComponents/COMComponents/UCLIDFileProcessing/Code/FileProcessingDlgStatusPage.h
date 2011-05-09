@@ -12,7 +12,10 @@
 #include <vector>
 #include <deque>
 #include <set>
+#include <map>
 #include <string>
+
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // FileProcessingDlgStatusPage dialog
@@ -100,12 +103,16 @@ private:
 	//////////////
 	// Variables
 	//////////////
-	std::vector<long> m_vecCurrFileIds;
-	std::vector<long> m_vecCompFileIds;
-	std::vector<long> m_vecFailFileIds;
+	vector<long> m_vecCurrFileIds;
+	vector<long> m_vecCompFileIds;
+	vector<long> m_vecFailFileIds;
+
+	// Map of FileIDs to file names
+	map<long, string> m_mapFileIdToFileName;
+	CMutex m_mutexFileNameMap;
 
 	// vector of strings for UEX codes to go with failed files
-	std::vector<std::string> m_vecFailedUEXCodes;
+	vector<string> m_vecFailedUEXCodes;
 
 	// Automatically scroll to the end of the list on insert based on this bool
 	bool m_bAutoScroll;
@@ -134,7 +141,7 @@ private:
 	// Methods
 	//////////
 	// Promise:  Will return the position of the fileID in the specified vector
-	int getTaskPosFromVector(const std::vector<long>& vecToSearch, long nFileID);
+	int getTaskPosFromVector(const vector<long>& vecToSearch, long nFileID);
 
 	// Resizes the columns as necessary. "Folder" column is dynamically sized.
 	void updateCurrColWidths();
@@ -217,5 +224,15 @@ private:
 	//				will match the right coordinates of the re-positioned button after this method
 	//				executes.
 	void repositionDetailsButton(UINT uiButtonID, UINT uiLabelID, CListCtrl& rListCtrl);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Gets the file name from the map of file id's to file name, or empty string
+	//			if not found.
+	string getFileNameForFileId(long fileId);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To remove the file name from the map of file id to file names
+	void removeFileNameForFileId(long fileId);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To add the file name to the map of file id to file names
+	void addFileNameToFileIdMap(long fileId, const string& strFileName);
 	//---------------------------------------------------------------------------------------------
 };
