@@ -236,6 +236,10 @@
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj">
+      <Project>{1B3DED27-DBF9-478A-9E31-FFA479621F5C}</Project>
+      <Name>Extract.Utilities.Email</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
@@ -263,6 +267,26 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

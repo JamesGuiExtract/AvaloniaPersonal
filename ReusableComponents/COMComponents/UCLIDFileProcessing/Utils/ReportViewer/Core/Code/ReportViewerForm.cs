@@ -1,20 +1,16 @@
-using CrystalDecisions.CrystalReports.Engine;
-using CrystalDecisions.Shared;
-using Extract;
 using Extract.Licensing;
 using Extract.ReportViewer.Properties;
 using Extract.Utilities;
+using Extract.Utilities.Email;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.Globalization;
 using System.IO;
-using System.Security.Permissions;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
 
 namespace Extract.ReportViewer
 {
@@ -76,6 +72,12 @@ namespace Extract.ReportViewer
         /// in the report saving but is only instantiated when it is actually used.
         /// </summary>
         private List<string> _standardReports;
+
+        /// <summary>
+        /// Collection of reports that have been generated and emailed. These objects should
+        /// be disposed when the form is closed.
+        /// </summary>
+        List<TemporaryFile> _temporaryFiles = new List<TemporaryFile>();
 
         #endregion Fields
 
@@ -511,6 +513,46 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
+        /// Handles the email report clicked.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        private void HandleFileEmailReportClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_report == null)
+                {
+                    return;
+                }
+
+                using (var wait = new TemporaryWaitCursor())
+                {
+                    var tempFileName = GetTemporaryPdfEmailReportFileName(_report.FileName);
+                    _temporaryFiles.Add(new TemporaryFile(new FileInfo(tempFileName)));
+
+                    _report.ExportReportToFile(tempFileName, true);
+
+                    var attachments = new VariantVector();
+                    attachments.PushBack(tempFileName);
+
+                    // Build email message with subject -
+                    // Report: <ReportName> mm/dd/yyyy hh:mm AM/PM"
+                    var message = new ExtractEmailMessage();
+                    message.Subject = string.Concat("Report: ",
+                        Path.GetFileNameWithoutExtension(_report.FileName),
+                        " ", DateTime.Now.ToString("g", CultureInfo.CurrentCulture));
+                    message.Attachments = attachments;
+                    message.ShowInClient(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32550");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
@@ -588,9 +630,9 @@ namespace Extract.ReportViewer
             _pleaseWaitLabel.Visible = false;
             _progressBar.Visible = false;
 
-            // Enable the export buttons
             _exportReportToPDFToolStripMenuItem.Enabled = true;
             _exportReportToolStripMenuItem.Enabled = true;
+            _emailReportToolStripMenuItem.Enabled = true;
             _refreshToolStripMenuItem.Enabled = true;
 
             // Invalidate the form
@@ -620,6 +662,43 @@ namespace Extract.ReportViewer
 
             // Return true if the item is in the list
             return _standardReports.Contains(reportName.ToUpperInvariant());
+        }
+
+        /// <summary>
+        /// Gets the name of the temporary pdf file for emailing a report.
+        /// <para><b>Note:</b></para>
+        /// This method will also create an empty file on the disk.
+        /// </summary>
+        /// <param name="reportFileName">Name of the report file being exported.</param>
+        /// <returns>The name of the temporary file.</returns>
+        static string GetTemporaryPdfEmailReportFileName(string reportFileName)
+        {
+            // Get the temporary file to write to
+            var baseFileName = Path.Combine(Path.GetTempPath(),
+                Path.GetFileNameWithoutExtension(reportFileName) + ".pdf");
+
+            // Temporary file name will be a time stamped named version of the
+            // the base file name with the time stamp placed before the extension.
+            // In the case that the file already exists, sleep for a random amount
+            // of time and generate a new timestamped file name. After successful
+            // drop out of the loop, create the file.
+            // NOTE: There is a potential race condition of two threads creating
+            // the same file, but it should be a fairly rare occurrence and since
+            // it would mean that two report viewers are open by the same user
+            // with the same report and email was clicked at basically the same
+            // instant, there really shouldn't be an issue. In all actuality I do
+            // not expect that the while loop would ever really be executed.
+            var tempFileName =
+                FileSystemMethods.BuildTimeStampedBackupFileName(baseFileName, true);
+            while (File.Exists(tempFileName))
+            {
+                Thread.Sleep((new Random().Next(300, 1000)));
+                tempFileName =
+                    FileSystemMethods.BuildTimeStampedBackupFileName(baseFileName, true);
+            }
+            File.Create(tempFileName).Dispose();
+
+            return tempFileName;
         }
 
         #endregion Methods

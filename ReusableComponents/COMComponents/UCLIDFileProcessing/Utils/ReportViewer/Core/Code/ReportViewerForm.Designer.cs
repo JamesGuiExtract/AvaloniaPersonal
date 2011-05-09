@@ -22,6 +22,11 @@ namespace Extract.ReportViewer
                     _report.Dispose();
                     _report = null;
                 }
+                if (_temporaryFiles != null)
+                {
+                    Extract.Utilities.CollectionMethods.ClearAndDispose(_temporaryFiles);
+                    _temporaryFiles = null;
+                }
             }
             base.Dispose(disposing);
         }
@@ -50,6 +55,7 @@ namespace Extract.ReportViewer
             this._aboutReportViewerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._pleaseWaitLabel = new System.Windows.Forms.Label();
             this._progressBar = new System.Windows.Forms.ProgressBar();
+            this._emailReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip1.SuspendLayout();
@@ -99,6 +105,7 @@ namespace Extract.ReportViewer
             this._refreshToolStripMenuItem,
             toolStripSeparator1,
             this._saveReportTemplateToolStripMenuItem,
+            this._emailReportToolStripMenuItem,
             this._exportReportToPDFToolStripMenuItem,
             this._exportReportToolStripMenuItem,
             toolStripSeparator2,
@@ -195,6 +202,14 @@ namespace Extract.ReportViewer
             this._progressBar.TabIndex = 3;
             this._progressBar.Visible = false;
             // 
+            // _emailReportToolStripMenuItem
+            // 
+            this._emailReportToolStripMenuItem.Enabled = false;
+            this._emailReportToolStripMenuItem.Name = "_emailReportToolStripMenuItem";
+            this._emailReportToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this._emailReportToolStripMenuItem.Text = "E&mail report...";
+            this._emailReportToolStripMenuItem.Click += new System.EventHandler(this.HandleFileEmailReportClicked);
+            // 
             // ReportViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -231,6 +246,7 @@ namespace Extract.ReportViewer
         private System.Windows.Forms.ToolStripMenuItem _aboutReportViewerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _exportReportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _refreshToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _emailReportToolStripMenuItem;
 
     }
 }

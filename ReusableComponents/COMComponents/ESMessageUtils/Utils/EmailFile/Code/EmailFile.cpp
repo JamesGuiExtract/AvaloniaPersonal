@@ -85,7 +85,7 @@ BOOL CEmailFileApp::InitInstance()
 
 			// If there is no SMTP server set the UI needs to be displayed to enter that information
 			string strServer = asString(ipEmailSettings->Server);
-			if ( strServer.empty() || m_bConfigureSettings)
+			if ((strServer.empty() && !m_bShowInClient) || m_bConfigureSettings)
 			{
 				// Get the UI Pointer
 				IConfigurableObjectPtr ipUI = ipEmailSettings;
@@ -336,8 +336,8 @@ bool CEmailFileApp::getAndValidateArguments(int argc, char* argv[])
 
 			string strTemp = argv[i];
 
-			// If no email address yet, assume this is the email address
-			if (m_strEmailAddress.empty())
+			// If no email address yet and /client flag has not been seen, assume this is the email address
+			if (m_strEmailAddress.empty() && !m_bShowInClient)
 			{
 				m_strEmailAddress = strTemp;
 			}
@@ -352,8 +352,8 @@ bool CEmailFileApp::getAndValidateArguments(int argc, char* argv[])
 			return false;
 		}
 	}
-	// Make sure there is either /c or an email address
-	if (m_bConfigureSettings || !m_strEmailAddress.empty())
+	// Make sure there is either /c or an email address or show in client
+	if (m_bConfigureSettings || !m_strEmailAddress.empty() || m_bShowInClient)
 	{
 		return true;
 	}
@@ -462,11 +462,17 @@ void CEmailFileApp::showInClient(ISmtpEmailSettingsPtr ipSettings,
 			MapiMessage message;
 			ZeroMemory(&message, sizeof(MapiMessage));
 
-			// Get the senders
-			auto strSender = asString(ipSettings->SenderName);
+			// Get the sender address information, only add a sender if
+			// there is a sender address specified
 			auto strSenderAddress = asString(ipSettings->SenderAddress);
-			auto sender = buildMapiRecipient(true, strSender, strSenderAddress);
-			message.lpOriginator = &sender;
+			unique_ptr<MapiRecipDesc> pSender;
+			if (!strSenderAddress.empty())
+			{
+				auto strSender = asString(ipSettings->SenderName);
+				pSender.reset(new MapiRecipDesc(
+					buildMapiRecipient(true, strSender, strSenderAddress)));
+				message.lpOriginator = pSender.get();
+			}
 
 			unique_ptr<MapiRecipDesc[]> pRecipients;
 			if (nRecipCount > 0)

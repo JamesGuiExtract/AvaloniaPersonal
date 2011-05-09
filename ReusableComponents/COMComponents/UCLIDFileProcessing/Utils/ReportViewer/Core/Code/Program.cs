@@ -1,10 +1,8 @@
-using Extract;
 using Extract.Licensing;
 using Extract.ReportViewer.Properties;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -18,12 +16,8 @@ namespace Extract.ReportViewer
         /// <summary>
         /// The application for sending a file by email.
         /// </summary>
-        private static readonly string _EMAIL_FILE_APPLICATION = "EmailFile.exe";
-
-        /// <summary>
-        /// The timeout to wait for the email file process to exit
-        /// </summary>
-        private static readonly int _EMAIL_TIMEOUT = 300000; // 300000 ms = 5 min.
+        private static readonly string _EMAIL_FILE_APPLICATION =
+            Path.Combine(Application.StartupPath, "EmailFile.exe");
 
         #endregion Constants
 
@@ -211,22 +205,18 @@ namespace Extract.ReportViewer
                 }
                 else if (mailRecipients.Count > 0)
                 {
-                    string reportPDF = Path.Combine(Path.GetTempPath(), "Report.pdf");
+                    var reportName = Path.GetFileNameWithoutExtension(reportFile);
+
+                    string reportPDF = Path.Combine(Path.GetTempPath(), reportName + ".pdf");
                     try
                     {
                         // Export the report to a PDF file
                         report.ExportReportToFile(reportPDF, true);
 
-                        // Build the list of email recipients
-                        StringBuilder sb = new StringBuilder(mailRecipients[0]);
-                        for (int i=1; i < mailRecipients.Count; i++)
-                        {
-                            sb.Append(",");
-                            sb.Append(mailRecipients[i]);
-                        }
+                        var recipients = string.Join(",", mailRecipients);
 
                         // Email the report
-                        EmailReport(reportPDF, mailSubject ?? "", sb.ToString());
+                        EmailReport(reportPDF, mailSubject, recipients);
                     }
                     finally
                     {
@@ -353,77 +343,32 @@ namespace Extract.ReportViewer
         /// <param name="recipient">The recipient(s) for the email.</param>
         private static void EmailReport(string fileName, string subject, string recipient)
         {
-            string uexFile = null;
             try
             {
-                // Get temporary file for logging any exception email file throws
-                uexFile = FileSystemMethods.GetTemporaryFileName("uex");
+                var arguments = new List<string>();
+                arguments.Add(recipient);
+                arguments.Add(fileName);
 
-                // Build arguments for email file application
-                string emailFile = Path.Combine(Application.StartupPath, _EMAIL_FILE_APPLICATION);
-                string arguments = "/subject \"" + (subject ?? "") + "\" \""
-                    + Path.GetFileName(fileName) + "\" \"" + recipient + "\" /ef \"" + uexFile + "\"";
-
-                // Build process information structure to launch the email file application
-                ProcessStartInfo processInfo = new ProcessStartInfo();
-                processInfo.FileName = emailFile;
-                processInfo.Arguments = arguments;
-                processInfo.WorkingDirectory = Path.GetDirectoryName(fileName);
-                processInfo.WindowStyle = ProcessWindowStyle.Hidden;
-
-                // Start the email file application
-                Process process = Process.Start(processInfo);
-
-                // Wait for the application to exit
-                process.WaitForExit(_EMAIL_TIMEOUT);
-
-                // If the timeout was exceeded but the process is still running then
-                // kill the process and throw an exception
-                if (!process.HasExited)
+                arguments.Add("/subject");
+                if (!string.IsNullOrWhiteSpace(subject))
                 {
-                    // Attempt to kill the email file program
-                    process.Kill();
-
-                    // Throw an exception
-                    ExtractException eex =
-                        new ExtractException("ELI25086", "Email file exceeded timeout!");
-                    eex.AddDebugData("Timeout Value", _EMAIL_TIMEOUT, false);
-                    throw eex;
+                    arguments.Add(subject);
+                }
+                else
+                {
+                    arguments.Add(Path.GetFileNameWithoutExtension(fileName));
                 }
 
-                // Ensure a uex file has been defined
-                if (!string.IsNullOrEmpty(uexFile))
-                {
-                    // Get the length of the file (if it is empty then no exception was logged)
-                    FileInfo fileInfo = new FileInfo(uexFile);
-                    if (fileInfo.Length > 0)
-                    {
-                        // Get the exception from the file and throw it
-                        string[] exceptionText = (File.ReadAllText(uexFile)).Split(
-                            new string[] {","}, StringSplitOptions.RemoveEmptyEntries);
-                        ExtractException uex = new ExtractException("ELI25084",
-                            "Error in EmailFile.exe!",
-                            exceptionText[exceptionText.Length - 1].Trim());
-                        throw uex;
-                    }
-                }
+                SystemMethods.RunExtractExecutable(_EMAIL_FILE_APPLICATION,
+                    arguments);
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI25085", ex);
                 ee.AddDebugData("File To Email", fileName, false);
-                ee.AddDebugData("Subject",
-                    string.IsNullOrEmpty(subject) ? "null" : subject, false);
+                ee.AddDebugData("Subject", subject ?? "null", false);
                 ee.AddDebugData("Recipient", recipient, false);
                 throw ee;
-            }
-            finally
-            {
-                // Cleanup the uex file if it exists
-                if (!string.IsNullOrEmpty(uexFile))
-                {
-                    FileSystemMethods.TryDeleteFile(uexFile);
-                }
             }
         }
 
