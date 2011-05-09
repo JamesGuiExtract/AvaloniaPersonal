@@ -2110,9 +2110,13 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 							// If not a normal stop, log processing inactive message
 							if (pFPM->m_eCurrentRunningState != kNormalStop)
 							{
-								UCLIDException ue("ELI30308",
-									"Application trace: File Action Manager processing now "
-									"inactive per schedule.");
+								string strTraceMessage =
+									string("Application trace: File Action Manager processing ") +
+									((pFPM->m_eCurrentRunningState == kScheduleStop)
+										? "now inactive per schedule."
+										: "paused.");
+										
+								UCLIDException ue("ELI30308", strTraceMessage);
 								ue.addDebugInfo("FPS File",
 									pFPM->m_strFpsFile.empty() ? "<Not Saved>" : pFPM->m_strFpsFile);
 								ue.log();
@@ -2137,9 +2141,13 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 					{
 						pFPM->startProcessing();
 
-						UCLIDException ue("ELI30309",
-							"Application trace: File Action Manager processing now "
-							"active per schedule.");
+						string strTraceMessage =
+							string("Application trace: File Action Manager processing ") +
+							((pFPM->m_eCurrentRunningState == kScheduleRun)
+								? "now active per schedule."
+								: "unpaused.");
+
+						UCLIDException ue("ELI30309", strTraceMessage);
 						ue.addDebugInfo("FPS File",
 							pFPM->m_strFpsFile.empty() ? "<Not Saved>" : pFPM->m_strFpsFile);
 						ue.log();
