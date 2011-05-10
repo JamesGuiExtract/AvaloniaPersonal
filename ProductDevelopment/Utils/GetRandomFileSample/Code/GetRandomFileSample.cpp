@@ -41,6 +41,7 @@ using namespace std;
 #include <UCLIDException.h>
 #include <StringTokenizer.h>
 #include <Misc.h>
+#include <VectorOperations.h>
 
 static const string gstrRAND = "<RAND>";
 
