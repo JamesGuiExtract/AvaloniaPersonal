@@ -52,6 +52,7 @@ static UINT indicators[] =
 	ID_INDICATOR_PAGE,
 	ID_INDICATOR_START,
 	ID_INDICATOR_END,
+	ID_INDICATOR_CONFIDENCE,
 	ID_INDICATOR_PERCENT
 };
 
@@ -670,7 +671,7 @@ BOOL CSpatialStringViewerDlg::PreTranslateMessage(MSG* pMsg)
 			int nStart, nEnd;
 			m_editText.GetSel(nStart, nEnd);
 
-			CString zPage(""), zStart(""), zEnd(""), zPercentage("");
+			CString zPage(""), zStart(""), zEnd(""), zConfidence(""), zPercentage("");
 
 			// refresh the current word length distribution if it is visible
 			if (ma_pWordLengthDistDlg.get() && asCppBool(ma_pWordLengthDistDlg->IsWindowVisible()))
@@ -687,16 +688,15 @@ BOOL CSpatialStringViewerDlg::PreTranslateMessage(MSG* pMsg)
 					ILetterPtr ipLetter = __nullptr;
 					m_ipSpatialString->GetNextOCRImageSpatialLetter(nEnd, &ipLetter);
 
-					if(ipLetter)
+					if(ipLetter != __nullptr)
 					{
 						nPage = ipLetter->GetPageNumber();
 					}
 				}
 
-				// check to see if the user has selected a single character
-				int nDifference = nEnd - nStart;
 				// check for a difference between -1 and 1 which indicates a single
 				// character is selected
+				int nDifference = nEnd - nStart;
 				if (nDifference == -1 || nDifference == 1 || nDifference == 0)
 				{
 					if (nEnd < m_ipSpatialString->Size)
@@ -705,17 +705,15 @@ BOOL CSpatialStringViewerDlg::PreTranslateMessage(MSG* pMsg)
 						// then check to see if the selection was right to left
 						// in which case the character we want is at nEnd, not
 						// nStart.
-						int nCharacter = nStart;
-						if (nDifference == -1)
-						{
-							nCharacter = nEnd;
-						}
+						int nCharacter = nDifference == -1 ? nEnd : nStart;
 
 						ILetterPtr ipLetter = m_ipSpatialString->GetOCRImageLetter(nCharacter);
 
 						// check to be sure we have a letter
 						if (ipLetter != __nullptr)
 						{
+							nConfidence = ipLetter->CharConfidence;
+
 							// update the Character Info window if it is visible
 							if (ma_pCharInfoDlg.get() && 
 								asCppBool(ma_pCharInfoDlg->IsWindowVisible()))
@@ -800,18 +798,21 @@ BOOL CSpatialStringViewerDlg::PreTranslateMessage(MSG* pMsg)
 			strStartAndEndString += commaFormatNumber(static_cast<LONGLONG>(nEnd));
 			zEnd = strStartAndEndString.c_str();
 
-			int nLastPos = m_nTotalNumChars - 1;
+			int nLastPos = m_nTotalNumChars;
 			if (nLastPos <= 0)
 			{
 				nLastPos = 1;
 			}
+
+			// Format the confidence
+			zConfidence.Format(ID_INDICATOR_CONFIDENCE, nConfidence);
 
 			// Compute and update the percentage
 			int nPercentage = (int)(((double)nStart/(double)nLastPos) * 100);
 			zPercentage.Format(ID_INDICATOR_PERCENT, nPercentage);
 
 			// Update the status bar
-			setStatusBarText(zPage, zStart, zEnd, zPercentage);
+			setStatusBarText(zPage, zStart, zEnd, zConfidence, zPercentage);
 
 			return CDialog::PreTranslateMessage(pMsg);
 		}
@@ -985,7 +986,6 @@ void CSpatialStringViewerDlg::resizeEditControl()
 	if (asCppBool(::IsWindow(m_statusBar.m_hWnd)))
 	{
 		m_statusBar.GetStatusBarCtrl().SetMinHeight(g_nStatusBarHeight);
-		m_statusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
 		RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 	}
 }
@@ -993,6 +993,7 @@ void CSpatialStringViewerDlg::resizeEditControl()
 void CSpatialStringViewerDlg::setStatusBarText(const CString& zPage,
 											   const CString& zStartPos, 
 											   const CString& zEndPos,
+											   const CString& zConfidence,
 											   const CString& zPercentage)
 {
 	// make sure the status bar exists before accessing it
@@ -1001,6 +1002,7 @@ void CSpatialStringViewerDlg::setStatusBarText(const CString& zPage,
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_PAGE), zPage);
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_START), zStartPos);
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_END), zEndPos);
+		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_CONFIDENCE), zConfidence);
 		m_statusBar.SetPaneText(m_statusBar.CommandToIndex(ID_INDICATOR_PERCENT), zPercentage);
 	}
 }

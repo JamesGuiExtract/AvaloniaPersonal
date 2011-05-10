@@ -64,6 +64,10 @@ void FindRegExDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_FIND, m_btnFind);
 	DDX_Control(pDX, IDC_CHK_AS_REGEX, m_chkAsRegEx);
 	DDX_Control(pDX, IDC_CHK_MULTI_REGEX, m_chkTreatAsMultiRegex);
+	DDX_Control(pDX, IDC_RADIO_OR, m_radOr);
+	DDX_Control(pDX, IDC_RADIO_AND, m_radAnd);
+	DDX_Control(pDX, IDC_RADIO_BEGIN, m_radBegin);
+	DDX_Control(pDX, IDC_RADIO_CUR_POS, m_radCurPos);
 	DDX_Check(pDX, IDC_CHK_CASE_SENSITIVE, m_bCaseSensitive);
 	DDX_Text(pDX, IDC_EDIT_FROM, m_zRangeFrom);
 	DDX_Text(pDX, IDC_EDIT_TO, m_zRangeTo);
@@ -549,7 +553,20 @@ void FindRegExDlg::showDetailSettings(bool bShow)
 		SetWindowPos(&wndTop, dlgCurrentRect.left, 
 					 dlgCurrentRect.top, dlgCurrentRect.Width(), 
 					 rectCaseSensitive.bottom + 36, SWP_NOZORDER);
+
 	}
+
+	// Show/hide advanced controls
+	BOOL showHide = asMFCBool(bShow);
+	m_radOr.ShowWindow(showHide);
+	m_radAnd.ShowWindow(showHide);
+	m_chkRange.ShowWindow(showHide);
+	m_editRangeTo.ShowWindow(showHide);
+	m_editRangeFrom.ShowWindow(showHide);
+	m_chkFontSizeRange.ShowWindow(showHide);
+	m_cmbIncludeFontSize.ShowWindow(showHide);
+	m_radBegin.ShowWindow(showHide);
+	m_radCurPos.ShowWindow(showHide);
 }
 //-------------------------------------------------------------------------------------------------
 bool FindRegExDlg::validateFromToValue()

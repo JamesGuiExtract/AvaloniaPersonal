@@ -43,6 +43,10 @@ public:
 	CButton	m_btnFind;
 	CButton	m_chkAsRegEx;
 	CButton	m_chkTreatAsMultiRegex;
+	CButton m_radOr;
+	CButton m_radAnd;
+	CButton m_radBegin;
+	CButton m_radCurPos;
 	BOOL	m_bCaseSensitive;
 	CString	m_zRangeFrom;
 	CString	m_zRangeTo;

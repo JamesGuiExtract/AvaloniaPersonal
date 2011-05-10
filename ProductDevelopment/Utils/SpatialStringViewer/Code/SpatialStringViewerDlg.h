@@ -94,7 +94,7 @@ private:
 	void resizeEditControl();
 
 	void setStatusBarText(const CString& zPage, const CString& zStartPos, 
-		const CString& zEndPos, const CString& zPercentage);
+		const CString& zEndPos, const CString& zConfidence, const CString& zPercentage);
 
 	// Updates the window caption for the specified file
 	void updateWindowCaption(const std::string& strFileName);

@@ -82,6 +82,7 @@
 #define ID_INDICATOR_FONTSIZE           59142
 #define ID_INDICATOR_CHARCONFIDENCE     59143
 #define ID_INDICATOR_FONT               59144
+#define ID_INDICATOR_CONFIDENCE			59145
 
 // Next default values for new objects
 // 
