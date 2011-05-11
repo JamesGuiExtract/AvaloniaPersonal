@@ -1,0 +1,6 @@
+<ExtractReportParameterData Version="2">
+  <ReportParameters>
+    <ValueListParameter Name="TagName" Query="SELECT '(All)' UNION SELECT Tag.TagName FROM Tag" Default="(All)" /> 
+    <DateRangeParameter Name="ReportingPeriod" Default="" /> 
+  </ReportParameters>
+</ExtractReportParameterData>
