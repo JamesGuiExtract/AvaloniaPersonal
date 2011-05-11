@@ -892,9 +892,9 @@ void convertStringToRegularExpression(string& str)
 {
 	string strResult = "";
 
-	for (unsigned int i = 0; i < str.length(); i++)
+	for(auto it = str.begin(); it != str.end(); it++)
 	{
-		switch(str[i])
+		switch(*it)
 		{
 		case '\\':
 		case '.':
@@ -913,7 +913,7 @@ void convertStringToRegularExpression(string& str)
 		case '!':
 		case '-':
 			strResult += '\\';
-			strResult += str[i];
+			strResult += *it;
 			break;
 		case '\r':
 			strResult += "\\r";
@@ -928,7 +928,7 @@ void convertStringToRegularExpression(string& str)
 				strResult += "\\f";
 			break;
 		default:
-			strResult += str[i];
+			strResult += *it;
 			break;
 		}
 	}

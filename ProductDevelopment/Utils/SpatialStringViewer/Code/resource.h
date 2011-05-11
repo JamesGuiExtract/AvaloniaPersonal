@@ -23,8 +23,6 @@
 #define IDC_EDIT_TO                     1008
 #define IDC_RADIO_BEGIN                 1009
 #define IDC_RADIO_CUR_POS               1010
-#define IDC_RADIO_OR                    1011
-#define IDC_RADIO_AND                   1012
 #define IDC_BTN_ADVANCE                 1013
 #define IDC_EDIT_FONTSIZEFROM           1015
 #define IDC_EDIT_FONTSIZETO             1016
@@ -63,8 +61,9 @@
 #define IDC_FONT_SUBSCRIPT              1051
 #define IDC_LIST_WORD_LENGTH_DIST		1052
 #define IDC_TEXT_NUMWORDS				1053
-#define IDC_CHK_MULTI_REGEX				1054
 #define IDC_EDIT_OCR_VERSION			1055
+#define IDC_FIND_PREVIOUS				1056
+#define IDC_FIND_RESET_FIND				1057
 #define ID_FILE_EXIT                    32773
 #define ID_HELP_ABOUTUCLIDSPATIALSTRINGVIEWER 32774
 #define ID_FILE_PROPERTIES              32775
@@ -90,7 +89,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1056
+#define _APS_NEXT_CONTROL_VALUE         1058
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

@@ -2473,3 +2473,48 @@ STDMETHODIMP CSpatialString::GetOCRImagePageBounds(long nPageNum, ILongRectangle
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30326");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::ContainsCharacterOutsideFontRange(long nMinFont, long nMaxFont,
+	VARIANT_BOOL* pbResult)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI32560", pbResult != __nullptr);
+		if (nMinFont < 0 || nMaxFont < 0 || nMinFont > nMaxFont)
+		{
+			UCLIDException ue("ELI32561", "Min and max values are invalid.");
+			ue.addDebugInfo("Min", nMinFont);
+			ue.addDebugInfo("Max", nMaxFont);
+			throw ue;
+		}
+
+		// Default to okay
+		*pbResult = VARIANT_FALSE;
+
+		// Only compare letters if the string is spatial, for all others just return false
+		if( m_eMode == kSpatialMode )
+		{
+			for(auto it = m_vecLetters.begin(); it != m_vecLetters.end(); it++)
+			{
+				// Ignore non-spatial letters
+				if (it->m_bIsSpatial)
+				{
+					// As soon as a letter is out of range, set result to true and return
+					long size = it->m_ucFontSize;
+					if (size < nMinFont || size > nMaxFont)
+					{
+						*pbResult = VARIANT_TRUE;
+						break;
+					}
+				}
+			}
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32562");
+}
+//-------------------------------------------------------------------------------------------------

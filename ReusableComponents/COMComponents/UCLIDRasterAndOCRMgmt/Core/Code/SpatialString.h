@@ -161,6 +161,7 @@ public:
 	STDMETHOD(MergeAsHybridString)(ISpatialString* pStringToMerge);
 	STDMETHOD(GetOriginalImagePageBounds)(long nPageNum, ILongRectangle** ppBounds);
 	STDMETHOD(GetOCRImagePageBounds)(long nPageNum, ILongRectangle** ppBounds);
+	STDMETHOD(ContainsCharacterOutsideFontRange)(long nFontMin, long nFontMax, VARIANT_BOOL* pbResult);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);

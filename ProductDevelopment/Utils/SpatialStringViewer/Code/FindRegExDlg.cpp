@@ -19,6 +19,19 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 //-------------------------------------------------------------------------------------------------
+// Local helper functions
+//-------------------------------------------------------------------------------------------------
+bool sortFoundPosFunction(const pair<size_t, size_t>& a, const pair<size_t, size_t>& b)
+{
+	if (a.first == b.first)
+	{
+		return a.second <= b.second;
+	}
+	
+	return a.first < b.first;
+}
+
+//-------------------------------------------------------------------------------------------------
 // FindRegExDlg dialog
 //-------------------------------------------------------------------------------------------------
 FindRegExDlg::FindRegExDlg(CSpatialStringViewerDlg* pSSVDlg,
@@ -28,16 +41,17 @@ FindRegExDlg::FindRegExDlg(CSpatialStringViewerDlg* pSSVDlg,
   m_pSSVDlg(pSSVDlg),
   m_pCfgDlg(pCfgDlg),
   m_ipRegExpr(NULL),
+  m_bCaseSensitive(FALSE),
+  m_zRangeFrom(""),
+  m_zRangeTo(""),
+  m_nSearchPos(1),
+  m_zPatterns(""),
+  m_bSearchStarted(false),
+  m_strSearchText(""),
+  m_nFontMin(-1),
+  m_nFontMax(-1),
   m_nDlgHeight(0)
 {
-	//{{AFX_DATA_INIT(FindRegExDlg)
-	m_bCaseSensitive = FALSE;
-	m_zRangeFrom = _T("");
-	m_zRangeTo = _T("");
-	m_nSearchPos = 1;
-	m_nOperator = 0;
-	m_zPatterns = _T("");
-	//}}AFX_DATA_INIT
 }
 //-------------------------------------------------------------------------------------------------
 FindRegExDlg::~FindRegExDlg()
@@ -63,16 +77,14 @@ void FindRegExDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_FROM, m_editRangeFrom);
 	DDX_Control(pDX, IDC_BTN_FIND, m_btnFind);
 	DDX_Control(pDX, IDC_CHK_AS_REGEX, m_chkAsRegEx);
-	DDX_Control(pDX, IDC_CHK_MULTI_REGEX, m_chkTreatAsMultiRegex);
-	DDX_Control(pDX, IDC_RADIO_OR, m_radOr);
-	DDX_Control(pDX, IDC_RADIO_AND, m_radAnd);
 	DDX_Control(pDX, IDC_RADIO_BEGIN, m_radBegin);
 	DDX_Control(pDX, IDC_RADIO_CUR_POS, m_radCurPos);
+	DDX_Control(pDX, IDC_FIND_PREVIOUS, m_btnPrevious);
+	DDX_Control(pDX, IDC_FIND_RESET_FIND, m_btnResetSearch);
 	DDX_Check(pDX, IDC_CHK_CASE_SENSITIVE, m_bCaseSensitive);
 	DDX_Text(pDX, IDC_EDIT_FROM, m_zRangeFrom);
 	DDX_Text(pDX, IDC_EDIT_TO, m_zRangeTo);
 	DDX_Radio(pDX, IDC_RADIO_BEGIN, m_nSearchPos);
-	DDX_Radio(pDX, IDC_RADIO_OR, m_nOperator);
 	DDX_Text(pDX, IDC_EDIT_EXPRS, m_zPatterns);
 	//}}AFX_DATA_MAP
 }
@@ -80,11 +92,12 @@ void FindRegExDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(FindRegExDlg, CDialog)
 	//{{AFX_MSG_MAP(FindRegExDlg)
 	ON_BN_CLICKED(IDC_BTN_FIND, OnBtnFind)
+	ON_BN_CLICKED(IDC_FIND_PREVIOUS, OnBtnPrevious)
+	ON_BN_CLICKED(IDC_FIND_RESET_FIND, OnBtnResetFind)
 	ON_BN_CLICKED(IDC_BTN_ADVANCE, OnBtnAdvance)
 	ON_WM_SHOWWINDOW()
 	ON_BN_CLICKED(IDC_CHK_RANGE, OnChkRange)
 	ON_BN_CLICKED(IDC_CHK_FONTSIZERANGE, OnChkFontsizerange)
-	ON_BN_CLICKED(IDC_CHK_AS_REGEX, OnChkAsRegex)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -103,7 +116,6 @@ BOOL FindRegExDlg::OnInitDialog()
 
 		// Default is regular expression
 		m_chkAsRegEx.SetCheck(BST_CHECKED);
-		m_chkTreatAsMultiRegex.EnableWindow(TRUE);
 
 		// if Advanced needs to be shown
 		showDetailSettings(m_pCfgDlg->isAdvancedShown());
@@ -123,6 +135,9 @@ BOOL FindRegExDlg::OnInitDialog()
 		m_cmbIncludeFontSize.AddString("in");
 		m_cmbIncludeFontSize.AddString("not in");
 		m_cmbIncludeFontSize.SetCurSel(0);
+
+		m_btnResetSearch.EnableWindow(FALSE);
+		m_btnPrevious.EnableWindow(FALSE);
 		
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07402");
@@ -135,54 +150,73 @@ void FindRegExDlg::OnBtnFind()
 {
 	try
 	{
-		CWaitCursor wait;
-
-		UpdateData();
-
-		// populate the vec of patterns
-		readPatterns((LPCTSTR)m_zPatterns);
-
-		if (!validateFromToValue())
+		if (!m_bSearchStarted)
 		{
-			return;
-		}
+			CWaitCursor wait;
 
-		// get entire or portion of original input text
-		// according to the setting
-		string strInput = calculateSearchText();
-		bool bFound = false;
-		if (!strInput.empty())
-		{
-			// look for matches
-			int nFoundStartPos, nFoundEndPos;
-			bFound = foundPatternsInText(strInput, nFoundStartPos, nFoundEndPos);
-			if (bFound)
+			UpdateData();
+
+			if (!validateFromToValue())
 			{
-				// OR relationship
-				if (nFoundStartPos >= 0 && nFoundEndPos > 0)
+				return;
+			}
+
+			// populate the vec of patterns
+			readPatterns((LPCTSTR)m_zPatterns);
+
+			m_strSearchText = calculateSearchText();
+			m_currentSearchPos = 0;
+			m_vecMatches.clear();
+
+			m_bSearchStarted = true;
+			computeMatches();
+
+			// If search is starting from current cursor, get cursor position and select first
+			// match that contains or is past the cursor position
+			if (!m_vecMatches.empty() && m_nSearchPos == 1)
+			{
+				size_t cursorPos = (size_t) m_pSSVDlg->getCurrentCursorPosition();
+				for(; m_currentSearchPos < m_vecMatches.size(); m_currentSearchPos++)
 				{
-					// select the text in the spatial string viewer
-					m_pSSVDlg->selectText(nFoundStartPos, nFoundEndPos+1);
-				}
-				// AND relationship
-				else
-				{
-					// only display a message
-					::MessageBox(NULL, "All specified patterns are found in the document.", "Find", MB_OK);
+					pair<size_t, size_t>& pos = m_vecMatches[m_currentSearchPos];
+					if (cursorPos < pos.first || (cursorPos > pos.first && cursorPos <= pos.second))
+					{
+						break;
+					}
 				}
 			}
+
+			m_btnFind.SetWindowText("&Next");
+			m_btnResetSearch.EnableWindow(TRUE);
 		}
 
-		if (!bFound)
+
+		if (!m_vecMatches.empty() && m_currentSearchPos < m_vecMatches.size())
 		{
-			// clear any selection
-			m_pSSVDlg->selectText(-1,0);
-			AfxMessageBox("No match found.");
+			pair<size_t, size_t>& pos = m_vecMatches[m_currentSearchPos++];
+			m_pSSVDlg->selectText(pos.first, pos.second+1);
 		}
-		string strTmp = (LPCSTR)m_zPatterns;
-		m_pCfgDlg->saveLastRegularExpression(strTmp);
+		else
+		{
+			MessageBox("No more matches.", "No Matches");
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07405");
+}
+//-------------------------------------------------------------------------------------------------
+void FindRegExDlg::OnBtnPrevious()
+{
+}
+//-------------------------------------------------------------------------------------------------
+void FindRegExDlg::OnBtnResetFind()
+{
+	try
+	{
+		m_bSearchStarted = false;
+		m_btnFind.SetWindowText("&Find");
+		m_btnResetSearch.EnableWindow(FALSE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32563");
 }
 //-------------------------------------------------------------------------------------------------
 void FindRegExDlg::OnBtnAdvance() 
@@ -196,7 +230,6 @@ void FindRegExDlg::OnBtnAdvance()
 //-------------------------------------------------------------------------------------------------
 void FindRegExDlg::OnChkRange() 
 {
-	// TODO: Add your control notification handler code here
 	try
 	{
 		if(m_chkRange.GetCheck() == 1)
@@ -234,17 +267,6 @@ void FindRegExDlg::OnChkFontsizerange()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10622");
 }
 //-------------------------------------------------------------------------------------------------
-void FindRegExDlg::OnChkAsRegex()
-{
-	try
-	{
-		// Enable/disable the treat as multiple regular expression check box
-		// based on whether the as regular expression checkbox is checked
-		m_chkTreatAsMultiRegex.EnableWindow(asMFCBool(m_chkAsRegEx.GetCheck() == BST_CHECKED));
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI24057");
-}
-//-------------------------------------------------------------------------------------------------
 BOOL FindRegExDlg::DestroyWindow() 
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -258,233 +280,97 @@ BOOL FindRegExDlg::DestroyWindow()
 //-------------------------------------------------------------------------------------------------
 string FindRegExDlg::calculateSearchText()
 {
-	// where to start searching
-	int nStartSearchPos = 0;
-	// if user sets start search position at current cursor position
-	if (m_nSearchPos == 1)
-	{
-		nStartSearchPos = m_pSSVDlg->getCurrentCursorPosition();
-	}
-
-	// default off set to 0
-	m_nOffSet = 0;
-	double dStartRange = 0.0;
-	double dEndRange = 1.0;
-	if (m_chkRange.GetCheck() == 1)
-	{
-		dStartRange = ::asDouble(LPCTSTR(m_zRangeFrom))/100.0;
-		dEndRange = ::asDouble(LPCTSTR(m_zRangeTo))/100.0;
-	}
-
-	// make sure end pos greater than start pos, and all within range
-	if (dStartRange >= dEndRange)
-	{
-		UCLIDException ue("ELI07406", "Invalid starting/ending range defined in the file.");
-		ue.addDebugInfo("Starting Range", LPCTSTR(m_zRangeFrom));
-		ue.addDebugInfo("Ending Range", LPCTSTR(m_zRangeTo));
-		throw ue;
-	}
-
 	// get the entire text first
 	string strInputText = m_pSSVDlg->getEntireDocumentText();
-	int nInputSize = strInputText.size();
-	// start from where in the input text
-	int nStartPos = (int)(dStartRange * nInputSize);
-	// compare nStartSearchPos and nStartPos, take whichever's
-	// value is greater
-	nStartPos = nStartSearchPos > nStartPos ? nStartSearchPos : nStartPos;
+	size_t inputLength = strInputText.length();
 
-	// end at where
-	int nEndPos = (int)(dEndRange * nInputSize);
+	auto startSearchPos = getSearchStartPosition(inputLength);
+	auto endSearchPos = getSearchEndPosition(inputLength);
+
+	// Offset is the starting position for the search
+	m_nOffSet = startSearchPos;
+
 	// if start position already passes the end position, return empty string
-	if (nEndPos <= nStartPos)
+	if (endSearchPos <= startSearchPos)
 	{
-		// no text
 		return "";
 	}
 
-	// set offset
-	m_nOffSet = nStartPos;
 	// get the input text
-	string strInputWithinRange = strInputText.substr(nStartPos, nEndPos-nStartPos + 1);
+	string strInputWithinRange = strInputText.substr(startSearchPos,
+		endSearchPos-startSearchPos + 1);
 
 	return strInputWithinRange;
 }
 //-------------------------------------------------------------------------------------------------
-bool FindRegExDlg::foundPatternsInText(const string& strInputText, 
-									   int &nFoundStartPos,
-									   int &nFoundEndPos)
+void FindRegExDlg::computeMatches()
 {
-	if (m_ipRegExpr == __nullptr)
-	{
-		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI13066", ipMiscUtils != __nullptr );
-
-		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("FindRegExDlg");
-		ASSERT_RESOURCE_ALLOCATION("ELI07404", m_ipRegExpr != __nullptr);
-	}
-
 	// if no patterns specified, return false
 	if (m_vecPatterns.empty())
 	{
-		return false;
+		return;
 	}
 
-	m_ipRegExpr->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
+	auto parser = getRegExParser();
+	parser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
 
-	nFoundStartPos = -1;
-	nFoundEndPos = -1;
-	bool bIsAndRelationship = m_nOperator == 1;
-	bool bOrSuccess = false;
-
-	// When we are doing an or search we want to find the first instance of each pattern
-	// and return whichever one was first
-	// these vars keep track of which first instance comes first in the document as we 
-	// iterate over the patterns
-	nFoundStartPos = -1;
-	nFoundEndPos = -1;
-
-	for (unsigned int n = 0; n < m_vecPatterns.size(); n++)
+	// If font size needs to be checked then ipTemp != __nullptr
+	ISpatialStringPtr ipTemp = __nullptr;
+	if (m_chkFontSizeRange.GetCheck() == BST_CHECKED)
 	{
+		ipTemp = m_pSSVDlg->getSpatialString();
+		ASSERT_RESOURCE_ALLOCATION("ELI15636", ipTemp != __nullptr);
+	}
 
-		// This string is the one we will search for the pattern
-		// when we find an instance of the pattern that does not meet 
-		// font size (or other) constraints we will chop this string at the end 
-		// of the found pattern and search again.  This will be repeated until we find an
-		// instance of the pattern that satisfies all the constraints
-		string strSearchText = strInputText;
+	for (auto it = m_vecPatterns.begin(); it != m_vecPatterns.end(); it++)
+	{
 		// This will keep track of how much of the original strSearchText has 
 		// been chopped off so that when a valid pattern is found (one that 
 		// satisfies constraints) we can map its location back to the original string
-		long nLocalOffset = 0;
+		size_t nLocalOffset = 0;
 
-		string strPattern = m_vecPatterns[n];
-		m_ipRegExpr->Pattern = _bstr_t(strPattern.c_str());
-		
-		// These flags will be used in determining when to stop searching
-		bool bFoundPattern = false;
-		bool bSearchAgain = false;
+		// Set the pattern
+		m_ipRegExpr->Pattern = it->c_str();
 
-		// whether or not this pattern is found in the input text
-		IIUnknownVectorPtr ipMatches;
-		do
+		// Get the matches
+		IIUnknownVectorPtr ipMatches = m_ipRegExpr->Find(m_strSearchText.c_str(),
+			VARIANT_FALSE, VARIANT_FALSE);
+		long nSize = ipMatches != __nullptr ? ipMatches->Size() : 0;
+		if (nSize == 0)
 		{
-			ipMatches = m_ipRegExpr->Find(_bstr_t(strSearchText.c_str()), VARIANT_TRUE,
-				VARIANT_FALSE);
-			if(ipMatches->Size() <= 0)
+			continue;
+		}
+
+		for (long i=0; i < nSize; i++)
+		{
+			// Get the start and end positions from the match
+			long nStart(0), nEnd(0);
+			getStartAndEndPositionForMatch(ipMatches->At(i), nStart, nEnd);
+
+			// Compute the offset start and end positions
+			nStart += m_nOffSet;
+			nEnd += m_nOffSet;
+
+			// Check if there is a font constraint
+			if (ipTemp != __nullptr)
 			{
-				// No pattern was found so the search is over and it failed
-				bSearchAgain = false;
-				bFoundPattern = false;
-			}
-			else
-			{
-				IObjectPairPtr ipObjPair = ipMatches->At(0);
-				ASSERT_RESOURCE_ALLOCATION("ELI07409", ipObjPair != __nullptr);
-				ITokenPtr ipMatch = ipObjPair->Object1;
-				ASSERT_RESOURCE_ALLOCATION("ELI07410", ipMatch != __nullptr);
+				// To ensure that if necessary this string meets our font constraints
+				// we will check the font size of each letter
+				ISpatialStringPtr ipSubStr = ipTemp->GetSubString(nStart, nEnd);
+				ASSERT_RESOURCE_ALLOCATION("ELI15637", ipSubStr != __nullptr);
 
-				// Check the font size constraint
-				if(m_chkFontSizeRange.GetCheck() == 1)
+				if (ipSubStr->ContainsCharacterOutsideFontRange(m_nFontMin, m_nFontMax) == VARIANT_TRUE)
 				{
-					long nStart = ipMatch->StartPosition + m_nOffSet + nLocalOffset;
-					long nEnd = ipMatch->EndPosition + m_nOffSet + nLocalOffset;
-
-					// To ensure that if necessary this string meets our font constraints
-					// we will check the font size of each letter
-					ISpatialStringPtr ipTemp = m_pSSVDlg->getSpatialString();
-					ASSERT_RESOURCE_ALLOCATION("ELI15636", ipTemp != __nullptr);
-					ISpatialStringPtr ipSubStr = ipTemp->GetSubString(nStart, nEnd);
-					ASSERT_RESOURCE_ALLOCATION("ELI15637", ipSubStr != __nullptr);
-
-					CPPLetter* pLetters = NULL;
-					long nNumLetters;
-					ipSubStr->GetOCRImageLetterArray(&nNumLetters, (void**)&pLetters);
-					ASSERT_RESOURCE_ALLOCATION("ELI25968", pLetters != __nullptr);
-					long i;
-					for (i = 0; i < nNumLetters; i++)
-					{
-						const CPPLetter& letter = pLetters[i];
-						// as soon as one letter in the found pattern does not
-						// meet the font size constraints we need to search again for 
-						// the pattern
-						if(!letterInFontSizeRange(letter))
-						{
-							// This pattern does not meet the font size constraint
-							// so we will chop the search string and search again
-							
-							// Update the local offset so we can map back to the original string
-							nLocalOffset += ipMatch->StartPosition+i+1;
-							// Chop the search string
-							strSearchText = strSearchText.substr(ipMatch->StartPosition+i+1);
-							//search again
-							bSearchAgain = true;
-							break;
-						}
-					}
-					// if the entire string was in the font size range
-					if(i == nNumLetters)
-					{
-						// We have found a pattern match that satisfies all constraints
-						// so we have a match and the search is over
-						bFoundPattern = true;
-						bSearchAgain = false;
-					}
-				}
-				else
-				{
-					// There are no constraints on this pattern
-					// so we have found our match
-					bFoundPattern = true;
-					bSearchAgain = false;
+					continue;
 				}
 			}
-		}
-		while(bSearchAgain); 
-		
-		if (bFoundPattern && !bIsAndRelationship)
-		{
-			// get the start and end position
-			IObjectPairPtr ipObjPair = ipMatches->At(0);
-			ASSERT_RESOURCE_ALLOCATION("ELI19339", ipObjPair != __nullptr);
-			ITokenPtr ipMatch = ipObjPair->Object1;
-			ASSERT_RESOURCE_ALLOCATION("ELI19340", ipMatch != __nullptr);
 
-			// start and end position must count the offset
-		//	nFoundStartPos = ipMatch->StartPosition + m_nOffSet + nLocalOffset;
-		//	nFoundEndPos = ipMatch->EndPosition + m_nOffSet + nLocalOffset;
-
-			long nTmpFoundStartPos = ipMatch->StartPosition + m_nOffSet + nLocalOffset;
-			long nTmpFoundEndPos = ipMatch->EndPosition + m_nOffSet + nLocalOffset;
-			if (nTmpFoundStartPos < nFoundStartPos ||
-				nFoundStartPos == -1)
-			{
-				nFoundStartPos = nTmpFoundStartPos;
-				nFoundEndPos = nTmpFoundEndPos;
-				bOrSuccess = true;
-			}
-			else if (nTmpFoundStartPos == nFoundStartPos && nTmpFoundEndPos > nFoundEndPos)
-			{
-				nFoundStartPos = nTmpFoundStartPos;
-				nFoundEndPos = nTmpFoundEndPos;
-			}
-
-			// if it's OR relationship, once a pattern is found
-			// return true immediately
-			//return true;
-		}
-		else if (!bFoundPattern && bIsAndRelationship)
-		{
-			// if it's AND relationship, once a pattern can't be found
-			// return false immediately
-			return false;
+			m_vecMatches.push_back(pair<size_t, size_t>(nStart, nEnd));
 		}
 	}
 
-	// once this point is reached, 
-	// if bIsAndRelationship == true, return true
-	// if bIsAndRelationship == false, return false
-	return bIsAndRelationship || bOrSuccess;
+	// Sort the found positions
+	sort(m_vecMatches.begin(), m_vecMatches.end(), sortFoundPosFunction);
 }
 //-------------------------------------------------------------------------------------------------
 void FindRegExDlg::readPatterns(const string& strPatternsText)
@@ -492,34 +378,20 @@ void FindRegExDlg::readPatterns(const string& strPatternsText)
 	m_vecPatterns.clear();
 	bool bAsRegex = m_chkAsRegEx.GetCheck() == BST_CHECKED;
 
-	// If treat as a multi-line regular expression then just set pattern vector to
-	// the pattern from the edit control
-	if (bAsRegex && m_chkTreatAsMultiRegex.GetCheck() == BST_UNCHECKED)
+	// delimiter is line feed
+	vector<string> vecLines;
+	StringTokenizer::sGetTokens(strPatternsText, "\r\n", vecLines);
+	for(auto it = vecLines.begin(); it != vecLines.end(); it++)
 	{
-		// Load the regular expression from the string that is in the format
-		// of a regular expression file (multi-line expression)
-		m_vecPatterns.push_back(getRegExpFromText(strPatternsText, ""));
-	}
-	// plain text OR multiple regex, split at line feeds
-	else
-	{
-		// delimiter is line feed
-		vector<string> vecLines;
-		StringTokenizer::sGetTokens(strPatternsText, "\r\n", vecLines);
-		for (unsigned int n = 0; n < vecLines.size(); n++)
+		if (!it->empty())
 		{
-			// skip any empty lines
-			string strLine = vecLines[n];
-			if (!strLine.empty())
+			if (!bAsRegex)
 			{
-				if (!bAsRegex)
-				{
-					// if it's not regular expression, 
-					::convertStringToRegularExpression(strLine);
-				}
-
-				m_vecPatterns.push_back(strLine);
+				// if it's not regular expression, 
+				::convertStringToRegularExpression(*it);
 			}
+
+			m_vecPatterns.push_back(*it);
 		}
 	}
 }
@@ -530,9 +402,6 @@ void FindRegExDlg::showDetailSettings(bool bShow)
 
 	CRect dlgCurrentRect;
 	GetWindowRect(&dlgCurrentRect);
-	CRect rectCaseSensitive;
-	GetDlgItem(IDC_CHK_CASE_SENSITIVE)->GetWindowRect(&rectCaseSensitive);
-	ScreenToClient(rectCaseSensitive);
 
 	// record the entire dialog height
 	if (m_nDlgHeight == 0)
@@ -549,17 +418,18 @@ void FindRegExDlg::showDetailSettings(bool bShow)
 	}
 	else
 	{
+		CRect rectRangeCheckBox;
+		m_chkFontSizeRange.GetWindowRect(&rectRangeCheckBox);
+		ScreenToClient(rectRangeCheckBox);
+
 		m_btnAdvance.SetWindowText("Advanced >>");
 		SetWindowPos(&wndTop, dlgCurrentRect.left, 
 					 dlgCurrentRect.top, dlgCurrentRect.Width(), 
-					 rectCaseSensitive.bottom + 36, SWP_NOZORDER);
-
+					 rectRangeCheckBox.top + 3, SWP_NOZORDER);
 	}
 
 	// Show/hide advanced controls
 	BOOL showHide = asMFCBool(bShow);
-	m_radOr.ShowWindow(showHide);
-	m_radAnd.ShowWindow(showHide);
 	m_chkRange.ShowWindow(showHide);
 	m_editRangeTo.ShowWindow(showHide);
 	m_editRangeFrom.ShowWindow(showHide);
@@ -571,21 +441,51 @@ void FindRegExDlg::showDetailSettings(bool bShow)
 //-------------------------------------------------------------------------------------------------
 bool FindRegExDlg::validateFromToValue()
 {
-	// make sure the value doesn't exceed 100
 	UpdateData();
 	
-	//////////////////
-	// Check font size
-	//////////////////
-	if (m_chkFontSizeRange.GetCheck() == 1)
+	// Check search range and font size settings
+	if (!checkSearchRangeSettings() || !checkFontSizeSettings())
+	{
+		return false;
+	}
+	
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+void FindRegExDlg::OnShowWindow(BOOL bShow, UINT nStatus) 
+{
+	CDialog::OnShowWindow(bShow, nStatus);
+	
+	if(bShow == TRUE)
+	{
+		m_editPatterns.SetFocus();
+		SetForegroundWindow();
+	}
+}
+//-------------------------------------------------------------------------------------------------
+size_t FindRegExDlg::getSearchStartPosition(size_t inputLength)
+{
+	double dStartRange = m_chkRange.GetCheck() == BST_CHECKED ?
+		asDouble((LPCTSTR)m_zRangeFrom)/100.0 : 0.0;
+
+	return (size_t)(dStartRange * inputLength);
+}
+//-------------------------------------------------------------------------------------------------
+size_t FindRegExDlg::getSearchEndPosition(size_t inputLength)
+{
+	double dEndRange = m_chkRange.GetCheck() == BST_CHECKED ?
+		asDouble((LPCTSTR)m_zRangeTo)/100.0 : 1.0;
+
+	return (size_t)(dEndRange * inputLength);
+}
+//-------------------------------------------------------------------------------------------------
+bool FindRegExDlg::checkFontSizeSettings()
+{
+	if (m_chkFontSizeRange.GetCheck() == BST_CHECKED)
 	{
 		// Retrieve settings
 		CString zFrom;
-		CString zTo;
-		int iFrom;
-		int iTo;
 		m_editFromFontSize.GetWindowText( zFrom );
-		m_editToFontSize.GetWindowText( zTo );
 
 		// Check for NULL entries
 		if (zFrom.IsEmpty())
@@ -596,7 +496,28 @@ bool FindRegExDlg::validateFromToValue()
 			m_editFromFontSize.SetFocus();
 			return false;
 		}
-		else if (zTo.IsEmpty())
+		auto nFrom = asLong((LPCTSTR)zFrom);
+		if (nFrom < 0 || nFrom > 99)
+		{
+			::MessageBox(NULL, "Please provide an integer value from 0 to 99", 
+				"From Value", MB_OK | MB_ICONEXCLAMATION);
+			m_editFromFontSize.SetSel(0, -1);
+			m_editFromFontSize.SetFocus();
+			return false;
+		}
+
+		CString zTo;
+		m_editToFontSize.GetWindowText( zTo );
+		if (zTo.IsEmpty())
+		{
+			::MessageBox(NULL, "Please provide an integer value from 0 to 99", 
+				"To Value", MB_OK | MB_ICONEXCLAMATION);
+			m_editToFontSize.SetSel(0, -1);
+			m_editToFontSize.SetFocus();
+			return false;
+		}
+		auto nTo = asLong((LPCTSTR)zTo);
+		if (nTo < 0 || nTo > 99)
 		{
 			::MessageBox(NULL, "Please provide an integer value from 0 to 99", 
 				"To Value", MB_OK | MB_ICONEXCLAMATION);
@@ -606,9 +527,7 @@ bool FindRegExDlg::validateFromToValue()
 		}
 
 		// Validate non-zero entries
-		iFrom = asLong( zFrom.operator LPCTSTR() );
-		iTo = asLong( zTo.operator LPCTSTR() );
-		if (iFrom > iTo)
+		if (nFrom > nTo)
 		{
 			::MessageBox(NULL, "To value must be greater than From value.", 
 				"To Value", MB_OK | MB_ICONEXCLAMATION);
@@ -616,14 +535,18 @@ bool FindRegExDlg::validateFromToValue()
 			m_editToFontSize.SetFocus();
 			return false;
 		}
+
+		m_nFontMin = nFrom;
+		m_nFontMax = nTo;
 	}
 
-	/////////////////////
-	// Check search scope
-	/////////////////////
-
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool FindRegExDlg::checkSearchRangeSettings()
+{
 	// if Search scope is entire document
-	if (m_chkRange.GetCheck() == 0)
+	if (m_chkRange.GetCheck() == BST_UNCHECKED)
 	{
 		return true;
 	}
@@ -636,7 +559,6 @@ bool FindRegExDlg::validateFromToValue()
 		m_editRangeFrom.SetFocus();
 		return false;
 	}
-
 	if (m_zRangeTo.IsEmpty())
 	{
 		::MessageBox(NULL, "Please provide an integer value from 1 to 100", 
@@ -647,7 +569,6 @@ bool FindRegExDlg::validateFromToValue()
 	}
 	
 	long nFromValue = ::asLong((LPCTSTR)m_zRangeFrom);
-	long nToValue = ::asLong((LPCTSTR)m_zRangeTo);
 	if (nFromValue >= 100)
 	{
 		::MessageBox(NULL, "Please provide an integer value from 0 to 99", 
@@ -657,6 +578,7 @@ bool FindRegExDlg::validateFromToValue()
 		return false;
 	}
 
+	long nToValue = ::asLong((LPCTSTR)m_zRangeTo);
 	if (nToValue > 100)
 	{
 		::MessageBox(NULL, "Please provide an integer value from 1 to 100", 
@@ -675,49 +597,33 @@ bool FindRegExDlg::validateFromToValue()
 		m_editRangeTo.SetFocus();
 		return false;
 	}
-	
+
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-void FindRegExDlg::OnShowWindow(BOOL bShow, UINT nStatus) 
+IRegularExprParserPtr FindRegExDlg::getRegExParser()
 {
-	CDialog::OnShowWindow(bShow, nStatus);
-	
-	// TODO: Add your message handler code here
-	if(bShow == TRUE)
+	if (m_ipRegExpr == __nullptr)
 	{
-		m_editPatterns.SetFocus();
-		SetForegroundWindow();
+		IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI13066", ipMiscUtils != __nullptr );
+
+		m_ipRegExpr = ipMiscUtils->GetNewRegExpParserInstance("FindRegExDlg");
+		ASSERT_RESOURCE_ALLOCATION("ELI07404", m_ipRegExpr != __nullptr);
 	}
-	
+
+	return m_ipRegExpr;
 }
 //-------------------------------------------------------------------------------------------------
-bool FindRegExDlg::letterInFontSizeRange(const CPPLetter& letter)
+void FindRegExDlg::getStartAndEndPositionForMatch(IObjectPairPtr ipMatchPair, long& nStart,
+	long& nEnd)
 {
-	// we will let all spatial letters pass
-	if(letter.m_bIsSpatial == false)
-	{
-		return true;
-	}
-	CString zFrom;
-	m_editFromFontSize.GetWindowText(zFrom);
-	CString zTo;
-	m_editToFontSize.GetWindowText(zTo);
-	long nMinFont = asLong(string(zFrom));
-	long nMaxFont = asLong(string(zTo));
+	ASSERT_ARGUMENT("ELI07409", ipMatchPair != __nullptr);
+	ITokenPtr ipMatch = ipMatchPair->Object1;
+	ASSERT_RESOURCE_ALLOCATION("ELI07410", ipMatch != __nullptr);
 
-	bool bInRange = false;
-	if ((nMinFont == -1 || letter.m_ucFontSize >= nMinFont) &&
-		(nMaxFont == -1 || letter.m_ucFontSize <= nMaxFont))
-	{
-		bInRange = true;
-	}
-
-	// This means we want font sizes outside "not in" the range
-	if(m_cmbIncludeFontSize.GetCurSel() == 1)
-	{
-		bInRange = !bInRange;
-	}
-	return bInRange;
+	// Get the start and end position of the match
+	nStart = ipMatch->StartPosition;
+	nEnd = ipMatch->EndPosition;
 }
-
+//-------------------------------------------------------------------------------------------------

@@ -1162,6 +1162,14 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			text not relative to the physicial image.
 		[id(97), helpstring("method GetOCRImagePageBounds")] HRESULT GetOCRImagePageBounds(
 			[in] long nPageNum, [out, retval] ILongRectangle** ppBounds);	
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To check if the string contains any spatial character that is outside
+		//			the specified font range. If the string is non-spatial this will always
+		//			return VARIANT_FALSE. If there is at least 1 spatial character outside
+		//			the range then the result will be VARIANT_TRUE.
+		[id(98), helpstring("method ContainsCharacterOutsideFontRange")] HRESULT
+			ContainsCharacterOutsideFontRange([in] long nMinFont, [in] long nMaxFont,
+			[out, retval] VARIANT_BOOL* pbResult);
 	};
 
 	[
