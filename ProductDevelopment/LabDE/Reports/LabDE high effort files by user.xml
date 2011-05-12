@@ -1,4 +1,4 @@
-<ExtractReportParameterData Version="1">
+<ExtractReportParameterData Version="2">
 	<ReportParameters>
 		<DateRangeParameter Name="ReportingPeriod" Default="" />
 		<NumberParameter Name="FileDurationInMinutes" Default="" />
