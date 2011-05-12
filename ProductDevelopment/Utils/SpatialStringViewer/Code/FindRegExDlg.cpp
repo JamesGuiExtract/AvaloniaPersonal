@@ -44,12 +44,12 @@ FindRegExDlg::FindRegExDlg(CSpatialStringViewerDlg* pSSVDlg,
   m_bCaseSensitive(FALSE),
   m_zRangeFrom(""),
   m_zRangeTo(""),
-  m_nSearchPos(1),
   m_zPatterns(""),
   m_bSearchStarted(false),
   m_strSearchText(""),
   m_nFontMin(-1),
   m_nFontMax(-1),
+  m_bShiftDown(false),
   m_nDlgHeight(0)
 {
 }
@@ -72,19 +72,16 @@ void FindRegExDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_FONTSIZEFROM, m_editFromFontSize);
 	DDX_Control(pDX, IDC_CMB_FONTSIZEINCLUDE, m_cmbIncludeFontSize);
 	DDX_Control(pDX, IDC_EDIT_EXPRS, m_editPatterns);
-	DDX_Control(pDX, IDC_BTN_ADVANCE, m_btnAdvance);
 	DDX_Control(pDX, IDC_EDIT_TO, m_editRangeTo);
 	DDX_Control(pDX, IDC_EDIT_FROM, m_editRangeFrom);
 	DDX_Control(pDX, IDC_BTN_FIND, m_btnFind);
 	DDX_Control(pDX, IDC_CHK_AS_REGEX, m_chkAsRegEx);
-	DDX_Control(pDX, IDC_RADIO_BEGIN, m_radBegin);
-	DDX_Control(pDX, IDC_RADIO_CUR_POS, m_radCurPos);
 	DDX_Control(pDX, IDC_FIND_PREVIOUS, m_btnPrevious);
 	DDX_Control(pDX, IDC_FIND_RESET_FIND, m_btnResetSearch);
+	DDX_Control(pDX, IDC_CHK_CASE_SENSITIVE, m_chkCaseSensitive);
 	DDX_Check(pDX, IDC_CHK_CASE_SENSITIVE, m_bCaseSensitive);
 	DDX_Text(pDX, IDC_EDIT_FROM, m_zRangeFrom);
 	DDX_Text(pDX, IDC_EDIT_TO, m_zRangeTo);
-	DDX_Radio(pDX, IDC_RADIO_BEGIN, m_nSearchPos);
 	DDX_Text(pDX, IDC_EDIT_EXPRS, m_zPatterns);
 	//}}AFX_DATA_MAP
 }
@@ -94,7 +91,6 @@ BEGIN_MESSAGE_MAP(FindRegExDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_FIND, OnBtnFind)
 	ON_BN_CLICKED(IDC_FIND_PREVIOUS, OnBtnPrevious)
 	ON_BN_CLICKED(IDC_FIND_RESET_FIND, OnBtnResetFind)
-	ON_BN_CLICKED(IDC_BTN_ADVANCE, OnBtnAdvance)
 	ON_WM_SHOWWINDOW()
 	ON_BN_CLICKED(IDC_CHK_RANGE, OnChkRange)
 	ON_BN_CLICKED(IDC_CHK_FONTSIZERANGE, OnChkFontsizerange)
@@ -110,15 +106,12 @@ BOOL FindRegExDlg::OnInitDialog()
 	
 	try
 	{
-		
 		m_editRangeFrom.EnableWindow(FALSE);
 		m_editRangeTo.EnableWindow(FALSE);
 
 		// Default is regular expression
 		m_chkAsRegEx.SetCheck(BST_CHECKED);
 
-		// if Advanced needs to be shown
-		showDetailSettings(m_pCfgDlg->isAdvancedShown());
 		int left, top;
 		m_pCfgDlg->getLastFindWindowPos(left, top);
 		SetWindowPos(NULL, left, top, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
@@ -146,66 +139,133 @@ BOOL FindRegExDlg::OnInitDialog()
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
 //-------------------------------------------------------------------------------------------------
+BOOL FindRegExDlg::PreTranslateMessage(MSG* pMsg)
+{
+	try
+	{
+		switch(pMsg->message)
+		{
+		case WM_KEYDOWN:
+			{
+				switch(pMsg->wParam)
+				{
+				case VK_SHIFT:
+					m_bShiftDown = true;
+					break;
+
+				case VK_F3:
+					{
+						if (m_bShiftDown)
+						{
+							OnBtnPrevious();
+							m_btnPrevious.SetFocus();
+						}
+						else
+						{
+							OnBtnFind();
+							m_btnFind.SetFocus();
+						}
+
+						// Indicate that the keypress has been handled
+						return TRUE;
+					}
+
+					break;
+				}
+			}
+			break;
+		case WM_KEYUP:
+			{
+				if (pMsg->wParam == VK_SHIFT)
+				{
+					m_bShiftDown = false;
+				}
+			}
+			break;
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32565");
+
+	return CDialog::PreTranslateMessage(pMsg);
+}
+//-------------------------------------------------------------------------------------------------
 void FindRegExDlg::OnBtnFind() 
 {
 	try
 	{
+		CWaitCursor wait;
+
+		// Check if there is a search started yet or not
 		if (!m_bSearchStarted)
 		{
-			CWaitCursor wait;
-
-			UpdateData();
-
-			if (!validateFromToValue())
+			// Initialize the new search
+			if (!initializeSearch())
 			{
 				return;
 			}
 
-			// populate the vec of patterns
-			readPatterns((LPCTSTR)m_zPatterns);
-
-			m_strSearchText = calculateSearchText();
-			m_currentSearchPos = 0;
-			m_vecMatches.clear();
-
-			m_bSearchStarted = true;
 			computeMatches();
-
-			// If search is starting from current cursor, get cursor position and select first
-			// match that contains or is past the cursor position
-			if (!m_vecMatches.empty() && m_nSearchPos == 1)
+			if (m_vecMatches.empty())
 			{
-				size_t cursorPos = (size_t) m_pSSVDlg->getCurrentCursorPosition();
-				for(; m_currentSearchPos < m_vecMatches.size(); m_currentSearchPos++)
-				{
-					pair<size_t, size_t>& pos = m_vecMatches[m_currentSearchPos];
-					if (cursorPos < pos.first || (cursorPos > pos.first && cursorPos <= pos.second))
-					{
-						break;
-					}
-				}
+				MessageBox("No matches found.", "No Match");
+				return;
 			}
 
-			m_btnFind.SetWindowText("&Next");
-			m_btnResetSearch.EnableWindow(TRUE);
+			// Set the current result to the first match
+			m_currentSearchResult = m_vecMatches.begin();
+
+			// Only indicate search started if there were matches
+			m_bSearchStarted = true;
+
+			updateUIForSearch();
+
+			// Select the next match relative to the current cursor position
+			size_t cursorPos = (size_t) m_pSSVDlg->getCurrentCursorPosition();
+			for(; m_currentSearchResult != m_vecMatches.end(); m_currentSearchResult++)
+			{
+				if (cursorPos <= m_currentSearchResult->first)
+				{
+					break;
+				}
+			}
+		}
+		else // Next result
+		{
+			m_currentSearchResult++;
 		}
 
+		// If the current index is past the last search result, wrap back to the first result
+		if (m_currentSearchResult == m_vecMatches.end())
+		{
+			m_currentSearchResult = m_vecMatches.begin();
+		}
 
-		if (!m_vecMatches.empty() && m_currentSearchPos < m_vecMatches.size())
-		{
-			pair<size_t, size_t>& pos = m_vecMatches[m_currentSearchPos++];
-			m_pSSVDlg->selectText(pos.first, pos.second+1);
-		}
-		else
-		{
-			MessageBox("No more matches.", "No Matches");
-		}
+		selectCurrentSearchResult();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07405");
 }
 //-------------------------------------------------------------------------------------------------
 void FindRegExDlg::OnBtnPrevious()
 {
+	try
+	{
+		// Do nothing if there is not a current search running
+		if (!m_bSearchStarted)
+		{
+			return;
+		}
+
+		// If already at the beginning then need to move to one past the last element
+		if (m_currentSearchResult == m_vecMatches.begin())
+		{
+			m_currentSearchResult = m_vecMatches.end();
+		}
+
+		m_currentSearchResult--;
+
+		selectCurrentSearchResult();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32564");
 }
 //-------------------------------------------------------------------------------------------------
 void FindRegExDlg::OnBtnResetFind()
@@ -213,66 +273,28 @@ void FindRegExDlg::OnBtnResetFind()
 	try
 	{
 		m_bSearchStarted = false;
-		m_btnFind.SetWindowText("&Find");
-		m_btnResetSearch.EnableWindow(FALSE);
+		updateUIForSearch();
+		m_editPatterns.SetFocus();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32563");
-}
-//-------------------------------------------------------------------------------------------------
-void FindRegExDlg::OnBtnAdvance() 
-{
-	try
-	{
-		showDetailSettings(!m_bShowAdvanced);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07411");
 }
 //-------------------------------------------------------------------------------------------------
 void FindRegExDlg::OnChkRange() 
 {
 	try
 	{
-		if(m_chkRange.GetCheck() == 1)
-		{
-			m_editRangeFrom.EnableWindow(TRUE);
-			m_editRangeTo.EnableWindow(TRUE);	
-		}
-		else
-		{
-			m_editRangeFrom.EnableWindow(FALSE);
-			m_editRangeTo.EnableWindow(FALSE);
-		}
+		updateRangeEnableStates();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07403");
 }
 //-------------------------------------------------------------------------------------------------
 void FindRegExDlg::OnChkFontsizerange() 
 {
-	// TODO: Add your control notification handler code here
 	try
 	{
-		if(m_chkFontSizeRange.GetCheck() == 1)
-		{
-			m_editFromFontSize.EnableWindow(TRUE);
-			m_editToFontSize.EnableWindow(TRUE);
-			m_cmbIncludeFontSize.EnableWindow(TRUE);
-		}
-		else
-		{
-			m_editFromFontSize.EnableWindow(FALSE);
-			m_editToFontSize.EnableWindow(FALSE);
-			m_cmbIncludeFontSize.EnableWindow(FALSE);
-		}
+		updateRangeEnableStates();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10622");
-}
-//-------------------------------------------------------------------------------------------------
-BOOL FindRegExDlg::DestroyWindow() 
-{
-	// TODO: Add your specialized code here and/or call the base class
-	m_pCfgDlg->showAdvanced(m_bShowAdvanced);
-
-	return CDialog::DestroyWindow();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -394,49 +416,9 @@ void FindRegExDlg::readPatterns(const string& strPatternsText)
 			m_vecPatterns.push_back(*it);
 		}
 	}
-}
-//-------------------------------------------------------------------------------------------------
-void FindRegExDlg::showDetailSettings(bool bShow)
-{
-	m_bShowAdvanced = bShow;
 
-	CRect dlgCurrentRect;
-	GetWindowRect(&dlgCurrentRect);
-
-	// record the entire dialog height
-	if (m_nDlgHeight == 0)
-	{
-		m_nDlgHeight = dlgCurrentRect.Height();
-	}
-
-	if (m_bShowAdvanced)
-	{
-		m_btnAdvance.SetWindowText("Advanced <<");
-		SetWindowPos(&wndTop, dlgCurrentRect.left, 
-					 dlgCurrentRect.top, dlgCurrentRect.Width(), 
-					 m_nDlgHeight, SWP_NOZORDER);
-	}
-	else
-	{
-		CRect rectRangeCheckBox;
-		m_chkFontSizeRange.GetWindowRect(&rectRangeCheckBox);
-		ScreenToClient(rectRangeCheckBox);
-
-		m_btnAdvance.SetWindowText("Advanced >>");
-		SetWindowPos(&wndTop, dlgCurrentRect.left, 
-					 dlgCurrentRect.top, dlgCurrentRect.Width(), 
-					 rectRangeCheckBox.top + 3, SWP_NOZORDER);
-	}
-
-	// Show/hide advanced controls
-	BOOL showHide = asMFCBool(bShow);
-	m_chkRange.ShowWindow(showHide);
-	m_editRangeTo.ShowWindow(showHide);
-	m_editRangeFrom.ShowWindow(showHide);
-	m_chkFontSizeRange.ShowWindow(showHide);
-	m_cmbIncludeFontSize.ShowWindow(showHide);
-	m_radBegin.ShowWindow(showHide);
-	m_radCurPos.ShowWindow(showHide);
+	// Store the last expression
+	m_pCfgDlg->saveLastRegularExpression(strPatternsText);
 }
 //-------------------------------------------------------------------------------------------------
 bool FindRegExDlg::validateFromToValue()
@@ -625,5 +607,71 @@ void FindRegExDlg::getStartAndEndPositionForMatch(IObjectPairPtr ipMatchPair, lo
 	// Get the start and end position of the match
 	nStart = ipMatch->StartPosition;
 	nEnd = ipMatch->EndPosition;
+}
+//-------------------------------------------------------------------------------------------------
+bool FindRegExDlg::initializeSearch()
+{
+	UpdateData();
+
+	if (m_bSearchStarted || !validateFromToValue())
+	{
+		return false;
+	}
+
+	// Reset search variables
+	m_vecPatterns.clear();
+	m_vecMatches.clear();
+	m_currentSearchResult = m_vecMatches.end();
+	m_strSearchText = "";
+
+	// populate the vector of patterns
+	readPatterns((LPCTSTR)m_zPatterns);
+
+	if (m_vecPatterns.empty())
+	{
+		MessageBox("Must define at least 1 search pattern.", "No Search Pattern");
+		m_editPatterns.SetFocus();
+		return false;
+	}
+
+	// Compute the text to search (may be the whole document or a restricted range)
+	m_strSearchText = calculateSearchText();
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+void FindRegExDlg::updateUIForSearch()
+{
+	BOOL bSearchStarted = asMFCBool(m_bSearchStarted);
+	m_btnFind.SetWindowText(m_bSearchStarted ? "&Next" : "&Find");
+	m_btnResetSearch.EnableWindow(bSearchStarted);
+	m_btnPrevious.EnableWindow(bSearchStarted);
+
+	// The search setting UI elements should be disabled if a search has been started
+	BOOL bEnableSearchSettings = asMFCBool(!m_bSearchStarted);
+	m_editPatterns.EnableWindow(bEnableSearchSettings);
+	m_chkAsRegEx.EnableWindow(bEnableSearchSettings);
+	m_chkCaseSensitive.EnableWindow(bEnableSearchSettings);
+	m_chkRange.EnableWindow(bEnableSearchSettings);
+	m_chkFontSizeRange.EnableWindow(bEnableSearchSettings);
+
+	updateRangeEnableStates();
+}
+//-------------------------------------------------------------------------------------------------
+void FindRegExDlg::updateRangeEnableStates()
+{
+	BOOL bEnablePercentRange = asMFCBool(!m_bSearchStarted && m_chkRange.GetCheck() == BST_CHECKED);
+	m_editRangeFrom.EnableWindow(bEnablePercentRange);
+	m_editRangeTo.EnableWindow(bEnablePercentRange);	
+
+	BOOL bEnableFontRange = asMFCBool(!m_bSearchStarted && m_chkFontSizeRange.GetCheck() == BST_CHECKED);
+	m_editFromFontSize.EnableWindow(bEnableFontRange);
+	m_editToFontSize.EnableWindow(bEnableFontRange);
+	m_cmbIncludeFontSize.EnableWindow(bEnableFontRange);
+}
+//-------------------------------------------------------------------------------------------------
+void FindRegExDlg::selectCurrentSearchResult()
+{
+	m_pSSVDlg->selectText(m_currentSearchResult->first, m_currentSearchResult->second+1);
 }
 //-------------------------------------------------------------------------------------------------

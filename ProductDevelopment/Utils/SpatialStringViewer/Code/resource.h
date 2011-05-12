@@ -21,9 +21,6 @@
 #define IDC_CHK_CASE_SENSITIVE          1004
 #define IDC_EDIT_FROM                   1007
 #define IDC_EDIT_TO                     1008
-#define IDC_RADIO_BEGIN                 1009
-#define IDC_RADIO_CUR_POS               1010
-#define IDC_BTN_ADVANCE                 1013
 #define IDC_EDIT_FONTSIZEFROM           1015
 #define IDC_EDIT_FONTSIZETO             1016
 #define IDC_CMB_FONTSIZEINCLUDE         1017

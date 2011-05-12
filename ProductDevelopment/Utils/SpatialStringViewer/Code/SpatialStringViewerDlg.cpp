@@ -860,7 +860,6 @@ string CSpatialStringViewerDlg::getEntireDocumentText()
 void CSpatialStringViewerDlg::selectText(int nStartPos, int nEndPos)
 {
 	m_editText.SetSel(nStartPos, nEndPos);
-	m_editText.SetFocus();
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSpatialStringViewerDlg::getSpatialString()

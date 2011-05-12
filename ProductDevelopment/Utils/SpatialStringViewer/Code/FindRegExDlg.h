@@ -31,23 +31,20 @@ public:
 	enum { IDD = IDD_DLG_FIND_REGEXPR };
 	CButton	m_chkRange;
 	CButton	m_chkFontSizeRange;
+	CButton m_chkCaseSensitive;
 	CEdit	m_editToFontSize;
 	CEdit	m_editFromFontSize;
 	CComboBox	m_cmbIncludeFontSize;
 	CEdit	m_editPatterns;
-	CButton	m_btnAdvance;
 	CEdit	m_editRangeTo;
 	CEdit	m_editRangeFrom;
 	CButton	m_btnFind;
 	CButton m_btnPrevious;
 	CButton m_btnResetSearch;
 	CButton	m_chkAsRegEx;
-	CButton m_radBegin;
-	CButton m_radCurPos;
 	BOOL	m_bCaseSensitive;
 	CString	m_zRangeFrom;
 	CString	m_zRangeTo;
-	int		m_nSearchPos;
 	CString	m_zPatterns;
 	//}}AFX_DATA
 
@@ -55,8 +52,6 @@ public:
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(FindRegExDlg)
-	public:
-	virtual BOOL DestroyWindow();
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
@@ -68,10 +63,10 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(FindRegExDlg)
 	virtual BOOL OnInitDialog();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBtnFind();
 	afx_msg void OnBtnPrevious();
 	afx_msg void OnBtnResetFind();
-	afx_msg void OnBtnAdvance();
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 	afx_msg void OnChkRange();
 	afx_msg void OnChkFontsizerange();
@@ -82,6 +77,8 @@ private:
 	////////////
 	// Variables
 	////////////
+	bool m_bShiftDown;
+
 	IRegularExprParserPtr m_ipRegExpr;
 
 	// the actual start searching position in the iput text
@@ -97,13 +94,11 @@ private:
 	// the dialog height
 	int m_nDlgHeight;
 
-	bool m_bShowAdvanced;
-
 	// Data that is set when a search is initiated and keeps track of the current search state
 	bool m_bSearchStarted;
 	string m_strSearchText;
 	vector<pair<size_t, size_t>> m_vecMatches;
-	size_t m_currentSearchPos;
+	vector<pair<size_t, size_t>>::iterator m_currentSearchResult;
 
 	// Min and max font range if it has been specified
 	long m_nFontMin;
@@ -122,9 +117,6 @@ private:
 	// convert block of patterns into a vector of patterns
 	void readPatterns(const string& strPatternsText);
 
-	// show or hide detail settings
-	void showDetailSettings(bool bShow);
-
 	// if the Search Range is selected, make sure the From and To values are valid
 	bool validateFromToValue();
 
@@ -140,4 +132,10 @@ private:
 	IRegularExprParserPtr getRegExParser();
 
 	void getStartAndEndPositionForMatch(IObjectPairPtr ipMatchPair, long& nStart, long& nEnd);
+
+	bool initializeSearch();
+	void updateUIForSearch();
+	void updateRangeEnableStates();
+
+	void selectCurrentSearchResult();
 };
