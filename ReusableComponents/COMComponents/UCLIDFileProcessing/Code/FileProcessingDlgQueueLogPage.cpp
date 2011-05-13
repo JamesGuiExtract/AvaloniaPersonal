@@ -341,12 +341,14 @@ void FileProcessingDlgQueueLogPage::OnNMRclkFileLists(NMHDR* pNMHDR, LRESULT* pR
 		case ID_GRID_CONTEXT_OPEN_FILE_LOCATION:
 			{
 				bool bOpenLocation = val == ID_GRID_CONTEXT_OPEN_FILE_LOCATION;
-				string strExe;
-				getSpecialFolderPath(CSIDL_SYSTEM, strExe);
-				strExe += "\\explorer.exe";
+
+				// LRCAU #6042 - explorer.exe appears to be in different locations sometimes
+				// depending on the install. Since it is hard to imagine Windows operating
+				// without explorer.exe being in the path, we should be able to just run
+				// explorer.exe without specifying the full path to it.
 				string strFileName = bOpenLocation ?
 					getDirectoryFromFullPath(vecFileNames[0]) : vecFileNames[0];
-				runEXE(strExe, strFileName);
+				runEXE("explorer.exe", strFileName);
 			}
 			break;
 		}
