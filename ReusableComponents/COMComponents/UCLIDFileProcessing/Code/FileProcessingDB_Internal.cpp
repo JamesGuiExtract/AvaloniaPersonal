@@ -357,14 +357,6 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				if (easRtn == kActionProcessing)
 				{
 					_lastCodePos = "220";
-					// If there is a record in the skipped table, call update stats with
-					// Skipped as the previous state
-					if (nSkippedActionID != -1)
-					{
-						_lastCodePos = "230";
-						easStatsFrom = kActionSkipped;
-					}
-					_lastCodePos = "240";
 
 					// Remove record from the LockedFileTable
 					executeCmdQuery(ipConnection, "DELETE FROM LockedFile WHERE FileID = " + 
@@ -1402,7 +1394,7 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 		{
 			lNumDocsSkipped--;
 			lNumPagesSkipped -= lOldPages;
-			llNumBytesComplete -= llOldFileSize;
+			llNumBytesSkipped -= llOldFileSize;
 			break;
 		}
 	case kActionPending:
@@ -1482,15 +1474,9 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 	FieldsPtr ipFields = ipActionStatSet->Fields;
 	ASSERT_RESOURCE_ALLOCATION("ELI26863", ipFields != __nullptr);
 
-	// Create an ActionStatistics pointer to return the values
-	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats(CLSID_ActionStatistics);
-	ASSERT_RESOURCE_ALLOCATION("ELI14101", ipActionStats != __nullptr);
-
 	// Check the last updated time stamp 
 	CTime timeCurrent = getSQLServerDateTimeAsCTime(ipConnection);
-
 	CTime timeLastUpdated = getTimeDateField(ipFields, "LastUpdateTimeStamp");
-
 	CTimeSpan ts = timeCurrent - timeLastUpdated;
 	if (bForceUpdate || ts.GetTotalSeconds() > m_nActionStatisticsUpdateFreqInSeconds)
 	{
@@ -1498,6 +1484,11 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 		{
 			// Need to update the ActionStatistics from the Delta table
 			updateActionStatisticsFromDelta(ipConnection, nActionID);
+
+			ipActionStatSet->Requery(adOptionUnspecified);
+
+			ipFields = ipActionStatSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI30751", ipFields != __nullptr);
 		}
 		else
 		{
@@ -1506,11 +1497,6 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 			throw ue;
 		}
 	}
-
-	ipActionStatSet->Requery(adOptionUnspecified);
-
-	ipFields = ipActionStatSet->Fields;
-	ASSERT_RESOURCE_ALLOCATION("ELI30751", ipFields != __nullptr);
 
 	// Get all the data from the recordset
 	long lNumDocsFailed =  getLongField(ipFields, "NumDocumentsFailed");
@@ -1528,6 +1514,10 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 	long lNumDocsPending = getLongField(ipFields, "NumDocumentsPending");
 	long lNumPagesPending = getLongField(ipFields, "NumPagesPending");
 	LONGLONG llNumBytesPending = getLongLongField(ipFields, "NumBytesPending");
+
+	// Create an ActionStatistics pointer to return the values
+	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats(CLSID_ActionStatistics);
+	ASSERT_RESOURCE_ALLOCATION("ELI14101", ipActionStats != __nullptr);
 
 	// Transfer the data from the recordset to the ActionStatisticsPtr
 	ipActionStats->SetAllStatistics(lNumDocs, lNumDocsPending, lNumDocsComplete, lNumDocsFailed, 
