@@ -82,7 +82,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 108;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 109;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -360,7 +360,8 @@ int UpdateToSchemaVersion105(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		// Add default value for last DB info change
-		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrLAST_DB_INFO_CHANGE + "', '" + getSQLServerDateTime(ipConnection) + "')");
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -459,6 +460,49 @@ int UpdateToSchemaVersion108(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32470");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion109(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		const int nNewSchemaVersion = 109;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Add GetFilesToProcessTransactionTimeout setting default if it is not already there
+		// [LRCAU #6105] - Add the get files to process transaction timeout if it does not exist
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) SELECT '"
+			+ gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT + 
+			"' AS [Name], '" + asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0)
+			+ "' AS [Value] WHERE NOT EXISTS (SELECT [Value] FROM [DBInfo] WHERE [Name] = '"
+			+ gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT + "')");
+
+		// Add the default values for the min and max sleep time between db checks
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrMIN_SLEEP_BETWEEN_DB_CHECKS + "', '"
+				+ asString(gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK) + "')");
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
+				+ gstrMAX_SLEEP_BETWEEN_DB_CHECKS + "', '"
+				+ asString(gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK) + "')");
+
+		// Update schema version and dbinfo update time
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		vecQueries.push_back(gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
+
+		// Execute the queries
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32569");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -5267,7 +5311,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 105:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion106);
 				case 106:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion107);
 				case 107:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion108);
-				case 108:	break;
+				case 108:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion109);
+				case 109:	break;
 
 				default:
 					{

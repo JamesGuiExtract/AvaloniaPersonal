@@ -32,6 +32,8 @@ static const string gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT = "GetFilesToPr
 static const string gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY = "StoreDocNameChangeHistory";
 static const string gstrSTORE_DOC_TAG_HISTORY = "StoreDocTagHistory";
 static const string gstrSTORE_DB_INFO_HISTORY = "StoreDBInfoChangeHistory";
+static const string gstrMIN_SLEEP_BETWEEN_DB_CHECKS = "MinMillisecondsBetweenCheckForFilesToProcess";
+static const string gstrMAX_SLEEP_BETWEEN_DB_CHECKS = "MaxMillisecondsBetweenCheckForFilesToProcess";
 static const string gstrLAST_DB_INFO_CHANGE = "LastDBInfoChange";
 
 // Default Settings
@@ -41,6 +43,8 @@ static const double gdDEFAULT_RETRY_TIMEOUT = 120.0;  // seconds
 static const long gnPING_TIMEOUT = 60000; // 60 seconds
 static const long gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES = 5; // 5 minutes
 static const double gdMINIMUM_TRANSACTION_TIMEOUT = 300.0; // 5 minutes
+static const long gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK = 2000; // 2 seconds
+static const long gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK = 60000; // 1 minute
 
 // Local machine as database host
 static const string gstrLOCAL_STRING = "(local)";

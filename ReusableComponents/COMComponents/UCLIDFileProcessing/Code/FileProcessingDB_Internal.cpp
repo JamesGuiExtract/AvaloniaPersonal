@@ -1160,6 +1160,8 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY] = "1";
 	mapDefaultValues[gstrSTORE_DOC_TAG_HISTORY] = "1";
 	mapDefaultValues[gstrSTORE_DB_INFO_HISTORY] = "1";
+	mapDefaultValues[gstrMIN_SLEEP_BETWEEN_DB_CHECKS] = asString(gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK);
+	mapDefaultValues[gstrMAX_SLEEP_BETWEEN_DB_CHECKS] = asString(gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK);
 	try
 	{
 		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = getSQLServerDateTime(getDBConnection());
