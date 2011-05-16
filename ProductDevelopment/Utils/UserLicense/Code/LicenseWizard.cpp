@@ -105,6 +105,7 @@ CLicenseWizard::~CLicenseWizard()
 //--------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CLicenseWizard, CPropertySheet)
 	ON_WM_SYSCOMMAND()
+	ON_BN_CLICKED(IDC_BTN_OPEN_LICENSE_FOLDER, OnOpenLicenseFolder)
 END_MESSAGE_MAP()	
 
 //--------------------------------------------------------------------------------------------------
@@ -141,6 +142,27 @@ BOOL CLicenseWizard::OnInitDialog()
 
 		SetIcon(hIcon , TRUE);		// Set big icon
 		SetIcon(hIcon , FALSE);		// Set small icon
+
+		// [LegacyRCAndUtils:6075]
+		// Add button to make it convenient to get to the license folder.
+		// Position the button so it is aligned vertically with the other buttons on the wizard
+		// sheet, but is on the left-hand side.
+		CRect rectButton;
+		GetDlgItem(IDCANCEL)->GetWindowRect(rectButton);
+		ScreenToClient(rectButton);		
+
+		CRect rectWizardSheet;
+		GetTabControl()->GetWindowRect(rectWizardSheet);
+		ScreenToClient(rectWizardSheet);
+
+		rectButton.left = rectWizardSheet.left;
+		// Make the button wide enough for "Open License Folder"
+		rectButton.right = rectWizardSheet.left + 120; 
+
+		m_BtnOpenLicenseFolder.Create("Open License Folder",
+			BS_PUSHBUTTON|WS_CHILD|WS_VISIBLE|WS_TABSTOP, rectButton, this,
+			IDC_BTN_OPEN_LICENSE_FOLDER);
+		m_BtnOpenLicenseFolder.SetFont(GetFont());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI23351")
 
@@ -201,5 +223,16 @@ void CLicenseWizard::OnSysCommand(UINT nID, LPARAM lParam)
 	{
 		CPropertySheet::OnSysCommand(nID, lParam);
 	}
+}
+//--------------------------------------------------------------------------------------------------
+void CLicenseWizard::OnOpenLicenseFolder()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		shellOpenDocument(getExtractLicenseFilesPath());
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32572");
 }
 //--------------------------------------------------------------------------------------------------

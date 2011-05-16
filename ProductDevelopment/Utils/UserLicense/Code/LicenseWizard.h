@@ -18,7 +18,11 @@ public:
 
 // Message handlers
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg void OnOpenLicenseFolder();
 
 	DECLARE_MESSAGE_MAP()
+
+private:
+	CButton m_BtnOpenLicenseFolder;
 };
 //--------------------------------------------------------------------------------------------------

@@ -33,6 +33,7 @@
 #define IDC_BTN_COPY_BODY               1168
 #define IDC_BTN_COPY_SUBJECT            1169
 #define IDC_BTN_COPY_RECIPIENT          1170
+#define IDC_BTN_OPEN_LICENSE_FOLDER		1171
 
 // Next default values for new objects
 // 
@@ -40,7 +41,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1171
+#define _APS_NEXT_CONTROL_VALUE         1172
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif
