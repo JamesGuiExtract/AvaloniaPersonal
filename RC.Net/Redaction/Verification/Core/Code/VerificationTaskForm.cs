@@ -1342,8 +1342,15 @@ namespace Extract.Redaction.Verification
         /// <returns>The current document to view from the history.</returns>
         VerificationMemento GetCurrentDocument()
         {
-            // Return either the history VOA or the currently processing VOA
-            return IsInHistory ? _history[_historyIndex] : _savedMemento;
+            if (_imageViewer.IsImageAvailable)
+            {
+                // Return either the history VOA or the currently processing VOA
+                return IsInHistory ? _history[_historyIndex] : _savedMemento;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
