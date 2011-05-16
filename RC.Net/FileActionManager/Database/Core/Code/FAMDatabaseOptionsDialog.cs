@@ -30,6 +30,8 @@ namespace Extract.FileActionManager.Database
         const string _AUTO_REVERT_LOCKED_FILES = "AutoRevertLockedFiles";
         const string _AUTO_REVERT_TIME_OUT_IN_MINUTES = "AutoRevertTimeOutInMinutes";
         const string _AUTO_REVERT_NOTIFY_EMAIL_LIST = "AutoRevertNotifyEmailList";
+        const string _MIN_TIME_BETWEEN_PROCESSING_DB_CHECK = "MinMillisecondsBetweenCheckForFilesToProcess";
+        const string _MAX_TIME_BETWEEN_PROCESSING_DB_CHECK = "MaxMillisecondsBetweenCheckForFilesToProcess";
 
         // Constants for History tab
         const string _UPDATE_FAST_TABLE = "UpdateFileActionStateTransitionTable";
@@ -180,6 +182,12 @@ namespace Extract.FileActionManager.Database
                 SetStandardCheckControls(settings);
                 SetAutoRevertControls(settings);
                 FillSkipMachineList(settings);
+
+                // Update the min and max times between DB checks for files
+                _numberMinTimeBetweenChecks.Text =
+                    settings.GetValue(_MIN_TIME_BETWEEN_PROCESSING_DB_CHECK);
+                _numberMaxTimeBetweenChecks.Text
+                    = settings.GetValue(_MAX_TIME_BETWEEN_PROCESSING_DB_CHECK);
 
                 // Set the input event history value
                 int dayCount = 0;
@@ -542,6 +550,20 @@ namespace Extract.FileActionManager.Database
                 {
                     map.Set(entry.Key, entry.Value.Checked ? "1" : "0");
                 }
+
+                // Get the min and max times (validate them) from the general tab
+                var min = _numberMinTimeBetweenChecks.Int32Value;
+                var max = _numberMaxTimeBetweenChecks.Int32Value;
+                if ((max - min) < 100)
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "The maximum time between checking for files to process must be at least 100ms greater than the minimum time.",
+                        "Invalid Max And Min", true);
+                    _numberMaxTimeBetweenChecks.Focus();
+                    return;
+                }
+                map.Set(_MIN_TIME_BETWEEN_PROCESSING_DB_CHECK, _numberMinTimeBetweenChecks.Text);
+                map.Set(_MAX_TIME_BETWEEN_PROCESSING_DB_CHECK, _numberMaxTimeBetweenChecks.Text);
 
                 bool autoRevert = _checkAutoRevertFiles.Checked;
                 if (autoRevert)
