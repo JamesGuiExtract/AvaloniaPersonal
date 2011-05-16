@@ -123,7 +123,7 @@
             this.Name = "ModifySourceDocNameInDBSettingsDialog";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Modify SourceDocName in Database";
+            this.Text = "Configure Core: Modify SourceDocName in Database";
             this.ResumeLayout(false);
             this.PerformLayout();
 

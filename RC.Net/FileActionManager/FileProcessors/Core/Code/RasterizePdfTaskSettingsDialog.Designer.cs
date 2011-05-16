@@ -233,7 +233,7 @@
             this.MinimizeBox = false;
             this.Name = "RasterizePdfTaskSettingsDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Rasterize PDF Settings";
+            this.Text = "Configure Core: Rasterize PDF Settings";
             this._groupDeleteFailed.ResumeLayout(false);
             this._groupDeleteFailed.PerformLayout();
             this.ResumeLayout(false);

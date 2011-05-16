@@ -571,6 +571,12 @@ namespace Extract.FileActionManager.FileProcessors
                         inputStream.ExtractDecrypt(outputStream, _passwordHash, _label);
                     }
 
+                    // Ensure the directory exists
+                    if (!Directory.Exists(Path.GetDirectoryName(destinationFile)))
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(destinationFile));
+                    }
+
                     File.Copy(tempOut.FileName, destinationFile, true);
                 }
                 finally
@@ -588,13 +594,6 @@ namespace Extract.FileActionManager.FileProcessors
                         outputStream.Dispose();
                     }
                 }
-
-                // Ensure the directory exists
-                if (!Directory.Exists(Path.GetDirectoryName(destinationFile)))
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(destinationFile));
-                }
-
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }

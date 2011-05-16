@@ -74,8 +74,8 @@
             // 
             // _folderNameTextBox
             // 
-            this._folderNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._folderNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._folderNameTextBox.Location = new System.Drawing.Point(12, 26);
             this._folderNameTextBox.Name = "_folderNameTextBox";
             this._folderNameTextBox.Size = new System.Drawing.Size(409, 20);
@@ -104,8 +104,8 @@
             // 
             // _recursionLimitTextBox
             // 
-            this._recursionLimitTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._recursionLimitTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._recursionLimitTextBox.Enabled = false;
             this._recursionLimitTextBox.Location = new System.Drawing.Point(34, 98);
             this._recursionLimitTextBox.Name = "_recursionLimitTextBox";
@@ -121,7 +121,7 @@
             this._recursionLimitTagsButton.Name = "_recursionLimitTagsButton";
             this._recursionLimitTagsButton.Size = new System.Drawing.Size(18, 20);
             this._recursionLimitTagsButton.TabIndex = 17;
-            this._recursionLimitTagsButton.TextControl = _recursionLimitTextBox;
+            this._recursionLimitTagsButton.TextControl = this._recursionLimitTextBox;
             this._recursionLimitTagsButton.UseVisualStyleBackColor = true;
             // 
             // _folderNameTagsButton
@@ -132,7 +132,7 @@
             this._folderNameTagsButton.Name = "_folderNameTagsButton";
             this._folderNameTagsButton.Size = new System.Drawing.Size(18, 20);
             this._folderNameTagsButton.TabIndex = 13;
-            this._folderNameTagsButton.TextControl = _folderNameTextBox;
+            this._folderNameTagsButton.TextControl = this._folderNameTextBox;
             this._folderNameTagsButton.UseVisualStyleBackColor = true;
             // 
             // _recursionLimitBrowseButton
@@ -145,6 +145,7 @@
             this._recursionLimitBrowseButton.Size = new System.Drawing.Size(26, 20);
             this._recursionLimitBrowseButton.TabIndex = 18;
             this._recursionLimitBrowseButton.Text = "...";
+            this._recursionLimitBrowseButton.TextControl = this._recursionLimitTextBox;
             this._recursionLimitBrowseButton.UseVisualStyleBackColor = true;
             // 
             // DeleteEmptyFolderTaskSettingsDialog
@@ -168,7 +169,7 @@
             this.Name = "DeleteEmptyFolderTaskSettingsDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure: Delete empty folder";
+            this.Text = "Configure Core: Delete empty folder";
             this.ResumeLayout(false);
             this.PerformLayout();
 

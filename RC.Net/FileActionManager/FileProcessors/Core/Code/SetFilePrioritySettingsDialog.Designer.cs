@@ -169,7 +169,7 @@
             this.MinimizeBox = false;
             this.Name = "SetFilePrioritySettingsDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Set File Priority";
+            this.Text = "Configure Core: Set File Priority";
             _fileNameGroupBox.ResumeLayout(false);
             _fileNameGroupBox.PerformLayout();
             _priorityGroupBox.ResumeLayout(false);

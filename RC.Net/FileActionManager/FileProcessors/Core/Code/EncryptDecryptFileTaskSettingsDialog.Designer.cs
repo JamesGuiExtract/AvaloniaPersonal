@@ -361,7 +361,7 @@
             this.MinimizeBox = false;
             this.Name = "EncryptDecryptFileTaskSettingsDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Encrypt/Decrypt File";
+            this.Text = "Configure Core: Encrypt/Decrypt File";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

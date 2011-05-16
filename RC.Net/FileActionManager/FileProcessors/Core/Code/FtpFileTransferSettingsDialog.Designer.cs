@@ -272,7 +272,7 @@
             this.Name = "FtpFileTransferSettingsDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Transfer file via FTP/SFTP";
+            this.Text = "Configure Core: Transfer file via FTP/SFTP";
             this._settingsTabControl.ResumeLayout(false);
             this._generalSettingsTabPage.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);

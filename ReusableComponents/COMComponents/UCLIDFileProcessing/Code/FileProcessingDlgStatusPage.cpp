@@ -632,15 +632,9 @@ void FileProcessingDlgStatusPage::OnNMRclkFileLists(NMHDR* pNMHDR, LRESULT* pRes
 		case ID_GRID_CONTEXT_OPEN_FILE:
 		case ID_GRID_CONTEXT_OPEN_FILE_LOCATION:
 			{
-				bool bOpenLocation = val == ID_GRID_CONTEXT_OPEN_FILE_LOCATION;
-
-				// LRCAU #6042 - explorer.exe appears to be in different locations sometimes
-				// depending on the install. Since it is hard to imagine Windows operating
-				// without explorer.exe being in the path, we should be able to just run
-				// explorer.exe without specifying the full path to it.
-				string strFileName = bOpenLocation ?
+				string strFileName = val == ID_GRID_CONTEXT_OPEN_FILE_LOCATION ?
 					getDirectoryFromFullPath(vecFileNames[0]) : vecFileNames[0];
-				runEXE("explorer.exe", strFileName);
+				shellOpenDocument(strFileName);
 			}
 			break;
 		}

@@ -206,7 +206,7 @@
             this.Name = "CreateFileTaskSettingsDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure: Create file";
+            this.Text = "Configure Core: Create file";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
