@@ -788,8 +788,8 @@ STDMETHODIMP CAFEngineFileProcessor::GetSizeMax(ULARGE_INTEGER *pcbSize)
 void CAFEngineFileProcessor::clear()
 {
 	m_strRuleFileNameForFileProcessing = "";
-	m_bReadUSSFileIfExist = false;
-	m_bCreateUssFileIfNonExist = false;
+	m_bReadUSSFileIfExist = true;
+	m_bCreateUssFileIfNonExist = true;
 	m_eOCRPagesType = kOCRAllPages;
 	m_strSpecificPages = "";
 	m_bUseCleanedImage = true;
