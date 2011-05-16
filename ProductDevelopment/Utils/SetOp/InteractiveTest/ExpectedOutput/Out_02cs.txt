@@ -2,6 +2,6 @@
 2
 3
 blue
-gReEn
 green
+gReEn
 red

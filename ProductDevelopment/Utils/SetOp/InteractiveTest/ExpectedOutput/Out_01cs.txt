@@ -1,6 +1,6 @@
 1
 2
 3
-gReEn
 green
+gReEn
 red
