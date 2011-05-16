@@ -8,6 +8,8 @@
 #include <map>
 #include <Win32Event.h>
 
+using namespace std;
+
 //-------------------------------------------------------------------------------------------------
 // FPRecordManager
 //-------------------------------------------------------------------------------------------------
@@ -47,7 +49,7 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Will remove any tasks in the queue with strFileName as their file (there should
 	//			be only one).  Appropriate messages will be sent
-	void remove(const std::string& strFileName);
+	void remove(const string& strFileName);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE:	To return true if the processing queue is open and to return false otherwise.
 	bool processingQueueIsOpen();
@@ -118,7 +120,7 @@ public:
 	void setKeepProcessingAsAdded(bool bVal);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: TO return the status as a string
-	static std::string statusAsString(const ERecordStatus& eStatus);
+	static string statusAsString(const ERecordStatus& eStatus);
 
 	// Sets the number of files to process and resets the number processed.
 	// if nNumberOfFiles == 0 then there is not a restriction on the number
@@ -184,10 +186,10 @@ private:
 	// the id of the last task to be added to the queue
 	long m_ulLastAddedID;
 
-	typedef std::list<long> TaskIdList;
+	typedef list<long> TaskIdList;
 	TaskIdList m_queTaskIds;
 
-	typedef std::map<long, FileProcessingRecord> TaskMap;
+	typedef map<long, FileProcessingRecord> TaskMap;
 	TaskMap m_mapTasks;
 
 	long m_nMaxStoredRecords;
@@ -210,7 +212,7 @@ private:
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFPMDB;
 
 	// The name of the action being processed
-	std::string m_strAction;
+	string m_strAction;
 
 	// The id of the action being processed
 	long m_nActionID;
@@ -218,8 +220,10 @@ private:
 	// The max number of files to get from the database each time the queue is empty
 	long m_nMaxFilesFromDB;
 
-	// The number of milliseconds to sleep between checking database for new files
-	long m_nMillisecondsBetweenDBCheck;
+	vector<unsigned long> m_vecSleepTimes;
+	vector<unsigned long>::iterator m_currentSleepTime; // Iterator into the sleep time vector
+	vector<unsigned long>::iterator m_maxSleepTime; // Iterator that points to the max sleep time
+	bool m_bSleepTimeCalculated;
 
 	// This flag indicates that processing should continue waiting for files to be added to the DB
 	bool m_bKeepProcessingAsAdded;
@@ -269,4 +273,13 @@ private:
 	//			if task is not pending or current and not in the task map an exception will be logged and
 	//			false will be returned.
 	bool removeTaskIfNotPendingOrCurrent(long nTaskID);
+
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To get the default sleep time and max sleep time from the DB config and compute
+	//			the different sleep time intervals based on the range
+	void computeSleepIntervals();
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To reset the sleep interval values so that they will be recalculated the next
+	//			time they are needed.
+	void resetSleepIntervals();
 };

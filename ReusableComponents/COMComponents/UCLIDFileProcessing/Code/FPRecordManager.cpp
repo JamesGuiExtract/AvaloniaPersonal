@@ -10,6 +10,12 @@
 #include <COMUtils.h>
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
+#include <FAMUtilsConstants.h>
+
+//-------------------------------------------------------------------------------------------------
+// Constants
+//-------------------------------------------------------------------------------------------------
+const size_t gnNUMBER_OF_SLEEP_INTERVALS = 10;
 
 //-------------------------------------------------------------------------------------------------
 // FPRecordManager
@@ -20,20 +26,19 @@ FPRecordManager::FPRecordManager()
   m_bRestrictNumStoredRecords(false),
   m_strAction(""),
   m_nActionID(0),
-  m_ipFPMDB(NULL),
+  m_ipFPMDB(__nullptr),
   m_bKeepProcessingAsAdded(true),
   m_bProcessSkippedFiles(false),
   m_bSkippedFilesForCurrentUser(true),
   m_nNumberOfFilesProcessed(0),
   m_nNumberOfFilesProcessedSuccessfully(0),
   m_nNumberOfFilesFailed(0),
+  m_vecSleepTimes(gnNUMBER_OF_SLEEP_INTERVALS),
+  m_bSleepTimeCalculated(false),
   m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
 {
 	try
 	{
-		// Get the max number of files to load in the record manager from the database
-		FileProcessingConfigMgr fpCfgMgr;
-		m_nMillisecondsBetweenDBCheck = fpCfgMgr.getMillisecondsBetweenDBCheck();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13993");
 }
@@ -165,9 +170,8 @@ void FPRecordManager::remove(const std::string& strFileName)
 //-------------------------------------------------------------------------------------------------
 bool FPRecordManager::pop(FileProcessingRecord& task)
 {
-	// keep waiting until either the queue is closed, or a file is available in the
-	// queue for processing
-	while (!processingIsStopped())
+	unsigned long nSleepTime = 0;
+	do
 	{
 		// if the queue is discarded, then return false immediately
 		if (processingQueueIsDiscarded())
@@ -222,6 +226,12 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 		{
 			// load from Database;
 			nNumFromDB = loadTasksFromDB(nNumberToLoad);
+
+			// If at least 1 file was loaded, reset the sleep time iterator to min sleep time
+			if (nNumFromDB > 0)
+			{
+				m_currentSleepTime = m_vecSleepTimes.begin();
+			}
 		}
 		
 		// if a file is available in the queue for processing, then update the task variable with
@@ -260,14 +270,20 @@ bool FPRecordManager::pop(FileProcessingRecord& task)
 			return true;
 		}
 
+		// Get the current sleep time (and increment the iterator if necessary)
+		nSleepTime = *m_currentSleepTime;
+		if (m_currentSleepTime != m_maxSleepTime)
+		{
+			m_currentSleepTime++;
+		}
+
 		// Unlock the lock guards before sleeping
 		lockGuard.Unlock();
 		lockDBLoad.Unlock();
-
-		// if a file is not available in the queue for processing,
-		// sleep for the specified amount of time.
-		Sleep(m_nMillisecondsBetweenDBCheck);
 	}
+	while (m_queueStopEvent.wait(nSleepTime) == WAIT_TIMEOUT);
+	// keep waiting until either the queue is closed, or a file is available in the
+	// queue for processing
 
 	return false;
 }
@@ -291,6 +307,7 @@ void FPRecordManager::clear(bool bClearUI)
 	m_queFinishedTasks.clear();
 	
 	clearEvents();
+	resetSleepIntervals();
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::clearEvents()
@@ -683,6 +700,11 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 {
 	ASSERT_ARGUMENT("ELI14004", m_ipFPMDB != __nullptr);
 
+	if (!m_bSleepTimeCalculated)
+	{
+		computeSleepIntervals();
+	}
+
 	// Get the list of file records
 	string strSkippedUser = 
 		m_bSkippedFilesForCurrentUser && m_bProcessSkippedFiles ? getCurrentUserName() : "";
@@ -719,8 +741,15 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 void FPRecordManager::setFPMDB(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFPMDB)
 {
 	ASSERT_ARGUMENT("ELI14005", ipFPMDB != __nullptr);
+
+	// Lock the db load mutex since we are modifying the DB pointer
+	CSingleLock lg(&m_LoadDBLock, TRUE);
+
 	// Set the database object
 	m_ipFPMDB = ipFPMDB;
+
+	// New DB, reset the sleep interval settings
+	resetSleepIntervals();
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::setActionID(long nActionID)
@@ -817,5 +846,59 @@ bool FPRecordManager::removeTaskIfNotPendingOrCurrent(long nTaskID)
 		ue.log();
 	}
 	return false;
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::computeSleepIntervals()
+{
+	try
+	{
+		auto nMinSleepTime = asUnsignedLong(asString(m_ipFPMDB->GetDBInfoSetting(
+			gstrMIN_SLEEP_BETWEEN_DB_CHECKS.c_str(), VARIANT_TRUE)));
+		auto nMaxSleepTime = asUnsignedLong(asString(m_ipFPMDB->GetDBInfoSetting(
+			gstrMAX_SLEEP_BETWEEN_DB_CHECKS.c_str(), VARIANT_TRUE)));
+
+		if (nMinSleepTime >= nMaxSleepTime || nMaxSleepTime - nMinSleepTime < 100)
+		{
+			UCLIDException ue("ELI32570",
+				"Invalid min and max sleep times specified in database. Using default values.");
+			ue.addDebugInfo("Min Time", nMinSleepTime);
+			ue.addDebugInfo("Max Time", nMaxSleepTime);
+			ue.log();
+
+			// Set the min and max to the defaults
+			nMinSleepTime = (unsigned long) gnDEFAULT_MIN_SLEEP_TIME_BETWEEN_DB_CHECK;
+			nMaxSleepTime = (unsigned long) gnDEFAULT_MAX_SLEEP_TIME_BETWEEN_DB_CHECK;
+		}
+
+		// Compute the amount of sleep time to increase in each interval
+		size_t nNumIntervals = m_vecSleepTimes.size()-1;
+		size_t nIntervalLength = (size_t)(
+			(((nMaxSleepTime - nMinSleepTime)*1.0) / (nNumIntervals*1.0)) + 0.5);
+		size_t nLastEntry = nNumIntervals;
+
+		// Set the last sleep time to the max sleep time
+		m_vecSleepTimes[nLastEntry] = nMaxSleepTime;
+
+		// Set the other sleep time values
+		size_t nTempTime = nMinSleepTime;
+		for (size_t i = 0; i < nLastEntry; i++)
+		{
+			m_vecSleepTimes[i] = nTempTime;
+			nTempTime += nIntervalLength;
+		}
+
+		// Set the current iterator to the min sleep time and the max iterator to the last entry
+		m_currentSleepTime = m_vecSleepTimes.begin();
+		m_maxSleepTime = m_vecSleepTimes.end() - 1;
+		m_bSleepTimeCalculated = true;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32571");
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::resetSleepIntervals()
+{
+	m_currentSleepTime = m_vecSleepTimes.end();
+	m_maxSleepTime = m_currentSleepTime;
+	m_bSleepTimeCalculated = false;
 }
 //-------------------------------------------------------------------------------------------------
