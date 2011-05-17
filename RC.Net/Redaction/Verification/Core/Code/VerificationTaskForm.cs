@@ -2796,10 +2796,12 @@ namespace Extract.Redaction.Verification
                 _imageViewer.ImagePageData = memento.ImagePageData;
             }
 
-            // Determine whether to visit all pages. If neither option is turned on, navigate as if
-            // both are turned on.
+            // Determine whether to visit all pages or sensitive items.. If neither option is turned
+            // on, navigate as if both are turned on.
             bool visitAllPages =
                 _settings.General.VerifyAllPages || !_settings.General.VerifyAllItems;
+            bool visitAllItems =
+                _settings.General.VerifyAllItems || !_settings.General.VerifyAllPages;
 
             switch (_navigationTarget)
             {
@@ -2815,6 +2817,12 @@ namespace Extract.Redaction.Verification
                         }
                         else
                         {
+                            // [FlexIDSCore:4662] If navigating by item, ensure selection is cleared
+                            // on the new doc.
+                            if (visitAllItems)
+                            {
+                                _redactionGridView.ClearSelection();
+                            }
                             _imageViewer.PageNumber = 1;
                         }
                     }
@@ -2852,6 +2860,12 @@ namespace Extract.Redaction.Verification
                         }
                         else
                         {
+                            // [FlexIDSCore:4662] If navigating by item, ensure selection is cleared
+                            // on the new doc.
+                            if (visitAllItems)
+                            {
+                                _redactionGridView.ClearSelection();
+                            }
                             _imageViewer.PageNumber = lastPage;
                         }
                     }

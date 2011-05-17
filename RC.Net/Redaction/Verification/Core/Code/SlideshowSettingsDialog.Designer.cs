@@ -277,6 +277,7 @@
             this._documentConditionTextBox.Enabled = false;
             this._documentConditionTextBox.Location = new System.Drawing.Point(24, 157);
             this._documentConditionTextBox.Name = "_documentConditionTextBox";
+            this._documentConditionTextBox.ReadOnly = true;
             this._documentConditionTextBox.Size = new System.Drawing.Size(381, 20);
             this._documentConditionTextBox.TabIndex = 4;
             this._documentConditionTextBox.DoubleClick += new System.EventHandler(this.HandleDocumentConditionTextBoxDoubleClick);
