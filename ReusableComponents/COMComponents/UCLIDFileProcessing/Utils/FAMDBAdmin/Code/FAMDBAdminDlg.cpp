@@ -333,6 +333,10 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 			{
 				m_bDBSchemaIsNotCurrent = true;
 			}
+			else if (strCurDBStatus == gstrCONNECTION_ESTABLISHED)
+			{
+				m_bIsDBGood = true;
+			}
 
 			// Enable menus
 			enableMenus();
