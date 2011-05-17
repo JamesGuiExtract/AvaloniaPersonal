@@ -225,6 +225,41 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 
 	try
 	{
+		// Validate action selection
+		long lIndex = m_comboActions.GetCurSel();
+		if (lIndex == CB_ERR)
+		{
+			MessageBox("You must select and action to set.", "No Action", MB_OK | MB_ICONERROR);
+			m_comboActions.SetFocus();
+			return;
+		}
+
+		// Validate target status selection
+		bool bNewStatus = m_radioNewStatus.GetCheck() == BST_CHECKED;
+		int nNewStatusIndex = bNewStatus ?
+			m_comboNewStatus.GetCurSel() : m_comboStatusFromAction.GetCurSel();
+		if (nNewStatusIndex == CB_ERR)
+		{
+			string strMessage;
+			string strCaption;
+			CComboBox* pCombo = __nullptr;
+			if (bNewStatus)
+			{
+				strMessage = "You must select a new status.";
+				strCaption = "No Status Selected";
+				pCombo = &m_comboNewStatus;
+			}
+			else
+			{
+				strMessage = "You must select a source action.";
+				strCaption = "No Source Action";
+				pCombo = &m_comboStatusFromAction;
+			}
+			MessageBox(strMessage.c_str(), strCaption.c_str(), MB_OK | MB_ICONERROR);
+			pCombo->SetFocus();
+			return;
+		}
+
 		// Add application trace whenever a database modification is made
 		// [LRCAU #5052 - JDS - 12/18/2008]
 		UCLIDException uex("ELI23597", "Application trace: Database change");
@@ -236,7 +271,6 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		// Get the selected action name and ID that will change the status
 		CString zToActionName;
 		m_comboActions.GetWindowText(zToActionName);
-		long lIndex = m_comboActions.GetCurSel();
 		long lToActionID = m_comboActions.GetItemData(lIndex);
 		uex.addDebugInfo("Action To Change", (LPCTSTR)zToActionName);
 		uex.addDebugInfo("Action ID To Change", lToActionID);
@@ -249,17 +283,15 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		long lFromActionID = -1;
 		CString zFromAction = "";
 		EActionStatus eNewStatus = kActionUnattempted;
-		if (m_radioNewStatus.GetCheck() == BST_CHECKED)
+		if (bNewStatus)
 		{
 			// Get the new status ID and cast to EActionStatus
-			int iStatusID = m_comboNewStatus.GetCurSel();
-			eNewStatus = (EActionStatus)(iStatusID);
+			eNewStatus = (EActionStatus)(nNewStatusIndex);
 			uex.addDebugInfo("New Status", asString(m_ipFAMDB->AsStatusString(eNewStatus)));
 		}
 		else
 		{
-			long lIndex = m_comboStatusFromAction.GetCurSel();
-			lFromActionID = m_comboStatusFromAction.GetItemData(lIndex);
+			lFromActionID = m_comboStatusFromAction.GetItemData(nNewStatusIndex);
 			m_comboStatusFromAction.GetWindowText(zFromAction);
 			uex.addDebugInfo("Copy From Action", lFromActionID); 
 		}
