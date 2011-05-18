@@ -414,9 +414,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     _navigationTools.Visible = false;
 
                     // Remove toolstrip separators after removing the thumbnails button.
-                    FormsMethods.HideUnnecessaryToolStripSeparators(
+                    FormsMethods.RemoveUnnecessaryToolStripSeparators(
                         _toolStripContainer.TopToolStripPanel.Controls);
-                    FormsMethods.HideUnnecessaryToolStripSeparators(
+                    FormsMethods.RemoveUnnecessaryToolStripSeparators(
                         _toolStripContainer.BottomToolStripPanel.Controls);
                 }
                 else
@@ -427,12 +427,10 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
 
                 // Disable selection, select all, next layer object, and previous layer
                 // object short cut keys
-                _imageViewer.Shortcuts[Keys.Escape] = null;
-                _imageViewer.Shortcuts[Keys.A | Keys.Control] = null;
-                _imageViewer.Shortcuts[Keys.F3] = null;
-                _imageViewer.Shortcuts[Keys.Control | Keys.OemPeriod] = null;
-                _imageViewer.Shortcuts[Keys.F3 | Keys.Shift] = null;
-                _imageViewer.Shortcuts[Keys.Control | Keys.Oemcomma] = null;
+                _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectSelectLayerObjectsTool);
+                _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectSelectAllLayerObjects);
+                _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.GoToNextLayerObject);
+                _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.GoToPreviousLayerObject);
 
                 // Add shortcut handler for Delete objects button
                 _imageViewer.Shortcuts[Keys.D] = _imageViewer.SelectDeleteLayerObjectsTool;
@@ -1242,6 +1240,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         {
             try
             {
+                var controlsToRemove = new HashSet<ToolStripItem>();
                 string[] buttonIds = argument.Split(',');
                 foreach (string buttonId in buttonIds)
                 {
@@ -1251,95 +1250,140 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     switch (id)
                     {
                         case ImageViewerControlId.DeleteLayerObjectsButton:
-                            _deleteLayerObjectsToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectDeleteLayerObjectsTool);
+                            controlsToRemove.Add(_deleteLayerObjectsToolStripButton);
+                            controlsToRemove.Add(_deleteLayerObjectsToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.FirstPageButton:
-                            _firstPageToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.GoToFirstPage);
+                            controlsToRemove.Add(_firstPageToolStripButton);
+                            controlsToRemove.Add(_firstPageToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.FitToPageButton:
-                            _fitToPageToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.ToggleFitToPageMode);
+                            controlsToRemove.Add(_fitToPageToolStripButton);
+                            controlsToRemove.Add(_firstPageToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.FitToWidthButton:
-                            _fitToWidthToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.ToggleFitToWidthMode);
+                            controlsToRemove.Add(_fitToWidthToolStripButton);
+                            controlsToRemove.Add(_fitToWidthToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.HighlightTextSplitButton:
-                            _highlightToolStripSplitButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.ToggleHighlightTool);
+                            controlsToRemove.Add(_highlightToolStripSplitButton);
+                            controlsToRemove.Add(_angularHighlightToolStripMenuItem);
+                            controlsToRemove.Add(_angularHighlightContextMenuItem);
+                            controlsToRemove.Add(_rectangularHighlightToolStripMenuItem);
+                            controlsToRemove.Add(_rectangularHighlightContextMenuItem);
                             break;
 
                         case ImageViewerControlId.LastPageButton:
-                            _lastPageToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.GoToLastPage);
+                            controlsToRemove.Add(_lastPageToolStripButton);
+                            controlsToRemove.Add(_lastPageToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.NavigateToPageEditBox:
-                            _pageNavigationToolStripTextBox.Visible = false;
+                            controlsToRemove.Add(_pageNavigationToolStripTextBox);
                             break;
 
                         case ImageViewerControlId.NextPageButton:
-                            _nextPageToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.GoToNextPage);
+                            controlsToRemove.Add(_nextPageToolStripButton);
+                            controlsToRemove.Add(_nextPageToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.NextTileButton:
-                            _nextTileToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectNextTile);
+                            controlsToRemove.Add(_nextTileToolStripButton);
                             break;
 
                         case ImageViewerControlId.OpenImageButton:
-                            _openImageToolStripSplitButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectOpenImage);
+                            controlsToRemove.Add(_openImageToolStripSplitButton);
+                            controlsToRemove.Add(_openImageToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.OpenSubImageWindowButton:
-                            _extractImageToolStripButton.Visible = false;
+                            controlsToRemove.Add(_extractImageToolStripButton);
                             break;
 
                         case ImageViewerControlId.PanButton:
-                            _panToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectPanTool);
+                            controlsToRemove.Add(_panToolStripButton);
+                            controlsToRemove.Add(_panContextMenuItem);
+                            controlsToRemove.Add(_panToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.PreviousPageButton:
-                            _previousPageToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.GoToPreviousPage);
+                            controlsToRemove.Add(_previousPageToolStripButton);
+                            controlsToRemove.Add(_previousPageToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.PreviousTileButton:
-                            _previousTileToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectPreviousTile);
+                            controlsToRemove.Add(_previousTileToolStripButton);
                             break;
 
                         case ImageViewerControlId.PrintButton:
-                            _printImageToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectPrint);
+                            controlsToRemove.Add(_printImageToolStripButton);
+                            controlsToRemove.Add(_printImageToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.RotateClockwiseButton:
-                            _rotateClockwiseToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectRotateClockwise);
+                            controlsToRemove.Add(_rotateClockwiseToolStripButton);
+                            controlsToRemove.Add(_rotateClockwiseToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.RotateCounterClockwiseButton:
-                            _rotateCounterclockwiseToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectRotateCounterclockwise);
+                            controlsToRemove.Add(_rotateCounterclockwiseToolStripButton);
+                            controlsToRemove.Add(_rotateCounterclockwiseToolStripButton);
                             break;
 
                         case ImageViewerControlId.ThumbnailViewerButton:
-                            _thumbnailsToolStripButton.Visible = false;
+                            controlsToRemove.Add(_thumbnailsToolStripButton);
                             break;
 
                         case ImageViewerControlId.ZoomInButton:
-                            _zoomInToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectZoomIn);
+                            controlsToRemove.Add(_zoomInToolStripButton);
+                            controlsToRemove.Add(_zoomInToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.ZoomNextButton:
-                            _zoomNextToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectZoomNext);
+                            controlsToRemove.Add(_zoomNextToolStripButton);
+                            controlsToRemove.Add(_zoomNextContextMenuItem);
+                            controlsToRemove.Add(_zoomNextToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.ZoomOutButton:
-                            _zoomOutToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectZoomOut);
+                            controlsToRemove.Add(_zoomOutToolStripButton);
+                            controlsToRemove.Add(_zoomOutToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.ZoomPreviousButton:
-                            _zoomPreviousToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectZoomPrevious);
+                            controlsToRemove.Add(_zoomPreviousToolStripButton);
+                            controlsToRemove.Add(_zoomPreviousContextMenuItem);
+                            controlsToRemove.Add(_zoomPreviousToolStripMenuItem);
                             break;
 
                         case ImageViewerControlId.ZoomWindowButton:
-                            _zoomWindowToolStripButton.Visible = false;
+                            _imageViewer.Shortcuts.RemoveHandlerFromKeys(_imageViewer.SelectZoomWindowTool);
+                            controlsToRemove.Add(_zoomWindowToolStripButton);
+                            controlsToRemove.Add(_zoomWindowContextMenuItem);
+                            controlsToRemove.Add(_zoomWindowToolStripMenuItem);
                             break;
 
                         default:
@@ -1350,11 +1394,14 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
                     }
                 }
 
-                // After hiding the buttons, ensure that there are no extra tool strip separators
-                FormsMethods.HideUnnecessaryToolStripSeparators(
+                // Remove the specified controls, then remove unnecessary separators
+                FormsMethods.RemoveAndDisposeToolStripItems(controlsToRemove);
+                FormsMethods.RemoveUnnecessaryToolStripSeparators(
                     _toolStripContainer.TopToolStripPanel.Controls);
-                FormsMethods.HideUnnecessaryToolStripSeparators(
+                FormsMethods.RemoveUnnecessaryToolStripSeparators(
                     _toolStripContainer.BottomToolStripPanel.Controls);
+                FormsMethods.RemoveUnnecessaryToolStripSeparators(_contextMenu);
+                FormsMethods.RemoveUnnecessaryToolStripSeparators(_menuStrip);
             }
             catch (Exception ex)
             {

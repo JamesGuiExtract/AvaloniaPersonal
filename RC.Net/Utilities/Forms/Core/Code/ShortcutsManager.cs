@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace Extract.Utilities.Forms
 {
@@ -155,6 +156,26 @@ namespace Extract.Utilities.Forms
         #region Shortcuts Manager Methods
 
         /// <summary>
+        /// Removes the specified handler from keys.
+        /// </summary>
+        /// <param name="shortcutHandler">The shortcut handler.</param>
+        public void RemoveHandlerFromKeys(ShortcutHandler shortcutHandler)
+        {
+            try
+            {
+                // Remove the handler for each key associated with the handler
+                foreach (var key in GetKeys(shortcutHandler))
+                {
+                    this[key] = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32579");
+            }
+        }
+
+        /// <summary>
         /// Gets an array of shortcut <see cref="Keys"/> associated with the specified 
         /// <see cref="ShortcutHandler"/>.
         /// </summary>
@@ -170,19 +191,11 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                // Iterate through each key value pair
-                List<Keys> keys = new List<Keys>();
-                foreach (KeyValuePair<Keys, ShortcutHandler> pair in _shortcuts)
-                {
-                    // Add this shortcut key to the list if it matches the shortcutHandler specified
-                    if (pair.Value == shortcutHandler)
-                    {
-                        keys.Add(pair.Key);
-                    }
-                }
-
-                // Return the calculated array
-                return keys.ToArray();
+                // Return an array of keys associated with the handler
+                return _shortcuts
+                    .Where(p => p.Value == shortcutHandler)
+                    .Select(p => p.Key)
+                    .ToArray();
             }
             catch (Exception e)
             {
@@ -301,7 +314,6 @@ namespace Extract.Utilities.Forms
                 throw ExtractException.AsExtractException("ELI26499", ex);
             }
         }
-
 
         /// <summary>
         /// Retrieves the specified key or key combination as text suitable for display to an end 
