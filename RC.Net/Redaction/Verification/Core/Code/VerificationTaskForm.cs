@@ -114,15 +114,13 @@ namespace Extract.Redaction.Verification
 
             /// <summary>
             /// Display the first page or sensitive item depending upon the value of
-            /// <see cref="GeneralVerificationSettings.VerifyAllPages"/> and
-            /// <see cref="GeneralVerificationSettings.VerifyAllItems"/>.
+            /// <see cref="GeneralVerificationSettings.VerifyAllPages"/>.
             /// </summary>
             FirstItem = 1,
 
             /// <summary>
             /// Display the last page or sensitive item depending upon the value of
-            /// <see cref="GeneralVerificationSettings.VerifyAllPages"/> and
-            /// <see cref="GeneralVerificationSettings.VerifyAllItems"/>.
+            /// <see cref="GeneralVerificationSettings.VerifyAllPages"/>.
             /// </summary>
             LastItem = 2,
 
@@ -1469,34 +1467,51 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Selects the previous redaction row.
+        /// Selects the previous sensitive item or page.
         /// </summary>
-        void SelectPreviousRedaction()
+        void SelectPreviousItemOrPage()
+        {
+            SelectPreviousItemOrPage(false);
+
+            UpdateControlsBasedOnSelection();
+        }
+
+        /// <summary>
+        /// Selects or checks the availability to select the previous sensitive item or page.
+        /// </summary>
+        /// <param name="checkAvailability"><see langword="true"/> to only test the availability of
+        /// the navigation without actually navigating; <see langword="false"/> to navigate.</param>
+        /// <returns><see langword="true"/> if navigation was available/performed;
+        /// <see langword="false"/> otherwise.</returns>
+        bool SelectPreviousItemOrPage(bool checkAvailability)
         {
             try
             {
                 // If no image is available, do nothing
                 if (!_imageViewer.IsImageAvailable)
                 {
-                    return;
+                    return false;
                 }
 
-                // Determine whether to visit all redactions/pages. If neither option is turned on,
-                // navigate as if both are turned on.
-                bool visitAllRedactions =
-                    _settings.General.VerifyAllItems || !_settings.General.VerifyAllPages;
-                bool visitAllPages =
-                    _settings.General.VerifyAllPages || !_settings.General.VerifyAllItems;
-
-                // Go to the previous row (or page) if it exists
-                int previousRow = visitAllRedactions ? _redactionGridView.GetPreviousRowIndex() : -1;
-                int previousPage = visitAllPages ? GetPreviousPage() : -1;
-                if (GoToPreviousRowOrPage(previousRow, previousPage))
+                 // Go to the previous row (or page) if it exists
+                int previousRow = _redactionGridView.GetPreviousRowIndex();
+                int previousPage = _settings.General.VerifyAllPages ? GetPreviousPage() : -1;
+                if (GoToPreviousRowOrPage(previousRow, previousPage, checkAvailability))
                 {
-                    return;
+                    return true;
                 }
 
-                GoToPreviousDocument(DocumentNavigationTarget.LastItem);
+                // Go to the previous document if there is one available in history.
+                if (_historyIndex > 0)
+                {
+                    if (!checkAvailability)
+                    {
+                        GoToPreviousDocument(DocumentNavigationTarget.LastItem);
+                    }
+                    return true;
+                }
+
+                return false;
             }
             catch (Exception ex)
             {
@@ -1507,7 +1522,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Selects the next redaction row.
         /// </summary>
-        void SelectNextRedaction()
+        void SelectNextItemOrPage()
         {
             try
             {
@@ -1517,16 +1532,9 @@ namespace Extract.Redaction.Verification
                     return;
                 }
                 
-                // Determine whether to visit all redactions/pages. If neither option is turned on,
-                // navigate as if both are turned on.
-                bool visitAllRedactions =
-                    _settings.General.VerifyAllItems || !_settings.General.VerifyAllPages;
-                bool visitAllPages =
-                    _settings.General.VerifyAllPages || !_settings.General.VerifyAllItems;
-
                 // Go to the next row (or page) if it exists
-                int nextRow = visitAllRedactions ? _redactionGridView.GetNextRowIndex() : -1;
-                int nextPage = visitAllPages ? GetNextPage() : -1;
+                int nextRow = _redactionGridView.GetNextRowIndex();
+                int nextPage = _settings.General.VerifyAllPages ? GetNextPage() : -1;
                 if (GoToNextRowOrPage(nextRow, nextPage))
                 {
                     return;
@@ -1591,17 +1599,19 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Goes to the first redaction or page at or before the specified redaction and page,
-        /// whichever comes last. 
+        /// Goes to or checks the availability to go to the first redaction or page at or before
+        /// the specified redaction and page, whichever comes last. 
         /// </summary>
         /// <param name="rowIndex">The previous redaction grid row index or -1 to advance to the
         /// specified page.</param>
         /// <param name="page">The previous page index or -1 to advance to the next specified
         /// index in the redaction grid.</param>
+        /// <param name="checkAvailability"><see langword="true"/> to only test the availability of
+        /// the navigation without actually navigating; <see langword="false"/> to navigate.</param>
         /// <returns><see langword="true"/> if there is a redaction on or before 
         /// <paramref name="rowIndex"/> or a page at or before <paramref name="page"/>;
         /// <see langword="false"/> otherwise.</returns>
-        bool GoToPreviousRowOrPage(int rowIndex, int page)
+        bool GoToPreviousRowOrPage(int rowIndex, int page, bool checkAvailability)
         {
             // Get the next unviewed row
             rowIndex = rowIndex < 0 ? -1 : rowIndex;
@@ -1612,14 +1622,20 @@ namespace Extract.Redaction.Verification
             // Visit the unvisited page if it comes after the unviewed redaction
             if (IsPageAfterRedactionAtIndex(page, rowIndex))
             {
-                VisitPage(page);
+                if (!checkAvailability)
+                {
+                    VisitPage(page);
+                }
                 return true;
             }
 
             // If there is a valid redaction to select, select it.
             if (rowIndex >= 0)
             {
-                _redactionGridView.SelectOnly(rowIndex);
+                if (!checkAvailability)
+                {
+                    _redactionGridView.SelectOnly(rowIndex);
+                }
                 return true;
             }
 
@@ -1872,9 +1888,9 @@ namespace Extract.Redaction.Verification
                 _commentsTextBox.Text = GetFileActionComment(memento);
 
                 _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
-                _nextDocumentToolStripButton.Enabled = IsInHistory;
+                _nextDocumentToolStripButton.Enabled = true;
 
-                _previousRedactionToolStripButton.Enabled = true;
+                // _previousRedactionToolStripButton is set in UpdateControlsBasedOnSelection()
                 _nextRedactionToolStripButton.Enabled = true;
 
                 _tagFileToolStripButton.Enabled = _fileDatabase != null;
@@ -1890,6 +1906,8 @@ namespace Extract.Redaction.Verification
 
                 _slideshowPlayToolStripButton.Enabled = !_slideshowRunning;
                 _slideshowStopToolStripButton.Enabled = _slideshowRunning;
+
+                UpdateControlsBasedOnSelection();
             }
             else
             {
@@ -1931,27 +1949,7 @@ namespace Extract.Redaction.Verification
             _lastExemptionToolStripButton.Enabled = 
                 selected && _redactionGridView.HasAppliedExemptions;
 
-            _previousRedactionToolStripButton.Enabled = selected && !IsFirstRowSelected();
-        }
-
-        /// <summary>
-        /// Determines whether the first row of the data grid is selected.
-        /// </summary>
-        /// <returns><see langword="true"/> if the first row is selected; <see langword="false"/> 
-        /// if the first row is not selected.</returns>
-        bool IsFirstRowSelected()
-        {
-            bool selected = false;
-            foreach (LayerObject layerObject in _redactionGridView.Rows[0].LayerObjects)
-            {
-                if (layerObject.Selected)
-                {
-                    selected = true;
-                    break;
-                }
-            }
-
-            return selected;
+            _previousRedactionToolStripButton.Enabled = SelectPreviousItemOrPage(true);
         }
 
         /// <summary>
@@ -2125,8 +2123,8 @@ namespace Extract.Redaction.Verification
                 _imageViewer.Shortcuts[Keys.O | Keys.Control] = null;
 
                 // Next/previous redaction
-                _imageViewer.Shortcuts[Keys.Tab] = SelectNextRedaction;
-                _imageViewer.Shortcuts[Keys.Tab | Keys.Shift] = SelectPreviousRedaction;
+                _imageViewer.Shortcuts[Keys.Tab] = SelectNextItemOrPage;
+                _imageViewer.Shortcuts[Keys.Tab | Keys.Shift] = SelectPreviousItemOrPage;
 
                 // Next/previous document
                 _imageViewer.Shortcuts[Keys.Tab | Keys.Control] = GoToNextDocument;
@@ -2152,6 +2150,14 @@ namespace Extract.Redaction.Verification
 
                 // Magnifier window
                 _imageViewer.Shortcuts[Keys.F12] = (() => _magnifierToolStripButton.PerformClick());
+
+                if (!_settings.General.VerifyAllPages)
+                {
+                    _nextRedactionToolStripButton.Text =
+                        _nextRedactionToolStripButton.Text.Replace("or page ", "");
+                    _previousRedactionToolStripButton.Text =
+                        _previousRedactionToolStripButton.Text.Replace("or page ", "");
+                }
 
                 if (_settings.LaunchInFullScreenMode)
                 {
@@ -2569,7 +2575,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                SelectPreviousRedaction();
+                SelectPreviousItemOrPage();
             }
             catch (Exception ex)
             {
@@ -2588,7 +2594,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                SelectNextRedaction();
+                SelectNextItemOrPage();
             }
             catch (Exception ex)
             {
@@ -2796,13 +2802,6 @@ namespace Extract.Redaction.Verification
                 _imageViewer.ImagePageData = memento.ImagePageData;
             }
 
-            // Determine whether to visit all pages or sensitive items.. If neither option is turned
-            // on, navigate as if both are turned on.
-            bool visitAllPages =
-                _settings.General.VerifyAllPages || !_settings.General.VerifyAllItems;
-            bool visitAllItems =
-                _settings.General.VerifyAllItems || !_settings.General.VerifyAllPages;
-
             switch (_navigationTarget)
             {
                 case DocumentNavigationTarget.FirstItem:
@@ -2811,18 +2810,16 @@ namespace Extract.Redaction.Verification
                         // 1) We are not visiting all pages OR
                         // 2) We are visiting all pages and there is a redaction on page 1
                         if (_redactionGridView.Rows.Count > 0 &&
-                                (!visitAllPages || _redactionGridView.Rows[0].PageNumber == 1))
+                                (!_settings.General.VerifyAllPages ||
+                                 _redactionGridView.Rows[0].PageNumber == 1))
                         {
                             _redactionGridView.SelectOnly(0);
                         }
                         else
                         {
-                            // [FlexIDSCore:4662] If navigating by item, ensure selection is cleared
-                            // on the new doc.
-                            if (visitAllItems)
-                            {
-                                _redactionGridView.ClearSelection();
-                            }
+                            // [FlexIDSCore:4662] Ensure selection is cleared on the new doc.
+                            _redactionGridView.ClearSelection();
+
                             _imageViewer.PageNumber = 1;
                         }
                     }
@@ -2854,18 +2851,16 @@ namespace Extract.Redaction.Verification
                         int lastRow = _redactionGridView.Rows.Count - 1;
                         int lastPage = _imageViewer.PageCount;
                         if (_redactionGridView.Rows.Count > 0 &&
-                                (!visitAllPages || _redactionGridView.Rows[lastRow].PageNumber == lastPage))
+                                (!_settings.General.VerifyAllPages ||
+                                 _redactionGridView.Rows[lastRow].PageNumber == lastPage))
                         {
                             _redactionGridView.SelectOnly(lastRow);
                         }
                         else
                         {
-                            // [FlexIDSCore:4662] If navigating by item, ensure selection is cleared
-                            // on the new doc.
-                            if (visitAllItems)
-                            {
-                                _redactionGridView.ClearSelection();
-                            }
+                            // [FlexIDSCore:4662] Ensure selection is cleared on the new doc.
+                            _redactionGridView.ClearSelection();
+
                             _imageViewer.PageNumber = lastPage;
                         }
                     }

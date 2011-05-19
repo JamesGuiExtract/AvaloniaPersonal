@@ -1007,7 +1007,7 @@ namespace Extract.Redaction.Verification
             this._previousRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._previousRedactionToolStripButton.Name = "_previousRedactionToolStripButton";
             this._previousRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._previousRedactionToolStripButton.Text = "Previous redaction (Shift+Tab)";
+            this._previousRedactionToolStripButton.Text = "Previous item or page (Shift+Tab)";
             this._previousRedactionToolStripButton.Click += new System.EventHandler(this.HandlePreviousRedactionToolStripButtonClick);
             // 
             // _nextRedactionToolStripButton
@@ -1018,7 +1018,7 @@ namespace Extract.Redaction.Verification
             this._nextRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._nextRedactionToolStripButton.Name = "_nextRedactionToolStripButton";
             this._nextRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._nextRedactionToolStripButton.Text = "Next redaction (Tab)";
+            this._nextRedactionToolStripButton.Text = "Next item or page (Tab)";
             this._nextRedactionToolStripButton.Click += new System.EventHandler(this.HandleNextRedactionToolStripButtonClick);
             // 
             // _exemptionsToolStrip
