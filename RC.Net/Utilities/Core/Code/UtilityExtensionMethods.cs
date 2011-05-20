@@ -87,8 +87,6 @@ namespace Extract.Utilities
                         "serializedHexValue");
                 }
 
-                ValidateLicense("ELI31809");
-
                 var bytes = serializedHexValue.ToByteArray();
                 using (var stream = new MemoryStream(bytes))
                 {

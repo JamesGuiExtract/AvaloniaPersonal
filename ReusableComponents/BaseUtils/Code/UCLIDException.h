@@ -368,7 +368,18 @@ public:
 	// PROMISE: saves the contents into the specified file
 	// ARGS:	strFile: path of the file to save with
 	//				bAppend: append exception information instead of overwriting the file
-	void saveTo(const string& strFile, bool bAppend=false) const;
+	//			pszMachineName: The name of the machine to place in the log string (if the
+	//				machine name is __nullptr then the current machine name will be used)
+	//			pszUserName: The name of the user to place in the log string (if the user name
+	//				is __nullptr then the current user name will be used)
+	//			nDateTime: The number of seconds since 01/01/1970 00:00:00 UTC to place in the
+	//				log string (if -1, then	the current time will be used)
+	//			nPid: The process id to place in the log string (if -1 the current pid will be used)
+	//			pszProductVersion: The product version to place in the log string (if __nullptr
+	//				the current product version will be used.
+	void saveTo(const string& strFile, bool bAppend=false, const char* pszMachineName = __nullptr,
+		const char* pszUserName = __nullptr, long nDateTime = -1, int nPid = -1,
+		const char* pszProductVersion = __nullptr) const;
 	//----------------------------------------------------------------------------------------------	
 	// PURPOSE: To throw this exception as a STL string object
 	// REQUIRE: Nothing.
