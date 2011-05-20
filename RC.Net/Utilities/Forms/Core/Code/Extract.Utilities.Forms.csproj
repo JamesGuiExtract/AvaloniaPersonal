@@ -193,7 +193,7 @@
     </Compile>
     <Compile Include="IPropertyPage.cs" />
     <Compile Include="IUserConfigurableComponent.cs" />
-    <Compile Include="Keys.cs" />
+    <Compile Include="KeyMethods.cs" />
     <Compile Include="MessageFilterBase.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
