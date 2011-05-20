@@ -102,10 +102,6 @@
       <Project>{E2701E73-4D37-477B-8359-5614136DFA09}</Project>
       <Name>Extract.ExceptionService.WCFInterface</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
-      <Name>Extract.Licensing</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>

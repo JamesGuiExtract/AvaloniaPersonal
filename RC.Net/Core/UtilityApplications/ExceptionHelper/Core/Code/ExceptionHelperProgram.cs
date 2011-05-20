@@ -1,5 +1,4 @@
 using Extract.ExceptionService;
-using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -60,9 +59,6 @@ namespace Extract.ExceptionHelper
                     ShowUsage();
                     return;
                 }
-
-                // Load the licenses
-                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
                 // Get the file name
                 string fileName = Path.GetFullPath(args[0]);
