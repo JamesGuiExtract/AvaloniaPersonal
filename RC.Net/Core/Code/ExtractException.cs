@@ -355,6 +355,49 @@ namespace Extract
         }
 
         /// <summary>
+        /// Log this exception to the standard exception log used by all of
+        /// Extract Systems' products, but adds the specified machine,user, time, etc
+        /// information to the log as opposed to using the default values that are read
+        /// from the current machine and product instance.
+        /// <para>NOTE: This method should only be called once on a given ExtractException
+        /// object.  If this method is called more than once on a given ExtractException
+        /// object, the encrypted stack trace may contain duplicate entries.</para>
+        /// </summary>
+        /// <param name="machineName">Name of the machine.</param>
+        /// <param name="userName">Name of the user.</param>
+        /// <param name="dateTimeUtc">The date time UTC that represents the number of
+        /// seconds since 01/01/1970 00:00:00.</param>
+        /// <param name="processId">The process id.</param>
+        /// <param name="applicationName">Name of the application.</param>
+        public void Log(string machineName, string userName, int dateTimeUtc,
+            int processId, string applicationName)
+        {
+            // Ensure the log function does not throw any exceptions
+            try
+            {
+                // Update the encrypted stack trace information with the stack trace associated with
+                // this ExtractException object, if this hasn't already been done.
+                RecordStackTrace();
+
+                // Create a UCLIDException COM object and populate it with all the information
+                // contained in this ExtractException object.
+                UCLID_EXCEPTIONMGMTLib.COMUCLIDException uex = AsCppException();
+
+                // Log the exception with the specified information
+                uex.LogWithSpecifiedInfo(machineName, userName, dateTimeUtc, processId, applicationName);
+            }
+            catch (Exception e)
+            {
+                // Log exception that was caught.
+                NativeMethods.LogException("ELI32588", e.Message);
+
+                // Log the exception that was supposed to be logged.
+                NativeMethods.LogException(EliCode, Message);
+            }
+
+        }
+
+        /// <summary>
         /// Display this exception using the standard exception viewer window used by all
         /// of Extract Systems' products.
         /// </summary>
@@ -1002,6 +1045,26 @@ namespace Extract
             // Convert the specified exception into an ExtractException and log it.
             ExtractException ee = AsExtractException(eliCode, ex);
             ee.Log();
+        }
+
+        /// <summary>
+        /// Logs the specified message and eli code to the Extract Systems log.
+        /// </summary>
+        /// <param name="eliCode">The eli code.</param>
+        /// <param name="message">The message.</param>
+        public static void Log(string eliCode, string message)
+        {
+            try
+            {
+                new ExtractException(eliCode, message).Log();
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI32593");
+                ee.AddDebugData("Message To Log", message, false);
+                ee.AddDebugData("EliCode", eliCode, false);
+                ee.Log();
+            }
         }
 
         /// <summary>

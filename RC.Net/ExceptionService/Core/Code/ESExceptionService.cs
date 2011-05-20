@@ -63,12 +63,11 @@ namespace Extract.ExceptionService
 
                 ResetHost();
 
-                LogException(new ApplicationException(
-                    "Application Trace: Exception service started."), "ELI30558");
+                ExtractException.Log("ELI30558", "Application Trace: Exception service started.");
             }
             catch (Exception ex)
             {
-                LogException(ex, "ELI30559");
+                ex.ExtractLog("ELI30559");
             }
         }
 
@@ -90,14 +89,13 @@ namespace Extract.ExceptionService
 
                 CloseHost();
 
-                LogException(new ApplicationException(
-                    "Application Trace: Exception service stopped."), "ELI30560");
+                ExtractException.Log("ELI30560", "Application Trace: Exception service stopped.");
 
                 base.OnStop();
             }
             catch (Exception ex)
             {
-                LogException(ex, "ELI30561");
+                ex.ExtractLog("ELI30561");
             }
         }
 
@@ -117,12 +115,12 @@ namespace Extract.ExceptionService
 
                 base.OnShutdown();
 
-                LogException(new ApplicationException(
-                    "Application Trace: Exception service was shutdown."), "ELI30565");
+                ExtractException.Log("ELI30565",
+                    "Application Trace: Exception service was shutdown.");
             }
             catch (Exception ex)
             {
-                LogException(ex, "ELI30566");
+                ex.ExtractLog("ELI30566");
             }
         }
 
@@ -163,15 +161,14 @@ namespace Extract.ExceptionService
                     if (!_endService.WaitOne(0))
                     {
                         ResetHost();
-                        LogException(new ApplicationException(
-                            "Application Trace: Exception service host was closed and restarted."),
-                            "ELI30562");
+                        ExtractException.Log("ELI30562",
+                            "Application Trace: Exception service host was closed and restarted.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogException(ex, "ELI30563");
+                ex.ExtractLog("ELI30563");
             }
         }
 
@@ -214,7 +211,7 @@ namespace Extract.ExceptionService
             }
             catch (Exception ex)
             {
-                LogException(ex, "ELI30564");
+                ex.ExtractLog("ELI30564");
             }
         }
 
@@ -246,23 +243,6 @@ namespace Extract.ExceptionService
                     AbortHost();
                     throw;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Attempts to log the specified <see cref="Exception"/> to the Extract exception log.
-        /// </summary>
-        /// <param name="ex">The <see cref="Exception"/> to log.</param>
-        /// <param name="eliCode">The ELI code to associate with the exception.</param>
-        static void LogException(Exception ex, string eliCode)
-        {
-            try
-            {
-                var logger = new ExtractExceptionLogger();
-                logger.LogException(new ExceptionLoggerData(ex, eliCode));
-            }
-            catch
-            {
             }
         }
     }

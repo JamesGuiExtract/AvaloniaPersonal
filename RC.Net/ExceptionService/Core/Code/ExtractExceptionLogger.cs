@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.ServiceModel;
-using System.Text;
 
 namespace Extract.ExceptionService
 {
@@ -21,15 +15,21 @@ namespace Extract.ExceptionService
         {
             try
             {
-                string eliCode = exceptionData.EliCode;
-                var ee = exceptionData.ExceptionData.LogExceptionWithHelperApp(eliCode);
-                if (ee != null)
-                {
-                    throw ee;
-                }
+                var ee = exceptionData.ExceptionData.AsExtract(exceptionData.EliCode);
+                ee.Log(exceptionData.MachineName, exceptionData.UserName,
+                    exceptionData.DateTimeUtc, exceptionData.ProcessId,
+                    exceptionData.ProductVersion);
             }
             catch (Exception exception)
             {
+                try
+                {
+                    exception.ExtractLog("ELI32580");
+                }
+                catch
+                {
+                }
+
                 throw new FaultException("Unable to log exception. " + exception.Message);
             }
         }

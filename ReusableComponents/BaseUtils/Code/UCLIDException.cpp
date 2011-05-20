@@ -686,29 +686,30 @@ void UCLIDException::addHresult(HRESULT hr)
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20299");
 }
 //-------------------------------------------------------------------------------------------------
-string UCLIDException::createLogString() const
+string UCLIDException::createLogString(const char* pszMachineName, const char* pszUserName,
+	long nDateTime, int nPid, const char* pszProductVersion) const
 {
 	try
 	{
-		string	strResult;
-		string	strSerial;
-		string	strApp;
-		string	strComputer;
-		string	strUser;
-		string	strPID;
-		string	strTime;
-		char	pszTime[20];
-
 		// Retrieve information for output
-		strSerial = getSerialNumber();
-		strApp = getApplication();
-		strComputer = getComputerName();
-		strUser = getCurrentUserName();
-		strPID = getCurrentProcessID();
+		string strSerial = getSerialNumber();
+		string strApp = pszProductVersion != __nullptr ? pszProductVersion : getApplication();
+		string strComputer = pszMachineName != __nullptr ? pszMachineName : getComputerName();
+		string strUser = pszUserName != __nullptr ? pszUserName : getCurrentUserName();
+		string strPID = nPid > 0 ? ::asString(nPid) : getCurrentProcessID();
 
-		// Get current time as string
-		sprintf_s(pszTime, sizeof(pszTime), "%ld", time(NULL) );
-		strTime = pszTime;
+		string strTime;
+		if (nDateTime > 0)
+		{
+			strTime = ::asString(nDateTime);
+		}
+		else
+		{
+			// Get current time as string
+			char pszTime[20] = {0};
+			sprintf_s(pszTime, sizeof(pszTime), "%ld", time(NULL));
+			strTime = pszTime;
+		}
 
 		/////////////////////////////////////////////
 		// Comma-separated single-line output format:
@@ -720,7 +721,7 @@ string UCLIDException::createLogString() const
 		// Process ID
 		// Current time
 		// Exception string
-		strResult = strSerial + "," + strApp + "," + strComputer + "," + strUser + 
+		string strResult = strSerial + "," + strApp + "," + strComputer + "," + strUser + 
 			"," + strPID + "," + strTime + "," + asStringizedByteStream();
 
 		return strResult;
@@ -904,7 +905,9 @@ void UCLIDException::renameLogFile(const string& strFileName, bool bUserRenamed,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent, bool bAddDisplayedTag) const
+void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent, bool bAddDisplayedTag,
+	const char* pszMachineName, const char* pszUserName, long nDateTime, int nPid,
+	const char* pszProductVersion) const
 {
 	// Use try/catch block to trap any exception
 	try
@@ -1177,7 +1180,7 @@ void UCLIDException::setSerialNumber(string strSerial)
 		replaceVariable( strSerial, "|", "" );
 
 		// append the delimiter if this is not the first application
-		if (!ms_strApplication.empty())
+		if (!ms_strSerial.empty())
 		{
 			ms_strSerial += "|";
 		}
@@ -1191,7 +1194,7 @@ void UCLIDException::setSerialNumber(string strSerial)
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20310");
 }
 //-------------------------------------------------------------------------------------------------
-const string& UCLIDException::getApplication(void)
+string UCLIDException::getApplication(void)
 {
 	return ms_strApplication;
 }

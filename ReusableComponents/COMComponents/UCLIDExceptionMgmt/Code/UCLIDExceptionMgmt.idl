@@ -114,6 +114,14 @@ library UCLID_EXCEPTIONMGMTLib
 		// ARGS:		pnIndex - return value for the number of stack trace entries.
 		[id(16), helpstring("method GetDebugInfoCount")] HRESULT GetDebugInfoCount(
 			[out, retval] long *pnIndex);
+		//-----------------------------------------------------------------------------------------
+		[id(17), helpstring("method GetApplicationName")] HRESULT GetApplicationName(
+			[out, retval] BSTR* pbstrAppName);
+		//-----------------------------------------------------------------------------------------
+		[id(18), helpstring("method LogWithSpecifiedInfo")] HRESULT LogWithSpecifiedInfo(
+			BSTR bstrMachineName, BSTR bstrUserName, long nDateTimeUtc, long nPid,
+			BSTR bstrApplicationName);
+		//-----------------------------------------------------------------------------------------
 	};
 	[
 		uuid(FC391C54-6F67-436E-B7C5-DA799737752E),

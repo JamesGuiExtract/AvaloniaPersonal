@@ -47,7 +47,7 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
@@ -59,7 +59,7 @@
     <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
@@ -113,9 +113,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\ExtensionMethods\Core\Code\Extract.ExtensionMethods.csproj">
-      <Project>{40DE51C9-1848-4897-93C6-78CF24C33516}</Project>
-      <Name>Extract.ExtensionMethods</Name>
+    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
+      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
+      <Name>Extract</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\WCFInterface\Core\Code\Extract.ExceptionService.WCFInterface.csproj">
       <Project>{E2701E73-4D37-477B-8359-5614136DFA09}</Project>

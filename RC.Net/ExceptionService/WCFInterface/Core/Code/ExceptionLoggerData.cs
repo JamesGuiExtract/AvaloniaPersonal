@@ -33,8 +33,9 @@ namespace Extract.ExceptionService
         /// Version 3: The exception data is now split into a collection of strings
         /// that are 8000 characters or less when it is serialized so that the
         /// data does not exceed the default XML serializer length limits.
+        /// Version 4: Added Machine Name, User Name, DateTime, ProcessID, Software Version
         /// </summary>
-        readonly static int _CURRENT_VERSION = 3;
+        readonly static int _CURRENT_VERSION = 4;
 
         /// <summary>
         /// The length at which to split the serialized exception.
@@ -46,14 +47,45 @@ namespace Extract.ExceptionService
         #region Fields
 
         /// <summary>
-        /// The exception data to serialize
+        /// The base time to use when calculating the DateTimeUtc value.
         /// </summary>
-        Exception _data;
+        static readonly DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
-        /// The ELI code associated with the exception
+        /// Gets the <see cref="Exception"/> associated with this class.
         /// </summary>
-        string _eliCode;
+        public Exception ExceptionData { get; private set;}
+
+        /// <summary>
+        /// Gets the ELI code for this exception (may be <see cref="String.Empty"/>).
+        /// </summary>
+        public string EliCode { get; private set; }
+
+        /// <summary>
+        /// Gets the machine name associated with the exception data.
+        /// </summary>
+        public string MachineName { get; private set; }
+
+        /// <summary>
+        /// Gets the user name associated with the exception data
+        /// </summary>
+        public string UserName { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> that has been converted to the number of
+        /// seconds since 01/01/1970 00:00:00 UTC.
+        /// </summary>
+        public int DateTimeUtc { get; private set; }
+
+        /// <summary>
+        /// Gets the process ID associated with the exception data.
+        /// </summary>
+        public int ProcessId { get; private set; }
+
+        /// <summary>
+        /// Gets the product version string associated with the exception data.
+        /// </summary>
+        public string ProductVersion { get; private set; }
 
         #endregion Fields
 
@@ -63,8 +95,15 @@ namespace Extract.ExceptionService
         /// Initializes a new instance of the <see cref="ExceptionLoggerData"/> class.
         /// </summary>
         /// <param name="data">The exception to be logged.</param>
-        public ExceptionLoggerData(Exception data)
-            : this(data, string.Empty)
+        /// <param name="machineName">Name of the machine.</param>
+        /// <param name="userName">Name of the user.</param>
+        /// <param name="dateTimeUtc">The date time in UTC from calling the method
+        /// <see cref="DateTime.ToFileTimeUtc"/>.</param>
+        /// <param name="processId">The process id.</param>
+        /// <param name="productVersion">The product version.</param>
+        public ExceptionLoggerData(Exception data, string machineName,
+            string userName, long dateTimeUtc, int processId, string productVersion)
+            : this(data, string.Empty, machineName, userName, dateTimeUtc, processId, productVersion)
         {
         }
 
@@ -74,15 +113,27 @@ namespace Extract.ExceptionService
         /// <param name="data">The exception to be logged.</param>
         /// <param name="eliCode">The ELI code to add to the exception data. This
         /// may not be <see langword="null"/></param>
-        public ExceptionLoggerData(Exception data, string eliCode)
+        /// <param name="machineName">Name of the machine.</param>
+        /// <param name="userName">Name of the user.</param>
+        /// <param name="dateTimeUtc">The date time in UTC from calling the method
+        /// <see cref="DateTime.ToFileTimeUtc"/>.</param>
+        /// <param name="processId">The process id.</param>
+        /// <param name="productVersion">The product version.</param>
+        public ExceptionLoggerData(Exception data, string eliCode, string machineName,
+            string userName, long dateTimeUtc, int processId, string productVersion)
         {
             if (eliCode == null)
             {
-                throw new ArgumentException("Value must not be null", "eliCode");
+                throw new ArgumentNullException("eliCode", "Value must not be null");
             }
 
-            _data = data;
-            _eliCode = eliCode;
+            ExceptionData = data;
+            EliCode = eliCode;
+            MachineName = machineName ?? string.Empty;
+            UserName = userName ?? string.Empty;
+            DateTimeUtc = (int)(DateTime.FromFileTimeUtc(dateTimeUtc) - baseTime).TotalSeconds;
+            ProcessId = processId;
+            ProductVersion = productVersion ?? string.Empty;
         }
 
         /// <summary>
@@ -100,10 +151,30 @@ namespace Extract.ExceptionService
                 ex.Data["MaxVersion"] = _CURRENT_VERSION;
                 throw ex;
             }
+
+            // Set the default values
+            EliCode = string.Empty;
+            MachineName = string.Empty;
+            UserName = string.Empty;
+            ProcessId = 0;
+            ProductVersion = string.Empty;
+            if (version < 4)
+            {
+                // Versions less than 4 did not have time stamp, set to current time
+                DateTimeUtc = (int)(DateTime.UtcNow - baseTime).TotalSeconds;
+            }
+
+            // Get the ELI code if after version 1
+            if (version > 1)
+            {
+                EliCode = info.GetString("EliCode");
+            }
+
+            // Get the serialized exception data
+            string data = string.Empty;
             if (version < 3)
             {
-                string data = info.GetString("ExceptionString");
-                _data = data.DeserializeFromHexString<Exception>();
+                data = info.GetString("ExceptionString");
             }
             else
             {
@@ -119,13 +190,17 @@ namespace Extract.ExceptionService
                     sb.Append(info.GetString(_EXCEPTION_PIECE_TAG
                         + i.ToString(CultureInfo.InvariantCulture)));
                 }
-
-                _data = sb.ToString().DeserializeFromHexString<Exception>();
+                data = sb.ToString();
             }
+            ExceptionData = data.DeserializeFromHexString<Exception>();
 
-            if (version > 1)
+            if (version >= 4)
             {
-                _eliCode = info.GetString("EliCode");
+                MachineName = info.GetString("MachineName");
+                UserName = info.GetString("UserName");
+                DateTimeUtc = info.GetInt32("DateTimeUtc");
+                ProcessId = info.GetInt32("ProcessId");
+                ProductVersion = info.GetString("ProductVersion");
             }
         }
 
@@ -144,7 +219,7 @@ namespace Extract.ExceptionService
             info.AddValue("CurrentVersion", _CURRENT_VERSION);
 
             // Serialize to a list of strings
-            List<string> strings = SerializeExceptionToHexStrings(_data);
+            List<string> strings = SerializeExceptionToHexStrings(ExceptionData);
 
             // Store the count of string pieces that make up the serialized exception
             info.AddValue("StringCount", strings.Count);
@@ -154,7 +229,12 @@ namespace Extract.ExceptionService
                 info.AddValue(_EXCEPTION_PIECE_TAG
                     + i.ToString(CultureInfo.InvariantCulture), strings[i]);
             }
-            info.AddValue("EliCode", _eliCode);
+            info.AddValue("EliCode", EliCode);
+            info.AddValue("MachineName", MachineName);
+            info.AddValue("UserName", UserName);
+            info.AddValue("DateTimeUtc", DateTimeUtc);
+            info.AddValue("ProcessId", ProcessId);
+            info.AddValue("ProductVersion", ProductVersion);
         }
 
         #endregion
@@ -170,7 +250,17 @@ namespace Extract.ExceptionService
         /// </returns>
         static List<string> SerializeExceptionToHexStrings(Exception e)
         {
-            string hexException = e.ToSerializedHexString();
+            string hexException = null;
+            try
+            {
+                hexException = e.ToSerializedHexString();
+            }
+            catch (SerializationException se)
+            {
+                // Handle the case where the exception cannot be serialized
+                hexException = new UnableToSerializeException("ELI32592", e, se)
+                    .ToSerializedHexString();
+            }
 
             // Need to split the string at 8000 character increments due to 
             // XML serializer length limitations.
@@ -188,31 +278,5 @@ namespace Extract.ExceptionService
         }
 
         #endregion Methods
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the <see cref="Exception"/> associated with this class.
-        /// </summary>
-        public Exception ExceptionData
-        {
-            get
-            {
-                return _data;
-            }
-        }
-
-        /// <summary>
-        /// Gets the ELI code for this exception (may be <see cref="String.Empty"/>).
-        /// </summary>
-        public string EliCode
-        {
-            get
-            {
-                return _eliCode;
-            }
-        }
-
-        #endregion Properties
     }
 }

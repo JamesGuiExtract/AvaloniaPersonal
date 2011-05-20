@@ -62,13 +62,9 @@
   <ItemGroup>
     <Compile Include="ExceptionLoggerData.cs" />
     <Compile Include="IExtractExceptionLogger.cs" />
+    <Compile Include="InternalHelperExtensionMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Core\ExtensionMethods\Core\Code\Extract.ExtensionMethods.csproj">
-      <Project>{40DE51C9-1848-4897-93C6-78CF24C33516}</Project>
-      <Name>Extract.ExtensionMethods</Name>
-    </ProjectReference>
+    <Compile Include="UnableToSerializeException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

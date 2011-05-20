@@ -4,6 +4,8 @@
 
 #include "resource.h"       // main symbols
 
+#include <memory>
+
 class UCLIDException;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -15,7 +17,7 @@ class ATL_NO_VTABLE CCOMUCLIDException :
 	public IDispatchImpl<ICOMUCLIDException, &IID_ICOMUCLIDException, &LIBID_UCLID_EXCEPTIONMGMTLib>
 {
 private:
-	UCLIDException *m_pException;
+	std::unique_ptr<UCLIDException> m_upException;
 
 public:
 	CCOMUCLIDException();
@@ -52,6 +54,9 @@ public:
 	STDMETHOD(GetStackTraceCount)(long *pnIndex);
 	STDMETHOD(GetDebugInfo)(long nIndex, BSTR* pbstrKeyName, BSTR* pbstrStringizedValue);
 	STDMETHOD(GetDebugInfoCount)(long *pnIndex);
+	STDMETHOD(GetApplicationName)(BSTR* pbstrAppName);
+	STDMETHOD(LogWithSpecifiedInfo)(BSTR bstrMachineName, BSTR bstrUserName, long nDateTimeUtc,
+		long nPid, BSTR bstrAppName);
 
 private:
 	// Method creates exception with the data from the COMUCLIDException object passed

@@ -282,8 +282,18 @@ public:
 	// PURPOSE: To format a string suitable for output by log() or saveTo()
 	// REQUIRE: Nothing.
 	// PROMISE: Nothing
-	// ARGS:	None.
-	string createLogString() const;
+	// ARGS:	pszMachineName: The name of the machine to place in the log string (if the
+	//				machine name is __nullptr then the current machine name will be used)
+	//			pszUserName: The name of the user to place in the log string (if the user name
+	//				is __nullptr then the current user name will be used)
+	//			nDateTime: The number of seconds since 01/01/1970 00:00:00 UTC to place in the
+	//				log string (if -1, then	the current time will be used)
+	//			nPid: The process id to place in the log string (if -1 the current pid will be used)
+	//			pszProductVersion: The product version to place in the log string (if __nullptr
+	//				the current product version will be used.
+	string createLogString(const char* pszMachineName = __nullptr,
+		const char* pszUserName = __nullptr, long nDateTime = -1, int nPid = -1,
+		const char* pszProductVersion = __nullptr) const;
 	//----------------------------------------------------------------------------------------------		
 	// PURPOSE: To retrieve text for the exception.
 	// PROMISE: To return the exception text associated with this exception.
@@ -340,7 +350,18 @@ public:
 	//				exceptions that are not displayed to the user.
 	//			bAddDisplayedTag: Prefix the description with "Displayed: " to indicated the
 	//				exception was originally displayed to the user.
-	void log(const string& strFile = "", bool bNotifyFDRS = true, bool bAddDisplayedTag = false) const;
+	//			pszMachineName: The name of the machine to place in the log string (if the
+	//				machine name is __nullptr then the current machine name will be used)
+	//			pszUserName: The name of the user to place in the log string (if the user name
+	//				is __nullptr then the current user name will be used)
+	//			nDateTime: The number of seconds since 01/01/1970 00:00:00 UTC to place in the
+	//				log string (if -1, then	the current time will be used)
+	//			nPid: The process id to place in the log string (if -1 the current pid will be used)
+	//			pszProductVersion: The product version to place in the log string (if __nullptr
+	//				the current product version will be used.
+	void log(const string& strFile = "", bool bNotifyFDRS = true, bool bAddDisplayedTag = false,
+		const char* pszMachineName = __nullptr, const char* pszUserName = __nullptr,
+		long nDateTime = -1, int nPid = -1, const char* pszProductVersion = __nullptr) const;
 	//----------------------------------------------------------------------------------------------	
 	// PURPOSE: To save the contents of vectors into file strFile
 	// REQUIRE: all parameters should contain valid information.
@@ -407,7 +428,7 @@ public:
 	//----------------------------------------------------------------------------------------------
 	static void setSerialNumber(string strSerial);
 	//----------------------------------------------------------------------------------------------
-	static const string& getApplication(void);
+	static string getApplication(void);
 	//----------------------------------------------------------------------------------------------
 	static const string& getSerialNumber(void);
 	//----------------------------------------------------------------------------------------------
