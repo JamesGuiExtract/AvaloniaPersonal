@@ -231,13 +231,15 @@ namespace Extract.Utilities.Forms
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI32358",
                     _OBJECT_NAME);
 
+                uint virtualKeyCode = 0;
+
                 // Extract the scan code for the key press
                 // http://msdn.microsoft.com/en-us/library/ms646280(VS.85).aspx
                 uint scanCode = (uint)(message.LParam.ToInt32() >> 16);
                 bool isExtendedKey = (scanCode & 0x0100) != 0;
                 scanCode = scanCode & 0x00FF;
 
-                // Although it is not supporte on all OS's, track extended keys by using an 0xe0
+                // Although it is not supported on all OS's, track extended keys by using an 0xe0
                 // prefix when possible.
                 // http://msdn.microsoft.com/en-us/library/ms646307(v=VS.85).aspx
                 if (isExtendedKey)
@@ -245,36 +247,17 @@ namespace Extract.Utilities.Forms
                     scanCode |= 0xe000;
                 }
 
-                uint virtualKeyCode;
-
                 lock (_keyMappingLock)
                 {
+                    // If this scan code has already been mapped return the mapped virtual key,
+                    // otherwise attempt to map it.
                     if (!_keyCodeMappings.TryGetValue(scanCode, out virtualKeyCode))
                     {
-                        // If we can convert the scan code to a virtual key code, then convert it
-                        // back to the original scan code, we have a proper mapping.
-                        virtualKeyCode =
-                            NativeMethods.ConvertKeyCode(scanCode, false, distinguishLeftRight);
-                        if (!isExtendedKey ||
-                            scanCode == NativeMethods.ConvertKeyCode(
-                                virtualKeyCode, true, distinguishLeftRight))
+                        if (!MapScanCodeToVirtualKey(
+                                ref scanCode, ref virtualKeyCode, distinguishLeftRight))
                         {
-                            // virtualKeyCode is valid
+                            return Keys.None;   
                         }
-                        else if (isExtendedKey && distinguishLeftRight)
-                        {
-                            // If on a system that doesn't support extended key scan codes, manually
-                            // handle special cases.
-                            uint nonExtendedScanCode = scanCode & 0x00FF;
-                            virtualKeyCode = MapSpecialExtendedKey(nonExtendedScanCode);
-                        }
-                        else
-                        {
-                            // Otherwise, we will return Keys.None.
-                            virtualKeyCode = 0;
-                        }
-
-                        _keyCodeMappings[scanCode] = virtualKeyCode;
                     }
                 }
 
@@ -305,47 +288,15 @@ namespace Extract.Utilities.Forms
 
                 lock (_keyMappingLock)
                 {
-                    // Check to see if the virtual key code can be converted to a scancode, then back to
-                    // the same virtual key code. If so, it is recognized.
+                    
                     uint virtualKeyCode = (uint)key;
-                    uint scanCode =
-                        NativeMethods.ConvertKeyCode(virtualKeyCode, true, distinguishLeftRight);
-                    if (virtualKeyCode ==
-                        NativeMethods.ConvertKeyCode(scanCode, false, distinguishLeftRight))
-                    {
-                        if (_keyCodeMappings.ContainsKey(scanCode))
-                        {
-                            return true;
-                        }
+                    uint scanCode = 0;
 
-                        // Map the scan code to the virtual key code for faster lookup in the future.
-                        if (virtualKeyCode ==
-                            NativeMethods.ConvertKeyCode(scanCode, false, distinguishLeftRight))
-                        {
-                            _keyCodeMappings[scanCode] = virtualKeyCode;
-                            return true;
-                        }
-                    }
-                    // If we failed to find a mapping, but distinguishLeftRight is true, see if a
-                    // special extended key case applies that we can use to map the key.
-                    else if (distinguishLeftRight)
-                    {
-                        // If the virtual key code can be converted to a scancode without left/right
-                        // distinction, then back to the same virtual key code using
-                        // MapSpecialExtendedKey, consider it a recognized mapping.
-                        scanCode = NativeMethods.ConvertKeyCode(virtualKeyCode, true, false);
-                        uint newVirtualKeyCode = MapSpecialExtendedKey(scanCode);
-                        if (virtualKeyCode == newVirtualKeyCode)
-                        {
-                            // Apply the extended key prefix to the mapped scan-code.
-                            scanCode |= 0xe000;
-                            _keyCodeMappings[scanCode] = virtualKeyCode;
-                            return true;
-                        }
-                    }
+                    // Check to see if the virtual key code can be converted to a scancode, then
+                    // back to the same virtual key code. If so, it is recognized.
+                    return MapScanCodeToVirtualKey(
+                        ref scanCode, ref virtualKeyCode, distinguishLeftRight);
                 }
-
-                return false;
             }
             catch (Exception ex)
             {
@@ -378,20 +329,122 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Attempts to map the specified scan code and/or virtual key code. If either value is 0,
+        /// the method will attempt to find the corresponding code. If both values are specified, the
+        /// method may attempt different values for one or the other code to find a valid mapping.
+        /// <para><b>Note</b></para>
+        /// This method must be called within a lock of _keyMappingLock.
+        /// </summary>
+        /// <param name="scanCode">The scan code.</param>
+        /// <param name="virtualKeyCode">The virtual key code.</param>
+        /// <param name="distinguishLeftRight"><see langword="true"/> if the mapping should be able
+        /// to distiguish left vs right hand keys, <see langword="false"/> otherwise.</param>
+        /// <returns><see langword="true"/> if a valid mapping exists; otherwise,
+        /// <see langword="true"/>.</returns>
+        static bool MapScanCodeToVirtualKey(ref uint scanCode, ref uint virtualKeyCode, bool distinguishLeftRight)
+        {
+            ExtractException.Assert("ELI32594", "Invalid parameters.", scanCode != 0 || virtualKeyCode != 0);
+
+            // If either code is not specified, attempt to find the corresponding code.
+            if (scanCode == 0)
+            {
+                scanCode = NativeMethods.ConvertKeyCode(virtualKeyCode, true, distinguishLeftRight);
+            }
+            else if (virtualKeyCode == 0)
+            {
+                virtualKeyCode =
+                    NativeMethods.ConvertKeyCode(scanCode, false, distinguishLeftRight);
+            }
+
+            // Verify that converting the specified scanCode yields the specified virtual key. If
+            // so, we have a valid mapping.
+            if (virtualKeyCode != 0 && virtualKeyCode ==
+                    NativeMethods.ConvertKeyCode(scanCode, false, distinguishLeftRight))
+            {
+                if (!_keyCodeMappings.ContainsKey(scanCode))
+                {
+                    // Map the scan code to the virtual key code for faster lookup in the future.
+                    _keyCodeMappings[scanCode] = virtualKeyCode;
+                }
+
+                return true;
+            }
+            else 
+            {
+                // If the scan code doesn't directly map to the virtual key but distinguishLeftRight is
+                // true, see if a special extended key case applies that we can use to map the key.
+                if (distinguishLeftRight)
+                {
+                    if (scanCode == 0)
+                    {
+                        // If the virtual key code can be converted to a scancode without left/right
+                        // distinction, then back to the same virtual key code using
+                        // MapSpecialExtendedKey, it is to be considered a recognized mapping.
+                        scanCode = NativeMethods.ConvertKeyCode(virtualKeyCode, true, false);
+                    }
+
+                    uint newVirtualKeyCode = MapSpecialExtendedKey(scanCode);
+
+                    // As long as the special extended key mapping yielded the desired virtual key
+                    // (or yielded a virtual key we did not have before) we have found a valid
+                    // mapping.
+                    if (newVirtualKeyCode != 0)
+                    {
+                        if (virtualKeyCode == 0)
+                        {
+                            virtualKeyCode = newVirtualKeyCode;
+                        }
+
+                        if (virtualKeyCode == newVirtualKeyCode)
+                        {
+                            // Ensure the mapping is applied using the extended key version of the
+                            // scan-code.
+                            scanCode |= 0xe000;
+
+                            _keyCodeMappings[scanCode] = virtualKeyCode;
+                            return true;
+                        }
+                    }
+                }
+
+                // [FlexIDSCore:4587]
+                // If the scan code is for an extended key and a virtual key mapping could not be found,
+                // attempt to treat it as a non-extended key and see if it can be mapped that way.
+                if ((scanCode & 0xe000) != 0 && virtualKeyCode == 0)
+                {
+                    uint nonExtendedScanCode = scanCode & 0x00FF;
+                    virtualKeyCode = NativeMethods.ConvertKeyCode(nonExtendedScanCode, false, false);
+
+                    if (virtualKeyCode != 0 && MapScanCodeToVirtualKey(
+                            ref nonExtendedScanCode, ref virtualKeyCode, distinguishLeftRight))
+                    {
+                        _keyCodeMappings[scanCode] = virtualKeyCode;
+
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Assuming <see paramref="nonExtendedScanCode"/> corresponds to an extended key, attempts
         /// to map the code to a virtual key code if it is a known special case.
         /// For example, if the non-extended scan code maps to VK_CONTROL, but we know the key is an
         /// extended key, we can deduce that the key is the right control key since only the right
         /// control key is an extended key.
         /// </summary>
-        /// <param name="nonExtendedScanCode">The scan code retrieved by using MapVirtualKeyEx with
+        /// <param name="scanCode">The scan code retrieved by using MapVirtualKeyEx with
         /// MAPVK_VK_TO_VSC (no left/right distinction).</param>
-        /// <returns>The virtual key code associated with the specified
-        /// <see paramref="nonExtendedScanCode"/> or 0 if the specified scan code is not a handled
-        /// special case.</returns>
-        static uint MapSpecialExtendedKey(uint nonExtendedScanCode)
+        /// <returns>The virtual key code associated with the specified <see paramref="scanCode"/>
+        /// or 0 if the specified scan code is not a handled special case.</returns>
+        static uint MapSpecialExtendedKey(uint scanCode)
         {
-            uint virtualKeyCode = NativeMethods.ConvertKeyCode(nonExtendedScanCode, false, false);
+            // Ensure we are dealing with a non-extended scan code.
+            scanCode = scanCode & 0x00FF;
+
+            uint virtualKeyCode = NativeMethods.ConvertKeyCode(scanCode, false, false);
 
             switch ((Keys)virtualKeyCode)
             {

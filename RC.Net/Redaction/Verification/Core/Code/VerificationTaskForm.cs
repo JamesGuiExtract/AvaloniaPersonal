@@ -3182,6 +3182,35 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="ImageViewer.PageChanged"/> event in order to reset the slideshow
+        /// timer.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.PageChangedEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleImageViewerPageChanged(object sender, PageChangedEventArgs e)
+        {
+            try
+            {
+                // [FlexIDSCore:4676]
+                // When the page changes while the slideshow is running, the slideshow timer needs
+                // to start over.
+                if (_slideshowTimer.Enabled)
+                {
+                    _slideShowTimerBarControl.StartTimer(_slideshowTimer.Interval);
+                    
+                    // Restart the timer
+                    _slideshowTimer.Stop();
+                    _slideshowTimer.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32596");
+            }
+        }
+
         #endregion Event Handlers
 
         #region IVerificationForm Members
@@ -3491,9 +3520,18 @@ namespace Extract.Redaction.Verification
         void StartSlideshowTimer()
         {
             ExtractException.Assert("ELI32180", "Slideshow error.", _slideshowRunning);
+
+            if (!_slideshowTimer.Enabled)
+            {
+                // As long as the slideshow timer is not already running (to protected against
+                // duplicate registrations of the PageChanged event), add handling of handle
+                // PageChanged events so that the timer can be reset when the page changes.
+                _imageViewer.PageChanged += HandleImageViewerPageChanged;
+            }
+
             _slideShowTimerBarControl.Visible = true;
             _slideShowTimerBarControl.StartTimer(_slideshowTimer.Interval);
-            _slideshowTimer.Enabled = true;
+            _slideshowTimer.Start();
 
             if (_slideshowTimerLastStopTime.HasValue && 
                 DateTime.Now.AddSeconds(-10) > _slideshowTimerLastStopTime)
@@ -3511,7 +3549,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void StopSlideshowTimer()
         {
-            _slideshowTimer.Enabled = false;
+            if (_slideshowTimer.Enabled)
+            {
+                _imageViewer.PageChanged -= HandleImageViewerPageChanged;
+            }
+
+            _slideshowTimer.Stop();
             _slideShowTimerBarControl.StopTimer(true);
             if (_slideshowRunning)
             {
