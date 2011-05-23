@@ -171,8 +171,9 @@ namespace Extract.Utilities.Forms
         void HandleTargetPaint(object sender, PaintEventArgs e)
         {
             // [FlexIDSCore:4556]
-            // It seems in some cases e.Graphics must be null. In that case, nothing can be drawn.
-            if (e.Graphics == null)
+            // It seems in some cases e.Graphics must be null (or perhaps _target is disposed?).
+            // In that case, nothing can be drawn.
+            if (e.Graphics == null || _target.IsDisposed)
             {
                 return;
             }
@@ -203,7 +204,14 @@ namespace Extract.Utilities.Forms
 	        }
 	        catch (Exception ex)
 	        {
-		        ExtractException.Display("ELI31110", ex);
+                // [FlexIDSCore:4556]
+                // Since we are getting an exception in rare cases, and since I have not had much
+                // luck finding a way to resolve the issue, I am changing the exception handling to
+                // log instead of display. In the cases I have seen (at least), the overlay text is
+                // still seen, its just that a single fleeting call generates an exception. The
+                // display of the exception is interfering with use of the software for a UI problem
+                // that would otherwise be undetectable.
+		        ExtractException.Log("ELI31110", ex);
 	        }
             finally
             {
