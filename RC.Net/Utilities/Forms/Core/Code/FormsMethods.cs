@@ -257,7 +257,7 @@ namespace Extract.Utilities.Forms
                     container.ParentForm.Controls.Add(temp);
 
                     // Iterate the top toolstrip panel. For any toolstrip on the top panel
-                    // move it to the bottom panel.
+                    // move it to a temporary panel.
                     for (int i = 0; i < top.Controls.Count; i++)
                     {
                         ToolStrip item = top.Controls[i] as ToolStrip;
@@ -273,6 +273,20 @@ namespace Extract.Utilities.Forms
 
                     // Now reload the toolstrips, this should move them to the correct location
                     ToolStripManager.LoadSettings(container.ParentForm);
+
+                    // [DotNetRCAndUtils:673]
+                    // If any toolstrips remain in the temporary ToolStripPanel (such as when the
+                    // application's user.config file doesn't exist) move them back to the top
+                    // toolstrip container manually.
+                    if (temp.Controls.Count > 0)
+                    {
+                        while (temp.Controls.Count > 0)
+                        {
+                            ((ToolStrip)temp.Controls[0]).Parent = top;
+                        }
+
+                        container.PerformLayout();
+                    }
 
                     container.ParentForm.Controls.Remove(temp);
                 }
