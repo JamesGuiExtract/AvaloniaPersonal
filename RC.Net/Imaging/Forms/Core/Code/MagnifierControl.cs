@@ -100,7 +100,7 @@ namespace Extract.Imaging.Forms
                     {
                         if (_imageViewer != null)
                         {
-                            _imageViewer.PostImagePaint -= HandleImageViewerPostImagePaint;
+                            _imageViewer.PreImagePaint -= HandleImageViewerPreImagePaint;
                             _imageViewer.MouseMove -= HandleImageViewerMouseMove;
                             _imageViewer.MouseLeave -= HandleImageViewerMouseLeave;
                             _imageViewer.ImageFileClosing -= HandleImageFileClosing;
@@ -110,7 +110,7 @@ namespace Extract.Imaging.Forms
                         _imageViewer = value;
                         _active = _imageViewer.IsImageAvailable;
 
-                        _imageViewer.PostImagePaint += HandleImageViewerPostImagePaint;
+                        _imageViewer.PreImagePaint += HandleImageViewerPreImagePaint;
                         _imageViewer.MouseMove += HandleImageViewerMouseMove;
                         _imageViewer.MouseLeave += HandleImageViewerMouseLeave;
                         _imageViewer.ImageFileClosing += HandleImageFileClosing;
@@ -171,18 +171,18 @@ namespace Extract.Imaging.Forms
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer"/> PostImagePaint event.
+        /// Handles the <see cref="ImageViewer"/> PreImagePaint event.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs"/>
         /// instance containing the event data.</param>
-        void HandleImageViewerPostImagePaint(object sender, PaintEventArgs e)
+        void HandleImageViewerPreImagePaint(object sender, PaintEventArgs e)
         {
             try
             {
                 if (!_painting)
                 {
-                    // As long as the post paint event wasn't a result of this control's paint,
+                    // As long as the pre paint event wasn't a result of this control's paint,
                     // update the magnifier.
                     DoRefresh();
                 }

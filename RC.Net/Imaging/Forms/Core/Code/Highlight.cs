@@ -1324,8 +1324,6 @@ namespace Extract.Imaging.Forms
                         ResizeActiveHighlight(mouse);
                     }
                 }
-
-                imageViewer.Invalidate();
             }
             catch (Exception ex)
             {
