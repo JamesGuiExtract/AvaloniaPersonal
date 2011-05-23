@@ -233,6 +233,8 @@ private:
     static void createTRPObject();
 	static void closeTRPObject();
 
+	static bool m_bDoNotCheckTempLicenseYet;
+
     // Throws exception if the Annotation support is not licensed
     static void validateAnnotationLicense();
 
@@ -248,6 +250,10 @@ private:
     //		 to use the same logic to check the licensed state of a
     //		 component.
     static bool internalIsLicensed(unsigned long ulLicenseID);
+
+	// Will either start or stop the TRP service based on whether the current license
+	// data contains an expiring component
+	static void startOrCloseTrpBasedOnLicenseData();
 
     ///////
     // Data

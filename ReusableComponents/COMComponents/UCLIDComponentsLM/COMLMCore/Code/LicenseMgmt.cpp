@@ -50,6 +50,7 @@ bool LicenseManagement::m_bUserLicenseFailure = false;
 long LicenseManagement::m_lOEMPassword = 0;
 bool LicenseManagement::m_bOEMPasswordOK = false;
 bool LicenseManagement::m_bFilesLoadedFromFolder = false;
+bool LicenseManagement::m_bDoNotCheckTempLicenseYet = false;
 LMData LicenseManagement::m_LicenseData;
 map<unsigned long, int> LicenseManagement::m_mapIdToDayLicensed;
 map<unsigned long, bool> LicenseManagement::m_mapIdToLicensed;
@@ -173,64 +174,50 @@ void LicenseManagement::initializeLicenseFromFile(const std::string& strLicenseF
 	/////////////////////
 	try
 	{
-		try
+		if (Data.containsExpiringComponent() && Data.isFirstComponentExpired())
 		{
-			if (Data.containsExpiringComponent() && Data.isFirstComponentExpired())
+			// Attempt to rename the license file to expired
+			try
 			{
-				// Attempt to rename the license file to expired
-				try
-				{
-					moveFile(strFQPath, strFQPath + ".expired", true, true);
-				}
-				catch(UCLIDException& uex)
-				{
-					uex.log();
-				}
-
-				// Log an application trace about the expired file
-				UCLIDException uex("ELI32449", "Application Trace: License file is expired.");
-				uex.addDebugInfo("License File Name", strFQPath);
+				moveFile(strFQPath, strFQPath + ".expired", true, true);
+			}
+			catch(UCLIDException& uex)
+			{
 				uex.log();
-
-				// Do not do anything else with this license data since it is expired
-				return;
 			}
 
-			// prevent simultaneous access to this object from multiple threads
-			CSingleLock guard(&m_lock, TRUE);
+			// Log an application trace about the expired file
+			UCLIDException uex("ELI32449", "Application Trace: License file is expired.");
+			uex.addDebugInfo("License File Name", strFQPath);
+			uex.log();
 
-			// Update data member with this object
-			updateLicenseData( Data );
-
-			// Update the OEM password (log a trace if the password was previously set and
-			// it has changed)
-			if (m_lOEMPassword != 0 && m_lOEMPassword != lOEMPassword)
-			{
-				UCLIDException ue("ELI32456", "Application Trace: OEM sdk mismatch.");
-				ue.addDebugInfo("Previous OEM", m_lOEMPassword, true);
-				ue.addDebugInfo("New OEM", lOEMPassword, true);
-				ue.log();
-			}
-			m_lOEMPassword = lOEMPassword;
-
-			// Now check if we have any expiring components and launch TRP if necessary
-			if (m_LicenseData.containsExpiringComponent())
-			{
-				// Create call does nothing if TRP is already running
-				createTRPObject();
-			}
-			// If no expiring components then close TRP if it is running
-			else if (m_upTrpRunning.get() != __nullptr)
-			{
-				closeTRPObject();
-			}
+			// Do not do anything else with this license data since it is expired
+			return;
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10682")
+
+		// prevent simultaneous access to this object from multiple threads
+		CSingleLock guard(&m_lock, TRUE);
+
+		// Update data member with this object
+		updateLicenseData( Data );
+
+		// Update the OEM password (log a trace if the password was previously set and
+		// it has changed)
+		if (m_lOEMPassword != 0 && m_lOEMPassword != lOEMPassword)
+		{
+			UCLIDException ue("ELI32456", "Application Trace: OEM sdk mismatch.");
+			ue.addDebugInfo("Previous OEM", m_lOEMPassword, true);
+			ue.addDebugInfo("New OEM", lOEMPassword, true);
+			ue.log();
+		}
+		m_lOEMPassword = lOEMPassword;
+
+		if (!m_bDoNotCheckTempLicenseYet)
+		{
+			startOrCloseTrpBasedOnLicenseData();
+		}
 	}
-	catch (UCLIDException& ue)
-	{
-		ue.log();
-	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI10682");
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::initializeLicenseFromFile(const std::string& strLicenseFile,
@@ -385,14 +372,16 @@ void LicenseManagement::loadLicenseFilesFromFolder(std::string strDirectory,
 	// Find each license file in the directory
 	CFileFind	finder;
 	string	strLicenseFile;
-	BOOL	bResult = finder.FindFile( strDirectory.c_str() );
+	bool bResult = asCppBool(finder.FindFile(strDirectory.c_str()));
 
+	// Don't launch trp until after loading all license files
+	m_bDoNotCheckTempLicenseYet = true;
 	while (bResult)
 	{
-		bResult = finder.FindNextFile();
+		bResult = asCppBool(finder.FindNextFile());
 
 		// Retrieve path to this license file
-		strLicenseFile = (finder.GetFilePath()).operator LPCTSTR();
+		strLicenseFile = (LPCTSTR)finder.GetFilePath();
 
 		// Check extension
 		string strExt = getExtensionFromFullPath( strLicenseFile, true );
@@ -427,6 +416,8 @@ void LicenseManagement::loadLicenseFilesFromFolder(std::string strDirectory,
 		}
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI03904")
 	}
+	m_bDoNotCheckTempLicenseYet = false;
+	startOrCloseTrpBasedOnLicenseData();
 
 	// Set the files loaded from folder flag to true
 	m_bFilesLoadedFromFolder = true;
@@ -787,6 +778,21 @@ bool LicenseManagement::internalIsLicensed(unsigned long ulComponentID)
 	///////////////////
 
 	return m_LicenseData.isLicensed(ulComponentID);
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::startOrCloseTrpBasedOnLicenseData()
+{
+	// Now check if we have any expiring components and launch TRP if necessary
+	if (m_LicenseData.containsExpiringComponent())
+	{
+		// Create call does nothing if TRP is already running
+		createTRPObject();
+	}
+	// If no expiring components then close TRP if it is running
+	else if (m_upTrpRunning.get() != __nullptr)
+	{
+		closeTRPObject();
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::validateAnnotationLicense()
