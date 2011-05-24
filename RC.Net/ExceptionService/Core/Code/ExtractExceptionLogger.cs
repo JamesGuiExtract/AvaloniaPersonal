@@ -18,13 +18,13 @@ namespace Extract.ExceptionService
                 var ee = exceptionData.ExceptionData.AsExtract(exceptionData.EliCode);
                 ee.Log(exceptionData.MachineName, exceptionData.UserName,
                     exceptionData.DateTimeUtc, exceptionData.ProcessId,
-                    exceptionData.ProductVersion);
+                    exceptionData.ProductVersion, true);
             }
             catch (Exception exception)
             {
                 try
                 {
-                    exception.ExtractLog("ELI32580");
+                    exception.ExtractLog("ELI32580", true);
                 }
                 catch
                 {

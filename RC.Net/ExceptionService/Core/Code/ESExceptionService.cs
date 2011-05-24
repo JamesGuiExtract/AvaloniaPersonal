@@ -63,11 +63,12 @@ namespace Extract.ExceptionService
 
                 ResetHost();
 
-                ExtractException.Log("ELI30558", "Application Trace: Exception service started.");
+                ExtractException.Log("ELI30558", "Application Trace: Exception service started.",
+                    true);
             }
             catch (Exception ex)
             {
-                ex.ExtractLog("ELI30559");
+                ex.ExtractLog("ELI30559", true);
             }
         }
 
@@ -89,13 +90,14 @@ namespace Extract.ExceptionService
 
                 CloseHost();
 
-                ExtractException.Log("ELI30560", "Application Trace: Exception service stopped.");
+                ExtractException.Log("ELI30560", "Application Trace: Exception service stopped.",
+                    true);
 
                 base.OnStop();
             }
             catch (Exception ex)
             {
-                ex.ExtractLog("ELI30561");
+                ex.ExtractLog("ELI30561", true);
             }
         }
 
@@ -116,11 +118,11 @@ namespace Extract.ExceptionService
                 base.OnShutdown();
 
                 ExtractException.Log("ELI30565",
-                    "Application Trace: Exception service was shutdown.");
+                    "Application Trace: Exception service was shutdown.", true);
             }
             catch (Exception ex)
             {
-                ex.ExtractLog("ELI30566");
+                ex.ExtractLog("ELI30566", true);
             }
         }
 
@@ -162,13 +164,14 @@ namespace Extract.ExceptionService
                     {
                         ResetHost();
                         ExtractException.Log("ELI30562",
-                            "Application Trace: Exception service host was closed and restarted.");
+                            "Application Trace: Exception service host was closed and restarted.",
+                            true);
                     }
                 }
             }
             catch (Exception ex)
             {
-                ex.ExtractLog("ELI30563");
+                ex.ExtractLog("ELI30563", true);
             }
         }
 
@@ -211,7 +214,7 @@ namespace Extract.ExceptionService
             }
             catch (Exception ex)
             {
-                ex.ExtractLog("ELI30564");
+                ex.ExtractLog("ELI30564", true);
             }
         }
 

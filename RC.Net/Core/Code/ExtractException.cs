@@ -302,7 +302,19 @@ namespace Extract
         /// </summary>
         public void Log()
         {
-            Log(null);
+            Log(null, false);
+        }
+
+        /// <summary>
+        /// Log this exception to the standard exception log used by all of
+        /// Extract Systems' products.
+        /// <para>NOTE: This method should only be called once on a given ExtractException
+        /// object.  If this method is called more than once on a given ExtractException
+        /// object, the encrypted stack trace may contain duplicate entries.</para>
+        /// </summary>
+        public void Log(string fileName)
+        {
+            Log(fileName, false);
         }
 
         /// <summary>
@@ -311,7 +323,7 @@ namespace Extract
         /// object.  If this method is called more than once on a given ExtractException
         /// object, the encrypted stack trace may contain duplicate entries.</para>
         /// </summary>
-        public void Log(string fileName)
+        public void Log(string fileName, bool forceLocal)
         {
             // Ensure the log function does not throw any exceptions
             try
@@ -328,7 +340,14 @@ namespace Extract
                 {
                     // Call the Log() method on the UCLIDException object to cause the exception to get
                     // logged to the standard log file used by all Extract Systems products.
-                    uex.Log();
+                    if (forceLocal)
+                    {
+                        uex.LogLocal();
+                    }
+                    else
+                    {
+                        uex.Log();
+                    }
                 }
                 else
                 {
@@ -369,8 +388,11 @@ namespace Extract
         /// seconds since 01/01/1970 00:00:00.</param>
         /// <param name="processId">The process id.</param>
         /// <param name="applicationName">Name of the application.</param>
+        /// <param name="noRemote">If <see langword="true"/> then forces the logging
+        /// of the exception to the local log even if a remote address is specified in
+        /// the registry.</param>
         public void Log(string machineName, string userName, int dateTimeUtc,
-            int processId, string applicationName)
+            int processId, string applicationName, bool noRemote)
         {
             // Ensure the log function does not throw any exceptions
             try
@@ -384,7 +406,8 @@ namespace Extract
                 UCLID_EXCEPTIONMGMTLib.COMUCLIDException uex = AsCppException();
 
                 // Log the exception with the specified information
-                uex.LogWithSpecifiedInfo(machineName, userName, dateTimeUtc, processId, applicationName);
+                uex.LogWithSpecifiedInfo(machineName, userName, dateTimeUtc, processId, applicationName,
+                    noRemote);
             }
             catch (Exception e)
             {
@@ -1054,9 +1077,21 @@ namespace Extract
         /// <param name="message">The message.</param>
         public static void Log(string eliCode, string message)
         {
+            Log(eliCode, message, false);
+        }
+
+        /// <summary>
+        /// Logs the specified message and eli code to the Extract Systems log.
+        /// </summary>
+        /// <param name="eliCode">The eli code.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="forceLocal">Logs the exception to the local log instead of
+        /// remotely.</param>
+        public static void Log(string eliCode, string message, bool forceLocal)
+        {
             try
             {
-                new ExtractException(eliCode, message).Log();
+                new ExtractException(eliCode, message).Log(null, forceLocal);
             }
             catch (Exception ex)
             {
@@ -1566,7 +1601,7 @@ namespace Extract
                 }
 
                 string[] tokens = lines[lineNumber - 1].Split(',');
-                if (tokens.Length != 7)
+                if (tokens.Length != 7 && tokens.Length != 1)
                 {
                     ExtractException ee = new ExtractException("ELI30277",
                         "Invalid number of tokens in the exception file.");
@@ -1627,6 +1662,17 @@ namespace Extract
         public static void ExtractLog(this Exception ex, string eliCode, string logFileName)
         {
             ExtractException.Log(logFileName, eliCode, ex);
+        }
+
+        /// <summary>Logs the exception to the Extract exception log.</summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="eliCode">The eli code to associate with the exception.</param>
+        /// <param name="forceLocal">If <see langword="true"/> will log the exception to
+        /// the local log.</param>
+        public static void ExtractLog(this Exception ex, string eliCode, bool forceLocal)
+        {
+            var ee = ex.AsExtract(eliCode);
+            ee.Log(null, forceLocal);
         }
 
         /// <summary>

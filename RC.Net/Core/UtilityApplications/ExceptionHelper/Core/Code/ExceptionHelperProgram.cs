@@ -1,6 +1,7 @@
 using Extract.ExceptionService;
 using Extract.Utilities;
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -49,7 +50,7 @@ namespace Extract.ExceptionHelper
         {
             try
             {
-                if (args.Length < 1 || args.Length > 10)
+                if (args.Length < 1 || args.Length > 11)
                 {
                     ShowUsage("Incorrect number of arguments.");
                     return;
@@ -69,6 +70,7 @@ namespace Extract.ExceptionHelper
                 int processId = -1;
                 string productName = null;
                 string eliCode = null;
+                bool deleteExceptionFile = false;
                 for (int i = 1; i < args.Length; i++)
                 {
                     var argument = args[i];
@@ -138,6 +140,10 @@ namespace Extract.ExceptionHelper
                             return;
                         }
                     }
+                    else if (argument.Equals("/delete", StringComparison.OrdinalIgnoreCase))
+                    {
+                        deleteExceptionFile = true;
+                    }
                     else
                     {
                         ShowUsage("Unrecognized argument: " + argument);
@@ -157,8 +163,19 @@ namespace Extract.ExceptionHelper
                 }
 
                 // Load the exception from disk
-                string hexException = File.ReadAllText(fileName);
-                var exception = hexException.DeserializeFromHexString<Exception>();
+                var exception = ExtractException.LoadFromFile(eliCode, fileName);
+
+                if (deleteExceptionFile)
+                {
+                    try
+                    {
+                        File.Delete(fileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI32597", true);
+                    }
+                }
 
                 // Get the current time (needed for both the local and remote logging)
                 var dateTimeUtc = DateTime.UtcNow;
@@ -170,7 +187,7 @@ namespace Extract.ExceptionHelper
 
                     var ee = exception.AsExtract(eliCode);
                     ee.Log(Environment.MachineName, Environment.UserName, dateTime,
-                        processId, productName);
+                        processId, productName, true);
                 }
                 if (operation.HasFlag(ExceptionOperation.RemoteLog))
                 {
@@ -184,7 +201,7 @@ namespace Extract.ExceptionHelper
             }
             catch (Exception ex)
             {
-                ExtractException.Log("ELI30289", ex);
+                ex.ExtractLog("ELI30289", true);
             }
         }
 
@@ -226,8 +243,8 @@ namespace Extract.ExceptionHelper
                 }
 
                 // Failed to use logging service so log exception locally
-                ex2.ExtractLog("ELI32595");
-                ex.ExtractLog(eliCode);
+                ex2.ExtractLog("ELI32595", true);
+                ex.ExtractLog(eliCode, true);
             }
         }
 
@@ -260,7 +277,7 @@ namespace Extract.ExceptionHelper
             // Add the command line syntax
             usage.Append(Environment.GetCommandLineArgs()[0]);
             usage.Append(" </?>|<exceptionfile> [EliCode] [/display] [/log] [/remote <machine/ipaddress>]");
-            usage.Append(" [/pid <ProcessId>] [/product <ProductName>]");
+            usage.Append(" [/pid <ProcessId>] [/product <ProductName>] /delete");
             usage.AppendLine();
             usage.Append("The default behavior is for the exception to be logged locally.  ");
             usage.Append("If you would like to log locally and remotely you must specify both ");
@@ -279,6 +296,7 @@ namespace Extract.ExceptionHelper
             usage.AppendLine("    /remote - Log the exception to a remote machine.");
             usage.AppendLine("    <machine/ipaddress> - The name or ip address of the machine");
             usage.AppendLine("        that is running the exception service.");
+            usage.AppendLine("    /delete - Deletes the specified <exceptionfile> after logging the exception.");
 
             // Display the usage as an error or as an information box
             MessageBox.Show(usage.ToString(), isError ? "Error" : "Usage", MessageBoxButtons.OK,

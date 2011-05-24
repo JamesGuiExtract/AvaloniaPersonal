@@ -67,6 +67,12 @@ const unsigned long gnSIGNATURE_SIZE = 8;
 // Current version number of the UCLIDException class
 const unsigned long gnCURRENT_VERSION = 3;
 
+// The name of the exception helper application
+const string gstrEXCEPTION_HELPER_EXE = "ExceptionHelper.exe";
+
+// Registry key that contains the remote exception service address
+const string gstrREMOTE_EXCEPTION_LOGGER_KEY = "RemoteExceptionServiceAddress";
+
 UCLIDExceptionHandler* UCLIDException::ms_pCurrentExceptionHandler = __nullptr;	
 
 // Stores the name and version of the application throwing the exception
@@ -75,12 +81,16 @@ string UCLIDException::ms_strApplication = "";
 // Stores the hardware lock serial number
 string UCLIDException::ms_strSerial = "";
 
+bool UCLIDException::ms_bRemoteLoggerRead = false;
+string UCLIDException::ms_strRemoteExceptionLoggerAddress = "";
+
 // Path in the 'all user\application data' folder to the exception log
 // [LRCAU #5028 - 11/18/2008 JDS]
-const string gstrDEFAULT_EXCEPTION_LOG_PATH = "\\LogFiles\\Misc\\ExtractException.Uex";
+// [LRCAU #6115] - 05/23/2011 JDS] remove the \misc folder
+const string gstrDEFAULT_EXCEPTION_LOG_PATH = "\\LogFiles\\ExtractException.Uex";
 
 // Mutex for protecting access to the log file
-static unique_ptr<CMutex> apmutexLogFile;
+static unique_ptr<CMutex> upmutexLogFile;
 static CMutex smutexCreate;
 
 //-------------------------------------------------------------------------------------------------
@@ -89,21 +99,21 @@ static CMutex smutexCreate;
 CMutex* getLogFileMutex()
 {
 	// Check if the log file mutex has been created yet
-	if (apmutexLogFile.get() == __nullptr)
+	if (upmutexLogFile.get() == __nullptr)
 	{
 		// Lock around creating the log file mutex
 		CSingleLock lgTemp(&smutexCreate, TRUE);
 
 		// Check again if it has been created
-		if (apmutexLogFile.get() == __nullptr)
+		if (upmutexLogFile.get() == __nullptr)
 		{
 			// Create the log file mutex
-			apmutexLogFile.reset(getGlobalNamedMutex(gstrLOG_FILE_MUTEX));
-			ASSERT_RESOURCE_ALLOCATION("ELI29994", apmutexLogFile.get() != __nullptr);
+			upmutexLogFile.reset(getGlobalNamedMutex(gstrLOG_FILE_MUTEX));
+			ASSERT_RESOURCE_ALLOCATION("ELI29994", upmutexLogFile.get() != __nullptr);
 		}
 	}
 
-	return apmutexLogFile.get();
+	return upmutexLogFile.get();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -173,7 +183,7 @@ unsigned char* externManipulator(const char* pszInput, unsigned long* pulLength)
 		}
 
 		// Log this exception to the standard exception log
-		ue.log();
+		ue.log("", true, false, true);
 
 		// Now throw the exception
 		throw ue;
@@ -185,7 +195,7 @@ unsigned char* externManipulator(const char* pszInput, unsigned long* pulLength)
 void externLogException(char *pszELICode, char *pszMessage)
 {
 	UCLIDException ue( pszELICode, pszMessage);
-	ue.log();
+	ue.log("", true, false, true);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -906,7 +916,7 @@ void UCLIDException::renameLogFile(const string& strFileName, bool bUserRenamed,
 }
 //-------------------------------------------------------------------------------------------------
 void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent, bool bAddDisplayedTag,
-	const char* pszMachineName, const char* pszUserName, long nDateTime, int nPid,
+	bool bForceLocal, const char* pszMachineName, const char* pszUserName, long nDateTime, int nPid,
 	const char* pszProductVersion) const
 {
 	// Use try/catch block to trap any exception
@@ -914,6 +924,27 @@ void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent, bool
 	{
 		try
 		{
+			// Add the "Displayed" prefix if necessary
+			unique_ptr<UCLIDException> upUclid(__nullptr);
+			const UCLIDException* pEx = this;
+			if (bAddDisplayedTag)
+			{
+				upUclid.reset(new UCLIDException(*this));
+				upUclid->m_strDescription = "Displayed: " + upUclid->m_strDescription;
+				pEx = upUclid.get();
+			}
+
+			// Only log remotely if no remote is false and a file has not been specified
+			if (!bForceLocal && strFile.empty())
+			{
+				string strRemoteAddress = getRemoteLoggingAddress();
+				if (!strRemoteAddress.empty())
+				{
+					pEx->logExceptionRemotely(strRemoteAddress);
+					return;
+				}
+			}
+
 			// This is the name of the file we are actually going to log this exception to
 			string strOutputLogFile = (strFile == "") ? getDefaultLogFileFullPath() : strFile;
 
@@ -922,21 +953,9 @@ void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent, bool
 
 			// Make sure that the directory exists
 			createDirectory( strFolder );
-
-			// Prefix "Displayed:" if requested and write it to the output file.
-			if (bAddDisplayedTag)
-			{
-				UCLIDException ue2(*this);
-				ue2.m_strDescription = "Displayed: " + ue2.m_strDescription;
-
-				ue2.saveTo(strOutputLogFile, true, pszMachineName,
-					pszUserName, nDateTime, nPid, pszProductVersion);
-			}
-			else
-			{
-				saveTo(strOutputLogFile, true, pszMachineName, pszUserName, nDateTime,
-					nPid, pszProductVersion);
-			}
+			
+			pEx->saveTo(strOutputLogFile, true, pszMachineName, pszUserName, nDateTime,
+				nPid, pszProductVersion);
 
 			// notify the Failure Detection & Reporting system that
 			// an exception was logged
@@ -962,7 +981,7 @@ void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent, bool
 
 				// Attempt logging to the default location, the exception that couldn't be logged 
 				// to the custom location
-				ueOuter.log("", bNotifyExceptionEvent);
+				ueOuter.log("", bNotifyExceptionEvent, false, true);
 			}
 
 			// If there was a failure to log to the default location, do nothing.
@@ -2045,5 +2064,66 @@ void UCLIDException::asString(string& rResult, bool bRecursiveCall) const
 		rResult += ms_strApplication;
 		rResult += "]";
 	}
+}
+//-------------------------------------------------------------------------------------------------
+void UCLIDException::logExceptionRemotely(const string& strRemoteAddress) const
+{
+	try
+	{
+		try
+		{
+			string strHelperApp = getModuleDirectory("baseutils.dll") + "\\" + gstrEXCEPTION_HELPER_EXE;
+
+			// Get a temporary file and write the exception data to it
+			TemporaryFileName tempFile("", "", false);
+			ofstream fOut(tempFile.getName().c_str());
+			fOut << asStringizedByteStream();
+			fOut.close();
+
+			string strParams = "\"" + tempFile.getName() + "\" /remote \"" + strRemoteAddress
+				+ "\" /pid " + getCurrentProcessID() + " /delete";
+
+			string strApp = getApplication();
+			if (!strApp.empty())
+			{
+				strParams += " /product \"" + strApp + "\"";
+			}
+
+			// Run the exception helper app
+			runEXE(strHelperApp, strParams);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32599");
+	}
+	catch(UCLIDException& uex)
+	{
+		uex.log("", true, false, true);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+string UCLIDException::getRemoteLoggingAddress()
+{
+	// Check if the remote logger data has been read yet
+	if (!ms_bRemoteLoggerRead)
+	{
+		CSingleLock lg(getLogFileMutex(), TRUE);
+
+		// Ensure the data has not been read yet
+		if (!ms_bRemoteLoggerRead)
+		{
+			// Check registry for file access timeout
+			RegistryPersistenceMgr machineCfgMgr = RegistryPersistenceMgr( HKEY_LOCAL_MACHINE, "" );
+
+			// Check for existence of file access timeout
+			if (machineCfgMgr.keyExists( gstrBASEUTILS_REG_PATH, gstrREMOTE_EXCEPTION_LOGGER_KEY ))
+			{
+				ms_strRemoteExceptionLoggerAddress = machineCfgMgr.getKeyValue(gstrBASEUTILS_REG_PATH,
+					gstrREMOTE_EXCEPTION_LOGGER_KEY);
+			}
+
+			ms_bRemoteLoggerRead = true;
+		}
+	}
+
+	return ms_strRemoteExceptionLoggerAddress;
 }
 //-------------------------------------------------------------------------------------------------

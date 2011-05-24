@@ -120,7 +120,10 @@ library UCLID_EXCEPTIONMGMTLib
 		//-----------------------------------------------------------------------------------------
 		[id(18), helpstring("method LogWithSpecifiedInfo")] HRESULT LogWithSpecifiedInfo(
 			BSTR bstrMachineName, BSTR bstrUserName, long nDateTimeUtc, long nPid,
-			BSTR bstrApplicationName);
+			BSTR bstrApplicationName, VARIANT_BOOL vbForceLogLocal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To enforce the logging of the exception to the local exception log
+		[id(19), helpstring("method LogLocal")]HRESULT LogLocal();
 		//-----------------------------------------------------------------------------------------
 	};
 	[

@@ -56,7 +56,8 @@ public:
 	STDMETHOD(GetDebugInfoCount)(long *pnIndex);
 	STDMETHOD(GetApplicationName)(BSTR* pbstrAppName);
 	STDMETHOD(LogWithSpecifiedInfo)(BSTR bstrMachineName, BSTR bstrUserName, long nDateTimeUtc,
-		long nPid, BSTR bstrAppName);
+		long nPid, BSTR bstrAppName, VARIANT_BOOL vbForceLogLocal);
+	STDMETHOD(LogLocal)();
 
 private:
 	// Method creates exception with the data from the COMUCLIDException object passed

@@ -366,7 +366,7 @@ STDMETHODIMP CCOMUCLIDException::GetApplicationName(BSTR* pbstrAppName)
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CCOMUCLIDException::LogWithSpecifiedInfo(BSTR bstrMachineName, BSTR bstrUserName,
-	long nDateTimeUtc, long nPid, BSTR bstrAppName)
+	long nDateTimeUtc, long nPid, BSTR bstrAppName, VARIANT_BOOL vbForceLogLocal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -377,7 +377,7 @@ STDMETHODIMP CCOMUCLIDException::LogWithSpecifiedInfo(BSTR bstrMachineName, BSTR
 		string strAppName = asString(bstrAppName);
 
 		// Log the exception with the specified data
-		m_upException->log("", true, false,
+		m_upException->log("", true, false, asCppBool(vbForceLogLocal),
 			strMachineName.empty() ? __nullptr : strMachineName.c_str(),
 			strUserName.empty() ? __nullptr : strUserName.c_str(),
 			nDateTimeUtc > 0 ? nDateTimeUtc : -1,
@@ -387,6 +387,19 @@ STDMETHODIMP CCOMUCLIDException::LogWithSpecifiedInfo(BSTR bstrMachineName, BSTR
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32591");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CCOMUCLIDException::LogLocal()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Force the exception to be logged locally
+		m_upException->log("", true, false, true);
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32598");
 }
 
 //-------------------------------------------------------------------------------------------------

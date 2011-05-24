@@ -350,6 +350,8 @@ public:
 	//				exceptions that are not displayed to the user.
 	//			bAddDisplayedTag: Prefix the description with "Displayed: " to indicated the
 	//				exception was originally displayed to the user.
+	//			bForceLocal: Forces the exception to be logged locally, even if a remote
+	//				exception service address is specified in the registry
 	//			pszMachineName: The name of the machine to place in the log string (if the
 	//				machine name is __nullptr then the current machine name will be used)
 	//			pszUserName: The name of the user to place in the log string (if the user name
@@ -360,8 +362,9 @@ public:
 	//			pszProductVersion: The product version to place in the log string (if __nullptr
 	//				the current product version will be used.
 	void log(const string& strFile = "", bool bNotifyFDRS = true, bool bAddDisplayedTag = false,
-		const char* pszMachineName = __nullptr, const char* pszUserName = __nullptr,
-		long nDateTime = -1, int nPid = -1, const char* pszProductVersion = __nullptr) const;
+		bool bForceLocal = false, const char* pszMachineName = __nullptr,
+		const char* pszUserName = __nullptr, long nDateTime = -1, int nPid = -1,
+		const char* pszProductVersion = __nullptr) const;
 	//----------------------------------------------------------------------------------------------	
 	// PURPOSE: To save the contents of vectors into file strFile
 	// REQUIRE: all parameters should contain valid information.
@@ -473,6 +476,12 @@ private:
 	// Provides hardware lock serial number
 	static string ms_strSerial;
 
+	// Bool for whether the remote address has been read yet or not
+	static bool ms_bRemoteLoggerRead;
+
+	// The remote exception service address (if logging to a remote machine)
+	static string ms_strRemoteExceptionLoggerAddress;
+
 	// ELI code associated with this exception.
 	string m_strELI;
 
@@ -517,6 +526,12 @@ private:
 	//		will be added as the last line
 	// if bRecursiveCall is true the exception information will be appended to the string.
 	void asString(string& rResult, bool bRecursiveCall) const;
+
+	// Logs the exception to the remote address
+	void logExceptionRemotely(const string& strAddress) const;
+
+	// Returns the remote logging address (if the key is set)
+	static string getRemoteLoggingAddress();
 };
 
 //==================================================================================================
