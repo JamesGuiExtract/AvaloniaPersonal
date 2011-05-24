@@ -857,6 +857,34 @@ void FPRecordManager::computeSleepIntervals()
 		auto nMaxSleepTime = asUnsignedLong(asString(m_ipFPMDB->GetDBInfoSetting(
 			gstrMAX_SLEEP_BETWEEN_DB_CHECKS.c_str(), VARIANT_TRUE)));
 
+		if (nMinSleepTime < gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK
+			|| nMinSleepTime > gnMAX_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK - 100)
+		{
+			auto nClosest = nMinSleepTime < gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK
+				? gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK : gnMAX_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK - 100;
+
+			UCLIDException ue("ELI32602",
+				"Invalid minimum sleep time specified in database. Using closest allowed minimum.");
+			ue.addDebugInfo("Min Time From DB", nMinSleepTime);
+			ue.addDebugInfo("Closest Min Allowed", nClosest);
+			ue.log();
+			nMinSleepTime = nClosest;
+		}
+
+		if (nMaxSleepTime > gnMAX_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK
+			|| nMaxSleepTime < gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK + 100)
+		{
+			auto nClosest = nMaxSleepTime > gnMAX_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK
+				? gnMAX_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK : gnMIN_ALLOWED_SLEEP_TIME_BETWEEN_DB_CHECK + 100;
+
+			UCLIDException ue("ELI32603",
+				"Invalid maximum sleep time specified in database. Using closest allowed.");
+			ue.addDebugInfo("Max Time From DB", nMaxSleepTime);
+			ue.addDebugInfo("Closest Max Allowed", nClosest);
+			ue.log();
+			nMaxSleepTime = nClosest;
+		}
+
 		if (nMinSleepTime >= nMaxSleepTime || nMaxSleepTime - nMinSleepTime < 100)
 		{
 			UCLIDException ue("ELI32570",

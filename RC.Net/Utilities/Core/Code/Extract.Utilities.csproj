@@ -101,6 +101,7 @@
     <Compile Include="UndoManager.cs" />
     <Compile Include="UtilityExtensionMethods.cs" />
     <Compile Include="UtilityMethods.cs" />
+    <Compile Include="ValueOutOfRangeEventArgs.cs" />
     <Compile Include="WindowsPrinterInformation.cs" />
   </ItemGroup>
   <ItemGroup>

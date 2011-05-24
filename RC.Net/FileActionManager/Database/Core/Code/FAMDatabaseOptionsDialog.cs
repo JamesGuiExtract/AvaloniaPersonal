@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using UCLID_FILEPROCESSINGLib;
-using UCLID_COMUTILSLib;
+﻿using Extract.Licensing;
 using Extract.Utilities;
-using System.Globalization;
 using Extract.Utilities.Forms;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
-using Extract.Licensing;
+using System.Windows.Forms;
+using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Database
 {
@@ -65,6 +61,10 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         static readonly Regex _emailValidate = new Regex(
             @"^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,4}$", RegexOptions.IgnoreCase);
+
+        // Min and max values for the processing db check for files edit boxes
+        const double _MIN_DB_CHECK_FOR_FILES_VALUE = 500.0;
+        const double _MAX_DB_CHECK_FOR_FILES_VALUE = 300000.0;
 
         #endregion Constants
 
@@ -119,6 +119,18 @@ namespace Extract.FileActionManager.Database
             {
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 InitializeComponent();
+
+                // Set the min and max values for the get files to process interval.
+                // Require a min difference of 100 between min and max values so adjust
+                // the range accordingly
+                _numberMinTimeBetweenChecks.MinimumValue = _MIN_DB_CHECK_FOR_FILES_VALUE;
+                _numberMinTimeBetweenChecks.MaximumValue = _MAX_DB_CHECK_FOR_FILES_VALUE - 100.0;
+                _numberMaxTimeBetweenChecks.MinimumValue = _MIN_DB_CHECK_FOR_FILES_VALUE + 100.0;
+                _numberMaxTimeBetweenChecks.MaximumValue = _MAX_DB_CHECK_FOR_FILES_VALUE;
+
+                // Add the out of range handlers for the min and max times
+                _numberMinTimeBetweenChecks.ValueOutOfRange += HandleValueOutOfRange;
+                _numberMaxTimeBetweenChecks.ValueOutOfRange += HandleValueOutOfRange;
 
                 _server = server;
                 _database = database;
@@ -551,17 +563,11 @@ namespace Extract.FileActionManager.Database
                     map.Set(entry.Key, entry.Value.Checked ? "1" : "0");
                 }
 
-                // Get the min and max times (validate them) from the general tab
-                var min = _numberMinTimeBetweenChecks.Int32Value;
-                var max = _numberMaxTimeBetweenChecks.Int32Value;
-                if ((max - min) < 100)
+                if (!IsMinimumAndMaximumTimeBetweenChecksValid())
                 {
-                    UtilityMethods.ShowMessageBox(
-                        "The maximum time between checking for files to process must be at least 100ms greater than the minimum time.",
-                        "Invalid Max And Min", true);
-                    _numberMaxTimeBetweenChecks.Focus();
                     return;
                 }
+
                 map.Set(_MIN_TIME_BETWEEN_PROCESSING_DB_CHECK, _numberMinTimeBetweenChecks.Text);
                 map.Set(_MAX_TIME_BETWEEN_PROCESSING_DB_CHECK, _numberMaxTimeBetweenChecks.Text);
 
@@ -629,6 +635,63 @@ namespace Extract.FileActionManager.Database
             {
                 ex.ExtractDisplay("ELI31923");
             }
+        }
+
+        /// <summary>
+        /// Determines whether minimum and maximum time between checks are valid values.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if minimum and maximum time between checks are valid;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        bool IsMinimumAndMaximumTimeBetweenChecksValid()
+        {
+            if (string.IsNullOrWhiteSpace(_numberMinTimeBetweenChecks.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "The minimum time between checking for files to process cannot be blank.",
+                    "Invalid Minimum Time", true);
+                _numberMinTimeBetweenChecks.Focus();
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(_numberMaxTimeBetweenChecks.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "The maximum time between checking for files to process cannot be blank.",
+                    "Invalid Maximum Time", true);
+                _numberMaxTimeBetweenChecks.Focus();
+                return false;
+            }
+
+            // Get the min and max times (validate them) from the general tab
+            var min = _numberMinTimeBetweenChecks.Int32Value;
+            var max = _numberMaxTimeBetweenChecks.Int32Value;
+            if (min < _MIN_DB_CHECK_FOR_FILES_VALUE)
+            {
+                UtilityMethods.ShowMessageBox("The minimum time must be >= "
+                    + _MIN_DB_CHECK_FOR_FILES_VALUE.ToString("G", CultureInfo.CurrentCulture),
+                    "Minimum Out Of Range", true);
+                _numberMinTimeBetweenChecks.Focus();
+                return false;
+            }
+            if (max > _MAX_DB_CHECK_FOR_FILES_VALUE)
+            {
+                UtilityMethods.ShowMessageBox("The maximum time must be <= "
+                    + _MAX_DB_CHECK_FOR_FILES_VALUE.ToString("G", CultureInfo.CurrentCulture),
+                    "Maximum Out Of Range", true);
+                _numberMaxTimeBetweenChecks.Focus();
+                return false;
+            }
+            if ((max - min) < 100)
+            {
+                UtilityMethods.ShowMessageBox(
+                    "The maximum time between checking for files to process must be at least 100ms greater than the minimum time.",
+                    "Invalid Max And Min", true);
+                _numberMaxTimeBetweenChecks.Focus();
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -905,6 +968,38 @@ namespace Extract.FileActionManager.Database
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI31935");
+            }
+        }
+
+        /// <summary>
+        /// Handles the value out of range.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Utilities.ValueOutOfRangeEventArgs"/> instance containing the event data.</param>
+        private void HandleValueOutOfRange(object sender, ValueOutOfRangeEventArgs e)
+        {
+            try
+            {
+                var control = sender as NumericEntryTextBox;
+                if (control == null)
+                {
+                    return;
+                }
+
+                UtilityMethods.ShowMessageBox(
+                    string.Concat("The entered value was out of range. The value must be >= ",
+                    e.MinimumValue, " and <= ", e.MaximumValue),
+                    "Value Out Of Range", true);
+                    
+                // Set the value of the text box to the closest value, select it, and set
+                // focus to it
+                control.Int64Value = (long)e.ClosestValidValue;
+                control.SelectAll();
+                control.Focus();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32604");
             }
         }
 
