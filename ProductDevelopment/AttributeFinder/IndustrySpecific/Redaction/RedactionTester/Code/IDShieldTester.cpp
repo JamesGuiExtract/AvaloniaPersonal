@@ -805,26 +805,20 @@ void CIDShieldTester::handleTestFolder(const string& strRulesFile, const string&
 	// ensure the folder of images exists
 	validateFileOrFolderExistence(strAbsoluteImageDir);
 
-	// Get a list of the .tif or .uss files in the directory in order to find images based on the
-	// presense of either a tif file or a uss file (but not require a uss file).
+	// Get a list of all files in the directory
 	vector<string> vecDirListing;
-	getFilesInDir(vecDirListing, strAbsoluteImageDir, "*.uss", false);
-	getFilesInDir(vecDirListing, strAbsoluteImageDir, "*.tif", false);
+	getFilesInDir(vecDirListing, strAbsoluteImageDir);
 
-	// If the directory contains tif and uss files, there will be duplicates. Extract the image name
-	// from each listing and add it to a set to eliminate duplicates.
+	// Iterate the list of files and add just the image files to the final set
 	set<string> setImageFilesToTest;
 	for (vector<string>::iterator iterFileName = vecDirListing.begin();
 		 iterFileName != vecDirListing.end();
 		 iterFileName++)
 	{
-		string strFileName = *iterFileName;
-		EFileType eFileType = getFileType(strFileName);
-		if (eFileType == kUSSFile)
+		if (getFileType(*iterFileName) == kImageFile)
 		{
-			strFileName = getPathAndFileNameWithoutExtension(strFileName);
+			setImageFilesToTest.insert(*iterFileName);
 		}
-		setImageFilesToTest.insert(strFileName);
 	}
 	
 	// Process each file in the folder
