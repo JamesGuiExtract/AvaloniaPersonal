@@ -116,7 +116,6 @@
 #define IDC_RADIO_ORIGINAL              241
 #define IDC_RADIO_SCHEMA                242
 #define IDC_CHECK_NAMES                 243
-#define IDC_EDIT_SAMPLE                 244
 #define IDC_CHECK_NAMES2                245
 #define IDC_CHECK_SCHEMA                245
 #define IDC_COMBO_ATTRIBUTE_SELECTOR    245

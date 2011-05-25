@@ -1229,9 +1229,9 @@ const std::string getFormattedString(const char* szText, ...)
 // PROMISE: Adds ShellExecute error information to the provided UCLIDException
 // ARGS:	rue- The UCLIDException to which the error info should be added
 //			hInstance- The return value from a ShellExecute call
-void addShellOpenDocumentErrorInfo(UCLIDException& rue, HINSTANCE hInstance)
+void addShellOpenDocumentErrorInfo(UCLIDException& rue, int nResult)
 {
-	switch ((long)hInstance)
+	switch (nResult)
 	{
 		case 0:
 			{
@@ -1315,7 +1315,7 @@ void addShellOpenDocumentErrorInfo(UCLIDException& rue, HINSTANCE hInstance)
 			}
 		default:
 			{
-				rue.addDebugInfo("ShellExecute ErrorCode", (long)hInstance);
+				rue.addDebugInfo("ShellExecute ErrorCode", nResult);
 				rue.addDebugInfo("ShellExecute Error", "Unknown Error");
 				break;
 			}
@@ -1324,18 +1324,18 @@ void addShellOpenDocumentErrorInfo(UCLIDException& rue, HINSTANCE hInstance)
 //-------------------------------------------------------------------------------------------------
 void shellOpenDocument(const string& strFilename)
 {
+	string strFolder = isValidFolder(strFilename) ? strFilename : getDirectoryFromFullPath(strFilename);
+
 	// Request windows shell to open the specified document
-	HINSTANCE hRes = ShellExecute(NULL, "open", strFilename.c_str(), NULL, 
-		getDirectoryFromFullPath(strFilename.c_str()).c_str(), SW_SHOW);
+	int nRes = (int)ShellExecute(NULL, "open", strFilename.c_str(), NULL, 
+		strFolder.c_str(), SW_SHOWNORMAL);
 
 	// Per MDSN for ShellExecute: 0-32 represent error values
-	if ((int)hRes >= 0 && (int)hRes <= 32)
+	if (nRes >= 0 && nRes <= 32)
 	{
 		UCLIDException ue("ELI18144", "Failed to open document!");
-		// Note: Be sure to addWin32ErrorInfo prior to addDebugInfo; addDebugInfo clears the last error
-		ue.addWin32ErrorInfo();
 		ue.addDebugInfo("Filename", strFilename);
-		addShellOpenDocumentErrorInfo(ue, hRes);
+		addShellOpenDocumentErrorInfo(ue, nRes);
 		throw ue;
 	}
 }
