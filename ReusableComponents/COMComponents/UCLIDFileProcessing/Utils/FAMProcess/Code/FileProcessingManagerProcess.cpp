@@ -145,6 +145,10 @@ STDMETHODIMP CFileProcessingManagerProcess::Start(LONG lNumberOfFilesToProcess)
 			throw uex;
 		}
 
+		// Restrict the number of stored records to twice the number of logical processors
+		m_ipFPM->RestrictNumStoredRecords = VARIANT_TRUE;
+		m_ipFPM->MaxStoredRecords = 2 * getNumLogicalProcessors();
+
 		// Set the number of files to process
 		m_ipFPM->NumberOfDocsToProcess = lNumberOfFilesToProcess;
 
