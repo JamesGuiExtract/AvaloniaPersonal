@@ -253,6 +253,9 @@ private:
 	// Mutex is locked only inside of the get connection method
 	CMutex m_mutex;
 	
+	// Mutex for accessing/updating counter values from the database
+	CMutex m_counterMutex;
+
 	// handle to window that should receive the database status notifications
 	HWND m_hUIWindow;
 

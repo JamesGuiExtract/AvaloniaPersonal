@@ -4505,6 +4505,9 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 					setLongLongField(ipFields, "Value", llValue);
 					ipCounterSet->Update();
 
+					// Commit the transaction
+					tg.CommitTrans();
+
 					// Set the return value
 					*pllNewValue = llValue;
 				}
@@ -4514,9 +4517,6 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 					uex.addDebugInfo("User Counter Name", asString(bstrCounterName));
 					throw uex;
 				}
-
-				// Commit the transaction
-				tg.CommitTrans();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI27816");
 		}

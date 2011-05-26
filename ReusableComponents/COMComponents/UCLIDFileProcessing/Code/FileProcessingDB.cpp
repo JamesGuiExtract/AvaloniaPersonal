@@ -1841,9 +1841,11 @@ STDMETHODIMP CFileProcessingDB::AddUserCounter(BSTR bstrCounterName, LONGLONG ll
 	{
 		validateLicense();
 
-		// Lock the user counter table
+		// Need to serialize access to the counter table [LRCAU #5935]
+		CSingleLock lg(&m_counterMutex, TRUE);
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 			gstrUSER_COUNTER_DB_LOCK);
+
 		AddUserCounter_Internal(true, bstrCounterName, llInitialValue);
 
 		return S_OK;
@@ -1859,9 +1861,11 @@ STDMETHODIMP CFileProcessingDB::RemoveUserCounter(BSTR bstrCounterName)
 	{
 		validateLicense();
 
-		// Lock the user counter table
+		// Need to serialize access to the counter table [LRCAU #5935]
+		CSingleLock lg(&m_counterMutex, TRUE);
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 			gstrUSER_COUNTER_DB_LOCK);
+
 		RemoveUserCounter_Internal(true, bstrCounterName);
 
 		return S_OK;
@@ -1877,9 +1881,11 @@ STDMETHODIMP CFileProcessingDB::RenameUserCounter(BSTR bstrCounterName, BSTR bst
 	{
 		validateLicense();
 
-		// Lock the user counter table
+		// Need to serialize access to the counter table [LRCAU #5935]
+		CSingleLock lg(&m_counterMutex, TRUE);
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 			gstrUSER_COUNTER_DB_LOCK);
+
 		RenameUserCounter_Internal(true, bstrCounterName, bstrNewCounterName);
 
 		return S_OK;
@@ -1895,7 +1901,8 @@ STDMETHODIMP CFileProcessingDB::SetUserCounterValue(BSTR bstrCounterName, LONGLO
 	{
 		validateLicense();
 
-		// Lock the user counter table
+		// Need to serialize access to the counter table [LRCAU #5935]
+		CSingleLock lg(&m_counterMutex, TRUE);
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 			gstrUSER_COUNTER_DB_LOCK);
 
@@ -1914,9 +1921,11 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterValue(BSTR bstrCounterName, LONGLO
 	{
 		validateLicense();
 
-		// Lock the user counter table
+		// Need to serialize access to the counter table [LRCAU #5935]
+		CSingleLock lg(&m_counterMutex, TRUE);
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 			gstrUSER_COUNTER_DB_LOCK);
+
 		GetUserCounterValue_Internal(true, bstrCounterName, pllValue);
 
 		return S_OK;
@@ -1932,9 +1941,11 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterNames(IVariantVector** ppvecNames)
 	{
 		validateLicense();
 		
-		// Lock the user counter table
+		// Need to serialize access to the counter table [LRCAU #5935]
+		CSingleLock lg(&m_counterMutex, TRUE);
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 			gstrUSER_COUNTER_DB_LOCK);
+
 		GetUserCounterNames_Internal(true, ppvecNames);
 
 		return S_OK;
@@ -1950,9 +1961,11 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterNamesAndValues(IStrToStrMap** ppma
 	{
 		validateLicense();
 
-		// Lock the user counter table
+		// Need to serialize access to the counter table [LRCAU #5935]
+		CSingleLock lg(&m_counterMutex, TRUE);
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 			gstrUSER_COUNTER_DB_LOCK);
+
 		GetUserCounterNamesAndValues_Internal(true, ppmapUserCounters);
 
 		return S_OK;
@@ -1969,9 +1982,11 @@ STDMETHODIMP CFileProcessingDB::IsUserCounterValid(BSTR bstrCounterName,
 	{
 		validateLicense();
 
-		// Lock the user counter table
+		// Need to serialize access to the counter table [LRCAU #5935]
+		CSingleLock lg(&m_counterMutex, TRUE);
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 			gstrUSER_COUNTER_DB_LOCK);
+
 		IsUserCounterValid_Internal(true, bstrCounterName, pbCounterValid);
 
 		return S_OK;
@@ -1988,7 +2003,8 @@ STDMETHODIMP CFileProcessingDB::OffsetUserCounter(BSTR bstrCounterName, LONGLONG
 	{
 		validateLicense();
 
-		// Lock the user counter table
+		// Need to serialize access to the counter table [LRCAU #5935]
+		CSingleLock lg(&m_counterMutex, TRUE);
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 			gstrUSER_COUNTER_DB_LOCK);
 
