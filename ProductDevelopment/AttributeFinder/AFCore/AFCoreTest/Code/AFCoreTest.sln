@@ -497,12 +497,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.ExceptionService", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.ExceptionService.WCFInterface", "..\..\..\..\..\RC.Net\ExceptionService\WCFInterface\Core\Code\Extract.ExceptionService.WCFInterface.csproj", "{E2701E73-4D37-477B-8359-5614136DFA09}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDShieldOnDemand", "..\..\..\..\..\RC.Net\Redaction\IDShieldOnDemand\Core\Code\IDShieldOnDemand.csproj", "{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 154
+		ProjectCount = 155
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -657,6 +659,7 @@ Global
 		ProjectRelativeDiskPath152 = ..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcxproj
 		ProjectRelativeDiskPath153 = ..\..\..\..\..\RC.Net\ExceptionService\Core\Code\Extract.ExceptionService.csproj
 		ProjectRelativeDiskPath154 = ..\..\..\..\..\RC.Net\ExceptionService\WCFInterface\Core\Code\Extract.ExceptionService.WCFInterface.csproj
+		ProjectRelativeDiskPath155 = ..\..\..\..\..\RC.Net\Redaction\IDShieldOnDemand\Core\Code\IDShieldOnDemand.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2529,6 +2532,18 @@ Global
 		{E2701E73-4D37-477B-8359-5614136DFA09}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{E2701E73-4D37-477B-8359-5614136DFA09}.Release|Win32.ActiveCfg = Release|Any CPU
 		{E2701E73-4D37-477B-8359-5614136DFA09}.Release|x86.ActiveCfg = Release|Any CPU
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Debug|Win32.ActiveCfg = Debug|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Debug|x86.ActiveCfg = Debug|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Debug|x86.Build.0 = Debug|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Release|Any CPU.ActiveCfg = Release|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Release|Mixed Platforms.Build.0 = Release|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Release|Win32.ActiveCfg = Release|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Release|x86.ActiveCfg = Release|x86
+		{6189B27D-3AA5-4E77-9DC7-56440AA0F33D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

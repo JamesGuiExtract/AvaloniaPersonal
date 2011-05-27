@@ -15,6 +15,11 @@ namespace Extract.Redaction
         public static readonly string VerificationSessionMetaDataName = "_VerificationSession";
 
         /// <summary>
+        /// The name to apply to the metadata attribute for IDShield OnDemand sessions.
+        /// </summary>
+        public static readonly string OnDemandSessionMetaDataName = "_OnDemandSession";
+
+        /// <summary>
         /// The name to apply to the metadata attribute for redaction sessions.
         /// </summary>
         public static readonly string RedactionSessionMetaDataName = "_RedactedFileOutputSession";

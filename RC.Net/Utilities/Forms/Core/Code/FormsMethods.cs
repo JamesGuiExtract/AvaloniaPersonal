@@ -343,6 +343,24 @@ namespace Extract.Utilities.Forms
                 throw ExtractException.AsExtractException("ELI31383", ex);
             }
         }
+        
+        /// <summary>
+        /// Removes the specified collection of <see cref="ToolStripItem"/> from their
+        /// parent <see cref="ToolStrip"/> containers and disposes of them.
+        /// </summary>
+        /// <param name="items">One or more <see cref="ToolStripItem"/> to remove
+        /// from their parent controls and dispose.</param>
+        public static void RemoveAndDisposeToolStripItems(params ToolStripItem[] items)
+        {
+            try
+            {
+                RemoveAndDisposeToolStripItems((IEnumerable<ToolStripItem>)items);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32605");
+            }
+        }
 
         /// <summary>
         /// Removes the specified collection of <see cref="ToolStripItem"/> from their
@@ -366,27 +384,6 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32576");
-            }
-        }
-
-        /// <summary>
-        /// Removes the specified <see cref="ToolStripItem"/> item from its parent
-        /// <see cref="ToolStrip"/>, disposes the item.
-        /// </summary>
-        /// <param name="item">The item to remove and dispose.</param>
-        public static void RemoveAndDisposeToolStripItem(ToolStripItem item)
-        {
-            try
-            {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI32577",
-                    _OBJECT_NAME);
-
-                RemoveAndDisposeToolStripItemInternal(item);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI32578");
             }
         }
 

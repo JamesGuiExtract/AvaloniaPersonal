@@ -88,9 +88,19 @@ namespace Extract.Redaction
         ComAttribute[] _verificationSessions;
 
         /// <summary>
+        /// The previous on-demand sessions.
+        /// </summary>
+        ComAttribute[] _onDemandSessions;
+
+        /// <summary>
         /// The unique verification session id.
         /// </summary>
         int _verificationSessionId;
+
+        /// <summary>
+        /// The unique on-demand session id.
+        /// </summary>
+        int _onDemandSessionId;
 
         /// <summary>
         /// The previous redaction sessions.
@@ -240,6 +250,19 @@ namespace Extract.Redaction
         }
 
         /// <summary>
+        /// Gets the on-demand session attributes.
+        /// </summary>
+        /// <value>The on-demand session attributes.</value>
+        [CLSCompliant(false)]
+        public ReadOnlyCollection<ComAttribute> OnDemandSessions
+        {
+            get 
+            {
+                return new ReadOnlyCollection<ComAttribute>(_onDemandSessions);
+            }
+        }
+
+        /// <summary>
         /// Gets the redaction session attributes.
         /// </summary>
         /// <value>The redaction session attributes.</value>
@@ -347,6 +370,7 @@ namespace Extract.Redaction
             _insensitiveAttributes = new List<ComAttribute>();
             _metadata = new List<ComAttribute>();
             _verificationSessionId = 0;
+            _onDemandSessionId = 0;
             _nextId = 1;
 
             _fileName = fileName;
@@ -396,6 +420,11 @@ namespace Extract.Redaction
             _verificationSessions = AttributeMethods.GetAttributesByName(attributes,
                 Constants.VerificationSessionMetaDataName);
             _verificationSessionId = GetSessionId(_verificationSessions);
+
+            // Get the previous on-demand sessions
+            _onDemandSessions = AttributeMethods.GetAttributesByName(attributes,
+                Constants.OnDemandSessionMetaDataName);
+            _onDemandSessionId = GetSessionId(_onDemandSessions);
 
             // Get the previous redaction sessions
             _redactionSessions = AttributeMethods.GetAttributesByName(attributes,
@@ -730,26 +759,33 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Saves the <see cref="RedactionFileLoader"/> with the specified changes and information. 
+        /// Saves the <see cref="RedactionFileLoader"/> with the specified changes and information.
         /// </summary>
         /// <param name="fileName">The full path to location where the file should be saved.</param>
         /// <param name="changes">The attributes that have been added, modified, and deleted.</param>
         /// <param name="time">The interval of screen time spent verifying the file.</param>
         /// <param name="settings">The settings used during verification.</param>
+        /// <param name="standAloneMode"><see langword="true"/> if the verification session was run
+        /// independent of the FAM and database; <see langword="false"/> otherwise.</param>
         [CLSCompliant(false)]
-        public void SaveVerificationSession(string fileName, RedactionFileChanges changes, 
-            TimeInterval time, VerificationSettings settings)
+        public void SaveVerificationSession(string fileName,
+            RedactionFileChanges changes, TimeInterval time, VerificationSettings settings,
+            bool standAloneMode)
         {
             try
             {
                 ComAttribute sessionData = CreateVerificationOptionsAttribute(settings);
 
-                // Calculate the new sensitive items
-                SaveSession(Constants.VerificationSessionMetaDataName, _verificationSessionId, 
-                    fileName, changes, time, sessionData);
+                string sessionName = standAloneMode
+                    ? Constants.OnDemandSessionMetaDataName
+                    : Constants.VerificationSessionMetaDataName;
 
-                // Update the session id
-                _verificationSessionId++;
+                int sessionId = standAloneMode
+                    ? _onDemandSessionId++
+                    : _verificationSessionId++;
+
+                // Calculate the new sensitive items
+                SaveSession(sessionName, sessionId, fileName, changes, time, sessionData);
             }
             catch (Exception ex)
             {
