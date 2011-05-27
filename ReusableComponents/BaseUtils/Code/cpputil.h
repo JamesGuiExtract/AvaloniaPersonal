@@ -222,7 +222,9 @@ EXPORT_BaseUtils string getDriveFromFullPath(const string& strFullFileName,
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils bool recursiveRemoveDirectory(const string &strDirectory);
 //-------------------------------------------------------------------------------------------------
-EXPORT_BaseUtils void createDirectory(const string& strDirectory);
+// Creates a directory, and if bSetPermissionsToAllUsers = true will set the security policy such
+//		that all users have access to the directory
+EXPORT_BaseUtils void createDirectory(const string& strDirectory, bool bSetPermissionsToAllUsers = false);
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils bool getAllSubDirsAndDeleteAllFiles(const string &strDirectory, 
 													 vector<string> &vecSubDirs);

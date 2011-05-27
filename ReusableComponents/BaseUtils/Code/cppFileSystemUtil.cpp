@@ -354,7 +354,7 @@ bool recursiveRemoveDirectory(const string &strDirectory)
 	return bRetVal;
 }
 //--------------------------------------------------------------------------------------------------
-void createDirectory(const string& strDirectory)
+void createDirectory(const string& strDirectory, bool bSetPermissionsToAllUsers)
 {
 	unsigned int uiPrevPos = 0;
 	unsigned int uiCurPos = 0;
@@ -395,6 +395,28 @@ void createDirectory(const string& strDirectory)
 		throw ue;
 	}
 
+	// If need to leave security open for the folders, create the security descriptor object
+	unique_ptr<SECURITY_ATTRIBUTES> upSecurityAttributes(__nullptr);
+	unique_ptr<SECURITY_DESCRIPTOR> upSecurityDescriptor(__nullptr);
+	if (bSetPermissionsToAllUsers)
+	{
+		upSecurityDescriptor.reset(new SECURITY_DESCRIPTOR());
+		InitializeSecurityDescriptor(upSecurityDescriptor.get(), SECURITY_DESCRIPTOR_REVISION);
+
+		// Set the DACL to wide open (say DACL is present but pass NULL and turn off
+		// setting of default DACL)
+		SetSecurityDescriptorDacl(upSecurityDescriptor.get(), TRUE, NULL, FALSE);
+
+		// Zero out a security attributes object
+		upSecurityAttributes.reset(new SECURITY_ATTRIBUTES());
+		ZeroMemory(upSecurityAttributes.get(), sizeof(SECURITY_ATTRIBUTES));
+
+		// Set the security attributes object
+		upSecurityAttributes->nLength = sizeof(SECURITY_ATTRIBUTES);
+		upSecurityAttributes->lpSecurityDescriptor = upSecurityDescriptor.get();
+		upSecurityAttributes->bInheritHandle = FALSE;
+	}
+
 	while (uiCurPos < strDirectory.length() && uiCurPos!= string::npos)
 	{
 		string strTempDir;
@@ -423,7 +445,7 @@ void createDirectory(const string& strDirectory)
 		if (!directoryExists(strTempDir))
 		{	
 			//call windows API function to create directory
-			if(CreateDirectory(strTempDir.c_str(), NULL)==0)
+			if(CreateDirectory(strTempDir.c_str(), upSecurityAttributes.get())==0)
 			{
 				// Get the error code
 				DWORD errorCode = GetLastError();
