@@ -409,6 +409,62 @@ namespace Extract.Utilities.Forms
             item.Dispose();
         }
 
+        /// <summary>
+        /// Executes the <see paramref="action"/> in the UI thread of the provided
+        /// <see paramref="control"/> via the message queue and blocks until the call is complete.
+        /// If an exception is thrown, it will be thrown out on the calling thread even if the
+        /// calling thread is different than the UI thread.
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> that should execute the
+        /// <see paramref="action"/>.</param>
+        /// <param name="action">The <see cref="Action"/></param>
+        public static void ExecuteInUIThread(Control control, Action action)
+        {
+            try
+            {
+                ExtractException thrownException = null;
+
+                // Invoke to avoid modifying the imageViewer from outside the UI thread. Use begin
+                // invoke so the operation isn't executed in the middle of another UI event.
+                IAsyncResult result = control.BeginInvoke((MethodInvoker)(() =>
+                {
+                    try
+                    {
+                        action();
+                    }
+                    catch (Exception ex)
+                    {
+                        thrownException = ex.AsExtract("ELI32612");
+                    }
+                }));
+
+                // If the control is running on a different thread, we can simply wait for the
+                // invocation to complete.
+                if (control.InvokeRequired)
+                {
+                    result.AsyncWaitHandle.WaitOne();
+                }
+                // If the control is running on this thread, we need to run the event loop while we wait
+                // in order for the method to be called.
+                else
+                {
+                    while (!result.AsyncWaitHandle.WaitOne(0))
+                    {
+                        Application.DoEvents();
+                    }
+                }
+
+                if (thrownException != null)
+                {
+                    throw thrownException;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32613");
+            }
+        }
+
         #endregion Methods
     }
 

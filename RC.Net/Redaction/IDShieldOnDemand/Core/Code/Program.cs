@@ -2,6 +2,7 @@
 using Extract.Licensing;
 using Extract.Redaction;
 using Extract.Redaction.Verification;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -150,8 +151,8 @@ namespace IDShieldOnDemand
 	        {
                 // Invoke the file open so that it doesn't occur as part of the Form.Load event
                 // handler.
-                _verifyForm.BeginInvoke((MethodInvoker)(() =>
-                    _verifyForm.Open(_fileToOpen, 0, 0, null, null)));
+                FormsMethods.ExecuteInUIThread(_verifyForm,
+                    () =>_verifyForm.Open(_fileToOpen, 0, 0, null, null));
 	        }
 	        catch (Exception ex)
 	        {

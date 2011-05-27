@@ -101,6 +101,10 @@
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Core\Code\Extract.Redaction.csproj">
       <Project>{44B108A6-5A58-4F2C-8126-BAF763A304BF}</Project>
       <Name>Extract.Redaction</Name>
