@@ -10,16 +10,33 @@ using System.Windows.Forms;
 namespace Extract.Redaction.Verification
 {
     /// <summary>
-    /// Represents a dialog that allows the user to select <see cref="VerificationOptions"/>.
+    /// Indicates how to determine if a VOA file should be created when redacted output is created
+    /// for verification in stand-alone mode and a VOA file doesn't already exist.
+    /// </summary>
+    public enum OnDemandCreateVOAFileMode
+    {
+        /// <summary>
+        /// Do not created a VOA file.
+        /// </summary>
+        DoNotCreate,
+        
+        /// <summary>
+        /// Prompt for whether to create a VOA file.
+        /// </summary>
+        Prompt,
+
+        /// <summary>
+        /// Always create a VOA file.
+        /// </summary>
+        Create
+    }
+
+    /// <summary>
+    /// Represents a dialog that allows the user to select verification options.
     /// </summary>
     public partial class VerificationOptionsDialog : Form
     {
         #region VerificationOptionsDialog Fields
-
-        /// <summary>
-        /// Settings for the <see cref="VerificationTaskForm"/> user interface.
-        /// </summary>
-        VerificationOptions _options;
 
         /// <summary>
         /// Settings for the verification task.
@@ -44,11 +61,13 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationOptionsDialog"/> class.
         /// </summary>
-        public VerificationOptionsDialog(VerificationOptions options, VerificationSettings taskSettings)
+        /// <param name="taskSettings">The task settings.</param>
+        /// <param name="standAloneMode"><see langword="true"/> if the verification session is being
+        /// run independent of the FAM and database; <see langword="false"/> otherwise.</param>
+        public VerificationOptionsDialog(VerificationSettings taskSettings, bool standAloneMode)
         {
             InitializeComponent();
 
-            _options = options;
             _taskSettings = taskSettings;
 
             // Fill the tool combo box from the enum
@@ -61,45 +80,27 @@ namespace Extract.Redaction.Verification
             _slideshowAutoStartCheckBox.Checked = _config.Settings.AutoStartSlideshow;
             _slideshowIntervalUpDown.Value = _config.Settings.SlideshowInterval;
             _slideshowIntervalUpDown.UserTextCorrected += HandleSlideshowIntervalCorrected;
+
+            // If the slideshow is not enabled, remove the slideshow settings tab.
+            if (!_taskSettings.SlideshowSettings.SlideshowEnabled)
+            {
+                this._tabControl.TabPages.Remove(_slideshowTabPage);
+                _slideshowTabPage.Dispose();
+                _slideshowTabPage = null;
+            }
+            
+            // If not running in standalone mode, removed the OnDemand settings tab.
+            if (!standAloneMode)
+            {
+                _tabControl.Controls.Remove(_onDemandTabPage);
+                _onDemandTabPage.Dispose();
+                _onDemandTabPage = null;
+            }
         }
 
         #endregion VerificationOptionsDialog Constructors
 
-        #region VerificationOptionsDialog Properties
-
-        /// <summary>
-        /// Gets or sets the <see cref="VerificationOptions"/>.
-        /// </summary>
-        /// <value>The <see cref="VerificationOptions"/>.</value>
-        /// <returns>The <see cref="VerificationOptions"/>.</returns>
-        public VerificationOptions VerificationOptions
-        {
-            get
-            {
-                return _options;
-            }
-            set
-            {
-                _options = value;
-            }
-        }
-
-        #endregion VerificationOptionsDialog Properties
-
         #region VerificationOptionsDialog Methods
-
-        /// <summary>
-        /// Gets the <see cref="VerificationOptions"/> from the user interface.
-        /// </summary>
-        /// <returns>The <see cref="VerificationOptions"/> from the user interface.</returns>
-        VerificationOptions GetVerificationOptions()
-        {
-            bool autoZoom = _autoZoomCheckBox.Checked;
-            int autoZoomScale = _autoZoomScaleTrackBar.Value;
-            AutoTool autoTool = GetAutoTool();
-
-            return new VerificationOptions(autoZoom, autoZoomScale, autoTool);
-        }
 
         /// <summary>
         /// Gets the <see cref="AutoTool"/> specified by the user interface.
@@ -109,11 +110,30 @@ namespace Extract.Redaction.Verification
         {
             if (_autoToolCheckBox.Checked)
             {
-                var tool = (AutoTool) Enum.Parse(typeof(AutoTool), _autoToolComboBox.Text, true);
+                var tool = (AutoTool)Enum.Parse(typeof(AutoTool), _autoToolComboBox.Text, true);
                 return tool;
             }
 
             return AutoTool.None;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="OnDemandCreateVOAFileMode"/> setting specified in the UI.
+        /// </summary>
+        /// <returns>The <see cref="OnDemandCreateVOAFileMode"/> settings specified in the UI.
+        /// </returns>
+        OnDemandCreateVOAFileMode GetOnDemandCreateVOAFileMode()
+        {
+            if (_createVOAFileRadioButton.Checked)
+            {
+                return OnDemandCreateVOAFileMode.Create;
+            }
+            else if (_promptVOAFileRadioButton.Checked)
+            {
+                return OnDemandCreateVOAFileMode.Prompt;
+            }
+            
+            return OnDemandCreateVOAFileMode.DoNotCreate;
         }
 
         /// <summary>
@@ -148,27 +168,13 @@ namespace Extract.Redaction.Verification
             {
                 base.OnLoad(e);
 
-                // Set auto zoom settings
-                _autoZoomCheckBox.Checked = _options.AutoZoom;
-                _autoZoomScaleTrackBar.Value = _options.AutoZoomScale;
-
-                // Set auto tool settings
-                AutoTool autoTool = _options.AutoTool;
+                // Initialize UI controls based on persisted values.
+                AutoTool autoTool = _config.Settings.AutoTool;
                 _autoToolCheckBox.Checked = autoTool != AutoTool.None;
                 _autoToolComboBox.Text = Enum.GetName(typeof(AutoTool), autoTool);
-
-                // [FlexIDSCore:4528]
-                // With an Aero theme, the tab control the _autoZoomScaleTrackBar is drawn on
-                // is transparent and, therefore, inherits the SystemColors.Window color. Otherwise,
-                // ensure the _autoZoomScaleTrackBar assumes the same color as the _generalTabPage.
-                if (_generalTabPage.BackColor == Color.Transparent)
-                {
-                    _autoZoomScaleTrackBar.BackColor = SystemColors.Window;
-                }
-                else
-                {
-                    _autoZoomScaleTrackBar.BackColor = _generalTabPage.BackColor;
-                }
+                _OCRCheckBox.Checked = _config.Settings.OCRText;
+                _autoZoomCheckBox.Checked = _config.Settings.AutoZoom;
+                _autoZoomScaleTrackBar.Value = _config.Settings.AutoZoomScale;
 
                 // If the slideshow is enabled, populate all _runKeyOptions which can be recognized
                 // on this system.
@@ -181,10 +187,16 @@ namespace Extract.Redaction.Verification
 
                     _slideshowRunKeyComboBox.Text = _runKeyOptions[_config.Settings.SlideshowRunKey];
                 }
-                // If the slideshow is not enabled, remove the slideshow settings tab.
-                else
+
+                // If OnDemand tab is available initialize the OnDemand settings.
+                if (_onDemandTabPage != null)
                 {
-                    this._tabControl.TabPages.Remove(_slideshowTabPage);
+                    _createVOAFileRadioButton.Checked =
+                        _config.Settings.OnDemandCreateVOAFileMode == OnDemandCreateVOAFileMode.Create;
+                    _promptVOAFileRadioButton.Checked =
+                        _config.Settings.OnDemandCreateVOAFileMode == OnDemandCreateVOAFileMode.Prompt;
+                    _doNotCreateVOAFileRadioButton.Checked =
+                        _config.Settings.OnDemandCreateVOAFileMode == OnDemandCreateVOAFileMode.DoNotCreate;
                 }
 
                 UpdateControls();
@@ -243,26 +255,35 @@ namespace Extract.Redaction.Verification
 
             try
             {
-                // Before checking the _slideshowIntervalUpDown value, register
-                // slideshowIntervalValid to be set to false in the case that UserTextCorrected is
-                // raised.
-                _slideshowIntervalUpDown.UserTextCorrected += handleUserTextCorrected;
-                _config.Settings.AutoStartSlideshow = _slideshowAutoStartCheckBox.Checked;
-                _config.Settings.SlideshowInterval = (int)_slideshowIntervalUpDown.Value;
-
-                // Apply any newly selected slideshow run key.
-                if (_slideshowRunKeyComboBox.Text != _runKeyOptions[_config.Settings.SlideshowRunKey])
+                if (_taskSettings.SlideshowSettings.SlideshowEnabled)
                 {
-                    _config.Settings.SlideshowRunKey = _runKeyOptions
-                        .Where(option => option.Value == _slideshowRunKeyComboBox.Text)
-                        .Single()
-                        .Key;
+                    // Before checking the _slideshowIntervalUpDown value, register
+                    // slideshowIntervalValid to be set to false in the case that UserTextCorrected is
+                    // raised.
+                    _slideshowIntervalUpDown.UserTextCorrected += handleUserTextCorrected;
+                    _config.Settings.SlideshowInterval = (int)_slideshowIntervalUpDown.Value;
                 }
 
                 // Store settings and close the dialog only if slideshowIntervalValid.
                 if (slideshowIntervalValid)
                 {
-                    _options = GetVerificationOptions();
+                    _config.Settings.AutoTool = GetAutoTool();
+                    _config.Settings.OCRText = _OCRCheckBox.Checked;
+                    _config.Settings.AutoZoom = _autoZoomCheckBox.Checked;
+                    _config.Settings.AutoZoomScale = _autoZoomScaleTrackBar.Value;
+                    _config.Settings.OnDemandCreateVOAFileMode = GetOnDemandCreateVOAFileMode();
+                    _config.Settings.AutoStartSlideshow = _slideshowAutoStartCheckBox.Checked;
+
+                    // Apply any newly selected slideshow run key.
+                    if (_taskSettings.SlideshowSettings.SlideshowEnabled &&
+                        _slideshowRunKeyComboBox.Text != _runKeyOptions[_config.Settings.SlideshowRunKey])
+                    {
+                        _config.Settings.SlideshowRunKey = _runKeyOptions
+                            .Where(option => option.Value == _slideshowRunKeyComboBox.Text)
+                            .Single()
+                            .Key;
+                    }
+
                     _config.Save();
 
                     DialogResult = DialogResult.OK;

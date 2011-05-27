@@ -199,7 +199,6 @@
       <DependentUpon>VerificationAboutBox.cs</DependentUpon>
     </Compile>
     <Compile Include="VerificationMemento.cs" />
-    <Compile Include="VerificationOptions.cs" />
     <Compile Include="VerificationOptionsDialog.cs">
       <SubType>Form</SubType>
     </Compile>

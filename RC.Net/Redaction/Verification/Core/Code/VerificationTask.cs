@@ -143,7 +143,7 @@ namespace Extract.Redaction.Verification
         /// <returns>A <see cref="VerificationTaskForm"/> with the current settings.</returns>
         IVerificationForm CreateVerificationTaskForm()
         {
-            return new VerificationTaskForm(_settings);
+            return new VerificationTaskForm(_settings, null, false);
         }
         
         #endregion Methods

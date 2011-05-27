@@ -1,6 +1,7 @@
 using Extract.AttributeFinder;
 using Extract.Drawing;
 using Extract.FileActionManager.Forms;
+using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Rules;
@@ -49,7 +50,12 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The title to display for the verification task form.
         /// </summary>
-        const string _FORM_TITLE = "ID Shield Verification";
+        const string _FORM_TASK_TITLE = "ID Shield Verification";
+
+        /// <summary>
+        /// The title to display for the verification task form when in stand-alone mode.
+        /// </summary>
+        const string _FORM_ONDEMAND_TITLE = "ID Shield On Demand";
 
         /// <summary>
         /// The full path to the file that contains information about persisting the 
@@ -181,11 +187,6 @@ namespace Extract.Redaction.Verification
         /// Wrapper around <see cref="_fileDatabase"/> for ID Shield specific functionality.
         /// </summary>
         IDShieldProductDBMgr _idShieldDatabase;
-
-        /// <summary>
-        /// The settings for the user interface.
-        /// </summary>
-        VerificationOptions _options;
 
         /// <summary>
         /// The last saved state of the currently processing document.
@@ -359,6 +360,28 @@ namespace Extract.Redaction.Verification
         /// </summary>
         double _previousDocumentScaleFactor;
 
+        /// <summary>
+        /// Indicates whether the verification session is being run independent of the FAM and
+        /// database.
+        /// </summary>
+        readonly bool _standAloneMode = true;
+
+        /// <summary>
+        /// The title to display for the form.
+        /// </summary>
+        readonly string _formTitle;
+
+        /// <summary>
+        /// Caches whether or not PDF read/write support is licensed.
+        /// </summary>
+        readonly bool _isPDFLicensed = false;
+
+        /// <summary>
+        /// The <see cref="RedactionTaskClass"/> instance to use to create redacted output in
+        /// stand-alone mode.
+        /// </summary>
+        RedactionTaskClass _redactedOutputTask;
+
         #endregion Fields
 
         #region Events
@@ -373,11 +396,27 @@ namespace Extract.Redaction.Verification
         #region Constructors
 
         /// <summary>
-        /// Initializes a new <see cref="VerificationTaskForm"/> class.
+        /// Initializes a new instance of the <see cref="VerificationTaskForm"/> class.
         /// </summary>
-        // Don't fight with auto-generated code.
-        //[SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
-        public VerificationTaskForm(VerificationSettings settings)
+        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if one is not provided
+        /// via the Open call.</param>
+        /// <param name="settings">The <see cref="VerificationSettings"/> to use.</param>
+        public VerificationTaskForm(VerificationSettings settings, FAMTagManager tagManager)
+            : this(settings, tagManager, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VerificationTaskForm"/> class with the
+        /// ability to indicated the form is not running in standalone mode.
+        /// </summary>
+        /// <param name="settings">The <see cref="VerificationSettings"/> to use.</param>
+        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if one is not provided
+        /// via the Open call.</param>
+        /// <param name="standAloneMode"><see langword="true"/> if the verification session is being
+        /// run independent of the FAM and database; <see langword="false"/> otherwise.</param>
+        internal VerificationTaskForm(VerificationSettings settings, FAMTagManager tagManager,
+            bool standAloneMode)
         {
             try
             {
@@ -395,10 +434,53 @@ namespace Extract.Redaction.Verification
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
                 _settings = settings;
+                _tagManager = tagManager;
 
                 _actionStatusTask = GetActionStatusTask(_settings.ActionStatusSettings);
 
                 InitializeComponent();
+
+                _standAloneMode = standAloneMode;
+                
+                // Adjust controls based on whether or not standalone mode is being used.
+                if (_standAloneMode)
+                {
+                    _formTitle = _FORM_ONDEMAND_TITLE;
+
+                    FormsMethods.RemoveAndDisposeToolStripItems(_nextDocumentToolStripButton,
+                        _previousDocumentToolStripButton, _saveToolStripMenuItem);
+                    FormsMethods.RemoveUnnecessaryToolStripSeparators(_basicDataGridToolStrip);
+                    
+                    // In standalone mode, there's no "commit".
+                    _saveAndCommitToolStripMenuItem.Text = "Save";
+                    _saveAndCommitToolStripButton.Text =
+                        _saveAndCommitToolStripButton.Text.Replace(" and Commit", "");
+                    _skipProcessingToolStripMenuItem.Text = "Close";
+                    _stopProcessingToolStripMenuItem.Text = "Exit";
+
+                    _imageViewer.OpeningImage += HandleImageViewerOpeningImage;
+                    _imageViewer.ImageFileClosing += HandleImageViewerImageFileClosing;
+
+                    // Do not maintain any document history in standalone mode.
+                    _history.Capacity = 0;
+
+                    // The redacted image output task for standalone mode uses with default settings except:
+                    // All turned-on items will be output (even clues, etc)
+                    // The redaction text is "<ExemptionCodes>"
+                    _redactedOutputTask = new RedactionTaskClass();
+                    _redactedOutputTask.AttributeNames = null;
+                    _redactedOutputTask.RedactionText = "<ExemptionCodes>";
+
+                    // Cached whether PDF support is used since we will be checking this with every save.
+                    _isPDFLicensed = LicenseUtilities.IsLicensed(LicenseIdName.PdfReadWriteFeature);
+                }
+                else
+                {
+                    _formTitle = _FORM_TASK_TITLE;
+
+                    _openImageToolStripSplitButton.Visible = false;
+                    _openImageToolStripMenuItem.Visible = false;
+                }
 
                 // Add the default redaction types
                 string[] types = _iniSettings.GetRedactionTypes();
@@ -428,8 +510,7 @@ namespace Extract.Redaction.Verification
                 
                 _imageViewer.DefaultRedactionFillColor = _iniSettings.OutputRedactionColor;
 
-                VerificationOptions options = VerificationOptions.ReadFrom(_iniSettings);
-                SetVerificationOptions(options);
+                SetVerificationOptions();
 
                 _currentVoa = new RedactionFileLoader(_iniSettings.ConfidenceLevels);
 
@@ -587,15 +668,27 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void Commit()
         {
-            // Save
-            TimeInterval screenTime = StopScreenTimeTimer();
-            Save(screenTime);
+            VerificationMemento memento = GetCurrentDocument();
+
+            // Save VOA file if needed.
+            if (NeedToSaveVOAFile(memento))
+            {
+                TimeInterval screenTime = StopScreenTimeTimer();
+                Save(screenTime);
+            }
+
+            // If in standalone, output the redacted version of the image.
+            if (_standAloneMode)
+            {
+                if (!SaveRedactedImage(memento))
+                {
+                    return;
+                }
+            }
 
             // Commit
             if (_actionStatusTask != null)
             {
-				VerificationMemento memento = GetCurrentDocument();
-
 				// Set up file record for call to processfile
 				FileRecordClass fileRecord = new FileRecordClass();
 				fileRecord.Name = memento.SourceDocument;
@@ -609,18 +702,14 @@ namespace Extract.Redaction.Verification
             // apply any tags or action status per the task configuration.
             if (_setSlideshowAdvancedPages.Count > 0)
             {
-                VerificationMemento memento = null;
                 if (_settings.SlideshowSettings.ApplyAutoAdvanceTag)
                 {
-                    memento = GetCurrentDocument();
                     _fileDatabase.TagFile(memento.FileId,
                         _settings.SlideshowSettings.AutoAdvanceTag);
                 }
 
                 if (_slideshowActionStatusTask != null)
                 {
-                    memento = memento ?? GetCurrentDocument();
-
 					// Set up file record for call to processfile
 					FileRecordClass fileRecord = new FileRecordClass();
 					fileRecord.Name = memento.SourceDocument;
@@ -631,6 +720,130 @@ namespace Extract.Redaction.Verification
                         null, false);
                 }
             }
+        }
+
+        /// <summary>
+        /// Determines whether the VOA file needs to be saved during the <see cref="Commit"/> call.
+        /// </summary>
+        /// <param name="memento">The memento.</param>
+        /// <returns><see langword="true"/> if the VOA file should be saved</returns>
+        bool NeedToSaveVOAFile(VerificationMemento memento)
+        {
+            // Save a VOA file in any of these cases:
+            // 1) We're not in stand-alone mode
+            // 2) The VOA file already exists
+            // 3) OnDemandCreateVOAFileMode == Create
+            // 4) OnDemandCreateVOAFileMode == Prompt AND the user answers yes.
+            if (!_standAloneMode ||
+                File.Exists(memento.AttributesFile) ||
+                _config.Settings.OnDemandCreateVOAFileMode == OnDemandCreateVOAFileMode.Create)
+            {
+                return true;
+            }
+            else if (_config.Settings.OnDemandCreateVOAFileMode == OnDemandCreateVOAFileMode.Prompt &&
+                     System.Windows.Forms.DialogResult.Yes ==
+                            MessageBox.Show(this,
+                                "Would you like to create an ID Shield data file for this document?",
+                                "Create ID Shield data file?", MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0))
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Saves a redacted copy of the loaded document to a location the user chooses.
+        /// </summary>
+        /// <param name="memento">The <see cref="VerificationMemento"/> representing the currently
+        /// loaded document.</param>
+        /// <returns><see langword="true"/> if the redacted image was successfully saved,
+        /// <see langword="false"/> otherwise.</returns>
+        bool SaveRedactedImage(VerificationMemento memento)
+        {
+            TemporaryFile tempVoaFile = null;
+
+            try
+            {
+                // Create a dialog to prompt the user for the ouput location.
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                {
+                    saveFileDialog.InitialDirectory = Path.GetDirectoryName(memento.SourceDocument);
+                    saveFileDialog.FileName =
+                        Path.GetFileNameWithoutExtension(memento.SourceDocument) + ".redacted";
+                    saveFileDialog.Filter = "TIFF files (*.tif;*.tiff)|*.tif;*.tiff";
+                    saveFileDialog.FilterIndex = 1;
+                    saveFileDialog.AddExtension = true;
+
+                    // If PDF read/write is licensed, support outputting to a PDF as well.
+                    if (_isPDFLicensed)
+                    {
+                        saveFileDialog.Filter += "|PDF Files (*.pdf)|*.pdf";
+                        if (ImageMethods.IsPdf(memento.SourceDocument))
+                        {
+                            saveFileDialog.FilterIndex = 2;
+                        }
+                    }
+
+                    DialogResult result = saveFileDialog.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        // Prevent overwriting the source document.
+                        if (string.Compare(saveFileDialog.FileName, memento.SourceDocument,
+                                StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            UtilityMethods.ShowMessageBox(
+                                "Cannot overwrite source image with redacted output. " +
+                                "Please choose a different filename.", "Cannot overwrite source",
+                                true);
+
+                            return SaveRedactedImage(memento);
+                        }
+
+                        // If there isn't a VOA file for the document, create a temporary VOA file
+                        // to supply to _redactedOutputTask.
+                        if (!File.Exists(memento.AttributesFile))
+                        {
+                            tempVoaFile = new TemporaryFile(".voa");
+                            _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
+
+                            RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
+                            _currentVoa.SaveVerificationSession(tempVoaFile.FileName,
+                                changes, new TimeInterval(DateTime.Now, 0), _settings, _standAloneMode);
+
+                            _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
+                        }
+                        else
+                        {
+                            _redactedOutputTask.VOAFileName = memento.AttributesFile;
+                        }
+
+                        _redactedOutputTask.OutputFileName = saveFileDialog.FileName;
+
+                        // Set up file record for call to processfile
+                        FileRecordClass fileRecord = new FileRecordClass();
+                        fileRecord.Name = memento.SourceDocument;
+                        fileRecord.FileID = memento.FileId;
+
+                        // Output the image.
+                        if (_redactedOutputTask.ProcessFile(fileRecord, 0, _tagManager, null, null, false) ==
+                            EFileProcessingResult.kProcessingSuccessful)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (tempVoaFile != null)
+                {
+                    tempVoaFile.Dispose();
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -722,7 +935,8 @@ namespace Extract.Redaction.Verification
             VerificationMemento memento = GetCurrentDocument();
             RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);
 
-            _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime, _settings);
+            _currentVoa.SaveVerificationSession(memento.AttributesFile, changes, screenTime,
+                _settings, _standAloneMode);
 
             // Clear the dirty flag [FIDSC #3846]
             _redactionGridView.Dirty = false;
@@ -887,6 +1101,11 @@ namespace Extract.Redaction.Verification
         /// the next document is opened.</param>
         void AdvanceToNextDocument(DocumentNavigationTarget navigationTarget)
         {
+            if (_standAloneMode)
+            {
+                return;
+            }
+
             TimeInterval screenTime = StopScreenTimeTimer();
             SaveRedactionCounts(screenTime);
 
@@ -1092,6 +1311,18 @@ namespace Extract.Redaction.Verification
         /// modified or if changes were successfully discarded or saved.</returns>
         bool WarnIfDirty()
         {
+            // If the user is in standalone mode, the current document doesn't have a VOA file and
+            // they are configured no to create one, there's no need to prompt about a dirty file.
+            if (_standAloneMode &&
+                _config.Settings.OnDemandCreateVOAFileMode == OnDemandCreateVOAFileMode.DoNotCreate)
+            {
+                VerificationMemento memento = GetCurrentDocument();
+                if (memento != null && !File.Exists(memento.AttributesFile))
+                {
+                    return false;
+                }
+            }
+
             // Check if the viewed document is dirty
             if (_redactionGridView.Dirty)
             {
@@ -1321,7 +1552,7 @@ namespace Extract.Redaction.Verification
         /// no warning was displayed.</returns>
         bool WarnIfStopping()
         {
-            bool warn = _userClosing && !_imageViewer.IsImageAvailable;
+            bool warn = !_standAloneMode && _userClosing && !_imageViewer.IsImageAvailable;
             if (warn)
             {
                 _userClosing = false;
@@ -1733,7 +1964,7 @@ namespace Extract.Redaction.Verification
         /// the previous document is opened.</param>
         void GoToPreviousDocument(DocumentNavigationTarget navigationTarget)
         {
-            if (_imageViewer.IsImageAvailable && _historyIndex > 0)
+            if (!_standAloneMode && _imageViewer.IsImageAvailable && _historyIndex > 0)
             {
                 _redactionGridView.CommitChanges();
 
@@ -1789,6 +2020,11 @@ namespace Extract.Redaction.Verification
         /// the next document is opened.</param>
         void GoToNextDocument(bool promptForSlideshowAdvance, DocumentNavigationTarget navigationTarget)
         {
+            if (_standAloneMode)
+            {
+                return;
+            }
+
             _redactionGridView.CommitChanges();
 
             // If the advancing from a document that has not yet been committed.
@@ -1881,17 +2117,21 @@ namespace Extract.Redaction.Verification
             {
                 VerificationMemento memento = GetCurrentDocument();
 
+                if (memento == null)
+                {
+                    // If a memento has not yet been created for this document, we can't update the
+                    // controls yet. (This can happen in standalone mode.)
+                    return;
+                }
+
                 _currentDocumentTextBox.Text = memento.SourceDocument;
-                Text = Path.GetFileName(memento.SourceDocument) + " - " + _FORM_TITLE;
+                Text = Path.GetFileName(memento.SourceDocument) + " - " + _formTitle;
 
                 _documentTypeTextBox.Text = memento.DocumentType;
                 _commentsTextBox.Text = GetFileActionComment(memento);
 
                 _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
                 _nextDocumentToolStripButton.Enabled = true;
-
-                // _previousRedactionToolStripButton is set in UpdateControlsBasedOnSelection()
-                _nextRedactionToolStripButton.Enabled = true;
 
                 _tagFileToolStripButton.Enabled = _fileDatabase != null;
                 _tagFileToolStripButton.FileId = memento.FileId;
@@ -1912,7 +2152,7 @@ namespace Extract.Redaction.Verification
             else
             {
                 _currentDocumentTextBox.Text = "";
-                Text = _FORM_TITLE + " (Waiting for file)";
+                Text = _formTitle + " (Waiting for file)";
 
                 _documentTypeTextBox.Text = "";
                 _commentsTextBox.Text = "";
@@ -1949,6 +2189,10 @@ namespace Extract.Redaction.Verification
             _lastExemptionToolStripButton.Enabled = 
                 selected && _redactionGridView.HasAppliedExemptions;
 
+            _nextRedactionToolStripButton.Enabled = !_standAloneMode ||
+                (_redactionGridView.Rows.Count > 0 &&
+                    _redactionGridView.GetFirstSelectedRowIndex() < _redactionGridView.Rows.Count - 1);
+
             _previousRedactionToolStripButton.Enabled = SelectPreviousItemOrPage(true);
         }
 
@@ -1960,6 +2204,7 @@ namespace Extract.Redaction.Verification
         {
             // Load the voa
             VerificationMemento memento = GetCurrentDocument();
+
             _currentVoa.LoadFrom(memento.AttributesFile, memento.SourceDocument);
 
             // Set the controls
@@ -2036,14 +2281,11 @@ namespace Extract.Redaction.Verification
         /// Stores the verification options specified and sets them on the 
         /// <see cref="RedactionGridView"/>.
         /// </summary>
-        /// <param name="options">The verification options to retain.</param>
-        void SetVerificationOptions(VerificationOptions options)
+        void SetVerificationOptions()
         {
-            _options = options;
-
-            _redactionGridView.AutoTool = _options.AutoTool;
-            _redactionGridView.AutoZoom = _options.AutoZoom;
-            _redactionGridView.AutoZoomScale = _options.AutoZoomScale;
+            _redactionGridView.AutoTool = _config.Settings.AutoTool;
+            _redactionGridView.AutoZoom = _config.Settings.AutoZoom;
+            _redactionGridView.AutoZoomScale = _config.Settings.AutoZoomScale;
 
             _slideshowTimer.Interval = _config.Settings.SlideshowInterval * 1000;
         }
@@ -2165,7 +2407,8 @@ namespace Extract.Redaction.Verification
                 }
                 _fullScreenToolStripMenuItem.Checked = _formStateManager.FullScreen;
 
-                bool slideshowEnabled = _settings.SlideshowSettings.SlideshowEnabled &&
+                bool slideshowEnabled = !_standAloneMode &&
+                                        _settings.SlideshowSettings.SlideshowEnabled &&
                                         !_settings.SlideshowSettings.RequireRunKey;
                 _startSlideshowCommand = new ApplicationCommand(_imageViewer.Shortcuts,
                     new Keys[] { Keys.F5 }, StartSlideshow,
@@ -2190,6 +2433,8 @@ namespace Extract.Redaction.Verification
                         StopSlideshowTimer();
                     }
                 }
+
+                UpdateControls();
             }
             catch (Exception ex)
             {
@@ -2613,12 +2858,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                VerificationOptionsDialog dialog = new VerificationOptionsDialog(_options, _settings);
+                VerificationOptionsDialog dialog = new VerificationOptionsDialog(_settings, _standAloneMode);
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    SetVerificationOptions(dialog.VerificationOptions);
-
-                    _options.WriteTo(_iniSettings);
+                    SetVerificationOptions();
                 }
             }
             catch (Exception ex)
@@ -2757,8 +3000,9 @@ namespace Extract.Redaction.Verification
                 }
                 else
                 {
-                    // No image is open. Clear the dirty flag [FIDSC #3846]
-                    _redactionGridView.Dirty = false;
+                    // No image is open. Clear the grid.
+                    // (This resets the dirty flag as well [FIDSC #3846])
+                    _redactionGridView.Clear();
                 }
             }
             catch (Exception ex)
@@ -3211,6 +3455,68 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="ImageViewer.OpeningImage"/> event. Processing that would normally
+        /// happen in the <see cref="AdvanceToNextDocument()"/> and <see cref="Open"/> method in FAM
+        /// mode will happen in this method in stand-alone mode.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.OpeningImageEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleImageViewerOpeningImage(object sender, OpeningImageEventArgs e)
+        {
+            try
+            {
+                if (WarnIfDirty())
+                {
+                    e.Cancel = true;
+                }
+                else
+                {
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        _imageViewer.UnloadImage(_imageViewer.ImageFile);
+                    }
+
+                    // Get the full path of the source document
+                    string fullPath = Path.GetFullPath(e.FileName);
+
+                    // Create the saved memento
+                    FileActionManagerPathTags pathTags =
+                        new FileActionManagerPathTags(fullPath, _tagManager.FPSFileDir);
+                    _savedMemento = CreateSavedMemento(fullPath, 0, 0, pathTags);
+
+                    // If the thumbnail viewer is not visible when a document is opened, don't load the
+                    // thumbnails. (They will get loaded if the thumbnail window is opened at a later
+                    // time).
+                    _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32610");
+            }
+        }
+
+        /// <summary>
+        /// Handles the<see cref="ImageViewer.ImageFileClosing"/> event to ensure the previously
+        /// loaded image is unloaded from the image reader cache in stand-alone mode.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.ImageFileClosingEventArgs"/>
+        /// instance containing the event data.</param>
+        void HandleImageViewerImageFileClosing(object sender, ImageFileClosingEventArgs e)
+        {
+            try
+            {
+                _imageViewer.UnloadImage(e.FileName);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32611");
+            }
+        }
+
         #endregion Event Handlers
 
         #region IVerificationForm Members
@@ -3247,11 +3553,12 @@ namespace Extract.Redaction.Verification
 
                 // Get the full path of the source document
                 string fullPath = Path.GetFullPath(fileName);
-                
+
+                _tagManager = tagManager ?? _tagManager;
+
                 // Create the path tags
                 FileActionManagerPathTags pathTags = 
-                    new FileActionManagerPathTags(fullPath, tagManager.FPSFileDir);
-                _tagManager = tagManager;
+                    new FileActionManagerPathTags(fullPath, _tagManager.FPSFileDir);
 
                 // Create the saved memento
                 _savedMemento = CreateSavedMemento(fullPath, fileID, actionID, pathTags);
@@ -3261,7 +3568,7 @@ namespace Extract.Redaction.Verification
                 // time).
                 _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen;
 
-                _imageViewer.OpenImage(_savedMemento.DisplayImage, false);
+                _imageViewer.OpenImage(_savedMemento.DisplayImage, _standAloneMode);
             }
             catch (Exception ex)
             {

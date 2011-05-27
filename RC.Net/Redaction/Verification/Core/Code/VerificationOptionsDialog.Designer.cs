@@ -38,100 +38,58 @@ namespace Extract.Redaction.Verification
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.GroupBox groupBox1;
-            System.Windows.Forms.Label label2;
-            System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label3;
             System.Windows.Forms.GroupBox groupBox2;
             System.Windows.Forms.TextBox textBox1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VerificationOptionsDialog));
-            this._autoZoomScaleTrackBar = new System.Windows.Forms.TrackBar();
-            this._autoZoomScaleTextBox = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.GroupBox groupBox1;
+            System.Windows.Forms.Label label2;
+            System.Windows.Forms.Label label1;
             this._slideshowRunKeyComboBox = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
+            this._autoZoomScaleTrackBar = new System.Windows.Forms.TrackBar();
+            this._autoZoomScaleTextBox = new System.Windows.Forms.TextBox();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._tabControl = new System.Windows.Forms.TabControl();
             this._generalTabPage = new System.Windows.Forms.TabPage();
+            this._OCRCheckBox = new System.Windows.Forms.CheckBox();
             this._autoToolComboBox = new System.Windows.Forms.ComboBox();
             this._autoToolCheckBox = new System.Windows.Forms.CheckBox();
-            this._autoZoomCheckBox = new System.Windows.Forms.CheckBox();
             this._slideshowTabPage = new System.Windows.Forms.TabPage();
             this._slideshowAutoStartCheckBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this._slideshowIntervalUpDown = new Extract.Utilities.Forms.BetterNumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
-            groupBox1 = new System.Windows.Forms.GroupBox();
-            label2 = new System.Windows.Forms.Label();
-            label1 = new System.Windows.Forms.Label();
+            this._zoomTabPage = new System.Windows.Forms.TabPage();
+            this._autoZoomCheckBox = new System.Windows.Forms.CheckBox();
+            this._onDemandTabPage = new System.Windows.Forms.TabPage();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this._doNotCreateVOAFileRadioButton = new System.Windows.Forms.RadioButton();
+            this._promptVOAFileRadioButton = new System.Windows.Forms.RadioButton();
+            this._createVOAFileRadioButton = new System.Windows.Forms.RadioButton();
             label3 = new System.Windows.Forms.Label();
             groupBox2 = new System.Windows.Forms.GroupBox();
             textBox1 = new System.Windows.Forms.TextBox();
+            groupBox1 = new System.Windows.Forms.GroupBox();
+            label2 = new System.Windows.Forms.Label();
+            label1 = new System.Windows.Forms.Label();
+            groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._autoZoomScaleTrackBar)).BeginInit();
-            groupBox2.SuspendLayout();
             this._tabControl.SuspendLayout();
             this._generalTabPage.SuspendLayout();
             this._slideshowTabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._slideshowIntervalUpDown)).BeginInit();
+            this._zoomTabPage.SuspendLayout();
+            this._onDemandTabPage.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(this._autoZoomScaleTrackBar);
-            groupBox1.Controls.Add(this._autoZoomScaleTextBox);
-            groupBox1.Controls.Add(label2);
-            groupBox1.Controls.Add(label1);
-            groupBox1.Location = new System.Drawing.Point(20, 41);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(343, 83);
-            groupBox1.TabIndex = 6;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Zoom level";
-            // 
-            // _autoZoomScaleTrackBar
-            // 
-            this._autoZoomScaleTrackBar.Enabled = false;
-            this._autoZoomScaleTrackBar.LargeChange = 3;
-            this._autoZoomScaleTrackBar.Location = new System.Drawing.Point(10, 36);
-            this._autoZoomScaleTrackBar.Minimum = 1;
-            this._autoZoomScaleTrackBar.Name = "_autoZoomScaleTrackBar";
-            this._autoZoomScaleTrackBar.Size = new System.Drawing.Size(301, 45);
-            this._autoZoomScaleTrackBar.TabIndex = 2;
-            this._autoZoomScaleTrackBar.Value = 1;
-            this._autoZoomScaleTrackBar.ValueChanged += new System.EventHandler(this.HandleAutoZoomScaleTrackBarValueChanged);
-            // 
-            // _autoZoomScaleTextBox
-            // 
-            this._autoZoomScaleTextBox.Enabled = false;
-            this._autoZoomScaleTextBox.Location = new System.Drawing.Point(317, 36);
-            this._autoZoomScaleTextBox.Name = "_autoZoomScaleTextBox";
-            this._autoZoomScaleTextBox.ReadOnly = true;
-            this._autoZoomScaleTextBox.Size = new System.Drawing.Size(20, 20);
-            this._autoZoomScaleTextBox.TabIndex = 3;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(259, 20);
-            label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(52, 13);
-            label2.TabIndex = 1;
-            label2.Text = "Zoom out";
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(7, 20);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(45, 13);
-            label1.TabIndex = 0;
-            label1.Text = "Zoom in";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(190, 133);
+            label3.Location = new System.Drawing.Point(188, 16);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(90, 13);
             label3.TabIndex = 9;
@@ -173,7 +131,7 @@ namespace Extract.Redaction.Verification
             // 
             textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            textBox1.BackColor = System.Drawing.SystemColors.Control;
+            textBox1.BackColor = System.Drawing.SystemColors.ControlLightLight;
             textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             textBox1.Location = new System.Drawing.Point(6, 19);
             textBox1.Multiline = true;
@@ -181,6 +139,58 @@ namespace Extract.Redaction.Verification
             textBox1.Size = new System.Drawing.Size(357, 45);
             textBox1.TabIndex = 0;
             textBox1.Text = resources.GetString("textBox1.Text");
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(this._autoZoomScaleTrackBar);
+            groupBox1.Controls.Add(this._autoZoomScaleTextBox);
+            groupBox1.Controls.Add(label2);
+            groupBox1.Controls.Add(label1);
+            groupBox1.Location = new System.Drawing.Point(17, 38);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new System.Drawing.Size(356, 83);
+            groupBox1.TabIndex = 8;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Zoom level";
+            // 
+            // _autoZoomScaleTrackBar
+            // 
+            this._autoZoomScaleTrackBar.Enabled = false;
+            this._autoZoomScaleTrackBar.LargeChange = 3;
+            this._autoZoomScaleTrackBar.Location = new System.Drawing.Point(10, 36);
+            this._autoZoomScaleTrackBar.Minimum = 1;
+            this._autoZoomScaleTrackBar.Name = "_autoZoomScaleTrackBar";
+            this._autoZoomScaleTrackBar.Size = new System.Drawing.Size(308, 45);
+            this._autoZoomScaleTrackBar.TabIndex = 2;
+            this._autoZoomScaleTrackBar.Value = 1;
+            this._autoZoomScaleTrackBar.ValueChanged += new System.EventHandler(this.HandleAutoZoomScaleTrackBarValueChanged);
+            // 
+            // _autoZoomScaleTextBox
+            // 
+            this._autoZoomScaleTextBox.Enabled = false;
+            this._autoZoomScaleTextBox.Location = new System.Drawing.Point(324, 36);
+            this._autoZoomScaleTextBox.Name = "_autoZoomScaleTextBox";
+            this._autoZoomScaleTextBox.ReadOnly = true;
+            this._autoZoomScaleTextBox.Size = new System.Drawing.Size(20, 20);
+            this._autoZoomScaleTextBox.TabIndex = 3;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(266, 20);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(52, 13);
+            label2.TabIndex = 1;
+            label2.Text = "Zoom out";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(7, 20);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(45, 13);
+            label1.TabIndex = 0;
+            label1.Text = "Zoom in";
             // 
             // _cancelButton
             // 
@@ -208,6 +218,8 @@ namespace Extract.Redaction.Verification
             // 
             this._tabControl.Controls.Add(this._generalTabPage);
             this._tabControl.Controls.Add(this._slideshowTabPage);
+            this._tabControl.Controls.Add(this._zoomTabPage);
+            this._tabControl.Controls.Add(this._onDemandTabPage);
             this._tabControl.Location = new System.Drawing.Point(13, 13);
             this._tabControl.Name = "_tabControl";
             this._tabControl.SelectedIndex = 0;
@@ -216,10 +228,10 @@ namespace Extract.Redaction.Verification
             // 
             // _generalTabPage
             // 
+            this._generalTabPage.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this._generalTabPage.Controls.Add(this._OCRCheckBox);
             this._generalTabPage.Controls.Add(this._autoToolComboBox);
             this._generalTabPage.Controls.Add(this._autoToolCheckBox);
-            this._generalTabPage.Controls.Add(this._autoZoomCheckBox);
-            this._generalTabPage.Controls.Add(groupBox1);
             this._generalTabPage.Controls.Add(label3);
             this._generalTabPage.Location = new System.Drawing.Point(4, 22);
             this._generalTabPage.Name = "_generalTabPage";
@@ -227,7 +239,16 @@ namespace Extract.Redaction.Verification
             this._generalTabPage.Size = new System.Drawing.Size(388, 168);
             this._generalTabPage.TabIndex = 0;
             this._generalTabPage.Text = "General";
-            this._generalTabPage.UseVisualStyleBackColor = true;
+            // 
+            // _OCRCheckBox
+            // 
+            this._OCRCheckBox.AutoSize = true;
+            this._OCRCheckBox.Location = new System.Drawing.Point(17, 38);
+            this._OCRCheckBox.Name = "_OCRCheckBox";
+            this._OCRCheckBox.Size = new System.Drawing.Size(235, 17);
+            this._OCRCheckBox.TabIndex = 10;
+            this._OCRCheckBox.Text = "OCR text if there is no pre-existing OCR data";
+            this._OCRCheckBox.UseVisualStyleBackColor = true;
             // 
             // _autoToolComboBox
             // 
@@ -235,7 +256,7 @@ namespace Extract.Redaction.Verification
             this._autoToolComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._autoToolComboBox.Enabled = false;
             this._autoToolComboBox.FormattingEnabled = true;
-            this._autoToolComboBox.Location = new System.Drawing.Point(84, 130);
+            this._autoToolComboBox.Location = new System.Drawing.Point(82, 13);
             this._autoToolComboBox.Name = "_autoToolComboBox";
             this._autoToolComboBox.Size = new System.Drawing.Size(100, 21);
             this._autoToolComboBox.TabIndex = 8;
@@ -243,7 +264,7 @@ namespace Extract.Redaction.Verification
             // _autoToolCheckBox
             // 
             this._autoToolCheckBox.AutoSize = true;
-            this._autoToolCheckBox.Location = new System.Drawing.Point(19, 132);
+            this._autoToolCheckBox.Location = new System.Drawing.Point(17, 15);
             this._autoToolCheckBox.Name = "_autoToolCheckBox";
             this._autoToolCheckBox.Size = new System.Drawing.Size(59, 17);
             this._autoToolCheckBox.TabIndex = 7;
@@ -251,19 +272,9 @@ namespace Extract.Redaction.Verification
             this._autoToolCheckBox.UseVisualStyleBackColor = true;
             this._autoToolCheckBox.CheckedChanged += new System.EventHandler(this.HandleAutoToolCheckBoxCheckedChanged);
             // 
-            // _autoZoomCheckBox
-            // 
-            this._autoZoomCheckBox.AutoSize = true;
-            this._autoZoomCheckBox.Location = new System.Drawing.Point(19, 17);
-            this._autoZoomCheckBox.Name = "_autoZoomCheckBox";
-            this._autoZoomCheckBox.Size = new System.Drawing.Size(205, 17);
-            this._autoZoomCheckBox.TabIndex = 5;
-            this._autoZoomCheckBox.Text = "Automatically zoom to redactable data";
-            this._autoZoomCheckBox.UseVisualStyleBackColor = true;
-            this._autoZoomCheckBox.CheckedChanged += new System.EventHandler(this.HandleAutoZoomCheckBoxCheckedChanged);
-            // 
             // _slideshowTabPage
             // 
+            this._slideshowTabPage.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this._slideshowTabPage.Controls.Add(groupBox2);
             this._slideshowTabPage.Controls.Add(this._slideshowAutoStartCheckBox);
             this._slideshowTabPage.Controls.Add(this.label4);
@@ -275,7 +286,6 @@ namespace Extract.Redaction.Verification
             this._slideshowTabPage.Size = new System.Drawing.Size(388, 168);
             this._slideshowTabPage.TabIndex = 1;
             this._slideshowTabPage.Text = "Slideshow";
-            this._slideshowTabPage.UseVisualStyleBackColor = true;
             // 
             // _slideshowAutoStartCheckBox
             // 
@@ -330,6 +340,85 @@ namespace Extract.Redaction.Verification
             this.label5.TabIndex = 19;
             this.label5.Text = "Automatically advance to the next page or document after";
             // 
+            // _zoomTabPage
+            // 
+            this._zoomTabPage.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this._zoomTabPage.Controls.Add(this._autoZoomCheckBox);
+            this._zoomTabPage.Controls.Add(groupBox1);
+            this._zoomTabPage.Location = new System.Drawing.Point(4, 22);
+            this._zoomTabPage.Name = "_zoomTabPage";
+            this._zoomTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this._zoomTabPage.Size = new System.Drawing.Size(388, 168);
+            this._zoomTabPage.TabIndex = 2;
+            this._zoomTabPage.Text = "Zoom";
+            // 
+            // _autoZoomCheckBox
+            // 
+            this._autoZoomCheckBox.AutoSize = true;
+            this._autoZoomCheckBox.Location = new System.Drawing.Point(17, 15);
+            this._autoZoomCheckBox.Name = "_autoZoomCheckBox";
+            this._autoZoomCheckBox.Size = new System.Drawing.Size(205, 17);
+            this._autoZoomCheckBox.TabIndex = 7;
+            this._autoZoomCheckBox.Text = "Automatically zoom to redactable data";
+            this._autoZoomCheckBox.UseVisualStyleBackColor = true;
+            this._autoZoomCheckBox.CheckedChanged += new System.EventHandler(this.HandleAutoZoomCheckBoxCheckedChanged);
+            // 
+            // _onDemandTabPage
+            // 
+            this._onDemandTabPage.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this._onDemandTabPage.Controls.Add(this.groupBox3);
+            this._onDemandTabPage.Location = new System.Drawing.Point(4, 22);
+            this._onDemandTabPage.Name = "_onDemandTabPage";
+            this._onDemandTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this._onDemandTabPage.Size = new System.Drawing.Size(388, 168);
+            this._onDemandTabPage.TabIndex = 3;
+            this._onDemandTabPage.Text = "ID Shield On Demand";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this._doNotCreateVOAFileRadioButton);
+            this.groupBox3.Controls.Add(this._promptVOAFileRadioButton);
+            this.groupBox3.Controls.Add(this._createVOAFileRadioButton);
+            this.groupBox3.Location = new System.Drawing.Point(17, 15);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(352, 93);
+            this.groupBox3.TabIndex = 1;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "If ID Shield data file does not exist, when saving:";
+            // 
+            // _doNotCreateVOAFileRadioButton
+            // 
+            this._doNotCreateVOAFileRadioButton.AutoSize = true;
+            this._doNotCreateVOAFileRadioButton.Location = new System.Drawing.Point(7, 19);
+            this._doNotCreateVOAFileRadioButton.Name = "_doNotCreateVOAFileRadioButton";
+            this._doNotCreateVOAFileRadioButton.Size = new System.Drawing.Size(139, 17);
+            this._doNotCreateVOAFileRadioButton.TabIndex = 2;
+            this._doNotCreateVOAFileRadioButton.TabStop = true;
+            this._doNotCreateVOAFileRadioButton.Text = "Do not create a data file";
+            this._doNotCreateVOAFileRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // _promptVOAFileRadioButton
+            // 
+            this._promptVOAFileRadioButton.AutoSize = true;
+            this._promptVOAFileRadioButton.Location = new System.Drawing.Point(7, 44);
+            this._promptVOAFileRadioButton.Name = "_promptVOAFileRadioButton";
+            this._promptVOAFileRadioButton.Size = new System.Drawing.Size(208, 17);
+            this._promptVOAFileRadioButton.TabIndex = 1;
+            this._promptVOAFileRadioButton.TabStop = true;
+            this._promptVOAFileRadioButton.Text = "Prompt for whether to create a data file";
+            this._promptVOAFileRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // _createVOAFileRadioButton
+            // 
+            this._createVOAFileRadioButton.AutoSize = true;
+            this._createVOAFileRadioButton.Location = new System.Drawing.Point(7, 67);
+            this._createVOAFileRadioButton.Name = "_createVOAFileRadioButton";
+            this._createVOAFileRadioButton.Size = new System.Drawing.Size(105, 17);
+            this._createVOAFileRadioButton.TabIndex = 0;
+            this._createVOAFileRadioButton.TabStop = true;
+            this._createVOAFileRadioButton.Text = "Create a data file";
+            this._createVOAFileRadioButton.UseVisualStyleBackColor = true;
+            // 
             // VerificationOptionsDialog
             // 
             this.AcceptButton = this._okButton;
@@ -347,17 +436,22 @@ namespace Extract.Redaction.Verification
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Verification options";
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._autoZoomScaleTrackBar)).EndInit();
-            groupBox2.ResumeLayout(false);
-            groupBox2.PerformLayout();
             this._tabControl.ResumeLayout(false);
             this._generalTabPage.ResumeLayout(false);
             this._generalTabPage.PerformLayout();
             this._slideshowTabPage.ResumeLayout(false);
             this._slideshowTabPage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._slideshowIntervalUpDown)).EndInit();
+            this._zoomTabPage.ResumeLayout(false);
+            this._zoomTabPage.PerformLayout();
+            this._onDemandTabPage.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -371,14 +465,21 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.TabPage _slideshowTabPage;
         private System.Windows.Forms.ComboBox _autoToolComboBox;
         private System.Windows.Forms.CheckBox _autoToolCheckBox;
-        private System.Windows.Forms.CheckBox _autoZoomCheckBox;
-        private System.Windows.Forms.TrackBar _autoZoomScaleTrackBar;
-        private System.Windows.Forms.TextBox _autoZoomScaleTextBox;
         private System.Windows.Forms.CheckBox _slideshowAutoStartCheckBox;
         private System.Windows.Forms.Label label4;
         private Extract.Utilities.Forms.BetterNumericUpDown _slideshowIntervalUpDown;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ComboBox _slideshowRunKeyComboBox;
+        private System.Windows.Forms.TabPage _zoomTabPage;
+        private System.Windows.Forms.CheckBox _autoZoomCheckBox;
+        private System.Windows.Forms.TrackBar _autoZoomScaleTrackBar;
+        private System.Windows.Forms.TextBox _autoZoomScaleTextBox;
+        private System.Windows.Forms.CheckBox _OCRCheckBox;
+        private System.Windows.Forms.TabPage _onDemandTabPage;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.RadioButton _createVOAFileRadioButton;
+        private System.Windows.Forms.RadioButton _promptVOAFileRadioButton;
+        private System.Windows.Forms.RadioButton _doNotCreateVOAFileRadioButton;
     }
 }

@@ -1844,6 +1844,38 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Clears all data from the grid
+        /// </summary>
+        public void Clear()
+        {
+            try
+            {
+                Active = false;
+
+                // Remove all rows
+                _dataGridView.Rows.Clear();
+
+                // Clear the data
+                _redactions.Clear();
+                _deletedItems.Clear();
+                for (int i = 0; i < _deletedCategoryCounts.Length; i++)
+                {
+                    _deletedCategoryCounts[i] = 0;
+                }
+
+                _dirty = false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32609");
+            }
+            finally
+            {
+                Active = true;
+            }
+        }
+
         #endregion Methods
 
         #region OnEvents

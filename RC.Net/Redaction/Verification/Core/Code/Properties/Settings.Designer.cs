@@ -58,5 +58,65 @@ namespace Extract.Redaction.Verification.Properties {
                 this["SlideshowRunKey"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("None")]
+        public global::Extract.Redaction.AutoTool AutoTool {
+            get {
+                return ((global::Extract.Redaction.AutoTool)(this["AutoTool"]));
+            }
+            set {
+                this["AutoTool"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoZoom {
+            get {
+                return ((bool)(this["AutoZoom"]));
+            }
+            set {
+                this["AutoZoom"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int AutoZoomScale {
+            get {
+                return ((int)(this["AutoZoomScale"]));
+            }
+            set {
+                this["AutoZoomScale"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DoNotCreate")]
+        public global::Extract.Redaction.Verification.OnDemandCreateVOAFileMode OnDemandCreateVOAFileMode {
+            get {
+                return ((global::Extract.Redaction.Verification.OnDemandCreateVOAFileMode)(this["OnDemandCreateVOAFileMode"]));
+            }
+            set {
+                this["OnDemandCreateVOAFileMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool OCRText {
+            get {
+                return ((bool)(this["OCRText"]));
+            }
+            set {
+                this["OCRText"] = value;
+            }
+        }
     }
 }

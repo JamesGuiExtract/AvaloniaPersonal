@@ -11,5 +11,20 @@
     <Setting Name="SlideshowRunKey" Type="System.Windows.Forms.Keys" Scope="User">
       <Value Profile="(Default)">LMenu</Value>
     </Setting>
+    <Setting Name="AutoTool" Type="Extract.Redaction.AutoTool" Scope="User">
+      <Value Profile="(Default)">None</Value>
+    </Setting>
+    <Setting Name="AutoZoom" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AutoZoomScale" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="OnDemandCreateVOAFileMode" Type="Extract.Redaction.Verification.OnDemandCreateVOAFileMode" Scope="User">
+      <Value Profile="(Default)">DoNotCreate</Value>
+    </Setting>
+    <Setting Name="OCRText" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
