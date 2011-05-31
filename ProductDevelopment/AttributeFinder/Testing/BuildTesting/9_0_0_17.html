@@ -1,0 +1,365 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.17 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.17 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>[LegacyRC #4915]</b> Temp license stuff
+        <ul>
+            <li>Create a temp license file a_temp.lic and a full license full.lic and put both in
+            your license file directory.</li>
+            <li>Start processing files.</li>
+            <li>Roll the clock back.</li>
+            <li>Confirm that ExtractTRP2 isn't running.</li>
+            <li>Confirm that the license state is not corrupted.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5141, #5293]</b>
+        <ul>
+            <li>Install and license ID Shield on a test machine that does not have an email client 
+            installed.</li>
+            <li>Run the User License application.</Li>
+            <li>Try to have it automatically create a license request email in your desktop email
+            application.</li>
+            <li>Confirm that reasonable errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5477]</b> USS File Viewer position
+        <ul>
+            <li>Find or create a very short .uss file and open it in the USS File Viewer.</li>
+            <li>Position the cursor at the end of the document.</li>
+            <li>Confirm that the position displayed in the status bar is never greater than 
+            100%.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5699]</b> Confirm that character confidence for the current selection is
+        displayed in the status bar of the USS File Viewer.</li>
+    <p>
+        <li><b>[LegacyRC #5702]</b> Confirm that all the information in the USS File Viewer status
+        bar displays correctly during resize events.</li>
+    <p>
+        <li><b>[LegacyRC #5642]</b> User created counter key in database
+        <ul>
+            <li>Confirm that the UserCreatedCounter table in the database contains the key
+            <b>PK_UserCreatedCounter</b>.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5657]</b>
+        <ul>
+            <li>Confirm that the image at <b>I:\Common\Testing\PVCS_Testing\LegacyRC\4398</b> fails
+            to OCR with a reasonably helpful error message.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5867]</b> Confirm that the progress status dialog of the FAM displays
+        correctly regardless of Windows theme.</li>
+    <p>
+        <li><b>[LegacyRC #5888]</b> Confirm that appropriate application traces are logged when the
+        FAM is paused/unpaused.</li>
+    <p> 
+        <li><b>[LegacyRC #5891]</b> Report Viewer and UAC
+        <ul>
+            <li>Log on as a domain user to a test machine with UAC enabled.</li>
+            <li>Open the report viewer and confirm that no errors are seen.</li>
+            <li>Confirm that report files are in a folder under common app data.</li>
+            <li>Confirm that reports can be saved.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5935]</b> Apply Bates Number
+        <ul>
+            <li>Set up an FPS file to run the Apply Bates Number task with four threads.</li>
+            <li>Queue a large number of files.</li>
+            <li>Run several (4+) instances of that FPS file.</li>
+            <li>Confirm that no errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5943]</b> DB Admin and clearing while processing
+        <ul>
+            <li>Start processing some images.</li>
+            <li>While the files are being processed, open the DB Admin and try to clear the
+            database.</li>
+            <li>Confirm that you are not able to clear the database while files are being
+            processed.</li>
+            <li>Confirm that all appropriate DB Admin menu items are still enabled.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5966]</b> DB Admin schema update application trace
+        <ul>
+            <li>Open a database with an out-of-date schema.</li>
+            <li>When prompted, update the schema.</li>
+            <li>Confirm that an application trace is logged.</li>
+            <li>Confirm that the same trace is logged if you update from the menu item rather than
+            the prompt.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6023]</b> FAM recovery files and autosave
+        <ul>
+            <li>Open an FPS file. Set up the FAM to autosave on run, and make a change to the FPS
+            file so it'll be marked dirty.</li>
+            <li>Wait until a recovery file is created.</li>
+            <li>Kill the FAM.</li>
+            <li>Open a new FAM instance. When prompted, recover your settings from the previous
+            file.</li>
+            <li>Run the recovered FPS file. Note that there is no filename provided in the title
+            bar.</li>
+            <li>Confirm that the <b>Save As</b> dialog appears.</lI>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6026]</b> SQL client install
+        <ul>
+            <li>Install and license ID Shield. Don't install SQL Server.</li>
+            <li>Confirm that the SQL native client has been installed.</li>
+        </uL></li>
+    <p>
+        <li><b>[LegacyRC #6061]</b> Confirm that there is a shortcut for the FAM Network Manager
+        if you install ID Shield or FLEX Index.</li>
+    <p>
+        <li><b>[LegacyRC #6065]</b> Confirm that the Apply Bates Number task correctly applies
+        Bates numbers to images.</li>
+    <p>
+        <li><b>[LegacyRC #6066]</b> Confirm that all of the items in the expandable tags menu 
+        appear in alphabetical order.</li>
+    <p>
+        <li><b>[LegacyRC #6071]</b> FTP file supplier
+        <ul>
+            <li>Set up an FTP file supplier to supply .tif images, append .tif to remote filenames,
+            and poll for new files every 2 minutes.</li>
+            <li>Start the FAM and put some .tif images in the FTP folder.</li>
+            <li>Confirm that 2 minutes later, the renamed files (*.tif.tif) are downloaded.</li>
+            <li>Confirm that in another 2 minutes, the *.tif.tif.tif files are downloaded.</lI>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6073, #6074, #6076, #6077]</b>
+        <ul>
+            <li>With a fresh install on a UAC-enabled machine, create a temp license and log in as
+            an unprivileged user.</li>
+            <li>Confirm that Extract software runs correctly.</li>
+            <li>Confirm that the COMLicenseGenerator has a button to generate the user string.</li>
+            <li>Confirm that the "Generate License File" and "Generate Unlock File" buttons are
+            enabled after generating the user string.</li>
+            <li>Confirm that if no license folder exists, one is created by UserLicense.exe.</LI>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6080]</b> UEX Viewer Show application traces
+        <ul>
+            <li>Confirm the presence of a <b>Show application traces</b> item in the UEX Viewer
+            View menu.</li>
+            <li>Confirm that it does what you would expect.</li>
+            <li>Confirm that its value is read from and saved to the registry under HKCU.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6081, #6082]</b>
+        <ul>
+            <li>Confirm that $ThreadID() is included in the list of tag functions.</li>
+            <li>Confirm that $ProcessID() is included in the list of tag functions.</li>
+            <li>Confirm that both function correctly.</li>
+            <li>Confirm that parameters are listed in the tag function drop-down.</lI.
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6083]</b> Ranges for USB serial keys
+        <ul>
+            <li>Confirm that the RuleSetEditor allows you to specify a range of values for USB key
+            serial numbers.</li>
+        </ul>
+    <p>
+        <li><b>[LegacyRC #6085]</b>
+        <ul>
+            <li>Run the compute FPS file from the ID Shield demo.</li>
+            <li>Set up a surround context task to run on the images.</li>
+            <li>Remove the USS files from a couple of the input images.</li>
+            <li>Set the FAM to display only the last 3 records in the grids.</li>
+            <li>Run the task.</li>
+            <li>Confirm that you can right-click on the failed files and no errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6086]</b> Confirm that the service can be run with a temporary 
+        license.</li>
+    <p>
+        <li><b>[LegacyRC #6088]</b> Confirm that all words in the General tab of the DB Admin's
+        database options dialog are spelled correctly.</li>
+    <p>
+        <li><b>[LegacyRC #6089]</b> Confirm that displayed exceptions are prefixed with the text 
+        "Displayed:"</li>
+    <p>
+        <li><b>[LegacyRC #6090]</b> Confirm that all the unimportant exceptions are labeled as
+        application traces</li>
+    <p>
+        <li><b>[LegacyRC #6093]</b> Emailfile
+        <ul>
+            <li>On a machine on with email settings have not been configured, run EmailFile.exe
+            with the /client flag.</li>
+            <li>Confirm that the settings dialog is not displayed.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6094]</b> Confirm that the USS File Viewer find dialog tab order is
+        reasonable.</li>
+    <p>
+        <li><b>[FlexIDSCore #4525]</b> ADODB.dll
+        <ul>
+            <li>Install and license on a completely clean XP or Windows 7 VM. Do not install SQL
+            Server.</li>
+            <li>Confirm that you can run verification without error.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4631, #4632, #4633, #4636]</b> Confirm that the verification task 
+        configuration includes the following options:
+        <ul>
+            <li>Require users to visit all pages in a document</li>
+            <li>Require users to review every suggested redaction of clue</li>
+            <li>Enable seamless page navigation between documents</li>
+            <li>Prompt to save changes before navigating away</li>
+        </ul></li>
+    <P>
+        <li><b>[FlexIDSCore #4634]</b> Verification navigation controls - confirm the following
+        behavior:
+        <ul>
+            <li>shift+tab can take you to the previous document, so tab and shift+tab behave
+            symmetrically.</li>
+            <li>Tab and Shift+Tab do not take into account the viewed/unviewed state of an
+            entry</li>
+        </uL></li>
+    <p>
+        <li><b>[FlexIDSCore #4642, #4643]</b> Slideshow
+        <ul>
+            <li>Confirm that the verification task property page includes a description of the run
+            key setting for the slideshow.</li>
+            <li>Confirm that the user settings in the verification UI allow the specification of
+            the run key.</li>
+            <li>Confirm that the run key works as expected.</li>
+            <li>Confirm that the verification task configuration also allows the user to select
+            a random prompt to confirm user alertness.</li>
+            <li>Confirm that the random prompt works as expected.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4649]</b> Confirm that all words in the verify sensitive data task
+        configuration page are spelled correctly.</li>
+    <p>
+        <li><b>[FlexIDSCore #4654]</b>
+        <ul>
+            <li>Run the verification FPS file from the ID Shield demo.</li>
+            <li>Save the first document.</li>
+            <li>Create a new manual redaction on the second document.</li>
+            <li>Delete the redaction you just created.</li>
+            <li>Confirm that you are only prompted once to confirm that you want to delete the
+            redaction.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4658]</b> FKB version install
+        <ul>
+            <li>Confirm that ComponentData is installed in an FKB-version-specific subdirectory of
+            the ComponentData folder.</li>
+            <li>Confirm that the ruleset editor allows the specification of a particular FKB
+            version.</li>
+            <li>Confirm that a version number is required to save a ruleset with a counter or a
+            swiping rule.</li>
+            <li>Confirm that nested rulesets are not required to specify an FKB version.</li>
+            <li>Confirm that if a nested ruleset does specify an FKB version, it must be the same
+            as the master ruleset's FKB version.</li>
+            <li>Confirm that old rules with no FKB version specified use the root of 
+            ComponentData.</li>
+            <li>Confirm that a ruleset saved with a legacy FKB version installed to the root of
+            ComponentData will confirm the version number in FKBVersion.txt.</li>
+            <li>Confirm that if a non-default ComponentDataDir is specified in RDTConfig, it is
+            assumed to include the full path (including any needed version number).</li>
+            <li>Confirm that about boxes for AttributeFinder specific applications list all
+            installed FKB versions.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #626]</b> Create file bug appending with multiple threads
+        <ul>
+            <li>Use a multi-core test machine and an FPS file configured to use multiple 
+            threads.</li>
+            <li>Configure a Create File task in append mode to write the name of all queued files
+            to a text file.</li>
+            <li>Run the FPS file with a significant (&gt;100) number of files queued.</li>
+            <li>Confirm that the list is written correctly.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #628]</b> Confirm that the FTP file supplier requires a special 
+        license.</li>
+    <p>
+        <li><b>[DotNetRC #631]</b> Confirm that the Connection Settings tab for the FTP file
+        supplier configuration includes a setting for the maximum number of simultaneous 
+        connections.</li>
+    <p>
+        <li><b>[DotNetRC #649]</b> 
+        <ul>
+            <li>Set up a couple of multi-core machines to execute rules, create redacted images,
+            and encrypt the redacted images.</li>
+            <li>Let them process for a while (at least a day) and confirm that no sharing 
+            violations are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #650]</b>
+        <ul>
+            <li>Install Office 2007; do not install the optional Print to PDF add-on.</li>
+            <li>Create an office document.</li>
+            <li>Try to use OfficeToTif.exe on your document. It should fail.</li>
+            <li>Confirm that the stack trace is not encrypted.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #651]</b> Confirm that OfficeToTif works with both Office 2007 and Office
+        2010.</lI>
+    <p>
+        <li><b>[DotnetRC #656]</b> Confirm that you generally get helpful error messages when you
+        fail to decrypt a file because you provided the wrong password.</li>
+    <p>
+        <li><b>[DotNetRC #657]</b> Confirm that no OutOfMemory exceptions are seen when you try to
+        decrypt unencrypted files.</li>
+    <P>
+        <li><b>[DotNetRC #658]</b> Confirm that the Report Viewer has a <b>Refresh</b> menu option
+        and a related <b>F5</b> keyboard shortcut.</li>
+    </ul></li>
+    
+<p>
+    <LI><h3>Automated Testing</h3>
+    <ul>
+        <LI>Automated Tests
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Document Classification
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Redaction
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Indexing
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+    </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+<p>
+        <li>64-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+    </ul></LI>
+</OL>
+</BODY>
+</HTML>
