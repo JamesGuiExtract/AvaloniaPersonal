@@ -128,7 +128,7 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 	<li>Remove the drive mapping for <b>H:\</b>.</li>
 </ol>
 <p>
-<h3>New Functions</h3>
+<h3>Specific Functions</h3>
 <ul>
 	<li><b>$FullUserName()</b>
 	<ul>
@@ -167,6 +167,11 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 			<li><b>%Y</b> - Year with century digits
 		</ul>
 	</ul>
+    <li><b>$ProcessID()</b>
+    <ul>
+        <li>Confirm that the $ProcessID() function returns the correct ID (compare with the ID 
+        shown in the Task Manager).</li>
+    </ul>
 	<li><b>$RandomAlphaNumeric()</b>
 	<ul>
 		<li>Confirm that $RandomAlphaNumeric() with an <b>nLength</b> parameter expands to a 
@@ -196,6 +201,10 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
         <li>Confirm that the function returns the file name with the original extension replaced
         by the target.
     </ul>
+    <li><b>$ThreadID()</b>
+    <ul>
+        <li>Confirm that $ThreadID() returns the thread ID.</li>
+    </ul></li>
 </ul>
 <p>
 <h3>Test Text Function Expander utility</h3>
@@ -227,8 +236,11 @@ Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp
 		<li>Confirm that clicking the tag selector button drops down the 
 		complete set of $ functions, preceded by &lt;SourceDocName&gt; and 
 		&lt;FPSFileDir&gt;.
+        <li>Confirm that the parameters for each function are provided in the dropdown.</li>
 		<li>Confirm that the selected tag is displayed in the <b>Value</b> edit 
 		box and that it replaces the currently selected text in the edit box.
+        <li>Confirm that the cursor is placed in the parentheses after inserting a tag 
+        function.</li>
 		<li>Confirm that an <b>Expansion</b> label is provided.
 		<li>Confirm that an associated read-only multi-line edit box is provided.
 		<li>Confirm that the edit box is empty by default.

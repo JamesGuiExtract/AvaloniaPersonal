@@ -26,18 +26,18 @@
 <h2>Database Selection - Part 1</h2>
 <ul>
     <li>A <b>Database server name</b> combo box is presented.</li>
-    <li><b>[LegacyRC #4552]</b> If both a <b>Server</b> and a <b>Database name</b> has been 
-    previously selected, confirm that both name are preloaded into the combo boxes.</li>
-    <li><b>[LegacyRC #4805]</b> Confirm that the combo box includes <b>(local)</b> as a option 
-    if SQL Server has been installed or not if only the native client was installed.
+    <li>If both a <b>Server</b> and a <b>Database name</b> have been previously selected, confirm 
+    that both names are preloaded into the combo boxes.</li>
+    <li>Confirm that the combo box includes <b>(local)</b> as a option if SQL Server has been 
+    installed or not if only the native client was installed.
     <ul>
-        <li>SQL Server Express 2005 or 2008 is not installed on the test machine, confirm that 
-        <b>(local)</b> is not included in the combo box.</li>
-        <li>SQL Server Express 2005 or 2008 is installed on the test machine, confirm that 
+        <li>If SQL Server Express 2005/2008/2008R2 is not installed on the test machine, confirm 
+        that <b>(local)</b> is not included in the combo box.</li>
+        <li>If SQL Server Express 2005/2008/2008R2 is installed on the test machine, confirm that 
         <b>(local)</b> is included in the combo box.</li>
-        <li>SQL Server Express 2005 or 2008 is installed on the test machine with specication 
-        of a named instance, confirm that <b>(local)\&lt;instanceName&gt;</b> is included 
-        in the combo box.</li>
+        <li>If SQL Server Express 2005/2008/2008R2 is installed on the test machine with a named
+        instance specified, confirm that <b>(local)\&lt;instanceName&gt;</b> is included in the
+        combo box.</li>
     </ul></li>
     <li>A <b>&lt;Browse...&gt;</b> item is available in the combo box.</li>
     <li>Selection of the <b>Browse</b> item changes the cursor to a wait cursor.</li>
@@ -59,17 +59,8 @@
     <li>Confirm that the two radio buttons are mutually exclusive.</li>
 <p>
     <li>Select <b>Allison02</b> or <b>FNP</b> as the database server.</li>
-    <li>Confirm that browsing for databases on this machine provokes 
-    <b>ELI21061 - Login failed for user</b>.</li>
+    <li>Confirm that browsing for databases on this machine provokes a reasonable error.</li>
     <li>Confirm that Exception details include the <b>ConnectionString</b> text.</li>
-<p>
-    <LI><b>[LegacyRC #5486]</b> Open DB Admin without database
-    <ul>
-        <LI>Open a new instance of the FAM without connecting to a database.</li>
-        <LI>Select <b>Tools - Database Administration Utility...</b>.</li>
-        <LI>Confirm that the <b>Select database to administer</b> dialog is displayed without 
-        error.</li>
-    </ul></li>
 </ul>
 
 <h2>Database Creation</h2>
@@ -100,10 +91,11 @@
     <li>After OK, confirm that a <b>Set Admin Password dialog</b> is presented.</li>
     <li><b>[LegacyRC #4562]</b> Confirm that clicking <b>Cancel</b> returns the user to the
     <b>Select database to administer</b> dialog without error.</li>
-    <li>Select <b>log to existing database</b> and click the <b>Next</b> button.</li>
+    <li>Select <b>log in to existing database</b> and click the <b>Next</b> button.</li>
     <li>Confirm that a <b>Set Admin Password message box</b> is presented.</li>
     <li>Confirm that after providing matching passwords, the main <b>File Action Manager Database
     Administration</b> window appears.</li>
+    <li>Confirm that no exceptions were logged.</li>
 <p>
     <li><b>[LegacyRC #4666]</b> Create multiple databases
     <ul>
@@ -114,21 +106,15 @@
         <li>Confirm that the second new database is successfully created.</li>
     </ul></li>
 <p>
-    <li><b>[LegacyRC #5545]</b> Unwanted exception on creation
-    <ul>
-        <li>Create a new database.</li>
-        <li>Confirm that an <b>Invalid object name 'DBInfo'</b> exception is either not logged or
-        is prepended with <b>Application trace:</b>.</li>
-    </ul></li>
-<p>
-    <LI><b>[LegacyRC #5679]</b> DB Admin and old schema version
+    <LI><b>[LegacyRC #5679, #5961]</b> DB Admin and old schema version
     <ul>
         <LI>Create a new database using <b>DB Admin</b>.</li>
         <li>Use SQL Management Studio to modify the schema version</li>
         <LI>Login to the database.</li>
         <li>Select the <b>Summary</b> tab.</li>
         <li>Confirm that an error message is displayed about the incorrect schema version.</li>
-        <li>Close the error message and confirm that the UI is still in a good state.</li>
+        <li>Confirm that you are prompted to update the schema and confirm that regardless of your
+        response, the UI is still in a good state.</li>
     </ul></li>
 </ul>
 
@@ -177,24 +163,44 @@
     <b>Processing</b>, <b>Complete</b>, <b>Skipped</b>, <b>Failed</b> and <b>Total</b>.</li>
 <p>
     <li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed after the database
-    is cleared by clicking Database->Clear menu.</li>
-    <li><b>[LegacyRC #4774]</b> Keyboard Accelerators from Summary Tab.
+    is cleared by clicking Database->Clear menu item.</li>
+    <li><b>[LegacyRC #4774, #5518]</b> Keyboard Accelerators from Summary Tab.
     <ul>
         <li>Confirm that <b>Ctrl + H</b> works for <b>Change Password</b>.</li>
         <li>Confirm that <b>Ctrl + M</b> works for <b>Manually Set Action Status</b>.</li>
+        <li>Confirm that <b>Ctrl + R</b> works for <b>Reset lock</b>.</li>
+        <li>Confirm that <b>Ctrl + A</b> works for <b>Manage actions</b>.</li>
+        <li>Confirm that <b>Ctrl + C</b> works for <b>Manage counters</b>.</li>
+        <li>Confirm that <b>Ctrl + T</b> works for <b>Manage tags</b>.</li>
+        <li>Confirm that <b>Ctrl + U</b> works for <b>Manage users</b>.</li>
+        <li>Confirm that <b>Ctrl + F</b> opens the <b>File Action Manager</b>.</li>
+        <li>Confirm that <b>F5</b> works for <b>refresh</b>.</li>
     </ul></li>
-    <li><b>[LegacyRC #5518]</b> Confirm that the <b>Summary</b> tab is refreshed using 
-    <b>F5</b>.</li>
 <p>
     <li>Confirm that the statistics in the summary tab come from the ActionStatistics table in the
     database.</li>
+<p>
+    <li>Confirm that right-clicking in a populated cell in the summary tab provides a context
+    menu.
+    <ul>
+        <li>Confirm that <b>Manually set action status...</b> brings up the set action status 
+        dialog with the scope prepopulated to include the files in the relevant cell.</li>
+        <li>Confirm that <b>Export file list...</b> brings up the file list export dialog with the
+        scope prepopulated to export a list of the files in the relevant cell.</li>
+        <li>Confirm that <b>View exceptions for failed files...</b> brings up a temporary UEX log
+        displaying the exceptions associated with failures for the relevant action.</li>
+    </ul></li>
 </ul>
 
 <h2>Database Menu</h2>
 <ul>
-    <li>Confirm that <b>Clear</b>, <b>Reset lock</b>, <b>Change password...</b>, <b>Logout</b>, 
-    and <b>Exit</b> items exist in the menu.</li>
-    <li>Confirm that all menu items are enabled.</li>
+    <li>Confirm that <b>Clear</b>, <b>Reset lock</b>, <b>Update database schema</b>, <b>Database 
+    options</b>, <b>Change password...</b>, <b>Logout</b>, and <b>Exit</b> items exist in the
+    menu.</li>
+    <li>Confirm that with a current schema version, all menu items except for <b>Update database
+    schema</b> are enabled.</li>
+    <li>Confirm that with an out-of-date schema version, only <b>Clear</b>, <b>Update database
+    schema</b>, <b>Logout</b>, and <b>Exit</b> are enabled.</li>
 <p>
     <li><b>Clear</b>
     <ul>
@@ -241,6 +247,95 @@
         <LI><b>[LegacyRC #5281]</b> Confirm that <b>LockDB.bat</b> located in the 
         <b>.\UCLIDFileProcessing\AutomatedTests</b> folder locks the database.</li>
         <li>Confirm that <b>CTRL+R</b> unlocks the database.</li>
+    </ul></li>
+<p> 
+    <li><b>Update database schema...</b>
+    <ul>
+        <li>Confirm that the <b>Update database schema</b> menu item is enabled only when you are
+        connected to a database with an out-of-date schema version.</li>
+        <li>Confirm that when you select that menu item, the schema is updated appropriately.</li>
+        <li>Confirm that the schema will be updated for any 8.0 database or later.</li>
+        <li>Confirm that appropriate error messages are seen attempting to update 5.0, 6.0, or 7.0
+        databases.</li>
+        <li>Confirm that an appropriate error message is seen attempting to update a database with
+        a schema version that is higher than the current schema version.</li>
+        <li>Confirm that all and only the components currently licensed are updated (i.e., confirm
+        that product-specific tables are not affected by the schema updater).</li>
+    </ul></li>
+<p>
+    <li><b>Database options</b>
+    <ul>
+        <li>Confirm that <b>Database options</b> brings up the database options dialog.</li>
+        <li><b>General tab</b>
+        <ul>
+            <li>Confirm that there are checkboxes for:
+            <ul>    
+                <li>Allow dynamic tag creation</li>
+                <li>Automatically create actions specified in FPS files</li>
+                <li>Automatically delete file action comments on completion</li>
+                <li>Automatically revert locked files</li>                
+            </ul></li>
+            <li>Confirm that there is a spin control for the number of minutes of inactivity after
+            which to revert files.</li>
+            <li>Confirm that there is a list box with <b>Add</b>, <b>Modify</b>, and <b>Remove</b>
+            buttons.</li>
+            <li>Confirm that both of those controls work as expected and that both are disabled 
+            when <b>Automatically revert locked files</b> is unchecked.
+            <ul>
+                <li>Confirm that the spin control works correctly with large, small, and 
+                non-integer values.</li>
+            </ul></li>
+            <li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
+            table.</li>
+        </ul></li>
+        <li><b>History tab</b>
+        <ul>
+            <li>Confirm that there are checkboxes for:
+            <ul>
+                <li>Store file action state transition history</li>
+                <li>Store queue event history</li>
+                <li>Store source document name change history</li>
+                <li>Store document tag history</li>
+                <li>Store File Action Manager (FAM) session history</li>
+                <li>Store input event tracking history
+                <ul>
+                    <li>Confirm that there is an associated spin control for how much history to
+                    store</li>
+                </ul></li>
+                <li>Store database settings change history</li>
+            </ul></li>
+            <li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
+            table.</li>
+        </ul></li>
+        <li><b>Security tab</b>
+        <ul>
+            <li>Confirm that there are checkboxes for:
+            <ul>
+                <li>Require FAM database administrator password to process all skipped files.</li>
+                <li>Require authentication to run.</li>
+            </ul></li>
+            <li>Confirm that there is a list box with associated Add, Modify, and Remove buttons
+            for <b>Skip authentication when running as a service on the following 
+            machines:</b></li>
+            <li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
+            table.</li>
+        </ul></li>
+        <li><b>Product Specific tab</b>
+        <ul>
+            <li>Confirm that items on this tab are shown iff they were licensed when the database
+            was created.</li>
+            <li>Confirm that the <b>ID Shield</b> group box contains a <b>Store ID Shield
+            processing history</b> checkbox.</li>
+            <li>Confirm that the <b>Data Entry</b> group box contains two checkboxes:
+            <ul>
+                <li>Store data entry processing history</li>
+                <li>Enable data entry counters</li>
+            </ul></li>
+            <li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
+            table.</li>
+        </ul></li>
+        <li>Confirm that changes made in the Database options dialog are logged in Application
+        Traces.</li>
     </ul></li>
 <p>
     <li><b>Change Password</b>
@@ -577,12 +672,12 @@
     <li><b>Check for new components</b>
     <ul>
         <li>Confirm that a wait cursor appears.</li>
-        <li>Confirm that <b>LST</b> files with an updated timestamp appear in the 
-        <b>CommonComponents</b> folder.</li>
+        <li>Confirm that <b>LST</b> files with an updated timestamp appear under the common
+        appdata folder.</li>
         <li><b>[LegacyRC #4758]</b> Confirm that the following LST files are updated.
         <ul>
             <li>Extract FAM Conditions.</li>
-            <li><b>[LegacyRC #4962]</b> Extract FAM Product Specific DB Managers.</li>
+            <li>Extract FAM Product Specific DB Managers.</li>
             <li>Extract FAM Reports.</li>
             <li>Extract File Suppliers.</li>
             <li>UCLID File Processors.</li>
@@ -592,29 +687,18 @@
 <p>
     <li><b>Manually set action status...</b>
     <ul>
+        <li>Confirm that there is a read-only edit box with an associated <b>Select files...</b>
+        button.</li>
         <li>Confirm that all actions listed in the database appear in the <b>Action</b> drop down
         menu and vice-versa.</li>
+        <li>Confirm that the action and target status drop down boxes both default to empty.</li>
+        <li>Confirm that you are required to specify an action and target status.</li>
         <li>Use the <b>OK</b> button to update the action status for <b>all files referenced in the
         database</b>. Confirm that the status has been updated for all files for the selected 
         action and that the dialog has closed.</li>
         <li><b>[LegacyRC #4423]</b> Use the <b>Apply</b> button to update the action status for
         <b>all files referenced in the database</b>. Confirm that the status has been updated for
         all files for the selected action and that the dialog remains open.</li>
-        <li>Confirm that updating the action status for <b>all files referenced in the database</b>
-        to the status of another action updates the status of all files for the selected 
-        action.</li>
-        <li>Confirm that updating a single <b>action status</b> for an action updates only that 
-        action status.</li>
-        <li>Confirm that it is possible to update the action status of files that were 
-        <b>skipped</b> for a particular action.
-        <ul>
-            <li>Confirm that selecting <b>Skipped</b> in the <b>Status is</b> dropdown box enables
-            the <b>By</b> dropdown box.</li>
-            <li>Confirm that the <b>By</b> dropdown box contains options for <b>&lt;any 
-            user&gt;</b> and for any user other than Administrator who has skipped files in the 
-            database.</li>
-            <li>Confirm that selecting these options works as expected.</li>
-        </ul></li>
         <li>Confirm that <b>CTRL+M</b> performs the same function as selecting <b>Manually Set 
         Action Status</b> from the <b>Action</b> menu.</li>
         <li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the latest
@@ -660,23 +744,6 @@
             <LI>Confirm that the manually <b>Skipped</b> files can be processed.</li>
         </ul></li>
 <p>
-        <LI><b>[LegacyRC #5627, #5647]</b> Set File Action Status allows action name expressions
-        <ul>
-            <li>Confirm that the <b>Manually Set Action Status</b> dialog includes a combo box
-            populated with each defined action.</li>
-            <li>Confirm that the <b>Manually Set Action Status</b> dialog includes a <b>Tag 
-            Selector</b> button allowing the user to choose an action including a $ function.</li>
-            <li>Confirm that status can be modified for an action that uses a $ function.</li>
-            <li>Confirm that trying to modify status for an action that uses a $ function that does
-            not actually exist in the database displays a meaningful error.</li>
-            <li>Confirm that status can be modified for an action that uses 
-            <b>&lt;SourceDocName&gt;</b>.</li>
-            <li>Confirm that <b>Manually Set Action Status</b> automatically creates an action if
-            <b>AutoCreateActions = 1</b>.</li>
-            <li>Confirm that <b>Manually Set Action Status</b> does not automatically create an
-            action if <b>AutoCreateActions = 0</b>.</li>
-        </ul></li>
-<p>
         <li><b>[LegacyRC #5860, #5861]</b> Set file action status in large databases
         <ul>
             <li>Confirm that setting file action status in a large (>10000 file) database does not
@@ -698,10 +765,6 @@
         control to specify the priority.</li>
         <li>Confirm that file priority is set properly.</li>
 <p>
-        <li>Confirm that the <b>Select Files</b> dialog contains a radio button for <b>All files
-        that have the file processing priority of</b> and an associated spinner control.</li>
-        <li>Confirm that file selection is properly based on file priority.</li>
-<p>
         <LI><b>[LegacyRC #5454]</b> Set priority based on tags
         <ul>
             <li>From the <b>Manually Set File Processing Priority</b> dialog, use the <b>Select 
@@ -720,7 +783,7 @@
             <li>Confirm that file processing priority is set as specified.</li>
         </ul></li>
 <p>
-        <LI><b>[LegacyRC #5531]</b> Setting file priority in DB Admin
+        <LI><b>[LegacyRC #5531]</b> Setting file priority in large database
         <ul>
             <LI>Confirm that the <b>FAM DB Admin</b> utility is not unresponsive for an extended
             period while setting file priority.  This should be tested with several thousand files
@@ -741,6 +804,13 @@
             <li>Confirm that the appropriate number of files were adjusted for priority.</li>
             <li>Confirm that the user message provides the correct number of files with changed 
             priority.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5886]</b><!-- fixed v 8.1.0.73 --> Manually set priority
+        <ul>
+            <li>Manually set the priority of files associated with <b>none</b> of a list of
+            tags.</li>
+            <li>Confirm that no errors are seen.</li>
         </ul></li>
     </ul></li>
 <p>
@@ -792,6 +862,15 @@
 <p>
         <li><b>[LegacyRC #5842]</b><!-- fixed v 8.1.0.32 --> Confirm that when you export a list of
         all files in the database, the list is sorted by file ID.</li>
+    <p>
+        <li><b>[LegacyRC #5884, #5885]</b><!-- fixed v 8.1.0.73 --> Exporting file lists
+        <ul>
+            <li>Export a list of files associated with <b>any</b> of a set of tags.</li>
+            <li>Export a list of files associated with <b>none</b> of a set of tags.</li>
+            <li>Export a list of files, narrowing the selection to a <b>random subset</b> of all
+            files.</li>
+            <li>Confirm that no errors are seen.</li>
+        </ul></li>
     </ul></li>
 <p>
     <li><b>Reports</b>
@@ -824,7 +903,8 @@
 <ul>
     <li>Confirm that a <b>Select files...</b> button exists on the following dialogs:
     <ul>
-        <li>Action - Manually set action status</li>
+        <li>Tools - Manually set action status</li>
+        <li>Tools - Manually set file processing priority</li>
         <li>Tools - Export file list</li>
     </ul></li>
     <li>Confirm that a radio button exists for <b>All files referenced in the database</b>.</li>
@@ -833,7 +913,7 @@
     <li>Confirm that a radio button exists for <b>All files for which</b>.</li>
     <li>Confirm that an associated combo box exists for selection of an <b>Action</b>.</li>
     <li>Confirm that an associated combo box exists for selection of a <b>Status</b>.</li>
-    <li>Confirm that an associated combo box exists for selection (By) of a <b>user</b>.</li>
+    <li>Confirm that an associated combo box exists for selection of a <b>user</b>.</li>
     <li>Confirm that the first two combo boxes are always enabled when the radio button is 
     selected.</li>
     <li>Confirm that the third combo box is only enabled when the radio button is selected and when
@@ -864,7 +944,7 @@
     <li>Confirm that a radio button exists for <b>All files that result from this SQL 
     query</b>.</li>
     <li>Confirm that an associated multi-line edit box exists for definition of the query.</li>
-    <li>Confirm that a <b>SELECT FAMFile.FileName FROM</b> label exists above the edit box.</li>
+    <li>Confirm that a <b>SELECT FAMFile.ID FROM</b> label exists above the edit box.</li>
     <li>Confirm that the edit box is only enabled when the radio button is selected.</li>
 <p>
     <li>Confirm that a radio button exists for <b>All files that have the file processing priority
@@ -931,9 +1011,10 @@
     count is correct.</li>
 </ul>
 <p>
-<h2>Miscellaneous</h2>
+<h2>Miscellaneous and bugfixes</h2>
 <ul>
     <li>The utility does not close when pressing the <b>Enter</b> key.</li>
+    <li>Confirm that DB Admin window location is persisted.</li>
     <li><b>[LegacyRC #4325]</b> The utility does not close when pressing the <b>Escape</b> 
     key.</li>
     <li><b>[FlexIDSCore #2565]</b> Confirm that it is possible to navigate away from and back to 
@@ -945,10 +1026,12 @@
         <li>Database - Clear</li>
         <li>Database - Reset lock</li>
         <li>Database - Change password</li>
+        <li>Changes made via the Database options dialog</li>
         <li>Action - Add</li>
         <li>Action - Remove</li>
         <li>Action - Rename</li>
         <li>Action - Manually set action status</li>
+        <li>Action - Manually set file processing priority</li>
     </ul></li>
 <p>
     <li><b>[LegacyRC #5684, #5685]</b> User authentication bugs
@@ -977,6 +1060,30 @@
         <li>Create a new database.</li>
         <li>Confirm that the caption for the notification message about setting the database 
         password is <b>Set Admin Password</b>.</li>
+    </ul></li>
+<p>
+    <li><b>[LegacyRC #5939]</b> Statistics after processing skipped documents
+    <ul>
+        <li>Queue 10 files.</li>
+        <li>Skip all 10 files.</li>
+        <li>Create an FPS file to process skipped files.</li>
+        <li>Process them and confirm that the database statistics are correct.</lI>
+    </ul></li>
+<p>
+    <li><b>[LegacyRC #5943]</b> Menu items after clearing while processing
+    <ul>
+        <li>Create a database, queue some files, and start them processing.</li>
+        <li>While files are being processed, open the DB Admin and try to clear the database.</li>
+        <li>A dialog will appear informing you that there is active processing; dismiss it.</li>
+        <li>Confirm that all appropriate menu items (e.g., Reset lock, Change password) are still
+        enabled.</li>
+    </ul></li>
+<p>
+    <li><b>[LegacyRC #5957]</b> Context menu and refresh
+    <ul>
+        <li>Use the context menu to reset action status.</li>
+        <li>Quickly use the context menu to set action status again.</li>
+        <li>Confirm that the Summary tab was refreshed.</li>
     </ul></li>
 </ul>
 </body>

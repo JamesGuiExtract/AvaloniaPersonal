@@ -32,28 +32,48 @@
             under the <b>Extract Systems ID Shield</b> start menu.</li>
             <li>Confirm that the shortcut opens the <b>ESFAMService.sdf</b> database.</li>
         </ul></li>
+    <p>
         <LI><b>FPSFile table</b>
         <ul>
-            <li>Confirm that the table contains an <b>ID</b> column.</li>
-            <li>Confirm that the table contains an <b>AutoStart</b> column.</li>
-            <li>Confirm that the table contains an <b>FileName</b> column.</li>
-            <li><b>[DotNet #405, #406]</b> Default values for tables
-            <!-- fixed v 8.1.0.1 -->
+            <li>Confirm that the table contains an <b>ID</b> column.
             <ul>
-                <li>Confirm that when a new row is added to the FPSFile table, the <b>ID</b>column
-                is auto-populated.</li>
-                <li>Confirm that the <b>AutoStart</b> checkbox defaults to checked.</li>
+                <li>Confirm that each value in the ID column is unique.</li>
+                <li>Confirm that this column is auto-populated when a new row is added to the
+                table.</li>
+                <li>Confirm that the column is read-only.</li>
             </ul></li>
-            <li><b>[DotNet #387]</b> Confirm that the values in the <b>ID</b> column cannot be
-            edited.</li>
-            <!-- fixed v 8.1.0.1 -->
+            <li>Confirm that the table contains a <b>FileName</b> column.
+            <ul>
+                <li>This column specified which FPS files will be run by the FAM service;
+                confirm that it works as expected.</li>
+                <li>Confirm that this column defaults to empty when a new row is added to the
+                table.</li>                
+            </ul></li>
+            <li>Confirm that the table contains a <b>NumberOfInstances</b> column.
+            <ul>
+                <li>This column specifies the number of instances of each FPS file the FAM service
+                will run; confirm that it works as expected.</li>
+                <li>Confirm that the column does not allow null values.</li>
+                <li>Confirm that this column defaults to 1 when a new row is added to the 
+                table.</li>
+            </ul></li>
+            <li>Confirm that the table contains a <b>NumberOfFilesToProcess</b> column.
+            <ul>
+                <li>This column specifies the number of files to process before respawning.</li>
+                <li>Confirm that a value of <b>0</b> means that FAMProcess.exe will not
+                respawn.</li>
+                <li>Confirm that a value of -1 means that the default value from the 
+                <b>Settings</b> table will be used.</li>
+                <li>Confirm that the setting works as expected.</li>
+                <li>Confirm that this column defaults to -1 when a new row is added to the
+                table.</li>
+            </ul></li>
         </ul></li>
         <LI><b>Settings table</b>
         <ul>
-            <li>Confirm that the table contains an <b>SleepTimeOnStart</b> column.</li>
-            <li>Confirm that the table contains an <b>DependentServices</b> column.</li>
-            <li>Confirm that the table contains an <b>NumberOfFilesToProcess</b> 
-            column.</li>
+            <li>Confirm that the table contains settings for <b>SleepTimeOnStart</b>,
+            <b>DependentServices</b>, <b>NumberOfFilesToProcessPerFAMInstance</b>,
+            <b>ServiceDBSchemaVersion</b>, and <b>DatabaseSchemaManager</b>.</li>
             <li>Confirm that the default value for <b>SleepTimeOnStart</b> is 
             <b>120000</b>.</li>
             <li>Confirm that the default value for <b>DependentServices</b> is 

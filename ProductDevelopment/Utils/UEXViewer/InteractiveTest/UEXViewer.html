@@ -10,562 +10,534 @@ UEXViewer Utility - Testing Checklist<br>
 </h1>
 <hr>
 <ol>
-	<li> <b>Size Limit on .Uex Files \ Creation of Multiple .Uex Files</b>
-       	<ul>
-		<li>Install FLEX Index or ID Shield.
-        	<li>Use the following steps to safely generate a large number of errors:
-		<ol>
-			<li>Clear a <b>(local)</b> database and called <b>Test</b>.
-			<li>Add a <b>GenerateErrors</b> action.
-			<li>Delete or rename any existing <b>.Uex</b> files in 
-			<i>C:\Documents and Settings\All Users\Application Data\Extract Systems\LogFiles\Misc</i>.
-			<li>Open and run <b>Error_Generator.fps</b> which is located in
-			<i>\Engineering\ProductDevelopment\Utils\UEXViewer\InteractiveTest</i> 
-			(Running this FPS file to completion will cause approximately 2500 files to fail.)
-			<li>Processing can be stopped when 1000+ files have failed.
-		</ol>
-                <li>Confirm that multiple <b>.Uex</b> files have been created.
-		<li>Confirm that all <b>.Uex</b> files are approximately 2 MB. (between 1.9 
-		and 2.1 MB is acceptable)
-                <li>Confirm that all <b>.Uex</b> files, except the most current, are stamped with 
-		both the date and the time in a zero-padded format.
-		<li>Confirm that the most current <b>.uex</b> file is named <b>ExtractException.uex</b>.
-		<li>Open the UEXViewer via <b>View Exception Log</b>.
-		<ul>
-			<li>Confirm that the most recent <b>.uex</b> file is loaded by default.
-			<li>Confirm that the complete filename without path is shown on the title bar.
-			<li>Confirm that the "Exception log files in the current folder" combo box 
-			list displays the complete filename without path.
-			<li>Confirm that the above-mentioned combo box list contains a list of 
-			all the <b>.Uex</b> files in the same directory as the loaded <b>.Uex</b> 
-			file, listed in order by name.
-			<li>Confirm that clicking on a <b>.Uex</b> filename in the combo box list 
-			loads that file.
-		</ul>
-		<li>Uninstall FLEX Index or ID Shield.
-		<li><b>[FlexIDSCore #2458]</b> Install FLEX Index or ID Shield and confirm that 
-		the previously existing <b>ExtractException.uex</b> has been renamed with the 
-		date and time as part of the filename in a zero-padded format.
-        </ul>
-        </li>
+    <li> <b>Size Limit on .Uex Files \ Creation of Multiple .Uex Files</b>
+    <ul>
+        <li>Install FLEX Index or ID Shield.</li>
+        <li>Use the following steps to safely generate a large number of errors:
+        <ol>
+            <li>Clear a <b>(local)</b> database and called <b>Test</b>.</li>
+            <li>Add a <b>GenerateErrors</b> action.</li>
+            <li>Delete or rename any existing <b>.Uex</b> files in 
+            <i>C:\Documents and Settings\All Users\Application Data\Extract Systems\LogFiles\Misc</i>.</li>
+            <li>Open and run <b>Error_Generator.fps</b> which is located in
+            <i>\Engineering\ProductDevelopment\Utils\UEXViewer\InteractiveTest</i> 
+            (Running this FPS file to completion will cause approximately 2500 files to fail.)</li>
+            <li>Processing can be stopped when 1000+ files have failed.</li>
+        </ol></li>
+        <li>Confirm that multiple <b>.Uex</b> files have been created.</li>
+        <li>Confirm that all <b>.Uex</b> files are approximately 2 MB. (between 1.9 and 2.1 MB is
+        acceptable)</li>
+        <li>Confirm that all <b>.Uex</b> files, except the most current, are stamped with both the
+        date and the time in a zero-padded format.</li>
+        <li>Confirm that the most current <b>.uex</b> file is named 
+        <b>ExtractException.uex</b>.</li>
+        <li>Open the UEXViewer via <b>View Exception Log</b>.
+        <ul>
+            <li>Confirm that the most recent <b>.uex</b> file is loaded by default.</li>
+            <li>Confirm that the complete filename without path is shown on the title bar.</li>
+            <li>Confirm that the "Exception log files in the current folder" combo box list 
+            displays the complete filename without path.</li>
+            <li>Confirm that the above-mentioned combo box list contains a list of all the 
+            <b>.Uex</b> files in the same directory as the loaded <b>.Uex</b> file, listed in 
+            order by name.</li>
+            <li>Confirm that clicking on a <b>.Uex</b> filename in the combo box list loads that 
+            file.</li>
+        </ul></li>
+        <li>Uninstall FLEX Index or ID Shield.</li>
+        <li><b>[FlexIDSCore #2458]</b> Install FLEX Index or ID Shield and confirm that the 
+        previously existing <b>ExtractException.uex</b> has been renamed with the date and time as
+        part of the filename in a zero-padded format.</li>
+        </ul></li>
 <p>	
-	<li> <b>Menus</b>
-	<ul>
-		<li><b>File Menu</b>
-		<ul>
+    <li> <b>Menus</b>
+    <ul>
+        <li><b>File Menu</b>
+        <ul>
             <li>Press alt, navigate to the File menu, and confirm that distinct alt shortcuts
-            are available for each menu item.
-			<li><b>Open</b> 
-			<ul>
-				<li>Confirm that <b>File - Open</b> displays a dialog that allows for 
-				selection of a <b>.Uex</b> file.
-				<li>Copy the <b>.Uex</b> files created above into a randomly 
-				named directory on the desktop.  Rename some of the <b>.Uex</b> 
-				files and then open one of the renamed files.
-				<li>Confirm that the complete filename without path is shown 
-				on the title bar.
-				<li>Confirm that the complete filename without path is shown in 
-				the drop-down menu labeled <b>Exception log files in current folder:</b>.
-				<li>Confirm that <b>CTRL + O</b> performs the same function as 
-				<b>File - Open</b>.
-			</ul>
-			<li><b>Open previous log file</b>
-			<ul>
-				<li>Confirm that <b>File - Open previous log file</b> loads the 
-				previous log file in the combo box list entitled <b>Exception 
-				log files in current folder:</b>.
-				<li>Confirm that <b>File->Open previous log file</b> is disabled 
-				when the first log file in the combo box list is being viewed.
-				<li>Confirm that the complete filename without path is shown 
-				on the title bar.
-				<li>Confirm that the complete filename without path is shown 
-				in the combo box list labeled <b>Exception log files in current 
-				folder:</b>.
-				<li>Confirm that <b>CTRL + Left</b> performs the same function as 
-				<b>File - Open previous log file</b>.
-				<li>Confirm that the <b>&lt;</b> button on the lower right of the 
-				user interface performs the same function as <b>File - Open 
-				previous log file</b>.
-			</ul>
-			<li><b>Open next log file</b>
-			<ul>
-				<li>Confirm that <b>File - Open next log file</b> loads the next 
-				log file in the combo box list entitled <b>Exception log files in 
-				current folder:</b>.
-				<li>Confirm that <b>File - Open next log file</b> is disabled 
-				when the last log file in the combo box list is being viewed.
-				<li>Confirm that the complete filename without path is shown on 
-				the title bar.
-				<li>Confirm that the complete filename without path is shown 
-				in the combo box list labeled <b>Exception log files in current 
-				folder:</b>.
-				<li>Confirm that <b>CTRL + Right</b> performs the same function 
-				as <b>File - Open next log file</b>.
-				<li>Confirm that the <b>&gt;</b> button on the lower right of 
-				the user interface performs the same function as <b>File - Open 
-				next log file</b>.
-			</ul>
-			<li><b>Save as</b>
-			<ul>
-				<li>Confirm that <b>File - Save as</b> displays a dialog that 
-				allows for saving the listed exceptions to a <b>.Uex</b> file.
-				<li>Save some exceptions to a separate file and confirm that the 
-				<b>.Uex</b> file can be opened in the UEX Viewer.
-				<li>Confirm that the desired exceptions are present in the 
-				<b>.Uex</b> file.
-				<li>Confirm that the desired exceptions are ordered most 
-				recent first.
-			</ul>
+            are available for each menu item.</li>
+            <li><b>Open</b> 
+            <ul>
+                <li>Confirm that <b>File - Open</b> displays a dialog that allows for selection of
+                a <b>.Uex</b> file.
+                <li>Copy the <b>.Uex</b> files created above into a randomly named directory on 
+                the desktop.  Rename some of the <b>.Uex</b> files and then open one of the renamed
+                files.</li>
+                <li>Confirm that the complete filename without path is shown on the title bar.</li>
+                <li>Confirm that the complete filename without path is shown in the drop-down 
+                menu labeled <b>Exception log files in current folder:</b>.</li>
+                <li>Confirm that <b>CTRL + O</b> performs the same function as <b>File - 
+                Open</b>.</li>
+            </ul></li>
+            <li><b>Open previous log file</b>
+            <ul>
+                <li>Confirm that <b>File - Open previous log file</b> loads the previous log file 
+                in the combo box list entitled <b>Exception log files in current 
+                folder:</b>.</li>
+                <li>Confirm that <b>File->Open previous log file</b> is disabled when the first 
+                log file in the combo box list is being viewed.</li>
+                <li>Confirm that the complete filename without path is shown on the title bar.</li>
+                <li>Confirm that the complete filename without path is shown in the combo box 
+                list labeled <b>Exception log files in current folder:</b>.</li>
+                <li>Confirm that <b>CTRL + Left</b> performs the same function as <b>File - Open 
+                previous log file</b>.</li>
+                <li>Confirm that the <b>&lt;</b> button on the lower right of the user interface 
+                performs the same function as <b>File - Open previous log file</b>.</li>
+            </ul></li>
+            <li><b>Open next log file</b>
+            <ul>
+                <li>Confirm that <b>File - Open next log file</b> loads the next log file in the 
+                combo box list entitled <b>Exception log files in current folder:</b>.</li>
+                <li>Confirm that <b>File - Open next log file</b> is disabled when the last log 
+                file in the combo box list is being viewed.</li>
+                <li>Confirm that the complete filename without path is shown on the title bar.</li>
+                <li>Confirm that the complete filename without path is shown in the combo box list 
+                labeled <b>Exception log files in current folder:</b>.</li>
+                <li>Confirm that <b>CTRL + Right</b> performs the same function as <b>File - Open 
+                next log file</b>.</li>
+                <li>Confirm that the <b>&gt;</b> button on the lower right of the user interface 
+                performs the same function as <b>File - Open next log file</b>.</li>
+            </ul></li>
+            <li><b>Save as</b>
+            <ul>
+                <li>Confirm that <b>File - Save as</b> displays a dialog that allows for saving 
+                the listed exceptions to a <b>.Uex</b> file.</li>
+                <li>Save some exceptions to a separate file and confirm that the <b>.Uex</b> file 
+                can be opened in the UEX Viewer.</li>
+                <li>Confirm that the desired exceptions are present in the <b>.Uex</b> file.</li>
+                <li>Confirm that the desired exceptions are ordered most recent first.</li>
+            </ul></li>
             <li><b>Refresh current log file</b>
             <ul>
                 <li>Confirm that <b>File - Refresh current log file</b> refreshed the view to show
-                recently-logged exceptions.
-                <li>Confirm that F5 performs the same function
-            </ul>
+                recently-logged exceptions.</li>
+                <li>Confirm that F5 performs the same function</li>
+            </ul></li>
             <li><b>Start new log file...</b>
             <ul>
                 <li>Confirm that <b>File - Start new log file</b> bring up a modal <b>Add Rename
-                Comment</b> dialog.
+                Comment</b> dialog.</li>
                 <li>Confirm that clicking <b>Cancel</b> or hitting the red X closes the dialog
-                with no change to the log file.
+                with no change to the log file.</li>
                 <li>Confirm that clicking <b>OK</b> without entering any text in the text box
                 results in a new <b>ExtractException.uex</b> file with a single ELI29952 logged.
                 <ul>
                     <li>Confirm that the details for the logged exception <b>do not</b> contain
-                    a <b>User Comment</b> field in the debug information.
-                </ul>
+                    a <b>User Comment</b> field in the debug information.</li>
+                </ul></li>
                 <li>Confirm that clicking <b>OK</b> after entering some text in the text box
                 results in a new <b>ExtractException.uex</b> file with a single ELI29952 logged.
                 <ul>
                     <li>Confirm that the details for the logged exception <b>do</b> contain a 
-                    <b>User Comment</b> field in the debug information.
-                </ul>
+                    <b>User Comment</b> field in the debug information.</li>
+                </ul></li>
 <p>
                 <li><b>[LegacyRC #5828]</b>
                 <!--fixed v. 8.1.0.7-->
                 <ul>
-                    <li>Open the current exception log on a machine that has multiple logs.
-                    <li>Confirm that File>Start new log file is enabled.
-                    <li>Navigate to an earlier log file.
-                    <li>Confirm that File>Start new log file is disabled.
-                </ul>
+                    <li>Open the current exception log on a machine that has multiple logs.</li>
+                    <li>Confirm that File>Start new log file is enabled.</li>
+                    <li>Navigate to an earlier log file.</li>
+                    <li>Confirm that File>Start new log file is disabled.</li>
+                </ul></li>
             </ul>
-			<li><b>Exit</b> 
-			<ul>
-				<li>Confirm that <b>File - Exit</b> exits the UEX Viewer.
-			</ul>
-		</ul>
+            <li><b>Exit</b> 
+            <ul>
+                <li>Confirm that <b>File - Exit</b> exits the UEX Viewer.</li>
+            </ul></li>
+        </ul></li>
 <p>
-		<li><b>Edit Menu</b>
-		<ul>
+        <li><b>Edit Menu</b>
+        <ul>
             <li>Press alt, navigate to the Edit menu, and confirm that distinct alt shortcuts
-            are available for each menu item.
-			<li><b>Paste</b> 
-			<ul>
-				<li>View a selected exception.  Click the <b>Details...</b> 
-				button.  Click the <b>Copy to Clipboard</b> button.  Close the 
-				Extract Exception dialog.  
-				Confirm that Selecting <b>Edit - Paste</b> adds the copied 
-				exception to the top of the list.
-				<li>Confirm that the Pasted exception only has column entries for 
-				<b>Top ELI Code</b> and <b>Top Exception</b>.
-				<li>Confirm that <b>CTRL + V</b> performs the same function as 
-				<b>Edit - Paste</b>.
-			</ul>
-			<li><b>Find</b>  
-			<ul>
-				<li>Confirm that <b>Edit - Find</b> brings up a modeless 
-				Find dialog.
-				<li>Confirm that <b>CTRL + F</b> performs the same function 
-				as <b>Edit - Find</b>.
-			</ul>
-			<li><b>Delete selection</b>
-			<ul> 
-				<li>Select a large subset of the loaded exceptions.  Confirm that 
-				selecting <b>Edit - Delete selection</b> removes them from 
-				the display.
-				<li>Confirm that a wait cursor is displayed during a lengthy 
-				delete operation.
-				<li>Confirm that <b>Edit - Delete selection</b> is disabled 
-				when no exceptions are selected.
-				<li>Confirm that <b>Del</b> performs the same function as 
-				<b>Edit - Delete selection</b>.
-			</ul>
-			<li><b>Invert Selection</b> 
-			<ul> 
-				<li>Select a subset of the loaded exceptions.  Confirm that clicking 
-				<b>Invert Selection</b> selects the other loaded exceptions.
-				<li>Confirm that clicking <b>Invert Selection</b> again changes 
-				selection back to the original subset.
-			</ul>
-			<li><b>Clear</b>
-			<ul>
-				<li>Confirm that the exceptions loaded above are cleared from 
-				the display.
-				<li>Confirm that the title bar reverts to <b>UEX Viewer</b>.
-				<li>Confirm that the <b>Exception log files in the current 
-				folder</b> combo box list, the <b>&lt;</b> button, and the 
-				<b>&gt;</b> button are disabled.
-			</ul>
-		</ul>
+            are available for each menu item.</li>
+            <li><b>Paste</b> 
+            <ul>
+                <li>View a selected exception.  Click the <b>Details...</b> button.  Click the 
+                <b>Copy to Clipboard</b> button.  Close the Extract Exception dialog.  Confirm 
+                that Selecting <b>Edit - Paste</b> adds the copied exception to the top of the 
+                list.</li>
+                <li>Confirm that the Pasted exception only has column entries for <b>Top ELI 
+                Code</b> and <b>Top Exception</b>.</li>
+                <li>Confirm that <b>CTRL + V</b> performs the same function as <b>Edit - 
+                Paste</b>.</li>
+            </ul></li>
+            <li><b>Find</b>  
+            <ul>
+                <li>Confirm that <b>Edit - Find</b> brings up a modeless Find dialog.</li>
+                <li>Confirm that <b>CTRL + F</b> performs the same function as <b>Edit - 
+                Find</b>.</li>
+            </ul></li>
+            <li><b>Delete selection</b>
+            <ul> 
+                <li>Select a large subset of the loaded exceptions.  Confirm that selecting 
+                <b>Edit - Delete selection</b> removes them from the display.</li>
+                <li>Confirm that a wait cursor is displayed during a lengthy delete operation.</li>
+                <li>Confirm that <b>Edit - Delete selection</b> is disabled when no exceptions are 
+                selected.</li>
+                <li>Confirm that <b>Del</b> performs the same function as <b>Edit - Delete 
+                selection</b>.</li>
+            </ul></li>
+            <li><b>Invert Selection</b> 
+            <ul> 
+                <li>Select a subset of the loaded exceptions.  Confirm that clicking <b>Invert 
+                Selection</b> selects the other loaded exceptions.</li>
+                <li>Confirm that clicking <b>Invert Selection</b> again changes selection back to 
+                the original subset.</li>
+                <li>Confirm that <b>CTRL + I</b> performs the same function as <b>Edit - Invert
+                selection</b>.</li>
+            </ul></li>
+            <li><b>Clear</b>
+            <ul>
+                <li>Confirm that the exceptions loaded above are cleared from the display.</li>
+                <li>Confirm that the title bar reverts to <b>UEX Viewer</b>.</li>
+                <li>Confirm that the <b>Exception log files in the current folder</b> combo box 
+                list, the <b>&lt;</b> button, and the <b>&gt;</b> button are disabled.</li>
+            </ul></li>
+        </ul></li>
 <p>
-		<li><b>Exception Menu</b>
-		<ul>
+        <li><b>View Menu</b>
+        <ul>
             <li>Press alt, navigate to the Exception menu, and confirm that distinct alt shortcuts
-            are available for each menu item.
-			<li><b>View Details</b>
-			<ul>
-				<li>Reload the <b>ExtractException.uex</b> file.  Confirm that 
-				selecting an exception and clicking <b>Exception - View details</b> 
-				displays the Extract Exception dialog.
-				<li>Confirm that Viewing an exception does NOT add the item to the 
-				<b>ExtractException.uex</b> file.
-				<li>Confirm that <b>Exception - View details</b> is disabled when no 
-				exceptions are selected.
-				<li>Confirm that <b>Exception - View details</b> is disabled when 
-				more than one exception is selected.
-				<li>Confirm that double-clicking on an exception performs the same 
-				function as <b>Exception - View details</b>.
-				<li>Confirm that <b>CTRL + D</b> performs the same function as 
-				<b>Exception - View details</b>.
-			</ul>
-		</ul>
+            are available for each menu item.</li>
+            <li><b>View Details</b>
+            <ul>
+                <li>Reload the <b>ExtractException.uex</b> file.  Confirm that selecting an 
+                exception and clicking <b>Exception - View details</b> displays the Extract 
+                Exception dialog.</li>
+                <li>Confirm that Viewing an exception does NOT add the item to the 
+                <b>ExtractException.uex</b> file.</li>
+                <li>Confirm that <b>Exception - View details</b> is disabled when no exceptions are 
+                selected.</li>
+                <li>Confirm that <b>Exception - View details</b> is disabled when more than one 
+                exception is selected.</li>
+                <li>Confirm that double-clicking on an exception performs the same function as 
+                <b>Exception - View details</b>.</li>
+                <li>Confirm that <b>CTRL + D</b> performs the same function as <b>Exception - View 
+                details</b>.</li>
+            </ul></li>
+            <li><b>Show application traces</b>
+            <ul>
+                <li>Confirm that this setting is checked by default.</li>
+                <li>Confirm that iff this setting is checked, application traces are displayed
+                in the UEX log.</li>
+                <li>Confirm that this setting is saved in the registry under
+                <b>HKCU\Software\Extract Systems\Utilities\UEXViewer\General</b></li>
+            </ul></li>
+            <li><b>Show displayed exceptions</b>
+            <ul>
+                <li>Confirm that this setting is checked by default.</li>
+                <li>Confirm that iff this setting is checked, exceptions that were previously
+                displayed to the user in exception dialogs are displayed in the UEX log.</li>
+                <li>Confirm that this setting is saved in the registry under
+                <b>HKCU\Software\Extract Systems\Utilities\UEXViewer\General</b></li>
+            </ul></li>
+        </ul></li>
 <p>
-		<li><b>Help Menu</b>
-		<ul>
-			<li><b>About UEX Viewer</b>
-			<ul>
-				<li>Confirm that selecting <b>Help - About UEX Viewer</b> opens the 
-				UEX Viewer information window.
-			</ul>
-		</ul>
-	</ul>
+        <li><b>Tools menu</b>
+        <ul>
+            <li><b>Export Debug Data</b>
+            <ul>
+                <li>Confirm that selecting the menu item displays an <b>Export Debug Data</b> 
+                dialog.</li>
+                <li>Confirm that the <b>Export Debug Data</b> dialog is modeless.</li>
+                <li>Confirm that the dialog contains an <b>Export settings</b> group box.</li>
+                <li>Confirm that the group box contains a <b>Name of debug parameter to export if 
+                found</b> edit box.</li>
+                <li>Confirm that the group box contains a <b>Specify filename to export data 
+                to</b> edit box.</li>
+                <li>Confirm that the group box contains an associated <b>...</b> (browse) 
+                button.</li>
+                <li>Confirm that clicking the browse button displays an <b>Open</b> dialog
+                <ul>
+                    <li>Confirm that <b>*.txt</b> is the default file extension.</li>
+                    <li>Confirm that <b>*.*</b> is an available file extension.</li>
+                    <li>Confirm that the fully-qualified path to the selected file is displayed 
+                    in the edit box.</li>
+                    <li>Confirm that a previously selected export file is persisted if the browse 
+                    button is clicked again.</li>
+                </ul></li>
+                <li>Confirm that the group box contains an <b>If the file already exists, append 
+                to it rather than overwriting it</b> check box.</li>
+                <li>Confirm that the dialog contains an <b>Export scope</b> group box.</li>
+                <li>Confirm that the group box contains an <b>All displayed exceptions</b> radio 
+                button.</li>
+                <li>Confirm that the group box contains an <b>All selected exceptions</b> radio 
+                button.</li>
+                <li>Confirm that the group box contains a <b>Narrow above scope to those with 
+                this top-level ELI code:</b> check box.</li>
+                <li>Confirm that the group box contains an associated edit box.</li>
+                <li>Confirm that the edit box is enabled only if the check box is checked.</li>
+                <li>Confirm that the edit box contains <b>ELI</b> text that cannot be deleted by 
+                the user.</li>
+    <p>
+                <li>Confirm that debug data can be exported via overwriting an existing file.</li>
+                <li>Confirm that a message box is presented to the user reporting the number of 
+                exported entries.</li>
+                <li>Confirm that if no entries are exported and the output file <b>did not</b> 
+                originally exist, then no export file is created.</li>
+                <li>Confirm that if no entries are exported and the output file <b>did</b> 
+                originally exist, then the export file is unchanged.</li>
+                <li>Confirm that debug data can be exported via appending to an existing file.</li>
+                <li>Confirm that debug data can be exported for all displayed exceptions.</li>
+                <li>Confirm that debug data can be exported for all selected exceptions.</li>
+                <li>Confirm that debug data can be exported with scope narrowed to a specified ELI
+                code.</li>
+                <li>Confirm that it is possible to export only unique values.</li>
+            </ul></li>
+        </ul></li>
+<p>
+        <li><b>Help Menu</b>
+        <ul>
+            <li><b>About UEX Viewer</b>
+            <ul>
+                <li>Confirm that selecting <b>Help - About UEX Viewer</b> opens the 
+                UEX Viewer information window.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
 <p>
         <li> <b>Find Dialog</b>
-    	<ul>
-          	<li><b>User Interface</b>
+        <ul>
+            <li><b>User Interface</b>
             <ul>
-                <li>Confirm that an edit box is provided to specify search text.
-                <li>Confirm that a message is displayed if no matches are found.
+                <li>Confirm that an edit box is provided to specify search text.</li>
+                <li>Confirm that a message is displayed if no matches are found.</li>
                 <li>Confirm that a <b>Select</b> group box is provided allowing specification of 
-                <b>all</b>, <b>next</b> or <b>previous</b> matching exceptions.
-                <li>Confirm that an error message is displayed if the search text is empty.
-            </ul>
+                <b>all</b>, <b>next</b> or <b>previous</b> matching exceptions.</li>
+                <li>Confirm that an error message is displayed if the search text is empty.</li>
+            </ul></li>
             <li><b>Find All</b>
             <ul>
-                <li>Confirm that each exception containing the search text is selected.
-            </ul>
+                <li>Confirm that each exception containing the search text is selected.</li>
+            </ul></li>
             <li><b>Find Next</b>
             <ul>
-                <li>Select <b>next matching exception</b>.  Confirm that only the 
-                first exception (after the first currently selected exception) 
-                containing the search text is selected.
-                <li>Confirm that subsequent <b>Find</b> operations advance forwards 
-                through the list.
-                <li>Confirm that a message is displayed when no more matches are found.
-            </ul>
+                <li>Select <b>next matching exception</b>.  Confirm that only the first exception 
+                (after the first currently selected exception) containing the search text is 
+                selected.</li>
+                <li>Confirm that subsequent <b>Find</b> operations advance forwards through the 
+                list.</li>
+                <li>Confirm that a message is displayed when no more matches are found.</li>
+            </ul></li>
             <li><b>Find Previous</b>
             <ul>
-                <li>Select <b>previous matching exception</b>.  Confirm that only the 
-                first exception (before the first currently selected exception) containing 
-                the search text is selected.
-                <li>Confirm that subsequent <b>Find</b> operations advance backwards 
-                through the list.
-                <li>Confirm that a message is displayed when no more matches are found.
-            </ul>
+                <li>Select <b>previous matching exception</b>.  Confirm that only the first 
+                exception (before the first currently selected exception) containing the search 
+                text is selected.</li>
+                <li>Confirm that subsequent <b>Find</b> operations advance backwards through the 
+                list.</li>
+                <li>Confirm that a message is displayed when no more matches are found.</li>
+            </ul></li>
             <p>
             <li><b>[LegacyRC #5799]</b>
             <!--fixed v. 8.1.0.7-->
             <ul>
-                <li>Select Find from the Edit menu.
+                <li>Select Find from the Edit menu.</li>
                 <li>Enter some text that <b>does not appear</b> in the log and click the Find 
-                button.
-                <li>Click OK in the "No Match Found" window.
-                <li>Confirm that focus remains with the Find dialog.
+                button.</li>
+                <li>Click OK in the "No Match Found" window.</li>
+                <li>Confirm that focus remains with the Find dialog.</li>
                 <li>Repeat the above test, this time searching for text that <b>does</b> appear in
-                the log.
-                <li>Confirm that focus remains with the Find dialog.
-            </ul>
-    	</ul>
-        </li>
+                the log.</li>
+                <li>Confirm that focus remains with the Find dialog.</li>
+            </ul></li>
+        </ul></li>
 <p>
-   	<li><b>Command-Line Options</b>
-     	<ul>
-		<li><b>Unregistration:</b> Confirm that <b>UEXViewer.exe /u</b> unregisters 
-		the .uex file association.
-        	<li><b>Registration:</b> Confirm that <b>UEXViewer.exe /r</b> registers 
-		the .uex file association.
-		<li>Confirm that double-clicking on a file containing multiple exceptions 
-		loads the entire list into the UEX Viewer.
-		<li>Confirm that double-clicking on a <b>.Uex</b> file containing a single 
-		exception displays the exception in the Extract Exception dialog.
-		<li>Confirm that double-clicking on a <b>.Uex</b> file containing a single 
-		exception does NOT add the item to the <b>ExtractException.uex</b> file.
-<p>
-        	<li><b>Filename</b> 
-		<ul>
-			<li>Confirm that <b>UEXViewer.exe &lt;filename&gt;</b> opens the 
-			specified file.
-			<li>Confirm that if <b>&lt;filename&gt;</b> contains multiple 
-			exceptions, the entire list is loaded.
-			<li>Confirm that if <b>&lt;filename&gt;</b> contains only one 
-			exception, the exception is displayed in the Extract Exception dialog.
-		</ul>
-<p>
-		<li><b>Usage:</b> Confirm that <b>UEXViewer.exe /?</b> displays a Usage message-box.
-  	</ul>
-     	</li>
-<p>
-   	<li><b>Export of Debug Data</b>
-    	<ul>
-      		<li><u><b>Main window</b></u>
-		<ul>
-			<li>Open a UEX file.
-			<li>Right-click on a single selected exception and confirm 
-			that a context menu appears.
-			<li>Confirm that <b>Copy ELI code</b> is enabled and that 
-			it copies the <b>Top ELI Code</b> text to the Clipboard.
-			<li>Confirm that <b>Copy ELI text</b> is enabled and that 
-			it copies the <b>Top Exception</b> text to the Clipboard.
-			<li>Confirm that <b>Cancel</b> is enabled and that it 
-			closes the context menu and does nothing to the Clipboard.
-<p>
-			<li>Right-click on multiple selected exceptions and confirm 
-			that a context menu appears.
-			<li>Confirm that <b>Copy ELI code</b> is disabled.
-			<li>Confirm that <b>Copy ELI text</b> is disabled.
-			<li>Confirm that <b>Cancel</b> is enabled and that it 
-			closes the context menu and does nothing to the Clipboard.
-		</ul>
-      		<li><b><u>Error Details dialog</u></b>
-		<ul>
-			<li>Open a UEX file.
-			<li>Double-click on a selected exception to open the 
-			<b>Error details</b> dialog.
-			<li>Right-click on an entry in the <b>Debug information</b> 
-			list and confirm that a context menu appears.
-			<li>Confirm that <b>Copy name</b> is enabled and that 
-			it copies the <b>Name</b> text to the Clipboard.
-			<li>Confirm that <b>Copy value</b> is enabled and that 
-			it copies the <b>Value</b> text to the Clipboard.
-			<li>Confirm that <b>Cancel</b> is enabled and that it 
-			closes the context menu and does nothing to the Clipboard.
-	  	   	<LI><b>[LegacyRC #5716]</b> Confirm that <b>Alt+Y</b> works to copy data 
-			to the Clipboard.
-		</ul>
-      		<li><b><u>Export Debug Data dialog</u></b>
-		<ul>
-			<li>Confirm that a <b>Tools</b> menu exists.
-			<li>Confirm that an <b>Export debug data...</b> menu item 
-			exists.
-			<li>Confirm that selecting the menu item displays an 
-			<b>Export Debug Data</b> dialog.
-			<li>Confirm that the <b>Export Debug Data</b> dialog is 
-			modeless.
-			<li>Confirm that the dialog contains an <b>Export settings</b> 
-			group box.
-			<li>Confirm that the group box contains a <b>Name of debug 
-			parameter to export if found</b> edit box.
-			<li>Confirm that the group box contains a <b>Specify filename 
-			to export data to</b> edit box.
-			<li>Confirm that the group box contains an associated 
-			<b>...</b> (browse) button.
-			<li>Confirm that clicking the browse button displays an 
-			<b>Open</b> dialog
-			<ul>
-				<li>Confirm that <b>*.txt</b> is the default file 
-				extension.
-				<li>Confirm that <b>*.*</b> is an available file 
-				extension.
-				<li>Confirm that the fully-qualified path to the 
-				selected file is displayed in the edit box.
-				<li>Confirm that a previously selected export file 
-				is persisted if the browse button is clicked again.
-			</ul>
-			<li>Confirm that the group box contains an <b>If the file 
-			already exists, append to it rather than overwriting it</b> 
-			check box.
-			<li>Confirm that the dialog contains an <b>Export scope</b> 
-			group box.
-			<li>Confirm that the group box contains an <b>All displayed 
-			exceptions</b> radio button.
-			<li>Confirm that the group box contains an <b>All selected 
-			exceptions</b> radio button.
-			<li>Confirm that the group box contains a <b>Narrow above 
-			scope to those with this top-level ELI code:</b> check box.
-			<li>Confirm that the group box contains an associated edit 
-			box.
-			<li>Confirm that the edit box is enabled only if the check 
-			box is checked.
-			<li>Confirm that the edit box contains <b>ELI</b> text that 
-			cannot be deleted by the user.
-<p>
-			<li>Confirm that debug data can be exported via overwriting 
-			an existing file.
-			<li>Confirm that a message box is presented to the user 
-			reporting the number of exported entries.
-			<li>Confirm that if no entries are exported and the output 
-			file <b>did not</b> originally exist, then no export file is 
-			created.
-			<li>Confirm that if no entries are exported and the output 
-			file <b>did</b> originally exist, then the export file is 
-			unchanged.
-			<li>Confirm that debug data can be exported via appending 
-			to an existing file.
-			<li>Confirm that debug data can be exported for all displayed 
-			exceptions.
-			<li>Confirm that debug data can be exported for all selected 
-			exceptions.
-			<li>Confirm that debug data can be exported with scope 
-			narrowed to a specified ELI code.
-            <li>Confirm that it is possible to export only unique values.
-			<li>Confirm that clicking on the cancel button closes the context menu and does nothing
-            to the Clipboard.
-		</ul>
-      		<li><b><u>Miscellaneous</u></b>
-		<ul>
-	  	   	<LI><b>[LegacyRC #5696]</b> Exporting encrypted debug data from UEX Viewer
-		       	<ul>
-				<li>Review an expection log from a stress test or an Endurance test that 
-				contains several <b>ELI15935: Application trace information</b> exceptions 
-				with USB key count information.
-		  	   	<LI>Confirm that if the test machine is connected to the network with 
-				a mapped drive to <b>FNP2\Internal</b> then the debug data from 
-				these exceptions <b>is not</b> encrypted.
-		  	   	<LI>Confirm that if the test machine is connected to the network with 
-				a mapped drive to <b>FNP2\Internal</b> then the exported debug data from 
-				these exceptions <b>is not</b> encrypted.
-	  	   		<LI>Confirm that if the test machine is not connected to the network then 
-				the debug data from these exceptions <b>is</b> encrypted.
-	  		   	<LI>Confirm that if the test machine is not connected to the network then 
-				the exported debug data from these exceptions <b>is</b> encrypted.
-		       	</ul>
-<p>
-	  	   	<LI><b>[LegacyRC #5808]</b> Export debug data from UEX Viewer
-		       	<ul>
-	      			<li>Open <b>export.uex</b> from 
-				<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5808</b>.
-				<li>Export debug data for debug values with the name <b>File</b>.
-				<li>Confirm that <b>3</b> entries are present in the output file.
-	       		</ul>
-		</ul>
-  	</ul>
-     	</li>
-<p>
-   	<li><b>Miscellaneous Items</b>
-    	<ul>
-		<li>Drag and drop a <b>.Uex</b> file onto the UEX Viewer.  Confirm that the new 
-		list <b>replaces</b> the old list.
-		<li>While holding CTRL, drag and drop a <b>.Uex</b> file onto the UEX Viewer. 
-		Confirm that the new list is <b>appended</b> to the old list.
-         	<li>Confirm that UEX Viewer documentation is available in the Help file.
-		<ul>
-	         	<li>FLEX Index, 
-	         	<li>ID Shield, or 
-	         	<li>LabDE
-		</ul>
-           	<li>Confirm that UEX Viewer documentation includes either a Start menu path or a 
-		fully-qualified path to the EXE.
-<p>
-  	   	<LI><b>[FlexIDSCore #3499]</b> Oversize exception
-	       	<ul>
-	      		<li>Create a license file that <b>does not</b> include support for <b>Convert 
-			to searchable PDF</b>.
-	      		<li>Open an auto-redaction FPS file from the 6.0 Redaction Demo or 7.0 
-			Demo IDShield.
-	      		<li>Confirm that an exception is logged about an inability to open 
-			the FPS file.
-	      		<li>Confirm that the exception does not create an unusually large UEX 
-			file and that the UEX Viewer opens the UEX file without difficulty.
-	       	</ul>
-<p>
-		<li><b>[FlexIDSCore #3986]</b> Exception log corruption
-		<ul>
-			<li>Run the FAM as a service.
-			<li>Open the <b>UEX Viewer</b> application.
-			<li>Stop the FAM service.
-			<li>Press <b>F5</b> to refresh the UEX Viewer.
-			<li>Confirm that the UEX file and viewer are both refreshed properly.
-		</ul>
-<p>
-        <li><b>[LegacyRCAndUtils #5839]</b> Log-corrupting .uex file
-        <!-- fixed v 8.1.0.33 -->
+        <li><b>Command-Line Options</b>
         <ul>
-            <li>Open the log file at <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5839</b>.
-            <li>Check extractexception.uex and confirm that no errors were logged reading bad.uex.
-        </ul>
+            <li><b>Unregistration:</b> Confirm that <b>UEXViewer.exe /u</b> unregisters the .uex 
+            file association.</li>
+            <li><b>Registration:</b> Confirm that <b>UEXViewer.exe /r</b> registers the .uex file 
+            association.</li>
+            <li>Confirm that double-clicking on a file containing multiple exceptions loads the 
+            entire list into the UEX Viewer.</li>
+            <li>Confirm that double-clicking on a <b>.Uex</b> file containing a single exception 
+            displays the exception in the Extract Exception dialog.</li>
+            <li>Confirm that double-clicking on a <b>.Uex</b> file containing a single exception 
+            does NOT add the item to the <b>ExtractException.uex</b> file.</li>
 <p>
-          	<li><b>[LegacyRCAndUtils #4642]</b> Encrypted Debug values
-		<ul>
-	           	<li>Confirm that a mapped drive exists to <b>\\fnp2\internal</b> - 
-			typically drive I:\.
-               		<li>Open a local copy of <b>Application_Trace.uex</b> attached to the PVCS entry.
-	          	<li>Confirm that the values associated with <b>Item 1</b> and <b>Item 2</b> 
-			are meaningful numbers.
-                	<li>Close the <b>UEX Viewer</b>.
-	          	<li>Disconnect the mapped drive to <b>\\fnp2\internal</b>. If <b>\\Jake\internal</b> 
-			is also mapped, disconnect this as well.
-        	  	<li>Reopen <b>Application_Trace.uex</b> attached to the PVCS entry.
-                	<li>Confirm that the values associated with <b>Item 1</b> and <b>Item 2</b> 
-			are <b>&lt;Encrypted&gt;</b>.
-		</ul>
+            <li><b>Filename</b> 
+            <ul>
+                <li>Confirm that <b>UEXViewer.exe &lt;filename&gt;</b> opens the specified 
+                file.</li>
+                <li>Confirm that if <b>&lt;filename&gt;</b> contains multiple exceptions, the 
+                entire list is loaded.</li>
+                <li>Confirm that if <b>&lt;filename&gt;</b> contains only one exception, the 
+                exception is displayed in the Extract Exception dialog.</li>
+            </ul></li>
 <p>
-		<li><b>[LegacyRCAndUtils #4108]</b> Navigation shortcut keys don't work after 
-		loading from combo box list</li>
-		<ul>
-			<li>Open <b>ExtractException.uex</b>.</li>
-			<li>Using the combo box, select an earlier exception log.</li>
-			<li>Confirm that the <b>&lt;</b> and <b>&gt;</b> buttons work.</li>
-			<li>Using the combo box, select an earlier exception log.</li>
-			<li>Confirm that the <b>&lt;CTRL&gt; + Left/Right</b> keyboard 
-			shortcuts work.</li>
-			<li>Using the <b>&lt;</b> and <b>&gt;</b> buttons, select a 
-			different exception log.
-			<li>Confirm that the <b>&lt;CTRL&gt; + Left/Right</b> keyboard 
-			shortcuts work.
-		</ul>
+            <li><b>Usage:</b> Confirm that <b>UEXViewer.exe /?</b> displays a Usage message 
+            box.</li>
+        </ul></li>
 <p>
-		<li><b>[LegacyRCAndUtils #5148]</b> Renamed exception log
-		<ul>
-			<li>Confirm that exceptions are now logged to <b>ExtractException.uex</b>
-			<li>Confirm that the <b>UEX Viewer</b> successfully opens both 
-			old and new UEX files.
-			<li>Confirm that the <b>UEX Viewer</b> successfully navigates between 
-			old and new UEX files.
-		</ul>
+        <li><b>Export of Debug Data</b>
+        <ul>
+            <li><b><u>Error Details dialog</u></b>
+            <ul>
+                <li>Open a UEX file.</li>
+                <li>Double-click on a selected exception to open the <b>Error details</b> 
+                dialog.</li>
+                <li>Right-click on an entry in the <b>Debug information</b> list and confirm that 
+                a context menu appears.</li>
+                <li>Confirm that <b>Copy name</b> is enabled and that it copies the <b>Name</b> 
+                text to the Clipboard.</li>
+                <li>Confirm that <b>Copy value</b> is enabled and that it copies the <b>Value</b> 
+                text to the Clipboard.</li>
+                <li>Confirm that <b>Cancel</b> is enabled and that it closes the context menu and 
+                does nothing to the Clipboard.</li>
+                <LI><b>[LegacyRC #5716]</b> Confirm that <b>Alt+Y</b> works to copy data to the 
+                Clipboard.</li>
+            </ul></li>
+            <li><b><u>Miscellaneous</u></b>
+            <ul>
+                <LI><b>[LegacyRC #5696]</b> Exporting encrypted debug data from UEX Viewer
+                <ul>
+                    <li>Review an expection log from a stress test or an Endurance test that 
+                    contains several <b>ELI15935: Application trace information</b> exceptions 
+                    with USB key count information.</li>
+                    <LI>Confirm that if the test machine is connected to the network with a mapped 
+                    drive to <b>FNP2\Internal</b> then the debug data from these exceptions <b>is 
+                    not</b> encrypted.</li>
+                    <LI>Confirm that if the test machine is not connected to the network then the 
+                    exported debug data from these exceptions <b>is</b> encrypted.</li>
+                </ul></li>
 <p>
-  	   	<LI><b>[LegacyRC #5308]</b> UEX Viewer
-	       	<ul>
-	      		<li>Confirm that UEX files from <b>ID Shield 6.0</b> can be opened.
-	      		<li>Confirm that UEX files from <b>ID Shield 7.0</b> can be opened.
-	       	</ul>
+                <LI><b>[LegacyRC #5808]</b> Export debug data from UEX Viewer
+                <ul>
+                    <li>Open <b>export.uex</b> from 
+                    <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5808</b>.</li>
+                    <li>Export debug data for debug values with the name <b>File</b>.</li>
+                    <li>Confirm that <b>3</b> entries are present in the output file.</li>
+                </ul></li>
+            </ul></li>
+        </ul></li>
 <p>
-  	   	<LI><b>[LegacyRC #5530</b> Confirm that a meaningful error message is presented for 
-		<b>View exception log</b> if no UEX file exists.
+        <li><b>Miscellaneous Items</b>
+        <ul>
+            <li><b>Context menu options</b>
+            <ul>
+                <li>Open a UEX log.</li>
+                <li>Select a single exception and right click to open the context menu.</lI>
+                <lI>Confirm that <b>Select all matching top-level exceptions</b> selects all 
+                exceptions with the same top-level ELI code.</li>
+                <li>Confirm that <b>Select all matchinng exception hierarchies</b> selects all
+                exceptions with matching inner exceptions.</lI>
+                <li>Confirm that <b>Copy top ELI code</b> copies the top-level ELI code to the
+                clipboard.</li>
+                <li>Confirm that <b>Cancel</b> closes the context menu without modifying either
+                the clipboard or the selection.</lI>
+            </ul></li>
+        <p>
+            <li>Drag and drop a <b>.Uex</b> file onto the UEX Viewer.  Confirm that the new list 
+            <b>replaces</b> the old list.</li>
+            <li>While holding CTRL, drag and drop a <b>.Uex</b> file onto the UEX Viewer. Confirm
+            that the new list is <b>appended</b> to the old list.</li>
+            <li>Confirm that UEX Viewer documentation is available in the Help file.
+            <ul>
+                <li>FLEX Index, </li>
+                <li>ID Shield, or </li>
+                <li>LabDE</li>
+            </ul></li>
+            <li>Confirm that UEX Viewer documentation includes either a Start menu path or a 
+            fully-qualified path to the EXE.</li>
 <p>
-  	   	<LI><b>[LegacyRC #5560]</b> UEX Viewer
-	       	<ul>
-	  	   	<LI>Confirm that the <b>ExtractException.Uex</b> file contains multiple 
-			exceptions.
-			<li>Modify the exception log with a text editor to include several 
-			incorrect lines.
-			<li>Confirm that the exception log can still be opened by the 
-			<b>UEX Viewer</b> utility.
-			<li>Confirm that error messages are presented for each incorrect line.
-	       	</ul>
+            <LI><b>[FlexIDSCore #3499]</b> Oversize exception
+            <ul>
+                <li>Create a license file that <b>does not</b> include support for <b>Convert to 
+                searchable PDF</b>.</li>
+                <li>Open an auto-redaction FPS file from the 6.0 Redaction Demo or 7.0 Demo 
+                IDShield.</li>
+                <li>Confirm that an exception is logged about an inability to open the FPS 
+                file.</li>
+                <li>Confirm that the exception does not create an unusually large UEX file and that 
+                the UEX Viewer opens the UEX file without difficulty.</li>
+            </ul></li>
 <p>
-  	   	<LI><b>[LegacyRC #5792, #5793, #5794]</b> Bad exception log
-	       	<ul>
-	      		<li>Open the exception log at 
-			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5792</b> using 
-			<b>Notepad.exe</b> or another text editor.
-			<li>Confirm that some exception lines are incomplete or corrupt.
-			<li>Open the UEX file using <b>UEXViewer.exe</b>.
-			<li>Confirm that the incomplete lines are presented as 
-			<b>**Unparseable exception**</b>.
-	       	</ul>
-    	</ul>
-   	</li>
+            <li><b>[FlexIDSCore #3986]</b> Exception log corruption
+            <ul>
+                <li>Run the FAM as a service.</li>
+                <li>Open the <b>UEX Viewer</b> application.</li>
+                <li>Stop the FAM service.</li>
+                <li>Press <b>F5</b> to refresh the UEX Viewer.</li>
+                <li>Confirm that the UEX file and viewer are both refreshed properly.</li>
+            </ul></li>
+<p>
+            <li><b>[LegacyRCAndUtils #5839]</b> Log-corrupting .uex file
+            <!-- fixed v 8.1.0.33 -->
+            <ul>
+                <li>Open the log file at <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5839</b>.</li>
+                <li>Check extractexception.uex and confirm that no errors were logged reading 
+                bad.uex.</li>
+            </ul></li>
+<p>
+            <li><b>[LegacyRCAndUtils #4642]</b> Encrypted Debug values
+            <ul>
+                <li>Confirm that a mapped drive exists to <b>\\fnp2\internal</b> - typically drive
+                I:\.</li>
+                <li>Open a local copy of <b>Application_Trace.uex</b> attached to the PVCS 
+                entry.</li>
+                <li>Confirm that the values associated with <b>Item 1</b> and <b>Item 2</b> are 
+                meaningful numbers.</li>
+                <li>Close the <b>UEX Viewer</b>.</li>
+                <li>Disconnect the mapped drive to <b>\\fnp2\internal</b>. If <b>\\Jake\internal</b> 
+                is also mapped, disconnect this as well.</li>
+                <li>Reopen <b>Application_Trace.uex</b> attached to the PVCS entry.</li>
+                <li>Confirm that the values associated with <b>Item 1</b> and <b>Item 2</b> are 
+                <b>&lt;Encrypted&gt;</b>.</li>
+            </ul></li>
+<p>
+            <li><b>[LegacyRCAndUtils #4108]</b> Navigation shortcut keys don't work after loading 
+            from combo box list
+            <ul>
+                <li>Open <b>ExtractException.uex</b>.</li>
+                <li>Using the combo box, select an earlier exception log.</li>
+                <li>Confirm that the <b>&lt;</b> and <b>&gt;</b> buttons work.</li>
+                <li>Using the combo box, select an earlier exception log.</li>
+                <li>Confirm that the <b>&lt;CTRL&gt; + Left/Right</b> keyboard shortcuts work.</li>
+                <li>Using the <b>&lt;</b> and <b>&gt;</b> buttons, select a different exception 
+                log.</li>
+                <li>Confirm that the <b>&lt;CTRL&gt; + Left/Right</b> keyboard shortcuts work.</li>
+            </ul></li>
+<p>
+            <li><b>[LegacyRCAndUtils #5148]</b> Renamed exception log
+            <ul>
+                <li>Confirm that exceptions are now logged to <b>ExtractException.uex</b></li>
+                <li>Confirm that the <b>UEX Viewer</b> successfully opens both old and new UEX 
+                files.</li>
+                <li>Confirm that the <b>UEX Viewer</b> successfully navigates between old and new 
+                UEX files.</li>
+            </ul></li>
+<p>
+            <LI><b>[LegacyRC #5308]</b> UEX Viewer
+            <ul>
+                <li>Confirm that UEX files from <b>ID Shield 6.0</b> can be opened.</li>
+                <li>Confirm that UEX files from <b>ID Shield 7.0</b> can be opened.</li>
+            </ul></li>
+<p>
+            <LI><b>[LegacyRC #5530</b> Confirm that a meaningful error message is presented for 
+            <b>View exception log</b> if no UEX file exists.</li>
+<p>
+            <LI><b>[LegacyRC #5560]</b> UEX Viewer
+            <ul>
+                <LI>Confirm that the <b>ExtractException.Uex</b> file contains multiple 
+                exceptions.</li>
+                <li>Modify the exception log with a text editor to include several incorrect 
+                lines.</li>
+                <li>Confirm that the exception log can still be opened by the <b>UEX Viewer</b> 
+                utility.</li>
+                <li>Confirm that error messages are presented for each incorrect line.</li>
+            </ul></li>
+<p>
+            <LI><b>[LegacyRC #5792, #5793, #5794]</b> Bad exception log
+            <ul>
+                <li>Open the exception log at <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5792</b> 
+                using <b>Notepad.exe</b> or another text editor.</li>
+                <li>Confirm that some exception lines are incomplete or corrupt.</li>
+                <li>Open the UEX file using <b>UEXViewer.exe</b>.</li>
+                <li>Confirm that the incomplete lines are presented as <b>**Unparseable 
+                exception**</b>.</li>
+            </ul></li>
+        </ul></li>
 </ol>
 </body>
 </html>

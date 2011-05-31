@@ -319,6 +319,7 @@
                 <li>An associated read-only edit box for <b>Sample text that uses the above 
                 pattern</b>.</li>
                 <li>Confirm that the edit box updates with combo box changes.</li>
+                <li>An <b>Advanced test settings...</b> button.</li>
                 <li>A group box for <b>Redaction colors</b>.</li>
                 <li>A drop-down box for <b>Border color</b>.</li>
                 <li>A drop-down box for <b>Fill color</b>.</li>
@@ -329,6 +330,40 @@
                 dialog.</li>
                 <li>An associated label with the text <b>If text is too large to fit inside 
                 redaction zone, it will automatically be scaled to fit</b>.</li>
+                <li>Confirm that the advanced text settings dialog includes the following elements:
+                <ul>
+                    <li>A <b>Perform the following search and replace operations on the redaction
+                    text</b> group box</li>
+                    <li>A two-column list box with columns <b>To Be Replaced</b> and 
+                    <b>Replacement</b></li>
+                    <li>The following buttons:
+                    <ul>
+                        <li>Add</li>
+                        <li>Remove</li>
+                        <li>Modify</li>
+                        <li>Up arrow</li>
+                        <li>Down arrow</li>
+                        <li>Load list...</li>
+                        <li>Save list...</li>
+                    </ul></li>
+                    <li>Confirm that the buttons are all enabled at reasonable times and behave
+                    the way you expect them to.</li>
+                    <li>Confirm the presence of an <b>Additional redaction text settings</b> group
+                    box containing
+                    <ul>
+                        <li>An <b>Auto adjust case for redaction text</b> checkbox</li>
+                        <li>A <b>Prefix first instance of type with</b> checkbox
+                        <ul>
+                            <li>with an associated edit box and tag selector</li>
+                        </ul></li>
+                        <li>A <b>Suffix first instance of type with</b> checkbox
+                        <ul>
+                            <li>with an associated edit box and tag selector</li>
+                        </ul></li>
+                    </ul></li>
+                    <li>An <b>OK</b> button</li>
+                    <li>A <b>Cancel</b> button</li>
+                </ul></li>
             </ul></li>
             <li>Confirm that the settings are persistent.</li>
         </UL></li>
@@ -346,6 +381,10 @@
                 <li>Confirm that redactions can be applied as either black or white annotations.</li>
                 <li>Confirm that redaction boxes can include text.</li>
                 <li>Confirm that the text is completely contained within the redactions.</li>
+                <li>Confirm that <b>replace strings</b> can be applied to the redaction text.</li>
+                <li>Confirm that the <b>auto adjust case</b> function works as expected.</li>
+                <li>Confirm that <b>affixing the first instance of a type</b> works as 
+                expected.</li>
                 <li>Confirm that redactions can be <b>black</b>.</li>
                 <li>Confirm that redactions can be <b>white</b>.</li>
             </ul></li>
@@ -355,6 +394,10 @@
                 <li>Confirm that existing redactions can be discarded.</li>
                 <li>Confirm that redaction boxes can include text.</li>
                 <li>Confirm that the text is completely contained within the redactions.</li>
+                <li>Confirm that <b>replace strings</b> can be applied to the redaction text.</li>
+                <li>Confirm that the <b>auto adjust case</b> function works as expected.</li>
+                <li>Confirm that <b>affixing the first instance of a type</b> works as 
+                expected.</li>
                 <li>Confirm that redactions can be <b>black</b>.</li>
                 <li>Confirm that redactions can be <b>white</b>.</li>
             </ul></li>
@@ -376,6 +419,8 @@
                 <li>The input and output files.</li>
                 <li>The redacted attributes.</li>
                 <li>The output options.</li>
+                <li>Confirm that each attribute in the VOA file is assigned an ID, regardless of
+                whether or not that particular attribute is redacted.</li>
             </ul></li>
 <p>
             <LI><b>[FlexIDSCore #3756]</b> Create redacted image task
@@ -527,6 +572,124 @@
             </ul></li>
         </ul></li>
     </UL></li>
+<p>
+    <li><h2>Redaction: Create redacted text</h2>
+    <ul>
+        <li><b>User Interface</b>
+        <ul>
+            <li>Use the add button to select <b>Redaction: Create redacted text</b> as your 
+            task.</li>
+            <li>Confirm that the task does <b>not</b> require configuration.</li>
+            <li>Confirm that you can save an FPS file containing this task without first opening
+            the configuration dialog.</li>
+            <li>Open the configuration dialog.</li>
+            <li>Confirm the presence of a <b>Data categories to redact</b> group box.
+            <ul>
+                <li>Confirm that the group box includes a radio button for <b>All</b>.</li>
+                <li>Confirm that it contains a radio button for <b>Selected</b>.
+                <ul>
+                    <li>Confirm that this radio button is selected by default.</li>
+                    <li>Confirm that there are checkboxes for High confidence, Medium confidence,
+                    Low confidence, and Manual data/redactions, all selected by default.</li>
+                    <li>Confirm that there is a checkbox for <b>Other</b>, not selected by
+                    default.</li>
+                    <li>Confirm that when you check the box for <b>Other</b>, the associated edit
+                    box is enabled.</li>
+                    <li>Confirm that the checkboxes are enabled only when the <b>Selected</b> radio
+                    button is selected.</li>
+                </ul></li>
+            </ul></li>
+            <li>Confirm the presence of a <b>Redaction method</b> group box.
+            <ul>
+                <li>Confirm that there is a <b>Replace</b> radio button selected by default.
+                <ul>
+                    <li>Confirm that there is an associated drop down box with options <b>all</b>
+                    and <b>alpha numeric</b>.</li>
+                    <li>Confirm that <b>all</b> is selected by default.</li>
+                    <li>Confirm that there is an edit box for the character with which to replace
+                    sensitive text.</li>
+                    <li>Confirm that it is <b>X</b> by default.</li>
+                    <li>Confirm that there is an associated checkbox to <b>Randomly add</b>
+                    characters to obscure the length of sensitive text.</li>
+                    <li>Confirm that the checkbox is enabled only when <b>all</b> is selected in
+                    the dropdown.</li>
+                    <li>Confirm that the checkbox has an associated spin control that is enabled
+                    only when the box is checked.</li>
+                    <li>Confirm that the dropdown and X edit box are enabled only when the 
+                    associated radio button is selected.</li>
+                </ul></li>
+                <li>Confirm that there is a <b>Replace sensitive text with the following text</b>
+                radio button.
+                <ul>
+                    <li>Confirm that there is an associated edit box with a default value of
+                    <b>[REDACTED]</b>.</li>
+                    <li>Confirm that the edit box is enabled only when the related radio button is
+                    selected.</li>
+                </ul></li>
+                <li>Confirm that there is a <b>Replace sensitive text with an XML element named</b>
+                radio button.
+                <ul>
+                    <li>Confirm that there is an associated edit box with a default value of
+                    <b>Sensitive</b>.</li>
+                    <li>Confirm that the edit box is enabled only when the related radio button is
+                    selected.</li>
+                </ul></li>
+            </ul></li>
+            <li>Confirm that there is an <b>ID Shield data file location</b> group box
+            <ul>
+                <li>Confirm that the default value is <b>You are using default settings</b>.</li>
+                <li>Confirm that there is a related <b>Customize...</b> button.</li>
+                <li>Confirm that the default data file path is 
+                <b>&lt;SourceDocName&gt;.voa</b></li>
+                <li>Confirm that the <b>Specify ID Shield data file path</b> dialog controls work
+                as expected.</li>
+            </ul></li>
+            <li>Confirm that there is an <b>Output location</b> group box
+            <ul>
+                <li>Confirm that the default value is 
+                <b>$InsertBeforeExt(&lt;SourceDocName&gt;,.redacted)</b></li>
+                <li>Confirm that there is an associated tag selector button and that it works as
+                expected.</li>
+            </ul></li>
+        <p>
+            <li>Confirm that the property page is keyboard navigable.</li>
+        </ul></li>
+    <p>
+        <li><b>Functionality</b>
+        <ul>
+            <li>Get a local copy of the .txt and .txt.voa files in 
+            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4559</b></li>
+            <li>Review the .voa file and run the document through the default Create redacted text
+            task. Confirm that appropriate data were redacted.</li>
+            <li>Confirm that appropriate data are redacted when you say to <b>redact all</b>.</li>
+            <li>Confirm that appropriate data are redacted when you specify other data categories
+            to redact.</li>
+            <li>Confirm correct behavior in the following situations:
+            <ul>
+                <li>Specifying a <b>character other than "X"</b> to redact with</li>
+                <li>Replacing only <b>alpha-numeric</b> characters</li>
+                <li>Obscuring the length of the redaction</li>
+                <li>Replacing the sensitive text with some other arbitrary text</li>
+                <li>Surrounding sensitive text with an XML element</li>
+                <li>Using a non-default .voa file</li>
+                <li>Using a non-default output location</li>
+            </ul></li>
+        <p>
+            <li>Get a local copy of the .txt and .txt.voa files in
+            <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4617</b>
+            <ul>
+                <li>Confirm that the Create redacted text task can be run on that .txt file in a
+                reasonable length of time.</li>
+                <li>Confirm that the output .txt file is redacted correctly (i.e., confirm that
+                characters beyong the 65536th can be redacted correctly).</li>
+            </ul></li>
+            <li>Confirm that the task fails
+            <ul>
+                <li>when the .voa file is missing</li>
+                <li>when run on images</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
 <p>
     <LI><h2>Redaction: Extend redactions to surround context</h2>
     <UL>
@@ -725,6 +888,67 @@
         </ul></li>
     </UL></li>
 <p>
+    <li><h2>Redaction: Merge ID Shield data files</h2>
+    <ul>
+        <li><b>User Interface</b>
+        <ul>
+            <li>Select a new <b>Redaction: Merge ID Shield data files</b> task.</li>
+            <li>Confirm that the task does <b>not</b> require that it be configured.</lI>
+            <li>Hit the Configure button.</li>
+            <li>Confirm that the property page contains appropriate text in the title bar.</li>
+            <li>Confirm the presence of a <b>Source</b> group box.
+            <ul>
+                <li>Confirm that it includes a text box with a default value of
+                <b>&lt;SourceDocName&gt;.session1.voa</b>.</li>
+                <li>Confirm that another text box has a default value of
+                <b>&lt;SourceDocName&gt;.session2.voa</b>.</li>
+                <li>Confirm that each text box has an associated tag selector button with 
+                the standard tags and functions.</li>
+                <li>Confirm that there is a spin control for the minimum overlap percentage.</li>
+                <li>Confirm that the value in the spin control must be between 1 and 100.</li>
+                <li>Confirm that the spin control works as expected.</li>
+            </ul></li>
+            <li>Confirm the presence of an <b>Output</b> group box.
+            <ul>
+                <li>Confirm that it includes a text box with a default value of
+                <b>&lt;SourceDocName&gt;.merged.voa</b>.</li>
+                <li>Confirm that there is an associated tag selector button that functions as
+                expected.</li>
+            </ul></li>
+            <li>Confirm that the property page requires both source VOA files and the output VOA
+            file to be specified.</li>
+        </ul></li>
+    <p>
+        <li><b>Functionality</b>
+        <ul>
+            <li>Confirm that attributes are merged correctly based on the overlap percentage
+            specified in the task configuration.</li>
+            <li>Confirm that if attributes with different names are merged, the name for the merged
+            attribute will be prioritized as follows: "Manual", "HCData", "MCData", "LCData".</li>
+            <li>Confirm that the text value of a merged attribute is <b>Merged</b>.</li>
+            <li>Confirm that attributes are merged per raster zone, not based on overall 
+            bounds.</li>
+            <li>Confirm that attributes that do not meet the criteria for mergine (i.e., attributes
+            that do not overlap) are preserved in the output.</li>
+            <li>Confirm that information about the merge session is stored in an appropriate
+            metadata node.</li>
+            <li>Confirm that the merge session metadata contains the metadata from the source VOA
+            files.</li>
+            <li>Confirm that the preserved metadata includes _MergedToID attributes to allow you
+            to trace a merged attribute to its source attributes.</li>
+            <li>Confirm that merge session metadata is nested appropriately when a 
+            previously-merged file is merged again.</li>
+            <li>Confirm that the merge task fails if one of the source VOA files is missing.</li>
+            <li>Confirm that non-spatial attributes (e.g., document types) are preserved
+            appropriately
+            <ul>
+                <li>Metadata is stored in the merge session metadata.</li>
+                <li>Identical non-spatial attributes are combined.</li>
+                <li>Otherwise, each source attribute should show up separately in the results.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
+<p>
     <LI><h2>Redaction: Redact image without verification (legacy)</h2>
     <UL>
         <li>Use the Add button to select <b>Redaction: Redact image without verification 
@@ -757,6 +981,81 @@
 <!-- *********************************************** -->
 <LI><h2>File Action Manager - Conditions</h2>
 <UL>
+    <li><h2>Compare ID Shield data files condition</h2>
+    <ul>
+        <li><b>User Interface</b>
+        <ul>
+            <li>Select a new <b>Compare ID Shield data files</b> condition.</li>
+            <li>Confirm that the condition requires that it be configured.</lI>
+            <li>Hit the Configure button.</li>
+            <li>Confirm that the property page contains appropriate text in the title bar.</li>
+            <li>Confirm the presence of a <b>Source</b> group box.
+            <ul>
+                <li>Confirm that there is a <b>met/unmet</b> dropdown box.</li>
+                <li>Confirm that there is a text box with a default value of
+                <b>&lt;SourceDocName&gt;.session1.voa</b>.</li>
+                <li>Confirm that another text box has a default value of
+                <b>&lt;SourceDocName&gt;.session2.voa</b>.</li>
+                <li>Confirm that each text box has an associated tag selector button with 
+                the standard tags and functions.</li>
+                <li>Confirm that there is a spin control for the minimum overlap percentage.</li>
+                <li>Confirm that the value in the spin control must be between 1 and 100.</li>
+                <li>Confirm that the spin control works as expected.</li>
+            </ul></li>
+            <li>Confirm the presence of an <b>Output</b> group box.
+            <ul>
+                <li>Confirm that there is a checkbox for <b>Output a merged VOA file to:</b> and
+                that it is <b>unchecked</b> by default.</li>
+                <li>Confirm that there is a text box with a default value of
+                <b>&lt;SourceDocName&gt;.merged.voa</b>.</li>
+                <li>Confirm that there is an associated tag selector button that functions as
+                expected.</li>
+                <li>Confirm that there is a checkbox to <b>Only create output if the condition is
+                met</b> and that it is checked by default.</li>
+                <li>Confirm that the text box, tag selector, and Only create checkbox are enabled
+                only if the Output checkbox is checked.</li>
+            </ul></li>
+            <li>Confirm that the property page requires both source VOA files and, if enabled,
+            the output VOA file to be specified.</li>
+        </ul></li>
+    <p>
+        <li><b>Functionality</b>
+        <ul>
+            <li>Confirm that the condition is met/not met appropriately based on a comparison of
+            the <b>spatial attributes</b> in the two source VOA files.</li>
+            <li>Confirm that a merged VOA file is output or not correctly based on the output
+            checkbox.</li>
+            <li>Confirm that attributes are merged correctly based on the overlap percentage
+            specified in the task configuration.</li>
+            <li>Confirm that if attributes with different names are merged, the name for the
+            merged attribute will be prioritized as follows: "Manual", "HCData", "MCData",
+            "LCData".</li>
+            <li>Confirm that the text value of a merged attribute is <b>Merged</b>.</li>
+            <li>Confirm that attributes are merged per raster zone, not based on overall 
+            bounds.</li>
+            <li>Confirm that attributes that do not meet the criteria for merging (i.e.,
+            attributes that do not overlap) are preserved in the output.</li>
+            <li>Confirm that information about the merge session is stored in an appropriate
+            metadata node.</li>
+            <li>Confirm that the preserved metadata includes _MergedToID attributes to allow you
+            to trace a merged attribute to its source attributes.</li>
+            <li>Confirm that the merge session metadata contains the metadata from the source VOA
+            files.</li>
+            <li>Confirm that merge session metadata is nested appropriately when a 
+            previously-merged file is merged again.</li>
+            <li>Confirm that the merge condition fails if one of the source VOA files is 
+            missing.</li>
+            <li>Confirm that non-spatial attributes (e.g., document types) are preserved
+            appropriately
+            <ul>
+                <li>Metadata is stored in the merge session metadata.</li>
+                <li>Identical non-spatial attributes are combined.</li>
+                <li>Otherwise, each source attribute should show up separately in the 
+                results.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
+
     <LI><h2>ID Shield Data File Contents Condition</h2>
     <UL>
         <li>Begin configuring a <b>Conditional Task</b> object, selecting the <b>ID Shield data 

@@ -19,83 +19,85 @@
 
 <h2>Command-line Use</h2>
 <ul>
-	<li>Confirm that <b>ReportViewer.exe</b> exists in the CommonComponents folder.
+	<li>Confirm that <b>ReportViewer.exe</b> exists in the CommonComponents folder.</li>
 	<li><b>ReportViewer.exe</b> can be opened when using a full license</li>
 	<li><b>ReportViewer.exe</b> can be opened when using an evaluation license</li>
 	<li><b>[LegacyRC #5261]</b> /prompt option
 	<ul>
-		<li>Run ReportViewer specifying a server, database, report file, and 
-		<b>/prompt</b>.  
+		<li>Run ReportViewer specifying a server, database, report file, and <b>/prompt</b>.</li>
 		<li>Fill in data for the prompt and click okay.</li>
 		<li>Confirm that the desired report is generated.</li>
 		<li>Confirm that an exception is not thrown.</li>
-	</ul>
+	</ul></li>
 </ul>
 
 <h2>FAM DB Admin Use</h2>
 <ul>
-	<li>Confirm that a <b>Open Report</b> dialog appears.
-	<li>Confirm that a <b>Standard Reports</b> tab is available.
-	<li>Confirm that a <b>Saved Reports</b> tab is available.
+	<li>Confirm that a <b>Open Report</b> dialog appears.</li>
+	<li>Confirm that a <b>Standard Reports</b> tab is available.</li>
+	<li>Confirm that a <b>Saved Reports</b> tab is available.</li>
 <p>
-	<li>Confirm that a <b>Report Viewer</b> thumbnail image is available - for each of 
-	the installed reports.
+	<li>Confirm that a <b>Report Viewer</b> thumbnail image is available - for each of the 
+    installed reports.</li>
 	<li><b>[LegacyRC #5084, #5147]</b> Missing thumbnail image
 	<ul>
-		<li>Open the Report Viewer.
-		<li>Rename one of the thumbnail images for a report.
-		<li>Confirm that selecting that report now displays a text message in the 
-		preview pane that the image is not available.
-		<li>Resize the Report Viewer.
-		<li>Confirm that the text message in the preview pane remains centered.
-	</ul>
+		<li>Open the Report Viewer.</li>
+		<li>Rename one of the thumbnail images for a report.</li>
+		<li>Confirm that selecting that report now displays a text message in the preview pane that
+        the image is not available.</li>
+		<li>Resize the Report Viewer.</li>
+		<li>Confirm that the text message in the preview pane remains centered.</li>
+	</ul></li>
 </ul>
 
 <h2>Core Reports</h2>
 <ol>
-	<li><b>Detailed report for specific document</b>
-	<li><b>Detailed usage report for specific user for specific day</b>
-	<li><b>Documents processed on machines</b>
-	<li><b>List of all actions in the project</b>
-	<li><b>List of all documents with specific tag</b>
-	<li><b>List of all file action comments in the project</b>
-	<li><b>List of all machines used in the project</b>
-	<li><b>List of all skipped documents in the project</b>
-	<li><b>List of all tagged documents in the project (by tag)</b>
-	<li><b>List of all tags in the project</b>
-	<li><b>List of all users in the project</b>
-	<li><b>Machines used for processing (by action)</b>
-	<li><b>Summary of actions and associated document counts</b>
-	<li><b>Summary of actions and associated document page counts</b>
-	<li><b>Summary of processing times (by action)</b>
-	<li><b>Usage report during custom date range broken down by user</b>
+	<li>Detailed report for specific document</li>
+	<li>Detailed usage report for specific user for specific day</li>
+	<li>Documents processed on machines</li>
+	<li>List of all actions in the project</li>
+	<li>List of all documents with specific tag</li>
+	<li>List of all file action comments in the project</li>
+	<li>List of all machines used in the project</li>
+	<li>List of all skipped documents in the project</li>
+	<li>List of all tagged documents in the project (by tag)</li>
+	<li>List of all tags in the project</li>
+	<li>List of all users in the project</li>
+	<li>Machines used for processing (by action)</li>
+	<li>Summary of actions and associated document counts</li>
+	<li>Summary of actions and associated document page counts</li>
+	<li>Summary of processing times (by action)</li>
+	<li>Usage report during custom date range broken down by user</li>
 </ol>
 
 <h2>Open Report dialog</h2>
 <ul>
-	<li>Confirm that selecting a report and clicking <b>Cancel</b> does not change the 
-	displayed report.
-	<li>Confirm that selecting a report and clicking <b>OK</b> displays the selected report.
-	<li>Confirm that selecting a report and pressing <b>&lt;Enter&gt;</b> displays the selected report.
-	<li><b>[LegacyRC #5231]</b> Confirm that <b>double-clicking</b> a report displays the selected report.
-	<li>Confirm that the <b>Delete selected report</b> button is disabled for each 
-	<b>Standard report</b>.
-	<li>Confirm that the <b>Delete selected report</b> button is enabled for each 
-	<b>Saved report</b>.
-	<li><b>[LegacyRC #5113]</b> Resize the window and confirm that the preview image 
-	resizes smoothly.</li>
+	<li>Confirm that selecting a report and clicking <b>Cancel</b> does not change the displayed 
+    report.</li>
+	<li>Confirm that selecting a report and clicking <b>OK</b> displays the selected report.</li>
+	<li>Confirm that selecting a report and pressing <b>&lt;Enter&gt;</b> displays the selected 
+    report.</li>
+	<li><b>[LegacyRC #5231]</b> Confirm that <b>double-clicking</b> a report displays the selected 
+    report.</li>
+	<li>Confirm that the <b>Delete selected report</b> button is disabled for each <b>Standard 
+    report</b>.</li>
+	<li>Confirm that the <b>Delete selected report</b> button is enabled for each <b>Saved 
+    report</b>.</li>
+	<li><b>[LegacyRC #5113]</b> Resize the window and confirm that the preview image resizes 
+    smoothly.</li>
 	<li><b>[LegacyRC #5084]</b> Rename a thumbnail image and confirm that selecting the associated 
 	report changes the preview image into a meaningful text message.</li>
 </ul>
 
 <h2>Report Viewer user interface</h2>
 <ul>
-	<li>Confirm that the window title without a report is <b>Report Viewer</b>.
-	<li>Select a non-parameterized report such as <b>List of all actions in the project</b>.
-	<li>Confirm that a <b>Parameter entry</b> dialog does not appear.
-	<li>Confirm that a marquee-style wait cursor appears while the report is generated.
-	<li>Confirm that the report appears in the report viewer window.
-	<li>Confirm that the window title with a report is <b>Report Viewer - &lt;report name&gt;</b>.
+	<li>Confirm that the window title without a report is <b>Report Viewer</b>.</li>
+	<li>Select a non-parameterized report such as <b>List of all actions in the project</b>.</li>
+	<li>Confirm that a <b>Parameter entry</b> dialog does not appear.</li>
+	<li>Confirm that a marquee-style wait cursor appears while the report is generated.</li>
+	<li>Confirm that the report appears in the report viewer window.</li>
+	<li>Confirm that the window title with a report is <b>Report Viewer - &lt;report 
+    name&gt;</b>.</li>
 <p>
     <li><b>[LegacyRC #5652]</b> Support for PgUp, PgDn
     <!-- fixed v 8.1.0.1 -->
@@ -105,124 +107,123 @@
     </ul></li>
 <p>
    	<LI><b>[DotNet #380]</b> Report Viewer
-       	<ul>
-		<li>Select a report that provides meaningful output.
-		<li>Confirm that a report template can be created.
-		<li>Rename the <b>.JPG</b> report thumbnail image.
-		<li>Confirm that a new report template can be created.
-       	</ul>
+    <ul>
+        <li>Select a report that provides meaningful output.</li>
+        <li>Confirm that a report template can be created.</li>
+        <li>Rename the <b>.JPG</b> report thumbnail image.</li>
+        <li>Confirm that a new report template can be created.</li>
+    </ul></li>
 <p>
 	<li><b>File menu</b>
 	<ul>
-		<li>Confirm that <b>Open report...</b> displays the associated dialog and 
-		allows the user to select another report.
-		<li>Confirm that <b>Save report template...</b> displays the associated dialog and 
-		allows the user to provide a report name.
+		<li>Confirm that <b>Open report...</b> displays the associated dialog and allows the user 
+        to select another report.</li>
+		<li>Confirm that <b>Save report template...</b> displays the associated dialog and allows 
+        the user to provide a report name.
 		<ul>
-			<li>Confirm that the saved report appears in the <b>Saved reports</b> tab.
-			<li><b>[LegacyRC #5178]</b> Confirm that the name of the saved report cannot match 
-			an existing <b>Standard report</b>.
-			<li>Confirm that if the name of the saved report matchs an existing 
-			<b>Saved report</b>, an <b>Overwrite Existing Report</b> confirmation 
-			dialog is presented.
-			<li>Confirm that clicking <b>Cancel</b> does not save the report.
-		</ul>
-		<li>Confirm that <b>Export to PDF...</b> displays a <b>Save As</b> dialog 
-		allowing the user to save the report to a PDF file.
-		<li><b>[LegacyRC #5158]</b> Confirm that <b>Export...</b> displays a 
-		<b>Save As</b> dialog allowing the user to save the report to various formats.  
-		<li>Confirm that a report can be saved to each of the formats as provided below and 
-		confirm that an <b>Export completed</b> message is displayed.
+			<li>Confirm that the saved report appears in the <b>Saved reports</b> tab.</li>
+			<li><b>[LegacyRC #5178]</b> Confirm that the name of the saved report cannot match an 
+            existing <b>Standard report</b>.</li>
+			<li>Confirm that if the name of the saved report matchs an existing <b>Saved 
+            report</b>, an <b>Overwrite Existing Report</b> confirmation dialog is presented.</li>
+			<li>Confirm that clicking <b>Cancel</b> does not save the report.</li>
+		</ul></li>
+		<li>Confirm that <b>Export to PDF...</b> displays a <b>Save As</b> dialog allowing the 
+        user to save the report to a PDF file.</li>
+		<li><b>[LegacyRC #5158]</b> Confirm that <b>Export...</b> displays a <b>Save As</b> dialog 
+        allowing the user to save the report to various formats.</li>
+		<li>Confirm that a report can be saved to each of the formats as provided below and confirm
+        that an <b>Export completed</b> message is displayed.
 		<ul>
-			<li>Crystal reports (*.rpt)
-			<li>PDF (*.pdf)
-			<li>Microsoft Excel (97-2003) (*.xls)
-			<li>Microsoft Excel (97-2003) Data Only (*.xls)
-			<li>Microsoft Word (97-2003) (*.doc)
-			<li>Microsoft Word (97-2003) - Editable (*.rtf)
-			<li>Rich Text Format (*.rtf)
-			<li>XML (*.xml)
-		</ul>
-		<li>Confirm that <b>Exit</b> closes the <b>Report Viewer</b>.
-	</ul>
+			<li>Crystal reports (*.rpt)</li>
+			<li>PDF (*.pdf)</li>
+			<li>Microsoft Excel (97-2003) (*.xls)</li>
+			<li>Microsoft Excel (97-2003) Data Only (*.xls)</li>
+			<li>Microsoft Word (97-2003) (*.doc)</li>
+			<li>Microsoft Word (97-2003) - Editable (*.rtf)</li>
+			<li>Rich Text Format (*.rtf)</li>
+			<li>XML (*.xml)</li>
+		</ul></li>
+		<li>Confirm that <b>Exit</b> closes the <b>Report Viewer</b>.</li>
+	</ul></li>
 <p>
 	<li><b>Help menu</b>
 	<ul>
-		<li>Confirm that <b>About Report Viewer...</b> displays an appropriate About box.
+		<li>Confirm that <b>About Report Viewer...</b> displays an appropriate About box.</li>
 		<li><b>[LegacyRC #5161]</b> Confirm that the <b>About box</b> contains an appropriate 
-		image and copyright information.
-	</ul>
+		image and copyright information.</li>
+	</ul></li>
 <p>
 	<li><b>Toolbar</b>
 	<ul>
-		<li>Confirm that all toolbar buttons are disabled if no report is visible.
-		<li>Open a report.
-		<li>Confirm that the <b>Export Report</b> button displays the appropriate dialog.
-		<li>Confirm that the <b>Print Report</b> button displays the appropriate dialog.
+		<li>Confirm that all toolbar buttons are disabled if no report is visible.</li>
+		<li>Open a report.</li>
+		<li>Confirm that the <b>Export Report</b> button displays the appropriate dialog.</li>
+		<li>Confirm that the <b>Print Report</b> button displays the appropriate dialog.</li>
 <p>
 		<li>Confirm that the <b>Go To First Page</b> button is disabled for a single-page 
-		report.
-		<li>Confirm that the <b>Go To First Page</b> button is disabled when displaying the 
-		first page of a multi-page report.
-		<li>Confirm that the <b>Go To First Page</b> button is enabled when displaying a 
-		non-first page of a multi-page report.
-		<li>Confirm that the <b>Go To First Page</b> button navigates to the first page.
+        report.</li>
+		<li>Confirm that the <b>Go To First Page</b> button is disabled when displaying the first 
+        page of a multi-page report.</li>
+		<li>Confirm that the <b>Go To First Page</b> button is enabled when displaying a non-first 
+        page of a multi-page report.</li>
+		<li>Confirm that the <b>Go To First Page</b> button navigates to the first page.</li>
 <p>
 		<li>Confirm that the <b>Go To Previous Page</b> button is disabled for a single-page 
-		report.
+		report.</li>
 		<li>Confirm that the <b>Go To Previous Page</b> button is disabled when displaying the 
-		first page of a multi-page report.
+		first page of a multi-page report.</li>
 		<li>Confirm that the <b>Go To Previous Page</b> button is enabled when displaying a 
-		non-first page of a multi-page report.
-		<li>Confirm that the <b>Go To Previous Page</b> button navigates to the previous page.
+		non-first page of a multi-page report.</li>
+		<li>Confirm that the <b>Go To Previous Page</b> button navigates to the previous page.</li>
 <p>
 		<li>Confirm that the <b>Go To Next Page</b> button is disabled for a single-page 
-		report.
+		report.</li>
 		<li>Confirm that the <b>Go To Next Page</b> button is enabled when displaying the 
-		non-last page of a multi-page report.
+		non-last page of a multi-page report.</li>
 		<li>Confirm that the <b>Go To Next Page</b> button is disabled when displaying a 
-		last page of a multi-page report.
-		<li>Confirm that the <b>Go To Next Page</b> button navigates to the next page.
+		last page of a multi-page report.</li>
+		<li>Confirm that the <b>Go To Next Page</b> button navigates to the next page.</li>
 <p>
 		<li>Confirm that the <b>Go To Last Page</b> button is disabled for a single-page 
-		report.
+		report.</li>
 		<li>Confirm that the <b>Go To Last Page</b> button is enabled when displaying the 
-		non-last page of a multi-page report.
+		non-last page of a multi-page report.</li>
 		<li>Confirm that the <b>Go To Last Page</b> button is disabled when displaying a 
-		last page of a multi-page report.
-		<li>Confirm that the <b>Go To Last Page</b> button navigates to the last page.
+		last page of a multi-page report.</li>
+		<li>Confirm that the <b>Go To Last Page</b> button navigates to the last page.</li>
 <p>
 		<li>Confirm that <b>/ &lt;pagecount&gt;</b> text is provided after the <b>Go To Page</b> 
-		edit box.
+		edit box.</li>
 		<li>Confirm that the <b>Go To Page</b> edit box is disabled for a single-page 
-		report.
+		report.</li>
 		<li>Confirm that the <b>Go To Page</b> edit box is enabled when displaying a 
-		multi-page report.
-		<li>Confirm that the <b>Go To Page</b> edit box navigates to the specified page.
+		multi-page report.</li>
+		<li>Confirm that the <b>Go To Page</b> edit box navigates to the specified page.</li>
 		<li>Confirm that the <b>Go To Page</b> edit box navigates to the last page if 
-		the specified page number is beyond the page count.
+		the specified page number is beyond the page count.</li>
 <p>
 		<li>Confirm that the <b>Find Text</b> button can successfully locate text in each 
-		column of each table of the report.
+		column of each table of the report.</li>
 		<li>Confirm that the <b>Find Text</b> button does not find text located on a previous 
-		page in the report.
+		page in the report.</li>
 <p>
 		<li>Confirm that the <b>Zoom</b> button displays a drop-down menu with <b>Page Width</b>, 
-		<b>Whole Page</b>, <b>Customize...</b>, and various percentages.
+		<b>Whole Page</b>, <b>Customize...</b>, and various percentages.</li>
 		<li>Confirm that selecting the <b>Customize</b> zoom setting displays a <b>Zooming</b> 
-		dialog allowing the user to specify a custom zoom level. 
-		<li>Confirm that the <b>minimum</b> custom zoom factor is 25 percent. 
-		<li>Confirm that the <b>maximum</b> custom zoom factor is 400 percent. 
+		dialog allowing the user to specify a custom zoom level.</li>
+		<li>Confirm that the <b>minimum</b> custom zoom factor is 25 percent. </li>
+		<li>Confirm that the <b>maximum</b> custom zoom factor is 400 percent. </li>
 		<li>Confirm that selecting one of the <b>Zoom</b> settings modifies the zoom level 
-		in the displayed report. 
-	</ul>
+		in the displayed report. </li>
+	</ul></li>
 <p>
 	<li><b>Status Bar</b>
 	<ul>
-		<li>Confirm that <b>Current Page No.:</b> is correctly displayed on the status bar. 
-		<li>Confirm that <b>Total Page No.:</b> is correctly displayed on the status bar. 
-		<li>Confirm that <b>Zoom Factor:</b> is correctly displayed on the status bar. 
-	</ul>
+		<li>Confirm that <b>Current Page No.:</b> is correctly displayed on the status bar. </li>
+		<li>Confirm that <b>Total Page No.:</b> is correctly displayed on the status bar. </li>
+		<li>Confirm that <b>Zoom Factor:</b> is correctly displayed on the status bar. </li>
+	</ul></li>
 </ul>
 
 <div class="page-break"></div>

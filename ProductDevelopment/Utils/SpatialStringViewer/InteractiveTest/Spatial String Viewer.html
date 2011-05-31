@@ -13,302 +13,299 @@
 <hr>
 
 <ol>
-	<li><h2>File Menu</h2>
-  	<ul>
-    		<li><u><b>Open</b></u>
-      		<ul>
-	    		<li>Confirm that the <b>Open</b> menu item displays standard Windows 
-			<b>Open</b> dialog.
- 			<li>Confirm that the default file extension in <b>.uss</b>.
-        		<li>Confirm that contents of the opened file are displayed in a 
-			read-only edit box.
-        		<li>Confirm that the window caption shows <b>Filename - USS File Viewer</b>.
+    <li><h2>File Menu</h2>
+    <ul>
+        <li><u><b>Open</b></u>
+        <ul>
+            <li>Confirm that the <b>Open</b> menu item displays standard Windows <b>Open</b>
+            dialog.</li>
+            <li>Confirm that the default file extension in <b>.uss</b>.</li>
+            <li>Confirm that contents of the opened file are displayed in a read-only edit 
+            box.</li>
+            <li>Confirm that the window caption shows <b>Filename - USS File Viewer</b>.</li>
+        <p>
+            <li><b>[LegacyRCAndUtils #4412]</b> Confirm that selecting and opening an image file 
+            opens the corresponding <b>.uss</b> file if located in the same directory.</li>
+            <li><b>[LegacyRCAndUtils #4418]</b> Confirm that selecting a double extension file 
+            opens the associated <b>.uss</b> file. An example is selecting 123.tif.voa and
+            expecting 123.tif.uss to open.</li>
+            <li><b>[LegacyRCAndUtils #4412]</b> Confirm that selecting and opening an image file 
+            that does not have a corresponding <b>.uss</b> file displays a meaningful error
+            message.</li>
+            <li><b>[LegacyRCAndUtils #4418]</b> Confirm that selecting and opening a double
+            extension file that does not have a corresponding <b>.uss</b> file displays a 
+            meaningful error message.</li>
+        </ul></li>
+    <p>
+        <li><u><b>Close</b></u>
+        <ul>
+            <li>Confirm that the <b>Close</b> menu item clears the read-only edit box.</li>
+            <li>Confirm that after <b>Close</b>, the window caption shows <b>USS File 
+            Viewer</b>.</li>
+            <li><b>[LegacyRCAndUtils #4295]</b> Confirm that after closing a file, selecting the
+            <b>Properties...</b> menu item displays a <b>No source document information is
+            available!</b> message.</li>
+        </ul></li>
+    <p>
+        <li><u><b>Properties</b></u>
+        <ul>
+            <li>Confirm that the <b>Properties</b> menu item displays a Properties dialog.</li>
+            <li>Confirm presence of the selectable path to the <b>Source Document:</b>.</li>
+            <li>Confirm presence of the selectable path to the <b>Original Source 
+            Document:</b>.</li>
+            <li><b>[LegacyRC #5512]</b> Confirm selectable presence of the <b>OCR Engine 
+            Version</b>.</li>
+            <li>Open an older USS file in the <b>USS File Viewer</b>.</li>
+            <LI>Confirm that the <b>OCR engine version</b> information is provided as 
+            <b>Unknown</b>.</li>
+        <p>
+            <LI><b>[FlexIDSCore #4102]</b> Confirm that the OCR Engine version for a new USS file 
+            is <b>Nuance 16.30</b>.</li>
+        <p>
+            <li>Confirm presence of a list box for <b>Page Information:</b>.</li>
+            <li>Confirm presence of columns for <b>Page #</b>, <b>Height</b>, <b>Width</b>, 
+            <b>Deskew</b> and <b>Orientation</b>.</li>
+        <p>
+            <LI><b>[FlexIDSCore #3519]</b> USS files and UNC path
+            <ul>
+                <li>Exercise the RSD file attached to the SCR against 
+                <b>K:\Common\Engineering\Sample Files\AtPac\CA -
+                Kern\Set002\Images\19834000236501.001</b>.</li>
+                <li>Confirm that the rules work without error.</li>
+            <p> 
+                <li>Navigate to and open a USS via a mapped drive.</li>
+                <li>Confirm that <b>File - Properties</b> shows the navigated path as Source
+                Document and the UNC path as Original Source Document.</li>
+                <li>Navigate to and open a USS via a UNC path.</li>
+                <li>Confirm that <b>File - Properties</b> shows the UNC path as both Source
+                Document and Original Source Document.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5313]</b> Confirm that the <b>File - Properties</b> menu item
+            displays a meaningful error message if no USS file is open.</li>
+        </ul></li>
+    <p>
+        <li><u><b>Exit</b></u>
+        <ul>
+            <li>Confirm that the <b>Exit</b> menu item closes the application.</li>
+        </ul></li>
+    </ul></li>
 <p>
-        		<li><b>[LegacyRCAndUtils #4412]</b> Confirm that selecting and opening an image file 
-			opens the corresponding <b>.uss</b> file if located in the same directory.
-    			<li><b>[LegacyRCAndUtils #4418]</b> Confirm that selecting a double extension file 
-			opens the associated <b>.uss</b> file.</li>  An example is selecting 
-			123.tif.voa and expecting 123.tif.uss to open.
-        		<li><b>[LegacyRCAndUtils #4412]</b> Confirm that selecting and opening an image file 
-			that does not have a corresponding <b>.uss</b> file displays a meaningful 
-			error message.
-        		<li><b>[LegacyRCAndUtils #4418]</b> Confirm that selecting and opening a double extension 
-			file that does not have a corresponding <b>.uss</b> file displays a 
-			meaningful error message.
-      		</ul>
+    <li><h2>Drag and Drop</h2>
+    <ul>
+        <li>Confirm that dropping a <b>.uss</b> file on the main dialog opens the .uss file.</li>
+        <li>Confirm that dropping a <b>.txt</b> file on the main dialog opens the .txt file.</li>
+    <p>
+        <li><b>[LegacyRCAndUtils #4412]</b> Confirm that dropping an image file on the main 
+        dialog opens the associated <b>.uss</b> file.</li>
+        <li><b>[LegacyRCAndUtils #5208]</b> Confirm that dropping a three-digit extension image
+        file (such as 123.001) on the main dialog opens the associated <b>.uss</b> file.</li>
+        <li><b>[LegacyRCAndUtils #4418]</b> Confirm that dropping a double extension file on the 
+        main dialog opens the associated <b>.uss</b> file.  An example is dropping 123.tif.voa 
+        and expecting 123.tif.uss to open.</li>
+        <li><b>[LegacyRCAndUtils #5210]</b> Confirm that dropping a double extension file (such as 
+        123.001.voa) on the main dialog opens the associated <b>.uss</b> file.</li>
+        <li><b>[LegacyRCAndUtils #4412]</b> Confirm that dropping an image file that does not 
+        have a corresponding <b>.uss</b> file displays a meaningful error message.</li>
+        <li><b>[LegacyRCAndUtils #4418]</b> Confirm that dropping a double extension file that 
+        does not have a corresponding <b>.uss</b> file displays a meaningful error message.</li>
+    </ul></li>
 <p>
-    		<li><u><b>Close</b></u>
-      		<ul>
-	    		<li>Confirm that the <b>Close</b> menu item clears the read-only edit box.
-    			<li>Confirm that after <b>Close</b>, the window caption shows <b>USS 
-			File Viewer</b>.
-       			<li><b>[LegacyRCAndUtils #4295]</b> Confirm that after closing a file, 
-			selecting the <b>Properties...</b> menu item displays a <b>No source 
-			document information is available!</b> message.
-      		</ul>
+    <li><h2>Tools Menu</h2>
+    <ul>
+        <li><u><b>Find</b></u>
+        <ul>
+            <li>Confirm that the <b>Find...</b> menu item displays the <b>Find</b> dialog.</li>
+            <li>Confirm that <b>Ctrl + F</b> also displays the <b>Find</b> dialog.</li>
+            <li>Confirm that the <b>Find what:</b> edit box is editable.</li>
+            <li>Confirm that the <b>Find</b> button searches the main read-only edit box for the
+            text contained in the local edit box.</li>
+            <li>Confirm that a <b>No match found</b> message box is displayed when no match is
+            found.</li>
+            <li>If a match is found
+            <ul>
+                <li>Confirm that the first match after the current cursor position is highlighted
+                in the main read-only USS File Viewer window.</li>
+                <li>Confirm that the <b>Find</b> button becomes a <b>Next</b> button.</li>
+                <li>Confirm that the <b>Previous</b> button is enabled.</li>
+                <li>Confirm that the <b>Next/Previous</b> buttons allow you to step forward or
+                backword through the matches, wrapping at the end of the document.</li>
+                <li>Confirm that the only enabled controls in the Find dialog are the <b>Next</b>,
+                <b>Previous</b>, and <b>Reset</b> buttons.</li>
+                <li>Confirm that the <b>Reset</b> button re-enables the controls and moves focus
+                to the <b>Find what</b> edit box.</li>
+                <li>Confirm that <b>F3</b> and <b>Shift+F3</b> function as shortcuts for <b>Find
+                Next / Find Previous</b>.</li>
+            </ul></li>
+            <li>Confirm that the <b>Regular Expression</b> check box is checkable.</li>
+            <li>Confirm that search strings are treated as regular expressions when checked.</li>
+            <li>Confirm that the <b>Case Sensitive</b> check box is checkable.</li>
+            <li>Confirm that searches are case sensitive when checked.</li>
+        <p>
+            <li>Confirm that the <b>From % to %</b> check box is selectable.</li>
+            <li>Confirm that selection enables the two corresponding edit boxes.</li>
+            <li>Confirm that input in the <b>First</b> edit box is restricted to numbers between
+            0-99.</li>
+            <li>Confirm that input in the <b>Second</b> edit box is restricted to numbers 
+            1-100.</li>
+            <li>Confirm that only the restricted area of the document is searched.</li>
+        <p>
+            <li>Confirm that the <b>Find in font sizes</b> check box is selectable.</li>
+            <li>Confirm that selection activates the corresponding combo box and the two
+            corresponding edit boxes.</li>
+            <li>Confirm that the <b>From:</b> value must be less than or equal to the <b>to</b>
+            value.</li>
+            <li>Confirm that only the specified font sizes are searched.</li>
+        <p>
+            <li>Confirm that the <b>X</b> button exits the dialog.</li>
+        </ul></li>
+    <p>
+        <li><u><b>Character Info</b></u>
+        <ul>
+            <li>Confirm that the <b>Character Info</b> menu item displays the <b>Character
+            Information</b> dialog.</li>
+            <li>Confirm that <b>Ctrl + I</b> also displays the <b>Character Information</b> 
+            dialog.</li>
+            <li>Confirm that the <b>Guess 1</b>, <b>Guess 2</b> and <b>Guess 3</b> edit boxes
+            display the ASCII character following the cursor position.</li>
+            <li>Place the cursor immediately before the last character in a paragraph. Confirm
+            that the <b>End Of Zone</b> and <b>End Of Paragraph</b> checkboxes are checked.</li>
+            <li>Place the cursor immediately before a non-whitespace character.  
+            <ul>
+                <li>Confirm that the <b>Page #</b> edit box displays the current page number.</li>
+                <li>Confirm that the <b>Font Size</b> edit box displays the font size of the
+                character.</li>
+                <li>Confirm that the <b>Confidence</b> edit box displays a number between <b>10
+                </b> and <b>100</b>.</li>
+                <li>Confirm that the <b>Top</b>, <b>Left</b>, <b>Bottom</b> and <b>Right</b> edit
+                boxes are populated with pixel positions.</li>
+                <li>Confirm that one or more of the various <b>Font</b> checkboxes are 
+                checked.</li>
+            </ul></li>
+        <p>
+            <li>Place the cursor immediately before a whitespace character.  
+            <ul>
+                <li>Confirm that the <b>End Of Zone</b> and <b>End Of Paragraph</b> checkboxes
+                are cleared.</li>
+                <li>Confirm that the <b>Page #</b> edit box is cleared.</li>
+                <li>Confirm that the <b>Font Size</b> edit box contains <b>0 pt</b>.</li>
+                <li>Confirm that the <b>Confidence</b> edit box contains <b>100</b>.</li>
+                <li>Confirm that the <b>Top</b>, <b>Left</b>, <b>Bottom</b> and <b>Right</b> edit 
+                boxes are cleared.</li>
+                <li>Confirm that the various <b>Font</b> checkboxes are cleared.</li>
+            </ul></li>
+        <p>
+            <li>Modify text selection in the main dialog to include multiple characters.  
+            <ul>
+                <li>Confirm that the <b>Guess 1</b>, <b>Guess 2</b> and <b>Guess 3</b> edit boxes 
+                are cleared.</li>
+                <li>Confirm that the <b>End Of Zone</b> and <b>End Of Paragraph</b> checkboxes
+                are cleared.</li>
+                <li>Confirm that the <b>Page #</b> edit box is populated.</li>
+                <li>Confirm that the <b>Font Size</b> edit box is renamed to <b>Common Fnt Sz</b>
+                and is populated.</li>
+                <li>Confirm that the <b>Confidence</b> edit box is renamed to <b>Avg Confidence
+                </b> and is populated with a value between 10 and 100.</li>
+                <li>Confirm that one or more of the various <b>Font</b> checkboxes are 
+                checked.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><u><b>Font Size Distribution</b></u>
+        <ul>
+            <li>Confirm that the <b>Font Size Distribution</b> menu item displays the <b>Font
+            Size Distribution</b> dialog.</li>
+            <li>Confirm that the total number of non-whitespace characters is displayed at the
+            top of the dialog.</li>
+            <li>Confirm that the <b>Font Size</b> column displays a list of font sizes in sorted
+            order.</li>
+            <li>Confirm that the <b>Num Chars</b> column displays the number of characters of a
+            particular <b>Font Size</b>.</li>
+            <li>Confirm that the <b>Percentage</b> column displays the percentage of the
+            characters of a particular <b>Font Size</b> in the document.</li>
+            <li>Confirm that when the entire document is selected the most common <b>Font Size</b>
+            as read from this dialog, should be displayed in the <b>Font Size:</b> field in the
+            status bar of the main dialog.</li>
+        </ul></li>
+    <p>
+        <li><u><b>Word Length Distribution</b></u>
+        <ul>
+            <li>Confirm that the <b>Word Length Distribution</b> menu item displays the <b>Word
+            Lengths</b> dialog.</li>
+            <li>Confirm that the <b>Total Number of Words</b> is displayed at the top of the
+            dialog.</li>
+            <li>Confirm that a three-column list is displayed with <b>Word Length</b>, <b>Count
+            </b> and <b>Percentage</b> columns.</li>
+            <li>Confirm that a vertical scrollbar is provided if necessary.</li>
+            <li>Confirm that the <b>OK</b> button closes the dialog.</li>
+        </ul></li>
+    </ul></li>
 <p>
-    		<li><u><b>Properties</b></u>
-      		<ul>
-	    		<li>Confirm that the <b>Properties</b> menu item displays a Properties dialog.
- 			<li>Confirm presence of the selectable path to the <b>Source Document:</b>.
- 			<li>Confirm presence of the selectable path to the <b>Original Source 
-			Document:</b>.
- 			<li><b>[LegacyRC #5512]</b> Confirm selectable presence of the <b>OCR 
-			Engine Version</b>.
-	  	   	<li>Open an older USS file in the <b>USS File Viewer</b>.
-	  	   	<LI>Confirm that the <b>OCR engine version</b> information is provided 
-			as <b>Unknown</b>.
+    <li><h2>Status Bar</h2>
+    <ul>
+        <li>Confirm that the <b>Page:</b> item displays the page number at the current cursor
+        position.</li>
+        <li>Confirm that the page number is -1 at the end of the document.</li>
+    <p>
+        <li>Confirm that the <b>Start Pos:</b> item displays the index of the character at the
+        beginning of the selected text.</li>
+        <li>Confirm that if no text is selected it displays the zero-based index of the character
+        following the cursor.</li>
+    <p>
+        <li>Confirm that the <b>End Pos:</b> item displays the index of the character at the end
+        of the selected text.</li>
+        <li>Confirm that if no text is selected it displays the index of the character following
+        the cursor.</li>
+    <p> 
+        <li>Confirm that the <b>Con:</b> item displays the character confidence of the currently
+        selected text.</li>
+        <li>Confirm that if no text is selected, it displays the character confidence of the 
+        character following the cursor.</li>
+    <p>
+        <li>Confirm that the <b>%</b> item displays the percentage of the document before the
+        current cursor position.</li>
+        <li>Confirm that the value is 0% at the beginning of the document.</li>
+        <li>Confirm that the value is 100% at the end of the document.</li>
+    <p>
+        <li>Confirm that the status bar is displayed correctly during window resize events.</li>
+    </ul></li>
 <p>
-	  	   	<LI><b>[FlexIDSCore #4102]</b> Confirm that the OCR Engine version for a new 
-			USS file is <b>Nuance 16.3</b>.
+    <li><h2>Help Menu</h2>
+    <ul>
+        <li>Confirm that the <b>F1</b> key does not display an error message.</li>
+        <li>Confirm that the <b>About USS File Viewer</b> menu item displays the <b>About USS
+        File Viewer</b> dialog.</li>
+        <li>Confirm that the dialog displays the expected version number plus copyright
+        information.</li>
+        <li>Confirm that the same dialog is displayed from the <b>About USS File Viewer</b> menu
+        item located on the system menu.</li>
+    </ul></li>
 <p>
- 			<li>Confirm presence of a list box for <b>Page Information:</b>.
- 			<li>Confirm presence of columns for <b>Page #</b>, <b>Height</b>, 
-			<b>Width</b>, <b>Deskew</b> and <b>Orientation</b>.
+    <li><h2>Command-Line Options</h2>
+    <ul>
+        <li>Confirm that if a USS file name is provided as an argument, e.g. <b>USSFileViewer.exe
+        filename.uss</b>, the specified file is opened.</li>
+        <li>Confirm that if two or more arguments are provided, a usage message is displayed and
+        the application exits smoothly.</li>
+    </ul></li>
 <p>
-	  	   	<LI><b>[FlexIDSCore #3519]</b> USS files and UNC path
-		       	<ul>
-	      			<li>Exercise the RSD file attached to the SCR against 
-				<b>K:\Common\Engineering\Sample Files\AtPac\CA -
-				Kern\Set002\Images\19834000236501.001</b>.
-		      		<li>Confirm that the rules work without error.
-<p> 
-		      		<li>Navigate to and open a USS via a mapped drive.
-	      			<li>Confirm that <b>File - Properties</b> shows the navigated path as 
-				Source Document and the UNC path as Original Source Document.
-		      		<li>Navigate to and open a USS via a UNC path.
-		      		<li>Confirm that <b>File - Properties</b> shows the UNC path as both 
-				Source Document and Original Source Document.
-		       	</ul>
-<p>
- 			<li><b>[LegacyRC #5313]</b> Confirm that the <b>File - Properties</b> 
-			menu item displays a meaningful error message if no USS file is open.
-      		</ul>
-<p>
-    		<li><u><b>Exit</b></u>
-      		<ul>
-	    		<li>Confirm that the <b>Exit</b> menu item closes the application.
-      		</ul>
-  	</ul>
-<p>
-  	<li><h2>Drag and Drop</h2>
-  	<ul>
-    		<li>Confirm that dropping a <b>.uss</b> file on the main dialog opens the .uss file.
-		<li>Confirm that dropping a <b>.txt</b> file on the main dialog opens the .txt file.
-<p>
-    		<li><b>[LegacyRCAndUtils #4412]</b> Confirm that dropping an image file on the main dialog opens 
-		the associated <b>.uss</b> file.
-    		<li><b>[LegacyRCAndUtils #5208]</b> Confirm that dropping a three-digit extension image file 
-		(such as 123.001) on the main dialog opens the associated <b>.uss</b> file.
-    		<li><b>[LegacyRCAndUtils #4418]</b> Confirm that dropping a double extension file on the main 
-		dialog opens the associated <b>.uss</b> file.  An example is dropping 123.tif.voa 
-		and expecting 123.tif.uss to open.</li>
-    		<li><b>[LegacyRCAndUtils #5210]</b> Confirm that dropping a double extension file (such as 
-		123.001.voa) on the main dialog opens the associated <b>.uss</b> file.</li>
-	        <li><b>[LegacyRCAndUtils #4412]</b> Confirm that dropping an image file that does not have a 
-		corresponding <b>.uss</b> file displays a meaningful error message.
-	        <li><b>[LegacyRCAndUtils #4418]</b> Confirm that dropping a double extension file that does not 
-		have a corresponding <b>.uss</b> file displays a meaningful error message.
-	</ul>
-  <p>
-    	<li><h2>Tools Menu</h2>
-      	<ul>
-    		<li><u><b>Find</b></u>
-      		<ul>
-	        	<li>Confirm that the <b>Find...</b> menu item displays the <b>Find</b> dialog.
-	        	<li>Confirm that <b>Ctrl + F</b> also displays the <b>Find</b> dialog.
-            		<li>Confirm that the <b>Find what:</b> edit box is editable.
-            		<li>Confirm that the <b>Find</b> button searches the main 
-			read-only edit box for the text contained in the local edit box.
-                	<li>Confirm that a <b>No match found</b> message box is displayed 
-			when no match is found.
-                	<li>Confirm that found matches are highlighted in the main read-only 
-			edit box.
-            		<li>Confirm that the <b>Regular Expression</b> check box is checkable.
-			<li>Confirm that search strings are treated as regular expressions 
-			when checked.</li>
-			<li><b>[LegacyRCAndUtils #5006]</b> Confirm that the <b>Treat each line 
-			as a regular expression</b> check box is checkable.</li>
-			<ul>
-				<li>Confirm that each line in the edit box is treated as a 
-				separate regular expression when checked.</li>
-				<li>Confirm that the entire edit box is treated as a single 
-				regular expression when unchecked.</li>
-			</ul>
-           		<li>Confirm that the <b>Case Sensitive</b> check box is checkable.
-                	<li>Confirm that searches are case sensitive when checked.
-<p>
-            		<li>Confirm that the <b>Advanced</b> button displays extended find options.
-              		<ul>
-                		<li>Confirm that the <b>Or</b> radio button is selectable.
-				<li>Each of the expressions in the edit box (one per line) is 
-				searched for and the first one found is highlighted.
-<p>
-                		<li>Confirm that the <b>And</b> radio button is selectable.
-				<li>All the expressions in the edit box (one per line) are 
-				searched for and a message is displayed to the user informing 
-				them of the search result.</li>
-<p>
-                		<li>Confirm that the <b>From % to %</b> check box is selectable.
-                    		<li>Confirm that selection enables the two corresponding 
-				edit boxes.
-                        	<li>Confirm that input in the <b>First</b> edit box is 
-				restricted to numbers between 0-99.
-                    		<li>Confirm that input in the <b>Second</b> edit box is restricted 
-				to numbers 1-100.
-				<li>Confirm that only the restricted area of the document is searched.
-<p>
-				<li>Confirm that the <b>Find in font sizes</b> check box is selectable.
-                    		<li>Confirm that selection activates the corresponding combo box 
-				and the two corresponding edit boxes.
-				<li>Confirm that the <b>From:</b> value must be less than or equal 
-				to the <b>to</b> value.
-				<li>Confirm that only the specified font sizes are searched.
-<p>
-                		<li>Confirm that the <b>Beginning of document</b> radio button is
-                  		selectable.
-                		<li>Confirm that the <b>Current position</b> radio button is selectable.
-              		</ul>
-<p>
-        		<li>Confirm that the <b>Cancel</b> button exits the dialog.
-        		<li>Confirm that the <b>X</b> button exits the dialog.
-          	</ul>
-<p>
-    		<li><u><b>Character Info</b></u>
-          	<ul>
-			<li>Confirm that the <b>Character Info</b> menu item displays 
-			the <b>Character Information</b> dialog.
-			<li>Confirm that <b>Ctrl + I</b> also displays the <b>Character 
-			Information</b> dialog.
-			<li>Confirm that the <b>Guess 1</b>, <b>Guess 2</b> and <b>Guess 3</b> 
-			edit boxes display the ASCII character following the cursor position.
-            		<li>Place the cursor immediately before the last character in a paragraph.  
-			Confirm that the <b>End Of Zone</b> and <b>End Of Paragraph</b> 
-			checkboxes are checked.
-            		<li>Place the cursor immediately before a non-whitespace character.  
-			<ul>
-				<li>Confirm that the <b>Page #</b> edit box displays the current 
-				page number.
-				<li>Confirm that the <b>Font Size</b> edit box displays the font size of 
-				the character.
-				<li>Confirm that the <b>Confidence</b> edit box displays a number between 
-				<b>10</b> and <b>100</b>.
-				<li>Confirm that the <b>Top</b>, <b>Left</b>, <b>Bottom</b> and 
-				<b>Right</b> edit boxes are populated with pixel positions.
-				<li>Confirm that one or more of the various <b>Font</b> checkboxes 
-				are checked.
-			</ul>
-<p>
-            		<li>Place the cursor immediately before a whitespace character.  
-			<ul>
-				<li>Confirm that the <b>End Of Zone</b> and <b>End Of Paragraph</b> 
-				checkboxes are cleared.
-				<li>Confirm that the <b>Page #</b> edit box is cleared.
-				<li>Confirm that the <b>Font Size</b> edit box contains <b>0 pt</b>.
-				<li>Confirm that the <b>Confidence</b> edit box contains <b>100</b>.
-				<li>Confirm that the <b>Top</b>, <b>Left</b>, <b>Bottom</b> 
-				and <b>Right</b> edit boxes are cleared.
-				<li>Confirm that the various <b>Font</b> checkboxes are cleared.
-			</ul>
-<p>
-            		<li>Modify text selection in the main dialog to include multiple characters.  
-			<ul>
-				<li>Confirm that the <b>Guess 1</b>, <b>Guess 2</b> and <b>Guess 3</b> 
-				edit boxes are cleared.
-				<li>Confirm that the <b>End Of Zone</b> and <b>End Of Paragraph</b> 
-				checkboxes are cleared.
-				<li>Confirm that the <b>Page #</b> edit box is populated.
-				<li>Confirm that the <b>Font Size</b> edit box is renamed to 
-				<b>Common Fnt Sz</b> and is populated.
-				<li>Confirm that the <b>Confidence</b> edit box is renamed to 
-				<b>Avg Confidence</b> and is populated with a value between 10 
-				and 100.
-				<li>Confirm that one or more of the various <b>Font</b> checkboxes 
-				are checked.
-	          	</ul>
-          	</ul>
-<p>
-    		<li><u><b>Font Size Distribution</b></u>
-          	<ul>
-			<li>Confirm that the <b>Font Size Distribution</b> menu item displays 
-			the <b>Font Size Distribution</b> dialog.
-			<li>Confirm that the total number of non-whitespace characters is displayed 
-			at the top of the dialog.
-            		<li>Confirm that the <b>Font Size</b> column displays a list of font 
-			sizes in sorted order.
-			<li>Confirm that the <b>Num Chars</b> column displays the number of 
-			characters of a particular <b>Font Size</b>.
-			<li>Confirm that the <b>Percentage</b> column displays the percentage of 
-			the characters of a particular <b>Font Size</b> in the document.
-			<li>Confirm that when the entire document is selected the most common 
-			<b>Font Size</b> as read from this dialog, should be displayed in the 
-			<b>Font Size:</b> field in the status bar of the main dialog.</li>
-          	</ul>
-<p>
-    		<li><u><b>Word Length Distribution</b></u>
-          	<ul>
-			<li>Confirm that the <b>Word Length Distribution</b> menu item displays 
-			the <b>Word Lengths</b> dialog.
-			<li>Confirm that the <b>Total Number of Words</b> is displayed 
-			at the top of the dialog.
-            		<li>Confirm that a three-column list is displayed with <b>Word Length</b>, 
-			<b>Count</b> and <b>Percentage</b> columns.
-			<li>Confirm that a vertical scrollbar is provided if necessary.
-			<li>Confirm that the <b>OK</b> button closes the dialog.
-          	</ul>
-      	</ul>
-<p>
-  	<li><h2>Status Bar</h2>
-    	<ul>
-      		<li>Confirm that the <b>Page Num:</b> item displays the page number at the 
-		current cursor position.
-          	<li>Confirm that the page number is -1 at the end of the document.
-<p>
-	  	<li>Confirm that the <b>Start Pos:</b> item displays the index of the character 
-	  	at the beginning of the selected text.
-          	<li>Confirm that if no text is selected it displays the zero-based index of the 
-		character following the cursor.
-<p>
-	  	<li>Confirm that the <b>End Pos:</b> item displays the index of the character 
-	  	at the end of the selected text.
-          	<li>Confirm that if no text is selected it displays the index of the character 
-		following the cursor.
-<p>
-	  	<li>Confirm that the <b>%</b> item displays the percentage of the document 
-		before the current cursor position.
-		<li>Confirm that the value is 0% at the beginning of the document.
-          	<li>Confirm that the value is 100% at the end of the document.
-    	</ul>
-<p>
-  	<li><h2>Help Menu</h2>
-    	<ul>
-      		<li>Confirm that the <b>F1</b> key does not display an error message.
-      		<li>Confirm that the <b>About USS File Viewer</b> menu item displays the 
-		<b>About USS File Viewer</b> dialog.
-          	<li>Confirm that the dialog displays the expected version number plus 
-		copyright information.
-          	<li>Confirm that the same dialog is displayed from the <b>About USS File 
-		Viewer</b> menu item located on the system menu.
-        </ul>
-<p>
-  	<li><h2>Command-Line Options</h2>
-    	<ul>
-       		<li>Confirm that if a USS file name is provided as an argument, e.g. 
-		<b>USSFileViewer.exe filename.uss</b>, the specified file is opened.
-       		<li>Confirm that if two or more arguments are provided, a usage message is 
-		displayed and the application exits smoothly.
-   	</ul>
-<p>
-  	<li><h2>Miscellaneous</h2>
-    	<ul>
-  	   	<LI><b>[FlexIDSCore #3587]</b> Processing 0-byte USS files
-	       	<ul>
-	      		<li>Create a USS file with <b>0</b> bytes.
-			<li>Exercise the USS file.
-			<li>Confirm that an <b>Unable to decompress</b> exception is not seen.
-			<li>Confirm that a meaningful exception is presented.
-	       	</ul>
-   	</ul>
+    <li><h2>Miscellaneous</h2>
+    <ul>
+        <LI><b>[FlexIDSCore #3587]</b> Processing 0-byte USS files
+        <ul>
+            <li>Create a USS file with <b>0</b> bytes.</li>
+            <li>Exercise the USS file.</li>
+            <li>Confirm that an <b>Unable to decompress</b> exception is not seen.</li>
+            <li>Confirm that a meaningful exception is presented.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5477]</b> possible to have pos &gt; 100%
+        <ul>
+            <li>Create and open a very short USS file.</li>
+            <li>Position the cursor at the very end of the document.</li>
+            <li>Confirm that the position in the status bar does not exceed 100%.</li>
+        </ul></li>
+    </ul></li>
 </ol>
 </body>
 </html>

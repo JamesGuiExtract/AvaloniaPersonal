@@ -131,7 +131,16 @@
         <li>Confirm the File Supplier column displays the file supplier(s) that supply the files to
         the queue.</li> 
         <li>Confirm the Folder column displays the path of the files being added to the queue.</li>
+        <li>Confirm that right-clicking on a file in this grid brings up a context menu:
+        <ul>
+            <li>Confirm that <b>Copy filename(s)</b> works as expected.</lI>
+            <li>Confirm that <b>Open file...</b> works as expected.</li>
+            <li>Confirm that <b>Open file location...</b> works as expected.</li>
+            <li>Confirm that <b>Cancel</b> works as expected.</lI>
+            <li>Confirm that the context menu works regardless of which O/S you're using.</li>
+        </ul></li>
     </ul></li>
+<p>
     <li>Confirm the Queue Log tab has a <b>Files added or updated in the queue recently</b> display
     area.
     <ul> 
@@ -150,7 +159,16 @@
         Pending, Processing, Completed, Skipped, or Failed.</li> 
         <li>Confirm the File Supplier column specifies the file suppliers for the queue.</li> 
         <li>Confirm the Folder column specifies the path of the files.</li>
-    </ul></li> 
+        <li>Confirm that right-clicking on a file in this grid brings up a context menu:
+        <ul>
+            <li>Confirm that <b>Copy filename(s)</b> works as expected.</lI>
+            <li>Confirm that <b>Open file...</b> works as expected.</li>
+            <li>Confirm that <b>Open file location...</b> works as expected.</li>
+            <li>Confirm that <b>Cancel</b> works as expected.</lI>
+            <li>Confirm that the context menu works regardless of which O/S you're using.</li>
+        </ul></li>
+    </ul></li>
+<p>
     <li>Confirm Queue Log has a <b>Queue events that failed recently</b> display area.
     <ul>   
         <li>Confirm it has one row for each file that failed to be added to the queue.</li> 
@@ -159,7 +177,15 @@
         <li>Confirm that double clicking on an Error entry brings up a exception dialog with 
         information about the Error of that row.</li>
         <li><b>[LegacyRC #4880]</b> Confirm that double clicking on an <b>empty</b> Error row does
-        nothing.</li> 
+        nothing.</li>
+        <li>Confirm that right-clicking on a file in this grid brings up a context menu:
+        <ul>
+            <li>Confirm that <b>Copy filename(s)</b> works as expected.</lI>
+            <li>Confirm that <b>Open file...</b> works as expected.</li>
+            <li>Confirm that <b>Open file location...</b> works as expected.</li>
+            <li>Confirm that <b>Cancel</b> works as expected.</lI>
+            <li>Confirm that the context menu works regardless of which O/S you're using.</li>
+        </ul></li>
     </ul></li>
     <li>Confirm that the setting of Already Existed flag in a file rename event is updated based on
     whether the new name of the file already exists in the database or not.
@@ -529,6 +555,13 @@
         <li>Confirm that no unusual exceptions are logged when the file supplier starts and
         stops.
     </ul>
+<p>
+    <li><b>[LegacyRC #5894]</b> Force processing
+    <ul>
+        <li>Queue some files.</li>
+        <li>Check the <b>Force Processing</b> box and requeue the same files.</li>
+        <li>Confirm that no queue event failures are logged.</li>
+    </ul></li>
 </ul>
 </body>
 </html>

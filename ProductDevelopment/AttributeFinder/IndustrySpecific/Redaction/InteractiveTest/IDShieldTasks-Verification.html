@@ -29,20 +29,24 @@
             <li>Confirm that clicking <b>Configure...</b> displays the <b>Verify redactions 
             settings</b> dialog.</li>
         <p>
-            <li>Confirm that the dialog contains a <b>General</b> group box.
+            <li>Confirm that the dialog contains a <b>General</b> group box with the following
+            checkboxes:
             <ul>
-                <li>Confirm that the group box contains an <b>Include all pages in redaction
-                review</b> check box, checked by default.</li>
-                <li>Confirm that the group box contains a <b> Require users to specify redaction
-                type for redactions</b> check box, checked by default.</li>
-                <li>Confirm that the group box contains a <b>Require users to specify exemption
-                codes for redactions</b> check box, unchecked by default.</li>
-                <li>Confirm that the group box contains an <b>Enable collection of redaction accuracy
-                feedback</b> check box, unchecked by default.</li>
-                <li>Confirm that an associated <b>Settings...</b> button is enabled only when the 
-                <b>feedback collection</b> check box is checked.</li>
-                <li>Confirm that the group box contains an <b>Enable input event tracking</b> check box,
-                unchecked by default.</li>
+                <li><b>Require users to visit all pages in a document</b>, checked by default</li>
+                <li><b>Require users to review every suggested redaction or clue</b>, checked by
+                default</li>
+                <li><b>Require users to specify redaction type for redactions</b>, checked by
+                default</li>
+                <li><b>Require users to specify exemption codes for redactions</b>, unchecked by
+                default</li>
+                <li><b>Enable seamless page navigation between documents</b>, checked by 
+                default</li>
+                <li><b>Enable collection of redaction accuracy feedback</b>, unchecked by 
+                default</li>
+                <li><b>Enable input event tracking</b>, unchecked by default</li>
+                <li><b>Open verification window in full screen mode</b>, unchecked by default</li>
+                <li><b>Prompt to save changes before navigating away from uncommitted 
+                documents</b>, unchecked by default</li>
             </ul></li>
             <p>
             <li>Check the <b>feedback collection</b> check box and click on the <b>Settings...</b>
@@ -55,7 +59,7 @@
                     <li>Confirm that the group box contains a <b>Feedback data folder</b> edit box
                     with a default value of <b>$DirOf(&lt;SourceDocName&gt;)\FeedbackData</b>.</li>
                     <li>Confirm that there is an associated <b>Tag Selector</b> button which
-                    displays a list of 2 &lt;&gt; tags and 20 <b>$</b> functions.</li>
+                    displays the usual tag functions.</li>
                     <li>Confirm that there is an associated <b>...</b> (Browse) button which brings
                     up the <b>Browse for folder</b> dialog.</li>
                     <li>Confirm that the group box contains an <b>Include redaction information</b>
@@ -102,7 +106,7 @@
                 <ul>
                     <li>Confirm that the dialog includes an enabled edit box for a file path.</li>
                     <li>Confirm that the dialog includes an associated <b>Tag Selector</b> 
-                    button which displays a list of 2 &lt;&gt; tags and 20 <b>$</b> functions.</li>
+                    button which displays the usual tag functions.</li>
                     <li>Confirm that the dialog includes an associated <b>...</b> (Browse) 
                     button.</li>
                     <li>Confirm that the dialog includes a <b>Reset</b> button.</li>
@@ -122,8 +126,64 @@
                 box is checked.</li>
                 <li>Confirm that the group box contains an edit box.</li>
                 <li>Confirm that the group box contains a <b>Tag Selector</b> button which displays
-                a list of 2 &lt;&gt; tags and 20 <b>$</b> functions.</li>
+                the usual tag functions.</li>
                 <li>Confirm that the group box contains a <b>...</b> (Browse) button.</li>
+            </ul></li>
+        <p>
+            <li>Confirm that the dialog contains a <b>Slideshow</b> group box
+            <ul>
+                <li>Confirm that the group box contains an <b>Enable slideshow in verification
+                UI</b> check box.</li>
+                <li>Confirm that the <b>Settings</b> button is enabled only when the checkbox is
+                checked.</li>
+                <li>Confirm that pressing the Settings button brings up a <b>Slideshow
+                settings</b> dialog.
+                <ul>
+                    <li>Confirm that the dialog contains a <b>General</b> group box.</li>
+                    <li>Confirm that the group box contains a checkbox <b>Switch to fit-to-page
+                    mode when the slideshow is started.</b>, checked by default.</li>
+                    <li>Confirm that there is an <b>Apply the document tag</b> checkbox, unchecked
+                    by default.
+                    <ul>
+                        <li>Confirm that there is an associated dropdown box with a list of tags
+                        in the database.</li>
+                        <li>Confirm that the dropdown is enabled only when the box is checked.</li>
+                    </ul></li>
+                    <li>Confirm that there is a <b>Set file action status of</b> checkbox, 
+                    unchecked by default.
+                    <ul>
+                        <li>Confirm that there is an associated combo box/tag selector with a list
+                        of actions in the database.</li>
+                        <li>Confirm that the combo box works as expected.</li>
+                        <li>Confirm that there is also an associated combo box with a list of
+                        possible action statuses.</li>
+                        <li>Confirm that the two combo boxes and the tag selector are enabled only
+                        when the checkbox is checked.</li>
+                    </ul></li>
+                    <li>Confirm that there is a checkbox to <b>Stop slideshow when the document
+                    meets the following condition</b>, unchecked by default.
+                    <ul>
+                        <li>Confirm that there is an associated edit box and Commands&gt; 
+                        button that are enabled only when the box is checked.</li>
+                        <li>Confirm that they function like our FAM condition selectors in other
+                        places.</li>
+                    </ul></li>
+                <p>
+                    <li>Confirm that there is a <b>Run key</b> groupbox containing an explanation
+                    of the run key functionality.</li>
+                <p>
+                    <li>Confirm that there is a <b>Confirm user alertness</b> group box
+                    <ul>
+                        <li>Confirm that it contains a radio button (selected by default) to 
+                        <b>Randomly prompt the operator to answer a simple question</b></li>
+                        <li>Confirm that the radio button has a related spin control to specify a
+                        number of pages.</li>
+                        <li>Confirm that the spin control is enabled only when the associated radio
+                        button is selectd, and that it works as expected.</li>
+                        <li>Confirm that there is a radio button for <b>Require the operator to use
+                        the "run key"</b></li>
+                    </ul></li>
+                </ul></li>
             </ul></li>
         <p>
             <li>Confirm that the dialog contains an <b>After committing a document</b> group box.
@@ -135,7 +195,7 @@
                 <li>Confirm that the group box contains a combo box containing the defined 
                 actions.</li>
                 <li>Confirm that the group box contains a <b>tag selector</b> button which displays
-                a list of 2 &lt;&gt; tags and 20 <b>$</b> functions.</li>
+                a list of the usual tag functions.</li>
                 <li>Confirm that the group box contains a combo box containing the defined action 
                 status strings.</li>
             </ul></li>
@@ -146,14 +206,42 @@
             <li>Set up a collection of multi-page documents for review, ensuring that some contain 
             sensitive items on the first page and some do not.
             <ul>
-                <li>Configure the verification task to <b>Include all pages in redaction 
-                review</b>.</li>
-                <li>Verify the documents and confirm that each document opens to the first page.</li>
+                <li>Configure the verification task to <b>Require users to visit all pages in a 
+                document</b>.</li>
+                <li>Verify the documents and confirm that each document opens to the first 
+                page.</li>
+                <li>Confirm that you must view all pages before committing the document.</li>
+                <li>Confirm that you do not need to meet the commit condition before skipping or
+                saving without committing.</li>
+                <li>Confirm that the <b>Tab</b> key advances through the pages of the 
+                document.</li>
                 <li>Requeue the documents.</li>
-                <li>Configure the verification task <b>not</b> to <b>Include all pages in redaction
-                review</b>.</li>
-                <li>Verify the documents and confirm that each one opens to the first page 
-                <b>containing sensitive data</b>.</li>
+                <li>Configure the verification task <b>not</b> to <b>Require users to visit all 
+                pages in a document</b>.</li>
+                <li>Verify the documents and confirm that each one opens to the first page.</li>
+                <li>Confirm that you do <b>not</b> need to view all pages before saving and
+                committing.</li>
+            </ul></li>
+        <p>
+            <ul>
+                <li>Configure the verification task to <b>Require users to review every suggested
+                redaction or clue</b>.</li>
+                <li>Verify the documents and confirm that each document opens to the first 
+                page.</li>
+                <li>Confirm that you must select each redaction and clue before committing the 
+                document.</li>
+                <li>Confirm that you are <b>not</b> required to visit every page before 
+                committing.</li>
+                <li>Confirm that the <b>Tab</b> key advances through the rows of data items in the
+                data grid.</li>
+                <li>Confirm that you do not need to meet the commit condition before skipping or
+                saving without committing.</li>
+                <li>Requeue the documents.</li>
+                <li>Configure the verification task <b>not</b> to <b>Require users to review every
+                suggested redaction or clue</b>.</li>
+                <li>Verify the documents and confirm that each one opens to the first page.</li>
+                <li>Confirm that you do <b>not</b> need to select each redaction/clue before 
+                saving and committing.</li>
             </ul></li>
         <p>
             <li>Confirm that <b>requiring types</b> works as expected.</li>
@@ -163,6 +251,14 @@
             <li>Confirm that <b>requiring exemption codes</b> works as expected.</li>
             <li>Confirm that even with exemption codes required, no exemption code is required for 
             redactions that are toggled <b>off</b>.</li>
+        <p>
+            <li>Enable <b>seamless page navigation</B>
+            <ul>
+                <li>Confirm that the <b>PgUp/PgDn</b> buttons can be used to navigate between
+                documents.</li>
+                <li>Confirm that they cannot be used to navigate between documents when seamless
+                navigation is disabled.</li>
+            </ul></li>
         <p>
             <LI><b>Feedback collection</b>
             <ul>
@@ -221,6 +317,23 @@
                 </ul></li>
             </ul></li>
         <p>
+            <li>Confirm that the <b>Open verification window in full screen mode</b> option works
+            as expected.</li>
+        <P>
+            <li>Select <b>Prompt to save changes</b>
+            <ul>
+                <li>Confirm that when you hit <b>Tab</b>, <b>Next document</b>, or <b>PgDn</b> 
+                (with seamless navigation enabled) on the most current document, you are prompted
+                to save and commit.</li>
+                <li>Confirm that you are <b>not</b> prompted if the prompt is disabled in the
+                property page.</li>
+                <li>Confirm that you are <b>not</b> prompted in either case when navigating between 
+                unchanged documents that have already been commited.</li>
+                <li>Confirm that you <b>are</b> prompted before moving on after making changes to
+                a document that had previously been committed (i.e., an image in your document
+                history).</li>
+            </ul></li>
+        <p>
             <li>Confirm that a non-default .voa file can be specified.</li>
             <li>Confirm appropriate behavior in the following cases:
             <ul>
@@ -244,6 +357,27 @@
             is specified.</li>
             <li>Confirm proper behavior with feedback collection, a non-default .voa, and a backdrop
             image.</li>
+        <p>
+            <li><b>Slideshow</b>
+            <ul>
+                <li>Confirm that the slideshow switches to <b>fit-to-page</b> mode or not as 
+                determined by the checkbox in the settings dialog.</li>
+                <li>Confirm that the slideshow <b>tag</b> feature works as expected.</li>
+                <li>Confirm that the <b>Set file action status of</b> feature works as 
+                expected.</li>
+                <li>Confirm that the slideshow <b>stop</b> condition works as expected.</li>
+                <li>Confirm that the <b>simple question</b> user alertness confirmation works as
+                expected.
+                <ul>
+                    <li>Confirm that the run key <b>can</b> still be used when this option is
+                    selected.</li>
+                </ul></li>
+                <li>Confirm that the <b>run key</b> option works as expected.
+                <ul>
+                    <li>Confirm that <b>F5</b> does <b>not</b> start the slideshow when this
+                    option is selected.</li>
+                </ul></li>
+            </ul></li>
         <p>
             <li><b>Set file action status after verification</b>
             <ul>
@@ -287,8 +421,45 @@
                     <li>Discard changes</li>
                     <li>Find or redact... (Ctrl+F)</li>
                 </ul></li>
+                <li>Confirm that the <b>View</b> menu contains the following items:
+                <ul>
+                    <li>Zoom
+                    <ul>
+                        <li>Fit to page (P)</li>
+                        <li>Fit to width (W)</li>
+                        <li>Zoom in (F7, Ctrl++)</li>
+                        <li>Zoom out (F8, Ctrl+-)</li>
+                        <li>Zoom previous (R, Alt+Left)</li>
+                        <li>Zoom next (Alt+Right)</li>
+                    </ul></li>
+                    <li>Rotate
+                    <ul>
+                        <li>Rotate counterclockwise (Ctrl+Shift+R)</li>
+                        <li>Rotate clockwise (Ctrl+R)</li>
+                    </ul></li>
+                    <li>Goto page
+                    <ul>
+                        <li>First page (Ctrl+Home)</li>
+                        <li>Previous page (PgUp)</li>
+                        <li>Page number...</li>
+                        <li>Next page (PgDn)</li>
+                        <li>Last page (Ctrl+End)</li>
+                    </ul></li>
+                    <li>Full screen (F11)</li>
+                </ul></li>
                 <li>Confirm that the <b>Tools</b> menu contains the following items:
                 <ul>
+                    <li>Zoom window (Z)</li>
+                    <li>Pan (A)</li>
+                    <li>Select redactions and other objects (Esc)</li>
+                    <li>Angular redaction (H)</li>
+                    <li>Rectangular redaction (H)</li>
+                    <li>Word redaction (H)</li>
+                    <li>Slideshow
+                    <ul>
+                        <li>Play</li>
+                        <li>Stop</li>
+                    </ul></li>
                     <li>Options</li>
                 </ul></li>
                 <li>Confirm that the <b>Help</b> menu contains the following items:
@@ -323,6 +494,12 @@
                         <li>Confirm that if neither of the above conditions is true, this button is
                         not available.</li>
                     </ul></li>
+                </ul></li>
+                <li><b>Slideshow</b> toolstrip - confirm that all buttons are present with
+                appropriate tooltip text.
+                <ul>
+                    <li>Slideshow play (F5)</li>
+                    <li>Slideshow stop</li>
                 </ul></li>
             </ul></li>
         <p>
@@ -437,32 +614,82 @@
                     of the verification checklist.</li>
                 </ul></li>
             <p>
+                <li>View menu
+                <ul>
+                    <li>For each menu item with an analogous image viewer function
+                    <ul>
+                        <li>Confirm that the tool or operation selected functions correctly.</li>
+                        <li>Confirm that the listed shortcut keys function correctly, regardless
+                        of the pinned/unpinned state of the data window, and regardless of which
+                        ID Shield window (e.g., image viewer or data window) has focus.</li>
+                    </ul></li>
+                    <li>Confirm that <b>Full screen</b> toggles fullscreen mode.</li>
+                    <li>Confirm that <b>F11</b> performs the same function.</li>
+                </ul></li>
+            <p>
                 <li>Tools menu
                 <ul>
+                    <li>For each menu item with an analogous image viewer function
+                    <ul>
+                        <li>Confirm that the tool or operation selected functions correctly.</li>
+                        <li>Confirm that the listed shortcut keys function correctly, regardless
+                        of the pinned/unpinned state of the data window, and regardless of which
+                        ID Shield window (e.g., image viewer or data window) has focus.</li>
+                    </ul></li>
+                    <li>Confirm that the <b>Slideshow play/stop</b> items work as expected.
+                    <ul>
+                        <li>If the verification task is set up to <b>require</b> the run key, you
+                        should not be able to start the slideshow with the menu item.</li>
+                        <li>Confirm that <b>PgUp</b> and <b>PgDn</b> do <b>not</b> stop the 
+                        slideshow.</li>
+                        <li>Confirm that all other keypresses/mouse clicks (except for F5) 
+                        <b>do</b> stop the slideshow.</li>
+                        <li>Confirm that the slideshow options are not displayed if the slideshow
+                        is disabled in the task configuration.</li>
+                    </ul></li>
                     <li>Confirm that <b>Options...</b> brings up the Options dialog.</li>
                     <li>Confirm that verification options are honored even for the first verified
-                    image.
+                    image.</li>
                 <p>
-                    <li>Confirm that the <b>Automatic Zoom</b> settings are read from and written 
-                    to <b>IDShield.ini</b>.
-                    <LI>Confirm that with <b>Auto Zoom</b> enabled, all selected redactions on the 
-                    current page are within view.
-                    <li>Confirm that with a higher <b>Auto Zoom</b> setting, the view is further 
-                    out from the redactions.
-                    <li>Confirm that selecting a single redaction in the Image Viewer does not 
-                    change the zoom.
-                    <li>Confirm that drawing a manual redaction does not change the zoom.
-                    <li>Confirm that with <b>Auto Zoom</b> disabled, the zoom does not change when
-                    redactions are selected.                    
-                <p>
-                    <li>Confirm that the <b>AutoPan</b> settings are read from and written to 
-                    <b>IDShield.ini</b>.
-                    <li>Confirm that the options can be configured to select the <b>pan</b> tool or
-                    the <b>selection</b> tool after creating a manual redaction, or (by unchecking 
-                    the related box) to <b>disable the automatic tool change</b>. Confirm that each
-                    option works properly.</li>
-                    <li>Confirm that the initial configuration is to select the <b>selection</b>
-                    tool after creating a manual redaction.</li>
+                    <li><b>General tab</b>
+                    <ul>
+                        <li>Confirm that the <b>Automatic Zoom</b> settings are read from and 
+                        written to <b>IDShield.ini</b>.</li>
+                        <LI>Confirm that with <b>Auto Zoom</b> enabled, all selected redactions on
+                        the current page are within view.</li>
+                        <li>Confirm that with a higher <b>Auto Zoom</b> setting, the view is 
+                        further out from the redactions.</li>
+                        <li>Confirm that selecting a single redaction in the Image Viewer does not                        
+                        change the zoom.</li>
+                        <li>Confirm that drawing a manual redaction does not change the zoom.</li>
+                        <li>Confirm that with <b>Auto Zoom</b> disabled, the zoom does not change 
+                        when redactions are selected.</li>
+                        <li>Confirm that the zoom level slider matches the rest of the window
+                        regardless of which Windows theme you are using.</li>
+                    <p>
+                        <li>Confirm that the <b>AutoPan</b> settings are read from and written to 
+                        <b>IDShield.ini</b>.</li>
+                        <li>Confirm that the options can be configured to select the <b>pan</b> 
+                        tool or the <b>selection</b> tool after creating a manual redaction, or 
+                        (by unchecking the related box) to <b>disable the automatic tool 
+                        change</b>. Confirm that each option works properly.</li>
+                        <li>Confirm that the initial configuration is to select the 
+                        <b>selection</b> tool after creating a manual redaction.</li>
+                    </ul></li>
+                    <li><b>Slideshow tab</b>
+                    <ul>
+                        <li>Confirm that there is a spin control for the number of seconds the
+                        slideshow should display each page.</li>
+                        <li>Confirm that the slideshow does, in fact, display each page for the
+                        specified number of seconds.</li>
+                        <li>Confirm that the spin control does not allow non-integer input.</li>
+                        <li>Confirm that the <b>Automatically start slideshow</b> checkbox works
+                        as expected.</li>
+                        <li>Confirm that the dropdown box to specify the <b>run key</b> works as
+                        expected.</li>
+                        <li>Confirm that the slideshow tab is not displayed if the slideshow is
+                        disabled in the task configuration.</li>
+                    </ul></li>
                 </ul></li>
             <p>
                 <li>Help menu
@@ -473,7 +700,7 @@
                 </ul></li>
             </ul></li>
         <p>
-            <li>Toolstrips
+            <li><b>Toolstrips</b>
             <ul>
                 <li>Confirm that toolstrips can be clicked and dragged and rearranged. Confirm
                 that they can be docked in different areas of the ID Shield window, and that their
@@ -492,10 +719,15 @@
                     saved and committed documents.</li>
                     <li>Confirm that <b>Ctrl+Shift+Tab</b> functions as a shortcut for Previous
                     document.</li>
-                    <li>Confirm that the <b>Next document</b> button is disabled when viewing the
-                    current document.</li>
+                    <li>Confirm that the <b>Next document</b> button is enabled even when viewing 
+                    the current document.</li>
                     <li>Confirm that the <b>Next document</b> button navigates forward through the
                     history queue.</li>
+                    <li>Confirm that the <b>Next document</b> button prompts you to save before
+                    navigating forward from the current document if the verification task is
+                    configured to do so.</li>
+                    <li>Confirm that <b>Ctrl+Tab</b> functions as a shortcut for Next 
+                    document.</li>
                     <li>Confirm that the default size of the history queue is <b>20</b>
                     documents.</li>
                     <li>Confirm that the size of the history is controlled by the registry setting
@@ -509,8 +741,7 @@
                     history navigation.</li>
                 <p>
                     <li>Confirm that the <b>Previous redaction</b> button is disabled when viewing
-                    the first redaction on the current document or a document that does not contain
-                    redactions.</li>
+                    the first redaction on the first document.</li>
                     <li>Confirm that the <b>Previous redaction</b> button navigates to the previous
                     redaction in the data grid.</li>
                     <li>Confirm that if <b>Review All Pages</b> is selected and the user is viewing
@@ -527,8 +758,11 @@
                     navigates to the next unviewed page.</li>
                     <li>Confirm that if the user is viewing the last redaction or page (depending
                     on settings) of the current document, the <b>Next redaction</b> button will 
-                    prompt the user to save and move on to the next document.</li>
+                    prompt the user to save and move on to the next document if the verification
+                    task is configured to do so.</li>
                     <li>Confirm that <b>Tab</b> functions as a shortcut for Next redaction.</li>
+                    <li>Confirm that the Next/Previous document and Next/Previous redaction buttons
+                    function symmetrically.</li>
                 </ul></li>
             <p>
                 <li><b>Exemption code</b> toolstrip
@@ -594,6 +828,25 @@
                     expected.</li>
                     <li>Confirm that new tags are correctly created and applied.</li>
                 </ul></li>
+            </ul></li>
+        <p>
+            <li><b>Slideshow</b> toolstrip
+            <ul>
+                <li>Confirm that the <b>Start</b> and <b>Stop</b> toolstrip buttons work as
+                expected.</lI>
+                <li>Confirm that the <b>Stop</b> button is disabled when the slideshow is not
+                running.</li>
+                <li>Confirm that the <b>Start</b> button is disabled when the slideshow <b>is</b>
+                running.</li>
+                <li>Confirm that when the slideshow runs, a blue progress bar is displayed at the
+                bottom of the <b>Image Viewer</b> window.</li>
+                <li>Confirm that when you stop the slideshow by interacting with the UI (e.g., by
+                pressing a key or clicking the mouse), the text SLIDESHOW STOPPED is displayed
+                prominently.</li>
+                <li>Confirm that when you stop by hitting the <b>Stop</b> button, no text is
+                displayed.</li>
+                <li>Confirm that the slideshow toolstrip is not displayed if the slideshow is
+                disabled in the task configuration.</li>
             </ul></li>
         <p>
             <li>Confirm that the <b>Document type</b> edit box correctly displays the type of the
@@ -687,6 +940,11 @@
             <li>Confirm that the <b>current</b> page has a <b>blue</b> background.</li>
             <li>Confirm that a vertical scrollbar is presented for a document with many pages and that
             it autoscrolls as the user tabs through the pages.</li>
+        <p>
+            <li>Confirm that the data window status bar displays the <b>Seconds verifying this
+            document</b> and </b>Average pages/hour</b>.</li>
+            <li>Confirm that the displayed numbers are correct for the current verification 
+            session.</li>
         </ul></li>
     </ul></li>
 <p>
@@ -706,6 +964,7 @@
                     <li>Select redactions and other objects (Esc)</li>
                     <li>Create angular redaction</li>
                     <li>Create rectangular redaction</li>
+                    <li>Create word redaction</li>
                 </ul></li>
                 <li><b>Page navigation</b> toolstrip - confirm that all buttons are present with
                 appropriate tooltip text.
@@ -730,6 +989,7 @@
                     <li>Rotate counterclockwise (Ctrl+Shift+R)</li>
                     <li>Rotate clockwise (Ctrl+R)</li>
                     <li>Show/Hide thumbnails</li>
+                    <li>Show/Hide magnifier</li>
                 </ul></li>
             </ul></li>
         <p>
@@ -746,15 +1006,27 @@
                 is <b>1</b>.</li>
             </ul></li>
         <p>
-            <li>Confirm that right-clicking in the image viewer brings up a contex menu with the
+            <li>Confirm that right-clicking in the image viewer brings up a context menu with the
             following items:
             <ul>
-                <li>Select redactions and other objects</li>
+                <li>Zoom previous</li>
                 <li>Zoom window</li>
                 <li>Pan</li>
+                <li>Select redactions and other objects</li>
                 <li>Angular redaction</li>
                 <li>Rectangular redaction</li>
-                <li>Block fit selection</li>
+                <li>Word redaction</li>
+                <li>Auto-shrink selection</li>
+                <li>Enlarge selection by 1 pixel
+                <ul>
+                    <li>Confirm that this tool works correctly on both angular and rectangular
+                    redactions.</li>
+                </ul></li>
+                <li>Shrink selection by 1 pixel
+                <ul>
+                    <li>Confirm that this tool works correctly on both angular and rectangular
+                    redactions.</li>
+                </ul></li>
             </ul></li>
         </ul></li>
     <p>
@@ -816,13 +1088,15 @@
                     one or more endpoints extends off the edge of the page.</li>
                     <li>Confirm that there is a minimum size for redactions.</li>
                 <p>
-                    <li>Confirm that the <b>Create angular redaction</b> button selects the angular
-                    redaction tool.</li>
+                    <li>Confirm that the <b>Create angular redaction</b> button selects the 
+                    angular redaction tool.</li>
                     <li>Confirm that the <b>Create rectangular redaction</b> button selects the
                     rectangular redaction tool.</li>
+                    <li>Confirm that the <b>Create word redaction</b> button selects the word
+                    redaction tool.</li>
                     <li>Confirm that the <b>H</b> key selects the most recently selected redaction
                     tool.</li>
-                    <li>Confirm that subsequent presses of the <b>H</b> key toggle between the two
+                    <li>Confirm that subsequent presses of the <b>H</b> key toggle among the three
                     redaction tools.</li>
                     <li>Confirm that the height of an angular redaction can be adjusted using 
                     either the <b>+</b>/<b>-</b> keys or the mouse <b>scrollwheel</b>.</li>
@@ -830,6 +1104,28 @@
                     <b>Shift</b> key while drawing the redaction.</li>
                     <li>Confirm that a redaction can be <b>block-fitted</b> by holding 
                     <b>Ctrl+Shift</b> while drawing the redaction.</li>
+                    <li>Confirm that auto-fit redactions completely cover the sensitive data.</li>
+                    <li>Confirm that redactions cannot be drawn outside the bounds of the 
+                    image.</li>
+                    <li>Confirm that with the angular and rectangular redaction tools, clicking
+                    without dragging does not create a new redaction.</li>
+                    <li>Select the word highlight tool while verifying a document with an 
+                    associated .uss file.
+                    <ul>
+                        <li>Mouse over some words and confirm that the word highlight preview is
+                        displayed.</lI>
+                        <li>Click and drag and confirm grey highlights are drawn over all words
+                        in the selected area.</li>
+                        <li>Click and drag in an area with no recognized words and confirm that
+                        no redaction is drawn.</li>
+                        <li>Confirm that multiple words redacted in the same line are merged into
+                        one redaction zone.</li>
+                        <li>Hold the shift key and click and drag with the word redaction tool.
+                        Confirm that pixel-fitting mode works as expected.</li>
+                        <li>Navigate back to a previous document and (without clicking in the
+                        image viewer) confirm that preview highlights are correctly shown for the
+                        earlier document.</li>
+                    </ul></li>
                 </ul></li>
             <p>
                 <li><b>Page navigation</b> toolstrip
@@ -841,7 +1137,8 @@
                     <li>Confirm that <b>Ctrl+Home</b> performs the same function.</li>
                 <p>
                     <li>Confirm that the <b>Go to previous page</b> button is disabled when the
-                    first page is currently open.</li>
+                    first page is currently open unless seamless navigation mode is turned 
+                    on.</li>
                     <li>Confirm that if the second or subsequent pages is open, the button
                     navigates to the previous page.</li>
                     <li>Confirm that <b>PgUp</b> performs the same function.</li>
@@ -852,7 +1149,7 @@
                     <li>Confirm that if an invalid page is entered, no change is made.</li>
                 <p>
                     <li>Confirm that the <b>Go to next page</b> button is disabled when the last
-                    page is currently open.</li>
+                    page is currently open unless seamless navigation mode is turned on.</li>
                     <li>Confirm that in other circumstances, the button navigates to the next 
                     page.</li>
                     <li>Confirm that the <b>PgDn</b> button performs the same function.</li>
@@ -906,11 +1203,15 @@
                     zoomed in to an image.</li>
                     <li>Confirm that it functions as expected when viewing a multi-page image.</li>
                     <li>Confirm that the <b>,</b> button performs the same function.</li>
+                    <li>Confirm that the Previous tile button respects the <b>Seamless 
+                    navigation</b> setting in the verification task.</li>
                 <p>
                     <li>Confirm that the <b>Next tile</b> button functions as expected while zoomed
                     in to an image.</li>
                     <li>Confirm that it functions as expected when viewing a multi-page image.</li>
                     <li>Confirm that the <b>.</b> button performs the same function.</li>
+                    <li>Confirm that the Next tile button respects the <b>Seamless navigation</b>
+                    setting in the verification task.</li>
                 <p>
                     <li>Confirm that the <b>Rotate counterclockwise</b> button rotates the image
                     counterclockwise.</li>
@@ -924,6 +1225,8 @@
                 <p>
                     <li>Confirm that the <b>Show/Hide thumbnails</b> button correctly toggles the
                     appearance of the thumbnail viewer.</li>
+                    <li>Confirm that the <b>Show/Hide magnifier</b> button correctly toggles the
+                    appearance of the magnifier.</li>
                 </ul></li>
             </ul></li>
         <p>
@@ -949,13 +1252,51 @@
                 <li>Confirm that thumbnails <b>do not</b> display annotations or redactions.</li>
                 <li>Confirm that a scrollbar appears in the thumbnail viewer if a many-paged image
                 is being viewed.</li>
+            <p>
+                <li>Confirm that thumbnails are not loaded when the thumbnail viewer is closed.
+                They should continue to load when the viewer is collapsed or auto-hidden.</li>
+            </ul></li>
+        <p>
+            <li>Magnifier
+            <ul>
+                <li>Confirm that the Magnifier has a title bar with three buttons.
+                <ul>
+                    <li>Confirm that the <b>triangle</b> has no apparent purpose.</li>
+                    <li>Confirm that the <b>pin</b> can be used to auto-hide the docked 
+                    viewer.</li>
+                    <li>Confirm that the <b>X</b> closes the magnifier.</li>
+                </ul></li>
+                <li>Confirm that double-clicking in the title bar undocks the viewer.</li>
+                <li>Confirm that the viewer can be docked at the top, bottom, left, or right of the
+                ID Shield window.</li>
+                <li>Confirm that the position and pinned/unpinned state of the viewer is correctly
+                persisted.</li>
+            <p>
+                <li>Confirm that the magnifier shows an enlarged view of the area on the image
+                around the mouse cursor.</li>
+                <li>Confirm that the magnified view displays existing redactions correctly.</li>
+                <li>Confirm that the magnifier is always centered over the mouse cursor.
+                <ul>
+                    <li>Confirm that this works correctly when using the <b>pan</b> tool. The
+                    magnifier view should be perfectly still during a pan tracking event.</li>
+                </uL></li>
+                <li>Confirm that the magnifier can be toggled with the <b>F12</b> key.</li>
+                <li>Confirm that the magnifier is blank when the cursor is not over the 
+                image.</li>
+                <li>Confirm that the magnifier does not prevent the image viewer from refreshing
+                as appropriate (e.g., after drawing a box with the zoom tool).</li>
             </ul></li>
         <p>
             <li>Confirm that the image viewer <b>context menu</b> can be used to select the pan,
             zoom, selection, or redaction tools.</li>
-            <li>Confirm that if one or more redactions is selected and the <b>Block fit 
+            <li>Confirm that if one or more redactions is selected and the <b>Auto-shrink 
             selection</b> option is chosen from the context menu, the selected redactions are block 
-            fit.</li>
+            fit.
+            <ul>
+                <li>Confirm that repeatedly auto-fitting angular redactions does not cause any
+                inappropriate shrinkage.</li>
+                <li>Confirm that <b>K</b> functions as a shortcut for auto-fit.</li>
+            </ul></li>
             <li>Confirm that <b>Ctrl+Mousewheel</b> can be used to zoom in and out centered on the
             current cursor position.</li>
             <li>Confirm that a <b>right click</b> can be used to cancel any click-drag operation 
@@ -1103,6 +1444,40 @@
             <li>Confirm that removing the second monitor between verification sessions is 
             supported by having the user interface display the windows on the single 
             monitor.</li>
+        </ul></li>
+    <p>
+        <li><b>Full screen mode</b>
+        <ul>
+            <li>Confirm that selecting <b>Full screen</b> from the view menu of the Data Window
+            puts the verification UI into full screen mode.</li>
+            <li>Confirm that when you first enter full screen mode, a bar appears at the top of
+            the screen with instructions for how to exit full screen mode.</li>
+            <li>Confirm that the "Exit full screen" bar hides after a few seconds and reappears
+            when you put the mouse at the top of the screen.</li>
+            <li>Confirm that F11 works as a shortcut to enter and exit full screen mode.</li>
+            <li>Confirm that full screen mode does not prevent the test machine's screensaver from
+            kicking in.</li>
+        </ul></li>
+    <p>
+        <li><b>Slideshow</b>
+        <ul>
+            <li>Configure verification with the default slideshow options.
+            <ul>
+                <li>Confirm that the slideshow does not allow you to bypass commit conditions 
+                (i.e., if you are required to review all redactions/clues, the slideshow will not
+                save and commit if there are unviewed data items).</li>
+                <li>Confirm that the slideshow stops after the last document in the queue.</li>
+                <li>Confirm that the slideshow stops if the screensaver kicks in.</li>
+                <li>Confirm that the slideshow stops if ID Shield loses focus.</li>
+                <li>Confirm that the UI confirms user alertness as specified by asking you to
+                press particular keys.
+                <ul>
+                    <li>Confirm that this function is case-insensitive.</li>
+                </ul></li>
+                <li>Confirm that the slideshow works regardless of its pinned/unpinned state and
+                regardless of which other UI elements (e.g., thumbnail viewer, data window) are
+                visible.</li>
+            </ul></li>
         </ul></li>
     <p>
         <li>Exercise verification using:
@@ -1653,6 +2028,181 @@
             <li>Hit the Find next button.</li>
             <li>Dismiss the error.</li>
             <li>Confirm that the search term edit box is enabled.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4398]</b> Navigating back with no doc open
+        <ul>
+            <li>Set up an FPS file to run single-threaded with verification and additional tasks
+            such that there will be a longish wait between documents.</li>
+            <li>Start processing; save the first doc.</li>
+            <li>Before the next file loads, press <b>Ctrl+Shift+Tab</b> to navigate to the
+            previous doc.</li>
+            <li>Confirm that no errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4484]</b> Pause condition configuration/persistence
+        <ul>
+            <li>Open the FAM. Add a new verification task.</li>
+            <li>Click the Settings button for the slideshow feature.</li>
+            <li>Click the "Stop slideshow..." checkbox.</li>
+            <li>Double-click in the associated edit box.</li>
+            <li>Configure a condition and hit OK.</li>
+            <li>Confirm that the condition is correctly displayed in the edit box.</li>
+            <li>Hit Cancel.</li>
+            <li>Reopen the slideshow settings dialog.</li>
+            <li>Confirm that the condition is no longer configured.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4489]</b> Auto-fit with rotated image
+        <ul>
+            <li>Verify an image that is rotated 90 degrees.</li>
+            <li>Rotate the image so it is vertical.</li>
+            <li>Make a redaction while holding the shift key to auto-fit the redaction zones.</li>
+            <li>Confirm that the redaction zones are drawn correctly (i.e., each character does
+            not get its own zone).</li>
+        </ul></li>
+    <P>
+        <li><b>[FlexIDSCore #4495]</b> Misplaced word redaction
+        <ul>
+            <li>Open verification.</li>
+            <li>Zoom/pan such that the point in the upper left corner of the image viewer is
+            inside a word.</li>
+            <li>Select the word redaction tool. Click the mouse button in some whitespace and drag
+            the mouse as short a distance as possible.</li>
+            <li>Confirm that there is no word redaction preview highlight over the word in the
+            upper left corner.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4496]</b> Word redaction tool and unredactable zones
+        <ul>
+            <li>Make a local copy of one of the images and .uss files from the ManyPageImages
+            folder on I:. Note that the .uss files have a 2007 modified date; reOCRing would
+            probably not get the same result.</li>
+            <li>Open the image for verification and select the word redaction tool</li>
+            <li>Above "JUDGMENT BY OPERATION OF LAW" there's a dashed line. Mouse over it and
+            confirm that no preview highlight is shown to redact that line.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4501]</b> Word redaction orphaned highlights
+        <ul>
+            <li>Open verification with a document that has a .uss file.</li>
+            <li>Select the word redaction tool</li>
+            <li>Hover over a word so that the word highlight preview appears.</li>
+            <li>Press the Escape key and move the mouse.</li>
+            <li>Confirm that the highlight preview correctly disappears.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4503]</b> Word redaction object reference exception
+        <ul>
+            <li>Hover the word redaction tool over a word so that the preview highlight 
+            appears.</li>
+            <li>Press Ctrl+S to save and move to the next document.</li>
+            <li>Confirm that no errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4506, #4502, #4505]</b> Word highlights shown for wrong document
+        <ul>
+            <li>Configure a FAM with a verification task set up to run multi-threaded.</li>
+            <li>Start verification. Select the word redaction tool.</li>
+            <li>Save a couple documents, then quickly switch back and forth among documents for a
+            while.</li>
+            <li>Click and drag to see the word highlight preview. Confirm that it is showing 
+            highlights for the appropriate document.</li>
+            <li>Confirm that no other errors or unexpected behavior (e.g., lockups) are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4507]</b> Word redaction exception on cancel
+        <ul>
+            <li>Open a document and select the word redaction tool</li>
+            <li>Click and drag in pixel-fitting mode to begin to draw a redaction. Before
+            releasing the mouse button,</li>
+            <li>Press the context menu key (between right ctrl and the windows key) and use the
+            keyboard to select one of the other tools.</li>
+            <li>Select the word redaction tool again. Click and drag to begin to draw another
+            redaction in pixel-fitting mode. Before releasing the mouse button,</li>
+            <li>Right click to cancel.</li>
+            <li>Confirm that no errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4515, #4557]</b> Magnifier and fit-to-page
+        <ul>
+            <li>In verification with the magnifier open, press P to fit-to-page.</li>
+            <li>Confirm that the magnifier window still shows a magnified view.</li>
+            <li>Confirm that the behavior is also correct in fit-to-width mode.</li>
+            <li>Select the angular highlight tool.</li>
+            <li>Start drawing a redaction.</li>
+            <li>Confirm that the highlight shown in the magnifier is the appropriate height.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4520]</b> Magnifier and highlights outside image
+        <ul>
+            <li>Zoom out on an image so that the image viewer shows empty space outside of the
+            image.</li>
+            <li>Select a highlight tool and click and drag in the empty space beyond the edge of
+            the image.</li>
+            <li>Confirm that the magnifier shows nothing.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4521]</b> Slideshow + Magnifier
+        <ul>
+            <li>Configure the slideshow to advance every second.</li>
+            <li>Open the magnifier window.</li>
+            <li>Start the slideshow. Keep the cursor in the image window.</li>
+            <li>Confirm that the slideshow advances as expected.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4524]</b> Moving mouse causes unexpected scroll
+        <ul>
+            <li>Zoom in on an image with the magnifier window open.</li>
+            <li>Move the mouse around. The issue is usually most likely to occur toward the top of
+            the screen.</li>
+            <li>Confirm that the image does not scroll when the mouse is moved.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4531, #4532]</b> Thumbnail viewer/magnifier window
+        <ul>
+            <li>Set up verification to have the thumbnail viewer docked on the right side of the
+            image viewer and the magnifier docked at the bottom of the data window.</li>
+            <li>Close and reopen verification. Confirm that the thumbnail and magnifier locations
+            were correctly persisted.</li>
+            <li>Close the thumbnail viewer, then close and reopen verification. Confirm correctly
+            persisted locations.</li>
+            <li>Open the thumbnail viewer and close the magnifier, then close and reopen 
+            verification. Confirm correctly persisted locations.</li>
+            <li>Close the thumbnail viewer, then close and reopen verification again. Confirm
+            correctly persisted locations.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4534]</b> Word redaction and duplicates
+        <ul>
+            <li>Open TestImage001.tif for verification.</li>
+            <li>Use the word redaction tool to redact the words "CURRENT" and "CHILD" from the
+            document title.</li>
+            <li>Confirm that you can still use the word redaction tool to redact just the word
+            "CURRENT".</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4535]</b> Line fitting bug
+        <ul>
+            <li>Open TestImage001.tif</li>
+            <li>Select the rectangular highlight tool.</li>
+            <li>Redact the case number line with line-fitting.</li>
+            <li>Confirm that the redaction is not split into two lines.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4536]</b> Magnifier and resize
+        <ul>
+            <li>With the magnifier window open, select the selection tool.</li>
+            <li>Click on the grip handle for an existing redaction.</li>
+            <li>Confirm that the redaction is not resized.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4543]</b> Exceptions in pixel-fitting mode
+        <ul>
+            <li>Open TestImage001.tif zoomed fit-to-page.</li>
+            <li>Use the word redaction tool in pixel-fitting mode starting in the white space near
+            the right margin of the document and dragging off the edge of the page.</li>
+            <li>Do this repeatedly and confirm that no errors are seen.</li>
         </ul></li>
     <p>
         <LI><b>[LegacyRC #5717]</b> Alt as an input event

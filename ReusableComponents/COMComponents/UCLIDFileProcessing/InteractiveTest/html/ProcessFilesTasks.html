@@ -115,6 +115,8 @@
                     <li>Verify that the exceptions recorded indicate that the page number was
                     invalid
                 </ul>
+                <li><b>[FlexIDSCore #4224]</b> Confirm that the Add Watermark task fails if the
+                requested page number does not exist.</li>
             </ul>
         </ul> 
 <p>
@@ -214,6 +216,8 @@
 <p>
         <li>Exercise the <b>Apply Bates number</b> functionality.
         <li>Confirm that progress status is updated correctly.
+        <li>Confirm that the task behaves appropriately beginning with an intial counter value of
+        <b>2,147,483,647</b>.</li>
 <p>
         <LI><b>[FlexIDSCore #3776]</b> Confirm that an appropriate error message is seen if an
         invalid tag such as <b>&lt;SourceDocName</b> is entered in the property page.
@@ -1247,6 +1251,14 @@
                 <li>Repeat the exercise as the SCR reports that the crash does not occur every time.
             </ul>
 <p>
+            <li><b>[LegacyRC #5311]</b>
+            <ul>
+                <li>Make many local copies of the two images at 
+                <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5370</b>.</li>
+                <li>OCR them.</li>
+                <li>Confirm that the documents OCR correctly and no exceptions are seen.</lI>
+            </ul></li>
+        <p>
             <li><b>[LegacyRC #5370]</b> Skipping pages that fail OCR
             <ul>
                 <li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5370</b> 
@@ -1297,6 +1309,53 @@
             </ul>            
         </ul>
 <p>
+        <li><b>Core: Rasterize PDF</b>
+        <ul>
+            <li>Use the Add button to select <b>Core: Rasterize PDF</b> as the task.</li>
+            <li>Confirm that the task requires configuration.</li>
+            <li>Open the property page.</li>
+        <p>
+            <li>Confirm that there is a <b>PDF file</b> edit box
+            <ul>
+                <li>Confirm that it defaults to <b>&lt;SourceDocName&gt;</b></li>
+                <li>Confirm that it is editable.</li>
+                <li>Confirm that it has an associated tag selector and browse button, and that 
+                they work correctly.</LI>
+            </ul></li>
+            <li>Confirm that there is a <b>Rasterized file</b> edit box
+            <ul>
+                <li>Confirm that it defaults to <b>&lt;SourceDocName&gt;.tif</b></li>
+                <li>Confirm that it is editable.</li>
+                <li>Confirm that it has an associated tag selector and browse button, and that 
+                they work correctly.</LI>
+            </ul></li>
+            <li>Confirm that there is an unchecked checkbox to <b>Modify SourceDocName in
+            database after conversion</b>.</li>
+            <li>Confirm that there is an unchecked checkbox to <b>Delete PDF file after
+            rasterization</b>.
+            <ul>
+                <li>Confirm that there is an <b>If the file cannot be deleted</b> group box and
+                that it is enabled iff the <b>Delete</b> checkbox is checked.</li>
+                <li>Confirm that it contains a <b>Fail the task and record an error</b> radio
+                button.</li>
+                <li>Confirm that it contains an <b>Ignore the error and continue</b> radio 
+                button.</li>
+                <li>Confirm that the <b>Fail</b> radio button is selected by default.</li>
+            </ul></li>
+        <p>
+            <li>Confirm that the task fails when run on non-PDF files.</li>
+            <li>Confirm that the task successfully converts a PDF into a TIF.</li>
+            <li>Confirm that you are prompted to confirm before saving a configuration that 
+            modifies SourceDocName.</li>
+            <li>Confirm that you are prompted for the database administration password before
+            running an FPS file that modifies SourceDocName.</li>
+            <li>Confirm that PDFs can be deleted after rasterization.</li>
+            <li>Confirm that the <b>Fail</b> option works as expected if the PDF cannot be
+            deleted.</li>
+            <li>Confirm that the <b>Ignore</b> option works as expected if the PDF cannot be
+            deleted.</lI>
+        </ul></li>
+    <p>
         <li><b>Core: Set file action status in database</b>
         <ul> 
             <li>Use the Add button to select <b>Core: Set file-action status in database</b> as
