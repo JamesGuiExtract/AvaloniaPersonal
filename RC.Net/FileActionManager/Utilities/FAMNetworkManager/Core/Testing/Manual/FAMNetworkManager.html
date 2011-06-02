@@ -1,0 +1,399 @@
+<HTML>
+
+<HEAD>
+<TITLE>FAM Network Manager Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>FAM Network Manager Testing Checklist<br>
+<IMG src="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<li><h2>Licensing</h2>
+<ul>
+    <li>Confirm that a FLEX Index or ID Shield server license is required to run this utility.</li>
+    <li>Confirm that licensing is checked when the utility opens.</li>
+</ul></li>
+<br>
+
+<!-- *********************************************** -->
+<li><h2>UI</h2>
+<ul>
+    <li><b>Window</b>
+    <ul>
+        <li>Confirm that the title bar includes the name of the application and the name of the
+        currently open file, if any.</li>
+        <li>Confirm that there are reasonable limits on resizing the window.</li>
+        <li>Confirm that the title bar reflects the dirty/non-dirty state of the currently open
+        file.</li>
+    </ul></li>
+<p>
+    <li><b>File menu</b>
+    <ul>
+        <li>Confirm that the File menu contains the following items:
+        <ul>
+            <li>New - Ctrl+N</li>
+            <li>Open... - Ctrl+O</li>
+            <li>Save... - Ctrl+S</li>
+            <li>Save As</li>
+            <li>Exit - Alt+F4</li>
+        </ul></li>
+        <li>Confirm that only Open and Exit are initially enabled.</li>
+    <p>
+        <li>Confirm that <b>New</b> clears any currently-open configuration.</li>
+        <li>Confirm that <b>Ctrl+N</b> performs the same function.</li>
+    <p>
+        <li>Confirm that <b>Open</b> brings up the Open dialog.</li>
+        <li>Confirm that the Open dialog defaults to an <b>.fnm</b> file type.</li>
+        <li>Confirm that the Open dialog works as expected.</li>
+        <li>Confirm that <b>Ctrl+O</b> performs the same function.</li>
+    <p>
+        <li>Confirm that <b>Save</b> works as expected.</li>
+        <li>Confirm that <b>Ctrl+S</b> performs the same function.</li>
+    <p>
+        <li>Confirm that <b>Save As</b> works as expected.</li>
+    <p>
+        <li>Confirm that <b>Exit</b> works as expected.</li>
+        <li>Confirm that <b>Alt+F4</b> performs the same function.</li>
+    </ul></li>
+<p>
+    <li><b>Tools menu</b>
+    <ul>
+        <li>Confirm that the Tools menu contains the following item:
+        <ul>
+            <li>Options...</li>
+        </ul></li>
+        <li>Confirm that it is initially enabled.</li>
+    <p>
+        <li>Confirm that <b>Options</b> brings up the <b> Refresh Time</b> dialog.</li>
+        <li>Confirm that the dialog contains a text box, an OK button, and a Cancel button.</li>
+        <li>Confirm that the buttons work as expected.</li>
+        <li>Confirm that the dialog validates the text box for positive integers.</li>
+    </ul></li>
+<p>
+    <li><b>Help menu</b>
+    <ul>
+        <li>Confirm that the Help menu contains the following item:
+        <ul>
+            <li>About...</li>
+        </ul></li>
+        <li>Confirm that it is initially enabled.</li>
+    <p>
+        <li>Confirm that About brings up the FAM Network Manager About box.</li>
+        <li>Confirm that the About box has the expected version number and copyright
+        information.</li>
+    </ul></li>
+<p>
+    <li><b>Toolstrips</b>
+    <ul>
+        <li>Confirm that both of the following toolstrips exist, that they contain the listed
+        buttons, and that the tooltip text for each button contains the name of the tool and the
+        appropriate keyboard shortcut:
+        <ul>
+            <li>Open toolstrip:
+            <ul>
+                <li>Open file (Ctrl+O)</li>
+                <li>Save file (Ctrl+S)</li>
+                <li>Add machine (F8)</li>
+                <li>Remove machine (Del)</li>
+                <li>Edit machine(s) group and name (F2)</li>
+                <li>Group dropdown list</li>
+            </ul></li>
+        <p>
+            <li>Start toolstrip:
+            <ul>
+                <li>Start service</li>
+                <li>Stop service</li>
+                <li>Service dropdown list</li>
+                <li>Modify service database</li>
+                <li>Auto refresh status</li>
+                <li>Refresh status (F5)</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li>Confirm that the various buttons are enabled only at appropriate times.</li>
+        <li>Confirm that when buttons/menu items are disabled, their associated keyboard shortcuts
+        are also disabled.</li>
+        <li>Confirm that toolstrip items with analogs in the File menu function as expected.</li>
+    <p>
+        <li>Confirm that clicking on the Add machine button brings up the Add Machine dialog.</li>
+        <li>Confirm that the Add Machine dialog contains:
+        <ul>
+            <li>A Machine name text box with an input limit of 256 characters.</li>
+            <li>An associated, disabled browse button.</li>
+            <li>A Group name combo box with an input limit of 40 characters.</li>
+            <li>An OK button.</li>
+            <li>A Cancel button.</li>
+        </ul></li>
+        <li>Confirm that all controls work as expected.</li>
+        <li>Confirm that pressing F8 performs the same function as clicking the Add machine
+        button.</li>
+    <p>
+        <li>Confirm that the Remove machine button is enabled when one or more machines is
+        selected in the data grid.</li>
+        <li>Confirm that pressing the Remove machine button when one or more machines is selected
+        removes the machine(s) from the grid.</li>
+    <p>
+        <li>Confirm that the Edit machine(s) group and name button is enabled when one or more
+        machines is selected in the data grid.</li>
+        <li>Confirm that pressing the Edit button with one or more machines selected brings up the
+        Modify Machine Name Or Group dialog.</li>
+        <li>Confirm that the Edit dialog contains:
+        <ul>
+            <li>A Machine name text box with an input limit of 256 characters.</li>
+            <li>An associated, disabled browse button.</li>
+            <li>A Group name combo box with an input limit of 40 characters.</li>
+            <li>An OK button.</li>
+            <li>A Cancel button.</li>
+        </ul></li>
+        <li>Confirm that if one machine is selected, the Machine name and Group name text boxes
+        are writeable and prepopulated with the current values for the selected machine.</li>
+        <li>Confirm that if multiple machines are selected, the Machine name text box contains a
+        comma-delimited list of machines and is read-only.</li>
+        <li>Confirm that if multiple machines are selected and they are all part of the same 
+        group, the group name combo box is writeable and populated with the current value.</li>
+        <li>Confirm that if multiple machines are selected and they are part of different groups,
+        the group name combo box is writeable and initially blank.</li>
+        <li>Confirm that pressing <b>F2</b> performs the same function as hitting the Edit
+        button.</li>
+    <p>
+        <li>Confirm that the Group name drop down list contains a list of all group names
+        currently in use.</li>
+    <p>
+        <li>Confirm that the Start service button is always enabled.</li>
+        <li>Confirm that the Stop service button is always enabled.</li>
+        <li>Confirm that the Service dropdown list includes entries for FAM, FDRS, and Both.</li>
+    <p>
+        <li>Confirm that the Modify service database button is enabled only when exactly one
+        machine is selected in the data grid.</li>
+        <li>Confirm that the Modify service database button brings up the SQLCEDBEditor
+        application with the Open and Close commands hidden.</li>
+        <li>Confirm that the SQLCEDBEditor otherwise appears as expected.</li>
+    <p>
+        <li>Confirm that the Auto refresh button is always enabled.</li>
+        <li>Confirm that Auto refresh functions as a toggle.</li>
+    <p>
+        <li>Confirm that the Refresh button is disabled when the Auto refresh feature is turned
+        on.</li>
+        <li>Confirm that the refresh button is otherwise always enabled.</li>
+        <li>Confirm that the refresh button refreshes the data from each of the machines in the
+        data grid.</li>
+    <p>
+        <li>Confirm that toolstrips can be rearranged by clicking and dragging them.</li>
+        <li>Confirm that toolstrip locations are persisted.</li>
+        <li>Confirm that toolstrip locations can be reset using the /reset flag on the command
+        line.</li>
+    </ul></li>
+<p>
+    <li><b>Grid</b>
+    <ul>
+        <li>Confirm that the data grid includes the following columns:
+        <ul>
+            <li>Machine</li>
+            <li>Group</li>
+            <li>FAM Status</li>
+            <li>FDRS Status</li>
+            <li>CPU</li>
+        </ul></li>
+        <li>Confirm that the data grid can be sorted by any of those columns.</li>
+        <li>Confirm that the grid columns and rows can be resized in a reasonable way.</li>
+    </ul></li>
+</ul></li>
+<p>
+
+<!-- *********************************************** -->
+
+<li><h2>Functionality</h2>
+<ul>
+    <li><b>New, open, save, etc</b>
+    <ul>
+        <li>Confirm that Open allows you to open saved .fnm files.</li>
+        <li>Confirm that all rows immediately refresh on Open.</li>
+        <li>Confirm that an .fnm file can be dropped onto the network manager to open it.</li>
+    <p>
+        <li>Confirm that New clears the current grid.</li>
+        <li>Confirm that you are prompted to save if changes have been made.</li>
+    <p>
+        <li>Confirm that Save saves the current state or brings up the Save As dialog if the
+        current file hasn't been saved yet.</li>
+    <p>
+        <li>Confirm that save prompts are provided when closing the network manager if changes
+        have been made.</li>
+        <li>Confirm that a Please Wait dialog appears when closing the network manager.</li>
+        <li>Confirm that the wait dialog is modal.</li>
+        <li>Confirm that the wait dialog cannot be closed prematurely.</li>
+    </ul></li>
+<p>
+    <li><b>Adding machines</b>
+    <ul>
+        <li>Confirm that the Add machines dialog requires that a machine name be specified.</li>
+        <li>Confirm that leading and trailing whitespace is trimmed from the group name.</li>
+    <p>
+        <li>Add a machine that does not exist with a group name Zombies. Confirm that:
+        <ul>
+            <li>A red error icon appears in the row header.</li>
+            <li>Double-clicking in the row causes the exception to be displayed.</li>
+            <li>Double-clicking elsewhere does <b>not</b> cause the exception to be displayed.</li>
+            <li>A plausible error is given as the reason why you are not connected.</li>
+            <li>Confirm that the FAM and FDRS status are both "Not Available" and the CPU usage is
+            "Counter N/A".</li>
+        </ul></li>
+    <p>
+        <li>Add Lisa or another machine that exists, but does not have the service installed.
+        Confirm that:
+        <ul>
+            <li>"Zombies" is included in the group name drop-down in the Add Machine dialog.</li>
+            <li>The FAM status and FDRS status are both "Not Available"</li>
+            <li>The CPU column correctly reports the current CPU usage.</li>
+        </ul></li>
+    <p>
+        <li>Add a machine that does exist and that has the FAM service installed. Confirm that:
+        <ul>
+            <li>FAM status is either "Stopped" or "Running".</li>
+            <li>FDRS status is "Not Available"</li>
+            <li>The CPU column correctly reports the current CPU usage.</li>
+        </ul></li>
+    <p>
+        <li>Add a machine that does exist and that has the FDRS service installed. Confirm that:
+        <ul>
+            <li>FAM status is "Not Available"</li>
+            <li>FDRS status is either "Stopped" or "Running".</li>
+            <li>The CPU column correctly reports the current CPU usage.</li>
+        </ul></li>
+    <p>
+        <li>Add a machine that does exist and that has both services installed. Confirm that:
+        <ul>
+            <li>FAM and FDRS status are both either "Stopped" or "Running".</li>
+            <li>The CPU column correctly reports the current CPU usage.</li>
+        </ul></li>
+    <p>
+        <li>Add many machines and confirm that the data grid scrolls down to ensure that the
+        newly-added row is always visible.</li>
+    </ul></li>
+<p>
+    <li><b>Modifying machine or group names</b>
+    <ul>
+        <li>Confirm that machine names are required to be defined.</li>
+        <li>Confirm that leading and trailing whitespace is trimmed from group names.</li>
+    <p>
+        <li>Select one machine and open the Modify dialog.
+        <ul>
+            <li>Confirm that the machine name and group name are prepopulated.</li>
+            <li>Modify the machine name to point to an existing machine.</li>
+            <li>Modify the group name.</li>
+            <li>Confirm that the data grid row is refreshed immediately when you hit OK in the
+            dialog.</li>
+        </ul></li>
+    <p>
+        <li>Select two machines and open the Modify dialog.
+        <ul>
+            <li>Confirm that modifying the group name changes the group for both machines.</li>
+        </ul></li>
+    </ul></li>
+<p>
+    <li><b>Group names and filtering</b>
+    <ul>
+        <li>Add several machines. Put some in group Robots, some in group Monkeys, and one in
+        group Cthulu.</li>
+        <li>Confirm that the group name dropdown list contains entries for Monkeys, Robots, Cthulu,
+        and a blank entry.</li>
+        <li>Confirm that selecting one of those entries filters the data grid so that only members
+        of the relevant group are displayed.</li>
+        <li>Select the machine in group Cthulu and delete it from the grid.</li>
+        <li>Confirm that the dropdown list has been updated to reflect that change.</li>
+    <p>
+        <li>Select the blank row in the dropdown to display all entries.</li>
+        <li>Note the current CPU percentages for the machines in the group Monkeys.</li>
+        <li>Filter to show only Robots.</li>
+        <li>Refresh.</li>
+        <li>Remove the filter.</li>
+        <li>Confirm that the Monkeys were not refreshed.</li>
+    <p>
+        <li>Filter to show only Monkeys.</li>
+        <li>Select all rows.</li>
+        <li>Modify them to be in group Team Sunshine.</li>
+        <li>Remove the filter.</li>
+        <li>Confirm that Robots were not edited.</li>
+    </ul></li>
+<p>
+    <li><b>Starting and stopping the services</b>
+    <ul>
+        <li>Confirm that you are prompted before starting and stopping the services.</li>
+        <li>Confirm that you can start/stop either or both of the services as specified.</li>
+        <li>Confirm that attempting to start a service that is not installed does nothing.</li>
+        <li>Confirm that the selected rows are refreshed when the start or stop command is
+        sent.</li>
+        <li>Confirm that the services are started/stopped on all currently-selected machines.</li>
+    </ul></li>
+<p>
+    <li><b>Editing the database</b>
+    <ul>
+        <li>In the following situations, confirm that a reasonable error message is displayed and
+        that the editor appears or doesn't as expected:
+        <ul>
+            <li>Select a nonexistant machine and hit the Modify database button.</li>
+            <li>Select a machine on which the FAM service is not installed and hit the Modify
+            database button.</li>
+            <li>Select a machine with a read-only database file and hit the Modify database
+            button.</li>
+            <li>Select a machine with a corrupt FAMService.sdf file and hit the Modify database
+            button.</li>
+            <li>While monitoring machine A, log on to A and open the service database, then try to
+            edit the database from the network manager.</li>
+        </ul></li>
+    <p>
+        <li>Confirm that the database editor works as expected.</li>
+    </ul></li>
+<p>
+    <li><b>Refresh and auto-refresh</b>
+    <ul>
+        <li>Confirm that the auto-refresh refreshes all currently visible rows with a frequency
+        specified under Tools &gt; Options.</li>
+        <li>Confirm that the manual refresh refreshes all currently visible rows.</li>
+    </ul></li>
+</ul></li>
+
+<!-- *********************************************** -->
+
+<li><h2>Bug fixes</h2>
+<ul>
+    <li><b>[DotNetRC #545]</b> Behavior with failed open
+    <!-- fixed v 8.1.0.95 -->
+    <ul>
+        <li>Configure the network manager to monitor some machines.</li>
+        <li>Try to open a file that is not an .fnm file.</li>
+        <li>After dismissing the error message, confirm that your current configuration has not
+        been cleared.</li>
+    </ul></li>
+<p>
+    <li><b>[DotNetRC #546]</b> Group list updating
+    <!-- fixed v 8.1.0.95 -->
+    <ul>
+        <li>Configure the manager to monitor a machine in group Zombies.</li>
+        <li>Open an .fnm file that has a list of machines, none of which are in the Zombies
+        group.</li>
+        <li>Confirm that Zombies is no longer included in the group name dropdown list.</li>
+    </ul></li>
+<p>
+    <li><b>[DotNetRC #549, #557]</b> Reconnecting after reboot
+    <!-- fixed v 8.1.0.95 -->
+    <ul>
+        <li>Open the network manager on machine A. Configure it to monitor machine B and set it to
+        autorefresh.</li>
+        <li>Log on to B and reboot.</li>
+        <li>When B starts up again, start the FAM service.</li>
+        <li>On A, confirm that the network manager successfully reconnected and is displaying
+        appropriate information about B.</li>
+    </ul></li>
+</ul></li>
+
+<!-- *********************************************** -->
+</OL>
+</BODY>
+</HTML>
