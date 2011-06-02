@@ -1,0 +1,88 @@
+<html>
+<head>
+    <title>EmailFile Utility - Testing Checklist</title>
+    <link type="text/css" rel="stylesheet" href="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+<body>
+    <h1>
+        EmailFile Utility - Testing Checklist<br>
+        <img src="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+    </h1>
+    <hr>
+    <ol>
+        <li><h2>General</h2>
+        <ul>
+            <li>Confirm that <b>EmailFile</b> requires a suitable license file.</li>
+            <li>Confirm that EmailFile displays a usage message when run with the /? flag</li>
+            <li>Confirm that EmailFile can be configured by running with the /c flag
+            <ul>
+                <li>Confirm that the <b>Email Settings</b> dialog appears.</li>
+            <p>
+                <li>Confirm that there is an enabled edit box for the outgoing SMTP server.</li>
+                <li>Confirm that there is an enabled edit box for Port and that it defaults to
+                <b>25</b>.</li>
+                <li>Confirm that there is a checkbox to require authentication to send, unchecked
+                by default.</li>
+                <li>Confirm that when that box is checked:
+                <ul>
+                    <li>the <b>User name</b> edit box is enabled.</lI>
+                    <li>the <b>Password</b> edit box is enabled.</lI>
+                    <li>the <b>Use SSL</b> check box is enabled.</li>
+                </ul></li>
+            <p>
+                <li>Confirm that there is an editable <b>Sender display name</b> edit box.</li>
+                <li>Confirm that there is an editable <b>Sender email address</b> edit box.</li>
+                <li>Confirm that there is an editable <b>Email signature</b> edit box.</li>
+            <p>
+                <li>With Require authentication <b>unchecked</b>, confirm that you are required to
+                specify an <b>outgoing server</b>, a <b>sender display name</b>, and a <b>sender 
+                email address</b>.</li>
+                <li>With Require authentication <b>checked</b>, confirm that you are required to
+                specify an <b>outgoing server</b>, a <b>sender display name</b>, a <b>sender email
+                address</b>, a <b>user name</b>, and a <b>password</b>.</li>
+                <li>Provide an email address in an invalid format. Confirm that you are prompted to
+                confirm before hitting OK or sending a test email.</li>
+                <li>Confirm that email settings are saved to a .config file under the common
+                <b>ProgramData</b> folder.</li>
+                <li>Confirm that deleting the .config file clears the settings.</lI>
+            </uL></li>
+        </ul></li>
+<p>
+        <li><h2>EmailFile - Interactive testing</h2>
+        <ul>
+            <li>Set up some email settings.</li>
+            <li>Confirm that you can send an email by running with a single argument (the target
+            email address).</li>
+            <li>Confirm that you can specify a subject line with the <b>/subject</b> flag.</li>
+            <li>Specify a .txt file with the <b>/body</b> flag and confirm that the contents of the
+            .txt file are the body of the email.</LI>
+            <li>Confirm that it fails gracefully if you specify a non-existent file.</li>
+            <li>Confirm that reasonable things happen if you specify a binary file.</li>
+            <li>Confirm that the <b>/client</b> flag fails gracefully on a machine with no
+            standalone email client installed.</li>
+            <li>Confirm that the <b>/client</b> flag works correctly.</li>
+            <li>Confirm that if a file is specified, it is sent correctly.</li>
+            <li>Confirm that the <b>/z</b> flag zips the specified attached file.</li>
+            <li>Confirm that the <b>/ef</b> flag works as expected.</li>
+        </ul></li>
+    <p>
+        <li><h2>Fixed SCRs</h2>
+        <ul>
+            <li><b>[LegacyRC #5230]</b>
+            <ul>
+                <li>Try to send a file that doesn't exist.</li>
+                <li>Confirm that an error is displayed and no email is sent.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6093]</b>
+            <ul>
+                <li>Clear any existing email settings.</li>
+                <li>Run EmailFile with the <b>/client</b> flag.</li>
+                <li>Confirm that the client appears and you are not prompted to configure email
+                settings.</li>
+            </ul></li>
+        </ul></li>
+
+    </ol>
+</body>
+</html>
