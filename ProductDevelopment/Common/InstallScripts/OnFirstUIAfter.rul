@@ -27,6 +27,9 @@ begin
 	// Install the ESFDRSService.exe 
 	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFDRSService.exe\"");
 
+	// Install the Extract.ExceptionService
+	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "Extract.ExceptionService.exe\"");
+	
     Disable(STATUSEX);
 
 	if ( gbInstalled ) then
