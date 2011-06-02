@@ -17,145 +17,6 @@
 <ol>
 
 <!-- *********************************************** -->
-<li><h2>Image Format Converter - Functionality</h2>
-<ul>
-   	<li>Execute the following test cases from a command window.  A TIF image and a PDF image 
-	will be needed for these tests.</li>
-   	<li>Confirm that <b>ImageFormatConverter</b> without additional arguments provides 
-	a usage message.</li>
-   	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;TIF_File.pdf&gt; 
-	/pdf</b> creates a PDF file that is a copy of the TIF file.</li>
-   	<li>Confirm that <b>ImageFormatConverter &lt;PDF_File.pdf&gt; &lt;PDF_File.tif&gt; 
-	/tif</b> creates a TIF file that is a copy of the PDF file.</li>
-   	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;JPG_File.jpg&gt; 
-	/jpg</b> creates a JPG file that is a copy of the TIF file.</li>
-   	<li>Confirm that <b>ImageFormatConverter &lt;PDF_File.pdf&gt; &lt;JPG_File.jpg&gt; 
-	/jpg</b> creates a JPG file that is a copy of the PDF file.</li>
-   	<li>Confirm that other output types such as <b>/bmp</b> are not supported and provide 
-	a meaningful error message.</li>
-<p>
-	<li><b>[LegacyRC #5206]</b> Proper handling of large images
-	<ul>
-		<li>Work with the images in <b>I:\Common\Engineering\ProductTesting\ManyPage Images</b>
-	   	<li>Confirm that the 275-page TIF can be converted to a PDF without error. 
-	   	<li>Confirm that the resulting PDF has 275 pages. 
-	   	<li>Confirm that the 275-page PDF can be converted back to a TIF without error. 
-	   	<li>Confirm that the resulting TIF has 275 pages. 
-	</ul>
-<p>
-   	<LI><b>[LegacyRC #5292]</b> Converting TIFs to PDFs
-       	<ul>
-		<li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5292</b> 
-		image files.
-		<li>Confirm that each image can be converted to a PDF.
-       	</ul>
-<p>
-   	<LI><b>[LegacyRC #5298]</b> PDF page sizes from Image Format Converter
-       	<ul>
-		<li>Make a local copy of the <b>Old Republic Title\RedactionDemo\Set003</b> 
-		image files.  Use <b>Image Format Converter</b> to convert them from PDF 
-		format to TIF.
-		<li>Open each image file in the Image Viewer.  Confirm that pages of different 
-		size are displayed without black areas.
-		<li>Write basic rules using Extract Lines.  Confirm that spatial information for 
-		OCR'd text is correct for both legal-size and letter-size pages.
-       	</ul>
-<p>
-   	<LI><b>[LegacyRC #5318]</b> Image Format Converter
-       	<ul>
-      		<li>Execute <b>ImageFormatConverter.exe /?</b> from a command window.
-      		<li>Confirm that a usage message is displayed.
-      		<li>Confirm that <b>two optional arguments</b> text is displayed.
-      		<li>Confirm that the <b>/retain</b> option is documented.
-      		<li>Confirm that both options are documented in the help file.
-       	</ul>
-<p>
-   	<LI><b>[LegacyRC #5588</b> Confirm that ImageFormatConverter.exe will create the output 
-	folder if it does not exist.
-   	<LI><b>[LegacyRC #5589]</b> Confirm that ImageFormatConverter.exe requires a <b>FLEX 
-	Index / ID Shield Core</b> license in order to convert a TIF file to a TIF file.
-<p>
-	<li><b>[LegacyRC #5739]</b> Confirm that <b>ImageFormatConverter.exe</b> supports the following 
-	command-line options
-	<ul>
-		<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a user password
-		<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> for 
-		specifying an owner password and permissions
-		<ul>
-			<li><b>0</b> for no permissions
-			<li><b>1</b> to allow low quality printing
-			<li><b>2</b> to allow high quality printing
-			<li><b>4</b> to allow document modifications
-			<li><b>8</b> to allow copying/extraction of contents
-			<li><b>16</b> to allow accessibility access to contents
-			<li><b>32</b> to allow adding/modifying text annotations
-			<li><b>64</b> to allow filling in form fields
-			<li><b>128</b> to allow document assembly
-			<li><b>255</b> to allow all permissions
-		</ul>
-		<li><b>/enc</b> to indicate that the specified passwords are encrypted.  
-		Note that the <b>/enc</b> switch is only for private use.
-	</ul>
-<p>
-   	<LI><b>[LegacyRC #5823]</b> Multipage TIF converts to blank PDF
-       	<ul>
-		<li>Use <b>ImageFormatConverter.exe</b> to convert the image from 
-		<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5823</b> to a PDF.
-		<li>Confirm that the output PDF does not have blank pages.
-       	</ul>
-<p>
-	<li><b>Image conversion for same type</b>
-	<ul>
-		<li>Referenced images can be found in 
-		<b>I:\Common\Engineering\ProductTesting\UniqueImageTypes</b>.
-	   	<li>Confirm that <b>jpeg_tiff.tif</b> can be converted to a TIF without error. 
-	   	<li>Confirm that <b>VersionOnePointTwo.pdf</b> can be converted to a PDF 
-		without error. 
-	   	<li>Confirm that <b>VersionOnePointFive.pdf</b> can be converted to a PDF 
-		without error. 
-	</ul>
-<p>
-    <li><b>[LegacyRC #5859]</b> ImageFormatConverter PDF output
-    <!-- fixed v 8.1.0.34 -->
-    <ul>
-        <li>Use ImageFormatConverter.exe to convert a file to PDF format.
-        <li>Confirm that the output PDF uses Group 4 compression.
-    </ul>    
-</ul>
-</li>
-<br />
-
-<!-- *********************************************** -->
-<li><h2>Image Format Converter - Error Logging</h2>
-<ul>
-   	<li>Execute the following test cases from a command window.  A TIF image and a PDF image 
-	will be needed for these tests.</li>
-   	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;TIF_File.pdf&gt; 
-	/pABC /ef C:\tiflog.uex</b> does not create a the desired PDF file and creates a 
-	non-empty <b>C:\tiflog.uex</b> log file.</li>
-   	<li>Confirm that <b>C:\tiflog.uex</b> contains an exception that complains about 
-	unsupported file types.</li>
-   	<li>Re-run the same ImageFormatConverter command and confirm that the existing 
-	<b>C:\tiflog.uex</b> log is not overwritten.</li>
-<p>
-   	<li>Execute the following test cases from the File Action Manager.  A folder containing 
-	3 or more PDF images will be needed for these tests.</li>
-   	<li>Create a separate FPS file to supply the PDF images from the test folder.  Confirm that 
-	running this FPS file successfully supplies the files to the database.</li>
-   	<li>Create a separate FPS file to perform auto-redaction on the previously supplied PDF 
-	images.  Before running this FPS file, rename two of the images.</li>
-   	<li>Run the auto-redaction FPS file.</li>
-	<ul>
-	   	<li>Confirm that the two renamed files fail processing.</li>
-	   	<li>Confirm that the exceptions associated with the failures complain about the 
-		file not being found.</li>
-	   	<li>Confirm that the remaining files are processed without error.</li>
-	</ul>
-</ul>
-</li>
-<br />
-
-<!-- *********************************************** -->
 <li><h2>ESConvertToPDF - Functionality</h2>
 <ul>
    	<li>Double-click on the EXE within the CommonComponents folder.  Confirm that a usage 
@@ -215,6 +76,171 @@
 		</ul>
 		<li><b>/enc</b> to indicate that the specified passwords are encrypted.  
 		Note that the <b>/enc</b> switch is only for private use.
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>ESConvertUSSToTXT - Functionality</h2>
+<ul>
+   	<li>Double-click on the EXE within the <b>CommonComponents</b> folder.  Confirm that a usage 
+	message is provided.
+   	<li><b>[LegacyRC #4936]</b> Special licensing required
+	<ul>
+   		<li>Confirm that <b>ESConvertUSSToTXT</b> does not run with only an 
+		<b>RDT</b> license.
+   		<li>Confirm that <b>ESConvertUSSToTXT</b> does run with a 
+		<b>Scansoft OEM OCR</b> license.
+   		<li>Confirm that a <b>USB key</b> is required to run the application.
+	</ul>
+   	<li>Confirm that a non-default icon is provided for the application.
+   	<li>Confirm that a DOS Window does not appear on the task bar when the application is running.
+	<li>Use image files from the RedactionDemo folder for the following tests.  The application 
+	should be exercised via <b>LaunchApplication</b> from the File Action Manager.
+	<ul>
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt</b> successfully creates output text files.
+   		<li>Rename one of the USS files so that it will be missing when the 
+		source document is processed.
+   		<li>Delete the previous <b>TXT</b> files. 
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt</b> displays an error message for the missing 
+		<b>USS</b> file.  Other files will be processed successfuly.
+   		<li>Delete the previous <b>TXT</b> files. 
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt /m:none</b> processes successfully without an 
+		output file created for the missing USS file.
+   		<li>Delete the previous <b>TXT</b> files. 
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt /m:zero</b> processes successfully with a zero-length 
+		output file created for the missing USS file.
+   		<li>Delete the previous <b>TXT</b> files. 
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt /ef C:\errortest.uex</b> processes successfully without an 
+		output file created for the missing USS file.
+   		<li>Confirm that <b>C:\errortest.uex</b> exists and contains one entry.
+   		<li>Run the same test again and confirm that <b>C:\errortest.uex</b> exists and 
+		contains two entries.
+	</ul>
+<p>
+	<LI><b>[LegacyRC #5338]</b> - Exercise new options
+	<ul>
+		<li>Confirm that <b>/Indexing</b> works to decrement the Indexing counter for 
+		each page of the document.
+		<li>Confirm that <b>/Pagination</b> works to decrement the Pagination counter 
+		for each page of the document.
+		<li>Confirm that <b>/Redaction</b> works to decrement the Redaction counter 
+		for each page of the document.
+       	</ul>
+   	</LI>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>ESOCR</h2>
+<ul>
+  	<li><b>Basic Operation and Command-Line Arguments</b></li>
+  	<ul>
+    		<li>Get local copies of test images from 
+		<b>ReusableComponents/COMComponents/UCLIDRasterAndOCRMgmt/Utils/ESOCR/InteractiveTest</b>.</li>
+    		<li>Confirm that ESOCR requires a license file.</li>
+    		<li>Confirm that an error message is displayed if ESOCR executes with only 
+		one argument.</li>
+    		<li>Confirm that an error message is displayed if ESOCR executes with 
+		four arguments.</li>
+    		<li>Confirm that ESOCR supports infile and outfile arguments with an optional 
+		<b>/se</b> argument.</li>
+		<li><b>[LegacyRC #4986]</b> Confirm that ESOCR supports both absolute and relative 
+		paths for both infile and outfile arguments.</li>
+  	</ul></li>
+<p>
+  	<li><h2>Error Conditions</h2></li>
+  	<ul>
+    		<li>Confirm that <b>TwoPages.tif</b> displays <b>Must be single-page 
+		image</b> exception.</li>
+    		<li>Confirm that <b>TooTall.tif</b> displays <b>Image is too tall</b> exception.</li>
+    		<li>Confirm that <b>TooWide.tif</b> displays <b>Image is too wide</b> exception.</li>
+<p>
+    		<li>Confirm that <b>TooWide.tif</b> does not display an exception 
+		if the <b>/se</b> argument is used.</li>
+    		<li>Also confirm that <b>TooWide.tif</b> with the <b>/se</b> argument does not 
+		create an output file.</li>
+		<li>Confirm that even when exceptions are thrown ESOCR does not throw an <b>MFC error</b>.</li>
+  	</ul></li>
+<p>
+  	<li><h2>Success Case</h2></li>
+  	<ul>
+    		<li>Confirm that <b>SmallImage.tif</b> OCRs successfully.</li>
+  	</ul></li>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>FAM DB Lock Checker</h2>
+<ul>
+   	<li>TBD</li>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Find String</h2>
+<ul>
+  	<li><b>General</b>
+    	<ul>
+                <li>Confirm that <b>FindString</b> requires a suitable license file. (RDT License)
+                <li>Confirm that FindString displays a <b>usage</b> message if other than 2-10 arguments 
+		are provided on the command-line.
+            </ul>
+        </li>
+<p>
+        <li><b>FindString - Interactive testing</b>
+	<ul>
+		<li>Copy the contents of the folder at 
+		<b>\ProductDevelopment\Utils\FindString\InteractiveTest</b> 
+		to <b>C:\test</b> (case sensitive).</li>
+		<li>Follow the instructions that appear on the command line after running 
+		<b>FindString_Test.bat</b>.</li>
+		<li>For each compare case, confirm that there are <b>no differences</b>.</li>
+		<li>For each usage display confirm that there is a <b>console message</b> matching the
+		expected message.</li>
+		<li>For each exception dialog, ensure the exception text <b>matches</b> the
+		expected message.</li>
+		<li>For the exception log, (which is written to the <b>same directory</b> as the 
+		FindString_Test.bat file) confirm its existence with a <b>current</b> timestamp.</li>
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Get Word Length Dist</h2>
+<ul>
+        <li><b>General</b>
+        <ul>
+		<li>Confirm that <b>GetWordLengthDist</b> requires a suitable license file. (RDT License)
+		<li>Confirm that GetWordLengthDist displays a <b>usage</b> message if other than 
+		2-6 arguments are provided on the command-line.
+	</ul>
+	</li>
+<p>
+	<li><b>GetWordLengthDist - Interactive testing</b>
+	<ul>
+		<li>Run <b>GetWordLengthDist_Test.bat</b>.</li>
+		<li>Follow the instructions that appear on the command line</li>
+		<ul>
+			<li>For each compare case, confirm that there are <b>no differences</b>.</li>
+			<li>For each csv case, confirm that there are <b>no differences</b>.</li>
+		</ul>
+		<li>For each usage display confirm that there is a <b>console message</b> matching 
+		the expected message.</li>
+		<li>For each exception dialog, ensure the exception text <b>matches</b> 
+		the expected message.</li>
+		<li>For the exception log, (which is written to the <b>same directory</b> as the 
+		GetWordLengthDist_Test.bat file) confirm its existence with a <b>current</b> timestamp.</li>
 	</ul>
 </ul>
 </li>
@@ -423,99 +449,169 @@
 <br />
 
 <!-- *********************************************** -->
-<li><h2>ESConvertUSSToTXT - Functionality</h2>
+<li><h2>Image Format Converter - Functionality</h2>
 <ul>
-   	<li>Double-click on the EXE within the <b>CommonComponents</b> folder.  Confirm that a usage 
-	message is provided.
-   	<li><b>[LegacyRC #4936]</b> Special licensing required
+   	<li>Execute the following test cases from a command window.  A TIF image and a PDF image 
+	will be needed for these tests.</li>
+   	<li>Confirm that <b>ImageFormatConverter</b> without additional arguments provides 
+	a usage message.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;TIF_File.pdf&gt; 
+	/pdf</b> creates a PDF file that is a copy of the TIF file.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;PDF_File.pdf&gt; &lt;PDF_File.tif&gt; 
+	/tif</b> creates a TIF file that is a copy of the PDF file.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;JPG_File.jpg&gt; 
+	/jpg</b> creates a JPG file that is a copy of the TIF file.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;PDF_File.pdf&gt; &lt;JPG_File.jpg&gt; 
+	/jpg</b> creates a JPG file that is a copy of the PDF file.</li>
+   	<li>Confirm that other output types such as <b>/bmp</b> are not supported and provide 
+	a meaningful error message.</li>
+<p>
+	<li><b>[LegacyRC #5206]</b> Proper handling of large images
 	<ul>
-   		<li>Confirm that <b>ESConvertUSSToTXT</b> does not run with only an 
-		<b>RDT</b> license.
-   		<li>Confirm that <b>ESConvertUSSToTXT</b> does run with a 
-		<b>Scansoft OEM OCR</b> license.
-   		<li>Confirm that a <b>USB key</b> is required to run the application.
-	</ul>
-   	<li>Confirm that a non-default icon is provided for the application.
-   	<li>Confirm that a DOS Window does not appear on the task bar when the application is running.
-	<li>Use image files from the RedactionDemo folder for the following tests.  The application 
-	should be exercised via <b>LaunchApplication</b> from the File Action Manager.
-	<ul>
-   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
-		&lt;SourceDocName&gt;.txt</b> successfully creates output text files.
-   		<li>Rename one of the USS files so that it will be missing when the 
-		source document is processed.
-   		<li>Delete the previous <b>TXT</b> files. 
-   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
-		&lt;SourceDocName&gt;.txt</b> displays an error message for the missing 
-		<b>USS</b> file.  Other files will be processed successfuly.
-   		<li>Delete the previous <b>TXT</b> files. 
-   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
-		&lt;SourceDocName&gt;.txt /m:none</b> processes successfully without an 
-		output file created for the missing USS file.
-   		<li>Delete the previous <b>TXT</b> files. 
-   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
-		&lt;SourceDocName&gt;.txt /m:zero</b> processes successfully with a zero-length 
-		output file created for the missing USS file.
-   		<li>Delete the previous <b>TXT</b> files. 
-   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
-		&lt;SourceDocName&gt;.txt /ef C:\errortest.uex</b> processes successfully without an 
-		output file created for the missing USS file.
-   		<li>Confirm that <b>C:\errortest.uex</b> exists and contains one entry.
-   		<li>Run the same test again and confirm that <b>C:\errortest.uex</b> exists and 
-		contains two entries.
+		<li>Work with the images in <b>I:\Common\Engineering\ProductTesting\ManyPage Images</b>
+	   	<li>Confirm that the 275-page TIF can be converted to a PDF without error. 
+	   	<li>Confirm that the resulting PDF has 275 pages. 
+	   	<li>Confirm that the 275-page PDF can be converted back to a TIF without error. 
+	   	<li>Confirm that the resulting TIF has 275 pages. 
 	</ul>
 <p>
-	<LI><b>[LegacyRC #5338]</b> - Exercise new options
-	<ul>
-		<li>Confirm that <b>/Indexing</b> works to decrement the Indexing counter for 
-		each page of the document.
-		<li>Confirm that <b>/Pagination</b> works to decrement the Pagination counter 
-		for each page of the document.
-		<li>Confirm that <b>/Redaction</b> works to decrement the Redaction counter 
-		for each page of the document.
+   	<LI><b>[LegacyRC #5292]</b> Converting TIFs to PDFs
+       	<ul>
+		<li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5292</b> 
+		image files.
+		<li>Confirm that each image can be converted to a PDF.
        	</ul>
-   	</LI>
+<p>
+   	<LI><b>[LegacyRC #5298]</b> PDF page sizes from Image Format Converter
+       	<ul>
+		<li>Make a local copy of the <b>Old Republic Title\RedactionDemo\Set003</b> 
+		image files.  Use <b>Image Format Converter</b> to convert them from PDF 
+		format to TIF.
+		<li>Open each image file in the Image Viewer.  Confirm that pages of different 
+		size are displayed without black areas.
+		<li>Write basic rules using Extract Lines.  Confirm that spatial information for 
+		OCR'd text is correct for both legal-size and letter-size pages.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #5318]</b> Image Format Converter
+       	<ul>
+      		<li>Execute <b>ImageFormatConverter.exe /?</b> from a command window.
+      		<li>Confirm that a usage message is displayed.
+      		<li>Confirm that <b>two optional arguments</b> text is displayed.
+      		<li>Confirm that the <b>/retain</b> option is documented.
+      		<li>Confirm that both options are documented in the help file.
+       	</ul>
+<p>
+   	<LI><b>[LegacyRC #5588</b> Confirm that ImageFormatConverter.exe will create the output 
+	folder if it does not exist.
+   	<LI><b>[LegacyRC #5589]</b> Confirm that ImageFormatConverter.exe requires a <b>FLEX 
+	Index / ID Shield Core</b> license in order to convert a TIF file to a TIF file.
+<p>
+	<li><b>[LegacyRC #5739]</b> Confirm that <b>ImageFormatConverter.exe</b> supports the following 
+	command-line options
+	<ul>
+		<li><b>/user &quot;&lt;password&gt;&quot;</b> for specifying a user password
+		<li><b>/owner &quot;&lt;password&gt;&quot; &lt;Permissions&gt;</b> for 
+		specifying an owner password and permissions
+		<ul>
+			<li><b>0</b> for no permissions
+			<li><b>1</b> to allow low quality printing
+			<li><b>2</b> to allow high quality printing
+			<li><b>4</b> to allow document modifications
+			<li><b>8</b> to allow copying/extraction of contents
+			<li><b>16</b> to allow accessibility access to contents
+			<li><b>32</b> to allow adding/modifying text annotations
+			<li><b>64</b> to allow filling in form fields
+			<li><b>128</b> to allow document assembly
+			<li><b>255</b> to allow all permissions
+		</ul>
+		<li><b>/enc</b> to indicate that the specified passwords are encrypted.  
+		Note that the <b>/enc</b> switch is only for private use.
+	</ul>
+<p>
+   	<LI><b>[LegacyRC #5823]</b> Multipage TIF converts to blank PDF
+       	<ul>
+		<li>Use <b>ImageFormatConverter.exe</b> to convert the image from 
+		<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5823</b> to a PDF.
+		<li>Confirm that the output PDF does not have blank pages.
+       	</ul>
+<p>
+	<li><b>Image conversion for same type</b>
+	<ul>
+		<li>Referenced images can be found in 
+		<b>I:\Common\Engineering\ProductTesting\UniqueImageTypes</b>.
+	   	<li>Confirm that <b>jpeg_tiff.tif</b> can be converted to a TIF without error. 
+	   	<li>Confirm that <b>VersionOnePointTwo.pdf</b> can be converted to a PDF 
+		without error. 
+	   	<li>Confirm that <b>VersionOnePointFive.pdf</b> can be converted to a PDF 
+		without error. 
+	</ul>
+<p>
+    <li><b>[LegacyRC #5859]</b> ImageFormatConverter PDF output
+    <!-- fixed v 8.1.0.34 -->
+    <ul>
+        <li>Use ImageFormatConverter.exe to convert a file to PDF format.
+        <li>Confirm that the output PDF uses Group 4 compression.
+    </ul>    
 </ul>
 </li>
 <br />
 
 <!-- *********************************************** -->
-<li><h2>Email File - Functionality</h2>
+<li><h2>Image Format Converter - Error Logging</h2>
 <ul>
-   	<li>Create <b>C:\A.txt</b> (a simple text file) to be emailed during this test.</li>
-   	<li>Note that <b>SELF</b> refers to your email address during this test.</li>
-   	<li>Note that <b>OTHER</b> refers to another tester's email address during this test.</li>
+   	<li>Execute the following test cases from a command window.  A TIF image and a PDF image 
+	will be needed for these tests.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;TIF_File.pdf&gt; 
+	/pABC /ef C:\tiflog.uex</b> does not create a the desired PDF file and creates a 
+	non-empty <b>C:\tiflog.uex</b> log file.</li>
+   	<li>Confirm that <b>C:\tiflog.uex</b> contains an exception that complains about 
+	unsupported file types.</li>
+   	<li>Re-run the same ImageFormatConverter command and confirm that the existing 
+	<b>C:\tiflog.uex</b> log is not overwritten.</li>
 <p>
-   	<li>Confirm that <b>EmailFile /c</b> displays a configuration dialog for 
-	email settings.</li>
-   	<li>Confirm that the settings are persistent.</li>
-   	<li>Configure some invalid settings and attempt to send an email.  Confirm that an 
-	exception dialog is presented to the user.</li>
-   	<li>Confirm that <b>EmailFile C:\A.txt SELF</b> emails the file to you. 
-   	<li>Confirm that <b>EmailFile /z C:\A.txt SELF</b> emails the file to you and that the file 
-	has been zipped. 
-   	<li>Confirm that <b>EmailFile C:\A.txt SELF;OTHER</b> emails the file to both you and 
-	the other tester. 
-   	<li>Confirm that <b>EmailFile C:\A.txt SELF,OTHER</b> emails the file to both you and 
-	the other tester. 
-   	<li>Confirm that <b>EmailFile /subject &quot;SEND FILE&quot; C:\A.txt SELF</b> emails the file 
-	to you with <b>SEND FILE</b> as the subject line. 
-   	<li>Confirm that <b>EmailFile C:\AB.txt SELF</b> sends an email without an attachment.
-<p>
-   	<li><b>Error testing</b>
+   	<li>Execute the following test cases from the File Action Manager.  A folder containing 
+	3 or more PDF images will be needed for these tests.</li>
+   	<li>Create a separate FPS file to supply the PDF images from the test folder.  Confirm that 
+	running this FPS file successfully supplies the files to the database.</li>
+   	<li>Create a separate FPS file to perform auto-redaction on the previously supplied PDF 
+	images.  Before running this FPS file, rename two of the images.</li>
+   	<li>Run the auto-redaction FPS file.</li>
 	<ul>
-   		<li>Prepare an error situation by using bad SMTP settings.
-   		<li>Confirm that <b>EmailFile C:\AB.txt SELF /ef C:\error.uex</b> creates an error log with 
-		a meaningful error message and does not display an error message
-   		<li>Confirm that repeating <b>EmailFile C:\AB.txt SELF /ef C:\error.uex</b> appends an entry 
-		to the error log.
+	   	<li>Confirm that the two renamed files fail processing.</li>
+	   	<li>Confirm that the exceptions associated with the failures complain about the 
+		file not being found.</li>
+	   	<li>Confirm that the remaining files are processed without error.</li>
 	</ul>
 </ul>
 </li>
 <br />
 
 <!-- *********************************************** -->
+<li><h2>Log Process Stats</h2>
+<ul>
+   	<li>TBD</li>
+</ul>
+</li>
+<br />
 
+<!-- *********************************************** -->
+<li><h2>Modify PDF File</h2>
+<ul>
+   	<li>TBD</li>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Office To TIF</h2>
+<ul>
+   	<li>TBD</li>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
 <li><h2>RedactFromXML</h2>
 <ul>
     <li><u>Functionality</u>
@@ -551,6 +647,59 @@
         text.</li>
     </ul></li>
 </ul></li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Set Operations</h2>
+<ul>
+        <li><b>General</b>
+        <ul>
+            <li>Confirm that <b>SetOperations</b> requires a suitable license file.</li>
+            <li>Confirm that SetOperations displays a <b>usage</b> message if an invalid
+            number of arguments are provided on the command line.</li>
+        </ul></li>
+<p>
+        <li><b>SetOperations - Interactive testing</b>
+        <ul>
+            <li>Run <b>SetOp_Test.bat</b>.</li>
+            <li>For each test case that is diff'ed, confirm that <b>FC: no differences 
+            encountered</b> is displayed in the command window.</li>
+            <li>Confirm that odd-numbered tests print the text <b>List of duplicates: red</b>.</li>
+            <li>For the exception log, confirm its existence with a <b>current</b> timestamp.</li>
+            <li>Confirm that the exception complains about the presence of duplicate items in one
+            of the lists.</li>
+        </ul>
+    <p>
+        <li><b>Fixed SCRs</b>
+        <ul>
+            <li><b>[LegacyRC #4990]</b> Confirm that SetOperations.exe works correctly with large 
+            (~million line) files.</li>
+        </ul></li>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Split File</h2>
+<ul>
+       	<li><b>Usage</b>
+       	<ul>
+		<li>From a command prompt, type <b>SplitFile</b>.
+		<LI>Confirm that a usage statement is provided: 
+		<b>SplitFile</b> <<b>File with file list> <# lines per file></b>
+        </ul>
+<p>
+	<li><b>Test</b>
+	<ul>
+               	<li>Create a file with 10 lines named <b>input.txt</b>.
+               	<li>Open a command prompt in the <b>input.txt</b> directory.
+               	<li>Execute the following command: <b>SplitFile input.txt 5</b>
+		<li>Confirm that two files are created: <b>input.1</b> with lines 1-5 
+		and <b>input.2</b> with lines 6-10.
+        </ul>
+</ul>
+</li>
+<br />
 
 <!-- *********************************************** -->
 <li><h2>Other</h2>
