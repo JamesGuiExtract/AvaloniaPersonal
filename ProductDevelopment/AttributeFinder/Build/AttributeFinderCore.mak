@@ -114,9 +114,8 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\SetOperations.exe" /mapout:"$(BinariesFolder)\Map\mapSetOperations.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\ModifyPdfFile.exe" /mapout:"$(BinariesFolder)\Map\mapModifyPdfFile.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Utilities.Ftp.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Utilities.Ftp.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.ExceptionService.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ExceptionService.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.ExceptionService.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ExceptionService.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe  /in:"$(BinariesFolder)\ExceptionHelper.dll" /mapout:"$(BinariesFolder)\Map\mapExceptionHelper.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.ExceptionService.exe" /mapout:"$(BinariesFolder)\Map\mapExtract.ExceptionService.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\ExceptionHelper.exe" /mapout:"$(BinariesFolder)\Map\mapExceptionHelper.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\IDShieldOnDemand.exe" /mapout:"$(BinariesFolder)\Map\mapIDShieldOnDemand.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 EncryptAndCopyComponentDataFiles: 
