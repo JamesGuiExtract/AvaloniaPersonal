@@ -1,0 +1,431 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.25 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.25 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+    <LI><h3>Recently fixed SCRs</h3>
+    <ul>
+        <li><b>[LegacyRC #5005, 6097, 6098, 6100]</b> USS File Viewer
+        <ul>
+            <li>Confirm that the USS File Viewer allows you to find the next and previous 
+            matches.</li>
+            <li>Confirm that the USS File Viewer search begins from the current location and wraps
+            at the end of the document.</li>
+            <li>Confirm that the USS File Viewer find dialog always shows advanced settings.</li>
+            <li>Confirm that F3 and Shift+F3 are supported shortcuts for find next/find 
+            previous.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5311]</b> OCR exceptions
+        <ul>
+            <li>Make many copies of the images in the PVCS testing folder for this SCR.</li>
+            <li>Set up an FPS file and OCR the copies; the test should run for at least an 
+            hour.</li>
+            <li>Confirm that no exceptions are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5914, #6107]</b> Reports
+        <ul>
+            <li>Confirm that all reports can be run without error on an empty database.</li>
+            <li>Confirm that they can be run without error on a database with nontrivial data.</li>
+            <li>Confirm that you get correct results on databases with active queueing and 
+            processing.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5935]</b> Apply Bates Number
+        <ul>
+            <li>Queue a large number of files and add a counter to the database.</li>
+            <li>Configure an FPS file with an Apply Bates Number task.</li>
+            <li>Simultaneously run several instances of the FPS file.</lI>
+            <li>Confirm that no optimistic concurrency check errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5939]</b> Database stats after processing skipped files
+        <ul>
+            <li>Queue 10 files.</li>
+            <li>Manually set them to skipped.</li>
+            <li>Create an FPS file configured to process skipped files.</li>
+            <li>Process the 10 files.</li>
+            <li>Confirm that the statistics in the FAM status bar, the database, and the DB Admin
+            are all correct.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #5943]</b>
+        <ul>
+            <li>Create a database, queue some files, and start them processing.</li>
+            <li>While files are being processed, open the DB Admin and try to clear the 
+            database.</li>
+            <li>A dialog will appear informing you that there is active processing; dismiss 
+            it.</li>
+            <li>Confirm that all DB Admin menu items are enabled as appropriate.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6042]</b> FAM context menus in file grids
+        <ul>
+            <li>Install ID Shield on a 32-bit operating system.</li>
+            <li>Confirm that you can open a file using the context menu in the grids in the 
+            queue/processing log tabs of the FAM.</li>
+            <li>Confirm that you can open a file location using the context menu in the grids in 
+            the queue/processing log tabs of the FAM.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6072]</b> DB Admin manually set status
+        <ul>
+            <li>Confirm that the Manually set action status dialog does not accept blank
+            parameters.</lI>
+        </ul></li>
+    <p> 
+        <li><b>[LegacyRC #6075]</b> User License "Open license folder" button
+        <ul>
+            <li>Confirm that the external User License utility includes a button to open the user
+            license folder.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6092]</b> FAM behavior with empty queue
+        <ul>
+            <li>Create an FPS file configured to process continuously.</li>
+            <li>Configure a second FPS file for verification.</li>
+            <li>Enqueue a small number of files for the first FPS file.</li>
+            <li>Enqueue a small number of files for the second FPS file.</li>
+            <li>Run several instances of the first FPS file.</li>
+            <li>Wait a minute or two after processing finishes while the FAM waits for more files
+            to process.</li>
+            <li>Open and run the second FPS file.</li>
+            <li>Confirm that there is no inordinate delay when the verification UI loads.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6096]</b> Doc tag change history report
+        <ul>
+            <li>Confirm the existence of a Document tag change history report.</li>
+            <li>Confirm that it includes columns for
+            <ul>
+                <li>filename</li>
+                <li>timestamp</li>
+                <li>tag name</li>
+                <li>added/removed</li>
+                <li>user</li>
+                <li>machine</li>
+            </ul></li>
+            <li>Confirm that it takes the parameters
+            <ul>
+                <li>Reporting period</li>
+                <li>Tag name</li>
+            </ul></li>
+            <li>Confirm that it works correctly in databases with 0, 1, and many tags.</li>
+            <li>Confirm that it works correctly with a completely empty database.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6105]</b> Update schema
+        <ul>
+            <li>Create an 8.0 database.</li>
+            <li>Open it in the DB Admin in the current build and update the schema.</li>
+            <li>Confirm that the updated database includes the GetFilesToProcessTransactionTimeout
+            setting.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6110, 6115, 6117]</b> UCLIDException
+        <ul>
+            <li>Confirm that ExtractException.uex is located in the <b>LogFiles</b> directory, not
+            the <b>LogFiles/Misc</b> directory.</li>
+            <li>Confirm that a registry key can be set to log exceptions remotely (the necessary
+            registry keys can be found in the PVCS_Testing folder for LegacyRC #6117).</li>
+            <li>Confirm that when exceptions are logged remotely, they are logged with details
+            (e.g., user and machine name) from the originating machine.</li>
+        </ul></li>
+    <p>
+        <li><b>[LegacyRC #6112]</b> Licensing
+        <ul>
+            <li>Create a temporary license.</li>
+            <li>Start processing something.</li>
+            <li>Roll back the date.</li>
+            <li>After the license state is corrupt, drop a permanent license into the LicenseFiles
+            directory.</li>
+            <li>Reboot.</li>
+            <li>Confirm that you can open the FAM without error.</li>
+        </uL></li>
+    <p>
+        <li><b>[LegacyRC #6114, DotNetRC #666]</b> Database Options interval to check for files
+        <ul>
+            <li>Open the Database Options dialog in the DB Admin.</li>
+            <li>Specify very large numbers for the minimum and maximum time between checking for
+            files to process.</li>
+            <li>Confirm that reasonable messages are displayed.</li>
+            <li>Confirm correct behavior setting very small values.</li>
+            <li>Confirm that the minimum minimum value is .5 seconds and the maximum maximum value
+            is 5 minutes.</li>
+            <li>Confirm that an empty string is also invalid.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #2795, 3069]</b> Select Page Region and box/line finders
+        <ul>
+            <li>Run the RSD file in the PVCS_Testing folder for #3069 on the image in the same
+            folder.</li>
+            <li>Confirm that no errors are seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4122]</b> ConvertLegacyHybridStrings registry setting
+        <ul>
+            <li>Confirm that the key HKCU\Software\Extract
+            Systems\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\ConvertLegacyHybridStrings
+            is not present.</li>
+            <li>Confirm that that if you run the tests in the PVCS_Testing folder for #4006, you
+            get appropriate results.</li>
+            <li>Add the above key and confirm that it has no effect on the results of those
+            tests.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4194]</b> ID Shield statistics reporter and numbered extensions
+        <ul>
+            <li>Grab a set of images with numbered extensions, process them, and verify them while
+            collecting feedback.</li>
+            <li>Run the ID Shield Statistics Reporter and confirm that you get correct statistics
+            and all of the images were counted.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4229]</b> Open the Convert VOA to XML task property page and confirm
+        that it does not contain an empty, disabled edit box.</li>
+    <p>
+        <li><b>[FlexIDSCore #4291]</b> SRICA
+        <ul>
+            <li>The files referenced are in the PVCS_Testing folder for this SCR.</li>
+            <li>Run <b>srica.rsd</b> on the image in the folder and confirm that any subattributes
+            are completely contained by their parents.</li>
+            <li>Run <b>srica2.rsd</b> and confirm that any subattributes are completely contained
+            by their parents.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4451]</b> Run the memory leak tests as a service and confirm that
+        FamProcess.exe does not leak memory.</li>
+    <p>
+        <li><b>[FlexIDSCore #4511, 4527, 4537, 4556, 4587, 4634, 4662, 4664, 4668, 4670, 4671, 
+        4676, 4683]</b> Verification stuff
+        <ul>
+            <li>Open verification and select the word redaction tool.</li>
+            <li>Save the first document.</li>
+            <li>Using the keyboard shortcuts, switch between the first and second documents as
+            quickly as possible.</li>
+            <li>Confirm that no exceptions are seen.</li>
+        <p>
+            <li>Open a document that contains some redactions. Confirm that the magnifier window
+            is open.</li>
+            <li>Resize the redaction.</li>
+            <li>Confirm that the size change is not too jittery.</li>
+            <li>Click on a grip handle.</li>
+            <li>Confirm that the redaction is not resized until you drag the grip handle.</li>
+        <p>
+            <li>With the magnifier open, confirm that tracking events do not suffer from poor
+            performance and that CPU usage is not unreasonable.</li>
+        <p>
+            <li>Open verification and select the word highlight tool.</li>
+            <li>Ensure that the ImageViewer does not have focus.</li>
+            <li>Start the slideshow.</li>
+            <li>Before the image changes, move the mouse over the image viewer and use ctrl+mouse
+            wheel to try to zoom in.</li>
+            <li>The "Slideshow Paused" messages will dispay, but it will not zoom in. While the
+            message is still displayed, click in the ImageViewer and try to zoom again.</li>
+            <li>Confirm that no exceptions are seen.</li>
+        <p>
+            <li>Confirm that the verification slideshow does not stop when you press the Page Down
+            key.</li>
+        <p>
+            <li>Confirm that shift+tab can take you to the previous document.</li>
+            <li>Confirm that tab navigation does not take into account the viewed/unviewed state of
+            pages/attributes.</li>
+            <li>Confirm that ctrl+tab and ctrl+shift+tab navigate to the last-visited page of the
+            next or previous document.</li>
+        <p>
+            <li>Run the compute FPS file from the ID Shield demo.</li>
+            <li>Run the verification FPS file.</li>
+            <li>Tab through documents 1 and 2.</li>
+            <li>On document 3, hit tab once to view the second redaction, then click on pages 2, 3,
+            and 4 in the page summary.</li>
+            <li>Save the document.</li>
+            <li>Hit ctrl+tab 3 times and confirm that you navigate correctly.</li>
+        <p>
+            <li>Confirm that the Previous redaction and Previous document buttons are enabled
+            except on the first redaction/document processed, and the Next redaction and Next
+            document buttons are always enabled.</li>
+        <p>
+            <li>In the Verification task property page, open the slideshow settings dialog.</li>
+            <li>Check the "Stop slideshow when..." box and confirm that the associated edit box is
+            read-only.</lI>
+        <P>
+            <li>Open the document in the PVCS_Testing folder for #4670 in verification.</li>
+            <li>Confirm that it opens to the appropriate page and that nothing is erroneously
+            marked viewed.</li>
+        <p>
+            <li>Queue some documents.</li>
+            <li>Verify all but the last one.</li>
+            <li>Skip the last document in the queue.</li>
+            <li>Confirm that no errors are seen.</li>
+        <p>
+            <li>Configure verification to require the user to visit all pages.</li>
+            <li>Open verification and advance to a document with multiple pages. If there are any
+            redactions on the first page, select the last one.</li>
+            <li>Start the slideshow.</li>
+            <li>Press tab.</li>
+            <li>Confirm that the slideshow timer restarts on the next page.</li>
+        <p>
+            <li>Open the verification options in the verification UI.</li>
+            <li>Confirm that both tabs are displayed correctly.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4641]</b> Confirm that the ExecuteRules task defaults to saving and
+        using previous OCR results.</li>
+    <p>
+        <li><b>[FlexIDSCore #4684, 4687]</b> IDShieldOnDemand
+        <ul>
+            <li>Confirm that IDShieldOnDemand is installed.</li>
+            <li>Confirm that there is a start menu shortcut for IDShieldOnDemand.</li>
+            <li>Confirm the following behavior:
+            <ul>
+                <li>Application title is "ID Shield on Demand"</li>
+                <li>The application will optionally accept a single command-line parameter as the
+                document to open when it launches.</li>
+                <li>does not connect to a database.</li>
+                <li>has an Open file button and menu option.</li>
+                <li>Document navigation buttons and shortcuts are not available.</li>
+                <li>Tab and the Next item button do not attempt to save and close the current
+                document once the last item is reached.</li>
+                <li>the "Save and commit" button is just a save button.</li>
+                <li>When a document is saved, it will prompt for a location to save redacted
+                output.</li>
+                <li>PDF files can be opened if licensed</li>
+                <li>If the opened file is a PDF, when saving redacted output, it should default to
+                a PDF extension.</li>
+                <li>The default output location is $InsertBeforeExtension(&lt;SourceDocName&gt;,
+                .redacted)</li>
+                <li>The user cannot overwrite the source image with the redacted image.</li>
+                <li>The settings cannot be configured
+                <ul>
+                    <li>VerifyAllPages is false</li>
+                    <li>VerifyAllItems is false</li>
+                    <li>Require types is false</li>
+                    <li>Seamless mode is false</li>
+                    <li>Slideshow is disabled</li>
+                    <li>Redactions are created for all enabled items</li>
+                    <li>Redaction text will be &lt;Exemption Codes&gt;</li>
+                </ul></li>
+                <li>There is an "ID Shield On Demand" verification options tab.</li>
+                <li>That tab provides the option to create a VOA file every time, after a prompt,
+                or never.</li>
+                <li>If a VOA file already exists, changes will be saved regardless.</li>
+                <li>VOA files will be saved with OnDemandSession metadata.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #460]</b> Context menu in ExtractImageViewer
+        <ul>
+            <lI>Open an image in the ExtractImageViewer.</li>
+            <li>Confirm that the context menu has separate entries for each highlight tool.</li>
+            <li>Confirm that the Tools menu also has separate entries for each highlight tool.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #642]</b> Titles for property pages for new tasks
+        <ul>
+            <li>Configure Core: Create file</li>
+            <li>Configure Core: Delete empty folder</li>
+            <li>Configure Core: Modify PDF file</li>
+            <li>Configure Core: Modify SourceDocName in Database</li>
+            <li>Configure Core: Rasterize PDF</li>
+            <li>Configure Core: Set file priority</li>
+            <li>Configure Data Entry: Verify extracted data</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #643]</b> Delete Empty Folder browse button
+        <ul>
+            <li>Select the Delete empty folder task.</li>
+            <li>Check the box for Delete parent folders recursively.</li>
+            <li>Check the box for Up to but not including this folder</li>
+            <li>Click the Browse button and select a folder</li>
+            <lI>Confirm that the selected folder appears in the edit box</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #665]</b> Confirm that the Encrypt File task will create the destination
+        folder if it's not already present.</li>
+    <p>
+        <li><b>[DotNetRC #667]</b>
+        <ul>
+            <li>Use scripting options to open the ExtractImageViewer with some controls 
+            hidden.</li>
+            <li>Confirm that if buttons are hidden, the related menu items, context menu items, and
+            shortcut keys are also hidden/disabled.</li>
+            <li>Confirm that the hidden state of controls is not persisted when the Image Viewer is
+            opened again without using the scripting options.</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #668]</b> Confirm that the ExceptionService is installed with FLEX Index
+        and ID Shield.</lI>
+    <p>
+        <li><b>[DotNetRC #669, 671, 672]</b> ExceptionHelper
+        <ul>
+            <li>Confirm that ExceptionHelper.exe is installed.</li>
+            <li>Confirm that remote exception logging works (this needs a more specific test 
+            case)</li>
+        </ul></li>
+    <p>
+        <li><b>[DotNetRC #673]</b> FormStateManager
+        <ul>
+            <li>Run ID Shield verification via the FAM.</li>
+            <li>Run ID Shield verification via RunFPS on a machine where the current user has never
+            used RunFPS.</li>
+            <li>Confirm that the toolstrips are loaded correctly.</li>
+            <li>Delete the user.config file under "C:\Users\Username\AppData\Local\
+            AppName_Application\GibberishFolderName\VersionString"</li>
+            <li>Open verification in the application whose config file has been deleted.</li>
+            <li>Confirm that the toolstrips are loaded correctly.</li>
+        </ul></li>
+    </ul></li>
+    
+<p>
+    <LI><h3>Automated Testing</h3>
+    <ul>
+        <LI>Automated Tests
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Document Classification
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Redaction
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+        <LI>National Ruleset : Indexing
+        <ul>
+            <li>Date, Test Machine, Number of Failures</li>
+            <li>Notes</li>
+        </ul></li>
+    </ul></LI>
+<p>
+    <LI><h3>Sanity Testing</h3>
+    <ul>
+        <li>32-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+<p>
+        <li>64-bit Operating System
+        <ul>
+            <li>Date, Tester, Test Machine</li>
+            <li>Notes</li>
+        </ul></li>		 
+    </ul></LI>
+</OL>
+</BODY>
+</HTML>
