@@ -23,8 +23,11 @@
     <Setting Name="OnDemandCreateVOAFileMode" Type="Extract.Redaction.Verification.OnDemandCreateVOAFileMode" Scope="User">
       <Value Profile="(Default)">DoNotCreate</Value>
     </Setting>
-    <Setting Name="OCRText" Type="System.Boolean" Scope="User">
+    <Setting Name="AutoOcr" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="OcrTradeoff" Type="Extract.Imaging.OcrTradeoff" Scope="User">
+      <Value Profile="(Default)">Balanced</Value>
     </Setting>
   </Settings>
 </SettingsFile>

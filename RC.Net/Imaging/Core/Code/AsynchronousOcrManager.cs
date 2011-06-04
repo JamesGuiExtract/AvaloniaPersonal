@@ -43,7 +43,7 @@ namespace Extract.Imaging
         /// <summary>
         /// The percentage of OCR progress that has completed. 
         /// </summary>
-        private double _progressPercent;
+        double _progressPercent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OcrProgressUpdateEventArgs"/> class.
@@ -107,9 +107,10 @@ namespace Extract.Imaging
 
     /// <summary>
     /// A class to manage launching OCR operations in a separate thread.  Currently
-    /// only supports OCR of one document at a time.  If <see cref="OcrFile(string, int, int)"/>
-    /// is called multiple times it will abort the currently running <see cref="Thread"/>
-    /// and spawn a new one to OCR the newly specified file.
+    /// only supports OCR of one document at a time.  If
+    /// <see cref="OcrFile(string, int, int, CancellationToken?)"/> is called multiple times it
+    /// will abort the currently running <see cref="Thread"/> and spawn a new one to OCR the newly
+    /// specified file.
     /// <para><b>Note:</b></para>
     /// <see cref="Thread.Abort()"/> is non-deterministic, but once the thread acts on the
     /// signal the SSOCR2 instance will be cleaned up.
@@ -128,13 +129,13 @@ namespace Extract.Imaging
         /// A constant for how long to wait for OCR timeout when waiting for
         /// the OCR thread to complete.
         /// </summary>
-        private static readonly int _OCR_THREAD_COMPLETION_TIMEOUT = 60000;
+        static readonly int _OCR_THREAD_COMPLETION_TIMEOUT = 60000;
 
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
+        static readonly string _OBJECT_NAME =
             typeof(AsynchronousOcrManager).ToString();
 
         #endregion Constants
@@ -149,28 +150,28 @@ namespace Extract.Imaging
         /// <summary>
         /// Flag that indicates if the current OCR process has begun.
         /// </summary>
-        private volatile bool _currentlyInOcr;
+        volatile bool _currentlyInOcr;
 
         /// <summary>
         /// Holds a stringized byte stream representation of the SpatialString returned
         /// from the most recently completed OCR process.
         /// </summary>
-        private string _ocrTextStream;
+        string _ocrTextStream;
 
         /// <summary>
         /// The name of the file for the OCR thread to perform text recognition on.
         /// </summary>
-        private string _fileToOcr;
+        string _fileToOcr;
 
         /// <summary>
         /// Mutex object
         /// </summary>
-        private object _lock = new object();
+        object _lock = new object();
 
         /// <summary>
         /// Handle to the thread that is performing the OCR process.
         /// </summary>
-        private Thread _ocrThread;
+        Thread _ocrThread;
 
         /// <summary>
         /// The first page to OCR.
@@ -191,31 +192,37 @@ namespace Extract.Imaging
         /// Holds an instance of the ScansoftOcrClass so that we can use the same
         /// COM object throughout the life of the <see cref="AsynchronousOcrManager"/> class.
         /// </summary>
-        private ScansoftOCRClass _ssocr;
+        ScansoftOCRClass _ssocr;
 
         /// <summary>
         /// An <see cref="AutoResetEvent"/> indicating that a new document has been flagged
         /// for OCR.
         /// </summary>
-        private EventWaitHandle _newOcrEvent = new AutoResetEvent(false);
+        EventWaitHandle _newOcrEvent = new AutoResetEvent(false);
 
         /// <summary>
         /// An <see cref="ManualResetEvent"/> indicating that the OCR operation has
         /// completed.
         /// </summary>
-        private EventWaitHandle _ocrDocumentCompleteEvent = new ManualResetEvent(true);
+        EventWaitHandle _ocrDocumentCompleteEvent = new ManualResetEvent(true);
 
         /// <summary>
         /// An <see cref="ManualResetEvent"/> inidicating that the OCR thread should
         /// exit.
         /// </summary>
-        private EventWaitHandle _endThreadEvent = new ManualResetEvent(false);
+        EventWaitHandle _endThreadEvent = new ManualResetEvent(false);
 
         /// <summary>
         /// An <see cref="ManualResetEvent"/> indicating that the current OCR event
         /// has been canceled.
         /// </summary>
-        private EventWaitHandle _ocrCanceledEvent = new ManualResetEvent(false);
+        EventWaitHandle _ocrCanceledEvent = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Active <see cref="CancellationToken"/> that can be used to cancel the currently running
+        /// operation in lieu of calling <see cref="CancelOcrOperation"/>.
+        /// </summary>
+        CancellationToken? _cancelToken;
 
         #endregion Fields
 
@@ -405,7 +412,7 @@ namespace Extract.Imaging
         /// Delegate method for the OCR <see cref="Thread"/>. Will perform
         /// an OCR operation on the provided file name.
         /// </summary>
-        private void OcrFileThread()
+        void OcrFileThread()
         {
             try
             {
@@ -486,7 +493,7 @@ namespace Extract.Imaging
                             }
 
                             // Send last progress update message to indicate completion or canceled.
-                            if (_ocrCanceledEvent.WaitOne(0, false))
+                            if (OcrCanceled)
                             {
                                 // Canceled, send the cancel update
                                 OnOcrProgressUpdate(new OcrProgressUpdateEventArgs(
@@ -550,9 +557,13 @@ namespace Extract.Imaging
         /// <param name="startPage">The first page of the image to OCR.</param>
         /// <param name="endPage">The last page of the image to OCR, or -1 to OCR to the end of 
         /// the document.</param>
-        public void OcrFile(string fileName, int startPage, int endPage)
+        /// <param name="cancelToken">A <see cref="CancellationToken"/> that can be used to cancel
+        /// the currently running operation in lieu of calling <see cref="CancelOcrOperation"/>.
+        /// Can be <see langword="null"/> if there is no cancel token to use.</param>
+        public void OcrFile(string fileName, int startPage, int endPage,
+            CancellationToken? cancelToken)
         {
-            OcrImageArea(fileName, startPage, endPage, null);
+            OcrImageArea(fileName, startPage, endPage, null, cancelToken);
         }
 
         /// <summary>
@@ -570,7 +581,11 @@ namespace Extract.Imaging
         /// the document.</param>
         /// <param name="imageArea">The logical area of each which should be OCR'd.
         /// If null, the entirety of each page will be OCR'd</param>
-        public void OcrImageArea(string fileName, int startPage, int endPage, Rectangle? imageArea)
+        /// <param name="cancelToken">A <see cref="CancellationToken"/> that can be used to cancel
+        /// the currently running operation in lieu of calling <see cref="CancelOcrOperation"/>.
+        /// Can be <see langword="null"/> if there is no cancel token to use.</param>
+        public void OcrImageArea(string fileName, int startPage, int endPage, Rectangle? imageArea,
+            CancellationToken? cancelToken)
         {
             try
             {
@@ -630,6 +645,25 @@ namespace Extract.Imaging
 
                 // Set the OCR canceled event to unsignaled
                 _ocrCanceledEvent.Reset();
+
+                if (cancelToken != null)
+                {
+                    // Before launching the OCR process, ensure the operaion has not already been
+                    // canceled.
+                    if (cancelToken.Value.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        // If a cancel token has been provided, spawn a thread to watch for
+                        // cancelation.
+                        _cancelToken = cancelToken;
+                        Thread cancelTokenWatchThread =
+                            new Thread(new ThreadStart(CancelTokenWatchThread));
+                        cancelTokenWatchThread.Start();
+                    }
+                }
 
                 // Signal the New OCR event
                 _newOcrEvent.Set();
@@ -701,11 +735,31 @@ namespace Extract.Imaging
         }
 
         /// <summary>
+        /// Watches for the _cancelToken to be signaled and, if it is, cancels the currently running
+        /// operation.
+        /// </summary>
+        void CancelTokenWatchThread()
+        {
+            ExtractException.Assert("ELI32623", "OCR cancel token not initialized.",
+                _cancelToken != null);
+
+            // Wait for either the _cancelToken or _endThreadEvent handles to be signaled.
+            WaitHandle[] waitHandles =
+                new WaitHandle[] { _cancelToken.Value.WaitHandle, _endThreadEvent };
+
+            // If the _cancelToken handle was signaled, cancel the running operation.
+            if (WaitHandle.WaitAny(waitHandles) == 0)
+            {
+                CancelOcrOperation();
+            }
+        }
+
+        /// <summary>
         /// Gets the private license code for licensing the OCR engine.
         /// </summary>
         /// <returns>A <see cref="string"/> containing the private license
         /// key for licensing the OCR engine.</returns>
-        private static string GetSpecialOcrValue()
+        static string GetSpecialOcrValue()
         {
             return LicenseUtilities.GetMapLabelValue(new MapLabel());
         }

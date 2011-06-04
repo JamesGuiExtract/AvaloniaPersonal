@@ -152,6 +152,10 @@ namespace Extract.Redaction.Verification
 
             // Set the auto tool
             _autoToolComboBox.Enabled = _autoToolCheckBox.Checked;
+
+            _ocrTradeOffLabel.Enabled = _OCRCheckBox.Checked;
+            _ocrTradeOffLabel2.Enabled = _OCRCheckBox.Checked;
+            _ocrTradeOffComboBox.Enabled = _OCRCheckBox.Checked;
         }
 
         #endregion VerificationOptionsDialog Methods
@@ -172,9 +176,28 @@ namespace Extract.Redaction.Verification
                 AutoTool autoTool = _config.Settings.AutoTool;
                 _autoToolCheckBox.Checked = autoTool != AutoTool.None;
                 _autoToolComboBox.Text = Enum.GetName(typeof(AutoTool), autoTool);
-                _OCRCheckBox.Checked = _config.Settings.OCRText;
                 _autoZoomCheckBox.Checked = _config.Settings.AutoZoom;
                 _autoZoomScaleTrackBar.Value = _config.Settings.AutoZoomScale;
+                _OCRCheckBox.Checked = _config.Settings.AutoOcr;
+
+                switch (_config.Settings.OcrTradeoff)
+                {
+                    case Imaging.OcrTradeoff.Accurate:
+                        _ocrTradeOffComboBox.SelectedItem = "Accurate";
+                        break;
+
+                    case Imaging.OcrTradeoff.Balanced:
+                        _ocrTradeOffComboBox.SelectedItem = "Balanced";
+                        break;
+
+                    case Imaging.OcrTradeoff.Fast:
+                        _ocrTradeOffComboBox.SelectedItem = "Fast";
+                        break;
+
+                    default:
+                        _ocrTradeOffComboBox.SelectedItem = "Balanced";
+                        break;
+                }
 
                 // If the slideshow is enabled, populate all _runKeyOptions which can be recognized
                 // on this system.
@@ -236,7 +259,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI31592", ex);
+                ex.ExtractDisplay("ELI31592");
             }
         }
 
@@ -268,11 +291,26 @@ namespace Extract.Redaction.Verification
                 if (slideshowIntervalValid)
                 {
                     _config.Settings.AutoTool = GetAutoTool();
-                    _config.Settings.OCRText = _OCRCheckBox.Checked;
                     _config.Settings.AutoZoom = _autoZoomCheckBox.Checked;
                     _config.Settings.AutoZoomScale = _autoZoomScaleTrackBar.Value;
                     _config.Settings.OnDemandCreateVOAFileMode = GetOnDemandCreateVOAFileMode();
                     _config.Settings.AutoStartSlideshow = _slideshowAutoStartCheckBox.Checked;
+                    _config.Settings.AutoOcr = _OCRCheckBox.Checked;
+
+                    if (string.Compare(_ocrTradeOffComboBox.Text, "Accurate",
+                            StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        _config.Settings.OcrTradeoff = Imaging.OcrTradeoff.Accurate;
+                    }
+                    else if (string.Compare(_ocrTradeOffComboBox.Text, "Fast",
+                            StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        _config.Settings.OcrTradeoff = Imaging.OcrTradeoff.Fast;
+                    }
+                    else
+                    {
+                        _config.Settings.OcrTradeoff = Imaging.OcrTradeoff.Balanced;
+                    }
 
                     // Apply any newly selected slideshow run key.
                     if (_taskSettings.SlideshowSettings.SlideshowEnabled &&
@@ -291,9 +329,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27409", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ex.ExtractDisplay("ELI27409");
             }
             finally
             {
@@ -316,9 +352,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27410", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ex.ExtractDisplay("ELI27410");
             }
         }
 
@@ -337,9 +371,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27411", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ex.ExtractDisplay("ELI27411");
             }
         }
 
@@ -358,9 +390,25 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27412", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
+                ex.ExtractDisplay("ELI27412");
+            }
+        }
+
+        /// <summary>
+        /// Handles the CheckChanged event for the auto OCR checkbox.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleOcrCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateControls();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32629");
             }
         }
 

@@ -110,12 +110,24 @@ namespace Extract.Redaction.Verification.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool OCRText {
+        public bool AutoOcr {
             get {
-                return ((bool)(this["OCRText"]));
+                return ((bool)(this["AutoOcr"]));
             }
             set {
-                this["OCRText"] = value;
+                this["AutoOcr"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Balanced")]
+        public global::Extract.Imaging.OcrTradeoff OcrTradeoff {
+            get {
+                return ((global::Extract.Imaging.OcrTradeoff)(this["OcrTradeoff"]));
+            }
+            set {
+                this["OcrTradeoff"] = value;
             }
         }
     }

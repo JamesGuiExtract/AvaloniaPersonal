@@ -125,6 +125,9 @@
     <Compile Include="RasterZoneCollection.cs" />
     <Compile Include="RegistryManager.cs" />
     <Compile Include="SynchronousOcrManager.cs" />
+    <Compile Include="ThreadSafeSpatialString.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">

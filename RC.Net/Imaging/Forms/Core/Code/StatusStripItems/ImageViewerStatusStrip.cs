@@ -13,6 +13,7 @@ namespace Extract.Imaging.Forms
     /// Represents a <see cref="StatusStrip"/> pre-populated with the following labels:
     /// <para/>
     /// <see cref="UserActionToolStripStatusLabel"/>,
+    /// <see cref="BackgroundProcessStatusLabel"/>,
     /// <see cref="ResolutionToolStripStatusLabel"/>, and
     /// <see cref="MousePositionToolStripStatusLabel"/>.
     /// </summary>
@@ -51,6 +52,7 @@ namespace Extract.Imaging.Forms
 
                 ToolStripStatusLabel[] statusStripItems = new ToolStripStatusLabel[]{
                                                     new UserActionToolStripStatusLabel(),
+                                                    new BackgroundProcessStatusLabel(),
                                                     new ResolutionToolStripStatusLabel(),
                                                     new MousePositionToolStripStatusLabel()};
 

@@ -14,8 +14,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
+using System.IO;
 using System.Security.Permissions;
 using System.Windows.Forms;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.Imaging.Forms
 {
@@ -450,6 +452,23 @@ namespace Extract.Imaging.Forms
         /// </summary>
         Point _lastMouseLocation;
 
+        /// <summary>
+        /// A <see cref="ProgressStatusDialogForm"/> to display the progress of automatic document
+        /// OCR occuring in the background.
+        /// </summary>
+        ProgressStatusDialogForm _ocrProgressForm;
+
+        /// <summary>
+        /// When _ocrProgressForm is displayed, indicates whether the background OCR operation has
+        /// completed.
+        /// </summary>
+        bool _ocrCompleted;
+
+        /// <summary>
+        /// The OCR data associated with the currently loaded document (if available).
+        /// </summary>
+        ThreadSafeSpatialString _ocrData;
+
         #endregion Fields
 
         #region Delegates
@@ -575,6 +594,17 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public event EventHandler<ExtendedNavigationEventArgs> ExtendedNavigation;
 
+        /// <summary>
+        /// Raised when a new status message is available regarding the state of background operations.
+        /// </summary>
+        public event EventHandler<BackgroundProcessStatusUpdateEventArgs> BackgroundProcessStatusUpdate;
+
+        /// <summary>
+        /// Raised when the automatic OCR processing has successfully completed on the currently
+        /// loaded document.
+        /// </summary>
+        public event EventHandler<OcrLoadedEventArgs> OcrLoaded;
+
         #endregion
 
         #region Image Viewer Constructors
@@ -633,6 +663,9 @@ namespace Extract.Imaging.Forms
                 _layerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
 
                 _wordHighlightManager = new WordHighlightManager(this);
+                _wordHighlightManager.BackgroundProcessStatusUpdate +=
+                    HandleBackgroundProcessStatusUpdate;
+                _wordHighlightManager.OcrLoaded += HandleOcrLoaded;
 
                 // Double-buffer to prevent flickering
                 SetStyle(ControlStyles.UserPaint, true);
@@ -645,7 +678,7 @@ namespace Extract.Imaging.Forms
             }
         }
 
-        #endregion
+        #endregion Constructors
 
         #region Properties
 
@@ -1539,6 +1572,7 @@ namespace Extract.Imaging.Forms
 
                     _pageNumber = 1;
                     _pageCount = 1;
+                    _ocrData = null;
                     _imagePages = new List<ImagePageData>(1);
                     _imagePages.Add(new ImagePageData());
 
@@ -2216,6 +2250,78 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Gets a value indicating whether OCR or word zone data is currently being loaded in the
+        /// background.
+        /// </summary>
+        /// <value><see langword="true"/> if loading data; otherwise, <see langword="false"/>.
+        /// </value>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool IsLoadingData
+        {
+            get
+            {
+                return IsImageAvailable && _wordHighlightManager.IsLoadingData;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the OCR data for the currently loaded image.
+        /// </summary>
+        /// <value>The <see cref="ThreadSafeSpatialString"/> instance representing the OCR data for the
+        /// current image.</value>
+        [CLSCompliant(false)]
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public ThreadSafeSpatialString OcrData
+        {
+            get
+            {
+                try
+                {
+                    if (IsImageAvailable)
+                    {
+                        if (_ocrData == null)
+                        {
+                            // If the _wordHighlightManager has loaded OCR data, grab it.
+                            if (_wordHighlightManager.OcrData != null)
+                            {
+                                _ocrData = _wordHighlightManager.OcrData;
+                            }
+                            // Otherwise, attempt to load the data from an existing uss file.
+                            else
+                            {
+                                string ocrFileName = _imageFile + ".uss";
+
+                                if (File.Exists(ocrFileName))
+                                {
+                                    SpatialString ocrSpatialString = new SpatialString();
+                                    ocrSpatialString.LoadFrom(ocrFileName, false);
+                                    _ocrData = new ThreadSafeSpatialString(this, ocrSpatialString);
+                                }
+                            }
+                        }
+
+                        return _ocrData;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32625");
+                }
+            }
+
+            set
+            {
+                _ocrData = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether <see cref="ImageReader"/>s for documents should be cached rather
         /// than loaded/unloaded on open/close.
         /// <para><b>Note</b></para>
@@ -2249,6 +2355,33 @@ namespace Extract.Imaging.Forms
         /// </value>
         [DefaultValue(false)]
         public bool WordHighlightToolEnabled
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the document text should be automatically OCR'd
+        /// if previously existing OCR data is not available.
+        /// </summary>
+        /// <value><see langword="true"/> to automatically OCR the document text if previously
+        /// existing OCR data is not available; otherwise, <see langword="false"/>.
+        /// </value>
+        [DefaultValue(true)]
+        public bool AutoOcr
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="OcrTradeoff"/> to use when automatically OCR'ing document
+        /// text.
+        /// </summary>
+        /// <value>The <see cref="OcrTradeoff"/> to use when automatically OCR'ing document text.
+        /// </value>
+        [DefaultValue(OcrTradeoff.Balanced)]
+        public OcrTradeoff OcrTradeoff
         {
             get;
             set;
@@ -3239,6 +3372,33 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Raises the <see cref="BackgroundProcessStatusUpdate"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The
+        /// <see cref="Extract.Imaging.Forms.BackgroundProcessStatusUpdateEventArgs"/> instance
+        /// containing the event data.</param>
+        void OnBackgroundProcessStatusUpdate(BackgroundProcessStatusUpdateEventArgs eventArgs)
+        {
+            if (BackgroundProcessStatusUpdate != null)
+            {
+                BackgroundProcessStatusUpdate(this, eventArgs);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="OcrLoaded"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="Extract.Imaging.Forms.OcrLoadedEventArgs"/>
+        /// instance containing the event data.</param>
+        void OnOcrLoaded(OcrLoadedEventArgs eventArgs)
+        {
+            if (OcrLoaded != null)
+            {
+                OcrLoaded(this, eventArgs);
+            }
+        }
+
+        /// <summary>
         /// Raises the <see cref="Control.MouseWheel"/> event.
         /// </summary>
         /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.
@@ -3646,6 +3806,58 @@ namespace Extract.Imaging.Forms
                 ExtractException ee = ExtractException.AsExtractException("ELI23372", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that a background process status update has occured.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The
+        /// <see cref="Extract.Imaging.Forms.BackgroundProcessStatusUpdateEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleBackgroundProcessStatusUpdate(object sender,
+            BackgroundProcessStatusUpdateEventArgs e)
+        {
+            try
+            {
+                if (_ocrProgressForm != null)
+                {
+                    _ocrProgressForm.Invoke((MethodInvoker)(() =>
+                        _ocrProgressForm.ProgressValue = (int)(e.ProgressPercent * 100.0)));
+                }
+
+                OnBackgroundProcessStatusUpdate(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32619");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that a background OCR operation has completed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.OcrLoadedEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleOcrLoaded(object sender, OcrLoadedEventArgs e)
+        {
+            try
+            {
+                // If an OCR progress form is currently visible, indicate that the operation
+                // completed and close the visible progress form.
+                if (_ocrProgressForm != null)
+                {
+                    _ocrCompleted = true;
+                    _ocrProgressForm.BeginInvoke((MethodInvoker)(() => _ocrProgressForm.Hide()));
+                }
+
+                OnOcrLoaded(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32626");
             }
         }
 

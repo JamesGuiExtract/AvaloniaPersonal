@@ -476,6 +476,8 @@ namespace Extract.Imaging.Forms
 
                     _reader = null;
 
+                    _ocrData = null;
+
                     // Set image file name to empty string
                     _imageFile = "";
 
@@ -4927,6 +4929,52 @@ namespace Extract.Imaging.Forms
 
                 // Allow painting of the ImageViewer again.
                 FormsMethods.LockControlUpdate(this, false);
+            }
+        }
+
+        /// <summary>
+        /// Displays a <see cref="ProgressStatusDialogForm"/> indicating OCR progress and blocks
+        /// until any active background OCR operation completes.
+        /// </summary>
+        /// <returns><see langword="true"/> if the OCR operation completed successfully,
+        /// <see langword="false"/> otherwise (such as if the user closes the progress form.
+        /// </returns>
+        public bool WaitForOcrData()
+        {
+            try
+            {
+                if (IsLoadingData)
+                {
+                    try
+                    {
+                        using (_ocrProgressForm =
+                            new ProgressStatusDialogForm(
+                                "Please wait while OCR completes for all document pages...",
+                                105, true, IntPtr.Zero))
+                        {
+                            _ocrProgressForm.Text = "OCR in progress";
+                            _ocrCompleted = false;
+
+                            _ocrProgressForm.ShowDialog(this);
+
+                            _ocrProgressForm = null;
+
+                            return _ocrCompleted;
+                        }
+                    }
+                    finally
+                    {
+                        _ocrProgressForm = null;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32624");
             }
         }
 

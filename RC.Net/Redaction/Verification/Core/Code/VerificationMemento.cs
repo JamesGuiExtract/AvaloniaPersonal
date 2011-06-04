@@ -1,3 +1,4 @@
+using Extract.Imaging;
 using Extract.Imaging.Forms;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -348,6 +349,18 @@ namespace Extract.Redaction.Verification
             {
                 _selection = new HashSet<int>(value);
             }
+        }
+
+        /// <summary>
+        /// Gets or sets OCR data to cache for the document.
+        /// </summary>
+        /// <value>A <see cref="ThreadSafeSpatialString"/> instance representing the OCR data associated
+        /// with the document.
+        /// </value>
+        public ThreadSafeSpatialString OcrData
+        {
+            get;
+            set;
         }
 
         #endregion Properties

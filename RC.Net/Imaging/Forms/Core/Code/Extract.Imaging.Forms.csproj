@@ -652,6 +652,12 @@
     <Compile Include="Controls\SetHighlightHeightToolStripButton.Designer.cs">
       <DependentUpon>SetHighlightHeightToolStripButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="StatusStripItems\BackgroundProcessStatusLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StatusStripItems\BackgroundProcessStatusLabel.Designer.cs">
+      <DependentUpon>BackgroundProcessStatusLabel.cs</DependentUpon>
+    </Compile>
     <Compile Include="StatusStripItems\ImageViewerStatusStrip.cs">
       <SubType>Component</SubType>
     </Compile>

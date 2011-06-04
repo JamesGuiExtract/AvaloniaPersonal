@@ -78,6 +78,12 @@ namespace Extract.Utilities.Forms
         List<Label> _labels;
 
         /// <summary>
+        /// Indicates whether the progress form is to have its status updated manually rather than
+        /// via a <see cref="ProgressStatus"/> instance.
+        /// </summary>
+        bool _manualMode;
+
+        /// <summary>
         /// Mutex used to synchronize methods that operate on the progress status object.
         /// </summary>
         object _lock = new object();
@@ -95,6 +101,35 @@ namespace Extract.Utilities.Forms
         public ProgressStatusDialogForm()
             : this(3, 100, true, IntPtr.Zero)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProgressStatusDialogForm"/> class in
+        /// "manual" mode with one label and one progress bar. The resulting instance will need to
+        /// updated manually via the <see cref="ProgressValue"/> property. Specifying
+        /// <see cref="ProgressStatus"/> is not allowed in manual mode.
+        /// </summary>
+        /// <param name="labelText">The string to apply to the status bar label.</param>
+        /// <param name="maxValue">An <see langword="int"/> specifying the <see cref="ProgressValue"/>
+        /// at which the progress bar should indicate 100% progress.</param>
+        /// <param name="showCloseButton">Whether the close button should be displayed
+        /// or not.</param>
+        /// <param name="stopEvent">The event handle that should be signaled
+        /// when the stop button is pressed. This may be <see cref="IntPtr.Zero"/></param>
+        public ProgressStatusDialogForm(string labelText, int maxValue, bool showCloseButton, IntPtr stopEvent)
+            : this (1, 0, showCloseButton, stopEvent)
+        {
+            try
+            {
+                _manualMode = true;
+
+                _labels[0].Text = labelText;
+                _progressBars[0].Maximum = maxValue;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32632");
+            }
         }
 
         /// <summary>
@@ -159,13 +194,16 @@ namespace Extract.Utilities.Forms
 
             try
             {
-                if (Visible)
+                if (!_manualMode)
                 {
-                    _timer.Start();
-                }
-                else
-                {
-                    _timer.Stop();
+                    if (Visible)
+                    {
+                        _timer.Start();
+                    }
+                    else
+                    {
+                        _timer.Stop();
+                    }
                 }
             }
             catch (Exception ex)
@@ -369,8 +407,35 @@ namespace Extract.Utilities.Forms
             {
                 lock (_lock)
                 {
+                    ExtractException.Assert("ELI32631",
+                        "Progress dialog not initialized in automatic mode.",
+                        !_manualMode);
+
                     _progressStatus = value;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the amount of progress the progress bar indicates in manual mode.
+        /// </summary>
+        /// <value>
+        /// An <see langword="int"/> indicating the progress toward the maxValue specified in
+        /// the <see cref="ProgressStatusDialogForm(string, int, bool, IntPtr)"/> constructor.
+        /// </value>
+        public int ProgressValue
+        {
+            get
+            {
+                return _progressBars[0].Value;
+            }
+
+            set
+            {
+                ExtractException.Assert("ELI32633",
+                    "Progress dialog not initialized in manual mode.", _manualMode);
+
+                _progressBars[0].Value = value;
             }
         }
 

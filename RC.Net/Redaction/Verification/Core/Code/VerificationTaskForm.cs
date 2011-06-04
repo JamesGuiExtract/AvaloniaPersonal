@@ -480,6 +480,8 @@ namespace Extract.Redaction.Verification
 
                     _openImageToolStripSplitButton.Visible = false;
                     _openImageToolStripMenuItem.Visible = false;
+
+                    _imageViewer.OcrLoaded += HandleOcrLoaded;
                 }
 
                 // Add the default redaction types
@@ -509,6 +511,9 @@ namespace Extract.Redaction.Verification
                 _imageViewer.CacheImages = true;
                 
                 _imageViewer.DefaultRedactionFillColor = _iniSettings.OutputRedactionColor;
+
+                _imageViewer.AutoOcr = _config.Settings.AutoOcr;
+                _imageViewer.OcrTradeoff = _config.Settings.OcrTradeoff;
 
                 SetVerificationOptions();
 
@@ -2216,6 +2221,12 @@ namespace Extract.Redaction.Verification
             // with redactions present.
             memento.HasContainedRedactions |= _redactionGridView.HasRedactions;
 
+            // If OCR data has been cached for this document, apply it back to the image viewer.
+            if (memento.OcrData != null)
+            {
+                _imageViewer.OcrData = memento.OcrData;
+            }
+
             return memento;
         }
 
@@ -2288,6 +2299,9 @@ namespace Extract.Redaction.Verification
             _redactionGridView.AutoZoomScale = _config.Settings.AutoZoomScale;
 
             _slideshowTimer.Interval = _config.Settings.SlideshowInterval * 1000;
+
+            _imageViewer.AutoOcr = _config.Settings.AutoOcr;
+            _imageViewer.OcrTradeoff = _config.Settings.OcrTradeoff;
         }
 
         /// <summary>
@@ -3473,11 +3487,6 @@ namespace Extract.Redaction.Verification
                 }
                 else
                 {
-                    if (_imageViewer.IsImageAvailable)
-                    {
-                        _imageViewer.UnloadImage(_imageViewer.ImageFile);
-                    }
-
                     // Get the full path of the source document
                     string fullPath = Path.GetFullPath(e.FileName);
 
@@ -3514,6 +3523,30 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI32611");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that a background OCR operation has completed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Extract.Imaging.Forms.OcrLoadedEventArgs"/> instance
+        /// containing the event data.</param>
+        void HandleOcrLoaded(object sender, OcrLoadedEventArgs e)
+        {
+            try
+            {
+                // Cache any OCR data that is the result of a background loading operation so that
+                // this document doesn't need to be re-OCR'd if re-visited in history.
+                VerificationMemento memento = GetCurrentDocument();
+                if (memento != null)
+                {
+                    memento.OcrData = e.OcrData;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI32630");
             }
         }
 

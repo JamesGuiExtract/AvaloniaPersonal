@@ -55,25 +55,29 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                SpatialString ocrResults = null;
+                ThreadSafeSpatialString ocrResults = _imageViewer.OcrData;
 
-                if (_imageViewer.IsImageAvailable)
+                // If OCR data isn't already loaded, check to see if the image viewer is loading
+                // data in the background.
+                if (ocrResults == null && _imageViewer.IsLoadingData)
                 {
-                    string ussFile = _imageViewer.ImageFile + ".uss";
-                    if (File.Exists(ussFile))
+                    // If data is loading, display a progress box and wait for the OCRing to complete.
+                    if (!_imageViewer.WaitForOcrData())
                     {
-                        ocrResults = new SpatialString();
-                        ocrResults.LoadFrom(ussFile, false);
+                        return null;
                     }
-                    else
-                    {
-                        MessageBox.Show("The 'Find and redact' feature can't be used on this document because OCR data is not available.", 
-                            "No OCR data", MessageBoxButtons.OK, MessageBoxIcon.None, 
-                            MessageBoxDefaultButton.Button1, 0);
-                    }
+
+                    ocrResults = _imageViewer.OcrData;
                 }
 
-                return ocrResults;
+                if (ocrResults == null)
+                {
+                    MessageBox.Show("The 'Find and redact' feature can't be used on this document because OCR data is not available.",
+                        "No OCR data", MessageBoxButtons.OK, MessageBoxIcon.None,
+                        MessageBoxDefaultButton.Button1, 0);
+                }
+                
+                return ocrResults.SpatialString;
             }
             catch (Exception ex)
             {

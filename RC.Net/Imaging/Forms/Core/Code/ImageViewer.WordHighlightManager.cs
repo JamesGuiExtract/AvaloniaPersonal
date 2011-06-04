@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
@@ -108,7 +108,20 @@ namespace Extract.Imaging.Forms
             /// <summary>
             /// The OCR data from the current <see cref="ImageViewer"/> document.
             /// </summary>
-            volatile ISpatialString _ocrData;
+            volatile ThreadSafeSpatialString _ocrData;
+
+            /// <summary>
+            /// Maintains the OCR data for each individual page.
+            /// </summary>
+            ConcurrentDictionary<int, ThreadSafeSpatialString> _ocrPageData =
+                new ConcurrentDictionary<int, ThreadSafeSpatialString>();
+
+            /// <summary>
+            /// The background process status message for each document page.
+            /// -1 indicates a status that should be used regardless of the current image page.
+            /// </summary>
+            ConcurrentDictionary<int, string> _pageStatusMessages =
+                new ConcurrentDictionary<int, string>();
 
             /// <summary>
             /// The collection of word highlights that have been created based on OCR data, grouped
@@ -138,9 +151,10 @@ namespace Extract.Imaging.Forms
             HashSet<LayerObject> _activeWordHighlights = new HashSet<LayerObject>();
 
             /// <summary>
-            /// Indicates whether word highlights are currently being loaded.
+            /// Indicates for which image page OCR or word highlights are currently being loaded.
+            /// -1 indicates no background loading is currently occurring.
             /// </summary>
-            volatile bool _loadingWordHighlights;
+            volatile int _loadingPage = -1;
 
             /// <summary>
             /// The average line height for each page.
@@ -173,7 +187,29 @@ namespace Extract.Imaging.Forms
             /// <summary>
             /// <see langword="true"/> if currently loading/managing word highlights.
             /// </summary>
-            bool _active;
+            volatile bool _highlightsEnabled;
+
+            /// <summary>
+            /// The <see cref="AsynchronousOcrManager"/> to be used for background OCRing.
+            /// </summary>
+            volatile AsynchronousOcrManager _ocrManager;
+
+            /// <summary>
+            /// The number of pages in the currently loaded document.
+            /// </summary>
+            volatile int _pageCount;
+
+            /// <summary>
+            /// Indicates whether the background worker thread should be restarted after completion
+            /// because a new operation was scheduled after the currently running instance was
+            /// canceled.
+            /// </summary>
+            volatile bool _restartBackgroundWorker;
+
+            /// <summary>
+            /// Indicates whether this instance has been disposed.
+            /// </summary>
+            volatile bool _disposed;
 
             #endregion Fields
 
@@ -202,6 +238,21 @@ namespace Extract.Imaging.Forms
 
             #endregion Constructors
 
+            #region Events
+
+            /// <summary>
+            /// Raised when a new status message is available regarding the state of background operations.
+            /// </summary>
+            public event EventHandler<BackgroundProcessStatusUpdateEventArgs> BackgroundProcessStatusUpdate;
+
+            /// <summary>
+            /// Raised when the automatic OCR processing has successfully completed on the currently
+            /// loaded document.
+            /// </summary>
+            public event EventHandler<OcrLoadedEventArgs> OcrLoaded;
+
+            #endregion Events
+
             #region Properties
 
             /// <summary>
@@ -217,6 +268,34 @@ namespace Extract.Imaging.Forms
                 get
                 {
                     return _trackingStartLocation.HasValue;
+                }
+            }
+
+            /// <summary>
+            /// Gets a value indicating whether OCR or word zone data is currently being loaded in
+            /// the background.
+            /// </summary>
+            /// <value><see langword="true"/> if OCR or word zone data is currently being loaded in
+            /// the background; otherwise, <see langword="false"/>.
+            /// </value>
+            public bool IsLoadingData
+            {
+                get
+                {
+                    return _loadingPage >= 0;
+                }
+            }
+
+            /// <summary>
+            /// Gets OCR associated with the currently loaded document (if available).
+            /// </summary>
+            public ThreadSafeSpatialString OcrData
+            {
+                get
+                {
+                    // If a clear data operation has been requested any value in _ocrData is no
+                    // longer valid.
+                    return _clearData ? null : _ocrData;
                 }
             }
 
@@ -277,7 +356,7 @@ namespace Extract.Imaging.Forms
             /// <see cref="Redaction"/>/<see cref="Highlight"/> is to be created.</param>
             public void EndTrackingOperation(bool cancel)
             {
-                bool restartWordLoading = false;
+                bool restartLoading = false;
 
                 try
                 {
@@ -285,7 +364,7 @@ namespace Extract.Imaging.Forms
                     // any currently running operation on the background worker.
                     lock (_lock)
                     {
-                        restartWordLoading = _loadingWordHighlights || 
+                        restartLoading = IsLoadingData || 
                             !_pagesOfAddedWordHighlights.Contains(_imageViewer.PageNumber);
                         CancelRunningOperation();
                     }
@@ -330,7 +409,7 @@ namespace Extract.Imaging.Forms
                 {
                     // Call activate to ensure we pick up loading word highlights again if
                     // a loading task was canceled.
-                    if (restartWordLoading)
+                    if (restartLoading)
                     {
                         Activate();
                     }
@@ -351,16 +430,13 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    // If the word highlighter or redactor is active when a new page is loaded,
-                    // activate.
-                    if (_imageViewer.IsImageAvailable &&
-                        (_imageViewer.CursorTool == CursorTool.WordHighlight ||
-                        _imageViewer.CursorTool == CursorTool.WordRedaction))
+                    // When a new page is loaded, activate.
+                    if (_imageViewer.IsImageAvailable)
                     {
                         Activate();
                     }
                     // Otherwise, deactivate and reset all loaded data
-                    else if (_active)
+                    else
                     {
                         Deactivate(true);
                     }
@@ -400,13 +476,9 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    if (_imageViewer.CursorTool == CursorTool.WordHighlight ||
-                        _imageViewer.CursorTool == CursorTool.WordRedaction)
-                    {
-                        // After changing pages, call Activate. Even if a loader task is already
-                        // active, this will force highlights to be loaded for the current page first.
-                        Activate();
-                    }
+                    // After changing pages, call Activate. Even if a loader task is already
+                    // active, this will force highlights to be loaded for the current page first.
+                    Activate();
                 }
                 catch (Exception ex)
                 {
@@ -423,16 +495,19 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    // Only run the _wordHighlightManager if the word highlighter/redactor is active.
-                    if (_imageViewer.IsImageAvailable &&
-                        (e.CursorTool == CursorTool.WordHighlight ||
-                         e.CursorTool == CursorTool.WordRedaction))
+                    if (_imageViewer.IsImageAvailable)
                     {
-                        Activate();
-                    }
-                    else
-                    {
-                        Deactivate(false);
+                        // If a word highlighter/redactor tool was selected, call Activate to ensure
+                        // word highlights are loaded for the current page.
+                        if (e.CursorTool == CursorTool.WordHighlight ||
+                            e.CursorTool == CursorTool.WordRedaction)
+                        {
+                            Activate();
+                        }
+                        else
+                        {
+                            DisableWordHighlights();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -534,7 +609,7 @@ namespace Extract.Imaging.Forms
             /// instance containing the event data.</param>
             void HandleDeletingLayerObjects(object sender, DeletingLayerObjectsEventArgs e)
             {
-                bool restartWordLoading = false;
+                bool restartLoading = false;
 
                 try
                 {
@@ -542,7 +617,7 @@ namespace Extract.Imaging.Forms
                     // any currently running operation on the background worker.
                     lock (_lock)
                     {
-                        restartWordLoading = _loadingWordHighlights;
+                        restartLoading = IsLoadingData;
                         CancelRunningOperation();
                     }
 
@@ -561,7 +636,7 @@ namespace Extract.Imaging.Forms
                     // reload the highlights for the affected pages.
                     if (deletedWordHighlights.Count > 0)
                     {
-                        restartWordLoading |= true;
+                        restartLoading |= true;
 
                         // Collect a list of all pages from which highlights are being deleted and all
                         // word highlights from those pages.
@@ -605,7 +680,7 @@ namespace Extract.Imaging.Forms
                 {
                     // Call activate to ensure we pick up loading word highlights again if
                     // a loading task was canceled.
-                    if (restartWordLoading)
+                    if (restartLoading)
                     {
                         Activate();
                     }
@@ -666,11 +741,18 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    _backgroundWorker.RunWorkerCompleted -= BackgroundWorkerCompleted;
-
-                    // If we are handling this event, it is in order to kick off the worker again
-                    // as soon as the previous worker thread completes.
-                    Activate();
+                    if (_restartBackgroundWorker)
+                    {
+                        // Start a new worker thread if a restart was requested.
+                        _restartBackgroundWorker = false;
+                        StartWorkerThread();
+                    }
+                    else
+                    {
+                        // Otherwise indicate that there is no longer any background loading going
+                        // on.
+                        _loadingPage = -1;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -705,6 +787,8 @@ namespace Extract.Imaging.Forms
                     // Dispose of managed resources
                     try
                     {
+                        _disposed = true;
+
                         if (_backgroundWorker != null)
                         {
                             Deactivate(false);
@@ -715,6 +799,12 @@ namespace Extract.Imaging.Forms
                         }
 
                         ClearData();
+
+                        if (_ocrManager != null)
+                        {
+                            _ocrManager.Dispose();
+                            _ocrManager = null;
+                        }
 
                         if (_backgroundWorkerIdle != null)
                         {
@@ -758,53 +848,30 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    ExtractException.Assert("ELI31505",
-                        "The word higlight/redaction tool is disabled an cannot be used.",
-                        _imageViewer.WordHighlightToolEnabled);
-
                     lock (_lock)
                     {
-                        if (!_active)
-                        {
-                            _active = true;
+                        // Word highlights need be enabled only if the word highlight/redaction tool
+                        // is active.
+                        bool enableHighlights =
+                            (_imageViewer.CursorTool == CursorTool.WordHighlight ||
+                             _imageViewer.CursorTool == CursorTool.WordRedaction);
 
-                            // If active, watch for when the cursor enters/leaves word highlights
-                            _imageViewer.CursorEnteredLayerObject +=
-                                HandleCursorEnteredLayerObject;
-                            _imageViewer.CursorLeftLayerObject +=
-                                HandleCursorLeftLayerObject;
-                            _imageViewer.LayerObjects.DeletingLayerObjects +=
-                                HandleDeletingLayerObjects;
-                        }
-
-                        // Create the background worker if it has not yet been created.
-                        if (_backgroundWorker == null)
+                        if (enableHighlights)
                         {
-                            _backgroundWorker = new BackgroundWorker();
-                            _backgroundWorker.WorkerSupportsCancellation = true;
-                            _backgroundWorker.DoWork += WorkerThread;
-                        }
-
-                        // If the background worker is not currently running, start it.
-                        if (_backgroundWorker.IsBusy)
-                        {
-                            // If the runnning working thread has been canceled, schedule a new
-                            // worker to start once the current one has completed.
-                            if (_backgroundWorker.CancellationPending)
-                            {
-                                _backgroundWorker.RunWorkerCompleted += BackgroundWorkerCompleted;
-                                return;
-                            }
+                            EnableWordHighlights();
                         }
                         else
                         {
-                            _backgroundWorker.RunWorkerAsync();
+                            DisableWordHighlights();
                         }
 
-                        // In case a running operation is cancelled by a message handler, indicate that a
-                        // loading operation has been started so it can be resumed after the handler
-                        // is complete.
-                        _loadingWordHighlights = true;
+                        // Ensure there is a background worker thread active to run the loading operation.
+                        StartWorkerThread();
+
+                        // In case a running operation is cancelled by a message handler, set
+                        // _loadingPage = 0 indicate that a loading operation has been started so it
+                        // can be resumed after the handler is complete.
+                        _loadingPage = 0;
 
                         // Start a new loading task for the current image viewer page (canceling any
                         // other operation currently in progress.
@@ -828,21 +895,7 @@ namespace Extract.Imaging.Forms
                 {
                     lock (_lock)
                     {
-                        if (_active)
-                        {
-                            _active = false;
-
-                            // Stop watching for when the cursor enters/leaves word highlights
-                            _imageViewer.CursorEnteredLayerObject -=
-                                HandleCursorEnteredLayerObject;
-
-                            _imageViewer.CursorLeftLayerObject -=
-                                HandleCursorLeftLayerObject;
-                            _imageViewer.LayerObjects.DeletingLayerObjects -=
-                                HandleDeletingLayerObjects;
-                        }
-
-                        HideWordHighlights();
+                        DisableWordHighlights();
 
                         _clearData |= clearData;
 
@@ -873,10 +926,88 @@ namespace Extract.Imaging.Forms
                             ClearData();
                         }
                     }
+
+                    // If deactivating, clear any background status message.
+                    if (clearData)
+                    {
+                        UpdateBackgroundProgressStatus(-1, "", 0);
+                    }
                 }
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI31292", ex);
+                }
+            }
+
+            /// <summary>
+            /// Enables the word highlights.
+            /// </summary>
+            void EnableWordHighlights()
+            {
+                if (!_highlightsEnabled)
+                {
+                    _highlightsEnabled = true;
+
+                    // If word highlights are active, watch for when the cursor
+                    // enters/leaves word highlights.
+                    _imageViewer.CursorEnteredLayerObject +=
+                        HandleCursorEnteredLayerObject;
+                    _imageViewer.CursorLeftLayerObject +=
+                        HandleCursorLeftLayerObject;
+                    _imageViewer.LayerObjects.DeletingLayerObjects +=
+                        HandleDeletingLayerObjects;
+                }
+            }
+
+            /// <summary>
+            /// Disables the word highlights.
+            /// </summary>
+            void DisableWordHighlights()
+            {
+                if (_highlightsEnabled)
+                {
+                    _highlightsEnabled = false;
+
+                    // Stop watching for when the cursor enters/leaves word highlights
+                    _imageViewer.CursorEnteredLayerObject -=
+                        HandleCursorEnteredLayerObject;
+
+                    _imageViewer.CursorLeftLayerObject -=
+                        HandleCursorLeftLayerObject;
+                    _imageViewer.LayerObjects.DeletingLayerObjects -=
+                        HandleDeletingLayerObjects;
+
+                    HideWordHighlights();
+                }
+            }
+
+            /// <summary>
+            /// Starts the worker thread if it is not already running.
+            /// </summary>
+            void StartWorkerThread()
+            {
+                // Create the background worker if it has not yet been created.
+                if (_backgroundWorker == null)
+                {
+                    _backgroundWorker = new BackgroundWorker();
+                    _backgroundWorker.WorkerSupportsCancellation = true;
+                    _backgroundWorker.DoWork += WorkerThread;
+                    _backgroundWorker.RunWorkerCompleted += BackgroundWorkerCompleted;
+                }
+
+                // If the background worker is not currently running, start it.
+                if (_backgroundWorker.IsBusy)
+                {
+                    // If the runnning working thread has been canceled, request a new worker to
+                    // start once the current one has completed.
+                    if (_backgroundWorker.CancellationPending)
+                    {
+                        _restartBackgroundWorker = true;
+                    }
+                }
+                else
+                {
+                    _backgroundWorker.RunWorkerAsync();
                 }
             }
 
@@ -987,25 +1118,11 @@ namespace Extract.Imaging.Forms
                                 _cancelToken = _canceler.Token;
                             }
 
-                            // Attempt to load OCR data for the current document for the operations
-                            // to use.
-                            if (_ocrData == null)
-                            {
-                                string ocrFileName = string.Empty;
-
-                                ExecuteInUIThread(() => ocrFileName = _imageViewer._imageFile + ".uss");
-
-                                if (File.Exists(ocrFileName))
-                                {
-                                    _ocrData = (ISpatialString)new SpatialStringClass();
-                                    _ocrData.LoadFrom(ocrFileName, false);
-                                }
-                            }
-
-                            _cancelToken.ThrowIfCancellationRequested();
-
                             // Perform the operation.
-                            currentOperation();
+                            if (currentOperation != null)
+                            {
+                                currentOperation();
+                            }
                         }
                         catch (OperationCanceledException)
                         { }
@@ -1029,10 +1146,56 @@ namespace Extract.Imaging.Forms
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    ExtractException.Log("ELI32628", ex);
+                }
                 finally
                 {
                     // If the background worker has been stopped, consider the background worker idle.
                     _backgroundWorkerIdle.Set();
+                }
+            }
+
+            /// <summary>
+            /// Handles the case that _ocrManager has updated the progress of an on-going OCR
+            /// operation.
+            /// </summary>
+            /// <param name="sender">The sender.</param>
+            /// <param name="e">The <see cref="Extract.Imaging.OcrProgressUpdateEventArgs"/> instance containing the event data.</param>
+            void HandleOcrProgressUpdate(object sender, OcrProgressUpdateEventArgs e)
+            {
+                try
+                {
+                    string status = string.Format(CultureInfo.CurrentCulture, "OCR: {0:P0}",
+                        e.ProgressPercent);
+
+                    UpdateBackgroundProgressStatus(_loadingPage, status, e.ProgressPercent);
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI32622");
+                }
+            }
+
+            /// <summary>
+            /// Gets the number of pages for which data has been loaded by the background operation.
+            /// This value depends on whether word highlights are enabled.
+            /// </summary>
+            int PagesLoaded
+            {
+                get
+                {
+                    if (_imageViewer.IsImageAvailable)
+                    {
+                        return _highlightsEnabled
+                            ? _wordHighlights.Count
+                            : _ocrPageData.Count;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
                 }
             }
 
@@ -1061,8 +1224,11 @@ namespace Extract.Imaging.Forms
 
                 _pagesOfAddedWordHighlights.Clear();
                 _wordHighlights.Clear();
+                _pageStatusMessages.Clear();
                 _wordLineMapping.Clear();
                 _averageLineHeight.Clear();
+                _pageCount = 0;
+                _ocrPageData.Clear();
                 _ocrData = null;
 
                 _clearData = false;
@@ -1111,7 +1277,8 @@ namespace Extract.Imaging.Forms
                         if (_ocrData != null)
                         {
                             // Retrieve an IUnknownVector of SpatialStrings representing the words on the page.
-                            ISpatialString pageData = (ISpatialString)_ocrData.GetSpecifiedPages(page, page);
+                            SpatialString pageData =
+                                _ocrData.SpatialString.GetSpecifiedPages(page, page);
 
                             // Base the height limit on the average line height for the page.
                             averageLineHeight = pageData.GetAverageLineHeight() * 5;
@@ -1219,72 +1386,222 @@ namespace Extract.Imaging.Forms
                     // should be tolerant to document/page changes that could occur in the UI thread.
                     // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
 
-                    // If there is no OCR data, there is nothing more to be done.
-                    if (_ocrData == null)
-                    {
-                        return;
-                    }
-
                     // Attempt to retrieve the image page currently being displayed and the total
                     // page count. If unable to, an image isn't currently available and the
                     // operation should be aborted.
                     int startingPage = -1;
-                    int pageCount = -1;
+                    bool autoOcr = false;
+
                     ExecuteInUIThread(() =>
                     {
                         startingPage = _imageViewer.PageNumber;
-                        pageCount = _imageViewer.PageCount;
+                        autoOcr = _imageViewer.AutoOcr;
+                        _pageCount = _imageViewer.PageCount;
+
+                        // Retrieve any OCR data the image viewer has for the current document.
+                        _ocrData = _ocrData ?? _imageViewer.OcrData;
                     });
-                    if (startingPage == -1 || pageCount == -1)
+
+                    // If there is no page loaded or no OCR data with autoOcr turned off, there is
+                    // nothing more to be done.
+                    if (startingPage == -1 || _pageCount == -1 ||
+                        (_ocrData == null && !autoOcr))
                     {
+                        UpdateBackgroundProgressStatus(-1, "OCR unavailable", 0.0);
+
                         return;
                     }
 
                     // Loop through all pages starting at the current page to ensure highlights for
                     // the current page are loaded first.
-                    int page = startingPage;
+                    _loadingPage = startingPage;
                     do
                     {
                         _cancelToken.ThrowIfCancellationRequested();
 
-                        // Create highlights for each word on the page (if they have not already
-                        // been created).
-                        HashSet<LayerObject> wordHighlights = LoadWordHighlightsForPage(page);
+                        // Retrieve OCR data for the current page, or OCR if appropriate.
+                        SpatialString pageOcr = LoadOcrDataForPage(_loadingPage);
 
-                        ExecuteInUIThread(() =>
+                        _cancelToken.ThrowIfCancellationRequested();
+
+                        // If word highlights are enabled and we have OCR data, load word highlights.
+                        if (_highlightsEnabled && pageOcr != null)
                         {
-                            if (page == startingPage)
+                            UpdateBackgroundProgressStatus(_loadingPage, "Loading word zones...", 1.0);
+
+                            // Create highlights for each word on the page (if they have not already
+                            // been created).
+                            HashSet<LayerObject> wordHighlights =
+                                LoadWordHighlightsForPage(_loadingPage, pageOcr);
+
+                            ExecuteInUIThread(() =>
                             {
-                                // If this is the current page, add the word highlights to the page if
-                                // they have not already been added.
-                                AddWordLayerObjects(page, wordHighlights);
-                            }
-                            else
-                            {
-                                // If this is not the current page, but highlights were previously
-                                // added to the page, remove them to prevent bogging down the image
-                                // viewer on documents with lots of pages.
-                                RemoveWordLayerObjects(page);
-                            }
-                        });
+                                if (_loadingPage == startingPage)
+                                {
+                                    // If this is the current page, add the word highlights to the
+                                    // page if they have not already been added.
+                                    AddWordLayerObjects(_loadingPage, wordHighlights);
+                                }
+                                else
+                                {
+                                    // If this is not the current page, but highlights were
+                                    // previously added to the page, remove them to prevent bogging
+                                    // down the image viewer on documents with lots of pages.
+                                    RemoveWordLayerObjects(_loadingPage);
+                                }
+                            });
+                        }
+
+                        UpdateBackgroundProgressStatus(_loadingPage,
+                            (pageOcr == null) ? "OCR unavailable" : "OCR available", 0.0);
 
                         // Increment the page number (looping back to the first page if necessary).
-                        page = (page < pageCount) ? page + 1 : 1;
+                        _loadingPage = (_loadingPage < _pageCount) ? _loadingPage + 1 : 1;
                     }
-                    while (page != startingPage);
+                    while (_loadingPage != startingPage);
+
+                    // If OCR data was not initially available, now that data for all pages has been
+                    // loaded, store the complete document OCR for access by the _imageViewer.
+                    if (_ocrData == null)
+                    {
+                        _ocrData = new ThreadSafeSpatialString(_imageViewer,
+                            _ocrPageData
+                                .OrderBy(entry => entry.Key)
+                                .Select(entry => entry.Value));
+
+                        OnOcrLoaded(_ocrData);
+                    }
                 }
                 catch (OperationCanceledException)
                 { }
                 catch (Exception ex)
                 {
+                    // If processing was not cancelled, loading failed.
+                    if (!_cancelToken.IsCancellationRequested)
+                    {
+                        UpdateBackgroundProgressStatus(_loadingPage, "OCR unavailable", 0.0);
+                    }
                     throw ExtractException.AsExtractException("ELI31298", ex);
                 }
                 finally
                 {
                     if (!_cancelToken.IsCancellationRequested)
                     {
-                        _loadingWordHighlights = false;
+                        _loadingPage = -1;
                     }
+                }
+            }
+
+            /// <summary>
+            /// Gets OCR data for the current page (if available).
+            /// </summary>
+            /// <param name="page"></param>
+            /// <returns>A <see cref="SpatialString"/> representing the OCR data for the specified
+            /// <see paramref="page"/>.</returns>
+            SpatialString LoadOcrDataForPage(int page)
+            {
+                // NOTE:
+                // This method executes on a background thread. While it is guaranted that only
+                // one instance of this method will run at any given time, any operations that
+                // occur in this method should be thread-safe with respect to the UI thread and
+                // should be tolerant to document/page changes that could occur in the UI thread.
+                // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
+
+                SpatialString pageOcr = null;
+                ThreadSafeSpatialString ocrData;
+                if (_ocrPageData.TryGetValue(page, out ocrData))
+                {
+                    pageOcr = ocrData.SpatialString;
+                }
+                else
+                {   
+                    // If OCR data is available for the document as a whole, simply grab the page
+                    // needed.
+                    if (_ocrData != null)
+                    {
+                        pageOcr = _ocrData.SpatialString.GetSpecifiedPages(page, page);
+
+                        if (pageOcr != null)
+                        {
+                            // Cache any valid data for the page.
+                            _ocrPageData[page] = new ThreadSafeSpatialString(_imageViewer, pageOcr);
+                        }
+                    }
+                    // Otherwise attempt to OCR data if _imageViewer.AutoOcr is on.
+                    else
+                    {
+                        bool autoOcr = false;
+                        OcrTradeoff ocrTradeoff = OcrTradeoff.Balanced;
+                        string imageFile = string.Empty;
+
+                        ExecuteInUIThread(() =>
+                        {
+                            autoOcr = _imageViewer.AutoOcr;
+                            ocrTradeoff = _imageViewer.OcrTradeoff;
+                            imageFile = _imageViewer.ImageFile;
+                        });
+
+                        if (autoOcr)
+                        {
+                            ocrData = OCRPage(imageFile, page, ocrTradeoff);
+
+                            if (ocrData != null)
+                            {
+                                pageOcr = ocrData.SpatialString;
+                                _ocrPageData[page] = ocrData;
+                            }
+                        }
+                    }
+                }
+
+                if (pageOcr != null && pageOcr.HasSpatialInfo())
+                {
+                    return pageOcr;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// Performs OCR on the specified <see paramref="imageFile"/> and
+            /// <see paramref="pageNumber"/>.
+            /// </summary>
+            /// <param name="imageFile">The image file to be OCR'd.</param>
+            /// <param name="pageNumber">The page number to be OCR'd.</param>
+            /// <param name="ocrTradeoff">The <see cref="OcrTradeoff"/> indicating the quality/speed
+            /// tradeoff to use.</param>
+            /// <returns>A <see cref="ThreadSafeSpatialString"/> instance representing the OCR data for
+            /// the specified <see paramref="imageFile"/> and <see paramref="pageNumber"/>.</returns>
+            ThreadSafeSpatialString OCRPage(string imageFile, int pageNumber, OcrTradeoff ocrTradeoff)
+            {
+                // NOTE:
+                // This method executes on a background thread. While it is guaranted that only
+                // one instance of this method will run at any given time, any operations that
+                // occur in this method should be thread-safe with respect to the UI thread and
+                // should be tolerant to document/page changes that could occur in the UI thread.
+                // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
+
+                try
+                {
+                    if (_ocrManager == null)
+                    {
+                        _ocrManager = new AsynchronousOcrManager();
+                        _ocrManager.OcrProgressUpdate += HandleOcrProgressUpdate;
+                    }
+
+                    _ocrManager.Tradeoff = ocrTradeoff;
+                    _ocrManager.OcrFile(imageFile, pageNumber, pageNumber, _cancelToken);
+                    _ocrManager.WaitForOcrCompletion();
+
+                    _cancelToken.ThrowIfCancellationRequested();
+
+                    return new ThreadSafeSpatialString(_imageViewer, _ocrManager.OcrOutput);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI32614");
                 }
             }
 
@@ -1294,9 +1611,11 @@ namespace Extract.Imaging.Forms
             /// it was previously canceled.
             /// </summary>
             /// <param name="page">The page to load.</param>
+            /// <param name="pageOcr">A <see cref="SpatialString"/> representing the OCR data for
+            /// the specified <see paramref="page"/>.</param>
             /// <returns>A <see cref="HashSet{T}"/> of <see cref="LayerObject"/>s representing the
             /// words on the specified page.</returns>
-            HashSet<LayerObject> LoadWordHighlightsForPage(int page)
+            HashSet<LayerObject> LoadWordHighlightsForPage(int page, SpatialString pageOcr)
             {
                 // NOTE:
                 // This method executes on a background thread. While it is guaranted that only
@@ -1305,11 +1624,8 @@ namespace Extract.Imaging.Forms
                 // should be tolerant to document/page changes that could occur in the UI thread.
                 // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
 
-                // Retrieve an IUnknownVector of SpatialStrings representing the words on the page.
-                ISpatialString pageData = (ISpatialString)_ocrData.GetSpecifiedPages(page, page);
-
                 // Get the data grouped by lines.
-                IUnknownVector pageLines = pageData.GetLines();
+                IUnknownVector pageLines = pageOcr.GetLines();
                 int lineCount = pageLines.Size();
 
                 // If there is no OCR data on the page, return null;
@@ -1336,7 +1652,7 @@ namespace Extract.Imaging.Forms
                 for (int i = 0; i < lineCount; i++)
                 {
                     // Get the words from this line.
-                    ISpatialString line = (ISpatialString)pageLines.At(i);
+                    SpatialString line = (SpatialString)pageLines.At(i);
                     IUnknownVector words = line.GetWords();
                     int wordCount = words.Size();
 
@@ -1360,7 +1676,7 @@ namespace Extract.Imaging.Forms
                         _cancelToken.ThrowIfCancellationRequested();
 
                         // Get a raster zone for the word.
-                        ISpatialString word = (ISpatialString)words.At(j);
+                        SpatialString word = (SpatialString)words.At(j);
                         IUnknownVector comRasterZones = word.GetOriginalImageRasterZones();
 
                         ExtractException.Assert("ELI31304", "Unexpected raster zone in OCR data.",
@@ -1881,6 +2197,89 @@ namespace Extract.Imaging.Forms
                 }
 
                 _activeWordHighlights.Clear();
+            }
+
+            /// <summary>
+            /// Sends a status message to the image viewer if appropriate for the specified
+            /// <see paramref="page"/>.
+            /// </summary>
+            /// <param name="page">The page for which the specified <see paramref="status"/> and
+            /// <see paramref="progressPercent"/> apply. -1 if they should apply for any loaded
+            /// page.</param>
+            /// <param name="status">A message describing the current state of the background
+            /// loading operation.</param>
+            /// <param name="progressPercent">The percent loading is complete for the specified
+            /// <see paramref="page"/>.</param>
+            void UpdateBackgroundProgressStatus(int page, string status, double progressPercent)
+            {
+                // Be sure to disregard any calls that occur after Dispose is called.
+                if (_disposed)
+                {
+                    return;
+                }
+
+                // Cache the current status for later use.
+                if (page != -1 && status != null)
+                {
+                    _pageStatusMessages[page] = status;
+                }
+
+                // Calculate the overall progress of the background operation.
+                double overallProgress = progressPercent;
+                if (page != -1)
+                {
+                    overallProgress = progressPercent / (double)_pageCount;
+                    overallProgress += (double)PagesLoaded / (double)_pageCount;
+                    if (overallProgress > 1.0)
+                    {
+                        overallProgress = 1.0;
+                    }
+                }
+
+                // If appropriate, raise the BackgroundProcessStatusUpdate event in the UI thread.
+                _imageViewer.BeginInvoke((MethodInvoker) (() =>
+                    {
+                        if (_imageViewer.IsImageAvailable)
+                        {
+                            if (page == -1 || page == _imageViewer.PageNumber)
+                            {
+                                OnBackgroundProcessStatusUpdate(status, overallProgress);
+                            }
+                            else if (_pageStatusMessages.TryGetValue(_imageViewer.PageNumber, out status))
+                            {
+                                OnBackgroundProcessStatusUpdate(status, overallProgress);
+                            }
+                        }
+                    }));
+            }
+
+            /// <summary>
+            /// Raises the <see cref="BackgroundProcessStatusUpdate"/> event.
+            /// </summary>
+            /// <param name="status">A message describing the current state of the background
+            /// loading operation.</param>
+            /// <param name="progressPercent">The percent loading is complete for the document as a
+            /// whole.</param>
+            void OnBackgroundProcessStatusUpdate(string status, double progressPercent)
+            {
+                if (BackgroundProcessStatusUpdate != null)
+                {
+                    BackgroundProcessStatusUpdate(this,
+                        new BackgroundProcessStatusUpdateEventArgs(status, progressPercent));
+                }
+            }
+
+            /// <summary>
+            /// Raises the <see cref="OcrLoaded"/> event.
+            /// </summary>
+            /// <param name="ocrData">A <see cref="ThreadSafeSpatialString"/> instance representing the
+            /// data from the completed OCR operation.</param>
+            void OnOcrLoaded(ThreadSafeSpatialString ocrData)
+            {
+                if (OcrLoaded != null)
+                {
+                    OcrLoaded(this, new OcrLoadedEventArgs(ocrData));
+                }
             }
 
             #endregion Private Members

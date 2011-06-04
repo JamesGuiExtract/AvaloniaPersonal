@@ -22,7 +22,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The text that displays on the label in the Visual Studio designer.
         /// </summary>
-        private static readonly string _DEFAULT_DESIGNTIME_TEXT = "Resolution: ";
+        private static readonly string _DEFAULT_DESIGNTIME_TEXT = "(Resolution)";
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -97,8 +97,7 @@ namespace Extract.Imaging.Forms
             else
             {
                 // Set the text based on the resolution of the open image
-                base.Text = "Resolution: " + 
-                    _imageViewer.ImageDpiX.ToString(CultureInfo.CurrentCulture)
+                base.Text =  _imageViewer.ImageDpiX.ToString(CultureInfo.CurrentCulture)
                     + " x " + _imageViewer.ImageDpiY.ToString(CultureInfo.CurrentCulture);
             }
         }

@@ -2,6 +2,7 @@ using Leadtools;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.Imaging.Forms
 {
@@ -571,6 +572,72 @@ namespace Extract.Imaging.Forms
         {
             get;
             set;
+        }
+    }
+
+    /// <summary>
+    /// Provides data for the <see cref="ImageViewer.BackgroundProcessStatusUpdate"/> event.
+    /// </summary>
+    public class BackgroundProcessStatusUpdateEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackgroundProcessStatusUpdateEventArgs"/> class.
+        /// </summary>
+        /// <param name="status">A message describing the current state of the background
+        /// loading operation.</param>
+        /// <param name="progressPercent">The percent loading is complete for the document as a
+        /// whole.</param>
+        public BackgroundProcessStatusUpdateEventArgs(string status, double progressPercent)
+            : base()
+        {
+            Status = status;
+            ProgressPercent = progressPercent;
+        }
+
+        /// <summary>
+        /// Gets a message describing the current state of the background loading operation.
+        /// </summary>
+        public string Status
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the percent loading is complete for the document as a whole.
+        /// </summary>
+        public double ProgressPercent
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
+    /// Provides data for the <see cref="ImageViewer.OcrLoaded"/> event.
+    /// </summary>
+    public class OcrLoadedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackgroundProcessStatusUpdateEventArgs"/>
+        /// class.
+        /// </summary>
+        /// <param name="ocrData">A <see cref="ThreadSafeSpatialString"/> instance representing the data
+        /// from the completed OCR operation.</param>
+        public OcrLoadedEventArgs(ThreadSafeSpatialString ocrData)
+            : base()
+        {
+            OcrData = ocrData;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ThreadSafeSpatialString"/> instance representing the data from the
+        /// completed OCR operation.
+        /// </summary>
+        public ThreadSafeSpatialString OcrData
+        {
+            get;
+            private set;
         }
     }
 }
