@@ -60,7 +60,15 @@
 <p />
 		<li><b>Test1 - OCR and Auto-redaction from a Folder file supplier</b>
 		<ul>
-			<li>Open <b>Auto-Redact.fps</b> and start processing.
+            <li>Log in to the test machine as a domain user.
+			<li>Open <b>Auto-Redact.fps</b> and confirm that an error prompt informs you that the DB
+            Schema version does not match.</li>
+            <li>Open the DB Admin and connect to the database <b>sanity_test1</b>.</li>
+            <li>When prompted to update the database to the current schema, click Yes.</li>
+            <li>Confirm that the database is successfully updated.</li>
+            <li>In the Database tab of the FAM, hit the Refresh button and confirm that it connects to
+            the database without error.</li>
+            <li>Start processing.
 			<li>Confirm that a few files complete the <b>OCR</b> and <b>Redact images</b> tasks.
 			<li>Copy the files from the <b>Images</b> folder to the <b>Images2</b> folder.
 			<li>Confirm that files are also being queued from the <b>Images2</b> folder.
@@ -77,8 +85,18 @@
 		<ul>
 			<li><b>User authentication</b> - Use <b>Compute.fps</b> to test.
 			<ul>
-				<li>Log in to the test machine as a domain user.
-				<li>Add a make-believe user via <b>DB Admin</b>.
+                <li>Open the DB Admin and connect to the database <b>sanity_test</b>.</li>
+                <li>When prompted to update the database to the current schema, click No.</li>
+                <li>Confirm that <b>only</b> the following menu items are enabled.
+                <ul>
+                    <li>Database - <b>Clear</b>, <b>Update database schema</b>, <b>Logout</b>, and 
+                    <b>Exit</b>.</li>
+                    <li>Tools - <b>Check for new components</b> and <b>File Action Manager</b>.</li>
+                    <li>Help - <b>File Action Manager Help</b> and <b>About this application</b>.</li>
+                </ul></li>
+                <li>Select the <b>Database - Update database schema</b> menu item.</li>
+                <li>Confirm that the database is successfully updated.</li>
+				<li>Add a make-believe user to the database via <b>DB Admin</b>.
 				<li>Open <b>Compute.fps</b> and start processing.
 				<li>Confirm that a meaningful error message appears and that 
 					processing does not start.
@@ -87,33 +105,42 @@
 				<li>Remove the logged-in user via <b>DB Admin</b>.
 				<li>Modify <b>SkipAuthenticationOnMachines</b> in the 
 				<b>DBInfo</b> table to include the test machine.
-				<li>Confirm that processing starts without error.
+                <li>Confirm that processing still does not start.
+                <li>Configure the FAM service to run Compute.fps
+				<li>Confirm that the FPS file can be run as a service without error.
+                <li>Stop the service and modify the database options so that authentication is not
+                required to run.</li>
 			</ul>		
 			<li>Open <b>Compute.fps</b> and start processing.
 			<li>After queueing is complete, use Task Manager to kill <b>ProcessFiles.exe</b> 
-				while documents are being processed. 
+            while documents are being processed. 
 			<li>Use <b>DB Admin</b> to reset the database lock.
 			<li>Use <b>DB Admin</b> to confirm that some files 
-				are stuck in <b>Processing</b>.
+            are stuck in <b>Processing</b>.
 			<li>Use <b>DB Admin</b> after auto-reversion to confirm that 
-				the files are back in <b>Pending</b> mode.
+            the files are back in <b>Pending</b> status.
 			<li>Open <b>Compute.fps</b> and process the remaining files.
 			<li>Confirm that a few files complete the <b>Execute rules</b> and <b>Conditionally 
-				execute task(s)</b> tasks.
+            execute task(s)</b> tasks.
 			<li>Use the <b>File Action Manager Database Administration</b> utility to display 
-				the <b>Summary</b> tab.  Confirm that the various counts are changing.
+            the <b>Summary</b> tab.  Confirm that the various counts are changing.
+            <li>Try to clear the database and confirm that you are not allowed to clear the database
+            while files are being processed.</li>
 			<li><b>Test3</b> can be started while <b>Test2</b> is executing.  Note that <b>Test3</b> 
-				cannot be completed until after Test2 has completed.
+            cannot be completed until after Test2 has completed.
 			<li>Confirm via <b>FAMDBAdmin</b> that several files are ready for verification 
-				before starting <b>Test3</b>.
+            before starting <b>Test3</b>.
 		</ul>
 <p />
 		<li><b>Test3 - Verify redactions</b>
 		<ul>
 			<li>Open <b>Verify.fps</b> and start processing.
+            <li>Start the slideshow and confirm that it stops when you reach a page containing clues or
+            redactable data.</li>
 			<li>Verify a few files and add several manual redactions.
 			<li>Confirm that redactions can be deleted.
 			<li>Confirm that redactions can be rotated.
+            <li>Confirm that redactions can be auto-shrunk.</li>
 			<li>Navigate to previously verified documents and add additional manual redactions.
 			<li>Confirm that the latest manual redactions are properly saved. 
 			<li><b>Find and redact user text or regular expression</b>
@@ -134,7 +161,7 @@
 				<li>Run the <b>Usage report during custom date range broken down by 
 				user</b> report.
 				<li>Confirm that appropriate results are seen.
-		</ul>
+            </ul>
 
 			<li>Skip a few files during verification.
 			<li>Tag some files during verification.
@@ -230,6 +257,7 @@
 			menu and that the active database is preselected.
 			<li>Confirm that a file list can be <b>exported</b>.
 			<li>Confirm that each available <b>Report</b> can be generated.
+            <li>Confirm that DBInfo settings can be <b>modified</b>.</li>
 		</ul>
 		<p />
 		<li><b>Help File</b>
@@ -275,6 +303,15 @@
 			<li>Confirm that the three buttons copy the appropriate information onto 
 			the clipboard.
 		</ul>
+    <p>
+        <li><b>ID Shield On Demand</b>
+        <ul>
+            <li>Open an image that does not have an associated USS file and confirm that the image
+            viewer status bar indicates progress as it is auto-OCRed.</li>
+            <li>Draw some manual redactions and add some exemption codes.</li>
+            <li>Save a redacted image. Open it in the image viewer and confirm that redactions are drawn
+            appropriately with exemption codes as redaction text.</li>
+        </uL></lI>
 	</ul>
 <p />
 	<li><h2>Utility Applications</h2>
@@ -330,6 +367,8 @@
 				<li>Confirm that a page of text can be OCR'd.
 				<li>Confirm that an angular swipe of text OCRs properly.
 				<li>Confirm that a rectangular swipe of text OCRs properly.
+                <li>Confirm that the word highlight tool works as expected on documents with and 
+                without associated USS files.
 				<li>Confirm that a highlight can be deleted.
 				<li>Confirm that thumbnails are available in verification for a 
 				multi-page image.
@@ -342,6 +381,8 @@
 				<li>Confirm that a page of text can be OCR'd.
 				<li>Confirm that an angular swipe of text OCRs properly.
 				<li>Confirm that a rectangular swipe of text OCRs properly.
+                <li>Confirm that the word highlight tool works as expected on documents with and 
+                without associated USS files.
 				<li>Confirm that a highlight can be deleted.
 				<li>Confirm that thumbnails are available in verification for a 
 				multi-page image.
@@ -417,6 +458,7 @@
 			<ul>
 				<li>choice of counters to decrement
 				<li>specification of USB Key Serial #'s 
+                <li>specification of FKB Version
 				<li>setting of an Internal Use Only flag.
 				<li>setting of a Swiping rule flag
 			</ul>
