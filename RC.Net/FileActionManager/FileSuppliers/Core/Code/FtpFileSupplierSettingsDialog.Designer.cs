@@ -294,9 +294,12 @@
             this._ftpConnectionSettingsControl.MinimumSize = new System.Drawing.Size(450, 370);
             this._ftpConnectionSettingsControl.Name = "_ftpConnectionSettingsControl";
             this._ftpConnectionSettingsControl.NumberOfConnections = 1;
+            this._ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = 0;
             this._ftpConnectionSettingsControl.Padding = new System.Windows.Forms.Padding(3);
+            this._ftpConnectionSettingsControl.ShowConnectionsControl = true;
             this._ftpConnectionSettingsControl.Size = new System.Drawing.Size(469, 370);
             this._ftpConnectionSettingsControl.TabIndex = 3;
+            this._ftpConnectionSettingsControl.TimeBetweenRetries = 0;
             // 
             // _secureFTPConnection
             // 
@@ -342,6 +345,7 @@
             this.MinimizeBox = false;
             this.Name = "FtpFileSupplierSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Files from FTP site";
             this._settingsTabControl.ResumeLayout(false);

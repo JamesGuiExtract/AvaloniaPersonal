@@ -65,7 +65,7 @@
             this._settingsTabControl.Location = new System.Drawing.Point(4, 4);
             this._settingsTabControl.Name = "_settingsTabControl";
             this._settingsTabControl.SelectedIndex = 0;
-            this._settingsTabControl.Size = new System.Drawing.Size(459, 330);
+            this._settingsTabControl.Size = new System.Drawing.Size(469, 378);
             this._settingsTabControl.TabIndex = 0;
             // 
             // _generalSettingsTabPage
@@ -75,7 +75,7 @@
             this._generalSettingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._generalSettingsTabPage.Name = "_generalSettingsTabPage";
             this._generalSettingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._generalSettingsTabPage.Size = new System.Drawing.Size(451, 304);
+            this._generalSettingsTabPage.Size = new System.Drawing.Size(461, 352);
             this._generalSettingsTabPage.TabIndex = 0;
             this._generalSettingsTabPage.Text = "General Settings";
             this._generalSettingsTabPage.UseVisualStyleBackColor = true;
@@ -93,7 +93,7 @@
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Location = new System.Drawing.Point(6, 105);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(439, 123);
+            this.groupBox2.Size = new System.Drawing.Size(449, 123);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "File paths";
@@ -171,7 +171,7 @@
             this.groupBox1.Controls.Add(this._uploadFileRadioButton);
             this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(439, 93);
+            this.groupBox1.Size = new System.Drawing.Size(449, 93);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Select file operation";
@@ -218,7 +218,7 @@
             this._connectionSettingsTabPage.Location = new System.Drawing.Point(4, 22);
             this._connectionSettingsTabPage.Name = "_connectionSettingsTabPage";
             this._connectionSettingsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._connectionSettingsTabPage.Size = new System.Drawing.Size(451, 304);
+            this._connectionSettingsTabPage.Size = new System.Drawing.Size(461, 352);
             this._connectionSettingsTabPage.TabIndex = 1;
             this._connectionSettingsTabPage.Text = "Connection Settings";
             this._connectionSettingsTabPage.UseVisualStyleBackColor = true;
@@ -232,16 +232,18 @@
             this._ftpConnectionSettingsControl.MinimumSize = new System.Drawing.Size(380, 300);
             this._ftpConnectionSettingsControl.Name = "_ftpConnectionSettingsControl";
             this._ftpConnectionSettingsControl.NumberOfConnections = 1;
+            this._ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = 0;
             this._ftpConnectionSettingsControl.Padding = new System.Windows.Forms.Padding(3);
             this._ftpConnectionSettingsControl.ShowConnectionsControl = false;
-            this._ftpConnectionSettingsControl.Size = new System.Drawing.Size(448, 300);
+            this._ftpConnectionSettingsControl.Size = new System.Drawing.Size(458, 348);
             this._ftpConnectionSettingsControl.TabIndex = 0;
+            this._ftpConnectionSettingsControl.TimeBetweenRetries = 0;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(307, 344);
+            this._okButton.Location = new System.Drawing.Point(317, 392);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 1;
@@ -253,7 +255,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(388, 344);
+            this._cancelButton.Location = new System.Drawing.Point(398, 392);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 2;
@@ -264,13 +266,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(469, 378);
+            this.ClientSize = new System.Drawing.Size(479, 426);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._settingsTabControl);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MinimumSize = new System.Drawing.Size(485, 416);
             this.Name = "FtpFileTransferSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Core: Transfer file via FTP/SFTP";
             this._settingsTabControl.ResumeLayout(false);

@@ -89,6 +89,9 @@ namespace Extract.FileActionManager.FileProcessors
                 _ftpConnectionSettingsControl.FtpConnection = 
                     _settings.ConfiguredFtpConnection ?? new SecureFTPConnection();
 
+                _ftpConnectionSettingsControl.TimeBetweenRetries = Settings.TimeToWaitBetweenRetries;
+                _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = Settings.NumberOfTimesToRetry;
+
                 UpdateControlState();
             }
             catch (Exception ex)
@@ -136,6 +139,10 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 _settings.ConfiguredFtpConnection = _ftpConnectionSettingsControl.FtpConnection;
+
+                _settings.TimeToWaitBetweenRetries = _ftpConnectionSettingsControl.TimeBetweenRetries;
+
+                _settings.NumberOfTimesToRetry = _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure;
 
                 // Still need to verify settings
                 DialogResult = DialogResult.OK;

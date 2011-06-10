@@ -7,6 +7,7 @@ using Extract.Utilities.Ftp;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -58,7 +59,17 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Current task version.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
+
+        /// <summary>
+        /// Default wait time between retries
+        /// </summary>
+        const int _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES = 1000;
+
+        /// <summary>
+        /// Default number of retries before failure
+        /// </summary>
+        const int _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE = 1000;
 
         #endregion Constants
 
@@ -76,6 +87,12 @@ namespace Extract.FileActionManager.FileProcessors
         // Connection that is used for the settings for the ftp server
         SecureFTPConnection _configuredFtpConnection = new SecureFTPConnection();
 
+        // Number of times to retry
+        int _numberOfTimesToRetry = _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE;
+
+        // Time to wait between retries
+        int _timeToWaitBetweenRetries = _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES;
+
         // Indicates that settings have been changed, but not saved.
         bool _dirty;
 
@@ -84,6 +101,10 @@ namespace Extract.FileActionManager.FileProcessors
 
         // Connection used when processing files
         SecureFTPConnection _runningConnection;
+
+        // Event to signal if that task has been canceled
+        // This will only be checked if a file is being retried.
+        AutoResetEvent _cancelTask = new AutoResetEvent(false);
 
         #endregion Fields
 
@@ -200,6 +221,44 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Number of times to retry calls to the ftp server
+        /// </summary>
+        public int NumberOfTimesToRetry
+        {
+            get
+            {
+                return _numberOfTimesToRetry;
+            }
+            set
+            {
+                if (_numberOfTimesToRetry != value)
+                {
+                    _numberOfTimesToRetry = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Time to wait between retries for calls to Ftp server
+        /// </summary>
+        public int TimeToWaitBetweenRetries
+        {
+            get
+            {
+                return _timeToWaitBetweenRetries;
+            }
+            set
+            {
+                if (_timeToWaitBetweenRetries != value)
+                {
+                    _timeToWaitBetweenRetries = value;
+                    _dirty = true;
+                }
+            }
+        }
+        
         #endregion Properties
          
         #region ICategorizedComponent Members
@@ -328,7 +387,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public void Cancel()
         {
-            // Do nothing, this task is not cancellable
+            try
+            {
+                _cancelTask.Set();
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI32649", "Could not cancel.");
+            }
         }
 
         /// <summary>
@@ -409,8 +475,14 @@ namespace Extract.FileActionManager.FileProcessors
                 remoteFile = tags.Expand(_remoteFileName);
                 remoteFile = remoteFile.Replace('\\', '/');
 
-                _runningConnection.Connect();
-                PerformAction(localFile, remoteFile);
+                // There are retry settings for the file supplier that will allow quicker exiting if
+                // the stop button is pressed on the FAM so change the connection to not retry.
+                _runningConnection.RetryCount = 0;
+
+                // Create retry object
+                Retry<Exception> retry = 
+                    new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _cancelTask);
+                retry.DoRetryNoReturnValue(PerformAction, localFile, remoteFile);
 
                 // If we reached this point then processing was successful
                 return EFileProcessingResult.kProcessingSuccessful;
@@ -435,7 +507,10 @@ namespace Extract.FileActionManager.FileProcessors
             }
             finally
             {
-                _runningConnection.Close();
+                if (_runningConnection.IsConnected)
+                {
+                    _runningConnection.Close();
+                }
             }
         }
 
@@ -509,9 +584,17 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
+                    InitializeDefaults();
+
                     _actionToPerform = (TransferActionToPerform)reader.ReadInt32();
                     _remoteFileName = reader.ReadString();
                     _localFileName = reader.ReadString();
+
+                    if (reader.Version >= 2)
+                    {
+                        _numberOfTimesToRetry = reader.ReadInt32();
+                        _timeToWaitBetweenRetries = reader.ReadInt32();
+                    }
 
                     string hexString = reader.ReadString();
                     using (MemoryStream ftpDataStream = new MemoryStream(hexString.ToByteArray()))
@@ -551,6 +634,8 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write((int)_actionToPerform);
                     writer.Write(_remoteFileName);
                     writer.Write(_localFileName);
+                    writer.Write(_numberOfTimesToRetry);
+                    writer.Write(_timeToWaitBetweenRetries);
 
                     // Write the Ftp connection settings to the steam
                     using (MemoryStream ftpDataStream = new MemoryStream())
@@ -662,6 +747,8 @@ namespace Extract.FileActionManager.FileProcessors
                 _actionToPerform = task.ActionToPerform;
                 _localFileName = task.LocalFileName;
                 _remoteFileName = task._remoteFileName;
+                _timeToWaitBetweenRetries = task._timeToWaitBetweenRetries;
+                _numberOfTimesToRetry = task._numberOfTimesToRetry;
 
                 ConfiguredFtpConnection = (SecureFTPConnection)task.ConfiguredFtpConnection.Clone();
 
@@ -680,23 +767,57 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="remoteFile">File name with path of the remote file</param>
         private void PerformAction(string localFile, string remoteFile)
         {
-            FtpMethods.SetCurrentFtpWorkingFolder(_runningConnection, remoteFile);
-            remoteFile = PathUtil.GetFileName(remoteFile);
-            switch (ActionToPerform)
+            try
             {
-                case TransferActionToPerform.UploadFileToFtpServer:
-                    _runningConnection.UploadFile(localFile, remoteFile);
-                    break;
-                case TransferActionToPerform.DownloadFileFromFtpServer:
-                    FtpMethods.GenerateLocalPathCreateIfNotExists(
-                        _runningConnection.ServerDirectory, Path.GetDirectoryName(localFile),
-                        _runningConnection.ServerDirectory);
-                    _runningConnection.DownloadFile(localFile, remoteFile);
-                    break;
-                case TransferActionToPerform.DeleteFileFromFtpServer:
-                    _runningConnection.DeleteFile(remoteFile);
-                    break;
+                if (!_runningConnection.IsConnected)
+                {
+                    _runningConnection.Connect();
+                }
+
+                FtpMethods.SetCurrentFtpWorkingFolder(_runningConnection, remoteFile);
+                remoteFile = PathUtil.GetFileName(remoteFile);
+                switch (ActionToPerform)
+                {
+                    case TransferActionToPerform.UploadFileToFtpServer:
+                        _runningConnection.UploadFile(localFile, remoteFile);
+                        break;
+                    case TransferActionToPerform.DownloadFileFromFtpServer:
+                        FtpMethods.GenerateLocalPathCreateIfNotExists(
+                            _runningConnection.ServerDirectory, Path.GetDirectoryName(localFile),
+                            _runningConnection.ServerDirectory);
+                        _runningConnection.DownloadFile(localFile, remoteFile);
+                        break;
+                    case TransferActionToPerform.DeleteFileFromFtpServer:
+                        _runningConnection.DeleteFile(remoteFile);
+                        break;
+                }
             }
+            catch (Exception ex)
+            {
+                ExtractException ee = ex.AsExtract("ELI32648");
+                switch (ActionToPerform)
+                {
+                    case TransferActionToPerform.UploadFileToFtpServer:
+                        ee.AddDebugData("TransferAction", "UploadFielToFtpServer", false);
+                        ee.AddDebugData("LocalFile", localFile, false);
+                        break;
+                    case TransferActionToPerform.DownloadFileFromFtpServer:
+                        ee.AddDebugData("TransferAction", "DownloadFileFromFtpServer", false);
+                        ee.AddDebugData("LocalFile", localFile, false);
+                        break;
+                    case TransferActionToPerform.DeleteFileFromFtpServer:
+                        ee.AddDebugData("TransferAction", "DeleteFileFromFtpServer", false);
+                        break;
+                }
+                ee.AddDebugData("RemoteFile", remoteFile, false);
+                throw ee;
+            }
+        }
+
+        void InitializeDefaults()
+        {
+            _numberOfTimesToRetry = _DEFAULT_NUMBER_OF_RETRIES_BEFORE_FAILURE;
+            _timeToWaitBetweenRetries = _DEFAULT_WAIT_TIME_IN_MILLISECONDS_BETWEEN_RETRIES;
         }
 
         #endregion Methods

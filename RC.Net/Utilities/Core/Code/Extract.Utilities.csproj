@@ -90,6 +90,7 @@
     <Compile Include="PathTagsBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistryMethods.cs" />
+    <Compile Include="Retry.cs" />
     <Compile Include="SourceDocumentPathTags.cs" />
     <Compile Include="StreamMethods.cs" />
     <Compile Include="StringPair.cs" />

@@ -72,6 +72,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 _pollRemoteCheckBox.Checked = _settings.PollRemoteLocation;
                 _pollingIntervalNumericUpDown.Value = _settings.PollingIntervalInMinutes;
                 _ftpConnectionSettingsControl.NumberOfConnections = _settings.NumberOfConnections;
+                _ftpConnectionSettingsControl.TimeBetweenRetries = _settings.TimeToWaitBetweenRetries;
+                _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure = _settings.NumberOfTimesToRetry;
 
                 // Set the AfterDownloadAction radio buttons
                 switch (_settings.AfterDownloadAction)
@@ -131,6 +133,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 _settings.PollRemoteLocation = _pollRemoteCheckBox.Checked;
                 _settings.PollingIntervalInMinutes = (int)_pollingIntervalNumericUpDown.Value;
                 _settings.NumberOfConnections = _ftpConnectionSettingsControl.NumberOfConnections;
+                _settings.NumberOfTimesToRetry = _ftpConnectionSettingsControl.NumberOfRetriesBeforeFailure;
+                _settings.TimeToWaitBetweenRetries = _ftpConnectionSettingsControl.TimeBetweenRetries;
 
                 if (_doNothingRadioButton.Checked)
                 {
