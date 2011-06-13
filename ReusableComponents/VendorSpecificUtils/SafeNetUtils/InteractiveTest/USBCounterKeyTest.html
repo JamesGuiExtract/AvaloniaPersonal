@@ -435,23 +435,11 @@
 <p>
 	<li><b>Complex Functionality</b>
 	<ul>
-		<li>Install the AnywhereUSB drivers on another test machine.
-		<li><u>Single-user key</u>
-		<ul>
-			<li>Confirm that each test machine can see the USB key.
-			<li>Confirm that each test machine can individually run rules and decrement 
-			the USB counter.
-			<li>Confirm that a meaningful exception is displayed if both test machines 
-			attempt to use the key at the same time.
-		</ul>
-		<li><u>Multiple-user key</u>
-		<ul>
-			<li>Confirm that each test machine can see the USB key.
-			<li>Confirm that each test machine can individually run rules and decrement 
-			the USB counter.
-			<li>Confirm that each test machine can simultaneously run rules and decrement 
-			the USB counter.
-		</ul>
+		<li>Physically connect a USB key to another test machine.
+		<li>Confirm that the USB key is available via remote connection.
+		<li>Install the AnywhereUSB drivers on the test machine currently hosting the USB key.
+		<li>Configure the AnywhereUSB device to use this test machine.
+		<li>Confirm that the USB key is still available via remote connection.
 <p>
 		<li>Adjust the <b>NumberOfUSBKeyRetries</b> and <b>WaitTimeoutUSBKeyRetry</b> 
 		keys under <b>HKLM\Software\Extract Systems\SafeNetUtils</b> to make 
