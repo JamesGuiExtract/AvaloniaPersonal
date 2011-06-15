@@ -6,14 +6,48 @@
 </HEAD>
 <BODY>
 
-<h1>ID Shield for Laserfiche<br>Miscellaneous Testing Checklist 
+<h1>ID Shield for Laserfiche<br>Miscellaneous Testing Checklist<br> 
 <IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 
 <hr>
 
-<ul>
-	<li><h3>PVCS</h3></li>
+	<h3>1.0.0.46 Patch E</h3>
+	<ul>
+		<li>Exercise the test cases below on <b>Laserfiche 7.2</b>.
+		<li><b>Test Ensure Redactions Setting</b>
+		<ul>
+			<li>Exercise the <b>Test Ensure Redactions Setting</b> section of the 
+			<b>Redaction Settings and Behavoir checklist</b>.
+		</ul>
+		<li><b>[Integrations #306]</b> Corresponding redaction validation takes too long
+		<ul>
+			<li>Find or create several 50-150 page documents.
+			<li>Process the images via <b>On Demand Redaction</b>.
+			<li>Verify one image without adding additional redactions.  Note the time 
+			required for validation.
+			<li>Verify another image and add several image redactions.  Note 
+			the time required for validation.  Confirm that the time requirements 
+			are similar.
+			<li>Verify another image and add several text redactions.  Note 
+			the time required for validation.  Confirm that the time requirements 
+			are similar.
+			<li>Verify another image and remove the OCR data for some of 
+			the pages.  Confirm that a message is presented to the user during 
+			validation.
+			<li>Verify another image and remove the OCR data for some of 
+			the pages.  Add some non-spatial text and create one or more redactions 
+			within the non-spatial text.  Confirm that a message is presented to the 
+			user during validation.
+			<li>Open several of the completed images and navigate through pages that 
+			contain redactions.  Confirm that no pages are locked.
+			<li>Exercise some of the above test cases on documents with <b>bad</b> 
+			OCR data.
+		</ul>
+		<li>Exercise the above test cases on <b>Laserfiche 8.1</b>.
+	</ul>
+<p>
+	<h3>PVCS</h3>
 	<ul>
 		<li><b>[Integrations #6]</b> Repository list has empty entry
 		<ul>
@@ -91,23 +125,32 @@
 		<li><b>[Integrations #137]</b> Documents without a template are not found/processed.
 		<ul>
 			<li>Ensure the background service is running.
-			<li>Find or import a document in to Laserfiche that does not have a template (Display the template column to verify)
+			<li>Find or import a document in to Laserfiche that does not have a 
+			template (Display the template column to verify)
 			<li>Submit the document for background processing.
 			<li>Ensure the document is processed by the background service.
 		</ul>
 <p>
-		<li><b>[Integrations #138]</b> Background submission and verification should not require desktop license.
+		<li><b>[Integrations #138]</b> Background submission and verification should not 
+		require desktop license.
 		<ul>
-			<li>License the test machine so that it has only a verification license (not a desktop or server license)
-			<li>In the Laserfiche client submit a document for background processing; ensure no exception is displayed.
-			<li>In the Laserfiche client verify a document that is pending verification; ensure no exception is displayed.
+			<li>License the test machine so that it has only a verification license 
+			(not a desktop or server license)
+			<li>In the Laserfiche client submit a document for background processing; 
+			ensure no exception is displayed.
+			<li>In the Laserfiche client verify a document that is pending verification; 
+			ensure no exception is displayed.
 		</ul>
 <p>
-		<li><b>[Integrations #139]</b> Background submission and verification should not validate rules file.
+		<li><b>[Integrations #139]</b> Background submission and verification should not 
+		validate rules file.
 		<ul>
-			<li>If the rules file is visible on the client machine, rename the rules file directory.
-			<li>In the Laserfiche client submit a document for background processing; ensure no exception is displayed.
-			<li>In the Laserfiche client verify a document that is pending verification; ensure no exception is displayed.
+			<li>If the rules file is visible on the client machine, rename the rules 
+			file directory.
+			<li>In the Laserfiche client submit a document for background processing; 
+			ensure no exception is displayed.
+			<li>In the Laserfiche client verify a document that is pending verification; 
+			ensure no exception is displayed.
 		</ul>
 <p>
 		<li><b>[Integrations #145]</b> Laserfiche image rotation is not taken into account
@@ -119,7 +162,7 @@
 		</ul>		
 	</ul>
 <p>
-	<li><h3>Other</h3></li>
+	<h3>Other</h3>
 	<ul>
 		<li><b>Process a multi-page document</b>
 		<ul>
@@ -199,6 +242,5 @@
 			<b>On-demand redaction</b>.
 		</ul>
 	</ul>
-</ul>
 </BODY>
 </HTML>
