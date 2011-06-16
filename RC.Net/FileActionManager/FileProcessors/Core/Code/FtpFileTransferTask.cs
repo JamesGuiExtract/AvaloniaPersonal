@@ -106,6 +106,9 @@ namespace Extract.FileActionManager.FileProcessors
         // This will only be checked if a file is being retried.
         AutoResetEvent _cancelTask = new AutoResetEvent(false);
 
+        // Flag set when task is initialized to indicate if loading the download info file is required
+        bool _loadDownloadInfoFile;
+
         #endregion Fields
 
         #region Constructor
@@ -430,6 +433,10 @@ namespace Extract.FileActionManager.FileProcessors
                 // Create the running connection and intialize the license
                 _runningConnection = (SecureFTPConnection)ConfiguredFtpConnection.Clone();
                 FtpMethods.InitializeFtpApiLicense(_runningConnection);
+
+                // Check if the RemoteSourceDocName tag is used in the input or output file name
+                _loadDownloadInfoFile = _localFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag) ||
+                    _remoteFileName.Contains(FileActionManagerPathTags.RemoteSourceDocumentTag);
             }
             catch (Exception ex)
             {
@@ -463,9 +470,24 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_licenseId, "ELI32423", _COMPONENT_DESCRIPTION);
 
-                // Create a tag manager and expand the tags in the file name
-                var tags = new FileActionManagerPathTags(
-                    Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir);
+                IPathTags tags;
+
+                if (_loadDownloadInfoFile)
+                {
+                    FtpDownloadedFileInfo downloadFileInfo = new FtpDownloadedFileInfo(Path.GetFullPath(pFileRecord.Name) + ".info");
+
+                    // Load the .info file 
+                    downloadFileInfo.Load();
+
+                    // Create a tag manager and expand the tags in the file name
+                    tags = new FileActionManagerPathTags(
+                       Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir, downloadFileInfo.RemoteSourceDocName);
+                }
+                else
+                {
+                    tags = new FileActionManagerPathTags(
+                       Path.GetFullPath(pFileRecord.Name), pFAMTM.FPSFileDir);
+                }
 
                 if (ActionToPerform != TransferActionToPerform.DeleteFileFromFtpServer)
                 {
@@ -702,6 +724,11 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _runningConnection.Dispose();
                     _runningConnection = null;
+                }
+                if (_cancelTask != null)
+                {
+                    _cancelTask.Dispose();
+                    _cancelTask = null;
                 }
             }
 

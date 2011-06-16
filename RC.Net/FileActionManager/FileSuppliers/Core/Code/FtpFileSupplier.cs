@@ -907,42 +907,28 @@ namespace Extract.FileActionManager.FileSuppliers
                 if (e.Succeeded)
                 {
                     // Verify that the files is exists localy
-                    if (File.Exists(e.LocalPath))
+                    if (File.Exists(e.LocalPath) && e.LocalFileSize == e.RemoteFileSize)
                     {
                         // Add the local file that was just downloaded to the database
                         _fileTarget.NotifyFileAdded(e.LocalPath, this);
+                        PerformAfterDownloadAction(e.RemoteFile, runningConnection);
                     }
                     else
                     {
                         ExtractException ee = new ExtractException("ELI32311", "File was not downloaded.");
                         ee.AddDebugData("LocalFile", e.LocalPath, false);
                         ee.AddDebugData("RemoteFile", e.RemoteFile, false);
+                        ee.AddDebugData("LocalFileSize", e.LocalFileSize, false);
+                        ee.AddDebugData("RemoteFileSize", e.RemoteFileSize, false);
                         throw ee;
-                    }
-
-                    // There are retry settings for the file supplier that will allow quicker exiting if
-                    // the stop button is pressed on the FAM so change the connection to not retry.
-                    runningConnection.RetryCount = 0;
-
-                    // Create retry object
-                    Retry<Exception> _retry = 
-                        new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
-
-                    // Perform the after download action
-                    switch (AfterDownloadAction)
-                    {
-                        case AfterDownloadRemoteFileActon.ChangeRemoteFileExtension:
-                            _retry.DoRetry(RenameFileOnFtpServer, e.RemoteFile, 
-                                e.RemoteFile + NewExtensionForRemoteFile, runningConnection);
-                            break;
-                        case AfterDownloadRemoteFileActon.DeleteRemoteFile:
-                            _retry.DoRetry(DeleteFileFromFtpServer, e.RemoteFile, runningConnection);
-                            break;
                     }
                 }
                 else
                 {
-                    // If the file was partially copied need to delete the file
+                    // If the file was partially downloaded should log and exception
+                    // The download may have failed due to the file existing in the local folder
+                    // and so the file may not have been changed.  Don't want to delete it 
+                    // since that could delete a file that existed before the download attempt
                     if (File.Exists(e.LocalPath))
                     {
                         ExtractException ee = new ExtractException("ELI32323",
@@ -960,7 +946,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 ee.Log();
             }
         }
-        
+                
         /// <summary>
         /// Handles the PollingTimer timeout event, it will cause the ManageFileDownload thread
         /// to connect to the ftp server and get a listing of files to download.  If the 
@@ -1472,7 +1458,6 @@ namespace Extract.FileActionManager.FileSuppliers
                     runningConnection.Connect();
                 }
 
-
                 FtpMethods.SetCurrentFtpWorkingFolder(runningConnection, currentFtpFile.Path);
                 string localFilePath = FtpMethods.GenerateLocalPathCreateIfNotExists(
                     runningConnection.ServerDirectory,
@@ -1481,7 +1466,37 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 // Determine the full name of the local file
                 localFile = Path.Combine(localFilePath, currentFtpFile.Name);
+
+                string infoFileName = localFile + ".info";
+
+                if (File.Exists(localFile) && File.Exists(infoFileName))
+                {
+                    FtpDownloadedFileInfo currentDownloadedFileInfo = new FtpDownloadedFileInfo(infoFileName);
+                    currentDownloadedFileInfo.Load();
+
+                    if (currentDownloadedFileInfo.RemoteFileSize == currentFtpFile.Size &&
+                        currentDownloadedFileInfo.RemoteLastModifiedTime == currentFtpFile.LastModified)
+                    {
+                        // The file does not need to be downloaded but it should be added to the
+                        // database again if required
+                        _fileTarget.NotifyFileAdded(localFile, this);
+
+                        // The after download action still needs to be done
+                        PerformAfterDownloadAction(currentFtpFile.Path, runningConnection);
+
+                        return;
+                    }
+                }
+
                 runningConnection.DownloadFile(localFile, currentFtpFile.Name);
+
+                // Make sure the local file exists ( the dowload may have failed. in some way)
+                if (File.Exists(localFile))
+                {
+                    FtpDownloadedFileInfo ftpInfoFile = new FtpDownloadedFileInfo(infoFileName,
+                        currentFtpFile);
+                    ftpInfoFile.Save();
+                }
             }
             catch (Exception ex)
             {
@@ -1498,6 +1513,34 @@ namespace Extract.FileActionManager.FileSuppliers
             finally
             {
                 CloseConnectionIfPausedAndWaitForResume(runningConnection);
+            }
+        }
+
+        /// <summary>
+        /// Performs the after download action for a downloaded file
+        /// </summary>
+        /// <param name="remoteFileName">The full remote file name with path on the server</param>
+        /// <param name="runningConnection">FTP connection used to preform the action</param>
+        private void PerformAfterDownloadAction(string remoteFileName, SecureFTPConnection runningConnection)
+        {
+            // There are retry settings for the file supplier that will allow quicker exiting if
+            // the stop button is pressed on the FAM so change the connection to not retry.
+            runningConnection.RetryCount = 0;
+
+            // Create retry object
+            Retry<Exception> _retry =
+                new Retry<Exception>(NumberOfTimesToRetry, TimeToWaitBetweenRetries, _stopSupplying);
+
+            // Perform the after download action
+            switch (AfterDownloadAction)
+            {
+                case AfterDownloadRemoteFileActon.ChangeRemoteFileExtension:
+                    _retry.DoRetry(RenameFileOnFtpServer, remoteFileName,
+                        remoteFileName + NewExtensionForRemoteFile, runningConnection);
+                    break;
+                case AfterDownloadRemoteFileActon.DeleteRemoteFile:
+                    _retry.DoRetry(DeleteFileFromFtpServer, remoteFileName, runningConnection);
+                    break;
             }
         }
         

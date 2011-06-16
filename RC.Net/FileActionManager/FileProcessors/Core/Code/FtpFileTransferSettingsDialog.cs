@@ -1,4 +1,5 @@
 ﻿using EnterpriseDT.Net.Ftp;
+using Extract.Utilities;
 using System;
 using System.Windows.Forms;
 
@@ -48,6 +49,10 @@ namespace Extract.FileActionManager.FileProcessors
         public FtpFileTransferSettingsDialog(FtpFileTransferTask settings)
         {
             InitializeComponent();
+
+            // Initialize the Path tags buttons to have <SourceDocName>, <FPSFileDir> and <RemoteSourceDocName> tags
+            _localFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "");
+            _remoteFileNamePathTagsButton.PathTags = new FileActionManagerPathTags("", "", "");
 
             _settings = settings ?? new FtpFileTransferTask();
         }

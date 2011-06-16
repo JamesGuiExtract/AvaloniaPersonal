@@ -121,7 +121,6 @@
             this._localFileNamePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_localFileNamePathTagsButton.Image")));
             this._localFileNamePathTagsButton.Location = new System.Drawing.Point(374, 82);
             this._localFileNamePathTagsButton.Name = "_localFileNamePathTagsButton";
-            this._localFileNamePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._localFileNamePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._localFileNamePathTagsButton.TabIndex = 2;
             this._localFileNamePathTagsButton.TextControl = this._localFileNameTextBox;
