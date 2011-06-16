@@ -173,6 +173,11 @@ Names|Wisconsin National Bank successor to Wisconsin Bank
 .Company|Wisconsin National Bank
 ..CompanyAlias|Wisconsin Bank|SII
 
+<TESTCASE>|Company Name with As Successor In Interest To|Wisconsin National Bank, as successor in interest to Wisconsin Bank
+Names|Wisconsin National Bank, as successor in interest to Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SII
+
 <TESTCASE>|Company Name with As Successor To|Wisconsin National Bank as successor to Wisconsin Bank
 Names|Wisconsin National Bank as successor to Wisconsin Bank
 .Company|Wisconsin National Bank
