@@ -95,6 +95,27 @@ namespace Extract.Utilities.Parsers
 
         #endregion
 
+        #region Public Methods
+
+        /// <summary>
+        /// Validates the currently assigned <see cref="Pattern"/>.
+        /// </summary>
+        /// <throws><see cref="ExtractException"/> if the specified regular expression pattern is
+        /// not valid.</throws>
+        public void ValidatePattern()
+        {
+            try
+            {
+                GetRegexParser();
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI32733", "Invalid regular expression pattern", ex);
+            }
+        }
+
+        #endregion Public Methods
+
         #region IRegularExprParser Methods
 
         /// <summary>

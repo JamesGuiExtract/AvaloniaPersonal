@@ -117,17 +117,81 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="icon_down" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon_down.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <metadata name="label1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label4.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label5.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label6.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label7.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="_regexInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
   </data>
-  <data name="icon_up" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon_up.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="_attributeQueryInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
   </data>
-  <data name="SelectDocTagArrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\SelectDocTagArrow.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="_voaFilePathTags.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABKSURBVFhH7dIxCgAgDARB//9pxUKwsgiBsxj7C8vgGB4B
+        AgQIEKgLzPq0Z7kDohEnIBZxB0QivhHo+VGFKxH2QqcJAQIECBB4CyyqxA/xREJjJwAAAABJRU5ErkJg
+        gg==
+</value>
   </data>
-  <data name="HelpBubble" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HelpBubble.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="_comparisonInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="_comparisonInfoTip.TipText" xml:space="preserve">
+    <value>If a greater than or less than comparison is specified and the value to compare against
+is a number, the specified attribute field value must be number to qualify for meeting
+the comparison.
+
+If an equals or not equals comparison is specified or the value to compare against is not
+a number, the values will be compared lexicographically (alphabetically).</value>
+  </data>
+  <data name="_rangeInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="_rangeInfoTip.TipText" xml:space="preserve">
+    <value>If both the range start and end values are a number, the specified attribute field value must be number to qualify for meeting
+the comparison.
+
+Otherwise, the values will be compared lexicographically (alphabetically).</value>
   </data>
 </root>

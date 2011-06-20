@@ -143,6 +143,12 @@
     <Compile Include="BrowseButton.Designer.cs">
       <DependentUpon>BrowseButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="InfoTip.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="InfoTip.Designer.cs">
+      <DependentUpon>InfoTip.cs</DependentUpon>
+    </Compile>
     <Compile Include="NumericEntryTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -276,6 +282,9 @@
       <DependentUpon>CustomizableMessageBoxForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="InfoTip.resx">
+      <DependentUpon>InfoTip.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="InputBoxForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>InputBoxForm.cs</DependentUpon>
@@ -398,6 +407,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon_up.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HelpBubble.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

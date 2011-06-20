@@ -151,7 +151,7 @@ namespace Extract.Redaction
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI32042",
-                    "Unable to initialize 'Extend redactions to surround context' task.", ex);
+                    "Unable to initialize 'Merge ID Shield data files' task.", ex);
             }
         }
 
@@ -206,7 +206,7 @@ namespace Extract.Redaction
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI32046",
-                    "Unable to cancel 'Extend redactions to surround context' task.", ex);
+                    "Unable to cancel 'Merge ID Shield data files' task.", ex);
             }
         }
 
@@ -224,7 +224,7 @@ namespace Extract.Redaction
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI32048",
-                    "Unable to close 'Extend redactions to surround context' task.", ex);
+                    "Unable to close 'Merge ID Shield data files' task.", ex);
             }
         }
 
