@@ -89,7 +89,7 @@
             label4.Location = new System.Drawing.Point(222, 63);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(133, 13);
-            label4.TabIndex = 7;
+            label4.TabIndex = 8;
             label4.Text = "of the following attribute(s):";
             // 
             // label5
@@ -98,7 +98,7 @@
             label5.Location = new System.Drawing.Point(13, 149);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(102, 13);
-            label5.TabIndex = 9;
+            label5.TabIndex = 11;
             label5.Text = "where the attribute\'s";
             // 
             // label6
@@ -107,7 +107,7 @@
             label6.Location = new System.Drawing.Point(252, 203);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(16, 13);
-            label6.TabIndex = 16;
+            label6.TabIndex = 19;
             label6.Text = "to";
             // 
             // label7
@@ -116,7 +116,7 @@
             label7.Location = new System.Drawing.Point(165, 229);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(69, 13);
-            label7.TabIndex = 19;
+            label7.TabIndex = 24;
             label7.Text = "the following:";
             // 
             // label2
@@ -125,7 +125,7 @@
             label2.Location = new System.Drawing.Point(192, 9);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(118, 13);
-            label2.TabIndex = 37;
+            label2.TabIndex = 2;
             label2.Text = "if the following VOA file:";
             // 
             // _containsComboBox
@@ -135,7 +135,7 @@
             this._containsComboBox.Location = new System.Drawing.Point(13, 60);
             this._containsComboBox.Name = "_containsComboBox";
             this._containsComboBox.Size = new System.Drawing.Size(146, 21);
-            this._containsComboBox.TabIndex = 3;
+            this._containsComboBox.TabIndex = 6;
             // 
             // _attributeQueryTextBox
             // 
@@ -145,7 +145,7 @@
             this._attributeQueryTextBox.Multiline = true;
             this._attributeQueryTextBox.Name = "_attributeQueryTextBox";
             this._attributeQueryTextBox.Size = new System.Drawing.Size(417, 53);
-            this._attributeQueryTextBox.TabIndex = 8;
+            this._attributeQueryTextBox.TabIndex = 10;
             // 
             // _fieldNameComboBox
             // 
@@ -154,7 +154,7 @@
             this._fieldNameComboBox.Location = new System.Drawing.Point(121, 146);
             this._fieldNameComboBox.Name = "_fieldNameComboBox";
             this._fieldNameComboBox.Size = new System.Drawing.Size(82, 21);
-            this._fieldNameComboBox.TabIndex = 10;
+            this._fieldNameComboBox.TabIndex = 12;
             // 
             // _comparisonRadioButton
             // 
@@ -162,7 +162,7 @@
             this._comparisonRadioButton.Location = new System.Drawing.Point(14, 175);
             this._comparisonRadioButton.Name = "_comparisonRadioButton";
             this._comparisonRadioButton.Size = new System.Drawing.Size(14, 13);
-            this._comparisonRadioButton.TabIndex = 11;
+            this._comparisonRadioButton.TabIndex = 13;
             this._comparisonRadioButton.TabStop = true;
             this._comparisonRadioButton.UseVisualStyleBackColor = true;
             // 
@@ -172,7 +172,7 @@
             this._rangeRadioButton.Location = new System.Drawing.Point(14, 201);
             this._rangeRadioButton.Name = "_rangeRadioButton";
             this._rangeRadioButton.Size = new System.Drawing.Size(91, 17);
-            this._rangeRadioButton.TabIndex = 12;
+            this._rangeRadioButton.TabIndex = 17;
             this._rangeRadioButton.TabStop = true;
             this._rangeRadioButton.Text = "is in the range";
             this._rangeRadioButton.UseVisualStyleBackColor = true;
@@ -185,7 +185,7 @@
             this._comparisonValueTextBox.Location = new System.Drawing.Point(209, 172);
             this._comparisonValueTextBox.Name = "_comparisonValueTextBox";
             this._comparisonValueTextBox.Size = new System.Drawing.Size(199, 20);
-            this._comparisonValueTextBox.TabIndex = 13;
+            this._comparisonValueTextBox.TabIndex = 15;
             // 
             // _rangeMinValueTextBox
             // 
@@ -193,7 +193,7 @@
             this._rangeMinValueTextBox.Location = new System.Drawing.Point(111, 200);
             this._rangeMinValueTextBox.Name = "_rangeMinValueTextBox";
             this._rangeMinValueTextBox.Size = new System.Drawing.Size(135, 20);
-            this._rangeMinValueTextBox.TabIndex = 14;
+            this._rangeMinValueTextBox.TabIndex = 18;
             // 
             // _rangeMaxValueTextBox
             // 
@@ -203,7 +203,7 @@
             this._rangeMaxValueTextBox.Location = new System.Drawing.Point(273, 200);
             this._rangeMaxValueTextBox.Name = "_rangeMaxValueTextBox";
             this._rangeMaxValueTextBox.Size = new System.Drawing.Size(135, 20);
-            this._rangeMaxValueTextBox.TabIndex = 15;
+            this._rangeMaxValueTextBox.TabIndex = 20;
             // 
             // _searchMatchRadioButton
             // 
@@ -211,7 +211,7 @@
             this._searchMatchRadioButton.Location = new System.Drawing.Point(14, 229);
             this._searchMatchRadioButton.Name = "_searchMatchRadioButton";
             this._searchMatchRadioButton.Size = new System.Drawing.Size(14, 13);
-            this._searchMatchRadioButton.TabIndex = 17;
+            this._searchMatchRadioButton.TabIndex = 22;
             this._searchMatchRadioButton.TabStop = true;
             this._searchMatchRadioButton.UseVisualStyleBackColor = true;
             // 
@@ -226,7 +226,7 @@
             this._searchMatchTypeComboBox.Location = new System.Drawing.Point(34, 226);
             this._searchMatchTypeComboBox.Name = "_searchMatchTypeComboBox";
             this._searchMatchTypeComboBox.Size = new System.Drawing.Size(125, 21);
-            this._searchMatchTypeComboBox.TabIndex = 18;
+            this._searchMatchTypeComboBox.TabIndex = 23;
             // 
             // _voaFileTextBox
             // 
@@ -235,7 +235,7 @@
             this._voaFileTextBox.Location = new System.Drawing.Point(13, 34);
             this._voaFileTextBox.Name = "_voaFileTextBox";
             this._voaFileTextBox.Size = new System.Drawing.Size(360, 20);
-            this._voaFileTextBox.TabIndex = 20;
+            this._voaFileTextBox.TabIndex = 3;
             // 
             // _searchTextBox
             // 
@@ -246,7 +246,7 @@
             this._searchTextBox.Multiline = true;
             this._searchTextBox.Name = "_searchTextBox";
             this._searchTextBox.Size = new System.Drawing.Size(418, 53);
-            this._searchTextBox.TabIndex = 23;
+            this._searchTextBox.TabIndex = 25;
             // 
             // _inListRadioButton
             // 
@@ -254,7 +254,7 @@
             this._inListRadioButton.Location = new System.Drawing.Point(13, 312);
             this._inListRadioButton.Name = "_inListRadioButton";
             this._inListRadioButton.Size = new System.Drawing.Size(241, 17);
-            this._inListRadioButton.TabIndex = 24;
+            this._inListRadioButton.TabIndex = 26;
             this._inListRadioButton.TabStop = true;
             this._inListRadioButton.Text = "matches one of the entries in the following list:";
             this._inListRadioButton.UseVisualStyleBackColor = true;
@@ -268,7 +268,7 @@
             this._matchListBox.Location = new System.Drawing.Point(13, 335);
             this._matchListBox.Name = "_matchListBox";
             this._matchListBox.Size = new System.Drawing.Size(337, 82);
-            this._matchListBox.TabIndex = 25;
+            this._matchListBox.TabIndex = 27;
             this._matchListBox.DoubleClick += new System.EventHandler(this.HandleListModifyButtonClick);
             // 
             // _removeButton
@@ -278,7 +278,7 @@
             this._removeButton.Location = new System.Drawing.Point(356, 364);
             this._removeButton.Name = "_removeButton";
             this._removeButton.Size = new System.Drawing.Size(75, 23);
-            this._removeButton.TabIndex = 26;
+            this._removeButton.TabIndex = 29;
             this._removeButton.Text = "Remove";
             this._removeButton.UseVisualStyleBackColor = true;
             this._removeButton.Click += new System.EventHandler(this.HandleListRemoveButtonClick);
@@ -290,7 +290,7 @@
             this._addButton.Location = new System.Drawing.Point(356, 335);
             this._addButton.Name = "_addButton";
             this._addButton.Size = new System.Drawing.Size(75, 23);
-            this._addButton.TabIndex = 27;
+            this._addButton.TabIndex = 28;
             this._addButton.Text = "Add";
             this._addButton.UseVisualStyleBackColor = true;
             this._addButton.Click += new System.EventHandler(this.HandleListAddButtonClick);
@@ -302,7 +302,7 @@
             this._modifyButton.Location = new System.Drawing.Point(356, 393);
             this._modifyButton.Name = "_modifyButton";
             this._modifyButton.Size = new System.Drawing.Size(75, 23);
-            this._modifyButton.TabIndex = 28;
+            this._modifyButton.TabIndex = 30;
             this._modifyButton.Text = "Modify";
             this._modifyButton.UseVisualStyleBackColor = true;
             this._modifyButton.Click += new System.EventHandler(this.HandleListModifyButtonClick);
@@ -313,7 +313,7 @@
             this._buttonOk.Location = new System.Drawing.Point(274, 466);
             this._buttonOk.Name = "_buttonOk";
             this._buttonOk.Size = new System.Drawing.Size(75, 23);
-            this._buttonOk.TabIndex = 29;
+            this._buttonOk.TabIndex = 34;
             this._buttonOk.Text = "OK";
             this._buttonOk.UseVisualStyleBackColor = true;
             this._buttonOk.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -325,7 +325,7 @@
             this._buttonCancel.Location = new System.Drawing.Point(355, 466);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
-            this._buttonCancel.TabIndex = 30;
+            this._buttonCancel.TabIndex = 35;
             this._buttonCancel.Text = "Cancel";
             this._buttonCancel.UseVisualStyleBackColor = true;
             // 
@@ -337,7 +337,7 @@
             this._comparisonComboBox.Location = new System.Drawing.Point(34, 172);
             this._comparisonComboBox.Name = "_comparisonComboBox";
             this._comparisonComboBox.Size = new System.Drawing.Size(169, 21);
-            this._comparisonComboBox.TabIndex = 31;
+            this._comparisonComboBox.TabIndex = 14;
             // 
             // _caseSensitiveCheckBox
             // 
@@ -345,7 +345,7 @@
             this._caseSensitiveCheckBox.Location = new System.Drawing.Point(13, 423);
             this._caseSensitiveCheckBox.Name = "_caseSensitiveCheckBox";
             this._caseSensitiveCheckBox.Size = new System.Drawing.Size(94, 17);
-            this._caseSensitiveCheckBox.TabIndex = 32;
+            this._caseSensitiveCheckBox.TabIndex = 31;
             this._caseSensitiveCheckBox.Text = "Case sensitive";
             this._caseSensitiveCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -356,7 +356,7 @@
             this._regexCheckBox.Location = new System.Drawing.Point(13, 446);
             this._regexCheckBox.Name = "_regexCheckBox";
             this._regexCheckBox.Size = new System.Drawing.Size(221, 17);
-            this._regexCheckBox.TabIndex = 33;
+            this._regexCheckBox.TabIndex = 32;
             this._regexCheckBox.Text = "Treat search terms as regular expressions";
             this._regexCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -370,7 +370,7 @@
             this._metComboBox.Location = new System.Drawing.Point(127, 6);
             this._metComboBox.Name = "_metComboBox";
             this._metComboBox.Size = new System.Drawing.Size(59, 21);
-            this._metComboBox.TabIndex = 36;
+            this._metComboBox.TabIndex = 1;
             // 
             // _regexInfoTip
             // 
@@ -379,10 +379,11 @@
             this._regexInfoTip.Location = new System.Drawing.Point(243, 447);
             this._regexInfoTip.Name = "_regexInfoTip";
             this._regexInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._regexInfoTip.TabIndex = 39;
+            this._regexInfoTip.TabIndex = 33;
+            this._regexInfoTip.TabStop = false;
             this._regexInfoTip.TipText = "When not performing greater than or less that comparisons, any specified values w" +
     "ill be treated\r\nas reqular expressions that, unless otherwise specified, fully m" +
-    "atch the specified field.";
+    "atch the specified attribute field.";
             // 
             // _attributeQueryInfoTip
             // 
@@ -391,8 +392,9 @@
             this._attributeQueryInfoTip.Location = new System.Drawing.Point(361, 63);
             this._attributeQueryInfoTip.Name = "_attributeQueryInfoTip";
             this._attributeQueryInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._attributeQueryInfoTip.TabIndex = 38;
-            this._attributeQueryInfoTip.TipText = "[Explain data entry query here]";
+            this._attributeQueryInfoTip.TabIndex = 9;
+            this._attributeQueryInfoTip.TabStop = false;
+            this._attributeQueryInfoTip.TipText = resources.GetString("_attributeQueryInfoTip.TipText");
             // 
             // _voaFilePathTags
             // 
@@ -401,7 +403,7 @@
             this._voaFilePathTags.Location = new System.Drawing.Point(379, 33);
             this._voaFilePathTags.Name = "_voaFilePathTags";
             this._voaFilePathTags.Size = new System.Drawing.Size(18, 20);
-            this._voaFilePathTags.TabIndex = 21;
+            this._voaFilePathTags.TabIndex = 4;
             this._voaFilePathTags.TextControl = this._voaFileTextBox;
             this._voaFilePathTags.UseVisualStyleBackColor = true;
             // 
@@ -411,7 +413,7 @@
             this._voaFileBrowse.Location = new System.Drawing.Point(403, 33);
             this._voaFileBrowse.Name = "_voaFileBrowse";
             this._voaFileBrowse.Size = new System.Drawing.Size(27, 20);
-            this._voaFileBrowse.TabIndex = 22;
+            this._voaFileBrowse.TabIndex = 5;
             this._voaFileBrowse.Text = "...";
             this._voaFileBrowse.TextControl = this._voaFileTextBox;
             this._voaFileBrowse.UseVisualStyleBackColor = true;
@@ -426,7 +428,7 @@
             0});
             this._attributeCountUpDown.Name = "_attributeCountUpDown";
             this._attributeCountUpDown.Size = new System.Drawing.Size(51, 20);
-            this._attributeCountUpDown.TabIndex = 6;
+            this._attributeCountUpDown.TabIndex = 7;
             this._attributeCountUpDown.Value = new decimal(new int[] {
             1,
             0,
@@ -442,7 +444,8 @@
             this._comparisonInfoTip.Location = new System.Drawing.Point(414, 172);
             this._comparisonInfoTip.Name = "_comparisonInfoTip";
             this._comparisonInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._comparisonInfoTip.TabIndex = 40;
+            this._comparisonInfoTip.TabIndex = 16;
+            this._comparisonInfoTip.TabStop = false;
             this._comparisonInfoTip.TipText = resources.GetString("_comparisonInfoTip.TipText");
             // 
             // _rangeInfoTip
@@ -453,7 +456,8 @@
             this._rangeInfoTip.Location = new System.Drawing.Point(414, 200);
             this._rangeInfoTip.Name = "_rangeInfoTip";
             this._rangeInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._rangeInfoTip.TabIndex = 41;
+            this._rangeInfoTip.TabIndex = 21;
+            this._rangeInfoTip.TabStop = false;
             this._rangeInfoTip.TipText = resources.GetString("_rangeInfoTip.TipText");
             // 
             // VOAFileContentsConditionSettingsDialog

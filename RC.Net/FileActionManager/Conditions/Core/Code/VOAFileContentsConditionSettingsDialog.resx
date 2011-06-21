@@ -154,6 +154,18 @@
         mQAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="_attributeQueryInfoTip.TipText" xml:space="preserve">
+    <value>An asterisk can be used to specify that all attributes should be evaluated, or attributes
+can be specified by name. Multiple attribute names should be delimited by commas.
+A more powerful query syntax is also supported; see the documentation for details.
+
+Examples:
+"*" - All attributes
+"HCData" - Attributes named "HCData"
+"HCData,MCData,LCData" - Attributes named HCData, MCData or LCData.
+"*@SSN" - Attributes with a type of "SSN"
+"Person/Last" - Attributes named "Last" having a parent attribute named "Person"</value>
+  </data>
   <data name="_voaFilePathTags.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -172,7 +184,7 @@
 </value>
   </data>
   <data name="_comparisonInfoTip.TipText" xml:space="preserve">
-    <value>If a greater than or less than comparison is specified and the value to compare against
+    <value>If a comparison involving greater than or less than is specified and the value to compare against
 is a number, the specified attribute field value must be number to qualify for meeting
 the comparison.
 
@@ -189,9 +201,7 @@ a number, the values will be compared lexicographically (alphabetically).</value
 </value>
   </data>
   <data name="_rangeInfoTip.TipText" xml:space="preserve">
-    <value>If both the range start and end values are a number, the specified attribute field value must be number to qualify for meeting
-the comparison.
-
+    <value>If both the range start and end values are numbers, the specified attribute field value must be number to qualify to be in the range.
 Otherwise, the values will be compared lexicographically (alphabetically).</value>
   </data>
 </root>
