@@ -49,11 +49,6 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Extract.AttributeFinder, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Imaging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Imaging.Forms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Utilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
-    <Reference Include="Extract.Utilities.Forms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -75,9 +70,21 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
+      <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
+      <Name>Extract.AttributeFinder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
+      <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
+      <Name>Extract.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
+      <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
+      <Name>Extract.Imaging.Forms</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
@@ -90,6 +97,14 @@
     <ProjectReference Include="..\..\..\..\Redaction\Core\Code\Extract.Redaction.csproj">
       <Project>{44B108A6-5A58-4F2C-8126-BAF763A304BF}</Project>
       <Name>Extract.Redaction</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
       <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>
