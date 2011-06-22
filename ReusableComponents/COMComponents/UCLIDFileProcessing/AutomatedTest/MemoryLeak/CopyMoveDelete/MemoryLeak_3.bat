@@ -1,8 +1,13 @@
-:: Clean Source folder
+:: Clean Source and Destination folders
 if exist "%testpath%\Source\" (
 del /q "%testpath%\Source\*.*"
 ) else (
 md "%testpath%\Source"
+)
+if exist "%testpath%\Destination\" (
+del /q "%testpath%\Destination\*.*"
+) else (
+md "%testpath%\Destination"
 )
 
 :: Wait a few seconds
