@@ -1,0 +1,264 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0 Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0 Feature Testing<br>ID Shield Features<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>Remove Legacy Tasks (#1)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Legacy ID Shield tasks from 7.0 should be removed
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Run <b>Check for new components</b> to update the FAM task list.
+			<li>Confirm that <b>Redaction: Redact image without verification</b> is 
+			not included in the list of tasks.
+			<li>Confirm that <b>Redaction: Verify and redact image</b> is not 
+			included in the list of tasks.
+			<li>Exercise a version 7.0 FPS file that contains the <b>Redaction: 
+			Redact image without verification</b> task.
+			<li>Confirm that an error message is displayed and that the FPS file 
+			does not open.
+			<li>Exercise a version 7.0 FPS file that contains the <b>Redaction: 
+			Verify and redact image</b> task.
+			<li>Confirm that an error message is displayed and that the FPS file 
+			does not open.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Double-Blind Verification Scenarios (#9)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Make it easier for Legislation Guard to find new 
+		sensitive data and identify it for review or redaction.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Exercise the <b>Redaction: Merge ID Shield data files</b> task.
+			<li>Confirm that performance is as expected.
+			<li>Exercise the <b>Match based upon compare ID Shield data files</b> 
+			condition.
+			<li>Confirm that performance is as expected.
+<p>
+			<li><b>Scenario 1 - Double Blind Verification</b>
+		       	<ul>
+		       		<li>Process the <b>Demo_IDShield</b> images.
+		       		<li>Verify the <b>Demo_IDShield</b> images.
+			       	<ul>
+			       		<li>Make sure that one or more sensitive items are 
+					missed.
+					<li>Make sure that one or more redactions are too small.
+					<li>Make sure that one or more redactions are too large.
+			       	</ul>
+		       		<li>Verify the <b>Demo_IDShield</b> images again, making sure 
+				that the output VOA files are named differently than the first 
+				set.  
+			       	<ul>
+			       		<li>Make sure that one or more sensitive items are 
+					missed.
+					<li>Make sure that one or more redactions are too small.
+					<li>Make sure that one or more redactions are too large.
+			       	</ul>
+				<li>Compare the two sets of VOA files several different ways
+			       	<ul>
+			       		<li>Make sure that the missed items are identified.
+					<li>Make sure that the small redactions are identified.
+					<li>Make sure that the large redactions are identified.
+					<li>Make sure that properly sized redactions are handled 
+					correctly.
+			       	</ul>
+		       	</ul>
+<p>
+			<li><b>Scenario 2 - Legislation Guard</b>
+		       	<ul>
+		       		<li>Process the <b>Demo_IDShield</b> images for <b>SSN</b>.
+		       		<li>Process the <b>Demo_IDShield</b> images for <b>DOB</b>, making 
+				sure that the output VOA files are named differently than the first 
+				set.
+				<li>Merge the two sets of VOA files.
+		       		<li>Verify the <b>Demo_IDShield</b> images using the merged VOA 
+				files as input.
+			       	<ul>
+			       		<li>Confirm that the <b>SSN</b> items are found and 
+					displayed correctly.
+			       		<li>Confirm that the <b>DOB</b> items are found and 
+					displayed correctly.
+			       	</ul>
+		       	</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Options for Redacted XML Files (#10)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Support production of XML files using a variety of 
+		options such as replacing sensitive data with XXXXX or surrounding it with 
+		<SensitiveData>...</SensitiveData>
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Exercise the <b>Redaction: Create redacted text</b> task.
+		       	<ul>
+		       		<li>Confirm that sensitive characters can be replaced with 
+				a specific character.
+		       		<li>Confirm that sensitive characters plus padding can be 
+				replaced with a specific character.
+		       		<li>Confirm that sensitive characters can be replaced with 
+				specific text.
+		       		<li>Confirm that sensitive characters can be surrounded with 
+				a specified XML element.
+		       	</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>ID Shield On Demand (#11)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #4684, #4708, #4709, #4710, #4711, #4712, #4713, 
+		#4714
+  	   	<LI><b>Details:</b> Support bringing up the ID Shield client in standalone 
+		mode.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that <b>IDShieldOnDemand.exe</b> is available from the 
+			Start menu.
+			<li>Confirm that an <b>ID Shield Client</b> license is sufficient.
+			<li>Exercise available features of the ID Shield client.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Preserve Metadata in Merge VOA Task (#19)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Support preserving and/or appending metadata as part of 
+		the merge operation.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Search and Replace in Redaction Labels (#20, #29)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that this functionality is available.
+			<li>Confirm that spaces can be introduced in the redaction label after 
+			using <b>Attribute type</b> as the label.
+			<li>Confirm that the case of the redaction label can be modified 
+			to fit its enclosing sentence.
+			<li>Confirm that <b>&ltFieldType&gt</b> is available for labeling text.
+			<li>Confirm that the tag problem is fixed in the XML object's 
+			property page.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>ID Shield Reports (#21, #27)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Modify existing reports and add new reports as needed to 
+		provide more useful information to the customer.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm for the appropriate reports that verification duration 
+			includes the following
+		       	<ul>
+				<li>Document loading time
+				<li>VOA loading time
+				<li>VOA saving time
+		       	</ul>
+			<li>Confirm that the following questions can be answered using 
+			<b>ID Shield</b> reports.
+		       	<ul>
+				<li>Which files were verified today?
+				<li>Which files were verified today by user <b>X</b>?
+				<li>Which files were verified today by user <b>X</b> that 
+				had redactions?
+				<li>Which files were verified today by user <b>X</b> that 
+				had manual redactions?
+		       	</ul>
+			<li>Confirm that the <b>Verifier</b> report has been modified to 
+			remove project verification time.
+		       	<ul>
+				<li>Confirm that a <b>TBD</b> column was added.
+		       	</ul>
+			<li>Confirm that the following new reports are available for  
+			<b>ID Shield</b>.
+		       	<ul>
+				<li>Use usage minutes from input events to calculate 
+				productivity.
+				<li>Use actual billable hours to calculate true 
+				productivity.
+				<li>An integrated report to show QC data (how many errors 
+				were made by each operator?)
+				<li>Average time per page for each user
+			       	<ul>
+			       		<li>Include minimum and maximum
+					<li>Include removal of anomalies
+			       	</ul>
+				<li>Integrated punch-in and punch-out timesheet for verifiers
+		       	</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Millisecond Timestamps in VOA and XML Files (#25)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #4234
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that timestamps in <b>VOA</b> files include milliseconds.
+			<li>Confirm that timestamps in <b>XML</b> files include milliseconds.
+	       	</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>

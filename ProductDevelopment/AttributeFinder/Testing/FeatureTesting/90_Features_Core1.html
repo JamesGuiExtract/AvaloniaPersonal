@@ -1,0 +1,329 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0 Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0 Feature Testing<br>File Action Manager and DB Admin<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>General Database Updates (#2)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li><b>(a)</b> Database access is claimed to be much faster with significantly 
+			reduced database locking.  Confirm significant performance improvement 
+			with one or more Analysis tests.
+	      		<li><b>(b)</b> Confirm that the database schema is automatically updated with 
+			installation of a newer build.
+			<ul>
+				<li>FAM database
+				<li>Services database
+				<li>LabDE Order Mapper
+			</ul>
+			<li><b>(c)</b> Confirm that the <b>DBInfoChangeHistory</b> table tracks 
+			database changes.
+			<ul>
+				<li>What changed and who changed the setting
+				<li>No simultaneous DB changes
+				<li>Enable/disable recording DBInfoChangeHistory
+				<li>New report to display database changes
+			</ul>
+			<li><b>(d)</b> Confirm that the <b>TagHistory</b> table tracks 
+			changes to document tags.
+			<ul>
+				<li>Tag added or removed
+				<li>Who made the change and when was it made
+				<li>New report to display tag changes
+			</ul>
+			<li><b>(e)</b> Support changing <b>&ltSourceDocName&gt</b> in the database.
+			<ul>
+				<li>Optionally track history of &ltSourceDocName&gt changes
+				<li>Require admin password to modify <b>&ltSourceDocName&gt</b> 
+				when not running as a service
+				<li>Do not require admin password to modify <b>&ltSourceDocName&gt</b> 
+				when running as a service
+			</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>FAM Enhancements (#4)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li><b>(a)</b> Make the FAM smarter so that it does not keep calling 
+			getfilestoprocess continuously when no files are in the queue and the FPS 
+			file is set to process files as they are added to the queue.
+			<ul>
+				<li>Confirm that if no files were in the queue when last checked, 
+				then sleep for random (0 to 20,000 milliseconds) amount of time 
+				before actually checking the database.
+				<li>Confirm that the 20,000 ms time is a <b>DBInfo</b> setting 
+				so that one setting can change the behavior for a entire network 
+				of machines working on a project.
+			</ul>
+			<li><b>(b)</b> Confirm that the FAM has a functional MRU list.
+			<li><b>(b)</b> Confirm that the FAM has functional <b>Open</b> and 
+			<b>Save</b> toolbar buttons.
+			<li><b>(c)</b> FAM context menus
+			<ul>
+				<li>Confirm that appropriate files can be opened from six grids.
+				<li>Confirm that containing folders can be opened from six grids.
+				<li>Confirm that filenames can be copied to the clipboard from 
+				six grids.
+			</ul>
+			<li><b>(d)</b> New text functions
+			<ul>
+				<li>Confirm proper behavior for <b>$ThreadId()</b>.
+				<li>Confirm proper behavior for <b>$ProcessId()</b>.
+				<li>Confirm proper behavior for <b>$Now()</b> with parameters.
+				<li>Confirm proper behavior for <b>$Now()</b> without parameters as 
+				<b>YYYY-MM-DD-HH-MM-SS-mmm</b>.
+			</ul>
+			<li><b>(e)</b> Confirm that the number of files to retrieve from the queue 
+			is now configurable from within the FPS file.
+			<li><b>(f)</b> Confirm that List parameters are now shown in text function 
+			drop-downs.
+			<li><b>(f)</b> Confirm that selection and cursor position are improved after 
+			selecting a text function.
+			<li><b>(g)</b> Confirm that the FAM caption is <b>&ltDatabaseName&gt on 
+			&ltDBServerName&gt - File Action Manager</b>
+			<li><b>(h)</b> Confirm that FAM and DB Admin can show the product versions 
+			of all FAM-based products installed on the local machine.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>DB Admin Enhancements (#5)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li><b>(a)</b> Confirm that database settings are now editable via a 
+			DB Admin UI.
+			<li><b>(b)</b> Confirm the ability to setup the database to allow FPS 
+			files to run as a service without the admin password on certain machines.
+			<li><b>(c)</b> Confirm that the Summary Grid context menus bring up a 
+			<b>Select Files</b> window with defaults corresponding to the cell that 
+			was right-clicked.
+			<ul>
+				<li>Manually set action status
+				<li>Export file list
+			</ul>
+			<li><b>(d)</b> Confirm that the DB Admin caption is <b>&ltDatabaseName&gt on 
+			&ltDBServerName&gt - File Action Manager Database Administration</b>
+			<li><b>(e)</b> Confirm that the database cannot be cleared while <b>Processing</b> 
+			is active.
+			<li><b>(e 1)</b> Confirm that the database cannot be cleared while <b>Queuing</b> 
+			is active.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>New File Suppliers (#7)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li><b>(a)</b> Secure FTP file supplier
+			<ul>
+				<li>Confirm separate license requirement for SFTP and FTP 
+				functionality.
+				<li>Test this file supplier separately.
+				<li>Test this file supplier along with the following to exercise 
+				redaction / data extraction in the cloud.
+				<ul>
+					<li>SFTP download task
+					<li>Unzip file task
+					<li>Decrypt file task
+					<li>( File processes here )
+					<li>Encrypt file task
+					<li>Zip file task
+					<li>SFTP upload task
+				</ul>
+			</ul>
+			<li><b>(b)</b> Dynamic Drag and Drop file supplier
+			<ul>
+				<li>Used for more intuitive one-off processing of files using 
+				current database and audit infrastructure.
+				<li>Also enables ability to send a folder of documentss to a 
+				single user for data entry or redaction verification (e.g. 
+				old republic title) – so that all documents related to a particular 
+				case can be keyed/reviewed by a particular user.
+				<li>This can be done by dragging-and-dropping the folder of files 
+				into the drop icon with the FPS file setup to queue to a particular 
+				user’s queue.
+			</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>New Features for Existing Tasks (#8)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li><b>(a)</b> Confirm that <b>Core: Execute rules</b> creates USS files 
+			by default.
+			<li><b>(b)</b> Confirm that <b>Core: Copy, move or delete file</b> can 
+			optionally modify &ltSourceDocName&gt after a copy or move operation.
+			<li><b>(c)</b> Confirm that <b>Core: OCR document</b> can create USS files 
+			from:
+			<ul>
+				<li>Text files
+				<li>XML files
+			</ul>
+			<li><b>(d)</b> Confirm that <b>Core: Copy, move or delete file</b> can 
+			optionally do a secure erase as part of a delete operation.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>New File Processing Tasks (#9)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li><b>(a)</b> Exercise the <b>Core: Set file priority</b> task.
+			<ul>
+				<li>Confirm admin password requirement (or not) is as intended.
+			</ul>
+			<li><b>(b)</b> Exercise the <b>Core: Create file</b> task.
+			<li><b>(c)</b> Exercise the <b>Core: Delete empty folder</b> task.
+			<li><b>(d)</b> Exercise the <b>Core: Encrypt/decrypt file</b> task.
+			<li><b>(e)</b> Exercise the <b>Core: Zip/unzip file</b> task.
+			<li><b>(f)</b> Exercise the <b>Core: Rasterize PDF file</b> task.
+			<li><b>(g)</b> Exercise the <b>Core: Modify &ltSourceDocName&gt in 
+			database</b> task.
+			<ul>
+				<li>Confirm admin password requirement.
+			</ul>
+			<li><b>(h)</b> Exercise the <b>Core: Extract image area</b> task.
+			<ul>
+				<li>Confirm functionality of property page.
+				<li>Confirm that tag selector contains <b>ZoneID</b> allowing 
+				unique filenames to be provided for multiple attributes or zones 
+				returned by the query.
+			</ul>
+			<li><b>(i)</b> Exercise the <b>Core: FTP/SFTP upload/download file</b> task.
+			<ul>
+				<li>Confirm requirement for separate license.
+			</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>New AF Condition Objects (#10)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> [FlexIDSCore #4715]
+  	   	<LI><b>Details:</b> A new condition object will be created to evaluate file 
+		timestamps.  A new condition object will be created to evaluate VOA file contents 
+		in order to help with conditional logic in the FAM based on document type, number of 
+		attributes found, confidence levels of attributes found, etc.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li><b>(a)</b> File Timestamp Condition
+			<ul>
+				<li>Confirm functionality of property page.
+				<li>Confirm functionality using absolute timestamps.
+				<li>Confirm functionality using relative timestamps.
+			</ul>
+			<li><b>(b)</b> VOA File Contents Condition
+			<ul>
+				<li>Confirm functionality of property page.
+				<li>TBD
+			</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>FAM Service Enhancements (#11)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li><b>(a)</b> Confirm that the <b>FAM Service</b> database includes 
+			a column to specify the number of instances.
+			<ul>
+				<li>Confirm that the specified number of instances are executed.
+			</ul>
+			<li><b>(b)</b> Confirm that the <b>FAM Service</b> can run with a 
+			temporary license.
+			<ul>
+				<li>Confirm that the <b>FAM Service</b> stops gracefully after 
+				the temporary license expires.
+			</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>New Reports - General (#12)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b>
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li><b>(a)</b> Exercise <b>Tag History</b> report 
+			<ul>
+				<li>Confirm presence and basic layout
+				<li>Confirm proper layout at 400% magnification
+				<li>Verify correct report contents
+			</ul>
+	       	</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>

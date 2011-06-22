@@ -1,0 +1,480 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0 Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0 Feature Testing<br>ID Shield Verification<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>Seamless Document Navigation (#2)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #4633, #4634, #4664
+  	   	<LI><b>Details:</b> Support optional navigation between documents by changing pages.
+		If the verifier steps through pages ID Shield will advance through documents as 
+		appropriate.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that the <b>Enable seamless page navigation between 
+			documents</b> checkbox is checked by default.
+			<li>Verify some <b>Demo_IDShield</b> images.
+			<li>Exercise <b>PageUp</b> and <b>PageDown</b>
+		       	<ul>
+		      		<li>Confirm that verification navigates through pages without 
+				regard to document boundary or visited / not visited state.
+	       		</ul>
+			<li>Exercise <b>PreviousTile</b> and <b>NextTile</b>
+		       	<ul>
+		      		<li>Confirm that verification navigates through tiles without 
+				regard to document boundary or visited / not visited state.
+	       		</ul>
+			<li>Stop processing and uncheck the <b>Enable seamless page 
+			navigation between documents</b> checkbox.
+			<li>Restart verification.
+			<li>Exercise <b>PageUp</b> and <b>PageDown</b>
+		       	<ul>
+		      		<li>Confirm that verification navigates through pages only 
+				through the current document.
+				<li>Confirm that a prompt is displayed before moving to 
+				the next document.
+	       		</ul>
+			<li>Exercise <b>PreviousTile</b> and <b>NextTile</b>
+		       	<ul>
+		      		<li>Confirm that verification navigates through tiles only 
+				through the current document.
+				<li>Confirm that a prompt is displayed before moving to 
+				the next document.
+	       		</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Slide Show (#3, #18)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #4470, #4475, #4477, #4478, #4479, #4480, #4482, #4483, 
+		#4484, 	#4521, #4528, #4572, #4573, #4587, #4592, #4596, #4607, #4616, #4635
+  	   	<LI><b>Details:</b> A slideshow feature has been added for redaction verfication 
+		which will automatically advance document pages after a specified number of seconds.  
+		The slideshow shall automatically pause upon user interaction, but resume as soon 
+		as the current document is saved (or the user unpauses). The user will be able to 
+		specify the number of seconds each page should display (default will be 4) and 
+		whether the slideshow should start automatically.  The redaction verificaton task 
+		will have configuration settings that determine whether the slideshow feature is to 
+		be available, to cause it to be automatically paused on certain documents, and to 
+		allow for tags or file action status to be set for document which were auto-advanced.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that the slideshow works in an intuitive way.
+			<li>Confirm that the slideshow is not available if the task setting 
+			is disabled.
+			<li>Confirm proper behavior of user alertness using a <b>run key</b>.
+			<li>Confirm proper behavior of user alertness using a <b>random question</b>.
+			<li>Confirm that the selected document tag is applied when a document is 
+			automatically advanced.
+			<li>Confirm that the selected file action status is applied when a document 
+			is automatically advanced.
+			<li>Confirm that the slideshow is automatically stopped when the selected 
+			condition is met.
+			<li>Confirm that the slideshow is automatically stopped when the screen 
+			saver is activated.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Word Redaction Tool (#4)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #4490, #4493, #4494, #4495, #4496, #4500, #4501, 
+		#4503, #4504, #4506, #4507, #4512, #4530, #4534, #4601
+  	   	<LI><b>Details:</b> Create a third redaction tool to enable creating creating 
+		redactions that exactly fit an OCR word.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that the <b>Word</b> redaction tool properly redacts 
+			selected text.
+			<li>Confirm that a visual indication of word selection is provided 
+			during mouse move events.
+			<li>Confirm that holding the mouse button down and dragging the mouse 
+			results in an appropriate group of words being selected.
+			<li>Confirm that the selected words are properly redacted in the 
+			output image.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Magnifier Tool (#5)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #4513, #4514, #4515, #4516, #4518, #4520, #4521, 
+		#4522, #4523, #4524, #4527, #4532, #4536, #4537, #4540, #4608, 
+  	   	<LI><b>Details:</b> The Magnifier window is a dockable window included with the 
+		verification UI that displays a zoomed-in view of the area around the image 
+		viewer cursor.  A toolstrip button will be provided to control opening and 
+		closing the window.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that the <b>Magnifier window</b> works properly as the image 
+			cursor moves around.
+			<li>Confirm that presence and position persistence works properly.
+			<li>Confirm that <b>F12</b> works as a shortcut to toggle presence / 
+			absence of the Magnifier window.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Realtime Progress Updates (#6)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> The Verification UI should provide a continuously updated 
+		display of the number of seconds spent on the current document.  Also, the 
+		current verification speed in pages per hour should be provided.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Verify some <b>Demo_IDShield</b> images.
+			<li>Confirm that a continuous update is provided for the number of 
+			seconds verifying the current document.
+			<ul>
+				<li>Confirm that the number of seconds starts up where it 
+				left off if a history document is reviewed.
+			</ul>
+			<li>Confirm that an average verification in <b>pages per hour</b> is 
+			updated after each completed image.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Full Screen Verification (#7)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #4450, #4453, #4457, #4584
+  	   	<LI><b>Details:</b> The verification UI should support a full-screen mode
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Confirm that <b>F11</b> toggles full-screen mode for verification.
+			<li>Confirm that <b>View - Full-screen mode</b> toggles full-screen mode 
+			for verification.
+			<li>Confirm that task persistence includes full-screen mode.
+			<li>Confirm that the title bar is not visible in full-screen mode.
+			<li>Confirm that the task bar is not visible in full-screen mode.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Image Pre-Fetch (#8)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #4442, #4447, #4448
+  	   	<LI><b>Details:</b> In order to minimize the time spent waiting for the next 
+		document, the framework should support a Prefetch method that will load the 
+		next document.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Verify some <b>multi-page</b> images with the task configured to 
+			use only one thread.  Spend very little time verifying each document.
+			<ul>
+				<li>Confirm that a noticeable delay exists between saving one 
+				document and displaying the next.
+			</ul>
+<p>
+			<li>Verify some <b>multi-page</b> images with the task configured to 
+			use more than one thread.  Spend very little time verifying each 
+			document.
+			<ul>
+				<li>Confirm that the delay between saving one document and 
+				displaying the next is significantly reduced.
+			</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Flash Window Title (#12)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Flash the window title when a new document appears in data 
+		entry or redaction verification windows when the window had been inactive.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Verify some <b>multi-page</b> images with the task configured to 
+			use only one thread.  Spend very little time verifying each document.
+			<ul>
+				<li>Confirm that a noticeable delay exists between saving one 
+				document and displaying the next.
+				<li>While waiting for another document to load, minimize the 
+				verification window.
+				<li>Confirm that the verification window stays minimized but 
+				the task bar element flashes to indicate a status change.
+				<li>Click on the flashing task bar element and confirm that 
+				the verification window returns to the foreground.
+				<li>Confirm that the new document has been loaded and is ready 
+				to be verified.
+			</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>New Shortcuts (#13, #14, #15, #16)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Add <b>Backspace</b> support as a shortcut for zoom 
+		previous.  Add <b>+</b> as a shortcut for enlarge selection by one pixel.
+		Add <b>-</b> as a shortcut for shrink selection by one pixel.  Modify 
+		<b>K</b> to be a shortcut for auto-shrink selection.  Modify support for 
+		<b>F2</b> to work for zoom to current selection even when the auto-zoom 
+		option is turned off.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Verify an image and modify the zoom level several times.
+			<li>Confirm that <b>Backspace</b> works as a shortcut for 
+			<b>Zoom Previous</b>.
+			<li>Confirm that the <b>Zoom Previous</b> toolbar button remains 
+			effective.
+			<li>Select a redaction.
+			<li>Confirm that <b>+</b> works as a shortcut for <b>Enlarge 
+			selection by 1 pixel</b>.
+			<li>Confirm that <b>-</b> works as a shortcut for <b>Shrink 
+			selection by 1 pixel</b>.
+			<li>Create a manual redaction that is too large for the text.
+			<li>Confirm that <b>K</b> works as a shortcut for <b>Auto-shrink 
+			selection</b>.
+<p>
+			<li>Verify some <b>Demo_IDShield</b> images.
+			<li>Modify verification settings so that <b>Automatically 
+			zoom to redactable data</b> is enabled.
+			<li>Confirm that the <b>Zoom level</b> slider is enabled and 
+			that the selected level is used when automatically zooming to 
+			the next selected redaction.
+			<li>Save the current redactions and advance to the next document.
+			<li>Confirm that the initial image display does not zoom in to 
+			the first selected redaction.
+			<li>Confirm that <b>F2</b> zooms in to the selected redaction.
+			<li>Modify verification settings so that <b>Automatically 
+			zoom to redactable data</b> is disabled.
+			<li>Confirm that the <b>Zoom level</b> slider is still enabled.
+			<li>Save the current redactions and advance to the next document.
+			<li>Confirm that the initial image display does not zoom in to 
+			the first selected redaction.
+			<li>Confirm that <b>F2</b> zooms in to the selected redaction.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Shrink-To-Fit Redactions (#17)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #3296
+  	   	<LI><b>Details:</b> Fix shrink-to-fit redactions so that no pixels are 
+		leaked.  Also pad the UI so that each sensitive pixel always appears covered.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Exercise shrink-to-fit redactions.
+			<li>Confirm that no pixel leakage is noted on any of the four sides 
+			in output images.
+			<li>Zoom in to a selected redaction and confirm that no pixel leakage 
+			is noted in the image viewer.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Resizing Any-Angle Redactions (#22)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Support the ability to select one grip handle of an any-
+		angle redaction and move the edge and not have the opposite edge move.  Also, 
+		the any-angle redaction should be extendable along the axis.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Verify some <b>Demo_IDShield</b> images.
+			<li>Create a manual redaction using the <b>Angular Redaction</b> 
+			tool.
+			<li>Select a grip handle and carefully resize the redaction
+		       	<ul>
+		       		<li>Confirm that the opposite side of the redaction does not 
+				move.
+				<li>Confirm that no wobble is visible in the redaction while 
+				it is being resized.
+		       	</ul>
+			<li>Repeat the above test with each grip handle.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Clues Not Moveable or Redactable (#23)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Make clues not moveable and not redactable.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Verify some <b>Demo_IDShield</b> images.
+			<li>Confirm that <b>Clue</b> items cannot be moved.
+			<li>Confirm that <b>Clue</b> items cannot be redacted.
+			<li>Confirm that a manual redaction can overlap a clue.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Persist Fit Modes (#24)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Fit-to-width and fit-to-page mode settings should be 
+		remembered across documents and sessions.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Verify some <b>Demo_IDShield</b> images.
+			<li>Zoom in to remove any fit mode setting.
+			<li>Advance to the next document and confirm that the fit mode is 
+			unchanged.
+			<li>Stop processing.
+			<li>Restart processing and confirm that the fit mode is unchanged.
+<p>
+			<li>Set the fit mode to <b>Fit to page</b>.
+			<li>Advance to the next document and confirm that the fit mode is 
+			unchanged.
+			<li>Stop processing.
+			<li>Restart processing and confirm that the fit mode is unchanged.
+<p>
+			<li>Set the fit mode to <b>Fit to width</b>.
+			<li>Advance to the next document and confirm that the fit mode is 
+			unchanged.
+			<li>Stop processing.
+			<li>Restart processing and confirm that the fit mode is unchanged.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Keyboard Support for Adjusting Redactions (#26)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> Support the ability to move or change the height of 
+		redactions using keystrokes.  This will allow faster fixing of redaction 
+		boxes when creating feedback data. Example: arrow keys to move, +/- to 
+		change height. Use ALT+numberpad digits to move the grip handles of the 
+		currently selected redaction (requires single-zone redaction to be selected).
+
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Verify some <b>Demo_IDShield</b> images.
+			<li>Create a manual redaction using the <b>Angular Redaction</b> 
+			tool.
+		       	<ul>
+		       		<li>Confirm that the redaction can be moved in any direction 
+				using the keyboard.
+		       		<li>Confirm that the redaction can be resized in any direction 
+				using the keyboard.
+		       	</ul>
+			<li>Create a manual redaction using the <b>Rectangular Redaction</b> 
+			tool.
+		       	<ul>
+		       		<li>Confirm that the redaction can be moved in any direction 
+				using the keyboard.
+		       		<li>Confirm that the redaction can be resized in any direction 
+				using the keyboard.
+		       	</ul>
+			<li>Create a manual redaction using the <b>Word Redaction</b> tool.
+		       	<ul>
+		       		<li>Confirm that the redaction can be moved in any direction 
+				using the keyboard.
+		       		<li>Confirm that the redaction can be resized in any direction 
+				using the keyboard.
+		       	</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Change Mouse Cursor for Auto-Shrink (#28)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> The mouse cursor should be changed if <b>Shift</b> or 
+		<b>Ctrl+Shift</b> is pressed while drawing a redaction in order to indicate 
+		that auto-shrink is active.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> 
+	       	<ul>
+	      		<li>TBD, 9.0.0.xx, MM/DD/YYYY
+	       	</ul>
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+			<li>Verify some <b>Demo_IDShield</b> images.
+			<li>Create a large manual redaction using the <b>Rectangular 
+			Redaction</b> tool.
+		       	<ul>
+		       		<li>Confirm that the mouse cursor does not change while 
+				drawing the redaction.
+		       	</ul>
+			<li>Create another large manual redaction and hold down the 
+			<b>Shift</b> key while drawing the redaction.
+		       	<ul>
+		       		<li>Confirm that the mouse cursor changes to <b>TBD</b> 
+				during the drawing operation.
+				<li>Confirm that the resulting redaction has been fit 
+				to individual lines.
+		       	</ul>
+			<li>Create another large manual redaction and hold down the 
+			<b>Ctrl</b> and <b>Shift</b> keys while drawing the redaction.
+		       	<ul>
+		       		<li>Confirm that the mouse cursor changes to <b>TBD</b> 
+				during the drawing operation.
+				<li>Confirm that the resulting redaction has been fit 
+				to a single block.
+		       	</ul>
+	       	</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>

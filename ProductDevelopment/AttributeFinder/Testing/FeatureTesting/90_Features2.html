@@ -1,0 +1,430 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0 Features Guide</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0 Features Guide </h1>
+<hr>
+
+<UL>
+	<LI><h3>Purpose</h3>
+       	<ul>
+  	   	<LI>To test individual features as well as combinations of features.
+  	   	<LI>To allow for individual experimentation during feature testing.
+  	   	<LI>To document the tested aspects of various features.
+		<li>Numbered items reference Arvind's <b>9.0 wish list</b> 
+		email from 06/07/2011.
+       	</ul>
+<p>
+	<LI><h3>Core FAM and DB Admin Features</h3>
+       	<ol>
+  	   	<LI><b>General Database Updates - (#02)</b>
+		<ul>
+			<li>Test faster database access
+			<li>Test automatic update of database schema
+			<li>Test <b>DBInfoChangeHistory</b> for tracking database changes
+			<li>Test <b>TagHistory</b> for tracking tag changes
+			<li>Test changing <b>&ltSourceDocName&gt</b> in the database
+		</ul>
+<p>
+  	   	<LI><b>FAM Enhancements - (#04)</b>
+		<ul>
+			<li>Test that checking for files to process when queue is empty is 
+			not continuous.
+			<li>Exercise the FAM MRU list.
+			<li>Confirm that the FAM caption is <b>&ltDatabaseName&gt on 
+			&ltDBServerName&gt - File Action Manager</b>
+			<li>Exercise the FAM <b>Open</b> and <b>Save</b> toolbar buttons.
+			<li>Exercise the FAM context menus in all six grids.
+			<li>Exercise the new text functions.
+			<ul>
+				<li>$ThreadId()
+				<li>$ProcessId()
+				<li>$Now() with and without parameters
+				<li>Test text selection and cursor placement
+			</ul>
+			<li>Confirm that the number of files to be retrieved from the queue 
+			is configurable in the FPS file.
+			<li>Confirm that FAM and DB Admin can show the product versions 
+			of all FAM-based products installed on the local machine.
+		</ul>
+<p>
+  	   	<LI><b>DB Admin Enhancements - (#05)</b>
+		<ul>
+			<li>Exercise DB Admin UI to modify database settings.
+			<li>Confirm the ability to setup the database to allow FPS 
+			files to run as a service without the admin password on certain machines.
+			<li>Exercise the <b>Summary Grid</b> context menus.
+			<li>Confirm that the DB Admin caption is <b>&ltDatabaseName&gt on 
+			&ltDBServerName&gt - File Action Manager Database Administration</b>.
+			<li>Test clearing the database while Queuing or Processing are active.
+		</ul>
+<p>
+  	   	<LI><b>New File Suppliers - (#07)</b>
+		<ul>
+			<li>Exercise <b>Secure FTP</b> file supplier
+			<li>Exercise <b>Dynamic drag and drop</b> file supplier
+		</ul>
+<p>
+  	   	<LI><b>New Features for Existing Tasks - (#08)</b>
+		<ul>
+			<li>Confirm that <b>Core: Execute rules</b> creates USS files by default.
+			<li>Confirm that <b>Core: Copy, move or delete file</b> can optionally 
+			modify &ltSourceDocName&gt after a copy or move operation.
+			<li>Confirm that <b>Core: Copy, move or delete file</b> can optionally 
+			do a secure erase as part of a delete operation.
+			<li>Confirm that <b>Core: OCR document</b> can creates USS files from:
+			<ul>
+				<li>Text files
+				<li>XML files
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>New File Processing Tasks - (#09)</b>
+		<ul>
+			<li>Exercise the <b>Core: Set file priority</b> task.
+			<li>Exercise the <b>Core: Create file</b> task.
+			<li>Exercise the <b>Core: Delete empty folder</b> task.
+			<li>Exercise the <b>Core: Encrypt/decrypt file</b> task.
+			<li>Exercise the <b>Core: Zip/unzip file</b> task.
+			<li>Exercise the <b>Core: Rasterize PDF file</b> task.
+			<li>Exercise the <b>Core: Modify &ltSourceDocName&gt in 
+			database</b> task.
+			<li>Exercise the <b>Core: Extract image area</b> task.
+			<li>Exercise the <b>Core: FTP/SFTP upload/download file</b> task.
+		</ul>
+<p>
+  	   	<LI><b>New AF Condition Objects - (#10)</b>
+		<ul>
+			<li>Exercise the <b>File timestamp</b> condition.
+			<li>Exercise the <b>VOA File contents</b> condition.
+		</ul>
+<p>
+  	   	<LI><b>FAM Service Enhancements - (#11)</b>
+		<ul>
+			<li>Confirm that the <b>FAM Service</b> database includes a column 
+			to specify the number of instances.
+			<li>Confirm that the <b>FAM Service</b> can run with a temporary license.
+		</ul>
+<p>
+  	   	<LI><b>New Reports: General - (#12)</b>
+		<ul>
+			<li>Exercise the <b>Tag History</b> report.
+		</ul>
+	</ol>
+<p>
+	<LI><h3>Other Core Features</h3>
+       	<ol>
+  	   	<LI><b>FAM Network Mananger - (#03)</b>
+		<ul>
+			<li>Exercise the utility
+			<ul>
+				<li>View and edit service databases
+				<li>Start and stop the FAM service
+				<li>Start remote desktop sessions
+				<li>View exception logs
+				<li>Add and remove custom columns
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>Imaging Framework - (#06)</b>
+		<ul>
+			<li>Exercise the background OCR capability with the Extract Image 
+			Viewer.
+		</ul>
+<p>
+  	   	<LI><b>Utility Enhancements - (#13)</b>
+		<ul>
+			<li>Confirm that <b>EmailFile.exe</b> works properly without 
+			<b>ltcml13n.dll</b>.
+			<li>Confirm that report emails can be personalized - including with 
+			a subject line.
+			<li>Confirm that <b>Report Viewer</b> can send emails by menu 
+			selection and from the command line.
+			<li>Confirm that <b>CreateMultiPageImage</b> reports or logs an 
+			error when a failure occurs.
+			<li>Confirm that <b>SplitMultiPageImage</b> reports or logs an 
+			error when a failure occurs.
+		</ul>
+<p>
+  	   	<LI><b>New Utilities - (#14)</b>
+		<ul>
+			<li>Exercise <b>OfficeToTif.exe</b>.
+			<li>Exercise <b>ExtractDebugData.exe</b>.
+			<li>Exercise <b>ESFDRSService.exe</b>.
+		</ul>
+<p>
+  	   	<LI><b>Exception Handling - (#15)</b>
+		<ul>
+			<li>Confirm that exceptions can be logged to a central machine.
+			<li>Confirm that UEX Viewer supports context menu entries
+			<ul>
+				<li>Select all entries exactly like this.
+				<li>Select all entries not exactly like this.
+			</ul>
+			<li>Confirm that UEX Viewer supports <b>Ctrl+I</b> as a shortcut 
+			to Invert the selected exceptions.
+			<li>Exercise filtering an exception log based on failed entries 
+			from DB Admin.
+			<li>Confirm that <b>Application Trace:</b> exceptions are not shown 
+			by default in UEX Viewer.
+			<li>Confirm that this setting is configurable.
+		</ul>
+<p>
+  	   	<LI><b>Enhancements to API / SDK - (#17)</b>
+		<ul>
+			<li>Exercise the demo C# application to show data extraction plus 
+			FLEX Index and ID Shield verification windows.
+		</ul>
+	</ol>
+<p>
+	<LI><h3>FLEX Index Features</h3>
+       	<ol>
+  	   	<LI><b>Data Entry Features - (#01)</b>
+		<ul>
+			<li>Exercise the <b>Word</b> selection tool from the <b>Data Entry: 
+			Verify extracted data</b> task.
+			<li>Exercise <b>Undo</b> from the <b>Data Entry: Verify extracted 
+			data</b> task.
+			<li>Exercise <b>Redo</b> from the <b>Data Entry: Verify extracted 
+			data</b> task.
+			<li>Exercise dynamic switching between multiple DEPs.
+			<li>Exercise improved data intelligence.
+		</ul>
+	</ol>
+<p>
+	<LI><h3>ID Shield - Verification</h3>
+       	<ol>
+  	   	<LI><b>Seamless Document Navigation - (#02)</b>
+		<ul>
+			<li>Confirm that seamless document navigation works as expected when 
+			the option is selected.
+			<li>Confirm that regular document navigation works as expected when 
+			the option is <b>not</b> selected.
+		</ul>
+<p>
+  	   	<LI><b>Slide Show - (#03)</b>
+		<ul>
+			<li>Exercise the slideshow feature.
+			<li>Exercise user alertness.
+			<li>Exercise the choices available for when a document automatically 
+			advances.
+		</ul>
+<p>
+  	   	<LI><b>Word Redaction Tool - (#04)</b>
+		<ul>
+			<li>Exercise the Word redaction tool.
+		</ul>
+<p>
+  	   	<LI><b>Magnifier Tool - (#05)</b>
+		<ul>
+			<li>Exercise the Magnifier tool.
+		</ul>
+<p>
+  	   	<LI><b>Realtime Progress Updates - (#06)</b>
+		<ul>
+			<li>Confirm that verification time is continuously updated for the 
+			current document.
+			<li>Confirm that average verification rate is updated after each 
+			completed image.
+		</ul>
+<p>
+  	   	<LI><b>Full Screen Verification - (#07)</b>
+		<ul>
+			<li>Exercise full-screen mode.
+			<li>Confirm that <b>F11</b> toggles full-screen mode.
+			<li>Confirm proper persistence handling.
+		</ul>
+<p>
+  	   	<LI><b>Image Prefetch - (#08)</b>
+		<ul>
+			<li>Confirm that user delay is minimized if the verification FPS file 
+			is configured to use multiple threads.
+		</ul>
+<p>
+  	   	<LI><b>Flash Window Title - (#12)</b>
+		<ul>
+			<li>Minimize the verification window while waiting for a new image.
+			<li>Confirm that the task bar element flashes once a new image has 
+			been loaded.
+		</ul>
+<p>
+  	   	<LI><b>New Shortcuts - (#13, #14, #15, #16)</b>
+		<ul>
+			<li>Confirm that <b>Backspace</b> is a shortcut for zoom previous.
+			<li>Confirm that <b>+</b> is a shortcut for enlarge selection by 1 pixel.
+			<li>Confirm that <b>-</b> is a shortcut for shrink selection by 1 pixel.
+			<li>Confirm that <b>K</b> is a shortcut for auto-shrink selection.
+			<li>Confirm that <b>F2</b> is a shortcut for auto-zoom to selection even 
+			when the option is not checked.
+		</ul>
+<p>
+  	   	<LI><b>Shrink To Fit Redactions - (#17)</b>
+		<ul>
+			<li>Exercise shrink-to-fit redactions.
+			<li>Confirm no pixel leakage in output images.
+			<li>Confirm no pixel leakage in image viewer.
+		</ul>
+<p>
+  	   	<LI><b>Resizing Any-Angle Redactions - (#22)</b>
+		<ul>
+			<li>Exercise resizing of angular redactions.
+			<li>Confirm that behavior is appropriate using any grip handle.
+		</ul>
+<p>
+  	   	<LI><b>Clues Not Moveable or Redactable - (#23)</b>
+		<ul>
+			<li>Confirm that <b>Clues</b> cannot be moved or redacted.
+		</ul>
+<p>
+  	   	<LI><b>Persistent Fit Mode - (#24)</b>
+		<ul>
+			<li>Confirm that <b>Fit-to-width</b>, <b>Fit-to-page</b> and 
+			<b>None</b> are each persistent across documents and sessions.
+		</ul>
+<p>
+  	   	<LI><b>Keyboard Support for Adjusting Redactions - (#26)</b>
+		<ul>
+			<li>Confirm that <b>Angular Redactions</b> can be moved and resized 
+			using the keyboard.
+			<li>Confirm that <b>Rectangular Redactions</b> can be moved and resized 
+			using the keyboard.
+			<li>Confirm that <b>Word Redactions</b> can be moved and resized 
+			using the keyboard.
+		</ul>
+<p>
+  	   	<LI><b>Change Mouse Cursor for Auto-Shrink - (#28)</b>
+		<ul>
+			<li>Exercise automatic <b>line fitting</b> while drawing a manual 
+			redaction.
+			<li>Exercise automatic <b>block fitting</b> while drawing a manual 
+			redaction.
+			<li>Confirm that the mouse cursor changed during creation of the 
+			manual redactions.
+		</ul>
+	</ol>
+<p>
+	<LI><h3>ID Shield - Other</h3>
+       	<ol>
+  	   	<LI><b>Remove Legacy Tasks - (#01)</b>
+		<ul>
+			<li>Confirm that <b>Redaction: Redact image without verification</b> is 
+			no longer a valid task.
+			<li>Confirm that <b>Redaction: Verify and redact image</b> is no longer 
+			a valid task.
+		</ul>
+<p>
+  	   	<LI><b>Double Blind Verification Scenarios - (#09)</b>
+		<ul>
+			<li>Exercise the <b>Redaction: Merge ID Shield data files</b> task.
+			<li>Exercise the <b>Match based upon compare ID Shield data files</b> 
+			condition.
+		</ul>
+<p>
+  	   	<LI><b>Options for Redacted XML Files - (#10)</b>
+		<ul>
+			<li>Exercise the <b>Redaction: Create redacted text</b> task.
+		</ul>
+<p>
+  	   	<LI><b>ID Shield On Demand - (#11)</b>
+		<ul>
+			<li>Exercise the application using an ID Shield Client license.
+		</ul>
+<p>
+  	   	<LI><b>Preserve Metadata in Merge VOA Task - (#19)</b>
+		<ul>
+			<li>Confirm proper functionality of this feature.
+		</ul>
+<p>
+  	   	<LI><b>Search and Replace in Redaction Labels - (#20, #29)</b>
+		<ul>
+			<li>Confirm proper functionality of this feature.
+			<li>Confirm that <b>&ltFieldType&gt</b> is available for labeling text.
+			<li>Confirm that the tag problem is fixed in the XML object's 
+			property page.
+		</ul>
+<p>
+  	   	<LI><b>ID Shield Reports - (#21, #27)</b>
+		<ul>
+			<li>Confirm that verification duration includes document loading time, 
+			VOA loading time, and VOA saving time.
+			<li>Confirm that reports are available for the following
+		       	<ul>
+				<li>Which files were verified today?
+				<li>Which files were verified today by user <b>X</b>?
+				<li>Which files were verified today by user <b>X</b> that 
+				had redactions?
+				<li>Which files were verified today by user <b>X</b> that 
+				had manual redactions?
+		       	</ul>
+			<li>Confirm that the <b>Verifier</b> report has been modified to 
+			remove project verification time.
+			<li>Confirm that the following new reports are available for  
+			<b>ID Shield</b>.
+		       	<ul>
+				<li>Use usage minutes from input events to calculate 
+				productivity.
+				<li>Use actual billable hours to calculate true 
+				productivity.
+				<li>An integrated report to show QC data (how many errors 
+				were made by each operator?)
+				<li>Average time per page for each user
+			       	<ul>
+			       		<li>Include minimum and maximum
+					<li>Include removal of anomalies
+			       	</ul>
+				<li>Integrated punch-in and punch-out timesheet for verifiers
+		       	</ul>
+		</ul>
+<p>
+  	   	<LI><b>MIllisecond Timestamps in VOA and XML Files - (#25)</b>
+		<ul>
+			<li>Confirm that timestamps in <b>VOA</b> files include milliseconds.
+			<li>Confirm that timestamps in <b>XML</b> files include milliseconds.
+		</ul>
+	</ol>
+<p>
+	<LI><h3>Rule Writing Features</h3>
+       	<ol>
+  	   	<LI><b>Document Classifier - (#16 A)</b>
+		<ul>
+			<li>Confirm that document classification no longer searches <b>Probable</b>
+			and <b>Maybe</b> rules if a <b>Sure</b> rule was triggered.
+		</ul>
+<p>
+  	   	<LI><b>Rule Set Editor Enhancements - (#16 BCDFG)</b>
+		<ul>
+			<li>Confirm that hyphenated serial number ranges are accepted for USB keys.
+			<li>Confirm that an FKB update can be specified for use with a ruleset.
+			<li>Confirm that multiple rulesets with different FKB requirements can 
+			run successfully on the same machine.
+			<li>Confirm that a new column exists allowing generated exceptions to just 
+			be logged.
+			<li>Confirm that rule sets containing the following rule objects can be 
+			run but cannot be saved.
+			<ul>
+				<li>Entity Name Splitter
+				<li>Grantor-grantee Finder V2
+				<li>Legal Description Finder
+				<li>Legal Description Splitter
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>Support for Fuzzy Regular Expressions - (#16 E)</b>
+		<ul>
+			<li>Confirm that fuzzy regular expressions are supported for all 
+			appropriate rule objects.
+		</ul>
+<p>
+  	   	<LI><b>More Rule Object Enhancements - (#16 H)</b>
+		<ul>
+			<li>TBD
+		</ul>
+	</ol>
+</UL>
+</BODY>
+</HTML>
