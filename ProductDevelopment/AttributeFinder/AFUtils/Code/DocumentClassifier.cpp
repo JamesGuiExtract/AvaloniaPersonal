@@ -548,7 +548,7 @@ STDMETHODIMP CDocumentClassifier::GetDocTypeSelection(BSTR* pbstrIndustry,
 			asCppBool(bAllowMultipleSelection), asCppBool(bAllowMultiplyClassified));
 
 		// Disable industry selection, if desired
-		if ( asCppBool(bAllowIndustryModification) )
+		if (!asCppBool(bAllowIndustryModification))
 		{
 			dlg.lockIndustrySelection();
 		}

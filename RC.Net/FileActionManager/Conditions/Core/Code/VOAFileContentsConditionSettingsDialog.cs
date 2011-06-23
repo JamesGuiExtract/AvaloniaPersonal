@@ -162,9 +162,9 @@ namespace Extract.FileActionManager.Conditions
                 base.OnLoad(e);
 
                 // Load the combo boxes with the readable values of their associates enums.
-                _containsComboBox.InitializeWithReadableEnum<VOAContentsConditionRequirement>();
-                _fieldNameComboBox.InitializeWithReadableEnum<AttributeField>();
-                _comparisonComboBox.InitializeWithReadableEnum<ComparisonOperator>();
+                _containsComboBox.InitializeWithReadableEnum<VOAContentsConditionRequirement>(false);
+                _fieldNameComboBox.InitializeWithReadableEnum<AttributeField>(false);
+                _comparisonComboBox.InitializeWithReadableEnum<ComparisonOperator>(false);
 
                 // Apply Settings values to the UI.
                 if (Settings != null)
@@ -437,7 +437,7 @@ namespace Extract.FileActionManager.Conditions
             {
                 UtilityMethods.ShowMessageBox("You must specify at least one value to compare",
                     "Empty list", true);
-                _matchListBox.Focus();
+                _addButton.Focus();
 
                 return true;
             }

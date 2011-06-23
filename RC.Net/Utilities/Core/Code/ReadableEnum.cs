@@ -132,6 +132,26 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Gets the readable value associated with the specified enum <see paramref="value"/>.
+        /// </summary>
+        /// <param name="value">The enum value for which the associated readable value is to be
+        /// returned.</param>
+        /// <param name="readableValue">The readable value.</param>
+        /// <returns><see langword="true"/> if a readable value was found for the specifiec enum
+        /// <see paramref="value"/>; otherwise, <see langword="false"/>.</returns>
+        public bool TryGetReadableValue(T value, out string readableValue)
+        {
+            try
+            {
+                return _valueStringDictionary.TryGetValue(value, out readableValue);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32746");
+            }
+        }
+
+        /// <summary>
         /// Gets the enum value associated with the specified <see paramref="readableValue"/>.
         /// </summary>
         /// <param name="readableValue">The readable value for which the enum value is to be
@@ -237,14 +257,40 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Gets the readable value associated with the specified enum <see paramref="value"/>.
+        /// </summary>
+        /// <typeparam name="T">The enum type for which the readable value is assigned.</typeparam>
+        /// <param name="value">The enum value for which the associated readable value is to be
+        /// returned.</param>
+        /// <param name="readableValue">The readable value.</param>
+        /// <returns><see langword="true"/> if a readable value was found for the specifiec enum
+        /// <see paramref="value"/>; otherwise, <see langword="false"/>.</returns>
+        public static bool TryGetReadableValue<T>(this T value, out string readableValue)
+            where T : struct
+        {
+            try
+            {
+                return GetReadableEnum<T>().TryGetReadableValue(value, out readableValue);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32747");
+            }
+        }
+
+        /// <summary>
         /// Populates the combo box with the readable values for the enum type.
         /// </summary>
         /// <typeparam name="T">The enum type for which the combo box is to be populated.</typeparam>
         /// <param name="comboBox">The combo box.</param>
+        /// <param name="ignoreUnassignedValues"><see langword="true"/> to leave any enum values
+        /// without readable values assigned out of the combo box, <see langword="false"/> to throw
+        /// an exception if any values are missing readable values.</param>
         // FXCop suggests that explicity providing the type for generic method is too difficult to
         // understand, but there is no need for a parameter of type T here.
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        public static void InitializeWithReadableEnum<T>(this ComboBox comboBox) where T : struct
+        public static void InitializeWithReadableEnum<T>(this ComboBox comboBox,
+            bool ignoreUnassignedValues) where T : struct
         {
             try
             {
@@ -252,6 +298,16 @@ namespace Extract.Utilities
 
                 foreach (T value in typeof(T).GetEnumValues())
                 {
+                    string readableValue;
+                    if (ignoreUnassignedValues && !value.TryGetReadableValue(out readableValue))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        readableValue = value.ToReadableValue();
+                    }
+
                     comboBox.Items.Add(value.ToReadableValue());
                 }
             }
