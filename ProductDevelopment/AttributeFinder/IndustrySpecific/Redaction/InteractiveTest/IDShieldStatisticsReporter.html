@@ -1,0 +1,350 @@
+<HTML>
+
+<HEAD>
+<TITLE>ID Shield Statistics Reporter Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>ID Shield Statistics Reporter Testing Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+    
+    <li><h2><b>User Interface</b></h2>
+    <ul>
+        <li>Confirm that the <b>ID Shield Statistics Reporter</b> includes tabs for <b>Feedback
+        data</b>, <b>Analyze</b> and <b>Review</b>.</li>
+        <li>Confirm that the utility has a non-trivial icon.</li>
+        <li>Confirm that the utility can be resized using the resize grip at the bottom right of
+        the window.</li>
+        <li>Confirm that its size and location are persisted.</li>
+    <p>
+        <li><b>Feedback data</b> tab
+        <ul>
+            <li>Confirm that the <b>Feedback data</b> tab includes a group box for <b>File and
+            folder options</b>.</li>
+            <li>Confirm that the group box includes an edit box for <b>Select feedback data folder
+            from which to analyze results</b>.</li>
+            <li>Confirm that the edit box can be modified manually.</li>
+            <li>Confirm that the group box includes a <b>...</b> (browse) button.</li>
+            <li>Confirm that clicking the browse button displays a <b>Folder</b> browser 
+            dialog.</li>
+            <li>Confirm that the folder selected in the dialog is displayed in the edit box.</li>
+            <li>Confirm that cancelling the folder browser dialog retains the previous text in the
+            edit box.</li>
+            <li>Confirm that the feedback folder is persisted across sessions.</li>
+        <p>
+            <li>Confirm that the group box contains an <b>Advanced options...</b> button.</li>
+            <li>Confirm that the button brings up the Advanced Options dialog.</li>
+            <li>Confirm that the dialog contains an <b>ID Shield data file with found 
+            redactions</b> edit box with a default value of
+            <b>&lt;SourceDocName&gt;.found.voa</b>.</li>
+            <li>Confirm that the dialog contains an <b>ID Shield data file with expected
+            redactions</b> edit box with a default value of
+            <b>&lt;SourceDocName&gt;.expected.voa</b>.</li>
+            <li>Confirm that each edit box has an associated <b>Tag selector</b> and <b>...</b>
+            (browse) button, and that the buttons work as expected.</li>
+            <li>Confirm that settings are correctly persisted.</li>
+        </ul></li>
+    <p>
+        <li><b>Analyze</b> tab
+        <ul>
+            <li>Confirm that the <b>Analyze</b> tab includes a group box for <b>Analysis 
+            options</b>.</li>
+            <li>Confirm that the group box includes a combo box for <b>Select analysis 
+            type</b>.</li>
+            <li>Confirm that the following combo box options are supported:
+            <ul>
+                <li>Automated redaction</li>
+                <li>Hybrid</li>
+                <li>Standard verification</li>
+            </ul></li>
+            <li>Confirm that the group box includes a check box for <b>Limit data types to be 
+            tested to</b>.</li>
+            <li>Confirm that the group box includes an associated edit box which is enabled only
+            when the box is checked.</li>
+            <li>Confirm that if the box is checked, a value must be entered in the text box in
+            order to run the analysis.</li>
+            <li>Confirm that if the RDT is licensed, the label indicates that types may be
+            separated by either a comma or a pipe, and if the RDT is not license, only the comma is
+            mentioned.</li>
+            <li>Confirm that the group box includes the following <b>Default to redacting the
+            following</b> check boxes:
+            <ul>
+                <li>High confidence sensitive data</li>
+                <li>Medium confidence sensitive data</li>
+                <li>Low confidence sensitive data</li>
+            </ul></li>
+            <li>Confirm that all three are checked by default.</li>
+            <li>Confirm that the group box includes an <b>Automated file selection condition...</b>
+            button which is enabled only with a <b>Hybrid</b> or <b>Automated</b> analysis 
+            type.</li>
+            <li>Confirm that clicking the <b>Automated file selection condition...</b> button
+            displays a <b>Configure automated condition</b> dialog.
+            <ul>
+                <li>Confirm that the dialog contains a <b>The ID Shield data file contains</b>
+                checkbox.</li>
+                <li>Confirm that there is an associated dropdown box with options <b>any</b>, 
+                <b>at least one of each</b>, <b>none</b>, and <b>only any</b>.</li>
+                <li>Confirm that only when the box is checked, five checkboxes are enabled below:
+                <ul>
+                    <li>High confidence sensitive data</li>
+                    <li>Medium confidence sensitive data</li>
+                    <li>Low confidence sensitive data</li>
+                    <li>Manually identified sensitive data</li>
+                    <li>Clues potentially identifying sensitive data</li>
+                </ul></li>
+                <li>Confirm the presence of an <b>Indicates one of the following as the document
+                type</b> checkbox.</li>
+                <li>Confirm that only when that box is checked, an associated <b>Select...</b>
+                button is enabled.</li>
+                <li>Confirm that the Select button brings up the <b>Select Document Types</b>
+                dialog and that the dialog works as expected.</li>
+                <li>Confirm that the document types selected are displayed in a list box in the
+                conditional dialog.</li>
+                <li>Confirm that condition settings are persistent.</li>
+            </ul></li>
+            <li>Confirm that the group box includes an <b>Verification file selection 
+            condition...</b> button which is enabled only with a <b>Hybrid</b> or <b>Standard</b>
+            analysis type.</li>
+            <li>Confirm that clicking the <b>Verification file selection condition...</b> button
+            displays a <b>Configure verification condition</b> dialog.
+            <ul>
+                <li>Confirm that the dialog is functionally the same as the <b>automated
+                condition</b> dialog</li>
+                <li>Confirm that by default, the verification condition is configured to verify
+                HCData, MCData, LCData, and Clues.</li>
+            </ul></li>
+            <li>Confirm that the <b>Analyze</b> tab includes an <b>Analyze</b> button.</li>
+            <li>Confirm that an hourglass cursor is displayed while the analysis process is 
+            executing.</li>
+            <li>Confirm that a <b>Test Result</b> dialog with the number of successfully completed
+            test cases appears when analysis is complete.</li>
+            <li>Confirm that the application automatically moves to the <b>Review</b> tab when 
+            analysis is complete.</li>
+        </ul></li>
+    <p>
+        <li><b>Review</b> tab
+        <ul>
+            <li>Confirm that the <b>Review</b> tab includes a combo box for <b>Review analysis 
+            from</b>.</li>
+            <li>Confirm that the combo box contains one entry for each previously executed 
+            analysis.</li>
+            <li>Confirm that the analysis entries are separate folders under the previously defined
+            feedback data folder.</li>
+            <li>Confirm that the format of the folder names is <b>Analysis - MM-DD-YYYY - 
+            HH.MM.SS</b>.</li>
+            <li>Confirm that the combo box entries have removed the <b>Analysis -</b> text.</li>
+            <li>Confirm that the <b>Review</b> tab includes a <b>Statistics</b> tab.</li>
+        <p>
+            <li>Confirm that the <b>Statistics</b> tab includes a multi-line edit box that includes
+            the following information:
+            <ul>
+                <li>Number of files tested</li>
+                <li>Number of pages tested</li>
+                <li>Number of files containing sensitive data</li>
+                <li>Number of pages containing sensitive data</li>
+                <li>Number of sensitive data items</li>
+                <li>Number of documents with overlapping sensitive data items</li>
+                <li>Analysis type</li>
+                <li>Manually review... (Standard or Hybrid only)</li>
+                <li>Automatically redact... (Automated or Hybrid only)</li>
+                <li>Default to redacting the following...</li>
+                <li>Number of sensitive data items redacted after processing</li>
+                <li>Number of false positives in redacted images (Automated or Hybrid only)</li>
+                <li>Ratio of correctly redacted items to false positives (Automated or Hybrid 
+                only)</li>
+                <li>Automated redaction efficiency:
+                <ul>
+                    <li>Number of automatically redacted files</li>
+                    <li>Number of sensitive data items in automatically redacted files</li>
+                    <li>Number of correct redactions</li>
+                    <li>Number of over-redactions</li>
+                    <li>Number of under-redactions</li>
+                    <li>Number of false positives</li>
+                    <li>Ratio of correctly redacted items to false positives</li>
+                </ul></li>
+                <li><b>OR</b> Verification efficiency: (If standard work-flow is selected)
+                <ul>
+                    <li>Number of files selected for review</li>
+                    <li>Number of correct redactions presented to reviewers</li>
+                    <li>Number of over-redactions presented to reviewers</li>
+                    <li>Number of under-redactions presented to reviewers</li>
+                    <li>Number of false positives presented to reviewers</li>
+                    <li>Ratio of correctly redacted items to false positives</li>
+                </ul></li>
+                <li><b>OR</b> (If hybrid work-flow is selected) Verification efficiency:
+                <ul>
+                    <li>Number of files selected for review</li>
+                    <li>Number of sensitive data items in files presented for review</li>
+                    <li>Number of correct redactions presented to reviewers</li>
+                    <li>Number of over-redactions presented to reviewers</li>
+                    <li>Number of under-redactions presented to reviewers</li>
+                    <li>Number of false positives presented to reviewers</li>
+                    <li>Ratio of correctly redacted items to false positives</li>
+                </ul></li>
+                <li><b>AND</b> Automated redaction efficiency:
+                <ul>
+                    <li>Number of automatically redacted files</li>
+                    <li>Number of sensitive data items in automatically redacted files</li>
+                    <li>Number of correct redactions</li>
+                    <li>Number of over-redactions</li>
+                    <li>Number of under-redactions</li>
+                    <li>Number of false positives</li>
+                    <li>Ratio of correctly redacted items to false positives</li>
+                </ul></li>
+                <li>Counts of documents for each found document type</li>
+            </ul></li>
+        <p>
+            <li>Confirm that the <b>Review</b> tab includes a <b>File lists</b> tab.</li>
+            <li>Confirm that the <b>File lists</b> tab includes a <b>Select file list</b> combo box
+            with the following choices:
+            <ul>
+                <li>Various DocType_*.txt</li>
+                <li>Files_AtLeastOneFalsePositive.txt</li>
+                <li>Files_AtLeastOneFoundClue.txt</li>
+                <li>Files_AtLeastOneFoundHCData.txt</li>
+                <li>Files_AtLeastOneFoundLCData.txt</li>
+                <li>Files_AtLeastOneFoundMCData.txt</li>
+                <li>Files_AtLeastOneFoundRedaction.txt</li>
+                <li>Files_NoFoundRedactions.txt</li>
+                <li>InsensitiveFiles_All.txt</li>
+                <li>InsensitiveFiles_AutomaticallyRedacted.txt (Automated or Hybrid only)</li>
+                <li>InsensitiveFiles_SelectedForReview.txt (Standard or Hybrid only)</li>
+                <li>SensitiveFiles_All.txt</li>
+                <li>SensitiveFiles_AtLeastOneCorrectRedaction.txt</li>
+                <li>SensitiveFiles_AtLeastOneMissedRedaction.txt</li>
+                <li>SensitiveFiles_AtLeastOneOverRedaction.txt</li>
+                <li>SensitiveFiles_AtLeastOneUnderRedaction.txt</li>
+                <li>SensitiveFiles_AutomaticallyRedacted.txt (Automated or Hybrid only)</li>
+                <li>SensitiveFiles_NotSelectedForReview.txt (Standard or Hybrid only)</li>
+                <li>SensitiveFiles_NotSelectedForRedaction.txt (Automated only)</li>
+                <li>SensitiveFiles_SelectedForReview.txt (Standard or Hybrid only)</li>
+            </ul></li>
+            <li>Confirm that the <b>File lists</b> tab includes a multi-line edit box for 
+            <b>Entries in selected file list</b>.</li>
+            <li>Confirm that double-clicking on a line in the edit box displays the selected image
+            in the <b>Image Viewer</b> plus the associated TestOutput VOA file in the <b>VOA 
+            Viewer</b>.</li>
+        </ul></li>
+    </ul></li>
+<p>
+    <li><b>Basic functionality</b>
+    <ul>
+        <li>Prepare a set of images for verification.</li>
+        <li>Collect feedback during verification.</li>
+        <li>Confirm that an <b>ID Shield Client</b> license is sufficient to run the IDSSR
+        utility.</li>
+        <li>In all of the following cases, confirm that the correct number of successful test cases
+        is reported.</li>
+        <li>Confirm that <b>Automated redaction</b> analysis works as expected when limiting the
+        test to either a single data type or multiple data types.</li>
+        <li>Confirm that <b>Hybrid</b> analysis works as expected when redacting only HC and MC 
+        data.</li>
+        <li>Confirm that <b>Standard verification</b> analysis works as expected.</li>
+        <li>Confirm that previous results can be checked via the <b>Review</b> tab.</li>
+        <li>Confirm that appropriate files are provided in the <b>File lists</b> tab.</li>
+        <li>Confirm that the <b>Detailed workflow statistic</b> section always outputs the
+        same statistics, regardless of workflow.</li>
+        <li>Examine some <b>test output .voas</b>:
+        <ul>
+            <li>Confirm that the <b>source VOA file</b> is indicated in the attribute type
+            <ul>
+                <li><b>Expected</b> - Misses and Correct</li>
+                <li><b>Found</b> - Over-redactions, Under-redactions and False positives</li>
+            </ul></li>
+            <li>Confirm that a single found redaction is not counted as both an over-redaction
+            and an under-redaction for the same expected attribute. </li>
+            <li>Confirm that the following statistics are reported for a single sensitive data
+            item:
+            <ul>
+                <li>1 redaction, too large = 1 correct, 1 over-redaction</li>
+                <li>2 redactions, 1 too large = 1 correct, 1 over-redaction</li>
+                <li>2 redactions, both too large = 1 correct, 2 over-redactions</li>
+                <li>2 redactions, both correct = 1 correct</li>
+                <li>2 redactions, 1 too little = 1 correct, 1 under-redaction</li>
+            </ul></li>
+            <li>Confirm that the following statistics are reported for a page with two 
+            sensitive data items and one redaction covering the entire page:
+            <ul>
+                <li>2 correct, 2 over-redactions</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
+<p>
+    <LI><b>Bug fixes</b>
+    <ul>
+        <li><b>[FlexIDSCore #3797]</b> Line separator in output .txt files
+        <!-- fixed v 8.0.0.16 -->
+        <ul>
+            <li>Confirm that the output statistics files use the standard <b>\r\n</b> 
+            characters as line separators.</li>
+        </ul></li>
+    <p>
+        <LI><b>[FlexIDSCore #3909]</b> Format of temporary .tcl file
+        <!-- fixed v 8.0.0.13 -->
+        <ul>
+            <li>Configure the IDSSR to run on some verified documents.
+            <li>Begin the analysis; do not dismiss the dialog indicating how many test cases
+            completed successfully.</li>
+            <li>Navigate to the temp directory and examine the .tcl and .dat files created by 
+            IDSSR.</li>
+            <li>Confirm that they are formatted appropriately.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #3913]</b> Double-clicking on whitespace in file lists
+        <!-- fixed v 8.0.0.13 -->
+        <ul>
+            <li>Open a file list with 5 or fewer entries in the IDSSR Review tab.</li>
+            <li>Confirm that whitespace is present in the <b>Entries ...</b> list box.</li>
+            <li>Double-click in the whitespace.</li>
+            <li>Confirm that no error is seen.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #3908]</b> Condition persistence
+        <!-- fixed v 8.0.0.47 -->
+        <ul>
+            <li>Configure the verification condition to include some of the pre-defined data
+            types.</li>
+            <li>Reopen the property page and unselect the data type check boxes.  Leave the
+            <b>ID Shield data file</b> check box checked.</li>
+            <li>Click OK and click through the exception.</li>
+            <li>Cancel the changes and reopen the configuration page.</li>
+            <li>Confirm that the originally selected data types are checked.</li>
+        </ul></li>
+    <p>
+        <LI><b>[FlexIDSCore #4131]</b> Opening on a clean install
+        <!-- fixed v 8.0.0.41 -->
+        <ul>
+            <li>Confirm that the application opens properly after a clean installation.</li>
+        </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4017]</b> Advanced options dialog
+        <!-- fixed v 8.0.0.30 -->
+        <ul>
+            <li>Confirm that the <b>Advanced Options</b> dialog is not resizeable.</li>
+        </ul></li>
+    <p>
+        <LI><b>[LegacyRC #5735]</b> FailedTestCases log
+        <!-- fixed v 8.0.0.38 -->
+        <ul>
+            <li>Prepare several thousand files for processing.</li>
+            <li>Configure <b>IDSSR</b> incorrectly so that an error is generated for each test.
+            One option is to look for a non-existent VOA file.</li>
+            <li>Exercise <b>IDSSR</b>.</li>
+            <li>Confirm that the <b>FailedTestCases.uex</b> file fills up and is properly 
+            renamed as expected.  <b>ELI14818</b> is expected to be included at the end of each
+            full UEX file.</li>
+        </ul></li>
+    </ul></li>
+
+<!-- *********************************************** -->    
+</OL>
+</BODY>
+</HTML>
