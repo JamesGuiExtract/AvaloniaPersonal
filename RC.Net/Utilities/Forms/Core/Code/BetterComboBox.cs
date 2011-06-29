@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Security.Permissions;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.Forms
@@ -29,6 +29,20 @@ namespace Extract.Utilities.Forms
         /// if <see cref="_hideSelection"/> is <see langword="true"/>.
         /// </summary>
         int _selectionLength;
+
+        /// <summary>
+        /// Keeps track of readable enum strings that have been renamed within the context of this
+        /// combo box.
+        /// </summary>
+        Dictionary<string, string> _stringToRenamedStrings =
+            new Dictionary<string, string>();
+
+        /// <summary>
+        /// Keeps track of the original readable enum string for every readable value that has been
+        /// renamed within the context of this combo box.
+        /// </summary>
+        Dictionary<string, string> _renamedToOriginalStrings =
+            new Dictionary<string, string>();
 
         #endregion Fields
 
@@ -99,6 +113,119 @@ namespace Extract.Utilities.Forms
                 ExtractException ee = ExtractException.AsExtractException("ELI29174", ex);
                 ee.AddDebugData("Text", text, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Renames a readable enum item for this combo box.
+        /// </summary>
+        /// <typeparam name="T">The enum type this combo box is populated by.</typeparam>
+        /// <param name="value">The enum value to be renamed.</param>
+        /// <param name="renamedValue">The string entry that should be associated with
+        /// <see paramref="value"/> in the combo box.</param>
+        public void RenameEnumValue<T>(T value, string renamedValue) where T : struct
+        {
+            try
+            {
+                // Find the original readable string associated with this enum value.
+                string originalValue = value.ToReadableValue();
+
+                // Find the string currently associated with this value in the combo box.
+                string currentValue;
+                if (_stringToRenamedStrings.TryGetValue(originalValue, out currentValue))
+                {
+                    // If we are going to be applying a different value, clear the map entries
+                    // corresponding to this value.
+                    if (currentValue != renamedValue)
+                    {
+                        _stringToRenamedStrings.Remove(originalValue);
+                        _renamedToOriginalStrings.Remove(currentValue);
+                    }
+                }
+                else
+                {
+                    currentValue = originalValue;
+                }
+
+                // Map the original readable value to the renamed value and update the item value.
+                if (currentValue != renamedValue)
+                {
+                    if (Items.Contains(renamedValue))
+                    {
+                        ExtractException ee = new ExtractException("ELI32761",
+                            "Cannot rename value to that of an value that already exists.");
+                        ee.AddDebugData("Enum value", value.ToString(), false);
+                        ee.AddDebugData("Renamed value", renamedValue, false);
+                        throw ee;
+                    }
+
+                    _stringToRenamedStrings[originalValue] = renamedValue;
+                    _renamedToOriginalStrings[renamedValue] = originalValue;
+
+                    int currentIndex = Items.IndexOf(currentValue);
+                    Items[currentIndex] = renamedValue;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32762");
+            }
+        }
+
+        /// <summary>
+        /// Gets the enum value associated with the readable value currently selected in the
+        /// <see cref="ComboBox"/> taking into account any renamed values.
+        /// </summary>
+        /// <typeparam name="T">The enum type for which the readable value is assigned.</typeparam>
+        /// <returns>The enum value.</returns>
+        /// <throws><see cref="ExtractException"/> if the selected item is not a readable string
+        /// assigned to one of the enums values.</throws>
+        public T ToEnumValue<T>() where T : struct
+        {
+            try
+            {
+                // Lookup the original readable value if it has been renamed.
+                string stringValue;
+                if (!_renamedToOriginalStrings.TryGetValue(Text, out stringValue))
+                {
+                    stringValue = Text;
+                }
+
+                return stringValue.ToEnumValue<T>();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32763");
+            }
+        }
+
+        /// <summary>
+        /// Selects the specified enum value.
+        /// </summary>
+        /// <typeparam name="T">The enum type for which readable values are assigned.</typeparam>
+        /// <returns>The enum value.</returns>
+        /// <param name="value">The value to select.</param>
+        /// <throws><see cref="ExtractException"/> if the <see paramref="value"/> is not a readable
+        /// enum value that exists in this <see cref="ComboBox"/>.</throws>
+        public void SelectEnumValue<T>(T value) where T : struct
+        {
+            try
+            {
+                // Lookup the renamed value if it has been renamed.
+                string originalValue = value.ToReadableValue<T>();
+                string renamedValue;
+                if (_stringToRenamedStrings.TryGetValue(originalValue, out renamedValue))
+                {
+                    Text = renamedValue;
+                }
+                else
+                {
+                    Text = originalValue;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32764");
             }
         }
 

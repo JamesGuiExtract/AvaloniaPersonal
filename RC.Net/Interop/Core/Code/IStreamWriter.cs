@@ -91,6 +91,25 @@ namespace Extract.Interop
         }
 
         /// <summary>
+        /// Writes a {T} to the stream.
+        /// </summary>
+        /// <typeparam name="T">The type of struct to write to the stream.</typeparam>
+        /// <param name="value">The struct to write to the stream.</param>
+        public void WriteStruct<T>(T value) where T : struct, ISerializable
+        {
+            try
+            {
+                _formatter.Serialize(_stream, value);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI32776", "Unable to write struct.", ex);
+                ee.AddDebugData("Value", value.ToString(), false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Writes a <see cref="String"/> to the <see cref="IStream"/> object.
         /// </summary>
         /// <param name="value">The <see cref="String"/> to write.</param>

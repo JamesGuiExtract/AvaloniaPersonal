@@ -136,6 +136,25 @@ namespace Extract.Interop
         }
 
         /// <summary>
+        /// Reads a {T} from the <see cref="IStream"/> object.
+        /// </summary>
+        /// <typeparam name="T">The type of struct to read from the stream.</typeparam>
+        /// <returns>The serialized struct.</returns>
+        public T ReadStruct<T>() where T : struct, ISerializable
+        {
+            try
+            {
+                return (T)_formatter.Deserialize(_stream);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI32777", "Unable to read struct.", ex);
+                ee.AddDebugData("Struct Type", typeof(T).ToString(), false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Reads a <see cref="String"/> from the <see cref="IStream"/> object.
         /// </summary>
         /// <returns>A <see cref="String"/>.</returns>

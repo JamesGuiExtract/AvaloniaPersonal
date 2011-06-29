@@ -191,15 +191,15 @@ namespace Extract.Utilities
 
         #endregion Fields
 
-        #region Methods
+        #region Extension Methods
 
         /// <summary>
         /// Obtains the enum value associated with the specified <see paramref="readableValue"/>.
         /// </summary>
         /// <typeparam name="T">The enum type for which the readable value is assigned.</typeparam>
         /// <param name="readableValue">The readable value.</param>
-        /// <returns>The enum value.</returns>
-        public static T FromReadableValue<T>(string readableValue) where T : struct
+        /// <returns>The associated enum value.</returns>
+        public static T ToEnumValue<T>(this string readableValue) where T : struct
         {
             try
             {
@@ -210,10 +210,6 @@ namespace Extract.Utilities
                 throw ex.AsExtract("ELI32726");
             }
         }
-
-        #endregion Methods
-
-        #region Extension Methods
 
         /// <summary>
         /// Assigns a readable value to the specified enum <see paramref="value"/>.
@@ -279,6 +275,42 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Populates the <see cref="ComboBox"/> with the specified readable enum values.
+        /// </summary>
+        /// <typeparam name="T">The enum type for which the combo box is to be populated.</typeparam>
+        /// <param name="comboBox">The <see cref="ComboBox"/>.</param>
+        /// <param name="values">The specific enum values that should populate the <see cref="ComboBox"/>.
+        /// (Any values not specified are cleared from the <see cref="ComboBox"/></param>
+        public static void InitializeWithReadableEnumValues<T>(this ComboBox comboBox, params T[] values)
+            where T : struct
+        {
+            try
+            {
+                // Keep track of the currently selected item.
+                string selectedText = comboBox.Text;
+
+                comboBox.Items.Clear();
+
+                foreach (T value in values)
+                {
+                    comboBox.Items.Add(value.ToReadableValue());
+                }
+
+                // Attempt to re-select the previously selected item if it is still present in the
+                // combo box.
+                if (!string.IsNullOrWhiteSpace(selectedText) &&
+                    comboBox.Items.Contains(selectedText))
+                {
+                    comboBox.Text = selectedText;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32766");
+            }
+        }
+
+        /// <summary>
         /// Populates the combo box with the readable values for the enum type.
         /// </summary>
         /// <typeparam name="T">The enum type for which the combo box is to be populated.</typeparam>
@@ -294,6 +326,9 @@ namespace Extract.Utilities
         {
             try
             {
+                // Keep track of the currently selected item.
+                string selectedText = comboBox.Text;
+
                 comboBox.Items.Clear();
 
                 foreach (T value in typeof(T).GetEnumValues())
@@ -310,6 +345,14 @@ namespace Extract.Utilities
 
                     comboBox.Items.Add(value.ToReadableValue());
                 }
+
+                // Attempt to re-select the previously selected item if it is still present in the
+                // combo box.
+                if (!string.IsNullOrWhiteSpace(selectedText) &&
+                   comboBox.Items.Contains(selectedText))
+                {
+                    comboBox.Text = selectedText;
+                }
             }
             catch (Exception ex)
             {
@@ -323,21 +366,45 @@ namespace Extract.Utilities
         /// </summary>
         /// <typeparam name="T">The enum type for which the readable value is assigned.</typeparam>
         /// <param name="comboBox">The <see cref="ComboBox"/>.</param>
-        /// <returns>The readable value.</returns>
+        /// <returns>The enum value.</returns>
         /// <throws><see cref="ExtractException"/> if the <see cref="ComboBox"/> is not a readable
         /// string assigned to one of the enums values.</throws>
         // Since this method acts explicity on a ComboBox, it is appropriate to name the parameter
         // comboBox rather than control.
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
-        public static T ToReadableEnumValue<T>(this ComboBox comboBox) where T : struct
+        public static T ToEnumValue<T>(this ComboBox comboBox) where T : struct
         {
             try
             {
-                return FromReadableValue<T>(comboBox.Text);
+                return comboBox.Text.ToEnumValue<T>();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32728");
+            }
+        }
+
+        /// <summary>
+        /// Selects the specified enum value.
+        /// </summary>
+        /// <typeparam name="T">The enum type for which readable values are assigned.</typeparam>
+        /// <param name="comboBox">The <see cref="ComboBox"/>.</param>
+        /// <param name="value">The value to select.</param>
+        /// <returns>The enum value.</returns>
+        /// <throws><see cref="ExtractException"/> if the <see paramref="value"/> is not a readable
+        /// enum value that exists in this <see cref="ComboBox"/>.</throws>
+        // Since this method acts explicity on a ComboBox, it is appropriate to name the parameter
+        // comboBox rather than control.
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
+        public static void SelectEnumValue<T>(this ComboBox comboBox, T value) where T : struct
+        {
+            try
+            {
+                comboBox.Text = value.ToReadableValue<T>();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32765");
             }
         }
 

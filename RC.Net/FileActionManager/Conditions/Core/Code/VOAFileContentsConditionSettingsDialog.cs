@@ -171,13 +171,13 @@ namespace Extract.FileActionManager.Conditions
                 {
                     _metComboBox.Text = Settings.MetIfTrue ? "met" : "not met";
                     _voaFileTextBox.Text = Settings.VOAFileName;
-                    _containsComboBox.Text = Settings.Requirement.ToReadableValue();
+                    _containsComboBox.SelectEnumValue(Settings.Requirement);
                     _attributeCountUpDown.Value = Settings.AttributeCount;
                     _attributeQueryTextBox.Text = Settings.AttributeQuery;
-                    _fieldNameComboBox.Text = Settings.ComparisonField.ToReadableValue();
+                    _fieldNameComboBox.SelectEnumValue(Settings.ComparisonField);
                     _comparisonRadioButton.Checked =
                         Settings.ComparisonMethod == AttributeComparisonMethod.Comparison;
-                    _comparisonComboBox.Text = Settings.ComparisonOperator.ToReadableValue();
+                    _comparisonComboBox.SelectEnumValue(Settings.ComparisonOperator);
                     _comparisonValueTextBox.Text = Settings.ComparisonValue;
                     _rangeRadioButton.Checked =
                         Settings.ComparisonMethod == AttributeComparisonMethod.Range;
@@ -254,10 +254,10 @@ namespace Extract.FileActionManager.Conditions
                 Settings.MetIfTrue = _metComboBox.Text == "met";
                 Settings.VOAFileName = _voaFileTextBox.Text;
                 Settings.Requirement =
-                    _containsComboBox.ToReadableEnumValue<VOAContentsConditionRequirement>();
+                    _containsComboBox.ToEnumValue<VOAContentsConditionRequirement>();
                 Settings.AttributeCount = (int)_attributeCountUpDown.Value;
                 Settings.AttributeQuery = _attributeQueryTextBox.Text;
-                Settings.ComparisonField = _fieldNameComboBox.ToReadableEnumValue<AttributeField>();
+                Settings.ComparisonField = _fieldNameComboBox.ToEnumValue<AttributeField>();
                 if (_comparisonRadioButton.Checked)
                 {
                     Settings.ComparisonMethod = AttributeComparisonMethod.Comparison;
@@ -281,7 +281,7 @@ namespace Extract.FileActionManager.Conditions
 
                 Settings.ComparisonValue = _comparisonValueTextBox.Text;
                 Settings.ComparisonOperator =
-                    _comparisonComboBox.ToReadableEnumValue<ComparisonOperator>();
+                    _comparisonComboBox.ToEnumValue<ComparisonOperator>();
                 Settings.RangeMinValue = _rangeMinValueTextBox.Text;
                 Settings.RangeMaxValue = _rangeMaxValueTextBox.Text;
                 Settings.SearchFullyMatches = _searchMatchTypeComboBox.Text == "fully matches";
