@@ -1,0 +1,212 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.32 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.32 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[FlexIDSCore #2686]</b> Select Document Type dialog
+        	<ul>
+            		<li>Create a ruleset using a <b>Document classifier</b>.
+            		<li>Confirm that the <b>Industry Specific Category name</b> is configurable.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4707]</b> Automatic OCR for ID Shield Verification
+        	<ul>
+            		<li>Confirm that a checkbox exists under <b>Tools - Options - General</b> to 
+			indicate if automatic background OCR should occur.
+			<li>Confirm that the default state is <b>checked</b>.
+            		<li>Confirm existence of an associated combo box to select OCR quality.
+			<ul>
+				<li>Accurate
+				<li>Balanced (the default)
+				<li>Fast
+			</ul>
+			<li>Confirm that for files requiring automatic OCR, no USS files are saved.
+			<li>Confirm that when performing automatic OCR in FAM mode, the OCR results 
+			are saved as part of the history information so that navigation to a previous 
+			document does not require additional OCR.
+			<li>Confirm that for files requiring automatic OCR, the <b>Word</b> redaction 
+			tool is initially disabled.
+			<li>Confirm that for files requiring automatic OCR, the <b>Word</b> redaction 
+			tool is enabled after the OCR is finished.
+			<li>Test automatic OCR for a multi-page image.
+			<ul>
+				<li>Confirm that background OCR starts for a new page as soon as the 
+				user navigates to that page even if OCR has not finished for the 
+				previous page.
+			</ul>
+			<li>Confirm that background OCR will pause during the auto-fit mode for the 
+			<b>Word</b> redaction tool.
+			<li>Open the <b>Find</b> dialog for a multi-page document that requires 
+			automatic OCR.
+			<ul>
+				<li>Confirm that a dialog with a progress bar is displayed notifying 
+				the user that they will need to wait until OCR is complete for the 
+				entire document.
+				<li>Confirm that if the user waits, the progress dialog will 
+				automatically close before the <b>Find</b> dialog appears.
+				<li>Confirm that if the user closes the progress dialog, the 
+				<b>Find</b> dialog will not appear.
+			</ul>
+			<li>Confirm that a new status bar label is provided to display:
+			<ul>
+				<li>Whether or not OCR is available.
+				<li>OCR progress for the current page.
+				<li>That word zones are currently being loaded (if the page 
+				already has OCR data).
+			</ul>
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4715]</b> FAM VOA File Contents Condition
+        	<ul>
+            		<li>Confirm that an edit box is available to specify the VOA file 
+			to be evaluated.
+			<li>Confirm that <b>&ltSourceDocName&gt</b> is the default.
+            		<li>Confirm that an associated tag selector is available.
+			<li>Confirm that the following requirements are available for 
+			considering the condition to be satisfied:
+			<ul>
+				<li>Contains exactly
+				<li>Contains at least
+				<li>Contains at most
+				<li>Does not contain exactly
+			</ul>
+			<li>Confirm that the requirement includes an edit box for specifying 
+			how many attributes that meet the specification.
+			<li>Confirm that an attribute query field is provided.
+			<li>Confirm that the attribute can be evaluated based on:
+			<ul>
+				<li>Name
+				<li>Value
+				<li>Type
+			</ul>
+			<li>Confirm that evaluation of each attribute can be done in any 
+			one of the following ways:
+			<ul>
+				<li>Equals
+				<li>Is not equal to
+				<li>Is less than
+				<li>Is less than or equal to
+				<li>Is greater than
+				<li>Is greater than or equal to
+<p>
+				<li>Whether or not it falls within a specified range
+				<li>Whether or not a search term is found in the specified 
+				attribute field
+				<ul>
+					<li>Fully matches
+					<li>Contains a match for
+				</ul>
+				<li>Whether or not the attribute fully matches one of the 
+				values in a specified list
+<p>
+				<li>Where appropriate, the following options should be 
+				available
+				<ul>
+					<li>Case sensitive searches
+					<li>Search as a regular expression
+					<li>Numeric comparison
+					<li>Condition is <b>met</b> or <b>not met</b>
+				</ul>
+			</ul>
+        	</ul>
+<p>        
+	        <li><b>[DotNetRC #632, #675, #677, #678]</b> FTP File Supplier
+        	<ul>
+	            	<li>Confirm that the file supplier will retry an operation if a 
+			failure occurs.
+        	    	<li>Confirm that the <b>Connection Settings</b> tab includes a 
+			checkbox to display <b>Advanced</b> settings.
+            		<li>Confirm that after the file supplier downloads a file from 
+			<b>FTP</b>, a <b>.info</b> file is created in the same folder 
+			that received the downloaded file.
+			<ul>
+				<li>Confirm that the .info file is in <b>XML</b> format.
+				<li>Confirm that the .info file contains a 
+				<b>RemoteSourceDocName</b> element.
+				<li>Confirm that the .info file contains a 
+				<b>RemoteFileSize</b> element.
+				<li>Confirm that the .info file contains a 
+				<b>RemoteLastModified</b> element.
+<p>
+				<li>Confirm that if the <b>.info</b> file exists in the local 
+				folder it is used to determine if the file should be 
+				re-downloaded.
+				<ul>
+					<li>Downloaded if file is not in the database.
+					<li>Downloaded if <b>Force processing</b> is set.
+					<li>Downloaded if file size has changed.
+					<li>Not downloaded if last modified information is 
+					unchanged.
+					<li>Confirm that the <b>after download</b> action 
+					is also performed if the file is re-downloaded.
+				</ul>
+			</ul>
+		</ul>
+<p>        
+	        <li><b>[DotNetRC #676, #679]</b> FTP File Transfer Task
+        	<ul>
+	            	<li>Confirm that the task will retry an operation if a 
+			failure occurs.
+	            	<li>Confirm that the task allows the use of the 
+			<b>&ltRemoteSourceDocName&gt</b> tag whose value is obtained from the 
+			<b>.info</b> file.
+			<li>Confirm that if the tag is used and the <b>.info</b> file does not 
+			exist then an exception is thrown.
+		</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
