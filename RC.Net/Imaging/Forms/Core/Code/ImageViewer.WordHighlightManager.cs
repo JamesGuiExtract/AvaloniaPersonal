@@ -1305,7 +1305,7 @@ namespace Extract.Imaging.Forms
 
                     // Create a new FittingData instance and try to find the top edge of pixel
                     // content. Allow for an edge to be found using "fuzzy" logic.
-                    FittingData data = new FittingData(rasterZone, _cancelToken);
+                    ZoneGeometry data = new ZoneGeometry(rasterZone, _cancelToken);
                     if (data.FitEdge(Side.Top, probe, false, false, _AUTO_FIT_FUZZY_FACTOR,
                         fuzzyEdgeBuffer, 0, 0, zoneHeightLimit))
                     {
@@ -1323,10 +1323,10 @@ namespace Extract.Imaging.Forms
 
                             // Generate the new auto-fitted highlight.
                             Highlight highlight = new Highlight(_imageViewer, "",
-                                data.ToRasterZone(), "", _imageViewer.GetHighlightDrawColor());
+                                data.ToRasterZone(false), "", _imageViewer.GetHighlightDrawColor());
                             highlight.Selectable = false;
                             highlight.CanRender = false;
-                            highlight.Inflate((double)_config.Settings.AutoFitZonePadding + 1, false);
+                            highlight.Inflate((float)_config.Settings.AutoFitZonePadding + 1, false);
 
                             // Add the new auto-fit highlight
                             ExecuteInUIThread(() =>
@@ -1344,8 +1344,8 @@ namespace Extract.Imaging.Forms
                     // remove it.
                     if (_autoFitHighlight != null)
                     {
-                        FittingData autoZoneFittingData =
-                            new FittingData(_autoFitHighlight.ToRasterZone());
+                        ZoneGeometry autoZoneFittingData =
+                            new ZoneGeometry(_autoFitHighlight.ToRasterZone());
                         if (!autoZoneFittingData.LinePassesThrough(startPoint, endPoint))
                         {
                             ExecuteInUIThread(() => RemoveAutoFitHighlight());
@@ -1702,7 +1702,7 @@ namespace Extract.Imaging.Forms
                         // cases. Therefore, pad the preview highlights by AutoFitZonePadding in
                         // each direction to give the user confidence that when the redaction is
                         // added it will properly cover the entire word.
-                        highlight.Inflate((double)_config.Settings.AutoFitZonePadding + 1, false);
+                        highlight.Inflate((float)_config.Settings.AutoFitZonePadding + 1, false);
 
                         _wordLineMapping[highlight] = lineIdentifier;
                         wordHighlights.Add(highlight);
@@ -1956,7 +1956,7 @@ namespace Extract.Imaging.Forms
                     using (PixelProbe probe =
                         _imageViewer._reader.CreatePixelProbe(_imageViewer.PageNumber))
                     {
-                        FittingData data = new FittingData(zone);
+                        ZoneGeometry data = new ZoneGeometry(zone);
 
                         // Shrink the box such that there are [AutoFitZonePadding] rows of white
                         // pixels between the edge of the zone and the contained pixel content.

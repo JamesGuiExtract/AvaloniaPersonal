@@ -8,7 +8,7 @@ using System.Threading;
 namespace Extract.Imaging.Forms
 {
     /// <summary>
-    /// Represents the side of a <see cref="FittingData"/> zone to be operated upon.
+    /// Represents the side of a <see cref="ZoneGeometry"/> zone to be operated upon.
     /// </summary>
     enum Side
     {
@@ -30,13 +30,13 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The bottom side.
         /// </summary>
-        Bottom = 3,
+        Bottom = 3
     };
 
     /// <summary>
-    /// Represents zone data and methods to act upon that data for the autofitting algorithm.
+    /// Allows for resizing and fitting of <see cref="RasterZone"/>s.
     /// </summary>
-    class FittingData : ICloneable
+    class ZoneGeometry : ICloneable
     {
         #region Fields
 
@@ -49,12 +49,12 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The page the zone is on.
         /// </summary>
-        public int _pageNumber;
+        int _pageNumber;
 
         /// <summary>
         /// The angle of the zone relative to horizontal.
         /// </summary>
-        public double _angle;
+        double _angle;
 
         /// <summary>
         /// Points representing the 4 corners of the zone.
@@ -81,21 +81,21 @@ namespace Extract.Imaging.Forms
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FittingData"/> class.
+        /// Initializes a new instance of the <see cref="ZoneGeometry"/> class.
         /// </summary>
         /// <param name="zone">The <see cref="RasterZone"/> the instances is to be based on.</param>
-        public FittingData(RasterZone zone)
+        public ZoneGeometry(RasterZone zone)
             : this(zone, null)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FittingData"/> class.
+        /// Initializes a new instance of the <see cref="ZoneGeometry"/> class.
         /// </summary>
         /// <param name="zone">The <see cref="RasterZone"/> the instances is to be based on.</param>
         /// <param name="cancelToken">A <see cref="CancellationToken"/> to allow a fitting operation
         /// to be canceled.</param>
-        public FittingData(RasterZone zone, CancellationToken? cancelToken)
+        public ZoneGeometry(RasterZone zone, CancellationToken? cancelToken)
         {
             try
             {
@@ -136,6 +136,19 @@ namespace Extract.Imaging.Forms
                 return _height;
             }
         }
+
+        /// <summary>
+        /// Gets the width.
+        /// </summary>
+        /// <value>The width.</value>
+        public float Width
+        {
+            get
+            {
+                return _width;
+            }
+        }
+
 
         #endregion Properties
 
@@ -346,83 +359,182 @@ namespace Extract.Imaging.Forms
         /// <param name="distance">The distance to move the side (negative to shrink).</param>
         public void InflateSide(Side side, float distance)
         {
-            // Retrieve a working rectangle relative to the zone's coordinate system and
-            // with the side to be operated upon as the left side.
-            PointF theta;
-            RectangleF rectangle = GetWorkingRectangle(side, out theta);
-
-            // Ensure we don't move one side past the opposing side.
-            if (rectangle.Width + distance < 0)
+            try
             {
-                distance = -rectangle.Width;
+                // Retrieve a working rectangle relative to the zone's coordinate system and
+                // with the side to be operated upon as the left side.
+                PointF theta;
+                RectangleF rectangle = GetWorkingRectangle(side, out theta);
+
+                int minSize = (side == Side.Left || side == Side.Right)
+                    ? Highlight.MinSize.Width
+                    : Highlight.MinSize.Height;
+
+                // Ensure we don't make the zone smaller than Highlight.MinSize.
+                if (rectangle.Width + distance < minSize)
+                {
+                    distance = -rectangle.Width + minSize;
+                }
+
+                // Adjust the rectangle by the specified distance.
+                rectangle.Location =
+                    new PointF(rectangle.Location.X - distance, rectangle.Location.Y);
+                rectangle.Width += distance;
+
+                // Set the new vertices.
+                _vertices[0] = rectangle.Location;
+                _vertices[1] = new PointF(rectangle.Right, rectangle.Top);
+                _vertices[2] = new PointF(rectangle.Right, rectangle.Bottom);
+                _vertices[3] = new PointF(rectangle.Left, rectangle.Bottom);
+
+                // Rotate the vertices into the image coordinate system.
+                for (int i = 0; i < 4; i++)
+                {
+                    _vertices[i] = GeometryMethods.Rotate(_vertices[i], theta);
+                }
+
+                // Update the width/height field as appropriate.
+                if (side == Side.Left || side == Side.Right)
+                {
+                    _width += distance;
+                }
+                else
+                {
+                    _height += distance;
+                }
             }
-
-            // Adjust the rectangle by the specified distance.
-            rectangle.Location =
-                new PointF(rectangle.Location.X - distance, rectangle.Location.Y);
-            rectangle.Width += distance;
-
-            // Set the new vertices.
-            _vertices[0] = rectangle.Location;
-            _vertices[1] = new PointF(rectangle.Right, rectangle.Top);
-            _vertices[2] = new PointF(rectangle.Right, rectangle.Bottom);
-            _vertices[3] = new PointF(rectangle.Left, rectangle.Bottom);
-
-            // Rotate the vertices into the image coordinate system.
-            for (int i = 0; i < 4; i++)
+            catch (Exception ex)
             {
-                _vertices[i] = GeometryMethods.Rotate(_vertices[i], theta);
-            }
-            
-            // Update the width/height field as appropriate.
-            if (side == Side.Left || side == Side.Right)
-            {
-                _width += distance;
-            }
-            else
-            {
-                _height += distance;
+                throw ex.AsExtract("ELI32821");
             }
         }
 
         /// <summary>
         /// Converts this instance to a <see cref="RasterZone"/>.
         /// </summary>
+        /// <param name="simpleRounding"><see langword="true"/> if the coordinates should be simply
+        /// rounded off to the nearest whole pixel, <see langword="false"/> if the coordinates should
+        /// always be rounded in a way to prevent against the zone shrinking (ie, always round "out").
+        /// </param>
         /// <returns>The <see cref="RasterZone"/> equivalent of this instance.</returns>
-        public RasterZone ToRasterZone()
+        public RasterZone ToRasterZone(bool simpleRounding)
+        {
+            try
+            {
+                PointF start;
+                PointF end;
+                int height;
+                GetZoneCoordinates(simpleRounding, out start, out end, out height);
+
+                // Create the raster zone
+                return new RasterZone(Point.Round(start), Point.Round(end), height, _pageNumber);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32824");
+            }
+        }
+
+        /// <summary>
+        /// Gets the zone coordinates.
+        /// </summary>
+        /// <param name="simpleRounding"><see langword="true"/> if the coordinates should be simply
+        /// rounded off to the nearest whole pixel, <see langword="false"/> if the coordinates should
+        /// always be rounded in a way to prevent against the zone shrinking (ie, always round "out").
+        /// </param>
+        /// <param name="start">The start.</param>
+        /// <param name="end">The end.</param>
+        /// <param name="height">The height.</param>
+        public void GetZoneCoordinates(bool simpleRounding, out PointF start, out PointF end, out int height)
         {
             // Retrieve a working rectangle relative to the zone's coordinate system and
             // with the side to be operated upon as the left side.
             PointF theta;
             RectangleF rectangle = GetWorkingRectangle(Side.Left, out theta);
 
-            // Compute the start and end points.
+            // Compute the start and end points.            
             float midPoint = rectangle.Location.Y + (_height / 2);
-            
-            PointF start = new PointF(rectangle.Left, midPoint);
+
+            start = new PointF(rectangle.Left, midPoint);
             start = GeometryMethods.Rotate(start, theta);
 
-            PointF end = new PointF(rectangle.Right, midPoint);
+            end = new PointF(rectangle.Right, midPoint);
             end = GeometryMethods.Rotate(end, theta);
 
-            // Adjust coordinates to ensure the raster zone doesn't shrink from points that are
-            // rounded off in the wrong direction.
-            int startX = (int)((start.X < end.X) ? start.X : Math.Ceiling(start.X));
-            int startY = (int)((start.Y < end.Y) ? start.Y : Math.Ceiling(start.Y));
-            int endX = (int)((end.X < start.X) ? end.X : Math.Ceiling(end.X));
-            int endY = (int)((end.Y < start.Y) ? end.Y : Math.Ceiling(end.Y));
-            int height = (int)Math.Ceiling(_height);
-
-            // If the height is odd, the top and bottom of the zone will be a .5 value. When such a
-            // zone is displayed, those values will be rounded off, potentially exposing pixel
-            // content. Expand the zone by a pixel to prevent this.
-            if (height % 2 == 1)
+            if (simpleRounding)
             {
-                height++;
-            }
+                start.X = (float)Math.Round(start.X);
+                start.Y = (float)Math.Round(start.Y);
+                end.X = (float)Math.Round(end.X);
+                end.Y = (float)Math.Round(end.Y);
 
-            // Create the raster zone
-            return new RasterZone(startX, startY, endX, endY, height, _pageNumber);
+                // Ensure height is even. If the height is odd, the top and bottom of the zone will
+                // be a .5 value. When such a zone is displayed, those values will be rounded off,
+                // potentially exposing pixel content. Expand the zone by a pixel to prevent this.
+                height = (int)Math.Round(_height / 2) * 2;
+            }
+            else
+            {
+                // Adjust coordinates such that the raster zone doesn't shrink from points that are
+                // rounded off in the wrong direction.
+                start.X = (start.X < end.X) ? start.X : (float)Math.Ceiling(start.X);
+                start.Y = (start.Y < end.Y) ? start.Y : (float)Math.Ceiling(start.Y);
+                end.X = (end.X < start.X) ? end.X : (float)Math.Ceiling(end.X);
+                end.Y = (end.Y < start.Y) ? end.Y : (float)Math.Ceiling(end.Y);
+
+                // Ensure height is even. If the height is odd, the top and bottom of the zone will
+                // be a .5 value. When such a zone is displayed, those values will be rounded off,
+                // potentially exposing pixel content. Expand the zone by a pixel to prevent this.
+                height = (int)Math.Ceiling(_height / 2) * 2;
+            }
+        }
+
+        /// <summary>
+        /// Rotates the orientation of the zone by the specified number of degrees.
+        /// </summary>
+        /// <param name="degrees">The degrees to rotate the orientation. Must be a multiple of 90.
+        /// </param>
+        public void RotateOrientation(double degrees)
+        {
+            try
+            {
+                ExtractException.Assert("ELI32819",
+                        "Orientation can only be rotated by multiples of 90 degrees",
+                        ((int)degrees % 90) == 0);
+
+                _angle = GeometryMethods.GetAngleDelta(0, _angle + degrees, true);
+
+                if (((int)degrees % 180) != 0)
+                {
+                    UtilityMethods.Swap(ref _height, ref _width);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32822");
+            }
+        }
+
+        /// <summary>
+        /// Updates the vertices based on the specified <see paramref="zone"/>
+        /// </summary>
+        /// <param name="zone">The <see cref="RasterZone"/> whose coordinates should be used to
+        /// update the vertices.</param>
+        public void UpdateVertices(RasterZone zone)
+        {
+            try
+            {
+                _vertices = zone.GetBoundaryPoints();
+
+                PointF theta;
+                RectangleF rectangle = GetWorkingRectangle(Side.Left, out theta);
+                _width = rectangle.Width;
+                _height = rectangle.Height;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32823");
+            }
         }
 
         #endregion Methods
@@ -440,7 +552,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Most members can simply be copied by value.
-                FittingData clone = (FittingData)MemberwiseClone();
+                ZoneGeometry clone = (ZoneGeometry)MemberwiseClone();
 
                 // Vertices array needs to be deep copied.
                 clone._vertices = new PointF[4];
@@ -456,14 +568,14 @@ namespace Extract.Imaging.Forms
 
         /// <summary>
         /// Determines if the specified points define a line along a similar angle to the zone
-        /// defined by this <see cref="FittingData"/> instance that passes across the left side of
+        /// defined by this <see cref="ZoneGeometry"/> instance that passes across the left side of
         /// this zone and whose plane passes between both pairs of vertices (whether or not the end
         /// point is past the zone's right side).
         /// </summary>
         /// <param name="startPoint">The starting <see cref="PointF"/> of the line to test.</param>
         /// <param name="endPoint">The ending <see cref="PointF"/> of the line to test.</param>
         /// <returns><see langword="true"/> if the line passes through the zone defined by this
-        /// <see cref="FittingData"/> instance, <see langword="false"/> otherwise.</returns>
+        /// <see cref="ZoneGeometry"/> instance, <see langword="false"/> otherwise.</returns>
         public bool LinePassesThrough(PointF startPoint, PointF endPoint)
         {
             try

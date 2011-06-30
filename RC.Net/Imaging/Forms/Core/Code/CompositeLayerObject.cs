@@ -517,8 +517,7 @@ namespace Extract.Imaging.Forms
                 {
                     if (layerObject.TrackingData != null)
                     {
-                        // Update tracking one last time
-                        layerObject.UpdateTracking(mouseX, mouseY);
+                        layerObject.EndTracking(mouseX, mouseY);
 
                         // Reset the tracking data
                         layerObject.TrackingData = null;

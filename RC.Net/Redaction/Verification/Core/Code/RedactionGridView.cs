@@ -2064,10 +2064,11 @@ namespace Extract.Redaction.Verification
                     }
                 }
 
-                // The layer object wasn't found. Complain.
-                ExtractException ee = new ExtractException("ELI26952", "Layer object not found.");
-                ee.AddDebugData("Id", e.LayerObject.Id, false);
-                throw ee;
+                // Intentionlly removed assertion that the layer object was found. A sub-layer
+                // object of a CompositeLayerObject may have been modified. In that case the ID will
+                // not be a direct member of any of the rows. However, the parent
+                // CompositeLayerObject will still get flagged as dirty allowing
+                // row.LayerObjectsDirty to be set.
             }
             catch (Exception ex)
             {

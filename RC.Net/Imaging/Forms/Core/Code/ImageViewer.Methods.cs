@@ -3262,7 +3262,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 ModifySelectedHighlights((highlight, quietSetData) =>
-                    InflateHighlight(highlight, quietSetData, -2));
+                    InflateHighlight(highlight, quietSetData, -1));
             }
             catch (Exception ex)
             {
@@ -3279,7 +3279,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 ModifySelectedHighlights((highlight, quietSetData) =>
-                    InflateHighlight(highlight, quietSetData, 2));
+                    InflateHighlight(highlight, quietSetData, 1));
             }
             catch (Exception ex)
             {
@@ -3351,7 +3351,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="highlight">The <see cref="Highlight"/> to fit.</param>
         /// <param name="quietSetData">Whether or not the
-        /// <see cref="Highlight.SetSpatialData(RasterZone, bool)"/> call should raise a
+        /// <see cref="Highlight.SetSpatialData(RasterZone, bool, bool)"/> call should raise a
         /// layer object changed event.</param>
         void BlockFitHighlight(Highlight highlight, bool quietSetData)
         {
@@ -3360,34 +3360,24 @@ namespace Extract.Imaging.Forms
             if (zone != null)
             {
                 // Update the highlights spatial data with the fitted zone
-                highlight.SetSpatialData(zone, quietSetData);
+                highlight.SetSpatialData(zone, quietSetData, true);
             }
         }
 
         /// <summary>
-        /// Inflates the height of the specified <see paramref="highlight"/> by the specified
-        /// number of pixels.
+        /// Inflates the specified <see paramref="highlight"/> by the specified number of pixels in
+        /// all directions.
         /// </summary>
         /// <param name="highlight">The <see cref="Highlight"/> to modify.</param>
         /// <param name="quietSetData"><see langword="true"/> if the
-        /// <see cref="Highlight.SetSpatialData(RasterZone, bool)"/> call should raise a
+        /// <see cref="Highlight.SetSpatialData(RasterZone, bool, bool)"/> call should raise a
         /// layer object changed event, <see langword="false"/> otherwise.</param>
-        /// <param name="distance">The number of pixels by which the height should be changed
-        /// (positive to inflate, negative to shrink)</param>
+        /// <param name="distance">The number of pixels each side of the highlight should be
+        /// inflated. (positive to inflate, negative to shrink)</param>
         static void InflateHighlight(Highlight highlight, bool quietSetData, int distance)
         {
             // Get the fitted zone and use it to inflate the sides by the specified distances.
-            if (highlight.Height + distance > Highlight.MinSize.Height)
-            {
-                if (quietSetData)
-                {
-                    highlight.QuietSetHeight(highlight.Height + distance);
-                }
-                else
-                {
-                    highlight.Height += distance;
-                }
-            }
+            highlight.Inflate(distance, quietSetData);
         }
 
         /// <summary>
@@ -3427,7 +3417,7 @@ namespace Extract.Imaging.Forms
         {
             using (PixelProbe probe = _reader.CreatePixelProbe(zone.PageNumber))
             {
-                FittingData data = new FittingData(zone);
+                ZoneGeometry data = new ZoneGeometry(zone);
 
                 return GetBlockFittedZone(data, probe);
             }
@@ -3440,7 +3430,7 @@ namespace Extract.Imaging.Forms
         /// <param name="probe">A probe to use to test for black pixels.</param>
         /// <returns>The smallest raster zone that contains all the black pixels of the specified 
         /// data.</returns>
-        static RasterZone GetBlockFittedZone(FittingData data, PixelProbe probe)
+        static RasterZone GetBlockFittedZone(ZoneGeometry data, PixelProbe probe)
         {
             // Shrink each side of the highlight
             data.FitEdge(Side.Left, probe);
@@ -3448,7 +3438,7 @@ namespace Extract.Imaging.Forms
             data.FitEdge(Side.Right, probe);
             data.FitEdge(Side.Bottom, probe);
 
-            RasterZone rasterZone = data.ToRasterZone();
+            RasterZone rasterZone = data.ToRasterZone(false);
 
             return (rasterZone.Height < _MIN_SPLIT_HEIGHT) ? null : rasterZone;
         }
@@ -3464,7 +3454,7 @@ namespace Extract.Imaging.Forms
             List<RasterZone> zones = new List<RasterZone>();
             using (PixelProbe probe = _reader.CreatePixelProbe(zone.PageNumber))
             {
-                FittingData data = new FittingData(zone);
+                ZoneGeometry data = new ZoneGeometry(zone);
 
                 // Trim whitespace at the top and bottom
                 data.FitEdge(Side.Left, probe);
@@ -3473,13 +3463,13 @@ namespace Extract.Imaging.Forms
                 data.FitEdge(Side.Bottom, probe);
 
                 // Attempt to split the highlight as many times as possible
-                FittingData blockFittedData;
+                ZoneGeometry blockFittedData;
                 RasterZone blockFittedZone;
                 float rowToSplit = FindRowToSplit(data, probe);
                 while (rowToSplit > 0)
                 {
                     // Create the zone entity
-                    blockFittedData = (FittingData)data.Clone();
+                    blockFittedData = (ZoneGeometry)data.Clone();
                     blockFittedData.InflateSide(Side.Bottom, -(data.Height - rowToSplit));
                     blockFittedZone = GetBlockFittedZone(blockFittedData, probe);
 
@@ -3523,7 +3513,7 @@ namespace Extract.Imaging.Forms
         /// <param name="probe">The probe to use to test image pixels.</param>
         /// <returns>The y coordinate of a row of white pixels were it would be appropriate to 
         /// split the fitting <paramref name="data"/>.</returns>
-        static float FindRowToSplit(FittingData data, PixelProbe probe)
+        static float FindRowToSplit(ZoneGeometry data, PixelProbe probe)
         {
             // Determine the last row we should iterate to allowing for the fact that the last zone
             // must be at least _MIN_SPLIT_HEIGHT in height.

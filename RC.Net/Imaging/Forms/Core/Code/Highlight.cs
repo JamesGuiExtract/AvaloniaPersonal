@@ -1,6 +1,7 @@
 using Extract.Drawing;
 using Extract.Utilities.Forms;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -12,6 +13,7 @@ using UCLID_COMUTILSLib;
 using EOrientation = UCLID_RASTERANDOCRMGMTLib.EOrientation;
 using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+
 
 namespace Extract.Imaging.Forms
 {
@@ -109,16 +111,6 @@ namespace Extract.Imaging.Forms
         Region _region;
 
         /// <summary>
-        /// Whether the highlight was angular when the tracking event began. Only intended to be
-        /// used during a tracking event.
-        /// </summary>
-        /// <remarks>
-        /// <para>A highlight that is angular at the start of an interactive adjust angle event 
-        /// may become rectangular by the end of the event.</para>
-        /// </remarks>
-        bool _originalIsAngular;
-
-        /// <summary>
         /// The original endpoints of the highlight currently being processed during an 
         /// interactive highlight event.
         /// </summary>
@@ -131,13 +123,10 @@ namespace Extract.Imaging.Forms
         int _originalHeight;
 
         /// <summary>
-        /// The x and y components of the unit vector that describes the angle of the highlight 
-        /// during an interactive tracking event.
+        /// Contains a unit vector for each side of a highlight that is being moved. (A corner
+        /// resize operation will have two; otherwise there will be only 1).
         /// </summary>
-        /// <remarks>This is needed because during interactive highlight resizing, it is often not 
-        /// possible to resize the highlight without losing at least some precision of the 
-        /// original angle. This angle is stored at the beginning of the resizing.</remarks>
-        PointF _activeHighlightVector;
+        Dictionary<Side, PointF> _activeTrackingVectors = new Dictionary<Side, PointF>();
 
         /// <summary>
         /// The angle of the highlight.  Calculated whenever CalculateRegion is called.
@@ -149,6 +138,12 @@ namespace Extract.Imaging.Forms
         /// with the Spot recognition window.
         /// </summary>
         static bool? _spotIRCompatible;
+
+        /// <summary>
+        /// Used to simplify resizing operations and allow for the angle of the highlight to be
+        /// maintained as much as possible.
+        /// </summary>
+        ZoneGeometry _zoneGeometry;
 
         #endregion Fields
 
@@ -332,7 +327,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Calculate the region
-                CalculateRegion();
+                CalculateRegion(false);
             }
             catch (Exception e)
             {
@@ -450,7 +445,7 @@ namespace Extract.Imaging.Forms
                     if (base.ImageViewer != null)
                     {
                         // Recalculate its region
-                        CalculateRegion();
+                        CalculateRegion(false);
                     }
 
                     Dirty = true;
@@ -491,7 +486,7 @@ namespace Extract.Imaging.Forms
                     if (base.ImageViewer != null)
                     {
                         // Recalculate its region
-                        CalculateRegion();
+                        CalculateRegion(false);
                     }
 
                     Dirty = true;
@@ -530,7 +525,7 @@ namespace Extract.Imaging.Forms
                     if (base.ImageViewer != null)
                     {
                         // Recalculate its region
-                        CalculateRegion();
+                        CalculateRegion(true);
                     }
 
                     Dirty = true;
@@ -942,7 +937,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Check if the highlight is being rotated
-                if (GetIsRotation(gripPoints, gripHandleId))
+                if (GetIsRotation(gripHandleId))
                 {
                     return ExtractCursors.Rotate;
                 }
@@ -951,8 +946,7 @@ namespace Extract.Imaging.Forms
                 base.ImageViewer.Transform.TransformPoints(gripPoints);
 
                 // Return the appropriate resize cursor
-                bool cornerResize = gripHandleId >= 4;
-                return GetResizeCursor(gripPoints[gripHandleId], cornerResize);
+                return GetResizeCursor(gripPoints, gripHandleId);
             }
             catch
             {
@@ -967,12 +961,10 @@ namespace Extract.Imaging.Forms
         /// Determines the direction of the resize cursor based on the mouse position and the 
         /// type of resize event.
         /// </summary>
-        /// <param name="point">The position of the mouse.</param>
-        /// <param name="cornerResize"><see langword="true"/> if it is a corner resize; 
-        /// <see langword="false"/> if it is a side resize.</param>
-        /// <returns>The resize cursor to use based on the mouse <paramref name="point"/> and 
-        /// whether it is a <paramref name="cornerResize"/>.</returns>
-        Cursor GetResizeCursor(PointF point, bool cornerResize)
+        /// <param name="gripPoints">The positions of the 8 grip handles for the highlight.</param>
+        /// <param name="gripId">The id of the handle to get a resize cursor for.</param>
+        /// <returns>The resize cursor to use based on the mouse <paramref name="gripId"/>.</returns>
+        Cursor GetResizeCursor(PointF[] gripPoints, int gripId)
         {
             // Get the center of the highlight in client coordinates
             PointF[] center = new PointF[] 
@@ -981,24 +973,24 @@ namespace Extract.Imaging.Forms
             };
             base.ImageViewer.Transform.TransformPoints(center);
 
-            // Check if this is a rectangular highlight's vertex
-            if (cornerResize)
-            {
-                // Return the cursor based on whether the vertex 
-                // is to the top-left/bottom-right of the center.
-                return point.X < center[0].X ^
-                       point.Y < center[0].Y
-                           ? Cursors.SizeNESW : Cursors.SizeNWSE;
-            }
+            // If this is a corner handle, we want to make its angle 45 degress more than than the
+            // angle that is used for the next side counterclockwise from the specified corner.
+            bool cornerResize = (gripId >= 4);
+            gripId %= 4;
+
+            PointF point = gripPoints[gripId];
 
             // Get the angle in degrees between the highlight's 
             // center and the center of the selected grip handle.
             double angle = GeometryMethods.GetAngle(center[0], point)
                            * 180.0 / Math.PI;
 
+            if (cornerResize)
+            {
+                angle += 45;
+            }
+
             // Express the angle as a positive number greater than 22.5
-            // NOTE: This is done so that when the number is divided by 45,
-            // it will round to a number between one and eight.
             if (angle < 22.5)
             {
                 angle += 360;
@@ -1010,33 +1002,23 @@ namespace Extract.Imaging.Forms
             // system. For this reason the result is mirrored on the 
             // y-axis, and the first & third quadrants become the
             // second & fourth quadrants respectively and vice versa.
-            switch ((int)Math.Round(angle / 45.0))
+            switch ((int)Math.Round(angle / 45.0) % 4)
             {
+                // Closest to 0 or 180 degrees
+                case 0:
+                    return Cursors.SizeWE;
+
                 // Closest to 45 or 225 degrees
                 case 1:
-                case 5:
-
-                    // Second and fourth quadrant
                     return Cursors.SizeNWSE;
 
                 // Closest to 90 or 270 degrees
                 case 2:
-                case 6:
-
                     return Cursors.SizeNS;
 
                 // Closest to 135 or 315 degrees
                 case 3:
-                case 7:
-
-                    // First and third quadrant
                     return Cursors.SizeNESW;
-
-                // Closest to 0 or 180 degrees
-                case 4:
-                case 8:
-
-                    return Cursors.SizeWE;
 
                 default:
 
@@ -1062,7 +1044,7 @@ namespace Extract.Imaging.Forms
 
                 if (base.ImageViewer != null)
                 {
-                    CalculateRegion();
+                    CalculateRegion(true);
 
                     if (raiseEvents)
                     {
@@ -1097,90 +1079,26 @@ namespace Extract.Imaging.Forms
                 // The highlight is being rotated if:
                 // 1) The side of a rectangular highlight is clicked with the CTRL key OR
                 // 2) The start or end point of an angular highlight is clicked
-                bool isRotation = GetIsRotation(imageGrips, gripHandleId);
+                bool isRotation = GetIsRotation(gripHandleId);
 
                 // Store the point of reference for the tracking event
                 PointF trackingPoint = new PointF(mouseX, mouseY);
 
-                // Check if this is a corner resize
-                if (gripHandleId >= 4)
+                // Set the cross cursor if necessary
+                base.ImageViewer.Cursor =
+                    isRotation
+                        ? ExtractCursors.ActiveRotate
+                        : base.ImageViewer.GetSelectionCursor(mouseX, mouseY);
+
+                // Restructure the highlight so that the selected 
+                // grip handle is the end point of the highlight.
+                if (isRotation)
                 {
-                    // Restructure the highlight so that the left or right 
-                    // center grip handle (from the client perspective) is
-                    // the end point of the highlight.
-                    // Choose the center grip handle with the smallest X value difference
-                    // with the selected corner grip handle to be the new end point.
-                    // [FlexIDSCore #4184]
-                    float minimumDiff = float.MaxValue;
-                    int index = -1;
-                    float x = clientGrips[gripHandleId].X;
-                    for (int j = 0; j < 4; j++)
-                    {
-                        float diff = Math.Abs(x - clientGrips[j].X);
-                        if (diff < minimumDiff)
-                        {
-                            minimumDiff = diff;
-                            index = j;
-                        }
-                    }
-
-                    // Ensure an index has been selected
-                    if (index == -1)
-                    {
-                        ExtractException.ThrowLogicException("ELI29908");
-                    }
-
-                    MakeGripHandleEndPoint(imageGrips, index);
-
-                    // Get the center point in image coordinates
-                    PointF center = GetCenterPoint();
-
-                    // Set the tracking point to the opposing corner
-                    trackingPoint = new PointF(
-                        center.X * 2F - imageGrips[gripHandleId].X,
-                        center.Y * 2F - imageGrips[gripHandleId].Y);
-                }
-                else
-                {
-                    // Set the cross cursor if necessary
-                    base.ImageViewer.Cursor =
-                        isRotation
-                            ? ExtractCursors.ActiveRotate
-                            : base.ImageViewer.GetSelectionCursor(mouseX, mouseY);
-
-                    // Restructure the highlight so that the selected 
-                    // grip handle is the end point of the highlight.
-                    if (isRotation || imageGrips.Length > 4)
-                    {
-                        MakeGripHandleEndPoint(imageGrips, gripHandleId);
-                    }
-                }
-
-                // Preserve the angularity of the highlight unless it is being rotated
-                _originalIsAngular = isRotation || imageGrips.Length <= 4;
-
-                // Ensure that rectangular highlights are truly rectangular
-                // [DotNetRCAndUtils #91]
-                if (!_originalIsAngular)
-                {
-                    int deltaX = _startPoint.X - _endPoint.X;
-                    int deltaY = _startPoint.Y - _endPoint.Y;
-
-                    if (deltaX != 0 && deltaY != 0)
-                    {
-                        if (Math.Abs(deltaX) < Math.Abs(deltaY))
-                        {
-                            QuietSetStartPoint(_startPoint - new Size(deltaX, 0));
-                        }
-                        else
-                        {
-                            QuietSetStartPoint(_startPoint - new Size(0, deltaY));
-                        }
-                    }
+                    MakeGripHandleEndPoint(imageGrips, gripHandleId);
                 }
 
                 // Store the active highlight vector
-                UpdateHighlightVector();
+                UpdateTrackingVectors(gripHandleId);
 
                 // Get the clipping area in client coordinates.
                 // [DotNetRCAndUtils #92]
@@ -1203,14 +1121,12 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Determines whether the current interactive grip handle event is rotation.
         /// </summary>
-        /// <param name="imageGrips">The coordinates of the grip handles.</param>
         /// <param name="gripHandleId">The id of the grip handle that was clicked.</param>
         /// <returns><see langword="true"/> if the grip handle event is rotation; 
         /// <see langword="false"/> if it is resizing or adjusting the height.</returns>
-        static bool GetIsRotation(PointF[] imageGrips, int gripHandleId)
+        static bool GetIsRotation(int gripHandleId)
         {
-            return imageGrips.Length > 4
-                       ? gripHandleId < 4 && Control.ModifierKeys == Keys.Control : gripHandleId == 0 || gripHandleId == 2;
+            return gripHandleId < 4 && Control.ModifierKeys == Keys.Control;
         }
 
         /// <summary>
@@ -1240,7 +1156,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Restore the original highlight position and dimensions
-                QuietSetSpatialData(_originalLine[0], _originalLine[1], _originalHeight);
+                QuietSetSpatialData(_originalLine[0], _originalLine[1], _originalHeight, false);
             }
             catch (Exception ex)
             {
@@ -1249,28 +1165,51 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Recomputes <see cref="_activeHighlightVector"/>, the unit vector describing the angle 
-        /// of the original highlight.
+        /// Recomputes the <see cref="_activeTrackingVectors"/>, the unit vectors describing the
+        /// angle of the original highlight.
         /// </summary>
-        void UpdateHighlightVector()
+        /// <param name="gripHandleId">>The id of the grip handle being moved.</param>
+        void UpdateTrackingVectors(int gripHandleId)
         {
-            // Get the vector components of the current highlight
-            float x, y;
-            if (_originalIsAngular)
+            _activeTrackingVectors.Clear();
+
+            List<int> trackingSideIds = new List<int>();
+            trackingSideIds.Add(gripHandleId % 4);
+            if (gripHandleId > 3)
             {
-                PointF[] gripPoints = GetGripPoints();
-                x = gripPoints[3].X - gripPoints[1].X;
-                y = gripPoints[3].Y - gripPoints[1].Y;
-            }
-            else
-            {
-                x = _endPoint.X - _startPoint.X;
-                y = _endPoint.Y - _startPoint.Y;
+                // If a corner grip handle was clicked, we'll be moving the next side
+                // counterclockwise from the first side as well.
+                trackingSideIds.Add((trackingSideIds[0] + 3) % 4);
             }
 
-            // Convert the vector to a unit vector and store it
-            float magnitude = (float)Math.Sqrt(x * x + y * y);
-            _activeHighlightVector = new PointF(x / magnitude, y / magnitude);
+            // Calculate a unit vector for each side being moved.
+            foreach (int trackingSideId in trackingSideIds)
+            {
+                // Get the vector components of the current highlight
+                float x, y;
+
+                int oppositeSideId = (trackingSideId + 2) % 4;
+
+                PointF[] gripPoints = GetGripPoints();
+                x = gripPoints[trackingSideId].X - gripPoints[oppositeSideId].X;
+                y = gripPoints[trackingSideId].Y - gripPoints[oppositeSideId].Y;
+
+                // Convert the vector to a unit vector and store it
+                float magnitude = (float)Math.Sqrt(x * x + y * y);
+                PointF trackingVector = new PointF(x / magnitude, y / magnitude);
+
+                // Associate the unit vector with the side being moved.
+                switch (trackingSideId)
+                {
+                    case 0: _activeTrackingVectors[Side.Left] = trackingVector; break;
+                    case 1: _activeTrackingVectors[Side.Bottom] = trackingVector; break;
+                    case 2: _activeTrackingVectors[Side.Right] = trackingVector; break;
+                    case 3: _activeTrackingVectors[Side.Top] = trackingVector; break;
+                    
+                    default:
+                        throw new ExtractException("ELI32818", "Internal logic error.");
+                }
+            }
         }
 
         /// <summary>
@@ -1296,33 +1235,14 @@ namespace Extract.Imaging.Forms
                     // Update the end point
                     QuietSetEndPoint(Point.Round(mouse));
                 }
-                else if (!_originalIsAngular &&
-                         (imageViewer.Cursor == Cursors.SizeNWSE
-                          || imageViewer.Cursor == Cursors.SizeNESW))
-                {
-                    // This is a corner resize event
-                    TrackingData.UpdateRectangle((int)(mouse.X + 0.5F), (int)(mouse.Y + 0.5F));
-
-                    // Get the y-coordinate for the raster points
-                    int y = (int)(TrackingData.Rectangle.Y
-                                  + TrackingData.Rectangle.Height / 2.0 + 0.5);
-
-                    // Set the spatial data for the highlight
-                    QuietSetSpatialData(new Point(TrackingData.Rectangle.X, y),
-                        new Point(TrackingData.Rectangle.Right, y),
-                        TrackingData.Rectangle.Height);
-                }
                 else if (imageViewer.Cursor != Cursors.SizeAll)
                 {
-                    if (_originalIsAngular)
-                    {
-                        AdjustHeight(mouse);
-                    }
-                    else
-                    {
-                        // Resize the highlight
-                        ResizeActiveHighlight(mouse);
-                    }
+                    // Resize the highlight
+                    ResizeActiveHighlight(mouse);
+                }
+                else
+                {
+                    imageViewer.Cursor = imageViewer.Cursor;
                 }
             }
             catch (Exception ex)
@@ -1332,25 +1252,26 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Adjusts the height of the highlight using the specified mouse position.
+        /// Ends an interactive tracking event
         /// </summary>
-        /// <param name="mouse">The mouse position in logical (image) coordinates.</param>
-        void AdjustHeight(PointF mouse)
+        /// <param name="mouseX">The physical (client) x-coordinate of the mouse cursor.</param>
+        /// <param name="mouseY">The physical (client) y-coordinate of the mouse cursor.</param>
+        public override void EndTracking(int mouseX, int mouseY)
         {
-            PointF center = GetCenterPoint();
-            double x = mouse.X - center.X;
-            double y = mouse.Y - center.Y;
-
-            double dotProduct = Math.Abs(x * _activeHighlightVector.X + y * _activeHighlightVector.Y);
-
-            double distance = GetGripPointDistance();
-            int height = (int)((dotProduct - distance) * 2);
-            if (height < 5)
+            try
             {
-                height = 5;
-            }
+                // If this wasn't a rotation tracking event, make sure the highlight angle remains
+                // locked.
+                bool lockAngle = (ImageViewer.Cursor != ExtractCursors.ActiveRotate);
 
-            QuietSetHeight(height);
+                base.EndTracking(mouseX, mouseY);
+
+                CalculateRegion(lockAngle);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32820");
+            }
         }
 
         /// <summary>
@@ -1361,25 +1282,87 @@ namespace Extract.Imaging.Forms
         /// point of the highlight is changed.</remarks>
         void ResizeActiveHighlight(PointF mouse)
         {
+            // Get the mouse position as a point in image coordinates
+            PointF trackingStart =
+                GeometryMethods.InvertPoint(ImageViewer.Transform, TrackingData.StartPoint);
+
             // Construct the vector components for a vector from the start point to the mouse
-            double x = mouse.X - _startPoint.X;
-            double y = mouse.Y - _startPoint.Y;
+            double x = mouse.X - trackingStart.X;
+            double y = mouse.Y - trackingStart.Y;
 
-            // Compute the dot product of the vectors
-            // NOTE: Because the active highlight vector is a unit vector, this is equivalent 
-            // to the the scalar projection of the mouse vector onto the active highlight vector.
-            double dotProduct = x * _activeHighlightVector.X + y * _activeHighlightVector.Y;
+            // Retrive a ZoneGeometry representing the new highlight size.
+            ZoneGeometry resizedGeometry = GetResizedGeometry(x, y);
 
-            // Enforce a minimum projection [DNRCAU #440]
-            if (Math.Abs(dotProduct) < _MINIMUM_LENGTH)
+            // To ensure the start and end points are kept as far away from each other as possible
+            // to reduce wobble when resizing if the new zone is taller than it is wide, move the
+            // the start and end points to what is currntly the top and bottom sides.
+            if (resizedGeometry.Width < resizedGeometry.Height)
             {
-                dotProduct = dotProduct < 0 ? -_MINIMUM_LENGTH : _MINIMUM_LENGTH;
+                ChangeTrackingDataOrientation();
+
+                // Recalculate the geometry with a swapped orientation.
+                resizedGeometry = GetResizedGeometry(x, y);
             }
 
-            // Compute the new point
-            QuietSetEndPoint(new Point(
-                (int)(_startPoint.X + _activeHighlightVector.X * dotProduct + 0.5),
-                (int)(_startPoint.Y + _activeHighlightVector.Y * dotProduct + 0.5)));
+            // Apply the resizedGeometry coordinates. 
+            PointF startPoint;
+            PointF endPoint;
+            int height;
+            resizedGeometry.GetZoneCoordinates(true, out startPoint, out endPoint, out height);
+            QuietSetSpatialData(Point.Round(startPoint), Point.Round(endPoint), height, true);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ZoneGeometry"/> representing the coordinates of the highlight after
+        /// the active grip point is moved to the specified image coordinates.
+        /// </summary>
+        /// <param name="x">The x image coordinate.</param>
+        /// <param name="y">The y image coordinate.</param>
+        /// <returns>A <see cref="ZoneGeometry"/> representing the resized highlight.</returns>
+        ZoneGeometry GetResizedGeometry(double x, double y)
+        {
+            ZoneGeometry resizedGeometry = (ZoneGeometry)_zoneGeometry.Clone();
+
+            // Inflate each side that is being moved based on the distance and direction the mouse
+            // was moved.
+            foreach (KeyValuePair<Side, PointF> trackingVector in _activeTrackingVectors)
+            {
+                // Compute the dot product of the vectors
+                // NOTE: Because the active highlight vector is a unit vector, this is equivalent 
+                // to the the scalar projection of the mouse vector onto the active highlight vector.
+                double dotProduct = x * trackingVector.Value.X + y * trackingVector.Value.Y;
+
+                // Enforce a minimum projection [DNRCAU #440]
+                if (Math.Abs(dotProduct) < _MINIMUM_LENGTH)
+                {
+                    dotProduct = dotProduct < 0 ? -_MINIMUM_LENGTH : _MINIMUM_LENGTH;
+                }
+
+                resizedGeometry.InflateSide(trackingVector.Key, (float)dotProduct);
+            }
+
+            return resizedGeometry;
+        }
+
+        /// <summary>
+        /// Changes the tracking data orientation such that move the start and end points are
+        /// assumed to be on what is currently the top and bottom sides.
+        /// </summary>
+        void ChangeTrackingDataOrientation()
+        {
+            _zoneGeometry.RotateOrientation(90);
+
+            Dictionary<Side, PointF> rotatedTrackingVectors = new Dictionary<Side, PointF>();
+
+            foreach (KeyValuePair<Side, PointF> trackingVector in _activeTrackingVectors)
+            {
+                // Adjust each side being adjusted in the tracking vector to the next side in a
+                // counter-clockwise direction to account for 
+                Side newSide = (Side)(((int)trackingVector.Key + 3) % 4);
+                rotatedTrackingVectors[newSide] = trackingVector.Value;
+            }
+
+            _activeTrackingVectors = rotatedTrackingVectors;
         }
 
         /// <summary>
@@ -1406,8 +1389,13 @@ namespace Extract.Imaging.Forms
             // Check if this grip handle is the start point
             if (gripHandles[gripHandleId] == start)
             {
+                if (_zoneGeometry != null)
+                {
+                    _zoneGeometry.RotateOrientation(180);
+                }
+
                 // Swap the start point and end point
-                QuietSetSpatialData(_endPoint, _startPoint, _height);
+                QuietSetSpatialData(_endPoint, _startPoint, _height, true);
 
                 // Done.
                 return;
@@ -1419,29 +1407,19 @@ namespace Extract.Imaging.Forms
             {
                 if (gripHandleId != i && gripHandles[i] != start && gripHandles[i] != end)
                 {
+                    if (_zoneGeometry != null)
+                    {
+                        _zoneGeometry.RotateOrientation((gripHandleId == 1) ? 90 : -90);
+                    }
+
                     // Define the new highlight
                     PointF[] points = GetGripPoints(_startPoint, _endPoint, _height);
                     QuietSetSpatialData(Point.Round(points[i]), Point.Round(points[gripHandleId]),
-                        (int)GeometryMethods.Distance(_startPoint, _endPoint));
+                        (int)GeometryMethods.Distance(_startPoint, _endPoint), true);
 
                     // Done.
                     return;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Sets the <see cref="StartPoint"/> without raising any events.
-        /// </summary>
-        /// <param name="startPoint">The midpoint of one side of the highlight in logical (image) 
-        /// coordinates.</param>
-        internal void QuietSetStartPoint(Point startPoint)
-        {
-            _startPoint = startPoint;
-
-            if (base.ImageViewer != null)
-            {
-                CalculateRegion();
             }
         }
 
@@ -1460,21 +1438,7 @@ namespace Extract.Imaging.Forms
 
             if (base.ImageViewer != null)
             {
-                CalculateRegion();
-            }
-        }
-
-        /// <summary>
-        /// Sets the <see cref="Height"/> without raising any events.
-        /// </summary>
-        /// <param name="height">The height of the highlight in image pixels.</param>
-        internal void QuietSetHeight(int height)
-        {
-            _height = height;
-
-            if (base.ImageViewer != null)
-            {
-                CalculateRegion();
+                CalculateRegion(false);
             }
         }
 
@@ -1488,11 +1452,14 @@ namespace Extract.Imaging.Forms
         /// <param name="height">The distance between two sides of the highlight measured 
         /// perpendicular to the line formed by <paramref name="startPoint"/> and 
         /// <paramref name="endPoint"/>.</param>
+        /// <param name="lockAngle"><see langword="true"/> if the new spatial data is intended to
+        /// maintain the existing angle of the highlight; <see langword="false"/> otherwise.</param>
         // This is not the compound word "endpoint". This is the "end point", meant in contrast to
         // "start point".
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "endPoint")]
-        internal void QuietSetSpatialData(Point startPoint, Point endPoint, int height)
+        internal void QuietSetSpatialData(Point startPoint, Point endPoint, int height,
+            bool lockAngle)
         {
             // Set the spatial data
             _startPoint = startPoint;
@@ -1503,7 +1470,7 @@ namespace Extract.Imaging.Forms
             if (base.ImageViewer != null)
             {
                 // Recalculate its region
-                CalculateRegion();
+                CalculateRegion(lockAngle);
             }
         }
 
@@ -1535,9 +1502,12 @@ namespace Extract.Imaging.Forms
         /// <param name="quietSetData">If <see langword="true"/> then will quietly
         /// update the spatial data, if <see langword="false"/> then a layer object
         /// changed event will be raised.</param>
+        /// <param name="lockAngle"><see langword="true"/> if the new spatial data is intended to
+        /// maintain the existing angle of the highlight; <see langword="false"/> otherwise.</param>
         /// <exception cref="ExtractException">If the <paramref name="rasterZone"/>
         /// is on a different page than this <see cref="Highlight"/>.</exception>
-        public void SetSpatialData(RasterZone rasterZone, bool quietSetData)
+        public void SetSpatialData(RasterZone rasterZone, bool quietSetData,
+            bool lockAngle)
         {
             try
             {
@@ -1549,11 +1519,11 @@ namespace Extract.Imaging.Forms
                 Point endPoint = new Point(rasterZone.EndX, rasterZone.EndY);
                 if (quietSetData)
                 {
-                    QuietSetSpatialData(startPoint, endPoint, rasterZone.Height);
+                    QuietSetSpatialData(startPoint, endPoint, rasterZone.Height, lockAngle);
                 }
                 else
                 {
-                    SetSpatialData(startPoint, endPoint, rasterZone.Height);
+                    SetSpatialData(startPoint, endPoint, rasterZone.Height, lockAngle);
                 }
             }
             catch (Exception ex)
@@ -1572,11 +1542,14 @@ namespace Extract.Imaging.Forms
         /// <param name="height">The distance between two sides of the highlight measured 
         /// perpendicular to the line formed by <paramref name="startPoint"/> and 
         /// <paramref name="endPoint"/>.</param>
+        /// <param name="lockAngle"><see langword="true"/> if the new spatial data is intended to
+        /// maintain the existing angle of the highlight; <see langword="false"/> otherwise.</param>
         // This is not the compound word "endpoint". This is the "end point", meant in contrast to
         // "start point".
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "endPoint")]
-        public void SetSpatialData(Point startPoint, Point endPoint, int height)
+        public void SetSpatialData(Point startPoint, Point endPoint, int height,
+            bool lockAngle)
         {
             try
             {
@@ -1589,7 +1562,7 @@ namespace Extract.Imaging.Forms
                 if (base.ImageViewer != null)
                 {
                     // Recalculate its region
-                    CalculateRegion();
+                    CalculateRegion(lockAngle);
                 }
 
                 Dirty = true;
@@ -1610,37 +1583,47 @@ namespace Extract.Imaging.Forms
         /// <remarks>
         /// Negative values of <paramref name="size"/> deflate the highlight.
         /// </remarks>
-        public void Inflate(double size, bool setDirty)
+        public void Inflate(float size, bool setDirty)
         {
             try
             {
                 // Do nothing if the size is zero
                 if (size != 0)
                 {
-                    // Find the change in x and y
-                    int deltaX = _endPoint.X - _startPoint.X;
-                    int deltaY = _endPoint.Y - _startPoint.Y;
+                    Rectangle originalBounds = GetBounds();
+                    ZoneGeometry originalZoneGeometry = (ZoneGeometry)_zoneGeometry.Clone();
 
-                    // Handle the special case of a widthless, heightless highlight
-                    if (deltaX == 0 && deltaY == 0)
+                    // Inflate each side the specified amount.
+                    _zoneGeometry.InflateSide(Side.Left, size);
+                    _zoneGeometry.InflateSide(Side.Top, size);
+                    _zoneGeometry.InflateSide(Side.Right, size);
+                    _zoneGeometry.InflateSide(Side.Bottom, size);
+
+                    PointF startPoint;
+                    PointF endPoint;
+                    int height;
+                    _zoneGeometry.GetZoneCoordinates(false, out startPoint, out endPoint, out height);
+
+                    QuietSetSpatialData(Point.Round(startPoint), Point.Round(endPoint), height, true);
+                    Rectangle newBounds = GetBounds();
+
+                    // If the width or height of the zone has not changed when inflating by a small factor,
+                    // double the magnitude of the resize so that all sides move.
+                    if (size < 2 &&
+                        (newBounds.Width == originalBounds.Width && newBounds.Width > MinSize.Width + 1) ||
+                        (newBounds.Height == originalBounds.Height && newBounds.Height > MinSize.Height + 1))
                     {
-                        // Seperate the start and end points horizontally
-                        _startPoint.Offset((int)(-size + 0.5), 0);
-                        _endPoint.Offset((int)(size + 0.5), 0);
+                        _zoneGeometry = originalZoneGeometry;
 
-                        // Set the new height
-                        _height = (int)(size * 2 + 0.5);
-                    }
-                    else
-                    {
-                        // Expand the start and end point directly away from the center point.
-                        PointF[] expandedPoints = new PointF[] { _startPoint, _endPoint };
-                        GeometryMethods.ExpandPoints((float)size, expandedPoints);
-                        _startPoint = Point.Round(expandedPoints[0]);
-                        _endPoint = Point.Round(expandedPoints[1]);
+                        size *= 2;
 
-                        // Inflate the height
-                        _height += (int)(size * 2 + 0.5);
+                        _zoneGeometry.InflateSide(Side.Left, size);
+                        _zoneGeometry.InflateSide(Side.Top, size);
+                        _zoneGeometry.InflateSide(Side.Right, size);
+                        _zoneGeometry.InflateSide(Side.Bottom, size);
+
+                        _zoneGeometry.GetZoneCoordinates(false, out startPoint, out endPoint, out height);
+                        QuietSetSpatialData(Point.Round(startPoint), Point.Round(endPoint), height, true);
                     }
                 }
 
@@ -1648,7 +1631,7 @@ namespace Extract.Imaging.Forms
                 if (base.ImageViewer != null)
                 {
                     // Recalculate its region
-                    CalculateRegion();
+                    CalculateRegion(true);
                 }
 
                 if (setDirty)
@@ -1731,6 +1714,8 @@ namespace Extract.Imaging.Forms
         /// Calculates the <see cref="Region"/> of this highlight from the spatial information 
         /// of the highlight.
         /// </summary>
+        /// <param name="lockAngle"><see langword="true"/> if the new spatial data is intended to
+        /// maintain the existing angle of the highlight; <see langword="false"/> otherwise.</param>
         /// <remarks>
         /// <para>This method should not be called if the highlight is detached from an image 
         /// viewer.</para>
@@ -1738,12 +1723,26 @@ namespace Extract.Imaging.Forms
         /// modified. For instance, when the <see cref="StartPoint"/>, <see cref="EndPoint"/>, and
         /// <see cref="Height"/> properties are set.</para>
         /// </remarks>
-        void CalculateRegion()
+        void CalculateRegion(bool lockAngle)
         {
             // Calculate the angle of the line
             _angle = GeometryMethods.GetAngle(_startPoint, _endPoint);
 
             _region = GetAngularRegion(_startPoint, _endPoint, _height);
+
+            if (TrackingData == null)
+            {
+                if (!lockAngle || _zoneGeometry == null)
+                {
+                    // Create entirely new ZoneGeometry based on the current coordinates.
+                    _zoneGeometry = new ZoneGeometry(ToRasterZone());
+                }
+                else
+                {
+                    // Update the ZoneGeometry vertices, but do not allow the angle to change.
+                    _zoneGeometry.UpdateVertices(ToRasterZone());
+                }
+            }
         }
 
         /// <summary>
@@ -1907,33 +1906,17 @@ namespace Extract.Imaging.Forms
             double yModifier = height / 2.0 * Math.Cos(_angle);
 
             // Calculate the grip handles
-            PointF[] gripHandles;
-            if (Math.Abs(_angle % (Math.PI / 2)) <= 1e-10)
+            PointF[] gripHandles = new PointF[] 
             {
-                // This is a rectangular highlight. There should be eight grip handles.
-                gripHandles = new PointF[] 
-                {
-                    start,
-                    new PointF((float)(center.X - xModifier), (float)(center.Y + yModifier)),
-                    end,
-                    new PointF((float)(center.X + xModifier), (float)(center.Y - yModifier)),
-                    new PointF((float)(start.X + xModifier), (float)(start.Y - yModifier)),
-                    new PointF((float)(start.X - xModifier), (float)(start.Y + yModifier)),
-                    new PointF((float)(end.X - xModifier), (float)(end.Y + yModifier)),
-                    new PointF((float)(end.X + xModifier), (float)(end.Y - yModifier))
-                };
-            }
-            else
-            {
-                // This is an angular highlight. There should be four grip handles.
-                gripHandles = new PointF[] 
-                {
-                    start,
-                    new PointF((float)(center.X - xModifier), (float)(center.Y + yModifier)),
-                    end,
-                    new PointF((float)(center.X + xModifier), (float)(center.Y - yModifier))
-                };
-            }
+                start,
+                new PointF((float)(center.X - xModifier), (float)(center.Y + yModifier)),
+                end,
+                new PointF((float)(center.X + xModifier), (float)(center.Y - yModifier)),
+                new PointF((float)(start.X + xModifier), (float)(start.Y - yModifier)),
+                new PointF((float)(start.X - xModifier), (float)(start.Y + yModifier)),
+                new PointF((float)(end.X - xModifier), (float)(end.Y + yModifier)),
+                new PointF((float)(end.X + xModifier), (float)(end.Y - yModifier))
+            };
 
             // Return the grip handles
             return gripHandles;
@@ -2126,7 +2109,7 @@ namespace Extract.Imaging.Forms
             reader.Read();
 
             // Calculate the region
-            CalculateRegion();
+            CalculateRegion(false);
         }
 
         /// <summary>
