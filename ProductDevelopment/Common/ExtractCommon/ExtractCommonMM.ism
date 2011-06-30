@@ -383,7 +383,7 @@
 		<row><td>interop.uclid_comlmlib.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>Interop.UCLID_COMLMLib.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>INTERO~1.DLL|Interop.UCLID_COMLMLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNETFILES_FILES&gt;\Interop.UCLID_COMLMLib.dll</td><td>1</td><td/></row>
 		<row><td>interop.uclid_comutilslib.dl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>Interop.UCLID_COMUTILSLib.dl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>INTERO~1.DLL|Interop.UCLID_COMUTILSLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNETFILES_FILES&gt;\Interop.UCLID_COMUTILSLib.dll</td><td>1</td><td/></row>
 		<row><td>interop.uclid_exceptionmgmtl.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>Interop.UCLID_EXCEPTIONMGMTL.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>INTERO~1.DLL|Interop.UCLID_EXCEPTIONMGMTLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DOTNETFILES_FILES&gt;\Interop.UCLID_EXCEPTIONMGMTLib.dll</td><td>1</td><td/></row>
-		<row><td>uclidexceptionmgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>UCLIDExceptionMgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>UCLIDE~1.DLL|UCLIDExceptionMgmt.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGFILES_FILES&gt;\UCLIDExceptionMgmt.dll</td><td>1</td><td/></row>
+		<row><td>uclidexceptionmgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>UCLIDExceptionMgmt.dll.8C24A694_86F1_4859_BEC1_8E282BADACF9</td><td>UCLIDE~1.DLL|UCLIDExceptionMgmt.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FI&gt;\UCLIDExceptionMgmt.dll</td><td>1</td><td/></row>
 	</table>
 
 	<table name="Font">
