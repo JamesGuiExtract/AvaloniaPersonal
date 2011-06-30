@@ -72,7 +72,6 @@ CopyLMInstallToProductInstallFolder: BuildExtractLMInstall
     @IF NOT EXIST "$(ProductInstallFolder)" MKDIR "$(ProductInstallFolder)"
     @XCOPY "$(ExtractLMInstallMediaDir)\*.*" "$(ProductInstallFolder)" /v /s /e /y
     $(VerifyDir) "$(ExtractLMInstallMediaDir)" "$(ProductInstallFolder)"
-	@COPY /v "$(LMInstallFilesRootDir)\64BitDrivers\*.*" "$(ProductInstallFolder)"
     @DeleteFiles "$(ProductInstallFolder)\vssver.scc"
     @ECHO.
     @DATE /T
