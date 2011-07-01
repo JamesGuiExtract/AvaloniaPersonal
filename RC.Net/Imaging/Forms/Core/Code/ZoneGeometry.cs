@@ -1,6 +1,8 @@
 using Extract.Drawing;
+using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -366,6 +368,14 @@ namespace Extract.Imaging.Forms
                 PointF theta;
                 RectangleF rectangle = GetWorkingRectangle(side, out theta);
 
+                // [FlexIDSCore:4724]
+                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
+                {
+                    Trace.WriteLine(string.Format(
+                        "Normalized rectangle: Left: {0}, Top: {1}, Right: {2}, Bottom: {3}",
+                        rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom));
+                }
+
                 int minSize = (side == Side.Left || side == Side.Right)
                     ? Highlight.MinSize.Width
                     : Highlight.MinSize.Height;
@@ -380,6 +390,14 @@ namespace Extract.Imaging.Forms
                 rectangle.Location =
                     new PointF(rectangle.Location.X - distance, rectangle.Location.Y);
                 rectangle.Width += distance;
+
+                // [FlexIDSCore:4724]
+                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
+                {
+                    Trace.WriteLine(string.Format(
+                        "New normalized rectangle: Left: {0}, Top: {1}, Right: {2}, Bottom: {3}",
+                        rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom));
+                }
 
                 // Set the new vertices.
                 _vertices[0] = rectangle.Location;
@@ -456,13 +474,29 @@ namespace Extract.Imaging.Forms
             float midPoint = rectangle.Location.Y + (_height / 2);
 
             start = new PointF(rectangle.Left, midPoint);
-            start = GeometryMethods.Rotate(start, theta);
-
             end = new PointF(rectangle.Right, midPoint);
+
+            // [FlexIDSCore:4724]
+            if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
+            {
+                Trace.WriteLine(string.Format(
+                    "New normalized zone: Start: {0}, End: {1}, Height: {2}",
+                    start.ToString(), end.ToString(), _height));
+            }
+
+            start = GeometryMethods.Rotate(start, theta);
             end = GeometryMethods.Rotate(end, theta);
 
             if (simpleRounding)
             {
+                // [FlexIDSCore:4724]
+                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
+                {
+                    Trace.WriteLine(string.Format(
+                        "New image zone: Start: {0}, End: {1}, Height: {2}",
+                        start.ToString(), end.ToString(), _height));
+                }
+
                 start.X = (float)Math.Round(start.X);
                 start.Y = (float)Math.Round(start.Y);
                 end.X = (float)Math.Round(end.X);
@@ -486,6 +520,14 @@ namespace Extract.Imaging.Forms
                 // be a .5 value. When such a zone is displayed, those values will be rounded off,
                 // potentially exposing pixel content. Expand the zone by a pixel to prevent this.
                 height = (int)Math.Ceiling(_height / 2) * 2;
+            }
+
+            // [FlexIDSCore:4724]
+            if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
+            {
+                Trace.WriteLine(string.Format(
+                    "New rounded image zone: Start: {0}, End: {1}, Height: {2}",
+                    start.ToString(), end.ToString(), height));
             }
         }
 

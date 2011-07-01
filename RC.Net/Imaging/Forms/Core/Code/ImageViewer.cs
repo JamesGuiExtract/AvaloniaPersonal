@@ -1,6 +1,7 @@
 using Extract.Drawing;
 using Extract.Imaging.Utilities;
 using Extract.Licensing;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Annotations;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -622,6 +624,14 @@ namespace Extract.Imaging.Forms
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23109",
                     _OBJECT_NAME);
+
+                // [FlexIDSCore:4724]
+                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
+                {
+                    Trace.Listeners.Add(new TextWriterTraceListener(System.IO.File.CreateText(
+                        Path.Combine(FileSystemMethods.CommonApplicationDataPath, "LogFiles",
+                            "ZoneSizeDebug.txt"))));
+                }
 
                 // Increment the active form count
                 IncrementFormCount();

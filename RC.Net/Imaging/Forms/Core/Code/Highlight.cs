@@ -1,7 +1,9 @@
 using Extract.Drawing;
+using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -1310,6 +1312,9 @@ namespace Extract.Imaging.Forms
             int height;
             resizedGeometry.GetZoneCoordinates(true, out startPoint, out endPoint, out height);
             QuietSetSpatialData(Point.Round(startPoint), Point.Round(endPoint), height, true);
+
+            // [FlexIDSCore:4724]
+            Trace.Flush();
         }
 
         /// <summary>
@@ -1336,6 +1341,15 @@ namespace Extract.Imaging.Forms
                 if (Math.Abs(dotProduct) < _MINIMUM_LENGTH)
                 {
                     dotProduct = dotProduct < 0 ? -_MINIMUM_LENGTH : _MINIMUM_LENGTH;
+                }
+
+                // [FlexIDSCore:4724]
+                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
+                {
+                    Trace.WriteLine("---------------------------------------------");
+                    Trace.WriteLine(string.Format(
+                        "Moving {0} {1}: Start: {2}, End: {3}, Height: {4}", trackingVector.Key.ToString(),
+                        dotProduct, _startPoint.ToString(), _endPoint.ToString(), Height));
                 }
 
                 resizedGeometry.InflateSide(trackingVector.Key, (float)dotProduct);
