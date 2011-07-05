@@ -3377,7 +3377,7 @@ namespace Extract.Imaging.Forms
         static void InflateHighlight(Highlight highlight, bool quietSetData, int distance)
         {
             // Get the fitted zone and use it to inflate the sides by the specified distances.
-            highlight.Inflate(distance, quietSetData);
+            highlight.Inflate(distance, true, quietSetData);
         }
 
         /// <summary>

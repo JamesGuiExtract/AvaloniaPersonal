@@ -1592,12 +1592,16 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="size">The amount to inflate each side of the <see cref="Highlight"/> in
         /// logical (image) pixels.</param>
+        /// <param name="simpleRounding"><see langword="true"/> if the coordinates should be simply
+        /// rounded off to the nearest whole pixel, <see langword="false"/> if the coordinates should
+        /// always be rounded in a way to prevent against the zone shrinking (ie, always round "out").
+        /// </param>
         /// <param name="setDirty">if set to <see langword="true"/> the dirty flag will be set.
         /// </param>
         /// <remarks>
         /// Negative values of <paramref name="size"/> deflate the highlight.
         /// </remarks>
-        public void Inflate(float size, bool setDirty)
+        public void Inflate(float size, bool simpleRounding, bool setDirty)
         {
             try
             {
@@ -1616,7 +1620,7 @@ namespace Extract.Imaging.Forms
                     PointF startPoint;
                     PointF endPoint;
                     int height;
-                    _zoneGeometry.GetZoneCoordinates(false, out startPoint, out endPoint, out height);
+                    _zoneGeometry.GetZoneCoordinates(simpleRounding, out startPoint, out endPoint, out height);
 
                     QuietSetSpatialData(Point.Round(startPoint), Point.Round(endPoint), height, true);
                     Rectangle newBounds = GetBounds();
@@ -1636,7 +1640,7 @@ namespace Extract.Imaging.Forms
                         _zoneGeometry.InflateSide(Side.Right, size);
                         _zoneGeometry.InflateSide(Side.Bottom, size);
 
-                        _zoneGeometry.GetZoneCoordinates(false, out startPoint, out endPoint, out height);
+                        _zoneGeometry.GetZoneCoordinates(simpleRounding, out startPoint, out endPoint, out height);
                         QuietSetSpatialData(Point.Round(startPoint), Point.Round(endPoint), height, true);
                     }
                 }

@@ -1326,7 +1326,7 @@ namespace Extract.Imaging.Forms
                                 data.ToRasterZone(false), "", _imageViewer.GetHighlightDrawColor());
                             highlight.Selectable = false;
                             highlight.CanRender = false;
-                            highlight.Inflate((float)_config.Settings.AutoFitZonePadding + 1, false);
+                            highlight.Inflate((float)_config.Settings.AutoFitZonePadding + 1, false, false);
 
                             // Add the new auto-fit highlight
                             ExecuteInUIThread(() =>
@@ -1702,7 +1702,7 @@ namespace Extract.Imaging.Forms
                         // cases. Therefore, pad the preview highlights by AutoFitZonePadding in
                         // each direction to give the user confidence that when the redaction is
                         // added it will properly cover the entire word.
-                        highlight.Inflate((float)_config.Settings.AutoFitZonePadding + 1, false);
+                        highlight.Inflate((float)_config.Settings.AutoFitZonePadding + 1, false, false);
 
                         _wordLineMapping[highlight] = lineIdentifier;
                         wordHighlights.Add(highlight);
