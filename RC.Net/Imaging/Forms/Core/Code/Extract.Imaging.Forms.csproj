@@ -245,7 +245,6 @@
       <DependentUpon>EditHighlightTextForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FitMode.cs" />
-    <Compile Include="ZoneGeometry.cs" />
     <Compile Include="ImageLayerObject.cs" />
     <Compile Include="ImageViewer.ImageReaderCache.cs">
       <DependentUpon>ImageViewer.cs</DependentUpon>

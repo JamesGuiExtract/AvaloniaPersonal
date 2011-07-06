@@ -315,8 +315,10 @@ namespace Extract.Imaging
                 // image page.  If either are off the image page, find a start and end point
                 // along the raster zone's plane that are within the image to work with.
                 Rectangle pageArea = new Rectangle(0, 0, page.Width, page.Height);
-                Point startPoint = zone.Start;
-                Point endPoint = zone.End;
+                Point startPoint;
+                Point endPoint;
+                int height;
+                zone.GetRoundedCoordinates(RoundingMode.Safe, out startPoint, out endPoint, out height);
 
                 if (!pageArea.Contains(startPoint))
                 {
@@ -331,7 +333,7 @@ namespace Extract.Imaging
                 // zone defined by the (possibly clipped) raster zone.  Note this bounding rectangle
                 // may extend offpage.
                 Rectangle boundingRectangle = GeometryMethods.GetBoundingRectangle(
-                    startPoint, endPoint, zone.Height);
+                    startPoint, endPoint, height);
 
                 // Create a destination image where the raster zone content will be copied to.  It is
                 // important that it is the same size as the bounding rectangle since the raster zone
@@ -385,10 +387,10 @@ namespace Extract.Imaging
                 // with only the content in the raster zone itself.
                 int finalImageAreaWidth = (int) GeometryMethods.Distance(endPoint, startPoint);
                 int xOffset = (rasterZoneImage.Width - finalImageAreaWidth) / 2;
-                int yOffset = (rasterZoneImage.Height - zone.Height) / 2;
+                int yOffset = (rasterZoneImage.Height - height) / 2;
 
                 Rectangle finalImageArea = new Rectangle(xOffset, yOffset, finalImageAreaWidth,
-                    zone.Height);
+                    height);
 
                 // Crop off any excess content leaving only the content from the raster zone itself.
                 CropCommand cropCommand = new CropCommand();

@@ -1,9 +1,7 @@
 using Extract.Drawing;
-using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -62,21 +60,21 @@ namespace Extract.Imaging.Forms
         /// <remarks><see cref="_endPoint"/> is the midpoint of the opposing side.</remarks>
         /// </summary>
         /// <seealso cref="StartPoint"/>
-        Point _startPoint;
+        PointF _startPoint;
 
         /// <summary>
         /// Midpoint of ending side of the highlight in logical (image) coordinates.
         /// <remarks><see cref="_startPoint"/> is the midpoint of the opposing side.</remarks>
         /// </summary>
         /// <seealso cref="EndPoint"/>
-        Point _endPoint;
+        PointF _endPoint;
 
         /// <summary>
         /// Distance in pixels between the sides of the highlight measured perpendicular to 
         /// the line segment formed by <see cref="_startPoint"/> and <see cref="_endPoint"/>.
         /// </summary>
         /// <seealso cref="Height"/>
-        int _height;
+        float _height;
 
         /// <summary>
         /// <see cref="System.Drawing.Color"/> of the highlight.
@@ -116,13 +114,13 @@ namespace Extract.Imaging.Forms
         /// The original endpoints of the highlight currently being processed during an 
         /// interactive highlight event.
         /// </summary>
-        Point[] _originalLine;
+        PointF[] _originalLine;
 
         /// <summary>
         /// The original height of the highlight currently being processed during an interactive
         /// highlight event.
         /// </summary>
-        int _originalHeight;
+        float _originalHeight;
 
         /// <summary>
         /// Contains a unit vector for each side of a highlight that is being moved. (A corner
@@ -146,6 +144,11 @@ namespace Extract.Imaging.Forms
         /// maintained as much as possible.
         /// </summary>
         ZoneGeometry _zoneGeometry;
+
+        /// <summary>
+        /// Indicates whether the <see cref="EndTracking"/> method is currently executing.
+        /// </summary>
+        bool _trackingEventEnding;
 
         #endregion Fields
 
@@ -287,8 +290,8 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
         /// open image.</exception>
         /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
-        public Highlight(ImageViewer imageViewer, string comment, Point start, Point end,
-            int height, int pageNumber, string text, Color color)
+        public Highlight(ImageViewer imageViewer, string comment, PointF start, PointF end,
+            float height, int pageNumber, string text, Color color)
             : base(imageViewer, pageNumber, comment)
         {
             try
@@ -308,7 +311,7 @@ namespace Extract.Imaging.Forms
                 Rectangle bounds = GetBounds();
                 if (bounds.Width < MinSize.Width)
                 {
-                    _endPoint.Offset(1, 0);
+                    _endPoint.X += 1;
                 }
                 if (bounds.Height < MinSize.Height)
                 {
@@ -323,8 +326,8 @@ namespace Extract.Imaging.Forms
                     // the .Net ImageViewer and the SpatialString code that adjusts the endpoints 
                     // onto the page is also removed.
                     RasterZone zone = GetTempRasterZone();
-                    _startPoint = new Point(zone.StartX, zone.StartY);
-                    _endPoint = new Point(zone.EndX, zone.EndY);
+                    _startPoint = new PointF(zone.StartX, zone.StartY);
+                    _endPoint = new PointF(zone.EndX, zone.EndY);
                     _height = zone.Height;
                 }
 
@@ -373,9 +376,8 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
         /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
         public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone)
-            : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY),
-                new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
-                null, imageViewer.DefaultHighlightColor)
+            : this(imageViewer, comment, rasterZone.Start, rasterZone.End,
+                rasterZone.Height, rasterZone.PageNumber, null, imageViewer.DefaultHighlightColor)
         {
 
         }
@@ -411,9 +413,8 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
         public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone,
             string text, Color color)
-            : this(imageViewer, comment, new Point(rasterZone.StartX, rasterZone.StartY),
-                new Point(rasterZone.EndX, rasterZone.EndY), rasterZone.Height, rasterZone.PageNumber,
-                text, color)
+            : this(imageViewer, comment, rasterZone.Start, rasterZone.End, rasterZone.Height,
+                rasterZone.PageNumber, text, color)
         {
 
         }
@@ -431,7 +432,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The midpoint of the one side of the highlight in logical (image) 
         /// coordinates.</returns>
         /// <remarks><see cref="EndPoint"/> is the midpoint of the opposing side.</remarks>
-        public Point StartPoint
+        public PointF StartPoint
         {
             get
             {
@@ -472,7 +473,7 @@ namespace Extract.Imaging.Forms
         // "start point".
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "EndPoint")]
-        public Point EndPoint
+        public PointF EndPoint
         {
             get
             {
@@ -511,7 +512,7 @@ namespace Extract.Imaging.Forms
         /// <remarks>The height is measured perpendicular to the line segment formed by the
         /// <see cref="StartPoint"/> and <see cref="EndPoint"/>.
         /// </remarks>
-        public int Height
+        public float Height
         {
             get
             {
@@ -1041,8 +1042,10 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                _startPoint.Offset(offsetBy);
-                _endPoint.Offset(offsetBy);
+                _startPoint.X += offsetBy.X;
+                _startPoint.Y += offsetBy.Y;
+                _endPoint.X += offsetBy.X;
+                _endPoint.Y += offsetBy.Y;
 
                 if (base.ImageViewer != null)
                 {
@@ -1140,7 +1143,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Store the original spatial data
-                _originalLine = new Point[] { _startPoint, _endPoint };
+                _originalLine = new PointF[] { _startPoint, _endPoint };
                 _originalHeight = _height;
             }
             catch (Exception ex)
@@ -1235,7 +1238,7 @@ namespace Extract.Imaging.Forms
                 if (imageViewer.Cursor == ExtractCursors.ActiveRotate)
                 {
                     // Update the end point
-                    QuietSetEndPoint(Point.Round(mouse));
+                    QuietSetEndPoint(_trackingEventEnding ? Point.Round(mouse) : mouse);
                 }
                 else if (imageViewer.Cursor != Cursors.SizeAll)
                 {
@@ -1262,6 +1265,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                _trackingEventEnding = true;
+
                 // If this wasn't a rotation tracking event, make sure the highlight angle remains
                 // locked.
                 bool lockAngle = (ImageViewer.Cursor != ExtractCursors.ActiveRotate);
@@ -1273,6 +1278,10 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI32820");
+            }
+            finally
+            {
+                _trackingEventEnding = false;
             }
         }
 
@@ -1295,10 +1304,16 @@ namespace Extract.Imaging.Forms
             // Retrive a ZoneGeometry representing the new highlight size.
             ZoneGeometry resizedGeometry = GetResizedGeometry(x, y);
 
-            // To ensure the start and end points are kept as far away from each other as possible
-            // to reduce wobble when resizing if the new zone is taller than it is wide, move the
-            // the start and end points to what is currntly the top and bottom sides.
-            if (resizedGeometry.Width < resizedGeometry.Height)
+            // Apply the resizedGeometry coordinates. 
+            PointF startPoint;
+            PointF endPoint;
+            float height;
+
+            // To ensure the start and end points are kept as far away from each other as
+            // possible to minimize angle error after rounding at the end of a resize
+            // operation, if the width is less than the height, move the the start and end
+            // points to what is currntly the top and bottom sides.
+            if (_trackingEventEnding && resizedGeometry.Width < resizedGeometry.Height)
             {
                 ChangeTrackingDataOrientation();
 
@@ -1306,15 +1321,10 @@ namespace Extract.Imaging.Forms
                 resizedGeometry = GetResizedGeometry(x, y);
             }
 
-            // Apply the resizedGeometry coordinates. 
-            PointF startPoint;
-            PointF endPoint;
-            int height;
-            resizedGeometry.GetZoneCoordinates(true, out startPoint, out endPoint, out height);
-            QuietSetSpatialData(Point.Round(startPoint), Point.Round(endPoint), height, true);
+            RoundingMode roundingMode = _trackingEventEnding ? RoundingMode.Simple : RoundingMode.None;
+            resizedGeometry.GetZoneCoordinates(roundingMode, out startPoint, out endPoint, out height);
 
-            // [FlexIDSCore:4724]
-            Trace.Flush();
+            QuietSetSpatialData(startPoint, endPoint, height, true);
         }
 
         /// <summary>
@@ -1336,21 +1346,6 @@ namespace Extract.Imaging.Forms
                 // NOTE: Because the active highlight vector is a unit vector, this is equivalent 
                 // to the the scalar projection of the mouse vector onto the active highlight vector.
                 double dotProduct = x * trackingVector.Value.X + y * trackingVector.Value.Y;
-
-                // Enforce a minimum projection [DNRCAU #440]
-                if (Math.Abs(dotProduct) < _MINIMUM_LENGTH)
-                {
-                    dotProduct = dotProduct < 0 ? -_MINIMUM_LENGTH : _MINIMUM_LENGTH;
-                }
-
-                // [FlexIDSCore:4724]
-                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
-                {
-                    Trace.WriteLine("---------------------------------------------");
-                    Trace.WriteLine(string.Format(
-                        "Moving {0} {1}: Start: {2}, End: {3}, Height: {4}", trackingVector.Key.ToString(),
-                        dotProduct, _startPoint.ToString(), _endPoint.ToString(), Height));
-                }
 
                 resizedGeometry.InflateSide(trackingVector.Key, (float)dotProduct);
             }
@@ -1428,8 +1423,8 @@ namespace Extract.Imaging.Forms
 
                     // Define the new highlight
                     PointF[] points = GetGripPoints(_startPoint, _endPoint, _height);
-                    QuietSetSpatialData(Point.Round(points[i]), Point.Round(points[gripHandleId]),
-                        (int)GeometryMethods.Distance(_startPoint, _endPoint), true);
+                    QuietSetSpatialData(points[i], points[gripHandleId],
+                        (float)GeometryMethods.Distance(_startPoint, _endPoint), true);
 
                     // Done.
                     return;
@@ -1446,7 +1441,7 @@ namespace Extract.Imaging.Forms
         // "start point".
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "endPoint")]
-        internal void QuietSetEndPoint(Point endPoint)
+        internal void QuietSetEndPoint(PointF endPoint)
         {
             _endPoint = endPoint;
 
@@ -1472,7 +1467,7 @@ namespace Extract.Imaging.Forms
         // "start point".
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "endPoint")]
-        internal void QuietSetSpatialData(Point startPoint, Point endPoint, int height,
+        internal void QuietSetSpatialData(PointF startPoint, PointF endPoint, float height,
             bool lockAngle)
         {
             // Set the spatial data
@@ -1529,15 +1524,13 @@ namespace Extract.Imaging.Forms
                     rasterZone.PageNumber == PageNumber, "Raster Zone Page", rasterZone.PageNumber,
                     "Highlight Page", PageNumber);
 
-                Point startPoint = new Point(rasterZone.StartX, rasterZone.StartY);
-                Point endPoint = new Point(rasterZone.EndX, rasterZone.EndY);
                 if (quietSetData)
                 {
-                    QuietSetSpatialData(startPoint, endPoint, rasterZone.Height, lockAngle);
+                    QuietSetSpatialData(rasterZone.Start, rasterZone.End, rasterZone.Height, lockAngle);
                 }
                 else
                 {
-                    SetSpatialData(startPoint, endPoint, rasterZone.Height, lockAngle);
+                    SetSpatialData(rasterZone.Start, rasterZone.End, rasterZone.Height, lockAngle);
                 }
             }
             catch (Exception ex)
@@ -1562,7 +1555,7 @@ namespace Extract.Imaging.Forms
         // "start point".
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
             MessageId = "endPoint")]
-        public void SetSpatialData(Point startPoint, Point endPoint, int height,
+        public void SetSpatialData(PointF startPoint, PointF endPoint, float height,
             bool lockAngle)
         {
             try
@@ -1592,16 +1585,14 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="size">The amount to inflate each side of the <see cref="Highlight"/> in
         /// logical (image) pixels.</param>
-        /// <param name="simpleRounding"><see langword="true"/> if the coordinates should be simply
-        /// rounded off to the nearest whole pixel, <see langword="false"/> if the coordinates should
-        /// always be rounded in a way to prevent against the zone shrinking (ie, always round "out").
-        /// </param>
+        /// <param name="roundingMode">The <see cref="RoundingMode"/> to use after inflating the
+        /// highlight.</param>
         /// <param name="setDirty">if set to <see langword="true"/> the dirty flag will be set.
         /// </param>
         /// <remarks>
         /// Negative values of <paramref name="size"/> deflate the highlight.
         /// </remarks>
-        public void Inflate(float size, bool simpleRounding, bool setDirty)
+        public void Inflate(float size, RoundingMode roundingMode, bool setDirty)
         {
             try
             {
@@ -1619,10 +1610,10 @@ namespace Extract.Imaging.Forms
 
                     PointF startPoint;
                     PointF endPoint;
-                    int height;
-                    _zoneGeometry.GetZoneCoordinates(simpleRounding, out startPoint, out endPoint, out height);
+                    float height;
+                    _zoneGeometry.GetZoneCoordinates(roundingMode, out startPoint, out endPoint, out height);
 
-                    QuietSetSpatialData(Point.Round(startPoint), Point.Round(endPoint), height, true);
+                    QuietSetSpatialData(startPoint, endPoint, height, true);
                     Rectangle newBounds = GetBounds();
 
                     // If the width or height of the zone has not changed when inflating by a small factor,
@@ -1640,8 +1631,8 @@ namespace Extract.Imaging.Forms
                         _zoneGeometry.InflateSide(Side.Right, size);
                         _zoneGeometry.InflateSide(Side.Bottom, size);
 
-                        _zoneGeometry.GetZoneCoordinates(simpleRounding, out startPoint, out endPoint, out height);
-                        QuietSetSpatialData(Point.Round(startPoint), Point.Round(endPoint), height, true);
+                        _zoneGeometry.GetZoneCoordinates(roundingMode, out startPoint, out endPoint, out height);
+                        QuietSetSpatialData(startPoint, endPoint, height, true);
                     }
                 }
 
@@ -1775,7 +1766,7 @@ namespace Extract.Imaging.Forms
         /// </param>
         /// <returns>The angled rectangular <see cref="Region"/> defined by the line segment 
         /// between two opposing sides and the height.</returns>
-        internal static Region GetAngularRegion(Point startPoint, Point endPoint, int height)
+        internal static Region GetAngularRegion(PointF startPoint, PointF endPoint, float height)
         {
             // Get the corners of the specified specified region
             PointF[] vertices = GeometryMethods.GetVertices(startPoint, endPoint, height);
@@ -1797,7 +1788,13 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                return GeometryMethods.GetBoundingRectangle(_startPoint, _endPoint, _height);
+                RasterZone zone = ToRasterZone();
+                Point start;
+                Point end;
+                int height;
+                zone.GetRoundedCoordinates(Imaging.RoundingMode.Safe, out start, out end, out height);
+
+                return GeometryMethods.GetBoundingRectangle(start, end, height);
             }
             catch (Exception ex)
             {
@@ -2082,7 +2079,7 @@ namespace Extract.Imaging.Forms
         /// <param name="point">The point to test for containment.</param>
         /// <returns><see langword="true"/> if the point is on the page; <see langword="false"/> 
         /// if the point is not on the page.</returns>
-        bool IsPointOnPage(Point point)
+        bool IsPointOnPage(PointF point)
         {
             return point.X >= 0 && point.Y >= 0 && point.X < ImageViewer.ImageWidth &&
                    point.Y < ImageViewer.ImageHeight;

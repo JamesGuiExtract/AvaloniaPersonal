@@ -3377,7 +3377,7 @@ namespace Extract.Imaging.Forms
         static void InflateHighlight(Highlight highlight, bool quietSetData, int distance)
         {
             // Get the fitted zone and use it to inflate the sides by the specified distances.
-            highlight.Inflate(distance, true, quietSetData);
+            highlight.Inflate(distance, RoundingMode.Simple, quietSetData);
         }
 
         /// <summary>
@@ -3438,7 +3438,7 @@ namespace Extract.Imaging.Forms
             data.FitEdge(Side.Right, probe);
             data.FitEdge(Side.Bottom, probe);
 
-            RasterZone rasterZone = data.ToRasterZone(false);
+            RasterZone rasterZone = data.ToRasterZone(RoundingMode.Safe);
 
             return (rasterZone.Height < _MIN_SPLIT_HEIGHT) ? null : rasterZone;
         }

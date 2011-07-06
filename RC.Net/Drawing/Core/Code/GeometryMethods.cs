@@ -469,7 +469,7 @@ namespace Extract.Drawing
         /// perpendicular to the line formed by <paramref name="start"/> and 
         /// <paramref name="end"/>.</param>
         /// <returns>The area of the specified angular rectangle.</returns>
-        public static double Area(Point start, Point end, int height)
+        public static double Area(PointF start, PointF end, float height)
         {
             try
             {

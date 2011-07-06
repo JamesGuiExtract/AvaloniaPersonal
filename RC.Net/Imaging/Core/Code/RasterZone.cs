@@ -25,6 +25,13 @@ namespace Extract.Imaging
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(RasterZone).ToString();
 
+        /// <summary>
+        /// The allowable difference between a floating point coordinate and the nearest whole
+        /// number to allow the coordinate to be rounded off without using the specialized rounding
+        /// from the <see cref="ZoneGeometry"/> class.
+        /// </summary>
+        static readonly float _ROUNDOFF_LEEWAY = 0.001F;
+
         #endregion Constants
 
         #region Fields
@@ -32,17 +39,17 @@ namespace Extract.Imaging
         /// <summary>
         /// The starting point of the <see cref="RasterZone"/>.
         /// </summary>
-        Point _start;
+        PointF _start;
 
         /// <summary>
         /// The end point of the <see cref="RasterZone"/>.
         /// </summary>
-        Point _end;
+        PointF _end;
 
         /// <summary>
         /// The height of the <see cref="RasterZone"/>.
         /// </summary>
-        int _height;
+        float _height;
 
         /// <summary>
         /// The page number of the <see cref="RasterZone"/>.
@@ -79,6 +86,32 @@ namespace Extract.Imaging
         public RasterZone(Point startPoint, Point endPoint, int height, int pageNumber) :
             this(startPoint.X, startPoint.Y, endPoint.X, endPoint.Y, height, pageNumber)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="RasterZone"/> class with specified
+        /// start point, end point, and height on the specified page.
+        /// </summary>
+        /// <param name="startPoint">A <see cref="Point"/> containing the start point
+        /// for the raster zone.</param>
+        /// <param name="endPoint">A <see cref="Point"/>containing the end point
+        /// for the raster zone.</param>
+        /// <param name="height">The height of the raster zone.</param>
+        /// <param name="pageNumber">The page that the raster zone is defined for.</param>
+        // This is not the compound word "endpoint". This is the "end point", meant in contrast to
+        // "start point".
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly",
+            MessageId = "endPoint")]
+        public RasterZone(PointF startPoint, PointF endPoint, float height, int pageNumber)
+        {
+            // Validate the license
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI32829",
+                _OBJECT_NAME);
+
+            _start = startPoint;
+            _end = endPoint;
+            _height = height;
+            _pageNumber = pageNumber;
         }
 
         /// <summary>
@@ -252,6 +285,55 @@ namespace Extract.Imaging
         }
 
         /// <summary>
+        /// Gets the <see cref="RasterZone"/>'s coordinates rounded using the specified
+        /// <see paramref="roundingMode"/>.
+        /// </summary>
+        /// <param name="roundingMode">The <see cref="RoundingMode"/> to use.</param>
+        /// <param name="start">A <see cref="PointF"/> specifying the start point.</param>
+        /// <param name="end">A <see cref="PointF"/> specifying the end point.</param>
+        /// <param name="height">The height of the raster zone.</param>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "3#")]
+        public void GetRoundedCoordinates(RoundingMode roundingMode, out Point start, out Point end,
+            out int height)
+        {
+            try
+            {
+                ExtractException.Assert("ELI32827", "Invalid rounding mode.",
+                    roundingMode != RoundingMode.None);
+
+                if (Math.Abs(_start.X - Math.Round(_start.X)) > _ROUNDOFF_LEEWAY ||
+                    Math.Abs(_start.Y - Math.Round(_start.Y)) > _ROUNDOFF_LEEWAY ||
+                    Math.Abs(_end.X - Math.Round(_end.X)) > _ROUNDOFF_LEEWAY ||
+                    Math.Abs(_end.Y - Math.Round(_end.Y)) > _ROUNDOFF_LEEWAY ||
+                    Math.Abs(_height - Math.Round(_height)) > _ROUNDOFF_LEEWAY)
+                {
+                    ZoneGeometry zoneGeometry = new ZoneGeometry(this);
+
+                    PointF startF;
+                    PointF endF;
+                    float heightF;
+                    zoneGeometry.GetZoneCoordinates(roundingMode, out startF, out endF, out heightF);
+
+                    start = Point.Round(startF);
+                    end = Point.Round(endF);
+                    height = (int)Math.Round(heightF);
+                }
+                else
+                {
+                    start = Point.Round(_start);
+                    end = Point.Round(_end);
+                    height = (int)Math.Round(_height);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32826");
+            }
+        }
+
+        /// <summary>
         /// Computes the smallest <see cref="Rectangle"/> that contains
         /// this <see cref="RasterZone"/>.
         /// </summary>
@@ -263,8 +345,13 @@ namespace Extract.Imaging
         {
             try
             {
+                Point start;
+                Point end;
+                int height;
+                GetRoundedCoordinates(RoundingMode.Safe, out start, out end, out height);
+
                 // Return the bounding rectangle
-                return GeometryMethods.GetBoundingRectangle(_start, _end, _height);
+                return GeometryMethods.GetBoundingRectangle(start, end, height);
             }
             catch (Exception ex)
             {
@@ -303,8 +390,13 @@ namespace Extract.Imaging
                 // Create a new COM RasterZone
                 ComRasterZone comRasterZone = new ComRasterZone();
 
+                Point start;
+                Point end;
+                int height;
+                GetRoundedCoordinates(RoundingMode.Safe, out start, out end, out height);
+
                 // Copy the .Net RasterZone data to the COM RasterZone
-                comRasterZone.CreateFromData(_start.X, _start.Y, _end.X, _end.Y, _height, _pageNumber);
+                comRasterZone.CreateFromData(start.X, start.Y, end.X, end.Y, height, _pageNumber);
 
                 return comRasterZone;
             }
@@ -476,7 +568,7 @@ namespace Extract.Imaging
                 int halfLength = length / 2;
 
                 // Check if the line is vertical
-                int deltaX = _start.X - _end.X;
+                float deltaX = _start.X - _end.X;
                 if (deltaX == 0)
                 {
                     // Check which Y point is greater and expand
@@ -616,15 +708,22 @@ namespace Extract.Imaging
                 // Only write zone information if the zone is not empty
                 if (this != new RasterZone())
                 {
+                    // Write the same coordinates that would be persisted via ToComRasterZone (ie,
+                    // rounded using RoundingMode.Safe).
+                    Point start;
+                    Point end;
+                    int height;
+                    GetRoundedCoordinates(RoundingMode.Safe, out start, out end, out height);
+
                     writer.WriteStartElement("Start");
-                    writer.WriteAttributeString("X", _start.X.ToString(CultureInfo.CurrentCulture));
-                    writer.WriteAttributeString("Y", _start.Y.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("X", start.X.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("Y", start.Y.ToString(CultureInfo.CurrentCulture));
                     writer.WriteEndElement();
                     writer.WriteStartElement("End");
-                    writer.WriteAttributeString("X", _end.X.ToString(CultureInfo.CurrentCulture));
-                    writer.WriteAttributeString("Y", _end.Y.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("X", end.X.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteAttributeString("Y", end.Y.ToString(CultureInfo.CurrentCulture));
                     writer.WriteEndElement();
-                    writer.WriteElementString("Height", _height.ToString(CultureInfo.CurrentCulture));
+                    writer.WriteElementString("Height", height.ToString(CultureInfo.CurrentCulture));
                     writer.WriteElementString("Page", _pageNumber.ToString(CultureInfo.CurrentCulture));
                 }
 
@@ -644,7 +743,7 @@ namespace Extract.Imaging
         /// Gets the start point of the <see cref="RasterZone"/>.
         /// </summary>
         /// <return>Start point of the <see cref="RasterZone"/>.</return>
-        public Point Start
+        public PointF Start
         {
             get
             {
@@ -657,7 +756,7 @@ namespace Extract.Imaging
         /// </summary>
         /// <return>The X-coordinate for the start point of the <see cref="RasterZone"/>.</return>
         /// <value>The X-coordinate for the start point of the <see cref="RasterZone"/>.</value>
-        public int StartX
+        public float StartX
         {
             get
             {
@@ -674,7 +773,7 @@ namespace Extract.Imaging
         /// </summary>
         /// <return>The Y-coordinate for the start point of the <see cref="RasterZone"/>.</return>
         /// <value>The Y-coordinate for the start point of the <see cref="RasterZone"/>.</value>
-        public int StartY
+        public float StartY
         {
             get
             {
@@ -690,7 +789,7 @@ namespace Extract.Imaging
         /// Gets the end point of the <see cref="RasterZone"/>.
         /// </summary>
         /// <return>End point of the <see cref="RasterZone"/>.</return>
-        public Point End
+        public PointF End
         {
             get
             {
@@ -703,7 +802,7 @@ namespace Extract.Imaging
         /// </summary>
         /// <return>The X-coordinate for the end point of the <see cref="RasterZone"/>.</return>
         /// <value>The X-coordinate for the end point of the <see cref="RasterZone"/>.</value>
-        public int EndX
+        public float EndX
         {
             get
             {
@@ -720,7 +819,7 @@ namespace Extract.Imaging
         /// </summary>
         /// <return>The Y-coordinate for the end point of the <see cref="RasterZone"/>.</return>
         /// <value>The Y-coordinate for the end point of the <see cref="RasterZone"/>.</value>
-        public int EndY
+        public float EndY
         {
             get
             {
@@ -737,7 +836,7 @@ namespace Extract.Imaging
         /// </summary>
         /// <return>The height of the <see cref="RasterZone"/>.</return>
         /// <value>The height of the <see cref="RasterZone"/>.</value>
-        public int Height
+        public float Height
         {
             get
             {
@@ -871,7 +970,7 @@ namespace Extract.Imaging
         /// <returns>The hashcode for this <see cref="RasterZone"/>.</returns>
         public override int GetHashCode()
         {
-            return (_start.GetHashCode() ^ _end.GetHashCode() ^ _height ^ _pageNumber);
+            return (_start.GetHashCode() ^ _end.GetHashCode() ^ (int)_height ^ _pageNumber);
         }
 
         /// <summary>

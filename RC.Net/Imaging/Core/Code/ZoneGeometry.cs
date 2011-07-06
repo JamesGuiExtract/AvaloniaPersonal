@@ -1,18 +1,17 @@
 using Extract.Drawing;
-using Extract.Licensing;
 using Extract.Utilities;
 using System;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
 
-namespace Extract.Imaging.Forms
+namespace Extract.Imaging
 {
     /// <summary>
     /// Represents the side of a <see cref="ZoneGeometry"/> zone to be operated upon.
     /// </summary>
-    enum Side
+    public enum Side
     {
         /// <summary>
         /// The left side.
@@ -36,17 +35,43 @@ namespace Extract.Imaging.Forms
     };
 
     /// <summary>
-    /// Allows for resizing and fitting of <see cref="RasterZone"/>s.
+    /// Represents the rounding method to use when retrieving zone coordinates.
     /// </summary>
-    class ZoneGeometry : ICloneable
+    public enum RoundingMode
     {
-        #region Fields
 
         /// <summary>
-        /// The config file that contains settings for the image viewer.
+        /// Do not round. Coordinates may represent fractions of a pixel.
         /// </summary>
-        static readonly ConfigSettings<Properties.Settings> _config =
-            new ConfigSettings<Properties.Settings>();
+        None = 0,
+
+        /// <summary>
+        /// Round to the nearest whole pixel.
+        /// </summary>
+        Simple = 1,
+
+        /// <summary>
+        /// Round to the next whole pixel in the opposite direction as the raster zone center to
+        /// ensure the zone doesn't shrink and expose or "leak" pixels as a result of rounding.
+        /// </summary>
+        Safe = 2
+    }
+
+    /// <summary>
+    /// Allows for resizing and fitting of <see cref="RasterZone"/>s.
+    /// </summary>
+    public class ZoneGeometry : ICloneable
+    {
+        #region Constants
+
+        /// <summary>
+        /// 
+        /// </summary>
+        const float _EQUIVALENCE_TOLERANCE = 0.001F;
+
+        #endregion Constants
+
+        #region Fields
 
         /// <summary>
         /// The page the zone is on.
@@ -54,7 +79,7 @@ namespace Extract.Imaging.Forms
         int _pageNumber;
 
         /// <summary>
-        /// The angle of the zone relative to horizontal.
+        /// The angle of the zone relative to horizontal (in radians).
         /// </summary>
         double _angle;
 
@@ -106,7 +131,7 @@ namespace Extract.Imaging.Forms
 
                 // [LegacyRCAndUtils #5205]
                 // Calculate the angle from horizontal as a number between -180 and 180
-                _angle = GeometryMethods.GetAngleDelta(0, zone.ComputeSkew(true), true);
+                _angle = GeometryMethods.GetAngleDelta(0, zone.ComputeSkew(false), false);
 
                 _vertices = zone.GetBoundaryPoints();
 
@@ -151,6 +176,29 @@ namespace Extract.Imaging.Forms
             }
         }
 
+        /// <summary>
+        /// Gets or sets the padding to use when auto-fitting a zone to pixel content.
+        /// </summary>
+        /// <value>The amount of padding (in pixels).</value>
+        public static int AutoFitZonePadding
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the minimum <see cref="Size"/> a zone should be be following any sizing or
+        /// fitting operation.
+        /// </summary>
+        /// <value>
+        /// The minimum <see cref="Size"/> a zone should be be following any sizing or fitting
+        /// operation.
+        /// </value>
+        public static Size MinSize
+        {
+            get;
+            set;
+        }
 
         #endregion Properties
 
@@ -187,7 +235,7 @@ namespace Extract.Imaging.Forms
             {
                 // The buffer is the distance from the first row of pixels, not the number of rows
                 // of pixels in between (as with AutoFitZonePadding).
-                float bufferValue = buffer ?? _config.Settings.AutoFitZonePadding + 1;
+                float bufferValue = buffer ?? AutoFitZonePadding + 1;
 
                 // Search for the edge of pixel content
                 float? edge = FindEdge(side, probe, shrink, findBlack, fuzzyFactor, fuzzyBuffer,
@@ -261,7 +309,7 @@ namespace Extract.Imaging.Forms
                 FuzzyEdgeQualifier countQualifier = null;
                 FuzzyEdgeQualifier spreadQualifier = null;
                 bool useFuzzyFactor = fuzzyFactor.HasValue;
-                    
+
                 // If an edge is allowed to be found using "fuzzy" logic, initialize
                 // FuzzyEdgeQualifier based on the base raster zone line pixel content.
                 if (useFuzzyFactor)
@@ -294,8 +342,8 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Scan the current row's pixels.
-	                bool offPage;
-	                int spread;
+                    bool offPage;
+                    int spread;
                     int count = CheckRowPixels(rectangle, row, theta, probe, roundPixelUp,
                         !useFuzzyFactor, out offPage, out spread);
 
@@ -322,11 +370,11 @@ namespace Extract.Imaging.Forms
                         }
                     }
 
-	                // If none of the pixels in the row were onpage, stop the search.
-	                if (offPage)
-	                {
-		                break;
-	                }
+                    // If none of the pixels in the row were onpage, stop the search.
+                    if (offPage)
+                    {
+                        break;
+                    }
                 }
 
                 // If no row was found, if using fuzzy logic ask for the best qualified row
@@ -368,17 +416,9 @@ namespace Extract.Imaging.Forms
                 PointF theta;
                 RectangleF rectangle = GetWorkingRectangle(side, out theta);
 
-                // [FlexIDSCore:4724]
-                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
-                {
-                    Trace.WriteLine(string.Format(
-                        "Normalized rectangle: Left: {0}, Top: {1}, Right: {2}, Bottom: {3}",
-                        rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom));
-                }
-
                 int minSize = (side == Side.Left || side == Side.Right)
-                    ? Highlight.MinSize.Width
-                    : Highlight.MinSize.Height;
+                    ? MinSize.Width
+                    : MinSize.Height;
 
                 // Ensure we don't make the zone smaller than Highlight.MinSize.
                 if (rectangle.Width + distance < minSize)
@@ -390,14 +430,6 @@ namespace Extract.Imaging.Forms
                 rectangle.Location =
                     new PointF(rectangle.Location.X - distance, rectangle.Location.Y);
                 rectangle.Width += distance;
-
-                // [FlexIDSCore:4724]
-                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
-                {
-                    Trace.WriteLine(string.Format(
-                        "New normalized rectangle: Left: {0}, Top: {1}, Right: {2}, Bottom: {3}",
-                        rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom));
-                }
 
                 // Set the new vertices.
                 _vertices[0] = rectangle.Location;
@@ -430,22 +462,20 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Converts this instance to a <see cref="RasterZone"/>.
         /// </summary>
-        /// <param name="simpleRounding"><see langword="true"/> if the coordinates should be simply
-        /// rounded off to the nearest whole pixel, <see langword="false"/> if the coordinates should
-        /// always be rounded in a way to prevent against the zone shrinking (ie, always round "out").
-        /// </param>
+        /// <param name="roundingMode">The <see cref="RoundingMode"/> to use when generating the
+        /// <see cref="RasterZone"/>.</param>
         /// <returns>The <see cref="RasterZone"/> equivalent of this instance.</returns>
-        public RasterZone ToRasterZone(bool simpleRounding)
+        public RasterZone ToRasterZone(RoundingMode roundingMode)
         {
             try
             {
                 PointF start;
                 PointF end;
-                int height;
-                GetZoneCoordinates(simpleRounding, out start, out end, out height);
+                float height;
+                GetZoneCoordinates(roundingMode, out start, out end, out height);
 
                 // Create the raster zone
-                return new RasterZone(Point.Round(start), Point.Round(end), height, _pageNumber);
+                return new RasterZone(start, end, height, _pageNumber);
             }
             catch (Exception ex)
             {
@@ -456,78 +486,83 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Gets the zone coordinates.
         /// </summary>
-        /// <param name="simpleRounding"><see langword="true"/> if the coordinates should be simply
-        /// rounded off to the nearest whole pixel, <see langword="false"/> if the coordinates should
-        /// always be rounded in a way to prevent against the zone shrinking (ie, always round "out").
-        /// </param>
-        /// <param name="start">The start.</param>
-        /// <param name="end">The end.</param>
-        /// <param name="height">The height.</param>
-        public void GetZoneCoordinates(bool simpleRounding, out PointF start, out PointF end, out int height)
+        /// <param name="roundingMode">The <see cref="RoundingMode"/> to use when retrieving the
+        /// coordinates.</param>
+        /// <param name="start">The zone's start point.</param>
+        /// <param name="end">The zone's end point.</param>
+        /// <param name="height">The zone's height.</param>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "3#")]
+        public void GetZoneCoordinates(RoundingMode roundingMode, out PointF start, out PointF end,
+            out float height)
         {
-            // Retrieve a working rectangle relative to the zone's coordinate system and
-            // with the side to be operated upon as the left side.
-            PointF theta;
-            RectangleF rectangle = GetWorkingRectangle(Side.Left, out theta);
-
-            // Compute the start and end points.            
-            float midPoint = rectangle.Location.Y + (_height / 2);
-
-            start = new PointF(rectangle.Left, midPoint);
-            end = new PointF(rectangle.Right, midPoint);
-
-            // [FlexIDSCore:4724]
-            if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
+            try
             {
-                Trace.WriteLine(string.Format(
-                    "New normalized zone: Start: {0}, End: {1}, Height: {2}",
-                    start.ToString(), end.ToString(), _height));
-            }
+                // Retrieve a working rectangle relative to the zone's coordinate system and
+                // with the side to be operated upon as the left side.
+                PointF theta;
+                RectangleF rectangle = GetWorkingRectangle(Side.Left, out theta);
 
-            start = GeometryMethods.Rotate(start, theta);
-            end = GeometryMethods.Rotate(end, theta);
+                // Compute the start and end points.            
+                float midPoint = rectangle.Location.Y + (_height / 2);
 
-            if (simpleRounding)
-            {
-                // [FlexIDSCore:4724]
-                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
+                start = new PointF(rectangle.Left, midPoint);
+                end = new PointF(rectangle.Right, midPoint);
+
+                if (roundingMode == RoundingMode.Safe)
                 {
-                    Trace.WriteLine(string.Format(
-                        "New image zone: Start: {0}, End: {1}, Height: {2}",
-                        start.ToString(), end.ToString(), _height));
+                    // For the "safe" rounding mode move the start and end points half a pixel away
+                    // from the center, to ensure they are rounded to the next whole pixel away from
+                    // the raster zone.
+                    start.X -= 0.5F;
+                    end.X += 0.5F;
                 }
 
-                start.X = (float)Math.Round(start.X);
-                start.Y = (float)Math.Round(start.Y);
-                end.X = (float)Math.Round(end.X);
-                end.Y = (float)Math.Round(end.Y);
+                start = GeometryMethods.Rotate(start, theta);
+                end = GeometryMethods.Rotate(end, theta);
 
-                // Ensure height is even. If the height is odd, the top and bottom of the zone will
-                // be a .5 value. When such a zone is displayed, those values will be rounded off,
-                // potentially exposing pixel content. Expand the zone by a pixel to prevent this.
-                height = (int)Math.Round(_height / 2) * 2;
+                if (roundingMode != RoundingMode.None)
+                {
+                    start.X = (float)Math.Round(start.X);
+                    start.Y = (float)Math.Round(start.Y);
+                    end.X = (float)Math.Round(end.X);
+                    end.Y = (float)Math.Round(end.Y);
+
+                    if (roundingMode == RoundingMode.Simple)
+                    {
+                        // Ensure height is even. If the height is odd, the top and bottom of the
+                        // zone will be a .5 value. When such a zone is displayed, those values will
+                        // be rounded off, potentially exposing pixel content. Expand the zone by a
+                        // pixel to prevent this.
+                        height = (int)Math.Round(_height / 2) * 2;
+                    }
+                    else
+                    {
+                        // Because the rounded coordinates are likely to be at a slightly different
+                        // angle than _angle, toward either end of the raster zone this allows for
+                        // the possibility that pixels will be leaked above or below the raster zone.
+                        // Before rounding up to the next even integer for height, add in the the
+                        // vertical distance the ends of the raster zone have been moved by rounding
+                        // of the start and end point.
+                        double angle = GeometryMethods.GetAngle(start, end);
+                        double angleOffset = GeometryMethods.GetAngleDelta(_angle, angle, false);
+                        double verticalOffset = Math.Abs(Math.Sin(angleOffset) * _width);
+
+                        // Ensure height is even. If the height is odd, the top and bottom of the zone will
+                        // be a .5 value. When such a zone is displayed, those values will be rounded off,
+                        // potentially exposing pixel content. Expand the zone by a pixel to prevent this.
+                        height = (int)Math.Ceiling((_height + verticalOffset) / 2) * 2;
+                    }
+                }
+                else
+                {
+                    height = _height;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // Adjust coordinates such that the raster zone doesn't shrink from points that are
-                // rounded off in the wrong direction.
-                start.X = (start.X < end.X) ? start.X : (float)Math.Ceiling(start.X);
-                start.Y = (start.Y < end.Y) ? start.Y : (float)Math.Ceiling(start.Y);
-                end.X = (end.X < start.X) ? end.X : (float)Math.Ceiling(end.X);
-                end.Y = (end.Y < start.Y) ? end.Y : (float)Math.Ceiling(end.Y);
-
-                // Ensure height is even. If the height is odd, the top and bottom of the zone will
-                // be a .5 value. When such a zone is displayed, those values will be rounded off,
-                // potentially exposing pixel content. Expand the zone by a pixel to prevent this.
-                height = (int)Math.Ceiling(_height / 2) * 2;
-            }
-
-            // [FlexIDSCore:4724]
-            if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
-            {
-                Trace.WriteLine(string.Format(
-                    "New rounded image zone: Start: {0}, End: {1}, Height: {2}",
-                    start.ToString(), end.ToString(), height));
+                throw ex.AsExtract("ELI32825");
             }
         }
 
@@ -544,7 +579,8 @@ namespace Extract.Imaging.Forms
                         "Orientation can only be rotated by multiples of 90 degrees",
                         ((int)degrees % 90) == 0);
 
-                _angle = GeometryMethods.GetAngleDelta(0, _angle + degrees, true);
+                double radians = GeometryMethods.ConvertDegreesToRadians(degrees);
+                _angle = GeometryMethods.GetAngleDelta(0, _angle + radians, false);
 
                 if (((int)degrees % 180) != 0)
                 {
@@ -641,8 +677,7 @@ namespace Extract.Imaging.Forms
                 {
                     // Compute the angle of the provided points.
                     double parameterAngle = GeometryMethods.GetAngle(startPoint, endPoint);
-                    parameterAngle = GeometryMethods.ConvertRadiansToDegrees(parameterAngle);
-                    GeometryMethods.GetAngleDelta(0, parameterAngle, true);
+                    GeometryMethods.GetAngleDelta(0, parameterAngle, false);
 
                     // Compute the difference in angle between the provided line and this zone.
                     double diffAngle = parameterAngle - _angle;
@@ -699,13 +734,11 @@ namespace Extract.Imaging.Forms
 
             // If necessary, rotate it further such that the side to be worked on becomes the left
             // side of the working zone.
-            workingAngle -= (double)side * 90;
-
-            workingAngle = GeometryMethods.ConvertDegreesToRadians(workingAngle);
+            workingAngle -= (double)side * Math.PI / 2;
 
             // Create theta values to translate the image coordinates into the working coordinate
             // system.
-            PointF workingTheta = 
+            PointF workingTheta =
                 new PointF((float)Math.Sin(workingAngle), (float)Math.Cos(workingAngle));
 
             // Calculate the vertices of this rectangle.

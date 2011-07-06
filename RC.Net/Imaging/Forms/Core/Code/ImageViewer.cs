@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -160,6 +159,12 @@ namespace Extract.Imaging.Forms
         #endregion Static Fields
 
         #region Fields
+
+        /// <summary>
+        /// The config file that contains settings for the image viewer.
+        /// </summary>
+        readonly ConfigSettings<Properties.Settings> _config =
+            new ConfigSettings<Properties.Settings>();
 
         /// <summary>
         /// File name of the currently open image file.
@@ -625,14 +630,6 @@ namespace Extract.Imaging.Forms
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23109",
                     _OBJECT_NAME);
 
-                // [FlexIDSCore:4724]
-                if (LicenseUtilities.IsLicensed(LicenseIdName.IdShieldOfficeObject))
-                {
-                    Trace.Listeners.Add(new TextWriterTraceListener(System.IO.File.CreateText(
-                        Path.Combine(FileSystemMethods.CommonApplicationDataPath, "LogFiles",
-                            "ZoneSizeDebug.txt"))));
-                }
-
                 // Increment the active form count
                 IncrementFormCount();
 
@@ -676,6 +673,9 @@ namespace Extract.Imaging.Forms
                 _wordHighlightManager.BackgroundProcessStatusUpdate +=
                     HandleBackgroundProcessStatusUpdate;
                 _wordHighlightManager.OcrLoaded += HandleOcrLoaded;
+
+                ZoneGeometry.AutoFitZonePadding = _config.Settings.AutoFitZonePadding;
+                ZoneGeometry.MinSize = Highlight.MinSize;
 
                 // Double-buffer to prevent flickering
                 SetStyle(ControlStyles.UserPaint, true);
@@ -3092,6 +3092,13 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                // Run _trackingUpdateCall if assigned to update the tracking region and tracking
+                // related graphics.
+                if (_trackingUpdateCall != null)
+                {
+                    _trackingUpdateCall(e);
+                }
+
                 // Draw the annotations if they exist
                 if (_annotations != null)
                 {
@@ -3125,13 +3132,6 @@ namespace Extract.Imaging.Forms
                 if (_activeLinkedLayerObject != null)
                 {
                     _activeLinkedLayerObject.DrawLinkArrows(e.Graphics);
-                }
-
-                // Run _trackingUpdateCall if assigned to update the tracking region and display
-                // tracking related graphics.
-                if (_trackingUpdateCall != null)
-                {
-                    _trackingUpdateCall(e);
                 }
 
                 base.OnPostImagePaint(e);
