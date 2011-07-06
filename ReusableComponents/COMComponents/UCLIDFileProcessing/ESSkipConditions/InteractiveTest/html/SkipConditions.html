@@ -21,7 +21,7 @@
 		license file, not an <b>RDT</b> license file.</li> 
 	</ul>
 <p>
-   	<li><h3>Functionality</h3>
+   	<li><h3>Logical Conditions Functionality</h3>
 	<ul>
 	   	<li>Start a blank <b>File Action Manager</b>.</li> 
    		<li>Select a database server and database.  Select an action, then check the 
@@ -34,7 +34,7 @@
        		Configure..., OK, Cancel.  There should also be an edit box for <i>FAM Condition 
        		description</i>, and a droplist for <i>Select Condition</i>.</li>
    		<ul> 
-      			<li>Confirm the droplist for Select Condition includes: <b>None</b>.</li>
+      			<li>Confirm the droplist for Select Condition includes: <b>&ltNone&gt</b>.</li>
 	      		<ul> 
         	 		<li>Confirm that when <b>None</b> is selected, it disables the Configure 
 				button in the Select Condition dialog.</li> 
@@ -209,245 +209,577 @@
 				and TestImage020.tif do not show up in the Name column of the 
         	     		<b>Files added or updated in the queue recently</b> display area.</li>
       			</ul> 
-<p>
-	      		<li>Confirm the droplist for the Select Condition dialog includes: 
-        	  	<b>Match based upon file existence</b>.</li>
-      			<ul> 
-         			<li>Confirm clicking on the Configure button brings up the <b>Configure  
-				Match based upon file existence</b> dialog.
-        	    		<li>Confirm that the dialog has a droplist with entries of <b>does</b> 
-				and <b>does not</b> as the fill-in text for <b>Match if the file 
-				does|does not exist</b>. 
-	            		<li>Confirm that the dialog has an edit box with an associated 
-				<b>Tag Selector</b> button and <b>Browse</b> button.
-            			<li>Confirm that the <b>Tag Selector</b> button displays a context 
-                		menu to the immediate right of the button.
-	            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
-        	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
-            			<li>Confirm that when an item is chosen it either inserts text at 
-				the cursor position or replaces the highlighted text in the edit box. 
-	            		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
-        	        	a File - Open dialog. 
-            			<li>Confirm that a file selected in the File - Open file dialog replaces 
-				the text in the edit box.</li>
-<p>
-	         		<li>Clear the database, then double click on <b>Skip_FileExistence.fps</b>
-        	     		in the FPS folder. 
-				<li>Confirm that an <b>Action not Found</b> error message is  
-				displayed.</li> 
-	         		<li>Add action <b>skip_basedonfileexistence</b> to the database.</li> 
-        	 		<li>Select action <b>skip_basedonfileexistence</b> in the Action tab of 
-				the File Action Manager for Skip_FileExistence.fps</li> 
-         			<li>Press the <b>Start processing</b> button.</li> 
-	         		<li>Confirm that the Name column of the <b>Files added or updated in 
-				the queue recently</b> display area of Queue Log shows only TestImage.tif,  
-				TestImage015.tif, TestImage020.tif, and TestImageB.tif, each in a 
-				separate row.</li> 
-	         		<li>Confirm that TestImage005.tif and TestImage009.tif do not show up 
-				in the Name column of the <b>Files added or updated in the queue 
-				recently</b> display area.</li>
-	      		</ul>
-<p>
-   	   		<li>Confirm the droplist for the Select Condition dialog includes: 
-        	  	<b>Match based upon filename pattern</b>.</li>
-      			<ul>
-         			<li>Confirm that pressing the Configure button in the Select 
-				Condition dialog brings up the <b>Configure Match based upon file name 
-				pattern</b> dialog.</li>
-        	    		<li>Confirm there is an edit box with an associated <b>Tag Selector</b> 
-				button.</li> 
-            			<li><b>[LegacyRC #4781]</b> Confirm that the default filename in the 
-				edit box is <b>&lt;SourceDocName&gt;</b>.
-	            		<li>Confirm that the <b>Tag Selector</b> button brings up a context 
-				menu.</li>
-	            		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
-        	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.  
-            			<li>Confirm that when an item is chosen, it either inserts text at 
-				the current cursor position or replaces the highlighted text in the 
-				edit box.</li> 
-        	    		<li>Confirm that the dialog contains two combo boxes under the 
-                		edit box. Confirm that the first combo box contains <b>does</b> and 
-				<b>does not</b>, and the other contains <b>contain</b> and <b>exactly 
-				match</b>.</li> 
-        	    		<li>Confirm that the default combo box settings are <b>does contain</b>.
-<p>
-	            		<li>Confirm that the <b>Match based upon file name pattern</b> dialog 
-				has a <b>Read regular expression from file</b> radio button and an 
-                		associated edit box.</li> 
-	            		<li>Confirm that the edit box is enabled only when the radio button 
-        	        	is selected.</li> 
-            			<li>Confirm that the edit box includes an associated Tag Selector 
-                		and Browse button.</li> 
-	            		<li>Confirm that the <b>Tag Selector</b> opens a context menu.
-        	    		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
-                		<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.  
-            			<li>Confirm that when an item is chosen it either inserts text at 
-				the current cursor position or replaces highlighted text in the 
-				edit box.</li> 
-            			<li>Confirm that the <b>Browse</b> button brings up a File - Open dialog, 
-				and that selecting a file replaces the text in the edit box.</li> 
-<p>
-	            		<li>Confirm there is a radio button associated with <b>Specify regular 
-        	        	expression:</b> in the dialog.</li> 
-            			<li>Confirm that this radio button is selected by default.</li> 
-            			<li>Confirm that the regular expression edit box is enabled only when 
-				the radio button is selected.</li> 
-        	    		<li>Confirm there is an associated <b>Case sensitive</b> checkbox.</li> 
-            			<li>Confirm that the checkbox is enabled and unselected by default.</li>
-<p>
-	         		<li>Clear the database, then double click on <b>Skip_NamePattern.fps</b> 
-				in the FPS folder. Confirm that an <b>Action not Found</b> error 
-				message is displayed.</li> 
-         			<li>Add action <b>skip_basedonnamepattern</b> to the database.</li> 
-	         		<li>Select action <b>skip_basedonnamepattern</b> in the Action tab of 
-				the File Action Manager for Skip_NamePattern.fps.</li> 
-         			<li>Press the Start button. 
-         			<li>Confirm that the Name column of the <b>Files added or updated in 
-				the queue recently</b> display area of Queue Log shows only 
-				TestImage.tif and TestImageB.tif, each in a separate row. 
-         			<li>Confirm that TestImage005.tif, TestImage009.tif, TestImage015.tif, 
-				and TestImage020.tif do not show up in the Name column of the <b>Files 
-				added or updated in the queue recently</b> display area.
-      			</ul> 
-<p>
-	      		<li>Confirm the droplist for the Select Condition dialog includes: 
-        	  	<b>Match based upon mathematical condition</b>.</li>
-      			<ul> 
-         			<li>Confirm clicking on the Configure button brings up the <b>Configure  
-				Match based upon mathematical condition</b> dialog.
-        	    		<li>Confirm that the dialog has a combo box with entries of <b>met</b> 
-				and <b>not met</b> as the fill-in text for <b>Consider this condition 
-				as having been</b>. 
-		      		<li>Confirm presence of a radio button for <b>Randomly</b>.
-		      		<li>Confirm presence of an associated edit box for a percentage.
-	      			<li>Confirm that the edit box contents are restricted to be between 
-				<b>1</b> and <b>99</b>.
-		      		<li>Confirm that the edit box is enabled only when the radio button 
-				is selected.
-	      			<li>Confirm proper behavior for this condition being <b>met</b>.
-	      			<li>Confirm proper behavior for this condition being <b>not met</b>.
-<p>
-		      		<li>Confirm presence of a radio button for <b>Once every</b>.
-		      		<li>Confirm presence of an associated edit box for a number of times.
-	      			<li>Confirm that the edit box contents are restricted to be greater than 
-				<b>1</b>.
-		      		<li>Confirm that the edit box is enabled only when the radio button 
-				is selected.
-	      			<li>Confirm proper behavior for this condition being <b>met</b>.
-	      			<li>Confirm proper behavior for this condition being <b>not met</b>.
-<p>
-		      		<li>Confirm presence of a radio button for <b>File ID</b>.
-		      		<li>Confirm presence of an associated edit box for a modulus.
-	      			<li>Confirm presence of an associated edit box for a result.
-	      			<li>Confirm that the <b>modulus</b> edit box contents are restricted to 
-				be greater than <b>1</b>.
-		      		<li>Confirm that the <b>result</b> edit box contents are restricted to be 
-				between <b>0</b> and <b>one less than the modulus</b>.
-	      			<li>Confirm that the edit boxes are enabled only when the radio button 
-				is selected.
-		      		<li>Confirm proper behavior for this condition being <b>met</b>.
-	      			<li>Confirm proper behavior for this condition being <b>not met</b>.
-        	    		<li>Confirm that settings are persistent.</li> 
-<p>
-		  	   	<LI><b>[LegacyRC #5434]</b> Mathematical condition object
-	       			<ul>
-	      				<li>Confirm that the property page is keyboard navigable.
-			      		<li>Confirm that property pages for other condition objects are 
-					also keyboard navigable.
-			       	</ul>
-<p>
-		  	   	<LI><b>[LegacyRC #5724]</b> Mathematical condition object
-	       			<ul>
-	      				<li>Exercise the modulus condition on files that <b>are not</b> 
-					already in the database.
-			      		<li>Confirm that the files fail to queue.
-					<li>Confirm that a meaningful exception is provided.
-			       	</ul>
-      			</ul> 
-<p>
-	      		<li>Confirm the droplist for the Select Condition dialog includes: 
-        	  	<b>Tag condition</b>.</li>
-      			<ul> 
-         			<li>Confirm that pressing the Configure button in the Select 
-				Condition dialog brings up the <b>Configure Tag condition</b> 
-				dialog.</li>
-        	    		<li>Confirm that there is a combo box for the condition being 
-				considered <b>met</b> or <b>unmet</b>.</li> 
-        	    		<li>Confirm that there is a combo box about different combinations 
-				of the following tags including:
-				<ul>
-					<li>all
-					<li>any
-					<li><b>[LegacyRC #5492]</b> none
-				</ul>
-	            		<li>Confirm that there is a list box with check boxes containing 
-				each tag defined in the database.
-	            		<li>Confirm that each check boxes is initially unchecked.
-        	    		<li>Confirm that settings are persistent.</li> 
-<p>
-				<li>Exercise different combinations of tags and confirm proper 
-				behavior of the following settings.
-				<ul>
-					<li>Condition <b>met</b> with <b>all</b> of the following tags.
-					<li>Condition <b>unmet</b> with <b>all</b> of the following tags.
-					<li>Condition <b>met</b> with <b>any</b> of the following tags.
-					<li>Condition <b>unmet</b> with <b>any</b> of the following tags.
-					<li>Condition <b>met</b> with <b>none</b> of the following tags.
-					<li>Condition <b>unmet</b> with <b>none</b> of the following tags.
-				</ul>
-<p>
-		  	   	<LI><b>[LegacyRC #5497]</b> Any tag condition is always true
-	       			<ul>
-			      		<li>Prepare some files for processing such that some files 
-					have tags and some do not have tags.
-					<li>Prepare an FPS file with a conditional task and Tag condition 
-					to OCR the document if the document is tagged with <b>any</b> tag.  
-					No task should be run against the document if the document is 
-					not tagged.
-					<li>Delete any existing USS files.
-					<li>Process the documents.
-	      				<li>Confirm that only the tagged documents have USS files.
-			       	</ul>
-     			</ul>
-<p>
-	      		<li>Confirm the droplist for the Select Condition dialog includes: 
-        	  	<b>Task condition</b>.</li>
-      			<ul> 
-         			<li>Confirm that pressing the Configure button in the Select 
-				Condition dialog brings up the <b>Configure Task condition</b> 
-				dialog.</li>
-        	    		<li>Confirm that there is a label about the condition being 
-				considered met.</li> 
-        	    		<li>Confirm that there is a combo box containing different 
-				<b>FAM task</b> objects.</li> 
-	            		<li>Confirm that there is an associated <b>Configure...</b> button 
-				that brings up the appropriate property page.</li>
-        	    		<li>Confirm that there is a <b>Log exceptions generated by the 
-				selected task</b> check box.</li> 
-        	    		<li>Confirm that the check box is <b>checked</b> by default.</li> 
-        	    		<li>Confirm that settings are persistent.</li> 
-<p>
-				<li>Confirm that the <b>Task condition</b> can be both met and 
-				not met for each task object.
-				<ul>
-					<li>Add watermark
-					<li>Archive or restore associated file
-					<li>Cleanup image
-					<li>Conditionally execute task(s)
-					<li>Convert to searchable PDF
-					<li>Convert VOA to XML
-					<li>Copy, move or delete file
-					<li>Execute rules
-					<li>Filter ID Shield data file - ID Shield only
-					<li>Manage tags
-					<li>OCR document
-					<li>Redact images (no verification) - ID Shield only
-					<li>Set file action status in database
-					<li>Verify extracted data - LabDE only
-					<li>Verify redactions - ID Shield only
-				</ul>
-     			</ul>
 		</ul>
+	</ul>
+<p>
+   	<li><h3>Other Conditions</h3>
+	<ul>
+	   	<li>Start a blank <b>File Action Manager</b>.</li> 
+   		<li>Select a database server and database.  Select an action, then check the 
+		<b>Queue files for this action</b> checkbox.</li> 
+      		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>Document type condition</b>.</li>
+		<ul> 
+       			<li>Confirm clicking on the Configure button brings up the <b>Configure  
+			Document type condition</b> dialog.
+       	    		<li>Confirm that the dialog has a droplist with entries of <b>met</b> 
+			and <b>not met</b> as the fill-in text for <b>Consider condition as  
+			met|not met if the following VOA file:</b>. 
+            		<li>Confirm that the dialog has an edit box with an associated 
+			<b>Tag Selector</b> button and <b>Browse</b> button.
+            		<li>Confirm that the default text in the edit box is 
+			<b>&ltSourceDocName&gt.voa</b>.
+       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
+               		menu to the immediate right of the button.
+            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
+       	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
+       			<li>Confirm that when an item is chosen it either inserts text at 
+			the cursor position or replaces the highlighted text in the edit box. 
+            		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        	an <b>Open</b> dialog. 
+       			<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
+			the text in the edit box.</li>
+			<li>Confirm that the dialog includes a <b>has a document type matching one of 
+			the following</b> list box.
+			<li>Confirm that the dialog includes a <b>Select...</b> button.
+			<li>Confirm that the <b>Select...</b> button displays a <b>Select Document 
+			Types</b> dialog.
+			<ul>
+				<li>Confirm that the dialog includes a <b>Document Category:</b> 
+				combo box.
+				<ul>
+					<li>County Document
+					<li>Legal Descriptions
+				</ul>
+				<li>Confirm that <b>County Document</b> is the default choice.
+				<li>Confirm that a multiple selection list box is provided that 
+				includes:
+				<ul>
+					<li>Any Unique
+					<li>Multiply Classified
+					<li>Unknown
+				</ul>
+				<li>Confirm that the list box also contains other types dependent on 
+				the selected category.
+			</ul>
+			<li>Confirm that selecting new document types <b>does not</b> remove any 
+			existing document types.
+			<li>Confirm that the dialog includes a <b>Remove</b> button.
+			<li>Confirm that the <b>Remove</b> button is only enabled when an item is 
+			selected in the list box.
+			<li>Confirm that the <b>Remove</b> button removes the selected entry from the 
+			list box.
+			<li>Confirm that the dialog includes a <b>Clear</b> button.
+			<li>Confirm that the <b>Clear</b> button is only enabled when the list box is 
+			not empty.
+			<li>Confirm that the <b>Clear</b> button removes all entries from the list box.
+      		</ul>
+<p>
+      		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>File timestamp condition</b>.</li>
+		<ul> 
+       			<li>Confirm clicking on the Configure button brings up the <b>Configure  
+			File timestamp condition</b> dialog.
+       	    		<li>Confirm that the dialog has a droplist with entries of <b>met</b> 
+			and <b>not met</b> as the fill-in text for <b>Consider condition as  
+			met|not met if the following file:</b>. 
+            		<li>Confirm that the dialog has an edit box with an associated 
+			<b>Tag Selector</b> button and <b>Browse</b> button.
+            		<li>Confirm that the default text in the edit box is 
+			<b>&ltSourceDocName&gt</b>.
+       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
+               		menu to the immediate right of the button.
+            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
+       	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
+       			<li>Confirm that when an item is chosen it either inserts text at 
+			the cursor position or replaces the highlighted text in the edit box. 
+            		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        	an <b>Open</b> dialog. 
+       			<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
+			the text in the edit box.</li>
+			<li>Confirm that the dialog includes a <b>has a timestamp</b> combo box.
+			<ul>
+				<li>created
+				<li>accessed
+				<li>modified
+			</ul>
+			<li>Confirm that the default combo box selection is <b>modified</b>.
+			<li>Confirm that the dialog includes an <b>in the range</b> radio button.
+			<ul>
+				<li>Confirm that the two associated combo boxes are enabled only 
+				when the radio button is selected.
+				<li>Confirm that each combo box defaults to a date and time of 
+				the current day at midnight in a <b>MM/DD/YYYY HH:MM:SS</b> format.
+				<li>Confirm that the combo box also includes <b>AM</b> or 
+				<b>PM</b> at the end of the date and time.
+				<li>Confirm that clicking either combo box causes a calendar 
+				control to drop down allowing the user to select a date.
+				<li>Confirm that selecting a date in the calendar control modifies 
+				the <b>MM/DD/YYYY</b> text but does not modify the time text.
+				<li>Confirm that the edit control portion of each combo box 
+				allows modification of the time text.
+				<li>Confirm that a meaningful error message is presented if the 
+				range start time is after the range stop time.
+			</ul>
+			<li>Confirm that the dialog includes an <b>equal to</b> radio button.
+			<ul>
+				<li>Confirm that the combo box choices are as follows:
+				<ul>
+					<li>equal to
+					<li>not equal to
+					<li>before
+					<li>equal to or before
+					<li>after
+					<li>equal to or after
+				</ul>
+				<li>Confirm that a collection of radio buttons is indented from 
+				the top-level radio buttons.
+				<ul>
+					<li>a <b>MM/DD/YYYY HH:MM:SS AM/PM</b> timestamp
+					<li>a <b>0 days</b> ago
+					<li>a <b>today</b> combo box
+					<li>the <b>modified</b> timestamp of this file: combo box
+				</ul>
+				<li>Confirm that none of the radio buttons are selected by default.
+<p>
+				<li>Confirm that selecting the timestamp radio button enables the 
+				associated combo box.
+				<li>Confirm that each combo box defaults to a date and time of 
+				the current day at midnight in a <b>MM/DD/YYYY HH:MM:SS</b> format.
+				<li>Confirm that clicking the combo box causes a calendar 
+				control to drop down allowing the user to select a date.
+				<li>Confirm that selecting a date in the calendar control modifies 
+				the <b>MM/DD/YYYY</b> text but does not modify the time text.
+				<li>Confirm that the edit control portion of each combo box 
+				allows modification of the time text.
+<p>
+				<li>Confirm that the <b>ago</b> radio button includes an associated 
+				spinner control and combo box.
+				<li>Confirm that the associated controls are only enabled when the 
+				radio button is selected.
+				<li>Confirm that the minimum value allowed by the spinner is <b>0</b>.
+				<li>Confirm that the maximum value allowed by the spinner is 
+				<b>2147483647</b>.
+				<li>Confirm that the following options are available in the combo box.
+				<ul>
+					<li>seconds
+					<li>minutes
+					<li>hours
+					<li>days
+					<li>weeks
+					<li>months
+					<li>years
+				</ul>
+<p>
+				<li>Confirm that the <b>today</b> combo box is only enabled when the 
+				associated radio button is selected.
+				<li>Confirm that the following options are available in the combo box.
+				<ul>
+					<li>today
+					<li>yesterday
+					<li>this week
+					<li>last week
+					<li>this month
+					<li>last month
+					<li>this year
+					<li>last year
+				</ul>
+<p>
+				<li>Confirm that the <b>modified</b> combo box is only enabled when the 
+				associated radio button is selected.
+				<li>Confirm that the following options are available in the combo box.
+				<ul>
+					<li>created
+					<li>accessed
+					<li>modified
+				</ul>
+				<li>Confirm that an edit box along with a tag selector and browse button 
+				are also enabled when the radio button is selected.
+	       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
+        	       		menu to the immediate right of the button.
+            			<li>Confirm that the items in the context menu include 
+				<b>&ltSourceDocName&gt</b>, <b>&ltFPSFileDir&gt</b>, and a set of 
+				functions that start with $.
+       				<li>Confirm that when an item is chosen it either inserts text at 
+				the cursor position or replaces the highlighted text in the edit box. 
+            			<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        		an <b>Open</b> dialog. 
+       				<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
+				the text in the edit box.</li>
+			</ul>
+      		</ul>
+<p>
+      		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>Match based upon file existence</b>.</li>
+		<ul> 
+       			<li>Confirm clicking on the Configure button brings up the <b>Configure  
+			Match based upon file existence</b> dialog.
+       	    		<li>Confirm that the dialog has a droplist with entries of <b>does</b> 
+			and <b>does not</b> as the fill-in text for <b>Match if the file 
+			does|does not exist</b>. 
+            		<li>Confirm that the dialog has an edit box with an associated 
+			<b>Tag Selector</b> button and <b>Browse</b> button.
+       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
+               		menu to the immediate right of the button.
+            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
+       	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
+       			<li>Confirm that when an item is chosen it either inserts text at 
+			the cursor position or replaces the highlighted text in the edit box. 
+            		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        	a File - Open dialog. 
+       			<li>Confirm that a file selected in the File - Open file dialog replaces 
+			the text in the edit box.</li>
+<p>
+         		<li>Clear the database, then double click on <b>Skip_FileExistence.fps</b>
+       	     		in the FPS folder. 
+			<li>Confirm that an <b>Action not Found</b> error message is  
+			displayed.</li> 
+         		<li>Add action <b>skip_basedonfileexistence</b> to the database.</li> 
+       	 		<li>Select action <b>skip_basedonfileexistence</b> in the Action tab of 
+			the File Action Manager for Skip_FileExistence.fps</li> 
+       			<li>Press the <b>Start processing</b> button.</li> 
+         		<li>Confirm that the Name column of the <b>Files added or updated in 
+			the queue recently</b> display area of Queue Log shows only TestImage.tif,  
+			TestImage015.tif, TestImage020.tif, and TestImageB.tif, each in a 
+			separate row.</li> 
+         		<li>Confirm that TestImage005.tif and TestImage009.tif do not show up 
+			in the Name column of the <b>Files added or updated in the queue 
+			recently</b> display area.</li>
+      		</ul>
+<p>
+   		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>Match based upon filename pattern</b>.</li>
+		<ul>
+       			<li>Confirm that pressing the Configure button in the Select 
+			Condition dialog brings up the <b>Configure Match based upon file name 
+			pattern</b> dialog.</li>
+       	    		<li>Confirm there is an edit box with an associated <b>Tag Selector</b> 
+			button.</li> 
+       			<li><b>[LegacyRC #4781]</b> Confirm that the default filename in the 
+			edit box is <b>&lt;SourceDocName&gt;</b>.
+            		<li>Confirm that the <b>Tag Selector</b> button brings up a context 
+			menu.</li>
+            		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
+       	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.  
+       			<li>Confirm that when an item is chosen, it either inserts text at 
+			the current cursor position or replaces the highlighted text in the 
+			edit box.</li> 
+       	    		<li>Confirm that the dialog contains two combo boxes under the 
+               		edit box. Confirm that the first combo box contains <b>does</b> and 
+			<b>does not</b>, and the other contains <b>contain</b> and <b>exactly 
+			match</b>.</li> 
+       	    		<li>Confirm that the default combo box settings are <b>does contain</b>.
+<p>
+            		<li>Confirm that the <b>Match based upon file name pattern</b> dialog 
+			has a <b>Read regular expression from file</b> radio button and an 
+               		associated edit box.</li> 
+            		<li>Confirm that the edit box is enabled only when the radio button 
+       	        	is selected.</li> 
+       			<li>Confirm that the edit box includes an associated Tag Selector 
+               		and Browse button.</li> 
+            		<li>Confirm that the <b>Tag Selector</b> opens a context menu.
+       	    		<li>Confirm that the context menu includes <b>&ltSourceDocName&gt</b>,
+               		<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.  
+       			<li>Confirm that when an item is chosen it either inserts text at 
+			the current cursor position or replaces highlighted text in the 
+			edit box.</li> 
+       			<li>Confirm that the <b>Browse</b> button brings up a File - Open dialog, 
+			and that selecting a file replaces the text in the edit box.</li> 
+<p>
+            		<li>Confirm there is a radio button associated with <b>Specify regular 
+       	        	expression:</b> in the dialog.</li> 
+       			<li>Confirm that this radio button is selected by default.</li> 
+       			<li>Confirm that the regular expression edit box is enabled only when 
+			the radio button is selected.</li> 
+       	    		<li>Confirm there is an associated <b>Case sensitive</b> checkbox.</li> 
+       			<li>Confirm that the checkbox is enabled and unselected by default.</li>
+<p>
+         		<li>Clear the database, then double click on <b>Skip_NamePattern.fps</b> 
+			in the FPS folder. Confirm that an <b>Action not Found</b> error 
+			message is displayed.</li> 
+       			<li>Add action <b>skip_basedonnamepattern</b> to the database.</li> 
+         		<li>Select action <b>skip_basedonnamepattern</b> in the Action tab of 
+			the File Action Manager for Skip_NamePattern.fps.</li> 
+       			<li>Press the Start button. 
+       			<li>Confirm that the Name column of the <b>Files added or updated in 
+			the queue recently</b> display area of Queue Log shows only 
+			TestImage.tif and TestImageB.tif, each in a separate row. 
+       			<li>Confirm that TestImage005.tif, TestImage009.tif, TestImage015.tif, 
+			and TestImage020.tif do not show up in the Name column of the <b>Files 
+			added or updated in the queue recently</b> display area.
+		</ul> 
+<p>
+      		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>Match based upon mathematical condition</b>.</li>
+		<ul> 
+       			<li>Confirm clicking on the Configure button brings up the <b>Configure  
+			Match based upon mathematical condition</b> dialog.
+       	    		<li>Confirm that the dialog has a combo box with entries of <b>met</b> 
+			and <b>not met</b> as the fill-in text for <b>Consider this condition 
+			as having been</b>. 
+	      		<li>Confirm presence of a radio button for <b>Randomly</b>.
+	      		<li>Confirm presence of an associated edit box for a percentage.
+      			<li>Confirm that the edit box contents are restricted to be between 
+			<b>1</b> and <b>99</b>.
+	      		<li>Confirm that the edit box is enabled only when the radio button 
+			is selected.
+      			<li>Confirm proper behavior for this condition being <b>met</b>.
+      			<li>Confirm proper behavior for this condition being <b>not met</b>.
+<p>
+	      		<li>Confirm presence of a radio button for <b>Once every</b>.
+	      		<li>Confirm presence of an associated edit box for a number of times.
+      			<li>Confirm that the edit box contents are restricted to be greater than 
+			<b>1</b>.
+	      		<li>Confirm that the edit box is enabled only when the radio button 
+			is selected.
+      			<li>Confirm proper behavior for this condition being <b>met</b>.
+      			<li>Confirm proper behavior for this condition being <b>not met</b>.
+<p>
+	      		<li>Confirm presence of a radio button for <b>File ID</b>.
+	      		<li>Confirm presence of an associated edit box for a modulus.
+      			<li>Confirm presence of an associated edit box for a result.
+      			<li>Confirm that the <b>modulus</b> edit box contents are restricted to 
+			be greater than <b>1</b>.
+	      		<li>Confirm that the <b>result</b> edit box contents are restricted to be 
+			between <b>0</b> and <b>one less than the modulus</b>.
+      			<li>Confirm that the edit boxes are enabled only when the radio button 
+			is selected.
+	      		<li>Confirm proper behavior for this condition being <b>met</b>.
+      			<li>Confirm proper behavior for this condition being <b>not met</b>.
+       	    		<li>Confirm that settings are persistent.</li> 
+<p>
+	  	   	<LI><b>[LegacyRC #5434]</b> Mathematical condition object
+       			<ul>
+      				<li>Confirm that the property page is keyboard navigable.
+		      		<li>Confirm that property pages for other condition objects are 
+				also keyboard navigable.
+		       	</ul>
+<p>
+	  	   	<LI><b>[LegacyRC #5724]</b> Mathematical condition object
+       			<ul>
+      				<li>Exercise the modulus condition on files that <b>are not</b> 
+				already in the database.
+		      		<li>Confirm that the files fail to queue.
+				<li>Confirm that a meaningful exception is provided.
+		       	</ul>
+		</ul> 
+<p>
+      		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>Tag condition</b>.</li>
+		<ul> 
+       			<li>Confirm that pressing the Configure button in the Select 
+			Condition dialog brings up the <b>Configure Tag condition</b> 
+			dialog.</li>
+       	    		<li>Confirm that there is a combo box for the condition being 
+			considered <b>met</b> or <b>unmet</b>.</li> 
+       	    		<li>Confirm that there is a combo box about different combinations 
+			of the following tags including:
+			<ul>
+				<li>all
+				<li>any
+				<li><b>[LegacyRC #5492]</b> none
+			</ul>
+            		<li>Confirm that there is a list box with check boxes containing 
+			each tag defined in the database.
+            		<li>Confirm that each check boxes is initially unchecked.
+       	    		<li>Confirm that settings are persistent.</li> 
+<p>
+			<li>Exercise different combinations of tags and confirm proper 
+			behavior of the following settings.
+			<ul>
+				<li>Condition <b>met</b> with <b>all</b> of the following tags.
+				<li>Condition <b>unmet</b> with <b>all</b> of the following tags.
+				<li>Condition <b>met</b> with <b>any</b> of the following tags.
+				<li>Condition <b>unmet</b> with <b>any</b> of the following tags.
+				<li>Condition <b>met</b> with <b>none</b> of the following tags.
+				<li>Condition <b>unmet</b> with <b>none</b> of the following tags.
+			</ul>
+<p>
+	  	   	<LI><b>[LegacyRC #5497]</b> Any tag condition is always true
+       			<ul>
+		      		<li>Prepare some files for processing such that some files 
+				have tags and some do not have tags.
+				<li>Prepare an FPS file with a conditional task and Tag condition 
+				to OCR the document if the document is tagged with <b>any</b> tag.  
+				No task should be run against the document if the document is 
+				not tagged.
+				<li>Delete any existing USS files.
+				<li>Process the documents.
+      				<li>Confirm that only the tagged documents have USS files.
+		       	</ul>
+		</ul>
+<p>
+      		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>Task condition</b>.</li>
+		<ul> 
+       			<li>Confirm that pressing the Configure button in the Select 
+			Condition dialog brings up the <b>Configure Task condition</b> 
+			dialog.</li>
+       	    		<li>Confirm that there is a label about the condition being 
+			considered met.</li> 
+       	    		<li>Confirm that there is a combo box containing different 
+			<b>FAM task</b> objects.</li> 
+            		<li>Confirm that there is an associated <b>Configure...</b> button 
+			that brings up the appropriate property page.</li>
+       	    		<li>Confirm that there is a <b>Log exceptions generated by the 
+			selected task</b> check box.</li> 
+       	    		<li>Confirm that the check box is <b>checked</b> by default.</li> 
+       	    		<li>Confirm that settings are persistent.</li> 
+<p>
+			<li>Confirm that the <b>Task condition</b> can be both met and 
+			not met for each task object.
+			<ul>
+				<li>Core: Add watermark
+				<li>Core: Apply Bates number
+				<li>Core: Archive or restore associated file
+				<li>Core: Cleanup image
+				<li>Core: Conditionally execute task(s)
+				<li>Core: Convert to searchable PDF
+				<li>Core: Convert VOA to XML
+				<li>Core: Copy, move or delete file
+				<li>Core: Create file
+				<li>Core: Delete empty folder
+				<li>Core: Encrypt/decrypt file
+				<li>Core: Execute rules
+				<li>Core: Launch application
+				<li>Core: Manage tags
+				<li>Core: Modify PDF file
+				<li>Core: Modify source document name in database
+				<li>Core: OCR document
+				<li>Core: Rasterize PDF
+				<li>Core: Set file priority
+				<li>Core: Set file-action status in database
+				<li>Core: Sleep
+				<li>Core: Transfer file via FTP/SFTP
+				<li>Data Entry: Verify extracted data
+				<li>Redaction: Create metadata XML
+				<li>Redaction: Create redacted image
+				<li>Redaction: Create redacted text
+				<li>Redaction: Extend redactions to surround context
+				<li>Redaction: Filter ID Shield data file
+				<li>Redaction: Merge ID Shield data files
+				<li>Redaction: Verify sensitive data
+			</ul>
+		</ul>
+<p>
+      		<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  	<b>VOA file contents condition</b>.</li>
+		<ul> 
+       			<li>Confirm clicking on the Configure button brings up the <b>Configure  
+			VOA file contents condition</b> dialog.
+       	    		<li>Confirm that the dialog has a droplist with entries of <b>met</b> 
+			and <b>not met</b> as the fill-in text for <b>Consider condition as  
+			met|not met if the following VOA file:</b>. 
+            		<li>Confirm that the dialog has an edit box with an associated 
+			<b>Tag Selector</b> button and <b>Browse</b> button.
+            		<li>Confirm that the default text in the edit box is 
+			<b>&ltSourceDocName&gt.voa</b>.
+       			<li>Confirm that the <b>Tag Selector</b> button displays a context 
+               		menu to the immediate right of the button.
+            		<li>Confirm that the items in the context menu include <b>&ltSourceDocName&gt</b>,
+       	        	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with $.
+       			<li>Confirm that when an item is chosen it either inserts text at 
+			the cursor position or replaces the highlighted text in the edit box. 
+            		<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        	an <b>Open</b> dialog. 
+       			<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
+			the text in the edit box.</li>
+<p>
+			<li>Confirm that the dialog includes a <b>contains at least</b> combo box.
+			<li>Confirm that the combo box includes the following options:
+			<ul>
+				<li>contains exactly
+				<li>contains at least
+				<li>contains at most
+				<li>does not contain exactly
+			</ul>
+			<li>Confirm that next to the combo box is a spinner control with a default 
+			of <b>1</b>.
+			<li>Confirm that the minimum value in the spinner control is <b>0</b>.
+			<li>Confirm that the maximum value in the spinner control is <b>1000</b>.
+			<li>Confirm that a balloon help item is provided that describes basic 
+			query syntax.
+			<li>Confirm that the balloon help references the documentation for additional 
+			information.
+			<li>Confirm that the associated multi-line edit box contains <b>*</b> by 
+			default.
+<p>
+			<li>Confirm that the dialog includes a combo box with attribute fields
+			<ul>
+				<li>name
+				<li>value
+				<li>type
+			</ul>
+			<li>Confirm that the default combo box selection is <b>name</b>.
+			<li>Confirm that several radio buttons are provided in the dialog
+			<ul>
+				<li>equals
+				<li>is in the range
+				<li>contains a match for
+				<li>matches one of the entries in the following list
+			</ul>
+			<li>Confirm that selecting the appropriate radio button enables the 
+			<b>equals</b> combo box and edit box.
+			<li>Confirm that the <b>equals</b> combo box includes the following options
+			<ul>
+				<li>equals
+				<li>is not equal to
+				<li>is less than
+				<li>is less than or equal to
+				<li>is greater than
+				<li>is greater than or equal to
+			</ul>
+			<li>Confirm that an associated balloon help button is included next to the 
+			edit box.
+			<li>Confirm that the balloon help text discusses the difference between 
+			comparing numeric and alphabetic attribute values.
+<p>
+			<li>Confirm that selecting the appropriate radio button enables the two 
+			<b>is in the range</b> edit boxes.
+			<li>Confirm that an associated balloon help button is included next to the 
+			second edit box.
+			<li>Confirm that the balloon help text discusses the difference between 
+			comparing numeric and alphabetic attribute values.
+			<li>Confirm that a meaningful error message is presented if numeric start 
+			and end values do not define a range.
+			<li>Confirm that no error message is presented if one value is numeric and 
+			the other is not.
+<p>
+			<li>Confirm that selecting the appropriate radio button enables the 
+			<b>contains a match for</b> combo box.
+			<li>Confirm that an associated multi-line edit box is also enabled.
+<p>
+			<li>Confirm that selecting the <b>matches one of the entries in the following 
+			list</b> radio button enables the associated list box.
+			<li>Confirm that associated buttons are also available.
+			<ul>
+				<li>Add...
+				<li>Remove
+				<li>Modify...
+			</ul>
+			<li>Confirm that the <b>Remove</b> button is only enabled when a list box 
+			item is selected.
+			<li>Confirm that the <b>Modify...</b> button is only enabled when a list box 
+			item is selected.
+			<li>Confirm that clicking the <b>Add...</b> button displays an <b>Add 
+			value</b> dialog.
+			<li>Confirm that the text entered in the <b>Add value</b> dialog is displayed 
+			in the list box above the currently selected value.
+			<li>Confirm that clicking the <b>Modify...</b> button displays an <b>Add 
+			value</b> dialog with the appropriate text in the edit box.
+			<li>Confirm that a modification is reflected in the list box contents.
+<p>
+			<li>Confirm that a <b>Case sensitive</b> check box is provided.
+			<li>Confirm that if the <b>Case sensitive</b> check box is checked that the 
+			attribute comparisons are conducted appropriately.
+			<li>Confirm that a <b>Treat search terms as regular expressions</b> check box 
+			is provided.
+			<li>Confirm that an associated balloon help button is provided that notes that 
+			the regular expressions by default will fully match the specified attribute 
+			field.
+			<li>Confirm that if the <b>regular expressions</b> check box is checked that 
+			the attribute comparisons are conducted appropriately.
+      		</ul>
 	</ul>
 <p>
    	<li><h3>Miscellaneous</h3>
