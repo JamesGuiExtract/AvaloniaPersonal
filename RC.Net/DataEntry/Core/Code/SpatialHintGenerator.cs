@@ -573,8 +573,7 @@ namespace Extract.DataEntry
         private static Rectangle GetTransformedRasterZoneBounds(RasterZone zone, Matrix transform)
         {
             // Transform the zone's start and end point using the supplied matrix.
-            Point[] rasterZonePoints = { new Point(zone.StartX, zone.StartY),
-                new Point(zone.EndX, zone.EndY) };
+            PointF[] rasterZonePoints = { zone.Start, zone.End };
             transform.TransformPoints(rasterZonePoints);
 
             // Create a new zone using the transformed coordinates.
