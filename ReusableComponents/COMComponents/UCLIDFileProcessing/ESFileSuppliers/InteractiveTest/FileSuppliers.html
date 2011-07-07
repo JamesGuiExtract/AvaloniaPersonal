@@ -377,6 +377,87 @@
         </ul></li>
     </ul></li>
 <p>
+    <li>Select <b>Files from FTP site</b> as the file supplier in the Select File Supplier dialog,
+    then press the Configure button.
+    <ul>
+        <li>Confirm that two tabs are presented, <b>General Settings</b> and <b>Connection
+        Settings</b>
+        <li>Confirm that the FTP file supplier requires a special license.</li>
+        <ul>
+            <li>General settings
+            <ul>
+                <li>Confirm the presence of a <b>Remote folder to download files from</b> text
+                box, blank by default.</li>
+                <li>Confirm the presence of a <b>File extension specification(s)</b> text
+                box, blank by default.</li>
+                <li>Confirm the presence of a <b>Recursively download files from any 
+                subfolders</b> checkbox, unchecked by default.</li>
+                <li>Confirm the presence of a <b>Keep polling the remote location for new files</b>
+                checkbox, unchecked by default.</li>
+                <li>Confirm the presence of a related <b>minute(s)</b> spin control set to <b>1</b>
+                by default and enabled only when the checkbox is checked.</li>
+                <li>Confirm the presence of an <b>After downloading the remote file</b> group box
+                containing the following controls:
+                <ul>
+                    <li>an <b>Append the following</b> radio button with an associated edit 
+                    box</li>
+                    <li>a <b>Delete the remote file</b> radio button selected by default</li>
+                    <li>a <b>Do nothing</b> radio button</li>
+                </ul></li>
+                <li>Confirm the presence of a <b>Local working folder</b> edit box with associated
+                tag selector and browse button.</li>
+            </ul></li>
+        <p>
+            <li>Connection settings
+            <ul>
+                <li>Confirm the presence of a grid for the following settings:
+                <ul>
+                    <li>Protocol</li>
+                    <li>Server Address</li>
+                    <li>Server Port</li>
+                    <li>User Name</li>
+                    <li>Password</li>
+                </ul></li>
+                <li>Confirm the presence of a box with a text description of the currently-selected
+                connection setting.</li>
+                <li>Confirm the presence of a <b>Show advanced connection settings</b> checkbox,
+                unchecked by default.</li>
+                <li>Confirm that when it is checked, more settings become available in the 
+                Connection settings grid.</li>
+                <li>Confirm the presence of a <b>Maximum number of simultaneous connections</b>
+                spin control with a default value of <b>1</b>.</li>
+                <li>Confirm the presence of a <b>Number of retries</b> spin control with a default
+                value of <b>1000</b>.</li>
+                <li>Confirm the presence of a <b>Time between retries</b> edit box with a default
+                value of <b>1000</b>.</li>
+                <li>Confirm the presence of a <b>Test Connection</b> button.</li>
+            </ul></li>
+        <p>
+            <li>Confirm that settings are persisted correctly.</li>
+        <p>
+            <li>Confirm that files can be supplied from an FTP site and they appear in the
+            appropriate local working folder.</li>
+            <li>Confirm that the file extension specification works as expected.</li>
+            <li>Confirm that recursive supplying works as expected.</li>
+            <li>Confirm that polling for new files works as expected.</li>
+            <li>Confirm that specified text can be appended to the remote filename's 
+            extension after downloading.</li>
+            <li>Confirm that the remote file can be deleted after downloading.</li>
+            <li>Confirm that the remote file can be left as-is after downloading.</li>
+            <li>Confirm that each of the connection protocols works as expected.</li>
+        <p>
+            <li><b>[LegacyRC #6071]</b> Polling frequency
+            <ul>
+                <li>Set up an FTP file supplier to supply TIF images, append TIF to remote 
+                filenames, and poll for new files every 2 minutes.</li>
+                <li>Start the FAM and put some TIF images in the FTP folder.</li>
+                <li>Confirm that 2 minutes later, the renamed files (*.tif.tif) are 
+                downloaded.</li>
+                <li>Confirm that in another 2 minutes, the *.tif.tif.tif files are downloaded.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
+<p>
     <li>Select <b>Files from static list</b> as the file supplier in Select File Supplier dialog, 
     then press the Configure button.
     <ul> 

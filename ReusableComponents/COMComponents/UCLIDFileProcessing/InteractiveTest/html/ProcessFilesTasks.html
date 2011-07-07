@@ -238,6 +238,14 @@
             <li>Confirm that the couter drop-down list in the <b>Apply Bates number</b> task does
             not allow editing.
         </ul>
+    <p>
+        <li><b>[LegacyRC #5935]</b> Errors running with multiple FAMs
+        <ul>
+            <li>Queue a large number of files and add a counter to the database.</li>
+            <li>Configure an FPS file with an Apply Bates Number task.</li>
+            <li>Run several instances of the FPS file simultaneously.</li>
+            <li>Confirm that no database-related errors are seen.</li>
+        </ul></li>
     </ul> 
 <p>
     <li><b>Core: Archive or restore associated file</b>
@@ -852,7 +860,10 @@
             </ul> 
 <p>
             <li>Confirm there is a checkbox for <b>Create destination folder if not present</b>. 
-            <li>Confirm the setting of the checkbox is persistent. 
+            <li>Confirm the setting of the checkbox is persistent.
+            <li>Confirm there is a checkbox for <b>Modify SourceDocName in database to match the
+            above destination name</b>.</li>
+            <li>Confirm the setting of the checkbox is persistent.</li>
             <li>Confirm there is a radio button for <b>Skip the operation and record an error</b> 
             under <i>If Destination File Already Exists</i>. 
             <li>Confirm there is a radio button for <b>Skip the operation without an error</b> 
@@ -880,6 +891,12 @@
                 and continue</b> is selected for <i>If destination File Already Exists</i>.
                 <li>Confirm that the <b>Allow read only file to be deleted</b> checkbox is 
                 disabled.
+                <li>Confirm that you are prompted for confirmation if you configure the task to
+                modify SourceDocName.</li>
+                <li>Confirm that you are prompted for the admin password when running the task if it
+                is configured to modify SourceDocName.</li>
+                <li>Confirm that an appropriate message is displayed if you provide a blank or
+                incorrect password.</li>
                 <LI><b>[FlexIDSCore #4254]</b> Copy, move, delete browse button error
                 <!-- fixed v 8.1.0.11 -->
                 <ul>
@@ -910,6 +927,12 @@
                 continue</b> is selected for <i>If Destination File Already Exists</i>.
                 <li>Confirm that the <b>Allow read only file to be deleted</b> checkbox is
                 disabled.
+                <li>Confirm that you are prompted for confirmation if you configure the task to
+                modify SourceDocName.</li>
+                <li>Confirm that you are prompted for the admin password when running the task if it
+                is configured to modify SourceDocName.</li>
+                <li>Confirm that an appropriate message is displayed if you provide a blank or
+                incorrect password.</li>
                 <LI><b>[FlexIDSCore #4254]</b> Copy, move, delete browse button error
                 <!-- fixed v 8.1.0.11 -->
                 <ul>
@@ -938,6 +961,120 @@
             processed without causing any exception. E.g. Valid$(file), Valid$(folder).    
         </ul>
 <p>
+        <li><b>Core: Create file</b>
+        <ul>
+            <li>Select <b>Core: Create file</b> as the task using the Add button.</li>
+            <li>Confirm that the task requires configuration and open the config page.</li>
+            <li>Confirm that there is a <b>Name of file to create</b> text box.</li>
+            <li>Confirm that there is an associated tag selector and that it functions as
+            expected.</li>
+            <li>Confirm that there is a <b>File contents</b> text box.</li>
+            <li>Confirm that it has an associated tag selector that functions as expected.</li>
+            <li>Confirm that horizontal and vertical scroll bars appear for sufficiently large
+            text inputs.</li>
+            <li>Confirm that the <b>Ctrl+A</b> shortcut functions to select all text in the file
+            contents text box.</li>
+            <li>Confirm that there is an <b>If the above file exists</b> group box with the
+            following radio buttons:
+            <ul>
+                <li>Skip the operation and record an error</li>
+                <li>Skip the operation without error</li>
+                <li>Overwrite the file</li>
+                <li>Append to the file</lI>
+            </ul></li>
+        <p>
+            <li>Confirm that files are created with the specified filenames.</li>
+            <li>Confirm that relative paths can be used to specify filenames.</li>
+            <li>Confirm that folder will be created if necessary.</li>
+            <li>Confirm that files are created with the specified contents.</li>
+            <li>Confirm that each of the radio button options works as expected.</lI>
+        <p>
+            <li><b>[DotNet #626]</b> Bug appending with multiple threads
+            <ul>
+                <li>Use a multi-core test machine and an FPS file configured to use multiple
+                threads.</li>
+                <li>Configure a Create File task in append mode to write the name of all queued
+                files to a text file.</li>
+                <li>Run the FPS file with a significant (&gt;100) number of files queued.</li>
+                <li>Confirm that the list is written correctly.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>Core: Delete empty folder</b>
+        <ul>
+            <li>Select <b>Core: Delete empty folder</b> as the task using the Add button.</li>
+            <li>Confirm the presence of a <b>Name of folder to delete</b> edit box with an
+            associated tag selector.</li>
+            <li>Confirm that the text box defaults to <b>$DirOf(&lt;SourceDocName&gt;)</b>.</li>
+            <li>Confirm that the tag selector functions as expected.</li>
+            <li>Confirm that there is a <b>Delete parent folders recursively</b> checkbox and that
+            it is <b>unchecked</b> by default.</li>
+            <li>Confirm that iff the recursive deletion box is checked, an <b>Up to but not
+            including this folder</b> checkbox is also enabled.</li>
+            <li>Confirm that iff the Up to but not including box is checked, an associated edit
+            box, browse button, and tag selector are also enabled.</li>
+            <li>Confirm that those controls each work as expected.</li>
+        <p>
+            <li>Confirm that an empty folder can be deleted.</li>
+            <li>Confirm that parent folders can be recursively deleted.</li>
+            <li>Confirm that a limit can be placed on recursive deletion.</li>
+        </ul></li>
+<p>
+        <li><b>Core: Encrypt/Decrypt file</b>
+        <ul>
+            <li>Select <b>Core: Encrypt/Decrypt file</b> as the task using the Add button.</li>
+            <li>Confirm that the task must configured.</li>
+        <p>
+            <li>Confirm that the config dialog includes the following elements:
+            <ul>
+                <li>A <b>File settings</b> group box
+                <ul>
+                    <li>Confirm the presence of an <b>Input file</b> text box with associated
+                    tag selector and browse button.</li>
+                    <li>Confirm that the default value is <b>&lt;SourceDocName&gt;</b>.</li>
+                    <li>Confirm the presence of a <b>Destination file</b> text box with associated
+                    tag selector and browse button.</li>
+                    <li>Confirm that the default value is <b>&lt;SourceDocName&gt;.enc</b>.</li>
+                    <li>Confirm that the tag selectors and browse buttons work.</li>
+                    <li>Confirm the presence of an <b>Overwrite destination file if it exists</b>
+                    checkbox.</li>
+                </ul></li>
+                <li>An <b>Encryption/decryption settings</b> group box
+                <ul>
+                    <li>Confirm the presence of a <b>Password</b> edit box.</li>
+                    <li>Confirm the presence of a <b>Confirm password</b> edit box.</li>
+                    <li>Confirm that a validation icon is displayed if the contents of the two
+                    edit boxes do not match.</li>
+                    <li>Confirm the presence of <b>Encrypt file</b> and <b>Decrypt file</b> radio
+                    buttons.</li>
+                </ul></li>
+            </ul></li>
+            <li>Confirm that you are required to proved a password in the configuration 
+            dialog.</li>
+        <p>
+            <li>Set up an "Encrypt file" task and hit the OK button.</li>
+            <li>Encrypt some files.</li>
+            <li>Reopen the configuration dialog.</li>
+            <li>Confirm that the length of the password has been obfuscated.</li>
+            <li>Confirm that the <b>Decrypt file</b> radio button has been disabled and a label
+            informs you that you need to change the password to enable it.</li>
+            <li>Add and remove a space from the password, then select the Decrypt file radio
+            button.</li>
+            <li>Try to decrypt your encrypted files and confirm that it fails.</li>
+        <p>
+            <li><b>[DotNet #649]</b>
+            <ul>
+                <li>Set up a couple of multi-core machines to execute rules, create redacted
+                images, and encrypt the redacted images.</li>
+                <li>Let them process for a while (at least a day) and confirm that no sharing
+                violations occur.</li>
+            </ul></li>
+            <li><b>[DotNet #657]</b> Confirm that no OutOfMemory exceptions are seen if you try
+            to decrypt files that are not encrypted.</li>
+            <li><b>[DotNet #665]</b> Confirm that the task will create the destination folder if
+            it is not already present.</li>
+        </ul></li>
+    <p>
         <li><b>Core: Execute rules</b>
         <ul> 
             <li>Select <b>Core: Execute rules</b> as the task using the Add button.
@@ -1016,6 +1153,10 @@
         <p>
             <li><b>[FlexIDSCore #4269]</b> Confirm that the tests located at
             I:\Common\Testing\PVCS_Testing\FlexIDSCore\4269 work as expected.
+        <p>
+            <li><b>[FlexIDSCore #4526]</b> Confirm that the Execute rules task can use previously
+            saved OCR results when processing images with numeric extensions regardless of 
+            extension length.</li>
         </ul> 
 <p>
         <li><b>Core: Launch application</b>
@@ -1106,7 +1247,8 @@
             <li>Confirm that the property page includes options to <b>Apply the tags selected
             below</b>, <b>Remove the tags selected below</b>, and <b>Toggle the state of the tags
             selected below</b>.
-            <li>Confirm that the property page includes a checked list of defined tags.
+            <li>Confirm that the property page includes a dropdown list of defined tags.
+            <li>Confirm the presence and functionality of an associated tag selector.
             <li>Confirm that property page settings are persistent. 
 <p>
             <li>Use the <b>List of all documents with specific tag</b> report to confirm that the
@@ -1115,6 +1257,7 @@
                 <li>Multiple tags can be applied to processed documents
                 <li>Multiple tags can be removed from processed documents
                 <li>Tags can be toggled for processed documents
+                <li>Dynamically created tags can be added to processed documents
             </ul>
 <p>
             <li><b>[LegacyRC #5447]</b> Do not partially complete a task
@@ -1174,18 +1317,65 @@
             <li>Confirm that annotations are correctly <b>removed from</b> the PDF file.
             <li>Confirm that annotations are correctly <b>retained in</b> the PDF file.
 <p>
-            <li><b>[DotNet #398]</b> Single threading
+            <li><b>[DotNet #398, #597]</b> Single threading
             <ul>
                 <li>Confirm that even with multiple threads processing in a single FAM, only one
                 PDF file is being modified at a time.
                 <li>Confirm that with multiple FAMs exercising the <b>Core: Modify pdf file</b>
                 task, only one PDF file is being modified at a time.
+                <li>Confirm that trying to run the task multi-threaded does not cause the FAM to
+                crash.</li>
             </ul>
 <p>
             <LI><b>[LegacyRC #5729]</b> Confirm that a meaningful exception is presented when 
             exercising <b>Core: Modify pdf file</b> with a TIF image.
         </ul> 
 <p>
+        <li><b>Core: Modify Source Document Name in Database</b>
+        <ul>
+            <li>Confirm that a <b>Core: Modify Source Document Name in database</b> task 
+            exists.</li>
+            <li>Confirm that the task requires a <b>server</b> license.</li>
+            <li>Confirm that the task must be configured.</li>
+        <p>
+            <li>Confirm that the config page provides an edit box to specify the <b>New name for
+            SourceDocName in the database</b>.</li>
+            <li>Confirm that the Cancel and Close buttons work as expected.</li>
+            <li>Confirm that a usage message is provided when you hit the <b>OK</b> button.</li>
+        <p>
+            <li>Confirm that you are asked to provide the admin password when starting a FAM that
+            includes an enabled Modify SourceDocName task.</li>
+            <li>Confirm that you are prompted for the password if the Modify SourceDocName task is
+            part of a conditional task.</li>
+            <li>Confirm that you are <b>not</b> asked to provide the admin password if the Modify
+            SourceDocName task is disabled.</lI>
+            <li>Confirm that an appropriate message is displayed if you provide a blank or
+            incorrect password.</li>
+        <p>
+            <li><b>[LegacyRC #5969]</b> Single quotes in new SourceDocName
+            <ul>
+                <li>Confirm that you cannot use the Modify SourceDocName for a SQL injection 
+                attack. One possibility is to set your new SourceDocName to
+                &lt;SourceDocName&gt;'WHERE FileName='&lt;SourceDocName&gt;';DROP TABLE
+                [FileActionStateTransition];UPDATE [FAMFile] SET [FileName] = 
+                '&lt;SourceDocName&gt;</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5979]</b> Couldn't be run as a service
+            <ul>
+                <li>Configure a database to require authentication to run.</li>
+                <li>Confirm that the FAM requires the admin password to run.</li>
+                <li>Confirm that the service also requires the admin password; this should 
+                prevent any files from being processed.</li>
+                <li>Add the machine name to the SkipAuthenticationOnMachines dbinfo setting.</li>
+                <li>Confirm that the FAM still requires the admin password.</li>
+                <li>Confirm that the service no longer requires the admin password.</li>
+                <li>Confirm that the same behavior happens if the database is <b>not</b> set to
+                require authentication, but the FAM includes a task that <b>does</b> require
+                administrative priveleges.</li>
+            </ul></li>
+        </ul></li>
+    <p>
         <li><b>Core: OCR document</b>
         <ul> 
             <li><b>[LegacyRC #4790]</b> Pay attention during OCR tests and watch for any MFC error
@@ -1423,6 +1613,33 @@
             </ul>
         </ul> 
 <p>
+        <li><b>Core: Set file priority</b>
+        <ul>
+            <li>Use the add button to select <b>Core: Set file priority</b> as the the task.</li>
+            <li>Confirm that this task requires a FLEX Index or ID Shield <b>server</b> 
+            license.</li>
+            <li>Confirm that there is a textbox for <b>Filename</b> with a default value of
+            <b>&lt;SourceDocName&gt;</b>.</li>
+            <li>Confirm that there is an associated <b>tag selector</b> and <b>browse</b> button
+            and that they work correctly.</li>
+            <li>Confirm that there is a dropdown for <b>Priority</b> with a default value of
+            <b>Normal</b>.</li>
+            <li>Confirm that the dropdown options are
+            <ul>
+                <li>Low</li>
+                <li>Below Normal</li>
+                <li>Normal</li>
+                <li>Above Normal</li>
+                <li>High</li>
+            </ul></li>
+        <P>
+            <li>Confirm that priority can be changed for a document other than 
+            <b>&lt;SourceDocName&gt;</b>.</li>
+            <li>Confirm that priority can be set to any of the priority options.</li>
+            <li>Confirm that the task fails appropriately when setting priority for a file that
+            does not exist in the database.</lI>
+        </ul></li>
+    <p>
         <li><b>Core: Sleep</b>
         <ul> 
             <li>Confirm that an <b>Core: Sleep</b> task exists.

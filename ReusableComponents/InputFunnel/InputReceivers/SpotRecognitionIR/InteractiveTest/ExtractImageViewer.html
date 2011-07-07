@@ -15,6 +15,8 @@
 
 <!-- *********************************************** -->
 
+<li>Confirm that Extract Image Viewer requires only a <b>Client</b> license to open.</li>
+<p>
 <li><h3>UI</h3>
 <ul>
     <li><b>File menu</b>
@@ -247,7 +249,8 @@
             <li>Pan
             <li>Zoom previous
             <li>Zoom next
-            <li>Highlighter
+            <li>Angular highlight
+            <li>Rectangular highlight
         </ul>
         <li>Confirm that they work as expected.
     <p>
@@ -279,7 +282,16 @@
         <ul>
             <li>Confirm that anti-aliasing is used or not according to the registry key at
             <b>HKCU\Software\Extract Systems\ReusableComponents\OcxAndDlls\ImageEdit\AntiAliasing</b>
-        </ul>        
+        </ul>
+    <p>
+        <li>AutoFitZonePadding
+        <ul>
+            <li>Confirm that there is an <b>AutoFitZonePadding</b> setting in the .config file in
+            the user's appdata folder with a default value of <b>1</b>.</li>
+            <li>Confirm that the setting controls how much to pad zones that are automatically
+            sized based on image pixels (i.e., zones created with block/line fitting, auto-shrink,
+            or either mode of the word highlight tool).</li>
+        </ul></li>
     <p>
         <li>Ignore shortcut keys during click + drag   
         <ul>
@@ -459,6 +471,8 @@
     <li>Confirm that a meaningful error is presented if a nonexistant script file is specified.
     <li>Confirm that a meaningful error is presented if a script attempts to hide an invalid 
     control id.
+    <li>Confirm that when buttons are hidden, the associated menu items and shortcut keys are also
+    removed/disabled.
 </ul>
 <p>
 <!-- *********************************************** -->
@@ -731,8 +745,8 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
         <li><b>[DotNet #496]</b>
         <!-- fixed v 8.1.0.33 -->
         <ul>
-            <li>Confirm that the clickable hotspot for the subimage cursor is at the point where the
-            crosshairs align.
+            <li>Confirm that the clickable hotspot for the subimage cursor is at the point where
+            the crosshairs align.
         </ul>
     <p>
         <li><b>[DotNet #499]</b>
@@ -782,6 +796,21 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
             <li>Open an image.
             <li>Confirm that no error is displayed.
         </ul>
+    <p>
+        <li><b>[DotNet #524]</b> Results of image search
+        <!-- fixed v 8.1.0.193 -->
+        <ul>
+            <li>Run the Demo_IDShield install for the "verify all interesting docs" demo; confirm
+            that the only images under Demo_IDShield are the 30 in the install folder and 14 in the
+            Input folder.</li>
+            <li>Open the image search form in the Extract Image Viewer (File &gt; Search for 
+            images).</li>
+            <li>Set the root folder to "C:\Demo_IDShield", the image extension to ".tif", and the
+            image name end to "1".</li>
+            <li>Click the "Find & Open Image" button.</li>
+            <li>Confirm that all provided filenames end in 1 and that all filenames ending in 1 are
+            provided.</li>
+        </ul></li>
     <p> 
         <li><b>[DotNet #589]</b>
         <ul>

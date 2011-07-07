@@ -304,6 +304,7 @@
         <li>Confirm choosing the <b>Options...</b> selection opens the Options dialog.</li> 
         <li>Confirm that the default value is <b>1000</b> records for display of status.</li>
         <li>Confirm that the spin control works as expected.</li>
+        <li>Confirm that it has a limit of 9999.</li>
         <li>Set the <b>Only display status for the last completed records</b> to 3, then process a
         set of more than 3 files that all complete successfully.</li> 
         <li>Confirm than no more than 3 files at a time are displayed in the <b>Files that 
@@ -763,7 +764,7 @@
 <p>
     <li>Follow the steps below to test the <b>crash recovery capability</b> of File Action Manager.
     <ul>
-        <li>Start a blank FAM, then select an action and set up a queue.  Do not save the settings.
+        <li>Start a blank FAM, then select an action and set up a queue. Do not save the settings.
         Press the <b>Start processing</b> button.</li>
         <li>Use the Windows <b>Task Manager</b> to kill the FAM instance.</li>
         <li>Confirm the presence of a $RecoveryFile$ in the current user's local AppData 
@@ -778,6 +779,16 @@
         <li>Confirm that the FAM title bar does not include a filename for a recovered file.</lI>
         <li>Confirm that a blank instance of the FAM is brought up and the $RecoveryFile$ is 
         cleared from AppData if the <b>No</b> button is pressed.</li>
+    <p>
+        <li>Open an FPS file. Set up the FAM to autosave on run and make a change to the FPS file
+        so it'll be marked dirty.</li>
+        <li>Wait until a recovery file is created.</li>
+        <li>Kill the FAM.</li>
+        <li>Open a new FAM instance. When prompted, recover your settings from the previous 
+        file.</li>
+        <li>Run the recovered FPS file. Note that there is no filename provided in the title
+        bar.</li>
+        <li>Confirm that a <b>Save As</b> dialog appears.</li>
     <p>
         <li>Confirm that recovery files are only saved when the current file is dirty.</li>
         <li>Confirm that the recovery file is removed when the dirty flag is removed:
@@ -836,12 +847,49 @@
         </ul></li>
     </ul></LI>
 <p>
+    <li><b>[LegacyRC #5983]</b> FAM appears locked up if files are being reverted
+    <ul>
+        <li>Start a FAM processing some files.</li>
+        <li>While it's processing, kill the FAM.</li>
+        <li>Remove the database lock.</li>
+        <li>Start processing again.</li>
+        <li>Confirm that files are autoreverted and that there is no lockup when reverting.</li>
+    </ul></li>
+<p>
+    <li><b>[LegacyRC #5989]</b> PDF input
+    <ul>
+        <li>Queue 1 large (100+ pages) PDF and many smaller ones.</li>
+        <li>Process them and confirm that they all process in parallel.</li>
+    </ul></li>
+<p>
     <li><b>[LegacyRC #6003]</b> Resource use changing after processing stops
     <ul>
         <li>Use LogProcessStats.exe to track the FAM's resource use.</li>
         <li>Create an unsaved FPS file and process a few files.</li>
         <li>When the FAM stops, leave it open for a few hours while statistics are logged.</li>
         <li>Check the stats and confirm that resource use was flat when the FAM was stopped.</li>
+    </ul></li>
+<p>
+    <li><b>[LegacyRC #6017, #6027]</b>
+    <ul>
+        <li>Create a new local Demo_IDShield database. Do not add any actions.</li>
+        <li>Open the Compute FPS file from the demo. It will complain about the missing 
+        action.</li>
+        <li>Before dismissing the error dialog, add teh Compute and Verify actions to the 
+        database.</li>
+        <li>Dismiss the FAM dialog.</li>
+        <li>Confirm that the FAM connects to the database successfully and displays all
+        appropriate tabs.</li>
+    </ul></li>
+<p>
+    <li><b>[LegacyRC #6018]</b>
+    <ul>
+        <li>Open the Options dialog from the menu bar.</li>
+        <li>Delete the value in the Completed records text box.</li>
+        <li>Hit OK.</li>
+        <li>Confirm that you are prompted to fill in a value.</li>
+        <li>Confirm that the max files from DB setting in the advanced dialog of the processing
+        setup tab also behaves correctly.</li>
     </ul></li>
 </ul> 
 </body> 

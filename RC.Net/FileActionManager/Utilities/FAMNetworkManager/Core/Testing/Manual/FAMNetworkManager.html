@@ -30,6 +30,7 @@
         <li>Confirm that the title bar includes the name of the application and the name of the
         currently open file, if any.</li>
         <li>Confirm that there are reasonable limits on resizing the window.</li>
+        <li>Confirm that window location and state are correctly persisted.</li>
         <li>Confirm that the title bar reflects the dirty/non-dirty state of the currently open
         file.</li>
     </ul></li>
@@ -41,7 +42,7 @@
             <li>New - Ctrl+N</li>
             <li>Open... - Ctrl+O</li>
             <li>Save... - Ctrl+S</li>
-            <li>Save As</li>
+            <li>Save As...</li>
             <li>Exit - Alt+F4</li>
         </ul></li>
         <li>Confirm that only Open and Exit are initially enabled.</li>
@@ -110,6 +111,7 @@
             <ul>
                 <li>Start service</li>
                 <li>Stop service</li>
+                <li>Remote desktop</li>
                 <li>Service dropdown list</li>
                 <li>Modify service database</li>
                 <li>Auto refresh status</li>
@@ -122,7 +124,8 @@
         are also disabled.</li>
         <li>Confirm that toolstrip items with analogs in the File menu function as expected.</li>
     <p>
-        <li>Confirm that clicking on the Add machine button brings up the Add Machine dialog.</li>
+        <li>Confirm that clicking on the <b>Add machine</b> button brings up the Add Machine 
+        dialog.</li>
         <li>Confirm that the Add Machine dialog contains:
         <ul>
             <li>A Machine name text box with an input limit of 256 characters.</li>
@@ -135,13 +138,13 @@
         <li>Confirm that pressing F8 performs the same function as clicking the Add machine
         button.</li>
     <p>
-        <li>Confirm that the Remove machine button is enabled when one or more machines is
+        <li>Confirm that the <b>Remove machine</b> button is enabled when one or more machines is
         selected in the data grid.</li>
         <li>Confirm that pressing the Remove machine button when one or more machines is selected
         removes the machine(s) from the grid.</li>
     <p>
-        <li>Confirm that the Edit machine(s) group and name button is enabled when one or more
-        machines is selected in the data grid.</li>
+        <li>Confirm that the <b>Edit machine(s) group and name</b> button is enabled when one or 
+        more machines is selected in the data grid.</li>
         <li>Confirm that pressing the Edit button with one or more machines selected brings up the
         Modify Machine Name Or Group dialog.</li>
         <li>Confirm that the Edit dialog contains:
@@ -163,24 +166,30 @@
         <li>Confirm that pressing <b>F2</b> performs the same function as hitting the Edit
         button.</li>
     <p>
-        <li>Confirm that the Group name drop down list contains a list of all group names
+        <li>Confirm that the <b>Group name</b> drop down list contains a list of all group names
         currently in use.</li>
     <p>
-        <li>Confirm that the Start service button is always enabled.</li>
-        <li>Confirm that the Stop service button is always enabled.</li>
-        <li>Confirm that the Service dropdown list includes entries for FAM, FDRS, and Both.</li>
+        <li>Confirm that the <b>Start service</b> button is always enabled.</li>
+        <li>Confirm that the <b>Stop service</b> button is always enabled.</li>
+        <li>Confirm that the <b>Service</b> dropdown list includes entries for FAM, FDRS, and 
+        Both.</li>
     <p>
-        <li>Confirm that the Modify service database button is enabled only when exactly one
+        <li>Confirm that the <b>Remote desktop</b> button is enabled only when exactly one machine 
+        is selected in the data grid.</li>
+        <li>Confirm that the Remote desktop button attempts to start a remote session with the
+        selected computer.</li>
+    <p>
+        <li>Confirm that the <b>Modify service database</b> button is enabled only when exactly one
         machine is selected in the data grid.</li>
         <li>Confirm that the Modify service database button brings up the SQLCEDBEditor
         application with the Open and Close commands hidden.</li>
         <li>Confirm that the SQLCEDBEditor otherwise appears as expected.</li>
     <p>
-        <li>Confirm that the Auto refresh button is always enabled.</li>
+        <li>Confirm that the <b>Auto refresh</b> button is always enabled.</li>
         <li>Confirm that Auto refresh functions as a toggle.</li>
     <p>
-        <li>Confirm that the Refresh button is disabled when the Auto refresh feature is turned
-        on.</li>
+        <li>Confirm that the <b>Refresh button</b> is disabled when the Auto refresh feature is 
+        turned on.</li>
         <li>Confirm that the refresh button is otherwise always enabled.</li>
         <li>Confirm that the refresh button refreshes the data from each of the machines in the
         data grid.</li>
@@ -203,6 +212,9 @@
         </ul></li>
         <li>Confirm that the data grid can be sorted by any of those columns.</li>
         <li>Confirm that the grid columns and rows can be resized in a reasonable way.</li>
+        <li>Confirm that selection in the grid goes by row, not by cell.</li>
+        <li>Confirm that tab advances by row and wraps around from the bottom of the grid to the
+        top.</li>
     </ul></li>
 </ul></li>
 <p>
@@ -211,6 +223,15 @@
 
 <li><h2>Functionality</h2>
 <ul>
+    <li><b>Connecting to machines</b>
+    <ul>
+        <li>Attempt to connect to a machine on which the <b>Remote registry</b> service is 
+        <b>not</b> running. Confirm that an error is indicated.</li>
+        <li>Log on to the remote machine and enable the service.</li>
+        <li>Refresh in the FAM Network Manager and confirm that it connects to the remote 
+        machine.</li>
+    </ul></li>
+<p>
     <li><b>New, open, save, etc</b>
     <ul>
         <li>Confirm that Open allows you to open saved .fnm files.</li>
@@ -349,6 +370,8 @@
         </ul></li>
     <p>
         <li>Confirm that the database editor works as expected.</li>
+        <li>Confirm that the utility will correctly find the service database on both XP/2003
+        machines and Vista or later.</lI>
     </ul></li>
 <p>
     <li><b>Refresh and auto-refresh</b>
@@ -356,6 +379,12 @@
         <li>Confirm that the auto-refresh refreshes all currently visible rows with a frequency
         specified under Tools &gt; Options.</li>
         <li>Confirm that the manual refresh refreshes all currently visible rows.</li>
+    <p>
+        <li>Set the auto-refresh time to something ridiculously large.</li>
+        <li>Turn on auto-refresh. Note that it will take a very long time.</li>
+        <li>Turn off auto-refresh.</li>
+        <li>Set the fresh time to something better, like 1000.</li>
+        <li>Turn on autorefresh again and confirm that it refreshes in a reasonable time.</li>
     </ul></li>
 </ul></li>
 
@@ -390,6 +419,21 @@
         <li>When B starts up again, start the FAM service.</li>
         <li>On A, confirm that the network manager successfully reconnected and is displaying
         appropriate information about B.</li>
+    </ul></li>
+<p>
+    <li><b>[DotnetRC #579]</b> 
+    <ul>
+        <li>Configure the network manager to connect to a machine that doesn't exist.</li>
+        <li>When the error icon comes up, double-click on it.</li>
+        <li>Confirm that <b>one</b> exception is displayed.</lI>
+    </ul></li>
+<p>
+    <li><b>[DotNetRC #580, #581]</b>
+    <ul>
+        <li>Confirm that no exception is displayed the first time you open the application.</li>
+        <li>Confirm that the application exhibits reasonable behavior regardless of the presence or
+        absence of the user.config file in the user's appdata folder.</li>
+        <li>Confirm that no exception is displayed the first time you close the application.</lI>
     </ul></li>
 </ul></li>
 

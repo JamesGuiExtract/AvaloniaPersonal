@@ -571,6 +571,20 @@
                 </ul></li>
             </ul></li>
         </ul></li>
+    <p>
+        <li><b>[FlexIDSCore #4549]</b> Auto-adjust case on redaction over blank zones
+        <ul>
+            <li>Confirm that the auto-adjust case setting does not cause the task to fail
+            when redacting attributes over blank regions in the document.</li>
+        </ul></li>
+        <li><b>[FlexIDSCore #4609]</b>
+        <ul>
+            <li>In the ID Shield demo, run the Compute FPS file.</li>
+            <li>Run a Create Redacted Image task on all the images.</li>
+            <li>Verify the images.</li>
+            <li>Open the VOA file for an image that contains both a clue and some redacted data and
+            confirm that all attributes have distinct IDs.</li>
+        </ul></li>
     </UL></li>
 <p>
     <li><h2>Redaction: Create redacted text</h2>
@@ -904,6 +918,7 @@
                 <b>&lt;SourceDocName&gt;.session2.voa</b>.</li>
                 <li>Confirm that each text box has an associated tag selector button with 
                 the standard tags and functions.</li>
+                <li>Confirm that the tag selectors work as expected.</li>
                 <li>Confirm that there is a spin control for the minimum overlap percentage.</li>
                 <li>Confirm that the value in the spin control must be between 1 and 100.</li>
                 <li>Confirm that the spin control works as expected.</li>
@@ -923,13 +938,14 @@
         <ul>
             <li>Confirm that attributes are merged correctly based on the overlap percentage
             specified in the task configuration.</li>
-            <li>Confirm that if attributes with different names are merged, the name for the merged
-            attribute will be prioritized as follows: "Manual", "HCData", "MCData", "LCData".</li>
+            <li>Confirm that if attributes with different names are merged, the name for the 
+            merged attribute will be prioritized as follows: "Manual", "HCData", "MCData",
+            "LCData".</li>
             <li>Confirm that the text value of a merged attribute is <b>Merged</b>.</li>
             <li>Confirm that attributes are merged per raster zone, not based on overall 
             bounds.</li>
-            <li>Confirm that attributes that do not meet the criteria for mergine (i.e., attributes
-            that do not overlap) are preserved in the output.</li>
+            <li>Confirm that attributes that do not meet the criteria for merging (i.e., 
+            attributes that do not overlap) are preserved in the output.</li>
             <li>Confirm that information about the merge session is stored in an appropriate
             metadata node.</li>
             <li>Confirm that the merge session metadata contains the metadata from the source VOA
@@ -945,6 +961,15 @@
                 <li>Metadata is stored in the merge session metadata.</li>
                 <li>Identical non-spatial attributes are combined.</li>
                 <li>Otherwise, each source attribute should show up separately in the results.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4604]</b> 
+            <ul>
+                <li>Run the ID Shield demo rules on the demo images.</li>
+                <li>With feedback collection turned on, verify the images. Make no changes before
+                saving.</li>
+                <li>Use the Merge task to merge the .found and .expected VOAs. Confirm that you
+                get reasonable results regarding clues.</li>
             </ul></li>
         </ul></li>
     </ul></li>
@@ -998,6 +1023,7 @@
                 <b>&lt;SourceDocName&gt;.session2.voa</b>.</li>
                 <li>Confirm that each text box has an associated tag selector button with 
                 the standard tags and functions.</li>
+                <li>Confirm that the tag selector works as expected.</li>
                 <li>Confirm that there is a spin control for the minimum overlap percentage.</li>
                 <li>Confirm that the value in the spin control must be between 1 and 100.</li>
                 <li>Confirm that the spin control works as expected.</li>
@@ -1052,6 +1078,15 @@
                 <li>Identical non-spatial attributes are combined.</li>
                 <li>Otherwise, each source attribute should show up separately in the 
                 results.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4604]</b> 
+            <ul>
+                <li>Run the ID Shield demo rules on the demo images.</li>
+                <li>With feedback collection turned on, verify the images. Make no changes before
+                saving.</li>
+                <li>Use the compare condition to compare the .found and .expected VOAs. Confirm
+                that you get reasonable results regarding clues.</li>
             </ul></li>
         </ul></li>
     </ul></li>

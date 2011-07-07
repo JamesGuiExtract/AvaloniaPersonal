@@ -181,7 +181,28 @@
 <!-- *********************************************** -->
 <li><h2>FAM DB Lock Checker</h2>
 <ul>
-   	<li>TBD</li>
+   	<li>Confirm that the title bar reads <b>FAMDBLockChecker</b>.</li>
+    <li>Confirm the presence of an editable <b>Server</b> text box.</li>
+    <li>Confirm the presence of an editable <b>Database</b> text box.</li>
+    <li>Confirm the presence of an editable <b>Check lock on average once every</b> text box.</li>
+    <li>Confirm the presence of a <b>Run</b> button.</li>
+    <li>Confirm the presence of read-only edit boxes for <b># Checks</b>, <b># Locks seen</b>, and
+    <b>%</b>.</li>
+<p>
+    <li>Confirm that the utility can connect to and monitor a local database.</li>
+    <li>Confirm that the utility can connect to and monitor a remote database.</li>
+    <li>Confirm that the utility gracefully handles it when disconnected from the database.</li>
+<p>
+    <li>Queue a nontrivial number of files for an action.</li>
+    <li>Set up an FPS file to process those files with a short sleep task.</li> 
+    <li>Set up the FAMDBLockChecker to monitor the database.</li>
+    <li>Run the FPS file while the DB lock checker is monitoring and note how many locks are 
+    seen.</li>
+    <li>Requeue the files and reconfigure the FPS file to run an Apply Bates Number task.</li>
+    <li>Run the FPS file while the DB lock checker is monitoring and note how many locks are 
+    seen.</li>
+    <li>Confirm that the database is locked more frequently with the Bates number task than the
+    sleep task.</li>
 </ul>
 </li>
 <br />
@@ -606,7 +627,29 @@
 <!-- *********************************************** -->
 <li><h2>Office To TIF</h2>
 <ul>
-   	<li>TBD</li>
+   	<li>Confirm that <b>Office2007ToTif.exe</b> and <b>OfficeToTif.exe</b> are installed.</li>
+    <li>Confirm that running <b>OfficeToTif.exe /?</b> on the command line displays an appropriate
+    usage message.</li>
+    <li>On a machine with <b>Office 2007</b> and the <b>print to PDF</b> extension installed, 
+    confirm that OfficeToTif.exe can convert the following document types to TIF:
+    <ul>
+        <li>.doc</li>
+        <li>.docx</li>
+        <li>.ppt</li>
+        <li>.pptx</li>
+        <li>.xls</li>
+        <li>.xlsx</li>
+    </ul></li>
+    <li>On a machine with <b>Office 2010</b> installed, confirm that OfficeToTif.exe can convert
+    the following document types to TIF:
+    <ul>
+        <li>.doc</li>
+        <li>.docx</li>
+        <li>.ppt</li>
+        <li>.pptx</li>
+        <li>.xls</li>
+        <li>.xlsx</li>
+    </ul></li>
 </ul>
 </li>
 <br />
@@ -672,8 +715,16 @@
     <p>
         <li><b>Fixed SCRs</b>
         <ul>
-            <li><b>[LegacyRC #4990]</b> Confirm that SetOperations.exe works correctly with large 
-            (~million line) files.</li>
+            <li><b>[LegacyRC #4990, DotNetRC #620]</b> Confirm that SetOperations.exe works
+            correctly with large (~million line) files.</li>
+        <p>
+            <li><b>[DotNetRC #621]</b> Leaking temporary database files
+            <ul>
+                <li>Set up SetOperations to perform an operation that will take some time.</li>
+                <li>While it is processing, hit Ctrl+C or Ctrl+Break in the console to cancel.</li>
+                <li>Confirm that any temporary database files are cleaned up when the app 
+                exits.</li>
+            </ul></li>
         </ul></li>
 </ul>
 </li>

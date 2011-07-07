@@ -29,6 +29,16 @@
 		the application.</li>
    		<li>Confirm that unsupported command-line arguments such as <b>ExtractTRP2 /abc</b> 
 		provide a message box with usage instructions.</li>
+        <li><b>[LegacyRC #4915]</b> Inconsistent behavior with both full license and unexpired
+        temp license
+        <ul>
+            <li>Create a temp license file <b>a_temp.lic</b> and a full license <b>full.lic</b>
+            and put both in your license file directory.</li>
+            <li>Start processing files.</li>
+            <li>Roll the clock back.</li>
+            <li>Confirm that ExtractTRP2 is <b>not</b> running.</li>
+            <li>Confirm that the license state is <b>not</b> corrupted.</li>
+        </ul></li>
    		<li><b>[LegacyRC #4934]</b> ExtractTRP2.exe and Unlock files
 		<ul>
 			<li>Create an evaluation license.
@@ -48,14 +58,31 @@
 			immediately closes it.</li>
 		</ul>
   	   	<LI><b>[LegacyRC #5287]</b> ExtractTRP2.exe error on close
-	       	<ul>
-	      		<li>Start <b>ExtractTRP2.exe</b>.
-	      		<li>Close the process from <b>Task Manager</b> and confirm that an 
-			Unexpected exception is not logged.
-	      		<li>Start <b>ExtractTRP2.exe</b> again.
-	      		<li>Run <b>ExtractTRP2.exe /exit</b> from the command line.
-	      		<li>Confirm that <b>ExtractTRP2.exe</b> exits without an exception.
-	       	</ul>
+        <ul>
+            <li>Start <b>ExtractTRP2.exe</b>.
+            <li>Close the process from <b>Task Manager</b> and confirm that an Unexpected
+            exception is not logged.
+            <li>Start <b>ExtractTRP2.exe</b> again.
+            <li>Run <b>ExtractTRP2.exe /exit</b> from the command line.
+            <li>Confirm that <b>ExtractTRP2.exe</b> exits without an exception.
+        </ul>
+        <li><b>[LegacyRC #6073]</b> ExtractTRP2 and UAC
+        <ul>
+            <li>With a fresh install on a UAC-enabled machine, create a temp license and log in as
+            an unprivileged user.</li>
+            <li>Confirm that Extract software runs correctly.</li>
+            <li>Confirm that ExtractTRP2 runs.</li>
+        </ul></li>
+        <li><b>[LegacyRC #6112]</b>
+        <ul>
+            <li>Create a temporary license.</li>
+            <li>Start processing something.</li>
+            <li>Roll back the date.</li>
+            <li>After the license state is corrupt, drop a permanent license in the LicenseFiles
+            directory.</li>
+            <li>Reboot.</li>
+            </li>Confirm that you can open the FAM without error.</li>
+        </ul></li>
 	</ul>
 	</li>
 <p>
@@ -75,6 +102,8 @@
 			Client and Server are presented for <b>Type</b>.</li>
 	   		<li>Confirm that the <b>Next</b> button is disabled until all information 
 			is provided.</li>
+            <li>Confirm that there is an <b>Open License Folder</b> button that opens an explorer
+            window to the appropriate folder.</li>
 		</ul>
    		<li><b>Step 2</b>
 		<ul>
@@ -141,6 +170,24 @@
 		   		<li>Confirm that the <b>Finish</b> button is now enabled.
 			</ul>
 		</ul>
+    <p>
+        <li><b>[LegacyRC #5141, #5293]</b>
+        <ul>
+            <li>Install and license ID Shield on a test machine that does not have an email client
+            installed.</li>
+            <li>Run the User License application.</li>
+            <li>Try to have it automatically create a license request email in your desktop email
+            application.</li>
+            <li>Confirm that reasonable errors are seen.</li>
+        </ul></li>
+        <li><b>[LegacyRC #6077]</b>
+        <ul>
+            <li>Install ID Shield on a clean machine.</li>
+            <li>Run the User License application.</li>
+            <li>Confirm that the LicenseFiles folder has been created in the Extract Systems 
+            folder under ApplicationData.</li>
+        </ul></li>
+        <li><b>[LegacyRC #6086]</b> Confirm that the service can be run using a temp license.</li>
 	</ul>
 	</li>
 </ol>

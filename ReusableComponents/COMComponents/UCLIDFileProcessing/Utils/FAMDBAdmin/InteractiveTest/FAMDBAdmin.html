@@ -106,7 +106,7 @@
         <li>Confirm that the second new database is successfully created.</li>
     </ul></li>
 <p>
-    <LI><b>[LegacyRC #5679, #5961]</b> DB Admin and old schema version
+    <LI><b>[LegacyRC #5679, #5961, #5966, #6032]</b> DB Admin and old schema version
     <ul>
         <LI>Create a new database using <b>DB Admin</b>.</li>
         <li>Use SQL Management Studio to modify the schema version</li>
@@ -115,6 +115,19 @@
         <li>Confirm that an error message is displayed about the incorrect schema version.</li>
         <li>Confirm that you are prompted to update the schema and confirm that regardless of your
         response, the UI is still in a good state.</li>
+        <li>Confirm that an application trace is logged when you update the schema.</li>
+        <li>Confirm that if you do not update the schema, only the following menu items are
+        enabled:
+        <ul>
+            <li>File &gt; Clear</li>
+            <li>File &gt; Update database schema</li>
+            <li>File &gt; Logout</li>
+            <li>File &gt; Exit</li>
+            <li>Tools &gt; Check for new components</li>
+            <li>Tools &gt; File Action Manager</li>
+            <li>Help &gt; File Action Manager Help</li>
+            <li>Help &gt; About this application</li>
+        </ul></li>
     </ul></li>
 </ul>
 
@@ -285,6 +298,11 @@
                 <li>Confirm that the spin control works correctly with large, small, and 
                 non-integer values.</li>
             </ul></li>
+            <li>Confirm that there is a spin control for <b>Minimum time between checking for
+            files to process</b>.</li>
+            <li>Confirm that there is a spin control for <b>Maximum time between checking for
+            files to process</b>.</li>
+            <li>Confirm that both controls work as expected.</li>
             <li>Confirm that all settings are correctly propagated back to the <b>DBInfo</b>
             table.</li>
         </ul></li>
@@ -336,6 +354,7 @@
         </ul></li>
         <li>Confirm that changes made in the Database options dialog are logged in Application
         Traces.</li>
+        <li>Confirm that all settings are correctly persisted.</li>
     </ul></li>
 <p>
     <li><b>Change Password</b>
@@ -413,7 +432,7 @@
             <li>Confirm that the <b>Refresh</b> button updates the <b>Action name</b> list.</li>
             <li>Confirm that the <b>Manage Actions</b> dialog contains a <b>Close</b> button.</li>
             <li>Confirm that the <b>Close</b> button closes the dialog.</li>
-            <li><b>[LegacyRC #5608]</b> Confirm that <b>ESC</b> will close the dialog.</li>
+            <li>Confirm that <b>ESC</b> will close the dialog.</li>
         </ul></li>
 <p>
         <li><u><b>Functionality</b></u>
@@ -503,7 +522,7 @@
         <li>Confirm that <b>Refresh</b> updates the list of counters and values.</li>
         <li>Confirm that the <b>Manage Counters</b> dialog includes a <b>Close</b> button.</li>
         <li>Confirm that <b>Close</b> closes the dialog.</li>
-        <li><b>[LegacyRC #5608]</b> Confirm that <b>ESC</b> will close the dialog.</li>
+        <li>Confirm that <b>ESC</b> will close the dialog.</li>
 <p>
         <LI><b>[LegacyRC #5662]</b> DB Admin exceptions
         <ul>
@@ -531,7 +550,7 @@
         of tags.</li>
         <li>Confirm that the <b>Manage Tags</b> dialog includes a button to <b>Close</b> the 
         dialog.</li>
-        <li><b>[LegacyRC #5608]</b> Confirm that <b>ESC</b> will close the dialog.</li>
+        <li>Confirm that <b>ESC</b> will close the dialog.</li>
         <li>Confirm that tags must begin with a letter, number or underscore character.</li>
         <li>Confirm that tags can contain spaces allowing for multiple-word strings.</li>
 <p>
@@ -603,7 +622,7 @@
             dialog.</li>
             <li>Confirm that the dialog includes a <b>Refresh</b> button.</li>
             <li>Confirm that the dialog includes a <b>Close</b> button.</li>
-            <li><b>[LegacyRC #5608]</b> Confirm that <b>ESC</b> will close the dialog.</li>
+            <li>Confirm that <b>ESC</b> will close the dialog.</li>
         </ul></li>
 <p>
         <li><u><b>Functionality</b></u>

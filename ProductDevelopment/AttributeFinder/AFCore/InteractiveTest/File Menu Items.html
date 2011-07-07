@@ -127,6 +127,26 @@
             <li><b>Key Serial #s:</b> edit box is editable.
             <ul>
                 <li>When entered, the value entered is displayed on status bar.</li>
+                <li>Confirm that hyphenated ranges (e.g., "7 - 11") can be specified.</li>
+            </ul></li>
+            <li><b>FKB Version</b> edit box is editable
+            <ul>
+                <li>Confirm that ComponentData is installed in an FKB-version-specific subdirectory
+                of the ComponentData folder.</li>
+                <li>Confirm that an FKB version must be specified to save a ruleset with a counter
+                or a swiping rule.</li>
+                <li>Confirm that nested rulesets do <b>not</b> require that an FKB version be
+                specified.</li>
+                <li>Confirm that if a nested ruleset does specify an FKB version, it must be the
+                same as the master ruleset's FKB version.</li>
+                <li>Confirm that old rules with no FKB version specified use the root of 
+                ComponentData.</li>
+                <li>Confirm that a ruleset saved with a legacy FKB version installed to the root of
+                ComponentData will confirm the version number in <b>FKBVersion.txt</b>.</li>
+                <li>Confirm that if a non-default ComponentDataDir is specified in RDTConfig, it
+                is assumed to include the full path (including any needed version number).</li>
+                <li>Confirm that about boxes for AttributeFinder-specific applications list all
+                installed FKB versions.</li>
             </ul></li>
             <li><b>Ruleset can be executed only internally</b> check box
             is checkable.

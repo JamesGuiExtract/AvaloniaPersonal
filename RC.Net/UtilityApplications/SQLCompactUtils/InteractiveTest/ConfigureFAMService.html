@@ -31,6 +31,22 @@
             <li>Confirm that a <b>Configure FAM Service</b> shortcut is available 
             under the <b>Extract Systems ID Shield</b> start menu.</li>
             <li>Confirm that the shortcut opens the <b>ESFAMService.sdf</b> database.</li>
+        <p>
+            <li>Confirm that the SQLCDBEditor recognizes the database schema version and the status
+            bar correctly indicates the following situations:
+            <ul>
+                <li>current schema</li>
+                <li>schema needs to be updated</li>
+                <li>schema unrecognized</li>
+                <li>schema is newer than current</li>
+            </ul></li>
+            <li>Connect to a database with an out-of-date schema version and confirm that you are
+            prompted to update the schema.
+            <ul>
+                <li>Select <b>No</b> and confirm that you can still edit the database 
+                normally.</li>
+                <li>Select <b>Yes</b> and confirm that the database is updated correctly.</li>
+            </ul></li>
         </ul></li>
 <p>
         <LI><b>FPSFile table</b>
@@ -46,6 +62,8 @@
             <ul>
                 <li>This column specified which FPS files will be run by the FAM service;
                 confirm that it works as expected.</li>
+                <li>Confirm that the service correctly interprets paths enclosed in quotation
+                marks.</li>
                 <li>Confirm that this column defaults to empty when a new row is added to the
                 table.</li>                
             </ul></li>
@@ -99,6 +117,7 @@
             a different database.</li>
             <li>Confirm that a <b>Save Database</b> button is provided for saving 
             database changes.</li>
+        <p>
             <li>Confirm that <b>File - Open</b> displays an Open dialog.</li>
             <li>Confirm that the Open dialog defaults to choosing <b>Database files 
             (*.sdf)</b>.</li>
@@ -114,10 +133,17 @@
             <li>Confirm that a confirmation message is presented if unsaved changes 
             have been made.</li>
             <li>Confirm that the application stays open.</li>
-            <li>Confirm that <b>File - Exits</b> closes the open database and exits 
+            <li>Confirm that <b>File - Exit</b> closes the open database and exits 
             the application.</li>
             <li>Confirm that a confirmation message is presented if unsaved changes 
             have been made.</li>
+        <p>
+            <li>Confirm that <b>Tools - Update to current schema...</b> is disabled when connected
+            to a database with the current schema version.</li>
+            <li>Confirm that it is enabled when connected to a database with an out-of-date
+            schema.</li>
+            <li>Confirm that <b>Update to current schema</b> works as expected.</lI>
+        <p>
             <li>Confirm that <b>Help - About</b> displays the <b>About SQLCDBEditor</b> 
             dialog.</li>
             <li>Confirm that the dialog includes the correct version number and 
@@ -141,6 +167,21 @@
             <li><b>[DotNet #409]</b> Confirm that the application does not close if after 
             prompting to save changes after attempting to close the editor, the save 
             operation fails.</li>
+            <li><b>[DotNet #442]</b> Database pointing to nonexistent FPS file
+            <ul>
+                <li>Configure the ESFAMService database to point to a FPS file that does not
+                exist.</li>
+                <li>Start the service and confirm that you don't see access violation errors from
+                FAMProcess.exe.</li>
+            </ul></li>
+            <li><b>[DotNet #511]</b> Sorting by filename with no filename specified
+            <ul>
+                <li>Open a service database with an empty FPSFile table.</li>
+                <li>In the FPSFile table, click in the <b>NumberOfFilesToProcess</b> cell to
+                add a new row.</li>
+                <li>Click in the <b>FileName</b> column header to sort the table by filename.</li>
+                <li>Confirm that no exceptions are seen.</li>
+            </ul></li>
             <li><b>[FlexIDSCore #4139]</b> Editing tables with no unique key.
             <ul>
                 <li>Open a database that contains a table that has no unique key. One

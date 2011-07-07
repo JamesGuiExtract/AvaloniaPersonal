@@ -46,8 +46,11 @@
             <li>SQLCompactImporter</li>
             <li>FAMDBLockChecker.exe</li>
             <li>Extract.Office.dll</li>
+            <li>ModifyPdfFile.exe</li>
             <li>.resource files for data entry</li>
         </ul></li>
+        <li>Confirm that the SQL native client is installed when you install just <b>FLEX 
+        Index</b> (and not SQL Server).</li>
 <p>
         <li><b>[FlexIDSCore #3870]</b> Confirm that <b>.NET 3.5</b> and .NET 4.0 can be installed
         via <b>Demo Shield</b> on a <b>Windows Server 2008 R2</b> operating system.</li>
@@ -70,16 +73,13 @@
                 <li>Convert FAM Database</li>
                 <li>Convert FPS File</li>
                 <li>Detect and Report Failure</li>
+                <li>FAM Network Manager</li>
                 <li>Feedback Manager</li>
                 <li>Image Viewer</li>
                 <li>Rule Tester</li>
                 <li>USS File Viewer</li>
                 <li>View Exception Log</li>
                 <li>VOA File Viewer</li>
-<p>
-                <LI><b>[FlexIDSCore #3915]</b> Confirm that a <b>Start menu</b> shortcut exists
-                under the <b>Utilities</b> menu to open <b>ESFAMService.sdf</b> in the 
-                SQL CE Editor.</li>
             </ul></li>
             <li>DB Administration</li>
             <li>File Action Manager</li>
@@ -128,10 +128,13 @@
             <li>SQLCompactImporter</li>
             <li>FAMDBLockChecker.exe</li>
             <li>Extract.Office.dll</li>
+            <li>ModifyPdfFile.exe</li>
         </ul></li>
 <p>
         <li><b>[FlexIDSCore #3870]</b> Confirm that <b>.NET 3.5</b> and .NET 4.0 can be installed
         via <b>Demo Shield</b> on a <b>Windows Server 2008 R2</b> operating system.</li>
+        <li>Confirm that the SQL native client is installed when you install just <b>ID Shield</b>
+        (and not SQL Server).</li>
         <LI>Confirm that copyright dates have been updated to 2011 for the following
         <ul>
                 <li>ID Shield installation splash screen</li>
@@ -151,15 +154,12 @@
                 <li>Convert FAM Database</li>
                 <li>Convert FPS File</li>
                 <li>Detect and Report Failure</li>
+                <li>FAM Network Manager</li>
                 <li>Image Viewer</li>
                 <li>Rule Tester</li>
                 <li>USS File Viewer</li>
                 <li>View Exception Log</li>
                 <li>VOA File Viewer</li>
-<p>
-                <LI><b>[FlexIDSCore #3915]</b> Confirm that a <b>Start menu</b> 
-                shortcut exists under the <b>Utilities</b> menu to open 
-                <b>ESFAMService.sdf</b> in the SQL CE Editor.</li>
             </ul></li>
             <li>DB Administration</li>
             <li>File Action Manager</li>
@@ -233,6 +233,8 @@
         Systems LM</b> uninstalls without error and that <b>ID Shield</b> still runs.</li>
         <li>With <b>FLEX Index</b> and <b>Extract Systems LM</b> installed, confirm that <b>Extract
         Systems LM</b> uninstalls without error and that <b>FLEX Index</b> still runs.</li>
+        <li>Confirm that when you uninstall all Extract Systems software, all Extract Systems
+        services (FAM service, FDRS service, exception service) are uninstalled.</li>
     </ul></li>
 <p>
     <LI><b>Uninstalls - each non-Server operating system</b>

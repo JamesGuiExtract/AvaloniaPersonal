@@ -127,71 +127,93 @@
         active.
     </ul>
 <p>
-    <li>Confirm the Processing Setup tab has a <b>Processing schedule</b> groupbox with a check box
-    and a button.</li>
-    <ul> 
-        <LI>Confirm that the group box contains a <b>Limit processing to certain days/times</b>
-        check box.
-        <LI>Confirm that the check box is <b>unchecked</b> by default.
-        <LI>Confirm that the group box contains a <b>Set schedule...</b> button.
-        <LI>Confirm that the button is enabled only when the check box is checked.
-<p>
-        <LI>Confirm that clicking the button displays a <b>Set Processing Schedule</b> dialog.
-        <LI>Confirm that the <b>Set Processing Schedule</b> dialog includes a multi-column grid
-        with hours and days of the week.
-        <LI>Confirm that the <b>Set Processing Schedule</b> dialog includes <b>OK</b> and 
-        <b>Cancel</b> buttons.
-        <LI>Confirm that the <b>Set Processing Schedule</b> dialog includes <b>Select all</b> and
-        <b>Select none</b> buttons.
-        <LI>Confirm that <b>Select all</b> changes all of the grid cells to green.
-        <LI>Confirm that <b>Select none</b> changes all of the grid cells to white.
-        <LI>Confirm that clicking in a grid cell toggles the color between white and green.
-        <li>Confirm that clicking in the upper left cell of the grid (i.e., the cell left of "Sun")
-        inverts the current selection.
-<p>
-        <LI>Confirm that schedule settings are loaded and saved correctly.
-    </ul>
-<p>
-    <li>Confirm the Processing Setup tab has a <b>Continuous processing</b> groupbox with two 
-    radio buttons.</li>
-    <ul> 
-        <li>Confirm the default setting is <b>Stop processing once the queue is empty</b>.</li>
-        <li>Confirm the setting of the radio button is persistent.</li>
-<p>
-        <LI><b>[LegacyRC #5745]</b> Default CPU usage when waiting for files
+    <li>Confirm the Processing Setup tab has an <b>Advanced...</b> button that brings up the
+    <b>Advanced Processing Configuration</b> dialog.
+    <ul>
+        <li>Confirm the Advanced Processing Configuration dialog has a <b>Processing schedule</b> 
+        groupbox with a check box and a button.
+        <ul> 
+            <LI>Confirm that the group box contains a <b>Limit processing to certain days/times</b>
+            check box.</li>
+            <LI>Confirm that the check box is <b>unchecked</b> by default.</li>
+            <LI>Confirm that the group box contains a <b>Set schedule...</b> button.</li>
+            <LI>Confirm that the button is enabled only when the check box is checked.</li>
+    <p>
+            <LI>Confirm that clicking the button displays a <b>Set Processing Schedule</b> 
+            dialog.</li>
+            <LI>Confirm that the <b>Set Processing Schedule</b> dialog includes a multi-column 
+            grid with hours and days of the week.</li>
+            <LI>Confirm that the <b>Set Processing Schedule</b> dialog includes <b>OK</b> and 
+            <b>Cancel</b> buttons.</li>
+            <LI>Confirm that the <b>Set Processing Schedule</b> dialog includes <b>Select all</b>
+            and <b>Select none</b> buttons.</li>
+            <LI>Confirm that <b>Select all</b> changes all of the grid cells to green.</li>
+            <LI>Confirm that <b>Select none</b> changes all of the grid cells to white.</li>
+            <LI>Confirm that clicking in a grid cell toggles the color between white and 
+            green.</li>
+            <li>Confirm that clicking in the upper left cell of the grid (i.e., the cell left of
+            "Sun") inverts the current selection.</li>
+    <p>
+            <LI>Confirm that schedule settings are loaded and saved correctly.</li>
+        </ul></li>
+    <p>
+        <li>Confirm the Advanced Processing Configuration dialog has a <b>Continuous processing</b>
+        groupbox with two radio buttons.
+        <ul> 
+            <li>Confirm the default setting is <b>Stop processing once the queue is empty</b>.</li>
+            <li>Confirm the setting of the radio button is persistent.</li>
+        <p>
+            <LI><b>[LegacyRC #5745]</b> Default CPU usage when waiting for files
+            <ul>
+                <li>Prepare an FPS file to process files where it will <b>Keep processing files
+                as they are added to the queue</b>.</li>
+                <li>Confirm that very little CPU usage is noted while the FPS file is just
+                waiting for a file to process.</li>
+                <li>Examine the <b>MillisecondsBetweenDBCheck</b> registry key under 
+                <b>HKCU/Software/Extract 
+                Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.</li>
+                <li>Confirm that the default is <b>2000</b>.</li>
+                <li>Confirm that changing the value to <b>20</b> increases to CPU usage while the
+                FPS file is waiting.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li>Confirm the Advanced Processing Configuration dialog has a <b>Threads for 
+        processing</b> groupbox with two radio buttons.
+        <ul> 
+            <li>Confirm the default setting is <b>Achieve peak performance</b>.</li>
+            <li>Confirm that with the default setting, the edit box and spin control associated
+            with the other radio button are both <b>disabled</b>.</li>
+            <li>Confirm that with the <b>Use threads</b> setting, the edit box and spin control 
+            are both enabled.</li>
+            <li>Confirm the setting of the radio button is persistent.</li>
+            <li><b>[LegacyRC #4312]</b> Confirm that the number of threads setting remains
+            persistent.</li>
+            <li><b>[LegacyRC #4811]</b> Confirm that the edit box is disabled after the
+            processing has completed if the <b>Use threads</b> radio button is not selected.</li>
+            <li><b>[LegacyRC #4314]</b> Confirm that the edit box is enabled after the processing
+            has completed only if the <b>Use threads</b> radio button is selected.</li>
+            <LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab allows no 
+            more than <b>100</b> threads via the spinner control.</li>
+            <LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab allows no 
+            more than <b>100</b> threads via the associated edit box.</li>
+        </ul> </li>
+    <p>
+        <li>Confirm that the Advanced Processing Configuration dialog has a <b>Files to 
+        retrieve</b> group box
         <ul>
-            <li>Prepare an FPS file to process files where it will <b>Keep processing files as they
-            are added to the queue</b>.
-            <li>Confirm that very little CPU usage is noted while the FPS file is just waiting for
-            a file to process.
-            <li>Examine the <b>MillisecondsBetweenDBCheck</b> registry key under 
-            <b>HKCU/Software/Extract 
-            Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.
-            <li>Confirm that the default is <b>2000</b>.
-            <li>Confirm that changing the value to <b>20</b> increases to CPU usage while the FPS
-            file is waiting.
-        </ul>
-    </ul>
+            <li>Confirm that the group box contains a spin control for <b>Retrieve X file(s) at a
+            time from the queue</b>.</li>
+            <li>Confirm that the spin control is restricted to values from 1-5000 inclusives.</li>
+            <li>Confirm that settings are persisted.</li>
+            <li>Confirm that the specified number of files are grabbed by the FAM when you start
+            processing.</li>
+        </ul></li>
+    <p>
+        <li>Confirm that the <b>Advanced...</b> button is disabled while the FAM is 
+        processing.</li>
+    </ul></li>
 <p>
-    <li>Confirm the Processing Setup tab has a <b>Threads for processing</b> groupbox with two 
-    radio buttons.</li>
-    <ul> 
-        <li>Confirm the default setting is <b>Achieve peak performance</b>.
-        <li>Confirm that with the default setting, the edit box and spin control associated with
-        the other radio button are both <b>disabled</b>.
-        <li>Confirm that with the <b>Use threads</b> setting, the edit box and spin control are
-        both enabled.
-        <li>Confirm the setting of the radio button is persistent.
-        <li><b>[LegacyRC #4312]</b> Confirm that the number of threads setting remains persistent.
-        <li><b>[LegacyRC #4811]</b> Confirm that the edit box is disabled after the processing has
-        completed if the <b>Use threads</b> radio button is not selected.
-        <li><b>[LegacyRC #4314]</b> Confirm that the edit box is enabled after the processing has
-        completed only if the <b>Use threads</b> radio button is selected.
-        <LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab allows no more
-        than <b>100</b> threads via the spinner control.
-        <LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab allows no more
-        than <b>100</b> threads via the associated edit box.
-    </ul> 
     <li><b>Drag and drop</b> any .fps file into File Action Manager.
     <li>Confirm that once processing starts, the <b>Add</b>, <b>Remove</b>, <b>Configure</b> 
     buttons, the <b>Up</b> and <b>Down</b> arrows and the controls for <b>Keep processing files as 
@@ -461,7 +483,19 @@
         inactive.
         <li>Confirm that the selected active and inactive cells are displayed with contrasting
         colors.
-    </ul>
+    </ul></li>
+<p>
+    <li><b>[LegacyRC #6085]</b> Error right-clicking on failed file
+    <ul>
+        <li>Run the compute FPS file from the ID Shield demo.</li>
+        <li>Set up a suround context task to run on the images.</li>
+        <li>Remove the USS files for a couple of the input images so they'll fail.</li>
+        <li>Set the FAM to display only the last 3 records in the grids (under Tools &lt; 
+        Options).</li>
+        <li>Run!</li>
+        <li>Once it's finished, right click on the files in the failed files grid and confirm that
+        no exceptions are seen.</li>
+    </ul></li>
 </ul>
 </body>
 </html>
