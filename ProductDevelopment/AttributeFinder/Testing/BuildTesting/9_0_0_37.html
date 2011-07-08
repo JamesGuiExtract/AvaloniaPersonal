@@ -1,0 +1,360 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.37 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.37 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[FlexIDSCore #4105, #4166, #4541, #4562, #4565, #4725]</b> 
+		Redaction resizing
+        	<ul>
+            		<li>Verify some documents that include both <b>angular</b> and 
+			<b>rectangular</b> redactions.
+			<li>Click the grip handle of a redaction
+			<ul>
+            			<li>Confirm that slightly moving the mouse cursor <b>does 
+				not</b> cause the handle's side of the redaction to jump 
+				to the mouse cursor.
+			</ul>
+			<li>Click the grip handle of a very small <b>(1x1)</b> redaction
+			<ul>
+            			<li>Confirm that the redaction <b>does not</b> change size.
+            			<li>Confirm that the redaction <b>does not</b> move.
+			</ul>
+			<li>Create a redaction at a significant angle
+			<li>Use the shrink selection context menu option (possibly several 
+			times) to shrink all sides of the redaction
+			<ul>
+            			<li>Confirm that the redaction <b>continues</b> to shrink.
+			</ul>
+			<li>Create a long redaction at a slight angle
+			<li>Use the <b>+</b> shortcut several times to expand the redaction
+			<ul>
+            			<li>Confirm that the angle of the redaction remains 
+				unchanged.
+			</ul>
+			<li>Experiment with shrinking and enlarging angled redactions
+			<ul>
+            			<li>Confirm that the angle of the redaction remains 
+				unchanged.
+			</ul>
+			<li>Select a highlight
+			<ul>
+				<li>Press and hold the <b>+</b> and <b>-</b> shortcuts to 
+				repeatedly grow and shrink the highlights by large amounts.
+            			<li>Confirm that highlight does not move its center position.
+            			<li>Confirm that when returned to its original size, the 
+				aspect ratio is unchanged.
+			</ul>
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4585]</b> Start menu shortcut for Configure FAM Service
+        	<ul>
+            		<li>Confirm that the shortcut works to open <b>ESFAMService.sdf</b>
+			for editing.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #4720]</b> Document Type FAM Condition
+        	<ul>
+		   	<li>Start a blank <b>File Action Manager</b>.</li> 
+   			<li>Select a database server and database.  Select an action, then 
+			check the <b>Queue files for this action</b> checkbox.</li> 
+      			<li>Confirm the droplist for the Select Condition dialog includes: 
+       	  		<b>Document type condition</b>.</li>
+			<ul>
+       				<li>Confirm clicking on the Configure button brings up the 
+				<b>Configure Document type condition</b> dialog.
+       	    			<li>Confirm that the dialog has a droplist with entries of 
+				<b>met</b> and <b>not met</b> as the fill-in text for 
+				<b>Consider condition as met|not met if the following VOA 
+				file:</b>. 
+            			<li>Confirm that the dialog has an edit box with an associated 
+				<b>Tag Selector</b> button and <b>Browse</b> button.
+            			<li>Confirm that the default text in the edit box is 
+				<b>&ltSourceDocName&gt.voa</b>.
+       				<li>Confirm that the <b>Tag Selector</b> button displays a context 
+               			menu to the immediate right of the button.
+            			<li>Confirm that the items in the context menu include 
+				<b>&ltSourceDocName&gt</b>, <b>&ltFPSFileDir&gt</b>, and a set 
+				of functions that start with $.
+       				<li>Confirm that when an item is chosen it either inserts text at 
+				the cursor position or replaces the highlighted text in the edit box. 
+            			<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        		an <b>Open</b> dialog. 
+       				<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
+				the text in the edit box.</li>
+				<li>Confirm that the dialog includes a <b>has a document type 
+				matching one of the following</b> list box.
+				<li>Confirm that the dialog includes a <b>Select...</b> button.
+				<li>Confirm that the <b>Select...</b> button displays a <b>Select 
+				Document Types</b> dialog.
+				<ul>
+					<li>Confirm that the dialog includes a <b>Document Category:</b> 
+					combo box.
+					<ul>
+						<li>County Document
+						<li>Legal Descriptions
+					</ul>
+					<li>Confirm that <b>County Document</b> is the default choice.
+					<li>Confirm that a multiple selection list box is provided that 
+					includes:
+					<ul>
+						<li>Any Unique
+						<li>Multiply Classified
+						<li>Unknown
+					</ul>
+					<li>Confirm that the list box also contains other types 
+					dependent on the selected category.
+				</ul>
+				<li>Confirm that selecting new document types <b>does not</b> remove any 
+				existing document types.
+				<li>Confirm that the dialog includes a <b>Remove</b> button.
+				<li>Confirm that the <b>Remove</b> button is only enabled when an item 
+				is selected in the list box.
+				<li>Confirm that the <b>Remove</b> button removes the selected entry 
+				from the list box.
+				<li>Confirm that the dialog includes a <b>Clear</b> button.
+				<li>Confirm that the <b>Clear</b> button is only enabled when the list 
+				box is not empty.
+				<li>Confirm that the <b>Clear</b> button removes all entries from the 
+				list box.
+	 		</ul>
+		   	<li>Confirm proper behavior of the condition object.</li> 
+ 		</ul>
+<p>
+        	<li><b>[LegacyRC #5517]</b> New Safenet Drivers
+        	<ul>
+            		<li>Open the <b>USB License Key Manager</b> utility.
+			<li>Select a USB key and confirm that counts are present.
+			<li>Click the <b>Server Status</b> button.  Note that Java needs to be 
+			installed on the test machine.
+            		<li>Confirm that the Sentinel Protection Server Version is <b>7.6.3</b>.
+        	</ul>
+<p>
+        	<li><b>[LegacyRC #6099]</b> Wrong UCLIDExceptionMgmt.dll Installed
+        	<ul>
+            		<li>Check the DLL version number.
+            		<li>Confirm that the version number matches the installed build.
+        	</ul>
+<p>
+        	<li><b>[LegacyRC #6116]</b> Start menu shortcut for View Exception Log
+        	<ul>
+            		<li>Confirm that the shortcut works to open <b>ExtractException.uex</b>.
+        	</ul>
+<p>        
+	        <li><b>[DotNetRC #686]</b> File Timestamp COndition
+        	<ul>
+		   	<li>Start a blank <b>File Action Manager</b>.</li> 
+   			<li>Select a database server and database.  Select an action, then 
+			check the <b>Queue files for this action</b> checkbox.</li>
+	      		<li>Confirm the droplist for the Select Condition dialog includes: 
+       		  	<b>File timestamp condition</b>.</li>
+			<ul> 
+       				<li>Confirm clicking on the Configure button brings up the 
+				<b>Configure File timestamp condition</b> dialog.
+       	    			<li>Confirm that the dialog has a droplist with entries of 
+				<b>met</b> and <b>not met</b> as the fill-in text for 
+				<b>Consider condition as met|not met if the following file:</b>. 
+            			<li>Confirm that the dialog has an edit box with an associated 
+				<b>Tag Selector</b> button and <b>Browse</b> button.
+            			<li>Confirm that the default text in the edit box is 
+				<b>&ltSourceDocName&gt</b>.
+       				<li>Confirm that the <b>Tag Selector</b> button displays a 
+				context menu to the immediate right of the button.
+            			<li>Confirm that the items in the context menu include 
+				<b>&ltSourceDocName&gt</b>, <b>&ltFPSFileDir&gt</b>, and a set 
+				of functions that start with $.
+       				<li>Confirm that when an item is chosen it either inserts text at 
+				the cursor position or replaces the highlighted text in the edit box. 
+            			<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        		an <b>Open</b> dialog. 
+       				<li>Confirm that a file selected in the <b>Open</b> dialog replaces 
+				the text in the edit box.</li>
+				<li>Confirm that the dialog includes a <b>has a timestamp</b> combo 
+				box.
+				<ul>
+					<li>created
+					<li>accessed
+					<li>modified
+				</ul>
+				<li>Confirm that the default combo box selection is <b>modified</b>.
+				<li>Confirm that the dialog includes an <b>in the range</b> radio 
+				button.
+				<ul>
+					<li>Confirm that the two associated combo boxes are enabled 
+					only when the radio button is selected.
+					<li>Confirm that each combo box defaults to a date and time 
+					of the current day at midnight in a <b>MM/DD/YYYY HH:MM:SS</b> 
+					format.
+					<li>Confirm that the combo box also includes <b>AM</b> or 
+					<b>PM</b> at the end of the date and time.
+					<li>Confirm that clicking either combo box causes a calendar 
+					control to drop down allowing the user to select a date.
+					<li>Confirm that selecting a date in the calendar control 
+					modifies the <b>MM/DD/YYYY</b> text but does not modify the 
+					time text.
+					<li>Confirm that the edit control portion of each combo box 
+					allows modification of the time text.
+					<li>Confirm that a meaningful error message is presented if 
+					the range start time is after the range stop time.
+				</ul>
+				<li>Confirm that the dialog includes an <b>equal to</b> radio button.
+				<ul>
+					<li>Confirm that the combo box choices are as follows:
+					<ul>
+						<li>equal to
+						<li>not equal to
+						<li>before
+						<li>equal to or before
+						<li>after
+						<li>equal to or after
+					</ul>
+					<li>Confirm that a collection of radio buttons is indented 
+					from the top-level radio buttons.
+					<ul>
+						<li>a <b>MM/DD/YYYY HH:MM:SS AM/PM</b> timestamp
+						<li>a <b>0 days</b> ago
+						<li>a <b>today</b> combo box
+						<li>the <b>modified</b> timestamp of this file: 
+						combo box
+					</ul>
+					<li>Confirm that none of the radio buttons are selected by 
+					default.
+<p>
+					<li>Confirm that selecting the timestamp radio button enables 
+					the associated combo box.
+					<li>Confirm that each combo box defaults to a date and time of 
+					the current day at midnight in a <b>MM/DD/YYYY HH:MM:SS</b> 
+					format.
+					<li>Confirm that clicking the combo box causes a calendar 
+					control to drop down allowing the user to select a date.
+					<li>Confirm that selecting a date in the calendar control 
+					modifies the <b>MM/DD/YYYY</b> text but does not modify the 
+					time text.
+					<li>Confirm that the edit control portion of each combo box 
+					allows modification of the time text.
+<p>
+					<li>Confirm that the <b>ago</b> radio button includes an 
+					associated spinner control and combo box.
+					<li>Confirm that the associated controls are only enabled 
+					when the radio button is selected.
+					<li>Confirm that the minimum value allowed by the spinner is 
+					<b>0</b>.
+					<li>Confirm that the maximum value allowed by the spinner is 
+					<b>2147483647</b>.
+					<li>Confirm that the following options are available in the 
+					combo box.
+					<ul>
+						<li>seconds
+						<li>minutes
+						<li>hours
+						<li>days
+						<li>weeks
+						<li>months
+						<li>years
+					</ul>
+<p>
+					<li>Confirm that the <b>today</b> combo box is only enabled 
+					when the associated radio button is selected.
+					<li>Confirm that the following options are available in the 
+					combo box.
+					<ul>
+						<li>today
+						<li>yesterday
+						<li>this week
+						<li>last week
+						<li>this month
+						<li>last month
+						<li>this year
+						<li>last year
+					</ul>
+<p>
+					<li>Confirm that the <b>modified</b> combo box is only enabled 
+					when the associated radio button is selected.
+					<li>Confirm that the following options are available in the 
+					combo box.
+					<ul>
+						<li>created
+						<li>accessed
+						<li>modified
+					</ul>
+					<li>Confirm that an edit box along with a tag selector and 
+					browse button are also enabled when the radio button is selected.
+	       				<li>Confirm that the <b>Tag Selector</b> button displays a 
+					context menu to the immediate right of the button.
+            				<li>Confirm that the items in the context menu include 
+					<b>&ltSourceDocName&gt</b>, <b>&ltFPSFileDir&gt</b>, and a set 
+					of functions that start with $.
+       					<li>Confirm that when an item is chosen it either inserts text 
+					at the cursor position or replaces the highlighted text in the 
+					edit box. 
+            				<li>Confirm that the <b>...</b> ( Browse ) button brings up 
+       	        			an <b>Open</b> dialog. 
+       					<li>Confirm that a file selected in the <b>Open</b> dialog 
+					replaces the text in the edit box.</li>
+				</ul>
+			</ul>
+		   	<li>Confirm proper behavior of the condition object.</li> 
+		</ul>
+<p>        
+	        <li><b>[DotNetRC #687]</b> Install and Register 
+		Extract.FileActionManager.Conditions.dll
+        	<ul>
+	            	<li>Confirm that the new condition objects are available directly after 
+			installation (without RegisterAll.bat or Check For New Components).
+		</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
