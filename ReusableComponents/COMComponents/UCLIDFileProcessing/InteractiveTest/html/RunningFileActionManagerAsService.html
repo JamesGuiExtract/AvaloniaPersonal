@@ -16,502 +16,413 @@ called the <b>service machine</b>.  The machine that contains the database is re
 <b>database machine</b>.
 <p>
 <ul>
-    <li><b>Rules, Images, and FPS files</b>
-    <ul>
-        <li><b>FLEX Index</b>
-        <ul>
-            <li>Make a local copy of <b>CT - Manchester - Cott</b> TIF images from Set002.
-            <li>Make a local copy of the most recent <b>CT - Manchester - Cott</b> Indexing rules
-            delivery.  The most recent rules from the internal branch may be used instead, if
-            appropriate.
+    	<li><b>Rules, Images, and FPS files</b>
+    	<ul>
+        	<li><b>General Setup</b>
+        	<ul>
+	        	<li>Review the service instructions for SQL Server 2005 or SQL Server 2008.
+        	</ul>
+        	<li><b>FLEX Index</b>
+        	<ul>
+            		<li>Make a local copy of <b>CT - Manchester - Cott</b> TIF images from Set002.
+            		<li>Make a local copy of the most recent <b>CT - Manchester - Cott</b> 
+			Indexing rules delivery.  The most recent rules from the internal branch may 
+			be used instead, if appropriate.
 <p>
-            <li>Create a <b>Queuing</b> FPS file to supply the images for processing. Use a UNC
-            path for the Folder file supplier.
-            <li>Create a <b>Listening</b> FPS file to supply existing images for processing. Also 
-            define a second supplier to listen to a folder. Use UNC paths for the Folder file
-            suppliers.
-            <li>Create a <b>Processing</b> FPS file to process the images. Use a <b>Core: Execute
-            rules</b> task.
+            		<li>Create a <b>Queuing</b> FPS file to supply the images for processing. 
+			Use a UNC path for the Folder file supplier.
+            		<li>Create a <b>Listening</b> FPS file to supply existing images for 
+			processing. Also define a second supplier to listen to a folder. Use UNC 
+			paths for the Folder file suppliers.
+            		<li>Create a <b>Processing</b> FPS file to process the images. Use a 
+			<b>Core: Execute rules</b> task.  Also use the <b>Keep processing</b> 
+			option.
 <p>
-            <li>Use the <b>SQLCDBEditor.exe</b> to add the FPS files to the <b>ESFAMService.sdf</b>
-            database. The database is created during installation and is located in the 
-            <b>CommonComponents</b> folder.
-            <li>Activate the FPS files appropriate for the test to be executed.
-        </ul>
-        <li><b>ID Shield</b>
-        <ul>
-            <li>Make a local copy of <b>IL - Lake - Cott</b> TIF images from Set002.
-            <li>Make a local copy of the most recent <b>IL - Lake - Cott</b> Redaction rules
-            delivery.
+            		<li>Use <b>Configure FAM Service</b> to add the FPS files to the 
+			<b>ESFAMService.sdf</b> database. The database is created during installation 
+			and is located in the <b>ESFAMService</b> folder.
+            		<li>Activate the FPS files appropriate for the test to be executed.
+        	</ul>
+        	<li><b>ID Shield</b>
+        	<ul>
+            		<li>Make a local copy of <b>IL - Lake - Cott</b> TIF images from Set002.
+            		<li>Make a local copy of the most recent <b>IL - Lake - Cott</b> 
+			Redaction rules delivery.
 <p>
-            <li>Create a <b>Queuing</b> FPS file to supply the images for processing.  Use a UNC
-            path for the Folder file supplier.
-            <li>Create a <b>Listening</b> FPS file to supply existing images for processing.  Also
-            define a second supplier to listen to a folder. Use UNC paths for the Folder file
-            suppliers.
-            <li>Create a <b>Processing</b> FPS file to process the images.  Use a <b>Core: Execute
-            rules</b> task and a <b>Redaction: Create redacted image</b> task.
+            		<li>Create a <b>Queuing</b> FPS file to supply the images for processing.  
+			Use a UNC path for the Folder file supplier.
+            		<li>Create a <b>Listening</b> FPS file to supply existing images for 
+			processing.  Also define a second supplier to listen to a folder. Use UNC 
+			paths for the Folder file suppliers.
+            		<li>Create a <b>Processing</b> FPS file to process the images.  Use a 
+			<b>Core: Execute rules</b> task and a <b>Redaction: Create redacted 
+			image</b> task.  Also use the <b>Keep processing</b> option.
 <p>
-            <li>Use the <b>SQLCDBEditor.exe</b> to add the FPS files to the <b>ESFAMService.sdf</b>
-            database.  The database is created during installation and is located in the
-            <b>CommonComponents</b> folder.
-            <li>Activate the FPS files appropriate for the test to be executed.
-        </ul>
-    </ul>
+            		<li>Use <b>Configure FAM Service</b> to add the FPS files to the 
+			<b>ESFAMService.sdf</b> database.  The database is created during 
+			installation and is located in the <b>ESFAMService</b> folder.
+            		<li>Activate the FPS files appropriate for the test to be executed.
+        	</ul>
+    	</ul>
 <p>
-    <li><b>FLEX Index Basic: Local system user, single machine</b>
-    <ul>
-        <li>Confirm that the database is clear.
-        <li>Set the FLEX Index <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
-        <li>Set the service startup type to <b>Automatic</b>.
-        <li>Restart the <b>service machine</b>.  Do not login.</li>
-        <li>Using a different machine, open up a FAM instance connected to the processing database
-        and activate the <b>Statistics</b> tab.</li>
-        <li>Confirm that files are queuing and processing.</li>
+    	<li><b>FLEX Index Basic: Specified domain user, single machine, remote DB</b>
+    	<ul>
+        	<li>Confirm that the database is clear.
+        	<li>Set the <b>NumberOfInstances</b> fields to 1 for the FLEX Index <b>Queuing</b> 
+		and <b>Processing</b> FPS files.
+        	<li>Set the service startup type to <b>Automatic</b> or <b>Automatic (Delayed)</b>.
+        	<li>Restart the <b>service machine</b>.  Do not login.</li>
+        	<li>Using a different machine, open up a FAM instance connected to the processing 
+		database and activate the <b>Statistics</b> tab.</li>
+        	<li>Confirm that files are queuing and processing.</li>
 <p>
-        <li>Login to the <b>service machine</b>.</li>
-        <li>Confirm via <b>Task Manager</b> that the following instances are active:
-        <ul> 
-            <li><b>ESFAMProcess.exe</b> - one instance for the service
-            <li><b>FAMProcess.exe</b> - one instance for the Queuing FPS file
-            <li><b>FAMProcess.exe</b> - one instance for the Processing FPS file
-        </ul> 
-        <li>Stop the service from the <b>Services</b> management console.
-        <li>If queuing has not finished on its own, confirm that it stops immediately.
-        <li>Confirm that processing stops gracefully as soon as the currently processing files are
-        finished.
-        <ul>
-            <li>Confirm that an application trace is logged when the service <b>starts</b>.
-            <li>Confirm that an application trace is logged when the service <b>is stopping</b>.
-            <li>Confirm that an application trace is logged when the service <b>has stopped</b>.
-        </ul>
-        <li>Confirm via <b>Task Manager</b> that none of the above EXEs are continuing to run.
-        <li>Confirm via <b>DB Admin</b> that no files are left in <b>Processing</b> mode.
-    </ul>
+        	<li>Login to the <b>service machine</b>.</li>
+        	<li>Confirm via <b>Task Manager</b> that the following instances are active:
+        	<ul> 
+            		<li><b>ESFAMService.exe</b> - one instance for the service
+            		<li><b>FAMProcess.exe</b> - one instance for the Queuing FPS file
+            		<li><b>FAMProcess.exe</b> - one instance for the Processing FPS file
+        	</ul> 
+        	<li>Stop the service from the <b>Services</b> management console.
+        	<li>If queuing has not finished on its own, confirm that it stops immediately.
+        	<li>Confirm that processing stops gracefully as soon as the currently processing 
+		files are finished.
+        	<ul>
+            		<li>Confirm that an application trace is logged when the service 
+			<b>starts</b>.
+            		<li>Confirm that an application trace is logged when the service 
+			<b>is stopping</b>.
+            		<li>Confirm that an application trace is logged when the service 
+			<b>has stopped</b>.
+        	</ul>
+        	<li>Confirm via <b>Task Manager</b> that none of the above EXEs are continuing 
+		to run.
+        	<li>Confirm via <b>DB Admin</b> that no files are left in <b>Processing</b> mode.
+    	</ul>
 <p>
-    <li><b>ID Shield Basic: Local system user, single machine</b>
-    <ul>
-        <li>Confirm that the database is clear.
-        <li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
-        <li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
-        <li>Restart the <b>service machine</b>.</li>
-        <li>Using a different machine, open up a FAM instance connected to the processing database
-        and activate the <b>Statistics</b> tab.</li>
-        <li>Confirm that files are queuing and processing.</li>
-        <li>Confirm that redacted images are being created.</li>
+    	<li><b>ID Shield Basic: Specified domain user, single machine, remote DB</b>
+    	<ul>
+        	<li>Confirm that the database is clear.
+        	<li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
+        	<li>Set the service startup type to <b>Automatic</b> or <b>Automatic (Delayed)</b>.
+        	<li>Restart the <b>service machine</b>.</li>
+        	<li>Using a different machine, open up a FAM instance connected to the processing 
+		database and activate the <b>Statistics</b> tab.</li>
+        	<li>Confirm that files are queuing and processing.</li>
+        	<li>Confirm that redacted images are being created.</li>
 <p>
-        <li>Login to the <b>service machine</b>.</li>
-        <li>Confirm via <b>Task Manager</b> that the following instances are active:
-        <ul> 
-            <li><b>ESFAMProcess.exe</b> - one instance for the service
-            <li><b>FAMProcess.exe</b> - one instance for the Queuing FPS file
-            <li><b>FAMProcess.exe</b> - one instance for the Processing FPS file
-        </ul> 
-        <li>Stop the service from the <b>Services</b> management console.
-        <li>If queuing has not finished on its own, confirm that it stops immediately.
-        <li>Confirm that processing stops gracefully as soon as the currently processing files are
-        finished.
-        <li>Confirm via <b>Task Manager</b> that none of the above EXEs are continuing to run.
-        <li>Confirm via <b>DB Admin</b> that no files are left in <b>Processing</b> mode.
-    </ul>
+        	<li>Login to the <b>service machine</b>.</li>
+        	<li>Confirm via <b>Task Manager</b> that the following instances are active:
+        	<ul> 
+            		<li><b>ESFAMService.exe</b> - one instance for the service
+            		<li><b>FAMProcess.exe</b> - one instance for the Queuing FPS file
+            		<li><b>FAMProcess.exe</b> - one instance for the Processing FPS file
+        	</ul> 
+        	<li>Stop the service from the <b>Services</b> management console.
+        	<li>If queuing has not finished on its own, confirm that it stops immediately.
+        	<li>Confirm that processing stops gracefully as soon as the currently processing 
+		files are finished.
+        	<li>Confirm via <b>Task Manager</b> that none of the above EXEs are continuing 
+		to run.
+        	<li>Confirm via <b>DB Admin</b> that no files are left in <b>Processing</b> mode.
+    	</ul>
 <p>
-    <li><b>FLEX Index Complex:</b>
-    <ul>
-        <li><b>Local system user, listening for supplied files</b>
-        <ul>
-            <li>Confirm that the database is clear.
-            <li>Prepare the <b>Listening</b> FPS file to only supply images via listening to a
-            folder on the local machine.
-            <li>Set the FLEX Index <b>Listening</b> and <b>Processing</b> FPS files to AutoStart.
-            <li>Set the service startup type to <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.  Do not login.</li>
-            <li>Using a different machine, open up a FAM instance connected to the processing 
-            database and activate the <b>Statistics</b> tab.</li>
-            <li>Confirm that files <b>are not</b> queuing and processing.</li>
-            <li>Add some files to the remote folder to test the listening feature.
-            <li>Confirm that files <b>are</b> queuing and processing.</li>
-        </ul>
-        <li><b>Specified user, UNC path for supplying</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Prepare the service to use login information for a specified domain user.
-            <li>Prepare the <b>Queuing</b> FPS file to supply images from a UNC path.
-            <li>Set the FLEX Index <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
-            <li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.  Do not login.</li>
-            <li>Using a different machine, open up a FAM instance connected to the processing
-            database and activate the <b>Statistics</b> tab.</li>
-            <li>Confirm that files are queuing and processing.</li>
-        </ul>
-    </ul>
+    	<li><b>FLEX Index Complex:</b>
+    	<ul>
+        	<li><b>Specified domain user, listening for supplied files, remote DB</b>
+        	<ul>
+            		<li>Confirm that the database is clear.
+            		<li>Prepare the <b>Listening</b> FPS file to only supply images via 
+			listening to a folder on the local machine.
+            		<li>Set the FLEX Index <b>Listening</b> and <b>Processing</b> FPS 
+			files to AutoStart.
+            		<li>Set the service startup type to <b>Automatic</b>.
+            		<li>Restart the <b>service machine</b>.  Do not login.</li>
+            		<li>Using a different machine, open up a FAM instance connected to the 
+			processing database and activate the <b>Statistics</b> tab.</li>
+            		<li>Confirm that files <b>are not</b> queuing and processing.</li>
+            		<li>Add some files to the remote folder to test the listening feature.
+            		<li>Confirm that files <b>are</b> queuing and processing.</li>
+        	</ul>
 <p>
-    <li><b>ID Shield Complex:</b>
-    <ul>
-        <li><b>Specified users, two machines</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>For each service machine, set the ID Shield <b>Queuing</b> and <b>Processing</b> 
-            FPS files to AutoStart.
-            <li>Set the service startup types to <b>Delayed</b> or <b>Automatic</b>.
-            <li>Restart the <b>service machines</b>.  Do not login.</li>
-            <li>Using a different machine, open up a FAM instance connected to the processing
-            database and activate the <b>Statistics</b> tab.</li>
-            <li>Confirm that files are queuing and processing.</li>
-            <li>Confirm that redacted images are being created.</li>
+        	<li><b>Local system user, local database, evaluation license</b>
+        	<ul>
+            		<li>Create a local database
+			<li>Create a <b>Queuing</b> FPS file to supply local images.
+			<li>Create a <b>Processing</b> FPS file.  Use the <b>Keep 
+			processing</b> option.
+			<li>Create a temporary license and rename or delete any other 
+			license files on the test machine.
+            		<li>Modify <b>ESFAMService.sdf</b> to execute a single instance of the 
+			<b>Queuing</b> and <b>Processing</b> FPS files.
+			<li>Configure the service to log on as the <b>Local System account</b>.
+            		<li>Set the service startup type to <b>Automatic</b> or 
+			<b>Automatic (Delayed)</b>.
+            		<li>Restart the <b>service machine</b>.  Do not login.</li>
+            		<li>Using a different machine, open up a DB Admin instance connected to 
+			the processing database.</li>
+            		<li>Confirm that files <b>are</b> queuing and processing.</li>
+        	</ul>
+    	</ul>
 <p>
-            <li>Login to one of the service machines and <b>Stop</b> the <b>ESFAMProcess.exe</b>
-            service.
-            <li>Confirm that files are continuing to process.</li>
-            <li>Confirm that redacted images are being created.</li>
-            <li><b>Start</b> the <b>ESFAMProcess.exe</b> service.
+    	<li><b>ID Shield Complex:</b>
+    	<ul>
+        	<li><b>Specified users, two machines</b>
+        	<ul>
+            		<li>Confirm on the database machine that the database is clear.
+            		<li>For each service machine, execute a single instance of the ID 
+			Shield <b>Queuing</b> and <b>Processing</b> FPS files.
+            		<li>Set the service startup types to <b>Automatic</b> or 
+			<b>Automatic (Delayed)</b>.  Do not login.</li>
+            		<li>Using a different machine, open up a FAM instance connected to the 
+			processing database and activate the <b>Statistics</b> tab.</li>
+            		<li>Confirm that files are queuing and processing.</li>
+            		<li>Confirm that redacted images are being created.</li>
 <p>
-            <li>Login to the other service machine and <b>Stop</b> the <b>ESFAMProcess.exe</b>
-            service.
-            <li>Confirm that files are continuing to process.</li>
-            <li>Confirm that redacted images are being created.</li>
-        </ul>
-        <li><b>Specified user, scheduled processing</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Modify the <b>Processing</b> FPS file to use scheduled processing.  Ensure that
-            processing <b>will not</b> be active when the test commences.
-            <li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
-            <li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.</li>
-            <li>Using a different machine, open up a FAM instance connected to the processing
-            database and activate the <b>Statistics</b> tab.</li>
-            <li>Confirm that files <b>are</b> queuing.</li>
-            <li>Confirm that files <b>are not</b> processing.</li>
-            <li>Confirm that redacted images <b>are not</b> being created.</li>
-            <li>Wait until the scheduled processing is due to start.
-            <li>Confirm that files <b>are</b> processing.</li>
-            <li>Confirm that redacted images <b>are</b> being created.</li>
-            <li>Confirm that application traces are logged when processing starts and stops per
-            schedule.
-        </ul>
-        <li><b>Specified user, process specific number of files</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Modify the <b>NumberOfFilesToProcessPerFAMInstance</b> setting in 
-            <b>ESFAMService.sdf</b> to <b>100</b>.
-            <li>Confirm that the <b>Processing</b> FPS file is configured to use half of the
-            available number of threads. 
-            <li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
-            <li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.</li>
-            <li>Log in as the specified user and confirm that new instances of <b>FAMProcess.exe</b> are being created appropriately.
-            <li><b>[DotNet #453]</b> Confirm that after a period of processing, there are no
-            <b>FAMProcess.exe</b> instances left orphaned on the system.
-        </ul>
-        <li><b>Specified user, stop service during processing of large file</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Provide very large (~100 pages) files for processing.
-            <li>Modify the <b>Processing</b> FPS file to use a single thread.
-            <li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to AutoStart.
-            <li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.</li>
-            <li>Using a different machine, open up a FAM instance connected to the processing
-            database and activate the <b>Statistics</b> tab.</li>
-            <li>Confirm that files are queuing and processing.</li>
-            <li>Confirm that redacted images are being created.</li>
+            		<li>Login to one of the service machines and <b>Stop</b> the 
+			<b>ESFAMProcess.exe</b> service.
+            		<li>Confirm that files are continuing to process.</li>
+            		<li>Confirm that redacted images are being created.</li>
+            		<li><b>Start</b> the <b>ESFAMProcess.exe</b> service.
 <p>
-            <li>Login to the service machine and <b>Stop</b> the <b>ESFAMProcess.exe</b> service.
-            <li>Confirm that the service stops processing before the large image has finished.
-            <li>Confirm that the redacted image is not created.</li>
-        </ul>
-    </ul>
+            		<li>Login to the other service machine and <b>Stop</b> the 
+			<b>ESFAMProcess.exe</b> service.
+            		<li>Confirm that files are continuing to process.</li>
+            		<li>Confirm that redacted images are being created.</li>
+        	</ul>
 <p>
-    <li><b>Error Handling:</b>
-    <ul>
-        <li><b>Run multiple FPS files, then stop the service</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Create four or more FPS files configured for AutoStart.
-            <li>Set the service startup type to <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.</li>
-            <li>Confirm that files are processing.</li>
-            <li><b>Stop</b> the service.
-            <li>Confirm that all of the <b>FAMProcess.exe</b> instances stop processing.</li>
-        </ul>
-        <li><b>Run multiple FPS files, then kill some</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Create four or more FPS files configured for AutoStart.
-            <li>Set the service startup type to <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.</li>
-            <li>Confirm that files are processing.</li>
-            <li>From <b>Task Manager</b>, kill two of the running <b>FAMProcess.exe</b> instances.
-            <li>Confirm that the remaining <b>FAMProcess.exe</b> instances continue to run.</li>
-        </ul>
-        <li><b>Stop the service after killing FPS files</b>
-        <ul>
-            <li>Continuing the above test, <b>Stop</b> the <b>Extract Systems FAM service</b>
-            service from the Services management console.
-            <li>Confirm that each running <b>FAMProcess.exe</b> instance finishes processing the
-            active files and then stops gracefully.</li>
-            <li><b>[DotNet #358, #414]</b> Confirm that <b>ELI28498</b> exceptions are not seen for
-            each previously killed instance of FAMProcess.exe.  It is acceptable that these
-            exceptions are wrapped in a more meaningful exception.
-        </ul>
-        <li><b>Restart the stopped service</b>
-        <ul>
-            <li>Continuing the above test, <b>Start</b> the <b>Extract Systems FAM service</b>
-            service from the Services management console.
-            <li>Confirm that each of the original four or more FPS files start processing files.
-        </ul>
+        	<li><b>Specified user, scheduled processing</b>
+        	<ul>
+            		<li>Confirm on the database machine that the database is clear.
+            		<li>Modify the <b>Processing</b> FPS file to use scheduled processing.  
+			Ensure that processing <b>will not</b> be active when the test commences.
+            		<li>Set the ID Shield <b>Queuing</b> and <b>Processing</b> FPS files to 
+			AutoStart.
+            		<li>Set the service startup type to <b>Delayed</b> or <b>Automatic</b>.
+            		<li>Restart the <b>service machine</b>.</li>
+            		<li>Using a different machine, open up a FAM instance connected to the 
+			processing database and activate the <b>Statistics</b> tab.</li>
+            		<li>Confirm that files <b>are</b> queuing.</li>
+            		<li>Confirm that files <b>are not</b> processing.</li>
+            		<li>Confirm that redacted images <b>are not</b> being created.</li>
+            		<li>Wait until the scheduled processing is due to start.
+            		<li>Confirm that files <b>are</b> processing.</li>
+            		<li>Confirm that redacted images <b>are</b> being created.</li>
+            		<li>Confirm that application traces are logged when processing starts 
+			and stops per schedule.
+        	</ul>
+    	</ul>
 <p>
-        <li><b>Auto-revert after restart of machine</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Create one FPS file configured for AutoStart.
-            <li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> to <b>5</b>.
-            <li>Provide several large (20-30+ pages) images for processing.
-            <li>Set the service startup type to <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.</li>
-            <li>Confirm that files are processing.</li>
-            <li><b>Restart</b> the test machine from the Start menu.
-            <li>Confirm that the <b>FAMProcess.exe</b> instance does not gracefully finish its
-            processing.
-            <li>Confirm that an Application trace message is logged for <b>FAM Service stopping</b>.
-            <li>Confirm that an Application trace message is logged for <b>FAM Service stopped</b>.
-            <li>Confirm on the database machine that one or more files are stuck in 
-            <b>Processing</b>.</li>
-            <li>Confirm that after approximately 5 minutes, the files that were stuck in Processing
-            revert to Pending and are processed by the service.
-        </ul>
+    	<li><b>Error Handling:</b>
+    	<ul>
+        	<li><b>Run multiple FPS files, then stop the service</b>
+        	<ul>
+            		<li>Confirm on the database machine that the database is clear.
+            		<li>Prepare four or more FPS file instances.
+            		<li>Set the service startup type to <b>Automatic</b> or <b>Automatic 
+			(Delayed)</b>.
+            		<li>Restart the <b>service machine</b>.</li>
+            		<li>Confirm that files are processing.</li>
+            		<li><b>Stop</b> the service.
+            		<li>Confirm that all of the <b>FAMProcess.exe</b> instances stop 
+			processing.</li>
+        	</ul>
 <p>
-        <li><b>[DotNetRC #363] Clear database while processing</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Create one or more FPS files configured for AutoStart.
-            <li>Set the service startup type to <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.</li>
-            <li>Confirm that files are processing.</li>
-            <li><b>Clear</b> the database.
-            <li>Confirm that the meaningful errors are logged.</li>
-            <li>Confirm that the service can be stopped without additional errors.</li>
-        </ul>
+        	<li><b>Run multiple FPS files, then kill some</b>
+        	<ul>
+            		<li>Confirm on the database machine that the database is clear.
+            		<li>Prepare four or more FPS file instances.
+            		<li>Set the service startup type to <b>Automatic</b> or <b>Automatic 
+			(Delayed)</b>.
+            		<li>Restart the <b>service machine</b>.</li>
+            		<li>Confirm that files are processing.</li>
+            		<li>From <b>Task Manager</b>, kill two of the running 
+			<b>FAMProcess.exe</b> instances.
+            		<li>Confirm that the remaining <b>FAMProcess.exe</b> instances 
+			continue to run.</li>
+        	</ul>
 <p>
-        <li><b>Run multiple FPS files, then gracefully restart the machine</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> to <b>5</b>.
-            <li>Create four or more FPS files configured for AutoStart.
-            <li>Set the service startup type to <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.</li>
-            <li>Confirm that files are processing.</li>
-            <li><b>[DotNet #421]</b> Handling the OnShutdown event
-            <ul>
-                <li><b>Restart</b> the test machine from the Start menu.
-                <li>Confirm that the <b>FAMProcess.exe</b> instances gracefully finish their
-                processing.</li>
-                <li>Confirm that files are processing normally after restart.</li>
-                <li>Confirm that if files were stuck in <b>Processing</b> mode during the restart,
-                that they automatically revert to <b>Pending</b> mode.</li>
-            </ul>
-            <li><b>[DotNet #444]</b> Confirm that <b>ELI28497</b> is not seen in the exception log.
-        </ul>
+        	<li><b>Stop the service after killing FPS files</b>
+        	<ul>
+            		<li>Continuing the above test, <b>Stop</b> the <b>Extract Systems 
+			FAM service</b> service from the Services management console.
+            		<li>Confirm that each running <b>FAMProcess.exe</b> instance finishes 
+			processing the active files and then stops gracefully.</li>
+            		<li><b>[DotNet #358, #414]</b> Confirm that <b>ELI28498</b> exceptions 
+			are not seen for each previously killed instance of FAMProcess.exe.  
+			It is acceptable that these exceptions are wrapped in a more meaningful 
+			exception.
+        	</ul>
 <p>
-        <li><b>Run multiple FPS files, then ungracefully restart the machine</b>
-        <ul>
-            <li>Confirm on the database machine that the database is clear.
-            <li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> to <b>5</b>.
-            <li>Create four or more FPS files configured for AutoStart.
-            <li>Set the service startup type to <b>Automatic</b>.
-            <li>Restart the <b>service machine</b>.</li>
-            <li>Confirm that files are processing.</li>
-            <li><b>Restart</b> the test machine by pressing the power button.
-            <li>Confirm that files are processing normally after restart.</li>
-            <li>Confirm that files stuck in <b>Processing</b> mode during the restart automatically
-            revert to <b>Pending</b> mode.</li>
-        </ul>
-    </ul>
+        	<li><b>Restart the stopped service</b>
+        	<ul>
+            		<li>Continuing the above test, <b>Start</b> the <b>Extract Systems 
+			FAM service</b> service from the Services management console.
+            		<li>Confirm that each of the original four or more FPS file instances 
+			start processing files.
+        	</ul>
 <p>
-    <li><b>Miscellaneous</b>
-    <ul>
-        <LI><b>[DotNet #370, #373, #374, #431]</b> FAM service
-        <ul>
-            <li>Confirm that <b>ESFAMService.sdf</b> is located in the <b>CommonComponents</b> 
-            folder.
-            <li>Confirm that <b>ESFAMService.sdf</b> contains a <b>Settings</b> table.
-            <li>Confirm that the <b>Settings</b> table includes a <b>SleepTimeOnStart</b> field.
-            <li>Confirm that the <b>SleepTimeOnStart</b> field defaults to <b>120000</b>.  Units
-            are milliseconds.
-            <li>Confirm that the <b>Settings</b> table includes a <b>DependentServices</b> field.
-            <li>Confirm that the <b>DependentServices</b> field is empty by default.
+        	<li><b>Run multiple FPS files, then gracefully restart the machine</b>
+        	<ul>
+            		<li>Confirm on the database machine that the database is clear.
+            		<li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> 
+			to <b>5</b>.
+            		<li>Prepare four or more FPS file instances.
+            		<li>Set the service startup type to <b>Automatic</b> or <b>Automatic 
+			(Delayed)</b>.
+            		<li>Restart the <b>service machine</b>.</li>
+            		<li>Confirm that files are processing.</li>
+            		<li><b>Restart</b> the test machine from the Start menu.
+            		<li>Confirm that Application trace messages are logged for <b>FAM 
+			Service stopping</b>.
+            		<li>Confirm that Application trace messages are logged for <b>FAM 
+			Service stopped</b>.
+            		<li>Check on the database machine to see if one or more files are stuck 
+			in <b>Processing</b> mode.</li>
+            		<li>Confirm that after approximately 5 minutes, any files that were 
+			stuck in Processing mode revert to Pending and are processed by the 
+			service.
+            		<li><b>[DotNet #444]</b> Confirm that <b>ELI28497</b> is not seen in 
+			the exception log.
+        	</ul>
 <p>
-            <li>Exercise the FAM service and confirm that the service does not start until after
-            the <b>SleepTimeOnStart</b> value.
-            <li>Add an entry to the <b>DependentServices</b> field.  Confirm that the service is
-            not currently running.
-            <li>Confirm that the FAM service does start but that <b>FAMProcess.exe</b> does not
-            start if the specified dependent service has not started.
-            <li>Confirm that an exception is logged after the sleep time has expired noting which
-            dependent services have not started.
-            <li>Start the dependent service.
-            <li>Confirm that <b>FAMProcess.exe</b> starts.
-            <li>Stop the FAM service.
+        	<li><b>Run multiple FPS files, then ungracefully restart the machine</b>
+        	<ul>
+            		<li>Confirm on the database machine that the database is clear.
+            		<li>Set the <b>AutoRevertTimeOutInMinutes</b> field in <b>DBInfo</b> 
+			to <b>5</b>.
+            		<li>Prepare four or more FPS file instances.
+            		<li>Set the service startup type to <b>Automatic</b> or <b>Automatic 
+			(Delayed)</b>.
+            		<li>Restart the <b>service machine</b>.</li>
+            		<li>Confirm that files are processing.</li>
+            		<li><b>Restart</b> the test machine by pressing the power button.
+            		<li>Confirm that files are processing normally after restart.</li>
+            		<li>Confirm that files stuck in <b>Processing</b> mode during the 
+			restart automatically revert to <b>Pending</b> mode.</li>
+        	</ul>
+    	</ul>
 <p>
-            <li>Add more entries to the <b>DependentServices</b> field using a pipe character as a
-            delimiter.
-            <li>Confirm that the FAM service does not start if only some of the specified dependent
-            services have started.
-            <li>Confirm that an exception is logged after the sleep time has expired noting which
-            dependent services have not started.
-            <li>Stop the FAM service.
-            <li>Confirm that an exception is logged noting which dependent services have still not
-            started as of the stop request.
-        </ul>
+    	<li><b>Service Database - FPSFile Table</b>
+    	<ul>
+        	<LI><b>FileName</b> - Exercised by previous test cases
+        	<LI><b>NumberOfInstances</b> - Exercised by previous test cases
+        	<LI><b>NumberOfFilesToProcess</b> - Exercised by previous test cases
+        	<ul>
+            		<li>Confirm that the default setting is <b>-1</b>.
+            		<li>Confirm that if a different value is specified it overrides the 
+			<b>NumberOfFilesToProcessPerFAMInstance</b> in the <b>Settings</b> 
+			table.
+			<ul>
+	            		<li><b>[DotNet #453]</b> Confirm that after a period of 
+				processing, there are no <b>FAMProcess.exe</b> instances left 
+				orphaned on the system.
+			</ul>
+            		<li>Confirm that if the default value is retained, the 
+			<b>NumberOfFilesToProcessPerFAMInstance</b> field in the <b>Settings</b> 
+			table is used.
+        	</ul>        
+    	</ul>
 <p>
-        <LI><b>[DotNet #379, #408, #410, LegacyRC #5670]</b> FAM Service
-        <ul>
-            <LI>Confirm that the <b>Settings</b> table in the <b>ESFAMService.sdf</b> database
-            contains an entry for <b>NumberOfFilesToProcessPerFAMInstance</b>.
-            <li>Confirm that the default setting is <b>0</b>.
-            <li>Confirm that for a <b>zero</b> value, the service continues to run as long as files
-            are available to process.
-            <li>Confirm that for a <b>non-zero</b> value, the service processes only the specified
-            number of files.
-            <li>Confirm that after processing the specified number of files, the 
-            <b>FAMProcess.exe</b> instance is automatically killed and then another 
-            <b>FAMProcess.exe</b> instance is automatically started.
+    	<li><b>Service Database - Settings Table</b>
+    	<ul>
+        	<LI><b>SleepOnStart</b>
+        	<ul>
+            		<li>Confirm that the <b>SleepTimeOnStart</b> field defaults to 
+			<b>120000</b>.  Units are milliseconds.
+            		<li>Exercise the FAM service and confirm that the service does not 
+			start until after the <b>SleepTimeOnStart</b> value.
+	    	</ul>
 <p>
-            <li>Confirm that a <b>SkipAuthenticationForServicesOnMachines</b> field exists in the
-            <b>DBInfo</b> table.
-            <li>Enable user authentication via <b>RequireAuthenticationBeforeRun</b>.
-            <li>Confirm that running an FPS file in normal mode correctly requires a user to be
-            defined in the database and to provide a password.
-            <li>Add the test machine to the comma-separated list of machines for 
-            <b>SkipAuthenticationForServicesOnMachines</b>.
-            <li>Confirm that the FAM service runs as expected without requiring a password.
-            <li>Confirm (again) that running an FPS file in normal mode correctly requires a user
-            to be defined in the database and to provide a password.
+        	<LI><b>DependentServices</b>
+        	<ul>
+            		<li>Confirm that the <b>DependentServices</b> field is empty by default.
+            		<li>Add an entry to the <b>DependentServices</b> field.  Confirm that 
+			the service is not currently running.
+            		<li>Confirm that the FAM service does start but that <b>FAMProcess.exe</b> 
+			does not start if the specified dependent service has not started.
+            		<li>Confirm that an exception is logged after the sleep time has expired 
+			noting which dependent services have not started.
+            		<li>Start the dependent service.
+            		<li>Confirm that <b>FAMProcess.exe</b> starts.
+            		<li>Stop the FAM service.
 <p>
-            <li>Remove the test machine from the comma-separated list of machines for 
-            <b>SkipAuthenticationForServicesOnMachines</b>.
-            <li>Prepare FPS files to be run via the FAM service against at least two databases.
-            <li>Configure one database to <b>require</b> user authentication.
-            <li>Configure another database to <b>not require</b> user authentication.
-            <li>Confirm that the FAM service logs an expection for the FPS file processing files
-            for the database that requries user authentication.
-            <li>Confirm that the other FPS file processes files as expected.
-            <li>Stop the service.
-            <li>Configure each database to require user authentication.
-            <li>Restart the service.
-            <li>Confirm that the FAM service logs a stop message and stops running since no FPS
-            file can be exercised without user authentication.
-            <li>Add the test machine to the comma-separated lists of machines for 
-            <b>SkipAuthenticationForServicesOnMachines</b>.
-            <li>Restart the service.
-            <li>Confirm that the FAM service and processing EXEs run as expected without requiring
-            a password.
-        </ul>
+            		<LI>Confirm that the <b>DependentServices</b> field works properly with 
+			<b>real</b> names of services.
+            		<LI>Confirm that the <b>DependentServices</b> field works properly with 
+			<b>display</b> names of services.
 <p>
-        <LI><b>[DotNet #412]</b> Rename ESFAMService.sdf with installation
-        <ul>
-            <LI>Move <b>ESFAMService.sdf</b> from the CommonComponents folder.
-            <li>Uninstall FLEX Index or ID Shield.
-            <li>Restore <b>ESFAMService.sdf</b> to the CommonComponents folder.
-            <li>Install FLEX Index or ID Shield.
-            <Li>Confirm that <b>ESFAMService.sdf</b> is renamed with a meaningful timestamp.
-        </ul>
+            		<li>Add more entries to the <b>DependentServices</b> field using a pipe 
+			character as a delimiter.
+            		<li>Confirm that the FAM service does not start if only some of the 
+			specified dependent services have started.
+            		<li>Confirm that an exception is logged after the sleep time has expired 
+			noting which dependent services have not started.
+            		<li>Stop the FAM service.
+            		<li>Confirm that an exception is logged noting which dependent services 
+			have still not started as of the stop request.
+	    	</ul>
 <p>
-        <LI><b>[DotNet #413]</b> ESFAMService.sdf schema version
-        <ul>
-            <LI>Confirm that the <b>Settings</b> table in <b>ESFAMService.sdf</b> includes a
-            <b>DBSchema</b> field.
-        </ul>
+        	<LI><b>NumberOfFilesToProcessPerFAMInstance</b>
+        	<ul>
+            		<li>Confirm that the default setting is <b>0</b>.
+            		<li>Confirm that for a <b>zero</b> value, the service continues to run as 
+			long as files are available to process.
+            		<li>Confirm that for a <b>non-zero</b> value, the service processes only 
+			the specified number of files.
+            		<li>Confirm that after processing the specified number of files, the 
+            		<b>FAMProcess.exe</b> instance is automatically killed and then another 
+            		<b>FAMProcess.exe</b> instance is automatically started.
+	    	</ul>
 <p>
-        <LI><b>[DotNet #415, #417, #418, FlexIDSCore #3848]</b> FAM Service
-        <ul>
-            <LI>Confirm that the <b>DependentServices</b> field works properly with <b>real</b> 
-            names of services.
-            <LI>Confirm that the <b>DependentServices</b> field works properly with <b>display</b>
-            names of services.
-            <li>Configure the FAM service so that no processing is taking place, just waiting for
-            files to be dropped into a listening folder.
-            <li>Confirm that CPU usage is approximately zero.
-            <li>Confirm that an exception is logged each time a new FAM instance is created.
-            <ul>
-                <li>Confirm that the FPS filename is included.
-                <li>Confirm that the process ID is included.
-            </ul>
-            <li>Configure the FAM service to use multiple FPS files.
-            <li>Process some files and kill at least one of the running instances of 
-            <b>FAMProcess.exe</b>.
-            <li>Stop the Extract Systems FAM service.
-            <li>Confirm that the exceptions logged about an inability to communicate with the
-            killed instances include meaningful text.
-        </ul>
+        	<LI><b>SchemaVersion</b>
+        	<ul>
+            		<li>Confirm that this field exists in the table.
+	    	</ul>
 <p>
-        <LI><b>[DotNet #419, #420, LegacyRC #5500, #5738, #5750]</b> Auto Revert
-        <ul>
-            <li>Configure the FAM Service to process 4 sets of the <b>Demo_IDShield</b> images.
-            <li>Prepare two FPS files to queue and process the images.
-            <li>Configure the auto revert timeout to <b>5</b> minutes.
-            <LI>Process the images with the FAM service.
-            <LI>Confirm that all of the files process without error.
-            <li>Modify the auto revert timeout to <b>2</b> minutes.
-            <li>Confirm that the auto revert timeout changes back to <b>5</b> minutes.
-            <li>Confirm that no text is present in the <b>Exception</b> field of the FAST table
-            after a file has been auto-reverted.
-        </ul>
+        	<LI><b>DatabaseSchemaManager</b>
+        	<ul>
+            		<li>Confirm that this field exists in the table.
+	    	</ul>
+    	</ul>
 <p>
-        <LI><b>[DotNet #429]</b> Confirm that completed instances of <b>FAMProcess.exe</b> are
-        removed from memory in a timely fashion.
+    	<li><b>Miscellaneous</b>
+    	<ul>
+        	<LI><b>SkipAuthenticationForServicesOnMachines</b>
+        	<ul>
+            		<li>Confirm that a <b>SkipAuthenticationForServicesOnMachines</b> field 
+			exists in the <b>DBInfo</b> table.
+            		<li>Enable user authentication via <b>RequireAuthenticationBeforeRun</b>.
+            		<li>Confirm that running an FPS file in normal mode correctly requires a 
+			user to be defined in the database and to provide a password.
+            		<li>Add the test machine to the comma-separated list of machines for 
+            		<b>SkipAuthenticationForServicesOnMachines</b>.
+            		<li>Confirm that the FAM service runs as expected without requiring a 
+			password.
+            		<li>Confirm (again) that running an FPS file in normal mode correctly 
+			requires a user to be defined in the database and to provide a password.
 <p>
-        <LI><b>[DotNet #452, #432, #454]</b> Respawning of FAMProcess.exe instances
-        <ul>
-            <LI>Configure the service to process a limited number of files per FAM instance.
-            <li>Confirm that the <b>Processing</b> FPS file is configured to stop processing once
-            the queue is empty. 
-            <li>Use <b>FAMDBAdmin.exe</b> to ensure that there are no files to process.
-            <li>Launch the service.
-            <Li>Use <b>Task Manager</b> to confirm that <b>FAMProcess.exe</b> instances are not
-            being rapidly created.
-        <p>
-            <li>Configure the service to respawn every n files.
-            <li>Configure the service to run 12 instances of the FAM.
-            <li>Start the service.
-            <li>Manually kill 3 instances of FAMProcess.exe.
-            <li>Stop the service.
-            <li>Confirm that appropriate exceptions/application traces were logged.
-        <p>
-            <li>Configure the service to respawn every 10 files.
-            <li>Configure an FPS file such that it will fail some documents.
-            <li>Start the service.
-            <li>Confirm that new FAM processes are respawned even for instances that failed some
-            files.
-        </ul>
-<p>
-        <LI><b>[FlexIDSCore #3848, #4126]</b> Unable to release USB key
-        <ul>
-            <LI>Configure the FAM service to use two FPS files
-            <ul>
-                <li>One runs redaction rules
-                <li>One creates redacted images and metadata XML
-            </ul>
-            <LI>Start with a clean database.
-            <li>Process the <b>Demo_IDShield</b> images.
-            <li>Confirm that <b>ELI11302: Unable to release USB Key License</b> exceptions are not
-            seen.
-        </ul>
-<p>
-        <LI><b>[LegacyRC #5645]</b> Confirm that the FAM service honors the <b>MaxFilesFromDB</b> 
-        setting found at <b>HKCU/Extract 
-        Systems/Software/ReusableComponents/COMComponents/FPRecordManager</b>.
-<p>
-        <li><b>[DotNetRC #441]</b> ESFAMService
-        <!-- fixed v 8.1.0.34 -->
-        <ul>
-            <li>Open the FAM service database.
-            <li>Confirm that the FPS file table includes a setting for the number of files to
-            process per instance.
-            <li>Confirm that the FPS file setting, if specified, overrides the global setting.
-            <li>Confirm that if the FPS file setting is not specified, the global setting is used.
-        </ul>        
-    </ul>
+            		<li>Remove the test machine from the comma-separated list of machines for 
+            		<b>SkipAuthenticationForServicesOnMachines</b>.
+            		<li>Prepare FPS files to be run via the FAM service against at least two 
+			databases.
+            		<li>Configure one database to <b>require</b> user authentication.
+            		<li>Configure another database to <b>not require</b> user authentication.
+            		<li>Confirm that the FAM service logs an expection for the FPS file 
+			processing files for the database that requries user authentication.
+            		<li>Confirm that the other FPS file processes files as expected.
+            		<li>Stop the service.
+            		<li>Configure each database to require user authentication.
+            		<li>Restart the service.
+            		<li>Confirm that the FAM service logs a stop message and stops running 
+			since no FPS file can be exercised without user authentication.
+            		<li>Add the test machine to the comma-separated lists of machines for 
+            		<b>SkipAuthenticationForServicesOnMachines</b>.
+            		<li>Restart the service.
+            		<li>Confirm that the FAM service and processing EXEs run as expected 
+			without requiring a password.
+        	</ul>
+    	</ul>
 </ul>
 </body> 
 </html>
