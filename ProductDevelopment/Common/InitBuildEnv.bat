@@ -4,7 +4,7 @@ SET BUILD_VSS_ROOT=%BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%
 SET VAULT_SERVER=white.extract.local
 SET VAULT_REPOSITORY="Extract"
 SET PATH=%windir%;%windir%\System32;I:\Common\Engineering\Tools\Utils;%VAULT_DIR%;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Nuance_16.3\bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_17\Bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\SafeNetUltraPro\Bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Inlite_5_7\bin
-SET PATH=%PATH%;%DevEnvDir%;%VCPP_DIR%\BIN;%VS_COMMON%\Tools;%VS_COMMON%\Tools\bin;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;%VCPP_DIR%\VCPackages;%VCPP_DIR%\Bin;C:\Program Files\PreEmptive Solutions\Dotfuscator Professional Edition 4.7;C:\Program Files\Microsoft FxCop 1.36;
+SET PATH=%PATH%;%DevEnvDir%;%VCPP_DIR%\BIN;%VS_COMMON%\Tools;%VS_COMMON%\Tools\bin;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319;%VCPP_DIR%\VCPackages;%VCPP_DIR%\Bin;C:\Program Files\PreEmptive Solutions\Dotfuscator Professional Edition 4.9;C:\Program Files\Microsoft FxCop 1.36;
 SET PATH=%PATH%;%WINDOWS_SDK%\BIN
 SET INSTALL_PRODUCT_DEVELOPMENT_PATH=\\fnp2\internal\Common\Engineering\productdevelopment
 
