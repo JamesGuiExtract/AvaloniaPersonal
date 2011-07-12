@@ -65,84 +65,146 @@ To get to the tag selector, use the Ruleset Editor and select an Attribute split
     	</ul>
 	</li>
 <p>
-  	<li><b>$DirNoDriveOf()</b> is present.
+  	<li><b>$ChangeExt(source, extension)</b> is present.
+    	<ul>
+    		<li>Edit box is populated with <b>$ChangeExt()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
+    	</ul>
+  	<li><b>$DirNoDriveOf(source)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$DirNoDriveOf()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$DirOf()</b> is present.
+  	<li><b>$DirOf(source)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$DirOf()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$DriveOf()</b> is present.
+  	<li><b>$DriveOf(source)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$DriveOf()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$Env()</b> is present.
+  	<li><b>$Env(environment variable)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$Env()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$ExtOf()</b> is present.
+  	<li><b>$ExtOf(source)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$ExtOf()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$FileNoExtOf()</b> is present.
+  	<li><b>$FileNoExtOf(source)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$FileNoExtOf()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$FileOf()</b> is present.
+  	<li><b>$FileOf(source)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$FileOf()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$FullUserName()</b> is present.
+  	<li><b>$FullUserName(1 = $UserName as fall back)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$FullUserName()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$InsertBeforeExt()</b> is present.
+  	<li><b>$InsertBeforeExt(source, text to insert)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$InsertBeforeExt()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$Now()</b> is present.
+  	<li><b>$Left(source, count)</b> is present.
+    	<ul>
+    		<li>Edit box is populated with <b>$Left()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
+    	</ul>
+  	</li>
+  	<li><b>$Mid(source, index, count (optional))</b> is present.
+    	<ul>
+    		<li>Edit box is populated with <b>$Mid()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
+    	</ul>
+  	</li>
+  	<li><b>$Now(format (optional))</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$Now()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$Offset()</b> is present.
+  	<li><b>$Offset(number, offset)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$Offset()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$PadValue()</b> is present.
+  	<li><b>$PadValue(source, character, length)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$PadValue()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$RandomAlphaNumeric()</b> is present.
+  	<li><b>$ProcessId()</b> is present.
+    	<ul>
+    		<li>Edit box is populated with <b>$ProcessId()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
+    	</ul>
+  	</li>
+  	<li><b>$RandomAlphaNumeric(num digits)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$RandomAlphaNumeric()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$Replace()</b> is present.
+  	<li><b>$Replace(source, search, replacement)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$Replace()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
-  	<li><b>$TrimAndConsolidateWS()</b> is present.
+  	<li><b>$Right(source, count)</b> is present.
+    	<ul>
+    		<li>Edit box is populated with <b>$Right()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
+    	</ul>
+  	</li>
+  	<li><b>$ThreadId()</b> is present.
+    	<ul>
+    		<li>Edit box is populated with <b>$ThreadId()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
+    	</ul>
+  	</li>
+  	<li><b>$TrimAndConsolidateWS(source)</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$TrimAndConsolidateWS()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
     	</ul>
   	</li>
   	<li><b>$UserName()</b> is present.
     	<ul>
     		<li>Edit box is populated with <b>$UserName()</b> when clicked.</li>
+		<li>Edit box cursor is between the <b>()</b> when clicked.</li>
+    	</ul>
+  	</li>
+</ul>
+<p>
+<h2>Miscellaneous</h2>
+<ul>
+  	<li><b>Highlighted text</b>
+    	<ul>
+	  	<li>Confirm that highlighted text is inside the <b>()</b> when a tag is selected.
+    		<li>Confirm that if the existing text is not highlighted, the selected tag 
+		appears after the edit cursor.
     	</ul>
   	</li>
 </ul>
