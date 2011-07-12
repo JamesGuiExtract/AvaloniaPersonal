@@ -13,254 +13,258 @@
 <hr>
 
 <h2>Each operating system shall be tested from a clean Clonezilla image or Virtual Machine.</h2>
+<h2>The .NET and SQL Server installations can be exercised from either the FLEX Index or the ID 
+Shield DemoShield application.</h2>
 <p>
 <UL>
-    <LI><b>FLEX Index Installation</b>
-    <ul>
-        <li><b>[FlexIDSCore #3963]</b> Confirm that the <b>Demo Shield</b> text fields do not
-        overlap when selecting other items.</li>
-        <li><b>[FlexIDSCore #4174]</b> Confirm that <b>elevated permissions</b> are requested
-        during installation of Extract Systems software if <b>administrator</b> is not the logged
-        in user.</li>
+    	<LI><b>.NET 3.5 and 4.0 Installation</b>
+    	<ul>
+        	<li>Confirm that the <b>Demo Shield</b> text fields do not overlap when selecting 
+		other items.</li>
+        	<li>Confirm that the installation finishes without error.</li>
+    	</ul>
 <p>
-        <li>Confirm that the following items are available from the <b>Demo Shield</b> install.  
-        Also confirm that an appropriate message is provided in the right-hand pane after a
-        mouse-over event on the product name.
-        <ul>
-            <li>Microsoft .NET 3.5 and 4.0</li>
-            <li>Install FLEX Index</li>
-            <li>SQL Server Applications
-            <ul>
-                <li>Windows Installer 4.5</li>
-                <li>SQL Server 2008</li>
-                <li>SQL Management Studio</li>
-            </ul></li>
-            <li>Extract Systems License Manager</li>
-        </ul></li>
-        <li>Confirm that the following <b>external</b> programs have been installed along with 
-        FLEX Index
-        <ul>
-            <li>SQL Compact 3.5</li>
-            <li>SQLCDBEditor</li>
-            <li>SQLCompactExporter</li>
-            <li>SQLCompactImporter</li>
-            <li>FAMDBLockChecker.exe</li>
-            <li>Extract.Office.dll</li>
-            <li>ModifyPdfFile.exe</li>
-            <li>.resource files for data entry</li>
-        </ul></li>
-        <li>Confirm that the SQL native client is installed when you install just <b>FLEX 
-        Index</b> (and not SQL Server).</li>
+    	<LI><b>SQL Server Installation</b>
+    	<ul>
+        	<li>Confirm that each of the following items are available and can be installed 
+		from the <b>Demo Shield</b> install.</li>
+        	<b>NOTE:</b> SQL Server 2008 R2 is not supported for 64-bit Windows XP.
+        	<ul>
+            		<li>SQL Server Applications
+            		<ul>
+                		<li>Windows Installer 4.5</li>
+                		<li>SQL Server 2008</li>
+                		<li>SQL Management Studio</li>
+            		</ul></li>
+        	</ul></li>
+    	</ul></li>
 <p>
-        <li><b>[FlexIDSCore #3870]</b> Confirm that <b>.NET 3.5</b> and .NET 4.0 can be installed
-        via <b>Demo Shield</b> on a <b>Windows Server 2008 R2</b> operating system.</li>
-        <LI>Confirm that copyright dates have been updated to 2011 for the following
-        <ul>
-        	<li>FLEX Index installation splash screen</li>
-		<li>FLEX Index installation licensing page</li>
+    	<LI><b>FLEX Index Installation</b>
+    	<ul>
+        	<li><b>[FlexIDSCore #3963]</b> Confirm that the <b>Demo Shield</b> text fields 
+		do not overlap when selecting other items.</li>
+        	<li><b>[FlexIDSCore #4174]</b> Confirm that <b>elevated permissions</b> are 
+		requested during installation of Extract Systems software if <b>administrator</b> is 
+		not the logged in user.</li>
+<p>
+        	<li>Confirm that the following items are available from the <b>Demo Shield</b> 
+		install.  Also confirm that an appropriate message is provided in the right-hand pane 
+		after a mouse-over event on the product name.
+        	<ul>
+            		<li>Microsoft .NET 3.5 and 4.0</li>
+            		<li>SQL Server Applications
+            		<ul>
+                		<li>Windows Installer 4.5</li>
+                		<li>SQL Server 2008</li>
+                		<li>SQL Management Studio</li>
+            		</ul></li>
+            		<li>Install FLEX Index</li>
+            		<li>Extract Systems License Manager</li>
+        	</ul></li>
+<p>
+        	<LI>Confirm that copyright dates have been updated to 2011 for the following
+        	<ul>
+        		<li>FLEX Index installation splash screen</li>
+			<li>FLEX Index installation licensing page</li>
+		</ul></li>
+		<li>Confirm that <b>FLEX Index</b> can be installed without error.
+<p>
+		<li>Confirm via the <b>Control Panel</b> that the following <b>external</b> programs 
+		have been installed along with FLEX Index.
+        	<ul>
+            		<li>Crystal Reports 2008 Runtime SP1</li>
+            		<li>Microsoft SQL Server Compact 3.5 SP2</li>
+        	</ul></li>
+		<li>Confirm that the following files have been installed in the 
+		<b>CommonComponents</b> folder.
+        	<ul>
+            		<li>DataEntryApplication.FlexIndex.resources</li>
+            		<li>Extract.Office.dll</li>
+            		<li>FAMDBLockChecker.exe</li>
+            		<li>ModifyPdfFile.exe</li>
+            		<li>SQLCompactExporter.exe</li>
+            		<li>SQLCompactImporter.exe</li>
+        	</ul></li>
+    	</ul></li>
+<p>
+    	<LI><b>FLEX Index Start Menu</b>
+    	<ul>
+        	<li>Confirm that the following items are available from the <b>Extract Systems 
+		FLEX Index</b> Start menu.  Note that functionality is tested in the Sanity Test.
+        	<ul>
+            		<li>DB Administration</li>
+            		<li>File Action Manager</li>
+            		<li>FLEX Index Help</li>
+            		<li>USB License Key Manager</li>
+            		<li>User License</li>
+            		<li>Utilities
+            		<ul>
+                		<li>Configure Email Settings</li>
+                		<li>Configure FAM Service Database</li>
+                		<li>Convert FAM Database</li>
+                		<li>Convert FPS File</li>
+                		<li>Detect and Report Failure</li>
+                		<li>FAM Network Manager</li>
+                		<li>Feedback Manager</li>
+                		<li>Image Viewer</li>
+                		<li>Rule Tester</li>
+                		<li>USS File Viewer</li>
+                		<li>View Exception Log</li>
+                		<li>VOA File Viewer</li>
+            		</ul></li>
+        	</ul></li>
+    	</ul></li>
+<p>
+    	<li>Confirm that <b>RegisterAll.bat</b> can be run without error.</li>
+<p>
+    	<li><b>[LegacyRC #5857]</b> FAM About box
+    	<!-- fixed v 8.1.0.32 -->    
+    	<ul>
+        	<li>Log onto the machine as a user other than the one who installed FLEX Index.</li>
+        	<li>Open the FAM.</li>
+        	<li>Select Help &gt; About File Action Manager...</li>
+        	<li>Confirm that no exception is seen.</li>
+    	</ul></li>
+<p>
+    	<LI><b>ID Shield Installation</b>
+    	<ul>
+        	<li><b>[FlexIDSCore #3963]</b> Confirm that the <b>Demo Shield</b> text fields 
+		do not overlap when selecting other items.</li>
+<p>
+        	<li>Confirm that the following items are available from the <b>Demo Shield</b> 
+		install.  Also confirm that an appropriate message is provided in the right-hand 
+		pane after a mouse-over event on the product name.
+        	<ul>
+            		<li>Microsoft .NET 3.5 and 4.0</li>
+            		<li>SQL Server Applications
+            		<ul>
+                		<li>Windows Installer 4.5</li>
+                		<li>SQL Server 2008</li>
+                		<li>SQL Management Studio</li>
+            		</ul></li>
+            		<li>Install ID Shield</li>
+            		<li>Extract Systems License Manager</li>
+        	</ul></li>
+<p>
+        	<LI>Confirm that copyright dates have been updated to 2011 for the following
+        	<ul>
+                	<li>ID Shield installation splash screen</li>
+                	<li>ID Shield installation licensing page</li>
+        	</ul></li>
+		<li>Confirm that <b>ID Shield</b> can be installed without error.
+<p>
+		<li>Confirm via the <b>Control Panel</b> that the following <b>external</b> programs 
+		have been installed along with ID Shield.
+        	<ul>
+            		<li>Crystal Reports 2008 Runtime SP1</li>
+            		<li>Microsoft SQL Server Compact 3.5 SP2</li>
+        	</ul></li>
+		<li>Confirm that the following files have been installed in the 
+		<b>CommonComponents</b> folder.
+        	<ul>
+            		<li>Extract.Office.dll</li>
+            		<li>FAMDBLockChecker.exe</li>
+            		<li>ModifyPdfFile.exe</li>
+            		<li>SQLCompactExporter.exe</li>
+            		<li>SQLCompactImporter.exe</li>
+        	</ul></li>
+    	</ul></li>
+<p>
+    	<LI><b>ID Shield Start Menu</b>
+    	<ul>
+        	<li>Confirm that the following items are available from the <b>Extract Systems 
+		ID Shield</b> Start menu.  Note that functionality is tested in the Sanity Test.
+        	<ul>
+            		<li>DB Administration</li>
+            		<li>File Action Manager</li>
+            		<li>ID Shield Help</li>
+			<li>ID Shield On Demand</li>
+            		<li>USB License Key Manager</li>
+            		<li>User License</li>
+            		<li>Utilities
+            		<ul>
+                		<li>Configure Email Settings</li>
+                		<li>Configure FAM Service Database</li>
+                		<li>Convert FAM Database</li>
+                		<li>Convert FPS File</li>
+                		<li>Detect and Report Failure</li>
+                		<li>FAM Network Manager</li>
+				<li>ID Shield Statistics Reporter</li>
+                		<li>Image Viewer</li>
+                		<li>Rule Tester</li>
+                		<li>USS File Viewer</li>
+                		<li>View Exception Log</li>
+                		<li>VOA File Viewer</li>
+            		</ul></li>
+        	</ul></li>
+    	</ul></li>
+<p>    
+    	<LI><b>Extract Systems LM Start Menu</b>
+    	<ul>
+        	<li><b>[LegacyRC #5796]</b> Confirm that installation of <b>Extract Systems LM</b> 
+		requests administrator privileges on Vista, Windows 7, Windows 2008 Server and 
+		Windows 2008 Server R2.</li>
+        	<li>Confirm that the following items are available and functional from the <b>Extract
+        	Systems LM</b> Start menu.
+        	<ul>
+            		<li>File Activation Utility</li>
+            		<li>USB License Key Manager</li>
+        	</ul></li>
+    	</ul></li>
+<p>
+	<li>Confirm that <b>FLEX Index RDT</b> can be installed without error.
+    	<LI><b>FLEX Index RDT Start Menu</b>
+    	<ul>
+        	<li>Confirm that the following items are available from the <b>Extract Systems 
+		FLEX Index RDT</b> Start menu.  Note that functionality is tested in the Sanity Test.
+        	<ul>
+            		<li>Automated Tests
+            		<ul>
+                		<li>Run All Tests</li>
+            		</ul></li>
+            		<li>FLEX Index SDK Help</li>
+            		<li>FLEX Index UI Help</li>
+            		<li>Image Cleanup Settings Editor</li>
+            		<li>Index Converter</li>
+            		<li>RDT Configuration</li>
+            		<li>Rule Set Editor</li>
+            		<li>Test Harness</li>
+        	</ul></li>
+    	</ul></li>
+<p>
+    	<LI><b>Uninstalls</b>
+    	<ul>
+        	<li>Confirm that <b>RDT</b>, <b>FLEX Index</b>, <b>ID Shield</b> and <b>Extract Systems 
+		LM</b> are installed.</li>
+		<ul>
+			<li>Confirm that <b>FLEX Index</b> cannot be uninstalled.
+			<li>Confirm that <b>ID Shield</b> cannot be uninstalled.
+		</ul>
+        	<li>Confirm that <b>RDT</b> uninstalls without error.</li>
+        	<li><b>[LegacyRC #3458]</b> Confirm that <b>Crystal Reports</b> is not uninstalled 
+		as part of the RDT uninstall.</li>
+        	<li>With <b>FLEX Index</b>, <b>ID Shield</b> and <b>Extract Systems LM</b> installed, 
+		confirm that <b>Extract Systems LM</b> uninstalls without error.</li>
+		<ul>
+			<li>Confirm that <b>DB Administration</b> still runs.
+			<li>Confirm that <b>File Action Manager</b> still runs.
+			<li>Confirm that <b>USB License Key Manager</b> still runs.
+		</ul>
+<p>
+        	<li>If necessary, create and use an evaluation license for <b>ID Shield</b>.</li>
+        	<li>Confirm that <b>ID Shield</b> still runs.</li>
+        	<li>Confirm that <b>ExtractTRP2.exe</b> is running.</li>
+        	<li>Uninstall <b>ID Shield</b>.</li>
+        	<li><b>[FlexIDSCore #3163]</b> Confirm that <b>ExtractTRP2.exe</b> is killed before the
+        	uninstall occurs.</li>
+        	<li><b>[LegacyRC #3616]</b> Confirm that <b>FLEX Index Help</b> is still available from the
+        	Start menu.</li>
+        	<li>Confirm that the Help file opens.</li>
+        	<li>Confirm that <b>FLEX Index</b> still runs.</li>
+        	<li>Uninstall <b>FLEX Index</b>.</li>
+        	<li>Confirm that when you uninstall all Extract Systems software, all Extract Systems
+ 		services (FAM service, FDRS service, exception service) are uninstalled.</li>
 	</ul></li>
-    </ul></li>
-<p>
-    <LI><b>FLEX Index Start Menu</b>
-    <ul>
-        <li>Confirm that the following items are available and functional from the <b>Extract
-        Systems FLEX Index</b> Start menu.
-        <ul>
-            <li>Utilities
-            <ul>
-                <li>Configure Email Settings</li>
-                <li>Configure FAM Service Database</li>
-                <li>Convert FAM Database</li>
-                <li>Convert FPS File</li>
-                <li>Detect and Report Failure</li>
-                <li>FAM Network Manager</li>
-                <li>Feedback Manager</li>
-                <li>Image Viewer</li>
-                <li>Rule Tester</li>
-                <li>USS File Viewer</li>
-                <li>View Exception Log</li>
-                <li>VOA File Viewer</li>
-            </ul></li>
-            <li>DB Administration</li>
-            <li>File Action Manager</li>
-            <li>FLEX Index Help</li>
-            <li>USB License Key Manager</li>
-            <li>User License</li>
-        </ul></li>
-    </ul></li>
-<p>    
-    <li>Confirm that <b>RegisterAll.bat</b> can be run without error.</li>
-<p>
-    <li><b>[LegacyRC #5857]</b> FAM About box
-    <!-- fixed v 8.1.0.32 -->    
-    <ul>
-        <li>Log onto the machine as a user other than the one who installed FLEX Index.</li>
-        <li>Open the FAM.</li>
-        <li>Select Help &gt; About File Action Manager...</li>
-        <li>Confirm that no exception is seen.</li>
-    </ul></li>
-<p>
-    <LI><b>ID Shield Installation</b>
-    <ul>
-        <li><b>[FlexIDSCore #3963]</b> Confirm that the <b>Demo Shield</b> text fields do not
-        overlap when selecting other items.</li>
-<p>
-        <li>Confirm that the following items are available from the <b>Demo Shield</b> install.
-        Also confirm that an appropriate message is provided in the right-hand pane after a 
-        mouse-over event on the product name.
-        <ul>
-            <li>Microsoft .NET 3.5 and 4.0</li>
-            <li>Install ID Shield</li>
-            <li>SQL Server Applications
-            <ul>
-                <li>Windows Installer 4.5</li>
-                <li>SQL Server 2008</li>
-                <li>SQL Management Studio</li>
-            </ul></li>
-            <li>Extract Systems License Manager</li>
-        </ul></li>
-        <li>Confirm that the following <b>external</b> programs have been installed along with ID
-        Shield
-        <ul>
-            <li>SQL Compact 3.5</li>
-            <li>SQLCDBEditor</li>
-            <li>SQLCompactExporter</li>
-            <li>SQLCompactImporter</li>
-            <li>FAMDBLockChecker.exe</li>
-            <li>Extract.Office.dll</li>
-            <li>ModifyPdfFile.exe</li>
-        </ul></li>
-<p>
-        <li><b>[FlexIDSCore #3870]</b> Confirm that <b>.NET 3.5</b> and .NET 4.0 can be installed
-        via <b>Demo Shield</b> on a <b>Windows Server 2008 R2</b> operating system.</li>
-        <li>Confirm that the SQL native client is installed when you install just <b>ID Shield</b>
-        (and not SQL Server).</li>
-        <LI>Confirm that copyright dates have been updated to 2011 for the following
-        <ul>
-                <li>ID Shield installation splash screen</li>
-                <li>ID Shield installation licensing page</li>
-        </ul></li>
-    </ul></li>
-<p>
-    <LI><b>ID Shield Start Menu</b>
-    <ul>
-        <li>Confirm that the following items are available and functional from the 
-        <b>Extract Systems ID Shield</b> Start menu.
-        <ul>
-            <li>Utilities
-            <ul>
-                <li>Configure Email Settings</li>
-                <li>Configure FAM Service Database</li>
-                <li>Convert FAM Database</li>
-                <li>Convert FPS File</li>
-                <li>Detect and Report Failure</li>
-                <li>FAM Network Manager</li>
-                <li>Image Viewer</li>
-                <li>Rule Tester</li>
-                <li>USS File Viewer</li>
-                <li>View Exception Log</li>
-                <li>VOA File Viewer</li>
-            </ul></li>
-            <li>DB Administration</li>
-            <li>File Action Manager</li>
-            <li>ID Shield Help</li>
-            <li>USB License Key Manager</li>
-            <li>User License</li>
-        </ul></li>
-    </ul></li>
-<p>    
-    <li>Confirm that <b>RegisterAll.bat</b> can be run without error.</li>
-<p>
-    <li><b>[LegacyRC #5857]</b> FAM About box
-    <!-- fixed v 8.1.0.32 -->
-    <ul>
-        <li>Log onto the machine as a user other than the one who installed ID Shield.</li>
-        <li>Open the FAM.</li>
-        <li>Select Help &gt; About File Action Manager...</li>
-        <li>Confirm that no exception is seen.</li>
-    </ul></li>
-<p>
-    <LI><b>Extract Systems LM Start Menu</b>
-    <ul>
-        <li><b>[LegacyRC #5796]</b> Confirm that installation of <b>Extract Systems LM</b> requests
-        administrator privileges on Vista, Windows 7, Windows 2008 Server and Windows 2008 Server
-        R2.</li>
-        <li>Confirm that the following items are available and functional from the <b>Extract
-        Systems LM</b> Start menu.
-        <ul>
-            <li>File Activation Utility</li>
-            <li>USB License Key Manager</li>
-        </ul></li>
-    </ul></li>
-<p>
-    <LI><b>SQL Server Installation</b>
-    <ul>
-        <li>Confirm that each of the following items are available and can be installed from the
-        <b>Demo Shield</b> install.<br>
-        <b>NOTE:</b> SQL Server 2008 R2 is not supported for 64-bit Windows XP.
-        <ul>
-            <li>SQL Server Applications
-            <ul>
-                <li>Windows Installer 4.5</li>
-                <li>SQL Server 2008</li>
-                <li>SQL Management Studio</li>
-            </ul></li>
-        </ul></li>
-    </ul></li>
-<p>
-    <LI><b>FLEX Index RDT Start Menu</b>
-    <ul>
-        <li>Confirm that the following items are available and functional from the <b>Extract
-        Systems FLEX Index RDT</b> Start menu.
-        <ul>
-            <li>Automated Tests
-            <ul>
-                <li>Run All Tests</li>
-            </ul></li>
-            <li>FLEX Index SDK Help</li>
-            <li>FLEX Index UI Help</li>
-            <li>Image Cleanup Settings Editor</li>
-            <li>Index Converter</li>
-            <li>RDT Configuration</li>
-            <li>Rule Set Editor</li>
-            <li>Test Harness</li>
-        </ul></li>
-    </ul></li>
-<p>
-    <LI><b>Uninstalls - each operating system</b>
-    <ul>
-        <li>With <b>ID Shield</b> and <b>Extract Systems LM</b> installed, confirm that <b>Extract
-        Systems LM</b> uninstalls without error and that <b>ID Shield</b> still runs.</li>
-        <li>With <b>FLEX Index</b> and <b>Extract Systems LM</b> installed, confirm that <b>Extract
-        Systems LM</b> uninstalls without error and that <b>FLEX Index</b> still runs.</li>
-        <li>Confirm that when you uninstall all Extract Systems software, all Extract Systems
-        services (FAM service, FDRS service, exception service) are uninstalled.</li>
-    </ul></li>
-<p>
-    <LI><b>Uninstalls - each non-Server operating system</b>
-    <ul>
-        <li>With <b>ID Shield</b> and <b>RDT</b> installed, confirm that <b>ID Shield</b> cannot be
-        uninstalled.</li>
-        <li>Uninstall <b>RDT</b>.</li>
-        <li><b>[LegacyRC #3458]</b> Confirm that <b>Crystal Reports</b> is not uninstalled as part
-        of the RDT uninstall.</li>
-        <li>If necessary, create and use an evaluation license for <b>ID Shield</b>.</li>
-        <li>Confirm that <b>ID Shield</b> still runs.</li>
-        <li>Confirm that <b>ExtractTRP2.exe</b> is running.</li>
-        <li>Uninstall <b>ID Shield</b>.</li>
-        <li><b>[FlexIDSCore #3163]</b> Confirm that <b>ExtractTRP2.exe</b> is killed before the
-        uninstall occurs.</li>
-<p>
-        <li>With <b>FLEX Index</b> and <b>RDT</b> installed, confirm that <b>FLEX Index</b> cannot
-        be uninstalled.</li>
-        <li>Uninstall <b>RDT</b>.</li>
-        <li><b>[LegacyRC #3616]</b> Confirm that <b>FLEX Index Help</b> is still available from the
-        Start menu.</li>
-        <li>Confirm that the Help file opens.</li>
-        <li>Confirm that <b>FLEX Index</b> still runs.</li>
-        <li>Uninstall <b>FLEX Index</b>.</li>
-        <li>Confirm that the <b>ESFAMProcess</b> service is uninstalled.</li>
-    </ul></li>
 </UL>
 </BODY>
 </HTML>
