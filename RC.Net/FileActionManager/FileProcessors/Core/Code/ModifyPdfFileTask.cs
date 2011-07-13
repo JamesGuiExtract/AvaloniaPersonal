@@ -379,7 +379,7 @@ namespace Extract.FileActionManager.FileProcessors
                 string pdfFile = pathTags.Expand(_settings.PdfFile);
 
                 // Modify the pdf to a temporary file, only copy if all is successful.
-                using (var tempFile = new TemporaryFile(".pdf"))
+                using (var tempFile = new TemporaryFile(".pdf", true))
                 {
                     var args = new List<string>();
                     args.Add(string.Concat("\"", pdfFile, "\""));

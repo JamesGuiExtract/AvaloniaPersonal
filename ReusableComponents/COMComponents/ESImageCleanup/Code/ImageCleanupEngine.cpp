@@ -100,13 +100,13 @@ STDMETHODIMP CImageCleanupEngine::CleanupImageInternalUseOnly(BSTR bstrInputFile
 		unique_ptr<TemporaryFileName> pTempInput(__nullptr);
 		if (isPDF(strInputFile))
 		{
-			pTempInput.reset(new TemporaryFileName(__nullptr, ".tif"));
+			pTempInput.reset(new TemporaryFileName(true, __nullptr, ".tif"));
 			strWorkingInput = pTempInput->getName();
 			convertPDFToTIF(strInputFile, strWorkingInput);
 		}
 
 		bool bOutputPDF = isPDFFile(strOutputFile);
-		TemporaryFileName tempFile(NULL,
+		TemporaryFileName tempFile(true, NULL,
 			bOutputPDF ? ".tif" : getExtensionFromFullPath(strOutputFile).c_str());
 
 		// Get a temporary file so that write operations appear atomic

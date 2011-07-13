@@ -236,7 +236,7 @@ string getFullUserName(bool bThrowExceptionIfNoFound)
 		+ "\\GetFullUserName.exe";
 
 	// Create a temporary file for the username to be written to
-	TemporaryFileName tempFile;
+	TemporaryFileName tempFile(false, NULL, NULL, true);
 
 	// Run the GetFullUserName application passing the temp file in as the argument
 	DWORD dwExitCode = runExeWithProcessKiller(strGetFullUserNamePath, false, tempFile.getName());
@@ -613,7 +613,7 @@ void runExtractEXE(const string& strExeFullFileName, const string& strParameters
 				   const string& strWorkingDir, DWORD dwCreationFlags/* = DETACHED_PROCESS*/)
 {
 	// Create temporary UEX file to hold exception thrown by outside utility
-	TemporaryFileName tfn( "", ".uex", true );
+	TemporaryFileName tfn( false, "", ".uex", true );
 
 	// Append /ef <filename> to provided parameters
 	string strNewParameters = strParameters;
@@ -668,7 +668,7 @@ DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractE
 			// If running an extract exe, add the /ef <ExceptionFile> argument
 			if (bIsExtractExe)
 			{
-				apTempFile.reset(new TemporaryFileName( "", ".uex", true));
+				apTempFile.reset(new TemporaryFileName( false, "", ".uex", true));
 				ASSERT_RESOURCE_ALLOCATION("ELI29399", apTempFile.get() != __nullptr);
 
 				strParameters += " /ef \"";

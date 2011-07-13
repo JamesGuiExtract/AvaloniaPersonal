@@ -1,3 +1,4 @@
+using Extract.Interfaces;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -83,7 +84,46 @@ namespace Extract.Utilities
         /// </summary>
         static object _fileAccessLock = new object();
 
+        /// <summary>
+        /// The <see cref="ISecureFileDeleter"/> instance to use to securely delete files.
+        /// </summary>
+        static ISecureFileDeleter _secureFileDeleter;
+
+        /// <summary>
+        /// Mutex used to prevent multiple threads from trying instantiate _secureFileDeleter.
+        /// </summary>
+        static object _secureFileDeleterLock = new object();
+
+        /// <summary>
+        /// The registry settings from which the the secure file delete options are to be retrieved.
+        /// </summary>
+        // Intentionally not dynamic since the values will not be read dynamically on the c++ side.
+        static readonly RegistrySettings<Properties.Settings> _registry =
+            new RegistrySettings<Properties.Settings>(
+                @"SOFTWARE\Extract Systems\ReusableComponents\Extract.Utilities", false);
+
         #endregion Fields
+
+        /// <summary>
+        /// Static initialization for the <see cref="FileSystemMethods"/> class.
+        /// </summary>
+        // FXCops warns that static fields should be assigned inline for performance reasons, but
+        // no static variables are being assigned here.
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
+        static FileSystemMethods()
+        {
+            try
+            {
+                // Create the SecureDeleteAllSensitiveFiles registry value so that it is
+                // immediately available for a user to find. The "SecureDeleter" setting is not one
+                // a user will likely ever need to set.
+                _registry.GeneratePropertyValues("SecureDeleteAllSensitiveFiles");
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32872");
+            }    
+        }
 
         /// <summary>
         /// Gets the path to the extract systems folder in the common application
@@ -319,7 +359,7 @@ namespace Extract.Utilities
 
                 // Attempt to overwrite the file. This is slower than moving the file.
                 File.Copy(source, destination, true);
-                File.Delete(source);
+                DeleteFile(source);
             }
             catch (Exception ex)
             {
@@ -722,6 +762,98 @@ namespace Extract.Utilities
             }
         }
 
+        /// <overloads>
+        /// Deletes the specified file.
+        /// </overloads>
+        /// <summary>
+        /// Deletes the specified <see paramref="fileName"/>.
+        /// <para><b>Note</b></para>
+        /// The value of the SecureDeleteAllSensitiveFiles registry entry will dictate whether the
+        /// file is deleted securely.
+        /// </summary>
+        /// <param name="fileName">The name of the file to delete.</param>
+        public static void DeleteFile(string fileName)
+        {
+            try
+            {
+                DeleteFile(fileName, _registry.Settings.SecureDeleteAllSensitiveFiles);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32873");
+            }
+        }
+
+        /// <summary>
+        /// Deletes the specified <see paramref="fileName"/>.
+        /// </summary>
+        /// <param name="fileName">The name of the file to delete.</param>
+        /// <param name="secureDeleteFile"><see langword="true"/> to delete the file securely;
+        /// <see langword="false"/> otherwise.</param>
+        public static void DeleteFile(string fileName, bool secureDeleteFile)
+        {
+            try
+            {
+                DeleteFile(fileName, secureDeleteFile, false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32874");
+            }
+        }
+
+        /// <summary>
+        /// Deletes the specified <see paramref="fileName"/>.
+        /// </summary>
+        /// <param name="fileName">The name of the file to delete.</param>
+        /// <param name="secureDeleteFile"><see langword="true"/> to delete the file securely;
+        /// <see langword="false"/> otherwise.</param>
+        /// <param name="throwIfUnableToDeleteSecurely">If <see langword="true"/>, when securely
+        /// deleteing a file, but the file could not be securely overwritten, an exception will be
+        /// throw before attempting the actual deletion.</param>
+        public static void DeleteFile(string fileName, bool secureDeleteFile,
+            bool throwIfUnableToDeleteSecurely)
+        {
+            try 
+	        {
+                if (secureDeleteFile)
+                {
+                    lock (_secureFileDeleterLock)
+                    {
+                        if (_secureFileDeleter == null)
+                        {
+                            // Instantiate the deleter
+                            Type deleterType =
+                                Type.GetTypeFromProgID(_registry.Settings.SecureDeleter);
+                            if (deleterType == null)
+                            {
+                                ExtractException ee = new ExtractException("ELI32875",
+                                    "Failed to find registered secure file deleter.");
+                                ee.AddDebugData("Deleter Type", _registry.Settings.SecureDeleter,
+                                    false);
+                                throw ee;
+                            }
+
+                            _secureFileDeleter =
+                                (ISecureFileDeleter)Activator.CreateInstance(deleterType);
+                        }
+                    }
+
+                    _secureFileDeleter.SecureDeleteFile(fileName, throwIfUnableToDeleteSecurely);
+                }
+                else
+                {
+                    // The secure file deleter takes care of sharing violation retires, so the
+                    // retry logic here should encapsulate only normal deletions.
+                    PerformFileOperationWithRetryOnSharingViolation(() => File.Delete(fileName));
+                }
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ex.AsExtract("ELI32876");
+	        }
+        }
+
         /// <overloads>Will attempt to delete a specified file and return whether the
         /// operation was successful or not.</overloads>
         /// <summary>
@@ -729,6 +861,9 @@ namespace Extract.Utilities
         /// be placed in the <see cref="ExtractException"/> out parameter.
         /// Returns <see langword="true"/> if the deletion was successful and
         /// <see langword="false"/> if it was not successful.
+        /// <para><b>Note</b></para>
+        /// The value of the SecureDeleteAllSensitiveFiles registry entry will dictate whether the
+        /// file is deleted securely.
         /// </summary>
         /// <param name="fileName">The file to delete.</param>
         /// <param name="exception">Will contain the exception (if any) that was
@@ -744,6 +879,9 @@ namespace Extract.Utilities
         /// Will attempt to delete the specified file. If an exception occurred it will
         /// be logged. Returns <see langword="true"/> if the deletion was successful and
         /// <see langword="false"/> if it was not successful.
+        /// <para><b>Note</b></para>
+        /// The value of the SecureDeleteAllSensitiveFiles registry entry will dictate whether the
+        /// file is deleted securely.
         /// </summary>
         /// <param name="fileName">The file to delete.</param>
         /// <returns><see langword="true"/> if the deletion was successful and
@@ -761,6 +899,9 @@ namespace Extract.Utilities
         /// otherwise the out parameter will be set to <see langword="null"/>.
         /// Returns <see langword="true"/> if the deletion was successful and
         /// <see langword="false"/> if it was not successful.
+        /// <para><b>Note</b></para>
+        /// The value of the SecureDeleteAllSensitiveFiles registry entry will dictate whether the
+        /// file is deleted securely.
         /// </summary>
         /// <param name="fileName">The file to delete.</param>
         /// <param name="logException">If <see langword="true"/> will log the exception.</param>
@@ -771,12 +912,35 @@ namespace Extract.Utilities
         public static bool TryDeleteFile(string fileName, bool logException,
             out ExtractException exception)
         {
+            return TryDeleteFile(fileName, logException,
+                _registry.Settings.SecureDeleteAllSensitiveFiles, out exception);
+        }
+
+        /// <summary>
+        /// Will attempt to delete the specified file and if <paramref name="logException"/>
+        /// is <see langword="true"/> will log any exceptions that occur.  Any exceptions that
+        /// occur will also be placed in the <see cref="ExtractException"/> out parameter
+        /// otherwise the out parameter will be set to <see langword="null"/>.
+        /// Returns <see langword="true"/> if the deletion was successful and
+        /// <see langword="false"/> if it was not successful.
+        /// </summary>
+        /// <param name="fileName">The file to delete.</param>
+        /// <param name="logException">If <see langword="true"/> will log the exception.</param>
+        /// <param name="secureDeleteFile"><see langword="true"/> to delete the file securely;
+        /// <see langword="false"/> otherwise.</param>
+        /// <param name="exception">Will contain the exception (if any) that was
+        /// thrown by the operation.</param>
+        /// <returns><see langword="true"/> if the deletion was successful and
+        /// <see langword="false"/> otherwise.</returns>
+        public static bool TryDeleteFile(string fileName, bool logException, bool secureDeleteFile,
+            out ExtractException exception)
+        {
             try
             {
                 // Attempt to delete the file (not checking for null/empty/existence
                 // since these will cause the File.Delete command to throw and exception
                 // and thus a return value of false)
-                File.Delete(fileName);
+                DeleteFile(fileName, secureDeleteFile);
 
                 // Deletion was successful, return true
                 exception = null;

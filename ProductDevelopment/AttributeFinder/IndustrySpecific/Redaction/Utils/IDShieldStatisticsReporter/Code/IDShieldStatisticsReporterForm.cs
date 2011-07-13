@@ -624,8 +624,8 @@ namespace Extract.IDShieldStatisticsReporter
                 using (new TemporaryWaitCursor())
                 {
                     // Create a temporary tcl and dat file that will be used for this test.
-                    settingsFile = new TemporaryFile(".dat");
-                    tclFile = new TemporaryFile(".tcl");
+                    settingsFile = new TemporaryFile(".dat", false);
+                    tclFile = new TemporaryFile(".tcl", false);
 
                     if (!ApplySettings(settingsFile.FileName))
                     {

@@ -289,7 +289,7 @@ namespace Extract.ExtractDebugData
                     if (Path.GetFileName(uexFilePath).Equals(
                         "ExtractException.uex", StringComparison.OrdinalIgnoreCase))
                     {
-                        tempUexFileCopy = new TemporaryFile(".uex");
+                        tempUexFileCopy = new TemporaryFile(".uex", false);
                         File.Copy(uexFilePath, tempUexFileCopy.FileName, true);
                         workingFilePath = tempUexFileCopy.FileName;
                     }

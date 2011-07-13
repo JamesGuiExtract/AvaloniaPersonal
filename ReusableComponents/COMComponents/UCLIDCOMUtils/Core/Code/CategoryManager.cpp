@@ -357,7 +357,7 @@ STDMETHODIMP CCategoryManager::DeleteCache(BSTR strCategoryName)
 		{
 			try
 			{
-				deleteFile(strCacheFileName, true);
+				deleteFile(strCacheFileName, true, false);
 			}
 			catch(UCLIDException& uex)
 			{

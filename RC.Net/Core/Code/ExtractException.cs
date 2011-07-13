@@ -1277,6 +1277,61 @@ namespace Extract
         }
 
         /// <summary>
+        /// Combines all provided <see paramref="exceptions"/> into a single
+        /// <see cref="ExtractException"/>. The last exception in the enumeration will be the
+        /// top-level exceptions.
+        /// </summary>
+        /// <param name="exceptions">The exceptions to aggregate.</param>
+        /// <returns>An aggregate <see cref="ExtractException"/> containin all data in
+        /// <see paramref="exceptions"/>.</returns>
+        // The debug data name of "ELI Code" is not an invalid ELI code.
+        [SuppressMessage("ExtractRules", "ES0002:MethodsShouldContainValidEliCodes")]
+        public static ExtractException AsAggregateException(IEnumerable<ExtractException> exceptions)
+        {
+            try
+            {
+                ExtractException aggregateException = null;
+                foreach (ExtractException ee in exceptions)
+                {
+                    if (aggregateException == null)
+                    {
+                        aggregateException = ee;
+                    }
+                    else
+                    {
+                        aggregateException = new ExtractException(ee.EliCode, ee.Message,
+                            aggregateException);
+                        aggregateException.CopyInformationFrom(ee);
+                    }
+                }
+
+                return aggregateException;
+            }
+            catch
+            {
+                ExtractException ee = new ExtractException("ELI32903",
+                    "Failed to aggregate exceptions");
+
+                // In the case of an error, try to at least output the top-level message and ELI
+                // code from each exception.
+                try
+                {
+                    foreach (ExtractException ee2 in exceptions)
+                    {
+                        if (ee2 != null)
+                        {
+                            ee.AddDebugData("ELI Code", ee2.EliCode, true);
+                            ee.AddDebugData("Exception Message", ee2.Message, true);
+                        }
+                    }
+                }
+                catch { }
+
+                return ee;
+            }
+        }
+
+        /// <summary>
         /// Throws an ExtractException built from the provided ELICode containing no debug data
         /// if the condition provided is false, otherwise does nothing.
         /// </summary>
@@ -1685,6 +1740,19 @@ namespace Extract
         public static ExtractException CreateComVisible(this Exception ex, string eliCode, string message)
         {
             return ExtractException.CreateComVisible(eliCode, message, ex);
+        }
+
+        /// <summary>
+        /// Combines all provided <see paramref="exceptions"/> into a single
+        /// <see cref="ExtractException"/>. The last exception in the enumeration will be the
+        /// top-level exceptions.
+        /// </summary>
+        /// <param name="exceptions">The exceptions to aggregate.</param>
+        /// <returns>An aggregate <see cref="ExtractException"/> containin all data in
+        /// <see paramref="exceptions"/>.</returns>
+        public static ExtractException AsAggregateException(this IEnumerable<ExtractException> exceptions)
+        {
+            return ExtractException.AsAggregateException(exceptions);
         }
 
         /// <summary>

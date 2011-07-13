@@ -1318,7 +1318,7 @@ string SpotRecognitionDlg::getZoneText(IRasterZonePtr& ripZone, IProgressStatus*
 
 	// first extract the zone into a temp image 
 	string strExtension(::getExtensionFromFullPath((LPCTSTR)m_UCLIDGenericDisplayCtrl.getImageName()));
-	TemporaryFileName tempImgFile(NULL, strExtension.c_str(), true);
+	TemporaryFileName tempImgFile(true, NULL, strExtension.c_str(), true);
 	
 	m_UCLIDGenericDisplayCtrl.extractZoneImage(ripZone->StartX, ripZone->StartY,
 		ripZone->EndX, ripZone->EndY, ripZone->Height, ripZone->PageNumber,
@@ -1331,7 +1331,7 @@ string SpotRecognitionDlg::getZoneText(IRasterZonePtr& ripZone, IProgressStatus*
 	}
 
 	// Create temporary file for bitmap output
-	TemporaryFileName tempOutFile( NULL, ".bmp", true );
+	TemporaryFileName tempOutFile( true, NULL, ".bmp", true );
 
 	L_INT nRet = L_FileConvert( (char *)tempImgFile.getName().c_str(),
 		(char *)tempOutFile.getName().c_str(), FILE_BMP, 0, 0, 8, 0, NULL, NULL, NULL);
@@ -1559,7 +1559,7 @@ void SpotRecognitionDlg::OnZoneEntitiesCreatedGenericDisplayCtrl(IUnknown* pZone
 					// the zone image shall be displayed in InputCorrectionDlg.
 					// Needs to be in the format of a bitmap since the input correction dlg
 					// can only display bitmap.
-					TemporaryFileName tempImgFile(NULL, ".bmp", true);
+					TemporaryFileName tempImgFile(true, NULL, ".bmp", true);
 					m_strLastZoneImageFile = tempImgFile.getName();
 
 					// extract the zone from original image into a temp image file

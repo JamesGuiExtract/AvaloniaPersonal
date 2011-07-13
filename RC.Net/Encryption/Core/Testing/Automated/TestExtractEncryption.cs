@@ -77,8 +77,8 @@ namespace Extract.Encryption
             "This string is the longest\n\nof\tthem\tyet\n\t\t\but there should still\n\n\n\t\tbe\tno\nproblem\n\twith\t\t\tencrypting\nthis\ntext"
             )] string text)
         {
-            using (TemporaryFile textFile = new TemporaryFile(),
-                tempEncrypted = new TemporaryFile())
+            using (TemporaryFile textFile = new TemporaryFile(true),
+                tempEncrypted = new TemporaryFile(true))
             {
                 // Get temporary file names
                 string tempTextFile = textFile.FileName;
@@ -114,7 +114,7 @@ namespace Extract.Encryption
             "This string is the longest\n\nof\tthem\tyet\n\t\t\but there should still\n\n\n\t\tbe\tno\nproblem\n\twith\t\t\tencrypting\nthis\ntext"
             )] string text)
         {
-            using (TemporaryFile tempFile = new TemporaryFile())
+            using (TemporaryFile tempFile = new TemporaryFile(true))
             {
                 // Get temporary file names
                 string tempEncryptedFile = tempFile.FileName;
@@ -148,7 +148,7 @@ namespace Extract.Encryption
             "This string is the longest\n\nof\tthem\tyet\n\t\t\but there should still\n\n\n\t\tbe\tno\nproblem\n\twith\t\t\tencrypting\nthis\ntext"
             )] string text)
         {
-            using (TemporaryFile tempFile = new TemporaryFile())
+            using (TemporaryFile tempFile = new TemporaryFile(true))
             {
                 // Get temporary file names
                 string tempEncryptedFile = tempFile.FileName;
@@ -223,8 +223,8 @@ namespace Extract.Encryption
             "This string is the longest\n\nof\tthem\tyet\n\t\t\but there should still\n\n\n\t\tbe\tno\nproblem\n\twith\t\t\tencrypting\nthis\ntext"
             )] string text)
         {
-            using (TemporaryFile textFile = new TemporaryFile(),
-                tempEncrypted = new TemporaryFile())
+            using (TemporaryFile textFile = new TemporaryFile(true),
+                tempEncrypted = new TemporaryFile(true))
             {
                 // Get temporary file names
                 string tempTextFile = textFile.FileName;
@@ -288,9 +288,9 @@ namespace Extract.Encryption
             "This string is the longest\n\nof\tthem\tyet\n\t\t\but there should still\n\n\n\t\tbe\tno\nproblem\n\twith\t\t\tencrypting\nthis\ntext"
             )] string text)
         {
-            using (TemporaryFile textFile = new TemporaryFile(),
-                tempEncrypted1 = new TemporaryFile(),
-                tempEncrypted2 = new TemporaryFile())
+            using (TemporaryFile textFile = new TemporaryFile(true),
+                tempEncrypted1 = new TemporaryFile(true),
+                tempEncrypted2 = new TemporaryFile(true))
             {
                 // Get temporary file names
                 string tempTextFile = textFile.FileName;
@@ -365,9 +365,9 @@ namespace Extract.Encryption
             "This string is the longest\n\nof\tthem\tyet\n\t\t\but there should still\n\n\n\t\tbe\tno\nproblem\n\twith\t\t\tencrypting\nthis\ntext"
             )] string text)
         {
-            using (TemporaryFile textFile = new TemporaryFile(),
-                tempEncrypted1 = new TemporaryFile(),
-                tempEncrypted2 = new TemporaryFile())
+            using (TemporaryFile textFile = new TemporaryFile(true),
+                tempEncrypted1 = new TemporaryFile(true),
+                tempEncrypted2 = new TemporaryFile(true))
             {
                 // Get temporary file names
                 string tempTextFile = textFile.FileName;

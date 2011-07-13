@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -130,7 +128,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_PAGE_NUMBERS,93,35,119,12,ES_AUTOHSCROLL
 END
 
-IDD_COPYMOVEDELETEFILEPROCESSORPP DIALOGEX 0, 0, 283, 264
+IDD_COPYMOVEDELETEFILEPROCESSORPP DIALOGEX 0, 0, 283, 296
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
@@ -143,27 +141,30 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_BROWSE_SRC,255,52,15,14
     CONTROL         "Allow read only file to be deleted",IDC_CHECK_ALLOW_READONLY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,69,165,12
+    CONTROL         "Securely delete",IDC_CHECK_SECURE_DELETE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,65,10
+    CONTROL         "Skip the operation with an error if the file cannot be securely overwritten",IDC_CHECK_SECURE_DELETE_THROW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,99,241,10
     CONTROL         "Record an error and continue",IDC_RADIO_NOSRC_ERR,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,96,119,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,127,119,10
     CONTROL         "Skip the operation without error",IDC_RADIO_NOSRC_NOERR,
-                    "Button",BS_AUTORADIOBUTTON,21,109,119,10
-    COMBOBOX        IDC_CMB_DST_FILE,14,150,220,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DST_DOC_TAG,239,150,10,14,BS_ICON
-    PUSHBUTTON      "...",IDC_BTN_BROWSE_DST,255,150,15,14
+                    "Button",BS_AUTORADIOBUTTON,21,140,119,10
+    COMBOBOX        IDC_CMB_DST_FILE,14,180,220,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DST_DOC_TAG,239,180,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_DST,255,180,15,14
     CONTROL         "Create destination folder if not present",IDC_CHECK_DIRECTORY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,167,145,12
-    CONTROL         "Modify SourceDocName in database to match the above destination filename.",
-					IDC_CHECK_MODIFY_SOURCEDOCNAME, "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,184,260,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,197,145,12
+    CONTROL         "Modify SourceDocName in database to match the above destination filename.",IDC_CHECK_MODIFY_SOURCEDOCNAME,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,214,260,12
     CONTROL         "Skip the operation and record an error",IDC_RADIO_DEST_ERR,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,212,181,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,242,181,10
     CONTROL         "Skip the operation without error",IDC_RADIO_DEST_NOERR,
-                    "Button",BS_AUTORADIOBUTTON,21,225,177,10
+                    "Button",BS_AUTORADIOBUTTON,21,255,177,10
     CONTROL         "Overwrite the file and continue",IDC_RADIO_DEST_OVERWRITE,
-                    "Button",BS_AUTORADIOBUTTON,21,238,177,10
-    GROUPBOX        "From",IDC_STATIC,7,40,268,93
-    GROUPBOX        "If Source File Does Not Exist",IDC_STATIC,14,86,220,40
-    GROUPBOX        "To",IDC_STATIC,7,138,268,121
-    GROUPBOX        "If Destination File Already Exists",IDC_STATIC,14,200,220,53
+                    "Button",BS_AUTORADIOBUTTON,21,268,177,10
+    GROUPBOX        "From",IDC_STATIC,7,40,268,124
+    GROUPBOX        "If Source File Does Not Exist",IDC_STATIC,14,117,220,40
+    GROUPBOX        "To",IDC_STATIC,7,168,268,121
+    GROUPBOX        "If Destination File Already Exists",IDC_STATIC,14,230,220,53
 END
 
 IDD_LAUNCHAPPFILEPROCESSORPP DIALOGEX 0, 0, 310, 123
@@ -324,7 +325,7 @@ BEGIN
     CONTROL         "Toggle the state of the tags selected below",IDC_RADIO_TOGGLE_TAG,
                     "Button",BS_AUTORADIOBUTTON,12,45,150,12
     GROUPBOX        "Tags (seperate multiple tags with semi-colon)",IDC_STATIC,7,65,236,27
-	COMBOBOX		IDC_COMBO_TAGS,12,75,212,50,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_TAGS,12,75,212,50,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "SelectDocTag",IDC_BTN_TAG_DOC_TAG,226,75,10,12,BS_ICON
 END
 
@@ -360,14 +361,14 @@ IDI_ICON_INFO           ICON                    "..\\..\\..\\..\\BaseUtils\\Code
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_COPYMOVEDELETEFILEPROCESSORPP, DIALOG
     BEGIN
         LEFTMARGIN, 4
         RIGHTMARGIN, 278
         TOPMARGIN, 5
-        BOTTOMMARGIN, 225
+        BOTTOMMARGIN, 257
     END
 
     IDD_LAUNCHAPPFILEPROCESSORPP, DIALOG
@@ -404,7 +405,6 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 269
         TOPMARGIN, 7
-        BOTTOMMARGIN, 219
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -415,7 +415,7 @@ END
 // Menu
 //
 
-IDR_MENU_CONTEXT MENU 
+IDR_MENU_CONTEXT MENU
 BEGIN
     POPUP "Context"
     BEGIN
@@ -434,7 +434,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "FileProcessors"
     IDS_TITLEOCRFileProcessorPP "&Title"
@@ -445,7 +445,7 @@ BEGIN
     IDS_DOCSTRINGCopyMoveDeleteFileProcessorPP "Your Help String"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLELaunchAppFileProcessorPP "&Title"
     IDS_HELPFILELaunchAppFileProcessorPP "Help File Name"
@@ -455,14 +455,14 @@ BEGIN
     IDS_DOCSTRINGSETACTIONSTATUSFILEPROCESSORPP "None"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLECONDITIONALTASKPP "Title"
     IDS_HELPFILECONDITIONALTASKPP "Help File Name"
     IDS_DOCSTRINGCONDITIONALTASKPP "Your Help String"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -43,8 +43,7 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 			_lastCodePos = "10";
 
 			// Create a temporary file for writing [LRCAU #5408]
-			TemporaryFileName tmpOutFile("", getExtensionFromFullPath(strOutputImage).c_str());
-
+			TemporaryFileName tmpOutFile(true, "", getExtensionFromFullPath(strOutputImage).c_str());
 
 			// Needed outside PDF manager scope
 			long nPageCount = 0;

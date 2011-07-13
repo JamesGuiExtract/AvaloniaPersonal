@@ -1320,7 +1320,20 @@ namespace Extract.Imaging.Forms
                 // Recalculate the geometry with a swapped orientation.
                 resizedGeometry = GetResizedGeometry(x, y);
             }
-
+            
+            // In order to ensure the side(s) being resized do not move "in" from their current
+            // positions (thus leaking pixels the user wasn't intending to leak), inflate these
+            // sides by .5 pixels before rounding to ensure these sides are rounded "safely".
+            // Do not use "safe" rounding for the whole zone since this results in frustrating
+            // expansion of all sides as the zone is re-sized.
+            if (_trackingEventEnding)
+            {
+                foreach (Side side in _activeTrackingVectors.Keys)
+                {
+                    resizedGeometry.InflateSide(side, 0.5F);
+                }
+            }
+            
             RoundingMode roundingMode = _trackingEventEnding ? RoundingMode.Simple : RoundingMode.None;
             resizedGeometry.GetZoneCoordinates(roundingMode, out startPoint, out endPoint, out height);
 

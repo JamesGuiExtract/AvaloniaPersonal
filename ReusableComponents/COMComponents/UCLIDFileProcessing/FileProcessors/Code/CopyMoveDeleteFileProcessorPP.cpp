@@ -114,6 +114,11 @@ STDMETHODIMP CCopyMoveDeleteFileProcessorPP::Apply(void)
 				// Set allow readonly
 				ipFP->AllowReadonly = asVariantBool(m_btnAllowReadonly.GetCheck() == BST_CHECKED);
 
+				// Secure delete options
+				ipFP->SecureDelete = asVariantBool(m_btnSecureDelete.GetCheck() == BST_CHECKED);
+				ipFP->ThrowIfUnableToDeleteSecurely =
+					asVariantBool(m_btnThrowIfUnableToDeleteSecurely.GetCheck() == BST_CHECKED);
+
 				// Handle Source radio buttons
 				if (m_radioSrcErr.GetCheck() == BST_CHECKED)
 				{
@@ -204,6 +209,10 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 			// Get the allow readonly checkbox
 			m_btnAllowReadonly = GetDlgItem(IDC_CHECK_ALLOW_READONLY);
 
+			// Secure delete options.
+			m_btnSecureDelete = GetDlgItem(IDC_CHECK_SECURE_DELETE);
+			m_btnThrowIfUnableToDeleteSecurely = GetDlgItem(IDC_CHECK_SECURE_DELETE_THROW);
+
 			// Get Source items
 			m_cmbSrc = GetDlgItem(IDC_CMB_SRC_FILE);
 			m_btnSrcSelectTag.SubclassDlgItem(IDC_BTN_SELECT_SRC_DOC_TAG, CWnd::FromHandle(m_hWnd));
@@ -223,11 +232,16 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 			m_btnCreateFolder = GetDlgItem( IDC_CHECK_DIRECTORY );
 			m_btnModifySourceDocName = GetDlgItem(IDC_CHECK_MODIFY_SOURCEDOCNAME);
 
-			// Set allow readonly
+			// Secure delete options.
 			m_btnAllowReadonly.SetCheck(asCppBool(ipFP->AllowReadonly) ? BST_CHECKED : BST_UNCHECKED);
 
-			// Set operation radio button
+			m_btnSecureDelete.SetCheck(asBSTChecked(ipFP->SecureDelete));
+			m_btnThrowIfUnableToDeleteSecurely.SetCheck(asBSTChecked(ipFP->ThrowIfUnableToDeleteSecurely));
+
 			BOOL bTmp;
+			OnBnClickedCheckSecureDelete(0, 0, 0, bTmp);
+
+			// Set operation radio button
 			ECopyMoveDeleteOperationType eOperation = (ECopyMoveDeleteOperationType)ipFP->Operation;
 			switch(eOperation)
 			{
@@ -428,6 +442,19 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnCbnSelEndCancelCmbDstFile(WORD wNotify
 
 	return 0;
 }
+//-------------------------------------------------------------------------------------------------
+LRESULT CCopyMoveDeleteFileProcessorPP::OnBnClickedCheckSecureDelete(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		updateEnabledState();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32862");
+
+	return 0;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods
@@ -601,10 +628,12 @@ void CCopyMoveDeleteFileProcessorPP::validateLicense()
 void CCopyMoveDeleteFileProcessorPP::updateEnabledState()
 {
 	bool bDeleteSelected = m_radioDelete.GetCheck() == BST_CHECKED;
+	bool bSecureDeleteSelected = m_btnSecureDelete.GetCheck() == BST_CHECKED;
 
 	// Set up enabled state based on wheither delete is checked
 	BOOL bEnableForDelete = bDeleteSelected ? TRUE : FALSE;
 	BOOL bDisableForDelete = bDeleteSelected ? FALSE : TRUE;
+	BOOL bEnableForSecureDelete = asMFCBool(bDeleteSelected && bSecureDeleteSelected);
 
 	// Disable or enable destination controls
 	m_cmbDst.EnableWindow(bDisableForDelete);
@@ -619,5 +648,9 @@ void CCopyMoveDeleteFileProcessorPP::updateEnabledState()
 
 	// Enable or disable readonly checkbox
 	m_btnAllowReadonly.EnableWindow(bEnableForDelete);
+
+	// Secure delete options
+	m_btnSecureDelete.EnableWindow(bEnableForDelete);
+	m_btnThrowIfUnableToDeleteSecurely.EnableWindow(bEnableForSecureDelete);
 }
 //-------------------------------------------------------------------------------------------------

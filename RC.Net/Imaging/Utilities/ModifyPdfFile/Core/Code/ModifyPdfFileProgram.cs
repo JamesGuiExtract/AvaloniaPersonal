@@ -109,7 +109,7 @@ namespace Extract.Utilities
                     throw ee;
                 }
 
-                using (var tempFile = new TemporaryFile(".pdf"))
+                using (var tempFile = new TemporaryFile(".pdf", true))
                 {
                     if (removeAnnotations)
                     {

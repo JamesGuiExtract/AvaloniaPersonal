@@ -1,28 +1,21 @@
-using Extract;
-using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Xml;
-using System.Xml.Serialization.Configuration;
 using System.Xml.XPath;
 
 namespace Extract.Utilities
 {
-    #region Public Methods
-
     /// <summary>
-    /// Wrapper for <see cref="ApplicationSettingsBase"/> objects that contain assembly settings
-    /// loaded from a .NET application config file that allows the settings to be loaded/saved to a
-    /// specified location and, optionally, dynamically updated as property values are changed.
+    /// Wrapper for <see cref="ApplicationSettingsBase"/> that allows the settings to be
+    /// loaded/saved to a specified config file and, optionally, dynamically updated as property
+    /// values are changed.
     /// </summary>
-    public class ConfigSettings<T> where T : ApplicationSettingsBase, new()
+    public sealed class ConfigSettings<T> : ExtractSettingsBase<T> where T : ApplicationSettingsBase, new()
     {
         #region Constants
 
@@ -46,11 +39,6 @@ namespace Extract.Utilities
         #region Fields
 
         /// <summary>
-        /// The ApplicationSettingsBase instance containing the config file properties
-        /// </summary>
-        T _settings;
-
-        /// <summary>
         /// Used to map the _config instance to the correct config file
         /// </summary>
         readonly ExeConfigurationFileMap _configFileMap = new ExeConfigurationFileMap();
@@ -61,33 +49,19 @@ namespace Extract.Utilities
         Configuration _config;
 
         /// <summary>
+        /// The <see cref="ClientSettingsSection"/> that persists application scoped properties.
+        /// </summary>
+        ClientSettingsSection _applicationConfigSection;
+
+        /// <summary>
+        /// The <see cref="ClientSettingsSection"/> that persists user scoped properties.
+        /// </summary>
+        ClientSettingsSection _userConfigSection;
+
+        /// <summary>
         /// The filename of the open configuration.
         /// </summary>
         string _configFileName;
-
-        /// <summary>
-        /// If <see langword="true"/>, properties will be saved to disk as soon as they are
-        /// modified and re-freshed from disk as necessary every time the Settings property is
-        /// accessed. If <see langword="false"/> the propeties will only be saved to 
-        /// disk on-demand and will never be refreshed from disk.
-        /// </summary>
-        bool _dynamic;
-
-        /// <summary>
-        /// The last known modification time of the open configuration file. Used to determine if
-        /// settings need to be re-loaded from disk.
-        /// </summary>
-        DateTime _configFileLastModified;
-
-        /// <summary>
-        /// Keeps track of properties modified since the last save.
-        /// </summary>
-        readonly List<string> _modifiedProperties = new List<string>();
-
-        /// <summary>
-        /// Indicates if the settings are currently being refreshed from disk.
-        /// </summary>
-        bool _refreshing;
 
         /// <summary>
         /// Mutex object to exclusive access while creating file-specific mutex's
@@ -101,6 +75,8 @@ namespace Extract.Utilities
             new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         #endregion Fields
+
+        #region Constructors
 
         /// <overloads>Initializes a new ConfigSettings instance.</overloads>
         /// <summary>
@@ -130,8 +106,8 @@ namespace Extract.Utilities
         /// </param>
         /// <param name="dynamic">If <see langword="true"/>, properties will be saved to disk as 
         /// soon as they are modified and re-freshed from disk as necessary every time the Settings 
-        /// property is accessed. If <see langword="false"/> the propeties will only be saved to 
-        /// disk on-demand and will never be refreshed from disk.</param>
+        /// property is accessed. If <see langword="false"/> the properties will only be loaded and
+        /// saved to disk when explicitly requested.</param>
         /// <param name="createIfMissing"><see langword="true"/> if a new config file instance
         /// should be created if there is no config file at the specified location,
         /// <see langword="false"/> if an error should occur if the file is missing.</param>
@@ -151,28 +127,17 @@ namespace Extract.Utilities
         /// </param>
         /// <param name="dynamic">If <see langword="true"/>, properties will be saved to disk as 
         /// soon as they are modified and re-freshed from disk as necessary every time the Settings 
-        /// property is accessed. If <see langword="false"/> the propeties will only be saved to 
-        /// disk on-demand and will never be refreshed from disk.</param>
+        /// property is accessed. If <see langword="false"/> the properties will only be loaded and
+        /// saved to disk when explicitly requested.</param>
         /// <param name="createIfMissing"><see langword="true"/> if a new config file instance
         /// should be created if there is no config file at the specified location,
         /// <see langword="false"/> if an error should occur if the file is missing.</param>
         public ConfigSettings(string configFileName, string defaultConfigFileName, bool dynamic,
             bool createIfMissing)
+            : base(dynamic)
         {
             try
             {
-                // Validate that the calling assembly is an extract assembly
-                if(!LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()))
-                {
-                    var ee = new ExtractException("ELI30041",
-                        "Object is not usable in current configuration.");
-                    ee.AddDebugData("Object Name", this.GetType().ToString(), false);
-                    throw ee;
-                }
-
-                // Create a new instance (will have the default settings)
-                _settings = new T();
-
                 // If a filename was not specified, create one based on the name of the
                 // ApplicationDataPath and the assembly that defines T.
                 if (configFileName == null)
@@ -191,8 +156,6 @@ namespace Extract.Utilities
                 // an new configuration file.
                 lock (FileLock)
                 {
-                    _dynamic = dynamic;
-
                     if (!File.Exists(_configFileName))
                     {
                         if (createIfMissing)
@@ -214,36 +177,15 @@ namespace Extract.Utilities
                     {
                         // Open the config file
                         _configFileMap.ExeConfigFilename = defaultConfigFileName;
-                        _config = ConfigurationManager.OpenMappedExeConfiguration(
-                            _configFileMap, ConfigurationUserLevel.None);
-
-                        // Load the settings (_OBJECT_SETTINGS_GROUP settings will be read at the time
-                        // ApplyObjectSettings is called).
-                        LoadSectionInformation(_APPLICATION_SETTINGS_GROUP);
-                        LoadSectionInformation(_USER_SETTINGS_GROUP);
+                        Load();
                     }
 
-                    // Open the config file
+                    // Open the primary config file
                     _configFileMap.ExeConfigFilename = _configFileName;
-                    _config = ConfigurationManager.OpenMappedExeConfiguration(
-                        _configFileMap, ConfigurationUserLevel.None);
-
-                    // Load the settings (_OBJECT_SETTINGS_GROUP settings will be read at the time
-                    // ApplyObjectSettings is called).
-                    LoadSectionInformation(_APPLICATION_SETTINGS_GROUP);
-                    LoadSectionInformation(_USER_SETTINGS_GROUP);
-
-                    // Keep track of the config file last modified time so we know when the _config
-                    // instance needs to be refreshed from disk.
-                     _configFileLastModified = File.GetLastWriteTime(_config.FilePath);
-
-                     // [DotNetRCAndUtils:635]
-                     // Call save to ensure any settings that do not yet exist in the config file
-                     // are written out.
-                     Save();
-
-                    _settings.PropertyChanged += HandlePropertyChanged;
+                    Load();
                 }
+
+                Constructed = true;
             }
             catch (Exception ex)
             {
@@ -254,28 +196,9 @@ namespace Extract.Utilities
             }
         }
 
-        /// <summary>
-        /// Gets the <see cref="ApplicationSettingsBase"/> instance containing the properties from
-        /// the config file.
-        /// <para><b>Note</b></para>
-        /// In dynamic mode, it is important to access settings through this property with every
-        /// call to ensure properties are in sync with the file on disk.
-        /// </summary>
-        /// <returns>The <see cref="ApplicationSettingsBase"/> instance.</returns>
-        public T Settings
-        {
-            get
-            {
-                if (_dynamic)
-                {
-                    // If the config file has been modified since it was last reloaded/refreshed,
-                    // grab the updated values from disk.
-                    Refresh(true);
-                }
+        #endregion Constructors
 
-                return _settings;
-            }
-        }
+        #region Public Methods
 
         /// <summary>
         /// Applies settings from the config file to the specified object using reflection.
@@ -330,7 +253,7 @@ namespace Extract.Utilities
         {
             try
             {
-                 // Locate the objectSettings group
+                // Locate the objectSettings group
                 DefaultSection section = (DefaultSection)_config.Sections[sectionName];
 
                 // Assuming we found an appropriate section, retrieve the XML 
@@ -354,19 +277,78 @@ namespace Extract.Utilities
             }
         }
 
+        #endregion Public Methods
+
+        #region Overrides
+
         /// <summary>
-        /// Saves modified <see cref="ApplicationSettingsBase"/> user properties to disk.
+        /// Specifies that some or all properties should be created in the config file even if the
+        /// value has not changed from its default. This allows for easier manipulation of the
+        /// settings by the user.
         /// </summary>
-        public void Save()
+        /// <param name="propertyNames">If specified, the names of the properties to generate. If
+        /// not specified, values for all members of the wrapped
+        /// <see cref="ApplicationSettingsBase"/> type will be generated.</param>
+        public override void GeneratePropertyValues(params string[] propertyNames)
         {
             try
             {
-                // If there are no modified properties, there is nothing to do.
-                if (_modifiedProperties.Count == 0)
+                // Update the _config instance so that it won't throw an exception when saving
+                // if the config file was updated since it was last loaded/refreshed.
+                ResetConfigFileConnection();
+
+                base.GeneratePropertyValues(propertyNames);
+
+                // If ForceSave is not set, the data will not be saved.
+                if (_userConfigSection != null)
                 {
-                    return;
+                    _userConfigSection.SectionInformation.ForceSave = true;
+                }
+                if (_applicationConfigSection != null)
+                {
+                    _applicationConfigSection.SectionInformation.ForceSave = true;
                 }
 
+                _config.Save(ConfigurationSaveMode.Full);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32892");
+            }
+        }
+
+        /// <summary>
+        /// Loads the data from the config file into the Settings instance.
+        /// </summary>
+        public override void Load()
+        {
+            try
+            {
+                base.Load();
+
+                lock (FileLock)
+                {
+                    ResetConfigFileConnection();
+
+                    // Load the settings (_OBJECT_SETTINGS_GROUP settings will be read at the time
+                    // ApplyObjectSettings is called).
+                    LoadSectionInformation(_APPLICATION_SETTINGS_GROUP);
+                    LoadSectionInformation(_USER_SETTINGS_GROUP);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32895");
+            }
+        }
+
+        /// <summary>
+        /// Saves modified <see cref="ApplicationSettingsBase"/> user properties to disk.
+        /// </summary>
+        public override void Save()
+        {
+            try
+            {
                 // If the file has been modified since it was loaded, an error will result when
                 // trying to save. Therefore, lock around saving so that it is not possible for the
                 // file to be updated between the time Refresh is called and the time the file is
@@ -375,41 +357,19 @@ namespace Extract.Utilities
                 {
                     // Update the _config instance so that it won't throw an exception when saving
                     // if the config file was updated since it was last loaded/refreshed.
-                    Refresh(false);
+                    ResetConfigFileConnection();
 
-                    // Locate the userSettings group (which contains the writable settings)
-                    ConfigurationSectionGroup configSectionGroup =
-                        _config.SectionGroups[_USER_SETTINGS_GROUP];
-
-                    ExtractException.Assert("ELI29690", "userSettings section missing!",
-                        configSectionGroup != null);
-
-                    // Retrieve the settings associated with the Setting's class's type.
-                    string settingsType = typeof(T).ToString();
-                    ClientSettingsSection configSection =
-                        (ClientSettingsSection)configSectionGroup.Sections[settingsType];
-
-                    // Loop through each modified setting and apply them.
-                    foreach (string modifiedProperty in _modifiedProperties)
-                    {
-                        // Create a new SettingElement if it was not already present in the config
-                        // file.
-                        SettingElement setting = configSection.Settings.Get(modifiedProperty);
-                        if (setting == null)
-                        {
-                            XmlDocument xmlDocument = new XmlDocument();
-                            xmlDocument.InnerXml = configSection.SectionInformation.GetRawXml();
-
-                            setting = new SettingElement(modifiedProperty, SettingsSerializeAs.String);
-                            setting.Value.ValueXml = xmlDocument.CreateElement("value");
-                            configSection.Settings.Add(setting);
-                        }
-
-                        ApplySettingValue(configSection.Settings.Get(modifiedProperty));
-                    }
+                    base.Save();
 
                     // If ForceSave is not set, the data will not be saved.
-                    configSection.SectionInformation.ForceSave = true;
+                    if (_userConfigSection != null)
+                    {
+                        _userConfigSection.SectionInformation.ForceSave = true;
+                    }
+                    if (_applicationConfigSection != null)
+                    {
+                        _applicationConfigSection.SectionInformation.ForceSave = true;
+                    }
 
                     _config.Save(ConfigurationSaveMode.Full);
                 }
@@ -423,42 +383,67 @@ namespace Extract.Utilities
             }
         }
 
-        #endregion Public Methods
-
         /// <summary>
-        /// Handles the case that a _settings property was changed.
+        /// Commits the specified <see paramref="value"/> of the specified property to the config
+        /// file.
         /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">The event data associated with the event.</param>
-        void HandlePropertyChanged(object sender, PropertyChangedEventArgs e)
+        /// <param name="propertyName">The name of the property to be applied.</param>
+        /// <param name="value">The value to apply.</param>
+        protected override void SavePropertyValue(string propertyName, string value)
         {
             try
             {
-                // Refreshing may trigger PropertyChanged events, don't save in this case.
-                if (!_refreshing)
-                {
-                    // If a save is already in progress, wait until that operation is complete
-                    // before applying a new change.
-                    lock (FileLock)
-                    {
-                        _modifiedProperties.Add(e.PropertyName);
-                    }
+                bool isUserProperty = IsUserProperty(propertyName);
+                ClientSettingsSection configSection = GetConfigSection(isUserProperty);
 
-                    // If in dynamic mode, save right away.
-                    if (_dynamic)
-                    {
-                        Save();
-                    }
+                // Create a new SettingElement if it was not already present in the config
+                // file.
+                SettingElement setting = configSection.Settings.Get(propertyName);
+                if (setting == null)
+                {
+                    XmlDocument xmlDocument = new XmlDocument();
+                    xmlDocument.InnerXml = configSection.SectionInformation.GetRawXml();
+
+                    setting = new SettingElement(propertyName, SettingsSerializeAs.String);
+                    setting.Value.ValueXml = xmlDocument.CreateElement("value");
+                    configSection.Settings.Add(setting);
+                }
+
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    setting.Value.ValueXml.InnerText = value;
+                }
+                else
+                {
+                    // So that empty elements aren't spread across 2 lines with separate open/close
+                    // elements, create a new empty element rather than settings the inner text.
+                    var doc = new XmlDocument();
+                    setting.Value.ValueXml = doc.CreateElement("value");
                 }
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI29691",
-                    "Error saving settings change!", ex);
-                ee.AddDebugData("Setting Name", e.PropertyName, false);
-                ee.Display();
+                throw ex.AsExtract("ELI32896");
             }
         }
+
+        /// <summary>
+        /// Gets the last modified time of the config file.
+        /// </summary>
+        /// <returns>The <see cref="DateTime"/> the config file was last modified .</returns>
+        protected override DateTime GetLastModifiedTime()
+        {
+            try
+            {
+                return File.GetLastWriteTime(_configFileName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32893");
+            }
+        }
+
+        #endregion Overrides
 
         #region Private Members
 
@@ -485,10 +470,33 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Creates a new config file with a userSettings section so that any modified
-        /// user settings can be applied.
+        /// Resets the _config instance so that it is in sync with the data on disk. This must be
+        /// called before loading/saving any modified data.
         /// </summary>
-        /// <param name="configFileName">The name of the file to create.</param>
+        void ResetConfigFileConnection()
+        {
+            try
+            {
+                _config = ConfigurationManager.OpenMappedExeConfiguration(
+                        _configFileMap, ConfigurationUserLevel.None);
+
+                _applicationConfigSection = null;
+                _userConfigSection = null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32894");
+            }
+        }
+
+        /// <summary>
+        /// Creates a new config file at the specified location. If HasUserProperties 
+        /// <see langword="true"/>, a UserSettingsGroup will be generated and if
+        /// HasApplicationProperties is <see langword="false"/>, an ApplicationSettingsGroup will
+        /// be generated. However, properties will be added to those groups only if they are
+        /// modified or if <see cref="GeneratePropertyValues"/> is called.
+        /// </summary>
+        /// <param name="configFileName">The name of the config file to create.</param>
         void CreateConfigFile(string configFileName)
         {
             try
@@ -509,38 +517,6 @@ namespace Extract.Utilities
                     xmlDocument.CreateElement("configSections");
                 configElement.AppendChild(configSectionsElement);
 
-                // userSettings definition node
-                XmlElement userSettingsDefinitionElement =
-                    CreateQualifiedTypeElement("sectionGroup", _USER_SETTINGS_GROUP,
-                    typeof(System.Configuration.UserSettingsGroup), xmlDocument);
-                configSectionsElement.AppendChild(userSettingsDefinitionElement);
-
-                // userSettings section definition node
-                XmlElement settingsSectionElement =
-                    CreateQualifiedTypeElement("section", _settings.GetType().ToString(),
-                    typeof(System.Configuration.ClientSettingsSection), xmlDocument);
-                userSettingsDefinitionElement.AppendChild(settingsSectionElement);
-
-                XmlAttribute allowExeDefinitionAttribute =
-                    xmlDocument.CreateAttribute("allowExeDefinition");
-                allowExeDefinitionAttribute.Value = "MachineToLocalUser";
-                settingsSectionElement.Attributes.Append(allowExeDefinitionAttribute);
-
-                XmlAttribute requirePermissionAttribute =
-                    xmlDocument.CreateAttribute("requirePermission");
-                requirePermissionAttribute.Value = "false";
-                settingsSectionElement.Attributes.Append(requirePermissionAttribute);
-
-                // userSettings node
-                XmlElement userSettingsElement =
-                    xmlDocument.CreateElement(_USER_SETTINGS_GROUP);
-                configElement.AppendChild(userSettingsElement);
-
-                // type specific node
-                XmlElement typeSpecificElement =
-                    xmlDocument.CreateElement(_settings.GetType().ToString());
-                userSettingsElement.AppendChild(typeSpecificElement);
-
                 // [FlexIDSCore:4131]
                 // Create the directory first, if necessary.
                 string directoryName = Path.GetDirectoryName(configFileName);
@@ -549,12 +525,232 @@ namespace Extract.Utilities
                     Directory.CreateDirectory(directoryName);
                 }
 
-                xmlDocument.Save(configFileName);
+                // Create section groups only if the Settings objects contains corresponding
+                // properties in them.
+                if (HasUserProperties)
+                {
+                    CreateConfigGroup(xmlDocument, configElement, configSectionsElement, true);
+                }
+                if (HasApplicationProperties)
+                {
+                    CreateConfigGroup(xmlDocument, configElement, configSectionsElement, false);
+                }
             }
             catch (Exception ex)
             {
                 throw new ExtractException("ELI29692", "Failed to create config file!", ex);
             }
+        }
+
+        /// <summary>
+        /// Gets one of the <see cref="ClientSettingsSection"/>s from the config file (creating it
+        /// if necessary).
+        /// </summary>
+        /// <param name="userSection"><see langword="true"/> to get the section from the
+        /// UserSettingsGroup; <see langword="false"/> to get the section from the
+        /// ApplicationSettingsGroup.</param>
+        /// <param name="recursing"><see langword="true"/> if this method is being called
+        /// recursively, to prevent the possibility of infinite recursion</param>
+        /// <returns>The appropriate <see cref="ClientSettingsSection"/>.</returns>
+        ClientSettingsSection GetConfigSection(bool userSection, bool recursing = false)
+        {
+            ConfigurationSectionGroup configSectionGroup = null;
+            ClientSettingsSection configSection = null;
+
+            if (userSection)
+            {
+                if (_userConfigSection != null)
+                {
+                    return _userConfigSection;
+                }
+
+                // Locate the UserSettingsGroup (which contains the writable settings)
+                configSectionGroup =
+                    _config.SectionGroups[_USER_SETTINGS_GROUP];
+            }
+            else
+            {
+                if (_applicationConfigSection != null)
+                {
+                    return _applicationConfigSection;
+                }
+
+                // Locate the ApplicationSettingsGroup (which contains the read-only settings)
+                configSectionGroup = _config.SectionGroups[_APPLICATION_SETTINGS_GROUP];
+            }
+
+            // If the group does not exist, create it, then re-attempt the GetConfigSection call.
+            // (CreateConfigGroup will create the config section as well.).
+            if (configSectionGroup == null && !recursing)
+            {
+                CreateConfigGroup(userSection);
+                return GetConfigSection(userSection, true);
+            }
+
+            ExtractException.Assert("ELI29690", "Settings group missing!",
+                configSectionGroup != null);
+
+            // Retrieve the settings associated with the Setting's class's type.
+            string settingsType = typeof(T).ToString();
+            configSection = (ClientSettingsSection)configSectionGroup.Sections[settingsType];
+
+            // If the section does not exist, create it, then re-attempt the GetConfigSection call.
+            if (configSection == null && !recursing)
+            {
+                CreateConfigSection(userSection);
+                return GetConfigSection(userSection, true);
+            }
+
+            ExtractException.Assert("ELI32902", "Settings section missing!",
+                configSectionGroup != null);
+
+            // Cache the section for faster access next time.
+            if (userSection)
+            {
+                _userConfigSection = configSection;
+            }
+            else
+            {
+                _applicationConfigSection = configSection;
+            }
+
+            return configSection;
+        }
+
+        /// <summary>
+        /// Creates an ApplicationSettingsGroup or UserSettingsGroup (along with a config section
+        /// for the assembly) depending upon the value of <see paramref="userSection"/>.
+        /// </summary>
+        /// <param name="userSection"><see langword="true"/> to create a UserSettingsGroup,
+        /// <see langword="false"/> to create an ApplicationSettingsGroup,</param>
+        void CreateConfigGroup(bool userSection)
+        {
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.Load(_configFileName);
+
+            // Get configuration and configSections nodes
+            XmlElement configElement = xmlDocument.DocumentElement;
+            XmlElement configSectionsElement = configElement["configSections"];
+
+            CreateConfigGroup(xmlDocument, configElement, configSectionsElement, userSection);
+        }
+
+        /// <summary>
+        /// Creates a settings group (along with a config section for the assembly) depending upon
+        /// the value of <see paramref="userSection"/>.
+        /// </summary>
+        /// <param name="xmlDocument">The <see cref="XmlDocument"/> in which the group is being
+        /// created.</param>
+        /// <param name="configElement">The <see cref="XmlElement"/> for the configuration node.
+        /// </param>
+        /// <param name="configSectionsElement">The <see cref="XmlElement"/> element for the config
+        /// sections node.</param>
+        /// <param name="userGroup"><see langword="true"/> to create a UserSettingsGroup,
+        /// <see langword="false"/> to create an ApplicationSettingsGroup,</param>
+        void CreateConfigGroup(XmlDocument xmlDocument, XmlElement configElement,
+            XmlElement configSectionsElement, bool userGroup)
+        {
+            string sectionName = userGroup ? _USER_SETTINGS_GROUP : _APPLICATION_SETTINGS_GROUP;
+            Type sectionType = userGroup
+                ? typeof(System.Configuration.UserSettingsGroup)
+                : typeof(System.Configuration.ApplicationSettingsGroup);
+
+            // Create a definition for the group.
+            XmlElement groupDefinitionElement =
+                CreateQualifiedTypeElement("sectionGroup", sectionName, sectionType, xmlDocument);
+            configSectionsElement.AppendChild(groupDefinitionElement);
+
+            // Create the group itself.
+            XmlElement groupElement = xmlDocument.CreateElement(sectionName);
+            configElement.AppendChild(groupElement);
+
+            // Create the corresponding config section.
+            CreateConfigSection(xmlDocument, groupDefinitionElement, groupElement, userGroup);
+
+            // Save the file, then refresh the config file connection.
+            xmlDocument.Save(_configFileName);
+
+            if (Constructed)
+            {
+                ResetConfigFileConnection();
+            }
+        }
+
+        /// <summary>
+        /// Creates a config section in the appropriate group for the current assembly.
+        /// </summary>
+        /// <param name="userSection"><see langword="true"/> to create the section in the
+        /// UserSettingsGroup, <see langword="false"/> to create it in the
+        /// ApplicationSettingsGroup,</param>
+        void CreateConfigSection(bool userSection)
+        {
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.Load(_configFileName);
+
+            string sectionName = userSection ? _USER_SETTINGS_GROUP : _APPLICATION_SETTINGS_GROUP;
+
+            // Get configuration and configSections nodes
+            XmlElement configElement = xmlDocument.DocumentElement;
+            XmlElement configSectionsElement = configElement["configSections"];
+            XmlNodeList sectionGroups = configSectionsElement.GetElementsByTagName("sectionGroup");
+            XmlElement groupDefinitionElement = sectionGroups
+                .OfType<XmlElement>()
+                .Where(element => element.GetAttribute("name") == sectionName)
+                .Single();
+            XmlElement groupElement = configElement[sectionName];
+
+            CreateConfigSection(xmlDocument, groupDefinitionElement, groupElement, userSection);
+
+            // Save the file, then refresh the config file connection. Perform the save in this
+            // overload; if it is done in the other the save will be duplicated in
+            // CreateConfigGroup.
+            xmlDocument.Save(_configFileName);
+
+            if (Constructed)
+            {
+                ResetConfigFileConnection();
+            }
+        }
+
+        /// <summary>
+        /// Creates a config section in the appropriate group for the current assembly.
+        /// </summary>
+        /// <param name="xmlDocument">The <see cref="XmlDocument"/> in which the section is being
+        /// created.</param>
+        /// <param name="groupDefinitionElement">The <see cref="XmlElement"/> for the group's
+        /// definition node.</param>
+        /// <param name="groupElement">The <see cref="XmlElement"/> for the group node.
+        /// </param>
+        /// <param name="userSection"><see langword="true"/> to create the section in the
+        /// UserSettingsGroup, <see langword="false"/> to create it in the
+        /// ApplicationSettingsGroup,</param>
+        void CreateConfigSection(XmlDocument xmlDocument, XmlElement groupDefinitionElement,
+            XmlElement groupElement, bool userSection)
+        {
+            // Create a definition for the section and add it to the group's definition.
+            XmlElement settingsSectionElement =
+                CreateQualifiedTypeElement("section", Settings.GetType().ToString(),
+                typeof(System.Configuration.ClientSettingsSection), xmlDocument);
+            groupDefinitionElement.AppendChild(settingsSectionElement);
+
+            // A user section should have the MachineToLocalUser scope applied.
+            if (userSection)
+            {
+                XmlAttribute allowExeDefinitionAttribute =
+                    xmlDocument.CreateAttribute("allowExeDefinition");
+                allowExeDefinitionAttribute.Value = "MachineToLocalUser";
+                settingsSectionElement.Attributes.Append(allowExeDefinitionAttribute);
+            }
+
+            XmlAttribute requirePermissionAttribute =
+                xmlDocument.CreateAttribute("requirePermission");
+            requirePermissionAttribute.Value = "false";
+            settingsSectionElement.Attributes.Append(requirePermissionAttribute);
+
+            // Create the config section itself.
+            XmlElement typeSpecificElement =
+                xmlDocument.CreateElement(Settings.GetType().ToString());
+            groupElement.AppendChild(typeSpecificElement);
         }
 
         /// <summary>
@@ -598,33 +794,20 @@ namespace Extract.Utilities
                 ClientSettingsSection configSection =
                     (ClientSettingsSection)configSectionGroup.Sections[settingsType];
 
-                ValidateSettings(configSection);
-
-                // Loop through all SettingsProperty to load any specified values from disk.
-                foreach (SettingsProperty setting in _settings.Properties)
+                if (configSection != null)
                 {
-                    string settingName = setting.Name;
-                    SettingElement xmlSetting = configSection.Settings.Get(settingName);
-                    if (xmlSetting == null)
+                    ValidateSettings(configSection);
+
+                    // Loop through all SettingsProperty to load any specified values from disk.
+                    foreach (SettingsProperty setting in Settings.Properties)
                     {
-                        // [DotNetRCAndUtils:635]
-                        // If there is no settings specified in the xml file, this is a user scoped
-                        // setting and we are currently looking at the target config file (rather
-                        // than a default config file), treat the setting as if it were modifed.
-                        // This ensures all unspecified settings will be explicitly written to the
-                        // config file to make modifying the values easier.
-                        if (_configFileName == _configFileMap.ExeConfigFilename &&
-                            setting.Attributes.ContainsKey(typeof(UserScopedSettingAttribute)))
+                        string settingName = setting.Name;
+                        SettingElement xmlSetting = configSection.Settings.Get(settingName);
+                        if (xmlSetting != null)
                         {
-                            HandlePropertyChanged(this, new PropertyChangedEventArgs(settingName));
+                            // Convert the string XML value to the appropriate type and apply the value.
+                            UpdatePropertyFromString(settingName, xmlSetting.Value.ValueXml.InnerText);
                         }
-                    }
-                    else
-                    {
-                        // Convert the string XML value to the appropriate type and apply the value.
-                        _settings[settingName] =
-                            TypeDescriptor.GetConverter(setting.PropertyType).ConvertFromString(
-                                xmlSetting.Value.ValueXml.InnerXml);
                     }
                 }
             }
@@ -639,7 +822,7 @@ namespace Extract.Utilities
         {
             IEnumerable<SettingElement> invalidXmlSettings = configSection.Settings
                 .Cast<SettingElement>()
-                .Where(setting => _settings.Properties[setting.Name] == null);
+                .Where(setting => Settings.Properties[setting.Name] == null);
             if (invalidXmlSettings.Any())
             {
                 ExtractException ee = new ExtractException("ELI28826",
@@ -649,92 +832,6 @@ namespace Extract.Utilities
                     ee.AddDebugData("Setting name", invalidXmlSetting.Name, false);
                 }
                 throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Applies to the specified setting in the _config instance the current value in _settings.
-        /// </summary>
-        /// <param name="setting">The setting to be applied.</param>
-        void ApplySettingValue(SettingElement setting)
-        {
-            ExtractException.Assert("ELI29685", "Null argument exception!", setting != null);
-
-            try
-            {
-                object settingObject = _settings[setting.Name];
-                ExtractException.Assert("ELI29683", "Invalid Setting!", settingObject != null);
-
-                // Check the type of the setting
-                Type settingType = settingObject.GetType();
-                string value = string.Empty;
-                if (settingType == typeof(string))
-                {
-                    value = (string)settingObject;
-                }
-                else
-                {
-                    value = TypeDescriptor.GetConverter(settingType)
-                        .ConvertToString(settingObject);
-                }
-
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    setting.Value.ValueXml.InnerText = value;
-                }
-                else
-                {
-                    // Create an empty value element and add it to the setting
-                    var doc = new XmlDocument();
-                    setting.Value.ValueXml = doc.CreateElement("value");
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI29684",
-                    "Failed to apply config file setting!", ex);
-                ee.AddDebugData("Setting name", setting.Name, false);
-                throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Re-initializes the _config instance from disk if the config file has been modified since
-        /// the last time the _config instance was loaded/refreshed.
-        /// </summary>
-        /// <param name="reloadValues">If <see langword="true"/> the property values will be loaded
-        /// from disk in the process, if <see langword="false"/>, the current _settings values will
-        /// not be changed.</param>
-        void Refresh(bool reloadValues)
-        {
-            if (_refreshing)
-            {
-                return;
-            }
-
-            try
-            {
-                _refreshing = true;
-
-                DateTime lastModified = File.GetLastWriteTime(_config.FilePath);
-
-                if (lastModified > _configFileLastModified)
-                {
-                    _config = ConfigurationManager.OpenMappedExeConfiguration(
-                        _configFileMap, ConfigurationUserLevel.None);
-
-                    if (reloadValues)
-                    {
-                        LoadSectionInformation(_APPLICATION_SETTINGS_GROUP);
-                        LoadSectionInformation(_USER_SETTINGS_GROUP);
-                    }
-
-                    _configFileLastModified = lastModified;
-                }
-            }
-            finally
-            {
-                _refreshing = false;
             }
         }
 

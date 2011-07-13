@@ -285,7 +285,7 @@ namespace Extract.ReportViewer
                 {
                     if (overwrite)
                     {
-                        File.Delete(fileName);
+                        FileSystemMethods.DeleteFile(fileName, false);
                     }
                     else
                     {
@@ -924,7 +924,7 @@ namespace Extract.ReportViewer
                     // If overwrite was true then delete the file
                     if (overwrite)
                     {
-                        File.Delete(fileName);
+                        FileSystemMethods.DeleteFile(fileName, false);
                     }
                     else
                     {

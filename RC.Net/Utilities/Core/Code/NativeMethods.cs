@@ -1,5 +1,5 @@
+using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -279,6 +279,21 @@ namespace Extract.Utilities
 
         #endregion // enum HChangeNotifyFlags
 
+        #region Structs
+
+        /// <summary>
+        /// Contains a 64-bit value representing the number of 100-nanosecond intervals since
+        /// January 1, 1601 (UTC).
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        struct FILETIME
+        {
+            public uint dwLowDateTime;
+            public uint dwHighDateTime;
+        }
+
+        #endregion Structs
+
         #region NativeMethods P/Invokes
 
         /// <summary>
@@ -353,6 +368,46 @@ namespace Extract.Utilities
         static extern void SHChangeNotify(HChangeNotifyEventID wEventId, HChangeNotifyFlags uFlags,
                                            IntPtr dwItem1,
                                            IntPtr dwItem2);
+
+        /// <summary>
+        /// Retrieves information about the specified registry key.
+        /// </summary>
+        /// <param name="hKey">A handle to an open registry key.</param>
+        /// <param name="lpClass">A pointer to a buffer that receives the user-defined class of the
+        /// key. This parameter can be NULL.</param>
+        /// <param name="lpcbClass">A pointer to a variable that specifies the size of the buffer
+        /// pointed to by the lpClass parameter, in characters. If lpClass is NULL, lpcClass can
+        /// be NULL.</param>
+        /// <param name="lpReserved">This parameter is reserved and must be NULL.</param>
+        /// <param name="lpcSubKeys">A pointer to a variable that receives the number of subkeys
+        /// that are contained by the specified key. This parameter can be NULL.</param>
+        /// <param name="lpcbMaxSubKeyLen">A pointer to a variable that receives the size of the
+        /// key's subkey with the longest name, in Unicode characters, not including the
+        /// terminating null character. This parameter can be NULL.</param>
+        /// <param name="lpcbMaxClassLen">A pointer to a variable that receives the size of the
+        /// longest string that specifies a subkey class, in Unicode characters. The count returned
+        /// does not include the terminating null character. This parameter can be NULL.</param>
+        /// <param name="lpcValues">A pointer to a variable that receives the number of values that
+        /// are associated with the key. This parameter can be NULL.</param>
+        /// <param name="lpcbMaxValueNameLen">A pointer to a variable that receives the size of the
+        /// key's longest value name, in Unicode characters. The size does not include the
+        /// terminating null character. This parameter can be NULL.</param>
+        /// <param name="lpcbMaxValueLen">A pointer to a variable that receives the size of the
+        /// longest data component among the key's values, in bytes. This parameter can be NULL.
+        /// </param>
+        /// <param name="lpcbSecurityDescriptor">A pointer to a variable that receives the size of
+        /// the key's security descriptor, in bytes. This parameter can be NULL.</param>
+        /// <param name="lpftLastWriteTime">A pointer to a FILETIME structure that receives the
+        /// last write time. This parameter can be NULL.</param>
+        /// <returns>If the function succeeds, the return value is ERROR_SUCCESS.</returns>
+        [DllImport("advapi32.dll", EntryPoint = "RegQueryInfoKey", CharSet = CharSet.Unicode,
+            CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        static extern int RegQueryInfoKey(
+            IntPtr hKey, out StringBuilder lpClass, ref uint lpcbClass,
+            IntPtr lpReserved, out uint lpcSubKeys, out uint lpcbMaxSubKeyLen,
+            out uint lpcbMaxClassLen, out uint lpcValues, out uint lpcbMaxValueNameLen,
+            out uint lpcbMaxValueLen, out uint lpcbSecurityDescriptor,
+            ref FILETIME lpftLastWriteTime);
 
         #endregion NativeMethods P/Invokes
 
@@ -453,6 +508,51 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI30191", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> the registry key or any of its values were last written
+        /// to.
+        /// </summary>
+        /// <param name="registryKey">The registry key to check.</param>
+        /// <returns>The <see cref="DateTime"/> the registry key or any of its values were last
+        /// written to.</returns>
+        public static DateTime GetRegistryKeyLastWriteTime(RegistryKey registryKey)
+        {
+            try
+            {
+                StringBuilder lpClass;
+                uint lpcbClass = 0;
+                IntPtr lpReserved = IntPtr.Zero;
+                uint lpcSubKeys;
+                uint lpcbMaxSubKeyLen;
+                uint lpcbMaxClassLen;
+                uint lpcValues;
+                uint lpcbMaxValueNameLen;
+                uint lpcbMaxValueLen;
+                uint lpcbSecurityDescriptor;
+                FILETIME lpftLastWriteTime = new FILETIME();
+                int result = RegQueryInfoKey(registryKey.Handle.DangerousGetHandle(), out lpClass,
+                    ref lpcbClass, lpReserved, out lpcSubKeys, out lpcbMaxSubKeyLen,
+                    out lpcbMaxClassLen, out lpcValues, out lpcbMaxValueNameLen,
+                    out lpcbMaxValueLen, out lpcbSecurityDescriptor, ref lpftLastWriteTime);
+
+                // Throw an exception if the result is not ERROR_SUCCESS.
+                if (result != 0)
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+
+                long lastWriteTime = (((long)lpftLastWriteTime.dwHighDateTime) << 32)
+                                     + (long)lpftLastWriteTime.dwLowDateTime;
+
+                DateTime lastWrite = DateTime.FromFileTime(lastWriteTime);
+                return lastWrite;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32871");
             }
         }
 

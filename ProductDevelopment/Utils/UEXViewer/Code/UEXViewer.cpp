@@ -304,7 +304,7 @@ int CUEXViewerApp::ExitInstance()
 	{
 		if (!m_strTemporaryFile.empty())
 		{
-			deleteFile(m_strTemporaryFile);
+			deleteFile(m_strTemporaryFile, false, false);
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI32289");

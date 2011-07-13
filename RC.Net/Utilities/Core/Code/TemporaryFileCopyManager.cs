@@ -45,6 +45,11 @@ namespace Extract.Utilities
             Dictionary<TemporaryFile, List<object>> _objectReferences =
                 new Dictionary<TemporaryFile, List<object>>();
 
+            /// <summary>
+            /// Indicates whether the contents of the temporary file may be sensitive.
+            /// </summary>
+            bool _sensitive;
+
             #region Constructors
 
             /// <summary>
@@ -55,8 +60,10 @@ namespace Extract.Utilities
             /// <param name="originalDatabaseFileName">The name of the source database. This
             /// database will be used directly only if it is not being accessed via a network share.
             /// </param>
+            /// <param name="sensitive"><see langword="true"/>if the contents of the temporary file
+            /// may be sensitive; otherwise, <see langword="false"/>.</param>
             public TemporaryFileCopy(object referencingInstance,
-                string originalDatabaseFileName)
+                string originalDatabaseFileName, bool sensitive)
             {
                 try
                 {
@@ -64,7 +71,8 @@ namespace Extract.Utilities
 
                      _lastModificationTime = File.GetLastWriteTime(_originalDatabaseFileName);
 
-                    _localTemporaryFile = new TemporaryFile();
+                     _sensitive = sensitive;
+                    _localTemporaryFile = new TemporaryFile(sensitive);
                     File.Copy(originalDatabaseFileName, _localTemporaryFile.FileName, true);
 
                     AddReference(referencingInstance);
@@ -100,7 +108,7 @@ namespace Extract.Utilities
                     // If the original file has been modified, copy it to a new temporary file.
                     if (modificationTime != _lastModificationTime)
                     {
-                        _localTemporaryFile = new TemporaryFile();
+                        _localTemporaryFile = new TemporaryFile(_sensitive);
 
                         _lastModificationTime = modificationTime;
                         File.Copy(_originalDatabaseFileName, _localTemporaryFile.FileName, true);
@@ -274,8 +282,11 @@ namespace Extract.Utilities
         /// which the path to the local database copy is needed. The database at the path
         /// specified is guaranteed to exist unmodified until the next call to
         /// GetCurrentTemporaryFileName using the specified instance.</param>
+        /// <param name="sensitive"><see langword="true"/>if the contents of the temporary file
+        /// may be sensitive; otherwise, <see langword="false"/>.</param>
         /// <returns>The filename of the temporary copy to use.</returns>
-        public string GetCurrentTemporaryFileName(string originalFileName, object referencingInstance)
+        public string GetCurrentTemporaryFileName(string originalFileName,
+            object referencingInstance, bool sensitive)
         {
             try
             {
@@ -288,7 +299,7 @@ namespace Extract.Utilities
                     // specified database, create a new one.                    
                     if (!_localFileCopies.TryGetValue(originalFileName, out temporaryFileCopy))
                     {
-                        temporaryFileCopy = new TemporaryFileCopy(this, originalFileName);
+                        temporaryFileCopy = new TemporaryFileCopy(this, originalFileName, sensitive);
                         _localFileCopies[originalFileName] = temporaryFileCopy;
                     }
 

@@ -300,7 +300,7 @@ namespace Extract.Utilities.Forms
 
                 ExtractException.Assert("ELI21217", "Stream must be specified.", stream != null);
 
-                using (TemporaryFile tempFile = new TemporaryFile())
+                using (TemporaryFile tempFile = new TemporaryFile(false))
                 {
                     // Write the stream to the temporary file
                     File.WriteAllBytes(tempFile.FileName,

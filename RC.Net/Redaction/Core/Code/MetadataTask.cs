@@ -209,7 +209,7 @@ namespace Extract.Redaction
             XmlWriter writer = null; 
             try 
 	        {
-                file = new TemporaryFile(".xml");
+                file = new TemporaryFile(".xml", true);
 	            writer = XmlWriter.Create(file.FileName);
 	            if (writer == null)
 	            {

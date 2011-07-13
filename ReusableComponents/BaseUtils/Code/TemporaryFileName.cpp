@@ -19,9 +19,10 @@ const string gmutMUTEX_NAME = "Global\\260BA215-4090-4172-B696-FC86B52269B4";
 //--------------------------------------------------------------------------------------------------
 // Public functions
 //--------------------------------------------------------------------------------------------------
-TemporaryFileName::TemporaryFileName(const char *pszPrefix, 
-									 const char *pszSuffix, bool bAutoDelete) :
+TemporaryFileName::TemporaryFileName(bool bSensitive, const char *pszPrefix/* = NULL*/,
+									 const char *pszSuffix/* = NULL*/, bool bAutoDelete/* = true*/) :
 m_strFileName(""),
+m_bSensitive(bSensitive),
 m_bAutoDelete(bAutoDelete)
 {
 	try
@@ -31,9 +32,10 @@ m_bAutoDelete(bAutoDelete)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20700");
 }
 //--------------------------------------------------------------------------------------------------
-TemporaryFileName::TemporaryFileName(const string& strDir, const char *pszPrefix, 
-									 const char *pszSuffix, bool bAutoDelete) :
+TemporaryFileName::TemporaryFileName(bool bSensitive, const string& strDir, const char *pszPrefix, 
+									 const char *pszSuffix, bool bAutoDelete/* = true*/) :
 m_strFileName(""),
+m_bSensitive(bSensitive),
 m_bAutoDelete(bAutoDelete)
 {
 	try
@@ -43,8 +45,10 @@ m_bAutoDelete(bAutoDelete)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20701");
 }
 //--------------------------------------------------------------------------------------------------
-TemporaryFileName::TemporaryFileName(const string& strFileName, bool bAutoDelete/* = true*/) :
+TemporaryFileName::TemporaryFileName(bool bSensitive, const string& strFileName,
+									 bool bAutoDelete/* = true*/) :
 m_strFileName(""),
+m_bSensitive(bSensitive),
 m_bAutoDelete(bAutoDelete)
 {
 	try
@@ -62,8 +66,18 @@ TemporaryFileName::~TemporaryFileName()
 		// If auto delete, there is a file name, and the file still exists, delete it
 		if (m_bAutoDelete && !m_strFileName.empty() && isValidFile(m_strFileName))
 		{
-			// Attempt to delete the file
-			deleteFile(m_strFileName, true);
+			if (m_bSensitive)
+			{
+				// If the file is sensitive, allow the SecureDeleteAllSensitiveFiles registry entry
+				// to dictate whether the file is deleted securely.
+				deleteFile(m_strFileName, true);
+			}
+			else
+			{
+				// If the file is not sensitive, don't use secure file deletion regardless of the
+				// value of the SecureDeleteAllSensitiveFiles registry entry.
+				deleteFile(m_strFileName, true, false);
+			}
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16407");

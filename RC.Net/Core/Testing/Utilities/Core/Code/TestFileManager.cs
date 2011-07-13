@@ -101,7 +101,7 @@ namespace Extract.Testing.Utilities
 
                     // Create a new temporary file with the specified name
                     // and add it to the collection
-                    tempFile = new TemporaryFile(new FileInfo(fileName));
+                    tempFile = new TemporaryFile(new FileInfo(fileName), false);
                     _files.Add(resourceName, tempFile);
                 }
 
@@ -159,13 +159,13 @@ namespace Extract.Testing.Utilities
             {
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
-                    tempFile = new TemporaryFile();
+                    tempFile = new TemporaryFile(false);
                 }
                 else
                 {
                     // Create a new TemporaryFile associated with the specified file name
                     FileInfo fileInfo = new FileInfo(fileName);
-                    tempFile = new TemporaryFile(fileInfo);
+                    tempFile = new TemporaryFile(fileInfo, false);
                 }
 
                 GeneralMethods.WriteEmbeddedResourceToFile<T>(_assembly,

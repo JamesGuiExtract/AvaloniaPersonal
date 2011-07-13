@@ -180,7 +180,7 @@ namespace Extract.Utilities.Test
         /// </summary>
         static void PrepareAsciiFile()
         {
-            _asciiFile = new TemporaryFile(".txt");
+            _asciiFile = new TemporaryFile(".txt", true);
             File.WriteAllText(_asciiFile.FileName, GetTestTextWithDefaultDelimiters(),
                 Encoding.ASCII);
         }
@@ -190,7 +190,7 @@ namespace Extract.Utilities.Test
         /// </summary>
         static void PrepareUnicodeFile()
         {
-            _unicodeFile = new TemporaryFile(".txt");
+            _unicodeFile = new TemporaryFile(".txt", true);
             File.WriteAllText(_unicodeFile.FileName, GetTestTextWithDefaultDelimiters(),
                 Encoding.Unicode);
         }
@@ -203,7 +203,7 @@ namespace Extract.Utilities.Test
         /// </summary>
         static void PrepareAsciiFileNonDefaultDelimeters()
         {
-            _asciiNonDefaultDelimiterFile = new TemporaryFile(".txt");
+            _asciiNonDefaultDelimiterFile = new TemporaryFile(".txt", true);
             File.WriteAllText(_asciiNonDefaultDelimiterFile.FileName,
                 GetTestTextWithNonDefaultDelimiters(), Encoding.ASCII);
         }
@@ -214,7 +214,7 @@ namespace Extract.Utilities.Test
         /// </summary>
         static void PrepareAsciiFileWithExtraWhitespace()
         {
-            _asciiExtraWhitespace = new TemporaryFile(".txt");
+            _asciiExtraWhitespace = new TemporaryFile(".txt", true);
             File.WriteAllText(_asciiExtraWhitespace.FileName,
                 GetTestTextWithDefaultDelimitersAndExtraWhitespace(), Encoding.ASCII);
         }

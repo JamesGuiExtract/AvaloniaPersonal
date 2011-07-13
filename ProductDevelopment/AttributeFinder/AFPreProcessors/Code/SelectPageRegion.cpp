@@ -1624,7 +1624,7 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 				if (!m_bIncludeRegion && bPageSpecified)
 				{
 					// Whiten the specified zone on this page - to a temporary file
-					TemporaryFileName tmpFile2( NULL, strExt.c_str(), true );
+					TemporaryFileName tmpFile2( true, NULL, strExt.c_str(), true );
 					string strTempFileName2 = tmpFile2.getName();
 					excludeImageZone(strPath, strTempFileName2, nPageNum, nLeft, nTop, nRight, nBottom);
 

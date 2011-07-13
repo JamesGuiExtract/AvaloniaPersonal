@@ -191,7 +191,7 @@ LRESULT CDetectAndReportFailureDlg::OnNotifyExceptionLogged(WPARAM wParam, LPARA
 			_lastCodePos = "70";
 
 			// delete the temporary file containing the stringized exception
-			DeleteFile(exceptionFileNameAtom.getName().c_str());
+			deleteFile(exceptionFileNameAtom.getName().c_str(), false, false);
 			_lastCodePos = "80";
 
 			// notify the exception dialog of this new exception

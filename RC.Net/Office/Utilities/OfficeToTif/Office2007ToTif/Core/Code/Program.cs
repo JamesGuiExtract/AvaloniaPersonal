@@ -41,7 +41,7 @@ namespace Extract.Office.Utilities.OfficeToTif.Office2007ToTif
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI30287", Path.GetFileNameWithoutExtension(Application.ExecutablePath));
 
-                tempPdf = new TemporaryFile(".pdf");
+                tempPdf = new TemporaryFile(".pdf", true);
                 string fileName = settings.OfficeDocumentName;
                 switch (settings.OfficeApplication)
                 {

@@ -228,7 +228,7 @@ namespace Extract.Utilities.Email
         {
             try
             {
-                using (var tempBody = new TemporaryFile())
+                using (var tempBody = new TemporaryFile(true))
                 {
                     var arguments = new List<string>();
                     arguments.Add("\"" + string.Join(";", _recipients) + "\"");

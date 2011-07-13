@@ -327,7 +327,7 @@ void CCheckFinder::findChecks(const string& strImageName, const vector<long>& ve
 		unique_ptr<TemporaryFileName> pTempFile(__nullptr);
 		if (isPDF(strImageName))
 		{
-			pTempFile.reset(new TemporaryFileName(__nullptr, ".tif"));
+			pTempFile.reset(new TemporaryFileName(true, __nullptr, ".tif"));
 			strWorkingFile = pTempFile->getName();
 			convertPDFToTIF(strImageName, strWorkingFile);
 		}

@@ -169,7 +169,7 @@ namespace Extract.ExceptionHelper
                 {
                     try
                     {
-                        File.Delete(fileName);
+                        FileSystemMethods.DeleteFile(fileName, false);
                     }
                     catch (Exception ex)
                     {

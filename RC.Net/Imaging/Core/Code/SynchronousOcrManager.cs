@@ -247,7 +247,7 @@ namespace Extract.Imaging
                     out orientation, out skew, out offset);
 
                 // Save the raster zone to a temporary file.
-                tempFile = new TemporaryFile();
+                tempFile = new TemporaryFile(true);
                 using (ImageWriter writer = 
                     Codecs.CreateWriter(tempFile.FileName, rasterZoneImage.OriginalFormat))
                 {

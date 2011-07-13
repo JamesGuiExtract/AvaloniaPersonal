@@ -313,7 +313,7 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 						try
 						{
 							// Create the temporary file
-							upTempFile.reset(new TemporaryFileName(strTempEncryptionFile));
+							upTempFile.reset(new TemporaryFileName(true, strTempEncryptionFile));
 
 							// Temporary file was created, break from the loop
 							// (this skips the sleep statement below)

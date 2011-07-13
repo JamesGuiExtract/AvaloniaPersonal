@@ -236,7 +236,7 @@ void CESConvertToPDFApp::convertToSearchablePDF()
 
 	// create temporary OmniPage document file.
 	// file will be automatically deleted when tfnDocument goes out of scope.
-	TemporaryFileName tfnDocument("", ".opd", true);
+	TemporaryFileName tfnDocument(true, "", ".opd", true);
 
 	// create output document
 	HDOC hDoc;

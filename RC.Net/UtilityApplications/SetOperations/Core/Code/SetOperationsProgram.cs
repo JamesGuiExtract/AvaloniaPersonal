@@ -132,7 +132,7 @@ namespace Extract.SetOperations
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI31625",
                     "SetOperations.exe");
 
-                tempDb = new TemporaryFile(".sdf");
+                tempDb = new TemporaryFile(".sdf", true);
                 using (var canceler = new CancellationTokenSource())
                 {
                     // Handle the cancel key event

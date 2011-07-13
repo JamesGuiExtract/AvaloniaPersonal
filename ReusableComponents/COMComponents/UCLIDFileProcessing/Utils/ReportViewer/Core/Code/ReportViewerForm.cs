@@ -529,7 +529,7 @@ namespace Extract.ReportViewer
                 using (var wait = new TemporaryWaitCursor())
                 {
                     var tempFileName = GetTemporaryPdfEmailReportFileName(_report.FileName);
-                    _temporaryFiles.Add(new TemporaryFile(new FileInfo(tempFileName)));
+                    _temporaryFiles.Add(new TemporaryFile(new FileInfo(tempFileName), false));
 
                     _report.ExportReportToFile(tempFileName, true);
 

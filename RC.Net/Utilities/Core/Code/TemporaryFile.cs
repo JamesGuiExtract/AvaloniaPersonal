@@ -31,6 +31,11 @@ namespace Extract.Utilities
         /// </summary>
         string _fileName;
 
+        /// <summary>
+        /// Indicates whether the contents of the temporary file may be sensitive.
+        /// </summary>
+        bool _sensitive;
+
         #endregion Fields
 
         #region Constructors
@@ -40,7 +45,10 @@ namespace Extract.Utilities
         /// Initializes a new <see cref="TemporaryFile"/> class. The resulting temporary
         /// file will be in the TEMP directory and have the extension ".tmp".
         /// </summary>
-        public TemporaryFile() : this(Path.GetTempPath(), ".tmp")
+        /// <param name="sensitive"><see langword="true"/>if the contents of the temporary file
+        /// may be sensitive; otherwise, <see langword="false"/>.</param>
+        public TemporaryFile(bool sensitive)
+            : this(Path.GetTempPath(), ".tmp", sensitive)
         {
         }
 
@@ -50,7 +58,10 @@ namespace Extract.Utilities
         /// <paramref name="extension"/>.
         /// </summary>
         /// <param name="extension">The extension for the temporary file.</param>
-        public TemporaryFile(string extension) : this(Path.GetTempPath(), extension)
+        /// <param name="sensitive"><see langword="true"/>if the contents of the temporary file
+        /// may be sensitive; otherwise, <see langword="false"/>.</param>
+        public TemporaryFile(string extension, bool sensitive)
+            : this(Path.GetTempPath(), extension, sensitive)
         {
         }
 
@@ -63,7 +74,9 @@ namespace Extract.Utilities
         /// <param name="folder">The folder to create the temporary file in. Must not be
         /// <see langword="null"/> or the empty string. The specified folder must exist
         /// on the system.</param>
-        public TemporaryFile(string folder, string extension)
+        /// <param name="sensitive"><see langword="true"/>if the contents of the temporary file
+        /// may be sensitive; otherwise, <see langword="false"/>.</param>
+        public TemporaryFile(string folder, string extension, bool sensitive)
         {
             try
             {
@@ -78,6 +91,7 @@ namespace Extract.Utilities
                 }
                 
                 _fileName = FileSystemMethods.GetTemporaryFileName(folder, extension);
+                _sensitive = sensitive;
             }
             catch (Exception ex)
             {
@@ -91,7 +105,9 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="fileInfo">A <see cref="FileInfo"/> object for the file to be managed
         /// by the <see cref="TemporaryFile"/> object.</param>
-        public TemporaryFile(FileSystemInfo fileInfo)
+        /// <param name="sensitive"><see langword="true"/>if the contents of the temporary file
+        /// may be sensitive; otherwise, <see langword="false"/>.</param>
+        public TemporaryFile(FileSystemInfo fileInfo, bool sensitive)
         {
             try
             {
@@ -106,6 +122,7 @@ namespace Extract.Utilities
                 }
                 
                 _fileName = fileInfo.FullName;
+                _sensitive = sensitive;
             }
             catch (Exception ex)
             {
@@ -154,8 +171,10 @@ namespace Extract.Utilities
         /// to the temporary file.
         /// </summary>
         /// <param name="fileName">The name of the file to copy.</param>
+        /// <param name="sensitive"><see langword="true"/>if the contents of the temporary file
+        /// may be sensitive; otherwise, <see langword="false"/>.</param>
         /// <returns>The temporary file that was created and copied to.</returns>
-        public static TemporaryFile CopyToTemporaryFile(string fileName)
+        public static TemporaryFile CopyToTemporaryFile(string fileName, bool sensitive)
         {
             TemporaryFile tempFile = null;
             try
@@ -169,7 +188,7 @@ namespace Extract.Utilities
                         "fileName");
                 }
 
-                tempFile = new TemporaryFile(Path.GetExtension(fileName));
+                tempFile = new TemporaryFile(Path.GetExtension(fileName), sensitive);
                 File.Copy(fileName, tempFile.FileName, true);
 
                 return tempFile;
@@ -225,10 +244,16 @@ namespace Extract.Utilities
                 {
                     if (disposing)
                     {
-                        // Try delete and log any exceptions, do not throw exceptions
-                        // from Dispose.
+                        // Try delete and log any exceptions, do not throw exceptions from Dispose.
+                        // If the file is not sensitive, do not allow for the
+                        // SecureDeleteAllSensitiveFiles registry entry to cause the file to be
+                        // deleted securely.
                         ExtractException ex;
-                        if (FileSystemMethods.TryDeleteFile(_fileName, out ex))
+                        bool deleteSucceeded = _sensitive
+                            ? FileSystemMethods.TryDeleteFile(_fileName, true, out ex)
+                            : FileSystemMethods.TryDeleteFile(_fileName, true, false, out ex);
+
+                        if (deleteSucceeded)
                         {
                             _fileName = null;
                         }
@@ -239,9 +264,11 @@ namespace Extract.Utilities
                     }
                     else
                     {
-                        // Do not use FileSystemMethods.TryDeleteFile since it creates an exception and
-                        // allocating memory in finalizers is not advised.
-                        File.Delete(_fileName);
+                        // Do not use FileSystemMethods.TryDeleteFile since it creates an exception
+                        // and allocating memory in finalizers is not advised.
+                        // Secure deletion would cause memory allocation as well. (really, the file
+                        // should have been deleted along with the managed resources).
+                        FileSystemMethods.DeleteFile(_fileName, false, false);
                     }
                 }
             }

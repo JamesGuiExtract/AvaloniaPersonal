@@ -2311,7 +2311,7 @@ string SpotRecognitionDlg::createSubImage(const std::string& strOriginalImageFil
 	string strFileExtension( getExtensionFromFullPath( strOriginalImageFileName, true ) );
 
 	// generate a temp file, but do not delete it automatically
-	TemporaryFileName subImageFile(NULL, strFileExtension.c_str(), false);
+	TemporaryFileName subImageFile(true, NULL, strFileExtension.c_str(), false);
 
 	// Prepare the default save options
 	int nFileFormat = fileInfo.Format;

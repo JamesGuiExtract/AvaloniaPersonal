@@ -237,7 +237,7 @@ namespace SplitMultiPageImage
             // Delete the file if necessary
             if (delete)
             {
-                File.Delete(input);
+                FileSystemMethods.DeleteFile(input);
             }
         }
 

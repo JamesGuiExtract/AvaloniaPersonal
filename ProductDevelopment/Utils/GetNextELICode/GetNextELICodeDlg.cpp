@@ -252,7 +252,11 @@ void CGetNextELICodeDlg::initializeLIGenerationProcess(ELocationIdentifierType e
 		}
 
 		// the file exists, try to delete it
-		if (!DeleteFile(strTempFile.c_str()))
+		try
+		{
+			deleteFile(strTempFile.c_str(), false, false);
+		}
+		catch (...)
 		{
 			strMsg = string("Unable to delete temporary file ") + strTempFile + string("!");
 			MessageBox(strMsg.c_str(), "ERROR", MB_ICONEXCLAMATION);
@@ -386,7 +390,11 @@ void CGetNextELICodeDlg::initializeLIGenerationProcess(ELocationIdentifierType e
 		}
 
 		// delete the file now
-		if (!DeleteFile(strTempFile.c_str()))
+		try
+		{
+			deleteFile(strTempFile.c_str(), false, false);
+		}
+		catch (...)
 		{
 			string strMessage = "Unable to delete temporary file ";
 			strMessage += strTempFile;

@@ -195,7 +195,7 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesUpdateRequiredV2()
         {
-            using (var tempV2 = new TemporaryFile(".sdf"))
+            using (var tempV2 = new TemporaryFile(".sdf", false))
             {
                 CreateV2Database(tempV2.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV2.FileName);
@@ -214,12 +214,12 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV2 = null, tempBackup = null;
             try
             {
-                tempV2 = new TemporaryFile(".sdf");
+                tempV2 = new TemporaryFile(".sdf", false);
                 CreateV2Database(tempV2.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV2.FileName);
                 var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
                 var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile);
+                tempBackup = new TemporaryFile(backupFile, false);
 
                 // Check that the database has been upgraded correctly
                 var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
@@ -252,12 +252,12 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV2 = null, tempBackup = null;
             try
             {
-                tempV2 = new TemporaryFile(".sdf");
+                tempV2 = new TemporaryFile(".sdf", false);
                 CreateV2Database(tempV2.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV2.FileName);
                 var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
                 var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile);
+                tempBackup = new TemporaryFile(backupFile, false);
 
                 int schemaVersion = new FAMServiceDatabaseManager(tempV2.FileName).GetSchemaVersion();
 
@@ -286,7 +286,7 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV2 = null, tempBackup = null;
             try
             {
-                tempV2 = new TemporaryFile(".sdf");
+                tempV2 = new TemporaryFile(".sdf", false);
                 CreateV2Database(tempV2.FileName);
                 var manager = new FAMServiceDatabaseManager();
                 IDatabaseSchemaUpdater updater = (IDatabaseSchemaUpdater)manager;
@@ -299,7 +299,7 @@ namespace Extract.FileActionManager.Database.Test
                         new CancellationTokenSource());
 
                     var backupFile = new FileInfo(task.Result);
-                    tempBackup = new TemporaryFile(backupFile);
+                    tempBackup = new TemporaryFile(backupFile, false);
                 }
                 manager = new FAMServiceDatabaseManager(tempV2.FileName);
 
@@ -335,7 +335,7 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesUpdateRequiredV3()
         {
-            using (var tempV3 = new TemporaryFile(".sdf"))
+            using (var tempV3 = new TemporaryFile(".sdf", false))
             {
                 CreateV3Database(tempV3.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV3.FileName);
@@ -352,12 +352,12 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV3 = null, tempBackup = null;
             try
             {
-                tempV3 = new TemporaryFile(".sdf");
+                tempV3 = new TemporaryFile(".sdf", false);
                 CreateV3Database(tempV3.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV3.FileName);
                 var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
                 var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile);
+                tempBackup = new TemporaryFile(backupFile, false);
 
                 // Check that the database has been upgraded correctly
                 var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
@@ -392,12 +392,12 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV3 = null, tempBackup = null;
             try
             {
-                tempV3 = new TemporaryFile(".sdf");
+                tempV3 = new TemporaryFile(".sdf", false);
                 CreateV3Database(tempV3.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV3.FileName);
                 var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
                 var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile);
+                tempBackup = new TemporaryFile(backupFile, false);
 
                 int schemaVersion = new FAMServiceDatabaseManager(tempV3.FileName).GetSchemaVersion();
 
@@ -426,7 +426,7 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV3 = null, tempBackup = null;
             try
             {
-                tempV3 = new TemporaryFile(".sdf");
+                tempV3 = new TemporaryFile(".sdf", false);
                 CreateV3Database(tempV3.FileName);
                 var manager = new FAMServiceDatabaseManager();
                 IDatabaseSchemaUpdater updater = (IDatabaseSchemaUpdater)manager;
@@ -439,7 +439,7 @@ namespace Extract.FileActionManager.Database.Test
                         new CancellationTokenSource());
 
                     var backupFile = new FileInfo(task.Result);
-                    tempBackup = new TemporaryFile(backupFile);
+                    tempBackup = new TemporaryFile(backupFile, false);
                 }
                 manager = new FAMServiceDatabaseManager(tempV3.FileName);
 
@@ -477,7 +477,7 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesUpdateRequiredV4()
         {
-            using (var tempV4 = new TemporaryFile(".sdf"))
+            using (var tempV4 = new TemporaryFile(".sdf", false))
             {
                 CreateV4Database(tempV4.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV4.FileName);
@@ -494,12 +494,12 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV4 = null, tempBackup = null;
             try
             {
-                tempV4 = new TemporaryFile(".sdf");
+                tempV4 = new TemporaryFile(".sdf", false);
                 CreateV4Database(tempV4.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV4.FileName);
                 var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
                 var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile);
+                tempBackup = new TemporaryFile(backupFile, false);
 
                 // Check that the database has been upgraded correctly
                 var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
@@ -534,12 +534,12 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV4 = null, tempBackup = null;
             try
             {
-                tempV4 = new TemporaryFile(".sdf");
+                tempV4 = new TemporaryFile(".sdf", false);
                 CreateV4Database(tempV4.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV4.FileName);
                 var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
                 var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile);
+                tempBackup = new TemporaryFile(backupFile, false);
                 int schemaVersion = new FAMServiceDatabaseManager(tempV4.FileName).GetSchemaVersion();
 
                 Assert.That(schemaVersion == FAMServiceDatabaseManager.CurrentSchemaVersion);
@@ -567,7 +567,7 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV4 = null, tempBackup = null;
             try
             {
-                tempV4 = new TemporaryFile(".sdf");
+                tempV4 = new TemporaryFile(".sdf", false);
                 CreateV4Database(tempV4.FileName);
                 var manager = new FAMServiceDatabaseManager();
                 IDatabaseSchemaUpdater updater = (IDatabaseSchemaUpdater)manager;
@@ -580,7 +580,7 @@ namespace Extract.FileActionManager.Database.Test
                         new CancellationTokenSource());
 
                     var backupFile = new FileInfo(task.Result);
-                    tempBackup = new TemporaryFile(backupFile);
+                    tempBackup = new TemporaryFile(backupFile, false);
                 }
                 manager = new FAMServiceDatabaseManager(tempV4.FileName);
 
@@ -616,7 +616,7 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesUpdateRequiredV5()
         {
-            using (var tempV5 = new TemporaryFile(".sdf"))
+            using (var tempV5 = new TemporaryFile(".sdf", false))
             {
                 CreateV5Database(tempV5.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV5.FileName);
@@ -633,12 +633,12 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV5 = null, tempBackup = null;
             try
             {
-                tempV5 = new TemporaryFile(".sdf");
+                tempV5 = new TemporaryFile(".sdf", false);
                 CreateV5Database(tempV5.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV5.FileName);
                 var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
                 var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile);
+                tempBackup = new TemporaryFile(backupFile, false);
 
                 // Check that the database has been upgraded correctly
                 var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
@@ -673,12 +673,12 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV5 = null, tempBackup = null;
             try
             {
-                tempV5 = new TemporaryFile(".sdf");
+                tempV5 = new TemporaryFile(".sdf", false);
                 CreateV5Database(tempV5.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV5.FileName);
                 var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
                 var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile);
+                tempBackup = new TemporaryFile(backupFile, false);
                 int schemaVersion = new FAMServiceDatabaseManager(tempV5.FileName).GetSchemaVersion();
 
                 Assert.That(schemaVersion == FAMServiceDatabaseManager.CurrentSchemaVersion);
@@ -706,7 +706,7 @@ namespace Extract.FileActionManager.Database.Test
             TemporaryFile tempV5 = null, tempBackup = null;
             try
             {
-                tempV5 = new TemporaryFile(".sdf");
+                tempV5 = new TemporaryFile(".sdf", false);
                 CreateV5Database(tempV5.FileName);
                 var manager = new FAMServiceDatabaseManager();
                 IDatabaseSchemaUpdater updater = (IDatabaseSchemaUpdater)manager;
@@ -719,7 +719,7 @@ namespace Extract.FileActionManager.Database.Test
                         new CancellationTokenSource());
 
                     var backupFile = new FileInfo(task.Result);
-                    tempBackup = new TemporaryFile(backupFile);
+                    tempBackup = new TemporaryFile(backupFile, false);
                 }
                 manager = new FAMServiceDatabaseManager(tempV5.FileName);
 
@@ -760,7 +760,7 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesNoUpdateRequiredCurrentVersion()
         {
-            using (var tempV6 = new TemporaryFile(".sdf"))
+            using (var tempV6 = new TemporaryFile(".sdf", false))
             {
                 CreateV6Database(tempV6.FileName);
                 var manager = new FAMServiceDatabaseManager(tempV6.FileName);

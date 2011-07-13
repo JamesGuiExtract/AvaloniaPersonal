@@ -2075,7 +2075,7 @@ void UCLIDException::logExceptionRemotely(const string& strRemoteAddress) const
 			string strHelperApp = getModuleDirectory("baseutils.dll") + "\\" + gstrEXCEPTION_HELPER_EXE;
 
 			// Get a temporary file and write the exception data to it
-			TemporaryFileName tempFile("", "", false);
+			TemporaryFileName tempFile(false, "", "", false);
 			ofstream fOut(tempFile.getName().c_str());
 			fOut << asStringizedByteStream();
 			fOut.close();

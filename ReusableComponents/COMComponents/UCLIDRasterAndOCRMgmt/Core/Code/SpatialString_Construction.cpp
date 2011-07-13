@@ -461,7 +461,7 @@ STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName,
 			// Any file that's not a text file is assumed to be a USS file.
 			// The .uss file may be compressed.
 			// create a temporary file with the uncompressed output
-			TemporaryFileName tmpFile;
+			TemporaryFileName tmpFile(true);
 			CompressionEngine::decompressFile(strInputFile, tmpFile.getName());
 
 			// Load this object from the file
@@ -544,7 +544,7 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 			// Any file that's not a text file is assumed to be a USS file.
 			// Create a temporary file (which will later be compressed and
 			// saved with the specified file name)
-			TemporaryFileName tmpFile;
+			TemporaryFileName tmpFile(true);
 			string strOutputFileName = asCppBool(bCompress) ? 
 				tmpFile.getName() : stdstrFullFileName;
 

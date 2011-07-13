@@ -398,7 +398,7 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 		// Generate the temporary .uex file and open it with the UEX viewer.
 		if (outputLines.size() > 0)
 		{
-			TemporaryFileName tempFile(__nullptr, ".uex", false);
+			TemporaryFileName tempFile(false, __nullptr, ".uex", false);
 			ofstream outputStream(tempFile.getName(), ios::out | ios::trunc);
 
 			bool firstLine = true;

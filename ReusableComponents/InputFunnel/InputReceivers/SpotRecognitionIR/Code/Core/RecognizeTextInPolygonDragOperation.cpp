@@ -184,7 +184,7 @@ void RecognizeTextInPolygonDragOperation::recognizeTextInPolygon()
 	
 	// now save the new bitmap to a temp file
 	string strExtension(::getExtensionFromFullPath(strImageFileName));
-	TemporaryFileName tempImgFile(NULL, strExtension.c_str(), true);
+	TemporaryFileName tempImgFile(true, NULL, strExtension.c_str());
 	::extractPolygonAsImage(strImageFileName, m_vecPolygonVertices, tempImgFile.getName());
 	
 	// process the image for paragraph text as appropriate

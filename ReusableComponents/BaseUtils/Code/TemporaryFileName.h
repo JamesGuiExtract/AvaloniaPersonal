@@ -12,16 +12,16 @@ class EXPORT_BaseUtils TemporaryFileName
 {
 public:
 	//----------------------------------------------------------------------------------------------
+	// constructor
+	TemporaryFileName(bool bSensitive, const char *pszPrefix = NULL,
+		const char *pszSuffix = NULL, bool bAutoDelete = true);
+	//----------------------------------------------------------------------------------------------
 	// constructor - added as per [p13 #4951] - JDS 04/09/2008
-	TemporaryFileName(const string& strDir, const char* pszPrefix, const char* pszSuffix,
-		bool bAutoDelete);
+	TemporaryFileName(bool bSensitive, const string& strDir, const char* pszPrefix,
+		const char* pszSuffix, bool bAutoDelete);
 	//----------------------------------------------------------------------------------------------
 	// constructor
-	TemporaryFileName(const char *pszPrefix = NULL, const char *pszSuffix = NULL, 
-		bool bAutoDelete = true);
-	//----------------------------------------------------------------------------------------------
-	// constructor
-	TemporaryFileName(const string& strFileName, bool bAutoDelete = true);
+	TemporaryFileName(bool bSensitive, const string& strFileName, bool bAutoDelete = true);
 	//----------------------------------------------------------------------------------------------
 	// destructor
 	// PROMISE: to delete the file whose name is getName(), if the file exists, and
@@ -39,6 +39,7 @@ private:
 	// Variables
 	//----------------------------------------------------------------------------------------------
 	string m_strFileName;
+	bool m_bSensitive;
 	bool m_bAutoDelete;
 	Random m_Rand;
 

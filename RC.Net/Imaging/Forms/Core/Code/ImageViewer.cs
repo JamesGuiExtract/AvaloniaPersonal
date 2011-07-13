@@ -161,10 +161,10 @@ namespace Extract.Imaging.Forms
         #region Fields
 
         /// <summary>
-        /// The config file that contains settings for the image viewer.
+        /// The registry settings for the image viewer.
         /// </summary>
-        readonly ConfigSettings<Properties.Settings> _config =
-            new ConfigSettings<Properties.Settings>();
+        readonly RegistrySettings<Properties.Settings> _registry =
+            new RegistrySettings<Properties.Settings>(@"Software\Extract Systems\Imaging");
 
         /// <summary>
         /// File name of the currently open image file.
@@ -630,6 +630,8 @@ namespace Extract.Imaging.Forms
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23109",
                     _OBJECT_NAME);
 
+                _registry.GeneratePropertyValues("AutoFitZonePadding");
+
                 // Increment the active form count
                 IncrementFormCount();
 
@@ -674,7 +676,7 @@ namespace Extract.Imaging.Forms
                     HandleBackgroundProcessStatusUpdate;
                 _wordHighlightManager.OcrLoaded += HandleOcrLoaded;
 
-                ZoneGeometry.AutoFitZonePadding = _config.Settings.AutoFitZonePadding;
+                ZoneGeometry.AutoFitZonePadding = _registry.Settings.AutoFitZonePadding;
                 ZoneGeometry.MinSize = Highlight.MinSize;
 
                 // Double-buffer to prevent flickering

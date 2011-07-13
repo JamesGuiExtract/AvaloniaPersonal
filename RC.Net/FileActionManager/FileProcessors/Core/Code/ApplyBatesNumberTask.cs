@@ -593,7 +593,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // Create a temporary file to apply the Bates number to, copy back after
                 // number is applied
-                outputFile = new TemporaryFile(Path.GetExtension(fileName));
+                outputFile = new TemporaryFile(Path.GetExtension(fileName), true);
 
                 // Generate bates numbers
                 batesNumbers = new List<string>(generator.GetNextNumberStrings(pageCount));

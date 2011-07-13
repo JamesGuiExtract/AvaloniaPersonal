@@ -84,7 +84,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="TestCommentedTextFileReader.cs" />
-    <Compile Include="TestConfigSettings.cs" />
+    <Compile Include="TestExtractSettings.cs" />
     <Compile Include="TestFileActionManagerPathTags.cs" />
     <Compile Include="TestUtilityMethods.cs" />
   </ItemGroup>

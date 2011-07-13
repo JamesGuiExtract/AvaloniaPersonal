@@ -507,7 +507,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     try
                     {
-                        File.Delete(pdfFile);
+                        FileSystemMethods.DeleteFile(pdfFile);
                     }
                     catch (Exception ex)
                     {
@@ -539,7 +539,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     try
                     {
-                        File.Delete(destFile);
+                        FileSystemMethods.DeleteFile(destFile);
                     }
                     catch (Exception ex2)
                     {

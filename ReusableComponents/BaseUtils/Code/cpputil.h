@@ -499,11 +499,33 @@ EXPORT_BaseUtils void moveFile(const string strSrcFileName,
 							   const bool bOverwrite = false,
 							   const bool bAllowReadonly = false);
 //-------------------------------------------------------------------------------------------------
-// PURPOSE: To delete a file, will delete a readonly file if bAllowReadonly = true
+// PURPOSE: To delete a file that is not readonly.
+// NOTE:	When this override is used, files will be securely deleted according to the
+//			SecureDeleteAllSensitiveFiles registry value.
 // REQUIRE: 
 // PROMISE: 
-EXPORT_BaseUtils void deleteFile(const string strFileName, const bool bAllowReadonly = false);
-
+EXPORT_BaseUtils void deleteFile(const string strFileName);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To delete a file.
+// ARGS:	bAllowReadonly - If true, will delete a readonly file, otherwise it will not.
+// NOTE:	When this override is used, files will be securely deleted according to the
+//			SecureDeleteAllSensitiveFiles registry value.
+// REQUIRE: 
+// PROMISE: 
+EXPORT_BaseUtils void deleteFile(const string strFileName, const bool bAllowReadonly);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To delete a file, will delete a readonly file if bAllowReadonly = true
+// ARGS:	bAllowReadonly - If true, will delete a readonly file, otherwise it will not.
+//			bSecureDelete - If true, will securely delete a file by overwriting and obfuscating it.
+//							If false, the file will not be deleted securely regardless of the
+//							the SecureDeleteAllSensitiveFiles registry value.
+//			bThrowIfUnableToDeleteSecurely - If true, when securely deleteing a file, but the file
+//				could not be securely overwritten, an exception will be throw before attempting
+//				the actual deletion.
+// REQUIRE: 
+// PROMISE: 
+EXPORT_BaseUtils void deleteFile(const string strFileName, const bool bAllowReadonly,
+	bool bSecureDelete, bool bThrowIfUnableToDeleteSecurely = false);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To get the retry count and timeout from the registry keys.  These values are
 //			used by waitForFileAccess, waitForFileToBeReadable, and waitForStgFileAccess.

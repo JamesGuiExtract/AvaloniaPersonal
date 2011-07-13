@@ -457,12 +457,15 @@ bool OCRFilterSettingsDlg::removeFOD(const std::string& strInputCategory)
 				}
 			}
 
-			if (::DeleteFile(strFODFileName.c_str()))
+			try
 			{
+				deleteFile(strFODFileName.c_str(), false, false);
+				
 				// only remove the fod if the file can be deleted successfully
 				m_pFODs->erase(itFOD);
 				return true;
 			}
+			catch (...) {}
 		}
 	}
 

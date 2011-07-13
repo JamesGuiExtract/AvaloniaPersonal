@@ -810,7 +810,7 @@ namespace Extract.Redaction.Verification
                         // to supply to _redactedOutputTask.
                         if (!File.Exists(memento.AttributesFile))
                         {
-                            tempVoaFile = new TemporaryFile(".voa");
+                            tempVoaFile = new TemporaryFile(".voa", true);
                             _redactedOutputTask.VOAFileName = tempVoaFile.FileName;
 
                             RedactionFileChanges changes = _redactionGridView.SaveChanges(memento.SourceDocument);

@@ -113,12 +113,20 @@ short main(int iargc, char* pszTestCasesFile[])
 	cout<<"\nTotal unique ELI codes found     : "<<iELITotal-iELIDuplicate<<endl;
 	
 
-	if(!DeleteFile((LPCTSTR)strELIFilePath.c_str()))
+	try
+	{
+		deleteFile((LPCTSTR)strELIFilePath.c_str(), false, false);
+	}
+	catch (...)
 	{
 		cout<<"\n Unable to delete temporary file : "<< strELIFilePath;
 	}
 
-	if(!DeleteFile((LPCTSTR)strDuplicateELIFilePath.c_str()))
+	try
+	{
+		deleteFile((LPCTSTR)strDuplicateELIFilePath.c_str(), false, false);
+	}
+	catch (...)
 	{
 		cout<<"\n Unable to delete temporary file : "<< strDuplicateELIFilePath;
 	}

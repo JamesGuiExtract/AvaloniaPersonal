@@ -20,8 +20,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-TemporaryFileName g_tmpTxtFileName("recognized_", ".txt");
-TemporaryFileName g_tmpTxtFileNameB("recognized_B", ".txt");
+TemporaryFileName g_tmpTxtFileName(true, "recognized_", ".txt");
+TemporaryFileName g_tmpTxtFileNameB(true, "recognized_B", ".txt");
 
 using namespace std;
 

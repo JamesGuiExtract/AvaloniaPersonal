@@ -149,8 +149,17 @@ bool DeleteFolderContents(const char* szFolder, BOOL bIncludeSubFolders, const c
 							}
 						}
 					}
-					else 
-						bResult = (DeleteFile(sItem) == TRUE);
+					else
+					{
+						try
+						{
+							deleteFile((LPCTSTR)sItem);
+						}
+						catch (...)
+						{
+							bResult = false;
+						}
+					}
 				}
 
 				bStopped = (WaitForSingleObject(hTerminate, 0) == WAIT_OBJECT_0);

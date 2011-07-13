@@ -38,6 +38,85 @@ const string gstrFILE_ACCESS_RETRIES = "FileAccessRetries";
 const string gstrFILE_ACCESS_TIMEOUT = "FileAccessTimeout";
 
 //--------------------------------------------------------------------------------------------------
+// Secure delete settings
+//--------------------------------------------------------------------------------------------------
+const string gstrDEFAULT_SECURE_DELETE_ALL = "False";
+const string gstrDEFAULT_SECURE_DELETER = "Extract.Utilities.SecureFileDeleters.DoD5220E";
+
+const string gstrSECURE_DELETE_ALL = "SecureDeleteAllSensitiveFiles";
+const string gstrSECURE_DELETER = "SecureDeleter";
+
+//--------------------------------------------------------------------------------------------------
+// This helper method retrieves the configured ISecureFileDeleter if either bForceUseSecureDeleter is
+// true or the SecureDeleteAllSensitiveFiles registry value is true. The ISecureFileDeleter is
+// cached on the first call and will be re-used for all subsequent calls.
+ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
+{
+	static CMutex sMutex;
+	static string sstrRegPath = gstrRC_REG_PATH + "\\Extract.Utilities";
+	static bool sbInitialized = false;
+	static bool sbAlwaysUseSecureDeleter = false;
+	static bool sbSecureDeleteAllSensitiveFiles = false;
+	static ISecureFileDeleterPtr sipSecureFileDeleter(__nullptr);
+
+	// Lock mutex 
+	CSingleLock lg(&sMutex, TRUE);
+
+	// Initialize the settings for secure deletion once (the first time they are needed), then use
+	// the cached settings from that point forward.
+	if (!sbInitialized)
+	{
+		RegistryPersistenceMgr machineCfgMgr = RegistryPersistenceMgr(HKEY_LOCAL_MACHINE, "");
+
+		// Check for and attempt creation of SecureDeleteAllSensitiveFiles setting if necessary.
+		if (!machineCfgMgr.keyExists(sstrRegPath, gstrSECURE_DELETE_ALL))
+		{
+			machineCfgMgr.createKey(sstrRegPath, gstrDEFAULT_SECURE_DELETE_ALL,
+				gstrDEFAULT_SECURE_DELETE_ALL);
+		}
+		
+		// Retrieve the SecureDeleteAllSensitiveFiles setting and convert to a bool.
+		string strDeleteAll = machineCfgMgr.getKeyValue(sstrRegPath, gstrSECURE_DELETE_ALL);
+		sbAlwaysUseSecureDeleter = (_stricmp(strDeleteAll.c_str(), "True") == 0);
+
+		// Retrieve theSecureDeleter setting (if it exists).
+		string strSecureFileDeleterProgID;
+		if (machineCfgMgr.keyExists(sstrRegPath, gstrSECURE_DELETER))
+		{
+			strSecureFileDeleterProgID = machineCfgMgr.getKeyValue(sstrRegPath, gstrSECURE_DELETER);
+		}
+		else
+		{
+			strSecureFileDeleterProgID = gstrDEFAULT_SECURE_DELETER;
+		}
+
+		// Retrieve the SecureDeleter setting and create an instance of the class if a value has
+		// been specified.
+		if (!strSecureFileDeleterProgID.empty())
+		{
+			sipSecureFileDeleter.CreateInstance(strSecureFileDeleterProgID.c_str());
+			ASSERT_RESOURCE_ALLOCATION("ELI32863", sipSecureFileDeleter != __nullptr);
+		}
+
+		sbInitialized = true;
+	}
+
+	if (bForceUseSecureDeleter || sbAlwaysUseSecureDeleter)
+	{
+		// If secure deletion is to be used in this case, return sipSecureFileDeleter.
+		if (sipSecureFileDeleter == __nullptr)
+		{
+			throw new UCLIDException("ELI32864", "A secure deletion provider has not been specified.");
+		}
+		return sipSecureFileDeleter;
+	}
+	else
+	{
+		// Otherwise secure deletion is not called for, return NULL
+		return __nullptr;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 void getFileAccessRetryCountAndTimeout(int& riRetryCount, int& riRetryTimeout)
 {
 	static CMutex sMutex;
@@ -544,7 +623,11 @@ bool getAllSubDirsAndDeleteAllFiles(const string &strDirectory, vector<string> &
 	// delete all files in this directory
 	for (iter = vecFilesToRemove.begin(); iter != vecFilesToRemove.end(); iter++)
 	{
-		if (remove(iter->c_str()))
+		try
+		{
+			deleteFile(iter->c_str());
+		}
+		catch (...)
 		{
 			bRetVal = false;
 		}
@@ -1695,7 +1778,7 @@ bool canCreateFile(string strFQFileOrFolderName)
 			// cannot create a file in the specified location.  by passing true
 			// as the last argument the temporary file will be deleted when 
 			// TemporaryFileName goes out of scope
-			TemporaryFileName(strFQFileOrFolderName, NULL, NULL, true);
+			TemporaryFileName(false, strFQFileOrFolderName, NULL, NULL, true);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20698");
 	}
@@ -1913,51 +1996,118 @@ void moveFile(const string strSrcFileName, const string strDstFileName,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23610");
 }
 //--------------------------------------------------------------------------------------------------
-void deleteFile(const string strFileName, const bool bAllowReadonly)
+bool deleteFile(const char* pszFileName, ISecureFileDeleterPtr ipSecureFileDeleter,
+	bool bThrowIfUnableToDeleteSecurely, unique_ptr<UCLIDException> &apueSecureDeleteException)
+{
+	if (ipSecureFileDeleter != __nullptr)
+	{
+		try
+		{
+			try
+			{
+				ipSecureFileDeleter->SecureDeleteFile(pszFileName, bThrowIfUnableToDeleteSecurely);
+				return true;
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+		}
+		catch (UCLIDException &ue)
+		{
+			apueSecureDeleteException.reset(new UCLIDException(ue));
+		}
+	}
+	else if (asCppBool(DeleteFile(pszFileName)))
+	{
+		return true;
+	}
+
+	return false;
+}
+//--------------------------------------------------------------------------------------------------
+void deleteFile(const string strFileName, const bool bAllowReadonly,
+	ISecureFileDeleterPtr ipSecureFileDeleter, bool bThrowIfUnableToDeleteSecurely)
+{
+	if (bAllowReadonly && fileExistsAndIsReadOnly(strFileName))
+	{
+		setFileAttributes(strFileName, FILE_ATTRIBUTE_NORMAL);
+	}
+
+	// Delete the file  (retry if the delete fails due to a share violation)
+	int iRetryCount(-1),iTimeout(-1);
+	getFileAccessRetryCountAndTimeout(iRetryCount, iTimeout);
+	int iRetries = 0;
+	const char* pszFileName = strFileName.c_str();
+	unique_ptr<UCLIDException> apueSecureDeleteException;
+
+	while (!deleteFile(pszFileName, ipSecureFileDeleter, bThrowIfUnableToDeleteSecurely,
+					   apueSecureDeleteException))
+	{
+		// Shared file retries are performed by the secure file deleter and need not be done here.
+		// Throw any exception from the secure file delete immediately.
+		if (apueSecureDeleteException.get() != __nullptr)
+		{
+			UCLIDException ue("ELI32910", "Secure delete failed!", *apueSecureDeleteException);
+			ue.addDebugInfo("File To Delete", strFileName);
+			throw ue;
+		}
+
+		// Failed to delete, get the last error
+		DWORD dwError = GetLastError();
+
+		// If the error was not a sharing violation then just throw an exception
+		if (dwError != ERROR_SHARING_VIOLATION)
+		{
+			UCLIDException ue("ELI16605", "Unable to delete file!");
+			ue.addDebugInfo("File To Delete", strFileName);
+			ue.addWin32ErrorInfo(dwError);
+			throw ue;
+		}
+		// Sharing violation, check if retry count has been exceeded
+		else if (iRetries > iRetryCount)
+		{
+			// Have attempted to delete the file the
+			// required number of times so throw exception
+			UCLIDException ue("ELI24978", "File cannot be deleted!");
+			ue.addDebugInfo("File To Delete", strFileName);
+			ue.addDebugInfo("Number of retries", iRetries);
+			ue.addWin32ErrorInfo(dwError);
+			throw ue;
+		}
+
+		// increment the number of retries and wait for the timeout period
+		iRetries++;
+		Sleep(iTimeout);
+	}
+}
+//--------------------------------------------------------------------------------------------------
+void deleteFile(const string strFileName)
 {
 	try
 	{
-		if (bAllowReadonly && fileExistsAndIsReadOnly(strFileName))
-		{
-			setFileAttributes(strFileName, FILE_ATTRIBUTE_NORMAL);
-		}
-
-		// Delete the file  (retry if the delete fails due to a share violation)
-		int iRetryCount(-1),iTimeout(-1);
-		getFileAccessRetryCountAndTimeout(iRetryCount, iTimeout);
-		int iRetries = 0;
-		const char* pszFileName = strFileName.c_str();
-		while(!asCppBool(DeleteFile(pszFileName)))
-		{
-			// Failed to delete, get the last error
-			DWORD dwError = GetLastError();
-
-			// If the error was not a sharing violation then just throw an exception
-			if (dwError != ERROR_SHARING_VIOLATION)
-			{
-				UCLIDException ue("ELI16605", "Unable to delete file!");
-				ue.addDebugInfo("File To Delete", strFileName);
-				ue.addWin32ErrorInfo(dwError);
-				throw ue;
-			}
-			// Sharing violation, check if retry count has been exceeded
-			else if (iRetries > iRetryCount)
-			{
-				// Have attempted to delete the file the
-				// required number of times so throw exception
-				UCLIDException ue("ELI24978", "File cannot be deleted!");
-				ue.addDebugInfo("File To Delete", strFileName);
-				ue.addDebugInfo("Number of retries", iRetries);
-				ue.addWin32ErrorInfo(dwError);
-				throw ue;
-			}
-
-			// increment the number of retries and wait for the timeout period
-			iRetries++;
-			Sleep(iTimeout);
-		}
+		deleteFile(strFileName, false);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23611");
+}
+//--------------------------------------------------------------------------------------------------
+void deleteFile(const string strFileName, bool bAllowReadonly)
+{
+	try
+	{
+		ISecureFileDeleterPtr ipSecureFileDeleter = getSecureFileDeleter(false);
+		deleteFile(strFileName, bAllowReadonly, ipSecureFileDeleter, false);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32865");
+}
+//--------------------------------------------------------------------------------------------------
+void deleteFile(const string strFileName, const bool bAllowReadonly,
+				bool bSecureDelete, bool bThrowIfUnableToDeleteSecurely/* = false*/)
+{
+	try
+	{
+		ISecureFileDeleterPtr ipSecureFileDeleter = 
+			bSecureDelete ? getSecureFileDeleter(true) : __nullptr;
+		deleteFile(strFileName, bAllowReadonly, ipSecureFileDeleter, bThrowIfUnableToDeleteSecurely);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32866");
 }
 //--------------------------------------------------------------------------------------------------
 void convertFileToListOfStrings(ifstream &file, list<string> &lstFileContents)

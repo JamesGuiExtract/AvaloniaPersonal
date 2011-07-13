@@ -70,7 +70,7 @@ namespace Extract.Imaging
 
                 _fileName = fileName;
                 _codecs = codecs;
-                _tempFile = new TemporaryFile();
+                _tempFile = new TemporaryFile(true);
                 _format = format;
                 _isPdf = ImageMethods.IsPdf(format);
             }

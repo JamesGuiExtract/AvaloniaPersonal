@@ -196,7 +196,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 		try
 		{
 			// Create a temporary file for the output [LRCAU #5583]
-			TemporaryFileName tmpOutput("", NULL,
+			TemporaryFileName tmpOutput(true, "", NULL,
 				getExtensionFromFullPath(strOutputFileName).c_str(), true);
 			const string& strTempOut = tmpOutput.getName();
 

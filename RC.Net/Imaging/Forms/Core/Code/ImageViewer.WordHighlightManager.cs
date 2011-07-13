@@ -49,10 +49,10 @@ namespace Extract.Imaging.Forms
             #region Fields
 
             /// <summary>
-            /// The config file that contains settings for the image viewer.
+            /// The registry settings for the image viewer.
             /// </summary>
-            readonly ConfigSettings<Properties.Settings> _config =
-                new ConfigSettings<Properties.Settings>();
+            readonly RegistrySettings<Properties.Settings> _registry =
+                new RegistrySettings<Properties.Settings>(@"Software\Extract Systems\Imaging");
 
             /// <summary>
             /// A lock to synchronize access to the <see cref="WordHighlightManager"/>'s fields.
@@ -1327,7 +1327,7 @@ namespace Extract.Imaging.Forms
                                 _imageViewer.GetHighlightDrawColor());
                             highlight.Selectable = false;
                             highlight.CanRender = false;
-                            highlight.Inflate((float)_config.Settings.AutoFitZonePadding + 1,
+                            highlight.Inflate((float)_registry.Settings.AutoFitZonePadding + 1,
                                 RoundingMode.Safe, false);
 
                             // Add the new auto-fit highlight
@@ -1704,7 +1704,7 @@ namespace Extract.Imaging.Forms
                         // cases. Therefore, pad the preview highlights by AutoFitZonePadding in
                         // each direction to give the user confidence that when the redaction is
                         // added it will properly cover the entire word.
-                        highlight.Inflate((float)_config.Settings.AutoFitZonePadding + 1,
+                        highlight.Inflate((float)_registry.Settings.AutoFitZonePadding + 1,
                             RoundingMode.Safe, false);
 
                         _wordLineMapping[highlight] = lineIdentifier;
@@ -1965,7 +1965,7 @@ namespace Extract.Imaging.Forms
                         // pixels between the edge of the zone and the contained pixel content.
                         // (buffer is the distance from the first row of pixels, not the number of
                         // rows of pixels in between as with AutoFitZonePadding).
-                        int buffer = _config.Settings.AutoFitZonePadding + 1;
+                        int buffer = _registry.Settings.AutoFitZonePadding + 1;
 
                         // Expand out up to 2 pixel in each direction looking for an all
                         // white row to ensure the zone has encapsulated all pixel content.

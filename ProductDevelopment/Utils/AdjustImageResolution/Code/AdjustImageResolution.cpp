@@ -128,7 +128,7 @@ void setImageResolution(const string& strImageFileName, int nNewXResolution, int
 			string strProc = getCurrentProcessID();
 			string strThread = asString( GetCurrentThreadId() );
 			string strPrefix = strProc.c_str() + string( "_" ) + strThread.c_str();
-			TemporaryFileName tfn( strPrefix.c_str() );
+			TemporaryFileName tfn( true, strPrefix.c_str() );
 			_lastCodePos = "60";
 
 			// Get initialized LOADFILEOPTION struct. 

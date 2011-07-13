@@ -263,7 +263,7 @@ namespace Extract.FileActionManager.Database
                 else if (backup)
                 {
                     backupFile = BackupDatabase();
-                    File.Delete(_databaseFile);
+                    FileSystemMethods.DeleteFile(_databaseFile);
                 }
 
                 bool created = false;

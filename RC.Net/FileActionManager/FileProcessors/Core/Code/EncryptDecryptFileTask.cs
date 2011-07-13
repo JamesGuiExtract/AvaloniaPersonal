@@ -538,7 +538,7 @@ namespace Extract.FileActionManager.FileProcessors
                 FileStream outputStream = null;
                 try
                 {
-                    tempOut = new TemporaryFile();
+                    tempOut = new TemporaryFile(true);
                     outputStream = File.Open(tempOut.FileName, FileMode.Create,
                         FileAccess.ReadWrite, FileShare.None);
 

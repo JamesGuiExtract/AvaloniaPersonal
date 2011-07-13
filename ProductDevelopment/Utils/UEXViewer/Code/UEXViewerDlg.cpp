@@ -1683,7 +1683,7 @@ void CUEXViewerDlg::addExceptions(string strUEXFile, bool bReplaceMode)
 	// By operating on the copy we should be able to read the file without
 	// causing corruption to the underlying exception file if processing is
 	// taking place. [LRCAU #3986]
-	TemporaryFileName tempFile;
+	TemporaryFileName tempFile(false);
 	string strFileToOpen = strUEXFile;
 	try
 	{

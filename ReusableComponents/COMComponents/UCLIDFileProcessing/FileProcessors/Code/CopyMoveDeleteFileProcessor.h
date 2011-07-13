@@ -72,6 +72,10 @@ public:
 	STDMETHOD(put_AllowReadonly)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_ModifySourceDocName)(/*[out, retval]*/ VARIANT_BOOL *pRetVal);
 	STDMETHOD(put_ModifySourceDocName)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_SecureDelete)(/*[out, retval]*/ VARIANT_BOOL *pRetVal);
+	STDMETHOD(put_SecureDelete)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_ThrowIfUnableToDeleteSecurely)(/*[out, retval]*/ VARIANT_BOOL *pRetVal);
+	STDMETHOD(put_ThrowIfUnableToDeleteSecurely)(/*[in]*/ VARIANT_BOOL newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -124,6 +128,11 @@ private:
 
 	// Specifies if the source doc name should be modified in the database
 	bool m_bModifySourceDocName;
+
+	// Specifies whether files are to be securely deleted and under what circumstances to throw
+	// exceptions.
+	bool m_bSecureDelete;
+	bool m_bThrowIfUnableToDeleteSecurely;
 
 	/////////////
 	// Methods

@@ -82,9 +82,9 @@ namespace Extract.Office.Utilities.OfficeToTif
                 // the document.
                 OfficeApplication application = GetOfficeApplicationFromFilename(sourceDocument);
 
-                using (TemporaryFile tempUex = new TemporaryFile("uex"),
-                    tempArgs = new TemporaryFile(),
-                    tempResult = new TemporaryFile(".tif"))
+                using (TemporaryFile tempUex = new TemporaryFile("uex", false),
+                    tempArgs = new TemporaryFile(false),
+                    tempResult = new TemporaryFile(".tif", true))
                 using (Process process = new Process())
                 {
                     // Build the arguments for the process

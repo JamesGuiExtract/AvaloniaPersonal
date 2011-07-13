@@ -403,7 +403,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		unique_ptr<TemporaryFileName> pPDFOut(__nullptr);
 		if (bOutputIsPdf)
 		{
-			pPDFOut.reset(new TemporaryFileName(__nullptr, ".tif"));
+			pPDFOut.reset(new TemporaryFileName(true, __nullptr, ".tif"));
 			strOutputWorking = pPDFOut->getName();
 		}
 
@@ -415,7 +415,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		{
 			// Write the output to a temporary file so that the creation of the
 			// redacted image appears as an atomic operation [FlexIDSCore #3547]
-			TemporaryFileName tempOutFile(NULL,
+			TemporaryFileName tempOutFile(true, NULL,
 				getExtensionFromFullPath(strOutputWorking).c_str(), true);
 
 			// Flag to indicate if any annotations been applied, if so then
@@ -791,7 +791,8 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 	}
 
 	// Create a temporary file for the output
-	TemporaryFileName tmpOutput("", NULL, getExtensionFromFullPath(strOutputFileName).c_str(), true);
+	TemporaryFileName tmpOutput(true, "", NULL, getExtensionFromFullPath(strOutputFileName).c_str(),
+		true);
 	const string& strTempOut = tmpOutput.getName();
 	char* pszOutput = (char*)strTempOut.c_str();
 

@@ -966,7 +966,7 @@ void CEAVGeneratorDlg::saveAttributesToEAV(const CString& zFileName)
 {
 	// Validate that the attributes and levels are appropriate
 	{
-		TemporaryFileName tempFile;
+		TemporaryFileName tempFile(true);
 		saveAttributesToVOA(tempFile.getName().c_str());
 	}
 

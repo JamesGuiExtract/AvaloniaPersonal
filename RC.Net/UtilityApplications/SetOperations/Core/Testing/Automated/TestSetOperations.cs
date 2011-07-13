@@ -48,9 +48,9 @@ namespace Extract.SetOperations.Test
             new string[] { "green", "blue", "Yellow", "", "\r\n", " " },
             new string[] { "1", "", "\r\n", "blue", "", "42", "165", "RED" })] string[] listB)
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false))
             {
                 File.WriteAllLines(fileA.FileName, listA);
                 File.WriteAllLines(fileB.FileName, listB);
@@ -90,9 +90,9 @@ namespace Extract.SetOperations.Test
             new string[] { "green", "blue", "Yellow", "", "\r\n", " " },
             new string[] { "1", "", "\r\n", "blue", "", "42", "165", "RED" })] string[] listB)
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false))
             {
                 File.WriteAllLines(fileA.FileName, listA);
                 File.WriteAllLines(fileB.FileName, listB);
@@ -132,9 +132,9 @@ namespace Extract.SetOperations.Test
             new string[] { "green", "blue", "Yellow", "", "\r\n", " " },
             new string[] { "1", "", "\r\n", "blue", "", "42", "165", "RED" })] string[] listB)
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false))
             {
                 File.WriteAllLines(fileA.FileName, listA);
                 File.WriteAllLines(fileB.FileName, listB);
@@ -174,9 +174,9 @@ namespace Extract.SetOperations.Test
             new string[] { "green", "blue", "Yellow", "", "\r\n", " " },
             new string[] { "1", "", "\r\n", "blue", "", "42", "165", "RED" })] string[] listB)
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false))
             {
                 File.WriteAllLines(fileA.FileName, listA);
                 File.WriteAllLines(fileB.FileName, listB);
@@ -216,9 +216,9 @@ namespace Extract.SetOperations.Test
             new string[] { "green", "blue", "Yellow", "", "\r\n", " " },
             new string[] { "1", "", "\r\n", "blue", "", "42", "165", "RED" })] string[] listB)
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false))
             {
                 File.WriteAllLines(fileA.FileName, listA);
                 File.WriteAllLines(fileB.FileName, listB);
@@ -258,9 +258,9 @@ namespace Extract.SetOperations.Test
             new string[] { "green", "blue", "Yellow", "", "\r\n", " " },
             new string[] { "1", "", "\r\n", "blue", "", "42", "165", "RED" })] string[] listB)
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false))
             {
                 File.WriteAllLines(fileA.FileName, listA);
                 File.WriteAllLines(fileB.FileName, listB);
@@ -293,10 +293,10 @@ namespace Extract.SetOperations.Test
         [Test, Category("Automated")]
         public static void TestDuplicatesThrowExceptionCaseInsensitive()
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"),
-                fileException = new TemporaryFile(".uex"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false),
+                fileException = new TemporaryFile(".uex", false))
             {
                 var listA = new List<string>(new string[] { "red", "gReEn", "green", 
                     "Blue", "1", "42", "     " });
@@ -330,10 +330,10 @@ namespace Extract.SetOperations.Test
         [Test, Category("Automated")]
         public static void TestDuplicatesThrowExceptionCaseSensitive()
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"),
-                fileException = new TemporaryFile(".uex"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false),
+                fileException = new TemporaryFile(".uex", false))
             {
                 var listA = new List<string>(new string[] { "red", "gReEn", "green", 
                     "Blue", "1", "42", "     " });
@@ -367,10 +367,10 @@ namespace Extract.SetOperations.Test
         [Test, Category("Automated")]
         public static void TestIgnoreDuplicatesDoNotThrowExceptionCaseInsensitive()
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"),
-                fileException = new TemporaryFile(".uex"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false),
+                fileException = new TemporaryFile(".uex", false))
             {
                 var listA = new List<string>(new string[] { "red", "gReEn", "green", 
                     "Blue", "1", "42", "     " });
@@ -402,10 +402,10 @@ namespace Extract.SetOperations.Test
         [Test, Category("Automated")]
         public static void TestIgnoreDuplicatesDoNotThrowExceptionCaseSensitive()
         {
-            using (TemporaryFile fileA = new TemporaryFile(".lst"),
-                fileB = new TemporaryFile(".lst"),
-                fileResult = new TemporaryFile(".lst"),
-                fileException = new TemporaryFile(".uex"))
+            using (TemporaryFile fileA = new TemporaryFile(".lst", false),
+                fileB = new TemporaryFile(".lst", false),
+                fileResult = new TemporaryFile(".lst", false),
+                fileException = new TemporaryFile(".uex", false))
             {
                 var listA = new List<string>(new string[] { "red", "gReEn", "green", 
                     "Blue", "1", "42", "     " });

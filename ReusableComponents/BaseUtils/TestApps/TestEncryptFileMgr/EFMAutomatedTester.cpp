@@ -90,7 +90,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		vecData.push_back("String 6");
 
 		// Store strings in temporary file
-		TemporaryFileName	tfnInput;
+		TemporaryFileName	tfnInput(true);
 		ofstream outfile( tfnInput.getName().c_str() );
 		bool bWriteNewline = false;
 		vector<string>::const_iterator iter;
@@ -110,7 +110,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		waitForFileToBeReadable(tfnInput.getName());
 
 		// Encrypt the file
-		TemporaryFileName	tfnOutput;
+		TemporaryFileName	tfnOutput(true);
 		efm.encrypt( tfnInput.getName().c_str(), tfnOutput.getName().c_str() );
 
 		// Decrypt the file
@@ -164,7 +164,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		}
 
 		// Write bytes to temporary file
-		TemporaryFileName	tfnBinaryIn;
+		TemporaryFileName	tfnBinaryIn(true);
 		CFile	fileIn;
 		fileIn.Open( tfnBinaryIn.getName().c_str(), 
 			CFile::modeCreate | CFile::modeWrite | CFile::typeBinary );
@@ -174,7 +174,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		waitForFileToBeReadable(tfnBinaryIn.getName());
 
 		// Encrypt the file
-		TemporaryFileName	tfnEncryptBin;
+		TemporaryFileName	tfnEncryptBin(true);
 		efm.encrypt( tfnBinaryIn.getName().c_str(), tfnEncryptBin.getName().c_str() );
 
 		// Decrypt the file
@@ -213,7 +213,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		}
 
 		// Write bytes to temporary file
-		TemporaryFileName	tfnBinaryIn2;
+		TemporaryFileName	tfnBinaryIn2(true);
 		CFile	fileIn2;
 		fileIn2.Open( tfnBinaryIn2.getName().c_str(), 
 			CFile::modeCreate | CFile::modeWrite | CFile::typeBinary );
@@ -223,7 +223,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		waitForFileToBeReadable(tfnBinaryIn2.getName());
 
 		// Encrypt the file
-		TemporaryFileName	tfnEncryptBin2;
+		TemporaryFileName	tfnEncryptBin2(true);
 		efm.encrypt( tfnBinaryIn2.getName().c_str(), tfnEncryptBin2.getName().c_str() );
 
 		// Decrypt the file
@@ -254,7 +254,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 
 
 		// Write bytes to temporary file
-		TemporaryFileName	tfnBinaryIn3;
+		TemporaryFileName	tfnBinaryIn3(true);
 		CFile	fileIn3;
 		fileIn3.Open( tfnBinaryIn3.getName().c_str(), 
 			CFile::modeCreate | CFile::modeWrite | CFile::typeBinary );
@@ -262,7 +262,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		waitForFileToBeReadable(tfnBinaryIn3.getName());
 
 		// Encrypt the file
-		TemporaryFileName	tfnEncryptBin3;
+		TemporaryFileName	tfnEncryptBin3(true);
 		efm.encrypt( tfnBinaryIn3.getName(), tfnEncryptBin3.getName().c_str() );
 
 		// Decrypt the file

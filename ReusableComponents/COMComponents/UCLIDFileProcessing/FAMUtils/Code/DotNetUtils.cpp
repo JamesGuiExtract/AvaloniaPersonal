@@ -23,7 +23,7 @@ extern HINSTANCE gFAMUtilsModuleResource;
 void getList(vector<string>& rvecList, const string& strArgs)
 {
 	// Create a temporary file name to hold the server list
-	TemporaryFileName tfn( "", ".txt", true );
+	TemporaryFileName tfn( true, "", ".txt", true );
 
 	// build path to SQLServerInfo.exe relative to FAMUtils
 	string strPathToEXE = getModuleDirectory(gFAMUtilsModuleResource);

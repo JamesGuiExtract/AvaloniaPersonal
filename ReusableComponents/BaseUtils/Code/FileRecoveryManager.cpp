@@ -129,7 +129,7 @@ void FileRecoveryManager::deleteRecoveryFile(const string& strFile)
 		// Ensure the file exists
 		if (isValidFile(strFile))
 		{
-			deleteFile(strFile, true);
+			deleteFile(strFile, true, false);
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25126");

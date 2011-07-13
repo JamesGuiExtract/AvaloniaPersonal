@@ -34,6 +34,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFValueModifiers", "..\..\..\AFValueModifiers\Code\AFValueModifiers.vcxproj", "{1AF05090-95C1-48BF-8E74-3F05844B63B0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcxproj", "{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
 EndProject
@@ -501,12 +504,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDShieldOnDemand", "..\..\.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Conditions", "..\..\..\..\..\RC.Net\FileActionManager\Conditions\Core\Code\Extract.FileActionManager.Conditions.csproj", "{30DC6A86-CB73-48E6-B4C3-520772284BFE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Interfaces", "..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj", "{8267221B-52C3-490B-A98F-7A51EBEB2A2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.SecureFileDeleters", "..\..\..\..\..\RC.Net\Utilities\SecureFileDeleters\Core\Code\Extract.Utilities.SecureFileDeleters.csproj", "{4E71D915-E822-4620-8E86-EB8255A96F82}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 156
+		ProjectCount = 158
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -663,6 +670,8 @@ Global
 		ProjectRelativeDiskPath154 = ..\..\..\..\..\RC.Net\ExceptionService\WCFInterface\Core\Code\Extract.ExceptionService.WCFInterface.csproj
 		ProjectRelativeDiskPath155 = ..\..\..\..\..\RC.Net\Redaction\IDShieldOnDemand\Core\Code\IDShieldOnDemand.csproj
 		ProjectRelativeDiskPath156 = ..\..\..\..\..\RC.Net\FileActionManager\Conditions\Core\Code\Extract.FileActionManager.Conditions.csproj
+		ProjectRelativeDiskPath157 = ..\..\..\..\..\RC.Net\Utilities\SecureFileDeleters\Core\Code\Extract.Utilities.SecureFileDeleters.csproj
+		ProjectRelativeDiskPath158 = ..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2559,6 +2568,30 @@ Global
 		{30DC6A86-CB73-48E6-B4C3-520772284BFE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{30DC6A86-CB73-48E6-B4C3-520772284BFE}.Release|Win32.ActiveCfg = Release|Any CPU
 		{30DC6A86-CB73-48E6-B4C3-520772284BFE}.Release|x86.ActiveCfg = Release|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Release|Win32.ActiveCfg = Release|Any CPU
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B}.Release|x86.ActiveCfg = Release|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|Win32.ActiveCfg = Release|Any CPU
+		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

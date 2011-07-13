@@ -33,7 +33,7 @@ void FailureDetectionAndReportingMgr::notifyExceptionLogged(const UCLIDException
 			// write the exception to a temporary file
 			string strEx = pEx->asStringizedByteStream();
 
-			TemporaryFileName tmpFile(NULL, ".tmp", false);
+			TemporaryFileName tmpFile(false, NULL, ".tmp", false);
 			strTempFileName = tmpFile.getName();
 			ofstream outfile(strTempFileName.c_str());
 			outfile << strEx;
@@ -75,7 +75,7 @@ void FailureDetectionAndReportingMgr::notifyExceptionDisplayed(const UCLIDExcept
 			// write the exception to a temporary file
 			string strEx = pEx->asStringizedByteStream();
 
-			TemporaryFileName tmpFile(NULL, ".tmp", false);
+			TemporaryFileName tmpFile(false, NULL, ".tmp", false);
 			strTempFileName = tmpFile.getName();
 			ofstream outfile(strTempFileName.c_str());
 			outfile << strEx;

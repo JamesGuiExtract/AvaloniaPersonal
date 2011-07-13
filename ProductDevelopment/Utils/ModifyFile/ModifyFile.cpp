@@ -68,7 +68,11 @@ int modifyFile(const char *pszFileName, bool bPrefixData, const char *pszData)
 	}
 	waitForFileAccess(pszFileName, giMODE_READ_ONLY);
 
-	if (!DeleteFile(pszTempFileName))
+	try
+	{
+		deleteFile(pszTempFileName);
+	}
+	catch (...)
 	{
 		cout << "WARNING: Unable to delete temporary file!" << endl;
 		return EXIT_FAILURE;

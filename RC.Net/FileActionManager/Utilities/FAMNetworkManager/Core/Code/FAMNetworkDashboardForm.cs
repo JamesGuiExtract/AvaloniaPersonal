@@ -923,7 +923,7 @@ namespace Extract.FileActionManager.Utilities
                     return;
                 }
 
-                using (TemporaryFile tempDb = new TemporaryFile(".sdf"))
+                using (TemporaryFile tempDb = new TemporaryFile(".sdf", false))
                 {
                     File.Copy(dbFile, tempDb.FileName, true);
                     using (SQLCDBEditorForm editor = new SQLCDBEditorForm(tempDb.FileName, false))

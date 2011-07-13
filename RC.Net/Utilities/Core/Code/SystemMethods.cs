@@ -329,7 +329,7 @@ namespace Extract.Utilities
         {
             try
             {
-                using (var tempFile = new TemporaryFile(".uex"))
+                using (var tempFile = new TemporaryFile(".uex", false))
                 {
                     var args = new List<string>(arguments);
                     args.Add("/ef");

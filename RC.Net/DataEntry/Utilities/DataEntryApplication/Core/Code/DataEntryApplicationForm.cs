@@ -3541,7 +3541,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // connections cannot see each other's changes.
                         if (_localDbCopy == null)
                         {
-                            _localDbCopy = new TemporaryFile();
+                            _localDbCopy = new TemporaryFile(true);
                         }
                         // Create a new connection string (and, thus, connection) if referencing a
                         // different database path or the source database has been updated.
@@ -3549,7 +3549,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                                  File.GetLastWriteTime(_dataSourcePath) > _lastDbModificationTime)
                         {
                             TemporaryFile oldDbCopy = _localDbCopy;
-                            _localDbCopy = new TemporaryFile();
+                            _localDbCopy = new TemporaryFile(true);
                             oldDbCopy.Dispose();
                         }
 
