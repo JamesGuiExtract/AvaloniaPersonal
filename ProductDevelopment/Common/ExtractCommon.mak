@@ -52,6 +52,8 @@ ObfuscateFiles:
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Drawing.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Drawing.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Encryption.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Encryption.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Interop.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Interop.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Interfaces.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Interfaces.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Utilities.SecureFileDeleters.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Utilities.SecureFileDeleters.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	
 CopyExtractCommonFiles: CleanupExtractCommonFiles ObfuscateFiles
     @ECHO Copying the ExtractCommon files to installation directory...
@@ -68,6 +70,8 @@ CopyExtractCommonFiles: CleanupExtractCommonFiles ObfuscateFiles
 	@DIR "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.rl"
 	@DIR "$(ExtractCommonInstallFilesRootDir)\DotNetFiles\Extract.Utilities.Forms.dll" /b >>"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.nl
 	@DIR "$(ExtractCommonInstallFilesRootDir)\DotNetFiles\Extract.Utilities.Email.dll" /b >>"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.nl
+	@DIR "$(ExtractCommonInstallFilesRootDir)\DotNetFiles\Extract.Interfaces.dll" /b >>"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.nl
+	@DIR "$(ExtractCommonInstallFilesRootDir)\DotNetFiles\Extract.Utilities.SecureFileDeleters.dll" /b >>"$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\ExtractCommon.nl
 	
 CreateExtractCommonMergeModule: CopyExtractCommonFiles  
 	@ECHO Creating ExtractCommon merge module...
