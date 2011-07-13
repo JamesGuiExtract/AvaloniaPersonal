@@ -1,4 +1,5 @@
 using Extract.Utilities.Test.Properties;
+using Microsoft.Win32;
 using NUnit.Framework;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -10,14 +11,14 @@ namespace Extract.Utilities.Test
     /// Class for testing the ConfigSettings class
     /// </summary>
     [TestFixture]
-    [Category("ConfigSettings")]
-    public class TestConfigSettings
+    [Category("ExtractSettings")]
+    public class TestExtractSettings
     {
         /// <summary>
         /// Tests the static vs dynamic behavior against the same config file.
         /// </summary>
         [Test]
-        public static void StaticVSDynamic()
+        public static void ConfigFileStaticVSDynamic()
         {
             string configFileName = Path.Combine(Path.GetTempPath(), "StaticVSDynamic.config");
 
@@ -75,7 +76,7 @@ namespace Extract.Utilities.Test
         /// Tests whether config files abide by the createIfMissing constructor parameter as true.
         /// </summary>
         [Test]
-        public static void AutomaticFileCreation()
+        public static void ConfigFileAutomaticFileCreation()
         {
             string configFileName =
                 Path.Combine(Path.GetTempPath(), "AutomaticFileCreation.config");
@@ -117,7 +118,7 @@ namespace Extract.Utilities.Test
         /// </summary>
         [Test]
         [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "noFileCreationConfig")]
-        public static void NoAutomaticFileCreation()
+        public static void ConfigFileNoAutomaticFileCreation()
         {
             string configFileName =
                 Path.Combine(Path.GetTempPath(), "NoAutomaticFileCreation.config");
@@ -165,6 +166,59 @@ namespace Extract.Utilities.Test
                 {
                     File.Delete(configFileName);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Tests the static vs dynamic behavior against the same registry key.
+        /// </summary>
+        [Test]
+        public static void RegistryStaticVSDynamic()
+        {
+            string registryKeyName =
+                    @"SOFTWARE\Extract Systems\ReusableComponents\Extract.Utilities.Test";
+
+            try
+            {
+                // Ensure there is no previously existing registry key.
+                Registry.CurrentUser.DeleteSubKey(registryKeyName, false);
+
+                // Initialize a dynamic RegistrySettings instance and ensure the proper default value.
+                RegistrySettings<Settings> dynamicConfig =
+                    new RegistrySettings<Settings>(registryKeyName, true);
+                Assert.That(dynamicConfig.Settings.TestInt == 42,
+                    "Dynamic RegistrySettings did not initialize properly");
+
+                // Specifying a new value should update the config file.
+                dynamicConfig.Settings.TestInt = 0;
+
+                // A static RegistrySettings instance initialized at this point should default to the
+                // value currently saved in the config file.
+                RegistrySettings<Settings> staticConfig =
+                    new RegistrySettings<Settings>(registryKeyName, false);
+                Assert.That(staticConfig.Settings.TestInt == 0,
+                    "Dynamic RegistrySettings did not update value.");
+
+                // A new value specifyied in the static instance should not affect the value in the
+                // dynamic instance.
+                staticConfig.Settings.TestInt = 1;
+                Assert.That(dynamicConfig.Settings.TestInt == 0,
+                    "Static RegistrySettings modified value without save.");
+
+                // However, saving the static config file should update the dynamic instance.
+                staticConfig.Save();
+                Assert.That(dynamicConfig.Settings.TestInt == 1,
+                    "Static RegistrySettings save failed to modify value.");
+
+                // Finally, changing the setting in the dynamic config file should not alter the
+                // static instance.
+                dynamicConfig.Settings.TestInt = 2;
+                Assert.That(staticConfig.Settings.TestInt == 1,
+                    "Static RegistrySettings updated dynamically.");
+            }
+            finally
+            {
+                Registry.CurrentUser.DeleteSubKey(registryKeyName, false);
             }
         }
     }
