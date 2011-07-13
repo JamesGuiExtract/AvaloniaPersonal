@@ -25,11 +25,11 @@ namespace Extract.Interfaces
         /// Securely deletes the specified <see paramref="fileName"/>.
         /// </summary>
         /// <param name="fileName">Name of the file to securely delete.</param>
-        /// <param name="throwIfUnableToDeleteSecurely"><see langword="true"/> if an exception should
-        /// be thrown before actually deleting the file if the file could not be securely
+        /// <param name="throwIfUnableToDeleteSecurely"><see langword="true"/> if an exception
+        /// should be thrown before actually deleting the file if the file could not be securely
         /// overwritten prior to deletion. If <see langword="false"/>, problems overwriting the file
-        /// will be logged if the <see cref="Properties.Settings.LogSecureDeleteErrors"/> value is
-        /// <see langword="true"/>, otherwise they will be ignored.</param>
-        void SecureDeleteFile(string fileName, bool throwIfOverwriteFailed);
+        /// will be logged if the LogSecureDeleteError registry value is true, otherwise they will
+        /// be ignored.</param>
+        void SecureDeleteFile(string fileName, bool throwIfUnableToDeleteSecurely);
     }
 }
