@@ -326,55 +326,39 @@ namespace Extract.Utilities
         {
             try
             {
-                MoveFile(source, destination, overwrite,
-                    _registry.Settings.SecureDeleteAllSensitiveFiles);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI0");
-            }
-        }
-
-        /// <summary>
-        /// Moves a file providing the option to overwrite if necessary.
-        /// </summary>
-        /// <param name="source">The file to move.</param>
-        /// <param name="destination">The location to which <paramref name="source"/> should be
-        /// moved.</param>
-        /// <param name="overwrite"><see langword="true"/> if the <paramref name="destination"/>
-        /// should be overwritten; <see langword="false"/> if an exception should be thrown if the
-        /// <paramref name="destination"/> exists.</param>
-        /// <param name="secureMoveFile">if set to <see langword="true"/> [secure move file].</param>
-        public static void MoveFile(string source, string destination, bool overwrite,
-            bool secureMoveFile)
-        {
-            try
-            {
                 // Attempt move first if possible, since this is fastest
                 if (!File.Exists(destination))
                 {
-                    if (secureMoveFile &&
-                        AttemptIOOperation(() => Directory.Move(source, destination)))
+                    try
                     {
+                        File.Move(source, destination);
                         return;
                     }
-                    else if (!secureMoveFile &&
-                             AttemptIOOperation(() => File.Move(source, destination)))
+                    catch (DirectoryNotFoundException)
                     {
-                        return;
+                        throw;
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        throw;
+                    }
+                    catch (IOException)
+                    {
+                        // The destination file exists. Ignore for now. 
+                        // Later either an exception will be thrown or the file will be copied by force.
                     }
                 }
 
-//                // The file already exists. If not overwriting, throw an exception.
-//                if (operationSucceeded && !overwrite)
-//                {
-//                    ExtractException ee = new ExtractException("ELI28454",
-//                        "Destination file already exists.");
-//                    throw ee;
-//                }
+                // The file already exists. If not overwriting, throw an exception.
+                if (!overwrite)
+                {
+                    ExtractException ee = new ExtractException("ELI28454",
+                        "Destination file already exists.");
+                    throw ee;
+                }
 
                 // Attempt to overwrite the file. This is slower than moving the file.
-                File.Copy(source, destination, overwrite);
+                File.Copy(source, destination, true);
                 DeleteFile(source);
             }
             catch (Exception ex)
@@ -385,35 +369,6 @@ namespace Extract.Utilities
                 ee.AddDebugData("Destination file", destination, false);
                 ee.AddDebugData("Overwrite", overwrite, false);
                 throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Attempts the IO operation.
-        /// </summary>
-        /// <param name="IOOperation">The IO operation.</param>
-        /// <returns></returns>
-        static bool AttemptIOOperation(Action IOOperation)
-        {
-            try
-            {
-                IOOperation();
-
-                return true;
-            }
-            catch (DirectoryNotFoundException)
-            {
-                throw;
-            }
-            catch (FileNotFoundException)
-            {
-                throw;
-            }
-            catch (IOException)
-            {
-                // The destination file exists. Ignore for now. 
-                // Later either an exception will be thrown or the file will be copied by force.
-                return false;
             }
         }
 
