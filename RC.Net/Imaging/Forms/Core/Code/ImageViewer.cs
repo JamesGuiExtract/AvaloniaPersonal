@@ -163,8 +163,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The registry settings for the image viewer.
         /// </summary>
-        readonly RegistrySettings<Properties.Settings> _registry =
-            new RegistrySettings<Properties.Settings>(@"Software\Extract Systems\Imaging");
+        readonly RegistrySettings<Properties.Settings> _registry;
 
         /// <summary>
         /// File name of the currently open image file.
@@ -629,6 +628,9 @@ namespace Extract.Imaging.Forms
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23109",
                     _OBJECT_NAME);
+
+                _registry = new RegistrySettings<Properties.Settings>(
+                    @"Software\Extract Systems\Imaging");
 
                 _registry.GeneratePropertyValues("AutoFitZonePadding");
 

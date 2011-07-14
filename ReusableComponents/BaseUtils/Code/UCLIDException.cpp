@@ -876,33 +876,43 @@ void UCLIDException::renameLogFile(const string& strFileName, bool bUserRenamed,
 
 		// perform the rename.  If the rename fails, just ignore it (we don't want to cause more 
 		// errors in the logging process)
-		if (MoveFile(strFileName.c_str(), strRenameFileTo.c_str()) != 0)
+		try
 		{
-			string strELICode = "ELI14818";
-			string strMessage = "Application trace: Current log file was time stamped and renamed.";
-			if (bUserRenamed)
+			try
 			{
-				strELICode = "ELI29952";
-				strMessage = "User renamed log file.";
-			}
+				moveFile(strFileName.c_str(), strRenameFileTo.c_str(), false, false);
 
-			// log an entry in the new log file indicating the file has been renamed.
-			UCLIDException ue(strELICode, strMessage);
-			ue.addDebugInfo("RenamedLogFile", strRenameFileTo);
-			if (!strComment.empty())
-			{
-				ue.addDebugInfo("User Comment", strComment);
+				string strELICode = "ELI14818";
+				string strMessage =
+					"Application trace: Current log file was time stamped and renamed.";
+				if (bUserRenamed)
+				{
+					strELICode = "ELI29952";
+					strMessage = "User renamed log file.";
+				}
+
+				// log an entry in the new log file indicating the file has been renamed.
+				UCLIDException ue(strELICode, strMessage);
+				ue.addDebugInfo("RenamedLogFile", strRenameFileTo);
+				if (!strComment.empty())
+				{
+					ue.addDebugInfo("User Comment", strComment);
+				}
+				ue.log(strFileName, false);
 			}
-			ue.log(strFileName, false);
+			// Only need to build an exception and throw it if bThrowExceptionOnFailure == true
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32916")
 		}
-		// Only need to build an exception and throw it if bThrowExceptionOnFailure == true
-		else if (bThrowExceptionOnFailure)
+		catch (UCLIDException &ue)
 		{
-			UCLIDException uex("ELI29951", "Unable to rename log file.");
-			uex.addWin32ErrorInfo();
-			uex.addDebugInfo("Log File Name", strFileName);
-			uex.addDebugInfo("New Log File Name", strRenameFileTo);
-			throw uex;
+			if (bThrowExceptionOnFailure)
+			{
+				UCLIDException uex("ELI29951", "Unable to rename log file.", ue);
+				uex.addWin32ErrorInfo();
+				uex.addDebugInfo("Log File Name", strFileName);
+				uex.addDebugInfo("New Log File Name", strRenameFileTo);
+				throw uex;
+			}
 		}
 	}
 	catch(...)

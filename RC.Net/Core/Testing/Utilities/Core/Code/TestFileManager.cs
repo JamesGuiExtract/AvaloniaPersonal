@@ -92,7 +92,7 @@ namespace Extract.Testing.Utilities
                     !fileName.Equals(tempFile.FileName, StringComparison.OrdinalIgnoreCase))
                 {
                     // Move the file to the new location
-                    File.Move(tempFile.FileName, fileName);
+                    FileSystemMethods.MoveFile(tempFile.FileName, fileName, false);
 
                     // Remove the old file from the collection and dispose of the
                     // temporary file

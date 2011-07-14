@@ -51,6 +51,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>1607</NoWarn>
+    <DocumentationFile>..\..\..\binaries64\Debug\Extract64.Core.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -62,6 +63,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>x64</PlatformTarget>
     <NoWarn>1607</NoWarn>
+    <DocumentationFile>..\..\..\binaries64\Release\Extract64.Core.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

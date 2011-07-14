@@ -104,9 +104,11 @@ namespace Extract.Utilities.Ftp
                 // Write the remote source document element
                 xmlWriter.WriteElementString(_REMOTE_SOURCE_DOC_NAME, RemoteSourceDocName);
 
-                xmlWriter.WriteElementString(_SOURCE_DOC_SIZE, RemoteFileSize.ToString());
+                xmlWriter.WriteElementString(_SOURCE_DOC_SIZE,
+                    RemoteFileSize.ToString(CultureInfo.InvariantCulture));
 
-                xmlWriter.WriteElementString(_LAST_MODIFIED, RemoteLastModifiedTime.Ticks.ToString());
+                xmlWriter.WriteElementString(_LAST_MODIFIED,
+                    RemoteLastModifiedTime.Ticks.ToString(CultureInfo.InvariantCulture));
             }
             catch (Exception ex)
             {
@@ -171,8 +173,10 @@ namespace Extract.Utilities.Ftp
 
                     xmlReader.ReadStartElement();
                     RemoteSourceDocName = xmlReader.ReadElementString(_REMOTE_SOURCE_DOC_NAME);
-                    RemoteFileSize = Convert.ToInt64(xmlReader.ReadElementString(_SOURCE_DOC_SIZE));
-                    RemoteLastModifiedTime = new DateTime(Convert.ToInt64(xmlReader.ReadElementString(_LAST_MODIFIED)));
+                    RemoteFileSize = Convert.ToInt64(
+                        xmlReader.ReadElementString(_SOURCE_DOC_SIZE), CultureInfo.InvariantCulture);
+                    RemoteLastModifiedTime =new DateTime(Convert.ToInt64(
+                        xmlReader.ReadElementString(_LAST_MODIFIED), CultureInfo.InvariantCulture));
                 }
             }
             catch (Exception ex)

@@ -82,8 +82,7 @@ namespace Extract.IDShieldStatisticsReporter
         /// <summary>
         /// The configuration file settings for the statistics reporter
         /// </summary>
-        readonly ConfigSettings<Settings> _config = new ConfigSettings<Settings>(
-            Path.Combine(FileSystemMethods.ApplicationDataPath, "IDShieldStatisticsReporter.config"));
+        readonly ConfigSettings<Settings> _config;
 
         /// <summary>
         /// The target test folder.
@@ -160,6 +159,10 @@ namespace Extract.IDShieldStatisticsReporter
                     _OBJECT_NAME);
 
                 InitializeComponent();
+
+                _config = new ConfigSettings<Settings>(
+                    Path.Combine(FileSystemMethods.ApplicationDataPath, 
+                    "IDShieldStatisticsReporter.config"));
 
                 // Create an condition object so that its configuration screen can be used to
                 // configure the automated condition.

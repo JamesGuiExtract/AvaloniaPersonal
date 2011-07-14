@@ -627,12 +627,23 @@ void CCopyMoveDeleteFileProcessorPP::validateLicense()
 //-------------------------------------------------------------------------------------------------
 void CCopyMoveDeleteFileProcessorPP::updateEnabledState()
 {
+	bool bMoveSelected = m_radioMove.GetCheck() == BST_CHECKED;
 	bool bDeleteSelected = m_radioDelete.GetCheck() == BST_CHECKED;
 	bool bSecureDeleteSelected = m_btnSecureDelete.GetCheck() == BST_CHECKED;
+
+	if (bMoveSelected)
+	{
+		m_btnSecureDelete.SetWindowText("Securely move");
+	}
+	else if (bDeleteSelected)
+	{
+		m_btnSecureDelete.SetWindowText("Securely delete");
+	}
 
 	// Set up enabled state based on wheither delete is checked
 	BOOL bEnableForDelete = bDeleteSelected ? TRUE : FALSE;
 	BOOL bDisableForDelete = bDeleteSelected ? FALSE : TRUE;
+	BOOL bEnableSecureDelete = asMFCBool(bMoveSelected || bDeleteSelected);
 	BOOL bEnableForSecureDelete = asMFCBool(bDeleteSelected && bSecureDeleteSelected);
 
 	// Disable or enable destination controls
@@ -650,7 +661,7 @@ void CCopyMoveDeleteFileProcessorPP::updateEnabledState()
 	m_btnAllowReadonly.EnableWindow(bEnableForDelete);
 
 	// Secure delete options
-	m_btnSecureDelete.EnableWindow(bEnableForDelete);
+	m_btnSecureDelete.EnableWindow(bEnableSecureDelete);
 	m_btnThrowIfUnableToDeleteSecurely.EnableWindow(bEnableForSecureDelete);
 }
 //-------------------------------------------------------------------------------------------------

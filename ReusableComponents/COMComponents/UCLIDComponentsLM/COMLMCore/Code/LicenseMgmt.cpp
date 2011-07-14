@@ -179,7 +179,7 @@ void LicenseManagement::initializeLicenseFromFile(const std::string& strLicenseF
 			// Attempt to rename the license file to expired
 			try
 			{
-				moveFile(strFQPath, strFQPath + ".expired", true, true);
+				moveFile(strFQPath, strFQPath + ".expired", true, false);
 			}
 			catch(UCLIDException& uex)
 			{

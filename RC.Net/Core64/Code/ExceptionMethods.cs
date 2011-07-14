@@ -101,7 +101,7 @@ namespace Extract64.Core
         /// </summary>
         /// <param name="value">An array of <see cref="byte"/>.  Must not be null.</param>
         /// <returns>A string containing each of the bytes as a two character hex string.</returns>
-        /// <exception cref="ExtractException">If value is <see langword="null"/>.</exception>
+        /// <throws><see cref="Exception"/>If value is <see langword="null"/>.</throws>
         static string ConvertBytesToHexString(byte[] value)
         {
             // Create a string builder with a capacity of twice the length of the bytes

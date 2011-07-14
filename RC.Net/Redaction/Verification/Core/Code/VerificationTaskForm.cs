@@ -170,8 +170,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The config file that contains settings for the verification UI.
         /// </summary>
-        readonly ConfigSettings<Properties.Settings> _config =
-            new ConfigSettings<Properties.Settings>();
+        readonly ConfigSettings<Properties.Settings> _config;
 
         /// <summary>
         /// The file corresponding to the currently open vector of attributes (VOA) file.
@@ -432,6 +431,8 @@ namespace Extract.Redaction.Verification
 
                 // License SandDock before creating the form
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
+
+                _config = new ConfigSettings<Properties.Settings>();
 
                 _settings = settings;
                 _tagManager = tagManager;

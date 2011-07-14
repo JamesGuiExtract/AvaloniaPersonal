@@ -46,8 +46,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The config file used to retrieve/store the options for the slideshow.
         /// </summary>
-        readonly ConfigSettings<Properties.Settings> _config =
-            new ConfigSettings<Properties.Settings>();
+        readonly ConfigSettings<Properties.Settings> _config;
 
         /// <summary>
         /// The set of keys that should be available for the user to select as the slideshow run key.
@@ -66,35 +65,44 @@ namespace Extract.Redaction.Verification
         /// run independent of the FAM and database; <see langword="false"/> otherwise.</param>
         public VerificationOptionsDialog(VerificationSettings taskSettings, bool standAloneMode)
         {
-            InitializeComponent();
-
-            _taskSettings = taskSettings;
-
-            // Fill the tool combo box from the enum
-            var autoToolType = typeof(AutoTool);
-            var names = new List<string>(Enum.GetNames(autoToolType));
-            names.Remove(Enum.GetName(autoToolType, AutoTool.None));
-            _autoToolComboBox.Items.AddRange(names.ToArray());
-
-            _slideshowAutoStartCheckBox.Enabled = !_taskSettings.SlideshowSettings.RequireRunKey;
-            _slideshowAutoStartCheckBox.Checked = _config.Settings.AutoStartSlideshow;
-            _slideshowIntervalUpDown.Value = _config.Settings.SlideshowInterval;
-            _slideshowIntervalUpDown.UserTextCorrected += HandleSlideshowIntervalCorrected;
-
-            // If the slideshow is not enabled, remove the slideshow settings tab.
-            if (!_taskSettings.SlideshowSettings.SlideshowEnabled)
+            try
             {
-                this._tabControl.TabPages.Remove(_slideshowTabPage);
-                _slideshowTabPage.Dispose();
-                _slideshowTabPage = null;
+                InitializeComponent();
+
+                _config = new ConfigSettings<Properties.Settings>();
+
+                _taskSettings = taskSettings;
+
+                // Fill the tool combo box from the enum
+                var autoToolType = typeof(AutoTool);
+                var names = new List<string>(Enum.GetNames(autoToolType));
+                names.Remove(Enum.GetName(autoToolType, AutoTool.None));
+                _autoToolComboBox.Items.AddRange(names.ToArray());
+
+                _slideshowAutoStartCheckBox.Enabled = !_taskSettings.SlideshowSettings.RequireRunKey;
+                _slideshowAutoStartCheckBox.Checked = _config.Settings.AutoStartSlideshow;
+                _slideshowIntervalUpDown.Value = _config.Settings.SlideshowInterval;
+                _slideshowIntervalUpDown.UserTextCorrected += HandleSlideshowIntervalCorrected;
+
+                // If the slideshow is not enabled, remove the slideshow settings tab.
+                if (!_taskSettings.SlideshowSettings.SlideshowEnabled)
+                {
+                    this._tabControl.TabPages.Remove(_slideshowTabPage);
+                    _slideshowTabPage.Dispose();
+                    _slideshowTabPage = null;
+                }
+
+                // If not running in standalone mode, removed the OnDemand settings tab.
+                if (!standAloneMode)
+                {
+                    _tabControl.Controls.Remove(_onDemandTabPage);
+                    _onDemandTabPage.Dispose();
+                    _onDemandTabPage = null;
+                }
             }
-            
-            // If not running in standalone mode, removed the OnDemand settings tab.
-            if (!standAloneMode)
+            catch (Exception ex)
             {
-                _tabControl.Controls.Remove(_onDemandTabPage);
-                _onDemandTabPage.Dispose();
-                _onDemandTabPage = null;
+                throw ex.AsExtract("ELI32918");
             }
         }
 

@@ -491,14 +491,25 @@ EXPORT_BaseUtils void copyFile(const string &strSrcFileName, const string &strDs
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To move a file from one location to another
 //			overwriting an existing file if bOverwrite = true
-//			allows readonly file to be moved if bAllowReadonly = true
+//			Whether the files will be moved securely will be determined by the
+//			SecureDeleteAllSensitiveFiles registry setting.
 // REQUIRE: 
 // PROMISE: 
 EXPORT_BaseUtils void moveFile(const string strSrcFileName, 
 							   const string strDstFileName,
-							   const bool bOverwrite = false,
-							   const bool bAllowReadonly = false);
+							   const bool bOverwrite = false);
 //-------------------------------------------------------------------------------------------------
+// PURPOSE: To move a file from one location to another
+//			overwriting an existing file if bOverwrite = true
+//			if bSecureMove is true, when moving files to a new value, the old copy will be
+//			securely deleted.
+// REQUIRE: 
+// PROMISE: 
+EXPORT_BaseUtils void moveFile(const string strSrcFileName, 
+							   const string strDstFileName,
+							   const bool bOverwrite,
+							   const bool bSecureMove);
+////-------------------------------------------------------------------------------------------------
 // PURPOSE: To delete a file that is not readonly.
 // NOTE:	When this override is used, files will be securely deleted according to the
 //			SecureDeleteAllSensitiveFiles registry value.

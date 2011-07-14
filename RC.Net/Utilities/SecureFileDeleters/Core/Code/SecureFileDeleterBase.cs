@@ -47,7 +47,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// overwrite pass.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
-        /// <param name="bytesToWrite"/>The number of bytes to fill the buffer with</param>
+        /// <param name="bytesToWrite">The number of bytes to fill the buffer with</param>
         protected delegate void OverwritePass(Byte[] buffer, int bytesToWrite);
 
         #endregion Delegates
@@ -63,9 +63,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// The registry settings from which the the secure file delete options are to be retrieved.
         /// </summary>
         // Intentionally not dynamic since the values will not be read dynamically on the c++ side.
-        static readonly RegistrySettings<Properties.Settings> _registry =
-            new RegistrySettings<Properties.Settings>(
-                @"SOFTWARE\Extract Systems\ReusableComponents\Extract.Utilities");
+        readonly RegistrySettings<Properties.Settings> _registry;
 
         #endregion Fields
 
@@ -77,7 +75,10 @@ namespace Extract.Utilities.SecureFileDeleters
         protected SecureFileDeleterBase()
         {
             try 
-	        {	        
+	        {
+                _registry = new RegistrySettings<Properties.Settings>(
+                    @"SOFTWARE\Extract Systems\ReusableComponents\Extract.Utilities");
+
                 OverwritePasses = new Collection<OverwritePass>();
 	        }
 	        catch (Exception ex)
@@ -337,15 +338,15 @@ namespace Extract.Utilities.SecureFileDeleters
 
         /// <summary>
         /// Verifies that the bytes at the end of the <see paramref="stream"/> match the bytes in
-        /// <see cref="writeBuffer"/>.
+        /// <see paramref="writeBuffer"/>.
         /// </summary>
         /// <param name="stream">The <see cref="Stream"/> to verify.</param>
         /// <param name="writeBuffer">The data the <see cref="Stream"/> should end with.</param>
         /// <param name="readBuffer">A buffer to store data read from the <see paramref="stream"/>.
         /// </param>
         /// <param name="bytesToVerify">The number of bytes to verify.</param>
-        /// <requires><see paramref="readBuffer"/> must be at least as large as
-        /// <see paramref="writeBuffer"/>.</requires>
+        /// <requires><see paramref="readBuffer"/> and <see paramref="readBuffer"/> must be at least
+        /// as large as <see paramref="bytesToVerify"/>.</requires>
         /// <throws><see cref="ExtractException"/> if the verificaton fails.</throws>
         protected static void VerifyData(Stream stream, byte[] writeBuffer, byte[] readBuffer,
             int bytesToVerify)
@@ -353,7 +354,7 @@ namespace Extract.Utilities.SecureFileDeleters
             try
             {
                 ExtractException.Assert("ELI32870", "Internal logic error.",
-                    readBuffer.Length >= bytesToVerify);
+                    readBuffer.Length >= bytesToVerify && writeBuffer.Length >= bytesToVerify);
 
                 // Read back from the file the data that was just written.
                 stream.Seek(-bytesToVerify, SeekOrigin.Current);
@@ -428,9 +429,10 @@ namespace Extract.Utilities.SecureFileDeleters
         }
 
         /// <summary>
-        /// Obfuscates the file attributes.
+        /// Sets the file to not indexed and assigns random date/time stamps.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
+        /// <param name="exceptions">The exceptions.</param>
         protected static void ObfuscateFileAttributes(string fileName,
             Collection<ExtractException> exceptions)
         {
@@ -482,7 +484,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// Fills the provided <see paramref="buffer"/> with the same byte value.
         /// </summary>
         /// <param name="buffer">The buffer to fill.</param>
-        /// <param name="bytesToWrite"/>The number of bytes to fill the buffer with</param>
+        /// <param name="bytesToWrite">The number of bytes to fill the buffer with</param>
         /// <param name="value">The <see langword="byte"/> that should fill the buffer.</param>
         protected virtual void StaticOverwrite(Byte[] buffer, int bytesToWrite, byte value)
         {
@@ -504,7 +506,7 @@ namespace Extract.Utilities.SecureFileDeleters
         /// Fills the provided <see paramref="buffer"/> with random data.
         /// </summary>
         /// <param name="buffer">The buffer to fill.</param>
-        /// <param name="bytesToWrite"/>The number of bytes to fill the buffer with</param>
+        /// <param name="bytesToWrite">The number of bytes to fill the buffer with</param>
         protected virtual void RandomOverwrite(Byte[] buffer, int bytesToWrite)
         {
             try

@@ -1900,8 +1900,60 @@ void copyFile(const string &strSrcFileName, const string &strDstFileName,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25513");
 }
 //--------------------------------------------------------------------------------------------------
+// Declare the delete file helper method which may need to be used by the below moveFile helper.
+bool deleteFile(const char* pszFileName, bool bAllowReadonly,
+	const ISecureFileDeleterPtr ipSecureFileDeleter, bool bThrowIfUnableToDeleteSecurely,
+	unique_ptr<UCLIDException> &rapueSecureDeleteException);
+//--------------------------------------------------------------------------------------------------
+// Helper for exported moveFile functions. Performs secure moves if ipSecureFileDeleter is provided.
+// If there is a failure when performing a secure delete following a move to a different volume,
+// rapueSecureDeleteException will be populated with the exception.
+bool moveFile(const string strSrcFileName, const string strDstFileName,
+			  const bool bOverwrite, const ISecureFileDeleterPtr ipSecureFileDeleter,
+			  unique_ptr<UCLIDException> &rapueSecureDeleteException)
+{
+	// Guarantee that a move performed as a copy and delete operation is flushed 
+	// to disk before the function returns
+	DWORD dwFlags = MOVEFILE_WRITE_THROUGH;
+	
+	// If moving to another volume, do not allow the OS Move fuction to do the copy/delete. We will
+	// do those steps ourselves in this case so that when the file is deleted it is securely deleted.
+	if (ipSecureFileDeleter == __nullptr)
+	{
+		dwFlags |= MOVEFILE_COPY_ALLOWED;
+	}
+	
+	if (bOverwrite)
+	{
+		dwFlags |= MOVEFILE_REPLACE_EXISTING;
+	}
+
+	if (asCppBool(MoveFileEx(strSrcFileName.c_str(), strDstFileName.c_str(), dwFlags)))
+	{
+		return true;
+	}
+
+	// If the the error is ERROR_NOT_SAME_DEVICE and secure delete is enabled, manually copy the
+	// file, then securely delete the original.
+	if (GetLastError() == ERROR_NOT_SAME_DEVICE && ipSecureFileDeleter != __nullptr)
+	{
+		// Failed to move, get the last error
+		if (!asCppBool(CopyFile(strSrcFileName.c_str(), strDstFileName.c_str(),
+				asMFCBool(!bOverwrite))))
+		{
+			return false;
+		}
+
+		unique_ptr<UCLIDException> apueSecureDeleteException;
+		return deleteFile(strSrcFileName.c_str(), true, ipSecureFileDeleter, false, 
+			rapueSecureDeleteException);
+	}
+
+	return false;
+}
+//--------------------------------------------------------------------------------------------------
 void moveFile(const string strSrcFileName, const string strDstFileName,
-			  const bool bOverwrite, const bool bAllowReadonly)
+			  const bool bOverwrite, const ISecureFileDeleterPtr ipSecureFileDeleter)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI01882");
 	try
@@ -1910,49 +1962,29 @@ void moveFile(const string strSrcFileName, const string strDstFileName,
 		DWORD dwOldAttributes = INVALID_FILE_ATTRIBUTES;
 		bool bResetAttributes = false;
 		_lastCodePos = "10";
-		if (bAllowReadonly)
-		{
-			_lastCodePos = "10_A";
-			if (fileExistsAndIsReadOnly(strSrcFileName))
-			{
-				_lastCodePos = "10_A_1";
-				dwOldAttributes = GetFileAttributes(strSrcFileName.c_str());
-				if (dwOldAttributes == INVALID_FILE_ATTRIBUTES)
-				{
-					UCLIDException uex("ELI23608", "Unable to get file attributes.");
-					uex.addWin32ErrorInfo();
-					uex.addDebugInfo("File To Get Attributes", strSrcFileName);
-					throw uex;
-				}
-
-				_lastCodePos = "10_A_2";
-				setFileAttributes(strSrcFileName, FILE_ATTRIBUTE_NORMAL);
-			}
-
-			_lastCodePos = "10_B";
-			if (fileExistsAndIsReadOnly(strDstFileName))
-			{
-				_lastCodePos = "10_B_1";
-				setFileAttributes(strDstFileName, FILE_ATTRIBUTE_NORMAL);
-			}
-		}
-		_lastCodePos = "20";
-
-		// Guarantee that a move performed as a copy and delete operation is flushed 
-		// to disk before the function returns
-		DWORD dwFlags = MOVEFILE_COPY_ALLOWED | MOVEFILE_WRITE_THROUGH;
-		if (bOverwrite)
-		{
-			dwFlags |= MOVEFILE_REPLACE_EXISTING;
-		}
-
+	
 		// Move the file (retry if it fails due to a share violation) [LegacyRCAndUtils #5139]
 		_lastCodePos = "30";
 		int iRetryCount(-1),iTimeout(-1);
 		getFileAccessRetryCountAndTimeout(iRetryCount, iTimeout);
 		int iRetries = 0;
-		while(!asCppBool(MoveFileEx(strSrcFileName.c_str(), strDstFileName.c_str(), dwFlags)))
+		unique_ptr<UCLIDException> apueSecureDeleteException;
+
+		while(!moveFile(strSrcFileName, strDstFileName, bOverwrite, ipSecureFileDeleter,
+			apueSecureDeleteException))
 		{
+			// Shared file retries are performed by the secure file deleter and need not be done here.
+			// Throw any exception from the secure file delete immediately.
+			if (apueSecureDeleteException.get() != __nullptr)
+			{
+				UCLIDException ue("ELI32919", "Secure move failed. "
+					"The file was copied to the new location, but could not be deleted from the old location",
+					*apueSecureDeleteException);
+				ue.addDebugInfo("SrcFile", strSrcFileName);
+				ue.addDebugInfo("DstFile", strDstFileName);
+				throw ue;
+			}
+
 			// Failed to move, get the last error
 			DWORD dwError = GetLastError();
 
@@ -1996,9 +2028,41 @@ void moveFile(const string strSrcFileName, const string strDstFileName,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23610");
 }
 //--------------------------------------------------------------------------------------------------
-bool deleteFile(const char* pszFileName, ISecureFileDeleterPtr ipSecureFileDeleter,
-	bool bThrowIfUnableToDeleteSecurely, unique_ptr<UCLIDException> &apueSecureDeleteException)
+void moveFile(const string strSrcFileName, const string strDstFileName,
+			  const bool bOverwrite/* = false*/)
 {
+	try
+	{
+		ISecureFileDeleterPtr ipSecureFileDeleter = getSecureFileDeleter(false);
+		moveFile(strSrcFileName, strDstFileName, bOverwrite, ipSecureFileDeleter);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32914");
+}
+//--------------------------------------------------------------------------------------------------
+void moveFile(const string strSrcFileName, const string strDstFileName,
+			  const bool bOverwrite, const bool bSecureMove)
+{
+	try
+	{
+		ISecureFileDeleterPtr ipSecureFileDeleter =
+			bSecureMove ? getSecureFileDeleter(true) : __nullptr;
+		moveFile(strSrcFileName, strDstFileName, bOverwrite, ipSecureFileDeleter);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32915");
+}
+//--------------------------------------------------------------------------------------------------
+// Helper for exported deleteFile functions. Performs secure deletes if ipSecureFileDeleter is
+// provided. If there is a failure when performing a secure delete following a move to a different
+// volume, rapueSecureDeleteException will be populated with the exception.
+bool deleteFile(const char* pszFileName, bool bAllowReadonly,
+	const ISecureFileDeleterPtr ipSecureFileDeleter, bool bThrowIfUnableToDeleteSecurely,
+	unique_ptr<UCLIDException> &rapueSecureDeleteException)
+{
+	if (bAllowReadonly && fileExistsAndIsReadOnly(pszFileName))
+	{
+		setFileAttributes(pszFileName, FILE_ATTRIBUTE_NORMAL);
+	}
+
 	if (ipSecureFileDeleter != __nullptr)
 	{
 		try
@@ -2008,11 +2072,11 @@ bool deleteFile(const char* pszFileName, ISecureFileDeleterPtr ipSecureFileDelet
 				ipSecureFileDeleter->SecureDeleteFile(pszFileName, bThrowIfUnableToDeleteSecurely);
 				return true;
 			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32921");
 		}
 		catch (UCLIDException &ue)
 		{
-			apueSecureDeleteException.reset(new UCLIDException(ue));
+			rapueSecureDeleteException.reset(new UCLIDException(ue));
 		}
 	}
 	else if (asCppBool(DeleteFile(pszFileName)))
@@ -2023,14 +2087,12 @@ bool deleteFile(const char* pszFileName, ISecureFileDeleterPtr ipSecureFileDelet
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
+// Helper for exported deleteFile functions. Performs secure deletes if ipSecureFileDeleter is
+// provided. If there is a failure when performing a secure delete following a move to a different
+// volume, rapueSecureDeleteException will be populated with the exception.
 void deleteFile(const string strFileName, const bool bAllowReadonly,
 	ISecureFileDeleterPtr ipSecureFileDeleter, bool bThrowIfUnableToDeleteSecurely)
 {
-	if (bAllowReadonly && fileExistsAndIsReadOnly(strFileName))
-	{
-		setFileAttributes(strFileName, FILE_ATTRIBUTE_NORMAL);
-	}
-
 	// Delete the file  (retry if the delete fails due to a share violation)
 	int iRetryCount(-1),iTimeout(-1);
 	getFileAccessRetryCountAndTimeout(iRetryCount, iTimeout);
@@ -2038,8 +2100,8 @@ void deleteFile(const string strFileName, const bool bAllowReadonly,
 	const char* pszFileName = strFileName.c_str();
 	unique_ptr<UCLIDException> apueSecureDeleteException;
 
-	while (!deleteFile(pszFileName, ipSecureFileDeleter, bThrowIfUnableToDeleteSecurely,
-					   apueSecureDeleteException))
+	while (!deleteFile(pszFileName, bAllowReadonly, ipSecureFileDeleter,
+					   bThrowIfUnableToDeleteSecurely, apueSecureDeleteException))
 	{
 		// Shared file retries are performed by the secure file deleter and need not be done here.
 		// Throw any exception from the secure file delete immediately.

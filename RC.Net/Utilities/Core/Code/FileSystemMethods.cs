@@ -98,9 +98,7 @@ namespace Extract.Utilities
         /// The registry settings from which the the secure file delete options are to be retrieved.
         /// </summary>
         // Intentionally not dynamic since the values will not be read dynamically on the c++ side.
-        static readonly RegistrySettings<Properties.Settings> _registry =
-            new RegistrySettings<Properties.Settings>(
-                @"SOFTWARE\Extract Systems\ReusableComponents\Extract.Utilities", false);
+        static readonly RegistrySettings<Properties.Settings> _registry;
 
         #endregion Fields
 
@@ -108,12 +106,15 @@ namespace Extract.Utilities
         /// Static initialization for the <see cref="FileSystemMethods"/> class.
         /// </summary>
         // FXCops warns that static fields should be assigned inline for performance reasons, but
-        // no static variables are being assigned here.
+        // initialize here so exception can be caught.
         [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
         static FileSystemMethods()
         {
             try
             {
+                _registry = new RegistrySettings<Properties.Settings>(
+                    @"SOFTWARE\Extract Systems\ReusableComponents\Extract.Utilities", false);
+
                 // Create the SecureDeleteAllSensitiveFiles registry value so that it is
                 // immediately available for a user to find. The "SecureDeleter" setting is not one
                 // a user will likely ever need to set.
@@ -121,7 +122,7 @@ namespace Extract.Utilities
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI32872");
+                ex.ExtractDisplay("ELI32872");
             }    
         }
 
@@ -315,6 +316,9 @@ namespace Extract.Utilities
 
         /// <summary>
         /// Moves a file providing the option to overwrite if necessary.
+        /// <para><b>Note</b></para>
+        /// The value of the SecureDeleteAllSensitiveFiles registry entry will dictate whether the
+        /// old file is deleted securely when moving it to a different volume.
         /// </summary>
         /// <param name="source">The file to move.</param>
         /// <param name="destination">The location to which <paramref name="source"/> should be 
@@ -326,31 +330,50 @@ namespace Extract.Utilities
         {
             try
             {
+                MoveFile(source, destination, overwrite,
+                    _registry.Settings.SecureDeleteAllSensitiveFiles);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32917");
+            }
+        }
+
+        /// <summary>
+        /// Moves a file providing the option to overwrite if necessary.
+        /// </summary>
+        /// <param name="source">The file to move.</param>
+        /// <param name="destination">The location to which <paramref name="source"/> should be
+        /// moved.</param>
+        /// <param name="overwrite"><see langword="true"/> if the <paramref name="destination"/>
+        /// should be overwritten; <see langword="false"/> if an exception should be thrown if the
+        /// <paramref name="destination"/> exists.</param>
+        /// <param name="secureMoveFile"><see langword="true"/> to delete the old file securely
+        /// when moving the file to a different volume; <see langword="false"/> otherwise.</param>
+        public static void MoveFile(string source, string destination, bool overwrite,
+            bool secureMoveFile)
+        {
+            try
+            {
                 // Attempt move first if possible, since this is fastest
                 if (!File.Exists(destination))
                 {
-                    try
+                    // If secureMoveFile is specified, use Directory.Move instead of File.Move;
+                    // Directory.Move will fail if the destination is on another drive, providing
+                    // the opportunity to manually copy then secure delete the original.
+                    if (secureMoveFile &&
+                        AttemptIOOperation(() => Directory.Move(source, destination)))
                     {
-                        File.Move(source, destination);
                         return;
                     }
-                    catch (DirectoryNotFoundException)
+                    else if (!secureMoveFile &&
+                             AttemptIOOperation(() => File.Move(source, destination)))
                     {
-                        throw;
-                    }
-                    catch (FileNotFoundException)
-                    {
-                        throw;
-                    }
-                    catch (IOException)
-                    {
-                        // The destination file exists. Ignore for now. 
-                        // Later either an exception will be thrown or the file will be copied by force.
+                        return;
                     }
                 }
-
                 // The file already exists. If not overwriting, throw an exception.
-                if (!overwrite)
+                else if (!overwrite && File.Exists(destination))
                 {
                     ExtractException ee = new ExtractException("ELI28454",
                         "Destination file already exists.");
@@ -359,7 +382,16 @@ namespace Extract.Utilities
 
                 // Attempt to overwrite the file. This is slower than moving the file.
                 File.Copy(source, destination, true);
-                DeleteFile(source);
+
+                // Ensure the source file is writeable before trying to delete it.
+                FileAttributes attributes = File.GetAttributes(source);
+                if (attributes.HasFlag(FileAttributes.ReadOnly))
+                {
+                    attributes ^= FileAttributes.ReadOnly;
+                    File.SetAttributes(source, attributes);
+                }
+
+                DeleteFile(source, secureMoveFile);
             }
             catch (Exception ex)
             {
@@ -369,6 +401,31 @@ namespace Extract.Utilities
                 ee.AddDebugData("Destination file", destination, false);
                 ee.AddDebugData("Overwrite", overwrite, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Helper method for MoveFile. Attempts the specified IO operation.
+        /// </summary>
+        /// <param name="IOOperation">The IO operation.</param>
+        /// <returns><see langword="true"/> if the operation succeeded, <see langword="false"/> if
+        /// the operation failed with an <see cref="IOException"/>.</returns>
+        /// <throws>Any exception encountered other than an <see cref="IOException"/>. Most common
+        /// exceptions would be <see cref="DirectoryNotFoundException"/> or 
+        /// <see cref="FileNotFoundException"/>.</throws>
+        static bool AttemptIOOperation(Action IOOperation)
+        {
+            try
+            {
+                IOOperation();
+
+                return true;
+            }
+            catch (IOException)
+            {
+                // Return false to allow a move attempt to be made by copying then deleting the
+                // original.
+                return false;
             }
         }
 

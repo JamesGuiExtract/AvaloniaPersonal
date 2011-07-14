@@ -184,7 +184,17 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(IFileRecord* pFileRec
 				if (isFileOrFolderValid( strExSrc ))
 				{
 					// Move File - overwrite if present
-					moveFile( strExSrc, strExDst, true, m_bAllowReadonly );
+					if (m_bSecureDelete)
+					{
+						// If m_bSecureDelete is set, delete securely.
+						moveFile( strExSrc, strExDst, true, true );
+					}
+					else
+					{
+						// If m_bSecureDelete is not set, allow the SecureDeleteAllSensitiveFiles
+						// registry entry to dictate whether the file is deleted securely.
+						moveFile( strExSrc, strExDst, true );
+					}
 
 					if (m_bModifySourceDocName)
 					{

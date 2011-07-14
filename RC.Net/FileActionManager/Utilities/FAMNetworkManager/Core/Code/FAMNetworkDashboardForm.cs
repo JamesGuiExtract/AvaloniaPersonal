@@ -271,8 +271,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Configuration settings for this application
         /// </summary>
-        readonly ConfigSettings<Properties.Settings> _config = new ConfigSettings<Properties.Settings>(
-            Path.Combine(FileSystemMethods.ApplicationDataPath, "FAMNetworkManager.config"));
+        readonly ConfigSettings<Properties.Settings> _config;
 
         #endregion Fields
 
@@ -328,20 +327,30 @@ namespace Extract.FileActionManager.Utilities
         /// form settings will not be used and form will be reset to install defaults.</param>
         public FAMNetworkDashboardForm(string fileToOpen, bool resetForm)
         {
-            InitializeComponent();
-
-            _currentFile = fileToOpen;
-
-            if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+            try
             {
-                // Loads/save UI state properties
-                _formStateManager = new FormStateManager(
-                    this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, true, null);
+                InitializeComponent();
+
+                _config = new ConfigSettings<Properties.Settings>(
+                    Path.Combine(FileSystemMethods.ApplicationDataPath, "FAMNetworkManager.config"));
+
+                _currentFile = fileToOpen;
+
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    // Loads/save UI state properties
+                    _formStateManager = new FormStateManager(
+                        this, _FORM_PERSISTENCE_FILE, _MUTEX_STRING, true, null);
+                }
+
+                _resetForm = resetForm;
+
+                Text = _FAM_MANAGER_TITLE;
             }
-
-            _resetForm = resetForm;
-
-            Text = _FAM_MANAGER_TITLE;
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32920");
+            }
         }
 
         #endregion Constructors

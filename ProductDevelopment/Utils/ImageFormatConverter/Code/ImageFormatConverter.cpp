@@ -439,7 +439,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 			// Move the temporary file to the output file location
 			// (overwrite the output file if it exists)
-			moveFile(strTempOut, strOutputFileName, true, true);
+			moveFile(strTempOut, strOutputFileName, true );
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23592");
 	}

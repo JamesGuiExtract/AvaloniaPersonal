@@ -51,8 +51,7 @@ namespace Extract.Imaging.Forms
             /// <summary>
             /// The registry settings for the image viewer.
             /// </summary>
-            readonly RegistrySettings<Properties.Settings> _registry =
-                new RegistrySettings<Properties.Settings>(@"Software\Extract Systems\Imaging");
+            readonly RegistrySettings<Properties.Settings> _registry;
 
             /// <summary>
             /// A lock to synchronize access to the <see cref="WordHighlightManager"/>'s fields.
@@ -223,6 +222,9 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
+                    _registry = new RegistrySettings<Properties.Settings>(
+                        @"Software\Extract Systems\Imaging");
+
                     _imageViewer = imageViewer;
 
                     _imageViewer.PageChanged += HandlePageChanged;

@@ -141,7 +141,7 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_BROWSE_SRC,255,52,15,14
     CONTROL         "Allow read only file to be deleted",IDC_CHECK_ALLOW_READONLY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,69,165,12
-    CONTROL         "Securely delete",IDC_CHECK_SECURE_DELETE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,65,10
+    CONTROL         "Securely delete",IDC_CHECK_SECURE_DELETE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,116,10
     CONTROL         "Skip the operation with an error if the file cannot be securely overwritten",IDC_CHECK_SECURE_DELETE_THROW,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,99,241,10
     CONTROL         "Record an error and continue",IDC_RADIO_NOSRC_ERR,

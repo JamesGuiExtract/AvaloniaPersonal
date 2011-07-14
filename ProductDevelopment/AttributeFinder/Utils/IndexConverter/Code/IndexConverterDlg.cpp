@@ -1036,7 +1036,7 @@ bool CIndexConverterDlg::moveFiles(const string& strFilesName,
 		string strFileNameOnly = ::getFileNameFromFullPath(strFileToMove);
 		string strNewFileName = strMoveToFolder + "\\" + strFileNameOnly;
 
-		::MoveFileEx(strFileToMove.c_str(), strNewFileName.c_str(), MOVEFILE_REPLACE_EXISTING);
+		moveFile(strFileToMove.c_str(), strNewFileName.c_str(), true);
 	}
 
 	return true;
