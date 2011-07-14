@@ -5,7 +5,7 @@
 </head>
 <body>
 
-<h1>FAM Service Setup - SQL Server 2008<br>
+<h1>FAM Service Setup - SQL Server 2008 R2<br>
 <IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>	
 <hr>
@@ -17,8 +17,8 @@ the database is referred to as the "database machine."
 <ol>
 	<li><b>Setting up the Database Machine</b>
 	<ul>
-		<li>Make sure the database machine has <b>SQL Server 2008</b> installed.</li>
-		<li>Use the <b>SQL Server Management Studio Express</b> application to create a new 
+		<li>Make sure the database machine has <b>SQL Server 2008 R2</b> installed.</li>
+		<li>Use the <b>DB Administration</b> application to create a new 
 		database named <b>ServiceTest</b> or clear the existing database if it 
 		already exists.</li>
 		<li>Add an action called <b>Process</b> to the database.</li>
@@ -95,7 +95,7 @@ the database is referred to as the "database machine."
 			list.
 			<li>Repeat the above steps to add <b>sqlservr.exe</b> to the 
 			exceptions list.  (It is located under <i>C:\Program Files\Microsoft 
-			SQL Server\MSSQL10.MSSQLSERVER\MSSQL\Binn</i>.)
+			SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\Binn</i>.)
 		</ul>
 		</li>
 <p>
@@ -104,7 +104,8 @@ the database is referred to as the "database machine."
 			<li>From SQL Server Management Studio, select the <b>Logins</b> tab.
 			<li>Add <b>Domain Users</b>
 			<ul>
-				<li>Use the <b></b> query in Jeff's Public folder OR
+				<li>Use the <b>CreateExtractDomainLogin.sql</b> query in Jeff's 
+				Public\SqlQueries folder OR
 				<li>Create and exercise the following two-line query within 
 				Management Studio:
 				<ul><b>
@@ -132,10 +133,9 @@ the database is referred to as the "database machine."
 		<ul>
 			<li>Confirm that <b>FLEX Index</b> or <b>ID Shield</b> is installed.
 			<li>Confirm that the service machine is fully licensed.  If it is not, use 
-			the <b>COM License Generator</b> utility to create a non-expiring license.
-			<li>Confirm via Add/Remove Programs that <b>SQL Compact Database</b> is 
-			installed.
-			<li>Confirm via Add/Remove Programs that <b>SQL CE Editor</b> is installed.
+			the <b>COM License Generator</b> utility to create a license file.
+			<li>Confirm via Add/Remove Programs that <b>Microsoft SQL Server Compact 
+			3.5</b> is installed.
 			<li>Open up the <b>USB License Key Manager</b> utility and make sure 
 			that the License Server is pointed to a valid machine.  (Usually 
 			<b>LISA</b>.)</li>
