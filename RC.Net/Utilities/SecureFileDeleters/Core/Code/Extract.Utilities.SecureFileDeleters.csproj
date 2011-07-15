@@ -36,7 +36,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\binaries\release\</OutputPath>
+    <OutputPath>..\..\..\..\..\binaries\release\</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -44,7 +44,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>x86</PlatformTarget>
-    <DocumentationFile>..\..\..\..\binaries\release\Extract.Utilities.SecureFileDeleters.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\..\..\binaries\release\Extract.Utilities.SecureFileDeleters.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
