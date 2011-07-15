@@ -11,14 +11,15 @@
 <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
-<h2>NOTE: Test results should be archived under I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests</h2>
+<h2>NOTE: Test results should be archived under I:\Common\Testing\Product Testing\FLEX_Index_90\EnduranceTests</h2>
 <ol>
 	<li><h2>Machine and image file peparation</h2>
 	<ul>
 		<li>Select a test machine.  Various operating systems should be exercised 
 		for these collected tests.  Confirm that the chosen operating system is 
 		appropriate for this test.
-		<li>Install and license <b>FLEX Index</b> or <b>ID Shield</b>.
+		<li>Install and license <b>FLEX Index</b> or <b>ID Shield</b>.  The license 
+		file should also include <b>Create Searchable PDF</b> and <b>PDF Read+Write</b>.
 		<li>Create a local <b>Statistics</b> folder for collection of process statistics.
 		<li>Create local <b>Images</b> and <b>Images2</b> folders.
 		<ul>
@@ -51,10 +52,10 @@
 		<li>Create a <b>Process.fps</b> file with one task.  
 		<ul>
 			<li>For an Indexing test, create an FPS file with one 
-			<b>Core: Convert to searchable pdf</b> task for processing.  Configure the 
+			<b>Core: Convert to searchable PDF</b> task for processing.  Configure the 
 			task to <b>Make output PDF/A compatible</b>.
-			<li>The Continuous Processing option on the Processing Setup page should be 
-			set to <b>Keep processing files as they are added to the queue</b>.  
+			<li>The Continuous Processing option on the <b>Advanced Processing Configuration</b> 
+			page should be set to <b>Keep processing files as they are added to the queue</b>.  
 		</ul>
 <p>
   	   	<LI><b>[LegacyRC #5659]</b> Confirm that running <b>Core: Convert to searchable PDF</b> 
@@ -67,7 +68,7 @@
 		<li>Confirm that the machine with the PDFA_Endurance_Test database has the desired 
 		<b>ID Shield</b> build.
 		<li>Confirm that <b>C:\Program Files\Extract Systems\CommonComponents\</b> (if the 
-		machine has a 64-bit OS, instead put <b>C:\Program Files (x86)\Extract 
+		machine has a 64-bit OS, use <b>C:\Program Files (x86)\Extract 
 		Systems\CommonComponents\</b>) is in the database machine's system path. 
 		<li>Confirm that email settings are correctly configured on the database machine.
 		<ul>
@@ -135,7 +136,7 @@
 <p>
 			<li>Spot check a random subset of the output files and confirm 
 			that they are PDF/A-compliant.  
-			<li>Check at least 1,000 files if the check must be done manually.
+			<li>Check at least 100 files if the check must be done manually.
 			<li>Check at least 50,000 files if the check can be done 
 			automatically.
 			<li>Make sure to check some of each of the following files:
@@ -161,8 +162,8 @@
 	<li><h2>Saving Test Results</h2>
 	<ul>
 		<li>Data will be stored in subfolders under 
-		I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests.
-		<li>A subfolders should be created for <b>PDFA</b>
+		I:\Common\Testing\Product Testing\FLEX_Index_90\EnduranceTests.
+		<li>A subfolder should be created for <b>PDFA</b>.
 		<li>The <b>Stats</b> folder should be copied to a <b>YYYY-MM-DD</b> 
 		named subfolder under the associated test subfolder.
 		<li>One or more Exception logs can be stored in a <b>UEX_Logs</b> subfolder.
@@ -170,7 +171,7 @@
 		<li>SQL Server Management Studio can be used to backup the PDFA_ENDURANCE 
 		database files to a <b>Database</b> subfolder.
 		<li>An example path for a particular test is: <br> 
-		<b>I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests\PDFA\2007-10-30</b>.
+		<b>I:\Common\Testing\Product Testing\FLEX_Index_90\EnduranceTests\PDFA\2011-07-30</b>.
 		<li>Copy and update a <b>TestDetails.txt</b> file in the YYYY-MM-DD folder.
 		This file will contain a summary of the test environment and results.
 	</ul>
