@@ -198,6 +198,9 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 		ASSERT_RESOURCE_ALLOCATION("ELI32926", ipCopyable != __nullptr);
 		IAFDocumentPtr ipAFSplitterDoc = ipCopyable->Clone();
 
+		// Assign the top level attribute's text as the document's source text.
+		ipAFSplitterDoc->Text = ipTopLevelAttribute->Value;
+
 		// pass the value into the rule set for further extraction
 		IIUnknownVectorPtr ipSubAttrValues 
 			= getRuleSet(strRSDFile)->ExecuteRulesOnText(ipAFSplitterDoc, NULL, NULL);
