@@ -50,7 +50,8 @@ public:
 	// PURPOSE:	get a certain key value from a certain folder
 	//
 	virtual std::string getKeyValue(const std::string& strFolderFullPath, 
-									const std::string& strFullKeyName) = 0;
+									const std::string& strFullKeyName,
+									const std::string& strDefaultValue) = 0;
 	//==============================================================================================
 	// PURPOSE:	get the key value from under a given folder
 	// REQUIRE:	

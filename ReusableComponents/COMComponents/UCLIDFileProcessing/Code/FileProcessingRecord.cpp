@@ -100,7 +100,7 @@ void FileProcessingRecord::markAsStarted()
 
 		// Retrieve the value
 		int nDisplayProgressStatus = asLong( rpm.getKeyValue( 
-			gstrFPRECORD_FOLDER, gstrDISPLAY_PROGRESS_STATUS_KEY ) );
+			gstrFPRECORD_FOLDER, gstrDISPLAY_PROGRESS_STATUS_KEY, gstrDEFAULT_PROGRESS_STATUS ) );
 
 		// Set flags
 		sbDisableProgressStatusDisplay = (nDisplayProgressStatus == 0);

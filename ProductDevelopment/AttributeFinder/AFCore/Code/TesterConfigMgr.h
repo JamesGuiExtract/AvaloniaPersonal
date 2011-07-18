@@ -99,6 +99,20 @@ private:
 	static const string LAST_FILE_SAVE_DIR;
 	static const string AUTO_EXPAND_ATTRIBUTES;
 
+	static const string DEFAULT_LAST_FILE_OPEN_DIR;
+	static const string DEFAULT_LAST_FILE_NAME;
+	static const string DEFAULT_WINDOW_POS_X;
+	static const string DEFAULT_WINDOW_POS_Y;
+	static const string DEFAULT_WINDOW_SIZE_X;
+	static const string DEFAULT_WINDOW_SIZE_Y;
+	static const string DEFAULT_ALL_ATTRIBUTES_TEST_SCOPE;
+	static const string DEFAULT_NAME_COLUMN_WIDTH;
+	static const string DEFAULT_SPLITTER_POS_Y;
+	static const string DEFAULT_SHOW_ONLY_VALID_ENTRIES;
+	static const string DEFAULT_TYPE_COLUMN_WIDTH;
+	static const string DEFAULT_LAST_FILE_SAVE_DIR;
+	static const string DEFAULT_AUTO_EXPAND_ATTRIBUTES;
+
 	IConfigurationSettingsPersistenceMgr* m_pCfgMgr;
 
 	string m_strSectionFolderName;

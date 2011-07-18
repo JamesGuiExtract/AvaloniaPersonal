@@ -76,6 +76,15 @@ private:
 	// last selected input finder name
 	static const std::string LAST_INPUT_FINDER;
 
+	static const string DEFAULT_LAST_FILE_OPEN_DIR;
+	static const string DEFAULT_TEXT_FONT;
+	static const string DEFAULT_TEXT_SIZE;
+	static const string DEFAULT_WINDOW_POS_X;
+	static const string DEFAULT_WINDOW_POS_Y;
+	static const string DEFAULT_WINDOW_SIZE_X;
+	static const string DEFAULT_WINDOW_SIZE_Y;
+	static const string DEFAULT_LAST_INPUT_FINDER;
+
 	IConfigurationSettingsPersistenceMgr* m_pCfgMgr;
 
 	std::string m_strSectionFolderName;

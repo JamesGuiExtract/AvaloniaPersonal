@@ -11,7 +11,7 @@ namespace Extract.Testing.Utilities
     /// </summary>
     public class TestFileManager<T> : IDisposable
     {
-        #region TestImageManager Fields
+        #region TestFileManager Fields
 
         /// <summary>
         /// A <see cref="Dictionary{T, K}"/> keyed by the resource identifiers and containing
@@ -20,25 +20,25 @@ namespace Extract.Testing.Utilities
         Dictionary<string, TemporaryFile> _files = new Dictionary<string, TemporaryFile>();
 
         /// <summary>
-        /// The assembly that this <see cref="TestImageManager"/> is associated with.
+        /// The assembly that this <see cref="TestFileManager{T}"/> is associated with.
         /// This is the assembly that will be used to retrieve the embedded resource images.
         /// </summary>
         Assembly _assembly = Assembly.GetAssembly(typeof(T));
 
-        #endregion TestImageManager Fields
+        #endregion TestFileManager Fields
 
-        #region TestImageManager Constructors
+        #region TestFileManager Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestImageManager"/> class.
+        /// Initializes a new instance of the <see cref="TestFileManager{T}"/> class.
         /// </summary>
         public TestFileManager()
         {
         }
 
-        #endregion TestImageManager Constructors
+        #endregion TestFileManager Constructors
 
-        #region TestImageManager Methods
+        #region TestFileManager Methods
 
         /// <overloads>
         /// Get the temporary file name corresponding to the specified resource name.
@@ -184,12 +184,12 @@ namespace Extract.Testing.Utilities
             }
         }
 
-        #endregion TestImageManager Methods
+        #endregion TestFileManager Methods
 
         #region IDisposable Members
 
         /// <summary>
-        /// Releases all resources used by the <see cref="TestImageManager"/>.
+        /// Releases all resources used by the <see cref="TestFileManager{T}"/>.
         /// </summary>
         public void Dispose()
         {
@@ -197,9 +197,9 @@ namespace Extract.Testing.Utilities
             GC.SuppressFinalize(this);
         }
 
-        /// <overloads>Releases resources used by the <see cref="TestImageManager"/>.</overloads>
+        /// <overloads>Releases resources used by the <see cref="TestFileManager{T}"/>.</overloads>
         /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="TestImageManager"/>.
+        /// Releases all unmanaged resources used by the <see cref="TestFileManager{T}"/>.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        

@@ -602,6 +602,8 @@ void CDocumentClassifier::appendSpecialTags(vector<string>& rvecTags, bool bIncl
 //-------------------------------------------------------------------------------------------------
 void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& strSpecificIndustryName)
 {
+	ASSERT_ARGUMENT("ELI05886", ipAFDoc != __nullptr);
+
 	// make sure the vecDocTypeInterpreters is not empty
 	map<string, vector<DocTypeInterpreter> >::iterator itMap 
 		= m_mapNameToVecInterpreters.find(strSpecificIndustryName);
@@ -612,9 +614,8 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 		throw ue;
 	}
 
-	vector<DocTypeInterpreter> vecDocTypeInterpreters = itMap->second;
-
-	ASSERT_ARGUMENT("ELI05886", ipAFDoc != __nullptr);
+	// Make a copy of the docTypeInterpreters since we will be modifying the vector.
+	vector<DocTypeInterpreter> vecDocTypeInterpreters = vector<DocTypeInterpreter>(itMap->second);
 
 	int nConfidenceLevel = 0;
 	// the vector that stores all document types (in string) at the same level
@@ -636,51 +637,68 @@ void CDocumentClassifier::createDocTags(IAFDocumentPtr ipAFDoc, const string& st
 	// store the returns from GetRelative pages in a cache
 	DocPageCache cache;
 
-	// string for component name and its associated prog id
-	for (unsigned int ui = 0; ui < vecDocTypeInterpreters.size(); ui++)
+	// Find kZeroLevel matches first, and remove them from vecDocTypeInterpreters since such a match
+	// disqualifies them for matches at any other level. Then, evaluate the other confidence levels
+	// in decending order and stop as soon as we have match(es) at any one of these levels.
+	vector<int> vecLevels;
+	vecLevels.push_back(kZeroLevel);
+	vecLevels.push_back(kSureLevel);
+	vecLevels.push_back(kProbableLevel);
+	vecLevels.push_back(kMaybeLevel);
+
+	for (auto iterLevel = vecLevels.begin(); iterLevel != vecLevels.end(); iterLevel++)
 	{
-		DocTypeInterpreter& dtiInterp = vecDocTypeInterpreters[ui];
-
-		// confidence level for each doc type
-		int nCurrentLevel = dtiInterp.getDocConfidenceLevel(ipAFDoc->Text, cache);
-		if (nConfidenceLevel > nCurrentLevel)
+		// Evaluate each DocTypeInterpreter at this confidence level.
+		for (unsigned int ui = 0; ui < vecDocTypeInterpreters.size(); ui++)
 		{
-			// skip this type
-			continue;
-		}
-		else if (nConfidenceLevel < nCurrentLevel)
-		{
-			// if current level is higher, then 
-			// replace the nConfidenceLevel
-			nConfidenceLevel = nCurrentLevel;
-
-			// clear the vectors
-			ipVecDocTypes->Clear();
-			ipVecBlockIDs->Clear();
-			ipVecRuleIDs->Clear();
-		}
+			DocTypeInterpreter& dtiInterp = vecDocTypeInterpreters[ui];
 		
-		// as long as the confidence level is above kZeroLevel
-		if (nConfidenceLevel > 0)
-		{
-			// Retrieve main Document Type
-			string strDocTypeName = dtiInterp.m_strDocTypeName;
-
-			// Check for defined sub-type
-			string strSubType = dtiInterp.m_strDocSubType;
-			if (strSubType.length() > 0)
+			if (dtiInterp.docConfidenceLevelMatches(*iterLevel, ipAFDoc->Text, cache))
 			{
-				// Append to doc type
-				strDocTypeName += ".";
-				strDocTypeName += strSubType.c_str();
+				if (*iterLevel > nConfidenceLevel)
+				{
+					// if current level is higher, then replace the nConfidenceLevel
+					nConfidenceLevel = *iterLevel;
+				}
+		
+				// as long as the confidence level is above kZeroLevel
+				if (*iterLevel > kZeroLevel)
+				{
+					// Retrieve main Document Type
+					string strDocTypeName = dtiInterp.m_strDocTypeName;
+
+					// Check for defined sub-type
+					string strSubType = dtiInterp.m_strDocSubType;
+					if (strSubType.length() > 0)
+					{
+						// Append to doc type
+						strDocTypeName += ".";
+						strDocTypeName += strSubType.c_str();
+					}
+
+					// store the doc type in the vector
+					ipVecDocTypes->PushBack( strDocTypeName.c_str() );
+
+					// Store the Block ID and Rule ID in the vectors
+					ipVecBlockIDs->PushBack( dtiInterp.m_strBlockID.c_str() );
+					ipVecRuleIDs->PushBack( dtiInterp.m_strRuleID.c_str() );
+				}
+
+				// If this doc type has matched at the kZeroLevel, it should not be evaluated for
+				// any matches at any other confidence level; remove it.
+				if (*iterLevel == kZeroLevel)
+				{
+					vecDocTypeInterpreters.erase(vecDocTypeInterpreters.begin() + ui);
+					ui--;
+				}
 			}
+		}
 
-			// store the doc type in the vector
-			ipVecDocTypes->PushBack( strDocTypeName.c_str() );
-
-			// Store the Block ID and Rule ID in the vectors
-			ipVecBlockIDs->PushBack( dtiInterp.m_strBlockID.c_str() );
-			ipVecRuleIDs->PushBack( dtiInterp.m_strRuleID.c_str() );
+		// If we have found at least one document type at this level, don't evaluate any further
+		// levels.
+		if (nConfidenceLevel > kZeroLevel)
+		{
+			break;
 		}
 	}
 	

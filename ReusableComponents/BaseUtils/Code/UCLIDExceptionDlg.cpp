@@ -26,6 +26,7 @@ using namespace std;
 const string gstrBASE_UTILS = "\\ReusableComponents\\BaseUtils";
 // Key name for automatic timeout in seconds
 const string gstrUE_AUTO_TIMEOUT = "ExceptionAutoTimeout";
+const string gstrDEFAULT_UE_AUTO_TIMEOUT = "0";
 
 //-------------------------------------------------------------------------------------------------
 // Statics
@@ -165,13 +166,15 @@ BOOL UCLIDExceptionDlg::OnInitDialog()
 		if (!machineCfgMgr.keyExists( gstrBASE_UTILS, gstrUE_AUTO_TIMEOUT ))
 		{
 			// Not found, just default to 0
-			machineCfgMgr.createKey( gstrBASE_UTILS, gstrUE_AUTO_TIMEOUT, "0" );
-			m_lTimeoutCount = 0;
+			machineCfgMgr.createKey( gstrBASE_UTILS, gstrUE_AUTO_TIMEOUT,
+				gstrDEFAULT_UE_AUTO_TIMEOUT );
+			m_lTimeoutCount = asLong(gstrDEFAULT_UE_AUTO_TIMEOUT);
 		}
 		else
 		{
 			// Retrieve automatic timeout in seconds
-			string strTime = machineCfgMgr.getKeyValue( gstrBASE_UTILS, gstrUE_AUTO_TIMEOUT );
+			string strTime = machineCfgMgr.getKeyValue( gstrBASE_UTILS, gstrUE_AUTO_TIMEOUT,
+				gstrDEFAULT_UE_AUTO_TIMEOUT);
 			m_lTimeoutCount = asLong( strTime );
 
 			// Set flag if timeout > 0

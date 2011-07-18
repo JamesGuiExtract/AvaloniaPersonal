@@ -30,6 +30,7 @@
 // Registry path and key for LeadTools serialization
 const string gstrLEADTOOLS_SERIALIZATION_PATH = "\\VendorSpecificUtils\\LeadUtils";
 const string gstrSERIALIZATION_KEY = "Serialization"; 
+const string gstrDEFAULT_SERIALIZATION = "0"; 
 
 // Path to the leadtools compression flag folder
 const string gstrLEADTOOLS_COMPRESSION_VALUE_FOLDER =
@@ -1101,12 +1102,13 @@ bool isLeadToolsSerialized()
 	if (!rpm.keyExists( gstrLEADTOOLS_SERIALIZATION_PATH, gstrSERIALIZATION_KEY ))
 	{
 		// Create key if not found, default to false
-		rpm.createKey( gstrLEADTOOLS_SERIALIZATION_PATH, gstrSERIALIZATION_KEY, asString( 0 ) );
-		return false;
+		rpm.createKey( gstrLEADTOOLS_SERIALIZATION_PATH, gstrSERIALIZATION_KEY,
+			gstrDEFAULT_SERIALIZATION );
+		return asCppBool(gstrDEFAULT_SERIALIZATION);
 	}
 
-	return rpm.getKeyValue( gstrLEADTOOLS_SERIALIZATION_PATH, gstrSERIALIZATION_KEY ) == "1" 
-		? true : false;
+	return asCppBool(rpm.getKeyValue( gstrLEADTOOLS_SERIALIZATION_PATH, gstrSERIALIZATION_KEY,
+		gstrDEFAULT_SERIALIZATION)); 
 }
 //-------------------------------------------------------------------------------------------------
 void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnnotations,
@@ -1846,7 +1848,7 @@ int getCompressionFactor(L_INT nFormat)
 			{
 				// Get the value from the registry
 				nReturn = (int)
-					asLong(rpm.getKeyValue(gstrLEADTOOLS_COMPRESSION_VALUE_FOLDER, strFormat));
+					asLong(rpm.getKeyValue(gstrLEADTOOLS_COMPRESSION_VALUE_FOLDER, strFormat, ""));
 			}
 			else
 			{

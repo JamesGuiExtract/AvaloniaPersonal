@@ -24,6 +24,9 @@
 static const string DOCTYPE_PREFIX = "Prefix";
 static const string DOCTYPE_LOADFILE_PERSESSION = "LoadFilePerSession";
 
+static const string DEFAULT_DOCTYPE_PREFIX = "";
+static const string DEFAULT_DOCTYPE_LOADFILE_PERSESSION = "1";
+
 /////////////
 // Tag Names
 /////////////
@@ -225,16 +228,16 @@ STDMETHODIMP CAFUtility::GetLoadFilePerSession(VARIANT_BOOL *pbSetting)
 		if (!ma_pUserCfgMgr->keyExists( gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_LOADFILE_PERSESSION ))
 		{
 			// Default setting is true
-			string strPerSession( "1" );
 			ma_pUserCfgMgr->createKey( gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_LOADFILE_PERSESSION, 
-				strPerSession );
+				DEFAULT_DOCTYPE_LOADFILE_PERSESSION );
 
-			*pbSetting = VARIANT_TRUE;
+			*pbSetting = asVariantBool(asCppBool(DEFAULT_DOCTYPE_LOADFILE_PERSESSION));
 		}
 
 		// Get the existing setting
 		bool bValue = ma_pUserCfgMgr->getKeyValue( 
-			gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_LOADFILE_PERSESSION ) == "1";
+			gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_LOADFILE_PERSESSION,
+			DEFAULT_DOCTYPE_LOADFILE_PERSESSION ) == "1";
 
 		// Return setting to caller
 		*pbSetting = asVariantBool(bValue);
@@ -682,14 +685,16 @@ STDMETHODIMP CAFUtility::get_ShouldCacheRSD(VARIANT_BOOL *pvbCacheRSD)
 		if (ma_pUserCfgMgr->keyExists(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY))
 		{
 			// Check the registry setting
-			string strValue = ma_pUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY);
+			string strValue = ma_pUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER,
+				gstrAF_CACHE_RSD_KEY, gstrAF_DEFAULT_CACHE_RSD);
 			*pvbCacheRSD = asVariantBool(strValue == "1");
 		}
 		else
 		{
 			// Default to disabling RSD caching [FIDSC #3979]
-			ma_pUserCfgMgr->createKey(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY, "0");
-			*pvbCacheRSD = VARIANT_FALSE;
+			ma_pUserCfgMgr->createKey(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY,
+				gstrAF_DEFAULT_CACHE_RSD);
+			*pvbCacheRSD = asVariantBool(asCppBool(gstrAF_DEFAULT_CACHE_RSD));
 		}
 
 		return S_OK;
@@ -1180,13 +1185,15 @@ string CAFUtility::getRulesFilePrefix()
 	// Check for key existence
 	if (!ma_pUserCfgMgr->keyExists( gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_PREFIX ))
 	{
-		string strPrefix("");
-		ma_pUserCfgMgr->createKey( gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_PREFIX, strPrefix );
+		string strPrefix(DEFAULT_DOCTYPE_PREFIX);
+		ma_pUserCfgMgr->createKey( gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_PREFIX,
+			DEFAULT_DOCTYPE_PREFIX );
 
 		return strPrefix;
 	}
 
-	return ma_pUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_PREFIX);
+	return ma_pUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_PREFIX,
+		DEFAULT_DOCTYPE_PREFIX);
 }
 //-------------------------------------------------------------------------------------------------
 bool CAFUtility::isAutoEncryptOn()
@@ -1195,15 +1202,15 @@ bool CAFUtility::isAutoEncryptOn()
 	if (!ma_pUserCfgMgr->keyExists( gstrAF_REG_SETTINGS_FOLDER, gstrAF_AUTO_ENCRYPT_KEY ))
 	{
 		// Default setting is OFF
-		string strAutoEncrypt( "0" );
+		string strAutoEncrypt( gstrAF_DEFAULT_AUTO_ENCRYPT );
 		ma_pUserCfgMgr->createKey( gstrAF_REG_SETTINGS_FOLDER, gstrAF_AUTO_ENCRYPT_KEY, 
-			strAutoEncrypt );
+			gstrAF_DEFAULT_AUTO_ENCRYPT );
 
 		return false;
 	}
 
 	return ma_pUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER, 
-		gstrAF_AUTO_ENCRYPT_KEY) == "1";
+		gstrAF_AUTO_ENCRYPT_KEY, gstrAF_DEFAULT_AUTO_ENCRYPT) == "1";
 }
 //-------------------------------------------------------------------------------------------------
 void CAFUtility::validateLicense()

@@ -28,6 +28,18 @@ const string PersistenceMgr::ATTRIBUTE_NAME = "Attribute_";
 const string PersistenceMgr::PACKAGE_FILE = "PackageFile";
 const string PersistenceMgr::CLEAR_AFTER_PACKAGE = "ClearAfterPackage";
 
+const string PersistenceMgr::DEFAULT_FEEDBACK_FOLDER = "";
+const string PersistenceMgr::DEFAULT_FEEDBACK_ENABLED = "0";
+const string PersistenceMgr::DEFAULT_AUTO_TURNOFF_ENABLED = "0";
+const string PersistenceMgr::DEFAULT_AUTO_TURNOFF_DATE = "";
+const string PersistenceMgr::DEFAULT_AUTO_TURNOFF_COUNT = "100";
+const string PersistenceMgr::DEFAULT_SKIP_COUNT = "0";
+const string PersistenceMgr::DEFAULT_DOCUMENT_COLLECTION = "0";
+const string PersistenceMgr::DEFAULT_CONVERT_TO_TEXT = "0";
+const string PersistenceMgr::DEFAULT_ATTRIBUTE_SELECTION = "0";
+const string PersistenceMgr::DEFAULT_PACKAGE_FILE = "";
+const string PersistenceMgr::DEFAULT_CLEAR_AFTER_PACKAGE = "1";
+
 //-------------------------------------------------------------------------------------------------
 // PersistenceMgr
 //-------------------------------------------------------------------------------------------------
@@ -46,13 +58,13 @@ bool PersistenceMgr::getFeedbackEnabled()
 	{
 		// Not found, just default to 0 - False
 		m_pCfgMgr->createKey( m_strSectionFolderName, FEEDBACK_ENABLED, 
-			"0" );
+			DEFAULT_FEEDBACK_ENABLED );
 	}
 	else
 	{
 		// Retrieve value
 		strValue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-			FEEDBACK_ENABLED );
+			FEEDBACK_ENABLED, DEFAULT_FEEDBACK_ENABLED );
 		bEnabled = asLong( strValue ) ? true : false;
 	}
 
@@ -83,11 +95,11 @@ string PersistenceMgr::getFeedbackFolder(void)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, FEEDBACK_FOLDER))
 	{
 		// Not found, just default to empty string
-		m_pCfgMgr->createKey(m_strSectionFolderName, FEEDBACK_FOLDER, "");
-		return "";
+		m_pCfgMgr->createKey(m_strSectionFolderName, FEEDBACK_FOLDER, DEFAULT_FEEDBACK_FOLDER);
+		return DEFAULT_FEEDBACK_FOLDER;
 	}
 
-	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, FEEDBACK_FOLDER );
+	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, FEEDBACK_FOLDER, DEFAULT_FEEDBACK_FOLDER );
 }
 //-------------------------------------------------------------------------------------------------
 void PersistenceMgr::setFeedbackFolder(const string& strFolder)
@@ -106,13 +118,13 @@ bool PersistenceMgr::getAutoTurnOffEnabled()
 	{
 		// Not found, just default to 0 - False
 		m_pCfgMgr->createKey( m_strSectionFolderName, AUTO_TURNOFF_ENABLED, 
-			"0" );
+			DEFAULT_AUTO_TURNOFF_ENABLED );
 	}
 	else
 	{
 		// Retrieve value
 		strValue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-			AUTO_TURNOFF_ENABLED );
+			AUTO_TURNOFF_ENABLED, DEFAULT_AUTO_TURNOFF_ENABLED );
 		bEnabled = asLong( strValue ) ? true : false;
 	}
 
@@ -143,11 +155,12 @@ string PersistenceMgr::getTurnOffDate(void)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, AUTO_TURNOFF_DATE))
 	{
 		// Not found, just default to empty string
-		m_pCfgMgr->createKey(m_strSectionFolderName, AUTO_TURNOFF_DATE, "");
-		return "";
+		m_pCfgMgr->createKey(m_strSectionFolderName, AUTO_TURNOFF_DATE, DEFAULT_AUTO_TURNOFF_DATE);
+		return DEFAULT_AUTO_TURNOFF_DATE;
 	}
 
-	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, AUTO_TURNOFF_DATE );
+	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, AUTO_TURNOFF_DATE,
+		DEFAULT_AUTO_TURNOFF_DATE);
 }
 //-------------------------------------------------------------------------------------------------
 void PersistenceMgr::setTurnOffDate(const string& strDate)
@@ -162,12 +175,13 @@ long PersistenceMgr::getTurnOffCount(void)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, AUTO_TURNOFF_COUNT))
 	{
 		// Not found, just default to 100
-		m_pCfgMgr->createKey(m_strSectionFolderName, AUTO_TURNOFF_COUNT, "100");
-		return 100;
+		m_pCfgMgr->createKey(m_strSectionFolderName, AUTO_TURNOFF_COUNT,
+			DEFAULT_AUTO_TURNOFF_COUNT);
+		return asLong(DEFAULT_AUTO_TURNOFF_COUNT);
 	}
 
 	return asLong( m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-		AUTO_TURNOFF_COUNT ) );
+		AUTO_TURNOFF_COUNT, DEFAULT_AUTO_TURNOFF_COUNT ) );
 }
 //-------------------------------------------------------------------------------------------------
 void PersistenceMgr::setSkipCount(const long lCount)
@@ -183,12 +197,12 @@ long PersistenceMgr::getSkipCount(void)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, SKIP_COUNT))
 	{
 		// Not found, just default to 0
-		m_pCfgMgr->createKey(m_strSectionFolderName, SKIP_COUNT, "0");
-		return 0;
+		m_pCfgMgr->createKey(m_strSectionFolderName, SKIP_COUNT, DEFAULT_SKIP_COUNT);
+		return asLong(DEFAULT_SKIP_COUNT);
 	}
 
 	return asLong( m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-		SKIP_COUNT ) );
+		SKIP_COUNT, DEFAULT_SKIP_COUNT ) );
 }
 //-------------------------------------------------------------------------------------------------
 void PersistenceMgr::setTurnOffCount(const long lCount)
@@ -204,12 +218,12 @@ long PersistenceMgr::getDocumentCollection(void)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, DOCUMENT_COLLECTION))
 	{
 		// Not found, just default to 0 - No Collection
-		m_pCfgMgr->createKey(m_strSectionFolderName, DOCUMENT_COLLECTION, "0");
-		return 0;
+		m_pCfgMgr->createKey(m_strSectionFolderName, DOCUMENT_COLLECTION, DEFAULT_DOCUMENT_COLLECTION);
+		return asLong(DEFAULT_DOCUMENT_COLLECTION);
 	}
 
 	return asLong( m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-		DOCUMENT_COLLECTION ) );
+		DOCUMENT_COLLECTION, DEFAULT_DOCUMENT_COLLECTION ) );
 }
 //-------------------------------------------------------------------------------------------------
 void PersistenceMgr::setDocumentCollection(const long lCount)
@@ -228,12 +242,13 @@ bool PersistenceMgr::getDocumentConversion()
 	if (!m_pCfgMgr->keyExists( m_strSectionFolderName, CONVERT_TO_TEXT ))
 	{
 		// Not found, just default to 0 - False
-		m_pCfgMgr->createKey( m_strSectionFolderName, CONVERT_TO_TEXT, "0" );
+		m_pCfgMgr->createKey( m_strSectionFolderName, CONVERT_TO_TEXT, DEFAULT_CONVERT_TO_TEXT );
 	}
 	else
 	{
 		// Retrieve value
-		strValue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, CONVERT_TO_TEXT );
+		strValue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, CONVERT_TO_TEXT,
+			DEFAULT_CONVERT_TO_TEXT );
 		bConvert = asLong( strValue ) ? true : false;
 	}
 
@@ -267,12 +282,13 @@ bool PersistenceMgr::getAttributeSelection()
 	if (!m_pCfgMgr->keyExists( m_strSectionFolderName, ATTRIBUTE_SELECTION ))
 	{
 		// Not found, just default to 0 - All Attributes
-		m_pCfgMgr->createKey( m_strSectionFolderName, ATTRIBUTE_SELECTION, "0" );
+		m_pCfgMgr->createKey( m_strSectionFolderName, ATTRIBUTE_SELECTION, DEFAULT_ATTRIBUTE_SELECTION );
 	}
 	else
 	{
 		// Retrieve value
-		strValue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ATTRIBUTE_SELECTION );
+		strValue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ATTRIBUTE_SELECTION,
+			DEFAULT_ATTRIBUTE_SELECTION);
 		bNamed = asLong( strValue ) ? true : false;
 	}
 
@@ -303,11 +319,11 @@ string PersistenceMgr::getPackageFile(void)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, PACKAGE_FILE))
 	{
 		// Not found, just default to empty string
-		m_pCfgMgr->createKey(m_strSectionFolderName, PACKAGE_FILE, "");
-		return "";
+		m_pCfgMgr->createKey(m_strSectionFolderName, PACKAGE_FILE, DEFAULT_PACKAGE_FILE);
+		return DEFAULT_PACKAGE_FILE;
 	}
 
-	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, PACKAGE_FILE );
+	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, PACKAGE_FILE, DEFAULT_PACKAGE_FILE );
 }
 //-------------------------------------------------------------------------------------------------
 void PersistenceMgr::setPackageFile(const string& strFile)
@@ -325,12 +341,13 @@ bool PersistenceMgr::getClearAfterPackage()
 	if (!m_pCfgMgr->keyExists( m_strSectionFolderName, CLEAR_AFTER_PACKAGE ))
 	{
 		// Not found, just default to 1 - True
-		m_pCfgMgr->createKey( m_strSectionFolderName, CLEAR_AFTER_PACKAGE, "1" );
+		m_pCfgMgr->createKey( m_strSectionFolderName, CLEAR_AFTER_PACKAGE, DEFAULT_CLEAR_AFTER_PACKAGE );
 	}
 	else
 	{
 		// Retrieve value
-		strValue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, CLEAR_AFTER_PACKAGE );
+		strValue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, CLEAR_AFTER_PACKAGE,
+			DEFAULT_CLEAR_AFTER_PACKAGE);
 		bClear = asLong( strValue ) ? true : false;
 	}
 

@@ -115,28 +115,15 @@ BOOL CServiceSettingsDlg::OnInitDialog()
 		m_pIDShieldLF->m_apDlgWait->hide();
 
 		// Retrieve any connection settings cached to the registry
-		string strServer, strRepository, strUser, strPassword, strThreads;
-		if (m_pIDShieldLF->m_apLocalMachineRegSettings->keyExists(gstrREG_SERVICE_KEY, gstrREG_SERVER))
+		string strServer = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_SERVER, "");
+		string strRepository = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_REPOSITORY, "");
+		string strUser = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_USER, "");
+		string strPassword = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_PASSWORD);
+		if (!strPassword.empty())
 		{
-			strServer = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_SERVER);
-		}
-		if (m_pIDShieldLF->m_apLocalMachineRegSettings->keyExists(gstrREG_SERVICE_KEY, gstrREG_REPOSITORY))
-		{
-			strRepository = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_REPOSITORY);
-		}
-		if (m_pIDShieldLF->m_apLocalMachineRegSettings->keyExists(gstrREG_SERVICE_KEY, gstrREG_SERVER))
-		{
-			strUser = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_USER);
-		}
-		if (m_pIDShieldLF->m_apLocalMachineRegSettings->keyExists(gstrREG_SERVICE_KEY, gstrREG_SERVER))
-		{
-			strPassword = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_PASSWORD);
 			m_pIDShieldLF->decryptPassword(strPassword);
 		}
-		if (m_pIDShieldLF->m_apLocalMachineRegSettings->keyExists(gstrREG_SERVICE_KEY, gstrREG_THREAD_COUNT))
-		{
-			strThreads = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_THREAD_COUNT);
-		}
+		string strThreads = m_pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_THREAD_COUNT, "1");
 
 		// Display the loaded settings
 		setUIValues(strServer, strRepository, strUser, strPassword, strThreads);

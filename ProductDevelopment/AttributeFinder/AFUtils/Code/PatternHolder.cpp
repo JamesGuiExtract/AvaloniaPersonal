@@ -13,6 +13,7 @@ using namespace std;
 PatternHolder::PatternHolder()
 : m_eConfidenceLevel(kZero),
   m_bIsAndRelationship(false),
+  m_nFindXRequirement(0),
   m_dStartingRange(0.0),
   m_dEndingRange(1.0),
   m_bCaseSensitive(false),
@@ -38,6 +39,7 @@ PatternHolder::PatternHolder(const PatternHolder& objToCopy)
 	{
 		m_eConfidenceLevel = objToCopy.m_eConfidenceLevel;
 		m_bIsAndRelationship = objToCopy.m_bIsAndRelationship;
+		m_nFindXRequirement = objToCopy.m_nFindXRequirement;
 		m_vecPatterns = objToCopy.m_vecPatterns;
 		m_dStartingRange = objToCopy.m_dStartingRange;
 		m_dEndingRange = objToCopy.m_dEndingRange;
@@ -62,6 +64,7 @@ PatternHolder& PatternHolder::operator=(const PatternHolder& objToAssign)
 	{
 		m_eConfidenceLevel = objToAssign.m_eConfidenceLevel;
 		m_bIsAndRelationship = objToAssign.m_bIsAndRelationship;
+		m_nFindXRequirement = objToAssign.m_nFindXRequirement;
 		m_vecPatterns = objToAssign.m_vecPatterns;
 		m_dStartingRange = objToAssign.m_dStartingRange;
 		m_dEndingRange = objToAssign.m_dEndingRange;
@@ -137,6 +140,9 @@ bool PatternHolder::foundPatternsInText(const ISpatialStringPtr& ipInputText, Do
 
 		// truncate the input string according to the range
 		string strInputWithinRange = strInputText.substr(nStartPos, nEndPos-nStartPos + 1);
+
+		int nFoundCount = 0;
+
 		for (unsigned int ui = 0; ui < m_vecPatterns.size(); ui++)
 		{
 			// Retrieve pattern plus optional Rule ID
@@ -165,7 +171,30 @@ bool PatternHolder::foundPatternsInText(const ISpatialStringPtr& ipInputText, Do
 
 			// whether or not this pattern is found in the input text
 			bool bFound = asCppBool(ipParser->StringContainsPattern(strInputWithinRange.c_str()));
-			if (bFound != m_bIsAndRelationship)
+
+			if (m_nFindXRequirement > 0)
+			{
+				// Evaluate whether X patterns have been met
+				if (bFound)
+				{
+					if (nFoundCount == 0)
+					{
+						m_strRuleID = strRuleID;
+					}
+					else if (!m_strRuleID.empty())
+					{
+						m_strRuleID += string(", " + strRuleID);
+					}
+
+					nFoundCount++;
+
+					if (nFoundCount == m_nFindXRequirement)
+					{
+						return true;
+					}
+				}
+			}
+			else if (bFound != m_bIsAndRelationship)
 			{
 				// If found and OR relationship ||
 				// !found and AND relationship

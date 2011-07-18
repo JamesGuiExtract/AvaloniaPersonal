@@ -319,7 +319,7 @@ void CStep1::checkForProduct(const string &strGUID, const string &strKeyFile,
 	try
 	{
 		// Retrieve the product name from the registry
-		string strProductName = ma_pInstallRegistryMgr->getKeyValue("\\" + strGUID, "DisplayName");
+		string strProductName = ma_pInstallRegistryMgr->getKeyValue("\\" + strGUID, "DisplayName", "");
 
 		// If we found a product name, the product is installed according to Windows.
 		if (!strProductName.empty())

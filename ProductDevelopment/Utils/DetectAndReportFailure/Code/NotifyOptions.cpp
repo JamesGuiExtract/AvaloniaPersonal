@@ -28,7 +28,7 @@ bool NotifyOptions::notificationIsEnabled(ENotificationType eType, ENotification
 	{
 		// return whether failure reporting is enabled or not at a high level
 		return m_apSettings->getKeyValue(getSettingsFolderName(eEvent),
-			getEnabledOrNotKeyName(eType)) == "1";
+			getEnabledOrNotKeyName(eType), "") == "1";
 	}
 	catch (UCLIDException& ue)
 	{
@@ -47,8 +47,8 @@ IVariantVectorPtr NotifyOptions::getEmailRecipients() const
 		ASSERT_RESOURCE_ALLOCATION("ELI12428", ipRecipients != NULL);
 
 		// get number of recipients
-		static const string strRECIPIENTS_FOLDER = "EmailRecipients";	
-		string strNumRecipients = m_apSettings->getKeyValue(strRECIPIENTS_FOLDER, "NumRecipients");
+		static const string strRECIPIENTS_FOLDER = "EmailRecipients";
+		string strNumRecipients = m_apSettings->getKeyValue(strRECIPIENTS_FOLDER, "NumRecipients", "");
 		unsigned long ulNumRecipients = asUnsignedLong(strNumRecipients);
 
 		// populate the vector with each of the recipients
@@ -56,7 +56,7 @@ IVariantVectorPtr NotifyOptions::getEmailRecipients() const
 		{
 			string strKey = "Recipient";
 			strKey += asString(ui + 1);
-			string strRecipient = m_apSettings->getKeyValue(strRECIPIENTS_FOLDER, strKey);
+			string strRecipient = m_apSettings->getKeyValue(strRECIPIENTS_FOLDER, strKey, "");
 			ipRecipients->PushBack(_bstr_t(strRecipient.c_str()));
 		}
 
@@ -76,7 +76,7 @@ unsigned long NotifyOptions::getNumExceptions() const
 	{
 		// return the number of exceptions
 		string strNumExceptions = m_apSettings->getKeyValue(
-			getSettingsFolderName(kExceptionsLoggedFrequently), "NumExceptions");
+			getSettingsFolderName(kExceptionsLoggedFrequently), "NumExceptions", "");
 		return asUnsignedLong(strNumExceptions);
 	}
 	catch (UCLIDException& ue)
@@ -92,7 +92,7 @@ unsigned long NotifyOptions::getExceptionCheckDurationInSeconds() const
 	{
 		// return the time period
 		string strTimePeriod = m_apSettings->getKeyValue(
-			getSettingsFolderName(kExceptionsLoggedFrequently), "ExceptionCheckDurationInSeconds");
+			getSettingsFolderName(kExceptionsLoggedFrequently), "ExceptionCheckDurationInSeconds", "");
 		return asUnsignedLong(strTimePeriod);
 	}
 	catch (UCLIDException& ue)
@@ -108,7 +108,7 @@ unsigned long NotifyOptions::getCPUThreshold() const
 	{
 		// return the CPU usage percent threshold
 		string strThreshold = m_apSettings->getKeyValue(
-			getSettingsFolderName(kCPUUsageIsLow), "CPUThreshold");
+			getSettingsFolderName(kCPUUsageIsLow), "CPUThreshold", "");
 		
 		// ensure that the threshold is not greater than 100
 		unsigned long ulThreshold = asUnsignedLong(strThreshold);
@@ -132,7 +132,7 @@ unsigned long NotifyOptions::getCPUCheckDurationInSeconds() const
 	{
 		// return the time period
 		string strTimePeriod = m_apSettings->getKeyValue(
-			getSettingsFolderName(kCPUUsageIsLow), "CPUCheckDurationInSeconds");
+			getSettingsFolderName(kCPUUsageIsLow), "CPUCheckDurationInSeconds", "");
 		return asUnsignedLong(strTimePeriod);
 	}
 	catch (UCLIDException& ue)
@@ -148,7 +148,7 @@ unsigned long NotifyOptions::getMinSecondsBetweenEmails(ENotificationEvent eEven
 	{
 		// return the time period
 		string strTimePeriod = m_apSettings->getKeyValue(
-			getSettingsFolderName(eEvent), "MinSecondsBetweenEmails");
+			getSettingsFolderName(eEvent), "MinSecondsBetweenEmails", "");
 		return asUnsignedLong(strTimePeriod);
 	}
 	catch (UCLIDException& ue)

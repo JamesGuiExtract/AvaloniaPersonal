@@ -1756,7 +1756,8 @@ EMicrReaderFlags CMicrFinder::getMicrReaderFlags()
 
 			if (regMgr.keyExists("", gstrMICR_FINDER_FLAGS_KEY))
 			{
-				lMicrFlags = asLong(regMgr.getKeyValue("", gstrMICR_FINDER_FLAGS_KEY));
+				lMicrFlags = asLong(regMgr.getKeyValue("", gstrMICR_FINDER_FLAGS_KEY,
+					asString(giMICR_FINDER_FLAGS_DEFAULT)));
 			}
 			else
 			{

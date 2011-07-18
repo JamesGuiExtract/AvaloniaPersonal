@@ -79,11 +79,11 @@ void WindowPersistenceMgr::RestoreWindowPosition()
 		else
 		{
 			// Retrieve the stored window position
-			bool bMaximized = (m_registryManager.getKeyValue("", WINDOW_MAXIMIZED) == "1");
-			long nLeft = asLong(m_registryManager.getKeyValue("", WINDOW_POS_X));
-			long nTop = asLong(m_registryManager.getKeyValue("", WINDOW_POS_Y));
-			long nWidth = asLong(m_registryManager.getKeyValue("", WINDOW_SIZE_X));
-			long nHeight = asLong(m_registryManager.getKeyValue("", WINDOW_SIZE_Y));
+			bool bMaximized = (m_registryManager.getKeyValue("", WINDOW_MAXIMIZED, "") == "1");
+			long nLeft = asLong(m_registryManager.getKeyValue("", WINDOW_POS_X, ""));
+			long nTop = asLong(m_registryManager.getKeyValue("", WINDOW_POS_Y, ""));
+			long nWidth = asLong(m_registryManager.getKeyValue("", WINDOW_SIZE_X, ""));
+			long nHeight = asLong(m_registryManager.getKeyValue("", WINDOW_SIZE_Y, ""));
 
 			// Initialize a WINDOWPLACEMENT based on the values stored in the registry. 
 			WINDOWPLACEMENT windowPlacement;

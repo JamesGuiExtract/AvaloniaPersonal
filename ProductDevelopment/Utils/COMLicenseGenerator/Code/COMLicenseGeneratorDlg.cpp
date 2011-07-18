@@ -1147,12 +1147,14 @@ std::string	CCOMLicenseGeneratorDlg::getTargetFolder()
 	if (!ma_pSettingsCfgMgr->keyExists( gstrLICENSE_SECTION, gstrTARGETFOLDER_KEY ))
 	{
 		// Create key if not found, default to empty string
-		ma_pSettingsCfgMgr->createKey( gstrLICENSE_SECTION, gstrTARGETFOLDER_KEY, "" );
-		strFolder = "";
+		ma_pSettingsCfgMgr->createKey( gstrLICENSE_SECTION, gstrTARGETFOLDER_KEY,
+			gstrDEFAULT_TARGETFOLDER );
+		strFolder = gstrDEFAULT_TARGETFOLDER;
 	}
 	else
 	{
-		strFolder = ma_pSettingsCfgMgr->getKeyValue( gstrLICENSE_SECTION, gstrTARGETFOLDER_KEY );
+		strFolder = ma_pSettingsCfgMgr->getKeyValue( gstrLICENSE_SECTION, gstrTARGETFOLDER_KEY,
+			gstrDEFAULT_TARGETFOLDER);
 	}
 
 #endif

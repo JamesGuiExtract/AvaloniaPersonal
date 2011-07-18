@@ -495,7 +495,8 @@ unsigned long CScansoftOCR::getMaxRecognitionsPerOCREngineInstance()
 			// get the key value and convert to unsigned long.
 			// if the key value cannot be accessed, or is invalid, 
 			// an exception will automatically be thrown 
-			string strKeyValue = apSettings->getKeyValue("", strREG_MAX_IMAGES_PER_INSTANCE_KEY_NAME);
+			string strKeyValue = apSettings->getKeyValue("", strREG_MAX_IMAGES_PER_INSTANCE_KEY_NAME,
+				asString(ulDEFAULT_VALUE));
 			ls_ulMaxImageRecognitions = asUnsignedLong(strKeyValue);
 		}
 		else

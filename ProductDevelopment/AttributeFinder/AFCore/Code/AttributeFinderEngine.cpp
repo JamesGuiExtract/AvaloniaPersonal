@@ -554,7 +554,7 @@ void CAttributeFinderEngine::getRootComponentDataFolder(string& rstrFolder, bool
 	};
 
 	// Get the key value
-	rstrFolder = mu_spUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY);
+	rstrFolder = mu_spUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER, COMPONENT_DATA_FOLDER_KEY, "");
 	
 	// If the key value is not empty, then it shall be assumed it's the component data folder that
 	// we should use.
@@ -648,7 +648,7 @@ UCLID_AFCORELib::IFeedbackMgrPtr CAttributeFinderEngine::getFeedbackManager()
 				gstrAF_REG_UTILS_FOLDER_PATH );
 
 			string strProgID = rpm.getKeyValue( gstrAF_REG_FEEDBACK_FOLDER, 
-				gstrAF_FEEDBACK_PROGID_KEY );
+				gstrAF_FEEDBACK_PROGID_KEY, "" );
 
 			if (strProgID.length() > 2)
 			{

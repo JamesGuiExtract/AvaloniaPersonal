@@ -252,7 +252,7 @@ void CUEXFindDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( FIND, FIND_WINDOW_POSX ))
 	{
 		// Retrieve value
-		strTemp = m_pCfgMgr->getKeyValue( FIND, FIND_WINDOW_POSX );
+		strTemp = m_pCfgMgr->getKeyValue( FIND, FIND_WINDOW_POSX, "" );
 		
 		// Convert to integer
 		lLeft = asLong( strTemp );
@@ -266,7 +266,7 @@ void CUEXFindDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( FIND, FIND_WINDOW_POSY ))
 	{
 		// Retrieve value
-		strTemp = m_pCfgMgr->getKeyValue( FIND, FIND_WINDOW_POSY );
+		strTemp = m_pCfgMgr->getKeyValue( FIND, FIND_WINDOW_POSY, "" );
 		
 		// Convert to integer
 		lTop = asLong( strTemp );
@@ -280,7 +280,7 @@ void CUEXFindDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( FIND, FIND_WINDOW_WIDTH ))
 	{
 		// Retrieve value
-		strTemp = m_pCfgMgr->getKeyValue( FIND, FIND_WINDOW_WIDTH );
+		strTemp = m_pCfgMgr->getKeyValue( FIND, FIND_WINDOW_WIDTH, "" );
 		
 		// Convert to integer
 		lWidth = asLong( strTemp );
@@ -294,7 +294,7 @@ void CUEXFindDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( FIND, FIND_WINDOW_HEIGHT ))
 	{
 		// Retrieve value
-		strTemp = m_pCfgMgr->getKeyValue( FIND, FIND_WINDOW_HEIGHT );
+		strTemp = m_pCfgMgr->getKeyValue( FIND, FIND_WINDOW_HEIGHT, "" );
 		
 		// Convert to integer
 		lHeight = asLong( strTemp );
@@ -316,7 +316,7 @@ void CUEXFindDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( FIND, SEARCH_TEXT ))
 	{
 		// Retrieve value
-		strTemp = m_pCfgMgr->getKeyValue( FIND, SEARCH_TEXT );
+		strTemp = m_pCfgMgr->getKeyValue( FIND, SEARCH_TEXT, "" );
 
 		// TODO: Change between CPP and Normal format to handle regular expression
 
@@ -334,7 +334,7 @@ void CUEXFindDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( FIND, SELECTION ))
 	{
 		// Retrieve value
-		strTemp = m_pCfgMgr->getKeyValue( FIND, SELECTION );
+		strTemp = m_pCfgMgr->getKeyValue( FIND, SELECTION, "" );
 
 		// Validate result
 		int iTemp = asLong( strTemp );

@@ -61,48 +61,48 @@ STDMETHODIMP CEmailSettings::raw_LoadFromRegistry(BSTR bstrKey)
 		m_strSMTPServer = "";
 		if ( UserCfgMgr.keyExists("", "SMTPServer" ))
 		{
-			m_strSMTPServer = UserCfgMgr.getKeyValue( "", "SMTPServer" );
+			m_strSMTPServer = UserCfgMgr.getKeyValue( "", "SMTPServer", "" );
 		}
 		// default value is port gnDEFAULT_PORT
 		m_lSMTPPort = gnDEFAULT_PORT;
 		if ( UserCfgMgr.keyExists( "", "SMTPPort" ))
 		{
-			string strSMTPPort = UserCfgMgr.getKeyValue( "", "SMTPPort" );
+			string strSMTPPort = UserCfgMgr.getKeyValue( "", "SMTPPort", "" );
 			if ( !strSMTPPort.empty() )
 			{
-				m_lSMTPPort = asLong (UserCfgMgr.getKeyValue( "", "SMTPPort" ).c_str());
+				m_lSMTPPort = asLong (UserCfgMgr.getKeyValue( "", "SMTPPort", "" ).c_str());
 			}
 		}
 		m_strSMTPUserName = "";
 		if ( UserCfgMgr.keyExists( "", "SMTPUserName" ) ) 
 		{
-			m_strSMTPUserName = UserCfgMgr.getKeyValue( "", "SMTPUserName" );
+			m_strSMTPUserName = UserCfgMgr.getKeyValue( "", "SMTPUserName", "" );
 		}
 		m_strSMTPPassword = "";
 		if ( UserCfgMgr.keyExists( "", "SMTPPassword" ) )
 		{
-			m_strSMTPPassword = UserCfgMgr.getKeyValue( "", "SMTPPassword" );
+			m_strSMTPPassword = UserCfgMgr.getKeyValue( "", "SMTPPassword", "" );
 			//TODO: Decrypt password if encrypted
 		}
 		m_strSenderName = "";
 		if ( UserCfgMgr.keyExists( "", "SenderName" ))
 		{
-			m_strSenderName = UserCfgMgr.getKeyValue( "", "SenderName" );
+			m_strSenderName = UserCfgMgr.getKeyValue( "", "SenderName", "" );
 		}
 		m_strSenderEmailAddr = "";
 		if ( UserCfgMgr.keyExists( "", "SenderEmailAddr" ) )
 		{
-			m_strSenderEmailAddr = UserCfgMgr.getKeyValue( "", "SenderEmailAddr" );
+			m_strSenderEmailAddr = UserCfgMgr.getKeyValue( "", "SenderEmailAddr", "" );
 		}
 		m_strEmailSignature = "";
 		if ( UserCfgMgr.keyExists( "", "EmailSignature" ))
 		{
-			m_strEmailSignature = UserCfgMgr.getKeyValue( "", "EmailSignature" );
+			m_strEmailSignature = UserCfgMgr.getKeyValue( "", "EmailSignature", "" );
 		}
 		m_nSMTPTimeout = gnDEFAULT_SMTP_TIMEOUT;
 		if ( UserCfgMgr.keyExists( "", "SMTPTimeout" ))
 		{
-			m_nSMTPTimeout = asLong(UserCfgMgr.getKeyValue( "", "SMTPTimeout" ));
+			m_nSMTPTimeout = asLong(UserCfgMgr.getKeyValue( "", "SMTPTimeout", "" ));
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12273")

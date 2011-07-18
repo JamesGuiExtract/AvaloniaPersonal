@@ -18,8 +18,12 @@ const string& gstrBOTTOM_POS = "Bottom";
 
 const string& gstrFIND_FOLDER = gstrROOT_REGISTRY_FOLDER + "\\Find";
 const string& gstrDISTRIBUTION_FOLDER = gstrROOT_REGISTRY_FOLDER + "\\Distribution";
+
 const string& gstrSHOW_ADVANCED = "Show Advanced";
 const string& gstrLAST_REG_EXP = "Last Reg Exp";
+
+const string& gstrDEFAULT_SHOW_ADVANCED = "0";
+const string& gstrDEFAULT_LAST_REG_EXP = "";
 
 //-------------------------------------------------------------------------------------------------
 SpatialStringViewerCfg::SpatialStringViewerCfg(CSpatialStringViewerDlg *pDlg)
@@ -67,10 +71,10 @@ void SpatialStringViewerCfg::restoreLastWindowPosition()
 	try
 	{
 		// get the values of left,right,top,bottom
-		rect.left = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrLEFT_POS));
-		rect.top = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrTOP_POS));
-		rect.right = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrRIGHT_POS));
-		rect.bottom = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrBOTTOM_POS));
+		rect.left = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrLEFT_POS, ""));
+		rect.top = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrTOP_POS, ""));
+		rect.right = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrRIGHT_POS, ""));
+		rect.bottom = asUnsignedLong(m_apCfgMgr->getKeyValue(gstrLAST_POS_FOLDER, gstrBOTTOM_POS, ""));
 
 		m_pDlg->MoveWindow(&rect);
 	}
@@ -88,11 +92,12 @@ bool SpatialStringViewerCfg::isAdvancedShown()
 	if (!m_apCfgMgr->keyExists(gstrFIND_FOLDER, gstrSHOW_ADVANCED))
 	{
 		// default to hide
-		m_apCfgMgr->createKey(gstrFIND_FOLDER, gstrSHOW_ADVANCED, "0");
-		return false;
+		m_apCfgMgr->createKey(gstrFIND_FOLDER, gstrSHOW_ADVANCED, gstrDEFAULT_SHOW_ADVANCED);
+		return asCppBool(gstrDEFAULT_SHOW_ADVANCED);
 	}
 
-	return m_apCfgMgr->getKeyValue(gstrFIND_FOLDER, gstrSHOW_ADVANCED) == "1";
+	return asCppBool(m_apCfgMgr->getKeyValue(gstrFIND_FOLDER, gstrSHOW_ADVANCED,
+		gstrDEFAULT_SHOW_ADVANCED));
 }
 //-------------------------------------------------------------------------------------------------
 void SpatialStringViewerCfg::showAdvanced(bool bShow)
@@ -106,10 +111,10 @@ std::string SpatialStringViewerCfg::getLastRegularExpression()
 	if (!m_apCfgMgr->keyExists(gstrFIND_FOLDER, gstrLAST_REG_EXP))
 	{
 		// default to empty
-		m_apCfgMgr->createKey(gstrFIND_FOLDER, gstrLAST_REG_EXP, "");
+		m_apCfgMgr->createKey(gstrFIND_FOLDER, gstrLAST_REG_EXP, gstrDEFAULT_LAST_REG_EXP);
 	}
 
-	return m_apCfgMgr->getKeyValue(gstrFIND_FOLDER, gstrLAST_REG_EXP);
+	return m_apCfgMgr->getKeyValue(gstrFIND_FOLDER, gstrLAST_REG_EXP, gstrDEFAULT_LAST_REG_EXP);
 }
 //-------------------------------------------------------------------------------------------------
 void SpatialStringViewerCfg::saveLastRegularExpression(std::string strRegExp)
@@ -122,8 +127,8 @@ void SpatialStringViewerCfg::getLastFindWindowPos(int& x, int& y)
 	// get the values of left,right,top,bottom
 	try
 	{
-		x = asLong(m_apCfgMgr->getKeyValue(gstrFIND_FOLDER, gstrLEFT_POS));
-		y = asLong(m_apCfgMgr->getKeyValue(gstrFIND_FOLDER, gstrTOP_POS));
+		x = asLong(m_apCfgMgr->getKeyValue(gstrFIND_FOLDER, gstrLEFT_POS, ""));
+		y = asLong(m_apCfgMgr->getKeyValue(gstrFIND_FOLDER, gstrTOP_POS, ""));
 	}
 	catch(...)
 	{
@@ -143,8 +148,8 @@ void SpatialStringViewerCfg::getLastDistributionWindowPos(int &x, int &y)
 {
 	try
 	{
-		x = asLong(m_apCfgMgr->getKeyValue(gstrDISTRIBUTION_FOLDER, gstrLEFT_POS));
-		y = asLong(m_apCfgMgr->getKeyValue(gstrDISTRIBUTION_FOLDER, gstrTOP_POS));
+		x = asLong(m_apCfgMgr->getKeyValue(gstrDISTRIBUTION_FOLDER, gstrLEFT_POS, ""));
+		y = asLong(m_apCfgMgr->getKeyValue(gstrDISTRIBUTION_FOLDER, gstrTOP_POS, ""));
 	}
 	catch(...)
 	{

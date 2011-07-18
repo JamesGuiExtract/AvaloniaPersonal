@@ -38,7 +38,7 @@ string FileProcessorsConfigMgr::getLastOpenedSourceNameFromScope()
 	}
 
 	// Return the key value from registry
-	return m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrLAST_OPENED_SOURCE_NAME);
+	return m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrLAST_OPENED_SOURCE_NAME, "");
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessorsConfigMgr::setLastOpenedSourceNameFromScope(const string& strSourceName)
@@ -56,7 +56,7 @@ void FileProcessorsConfigMgr::getOpenedSourceHistoryFromScope(std::vector<std::s
 		// Create the registry key if not exists
 		m_pCfgMgr->createKey(m_strCopyMoveDeleteFolderName, gstrOPENED_SOURCE_HISTORY, strList);
 	}
-	strList = m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrOPENED_SOURCE_HISTORY);
+	strList = m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrOPENED_SOURCE_HISTORY, "");
 	
 	// each item in the list is separated by a pipe (|) character, parse them
 	StringTokenizer::sGetTokens(strList, "|", rvecHistory);
@@ -90,7 +90,7 @@ string FileProcessorsConfigMgr::getLastOpenedDestNameFromScope()
 	}
 
 	// Return the key value from registry
-	return m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrLAST_OPENED_DEST_NAME);
+	return m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrLAST_OPENED_DEST_NAME, "");
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessorsConfigMgr::setLastOpenedDestNameFromScope(const string& strDestName)
@@ -108,7 +108,7 @@ void FileProcessorsConfigMgr::getOpenedDestHistoryFromScope(std::vector<std::str
 		// Create the registry key if not exists
 		m_pCfgMgr->createKey(m_strCopyMoveDeleteFolderName, gstrOPENED_DEST_HISTORY, strList);
 	}
-	strList = m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrOPENED_DEST_HISTORY);
+	strList = m_pCfgMgr->getKeyValue(m_strCopyMoveDeleteFolderName, gstrOPENED_DEST_HISTORY, "");
 	
 	// each item in the list is separated by a pipe (|) character, parse them
 	StringTokenizer::sGetTokens(strList, "|", rvecHistory);

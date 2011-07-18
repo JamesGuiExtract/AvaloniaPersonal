@@ -69,6 +69,10 @@ const string EXCEPTION_WIDTH	= "ExceptionWidth";
 const string SHOW_TRACES		= "ShowApplicationTraces";
 const string SHOW_DISPLAYED_EXCEPTIONS = "ShowDisplayedExceptions";
 
+const string DEFAULT_DIRECTORY = "C:\\";
+const string DEFAULT_SHOW_TRACES = "1";
+const string DEFAULT_SHOW_DISPLAYED_EXCEPTIONS = "1";
+
 // Window Size Bounds
 #define	MIN_WINDOW_X				731
 #define	MIN_WINDOW_Y				200
@@ -1432,7 +1436,7 @@ void CUEXViewerDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( GENERAL, WINDOW_POS_X ))
 	{
 		// Retrieve value
-		strWidth = m_pCfgMgr->getKeyValue( GENERAL, WINDOW_POS_X );
+		strWidth = m_pCfgMgr->getKeyValue( GENERAL, WINDOW_POS_X, "" );
 		
 		// Convert to integer
 		lLeft = atoi( strWidth.c_str() );
@@ -1446,7 +1450,7 @@ void CUEXViewerDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( GENERAL, WINDOW_POS_Y ))
 	{
 		// Retrieve value
-		strWidth = m_pCfgMgr->getKeyValue( GENERAL, WINDOW_POS_Y );
+		strWidth = m_pCfgMgr->getKeyValue( GENERAL, WINDOW_POS_Y, "" );
 		
 		// Convert to integer
 		lTop = atoi( strWidth.c_str() );
@@ -1460,7 +1464,7 @@ void CUEXViewerDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( GENERAL, WINDOW_SIZE_X ))
 	{
 		// Retrieve value
-		strWidth = m_pCfgMgr->getKeyValue( GENERAL, WINDOW_SIZE_X );
+		strWidth = m_pCfgMgr->getKeyValue( GENERAL, WINDOW_SIZE_X, "" );
 		
 		// Convert to integer
 		lWidth = atoi( strWidth.c_str() );
@@ -1474,7 +1478,7 @@ void CUEXViewerDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( GENERAL, WINDOW_SIZE_Y ))
 	{
 		// Retrieve value
-		strWidth = m_pCfgMgr->getKeyValue( GENERAL, WINDOW_SIZE_Y );
+		strWidth = m_pCfgMgr->getKeyValue( GENERAL, WINDOW_SIZE_Y, "" );
 		
 		// Convert to integer
 		lHeight = atoi( strWidth.c_str() );
@@ -1525,7 +1529,7 @@ void CUEXViewerDlg::initPersistent()
 	if (m_pCfgMgr->keyExists( GENERAL, DIRECTORY ))
 	{
 		// Retrieve value
-		strDir = m_pCfgMgr->getKeyValue( GENERAL, DIRECTORY );
+		strDir = m_pCfgMgr->getKeyValue( GENERAL, DIRECTORY, DEFAULT_DIRECTORY );
 		
 		// Store in CString
 		m_zDirectory = strDir.c_str();
@@ -1539,20 +1543,20 @@ void CUEXViewerDlg::initPersistent()
 	else
 	{
 		// Default to C drive
-		m_zDirectory = "C:\\";
+		m_zDirectory = DEFAULT_DIRECTORY.c_str();
 	}
 
 	// Set the initial state of the "Show application traces" option.
 	if (m_pCfgMgr->keyExists(GENERAL, SHOW_TRACES))
 	{
-		m_bShowTraces = (m_pCfgMgr->getKeyValue(GENERAL, SHOW_TRACES) == "1");
+		m_bShowTraces = asCppBool(m_pCfgMgr->getKeyValue(GENERAL, SHOW_TRACES, DEFAULT_SHOW_TRACES));
 	}
 
 	// Set the initial state of the "Show displayed exceptions" option.
 	if (m_pCfgMgr->keyExists(GENERAL, SHOW_DISPLAYED_EXCEPTIONS))
 	{
-		m_bShowDisplayedExceptions =
-			(m_pCfgMgr->getKeyValue(GENERAL, SHOW_DISPLAYED_EXCEPTIONS) == "1");
+		m_bShowDisplayedExceptions = asCppBool(
+			m_pCfgMgr->getKeyValue(GENERAL, SHOW_DISPLAYED_EXCEPTIONS, DEFAULT_SHOW_DISPLAYED_EXCEPTIONS));
 	}
 
 	// Retrieve column widths
@@ -1964,7 +1968,7 @@ long CUEXViewerDlg::getColumnWidth(string strColumn)
 	if (m_pCfgMgr->keyExists( COLUMNS, strColumn.c_str() ))
 	{
 		// Retrieve value
-		string strWidth = m_pCfgMgr->getKeyValue( COLUMNS, strColumn.c_str() );
+		string strWidth = m_pCfgMgr->getKeyValue( COLUMNS, strColumn.c_str(), "" );
 		
 		// Convert to integer
 		int iActual = asLong( strWidth );

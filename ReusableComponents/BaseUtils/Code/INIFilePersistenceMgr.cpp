@@ -60,7 +60,8 @@ INIFilePersistenceMgr& INIFilePersistenceMgr::operator=(const INIFilePersistence
 	return *this;
 }
 //-------------------------------------------------------------------------------------------------
-string INIFilePersistenceMgr::getKeyValue(const string& strFolderFullPath, const string& strFullKeyName)
+string INIFilePersistenceMgr::getKeyValue(const string& strFolderFullPath,
+	const string& strFullKeyName, const string& strDefaultValue)
 {
 	string strSectionName(getSectionName(strFolderFullPath));
 	
@@ -69,7 +70,7 @@ string INIFilePersistenceMgr::getKeyValue(const string& strFolderFullPath, const
 
 	TCHAR pszKeyValue[MAX_PATH];
 	//default key value is "" in case the key value is null
-	::GetPrivateProfileString(strSectionName.c_str(), strFullKeyName.c_str(), "", 
+	::GetPrivateProfileString(strSectionName.c_str(), strFullKeyName.c_str(), strDefaultValue.c_str(), 
 							pszKeyValue, sizeof(pszKeyValue), m_strINIFileName.c_str());
 	
 	return string(pszKeyValue);
@@ -160,7 +161,7 @@ void INIFilePersistenceMgr::renameKey(const string& strFolderFullPath,
 	//if key exists, delete old key
 	if (keyExists(strFolderFullPath, strKeyToRename))
 	{
-		string strKeyValue = getKeyValue(strFolderFullPath, strKeyToRename);
+		string strKeyValue = getKeyValue(strFolderFullPath, strKeyToRename, "");
 		deleteKey(strFolderFullPath, strKeyToRename);
 		
 		//create the new key 

@@ -18,6 +18,9 @@ const string& gstrIMAGE_EDIT_REGISTRY_FOLDER = gstrRC_REG_PATH + "\\OcxAndDlls\\
 const string& gstrANTI_ALIASING = "AntiAliasing";
 const string& gstrANNOTATION = "Annotation";
 
+const string& gstrDEFAULT_ANTI_ALIASING = "1";
+const string& gstrDEFAULT_ANNOTATION = "1";
+
 //-------------------------------------------------------------------------------------------------
 // ImageEditCtrlCfg
 //-------------------------------------------------------------------------------------------------
@@ -49,13 +52,14 @@ bool ImageEditCtrlCfg::isAntiAliasingEnabled()
 	if (!m_apCfgMgr->keyExists( gstrIMAGE_EDIT_REGISTRY_FOLDER, gstrANTI_ALIASING ))
 	{
 		// Use default (OFF) if empty
-		m_apCfgMgr->createKey( gstrIMAGE_EDIT_REGISTRY_FOLDER, gstrANTI_ALIASING, "1" );
+		m_apCfgMgr->createKey( gstrIMAGE_EDIT_REGISTRY_FOLDER, gstrANTI_ALIASING,
+			gstrDEFAULT_ANTI_ALIASING );
 	}
 
 	// Convert found string to bool - functionality must also be licensed
 	string strSetting = m_apCfgMgr->getKeyValue( gstrIMAGE_EDIT_REGISTRY_FOLDER, 
-		gstrANTI_ALIASING );
-	if (!strSetting.empty() && strSetting == "1" && isAntiAliasingLicensed())
+		gstrANTI_ALIASING, gstrDEFAULT_ANTI_ALIASING );
+	if (asCppBool(strSetting) && isAntiAliasingLicensed())
 	{
 		bIsEnabled = true;
 	}
@@ -86,13 +90,14 @@ bool ImageEditCtrlCfg::isAnnotationEnabled()
 	if (!m_apCfgMgr->keyExists( gstrIMAGE_EDIT_REGISTRY_FOLDER, gstrANNOTATION ))
 	{
 		// Use default (ON) if empty
-		m_apCfgMgr->createKey( gstrIMAGE_EDIT_REGISTRY_FOLDER, gstrANNOTATION, "1" );
+		m_apCfgMgr->createKey( gstrIMAGE_EDIT_REGISTRY_FOLDER, gstrANNOTATION,
+			gstrDEFAULT_ANNOTATION );
 	}
 
 	// Convert found string to bool - functionality must also be licensed
 	string strSetting = m_apCfgMgr->getKeyValue( gstrIMAGE_EDIT_REGISTRY_FOLDER, 
-		gstrANNOTATION );
-	if (!strSetting.empty() && strSetting == "1")
+		gstrANNOTATION, gstrDEFAULT_ANNOTATION );
+	if (asCppBool(strSetting))
 	{
 		// Check annotation license
 		if ( LicenseManagement::isAnnotationLicensed() )

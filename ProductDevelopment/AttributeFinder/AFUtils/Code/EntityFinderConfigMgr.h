@@ -23,6 +23,7 @@ private:
 	// Data
 	///////
 	static const std::string LOGGING_ENABLED;
+	static const std::string DEFAULT_LOGGING_ENABLED;
 
 	IConfigurationSettingsPersistenceMgr* m_pCfgMgr;
 

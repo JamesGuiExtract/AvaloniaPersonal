@@ -144,7 +144,8 @@ void RegistryPersistenceMgr::setKeyValue(const string& strFolderFullPath,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-string RegistryPersistenceMgr::getKeyValue(const string& strFolderFullPath, const string& strFullKeyName)
+string RegistryPersistenceMgr::getKeyValue(const string& strFolderFullPath,
+	const string& strFullKeyName, const std::string& strDefaultValue)
 {
 	HKEY hKey;
 	string strKey = m_strRootKeyFullPath + strFolderFullPath;
@@ -159,11 +160,11 @@ string RegistryPersistenceMgr::getKeyValue(const string& strFolderFullPath, cons
 	TCHAR szValue[500];
 	DWORD dwBufLen = 500;
 
-	// if key doesn't exist, return empty
+	// if key doesn't exist, return the default value
 	if (ret != ERROR_SUCCESS)
 	{
 		::RegCloseKey(hKey);
-		return "";
+		return strDefaultValue;
 	}
 	
 	ret = ::RegQueryValueEx(hKey,
@@ -176,6 +177,14 @@ string RegistryPersistenceMgr::getKeyValue(const string& strFolderFullPath, cons
 	if (ret != ERROR_SUCCESS)
 	{
 		::RegCloseKey(hKey);
+
+		// If the reason the query failed is that the registry value doesn't exist, return the
+		// default value.
+		if (ret == ERROR_FILE_NOT_FOUND)
+		{
+			return strDefaultValue;
+		}
+
 		UCLIDException uclidException("ELI01837", "Failed to get the value of a registry key.");
 		uclidException.addDebugInfo("ErrorCode", ret);
 		uclidException.addDebugInfo("Key Path", strKey);
@@ -238,6 +247,13 @@ vector<string> RegistryPersistenceMgr::getKeyMultiStringValue(const std::string&
 	if (ret != ERROR_SUCCESS)
 	{
 		::RegCloseKey(hKey);
+
+		// If the reason the query failed is that the registry value doesn't exist, return empty.
+		if (ret == ERROR_FILE_NOT_FOUND)
+		{
+			return vecStrings;
+		}
+
 		UCLIDException uclidException("ELI20387", "Failed to get the value of a registry key.");
 		uclidException.addDebugInfo("ErrorCode", ret);
 		uclidException.addDebugInfo("Key Path", strKey);
@@ -421,12 +437,22 @@ void RegistryPersistenceMgr::createKey(const string& strFolderFullPath,
 	{
 		::RegCloseKey(hKey);
 
-		UCLIDException uclidException("ELI01816", "Failed to create a registry key.");
-		uclidException.addDebugInfo("ErrorCode", ret);
-		uclidException.addDebugInfo("Key Path", strKey);
-		uclidException.addDebugInfo("Full Key Name", strFullKeyName);
-		uclidException.addDebugInfo("ErrorMessage", getWindowsErrorString(ret));
-		throw uclidException;
+		// To prevent our software from behaving badly when running with limited permissiongs,
+		// ignore ERROR_ACCESS_DENIED when creating a key for the first time if not in the current
+		// user hive.
+		if (ret == ERROR_ACCESS_DENIED && m_hkeyRoot != HKEY_CURRENT_USER)
+		{
+			return;
+		}
+		else
+		{
+			UCLIDException uclidException("ELI01816", "Failed to create a registry key.");
+			uclidException.addDebugInfo("ErrorCode", ret);
+			uclidException.addDebugInfo("Key Path", strKey);
+			uclidException.addDebugInfo("Full Key Name", strFullKeyName);
+			uclidException.addDebugInfo("ErrorMessage", getWindowsErrorString(ret));
+			throw uclidException;
+		}
 	}
 
 	DWORD size = strKeyValue.size();
@@ -479,12 +505,22 @@ void RegistryPersistenceMgr::createKey(const string& strFolderFullPath,
 	{
 		::RegCloseKey(hKey);
 
-		UCLIDException uclidException("ELI20728", "Failed to create a registry key.");
-		uclidException.addDebugInfo("ErrorCode", ret);
-		uclidException.addDebugInfo("Key Path", strKey);
-		uclidException.addDebugInfo("Key name", strFullKeyName);
-		uclidException.addDebugInfo("ErrorMessage", getWindowsErrorString(ret));
-		throw uclidException;
+		// To prevent our software from behaving badly when running with limited permissiongs,
+		// ignore ERROR_ACCESS_DENIED when creating a key for the first time if not in the current
+		// user hive.
+		if (ret == ERROR_ACCESS_DENIED && m_hkeyRoot != HKEY_CURRENT_USER)
+		{
+			return;
+		}
+		else
+		{
+			UCLIDException uclidException("ELI20728", "Failed to create a registry key.");
+			uclidException.addDebugInfo("ErrorCode", ret);
+			uclidException.addDebugInfo("Key Path", strKey);
+			uclidException.addDebugInfo("Key name", strFullKeyName);
+			uclidException.addDebugInfo("ErrorMessage", getWindowsErrorString(ret));
+			throw uclidException;
+		}
 	}
 
 	DWORD size = sizeof(dwKeyValue);

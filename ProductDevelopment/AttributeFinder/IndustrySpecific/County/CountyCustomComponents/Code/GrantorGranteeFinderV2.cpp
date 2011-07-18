@@ -39,6 +39,7 @@ const string CGrantorGranteeFinderV2::GGFINDERS_SECTIONNAME = "\\GrantorGranteeF
 
 // Key Name
 const string CGrantorGranteeFinderV2::DOCTYPE_STORERULES = "StoreRulesWorked";
+const string CGrantorGranteeFinderV2::DEFAULT_DOCTYPE_STORERULES = "0";
 
 const string gstrCOUNTY_CUSTOM_COMPONENTS_KEY = gstrAF_REG_ROOT_FOLDER_PATH + string("\\IndustrySpecific\\County\\CountyCustomComponents");
 
@@ -659,13 +660,14 @@ bool CGrantorGranteeFinderV2::storeRulesWorked()
 	if (!ma_pUserCfgMgr->keyExists(GGFINDERS_SECTIONNAME, DOCTYPE_STORERULES))
 	{
 		// Default setting is OFF
-		string strStore("0");
+		string strStore(DEFAULT_DOCTYPE_STORERULES);
 		ma_pUserCfgMgr->createKey( GGFINDERS_SECTIONNAME, DOCTYPE_STORERULES, strStore );
 
 		return (strStore == "1");
 	}
 
-	return ma_pUserCfgMgr->getKeyValue(GGFINDERS_SECTIONNAME, DOCTYPE_STORERULES)=="1";
+	return ma_pUserCfgMgr->getKeyValue(GGFINDERS_SECTIONNAME, DOCTYPE_STORERULES,
+		DEFAULT_DOCTYPE_STORERULES) == "1";
 }
 //-------------------------------------------------------------------------------------------------
 void CGrantorGranteeFinderV2::validateLicense()

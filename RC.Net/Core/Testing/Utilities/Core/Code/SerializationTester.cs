@@ -21,38 +21,45 @@ namespace Extract.Testing.Utilities
         /// <see langword="false"/> if it does not serialize correctly.</returns>
         public static bool TestSerialization<T>(T value) where T : class, ISerializable
         {
-            ExtractException.Assert("ELI27915", "Object must not be null.", value != null,
-                "Object Type", typeof(T));
-
-            // Create a memory stream to stream the object to and from
-            using (MemoryStream stream = new MemoryStream())
+            try
             {
-                // Create a new formatter
-                BinaryFormatter formatter = new BinaryFormatter();
+                ExtractException.Assert("ELI27915", "Object must not be null.", value != null,
+                        "Object Type", typeof(T));
 
-                // Stream the object
-                formatter.Serialize(stream, value);
-
-                // Move the stream back to the beginning
-                stream.Seek(0, SeekOrigin.Begin);
-
-                // Now attempt to deserialize the object
-                T test = formatter.Deserialize(stream) as T;
-
-                if (test == null)
+                // Create a memory stream to stream the object to and from
+                using (MemoryStream stream = new MemoryStream())
                 {
-                    return false;
-                }
+                    // Create a new formatter
+                    BinaryFormatter formatter = new BinaryFormatter();
 
-                // Check if item needs to be disposed
-                IDisposable disposer = test as IDisposable;
-                if (disposer != null)
-                {
-                    disposer.Dispose();
-                    test = null;
-                }
+                    // Stream the object
+                    formatter.Serialize(stream, value);
 
-                return true;
+                    // Move the stream back to the beginning
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    // Now attempt to deserialize the object
+                    T test = formatter.Deserialize(stream) as T;
+
+                    if (test == null)
+                    {
+                        return false;
+                    }
+
+                    // Check if item needs to be disposed
+                    IDisposable disposer = test as IDisposable;
+                    if (disposer != null)
+                    {
+                        disposer.Dispose();
+                        test = null;
+                    }
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32925");
             }
         }
     }

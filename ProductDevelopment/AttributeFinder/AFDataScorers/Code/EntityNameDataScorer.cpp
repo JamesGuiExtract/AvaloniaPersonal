@@ -25,6 +25,7 @@ using namespace std;
 // Constants
 //-------------------------------------------------------------------------------------------------
 const string gstrDATA_SCORER_LOGGING_ENABLED = "LoggingEnabled";
+const string gstrDEFAULT_DATA_SCORER_LOGGING_ENABLED = "0";
 const string gstrAF_DATA_SCORERS = "AFDataScorers";
 const string gstrAF_DATA_SCORERS_PATH = gstrAF_REG_ROOT_FOLDER_PATH + string("\\") + gstrAF_DATA_SCORERS;
 const string gstrENDS = "\\EntityNameDataScorer";
@@ -805,12 +806,14 @@ long CEntityNameDataScorer::getLoggingEnabled()
 	if (!ma_pUserCfgMgr->keyExists( gstrENDS, gstrDATA_SCORER_LOGGING_ENABLED ))
 	{
 		// Key does not exist, set and return default (NOT ENABLED)
-		ma_pUserCfgMgr->createKey( gstrENDS, gstrDATA_SCORER_LOGGING_ENABLED, "0" );
+		ma_pUserCfgMgr->createKey( gstrENDS, gstrDATA_SCORER_LOGGING_ENABLED,
+			gstrDEFAULT_DATA_SCORER_LOGGING_ENABLED );
 	}
 	else
 	{
 		// Key found - return its value
-		string strResult = ma_pUserCfgMgr->getKeyValue( gstrENDS, gstrDATA_SCORER_LOGGING_ENABLED );
+		string strResult = ma_pUserCfgMgr->getKeyValue( gstrENDS, gstrDATA_SCORER_LOGGING_ENABLED, 
+			gstrDEFAULT_DATA_SCORER_LOGGING_ENABLED );
 		lResult = ::asLong( strResult );
 	}
 

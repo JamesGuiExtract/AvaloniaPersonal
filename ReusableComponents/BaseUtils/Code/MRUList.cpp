@@ -72,7 +72,7 @@ void MRUList::readFromPersistentStore()
 		// Do NOT push any empty string into the list
 		if (m_pConfigMgr->keyExists(m_strSectionName, getEntryName(i)))
 		{
-			string strKeyValue(m_pConfigMgr->getKeyValue(m_strSectionName, getEntryName(i)));
+			string strKeyValue(m_pConfigMgr->getKeyValue(m_strSectionName, getEntryName(i), ""));
 			if (!strKeyValue.empty())
 			{
 				m_quMRUList.push_back(strKeyValue);

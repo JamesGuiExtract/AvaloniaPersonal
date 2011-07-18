@@ -28,8 +28,11 @@ using namespace std;
 const string gstrSCROLL_LOGGER_KEY = "ScrollLogger";
 const string gstrRETAIN_NODES_KEY = "RetainTestCaseNodes";
 const string gstrDIFF_COMMAND_LINE_KEY = "DiffCommandLine";
-const string gstrDEFAULT_DIFF_CMD = "C:\\Program Files\\KDiff3\\kdiff3.exe %1 %2";
 const string gstrDELIMITER = "^|&$";
+
+const string gstrDEFAULT_SCROLL_LOGGER = "0";
+const string gstrDEFAULT_RETAIN_NODES = "1";
+const string gstrDEFAULT_DIFF_COMMAND_LINE = "C:\\Program Files\\KDiff3\\kdiff3.exe %1 %2";
 
 //-------------------------------------------------------------------------------------------------
 // TestResultLoggerDlg dialog
@@ -494,12 +497,12 @@ bool TestResultLoggerDlg::autoScrollEnabled() const
 	// check the flag to scroll logger window in the registry
 	if (!m_apCfgMgr->keyExists("\\", gstrSCROLL_LOGGER_KEY))
 	{
-		m_apCfgMgr->createKey("\\", gstrSCROLL_LOGGER_KEY, "0");
-		return false;
+		m_apCfgMgr->createKey("\\", gstrSCROLL_LOGGER_KEY, gstrDEFAULT_SCROLL_LOGGER);
+		return asCppBool(gstrDEFAULT_SCROLL_LOGGER);
 	}
 
 	// if we reached here, we should use default behavior (no scrolling)
-	return m_apCfgMgr->getKeyValue("\\", gstrSCROLL_LOGGER_KEY) == "1";
+	return asCppBool(m_apCfgMgr->getKeyValue("\\", gstrSCROLL_LOGGER_KEY, gstrDEFAULT_SCROLL_LOGGER));
 }
 //-------------------------------------------------------------------------------------------------
 bool TestResultLoggerDlg::retainTestCaseNodes() const
@@ -507,11 +510,11 @@ bool TestResultLoggerDlg::retainTestCaseNodes() const
 	if (!m_apCfgMgr->keyExists("\\", gstrRETAIN_NODES_KEY))
 	{
 		// by default, always keep the nodes
-		m_apCfgMgr->createKey("\\", gstrRETAIN_NODES_KEY, "1");
-		return true;
+		m_apCfgMgr->createKey("\\", gstrRETAIN_NODES_KEY, gstrDEFAULT_RETAIN_NODES);
+		return asCppBool(gstrDEFAULT_RETAIN_NODES);
 	}
 
-	return m_apCfgMgr->getKeyValue("\\", gstrRETAIN_NODES_KEY) == "1";
+	return asCppBool(m_apCfgMgr->getKeyValue("\\", gstrRETAIN_NODES_KEY, gstrDEFAULT_RETAIN_NODES));
 }
 //-------------------------------------------------------------------------------------------------
 string TestResultLoggerDlg::getDiffString()
@@ -519,14 +522,14 @@ string TestResultLoggerDlg::getDiffString()
 	if( !m_apCfgMgr->keyExists("\\", gstrDIFF_COMMAND_LINE_KEY) )
 	{
 		// Set the default string if one doesnt exist
-		m_apCfgMgr->createKey("\\", gstrDIFF_COMMAND_LINE_KEY, gstrDEFAULT_DIFF_CMD);
+		m_apCfgMgr->createKey("\\", gstrDIFF_COMMAND_LINE_KEY, gstrDEFAULT_DIFF_COMMAND_LINE);
 
 		// Then return the default string
-		return gstrDEFAULT_DIFF_CMD;
+		return gstrDEFAULT_DIFF_COMMAND_LINE;
 	}
 
 	// If a string already exists, return it
-	return m_apCfgMgr->getKeyValue("\\", gstrDIFF_COMMAND_LINE_KEY);
+	return m_apCfgMgr->getKeyValue("\\", gstrDIFF_COMMAND_LINE_KEY, gstrDEFAULT_DIFF_COMMAND_LINE);
 }
 //-------------------------------------------------------------------------------------------------
 void TestResultLoggerDlg::startTestHarness(const string& strHarnessDescription)

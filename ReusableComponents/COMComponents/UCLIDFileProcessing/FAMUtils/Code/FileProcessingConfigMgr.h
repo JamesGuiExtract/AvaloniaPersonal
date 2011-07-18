@@ -122,6 +122,28 @@ private:
 	static const string USE_PRE_NORMALIZED;
 	static const string AUTO_SAVE_FPS_FILE;
 
+	static const string DEFAULT_WINDOW_POS_X;
+	static const string DEFAULT_WINDOW_POS_Y;
+	static const string DEFAULT_WINDOW_SIZE_X;
+	static const string DEFAULT_WINDOW_SIZE_Y;
+	static const string DEFAULT_WINDOW_MAXIMIZED;
+	static const string DEFAULT_SCOPE_LAST_OPENED_FILE_NAME;
+	static const string DEFAULT_SCOPE_LAST_OPENED_FOLDER_NAME;
+	static const string DEFAULT_SCOPE_OPENED_FOLDER_HISTORY;
+	static const string DEFAULT_SCOPE_LAST_USED_FILE_EXTENSION;
+	static const string DEFAULT_SCOPE_LAST_OPENED_LIST_NAME;
+	static const string DEFAULT_MAX_STORED_RECORDS;
+	static const string DEFAULT_RESTRICT_NUM_STORED_RECORDS;
+	static const string DEFAULT_MS_BETWEEN_DB_CHECK;
+	static const string DEFAULT_TIMER_TICK_SPEED;
+	static const string DEFAULT_DB_SERVER_HISTORY;
+	static const string DEFAULT_DB_LOCK_TIMEOUT;
+	static const string DEFAULT_AUTO_SCROLLING;
+	static const string DEFAULT_LAST_GOOD_SERVER;
+	static const string DEFAULT_LAST_GOOD_DATABASE;
+	static const string DEFAULT_USE_PRE_NORMALIZED;
+	static const string DEFAULT_AUTO_SAVE_FPS_FILE;
+
 	// Dialog size bounds
 	static const int DLG_MIN_WIDTH;
 	static const int DLG_MIN_HEIGHT;

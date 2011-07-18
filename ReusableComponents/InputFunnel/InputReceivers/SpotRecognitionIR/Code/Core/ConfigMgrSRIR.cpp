@@ -34,7 +34,26 @@ const string ConfigMgrSRIR::OCR_REGION_TYPE = "OCRRegionType";
 const string ConfigMgrSRIR::LAST_SELECTION_TOOL = "SelectionTool";
 const string ConfigMgrSRIR::FIT_TO_STATUS = "FitToStatus";
 const string ConfigMgrSRIR::DISPLAY_PERCENTAGE = "DisplayPercentageEnabled";
-const int gnDEFAULT_OCR_REGION_TYPE = 0;
+
+const string ConfigMgrSRIR::DEFAULT_LAST_FILE_OPEN_DIR = ".";
+const string ConfigMgrSRIR::DEFAULT_WINDOW_POS_X = "10";
+const string ConfigMgrSRIR::DEFAULT_WINDOW_POS_Y = "10";
+const string ConfigMgrSRIR::DEFAULT_WINDOW_SIZE_X = "280";
+const string ConfigMgrSRIR::DEFAULT_WINDOW_SIZE_Y = "170";
+const string ConfigMgrSRIR::DEFAULT_ZONE_HEIGHT = "45";
+const string ConfigMgrSRIR::DEFAULT_ZONE_COLOR_RED = "255";
+const string ConfigMgrSRIR::DEFAULT_ZONE_COLOR_GREEN = "255";
+const string ConfigMgrSRIR::DEFAULT_ZONE_COLOR_BLUE = "0";
+const string ConfigMgrSRIR::DEFAULT_USED_ZONE_COLOR_RED = "255";
+const string ConfigMgrSRIR::DEFAULT_USED_ZONE_COLOR_GREEN = "192";
+const string ConfigMgrSRIR::DEFAULT_USED_ZONE_COLOR_BLUE = "192";
+const string ConfigMgrSRIR::DEFAULT_AUTO_ROTATE_STEP_SIZE = "4";
+const string ConfigMgrSRIR::DEFAULT_NUM_AUTO_ROTATE_STEPS = "1";
+const string ConfigMgrSRIR::DEFAULT_HEIGHT_PAD_FACTOR = "1.2"; // 20%
+const string ConfigMgrSRIR::DEFAULT_OCR_REGION_TYPE = "0";
+const string ConfigMgrSRIR::DEFAULT_LAST_SELECTION_TOOL = asString((long)kSelectText);
+const string ConfigMgrSRIR::DEFAULT_FIT_TO_STATUS = "1";
+const string ConfigMgrSRIR::DEFAULT_DISPLAY_PERCENTAGE = "0";
 
 // Definitions
 #define	MIN_WIDTH				425
@@ -52,11 +71,13 @@ string ConfigMgrSRIR::getLastFileOpenDirectory(void)
 {
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, LAST_FILE_OPEN_DIR))
 	{
-		m_pCfgMgr->createKey(m_strSectionFolderName, LAST_FILE_OPEN_DIR, ".");
-		return ".";
+		m_pCfgMgr->createKey(m_strSectionFolderName, LAST_FILE_OPEN_DIR,
+			DEFAULT_LAST_FILE_OPEN_DIR);
+		return DEFAULT_LAST_FILE_OPEN_DIR;
 	}
 
-	return m_pCfgMgr->getKeyValue(m_strSectionFolderName, LAST_FILE_OPEN_DIR);
+	return m_pCfgMgr->getKeyValue(m_strSectionFolderName, LAST_FILE_OPEN_DIR,
+		DEFAULT_LAST_FILE_OPEN_DIR);
 }
 
 //---------------------------------------------------------------------------
@@ -74,13 +95,13 @@ void ConfigMgrSRIR::getWindowPos(long &lPosX, long &lPosY)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, WINDOW_POS_X))
 	{
 		// Not found, just default to 10
-		m_pCfgMgr->createKey(m_strSectionFolderName, WINDOW_POS_X, "10");
-		lPosX = 10;
+		m_pCfgMgr->createKey(m_strSectionFolderName, WINDOW_POS_X, DEFAULT_WINDOW_POS_X);
+		lPosX = asLong(DEFAULT_WINDOW_POS_X);
 	}
 	else
 	{
 		// Retrieve X position
-		strX = m_pCfgMgr->getKeyValue(m_strSectionFolderName, WINDOW_POS_X);
+		strX = m_pCfgMgr->getKeyValue(m_strSectionFolderName, WINDOW_POS_X, DEFAULT_WINDOW_POS_X);
 		lPosX = asLong( strX );
 	}
 
@@ -88,13 +109,13 @@ void ConfigMgrSRIR::getWindowPos(long &lPosX, long &lPosY)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, WINDOW_POS_Y))
 	{
 		// Not found, just default to 10
-		m_pCfgMgr->createKey(m_strSectionFolderName, WINDOW_POS_Y, "10");
-		lPosY = 10;
+		m_pCfgMgr->createKey(m_strSectionFolderName, WINDOW_POS_Y, DEFAULT_WINDOW_POS_Y);
+		lPosY = asLong(DEFAULT_WINDOW_POS_Y);
 	}
 	else
 	{
 		// Retrieve Y position
-		strY = m_pCfgMgr->getKeyValue(m_strSectionFolderName, WINDOW_POS_Y);
+		strY = m_pCfgMgr->getKeyValue(m_strSectionFolderName, WINDOW_POS_Y, DEFAULT_WINDOW_POS_Y);
 		lPosY = asLong( strY );
 	}
 }
@@ -122,13 +143,14 @@ void ConfigMgrSRIR::getWindowSize(long &lSizeX, long &lSizeY)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, WINDOW_SIZE_X))
 	{
 		// Not found, just default to 280
-		m_pCfgMgr->createKey( m_strSectionFolderName, WINDOW_SIZE_X, "280" );
-		lSizeX = 280;
+		m_pCfgMgr->createKey( m_strSectionFolderName, WINDOW_SIZE_X, DEFAULT_WINDOW_SIZE_X );
+		lSizeX = asLong(DEFAULT_WINDOW_SIZE_X);
 	}
 	else
 	{
 		// Retrieve width
-		strX = m_pCfgMgr->getKeyValue( m_strSectionFolderName, WINDOW_SIZE_X );
+		strX = m_pCfgMgr->getKeyValue( m_strSectionFolderName, WINDOW_SIZE_X,
+			DEFAULT_WINDOW_SIZE_X );
 		lSizeX = asLong( strX );
 	}
 
@@ -136,13 +158,14 @@ void ConfigMgrSRIR::getWindowSize(long &lSizeX, long &lSizeY)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, WINDOW_SIZE_Y))
 	{
 		// Not found, just default to 170
-		m_pCfgMgr->createKey( m_strSectionFolderName, WINDOW_SIZE_Y, "170" );
-		lSizeY = 170;
+		m_pCfgMgr->createKey( m_strSectionFolderName, WINDOW_SIZE_Y, DEFAULT_WINDOW_SIZE_Y );
+		lSizeY = asLong(DEFAULT_WINDOW_SIZE_Y);
 	}
 	else
 	{
 		// Retrieve height
-		strY = m_pCfgMgr->getKeyValue( m_strSectionFolderName, WINDOW_SIZE_Y );
+		strY = m_pCfgMgr->getKeyValue( m_strSectionFolderName, WINDOW_SIZE_Y,
+			DEFAULT_WINDOW_SIZE_Y );
 		lSizeY = asLong( strY );
 	}
 
@@ -195,13 +218,13 @@ void ConfigMgrSRIR::getZoneHeight(long &lHeight)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, ZONE_HEIGHT))
 	{
 		// Not found, just default to 45
-		m_pCfgMgr->createKey( m_strSectionFolderName, ZONE_HEIGHT, "45" );
-		lHeight = 45;
+		m_pCfgMgr->createKey( m_strSectionFolderName, ZONE_HEIGHT, DEFAULT_ZONE_HEIGHT );
+		lHeight = asLong(DEFAULT_ZONE_HEIGHT);
 	}
 	else
 	{
 		// Retrieve height
-		strHeight = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ZONE_HEIGHT );
+		strHeight = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ZONE_HEIGHT, DEFAULT_ZONE_HEIGHT );
 		lHeight = asLong( strHeight );
 	}
 }
@@ -230,13 +253,14 @@ void ConfigMgrSRIR::getZoneColor(COLORREF &color)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, ZONE_COLOR_RED))
 	{
 		// Not found, just default to 0
-		m_pCfgMgr->createKey( m_strSectionFolderName, ZONE_COLOR_RED, "255");
-		iRed = 255;
+		m_pCfgMgr->createKey( m_strSectionFolderName, ZONE_COLOR_RED, DEFAULT_ZONE_COLOR_RED);
+		iRed = asLong(DEFAULT_ZONE_COLOR_RED);
 	}
 	else
 	{
 		// Retrieve red
-		strRed = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ZONE_COLOR_RED );
+		strRed = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ZONE_COLOR_RED,
+			DEFAULT_ZONE_COLOR_RED );
 		iRed = ::asLong(strRed);
 
 		// Limit color between 0 and 255
@@ -255,13 +279,14 @@ void ConfigMgrSRIR::getZoneColor(COLORREF &color)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, ZONE_COLOR_GREEN))
 	{
 		// Not found, just default to 255
-		m_pCfgMgr->createKey( m_strSectionFolderName, ZONE_COLOR_GREEN, "255" );
-		iGreen = 255;
+		m_pCfgMgr->createKey( m_strSectionFolderName, ZONE_COLOR_GREEN, DEFAULT_ZONE_COLOR_GREEN );
+		iGreen = asLong(DEFAULT_ZONE_COLOR_GREEN);
 	}
 	else
 	{
 		// Retrieve green
-		strGreen = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ZONE_COLOR_GREEN );
+		strGreen = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ZONE_COLOR_GREEN,
+			DEFAULT_ZONE_COLOR_GREEN);
 		iGreen = ::asLong(strGreen);
 
 		// Limit color between 0 and 255
@@ -280,13 +305,14 @@ void ConfigMgrSRIR::getZoneColor(COLORREF &color)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, ZONE_COLOR_BLUE))
 	{
 		// Not found, just default to 255
-		m_pCfgMgr->createKey( m_strSectionFolderName, ZONE_COLOR_BLUE, "0" );
-		iBlue = 0;
+		m_pCfgMgr->createKey( m_strSectionFolderName, ZONE_COLOR_BLUE, DEFAULT_ZONE_COLOR_BLUE );
+		iBlue = asLong(DEFAULT_ZONE_COLOR_BLUE);
 	}
 	else
 	{
 		// Retrieve blue
-		strBlue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ZONE_COLOR_BLUE );
+		strBlue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, ZONE_COLOR_BLUE,
+			DEFAULT_ZONE_COLOR_BLUE );
 		iBlue = ::asLong(strBlue);
 
 		// Limit color between 0 and 255
@@ -346,13 +372,15 @@ void ConfigMgrSRIR::getUsedZoneColor(COLORREF &color)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, USED_ZONE_COLOR_RED))
 	{
 		// Not found, just default to 255
-		m_pCfgMgr->createKey( m_strSectionFolderName, USED_ZONE_COLOR_RED, "255");
-		iRed = 255;
+		m_pCfgMgr->createKey( m_strSectionFolderName, USED_ZONE_COLOR_RED,
+			DEFAULT_USED_ZONE_COLOR_RED);
+		iRed = asLong(DEFAULT_USED_ZONE_COLOR_RED);
 	}
 	else
 	{
 		// Retrieve red
-		strRed = m_pCfgMgr->getKeyValue( m_strSectionFolderName, USED_ZONE_COLOR_RED );
+		strRed = m_pCfgMgr->getKeyValue( m_strSectionFolderName, USED_ZONE_COLOR_RED,
+			DEFAULT_USED_ZONE_COLOR_RED);
 		iRed = ::asLong(strRed);
 
 		// Limit color between 0 and 255
@@ -371,13 +399,15 @@ void ConfigMgrSRIR::getUsedZoneColor(COLORREF &color)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, USED_ZONE_COLOR_GREEN))
 	{
 		// Not found, just default to 192
-		m_pCfgMgr->createKey( m_strSectionFolderName, USED_ZONE_COLOR_GREEN, "192" );
-		iGreen = 255;
+		m_pCfgMgr->createKey( m_strSectionFolderName, USED_ZONE_COLOR_GREEN,
+			DEFAULT_USED_ZONE_COLOR_GREEN );
+		iGreen = asLong(DEFAULT_USED_ZONE_COLOR_GREEN);
 	}
 	else
 	{
 		// Retrieve green
-		strGreen = m_pCfgMgr->getKeyValue( m_strSectionFolderName, USED_ZONE_COLOR_GREEN );
+		strGreen = m_pCfgMgr->getKeyValue( m_strSectionFolderName, USED_ZONE_COLOR_GREEN,
+			DEFAULT_USED_ZONE_COLOR_GREEN);
 		iGreen = ::asLong(strGreen);
 
 		// Limit color between 0 and 255
@@ -396,13 +426,15 @@ void ConfigMgrSRIR::getUsedZoneColor(COLORREF &color)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, USED_ZONE_COLOR_BLUE))
 	{
 		// Not found, just default to 192
-		m_pCfgMgr->createKey( m_strSectionFolderName, USED_ZONE_COLOR_BLUE, "192" );
-		iBlue = 0;
+		m_pCfgMgr->createKey( m_strSectionFolderName, USED_ZONE_COLOR_BLUE,
+			DEFAULT_USED_ZONE_COLOR_BLUE );
+		iBlue = asLong(DEFAULT_USED_ZONE_COLOR_BLUE);
 	}
 	else
 	{
 		// Retrieve blue
-		strBlue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, USED_ZONE_COLOR_BLUE );
+		strBlue = m_pCfgMgr->getKeyValue( m_strSectionFolderName, USED_ZONE_COLOR_BLUE,
+			DEFAULT_USED_ZONE_COLOR_BLUE);
 		iBlue = ::asLong(strBlue);
 
 		// Limit color between 0 and 255
@@ -451,17 +483,19 @@ void ConfigMgrSRIR::setUsedZoneColor(COLORREF color)
 //--------------------------------------------------------------------------------------------------
 unsigned long ConfigMgrSRIR::getNumAutoRotateSteps()
 {
-	unsigned long lResult = 1; // default number of steps
+	unsigned long lResult = asLong(DEFAULT_NUM_AUTO_ROTATE_STEPS); // default number of steps
 
 	// Check for existence of key
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, NUM_AUTO_ROTATE_STEPS))
 	{
-		m_pCfgMgr->createKey(m_strSectionFolderName, NUM_AUTO_ROTATE_STEPS, ::asString(lResult));
+		m_pCfgMgr->createKey(m_strSectionFolderName, NUM_AUTO_ROTATE_STEPS,
+			DEFAULT_NUM_AUTO_ROTATE_STEPS);
 	}
 	else
 	{
 		// key found - return its value
-		string strResult = m_pCfgMgr->getKeyValue(m_strSectionFolderName, NUM_AUTO_ROTATE_STEPS);
+		string strResult = m_pCfgMgr->getKeyValue(m_strSectionFolderName, NUM_AUTO_ROTATE_STEPS,
+			DEFAULT_NUM_AUTO_ROTATE_STEPS);
 		lResult = ::asLong(strResult);
 	}
 
@@ -470,17 +504,18 @@ unsigned long ConfigMgrSRIR::getNumAutoRotateSteps()
 //--------------------------------------------------------------------------------------------------
 unsigned long ConfigMgrSRIR::getAutoRotateStepSize()
 {
-	unsigned long lResult = 4; // default step size
+	unsigned long lResult = asLong(DEFAULT_AUTO_ROTATE_STEP_SIZE); // default step size
 
 	// Check for existence of key
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, AUTO_ROTATE_STEP_SIZE))
 	{
-		m_pCfgMgr->createKey(m_strSectionFolderName, AUTO_ROTATE_STEP_SIZE, ::asString(lResult));
+		m_pCfgMgr->createKey(m_strSectionFolderName, AUTO_ROTATE_STEP_SIZE, DEFAULT_AUTO_ROTATE_STEP_SIZE);
 	}
 	else
 	{
 		// key found - return its value
-		string strResult = m_pCfgMgr->getKeyValue(m_strSectionFolderName, AUTO_ROTATE_STEP_SIZE);
+		string strResult = m_pCfgMgr->getKeyValue(m_strSectionFolderName, AUTO_ROTATE_STEP_SIZE,
+			DEFAULT_AUTO_ROTATE_STEP_SIZE);
 		lResult = ::asLong(strResult);
 	}
 
@@ -489,17 +524,18 @@ unsigned long ConfigMgrSRIR::getAutoRotateStepSize()
 //--------------------------------------------------------------------------------------------------
 int ConfigMgrSRIR::getOCRRegionType()
 {
-	unsigned long iResult = gnDEFAULT_OCR_REGION_TYPE;
+	unsigned long iResult = asLong(DEFAULT_OCR_REGION_TYPE);
 
 	// Check for existence of key
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, OCR_REGION_TYPE))
 	{
-		m_pCfgMgr->createKey(m_strSectionFolderName, OCR_REGION_TYPE, ::asString(iResult));
+		m_pCfgMgr->createKey(m_strSectionFolderName, OCR_REGION_TYPE, DEFAULT_OCR_REGION_TYPE);
 	}
 	else
 	{
 		// key found - return its value
-		string strResult = m_pCfgMgr->getKeyValue(m_strSectionFolderName, OCR_REGION_TYPE);
+		string strResult = m_pCfgMgr->getKeyValue(m_strSectionFolderName, OCR_REGION_TYPE,
+			DEFAULT_OCR_REGION_TYPE);
 		iResult = ::asLong(strResult);
 	}
 
@@ -507,7 +543,7 @@ int ConfigMgrSRIR::getOCRRegionType()
 	// value.
 	if (iResult < 0 || iResult > 2)
 	{
-		iResult = gnDEFAULT_OCR_REGION_TYPE;
+		iResult = asLong(DEFAULT_OCR_REGION_TYPE);
 		setOCRRegionType(iResult);
 	}
 
@@ -522,16 +558,17 @@ void ConfigMgrSRIR::setOCRRegionType(int iValue)
 double ConfigMgrSRIR::getZonePadFactor()
 {
 	// set default to 1.2 (20%)
-	double dPadFactor = 1.2;
+	double dPadFactor = asDouble(DEFAULT_HEIGHT_PAD_FACTOR);
 	
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, HEIGHT_PAD_FACTOR))
 	{
-		m_pCfgMgr->createKey(m_strSectionFolderName, HEIGHT_PAD_FACTOR, ::asString(dPadFactor));
+		m_pCfgMgr->createKey(m_strSectionFolderName, HEIGHT_PAD_FACTOR, DEFAULT_HEIGHT_PAD_FACTOR);
 	}
 	else
 	{
 		// key found - return its value
-		string strResult = m_pCfgMgr->getKeyValue(m_strSectionFolderName, HEIGHT_PAD_FACTOR);
+		string strResult = m_pCfgMgr->getKeyValue(m_strSectionFolderName, HEIGHT_PAD_FACTOR,
+			DEFAULT_HEIGHT_PAD_FACTOR);
 		dPadFactor = ::asDouble(strResult);
 	}
 
@@ -545,13 +582,14 @@ ETool ConfigMgrSRIR::getLastSelectionTool()
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, LAST_SELECTION_TOOL))
 	{
 		// Not found, just default to 45
-		m_pCfgMgr->createKey( m_strSectionFolderName, LAST_SELECTION_TOOL, asString((long)kSelectText) ); // kAnyAngleZone
+		m_pCfgMgr->createKey( m_strSectionFolderName, LAST_SELECTION_TOOL, DEFAULT_LAST_SELECTION_TOOL );
 	}
 
 	// Retrieve tool
-	string	strHeight;
-	strHeight = m_pCfgMgr->getKeyValue( m_strSectionFolderName, LAST_SELECTION_TOOL );
-	return (ETool)asLong( strHeight );
+	string	strTool;
+	strTool = m_pCfgMgr->getKeyValue( m_strSectionFolderName, LAST_SELECTION_TOOL,
+		DEFAULT_LAST_SELECTION_TOOL);
+	return (ETool)asLong( strTool );
 }
 //--------------------------------------------------------------------------------------------------
 void ConfigMgrSRIR::setLastSelectionTool(ETool eTool)
@@ -565,16 +603,13 @@ bool ConfigMgrSRIR::getFitToStatus()
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, FIT_TO_STATUS))
 	{
 		// Set to fit to page if does not exist
-		m_pCfgMgr->createKey(m_strSectionFolderName, FIT_TO_STATUS, "1");
-		return true;
+		m_pCfgMgr->createKey(m_strSectionFolderName, FIT_TO_STATUS, DEFAULT_FIT_TO_STATUS);
+		return DEFAULT_FIT_TO_STATUS == "1";
 	}
 
 	// Retrieve the stataus
-	bool bRet = false;
-	if (m_pCfgMgr->getKeyValue(m_strSectionFolderName, FIT_TO_STATUS) != "0")
-	{
-		bRet = true;
-	}
+	bool bRet = m_pCfgMgr->getKeyValue(m_strSectionFolderName, FIT_TO_STATUS,
+		DEFAULT_FIT_TO_STATUS) == "1";
 
 	return bRet;
 }
@@ -591,16 +626,14 @@ bool ConfigMgrSRIR::getDisplayPercentageEnabled()
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, DISPLAY_PERCENTAGE))
 	{
 		// Set to fit to page if does not exist
-		m_pCfgMgr->createKey(m_strSectionFolderName, DISPLAY_PERCENTAGE, "0");
-		return false;
+		m_pCfgMgr->createKey(m_strSectionFolderName, DISPLAY_PERCENTAGE,
+			DEFAULT_DISPLAY_PERCENTAGE);
+		return asCppBool(DEFAULT_DISPLAY_PERCENTAGE);
 	}
 
 	// Retrieve the stataus
-	bool bRet = false;
-	if (m_pCfgMgr->getKeyValue(m_strSectionFolderName, DISPLAY_PERCENTAGE) != "0")
-	{
-		bRet = true;
-	}
+	bool bRet = asCppBool(m_pCfgMgr->getKeyValue(m_strSectionFolderName, DISPLAY_PERCENTAGE,
+		DEFAULT_DISPLAY_PERCENTAGE));
 
 	return bRet;
 }

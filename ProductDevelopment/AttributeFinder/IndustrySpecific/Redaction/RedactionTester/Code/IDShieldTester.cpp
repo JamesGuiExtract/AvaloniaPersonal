@@ -299,7 +299,8 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			string strOverlapLeniency = "";
 			if( rpm.keyExists(gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_PERCENT_KEY) )
 			{
-				strOverlapLeniency = rpm.getKeyValue( gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_PERCENT_KEY );
+				strOverlapLeniency = rpm.getKeyValue( gstrOVERLAP_PERCENT_FOLDER,
+					gstrOVERLAP_PERCENT_KEY, gstrOVERLAP_DEFAULT_VALUE );
 			}
 			else
 			{
@@ -318,7 +319,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			if (rpm.keyExists(gstrOVERLAP_PERCENT_FOLDER, gstrOVER_REDACTION_PERCENT_KEY))
 			{
 				strOverRedactionERAP = rpm.getKeyValue(gstrOVERLAP_PERCENT_FOLDER, 
-					gstrOVER_REDACTION_PERCENT_KEY);
+					gstrOVER_REDACTION_PERCENT_KEY, gstrOVER_REDACTION_ERAP_DEFAULT_VALUE);
 			}
 			else
 			{
@@ -337,7 +338,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			if (rpm.keyExists(gstrOVERLAP_PERCENT_FOLDER, gstrOVERLAP_MINUMUM_PERCENT_KEY))
 			{
 				strOverlapMinimumPercent = rpm.getKeyValue(gstrOVERLAP_PERCENT_FOLDER, 
-					gstrOVERLAP_MINUMUM_PERCENT_KEY);
+					gstrOVERLAP_MINUMUM_PERCENT_KEY, gstrOVERLAP_MINUMUM_DEFAULT_VALUE);
 			}
 			else
 			{

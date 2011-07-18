@@ -162,7 +162,7 @@ TimeRollbackPreventer::TimeRollbackPreventer(bool bLaunchThread)
 				// Attempt to get the TRP RW value from the registry, if the value is not
 				// there or invalid, just use the default value
 				string strTimeOut = ma_pRollbackCfgMgr->getKeyValue(
-					strCOMLM_CORE_SETTINGS, strTRP_RW_TIMEOUT_KEY);
+					strCOMLM_CORE_SETTINGS, strTRP_RW_TIMEOUT_KEY, asString(ulDEFAULT_RW_TIME0UT));
 				if (!strTimeOut.empty())
 				{
 					m_ulRWTimeout = asUnsignedLong(strTimeOut);
@@ -785,7 +785,7 @@ string TimeRollbackPreventer::getRemoteDateTimeString(const string& strPath, con
 			return "";
 		}
 
-		return ma_pRollbackCfgMgr->getKeyValue( strPath, strKey );
+		return ma_pRollbackCfgMgr->getKeyValue( strPath, strKey, "" );
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10703")
 }
@@ -823,7 +823,7 @@ void TimeRollbackPreventer::handleUnlockCode()
 			{
 				// Retrieve string
 				string	strCount = ma_pRollbackCfgMgr->getKeyValue( 
-					COUNT_SECTION_NAME, COUNT );
+					COUNT_SECTION_NAME, COUNT, "" );
 
 				// Convert to value
 				if (strCount.length() > 0)
@@ -842,7 +842,7 @@ void TimeRollbackPreventer::handleUnlockCode()
 					asString( i + 1 ) ))
 				{
 					strPreviousCode = ma_pRollbackCfgMgr->getKeyValue( 
-						UNLOCK_SECTION_NAME, asString( i + 1 ) );
+						UNLOCK_SECTION_NAME, asString( i + 1 ), "" );
 				}
 
 				// Compare codes

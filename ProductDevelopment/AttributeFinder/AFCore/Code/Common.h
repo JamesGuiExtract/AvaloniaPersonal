@@ -11,12 +11,14 @@ const std::string gstrAF_REG_SETTINGS_FOLDER_PATH = gstrAF_REG_ROOT_FOLDER_PATH 
 const std::string gstrAF_REG_UTILS_FOLDER_PATH = gstrAF_REG_ROOT_FOLDER_PATH + std::string("\\Utils");
 
 const std::string gstrAF_AUTO_ENCRYPT_KEY = "AutoEncrypt";
+const std::string gstrAF_DEFAULT_AUTO_ENCRYPT = "0";
 const std::string gstrAF_AUTO_ENCRYPT_KEY_PATH = gstrAF_REG_SETTINGS_FOLDER_PATH + std::string("\\") + gstrAF_AUTO_ENCRYPT_KEY;
 
 const std::string gstrAF_AFCORE_KEY = "AFCore";
 const std::string gstrAF_AFCORE_KEY_PATH = gstrAF_REG_ROOT_FOLDER_PATH + std::string("\\") + gstrAF_AFCORE_KEY;
 
 const std::string gstrAF_CACHE_RSD_KEY = "CacheRSD";
+const std::string gstrAF_DEFAULT_CACHE_RSD = "0";
 
 const std::string gstrAF_REG_FEEDBACK_FOLDER = "\\FeedbackManager";
 const std::string gstrAF_FEEDBACK_PROGID_KEY = "ProgID";

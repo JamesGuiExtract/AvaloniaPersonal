@@ -182,6 +182,20 @@ private:
 	static const string DIFF_COMMAND_LINE_KEY;
 	static const string AUTOOPENIMAGE_KEY;
 	static const string AUTOEXPANDATTRIBUTES_KEY;
+
+	static const string DEFAULT_AUTOENCRYPT_KEY;
+	static const string DEFAULT_LOADONCE_KEY;
+	static const string DEFAULT_EFALOG_KEY;
+	static const string DEFAULT_RULEIDTAG_KEY;
+	static const string DEFAULT_PREFIX_KEY;
+	static const string DEFAULT_ROOTFOLDER_KEY;
+	static const string DEFAULT_DATAFOLDER_KEY;
+	static const string DEFAULT_SCROLLLOGGER_KEY;
+	static const string DEFAULT_ENDSLOG_KEY;
+	static const string DEFAULT_DISPLAY_PERCENTAGE_KEY;
+	static const string DEFAULT_DIFF_COMMAND_LINE_KEY;
+	static const string DEFAULT_AUTOOPENIMAGE_KEY;
+	static const string DEFAULT_AUTOEXPANDATTRIBUTES_KEY;
 };
 
 //{{AFX_INSERT_LOCATION}}

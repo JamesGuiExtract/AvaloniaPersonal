@@ -913,7 +913,7 @@ void GridDrawer::loadLayersFromINI( std::string strINIFile )
 
 	for ( ELayer i = kSection; i <= kQQQQLayer; i = (ELayer)((int)i + 1) )
 	{
-		strLayerName = mgrSettings.getKeyValue( strFolder, mapLCodeToName[i] );
+		strLayerName = mgrSettings.getKeyValue( strFolder, mapLCodeToName[i], "" );
 		if ( !strLayerName.empty() )
 		{
 			m_mapLayerCodeToName[i] = strLayerName ;

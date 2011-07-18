@@ -38,7 +38,7 @@ namespace Extract.Testing.Utilities
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FormUtilities" /> class.
+        /// Initializes a new instance of the <see cref="EventCounters" /> class.
         /// </summary>
         public EventCounters()
         {

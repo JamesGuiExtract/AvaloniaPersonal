@@ -76,14 +76,16 @@ ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 		}
 		
 		// Retrieve the SecureDeleteAllSensitiveFiles setting and convert to a bool.
-		string strDeleteAll = machineCfgMgr.getKeyValue(sstrRegPath, gstrSECURE_DELETE_ALL);
-		sbAlwaysUseSecureDeleter = (_stricmp(strDeleteAll.c_str(), "True") == 0);
+		string strDeleteAll = machineCfgMgr.getKeyValue(sstrRegPath, gstrSECURE_DELETE_ALL,
+			gstrDEFAULT_SECURE_DELETE_ALL);
+		sbAlwaysUseSecureDeleter = !strDeleteAll.empty() && asCppBool(strDeleteAll);
 
 		// Retrieve theSecureDeleter setting (if it exists).
 		string strSecureFileDeleterProgID;
 		if (machineCfgMgr.keyExists(sstrRegPath, gstrSECURE_DELETER))
 		{
-			strSecureFileDeleterProgID = machineCfgMgr.getKeyValue(sstrRegPath, gstrSECURE_DELETER);
+			strSecureFileDeleterProgID = machineCfgMgr.getKeyValue(sstrRegPath, gstrSECURE_DELETER,
+				gstrDEFAULT_SECURE_DELETER);
 		}
 		else
 		{
@@ -142,7 +144,7 @@ void getFileAccessRetryCountAndTimeout(int& riRetryCount, int& riRetryTimeout)
 
 		// Retrieve file access timeout
 		string strTimeout = machineCfgMgr.getKeyValue( gstrBASEUTILS_REG_PATH,
-			gstrFILE_ACCESS_TIMEOUT );
+			gstrFILE_ACCESS_TIMEOUT, gstrDEFAULT_FILE_ACCESS_TIMEOUT );
 		siTimeout = asLong( strTimeout);
 
 		// Get the number of retries
@@ -156,7 +158,7 @@ void getFileAccessRetryCountAndTimeout(int& riRetryCount, int& riRetryTimeout)
 
 		// Retrieve number of retries
 		string strRetries = machineCfgMgr.getKeyValue( gstrBASEUTILS_REG_PATH,
-			gstrFILE_ACCESS_RETRIES );
+			gstrFILE_ACCESS_RETRIES, gstrDEFAULT_FILE_ACCESS_RETRIES );
 		siRetries = asLong( strRetries);
 	}
 

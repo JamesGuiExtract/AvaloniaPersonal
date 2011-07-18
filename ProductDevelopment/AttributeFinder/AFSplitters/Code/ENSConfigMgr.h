@@ -23,6 +23,7 @@ private:
 	// Data
 	///////
 	static const std::string MOVE_NAMES;
+	static const std::string DEFAULT_MOVE_NAMES;
 
 	IConfigurationSettingsPersistenceMgr* m_pCfgMgr;
 

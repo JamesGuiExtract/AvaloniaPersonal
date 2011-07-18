@@ -30,6 +30,20 @@ const string TesterConfigMgr::TYPE_COLUMN_WIDTH = "TypeColumnWidth";
 const string TesterConfigMgr::LAST_FILE_SAVE_DIR = "LastFileSaveDirectory";
 const string TesterConfigMgr::AUTO_EXPAND_ATTRIBUTES = "AutoExpandAttributes";
 
+const string TesterConfigMgr::DEFAULT_LAST_FILE_OPEN_DIR = ".";
+const string TesterConfigMgr::DEFAULT_LAST_FILE_NAME = "";
+const string TesterConfigMgr::DEFAULT_WINDOW_POS_X = "10";
+const string TesterConfigMgr::DEFAULT_WINDOW_POS_Y = "10";
+const string TesterConfigMgr::DEFAULT_WINDOW_SIZE_X = "280";
+const string TesterConfigMgr::DEFAULT_WINDOW_SIZE_Y = "170";
+const string TesterConfigMgr::DEFAULT_ALL_ATTRIBUTES_TEST_SCOPE = "0";
+const string TesterConfigMgr::DEFAULT_NAME_COLUMN_WIDTH = "125";
+const string TesterConfigMgr::DEFAULT_SPLITTER_POS_Y = "205";
+const string TesterConfigMgr::DEFAULT_SHOW_ONLY_VALID_ENTRIES = "0";
+const string TesterConfigMgr::DEFAULT_TYPE_COLUMN_WIDTH = "125";
+const string TesterConfigMgr::DEFAULT_LAST_FILE_SAVE_DIR = ".";
+const string TesterConfigMgr::DEFAULT_AUTO_EXPAND_ATTRIBUTES = "0";
+
 // Minimum width and height for the dialog
 const int	TesterConfigMgr::giRTDLG_MIN_WIDTH = 380;
 const int	TesterConfigMgr::giRTDLG_MIN_HEIGHT = 410;
@@ -51,11 +65,11 @@ string TesterConfigMgr::getLastFileOpenDirectory(void)
 {
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, LAST_FILE_OPEN_DIR))
 	{
-		m_pCfgMgr->createKey(m_strSectionFolderName, LAST_FILE_OPEN_DIR, ".");
-		return ".";
+		m_pCfgMgr->createKey(m_strSectionFolderName, LAST_FILE_OPEN_DIR, DEFAULT_LAST_FILE_OPEN_DIR);
+		return DEFAULT_LAST_FILE_OPEN_DIR;
 	}
 
-	return m_pCfgMgr->getKeyValue(m_strSectionFolderName, LAST_FILE_OPEN_DIR);
+	return m_pCfgMgr->getKeyValue(m_strSectionFolderName, LAST_FILE_OPEN_DIR, DEFAULT_LAST_FILE_OPEN_DIR);
 }
 //-------------------------------------------------------------------------------------------------
 void TesterConfigMgr::setLastFileOpenDirectory(const string& strFileDir)
@@ -67,11 +81,11 @@ string TesterConfigMgr::getLastFileName(void)
 {
 	if (!m_pCfgMgr->keyExists( m_strSectionFolderName, LAST_FILE_NAME ))
 	{
-		m_pCfgMgr->createKey( m_strSectionFolderName, LAST_FILE_NAME, "" );
-		return "";
+		m_pCfgMgr->createKey( m_strSectionFolderName, LAST_FILE_NAME, DEFAULT_LAST_FILE_NAME );
+		return DEFAULT_LAST_FILE_NAME;
 	}
 
-	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, LAST_FILE_NAME );
+	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, LAST_FILE_NAME, DEFAULT_LAST_FILE_NAME );
 }
 //-------------------------------------------------------------------------------------------------
 void TesterConfigMgr::setLastFileName(const string& strFileName)
@@ -89,13 +103,13 @@ void TesterConfigMgr::getWindowPos(long &lPosX, long &lPosY)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, WINDOW_POS_X))
 	{
 		// Not found, just default to 10
-		m_pCfgMgr->createKey(m_strSectionFolderName, WINDOW_POS_X, "10");
+		m_pCfgMgr->createKey(m_strSectionFolderName, WINDOW_POS_X, DEFAULT_WINDOW_POS_X);
 		lPosX = 10;
 	}
 	else
 	{
 		// Retrieve X position
-		strX = m_pCfgMgr->getKeyValue(m_strSectionFolderName, WINDOW_POS_X);
+		strX = m_pCfgMgr->getKeyValue(m_strSectionFolderName, WINDOW_POS_X, DEFAULT_WINDOW_POS_X);
 		lPosX = asLong( strX );
 	}
 
@@ -103,13 +117,13 @@ void TesterConfigMgr::getWindowPos(long &lPosX, long &lPosY)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, WINDOW_POS_Y))
 	{
 		// Not found, just default to 10
-		m_pCfgMgr->createKey(m_strSectionFolderName, WINDOW_POS_Y, "10");
+		m_pCfgMgr->createKey(m_strSectionFolderName, WINDOW_POS_Y, DEFAULT_WINDOW_POS_Y);
 		lPosY = 10;
 	}
 	else
 	{
 		// Retrieve Y position
-		strY = m_pCfgMgr->getKeyValue(m_strSectionFolderName, WINDOW_POS_Y);
+		strY = m_pCfgMgr->getKeyValue(m_strSectionFolderName, WINDOW_POS_Y, DEFAULT_WINDOW_POS_Y);
 		lPosY = asLong( strY );
 	}
 }
@@ -136,13 +150,13 @@ void TesterConfigMgr::getWindowSize(long &lSizeX, long &lSizeY)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, WINDOW_SIZE_X))
 	{
 		// Not found, just default to 280
-		m_pCfgMgr->createKey( m_strSectionFolderName, WINDOW_SIZE_X, "280" );
+		m_pCfgMgr->createKey( m_strSectionFolderName, WINDOW_SIZE_X, DEFAULT_WINDOW_SIZE_X );
 		lSizeX = 280;
 	}
 	else
 	{
 		// Retrieve width
-		strX = m_pCfgMgr->getKeyValue( m_strSectionFolderName, WINDOW_SIZE_X );
+		strX = m_pCfgMgr->getKeyValue( m_strSectionFolderName, WINDOW_SIZE_X, DEFAULT_WINDOW_SIZE_X );
 		lSizeX = asLong( strX );
 	}
 
@@ -150,13 +164,13 @@ void TesterConfigMgr::getWindowSize(long &lSizeX, long &lSizeY)
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, WINDOW_SIZE_Y))
 	{
 		// Not found, just default to 170
-		m_pCfgMgr->createKey( m_strSectionFolderName, WINDOW_SIZE_Y, "170" );
+		m_pCfgMgr->createKey( m_strSectionFolderName, WINDOW_SIZE_Y, DEFAULT_WINDOW_SIZE_Y );
 		lSizeY = 170;
 	}
 	else
 	{
 		// Retrieve height
-		strY = m_pCfgMgr->getKeyValue( m_strSectionFolderName, WINDOW_SIZE_Y );
+		strY = m_pCfgMgr->getKeyValue( m_strSectionFolderName, WINDOW_SIZE_Y, DEFAULT_WINDOW_SIZE_Y );
 		lSizeY = asLong( strY );
 	}
 
@@ -211,14 +225,14 @@ bool TesterConfigMgr::getAllAttributesTestScope()
 	{
 		// Not found, just default to 0 - False
 		m_pCfgMgr->createKey( m_strSectionFolderName, ALL_ATTRIBUTES_TEST_SCOPE, 
-			"0" );
+			DEFAULT_ALL_ATTRIBUTES_TEST_SCOPE );
 	}
 	else
 	{
 		// Retrieve scope
 		strScope = m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-			ALL_ATTRIBUTES_TEST_SCOPE );
-		bAllAttributes = asLong( strScope ) ? true : false;
+			ALL_ATTRIBUTES_TEST_SCOPE, DEFAULT_ALL_ATTRIBUTES_TEST_SCOPE );
+		bAllAttributes = asCppBool( strScope );
 	}
 
 	return bAllAttributes;
@@ -253,7 +267,7 @@ string TesterConfigMgr::getLastInputType(void)
 		return gstrMANUALTEXT;
 	}
 
-	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, LAST_INPUT_TYPE );
+	return m_pCfgMgr->getKeyValue( m_strSectionFolderName, LAST_INPUT_TYPE, gstrMANUALTEXT );
 }
 //-------------------------------------------------------------------------------------------------
 void TesterConfigMgr::setLastInputType(const string& strType)
@@ -273,13 +287,13 @@ long TesterConfigMgr::getNameColumnWidth()
 	{
 		// Not found, just default to one-third of minimum width
 		m_pCfgMgr->createKey( m_strSectionFolderName, NAME_COLUMN_WIDTH, 
-			"125" );
+			DEFAULT_NAME_COLUMN_WIDTH );
 	}
 	else
 	{
 		// Retrieve column width
 		strWidth = m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-			NAME_COLUMN_WIDTH );
+			NAME_COLUMN_WIDTH, DEFAULT_NAME_COLUMN_WIDTH );
 		lColumnWidth = asLong( strWidth );
 	}
 
@@ -308,13 +322,13 @@ long TesterConfigMgr::getSplitterPosition()
 	{
 		// Not found, just default to half of minimum height
 		m_pCfgMgr->createKey( m_strSectionFolderName, SPLITTER_POS_Y, 
-			"205" );
+			DEFAULT_SPLITTER_POS_Y );
 	}
 	else
 	{
 		// Retrieve splitter position
 		strPosition = m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-			SPLITTER_POS_Y );
+			SPLITTER_POS_Y, DEFAULT_SPLITTER_POS_Y );
 		lPosition = asLong( strPosition );
 	}
 
@@ -343,14 +357,14 @@ bool TesterConfigMgr::getShowOnlyValidEntries()
 	{
 		// Not found, just default to 0 - False ---> All entries will be shown
 		m_pCfgMgr->createKey( m_strSectionFolderName, SHOW_ONLY_VALID_ENTRIES, 
-			"0" );
+			DEFAULT_SHOW_ONLY_VALID_ENTRIES );
 	}
 	else
 	{
 		// Retrieve setting
 		strValid = m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-			SHOW_ONLY_VALID_ENTRIES );
-		bShowValid = asLong( strValid ) ? true : false;
+			SHOW_ONLY_VALID_ENTRIES, DEFAULT_SHOW_ONLY_VALID_ENTRIES );
+		bShowValid = asCppBool( strValid );
 	}
 
 	return bShowValid;
@@ -385,13 +399,13 @@ long TesterConfigMgr::getTypeColumnWidth()
 	{
 		// Not found, just default to one-third of minimum width
 		m_pCfgMgr->createKey( m_strSectionFolderName, TYPE_COLUMN_WIDTH, 
-			"125" );
+			DEFAULT_TYPE_COLUMN_WIDTH );
 	}
 	else
 	{
 		// Retrieve column width
 		strWidth = m_pCfgMgr->getKeyValue( m_strSectionFolderName, 
-			TYPE_COLUMN_WIDTH );
+			TYPE_COLUMN_WIDTH, DEFAULT_TYPE_COLUMN_WIDTH );
 		lColumnWidth = asLong( strWidth );
 	}
 
@@ -414,11 +428,11 @@ string TesterConfigMgr::getLastFileSaveDirectory(void)
 {
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, LAST_FILE_SAVE_DIR))
 	{
-		m_pCfgMgr->createKey(m_strSectionFolderName, LAST_FILE_SAVE_DIR, ".");
-		return ".";
+		m_pCfgMgr->createKey(m_strSectionFolderName, LAST_FILE_SAVE_DIR, DEFAULT_LAST_FILE_SAVE_DIR);
+		return DEFAULT_LAST_FILE_SAVE_DIR;
 	}
 
-	return m_pCfgMgr->getKeyValue(m_strSectionFolderName, LAST_FILE_SAVE_DIR);
+	return m_pCfgMgr->getKeyValue(m_strSectionFolderName, LAST_FILE_SAVE_DIR, DEFAULT_LAST_FILE_SAVE_DIR);
 }
 //-------------------------------------------------------------------------------------------------
 void TesterConfigMgr::setLastFileSaveDirectory(const string& strFileDir)
@@ -432,13 +446,13 @@ bool TesterConfigMgr::getAutoExpandAttributes()
 
 	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, AUTO_EXPAND_ATTRIBUTES))
 	{
-		m_pCfgMgr->createKey(m_strSectionFolderName, AUTO_EXPAND_ATTRIBUTES, "0");
+		m_pCfgMgr->createKey(m_strSectionFolderName, AUTO_EXPAND_ATTRIBUTES, DEFAULT_AUTO_EXPAND_ATTRIBUTES);
 	}
 	else
 	{
 		// Retrieve setting
 		string strAutoExpand = m_pCfgMgr->getKeyValue( m_strSectionFolderName,
-			AUTO_EXPAND_ATTRIBUTES);
+			AUTO_EXPAND_ATTRIBUTES, DEFAULT_AUTO_EXPAND_ATTRIBUTES);
 		bAutoExpand = strAutoExpand != "0";
 	}
 

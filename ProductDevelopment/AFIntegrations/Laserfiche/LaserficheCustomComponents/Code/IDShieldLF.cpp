@@ -166,12 +166,10 @@ CIDShieldLF::CIDShieldLF()
 		ASSERT_RESOURCE_ALLOCATION("ELI20945", m_apLocalMachineRegSettings.get() != NULL);
 
 		// Load the max documents that are processable at one time via a Client session.
-		if (m_apLocalMachineRegSettings->keyExists(gstrREG_LASERFICHE_KEY, gstrREG_MAX_DOCS_TO_PROCESS))
-		{
-			string strMaxDocsToProcess = 
-				m_apLocalMachineRegSettings->getKeyValue(gstrREG_LASERFICHE_KEY, gstrREG_MAX_DOCS_TO_PROCESS);
-			m_nMaxDocsToProcess = asLong(strMaxDocsToProcess);
-		}
+		string strMaxDocsToProcess = 
+			m_apLocalMachineRegSettings->getKeyValue(gstrREG_LASERFICHE_KEY,
+			gstrREG_MAX_DOCS_TO_PROCESS, gnMAX_DOCS_TO_PROCESS_DEFAULT);
+		m_nMaxDocsToProcess = asLong(strMaxDocsToProcess);
 
 		// Initialize deafult search types
 		m_RepositorySettings.strDocumentSearchType = gstrDEFAULT_DOCUMENT_SEARCH_TYPE;
@@ -238,19 +236,9 @@ STDMETHODIMP CIDShieldLF::ConnectPrompt(EConnectionMode eConnectionMode, VARIANT
 		}
 
 		// Retrieve any connection settings cached to the registry
-		string strServer, strRepository, strUser, strPassword;
-		if (m_apCurrentUserRegSettings->keyExists(gstrREG_CONSOLE_KEY, gstrREG_SERVER))
-		{
-			strServer = m_apCurrentUserRegSettings->getKeyValue(gstrREG_CONSOLE_KEY, gstrREG_SERVER);
-		}
-		if (m_apCurrentUserRegSettings->keyExists(gstrREG_CONSOLE_KEY, gstrREG_REPOSITORY))
-		{
-			strRepository = m_apCurrentUserRegSettings->getKeyValue(gstrREG_CONSOLE_KEY, gstrREG_REPOSITORY);
-		}
-		if (m_apCurrentUserRegSettings->keyExists(gstrREG_CONSOLE_KEY, gstrREG_SERVER))
-		{
-			strUser = m_apCurrentUserRegSettings->getKeyValue(gstrREG_CONSOLE_KEY, gstrREG_USER);
-		}
+		string strServer = m_apCurrentUserRegSettings->getKeyValue(gstrREG_CONSOLE_KEY, gstrREG_SERVER, "");
+		string strRepository = m_apCurrentUserRegSettings->getKeyValue(gstrREG_CONSOLE_KEY, gstrREG_REPOSITORY, "");
+		string strUser = m_apCurrentUserRegSettings->getKeyValue(gstrREG_CONSOLE_KEY, gstrREG_USER);
 
 		// Initialize a wait dialog
 		m_apDlgWait.reset(new CWaitDlg(NULL));
@@ -471,7 +459,7 @@ STDMETHODIMP CIDShieldLF::ConnectToActiveClient(EConnectionMode eConnectionMode,
 					if (!bGotRepositoryInfo)
 					{
 						string strDefaultLogin = 
-							m_apCurrentUserRegSettings->getKeyValue(gstrREG_CLIENT_LOGINS_KEY, "");
+							m_apCurrentUserRegSettings->getKeyValue(gstrREG_CLIENT_LOGINS_KEY, "", "");
 
 						if (!strDefaultLogin.empty())
 						{
@@ -502,7 +490,7 @@ STDMETHODIMP CIDShieldLF::ConnectToActiveClient(EConnectionMode eConnectionMode,
 					if (m_apCurrentUserRegSettings->keyExists(gstrREG_CLIENT_LOGINS_KEY, strRegKey))
 					{
 						strPassword = m_apCurrentUserRegSettings->getKeyValue(
-							gstrREG_CLIENT_LOGINS_KEY, strRegKey);
+							gstrREG_CLIENT_LOGINS_KEY, strRegKey, "");
 						decryptPassword(strPassword);
 
 						try
@@ -799,13 +787,13 @@ STDMETHODIMP CIDShieldLF::StartBackgroundProcessing(void)
 
 		// Retrieve the login credentials from the registry
 		string strServer = 
-			m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_SERVER);
+			m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_SERVER, "");
 		string strRepository = 
-			m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_REPOSITORY);
+			m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_REPOSITORY, "");
 		string strUser = 
-			m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_USER);
+			m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_USER, "");
 		string strPassword = 
-			m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_PASSWORD);
+			m_apLocalMachineRegSettings->getKeyValue(gstrREG_SERVICE_KEY, gstrREG_PASSWORD, "");
 		decryptPassword(strPassword);
 
 		// Attempt and validate a connection to Laserfiche.
@@ -1302,27 +1290,27 @@ void CIDShieldLF::loadSettings(bool bReload/* = false*/)
 		m_RepositorySettings.strMasterRSD = m_apSettingsMgr->getKeyValue(
 			gstrINI_SECTION_REDACTION, gstrINI_MASTERRSD);
 
-		string strHCData = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_REDACTION, gstrINI_HCDATA);
+		string strHCData = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_REDACTION, gstrINI_HCDATA, "");
 		m_RepositorySettings.bRedactHCData = (strHCData.empty() ? true : asCppBool(strHCData));
 
-		string strMCData = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_REDACTION, gstrINI_MCDATA);
+		string strMCData = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_REDACTION, gstrINI_MCDATA, "");
 		m_RepositorySettings.bRedactMCData = (strMCData.empty() ? true : asCppBool(strMCData));
 
-		string strLCData = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_REDACTION, gstrINI_LCDATA);
+		string strLCData = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_REDACTION, gstrINI_LCDATA, "");
 		m_RepositorySettings.bRedactLCData = (strLCData.empty() ? true : asCppBool(strLCData));
 
-		string strAutoTag = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_VERIFICATION, gstrINI_AUTO_TAG);
+		string strAutoTag = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_VERIFICATION, gstrINI_AUTO_TAG, "");
 		m_RepositorySettings.bAutoTagForVerify = (strAutoTag.empty() ? true : asCppBool(strAutoTag));
 
-		string strTagAll = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_VERIFICATION, gstrINI_TAG_ALL);
+		string strTagAll = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_VERIFICATION, gstrINI_TAG_ALL, "");
 		m_RepositorySettings.bTagAllForVerify = (strTagAll.empty() ? true : asCppBool(strTagAll));
 
-		string strOnDemand = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_VERIFICATION, gstrINI_ON_DEMAND);
+		string strOnDemand = m_apSettingsMgr->getKeyValue(gstrINI_SECTION_VERIFICATION, gstrINI_ON_DEMAND, "");
 		m_RepositorySettings.bOnDemandVerify = (strOnDemand.empty() ? true : asCppBool(strOnDemand));
 
 		// [FlexIDSIntegrations:51]
 		string strEnsureTextRedactions =
-			m_apSettingsMgr->getKeyValue(gstrINI_SECTION_VERIFICATION, gstrINI_ENSURE_TEXT_REDACTIONS);
+			m_apSettingsMgr->getKeyValue(gstrINI_SECTION_VERIFICATION, gstrINI_ENSURE_TEXT_REDACTIONS, "");
 		m_RepositorySettings.bEnsureTextRedactions =
 			(strEnsureTextRedactions.empty() ? true : asCppBool(strEnsureTextRedactions));
 
@@ -1332,17 +1320,17 @@ void CIDShieldLF::loadSettings(bool bReload/* = false*/)
 		// specified in the ini file to allow customers flexibility in how searches are performed.
 		// (The search types are not exposed in the admin console UI, however)
 		string strDocumentSearchType = m_apSettingsMgr->getKeyValue(
-				gstrINI_SEARCH_SECTION, gstrINI_DOCUMENT_SEARCH_TYPE);
+				gstrINI_SEARCH_SECTION, gstrINI_DOCUMENT_SEARCH_TYPE, "");
 		m_RepositorySettings.strDocumentSearchType = 
 			(strDocumentSearchType.empty() ? gstrDEFAULT_DOCUMENT_SEARCH_TYPE : strDocumentSearchType);
 
 		string strFolderSearchType = m_apSettingsMgr->getKeyValue(
-				gstrINI_SEARCH_SECTION, gstrINI_FOLDER_SEARCH_TYPE);
+				gstrINI_SEARCH_SECTION, gstrINI_FOLDER_SEARCH_TYPE, "");
 		m_RepositorySettings.strFolderSearchType = 
 			(strFolderSearchType.empty() ? gstrDEFAULT_FOLDER_SEARCH_TYPE : strFolderSearchType);
 
 		string strAllSearchType = m_apSettingsMgr->getKeyValue(
-				gstrINI_SEARCH_SECTION, gstrINI_ALL_SEARCH_TYPE);
+				gstrINI_SEARCH_SECTION, gstrINI_ALL_SEARCH_TYPE, "");
 		m_RepositorySettings.strAllSearchType =
 			(strAllSearchType.empty() ? gstrDEFAULT_ALL_SEARCH_TYPE : strAllSearchType);
 	}
@@ -2395,7 +2383,7 @@ UINT CIDShieldLF::runBackgroundMasterThread(LPVOID pData)
 			{
 				string strBackgroundSearchInterval = 
 					pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(
-					gstrREG_SERVICE_KEY, gstrREG_SEARCH_INTERVAL);
+					gstrREG_SERVICE_KEY, gstrREG_SEARCH_INTERVAL, gnMAX_BACKGROUND_SEARCH_INTERVAL_DEFAULT);
 				m_nBackgroundSearchInterval = asLong(strBackgroundSearchInterval);
 			}
 
@@ -2405,7 +2393,7 @@ UINT CIDShieldLF::runBackgroundMasterThread(LPVOID pData)
 																	gstrREG_THREAD_COUNT))
 			{
 				strThreadCount = pIDShieldLF->m_apLocalMachineRegSettings->getKeyValue(
-					gstrREG_SERVICE_KEY, gstrREG_THREAD_COUNT);
+					gstrREG_SERVICE_KEY, gstrREG_THREAD_COUNT, strThreadCount);
 			}
 
 			int nThreadCount = asLong(strThreadCount);

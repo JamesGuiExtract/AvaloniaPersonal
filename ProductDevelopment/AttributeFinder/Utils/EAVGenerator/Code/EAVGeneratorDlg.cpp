@@ -31,6 +31,7 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 const string gstrVOAVIEWER_SECTION = "\\AttributeFinder\\Utils\\EAVGenerator";
 const string gstrAUTOOPENIMAGE_KEY = "AutoOpenImage";
+const string gstrDEFAULT_AUTOOPENIMAGE = "1";
 
 const string gstrDEFAULT_NEW_SWIPE_NAME = "Manual";
 
@@ -66,19 +67,21 @@ CEAVGeneratorDlg::CEAVGeneratorDlg(CWnd* pParent /*=NULL*/)
 		if (!rpmVOA.keyExists(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY))
 		{
 			// create the key and default to off
-			rpmVOA.createKey(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY, "1");
+			rpmVOA.createKey(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY,
+				gstrDEFAULT_AUTOOPENIMAGE);
 			
 			// set m_bAutoOpenImageEnabled = false;
-			m_bAutoOpenImageEnabled = false;
+			m_bAutoOpenImageEnabled = asCppBool(gstrDEFAULT_AUTOOPENIMAGE);
 		}
 		else
 		{
 			// key exists, so read from the registry
 			string strAutoOpenImageKey = 
-				rpmVOA.getKeyValue(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY);
+				rpmVOA.getKeyValue(gstrVOAVIEWER_SECTION, gstrAUTOOPENIMAGE_KEY,
+					gstrDEFAULT_AUTOOPENIMAGE);
 
 			// set the AutoOpenImage value
-			m_bAutoOpenImageEnabled = (strAutoOpenImageKey == "1");
+			m_bAutoOpenImageEnabled = asCppBool(strAutoOpenImageKey);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06189")

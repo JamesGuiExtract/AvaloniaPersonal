@@ -268,7 +268,7 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 				{
 					// get the key value. If it is "1", then auto-encrypt 
 					// setting is on
-					if (pSettings->getKeyValue(strRegFolder, strRegKey) == "1")
+					if (pSettings->getKeyValue(strRegFolder, strRegKey, "0") == "1")
 					{
 						bAutoEncryptOn = true;
 					}

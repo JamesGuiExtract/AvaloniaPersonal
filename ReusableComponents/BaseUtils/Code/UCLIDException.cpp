@@ -2127,7 +2127,7 @@ string UCLIDException::getRemoteLoggingAddress()
 			if (machineCfgMgr.keyExists( gstrBASEUTILS_REG_PATH, gstrREMOTE_EXCEPTION_LOGGER_KEY ))
 			{
 				ms_strRemoteExceptionLoggerAddress = machineCfgMgr.getKeyValue(gstrBASEUTILS_REG_PATH,
-					gstrREMOTE_EXCEPTION_LOGGER_KEY);
+					gstrREMOTE_EXCEPTION_LOGGER_KEY, "");
 			}
 
 			ms_bRemoteLoggerRead = true;

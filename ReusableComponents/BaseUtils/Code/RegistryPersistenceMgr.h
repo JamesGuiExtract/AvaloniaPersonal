@@ -69,7 +69,8 @@ public:
 	// PURPOSE:	get a certain key value from a certain section
 	//
 	virtual string getKeyValue(const string& strFolderFullPath, 
-									const string& strFullKeyName);
+							   const string& strFullKeyName,
+							   const string& strDefaultValue);
 	//==============================================================================================
 	// PURPOSE:	set the key value from under a given seciton
 	// REQUIRE:	
@@ -91,7 +92,7 @@ public:
 	// REQUIRE:	
 	//
 	virtual vector<string> getKeyMultiStringValue(const string& strFolderFullPath, 
-															const string& strFullKeyName);
+												  const string& strFullKeyName);
 	//==============================================================================================
 	// PURPOSE:	rename the key under a given folder
 	// REQUIRE:	delete existing key, create the key with new name, and assign a default value to it

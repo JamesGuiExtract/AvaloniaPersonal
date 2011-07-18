@@ -144,6 +144,26 @@ private:
 	static const std::string FIT_TO_STATUS;
 	static const std::string DISPLAY_PERCENTAGE;
 
+	static const std::string DEFAULT_LAST_FILE_OPEN_DIR;
+	static const std::string DEFAULT_WINDOW_POS_X;
+	static const std::string DEFAULT_WINDOW_POS_Y;
+	static const std::string DEFAULT_WINDOW_SIZE_X;
+	static const std::string DEFAULT_WINDOW_SIZE_Y;
+	static const std::string DEFAULT_ZONE_HEIGHT;
+	static const std::string DEFAULT_ZONE_COLOR_RED;
+	static const std::string DEFAULT_ZONE_COLOR_GREEN;
+	static const std::string DEFAULT_ZONE_COLOR_BLUE;
+	static const std::string DEFAULT_USED_ZONE_COLOR_RED;
+	static const std::string DEFAULT_USED_ZONE_COLOR_GREEN;
+	static const std::string DEFAULT_USED_ZONE_COLOR_BLUE;
+	static const std::string DEFAULT_AUTO_ROTATE_STEP_SIZE;
+	static const std::string DEFAULT_NUM_AUTO_ROTATE_STEPS;
+	static const std::string DEFAULT_HEIGHT_PAD_FACTOR;
+	static const std::string DEFAULT_OCR_REGION_TYPE;
+	static const std::string DEFAULT_LAST_SELECTION_TOOL;
+	static const std::string DEFAULT_FIT_TO_STATUS;
+	static const std::string DEFAULT_DISPLAY_PERCENTAGE;
+
 	IConfigurationSettingsPersistenceMgr *m_pCfgMgr;
 	std::string m_strSectionFolderName;
 };

@@ -29,7 +29,8 @@ string ConfigMgrIF::getOCREngineProgID()
 		return DEFAULT_PROG_ID;
 	}
 
-	return ma_pUserCfgMgr->getKeyValue(OPTION_FOLDER, OCR_ENGINE_PROG_ID_KEY_NAME);
+	return ma_pUserCfgMgr->getKeyValue(OPTION_FOLDER, OCR_ENGINE_PROG_ID_KEY_NAME,
+		DEFAULT_PROG_ID);
 }
 //--------------------------------------------------------------------------------------------------
 void ConfigMgrIF::setOCREngineProgID(const string& strProgID)

@@ -107,6 +107,19 @@ private:
 	static const std::string PACKAGE_FILE;
 	static const std::string CLEAR_AFTER_PACKAGE;
 
+	static const std::string DEFAULT_FEEDBACK_FOLDER;
+	static const std::string DEFAULT_FEEDBACK_ENABLED;
+	static const std::string DEFAULT_AUTO_TURNOFF_ENABLED;
+	static const std::string DEFAULT_AUTO_TURNOFF_DATE;
+	static const std::string DEFAULT_AUTO_TURNOFF_COUNT;
+	static const std::string DEFAULT_SKIP_COUNT;
+	static const std::string DEFAULT_DOCUMENT_COLLECTION;
+	static const std::string DEFAULT_CONVERT_TO_TEXT;
+	static const std::string DEFAULT_ATTRIBUTE_SELECTION;
+	static const std::string DEFAULT_ATTRIBUTE_NAME;
+	static const std::string DEFAULT_PACKAGE_FILE;
+	static const std::string DEFAULT_CLEAR_AFTER_PACKAGE;
+
 	IConfigurationSettingsPersistenceMgr* m_pCfgMgr;
 
 	std::string m_strSectionFolderName;

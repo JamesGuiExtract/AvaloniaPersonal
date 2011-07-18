@@ -429,7 +429,8 @@ unsigned long FolderEventsListener::getTimeBetweenListeningRestarts()
 	{
 		ma_pCfgMgr->createKey ("", gstrTIME_BETWEEN_LISTENING_RESTARTS_KEY, asString(gulDEFAULT_TIME_BETWEEN_RESTARTS));
 	}
-	return asUnsignedLong( ma_pCfgMgr->getKeyValue("", gstrTIME_BETWEEN_LISTENING_RESTARTS_KEY ));
+	return asUnsignedLong( ma_pCfgMgr->getKeyValue("", gstrTIME_BETWEEN_LISTENING_RESTARTS_KEY,
+		asString(gulDEFAULT_TIME_BETWEEN_RESTARTS)));
 }
 //-------------------------------------------------------------------------------------------------
 void FolderEventsListener::processChanges(string strBaseDir, Win32Event &eventKill, LPBYTE & rlpBuffer, MTSafeQueue<FolderEvent> & queEvents, bool bFileChange )

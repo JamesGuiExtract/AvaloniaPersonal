@@ -25,13 +25,13 @@ public:
 
 	~DocTypeInterpreter();
 
-	// Which confidence level does the input text at
+	// Determines if the doc type matches any pattern for the specified confidence level.
 	// 0 - Zero
 	// 1 - Maybe
 	// 2 - Probable
 	// 3 - Sure
 	// Require: loadDocTypeFile() must be called prior to calling this function
-	int getDocConfidenceLevel(const ISpatialStringPtr& ipInputText, DocPageCache& cache);
+	bool docConfidenceLevelMatches(int nLevel, const ISpatialStringPtr& ipInputText, DocPageCache& cache);
 
 	// load the file and create PatternHolders
 	// It will check if the file has .dcc or .etf extension.
@@ -73,6 +73,8 @@ private:
 	const static string ANDEndTag;
 	const static string SINGLEBeginTag;
 	const static string SINGLEEndTag;
+	const static string FINDXOFBeginTag;
+	const static string FINDXOFEndTag;
 
 	const static string SCOPEBeginTag;
 	const static string SCOPEEndTag;
@@ -130,7 +132,7 @@ private:
 						   const string& strBlockStartingLineText,
 						   const string& strEndTagToFind);
 
-	void readBeginTag(const string& strBeginTag, PatternHolder& patternHolder);
+	void readBeginTag(const string& strBeginTag, PatternHolder& patternHolder, bool &rbIsFindXBlock);
 
 	void readPageScope(const string& strStartPage,
 					   const string& strEndPage,

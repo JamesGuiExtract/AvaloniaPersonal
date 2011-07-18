@@ -152,7 +152,7 @@ string CFPAboutDlg::getComponentDataDirectory()
 		if (ma_pSettingsCfgMgr->keyExists(gstrSETTINGS_FOLDER, gstrCOMPONENT_DATA_FOLDER))
 		{
 			strComponentDataDir = ma_pSettingsCfgMgr->getKeyValue(gstrSETTINGS_FOLDER,
-				gstrCOMPONENT_DATA_FOLDER);
+				gstrCOMPONENT_DATA_FOLDER, "");
 		}
 
 		// If string is not empty then return the value found from the registry

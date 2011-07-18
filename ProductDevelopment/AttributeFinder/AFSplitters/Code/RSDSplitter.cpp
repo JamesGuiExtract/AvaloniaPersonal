@@ -155,11 +155,14 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 	try
 	{
 		validateLicense();
+		
+		IAFDocumentPtr ipAFDoc(pAFDoc);
+		ASSERT_RESOURCE_ALLOCATION("ELI32930", ipAFDoc);
 
 		// the specified RSD file may contain tags that need to be
 		// expanded - so expand any tags therein
 		AFTagManager tagMgr;
-		string strRSDFile = tagMgr.expandTagsAndFunctions(m_strRSDFileName, pAFDoc);
+		string strRSDFile = tagMgr.expandTagsAndFunctions(m_strRSDFileName, ipAFDoc);
 
 		// NOTE: The following check is to prevent infinite loops that
 		// for instance can be caused by a RSD file using itself as the splitter
@@ -187,13 +190,17 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 		// get current attribute's value
 		IAttributePtr ipTopLevelAttribute(pAttribute);
 		ASSERT_RESOURCE_ALLOCATION("ELI19104", ipTopLevelAttribute != __nullptr);
-		IAFDocumentPtr ipAFDoc(CLSID_AFDocument);
-		ASSERT_RESOURCE_ALLOCATION("ELI07618", ipAFDoc != __nullptr);
-		ipAFDoc->Text = ipTopLevelAttribute->Value;
+
+		// [FlexIDSCore:2587]
+		// Copy the entire AFDocument for the splitter will use (includes string and object tags so
+		// that the target rulset does not need to re-run document classiers.
+		ICopyableObjectPtr ipCopyable = ipAFDoc;
+		ASSERT_RESOURCE_ALLOCATION("ELI32926", ipCopyable != __nullptr);
+		IAFDocumentPtr ipAFSplitterDoc = ipCopyable->Clone();
 
 		// pass the value into the rule set for further extraction
 		IIUnknownVectorPtr ipSubAttrValues 
-			= getRuleSet(strRSDFile)->ExecuteRulesOnText(ipAFDoc, NULL, NULL);
+			= getRuleSet(strRSDFile)->ExecuteRulesOnText(ipAFSplitterDoc, NULL, NULL);
 
 		// Clear the cache if necessary
 		if (!m_bCacheRSD)

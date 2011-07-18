@@ -159,6 +159,7 @@ private:
 	////////////
 	static const std::string GGFINDERS_SECTIONNAME;
 	static const std::string DOCTYPE_STORERULES;
+	static const std::string DEFAULT_DOCTYPE_STORERULES;
 
 	////////////
 	// Variables

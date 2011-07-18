@@ -19,12 +19,12 @@ namespace Extract.Testing.Utilities
         /// <overloads>Retrieves a component from the specified <see cref="Control"/>.</overloads>
         /// <summary>
         /// Retrieves the first component contained within a component of the 
-        /// <see cref="_form"/> that is of the type <paramref name="TComponent"/>. 
+        /// <see cref="Form"/> that is of the type <typeref name="TComponent"/>. 
         /// </summary>
         /// <typeparam name="TComponent">The type of the component to retrieve.</typeparam>
         /// <param name="control">The control within which to find the component.</param>
-        /// <returns>The first component of <see cref="_form"/> that is of the type
-        /// <paramref name="TComponent"/>. </returns>
+        /// <returns>The first component of <see cref="Form"/> that is of the type
+        /// <typeref name="TComponent"/>. </returns>
         // FXCop does not like non-inferrable generics since it makes the library more "difficult"
         // to use.  Since this is just a helper class for use with our internal NUnit testing
         // we do not need to be concerned with how "difficult" it is to use this library.
@@ -37,14 +37,14 @@ namespace Extract.Testing.Utilities
 
         /// <summary>
         /// Retrieves the first component contained within a component of the
-        /// <paramref name="control"/> that is of the type <paramref name="TComponent"/> and 
+        /// <paramref name="control"/> that is of the type <typeref name="TComponent"/> and 
         /// with Text property of <paramref name="itemText"/>. 
         /// </summary>
         /// <typeparam name="TComponent">The type of the component to retrieve.</typeparam>
         /// <param name="control">The control within which to find the component.</param>
         /// <param name="itemText">The Text property of the component to retrieve.</param>
         /// <returns>The first component of <paramref name="control"/> that is of the type
-        /// <paramref name="TComponent"/> with Text property of <paramref name="itemText"/>. 
+        /// <typeref name="TComponent"/> with Text property of <paramref name="itemText"/>. 
         /// </returns>
         // FXCop does not like non-inferrable generics since it makes the library more "difficult"
         // to use.  Since this is just a helper class for use with our internal NUnit testing
@@ -53,71 +53,78 @@ namespace Extract.Testing.Utilities
         public static TComponent GetFormComponent<TComponent>(Control control, string itemText)
             where TComponent : Component
         {
-            // Check whether this control is the specified form component
-            TComponent component = control as TComponent;
-            if (component != null && (string.IsNullOrEmpty(itemText) || control.Name == itemText
-                || control.Text == itemText))
+            try
             {
-                return component;
-            }
-
-            // Check whether this is a toolstrip control
-            ToolStrip toolStrip = control as ToolStrip;
-            if (toolStrip != null)
-            {
-                // Iterate through each tool strip item
-                foreach (ToolStripItem toolStripItem in toolStrip.Items)
+                // Check whether this control is the specified form component
+                TComponent component = control as TComponent;
+                if (component != null && (string.IsNullOrEmpty(itemText) || control.Name == itemText
+                    || control.Text == itemText))
                 {
-                    // Check whether this toolstrip is the specified form component
-                    component = toolStripItem as TComponent;
-                    if (component != null && (itemText == null || toolStripItem.Text == itemText))
+                    return component;
+                }
+
+                // Check whether this is a toolstrip control
+                ToolStrip toolStrip = control as ToolStrip;
+                if (toolStrip != null)
+                {
+                    // Iterate through each tool strip item
+                    foreach (ToolStripItem toolStripItem in toolStrip.Items)
                     {
-                        return component;
+                        // Check whether this toolstrip is the specified form component
+                        component = toolStripItem as TComponent;
+                        if (component != null && (itemText == null || toolStripItem.Text == itemText))
+                        {
+                            return component;
+                        }
                     }
                 }
-            }
 
-            // Check whether this is a menustrip control
-            MenuStrip menuStrip = control as MenuStrip;
-            if (menuStrip != null)
-            {
-                // Iterate through each tool strip item
-                foreach (ToolStripItem toolStripItem in menuStrip.Items)
+                // Check whether this is a menustrip control
+                MenuStrip menuStrip = control as MenuStrip;
+                if (menuStrip != null)
+                {
+                    // Iterate through each tool strip item
+                    foreach (ToolStripItem toolStripItem in menuStrip.Items)
+                    {
+                        // Recursively search for the component within this item and its children
+                        component = GetFormComponent<TComponent>(toolStripItem, itemText);
+                        if (component != null)
+                        {
+                            return component;
+                        }
+                    }
+                }
+
+                // Check each sub control of this control
+                Control.ControlCollection controls = control.Controls;
+                foreach (Control subcontrol in controls)
                 {
                     // Recursively search for the component within this item and its children
-                    component = GetFormComponent<TComponent>(toolStripItem, itemText);
+                    component = GetFormComponent<TComponent>(subcontrol, itemText);
                     if (component != null)
                     {
                         return component;
                     }
                 }
-            }
 
-            // Check each sub control of this control
-            Control.ControlCollection controls = control.Controls;
-            foreach (Control subcontrol in controls)
-            {
-                // Recursively search for the component within this item and its children
-                component = GetFormComponent<TComponent>(subcontrol, itemText);
-                if (component != null)
+                // Recursively search for the component within the 
+                // context menu strip associated with this control.
+                if (control.ContextMenuStrip != null)
                 {
-                    return component;
+                    component = GetFormComponent<TComponent>(control.ContextMenuStrip, itemText);
                 }
-            }
 
-            // Recursively search for the component within the 
-            // context menu strip associated with this control.
-            if (control.ContextMenuStrip != null)
+                return itemText == null || control.Text == itemText ? component : null;
+            }
+            catch (Exception ex)
             {
-                component = GetFormComponent<TComponent>(control.ContextMenuStrip, itemText);
+                throw ex.AsExtract("ELI32922");
             }
-
-            return itemText == null || control.Text == itemText ? component : null;
         }
 
         /// <summary>
         /// Retrieves the first component contained within a component of the 
-        /// <paramref name="toolStripItem"/> that is of the type <paramref name="TComponent"/> 
+        /// <paramref name="toolStripItem"/> that is of the type <typeref name="TComponent"/> 
         /// and with Text property of <paramref name="itemText"/>. 
         /// </summary>
         /// <typeparam name="TComponent">The type of the component to retrieve.</typeparam>
@@ -125,7 +132,7 @@ namespace Extract.Testing.Utilities
         /// <param name="itemText">The Text property of the component to retrieve.</param>
         /// </param>
         /// <returns>The first component of <paramref name="toolStripItem"/> that is of the type
-        /// <paramref name="TComponent"/> with Text property of <paramref name="itemText"/>. 
+        /// <typeref name="TComponent"/> with Text property of <paramref name="itemText"/>. 
         /// </returns>
         // FXCop does not like non-inferrable generics since it makes the library more "difficult"
         // to use.  Since this is just a helper class for use with our internal NUnit testing
@@ -134,31 +141,38 @@ namespace Extract.Testing.Utilities
         public static TComponent GetFormComponent<TComponent>(ToolStripItem toolStripItem, string itemText)
             where TComponent : Component
         {
-            // Check whether this control is the specified component
-            TComponent component = toolStripItem as TComponent;
-            if (component != null && (itemText == null || toolStripItem.Text == itemText))
+            try
             {
-                return component;
-            }
-
-            // Check whether this is a tool strip menu item
-            ToolStripMenuItem menuItem = toolStripItem as ToolStripMenuItem;
-            if (menuItem != null)
-            {
-                // Iterate through each child tool strip item
-                foreach (ToolStripItem childItem in menuItem.DropDownItems)
+                // Check whether this control is the specified component
+                TComponent component = toolStripItem as TComponent;
+                if (component != null && (itemText == null || toolStripItem.Text == itemText))
                 {
-                    // Recursively search for the component within this item and its children
-                    component = GetFormComponent<TComponent>(childItem, itemText);
-                    if (component != null)
+                    return component;
+                }
+
+                // Check whether this is a tool strip menu item
+                ToolStripMenuItem menuItem = toolStripItem as ToolStripMenuItem;
+                if (menuItem != null)
+                {
+                    // Iterate through each child tool strip item
+                    foreach (ToolStripItem childItem in menuItem.DropDownItems)
                     {
-                        return component;
+                        // Recursively search for the component within this item and its children
+                        component = GetFormComponent<TComponent>(childItem, itemText);
+                        if (component != null)
+                        {
+                            return component;
+                        }
                     }
                 }
-            }
 
-            // The component was not found
-            return null;
+                // The component was not found
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32923");
+            }
         }
 
         #region Methods
@@ -173,42 +187,49 @@ namespace Extract.Testing.Utilities
         /// the instructions for performing the current test.</param>
         public static void ShowModelessInstructionsAndWait(string[] instructions)
         {
-            // Create a StringBuilder to hold the message to display
-            StringBuilder sb = new StringBuilder("Here are your instructions\n\n");
-
-            // Build the instruction list
-            int i = 1;
-            foreach (string instruction in instructions)
+            try
             {
-                sb.Append(i.ToString(CultureInfo.CurrentCulture));
-                sb.Append(". ");
-                sb.Append(instruction);
-                sb.Append("\n");
-                i++;
-            }
+                // Create a StringBuilder to hold the message to display
+                StringBuilder sb = new StringBuilder("Here are your instructions\n\n");
 
-            // Add a polite ending
-            sb.Append("\nThank you.");
-
-            // Build and display the modeless dialog box
-            using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
-            {
-                // Build the modeless dialog
-                messageBox.AddStandardButtons(MessageBoxButtons.OK);
-                messageBox.Caption = "Test instructions";
-                messageBox.StandardIcon = MessageBoxIcon.Information;
-                messageBox.Text = sb.ToString();
-
-                // Show the modeless dialog
-                messageBox.ShowModeless();
-
-                // Loop until the dialog has closed
-                while (messageBox.IsVisible)
+                // Build the instruction list
+                int i = 1;
+                foreach (string instruction in instructions)
                 {
-                    // Process all messages in the queue
-                    Application.DoEvents();
-                    System.Threading.Thread.Sleep(100);
+                    sb.Append(i.ToString(CultureInfo.CurrentCulture));
+                    sb.Append(". ");
+                    sb.Append(instruction);
+                    sb.Append("\n");
+                    i++;
                 }
+
+                // Add a polite ending
+                sb.Append("\nThank you.");
+
+                // Build and display the modeless dialog box
+                using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                {
+                    // Build the modeless dialog
+                    messageBox.AddStandardButtons(MessageBoxButtons.OK);
+                    messageBox.Caption = "Test instructions";
+                    messageBox.StandardIcon = MessageBoxIcon.Information;
+                    messageBox.Text = sb.ToString();
+
+                    // Show the modeless dialog
+                    messageBox.ShowModeless();
+
+                    // Loop until the dialog has closed
+                    while (messageBox.IsVisible)
+                    {
+                        // Process all messages in the queue
+                        Application.DoEvents();
+                        System.Threading.Thread.Sleep(100);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI32924");
             }
         }
 

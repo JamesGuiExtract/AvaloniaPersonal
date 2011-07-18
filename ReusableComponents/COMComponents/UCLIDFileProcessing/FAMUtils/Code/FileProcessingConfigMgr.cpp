@@ -46,15 +46,34 @@ const string FileProcessingConfigMgr::LAST_GOOD_DATABASE = "LastGoodDatabase";
 const string FileProcessingConfigMgr::USE_PRE_NORMALIZED = "UsePreNormalized";
 const string FileProcessingConfigMgr::AUTO_SAVE_FPS_FILE = "AutoSaveFPS";
 
+const string FileProcessingConfigMgr::DEFAULT_WINDOW_POS_X = "10";
+const string FileProcessingConfigMgr::DEFAULT_WINDOW_POS_Y = "10";
+const string FileProcessingConfigMgr::DEFAULT_WINDOW_SIZE_X = "280";
+const string FileProcessingConfigMgr::DEFAULT_WINDOW_SIZE_Y = "170";
+const string FileProcessingConfigMgr::DEFAULT_WINDOW_MAXIMIZED = "0";
+const string FileProcessingConfigMgr::DEFAULT_SCOPE_LAST_OPENED_FILE_NAME = "";
+const string FileProcessingConfigMgr::DEFAULT_SCOPE_LAST_OPENED_FOLDER_NAME = "";
+const string FileProcessingConfigMgr::DEFAULT_SCOPE_OPENED_FOLDER_HISTORY = "";
+const string FileProcessingConfigMgr::DEFAULT_SCOPE_LAST_USED_FILE_EXTENSION = "*.*";
+const string FileProcessingConfigMgr::DEFAULT_SCOPE_LAST_OPENED_LIST_NAME = "";
+const string FileProcessingConfigMgr::DEFAULT_MAX_STORED_RECORDS = "1000";
+const string FileProcessingConfigMgr::DEFAULT_RESTRICT_NUM_STORED_RECORDS = "1";
+const string FileProcessingConfigMgr::DEFAULT_MS_BETWEEN_DB_CHECK = "2000";
+const string FileProcessingConfigMgr::DEFAULT_TIMER_TICK_SPEED = "2000";
+const string FileProcessingConfigMgr::DEFAULT_DB_SERVER_HISTORY = "";
+const string FileProcessingConfigMgr::DEFAULT_DB_LOCK_TIMEOUT = "300"; // 5 min
+const string FileProcessingConfigMgr::DEFAULT_AUTO_SCROLLING = "1";
+const string FileProcessingConfigMgr::DEFAULT_LAST_GOOD_SERVER = "0";
+const string FileProcessingConfigMgr::DEFAULT_LAST_GOOD_DATABASE = "0";
+const string FileProcessingConfigMgr::DEFAULT_USE_PRE_NORMALIZED = "1";
+const string FileProcessingConfigMgr::DEFAULT_AUTO_SAVE_FPS_FILE = "0";
+
 // Minimum width and height for the dialog
 const int FileProcessingConfigMgr::DLG_MIN_WIDTH = 380;
 const int FileProcessingConfigMgr::DLG_MIN_HEIGHT = 200;
 
 // a numThreads value of 0 means use one thread for each processor
 static const int DEFAULT_NUM_THREADS = 0;
-
-static const int DEFAULT_MAX_STORED_RECORDS = 1000;
-static const string DEFAULT_RESTRICT_NUM_STORED_RECORDS = "1";
 
 static const string DEFAULT_DB_CONNECTION_STRING = 
 			"Provider=SQLNCLI;Server=(local);"
@@ -80,18 +99,6 @@ static const string gstrSQL_SERVER_REG_PATH = "SOFTWARE\\Microsoft\\Microsoft SQ
 // Key name that contains the instance names of installed SQL servers
 static const string gstrSQL_SERVER_INSTALLED_INSTANCES_KEY = "InstalledInstances";
 
-// Default for Max files from a database
-static const long DEFAULT_MAX_FILES_FROM_DB = 1;
-
-// Default for milliseconds between db checks
-static const long DEFAULT_MS_BETWEEN_DB_CHECK = 2000;
-
-// Default timer tick speed (2000 ms)
-static const unsigned int DEFAULT_TIMER_TICK_SPEED = 2000;
-
-// Default Database lock timeout in sec
-static const long DEFAULT_DB_LOCK_TIMEOUT = 300; // 5 min
-
 //-------------------------------------------------------------------------------------------------
 // FileProcessingConfigMgr
 //-------------------------------------------------------------------------------------------------
@@ -113,13 +120,13 @@ void FileProcessingConfigMgr::getWindowPos(long &lPosX, long &lPosY)
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X))
 	{
 		// Not found, just default to 10
-		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X, "10");
-		lPosX = 10;
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X, DEFAULT_WINDOW_POS_X);
+		lPosX = asLong(DEFAULT_WINDOW_POS_X);
 	}
 	else
 	{
 		// Retrieve X position
-		strX = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X);
+		strX = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_X, DEFAULT_WINDOW_POS_X);
 		lPosX = asLong(strX);
 	}
 
@@ -127,13 +134,13 @@ void FileProcessingConfigMgr::getWindowPos(long &lPosX, long &lPosY)
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y))
 	{
 		// Not found, just default to 10
-		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y, "10");
-		lPosY = 10;
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y, DEFAULT_WINDOW_POS_Y);
+		lPosY = asLong(DEFAULT_WINDOW_POS_Y);
 	}
 	else
 	{
 		// Retrieve Y position
-		strY = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y);
+		strY = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_POS_Y, DEFAULT_WINDOW_POS_Y);
 		lPosY = asLong(strY);
 	}
 }
@@ -160,13 +167,13 @@ void FileProcessingConfigMgr::getWindowSize(long &lSizeX, long &lSizeY)
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X))
 	{
 		// Not found, just default to 280
-		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X, "280");
-		lSizeX = 280;
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X, DEFAULT_WINDOW_SIZE_X);
+		lSizeX = asLong(DEFAULT_WINDOW_SIZE_X);
 	}
 	else
 	{
 		// Retrieve width
-		strX = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X);
+		strX = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_X, DEFAULT_WINDOW_SIZE_X);
 		lSizeX = asLong(strX);
 	}
 
@@ -174,13 +181,13 @@ void FileProcessingConfigMgr::getWindowSize(long &lSizeX, long &lSizeY)
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y))
 	{
 		// Not found, just default to 170
-		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y, "170");
-		lSizeY = 170;
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y, DEFAULT_WINDOW_SIZE_Y);
+		lSizeY = asLong(DEFAULT_WINDOW_SIZE_Y);
 	}
 	else
 	{
 		// Retrieve height
-		strY = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y);
+		strY = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_SIZE_Y, DEFAULT_WINDOW_SIZE_Y);
 		lSizeY = asLong(strY);
 	}
 
@@ -232,16 +239,14 @@ bool FileProcessingConfigMgr::getWindowMaximized()
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED))
 	{
 		// Not found, just default to false
-		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED, "0");
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED, DEFAULT_WINDOW_MAXIMIZED);
 	}
 	else
 	{
 		// Retrieve setting
-		strValue = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED);
-		if (strValue.length() > 0)
-		{
-			bMaximized = (strValue == "1");
-		}
+		strValue = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, WINDOW_MAXIMIZED,
+			DEFAULT_WINDOW_MAXIMIZED);
+		bMaximized = asCppBool(strValue);
 	}
 
 	return bMaximized;
@@ -255,12 +260,8 @@ void FileProcessingConfigMgr::setWindowMaximized(bool bMaximized)
 //-------------------------------------------------------------------------------------------------
 string FileProcessingConfigMgr::getLastOpenedFileNameFromScope()
 {
-	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME))
-	{
-		return "";
-	}
-
-	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME);
+	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FILE_NAME,
+		DEFAULT_SCOPE_LAST_OPENED_FILE_NAME);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setLastOpenedFileNameFromScope(const string& strFileName)
@@ -270,12 +271,8 @@ void FileProcessingConfigMgr::setLastOpenedFileNameFromScope(const string& strFi
 //-------------------------------------------------------------------------------------------------
 string FileProcessingConfigMgr::getLastOpenedFolderNameFromScope()
 {
-	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FOLDER_NAME))
-	{
-		return "";
-	}
-
-	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FOLDER_NAME);
+	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_FOLDER_NAME,
+		DEFAULT_SCOPE_LAST_OPENED_FOLDER_NAME);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setLastOpenedFolderNameFromScope(const string& strFolderName)
@@ -287,20 +284,18 @@ vector<string> FileProcessingConfigMgr::getFileExtensionList()
 {
 	vector<string> vecExtList;
 	// default set of images support by our current SSOCR
-	string strList("");
+	string strList =  "*.tif"
+					  "|*.bmp"
+					  "|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*;"
+					  "*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*"
+					  "|*.*";
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST))
 	{
-		strList = "*.tif"
-				  "|*.bmp"
-				  "|*.bmp*;*.rle*;*.dib*;*.rst*;*.gp4*;*.mil*;*.cal*;*.cg4*;"
-				  "*.flc*;*.fli*;*.gif*;*.jpg*;*.pcx*;*.pct*;*.png*;*.tga*;*.tif*"
-				  "|*.*";
 		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST, strList);
 	}
-
-	if (strList.empty())
+	else
 	{
-		strList = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST);
+		m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_FILE_EXTENSION_LIST, strList);
 	}
 
 	// each item in the list is separated by a pipe (|) character, parse them
@@ -330,10 +325,11 @@ void FileProcessingConfigMgr::getOpenedFolderHistoryFromScope(vector<string>& rv
 	string strList("");
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY))
 	{
-		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY, strList);
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY,
+			DEFAULT_SCOPE_OPENED_FOLDER_HISTORY);
 	}
-	strList = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY);
-	
+	strList = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_OPENED_FOLDER_HISTORY,
+		DEFAULT_SCOPE_OPENED_FOLDER_HISTORY);
 
 	// each item in the list is separated by a pipe (|) character, parse them
 	StringTokenizer::sGetTokens(strList, "|", rvecHistory);
@@ -357,12 +353,8 @@ void FileProcessingConfigMgr::setOpenedFolderHistoryFromScope(const vector<strin
 //-------------------------------------------------------------------------------------------------
 string FileProcessingConfigMgr::getLastUsedFileExtension()
 {
-	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_USED_FILE_EXTENSION))
-	{
-		return "*.*";
-	}
-
-	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_USED_FILE_EXTENSION);
+	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_USED_FILE_EXTENSION,
+		DEFAULT_SCOPE_LAST_USED_FILE_EXTENSION);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setLastUsedFileExtension(const string& strExt)
@@ -372,12 +364,8 @@ void FileProcessingConfigMgr::setLastUsedFileExtension(const string& strExt)
 //-------------------------------------------------------------------------------------------------
 string FileProcessingConfigMgr::getLastOpenedListNameFromScope()
 {
-	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_LIST_NAME))
-	{
-		return "";
-	}
-
-	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_LIST_NAME);
+	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, SCOPE_LAST_OPENED_LIST_NAME,
+		DEFAULT_SCOPE_LAST_OPENED_LIST_NAME);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setLastOpenedListNameFromScope(const string& strListName)
@@ -389,10 +377,12 @@ long FileProcessingConfigMgr::getMaxStoredRecords()
 {
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS))
 	{
-		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS, asString(DEFAULT_MAX_STORED_RECORDS));
+		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS,
+			DEFAULT_MAX_STORED_RECORDS);
 	}
 
-	return asLong(m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS));
+	return asLong(m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, MAX_STORED_RECORDS,
+		DEFAULT_MAX_STORED_RECORDS));
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setMaxStoredRecords(long nMaxStoredRecords)
@@ -404,10 +394,12 @@ bool FileProcessingConfigMgr::getRestrictNumStoredRecords()
 {
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS))
 	{
-		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS, DEFAULT_RESTRICT_NUM_STORED_RECORDS);
+		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS,
+			DEFAULT_RESTRICT_NUM_STORED_RECORDS);
 	}
 
-	return m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS) != "0";
+	return asCppBool(m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, RESTRICT_NUM_STORED_RECORDS,
+		DEFAULT_RESTRICT_NUM_STORED_RECORDS));
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::setRestrictNumStoredRecords(bool bRestrict)
@@ -418,19 +410,19 @@ void FileProcessingConfigMgr::setRestrictNumStoredRecords(bool bRestrict)
 long FileProcessingConfigMgr::getMillisecondsBetweenDBCheck()
 {
 	// Set return value to defaultg
-	long rtnValue = DEFAULT_MS_BETWEEN_DB_CHECK;
+	long rtnValue = asLong(DEFAULT_MS_BETWEEN_DB_CHECK);
 	
 	// if key exists get that value other wise set the default value
 	if ( m_apHKCU->keyExists(gstrFP_RECORD_MGR_PATH, MILLISECONDS_BETWEEN_DB_CHECK))
 	{
 		rtnValue = asLong(m_apHKCU->getKeyValue(gstrFP_RECORD_MGR_PATH,
-			MILLISECONDS_BETWEEN_DB_CHECK));
+			MILLISECONDS_BETWEEN_DB_CHECK, DEFAULT_MS_BETWEEN_DB_CHECK));
 	}
 	else
 	{
 		// Set the default value
 		m_apHKCU->setKeyValue(gstrFP_RECORD_MGR_PATH, MILLISECONDS_BETWEEN_DB_CHECK,
-			asString(DEFAULT_MS_BETWEEN_DB_CHECK));
+			DEFAULT_MS_BETWEEN_DB_CHECK);
 	}
 	return rtnValue;
 }
@@ -440,7 +432,8 @@ unsigned int FileProcessingConfigMgr::getTimerTickSpeed()
 	if(m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED) )
 	{
 		// If the registry key exists, return it
-		string strTemp = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED);
+		string strTemp = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED,
+			DEFAULT_TIMER_TICK_SPEED);
 		if (strTemp != "")
 		{
 			unsigned long ulTemp = asUnsignedLong( strTemp );
@@ -450,15 +443,15 @@ unsigned int FileProcessingConfigMgr::getTimerTickSpeed()
 		else
 		{
 			// Empty string, just return the default
-			return DEFAULT_TIMER_TICK_SPEED ;
+			return asLong(DEFAULT_TIMER_TICK_SPEED);
 		}
 	}
 	else
 	{
 		// If the registry key does not exist, set the default value and return it
 		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, TIMER_TICK_SPEED, 
-							asString( DEFAULT_TIMER_TICK_SPEED ) );
-		return DEFAULT_TIMER_TICK_SPEED ;
+							DEFAULT_TIMER_TICK_SPEED);
+		return asLong(DEFAULT_TIMER_TICK_SPEED);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -470,12 +463,13 @@ void FileProcessingConfigMgr::setTimerTickSpeed(string strTickSpeed)
 //-------------------------------------------------------------------------------------------------
 void FileProcessingConfigMgr::getDBServerHistory(vector<string>& rvecHistory)
 {
-	string strList("");
+	string strList(DEFAULT_DB_SERVER_HISTORY);
 	if (!m_apHKCU->keyExists(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY))
 	{
 		m_apHKCU->createKey(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY, strList);
 	}
-	strList = m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY);
+	strList = m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, DB_SERVER_HISTORY,
+		DEFAULT_DB_SERVER_HISTORY);
 	
 
 	// each item in the list is separated by a pipe (|) character, parse them
@@ -511,10 +505,11 @@ long FileProcessingConfigMgr::getDBLockTimeout()
 	if (!m_apHKCU->keyExists(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT))
 	{
 		// if not create key and give it a default value of DEFAULT_DB_LOCK_TIMEOUT
-		m_apHKCU->createKey(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT, asString(DEFAULT_DB_LOCK_TIMEOUT));
+		m_apHKCU->createKey(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT, DEFAULT_DB_LOCK_TIMEOUT);
 	}
 	// Get the DB Lock time out from the registry
-	long lDBLockTimeout = asLong(m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT));
+	long lDBLockTimeout = asLong(m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, DB_LOCK_TIMEOUT,
+		DEFAULT_DB_LOCK_TIMEOUT));
 
 	// Return the time out
 	return lDBLockTimeout;
@@ -530,16 +525,14 @@ bool FileProcessingConfigMgr::getAutoScrolling()
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING))
 	{
 		// Not found, just default to true
-		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING, "1");
+		m_apHKCU->createKey(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING, DEFAULT_AUTO_SCROLLING);
 	}
 	else
 	{
 		// Retrieve setting
-		strValue = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING);
-		if (strValue.length() > 0)
-		{
-			bAutoScroll = (strValue == "1");
-		}
+		strValue = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SCROLLING,
+			DEFAULT_AUTO_SCROLLING);
+		bAutoScroll = asCppBool(strValue);
 	}
 
 	return bAutoScroll;
@@ -560,13 +553,15 @@ void FileProcessingConfigMgr::getLastGoodDBSettings(string& strServer, string& s
 	// Get the server
 	if(m_apHKCU->keyExists(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER)) 
 	{
-		strServer = m_apHKCU->getKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER);
+		strServer = m_apHKCU->getKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_SERVER,
+			DEFAULT_LAST_GOOD_SERVER);
 	}
 
 	// Get the databse
 	if(m_apHKCU->keyExists(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE)) 
 	{
-		strDatabase = m_apHKCU->getKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE);
+		strDatabase = m_apHKCU->getKeyValue(gstrFAM_DBADMIN_REG_PATH, LAST_GOOD_DATABASE,
+			DEFAULT_LAST_GOOD_DATABASE);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -608,16 +603,14 @@ bool FileProcessingConfigMgr::getUsePreNormalized()
 	if (!m_apHKCU->keyExists(gstrFP_DB_REGISTRY_PATH, USE_PRE_NORMALIZED))
 	{
 		// Not found, just default to true
-		m_apHKCU->createKey(gstrFP_DB_REGISTRY_PATH, USE_PRE_NORMALIZED, "1");
+		m_apHKCU->createKey(gstrFP_DB_REGISTRY_PATH, USE_PRE_NORMALIZED, DEFAULT_USE_PRE_NORMALIZED);
 	}
 	else
 	{
 		// Retrieve setting
-		strValue = m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, USE_PRE_NORMALIZED);
-		if (strValue.length() > 0)
-		{
-			bUsePreNormalized = (strValue == "1");
-		}
+		strValue = m_apHKCU->getKeyValue(gstrFP_DB_REGISTRY_PATH, USE_PRE_NORMALIZED,
+			DEFAULT_USE_PRE_NORMALIZED);
+		bUsePreNormalized = asCppBool(strValue);
 	}
 
 	return bUsePreNormalized;
@@ -628,15 +621,14 @@ bool FileProcessingConfigMgr::getAutoSaveFPSOnRun()
 	bool bAutoSave = false;
 	if (!m_apHKCU->keyExists(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE))
 	{
-		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE, "0");
+		m_apHKCU->setKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE,
+			DEFAULT_AUTO_SAVE_FPS_FILE);
 	}
 	else
 	{
-		string strVal = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE);
-		if (!strVal.empty())
-		{
-			bAutoSave = (strVal == "1");
-		}
+		string strVal = m_apHKCU->getKeyValue(gstrFP_DLG_REGISTRY_PATH, AUTO_SAVE_FPS_FILE,
+			DEFAULT_AUTO_SAVE_FPS_FILE);
+		bAutoSave = asCppBool(strVal);
 	}
 
 	return bAutoSave;

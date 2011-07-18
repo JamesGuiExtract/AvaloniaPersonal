@@ -67,6 +67,7 @@ const char gpszCommonComponentsFolderExtract[] =
 // Information for Registry items
 const string gstrLICENSE_SECTION = "\\COMLicense";
 const string gstrTARGETFOLDER_KEY = "TargetFolder";
+const string gstrDEFAULT_TARGETFOLDER = "";
 
 // Define the default Utilities Registry folder
 const string gstrUTILITIES_FOLDER = gstrREG_ROOT_KEY + "\\Utilities";

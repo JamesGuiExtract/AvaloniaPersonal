@@ -1638,7 +1638,7 @@ std::string	CDataEntryGrid::getSetting(std::string strKey, bool bRequired)
 	INIFilePersistenceMgr	mgrSettings( m_strINIFile );
 
 	// Get value from key
-	string strTemp = mgrSettings.getKeyValue( getFolder(), strKey );
+	string strTemp = mgrSettings.getKeyValue( getFolder(), strKey, "" );
 
 	// Remove any leading and trailing whitespace
 	strTemp = trim( strTemp, " \t", " \t" );

@@ -39,7 +39,7 @@ const string CRDTConfigDlg::RULEIDTAG_KEY = "StoreRulesWorked";
 const string CRDTConfigDlg::PREFIX_KEY = "Prefix";
 const string CRDTConfigDlg::ROOTFOLDER_KEY = "RootTestFilesFolder";
 const string CRDTConfigDlg::DATAFOLDER_KEY = "ComponentDataFolder";
-const std::string CRDTConfigDlg::SCROLLLOGGER_KEY = "ScrollLogger";
+const string CRDTConfigDlg::SCROLLLOGGER_KEY = "ScrollLogger";
 const string CRDTConfigDlg::DIFF_COMMAND_LINE_KEY = "DiffCommandLine";
 const string CRDTConfigDlg::ENDSLOG_KEY = "LoggingEnabled";
 const string CRDTConfigDlg::DISPLAY_PERCENTAGE_KEY = "DisplayPercentageEnabled";
@@ -48,7 +48,20 @@ const string CRDTConfigDlg::AUTOEXPANDATTRIBUTES_KEY = "AutoExpandAttributes";
 
 // Default values
 const string gstrEMPTY_DEFAULT = "<None>";
-const std::string gstrDIFF_COMMAND_DEFAULT = "C:\\Program Files\\KDiff3\\kdiff3.exe %1 %2";
+
+const string DEFAULT_AUTOENCRYPT = "1";
+const string DEFAULT_LOADONCE = "1";
+const string DEFAULT_EFALOG = "0";
+const string DEFAULT_RULEIDTAG = "0";
+const string DEFAULT_PREFIX = "";
+const string DEFAULT_ROOTFOLDER = "";
+const string DEFAULT_DATAFOLDER = "";
+const string DEFAULT_SCROLLLOGGER = "0";
+const string DEFAULT_DIFF_COMMAND_LINE = "C:\\Program Files\\KDiff3\\kdiff3.exe %1 %2";
+const string DEFAULT_ENDSLOG = "0";
+const string DEFAULT_DISPLAY_PERCENTAGE = "0";
+const string DEFAULT_AUTOOPENIMAGE = "1";
+const string DEFAULT_AUTOEXPANDATTRIBUTES = "0";
 
 //-------------------------------------------------------------------------------------------------
 // CRDTConfigDlg
@@ -269,7 +282,7 @@ void CRDTConfigDlg::OnDefaults()
 	}
 
 	// Set default for diff command line
-	m_zDiffCommandLine = gstrDIFF_COMMAND_DEFAULT.c_str();
+	m_zDiffCommandLine = DEFAULT_DIFF_COMMAND_LINE.c_str();
 
 	// Refresh display
 	UpdateData( FALSE );
@@ -363,12 +376,12 @@ bool CRDTConfigDlg::getAutoEncrypt()
 	if (!ma_pSettingsCfgMgr->keyExists( SETTINGS_SECTION, AUTOENCRYPT_KEY ))
 	{
 		// Create key if not found, default to true [LRCAU #4926]
-		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, AUTOENCRYPT_KEY, "1" );
-		return true;
+		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, AUTOENCRYPT_KEY, DEFAULT_AUTOENCRYPT );
+		return asCppBool(DEFAULT_AUTOENCRYPT);
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( SETTINGS_SECTION, AUTOENCRYPT_KEY ) == "1" ? 
-		true : false;
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue( SETTINGS_SECTION, AUTOENCRYPT_KEY,
+		DEFAULT_AUTOENCRYPT ));
 }
 //-------------------------------------------------------------------------------------------------
 string CRDTConfigDlg::getDataFolder()
@@ -377,11 +390,11 @@ string CRDTConfigDlg::getDataFolder()
 	if (!ma_pSettingsCfgMgr->keyExists( SETTINGS_SECTION, DATAFOLDER_KEY ))
 	{
 		// Create key if not found, default to empty string
-		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, DATAFOLDER_KEY, "" );
-		return "";
+		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, DATAFOLDER_KEY, DEFAULT_DATAFOLDER );
+		return DEFAULT_DATAFOLDER;
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( SETTINGS_SECTION, DATAFOLDER_KEY );
+	return ma_pSettingsCfgMgr->getKeyValue( SETTINGS_SECTION, DATAFOLDER_KEY, DEFAULT_DATAFOLDER );
 }
 //-------------------------------------------------------------------------------------------------
 bool CRDTConfigDlg::getDisplaySRWPercent()
@@ -391,12 +404,12 @@ bool CRDTConfigDlg::getDisplaySRWPercent()
 	{
 		// Create key if not found, default to false
 		ma_pSettingsCfgMgr->createKey( SPOTRECOGNITION_SECTION, DISPLAY_PERCENTAGE_KEY, 
-			"0" );
-		return false;
+			DEFAULT_DISPLAY_PERCENTAGE );
+		return asCppBool(DEFAULT_DISPLAY_PERCENTAGE);
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( SPOTRECOGNITION_SECTION, DISPLAY_PERCENTAGE_KEY ) == "1" ? 
-		true : false;
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue( SPOTRECOGNITION_SECTION, DISPLAY_PERCENTAGE_KEY,
+		DEFAULT_DISPLAY_PERCENTAGE));
 }
 //-------------------------------------------------------------------------------------------------
 bool CRDTConfigDlg::getEFALogging()
@@ -405,12 +418,12 @@ bool CRDTConfigDlg::getEFALogging()
 	if (!ma_pSettingsCfgMgr->keyExists( ENTITYFINDER_SECTION, EFALOG_KEY ))
 	{
 		// Create key if not found, default to false
-		ma_pSettingsCfgMgr->createKey( ENTITYFINDER_SECTION, EFALOG_KEY, "0" );
-		return false;
+		ma_pSettingsCfgMgr->createKey( ENTITYFINDER_SECTION, EFALOG_KEY, DEFAULT_EFALOG );
+		return asCppBool(DEFAULT_EFALOG);
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( ENTITYFINDER_SECTION, EFALOG_KEY ) == "1" ? 
-		true : false;
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue( ENTITYFINDER_SECTION, EFALOG_KEY,
+		DEFAULT_EFALOG));
 }
 //-------------------------------------------------------------------------------------------------
 bool CRDTConfigDlg::getENDSLogging()
@@ -419,12 +432,12 @@ bool CRDTConfigDlg::getENDSLogging()
 	if (!ma_pSettingsCfgMgr->keyExists( ENTITYNAMEDATASCORER_SECTION, ENDSLOG_KEY ))
 	{
 		// Create key if not found, default to false
-		ma_pSettingsCfgMgr->createKey( ENTITYNAMEDATASCORER_SECTION, ENDSLOG_KEY, "0" );
-		return false;
+		ma_pSettingsCfgMgr->createKey( ENTITYNAMEDATASCORER_SECTION, ENDSLOG_KEY, DEFAULT_ENDSLOG);
+		return asCppBool(DEFAULT_ENDSLOG);
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( ENTITYNAMEDATASCORER_SECTION, ENDSLOG_KEY ) == "1" ? 
-		true : false;
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue( ENTITYNAMEDATASCORER_SECTION, ENDSLOG_KEY,
+		DEFAULT_ENDSLOG));
 }
 //-------------------------------------------------------------------------------------------------
 bool CRDTConfigDlg::getLoadOncePerSession()
@@ -433,12 +446,12 @@ bool CRDTConfigDlg::getLoadOncePerSession()
 	if (!ma_pSettingsCfgMgr->keyExists( SETTINGS_SECTION, LOADONCE_KEY ))
 	{
 		// Create key if not found, default to true
-		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, LOADONCE_KEY, "1" );
-		return true;
+		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, LOADONCE_KEY, DEFAULT_LOADONCE );
+		return asCppBool(DEFAULT_LOADONCE);
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( SETTINGS_SECTION, LOADONCE_KEY ) == "1" ? 
-		true : false;
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue( SETTINGS_SECTION, LOADONCE_KEY,
+		DEFAULT_LOADONCE));
 }
 //-------------------------------------------------------------------------------------------------
 bool CRDTConfigDlg::getAutoOpenImage()
@@ -447,11 +460,12 @@ bool CRDTConfigDlg::getAutoOpenImage()
 	if (!ma_pSettingsCfgMgr->keyExists( VOAVIEWER_SECTION, AUTOOPENIMAGE_KEY))
 	{
 		// create the key if not found and default to true
-		ma_pSettingsCfgMgr->createKey(VOAVIEWER_SECTION, AUTOOPENIMAGE_KEY, "1");
-		return false;
+		ma_pSettingsCfgMgr->createKey(VOAVIEWER_SECTION, AUTOOPENIMAGE_KEY, DEFAULT_AUTOOPENIMAGE);
+		return asCppBool(DEFAULT_AUTOOPENIMAGE);
 	}
 
-	return (ma_pSettingsCfgMgr->getKeyValue(VOAVIEWER_SECTION, AUTOOPENIMAGE_KEY) == "1");
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue(VOAVIEWER_SECTION, AUTOOPENIMAGE_KEY,
+		DEFAULT_AUTOOPENIMAGE));
 }
 //-------------------------------------------------------------------------------------------------
 void CRDTConfigDlg::getRegistrySettings()
@@ -551,11 +565,11 @@ string CRDTConfigDlg::getPrefix()
 	if (!ma_pSettingsCfgMgr->keyExists( SETTINGS_SECTION, PREFIX_KEY ))
 	{
 		// Create key if not found, default to empty string
-		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, PREFIX_KEY, "" );
-		return "";
+		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, PREFIX_KEY, DEFAULT_PREFIX );
+		return DEFAULT_PREFIX;
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( SETTINGS_SECTION, PREFIX_KEY );
+	return ma_pSettingsCfgMgr->getKeyValue( SETTINGS_SECTION, PREFIX_KEY, DEFAULT_PREFIX );
 }
 //-------------------------------------------------------------------------------------------------
 string CRDTConfigDlg::getRootFolder()
@@ -564,11 +578,11 @@ string CRDTConfigDlg::getRootFolder()
 	if (!ma_pSettingsCfgMgr->keyExists( TESTING_SECTION, ROOTFOLDER_KEY ))
 	{
 		// Create key if not found, default to empty string
-		ma_pSettingsCfgMgr->createKey( TESTING_SECTION, ROOTFOLDER_KEY, "" );
-		return "";
+		ma_pSettingsCfgMgr->createKey( TESTING_SECTION, ROOTFOLDER_KEY, DEFAULT_ROOTFOLDER );
+		return DEFAULT_ROOTFOLDER;
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( TESTING_SECTION, ROOTFOLDER_KEY );
+	return ma_pSettingsCfgMgr->getKeyValue( TESTING_SECTION, ROOTFOLDER_KEY, DEFAULT_ROOTFOLDER );
 }
 //-------------------------------------------------------------------------------------------------
 bool CRDTConfigDlg::getRuleIDTag()
@@ -577,12 +591,12 @@ bool CRDTConfigDlg::getRuleIDTag()
 	if (!ma_pSettingsCfgMgr->keyExists( GRANTORGRANTEE_SECTION, RULEIDTAG_KEY ))
 	{
 		// Create key if not found, default to false
-		ma_pSettingsCfgMgr->createKey( GRANTORGRANTEE_SECTION, RULEIDTAG_KEY, "0" );
-		return false;
+		ma_pSettingsCfgMgr->createKey( GRANTORGRANTEE_SECTION, RULEIDTAG_KEY, DEFAULT_RULEIDTAG );
+		return asCppBool(DEFAULT_RULEIDTAG);
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( GRANTORGRANTEE_SECTION, RULEIDTAG_KEY ) == "1" ? 
-		true : false;
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue( GRANTORGRANTEE_SECTION, RULEIDTAG_KEY,
+		DEFAULT_RULEIDTAG));
 }
 //-------------------------------------------------------------------------------------------------
 bool CRDTConfigDlg::getScrollLogger()
@@ -591,12 +605,12 @@ bool CRDTConfigDlg::getScrollLogger()
 	if (!ma_pSettingsCfgMgr->keyExists( TESTING_SECTION, SCROLLLOGGER_KEY ))
 	{
 		// Create key if not found, default to false
-		ma_pSettingsCfgMgr->createKey( TESTING_SECTION, SCROLLLOGGER_KEY, "0" );
-		return false;
+		ma_pSettingsCfgMgr->createKey( TESTING_SECTION, SCROLLLOGGER_KEY, DEFAULT_SCROLLLOGGER );
+		return asCppBool(DEFAULT_SCROLLLOGGER);
 	}
 
-	return ma_pSettingsCfgMgr->getKeyValue( TESTING_SECTION, SCROLLLOGGER_KEY ) == "1" ? 
-		true : false;
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue( TESTING_SECTION, SCROLLLOGGER_KEY,
+		DEFAULT_SCROLLLOGGER));
 }
 //-------------------------------------------------------------------------------------------------
 CString CRDTConfigDlg::getDiffCommandString()
@@ -604,26 +618,28 @@ CString CRDTConfigDlg::getDiffCommandString()
 	if( !ma_pSettingsCfgMgr->keyExists(TESTING_SECTION, DIFF_COMMAND_LINE_KEY) )
 	{
 		// Set the default string if one doesnt exist
-		ma_pSettingsCfgMgr->createKey(TESTING_SECTION, DIFF_COMMAND_LINE_KEY, gstrDIFF_COMMAND_DEFAULT);
+		ma_pSettingsCfgMgr->createKey(TESTING_SECTION, DIFF_COMMAND_LINE_KEY, DEFAULT_DIFF_COMMAND_LINE);
 
 		// Then return the default string
-		return gstrDIFF_COMMAND_DEFAULT.c_str();
+		return DEFAULT_DIFF_COMMAND_LINE.c_str();
 	}
 
 	// If a string already exists, return it
-	return ma_pSettingsCfgMgr->getKeyValue(TESTING_SECTION, DIFF_COMMAND_LINE_KEY).c_str();
+	return ma_pSettingsCfgMgr->getKeyValue(TESTING_SECTION, DIFF_COMMAND_LINE_KEY,
+		DEFAULT_DIFF_COMMAND_LINE).c_str();
 }
 //-------------------------------------------------------------------------------------------------
 bool CRDTConfigDlg::getAutoExpandAttributes()
 {
 	if (!ma_pSettingsCfgMgr->keyExists(RULETESTER_SECTION, AUTOEXPANDATTRIBUTES_KEY))
 	{
-		ma_pSettingsCfgMgr->createKey(RULETESTER_SECTION, AUTOEXPANDATTRIBUTES_KEY, "0");
+		ma_pSettingsCfgMgr->createKey(RULETESTER_SECTION, AUTOEXPANDATTRIBUTES_KEY, DEFAULT_AUTOEXPANDATTRIBUTES);
 
-		return false;
+		return asCppBool(DEFAULT_AUTOEXPANDATTRIBUTES);
 	}
 	
-	return ma_pSettingsCfgMgr->getKeyValue(RULETESTER_SECTION, AUTOEXPANDATTRIBUTES_KEY) != "0";
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue(RULETESTER_SECTION, AUTOEXPANDATTRIBUTES_KEY,
+		DEFAULT_AUTOEXPANDATTRIBUTES));
 }
 //-------------------------------------------------------------------------------------------------
 void CRDTConfigDlg::loadMRUListItems()

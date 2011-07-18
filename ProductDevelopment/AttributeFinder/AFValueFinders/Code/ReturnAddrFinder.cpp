@@ -739,7 +739,7 @@ bool CReturnAddrFinder::checkRegistryBool(string key, bool defaultValue)
 	{
 		ma_pUserCfgMgr->createKey( RETURN_ADDRESS_FINDER, key, defaultValue?"1":"0" );
 	}
-	if (ma_pUserCfgMgr->getKeyValue( RETURN_ADDRESS_FINDER, key ) != "0")
+	if (ma_pUserCfgMgr->getKeyValue( RETURN_ADDRESS_FINDER, key, defaultValue?"1":"0" ) != "0")
 	{
 		bRet = true;
 	}

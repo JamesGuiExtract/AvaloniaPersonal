@@ -59,7 +59,7 @@ string SafeNetLicenseCfg::getContactServerName()
 	else
 	{
 		strServerName = ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER, gstrSAFENET_SERVER_NAME );
+			gstrSAFENET_UTILS_CFG_FOLDER, gstrSAFENET_SERVER_NAME, getComputerName());
 	}
 	return strServerName;
 }
@@ -82,7 +82,7 @@ string SafeNetLicenseCfg::getAlertToList ()
 	{
 
 		return ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER, "AlertToList" );
+			gstrSAFENET_UTILS_CFG_FOLDER, "AlertToList", "" );
 	}
 	catch (...)
 	{
@@ -111,7 +111,7 @@ bool SafeNetLicenseCfg::getSendAlert()
 		string strSendAlert;
 
 		strSendAlert = ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER, "SendAlert" );
+			gstrSAFENET_UTILS_CFG_FOLDER, "SendAlert", "0" );
 		if ( strSendAlert == "1" )
 		{
 			return true;
@@ -136,7 +136,7 @@ DWORD SafeNetLicenseCfg::getCounterAlertLevel( string strCounterName )
 		string strAlertLevel;
 		ma_pUserCfgMgr->createFolder( gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName );
 		strAlertLevel = ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, "AlertLevel" );
+			gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, "AlertLevel", "0" );
 		return asUnsignedLong(strAlertLevel);
 	}
 	catch (...)
@@ -160,7 +160,7 @@ DWORD SafeNetLicenseCfg::getCounterAlertMultiple( string strCounterName )
 		string strAlertMultiple;
 		ma_pUserCfgMgr->createFolder( gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName );
 		strAlertMultiple = ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, "AlertMultiple" );
+			gstrSAFENET_UTILS_CFG_FOLDER + "\\" + strCounterName, "AlertMultiple", "0" );
 		return asUnsignedLong(strAlertMultiple);
 	}
 	catch (...)
@@ -180,12 +180,12 @@ string SafeNetLicenseCfg::getAlertSendAddress()
 			return gstrDEFAULT_ALERT_SEND_ADDR; 
 		}
 		return ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER, "AlertSendAddress" );
+			gstrSAFENET_UTILS_CFG_FOLDER, "AlertSendAddress", gstrDEFAULT_ALERT_SEND_ADDR );
 	}
 	catch (...)
 	{
 	}
-	return "";
+	return gstrDEFAULT_ALERT_SEND_ADDR;
 
 }
 //-------------------------------------------------------------------------------------------------
@@ -199,12 +199,12 @@ string SafeNetLicenseCfg::getAlertSendDisplay()
 			return gstrDEFAULT_ALERT_SEND_DISPLAY; 
 		}
 		return ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER, "AlertSendDisplay" );
+			gstrSAFENET_UTILS_CFG_FOLDER, "AlertSendDisplay", gstrDEFAULT_ALERT_SEND_DISPLAY );
 	}
 	catch (...)
 	{
 	}
-	return "";
+	return gstrDEFAULT_ALERT_SEND_DISPLAY;
 
 }
 //-------------------------------------------------------------------------------------------------
@@ -229,7 +229,7 @@ bool SafeNetLicenseCfg::getSendToExtract()
 		string strSendToExtract;
 
 		strSendToExtract= ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER, "SendToEXtract" );
+			gstrSAFENET_UTILS_CFG_FOLDER, "SendToEXtract", "0" );
 		if ( strSendToExtract == "1" )
 		{
 			return true;
@@ -251,7 +251,7 @@ int SafeNetLicenseCfg::getWaitTimeoutForCounterOut()
 			return asLong(gstrDEFAULT_WAIT_TIMEOUT_FOR_COUNTER_OUT); 
 		}
 		return asLong(ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER, "WaitTimeoutForCounterOut" ));
+			gstrSAFENET_UTILS_CFG_FOLDER, "WaitTimeoutForCounterOut", gstrDEFAULT_WAIT_TIMEOUT_FOR_COUNTER_OUT ));
 	}
 	catch (...)
 	{
@@ -271,7 +271,7 @@ double SafeNetLicenseCfg::getRetryWaitTime()
 			return asDouble(gstrDEFAULT_WAIT_TIMEOUT_FOR_USB_KEY_RETRY ); 
 		}
 		return asDouble(ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER, "WaitTimeoutUSBKeyRetry" ));
+			gstrSAFENET_UTILS_CFG_FOLDER, "WaitTimeoutUSBKeyRetry", gstrDEFAULT_WAIT_TIMEOUT_FOR_USB_KEY_RETRY ));
 	}
 	catch (...)
 	{
@@ -290,7 +290,7 @@ long SafeNetLicenseCfg::getNumberRetries()
 			return asLong(gstrDEFAULT_WAIT_TIMEOUT_FOR_COUNTER_OUT); 
 		}
 		return asLong(ma_pUserCfgMgr->getKeyValue( 
-			gstrSAFENET_UTILS_CFG_FOLDER, "NumberOfUSBKeyRetries" ));
+			gstrSAFENET_UTILS_CFG_FOLDER, "NumberOfUSBKeyRetries", gstrDEFAULT_WAIT_TIMEOUT_FOR_COUNTER_OUT ));
 	}
 	catch (...)
 	{

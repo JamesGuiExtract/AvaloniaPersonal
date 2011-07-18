@@ -423,7 +423,7 @@ void QueryDlg::addLayerFromINItoLB( std::string strLayerIDName)
 	
 	string strLayerName;
 	// populate the layer combo box
-	strLayerName = mgrSettings.getKeyValue( strFolder, strLayerIDName );
+	strLayerName = mgrSettings.getKeyValue( strFolder, strLayerIDName, "" );
 	if ( !strLayerName.empty() )
 	{
 		m_cmbLayer.AddString(strLayerName.c_str());

@@ -140,7 +140,7 @@ BOOL CTestHarnessDlg::OnInitDialog()
 		// load the name of the last selected TCL file if possible
 		if (m_zFilename.IsEmpty() && m_apCfgMgr->keyExists("\\", gstrLAST_FILE_REG_KEY))
 		{
-			m_zFilename = m_apCfgMgr->getKeyValue("\\", gstrLAST_FILE_REG_KEY).c_str();
+			m_zFilename = m_apCfgMgr->getKeyValue("\\", gstrLAST_FILE_REG_KEY, "").c_str();
 		}
 
 		UpdateData(FALSE);

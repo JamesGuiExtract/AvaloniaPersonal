@@ -32,6 +32,8 @@ const string DocTypeInterpreter::ANDBeginTag = "AND_BEGIN";
 const string DocTypeInterpreter::ANDEndTag = "AND_END";
 const string DocTypeInterpreter::SINGLEBeginTag = "SINGLE_BEGIN";
 const string DocTypeInterpreter::SINGLEEndTag = "SINGLE_END";
+const string DocTypeInterpreter::FINDXOFBeginTag = "FINDXOF_BEGIN";
+const string DocTypeInterpreter::FINDXOFEndTag = "FINDXOF_END";
 
 const string DocTypeInterpreter::SCOPEBeginTag = "SCOPE_BEGIN";
 const string DocTypeInterpreter::SCOPEEndTag = "SCOPE_END";
@@ -74,19 +76,26 @@ DocTypeInterpreter& DocTypeInterpreter::operator=(const DocTypeInterpreter& objT
 //-------------------------------------------------------------------------------------------------
 // Public Methods
 //-------------------------------------------------------------------------------------------------
-int DocTypeInterpreter::getDocConfidenceLevel(const ISpatialStringPtr& ipInputText, DocPageCache& cache)
+bool DocTypeInterpreter::docConfidenceLevelMatches(int nLevel, const ISpatialStringPtr& ipInputText,
+	DocPageCache& cache)
 {
 	try
 	{
-		EConfidenceLevel eConfidenceLevel = kZero;
+		bool bFound = false;
 
 		// go through all PatternHolders
 		for (unsigned int ui = 0; ui < m_vecPatternHolders.size(); ui++)
 		{
 			PatternHolder& patternHolder = m_vecPatternHolders[ui];
 
+			// Only consider patterns for the specified nLevel
+			if (patternHolder.m_eConfidenceLevel != nLevel)
+			{
+				continue;
+			}
+
 			// find match
-			bool bFound = patternHolder.foundPatternsInText(ipInputText, cache);
+			bFound = patternHolder.foundPatternsInText(ipInputText, cache);
 			if (bFound)
 			{
 				// Retrieve Block ID
@@ -109,10 +118,6 @@ int DocTypeInterpreter::getDocConfidenceLevel(const ISpatialStringPtr& ipInputTe
 				// Block ID (if defined) must be unique
 				if (!bFoundMatch)
 				{
-					// if there's a match, return current confidence level
-					// store in this pattern holder
-					eConfidenceLevel = patternHolder.m_eConfidenceLevel;
-
 					// Set document sub-type, if defined
 					if (patternHolder.m_strSubType.length() > 0)
 					{
@@ -140,11 +145,14 @@ int DocTypeInterpreter::getDocConfidenceLevel(const ISpatialStringPtr& ipInputTe
 					ue.addDebugInfo( "Block ID", strBlockID );
 					throw ue;
 				}
-				break;
+
+				// A match was found at this level; no need to evaluate any further blocks.
+				return true;
 			}
 		}
 
-		return (int)eConfidenceLevel;
+		// We've iterated all the patterns for nLevel without finding a match.
+		return false;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28728");
 }
@@ -399,6 +407,7 @@ void DocTypeInterpreter::loadConfidenceLevelBlocks(CommentedTextFileReader& file
 		vecBeginToEndTags[ORBeginTag] = OREndTag;
 		vecBeginToEndTags[ANDBeginTag] = ANDEndTag;
 		vecBeginToEndTags[SINGLEBeginTag] = SINGLEEndTag;
+		vecBeginToEndTags[FINDXOFBeginTag] = FINDXOFEndTag;
 
 		// Check for beginning of SCOPE block
 		if (strLine.find( SCOPEBeginTag ) != string::npos)
@@ -407,7 +416,7 @@ void DocTypeInterpreter::loadConfidenceLevelBlocks(CommentedTextFileReader& file
 			bScopeFound = true;
 		}
 
-		// Check for and process OR / AND / SINGLE blocks
+		// Check for and process OR / AND / SINGLE / FINDXOF blocks
 		map<string, string>::iterator itMap = vecBeginToEndTags.begin();
 		// if OR/AND/SINGLE begin tag is found
 		for (; itMap != vecBeginToEndTags.end(); itMap++)
@@ -467,8 +476,11 @@ void DocTypeInterpreter::loadPatternsBlock(CommentedTextFileReader& fileReader,
 										   const string& strEndTagToFind)
 {
 	// every beginning of a Patterns block contains:
-	// 1) the begin tag : AND_BEGIN, OR_BEGIN, SINGLE_BEGIN
-	// 2) Case sensitive : true or false
+	// 1) the begin tag : AND_BEGIN, OR_BEGIN, SINGLE_BEGIN, FINDXOF_BEGIN
+	// 2) FINDXOF blocks only: The number of patterns which must be found
+	// 3) The block ID
+	// 5) Case sensitive : true or false
+	// 4) The sub-type (optional)
 	// Note that the associated SCOPE block also applies here
 
 	// create a new PatternHolder
@@ -482,12 +494,23 @@ void DocTypeInterpreter::loadPatternsBlock(CommentedTextFileReader& fileReader,
 
 	// New Size A: 3 = XYZ_BEGIN,BLOCK_ID,bCase
 	// New Size B: 4 = XYZ_BEGIN,BLOCK_ID,bCase,Subtype
+	// New Size C: 4 = XYZ_FINDXOF,nRequiredCount,BLOCK_ID,bCase
+	// New Size D: 5 = XYZ_FINDXOF,nRequiredCount,BLOCK_ID,bCase,SubType
 	// Old Size A: 4 = XYZ_BEGIN,dStart,dEnd,bCase
 	// Old Size B: 6 = XYZ_BEGIN,dStart,dEnd,bCase,nStartPage,nEndPage
-	bool	bOldSyntax = false;
-	string	strCaseSensitive;
-	string	strBlockID;
-	string	strSubType;
+	bool bOldSyntax = false;
+	bool bFindXBlock = false;
+	string strFindXRequirement;
+	string strCaseSensitive;
+	string strBlockID;
+	string strSubType;
+
+	// *************
+	// get the BEGIN tag
+	// *************
+	string strBeginTag = ::trim(vecValues[0], " \t", " \t");
+	readBeginTag(strBeginTag, patternHolder, bFindXBlock);
+
 	switch (nSize)
 	{
 	// Position of Case-sensitivity flag depends on token count and syntax type
@@ -499,8 +522,9 @@ void DocTypeInterpreter::loadPatternsBlock(CommentedTextFileReader& fileReader,
 
 	case 4:
 		// Check last token, determine which syntax applies
-		if ((vecValues[3].find( "true", 0 ) != string::npos) || 
-			(vecValues[3].find( "false", 0 ) != string::npos))
+		if (!bFindXBlock &&
+			((vecValues[3].find( "true", 0 ) != string::npos) || 
+			 (vecValues[3].find( "false", 0 ) != string::npos)))
 		{
 			bOldSyntax = true;
 		}
@@ -518,13 +542,28 @@ void DocTypeInterpreter::loadPatternsBlock(CommentedTextFileReader& fileReader,
 			m_strStartPage = "1";
 			m_strEndPage = "-1";
 		}
-		// New-style syntax, with defined subtype
+		// New-style syntax, FindX block
+		else if (bFindXBlock)
+		{
+			strFindXRequirement = trim( vecValues[1], " \t", " \t" );
+			strBlockID = trim( vecValues[2], " \t", " \t" );			
+			strCaseSensitive = trim( vecValues[3], " \t", " \t" );
+		}
+		// New-style syntax, not a FindX block with defined subtype
 		else
 		{
 			strCaseSensitive = trim( vecValues[2], " \t", " \t" );
 			strBlockID = trim( vecValues[1], " \t", " \t" );
 			strSubType = trim( vecValues[3], " \t", " \t" );
 		}
+		break;
+
+	case 5:
+		// New-style syntax, FindX block with defined subtype
+		strFindXRequirement = trim( vecValues[1], " \t", " \t" );
+		strBlockID = trim( vecValues[2], " \t", " \t" );			
+		strCaseSensitive = trim( vecValues[3], " \t", " \t" );
+		strSubType = trim( vecValues[4], " \t", " \t" );
 		break;
 
 	case 6:
@@ -557,20 +596,13 @@ void DocTypeInterpreter::loadPatternsBlock(CommentedTextFileReader& fileReader,
 		throw ue;
 	}
 
-	// *************
-	// get the BEGIN tag
-	// *************
-	string strBeginTag = ::trim(vecValues[0], " \t", " \t");
-	readBeginTag(strBeginTag, patternHolder);
-
-	// ****************
-	// Case sensitivity
-	// ****************
 	patternHolder.m_bCaseSensitive = (_strcmpi( strCaseSensitive.c_str(), "true" ) == 0);
 
-	// **********
-	// Page scope
-	// **********
+	if (bFindXBlock)
+	{
+		patternHolder.m_nFindXRequirement = asLong(strFindXRequirement);
+	}
+
 	readPageScope( m_strStartPage, m_strEndPage, patternHolder );
 
 	// Set Block ID and optional sub-type
@@ -623,21 +655,29 @@ void DocTypeInterpreter::loadPatternsBlock(CommentedTextFileReader& fileReader,
 
 	// this function is not supposed to read any BEGIN tag since
 	// as soon as the END tag is reached, it returns immediately
-	string strMsg = "Invalid OR/AND/SINGLE block. Make sure it has a matching END tag.";
+	string strMsg = "Invalid OR/AND/SINGLE/FINDXOF block. Make sure it has a matching END tag.";
 	UCLIDException ue("ELI07097", strMsg);
 	ue.addDebugInfo("First Line of the block", strBlockStartingLineText);
 	throw ue;
 }
 //-------------------------------------------------------------------------------------------------
-void DocTypeInterpreter::readBeginTag(const string& strBeginTag, 
-									  PatternHolder& patternHolder)
+void DocTypeInterpreter::readBeginTag(const string& strBeginTag,
+									  PatternHolder& patternHolder,
+									  bool &rbIsFindXBlock)
 {
-	if (strBeginTag == ANDBeginTag
-		|| strBeginTag == ORBeginTag 
-		|| strBeginTag == SINGLEBeginTag)
+	if (strBeginTag == ANDBeginTag)
 	{
-		// Is it AND relationship?
-		patternHolder.m_bIsAndRelationship = strBeginTag == ANDBeginTag;
+		patternHolder.m_bIsAndRelationship = true;
+	}
+	else if (strBeginTag == ORBeginTag)
+	{
+	}
+	else if (strBeginTag == SINGLEBeginTag)
+	{
+	}
+	else if (strBeginTag == FINDXOFBeginTag)
+	{
+		rbIsFindXBlock = true;
 	}
 	else 
 	{

@@ -27,12 +27,11 @@ string CfgOCRFiltering::getLastUsedOCRFilteringScheme()
 	if (!ma_pUserCfgMgr->keyExists(strAppKey, LAST_USED_SCHEME))
 	{
 		// Not found, just default to DEFAULT_SCHEME
-		string strDefaultScheme(DEFAULT_SCHEME);
-		ma_pUserCfgMgr->createKey(strAppKey, LAST_USED_SCHEME, strDefaultScheme);
-		return strDefaultScheme;
+		ma_pUserCfgMgr->createKey(strAppKey, LAST_USED_SCHEME, DEFAULT_SCHEME);
+		return DEFAULT_SCHEME;
 	}
 
-	return ma_pUserCfgMgr->getKeyValue(strAppKey, LAST_USED_SCHEME);	
+	return ma_pUserCfgMgr->getKeyValue(strAppKey, LAST_USED_SCHEME, DEFAULT_SCHEME);	
 }
 //---------------------------------------------------------------------------
 void CfgOCRFiltering::setLastUsedOCRFilteringScheme(const string& strSchemeName)

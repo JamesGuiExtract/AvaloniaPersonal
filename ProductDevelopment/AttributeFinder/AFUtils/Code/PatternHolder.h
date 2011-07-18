@@ -40,6 +40,9 @@ public:
 	// whether or not it's OR or AND relationship in between patterns
 	bool m_bIsAndRelationship;
 
+	// If a FindX block, how many matches are required.
+	int m_nFindXRequirement;
+
 	// vector of patterns
 	vector<string> m_vecPatterns;
 

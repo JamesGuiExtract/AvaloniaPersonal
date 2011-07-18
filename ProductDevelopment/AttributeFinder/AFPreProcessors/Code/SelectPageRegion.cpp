@@ -1667,25 +1667,18 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 				ASSERT_RESOURCE_ALLOCATION( "ELI28125", ipResult != __nullptr );
 
 				ILongToObjectMapPtr ipPageInfos = __nullptr;
-				if (bHasSpatialInfo)
-				{
-					// Clone the page infos for the original object
-					ICopyableObjectPtr ipCopier = ipOriginPage->SpatialPageInfos;
-					ASSERT_RESOURCE_ALLOCATION("ELI28134", ipCopier != __nullptr);
-					ipPageInfos = ipCopier->Clone();
-					ASSERT_RESOURCE_ALLOCATION("ELI28135", ipPageInfos != __nullptr);
-				}
-				else
-				{
-					// Create a spatial page info for this page
-					ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
-					ASSERT_RESOURCE_ALLOCATION("ELI28173", ipPageInfo != __nullptr);
-					ipPageInfo->SetPageInfo(nWidth, nHeight, kRotNone, 0.0);
+				
+				// [FlexIDSCore:4719]
+				// Regardless of whether the page contains spatial info, since the coordinates we
+				// have are relative to the image, not the OCR text, create a spatial page info with
+				// an orientation of kRotNone and a skew of 0.0
+				ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
+				ASSERT_RESOURCE_ALLOCATION("ELI28173", ipPageInfo != __nullptr);
+				ipPageInfo->SetPageInfo(nWidth, nHeight, kRotNone, 0.0);
 
-					ipPageInfos.CreateInstance(CLSID_LongToObjectMap);
-					ASSERT_RESOURCE_ALLOCATION("ELI28174", ipPageInfos != __nullptr);
-					ipPageInfos->Set(nPageNum, ipPageInfo);
-				}
+				ipPageInfos.CreateInstance(CLSID_LongToObjectMap);
+				ASSERT_RESOURCE_ALLOCATION("ELI28174", ipPageInfos != __nullptr);
+				ipPageInfos->Set(nPageNum, ipPageInfo);
 
 				// If including this region OR it is not a specified page
 				// return a single image region

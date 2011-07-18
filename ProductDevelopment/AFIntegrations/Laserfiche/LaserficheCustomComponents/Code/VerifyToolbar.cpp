@@ -158,9 +158,9 @@ BOOL CVerifyToolbar::OnInitDialog()
 		{
 			// Load the top & left window coordinates
 			string strLeft = m_pIDShieldLF->m_apCurrentUserRegSettings->getKeyValue(
-				gstrREG_VERIFY_WINDOW_KEY, gstrREG_VERIFY_WINDOW_LEFT);
+				gstrREG_VERIFY_WINDOW_KEY, gstrREG_VERIFY_WINDOW_LEFT, "0");
 			string strTop = m_pIDShieldLF->m_apCurrentUserRegSettings->getKeyValue(
-				gstrREG_VERIFY_WINDOW_KEY, gstrREG_VERIFY_WINDOW_TOP);
+				gstrREG_VERIFY_WINDOW_KEY, gstrREG_VERIFY_WINDOW_TOP, "0");
 
 			// Retrieve the current window rect (so that we can preserve the window size)
 			CRect rectWindow;
@@ -520,7 +520,7 @@ bool CVerifyToolbar::verifyDocument(
 						strHiddenPromptKey, gstrREG_LF_SAVEDOC_PROMPT))
 				{
 					strExistingPromptValue = m_pIDShieldLF->m_apCurrentUserRegSettings->getKeyValue(
-						strHiddenPromptKey, gstrREG_LF_SAVEDOC_PROMPT);
+						strHiddenPromptKey, gstrREG_LF_SAVEDOC_PROMPT, "");
 				}
 
 				if (strExistingPromptValue != strLF_HIDE_PROMPT)

@@ -437,6 +437,6 @@ std::string CLicenseTimeInfoDlg::getRemoteDateTimeString(std::string strPath, st
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI12510")
 
-	return ma_pRollbackCfgMgr->getKeyValue( strPath, strKey );
+	return ma_pRollbackCfgMgr->getKeyValue( strPath, strKey, "" );
 }
 //-------------------------------------------------------------------------------------------------

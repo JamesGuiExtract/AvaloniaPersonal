@@ -42,6 +42,7 @@ const L_INT giJPG_COMPRESS_DEFAULT = 50;
 // Registry settings for whether an image should be expanded or not when converting to PDF
 const string gstrIMAGE_FORMAT_CONVERTER = "\\ImageFormatConverter";
 const string gstrEXPAND_FOR_PDF = "ExpandImageForPdfConversion";
+const string gstrDEFAULT_EXPAND_FOR_PDF = "1";
 
 //-------------------------------------------------------------------------------------------------
 // CImageFormatConverterApp
@@ -175,10 +176,11 @@ bool expandImageWhenConvertingPdf()
 	RegistryPersistenceMgr regMgr(HKEY_CURRENT_USER, gstrREG_ROOT_KEY + "\\Utilities");
 	if (!regMgr.keyExists(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF))
 	{
-		regMgr.createKey(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF, "1");
+		regMgr.createKey(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF, gstrDEFAULT_EXPAND_FOR_PDF);
 	}
 
-	return regMgr.getKeyValue(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF) == "1";
+	return asCppBool(regMgr.getKeyValue(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF,
+		gstrDEFAULT_EXPAND_FOR_PDF));
 }
 //-------------------------------------------------------------------------------------------------
 // Will perform the image conversion and will also retain the existing annotations

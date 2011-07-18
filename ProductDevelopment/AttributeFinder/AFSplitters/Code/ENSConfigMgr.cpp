@@ -14,6 +14,7 @@ using namespace std;
 
 // Define keys
 const string ENSConfigMgr::MOVE_NAMES = "MoveLastNameToFront";
+const string ENSConfigMgr::DEFAULT_MOVE_NAMES = "0";
 
 //-------------------------------------------------------------------------------------------------
 // ENSConfigMgr
@@ -31,12 +32,12 @@ long ENSConfigMgr::getMoveNames()
 	if (!m_pCfgMgr->keyExists( m_strSectionFolderName, MOVE_NAMES ))
 	{
 		// Key does not exist, set and return default (NO MOVE)
-		m_pCfgMgr->createKey( m_strSectionFolderName, MOVE_NAMES, "0" );
+		m_pCfgMgr->createKey( m_strSectionFolderName, MOVE_NAMES, DEFAULT_MOVE_NAMES );
 	}
 	else
 	{
 		// Key found - return its value
-		string strResult = m_pCfgMgr->getKeyValue( m_strSectionFolderName, MOVE_NAMES );
+		string strResult = m_pCfgMgr->getKeyValue( m_strSectionFolderName, MOVE_NAMES, DEFAULT_MOVE_NAMES );
 		lResult = ::asLong( strResult );
 	}
 

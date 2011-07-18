@@ -14,6 +14,7 @@ using namespace std;
 
 // Define keys
 const string EntityFinderConfigMgr::LOGGING_ENABLED = "LoggingEnabled";
+const string EntityFinderConfigMgr::DEFAULT_LOGGING_ENABLED = "0";
 
 //-------------------------------------------------------------------------------------------------
 // EntityFinderConfigMgr
@@ -31,12 +32,13 @@ long EntityFinderConfigMgr::getLoggingEnabled()
 	if (!m_pCfgMgr->keyExists( m_strSectionFolderName, LOGGING_ENABLED ))
 	{
 		// Key does not exist, set and return default (NOT ENABLED)
-		m_pCfgMgr->createKey( m_strSectionFolderName, LOGGING_ENABLED, "0" );
+		m_pCfgMgr->createKey( m_strSectionFolderName, LOGGING_ENABLED, DEFAULT_LOGGING_ENABLED );
 	}
 	else
 	{
 		// Key found - return its value
-		string strResult = m_pCfgMgr->getKeyValue( m_strSectionFolderName, LOGGING_ENABLED );
+		string strResult = m_pCfgMgr->getKeyValue( m_strSectionFolderName, LOGGING_ENABLED,
+			DEFAULT_LOGGING_ENABLED);
 		lResult = ::asLong( strResult );
 	}
 

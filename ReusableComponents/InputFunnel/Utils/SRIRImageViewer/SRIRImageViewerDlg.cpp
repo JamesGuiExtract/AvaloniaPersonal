@@ -165,12 +165,12 @@ void CSRIRImageViewerDlg::loadSettingsFromRegistry()
 {
 	if (m_apCfg->keyExists("\\", gpszLAST_ROOT_FOLDER))
 	{
-		m_zRootFolder = m_apCfg->getKeyValue("\\", gpszLAST_ROOT_FOLDER).c_str();
+		m_zRootFolder = m_apCfg->getKeyValue("\\", gpszLAST_ROOT_FOLDER, "").c_str();
 	}
 
 	if (m_apCfg->keyExists("\\", gpszLAST_IMG_EXT_KEY))
 	{
-		m_zImageExt = m_apCfg->getKeyValue("\\", gpszLAST_IMG_EXT_KEY).c_str();
+		m_zImageExt = m_apCfg->getKeyValue("\\", gpszLAST_IMG_EXT_KEY, "").c_str();
 	}
 
 	UpdateData(FALSE);

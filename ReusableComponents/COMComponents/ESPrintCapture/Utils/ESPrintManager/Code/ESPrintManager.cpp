@@ -125,11 +125,11 @@ PrintedImageResults CESPrintManagerApp::processPrintedINIFile()
 	PrintedImageResults results;
 
 	// Get the original document 
-	results.OriginalDocument = imgrPrintedINI.getKeyValue(strFolder + "Info", "DocumentName");
+	results.OriginalDocument = imgrPrintedINI.getKeyValue(strFolder + "Info", "DocumentName", "");
 
 	// Get the count of output files
 	strFolder += "Output";
-	long lFileCount = asLong(imgrPrintedINI.getKeyValue(strFolder, "FileCount"));
+	long lFileCount = asLong(imgrPrintedINI.getKeyValue(strFolder, "FileCount", ""));
 
 	// Currently only support output of a single multi-page tif file, if more
 	// than one file was produced this is an error condition
@@ -141,7 +141,7 @@ PrintedImageResults CESPrintManagerApp::processPrintedINIFile()
 			for (long i = 0; i < lFileCount; i++)
 			{
 				string strNewFile =
-					imgrPrintedINI.getKeyValue(strFolder, gstrFILE_KEY + asString(i));
+					imgrPrintedINI.getKeyValue(strFolder, gstrFILE_KEY + asString(i), "");
 				deleteFile(strNewFile);
 			}
 		}
@@ -155,7 +155,7 @@ PrintedImageResults CESPrintManagerApp::processPrintedINIFile()
 	}
 
 	// Return the generated image file
-	results.ImageFile = imgrPrintedINI.getKeyValue(strFolder, gstrFILE_KEY + "0");
+	results.ImageFile = imgrPrintedINI.getKeyValue(strFolder, gstrFILE_KEY + "0", "");
 
 	return results;
 }
@@ -206,7 +206,7 @@ void CESPrintManagerApp::readSettingsFromRegistry()
 {
 	// Get the application to launch from the registry
 	m_strLaunchApplication = m_apUserCfgMgr->getKeyValue("",
-		gstrESPRINTMANAGER_SETTINGS_APPLICATION_KEY);
+		gstrESPRINTMANAGER_SETTINGS_APPLICATION_KEY, "");
 
 	if (m_strLaunchApplication.empty())
 	{
@@ -216,6 +216,6 @@ void CESPrintManagerApp::readSettingsFromRegistry()
 
 	// Get any command line options if specified
 	m_strCommandLineArgs = m_apUserCfgMgr->getKeyValue("",
-		gstrESPRINTMANAGER_SETTINGS_APPLICATION_ARGS_KEY);
+		gstrESPRINTMANAGER_SETTINGS_APPLICATION_ARGS_KEY, "");
 }
 //--------------------------------------------------------------------------------------------------
