@@ -190,16 +190,28 @@ STDMETHODIMP CRSDSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAFDocumen
 		// get current attribute's value
 		IAttributePtr ipTopLevelAttribute(pAttribute);
 		ASSERT_RESOURCE_ALLOCATION("ELI19104", ipTopLevelAttribute != __nullptr);
+		IAFDocumentPtr ipAFSplitterDoc(CLSID_AFDocument);
+		ASSERT_RESOURCE_ALLOCATION("ELI07618", ipAFSplitterDoc != __nullptr);
+
+		ipAFSplitterDoc->Text = ipTopLevelAttribute->Value;
 
 		// [FlexIDSCore:2587]
-		// Copy the entire AFDocument for the splitter will use (includes string and object tags so
-		// that the target rulset does not need to re-run document classiers.
-		ICopyableObjectPtr ipCopyable = ipAFDoc;
+		// Copy the the document's string tags to the ipAFSplitterDoc the splitter will use.
+		ICopyableObjectPtr ipCopyable = ipAFDoc->StringTags;
 		ASSERT_RESOURCE_ALLOCATION("ELI32926", ipCopyable != __nullptr);
-		IAFDocumentPtr ipAFSplitterDoc = ipCopyable->Clone();
+		IStrToStrMapPtr ipStringTagCopy(ipCopyable->Clone());
+		ASSERT_RESOURCE_ALLOCATION("ELI32927", ipStringTagCopy != __nullptr);
+		
+		ipAFSplitterDoc->StringTags = ipStringTagCopy;
 
-		// Assign the top level attribute's text as the document's source text.
-		ipAFSplitterDoc->Text = ipTopLevelAttribute->Value;
+		// [FlexIDSCore:2587]
+		// Copy the the document's object tags to the ipAFSplitterDoc the splitter will use.
+		ipCopyable = ipAFDoc->ObjectTags;
+		ASSERT_RESOURCE_ALLOCATION("ELI32928", ipCopyable != __nullptr);
+		IStrToObjectMapPtr ipObjectTagCopy(ipCopyable->Clone());
+		ASSERT_RESOURCE_ALLOCATION("ELI32929", ipObjectTagCopy != __nullptr);
+
+		ipAFSplitterDoc->ObjectTags = ipObjectTagCopy;
 
 		// pass the value into the rule set for further extraction
 		IIUnknownVectorPtr ipSubAttrValues 
