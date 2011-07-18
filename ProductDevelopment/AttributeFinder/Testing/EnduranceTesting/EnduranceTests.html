@@ -11,7 +11,7 @@
 <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
 </h1>
 <hr>
-<h2>NOTE: Test results should be archived under I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests</h2>
+<h2>NOTE: Test results should be archived under I:\Common\Testing\Product Testing\FLEX_Index_90\EnduranceTests</h2>
 <ol>
 	<li><h2>Machine Preparation</h2>
 	<ul>
@@ -23,23 +23,26 @@
 		<li>Use the <b>USB License Key Manager</b> utility to confirm that a network 
 		USB key is configured and available.  The usual location is on <b>LISA</b>.
 		<li>Create a local <b>Statistics</b> folder for collection of process statistics.
-		<li>Create a local folder for the ruleset to be exercised and select the corresponding 
-		images.  Note: The images need to match the ruleset.
+		<li>Create a local folder for the ruleset to be exercised and select the 
+		corresponding images.  Note: The images need to match the ruleset.
 		<ul>
-			<li>For Redaction: <b>Utah - Department of Commerce</b> is the suggested ruleset.
-			<li>Extract the selected rules from the most recent <b>Deliveries</b> folder.  
-			The basic path is <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Customer 
-			Specific Files\</b>.
+			<li>For Redaction: <b>Utah - Department of Commerce</b> is the 
+			suggested ruleset.
+			<li>Extract the selected rules from the most recent <b>Deliveries</b> 
+			folder.  
+			The basic path is <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Customer Specific Files\</b>.
 		</ul>
 <p>
 		<li><b>Image Files</b>: 
 		<ul>
-			<li>For a test using the <b>UTAH Department of Commerce</b> rules and images 
-			there are over 1 million images currently stored on \\HPQC2\F.
+			<li>For a test using the <b>UTAH Department of Commerce</b> rules 
+			and images there are over 1 million images currently stored on 
+			<b>\\HPQC2\F</b>.
 			<p>
-			<li>If using a different set of rules and images, create two local folders 
-			(<b>Images</b> and <b>Images2</b>) for images to be processed.  Copies of 
-			folders can also be used to increase the number of images to be processed.  
+			<li>If using a different set of rules and images, create two local 
+			folders (<b>Images</b> and <b>Images2</b>) for images to be processed.  
+			Copies of folders can also be used to increase the number of images 
+			to be processed.  
 			<li>Copy images from K: to appropriate subfolders of <b>Images</b> 
 			before processing starts.  This provides images for immediate supplying 
 			and processing.
@@ -85,25 +88,31 @@
 <p>
 	<li><h2>File Preparation</h2>
 	<ul>
-		<li>Create a <b>Queue.fps</b> file with two Folder file suppliers.  
-		    The file suppliers should be configured as follows: 
+		<li>Create a <b>Queue.fps</b> file with two Folder file suppliers.  The file 
+		suppliers should be configured as follows: 
 		<ul>
-			<li>One File Supplier should be configured to recursively supply <b>*.tif</b> 
-			files from an Images folder that contains subfolders with preloaded images.
-			<li>One File Supplier should be configured to recursively supply <b>*.tif</b> 
-			files from an empty Images2 folder.  
-			Configure the file supplier to <b>Continuously supply files that are added</b>. 
-			Subfolders will later be copied into this folder to exercise listening.
+			<li>One File Supplier should be configured to recursively supply 
+			<b>*.tif</b> files from an Images folder that contains subfolders 
+			with preloaded images.
+			<li>One File Supplier should be configured to recursively supply 
+			<b>*.tif</b> files from an empty Images2 folder.  
+			Configure the file supplier to <b>Continuously supply files that 
+			are added</b>. Subfolders will later be copied into this folder 
+			to exercise listening.
 		</ul>
 <p>
 		<li>Create a <b>Process.fps</b> file with one task.  
 		<ul>
 			<li>For an Indexing test, create an FPS file with one 
 			<b>Execute Rules</b> task for processing.  
-			<li>For a Redaction test, create an FPS file with a <b>Redact images 
-			(no verification)</b> task for processing.
-			<li>The Continuous Processing option on the Processing Setup page should be 
-			set to <b>Keep processing files as they are added to the queue</b>.  
+			<li>For a Redaction test, create an FPS file with two processing tasks.
+			<ul>
+				<li><b>Core: Execute rules</b>
+				<li><b>Redaction: Create redacted image</b>
+			</ul>
+			<li>The Continuous Processing option on the Advanced Processing 
+			Configuration page should be set to <b>Keep processing files as they 
+			are added to the queue</b>.  
 		</ul>
 	</ul>
 <p>
@@ -121,11 +130,11 @@
 			<li>SMTP should be set to 192.168.44.1.
 			<li>Enter your desired Sender Display Name and your email address.
 		</ul>
-		<li>Get <b>AttributeFinder/Testing/EnduranceTesting/reports.bat</b> from Vault and copy 
-		it to a local location on the database machine.
-		<li>Edit the batch file, inserting the correct server and the email address(es) where 
-		the reports will be sent.  Note: More than one email address can be inserted, 
-		separated by semicolons.
+		<li>Get <b>AttributeFinder/Testing/EnduranceTesting/reports.bat</b> from Vault 
+		and copy it to a local location on the database machine.
+		<li>Edit the batch file, inserting the correct server and the email address(es) 
+		where the reports will be sent.  Note: More than one email address can be 
+		inserted, separated by semicolons.
 		<li>Use <b>Windows Task Scheduler</b> to run reports.bat.
 		<ul>
 			<li>Go to <b>Start</b>-><b>Programs</b>-><b>Accessories</b>-><b>System 
@@ -135,17 +144,17 @@
 			<li>Configure it to run reports.bat and schedule the task to run at least 
 			once per day.</li>
 		</ul>
-		<li>After the <b>Windows Scheduled Task</b> has been configured, confirm that the scheduled 
-		task, batch file, and Report Viewer are working correctly by doing a test run of the task (right 
-		click the task in the list and click 'Run').
+		<li>After the <b>Windows Scheduled Task</b> has been configured, confirm that the 
+		scheduled task, batch file, and Report Viewer are working correctly by doing a 
+		test run of the task (right click the task in the list and click 'Run').
 	</ul>
 <p>
 
 	<li><h2>Test Execution</h2>
 	<ul>
 		<li>Open a command prompt and begin the collection of process statistics with the 
-		following command string where &quot;Statistics&quot; is the folder created in Step 4 
-		of Machine Preparation.	
+		following command string where &quot;Statistics&quot; is the folder created in 
+		Step 4 of Machine Preparation.	
 		<li><b>LogProcessStats.exe ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe 5m &quot;Statistics&quot;</b>
 		<li>Open both the Queueing and the Processing FPS files.
 <p>
@@ -159,26 +168,27 @@
 		<ul>
 			<li>Processing failures listed on the <b>Processing Log</b> page.
 			<li>Memory usage via <b>Task Manager</b>.
-			<li>Use xcopy to copy a set of images into a subfolder under <b>Images2</b>. This will
-            exercise the file supplier that is listening for new files.
-            <li><b>[FlexIDSCore #3564]</b> <!-- fixed v 8.1.0.18 --> Watch the processing log tab
-            for a while and confirm that it does not take an inordinate amount of time for threads
-            to grab new files once the currently-processing files reach 100%.
+			<li>Use xcopy to copy a set of images into a subfolder under <b>Images2</b>. 
+			This will exercise the file supplier that is listening for new files.
+            		<li><b>[FlexIDSCore #3564]</b> <!-- fixed v 8.1.0.18 --> Watch the 
+			Processing Log tab for a while and confirm that it does not take an 
+			inordinate amount of time for threads to grab new files once 
+			the currently-processing files reach 100%.
 		</ul>
 <p>
 		<li>The following items should be checked when processing finishes or is stopped.
 		<ul>
-			<li>Collection of process statistics should be stopped via <b>Ctrl+C</b> in 
-			the appropriate command window.
+			<li>Collection of process statistics should be stopped via <b>Ctrl+C</b> 
+			in the appropriate command window.
 			<li>Open the process statistics spreadsheet <b>ImportData.xls</b>.  
-			Import using <b>Ctrl+Shift+I</b> the following CSV files from the Statistics folder.
+			Import using <b>Ctrl+Shift+I</b> the following CSV files from the 
+			Statistics folder.
 			<ul>
 				<li>cpu.csv
 				<li>ProcessFiles.NNN.csv where NNN is the process ID.  
 				Import the larger of the two files.
 			</ul>
-			<li>Save the spreadsheet with a meaningful name to include <b>_6A</b> or <b>_6B</b> 
-			as the test number.
+			<li>Save the spreadsheet with a meaningful name.
 		</ul>
 <p>
 		<li><b>[LegacyRC #5535]</b> Confirm that the FAM status bar statistics continue to 
@@ -187,22 +197,24 @@
 <p>
 	<li><h2>Saving Test Results</h2>
 	<ul>
-		<li>Data will be stored in subfolders under 
-		I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests.
-		<li>Subfolders can be created for some or all of
+		<li>Data will be stored in <b>YYYY-MM-DD</b> subfolders under 
+		I:\Common\Testing\Product Testing\FLEX_Index_90\EnduranceTests.
+		<li>Subfolders in between EnduranceTests and YYYY-MM-DD can be created 
+		for some or all of
 		<ul>
-			<li>ID_Shield
+			<li>ArchiveRestore
 			<li>FLEX_Index
+			<li>ID_Shield
 			<LI>PDFA
 		</ul>
-		<li>The <b>Stats</b> folder should be copied to a <b>YYYY-MM-DD</b> 
-		named subfolder under the associated test subfolder.
+		<li>A <b>Stats</b> folder should be included within the <b>YYYY-MM-DD</b> 
+		subfolder.
 		<li>One or more Exception logs can be stored in a <b>UEX_Logs</b> subfolder.
 		This is useful if any unexpected errors are noticed during review. 
 		<li>SQL Server Management Studio can be used to backup the ENDURANCE 
 		database files to a <b>Database</b> subfolder.
 		<li>An example path for a particular test is: <br> 
-		<b>I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests\ID_Shield\2007-10-30</b>.
+		<b>I:\Common\Testing\Product Testing\FLEX_Index_90\EnduranceTests\ID_Shield\2011-07-30</b>.
 		<li>Copy and update a <b>TestDetails.txt</b> file in the YYYY-MM-DD folder.
 		This file will contain a summary of the test environment and results.
 	</ul>
