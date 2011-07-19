@@ -182,11 +182,13 @@ void CSpatialString::insert(long nPos,
                         {
                             if (lFirstPage < letter.m_usPageNumber)
                             {
-                                UCLIDException ue("ELI25798",
-                                    "Cannot insert string: Page inconsistency");
-                                ue.addDebugInfo("First page of insert", lFirstPage);
-                                ue.addDebugInfo("Page To Insert After", letter.m_usPageNumber);
-                                throw ue;
+                                // [FlexIDSCore:3942]
+								// Rather than throwing an exception here, instead convert the
+								// spatial string to a hybrid string in which page order doesn't
+								// matter.
+								downgradeToHybrid();
+								insert(nPos, ipStringToInsert);
+								return;
                             }
 
                             break;

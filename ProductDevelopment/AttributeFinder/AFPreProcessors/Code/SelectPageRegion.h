@@ -155,6 +155,9 @@ private:
 	// Utility Functions
 	IAFUtilityPtr m_ipAFUtility;
 
+	// For RegEx parser.
+	IMiscUtilsPtr m_ipMiscUtils;
+
 	// For regular expression searching
 	// The string to match which may or may not be a regular expression
 	string m_strPattern;
@@ -194,8 +197,17 @@ private:
 	// is 9, and it is set to include region defined, then the return vector
 	// shall contain 2,3 and 5. If it is set to exclude region defined, then 
 	// the return vector shall contain 1,4,6,7,8,9
+	// The order of the returned pages numbers is not guaranteed.
 	vector<int> getActualPageNumbers(int nLastPageNumber, const ISpatialStringPtr& ipInputText,
 		const IAFDocumentPtr& ipAFDoc);
+	
+	// Determines whether m_strPattern when interpreted as a regular expression is found within
+	// strPageText.
+	bool isRegExFoundOnPage(string strPageText, const IAFDocumentPtr& ipAFDoc);
+
+	// Determines whether m_strPattern when interpreted as a literal string is found within
+	// strPageText.
+	bool isStringFoundOnPage(string strPageText);
 
 	// return actual page content based on the restriction defined
 	ISpatialStringPtr getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,

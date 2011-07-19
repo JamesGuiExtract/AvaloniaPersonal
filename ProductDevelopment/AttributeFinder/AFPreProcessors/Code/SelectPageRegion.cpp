@@ -54,8 +54,14 @@ CSelectPageRegion::CSelectPageRegion()
   m_strTextToAssign(""),
   m_nRegionRotation(-1)
 {
+	// For getImagePixelHeightAndWidth.
+	initPDFSupport();
+
 	m_ipAFUtility.CreateInstance(CLSID_AFUtility);
 	ASSERT_RESOURCE_ALLOCATION("ELI09753", m_ipAFUtility != __nullptr);
+
+	m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+	ASSERT_RESOURCE_ALLOCATION("ELI32932", m_ipAFUtility != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSelectPageRegion::~CSelectPageRegion()
@@ -653,79 +659,39 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 			ipInputText, ipAFDoc );
 
 		bool bRestrictionDefined = isRestrictionDefined();
-		if (eMode == kNonSpatialMode)
+		
+		for (long i = 1; i <= nLastPageNumber; i++)
 		{
-			for (long i = 1; i <= nLastPageNumber; i++)
+			int nHeight(-1), nWidth(-1);
+			getImagePixelHeightAndWidth(strSourceDoc, nHeight, nWidth, i);
+
+			// Check the page specification
+			bool bPageSpecified = find(vecPageNumbers.begin(), vecPageNumbers.end(), 
+				i) != vecPageNumbers.end();
+
+			ISpatialStringPtr ipPageText = (eMode == kNonSpatialMode)
+				? ipInputText
+				: ipInputText->GetSpecifiedPages(i, i);
+
+			// Get the appropriate content for this page
+			ISpatialStringPtr ipContentFromThisPage = getRegionContent( ipPageText, 
+				bPageSpecified, bRestrictionDefined, i, nWidth, nHeight);
+
+			// Provide non-NULL content to an Attribute to be included in the collection
+			if (ipContentFromThisPage != __nullptr)
 			{
-				int nHeight(-1), nWidth(-1);
-				getImagePixelHeightAndWidth(strSourceDoc, nHeight, nWidth, i);
+				// Create an Attribute
+				IAttributePtr ipNewAttribute( CLSID_Attribute );
+				ASSERT_RESOURCE_ALLOCATION("ELI28166", ipNewAttribute != __nullptr);
 
-				// Check the page specification
-				bool bPageSpecified = find(vecPageNumbers.begin(), vecPageNumbers.end(), 
-					i) != vecPageNumbers.end();
+				// Update the SourceDocName of the Spatial String
+				ipContentFromThisPage->SourceDocName = strSourceDoc.c_str();
 
-				// Get the appropriate content for this page
-				ISpatialStringPtr ipContentFromThisPage = getRegionContent( ipInputText, 
-					bPageSpecified, bRestrictionDefined, i, nWidth, nHeight);
+				// Set the Attribute Value
+				ipNewAttribute->Value = ipContentFromThisPage;
 
-				// Provide non-NULL content to an Attribute to be included in the collection
-				if (ipContentFromThisPage != __nullptr)
-				{
-					// Create an Attribute
-					IAttributePtr ipNewAttribute( CLSID_Attribute );
-					ASSERT_RESOURCE_ALLOCATION("ELI28166", ipNewAttribute != __nullptr);
-
-					// Update the SourceDocName of the Spatial String
-					ipContentFromThisPage->SourceDocName = strSourceDoc.c_str();
-
-					// Set the Attribute Value
-					ipNewAttribute->Value = ipContentFromThisPage;
-
-					// Add the Attribute to the collection
-					ipAttributes->PushBack( ipNewAttribute );
-				}
-			}
-		}
-		else
-		{
-			IIUnknownVectorPtr ipPages = ipInputText->GetPages();
-			ASSERT_RESOURCE_ALLOCATION("ELI28167", ipPages != __nullptr);
-
-			int nCount = ipPages->Size();
-
-			// Step through each page in the AFDocument, check specification for this page, 
-			// and create an Attribute for each non-NULL Spatial String
-			for (long i = 0; i < nCount; i++)
-			{
-				// Get this page
-				ISpatialStringPtr ipPage = ipPages->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI18572", ipPage != __nullptr);
-				long nPageNum = ipPage->GetFirstPageNumber();
-
-				// Check the page specification
-				bool bPageSpecified = find(vecPageNumbers.begin(), vecPageNumbers.end(), 
-					nPageNum) != vecPageNumbers.end();
-
-				// Get the appropriate content for this page
-				ISpatialStringPtr ipContentFromThisPage = getRegionContent( ipPage, 
-					bPageSpecified, bRestrictionDefined );
-
-				// Provide non-NULL content to an Attribute to be included in the collection
-				if (ipContentFromThisPage != __nullptr)
-				{
-					// Create an Attribute
-					IAttributePtr ipNewAttribute( CLSID_Attribute );
-					ASSERT_RESOURCE_ALLOCATION("ELI18570", ipNewAttribute != __nullptr);
-
-					// Update the SourceDocName of the Spatial String
-					ipContentFromThisPage->SourceDocName = strSourceDoc.c_str();
-
-					// Set the Attribute Value
-					ipNewAttribute->Value = ipContentFromThisPage;
-
-					// Add the Attribute to the collection
-					ipAttributes->PushBack( ipNewAttribute );
-				}
+				// Add the Attribute to the collection
+				ipAttributes->PushBack(ipNewAttribute);
 			}
 		}
 
@@ -783,56 +749,28 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 
 		ISpatialStringPtr ipResult( CLSID_SpatialString );
 		ASSERT_RESOURCE_ALLOCATION("ELI18561", ipResult != __nullptr);
+
 		// Step through each page of the document
-		if (eMode == kNonSpatialMode)
+		for (long i=1; i <= nLastPageNumber; i++)
 		{
-			for (long i=1; i <= nLastPageNumber; i++)
+			int nWidth(-1), nHeight(-1);
+			getImagePixelHeightAndWidth(strSourceDoc, nHeight, nWidth, i);
+
+			// If the page is specifed
+			bool bPageSpecified = find(vecActualPageNumbers.begin(), vecActualPageNumbers.end(), 
+				i) != vecActualPageNumbers.end();
+
+			ISpatialStringPtr ipPageText = (eMode == kNonSpatialMode)
+				? ipInputText
+				: ipInputText->GetSpecifiedPages(i, i);
+
+			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipPageText,
+				bPageSpecified, bRestrictionDefined, i, nWidth, nHeight);
+
+			// Append non-NULL content to the result string
+			if (ipContentFromThisPage != __nullptr)
 			{
-				int nWidth(-1), nHeight(-1);
-				getImagePixelHeightAndWidth(strSourceDoc, nHeight, nWidth, i);
-
-				// If the page is specifed
-				bool bPageSpecified = find(vecActualPageNumbers.begin(), vecActualPageNumbers.end(), 
-					i) != vecActualPageNumbers.end();
-
-				ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipInputText,
-					bPageSpecified, bRestrictionDefined, i, nWidth, nHeight);
-
-				// Append non-NULL content to the result string
-				if (ipContentFromThisPage != __nullptr)
-				{
-					ipResult->Append( ipContentFromThisPage );
-				}
-			}
-		}
-		// Step through each page in the AFDocument, check specification for this page, 
-		// and add the appropriate Region Content to the final Spatial String
-		else
-		{
-			IIUnknownVectorPtr ipPages = ipInputText->GetPages();
-
-			long nCount = ipPages->Size();
-
-			for (long i = 0; i < nCount; i++)
-			{
-				// Get this page
-				ISpatialStringPtr ipPage = ipPages->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI18562", ipPage != __nullptr);
-				long nPageNum = ipPage->GetFirstPageNumber();
-
-				// If the page is specifed
-				bool bPageSpecified = find(vecActualPageNumbers.begin(), vecActualPageNumbers.end(), 
-					nPageNum) != vecActualPageNumbers.end();
-
-				// Get the appropriate content
-				ISpatialStringPtr ipContentFromThisPage = getRegionContent( ipPage, 
-					bPageSpecified, bRestrictionDefined );
-
-				// Append non-NULL content to the result string
-				if (ipContentFromThisPage != __nullptr)
-				{
-					ipResult->Append( ipContentFromThisPage );
-				}
+				ipResult->Append( ipContentFromThisPage );
 			}
 		}
 
@@ -1335,171 +1273,82 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 	{
 		vector<int> vecPages;
 
-		// Only search the text if the string is not non-spatial
-		if (ipInputText->GetMode() != kNonSpatialMode)
+		// Generate a map of each page number to the text on that page.
+		map<int, string> mapPageText;
+
+		if (ipInputText->GetMode() == kNonSpatialMode)
 		{
-			// Get the collection of pages and the count
-			IIUnknownVectorPtr ipPages = ipInputText->GetPages();
-			ASSERT_RESOURCE_ALLOCATION("ELI28168", ipPages != __nullptr);
-			long lSize = ipPages->Size();
-
-			if (m_bIsRegExp)
+			if (nLastPageNumber == 1)
 			{
-				IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
-				ASSERT_RESOURCE_ALLOCATION("ELI13023", ipMiscUtils != __nullptr );
-
-				// Find with a regular expression pattern
-				IRegularExprParserPtr ipRegExpParser =
-					ipMiscUtils->GetNewRegExpParserInstance("SelectPageRegion");
-				ASSERT_RESOURCE_ALLOCATION("ELI09378", ipRegExpParser != __nullptr);
-
-				string strRootFolder = "";
-
-				// We eat the exception that will be thrown if the RSDFileDir tag does not exist 
-				// because we can still run the regexp providing of course that the regexp contains no
-				// #import statements
-				try
+				// If a non-spatial string is from a document with only one page, we know what page
+				// it is from.
+				mapPageText[1] = ipInputText->String;
+			}
+			else if (ipInputText->String.length() == 0)
+			{
+				// If the ipInputText is empty, we can assume each page has blank text.
+				for(int i = 1; i <= nLastPageNumber; i++)
 				{
-					string rootTag = "<RSDFileDir>";
-					strRootFolder = m_ipAFUtility->ExpandTags(rootTag.c_str(), ipAFDoc );
-				}
-				catch(...)
-				{
-				}
-				string strRegExp = getRegExpFromText(m_strPattern, strRootFolder, true,
-					gstrAF_AUTO_ENCRYPT_KEY_PATH);
-
-				ipRegExpParser->Pattern = strRegExp.c_str();
-				ipRegExpParser->IgnoreCase = asVariantBool(!m_bIsCaseSensitive);
-
-				if(m_eRegExpPageSelectionType == kSelectAllPagesWithRegExp)
-				{
-					for (long i = 0; i < lSize; i++)
-					{
-						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI09379", ipPage != __nullptr);
-						IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->String, 
-							VARIANT_TRUE, VARIANT_FALSE);
-						ASSERT_RESOURCE_ALLOCATION("ELI28169", ipFound != __nullptr);
-						if (ipFound->Size() > 0)
-						{
-							vecPages.push_back(ipPage->GetFirstPageNumber());
-						}
-					}
-				}
-				else if(m_eRegExpPageSelectionType == kSelectLeadingPagesWithRegExp)
-				{
-					for (long i = 0; i < lSize; i++)
-					{
-						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI19149", ipPage != __nullptr);
-						IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->String, 
-							VARIANT_TRUE, VARIANT_FALSE);
-						ASSERT_RESOURCE_ALLOCATION("ELI28170", ipFound != __nullptr);
-						if (ipFound->Size() > 0)
-						{
-							vecPages.push_back(ipPage->GetFirstPageNumber());
-						}
-						else 
-						{
-							break;
-						}
-					}
-				}
-				else if(m_eRegExpPageSelectionType == kSelectTrailingPagesWithRegExp)
-				{
-					for (long i = lSize - 1; i >= 0; i--)
-					{
-						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI19150", ipPage != __nullptr);
-						IIUnknownVectorPtr ipFound = ipRegExpParser->Find(ipPage->GetString(), 
-							VARIANT_TRUE, VARIANT_FALSE);
-						ASSERT_RESOURCE_ALLOCATION("ELI28171", ipFound != __nullptr);
-						if (ipFound->Size() > 0)
-						{
-							vecPages.insert(vecPages.begin(), ipPage->GetFirstPageNumber());
-						}
-						else 
-						{
-							break;
-						}
-					}
+					mapPageText[i] = "";
 				}
 			}
 			else
 			{
-				if(m_eRegExpPageSelectionType == kSelectAllPagesWithRegExp)
-				{
-					for (long i = 0; i < lSize; i++)
-					{
-						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI09380", ipPage != __nullptr);
-						string strPage = asString(ipPage->String);
+				// We cannot know what pages the text belongs to, so return an empty vector at this
+				// point.
+				return vecPages;
+			}
+		}
+		else
+		{
+			// Get the collection of pages and the count
+			IIUnknownVectorPtr ipPages = ipInputText->GetPages();
+			ASSERT_RESOURCE_ALLOCATION("ELI28168", ipPages != __nullptr);
+			long nSize = ipPages->Size();
 
-						string strTmpPattern = m_strPattern;
-						if (!m_bIsCaseSensitive)
-						{
-							makeLowerCase(strTmpPattern);
-							makeLowerCase(strPage);
-						}
-						long pos = strPage.find(strTmpPattern, 0);
-						if (pos != string::npos)
-						{
-							vecPages.push_back(ipPage->GetFirstPageNumber());
-						}
-					}
-				}
-				else if(m_eRegExpPageSelectionType == kSelectLeadingPagesWithRegExp)
-				{
-					for (long i = 0; i < lSize; i++)
-					{
-						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI19151", ipPage != __nullptr);
-						string strPage = asString(ipPage->String);
+			// For each page in ipInputText, assign the text to mapPageText.
+			for (long i = 0; i < nSize; i++)
+			{
+				ISpatialStringPtr ipPage = ipPages->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI19149", ipPage != __nullptr);
 
-						string strTmpPattern = m_strPattern;
-						if (!m_bIsCaseSensitive)
-						{
-							makeLowerCase(strTmpPattern);
-							makeLowerCase(strPage);
-						}
-						long pos = strPage.find(strTmpPattern, 0);
-						if (pos != string::npos)
-						{
-							vecPages.push_back(ipPage->GetFirstPageNumber());
-						}
-						else 
-						{
-							break;
-						}
-					}
-				}
-				else if(m_eRegExpPageSelectionType == kSelectTrailingPagesWithRegExp)
-				{
-					for (long i = lSize - 1; i >= 0; i--)
-					{
-						ISpatialStringPtr ipPage = ipPages->At(i);
-						ASSERT_RESOURCE_ALLOCATION("ELI19152", ipPage != __nullptr);
-						string strPage = asString(ipPage->String);
+				int nPage = ipPage->GetFirstPageNumber();
+				mapPageText[nPage] = ipPage->String;
+			}
 
-						string strTmpPattern = m_strPattern;
-						if (!m_bIsCaseSensitive)
-						{
-							makeLowerCase(strTmpPattern);
-							makeLowerCase(strPage);
-						}
-						long pos = strPage.find(strTmpPattern, 0);
-						if (pos != string::npos)
-						{
-							long nPageNum = ipPage->GetFirstPageNumber();
-							vecPages.insert(vecPages.begin(), nPageNum);
-						}
-						else 
-						{
-							break;
-						}
-					}
+			// For any pages not in ipPages (blank pages or un-OCRable pages), assign an empty string.
+			for (int i = 1; i <= nLastPageNumber; i++)
+			{
+				if (mapPageText.find(i) == mapPageText.end())
+				{
+					mapPageText[i] = "";
 				}
+			}
+		}
+		
+		// Loop for each page in the document (whether there is OCR text or not).
+		for (int i = 0; i < nLastPageNumber; i++)
+		{
+			// Iterate the pages backward for kSelectTrailingPagesWithRegExp, forward otherwise.
+			int nPage = (m_eRegExpPageSelectionType == kSelectTrailingPagesWithRegExp) 
+				? nLastPageNumber - i
+				: i + 1;
+			string strPageText = mapPageText[nPage];
+
+			// Is m_strPattern found on this page?
+			bool bFoundOnPage = m_bIsRegExp
+				? isRegExFoundOnPage(strPageText, ipAFDoc) 
+				: isStringFoundOnPage(strPageText);
+
+			if (bFoundOnPage)
+			{
+				vecPages.push_back(nPage);
+			}
+			else if (m_eRegExpPageSelectionType != kSelectAllPagesWithRegExp)
+			{
+				// For leading and trailing pages method, break as soon as we find a non-matching
+				// page.
+				break;
 			}
 		}
 
@@ -1509,6 +1358,50 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 	{
 		THROW_LOGIC_ERROR_EXCEPTION("ELI28699");
 	}
+}
+//-------------------------------------------------------------------------------------------------
+bool CSelectPageRegion::isRegExFoundOnPage(string strPageText, const IAFDocumentPtr& ipAFDoc)
+{
+	// Find with a regular expression pattern
+	IRegularExprParserPtr ipRegExpParser =
+		m_ipMiscUtils->GetNewRegExpParserInstance("SelectPageRegion");
+	ASSERT_RESOURCE_ALLOCATION("ELI09378", ipRegExpParser != __nullptr);
+
+	string strRootFolder = "";
+
+	// We eat the exception that will be thrown if the RSDFileDir tag does not exist 
+	// because we can still run the regexp providing of course that the regexp contains no
+	// #import statements
+	try
+	{
+		string rootTag = "<RSDFileDir>";
+		strRootFolder = m_ipAFUtility->ExpandTags(rootTag.c_str(), ipAFDoc );
+	}
+	catch(...)
+	{
+	}
+	string strRegExp = getRegExpFromText(m_strPattern, strRootFolder, true,
+		gstrAF_AUTO_ENCRYPT_KEY_PATH);
+
+	ipRegExpParser->Pattern = strRegExp.c_str();
+	ipRegExpParser->IgnoreCase = asVariantBool(!m_bIsCaseSensitive);
+
+	IIUnknownVectorPtr ipFound = ipRegExpParser->Find(strPageText.c_str(), VARIANT_TRUE, VARIANT_FALSE);
+	ASSERT_RESOURCE_ALLOCATION("ELI28169", ipFound != __nullptr);
+
+	return (ipFound->Size() > 0);
+}
+//-------------------------------------------------------------------------------------------------
+bool CSelectPageRegion::isStringFoundOnPage(string strPageText)
+{
+	string strTmpPattern = m_strPattern;
+	if (!m_bIsCaseSensitive)
+	{
+		makeLowerCase(strTmpPattern);
+		makeLowerCase(strPageText);
+	}
+	long pos = strPageText.find(strTmpPattern, 0);
+	return (pos != string::npos);
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStringPtr& ipOriginPage,
@@ -1526,28 +1419,6 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipOriginPage);
 
 		ISpatialStringPtr ipResult(NULL);
-
-		// Check whether the string is spatial or not
-		bool bHasSpatialInfo = asCppBool(ipOriginPage->HasSpatialInfo());
-
-		// Use the spatial string to get the boundaries if the string is spatial
-		// otherwise just use the width and height passed in
-		if (bHasSpatialInfo)
-		{
-			// Get the width and height of the page using the page info
-			// this will give us the real page boundaries as they relate to letter positions
-			nPageNum = ipOriginPage->GetFirstPageNumber();
-			ISpatialPageInfoPtr ipPageInfo = ipOriginPage->GetPageInfo(nPageNum);
-			if(ipPageInfo == __nullptr)
-			{
-				UCLIDException ue("ELI10502", "Unable to obtain spatial page info.");
-				ue.addDebugInfo("Page Number", nPageNum);
-				throw ue;
-			}
-
-			// Get the width and height of the page
-			ipPageInfo->GetWidthAndHeight(&nWidth, &nHeight);
-		}
 
 		// Compute current page's boundary
 		long nLeft(0), nTop(0), nRight(nWidth), nBottom(nHeight);
@@ -1918,4 +1789,3 @@ IIUnknownVectorPtr CSelectPageRegion::buildRasterZonesForExcludedRegion(long nLe
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28144");
 }
-//-------------------------------------------------------------------------------------------------

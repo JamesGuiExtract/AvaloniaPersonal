@@ -13,6 +13,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <COMUtils.h>
 #include <SpecialIcoMap.h>
+#include <mathUtil.h>
 
 #include <io.h>
 #include <cmath>
@@ -1661,6 +1662,24 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 			rectArea.right = info.Size.cx;
 
 			pArea = &rectArea;
+		}
+
+		// [FlexIDSCore:4406]
+		// If the image has a rotated orientation, the specified area to OCR must be rotated into
+		// text's coordinate system.
+		if (imgRotate != ROT_NO)
+		{
+			long degress;
+			switch (imgRotate)
+			{
+				case ROT_LEFT:	degress = -90; break;
+				case ROT_DOWN:	degress = 180; break;
+				case ROT_RIGHT: degress = 90; break;
+				default:
+					THROW_LOGIC_ERROR_EXCEPTION("ELI32933");
+			}
+
+			rotateRectangle(*pArea, info.Size.cx, info.Size.cy, degress);
 		}
 
 		createZonesFromLineRemoval(pArea);
