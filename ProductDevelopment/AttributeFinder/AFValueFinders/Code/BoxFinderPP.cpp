@@ -13,18 +13,18 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const int gnUNSPECIFIED = -1;
+const double gdUNSPECIFIED = numeric_limits<double>::signaling_NaN();
 const int MAX_CLUE_CHARS = 4096;
 const string gstrSPECIFY_PAGES = "Please specify pages to include!";
 const string gstrSPECIFY_BOX_SIZE = "Please expected box dimensions!";
 const string gstrINVALID_MIN_DIMENSION = "Invalid value.\r\n\r\nMinimum expected box size values "
-	"must be a percentage value in the range 0 - 99 or be left blank for unspecified.";
+	"must be a percentage value in the range 0 - 100 or be left blank for unspecified.";
 const string gstrINVALID_MAX_DIMENSION = "Invalid value.\r\n\r\nMaximum expected box size values " 
 	"must be a percentage value in the range 0 - 100 or be left blank for unspecified.";
-const long gnMINIMUM_DIMENSION_LOWER_LIMIT = 0;
-const long gnMINIMUM_DIMENSION_UPPER_LIMIT = 99;
-const long gnMAXIMUM_DIMENSION_LOWER_LIMIT = 0;
-const long gnMAXIMUM_DIMENSION_UPPER_LIMIT = 100;
+const double gdMINIMUM_DIMENSION_LOWER_LIMIT = 0.0;
+const double gdMINIMUM_DIMENSION_UPPER_LIMIT = 100.0;
+const double gdMAXIMUM_DIMENSION_LOWER_LIMIT = 0.0;
+const double gdMAXIMUM_DIMENSION_UPPER_LIMIT = 100.0;
 
 
 //-------------------------------------------------------------------------------------------------
@@ -148,24 +148,24 @@ LRESULT CBoxFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 		}
 
 		// Initialize the page dimension controls
-		if (ipBoxFinder->BoxWidthMin != gnUNSPECIFIED)
+		if (isDoubleValueSpecified(ipBoxFinder->BoxWidthMin))
 		{
-			m_editBoxWidthMin.SetWindowText(asString(ipBoxFinder->BoxWidthMin).c_str());
+			m_editBoxWidthMin.SetWindowText(asString(ipBoxFinder->BoxWidthMin, 1, 2).c_str());
 		}
 
-		if (ipBoxFinder->BoxWidthMax != gnUNSPECIFIED)
+		if (isDoubleValueSpecified(ipBoxFinder->BoxWidthMax))
 		{
-			m_editBoxWidthMax.SetWindowText(asString(ipBoxFinder->BoxWidthMax).c_str());
+			m_editBoxWidthMax.SetWindowText(asString(ipBoxFinder->BoxWidthMax, 1, 2).c_str());
 		}
 
-		if (ipBoxFinder->BoxHeightMin != gnUNSPECIFIED)
+		if (isDoubleValueSpecified(ipBoxFinder->BoxHeightMin))
 		{
-			m_editBoxHeightMin.SetWindowText(asString(ipBoxFinder->BoxHeightMin).c_str());
+			m_editBoxHeightMin.SetWindowText(asString(ipBoxFinder->BoxHeightMin, 1, 2).c_str());
 		}
 	
-		if (ipBoxFinder->BoxHeightMax != gnUNSPECIFIED)
+		if (isDoubleValueSpecified(ipBoxFinder->BoxHeightMax))
 		{
-			m_editBoxHeightMax.SetWindowText(asString(ipBoxFinder->BoxHeightMax).c_str());
+			m_editBoxHeightMax.SetWindowText(asString(ipBoxFinder->BoxHeightMax, 1, 2).c_str());
 		}
 
 		// Initialize the return value specification controls
@@ -588,14 +588,15 @@ STDMETHODIMP CBoxFinderPP::Apply(void)
 			}
 
 			// Store box dimension settings
-			ipBoxFinder->BoxWidthMin = verifyControlValueAsLong(m_editBoxWidthMin, 
-				gnMINIMUM_DIMENSION_LOWER_LIMIT, gnMINIMUM_DIMENSION_UPPER_LIMIT, 
-				gstrINVALID_MIN_DIMENSION, gnUNSPECIFIED);
-			ipBoxFinder->BoxWidthMax = verifyControlValueAsLong(m_editBoxWidthMax, 
-				gnMAXIMUM_DIMENSION_LOWER_LIMIT, gnMAXIMUM_DIMENSION_UPPER_LIMIT, 
-				gstrINVALID_MAX_DIMENSION, gnUNSPECIFIED);
+			ipBoxFinder->BoxWidthMin = verifyControlValueAsDouble(m_editBoxWidthMin, 
+				gdMINIMUM_DIMENSION_LOWER_LIMIT, gdMINIMUM_DIMENSION_UPPER_LIMIT, 
+				gstrINVALID_MIN_DIMENSION, gdUNSPECIFIED);
+			ipBoxFinder->BoxWidthMax = verifyControlValueAsDouble(m_editBoxWidthMax, 
+				gdMAXIMUM_DIMENSION_LOWER_LIMIT, gdMAXIMUM_DIMENSION_UPPER_LIMIT, 
+				gstrINVALID_MAX_DIMENSION, gdUNSPECIFIED);
 
-			if (ipBoxFinder->BoxWidthMax != gnUNSPECIFIED &&
+			if (isDoubleValueSpecified(ipBoxFinder->BoxWidthMax) &&
+				isDoubleValueSpecified(ipBoxFinder->BoxWidthMin) &&
 				ipBoxFinder->BoxWidthMin > ipBoxFinder->BoxWidthMax)
 			{
 				m_editBoxWidthMax.SetFocus();
@@ -604,14 +605,15 @@ STDMETHODIMP CBoxFinderPP::Apply(void)
 				throw ue;
 			}
 
-			ipBoxFinder->BoxHeightMin = verifyControlValueAsLong(m_editBoxHeightMin,
-				gnMINIMUM_DIMENSION_LOWER_LIMIT, gnMINIMUM_DIMENSION_UPPER_LIMIT, 
-				gstrINVALID_MIN_DIMENSION, gnUNSPECIFIED);
-			ipBoxFinder->BoxHeightMax = verifyControlValueAsLong(m_editBoxHeightMax,
-				gnMAXIMUM_DIMENSION_LOWER_LIMIT, gnMAXIMUM_DIMENSION_UPPER_LIMIT, 
-				gstrINVALID_MAX_DIMENSION, gnUNSPECIFIED);
+			ipBoxFinder->BoxHeightMin = verifyControlValueAsDouble(m_editBoxHeightMin,
+				gdMINIMUM_DIMENSION_LOWER_LIMIT, gdMINIMUM_DIMENSION_UPPER_LIMIT, 
+				gstrINVALID_MIN_DIMENSION, gdUNSPECIFIED);
+			ipBoxFinder->BoxHeightMax = verifyControlValueAsDouble(m_editBoxHeightMax,
+				gdMAXIMUM_DIMENSION_LOWER_LIMIT, gdMAXIMUM_DIMENSION_UPPER_LIMIT, 
+				gstrINVALID_MAX_DIMENSION, gdUNSPECIFIED);
 
-			if (ipBoxFinder->BoxHeightMax != gnUNSPECIFIED &&
+			if (isDoubleValueSpecified(ipBoxFinder->BoxHeightMax) &&
+				isDoubleValueSpecified(ipBoxFinder->BoxHeightMin) &&
 				ipBoxFinder->BoxHeightMin > ipBoxFinder->BoxHeightMax)
 			{
 				m_editBoxHeightMax.SetFocus();

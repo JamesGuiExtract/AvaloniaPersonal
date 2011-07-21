@@ -144,6 +144,8 @@ private:
 	// Update the state of the clue buttons based on the items in the clue list
 	void updateClueButtons();
 
+	inline bool isDoubleValueSpecified(double d) { return (d == d); }	
+
 	void validateLicense();
 };
 

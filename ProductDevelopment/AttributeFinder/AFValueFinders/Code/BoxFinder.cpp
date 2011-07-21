@@ -14,10 +14,16 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion		= 2;
+const unsigned long gnCurrentVersion		= 3;
+// Version 2: 
+//		Added m_bFirstBoxOnly
+// Version 3:
+//		Box Min/Max Width/Height are now floating point coordinates.
+
 const int gnMIN_ZONE_HEIGHT					= 20;
 const int gnMIN_ZONE_WIDTH					= 20;
-const int gnUNSPECIFIED						= -1;
+const long gnUNSPECIFIED					= -1;
+const double gdUNSPECIFIED					= numeric_limits<double>::signaling_NaN();
 const int gnDATA_SEARCH_RECT_SIZE			= 25;
 const string gstrDEFAULT_ATTRIBUTE_TEXT		= "000-00-0000";
 const long gnLINEUTIL_COLUMN_COUNT_MIN		= 1;
@@ -31,10 +37,10 @@ const long gnLINEUTIL_VERT_LINE_BRIDGE_GAP	= 50;
 const long gnLINEUTIL_EXTENSION_CONSECUTIVE	= 9;
 const long gnLINEUTIL_EXTENSION_GAP_ALLOWANCE = 13;
 const long gnLINEUTIL_EXTENSION_SCAN_WIDTH	= 3;
-const long gnMINIMUM_DIMENSION_LOWER_LIMIT	= 0;
-const long gnMINIMUM_DIMENSION_UPPER_LIMIT	= 99;
-const long gnMAXIMUM_DIMENSION_LOWER_LIMIT	= 0;
-const long gnMAXIMUM_DIMENSION_UPPER_LIMIT	= 100;
+const double gdMINIMUM_DIMENSION_LOWER_LIMIT	= 0.0;
+const double gdMINIMUM_DIMENSION_UPPER_LIMIT	= 100.0;
+const double gdMAXIMUM_DIMENSION_LOWER_LIMIT	= 0.0;
+const double gdMAXIMUM_DIMENSION_UPPER_LIMIT	= 100.0;
 
 //-------------------------------------------------------------------------------------------------
 // CBoxFinder
@@ -354,7 +360,7 @@ STDMETHODIMP CBoxFinder::put_SpecifiedPages(BSTR newVal)
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CBoxFinder::get_BoxWidthMin(long *pVal)
+STDMETHODIMP CBoxFinder::get_BoxWidthMin(double *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -364,26 +370,26 @@ STDMETHODIMP CBoxFinder::get_BoxWidthMin(long *pVal)
 
 		validateLicense();
 
-		*pVal = m_nBoxWidthMin;
+		*pVal = m_dBoxWidthMin;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19719")
 
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CBoxFinder::put_BoxWidthMin(long newVal)
+STDMETHODIMP CBoxFinder::put_BoxWidthMin(double newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		// verify that the new value is either gnUNSPECIFIED or a valid percentage
-		ASSERT_ARGUMENT("ELI19894", newVal == gnUNSPECIFIED || 
-			(newVal >= gnMINIMUM_DIMENSION_LOWER_LIMIT && newVal <= gnMINIMUM_DIMENSION_UPPER_LIMIT));
+		// verify that the new value is either gdUNSPECIFIED or a valid percentage
+		ASSERT_ARGUMENT("ELI19894", !isDoubleValueSpecified(newVal) || 
+			(newVal >= gdMINIMUM_DIMENSION_LOWER_LIMIT && newVal <= gdMINIMUM_DIMENSION_UPPER_LIMIT));
 
 		validateLicense();
 
-		m_nBoxWidthMin = newVal;
+		m_dBoxWidthMin = newVal;
 
 		m_bDirty = true;
 	}
@@ -392,7 +398,7 @@ STDMETHODIMP CBoxFinder::put_BoxWidthMin(long newVal)
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CBoxFinder::get_BoxWidthMax(long *pVal)
+STDMETHODIMP CBoxFinder::get_BoxWidthMax(double *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -402,26 +408,26 @@ STDMETHODIMP CBoxFinder::get_BoxWidthMax(long *pVal)
 
 		validateLicense();
 
-		*pVal = m_nBoxWidthMax;
+		*pVal = m_dBoxWidthMax;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19722")
 
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CBoxFinder::put_BoxWidthMax(long newVal)
+STDMETHODIMP CBoxFinder::put_BoxWidthMax(double newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		// verify that the new value is either gnUNSPECIFIED or a valid percentage
-		ASSERT_ARGUMENT("ELI19891", newVal == gnUNSPECIFIED || 
-			(newVal >= gnMAXIMUM_DIMENSION_LOWER_LIMIT && newVal <= gnMAXIMUM_DIMENSION_UPPER_LIMIT));
+		// verify that the new value is either gdUNSPECIFIED or a valid percentage
+		ASSERT_ARGUMENT("ELI19891", !isDoubleValueSpecified(newVal) || 
+			(newVal >= gdMAXIMUM_DIMENSION_LOWER_LIMIT && newVal <= gdMAXIMUM_DIMENSION_UPPER_LIMIT));
 
 		validateLicense();
 
-		m_nBoxWidthMax = newVal;
+		m_dBoxWidthMax = newVal;
 
 		m_bDirty = true;
 	}
@@ -430,7 +436,7 @@ STDMETHODIMP CBoxFinder::put_BoxWidthMax(long newVal)
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CBoxFinder::get_BoxHeightMin(long *pVal)
+STDMETHODIMP CBoxFinder::get_BoxHeightMin(double *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -440,26 +446,26 @@ STDMETHODIMP CBoxFinder::get_BoxHeightMin(long *pVal)
 
 		validateLicense();
 
-		*pVal = m_nBoxHeightMin;
+		*pVal = m_dBoxHeightMin;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19725")
 
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CBoxFinder::put_BoxHeightMin(long newVal)
+STDMETHODIMP CBoxFinder::put_BoxHeightMin(double newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		// verify that the new value is either gnUNSPECIFIED or a valid percentage
-		ASSERT_ARGUMENT("ELI19892", newVal == gnUNSPECIFIED || 
-			(newVal >= gnMINIMUM_DIMENSION_LOWER_LIMIT && newVal <= gnMINIMUM_DIMENSION_UPPER_LIMIT));
+		// verify that the new value is either gdUNSPECIFIED or a valid percentage
+		ASSERT_ARGUMENT("ELI19892", !isDoubleValueSpecified(newVal) || 
+			(newVal >= gdMINIMUM_DIMENSION_LOWER_LIMIT && newVal <= gdMINIMUM_DIMENSION_UPPER_LIMIT));
 
 		validateLicense();
 
-		m_nBoxHeightMin = newVal;
+		m_dBoxHeightMin = newVal;
 
 		m_bDirty = true;
 	}
@@ -468,7 +474,7 @@ STDMETHODIMP CBoxFinder::put_BoxHeightMin(long newVal)
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CBoxFinder::get_BoxHeightMax(long *pVal)
+STDMETHODIMP CBoxFinder::get_BoxHeightMax(double *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -478,26 +484,26 @@ STDMETHODIMP CBoxFinder::get_BoxHeightMax(long *pVal)
 
 		validateLicense();
 
-		*pVal = m_nBoxHeightMax;
+		*pVal = m_dBoxHeightMax;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19728")
 
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CBoxFinder::put_BoxHeightMax(long newVal)
+STDMETHODIMP CBoxFinder::put_BoxHeightMax(double newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		// verify that the new value is either gnUNSPECIFIED or a valid percentage
-		ASSERT_ARGUMENT("ELI19893", newVal == gnUNSPECIFIED || 
-			(newVal >= gnMAXIMUM_DIMENSION_LOWER_LIMIT && newVal <= gnMAXIMUM_DIMENSION_UPPER_LIMIT));
+		// verify that the new value is either gdUNSPECIFIED or a valid percentage
+		ASSERT_ARGUMENT("ELI19893", !isDoubleValueSpecified(newVal) || 
+			(newVal >= gdMAXIMUM_DIMENSION_LOWER_LIMIT && newVal <= gdMAXIMUM_DIMENSION_UPPER_LIMIT));
 
 		validateLicense();
 
-		m_nBoxHeightMax = newVal;
+		m_dBoxHeightMax = newVal;
 
 		m_bDirty = true;
 	}
@@ -1015,10 +1021,10 @@ STDMETHODIMP CBoxFinder::raw_CopyFrom(IUnknown *pObject)
 		m_nNumFirstPages				= ipCopyThis->NumFirstPages;
 		m_nNumLastPages					= ipCopyThis->NumLastPages;
 		m_strSpecifiedPages				= asString(ipCopyThis->SpecifiedPages);
-		m_nBoxWidthMin					= ipCopyThis->BoxWidthMin;
-		m_nBoxWidthMax					= ipCopyThis->BoxWidthMax;
-		m_nBoxHeightMin					= ipCopyThis->BoxHeightMin;
-		m_nBoxHeightMax					= ipCopyThis->BoxHeightMax;
+		m_dBoxWidthMin					= ipCopyThis->BoxWidthMin;
+		m_dBoxWidthMax					= ipCopyThis->BoxWidthMax;
+		m_dBoxHeightMin					= ipCopyThis->BoxHeightMin;
+		m_dBoxHeightMax					= ipCopyThis->BoxHeightMax;
 		m_eFindType						= (EFindType) ipCopyThis->FindType;
 		m_strAttributeText				= asString(ipCopyThis->AttributeText);
 		m_bExcludeClueArea				= asCppBool(ipCopyThis->ExcludeClueArea);
@@ -1085,8 +1091,6 @@ STDMETHODIMP CBoxFinder::IsDirty(void)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19243");
 }
 //-------------------------------------------------------------------------------------------------
-// Version 2: 
-//    Added m_bFirstBoxOnly, 
 STDMETHODIMP CBoxFinder::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1142,10 +1146,25 @@ STDMETHODIMP CBoxFinder::Load(IStream *pStream)
 		dataReader >> m_nNumFirstPages;
 		dataReader >> m_nNumLastPages;
 		dataReader >> m_strSpecifiedPages;
-		dataReader >> m_nBoxWidthMin;
-		dataReader >> m_nBoxWidthMax;
-		dataReader >> m_nBoxHeightMin;
-		dataReader >> m_nBoxHeightMax;
+		if (nDataVersion < 3)
+		{
+			long temp;
+			dataReader >> temp;
+			m_dBoxWidthMin = (temp == gnUNSPECIFIED) ? gdUNSPECIFIED : temp;
+			dataReader >> temp;
+			m_dBoxWidthMax = (temp == gnUNSPECIFIED) ? gdUNSPECIFIED : temp;
+			dataReader >> temp;
+			m_dBoxHeightMin = (temp == gnUNSPECIFIED) ? gdUNSPECIFIED : temp;
+			dataReader >> temp;
+			m_dBoxHeightMax = (temp == gnUNSPECIFIED) ? gdUNSPECIFIED : temp;
+		}
+		else
+		{
+			dataReader >> m_dBoxWidthMin;
+			dataReader >> m_dBoxWidthMax;
+			dataReader >> m_dBoxHeightMin;
+			dataReader >> m_dBoxHeightMax;
+		}
 		
 		lTemp = (long) kImageRegion;
 		dataReader >> lTemp;
@@ -1196,10 +1215,10 @@ STDMETHODIMP CBoxFinder::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_nNumFirstPages;
 		dataWriter << m_nNumLastPages;
 		dataWriter << m_strSpecifiedPages;
-		dataWriter << m_nBoxWidthMin;
-		dataWriter << m_nBoxWidthMax;
-		dataWriter << m_nBoxHeightMin;
-		dataWriter << m_nBoxHeightMax;
+		dataWriter << m_dBoxWidthMin;
+		dataWriter << m_dBoxWidthMax;
+		dataWriter << m_dBoxHeightMin;
+		dataWriter << m_dBoxHeightMax;
 		dataWriter << (long) m_eFindType;
 		dataWriter << m_strAttributeText;
 		dataWriter << m_bExcludeClueArea;
@@ -1623,34 +1642,34 @@ bool CBoxFinder::qualifyBox(ILongRectanglePtr ipRect, ISpatialPageInfoPtr ipPage
 							 eOrientation == kRotFlippedDown;
 
 	// Test the width of the box against specs if necessary
-	if (m_nBoxWidthMin != gnUNSPECIFIED || m_nBoxWidthMax != gnUNSPECIFIED)
+	if (isDoubleValueSpecified(m_dBoxWidthMin) || isDoubleValueSpecified(m_dBoxWidthMax))
 	{
 		double dPageWidth = (bTextIsHorizontal ? nPageWidth : nPageHeight);
 		double dBoxWidth = nRectRight - nRectLeft;
 		double dWidthPercent = 100.0 * dBoxWidth / dPageWidth;
 
-		if (m_nBoxWidthMin != gnUNSPECIFIED && dWidthPercent < (double) m_nBoxWidthMin)
+		if (isDoubleValueSpecified(m_dBoxWidthMin) && dWidthPercent < m_dBoxWidthMin)
 		{
 			return false;
 		}
-		else if (m_nBoxWidthMax != gnUNSPECIFIED && dWidthPercent > (double) m_nBoxWidthMax)
+		else if (isDoubleValueSpecified(m_dBoxWidthMax) && dWidthPercent > m_dBoxWidthMax)
 		{
 			return false;
 		}
 	}
 	
 	// Test the height of the box against specs if necessary
-	if (m_nBoxHeightMin != gnUNSPECIFIED || m_nBoxHeightMax != gnUNSPECIFIED)
+	if (isDoubleValueSpecified(m_dBoxHeightMin) || isDoubleValueSpecified(m_dBoxHeightMax))
 	{
 		double dPageHeight = (bTextIsHorizontal ? nPageHeight : nPageWidth);
 		double dBoxHeight = nRectBottom - nRectTop;
 		double dHeightPercent = 100.0 * dBoxHeight / dPageHeight;
 
-		if (m_nBoxHeightMin != gnUNSPECIFIED && dHeightPercent < (double) m_nBoxHeightMin)
+		if (isDoubleValueSpecified(m_dBoxHeightMin) && dHeightPercent < m_dBoxHeightMin)
 		{
 			return false;
 		}
-		else if (m_nBoxHeightMax != gnUNSPECIFIED && dHeightPercent > (double) m_nBoxHeightMax)
+		else if (isDoubleValueSpecified(m_dBoxHeightMax) && dHeightPercent > m_dBoxHeightMax)
 		{
 			return false;
 		}
@@ -1922,10 +1941,10 @@ void CBoxFinder::resetDataMembers()
 	m_nNumFirstPages				= 0;
 	m_nNumLastPages					= 0;
 	m_strSpecifiedPages				= "";
-	m_nBoxWidthMin					= gnUNSPECIFIED;
-	m_nBoxWidthMax					= gnUNSPECIFIED;
-	m_nBoxHeightMin					= gnUNSPECIFIED;
-	m_nBoxHeightMax					= gnUNSPECIFIED;
+	m_dBoxWidthMin					= gdUNSPECIFIED;
+	m_dBoxWidthMax					= gdUNSPECIFIED;
+	m_dBoxHeightMin					= gdUNSPECIFIED;
+	m_dBoxHeightMax					= gdUNSPECIFIED;
 	m_eFindType						= kImageRegion;
 	m_strAttributeText				= gstrDEFAULT_ATTRIBUTE_TEXT;
 	m_bExcludeClueArea				= false;

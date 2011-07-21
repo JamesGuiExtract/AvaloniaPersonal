@@ -77,14 +77,14 @@ public:
 	STDMETHOD(put_NumLastPages)(long newVal);
 	STDMETHOD(get_SpecifiedPages)(BSTR *pVal);
 	STDMETHOD(put_SpecifiedPages)(BSTR newVal);
-	STDMETHOD(get_BoxWidthMin)(long *pVal);
-	STDMETHOD(put_BoxWidthMin)(long newVal);
-	STDMETHOD(get_BoxWidthMax)(long *pVal);
-	STDMETHOD(put_BoxWidthMax)(long newVal);
-	STDMETHOD(get_BoxHeightMin)(long *pVal);
-	STDMETHOD(put_BoxHeightMin)(long newVal);
-	STDMETHOD(get_BoxHeightMax)(long *pVal);
-	STDMETHOD(put_BoxHeightMax)(long newVal);
+	STDMETHOD(get_BoxWidthMin)(double *pVal);
+	STDMETHOD(put_BoxWidthMin)(double newVal);
+	STDMETHOD(get_BoxWidthMax)(double *pVal);
+	STDMETHOD(put_BoxWidthMax)(double newVal);
+	STDMETHOD(get_BoxHeightMin)(double *pVal);
+	STDMETHOD(put_BoxHeightMin)(double newVal);
+	STDMETHOD(get_BoxHeightMax)(double *pVal);
+	STDMETHOD(put_BoxHeightMax)(double newVal);
 	STDMETHOD(get_FindType)(EFindType *pVal);
 	STDMETHOD(put_FindType)(EFindType newVal);
 	STDMETHOD(get_AttributeText)(BSTR *pVal);
@@ -154,10 +154,10 @@ private:
 	string m_strSpecifiedPages;
 
 	// Required dimensions of box. Any of these can be -1 to represent an unspecified dimension
-	long m_nBoxWidthMin;
-	long m_nBoxWidthMax;
-	long m_nBoxHeightMin;
-	long m_nBoxHeightMax;
+	double m_dBoxWidthMin;
+	double m_dBoxWidthMax;
+	double m_dBoxHeightMin;
+	double m_dBoxHeightMax;
 
 	// Whether to return a spatial area or the text in the box
 	EFindType m_eFindType;
@@ -268,6 +268,8 @@ private:
 
 	// PROMISE: Reset all data members to default values
 	void resetDataMembers();
+
+	inline bool isDoubleValueSpecified(double d) { return (d == d); }
 
 	void validateLicense();
 };

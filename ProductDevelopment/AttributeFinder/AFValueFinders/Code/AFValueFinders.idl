@@ -635,20 +635,20 @@ library	UCLID_AFVALUEFINDERSLib
 		[propput, id(8), helpstring("property SpecifiedPages")] HRESULT SpecifiedPages([in] BSTR newVal);
 
 		// The minimum width of a box to be found. Can be -1 for unspecified.
-		[propget, id(9), helpstring("property BoxWidthMin")] HRESULT BoxWidthMin([out, retval] long *pVal);
-		[propput, id(9), helpstring("property BoxWidthMin")] HRESULT BoxWidthMin([in] long newVal);
+		[propget, id(9), helpstring("property BoxWidthMin")] HRESULT BoxWidthMin([out, retval] double *pVal);
+		[propput, id(9), helpstring("property BoxWidthMin")] HRESULT BoxWidthMin([in] double newVal);
 
 		// The maximum width of a box to be found. Can be -1 for unspecified.
-		[propget, id(10), helpstring("property BoxWidthMax")] HRESULT BoxWidthMax([out, retval] long *pVal);
-		[propput, id(10), helpstring("property BoxWidthMax")] HRESULT BoxWidthMax([in] long newVal);
+		[propget, id(10), helpstring("property BoxWidthMax")] HRESULT BoxWidthMax([out, retval] double *pVal);
+		[propput, id(10), helpstring("property BoxWidthMax")] HRESULT BoxWidthMax([in] double newVal);
 
 		// The minimum height of a box to be found. Can be -1 for unspecified.
-		[propget, id(11), helpstring("property BoxHeightMin")] HRESULT BoxHeightMin([out, retval] long *pVal);
-		[propput, id(11), helpstring("property BoxHeightMin")] HRESULT BoxHeightMin([in] long newVal);
+		[propget, id(11), helpstring("property BoxHeightMin")] HRESULT BoxHeightMin([out, retval] double *pVal);
+		[propput, id(11), helpstring("property BoxHeightMin")] HRESULT BoxHeightMin([in] double newVal);
 
 		// The maximum height of a box to be found. Can be -1 for unspecified.
-		[propget, id(12), helpstring("property BoxHeightMax")] HRESULT BoxHeightMax([out, retval] long *pVal);
-		[propput, id(12), helpstring("property BoxHeightMax")] HRESULT BoxHeightMax([in] long newVal);
+		[propget, id(12), helpstring("property BoxHeightMax")] HRESULT BoxHeightMax([out, retval] double *pVal);
+		[propput, id(12), helpstring("property BoxHeightMax")] HRESULT BoxHeightMax([in] double newVal);
 
 		// Whether to find spatial area or the text in the box
 		[propget, id(13), helpstring("property FindType")] HRESULT FindType([out, retval] EFindType *pVal);

@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -550,6 +548,17 @@ IDD_BOXFINDERPP DIALOGEX 0, 0, 430, 282
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
+    CONTROL         "",IDC_LIST_CLUES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,12,25,216,52
+    PUSHBUTTON      "Add...",IDC_BTN_ADD_CLUE,235,25,42,13
+    PUSHBUTTON      "Remove",IDC_BTN_REMOVE_CLUE,235,43,42,13
+    PUSHBUTTON      "Modify...",IDC_BTN_MODIFY_CLUE,235,62,42,13
+    PUSHBUTTON      "",IDC_BTN_CLUE_UP,235,81,18,18,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_CLUE_DOWN,259,81,18,18,BS_ICON
+    CONTROL         "Case sensitive",IDC_CHK_CASE_SENSITIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,82,61,10
+    CONTROL         "Above clue is a regular expression",IDC_CHK_AS_REGEXPR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,95,123,10
+    CONTROL         "Stop searching after first box is found",IDC_CHK_FIRST_BOX_ONLY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,132,10
     CONTROL         "",IDC_PICT_CLUE_DIAGRAM,"Static",SS_BITMAP | SS_CENTERIMAGE,286,25,126,74
     CONTROL         "All pages",IDC_RADIO_ALL_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,140,78,10
     CONTROL         "First",IDC_RADIO_FIRST_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,157,28,10
@@ -558,47 +567,36 @@ BEGIN
     EDITTEXT        IDC_EDIT_FIRST_PAGE_NUMS,42,156,36,13,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT_LAST_PAGE_NUMS,42,173,36,13,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT_SPECIFIED_PAGE_NUMS,78,190,87,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BOX_WIDTH_MIN,101,238,27,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BOX_WIDTH_MAX,138,238,27,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BOX_HEIGHT_MIN,101,256,27,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BOX_HEIGHT_MAX,138,256,27,13,ES_AUTOHSCROLL
+    CONTROL         "Return spatial information of found box and artificially associate",IDC_RADIO_RETURN_BOX_AREA,
+                    "Button",BS_AUTORADIOBUTTON,187,141,216,10
+    CONTROL         "Return text found within the box",IDC_RADIO_RETURN_TEXT,
+                    "Button",BS_AUTORADIOBUTTON,187,203,216,10
+    EDITTEXT        IDC_EDIT_ATTRIBUTE_TEXT,198,163,117,13,ES_AUTOHSCROLL
+    CONTROL         "Exclude vertical spatial area of clue from box",IDC_CHECK_EXCLUDE_CLUE_AREA,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,182,198,10
+    CONTROL         "Include clue text as part of the return value",IDC_CHECK_INCLUDE_CLUE_TEXT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,217,198,10
+    CONTROL         "Include all lines that are found in the output",IDC_CHECK_INCLUDE_LINES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,197,250,198,10
     GROUPBOX        "Search Scope",IDC_STATIC,6,128,168,83,BS_LEFT
     LTEXT           "pages",IDC_STATIC,84,158,54,8
     LTEXT           "pages",IDC_STATIC,84,175,54,8
     LTEXT           "Clues to find box:",IDC_STATIC,12,15,55,8
     ICON            IDI_ICON_DYNAMIC_LIST,IDC_CLUE_DYNAMIC_LIST_HELP,71,15,20,20,SS_NOTIFY
-    PUSHBUTTON      "Add...",IDC_BTN_ADD_CLUE,235,25,42,13
-    PUSHBUTTON      "Remove",IDC_BTN_REMOVE_CLUE,235,43,42,13
-    PUSHBUTTON      "Modify...",IDC_BTN_MODIFY_CLUE,235,62,42,13
-    CONTROL         "",IDC_LIST_CLUES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,12,25,216,52
-    CONTROL         "Case sensitive",IDC_CHK_CASE_SENSITIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,82,61,10
-    CONTROL         "Above clue is a regular expression",IDC_CHK_AS_REGEXPR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,95,123,10
     GROUPBOX        "Clues to find box",IDC_STATIC,6,3,416,120
     LTEXT           "Select location of clue relative to box:",IDC_STATIC,286,14,129,8
     GROUPBOX        "Return value",IDC_STATIC,182,128,240,147,BS_LEFT
-    CONTROL         "Return spatial information of found box and artificially associate",IDC_RADIO_RETURN_BOX_AREA,
-                    "Button",BS_AUTORADIOBUTTON,187,141,216,10
     LTEXT           "the spatial area with the following text:",IDC_STATIC,198,152,120,8
-    EDITTEXT        IDC_EDIT_ATTRIBUTE_TEXT,198,163,117,13,ES_AUTOHSCROLL
-    CONTROL         "Exclude vertical spatial area of clue from box",IDC_CHECK_EXCLUDE_CLUE_AREA,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,182,198,10
-    CONTROL         "Return text found within the box",IDC_RADIO_RETURN_TEXT,
-                    "Button",BS_AUTORADIOBUTTON,187,203,216,10
-    CONTROL         "Include clue text as part of the return value",IDC_CHECK_INCLUDE_CLUE_TEXT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,217,198,10
     GROUPBOX        "Expected size of box",IDC_STATIC,6,216,168,59,BS_LEFT
     LTEXT           "Width (% of page width):",IDC_STATIC,12,241,79,8
     LTEXT           "Height (% of page height):",IDC_STATIC,11,258,87,8
     LTEXT           "Minimum",IDC_STATIC,101,226,28,8
     LTEXT           "Maximum",IDC_STATIC,137,226,30,8
-    EDITTEXT        IDC_EDIT_BOX_WIDTH_MIN,101,238,27,13,ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        IDC_EDIT_BOX_HEIGHT_MIN,101,256,27,13,ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        IDC_EDIT_BOX_WIDTH_MAX,138,238,27,13,ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        IDC_EDIT_BOX_HEIGHT_MAX,138,256,27,13,ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "Debug information",IDC_STATIC,190,237,223,31,BS_LEFT
-    CONTROL         "Include all lines that are found in the output",IDC_CHECK_INCLUDE_LINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,197,250,198,10
-    CONTROL         "Stop searching after first box is found",IDC_CHK_FIRST_BOX_ONLY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,132,10
-    PUSHBUTTON      "",IDC_BTN_CLUE_UP,235,81,18,18,BS_ICON
-    PUSHBUTTON      "",IDC_BTN_CLUE_DOWN,259,81,18,18,BS_ICON
 END
 
 IDD_LOOPFINDERPP DIALOGEX 0, 0, 290, 241
@@ -654,7 +652,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_VALUEBEFORECLUEPP, DIALOG
     BEGIN
@@ -786,7 +784,7 @@ IDB_BITMAP_CLUEBOTTOMRIGHT BITMAP                  "res\\ClueChartBottomRight.bm
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROJNAME            "AFValueFinders"
     IDS_TITLERegExprRulePP  "Title"
@@ -794,7 +792,7 @@ BEGIN
     IDS_DOCSTRINGRegExprRulePP "Your Help String"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLEValueAfterCluePP "ValueAfterCluePP"
     IDS_HELPFILEValueAfterCluePP "ValueAfterCluePP"
@@ -807,7 +805,7 @@ BEGIN
     IDS_DOCSTRINGValueFromListPP "ValueFromListPP"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLEExtractLinePP  "ExtractLinePP"
     IDS_HELPFILEExtractLinePP "ExtractLinePP"
@@ -820,7 +818,7 @@ BEGIN
     IDS_DOCSTRINGSPMFinderPP "SPMFinderPP"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLELocateImageRegionPP "LocateImageRegionPP"
     IDS_HELPFILELocateImageRegionPP "LocateImageRegionPP"
@@ -830,7 +828,7 @@ BEGIN
     IDS_DOCSTRINGReturnAddrFinderPP "ReturnAddrFinderPP"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLECreateValuePP  "CreateValuePP"
     IDS_HELPFILECreateValuePP "CreateValuePP"
@@ -842,7 +840,7 @@ BEGIN
     IDS_HELPFILEIMAGEREGIONWITHLINESPP "ImageRegionWithLinesPP"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLELOOPFINDERPP   "Loop Finder"
     IDS_HELPFILELOOPFINDERPP "Help File Name"
@@ -851,12 +849,12 @@ BEGIN
     IDS_HELPFILEMICRFINDERPP "Help File Name"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_DOCSTRINGMICRFINDERPP "Your Help String"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

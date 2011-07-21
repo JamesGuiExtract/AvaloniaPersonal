@@ -325,7 +325,23 @@ namespace Extract.Redaction
 
                 // Generate the output file.
                 string outputFileName = pathTags.Expand(_settings.OutputFileName);
-                File.WriteAllText(outputFileName, redactedString);
+
+                // [FlexIDSCore:4564]
+                // The bytes in the source string (and therefore in redactedString) already contain
+                // any encoding such as utf-8. To prevent File.WriteAllText from attempting to
+                // encode already encoded characters (thus generating nonsense), write the raw
+                // bytes from redactedString to disk using File.WriteAllBytes.
+                // NOTE: This solution presumes the file the text does not use double-byte encoding
+                // such as unicode. However, since the rules framework does not currently processes
+                // unicode files correctly this assumption is, at the moment, acceptable.
+                char[] chars = redactedString.ToArray();
+                long length = chars.LongLength;
+                byte[] bytes = new byte[length];
+                for (long i = 0; i < length; i++)
+                {
+                    bytes[i] = (byte)chars[i];
+                }
+                File.WriteAllBytes(outputFileName, bytes);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
