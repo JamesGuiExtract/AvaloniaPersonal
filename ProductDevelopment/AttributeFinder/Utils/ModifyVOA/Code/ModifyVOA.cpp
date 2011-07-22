@@ -89,6 +89,7 @@ void processInputFileOrFolder(string& rstrInput, vector<string>& rvecInputFiles)
 	if (isValidFolder(rstrInput))
 	{
 		getFilesInDir(rvecInputFiles, rstrInput, "*.voa");
+		getFilesInDir(rvecInputFiles, rstrInput, "*.evoa");
 	}
 	// check if it is a valid file
 	else if (isValidFile(rstrInput))

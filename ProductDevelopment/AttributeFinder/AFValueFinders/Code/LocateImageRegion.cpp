@@ -14,11 +14,13 @@
 #include <AFTagManager.h>
 #include <ComponentLicenseIDs.h>
 #include <AFCppUtils.h>
+#include <MiscLeadUtils.h>
 
 #include <cmath>
 
 // current version
-const unsigned long gnCurrentVersion = 5;
+// Version 6: Added units field to boundary info.
+const unsigned long gnCurrentVersion = 6;
 
 //-------------------------------------------------------------------------------------------------
 // CLocateImageRegion
@@ -56,6 +58,9 @@ CLocateImageRegion::CLocateImageRegion()
 
 		m_ipMisc.CreateInstance(CLSID_MiscUtils);
 		ASSERT_RESOURCE_ALLOCATION("ELI22434", m_ipMisc != __nullptr);
+
+		// For getImageXAndYResolution
+		initPDFSupport();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI07795")
 }
@@ -296,7 +301,8 @@ STDMETHODIMP CLocateImageRegion::SetRegionBoundary(EBoundary eRegionBoundary,
 												   EBoundary eSide, 
 												   EBoundaryCondition eCondition, 
 												   EExpandDirection eExpandDirection, 
-												   double dExpandNumber)
+												   double dExpandNumber,
+												   EUnits eUnits)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -309,6 +315,7 @@ STDMETHODIMP CLocateImageRegion::SetRegionBoundary(EBoundary eRegionBoundary,
 		boundInfo.m_eCondition = eCondition;
 		boundInfo.m_eExpandDirection = eExpandDirection;
 		boundInfo.m_dExpandNumber = dExpandNumber;
+		boundInfo.m_eUnits = eUnits;
 
 		m_mapBoundaryToInfo[eRegionBoundary] = boundInfo;
 	}
@@ -321,7 +328,8 @@ STDMETHODIMP CLocateImageRegion::GetRegionBoundary(EBoundary eRegionBoundary,
 												   EBoundary *peSide, 
 												   EBoundaryCondition *peCondition, 
 												   EExpandDirection *peExpandDirection, 
-												   double *pdExpandNumber)
+												   double *pdExpandNumber,
+												   EUnits *peUnits)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -344,6 +352,7 @@ STDMETHODIMP CLocateImageRegion::GetRegionBoundary(EBoundary eRegionBoundary,
 		*peCondition = boundInfo.m_eCondition;
 		*peExpandDirection = boundInfo.m_eExpandDirection;
 		*pdExpandNumber = boundInfo.m_dExpandNumber;
+		*peUnits = boundInfo.m_eUnits;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07786")
 
@@ -596,6 +605,22 @@ STDMETHODIMP CLocateImageRegion::Load(IStream *pStream)
 				dataReader >> boundInfo.m_dExpandNumber;
 			}
 
+			if(nDataVersion <= 5)
+			{
+				// In previous versions, the average size of the clue was always used when the
+				// bounds were relative to the clue and the average size of the page text was always
+				// used when the bounds were relative to the page.
+				boundInfo.m_eUnits = ((n + 1) == kTop || (n + 1) == kBottom)
+					? ((boundInfo.m_eCondition == kPage) ? kPageLines : kClueLines)
+					: ((boundInfo.m_eCondition == kPage) ? kPageCharacters : kClueCharacters);
+			}
+			else
+			{
+				long nTemp;
+				dataReader >> nTemp;
+				boundInfo.m_eUnits = (EUnits)nTemp;
+			}
+
 			// store in the map
 			m_mapBoundaryToInfo[eRegionBoundary] = boundInfo;
 		}
@@ -692,6 +717,7 @@ STDMETHODIMP CLocateImageRegion::Save(IStream *pStream, BOOL fClearDirty)
 			dataWriter << (long)boundInfo.m_eCondition;
 			dataWriter << (long)boundInfo.m_eExpandDirection;
 			dataWriter << boundInfo.m_dExpandNumber;
+			dataWriter << (long)boundInfo.m_eUnits;
 		}
 
 		///////////////////
@@ -955,13 +981,15 @@ STDMETHODIMP CLocateImageRegion::raw_CopyFrom(IUnknown *pObject)
 			UCLID_AFVALUEFINDERSLib::EBoundary eSide;
 			UCLID_AFVALUEFINDERSLib::EExpandDirection eExpandDirection;
 			double dExpandNumber;
+			UCLID_AFVALUEFINDERSLib::EUnits eUnits;
 		
 			ipSource->GetRegionBoundary((UCLID_AFVALUEFINDERSLib::EBoundary)i, 
-				&eSide, &eCondition, &eExpandDirection, &dExpandNumber);
+				&eSide, &eCondition, &eExpandDirection, &dExpandNumber, &eUnits);
 			boundInfo.m_eSide = (EBoundary)eSide;
 			boundInfo.m_eCondition = (EBoundaryCondition)eCondition;
 			boundInfo.m_eExpandDirection = (EExpandDirection)eExpandDirection;
 			boundInfo.m_dExpandNumber = dExpandNumber;
+			boundInfo.m_eUnits = (EUnits)eUnits;
 			m_mapBoundaryToInfo[(EBoundary)i] = boundInfo;
 		}
 	}
@@ -1110,6 +1138,9 @@ IIUnknownVectorPtr CLocateImageRegion::findRegionContent(ISpatialStringPtr ipInp
 	// create an IIUnknownVector to hold the results
 	IIUnknownVectorPtr ipVecFoundRegions(CLSID_IUnknownVector);
 	ASSERT_RESOURCE_ALLOCATION("ELI16817", ipVecFoundRegions != __nullptr);
+
+	// Clear the cache of page resolutions from the last time this rule was run.
+	m_mapPageResolutions.clear();
 
 	// Create IVariantVectorPtr array to backup the clues strings.
 	IVariantVectorPtr ipCopy[4];
@@ -1584,74 +1615,74 @@ bool CLocateImageRegion::findCluesWithinBoundary(ISpatialStringPtr ipPageText,
 long CLocateImageRegion::getExpandPixels(EBoundary eRegionBound, ISpatialStringPtr ipPageText)
 {
 	BoundaryToInfo::iterator itBound = m_mapBoundaryToInfo.find(eRegionBound);
-	if (itBound != m_mapBoundaryToInfo.end())
+	if (itBound == m_mapBoundaryToInfo.end())
 	{
-		BoundaryInfo boundInfo = itBound->second;
-		if (boundInfo.m_dExpandNumber > 0)
-		{
-			// check if this is a page edge condition [P16 #2900]
-			if(boundInfo.m_eCondition == kPage)
-			{
-				// get the expand pixels using the average line height or average character width
-				// of the whole page that matched the clues
-				return getExpandPixels(eRegionBound, boundInfo, ipPageText);		
-			}
+		return 0;
+	}
 
-			// look for the boundary condition associated clue list if any
+	BoundaryInfo boundInfo = itBound->second;
+	if (boundInfo.m_dExpandNumber == 0)
+	{
+		return 0;
+	}
+
+	// get the expand number (the number of units to expand)
+	double dExpandPixels = boundInfo.m_dExpandNumber;
+			
+	// calculate the unit of expansion (average line height or char width) and
+	// determine pixel expansion direction by negating the expand pixels when appropriate
+	if (boundInfo.m_eUnits ==  kInches)
+	{
+		string strSourceDoc = asString(ipPageText->SourceDocName);
+		long nPage = ipPageText->GetFirstPageNumber();
+		int nXResolution, nYResolution;
+		getPageResolution(strSourceDoc, nPage, nXResolution, nYResolution);
+
+		dExpandPixels *= (eRegionBound == kLeft || eRegionBound == kRight) 
+			? nXResolution
+			: nYResolution;
+	}
+	else
+	{
+		ISpatialStringPtr ipSpatialString;
+
+		// If the units are relative to the entire pages average text size
+		if(boundInfo.m_eUnits == kPageLines || boundInfo.m_eUnits == kPageCharacters)
+		{
+			ipSpatialString = ipPageText;
+		}
+		// If the units are relative to the text of the clue used to define the border.
+		else
+		{
 			IndexToClueListInfo::iterator itClueList = 
 				m_mapIndexToClueListInfo.find((EClueListIndex)boundInfo.m_eCondition);
 			if (itClueList != m_mapIndexToClueListInfo.end())
 			{
-				// get the expand pixels using the average line height or average character width
-				// of the clue string
-				return getExpandPixels(eRegionBound, boundInfo, itClueList->second.m_ipFoundString);
+				ipSpatialString = itClueList->second.m_ipFoundString;	
+			}
+			else
+			{
+				THROW_LOGIC_ERROR_EXCEPTION("ELI32941")
 			}
 		}
-	}
 
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-long CLocateImageRegion::getExpandPixels(EBoundary eRegionBound, BoundaryInfo boundInfo, 
-					 ISpatialStringPtr ipSpatialString)
-{	
-	// get the expand number (the number of units to expand)
-	double dExpandPixels = boundInfo.m_dExpandNumber;
-
-	// calculate the unit of expansion (average line height or char width) and
-	// determine pixel expansion direction by negating the expand pixels when appropriate
-	switch (eRegionBound)
-	{
-	case kTop:
-	case kBottom:
+		if (boundInfo.m_eUnits == kPageLines || boundInfo.m_eUnits == kClueLines)
 		{
-			// multiply the expand number by the average line height in pixels
 			dExpandPixels *= ipSpatialString->GetAverageLineHeight();
-
-			// negate the sign if expanding upwards
-			if(boundInfo.m_eExpandDirection == kExpandUp)
-			{
-				dExpandPixels *= -1;
-			}
 		}
-		break;
-	case kLeft:
-	case kRight:
+		else
 		{
-			// multiply the expand number by the character width in pixels
 			dExpandPixels *= ipSpatialString->GetAverageCharWidth();
-
-			// negate the sign if expanding to the left
-			if(boundInfo.m_eExpandDirection == kExpandLeft)
-			{
-				dExpandPixels *= -1;
-			}
-			break;
 		}
 	}
 
-	// return the number of pixels to expand, rounded to the nearest pixel
-	return (long) floor(dExpandPixels + .5);
+	// If expanding to the left or up, we need to subtract this number of pixels.
+	if (boundInfo.m_eExpandDirection == kExpandUp || boundInfo.m_eExpandDirection == kExpandLeft)
+	{
+		dExpandPixels = -dExpandPixels;
+	}
+
+	return (long)floor(dExpandPixels + .5);
 }
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CLocateImageRegion::getFinalResultString(ISpatialStringPtr ipPageText)
@@ -1895,6 +1926,24 @@ ISpatialStringPtr CLocateImageRegion::combineRegions(IIUnknownVectorPtr ipVecIma
 
 	// return the combined regions
 	return ipResult;
+}
+//-------------------------------------------------------------------------------------------------
+void CLocateImageRegion::getPageResolution(string strSourceDoc, int nPage, int &rnXResolution,
+	int &rnYResolution)
+{
+	auto iter = m_mapPageResolutions.find(nPage);
+	if (iter == m_mapPageResolutions.end())
+	{
+		// We haven't yet retrieved coordinates for this page. Retrieve and cache them.
+		getImageXAndYResolution(strSourceDoc, rnXResolution, rnYResolution, nPage);
+		m_mapPageResolutions[nPage] = pair<int, int>(rnXResolution, rnYResolution);
+	}
+	else
+	{
+		// Return the cached coordinates.
+		rnXResolution = iter->second.first;
+		rnYResolution = iter->second.second;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

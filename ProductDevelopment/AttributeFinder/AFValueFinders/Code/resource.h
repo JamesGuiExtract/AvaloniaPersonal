@@ -352,14 +352,18 @@
 #define IDC_EDIT_FINDING_RULE           459
 #define IDC_EDIT_PREPROCESSOR           460
 #define IDC_EDIT_CONDITION              461
-#define IDC_CHECK_SPLIT_ROUTING			462
-#define IDC_CHECK_SPLIT_ACCOUNT			463
-#define IDC_CHECK_SPLIT_CHECK			464
-#define IDC_CHECK_SPLIT_AMOUNT			465
+#define IDC_CHECK_SPLIT_ROUTING         462
+#define IDC_CHECK_SPLIT_ACCOUNT         463
+#define IDC_CHECK_SPLIT_CHECK           464
+#define IDC_CHECK_SPLIT_AMOUNT          465
 #define IDC_CHECK_0_ROTATION            466
 #define IDC_CHECK_90_ROTATION           467
 #define IDC_CHECK_180_ROTATION          468
 #define IDC_CHECK_270_ROTATION          469
+#define IDC_COMBO_EXPAND_UNITS_TOP      470
+#define IDC_COMBO_EXPAND_UNITS_BOTTOM   471
+#define IDC_COMBO_EXPAND_UNITS_LEFT     472
+#define IDC_COMBO_EXPAND_UNITS_RIGHT    473
 
 // Next default values for new objects
 // 
@@ -367,7 +371,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1002
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         470
+#define _APS_NEXT_CONTROL_VALUE         474
 #define _APS_NEXT_SYMED_VALUE           194
 #endif
 #endif

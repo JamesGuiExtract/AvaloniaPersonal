@@ -246,12 +246,12 @@ LEADUTILS_API int getNumberOfPagesInImage( const string& strImageFileName );
 // PROMISE: To fill the riXResolution and riYResolution variables with the X and Y resolution
 //			of the specified image [p13 #4809]
 LEADUTILS_API void getImageXAndYResolution(const string& strImageFileName, int& riXResolution,
-										   int& riYResolution);
+										   int& riYResolution, int nPageNum = 1);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To fill the riHeight and riWidth variables with the height and width
 //			of the specified one-based page of an image in pixels [p13 #4809]
 LEADUTILS_API void getImagePixelHeightAndWidth(const string& strImageFileName, int& riHeight, 
-											   int& riWidth, int nPageNum=1);
+											   int& riWidth, int nPageNum = 1);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the handle of a bitmap for the given page in the file
 // the bitmap will have to be freed by caller

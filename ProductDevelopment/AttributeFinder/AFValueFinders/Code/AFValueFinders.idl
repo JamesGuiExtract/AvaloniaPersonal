@@ -83,6 +83,21 @@ library	UCLID_AFVALUEFINDERSLib
 
 	typedef
 	[
+		uuid(2FF178F0-5A3E-4453-84B3-A95B0AB9D2D5), 
+		helpstring("AFValueFinder Units")
+	]
+	enum EUnits
+	{
+		kClueLines,
+		kPageLines,
+		kClueCharacters,
+		kPageCharacters,
+		kInches,
+		kPixels
+	}EUnits;
+
+	typedef
+	[
 		uuid(286D7BB5-2BCD-48f6-BCB5-7115CD3A2D7D), 
 		helpstring("UCLID EBoundaryCondition Type")
 	]
@@ -480,11 +495,12 @@ library	UCLID_AFVALUEFINDERSLib
 		[id(4), helpstring("method SetRegionBoundary")] HRESULT SetRegionBoundary(
 			[in] EBoundary eRegionBoundary, [in] EBoundary eSide, 
 			[in] EBoundaryCondition eCondition, 
-			[in] EExpandDirection eExpandDirection, [in] double dExpandNumber);
+			[in] EExpandDirection eExpandDirection, [in] double dExpandNumber, [in] EUnits eUnits);
 		[id(5), helpstring("method GetRegionBoundary")] HRESULT GetRegionBoundary(
 			[in] EBoundary eRegionBoundary, [in, out] EBoundary *peSide, 
 			[in, out] EBoundaryCondition *peCondition, 
-			[in, out] EExpandDirection *peExpandDirection, [in, out] double *pdExpandNumber);
+			[in, out] EExpandDirection *peExpandDirection, [in, out] double *pdExpandNumber,
+			[in, out] EUnits *peUnits);
 		// Set clue list along with its flags
 		// eIndex: which list are we setting
 		// pvecClues: list of clues in string format

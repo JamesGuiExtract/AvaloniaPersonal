@@ -48,6 +48,12 @@ CLocateImageRegionPP::CLocateImageRegionPP()
 
 		// Get the file header string and its length from IMiscUtilsPtr object
 		m_strFileHeader = ipMiscUtils->GetFileHeader();
+
+		m_mapUnitValues[kInches] = "Inches";
+		m_mapUnitValues[kClueLines] = "Clue Lines";
+		m_mapUnitValues[kPageLines] = "Page Lines";
+		m_mapUnitValues[kClueCharacters] = "Clue Characters";
+		m_mapUnitValues[kPageCharacters] = "Page Characters";
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI07710")
 }
@@ -121,7 +127,8 @@ STDMETHODIMP CLocateImageRegionPP::Apply(void)
 						(UCLID_AFVALUEFINDERSLib::EBoundary) boundary[i].m_eSide,
 						(UCLID_AFVALUEFINDERSLib::EBoundaryCondition) boundary[i].m_eCondition, 
 						(UCLID_AFVALUEFINDERSLib::EExpandDirection) boundary[i].m_eDirection, 
-						boundary[i].m_dExpand);
+						boundary[i].m_dExpand,
+						(UCLID_AFVALUEFINDERSLib::EUnits)boundary[i].m_eUnits);
 				}
 
 				if (!storeClueLists(ipLocateRegion))
@@ -228,15 +235,18 @@ LRESULT CLocateImageRegionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPar
 			UCLID_AFVALUEFINDERSLib::EBoundaryCondition eCondition;
 			UCLID_AFVALUEFINDERSLib::EExpandDirection eExpandDirection;
 			double dExpandNumber;
+			UCLID_AFVALUEFINDERSLib::EUnits eExpandUnits;
 			long n;
 			for (n = (long)kTop; n <= (long)kRight; n++)
 			{
 				eRegionBound = (UCLID_AFVALUEFINDERSLib::EBoundary)n;
 				ipLocateRegion->GetRegionBoundary(eRegionBound, &eSide, 
-					&eCondition, &eExpandDirection, &dExpandNumber);
+					&eCondition, &eExpandDirection, &dExpandNumber,
+					(UCLID_AFVALUEFINDERSLib::EUnits*)&eExpandUnits);
 				initBoundaries((EBoundary)eRegionBound, (EBoundary)eSide, 
 							   (EBoundaryCondition)eCondition, 
-							   (EExpandDirection)eExpandDirection, dExpandNumber);
+							   (EExpandDirection)eExpandDirection, dExpandNumber,
+							   (EUnits)eExpandUnits);
 			}
 
 			// initialize clue lists
@@ -671,6 +681,19 @@ LRESULT CLocateImageRegionPP::OnSelChangeInsideOutside(WORD /*wNotifyCode*/, WOR
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
+LRESULT CLocateImageRegionPP::OnSelChangeCondition(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		updateUnitsCombo(wID);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32942");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
 LRESULT CLocateImageRegionPP::OnBnClickedBtnLoadList(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1007,7 +1030,8 @@ void CLocateImageRegionPP::initBoundaries(EBoundary eRegionBoundary,
 										  EBoundary eSide,
 										  EBoundaryCondition eCondition,
 										  EExpandDirection eExpandDirection,
-										  double dExpandNumber)
+										  double dExpandNumber,
+										  EUnits eUnits)
 {
 	int iOffset = 0;
 
@@ -1040,6 +1064,11 @@ void CLocateImageRegionPP::initBoundaries(EBoundary eRegionBoundary,
 	CString zNumber;
 	zNumber.Format("%g", dExpandNumber);
 	ctrlBoundary.m_editExpandNumber.SetWindowText(zNumber);
+
+	ctrlBoundary.m_cmbExpandUnits.SelectString(-1, m_mapUnitValues[eUnits]);
+
+	// Update the contents of the units combo box based on the condition combo's current selection. 
+	updateUnitsCombo(ctrlBoundary.m_cmbCondition.GetDlgCtrlID());
 }
 //-------------------------------------------------------------------------------------------------
 void CLocateImageRegionPP::initClueList(EClueListIndex eListIndex, 
@@ -1212,12 +1241,15 @@ void CLocateImageRegionPP::setupControls()
 	int iCondition[] = {IDC_CMB_CONDITION1, IDC_CMB_CONDITION2, IDC_CMB_CONDITION3, IDC_CMB_CONDITION4};
 	int iDirection[] = {IDC_CMB_EXPAND_DIR_TOP, IDC_CMB_EXPAND_DIR_BOTTOM, IDC_CMB_EXPAND_DIR_LEFT, IDC_CMB_EXPAND_DIR_RIGHT};
 	int iExpandNumbers[] = {IDC_EDIT_NUM1, IDC_EDIT_NUM2, IDC_EDIT_NUM3, IDC_EDIT_NUM4};
+	int iUnits[] = {IDC_COMBO_EXPAND_UNITS_TOP, IDC_COMBO_EXPAND_UNITS_BOTTOM,
+		IDC_COMBO_EXPAND_UNITS_LEFT, IDC_COMBO_EXPAND_UNITS_RIGHT};
 	for (int i = 0; i < 4; i++)
 	{
 		m_ctrlBoundary[i].m_cmbSide = GetDlgItem(iSide[i]);
 		m_ctrlBoundary[i].m_cmbCondition = GetDlgItem(iCondition[i]);
 		m_ctrlBoundary[i].m_cmbExpandDirection = GetDlgItem(iDirection[i]);
 		m_ctrlBoundary[i].m_editExpandNumber = GetDlgItem(iExpandNumbers[i]);
+		m_ctrlBoundary[i].m_cmbExpandUnits = GetDlgItem(iUnits[i]);
 
 		for (ui = 0; ui < s_vecConditions.size(); ui++)
 		{
@@ -1233,14 +1265,20 @@ void CLocateImageRegionPP::setupControls()
 		m_ctrlBoundary[3].m_cmbSide.AddString(s_vecSides[ui+2]);
 	}
 
-	// Setup expand direction controls
+	// Setup expand direction and units controls
 	const char pszExpandDirections[4][6] = { "Up", "Down", "Left", "Right" };
-	for(ui = 0; ui < 2; ui++)
+
+	// Loop for each control set (top, bottom, left, right)
+	for(ui = 0; ui < 4; ui++)
 	{
-		m_ctrlBoundary[0].m_cmbExpandDirection.AddString(pszExpandDirections[ui]);
-		m_ctrlBoundary[1].m_cmbExpandDirection.AddString(pszExpandDirections[ui]);
-		m_ctrlBoundary[2].m_cmbExpandDirection.AddString(pszExpandDirections[ui + 2]);
-		m_ctrlBoundary[3].m_cmbExpandDirection.AddString(pszExpandDirections[ui + 2]);
+		m_ctrlBoundary[ui].m_cmbExpandDirection.AddString(pszExpandDirections[(ui/2) * 2]);
+		m_ctrlBoundary[ui].m_cmbExpandDirection.AddString(pszExpandDirections[((ui/2) * 2) + 1] );
+
+		m_ctrlBoundary[ui].m_cmbExpandUnits.AddString(m_mapUnitValues[kInches]);
+		// Relative to clue average size.
+		m_ctrlBoundary[ui].m_cmbExpandUnits.AddString(m_mapUnitValues[(EUnits)((ui/2) * 2)]);
+		// Relative to page average size.
+		m_ctrlBoundary[ui].m_cmbExpandUnits.AddString(m_mapUnitValues[(EUnits)(((ui/2) * 2) + 1)]);
 	}
 
 	m_listClues = GetDlgItem(IDC_LIST_CLUES);
@@ -1384,6 +1422,24 @@ bool CLocateImageRegionPP::tryGetRegionBoundary(EBoundary eBoundary, RegionBound
 	else
 	{
 		boundary.m_eDirection = (EExpandDirection)(iOffset + 1);
+	}
+
+	// Get the units used to specify the boundary offset distance.
+	CString zUnits;
+	ctrlBoundary.m_cmbExpandUnits.GetWindowText(zUnits);
+	if (asCppBool(zUnits.IsEmpty()))
+	{
+		MessageBox(CString("The boundary offset units have not been specified for the ") +
+			CString(getBoundaryName(eBoundary).c_str()) + " boundary.", "Invalid setting");
+		return false;
+	}
+
+	for (int i = 0; i < kPixels; i++)
+	{
+		if (zUnits == m_mapUnitValues[(EUnits)i])
+		{
+			boundary.m_eUnits = (EUnits)i;
+		}
 	}
 
 	// Get the number of spatial lines to expand the boundary or return with an error message
@@ -1566,6 +1622,38 @@ void CLocateImageRegionPP::updateRestrictSearchControl(EClueListIndex eCurrentLi
 				listInfo.m_zListNumbers += zTemp;
 			}
 		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CLocateImageRegionPP::updateUnitsCombo(WORD wConditionCtrlID)
+{
+	int boundaryIndex;
+	switch (wConditionCtrlID)
+	{
+		case IDC_CMB_CONDITION1: boundaryIndex = 0; break;
+		case IDC_CMB_CONDITION2: boundaryIndex = 1; break;
+		case IDC_CMB_CONDITION3: boundaryIndex = 2; break;
+		case IDC_CMB_CONDITION4: boundaryIndex = 3; break;
+		default: THROW_LOGIC_ERROR_EXCEPTION("ELI32943");
+	}
+
+	// Get the appropriate controls as the currently selected condition.
+	BoundaryControls& ctrlBoundary = m_ctrlBoundary[boundaryIndex];
+	EBoundaryCondition eCondition =
+		(EBoundaryCondition) (ctrlBoundary.m_cmbCondition.GetCurSel() + 1);
+
+	// If using a page boundary condition, ensure the "clue" unit option is not available.
+	if (eCondition == kPage && ctrlBoundary.m_cmbExpandUnits.GetCount() == 3)
+	{
+		ctrlBoundary.m_cmbExpandUnits.DeleteString(1);
+		ctrlBoundary.m_cmbExpandUnits.Invalidate();
+	}
+	// If using a clue boundary condition, ensure the "clue" unit option is available.
+	else if (eCondition != kPage && ctrlBoundary.m_cmbExpandUnits.GetCount() == 2)
+	{
+		EUnits eUnits = (EUnits)((boundaryIndex/2) * 2);
+		ctrlBoundary.m_cmbExpandUnits.InsertString(1, m_mapUnitValues[eUnits]);
+		ctrlBoundary.m_cmbExpandUnits.Invalidate();
 	}
 }
 //-------------------------------------------------------------------------------------------------

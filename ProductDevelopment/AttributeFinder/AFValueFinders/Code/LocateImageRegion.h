@@ -85,10 +85,12 @@ public:
 	STDMETHOD(put_ImageRegionText)(BSTR newVal);
 	STDMETHOD(GetRegionBoundary)(/*[in]*/ EBoundary eRegionBoundary, 
 		/*[in, out]*/ EBoundary *peSide, /*[in, out]*/ EBoundaryCondition *peCondition, 
-		/*[in, out]*/ EExpandDirection *peExpandDirection, /*[in, out]*/ double *pdExpandNumber);
+		/*[in, out]*/ EExpandDirection *peExpandDirection, /*[in, out]*/ double *pdExpandNumber,
+		/*[in, out]*/ EUnits *peUnits);
 	STDMETHOD(SetRegionBoundary)(/*[in]*/ EBoundary eRegionBoundary, 
 		/*[in]*/ EBoundary eSide, /*[in]*/ EBoundaryCondition eCondition, 
-		/*[in]*/ EExpandDirection eExpandDirection, /*[in]*/ double ExpandNumber);
+		/*[in]*/ EExpandDirection eExpandDirection, /*[in]*/ double ExpandNumber,
+		/*[in]*/ EUnits eUnits);
 	STDMETHOD(get_IntersectingEntityType)(/*[out, retval]*/ ESpatialEntity *pVal);
 	STDMETHOD(put_IntersectingEntityType)(/*[in]*/ ESpatialEntity newVal);
 	STDMETHOD(get_IncludeIntersectingEntities)(/*[out, retval]*/ VARIANT_BOOL *pVal);
@@ -178,7 +180,8 @@ private:
 			: m_eSide(kNoBoundary),
 			  m_eCondition(kNoCondition),	// always default to document edge
 			  m_eExpandDirection(kNoDirection),
-			  m_dExpandNumber(0)
+			  m_dExpandNumber(0),
+			  m_eUnits(kInches)
 		{
 		}
 
@@ -193,6 +196,8 @@ private:
 		EExpandDirection m_eExpandDirection;
 		// How many SpatialLines|Characters|Words shall we expand?
 		double m_dExpandNumber;
+		// The units used by m_dExpandNumber.
+		EUnits m_eUnits;
 	};
 
 	// determines whether to find text or an image region
@@ -238,6 +243,9 @@ private:
 	CCachedListLoader m_cachedListLoader;
 
 	IMiscUtilsPtr m_ipMisc;
+
+	// Map of page numbers to cached X and Y resolution for the page.
+	map<int, pair<int, int>> m_mapPageResolutions;
 
 	//////////
 	// Methods
@@ -309,9 +317,6 @@ private:
 	// get the expand pixels according to the border
 	long getExpandPixels(EBoundary eRegionBound, ISpatialStringPtr ipPageText);
 
-	long getExpandPixels(EBoundary eRegionBound, BoundaryInfo boundInfo, 
-					 ISpatialStringPtr ipSpatialString);
-
 	// Based on the m_mapBorderToPosition, expansion, inside/outside region,
 	// include/exclude intersecting entities, we finally can get the region 
 	// of text that we're looking for
@@ -348,6 +353,9 @@ private:
 	//          document preprocessors [P16 #2729]).
 	ISpatialStringPtr combineRegions(IIUnknownVectorPtr ipVecImageRegions, 
 		_bstr_t bstrSourceDocName = "");
+
+	// Gets the resolution of the specified page.
+	void getPageResolution(string strSourceDoc, int nPage, int &rnXResolution, int &rnYResolution);
 
 	void validateLicense();
 };

@@ -932,13 +932,17 @@ int getNumberOfPagesInImage( const string& strImageFileName )
 }
 //-------------------------------------------------------------------------------------------------
 void getImageXAndYResolution(const string& strImageFileName, int& riXResolution, 
-							 int& riYResolution)
+							 int& riYResolution, int nPageNum/* = 1*/)
 {
 	try
 	{
+		// Get initialized LOADFILEOPTION struct. 
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(0);
+		lfo.PageNumber = nPageNum;
+
 		// Get initialized FILEINFO struct
 		FILEINFO fileInfo;
-		getFileInformation(strImageFileName, false, fileInfo);
+		getFileInformation(strImageFileName, false, fileInfo, &lfo);
 
 		riXResolution = fileInfo.XResolution;
 		riYResolution = fileInfo.YResolution;

@@ -1324,43 +1324,57 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 				// This is the formula that RecAPI v12.7 used internally to determine fontSize.
 				letter.m_ucFontSize = (unsigned char) (pCurLetter->capHeight * dFontSizeMultiplier);
 
-				// Scansoft uses 0 as highest confidence 100 as lowest so we need to reverse that.
-				// Ignore the bit that ScanSoft uses to denote suspect words.
-				letter.m_ucCharConfidence = 100 - (pCurLetter->err & RE_ERROR_LEVEL_MASK);
+				if (bIsRecognized)
+				{
+					// Scansoft uses 0 as highest confidence 100 as lowest so we need to reverse that.
+					// Ignore the bit that ScanSoft uses to denote suspect words.
+					letter.m_ucCharConfidence = 100 - (pCurLetter->err & RE_ERROR_LEVEL_MASK);
 
-				// set font attributes
-				letter.m_ucFont = 0;
-				if((pCurLetter->fontAttrib & R_ITALIC) != 0)
-				{
-					letter.setItalic(true);
+					// set font attributes
+					letter.m_ucFont = 0;
+					if((pCurLetter->fontAttrib & R_ITALIC) != 0)
+					{
+						letter.setItalic(true);
+					}
+					if((pCurLetter->fontAttrib & R_BOLD) != 0)
+					{
+						letter.setBold(true);
+					}
+					if((pCurLetter->fontAttrib & R_SERIF) != 0)
+					{
+						letter.setSerif(true);
+					}
+					else if((pCurLetter->fontAttrib & R_SANSSERIF) != 0)
+					{
+						letter.setSansSerif(true);
+					}
+					if((pCurLetter->fontAttrib & R_PROPORTIONAL) != 0)
+					{
+						letter.setProportional(true);
+					}
+					if((pCurLetter->fontAttrib & R_UNDERLINE) != 0)
+					{
+						letter.setUnderline(true);
+					}
+					if((pCurLetter->fontAttrib & R_SUPERSCRIPT) != 0)
+					{
+						letter.setSuperScript(true);
+					}
+					if((pCurLetter->fontAttrib & R_SUBSCRIPT) != 0)
+					{
+						letter.setSubScript(true);
+					}
 				}
-				if((pCurLetter->fontAttrib & R_BOLD) != 0)
+				else
 				{
-					letter.setBold(true);
-				}
-				if((pCurLetter->fontAttrib & R_SERIF) != 0)
-				{
-					letter.setSerif(true);
-				}
-				else if((pCurLetter->fontAttrib & R_SANSSERIF) != 0)
-				{
-					letter.setSansSerif(true);
-				}
-				if((pCurLetter->fontAttrib & R_PROPORTIONAL) != 0)
-				{
-					letter.setProportional(true);
-				}
-				if((pCurLetter->fontAttrib & R_UNDERLINE) != 0)
-				{
-					letter.setUnderline(true);
-				}
-				if((pCurLetter->fontAttrib & R_SUPERSCRIPT) != 0)
-				{
-					letter.setSuperScript(true);
-				}
-				if((pCurLetter->fontAttrib & R_SUBSCRIPT) != 0)
-				{
-					letter.setSubScript(true);
+					// [FlexIDSCore:4590]
+					// Assign unrecognized characters a confidence of 1 so that when testing based
+					// on confidence it can't be confused with an empty string.
+					letter.m_ucCharConfidence = 1;
+
+					// If the character is not recognized, don't allow any font attributes to be
+					// applied.
+					letter.m_ucFont = 0;
 				}
 			
 				// append the letter object to the list of letters for this page

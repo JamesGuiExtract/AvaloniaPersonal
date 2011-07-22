@@ -30,6 +30,8 @@ CSpatialProximityAS::CSpatialProximityAS()
 
 		m_ipAFUtility.CreateInstance(CLSID_AFUtility);
 		ASSERT_RESOURCE_ALLOCATION("ELI22706", m_ipAFUtility != __nullptr);
+
+		initPDFSupport();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI22560");
 }

@@ -57,6 +57,10 @@ BEGIN_MSG_MAP(CLocateImageRegionPP)
 	COMMAND_HANDLER(IDC_CHK_RESTRICT, BN_CLICKED, OnClickedChkRestrict)
 	COMMAND_HANDLER(IDC_CMB_FIND_TYPE, CBN_SELCHANGE, OnCbnSelchangeCmbFindType)
 	COMMAND_HANDLER(IDC_CMB_INSIDE, CBN_SELCHANGE, OnSelChangeInsideOutside)
+	COMMAND_HANDLER(IDC_CMB_CONDITION1, CBN_SELCHANGE, OnSelChangeCondition);
+	COMMAND_HANDLER(IDC_CMB_CONDITION2, CBN_SELCHANGE, OnSelChangeCondition);
+	COMMAND_HANDLER(IDC_CMB_CONDITION3, CBN_SELCHANGE, OnSelChangeCondition);
+	COMMAND_HANDLER(IDC_CMB_CONDITION4, CBN_SELCHANGE, OnSelChangeCondition);
 	NOTIFY_HANDLER(IDC_LIST_CLUES, LVN_ITEMCHANGED, OnItemchangedList)
 	NOTIFY_HANDLER(IDC_LIST_CLUES, NM_DBLCLK, OnDblclkClueList)
 END_MSG_MAP()
@@ -91,6 +95,7 @@ END_MSG_MAP()
 	LRESULT OnBnClickedBtnSaveList(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedClueDynamicListInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnSelChangeInsideOutside(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnSelChangeCondition(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	////////////
@@ -130,7 +135,8 @@ private:
 			  m_eSide(kNoBoundary),
 			  m_eCondition(kNoCondition),
 			  m_eDirection(kNoDirection),
-			  m_dExpand(0)
+			  m_dExpand(0),
+			  m_eUnits(kInches)
 		{}
 
 		EBoundary m_eRegion; 
@@ -138,6 +144,7 @@ private:
 		EBoundaryCondition m_eCondition;
 		EExpandDirection m_eDirection;
 		double m_dExpand;
+		EUnits m_eUnits;
 	};
 
 	struct BoundaryControls
@@ -146,6 +153,7 @@ private:
 		ATLControls::CComboBox m_cmbCondition;
 		ATLControls::CComboBox m_cmbExpandDirection;
 		ATLControls::CEdit m_editExpandNumber;
+		ATLControls::CComboBox m_cmbExpandUnits;
 	};
 
 	// map for each list detail.
@@ -199,6 +207,9 @@ private:
 
 	CXInfoTip m_infoTip;
 
+	// Map of the readable text to be associates with each EUnits enum value.
+	map<EUnits, CString> m_mapUnitValues;
+
 	//////////
 	// Methods
 	//////////
@@ -230,7 +241,8 @@ private:
 						EBoundary eSide,
 						EBoundaryCondition eCondition,
 						EExpandDirection eExpandDirection,
-						double dExpandNumber);
+						double dExpandNumber,
+						EUnits eUnits);
 
 	// setup clue lists
 	void initClueList(EClueListIndex eListIndex, IVariantVectorPtr ipClues, 
@@ -259,6 +271,10 @@ private:
 
 	// update Restrict Search related controls for current list
 	void updateRestrictSearchControl(EClueListIndex eListIndex, ListInfo& listInfo);
+
+	// Updates the contents of the units combo box associated with and depending the selection of
+	// the specified border condition combo box.
+	void updateUnitsCombo(WORD wConditionCtrlID);
 
 	void validateLicense();
 };
