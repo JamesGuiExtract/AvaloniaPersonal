@@ -1,0 +1,176 @@
+<HTML>
+
+<HEAD>
+<TITLE>Secure Delete Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield Feature Testing<br>Secure Delete<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>Basic Testing</h2>
+       	<ul>
+       		<li><b>Copy Move Delete</b> task
+		<ul>
+			<li>Exercise the normal <b>delete</b> function.  Use a file 
+			recovery tool such as <b>Recuva</b> and confirm that 
+			the deleted file can be recovered.
+			<li>Exercise the normal <b>move</b> function.  Use a file 
+			recovery tool such as <b>Recuva</b> and confirm that 
+			the moved file can be recovered.
+			<li>Use the <b>Secure delete</b> feature and confirm that 
+			a <b>deleted</b> file cannot be recovered.
+			<li>Use the <b>Secure delete</b> feature and confirm that 
+			a <b>moved</b> file cannot be recovered.
+		</ul>
+<p>
+       		<li><b>Registry Key</b>
+		<ul>
+			<li>Exercise the <b>Core: Archive or restore associated 
+			file</b> task using the option to <b>Delete above file 
+			after archiving</b>.  Use a file recovery tool such as 
+			<b>Recuva</b> and confirm that the deleted file can be 
+			recovered.
+			<li>Set the <b>SecureDeleteAllSensitiveFiles</b> under 
+			HKLM\SOFTWARE\Extract 
+			Systems\ReusableComponents\Extract.Utilities\.
+			<li>Exercise the same <b>Core: Archive or restore 
+			associated file</b> task and confirm that the deleted 
+			file cannot be recovered.
+			<li>Exercise the retry logic by opening an image file 
+			in <b>Paint</b> before trying the archive with delete.
+			<li>Confirm that closing <b>Paint</b> within about 20 
+			seconds still results in a successful secure deletion.
+			<li>Confirm that setting the <b>SecureDeleteAllSensitiveFiles</b> 
+			registry key supersedes the associated object property 
+			from <b>Core: Copy, move or delete file</b>.
+		</ul>
+<p>
+       		<li><b>Error Logging</b>
+		<ul>
+			<li>Retain the <b>SecureDeleteAllSensitiveFiles</b> from 
+			above.
+			<li>Add the <b>LogSecureDeleteErrors</b> key and set it 
+			to True.
+			<li>Exercise the following scenarios and check that 
+			meaningful error messages are logged.
+			<ul>
+				<li>Process a compressed or encrypted file.
+				<li>Process a file that is open for editing 
+				in another application and remains open beyond 
+				the retry timeout.
+			</ul>
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>Special Testing</h2>
+       	<ul>
+       		<li><b>Network and UNC files</b>
+		<ul>
+			<li>Exercise the <b>Core: Copy, move or delete file</b> task 
+			to securely delete files for files on a network drive.
+			<li>Confirm that the files are securely deleted.
+			<li>Exercise the <b>Core: Copy, move or delete file</b> task 
+			to securely move files for files specified via UNC path.
+			<li>Confirm that the files are securely moved.
+		</ul>
+<p>
+       		<li><b>Compressed files</b>
+		<ul>
+			<li>Create some files for testing that are <b>compressed</b>.
+			<li>Exercise the <b>Core: Copy, move or delete file</b> task 
+			to securely delete files and skip the operation with an error 
+			if the file cannot be securely overwritten.
+			<li>Confirm that the operations fail and that the files are 
+			not deleted.
+			<li>Repeat the test without the option to fail with an error 
+			if the file cannot be securely overwritten.
+			<li>Confirm that the files are deleted.
+			<li>Check to see if the files can be retrieved with a file 
+			recovery tool.
+		</ul>
+<p>
+       		<li><b>Encrypted files</b>
+		<ul>
+			<li>Create some files for testing that are <b>encrypted</b>.
+			<li>Exercise the <b>Core: Copy, move or delete file</b> task 
+			to securely delete files and skip the operation with an error 
+			if the file cannot be securely overwritten.
+			<li>Confirm that the operations fail and that the files are 
+			not deleted.
+			<li>Repeat the test without the option to fail with an error 
+			if the file cannot be securely overwritten.
+			<li>Confirm that the files are deleted.
+			<li>Check to see if the files can be retrieved with a file 
+			recovery tool.
+		</ul>
+<p>
+       		<li><b>FAT File System</b>
+		<ul>
+			<li>Prepare some files for processing on a thumb drive.  Confirm 
+			that the thumb drive uses a FAT32 file system.
+			<li>Exercise the <b>Core: Copy, move or delete file</b> task 
+			<b>without</b> secure deletion.
+			<li>Confirm that the files are recoverable.
+			<li>Exercise the <b>Core: Copy, move or delete file</b> task 
+			<b>with</b>secure deletion.
+			<li>Confirm that the files are securely deleted.
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>Performance Testing</h2>
+       	<ul>
+       		<li><b>Running Rules</b>
+		<ul>
+			<li>Configure a DB and FPS file to OCR, Execute rules, Create 
+			a redacted image, Delete the original image, Delete the USS file, 
+			and Delete the VOA file.
+			<li>Note the image set used for testing.
+			<li>Note the rules used for testing.
+			<li>Note the total processing time for each of the following 
+			combinations.
+			<ul>
+				<li><b>without</b> SecureDeleteAllSensitiveFiles and 
+				<b>without</b> Secure delete in the delete tasks
+				<li><b>without</b> SecureDeleteAllSensitiveFiles and 
+				<b>with</b> Secure delete in the delete tasks
+				<li><b>with</b> SecureDeleteAllSensitiveFiles
+			</ul>
+		</ul>
+<p>
+       		<li><b>Deleting Files</b>
+		<ul>
+			<li>Configure a DB and FPS file to Delete the original image.
+			<li>Note the image set used for testing.
+			<li>Note the total processing time for each of the following 
+			combinations.
+			<ul>
+				<li><b>without</b> SecureDeleteAllSensitiveFiles
+				<li><b>with</b> SecureDeleteAllSensitiveFiles
+			</ul>
+		</ul>
+<p>
+       		<li><b>Verification</b>
+		<ul>
+			<li>Configure a DB and FPS file to Verify sensitive data.  The 
+			VOA files are assumed to already be present.
+			<li>Prepare an auto-hot key script to verify the images as fast 
+			as possible.
+			<li>Note the image set used for testing.
+			<li>Note the rules used to create the VOA files.
+			<li>Note the total processing time for each of the following 
+			combinations.
+			<ul>
+				<li><b>without</b> SecureDeleteAllSensitiveFiles
+				<li><b>with</b> SecureDeleteAllSensitiveFiles
+			</ul>
+		</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>
