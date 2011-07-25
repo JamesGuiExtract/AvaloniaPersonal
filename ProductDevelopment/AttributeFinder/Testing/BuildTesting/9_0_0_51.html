@@ -1,0 +1,234 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.51 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.51 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+  	   	<LI><b>[FlexIDSCore #1285]</b> Optimize Document Classifier
+        	<ul>
+            		<li>Exercise the <b>Document Classifier NRS</b> on an earlier build of 
+			<b>RDT</b>.
+			<li>Note the approximate run time required.
+			<li>Install the current build of <b>RDT</b> on the same test machine.
+			<li>Exercise the <b>Document Classifier NRS</b>.
+			<li>Confirm that the current build is significantly faster.
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #2525]</b> Enhance Average Character Size For 
+		Locate Image Region
+        	<ul>
+            		<li>TBD
+        	</ul>
+<p>
+        	<li><b>[FlexIDSCore #2587]</b> Split Attributes Using RSD File Should 
+		Use Existing Doc Type Tag
+        	<ul>
+            		<li>Exercise a ruleset that needs and uses an RSD splitter based 
+			on a specific document type.  Make sure that the RSD file used as 
+			a splitter includes a Document Classifer.
+			<li>Remove the dDocument Classifier from the RSD splitter.
+			<li>Confirm that the same results are seen.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3590]</b> Add FindXOf Block To Document Classifier
+        	<ul>
+            		<li>Create a new DCC file and add it to the local 
+			<b>Doc_Types.idx</b> file.
+			<li>Define a rule in the DCC file that uses <b>FindXOf</b> 
+			syntax as described in the SCR.
+			<li>Confirm that <b>FindXOf</b> works properly.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4014]</b> Exclude Pages In Select Page Region
+        	<ul>
+            		<li>Exercise the RSD file and image found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4014</b>.
+			<li>Confirm that three attributes are found, one each for 
+			pages 6, 7 and 8.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4406]</b> OCR Image Area With ICR Option
+        	<ul>
+            		<li>Exercise the RSD file and image found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4406</b>.
+			<li>Confirm that one attribute is found, containing most 
+			of the entire image text.
+			<li>Confirm that no exceptions were logged about 
+			<b>Failure to OCR image</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4564]</b> Create Redacted Text With Extended ASCII 
+		Characters
+        	<ul>
+            		<li>Exercise <b>Redaction: Create redacted text</b> and use 
+			some extended ASCII characters.
+			<li>Confirm that the extended characters are handled correctly 
+			in the output.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4589]</b> More Precise Box Finder Box Sizes
+        	<ul>
+            		<li>Confirm that decimal percentages are supported in 
+			<b>Box Finder</b> configuration.
+            		<li>Exercise the image found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4589</b>.
+			<li>Confirm that the <b>date of birth</b> box can be isolated 
+			without including boxes that are significantly smaller.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4590]</b> Unknown Characters From OCR Image Area
+        	<ul>
+            		<li>Exercise the RSD file and image found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4590</b>.
+			<li>Confirm that unrecognized characters are found.
+			<li>Confirm that the character confidence of the unrecognized 
+			characters is <b>1</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4655]</b> Support EVOA In ModifyVOA
+        	<ul>
+            		<li>Confirm that <b>ModifyVOA.exe</b> will process both 
+			<b>.VOA</b> and <b>.EVOA</b> files located in the same directory.
+        	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #4719]</b> Select Page Region Selects Region Too Small
+        	<ul>
+            		<li>Exercise the RSD file and image found at 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\4719</b>.
+			<li>Confirm that each rule finds the whole page of the image.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5902, #6037, #6038, #6039, #6040, #6041]</b> 
+		UAC and FAM Utilities
+        	<ul>
+            		<li>Install ID Shield as <b>local admin</b>.
+			<li>Create a user account that does not have administrator 
+			privileges.
+			<li>Log off and log back in as the non-privileged user.
+			<li>Open the UEX Viewer.
+			<li>Confirm that the error log opens without error.
+			<li>Confirm that the <b>Automatically close window</b> 
+			checkbox acts and persists as expected.
+			<li>Confirm that <b>USB License Key Manager</b> allows the 
+			non-privileged user to set and persist the License Server.
+			<li>Confirm that <b>Configure Email Settings</b> can be 
+			exercised without error.
+			<li>Exercise <b>Compute.fps</b> from the ID Shield demo.
+			<li>Confirm that files process without error.
+			<li>Confirm that processing (while listening) can be 
+			stopped without error.
+			<li>Confirm that a <b>TIF</b> image can be double-clicked 
+			to open it in the legacy Image Viewer.
+			<li>Confirm that the image can be OCR'd.
+			<li>Confirm that the same image can be opened and OCR'd in 
+			<b>ExtractImageViewer.exe</b>.
+        	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #6132, #6133, #6134, #6137]</b> Secure File Deletion
+        	<ul>
+            		<li><b>Copy Move Delete</b> task
+			<ul>
+				<li>Exercise the normal <b>delete</b> function.  Use a file 
+				recovery tool such as <b>Recuva</b> and confirm that 
+				the deleted file can be recovered.
+				<li>Exercise the normal <b>move</b> function.  Use a file 
+				recovery tool such as <b>Recuva</b> and confirm that 
+				the moved file can be recovered.
+				<li>Use the <b>Secure delete</b> feature and confirm that 
+				a <b>deleted</b> file cannot be recovered.
+				<li>Use the <b>Secure delete</b> feature and confirm that 
+				a <b>moved</b> file cannot be recovered.
+				<li>
+			</ul>
+<p>
+            		<li><b>Registry Key</b>
+			<ul>
+				<li>Exercise the <b>Core: Archive or restore associated 
+				file</b> task using the option to <b>Delete above file 
+				after archiving</b>.  Use a file recovery tool such as 
+				<b>Recuva</b> and confirm that the deleted file can be 
+				recovered.
+				<li>Set the <b>SecureDeleteAllSensitiveFiles</b> under 
+				HKLM\SOFTWARE\Extract 
+				Systems\ReusableComponents\Extract.Utilities\.
+				<li>Exercise the same <b>Core: Archive or restore 
+				associated file</b> task and confirm that the deleted 
+				file cannot be recovered.
+				<li>Exercise the retry logic by opening an image file 
+				in <b>Paint</b> before trying the archive with delete.
+				<li>Confirm that closing <b>Paint</b> within about 20 
+				seconds still results in a successful secure deletion.
+			</ul>
+<p>
+            		<li><b>Error Logging</b>
+			<ul>
+				<li>Retain the <b>SecureDeleteAllSensitiveFiles</b> from 
+				above.
+				<li>Add the <b>LogSecureDeleteErrors</b> key and set it 
+				to True.
+				<li>Exercise the following scenarios and check that 
+				meaningful error messages are logged
+				<ul>
+					<li>Process a compressed or encrypted file.
+					<li>Process a file that is open for editing 
+					in another application and remains open beyond 
+					the retry timeout.
+				</ul>
+			</ul>
+        	</ul>
+    	</ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
