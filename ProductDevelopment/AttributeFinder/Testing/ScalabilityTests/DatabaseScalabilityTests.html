@@ -1,0 +1,57 @@
+<html>
+
+<head>
+<title>File Action Manager Database Scalability Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>File Action Manager Database Scalability Tests<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<p>
+* ID Shield and Extract Systems LM should be installed and licensed for these tests. It is not necessary 
+to install FLEX Index.
+<ol>
+<li><h2>Test #1 - Machine Scalability</h2>
+<ul>
+	<li><b>Purpose & Machine Setup</b>
+	<ul>
+		<li>Measure the maximum database throughput as more processing machines are added to the
+        database.
+		<li>Select a test machine to serve as the image and database host.
+		<li>Collect a large folder of files to process; typically we use the Utah images.  
+		<li>Queue all of the images; note that the files must be queued via UNC path or mapped
+        drive. Save a copy of the database with all files queued.
+		<li>Configure an FPS file to run a Set File Action Status task. In the advanced processing
+        settings, set it to grab 1000 files from the database at a time.
+	</ul>
+<p>
+	<li><b>Test Execution</b>
+	<ul>
+		<li>Before each test:
+        <ul>
+            <li>Delete the old database and replace it with a clean copy with all files queued.
+            <li>Reboot all test machines from the previous test.
+            <li>Add one more machine to the pool of processing machines.
+        </ul>
+        <li>On each processing machine, start the test FPS file.
+	</ul>
+<p>
+	<li><b>Test Results</b>
+	<ul>
+		<li>Record the starting and ending processing times in an appropriate spreadsheet; see
+        I:\Common\Testing\Product Testing\FLEX_Index_90\ScalabilityTests\MachineScalability for an
+        example.
+        <br>
+		<li>Create a chart to display the rate of documents processed per day for each test
+        configuration.
+    </ul>
+</ul>
+<p>
+</ul>
+</ol>
+</body>
+</html>
