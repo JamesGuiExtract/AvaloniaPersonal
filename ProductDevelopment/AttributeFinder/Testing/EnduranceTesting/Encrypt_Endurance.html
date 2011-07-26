@@ -35,7 +35,8 @@
 	<li><h2>Database and FPS file preparation</h2>
 	<ul>
 		<li>Use the <b>FAM DB Admin</b> utility to log onto or create the 
-		<b>Encrypt_Endurance</b> database on HPQC2.
+		<b>Encrypt_Endurance</b> database on a test machine such as HPQC2 
+		that has sufficient available disk space.
 		<li>Log in, the password should be "a", and add a <b>Test</b> action 
 		to the database if it does not already exist.
 		<li>Create a <b>Queue.fps</b> file with two Folder file suppliers.  
@@ -52,8 +53,9 @@
 			exercise listening.
 		</ul>
 <p>
-		<li>Create a <b>Process.fps</b> file with three tasks.  This FPS 
-		file will exercise just the encryption and decryption features.
+		<li>To exercise just the encrypt & decrypt feature, create a 
+		<b>Process.fps</b> file with three tasks.  This FPS file will 
+		exercise just the encryption and decryption features.
 		<ul>
 			<li>Create an FPS file with one <b>Core: Execute rules</b> 
 			task for processing.  
@@ -72,9 +74,9 @@
 			as they are added to the queue</b>.  
 		</ul>
 <p>
-		<li>Create a <b>Process.fps</b> file with seven tasks.  This FPS 
-		file will exercise PDF/A conversion, Archive and restore plus 
-		encryption and decryption features.
+		<li>To exercise the encrypt & decrypt feature along with archive & 
+		restore plus PDF/A conversion, create a <b>Process.fps</b> file with 
+		seven tasks.  This FPS file will exercise all three of the features.
 		<ol>
 			<li>Start with a <b>Core: Execute rules</b> task to 
 			process the image.
@@ -135,8 +137,14 @@
 		<li>Get <b>AttributeFinder/Testing/EnduranceTesting/reports.bat</b> 
 		from Vault and copy it to a local location on the database machine.
 		<li>Edit the batch file, inserting the correct server and the email 
-		address(es) where the reports will be sent.  Note: More than one email 
-		address can be inserted, separated by semicolons.
+		address(es) where the reports will be sent.  
+		<ul>
+			<li>Note: More than one email address can be inserted, separated 
+			by semicolons.
+			<li>Note: The batch file is not necessary to run scheduled reports, 
+			(<Server> <Database> "Summary of actions and associated document 
+			page counts" /mailto <Address> /subject <Subject>) can be used.
+		</ul>
 		<li>Use <b>Windows Task Scheduler</b> to run reports.bat.
 		<ul>
 			<li>Go to <b>Start</b>-><b>Programs</b>-><b>Accessories</b>-><b>System 
