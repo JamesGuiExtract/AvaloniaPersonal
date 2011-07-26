@@ -83,6 +83,10 @@ public:
 	STDMETHOD(get_CanSave)(VARIANT_BOOL *pVal);
 	STDMETHOD(get_FKBVersion)(BSTR *pVal);
 	STDMETHOD(put_FKBVersion)(BSTR newVal);
+	STDMETHOD(get_IgnorePreprocessorErrors)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_IgnorePreprocessorErrors)(VARIANT_BOOL newVal);
+	STDMETHOD(get_IgnoreOutputHandlerErrors)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_IgnoreOutputHandlerErrors)(VARIANT_BOOL newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -161,6 +165,9 @@ private:
 
 	// version number of the ruleset
 	long m_nVersionNumber;
+
+	bool m_bIgnorePreprocessorErrors;
+	bool m_bIgnoreOutputHandlerErrors;
 
 	/////////////////
 	// Helper functions

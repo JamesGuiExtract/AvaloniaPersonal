@@ -73,14 +73,8 @@ void CRuleSetEditor::OnEditCopy()
 
 		case kRulesList:
 		{
-			// Check for current rule selection
-			int iIndex = -1;
-			POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-			if (pos != __nullptr)
-			{
-				// Get index of first selection
-				iIndex = m_listRules.GetNextSelectedItem( pos );
-			}
+			// Get index of first selection
+			int iIndex = m_listRules.GetFirstSelectedRow();
 
 			if (iIndex == -1)
 			{
@@ -113,7 +107,7 @@ void CRuleSetEditor::OnEditCopy()
 				ipCopiedRules->PushBack( ipObject );
 
 				// Get the next selection
-				iIndex = m_listRules.GetNextSelectedItem( pos );
+				iIndex = m_listRules.GetNextSelectedRow();
 			}
 
 			// ClipboardManager will handle the Copy
@@ -284,19 +278,13 @@ void CRuleSetEditor::OnEditPaste()
 					"Clipboard object is not a vector of Attribute Rules!" );
 			}
 
-			// Check for current rule selection
-			int iIndex = -1;
-			POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-			if (pos != __nullptr)
-			{
-				// Get index of first selection
-				iIndex = m_listRules.GetNextSelectedItem( pos );
-			}
+			// Get index of first selection
+			int iIndex = m_listRules.GetFirstSelectedRow();
 
 			// Check for item count if no selection
 			if (iIndex == -1)
 			{
-				iIndex = m_listRules.GetItemCount();
+				iIndex = m_listRules.GetNumberRows();
 			}
 
 			// Retrieve vector of existing Rules
@@ -320,23 +308,19 @@ void CRuleSetEditor::OnEditPaste()
 				// Retrieve rule description
 				UCLID_AFCORELib::IAttributeRulePtr	ipNewRule = ipPastedRules->At( i );
 				ASSERT_RESOURCE_ALLOCATION( "ELI19129", ipNewRule != __nullptr );
+				bool bIgnoreErrors = asCppBool( ipNewRule->IgnoreErrors );
 				string	strDescription( ipNewRule->GetDescription() );
 
 				// Add the item without text in Enabled column
-				m_listRules.InsertItem( iIndex + i, "" );
-
-				// Add description text
-				m_listRules.SetItemText( iIndex + i, m_iDESC_LIST_COLUMN, 
-					strDescription.c_str() );
-
-				// Default enabled state to true
-				m_listRules.SetCheck( iIndex + i, TRUE );
+				m_listRules.InsertRow(iIndex + i);
+				// Default to enabled, but keep previous rule's ignore error state.
+				m_listRules.SetRowInfo(iIndex, true, bIgnoreErrors, strDescription.c_str());
 
 				// Insert the new Rule
 				ipRules->Insert( iIndex + i, ipNewRule );
 
 				// select the new item
-				m_listRules.SetItemState(iIndex+i, LVIS_SELECTED, LVIS_SELECTED);
+				m_listRules.SelectRow(iIndex+i);
 			}
 			m_listRules.SetFocus();
 

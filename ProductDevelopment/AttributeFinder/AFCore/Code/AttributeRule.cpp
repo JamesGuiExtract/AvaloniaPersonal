@@ -17,7 +17,8 @@ using namespace std;
 // Set current version number
 // History : m_bApplyModifyingRules is added in version 2
 //         : m_ipDocPreprocessor is added in version 3
-const unsigned long gnCurrentVersion = 3;
+//		   : m_bIgnoreErrors, m_bIgnorePreprocessorErrors, m_bIgnoreModifierErrors: version 4
+const unsigned long gnCurrentVersion = 4;
 const long nNUM_PROGRESS_ITEMS_PER_VALUE_MODIFYING_RULE = 1;
 
 //-------------------------------------------------------------------------------------------------
@@ -27,6 +28,9 @@ CAttributeRule::CAttributeRule()
 : m_strAttributeRuleDescription(""),
 m_bIsEnabled(true), 
 m_bApplyModifyingRules(false),
+m_bIgnoreErrors(false),
+m_bIgnorePreprocessorErrors(false),
+m_bIgnoreModifierErrors(false),
 m_bDirty(false)
 {
 }
@@ -102,6 +106,10 @@ STDMETHODIMP CAttributeRule::raw_CopyFrom(IUnknown * pObject)
 		IObjectWithDescriptionPtr ipPreTemp = ipSource->GetRuleSpecificDocPreprocessor();
 		ASSERT_RESOURCE_ALLOCATION("ELI08222", ipPreTemp != __nullptr);
 		m_ipDocPreprocessor = ipPreTemp->Clone();
+
+		m_bIgnoreErrors = asCppBool(ipSource->IgnoreErrors);
+		m_bIgnoreModifierErrors = asCppBool(ipSource->IgnoreModifierErrors);
+		m_bIgnorePreprocessorErrors = asCppBool(ipSource->IgnorePreprocessorErrors);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08223");
 
@@ -300,6 +308,99 @@ STDMETHODIMP CAttributeRule::put_ApplyModifyingRules(VARIANT_BOOL newVal)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::get_IgnoreErrors(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bIgnoreErrors);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::put_IgnoreErrors(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bIgnoreErrors = asCppBool(newVal);
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::get_IgnorePreprocessorErrors(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bIgnorePreprocessorErrors);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::put_IgnorePreprocessorErrors(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bIgnorePreprocessorErrors = asCppBool(newVal);
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::get_IgnoreModifierErrors(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bIgnoreModifierErrors);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeRule::put_IgnoreModifierErrors(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bIgnoreModifierErrors = asCppBool(newVal);
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc, 
 											   IProgressStatus *pProgressStatus,
 											   IIUnknownVector **pAttributes)
@@ -357,26 +458,44 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 				UCLID_AFCORELib::IAFDocumentPtr ipAFDocCopy = ipCopyObj->Clone();
 				ASSERT_RESOURCE_ALLOCATION("ELI15666", ipAFDocCopy != __nullptr);
 
-				// Preprocess the doc if there's any preprocessor thats enabled
-				if (bEnabledAttributePreProcessorExists)
+				try
 				{
-					UCLID_AFCORELib::IDocumentPreprocessorPtr ipDocPreprocessor = m_ipDocPreprocessor->Object;
-					if (ipDocPreprocessor)
+					try
 					{
-						// Update progress status
-						if (ipProgressStatus)
+						// Preprocess the doc if there's any preprocessor thats enabled
+						if (bEnabledAttributePreProcessorExists)
 						{
-							ipProgressStatus->StartNextItemGroup("Executing field-rule pre-processor...", 
-								nNUM_PROGRESS_ITEMS_PRE_PROCESSOR);
+							UCLID_AFCORELib::IDocumentPreprocessorPtr ipDocPreprocessor = m_ipDocPreprocessor->Object;
+							if (ipDocPreprocessor)
+							{
+								// Update progress status
+								if (ipProgressStatus)
+								{
+									ipProgressStatus->StartNextItemGroup("Executing field-rule pre-processor...", 
+										nNUM_PROGRESS_ITEMS_PRE_PROCESSOR);
+								}
+
+								// Create a pointer to the Sub-ProgressStatus object, depending upon whether
+								// the caller requested progress information
+								IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+									__nullptr : ipProgressStatus->SubProgressStatus;
+
+								// Execute the local attribute-level pre-processor rule
+								ipDocPreprocessor->Process(ipAFDocCopy, ipSubProgressStatus);
+							}
 						}
-
-						// Create a pointer to the Sub-ProgressStatus object, depending upon whether
-						// the caller requested progress information
-						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
-							__nullptr : ipProgressStatus->SubProgressStatus;
-
-						// Execute the local attribute-level pre-processor rule
-						ipDocPreprocessor->Process(ipAFDocCopy, ipSubProgressStatus);
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+				}
+				catch(UCLIDException& ue)
+				{
+					if (m_bIgnorePreprocessorErrors)
+					{
+						ue.log();
+					}
+					else
+					{
+						throw ue;
 					}
 				}
 
@@ -414,45 +533,66 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 						0, nSize, VARIANT_FALSE);
 				}
 
-				// pass the vector of values through value modifying rules one by one
-				for (long n = 0; n < nSize; n++)
+				try
 				{
-					// update the sub progress status object if it exists
-					if (ipSubProgressStatus)
+					try
 					{
-						ipSubProgressStatus->StartNextItemGroup(
-							get_bstr_t("Executing value modifier rule " + asString(n) + " of " + asString(nSize)), 1);
+						// pass the vector of values through value modifying rules one by one
+						for (long n = 0; n < nSize; n++)
+						{
+							// update the sub progress status object if it exists
+							if (ipSubProgressStatus)
+							{
+								ipSubProgressStatus->StartNextItemGroup(
+									get_bstr_t("Executing value modifier rule " + asString(n) +
+									" of " + asString(nSize)), 1);
+							}
+
+							// get each attribute
+							UCLID_AFCORELib::IAttributePtr ipAttribute =
+								ipOriginAttributes->At(n);
+							ASSERT_RESOURCE_ALLOCATION("ELI06035", ipAttribute != __nullptr);
+
+							ISpatialStringPtr ipAttrValue = ipAttribute->Value;
+							ASSERT_RESOURCE_ALLOCATION("ELI15496", ipAttrValue != __nullptr);
+							if (ipAttrValue->IsEmpty() == VARIANT_TRUE)
+							{
+								// do not want any attribute with empty value
+								continue;
+							}
+
+							// if applying modifying rules...
+							if (m_bApplyModifyingRules)
+							{
+								// TODO: In the future, we want to make this
+								// into an option where the user can set their
+								// preferences on applying modifying rules
+								// on all sub attributes of the attribute
+								applyModifyingRulesOnAttribute(ipAttribute, ipAFDocCopy,
+									ipSubProgressStatus, true);
+							}
+
+							// [P13 #4668]
+							// only add the resulting value to the return vector if it's not empty
+							ipAttrValue = ipAttribute->Value;
+							if (ipAttrValue->IsEmpty() == VARIANT_FALSE)
+							{
+								// store attribute in the returning vector
+								ipResultingValues->PushBack(ipAttribute);
+							}
+						}
 					}
-
-					// get each attribute
-					UCLID_AFCORELib::IAttributePtr ipAttribute =
-						ipOriginAttributes->At(n);
-					ASSERT_RESOURCE_ALLOCATION("ELI06035", ipAttribute != __nullptr);
-
-					ISpatialStringPtr ipAttrValue = ipAttribute->Value;
-					ASSERT_RESOURCE_ALLOCATION("ELI15496", ipAttrValue != __nullptr);
-					if (ipAttrValue->IsEmpty() == VARIANT_TRUE)
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+				}
+				catch(UCLIDException& ue)
+				{
+					if (m_bIgnoreModifierErrors)
 					{
-						// do not want any attribute with empty value
-						continue;
+						ue.log();
 					}
-
-					// if applying modifying rules...
-					if (m_bApplyModifyingRules)
+					else
 					{
-						// TODO: In the future, we want to make this
-						// into an option where the user can set their
-						// preferences on applying modifying rules
-						// on all sub attributes of the attribute
-						applyModifyingRulesOnAttribute(ipAttribute, ipAFDocCopy, ipSubProgressStatus, true);
-					}
-
-					// only add the resulting value to the return vector if it's not empty [P13 #4668]
-					ipAttrValue = ipAttribute->Value;
-					if (ipAttrValue->IsEmpty() == VARIANT_FALSE)
-					{
-						// store attribute in the returning vector
-						ipResultingValues->PushBack(ipAttribute);
+						throw ue;
 					}
 				}
 
@@ -601,6 +741,11 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 		m_bApplyModifyingRules = false;
 		// Version 3 has a Document Preprocessor
 		m_ipDocPreprocessor = __nullptr;
+		// Verson 4: ignore error flags
+		// True for compatibility with previous behavior. Default for new rules is false.
+		m_bIgnoreErrors = true; 
+		m_bIgnorePreprocessorErrors = false;
+		m_bIgnoreModifierErrors = false;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -632,6 +777,13 @@ STDMETHODIMP CAttributeRule::Load(IStream *pStream)
 		if (nDataVersion >= 2)
 		{
 			dataReader >> m_bApplyModifyingRules;
+		}
+
+		if (nDataVersion >= 4)
+		{
+			dataReader >> m_bIgnoreErrors;
+			dataReader >> m_bIgnorePreprocessorErrors;
+			dataReader >> m_bIgnoreModifierErrors;
 		}
 
 		// Separately read the value finding rule object from the stream
@@ -699,6 +851,9 @@ STDMETHODIMP CAttributeRule::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bIsEnabled;
 		dataWriter << m_strAttributeRuleDescription;
 		dataWriter << m_bApplyModifyingRules;
+		dataWriter << m_bIgnoreErrors;
+		dataWriter << m_bIgnorePreprocessorErrors;
+		dataWriter << m_bIgnoreModifierErrors;
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object

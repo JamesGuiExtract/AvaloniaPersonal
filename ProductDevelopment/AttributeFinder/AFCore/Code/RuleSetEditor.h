@@ -17,11 +17,13 @@
 
 #include "resource.h"
 #include "afxwin.h"
+#include "RuleGrid.h"
 
 #include <FileRecoveryManager.h>
 
 #include <memory>
 #include <string>
+#include <stack>
 
 using namespace std;
 
@@ -64,15 +66,18 @@ public:
 	CButton	m_btnRuleDown;
 	CButton	m_btnConRule;
 	CButton	m_btnDelRule;
-	CListCtrl	m_listRules;
+	CRuleGrid m_listRules;
 	CButton	m_btnDelAttr;
 	CButton	m_btnRenAttr;
 	CComboBox	m_comboAttr;
 	BOOL	m_bStopWhenValueFound;
 	BOOL	m_bDocumentPP;
+	BOOL	m_bIgnoreDocumentPPErrors;
 	BOOL	m_bOutputHandler;
+	BOOL	m_bIgnoreOutputHandlerErrors;
 	BOOL	m_bInputValidator;
 	BOOL	m_bAttSplitter;
+	BOOL	m_bIgnoreAttSplitterErrors;
 	CString	m_zPPDescription;
 	CString	m_zIVDescription;
 	CString	m_zAttributeSplitterDescription;
@@ -115,8 +120,8 @@ protected:
 	afx_msg void OnBtnRuleUp();
 	afx_msg void OnBtnRuleDown();
 	afx_msg void OnBtnSelectIV();
-	afx_msg void OnDblclkListRules(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnClickListRules(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg LRESULT OnDblclkListRules(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnCellValueChange(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnSelchangeComboAttributes();
 	afx_msg void OnCheckStop();
 	afx_msg void OnClose();
@@ -124,7 +129,7 @@ protected:
 	afx_msg void OnCancel();
 	afx_msg void OnDropFiles( HDROP hDropInfo );
 	afx_msg void OnBtnSelectAttributeSplitter();
-	afx_msg void OnRclickListRules(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg LRESULT OnRclickListRules(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnEditCut();
 	afx_msg void OnEditCopy();
 	afx_msg void OnEditPaste();
@@ -138,15 +143,18 @@ protected:
 	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg void OnEditDuplicate();
 	afx_msg void OnBtnSelectPreprocessor();
-	afx_msg void OnItemchangedListRules(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg LRESULT OnItemchangedListRules(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBtnSelectOutputHandler();
 	afx_msg void OnRclickHandlerText(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnFileProperties();
 	afx_msg void OnBnClickedCheckDocumentPp();
+	afx_msg void OnBnClickedIgnorePpErrors();
 	afx_msg void OnBnClickedCheckInputValidator();
 	afx_msg void OnBnClickedCheckAttSplitter();
+	afx_msg void OnBnClickedIgnoreAttSplitterErrors();
 	afx_msg void OnBnClickedCheckOutputHandler();
+	afx_msg void OnBnClickedIgnoreOutputHandlerErrors();
 	//}}AFX_MSG
 	afx_msg void OnSelectMRUMenu(UINT nID);
 	afx_msg void OnDoubleClickDocumentPreprocessor();
@@ -191,9 +199,6 @@ private:
 	// Which control owns the context menu
 	EEditorControlSelected	m_eContextMenuCtrl;
 
-	// Moved this to header file as data members to allow access in two CPP files
-	int m_iDESC_LIST_COLUMN;
-
 	// Expected path to Test Harness executable
 	string	m_strTestHarnessPath;
 
@@ -231,9 +236,6 @@ private:
 	// Enables/disables menu and UI items if Rule Set is or is not encrypted
 	void enableEditFeatures(bool bEnable);
 
-	// Set up column header
-	void prepareList();
-
 	// call this method to get attribute name
 	bool promptForAttributeName(PromptDlg& promptDlg);
 
@@ -259,10 +261,7 @@ private:
 	void openFile(string strFileName);
 
 	// Deletes Attribute rules that have been marked for deletion via SetItemData
-	void deleteMarkedRules();
-
-	// Uses SetItemData to mark selected Attribute Rules for later deletion
-	void markSelectedRules();
+	void deleteSelectedRules();
 
 	// Adds Test Harness item to Tools menu
 	// ONLY IF TestHarness object is licensed
@@ -284,14 +283,16 @@ private:
 	void setStatusBarText();
 
 	//---------------------------------------------------------------------------------------------
-	// PURPOSE: updates a check box and an edit control based on the given object
+	// PURPOSE: updates check boxes and an edit control based on the given object
 	// REQUIRE: non-NULL arguments and a valid Check Box ID
-	// PROMISE: sets the check box state to correspond with whether the Object is enabled.
+	// PROMISE: sets the check box 1 state to correspond with whether the Object is enabled.
 	//          disables the check box if the Object has description, otherwise enables.
 	//          sets the edit control text to match the Object's description.
 	//          refreshes the display of the check box and edit control.
+	//			If uiCheckBoxID2 is provided, it is enabled/disabled based on the check state of
+	//			uiCheckBoxID1.
 	void updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescription* pObject, 
-		BOOL &bCheckBoxState, UINT uiCheckBoxID, CString &zEditControlText);	
+		BOOL &bCheckBoxState, CString &zEditControlText, UINT uiCheckBoxID1, UINT uiCheckBoxID2 = 0);	
 
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Throws an exception if the rule set is not licensed or is encrypted and cannot be saved

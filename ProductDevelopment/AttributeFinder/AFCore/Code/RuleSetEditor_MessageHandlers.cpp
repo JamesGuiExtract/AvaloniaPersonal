@@ -658,8 +658,8 @@ BOOL CRuleSetEditor::OnInitDialog()
 		SetIcon( m_hIcon, TRUE );			// Set big icon
 		SetIcon( m_hIcon, FALSE );			// Set small icon
 
-		// Prepare the list control for Attribute Rules
-		prepareList();
+		// Associate the CRuleGrid class with the dialog resource.
+		m_listRules.AttachGrid(this, IDC_LIST_RULES);
 
 		// Set Up and Down bitmaps to buttons
 		m_btnRuleUp.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_UP)));
@@ -743,32 +743,22 @@ void CRuleSetEditor::OnBtnAddRule()
 			// Add the description to the list
 			if (!zDescription.IsEmpty())
 			{
-				// Check for current rule selection
-				POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-				if (pos != __nullptr)
-				{
-					// Get index of first selection
-					nCurrentSelectedIndex = m_listRules.GetNextSelectedItem( pos );
-				}
+				// Get index of first selection
+				nCurrentSelectedIndex = m_listRules.GetFirstSelectedRow();
 
 				// Check for item count if no selection
 				if (nCurrentSelectedIndex == -1)
 				{
-					nCurrentSelectedIndex = m_listRules.GetItemCount();
+					nCurrentSelectedIndex = m_listRules.GetNumberRows();
 				}
 
 				//////////////////
 				// Insert new item before selection or at end of list
 				//////////////////
 				// Add the item without text in Enabled column
-				m_listRules.InsertItem( nCurrentSelectedIndex, "" );
-
-				// Add description text
-				m_listRules.SetItemText( nCurrentSelectedIndex, m_iDESC_LIST_COLUMN, 
-					LPCTSTR(zDescription) );
-
-				// Default enabled state to true
-				m_listRules.SetCheck( nCurrentSelectedIndex, TRUE );
+				m_listRules.InsertRow(nCurrentSelectedIndex);
+				// Default to enabled but not to ignore errors.
+				m_listRules.SetRowInfo(nCurrentSelectedIndex, true, false, zDescription);
 
 				///////////////////////////////
 				// Insert this Rule into vector
@@ -796,7 +786,7 @@ void CRuleSetEditor::OnBtnAddRule()
 			clearListSelection();
 			
 			// Select the newly added rule or retain current selection
-			m_listRules.SetItemState( nCurrentSelectedIndex, LVIS_SELECTED, LVIS_SELECTED );
+			m_listRules.SelectRow(nCurrentSelectedIndex);
 			m_listRules.SetFocus();
 		}
 
@@ -813,14 +803,8 @@ void CRuleSetEditor::OnBtnDeleteRule()
 
 	try
 	{	
-		// Check for current rule selection
-		int iIndex = -1;
-		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != __nullptr)
-		{
-			// Get index of first selection
-			iIndex = m_listRules.GetNextSelectedItem( pos );
-		}
+		// Get index of first selection
+		int iIndex = m_listRules.GetFirstSelectedRow();
 
 		// Just return if no items are selected
 		if (iIndex == -1)
@@ -829,7 +813,7 @@ void CRuleSetEditor::OnBtnDeleteRule()
 		}
 
 		// Check for multiple selection of Rules
-		int iIndex2 = m_listRules.GetNextSelectedItem( pos );
+		int iIndex2 = m_listRules.GetNextSelectedRow();
 
 		// Handle single-selection case
 		int		iResult;
@@ -837,8 +821,7 @@ void CRuleSetEditor::OnBtnDeleteRule()
 		if (iIndex2 == -1)
 		{
 			// Retrieve current Rule description
-			CString	zDescription = m_listRules.GetItemText( iIndex, 
-				m_iDESC_LIST_COLUMN );
+			CString	zDescription = m_listRules.GetDescription(iIndex);
 
 			// Create prompt for confirmation
 			zPrompt.Format( "Are you sure that rule '%s' should be deleted?", 
@@ -858,14 +841,11 @@ void CRuleSetEditor::OnBtnDeleteRule()
 		// Act on response
 		if (iResult == IDYES)
 		{
-			// Mark selected items for deletion
-			markSelectedRules();
-
-			// Delete the marked rules
-			deleteMarkedRules();
+			// Delete the selected rules
+			deleteSelectedRules();
 
 			// Select the next (or the last) rule
-			int iCount = m_listRules.GetItemCount();
+			int iCount = m_listRules.GetNumberRows();
 			if (iCount <= iIndex)
 			{
 				iIndex = iCount - 1;
@@ -873,7 +853,7 @@ void CRuleSetEditor::OnBtnDeleteRule()
 		}
 
 		// Retain selection and focus
-		m_listRules.SetItemState( iIndex, LVIS_SELECTED, LVIS_SELECTED );
+		m_listRules.SelectRow(iIndex);
 		m_listRules.SetFocus();
 
 		// Refresh the display
@@ -901,14 +881,8 @@ void CRuleSetEditor::OnBtnConfigureRule()
 		CString	zAttribute;
 		m_comboAttr.GetLBText( iIndex, zAttribute );
 
-		// Retrieve current selection index
-		iIndex = -1;
-		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != __nullptr)
-		{
-			// Get index of first selection
-			iIndex = m_listRules.GetNextSelectedItem( pos );
-		}
+		// Get index of first selection
+		iIndex = m_listRules.GetFirstSelectedRow();
 
 		if (iIndex > -1)
 		{
@@ -956,8 +930,7 @@ void CRuleSetEditor::OnBtnConfigureRule()
 				if (!zDescription.IsEmpty())
 				{
 					// Update the description text
-					m_listRules.SetItemText( iIndex, m_iDESC_LIST_COLUMN, 
-						LPCTSTR(zDescription) );
+					m_listRules.SetDescription(iIndex, zDescription);
 
 					//////////////////////////
 					// Update the Rules vector
@@ -983,7 +956,7 @@ void CRuleSetEditor::OnBtnConfigureRule()
 			}			// end if results accepted
 
 			// Retain selection and focus
-			m_listRules.SetItemState( iIndex, LVIS_SELECTED, LVIS_SELECTED );
+			m_listRules.SelectRow(iIndex);
 			m_listRules.SetFocus();
 
 			// Update button states
@@ -1000,37 +973,25 @@ void CRuleSetEditor::OnBtnRuleUp()
 
 	try
 	{	
-		// Check for current rule selection
-		int iIndex = -1;
-		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != __nullptr)
-		{
-			// Get index of first selection
-			iIndex = m_listRules.GetNextSelectedItem( pos );
-		}
+		// Get index of first selection
+		int iIndex = m_listRules.GetFirstSelectedRow();
 
 		// Selection cannot be at top of list
 		if (iIndex > 0)
 		{
-			// Retrieve current Rule flag
-			BOOL	bEnabled = m_listRules.GetCheck( iIndex );
-
-			// Retrieve current Rule description
-			CString	zDescription = m_listRules.GetItemText( iIndex, 
-				m_iDESC_LIST_COLUMN );
+			// Retrieve current row's values
+			bool bEnabled = m_listRules.GetEnabled(iIndex);
+			bool bIgnoreErrors = m_listRules.GetIgnoreError(iIndex);
+			CString	zDescription = m_listRules.GetDescription(iIndex);
 
 			// Delete the item
-			m_listRules.DeleteItem( iIndex );
+			m_listRules.DeleteRow(iIndex);
 
 			// Replace the item one row higher
-			m_listRules.InsertItem( iIndex - 1, "" );
+			m_listRules.InsertRow(iIndex - 1);
 
-			// Restore the flag
-			m_listRules.SetCheck( iIndex - 1, bEnabled );
-
-			// Restore the description
-			m_listRules.SetItemText( iIndex - 1, m_iDESC_LIST_COLUMN, 
-				LPCTSTR(zDescription) );
+			// Restore the saved values.
+			m_listRules.SetRowInfo(iIndex - 1, bEnabled, bIgnoreErrors, zDescription);
 
 			//////////////////////////
 			// Update the Rules vector
@@ -1048,7 +1009,7 @@ void CRuleSetEditor::OnBtnRuleUp()
 			ipRules->Swap( iIndex, iIndex - 1 );
 
 			// Retain selection and focus
-			m_listRules.SetItemState( iIndex - 1, LVIS_SELECTED, LVIS_SELECTED );
+			m_listRules.SelectRow(iIndex - 1);
 			m_listRules.SetFocus();
 
 			// Update button states
@@ -1065,38 +1026,28 @@ void CRuleSetEditor::OnBtnRuleDown()
 
 	try
 	{	
-		// Check for current rule selection
-		int iIndex = -1;
-		POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != __nullptr)
-		{
-			// Get index of first selection
-			iIndex = m_listRules.GetNextSelectedItem( pos );
-		}
+		// Get index of first selection
+		int iIndex = m_listRules.GetFirstSelectedRow();
 
 		// Selection cannot be at bottom of list
-		int iCount = m_listRules.GetItemCount();
+		int iCount = m_listRules.GetNumberRows();
 		if (iIndex < iCount - 1)
 		{
-			// Retrieve current Rule flag
-			BOOL	bEnabled = m_listRules.GetCheck( iIndex );
+			// Retrieve current row's values
+			bool bEnabled = m_listRules.GetEnabled(iIndex);
+			bool bIgnoreErrors = m_listRules.GetIgnoreError(iIndex);
 
 			// Retrieve current Rule description
-			CString	zDescription = m_listRules.GetItemText( iIndex, 
-				m_iDESC_LIST_COLUMN );
+			CString	zDescription = m_listRules.GetDescription(iIndex);
 
 			// Delete the item
-			m_listRules.DeleteItem( iIndex );
+			m_listRules.DeleteRow(iIndex);
 
 			// Replace the item one row lower
-			m_listRules.InsertItem( iIndex + 1, "" );
+			m_listRules.InsertRow(iIndex + 1);
 
-			// Restore the flag
-			m_listRules.SetCheck( iIndex + 1, bEnabled );
-
-			// Restore the description
-			m_listRules.SetItemText( iIndex + 1, m_iDESC_LIST_COLUMN, 
-				LPCTSTR(zDescription) );
+			// Restore the saved values.
+			m_listRules.SetRowInfo(iIndex + 1, bEnabled, bIgnoreErrors, zDescription);
 
 			//////////////////////////
 			// Update the Rules vector
@@ -1114,7 +1065,7 @@ void CRuleSetEditor::OnBtnRuleDown()
 			ipRules->Swap( iIndex, iIndex + 1 );
 
 			// Retain selection and focus
-			m_listRules.SetItemState( iIndex + 1, LVIS_SELECTED, LVIS_SELECTED );
+			m_listRules.SelectRow(iIndex + 1);
 			m_listRules.SetFocus();
 
 			// Update button states
@@ -1124,7 +1075,7 @@ void CRuleSetEditor::OnBtnRuleDown()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04431")
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::OnClickListRules(NMHDR* pNMHDR, LRESULT* pResult) 
+LRESULT CRuleSetEditor::OnCellValueChange(WPARAM wParam, LPARAM lParam) 
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
@@ -1140,38 +1091,45 @@ void CRuleSetEditor::OnClickListRules(NMHDR* pNMHDR, LRESULT* pResult)
 		GetCursorPos( &p );
 		m_listRules.ScreenToClient( &p );
 
+		// Extract the row and column from lParam
+		short nRow = (short)LOWORD(lParam);
+		short nCol = (short)HIWORD(lParam);
 
-		UINT	uiFlags;
-		int		iIndex = m_listRules.HitTest( p, &uiFlags );
-
-		// Was click on the checkbox?
-		// Note: if the item is clicked on anywhere but the check box,
-		// the flag contains LVHT_ONITEMSTATEICON, LVHT_ONITEMICON and 
-		// LVHT_ONITEMLABEL. If the item is clicked on only the check box
-		// part, the flag will only contain LVHT_ONITEMSTATEICON 
-		if (iIndex >= 0
-			&& (uiFlags & LVHT_ONITEMSTATEICON)
-			&& !(uiFlags & LVHT_ONITEMICON)
-			&& !(uiFlags & LVHT_ONITEMLABEL))
+		// Only concerned here with whether a check box column of a valid row changed.
+		if (nRow < 0 || nCol < 0 || nCol > 1)
 		{
-			// Retrieve existing vector of Rules
-			IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
-
-			// Retrieve this rule from vector
-			UCLID_AFCORELib::IAttributeRulePtr	ipRule = ipRules->At(iIndex);
-
-			// Get the old state of the checkbox
-			BOOL bChecked = m_listRules.GetCheck(iIndex);
-			// Enable the rule if the old state of the check box is unchecked
-			ipRule->IsEnabled = asVariantBool(!bChecked);
+			return 0;
 		}
-		
-		*pResult = 0;
+
+		// Retrieve existing vector of Rules
+		IIUnknownVectorPtr	ipRules = m_ipInfo->GetAttributeRules();
+
+		// Retrieve this rule from vector
+		UCLID_AFCORELib::IAttributeRulePtr	ipRule = ipRules->At(nRow);
+
+		// The enabled state changed.
+		if (nCol == 0)
+		{
+			bool bEnabled = m_listRules.GetEnabled(nRow);
+
+			// Enable the rule if the old state of the check box is unchecked
+			ipRule->IsEnabled = asVariantBool(bEnabled);
+		}
+		// The ignore errors state changed.
+		else if (nCol == 1)
+		{
+			bool bIgnoreErrors = m_listRules.GetIgnoreError(nRow);
+
+			// Enable the rule if the old state of the check box is unchecked
+			ipRule->IgnoreErrors = asVariantBool(bIgnoreErrors);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04432")
+
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::OnDblclkListRules(NMHDR* pNMHDR, LRESULT* pResult) 
+LRESULT CRuleSetEditor::OnDblclkListRules(WPARAM wParam, LPARAM lParam) 
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
@@ -1180,77 +1138,63 @@ void CRuleSetEditor::OnDblclkListRules(NMHDR* pNMHDR, LRESULT* pResult)
 	{	
 		// This will act as Select + Configure
 		OnBtnConfigureRule();
-
-		*pResult = 0;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04433")
+
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::OnRclickListRules(NMHDR* pNMHDR, LRESULT* pResult) 
+LRESULT CRuleSetEditor::OnRclickListRules(WPARAM wParam, LPARAM lParam) 
 {
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
 
 	try
 	{
-		// Check for current Attribute selection
-		int iAttributeIndex = -1;
-		iAttributeIndex = m_comboAttr.GetCurSel();
-
 		// Just return if no Attribute is selected
-		if (iAttributeIndex == -1)
+		if (lParam == -1)
 		{
-			return;
+			return 0;
 		}
 
-		// always wait till the item(s) r-clicked is(are) selected
-		// then bring up the context menu
-		if (pNMHDR)
-		{
-			int iIndex = -1;
-			POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-			if (pos != __nullptr)
-			{
-				// Get index of first selection
-				iIndex = m_listRules.GetNextSelectedItem( pos );
-			}
+		// Get index of first selection
+		int iIndex = m_listRules.GetFirstSelectedRow();
 
-			// Load the context menu
-			CMenu menu;
-			menu.LoadMenu( IDR_MNU_CONTEXT );
-			CMenu *pContextMenu = menu.GetSubMenu( 0 );
+		// Load the context menu
+		CMenu menu;
+		menu.LoadMenu( IDR_MNU_CONTEXT );
+		CMenu *pContextMenu = menu.GetSubMenu( 0 );
 			
-			// Set the control
-			m_eContextMenuCtrl = kRulesList;
+		// Set the control
+		m_eContextMenuCtrl = kRulesList;
 			
-			//////////////////////////
-			// Enable or disable items
-			//////////////////////////
-			UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
-			UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-			bool bEnable = iIndex > -1;
+		//////////////////////////
+		// Enable or disable items
+		//////////////////////////
+		UINT nEnable = (MF_BYCOMMAND | MF_ENABLED);
+		UINT nDisable = (MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+		bool bEnable = iIndex > -1;
 			
-			// No Rule item selected
-			pContextMenu->EnableMenuItem(ID_EDIT_CUT, bEnable ? nEnable : nDisable);
-			pContextMenu->EnableMenuItem(ID_EDIT_COPY, bEnable ? nEnable : nDisable);
-			pContextMenu->EnableMenuItem(ID_EDIT_DELETE, bEnable ? nEnable : nDisable);
+		// No Rule item selected
+		pContextMenu->EnableMenuItem(ID_EDIT_CUT, bEnable ? nEnable : nDisable);
+		pContextMenu->EnableMenuItem(ID_EDIT_COPY, bEnable ? nEnable : nDisable);
+		pContextMenu->EnableMenuItem(ID_EDIT_DELETE, bEnable ? nEnable : nDisable);
 			
-			bEnable = 
-				m_ipClipboardMgr->ObjectIsIUnknownVectorOfType(IID_IAttributeRule) == VARIANT_TRUE;
-			pContextMenu->EnableMenuItem(ID_EDIT_PASTE, bEnable ? nEnable : nDisable);
+		bEnable = 
+			m_ipClipboardMgr->ObjectIsIUnknownVectorOfType(IID_IAttributeRule) == VARIANT_TRUE;
+		pContextMenu->EnableMenuItem(ID_EDIT_PASTE, bEnable ? nEnable : nDisable);
 			
-			// Map the point to the correct position
-			CPoint	point;
-			GetCursorPos(&point);
+		// Map the point to the correct position
+		CPoint	point;
+		GetCursorPos(&point);
 			
-			// Display and manage the context menu
-			pContextMenu->TrackPopupMenu( TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, 
-				point.x, point.y, this );
-		}
-
-		*pResult = 0;
+		// Display and manage the context menu
+		pContextMenu->TrackPopupMenu( TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, 
+			point.x, point.y, this );
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05403")
+
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::OnCheckStop() 
@@ -1338,7 +1282,7 @@ void CRuleSetEditor::OnBtnSelectIV()
 			{
 				// update controls based on new or modified input validator
 				updateCheckBoxAndEditControlBasedOnObject(m_ipInfo->InputValidator,
-					m_bInputValidator, IDC_CHECK_INPUT_VALIDATOR, m_zIVDescription);
+					m_bInputValidator, m_zIVDescription, IDC_CHECK_INPUT_VALIDATOR);
 			}
 		}
 	}
@@ -1367,7 +1311,8 @@ void CRuleSetEditor::OnBtnSelectPreprocessor()
 		{
 			// update controls to reflect the new or changed document preprocessor
 			updateCheckBoxAndEditControlBasedOnObject(m_ipRuleSet->GlobalDocPreprocessor,
-				m_bDocumentPP, IDC_CHECK_DOCUMENT_PP, m_zPPDescription);
+				m_bDocumentPP, m_zPPDescription, IDC_CHECK_DOCUMENT_PP,
+				IDC_CHECK_IGNORE_PP_ERRORS);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06020")
@@ -1529,7 +1474,8 @@ void CRuleSetEditor::OnBtnSelectAttributeSplitter()
 			{
 				// update controls to reflect new or modified attribute splitter
 				updateCheckBoxAndEditControlBasedOnObject(m_ipInfo->AttributeSplitter,
-					m_bAttSplitter, IDC_CHECK_ATT_SPLITTER, m_zAttributeSplitterDescription);
+					m_bAttSplitter, m_zAttributeSplitterDescription, IDC_CHECK_ATT_SPLITTER,
+					IDC_CHECK_IGNORE_AS_ERRORS);
 			}
 		}
 	}
@@ -1557,7 +1503,8 @@ void CRuleSetEditor::OnBtnSelectOutputHandler()
 		{
 			// update controls to display modified output handler
 			updateCheckBoxAndEditControlBasedOnObject(m_ipRuleSet->GlobalOutputHandler,
-				m_bOutputHandler, IDC_CHECK_OUTPUT_HANDLER, m_zOutputHandlerDescription);
+				m_bOutputHandler, m_zOutputHandlerDescription, IDC_CHECK_OUTPUT_HANDLER,
+				IDC_CHECK_IGNORE_OH_ERRORS);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI07730")
@@ -1576,7 +1523,7 @@ void CRuleSetEditor::OnDoubleClickDocumentPreprocessor()
 		{
 			// update display of the output handler check box and edit control
 			updateCheckBoxAndEditControlBasedOnObject(m_ipRuleSet->GlobalDocPreprocessor,
-				m_bDocumentPP, IDC_CHECK_DOCUMENT_PP, m_zPPDescription);
+				m_bDocumentPP, m_zPPDescription, IDC_CHECK_DOCUMENT_PP, IDC_CHECK_IGNORE_PP_ERRORS);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16038")
@@ -1600,7 +1547,7 @@ void CRuleSetEditor::OnDoubleClickInputValidator()
 			{
 				// update display of the output handler check box and edit control
 				updateCheckBoxAndEditControlBasedOnObject(m_ipInfo->InputValidator,
-					m_bInputValidator, IDC_CHECK_INPUT_VALIDATOR, m_zIVDescription);
+					m_bInputValidator, m_zIVDescription, IDC_CHECK_INPUT_VALIDATOR);
 			}
 		}
 	}
@@ -1624,7 +1571,8 @@ void CRuleSetEditor::OnDoubleClickAttributeSplitter()
 			{
 				// update display of the output handler check box and edit control
 				updateCheckBoxAndEditControlBasedOnObject(m_ipInfo->AttributeSplitter,
-					m_bAttSplitter, IDC_CHECK_ATT_SPLITTER, m_zAttributeSplitterDescription);
+					m_bAttSplitter, m_zAttributeSplitterDescription, IDC_CHECK_ATT_SPLITTER,
+					IDC_CHECK_IGNORE_AS_ERRORS);
 			}
 		}
 	}
@@ -1644,7 +1592,8 @@ void CRuleSetEditor::OnDoubleClickOutputHandler()
 		{
 			// update display of the output handler check box and edit control
 			updateCheckBoxAndEditControlBasedOnObject(m_ipRuleSet->GlobalOutputHandler,
-				m_bOutputHandler, IDC_CHECK_OUTPUT_HANDLER, m_zOutputHandlerDescription);
+				m_bOutputHandler, m_zOutputHandlerDescription, IDC_CHECK_OUTPUT_HANDLER,
+				IDC_CHECK_IGNORE_OH_ERRORS);
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16041")
@@ -1684,7 +1633,7 @@ int CRuleSetEditor::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT messa
 				(point.y >= rectRules.top) && (point.y <= rectRules.bottom))
 			{
 				// Create and manage a context menu for Rules list
-				OnRclickListRules( NULL, &result );
+				OnRclickListRules(0, 0);
 			}
 		}
 	}
@@ -1819,15 +1768,15 @@ void CRuleSetEditor::OnTimer(UINT nIDEvent)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI05506")
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::OnItemchangedListRules(NMHDR* pNMHDR, LRESULT* pResult) 
+LRESULT CRuleSetEditor::OnItemchangedListRules(WPARAM wParam, LPARAM lParam) 
 {
 	try
 	{
 		setButtonStates();
-		
-		*pResult = 0;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI06846")
+
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::OnSize(UINT nType, int cx, int cy) 
@@ -1918,6 +1867,8 @@ void CRuleSetEditor::OnBnClickedCheckDocumentPp()
 	IObjectWithDescriptionPtr ipGDPP = m_ipRuleSet->GlobalDocPreprocessor;
 	ASSERT_RESOURCE_ALLOCATION("ELI15510", ipGDPP != __nullptr);
 
+	GetDlgItem(IDC_CHECK_IGNORE_PP_ERRORS)->EnableWindow(m_bDocumentPP);
+
 	// Check what the checkbox is set to and then
 	// Enable or Disable the PreProcessor accordingly
 	if( m_bDocumentPP == TRUE )
@@ -1930,6 +1881,13 @@ void CRuleSetEditor::OnBnClickedCheckDocumentPp()
 	}
 }
 //--------------------------------------------------------------------------------------------------
+void CRuleSetEditor::OnBnClickedIgnorePpErrors()
+{
+	UpdateData(TRUE);
+
+	m_ipRuleSet->IgnorePreprocessorErrors = asVariantBool(asCppBool(m_bIgnoreDocumentPPErrors));
+}
+//--------------------------------------------------------------------------------------------------
 void CRuleSetEditor::OnBnClickedCheckOutputHandler()
 {
 	UpdateData( TRUE );
@@ -1937,6 +1895,8 @@ void CRuleSetEditor::OnBnClickedCheckOutputHandler()
 	// Retrieve the Output Handler
 	IObjectWithDescriptionPtr ipOH = m_ipRuleSet->GlobalOutputHandler;
 	ASSERT_RESOURCE_ALLOCATION("ELI15511", ipOH != __nullptr);
+
+	GetDlgItem(IDC_CHECK_IGNORE_OH_ERRORS)->EnableWindow(m_bOutputHandler);
 
 	// Check what the checkbox is set to and then
 	// Enable or Disable the Output Handler accordingly
@@ -1948,6 +1908,13 @@ void CRuleSetEditor::OnBnClickedCheckOutputHandler()
 	{
 		ipOH->PutEnabled( VARIANT_FALSE );
 	}
+}
+//--------------------------------------------------------------------------------------------------
+void CRuleSetEditor::OnBnClickedIgnoreOutputHandlerErrors()
+{
+	UpdateData(TRUE);
+
+	m_ipRuleSet->IgnoreOutputHandlerErrors = asVariantBool(asCppBool(m_bIgnoreOutputHandlerErrors));
 }
 //--------------------------------------------------------------------------------------------------
 void CRuleSetEditor::OnBnClickedCheckInputValidator()
@@ -1978,6 +1945,8 @@ void CRuleSetEditor::OnBnClickedCheckAttSplitter()
 	IObjectWithDescriptionPtr ipSplitter = m_ipInfo->AttributeSplitter;
 	ASSERT_RESOURCE_ALLOCATION("ELI15513", ipSplitter != __nullptr);
 
+	GetDlgItem(IDC_CHECK_IGNORE_AS_ERRORS)->EnableWindow(m_bAttSplitter);
+
 	// Check what the checkbox is set to and then
 	// Enable or Disable the Attribute Splitter accordingly
 	if( m_bAttSplitter == TRUE )
@@ -1988,5 +1957,12 @@ void CRuleSetEditor::OnBnClickedCheckAttSplitter()
 	{
 		ipSplitter->PutEnabled( VARIANT_FALSE );
 	}
+}
+//--------------------------------------------------------------------------------------------------
+void CRuleSetEditor::OnBnClickedIgnoreAttSplitterErrors()
+{
+	UpdateData(TRUE);
+
+	m_ipInfo->IgnoreAttributeSplitterErrors = asVariantBool(asCppBool(m_bIgnoreAttSplitterErrors));
 }
 //--------------------------------------------------------------------------------------------------

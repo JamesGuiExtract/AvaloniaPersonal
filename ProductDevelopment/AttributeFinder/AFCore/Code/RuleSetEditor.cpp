@@ -65,7 +65,6 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
  m_eContextMenuCtrl(kNoControl),
  m_strCurrentFileName(""),
  m_FRM(".tmp"),
- m_iDESC_LIST_COLUMN(1),
  m_strBinFolder(strBinFolder),
  m_pMRUFilesMenu(__nullptr)
 {
@@ -172,15 +171,17 @@ void CRuleSetEditor::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_RULEDOWN, m_btnRuleDown);
 	DDX_Control(pDX, IDC_BTN_CONRULE, m_btnConRule);
 	DDX_Control(pDX, IDC_BTN_DELRULE, m_btnDelRule);
-	DDX_Control(pDX, IDC_LIST_RULES, m_listRules);
 	DDX_Control(pDX, IDC_BTN_DELATTR, m_btnDelAttr);
 	DDX_Control(pDX, IDC_BTN_RENATTR, m_btnRenAttr);
 	DDX_Control(pDX, IDC_COMBO_ATTRIBUTES, m_comboAttr);
 	DDX_Check(pDX, IDC_CHECK_STOP, m_bStopWhenValueFound);
 	DDX_Check(pDX, IDC_CHECK_DOCUMENT_PP, m_bDocumentPP);
+	DDX_Check(pDX, IDC_CHECK_IGNORE_PP_ERRORS, m_bIgnoreDocumentPPErrors);
 	DDX_Check(pDX, IDC_CHECK_INPUT_VALIDATOR, m_bInputValidator);
 	DDX_Check(pDX, IDC_CHECK_ATT_SPLITTER, m_bAttSplitter);
+	DDX_Check(pDX, IDC_CHECK_IGNORE_AS_ERRORS, m_bIgnoreAttSplitterErrors);
 	DDX_Check(pDX, IDC_CHECK_OUTPUT_HANDLER, m_bOutputHandler);
+	DDX_Check(pDX, IDC_CHECK_IGNORE_OH_ERRORS, m_bIgnoreOutputHandlerErrors);
 	DDX_Text(pDX, IDC_EDIT_PREPROCESSOR, m_zPPDescription);
 	DDX_Text(pDX, IDC_EDIT_IV, m_zIVDescription);
 	DDX_Text(pDX, IDC_EDIT_ATTRIBUTE_SPLITTER, m_zAttributeSplitterDescription);
@@ -210,14 +211,14 @@ BEGIN_MESSAGE_MAP(CRuleSetEditor, CDialog)
 	ON_BN_CLICKED(IDC_BTN_RULEUP, OnBtnRuleUp)
 	ON_BN_CLICKED(IDC_BTN_RULEDOWN, OnBtnRuleDown)
 	ON_BN_CLICKED(IDC_BTN_SELECTIV, OnBtnSelectIV)
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST_RULES, OnDblclkListRules)
-	ON_NOTIFY(NM_CLICK, IDC_LIST_RULES, OnClickListRules)
+	ON_MESSAGE(WM_RULE_GRID_DBLCLICK, OnDblclkListRules)
+	ON_MESSAGE(WM_RULE_GRID_CELL_VALUE_CHANGE, OnCellValueChange)
 	ON_CBN_SELCHANGE(IDC_COMBO_ATTRIBUTES, OnSelchangeComboAttributes)
 	ON_BN_CLICKED(IDC_CHECK_STOP, OnCheckStop)
 	ON_WM_CLOSE()
 	ON_WM_DROPFILES()
 	ON_BN_CLICKED(IDC_BTN_SELECT_ATTRIBUTE_SPLITTER, OnBtnSelectAttributeSplitter)
-	ON_NOTIFY(NM_RCLICK, IDC_LIST_RULES, OnRclickListRules)
+	ON_MESSAGE(WM_RULE_GRID_RCLICK, OnRclickListRules)
 	ON_COMMAND(ID_EDIT_CUT, OnEditCut)
 	ON_COMMAND(ID_EDIT_COPY, OnEditCopy)
 	ON_COMMAND(ID_EDIT_PASTE, OnEditPaste)
@@ -231,7 +232,7 @@ BEGIN_MESSAGE_MAP(CRuleSetEditor, CDialog)
 	ON_WM_TIMER()
 	ON_COMMAND(ID_EDIT_DUPLICATE, OnEditDuplicate)
 	ON_BN_CLICKED(IDC_BTN_SELECTPP, OnBtnSelectPreprocessor)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_RULES, OnItemchangedListRules)
+	ON_MESSAGE(WM_RULE_GRID_SELCHANGE, OnItemchangedListRules)
 	ON_BN_CLICKED(IDC_BTN_SELECTOH, OnBtnSelectOutputHandler)
 	ON_NOTIFY(NM_RCLICK, IDC_EDIT_OH, OnRclickHandlerText)
 	ON_WM_SIZE()
@@ -239,33 +240,25 @@ BEGIN_MESSAGE_MAP(CRuleSetEditor, CDialog)
 	//}}AFX_MSG_MAP
 	ON_COMMAND_RANGE(ID_MRU_FILE1, ID_MRU_FILE5, OnSelectMRUMenu)
 	ON_BN_CLICKED(IDC_CHECK_DOCUMENT_PP, &CRuleSetEditor::OnBnClickedCheckDocumentPp)
+	ON_BN_CLICKED(IDC_CHECK_IGNORE_PP_ERRORS, &CRuleSetEditor::OnBnClickedIgnorePpErrors)
 	ON_BN_CLICKED(IDC_CHECK_INPUT_VALIDATOR, &CRuleSetEditor::OnBnClickedCheckInputValidator)
 	ON_BN_CLICKED(IDC_CHECK_ATT_SPLITTER, &CRuleSetEditor::OnBnClickedCheckAttSplitter)
+	ON_BN_CLICKED(IDC_CHECK_IGNORE_AS_ERRORS, &CRuleSetEditor::OnBnClickedIgnoreAttSplitterErrors)
 	ON_BN_CLICKED(IDC_CHECK_OUTPUT_HANDLER, &CRuleSetEditor::OnBnClickedCheckOutputHandler)
+	ON_BN_CLICKED(IDC_CHECK_IGNORE_OH_ERRORS, &CRuleSetEditor::OnBnClickedIgnoreOutputHandlerErrors)
 	ON_STN_DBLCLK(IDC_EDIT_OH, &CRuleSetEditor::OnDoubleClickOutputHandler)
 	ON_STN_DBLCLK(IDC_EDIT_ATTRIBUTE_SPLITTER, &CRuleSetEditor::OnDoubleClickAttributeSplitter)
 	ON_STN_DBLCLK(IDC_EDIT_IV, &CRuleSetEditor::OnDoubleClickInputValidator)
 	ON_STN_DBLCLK(IDC_EDIT_PREPROCESSOR, &CRuleSetEditor::OnDoubleClickDocumentPreprocessor)
 END_MESSAGE_MAP()
 
-void CRuleSetEditor::clearListSelection()
-{
-	POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-	if (pos == NULL)
-	{
-		// no item selected, return
-		return;
-	}
-	
-	while (pos)
-	{
-		int nItemSelected = m_listRules.GetNextSelectedItem(pos);
-		m_listRules.SetItemState(nItemSelected, 0, LVIS_SELECTED);
-	}
-}
-
 //-------------------------------------------------------------------------------------------------
 // Private methods
+//-------------------------------------------------------------------------------------------------
+void CRuleSetEditor::clearListSelection()
+{
+	m_listRules.ClearSelections();
+}
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::processDroppedFile(char *pszFile) 
 {
@@ -423,6 +416,9 @@ void CRuleSetEditor::enableEditFeatures(bool bEnable)
 		vecRSDControlIDs.push_back(IDC_CHECK_INPUT_VALIDATOR);
 		vecRSDControlIDs.push_back(IDC_CHECK_ATT_SPLITTER);
 		vecRSDControlIDs.push_back(IDC_CHECK_OUTPUT_HANDLER);
+		vecRSDControlIDs.push_back(IDC_CHECK_IGNORE_PP_ERRORS);
+		vecRSDControlIDs.push_back(IDC_CHECK_IGNORE_AS_ERRORS);
+		vecRSDControlIDs.push_back(IDC_CHECK_IGNORE_OH_ERRORS);
 	}
 	
 	// Show/Hide the controls that should only be shown in edit-mode
@@ -466,37 +462,6 @@ void CRuleSetEditor::enableEditFeatures(bool bEnable)
 		pMainMenu->EnableMenuItem( nID, 
 			bEnable ? MF_BYCOMMAND | MF_ENABLED : MF_BYCOMMAND | MF_GRAYED );
 	}
-}
-//-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::prepareList() 
-{
-	// Enable full row selection plus grid lines and checkboxes
-	m_listRules.SetExtendedStyle( 
-		LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES );
-
-	//////////////////
-	// Prepare headers
-	//////////////////
-	// Get dimensions of control
-	CRect	rect;
-	m_listRules.GetClientRect( &rect );
-	
-	// Retrieve fixed column widths
-	long	lEWidth = 55;
-
-	// Compute width for Description column
-	CRect	rectList;
-	m_listRules.GetClientRect( rectList );
-	long	lDWidth = rectList.Width() - lEWidth;
-	
-	// Add 2 column headings to Rules list
-	// It would be nice to center the left column's checkbox, 
-	// however, in the help it specifies that the first column
-	// must be left aligned. Using LVCFMT_CENTER has no effect.
-	m_listRules.InsertColumn( giENABLE_LIST_COLUMN, "Enabled", 
-		LVCFMT_LEFT, lEWidth, giENABLE_LIST_COLUMN );
-	m_listRules.InsertColumn( m_iDESC_LIST_COLUMN, "Description", 
-		LVCFMT_LEFT, lDWidth, m_iDESC_LIST_COLUMN );
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSetEditor::promptForAttributeName(PromptDlg& promptDlg)
@@ -604,7 +569,10 @@ void CRuleSetEditor::refreshUIFromAttribute()
 	// Update list of Attribute Rules
 	/////////////////////////////////
 	// Clear the list
-	m_listRules.DeleteAllItems();
+	while (m_listRules.GetNumberRows() > 0)
+	{
+		m_listRules.DeleteRow(0);
+	}
 
 	// Retrieve vector of Attribute Rules
 	if (m_ipInfo)
@@ -626,16 +594,15 @@ void CRuleSetEditor::refreshUIFromAttribute()
 			if (ipRule != __nullptr)
 			{
 				// Retrieve the Rule description
-				_bstr_t	bstrDescription = ipRule->GetDescription();
+				string strDescription = asString(ipRule->GetDescription());
 
 				// Retrieve the Enabled flag
-				VARIANT_BOOL	vbEnabled = ipRule->GetIsEnabled();
+				bool bEnabled = asCppBool(ipRule->GetIsEnabled());
+				bool bIgnoreErrors = asCppBool(ipRule->IgnoreErrors);
 
 				// Add the item to the list
-				m_listRules.InsertItem( i, "" );
-				m_listRules.SetItemText( i, m_iDESC_LIST_COLUMN, (const char *)bstrDescription);
-
-				m_listRules.SetCheck(i, vbEnabled == VARIANT_TRUE);
+				m_listRules.InsertRow(i);
+				m_listRules.SetRowInfo(i, bEnabled, bIgnoreErrors, strDescription.c_str());
 			}
 		}
 	}
@@ -692,6 +659,9 @@ void CRuleSetEditor::refreshUIFromAttribute()
 			// if there is no AS, disable the checkbox
 			GetDlgItem( IDC_CHECK_ATT_SPLITTER )->EnableWindow( FALSE );
 			m_bAttSplitter = FALSE;
+
+			GetDlgItem( IDC_CHECK_IGNORE_AS_ERRORS )->EnableWindow( FALSE );
+			m_bIgnoreAttSplitterErrors = FALSE;
 		}
 		else
 		{
@@ -707,6 +677,16 @@ void CRuleSetEditor::refreshUIFromAttribute()
 			{
 				m_bAttSplitter = FALSE;
 			}
+
+			GetDlgItem( IDC_CHECK_IGNORE_AS_ERRORS )->EnableWindow( m_bAttSplitter );
+			if( m_ipInfo->IgnoreAttributeSplitterErrors == VARIANT_TRUE )
+			{
+				m_bIgnoreAttSplitterErrors = TRUE;
+			}
+			else
+			{
+				m_bIgnoreAttSplitterErrors = FALSE;
+			}
 		}
 	}
 	else
@@ -720,6 +700,8 @@ void CRuleSetEditor::refreshUIFromAttribute()
 		m_bInputValidator = FALSE;
 		GetDlgItem( IDC_CHECK_ATT_SPLITTER )->EnableWindow( FALSE );
 		m_bAttSplitter = FALSE;
+		GetDlgItem( IDC_CHECK_IGNORE_AS_ERRORS )->EnableWindow( FALSE );
+		m_bIgnoreAttSplitterErrors = FALSE;
 	}
 
 	UpdateData(FALSE);
@@ -754,6 +736,9 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 		//if not, disable the checkbox
 		GetDlgItem( IDC_CHECK_DOCUMENT_PP )->EnableWindow( FALSE );
 		m_bDocumentPP = FALSE;
+
+		GetDlgItem( IDC_CHECK_IGNORE_PP_ERRORS )->EnableWindow( FALSE );
+		m_bIgnoreDocumentPPErrors = FALSE;
 	}
 	else
 	{
@@ -767,6 +752,16 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 		else
 		{
 			m_bDocumentPP = FALSE;
+		}
+
+		GetDlgItem( IDC_CHECK_IGNORE_PP_ERRORS )->EnableWindow( m_bDocumentPP );
+		if( m_ipRuleSet->IgnorePreprocessorErrors == VARIANT_TRUE )
+		{
+			m_bIgnoreDocumentPPErrors = TRUE;
+		}
+		else
+		{
+			m_bIgnoreDocumentPPErrors = FALSE;
 		}
 	}
 
@@ -785,6 +780,9 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 		// if there is not an OH, disable the checkbox
 		GetDlgItem( IDC_CHECK_OUTPUT_HANDLER )->EnableWindow( FALSE );
 		m_bOutputHandler = FALSE;
+
+		GetDlgItem( IDC_CHECK_IGNORE_OH_ERRORS )->EnableWindow( FALSE );
+		m_bIgnoreOutputHandlerErrors = FALSE;
 	}
 	else
 	{
@@ -798,6 +796,16 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 		else
 		{
 			m_bOutputHandler = FALSE;
+		}
+
+		GetDlgItem( IDC_CHECK_IGNORE_OH_ERRORS )->EnableWindow( m_bOutputHandler );
+		if( m_ipRuleSet->IgnoreOutputHandlerErrors == VARIANT_TRUE )
+		{
+			m_bIgnoreOutputHandlerErrors = TRUE;
+		}
+		else
+		{
+			m_bIgnoreOutputHandlerErrors = FALSE;
 		}
 	}
 
@@ -911,7 +919,7 @@ void CRuleSetEditor::setButtonStates()
 	// Check count in Rules list
 	POSITION pos = NULL;
 	int iIndex = -1;
-	iCount = m_listRules.GetItemCount();
+	iCount = m_listRules.GetNumberRows();
 	if (iCount == 0)
 	{
 		// Disable most buttons
@@ -928,12 +936,7 @@ void CRuleSetEditor::setButtonStates()
 		pButton->EnableWindow( asMFCBool(iCount > 1) );
 
 		// Next have to see if an item is selected
-		pos = m_listRules.GetFirstSelectedItemPosition();
-		if (pos != __nullptr)
-		{
-			// Get index of first selection
-			iIndex = m_listRules.GetNextSelectedItem( pos );
-		}
+		iIndex = m_listRules.GetFirstSelectedRow();
 
 		if (iIndex > -1)
 		{
@@ -941,7 +944,7 @@ void CRuleSetEditor::setButtonStates()
 			m_btnDelRule.EnableWindow( TRUE );
 
 			// Check for multiple selection
-			int iIndex2 = m_listRules.GetNextSelectedItem( pos );
+			int iIndex2 = m_listRules.GetNextSelectedRow();
 			if (iIndex2 == -1)
 			{
 				// Only one Rule selected, enable Configure
@@ -1029,10 +1032,10 @@ bool CRuleSetEditor::clipboardObjectIsAttribute()
 	return bResult;
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::deleteMarkedRules() 
+void CRuleSetEditor::deleteSelectedRules() 
 {
 	// Get list count
-	int iCount = m_listRules.GetItemCount();
+	int iCount = m_listRules.GetNumberRows();
 	if (iCount == 0)
 	{
 		return;
@@ -1046,39 +1049,27 @@ void CRuleSetEditor::deleteMarkedRules()
 		throw UCLIDException( "ELI05571", "Unable to retrieve Attribute Rules." );
 	}
 
-	// Step backwards through list
-	for (int i = iCount - 1; i >= 0; i--)
+	// Push the rows to delete to a stack so that they can be deleted in reverse order.
+	stack<int> rowsToDelete;
+	int iIndex = m_listRules.GetFirstSelectedRow();
+	while (iIndex != -1)
 	{
-		// Retrieve ItemData and look for "mark"
-		DWORD	dwData = m_listRules.GetItemData( i );
-		if (dwData == 1)
-		{
-			// Remove this item from list
-			m_listRules.DeleteItem( i );
-
-			// Remove this item from the vector of Rules
-			ipRules->Remove( i );
-		}
+		rowsToDelete.push(iIndex);
+		iIndex = m_listRules.GetNextSelectedRow();
 	}
-}
-//-------------------------------------------------------------------------------------------------
-void CRuleSetEditor::markSelectedRules() 
-{
-	POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-	if (pos != __nullptr)
+
+	// Delete the rows in reverse order so that the indexes remain valid.
+	while (!rowsToDelete.empty())
 	{
-		// Get index of first selection
-		int iIndex = m_listRules.GetNextSelectedItem( pos );
+		int iIndex = rowsToDelete.top();
 
-		// Loop through selected items
-		while (iIndex != -1)
-		{
-			// Set ItemData = 1 as a "mark"
-			m_listRules.SetItemData( iIndex, (DWORD) 1 );
+		// Remove this item from list
+		m_listRules.DeleteRow(iIndex);
 
-			// Get index of next selected item
-			iIndex = m_listRules.GetNextSelectedItem( pos );
-		}
+		// Remove this item from the vector of rules
+		ipRules->Remove(iIndex);
+
+		rowsToDelete.pop();
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1278,7 +1269,8 @@ void CRuleSetEditor::setStatusBarText()
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescription* pObject, 
-						BOOL &bCheckBoxState, UINT uiCheckBoxID, CString &zEditControlText)
+						BOOL &bCheckBoxState, CString &zEditControlText,  UINT uiCheckBoxID1, 
+						UINT uiCheckBoxID2/* = 0*/)
 {
 	// use smart pointer
 	IObjectWithDescriptionPtr ipObject = pObject;
@@ -1287,8 +1279,8 @@ void CRuleSetEditor::updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescri
 	// update edit control text to match description
 	zEditControlText = static_cast<const char*>(ipObject->Description);
 	
-	// get the checkbox using its ID
-	CButton* pCheckBox = (CButton *) GetDlgItem(uiCheckBoxID);
+	// get the first checkbox using its ID
+	CButton* pCheckBox = (CButton *) GetDlgItem(uiCheckBoxID1);
 
 	// throw an error if the check box doesn't exist
 	if( !pCheckBox )
@@ -1322,6 +1314,28 @@ void CRuleSetEditor::updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescri
 
 	// refresh screen
 	UpdateData(FALSE);
+
+	// get the second checkbox using its ID (if specified)
+	if (uiCheckBoxID2 != 0)
+	{
+		CButton* pCheckBox2 = (CButton *) GetDlgItem(uiCheckBoxID2);
+
+		// throw an error if the check box doesn't exist
+		if( !pCheckBox2 )
+		{
+			UCLIDException ue("ELI32958", "Unable to access check box resource.");
+			throw ue;
+		}
+
+		// Set the second check box's enabled status to the check state of the first.
+		if (!asCppBool(bCheckBoxState))
+		{
+			pCheckBox2->SetCheck(BST_UNCHECKED);
+		}
+		pCheckBox2->EnableWindow(bCheckBoxState);
+
+		UpdateData(TRUE);
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::validateRuleSetCanBeSaved()

@@ -58,6 +58,8 @@ public:
 		/*[out, retval]*/ IIUnknownVector **pAttributes);
 	STDMETHOD(get_AttributeSplitter)(/*[out, retval]*/ IObjectWithDescription* *pVal);
 	STDMETHOD(put_AttributeSplitter)(/*[in]*/ IObjectWithDescription *newVal);
+	STDMETHOD(get_IgnoreAttributeSplitterErrors)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_IgnoreAttributeSplitterErrors)(VARIANT_BOOL newVal);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -74,6 +76,7 @@ private:
 	bool m_bStopSearchingWhenValueFound;
 	IObjectWithDescriptionPtr m_ipInputValidator;
 	IObjectWithDescriptionPtr m_ipAttributeSplitter;
+	bool m_bIgnoreAttributeSplitterErrors;
 
 	//////////////
 	// Methods

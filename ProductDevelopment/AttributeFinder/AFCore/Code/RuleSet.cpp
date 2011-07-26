@@ -18,7 +18,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 9;
+const unsigned long gnCurrentVersion = 10;
 // Version 3:
 //   Added Output Handler persistence
 // Version 7:
@@ -26,8 +26,10 @@ const unsigned long gnCurrentVersion = 9;
 //   method to be called pages to distinguish between the two.
 // Version 8:
 //   Added swiping rule flag
-// Vertion 9:
+// Version 9:
 //	 Added FKB version
+// Version 10:
+//	 Added Ignore preprocessor and output handler error options.
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
@@ -57,6 +59,8 @@ m_bRuleSetOnlyForInternalUse(false),
 m_bSwipingRule(false),
 m_strKeySerialNumbers(""),
 m_strFKBVersion(""),
+m_bIgnorePreprocessorErrors(false),
+m_bIgnoreOutputHandlerErrors(false),
 m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current version number
 {
 	try
@@ -332,25 +336,46 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// If any counters are set decrement them here
 				decrementCounters(ipAFDoc->Text);
 
-				// Preprocess the doc if there's any preprocessor
-				if (bEnabledDocumentPreprocessorExists)
+				// Try/catch for preprocessors
+				try
 				{
-					// Update the progress status
-					if (ipProgressStatus)
+					try
 					{
-						ipProgressStatus->StartNextItemGroup("Executing the pre-processor rules...", nNUM_PROGRESS_ITEMS_PRE_PROCESSOR);
+						// Preprocess the doc if there's any preprocessor
+						if (bEnabledDocumentPreprocessorExists)
+						{
+							// Update the progress status
+							if (ipProgressStatus)
+							{
+								ipProgressStatus->StartNextItemGroup(
+									"Executing the pre-processor rules...",
+									nNUM_PROGRESS_ITEMS_PRE_PROCESSOR);
+							}
+
+							// Create a pointer to the Sub-ProgressStatus object, depending upon
+							// whether the caller requested progress information
+							IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+								__nullptr : ipProgressStatus->SubProgressStatus;
+
+							// Execute the document preprocessor
+							UCLID_AFCORELib::IDocumentPreprocessorPtr ipDocPreprocessor(m_ipDocPreprocessor->Object);
+							if (ipDocPreprocessor)
+							{
+								ipDocPreprocessor->Process(ipAFDoc, ipSubProgressStatus);
+							}
+						}
 					}
-
-					// Create a pointer to the Sub-ProgressStatus object, depending upon whether
-					// the caller requested progress information
-					IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
-						__nullptr : ipProgressStatus->SubProgressStatus;
-
-					// Execute the document preprocessor
-					UCLID_AFCORELib::IDocumentPreprocessorPtr ipDocPreprocessor(m_ipDocPreprocessor->Object);
-					if (ipDocPreprocessor)
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32952");
+				}
+				catch (UCLIDException &ue)
+				{
+					if (m_bIgnorePreprocessorErrors)
 					{
-						ipDocPreprocessor->Process(ipAFDoc, ipSubProgressStatus);
+						ue.log();
+					}
+					else
+					{
+						throw ue;
 					}
 				}
 
@@ -415,25 +440,46 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					ipFoundAttributes->Append(ipAttributes);
 				}
 
-				// Pass the found attributes to a defined Output Handler
-				if (bEnabledOutputHandlerExists)
+				// Try/catch for output handlers
+				try
 				{
-					// Update the progress status
-					if (ipProgressStatus)
+					try
 					{
-						ipProgressStatus->StartNextItemGroup("Executing the output handler rules...", nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER);
+						// Pass the found attributes to a defined Output Handler
+						if (bEnabledOutputHandlerExists)
+						{
+							// Update the progress status
+							if (ipProgressStatus)
+							{
+								ipProgressStatus->StartNextItemGroup(
+									"Executing the output handler rules...",
+									nNUM_PROGRESS_ITEMS_OUTPUT_HANDLER);
+							}
+
+							// Execute the output hander
+							UCLID_AFCORELib::IOutputHandlerPtr ipOH( m_ipOutputHandler->Object );
+							if (ipOH)
+							{
+								// Create a pointer to the Sub-ProgressStatus object, depending upon
+								// whether the caller requested progress information
+								IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+									__nullptr : ipProgressStatus->SubProgressStatus;
+
+								ipOH->ProcessOutput( ipFoundAttributes, ipAFDoc, ipSubProgressStatus );
+							}
+						}
 					}
-
-					// Execute the output hander
-					UCLID_AFCORELib::IOutputHandlerPtr ipOH( m_ipOutputHandler->Object );
-					if (ipOH)
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32953");
+				}
+				catch(UCLIDException& ue)
+				{
+					if (m_bIgnoreOutputHandlerErrors)
 					{
-						// Create a pointer to the Sub-ProgressStatus object, depending upon whether
-						// the caller requested progress information
-						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
-							__nullptr : ipProgressStatus->SubProgressStatus;
-
-						ipOH->ProcessOutput( ipFoundAttributes, ipAFDoc, ipSubProgressStatus );
+						ue.log();
+					}
+					else
+					{
+						throw ue;
 					}
 				}
 
@@ -967,6 +1013,71 @@ STDMETHODIMP CRuleSet::put_FKBVersion(BSTR newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32483")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_IgnorePreprocessorErrors(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bIgnorePreprocessorErrors);
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32954")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_IgnorePreprocessorErrors(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bIgnorePreprocessorErrors = asCppBool(newVal); 
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32955")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_IgnoreOutputHandlerErrors(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bIgnoreOutputHandlerErrors);
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32956")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_IgnoreOutputHandlerErrors(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bIgnoreOutputHandlerErrors = asCppBool(newVal); 
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32957")
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -1156,6 +1267,12 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			{
 				dataReader >> m_strFKBVersion;
 			}
+
+			if (m_nVersionNumber >= 10)
+			{
+				dataReader >> m_bIgnorePreprocessorErrors;
+				dataReader >> m_bIgnoreOutputHandlerErrors;
+			}
 		}
 
 		// load the string-to-object map (attribute name to attribute find info map)
@@ -1257,6 +1374,9 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_strKeySerialNumbers;
 
 		dataWriter << m_strFKBVersion;
+
+		dataWriter << m_bIgnorePreprocessorErrors;
+		dataWriter << m_bIgnoreOutputHandlerErrors;
 
 		// flush bytes
 		dataWriter.flushToByteStream();
@@ -1425,6 +1545,9 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 
 		// copy the version number
 		m_nVersionNumber = ipSource->VersionNumber;
+
+		m_bIgnorePreprocessorErrors = asCppBool(ipSource->IgnorePreprocessorErrors);
+		m_bIgnoreOutputHandlerErrors = asCppBool(ipSource->IgnoreOutputHandlerErrors);
 
 		return S_OK;
 	}

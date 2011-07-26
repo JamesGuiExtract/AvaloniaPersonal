@@ -13,14 +13,18 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 5;
+// Version 6: Added IgnoreAttributeSplitterErrors
+const unsigned long gnCurrentVersion = 6;
 
 //-------------------------------------------------------------------------------------------------
 // CAttributeFindInfo
 //-------------------------------------------------------------------------------------------------
 CAttributeFindInfo::CAttributeFindInfo()
-:m_bStopSearchingWhenValueFound(false), m_ipAttributeRules(__nullptr),
-m_ipInputValidator(__nullptr), m_bDirty(false)
+: m_bStopSearchingWhenValueFound(false)
+, m_ipAttributeRules(__nullptr)
+, m_ipInputValidator(__nullptr)
+, m_bIgnoreAttributeSplitterErrors(false)
+, m_bDirty(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -269,12 +273,19 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// Log the rsd filename currently being executed.
 				addCurrentRSDFileToDebugInfo(ue);
 
+				if (ipAttributeRule->IgnoreErrors)
+				{
 #ifdef _DEBUG
-				ue.display();
+					ue.display();
 #else
-				ue.log();
+					ue.log();
 #endif
-				continue;
+					continue;
+				}
+				else
+				{
+					throw ue;
+				}
 			}
 
 			// get the found attributes, and append
@@ -309,35 +320,53 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					ipAttribute->InputValidator = __nullptr;
 				}
 
-				// if an attribute splitter has been specified for this
-				// attribute, invoke the attribute splitter
-				if (bEnabledSplitterExists)
+				try
 				{
-					// Update the progress status
-					// [P16:2855] Only initialize the splitter progress group for the first item.
-					// Otherwise, we will process multiple groups when we only had progress items 
-					// allocated for one group.
-					if (ipProgressStatus && j == 0)
+					try
 					{
-						ipProgressStatus->StartNextItemGroup("Executing field splitter rules...", 
-							nNUM_PROGRESS_ITEMS_PER_SPLITTER_OPERATION);
+						// if an attribute splitter has been specified for this
+						// attribute, invoke the attribute splitter
+						if (bEnabledSplitterExists)
+						{
+							// Update the progress status
+							// [P16:2855] Only initialize the splitter progress group for the first item.
+							// Otherwise, we will process multiple groups when we only had progress items 
+							// allocated for one group.
+							if (ipProgressStatus && j == 0)
+							{
+								ipProgressStatus->StartNextItemGroup("Executing field splitter rules...", 
+									nNUM_PROGRESS_ITEMS_PER_SPLITTER_OPERATION);
+							}
+
+							// [P16:2855] Don't allow splitters to update progress unless the way we
+							// use progress status's here changes significantly.
+							// Since we don't how many attributes we will be splitting before initializing
+							// the progress status, we can't know that we have an accurate number
+							// steps initialized and therefore don't have enough info to allow splitters
+							// to update progress status info
+							//IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
+							//	__nullptr : ipProgressStatus->SubProgressStatus;
+
+							// Get the splitter object
+							UCLID_AFCORELib::IAttributeSplitterPtr ipSplitter =
+								m_ipAttributeSplitter->Object;
+							
+							// Execute the split operation
+							ipSplitter->SplitAttribute(ipAttribute, ipAFDoc, __nullptr/*ipSubProgressStatus*/);
+						}
 					}
-
-					// [P16:2855] Don't allow splitters to update progress unless the way we
-					// use progress status's here changes significantly.
-					// Since we don't how many attributes we will be splitting before initializing
-					// the progress status, we can't know that we have an accurate number
-					// steps initialized and therefore don't have enough info to allow splitters
-					// to update progress status info
-					//IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == __nullptr) ? 
-					//	__nullptr : ipProgressStatus->SubProgressStatus;
-
-					// Get the splitter object
-					UCLID_AFCORELib::IAttributeSplitterPtr ipSplitter =
-						m_ipAttributeSplitter->Object;
-
-					// Execute the split operation
-					ipSplitter->SplitAttribute(ipAttribute, ipAFDoc, __nullptr/*ipSubProgressStatus*/);
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32949");
+				}
+				catch(UCLIDException& ue)
+				{
+					if (m_bIgnoreAttributeSplitterErrors)
+					{
+						ue.log();
+					}
+					else
+					{
+						throw ue;
+					}
 				}
 
 				// add the attribute to the vector of found attributes
@@ -404,6 +433,38 @@ STDMETHODIMP CAttributeFindInfo::put_AttributeSplitter(IObjectWithDescription *n
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05283")
 
 	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeFindInfo::get_IgnoreAttributeSplitterErrors(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bIgnoreAttributeSplitterErrors);
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32950")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttributeFindInfo::put_IgnoreAttributeSplitterErrors(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bIgnoreAttributeSplitterErrors = asCppBool(newVal); 
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32951")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -533,6 +594,11 @@ STDMETHODIMP CAttributeFindInfo::Load(IStream *pStream)
 			dataReader >> m_bStopSearchingWhenValueFound;
 		}
 
+		if (nDataVersion >= 6)
+		{
+			dataReader >> m_bIgnoreAttributeSplitterErrors;
+		}
+
 		// Separately read attribute rules from the stream
 		IPersistStreamPtr ipObj;
 		readObjectFromStream(ipObj, pStream, "ELI09947");
@@ -636,6 +702,7 @@ STDMETHODIMP CAttributeFindInfo::Save(IStream *pStream, BOOL fClearDirty)
 		ByteStreamManipulator dataWriter( ByteStreamManipulator::kWrite, data );
 		dataWriter << gnCurrentVersion;
 		dataWriter << m_bStopSearchingWhenValueFound;
+		dataWriter << m_bIgnoreAttributeSplitterErrors;
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -703,6 +770,7 @@ STDMETHODIMP CAttributeFindInfo::raw_CopyFrom(IUnknown * pObject)
 
 		// Set this object's StopSearchingWhenValueFound property
 		m_bStopSearchingWhenValueFound = asCppBool(ipSource->GetStopSearchingWhenValueFound());
+		m_bIgnoreAttributeSplitterErrors = asCppBool(ipSource->IgnoreAttributeSplitterErrors);
 
 		// Set the other object's Input Validator
 		IObjectWithDescriptionPtr ipIVTemp = ipSource->GetInputValidator();

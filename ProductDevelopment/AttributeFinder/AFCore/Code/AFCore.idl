@@ -198,6 +198,15 @@ library UCLID_AFCORELib
 		// return IDocumentPreprocessor with a description
 		[propget, id(7), helpstring("property RuleSpecificDocPreprocessor")] HRESULT RuleSpecificDocPreprocessor([out, retval] IObjectWithDescription **pVal);
 		[propput, id(7), helpstring("property RuleSpecificDocPreprocessor")] HRESULT RuleSpecificDocPreprocessor([in] IObjectWithDescription *newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(8), helpstring("property IgnoreErrors")] HRESULT IgnoreErrors([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(8), helpstring("property IgnoreErrors")] HRESULT IgnoreErrors([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(9), helpstring("property IgnorePreprocessorErrors")] HRESULT IgnorePreprocessorErrors([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(9), helpstring("property IgnorePreprocessorErrors")] HRESULT IgnorePreprocessorErrors([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(10), helpstring("property IgnoreModifierErrors")] HRESULT IgnoreModifierErrors([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(10), helpstring("property IgnoreModifierErrors")] HRESULT IgnoreModifierErrors([in] VARIANT_BOOL newVal);
 	};
 
 	[
@@ -244,6 +253,11 @@ library UCLID_AFCORELib
 			[out, retval] IObjectWithDescription* *pVal);
 		[propput, id(6), helpstring("property AttributeSplitter")] HRESULT AttributeSplitter(
 			[in] IObjectWithDescription *newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(7), helpstring("property IgnoreAttributeSplitterErrors")] HRESULT
+			IgnoreAttributeSplitterErrors([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property IgnoreAttributeSplitterErrors")] HRESULT
+			IgnoreAttributeSplitterErrors([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 	};
 
@@ -387,6 +401,16 @@ library UCLID_AFCORELib
 		// The FKB version that should be used for this rule set.
 		[propget, id(19), helpstring("property FKBVersion")] HRESULT FKBVersion([out, retval] BSTR *pVal);
 		[propput, id(19), helpstring("property FKBVersion")] HRESULT FKBVersion([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(20), helpstring("property IgnorePreprocessorErrors")] HRESULT
+			IgnorePreprocessorErrors([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(20), helpstring("property IgnorePreprocessorErrors")] HRESULT
+			IgnorePreprocessorErrors([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(21), helpstring("property IgnoreOutputHandlerErrors")] HRESULT
+			IgnoreOutputHandlerErrors([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(21), helpstring("property IgnoreOutputHandlerErrors")] HRESULT
+			IgnoreOutputHandlerErrors([in] VARIANT_BOOL newVal);
 	};
 
 	[

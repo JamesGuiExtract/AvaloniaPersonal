@@ -64,6 +64,12 @@ public:
 		/*[out, retval]*/ IIUnknownVector** pAttributes);
 	STDMETHOD(get_RuleSpecificDocPreprocessor)(/*[out, retval]*/ IObjectWithDescription* *pVal);
 	STDMETHOD(put_RuleSpecificDocPreprocessor)(/*[in]*/ IObjectWithDescription *newVal);
+	STDMETHOD(get_IgnoreErrors)(/*[out, retval]*/ VARIANT_BOOL *pVal);
+	STDMETHOD(put_IgnoreErrors)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_IgnorePreprocessorErrors)(/*[out, retval]*/ VARIANT_BOOL *pVal);
+	STDMETHOD(put_IgnorePreprocessorErrors)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_IgnoreModifierErrors)(/*[out, retval]*/ VARIANT_BOOL *pVal);
+	STDMETHOD(put_IgnoreModifierErrors)(/*[in]*/ VARIANT_BOOL newVal);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -89,6 +95,10 @@ private:
 
 	// whether or not all modifying rules defined shall be applied
 	bool m_bApplyModifyingRules;
+
+	bool m_bIgnoreErrors;
+	bool m_bIgnorePreprocessorErrors;
+	bool m_bIgnoreModifierErrors;
 
 	// flag to keep track of whether this object has changed
 	// since the last save-to-stream operation

@@ -13,6 +13,8 @@
 #include <CommonToExtractProducts.h>
 
 #include <afxwin.h>
+#include <afxole.h>  // Needed for UltimateGrid
+					 // (see http://www.codeproject.com/Messages/2869965/Re-Run-Time-Check-Failure-sharp0.aspx)
 #include <afxdisp.h>
 #include <afxcmn.h>			// For CListCtrl class
 #include <afxext.h>

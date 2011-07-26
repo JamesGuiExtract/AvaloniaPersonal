@@ -62,6 +62,8 @@ CAddRuleDlg::CAddRuleDlg(IClipboardObjectManagerPtr ipCBMgr,
 	m_zDescription = _T("");
 	m_zPrompt = _T("Select Attribute Finding rule");
 	m_zPPDescription = _T("");
+	m_bIgnoreModErrors = FALSE;
+	m_bIgnoreDocPPErrors = FALSE;
 	//}}AFX_DATA_INIT
 }
 //-------------------------------------------------------------------------------------------------
@@ -84,6 +86,8 @@ void CAddRuleDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_DESC, m_zDescription);
 	DDX_Text(pDX, IDC_STATIC_DESC, m_zPrompt);
 	DDX_Text(pDX, IDC_EDIT_PREPROCESSOR, m_zPPDescription);
+	DDX_Check(pDX, IDC_CHECK_IGNORE_PP_ERRORS, m_bIgnoreDocPPErrors);
+	DDX_Check(pDX, IDC_CHECK_IGNORE_MODIFIER_ERRORS, m_bIgnoreModErrors);
 	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
@@ -800,6 +804,9 @@ void CAddRuleDlg::OnOK()
 
 			// Store the Document Preprocessor
 			m_ipRule->RuleSpecificDocPreprocessor = m_ipDocPreprocessor;
+			
+			m_ipRule->IgnorePreprocessorErrors = asVariantBool(m_bIgnoreDocPPErrors);
+			m_ipRule->IgnoreModifierErrors = asVariantBool(m_bIgnoreModErrors);
 		}
 
 		CDialog::OnOK();
@@ -1325,106 +1332,106 @@ void CAddRuleDlg::prepareList()
 void CAddRuleDlg::setButtonStates()
 {
 	// Check modify flag
-	CButton*	pButton = (CButton *)GetDlgItem( IDC_CHECK_MODIFY );
-	if (pButton != __nullptr)
+	CButton* pButton = (CButton *)GetDlgItem(IDC_CHECK_MODIFY);
+	ASSERT_RESOURCE_ALLOCATION("ELI32945", pButton != __nullptr);
+	bool bModifiersEnabled = (pButton->GetCheck() == BST_CHECKED);
+
+	if (!bModifiersEnabled)
 	{
-		if (pButton->GetCheck() != 1)
+		// Disable the buttons
+		m_btnAddRule.EnableWindow( FALSE );
+		m_btnDelRule.EnableWindow( FALSE );
+		m_btnConRule.EnableWindow( FALSE );
+		m_btnRuleUp.EnableWindow( FALSE );
+		m_btnRuleDown.EnableWindow( FALSE );
+
+		// Disable the list
+		m_listRules.EnableWindow( FALSE );
+	}
+	else
+	{
+		// Enable the Add button and the list
+		m_btnAddRule.EnableWindow( TRUE );
+		m_listRules.EnableWindow( TRUE );
+
+		int	iCount = m_listRules.GetItemCount();
+		if (iCount == 0)
 		{
-			// Disable the buttons
-			m_btnAddRule.EnableWindow( FALSE );
+			// Disable other Rule buttons
 			m_btnDelRule.EnableWindow( FALSE );
 			m_btnConRule.EnableWindow( FALSE );
 			m_btnRuleUp.EnableWindow( FALSE );
 			m_btnRuleDown.EnableWindow( FALSE );
-
-			// Disable the list
-			m_listRules.EnableWindow( FALSE );
 		}
 		else
 		{
-			// Enable the Add button and the list
-			m_btnAddRule.EnableWindow( TRUE );
-			m_listRules.EnableWindow( TRUE );
-
-			int	iCount = m_listRules.GetItemCount();
-			if (iCount == 0)
+			// Next have to see if an item is selected
+			int iIndex = -1;
+			POSITION pos = m_listRules.GetFirstSelectedItemPosition();
+			if (pos != __nullptr)
 			{
-				// Disable other Rule buttons
-				m_btnDelRule.EnableWindow( FALSE );
-				m_btnConRule.EnableWindow( FALSE );
-				m_btnRuleUp.EnableWindow( FALSE );
-				m_btnRuleDown.EnableWindow( FALSE );
+				// Get index of first selection
+				iIndex = m_listRules.GetNextSelectedItem( pos );
 			}
-			else
+
+			if (iIndex > -1)
 			{
-				// Next have to see if an item is selected
-				int iIndex = -1;
-				POSITION pos = m_listRules.GetFirstSelectedItemPosition();
-				if (pos != __nullptr)
-				{
-					// Get index of first selection
-					iIndex = m_listRules.GetNextSelectedItem( pos );
-				}
+				// Enable the Delete button
+				m_btnDelRule.EnableWindow( TRUE );
 
-				if (iIndex > -1)
+				// Check for multiple selection
+				int iIndex2 = m_listRules.GetNextSelectedItem( pos );
+				if (iIndex2 == -1)
 				{
-					// Enable the Delete button
-					m_btnDelRule.EnableWindow( TRUE );
+					// Only one Rule selected, enable Configure
+					m_btnConRule.EnableWindow( TRUE );
 
-					// Check for multiple selection
-					int iIndex2 = m_listRules.GetNextSelectedItem( pos );
-					if (iIndex2 == -1)
+					// Must be more than one rule for these buttons
+					if (iCount > 1)
 					{
-						// Only one Rule selected, enable Configure
-						m_btnConRule.EnableWindow( TRUE );
-
-						// Must be more than one rule for these buttons
-						if (iCount > 1)
+						// Check boundary conditions
+						if (iIndex == iCount - 1)
 						{
-							// Check boundary conditions
-							if (iIndex == iCount - 1)
-							{
-								// Cannot move last item down
-								m_btnRuleDown.EnableWindow( FALSE );
-							}
-							else
-							{
-								m_btnRuleDown.EnableWindow( TRUE );
-							}
-
-							if (iIndex == 0)
-							{
-								// Cannot move first item up
-								m_btnRuleUp.EnableWindow( FALSE );
-							}
-							else
-							{
-								m_btnRuleUp.EnableWindow( TRUE );
-							}
+							// Cannot move last item down
+							m_btnRuleDown.EnableWindow( FALSE );
 						}
 						else
 						{
-							// Cannot change order if only one rule
+							m_btnRuleDown.EnableWindow( TRUE );
+						}
+
+						if (iIndex == 0)
+						{
+							// Cannot move first item up
 							m_btnRuleUp.EnableWindow( FALSE );
-							m_btnRuleDown.EnableWindow( FALSE );
+						}
+						else
+						{
+							m_btnRuleUp.EnableWindow( TRUE );
 						}
 					}
 					else
 					{
-						// More than one Rule is selected, disable other buttons
-						m_btnConRule.EnableWindow( FALSE );
+						// Cannot change order if only one rule
 						m_btnRuleUp.EnableWindow( FALSE );
 						m_btnRuleDown.EnableWindow( FALSE );
 					}
 				}
 				else
 				{
-					// No selection --> disable most buttons
-					m_btnDelRule.EnableWindow( FALSE );
+					// More than one Rule is selected, disable other buttons
 					m_btnConRule.EnableWindow( FALSE );
 					m_btnRuleUp.EnableWindow( FALSE );
 					m_btnRuleDown.EnableWindow( FALSE );
 				}
+			}
+			else
+			{
+				// No selection --> disable most buttons
+				m_btnDelRule.EnableWindow( FALSE );
+				m_btnConRule.EnableWindow( FALSE );
+				m_btnRuleUp.EnableWindow( FALSE );
+				m_btnRuleDown.EnableWindow( FALSE );
 			}
 		}
 	}
@@ -1449,6 +1456,18 @@ void CAddRuleDlg::setButtonStates()
 
 	// Always enable the Select Document Preprocessor button
 	m_btnSelectPreprocessor.EnableWindow( TRUE );
+
+	CButton* pDocPPButton = (CButton *)GetDlgItem(IDC_CHECK_AFRULE_DOC_PP);
+	ASSERT_RESOURCE_ALLOCATION("ELI32946", pDocPPButton != __nullptr);
+	bool bDocPPE = (pDocPPButton->GetCheck() == BST_CHECKED);
+
+	CButton* pIgnoreErrBtn = (CButton *)GetDlgItem(IDC_CHECK_IGNORE_PP_ERRORS);
+	ASSERT_RESOURCE_ALLOCATION("ELI32947", pIgnoreErrBtn != __nullptr);
+	pIgnoreErrBtn->EnableWindow(asMFCBool(bDocPPE));
+
+	pIgnoreErrBtn = (CButton *)GetDlgItem(IDC_CHECK_IGNORE_MODIFIER_ERRORS);
+	ASSERT_RESOURCE_ALLOCATION("ELI32948", pIgnoreErrBtn != __nullptr);
+	pIgnoreErrBtn->EnableWindow(asMFCBool(bModifiersEnabled));
 }
 //-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::setDescription() 
@@ -1582,8 +1601,10 @@ void CAddRuleDlg::setAMRules()
 		}
 	}
 
-	// Set the checkbox
-	m_bApplyMod = m_ipRule->ApplyModifyingRules==VARIANT_TRUE ? TRUE: FALSE;
+	// Set the checkboxes
+	m_bApplyMod = asMFCBool(m_ipRule->ApplyModifyingRules);
+	m_bIgnoreDocPPErrors = asMFCBool(m_ipRule->IgnorePreprocessorErrors);
+	m_bIgnoreModErrors = asMFCBool(m_ipRule->IgnoreModifierErrors);
 
 	// Refresh the display
 	UpdateData( FALSE );
@@ -1635,6 +1656,8 @@ void CAddRuleDlg::OnBnClickedCheckAfruleDocPp()
 	{
 		m_ipDocPreprocessor->PutEnabled( VARIANT_FALSE );
 	}
+
+	setButtonStates();
 }
 //-------------------------------------------------------------------------------------------------
 void CAddRuleDlg::replaceRuleInListAt(int iIndex, IObjectWithDescriptionPtr ipNewRule)

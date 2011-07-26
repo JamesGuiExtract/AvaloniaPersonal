@@ -58,6 +58,8 @@ public:
 	CString	m_zDescription;
 	CString	m_zPrompt;
 	CString	m_zPPDescription;
+	BOOL	m_bIgnoreDocPPErrors;
+	BOOL	m_bIgnoreModErrors;
 	//}}AFX_DATA
 
 
