@@ -1151,12 +1151,6 @@ LRESULT CRuleSetEditor::OnRclickListRules(WPARAM wParam, LPARAM lParam)
 
 	try
 	{
-		// Just return if no Attribute is selected
-		if (lParam == -1)
-		{
-			return 0;
-		}
-
 		// Get index of first selection
 		int iIndex = m_listRules.GetFirstSelectedRow();
 
@@ -1627,13 +1621,6 @@ int CRuleSetEditor::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT messa
 			{
 				// Create and manage a context menu for Attributes combo box
 				OnRclickComboAttributes( NULL, &result );
-			}
-			// Check to see if right-click in Rules list
-			else if ((point.x >= rectRules.left) && (point.x <= rectRules.right) &&
-				(point.y >= rectRules.top) && (point.y <= rectRules.bottom))
-			{
-				// Create and manage a context menu for Rules list
-				OnRclickListRules(0, 0);
 			}
 		}
 	}

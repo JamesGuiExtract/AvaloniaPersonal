@@ -314,7 +314,7 @@ void CRuleSetEditor::OnEditPaste()
 				// Add the item without text in Enabled column
 				m_listRules.InsertRow(iIndex + i);
 				// Default to enabled, but keep previous rule's ignore error state.
-				m_listRules.SetRowInfo(iIndex, true, bIgnoreErrors, strDescription.c_str());
+				m_listRules.SetRowInfo(iIndex + i, true, bIgnoreErrors, strDescription.c_str());
 
 				// Insert the new Rule
 				ipRules->Insert( iIndex + i, ipNewRule );

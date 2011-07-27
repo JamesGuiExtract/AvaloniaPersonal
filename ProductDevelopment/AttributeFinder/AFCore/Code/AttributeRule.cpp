@@ -318,7 +318,7 @@ STDMETHODIMP CAttributeRule::get_IgnoreErrors(VARIANT_BOOL *pVal)
 
 		*pVal = asVariantBool(m_bIgnoreErrors);
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33021");
 
 	return S_OK;
 }
@@ -334,7 +334,7 @@ STDMETHODIMP CAttributeRule::put_IgnoreErrors(VARIANT_BOOL newVal)
 		m_bIgnoreErrors = asCppBool(newVal);
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33022");
 
 	return S_OK;
 }
@@ -349,7 +349,7 @@ STDMETHODIMP CAttributeRule::get_IgnorePreprocessorErrors(VARIANT_BOOL *pVal)
 
 		*pVal = asVariantBool(m_bIgnorePreprocessorErrors);
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33023");
 
 	return S_OK;
 }
@@ -365,7 +365,7 @@ STDMETHODIMP CAttributeRule::put_IgnorePreprocessorErrors(VARIANT_BOOL newVal)
 		m_bIgnorePreprocessorErrors = asCppBool(newVal);
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33024");
 
 	return S_OK;
 }
@@ -380,7 +380,7 @@ STDMETHODIMP CAttributeRule::get_IgnoreModifierErrors(VARIANT_BOOL *pVal)
 
 		*pVal = asVariantBool(m_bIgnoreModifierErrors);
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33025");
 
 	return S_OK;
 }
@@ -396,7 +396,7 @@ STDMETHODIMP CAttributeRule::put_IgnoreModifierErrors(VARIANT_BOOL newVal)
 		m_bIgnoreModifierErrors = asCppBool(newVal);
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI0");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33026");
 
 	return S_OK;
 }
@@ -485,7 +485,7 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 							}
 						}
 					}
-					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33027");
 				}
 				catch(UCLIDException& ue)
 				{
@@ -582,7 +582,7 @@ STDMETHODIMP CAttributeRule::ExecuteRuleOnText(IAFDocument* pAFDoc,
 							}
 						}
 					}
-					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI0");
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33028");
 				}
 				catch(UCLIDException& ue)
 				{
