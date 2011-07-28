@@ -193,6 +193,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="MergeAttributesPreferenceListDlg.cpp" />
     <ClCompile Include="MergeAttributes.cpp" />
     <ClCompile Include="MergeAttributesPP.cpp" />
     <ClCompile Include="MergeAttributeTrees.cpp" />
@@ -388,6 +389,7 @@
     <ClInclude Include="EliminateDuplicates.h" />
     <ClInclude Include="..\..\AFUtils\Code\Helper.h" />
     <ClInclude Include="KeepAttributesInMemory.h" />
+    <ClInclude Include="MergeAttributesPreferenceListDlg.h" />
     <ClInclude Include="MergeAttributes.h" />
     <ClInclude Include="MergeAttributesPP.h" />
     <ClInclude Include="MergeAttributeTrees.h" />

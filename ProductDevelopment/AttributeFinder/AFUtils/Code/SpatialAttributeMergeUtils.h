@@ -55,6 +55,22 @@ class ATL_NO_VTABLE CSpatialAttributeMergeUtils :
 	STDMETHOD(put_PreserveAsSubAttributes)(VARIANT_BOOL newVal);
 	STDMETHOD(get_CreateMergedRegion)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_CreateMergedRegion)(VARIANT_BOOL newVal);
+	STDMETHOD(get_TreatNameListAsRegex)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_TreatNameListAsRegex)(VARIANT_BOOL newVal);
+	STDMETHOD(get_ValueMergeMode)(EFieldMergeMode *pVal);
+	STDMETHOD(put_ValueMergeMode)(EFieldMergeMode newVal);
+	STDMETHOD(get_ValueMergePriority)(IVariantVector **ppVal);
+	STDMETHOD(put_ValueMergePriority)(IVariantVector *pNewVal);
+	STDMETHOD(get_TreatValueListAsRegex)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_TreatValueListAsRegex)(VARIANT_BOOL newVal);
+	STDMETHOD(get_TypeFromName)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_TypeFromName)(VARIANT_BOOL newVal);
+	STDMETHOD(get_PreserveType)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_PreserveType)(VARIANT_BOOL newVal);
+	STDMETHOD(get_TypeMergePriority)(IVariantVector **ppVal);
+	STDMETHOD(put_TypeMergePriority)(IVariantVector *pNewVal);
+	STDMETHOD(get_TreatTypeListAsRegex)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_TreatTypeListAsRegex)(VARIANT_BOOL newVal);
 	STDMETHOD(FindQualifiedMerges)(IIUnknownVector* pAttributes, ISpatialString *pDocText);
 	STDMETHOD(CompareAttributeSets)(IIUnknownVector* pvecAttributeSet1,
 		IIUnknownVector* pvecAttributeSet2, ISpatialString *pDocText,
@@ -102,6 +118,33 @@ private:
 	// occupy, otherwise the attribute raster zones will be merged on an individual basis.
 	bool m_bCreateMergedRegion;
 
+	// If true, the values in m_ipNameMergePriority will be treated as regular expressions.
+	bool m_bTreatNameListAsRegex;
+
+	// Specifies the method that should be used to determine the value text of the merged attribute.
+	EFieldMergeMode m_eValueMergeMode;
+
+	// If m_eValueMergeMode == kPreserveField, this specifies the priority in which value text should
+	// be preserved.
+	IVariantVectorPtr m_ipValueMergePriority;
+
+	// If true, the values in m_ipValueMergePriority will be treated as regular expressions.
+	bool m_bTreatValueListAsRegex;
+
+	// If true, the type used will be that of the attribute whose name was chosen. If
+	// m_bPreserveType is also specified, m_ipTypeMergePriority will be used as a tiebreaker.
+	bool m_bTypeFromName;
+
+	// If true, the kPreserveField merge mode will be used unless m_bTypeFromName is also specified,
+	// in which case this will be used as a fallback.
+	bool m_bPreserveType;
+
+	// If m_bPreserveType is true, this specifies the priority in which types should be preserved.
+	IVariantVectorPtr m_ipTypeMergePriority;
+
+	// If true, the values in m_ipTypeMergePriority will be treated as regular expressions.
+	bool m_bTreatTypeListAsRegex;
+
 	// Define type to represent the portion of an attribute that is on a given page and 
 	typedef pair<IAttribute*, long> AttributePage;
 	// Define a map to Keep track of the merged attribute each AttributePage belongs to.
@@ -128,6 +171,9 @@ private:
 	// of merged values (which are returned in terms of literal page coordinates and not the page
 	// info) appear at the correct location.
 	map<long, ISpatialPageInfoPtr> m_mapSpatialInfos;
+
+	// The parser to use to evaluate regex preservation lists.
+	IRegularExprParserPtr m_ipParser;
 
 	/////////////////
 	// Methods
@@ -178,14 +224,20 @@ private:
 
 	// Creates and returns the spatial string value to be assigned to the merged result of 
 	// ipAttribute1 and ipAttribute2.
-	ISpatialStringPtr createMergedValue(IAttributePtr ipAttribute1, IAttributePtr ipAttribute2, 
-										long nPage);
+	ISpatialStringPtr createMergedValue(string strText, IAttributePtr ipAttribute1,
+										IAttributePtr ipAttribute2, long nPage);
 
-	// Given bstrValueA and bstrValueB, rbstrResult is set to the value that should be
-	// preserved given the values in ipValuePriorityList. false if returned if neither
-	// value can be found in ipValuePriorityList. 
-	bool getValueToPreserve(_bstr_t bstrValueA, _bstr_t bstrValueB, 
-							IVariantVectorPtr ipValuePriorityList, _bstr_t &rbstrResult);
+	// ipAttributeA, ipAttributeBis will be returned to represent whether bstrValueA or bstrValueB
+	// was the better match based on the ipValuePriorityList. If neither attribute matches a value
+	// in the perservation list and either both are empty or both are populated __nullptr will be
+	// returned. (If only one value is populated, it will be considered a match even if it is not
+	// in the list).
+	// If provided, pbBothMatch will indicated whether both values match.
+	IAttributePtr getAttributeToPreserve(IAttributePtr &ipAttributeA, IAttributePtr &ipAttributeB,
+										 _bstr_t bstrValueA, _bstr_t bstrValueB, 
+										 IVariantVectorPtr ipValuePriorityList,
+										 bool bTreatAsRegEx,
+										 bool *pbBothMatch = __nullptr);
 
 	// If m_bPreserveAsSubAttributes is true, all sub-attributes of ipAttribute are added as
 	// sub-attributes of ipMergeResult. In either case, if ipAttribute is a result of a previous
@@ -216,6 +268,12 @@ private:
 	// Checks to see if all spatial attributes in the provided vector have been merged into the
 	// current set of qualified merges.
 	bool areAllAttributesMerged(IIUnknownVectorPtr ipAttributes);
+
+	// Tests whether strText is a match for strPattern. If bTreatAsRegEx is true, strPattern will be
+	// treated as a regex. If bTreatAsRegEx is false and strText and strPattern are a
+	// case-insensitive but not case-sensitive match, rbCaseInsensitive will be set to true.
+	bool textIsMatch(const string& strText, const string& strPattern, bool bTreatAsRegEx,
+		bool &rbCaseInsensitive);
 
 	// Validate license.
 	void validateLicense();	

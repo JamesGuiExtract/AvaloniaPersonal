@@ -125,7 +125,8 @@ library UCLID_AFUTILSLib
 	{
 		kSpecifyField,
         kCombineField,
-		kPreserveField
+		kPreserveField,
+		kSelectField
     } EFieldMergeMode;
 
 	// Interfaces
@@ -629,6 +630,43 @@ library UCLID_AFUTILSLib
 		// For each attribute in the provided vector of attributes that qualified to be merged via either a call to
 		// FindQualifiedMerges or CompareAttributeSets, the attribute is replaced with the qualified merge.
 		[id(13), helpstring("method ApplyMerges")] HRESULT ApplyMerges([in] IIUnknownVector* pvecAttributeSet);
+
+		// If VARIANT_TRUE, the values in NameMergePriority will be treated as regular expressions.
+		// If VARIANT_FALSE, the values in NameMergePriority will be treated as literal values.
+		[propget, id(14), helpstring("property TreatNameListAsRegex")] HRESULT TreatNameListAsRegex([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(14), helpstring("property TreatNameListAsRegex")] HRESULT TreatNameListAsRegex([in] VARIANT_BOOL newVal);
+
+		// Specifies the method that should be used to determine the value text of the merged attribute.
+		[propget, id(15), helpstring("property ValueMergeMode")] HRESULT ValueMergeMode([out, retval] EFieldMergeMode *pVal);
+		[propput, id(15), helpstring("property ValueMergeMode")] HRESULT ValueMergeMode([in] EFieldMergeMode newVal);
+
+		// If ValueMergeMode == kPreserveField, this specifies the priority in which value text should be preserved.
+		[propget, id(16), helpstring("property ValueMergePriority")] HRESULT ValueMergePriority([out, retval] IVariantVector **ppVal);
+		[propput, id(16), helpstring("property ValueMergePriority")] HRESULT ValueMergePriority([in] IVariantVector *pNewVal);
+
+		// If VARIANT_TRUE, the values in ValueMergePriority will be treated as regular expressions.
+		// If VARIANT_FALSE, the values in ValueMergePriority will be treated as literal values.
+		[propget, id(17), helpstring("property TreatValueListAsRegex")] HRESULT TreatValueListAsRegex([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(17), helpstring("property TreatValueListAsRegex")] HRESULT TreatValueListAsRegex([in] VARIANT_BOOL newVal);
+
+		// If VARIANT_TRUE, the type used will be that of the attribute whose name was chosen. If PreserveType is also specified,
+		//		TypeMergePriority will be used as a tiebreaker.
+		[propget, id(18), helpstring("property TypeFromName")] HRESULT TypeFromName([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(18), helpstring("property TypeFromName")] HRESULT TypeFromName([in] VARIANT_BOOL newVal);
+
+		// If VARIANT_TRUE, the kPreserveField merge mode will be used unless TypeFromName is also specified,
+		//		in which case this will be used as a fallback.
+		[propget, id(19), helpstring("property PreserveType")] HRESULT PreserveType([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(19), helpstring("property PreserveType")] HRESULT PreserveType([in] VARIANT_BOOL newVal);
+
+		// If PreserveType is VARIANT_TRUE, this specifies the priority in which types should be preserved.
+		[propget, id(20), helpstring("property TypeMergePriority")] HRESULT TypeMergePriority([out, retval] IVariantVector **ppVal);
+		[propput, id(20), helpstring("property TypeMergePriority")] HRESULT TypeMergePriority([in] IVariantVector *pNewVal);
+
+		// If VARIANT_TRUE, the values in TypeMergePriority will be treated as regular expressions.
+		// If VARIANT_FALSE, the values in TypeMergePriority will be treated as literal values.
+		[propget, id(21), helpstring("property TreatTypeListAsRegex")] HRESULT TreatTypeListAsRegex([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(21), helpstring("property TreatTypeListAsRegex")] HRESULT TreatTypeListAsRegex([in] VARIANT_BOOL newVal);
     };
 
 	// Coclasses

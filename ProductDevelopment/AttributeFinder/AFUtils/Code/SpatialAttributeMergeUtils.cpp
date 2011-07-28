@@ -26,6 +26,16 @@ CSpatialAttributeMergeUtils::CSpatialAttributeMergeUtils()
 , m_strSpecifiedValue("000-00-0000")
 , m_bPreserveAsSubAttributes(false)
 , m_bCreateMergedRegion(false)
+, m_bTreatNameListAsRegex(false)
+, m_eValueMergeMode(kSpecifyField)
+, m_bTreatValueListAsRegex(true)
+, m_bTypeFromName(false)
+, m_bPreserveType(false)
+, m_bTreatTypeListAsRegex(false)
+, m_ipNameMergePriority(__nullptr)
+, m_ipValueMergePriority(__nullptr)
+, m_ipTypeMergePriority(__nullptr)
+, m_ipParser(__nullptr)
 {
 	try
 	{
@@ -43,6 +53,9 @@ CSpatialAttributeMergeUtils::~CSpatialAttributeMergeUtils()
 		m_mapChildToParentAttributes.clear();
 		m_mapAttributeInfo.clear();
 		m_mapSpatialInfos.clear();
+		m_ipValueMergePriority = __nullptr;
+		m_ipTypeMergePriority = __nullptr;
+		m_ipParser = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31769");
 }
@@ -62,6 +75,9 @@ void CSpatialAttributeMergeUtils::FinalRelease()
 		m_mapChildToParentAttributes.clear();
 		m_mapAttributeInfo.clear();
 		m_mapSpatialInfos.clear();
+		m_ipValueMergePriority = __nullptr;
+		m_ipTypeMergePriority = __nullptr;
+		m_ipParser = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI32133");
 }
@@ -192,7 +208,8 @@ STDMETHODIMP CSpatialAttributeMergeUtils::put_TypeMergeMode(EFieldMergeMode newV
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI32098", newVal == kSpecifyField || newVal == kCombineField);
+		ASSERT_ARGUMENT("ELI32098", newVal == kSpecifyField || newVal == kCombineField
+			|| newVal == kSelectField);
 
 		validateLicense();
 
@@ -398,6 +415,270 @@ STDMETHODIMP CSpatialAttributeMergeUtils::put_CreateMergedRegion(VARIANT_BOOL ne
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32119")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::get_TreatNameListAsRegex(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33103", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bTreatNameListAsRegex);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33104")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::put_TreatNameListAsRegex(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bTreatNameListAsRegex = asCppBool(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33105")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::get_ValueMergeMode(EFieldMergeMode *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33106", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = m_eValueMergeMode;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33107")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::put_ValueMergeMode(EFieldMergeMode newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33108", newVal != kCombineField);
+
+		validateLicense();
+
+		m_eValueMergeMode = newVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33109")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::get_ValueMergePriority(IVariantVector **ppVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33083", ppVal != __nullptr);
+
+		validateLicense();
+		
+		IVariantVectorPtr ipShallowCopy = m_ipValueMergePriority;
+		*ppVal = ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33084")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::put_ValueMergePriority(IVariantVector *pNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33085", pNewVal != __nullptr);
+
+		validateLicense();
+
+		m_ipValueMergePriority = pNewVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33086")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::get_TreatValueListAsRegex(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33087", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bTreatValueListAsRegex);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33088")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::put_TreatValueListAsRegex(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bTreatValueListAsRegex = asCppBool(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33089")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::get_TypeFromName(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33090", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bTypeFromName);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33091")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::put_TypeFromName(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bTypeFromName = asCppBool(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33092")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::get_PreserveType(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33093", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bPreserveType);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33094")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::put_PreserveType(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bPreserveType = asCppBool(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33095")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::get_TypeMergePriority(IVariantVector **ppVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33096", ppVal != __nullptr);
+
+		validateLicense();
+		
+		IVariantVectorPtr ipShallowCopy = m_ipTypeMergePriority;
+		*ppVal = ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33097")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::put_TypeMergePriority(IVariantVector *pNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33098", pNewVal != __nullptr);
+
+		validateLicense();
+
+		m_ipTypeMergePriority = pNewVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33099")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::get_TreatTypeListAsRegex(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33100", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bTreatTypeListAsRegex);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33101")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialAttributeMergeUtils::put_TreatTypeListAsRegex(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bTreatTypeListAsRegex = asCppBool(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33102")
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialAttributeMergeUtils::FindQualifiedMerges(IIUnknownVector* pAttributes,
@@ -954,8 +1235,8 @@ void CSpatialAttributeMergeUtils::mergeAttributePair(IAttributePtr ipMergedAttri
 	ASSERT_ARGUMENT("ELI22977", ipAttribute1 != __nullptr);
 	ASSERT_ARGUMENT("ELI22978", ipAttribute2 != __nullptr);
 
-	// Assign value for the merged attribute
-	ipMergedAttribute->Value = createMergedValue(ipAttribute1, ipAttribute2, nPage);
+	IAttributePtr ipNamePreservedAttribute = __nullptr;
+	bool bAttributeNamesMatch = false;
 
 	if (m_eNameMergeMode == kSpecifyField)
 	{
@@ -965,20 +1246,70 @@ void CSpatialAttributeMergeUtils::mergeAttributePair(IAttributePtr ipMergedAttri
 	else if (m_eNameMergeMode == kPreserveField)
 	{
 		// Set the attribute name by using one of the existing names & m_ipNameMergePriority.
-		_bstr_t bstrName;
-		if (!getValueToPreserve(ipAttribute1->Name, ipAttribute2->Name, m_ipNameMergePriority, bstrName))
+		ipNamePreservedAttribute = getAttributeToPreserve(ipAttribute1, ipAttribute2,
+			ipAttribute1->Name, ipAttribute2->Name, m_ipNameMergePriority, m_bTreatNameListAsRegex,
+			&bAttributeNamesMatch);
+
+		if (ipNamePreservedAttribute == __nullptr)
 		{
 			ipMergedAttribute->Name = gbstrNEEDS_NAME;
 		}
 		else
 		{
-			ipMergedAttribute->Name = bstrName;
+			ipMergedAttribute->Name = ipNamePreservedAttribute->Name;
 		}
 	}
 	else
 	{
 		// An invalid EMergeMode is being used.
 		THROW_LOGIC_ERROR_EXCEPTION("ELI22928");
+	}
+
+	if (m_eValueMergeMode == kSpecifyField)
+	{
+		ipMergedAttribute->Value = createMergedValue(m_strSpecifiedValue, ipAttribute1,
+			ipAttribute2, nPage);
+	}
+	else if (m_eValueMergeMode == kPreserveField)
+	{
+		// Set the attribute value text by using one of the existing values & m_ipValueMergePriority.
+		IAttributePtr ipValuePreservedAttribute = getAttributeToPreserve(ipAttribute1, ipAttribute2,
+			ipAttribute1->Value->String, ipAttribute2->Value->String, m_ipValueMergePriority,
+			m_bTreatValueListAsRegex);
+
+		// If we couldn't determine which value to preserve, pick one. (With value preservation
+		// list, its probably not safe to assume the preservation list will cover all possible
+		// values.)
+		if (ipValuePreservedAttribute == __nullptr)
+		{
+			ipValuePreservedAttribute = ipAttribute1;
+			
+			UCLIDException ue("ELI33119", "Application trace: unable to find match for either "
+				"attribute in the value preservation list.");
+			ue.log();
+		}
+
+		ipMergedAttribute->Value = createMergedValue(
+			asString(ipValuePreservedAttribute->Value->String),
+			ipAttribute1, ipAttribute2, nPage);
+	}
+	else if (m_eValueMergeMode == kSelectField)
+	{
+		if (ipNamePreservedAttribute == __nullptr)
+		{
+			// If a name to preserve has not yet been found, assign gbstrNEEDS_NAME since the
+			// merged result needs some text value for now. If no valid name is found, the attribute
+			// will never be returned, so there is no risk of gbstrNEEDS_NAME ending up as the
+			// attribute value.
+			ipMergedAttribute->Value = createMergedValue(asString(gbstrNEEDS_NAME),
+				ipAttribute1, ipAttribute2, nPage);
+		}
+		else
+		{
+			ipMergedAttribute->Value = createMergedValue(
+				asString(ipNamePreservedAttribute->Value->String),
+				ipAttribute1, ipAttribute2, nPage);
+		}
 	}
 
 	if (m_eTypeMergeMode == kSpecifyField)
@@ -1006,6 +1337,30 @@ void CSpatialAttributeMergeUtils::mergeAttributePair(IAttributePtr ipMergedAttri
 			ipMergedAttribute->Type = ipAttribute2->Type;
 		}
 	}
+	else if (m_eTypeMergeMode == kSelectField)
+	{
+		// First try to use the type of the attribute that supplied the name is specified.
+		if (m_bTypeFromName)
+		{
+			if (ipNamePreservedAttribute != __nullptr)
+			{
+				ipMergedAttribute->Type = ipNamePreservedAttribute->Type;
+			}
+		}
+
+		// The TypeMergePriority list can be used as a backup even if TypeFromName was specified if
+		// both attributes matched.
+		if (m_bPreserveType && (!m_bTypeFromName || bAttributeNamesMatch))
+		{
+			IAttributePtr ipTypePreservedAttribute = getAttributeToPreserve(ipAttribute1, ipAttribute2,
+				ipAttribute1->Type, ipAttribute2->Type, m_ipTypeMergePriority, m_bTreatTypeListAsRegex);
+
+			if (ipTypePreservedAttribute != __nullptr)
+			{
+				ipMergedAttribute->Type = ipTypePreservedAttribute->Type;
+			}
+		}
+	}
 	else
 	{
 		// An invalid EMergeMode is being used.
@@ -1016,7 +1371,8 @@ void CSpatialAttributeMergeUtils::mergeAttributePair(IAttributePtr ipMergedAttri
 	loadAttributeInfo(ipMergedAttribute);
 }
 //--------------------------------------------------------------------------------------------------
-ISpatialStringPtr CSpatialAttributeMergeUtils::createMergedValue(IAttributePtr ipAttribute1, 
+ISpatialStringPtr CSpatialAttributeMergeUtils::createMergedValue(string strText,
+																 IAttributePtr ipAttribute1, 
 																 IAttributePtr ipAttribute2,
 																 long nPage)
 {
@@ -1109,38 +1465,45 @@ ISpatialStringPtr CSpatialAttributeMergeUtils::createMergedValue(IAttributePtr i
 		}
 	}
 
-	// If there is only one resulting raster zone, create a psuedo-spatial string with
-	// m_strSpecifiedValue as the text spread evenly across the entire area of the attribute.
-	if (ipMergedRasterZones->Size() == 1)
+	// If there is only one resulting raster zone and the text to assign does not have any newline
+	// chars, create a psuedo-spatial string with strText as the text spread evenly across the
+	// entire area of the attribute.
+	if (ipMergedRasterZones->Size() == 1 &&
+		strText.find('\r') == string::npos && strText.find('\n') == string::npos)
 	{
 		IRasterZonePtr ipRasterZone = ipMergedRasterZones->At(0);
 		ASSERT_RESOURCE_ALLOCATION("ELI30973", ipRasterZone != __nullptr);
 	
-		ipMergedValue->CreatePseudoSpatialString(ipRasterZone, m_strSpecifiedValue.c_str(),
+		ipMergedValue->CreatePseudoSpatialString(ipRasterZone, strText.c_str(),
 			m_ipDocText->SourceDocName, m_ipDocText->SpatialPageInfos);
 	}
-	// Otherwise, create a hybrid result with m_strSpecifiedValue as the text value.
+	// Otherwise, create a hybrid result with strText as the text value.
 	else
 	{
-		ipMergedValue->CreateHybridString(ipMergedRasterZones, m_strSpecifiedValue.c_str(),
+		ipMergedValue->CreateHybridString(ipMergedRasterZones, strText.c_str(),
 			m_ipDocText->SourceDocName, m_ipDocText->SpatialPageInfos);
 	}
 
 	return ipMergedValue;
 }
 //--------------------------------------------------------------------------------------------------
-bool CSpatialAttributeMergeUtils::getValueToPreserve(_bstr_t bstrValueA, _bstr_t bstrValueB, 
-													 IVariantVectorPtr ipValuePriorityList,
-													 _bstr_t &rbstrResult)
+IAttributePtr CSpatialAttributeMergeUtils::getAttributeToPreserve(IAttributePtr &ipAttributeA, 
+																  IAttributePtr &ipAttributeB,
+																  _bstr_t bstrValueA, _bstr_t bstrValueB, 
+																  IVariantVectorPtr ipValuePriorityList,
+																  bool bTreatAsRegEx,
+																  bool *pbBothMatch/* = __nullptr*/)
 {
+	if (pbBothMatch != __nullptr)
+	{
+		*pbBothMatch = false;
+	}
+	IAttributePtr ipResult = __nullptr;
+
 	ASSERT_ARGUMENT("ELI22896", ipValuePriorityList != __nullptr);
 
-	rbstrResult = "";
-
-	// Create CStrings representing both values for easy case-sensitive or non-case-sensitive
-	// comparisons.
-	CString zValueA(asString(bstrValueA).c_str());
-	CString zValueB(asString(bstrValueB).c_str());
+	string strValueA = asString(bstrValueA);
+	string strValueB = asString(bstrValueB);
 
 	// Iterate through the priority list looking for the first matching value. The loop will
 	// make case-insensitive comparisons, but will attempt to use the list to resolve differences
@@ -1148,43 +1511,70 @@ bool CSpatialAttributeMergeUtils::getValueToPreserve(_bstr_t bstrValueA, _bstr_t
 	long nCount = ipValuePriorityList->Size;
 	for (long i = 0; i < nCount; i++)
 	{
-		CString zValue(asString(ipValuePriorityList->GetItem(i).bstrVal).c_str());
+		bool bCaseInsensitive = false;
+		string strPattern = asString(ipValuePriorityList->GetItem(i).bstrVal);
 		
-		if (zValue.CompareNoCase(zValueA) == 0)
+		if (textIsMatch(strValueA, strPattern, bTreatAsRegEx, bCaseInsensitive))
 		{
 			// ValueA is a match
-			rbstrResult = bstrValueA;
-
-			if (zValue == zValueA)
+			if (!bCaseInsensitive)
 			{
+				if (pbBothMatch != __nullptr)
+				{
+					*pbBothMatch = 
+						textIsMatch(strValueA, strValueB, bTreatAsRegEx, bCaseInsensitive)
+						&& !bCaseInsensitive;
+				}
+
 				// Return immediately with a case-sensitive match. Otherwise, check valueB
 				// in case it is a case-sensitive match.
-				return true;
+				return ipAttributeA;
 			}
+
+			ipResult = ipAttributeA;
 		}
 
-		if (zValue.CompareNoCase(zValueB) == 0)
+		if (textIsMatch(strValueB, strPattern, bTreatAsRegEx, bCaseInsensitive))
 		{
+			if (pbBothMatch != __nullptr)
+			{
+				*pbBothMatch = (ipResult != __nullptr);
+			}
+
 			// ValueB is a match
-			rbstrResult = bstrValueB;
+			ipResult = ipAttributeB;
 		}
 
-		if (rbstrResult.length() != 0)
+		if (ipResult != __nullptr)
 		{
 			// We have found a match.
-			return true;
+			return ipResult;
 		}
 	}
 
-	if (zValueA.CompareNoCase(zValueB) == 0)
+	if (_strcmpi(strValueA.c_str(), strValueB.c_str()) == 0)
 	{
 		// If value A and B are equal, use this value. (Save this check for last to allow the list
 		// to resolve case sensisitivity differences if possible).
-		rbstrResult = bstrValueA;
-		return true;
+		if (pbBothMatch != __nullptr)
+		{
+			*pbBothMatch = true;
+		}
+		return ipAttributeA;
 	}
 
-	return false;
+	// Finally, if at least one of the two attributes have a value for the specified field but the
+	// other does not, return that since something is better than nothing.
+	if (!strValueA.empty() && strValueB.empty())
+	{
+		return ipAttributeA;
+	}
+	else if (strValueA.empty() && !strValueB.empty())
+	{
+		return ipAttributeB;
+	}
+
+	return __nullptr;
 }
 //--------------------------------------------------------------------------------------------------
 bool CSpatialAttributeMergeUtils::associateAttributeWithResult(IAttributePtr ipAttribute, 
@@ -1433,6 +1823,41 @@ bool CSpatialAttributeMergeUtils::areAllAttributesMerged(IIUnknownVectorPtr ipAt
 	}
 
 	return true;
+}
+//--------------------------------------------------------------------------------------------------
+bool CSpatialAttributeMergeUtils::textIsMatch(const string& strText, const string& strPattern,
+	bool bTreatAsRegEx, bool &rbCaseInsensitive)
+{
+	rbCaseInsensitive = false;
+
+	if (bTreatAsRegEx)
+	{
+		if (m_ipParser == __nullptr)
+		{
+			IMiscUtilsPtr ipMiscUtils(CLSID_MiscUtils);
+			ASSERT_RESOURCE_ALLOCATION("ELI33110", ipMiscUtils != __nullptr );
+
+			m_ipParser = ipMiscUtils->GetNewRegExpParserInstance("SpatialAttributeMergeUtils");
+			ASSERT_RESOURCE_ALLOCATION("ELI33111", m_ipParser != __nullptr);
+		}
+		
+		m_ipParser->Pattern = strPattern.c_str();
+		return asCppBool(m_ipParser->StringMatchesPattern(strText.c_str()));
+	}
+	else
+	{
+		if (strText == strPattern)
+		{
+			return true;
+		}
+		else if (_strcmpi(strText.c_str(), strPattern.c_str()) == 0)
+		{
+			rbCaseInsensitive = true;
+			return true;
+		}
+	}
+
+	return false;
 }
 //--------------------------------------------------------------------------------------------------
 void CSpatialAttributeMergeUtils::validateLicense()

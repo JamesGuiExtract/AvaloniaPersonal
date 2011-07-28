@@ -13,7 +13,10 @@
 //--------------------------------------------------------------------------------------------------
 // Version 2: Added CreateMergedRegion. Default is false, however when version 1 files are loaded it
 // will default to true to maintain behavior for version 1 rule objects.
-const unsigned long gnCurrentVersion			= 2;
+// Version 3: Added TreatNameListAsRegex, m_eValueMergeMode, m_ipValueMergePriority,
+//			  m_bTreatValueListAsRegexTypeFromName, PreserveType, TypeMergePriority and
+//			  TreatTypeListAsRegex
+const unsigned long gnCurrentVersion			= 3;
 const unsigned long gnDEFAULT_OVERLAP_PERCENT	= 75;
 
 //--------------------------------------------------------------------------------------------------
@@ -39,6 +42,8 @@ CMergeAttributes::~CMergeAttributes()
 	{
 		m_ipAFUtility = __nullptr;
 		m_ipNameMergePriority = __nullptr;
+		m_ipValueMergePriority = __nullptr;
+		m_ipTypeMergePriority = __nullptr;
 		m_ipAttributeMerger = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI22731");
@@ -55,6 +60,8 @@ void CMergeAttributes::FinalRelease()
 	{
 		m_ipAFUtility = __nullptr;
 		m_ipNameMergePriority = __nullptr;
+		m_ipValueMergePriority = __nullptr;
+		m_ipTypeMergePriority = __nullptr;
 		m_ipAttributeMerger = __nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI32139");
@@ -194,7 +201,8 @@ STDMETHODIMP CMergeAttributes::put_TypeMergeMode(EFieldMergeMode newVal)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI22930", newVal == kSpecifyField || newVal == kCombineField);
+		ASSERT_ARGUMENT("ELI22930", newVal == kSpecifyField || newVal == kCombineField
+			|| newVal == kSelectField);
 
 		validateLicense();
 
@@ -415,6 +423,286 @@ STDMETHODIMP CMergeAttributes::put_CreateMergedRegion(VARIANT_BOOL newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30841")
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_TreatNameListAsRegex(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33033", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bTreatNameListAsRegex);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33034")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::put_TreatNameListAsRegex(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bTreatNameListAsRegex = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33035")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_ValueMergeMode(EFieldMergeMode *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33036", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = m_eValueMergeMode;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33037")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::put_ValueMergeMode(EFieldMergeMode newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33038", newVal != kCombineField);
+
+		validateLicense();
+
+		m_eValueMergeMode = newVal;
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33039")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_ValueMergePriority(IVariantVector **ppVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33076", ppVal != __nullptr);
+
+		validateLicense();
+		
+		IVariantVectorPtr ipShallowCopy = m_ipValueMergePriority;
+		*ppVal = ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33077")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::put_ValueMergePriority(IVariantVector *pNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33078", pNewVal != __nullptr);
+
+		validateLicense();
+
+		m_ipValueMergePriority = pNewVal;
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33079")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_TreatValueListAsRegex(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33080", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bTreatValueListAsRegex);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33081")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::put_TreatValueListAsRegex(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bTreatValueListAsRegex = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33082")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_TypeFromName(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33040", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bTypeFromName);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33041")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::put_TypeFromName(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bTypeFromName = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33042")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_PreserveType(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33043", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bPreserveType);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33044")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::put_PreserveType(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bPreserveType = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33045")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_TypeMergePriority(IVariantVector **ppVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33046", ppVal != __nullptr);
+
+		validateLicense();
+		
+		IVariantVectorPtr ipShallowCopy = m_ipTypeMergePriority;
+		*ppVal = ipShallowCopy.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33047")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::put_TypeMergePriority(IVariantVector *pNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33048", pNewVal != __nullptr);
+
+		validateLicense();
+
+		m_ipTypeMergePriority = pNewVal;
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33049")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::get_TreatTypeListAsRegex(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI33050", pVal != __nullptr);
+
+		validateLicense();
+		
+		*pVal = asVariantBool(m_bTreatTypeListAsRegex);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33051")
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributes::put_TreatTypeListAsRegex(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bTreatTypeListAsRegex = asCppBool(newVal);
+
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33052")
+}
 
 //--------------------------------------------------------------------------------------------------
 // IOutputHandler
@@ -539,10 +827,34 @@ STDMETHODIMP CMergeAttributes::Load(IStream *pStream)
 			dataReader >> m_bCreateMergedRegion;
 		}
 
+		if (nDataVersion >= 3)
+		{
+			dataReader >> m_bTreatNameListAsRegex;
+			dataReader >> nTemp;
+			m_eValueMergeMode = (EFieldMergeMode) nTemp;
+			dataReader >> m_bTreatValueListAsRegex;
+			dataReader >> m_bTypeFromName;
+			dataReader >> m_bPreserveType;
+			dataReader >> m_bTreatTypeListAsRegex;
+		}
+
 		// Clone the NameMergePriority member
 		IPersistStreamPtr ipNameMergePriority;
 		readObjectFromStream(ipNameMergePriority, pStream, "ELI22844");
 		m_ipNameMergePriority = ipNameMergePriority;
+
+		if (nDataVersion >= 3)
+		{
+			// Clone the ValueMergePriority member
+			IPersistStreamPtr ipValueMergePriority;
+			readObjectFromStream(ipValueMergePriority, pStream, "ELI33113");
+			m_ipValueMergePriority = ipValueMergePriority;
+
+			// Clone the TypeMergePriority member
+			IPersistStreamPtr ipTypeMergePriority;
+			readObjectFromStream(ipTypeMergePriority, pStream, "ELI33112");
+			m_ipTypeMergePriority = ipTypeMergePriority;
+		}
 
 		// Reset m_ipAttributeMerger to force it to be re-loaded next time the rule is run.
 		m_ipAttributeMerger = __nullptr;
@@ -585,6 +897,14 @@ STDMETHODIMP CMergeAttributes::Save(IStream *pStream, BOOL fClearDirty)
 
 		dataWriter << m_bCreateMergedRegion;
 
+		// Version 3 members
+		dataWriter << m_bTreatNameListAsRegex;
+		dataWriter << (long)m_eValueMergeMode;
+		dataWriter << m_bTreatValueListAsRegex;
+		dataWriter << m_bTypeFromName;
+		dataWriter << m_bPreserveType;
+		dataWriter << m_bTreatTypeListAsRegex;
+
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -596,6 +916,16 @@ STDMETHODIMP CMergeAttributes::Save(IStream *pStream, BOOL fClearDirty)
 		IPersistStreamPtr ipNameMergePriority(m_ipNameMergePriority);
 		ASSERT_RESOURCE_ALLOCATION("ELI22846", ipNameMergePriority != __nullptr);
 		writeObjectToStream(ipNameMergePriority, pStream, "ELI22847", fClearDirty);
+
+		// Write the ValueMergePriority list to the stream (version 3)
+		IPersistStreamPtr ipValueMergePriority(m_ipValueMergePriority);
+		ASSERT_RESOURCE_ALLOCATION("ELI33114", ipValueMergePriority != __nullptr);
+		writeObjectToStream(ipValueMergePriority, pStream, "ELI33115", fClearDirty);
+
+		// Write the TypeMergePriority list to the stream (version 3)
+		IPersistStreamPtr ipTypeMergePriority(m_ipTypeMergePriority);
+		ASSERT_RESOURCE_ALLOCATION("ELI33053", ipTypeMergePriority != __nullptr);
+		writeObjectToStream(ipTypeMergePriority, pStream, "ELI33054", fClearDirty);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -690,12 +1020,30 @@ STDMETHODIMP CMergeAttributes::raw_CopyFrom(IUnknown *pObject)
 		m_strSpecifiedValue			= asString(ipCopyThis->SpecifiedValue);
 		m_bPreserveAsSubAttributes	= asCppBool(ipCopyThis->PreserveAsSubAttributes);
 		m_bCreateMergedRegion		= asCppBool(ipCopyThis->CreateMergedRegion);
+		m_bTreatNameListAsRegex		= asCppBool(ipCopyThis->TreatNameListAsRegex);
+		m_eValueMergeMode			= (EFieldMergeMode) ipCopyThis->ValueMergeMode;
+		m_bTreatValueListAsRegex	= asCppBool(ipCopyThis->TreatValueListAsRegex);
+		m_bTypeFromName				= asCppBool(ipCopyThis->TypeFromName);
+		m_bPreserveType				= asCppBool(ipCopyThis->PreserveType);
+		m_bTreatTypeListAsRegex		= asCppBool(ipCopyThis->TreatTypeListAsRegex);
 
 		// Clone the NameMergePriority member
 		ICopyableObjectPtr ipCopyableNameMergePriority = ipCopyThis->NameMergePriority;
 		ASSERT_RESOURCE_ALLOCATION("ELI22836", ipCopyableNameMergePriority != __nullptr);
 		m_ipNameMergePriority = ipCopyableNameMergePriority->Clone();
 		ASSERT_RESOURCE_ALLOCATION("ELI22837", m_ipNameMergePriority != __nullptr);
+
+		// Clone the ValueMergePriority member
+		ICopyableObjectPtr ipCopyableValueMergePriority = ipCopyThis->ValueMergePriority;
+		ASSERT_RESOURCE_ALLOCATION("ELI33116", ipCopyableValueMergePriority != __nullptr);
+		m_ipValueMergePriority = ipCopyableValueMergePriority->Clone();
+		ASSERT_RESOURCE_ALLOCATION("ELI33117", m_ipValueMergePriority != __nullptr);
+		
+		// Clone the TypeMergePriority member
+		ICopyableObjectPtr ipCopyableTypeMergePriority = ipCopyThis->TypeMergePriority;
+		ASSERT_RESOURCE_ALLOCATION("ELI33055", ipCopyableTypeMergePriority != __nullptr);
+		m_ipTypeMergePriority = ipCopyableTypeMergePriority->Clone();
+		ASSERT_RESOURCE_ALLOCATION("ELI33056", m_ipTypeMergePriority != __nullptr);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22747");
 }
@@ -758,14 +1106,15 @@ STDMETHODIMP CMergeAttributes::raw_IsConfigured(VARIANT_BOOL *pbValue)
 			// The overlap percent must be between 0 and 100
 			*pbValue =  VARIANT_FALSE;
 		}
-		else if (m_eNameMergeMode != kSpecifyField && m_eNameMergeMode != kPreserveField)
+		else if (m_eNameMergeMode == kSelectField)
 		{
-			// The name can be specified only via direct specification, or via preservation.
+			// The name cannot be specified via the kSelectField method.
 			*pbValue =  VARIANT_FALSE;
 		}
-		else if (m_eTypeMergeMode != kSpecifyField && m_eTypeMergeMode != kCombineField)
+		else if (m_eTypeMergeMode == kPreserveField)
 		{
-			// The type can be specified only via direct specification, or combination.
+			// The type really be preserved with any of the methods, but preserve field
+			// is a sub-option under kSelectField for type.
 			*pbValue =  VARIANT_FALSE;
 		}
 		else if (m_eNameMergeMode == kSpecifyField && m_strSpecifiedName.empty())
@@ -776,6 +1125,16 @@ STDMETHODIMP CMergeAttributes::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		else if (m_eNameMergeMode == kPreserveField && m_ipNameMergePriority->Size == 0)
 		{
 			// If using name preservation, at least one entry must be in the name preservation list.
+			*pbValue =  VARIANT_FALSE;
+		}
+		else if (m_eValueMergeMode == kPreserveField && m_ipValueMergePriority->Size == 0)
+		{
+			// If using value preservation, at least one entry must be in the value preservation list.
+			*pbValue =  VARIANT_FALSE;
+		}
+		else if (m_eTypeMergeMode == kSelectField && m_bPreserveType && m_ipTypeMergePriority->Size == 0)
+		{
+			// If using type preservation, at least one entry must be in the type preservation list.
 			*pbValue =  VARIANT_FALSE;
 		}
 		
@@ -827,9 +1186,21 @@ void CMergeAttributes::reset()
 	m_strSpecifiedValue = "000-00-0000";
 	m_bPreserveAsSubAttributes = true;
 	m_bCreateMergedRegion = false;
+	m_bTreatNameListAsRegex = false;
+	m_eValueMergeMode = kSpecifyField;
+	m_bTreatValueListAsRegex = true;
+	m_bTypeFromName = false;
+	m_bPreserveType = false;
+	m_bTreatTypeListAsRegex = false;
 
 	m_ipNameMergePriority.CreateInstance(CLSID_VariantVector);
 	ASSERT_RESOURCE_ALLOCATION("ELI22840", m_ipNameMergePriority != __nullptr);
+
+	m_ipValueMergePriority.CreateInstance(CLSID_VariantVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI33118", m_ipValueMergePriority != __nullptr);
+
+	m_ipTypeMergePriority.CreateInstance(CLSID_VariantVector);
+	ASSERT_RESOURCE_ALLOCATION("ELI33057", m_ipTypeMergePriority != __nullptr);
 }
 //--------------------------------------------------------------------------------------------------
 ISpatialAttributeMergeUtilsPtr CMergeAttributes::getAttributeMerger()
@@ -850,6 +1221,14 @@ ISpatialAttributeMergeUtilsPtr CMergeAttributes::getAttributeMerger()
 		m_ipAttributeMerger->NameMergePriority = m_ipNameMergePriority;
 		m_ipAttributeMerger->PreserveAsSubAttributes = asVariantBool(m_bPreserveAsSubAttributes);
 		m_ipAttributeMerger->CreateMergedRegion = asVariantBool(m_bCreateMergedRegion);
+		m_ipAttributeMerger->TreatNameListAsRegex = asVariantBool(m_bTreatNameListAsRegex);
+		m_ipAttributeMerger->ValueMergeMode = m_eValueMergeMode;
+		m_ipAttributeMerger->ValueMergePriority = m_ipValueMergePriority;
+		m_ipAttributeMerger->TreatValueListAsRegex = asVariantBool(m_bTreatValueListAsRegex);
+		m_ipAttributeMerger->TypeFromName = asVariantBool(m_bTypeFromName);
+		m_ipAttributeMerger->PreserveType = asVariantBool(m_bPreserveType);
+		m_ipAttributeMerger->TypeMergePriority = m_ipTypeMergePriority;
+		m_ipAttributeMerger->TreatTypeListAsRegex = asVariantBool(m_bTreatTypeListAsRegex);
 
 		// Use the largest percentage of mutual overlap between the two. [FlexIDSCore #3509]
 		m_ipAttributeMerger->UseMutualOverlap = VARIANT_FALSE;

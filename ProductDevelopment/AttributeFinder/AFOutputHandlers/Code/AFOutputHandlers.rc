@@ -285,42 +285,55 @@ BEGIN
     LTEXT           "The object must be configured",IDC_TXT_MUST_CONFIGURE,10,150,120,10
 END
 
-IDD_MERGEATTRIBUTESPP DIALOGEX 0, 0, 256, 337
+IDD_MERGEATTRIBUTESPP DIALOGEX 0, 0, 310, 431
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
+    GROUPBOX        "Merge criteria",IDC_STATIC,6,2,299,78
+    LTEXT           "Merge attributes matching this query",IDC_STATIC,12,14,120,8
     EDITTEXT        IDC_EDIT_QUERY,12,26,231,30,ES_MULTILINE | ES_AUTOHSCROLL
+    LTEXT           "when they overlap spatially by at least",IDC_STATIC,12,62,120,8
     EDITTEXT        IDC_EDIT_OVERLAP_PERCENT,135,60,18,14,ES_AUTOHSCROLL
+    LTEXT           "percent.",IDC_STATIC,157,62,27,8
+    GROUPBOX        "Name of merged attribute",IDC_STATIC,6,83,299,63
     CONTROL         "Use:",IDC_RADIO_SPECIFY_NAME,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,95,26,10
+    EDITTEXT        IDC_EDIT_NAME,40,94,155,14,ES_AUTOHSCROLL
     CONTROL         "Preserve attribute name in this order of preference",IDC_RADIO_PRESERVE_NAME,
                     "Button",BS_AUTORADIOBUTTON,12,112,170,10
-    EDITTEXT        IDC_EDIT_NAME,40,94,155,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_LIST_NAMES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER,24,125,171,72
-    PUSHBUTTON      "Add...",IDC_BTN_ADD_NAME,201,125,42,14
-    PUSHBUTTON      "Remove",IDC_BTN_REMOVE_NAME,201,143,42,14
-    PUSHBUTTON      "Modify...",IDC_BTN_MODIFY_NAME,201,161,42,14
-    PUSHBUTTON      "",IDC_BTN_NAME_UP,201,179,18,18,BS_ICON
-    PUSHBUTTON      "",IDC_BTN_NAME_DOWN,225,179,18,18,BS_ICON
-    EDITTEXT        IDC_EDIT_VALUE,120,218,123,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_NAME_LIST,22,124,236,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Edit...",IDC_BUTTON_EDIT_NAME_LIST,265,123,34,16
+    GROUPBOX        "Value of merged attribute",IDC_STATIC,7,151,298,159
+    GROUPBOX        "Text of value",IDC_STATIC,15,162,281,79
+    CONTROL         "Set the text of merged attribute to:",IDC_RADIO_SPECIFY_VALUE,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,27,175,123,10
+    EDITTEXT        IDC_EDIT_VALUE,153,173,135,14,ES_AUTOHSCROLL
+    CONTROL         "Use the value of the attribute whose name is preserved",IDC_RADIO_VALUE_FROM_NAME,
+                    "Button",BS_AUTORADIOBUTTON,27,191,191,10
+    CONTROL         "Preserve attribute value in this order of preference",IDC_RADIO_PRESERVE_VALUE,
+                    "Button",BS_AUTORADIOBUTTON,27,206,170,10
+    EDITTEXT        IDC_EDIT_VALUE_LIST,37,218,214,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Edit...",IDC_BUTTON_EDIT_VALUE_LIST,257,217,34,16
+    GROUPBOX        "Spatial area of value",IDC_STATIC,15,244,281,42
     CONTROL         "Merge into single rectangular region based on overall bounds",IDC_RADIO_CREATE_MERGED_REGION,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,25,235,217,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,27,255,217,10
     CONTROL         "Merge individual raster zones seperately",IDC_RADIO_MERGE_INDIVIDUAL_ZONES,
-                    "Button",BS_AUTORADIOBUTTON,25,251,216,10
+                    "Button",BS_AUTORADIOBUTTON,27,271,216,10
     CONTROL         "Preserve the original attributes as sub-attributes to the merged attribute",IDC_CHECK_SUBATTRIBUTES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,268,235,10
-    CONTROL         "Use:",IDC_RADIO_SPECIFY_TYPE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,13,298,26,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,293,235,10
+    GROUPBOX        "Type of merged attribute",IDC_STATIC,7,315,298,109
+    CONTROL         "Use:",IDC_RADIO_SPECIFY_TYPE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,13,329,26,10
+    EDITTEXT        IDC_EDIT_TYPE,41,328,155,14,ES_AUTOHSCROLL
     CONTROL         "Combine the types (Type1+Type2)",IDC_RADIO_COMBINE_TYPES,
-                    "Button",BS_AUTORADIOBUTTON,13,314,216,10
-    EDITTEXT        IDC_EDIT_TYPE,41,298,155,14,ES_AUTOHSCROLL
-    LTEXT           "Set the text of merged attribute to:",IDC_STATIC,12,220,108,8
-    GROUPBOX        "Merge criteria",IDC_STATIC,6,2,244,78
-    LTEXT           "Merge attributes matching this query",IDC_STATIC,12,14,120,8
-    LTEXT           "when they overlap spatially by at least",IDC_STATIC,12,62,120,8
-    LTEXT           "percent.",IDC_STATIC,157,62,27,8
-    GROUPBOX        "Name of merged attribute",IDC_STATIC,6,83,244,121
-    GROUPBOX        "Type of merged attribute",IDC_STATIC,7,287,244,43
-    GROUPBOX        "Value of merged attribute",IDC_STATIC,6,207,244,76
+                    "Button",BS_AUTORADIOBUTTON,13,344,216,10
+    CONTROL         "Conditionally select the attribute type.",IDC_RADIO_SELECT_TYPE,
+                    "Button",BS_AUTORADIOBUTTON,13,360,133,10
+    CONTROL         "Use the type of the attribute whose name is preserved",IDC_CHECK_TYPE_FROM_NAME,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,374,192,10
+    CONTROL         "Preserve attribute type in this order of preference",IDC_CHECK_PRESERVE_TYPE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,389,169,10
+    EDITTEXT        IDC_EDIT_TYPE_LIST,36,403,222,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Edit...",IDC_BUTTON_EDIT_TYPE_LIST,265,402,34,16
 END
 
 IDD_MERGEATTRIBUTETREESPP DIALOGEX 0, 0, 240, 265
@@ -348,6 +361,22 @@ BEGIN
     CONTROL         "Remove empty attribute hierarchy",IDC_CHECK_MERGE_REMOVE_EMPTY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,249,120,10
     ICON            IDI_ICON_INFO,IDC_MERGE_REMOVE_INFO,130,250,15,10,SS_NOTIFY
+END
+
+IDD_MERGEATTRIBUTESPREFERENCELISTDLG DIALOGEX 0, 0, 245, 135
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,135,115,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,189,115,50,14
+    GROUPBOX        "Select values in the following order of preference:",IDC_STATIC,7,6,232,104
+    CONTROL         "Treat as regular expressions",IDC_CHECK_REGEX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,95,107,10
+    CONTROL         "",IDC_LIST_NAMES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER,14,18,171,72
+    PUSHBUTTON      "Add...",IDC_BTN_ADD_NAME,191,18,42,14
+    PUSHBUTTON      "Remove",IDC_BTN_REMOVE_NAME,191,36,42,14
+    PUSHBUTTON      "Modify...",IDC_BTN_MODIFY_NAME,191,54,42,14
+    PUSHBUTTON      "",IDC_BTN_NAME_UP,191,72,18,18,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_NAME_DOWN,215,72,18,18,BS_ICON
 END
 
 
@@ -403,9 +432,17 @@ BEGIN
     IDD_MERGEATTRIBUTESPP, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 251
+        RIGHTMARGIN, 305
         TOPMARGIN, 7
-        BOTTOMMARGIN, 330
+        BOTTOMMARGIN, 424
+    END
+
+    IDD_MERGEATTRIBUTESPREFERENCELISTDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 239
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 129
     END
 END
 #endif    // APSTUDIO_INVOKED

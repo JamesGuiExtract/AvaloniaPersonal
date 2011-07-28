@@ -80,6 +80,22 @@ public:
 	STDMETHOD(put_PreserveAsSubAttributes)(VARIANT_BOOL newVal);
 	STDMETHOD(get_CreateMergedRegion)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_CreateMergedRegion)(VARIANT_BOOL newVal);
+	STDMETHOD(get_TreatNameListAsRegex)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_TreatNameListAsRegex)(VARIANT_BOOL newVal);
+	STDMETHOD(get_ValueMergeMode)(EFieldMergeMode *pVal);
+	STDMETHOD(put_ValueMergeMode)(EFieldMergeMode newVal);
+	STDMETHOD(get_ValueMergePriority)(IVariantVector **ppVal);
+	STDMETHOD(put_ValueMergePriority)(IVariantVector *pNewVal);
+	STDMETHOD(get_TreatValueListAsRegex)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_TreatValueListAsRegex)(VARIANT_BOOL newVal);
+	STDMETHOD(get_TypeFromName)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_TypeFromName)(VARIANT_BOOL newVal);
+	STDMETHOD(get_PreserveType)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_PreserveType)(VARIANT_BOOL newVal);
+	STDMETHOD(get_TypeMergePriority)(IVariantVector **ppVal);
+	STDMETHOD(put_TypeMergePriority)(IVariantVector *pNewVal);
+	STDMETHOD(get_TreatTypeListAsRegex)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_TreatTypeListAsRegex)(VARIANT_BOOL newVal);
 
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
@@ -146,6 +162,33 @@ private:
 	// If true, the resulting attributes will be a unification of the overall region the attributes
 	// occupy, otherwise the attribute raster zones will be merged on an individual basis.
 	bool m_bCreateMergedRegion;
+
+	// If true, the values in m_ipNameMergePriority will be treated as regular expressions.
+	bool m_bTreatNameListAsRegex;
+
+	// Specifies the method that should be used to determine the value text of the merged attribute.
+	EFieldMergeMode m_eValueMergeMode;
+
+	// If m_eValueMergeMode == kPreserveField, this specifies the priority in which value text should
+	// be preserved.
+	IVariantVectorPtr m_ipValueMergePriority;
+
+	// If true, the values in m_ipValueMergePriority will be treated as regular expressions.
+	bool m_bTreatValueListAsRegex;
+
+	// If true, the type used will be that of the attribute whose name was chosen. If
+	// m_bPreserveType is also specified, m_ipTypeMergePriority will be used as a tiebreaker.
+	bool m_bTypeFromName;
+
+	// If true, the kPreserveField merge mode will be used unless m_bTypeFromName is also specified,
+	// in which case this will be used as a fallback.
+	bool m_bPreserveType;
+
+	// If m_bPreserveType is true, this specifies the priority in which types should be preserved.
+	IVariantVectorPtr m_ipTypeMergePriority;
+
+	// If true, the values in m_ipTypeMergePriority will be treated as regular expressions.
+	bool m_bTreatTypeListAsRegex;
 
 	// An AFUtility instance to execute attribute queries.
 	IAFUtilityPtr m_ipAFUtility;

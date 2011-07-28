@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "MergeAttributesPP.h"
+#include "MergeAttributesPreferenceListDlg.h"
 #include "..\..\AFUtils\Code\Helper.h"
 
 #include <UCLIDException.h>
@@ -50,40 +51,52 @@ LRESULT CMergeAttributesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam
 		m_editOverlapPercent		= GetDlgItem(IDC_EDIT_OVERLAP_PERCENT);
 		m_btnSpecifyName			= GetDlgItem(IDC_RADIO_SPECIFY_NAME);
 		m_btnPreserveName			= GetDlgItem(IDC_RADIO_PRESERVE_NAME);
+		m_editNameList				= GetDlgItem(IDC_EDIT_NAME_LIST);
+		m_btnEditNameList			= GetDlgItem(IDC_BUTTON_EDIT_NAME_LIST);
+		m_btnValueFromName			= GetDlgItem(IDC_RADIO_VALUE_FROM_NAME);
+		m_btnSpecifyValue			= GetDlgItem(IDC_RADIO_SPECIFY_VALUE); 
+		m_btnPreserveValue			= GetDlgItem(IDC_RADIO_PRESERVE_VALUE);
+		m_editValueList				= GetDlgItem(IDC_EDIT_VALUE_LIST);
+		m_btnEditValueList			= GetDlgItem(IDC_BUTTON_EDIT_VALUE_LIST);
 		m_btnSpecifyType			= GetDlgItem(IDC_RADIO_SPECIFY_TYPE);
 		m_btnCombineType			= GetDlgItem(IDC_RADIO_COMBINE_TYPES);
+		m_btnSelectType				= GetDlgItem(IDC_RADIO_SELECT_TYPE);
+		m_btnTypeFromName			= GetDlgItem(IDC_CHECK_TYPE_FROM_NAME);
+		m_btnPreserveType			= GetDlgItem(IDC_CHECK_PRESERVE_TYPE);
+		m_editTypeList				= GetDlgItem(IDC_EDIT_TYPE_LIST);
+		m_btnEditTypeList			= GetDlgItem(IDC_BUTTON_EDIT_TYPE_LIST);
 		m_editSpecifiedName			= GetDlgItem(IDC_EDIT_NAME);
 		m_editSpecifiedType			= GetDlgItem(IDC_EDIT_TYPE);
 		m_editSpecifiedValue		= GetDlgItem(IDC_EDIT_VALUE);
-		m_listNameMergePriority		= GetDlgItem(IDC_LIST_NAMES);
-		m_btnAdd					= GetDlgItem(IDC_BTN_ADD_NAME);
-		m_btnModify					= GetDlgItem(IDC_BTN_MODIFY_NAME);
-		m_btnRemove					= GetDlgItem(IDC_BTN_REMOVE_NAME);
 		m_btnPreserveAsSubAttributes = GetDlgItem(IDC_CHECK_SUBATTRIBUTES);
 		m_btnCreateMergedRegion		= GetDlgItem(IDC_RADIO_CREATE_MERGED_REGION);
 		m_btnMergeIndividualZones	= GetDlgItem(IDC_RADIO_MERGE_INDIVIDUAL_ZONES);
-		m_btnUp.SubclassDlgItem(IDC_BTN_NAME_UP, CWnd::FromHandle(m_hWnd));
-		m_btnDown.SubclassDlgItem(IDC_BTN_NAME_DOWN, CWnd::FromHandle(m_hWnd));
-		
-		// Assign icons to the up and down buttons
-		m_btnUp.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_UP)));
-		m_btnDown.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_DOWN)));
 
 		// Load the rule values into the property page.
 		m_editAttributeQuery.SetWindowText(asString(ipRule->AttributeQuery).c_str());
 		m_editOverlapPercent.SetWindowText(asString(ipRule->OverlapPercent, 0, 5).c_str());
 		m_btnSpecifyName.SetCheck(asBSTChecked(ipRule->NameMergeMode == kSpecifyField));
 		m_btnPreserveName.SetCheck(asBSTChecked(ipRule->NameMergeMode == kPreserveField));
+		updateDelimetedList(m_vecNameMergePriority, m_editNameList, ipRule->NameMergePriority);
+		m_bTreatNameListAsRegex = asCppBool(ipRule->TreatNameListAsRegex);
+		m_btnValueFromName.SetCheck(asBSTChecked(ipRule->ValueMergeMode == kSelectField));
+		m_btnSpecifyValue.SetCheck(asBSTChecked(ipRule->ValueMergeMode == kSpecifyField));
+		m_btnPreserveValue.SetCheck(asBSTChecked(ipRule->ValueMergeMode == kPreserveField));
+		updateDelimetedList(m_vecValueMergePriority, m_editValueList, ipRule->ValueMergePriority);
+		m_bTreatValueListAsRegex = asCppBool(ipRule->TreatValueListAsRegex);
 		m_btnSpecifyType.SetCheck(asBSTChecked(ipRule->TypeMergeMode == kSpecifyField));
 		m_btnCombineType.SetCheck(asBSTChecked(ipRule->TypeMergeMode == kCombineField));
+		m_btnSelectType.SetCheck(asBSTChecked(ipRule->TypeMergeMode == kSelectField));
+		m_btnTypeFromName.SetCheck(asBSTChecked(ipRule->TypeFromName));
+		m_btnPreserveType.SetCheck(asBSTChecked(ipRule->PreserveType));
+		updateDelimetedList(m_vecTypeMergePriority, m_editTypeList, ipRule->TypeMergePriority);
+		m_bTreatTypeListAsRegex = asCppBool(ipRule->TreatTypeListAsRegex);
 		m_editSpecifiedName.SetWindowText(asString(ipRule->SpecifiedName).c_str());
 		m_editSpecifiedType.SetWindowText(asString(ipRule->SpecifiedType).c_str());
 		m_editSpecifiedValue.SetWindowText(asString(ipRule->SpecifiedValue).c_str());
 		m_btnPreserveAsSubAttributes.SetCheck(asBSTChecked(ipRule->PreserveAsSubAttributes));
 		m_btnCreateMergedRegion.SetCheck(asBSTChecked(ipRule->CreateMergedRegion));
 		m_btnMergeIndividualZones.SetCheck(asBSTChecked(ipRule->CreateMergedRegion == VARIANT_FALSE));
-
-		initializeList(m_listNameMergePriority, ipRule->NameMergePriority);
 
 		updateControls();
 
@@ -94,8 +107,8 @@ LRESULT CMergeAttributesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
-LRESULT CMergeAttributesPP::OnBnClickedRadioBtn(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
-												BOOL& bHandled)
+LRESULT CMergeAttributesPP::OnBnClickedCheckOrRadioBtn(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
+													   BOOL& bHandled)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -112,253 +125,67 @@ LRESULT CMergeAttributesPP::OnBnClickedRadioBtn(WORD wNotifyCode, WORD wID, HWND
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
-LRESULT CMergeAttributesPP::OnBnClickedBtnAdd(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
-											  BOOL& bHandled)
+LRESULT CMergeAttributesPP::OnBnClickedButtonEditNameList(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		// Prompt user to enter a new value
-		CString zValue;
-		if (promptForValue(zValue, m_listNameMergePriority, "", -1, true))
+		// Pop dialog allowing the user to edit the name merge priority list.
+		if (CMergeAttributesPreferenceListDlg::EditList("Attribute name order of preference", 
+			m_vecNameMergePriority, true, m_bTreatNameListAsRegex))
 		{
-			int nTotal = m_listNameMergePriority.GetItemCount();
-				
-			// new item index
-			int nIndex = m_listNameMergePriority.InsertItem(nTotal, zValue);
-			for (int i = 0; i <= nTotal; i++)
+			// If the dialog was ok'd apply the updated values to m_editNameList.
+			updateDelimetedList(m_vecNameMergePriority, m_editNameList);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33058");
+
+	return 0;
+}
+//--------------------------------------------------------------------------------------------------
+LRESULT CMergeAttributesPP::OnBnClickedButtonEditValueList(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Pop dialog allowing the user to edit the value merge priority list.
+		if (CMergeAttributesPreferenceListDlg::EditList("Attribute value order of preference", 
+			m_vecValueMergePriority, false, m_bTreatValueListAsRegex))
+		{
+			// If the dialog was ok'd apply the updated values to m_editValueList.
+			updateDelimetedList(m_vecValueMergePriority, m_editValueList);
+
+			// Warn that regex's may be necessary for the preservation list to be effective.
+			if (!m_bTreatValueListAsRegex)
 			{
-				// deselect any other items
-				int nState = (i == nIndex) ? LVIS_SELECTED : 0;
-
-				// only select current newly added item
-				m_listNameMergePriority.SetItemState(i, nState, LVIS_SELECTED);
+				MessageBox("Unless the attributes being merged all have artificially assigned values, "
+					"use regular expressions for the value preservation priority list for a better "
+					"chance of selecting the appropriate value to use.", "Warning", MB_OK | MB_ICONWARNING);
 			}
-
-			// adjust the column width in case there is a vertical scrollbar
-			CRect rect;
-			m_listNameMergePriority.GetClientRect(&rect);			
-			m_listNameMergePriority.SetColumnWidth(0, rect.Width());
-
-			SetDirty(TRUE);
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22851");
-
-	// Call updateButtons to update the related buttons
-	updateButtons();
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33121");
 
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
-LRESULT CMergeAttributesPP::OnBnClickedBtnModify(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
-												 BOOL& bHandled)
+LRESULT CMergeAttributesPP::OnBnClickedButtonEditTypeList(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		// Get currently selected item
-		int nSelectedItemIndex = m_listNameMergePriority.GetNextItem(-1, LVNI_ALL | LVNI_SELECTED);
-		if (nSelectedItemIndex==LB_ERR)
+		// Pop dialog allowing the user to edit the type merge priority list.
+		if (CMergeAttributesPreferenceListDlg::EditList("Attribute type order of preference",
+			m_vecTypeMergePriority, true, m_bTreatTypeListAsRegex))
 		{
-			return 0;
-		}
-
-		// Get selected text
-		CComBSTR bstrValue;
-		m_listNameMergePriority.GetItemText(nSelectedItemIndex, 0, bstrValue.m_str);
-
-		// Prompt user to modify the current value
-		CString zValue(asString(bstrValue.m_str).c_str());
-		if (promptForValue(zValue, m_listNameMergePriority, "", nSelectedItemIndex))
-		{
-			// If the user OK'd the box, save the new value
-			m_listNameMergePriority.DeleteItem(nSelectedItemIndex);
-			
-			int nIndex = m_listNameMergePriority.InsertItem(nSelectedItemIndex, zValue);
-
-			m_listNameMergePriority.SetItemState(nIndex, LVIS_SELECTED, LVIS_SELECTED);
-
-			// Call updateButtons to update the related buttons
-			updateButtons();
-
-			// Set Dirty flag
-			SetDirty(TRUE);
+			// If the dialog was ok'd apply the updated values to m_editNameList.
+			updateDelimetedList(m_vecTypeMergePriority, m_editTypeList);
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22852");
-
-	return 0;
-}
-//--------------------------------------------------------------------------------------------------
-LRESULT CMergeAttributesPP::OnBnClickedBtnRemove(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
-												 BOOL& bHandled)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		// Get first selected item
-		int nItem = m_listNameMergePriority.GetNextItem(-1, LVNI_ALL | LVNI_SELECTED);
-		
-		if (nItem != -1)
-		{
-			int nRes = MessageBox("Delete selected item(s)?", "Confirm", MB_YESNO);
-			if (nRes == IDYES)
-			{
-				// Remove selected items
-				int nFirstItem = nItem;
-				
-				// Delete any selected item since this list ctrl allows multiple selection
-				while(nItem != -1)
-				{
-					// Remove from the UI listbox
-					m_listNameMergePriority.DeleteItem(nItem);
-					// Get next item selected item
-					nItem = m_listNameMergePriority.GetNextItem(nItem - 1, 
-						((nItem == 0) ? LVNI_ALL : LVNI_BELOW) | LVNI_SELECTED);
-				}
-				
-				// If there's more item(s) below last deleted item, then set 
-				// Selection on the next item
-				int nTotalNumOfItems = m_listNameMergePriority.GetItemCount();
-				if (nFirstItem < nTotalNumOfItems)
-				{
-					m_listNameMergePriority.SetItemState(nFirstItem, LVIS_SELECTED, LVIS_SELECTED);
-				}
-				else if (nTotalNumOfItems > 0)
-				{
-					// Select the last item
-					m_listNameMergePriority.SetItemState(nTotalNumOfItems - 1, LVIS_SELECTED, 
-						LVIS_SELECTED);
-				}
-			}
-
-			// Adjust the column width in case there is a vertical scrollbar now
-			CRect rect;
-			m_listNameMergePriority.GetClientRect(&rect);
-			m_listNameMergePriority.SetColumnWidth(0, rect.Width());
-
-			// Call updateButtons to update the related buttons
-			updateButtons();
-
-			SetDirty(TRUE);
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22853");
-
-	return 0;
-}
-//--------------------------------------------------------------------------------------------------
-LRESULT CMergeAttributesPP::OnBnClickedBtnUp(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		// Get current selected item index
-		int nSelectedItemIndex = m_listNameMergePriority.GetNextItem(-1, LVNI_ALL | LVNI_SELECTED);
-		if (nSelectedItemIndex >= 0)
-		{
-			// Get the index of the item right above currently selected item
-			int nAboveIndex = nSelectedItemIndex - 1;
-			if (nAboveIndex < 0)
-			{
-				return 0;
-			}
-
-			// Get selected item text from list
-			CComBSTR bstrValue;
-			m_listNameMergePriority.GetItemText(nSelectedItemIndex, 0, bstrValue.m_str);
-
-			// Then remove the selected item
-			m_listNameMergePriority.DeleteItem(nSelectedItemIndex);
-
-			// Now insert the item right before the item that was above
-			int nActualIndex = m_listNameMergePriority.InsertItem(nAboveIndex, 
-				asString(bstrValue.m_str).c_str());
-			
-			// Keep this item selected
-			m_listNameMergePriority.SetItemState(nActualIndex, LVIS_SELECTED, LVIS_SELECTED);
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22854");
-
-	return 0;
-}
-//--------------------------------------------------------------------------------------------------
-LRESULT CMergeAttributesPP::OnBnClickedBtnDown(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		// Get current selected item index
-		int nSelectedItemIndex = m_listNameMergePriority.GetNextItem(-1, LVNI_ALL | LVNI_SELECTED);
-		if (nSelectedItemIndex >= 0)
-		{
-			// Get the index of the item right below currently selected item
-			int nBelowIndex = nSelectedItemIndex + 1;
-			if (nBelowIndex == m_listNameMergePriority.GetItemCount())
-			{
-				return 0;
-			}
-
-			// Get selected item text from list
-			CComBSTR bstrValue;
-			m_listNameMergePriority.GetItemText(nSelectedItemIndex, 0, bstrValue.m_str);
-
-			// Then remove the selected item
-			m_listNameMergePriority.DeleteItem(nSelectedItemIndex);
-
-			// Now insert the item right before the item that was above
-			int nActualIndex = m_listNameMergePriority.InsertItem(nBelowIndex, 
-				asString(bstrValue.m_str).c_str());
-
-			// Keep this item selected
-			m_listNameMergePriority.SetItemState(nActualIndex, LVIS_SELECTED, LVIS_SELECTED);
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22855");
-
-	return 0;
-}
-//--------------------------------------------------------------------------------------------------
-LRESULT CMergeAttributesPP::OnItemChangedList(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandle)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		// A new name has been selected in the preservation priority list box.  Update the buttons
-		// as appropriate for the new selection.
-		updateButtons();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22856");
-
-	return 0;
-}
-//--------------------------------------------------------------------------------------------------
-LRESULT CMergeAttributesPP::OnDblclkList(int idCtrl, LPNMHDR pNMHDR, BOOL& bHandled)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		if (m_listNameMergePriority.GetSelectedCount() == 1)
-		{
-			// If a single entry was double-clicked, open a dialog to allow editing of that entry.
-			OnBnClickedBtnModify(0, 0, 0, bHandled);
-		}
-		else
-		{
-			// Open a dialog to allow a new value to be added to the list.
-			OnBnClickedBtnAdd(0, 0, 0, bHandled);
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI22857");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33059");
 
 	return 0;
 }
@@ -390,7 +217,15 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 				"The minimum mutual overlap percentage must be in the range 0 - 100", 
 				75,	"Specify a minimum mutual overlap percentage for merging");
 
-			IVariantVectorPtr ipNamePrioirtyList = retrieveListValues(m_listNameMergePriority);
+			// Attribute name
+			IVariantVectorPtr ipNamePrioirtyList(CLSID_VariantVector);
+			for each (string strValue in m_vecNameMergePriority)
+			{
+				ipNamePrioirtyList->PushBack(strValue.c_str());
+			}
+			ipRule->NameMergePriority = ipNamePrioirtyList;
+
+			ipRule->TreatNameListAsRegex = asVariantBool(m_bTreatNameListAsRegex);
 			
 			if ((m_btnSpecifyName.GetCheck() == BST_CHECKED))
 			{
@@ -415,15 +250,14 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 				ipRule->NameMergeMode = (EFieldMergeMode) kPreserveField;
 				ipRule->SpecifiedName = verifyControlValueAsBSTR(m_editSpecifiedName);
 
-				if (ipNamePrioirtyList->Size == 0)
+				if (m_vecNameMergePriority.size() == 0)
 				{
-					m_btnAdd.SetFocus();
+					m_btnEditNameList.SetFocus();
 					throw UCLIDException("ELI22942", "Specify at least one name to preserve!");
 				}
 			}
 
-			ipRule->NameMergePriority = ipNamePrioirtyList;
-
+			// Attribute type
 			if (m_btnSpecifyType.GetCheck() == BST_CHECKED)
 			{
 				_bstr_t bstrType = verifyControlValueAsBSTR(m_editSpecifiedType);
@@ -444,14 +278,85 @@ STDMETHODIMP CMergeAttributesPP::Apply(void)
 				ipRule->TypeMergeMode = (EFieldMergeMode) kSpecifyField;
 				ipRule->SpecifiedType = bstrType;
 			}
-			else
+			else 
 			{
-				ipRule->TypeMergeMode = (EFieldMergeMode) kCombineField;
+				if (m_btnCombineType.GetCheck() == BST_CHECKED)
+				{
+					ipRule->TypeMergeMode = (EFieldMergeMode) kCombineField;
+				}
+				else
+				{
+					ipRule->TypeMergeMode = (EFieldMergeMode) kSelectField;
+
+					if (m_btnTypeFromName.GetCheck() == BST_UNCHECKED &&
+						m_btnPreserveType.GetCheck() == BST_UNCHECKED)
+					{
+						throw UCLIDException("ELI33060", "Specify at least one type selection method!");
+					}
+				}
+
 				ipRule->SpecifiedType = verifyControlValueAsBSTR(m_editSpecifiedType);
 			}
 
-			ipRule->SpecifiedValue = verifyControlValueAsBSTR(m_editSpecifiedValue,
-				"Specify a value for the merged attribute!");
+			ipRule->TypeFromName = asVariantBool(m_btnTypeFromName.GetCheck() == BST_CHECKED);
+
+			if (m_btnPreserveType.GetCheck() == BST_CHECKED)
+			{
+				ipRule->PreserveType = VARIANT_TRUE;
+				
+				if (m_btnSelectType.GetCheck() == BST_CHECKED && 
+					m_vecTypeMergePriority.size() == 0)
+				{
+					m_btnEditTypeList.SetFocus();
+					throw UCLIDException("ELI33061", "Specify at least one type to preserve!");
+				}
+			}
+			else
+			{
+				ipRule->PreserveType = VARIANT_FALSE;
+			}
+
+			IVariantVectorPtr ipTypePrioirtyList(CLSID_VariantVector);
+			for each (string strValue in m_vecTypeMergePriority)
+			{
+				ipTypePrioirtyList->PushBack(strValue.c_str());
+			}
+			ipRule->TypeMergePriority = ipTypePrioirtyList;
+
+			ipRule->TreatTypeListAsRegex = asVariantBool(m_bTreatTypeListAsRegex);
+
+			// Attribute value
+			IVariantVectorPtr ipValuePrioirtyList(CLSID_VariantVector);
+			for each (string strValue in m_vecValueMergePriority)
+			{
+				ipValuePrioirtyList->PushBack(strValue.c_str());
+			}
+			ipRule->ValueMergePriority = ipValuePrioirtyList;
+
+			ipRule->TreatValueListAsRegex = asVariantBool(m_bTreatValueListAsRegex);
+
+			if (m_btnSpecifyValue.GetCheck() == BST_CHECKED)
+			{
+				ipRule->ValueMergeMode = (EFieldMergeMode) kSpecifyField;
+				ipRule->SpecifiedValue = verifyControlValueAsBSTR(m_editSpecifiedValue,
+					"Specify a value for the merged attribute!");
+			}
+			else if (m_btnValueFromName.GetCheck() == BST_CHECKED)
+			{
+				ipRule->ValueMergeMode = (EFieldMergeMode) kSelectField;
+				ipRule->SpecifiedValue = verifyControlValueAsBSTR(m_editSpecifiedValue);
+			}
+			else
+			{
+				ipRule->ValueMergeMode = (EFieldMergeMode) kPreserveField;
+				ipRule->SpecifiedValue = verifyControlValueAsBSTR(m_editSpecifiedValue);
+
+				if (m_vecValueMergePriority.size() == 0)
+				{
+					m_btnEditNameList.SetFocus();
+					throw UCLIDException("ELI33120", "Specify at least one value to preserve!");
+				}
+			}
 				
 			ipRule->PreserveAsSubAttributes =
 				asVariantBool(m_btnPreserveAsSubAttributes.GetCheck() == BST_CHECKED);
@@ -502,47 +407,6 @@ STDMETHODIMP CMergeAttributesPP::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //--------------------------------------------------------------------------------------------------
 // Private Methods
 //--------------------------------------------------------------------------------------------------
-void CMergeAttributesPP::initializeList(ATLControls::CListViewCtrl &listControl,
-										IVariantVectorPtr ipEntries)
-{
-	ASSERT_RESOURCE_ALLOCATION("ELI22850", ipEntries != __nullptr);
-
-	listControl.SetExtendedListViewStyle(LVS_EX_GRIDLINES|LVS_EX_FULLROWSELECT);
-	CRect rect;			
-	listControl.GetClientRect(&rect);
-	
-	// Make the first column as wide as the whole list box
-	listControl.InsertColumn(0, "", LVCFMT_LEFT, rect.Width(), 0);
-
-	// Add every value in ipEntries to the list.
-	long nSize = ipEntries->Size;
-	for (int i = 0; i < nSize; i++)
-	{
-		listControl.InsertItem(i, asString(ipEntries->GetItem(i).bstrVal).c_str());
-	}
-
-	listControl.GetClientRect(&rect);
-	// Adjust the column width in case there is a vertical scrollbar now
-	listControl.SetColumnWidth(0, rect.Width());
-}
-//--------------------------------------------------------------------------------------------------
-IVariantVectorPtr CMergeAttributesPP::retrieveListValues(ATLControls::CListViewCtrl &listControl)
-{
-	IVariantVectorPtr ipEntries(CLSID_VariantVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI22874", ipEntries != __nullptr);
-
-	// Retrieve the entries from listControl (validate each entry)
-	for (long i = 0; i < listControl.GetItemCount(); i++)
-	{
-		CComBSTR bstrValue;
-		listControl.GetItemText(i, 0, bstrValue.m_str);
-		validateIdentifier(asString(bstrValue));
-		ipEntries->PushBack(bstrValue.m_str);
-	}
-	
-	return ipEntries;
-}
-//--------------------------------------------------------------------------------------------------
 void CMergeAttributesPP::updateControls()
 {
 	if (m_btnSpecifyName.GetCheck() == BST_CHECKED)
@@ -550,84 +414,96 @@ void CMergeAttributesPP::updateControls()
 		// Enable the name specification edit box.
 		m_editSpecifiedName.EnableWindow(TRUE);
 
-		// Disable all controls dealing with name preservation.
-		// Deselect items in list and disable it before disabling the buttons so that events fired
-		// while de-activating list don't cause buttons to become re-enabled.
-		ATLControls::CListViewCtrl listNames = GetDlgItem(IDC_LIST_NAMES);
-		for (int i = 0; i < listNames.GetItemCount(); i++)
+		// Disable controls dependent on the preserve name option.
+		m_editNameList.EnableWindow(FALSE);
+		m_btnEditNameList.EnableWindow(FALSE);
+		if (m_btnValueFromName.GetCheck() == BST_CHECKED)
 		{
-			listNames.SetItemState(i, 0, LVIS_SELECTED);
+			m_btnValueFromName.SetCheck(BST_UNCHECKED);
+			m_btnSpecifyValue.SetCheck(BST_CHECKED);
 		}
-		listNames.EnableWindow(FALSE);
-
-		// Disable the buttons associated with the name priority list control.
-		GetDlgItem(IDC_BTN_ADD_NAME).EnableWindow(FALSE);
-		GetDlgItem(IDC_BTN_MODIFY_NAME).EnableWindow(FALSE);
-		GetDlgItem(IDC_BTN_REMOVE_NAME).EnableWindow(FALSE);
-		GetDlgItem(IDC_BTN_NAME_UP).EnableWindow(FALSE);
-		GetDlgItem(IDC_BTN_NAME_DOWN).EnableWindow(FALSE);
+		m_btnValueFromName.EnableWindow(FALSE);
 	}
 	else
 	{
 		// Disable the name specification edit box.
 		m_editSpecifiedName.EnableWindow(FALSE);
 
-		// Enable the name priority list control and its buttons as appropriate.
-		GetDlgItem(IDC_LIST_NAMES).EnableWindow(TRUE);
-		updateButtons();
+		// Enable controls dependent on the preserve name option.
+		m_editNameList.EnableWindow(TRUE);
+		m_btnEditNameList.EnableWindow(TRUE);
+		m_btnValueFromName.EnableWindow(TRUE);
 	}
 
-	// Enable/disable the type specification edit box as appropriate.
+	// Enable/disable the value specification edit box and priority list as appropriate.
+	m_editSpecifiedValue.EnableWindow(asMFCBool(m_btnSpecifyValue.GetCheck() == BST_CHECKED));
 	m_editSpecifiedType.EnableWindow(asMFCBool(m_btnSpecifyType.GetCheck() == BST_CHECKED));
-}
-//--------------------------------------------------------------------------------------------------
-void CMergeAttributesPP::updateButtons()
-{
-	// Enable/disable up and down arrow key buttons appropriately
-	m_btnUp.EnableWindow(FALSE);
-	m_btnDown.EnableWindow(FALSE);
-	m_btnAdd.EnableWindow(TRUE);
+	m_editValueList.EnableWindow(asMFCBool(m_btnPreserveValue.GetCheck() == BST_CHECKED));
+	m_btnEditValueList.EnableWindow(asMFCBool(m_btnPreserveValue.GetCheck() == BST_CHECKED));
 
-	// Get current selected item index
-	int nSelectedItemIndex = m_listNameMergePriority.GetNextItem(-1, LVNI_ALL | LVNI_SELECTED);
-	int nSelCount = m_listNameMergePriority.GetSelectedCount();
-	int nCount = m_listNameMergePriority.GetItemCount();
-	
-	if (nSelCount == 0)
+	// "SelectType" encompases both the type priority list an selecting the type of the attribute
+	// that supplied the chosen name.
+	if (m_btnSelectType.GetCheck() == BST_CHECKED)
 	{
-		// Modify and remove should be disabled if there are no entries selected
-		m_btnModify.EnableWindow(FALSE);
-		m_btnRemove.EnableWindow(FALSE);
+		// Enable/diable PreserveType controls.
+		m_btnPreserveType.EnableWindow(TRUE);
+		if (m_btnPreserveType.GetCheck() == BST_CHECKED)
+		{
+			m_editTypeList.EnableWindow(TRUE);
+			m_btnEditTypeList.EnableWindow(TRUE);
+		}
+		else
+		{
+			m_editTypeList.EnableWindow(FALSE);
+			m_btnEditTypeList.EnableWindow(FALSE);
+		}
 	}
 	else
 	{
-		// Modify should be enabled if there is exactly one entry selected
-		m_btnModify.EnableWindow(asMFCBool(nSelCount == 1));
-		// Remove should be enabled if there is at least one entry selected
-		m_btnRemove.EnableWindow(asMFCBool(nSelCount >= 1));
+		// Disable all PreserveType controls.
+		m_btnPreserveType.EnableWindow(FALSE);
+		m_editTypeList.EnableWindow(FALSE);
+		m_btnEditTypeList.EnableWindow(FALSE);
+	}
 
-		if ((nCount > 1) && (nSelCount == 1))
+	// Uncheck the TypeFromName checkbox if name is not getting preserved from one of the attributes.
+	if (m_btnPreserveName.GetCheck() != BST_CHECKED &&
+		m_btnTypeFromName.GetCheck() == BST_CHECKED)
+	{
+		m_btnTypeFromName.SetCheck(BST_UNCHECKED);
+	}
+
+	bool bEnableTypeFromName = 
+		(m_btnSelectType.GetCheck() == BST_CHECKED) && (m_btnPreserveName.GetCheck() == BST_CHECKED);
+	m_btnTypeFromName.EnableWindow(asBSTChecked(bEnableTypeFromName));
+}
+//--------------------------------------------------------------------------------------------------
+void CMergeAttributesPP::updateDelimetedList(vector<string>& vecList, ATLControls::CEdit& editControl,
+	IVariantVectorPtr ipList/* = __nullptr*/)
+{
+	// If ipList is specified, use it to populate vecList.
+	if (ipList != __nullptr)
+	{
+		vecList.clear();
+		int count = ipList->Size;
+		for (int i = 0; i < count; i++)
 		{
-			if (nSelectedItemIndex == 0)
-			{
-				// First item selected; enable down button only
-				m_btnUp.EnableWindow(FALSE);
-				m_btnDown.EnableWindow(TRUE);
-			}
-			else if (nSelectedItemIndex > 0 && nSelectedItemIndex < (nCount - 1))
-			{
-				// Some item other that first and last item selected; enable both buttons
-				m_btnUp.EnableWindow(TRUE);
-				m_btnDown.EnableWindow(TRUE);
-			}
-			else if (nSelectedItemIndex == (nCount - 1))
-			{
-				// Last item selected; enable up button only
-				m_btnUp.EnableWindow(TRUE);
-				m_btnDown.EnableWindow(FALSE);
-			}
+			vecList.push_back(asString(_bstr_t(ipList->GetItem(i))));
 		}
 	}
+
+	// Use vecList to populate editControl as a semi-colon delimited list.
+	string strList;
+	for each (string strValue in vecList)
+	{
+		if (!strList.empty())
+		{
+			strList += ";";
+		}
+		strList += strValue;
+	}
+
+	editControl.SetWindowText(strList.c_str());
 }
 //--------------------------------------------------------------------------------------------------
 void CMergeAttributesPP::validateLicense()

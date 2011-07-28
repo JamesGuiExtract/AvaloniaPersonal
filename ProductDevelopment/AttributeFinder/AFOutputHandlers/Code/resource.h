@@ -67,6 +67,7 @@
 #define IDR_MERGEATTRIBUTETREES         160
 #define IDD_MERGEATTRIBUTETREESPP       161
 #define IDR_MERGEATTRIBUTETREESPP       162
+#define IDD_MERGEATTRIBUTESPREFERENCELISTDLG 163
 #define IDD_DLG_SelectWithUI            201
 #define IDC_LIST_ENTRIES                202
 #define IDD_MODIFYATTRIBUTEVALUE        203
@@ -161,14 +162,29 @@
 #define IDC_CHECK_MERGE_REMOVE_EMPTY    334
 #define IDC_MERGE_REMOVE_INFO           335
 #define IDC_RADIO_MERGE_INDIVIDUAL_ZONES 336
+#define IDD_MERGEATTRIBUTE_PRIORITYLIST_DLG 337
+#define IDC_CHECK_REGEX                 338
+#define IDC_RADIO_SELECT_TYPE           339
+#define IDC_CHECK_TYPE_FROM_NAME        340
+#define IDC_CHECK_PRESERVE_TYPE         341
+#define IDC_RADIO_SPECIFY_VALUE         342
+#define IDC_RADIO_SELECT_VALUE          343
+#define IDC_RADIO_VALUE_FROM_NAME       344
+#define IDC_BUTTON_EDIT_NAME_LIST       345
+#define IDC_BUTTON_EDIT_TYPE_LIST       346
+#define IDC_EDIT_NAME_LIST              347
+#define IDC_EDIT_TYPE_LIST              348
+#define IDC_EDIT_VALUE_LIST             349
+#define IDC_BUTTON_EDIT_VALUE_LIST      350
+#define IDC_RADIO_PRESERVE_VALUE        351
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        337
+#define _APS_NEXT_RESOURCE_VALUE        352
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         337
-#define _APS_NEXT_SYMED_VALUE           163
+#define _APS_NEXT_CONTROL_VALUE         352
+#define _APS_NEXT_SYMED_VALUE           164
 #endif
 #endif
