@@ -446,6 +446,27 @@
             <li>Confirm that the remote file can be left as-is after downloading.</li>
             <li>Confirm that each of the connection protocols works as expected.</li>
         <p>
+            <li>Confirm that the file supplier will retry an operation if a failure occurs.</li>
+            <li>Confirm that after the file supplier downloads a file from an FTP site, a 
+            <b>.info</b> file is created in the local working folder
+            <ul>
+                <li>Confirm that the .info file is in XML format.</li>
+                <li>Confirm that the .info file contains a <b>RemoteSourceDocName</b> element.</li>
+                <li>Confirm that the .info file contains a <b>RemoteFileSize</b> element.</li>
+                <li>Confirm that the .info file contains a <b>RemoteLastModified</b> element.</li>
+            <p>
+                <li>Confirm that if the .info file exists in a local folder, it is used to 
+                determine if the file should be re-downloaded
+                <ul>
+                    <li>Download if file is not in database.</li>
+                    <li>Download if <b>Force processing</b> is set.</li>
+                    <li>Download if file size has changed</li>
+                    <li>Don't download if last modified information is unchanged.</li>
+                    <li>Confirm that the <b>after download</b> action is also performed if the file
+                    is re-downloaded.</li>
+                </ul></li>
+            </ul></li>
+        <p>
             <li><b>[LegacyRC #6071]</b> Polling frequency
             <ul>
                 <li>Set up an FTP file supplier to supply TIF images, append TIF to remote 

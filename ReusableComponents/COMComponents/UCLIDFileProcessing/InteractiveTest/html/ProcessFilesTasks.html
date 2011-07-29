@@ -1651,40 +1651,108 @@
             <li>Confirm that a sleep value above <b>2147483647</b> is invalid.
             <li>Confirm that the property page includes a combo box to specify the units of time
             for which to sleep
+            <ul>
+                <li>Millisecond(s)
+                <li>Second(s)
+                <li>Minute(s)
+                <li>Hour(s)
+            </ul>
+            <li>Confirm that the default unit is <b>Second(s)</b>.
+            <li>Confirm that the property page includes a <b>Sleep for a random amount of time 
+            between 1 millisecond and specified time</b> check box.
+            <li>Confirm that settings are persistent.
+    <p>
+            <li>Confirm that the task sleeps for an appropriate amount of time
+            <ul>
+                <li>some number of <b>milliseconds</b>.
+                <li>some number of <b>milliseconds</b> with a random sleep.
+                <li>some number of <b>seconds</b>.
+                <li>some number of <b>seconds</b> with a random sleep.
+                <li>some number of <b>minutes</b>.
+                <li>some number of <b>minutes</b> with a random sleep.
+                <li>some number of <b>hours</b>.
+                <li>some number of <b>hours</b> with a random sleep.
+            </ul>
+    <p>
+            <li>Sleep is a cancellable task
+            <ul>
+                <li>Configure an FPS file with a <b>Core: Sleep</b> task followed by at least one
+                additional task.
+                <li>Start processing in the FAM.
+                <li>Stop processing during the time in which the Sleep task is active.
+                <li>Confirm that processing stops immediately.
+                <li>Confirm that subsequent tasks <b>are not</b> executed.
+                <li>Confirm that progress status is updated as sleep proceeds.
+            </ul>
+        </ul> 
+    <p>
+        <li><b>Core: Transfer file via FTP/SFTP</b>
         <ul>
-            <li>Millisecond(s)
-            <li>Second(s)
-            <li>Minute(s)
-            <li>Hour(s)
-        </ul>
-        <li>Confirm that the default unit is <b>Second(s)</b>.
-        <li>Confirm that the property page includes a <b>Sleep for a random amount of time between
-        1 millisecond and specified time</b> check box.
-        <li>Confirm that settings are persistent.
-<p>
-        <li>Confirm that the task sleeps for an appropriate amount of time
-        <ul>
-            <li>some number of <b>milliseconds</b>.
-            <li>some number of <b>milliseconds</b> with a random sleep.
-            <li>some number of <b>seconds</b>.
-            <li>some number of <b>seconds</b> with a random sleep.
-            <li>some number of <b>minutes</b>.
-            <li>some number of <b>minutes</b> with a random sleep.
-            <li>some number of <b>hours</b>.
-            <li>some number of <b>hours</b> with a random sleep.
-        </ul>
-<p>
-        <li>Sleep is a cancellable task
-        <ul>
-            <li>Configure an FPS file with a <b>Core: Sleep</b> task followed by at least one
-            additional task.
-            <li>Start processing in the FAM.
-            <li>Stop processing during the time in which the Sleep task is active.
-            <li>Confirm that processing stops immediately.
-            <li>Confirm that subsequent tasks <b>are not</b> executed.
-            <li>Confirm that progress status is updated as sleep proceeds.
-        </ul>
-    </ul> 
+            <li>Confirm that a <b>Core: Transfer file via FTP/SFTP</b> tassk exists.</li>
+            <li>Confirm that it requires a special license.</li>
+            <li>Confirm that the configuration dialog has a <b>General Settings</b> tab and a
+            <b>Connection Settings</b> tab.</li>
+        <p>
+            <li><b>General Settings</b>
+            <ul>
+                <li>Confirm that there is a group box for <b>Select file operation</b> and that it
+                contains the following radio buttons
+                <ul>
+                    <li><b>Upload file to remote server (selected by default)</b></li>
+                    <li><b>Download file from remote server</b></li>
+                    <li><b>Delete file on remote server</b></li>
+                </ul></lI>
+                <li>Confirm that there is a group box for <b>File paths</b> and that it contains
+                the following controls
+                <ul>
+                    <li><b>Remote filename</b> text box with associated tag selector</li>
+                    <li><b>Local filename</b> text box with a default value of 
+                    <b>&lt;SourceDocName&gt;</b> and associated tag selector and browse 
+                    button.</li>
+                </ul></LI>
+            <p>
+                <li>Confirm that all the controls work as expected.</li>
+                <li>Confirm that the <b>Local filename</b> text box is disabled when the
+                <b>Delete file</b> option is selected.</li>
+            </ul></li>
+        <p>
+            <li><b>Connection Settings</b>
+            <ul>
+                <li>Confirm the presence of a grid for the following settings:
+                <ul>
+                    <li>Protocol</li>
+                    <li>Server Address</li>
+                    <li>Server Port</li>
+                    <li>User Name</li>
+                    <li>Password</li>
+                </ul></li>
+                <li>Confirm the presence of a box with a text description of the currently-selected
+                connection setting.</li>
+                <li>Confirm the presence of a <b>Show advanced connection settings</b> checkbox,
+                unchecked by default.</li>
+                <li>Confirm that when it is checked, more settings become available in the 
+                Connection settings grid.</li>
+                <li>Confirm the presence of a <b>Number of retries</b> spin control with a default
+                value of <b>1000</b>.</li>
+                <li>Confirm the prsence of a <b>Time between retries</b> edit box with a default
+                value of <b>1000</b>.</li>
+                <li>Confirm the presence of a <b>Test Connection</b> button.</li>
+            <p>
+                <li>Confirm that all controls work as expected and all settings are persisted
+                correctly.</li>
+            </ul></li>
+        <p>
+            <li>Confirm that files can be uploaded to an FTP site.</li>
+            <li>Confirm that files can be downloaded from an FTP site.</li>
+            <li>Confirm that files can be deleted from an FTP site.</li>
+            <li>Confirm that all available connection protocols work as expected.</li>
+        <p>
+            <li>Confirm that the task will retry an operation if a failure occurs.</li>
+            <li>Confirm that the task allows the use of the <b>&lt;RemoteSourceDocName&gt;</b> tag
+            whose value is obtained from an associated <b>.info</b> file.</li>
+            <li>Confirm that if the tag is used and the .info file does not exist, an exception is
+            thrown.</li>
+        </ul></li>
 </ul>
 </ol>
 </body>
