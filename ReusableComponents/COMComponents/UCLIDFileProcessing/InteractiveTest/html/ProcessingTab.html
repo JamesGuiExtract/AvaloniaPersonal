@@ -10,492 +10,443 @@
 <hr>
 <b>Setup</b>
 <ul>
-    <li>Launch <b>File Action Manager</b>.</li> 
-    <li>Select a <b>Database Server</b> and a <b>Database</b>.</li> 
-    <li>Select an <b>Action</b>.</li> 
-    <li>Confirm checking the <b>Process files in the queue for this action</b> checkbox in the 
-    Action tab creates two new tabs: Processing Setup and Processing Log.</li>
-    <li>Confirm that clearing the <b>Process files in the queue for this action</b> checkbox makes
-    Processing Setup and Processing Log tabs disappear.</li> 
-    <li>Confirm the setting of the checkbox is persistent.</li>
+ 	<li>Launch <b>File Action Manager</b>.</li> 
+ 	<li>Select a <b>Database Server</b> and a <b>Database</b>.</li> 
+ 	<li>Select an <b>Action</b>.</li> 
+    	<li>Confirm checking the <b>Process files in the queue for this action</b> checkbox in 
+	the Action tab creates two new tabs: Processing Setup and Processing Log.</li>
+    	<li>Confirm that clearing the <b>Process files in the queue for this action</b> checkbox 
+	makes Processing Setup and Processing Log tabs disappear.</li> 
+    	<li>Confirm the setting of the checkbox is persistent.</li>
 </ul>
 <p>
 <b>Processing Setup Tab</b>
 <ul>
-    <li>Confirm that the <b>Processing Setup</b> tab has Add, Remove, and Configure buttons as well
-    as Up and Down arrows.</li> 
-    <li>Confirm the initial state of <b>Add</b> button is enabled, and disabled for <b>Remove</b>, 
-    <b>Configure</b>, <b>Up</b> and <b>Down</b> arrows.</li> 
-    <li>Confirm that resizing the <b>File Action Manager</b> appropriately adjusts the size and 
-    position of the Processing Setup controls.</li> 
-    <LI><b>[LegacyRC #5603, FlexIDSCore #3578]</b> Confirm that copying and pasting tasks in the
-    FAM properly includes the enabled checkbox and properly processes only the enabled tasks.
+    	<li>Confirm that the <b>Processing Setup</b> tab has Add, Remove, and Configure buttons 
+	as well as Up and Down arrows.</li> 
+    	<li>Confirm the initial state of <b>Add</b> button is enabled, and disabled for 
+	<b>Remove</b>, <b>Configure</b>, <b>Up</b> and <b>Down</b> arrows.</li> 
+    	<li>Confirm that resizing the <b>File Action Manager</b> appropriately adjusts the size 
+	and position of the Processing Setup controls.</li> 
+    	<LI><b>[LegacyRC #5603, FlexIDSCore #3578]</b> Confirm that copying and pasting tasks in 
+	the FAM properly includes the enabled checkbox and properly processes only the enabled 
+	tasks.
 <p>
-    <li>Confirm the Processing Setup tab has a <b>If any of the above tasks fail</b> groupbox.</li>
-    <ul> 
-        <li>Confirm existence of a <b>Log the details of the error to the following file</b> 
-        checkbox.
-        <li>Confirm that the check box is enabled during setup.
-        <li>Confirm that the checkbox is unchecked by default.
-        <li>Confirm that the associated edit box is enabled only when the checkbox is checked.
-        <li>Confirm that the associated <b>Tag Selector</b> is enabled only when the checkbox is
-        checked.
-        <li>Confirm that the associated <b>...</b> ( Browse ) button is enabled only when the 
-        checkbox is checked.
+    	<li>Confirm the Processing Setup tab has a <b>If any of the above tasks fail</b> 
+	groupbox.</li>
+    	<ul> 
+        	<li>Confirm existence of a <b>Log the details of the error to the following file</b> 
+        	checkbox.
+        	<li>Confirm that the check box is enabled during setup.
+        	<li>Confirm that the checkbox is unchecked by default.
+        	<li>Confirm that the associated edit box is enabled only when the checkbox is 
+		checked.
+        	<li>Confirm that the associated <b>Tag Selector</b> is enabled only when the 
+		checkbox is checked.
+        	<li>Confirm that the associated <b>...</b> ( Browse ) button is enabled only when 
+		the checkbox is checked.
 <p>
-        <li>Confirm existence of a <b>Execute the following task</b> checkbox.
-        <li>Confirm that the checkbox is unchecked by default.
-        <li>Confirm that the associated <b>Commands &gt;</b> button is enabled only when the 
-        checkbox is checked.
-        <li>Confirm that the <b>Commands &gt;</b> button displays a drop-down menu. 
-        <ul>
-            <li>Confirm that the drop-down menu includes: <b>Select Task...</b>, <b>Configure 
-            Task...</b>, <b>Configure description...</b> and <b>Cancel</b>.
-            <li>Confirm that <b>Select Task...</b> displays a Select Task dialog and allows the
-            user to select and configure a task.
-            <li>Confirm that <b>Configure Task...</b> is enabled only when a task has previously
-            been selected and configured.
-            <li>Confirm that <b>Configure Task...</b> displays the settings dialog appropriate for
-            the previously configured task.
-            <li>Confirm that <b>Configure description...</b> is enabled only when a task has 
-            previously been selected and configured.
-            <li>Confirm that <b>Configure description...</b> displays a Configure description
-            dialog.
-        </ul>
+        	<li>Confirm existence of a <b>Execute the following task</b> checkbox.
+        	<li>Confirm that the checkbox is unchecked by default.
+        	<li>Confirm that the associated <b>Commands &gt;</b> button is enabled only when 
+		the checkbox is checked.
+        	<li>Confirm that the <b>Commands &gt;</b> button displays a drop-down menu. 
+        	<ul>
+            		<li>Confirm that the drop-down menu includes: <b>Select Task...</b>, 
+			<b>Configure Task...</b>, <b>Configure description...</b> and <b>Cancel</b>.
+            		<li>Confirm that <b>Select Task...</b> displays a Select Task dialog and 
+			allows the user to select and configure a task.
+            		<li>Confirm that <b>Configure Task...</b> is enabled only when a task has 
+			previously been selected and configured.
+            		<li>Confirm that <b>Configure Task...</b> displays the settings dialog 
+			appropriate for the previously configured task.
+            		<li>Confirm that <b>Configure description...</b> is enabled only when a 
+			task has previously been selected and configured.
+            		<li>Confirm that <b>Configure description...</b> displays a Configure 
+			description dialog.
+        	</ul>
 <p>
-        <li><b>[LegacyRC #4564]</b> Confirm that <b>Double-click</b> on the <b>Execute the 
-        following task</b> edit box displays the appropriate settings dialog for the previously
-        configured task.
-        <li>Confirm that <b>Ctrl+Double-click</b> on the <b>Execute the following task</b> edit box
-        displays the Select Task dialog.
-        <li>Confirm that <b>Alt+Double-click</b> on the <b>Execute the following task</b> edit box
-        displays the Configure description dialog.
-        <LI><b>[FlexIDSCore #4227, #4257]</b> Double-clicking read-only text boxes
-        <!-- fixed v 8.1.0.5 -->
-        <ul>
-            <li>On Server 2008, Server 2008R2, or Windows 7, confirm the following behavior:
-            <ul>
-                <li>In the FAM, configure a task in the <b>Execute the following task</b> box.
-                <li>Double-click on the task to reopen the property page.
-                <li>Confirm that the text of the read-only label has not been copied to the 
-                clipboard.
-            </ul>
-        </ul>
+        	<li><b>[LegacyRC #4564]</b> Confirm that <b>Double-click</b> on the <b>Execute 
+		the following task</b> edit box displays the appropriate settings dialog for the 
+		previously configured task.
+        	<li>Confirm that <b>Ctrl+Double-click</b> on the <b>Execute the following task</b> 
+		edit box displays the Select Task dialog.
+        	<li>Confirm that <b>Alt+Double-click</b> on the <b>Execute the following task</b> 
+		edit box displays the Configure description dialog.
+        	<LI><b>[FlexIDSCore #4227, #4257]</b> Double-clicking read-only text boxes
+        	<!-- fixed v 8.1.0.5 -->
+        	<ul>
+            		<li>On Server 2008, Server 2008R2, or Windows 7, confirm the following 
+			behavior:
+            		<ul>
+                		<li>In the FAM, configure a task in the <b>Execute the following 
+				task</b> box.
+                		<li>Double-click on the task to reopen the property page.
+                		<li>Confirm that the text of the read-only label has not been 
+				copied to the Clipboard.
+            		</ul>
+        	</ul>
 <p>
-        <li><b>[LegacyRC #4924]</b> Shortcut keys for Context menu commands
-        <ul>
-            <li>Confirm that <b>Ctrl+X</b> works for <b>Cut</b>.
-            <li>Confirm that <b>Ctrl+C</b> works for <b>Copy</b>.
-            <li>Confirm that <b>Ctrl+V</b> works for <b>Paste</b>.
-            <li>Confirm that <b>DEL</b> works for <b>Delete</b>.
-        </ul>
-    </ul> 
+        	<li><b>[LegacyRC #4924]</b> Shortcut keys for Context menu commands
+        	<ul>
+            		<li>Confirm that <b>Ctrl+X</b> works for <b>Cut</b>.
+            		<li>Confirm that <b>Ctrl+C</b> works for <b>Copy</b>.
+            		<li>Confirm that <b>Ctrl+V</b> works for <b>Paste</b>.
+            		<li>Confirm that <b>DEL</b> works for <b>Delete</b>.
+        	</ul>
+    	</ul> 
 <p>
-    <li>Confirm the Processing Setup tab has a <b>File processing scope</b> groupbox with two radio
-    buttons.
-    <ul>
-        <li>Confirm that the default setting is <b>Process all files in the queue</b>
-        <li>Confirm that with the default setting, the drop-down box is <b>disabled</b>.
-        <li>Confirm that selecting the <b>Process all files that skipped</b> radio button enables
-        the drop-down box.
-        <li>Confirm that the drop-down box contains the options <b>I</b> and <b>all users</b>.
-        <LI><b>[LegacyRC #5413, #5414]</b> DB setting for requiring password before processing all
-        skipped files
-        <ul>
-            <li>Confirm that a <b>DBInfo</b> setting for 
-            <b>RequirePasswordToProcessAllSkippedFiles</b> exists.
-            <li>Confirm that the default setting is enabled.
-            <li>Confirm that when <b>RequirePasswordToProcessAllSkippedFiles</b> is enabled, the DB
-            Admin password <b>is required</b> in order to process all skipped files.
-            <li><b>[LegacyRC #5419]</b> Confirm that clicking <b>Cancel</b> from the password 
-            dialog returns to the FAM without starting processing.
-            <li>Confirm that when <b>RequirePasswordToProcessAllSkippedFiles</b> is disabled, the 
-            DB Admin password <b>is not required</b> in order to process all skipped files.
-        </ul>
-        <li><b>[LegacyRC #5853]</b> Processing skipped files
-        <!-- fixed v 8.1.0.46 -->
-        <ul>
-            <li>Log in to a test machine as a domain user.
-            <li>Verify some files; skip some.
-            <li>Log out and log back in as the local admin. Configure the .fps file to process all
-            files skipped by any user.
-            <li>Reverify the skipped files; skip them again.
-            <li>Modify the .fps file to process all files skipped by the current user; hit play.
-            <li>Confirm that the files are presented for verification.
-        </ul>
-        <li>Confirm that the <b>File processing scope</b> controls are disabled while processing is
-        active.
-    </ul>
+    	<li>Confirm the Processing Setup tab has a <b>File processing scope</b> groupbox with 
+	two radio buttons.
+    	<ul>
+        	<li>Confirm that the default setting is <b>Process all files in the queue</b>
+        	<li>Confirm that with the default setting, the drop-down box is <b>disabled</b>.
+        	<li>Confirm that selecting the <b>Process all files that skipped</b> radio 
+		button enables the drop-down box.
+        	<li>Confirm that the drop-down box contains the options <b>I</b> and <b>all 
+		users</b>.
+        	<LI><b>[LegacyRC #5413, #5414]</b> DB setting for requiring password before 
+		processing all skipped files
+        	<ul>
+            		<li>Confirm that a <b>Database Settings</b> field for <b>Require FAM 
+			database administrator password to process all skipped files</b> exists.
+            		<li>Confirm that the default setting is enabled.
+            		<li>Confirm that when the check box is checked, the DB Admin password 
+			<b>is required</b> in order to process all skipped files.
+            		<li>Confirm that when the check box is unchecked, the DB Admin password 
+			<b>is not required</b> in order to process all skipped files.
+        	</ul>
+        	<li><b>[LegacyRC #5853]</b> Processing skipped files
+        	<!-- fixed v 8.1.0.46 -->
+        	<ul>
+            		<li>Log in to a test machine as a domain user.
+            		<li>Verify some files; skip some.
+            		<li>Log out and log back in as the local admin. Configure the .fps file 
+			to process all files skipped by any user.
+            		<li>Reverify the skipped files; skip them again.
+            		<li>Modify the .fps file to process all files skipped by the current user; 
+			hit play.
+            		<li>Confirm that the files are presented for verification.
+        	</ul>
+        	<li>Confirm that the <b>File processing scope</b> controls are disabled while 
+		processing is active.
+    	</ul>
 <p>
-    <li>Confirm the Processing Setup tab has an <b>Advanced...</b> button that brings up the
-    <b>Advanced Processing Configuration</b> dialog.
-    <ul>
-        <li>Confirm the Advanced Processing Configuration dialog has a <b>Processing schedule</b> 
-        groupbox with a check box and a button.
-        <ul> 
-            <LI>Confirm that the group box contains a <b>Limit processing to certain days/times</b>
-            check box.</li>
-            <LI>Confirm that the check box is <b>unchecked</b> by default.</li>
-            <LI>Confirm that the group box contains a <b>Set schedule...</b> button.</li>
-            <LI>Confirm that the button is enabled only when the check box is checked.</li>
-    <p>
-            <LI>Confirm that clicking the button displays a <b>Set Processing Schedule</b> 
-            dialog.</li>
-            <LI>Confirm that the <b>Set Processing Schedule</b> dialog includes a multi-column 
-            grid with hours and days of the week.</li>
-            <LI>Confirm that the <b>Set Processing Schedule</b> dialog includes <b>OK</b> and 
-            <b>Cancel</b> buttons.</li>
-            <LI>Confirm that the <b>Set Processing Schedule</b> dialog includes <b>Select all</b>
-            and <b>Select none</b> buttons.</li>
-            <LI>Confirm that <b>Select all</b> changes all of the grid cells to green.</li>
-            <LI>Confirm that <b>Select none</b> changes all of the grid cells to white.</li>
-            <LI>Confirm that clicking in a grid cell toggles the color between white and 
-            green.</li>
-            <li>Confirm that clicking in the upper left cell of the grid (i.e., the cell left of
-            "Sun") inverts the current selection.</li>
-    <p>
-            <LI>Confirm that schedule settings are loaded and saved correctly.</li>
-        </ul></li>
-    <p>
-        <li>Confirm the Advanced Processing Configuration dialog has a <b>Continuous processing</b>
-        groupbox with two radio buttons.
-        <ul> 
-            <li>Confirm the default setting is <b>Stop processing once the queue is empty</b>.</li>
-            <li>Confirm the setting of the radio button is persistent.</li>
-        <p>
-            <LI><b>[LegacyRC #5745]</b> Default CPU usage when waiting for files
-            <ul>
-                <li>Prepare an FPS file to process files where it will <b>Keep processing files
-                as they are added to the queue</b>.</li>
-                <li>Confirm that very little CPU usage is noted while the FPS file is just
-                waiting for a file to process.</li>
-                <li>Examine the <b>MillisecondsBetweenDBCheck</b> registry key under 
-                <b>HKCU/Software/Extract 
-                Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.</li>
-                <li>Confirm that the default is <b>2000</b>.</li>
-                <li>Confirm that changing the value to <b>20</b> increases to CPU usage while the
-                FPS file is waiting.</li>
-            </ul></li>
-        </ul></li>
-    <p>
-        <li>Confirm the Advanced Processing Configuration dialog has a <b>Threads for 
-        processing</b> groupbox with two radio buttons.
-        <ul> 
-            <li>Confirm the default setting is <b>Achieve peak performance</b>.</li>
-            <li>Confirm that with the default setting, the edit box and spin control associated
-            with the other radio button are both <b>disabled</b>.</li>
-            <li>Confirm that with the <b>Use threads</b> setting, the edit box and spin control 
-            are both enabled.</li>
-            <li>Confirm the setting of the radio button is persistent.</li>
-            <li><b>[LegacyRC #4312]</b> Confirm that the number of threads setting remains
-            persistent.</li>
-            <li><b>[LegacyRC #4811]</b> Confirm that the edit box is disabled after the
-            processing has completed if the <b>Use threads</b> radio button is not selected.</li>
-            <li><b>[LegacyRC #4314]</b> Confirm that the edit box is enabled after the processing
-            has completed only if the <b>Use threads</b> radio button is selected.</li>
-            <LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab allows no 
-            more than <b>100</b> threads via the spinner control.</li>
-            <LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab allows no 
-            more than <b>100</b> threads via the associated edit box.</li>
-        </ul> </li>
-    <p>
-        <li>Confirm that the Advanced Processing Configuration dialog has a <b>Files to 
-        retrieve</b> group box
-        <ul>
-            <li>Confirm that the group box contains a spin control for <b>Retrieve X file(s) at a
-            time from the queue</b>.</li>
-            <li>Confirm that the spin control is restricted to values from 1-5000 inclusives.</li>
-            <li>Confirm that settings are persisted.</li>
-            <li>Confirm that the specified number of files are grabbed by the FAM when you start
-            processing.</li>
-        </ul></li>
-    <p>
-        <li>Confirm that the <b>Advanced...</b> button is disabled while the FAM is 
-        processing.</li>
-    </ul></li>
+    	<li>Confirm the Processing Setup tab has an <b>Advanced...</b> button that brings up the
+    	<b>Advanced Processing Configuration</b> dialog.
+    	<ul>
+        	<li>Confirm the Advanced Processing Configuration dialog has a <b>Processing 
+		schedule</b> groupbox with a check box and a button.
+        	<ul> 
+            		<LI>Confirm that the group box contains a <b>Limit processing to certain 
+			days/times</b> check box.</li>
+            		<LI>Confirm that the check box is <b>unchecked</b> by default.</li>
+            		<LI>Confirm that the group box contains a <b>Set schedule...</b> button.</li>
+            		<LI>Confirm that the button is enabled only when the check box is checked.</li>
 <p>
-    <li><b>Drag and drop</b> any .fps file into File Action Manager.
-    <li>Confirm that once processing starts, the <b>Add</b>, <b>Remove</b>, <b>Configure</b> 
-    buttons, the <b>Up</b> and <b>Down</b> arrows and the controls for <b>Keep processing files as 
-    they are added to the queue</b>, and <b>Threads for processing</b> are all disabled in 
-    Processing Setup tab.
+            		<LI>Confirm that clicking the button displays a <b>Set Processing Schedule</b> 
+            		dialog.</li>
+            		<LI>Confirm that the <b>Set Processing Schedule</b> dialog includes a multi-column 
+            		grid with hours and days of the week.</li>
+            		<LI>Confirm that the <b>Set Processing Schedule</b> dialog includes <b>OK</b> and 
+            		<b>Cancel</b> buttons.</li>
+            		<LI>Confirm that the <b>Set Processing Schedule</b> dialog includes <b>Select 
+			all</b> and <b>Select none</b> buttons.</li>
+            		<LI>Confirm that <b>Select all</b> changes all of the grid cells to green.</li>
+            		<LI>Confirm that <b>Select none</b> changes all of the grid cells to white.</li>
+            		<LI>Confirm that clicking in a grid cell toggles the color between white and 
+            		green.</li>
+            		<li>Confirm that clicking in the upper left cell of the grid (i.e., the cell 
+			left of "Sun") inverts the current selection.</li>
 <p>
-    <li>Confirm the <b>Add</b> button in Processing Setup tab brings up the <b>Select Task</b> 
-    dialog.</li> 
-    <li><b>[LegacyRC #4732]</b> Confirm that adding tasks adds the new tasks below the first 
-    selected task.</li> 
-    <li><b>[LegacyRC #4732]</b> Confirm that adding tasks adds the new tasks at the bottom of the 
-    list if no tasks are selected.</li> 
-    <li><b>[LegacyRC #4376]</b> Begin with a new FPS file.  Add and configure a task.  Modify some 
-    settings for the task.  Confirm that the FPS file can be saved - indicating that the modified 
-    task is still enabled within the code.</li> 
-    <li>Confirm highlighting a task in listbox activates the <b>Remove</b> and <b>Commands &gt;</b> 
-    buttons.</li> 
-    <li>Confirm <b>CTRL+Left Click</b> allows for multiple selection of listbox items.</li> 
-    <li>Confirm <b>Shift+Left Click</b> allows for multiple selection of list box items. 
-    <li>Confirm pressing the <b>Remove</b> button brings up the <b>Confirm Delete</b> dialog.</li>
-    <ul>
-        <li>Confirm the <b>Yes</b> button deletes the selected item(s).</li>
-        <li>Confirm the <b>No</b> button does not delete the selected item(s).</li> 
-    </ul>
-    <li>Confirm the <b>Remove</b> button can delete multiple items.</li> 
-    <li>Confirm <b>Commands &gt;</b> button brings up a drop-down menu.</li> 
-    <ul>
-        <li>Confirm <b>Select Task...</b> exists.</li>
-        <li>Confirm <b>Select Task...</b> brings up the <b>Select Task</b> dialog.</li> 
-        <li>Confirm that the <b>Select Task</b> dialog defaults to the existing task.</li> 
-        <li>Confirm that the <b>Select Task</b> dialog combo box does <b>not</b> include 
-        <b>&lt;None&gt;</b> at the top of the list.</li> 
-        <li>Select and configure a different file processor and confirm that the new task replaces
-        the previous task.</li>
-        <li>Select and configure a different file processor and then <b>Cancel</b> the changes from
-        the Select Task dialog.  Confirm that the existing task is retained.</li>
+            		<LI>Confirm that schedule settings are loaded and saved correctly.</li>
+        	</ul></li>
 <p>
-        <li>Confirm <b>Configure Task...</b> exists.</li>
-        <li>Confirm <b>Configure Task...</b> directly displays the configured settings for the 
-        existing task.</li>
-        <li>Modify the settings and confirm that the new settings replace the existing 
-        settings.</li>
-        <li>Modify the settings and then <b>Cancel</b> the changes from the property page. Confirm
-        that the existing settings are retained.</li>
+        	<li>Confirm the Advanced Processing Configuration dialog has a <b>Continuous processing</b>
+        	groupbox with two radio buttons.
+        	<ul> 
+            		<li>Confirm the default setting is <b>Stop processing once the queue is empty</b>.</li>
+            		<li>Confirm the setting of the radio button is persistent.</li>
 <p>
-        <li>Confirm <b>Configure description...</b> exists.</li>
-        <li>Confirm <b>Configure description...</b> displays a Configure description dialog.</li>
-        <li>Modify the description and confirm that the new description replaces the existing 
-        description.</li>
-        <li>Confirm that the previously defined object settings are retained.</li>
-        <li>Modify the description and then <b>Cancel</b> the changes from the dialog. Confirm that
-        the existing description is retained.</li>
-    </ul>
-    <li>Confirm that <b>Double-click</b> on a task brings up the Configure task dialog.</li> 
-    <li>Confirm that <b>Ctrl + Double-click</b> on a task brings up the Select task dialog.</li> 
-    <li>Confirm that <b>Alt + Double-click</b> on a task brings up the Configure description 
-    dialog.</li> 
-    <li>Confirm for each above dialog that the <b>OK</b> button saves changes and exits the 
-    dialog.</li> 
-    <li>Confirm for each above dialog that the <b>Cancel</b> button ignores changes and exits the
-    dialog.</li> 
+            		<LI><b>[LegacyRC #5745]</b> Default CPU usage when waiting for files
+            		<ul>
+                		<li>Prepare an FPS file to process files where it will <b>Keep processing 
+				files as they are added to the queue</b>.</li>
+                		<li>Confirm that very little CPU usage is noted while the FPS file is just
+                		waiting for a file to process.</li>
+                		<li>Examine the <b>MillisecondsBetweenDBCheck</b> registry key under 
+                		<b>HKCU/Software/Extract 
+                		Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.</li>
+                		<li>Confirm that the default is <b>2000</b>.</li>
+                		<li>Confirm that changing the value to <b>20</b> increases the CPU usage 
+				while the FPS file is waiting.</li>
+            		</ul></li>
+        	</ul></li>
 <p>
-    <li>Confirm <b>Up arrow</b> button moves the selected item up in the list box and retains the
-    checkbox setting.</li> 
-    <li>Confirm <b>Down arrow</b> button moves the selected item down in the list box and retains
-    the checkbox setting.</li> 
-    <li>Confirm <b>Up</b> and <b>Down</b> arrow buttons become inactive when reaching top or bottom
-    of the list, respectively.</li> 
-    <li>Confirm <b>Right Click</b> on list box displays context menu.</li><br> 
+        	<li>Confirm the Advanced Processing Configuration dialog has a <b>Threads for 
+        	processing</b> groupbox with two radio buttons.
+        	<ul>
+            		<li>Confirm the default setting is <b>Achieve peak performance</b>.</li>
+            		<li>Confirm that with the default setting, the edit box and spin control 
+			associated with the other radio button are both <b>disabled</b>.</li>
+            		<li>Confirm that with the <b>Use threads</b> setting, the edit box and spin 
+			control are both enabled.</li>
+            		<li>Confirm the settings are persistent.</li>
+            		<LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab 
+			allows no more than <b>100</b> threads via the spinner control.</li>
+            		<LI><b>[LegacyRC #5491]</b> Confirm that the <b>Processing Setup</b> tab 
+			allows no more than <b>100</b> threads via the associated edit box.</li>
+        	</ul> </li>
 <p>
-    <li><b>Context Menu Options</b></li> 
-    <ul>
-        <li>Confirm <b>Cut</b> exists.</li>
-        <li>Confirm that <b>Cut</b> is only enabled when one or more tasks are selected.</li> 
-        <li>Confirm that clicking on <b>Cut</b> brings up the <b>Confirm Delete</b> dialog.</li>
-        <li>Confirm items can be successfully cut to the clipboard.</li> 
-        <li>Confirm <b>Cut</b> can successfully cut multiple items.</li> 
+        	<li>Confirm that the Advanced Processing Configuration dialog has a <b>Files to 
+        	retrieve</b> group box
+        	<ul>
+            		<li>Confirm that the group box contains a spin control for <b>Retrieve X 
+			file(s) at a time from the queue</b>.</li>
+            		<li>Confirm that the spin control is restricted to values from <b>1-5000</b> 
+			inclusive.</li>
+            		<li>Confirm that settings are persistent.</li>
+            		<li>Confirm that the specified number of files are grabbed by the FAM when 
+			you start processing.</li>
+        	</ul></li>
 <p>
-        <li>Confirm <b>Copy</b> exists.</li> 
-        <li>Confirm that <b>Copy</b> is only enabled when one or more tasks are selected.</li> 
-        <li>Confirm items can be successfully copied to the clipboard.</li> 
-        <li>Confirm <b>Copy</b> can successfully copy multiple items.</li> 
+        	<li>Confirm that the <b>Advanced...</b> button is disabled while the FAM is 
+        	processing.</li>
+    	</ul></li>
 <p>
-        <li>Confirm <b>Paste</b> exists.</li> 
-        <li>Confirm that <b>Paste</b> is only enabled if one or more file processing tasks are
-        already in the clipboard.</li> 
-        <li>Confirm that single items can be successfully pasted from clipboard.</li> 
-        <li>Confirm <b>Paste</b> can successfully paste multiple cut or copied items.</li>
-        <li><b>[LegacyRC #4377]</b> Confirm that plain text cannot be pasted in the list of File 
-        Processors.  (From Notepad, copy some text into the clipboard and then try to paste the
-        text into the list box.)</li>
+    	<li><b>Drag and drop</b> any .fps file into File Action Manager.
+    	<li>Confirm that once processing starts, the <b>Add</b>, <b>Remove</b>, <b>Configure</b> 
+    	buttons, the <b>Up</b> and <b>Down</b> arrows and the controls for <b>Keep processing 
+	files as they are added to the queue</b>, and <b>Threads for processing</b> are all 
+	disabled in the Processing Setup tab.
 <p>
-        <li>Confirm <b>Delete</b> exists.</li>
-        <li>Confirm that <b>Delete</b> is only enabled when one or more tasks is selected.</li> 
-        <li>Confirm that a single item can be deleted successfully.</li>
-        <li>Confirm <b>Delete</b> can successfully delete multiple items.</li>
-        <li>Confirm that clicking on <b>Delete</b> brings up the <b>Confirm Delete</b> dialog.</li>
+    	<li>Confirm the <b>Add</b> button in Processing Setup tab brings up the <b>Select Task</b> 
+    	dialog.</li> 
+    	<li>Confirm highlighting a task in listbox activates the <b>Remove</b> and 
+	<b>Commands &gt;</b> buttons.</li> 
+    	<li>Confirm <b>CTRL+Left Click</b> allows for multiple selection of listbox items.</li> 
+    	<li>Confirm <b>Shift+Left Click</b> allows for multiple selection of list box items. 
+    	<li>Confirm pressing the <b>Remove</b> button brings up the <b>Confirm Delete</b> dialog.</li>
+    	<ul>
+        	<li>Confirm the <b>Yes</b> button deletes the selected item(s).</li>
+        	<li>Confirm the <b>No</b> button does not delete the selected item(s).</li> 
+    	</ul>
+    	<li>Confirm the <b>Remove</b> button can delete multiple items.</li> 
+    	<li>Confirm <b>Commands &gt;</b> button brings up a drop-down menu.</li> 
+    	<ul>
+        	<li>Confirm <b>Select Task...</b> exists.</li>
+        	<li>Confirm <b>Select Task...</b> brings up the <b>Select Task</b> dialog.</li> 
+        	<li>Confirm that the <b>Select Task</b> dialog defaults to the existing task.</li> 
+        	<li>Confirm that the <b>Select Task</b> dialog combo box does <b>not</b> include 
+        	<b>&lt;None&gt;</b> at the top of the list.</li> 
+        	<li>Select and configure a different file processor and confirm that the new task 
+		replaces the previous task.</li>
+        	<li>Select and configure a different file processor and then <b>Cancel</b> the 
+		changes from the Select Task dialog.  Confirm that the existing task is retained.</li>
 <p>
-        <li>Confirm <b>Cancel</b> exists and is always enabled.</li>
-        <li>Confirm <b>Cancel</b> exits context menu.</li>
-    </ul> 
+        	<li>Confirm <b>Configure Task...</b> exists.</li>
+        	<li>Confirm <b>Configure Task...</b> directly displays the configured settings for 
+		the existing task.</li>
+        	<li>Modify the settings and confirm that the new settings replace the existing 
+        	settings.</li>
+        	<li>Modify the settings and then <b>Cancel</b> the changes from the property page. 
+		Confirm that the existing settings are retained.</li>
+<p>
+        	<li>Confirm <b>Configure description...</b> exists.</li>
+        	<li>Confirm <b>Configure description...</b> displays a Configure description dialog.</li>
+        	<li>Modify the description and confirm that the new description replaces the existing 
+        	description.</li>
+        	<li>Confirm that the previously defined object settings are retained.</li>
+        	<li>Modify the description and then <b>Cancel</b> the changes from the dialog. Confirm 
+		that the existing description is retained.</li>
+    	</ul>
+    	<li>Confirm that <b>Double-click</b> on a task brings up the Configure task dialog.</li> 
+    	<li>Confirm that <b>Ctrl + Double-click</b> on a task brings up the Select task dialog.</li> 
+    	<li>Confirm that <b>Alt + Double-click</b> on a task brings up the Configure description 
+    	dialog.</li> 
+    	<li>Confirm for each above dialog that the <b>OK</b> button saves changes and exits the 
+    	dialog.</li> 
+    	<li>Confirm for each above dialog that the <b>Cancel</b> button ignores changes and exits the
+    	dialog.</li> 
+<p>
+    	<li>Confirm <b>Up arrow</b> button moves the selected item up in the list box and retains the
+    	checkbox setting.</li> 
+    	<li>Confirm <b>Down arrow</b> button moves the selected item down in the list box and retains
+    	the checkbox setting.</li> 
+    	<li>Confirm <b>Up</b> and <b>Down</b> arrow buttons become inactive when reaching top or bottom
+    	of the list, respectively.</li> 
+    	<li>Confirm <b>Right Click</b> on list box displays context menu.</li><br> 
+<p>
+    	<li><b>Context Menu Options</b></li> 
+    	<ul>
+        	<li>Confirm <b>Cut</b> exists.</li>
+        	<li>Confirm that <b>Cut</b> is only enabled when one or more tasks are selected.</li> 
+        	<li>Confirm that clicking on <b>Cut</b> brings up the <b>Confirm Delete</b> dialog.</li>
+        	<li>Confirm items can be successfully cut to the Clipboard.</li> 
+        	<li>Confirm <b>Cut</b> can successfully cut multiple items.</li> 
+<p>
+        	<li>Confirm <b>Copy</b> exists.</li> 
+        	<li>Confirm that <b>Copy</b> is only enabled when one or more tasks are selected.</li> 
+        	<li>Confirm items can be successfully copied to the Clipboard.</li> 
+        	<li>Confirm <b>Copy</b> can successfully copy multiple items.</li> 
+<p>
+        	<li>Confirm <b>Paste</b> exists.</li> 
+        	<li>Confirm that <b>Paste</b> is only enabled if one or more file processing tasks 
+		are already in the Clipboard.</li> 
+        	<li>Confirm that single items can be successfully pasted from the Clipboard.</li> 
+        	<li>Confirm <b>Paste</b> can successfully paste multiple cut or copied items.</li>
+        	<li><b>[LegacyRC #4377]</b> Confirm that plain text cannot be pasted in the list 
+		of File Processors.  (From Notepad, copy some text into the clipboard and then try 
+		to paste the text into the list box.)</li>
+<p>
+        	<li>Confirm <b>Delete</b> exists.</li>
+        	<li>Confirm that <b>Delete</b> is only enabled when one or more tasks is selected.</li> 
+        	<li>Confirm that a single item can be deleted successfully.</li>
+        	<li>Confirm <b>Delete</b> can successfully delete multiple items.</li>
+        	<li>Confirm that clicking on <b>Delete</b> brings up the <b>Confirm Delete</b> dialog.</li>
+<p>
+        	<li>Confirm <b>Cancel</b> exists and is always enabled.</li>
+        	<li>Confirm <b>Cancel</b> exits the context menu.</li>
+    	</ul> 
 </ul>
 <p>
 <b>Processing Log Tab</b>
 <ul> 
-    <li>Confirm that the <b>Processing Log</b> tab has three separate display areas: Files 
-    currently being processed, Files that completed processing recently, Files that failed 
-    processing recently.</li> 
-    <li>Confirm that the <b>Files currently being processed</b> grid has columns for Date, Start
-    Time, FileID, Filename, Pages, Current Task, Current Task Progress, Priority, Folder.</li>
-    <ul> 
-        <li>Confirm the <b>Date</b> column displays the date of the files currently being processed
-        in the format of mm/dd.</li> 
-        <li>Confirm the <b>Start Time</b> column displays the time of the files currently being 
-        processed in the format of HH:MM:SS.</li> 
-        <li>Confirm the <b>FileID</b> column displays the file ID of the file currently being 
-        processed.</li> 
-        <li>Confirm the <b>Filename</b> column displays the filename of the file currently being
-        processed.</li> 
-        <li>Confirm the <b>Pages</b> column displays the number of pages in the file.</li> 
-        <li>Confirm the <b>Current Task</b> column displays the task(s) that are operating on the
-        files.</li> 
-        <li>Confirm the <b>Current Task Progress</b> column displays the overall progress as a
-        numeric progress indicator.  Confirm that units are in 0.01%.</li> 
-        <li>Confirm the <b>Priority</b> column displays the priority of the file being 
-        processed.</li>
-        <li>Confirm the <b>Folder</b> column displays the name of the folder containing the file
-        being processed.</li>
-        <li>Confirm that right-clicking on a file in this grid brings up a context menu:
-        <ul>
-            <li>Confirm that <b>Copy filename(s)</b> works as expected.</lI>
-            <li>Confirm that <b>Open file...</b> works as expected.</li>
-            <li>Confirm that <b>Open file location...</b> works as expected.</li>
-            <li>Confirm that <b>Cancel</b> works as expected.</lI>
-            <li>Confirm that the context menu works regardless of which O/S you're using.</li>
-        </ul></li>
-    </ul> 
+    	<li>Confirm that the <b>Processing Log</b> tab has three separate display areas: Files 
+    	currently being processed, Files that completed processing recently, Files that failed 
+    	processing recently.</li> 
+    	<li>Confirm that the <b>Files currently being processed</b> grid has columns for Date, Start
+    	Time, FileID, Filename, Pages, Current Task, Current Task Progress, Priority, Folder.</li>
+    	<ul> 
+        	<li>Confirm the <b>Date</b> column displays the date of the files currently being 
+		processed in the format of mm/dd.</li> 
+        	<li>Confirm the <b>Start Time</b> column displays the time of the files currently 
+		being processed in the format of HH:MM:SS.</li> 
+        	<li>Confirm the <b>FileID</b> column displays the file ID of the file currently 
+		being processed.</li> 
+        	<li>Confirm the <b>Filename</b> column displays the filename of the file currently 
+		being processed.</li> 
+        	<li>Confirm the <b>Pages</b> column displays the number of pages in the file.</li> 
+        	<li>Confirm the <b>Current Task</b> column displays the task(s) that are operating 
+		on the files.</li> 
+        	<li>Confirm the <b>Current Task Progress</b> column displays the overall progress 
+		as a numeric progress indicator.  Confirm that units are in <b>0.01%</b>.</li> 
+        	<li>Confirm the <b>Priority</b> column displays the priority of the file being 
+        	processed.</li>
+        	<li>Confirm the <b>Folder</b> column displays the name of the folder containing 
+		the file being processed.</li>
+        	<li>Confirm that right-clicking on a file in this grid brings up a context menu:
+        	<ul>
+            		<li>Confirm that <b>Copy filename(s)</b> works as expected.</lI>
+            		<li>Confirm that <b>Open file...</b> works as expected.</li>
+            		<li>Confirm that <b>Open file location...</b> works as expected.</li>
+            		<li>Confirm that <b>Cancel</b> works as expected.</li>
+        	</ul></li>
+    	</ul> 
 <p>
-    <li>Confirm the <b>Files that completed processing recently</b> grid has columns for Date, 
-    Start Time, FileID, Filename, Pages, Total Time(s), Priority, Folder.</li>
-    <ul> 
-        <li>Confirm the <b>Date</b> column displays the date of the files that completed processing
-        in the last run in the format of mm/dd.</li> 
-        <li>Confirm <b>Start Time</b> column displays the start time of the files that completed
-        processing in the last run in the format of HH:MM:SS.</li> 
-        <li>Confirm the <b>FileID</b> column displays the file ID of the file.</li> 
-        <li>Confirm the <b>Filename</b> column displays the filename of the file.</li> 
-        <li>Confirm the <b>Pages</b> column displays the number of pages in the file.</li> 
-        <li>Confirm the <b>Total Time(s)</b> column displays the amount of time it takes 
-        to finish performing the task on each file in seconds with 10-millisecond precision. 
-        <li>Confirm the <b>Priority</b> column displays the priority of the file that 
-        processed.</li>
-        <li>Confirm the <b>Folder</b> column displays the name of the folder containing the 
-        file that processed.</li>
-        <li>Confirm that right-clicking on a file in this grid brings up a context menu:
-        <ul>
-            <li>Confirm that <b>Copy filename(s)</b> works as expected.</lI>
-            <li>Confirm that <b>Open file...</b> works as expected.</li>
-            <li>Confirm that <b>Open file location...</b> works as expected.</li>
-            <li>Confirm that <b>Cancel</b> works as expected.</lI>
-            <li>Confirm that the context menu works regardless of which O/S you're using.</li>
-        </ul></li>
-    </ul>  
-    <li>Confirm the <b>Files that failed processing recently</b> grid has columns 
-    for Date, Start Time, FileID, Filename, Pages, Total Time(s), Error, 
-    Priority, Folder.</li>
-    <ul> 
-        <li>Confirm the <b>Date</b> column displays the date of the files that failed 
-        processing in the last run in the format of mm/dd.</li> 
-        <li>Confirm <b>Start Time</b> column displays the start time of the files that                                 	failed processing in the format of HH:MM:SS.</li> 
-        <li>Confirm the <b>FileID</b> column displays the file ID of the files.</li> 
-        <li>Confirm the <b>Filename</b> column displays the filename of the files.</li> 
-        <li>Confirm the <b>Pages</b> column displays the number of pages in the files.</li>       
-        <li>Confirm the <b>Total Time(s)</b> column displays the amount of time it takes 
-        to finish performing the task on each file in seconds with 10-millisecond precision. 
-        <li><b>[LegacyRC #4436]</b> Confirm that the <b>Error details...</b> button is disabled if 
-        no entry is selected in the list of failed files.
-        <li>Confirm that double-clicking an entry in <b>Error</b> column brings up an 
-        Exception dialog that gives the details of the Error. 
-        <li><b>[LegacyRC #4436]</b> Select an entry in the failed list.  Confirm that clicking the 
-        <b>Error details...</b> button brings up an Exception dialog that gives the details 
-        <li>Confirm the <b>Priority</b> column displays the priority of the file that failed 
-        processing.</li>
-        <li>Confirm the <b>Folder</b> column displays the name of the folder containing the 
-        failed file.</li>
-        <li>Confirm that right-clicking on a file in this grid brings up a context menu:
-        <ul>
-            <li>Confirm that <b>Copy filename(s)</b> works as expected.</lI>
-            <li>Confirm that <b>Open file...</b> works as expected.</li>
-            <li>Confirm that <b>Open file location...</b> works as expected.</li>
-            <li>Confirm that <b>Cancel</b> works as expected.</lI>
-            <li>Confirm that the context menu works regardless of which O/S you're using.</li>
-        </ul></li>
-    </ul>
+    	<li>Confirm the <b>Files that completed processing recently</b> grid has columns for Date, 
+    	Start Time, FileID, Filename, Pages, Total Time(s), Priority, Folder.</li>
+    	<ul> 
+        	<li>Confirm the <b>Date</b> column displays the date of the files that completed 
+		processing in the last run in the format of mm/dd.</li> 
+        	<li>Confirm <b>Start Time</b> column displays the start time of the files that 
+		completed processing in the last run in the format of HH:MM:SS.</li> 
+        	<li>Confirm the <b>FileID</b> column displays the file ID of the file.</li> 
+        	<li>Confirm the <b>Filename</b> column displays the filename of the file.</li> 
+        	<li>Confirm the <b>Pages</b> column displays the number of pages in the file.</li> 
+        	<li>Confirm the <b>Total Time(s)</b> column displays the amount of time it takes 
+        	to finish performing the task on each file in seconds with 10-millisecond precision. 
+        	<li>Confirm the <b>Priority</b> column displays the priority of the file that 
+        	processed.</li>
+        	<li>Confirm the <b>Folder</b> column displays the name of the folder containing the 
+        	file that processed.</li>
+        	<li>Confirm that right-clicking on a file in this grid brings up a context menu:
+        	<ul>
+            		<li>Confirm that <b>Copy filename(s)</b> works as expected.</lI>
+            		<li>Confirm that <b>Open file...</b> works as expected.</li>
+            		<li>Confirm that <b>Open file location...</b> works as expected.</li>
+            		<li>Confirm that <b>Cancel</b> works as expected.</lI>
+        	</ul></li>
+    	</ul>  
+    	<li>Confirm the <b>Files that failed processing recently</b> grid has columns 
+    	for Date, Start Time, FileID, Filename, Pages, Total Time(s), Error, 
+    	Priority, Folder.</li>
+    	<ul> 
+        	<li>Confirm the <b>Date</b> column displays the date of the files that failed 
+        	processing in the last run in the format of mm/dd.</li> 
+        	<li>Confirm <b>Start Time</b> column displays the start time of the files that 
+		failed processing in the format of HH:MM:SS.</li> 
+        	<li>Confirm the <b>FileID</b> column displays the file ID of the files.</li> 
+        	<li>Confirm the <b>Filename</b> column displays the filename of the files.</li> 
+        	<li>Confirm the <b>Pages</b> column displays the number of pages in the files.</li>       
+        	<li>Confirm the <b>Total Time(s)</b> column displays the amount of time it takes 
+        	to finish performing the task on each file in seconds with 10-millisecond precision. 
+        	<li><b>[LegacyRC #4436]</b> Confirm that the <b>Error details...</b> button is 
+		disabled if no entry is selected in the list of failed files.
+        	<li>Confirm that double-clicking an entry in <b>Error</b> column brings up an 
+        	Exception dialog that gives the details of the Error. 
+        	<li><b>[LegacyRC #4436]</b> Select an entry in the failed list.  Confirm that 
+		clicking the <b>Error details...</b> button brings up an Exception dialog that 
+		gives the details of the Error.
+        	<li>Confirm the <b>Priority</b> column displays the priority of the file that 
+		failed processing.</li>
+        	<li>Confirm the <b>Folder</b> column displays the name of the folder containing the 
+        	failed file.</li>
+        	<li>Confirm that right-clicking on a file in this grid brings up a context menu:
+        	<ul>
+            		<li>Confirm that <b>Copy filename(s)</b> works as expected.</lI>
+            		<li>Confirm that <b>Open file...</b> works as expected.</li>
+            		<li>Confirm that <b>Open file location...</b> works as expected.</li>
+            		<li>Confirm that <b>Cancel</b> works as expected.</lI>
+        	</ul></li>
+    	</ul>
 <p>
-    <li>Confirm the <b>Progress details...</b> button displays a modeless dialog that displays 
-    progress information for the currently selected file in the <b>Files currently being 
-    processed</b> grid.</li>
-    <li>Confirm that the selection within the <b>Files currently being processed</b> grid is 
-    scrolls up to the top of the grid as higher files finish processing.</li>
-    <li>Confirm that the selection within the <b>Files currently being processed</b> grid stays at
-    the top of the grid as files continue to finish processing.</li>
-    <li><b>[LegacyRC #4879]</b> Error clicking on empty failed file.
-    <ul>
-        <li>Create an <b>FPS</b> file and start processing files.
-        <li>Double-click on an empty line in the <b>Files that failed</b> grid.
-        <li>Confirm that no error is displayed. 
-    </ul>
-<p>
-    <li><b>[LegacyRC #4816]</b> Zero-page images if non-standard file extension.
-    <ul>
-        <li>Modify one or two of the <b>Redaction Demo</b> images to have non-standard file 
-        extensions such as <b>.bin</b> or <b>.tifxxxn</b>.
-        <li>Create an FPS file to supply and process the <b>Redaction Demo</b> images including the
-        renamed examples.
-        <li>Confirm that the <b>Processing Log</b> includes non-zero entries in the <b>Pages</b>
-        column.
-    </ul>
+    	<li>Confirm the <b>Progress details...</b> button displays a modeless dialog that displays 
+    	progress information for the currently selected file in the <b>Files currently being 
+    	processed</b> grid.</li>
+    	<li>Confirm that the selection within the <b>Files currently being processed</b> grid 
+    	scrolls up to the top of the grid as higher files finish processing.</li>
+    	<li>Confirm that the selection within the <b>Files currently being processed</b> grid 
+	stays at the top of the grid as files continue to finish processing.</li>
 </ul>
 <p>
 <b>Miscellaneous/Bug Fixes</b>
 <ul>
-    <li><b>[LegacyRC #4844]</b> Memory leak when processing bad images.</li> 
-    <ul> 
-        <li>Select a large folder ( 5000+ ) of <b>VOA</b> files and rename them to be <b>TIF</b>
-        files.</li> 
-        <li>Create an FPS to queue and process the images.</li> 
-        <li>Exercise the FPS file while running <b>LogProcessStats</b> to track memory and handle
-        usage.</li>
-        <li>Confirm that no unusual memory or handle leak is seen.</li> 
-    </ul> 
-
-<p>
-    <LI><b>[FlexIDSCore #3046]</b> Retaining existing annotations
-    <ul>
-        <li>Confirm that auto-redaction successfully retains existing annotations.
-    </ul>
-<p>
-    <li><b>[LegacyRC #5080]</b> FAM - threads exiting with exception leave task in processing 
-    list on UI
-    <ul>
-        <li>Configure an FPS file to process some files.
-        <li>Exercise the FPS file in such a way that threads exit with exceptions. One way to do
-        this is to use the DBAdmin utility to change the name of the relevant action while the FPS
-        file is processing.
-        <li>Confirm that after the threads exit, the files are listed under <b>Files that recently 
-        failed processing</b>.
-    </ul>
-<p>
-    <LI><b>[LegacyRC #5289, #5290]</b> Improper Paste in FAM
-    <ul>
-        <li>Configure a list of multiple conditions.
-        <li>Confirm that a task object <b>cannot</b> be pasted into the list.
-        <li>Confirm that a skip condition <b>cannot</b> be pasted into the list of tasks on the
-        Processing Setup tab.
-    </ul>
+    	<li><b>[LegacyRC #4844] NOT FIXED!</b> Memory leak when processing bad images.</li> 
+    	<ul> 
+        	<li>Select a large folder ( 5000+ ) of <b>VOA</b> files and rename them to be 
+		<b>TIF</b> files.</li> 
+        	<li>Create an FPS to queue and process the images.</li> 
+        	<li>Exercise the FPS file while running <b>LogProcessStats</b> to track memory 
+		and handle usage.</li>
+        	<li>Confirm that no unusual memory or handle leak is seen.</li> 
+    	</ul> 
 <p>        
-    <li><b>[LegacyRC #5873, #5874, #5875, #5876, #5877]</b> FAM - processing schedule
-    <!-- fixed v 8.1.0.72 -->
-    <ul>
-        <li>Open the Set Processing Schedule dialog.
-        <li>Confirm that nothing unexpected happens when you click in column headers.
-        <li>Confirm that both letters in the OK button are capitalized.
-        <li>Confirm that the dialog cannot be maximized.
-    <p>
-        <li>Select multiple cells. Make sure that some are set to be active and some are
-        inactive.
-        <li>Confirm that the selected active and inactive cells are displayed with contrasting
-        colors.
-    </ul></li>
+    	<li><b>[LegacyRC #5873, #5874, #5875, #5876, #5877]</b> FAM - processing schedule
+    	<!-- fixed v 8.1.0.72 -->
+    	<ul>
+        	<li>Open the Set Processing Schedule dialog.
+        	<li>Confirm that nothing unexpected happens when you click in column headers.
+        	<li>Confirm that both letters in the OK button are capitalized.
+        	<li>Confirm that the dialog cannot be maximized.
 <p>
-    <li><b>[LegacyRC #6085]</b> Error right-clicking on failed file
-    <ul>
-        <li>Run the compute FPS file from the ID Shield demo.</li>
-        <li>Set up a suround context task to run on the images.</li>
-        <li>Remove the USS files for a couple of the input images so they'll fail.</li>
-        <li>Set the FAM to display only the last 3 records in the grids (under Tools &lt; 
-        Options).</li>
-        <li>Run!</li>
-        <li>Once it's finished, right click on the files in the failed files grid and confirm that
-        no exceptions are seen.</li>
-    </ul></li>
+        	<li>Select multiple cells. Make sure that some are set to be active and some 
+		are inactive.
+        	<li>Confirm that the selected active and inactive cells are displayed with 
+		contrasting colors.
+    	</ul></li>
+<p>
+    	<li><b>[LegacyRC #6085]</b> Error right-clicking on failed file
+    	<ul>
+        	<li>Run the compute FPS file from the ID Shield demo.</li>
+        	<li>Set up a suround context task to run on the images.</li>
+        	<li>Remove the USS files for a couple of the input images so they'll fail.</li>
+        	<li>Set the FAM to display only the last 3 records in the grids (under Tools &lt; 
+        	Options).</li>
+        	<li>Run!</li>
+        	<li>Once it's finished, right click on the files in the failed files grid and 
+		confirm that no exceptions are seen.</li>
+    	</ul></li>
 </ul>
 </body>
 </html>
