@@ -489,6 +489,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.F
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Database.Test", "..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj", "{6B284A4D-132C-4FE4-858F-06A9C476B19B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C} = {A2E13543-A708-49E3-BA6E-4FC6DFE31E7C}
+		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
+		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+		{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149} = {CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}
+		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Email", "..\..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj", "{1B3DED27-DBF9-478A-9E31-FFA479621F5C}"
 EndProject
@@ -670,8 +680,8 @@ Global
 		ProjectRelativeDiskPath154 = ..\..\..\..\..\RC.Net\ExceptionService\WCFInterface\Core\Code\Extract.ExceptionService.WCFInterface.csproj
 		ProjectRelativeDiskPath155 = ..\..\..\..\..\RC.Net\Redaction\IDShieldOnDemand\Core\Code\IDShieldOnDemand.csproj
 		ProjectRelativeDiskPath156 = ..\..\..\..\..\RC.Net\FileActionManager\Conditions\Core\Code\Extract.FileActionManager.Conditions.csproj
-		ProjectRelativeDiskPath157 = ..\..\..\..\..\RC.Net\Utilities\SecureFileDeleters\Core\Code\Extract.Utilities.SecureFileDeleters.csproj
-		ProjectRelativeDiskPath158 = ..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj
+		ProjectRelativeDiskPath157 = ..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj
+		ProjectRelativeDiskPath158 = ..\..\..\..\..\RC.Net\Utilities\SecureFileDeleters\Core\Code\Extract.Utilities.SecureFileDeleters.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
