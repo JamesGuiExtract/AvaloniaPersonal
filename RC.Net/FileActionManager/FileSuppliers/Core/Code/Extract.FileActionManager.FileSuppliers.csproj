@@ -60,6 +60,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -68,6 +69,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContextMenuFileSupplier.cs" />
+    <Compile Include="ContextMenuFileSupplierSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ContextMenuFileSupplierSettingsDialog.Designer.cs">
+      <DependentUpon>ContextMenuFileSupplierSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="FtpFileSupplier.cs" />
     <Compile Include="FtpFileSupplierSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -120,6 +128,10 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
+      <Name>Extract.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
@@ -146,6 +158,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ContextMenuFileSupplierSettingsDialog.resx">
+      <DependentUpon>ContextMenuFileSupplierSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FtpFileSupplierSettingsDialog.resx">
       <DependentUpon>FtpFileSupplierSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>

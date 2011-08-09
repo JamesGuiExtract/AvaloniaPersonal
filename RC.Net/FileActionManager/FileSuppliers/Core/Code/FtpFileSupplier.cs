@@ -185,10 +185,17 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             set
             {
-                if (_remoteDownloadFolder != value)
+                try
                 {
-                    _remoteDownloadFolder = value;
-                    _dirty = true;
+                    if (_remoteDownloadFolder != value)
+                    {
+                        _remoteDownloadFolder = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI33073");
                 }
             }
         }
@@ -313,10 +320,17 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             set
             {
-                if (_newExtensionForRemoteFile != value)
+                try
                 {
-                    _newExtensionForRemoteFile = value;
-                    _dirty = true;
+                    if (_newExtensionForRemoteFile != value)
+                    {
+                        _newExtensionForRemoteFile = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI33074");
                 }
             }
         }
@@ -333,10 +347,17 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             set
             {
-                if (_localWorkingfolder != value)
+                try
                 {
-                    _localWorkingfolder = value;
-                    _dirty = true;
+                    if (_localWorkingfolder != value)
+                    {
+                        _localWorkingfolder = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI33075");
                 }
             }
         }
