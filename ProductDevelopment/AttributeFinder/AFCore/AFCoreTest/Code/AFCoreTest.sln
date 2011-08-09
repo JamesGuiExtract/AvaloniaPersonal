@@ -518,12 +518,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Interfaces", "..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.SecureFileDeleters", "..\..\..\..\..\RC.Net\Utilities\SecureFileDeleters\Core\Code\Extract.Utilities.SecureFileDeleters.csproj", "{4E71D915-E822-4620-8E86-EB8255A96F82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.ShellExtensions", "..\..\..\..\..\RC.Net\Utilities\ShellExtensions\Core\Code\Extract.Utilities.ShellExtensions.csproj", "{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESIPCService", "..\..\..\..\..\RC.Net\UtilityApplications\Services\ESIPCService\Core\Code\ESIPCService.csproj", "{E5113109-E090-4208-9D1F-8C638DC66634}"
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 158
+		ProjectCount = 160
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcxproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcxproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcxproj
@@ -682,6 +686,8 @@ Global
 		ProjectRelativeDiskPath156 = ..\..\..\..\..\RC.Net\FileActionManager\Conditions\Core\Code\Extract.FileActionManager.Conditions.csproj
 		ProjectRelativeDiskPath157 = ..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj
 		ProjectRelativeDiskPath158 = ..\..\..\..\..\RC.Net\Utilities\SecureFileDeleters\Core\Code\Extract.Utilities.SecureFileDeleters.csproj
+		ProjectRelativeDiskPath159 = ..\..\..\..\..\RC.Net\Utilities\ShellExtensions\Core\Code\Extract.Utilities.ShellExtensions.csproj
+		ProjectRelativeDiskPath160 = ..\..\..\..\..\RC.Net\UtilityApplications\Services\ESIPCService\Core\Code\ESIPCService.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2602,6 +2608,30 @@ Global
 		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|Win32.ActiveCfg = Release|Any CPU
 		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|x86.ActiveCfg = Release|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Release|Win32.ActiveCfg = Release|Any CPU
+		{74D48E75-8855-4ACF-88E0-1BBDCFD109B1}.Release|x86.ActiveCfg = Release|Any CPU
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Debug|Win32.ActiveCfg = Debug|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Debug|x86.ActiveCfg = Debug|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Debug|x86.Build.0 = Debug|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Release|Any CPU.ActiveCfg = Release|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Release|Mixed Platforms.Build.0 = Release|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Release|Win32.ActiveCfg = Release|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Release|x86.ActiveCfg = Release|x86
+		{E5113109-E090-4208-9D1F-8C638DC66634}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
