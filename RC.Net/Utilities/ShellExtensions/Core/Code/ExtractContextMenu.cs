@@ -318,7 +318,6 @@ namespace Extract.Utilities.ShellExtensions
         /// <summary>
         /// Unregisters the specified <see paramref="type"/>.
         /// </summary>
-        /// <param name="t">The t.</param>
         /// <param name="type">The <see cref="Type"/> to un-register.</param>
         [ComUnregisterFunction]
         static void Unregister(Type type)

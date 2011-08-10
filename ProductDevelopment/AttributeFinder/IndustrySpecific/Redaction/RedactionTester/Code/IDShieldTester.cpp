@@ -106,6 +106,9 @@ const string gstrATTRIBUTE_LCDATA	= "LCData";
 const string gstrATTRIBUTE_MANUAL	= "Manual";
 const string gstrATTRIBUTE_CLUES	= "Clues";
 
+// Special root paths where automated tests exist.
+const string gstrSPECIAL_ROOT_PATHS[] = { "Extract Systems\\TestingFiles\\", "D:\\Engineering\\" };
+
 //-------------------------------------------------------------------------------------------------
 // Local helper functions
 //-------------------------------------------------------------------------------------------------
@@ -417,7 +420,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			}	
 
 			// Determine the Analysis folder to create the log files in
-			getOutputDirectory(getDirectoryFromFullPath(strTestRuleSetsFile));
+			getOutputDirectory(getDirectoryFromFullPath(strTestRuleSetsFile), true);
 
 			// Process the DAT file
 			processDatFile(strTestRuleSetsFile);
@@ -765,7 +768,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		else if (vecTokens[0] == "OutputFilesFolder")
 		{
 			// Update m_strOutputFileDirectory based on the specified folder.
-			getOutputDirectory(vecTokens[1]);
+			getOutputDirectory(vecTokens[1], false);
 		}
 		else if (vecTokens[0] == "OutputAutomatedStatsOnly")
 		{
@@ -2580,9 +2583,27 @@ void CIDShieldTester::updateRedactionAttributeTester()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CIDShieldTester::getOutputDirectory(string rootDirectory)
+void CIDShieldTester::getOutputDirectory(string rootDirectory, bool bAutoSelectDirectory)
 {
 	// Determine the Analysis folder to create the log files in
+	// [LegacyRCAndUtils:6046]
+	// If bAutoSelectDirectory is true and rootDirectory is a path known to contain automated tests,
+	// set the OutputFileDirectory to be in a parallel path under application data instead.
+	if (bAutoSelectDirectory)
+	{
+		for each (string strSpecialRootPath in gstrSPECIAL_ROOT_PATHS)
+		{
+			PTSTR pszMatch = StrStrI(rootDirectory.c_str(), strSpecialRootPath.c_str());
+			if (pszMatch != __nullptr)
+			{
+				pszMatch += strlen(strSpecialRootPath.c_str());
+				rootDirectory = getExtractApplicationDataPath()
+					+ "\\TestableComponents\\IDShieldTester\\" + pszMatch;
+				break;
+			}
+		}
+	}
+
 	m_strOutputFileDirectory = rootDirectory + "\\Analysis - " + getTimeStamp();
 }
 //-------------------------------------------------------------------------------------------------
