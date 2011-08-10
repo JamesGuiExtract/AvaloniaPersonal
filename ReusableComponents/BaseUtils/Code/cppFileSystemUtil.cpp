@@ -23,6 +23,7 @@
 #include <Shlwapi.h>
 #include <io.h>
 #include <sys/utime.h>
+#include <Aclapi.h>
 
 #include <afxmt.h>
 
@@ -439,117 +440,166 @@ void createDirectory(const string& strDirectory, bool bSetPermissionsToAllUsers)
 {
 	unsigned int uiPrevPos = 0;
 	unsigned int uiCurPos = 0;
+	PSID pEveryoneSID = __nullptr;
+	PACL pACL = __nullptr;
 
-	// Test for folder already exists
-	if (isFileOrFolderValid( strDirectory ))
+	// Try/catch to ensure pEveryoneSID and pACL are freed.
+	try
 	{
-		return;
-	}
+		// Test for folder already exists
+		if (isFileOrFolderValid( strDirectory ))
+		{
+			return;
+		}
 
-	uiCurPos = strDirectory.find_first_of("\\", uiPrevPos);
-	if (uiCurPos == string::npos)
-	{
-		UCLIDException ue("ELI00256", "You must specify a valid directory!");
-		ue.addDebugInfo("Directory", strDirectory);
-		throw ue;
-	}
-
-	// strDirectory may be something like \\frank\internal\common\engineering
-	// or something like I:\Common\engineering
-	// in either case, the earliest folder that may be missing that we can
-	// try to create is the Common folder.  Set iCurPos to the slash before
-	// the Common in the above example
-	if (strDirectory.find("\\\\") == 0)
-	{
-		// get to the slash in front of name of the network share
-		uiCurPos = strDirectory.find_first_of("\\", 2);
-	}
-	else if (strDirectory.find(":") == 1)
-	{
-		// get to the slash that is hopefully immediately after the colon
-		uiCurPos = strDirectory.find_first_of("\\", 2);
-	}
-	else
-	{
-		UCLIDException ue("ELI09824", "Cannot create directory - invalid directory name!");
-		ue.addDebugInfo("strDirectory", strDirectory);
-		throw ue;
-	}
-
-	// If need to leave security open for the folders, create the security descriptor object
-	unique_ptr<SECURITY_ATTRIBUTES> upSecurityAttributes(__nullptr);
-	unique_ptr<SECURITY_DESCRIPTOR> upSecurityDescriptor(__nullptr);
-	if (bSetPermissionsToAllUsers)
-	{
-		upSecurityDescriptor.reset(new SECURITY_DESCRIPTOR());
-		InitializeSecurityDescriptor(upSecurityDescriptor.get(), SECURITY_DESCRIPTOR_REVISION);
-
-		// Set the DACL to wide open (say DACL is present but pass NULL and turn off
-		// setting of default DACL)
-		SetSecurityDescriptorDacl(upSecurityDescriptor.get(), TRUE, NULL, FALSE);
-
-		// Zero out a security attributes object
-		upSecurityAttributes.reset(new SECURITY_ATTRIBUTES());
-		ZeroMemory(upSecurityAttributes.get(), sizeof(SECURITY_ATTRIBUTES));
-
-		// Set the security attributes object
-		upSecurityAttributes->nLength = sizeof(SECURITY_ATTRIBUTES);
-		upSecurityAttributes->lpSecurityDescriptor = upSecurityDescriptor.get();
-		upSecurityAttributes->bInheritHandle = FALSE;
-	}
-
-	while (uiCurPos < strDirectory.length() && uiCurPos!= string::npos)
-	{
-		string strTempDir;
-		uiPrevPos = uiCurPos + 1;
 		uiCurPos = strDirectory.find_first_of("\\", uiPrevPos);
 		if (uiCurPos == string::npos)
 		{
-			//if the directory only contains the drive letter (ex. c:\)
-			if (strDirectory[uiPrevPos-2] == ':' 
-				&& strDirectory.find_last_not_of(" \t") == uiPrevPos-1)
-			{
-				throw UCLIDException("ELI00257", "You must specify the directory!");
-			}
-			else
-			{
-				strTempDir=strDirectory;
-			}
+			UCLIDException ue("ELI00256", "You must specify a valid directory!");
+			ue.addDebugInfo("Directory", strDirectory);
+			throw ue;
+		}
+
+		// strDirectory may be something like \\frank\internal\common\engineering
+		// or something like I:\Common\engineering
+		// in either case, the earliest folder that may be missing that we can
+		// try to create is the Common folder.  Set iCurPos to the slash before
+		// the Common in the above example
+		if (strDirectory.find("\\\\") == 0)
+		{
+			// get to the slash in front of name of the network share
+			uiCurPos = strDirectory.find_first_of("\\", 2);
+		}
+		else if (strDirectory.find(":") == 1)
+		{
+			// get to the slash that is hopefully immediately after the colon
+			uiCurPos = strDirectory.find_first_of("\\", 2);
 		}
 		else
 		{
-			strTempDir = strDirectory.substr(0, uiCurPos+1);
+			UCLIDException ue("ELI09824", "Cannot create directory - invalid directory name!");
+			ue.addDebugInfo("strDirectory", strDirectory);
+			throw ue;
 		}
 
-		//if the directory doesn't exist
-		// using access() to tell the existence of a directory might work for Windows 95/98
-		if (!directoryExists(strTempDir))
-		{	
-			//call windows API function to create directory
-			if(CreateDirectory(strTempDir.c_str(), upSecurityAttributes.get())==0)
-			{
-				// Get the error code
-				DWORD errorCode = GetLastError();
+		// If need to leave security open for the folders, create the security descriptor object
+		unique_ptr<EXPLICIT_ACCESS> upExplicitAccess(__nullptr);
+		unique_ptr<SECURITY_ATTRIBUTES> upSecurityAttributes(__nullptr);
+		unique_ptr<SECURITY_DESCRIPTOR> upSecurityDescriptor(__nullptr);
+		if (bSetPermissionsToAllUsers)
+		{
+			upSecurityDescriptor.reset(new SECURITY_DESCRIPTOR());
+			InitializeSecurityDescriptor(upSecurityDescriptor.get(), SECURITY_DESCRIPTOR_REVISION);
+		
+			// Create an SID for the "everyone" group.
+			SID_IDENTIFIER_AUTHORITY SIDAuthWorld = SECURITY_WORLD_SID_AUTHORITY;
+			AllocateAndInitializeSid(&SIDAuthWorld, 1,
+										SECURITY_WORLD_RID,
+										0, 0, 0, 0, 0, 0, 0,
+										&pEveryoneSID);
 
-				// if two threads are trying to create the same directory at the same time, 
-				// both threads could have entered the "if (!directoryExists(strTempDir))"
-				// code block above, and one of the threads may have executed the CreateDirectory()
-				// call above, and the second thread's CreateDirectory call will fail because the
-				// directly already exists.  So, when the create directory call fails, before
-				// throwing an exception, just double check to make sure that the directory still
-				// does not exist.
-				if (!directoryExists(strTempDir))
+			// Initialize an EXPLICIT_ACCESS structure for an ACE. The ACE will allow "everyone"
+			// all access to the folder and allow those permissions to be inherited.
+			upExplicitAccess.reset(new EXPLICIT_ACCESS());
+			ZeroMemory(upExplicitAccess.get(), sizeof(EXPLICIT_ACCESS));
+			upExplicitAccess->grfAccessPermissions = FILE_ALL_ACCESS;
+			upExplicitAccess->grfAccessMode = GRANT_ACCESS;
+			upExplicitAccess->grfInheritance= CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
+			upExplicitAccess->Trustee.TrusteeForm = TRUSTEE_IS_SID;
+			upExplicitAccess->Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+			upExplicitAccess->Trustee.ptstrName  = (LPTSTR) pEveryoneSID;
+
+			// Create a new ACL that contains the new ACE.
+			SetEntriesInAcl(1, upExplicitAccess.get(), NULL, &pACL);
+
+			// Apply the ACL to the DACL
+			SetSecurityDescriptorDacl(upSecurityDescriptor.get(), TRUE, pACL, FALSE);
+
+			// Zero out a security attributes object
+			upSecurityAttributes.reset(new SECURITY_ATTRIBUTES());
+			ZeroMemory(upSecurityAttributes.get(), sizeof(SECURITY_ATTRIBUTES));
+
+			// Set the security attributes object
+			upSecurityAttributes->nLength = sizeof(SECURITY_ATTRIBUTES);
+			upSecurityAttributes->lpSecurityDescriptor = upSecurityDescriptor.get();
+			upSecurityAttributes->bInheritHandle = FALSE;
+		}
+
+		while (uiCurPos < strDirectory.length() && uiCurPos!= string::npos)
+		{
+			string strTempDir;
+			uiPrevPos = uiCurPos + 1;
+			uiCurPos = strDirectory.find_first_of("\\", uiPrevPos);
+			if (uiCurPos == string::npos)
+			{
+				//if the directory only contains the drive letter (ex. c:\)
+				if (strDirectory[uiPrevPos-2] == ':' 
+					&& strDirectory.find_last_not_of(" \t") == uiPrevPos-1)
 				{
-					string strMessage = "The directory \"";
-					strMessage += strDirectory;
-					strMessage += "\" could not be created!\nPlease specify a valid "
-						"and complete path of the directory to create.";
-					UCLIDException uex("ELI00258", strMessage);
-					uex.addWin32ErrorInfo(errorCode);
-					throw uex;
+					throw UCLIDException("ELI00257", "You must specify the directory!");
+				}
+				else
+				{
+					strTempDir=strDirectory;
+				}
+			}
+			else
+			{
+				strTempDir = strDirectory.substr(0, uiCurPos+1);
+			}
+
+			//if the directory doesn't exist
+			// using access() to tell the existence of a directory might work for Windows 95/98
+			if (!directoryExists(strTempDir))
+			{	
+				//call windows API function to create directory
+				if(CreateDirectory(strTempDir.c_str(), upSecurityAttributes.get())==0)
+				{
+					// Get the error code
+					DWORD errorCode = GetLastError();
+
+					// if two threads are trying to create the same directory at the same time, 
+					// both threads could have entered the "if (!directoryExists(strTempDir))"
+					// code block above, and one of the threads may have executed the CreateDirectory()
+					// call above, and the second thread's CreateDirectory call will fail because the
+					// directly already exists.  So, when the create directory call fails, before
+					// throwing an exception, just double check to make sure that the directory still
+					// does not exist.
+					if (!directoryExists(strTempDir))
+					{
+						string strMessage = "The directory \"";
+						strMessage += strDirectory;
+						strMessage += "\" could not be created!\nPlease specify a valid "
+							"and complete path of the directory to create.";
+						UCLIDException uex("ELI00258", strMessage);
+						uex.addWin32ErrorInfo(errorCode);
+						throw uex;
+					}
 				}
 			}
 		}
+	
+		if (pEveryoneSID != __nullptr)
+		{
+			FreeSid(pEveryoneSID);
+		}
+		if (pACL != __nullptr)
+		{
+			LocalFree(pACL);
+		}
+	}
+	catch (...)
+	{
+		if (pEveryoneSID != __nullptr)
+		{
+			FreeSid(pEveryoneSID);
+		}
+		if (pACL != __nullptr)
+		{
+			LocalFree(pACL);
+		}
+
+		throw;
 	}
 }
 //--------------------------------------------------------------------------------------------------

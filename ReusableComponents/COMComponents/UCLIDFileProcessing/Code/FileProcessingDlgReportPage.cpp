@@ -1297,18 +1297,13 @@ const string& FileProcessingDlgReportPage::getLogFileFullPath()
 	// If the log file has not yet been found, calculate it
 	if (ls_strLogFileName.empty())
 	{
-		// Calculate the path to the log file
-		// Find CommonComponents folder
-		std::string strDir1 = getModuleDirectory(_Module.m_hInst) + "\\";
-
-		// Relative path to LogFiles/Misc
-		strDir1 += "..\\LogFiles\\Misc";
-		simplifyPathName(strDir1);
+		// Calculate the path to the LogFiles folder
+		string strDir1 = getExtractApplicationDataPath() + "\\LogFiles";
 
 		// Check if the folder exists and create if necessary [LRCAU #5111]
 		if (!isValidFolder(strDir1))
 		{
-			createDirectory(strDir1);
+			createDirectory(strDir1, true);
 		}
 
 		ls_strLogFileName = strDir1 + "\\Statistics.csv";	

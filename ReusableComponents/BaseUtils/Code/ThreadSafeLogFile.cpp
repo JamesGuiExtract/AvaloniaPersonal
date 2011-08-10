@@ -102,7 +102,7 @@ void ThreadSafeLogFile::init()
 
 		// Make sure that directory of log file exists
 		string strDirectory = getDirectoryFromFullPath( m_strLogFileName );
-		createDirectory( strDirectory );
+		createDirectory( strDirectory, true );
 
 		static unsigned long ls_ulLastUsedID = 0;
 		
@@ -264,23 +264,7 @@ const string& ThreadSafeLogFile::getDefaultLogFileName()
 		// compute the default log file name if it hasn't yet been computed
 		if (ls_strDefaultLogFileName.empty())
 		{
-			// compute the directory name
-			string strDefaultLogFileName = getModuleDirectory(BaseUtilsDLL.hModule);
-			strDefaultLogFileName += "\\..\\LogFiles\\Misc";
-
-			// Adjust for relative path
-			char pszFullFileName[_MAX_PATH];
-			if (_fullpath(pszFullFileName, (char*)strDefaultLogFileName.c_str(), _MAX_PATH) == NULL)
-			{
-				UCLIDException ue("ELI12781", "Invalid path!");
-				ue.addDebugInfo("Input path", strDefaultLogFileName);
-				throw ue;
-			}
-
-			// append the name of the file to the directory to 
-			// compute the full path
-			strDefaultLogFileName += "\\Default.log";
-			ls_strDefaultLogFileName = strDefaultLogFileName;
+			ls_strDefaultLogFileName = getExtractApplicationDataPath() + "\\LogFiles\\Default.log";
 		}
 
 		// return the name of the default log file

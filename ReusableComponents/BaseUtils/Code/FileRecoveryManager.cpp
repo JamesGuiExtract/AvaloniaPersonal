@@ -157,7 +157,7 @@ bool FileRecoveryManager::isRecoveryFolderWritable()
 		// Attempt to create it
 		try
 		{
-			createDirectory(m_strRecoveryFileFolder);
+			createDirectory(m_strRecoveryFileFolder, true);
 		}
 		catch(...)
 		{
