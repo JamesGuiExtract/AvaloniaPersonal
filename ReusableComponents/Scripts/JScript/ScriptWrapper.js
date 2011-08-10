@@ -5,13 +5,11 @@
 var GBoolLogErrorsOnly = false;
 var GBoolShowDebugInfo = false;
 
+// Create FileSystemObject
+var fso = new ActiveXObject("Scripting.FileSystemObject");
+
 // Run the script
-try {
-    main(parseCommandLineOptions());
-}
-catch(err) {
-    handleScriptError("ELI32515", "Fatal Error", err);
-}
+main(parseCommandLineOptions());
 
 //--------------------------------------------------------------------------------------------------
 // Parses the command-line arguments for options and returns the remaining arguments.
@@ -161,4 +159,39 @@ function prettyXMLSave(xDoc, strFileName) {
         handleScriptError("ELI32526", "Unable to save XML file!", err, "XML Path", strFileName);
     }
 }
+
+//--------------------------------------------------------------------------------------------------
+// Read all text from the file
+//--------------------------------------------------------------------------------------------------
+function readAllText(fname) {
+    // Open the file
+    try {
+        var f = fso.OpenTextFile(fname, 1);
+    }
+    catch(err) {
+        handleScriptError("ELI33180", "Unable to open input file!", err, "FileName", fname);
+    }
+    // Read from the file
+    if (f.AtEndOfStream)
+        return ("");
+    else
+        return (f.ReadAll());
+}
+
+//--------------------------------------------------------------------------------------------------
+// Write all text to the file
+//--------------------------------------------------------------------------------------------------
+function writeText(fname, text) {
+    // Open the file
+    try {
+        var f = fso.OpenTextFile(fname, 2, true);
+    }
+    catch(err) {
+        handleScriptError("ELI33181", "Unable to open output file!", err, "FileName", fname);
+    }
+    // Write to the file
+    f.Write(text);
+    f.Close();
+}
+
 //--------------------------------------------------------------------------------------------------
