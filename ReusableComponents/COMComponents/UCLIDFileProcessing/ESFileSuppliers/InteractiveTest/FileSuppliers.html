@@ -234,7 +234,50 @@
 </ul>
 <p>
 <b>File Suppliers</b>
-<ol> 
+<ol>
+    	<li>Select <b>Files from context menu</b> as the file supplier in Select File Supplier dialog, 
+	then press the Configure button.
+    	<ul> 
+        	<li>Confirm it brings up <b>Configure Files from context menu</b> dialog.</li> 
+        	<li>Confirm the dialog has an edit box for <b>Context menu option name</b>, a 
+		combo box to specify file type, a checkbox with an associated edit box and browse 
+		button to specify a path and a checkbox to allow the context menu to apply to 
+		selected folders.</li> 
+        	<li>Confirm that the dialog has <b>OK</b> and <b>Cancel</b> buttons and that both are 
+        	enabled.</li> 
+        	<li>Confirm that the file type combo box is preloaded with various image file 
+		choices.</li>
+        	<li>Confirm that the file type combo box allows specification of custom file types.</li>
+        	<li>Confirm that the edit box and associated browse button are only enabled if the 
+		check box is checked.</li>
+        	<li>Confirm that the path to the folder selected via browse button is automatically 
+		copied to the edit box.</li> 
+<p>
+		<li>Confirm that the context menu is not displayed if the <b>Extract Systems IPC 
+		Service</b> service is not started.
+		<li>Confirm that the context menu is not displayed if files are selected of a 
+		different file type.
+		<li>Confirm that the context menu is not displayed if the selected files are in 
+		a different folder location.
+		<li>Confirm that the context menu is not displayed if a folder is selected the 
+		associated checkbox is unchecked.
+		<li>Confirm that the context menu is displayed if appropriate files are selected.
+		<li>Confirm that files are supplied as expected.
+<p>
+		<li><b>[DotNetRC #711]</b> Reset after stop
+		<ul>
+			<li>Prepare a collection of subfolders containing files to be supplied.
+			<li>Configure the file supplier to apply to matching files within 
+			selected folders.
+			<li>Start processing and confirm that files are being queued.
+			<li>Stop processing before queuing is finished.
+			<li>Start processing again and select an individual file to be queued.
+			<li>Confirm that the individual file is queued.
+			<li>Confirm that the remaining files from the previous queuing session 
+			<b>are not</b> queued.
+		</ul>
+    	</ul> 
+<p>
     	<li>Select <b>Files from dynamic list</b> as the file supplier in Select File Supplier dialog, 
 	then press the Configure button.
     	<ul> 
