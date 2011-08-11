@@ -76,8 +76,14 @@ Dlg_SdFeatureTree:
 				UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFDRSService.exe\"");   
 				
 				// Uninstall the Extract.ExceptionService
-				UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "Extract.ExceptionService.exe\"");
+				UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "Extract.ExceptionService.exe\"");      
 				
+				// UnInstall the ESIPCService
+				UninstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESIPCService.exe\"");      
+				
+				// Unregister the shell extension
+				UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
+
 				// Uninstall Crystal Reports
 				UninstallCrystalReports12();
 				UninstallInstallSQLCE ();

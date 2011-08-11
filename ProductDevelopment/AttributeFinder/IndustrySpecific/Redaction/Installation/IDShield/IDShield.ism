@@ -245,6 +245,7 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
+		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\SFHelper.dll</td></row>
 	</table>
@@ -313,6 +314,8 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
+		<row><td>AllOtherFiles</td><td>{60F2D24A-0FD5-46E0-960E-167AF619EAE3}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AllOtherFiles1</td><td>{5171B21C-F399-4BE7-99CD-8EAEC271D053}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.CustomComponentsHelper.dll</td><td>{BC1778CF-1B0D-4DB8-A811-8F3213EA5016}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.customcomp</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td>{DEC2B72C-0860-4D86-80E3-1D0DD6D14F94}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.verificati</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -381,6 +384,8 @@
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>COMMON_COMPONENTS</td><td>FlexIndexComponents</td></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>AllOtherFiles</td></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>AllOtherFiles1</td></row>
 		<row><td>INSTALLDIR</td><td>ISRegistryComponent</td></row>
 		<row><td>INSTALLDIR</td><td>NewComponent1</td></row>
 		<row><td>INSTALLDIR</td><td>UtilitiesShortCuts</td></row>
@@ -393,6 +398,8 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
+		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td>257</td><td>ISSetupFilesHelper</td><td>SFCleanupEx</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td>257</td><td>ISSetupFilesHelper</td><td>SFStartupEx</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
@@ -1150,6 +1157,8 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>Documentation</td><td>AllOtherFiles</td></row>
+		<row><td>Documentation</td><td>AllOtherFiles1</td></row>
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>IDShieldMain</td><td>ExemptionCodes</td></row>
 		<row><td>IDShieldMain</td><td>Extract.Redaction.CustomComponentsHelper.dll</td></row>
@@ -1441,6 +1450,8 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
+		<row><td>AllOtherFiles</td><td/><td/><td>_25804A87_FFD1_44A9_AFF5_93E14F7152C4_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>AllOtherFiles1</td><td/><td/><td>_DE1B7EA1_AB38_4058_97BE_B1886DA08CF8_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ExemptionCodes</td><td/><td/><td>_DC4F41A0_2184_486F_85BC_827E04CF07BD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.CustomComponentsHelper.dll</td><td/><td/><td>_01E0B1D8_4082_473F_AA8B_C078BA868206_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td/><td/><td>_9455B052_64C2_4C44_BABF_F480528B2F4B_FILTER</td><td/><td/><td/><td/></row>
@@ -1649,6 +1660,7 @@
 		<col key="yes" def="s255">User</col>
 		<col def="I4">Permission</col>
 		<col def="I4">Attributes</col>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Everyone</td><td>1880031743</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
@@ -1787,6 +1799,7 @@
 		<row><td>PATH_TO_EXEMPTIONCODES_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\ExemptionCodes</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITEKEYINSTAL_FILES</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
+		<row><td>PATH_TO_LOGICNP_FILES</td><td>P:\AttributeFinder\RequiredInstalls\LogicNP</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMPO_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_OFFICEREDIST_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\OfficeRedist</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REPORTS_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\Reports</td><td/><td>2</td></row>
@@ -2077,8 +2090,10 @@
 		<row><td>SetupFile1</td><td>license.txt</td><td/><td>0</td><td>0</td><td>&lt;ISProjectDataFolder&gt;\support files\license.txt</td></row>
 		<row><td>SetupFile10</td><td>UninstallInlite.bat</td><td/><td>0</td><td>0</td><td>&lt;ISPROJECTDIR&gt;\support files\UninstallInlite.bat</td></row>
 		<row><td>SetupFile11</td><td>ClearImageEUK_5_7_3.exe</td><td/><td>0</td><td>0</td><td>&lt;INLITE_INSTALLATION_FILES&gt;\ClearImageEUK_5_7_3.exe</td></row>
+		<row><td>SetupFile12</td><td>RegisterExtensionDotNet40.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_LOGICNP_FILES&gt;\RegisterExtensionDotNet40.exe</td></row>
 		<row><td>SetupFile13</td><td>SqlCeEditorSetup.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQL COMPACT EDI_FI&gt;\SqlCeEditorSetup.msi</td></row>
 		<row><td>SetupFile14</td><td>SSCERuntime_x86-ENU.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime_x86-ENU.msi</td></row>
+		<row><td>SetupFile15</td><td>RegisterExtensionDotNet40_x64.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_LOGICNP_FILES&gt;\RegisterExtensionDotNet40_x64.exe</td></row>
 		<row><td>SetupFile2</td><td>Setup.bmp</td><td/><td>0</td><td>1</td><td>&lt;ISProjectDataFolder&gt;\support files\Setup.bmp</td></row>
 		<row><td>SetupFile3</td><td>sqlncli.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli.msi</td></row>
 		<row><td>SetupFile4</td><td>sqlncli_x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLSERVEREXPRES_FILES&gt;\sqlncli_x64.msi</td></row>
@@ -2086,6 +2101,7 @@
 		<row><td>SetupFile6</td><td>SSCERuntime_x64-ENU.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime_x64-ENU.msi</td></row>
 		<row><td>SetupFile7</td><td>CBUSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITEKEYINSTAL_FILES&gt;\CBUSetup.exe</td></row>
 		<row><td>SetupFile8</td><td>CRRuntime_12_1_mlb.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_CRYSTAL_REPORTS12&gt;\CRRuntime_12_1_mlb.msi</td></row>
+		<row><td>SetupFile9</td><td>RegisterExtensionDotNet40_x86.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_LOGICNP_FILES&gt;\RegisterExtensionDotNet40_x86.exe</td></row>
 	</table>
 
 	<table name="ISSetupPrerequisites">
@@ -3387,6 +3403,8 @@
 		<row><td>DuplicateFiles</td><td/><td>4210</td><td>DuplicateFiles</td><td/></row>
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
+		<row><td>ISLockPermissionsCost</td><td/><td>1401</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td/><td>5901</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td/><td>6606</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td/><td>3</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>

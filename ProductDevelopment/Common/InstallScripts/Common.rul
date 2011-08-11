@@ -81,6 +81,8 @@
     prototype UninstallDotNetService(STRING);    
 	prototype BOOL AreOtherExtractProductsInstalled();
 	prototype InstallOfficeRedist();
+	prototype RegisterLoginNPShellExtension(STRING);
+	prototype UnregisterLoginNPShellExtension(STRING);
 
     // your global variables
     BOOL gbInstalled;
@@ -655,4 +657,54 @@ begin
 	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 	
 	SdShowMsg("Setup is Installing Microsoft Office Redistributable", FALSE);
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: RegisterLoginNPShellExtension
+//
+//  Purpose: This function rgisters a LoginNP shell extension
+///////////////////////////////////////////////////////////////////////////////
+function RegisterLoginNPShellExtension(strExtension)
+	string szProgram;
+	string szArguments;
+begin       
+  	SdShowMsg("Setup is registering shell extension.", TRUE);
+   
+   	szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x86.exe";
+   	szArguments = "-i "  + PROGRAMFILES ^ EXTRACT_DIR ^ strExtension;
+	LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
+
+	// Register for 64 bit also
+	if ( SYSINFO.bIsWow64 ) then
+   		szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x64.exe";
+		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
+	endif
+	
+  	SdShowMsg("Setup is registering shell extension.", FALSE);
+end;        
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UnregisterLoginNPShellExtension
+//
+//  Purpose: This function unregisters a LoginNP shell extension
+///////////////////////////////////////////////////////////////////////////////
+function UnregisterLoginNPShellExtension(strExtension)
+	string szProgram;  
+	string szArguments;
+begin       
+  	SdShowMsg("Setup is unregistering shell extension.", TRUE);
+   
+   	szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x86.exe";
+   	szArguments = "-u "  + PROGRAMFILES ^ EXTRACT_DIR ^ strExtension;
+	LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
+
+	// Register for 64 bit also
+	if ( SYSINFO.bIsWow64 ) then
+   		szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x64.exe";
+		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
+	endif
+
+ 	SdShowMsg("Setup is unregistering shell extension.", FALSE);
 end;

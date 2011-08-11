@@ -245,6 +245,7 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
+		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
 		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 	</table>
@@ -313,6 +314,7 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
+		<row><td>AllOtherFiles</td><td>{A68CD803-AB47-49CC-9488-BF68116E1BFE}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FieldActivation</td><td>{3198502E-576E-4944-83FB-5CEBA591DF96}</td><td>COMMONCOMPONENTS</td><td>8</td><td/><td>fieldactutil.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UUsafe32.dll</td><td>{BAA2F71D-781F-4961-98FB-1715CC627C78}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>uusafe32.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
@@ -368,6 +370,7 @@
 	<table name="CreateFolder">
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>AllOtherFiles</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -377,6 +380,8 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
+		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
@@ -425,6 +430,7 @@
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CommonFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>ExtractSystemsLM_Programs</td><td>ProgramMenuFolder</td><td>##ID_STRING5##</td><td/><td>1</td><td/></row>
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
@@ -1127,6 +1133,7 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>DefaultFeature</td><td>AllOtherFiles</td></row>
 		<row><td>DefaultFeature</td><td>FieldActivation</td></row>
 		<row><td>DefaultFeature</td><td>UUsafe32.dll</td></row>
 	</table>
@@ -1396,6 +1403,7 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
+		<row><td>AllOtherFiles</td><td/><td/><td>_0F9BC11F_11FA_464C_9308_795917BFE2A7_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FieldActivation</td><td/><td/><td>_94CB8EED_363C_42D4_BE99_3E7FA0968D70_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UUsafe32.dll</td><td/><td/><td>_56B51402_AD24_471E_BC88_0E3D875A2FB3_FILTER</td><td/><td/><td/><td/></row>
 	</table>
@@ -1589,6 +1597,7 @@
 		<col key="yes" def="s255">User</col>
 		<col def="I4">Permission</col>
 		<col def="I4">Attributes</col>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Everyone</td><td>1880031743</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
@@ -3281,6 +3290,8 @@
 		<row><td>DuplicateFiles</td><td/><td>4210</td><td>DuplicateFiles</td><td/></row>
 		<row><td>FileCost</td><td/><td>1000</td><td>FileCost</td><td/></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
+		<row><td>ISLockPermissionsCost</td><td/><td>1456</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td/><td>5851</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td/><td>2201</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td/><td>5501</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td/><td>6401</td><td/><td/></row>
