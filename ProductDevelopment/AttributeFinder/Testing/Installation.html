@@ -18,73 +18,32 @@
 	<LI><h2>Install Options</h2>
 	<p>
 	<UL>
-	  	<LI>Confirm that <b>not agreeing</b> with the terms of the license agreement halts the
-        installation with no files copied to the system.
-  		<LI>Confirm that a <b>Custom</b> SDK installation allows installation of the <b>SDK 
-        Redistribution Components</b>.
+	  	<LI>Confirm that <b>not agreeing</b> with the terms of the license agreement halts 
+		the installation with no files copied to the system.
+  		<LI>Confirm that a FLEX Index <b>Custom</b> SDK installation allows installation 
+		of the <b>SDK Redistribution Components</b> to the \FlexIndex\Redist folder.
 		<ul>
-            <LI>Confirm that Merge Modules for <b>FlexIndexSDK</b> and <b>InputFunnel</b> are 
-            copied to the \FlexIndex\Redist folder.
-        </ul>
-	  	<LI>Confirm that a <b>Compact</b> SDK installation does not install <b>Tutorials</b> or
-        <b>Help</b>.
-        <LI><b>[FlexIDSCore #2892]</b> Confirm that installing FLEX Index provides a meaningful 
-        splash screen.
-        <!-- Pretty sure as of 8.1, this is no longer accurate
+            		<LI>DataEntry.msm
+            		<LI>ExtractCommonMM.msm
+            		<LI>UCLIDFlexIndex.msm
+        	</ul>
+	  	<LI>Confirm that a FLEX Index <b>Compact</b> SDK installation does not install 
+		<b>Tutorials</b> or <b>Help</b>.
 <p>
-	  	<LI><b>[FlexIDSCore #2521]</b> Confirm that installing FLEX Index on a freshly ghosted test machine 
-		does not first require installation of .NET.
-	  	<LI><b>[FlexIDSCore #2522]</b> Confirm that installing ID Shield on a freshly ghosted test machine 
-		does not first require installation of .NET.
-        -->
-<p>
-	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of FLEX Index cannot be
-        installed on a test machine with an older version of Extract Systems LM.
-	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of ID Shield cannot be
-        installed on a test machine with an older version of Extract Systems LM.
-	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of FLEX Index cannot be installed 
-		on a test machine with an older version of ID Shield.
-	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of Extract Systems LM cannot be
-        installed on a test machine with an older version of ID Shield.
-	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of ID Shield cannot be installed 
-		on a test machine with an older version of FLEX Index.
-	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of Extract Systems LM cannot be
-        installed on a test machine with an older version of FLEX Index.
-<p>
-	  	<LI>*Confirm that an upgrade installation of <b>FLEX Index</b> is available and effective
-        after installation of the previous version.
-	  	<LI>*Confirm that an upgrade installation of <b>ID Shield</b> is available and effective 
-        after installation of the previous version.
-<p>
-  	   	<LI><b>[FlexIDSCore #3151]</b> Cannot Install Software If Not Administrator
-        <ul>
-            <li>Confirm that the installation process exits gracefully if the logged in user is not
-            a member of the Administrators group.
-        </ul>
-<p>
-  	   	<LI><b>[FlexIDSCore #3514]</b> Competing versions
-        <ul>
-            <li>Prepare a test machine with a current installation of <b>ID Shield Office</b> or
-            <b>ID Shield for Laserfiche</b>.
-			<li>Confirm that <b>FLEX Index</b> cannot be installed.
-			<li>Confirm that <b>ID Shield</b> cannot be installed.
-			<li>Confirm that <b>Extract Systems LM</b> cannot be installed.
-        </ul>
-<p>
-  	   	<LI><b>[FlexIDSCore #3573]</b> Windows version &lt;= XP
-	    <ul>
-            <li>Prepare a test machine with an unsupported operating system such as Windows 2000.
-			<li>Confirm that <b>FLEX Index</b> cannot be installed.
-			<li>Confirm that <b>ID Shield</b> cannot be installed.
-			<li>Confirm that <b>Extract Systems LM</b> cannot be installed.
-        </ul>
-    </ul>
+	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of FLEX Index cannot be 
+		installed on a test machine with an older version of any Extract Systems software.
+	  	<LI><b>[FlexIDSCore #2856]</b> Confirm that a newer version of ID Shield cannot be 
+		installed on a test machine with an older version of any Extract Systems software.
+	  	<LI><b>[LegacyRC #4663]</b> Confirm that a newer version of Extract Systems LM 
+		cannot be installed on a test machine with an older version of any Extract Systems 
+		software.
+    	</ul>
 <p>
 	<LI><h2>Product-Level Licensing</h2>
 	<UL>
-        <li>Confirm that only licenses for the current version will effectively license the
-        software.</li>
-    <p>
+        	<li>Confirm that only licenses for the current version will effectively license the
+        	software.</li>
+<p>
 		<li><u>Start Menu Items</u>
 <p>
 		Below is a table indicating which start menu items that each license 
@@ -93,12 +52,12 @@
 		steps below.
 		<p>
 		<ul>
-			<li>Create the license file using the <b>COM License Generator</b> utility. Copy this
-            file to the CommonComponents folder.  Remove any other <b>.lic</b> files from the 
-            CommonComponents folder.</li>
+			<li>Create the license file using the <b>COM License Generator</b> utility. 
+			Copy this file to the LicenseFiles folder.  Remove or rename any other 
+			<b>.lic</b> files from the folder.</li>
 			<li>Open the <b>Extract Systems</b> start menu.</li>
-			<li>Confirm that the items marked <b>Yes</b> on the table are on the Start menu and are
-            licensed.</li>
+			<li>Confirm that the items marked <b>Yes</b> on the table are on the 
+			Start menu and are licensed.</li>
 			<li>Confirm that the items marked <b>No</b> on the table are not licensed.</li>
 		</ul>
 <p>
@@ -111,6 +70,69 @@
 			<th><font size="2">IDShield Server</font></th>
 			<th><font size="2">Simple Rule Writing</font></th>
 			<th><font size="2">RDT</font></th>
+			<tr align="center">
+				<th><font size="2">DB Administration
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+			</tr>
+			<tr align="center">
+				<th><font size="2">File Action Manager
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+			</tr>
+			<tr align="center">
+				<th><font size="2">ID Shield On Demand
+				<td><font size="2"><li>N/A
+				<td><font size="2"><li>N/A
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+			</tr>
+			<tr align="center">
+				<th><font size="2">USB License Key Manager
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+			</tr>
+			<tr align="center">
+				<th><font size="2">User License
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+			</tr>
+			<tr align="center">
+				<th><font size="2">Utilities
+				<td><font size="2">
+				<td><font size="2">
+				<td><font size="2">
+				<td><font size="2">
+				<td><font size="2">
+				<td><font size="2">
+			</tr>
+			<tr align="center">
+				<th><font size="2">Configure Email Settings</font></th>
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+			</tr>
 			<tr align="center">
 				<th><font size="2">Configure FAM Service</font></th>
 				<td><font size="2"><li>Yes
@@ -139,7 +161,7 @@
 				<td><font size="2"><li>Yes
 			</tr>
 			<tr align="center">
-				<th><font size="2">DB Administration
+				<th><font size="2">Detect and Report Failure</font></th>
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
@@ -147,7 +169,7 @@
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
 			</tr>
-            <tr align="center">
+            		<tr align="center">
 				<th><font size="2">FAM Network Manager
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
@@ -166,18 +188,9 @@
 				<td><font size="2"><li>Yes
 			</tr>
 			<tr align="center">
-				<th><font size="2">File Action Manager
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
-				<td><font size="2"><li>Yes
-			</tr>
-			<tr align="center">
 				<th><font size="2">ID Shield Statistics Reporter
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
+				<td><font size="2"><li>N/A
+				<td><font size="2"><li>N/A
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
@@ -193,43 +206,7 @@
 				<td><font size="2"><li>Yes
 			</tr>
 			<tr align="center">
-				<th><font size="2">RDT Configuration
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>Yes
-			</tr>
-			<tr align="center">
 				<th><font size="2">Rule Tester
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-			</tr>
-			<tr align="center">
-				<th><font size="2">Rule Set Editor
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-			</tr>
-			<tr align="center">
-				<th><font size="2">UEX Viewer
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-			</tr>
-			<tr align="center">
-				<th><font size="2">USB License Key Manager
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
@@ -247,6 +224,15 @@
 				<td><font size="2"><li>Yes
 			</tr>
 			<tr align="center">
+				<th><font size="2">View Exception Log
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+			</tr>
+			<tr align="center">
 				<th><font size="2">VOA File Viewer
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
@@ -256,25 +242,24 @@
 				<td><font size="2"><li>Yes
 			</tr>
 		</table></li>
-</UL>
+	</UL>
 <p>
 	<LI><h2>File Processors</h2></li>
 <p>
-	Below is a table indicating which file processors that each license type should be able to 
-    access.
-	For each license type, confirm that only the appropriate file processors can be accessed by
-    following the steps below. (The <b>Simple Rule Writing</b> license should not have access to
-    the <b>File Action Manager</b>, and thus should have no file processors.)
+	Below is a table indicating which file processors that each license type should be able 
+	to access.  For each license type, confirm that only the appropriate file processors can 
+	be accessed by following the steps below. (The <b>Simple Rule Writing</b> license should 
+	not have access to the <b>File Action Manager</b>, and thus should have no file processors.)
 <p>
 	<ul>
-		<li>Create the license file using the <b>COM License Generator</b> utility. Copy this file
-        to the CommonComponents folder.  Remove any other <b>.lic</b> files from the
-        CommonComponents folder.</li>
-		<li>Open the <b>File Action Manager</b>.  Select any action from the current database and
-        then click <i>Process files in the queue for this action</i>. Click on the Processing Setup
-        tab and then click <i>Add...</i>
-		<li>Confirm that <b>only</b> the file processors marked as "Yes" in the table below are
-        contained in the drop down menu labeled <i>Select Task</i>.
+		<li>Create the license file using the <b>COM License Generator</b> utility. Copy this 
+		file to the LicenseFiles folder.  Remove or rename any other <b>.lic</b> files from the 
+		folder.</li>
+		<li>Open the <b>File Action Manager</b>.  Select any action from the current database 
+		and then click <i>Process files in the queue for this action</i>. Click on the 
+		Processing Setup tab and then click <i>Add...</i>
+		<li>Confirm that <b>only</b> the file processors marked as "Yes" in the table below are 
+		contained in the drop down menu labeled <i>Select Task</i>.
 		<li>Close the <b>File Action Manager</b>.
 <p>
 		<table border=1 cellpadding="5" cellspacing="0">
@@ -360,6 +345,33 @@
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
+			<th><font size="2">Core: Create file
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
+			<th><font size="2">Core: Delete empty folder
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
+			<th><font size="2">Core: Encrypt/Decrypt file
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
 			<th><font size="2">Core: Execute rules
 			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
@@ -396,10 +408,37 @@
 			<td><font size="2"><li>Modify PDF (Pegasus PDF Annotation Removal)
 		</tr>
 		<tr align="center">
+			<th><font size="2">Core: Modify Source Document Name in Database
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
 			<th><font size="2">Core: OCR document
 			<td><font size="2"><li>No
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>No
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
+			<th><font size="2">Core: Rasterize PDF
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>PDF Read/Write
+		</tr>
+		<tr align="center">
+			<th><font size="2">Core: Set file priority
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
@@ -421,6 +460,15 @@
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
+			<th><font size="2">Core: Transfer file via FTP/SFTP
+			<td><font size="2"><li>No
+			<td><font size="2"><li>No
+			<td><font size="2"><li>No
+			<td><font size="2"><li>No
+			<td><font size="2"><li>No
+			<td><font size="2"><li>FTP/SFTP file transfer
 		</tr>
 		<tr align="center">
 			<th><font size="2">Data Entry: Verify extracted data
@@ -450,6 +498,15 @@
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
+			<th><font size="2">Redaction: Create redacted text
+			<td><font size="2"><li>No
+			<td><font size="2"><li>No
+			<td><font size="2"><li>No
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>Yes
+			<td><font size="2"><li>N/A
+		</tr>
+		<tr align="center">
 			<th><font size="2">Redaction: Extend redactions to surround context
 			<td><font size="2"><li>No
 			<td><font size="2"><li>No
@@ -468,19 +525,10 @@
 			<td><font size="2"><li>N/A
 		</tr>
 		<tr align="center">
-			<th><font size="2">Redaction: Redact image without verification (legacy)
+			<th><font size="2">Redaction: Merge ID Shield data files
 			<td><font size="2"><li>No
 			<td><font size="2"><li>No
 			<td><font size="2"><li>No
-			<td><font size="2"><li>Yes
-			<td><font size="2"><li>Yes
-			<td><font size="2"><li>N/A
-		</tr>
-		<tr align="center">
-			<th><font size="2">Redaction: Verify and redact image (legacy)
-			<td><font size="2"><li>No
-			<td><font size="2"><li>No
-			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>Yes
 			<td><font size="2"><li>N/A
@@ -498,31 +546,29 @@
 <p>
 		<li><u>Testing Specially Licensed Tasks</u>
 		<ul>
-			<li>For the tasks noted above that contain a specific entry in the <b>Special
-            License</b> column, create a separate specific license file and copy it to the
-            <b>CommonComponents</b> folder.
+			<li>For the tasks noted above that contain a specific entry in the <b>Special 
+			License</b> column, create a separate specific license file and copy it to the 
+			<b>LicenseFiles</b> folder.
 			<li>Update the collection of supported tasks via <b>Tools - Check for new 
-            components</b>.
+			components</b>.
 			<li>Confirm that the special task is now licensed.
 		</ul>
 	</ul>
 <p>
-</ul>
-<p>
 	<li><h2>Other Utilities</h2>
 <p>
-	Below is a table indicating which additional utilities that each license type should be able to
-    access. For each license type, confirm that only the appropriate utilities can be accessed by
-    following the steps below. 
+	Below is a table indicating which additional utilities that each license type should be able 
+	to access. For each license type, confirm that only the appropriate utilities can be accessed 
+	by following the steps below. 
 <p>
 	<ul>
-		<li>Create the license file using the <b>COM License Generator</b> utility. Copy this file
-        to the CommonComponents folder.  Remove any other <b>.lic</b> files from the
-        CommonComponents folder.</li>
-		<li>Confirm that each of the utilities marked with <b>Yes</b> are licensed and can be run.
-        Confirm that each of the utilities marked with <b>No</b> are not licensed.  The paths to
-        the utilities, or applicable instructions, have been included in the table below.  All the
-        paths are located under <b>C:\Program Files\Extract Systems</b> (for a 32-bit system).
+		<li>Create the license file using the <b>COM License Generator</b> utility. Copy this 
+		file to the LicenseFiles folder.  Remove any other <b>.lic</b> files from the folder.</li>
+		<li>Confirm that each of the utilities marked with <b>Yes</b> are licensed and can be 
+		run.  Confirm that each of the utilities marked with <b>No</b> are not licensed.  The 
+		paths to the utilities, or applicable instructions, have been included in the table 
+		below.  All the paths are located under <b>C:\Program Files\Extract Systems</b> (for 
+		a 32-bit system).
 <p>
 		<table border=1 cellpadding="5" cellspacing="0">
 		<tr>
@@ -545,26 +591,6 @@
 				<td><font size="2">.\CommonComponents\<br>AdjustImageResolution.exe
 			</tr>
 			<tr align="center">
-				<th><font size="2">Convert FPS File
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>Yes
-				<td><font size="2">.\CommonComponents\<br>ConvertFPSFile.exe
-			</tr>
-			<tr align="center">
-				<th><font size="2">CopyNumberedFiles
-				<td><font size="2"><li>N/A
-				<td><font size="2"><li>N/A
-				<td><font size="2"><li>N/A
-				<td><font size="2"><li>N/A
-				<td><font size="2"><li>N/A
-				<td><font size="2"><li>Yes
-				<td><font size="2">.\CommonComponents\<br>CopyNumberedFiles.exe
-			</tr>
-			<tr align="center">
 				<th><font size="2">Create Multipage Image
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
@@ -573,16 +599,6 @@
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
 				<td><font size="2">.\CommonComponents\<br>CreateMultiPageImage.exe
-			</tr>
-			<tr align="center">
-				<th><font size="2">Document Sorter
-				<td><font size="2"><li>No
-				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>Yes
-				<td><font size="2">.\CommonComponents\<br>DocumentSorterConsoleApp.exe
 			</tr>
 			<tr align="center">
 				<th><font size="2">Email File
@@ -595,16 +611,6 @@
 				<td><font size="2">.\CommonComponents\<br>EmailFile.exe
 			</tr>
 			<tr align="center">
-				<th><font size="2">EncryptFile
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>Yes
-				<td><font size="2">.\CommonComponents\<br>EncryptFile.exe
-			</tr>
-				<tr align="center">
 				<th><font size="2">ESOCR
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
@@ -615,44 +621,44 @@
 				<td><font size="2">.\CommonComponents\<br>ESOCR.exe
 			</tr>
 			<tr align="center">
-				<th><font size="2">GetWordLengthDist
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
+				<th><font size="2">ExtractImageViewer
 				<td><font size="2"><li>Yes
-				<td><font size="2">.\CommonComponents\<br>GetWordLengthDist.exe
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2">.\CommonComponents\<br>ExtractImageViewer.exe
 			</tr>
 			<tr align="center">
-				<th><font size="2">ID Shield Statistics Reporter
-				<td><font size="2"><li>No
-				<td><font size="2"><li>No
+				<th><font size="2">FAMDBLockChecker
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
-				<td><font size="2">.\CommonComponents\<br>IDShieldStatisticsReporter.exe
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2">.\CommonComponents\<br>FAMDBLockChecker.exe
 			</tr>
 			<tr align="center">
-				<th><font size="2">Index Converter
-				<td><font size="2"><li>N/A
-				<td><font size="2"><li>N/A
-				<td><font size="2"><li>N/A
-				<td><font size="2"><li>N/A
-				<td><font size="2"><li>N/A
+				<th><font size="2">KillAllOCRInstances
 				<td><font size="2"><li>Yes
-				<td><font size="2">.\CommonComponents\<br>IndexConverter.exe
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>Yes
+				<td><font size="2">.\CommonComponents\<br>KillAllOCRInstances.bat
 			</tr>
 			<tr align="center">
-				<th><font size="2">KillOCRInstances
+				<th><font size="2">LogProcessStats
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
 				<td><font size="2"><li>Yes
-				<td><font size="2">.\CommonComponents\<br>KillOCRInstances.bat
+				<td><font size="2">.\CommonComponents\<br>LogProcessStats.exe
 			</tr>
 			<tr align="center">
 				<th><font size="2">OCR in Image Viewer
@@ -675,6 +681,16 @@
 				<td><font size="2"><li>No
 				<td><font size="2"><li>Yes
 				<td><font size="2">.\CommonComponents\<br>RedactFromXML.exe
+			</tr>
+			<tr align="center">
+				<th><font size="2">Run FPS File
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2"><li>No
+				<td><font size="2"><li>Yes
+				<td><font size="2">.\CommonComponents\<br>RunFPSFile.exe
 			</tr>
 			<tr align="center">
 				<th><font size="2">Run Rules
@@ -745,8 +761,8 @@
 		<ul>
 			<li>Use the <b>COM License Generator</b> utility to create 
 			a license which includes the <b>Create Searchable PDF</b> package.  
-			Copy this file to the CommonComponents folder.  
-			<li>Confirm that the <b>Convert to searchable PDF</b> task 
+			Copy this file to the LicenseFiles folder.  
+			<li>Confirm that the <b>Core: Convert to searchable PDF</b> task 
 			is available in the File Action Manager.
 			<li>Use this task to convert some redacted TIF images, and 
 			confirm that the redacted output image is also available 
@@ -757,27 +773,37 @@
 		<ul>
 			<li>Use the <b>COM License Generator</b> utility to create 
 			a license which includes the <b>Disable USB Key Serial 
-			Numbers</b> package.  Copy this file to the CommonComponents 
+			Numbers</b> package.  Copy this file to the LicenseFiles 
 			folder.
 			<li>Confirm that a customer rules set that is locked to 
 			a specific serial number can be run with a different USB Key.
 		</ul>
 <p>
-		<li><b>Disable USB Counters (locked to PC)</b> <b>WAYNE MUST PERFORM THIS TEST!!!</b>
+		<li><b>Disable USB Counters (locked to PC)</b> <b>DEVELOPER MUST PERFORM THIS TEST!!!</b>
 		<ul>
 			<li>Use the <b>COM License Generator</b> utility to create 
 			a license which includes the <b>Disable USB Counters 
 			(locked to PC)</b> package.  Copy this file to the 
-			CommonComponents folder.
+			LicenseFiles folder.
 			<li>Confirm that a customer rules set that is locked to 
 			a specific serial number can be run without a USB key.
+		</ul>
+<p>
+		<li><b>FTP/SFTP File Transfer</b>
+		<ul>
+			<li>Use the <b>COM License Generator</b> utility to create 
+			a license which includes the <b>FTP/SFTP file transfer</b> package.  
+			Copy this file to the LicenseFiles folder.  
+			<li>Confirm that the <b>Core: Transfer file via FTP/SFTP</b> task 
+			is available in the File Action Manager.
+			<li>Confirm that files can be successfully transferred.
 		</ul>
 <p>
 		<li><b>Handwriting Recognition</b>
 		<ul>
 			<li>Use the <b>COM License Generator</b> utility to create 
 			a license which includes the <b>Handwriting Recognition</b> package.  
-			Copy this file to the CommonComponents folder.  
+			Copy this file to the LicenseFiles folder.  
 			<li>Confirm that the <b>Find SSNs within image area</b> value  
 			modifier is available in the Rule Set Editor.
 			<li>Exercise the associated automated tests and confirm 
@@ -788,8 +814,8 @@
 		<ul>
 			<li>Use the <b>COM License Generator</b> utility to create 
 			a license which includes the <b>Image Cleanup Engine</b> package.  
-			Copy this file to the CommonComponents folder.  
-			<li>Confirm that the <b>Cleanup image</b> task 
+			Copy this file to the LicenseFiles folder.  
+			<li>Confirm that the <b>Core: Cleanup image</b> task 
 			is available in the File Action Manager.
 			<li>Use this task to clean some images ( see the image files 
 			associated with the automated test ), and confirm that 
@@ -800,7 +826,7 @@
 		<ul>
 			<li>Use the <b>COM License Generator</b> utility to create 
 			a license which includes the <b>MICR Finding Engine</b> package.  
-			Copy this file to the CommonComponents folder.  
+			Copy this file to the LicenseFiles folder.  
 			<li>Also license <b>ID Shield Server</b> but not <b>RDT</b>.
 			<li>Exercise the <b>St Johns</b> rules or another rule set that 
 			uses the <b>MICR Finder</b>.
@@ -815,8 +841,7 @@
 		<ul>
 			<li>Use the <b>COM License Generator</b> utility to create 
 			a license which includes the <b>Modify PDF (Pegasus PDF Annotation 
-			Removal)</b> package.  
-			Copy this file to the CommonComponents folder.  
+			Removal)</b> package.  Copy this file to the LicenseFiles folder.  
 			<li>Confirm that the <b>Core: Modify PDF file</b> task is licensed.
 			<li>Confirm that annotations can be removed from PDF documents.
 		</ul>
@@ -825,69 +850,18 @@
 		<ul>
 			<li>Use the <b>COM License Generator</b> utility to create 
 			a license which includes the <b>PDF Read + Write</b> package.  
-			Copy this file to the CommonComponents folder.  
+			Copy this file to the LicenseFiles folder.  
 			<li>Confirm that PDF documents can be opened in the <b>Spot 
 			Recognition Window</b>.
 			<li>Confirm that PDF documents can be redacted in <b>ID 
 			Shield</b>, and that the redacted output image is also in 
 			PDF format.
 		</ul>
-<p>
-	</ul>
-<p>
-	<li><h2>Other Installed EXEs</h2>
-	<ul>
-		<li>to the <b>CommonComponents</b> folder
-		<li><b>FLEX Index / ID Shield</b>
-		<ul>
-			<li>EmailFile.exe
-			<ul>
-				<li><b>[LegacyRC #5170]</b> Confirm that this application 
-				has a working <b>Send test email</b> button.
-			</ul>
-			<li>GetFullUserName.exe
-			<li>OSSI.exe
-		</ul>
-		<li><b>RDT</b>
-		<ul>
-			<li>OCRSingleDocument.exe
-			<ul>
-				<li><b>[LegacyRC #5262]</b> Confirm that this application 
-				will run from the command line.
-			</ul>
-			<li>VBScriptUtils.dll
-		</ul>
 	</ul>
 </UL>
 <p>
 	<LI><h2>Miscellaneous - Can be tested on any operating system</h2>
 	<UL>
-	  	<LI><b>[LegacyRC #4741]</b> Cleanup Image
-		<ul>
-			<li>Confirm that <b>CleanupImage.exe</b> has an icon different than 
-			the default MFC icon.
-			<li>Confirm that double-clicking on the EXE does not display a DOS window.
-		</ul>
-<p>
-	  	<LI><b>[LegacyRC #4740]</b> Convert To Searchable PDF
-		<ul>
-			<li>Confirm that <b>ESConvertToPDF.exe</b> has an icon different than 
-			the default MFC icon.
-			<li>Confirm that double-clicking on the EXE does not display a DOS window.
-		</ul>
-<p>
-	  	<LI><b>[LegacyRC #4634]</b> * Image Format Converter
-		<ul>
-			<li>Confirm that <b>ImageFormatConverter.exe</b> has an icon different than 
-			the default MFC icon.
-		</ul>
-<p>
-	  	<LI><b>[LegacyRC #4607]</b> Convert FAM Database
-		<ul>
-			<li>Confirm that <b>ConvertFAMDB.exe</b> has an icon different than 
-			the default MFC icon.
-		</ul>
-	<p>
   	   	<LI><b>[LegacyRC #5029]</b> Max Files Per SSOCR2 instance registry item 
 	       	<ul>
 	      		<li>Check the <b>HKLM/Software/ReusableComponents/COMComponents/UCLIDRasterAndOCRMgmt/OCREngines/SSOCR/MaxFilesPerInstance</b> 
@@ -899,118 +873,16 @@
 		       	</ul>
 	       	</ul>
 <p>
-  	   	<LI><b>[LegacyRC #5028]</b> Location of UEX file
-	       	<ul>
-			<li>Confirm that the file <b>is not</b> present at Program Files\Extract 			Systems\LogFiles\Misc on a clean system.
-			<li>Confirm that the file <b>is not</b> present at Documents and Settings\All 
-			Users\Application Data\Extract Systems\LogFiles\Misc on a clean system.
-			<li>Install ID Shield and create a database.
-			<li>Confirm that the file <b>is</b> present at Documents and Settings\All 
-			Users\Application Data\Extract Systems\LogFiles\Misc.
-			<li>Confirm that the <b>View Exception Log</b> item in the Start menu displays the 
-			exception log.
-	       	</ul>
-<p>
-  	   	<LI><b>[LegacyRC #5069]</b> Location of RPT files
-	       	<ul>
-			<li>Install <b>ID Shield</b> and create a database.
-			<li>Open the <b>Report Viewer</b> and confirm that a list <b>Standard reports</b> 
-			is presented along with thumbnail images.
-			<li>Confirm that the associated RPT and JPG files are located in the 
-			<b>Extract Systems\CommonComponents\FileProcessingComponents\Reports\Standard 
-			reports</b> folder.
-	       	</ul>
-<p>
   	   	<LI><b>[LegacyRC #5554]</b> OCR engine version 16.3
 	       	<ul>
 	  	   	<LI>Confirm that <b>KernelAPI.dll</b> has a <b>16.3.9559.1746</b> 
 			version number.
 	       	</ul>
 <p>
-  	   	<LI><b>[LegacyRC #5577]</b> Lead Tools version 16.5 Release 2
+  	   	<LI><b>[LegacyRC #6002]</b> Lead Tools version 17
 	       	<ul>
-	  	   	<LI>Confirm that <b>Ltkrnu.dll.dll</b> has a <b>16.5.5.1</b> 
+	  	   	<LI>Confirm that <b>Ltkrnu.dll.dll</b> has a <b>17.0.0.10</b> 
 			version number.
-	       	</ul>
-<p>
-  	   	<LI><b>[LegacyRC #5617]</b> Max Files From Database
-	       	<ul>
-			<li>Examine <b>HKCU/Software/Extract 
-			Systems/ReusableComponents/COMComponents/UCLIDFileProcessing/FPRecordManager</b>.
-			<li>Confirm that the default value for the <b>MaxFilesFromDB</b> key 
-			is <b>1</b>.
-	       	</ul>
-<p>
-		<li><b>[FlexIDSCore #3160]</b> Install - Register .fps file types to open with ProcessFiles</li>
-		<ul>
-			<li>Ensure that the .fps file type is registered to open with ProcessFiles.</li>
-		</ul>
-<p>
-		<li><b>[FlexIDSCore #3161]</b> Uninstall leaves CrystalReports installed</li>
-		<ul>
-			<li>Confirm that uninstalling FlexIndex or IDShield brings up a dialog asking if 
-			you want to uninstall Crystal Reports as well.</li>
-			<li>Confirm that selecting <b>No</b> uninstalls FLEX Index or ID Shield but 
-			leaves Crystal Reports installed.</li>
-			<li>Confirm that selecting <b>Yes</b> uninstalls FLEX Index or ID Shield as well 
-			as Crystal Reports.
-		</ul>
-<p>
-		<li><b>[FlexIDSCore #3210]</b> Registry key has incorrect path for RuleSet Editor</li>
-		<ul>
-			<li>Confirm that the registry key HKEY_CLASSES_ROOT\Extract Systems RSD 
-			File\shell\open\command points to "C:\Program Files\Extract 
-			Systems\CommonComponents\RuleSetEditor.exe" "%1"</li>
-		</ul>
-<p>
-		<li><b>[FlexIDSCore #3241]</b> Registry key has incorrect path to VOAFileViewer.exe</li>
-		<ul>
-			<li>Confirm that the registry key HKEY_CLASSES_ROOT\Extract Systems EAV 
-			File\shell\open\command	points to "C:\Program Files\Extract 
-			Systems\CommonComponents\VOAFileViewer.exe" "%1"</li>
-		</ul>
-<p>
-		<li><b>[FlexIDSCore #3421]</b> USS and VOA icons
-		<ul>
-			<li>Confirm that <b>USS</b> files are displayed with the same icon as the 
-			<b>USS File Viewer</b>.
-			<li>Confirm that <b>VOA</b> files are displayed with the same icon as the 
-			<b>VOA File Viewer</b>.
-		</ul>
-<p>
-  	   	<LI><b>[FlexIDSCore #3663, #3664]</b> File associations after installation
-		<ul>
-			<li>Confirm that <b>VOA</b> and <b>EVOA</b> files are associated with the 
-			<b>VOA Viewer</b> without running the viewer as administrator.
-			<li>Confirm that <b>TIF</b> files are associated with the <b>Image Viewer</b> 
-			without running the viewer as administrator.
-		</ul>
-<p>
-  	   	<LI><b>[FlexIDSCore #3917]</b> RegisterAll.bat
-	       	<ul>
-			<li>Confirm that <b>RegisterAll.bat</b> is located in the 
-			<b>CommonComponents</b> folder.
-			<li>Exercise the batch file.
-			<li>Confirm that the user is prompted to start the registration process.
-			<li>Confirm that a status message is displayed in the command window for 
-			each file being registered.
-			<li>Confirm that the user is prompted again at the end of the registration 
-			process.
-			<li>Confirm that exercising the batch file using the <b>/s</b> flag 
-			causes the file to run silently without prompts or messages.
-	       	</ul>
-<p>
-  	   	<LI><b>[FlexIDSCore #3979]</b> Confirm that <b>CacheRSD</b> from 
-		<b>HKCU\Software\Extract Systems\AttributeFinder\Settings</b> is disabled by default.
-<p>
-  	   	<LI><b>[FlexIDSCore #4106]</b> Confirm that a folder for <b>SQL Server 2008 SP1</b> is 
-		included with the installation.
-<p>
-  	   	<LI><b>[LegacyRC #4329]</b> Remove LST files with Uninstall
-	       	<ul>
-	      		<li>Uninstall both <b>FLEX Index</b> and <b>ID Shield</b>.
-			<li>Confirm that the <b>*.LST</b> files have been removed 
-			from the <b>CommonComponents</b> folder.
 	       	</ul>
 	</UL>
 <p>
