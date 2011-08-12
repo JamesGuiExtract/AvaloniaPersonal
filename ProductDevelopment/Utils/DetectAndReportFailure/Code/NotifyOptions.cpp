@@ -176,9 +176,8 @@ const string& NotifyOptions::getINIFileName() const
 		// ensure that we can access the CWinApp object
 		CWinApp *pApp = AfxGetApp();
 		ASSERT_ARGUMENT("ELI12373", pApp != NULL);
-
-		string strModuleDirectory = getModuleDirectory(pApp->m_hInstance);
-		strINIFileName = strModuleDirectory + string("\\DetectAndReportFailure.ini");
+		
+		strINIFileName = getExtractApplicationDataPath() + "\\FDRS\\DetectAndReportFailure.ini";
 	}
 
 	return strINIFileName;
