@@ -16,7 +16,6 @@
 #define IDR_AFDOCUMENT                  112
 #define IDR_RULEEXECUTIONENV            113
 #define IDR_RULEEXECUTIONSESSION        114
-#define IDR_FEEDBACKMGRINTERNALS        115
 #define IDR_RULETESTERUI                116
 #define IDS_TITLETesterDlgRulesetPage   118
 #define IDS_HELPFILETesterDlgRulesetPage 119
@@ -191,7 +190,6 @@
 #define ID_EDIT_DUPLICATE               32783
 #define ID_TOOLS_HARNESS                32784
 #define ID_BUTTON_VOA                   32785
-#define ID_BUTTON_FEEDBACK              32786
 #define ID_FILE_MRU                     32787
 #define ID_MRU_FILE1                    32788
 #define ID_MRU_FILE2                    32789

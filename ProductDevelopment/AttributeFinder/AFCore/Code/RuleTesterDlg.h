@@ -88,7 +88,6 @@ protected:
 	afx_msg void OnButtonSRIR();
 	afx_msg void OnButtonClear();
 	afx_msg void OnButtonExecute();
-	afx_msg void OnButtonFeedback();
 	afx_msg void OnButtonVoa();
 	afx_msg void OnButtonEnableSRIR();
 	afx_msg void OnButtonAbout();

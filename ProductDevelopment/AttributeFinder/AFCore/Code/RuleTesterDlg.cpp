@@ -114,7 +114,6 @@ BEGIN_MESSAGE_MAP(RuleTesterDlg, CDialog)
 	ON_COMMAND(ID_BUTTON_SRIR, OnButtonSRIR)
 	ON_COMMAND(ID_BUTTON_CLEAR, OnButtonClear)
 	ON_COMMAND(ID_BUTTON_EXECUTE, OnButtonExecute)
-	ON_COMMAND(ID_BUTTON_FEEDBACK, OnButtonFeedback)
 	ON_COMMAND(ID_BUTTON_VOA, OnButtonVoa)
 	ON_COMMAND(ID_BUTTON_KEY_SR, OnButtonEnableSRIR)
 	ON_COMMAND(ID_BUTTON_ABOUT, OnButtonAbout)
@@ -659,23 +658,6 @@ BOOL RuleTesterDlg::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT *pResult)
 	}
 
 	return retCode;
-}
-//-------------------------------------------------------------------------------------------------
-void RuleTesterDlg::OnButtonFeedback() 
-{
-	AFX_MANAGE_STATE(AfxGetModuleState());
-	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
-
-	try
-	{
-		// Get Feedback Manager from Attribute Finder Engine
-		UCLID_AFCORELib::IFeedbackMgrPtr ipFeedback = getAFEngine()->FeedbackManager;
-		ASSERT_RESOURCE_ALLOCATION("ELI09056", ipFeedback != __nullptr);
-
-		// Provide modified results to the Feedback Manager
-		ipFeedback->RecordCorrectData(get_bstr_t(m_strRuleID.c_str()), m_ipAttributes);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08794")
 }
 //-------------------------------------------------------------------------------------------------
 void RuleTesterDlg::OnButtonVoa() 
@@ -1551,26 +1533,19 @@ void RuleTesterDlg::updateButtonStates(bool bRulesExecuting)
 {
 	try
 	{
-		// Set default enable/disable values for VOA and Feedback
+		// Set default enable/disable value for VOA
 		BOOL bEnableVOA = FALSE;
-		BOOL bEnableFeedback = FALSE;
 
 		// All others are enabled/disabled based on rule execution
 		BOOL bEnableOthers = asMFCBool(!bRulesExecuting);
 
 		// If the rules are not currently executing then enable/disable the
-		// VOA and Feedback buttons based on the whether there are attributes
-		// and a ruleID
+		// VOA button based on the whether there are attributes
 		if (!bRulesExecuting)
 		{
 			if (m_ipAttributes != __nullptr && m_ipAttributes->Size() > 0)
 			{
 				bEnableVOA = TRUE;
-
-				if (!m_strRuleID.empty())
-				{
-					bEnableFeedback = TRUE;
-				}
 			}
 		}
 
@@ -1583,7 +1558,6 @@ void RuleTesterDlg::updateButtonStates(bool bRulesExecuting)
 			m_apToolBar->GetToolBarCtrl().EnableButton(ID_BUTTON_KEY_SR, bEnableOthers);
 			m_apToolBar->GetToolBarCtrl().EnableButton(ID_BUTTON_ABOUT, bEnableOthers);
 			m_apToolBar->GetToolBarCtrl().EnableButton(ID_BUTTON_VOA, bEnableVOA);
-			m_apToolBar->GetToolBarCtrl().EnableButton(ID_BUTTON_FEEDBACK, bEnableFeedback);
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25563");

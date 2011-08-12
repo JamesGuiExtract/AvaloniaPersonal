@@ -378,6 +378,10 @@ BEGIN
         BOTTOMMARGIN, 167
     END
 
+    IDD_DLG_TESTER_EDIT, DIALOG
+    BEGIN
+    END
+
     IDD_ENGINE_PROGRESS_DLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -408,6 +412,10 @@ BEGIN
         RIGHTMARGIN, 219
         TOPMARGIN, 7
         BOTTOMMARGIN, 109
+    END
+
+    IDD_TESTERDLG_RULESET_PAGE, DIALOG
+    BEGIN
     END
 
     IDD_CONDITIONALRULEPP, DIALOG
@@ -492,7 +500,6 @@ BEGIN
     BUTTON      ID_BUTTON_EXECUTE
     SEPARATOR
     BUTTON      ID_BUTTON_VOA
-    BUTTON      ID_BUTTON_FEEDBACK
     BUTTON      ID_BUTTON_KEY_SR
     SEPARATOR
     BUTTON      ID_BUTTON_ABOUT
@@ -583,7 +590,6 @@ END
 STRINGTABLE
 BEGIN
     ID_BUTTON_VOA           "Save attributes to VOA file"
-    ID_BUTTON_FEEDBACK      "Save attributes to Feedback"
     ID_BUTTON_KEY_SR        "Disable Image Viewer when pressed"
     ID_BUTTON_ABOUT         "About Rule Tester..."
 END

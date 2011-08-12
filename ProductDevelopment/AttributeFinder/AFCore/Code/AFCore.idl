@@ -36,7 +36,6 @@ library UCLID_AFCORELib
 	// forward declarations
 	/////////////////////////
 	interface IAttributeSplitter;
-	interface IFeedbackMgr;
 
 	//////////////
 	// Enums
@@ -480,8 +479,6 @@ library UCLID_AFCORELib
 			[in] IProgressStatus *pProgressStatus,
 			[out, retval] IIUnknownVector** pAttributes);
 		//-----------------------------------------------------------------------------------------
-		[propget, id(7), helpstring("property FeedbackManager")] HRESULT FeedbackManager([out, retval] IFeedbackMgr **pVal);
-		//-----------------------------------------------------------------------------------------
 		// Displays a product-specific About box
 		[id(8), helpstring("method ShowHelpAboutBox")] HRESULT ShowHelpAboutBox([in] EHelpAboutType eType, [in] BSTR strProductVersion);
 		//-----------------------------------------------------------------------------------------
@@ -593,76 +590,6 @@ library UCLID_AFCORELib
 
 	};
 
-	//---------------------------------------------------------------------------------------------
-
-	[
-		object,
-		uuid(4E432DEA-68DC-44B5-9EAD-CE48BFF660BC),
-		dual,
-		helpstring("IFeedbackMgr Interface"),
-		pointer_default(unique)
-	]
-	interface IFeedbackMgr : IDispatch
-	{
-		// Saves a copy of the vector of Attributes as "ID.correct.voa" in the 
-		// Feedback folder.  Also stores the system time in the appropriate 
-		// CorrectTime field in the Feedback database.
-		[id(1), helpstring("method RecordCorrectData")] HRESULT RecordCorrectData([in] BSTR strRuleExecutionID, [in] IIUnknownVector* pData);
-	};
-
-	//---------------------------------------------------------------------------------------------
-
-	[
-		object,
-		uuid(02A62A96-E2CE-454B-AF5E-EFF091EF27E0),
-		dual,
-		helpstring("IFeedbackMgrInternals Interface"),
-		pointer_default(unique)
-	]
-	interface IFeedbackMgrInternals : IDispatch
-	{
-		// Saves a copy of the vector of Attributes as "ID.found.voa" in the 
-		// Feedback folder.  Also stores the difference between the system time and 
-		// previously stored StartTime in the Duration field in the Feedback database.
-		[id(1), helpstring("method RecordFoundData")] HRESULT RecordFoundData([in] BSTR strRuleExecutionID, [in] IIUnknownVector* pData);
-
-		// Saves a copy of the exception as "ID.uex" in the Feedback folder.
-		[id(2), helpstring("method RecordException")] HRESULT RecordException([in] BSTR strRuleExecutionID, [in] BSTR strException);
-
-		// Saves a copy of the vector of Attributes as "ID.found.voa" in the 
-		// Feedback folder.  Also stores the system time in the appropriate 
-		// StartTime field in the Feedback database.
-		[id(3), helpstring("method RecordRuleExecution")] HRESULT RecordRuleExecution([in] IAFDocument *pAFDoc, [in] BSTR strRSDFileName, [out, retval] BSTR *pstrRuleExecutionID);
-
-		// Displays the Configure Feedback dialog allowing the user to enable/disable
-		// feedback collection, set skip counts and set handling of source documents.
-		// Moved this functionality to Feedback EXE 1/25/05 - WEL
-//		[id(4), helpstring("method ShowConfigUI")] HRESULT ShowConfigUI();
-
-		// Displays the Package Feedback dialog.
-		// Moved this functionality to Feedback EXE 1/25/05 - WEL
-//		[id(5), helpstring("method ShowPackagingUI")] HRESULT ShowPackagingUI();
-
-		// Not used at this time
-//		[id(6), helpstring("method ShowUnpackagingUI")] HRESULT ShowUnpackagingUI();
-
-		// Displays a dialog allowing the user to show either the Configure dialog
-		// of the Package dialog.  This is the default display from the Feedback EXE.
-		// Moved this functionality to Feedback EXE 1/25/05 - WEL
-//		[id(7), helpstring("method ShowChoiceUI")] HRESULT ShowChoiceUI();
-
-		// Deletes all files from the Feedback folder.  Deletes all records from 
-		// the Feedback database.
-		[id(8), helpstring("method ClearFeedbackData")] HRESULT ClearFeedbackData([in] VARIANT_BOOL bShowPrompt);
-
-		// Returns an ADO Recordset object containing all records and all fields from 
-		// the RuleExecution table in the Feedback database.  An IUnknown object is 
-		// returned here to avoid the need for AFCore to #import msado15.dll
-		[id(9), helpstring("method GetFeedbackRecords")] HRESULT GetFeedbackRecords([out, retval] IUnknown **pFeedbackRecords);
-
-		// Closes the database connection to allow independent file access.
-		[id(10), helpstring("method CloseConnection")] HRESULT CloseConnection();
-	};
 	//---------------------------------------------------------------------------------------------
 	[
 		object,

@@ -241,10 +241,6 @@
       <Project>{a29cd5b4-bfdc-44d4-b3fe-9a73248fcab3}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\Feedback\Code\Feedback.vcxproj">
-      <Project>{17b1361c-dc30-4e7a-8f98-f2fab2aade19}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\RuleTester\Code\RuleTester.vcxproj">
       <Project>{bb3f042d-ede8-4324-916f-73c4ad01e1bf}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

@@ -80,7 +80,6 @@ CAttributeFinderEngine::~CAttributeFinderEngine()
 		// Release COM objects
 		m_ipOCREngine = __nullptr;
 		m_ipOCRUtils = __nullptr;
-		m_ipInternals = __nullptr;
 		mu_pUserCfgMgr.reset();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16300");
@@ -278,35 +277,6 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		}
 		_lastCodePos = "18";
 
-		/////////////////////////////////////
-		// Get Rule Execution ID for Feedback
-		/////////////////////////////////////
-
-		UCLID_AFCORELib::IFeedbackMgrInternalsPtr ipInternals = getInternals();
-		ASSERT_RESOURCE_ALLOCATION("ELI28078", ipInternals != __nullptr);
-
-		// Get RSD File from Rule Set
-		_bstr_t _bstrRSD = ipRuleSet->FileName;
-		_lastCodePos = "21";
-
-		// Get next ID
-		_bstr_t	bstrID = ipInternals->RecordRuleExecution(ipAFDoc, _bstrRSD);
-		_lastCodePos = "22";
-
-		// Add string tag if ID is defined
-		if (bstrID.length() > 0)
-		{
-			_lastCodePos = "23";
-
-			// Retrieve existing String Tags from AFDocument
-			IStrToStrMapPtr	ipStringTags = ipAFDoc->StringTags;
-			ASSERT_RESOURCE_ALLOCATION("ELI09062", ipStringTags != __nullptr);
-
-			// Add Rule ID tag to AFDocument
-			ipStringTags->Set(gstrRULE_EXEC_ID_TAG_NAME.c_str(), bstrID);
-		}
-		_lastCodePos = "24";
-
 		// Update progress status to indicate that we are next going to execute rules
 		if (ipProgressStatus)
 		{
@@ -327,10 +297,6 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 			ipvecAttributeNames, ipSubProgressStatus);
 		ASSERT_RESOURCE_ALLOCATION("ELI28079", ipAttributes != __nullptr);
 
-		// Provide Found Data to Feedback
-		ipInternals->RecordFoundData(bstrID, ipAttributes);
-		_lastCodePos = "28";
-
 		// Set the return value for the attributes
 		*ppAttributes = ipAttributes.Detach();
 		_lastCodePos = "30";
@@ -345,26 +311,6 @@ STDMETHODIMP CAttributeFinderEngine::FindAttributes(IAFDocument *pDoc,
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07820");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAttributeFinderEngine::get_FeedbackManager(IFeedbackMgr **pVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		// Check licensing
-		validateLicense();
-
-		ASSERT_ARGUMENT("ELI28080", pVal != __nullptr);
-
-		// Get the feedback manager and return it
-		UCLID_AFCORELib::IFeedbackMgrPtr ipManager = getFeedbackManager();
-		*pVal = (IFeedbackMgr*) ipManager.Detach();
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09052")
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CAttributeFinderEngine::ShowHelpAboutBox(EHelpAboutType eType, BSTR strProductVersion)
@@ -635,57 +581,6 @@ void CAttributeFinderEngine::getComponentDataFolder(string& rstrFolder)
 		ue.addWin32ErrorInfo();
 		throw ue;
 	}
-}
-//-------------------------------------------------------------------------------------------------
-UCLID_AFCORELib::IFeedbackMgrPtr CAttributeFinderEngine::getFeedbackManager()
-{
-	try
-	{
-		if (m_ipFeedbackMgr == __nullptr)
-		{
-			// Retrieve ProgID from Registry
-			RegistryPersistenceMgr	rpm( HKEY_LOCAL_MACHINE, 
-				gstrAF_REG_UTILS_FOLDER_PATH );
-
-			string strProgID = rpm.getKeyValue( gstrAF_REG_FEEDBACK_FOLDER, 
-				gstrAF_FEEDBACK_PROGID_KEY, "" );
-
-			if (strProgID.length() > 2)
-			{
-				m_ipFeedbackMgr.CreateInstance( strProgID.c_str() );
-				if (m_ipFeedbackMgr == __nullptr)
-				{
-					UCLIDException ue( "ELI28083", "Failed to create Feedback Manager." );
-					ue.addDebugInfo( "Prog ID", strProgID );
-					throw ue;
-				}
-			}
-			else
-			{
-				UCLIDException ue( "ELI28084", "ProgID for Feedback Manager not found." );
-				throw ue;
-			}
-		}
-
-		return m_ipFeedbackMgr;
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28085");
-}
-//-------------------------------------------------------------------------------------------------
-UCLID_AFCORELib::IFeedbackMgrInternalsPtr CAttributeFinderEngine::getInternals()
-{
-	try
-	{
-		if (m_ipInternals == __nullptr)
-		{
-			// Get Internals interface from the feedback manager
-			m_ipInternals = getFeedbackManager();
-			ASSERT_RESOURCE_ALLOCATION( "ELI28086", m_ipInternals != __nullptr );
-		}
-
-		return m_ipInternals;
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28087");
 }
 //-------------------------------------------------------------------------------------------------
 void CAttributeFinderEngine::validateLicense()

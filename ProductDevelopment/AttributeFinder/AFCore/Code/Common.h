@@ -20,11 +20,6 @@ const std::string gstrAF_AFCORE_KEY_PATH = gstrAF_REG_ROOT_FOLDER_PATH + std::st
 const std::string gstrAF_CACHE_RSD_KEY = "CacheRSD";
 const std::string gstrAF_DEFAULT_CACHE_RSD = "0";
 
-const std::string gstrAF_REG_FEEDBACK_FOLDER = "\\FeedbackManager";
-const std::string gstrAF_FEEDBACK_PROGID_KEY = "ProgID";
-const std::string gstrAF_FEEDBACK_FEEDBACK_PROGID = "FeedbackManager.FeedbackMgr";
-const std::string gstrAF_FEEDBACK_KEY_PATH = gstrAF_REG_FEEDBACK_FOLDER + std::string("\\") + gstrAF_FEEDBACK_PROGID_KEY;
-
 const std::string gstrRULE_EXEC_ID_TAG_NAME = "RuleExecutionID";
 const std::string gstrRULE_EXEC_ID_TAG = "<" + gstrRULE_EXEC_ID_TAG_NAME + ">";
 const std::string gstrRSD_FILE_OPEN_FILTER =	"Ruleset definition files (*.rsd;*.rsd.etf)|*.rsd;*.rsd.etf|"

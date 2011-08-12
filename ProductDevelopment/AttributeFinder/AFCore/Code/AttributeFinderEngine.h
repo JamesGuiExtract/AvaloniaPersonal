@@ -48,7 +48,6 @@ public:
 							  /*[in]*/ VARIANT_BOOL vbUseAFDocText,
 							  /*[in]*/ IProgressStatus *pProgressStatus,
 							  /*[out, retval]*/ IIUnknownVector** pAttributes);
-	STDMETHOD(get_FeedbackManager)(/*[out, retval]*/ IFeedbackMgr **pVal);
 	STDMETHOD(ShowHelpAboutBox)(/*[in]*/ EHelpAboutType eType, /*[in]*/ BSTR strProductVersion);
 	STDMETHOD(GetComponentDataFolder)(/*[out, retval]*/ BSTR *pstrComponentDataFolder);
 
@@ -71,10 +70,6 @@ private:
 	IOCREnginePtr m_ipOCREngine;
 
 	IOCRUtilsPtr m_ipOCRUtils;
-
-	// Feedback objects
-	UCLID_AFCORELib::IFeedbackMgrPtr m_ipFeedbackMgr;
-	UCLID_AFCORELib::IFeedbackMgrInternalsPtr	m_ipInternals;
 
 	// Handles registry settings
 	unique_ptr<IConfigurationSettingsPersistenceMgr> mu_pUserCfgMgr;
@@ -104,10 +99,6 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// Gets the FKB version specific (or registry overridden) component data folder
 	void getComponentDataFolder(string& rFolder);
-	//----------------------------------------------------------------------------------------------
-	UCLID_AFCORELib::IFeedbackMgrPtr getFeedbackManager();
-	//----------------------------------------------------------------------------------------------
-	UCLID_AFCORELib::IFeedbackMgrInternalsPtr getInternals();
 	//----------------------------------------------------------------------------------------------
 	void validateLicense();
 };
