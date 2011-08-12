@@ -82,7 +82,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 109;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 110;
 //-------------------------------------------------------------------------------------------------
 string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 {
@@ -503,6 +503,55 @@ int UpdateToSchemaVersion109(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32569");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion110(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 110;
+
+		if (pnNumSteps != __nullptr)
+		{
+			// This update does not require transferring any data.
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		_RecordsetPtr ipProcessingFAMCount(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI33182", ipProcessingFAMCount != __nullptr);
+
+		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [ProcessingFAM]",
+			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
+
+		ipProcessingFAMCount->MoveFirst();
+		long nRowCount = getLongField(ipProcessingFAMCount->Fields, "FAMCOUNT");
+		if (nRowCount > 0)
+		{
+			throw UCLIDException("ELI33183", "Unable to update database since at least one instance "
+				"of File Action Manager is currently processing files in the database");
+		}
+
+		// Drop ProcessingFAM so it can be re-created with the proper columns.
+		// No need to transfer data. It will be assumed that all entries are crashed/hung instances.
+		vecQueries.push_back("ALTER TABLE [LockedFile] DROP CONSTRAINT [FK_LockedFile_ProcessingFAM]");
+		vecQueries.push_back("ALTER TABLE [ProcessingFAM] DROP CONSTRAINT [FK_ProcessingFAM_Action]");
+		vecQueries.push_back("DROP TABLE [ProcessingFAM]");
+		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_TABLE);
+		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_UPI_INDEX);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTIVEFAM_FK);
+		vecQueries.push_back(gstrADD_ACTION_ACTIVEFAM_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33184");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -3774,7 +3823,7 @@ bool CFileProcessingDB::ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQu
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::UnregisterProcessingFAM_Internal(bool bDBLocked)
+bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 {
 	try
 	{
@@ -5312,7 +5361,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 106:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion107);
 				case 107:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion108);
 				case 108:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion109);
-				case 109:	break;
+				case 109:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion110);
+				case 110:	break;
 
 				default:
 					{

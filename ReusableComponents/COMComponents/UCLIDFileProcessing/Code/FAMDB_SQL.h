@@ -149,11 +149,21 @@ static const string gstrCREATE_FAM_FILE_TAG_TABLE = "CREATE TABLE [FileTag] ("
 	"[FileID] [int] NOT NULL, "
 	"[TagID] [int] NOT NULL)";
 
+// The ProcessingFAM table is now the ActiveFAM table, but this definition needs to remain for the
+// schema update process.
 static const string gstrCREATE_PROCESSING_FAM_TABLE = 
 	"CREATE TABLE [ProcessingFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ProcessingFAM] PRIMARY KEY CLUSTERED, "
 	"[ActionID] [int] NOT NULL, "
 	"[UPI] [nvarchar](450), "
 	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ProcessingFAM_LastPingTime]  DEFAULT (GETDATE()))";
+
+static const string gstrCREATE_ACTIVE_FAM_TABLE = 
+	"CREATE TABLE [ActiveFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ActiveFAM] PRIMARY KEY CLUSTERED, "
+	"[ActionID] [int] NOT NULL, "
+	"[UPI] [nvarchar](450), "
+	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ActiveFAM_LastPingTime]  DEFAULT (GETDATE()),"
+	"[Queuing] [bit] NOT NULL,"
+	"[Processing] [bit] NOT NULL)";
 
 static const string gstrCREATE_LOCKED_FILE_TABLE = 
 	"CREATE TABLE [LockedFile]([FileID] [int] NOT NULL,"
@@ -258,8 +268,8 @@ static const string gstrCREATE_SKIPPED_FILE_UPI_INDEX = "CREATE NONCLUSTERED IND
 static const string gstrCREATE_FILE_TAG_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_File_Tag] ON [FileTag]([FileID], [TagID])";
 
-static const string gstrCREATE_PROCESSING_FAM_UPI_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
-	"[IX_ProcessingFAM_UPI] ON [ProcessingFAM]([UPI])";
+static const string gstrCREATE_ACTIVE_FAM_UPI_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_ActiveFAM_UPI] ON [ActiveFAM]([UPI])";
 
 static const string gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX = "CREATE NONCLUSTERED INDEX "
 	"[IX_UserCreatedCounter_Value] ON [UserCreatedCounter]([Value])";
@@ -416,6 +426,8 @@ static const string gstrADD_LOCKED_FILE_FAMFILE_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+// The ProcessingFAM table is now the ActiveFAM table, but this definition needs to remain for the
+// schema update process.
 static const string gstrADD_LOCKED_FILE_PROCESSINGFAM_FK =
 	"ALTER TABLE [dbo].[LockedFile]  "
 	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_ProcessingFAM] FOREIGN KEY([UPIID])"
@@ -423,12 +435,26 @@ static const string gstrADD_LOCKED_FILE_PROCESSINGFAM_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
-// Do not want ON UPDATE CASCADE or ON DELETE CASCADE because if
-// there are records in the ProcessingFAM table there is a FAM processing or Records that need
-// to be reverted.
+static const string gstrADD_LOCKED_FILE_ACTIVEFAM_FK =
+	"ALTER TABLE [dbo].[LockedFile]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_ActiveFAM] FOREIGN KEY([UPIID])"
+	"REFERENCES [dbo].[ActiveFAM] ([ID])"
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+// The ProcessingFAM table is now the ActiveFAM table, but this definition needs to remain for the
+// schema update process.
 static const string gstrADD_ACTION_PROCESSINGFAM_FK =
 	"ALTER TABLE [dbo].[ProcessingFAM]  "
 	"WITH CHECK ADD  CONSTRAINT [FK_ProcessingFAM_Action] FOREIGN KEY([ActionID])"
+	"REFERENCES [dbo].[Action] ([ID])";
+
+// Do not want ON UPDATE CASCADE or ON DELETE CASCADE because if
+// there are records in the ActiveFAM table there is a FAM processing or Records that need
+// to be reverted.
+static const string gstrADD_ACTION_ACTIVEFAM_FK =
+	"ALTER TABLE [dbo].[ActiveFAM]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_ActiveFAM_Action] FOREIGN KEY([ActionID])"
 	"REFERENCES [dbo].[Action] ([ID])";
 
 static const string gstrADD_FAM_SESSION_MACHINE_FK =

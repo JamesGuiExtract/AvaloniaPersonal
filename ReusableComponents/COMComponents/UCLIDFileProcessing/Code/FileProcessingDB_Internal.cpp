@@ -956,7 +956,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_UPI_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
-		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_UPI_INDEX);
+		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_UPI_INDEX);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX);
@@ -991,7 +991,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_STATE_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_FAMFILE_FK);
-		vecQueries.push_back(gstrADD_LOCKED_FILE_PROCESSINGFAM_FK);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTIVEFAM_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_MACHINE_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_FAMUSER_FK);
 		vecQueries.push_back(gstrADD_FAM_SESSION_FPSFILE_FK);
@@ -1001,7 +1001,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
-		vecQueries.push_back(gstrADD_ACTION_PROCESSINGFAM_FK);
+		vecQueries.push_back(gstrADD_ACTION_ACTIVEFAM_FK);
 		vecQueries.push_back(gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK);
 		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMUSER_FK);
@@ -1050,7 +1050,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE);
 	vecQueries.push_back(gstrCREATE_FAM_SKIPPED_FILE_TABLE);
 	vecQueries.push_back(gstrCREATE_FAM_FILE_TAG_TABLE);
-	vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE);
+	vecQueries.push_back(gstrCREATE_ACTIVE_FAM_TABLE);
 	vecQueries.push_back(gstrCREATE_LOCKED_FILE_TABLE);
 	vecQueries.push_back(gstrCREATE_FPS_FILE_TABLE);
 	vecQueries.push_back(gstrCREATE_FAM_SESSION);
@@ -2051,7 +2051,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFAM_SKIPPED_FILE);
 	vecTables.push_back(gstrFAM_FILE_TAG);
 	vecTables.push_back(gstrFAM_TAG);
-	vecTables.push_back(gstrPROCESSING_FAM);
+	vecTables.push_back(gstrACTIVE_FAM);
 	vecTables.push_back(gstrLOCKED_FILE);
 	vecTables.push_back(gstrUSER_CREATED_COUNTER);
 	vecTables.push_back(gstrFPS_FILE);
@@ -2649,10 +2649,10 @@ void CFileProcessingDB::clear(bool retainUserValues)
 		// Get the connection pointer
 		_ConnectionPtr ipConnection = getDBConnection();
 
-		// If the ProcessingFAM table does exist will need check for active processing
+		// If the ActiveFAM table does exist will need check for active processing
 		// since part of checking will be to revert timed out FAMS need to lock the database
 		// LegacyRCAndUtils #5940
-		if (doesTableExist(ipConnection, gstrPROCESSING_FAM))
+		if (doesTableExist(ipConnection, gstrACTIVE_FAM))
 		{
 			// Make sure processing is not active
 			// This check needs to be done with the database locked since it will attempt to revert
@@ -2984,7 +2984,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 	{
 		// Setup Setting Query
 		string strSQL = "SELECT FileID, Action.ID as ActionID, UPI, StatusBeforeLock, ASCName " 
-			" FROM LockedFile INNER JOIN ProcessingFAM ON LockedFile.UPIID = ProcessingFAM.ID"
+			" FROM LockedFile INNER JOIN ActiveFAM ON LockedFile.UPIID = ActiveFAM.ID"
 			" INNER JOIN Action ON LockedFile.ActionID = Action.ID"
 			" WHERE LockedFile.UPIID = " + asString(nUPIID);
 
@@ -3019,8 +3019,8 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			ipFileSet->MoveNext();
 		}
 
-		// Delete the UPI record from the ProcessingFAM table
-		string strQuery = "DELETE FROM ProcessingFAM WHERE ID = " + asString(nUPIID); 
+		// Delete the UPI record from the ActiveFAM table
+		string strQuery = "DELETE FROM ActiveFAM WHERE ID = " + asString(nUPIID); 
 		executeCmdQuery(getDBConnection(), strQuery);
 
 		// Set up the logged exception if it is not null
@@ -3077,7 +3077,7 @@ void CFileProcessingDB::pingDB()
 
 	// Always call the getKeyID so that if the record was removed by another
 	// instance because this instance lost the DB for a while
-	long nUPIID = getKeyID(getDBConnection(), "ProcessingFAM", "UPI", m_strUPI);
+	long nUPIID = getKeyID(getDBConnection(), "ActiveFAM", "UPI", m_strUPI);
 	if (nUPIID != m_nUPIID)
 	{
 		// The only time m_nUPIID is 0 is when there was no previous instance 
@@ -3096,7 +3096,7 @@ void CFileProcessingDB::pingDB()
 	{
 		// Update the ping record. 
 		executeCmdQuery(getDBConnection(), 
-			"UPDATE ProcessingFAM SET LastPingTime=GETDATE() WHERE ID = " + asString(nUPIID));
+			"UPDATE ActiveFAM SET LastPingTime=GETDATE() WHERE ID = " + asString(nUPIID));
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -3150,9 +3150,9 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 		// Set the revert in progress flag so only one thread executes this per process
 		m_bRevertInProgress = true;
 
-		// Query to show the elapsed time since last ping for all ProcessingFAM records
+		// Query to show the elapsed time since last ping for all ActiveFAM records
 		string strElapsedSQL = "SELECT [ID], DATEDIFF(minute,[LastPingTime],GetDate()) as Elapsed "
-			"FROM [ProcessingFAM]";
+			"FROM [ActiveFAM]";
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI27813", ipFileSet != __nullptr);
@@ -3160,7 +3160,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 		ipFileSet->Open(strElapsedSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
-		// Step through all of the ProcessingFAM records to find dead FAM's
+		// Step through all of the ActiveFAM records to find dead FAM's
 		while(ipFileSet->adoEOF == VARIANT_FALSE)
 		{
 			FieldsPtr ipFields = ipFileSet->Fields;
@@ -3570,8 +3570,8 @@ _RecordsetPtr CFileProcessingDB::getFileActionStatusSet(_ConnectionPtr& ipConnec
 void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _ConnectionPtr ipConnection, 
 	const long &lActionID)
 {
-	// If the ProcessingFAM table does not exist nothing is processing so return
-	if (!doesTableExist(ipConnection, gstrPROCESSING_FAM))
+	// If the ActiveFAM table does not exist nothing is processing so return
+	if (!doesTableExist(ipConnection, gstrACTIVE_FAM))
 	{
 		return;
 	}
@@ -3593,8 +3593,8 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI31589", ipProcessingSet != __nullptr);
 
-	// Open recordset with ProcessingFAM records that show processing on the action
-	string strSQL = "SELECT UPI FROM ProcessingFAM WHERE ActionID = " + strActionID;
+	// Open recordset with ActiveFAM records that show processing on the action
+	string strSQL = "SELECT UPI FROM ActiveFAM WHERE ActionID = " + strActionID;
 	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 		adLockReadOnly, adCmdText);
 
@@ -3618,8 +3618,8 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 {
 	_ConnectionPtr ipConnection = getDBConnection();
 
-	// If the ProcessingFAM table does not exist nothing is processing so return
-	if (!doesTableExist(ipConnection, gstrPROCESSING_FAM))
+	// If the ActiveFAM table does not exist nothing is processing so return
+	if (!doesTableExist(ipConnection, gstrACTIVE_FAM))
 	{
 		return;
 	}
@@ -3639,8 +3639,8 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI30609", ipProcessingSet != __nullptr);
 
-	// Open recordset with ProcessingFAM records that show processing on the action
-	string strSQL = "SELECT UPI FROM ProcessingFAM";
+	// Open recordset with ActiveFAM records that show processing on the action
+	string strSQL = "SELECT UPI FROM ActiveFAM";
 	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 		adLockReadOnly, adCmdText);
 
@@ -3770,7 +3770,7 @@ set<string> getDBInfoRowNames(const _ConnectionPtr& ipConnection)
 }
 //-------------------------------------------------------------------------------------------------
 // WARNING: If any DBInfo row or table is removed, this code needs to be modified so that it does
-// not treat the removed element(s) on and old schema versions as unrecognized.
+// not treat the removed element(s) on old schema versions as unrecognized.
 vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _ConnectionPtr& ipConnection)
 {
 	vector<string> vecUnrecognizedElements;
@@ -3788,6 +3788,7 @@ vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _Connecti
 	// Retrieve a list of all tables the FAM DB has managed since version 23
 	vector<string> vecTableCreationQueries = getTableCreationQueries(true);
 	vector<string> vecFAMDBTableNames = getTableNamesFromCreationQueries(vecTableCreationQueries);
+	addOldTables(vecFAMDBTableNames);
 
 	// Remove all tables known to the FAM DB from the names of tables found in the DB to leave a
 	// list of tables unknown to the FAM DB.
@@ -3886,6 +3887,12 @@ void CFileProcessingDB::addOldDBInfoValues(map<string, string>& mapOldValues)
 	//		to the map so that a database that still contains the old name
 	//		is not treated as an unrecognized element
 	mapOldValues["SkipAuthenticationOnMachines"] = "";
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::addOldTables(vector<string>& vecTables)
+{
+	// Version 110 - ProcessingFAM has become ActiveFAM
+	vecTables.push_back(gstrPROCESSING_FAM);
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection,

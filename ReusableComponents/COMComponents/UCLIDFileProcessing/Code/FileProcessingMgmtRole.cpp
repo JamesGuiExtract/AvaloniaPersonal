@@ -1230,9 +1230,6 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		// Get the action id
 		long lActionID = ipFileRecord->ActionID;
 
-		// Register this processing FAM for auto revert
-		getFPMDB()->RegisterProcessingFAM(lActionID);
-
 		// Get the current action status-- allow an attempt to auto-revert locked files if the file
 		// is in the processing state.
 		string strActionName = getFPMDB()->GetActionName(lActionID);
@@ -1288,8 +1285,6 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		processTask(task, &threadData);
 
 		ipExecutor->Close();
-
-		getFPMDB()->UnregisterProcessingFAM();
 
 		m_bProcessingSingleFile = false;
 
@@ -1428,12 +1423,6 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData)
 				// Release the memory for the Thread objects since they will not be needed
 				// This should be done before the notification that processing is complete
 				pFPM->releaseProcessingThreadDataObjects();
-
-				// Unregister Processing FAM to reset file back to previous state if any remaining
-				if (pFPM->m_bProcessing)
-				{
-					pFPM->getFPMDB()->UnregisterProcessingFAM();
-				}
 
 				CoUninitialize();
 			}
@@ -2307,9 +2296,6 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 
 			// start the processing
 			m_bProcessing = true;
-
-			// Register this processing FAM for auto revert
-			m_pDB->RegisterProcessingFAM(lActionID);
 			
 			if (!bDontStartThreads)
 			{

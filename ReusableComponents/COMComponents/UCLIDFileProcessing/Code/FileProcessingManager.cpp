@@ -226,46 +226,60 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		EStartStopStatus eStatus = kStart;
 		logStatusInfo(eStatus);
 
-		// start the file supplying
 		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipSupplyingActionMgmtRole =
 			getActionMgmtRole(m_ipFSMgmtRole);
-		if (ipSupplyingActionMgmtRole->Enabled == VARIANT_TRUE)
-		{
-			// Set flag indicating that supplying was started
-			m_bSupplying = true;
-			ipSupplyingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
-				(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis,
-				m_strFPSFileName.c_str());
-		}
 
-		// start the file processing
 		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipProcessingActionMgmtRole =
-			getActionMgmtRole(m_ipFPMgmtRole);
-		if (ipProcessingActionMgmtRole->Enabled == VARIANT_TRUE)
+				getActionMgmtRole(m_ipFPMgmtRole);
+		
+		// Register this FAM as active (allows for files stuck processing to be reverted)
+		m_ipFPMDB->RegisterActiveFAM(lActionId, ipSupplyingActionMgmtRole->Enabled,
+			ipProcessingActionMgmtRole->Enabled);
+		
+		// Try/catch in case of a failure to start processing so UnregisterProcessingFAM can be
+		// called and to stop supplying if it was started.
+		try
 		{
-			// set flag to indicate that processing was started
-			m_bProcessing = true;
-
-			// If an exception is thrown while starting the file processing the supplying needs to be stopped
-			try
+			// start the file supplying
+			if (ipSupplyingActionMgmtRole->Enabled == VARIANT_TRUE)
 			{
+				ipSupplyingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
+					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager, ipThis,
+					m_strFPSFileName.c_str());
+
+				// Set flag indicating that supplying was started
+				m_bSupplying = true;
+			}
+
+			// start the file processing
+			if (ipProcessingActionMgmtRole->Enabled == VARIANT_TRUE)
+			{
+				// set flag to indicate that processing was started
+				m_bProcessing = true;
+
 				m_ipFPMgmtRole->OkToStopWhenQueueIsEmpty = m_bSupplying ? VARIANT_FALSE : VARIANT_TRUE;
 
 				ipProcessingActionMgmtRole->Start(m_ipFPMDB, lActionId, strExpandedAction.c_str(), 
 					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager,
 					ipThis, m_strFPSFileName.c_str());
 			}
-			catch (...)
+		}
+		catch (...)
+		{
+			try
 			{
-				// If supplying  call the stop method on the SupplyingActionMgmtRole
+				// If an exception is thrown while starting the file processing the supplying needs to be stopped
 				if ( m_bSupplying )
 				{
 					ipSupplyingActionMgmtRole->Stop();
 				}
 
-				// Rethrow the exception
-				throw;
+				m_ipFPMDB->UnregisterActiveFAM();
 			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33185");
+
+			// Rethrow the exception
+			throw;
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08847")
@@ -1032,6 +1046,10 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				// tag manager) [LRCAU #5813]
 				_bstr_t bstrActionName(getExpandedActionName().c_str());
 
+				// Register as an active FAM (allows for stuck files to be reverted)
+				long nActionId = getFPMDB()->GetActionID(bstrActionName);
+				getFPMDB()->RegisterActiveFAM(nActionId, vbQueue, vbProcess);
+
 				// Validate that the action name exists in the database (auto-create if that setting is set)
 				getFPMDB()->AutoCreateAction(bstrActionName);
 
@@ -1070,6 +1088,8 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 					m_ipFPMgmtRole->ProcessSingleFile(ipFileRecord, getFPMDB(), m_ipFAMTagManager);
 				}
 
+				getFPMDB()->UnregisterActiveFAM();
+
 				return S_OK;
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29561");
@@ -1078,6 +1098,8 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 		{
 			try
 			{
+				getFPMDB()->UnregisterActiveFAM();
+
 				ue.addDebugInfo("Database Server", asString(getFPMDB()->DatabaseServer));
 				ue.addDebugInfo("Database Name", asString(getFPMDB()->DatabaseName));
 				ue.addDebugInfo("Action", m_strAction);
@@ -1174,6 +1196,9 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCompleted(void)
 	
 	if ( !m_bSupplying )
 	{
+		// Unregister Active FAM to reset file back to previous state if any remaining
+		m_ipFPMDB->UnregisterActiveFAM();
+
 		// Log processing has finished information
 		EStartStopStatus eStatus = kEndStop;
 		logStatusInfo(eStatus);
@@ -1196,6 +1221,9 @@ STDMETHODIMP CFileProcessingManager::NotifySupplyingCompleted(void)
 
 	if ( !m_bProcessing )
 	{
+		// Unregister Active FAM to reset file back to previous state if any remaining
+		m_ipFPMDB->UnregisterActiveFAM();
+
 		// Log processing has finished information
 		EStartStopStatus eStatus = kEndStop;
 		logStatusInfo(eStatus);

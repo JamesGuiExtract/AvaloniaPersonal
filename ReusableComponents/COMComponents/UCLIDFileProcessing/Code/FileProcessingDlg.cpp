@@ -2342,7 +2342,8 @@ void FileProcessingDlg::setCurrFPSFile(const string& strFileName)
 	if (m_strCurrFPSFilename != "")
 	{
 		string strFile = getFileNameFromFullPath(strFileName);
-		szTitle.Format("%s - File Action Manager", strFile.c_str());
+		szTitle.Format("%s - %s on %s - File Action Manager", strFile.c_str(),
+			asString(getFPM()->DatabaseName).c_str(), asString(getFPM()->DatabaseServer).c_str());
 	}
 
 	// Add the Processing state string if 

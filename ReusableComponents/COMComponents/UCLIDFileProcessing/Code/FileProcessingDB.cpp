@@ -1763,7 +1763,8 @@ STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnReco
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27686");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RegisterProcessingFAM(long lActionID)
+STDMETHODIMP CFileProcessingDB::RegisterActiveFAM(long lActionID, VARIANT_BOOL vbQueuing,
+	VARIANT_BOOL vbProcessing)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -1771,12 +1772,16 @@ STDMETHODIMP CFileProcessingDB::RegisterProcessingFAM(long lActionID)
 	{
 		validateLicense();
 
-		// This creates a record in the ProcessingFAM table and the LastPingTime
+		// This creates a record in the ActiveFAM table and the LastPingTime
 		// is set to the current time by default.
-		executeCmdQuery(getDBConnection(), "INSERT INTO ProcessingFAM (UPI, ActionID) "
-			"VALUES ('" + m_strUPI + "', " + asString(lActionID) + ")");
+		executeCmdQuery(getDBConnection(), 
+			"INSERT INTO ActiveFAM (UPI, ActionID, Queuing, Processing) "
+			"VALUES ('" + m_strUPI + "', '" + asString(lActionID) + "', '" 
+			+ (asCppBool(vbQueuing) ? "1" : "0") + "', '"
+			+ (asCppBool(vbProcessing) ? "1" : "0") + "')");
+
 		// get the new records ID to return
-		m_nUPIID = getLastTableID(getDBConnection(), "ProcessingFAM");
+		m_nUPIID = getLastTableID(getDBConnection(), "ActiveFAM");
 
 		m_eventStopPingThread.reset();
 		m_eventPingThreadExited.reset();
@@ -1790,7 +1795,7 @@ STDMETHODIMP CFileProcessingDB::RegisterProcessingFAM(long lActionID)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27726");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::UnregisterProcessingFAM()
+STDMETHODIMP CFileProcessingDB::UnregisterActiveFAM()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -1798,11 +1803,11 @@ STDMETHODIMP CFileProcessingDB::UnregisterProcessingFAM()
 	{
 		validateLicense();
 
-		if (!UnregisterProcessingFAM_Internal(false))
+		if (!UnregisterActiveFAM_Internal(false))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-			UnregisterProcessingFAM_Internal(true);
+			UnregisterActiveFAM_Internal(true);
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27728");

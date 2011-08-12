@@ -1020,17 +1020,6 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrCounterName, [in] LONGLONG llOffsetValue, [out, retval] LONGLONG*pllNewValue); 
 
 		// -----------------------------------------------------------------------------------------------
-		// Methods related to auto-resetting of files stuck in processing
-		// -----------------------------------------------------------------------------------------------
-		// PURPOSE: To add a new record to the ProcessingFAM table with the current processes UPI
-		//			and ActionID, and start a thread to update the LastPingTime at a regular interval.
-		[id(79), helpstring("method RegisterProcessingFAM")] HRESULT RegisterProcessingFAM([in] long lActionID);
-		// -----------------------------------------------------------------------------------------------
-		// PURPOSE: To remove the record for in the ProcessingFAM table and stop the thread updating
-		//			the LastPingTime
-		[id(80), helpstring("method UnregisterProcessingFAM")] HRESULT UnregisterProcessingFAM();
-
-		// -----------------------------------------------------------------------------------------------
 		// Methods related to storing FAMSession information
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To record the start time for the current FAM session
@@ -1121,6 +1110,19 @@ library UCLID_FILEPROCESSINGLib
 		// is only set if at least 1 item in the list of settings is updated.
 		[id(99), helpstring("method SetDBInfoSettings")] HRESULT SetDBInfoSettings(
 			[in] IStrToStrMap* pSettings, [out, retval] long* plNumUpdatedRows);
+
+		// -----------------------------------------------------------------------------------------------
+		// Methods related to auto-resetting of files stuck in processing
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To add a new record to the ActiveFAM table with the current processes UPI, ActionID
+		// and whether it is queuing, processing, or both. A thread is started to update the LastPingTime
+		// at a regular interval.
+		[id(100), helpstring("method RegisterActiveFAM")] HRESULT RegisterActiveFAM(
+			[in] long lActionID, [in] VARIANT_BOOL vbQueuing, [in] VARIANT_BOOL vbProcessing);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To remove the record for in the ActiveFAM table and stop the thread updating
+		//			the LastPingTime
+		[id(101), helpstring("method UnregisterActiveFAM")] HRESULT UnregisterActiveFAM();
 	};
 
 	[

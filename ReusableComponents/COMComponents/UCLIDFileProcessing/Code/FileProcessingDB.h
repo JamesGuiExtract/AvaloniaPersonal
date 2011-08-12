@@ -49,7 +49,8 @@ static const string gstrFAM_FILE_ACTION_COMMENT = "FileActionComment";
 static const string gstrFAM_SKIPPED_FILE = "SkippedFile";
 static const string gstrFAM_TAG = "Tag";
 static const string gstrFAM_FILE_TAG = "FileTag";
-static const string gstrPROCESSING_FAM = "ProcessingFAM";
+static const string gstrPROCESSING_FAM = "ProcessingFAM"; // No long exists, but keep for schema updates
+static const string gstrACTIVE_FAM = "ActiveFAM";
 static const string gstrLOCKED_FILE = "LockedFile";
 static const string gstrUSER_CREATED_COUNTER = "UserCreatedCounter";
 static const string gstrFPS_FILE = "FPSFile";
@@ -190,8 +191,8 @@ public:
 	STDMETHOD(GetUserCounterNamesAndValues)(IStrToStrMap** ppmapUserCounters);
 	STDMETHOD(IsUserCounterValid)(BSTR bstrCounterName, VARIANT_BOOL* pbCounterValid);
 	STDMETHOD(OffsetUserCounter)(BSTR bstrCounterName, LONGLONG llOffsetValue, LONGLONG* pllNewValue);
-	STDMETHOD(RegisterProcessingFAM)(long lActionID);
-	STDMETHOD(UnregisterProcessingFAM)();
+	STDMETHOD(RegisterActiveFAM)(long lActionID, VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing);
+	STDMETHOD(UnregisterActiveFAM)();
 	STDMETHOD(RecordFAMSessionStart)(BSTR bstrFPSFileName);
 	STDMETHOD(RecordFAMSessionStop)();
 	STDMETHOD(RecordInputEvent)(BSTR bstrTimeStamp, long nActionID, long nEventCount,
@@ -369,7 +370,7 @@ private:
 
 	// Flag to indicate that the FAM has been registered for auto revert
 	// if this is false and then pingDB just returns without doing anything
-	// if this is true pingDB updates the LastPingTime in ProcessingFAM record 
+	// if this is true pingDB updates the LastPingTime in ActiveFAM record 
 	// and will log changes of the m_nUPIID
 	bool m_bFAMRegistered;
 
@@ -692,11 +693,11 @@ private:
 	// If there are files to revert and bDBLocked is false an exception will be thrown
 	void revertTimedOutProcessingFAMs(bool bDBLocked, const _ConnectionPtr& ipConnection);
 
-	// Thread function that maintains the LastPingtime in the ProcessingFAM table in
+	// Thread function that maintains the LastPingtime in the ActiveFAM table in
 	// the database pData should be a pointer to the database object
 	static UINT maintainLastPingTimeForRevert(void* pData);
 
-	// Method updates the ProcessingFAM LastPingTime for the currently registered FAM
+	// Method updates the ActiveFAM LastPingTime for the currently registered FAM
 	void pingDB();
 
 	// Method that creates a thread to send the mail message
@@ -766,6 +767,9 @@ private:
 	// Adds any old DB info values into the list of current db info values so that
 	// findUnrecognizedSchemaElements does not fail
 	void addOldDBInfoValues(map<string, string>& mapValues);
+
+	// Adds any old table names into vecTables so that findUnrecognizedSchemaElements does not fail
+	void addOldTables(vector<string>& vecTables);
 
 	// Runs the UpdateSchemaForFAMDBVersion function for each installed product-specific database.
 	void executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection, int nFAMSchemaVersion,
@@ -840,7 +844,7 @@ private:
 	bool SetStatusForFilesWithTags_Internal(bool bDBLocked, IVariantVector *pvecTagNames,
 		VARIANT_BOOL vbAndOperation, long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
 	bool ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQuery, long* pnRecordsAffected);
-	bool UnregisterProcessingFAM_Internal(bool bDBLocked);
+	bool UnregisterActiveFAM_Internal(bool bDBLocked);
 	bool SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSelectQuery, EFilePriority eNewPriority,
 		IRandomMathCondition *pRandomCondition, long *pnNumRecordsModified);
 	bool AddUserCounter_Internal(bool bDBLocked, BSTR bstrCounterName, LONGLONG llInitialValue);
