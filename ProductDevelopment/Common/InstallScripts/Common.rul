@@ -679,7 +679,7 @@ begin
 	if ( SYSINFO.bIsWow64 ) then
    		szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x64.exe";
 		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
-	endif
+	endif;
 	
   	SdShowMsg("Setup is registering shell extension.", FALSE);
 end;        
@@ -704,7 +704,7 @@ begin
 	if ( SYSINFO.bIsWow64 ) then
    		szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x64.exe";
 		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT); 
-	endif
+	endif;
 
  	SdShowMsg("Setup is unregistering shell extension.", FALSE);
 end;
