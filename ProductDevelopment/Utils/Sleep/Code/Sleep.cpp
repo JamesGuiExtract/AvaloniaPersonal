@@ -46,7 +46,7 @@ void displayUsage()
 	strMessage += "/v - verbose output (displays modeless dialog with the sleep time)\n\n";
 	strMessage += "EXAMPLE:\n";
 	strMessage += "Sleep 2m /v /r would specify to sleep for a random time between\n";
-	strMessage += "\t0 and 12000 milliseconds and will display a dialog\n";
+	strMessage += "\t0 and 120,000 milliseconds and will display a dialog\n";
 	strMessage += "\tshowing how long it will sleep.\n\n";
 
 	AfxMessageBox(strMessage.c_str(), MB_OK | MB_ICONINFORMATION);
