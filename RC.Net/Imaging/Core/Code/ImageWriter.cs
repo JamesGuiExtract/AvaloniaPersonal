@@ -4,6 +4,7 @@ using Extract.Licensing;
 using Extract.Utilities;
 using Leadtools;
 using Leadtools.Codecs;
+using System.IO;
 
 namespace Extract.Imaging
 {
@@ -61,7 +62,10 @@ namespace Extract.Imaging
         /// <param name="fileName">The name of the file to output.</param>
         /// <param name="codecs">The codecs used to encode the image.</param>
         /// <param name="format">The output file format.</param>
-        internal ImageWriter(string fileName, RasterCodecs codecs, RasterImageFormat format)
+        /// <param name="append"><see langword="true"/> if <see paramref="fileName"/> should be
+        /// appended to if it already exists; <see langword="false"/> otherwise.</param>
+        internal ImageWriter(string fileName, RasterCodecs codecs, RasterImageFormat format,
+            bool append)
         {
             try
             {
@@ -73,6 +77,11 @@ namespace Extract.Imaging
                 _tempFile = new TemporaryFile(true);
                 _format = format;
                 _isPdf = ImageMethods.IsPdf(format);
+
+                if (append && File.Exists(fileName))
+                {
+                    File.Copy(fileName, _tempFile.FileName, true);
+                }
             }
             catch (Exception ex)
             {

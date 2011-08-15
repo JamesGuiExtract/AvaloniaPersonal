@@ -46,6 +46,10 @@ private:
 	// Email address to send to
 	string m_strEmailAddress;
 
+	// Who the email should appear to have been sent from.
+	string m_strSenderAddress;
+	string m_strSenderName;
+
 	string m_strBody;
 
 	bool m_bZipFile;

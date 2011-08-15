@@ -184,18 +184,6 @@
     <ClCompile Include="ImageOutputDlg.cpp" />
     <ClCompile Include="InputManagerEventHandler.cpp" />
     <ClCompile Include="MetadataDlg.cpp" />
-    <ClCompile Include="RedactFileProcessor.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="RedactFileProcessorPP.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="RedactionAppearanceDlg.cpp" />
     <ClCompile Include="RedactionCCUtils.cpp" />
     <ClCompile Include="RedactionCustomComponents.cpp">
@@ -206,19 +194,6 @@
     </ClCompile>
     <ClCompile Include="RedactionTask.cpp" />
     <ClCompile Include="RedactionTaskPP.cpp" />
-    <ClCompile Include="RedactionUISettings.cpp" />
-    <ClCompile Include="RedactionVerificationUI.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="RedactionVerificationUIPP.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="SelectTargetFileUI.cpp" />
     <ClCompile Include="SelectTargetFileUIDlg.cpp" />
     <ClCompile Include="SSNFinder.cpp" />
@@ -245,12 +220,8 @@
     <None Include="IDShieldProductDBMgr.rgs" />
     <None Include="IDShieldVOAFileContentsCondition.rgs" />
     <None Include="IDShieldVOAFileContentsConditionPP.rgs" />
-    <None Include="RedactFileProcessor.rgs" />
-    <None Include="RedactFileProcessorPP.rgs" />
     <None Include="RedactionTask.rgs" />
     <None Include="RedactionTaskPP.rgs" />
-    <None Include="RedactionVerificationUI.rgs" />
-    <None Include="RedactionVerificationUIPP.rgs" />
     <None Include="res\SelectDocTagArrow.ico" />
     <None Include="SelectTargetFileUI.rgs" />
     <None Include="SSNFinder.rgs" />
@@ -288,16 +259,11 @@
     <ClInclude Include="IDShieldVOAFileContentsConditionPP.h" />
     <ClInclude Include="ImageOutputDlg.h" />
     <ClInclude Include="MetadataDlg.h" />
-    <ClInclude Include="RedactFileProcessor.h" />
-    <ClInclude Include="RedactFileProcessorPP.h" />
     <ClInclude Include="RedactionAppearanceDlg.h" />
     <ClInclude Include="RedactionCCConstants.h" />
     <ClInclude Include="RedactionCCUtils.h" />
     <ClInclude Include="RedactionTask.h" />
     <ClInclude Include="RedactionTaskPP.h" />
-    <ClInclude Include="RedactionUISettings.h" />
-    <ClInclude Include="RedactionVerificationUI.h" />
-    <ClInclude Include="RedactionVerificationUIPP.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SelectTargetFileUI.h" />
     <ClInclude Include="SelectTargetFileUIDlg.h" />

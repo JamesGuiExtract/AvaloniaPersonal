@@ -42,8 +42,8 @@ namespace Extract.Redaction
             System.Windows.Forms.Label label1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MetadataSettingsDialog));
             this._metadataPathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._metadataBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._metadataFileTextBox = new System.Windows.Forms.TextBox();
+            this._metadataBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._dataFileControl = new Extract.Redaction.DataFileControl();
@@ -82,8 +82,15 @@ namespace Extract.Redaction
             this._metadataPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._metadataPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._metadataPathTagsButton.TabIndex = 2;
-            this._metadataPathTagsButton.TextControl = _metadataFileTextBox;
+            this._metadataPathTagsButton.TextControl = this._metadataFileTextBox;
             this._metadataPathTagsButton.UseVisualStyleBackColor = true;
+            // 
+            // _metadataFileTextBox
+            // 
+            this._metadataFileTextBox.Location = new System.Drawing.Point(10, 40);
+            this._metadataFileTextBox.Name = "_metadataFileTextBox";
+            this._metadataFileTextBox.Size = new System.Drawing.Size(347, 20);
+            this._metadataFileTextBox.TabIndex = 1;
             // 
             // _metadataBrowseButton
             // 
@@ -94,13 +101,6 @@ namespace Extract.Redaction
             this._metadataBrowseButton.Text = "...";
             this._metadataBrowseButton.UseVisualStyleBackColor = true;
             this._metadataBrowseButton.PathSelected += new System.EventHandler<Extract.Utilities.Forms.PathSelectedEventArgs>(this.HandleMetadataBrowseButtonPathSelected);
-            // 
-            // _metadataFileTextBox
-            // 
-            this._metadataFileTextBox.Location = new System.Drawing.Point(10, 40);
-            this._metadataFileTextBox.Name = "_metadataFileTextBox";
-            this._metadataFileTextBox.Size = new System.Drawing.Size(347, 20);
-            this._metadataFileTextBox.TabIndex = 1;
             // 
             // _cancelButton
             // 
@@ -144,11 +144,15 @@ namespace Extract.Redaction
             this.Controls.Add(this._cancelButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(451, 226);
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(451, 226);
             this.Name = "MetadataSettingsDialog";
             this.ShowIcon = false;
-		    this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Create redaction metadata";
+            this.ShowInTaskbar = false;
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Configure Redaction: Create metadata xml";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             this.ResumeLayout(false);

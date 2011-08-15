@@ -96,8 +96,9 @@ void usage()
 						"/r - register .uex files to open by default with UEXViewer.exe then exit\n"
 						"/u - unregister .uex files to not open with UEXViewer.exe then exit\n"
 						"/? - display usage information\n"
-						"<filename> [/temp] - open UEXViewer.exe with the specified file\n";
-						"	/temp - The .uex file is temporary; delete it when the application is closed";
+						"<filename> [/temp] - open UEXViewer.exe with the specified file\n"
+						"    /temp - The .uex file is temporary; automatically delete it when\n"
+						"    the application is closed";
 	AfxMessageBox(strUsage.c_str());
 }
 //-------------------------------------------------------------------------------------------------

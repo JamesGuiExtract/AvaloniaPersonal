@@ -222,7 +222,7 @@ namespace SplitMultiPageImage
 
                     // Create the output file
                     string output = GetOutputFileName(baseFileName, i, stringFormat);
-                    using (ImageWriter writer = codecs.CreateWriter(output, reader.Format))
+                    using (ImageWriter writer = codecs.CreateWriter(output, reader.Format, false))
                     {
                         writer.AppendImage(image);
                         if (tag != null)

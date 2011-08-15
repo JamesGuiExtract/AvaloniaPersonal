@@ -44,8 +44,8 @@ namespace Extract.FileActionManager.FileProcessors
             this._cancelButton = new System.Windows.Forms.Button();
             this._fileNameGroupBox = new System.Windows.Forms.GroupBox();
             this._fileTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._fileNameTextBox = new System.Windows.Forms.TextBox();
+            this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this.label1 = new System.Windows.Forms.Label();
             this._appearanceGroupBox.SuspendLayout();
             this._fileNameGroupBox.SuspendLayout();
@@ -53,8 +53,8 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             // _appearanceGroupBox
             // 
-            this._appearanceGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._appearanceGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._appearanceGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this._appearanceGroupBox.Controls.Add(this._changeAppearanceButton);
             this._appearanceGroupBox.Controls.Add(this._appearanceSummaryText);
@@ -81,8 +81,8 @@ namespace Extract.FileActionManager.FileProcessors
             // _appearanceSummaryText
             // 
             this._appearanceSummaryText.AcceptsReturn = true;
-            this._appearanceSummaryText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._appearanceSummaryText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._appearanceSummaryText.Location = new System.Drawing.Point(6, 19);
             this._appearanceSummaryText.Multiline = true;
             this._appearanceSummaryText.Name = "_appearanceSummaryText";
@@ -119,8 +119,8 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             // _fileNameGroupBox
             // 
-            this._fileNameGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileNameGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._fileNameGroupBox.Controls.Add(this._fileTagsButton);
             this._fileNameGroupBox.Controls.Add(this._browseButton);
             this._fileNameGroupBox.Controls.Add(this._fileNameTextBox);
@@ -143,8 +143,17 @@ namespace Extract.FileActionManager.FileProcessors
             this._fileTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileTagsButton.TabIndex = 2;
-            this._fileTagsButton.TextControl = _fileNameTextBox;
+            this._fileTagsButton.TextControl = this._fileNameTextBox;
             this._fileTagsButton.UseVisualStyleBackColor = true;
+            // 
+            // _fileNameTextBox
+            // 
+            this._fileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileNameTextBox.Location = new System.Drawing.Point(6, 33);
+            this._fileNameTextBox.Name = "_fileNameTextBox";
+            this._fileNameTextBox.Size = new System.Drawing.Size(250, 20);
+            this._fileNameTextBox.TabIndex = 1;
             // 
             // _browseButton
             // 
@@ -160,15 +169,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._browseButton.TextControl = this._fileNameTextBox;
             this._browseButton.UseVisualStyleBackColor = true;
             // 
-            // _fileNameTextBox
-            // 
-            this._fileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this._fileNameTextBox.Location = new System.Drawing.Point(6, 33);
-            this._fileNameTextBox.Name = "_fileNameTextBox";
-            this._fileNameTextBox.Size = new System.Drawing.Size(250, 20);
-            this._fileNameTextBox.TabIndex = 1;
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -182,6 +182,7 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(347, 188);
             this.Controls.Add(this._fileNameGroupBox);
             this.Controls.Add(this._cancelButton);
@@ -189,8 +190,11 @@ namespace Extract.FileActionManager.FileProcessors
             this.Controls.Add(this._appearanceGroupBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "ApplyBatesNumberSettingsDialog";
+            this.RightToLeftLayout = true;
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Apply Bates Number";
+            this.Text = "Configure Core: Apply Bates Number";
             this._appearanceGroupBox.ResumeLayout(false);
             this._appearanceGroupBox.PerformLayout();
             this._fileNameGroupBox.ResumeLayout(false);

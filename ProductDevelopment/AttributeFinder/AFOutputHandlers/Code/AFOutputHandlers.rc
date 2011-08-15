@@ -317,7 +317,7 @@ BEGIN
     GROUPBOX        "Spatial area of value",IDC_STATIC,15,244,281,42
     CONTROL         "Merge into single rectangular region based on overall bounds",IDC_RADIO_CREATE_MERGED_REGION,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,27,255,217,10
-    CONTROL         "Merge individual raster zones seperately",IDC_RADIO_MERGE_INDIVIDUAL_ZONES,
+    CONTROL         "Merge individual raster zones separately",IDC_RADIO_MERGE_INDIVIDUAL_ZONES,
                     "Button",BS_AUTORADIOBUTTON,27,271,216,10
     CONTROL         "Preserve the original attributes as sub-attributes to the merged attribute",IDC_CHECK_SUBATTRIBUTES,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,293,235,10

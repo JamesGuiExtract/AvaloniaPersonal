@@ -84,7 +84,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._pdfFilePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._pdfFilePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._pdfFilePathTagsButton.TabIndex = 2;
-            this._pdfFilePathTagsButton.TextControl = _pdfFileTextBox;
+            this._pdfFilePathTagsButton.TextControl = this._pdfFileTextBox;
             this._pdfFilePathTagsButton.UseVisualStyleBackColor = true;
             // 
             // label1
@@ -143,6 +143,7 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(443, 170);
             this.Controls.Add(this._cancelButton);
             this.Controls.Add(this._okButton);
@@ -153,6 +154,7 @@ namespace Extract.FileActionManager.FileProcessors
             this.MinimizeBox = false;
             this.Name = "ModifyPdfFileSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Core: Modify PDF file";
             groupBox1.ResumeLayout(false);

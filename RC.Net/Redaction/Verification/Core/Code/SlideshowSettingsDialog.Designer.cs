@@ -257,7 +257,7 @@
             this._documentConditionButton.Name = "_documentConditionButton";
             this._documentConditionButton.Size = new System.Drawing.Size(84, 23);
             this._documentConditionButton.TabIndex = 5;
-            this._documentConditionButton.Text = "Commands>";
+            this._documentConditionButton.Text = "Commands >";
             this._documentConditionButton.UseVisualStyleBackColor = true;
             this._documentConditionButton.Click += new System.EventHandler(this.HandleDocumentConditionClick);
             // 

@@ -645,7 +645,7 @@ namespace Extract.FileActionManager.FileSuppliers
 
         /// <summary>
         /// Code to be executed upon registration in order to add this class to the
-        /// "Extract FAM Conditions" COM category.
+        /// "Extract File Suppliers" COM category.
         /// </summary>
         /// <param name="type">The <paramref name="type"/> being registered.</param>
         [ComRegisterFunction]
@@ -657,7 +657,7 @@ namespace Extract.FileActionManager.FileSuppliers
 
         /// <summary>
         /// Code to be executed upon unregistration in order to remove this class from the
-        /// "Extract FAM Conditions" COM category.
+        /// "Extract File Suppliers" COM category.
         /// </summary>
         /// <param name="type">The <paramref name="type"/> being unregistered.</param>
         [ComUnregisterFunction]

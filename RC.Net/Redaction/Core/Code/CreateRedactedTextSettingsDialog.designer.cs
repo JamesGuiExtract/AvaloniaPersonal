@@ -66,7 +66,7 @@
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(305, 477);
+            this._okButton.Location = new System.Drawing.Point(315, 487);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 4;
@@ -77,7 +77,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(386, 477);
+            this._cancelButton.Location = new System.Drawing.Point(396, 487);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 5;
@@ -86,8 +86,8 @@
             // 
             // _dataToRedactGroupBox
             // 
-            this._dataToRedactGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._dataToRedactGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._dataToRedactGroupBox.Controls.Add(this._manualDataCheckBox);
             this._dataToRedactGroupBox.Controls.Add(this._mediumConfidenceDataCheckBox);
             this._dataToRedactGroupBox.Controls.Add(this._otherDataCheckBox);
@@ -98,7 +98,7 @@
             this._dataToRedactGroupBox.Controls.Add(this._redactAllTypesRadioButton);
             this._dataToRedactGroupBox.Location = new System.Drawing.Point(12, 13);
             this._dataToRedactGroupBox.Name = "_dataToRedactGroupBox";
-            this._dataToRedactGroupBox.Size = new System.Drawing.Size(449, 163);
+            this._dataToRedactGroupBox.Size = new System.Drawing.Size(459, 163);
             this._dataToRedactGroupBox.TabIndex = 0;
             this._dataToRedactGroupBox.TabStop = false;
             this._dataToRedactGroupBox.Text = "Data categories to redact";
@@ -155,12 +155,12 @@
             // 
             // _dataTypesTextBox
             // 
-            this._dataTypesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._dataTypesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._dataTypesTextBox.Enabled = false;
             this._dataTypesTextBox.Location = new System.Drawing.Point(26, 136);
             this._dataTypesTextBox.Name = "_dataTypesTextBox";
-            this._dataTypesTextBox.Size = new System.Drawing.Size(413, 20);
+            this._dataTypesTextBox.Size = new System.Drawing.Size(423, 20);
             this._dataTypesTextBox.TabIndex = 7;
             // 
             // _redactSpecificTypesRadioButton
@@ -187,8 +187,8 @@
             // 
             // _redactionMethodGroupBox
             // 
-            this._redactionMethodGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._redactionMethodGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._redactionMethodGroupBox.Controls.Add(this._addCharactersLabel1);
             this._redactionMethodGroupBox.Controls.Add(this._replacementTextTextBox);
             this._redactionMethodGroupBox.Controls.Add(this._replaceTextRadioButton);
@@ -203,7 +203,7 @@
             this._redactionMethodGroupBox.Controls.Add(this._replaceCharactersRadioButton);
             this._redactionMethodGroupBox.Location = new System.Drawing.Point(12, 182);
             this._redactionMethodGroupBox.Name = "_redactionMethodGroupBox";
-            this._redactionMethodGroupBox.Size = new System.Drawing.Size(449, 167);
+            this._redactionMethodGroupBox.Size = new System.Drawing.Size(459, 167);
             this._redactionMethodGroupBox.TabIndex = 1;
             this._redactionMethodGroupBox.TabStop = false;
             this._redactionMethodGroupBox.Text = "Redaction method";
@@ -219,11 +219,11 @@
             // 
             // _replacementTextTextBox
             // 
-            this._replacementTextTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._replacementTextTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._replacementTextTextBox.Location = new System.Drawing.Point(25, 92);
             this._replacementTextTextBox.Name = "_replacementTextTextBox";
-            this._replacementTextTextBox.Size = new System.Drawing.Size(414, 20);
+            this._replacementTextTextBox.Size = new System.Drawing.Size(424, 20);
             this._replacementTextTextBox.TabIndex = 10;
             // 
             // _replaceTextRadioButton
@@ -316,11 +316,11 @@
             // 
             // _xmlElementTextBox
             // 
-            this._xmlElementTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._xmlElementTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._xmlElementTextBox.Location = new System.Drawing.Point(26, 141);
             this._xmlElementTextBox.Name = "_xmlElementTextBox";
-            this._xmlElementTextBox.Size = new System.Drawing.Size(414, 20);
+            this._xmlElementTextBox.Size = new System.Drawing.Size(424, 20);
             this._xmlElementTextBox.TabIndex = 11;
             // 
             // _replaceCharactersRadioButton
@@ -336,13 +336,13 @@
             // 
             // _outputGroupBox
             // 
-            this._outputGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._outputGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._outputGroupBox.Controls.Add(this._outputPathTagsButton);
             this._outputGroupBox.Controls.Add(this._outputLocationTextBox);
             this._outputGroupBox.Location = new System.Drawing.Point(12, 422);
             this._outputGroupBox.Name = "_outputGroupBox";
-            this._outputGroupBox.Size = new System.Drawing.Size(449, 49);
+            this._outputGroupBox.Size = new System.Drawing.Size(459, 49);
             this._outputGroupBox.TabIndex = 3;
             this._outputGroupBox.TabStop = false;
             this._outputGroupBox.Text = "Output location";
@@ -351,47 +351,50 @@
             // 
             this._outputPathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._outputPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_outputPathTagsButton.Image")));
-            this._outputPathTagsButton.Location = new System.Drawing.Point(425, 19);
+            this._outputPathTagsButton.Location = new System.Drawing.Point(435, 19);
             this._outputPathTagsButton.Name = "_outputPathTagsButton";
             this._outputPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._outputPathTagsButton.TabIndex = 1;
-            this._outputPathTagsButton.TextControl = _outputLocationTextBox;
+            this._outputPathTagsButton.TextControl = this._outputLocationTextBox;
             this._outputPathTagsButton.UseVisualStyleBackColor = true;
             // 
             // _outputLocationTextBox
             // 
-            this._outputLocationTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._outputLocationTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._outputLocationTextBox.Location = new System.Drawing.Point(6, 20);
             this._outputLocationTextBox.Name = "_outputLocationTextBox";
-            this._outputLocationTextBox.Size = new System.Drawing.Size(413, 20);
+            this._outputLocationTextBox.Size = new System.Drawing.Size(423, 20);
             this._outputLocationTextBox.TabIndex = 0;
             // 
             // _dataFileControl
             // 
-            this._dataFileControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._dataFileControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._dataFileControl.Location = new System.Drawing.Point(12, 355);
             this._dataFileControl.Name = "_dataFileControl";
-            this._dataFileControl.Size = new System.Drawing.Size(449, 60);
+            this._dataFileControl.Size = new System.Drawing.Size(459, 60);
             this._dataFileControl.TabIndex = 2;
             // 
             // CreateRedactedTextSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(473, 512);
+            this.CancelButton = this._cancelButton;
+            this.ClientSize = new System.Drawing.Size(483, 522);
             this.Controls.Add(this._outputGroupBox);
             this.Controls.Add(this._redactionMethodGroupBox);
             this.Controls.Add(this._dataToRedactGroupBox);
             this.Controls.Add(this._dataFileControl);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(489, 550);
             this.Name = "CreateRedactedTextSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Redaction: Create redacted text";
             this._dataToRedactGroupBox.ResumeLayout(false);

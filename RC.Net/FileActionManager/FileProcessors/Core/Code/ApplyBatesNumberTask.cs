@@ -599,7 +599,7 @@ namespace Extract.FileActionManager.FileProcessors
                 batesNumbers = new List<string>(generator.GetNextNumberStrings(pageCount));
 
                 // Apply the bates number to each page
-                writer = _codecs.CreateWriter(outputFile.FileName, format);
+                writer = _codecs.CreateWriter(outputFile.FileName, format, false);
                 for (int i = 1; i <= pageCount; i++)
                 {
                     // Start a new progress status group every 4 pages

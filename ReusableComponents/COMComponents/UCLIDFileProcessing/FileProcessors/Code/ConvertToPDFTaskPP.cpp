@@ -260,6 +260,8 @@ LRESULT CConvertToPDFTaskPP::OnClickedCheckPdfA(WORD wNotifyCode, WORD wID, HWND
 		// Enable/disable the settings button appropriately
 		BOOL bEnable = asMFCBool(m_checkPDFA.GetCheck() != BST_CHECKED);
 		m_checkPDFSecurity.EnableWindow(bEnable);
+
+		bEnable = asMFCBool(m_checkPDFSecurity.GetCheck() == BST_CHECKED);
 		m_btnPDFSecuritySettings.EnableWindow(bEnable);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29740");

@@ -248,8 +248,8 @@ namespace Extract.Imaging
 
                 // Save the raster zone to a temporary file.
                 tempFile = new TemporaryFile(true);
-                using (ImageWriter writer = 
-                    Codecs.CreateWriter(tempFile.FileName, rasterZoneImage.OriginalFormat))
+                using (ImageWriter writer =
+                    Codecs.CreateWriter(tempFile.FileName, rasterZoneImage.OriginalFormat, false))
                 {
                     writer.AppendImage(rasterZoneImage);
                     writer.Commit(true);

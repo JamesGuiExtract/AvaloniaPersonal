@@ -506,7 +506,7 @@ namespace Extract.Redaction.CustomComponentsHelper
         static TwoValueEntryDialog CreateTwoEntryDialog()
         {
             return new TwoValueEntryDialog(false,
-                  "Enter Replacement String Pair",
+                  "Enter replacement string pair",
                   "Specify string to be replaced:",
                   "Specify replacement string:");
         }

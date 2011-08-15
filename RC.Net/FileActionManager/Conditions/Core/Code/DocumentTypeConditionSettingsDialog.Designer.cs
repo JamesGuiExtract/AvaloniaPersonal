@@ -212,14 +212,17 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._buttonCancel;
             this.ClientSize = new System.Drawing.Size(453, 432);
             this.Controls.Add(groupBox1);
             this.Controls.Add(this._buttonOk);
             this.Controls.Add(this._buttonCancel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "DocumentTypeConditionSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Core: Document Type Condition";
             groupBox1.ResumeLayout(false);

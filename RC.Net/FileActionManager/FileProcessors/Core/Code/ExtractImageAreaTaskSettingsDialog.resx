@@ -120,20 +120,56 @@
   <metadata name="label1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <metadata name="label4.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
   <metadata name="groupBox1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
-  <metadata name="label6.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="groupBox2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
-  <metadata name="label7.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="label6.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="label2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="_voaFilePathTags.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="_attributeQueryInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="_attributeQueryInfoTip.TipText" xml:space="preserve">
+    <value>An asterisk can be used to specify that all attributes should be evaluated, or attributes
+can be specified by name. Multiple attribute names should be delimited by commas.
+A more powerful query syntax is also supported; see the documentation for details.
+
+Examples:
+"*" - All attributes
+"HCData" - Attributes named "HCData"
+"HCData,MCData,LCData" - Attributes named HCData, MCData or LCData.
+"*@SSN" - Attributes with a type of "SSN"
+"Person/Last" - Attributes named "Last" having a parent attribute named "Person"</value>
+  </data>
+  <data name="_outputFileInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAACnSURBVDhPrVMBCsAgCOzpPa2X1WZmnmbRYIFgopenV0p62ut+tVnd9CTwyZU7xtkfD3YQSOR6
+        CnkrpQxwAMg5dyTsQAq1QMFs7KW8AmDb6lvQsAPPkQZqaVxTEDoRFZxwH6JSiKbMHdiXNc8BMHat1a0x
+        uh62wACSEHUA+7IUdqIxrGMdyBysHqbSTvLWj2D1wH+CYjuDP8QuAqDGl8RdAGlcF/2R+ABXWzYReseN
+        mQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="_outputFileInfoTip.TipText" xml:space="preserve">
+    <value>If multiple areas may be extracted, the &lt;AreaID&gt; tag must be used in the output file.
+&lt;AreaID&gt; will be replaced with a number that ensures uniqueness of the output file
+(not just for the current source document, but in general).
+</value>
+  </data>
+  <data name="_outputFilePathTagsButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABKSURBVFhH7dIxCgAgDARB//9pxUKwsgiBsxj7C8vgGB4B
@@ -141,7 +177,12 @@
         gg==
 </value>
   </data>
-  <metadata name="label7.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
+  <data name="_dataFilePathTagsButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABKSURBVFhH7dIxCgAgDARB//9pxUKwsgiBsxj7C8vgGB4B
+        AgQIEKgLzPq0Z7kDohEnIBZxB0QivhHo+VGFKxH2QqcJAQIECBB4CyyqxA/xREJjJwAAAABJRU5ErkJg
+        gg==
+</value>
+  </data>
 </root>

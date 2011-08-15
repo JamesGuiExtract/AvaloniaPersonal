@@ -269,6 +269,40 @@ namespace Extract.Imaging
             }
         }
 
+        /// <overloads>
+        /// Extracts into a separate <see cref="RasterImage"/> the specified <see cref="RasterZone"/>
+        /// The extracted image will be oriented with the <see cref="RasterZone"/> so that the start
+        /// and end point lie along a horizontal line that bisects the resulting image.
+        /// </overloads>
+        /// <summary>
+        /// Extracts into a separate <see cref="RasterImage"/> the specified <see cref="RasterZone"/>
+        /// The extracted image will be oriented with the <see cref="RasterZone"/> so that the start
+        /// and end point lie along a horizontal line that bisects the resulting image.
+        /// </summary>
+        /// <param name="page">The <see cref="RasterImage"/> from which the 
+        /// <see cref="RasterZone"/> is to be extracted. The zone will be extracted from the 
+        /// currently active page.</param>
+        /// <param name="zone">The <see cref="RasterZone"/> to be extracted as a separate 
+        /// <see cref="RasterImage"/>.</param>
+        /// <returns>An <see cref="RasterImage"/> containing the image content within the
+        /// specified <see cref="RasterZone"/>. NOTE: The caller is responsible from disposing the
+        /// returned <see cref="RasterImage"/>.</returns>
+        public static RasterImage ExtractZoneFromPage(RasterZone zone, RasterImage page)
+        {
+            try
+            {
+                int orientation;
+                double skew;
+                Size offset;
+
+                return ExtractZoneFromPage(zone, page, out orientation, out skew, out offset);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33212");
+            }
+        }
+
         /// <summary>
         /// Extracts into a separate <see cref="RasterImage"/> the specified <see cref="RasterZone"/>
         /// The extracted image will be oriented with the <see cref="RasterZone"/> so that the start
@@ -293,7 +327,7 @@ namespace Extract.Imaging
         /// image would need to be offset to be at the corresponding location in the source image.
         /// </param>
         /// <returns>An <see cref="RasterImage"/> containing the image content within the
-        /// specified <see cref="RasterZone"/>.  NOTE: The caller is responsible from disposing the
+        /// specified <see cref="RasterZone"/>. NOTE: The caller is responsible from disposing the
         /// returned <see cref="RasterImage"/>.</returns>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "3#")]

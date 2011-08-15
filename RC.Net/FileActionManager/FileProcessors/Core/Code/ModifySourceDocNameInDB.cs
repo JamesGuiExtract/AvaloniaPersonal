@@ -27,7 +27,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Modify Source Document Name in Database";
+        const string _COMPONENT_DESCRIPTION = "Core: Modify source document name in database";
 
         /// <summary>
         /// Current task version.

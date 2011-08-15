@@ -779,7 +779,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	else if (apAggregateException.get() != __nullptr)
 	{
 		apAggregateException.reset(new UCLIDException("ELI29014", 
-			"Application trace: At least one OCR decomposition methods failed.",
+			"Application trace: At least one OCR decomposition method failed.",
 			*apAggregateException));
 
 		apAggregateException->addDebugInfo("Image", asString(strImageFileName));

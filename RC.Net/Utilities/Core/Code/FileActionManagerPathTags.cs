@@ -65,6 +65,53 @@ namespace Extract.Utilities
 
         #region FileActionManagerPathTags Methods
 
+        /// <overloads>Updates the tag values.</overloads>
+        /// <summary>
+        /// Updates the tag values based on the current <see paramref="sourceDocument"/> and
+        /// <see paramref="fpsDirectory"/>.
+        /// </summary>
+        /// <param name="sourceDocument">The current source document.</param>
+        /// <param name="fpsDirectory">The current FPS directory.</param>
+        public void UpdateTagValues(string sourceDocument, string fpsDirectory)
+        {
+            try
+            {
+                Dictionary<string, string> newTagValues = GetTagsToValues(sourceDocument, fpsDirectory);
+                foreach (KeyValuePair<string, string> tagValue in newTagValues)
+                {
+                    SetTagValue(tagValue.Key, tagValue.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33213");
+            }
+        }
+
+        /// <summary>
+        /// Updates the tag values based on the current <see paramref="sourceDocument"/>,
+        /// <see paramref="fpsDirectory"/> and <see paramref="remoteSourceDocName"/>.
+        /// </summary>
+        /// <param name="sourceDocument">The current source document.</param>
+        /// <param name="fpsDirectory">The current  FPS directory.</param>
+        /// <param name="remoteSourceDocName">The current remote source document.</param>
+        public void UpdateTagValues(string sourceDocument, string fpsDirectory, string remoteSourceDocName)
+        {
+            try
+            {
+                Dictionary<string, string> newTagValues =
+                    GetTagsToValues(sourceDocument, fpsDirectory, remoteSourceDocName);
+                foreach (KeyValuePair<string, string> tagValue in newTagValues)
+                {
+                    SetTagValue(tagValue.Key, tagValue.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33214");
+            }
+        }
+
         /// <summary>
         /// Gets the path tags mapped to their expanded form.
         /// </summary>

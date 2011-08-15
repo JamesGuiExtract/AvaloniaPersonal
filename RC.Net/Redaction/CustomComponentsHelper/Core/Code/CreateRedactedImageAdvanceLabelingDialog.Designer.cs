@@ -45,8 +45,8 @@
             this._checkAutoCase = new System.Windows.Forms.CheckBox();
             this._checkPrefixText = new System.Windows.Forms.CheckBox();
             this._suffixTags = new Extract.Utilities.Forms.PathTagsButton();
-            this._textPrefix = new System.Windows.Forms.TextBox();
             this._textSuffix = new System.Windows.Forms.TextBox();
+            this._textPrefix = new System.Windows.Forms.TextBox();
             this._prefixTags = new Extract.Utilities.Forms.PathTagsButton();
             this._checkSuffixText = new System.Windows.Forms.CheckBox();
             this._buttonOk = new System.Windows.Forms.Button();
@@ -59,8 +59,8 @@
             // 
             // groupBox1
             // 
-            groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             groupBox1.Controls.Add(this._buttonUp);
             groupBox1.Controls.Add(this._listReplacements);
             groupBox1.Controls.Add(this._buttonAdd);
@@ -89,8 +89,8 @@
             // 
             // _listReplacements
             // 
-            this._listReplacements.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._listReplacements.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._listReplacements.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this._columnToBeReplaced,
             this._columnReplacement});
@@ -184,9 +184,9 @@
             // 
             // groupBox2
             // 
-            groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             groupBox2.Controls.Add(this._checkAutoCase);
             groupBox2.Controls.Add(this._checkPrefixText);
             groupBox2.Controls.Add(this._suffixTags);
@@ -230,16 +230,8 @@
             this._suffixTags.Name = "_suffixTags";
             this._suffixTags.Size = new System.Drawing.Size(18, 20);
             this._suffixTags.TabIndex = 6;
-            this._suffixTags.TextControl = _textSuffix;
+            this._suffixTags.TextControl = this._textSuffix;
             this._suffixTags.UseVisualStyleBackColor = true;
-            // 
-            // _textPrefix
-            // 
-            this._textPrefix.HideSelection = false;
-            this._textPrefix.Location = new System.Drawing.Point(29, 65);
-            this._textPrefix.Name = "_textPrefix";
-            this._textPrefix.Size = new System.Drawing.Size(312, 20);
-            this._textPrefix.TabIndex = 2;
             // 
             // _textSuffix
             // 
@@ -249,6 +241,14 @@
             this._textSuffix.Size = new System.Drawing.Size(312, 20);
             this._textSuffix.TabIndex = 5;
             // 
+            // _textPrefix
+            // 
+            this._textPrefix.HideSelection = false;
+            this._textPrefix.Location = new System.Drawing.Point(29, 65);
+            this._textPrefix.Name = "_textPrefix";
+            this._textPrefix.Size = new System.Drawing.Size(312, 20);
+            this._textPrefix.TabIndex = 2;
+            // 
             // _prefixTags
             // 
             this._prefixTags.DisplayFunctionTags = false;
@@ -257,7 +257,7 @@
             this._prefixTags.Name = "_prefixTags";
             this._prefixTags.Size = new System.Drawing.Size(18, 20);
             this._prefixTags.TabIndex = 3;
-            this._prefixTags.TextControl = _textPrefix;
+            this._prefixTags.TextControl = this._textPrefix;
             this._prefixTags.UseVisualStyleBackColor = true;
             // 
             // _checkSuffixText
@@ -297,6 +297,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = _buttonCancel;
             this.ClientSize = new System.Drawing.Size(508, 435);
             this.Controls.Add(this._buttonOk);
             this.Controls.Add(_buttonCancel);
@@ -307,8 +308,10 @@
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(514, 463);
             this.Name = "CreateRedactedImageAdvanceLabelingDialog";
+            this.ShowInTaskbar = false;
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Advanced Label Settings";
+            this.Text = "Advanced label settings";
             groupBox1.ResumeLayout(false);
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();

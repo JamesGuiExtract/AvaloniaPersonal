@@ -47,8 +47,8 @@
             // 
             // _textValue1
             // 
-            this._textValue1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._textValue1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._textValue1.Location = new System.Drawing.Point(12, 25);
             this._textValue1.Name = "_textValue1";
             this._textValue1.Size = new System.Drawing.Size(260, 20);
@@ -65,8 +65,8 @@
             // 
             // _textValue2
             // 
-            this._textValue2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._textValue2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._textValue2.Location = new System.Drawing.Point(12, 64);
             this._textValue2.Name = "_textValue2";
             this._textValue2.Size = new System.Drawing.Size(260, 20);
@@ -99,6 +99,7 @@
             this.AcceptButton = this._buttonOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._buttonCancel;
             this.ClientSize = new System.Drawing.Size(284, 125);
             this.Controls.Add(this._buttonOk);
             this.Controls.Add(this._buttonCancel);
@@ -107,7 +108,9 @@
             this.Controls.Add(this._textValue1);
             this.Controls.Add(this._label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.MinimumSize = new System.Drawing.Size(300, 159);
             this.Name = "TwoValueEntryDialog";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Enter Values";
             this.ResumeLayout(false);

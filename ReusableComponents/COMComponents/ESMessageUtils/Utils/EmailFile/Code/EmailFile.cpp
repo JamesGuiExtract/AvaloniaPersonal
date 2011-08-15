@@ -232,6 +232,12 @@ void CEmailFileApp::displayUsage(const string &strErrorMessage)
 	strUsage += "<options>:\r\n";
 	strUsage += "    /c - Configure email settings\r\n";
 	strUsage += "    /subject <subject line> - Subject line for the email.\r\n";
+	strUsage += "    /senderAddress <sender address> - The address the email should\r\n";
+	strUsage += "        appear to come from. If not specified, the setting from the\r\n";
+	strUsage += "        general Extract email settings will be used.\r\n";
+	strUsage += "    /senderName <sender name> - The sender name the email should\r\n";
+    strUsage += "        appear to come from. If not specified, the setting from the\r\n";
+	strUsage += "        general Extract email settings will be used.\r\n";
 	strUsage += "    /body <FileContainingText> - The file containing the body of the message.\r\n";
 	strUsage += "    /client - Opens the email in the client application.\r\n";
 	strUsage += "    /z - Zip the file that is being sent before emailing\r\n";
@@ -256,6 +262,8 @@ bool CEmailFileApp::getAndValidateArguments(int argc, char* argv[])
 	m_strSubject = "";
 	m_strFileToEmail = "";
 	m_strEmailAddress = "";
+	m_strSenderAddress = "";
+	m_strSenderName = "";
 	m_strBody = "";
 	m_bZipFile = false;
 	m_bConfigureSettings = false;
@@ -300,6 +308,26 @@ bool CEmailFileApp::getAndValidateArguments(int argc, char* argv[])
 			}
 
 			m_strSubject = argv[++i];
+		}
+		else if (strArg == "/senderaddress")
+		{
+			if (i+1 >= argc)
+			{
+				displayUsage("Missing sender address!");
+				return false;
+			}
+
+			m_strSenderAddress = argv[++i];
+		}
+		else if (strArg == "/sendername")
+		{
+			if (i+1 >= argc)
+			{
+				displayUsage("Missing sender name!");
+				return false;
+			}
+
+			m_strSenderName = argv[++i];
 		}
 		else if (strArg == "/client")
 		{
@@ -437,6 +465,16 @@ void CEmailFileApp::sendEmail(ISmtpEmailSettingsPtr ipEmailSettings,
 		ipMessage->Body = m_strBody.c_str();
 	}
 
+	if (!m_strSenderAddress.empty())
+	{
+		ipMessage->SenderAddress = m_strSenderAddress.c_str();
+	}
+
+	if (!m_strSenderName.empty())
+	{
+		ipMessage->SenderName = m_strSenderName.c_str();
+	}
+
 	// Send  the message
 	ipMessage->Send();
 }
@@ -462,15 +500,21 @@ void CEmailFileApp::showInClient(ISmtpEmailSettingsPtr ipSettings,
 			MapiMessage message;
 			ZeroMemory(&message, sizeof(MapiMessage));
 
+			string strSenderAddress = !m_strSenderAddress.empty()
+				? m_strSenderAddress
+				: asString(ipSettings->SenderAddress);
+
+			string strSenderName = !m_strSenderName.empty()
+				? m_strSenderName
+				: asString(ipSettings->SenderName);
+
 			// Get the sender address information, only add a sender if
 			// there is a sender address specified
-			auto strSenderAddress = asString(ipSettings->SenderAddress);
 			unique_ptr<MapiRecipDesc> pSender;
 			if (!strSenderAddress.empty())
 			{
-				auto strSender = asString(ipSettings->SenderName);
 				pSender.reset(new MapiRecipDesc(
-					buildMapiRecipient(true, strSender, strSenderAddress)));
+					buildMapiRecipient(true, strSenderName, strSenderAddress)));
 				message.lpOriginator = pSender.get();
 			}
 

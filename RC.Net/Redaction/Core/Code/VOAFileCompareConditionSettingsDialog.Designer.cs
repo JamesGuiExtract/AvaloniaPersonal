@@ -55,10 +55,28 @@
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(6, 123);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(307, 13);
+            label4.TabIndex = 8;
+            label4.Text = "Consider redactions as equal if they mutually overlap each other";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new System.Drawing.Point(378, 123);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(46, 13);
+            label5.TabIndex = 10;
+            label5.Text = "percent.";
+            // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(284, 272);
+            this._okButton.Location = new System.Drawing.Point(294, 282);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 11;
@@ -69,7 +87,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(365, 272);
+            this._cancelButton.Location = new System.Drawing.Point(375, 282);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 12;
@@ -78,11 +96,11 @@
             // 
             // _dataFile1TextBox
             // 
-            this._dataFile1TextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._dataFile1TextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._dataFile1TextBox.Location = new System.Drawing.Point(6, 46);
             this._dataFile1TextBox.Name = "_dataFile1TextBox";
-            this._dataFile1TextBox.Size = new System.Drawing.Size(395, 20);
+            this._dataFile1TextBox.Size = new System.Drawing.Size(405, 20);
             this._dataFile1TextBox.TabIndex = 3;
             // 
             // label1
@@ -126,35 +144,17 @@
             // 
             // _dataFile2TextBox
             // 
-            this._dataFile2TextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._dataFile2TextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._dataFile2TextBox.Location = new System.Drawing.Point(6, 89);
             this._dataFile2TextBox.Name = "_dataFile2TextBox";
-            this._dataFile2TextBox.Size = new System.Drawing.Size(395, 20);
+            this._dataFile2TextBox.Size = new System.Drawing.Size(405, 20);
             this._dataFile2TextBox.TabIndex = 6;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(6, 123);
-            label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(307, 13);
-            label4.TabIndex = 8;
-            label4.Text = "Consider redactions as equal if they mutually overlap each other";
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(378, 123);
-            label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(46, 13);
-            label5.TabIndex = 10;
-            label5.Text = "percent.";
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this._conditionMetComboBox);
             this.groupBox1.Controls.Add(label5);
             this.groupBox1.Controls.Add(this._dataFile1TextBox);
@@ -168,21 +168,21 @@
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(428, 148);
+            this.groupBox1.Size = new System.Drawing.Size(438, 148);
             this.groupBox1.TabIndex = 13;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Data comparison";
             // 
             // _overlapThresholdUpDown
             // 
-            this._overlapThresholdUpDown.Location = new System.Drawing.Point(332, 121);
+            this._overlapThresholdUpDown.Location = new System.Drawing.Point(331, 121);
             this._overlapThresholdUpDown.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
             this._overlapThresholdUpDown.Name = "_overlapThresholdUpDown";
-            this._overlapThresholdUpDown.Size = new System.Drawing.Size(40, 20);
+            this._overlapThresholdUpDown.Size = new System.Drawing.Size(43, 20);
             this._overlapThresholdUpDown.TabIndex = 9;
             this._overlapThresholdUpDown.Value = new decimal(new int[] {
             100,
@@ -194,35 +194,35 @@
             // 
             this._dataFile1PathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._dataFile1PathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_dataFile1PathTagsButton.Image")));
-            this._dataFile1PathTagsButton.Location = new System.Drawing.Point(405, 45);
+            this._dataFile1PathTagsButton.Location = new System.Drawing.Point(415, 45);
             this._dataFile1PathTagsButton.Name = "_dataFile1PathTagsButton";
             this._dataFile1PathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._dataFile1PathTagsButton.TabIndex = 4;
-            this._dataFile1PathTagsButton.TextControl = _dataFile1TextBox;
+            this._dataFile1PathTagsButton.TextControl = this._dataFile1TextBox;
             this._dataFile1PathTagsButton.UseVisualStyleBackColor = true;
             // 
             // _dataFile2PathTagsButton
             // 
             this._dataFile2PathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._dataFile2PathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_dataFile2PathTagsButton.Image")));
-            this._dataFile2PathTagsButton.Location = new System.Drawing.Point(405, 88);
+            this._dataFile2PathTagsButton.Location = new System.Drawing.Point(415, 88);
             this._dataFile2PathTagsButton.Name = "_dataFile2PathTagsButton";
             this._dataFile2PathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._dataFile2PathTagsButton.TabIndex = 7;
-            this._dataFile2PathTagsButton.TextControl = _dataFile2TextBox;
+            this._dataFile2PathTagsButton.TextControl = this._dataFile2TextBox;
             this._dataFile2PathTagsButton.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this._outputConditionCheckBox);
             this.groupBox2.Controls.Add(this._outputFilePathTagsButton);
             this.groupBox2.Controls.Add(this._outputFileTextBox);
             this.groupBox2.Controls.Add(this._outputDataCheckBox);
             this.groupBox2.Location = new System.Drawing.Point(12, 167);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(428, 92);
+            this.groupBox2.Size = new System.Drawing.Size(438, 92);
             this.groupBox2.TabIndex = 14;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Output";
@@ -241,20 +241,20 @@
             // 
             this._outputFilePathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._outputFilePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_outputFilePathTagsButton.Image")));
-            this._outputFilePathTagsButton.Location = new System.Drawing.Point(405, 42);
+            this._outputFilePathTagsButton.Location = new System.Drawing.Point(415, 42);
             this._outputFilePathTagsButton.Name = "_outputFilePathTagsButton";
             this._outputFilePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._outputFilePathTagsButton.TabIndex = 11;
-            this._outputFilePathTagsButton.TextControl = _outputFileTextBox;
+            this._outputFilePathTagsButton.TextControl = this._outputFileTextBox;
             this._outputFilePathTagsButton.UseVisualStyleBackColor = true;
             // 
             // _outputFileTextBox
             // 
-            this._outputFileTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._outputFileTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._outputFileTextBox.Location = new System.Drawing.Point(6, 42);
             this._outputFileTextBox.Name = "_outputFileTextBox";
-            this._outputFileTextBox.Size = new System.Drawing.Size(395, 20);
+            this._outputFileTextBox.Size = new System.Drawing.Size(405, 20);
             this._outputFileTextBox.TabIndex = 7;
             // 
             // _outputDataCheckBox
@@ -269,20 +269,23 @@
             // 
             // VOAFileCompareConditionSettingsDialog
             // 
-            this.ClientSize = new System.Drawing.Size(452, 307);
+            this.CancelButton = this._cancelButton;
+            this.ClientSize = new System.Drawing.Size(462, 317);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(468, 345);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(468, 345);
             this.Name = "VOAFileCompareConditionSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure ID Shield data file compare condition";
+            this.Text = "Configure Redaction: Compare ID Shield data files condition";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._overlapThresholdUpDown)).EndInit();

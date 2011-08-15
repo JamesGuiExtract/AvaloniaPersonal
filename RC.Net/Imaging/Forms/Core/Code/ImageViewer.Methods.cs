@@ -521,7 +521,7 @@ namespace Extract.Imaging.Forms
             int originalPage = _pageNumber;
             TemporaryWaitCursor waitCursor = null;
             Matrix transform = null;
-            ImageWriter writer = Codecs.CreateWriter(fileName, format);
+            ImageWriter writer = Codecs.CreateWriter(fileName, format, false);
             ImageReader reader = Codecs.CreateReader(_imageFile);
             try
             {

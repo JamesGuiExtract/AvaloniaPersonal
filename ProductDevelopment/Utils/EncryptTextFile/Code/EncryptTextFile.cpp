@@ -56,6 +56,11 @@ bool verifyArguments(int argc, char* argv[])
 		return false;
 	}
 
+	if (strcmp(argv[1], "/?") == 0)
+	{
+		return false;
+	}
+
 	return true;
 }
 

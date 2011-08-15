@@ -29,19 +29,20 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.GroupBox groupBox1;
+            System.Windows.Forms.Label label5;
             System.Windows.Forms.Label label4;
             System.Windows.Forms.Label label8;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileTimestampConditionSettingsDialog));
             System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label6;
             System.Windows.Forms.Label label7;
-            System.Windows.Forms.Label label5;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileTimestampConditionSettingsDialog));
             this.panel1 = new System.Windows.Forms.Panel();
             this._timePeriodComboBox = new System.Windows.Forms.ComboBox();
             this._relativeTimePeriodCompareRadioButton = new System.Windows.Forms.RadioButton();
             this._fileCompareLabel1 = new System.Windows.Forms.Label();
+            this._numberAgoUpDown = new Extract.Utilities.Forms.BetterNumericUpDown();
             this._comparisonDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this._relativeCompareLabel2 = new System.Windows.Forms.Label();
             this._fileCompareRadioButton = new System.Windows.Forms.RadioButton();
@@ -49,23 +50,23 @@
             this._file2PropertyComboBox = new System.Windows.Forms.ComboBox();
             this._file2TextBox = new System.Windows.Forms.TextBox();
             this._unitsAgoComboBox = new System.Windows.Forms.ComboBox();
+            this._file2Browse = new Extract.Utilities.Forms.BrowseButton();
+            this._file2PathTags = new Extract.Utilities.Forms.PathTagsButton();
             this._relativeTimeCompareRadioButton = new System.Windows.Forms.RadioButton();
             this._rangeEndDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this._compareRadioButton = new System.Windows.Forms.RadioButton();
             this._rangeRadioButton = new System.Windows.Forms.RadioButton();
             this._rangeStartDateTimePicker = new System.Windows.Forms.DateTimePicker();
+            this._comparisonComboBox = new Extract.Utilities.Forms.BetterComboBox();
             this._file1PropertyComboBox = new System.Windows.Forms.ComboBox();
             this._metComboBox = new System.Windows.Forms.ComboBox();
+            this._file1PathTags = new Extract.Utilities.Forms.PathTagsButton();
             this._file1TextBox = new System.Windows.Forms.TextBox();
+            this._file1Browse = new Extract.Utilities.Forms.BrowseButton();
             this._buttonOk = new System.Windows.Forms.Button();
             this._buttonCancel = new System.Windows.Forms.Button();
-            this._numberAgoUpDown = new Extract.Utilities.Forms.BetterNumericUpDown();
-            this._file2Browse = new Extract.Utilities.Forms.BrowseButton();
-            this._comparisonComboBox = new Extract.Utilities.Forms.BetterComboBox();
-            this._file1Browse = new Extract.Utilities.Forms.BrowseButton();
-            this._file2PathTags = new Extract.Utilities.Forms.PathTagsButton();
-            this._file1PathTags = new Extract.Utilities.Forms.PathTagsButton();
             groupBox1 = new System.Windows.Forms.GroupBox();
+            label5 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label8 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -73,7 +74,6 @@
             label1 = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
             label7 = new System.Windows.Forms.Label();
-            label5 = new System.Windows.Forms.Label();
             groupBox1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._numberAgoUpDown)).BeginInit();
@@ -102,7 +102,7 @@
             groupBox1.Controls.Add(label7);
             groupBox1.Location = new System.Drawing.Point(13, 13);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(470, 287);
+            groupBox1.Size = new System.Drawing.Size(480, 297);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             // 
@@ -130,8 +130,17 @@
             this.panel1.Controls.Add(this._relativeTimeCompareRadioButton);
             this.panel1.Location = new System.Drawing.Point(2, 147);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(466, 138);
+            this.panel1.Size = new System.Drawing.Size(476, 148);
             this.panel1.TabIndex = 15;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new System.Drawing.Point(48, 87);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(22, 13);
+            label5.TabIndex = 10;
+            label5.Text = "the";
             // 
             // _timePeriodComboBox
             // 
@@ -165,6 +174,19 @@
             this._fileCompareLabel1.Name = "_fileCompareLabel1";
             this._fileCompareLabel1.Size = new System.Drawing.Size(0, 13);
             this._fileCompareLabel1.TabIndex = 86;
+            // 
+            // _numberAgoUpDown
+            // 
+            this._numberAgoUpDown.Enabled = false;
+            this._numberAgoUpDown.Location = new System.Drawing.Point(48, 28);
+            this._numberAgoUpDown.Maximum = new decimal(new int[] {
+            2147483647,
+            0,
+            0,
+            0});
+            this._numberAgoUpDown.Name = "_numberAgoUpDown";
+            this._numberAgoUpDown.Size = new System.Drawing.Size(51, 20);
+            this._numberAgoUpDown.TabIndex = 3;
             // 
             // _comparisonDateTimePicker
             // 
@@ -245,7 +267,7 @@
             this._file2TextBox.Enabled = false;
             this._file2TextBox.Location = new System.Drawing.Point(48, 111);
             this._file2TextBox.Name = "_file2TextBox";
-            this._file2TextBox.Size = new System.Drawing.Size(355, 20);
+            this._file2TextBox.Size = new System.Drawing.Size(365, 20);
             this._file2TextBox.TabIndex = 13;
             // 
             // _unitsAgoComboBox
@@ -261,6 +283,30 @@
             this._unitsAgoComboBox.Name = "_unitsAgoComboBox";
             this._unitsAgoComboBox.Size = new System.Drawing.Size(86, 21);
             this._unitsAgoComboBox.TabIndex = 4;
+            // 
+            // _file2Browse
+            // 
+            this._file2Browse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._file2Browse.Enabled = false;
+            this._file2Browse.Location = new System.Drawing.Point(443, 111);
+            this._file2Browse.Name = "_file2Browse";
+            this._file2Browse.Size = new System.Drawing.Size(27, 20);
+            this._file2Browse.TabIndex = 15;
+            this._file2Browse.Text = "...";
+            this._file2Browse.TextControl = this._file2TextBox;
+            this._file2Browse.UseVisualStyleBackColor = true;
+            // 
+            // _file2PathTags
+            // 
+            this._file2PathTags.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._file2PathTags.Enabled = false;
+            this._file2PathTags.Image = ((System.Drawing.Image)(resources.GetObject("_file2PathTags.Image")));
+            this._file2PathTags.Location = new System.Drawing.Point(419, 111);
+            this._file2PathTags.Name = "_file2PathTags";
+            this._file2PathTags.Size = new System.Drawing.Size(18, 20);
+            this._file2PathTags.TabIndex = 14;
+            this._file2PathTags.TextControl = this._file2TextBox;
+            this._file2PathTags.UseVisualStyleBackColor = true;
             // 
             // _relativeTimeCompareRadioButton
             // 
@@ -323,6 +369,18 @@
             this._rangeStartDateTimePicker.Size = new System.Drawing.Size(169, 20);
             this._rangeStartDateTimePicker.TabIndex = 10;
             // 
+            // _comparisonComboBox
+            // 
+            this._comparisonComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._comparisonComboBox.Enabled = false;
+            this._comparisonComboBox.FormattingEnabled = true;
+            this._comparisonComboBox.Items.AddRange(new object[] {
+            "greater than or equal to"});
+            this._comparisonComboBox.Location = new System.Drawing.Point(29, 120);
+            this._comparisonComboBox.Name = "_comparisonComboBox";
+            this._comparisonComboBox.Size = new System.Drawing.Size(109, 21);
+            this._comparisonComboBox.TabIndex = 14;
+            // 
             // label2
             // 
             label2.AutoSize = true;
@@ -375,14 +433,36 @@
             this._metComboBox.Size = new System.Drawing.Size(59, 21);
             this._metComboBox.TabIndex = 1;
             // 
+            // _file1PathTags
+            // 
+            this._file1PathTags.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._file1PathTags.Image = ((System.Drawing.Image)(resources.GetObject("_file1PathTags.Image")));
+            this._file1PathTags.Location = new System.Drawing.Point(423, 40);
+            this._file1PathTags.Name = "_file1PathTags";
+            this._file1PathTags.Size = new System.Drawing.Size(18, 20);
+            this._file1PathTags.TabIndex = 4;
+            this._file1PathTags.TextControl = this._file1TextBox;
+            this._file1PathTags.UseVisualStyleBackColor = true;
+            // 
             // _file1TextBox
             // 
             this._file1TextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._file1TextBox.Location = new System.Drawing.Point(9, 41);
             this._file1TextBox.Name = "_file1TextBox";
-            this._file1TextBox.Size = new System.Drawing.Size(398, 20);
+            this._file1TextBox.Size = new System.Drawing.Size(408, 20);
             this._file1TextBox.TabIndex = 3;
+            // 
+            // _file1Browse
+            // 
+            this._file1Browse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._file1Browse.Location = new System.Drawing.Point(447, 40);
+            this._file1Browse.Name = "_file1Browse";
+            this._file1Browse.Size = new System.Drawing.Size(27, 20);
+            this._file1Browse.TabIndex = 5;
+            this._file1Browse.Text = "...";
+            this._file1Browse.TextControl = this._file1TextBox;
+            this._file1Browse.UseVisualStyleBackColor = true;
             // 
             // label7
             // 
@@ -396,7 +476,7 @@
             // _buttonOk
             // 
             this._buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonOk.Location = new System.Drawing.Point(327, 306);
+            this._buttonOk.Location = new System.Drawing.Point(337, 316);
             this._buttonOk.Name = "_buttonOk";
             this._buttonOk.Size = new System.Drawing.Size(75, 23);
             this._buttonOk.TabIndex = 1;
@@ -408,107 +488,30 @@
             // 
             this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._buttonCancel.Location = new System.Drawing.Point(408, 306);
+            this._buttonCancel.Location = new System.Drawing.Point(418, 316);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
             this._buttonCancel.TabIndex = 2;
             this._buttonCancel.Text = "Cancel";
             this._buttonCancel.UseVisualStyleBackColor = true;
             // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(48, 87);
-            label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(22, 13);
-            label5.TabIndex = 10;
-            label5.Text = "the";
-            // 
-            // _numberAgoUpDown
-            // 
-            this._numberAgoUpDown.Enabled = false;
-            this._numberAgoUpDown.Location = new System.Drawing.Point(48, 28);
-            this._numberAgoUpDown.Maximum = new decimal(new int[] {
-            2147483647,
-            0,
-            0,
-            0});
-            this._numberAgoUpDown.Name = "_numberAgoUpDown";
-            this._numberAgoUpDown.Size = new System.Drawing.Size(51, 20);
-            this._numberAgoUpDown.TabIndex = 3;
-            // 
-            // _file2Browse
-            // 
-            this._file2Browse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._file2Browse.Enabled = false;
-            this._file2Browse.Location = new System.Drawing.Point(433, 111);
-            this._file2Browse.Name = "_file2Browse";
-            this._file2Browse.Size = new System.Drawing.Size(27, 20);
-            this._file2Browse.TabIndex = 15;
-            this._file2Browse.Text = "...";
-            this._file2Browse.TextControl = this._file2TextBox;
-            this._file2Browse.UseVisualStyleBackColor = true;
-            // 
-            // _comparisonComboBox
-            // 
-            this._comparisonComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._comparisonComboBox.Enabled = false;
-            this._comparisonComboBox.FormattingEnabled = true;
-            this._comparisonComboBox.Items.AddRange(new object[] {
-            "greater than or equal to"});
-            this._comparisonComboBox.Location = new System.Drawing.Point(29, 120);
-            this._comparisonComboBox.Name = "_comparisonComboBox";
-            this._comparisonComboBox.Size = new System.Drawing.Size(109, 21);
-            this._comparisonComboBox.TabIndex = 14;
-            // 
-            // _file1Browse
-            // 
-            this._file1Browse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._file1Browse.Location = new System.Drawing.Point(437, 40);
-            this._file1Browse.Name = "_file1Browse";
-            this._file1Browse.Size = new System.Drawing.Size(27, 20);
-            this._file1Browse.TabIndex = 5;
-            this._file1Browse.Text = "...";
-            this._file1Browse.TextControl = this._file1TextBox;
-            this._file1Browse.UseVisualStyleBackColor = true;
-            // 
-            // _file2PathTags
-            // 
-            this._file2PathTags.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._file2PathTags.Enabled = false;
-            this._file2PathTags.Image = ((System.Drawing.Image)(resources.GetObject("_file2PathTags.Image")));
-            this._file2PathTags.Location = new System.Drawing.Point(409, 111);
-            this._file2PathTags.Name = "_file2PathTags";
-            this._file2PathTags.Size = new System.Drawing.Size(18, 20);
-            this._file2PathTags.TabIndex = 14;
-            this._file2PathTags.TextControl = this._file2TextBox;
-            this._file2PathTags.UseVisualStyleBackColor = true;
-            // 
-            // _file1PathTags
-            // 
-            this._file1PathTags.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._file1PathTags.Image = ((System.Drawing.Image)(resources.GetObject("_file1PathTags.Image")));
-            this._file1PathTags.Location = new System.Drawing.Point(413, 40);
-            this._file1PathTags.Name = "_file1PathTags";
-            this._file1PathTags.Size = new System.Drawing.Size(18, 20);
-            this._file1PathTags.TabIndex = 4;
-            this._file1PathTags.TextControl = this._file1TextBox;
-            this._file1PathTags.UseVisualStyleBackColor = true;
-            // 
             // FileTimestampConditionSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(495, 341);
+            this.CancelButton = this._buttonCancel;
+            this.ClientSize = new System.Drawing.Size(505, 351);
             this.Controls.Add(groupBox1);
             this.Controls.Add(this._buttonOk);
             this.Controls.Add(this._buttonCancel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(511, 379);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(511, 379);
             this.Name = "FileTimestampConditionSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Core: File Timestamp Condition";

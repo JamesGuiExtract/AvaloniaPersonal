@@ -144,7 +144,7 @@
             this._attributeQueryTextBox.Location = new System.Drawing.Point(13, 87);
             this._attributeQueryTextBox.Multiline = true;
             this._attributeQueryTextBox.Name = "_attributeQueryTextBox";
-            this._attributeQueryTextBox.Size = new System.Drawing.Size(417, 53);
+            this._attributeQueryTextBox.Size = new System.Drawing.Size(427, 53);
             this._attributeQueryTextBox.TabIndex = 10;
             // 
             // _fieldNameComboBox
@@ -184,7 +184,7 @@
             this._comparisonValueTextBox.Enabled = false;
             this._comparisonValueTextBox.Location = new System.Drawing.Point(209, 172);
             this._comparisonValueTextBox.Name = "_comparisonValueTextBox";
-            this._comparisonValueTextBox.Size = new System.Drawing.Size(199, 20);
+            this._comparisonValueTextBox.Size = new System.Drawing.Size(209, 20);
             this._comparisonValueTextBox.TabIndex = 15;
             // 
             // _rangeMinValueTextBox
@@ -202,7 +202,7 @@
             this._rangeMaxValueTextBox.Enabled = false;
             this._rangeMaxValueTextBox.Location = new System.Drawing.Point(273, 200);
             this._rangeMaxValueTextBox.Name = "_rangeMaxValueTextBox";
-            this._rangeMaxValueTextBox.Size = new System.Drawing.Size(135, 20);
+            this._rangeMaxValueTextBox.Size = new System.Drawing.Size(145, 20);
             this._rangeMaxValueTextBox.TabIndex = 20;
             // 
             // _searchMatchRadioButton
@@ -234,7 +234,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._voaFileTextBox.Location = new System.Drawing.Point(13, 34);
             this._voaFileTextBox.Name = "_voaFileTextBox";
-            this._voaFileTextBox.Size = new System.Drawing.Size(360, 20);
+            this._voaFileTextBox.Size = new System.Drawing.Size(370, 20);
             this._voaFileTextBox.TabIndex = 3;
             // 
             // _searchTextBox
@@ -245,7 +245,7 @@
             this._searchTextBox.Location = new System.Drawing.Point(12, 253);
             this._searchTextBox.Multiline = true;
             this._searchTextBox.Name = "_searchTextBox";
-            this._searchTextBox.Size = new System.Drawing.Size(418, 53);
+            this._searchTextBox.Size = new System.Drawing.Size(428, 53);
             this._searchTextBox.TabIndex = 25;
             // 
             // _inListRadioButton
@@ -267,7 +267,7 @@
             this._matchListBox.FormattingEnabled = true;
             this._matchListBox.Location = new System.Drawing.Point(13, 335);
             this._matchListBox.Name = "_matchListBox";
-            this._matchListBox.Size = new System.Drawing.Size(337, 82);
+            this._matchListBox.Size = new System.Drawing.Size(347, 82);
             this._matchListBox.TabIndex = 27;
             this._matchListBox.DoubleClick += new System.EventHandler(this.HandleListModifyButtonClick);
             // 
@@ -275,7 +275,7 @@
             // 
             this._removeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._removeButton.Enabled = false;
-            this._removeButton.Location = new System.Drawing.Point(356, 364);
+            this._removeButton.Location = new System.Drawing.Point(366, 364);
             this._removeButton.Name = "_removeButton";
             this._removeButton.Size = new System.Drawing.Size(75, 23);
             this._removeButton.TabIndex = 29;
@@ -287,7 +287,7 @@
             // 
             this._addButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._addButton.Enabled = false;
-            this._addButton.Location = new System.Drawing.Point(356, 335);
+            this._addButton.Location = new System.Drawing.Point(366, 335);
             this._addButton.Name = "_addButton";
             this._addButton.Size = new System.Drawing.Size(75, 23);
             this._addButton.TabIndex = 28;
@@ -299,7 +299,7 @@
             // 
             this._modifyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._modifyButton.Enabled = false;
-            this._modifyButton.Location = new System.Drawing.Point(356, 393);
+            this._modifyButton.Location = new System.Drawing.Point(366, 393);
             this._modifyButton.Name = "_modifyButton";
             this._modifyButton.Size = new System.Drawing.Size(75, 23);
             this._modifyButton.TabIndex = 30;
@@ -310,7 +310,7 @@
             // _buttonOk
             // 
             this._buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonOk.Location = new System.Drawing.Point(274, 466);
+            this._buttonOk.Location = new System.Drawing.Point(284, 476);
             this._buttonOk.Name = "_buttonOk";
             this._buttonOk.Size = new System.Drawing.Size(75, 23);
             this._buttonOk.TabIndex = 34;
@@ -322,7 +322,7 @@
             // 
             this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._buttonCancel.Location = new System.Drawing.Point(355, 466);
+            this._buttonCancel.Location = new System.Drawing.Point(365, 476);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
             this._buttonCancel.TabIndex = 35;
@@ -400,7 +400,7 @@
             // 
             this._voaFilePathTags.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._voaFilePathTags.Image = ((System.Drawing.Image)(resources.GetObject("_voaFilePathTags.Image")));
-            this._voaFilePathTags.Location = new System.Drawing.Point(379, 33);
+            this._voaFilePathTags.Location = new System.Drawing.Point(389, 33);
             this._voaFilePathTags.Name = "_voaFilePathTags";
             this._voaFilePathTags.Size = new System.Drawing.Size(18, 20);
             this._voaFilePathTags.TabIndex = 4;
@@ -410,7 +410,7 @@
             // _voaFileBrowse
             // 
             this._voaFileBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._voaFileBrowse.Location = new System.Drawing.Point(403, 33);
+            this._voaFileBrowse.Location = new System.Drawing.Point(413, 33);
             this._voaFileBrowse.Name = "_voaFileBrowse";
             this._voaFileBrowse.Size = new System.Drawing.Size(27, 20);
             this._voaFileBrowse.TabIndex = 5;
@@ -441,7 +441,7 @@
             this._comparisonInfoTip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._comparisonInfoTip.BackColor = System.Drawing.Color.Transparent;
             this._comparisonInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_comparisonInfoTip.BackgroundImage")));
-            this._comparisonInfoTip.Location = new System.Drawing.Point(414, 172);
+            this._comparisonInfoTip.Location = new System.Drawing.Point(424, 172);
             this._comparisonInfoTip.Name = "_comparisonInfoTip";
             this._comparisonInfoTip.Size = new System.Drawing.Size(16, 16);
             this._comparisonInfoTip.TabIndex = 16;
@@ -453,7 +453,7 @@
             this._rangeInfoTip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._rangeInfoTip.BackColor = System.Drawing.Color.Transparent;
             this._rangeInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_rangeInfoTip.BackgroundImage")));
-            this._rangeInfoTip.Location = new System.Drawing.Point(414, 200);
+            this._rangeInfoTip.Location = new System.Drawing.Point(424, 200);
             this._rangeInfoTip.Name = "_rangeInfoTip";
             this._rangeInfoTip.Size = new System.Drawing.Size(16, 16);
             this._rangeInfoTip.TabIndex = 21;
@@ -464,7 +464,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(442, 501);
+            this.CancelButton = this._buttonCancel;
+            this.ClientSize = new System.Drawing.Size(452, 511);
             this.Controls.Add(this._rangeInfoTip);
             this.Controls.Add(this._comparisonInfoTip);
             this.Controls.Add(this._regexInfoTip);
@@ -501,12 +502,14 @@
             this.Controls.Add(this._attributeCountUpDown);
             this.Controls.Add(this._containsComboBox);
             this.Controls.Add(label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(458, 539);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(458, 539);
             this.Name = "VOAFileContentsConditionSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Core: VOA File Contents Condition";

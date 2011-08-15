@@ -246,7 +246,7 @@ BEGIN
     PUSHBUTTON      "SelectDocTag",IDC_BTN_CONVERT_TO_PDF_INPUT_IMAGE_DOC_TAG,296,17,10,12,BS_ICON
     PUSHBUTTON      "...",IDC_BTN_CONVERT_TO_PDF_BROWSE_INPUT_IMAGE,310,17,15,12
     CONTROL         "Make output PDF/A compatible (this will increase the size of the PDF)",IDC_CHECK_PDFA,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,34,230,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,34,239,10
     CONTROL         "Enable PDF security",IDC_CHECK_PDF_SECURITY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,51,78,10
     PUSHBUTTON      "Settings...",IDC_BTN_PDF_SECURITY_SETTINGS,89,50,60,12
     LTEXT           "Note: This task will replace the unsearchable image (or PDF file) with the searchable PDF file.\r\n\r\nIf the above file is an image file, it will be deleted after the searchable PDF file is created.",3,7,68,306,25
@@ -324,7 +324,7 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON,12,30,130,12
     CONTROL         "Toggle the state of the tags selected below",IDC_RADIO_TOGGLE_TAG,
                     "Button",BS_AUTORADIOBUTTON,12,45,150,12
-    GROUPBOX        "Tags (seperate multiple tags with semi-colon)",IDC_STATIC,7,65,236,27
+    GROUPBOX        "Tags (separate multiple tags with semicolon)",IDC_STATIC,7,65,236,27
     COMBOBOX        IDC_COMBO_TAGS,12,75,212,50,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "SelectDocTag",IDC_BTN_TAG_DOC_TAG,226,75,10,12,BS_ICON
 END
@@ -405,6 +405,10 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 269
         TOPMARGIN, 7
+    END
+
+    IDD_MANAGE_TAGS_TASKPP, DIALOG
+    BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED

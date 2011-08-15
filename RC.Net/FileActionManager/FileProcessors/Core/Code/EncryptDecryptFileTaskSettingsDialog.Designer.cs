@@ -47,14 +47,14 @@
             this._pathTagsInput = new Extract.Utilities.Forms.PathTagsButton();
             this._textPassword = new System.Windows.Forms.TextBox();
             this._textPasswordConfirm = new System.Windows.Forms.TextBox();
+            this._labelEnableDecrypt = new System.Windows.Forms.Label();
+            this._labelEnableEncrypt = new System.Windows.Forms.Label();
             this._radioDecrypt = new System.Windows.Forms.RadioButton();
             this._radioEncrypt = new System.Windows.Forms.RadioButton();
             this._labelPasswordError = new System.Windows.Forms.Label();
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOk = new System.Windows.Forms.Button();
             this._errorPassword = new System.Windows.Forms.ErrorProvider(this.components);
-            this._labelEnableEncrypt = new System.Windows.Forms.Label();
-            this._labelEnableDecrypt = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             groupBox1 = new System.Windows.Forms.GroupBox();
@@ -268,6 +268,26 @@
             panel1.Size = new System.Drawing.Size(261, 55);
             panel1.TabIndex = 4;
             // 
+            // _labelEnableDecrypt
+            // 
+            this._labelEnableDecrypt.AutoSize = true;
+            this._labelEnableDecrypt.Location = new System.Drawing.Point(88, 33);
+            this._labelEnableDecrypt.Name = "_labelEnableDecrypt";
+            this._labelEnableDecrypt.Size = new System.Drawing.Size(148, 13);
+            this._labelEnableDecrypt.TabIndex = 3;
+            this._labelEnableDecrypt.Text = "To enable, change password.";
+            this._labelEnableDecrypt.Visible = false;
+            // 
+            // _labelEnableEncrypt
+            // 
+            this._labelEnableEncrypt.AutoSize = true;
+            this._labelEnableEncrypt.Location = new System.Drawing.Point(88, 9);
+            this._labelEnableEncrypt.Name = "_labelEnableEncrypt";
+            this._labelEnableEncrypt.Size = new System.Drawing.Size(148, 13);
+            this._labelEnableEncrypt.TabIndex = 2;
+            this._labelEnableEncrypt.Text = "To enable, change password.";
+            this._labelEnableEncrypt.Visible = false;
+            // 
             // _radioDecrypt
             // 
             this._radioDecrypt.AutoSize = true;
@@ -325,26 +345,6 @@
             this._errorPassword.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
             this._errorPassword.ContainerControl = this;
             // 
-            // _labelEnableEncrypt
-            // 
-            this._labelEnableEncrypt.AutoSize = true;
-            this._labelEnableEncrypt.Location = new System.Drawing.Point(88, 9);
-            this._labelEnableEncrypt.Name = "_labelEnableEncrypt";
-            this._labelEnableEncrypt.Size = new System.Drawing.Size(148, 13);
-            this._labelEnableEncrypt.TabIndex = 2;
-            this._labelEnableEncrypt.Text = "To enable, change password.";
-            this._labelEnableEncrypt.Visible = false;
-            // 
-            // _labelEnableDecrypt
-            // 
-            this._labelEnableDecrypt.AutoSize = true;
-            this._labelEnableDecrypt.Location = new System.Drawing.Point(88, 33);
-            this._labelEnableDecrypt.Name = "_labelEnableDecrypt";
-            this._labelEnableDecrypt.Size = new System.Drawing.Size(148, 13);
-            this._labelEnableDecrypt.TabIndex = 3;
-            this._labelEnableDecrypt.Text = "To enable, change password.";
-            this._labelEnableDecrypt.Visible = false;
-            // 
             // EncryptDecryptFileTaskSettingsDialog
             // 
             this.AcceptButton = this._buttonOk;
@@ -360,6 +360,8 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "EncryptDecryptFileTaskSettingsDialog";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Core: Encrypt/Decrypt File";
             groupBox1.ResumeLayout(false);

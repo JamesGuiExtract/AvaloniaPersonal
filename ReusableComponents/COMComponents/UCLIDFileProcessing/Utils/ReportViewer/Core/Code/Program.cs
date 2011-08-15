@@ -19,6 +19,12 @@ namespace Extract.ReportViewer
         private static readonly string _EMAIL_FILE_APPLICATION =
             Path.Combine(Application.StartupPath, "EmailFile.exe");
 
+        /// <summary>
+        /// A tag which will be substituted with the report name if included in the subject
+        /// argument.
+        /// </summary>
+        static readonly string _REPORT_NAME_TAG = "<ReportName>";
+
         #endregion Constants
 
         /// <summary>
@@ -61,7 +67,7 @@ namespace Extract.ReportViewer
                         return;
                     }
                 }
-                else if (args.Length < 2 || args.Length > 9)
+                else if (args.Length < 2 || args.Length > 13)
                 {
                     ShowUsage("Incorrect number of arguments!");
                     return;
@@ -74,6 +80,8 @@ namespace Extract.ReportViewer
                 string outputFile = "";
                 List<string> mailRecipients = new List<string>();
                 string mailSubject = null;
+                string senderAddress = null;
+                string senderName = null;
                 bool overwrite = false;
                 bool prompt = false;
                 if (args.Length > 2)
@@ -162,6 +170,39 @@ namespace Extract.ReportViewer
                                 return;
                             }
                         }
+                        else if (args[i].Equals("/senderAddress", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if ((i + 1) < args.Length)
+                            {
+                                senderAddress = args[++i];
+
+                                if (!senderAddress.Contains("@"))
+                                {
+                                    ExtractException ee = new ExtractException("ELI33218",
+                                        "Invalid email sender! No '@' found.");
+                                    ee.AddDebugData("Mail Recipient", senderAddress, false);
+                                    ee.AddDebugData("Recipients String", senderAddress, false);
+                                    throw ee;
+                                }
+                            }
+                            else
+                            {
+                                ShowUsage("/senderAddress must be followed by an email address!");
+                                return;
+                            }
+                        }
+                        else if (args[i].Equals("/senderName", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if ((i + 1) < args.Length)
+                            {
+                                senderName = args[++i];
+                            }
+                            else
+                            {
+                                ShowUsage("/senderName must be followed by the name of the sender!");
+                                return;
+                            }
+                        }
                         else
                         {
                             ShowUsage("Invalid argument: " + args[i]);
@@ -216,7 +257,7 @@ namespace Extract.ReportViewer
                         var recipients = string.Join(",", mailRecipients);
 
                         // Email the report
-                        EmailReport(reportPDF, mailSubject, recipients);
+                        EmailReport(reportPDF, mailSubject, recipients, senderAddress, senderName);
                     }
                     finally
                     {
@@ -300,6 +341,7 @@ namespace Extract.ReportViewer
             usage.Append(Environment.GetCommandLineArgs()[0]);
             usage.AppendLine(" /? | /reset | <ServerName> <DatabaseName> [<CrystalReportFile> "
                 + "/f <OutputPDFName> /ow /prompt /mailto <recipient_list> /subject <mail_subject> "
+                + "/senderAddress <sender_address> /senderName <sender_name> "
                 + "/ef (ExceptionLogFile)");
             usage.AppendLine();
             usage.AppendLine("Usage:");
@@ -318,9 +360,22 @@ namespace Extract.ReportViewer
             usage.AppendLine();
             usage.AppendLine("/mailto <recipient_list> - Comma separated list of report mail recipients");
             usage.AppendLine();
-            usage.AppendLine("/subject <mail_subject> - Subject line of report email that will be generated");
-            usage.AppendLine("                          Subject line can only be specified if /mailto is specified"); 
+            usage.AppendLine("/subject <mail_subject> - Subject line of report email that will be");
+            usage.AppendLine("    generated. Subject line can only be specified if /mailto is");
+            usage.AppendLine("    specified. If subject includes \"" + _REPORT_NAME_TAG + "\"");
+            usage.AppendLine("    it will be replaced with the name of the report.");
             usage.AppendLine();
+            usage.AppendLine("/senderAddress <sender_address> - The address the email should");
+            usage.AppendLine("    appear to come from. Sender address can only be specified if");
+            usage.AppendLine("    /mailto is specified. If not specified, the setting from the");
+            usage.AppendLine("    general Extract email settings will be used.");
+            usage.AppendLine();
+            usage.AppendLine("/senderName <sender_name> - The sender name the email should");
+            usage.AppendLine("    appear to come from. Sender name can only be specified if");
+            usage.AppendLine("    /mailto is specified. If not specified, the setting from the");
+            usage.AppendLine("    general Extract email settings will be used.");
+            usage.AppendLine();
+
             usage.AppendLine("/ef <ExceptionLogFile> - Log exceptions to the specified file");
             usage.AppendLine();
             usage.AppendLine("/? - Display usage");
@@ -341,7 +396,14 @@ namespace Extract.ReportViewer
         /// <param name="fileName">The name of the file to email.</param>
         /// <param name="subject">The subject for the email.</param>
         /// <param name="recipient">The recipient(s) for the email.</param>
-        private static void EmailReport(string fileName, string subject, string recipient)
+        /// <param name="senderAddress">The address the email should appear to come from.
+        /// If <see langword="null"/>, the setting from the general Extract email settings will be
+        /// used.</param>
+        /// <param name="senderName">The sender name the email should appear to come from.
+        /// If <see langword="null"/>, the setting from the general Extract email settings will be
+        /// used.</param>
+        private static void EmailReport(string fileName, string subject, string recipient,
+            string senderAddress, string senderName)
         {
             try
             {
@@ -349,14 +411,29 @@ namespace Extract.ReportViewer
                 arguments.Add(recipient);
                 arguments.Add(fileName);
 
-                arguments.Add("/subject");
-                if (!string.IsNullOrWhiteSpace(subject))
+                // If the subject has not been specified, use the report name as the email subject.
+                if (string.IsNullOrWhiteSpace(subject))
                 {
-                    arguments.Add(subject);
+                    subject = _REPORT_NAME_TAG;
                 }
-                else
+
+                // Substitute <ReportName> with the name of the report.
+                subject = subject.Replace(_REPORT_NAME_TAG, Path.GetFileNameWithoutExtension(fileName));
+
+                arguments.Add("/subject");
+                arguments.Add(subject);
+
+                // Override the default sender address and name (if specified).
+                if (!string.IsNullOrWhiteSpace(senderAddress))
                 {
-                    arguments.Add(Path.GetFileNameWithoutExtension(fileName));
+                    arguments.Add("/senderAddress");
+                    arguments.Add(senderAddress);
+                }
+
+                if (!string.IsNullOrWhiteSpace(senderName))
+                {
+                    arguments.Add("/senderName");
+                    arguments.Add(senderName);
                 }
 
                 SystemMethods.RunExtractExecutable(_EMAIL_FILE_APPLICATION,

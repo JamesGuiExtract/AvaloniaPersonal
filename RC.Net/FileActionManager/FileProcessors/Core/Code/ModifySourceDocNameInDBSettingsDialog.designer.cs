@@ -85,8 +85,8 @@
             // 
             // _renameFileToTextBox
             // 
-            this._renameFileToTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._renameFileToTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._renameFileToTextBox.Location = new System.Drawing.Point(12, 33);
             this._renameFileToTextBox.Name = "_renameFileToTextBox";
             this._renameFileToTextBox.Size = new System.Drawing.Size(369, 20);
@@ -101,15 +101,16 @@
             this._fileTagsButton.MinimumSize = new System.Drawing.Size(18, 20);
             this._fileTagsButton.Name = "_fileTagsButton";
             this._fileTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
-            this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
+			this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileTagsButton.TabIndex = 1;
-            this._fileTagsButton.TextControl = _renameFileToTextBox;
+            this._fileTagsButton.TextControl = this._renameFileToTextBox;
             this._fileTagsButton.UseVisualStyleBackColor = true;
             // 
             // ModifySourceDocNameInDBSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._btnCancel;
             this.ClientSize = new System.Drawing.Size(456, 96);
             this.Controls.Add(this._fileTagsButton);
             this.Controls.Add(this._browseButton);
@@ -121,9 +122,10 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ModifySourceDocNameInDBSettingsDialog";
+            this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Modify SourceDocName in Database";
+            this.Text = "Configure Core: Modify source document name in database";
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -73,7 +73,7 @@ namespace Extract.Interfaces
             StringBuilder regexPatternBuilder = new StringBuilder();
 
             // Allow semi-colon to sperate multiple patterns. Loop to build a Regex for each pattern
-            // seperately (and "or" them together into one unified _filterRegex)
+            // separately (and "or" them together into one unified _filterRegex)
             char[] splitterChar = new char[] { ';' };
             string[] filePatterns =
                 filterPattern.Split(splitterChar, StringSplitOptions.RemoveEmptyEntries);

@@ -86,12 +86,22 @@ namespace Extract.Utilities.Email
         VariantVector Recipients { get; set; }
 
         /// <summary>
-        /// Gets or sets the sender name.
+        /// Gets or sets the sender address.
         /// </summary>
         /// <value>
-        /// The sender name.
+        /// The sender address to use or <see langword="null"/> to use the value from the general
+        /// Extract email settings.
         /// </value>
-        string Sender { get; set; }
+        string SenderAddress { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the sender.
+        /// </summary>
+        /// <value>
+        /// The name of the sender or <see langword="null"/> to use the value from the general
+        /// Extract email settings.
+        /// </value>
+        string SenderName { get; set; }
 
         /// <summary>
         /// Allows the adding of a single recipient to the recipients list.
@@ -141,6 +151,26 @@ namespace Extract.Utilities.Email
 
         #endregion Fields
 
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExtractEmailMessage"/> class.
+        /// </summary>
+        public ExtractEmailMessage()
+        {
+            try
+            {
+                // Sets default values for all members
+                Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33217");
+            }
+        }
+
+        #endregion Constructors
+
         #region IExtractEmailMessage Members
 
         /// <summary>
@@ -163,12 +193,9 @@ namespace Extract.Utilities.Email
                     AddRecipients(message.To);
                     message.Subject = Subject;
                     message.Body = sb.ToString();
-                    message.From = new MailAddress(EmailSettings.SenderAddress,
-                        EmailSettings.SenderName);
-                    if (!string.IsNullOrWhiteSpace(Sender))
-                    {
-                        message.Sender = new MailAddress(Sender);
-                    }
+                    message.From = new MailAddress(
+                        SenderAddress ?? EmailSettings.SenderAddress,
+                        SenderName ?? EmailSettings.SenderName);
 
                     if (_fileAttachements.Count > 0)
                     {
@@ -211,7 +238,11 @@ namespace Extract.Utilities.Email
                 _recipients.Clear();
                 Subject = string.Empty;
                 Body = string.Empty;
-                Sender = string.Empty;
+                
+                // null for SenderAddress and SenderName indicates that the general email setting
+                // values should be used.
+                SenderAddress = null;
+                SenderName = null;
             }
             catch (Exception ex)
             {
@@ -402,12 +433,22 @@ namespace Extract.Utilities.Email
         }
 
         /// <summary>
-        /// Gets or sets the sender name.
+        /// Gets or sets the sender address.
         /// </summary>
         /// <value>
-        /// The sender name.
+        /// The sender address to use or <see langword="null"/> to use the value from the general
+        /// Extract email settings.
         /// </value>
-        public string Sender { get; set; }
+        public string SenderAddress { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the sender.
+        /// </summary>
+        /// <value>
+        /// The name of the sender or <see langword="null"/> to use the value from the general
+        /// Extract email settings.
+        /// </value>
+        public string SenderName { get; set; }
 
         #endregion
 

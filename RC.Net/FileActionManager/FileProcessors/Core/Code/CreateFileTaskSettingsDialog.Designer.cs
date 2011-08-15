@@ -40,15 +40,15 @@
             this._cancelButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this._fileContentsTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._fileNameTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._fileContentsTextBox = new Extract.Utilities.Forms.BetterMultilineTextBox();
+            this._fileNameTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // _fileNameTextBox
             // 
-            this._fileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._fileNameTextBox.Location = new System.Drawing.Point(12, 26);
             this._fileNameTextBox.Name = "_fileNameTextBox";
             this._fileNameTextBox.Size = new System.Drawing.Size(408, 20);
@@ -66,8 +66,8 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this._appendRadioButton);
             this.groupBox1.Controls.Add(this._overwriteRadioButton);
             this.groupBox1.Controls.Add(this._skipWithoutErrorRadioButton);
@@ -161,19 +161,8 @@
             this._fileContentsTagsButton.Name = "_fileContentsTagsButton";
             this._fileContentsTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileContentsTagsButton.TabIndex = 5;
-            this._fileContentsTagsButton.TextControl = _fileContentsTextBox;
+            this._fileContentsTagsButton.TextControl = this._fileContentsTextBox;
             this._fileContentsTagsButton.UseVisualStyleBackColor = true;
-            // 
-            // _fileNameTagsButton
-            // 
-            this._fileNameTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._fileNameTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_fileNameTagsButton.Image")));
-            this._fileNameTagsButton.Location = new System.Drawing.Point(426, 25);
-            this._fileNameTagsButton.Name = "_fileNameTagsButton";
-            this._fileNameTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._fileNameTagsButton.TabIndex = 2;
-            this._fileNameTagsButton.TextControl = _fileNameTextBox;
-            this._fileNameTagsButton.UseVisualStyleBackColor = true;
             // 
             // _fileContentsTextBox
             // 
@@ -183,6 +172,17 @@
             this._fileContentsTextBox.Size = new System.Drawing.Size(408, 96);
             this._fileContentsTextBox.TabIndex = 9;
             this._fileContentsTextBox.WordWrap = false;
+            // 
+            // _fileNameTagsButton
+            // 
+            this._fileNameTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileNameTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_fileNameTagsButton.Image")));
+            this._fileNameTagsButton.Location = new System.Drawing.Point(426, 25);
+            this._fileNameTagsButton.Name = "_fileNameTagsButton";
+            this._fileNameTagsButton.Size = new System.Drawing.Size(18, 20);
+            this._fileNameTagsButton.TabIndex = 2;
+            this._fileNameTagsButton.TextControl = this._fileNameTextBox;
+            this._fileNameTagsButton.UseVisualStyleBackColor = true;
             // 
             // CreateFileTaskSettingsDialog
             // 
@@ -205,6 +205,7 @@
             this.MinimizeBox = false;
             this.Name = "CreateFileTaskSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Core: Create file";
             this.groupBox1.ResumeLayout(false);

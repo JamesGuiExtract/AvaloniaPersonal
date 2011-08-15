@@ -34,8 +34,8 @@
             System.Windows.Forms.GroupBox _priorityGroupBox;
             System.Windows.Forms.Label label1;
             this._fileTagsButton = new Extract.Utilities.Forms.PathTagsButton();
-            this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._fileNameTextBox = new System.Windows.Forms.TextBox();
+            this._browseButton = new Extract.Utilities.Forms.BrowseButton();
             this._priorityComboBox = new System.Windows.Forms.ComboBox();
             this._btnCancel = new System.Windows.Forms.Button();
             this._btnOK = new System.Windows.Forms.Button();
@@ -71,8 +71,17 @@
             this._fileTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileTagsButton.TabIndex = 1;
-            this._fileTagsButton.TextControl = _fileNameTextBox;
+            this._fileTagsButton.TextControl = this._fileNameTextBox;
             this._fileTagsButton.UseVisualStyleBackColor = true;
+            // 
+            // _fileNameTextBox
+            // 
+            this._fileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._fileNameTextBox.Location = new System.Drawing.Point(6, 33);
+            this._fileNameTextBox.Name = "_fileNameTextBox";
+            this._fileNameTextBox.Size = new System.Drawing.Size(250, 20);
+            this._fileNameTextBox.TabIndex = 0;
             // 
             // _browseButton
             // 
@@ -87,15 +96,6 @@
             this._browseButton.Text = "...";
             this._browseButton.TextControl = this._fileNameTextBox;
             this._browseButton.UseVisualStyleBackColor = true;
-            // 
-            // _fileNameTextBox
-            // 
-            this._fileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this._fileNameTextBox.Location = new System.Drawing.Point(6, 33);
-            this._fileNameTextBox.Name = "_fileNameTextBox";
-            this._fileNameTextBox.Size = new System.Drawing.Size(250, 20);
-            this._fileNameTextBox.TabIndex = 0;
             // 
             // label3
             // 
@@ -117,15 +117,6 @@
             _priorityGroupBox.TabStop = false;
             _priorityGroupBox.Text = "Priority";
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(6, 16);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(98, 13);
-            label1.TabIndex = 0;
-            label1.Text = "Priority to set for file";
-            // 
             // _priorityComboBox
             // 
             this._priorityComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -134,6 +125,15 @@
             this._priorityComboBox.Name = "_priorityComboBox";
             this._priorityComboBox.Size = new System.Drawing.Size(247, 21);
             this._priorityComboBox.TabIndex = 0;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(6, 16);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(98, 13);
+            label1.TabIndex = 0;
+            label1.Text = "Priority to set for file";
             // 
             // _btnCancel
             // 
@@ -159,6 +159,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._btnCancel;
             this.ClientSize = new System.Drawing.Size(347, 177);
             this.Controls.Add(this._btnOK);
             this.Controls.Add(this._btnCancel);
@@ -168,8 +169,10 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SetFilePrioritySettingsDialog";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Configure Core: Set File Priority";
+            this.Text = "Configure Core: Set file priority";
             _fileNameGroupBox.ResumeLayout(false);
             _fileNameGroupBox.PerformLayout();
             _priorityGroupBox.ResumeLayout(false);

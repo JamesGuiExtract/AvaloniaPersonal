@@ -210,11 +210,14 @@ namespace Extract.Redaction
             this.Controls.Add(this._cancelButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(428, 333);
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(428, 333);
             this.Name = "SurroundContextSettingsDialog";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Extend redactions to surround context";
+            this.Text = "Configure Redaction: Extend redactions to surround context";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

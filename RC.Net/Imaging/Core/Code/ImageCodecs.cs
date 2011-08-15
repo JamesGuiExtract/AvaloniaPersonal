@@ -98,15 +98,17 @@ namespace Extract.Imaging
         /// </summary>
         /// <param name="fileName">The name of the file to write to.</param>
         /// <param name="format">The format of <paramref name="fileName"/>.</param>
+        /// <param name="append"><see langword="true"/> if <see paramref="fileName"/> should be
+        /// appended to if it already exists; <see langword="false"/> otherwise.</param>
         /// <returns>An <see cref="ImageWriter"/> to write to <paramref name="fileName"/>.</returns>
-        public ImageWriter CreateWriter(string fileName, RasterImageFormat format)
+        public ImageWriter CreateWriter(string fileName, RasterImageFormat format, bool append)
         {
             RasterCodecs codecs = null;
             try
             {
                 codecs = GetCodecs();
 
-                return new ImageWriter(fileName, codecs, format);
+                return new ImageWriter(fileName, codecs, format, append);
             }
             catch (Exception ex)
             {
