@@ -1,0 +1,390 @@
+<HTML>
+
+<HEAD>
+<TITLE>ID Shield Verification Checklist - Task Setup</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>ID Shield Testing Checklist<br>Verification - Task Setup<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+
+<!-- *********************************************** -->
+
+
+<h2>Redaction: Verify sensitive data</h2>
+<UL>
+    <li><b>Property page</b>
+    <ul>
+        <li>User Interface
+        <ul>
+            <li>Use the Add button to select <b>Redaction: Verify sensitive data</b> as the
+            task.</li>
+            <li>Confirm that <b>The Task must be configured</b> label does not appear on the 
+            <b>Select Task</b> dialog.</li>
+            <li>Confirm that clicking <b>Configure...</b> displays the <b>Verify redactions 
+            settings</b> dialog.</li>
+        <p>
+            <li>Confirm that the dialog contains a <b>General</b> group box with the following
+            checkboxes:
+            <ul>
+                <li><b>Require users to visit all pages in a document</b>, checked by default</li>
+                <li><b>Require users to review every suggested redaction or clue</b>, checked by
+                default</li>
+                <li><b>Require users to specify redaction type for redactions</b>, checked by
+                default</li>
+                <li><b>Require users to specify exemption codes for redactions</b>, unchecked by
+                default</li>
+                <li><b>Enable seamless page navigation between documents</b>, checked by 
+                default</li>
+                <li><b>Enable collection of redaction accuracy feedback</b>, unchecked by 
+                default</li>
+                <li><b>Enable input event tracking</b>, unchecked by default</li>
+                <li><b>Open verification window in full screen mode</b>, unchecked by default</li>
+                <li><b>Prompt to save changes before navigating away from uncommitted 
+                documents</b>, unchecked by default</li>
+            </ul></li>
+            <p>
+            <li>Check the <b>feedback collection</b> check box and click on the <b>Settings...</b>
+            button.</li>
+            <li>Confirm that the <b>Feedback collection settings</b> dialog appears.
+            <ul>
+                <li>Confirm that the dialog contains a <b>Data storage and options</b> group 
+                box.
+                <ul>
+                    <li>Confirm that the group box contains a <b>Feedback data folder</b> edit box
+                    with a default value of <b>$DirOf(&lt;SourceDocName&gt;)\FeedbackData</b>.</li>
+                    <li>Confirm that there is an associated <b>Tag Selector</b> button which
+                    displays the usual tag functions.</li>
+                    <li>Confirm that there is an associated <b>...</b> (Browse) button which brings
+                    up the <b>Browse for folder</b> dialog.</li>
+                    <li>Confirm that the group box contains an <b>Include redaction information</b>
+                    checkbox, checked and disabled by default.</li>
+                    <li>Confirm that the group box contains an <b>Include original document</b>
+                    checkbox, checked and enabled by default.</li>
+                </ul></li>
+            <p>
+                <li>Confirm that the dialog contains a <b>Filenames to use for feedback data</b>
+                group box.
+                <ul>
+                    <li>Confirm that the group box contains a <b>Use original filenames</b> radio
+                    button which is selected by default.</li>
+                    <li>Confirm that the group box contains an <b>ID Shield should generate unique
+                    filenames</b> radio button which is not selected by default.</li>
+                </ul></li>
+            <p>
+                <li>Confirm that the dialog contains a <b>Collect feedback for</b> group box.
+                <ul>
+                    <li>Confirm that the group box contains an <b>All verified documents</b> check
+                    box which is checked by default.</li>
+                    <li>Confirm that the group box contains an <b>All verified documents that have
+                    (or had) redactions or clues</b> check box which is checked and disabled by
+                    default.</li>
+                    <li>Confirm that the group box contains an <b>All verified documents that
+                    contain user corrections</b> check box which is checked and disabled by
+                    default.</li>
+                    <li>Confirm that the second and third checkboxes are disabled only when the
+                    first is checked.</li>
+                </ul></li>
+            <p>
+                <li>Confirm that the <b>OK</b>, <b>Cancel</b>, and <b>X</b> buttons all work as
+                expected.</li>
+            </ul></li>
+        <p>
+            <li>Confirm that the <b>Verify redaction settings</b> dialog contains an <b>ID Shield
+            data file location</b> group box.
+            <ul>
+                <li>Confirm that by default, the group box contains the text <b>You are using
+                default settings.</b></li>
+                <li>Confirm that there is an enabled <b>Customize...</b> button.
+                <li>Confirm that pressing the <b>Customize...</b> button brings up the <b>Specify
+                ID Shield data file path</b> dialog.
+                <ul>
+                    <li>Confirm that the dialog includes an enabled edit box for a file path.</li>
+                    <li>Confirm that the dialog includes an associated <b>Tag Selector</b> 
+                    button which displays the usual tag functions.</li>
+                    <li>Confirm that the dialog includes an associated <b>...</b> (Browse) 
+                    button.</li>
+                    <li>Confirm that the dialog includes a <b>Reset</b> button.</li>
+                    <li>Confirm that the Reset button restores the default file path.</li>
+                    <li>Confirm that the default file path is <b>&lt;SourceDocName&gt;.voa</b>
+                    .</li>
+                    <li>Confirm that the <b>OK</b>, <b>Cancel</b>, and <b>X</b> buttons all work as
+                    expected.</li>
+                </ul></li>
+            </ul></li>
+        <p>
+            <li>Confirm that the dialog contains an <b>Image location</b> group box.
+            <ul>
+                <li>Confirm that the group box contains a <b>Use image as backdrop for verification
+                if available</b> check box.</li>
+                <li>Confirm that other controls in the group box are enabled only when the check
+                box is checked.</li>
+                <li>Confirm that the group box contains an edit box.</li>
+                <li>Confirm that the group box contains a <b>Tag Selector</b> button which displays
+                the usual tag functions.</li>
+                <li>Confirm that the group box contains a <b>...</b> (Browse) button.</li>
+            </ul></li>
+        <p>
+            <li>Confirm that the dialog contains a <b>Slideshow</b> group box
+            <ul>
+                <li>Confirm that the group box contains an <b>Enable slideshow in verification
+                UI</b> check box.</li>
+                <li>Confirm that the <b>Settings</b> button is enabled only when the checkbox is
+                checked.</li>
+                <li>Confirm that pressing the Settings button brings up a <b>Slideshow
+                settings</b> dialog.
+                <ul>
+                    <li>Confirm that the dialog contains a <b>General</b> group box.</li>
+                    <li>Confirm that the group box contains a checkbox <b>Switch to fit-to-page
+                    mode when the slideshow is started.</b>, checked by default.</li>
+                    <li>Confirm that there is an <b>Apply the document tag</b> checkbox, unchecked
+                    by default.
+                    <ul>
+                        <li>Confirm that there is an associated dropdown box with a list of tags
+                        in the database.</li>
+                        <li>Confirm that the dropdown is enabled only when the box is checked.</li>
+                    </ul></li>
+                    <li>Confirm that there is a <b>Set file action status of</b> checkbox, 
+                    unchecked by default.
+                    <ul>
+                        <li>Confirm that there is an associated combo box/tag selector with a list
+                        of actions in the database.</li>
+                        <li>Confirm that the combo box works as expected.</li>
+                        <li>Confirm that there is also an associated combo box with a list of
+                        possible action statuses.</li>
+                        <li>Confirm that the two combo boxes and the tag selector are enabled only
+                        when the checkbox is checked.</li>
+                    </ul></li>
+                    <li>Confirm that there is a checkbox to <b>Stop slideshow when the document
+                    meets the following condition</b>, unchecked by default.
+                    <ul>
+                        <li>Confirm that there is an associated edit box and Commands&gt; 
+                        button that are enabled only when the box is checked.</li>
+                        <li>Confirm that they function like our FAM condition selectors in other
+                        places.</li>
+                    </ul></li>
+                <p>
+                    <li>Confirm that there is a <b>Run key</b> groupbox containing an explanation
+                    of the run key functionality.</li>
+                <p>
+                    <li>Confirm that there is a <b>Confirm user alertness</b> group box
+                    <ul>
+                        <li>Confirm that it contains a radio button (selected by default) to 
+                        <b>Randomly prompt the operator to answer a simple question</b></li>
+                        <li>Confirm that the radio button has a related spin control to specify a
+                        number of pages.</li>
+                        <li>Confirm that the spin control is enabled only when the associated radio
+                        button is selectd, and that it works as expected.</li>
+                        <li>Confirm that there is a radio button for <b>Require the operator to use
+                        the "run key"</b></li>
+                    </ul></li>
+                </ul></li>
+            </ul></li>
+        <p>
+            <li>Confirm that the dialog contains an <b>After committing a document</b> group box.
+            <ul>
+                <li>Confirm that the group box contains a <b>Set file action status of</b> check 
+                box.</li>
+                <li>Confirm that other controls in the group box are enabled only when the check 
+                box is checked.</li>
+                <li>Confirm that the group box contains a combo box containing the defined 
+                actions.</li>
+                <li>Confirm that the group box contains a <b>tag selector</b> button which displays
+                a list of the usual tag functions.</li>
+                <li>Confirm that the group box contains a combo box containing the defined action 
+                status strings.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li>Functionality
+        <ul>
+            <li>Set up a collection of multi-page documents for review, ensuring that some contain 
+            sensitive items on the first page and some do not.
+            <ul>
+                <li>Configure the verification task to <b>Require users to visit all pages in a 
+                document</b>.</li>
+                <li>Verify the documents and confirm that each document opens to the first 
+                page.</li>
+                <li>Confirm that you must view all pages before committing the document.</li>
+                <li>Confirm that you do not need to meet the commit condition before skipping or
+                saving without committing.</li>
+                <li>Confirm that the <b>Tab</b> key advances through the rows of the data grid and
+                pages of the document.</li>
+                <li>Requeue the documents.</li>
+                <li>Configure the verification task <b>not</b> to <b>Require users to visit all 
+                pages in a document</b>.</li>
+                <li>Verify the documents and confirm that each one opens to the first page.</li>
+                <li>Confirm that you do <b>not</b> need to view all pages before saving and
+                committing.</li>
+            </ul></li>
+        <p>
+            <ul>
+                <li>Configure the verification task to <b>Require users to review every suggested
+                redaction or clue</b>.</li>
+                <li>Verify the documents and confirm that each document opens to the first 
+                page.</li>
+                <li>Confirm that you must select each redaction and clue before committing the 
+                document.</li>
+                <li>Confirm that you are <b>not</b> required to visit every page before 
+                committing.</li>
+                <li>Confirm that the <b>Tab</b> key advances through the rows of data items in the
+                data grid.</li>
+                <li>Confirm that you do not need to meet the commit condition before skipping or
+                saving without committing.</li>
+                <li>Requeue the documents.</li>
+                <li>Configure the verification task <b>not</b> to <b>Require users to review every
+                suggested redaction or clue</b>.</li>
+                <li>Verify the documents and confirm that each one opens to the first page.</li>
+                <li>Confirm that you do <b>not</b> need to select each redaction/clue before 
+                saving and committing.</li>
+            </ul></li>
+        <p>
+            <li>Confirm that <b>requiring types</b> works as expected.</li>
+            <li>Confirm that even with types required, no type is required for redactions that are
+            toggled <b>off</b>.</li>
+        <p>
+            <li>Confirm that <b>requiring exemption codes</b> works as expected.</li>
+            <li>Confirm that even with exemption codes required, no exemption code is required for 
+            redactions that are toggled <b>off</b>.</li>
+        <p>
+            <li>Enable <b>seamless page navigation</B>
+            <ul>
+                <li>Confirm that the <b>PgUp/PgDn</b> buttons can be used to navigate between
+                documents.</li>
+                <li>Confirm that they cannot be used to navigate between documents when seamless
+                navigation is disabled.</li>
+            </ul></li>
+        <p>
+            <LI><b>Feedback collection</b>
+            <ul>
+                <li>Confirm that feedback is collected when enabled and not when disabled.</li>
+                <li>Confirm that feedback is saved to the folder specified. Confirm appropriate
+                behavior in the following situations:
+                <ul>
+                    <li>Specify a path using tags</li>
+                    <li>Specify an absolute path</li>
+                    <li>Specify an invalid path</li>
+                    <li>Select a path using the <b>browse</b> button</li>
+                    <li>Specify a folder the user doesn't have permissioin to write to</li>
+                </ul></li>
+                <li>Confirm that the original document is included or not as specified.</li>
+                <li>Confirm that filename generation works as specified.</li>
+                <li>Confirm that the feedback collection scope (all verified, all sensitive, all
+                corrected) works as expected.</li>
+                <li>Confirm that the feedback collection folder contains both <b>.expected.voa</b>
+                and <b>.found.voa</b> files.</li>
+                <li>Confirm that appropriate feedback is collected when .voa files are modified in
+                verification through <b>history navigation</b>.</li>
+                <li>Confirm that extensions are not trimmed from filenames when feedback is
+                collected.</li>
+            </ul></li>
+        <p>
+            <li><b>Input Event Tracking support for verification</b>
+            <ul>
+                <li>Start verifying documents during a specific (noted) minute.  Make sure to 
+                perform some input events during the minute.</li>
+                <li>Some possible input events:
+                <ul>
+                    <li>Scroll using arrow keys</li>
+                    <li>Scroll with the mouse in the scrollbar</li>
+                    <li>Move the mousewheel</li>
+                    <li>Click in the data window (docked)</li>
+                    <li>Click in the data window (undocked)</li>
+                    <li>Type letters</li>
+                    <li>Press the alt key repeatedly</li>
+                    <li>Tab</li>
+                </ul></li>
+                <li>Test other possible input events as they occur to you.</li>
+                <li>Stop verifying documents near the beginning of a specific (noted) minute.</li>
+                <li>Check input event tracking results
+                <ul>
+                    <li>Run the <b>Detailed usage report for specific user for specific day</b> 
+                    and select the appropriate user and day.</li>
+                    <li>Confirm that input events were noted for minutes in which input events were
+                    made and not for minutes in which events were not made.</li>
+                </ul></li>
+            </ul></li>
+        <p>
+            <li>Confirm that the <b>Open verification window in full screen mode</b> option works
+            as expected.</li>
+        <P>
+            <li>Select <b>Prompt to save changes</b>
+            <ul>
+                <li>Confirm that when you hit <b>Tab</b>, <b>Next document</b>, or <b>PgDn</b> 
+                (with seamless navigation enabled) on the most current document, you are prompted
+                to save and commit.</li>
+                <li>Confirm that you are <b>not</b> prompted if the prompt is disabled in the
+                property page.</li>
+                <li>Confirm that you are <b>not</b> prompted in either case when navigating
+                between unchanged documents that have already been committed.</li>
+                <li>Confirm that you <b>are</b> prompted before moving on after making changes to
+                a document that had previously been committed (i.e., an image in your document
+                history).</li>
+            </ul></li>
+        <p>
+            <li>Confirm that a non-default .voa file can be specified.</li>
+            <li>Confirm appropriate behavior in the following cases:
+            <ul>
+                <li>.voa file specified using tags</li>
+                <li>Static .voa file specified (i.e., the same .voa file for each document)</li>
+                <li>Nonexistant .voa file specified</li>
+                <li>Read-only .voa file specified</li>
+            </ul></li>
+        <p>
+            <li>Confirm that a backdrop image can be specified.</li>
+            <li>Confirm appropriate behavior in the following cases:
+            <ul>
+                <li>Backdrop image specified using tags</li>
+                <li>Specific backdrop image specified (same for each document)</li>
+                <li>Nonexistant image specified</li>
+            </ul></li>
+        <p>
+            <li>Confirm proper behavior when a non-default .voa file is specified and feedback
+            collection is enabled.</li>
+            <li>Confirm proper behavior when a non-default .voa file is specified and a backdrop
+            image is specified.</li>
+            <li>Confirm proper behavior with feedback collection, a non-default .voa, and a
+            backdrop image.</li>
+        <p>
+            <li><b>Slideshow</b>
+            <ul>
+                <li>Confirm that the slideshow switches to <b>fit-to-page</b> mode or not as 
+                determined by the checkbox in the settings dialog.</li>
+                <li>Confirm that the slideshow <b>tag</b> feature works as expected.</li>
+                <li>Confirm that the <b>Set file action status of</b> feature works as 
+                expected.</li>
+                <li>Confirm that the slideshow <b>stop</b> condition works as expected.</li>
+                <li>Confirm that the <b>simple question</b> user alertness confirmation works as
+                expected.
+                <ul>
+                    <li>Confirm that the run key <b>can</b> still be used when this option is
+                    selected.</li>
+                </ul></li>
+                <li>Confirm that the <b>run key</b> option works as expected.
+                <ul>
+                    <li>Confirm that <b>F5</b> does <b>not</b> start the slideshow when this
+                    option is selected.</li>
+                </ul></li>
+            </ul></li>
+        <p>
+            <li><b>Set file action status after verification</b>
+            <ul>
+                <li>Confirm that the appropriate file action status is set as specified.</li>
+                <li>Confirm that the file action status is <b>not</b> set after a <b>save without
+                committing</b>.</li>
+                <li>Confirm that the file action status <b>is</b> set after navigating back in the
+                history and saving a document again.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
+</ul>
+
+
+<p>
+
+</HTML>

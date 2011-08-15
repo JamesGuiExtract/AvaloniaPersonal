@@ -1,0 +1,554 @@
+<HTML>
+
+<HEAD>
+<TITLE>ID Shield Verification Checklist - Bug Fixes</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>ID Shield Testing Checklist<br>Verification - Bug Fixes<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+
+<!-- *********************************************** -->
+
+
+<h2>Redaction: Verify sensitive data</h2>
+<UL>
+    <li><b>Bug Fixes</b>
+    <ul>
+        <li><b>Old bugs</b>
+        <ul>
+            <li>Exercise verification on a local copy of the images in the folder 
+            <b>I:\Common\Testing\Test_Images\Historically_Problematic_Images</b>. Add manual
+            redactions to each and confirm that no problems are seen.</li>
+        <p>
+            <LI><b>[FlexIDSCore #3626]</b> Window focus issues
+            <!-- 8.0.0.54 -->
+            <ul>
+                <li>Configure an FPS file for verification with the following settings
+                <ul>
+                    <li>Review all pages</li>
+                    <li>Specify types</li>
+                    <li>Require exemption codes</li>
+                </ul></li>
+                <li>Verify a document without reviewing all pages.</li>
+                <li>Confirm that the verification window changes to the first unviewed page 
+                after closing the error message.</li>
+                <li>Verify a document without setting a redaction type.</li>
+                <li>Confirm that focus changes to the first redaction without a type and 
+                drops down the combo box.</li>
+                <li>Verify a document without setting an exemption code.</li>
+                <li>Confirm that focus changes to the first redaction without an exemption 
+                code.</li>
+            </ul></li>
+        <p>
+            <LI><b>[FlexIDSCore #3738]</b> Incorrect file status with multiple verifiers
+            <!-- fixed v 7.1.1.63 -->
+            <ul>
+                <li>Prepare several thousand files for verification.</li>
+                <li>Create two separate FPS files to verify images.  The two FAMs can run on 
+                the same test machine. Set the FPS files to grab 1000 files at a time from the
+                database for processing.</li>
+                <li>Open a <b>DB Admin</b> instance and navigate to the Summary tab.</li>
+                <li>Start processing with the first FAM.</li>
+                <li>Confirm that <b>1000</b> files are in <b>Processing</b> mode. </li>
+                <li>Verify some files and <b>Stop processing</b>.</li>
+                <li>Confirm that <b>&lt; 1000</b> files are in <b>Processing</b> mode and that
+                the number continues to decrease. </li>
+                <li>While the first FAM is stopping, start processing with the second FAM.  </li>
+                <li>Confirm that the number of <b>Processing</b> files is between 1000 and 
+                2000.</li>
+                <li>Confirm that the number of files in <b>Processing</b> mode continues to 
+                decrease to 1000. </li>
+                <li>Verify some files.</li>
+                <li>Confirm that <b>&lt; 1000</b> files are in <b>Processing</b> mode. </li>
+            </ul>
+        <p>
+            <li><b>[FlexIDSCore #3830]</b> Thread safety for PDF images
+            <!-- fixed v 7.1.1.75 -->
+            <ul>
+                <li>Configure verification to not require viewing all pages.</li>
+                <li>Verify several multipage PDFs.</li>
+                <li>Save and commit before the thumbnail viewer can load all of the pages.</li>
+                <li>Confirm that no exceptions are thrown.</li>
+                <li>Confirm that no unexpected application crashes are seen.</li>
+            </ul></li>
+        <p>
+            <LI>*<b>[FlexIDSCore #3844]</b> Type combo box - note this may not be fixed
+            <!-- fixed v ?? -->
+            <ul>
+                <li>Verify a document that contains redactions.</li>
+                <li>Move or resize a redaction.</li>
+                <li>Click in the whitespace next to the text in the <b>Type</b> combo box.</li>
+                <li>Confirm that the combo box drop-down appears without requiring an extra 
+                click.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #3846]</b> Results when verifying exactly one file
+            <!-- fixed v 7.1.1.77 -->
+            <ul>
+                <li>Create an action and supply exactly one file to the queue for that action.</li>
+                <li>Process the file for verification, first confirming that a useful VOA file 
+                exists.</li>
+                <li>Review all pages of the file and then click <b>Save</b>.</li>
+                <li>Confirm that the verification interface closes gracefully if the FAM 
+                settings <b>are not</b> set to process continuously.</li>
+                <li>Confirm that the verification interface remains if the FAM settings 
+                <b>are</b> set to process continuously.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4078]</b> 
+            <!-- fixed v 8.0.0.42 -->
+            <ul>
+                <li>Confirm that if thumbnails are not shown when processing is started, they are 
+                still displayed properly when toggled on.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4184]</b> Resizing redactions
+            <!-- fixed v 8.0.0.55 -->
+            <ul>
+                <li>Verify an image.</li>
+                <li>Rotate the image 270 degrees clockwise.</li>
+                <li>Draw a manual redaction.</li>
+                <li>Resize the redaction using the corner grip handles.</li>
+                <li>Confirm that resizing works as expected.</li>
+            </ul></li>
+        <p>
+            <LI><b>[FlexIDSCore #4246]</b> Verification locking files while the FAM remains 
+            active
+            <!-- fixed v 8.0.0.68 -->
+            <ul>
+                <li>Create a folder with 3 ID Shield demo images.</li>
+                <li>Create an FPS file to queue the 3 files - with Force processing turned on.</li>
+                <li>Add a <b>Redaction: Verify sensitive data</b> task to the FPS file.</li>
+                <li>Run the FPS file and stop processing for the first file while leaving the
+                FAM active.</li>
+                <li>Use <b>Windows Explorer</b> to confirm that the first file can be renamed.</li>
+                <li>Start processing again in the FAM and save the first image.</li>
+                <li>Stop processing for the second image while leaving the FAM active.</li>
+                <li>Use <b>Windows Explorer</b> to confirm that the second file can be
+                renamed.</li>
+                <li>Start processing again in the FAM and save the second image.</li>
+                <li>Stop processing for the third image while leaving the FAM active.</li>
+                <li>Use <b>Windows Explorer</b> to confirm that the third file can be renamed.</li>
+            </ul></li>
+        <p>
+            <LI><b>[LegacyRC #5734]</b> PDF Processing
+            <!-- 8.0.0.37 -->
+            <ul>
+                <li>Confirm that PDF images can be simultaneously queued and verified when 
+                processing multi-threaded.</li>
+            </ul></li>
+        </ul></li>
+    <p>
+        <li><b>Current (9.0-release-cycle) bugs</b>
+        <ul>
+            <LI><b>[FlexIDSCore #3621]</b> Duplicate exemption codes
+            <!-- fixed v 8.1.0.2 -->
+            <ul>
+                <li>Verify a document.</li>
+                <li>Create a redaction.</li>
+                <li>Apply the <b>(b)(1)</b> exemption code from FOIA to the 
+                redaction and press <b>OK</b>.</li>
+                <li>Open the exemption code dialog again.</li>
+                <li>Confirm that only one copy of the exemption code is present.</li>
+            </ul></li>
+        <p>
+            <LI><b>[FlexIDSCore #3857, #3863]</b> Commit conditions for skipped documents
+            <!-- fixed v 7.1.1.87, 8.0.0.2 -->
+            <ol>
+                <li>Configure an FPS file to require the user to view all pages or specify 
+                types for all redactions.</li>
+                <li>Open a document.</li>
+                <li>Make a change but make sure that the conditions in <b>step 1</b> are not
+                met.</li>
+                <li>Skip the document.</li>
+                <li>When prompted, choose <b>Save changes</b>.</li>
+                <li>Confirm that the document is skipped and no other prompts are presented.</li>
+            <p>
+                <li>Open another document.</li>
+                <li>Make a change and make sure that the conditions in <b>step 1</b> are met.</li>
+                <li>Save the changes without commit.</li>
+                <li>Skip the document.</li>
+                <li>Confirm that the document is skipped and no prompts are presented.</li>
+            </ol></li>
+        <p>
+            <li><b>[FlexIDSCore #4205]</b> Selected redaction should scroll into view
+            <!-- fixed v 8.1.0.6 -->
+            <ul>
+                <li>Create enough manual redactions that they are not all simultaneously
+                visible in the data grid.</li>
+                <li>In the image viewer, select one of the redactions that is not currently 
+                visible in the data grid.</li>
+                <li>Confirm that the data grid item scrolls into view.</li>
+                <li>Select multiple redactions with the Select redactions tool.</li>
+                <li>Confirm that the <b>first</b> selected redaction scrolls into view only if
+                necessary.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4248]</b> PDF display
+            <!-- fixed v 8.1.0.6 -->
+            <ul>
+                <li>Confirm that all pages of the images in I:\Common\Testing\PVCS_Testing\Flex
+                IDSCore\4248 are visible in verification.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4261]</b> Verification with multiple remote users
+            <!-- fixed v 8.1.0.5 -->
+            <ul>
+                <li>Enable terminal services (Note: a server OS is required for this test).</li>
+                <li>Create an .fps file to run as a service executing rules and setting files to
+                pending for a verification action.</li>
+                <li>Create an .fps file to verify images.</li>
+                <li>Confirm that multiple users can log on remotely and verify at the same time.</li>
+                <li>Confirm that multiple users can log on remotely and open the following 
+                utilities:
+                <ul>
+                    <li>DB Admin</li>
+                    <li>UEX Viewer</li>
+                    <li>USS Viewer</li>
+                    <li>VOA Viewer</li>
+                </ul></li>
+            </ul></li>
+        <p>
+            <LI><b>[FlexIDSCore #4267]</b> Toggling
+            <!-- fixed v 8.1.0.12 -->
+            <ul>
+                <li>Configure the .ini file not to warn on redactions/nonredactions.</li>
+                <li>Open a document for verification that contains more than one redaction.</li>
+                <li>Use the mouse to select a redaction in the data grid and click in the checkbox 
+                to change its redacted state.</li>
+                <li>Press ctrl+a to select all redactions.</li>
+                <li>Press the space bar. Note that now everything is toggled on.</li>
+                <li>Press the space bar again and immediately click in the image viewer.</li>
+                <li>Confirm that the state of all redactions changes appropriately.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4283]</b> Error with Find or redact
+            <!-- fixed v 8.1.0.46 -->
+            <ul>
+                <li>Open the Find or redact text dialog in ID Shield verification.</li>
+                <li>Enter a search that will cause an exception (e.g., a single backslash with 
+                regex search enabled).</li>
+                <li>Hit the Find next button.</li>
+                <li>Dismiss the error.</li>
+                <li>Confirm that the search term edit box is enabled.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4397]</b> Error logged on stop from FAM
+            <ul>
+                <li>Start verifying some documents.</li>
+                <li>Go to the FAM and hit Stop.</li>
+                <li>Confirm that no exceptions are logged.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4398]</b> Navigating back with no doc open
+            <ul>
+                <li>Set up an FPS file to run single-threaded with verification and additional
+                tasks such that there will be a longish wait between documents.</li>
+                <li>Start processing; save the first doc.</li>
+                <li>Before the next file loads, press <b>Ctrl+Shift+Tab</b> to navigate to the
+                previous doc.</li>
+                <li>Confirm that no errors are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4484]</b> Pause condition configuration/persistence
+            <ul>
+                <li>Open the FAM. Add a new verification task.</li>
+                <li>Click the Settings button for the slideshow feature.</li>
+                <li>Click the "Stop slideshow..." checkbox.</li>
+                <li>Double-click in the associated edit box.</li>
+                <li>Configure a condition and hit OK.</li>
+                <li>Confirm that the condition is correctly displayed in the edit box.</li>
+                <li>Hit Cancel.</li>
+                <li>Reopen the slideshow settings dialog.</li>
+                <li>Confirm that the condition is no longer configured.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4489]</b> Auto-fit with rotated image
+            <ul>
+                <li>Verify an image that is rotated 90 degrees.</li>
+                <li>Rotate the image so it is vertical.</li>
+                <li>Make a redaction while holding the shift key to auto-fit the redaction 
+                zones.</li>
+                <li>Confirm that the redaction zones are drawn correctly (i.e., each character does
+                not get its own zone).</li>
+            </ul></li>
+        <P>
+            <li><b>[FlexIDSCore #4494]</b>
+            <!-- fixed v 8.1.0.127 -->
+            <ul>
+                <li>Open verification and select the word redactio tool.</li>
+                <li>Click on a word to create a redaction covering that word.</li>
+                <li>Without moving the cursor, click on the word again. Note that a duplicate
+                redaction is not created.</li>
+                <li>Move the cursor away from the redaction, then click on the same word again.
+                Confirm that an exact duplicate redaction is not created.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4495]</b> Misplaced word redaction
+            <!-- fixed v 8.1.0.151 -->
+            <ul>
+                <li>Open verification.</li>
+                <li>Zoom/pan such that the point in the upper left corner of the image viewer is
+                inside a word.</li>
+                <li>Select the word redaction tool. Click the mouse button in some whitespace and 
+                drag the mouse as short a distance as possible.</li>
+                <li>Confirm that there is no word redaction preview highlight over the word in the
+                upper left corner.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4496]</b> Word redaction tool and unredactable zones
+            <!-- fixed v 8.1.0.127 -->
+            <ul>
+                <li>Make a local copy of one of the images and .uss files from the ManyPageImages
+                folder on I:. Note that the .uss files have a 2007 modified date; reOCRing would
+                probably not get the same result.</li>
+                <li>Open the image for verification and select the word redaction tool</li>
+                <li>Above "JUDGMENT BY OPERATION OF LAW" there's a dashed line. Mouse over it and
+                confirm that no preview highlight is shown to redact that line.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4501]</b> Word redaction orphaned highlights
+            <!-- fixed v 8.1.0.127 -->
+            <ul>
+                <li>Open verification with a document that has a .uss file.</li>
+                <li>Select the word redaction tool</li>
+                <li>Hover over a word so that the word highlight preview appears.</li>
+                <li>Press the Escape key and move the mouse.</li>
+                <li>Confirm that the highlight preview correctly disappears.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4503]</b> Word redaction object reference exception
+            <!-- fixed v 8.1.0.127 -->
+            <ul>
+                <li>Hover the word redaction tool over a word so that the preview highlight 
+                appears.</li>
+                <li>Press Ctrl+S to save and move to the next document.</li>
+                <li>Confirm that no errors are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4506, #4502, #4505]</b> Word highlights shown for wrong document
+            <!-- fixed v 8.1.0.127 -->
+            <ul>
+                <li>Configure a FAM with a verification task set up to run multi-threaded.</li>
+                <li>Start verification. Select the word redaction tool.</li>
+                <li>Save a couple documents, then quickly switch back and forth among documents 
+                for a while.</li>
+                <li>Click and drag to see the word highlight preview. Confirm that it is showing 
+                highlights for the appropriate document.</li>
+                <li>Confirm that no other errors or unexpected behavior (e.g., lockups) are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4507]</b> Word redaction exception on cancel
+            <!-- fixed v 8.1.0.132 -->
+            <ul>
+                <li>Open a document and select the word redaction tool</li>
+                <li>Click and drag in pixel-fitting mode to begin to draw a redaction. Before
+                releasing the mouse button,</li>
+                <li>Press the context menu key (between right ctrl and the windows key) and use the
+                keyboard to select one of the other tools.</li>
+                <li>Select the word redaction tool again. Click and drag to begin to draw another
+                redaction in pixel-fitting mode. Before releasing the mouse button,</li>
+                <li>Right click to cancel.</li>
+                <li>Confirm that no errors are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4510]</b> Select the rectangular redaction tool and confirm that
+            clicking in the image viewer does not create a new redaction.</li>
+            <!-- fixed v 8.1.0.132 -->
+        <p>
+            <li><b>[FlexIDSCore #4511]</b> 
+            <!-- fixed v 9.0.0.22 -->
+            <ul>
+                <li>Open verification and select the word redaction tool.</li>
+                <li>Save the first document.</li>
+                <li>Using the keyboard shortcuts, switch between the first and second documents
+                as quickly as possible.</li>
+                <li>Confirm that no exceptions are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4514]</b>
+            <!-- fixed v 8.1.0.138 -->
+            <ul>
+                <li>Confirm that in the magnifier window, a redactions fill color always fills
+                redactions completely as appropriate.</lI>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4515, #4557]</b> Magnifier and fit-to-page
+            <!-- fixed v 8.1.0.137 -->
+            <ul>
+                <li>In verification with the magnifier open, press P to fit-to-page.</li>
+                <li>Confirm that the magnifier window still shows a magnified view.</li>
+                <li>Confirm that the behavior is also correct in fit-to-width mode.</li>
+                <li>Select the angular highlight tool.</li>
+                <li>Start drawing a redaction.</li>
+                <li>Confirm that the highlight shown in the magnifier is the appropriate 
+                height.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4520]</b> Magnifier and highlights outside image
+            <!-- fixed v 8.1.0.138 -->
+            <ul>
+                <li>Zoom out on an image so that the image viewer shows empty space outside of the
+                image.</li>
+                <li>Select a highlight tool and click and drag in the empty space beyond the 
+                edge of the image.</li>
+                <li>Confirm that the magnifier shows nothing.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4521]</b> Slideshow + Magnifier
+            <!-- fixed v 8.1.0.137 -->
+            <ul>
+                <li>Configure the slideshow to advance every second.</li>
+                <li>Open the magnifier window.</li>
+                <li>Start the slideshow. Keep the cursor in the image window.</li>
+                <li>Confirm that the slideshow advances as expected.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4518, #4524]</b> Moving mouse causes unexpected scroll
+            <!-- fixed v 8.1.0.137 -->
+            <ul>
+                <li>Zoom in on an image with the magnifier window open.</li>
+                <li>Move the mouse around. The issue is usually most likely to occur toward the 
+                top of the screen.</li>
+                <li>Confirm that the image does not scroll when the mouse is moved.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4527]</b> 
+            <!-- fixed v 9.0.0.22 -->
+            <ul>
+                <li>Open a document that contains some redactions. Confirm that the magnifier
+                window is open.</li>
+                <li>Resize the redaction and confirm that the size change is not too jittery.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4531, #4532]</b> Thumbnail viewer/magnifier window
+            <!-- fixed v 8.1.0.150 -->
+            <ul>
+                <li>Set up verification to have the thumbnail viewer docked on the right side of 
+                the image viewer and the magnifier docked at the bottom of the data window.</li>
+                <li>Close and reopen verification. Confirm that the thumbnail and magnifier 
+                locations were correctly persisted.</li>
+                <li>Close the thumbnail viewer, then close and reopen verification. Confirm 
+                correctly persisted locations.</li>
+                <li>Open the thumbnail viewer and close the magnifier, then close and reopen 
+                verification. Confirm correctly persisted locations.</li>
+                <li>Close the thumbnail viewer, then close and reopen verification again. Confirm
+                correctly persisted locations.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4534]</b> Word redaction and duplicates
+            <!-- fixed v 8.1.0.150 -->
+            <ul>
+                <li>Open TestImage001.tif for verification.</li>
+                <li>Use the word redaction tool to redact the words "CURRENT" and "CHILD" from the
+                document title.</li>
+                <li>Confirm that you can still use the word redaction tool to redact just the word
+                "CURRENT".</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4535]</b> Line fitting bug
+            <ul>
+                <li>Open TestImage001.tif</li>
+                <li>Select the rectangular highlight tool.</li>
+                <li>Redact the case number line with line-fitting.</li>
+                <li>Confirm that the redaction is not split into two lines.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4536]</b> Magnifier and resize
+            <!-- fixed v 8.1.0.150 -->
+            <ul>
+                <li>With the magnifier window open, select the selection tool.</li>
+                <li>Click on the grip handle for an existing redaction.</li>
+                <li>Confirm that the redaction is not resized.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4543]</b> Exceptions in pixel-fitting mode
+            <ul>
+                <li>Open TestImage001.tif zoomed fit-to-page.</li>
+                <li>Use the word redaction tool in pixel-fitting mode starting in the white 
+                space near the right margin of the document and dragging off the edge of the
+                page.</li>
+                <li>Do this repeatedly and confirm that no errors are seen.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4556]</b>
+            <!-- fixed v 9.0.0.22 -->
+            <ul>
+                <li>Open verification.</li>
+                <li>Activate the word redaction tool</li>
+                <li>Ensure the ImageViewer does not have focus.</li>
+                <li>Start the slideshow.</li>
+                <li>Before the image changes, with the mouse over the image viewer, try to use
+                ctrl+mouse wheel to zoom in.</li>
+                <li>The "Slideshow Paused" message will display; while it is displayed, click on
+                the ImageViewer and try to zoom in again.</li>
+                <lI>Confirm that no exceptions are seen.</lI>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4610]</b> Sluggish highlights on PDFs
+            <!-- fixed v 9.0.0.1 -->
+            <ul>
+                <li>Verify a bunch of PDFs that have associated USS files.</li>
+                <li>Confirm that word redaction tool highlights appear without unreasonable
+                delay.</li>
+                <li>Confirm that attributes are drawn on the image without unreasonable 
+                delay.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4662]</b> page navigation
+            <!-- fixed v 9.0.0.21 -->
+            <ul>
+                <li>Run the compute FPS file from the ID Shield demo.</li>
+                <li>Run the verification FPS file.</li>
+                <li>Tab through documents 1 and 2.</li>
+                <li>On document 3, hit tab once to view the second redaction, and then click on
+                pages 2, 3, and 4 in the page summary.</li>
+                <li>Save the document (Ctrl+S or the Save and commit button).</li>
+                <li>Hit shift+tab three times.</li>
+                <li>Confirm that you navigate backwards correctly.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4670]</b>
+            <!-- fixed v 9.0.0.21 -->
+            <ul>
+                <li>Set up a verification task to require the user to visit all pages; uncheck all
+                of the other boxes in the general groupbox of the task configuration.</li>
+                <li>Open the document in the PVCS_Testing folder for this SCR in 
+                verification.</li>
+                <li>Confirm that it opens to the appropriate page and that nothing is erroneously 
+                marked viewed.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4671]</b>
+            <!-- fixed v 9.0.0.21 -->
+            <ul>
+                <li>Queue some documents for verification.</li>
+                <li>Verify them.</li>
+                <li>Skip the last document in the queue.</li>
+                <li>Confirm that no exceptions are shown.</li>
+            </ul></li>
+        <p>
+            <li>[DotNet #673]</b> FormStateManager
+            <ul>
+                <li>Run ID Shield verification via the FAM</li>
+                <li>Run ID Shield verification via RunFPS on a machine where the current user has
+                never used RunFPS.</li>
+                <li>Confirm that the toolstrips are loaded correctly.</li>
+                <li>Delete the user.config file under <b>C:\Users\[Username]\AppData\Local\[ApplicationName]_Application\[GibberishFolderName]\[VersionString]</b></li>
+                <li>Open verification in the application whose config file has been deleted.</li>
+                <li>Confirm that the toolstrips are loaded correctly.</li>
+            </ul></li>
+        </ul></li>
+    </ul></li>
+</ul>
+
+
+<p>
+
+</HTML>
