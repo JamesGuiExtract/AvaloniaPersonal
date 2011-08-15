@@ -3603,6 +3603,11 @@ namespace Extract.Redaction.Verification
                 _thumbnailViewer.Active = _thumbnailDockableWindow.IsOpen;
 
                 _imageViewer.OpenImage(_savedMemento.DisplayImage, _standAloneMode);
+
+                if (!Focused)
+                {
+                    FormsMethods.FlashWindow(this, true, true);
+                }
             }
             catch (Exception ex)
             {

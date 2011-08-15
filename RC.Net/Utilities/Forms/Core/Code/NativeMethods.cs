@@ -8,6 +8,46 @@ namespace Extract.Utilities.Forms
 {
     internal static class NativeMethods
     {
+        #region Constants
+
+        // Stop flashing
+        const uint FLASHW_STOP = 0;
+ 
+        // Flash the window title
+        const uint FLASHW_CAPTION = 0x00000001;
+ 
+        // Flash the taskbar button
+        const uint FLASHW_TRAY = 0x00000002;
+
+        // Flash the window title and taskbar button
+        const uint FLASHW_ALL = FLASHW_CAPTION | FLASHW_TRAY;
+
+        // Flash continuously
+        const uint FLASHW_TIMER = 0x00000004;
+
+        // Flash until the window comes to the foreground
+        const uint FLASHW_TIMERNOFG = 0x0000000C;
+
+        #endregion Constants
+
+        #region Structs
+
+        /// <summary>
+        /// Contains the flash status for a window and the number of times the system should flash
+        /// the window.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FLASHWINFO
+        {
+            public UInt32 cbSize;
+            public IntPtr hwnd;
+            public UInt32 dwFlags;
+            public UInt32 uCount;
+            public UInt32 dwTimeout;
+        }
+
+        #endregion Structs
+
         #region P/Invokes
 
         /// <summary>
@@ -226,6 +266,17 @@ namespace Extract.Utilities.Forms
         /// <returns>0 if the call was successful.</returns>
         [DllImport("uxtheme.dll", ExactSpelling = true, CharSet = CharSet.Unicode)]
         public static extern int SetWindowTheme(IntPtr hWnd, String pszSubAppName, String pszSubIdList);
+
+        /// <summary>
+        /// Flashes the specified window. It does not change the active state of the window.
+        /// </summary>
+        /// <param name="pwfi">A pointer to a <see cref="FLASHWINFO"/> structure.</param>
+        /// <returns>The return value specifies the window's state before the call to the
+        /// FlashWindowEx function. If the window caption was drawn as active before the call, the
+        /// return value is nonzero. Otherwise, the return value is zero.</returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
 
         #endregion P/Invokes
 
@@ -562,6 +613,35 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI30339", ex);
+            }
+        }
+
+        /// <summary>
+        /// Starts or stops the specified <see paramref="window"/>'s title bar and taskbar button from
+        /// flashing.
+        /// </summary>
+        /// <param name="start"><see langword="true"/> to start flashing; <see langword="false"/> to
+        /// stop flashing.</param>
+        /// <param name="window">The <see cref="IWin32Window"/> that is to flash.</param>
+        /// <param name="stopOnActivate"><see langword="true"/> to stop flashing when the window is
+        /// activated (brought to the foreground).</param>
+        public static void FlashWindow(IWin32Window window, bool start, bool stopOnActivate)
+        {
+            try
+            {
+                FLASHWINFO flashWindowInfo = new FLASHWINFO();
+                flashWindowInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(flashWindowInfo));
+                flashWindowInfo.hwnd = window.Handle;
+                flashWindowInfo.dwFlags = (start ? FLASHW_ALL : FLASHW_STOP) |
+                                          (stopOnActivate ? FLASHW_TIMERNOFG : 0);
+                flashWindowInfo.uCount = UInt32.MaxValue;
+                flashWindowInfo.dwTimeout = 0;
+
+                FlashWindowEx(ref flashWindowInfo);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33219");
             }
         }
 

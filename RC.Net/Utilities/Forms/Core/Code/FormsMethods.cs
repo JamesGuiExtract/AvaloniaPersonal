@@ -465,6 +465,27 @@ namespace Extract.Utilities.Forms
             }
         }
 
+        /// <summary>
+        /// Starts or stops the specified <see paramref="window"/>'s title bar and taskbar button from
+        /// flashing.
+        /// </summary>
+        /// <param name="start"><see langword="true"/> to start flashing; <see langword="false"/> to
+        /// stop flashing.</param>
+        /// <param name="window">The <see cref="IWin32Window"/> that is to flash.</param>
+        /// <param name="stopOnActivate"><see langword="true"/> to stop flashing when the window is
+        /// activated (brought to the foreground).</param>
+        public static void FlashWindow(IWin32Window window, bool start, bool stopOnActivate)
+        {
+            try
+            {
+                NativeMethods.FlashWindow(window, start, stopOnActivate);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI33220");
+            }
+        }
+
         #endregion Methods
     }
 
