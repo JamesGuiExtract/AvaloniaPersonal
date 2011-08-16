@@ -1,0 +1,296 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0.0.64 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0.0.64 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Recently fixed SCRs</h3>
+    	<ul>
+            <li><b>UAC-related</b>
+            <ul>
+                <li><b>[LegacyRC 5890]</b> UEX log permissions
+                <ul>
+                    <li>Log in as local admin to a machine with UAC enabled; remove any existing
+                    UEX logs.</li>
+                    <li>Do something that will cause ExtractException.uex to be created.</li>
+                    <li>Log off and log back in as an unprivileged user.</li>
+                    <li>Confirm that you have access to the UEX log and exceptions are logged
+                    correctly.</lI>
+                    <li>Repeat the test in the other direction (i.e., confirm that local admin has
+                    access to a log created by another account).</li>
+                </uL></li>
+            <p>
+                <li><b>[LegacyRC #6043]</b> FDRS
+                <ul>
+                    <li>Run FDRS as an unprivileged user.</li>
+                    <li>Confirm that settings are read from and written to an INI file in the
+                    common application data folder.</li>
+                    <li>Confirm that settings can be modified via the <b>Configure &gt; Automatic
+                    notifications...</b> context menu option.</li>
+                </ul></li>
+            <p>
+                <li><b>[LegacyRC #6046]</b> Test Harness
+                <ul>
+                    <li>As an unprivileged user, run all the automated tests and confirm that they
+                    work as expected.</li>
+                </ul></li>
+            <p>
+                <li><b>[LegacyRC #6051]</b> Feedback manager
+                <ul>
+                    <li>Confirm that Feedback.exe and UCLIDAFFeedback.dll have been removed from
+                    the installer.</li>
+                </ul></li>
+            </ul></li>
+        <p> 
+            <li><b>[LegacyRC #5893, #6047]</b> Convert to searchable PDF property page
+            <ul>
+                <li>Open the Core: Convert to searchable PDF config dialog. Note that the Settings
+                button is initially disabled.</li>
+                <li>Check the checkbox for PDF/A conversion, then uncheck it.</li>
+                <li>Confirm that the Settings button remains disabled.</li>
+            <p>
+                <li>Confirm that the close-paren at the end of the <b>Make output PDF/A 
+                compatible</b> line is completely visible.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #5903]</b> ELI29014 grammar fix
+            <ul>
+                <li>Make a local copy of 
+                \Annual_Rpts_Chg\Annual_Rpts_Chg_2\642\E80L#P9$W4U9@RTN0000000001_1.tif from the
+                Utah images collected on the L: drive of HPQC2.</li>
+                <li>OCR the document.</li>
+                <li>If ELI29014 was logged, confirm that the text says "At least one... method 
+                failed."</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6045]</b> EncryptFile.exe
+            <ul>
+                <li>Confirm that encryptfile provides a usage message when run with the /? 
+                flag.</li>
+                <li>Confirm that the usage message indicates that by default, the utility will
+                create an output file with the .etf extension appended to (not in place of) the
+                original extension.</li>
+            </ul></li>
+        <p>
+            <li><b>[LegacyRC #6063]</b> Confirm that the UEX Viewer usage message includes a line
+            explaining the use of the <b>/temp</b> flag.</li>
+        <p>
+            <li><b>[LegacyRC #6064]</b> Confirm that the usage message for Sleep.exe includes an
+            example indicating that "Sleep 2m /v /r" will sleep for a random time between 0 and
+            <b>120000</b> milliseconds.</li>
+        <p>
+            <li><b>[LegacyRC #6121]</b> In the property page for the Manage tags task, confirm that
+            <b>separate</b> is spelled correctly and that <b>semicolon</b> is not hyphenated.</li>
+        <p>
+            <li><b>[LegacyRC #6161]</b> Confirm that USS files are correctly registered on install
+            to open with USSFileViewer.exe.</li>
+        <p>
+            <li><b>[LegacyRC #6162]</b> Confirm that the FAM title bar is in the form <b>
+            &lt;FPSFileName&gt; - &lt;DatabaseName&gt; on &lt;DBServerName&gt; - File Action
+            Manager</b>.</li>
+        <p>
+            <li><b>[LegacyRC #6163]</b>
+            <ul>
+                <li>Confirm that the DB Admin does <b>not</b> allow you to clear the database in
+                the following situations:
+                <ul>
+                    <li>FAM is processing documents</lI>
+                    <li>FAM is queueing documents</li>
+                    <li>FAM is running displaying statistics</li>
+                    <li>FAM is listening for documents or waiting for documents to be added to the
+                    queue.</li>
+                </ul></li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4390]</b> Decimals in LIR specification
+            <ul>
+                <li>Create a Locate Image Region rule and confirm that decimal amounts can be used
+                to specify the left/right bounds of the image region.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4463]</b> Confirm that all the words in the Merge attributes
+            output handler property page are spelled correctly.</li>
+        <p>
+            <li><b>[FlexIDSCore #4581, #4582]</b> Merge attributes Type/Value specification
+            <ul>
+                <li>Set up an RSD file such that it will find two or more spatially similar 
+                attributes with different names or types.</li>
+                <li>Confirm that the attributes can be merged and output with a <b>specific</b>
+                type.</li>
+                <li>Confirm that the attributes can be merged and output with a <b>specific</b>
+                value.</li>
+                <li>Confirm that the attributes can be merged and output with <b>combined</b>
+                types.</li>
+            <p>
+                <li>Specify an order of preference for preserving the attribute's name.</li>
+                <li>Confirm that the type of the attribute whose name is preserved can be assigned
+                to the output attribute.</li>
+                <li>Confirm that the value of the attribute whose name is preserved can be assigned
+                to the output attribute.</li>
+            <p>
+                <li>Confirm that an order of preference can be specified for preserving the
+                attribute's type or value.</lI>
+                <li>Confirm that the type or value is preserved as expected.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4602]</b> Merge/Compare ID Shield data file property page issues
+            <ul>
+                <li>Open the Merge ID Shield data file property page.</lI>
+                <li>Confirm that <b>100</b> fits in the overlap percentage box.</li>
+                <li>Confirm that the title bar includes an appropriate label.</li>
+                <li>Confirm that the Esc key can close the dialog.</li>
+                <li>Confirm that the dialog does not get a separate entry in the windows 
+                taskbar.</li>
+                <li>Confirm the same behavior for the Compare ID Shield data file condition.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4606]</b> Advanced redaction text settings dialog
+            <ul>
+                <li>Confirm that neither the dialog for advanced redaction text settings nor the
+                Enter Replacement String Pair dialog (which comes up when you hit the Add button)
+                gets a separate taskbar entry.</li>
+                <li>Confirm that the title bars for both dialogs are in sentence case.</li>
+                <li>Confirm that the replacement strings dialog enforces a minimum size.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4644]</b> Confirm that property pages for the redaction tasks all
+            have appropriate captions.</li>
+        <p>
+            <li><b>[FlexIDSCore #4651]</b> Confirm that there is a space between Commands and &gt;
+            in the verification slideshow settings dialog.</li>
+        <p>
+            <li><b>[FlexIDSCore #4674]</b> Confirm that standard reports are installed in the
+            appropriate directory ("ProgramData\Extract Systems\Reports\Standard reports").</lI>
+        <p>
+            <li><b>[FlexIDSCore #4759]</b> "Ignore errors" option
+            <ul>
+                <li>Configure a regular expression rule with a malformed regex (e.g., 
+                "[\s\S]**").</li>
+                <li>Run the rule on some text and confirm that an error is displayed.</lI>
+                <li>Check the IE box and confirm that the error is ignored.</li>
+                <li>Add a value modifier that will cause an exception (e.g., an advanced replace 
+                string set to replace a malformed regex) and confirm that the <b>Ignore any
+                modifying rule errors</b> works as expected.</li>
+                <li>Confirm that the "ignore errors" options also work for preprocessors, 
+                splitters, and output handlers.</li>
+            </ul></li>
+        <p>
+            <li><b>[FlexIDSCore #4773]</b> Confirm that ID Shield can be installed.</li>
+        <p>
+            <li><b>[FlexIDSCore #4776]</b> Run the FLEX Index demo and confirm that reasonable
+            spatial information is displayed for the Consideration Amount field on 
+            Example06.tif.</li>
+        <p>
+            <li><b>[FlexIDSCore #4779]</b> Install FLEX Index in Custom mode and install 
+            redistributable components. Confirm that UCLIDInputFunnel cannot be installed.</li>
+        <p>
+            <li><b>[FlexIDSCore #4783]</b> Confirm that the legacy ID Shield tasks have been
+            removed.</li>
+        <p> 
+            <li><b>[FlexIDSCore #4785]</b> Flash the verification title bar
+            <ul>
+                <li>Set up an FPS file with a file supplier listening to a folder and a 
+                verification task.</li>
+                <li>Save any pending documents so the verification UI is waiting for a file to be
+                added.</li>
+                <li>Add a file to the listening folder and confirm that the verification title bar
+                flashes to indicate that a new document has come up.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNET #645]</b> Confirm that the all the FAM task property pages have
+            appropriate captions.</li>
+        <P>
+            <li><b>[DotNET #668]</b> Confirm that the Extract Exception Service is installed.</li>
+        <p>
+            <li><b>[DotNET #702, #707]</b> Context menu file supplier
+            <ul>
+                <li>Confirm that the context menu file supplier is available after install without
+                requiring any goofy registration acrobatics.</li>
+                <li>Configure a context menu file supplier and test it pretty thoroughly--I'm 
+                leaving this test case pretty much undefined; go nuts with it.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNET #718]</b> Extract image area task
+            <ul>
+                <li>Confirm that the task is installed and available.</li>
+                <li>Confirm that the property page contains:
+                <ul>
+                    <li>an edit box for VOA file</li>
+                    <li>an edit box for attribute query to select attribute(s) whose spatial area
+                    is to be extracted.</li>
+                    <li>A choice between using the overall bounds of an attribute or using each
+                    raster zone individually.</li>
+                    <li>A choice between outputting only the first qualifying image area or
+                    outputting them all.</li>
+                    <li>An output filename expression editbox with a corresponding tag selector
+                    which includes an &lt;AreaID&gt; so that unique filenames can be specified for
+                    each qualifying area.</li>
+                </ul></li>
+                <li>Confirm that the task can be used to extract portions of an image and save them
+                to disk.</li>
+            </ul></li>
+        <p>
+            <li><b>[DotNET #719]</b> New command-line option for report viewer
+            <ul>
+                <li>Confirm that the report viewer supports command-line options that allow for
+                the subject of an email to be specified and for the sender (configured in the
+                email settings) to be overwritten.</li>
+                <li>Confirm that the subject specification supports a <b>&lt;ReportName&gt;</b>
+                tag which will be replaced with the name of the report being sent.</li>
+                <li>Confirm that the &lt;ReportName&gt; tag works correctly with both standard and
+                saved reports.</li>
+            </ul></li>
+        </ul>
+<p>
+	<LI><h3>Automated Testing</h3>
+   	<ul>
+  	   	<LI>Automated Tests
+	    	<ul>
+            		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+       		</ul>
+		<LI>National Ruleset : Document Classification
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Redaction
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+		<LI>National Ruleset : Indexing
+       		<ul>
+      			<li>Date, Test Machine, Number of Failures
+      			<li>Notes
+       		</ul>
+   	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+      			<li>Date, Tester, Test Machine
+      			<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
