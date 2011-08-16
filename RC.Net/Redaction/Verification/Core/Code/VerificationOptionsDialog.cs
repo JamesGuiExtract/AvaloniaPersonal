@@ -149,11 +149,6 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void UpdateControls()
         {
-            // Enable/disable auto zoom
-            bool autoZoom = _autoZoomCheckBox.Checked;
-            _autoZoomScaleTrackBar.Enabled = autoZoom;
-            _autoZoomScaleTextBox.Enabled = autoZoom;
-
             // Set the auto zoom scale
             int value = _autoZoomScaleTrackBar.Value;
             _autoZoomScaleTextBox.Text = value.ToString(CultureInfo.CurrentCulture);

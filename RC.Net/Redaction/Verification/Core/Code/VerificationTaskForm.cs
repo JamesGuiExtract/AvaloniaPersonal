@@ -1271,7 +1271,8 @@ namespace Extract.Redaction.Verification
             // Prompt for requiring all redactions to have a type
             if (_settings.General.RequireTypes)
             {
-                foreach (RedactionGridViewRow row in _redactionGridView.Rows)
+                foreach (RedactionGridViewRow row in _redactionGridView.Rows
+                    .Where(row => !row.ReadOnly))
                 {
                     if (string.IsNullOrEmpty(row.RedactionType))
                     {
@@ -1289,7 +1290,8 @@ namespace Extract.Redaction.Verification
             // Prompt for all redactions to have an exemption code
             if (_settings.General.RequireExemptions)
             {
-                foreach (RedactionGridViewRow row in _redactionGridView.Rows)
+                foreach (RedactionGridViewRow row in _redactionGridView.Rows
+                    .Where(row => !row.ReadOnly))
                 {
                     // Only prompt for rows that are being redacted [FlexIDSCore #4223]
                     if (row.Redacted && row.Exemptions.IsEmpty)
@@ -2189,11 +2191,14 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void UpdateControlsBasedOnSelection()
         {
-            bool selected = _imageViewer.LayerObjects.Selection.Count > 0;
+            // Layer-objects for read-only rows will be non-moveable.
+            bool editableControlSelected = _imageViewer.LayerObjects.Selection
+                .Where(layerObject => layerObject.Movable)
+                .Any();
 
-            _applyExemptionToolStripButton.Enabled = selected;
-            _lastExemptionToolStripButton.Enabled = 
-                selected && _redactionGridView.HasAppliedExemptions;
+            _applyExemptionToolStripButton.Enabled = editableControlSelected;
+            _lastExemptionToolStripButton.Enabled =
+                editableControlSelected && _redactionGridView.HasAppliedExemptions;
 
             _nextRedactionToolStripButton.Enabled = !_standAloneMode ||
                 (_redactionGridView.Rows.Count > 0 &&
@@ -2370,8 +2375,10 @@ namespace Extract.Redaction.Verification
                 // because the page summary view needs to handle this event FIRST.
                 _imageViewer.ImageFileChanged += HandleImageViewerImageFileChanged;
 
-                // Center on selected layer objects
-                _imageViewer.Shortcuts[Keys.F2] = _redactionGridView.BringSelectionIntoView;
+                // Center on selected layer objects. Use forceAutoZoom parameter so that it works
+                // even if auto-zoom is disabled.
+                _imageViewer.Shortcuts[Keys.F2] = (() =>
+                    _redactionGridView.BringSelectionIntoViewSelected(true, false));
 
                 // Disable the close image
                 _imageViewer.Shortcuts[Keys.F4 | Keys.Control] = null;

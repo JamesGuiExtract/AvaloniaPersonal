@@ -387,6 +387,20 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="RedactionGridViewRow"/> is read-only.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if read-only; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool ReadOnly
+        {
+            get
+            {
+                return _confidenceLevel.ReadOnly;
+            }
+        }
+
         #endregion Properties
 
         #region Methods

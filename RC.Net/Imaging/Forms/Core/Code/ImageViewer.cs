@@ -2862,8 +2862,8 @@ namespace Extract.Imaging.Forms
             // Iterate through all selected layer object
             foreach (LayerObject layerObject in _layerObjects.Selection)
             {
-                // Skip this layer object if it is on a different page
-                if (layerObject.PageNumber != _pageNumber)
+                // Skip this layer object if it is not moveable or on a different page
+                if (!layerObject.Movable || layerObject.PageNumber != _pageNumber)
                 {
                     continue;
                 }
@@ -2882,7 +2882,7 @@ namespace Extract.Imaging.Forms
             {
                 foreach (LayerObject layerObject in _layerObjectsUnderCursor)
                 {
-                    if (layerObject.Selectable && layerObject.Visible)
+                    if (layerObject.Selectable && layerObject.Movable && layerObject.Visible)
                     {
                         // Return the sizing mouse cursor
                         return Cursors.SizeAll;
@@ -2900,8 +2900,8 @@ namespace Extract.Imaging.Forms
                 foreach (LayerObject layerObject in _layerObjects)
                 {
                     // Check if the mouse cursor is over a layer object
-                    // Only perform hit test if object is selectable and visible
-                    if (layerObject.Selectable && layerObject.Visible
+                    // Only perform hit test if object is selectable, moveable and visible
+                    if (layerObject.Selectable && layerObject.Movable && layerObject.Visible
                         && layerObject.HitTest(hitPoint))
                     {
                         // Return the sizing mouse cursor
@@ -3129,7 +3129,7 @@ namespace Extract.Imaging.Forms
                 bool drawGripPoints = _cursorTool == CursorTool.SelectLayerObject;
                 foreach (LayerObject layerObject in _layerObjects.Selection)
                 {
-                    layerObject.DrawSelection(e.Graphics, drawGripPoints);
+                    layerObject.DrawSelection(e.Graphics, drawGripPoints && layerObject.Movable);
                 }
 
                 // Draw the link arrows

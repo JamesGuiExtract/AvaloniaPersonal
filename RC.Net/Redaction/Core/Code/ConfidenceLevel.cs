@@ -15,6 +15,7 @@ namespace Extract.Redaction
         readonly bool _output;
         readonly bool _warnIfRedact;
         readonly bool _warnIfNonRedact;
+        readonly bool _readOnly;
 
         #endregion Fields
 
@@ -23,7 +24,8 @@ namespace Extract.Redaction
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfidenceLevel"/> class.
         /// </summary>
-        public ConfidenceLevel(string shortName, string query, Color color, bool output, bool warnIfRedact, bool warnIfNonRedact)
+        public ConfidenceLevel(string shortName, string query, Color color, bool output,
+            bool warnIfRedact, bool warnIfNonRedact, bool readOnly)
         {
             _shortName = shortName;
             _query = query;
@@ -31,6 +33,7 @@ namespace Extract.Redaction
             _output = output;
             _warnIfRedact = warnIfRedact;
             _warnIfNonRedact = warnIfNonRedact;
+            _readOnly = readOnly;
         }
 
         #endregion Constructors
@@ -112,6 +115,20 @@ namespace Extract.Redaction
             get
             {
                 return _warnIfNonRedact;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the attribute is read-only.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the attribute is read-only; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool ReadOnly
+        {
+            get
+            {
+                return _readOnly;
             }
         }
 

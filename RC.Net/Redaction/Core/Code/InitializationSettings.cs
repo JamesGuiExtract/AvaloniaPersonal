@@ -39,6 +39,8 @@ namespace Extract.Redaction
 
         const string _WARN_IF_NON_REDACT = "WarnIfNonRedact";
 
+        const string _READ_ONLY = "ReadOnly";
+
         const string _REDACTION_TYPES_SECTION = "RedactionDataTypes";
 
         const string _REDACTION_TYPE_COUNT_KEY = "NumRedactionDataTypes";
@@ -252,10 +254,11 @@ namespace Extract.Redaction
                 bool output = iniFile.ReadInt32(section, _OUTPUT_KEY) != 0;
                 bool warnIfRedact = iniFile.ReadInt32(section, _WARN_IF_REDACT) != 0;
                 bool warnIfNonRedact = iniFile.ReadInt32(section, _WARN_IF_NON_REDACT) != 0;
+                bool readOnly = iniFile.ReadInt32(section, _READ_ONLY) != 0;
 
                 // Store the confidence level
                 levels[i - 1] = new ConfidenceLevel(shortName, query, color, output, 
-                    warnIfRedact, warnIfNonRedact);
+                    warnIfRedact, warnIfNonRedact, readOnly);
             }
 
             return new ConfidenceLevelsCollection(levels);

@@ -195,7 +195,7 @@ namespace Extract.Redaction
                 {
                     // Create a ConfidenceLevel that queries for all attributes.
                     confidenceLevels.Add(
-                        new ConfidenceLevel("*", "*", Color.Black, true, false, false));
+                        new ConfidenceLevel("*", "*", Color.Black, true, false, false, false));
                 }
                 else
                 {
@@ -205,7 +205,7 @@ namespace Extract.Redaction
                         // Create a ConfidenceLevel that query for each specified data type that is to
                         // be redacted.
                         confidenceLevels.Add(
-                            new ConfidenceLevel(dataType, dataType, Color.Black, true, false, false));
+                            new ConfidenceLevel(dataType, dataType, Color.Black, true, false, false, false));
                     }
                 }
 

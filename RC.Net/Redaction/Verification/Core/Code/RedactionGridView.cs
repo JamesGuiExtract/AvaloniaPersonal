@@ -169,14 +169,34 @@ namespace Extract.Redaction.Verification
         Font _visitedFont;
 
         /// <summary>
-        /// The cell style for rows that have been visited.
+        /// The cell style for rows that have been not been visited and are read-only.
+        /// </summary>
+        DataGridViewCellStyle _readOnlyCellStyle;
+
+        /// <summary>
+        /// The cell style for the page cell of rows that have been not been visited and are read-only.
+        /// </summary>
+        DataGridViewCellStyle _readOnlyPageCellStyle;
+
+        /// <summary>
+        /// The cell style for rows that have been visited and are editable.
         /// </summary>
         DataGridViewCellStyle _visitedCellStyle;
 
         /// <summary>
-        /// The cell style for the page cell of visited rows.
+        /// The cell style for the page cell of visited rows that are editable.
         /// </summary>
         DataGridViewCellStyle _visitedPageCellStyle;
+
+        /// <summary>
+        /// The cell style for rows that have been visited and are read-only.
+        /// </summary>
+        DataGridViewCellStyle _visitedReadOnlyCellStyle;
+
+        /// <summary>
+        /// The cell style for the page cell of rows that have been visited and are read-only.
+        /// </summary>
+        DataGridViewCellStyle _visitedReadOnlyPageCellStyle;
 
         /// <summary>
         /// Indicates whether the grid is actively tracking data.
@@ -496,9 +516,53 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets the <see cref="DataGridViewCellStyle"/> associated with visited redactions.
+        /// Gets the <see cref="DataGridViewCellStyle"/> associated with unvisited, editable redactions.
         /// </summary>
-        /// <value>The <see cref="DataGridViewCellStyle"/> associated with visited redactions.</value>
+        /// <value>The <see cref="DataGridViewCellStyle"/> associated with unvisited redactions.</value>
+        DataGridViewCellStyle ReadOnlyCellStyle
+        {
+            get
+            {
+                if (_readOnlyCellStyle == null)
+                {
+                    // Use InactiveCaptionText color for this row.
+                    DataGridViewCellStyle style = _dataGridView.DefaultCellStyle.Clone();
+                    style.ForeColor = SystemColors.InactiveCaptionText;
+                    style.SelectionForeColor = SystemColors.InactiveCaptionText;
+                    _readOnlyCellStyle = style;
+                }
+
+                return _readOnlyCellStyle;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DataGridViewCellStyle"/> for the cell in the page column of unvisited,
+        /// editable redactions.
+        /// </summary>
+        /// <value>The <see cref="DataGridViewCellStyle"/> for the cell in the page column of unvisited
+        /// redactions.</value>
+        DataGridViewCellStyle ReadOnlyPageCellStyle
+        {
+            get
+            {
+                if (_readOnlyPageCellStyle == null)
+                {
+                    // Use the read-only cell style, but change the text alignment
+                    DataGridViewCellStyle style = ReadOnlyCellStyle.Clone();
+                    style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    _readOnlyPageCellStyle = style;
+                }
+
+                return _readOnlyPageCellStyle;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DataGridViewCellStyle"/> associated with visited, editable redactions.
+        /// </summary>
+        /// <value>The <see cref="DataGridViewCellStyle"/> associated with visited, editable redactions.
+        /// </value>
         DataGridViewCellStyle VisitedCellStyle
         {
             get
@@ -534,6 +598,48 @@ namespace Extract.Redaction.Verification
                 }
 
                 return _visitedPageCellStyle;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DataGridViewCellStyle"/> associated with visited, read-only redactions.
+        /// </summary>
+        /// <value>The <see cref="DataGridViewCellStyle"/> associated with visited, read-only
+        /// redactions.</value>
+        DataGridViewCellStyle VisitedReadOnlyCellStyle
+        {
+            get
+            {
+                if (_visitedReadOnlyCellStyle == null)
+                {
+                    // Use the read-only cell style, but with the visited font for this row
+                    DataGridViewCellStyle style = ReadOnlyCellStyle.Clone();
+                    style.Font = VisitedFont;
+                    _visitedReadOnlyCellStyle = style;
+                }
+
+                return _visitedReadOnlyCellStyle;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DataGridViewCellStyle"/> for the cell in the page column of visited, read-only redactions.
+        /// </summary>
+        /// <value>The <see cref="DataGridViewCellStyle"/> for the cell in the page column of visited, read-only
+        /// redactions.</value>
+        DataGridViewCellStyle VisitedReadOnlyPageCellStyle
+        {
+            get
+            {
+                if (_visitedReadOnlyPageCellStyle == null)
+                {
+                    // Use the visited, read-only style, but with center alignment for this row.
+                    DataGridViewCellStyle style = VisitedReadOnlyCellStyle.Clone();
+                    style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    _visitedReadOnlyPageCellStyle = style;
+                }
+
+                return _visitedReadOnlyPageCellStyle;
             }
         }
         
@@ -706,7 +812,7 @@ namespace Extract.Redaction.Verification
             {
                 // Determine the resultant redacted state [FIDSC #3897]
                 bool redacted = false;
-                foreach (RedactionGridViewRow row in SelectedRows)
+                foreach (RedactionGridViewRow row in SelectedRows.Where(row => !row.ReadOnly))
                 {
                     if (!row.Redacted)
                     {
@@ -723,7 +829,9 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Set the state
-                foreach (DataGridViewRow row in _dataGridView.SelectedRows)
+                foreach (DataGridViewRow row in _dataGridView.SelectedRows
+                    .Cast<DataGridViewRow>()
+                    .Where(row => !row.ReadOnly))
                 {
                     RedactionGridViewRow redaction = _redactions[row.Index];
                     redaction.Redacted = redacted;
@@ -897,7 +1005,7 @@ namespace Extract.Redaction.Verification
                 // Select only those layer objects that correspond to selected rows
                 UpdateLayerObjectSelection();
 
-                BringSelectionIntoView(false);
+                BringSelectionIntoView(false, false);
 
                 _imageViewer.Invalidate();
             }
@@ -909,23 +1017,37 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Centers the view on redactions selected on the current page; if there are no 
-        /// redactions selected on the current page, uses the first page with a selected redaction.
+        /// Handles UI command to bring the selected item into view.
         /// </summary>
-        public void BringSelectionIntoView()
+        /// <param name="forceAutoZoom"><see langword="true"/> to perform auto-zoom even if
+        /// <see cref="_autoZoom"/> is <see langword="false"/>.</param>
+        /// <param name="alwaysShiftZoom"><see langword="true"/> if the zoom should be adjusted
+        /// regardless of whether redactions are already in view; <see langword="false"/> if the
+        /// zoom should only be adjusted if in auto-zoom mode is on or if at least one redaction
+        /// on the page is not fully visible.</param>
+        public void BringSelectionIntoViewSelected(bool forceAutoZoom, bool alwaysShiftZoom)
         {
-            BringSelectionIntoView(true);
+            try
+            {
+                BringSelectionIntoView(forceAutoZoom, alwaysShiftZoom);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI33221");
+            }
         }
 
         /// <summary>
-        /// Centers the view on redactions selected on the current page; if there are no 
+        /// Centers the view on redactions selected on the current page; if there are no
         /// redactions selected on the current page, uses the first page with a selected redaction.
         /// </summary>
-        /// <param name="alwaysShiftZoom"><see langword="true"/> if the zoom should be adjusted 
-        /// regardless of whether redactions are already in view; <see langword="false"/> if the 
-        /// zoom should only be adjusted if in auto-zoom mode is on or if at least one redaction 
+        /// <param name="forceAutoZoom"><see langword="true"/> to perform auto-zoom even if
+        /// <see cref="_autoZoom"/> is <see langword="false"/>.</param>
+        /// <param name="alwaysShiftZoom"><see langword="true"/> if the zoom should be adjusted
+        /// regardless of whether redactions are already in view; <see langword="false"/> if the
+        /// zoom should only be adjusted if in auto-zoom mode is on or if at least one redaction
         /// on the page is not fully visible.</param>
-        public void BringSelectionIntoView(bool alwaysShiftZoom)
+        public void BringSelectionIntoView(bool forceAutoZoom, bool alwaysShiftZoom)
         {
             try
             {
@@ -942,7 +1064,7 @@ namespace Extract.Redaction.Verification
                         selected = GetSelectedLayerObjectsOnVisiblePage();
                     }
 
-                    if (_autoZoom)
+                    if (_autoZoom || forceAutoZoom)
                     {
                         // Auto-zoom is on, zoom around all layer objects on the current page.
                         PerformAutoZoom(selected);
@@ -1002,7 +1124,8 @@ namespace Extract.Redaction.Verification
             // Select/deselect the layer objects corresponding to each selected row
             foreach (LayerObject layerObject in _imageViewer.LayerObjects)
             {
-                bool shouldBeSelected = selectedIds.Contains(layerObject.Id);
+                bool shouldBeSelected =
+                    layerObject.Selectable && selectedIds.Contains(layerObject.Id);
                 if (layerObject.Selected != shouldBeSelected)
                 {
                     layerObject.Selected = shouldBeSelected;
@@ -1078,8 +1201,22 @@ namespace Extract.Redaction.Verification
         /// <param name="row">The row to mark as visited.</param>
         void MarkAsVisited(DataGridViewRow row)
         {
-            row.DefaultCellStyle = VisitedCellStyle;
-            row.Cells[_pageColumn.Index].Style = VisitedPageCellStyle;
+            foreach (DataGridViewCell cell in row.Cells)
+            {
+                if (cell.OwningColumn == _pageColumn)
+                {
+                    cell.Style = row.ReadOnly
+                        ? VisitedReadOnlyPageCellStyle
+                        : VisitedPageCellStyle;
+                }
+                else
+                {
+                    cell.Style = row.ReadOnly
+                        ? VisitedReadOnlyCellStyle
+                        : VisitedCellStyle;
+                }
+            }
+
             _redactions[row.Index].Visited = true;
         }
 
@@ -1151,7 +1288,9 @@ namespace Extract.Redaction.Verification
             {
                 _dirty = true;
 
-                foreach (DataGridViewRow row in _dataGridView.SelectedRows)
+                foreach (DataGridViewRow row in _dataGridView.SelectedRows
+                    .Cast<DataGridViewRow>()
+                    .Where(row => !row.ReadOnly))
                 {
                     RedactionGridViewRow redaction = _redactions[row.Index];
                     redaction.Exemptions = exemptions;
@@ -1202,6 +1341,22 @@ namespace Extract.Redaction.Verification
                 ArrayList adapter = ArrayList.Adapter(_redactions);
                 adapter.Sort(new RedactionGridViewRowComparer());
 
+                // If the row is read-only, apply the appropriate cell-style.
+                for (int i = 0; i < _redactions.Count; i++)
+                {
+                    DataGridViewRow gridRow = _dataGridView.Rows[i];
+                    gridRow.ReadOnly = _redactions[i].ReadOnly;
+                    if (gridRow.ReadOnly)
+                    {
+                        foreach (DataGridViewCell cell in _dataGridView.Rows[i].Cells)
+                        {
+                            cell.Style = cell.OwningColumn == _pageColumn
+                                ? ReadOnlyPageCellStyle
+                                : ReadOnlyCellStyle;
+                        }
+                    }
+                }
+
                 // Set viewed rows
                 if (visitedRows != null)
                 {
@@ -1250,10 +1405,12 @@ namespace Extract.Redaction.Verification
                 // Add each attribute
                 RedactionGridViewRow row = 
                     RedactionGridViewRow.FromSensitiveItem(item, _imageViewer, MasterCodes);
+
                 Add(row);
 
                 foreach (LayerObject layerObject in row.LayerObjects)
                 {
+                    layerObject.Movable = !row.ReadOnly;
                     _imageViewer.LayerObjects.Add(layerObject);
                 }
             }
@@ -1781,7 +1938,7 @@ namespace Extract.Redaction.Verification
         {
             // Check if only one row has input focus
             DataGridViewSelectedRowCollection rows = _dataGridView.SelectedRows;
-            if (rows.Count == 1)
+            if (rows.Count == 1 && !rows[0].ReadOnly)
             {
                 // Select the type column
                 _dataGridView.CurrentCell = rows[0].Cells[_typeColumn.Index];
@@ -2152,8 +2309,9 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Check if an exemption codes cell was clicked
-                if (IsExemptionColumn(e.ColumnIndex) && e.RowIndex >= 0)
+                // Check if an exemption codes cell was clicked and it is not read-only
+                if (IsExemptionColumn(e.ColumnIndex) && e.RowIndex >= 0 &&
+                    !_redactions[e.RowIndex].ReadOnly)
                 {
                     PromptForExemptions();
                 }
@@ -2207,7 +2365,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (e.RowIndex >= 0 && IsRedactedColumn(e.ColumnIndex))
+                if (e.RowIndex >= 0 && IsRedactedColumn(e.ColumnIndex) &&
+                    !_redactions[e.RowIndex].ReadOnly)
                 {
                     // Warn if necessary about the redacted state
                     bool redacted = Rows[e.RowIndex].Redacted;

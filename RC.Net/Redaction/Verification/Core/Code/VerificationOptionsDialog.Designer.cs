@@ -158,7 +158,6 @@ namespace Extract.Redaction.Verification
             // 
             // _autoZoomScaleTrackBar
             // 
-            this._autoZoomScaleTrackBar.Enabled = false;
             this._autoZoomScaleTrackBar.LargeChange = 3;
             this._autoZoomScaleTrackBar.Location = new System.Drawing.Point(10, 36);
             this._autoZoomScaleTrackBar.Minimum = 1;
@@ -170,7 +169,6 @@ namespace Extract.Redaction.Verification
             // 
             // _autoZoomScaleTextBox
             // 
-            this._autoZoomScaleTextBox.Enabled = false;
             this._autoZoomScaleTextBox.Location = new System.Drawing.Point(324, 36);
             this._autoZoomScaleTextBox.Name = "_autoZoomScaleTextBox";
             this._autoZoomScaleTextBox.ReadOnly = true;

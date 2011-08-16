@@ -16,6 +16,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -3106,20 +3107,6 @@ namespace Extract.Imaging.Forms
                         }
                     }
                 }
-
-                // If objects were moved successfully, but some of the objects were
-                // non-moveable prompt the user
-                if (success && containsNonMoveableObjects)
-                {
-                    using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
-                    {
-                        messageBox.Text = "The selection contained non-moveable objects. These objects have not been moved.";
-                        messageBox.Caption = "Some Objects Were Not Moved";
-                        messageBox.StandardIcon = MessageBoxIcon.Information;
-                        messageBox.AddStandardButtons(MessageBoxButtons.OK);
-                        messageBox.Show();
-                    }
-                }
             }
 
             // Refresh the image viewer
@@ -3298,11 +3285,9 @@ namespace Extract.Imaging.Forms
             {
                 using (new TemporaryWaitCursor())
                 {
-                    // Get the list of selected layer objects
-                    List<LayerObject> objects = new List<LayerObject>(_layerObjects.Selection);
-
-                    // Iterate through the list of selected objects
-                    foreach (LayerObject layerObject in objects)
+                    // Iterate through the list of selected objects that are moveable
+                    foreach (LayerObject layerObject in _layerObjects.Selection
+                        .Where(layerObject => layerObject.Movable))
                     {
                         // If the object is a single highlight, perform the modification.
                         Highlight highlight = layerObject as Highlight;
@@ -4141,11 +4126,10 @@ namespace Extract.Imaging.Forms
             _mainShortcuts[Keys.OemMinus | Keys.Control] = SelectZoomOut;
 
             // Zoom previous
-            _mainShortcuts[Keys.R] = SelectZoomPrevious;
+            _mainShortcuts[Keys.Back] = SelectZoomPrevious;
             _mainShortcuts[Keys.Left | Keys.Alt] = SelectZoomPrevious;
 
             // Zoom next
-            _mainShortcuts[Keys.T] = SelectZoomNext;
             _mainShortcuts[Keys.Right | Keys.Alt] = SelectZoomNext;
 
             // Pan tool
