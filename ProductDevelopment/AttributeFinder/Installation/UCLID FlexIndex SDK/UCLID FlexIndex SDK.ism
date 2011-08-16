@@ -245,7 +245,6 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
-		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
 		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\SFHelper.dll</td></row>
@@ -392,8 +391,6 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
-		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
-		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
@@ -4572,8 +4569,6 @@
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FileManager.F12958CC_F693_4837_866A_16AE49AE39E2</td><td>Not Installed</td><td>5</td><td/><td>4</td></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
-		<row><td>ISLockPermissionsCost</td><td/><td>1401</td><td/><td/></row>
-		<row><td>ISLockPermissionsInstall</td><td/><td>5901</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td/><td>2151</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td/><td>5601</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td/><td>6601</td><td/><td/></row>
@@ -5090,7 +5085,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut141</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut1411</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut16</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
-		<row><td>NewShortcut2</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut3</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut4</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut5</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
@@ -5193,7 +5187,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1411</td><td>newfolder1</td><td>##ID_STRING34##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td>"[COMMON_COMPONENTS]ESFAMService.sdf"</td><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut15</td><td>newfolder1</td><td>##ID_STRING39##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]SQLCDBEditor</td><td>"[CommonAppDataFolder]Extract Systems\ESFAMService\ESFAMService.sdf"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut16</td><td>newfolder1</td><td>##ID_STRING40##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]FAMNetworkManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut2</td><td>newfolder1</td><td>##ID_STRING5##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]Feedback.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING6##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder1</td><td>##ID_STRING7##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut5</td><td>newfolder1</td><td>##ID_STRING8##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]USSFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
