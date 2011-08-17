@@ -125,15 +125,15 @@ library	UCLID_AFVALUEFINDERSLib
 	typedef
 	[
 		uuid(C7755A9B-48A0-4884-B68C-C4A56CCFE765), 
-		helpstring("UCLID SPM Match Type")
+		helpstring("UCLID Pattern Matcher Match Type")
 	]
-	enum ESPMReturnMatchType
+	enum EPMReturnMatchType
 	{
 		kReturnFirstMatch = 1, // default
 		kReturnBestMatch = 2, 
 		kReturnAllMatches = 3, 
 		kReturnFirstOrBest = 4
-	} ESPMReturnMatchType;
+	} EPMReturnMatchType;
 
 	typedef
 	[
@@ -423,8 +423,8 @@ library	UCLID_AFVALUEFINDERSLib
 		//			and all matches that are found will be returned.  If 
 		//			ReturnAllMatches == VARIANT_FALSE, then only the first match
 		//			(if any) will be returned.
-		[propget, id(11), helpstring("property ReturnMatchType")] HRESULT ReturnMatchType([out, retval] ESPMReturnMatchType *peVal);
-		[propput, id(11), helpstring("property ReturnMatchType")] HRESULT ReturnMatchType([in] ESPMReturnMatchType eNewVal);
+		[propget, id(11), helpstring("property ReturnMatchType")] HRESULT ReturnMatchType([out, retval] EPMReturnMatchType *peVal);
+		[propput, id(11), helpstring("property ReturnMatchType")] HRESULT ReturnMatchType([in] EPMReturnMatchType eNewVal);
 		//-----------------------------------------------------------------------------------------
 		// List of strings that are used as preprocessors in the input text/file
 		// For instance: 
@@ -447,6 +447,64 @@ library	UCLID_AFVALUEFINDERSLib
 		//			documents that don't get classified from throwing exceptions
 		[propget, id(14), helpstring("property IgnoreInvalidTags")] HRESULT IgnoreInvalidTags([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(14), helpstring("property IgnoreInvalidTags")] HRESULT IgnoreInvalidTags([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+	[
+		object,
+		uuid(05658FC2-99BF-4B21-832D-DC0EAE1C7843),
+		dual,
+		helpstring("IREPMFinder Interface"),
+		pointer_default(unique)
+	]
+	interface IREPMFinder : IDispatch
+	{
+		// This variable contains the name of the file that has rules
+		[propget, id(1), helpstring("property RulesFileName")] HRESULT RulesFileName([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property RulesFileName")] HRESULT RulesFileName([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// Whether or not store successfuly executed rule as a document tag in AFDocument
+		[propget, id(2), helpstring("property StoreRuleWorked")] HRESULT StoreRuleWorked([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property StoreRuleWorked")] HRESULT StoreRuleWorked([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// In order to be able to tell which rule was actually effective on finding
+		// the attribute, a special "Attribute" will be created to hold the info about
+		// which rule is used. The "Attribute" name will be default to "RuleWorked". 
+		// User has the choice to define other name through this property.
+		// This property shall be set if StoreRuleWorked is true
+		[propget, id(3), helpstring("property RuleWorkedName")] HRESULT RuleWorkedName([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property RuleWorkedName")] HRESULT RuleWorkedName([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// Case sensitivity
+		[propget, id(4), helpstring("property CaseSensitive")] HRESULT CaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property CaseSensitive")] HRESULT CaseSensitive([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// The DataScorer, if any, that should be used to score the found data
+		// REQUIRE: The Object inside IObjectWithDescription should be of type ISPMDataScorer
+		[propget, id(5), helpstring("property DataScorer")] HRESULT DataScorer([out, retval] IObjectWithDescription **ppObj);
+		[propput, id(5), helpstring("property DataScorer")] HRESULT DataScorer([in] IObjectWithDescription *pObj);
+		//-----------------------------------------------------------------------------------------
+		// The minimum score to use to determine match, if the data scorer is specified
+		// REQUIRE: The only valid match scores are between 0 and 100 inclusive.
+		[propget, id(6), helpstring("property MinScoreToConsiderAsMatch")] HRESULT MinScoreToConsiderAsMatch([out, retval] long *pVal);
+		[propput, id(6), helpstring("property MinScoreToConsiderAsMatch")] HRESULT MinScoreToConsiderAsMatch([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// Whether all the matches, or only the first match should be returned
+		// PROMISE: If ReturnAllMatches == VARIANT_TRUE, all rules will be executed
+		//			and all matches that are found will be returned.  If 
+		//			ReturnAllMatches == VARIANT_FALSE, then only the first match
+		//			(if any) will be returned.
+		[propget, id(7), helpstring("property ReturnMatchType")] HRESULT ReturnMatchType([out, retval] EPMReturnMatchType *peVal);
+		[propput, id(7), helpstring("property ReturnMatchType")] HRESULT ReturnMatchType([in] EPMReturnMatchType eNewVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(8), helpstring("property MinFirstToConsiderAsMatch")] HRESULT MinFirstToConsiderAsMatch([out, retval] long *pVal);
+		[propput, id(8), helpstring("property MinFirstToConsiderAsMatch")] HRESULT MinFirstToConsiderAsMatch([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: If IgnoreInvalidTags is true and IsPatternsFromFile is true and the pattern file 
+		//			name contains tags and any of the tags do not exist then instead of throwing an 
+		//			exception the REPMFinder will return no found attributes.  This can prevent
+		//			documents that don't get classified from throwing exceptions
+		[propget, id(9), helpstring("property IgnoreInvalidTags")] HRESULT IgnoreInvalidTags([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(9), helpstring("property IgnoreInvalidTags")] HRESULT IgnoreInvalidTags([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 	};
 	[
@@ -930,6 +988,21 @@ library	UCLID_AFVALUEFINDERSLib
 		interface ILicensedComponent;
 		interface ICopyableObject;
 	};
+
+	[
+		uuid(F670EE2D-54D2-4FD6-AD77-C40211544804),
+		helpstring("REPMFinder Class")
+	]
+	coclass REPMFinder
+	{
+		[default] interface IREPMFinder;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface IMustBeConfiguredObject;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+
 	[
 		uuid(8D774DD6-7026-4FE1-9517-B448FDFB76BF),
 		helpstring("ReturnAddrFinder Class")
@@ -1016,6 +1089,15 @@ library	UCLID_AFVALUEFINDERSLib
 		helpstring("SPMFinderPP Class")
 	]
 	coclass SPMFinderPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(5E517A93-0280-4F0C-9BC2-4B95946BA632),
+		helpstring("REPMFinderPP Class")
+	]
+	coclass REPMFinderPP
 	{
 		interface IUnknown;
 	};

@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueFinders.REPMFinderPP.1 = s 'REPMFinderPP Class'
+	{
+		CLSID = s '{5E517A93-0280-4F0C-9BC2-4B95946BA632}'
+	}
+	UCLIDAFValueFinders.REPMFinderPP = s 'REPMFinderPP Class'
+	{
+		CLSID = s '{5E517A93-0280-4F0C-9BC2-4B95946BA632}'
+		CurVer = s 'UCLIDAFValueFinders.REPMFinderPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5E517A93-0280-4F0C-9BC2-4B95946BA632} = s 'REPMFinderPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

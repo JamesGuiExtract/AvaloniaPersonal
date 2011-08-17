@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinders.REPMFinder.1 = s 'REPMFinder Class'
+	{
+		CLSID = s '{F670EE2D-54D2-4FD6-AD77-C40211544804}'
+	}
+	UCLIDAFValueFinders.REPMFinder = s 'REPMFinder Class'
+	{
+		CLSID = s '{F670EE2D-54D2-4FD6-AD77-C40211544804}'
+		CurVer = s 'UCLIDAFValueFinders.REPMFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F670EE2D-54D2-4FD6-AD77-C40211544804} = s 'REPMFinder Class'
+		{
+			ProgID = s 'UCLIDAFValueFinders.REPMFinder.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinders.REPMFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

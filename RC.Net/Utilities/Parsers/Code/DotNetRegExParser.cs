@@ -211,6 +211,75 @@ namespace Extract.Utilities.Parsers
         }
 
         /// <summary>
+        /// Search the input text and retrieves tokens representing the named groups from a
+        /// successful search. The primary search result is ignored.
+        /// </summary>
+        /// <param name="strInput">The string to search.</param>
+        /// <param name="bFindFirstMatchOnly"><see langword="true"/> to return the named groups for
+        /// the first match only; <see langword="true"/> to return the named groups for all matches.
+        /// </param>
+        /// <returns>An <see cref="IUnknownVector"/> of <see cref="Token"/>s representing the named
+        /// groups from a successful search. An empty vector will be returned if the overall regex
+        /// did not match or there were no non-empty named groups.</returns>
+        public IUnknownVector FindNamedGroups(string strInput, bool bFindFirstMatchOnly)
+        {
+            try
+            {
+                // Make sure the Parser is licensed
+                ValidateLicense();
+
+                // Get the parser
+                Regex parser = GetRegexParser();
+
+                // Get the first match if there is one
+                Match foundMatch = parser.Match(strInput);
+
+                // Create the return object
+                IUnknownVector returnVector = new IUnknownVector();
+
+                // Iterate every match.
+                while (foundMatch.Success)
+                {
+                    // Process the groups, starting with the 2nd item
+                    // in the group list because the first item is just the
+                    // entire match
+                    for (int i = 1; i < foundMatch.Groups.Count; i++)
+                    {
+                        // Get the group
+                        Group g = foundMatch.Groups[i];
+
+                        // Get the name of the group from the parser
+                        string groupName = parser.GroupNameFromNumber(i);
+
+                        // Create a new token object
+                        Token captureToken = new Token();
+
+                        // Initialize with the values from the group
+                        captureToken.InitToken(g.Index, g.Index + g.Length - 1, groupName, g.Value);
+
+                        // Add to the named matches collection.
+                        returnVector.PushBack(captureToken);
+                    }
+
+                    // If only want the first match return.
+                    if (bFindFirstMatchOnly)
+                    {
+                        break;
+                    }
+
+                    // Get the next match
+                    foundMatch = foundMatch.NextMatch();
+                }
+
+                return returnVector;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI33368", "Failed to find named groups.", ex);
+            }
+        }
+
+        /// <summary>
         /// Replaces the <see cref="Pattern"/> found in the input string.
         /// </summary>
         /// <param name="strInputText">The string to search.</param>

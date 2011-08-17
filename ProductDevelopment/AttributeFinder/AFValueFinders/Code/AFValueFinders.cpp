@@ -29,6 +29,8 @@
 #include "BlockFinderPP.h"
 #include "SPMFinder.h"
 #include "SPMFinderPP.h"
+#include "REPMFinder.h"
+#include "REPMFinderPP.h"
 #include "ReturnAddrFinder.h"
 #include "LocateImageRegion.h"
 #include "LocateImageRegionPP.h"
@@ -58,6 +60,8 @@ OBJECT_ENTRY(CLSID_BlockFinder, CBlockFinder)
 OBJECT_ENTRY(CLSID_BlockFinderPP, CBlockFinderPP)
 OBJECT_ENTRY(CLSID_SPMFinder, CSPMFinder)
 OBJECT_ENTRY(CLSID_SPMFinderPP, CSPMFinderPP)
+OBJECT_ENTRY(CLSID_REPMFinder, CREPMFinder)
+OBJECT_ENTRY(CLSID_REPMFinderPP, CREPMFinderPP)
 OBJECT_ENTRY(CLSID_ReturnAddrFinder, CReturnAddrFinder)
 OBJECT_ENTRY(CLSID_LocateImageRegion, CLocateImageRegion)
 OBJECT_ENTRY(CLSID_LocateImageRegionPP, CLocateImageRegionPP)

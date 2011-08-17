@@ -267,6 +267,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="RegExPatternFileInterpreter.cpp" />
     <ClCompile Include="RegExprRule.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -279,6 +280,8 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="REPMFinder.cpp" />
+    <ClCompile Include="REPMFinderPP.cpp" />
     <ClCompile Include="ReturnAddrFinder.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -358,6 +361,8 @@
     <None Include="BoxFinder.rgs" />
     <None Include="BoxFinderPP.rgs" />
     <None Include="CheckFinder.rgs" />
+    <None Include="REPMFinder.rgs" />
+    <None Include="REPMFinderPP.rgs" />
     <None Include="res\ClueChartBottom.bmp" />
     <None Include="res\ClueChartBottomLeft.bmp" />
     <None Include="res\ClueChartBottomRight.bmp" />
@@ -449,8 +454,11 @@
     <ClInclude Include="MicrFinder.h" />
     <ClInclude Include="MicrFinderPP.h" />
     <ClInclude Include="PatternFileInterpreter.h" />
+    <ClInclude Include="RegExPatternFileInterpreter.h" />
     <ClInclude Include="RegExprRule.h" />
     <ClInclude Include="RegExprRulePP.h" />
+    <ClInclude Include="REPMFinder.h" />
+    <ClInclude Include="REPMFinderPP.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ReturnAddrFinder.h" />
     <ClInclude Include="ReturnAddrFinderPP.h" />

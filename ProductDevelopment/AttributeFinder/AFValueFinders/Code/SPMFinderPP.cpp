@@ -101,22 +101,22 @@ STDMETHODIMP CSPMFinderPP::Apply(void)
 			// store the return match type
 			if (IsDlgButtonChecked(IDC_RADIO_RETURN_FIRST_MATCH) == TRUE)
 			{
-				ipSPMFinder->ReturnMatchType = (UCLID_AFVALUEFINDERSLib::ESPMReturnMatchType)
+				ipSPMFinder->ReturnMatchType = (UCLID_AFVALUEFINDERSLib::EPMReturnMatchType)
 					kReturnFirstMatch;
 			}
 			else if (IsDlgButtonChecked(IDC_RADIO_RETURN_BEST_MATCH) == TRUE)
 			{
-				ipSPMFinder->ReturnMatchType = (UCLID_AFVALUEFINDERSLib::ESPMReturnMatchType)
+				ipSPMFinder->ReturnMatchType = (UCLID_AFVALUEFINDERSLib::EPMReturnMatchType)
 					kReturnBestMatch;
 			}
 			else if (IsDlgButtonChecked(IDC_RADIO_RETURN_ALL_MATCHES) == TRUE)
 			{
-				ipSPMFinder->ReturnMatchType = (UCLID_AFVALUEFINDERSLib::ESPMReturnMatchType)
+				ipSPMFinder->ReturnMatchType = (UCLID_AFVALUEFINDERSLib::EPMReturnMatchType)
 					kReturnAllMatches;
 			}
 			else if (IsDlgButtonChecked(IDC_RADIO_RETURN_FIRST_OR_BEST) == TRUE)
 			{
-				ipSPMFinder->ReturnMatchType = (UCLID_AFVALUEFINDERSLib::ESPMReturnMatchType)
+				ipSPMFinder->ReturnMatchType = (UCLID_AFVALUEFINDERSLib::EPMReturnMatchType)
 					kReturnFirstOrBest;
 			}
 			else
@@ -303,7 +303,7 @@ LRESULT CSPMFinderPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 
 
 			// update the return-match-type radio button
-			ESPMReturnMatchType eType = (ESPMReturnMatchType) ipSPMFinder->ReturnMatchType;
+			EPMReturnMatchType eType = (EPMReturnMatchType) ipSPMFinder->ReturnMatchType;
 			switch (eType)
 			{
 			case kReturnFirstMatch:

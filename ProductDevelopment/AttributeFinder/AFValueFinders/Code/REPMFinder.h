@@ -1,9 +1,9 @@
-// SPMFinder.h : Declaration of the CSPMFinder
+// REPMFinder.h : Declaration of the CREPMFinder
 
 #pragma once
 
 #include "resource.h"       // main symbols
-#include "PatternFileInterpreter.h"
+#include "RegExPatternFileInterpreter.h"
 
 #include "..\..\AFCore\Code\AFCategories.h"
 
@@ -11,31 +11,31 @@
 #include <map>
 
 /////////////////////////////////////////////////////////////////////////////
-// CSPMFinder
-class ATL_NO_VTABLE CSPMFinder : 
+// CREPMFinder
+class ATL_NO_VTABLE CREPMFinder : 
 	public CComObjectRootEx<CComMultiThreadModel>,
-	public CComCoClass<CSPMFinder, &CLSID_SPMFinder>,
+	public CComCoClass<CREPMFinder, &CLSID_REPMFinder>,
 	public ISupportErrorInfo,
-	public IDispatchImpl<ISPMFinder, &IID_ISPMFinder, &LIBID_UCLID_AFVALUEFINDERSLib>,
+	public IDispatchImpl<IREPMFinder, &IID_IREPMFinder, &LIBID_UCLID_AFVALUEFINDERSLib>,
 	public IDispatchImpl<IAttributeFindingRule, &IID_IAttributeFindingRule, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IPersistStream,
-	public ISpecifyPropertyPagesImpl<CSPMFinder>
+	public ISpecifyPropertyPagesImpl<CREPMFinder>
 {
 public:
-	CSPMFinder();
-	~CSPMFinder();
+	CREPMFinder();
+	~CREPMFinder();
 
-DECLARE_REGISTRY_RESOURCEID(IDR_SPMFINDER)
+DECLARE_REGISTRY_RESOURCEID(IDR_REPMFINDER)
 
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-BEGIN_COM_MAP(CSPMFinder)
-	COM_INTERFACE_ENTRY(ISPMFinder)
-	COM_INTERFACE_ENTRY2(IDispatch,ISPMFinder)
+BEGIN_COM_MAP(CREPMFinder)
+	COM_INTERFACE_ENTRY(IREPMFinder)
+	COM_INTERFACE_ENTRY2(IDispatch,IREPMFinder)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY(IAttributeFindingRule)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
@@ -46,11 +46,11 @@ BEGIN_COM_MAP(CSPMFinder)
 	COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
 END_COM_MAP()
 
-BEGIN_PROP_MAP(CSPMFinder)
-	PROP_PAGE(CLSID_SPMFinderPP)
+BEGIN_PROP_MAP(CREPMFinder)
+	PROP_PAGE(CLSID_REPMFinderPP)
 END_PROP_MAP()
 
-BEGIN_CATEGORY_MAP(CSPMFinder)
+BEGIN_CATEGORY_MAP(CREPMFinder)
 	IMPLEMENTED_CATEGORY(CATID_AFAPI_VALUE_FINDERS)
 END_CATEGORY_MAP()
 
@@ -81,28 +81,18 @@ END_CATEGORY_MAP()
 	STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 	STDMETHOD(GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
-// ISPMFinder
+// IREPMFinder
 public:
 	STDMETHOD(get_MinFirstToConsiderAsMatch)(/*[out, retval]*/ long *pVal);
 	STDMETHOD(put_MinFirstToConsiderAsMatch)(/*[in]*/ long newVal);
-	STDMETHOD(get_Preprocessors)(/*[out, retval]*/ IVariantVector **pVal);
-	STDMETHOD(put_Preprocessors)(/*[in]*/ IVariantVector *newVal);
-	STDMETHOD(get_GreedySearch)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_GreedySearch)(/*[in]*/ VARIANT_BOOL newVal);
-	STDMETHOD(get_TreatMultipleWSAsOne)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_TreatMultipleWSAsOne)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_CaseSensitive)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_CaseSensitive)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_StoreRuleWorked)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_StoreRuleWorked)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_RuleWorkedName)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_RuleWorkedName)(/*[in]*/ BSTR newVal);
-	STDMETHOD(get_RulesText)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_RulesText)(/*[in]*/ BSTR newVal);
 	STDMETHOD(get_RulesFileName)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_RulesFileName)(/*[in]*/ BSTR newVal);
-	STDMETHOD(get_IsPatternsFromFile)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_IsPatternsFromFile)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_DataScorer)(/*[out, retval]*/ IObjectWithDescription **ppObj);
 	STDMETHOD(put_DataScorer)(/*[in]*/ IObjectWithDescription *pObj);
 	STDMETHOD(get_MinScoreToConsiderAsMatch)(/*[out, retval]*/ long *pVal);
@@ -126,30 +116,25 @@ private:
 	// Only used if m_eReturnMatchType is kReturnFirstOrBest
 	long m_nMinFirstToConsiderAsMatch;
 
-	bool m_bIsPatternsFromFile;
 	bool m_bCaseSensitive;
-	bool m_bMultipleWSAsOne;
-	bool m_bGreedySearch;
 	bool m_bStoreRuleWorked;
 	std::string m_strRulesFileName;
-	std::string m_strRulesText;
 	std::string m_strRuleWorkedName;
-	IStringPatternMatcherPtr m_ipSPM;
-	IAFUtilityPtr	m_ipAFUtility;
+	IRegularExprParserPtr m_ipRegExpParser;
+	IAFUtilityPtr m_ipAFUtility;
+	IMiscUtilsPtr m_ipMiscUtils;
 	IObjectWithDescriptionPtr m_ipDataScorer;
 
 	bool m_bIgnoreInvalidTags;
 
-	// map of pattern file name to PatternFileInterpreter
-	std::map<std::string, PatternFileInterpreter> m_mapFileNameToInterpreter;
-
-	IVariantVectorPtr m_ipPreprocessors;
+	// map of pattern file name to RegExPatternFileInterpreter
+	std::map<std::string, RegExPatternFileInterpreter> m_mapFileNameToInterpreter;
 
 	///////////
 	// Methods
 	///////////
 	//----------------------------------------------------------------------------------------------
-	UCLID_AFVALUEFINDERSLib::ISPMFinderPtr getThisAsCOMPtr();
+	UCLID_AFVALUEFINDERSLib::IREPMFinderPtr getThisAsCOMPtr();
 	//----------------------------------------------------------------------------------------------
 	// Whether or not the input file name string contains
 	// valid <DocType> tag.
@@ -158,6 +143,7 @@ private:
 	bool containsValidDocTypeTag(const std::string& strFileName);
 
 	IAFUtilityPtr getAFUtility();
+	IRegularExprParserPtr getRegExParser();
 
 	// Replace all <DocType> with current document type name,
 	// auto encrypt file into .etf file if required, put prefix

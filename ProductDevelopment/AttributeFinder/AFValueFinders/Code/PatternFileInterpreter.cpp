@@ -65,7 +65,7 @@ bool PatternFileInterpreter::foundPattern(IStringPatternMatcherPtr ipSPM,
 	ASSERT_ARGUMENT("ELI08645", ipSPMFinder != __nullptr);
 
 	// get the return match type from the SPM
-	UCLID_AFVALUEFINDERSLib::ESPMReturnMatchType eReturnMatchType = 
+	UCLID_AFVALUEFINDERSLib::EPMReturnMatchType eReturnMatchType = 
 		ipSPMFinder->ReturnMatchType;
 
 	// get the data scorer object

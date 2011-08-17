@@ -1,7 +1,7 @@
-// SPMFinder.cpp : Implementation of CSPMFinder
+// REPMFinder.cpp : Implementation of CREPMFinder
 #include "stdafx.h"
 #include "AFValueFinders.h"
-#include "SPMFinder.h"
+#include "REPMFinder.h"
 
 #include <SpecialStringDefinitions.h>
 #include <Common.h>
@@ -20,51 +20,50 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 5;
+const unsigned long gnCurrentVersion = 1;
 const EPMReturnMatchType eDEFAULT_RETURN_MATCH_TYPE = kReturnFirstMatch;
 
 //-------------------------------------------------------------------------------------------------
-// CSPMFinder
+// CREPMFinder
 //-------------------------------------------------------------------------------------------------
-CSPMFinder::CSPMFinder()
+CREPMFinder::CREPMFinder()
 : m_bDirty(false),
-  m_bIsPatternsFromFile(true),
   m_bCaseSensitive(false),
-  m_bMultipleWSAsOne(true),
-  m_bGreedySearch(false),
   m_bStoreRuleWorked(false),
   m_strRulesFileName(""),
-  m_strRulesText(""),
   m_strRuleWorkedName(""),
-  m_ipSPM(NULL),
-  m_ipAFUtility(NULL),
+  m_ipMiscUtils(__nullptr),
+  m_ipRegExpParser(__nullptr),
+  m_ipAFUtility(__nullptr),
   m_eReturnMatchType(eDEFAULT_RETURN_MATCH_TYPE),
   m_nMinScoreToConsiderAsMatch(0),
   m_nMinFirstToConsiderAsMatch(0),
   m_ipDataScorer(NULL),
-  m_ipPreprocessors(NULL),
   m_bIgnoreInvalidTags(true)
 {
 }
 //-------------------------------------------------------------------------------------------------
-CSPMFinder::~CSPMFinder()
+CREPMFinder::~CREPMFinder()
 {
 	try
 	{
+		m_ipMiscUtils = __nullptr;
+		m_ipRegExpParser = __nullptr;
+		m_ipAFUtility = __nullptr;
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16349");
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33222");
 }
 
 //-------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::InterfaceSupportsErrorInfo(REFIID riid)
+STDMETHODIMP CREPMFinder::InterfaceSupportsErrorInfo(REFIID riid)
 {
 	static const IID* arr[] = 
 	{
 		&IID_IAttributeFindingRule,
 		&IID_ICategorizedComponent,
-		&IID_ISPMFinder,
+		&IID_IREPMFinder,
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent
@@ -80,7 +79,7 @@ STDMETHODIMP CSPMFinder::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 // IAttributeFindingRule
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pProgressStatus,
+STDMETHODIMP CREPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pProgressStatus,
 									   IIUnknownVector **pAttributes)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -90,88 +89,64 @@ STDMETHODIMP CSPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 		validateLicense();
 
 		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI07059", ipAFDoc != __nullptr);
+		ASSERT_ARGUMENT("ELI33223", ipAFDoc != __nullptr);
 
-		if (m_ipSPM == __nullptr)
-		{
-			m_ipSPM.CreateInstance(CLSID_StringPatternMatcher);
-			ASSERT_RESOURCE_ALLOCATION("ELI07028", m_ipSPM != __nullptr);
-		}
-
-		m_ipSPM->CaseSensitive = m_bCaseSensitive ? VARIANT_TRUE : VARIANT_FALSE;
-		m_ipSPM->TreatMultipleWSAsOne = m_bMultipleWSAsOne ? VARIANT_TRUE : VARIANT_FALSE;
+		getRegExParser()->IgnoreCase = m_bCaseSensitive ? VARIANT_FALSE : VARIANT_TRUE;
 
 		// return vec of attributes
 		IIUnknownVectorPtr ipRetAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI07061", ipRetAttributes != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI33225", ipRetAttributes != __nullptr);
 
-		string strInput(m_strRulesFileName);
-		if (m_bIsPatternsFromFile)
-		{
-			// get the actual file name based on the current input document type
-			strInput = getInputFileName(m_strRulesFileName, ipAFDoc);
+		// get the actual file name based on the current input document type
+		string strInput = getInputFileName(m_strRulesFileName, ipAFDoc);
 			
-			// if the input file name is empty, it means that the
-			// document type is not determined, or this document
-			// is classifed as more than one document types.
-			// Return an empty attribute vec to indicate that there's no attribute found
-			// or the specified document type has no SPM finder rules associated with it
-			if (strInput.empty())
-			{
-				*pAttributes = ipRetAttributes.Detach();
-				return S_OK;
-			}
-			else if (!isFileOrFolderValid( strInput ))
-			{
-				// If a tag expanded to a file that doesn't exist we won't throw
-				// an exception, we will just return no attributes
-				UCLIDException ue("ELI07502", "Specified file not found for String Pattern Matcher rule.");
-				ue.addDebugInfo("File", strInput);
-				ue.log();
-				*pAttributes = ipRetAttributes.Detach();
-				return S_OK;
-			}
-
-			// load pattern file
-			loadPatternFile(strInput);
-		}
-		// if input is directly from text panel
-		else
+		// if the input file name is empty, it means that the
+		// document type is not determined, or this document
+		// is classifed as more than one document types.
+		// Return an empty attribute vec to indicate that there's no attribute found
+		// or the specified document type has no REPM finder rules associated with it
+		if (strInput.empty())
 		{
-			strInput = m_strRulesText;
+			*pAttributes = ipRetAttributes.Detach();
+			return S_OK;
 		}
+		else if (!isFileOrFolderValid( strInput ))
+		{
+			// If a tag expanded to a file that doesn't exist we won't throw
+			// an exception, we will just return no attributes
+			UCLIDException ue("ELI33226",
+				"Specified file not found for Regular Expression Pattern Matcher rule.");
+			ue.addDebugInfo("File", strInput);
+			ue.log();
+			*pAttributes = ipRetAttributes.Detach();
+			return S_OK;
+		}
+
+		// load pattern file
+		loadPatternFile(strInput);
 
 		ISpatialStringPtr ipInputText = ipAFDoc->Text;
-		ASSERT_RESOURCE_ALLOCATION("ELI07060", ipInputText != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI33227", ipInputText != __nullptr);
 
-		PatternFileInterpreter patternInterpreter;
-		if (!m_bIsPatternsFromFile)
+		RegExPatternFileInterpreter patternInterpreter;
+
+		// get the pattern interpreter from the map if any
+		map<string, RegExPatternFileInterpreter>::iterator itMap
+			= m_mapFileNameToInterpreter.find(strInput);
+		if (itMap == m_mapFileNameToInterpreter.end())
 		{
-			if (m_ipPreprocessors)
-			{
-				patternInterpreter.setPreprocessors(m_ipPreprocessors);
-			}
-			patternInterpreter.readPatterns(strInput, false, true);
+			UCLIDException ue("ELI33228",
+				"Failed to locate a RegExPatternFileInterpreter for this pattern file.");
+			ue.addDebugInfo("Pattern File Name", strInput);
+			throw ue;
 		}
-		else
-		{
-			// get the pattern interpreter from the map if any
-			map<string, PatternFileInterpreter>::iterator itMap
-				= m_mapFileNameToInterpreter.find(strInput);
-			if (itMap == m_mapFileNameToInterpreter.end())
-			{
-				UCLIDException ue("ELI07164", "Failed to locate a PatternFileInterpreter for this pattern file.");
-				ue.addDebugInfo("Pattern File Name", strInput);
-				throw ue;
-			}
 			
-			patternInterpreter = itMap->second;
-		}
+		patternInterpreter = itMap->second;
 		
 		// for each pattern string, look for match
 		string strPatternID("");
-		UCLID_AFVALUEFINDERSLib::ISPMFinderPtr ipThis(this);
-		if (patternInterpreter.foundPattern(m_ipSPM, ipThis, ipInputText, 
+		UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipThis(this);
+		if (patternInterpreter.foundPattern(getRegExParser(), ipThis, ipInputText,
 			ipRetAttributes, strPatternID))
 		{
 			// store the rule that works in AFDocument if required
@@ -196,47 +171,15 @@ STDMETHODIMP CSPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 		
 		*pAttributes = ipRetAttributes.Detach();
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07009");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33229");
 	
 	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
-// ISPMFinder
+// IREPMFinder
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_IsPatternsFromFile(VARIANT_BOOL *pVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		*pVal = m_bIsPatternsFromFile ? VARIANT_TRUE : VARIANT_FALSE;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07020");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_IsPatternsFromFile(VARIANT_BOOL newVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		m_bIsPatternsFromFile = newVal==VARIANT_TRUE;
-
-		m_bDirty = true;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07021");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_RulesFileName(BSTR *pVal)
+STDMETHODIMP CREPMFinder::get_RulesFileName(BSTR *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -246,12 +189,12 @@ STDMETHODIMP CSPMFinder::get_RulesFileName(BSTR *pVal)
 
 		*pVal = _bstr_t(m_strRulesFileName.c_str()).copy();
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07022");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33232");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_RulesFileName(BSTR newVal)
+STDMETHODIMP CREPMFinder::put_RulesFileName(BSTR newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -276,7 +219,7 @@ STDMETHODIMP CSPMFinder::put_RulesFileName(BSTR newVal)
 		// or if the file name contains valid <DocType> strings
 		if (getAFUtility()->StringContainsInvalidTags(strFile.c_str()) == VARIANT_TRUE)
 		{
-			UCLIDException ue("ELI07473", "The rules file contains invalid tags.");
+			UCLIDException ue("ELI33233", "The rules file contains invalid tags.");
 			ue.addDebugInfo("File", strFile);
 			throw ue;
 		}
@@ -284,13 +227,13 @@ STDMETHODIMP CSPMFinder::put_RulesFileName(BSTR newVal)
 		{
 			if (!isAbsolutePath(strFile))
 			{
-				UCLIDException ue("ELI07501", "Specification of a relative path to the RSD/ETF file is not allowed.");
+				UCLIDException ue("ELI33234", "Specification of a relative path to the RSD/ETF file is not allowed.");
 				ue.addDebugInfo("File", strFile);
 				throw ue;
 			}
 			else if (!isValidFile(strFile))
 			{
-				UCLIDException ue("ELI07474", "The specified rules file does not exist.");
+				UCLIDException ue("ELI33235", "The specified rules file does not exist.");
 				ue.addDebugInfo("File", strFile);
 				ue.addWin32ErrorInfo();
 				throw ue;
@@ -301,51 +244,12 @@ STDMETHODIMP CSPMFinder::put_RulesFileName(BSTR newVal)
 
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07023");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33236");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_RulesText(BSTR *pVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		*pVal = _bstr_t(m_strRulesText.c_str()).copy();
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07024");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_RulesText(BSTR newVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-		validateRDTLicense();
-
-		string strText = asString( newVal );
-		// make sure the text is empty
-		if (strText.empty())
-		{
-			throw UCLIDException("ELI07040", "No rule is defined.");
-		}
-
-		m_strRulesText = strText;
-		m_bDirty = true;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07025");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_StoreRuleWorked(VARIANT_BOOL *pVal)
+STDMETHODIMP CREPMFinder::get_StoreRuleWorked(VARIANT_BOOL *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -355,12 +259,12 @@ STDMETHODIMP CSPMFinder::get_StoreRuleWorked(VARIANT_BOOL *pVal)
 
 		*pVal = m_bStoreRuleWorked ? VARIANT_TRUE : VARIANT_FALSE;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07072");	
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33240");	
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_StoreRuleWorked(VARIANT_BOOL newVal)
+STDMETHODIMP CREPMFinder::put_StoreRuleWorked(VARIANT_BOOL newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -371,12 +275,12 @@ STDMETHODIMP CSPMFinder::put_StoreRuleWorked(VARIANT_BOOL newVal)
 		m_bStoreRuleWorked = newVal==VARIANT_TRUE;
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07073");	
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33241");	
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_RuleWorkedName(BSTR *pVal)
+STDMETHODIMP CREPMFinder::get_RuleWorkedName(BSTR *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -392,12 +296,12 @@ STDMETHODIMP CSPMFinder::get_RuleWorkedName(BSTR *pVal)
 
 		*pVal = _bstr_t(m_strRuleWorkedName.c_str()).copy();
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07026");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33242");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_RuleWorkedName(BSTR newVal)
+STDMETHODIMP CREPMFinder::put_RuleWorkedName(BSTR newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -412,12 +316,12 @@ STDMETHODIMP CSPMFinder::put_RuleWorkedName(BSTR newVal)
 			m_bDirty = true;
 		}		
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07027");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33243");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_CaseSensitive(VARIANT_BOOL *pVal)
+STDMETHODIMP CREPMFinder::get_CaseSensitive(VARIANT_BOOL *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -427,12 +331,12 @@ STDMETHODIMP CSPMFinder::get_CaseSensitive(VARIANT_BOOL *pVal)
 
 		*pVal = m_bCaseSensitive ? VARIANT_TRUE : VARIANT_FALSE;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07029");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33244");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_CaseSensitive(VARIANT_BOOL newVal)
+STDMETHODIMP CREPMFinder::put_CaseSensitive(VARIANT_BOOL newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -443,74 +347,12 @@ STDMETHODIMP CSPMFinder::put_CaseSensitive(VARIANT_BOOL newVal)
 		m_bCaseSensitive = newVal==VARIANT_TRUE;
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07030");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33245");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_TreatMultipleWSAsOne(VARIANT_BOOL *pVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		*pVal = m_bMultipleWSAsOne ? VARIANT_TRUE : VARIANT_FALSE;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07031");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_TreatMultipleWSAsOne(VARIANT_BOOL newVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		m_bMultipleWSAsOne = newVal==VARIANT_TRUE;
-		m_bDirty = true;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07032");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_GreedySearch(VARIANT_BOOL *pVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		*pVal = m_bGreedySearch ? VARIANT_TRUE : VARIANT_FALSE;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07053");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_GreedySearch(VARIANT_BOOL newVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		m_bGreedySearch = newVal==VARIANT_TRUE;
-		m_bDirty = true;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07054");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_DataScorer(IObjectWithDescription **ppObj)
+STDMETHODIMP CREPMFinder::get_DataScorer(IObjectWithDescription **ppObj)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -523,18 +365,18 @@ STDMETHODIMP CSPMFinder::get_DataScorer(IObjectWithDescription **ppObj)
 		if (m_ipDataScorer == __nullptr)
 		{
 			m_ipDataScorer.CreateInstance(CLSID_ObjectWithDescription);
-			ASSERT_RESOURCE_ALLOCATION("ELI08593", m_ipDataScorer != __nullptr);
+			ASSERT_RESOURCE_ALLOCATION("ELI33250", m_ipDataScorer != __nullptr);
 		}
 
 		CComQIPtr<IObjectWithDescription> ipObj = m_ipDataScorer;
 		ipObj.CopyTo(ppObj);
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08586");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33251");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_DataScorer(IObjectWithDescription *pObj)
+STDMETHODIMP CREPMFinder::put_DataScorer(IObjectWithDescription *pObj)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -546,12 +388,12 @@ STDMETHODIMP CSPMFinder::put_DataScorer(IObjectWithDescription *pObj)
 		m_ipDataScorer = pObj;
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08587");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33252");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_MinScoreToConsiderAsMatch(long *pVal)
+STDMETHODIMP CREPMFinder::get_MinScoreToConsiderAsMatch(long *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -562,12 +404,12 @@ STDMETHODIMP CSPMFinder::get_MinScoreToConsiderAsMatch(long *pVal)
 		// return the value of the member variable
 		*pVal = m_nMinScoreToConsiderAsMatch;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08588");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33253");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_MinScoreToConsiderAsMatch(long newVal)
+STDMETHODIMP CREPMFinder::put_MinScoreToConsiderAsMatch(long newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -578,7 +420,7 @@ STDMETHODIMP CSPMFinder::put_MinScoreToConsiderAsMatch(long newVal)
 		// ensure that the new minimum match score is in [0,100]
 		if (newVal < 0 || newVal > 100)
 		{
-			UCLIDException ue("ELI08592", "Invalid score - score must be in the range 0 to 100.");
+			UCLIDException ue("ELI33254", "Invalid score - score must be in the range 0 to 100.");
 			ue.addDebugInfo("newVal", newVal);
 			throw ue;
 		}
@@ -587,12 +429,12 @@ STDMETHODIMP CSPMFinder::put_MinScoreToConsiderAsMatch(long newVal)
 		m_nMinScoreToConsiderAsMatch = newVal;
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08589");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33255");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_ReturnMatchType(EPMReturnMatchType *peVal)
+STDMETHODIMP CREPMFinder::get_ReturnMatchType(EPMReturnMatchType *peVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -602,12 +444,12 @@ STDMETHODIMP CSPMFinder::get_ReturnMatchType(EPMReturnMatchType *peVal)
 
 		*peVal = m_eReturnMatchType;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08590");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33256");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_ReturnMatchType(EPMReturnMatchType eNewVal)
+STDMETHODIMP CREPMFinder::put_ReturnMatchType(EPMReturnMatchType eNewVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -619,7 +461,7 @@ STDMETHODIMP CSPMFinder::put_ReturnMatchType(EPMReturnMatchType eNewVal)
 		if (eNewVal != kReturnBestMatch && eNewVal != kReturnFirstMatch &&
 			eNewVal != kReturnAllMatches && eNewVal != kReturnFirstOrBest)
 		{
-			UCLIDException ue("ELI08620", "Invalid return match type.");
+			UCLIDException ue("ELI33257", "Invalid return match type.");
 			ue.addDebugInfo("eNewVal", (unsigned long) eNewVal);
 			throw ue;
 		}
@@ -627,51 +469,12 @@ STDMETHODIMP CSPMFinder::put_ReturnMatchType(EPMReturnMatchType eNewVal)
 		m_eReturnMatchType = eNewVal;
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08591");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33258");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_Preprocessors(IVariantVector **pVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		if (m_ipPreprocessors == __nullptr)
-		{
-			m_ipPreprocessors.CreateInstance(CLSID_VariantVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI08756", m_ipPreprocessors != __nullptr);
-		}
-
-		IVariantVectorPtr ipShallowCopy = m_ipPreprocessors;
-		*pVal = ipShallowCopy.Detach();
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08754");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_Preprocessors(IVariantVector *newVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		m_ipPreprocessors = newVal;
-
-		m_bDirty = true;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08755");
-
-	return S_OK;
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_MinFirstToConsiderAsMatch(long *pVal)
+STDMETHODIMP CREPMFinder::get_MinFirstToConsiderAsMatch(long *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -680,12 +483,12 @@ STDMETHODIMP CSPMFinder::get_MinFirstToConsiderAsMatch(long *pVal)
 		validateLicense();
 		*pVal = m_nMinFirstToConsiderAsMatch;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09027");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33262");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_MinFirstToConsiderAsMatch(long newVal)
+STDMETHODIMP CREPMFinder::put_MinFirstToConsiderAsMatch(long newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -697,12 +500,12 @@ STDMETHODIMP CSPMFinder::put_MinFirstToConsiderAsMatch(long newVal)
 		
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09028");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33263");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::get_IgnoreInvalidTags(VARIANT_BOOL *pVal)
+STDMETHODIMP CREPMFinder::get_IgnoreInvalidTags(VARIANT_BOOL *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -712,12 +515,12 @@ STDMETHODIMP CSPMFinder::get_IgnoreInvalidTags(VARIANT_BOOL *pVal)
 
 		*pVal = m_bIgnoreInvalidTags ? VARIANT_TRUE : VARIANT_FALSE;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10135");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33264");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::put_IgnoreInvalidTags(VARIANT_BOOL newVal)
+STDMETHODIMP CREPMFinder::put_IgnoreInvalidTags(VARIANT_BOOL newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -728,14 +531,14 @@ STDMETHODIMP CSPMFinder::put_IgnoreInvalidTags(VARIANT_BOOL newVal)
 		m_bIgnoreInvalidTags = newVal==VARIANT_TRUE;
 		m_bDirty = true;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10136");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33265");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 // IMustBeConfiguredObject
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::raw_IsConfigured(VARIANT_BOOL * pbValue)
+STDMETHODIMP CREPMFinder::raw_IsConfigured(VARIANT_BOOL * pbValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -743,12 +546,11 @@ STDMETHODIMP CSPMFinder::raw_IsConfigured(VARIANT_BOOL * pbValue)
 	{
 		validateLicense();
 
-		bool bPatternsOK = (m_bIsPatternsFromFile && !m_strRulesFileName.empty())
-			|| (!m_bIsPatternsFromFile && !m_strRulesText.empty());
+		bool bPatternsOK = !m_strRulesFileName.empty();
 
 		*pbValue = bPatternsOK ? VARIANT_TRUE: VARIANT_FALSE;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07010");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33266");
 
 	return S_OK;
 }
@@ -756,17 +558,17 @@ STDMETHODIMP CSPMFinder::raw_IsConfigured(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // ICategorizedComponent
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::raw_GetComponentDescription(BSTR * pstrComponentDescription)
+STDMETHODIMP CREPMFinder::raw_GetComponentDescription(BSTR * pstrComponentDescription)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI19584", pstrComponentDescription != __nullptr)
+		ASSERT_ARGUMENT("ELI33267", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("String pattern matcher finder").Detach();
+		*pstrComponentDescription = _bstr_t("Regular expression pattern matcher finder").Detach();
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07011")
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33268")
 
 	return S_OK;
 }
@@ -774,7 +576,7 @@ STDMETHODIMP CSPMFinder::raw_GetComponentDescription(BSTR * pstrComponentDescrip
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::raw_IsLicensed(VARIANT_BOOL * pbValue)
+STDMETHODIMP CREPMFinder::raw_IsLicensed(VARIANT_BOOL * pbValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -803,7 +605,7 @@ STDMETHODIMP CSPMFinder::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 // ICopyableObject
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::raw_CopyFrom(IUnknown *pObject)
+STDMETHODIMP CREPMFinder::raw_CopyFrom(IUnknown *pObject)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -811,30 +613,20 @@ STDMETHODIMP CSPMFinder::raw_CopyFrom(IUnknown *pObject)
 	{
 		validateLicense();
 
-		UCLID_AFVALUEFINDERSLib::ISPMFinderPtr ipSource(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI08259", ipSource!=NULL);
+		UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipSource(pObject);
+		ASSERT_RESOURCE_ALLOCATION("ELI33269", ipSource!=NULL);
 
-		m_bIsPatternsFromFile = (ipSource->GetIsPatternsFromFile()==VARIANT_TRUE) ? true : false;
 		m_bCaseSensitive = (ipSource->GetCaseSensitive() == VARIANT_TRUE) ? true : false;
-		m_bMultipleWSAsOne = (ipSource->GetTreatMultipleWSAsOne() == VARIANT_TRUE) ? true : false;
-		m_bGreedySearch = (ipSource->GetGreedySearch() == VARIANT_TRUE) ? true : false;
 		m_bStoreRuleWorked = (ipSource->GetStoreRuleWorked() == VARIANT_TRUE) ? true : false;
-	
-		if (m_bIsPatternsFromFile)
-		{
-			m_strRulesFileName = ipSource->GetRulesFileName();
-		}
-		else
-		{
-			m_strRulesText = ipSource->GetRulesText();
-		}
+
+		m_strRulesFileName = ipSource->GetRulesFileName();
 
 		// copy the data scorer object
 		m_ipDataScorer = __nullptr;
 		m_ipDataScorer.CreateInstance(CLSID_ObjectWithDescription);
-		ASSERT_RESOURCE_ALLOCATION("ELI08631", m_ipDataScorer != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI33270", m_ipDataScorer != __nullptr);
 		ICopyableObjectPtr ipCopyableObj = m_ipDataScorer;
-		ASSERT_RESOURCE_ALLOCATION("ELI08630", ipCopyableObj != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI33271", ipCopyableObj != __nullptr);
 		ipCopyableObj->CopyFrom(ipSource->DataScorer);
 
 		// copy the return match type
@@ -848,21 +640,13 @@ STDMETHODIMP CSPMFinder::raw_CopyFrom(IUnknown *pObject)
 		m_strRuleWorkedName = ipSource->GetRuleWorkedName();
 
 		m_bIgnoreInvalidTags = ipSource->IgnoreInvalidTags == VARIANT_TRUE;
-
-		// copy preprocessors
-		m_ipPreprocessors = __nullptr;
-		m_ipPreprocessors.CreateInstance(CLSID_VariantVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI08759", m_ipPreprocessors != __nullptr);
-		ipCopyableObj = m_ipPreprocessors;
-		ASSERT_RESOURCE_ALLOCATION("ELI08760", ipCopyableObj != __nullptr);
-		ipCopyableObj->CopyFrom(ipSource->Preprocessors);
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08261");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33274");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::raw_Clone(IUnknown* *pObject)
+STDMETHODIMP CREPMFinder::raw_Clone(IUnknown* *pObject)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -870,8 +654,8 @@ STDMETHODIMP CSPMFinder::raw_Clone(IUnknown* *pObject)
 	{
 		validateLicense();
 
-		ICopyableObjectPtr ipObjCopy(CLSID_SPMFinder);
-		ASSERT_RESOURCE_ALLOCATION("ELI08349", ipObjCopy != __nullptr);
+		ICopyableObjectPtr ipObjCopy(CLSID_REPMFinder);
+		ASSERT_RESOURCE_ALLOCATION("ELI33275", ipObjCopy != __nullptr);
 
 		IUnknownPtr ipUnk = this;
 		ipObjCopy->CopyFrom(ipUnk);
@@ -879,7 +663,7 @@ STDMETHODIMP CSPMFinder::raw_Clone(IUnknown* *pObject)
 		// return the new variant vector to the caller
 		*pObject = ipObjCopy.Detach();
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07014");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33276");
 
 	return S_OK;
 }
@@ -887,21 +671,21 @@ STDMETHODIMP CSPMFinder::raw_Clone(IUnknown* *pObject)
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::GetClassID(CLSID *pClassID)
+STDMETHODIMP CREPMFinder::GetClassID(CLSID *pClassID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-	*pClassID = CLSID_SPMFinder;
+	*pClassID = CLSID_REPMFinder;
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::IsDirty(void)
+STDMETHODIMP CREPMFinder::IsDirty(void)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
 	return m_bDirty ? S_OK : S_FALSE;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::Load(IStream *pStream)
+STDMETHODIMP CREPMFinder::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -909,19 +693,14 @@ STDMETHODIMP CSPMFinder::Load(IStream *pStream)
 	{
 		validateLicense();
 
-		m_bIsPatternsFromFile = false;
 		m_bCaseSensitive = false;
-		m_bMultipleWSAsOne = true;
-		m_bGreedySearch = false;
 		m_bStoreRuleWorked = false;
 		m_strRulesFileName = "";
-		m_strRulesText = "";
 		m_strRuleWorkedName = "";
 		m_eReturnMatchType = eDEFAULT_RETURN_MATCH_TYPE;
 		m_nMinScoreToConsiderAsMatch = 0;
 		m_nMinFirstToConsiderAsMatch = 0;
 		m_ipDataScorer = __nullptr; // delete the current data scorer object
-		m_ipPreprocessors = __nullptr;
 		
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -938,71 +717,41 @@ STDMETHODIMP CSPMFinder::Load(IStream *pStream)
 		if (nDataVersion > gnCurrentVersion)
 		{
 			// Throw exception
-			UCLIDException ue( "ELI07647", "Unable to load newer SPM Finder." );
+			UCLIDException ue( "ELI33277", "Unable to load newer REPM Finder." );
 			ue.addDebugInfo( "Current Version", gnCurrentVersion );
 			ue.addDebugInfo( "Version to Load", nDataVersion );
 			throw ue;
 		}
 
-		if (nDataVersion >= 1)
-		{
-			dataReader >> m_bIsPatternsFromFile;
-			dataReader >> m_bCaseSensitive;
-			dataReader >> m_bMultipleWSAsOne;
-			dataReader >> m_bGreedySearch;
-			dataReader >> m_bStoreRuleWorked;
-			dataReader >> m_strRulesFileName;
-			dataReader >> m_strRulesText;
-			dataReader >> m_strRuleWorkedName;
-		}
+		dataReader >> m_bCaseSensitive;
+		dataReader >> m_bStoreRuleWorked;
+		dataReader >> m_strRulesFileName;
+		dataReader >> m_strRuleWorkedName;
 
-		if (nDataVersion >= 2)
-		{
-			// read the min-score-to-consider-as-match and the return match type
-			dataReader >> m_nMinScoreToConsiderAsMatch;
-			unsigned long ulTemp;
-			dataReader >> ulTemp;
-			m_eReturnMatchType = (EPMReturnMatchType) ulTemp;
-		}
+		// read the min-score-to-consider-as-match and the return match type
+		dataReader >> m_nMinScoreToConsiderAsMatch;
+		unsigned long ulTemp;
+		dataReader >> ulTemp;
+		m_eReturnMatchType = (EPMReturnMatchType) ulTemp;
 
-		if (nDataVersion >= 4 )
-		{
-			dataReader >> m_nMinFirstToConsiderAsMatch;
-		}
-
-		if(nDataVersion >= 5 )
-		{
-			dataReader >> m_bIgnoreInvalidTags;
-		}
+		dataReader >> m_nMinFirstToConsiderAsMatch;
+		dataReader >> m_bIgnoreInvalidTags;
 
 		// read the data scorer object
-		if (nDataVersion >= 2)
-		{
-			// read the data scorer object
-			IPersistStreamPtr ipObj;
-			::readObjectFromStream(ipObj, pStream, "ELI09965");
-			ASSERT_RESOURCE_ALLOCATION("ELI08627", ipObj != __nullptr);
-			m_ipDataScorer = ipObj;
-		}
-
-		if (nDataVersion >= 3)
-		{
-			// read the list of preprocessors
-			IPersistStreamPtr ipObj;
-			::readObjectFromStream(ipObj, pStream, "ELI09966");
-			ASSERT_RESOURCE_ALLOCATION("ELI08757", ipObj != __nullptr);
-			m_ipPreprocessors = ipObj;
-		}
+		IPersistStreamPtr ipObj;
+		::readObjectFromStream(ipObj, pStream, "ELI33278");
+		ASSERT_RESOURCE_ALLOCATION("ELI33279", ipObj != __nullptr);
+		m_ipDataScorer = ipObj;
 
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07016");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33282");
 	
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
+STDMETHODIMP CREPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -1015,13 +764,9 @@ STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 		ByteStreamManipulator dataWriter(ByteStreamManipulator::kWrite, data);
 
 		dataWriter << gnCurrentVersion;
-		dataWriter << m_bIsPatternsFromFile;
 		dataWriter << m_bCaseSensitive;
-		dataWriter << m_bMultipleWSAsOne;
-		dataWriter << m_bGreedySearch;
 		dataWriter << m_bStoreRuleWorked;
 		dataWriter << m_strRulesFileName;
-		dataWriter << m_strRulesText;
 		dataWriter << m_strRuleWorkedName;
 		dataWriter << m_nMinScoreToConsiderAsMatch;
 		dataWriter << (unsigned long) m_eReturnMatchType;
@@ -1034,31 +779,19 @@ STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 		pStream->Write(&nDataLength, sizeof(nDataLength), NULL);
 		pStream->Write(data.getData(), nDataLength, NULL);
 
-
-		UCLID_AFVALUEFINDERSLib::ISPMFinderPtr ipThis = getThisAsCOMPtr();
+		UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipThis = getThisAsCOMPtr();
 
 		// Make sure DataScorer object-with-description exists
 		IObjectWithDescriptionPtr ipObjWithDesc = ipThis->DataScorer;
-		ASSERT_RESOURCE_ALLOCATION("ELI08624", ipObjWithDesc != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI33283", ipObjWithDesc != __nullptr);
 		
 		// write the data-scorer object to the stream
 		IPersistStreamPtr ipObj = ipObjWithDesc;
 		if (ipObj == __nullptr)
 		{
-			throw UCLIDException("ELI08625", "DataScorer object does not support persistence.");
+			throw UCLIDException("ELI33284", "DataScorer object does not support persistence.");
 		}
-		writeObjectToStream(ipObj, pStream, "ELI09920", fClearDirty);
-
-		// Make sure preprcessors exists
-		IVariantVectorPtr ipPreprocessors = ipThis->Preprocessors;
-		
-		// write the object to the stream
-		ipObj = ipPreprocessors;
-		if (ipObj == __nullptr)
-		{
-			throw UCLIDException("ELI08758", "VariantVector object does not support persistence.");
-		}
-		writeObjectToStream(ipObj, pStream, "ELI09921", fClearDirty);
+		writeObjectToStream(ipObj, pStream, "ELI33285", fClearDirty);
 
 		// Clear the flag as specified
 		if (fClearDirty)
@@ -1066,12 +799,12 @@ STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 			m_bDirty = false;
 		}
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07015");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI33288");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSPMFinder::GetSizeMax(ULARGE_INTEGER *pcbSize)
+STDMETHODIMP CREPMFinder::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
 	return E_NOTIMPL;
 }
@@ -1079,26 +812,43 @@ STDMETHODIMP CSPMFinder::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-UCLID_AFVALUEFINDERSLib::ISPMFinderPtr CSPMFinder::getThisAsCOMPtr()
+UCLID_AFVALUEFINDERSLib::IREPMFinderPtr CREPMFinder::getThisAsCOMPtr()
 {
-	UCLID_AFVALUEFINDERSLib::ISPMFinderPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI16968", ipThis != __nullptr);
+	UCLID_AFVALUEFINDERSLib::IREPMFinderPtr ipThis(this);
+	ASSERT_RESOURCE_ALLOCATION("ELI33289", ipThis != __nullptr);
 
 	return ipThis;
 }
 //-------------------------------------------------------------------------------------------------
-IAFUtilityPtr CSPMFinder::getAFUtility()
+IAFUtilityPtr CREPMFinder::getAFUtility()
 {
 	if (m_ipAFUtility == __nullptr)
 	{
 		m_ipAFUtility.CreateInstance( CLSID_AFUtility );
-		ASSERT_RESOURCE_ALLOCATION( "ELI07324", m_ipAFUtility != __nullptr );
+		ASSERT_RESOURCE_ALLOCATION( "ELI33290", m_ipAFUtility != __nullptr );
 	}
 	
 	return m_ipAFUtility;
 }
 //-------------------------------------------------------------------------------------------------
-string CSPMFinder::getInputFileName(const string& strInputFile, IAFDocumentPtr ipAFDoc)
+IRegularExprParserPtr CREPMFinder::getRegExParser()
+{
+	if (m_ipMiscUtils == __nullptr)
+	{
+		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
+		ASSERT_RESOURCE_ALLOCATION("ELI33353", m_ipMiscUtils != __nullptr);
+	}
+
+	if (m_ipRegExpParser == __nullptr)
+	{
+		m_ipRegExpParser = m_ipMiscUtils->GetNewRegExpParserInstance("REPMFinder");
+		ASSERT_RESOURCE_ALLOCATION("ELI33224", m_ipRegExpParser != __nullptr);
+	}
+
+	return m_ipRegExpParser;
+}
+//-------------------------------------------------------------------------------------------------
+string CREPMFinder::getInputFileName(const string& strInputFile, IAFDocumentPtr ipAFDoc)
 {	
 
 	string strResult;
@@ -1122,10 +872,10 @@ string CSPMFinder::getInputFileName(const string& strInputFile, IAFDocumentPtr i
 	return strResult;
 }
 //-------------------------------------------------------------------------------------------------
-void CSPMFinder::loadPatternFile(const string& strPatternFileName)
+void CREPMFinder::loadPatternFile(const string& strPatternFileName)
 {
 	// look for the industry name entry
-	map<string, PatternFileInterpreter>::iterator itMap 
+	map<string, RegExPatternFileInterpreter>::iterator itMap 
 		= m_mapFileNameToInterpreter.find(strPatternFileName);
 	if (itMap != m_mapFileNameToInterpreter.end())
 	{
@@ -1138,26 +888,22 @@ void CSPMFinder::loadPatternFile(const string& strPatternFileName)
 	}
 
 	// create a new pattern file interpreter
-	PatternFileInterpreter patternInterpreter;
-	if (m_ipPreprocessors)
-	{
-		patternInterpreter.setPreprocessors(m_ipPreprocessors);
-	}
-	patternInterpreter.readPatterns(strPatternFileName, true, true);
+	RegExPatternFileInterpreter patternInterpreter;
+	patternInterpreter.readPatterns(strPatternFileName, true);
 	m_mapFileNameToInterpreter[strPatternFileName] = patternInterpreter;
 }
 //-------------------------------------------------------------------------------------------------
-void CSPMFinder::validateLicense()
+void CREPMFinder::validateLicense()
 {
 	static const unsigned long THIS_COMPONENT_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
 
-	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI07017", "String Pattern Matcher Finder");
+	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI33291", "Regular Expression Pattern Matcher Finder");
 }
 //-------------------------------------------------------------------------------------------------
-void CSPMFinder::validateRDTLicense()
+void CREPMFinder::validateRDTLicense()
 {
 	static const unsigned long COMP_RDT_ID = gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS;
 
-	VALIDATE_LICENSE(COMP_RDT_ID, "ELI07350", "SPMFinder - Pattern Reader");
+	VALIDATE_LICENSE(COMP_RDT_ID, "ELI33292", "REPMFinder - Pattern Reader");
 }
 //-------------------------------------------------------------------------------------------------

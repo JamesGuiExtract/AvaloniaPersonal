@@ -103,6 +103,8 @@ IDR_BLOCKFINDER         REGISTRY                "BlockFinder.rgs"
 IDR_BLOCKFINDERPP       REGISTRY                "BlockFinderPP.rgs"
 IDR_SPMFINDER           REGISTRY                "SPMFinder.rgs"
 IDR_SPMFINDERPP         REGISTRY                "SPMFinderPP.rgs"
+IDR_REPMFINDER          REGISTRY                "REPMFinder.rgs"
+IDR_REPMFINDERPP        REGISTRY                "REPMFinderPP.rgs"
 IDR_RETURNADDRFINDER    REGISTRY                "ReturnAddrFinder.rgs"
 IDR_LOCATEIMAGEREGION   REGISTRY                "LocateImageRegion.rgs"
 IDR_LOCATEIMAGEREGIONPP REGISTRY                "LocateImageRegionPP.rgs"
@@ -645,6 +647,43 @@ BEGIN
     CONTROL         "270°",IDC_CHECK_270_ROTATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,130,122,35,10
 END
 
+IDD_REPMFINDERPP DIALOGEX 0, 0, 366, 190
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_RULE_FILE,12,13,273,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_REPM,305,13,15,14
+    PUSHBUTTON      "",IDC_BTN_OPEN_NOTEPAD,325,13,16,14,BS_ICON
+    ICON            IDI_ICON_INFO,IDC_PATTERN_FILE_INFO,345,13,21,20,SS_NOTIFY
+    GROUPBOX        "Pattern",IDC_STATIC,5,2,355,51
+    CONTROL         "Case Sensitive",IDC_CHK_CASE_REPM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,71,63,10
+    CONTROL         "Store rule ID(s) of successfully executed rule(s) as document tag named",IDC_CHK_STORE_RULE_WORKED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,86,241,10
+    EDITTEXT        IDC_EDIT_RULE_WORKED_NAME,259,86,80,12,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_RULEID_TAG_INFO,345,86,21,20,SS_NOTIFY
+    LTEXT           "Static",IDC_STATIC_DATA_SCORER,15,114,155,15,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "Select ...",IDC_BUTTON_SELECT_DATA_SCORER,175,114,45,15
+    LTEXT           "Minimum match score:",IDC_STATIC_MIN_SCORE_LABEL,235,116,55,8
+    EDITTEXT        IDC_EDIT_MIN_SCORE,295,115,30,12,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_MIN_SCORE_INFO,345,117,21,20,SS_NOTIFY
+    LTEXT           "or best match",IDC_STATIC_MIN_FIRST_SCORE_LABEL,293,166,46,10
+    EDITTEXT        IDC_EDIT_MIN_FIRST_SCORE,261,165,30,12,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_MIN_FIRST_SCORE_INFO,345,166,21,20,SS_NOTIFY
+    GROUPBOX        "Return Options",IDC_STATIC,5,138,355,43
+    CONTROL         "Return first match only",IDC_RADIO_RETURN_FIRST_MATCH,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,47,151,92,10
+    CONTROL         "Return best match",IDC_RADIO_RETURN_BEST_MATCH,"Button",BS_AUTORADIOBUTTON,177,151,78,10
+    CONTROL         "Return all matches",IDC_RADIO_RETURN_ALL_MATCHES,"Button",BS_AUTORADIOBUTTON,47,166,78,10
+    CONTROL         "Return first match  >=",IDC_RADIO_RETURN_FIRST_OR_BEST,
+                    "Button",BS_AUTORADIOBUTTON,177,166,78,10
+    LTEXT           "Use following DataScorer object to determine validity of match",IDC_STATIC,15,102,225,10
+    GROUPBOX        "Match Options",IDC_STATIC,5,56,355,79
+    CONTROL         "If, when expanding any tag in the above filename, the tag does not exist, return no attributes and do not throw an exception",IDC_CHK_IGNORE_NO_TAGS,
+                    "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,12,31,344,20
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,290,13,10,14,BS_ICON
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -721,6 +760,12 @@ BEGIN
         RIGHTMARGIN, 170
         TOPMARGIN, 5
         BOTTOMMARGIN, 85
+    END
+
+    IDD_REPMFINDERPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        BOTTOMMARGIN, 186
     END
 END
 #endif    // APSTUDIO_INVOKED

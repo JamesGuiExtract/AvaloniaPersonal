@@ -335,6 +335,15 @@ library UCLID_COMUTILSLib
 		[id(8), helpstring("method FindReplacements")] HRESULT FindReplacements(
 			[in] BSTR bstrInput, [in] BSTR bstrReplacement, [in] VARIANT_BOOL bFindFirstMatchOnly, 
 			[out, retval] IIUnknownVector **ippObjectPairs);
+		//-----------------------------------------------------------------------------------------
+		/// <summary>
+        /// PROMISE: Search the input text and retrieves tokens representing the named groups from a
+        ///			 successful search. The primary search result is ignored.
+        /// PARAM:	 strInput -The string to search.</param>
+        ///			 bFindFirstMatchOnly - VARIANT_TRUE to return the named groups for the first match
+		//				only; VARIANT_FALSE to return the named groups for all matches.
+		[id(9), helpstring("method FindNamedGroups")] HRESULT FindNamedGroups([in] BSTR strInput, 
+			[in] VARIANT_BOOL bFindFirstMatchOnly, [out, retval] IIUnknownVector **ippMatchTokens);
 	};
 	[
 		object,

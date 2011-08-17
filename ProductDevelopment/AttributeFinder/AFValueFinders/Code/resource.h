@@ -94,6 +94,12 @@
 #define IDS_HELPFILEMICRFINDERPP        191
 #define IDS_DOCSTRINGMICRFINDERPP       192
 #define IDR_CHECKFINDER                 193
+#define IDR_REPMFINDER                  194
+#define IDS_TITLEREPMFinderPP           195
+#define IDS_HELPFILEREPMFinderPP        196
+#define IDS_DOCSTRINGREPMFinderPP       197
+#define IDR_REPMFINDERPP                198
+#define IDD_REPMFINDERPP                199
 #define IDC_EDIT_PATTERN                201
 #define IDI_ICON_INFO                   202
 #define IDC_LIST_VALUE_LIST             203
@@ -364,6 +370,8 @@
 #define IDC_COMBO_EXPAND_UNITS_BOTTOM   471
 #define IDC_COMBO_EXPAND_UNITS_LEFT     472
 #define IDC_COMBO_EXPAND_UNITS_RIGHT    473
+#define IDC_BTN_BROWSE_REPM             474
+#define IDC_CHK_CASE_REPM               475
 
 // Next default values for new objects
 // 
@@ -371,7 +379,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        1002
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         474
-#define _APS_NEXT_SYMED_VALUE           194
+#define _APS_NEXT_CONTROL_VALUE         476
+#define _APS_NEXT_SYMED_VALUE           200
 #endif
 #endif
