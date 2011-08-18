@@ -126,6 +126,7 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
+		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\i386\ISLockPermissions.dll</td></row>
 		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\isregsvr.dll</td></row>
 	</table>
 
@@ -188,7 +189,6 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{169E1063-A463-4CA5-B586-E4EC7603C469}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{360A61B5-15DC-4AED-AC50-94984A011457}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>_11111111.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{D0CF33E9-D686-4F96-B168-555C8E384DC5}</td><td>COMPONENT_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td><td/><td>FKBVersion.txt.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{7F3236DA-95FF-4D6C-86E0-0AB0FA283204}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -212,6 +212,7 @@
 		<row><td>Extract.Office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{59BC7F55-00F2-4F05-AA05-5C27B17DD4D5}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Utilities.Ftp.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{21D596C1-4AFA-4023-A239-B6A9B471CA44}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.utilities.ftp.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Utilities.ShellExten.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{AD9C119F-67BD-4E40-8A9C-F062007D84C9}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.utilities.shellexten.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ExtractCommonAppFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{F1E4A6BB-F90F-46C5-A49B-727F68211701}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ExtractImageViewer.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{FBF8567F-CF3E-433D-9A78-D026A4588F36}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extractimageviewer.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FAMDBLockChecker.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{BAB44E9C-3D57-463C-B62B-546288C10D14}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>famdblockchecker.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FAMNetworkManager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{3C99AD7E-842C-43AF-B97C-A7EAC3B0C9C7}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>famnetworkmanager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -234,6 +235,7 @@
 		<row><td>Office2007ToTif.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{D3157575-D5A5-40B9-88FD-858817B6062A}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>office2007totif.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>OfficeToTif.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{1C7B3428-7CA8-4FD9-A3D1-769ED53DD0DB}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>officetotif.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>PegasusImaging.WinForms.PdfX.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{436CB31C-F706-4F25-8F41-C3EA42805E2F}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>pegasusimaging.winforms.pdfx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{09CCFE5F-EAC9-4077-B120-9E6C533F4708}</td><td>FDRS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>detectandreportfailure.ini.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RegExprIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{BF89DE2D-966E-4A35-82EC-678EC366C642}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>regexpriv.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{14CB5FC3-E5F2-4793-8E2F-A452B33B01A5}</td><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>detailed_report_for_.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RunFPSFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{970A05B7-73AB-4075-9520-19866FE2A656}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>runfpsfile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -306,7 +308,7 @@
 	<table name="CreateFolder">
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ExtractCommonAppFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -316,6 +318,8 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
+		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
+		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
@@ -362,6 +366,7 @@
 		<row><td>DIRPROPERTY2.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>TARGETDIR</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>DIRPROPERTY3.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>TARGETDIR</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>DIRPROPERTY4.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>TARGETDIR</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>DIRPROPERTY5.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>TARGETDIR</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
@@ -475,6 +480,7 @@
 		<row><td>_11111111.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>_11111~1.DLL|_11111111.Dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;CLEAR_IMAGE_PATH&gt;\_11111111.Dll</td><td>17</td><td/></row>
 		<row><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>adodb.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\microsoft.net\primary interop assemblies\adodb.dll</td><td>1</td><td/></row>
 		<row><td>detailed_report_for_.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DETAIL~1.RPT|Detailed report for specific document.rpt</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;SDK_REPORT_PATH&gt;\Detailed report for specific document.rpt</td><td>17</td><td/></row>
+		<row><td>detectandreportfailure.ini.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DETECT~1.INI|DetectAndReportFailure.ini</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;\DetectAndReportFailure.ini</td><td>1</td><td/></row>
 		<row><td>esfamconditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMC~1.DLL|ESFAMConditions.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ESFAMConditions.dll</td><td>17</td><td/></row>
 		<row><td>esfamservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMS~1.EXE|ESFAMService.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\ESFAMService.exe</td><td>17</td><td/></row>
 		<row><td>esfdrsservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFDRSService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFDRS~1.EXE|ESFDRSService.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\ESFDRSService.exe</td><td>1</td><td/></row>
@@ -646,7 +652,6 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_00F3A911_F18C_4CAE_ADD9_F9657BCA1AD9_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7691BC11_C729_4DB9_B2E6_3956F2A7CD0A_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_235D7774_6F14_4A35_BF03_0E4CE8C4AE81_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_BF34E9F1_CCAB_4C3A_90F8_EB156B51E5EC_FILTER</td><td/><td/><td/><td/></row>
@@ -670,6 +675,7 @@
 		<row><td>Extract.Office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_2121E1C5_F3BF_4E58_B186_E299B34FB16C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Utilities.Ftp.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_4165575A_F2E3_4266_9010_91A13FD3A172_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Utilities.ShellExten.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_393EBCBA_16D2_4576_BD1A_5F252EA162D4_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ExtractCommonAppFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_37907DAE_2072_44EF_87EB_F7AD13511568_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ExtractImageViewer.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7FC76530_ECCC_4038_96F2_266EEE7E6807_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FAMDBLockChecker.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_C332A079_832E_4612_8D92_1D4E785E174C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FAMNetworkManager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7C90C8C5_1760_4E2B_AFBC_1E92CAB2FDF2_FILTER</td><td/><td/><td/><td/></row>
@@ -692,7 +698,8 @@
 		<row><td>Office2007ToTif.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_07598837_BF70_40C6_A380_7AB5AC9979EF_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>OfficeToTif.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_DDD2EA34_239E_44C0_8B45_BD62ED6D3666_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>PegasusImaging.WinForms.PdfX.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_D15B027D_4EA1_48CB_919C_6C0FA6A919CC_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_37116F83_168F_491F_B36A_CE997EB802C3_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_8C152301_FE79_4E43_BAF3_6536DAE57B5D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ProgramDataFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_8DA80874_4396_47BF_8EF4_5B3115FF9D05_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RegExprIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_4F85E270_F90E_4707_81D6_D2B8AAF6CB17_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_6AE1A17B_7E4E_49B5_A4A1_19D6BFF8C693_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RunFPSFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_C91760E9_1EEB_4552_884F_8BADE39F5C1D_FILTER</td><td/><td/><td/><td/></row>
@@ -805,7 +812,7 @@
 		<col def="I4">ISAttributes</col>
 		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_COMPONENTDATA_FILES&gt;</td><td>4</td><td/><td>FKBVersion.txt</td><td>2</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_NONSELFREGCOMMON_FILES&gt;</td><td>4</td><td/><td>AFCommon.rl, RWUtils.dll</td><td>2</td></row>
-		<row><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;</td><td>4</td><td/><td/><td>10</td></row>
+		<row><td>ProgramDataFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;</td><td>4</td><td/><td/><td>10</td></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;SDK_REPORT_PATH&gt;</td><td>4</td><td/><td>Detailed report for specific document.rpt</td><td>2</td></row>
 	</table>
 
@@ -895,8 +902,8 @@
 		<col key="yes" def="s255">User</col>
 		<col def="I4">Permission</col>
 		<col def="I4">Attributes</col>
-		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Users</td><td>1880031743</td><td>0</td></row>
-		<row><td>FDRS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Users</td><td>1880031743</td><td>0</td></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Administrators</td><td>1880031743</td><td>0</td></row>
+		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Authenticated Users</td><td>1610809791</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
@@ -1326,7 +1333,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="s72">Component</col>
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
-		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ClearImage.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>CountyCustomComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -1350,6 +1356,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Extract.Office.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Extract.Utilities.Ftp.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Extract.Utilities.ShellExten.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>ExtractCommonAppFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ExtractImageViewer.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>FAMDBLockChecker.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>FAMNetworkManager.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -1373,6 +1380,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>OfficeToTif.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>PegasusImaging.WinForms.PdfX.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>ProgramDataFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>RegExprIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>RunFPSFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -1444,12 +1452,14 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S64">BaseAction</col>
 		<col def="I2">After</col>
 		<col def="S255">Condition</col>
+		<row><td>ISLockPermissionsCost</td><td/><td>InstallValidate</td><td>1</td><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td/><td>StartServices</td><td>1</td><td/></row>
 		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
 		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
 		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
 		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
 		<row><td>InstallFinalize</td><td>3150</td><td/><td/><td/></row>
+		<row><td>InstallValidate</td><td>1400</td><td/><td/><td/></row>
 		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
 		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
 		<row><td>StartServices</td><td>5900</td><td/><td/><td/></row>
@@ -1661,6 +1671,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>DIRPROPERTY2.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>REPORTS</td><td/></row>
 		<row><td>DIRPROPERTY3.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td/></row>
 		<row><td>DIRPROPERTY4.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>STANDARD_REPORTS</td><td/></row>
+		<row><td>DIRPROPERTY5.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FDRS</td><td/></row>
 		<row><td>IS_COMPLUS_PROGRESSTEXT_COST</td><td>##IDS_COMPLUS_PROGRESSTEXT_COST##</td><td/></row>
 		<row><td>IS_COMPLUS_PROGRESSTEXT_INSTALL</td><td>##IDS_COMPLUS_PROGRESSTEXT_INSTALL##</td><td/></row>
 		<row><td>IS_COMPLUS_PROGRESSTEXT_UNINSTALL</td><td>##IDS_COMPLUS_PROGRESSTEXT_UNINSTALL##</td><td/></row>

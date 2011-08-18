@@ -313,8 +313,6 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>AllOtherFiles</td><td>{60F2D24A-0FD5-46E0-960E-167AF619EAE3}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AllOtherFiles1</td><td>{5171B21C-F399-4BE7-99CD-8EAEC271D053}</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.CustomComponentsHelper.dll</td><td>{BC1778CF-1B0D-4DB8-A811-8F3213EA5016}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.customcomp</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td>{DEC2B72C-0860-4D86-80E3-1D0DD6D14F94}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.verificati</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -323,12 +321,12 @@
 		<row><td>Help</td><td>{D0D6E5DA-8D44-45F0-8FDD-325E3C7EE9D6}</td><td>HELP</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldComponents</td><td>{0B818341-9DC6-4923-B336-2FBC659BCF44}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldOnDemand.exe</td><td>{A37823A6-23A8-4DA3-9B9A-CB7214FD898B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldondemand.exe</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>IDShieldReports</td><td>{EBD8982B-68E8-41A2-AF73-CC50371C0B4B}</td><td>REPORTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>IDShieldOnDemandShortcut</td><td>{2076706E-8F56-4516-93C0-5ADBB4C8FC10}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>IDShieldReports</td><td>{EBD8982B-68E8-41A2-AF73-CC50371C0B4B}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldStatisticsReporter.exe</td><td>{E4593422-EE49-4A44-94A0-0FC9C230817E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldstatisticsreporter.e</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISRegistryComponent</td><td>{BB5CF529-C4A7-46DD-AC5A-F35EB2E1E0E6}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>{B8FF0255-1CA6-48A0-8BD5-3CFB7A976086}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.extractredactiontest</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>{4EC39FF6-1C91-4E50-B9C5-B3E0AA02D9EA}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.uclid_redactioncusto</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>NewComponent1</td><td>{2076706E-8F56-4516-93C0-5ADBB4C8FC10}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionCC.dll</td><td>{609DD8EB-6620-4A9E-AE69-452AE7A103C8}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>RedactionCC.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UtilitiesShortCuts</td><td>{682A75A7-D1DE-495C-A7B3-D28EC49EC35E}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -383,10 +381,8 @@
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>COMMON_COMPONENTS</td><td>FlexIndexComponents</td></row>
-		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>AllOtherFiles</td></row>
-		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>AllOtherFiles1</td></row>
+		<row><td>INSTALLDIR</td><td>IDShieldOnDemandShortcut</td></row>
 		<row><td>INSTALLDIR</td><td>ISRegistryComponent</td></row>
-		<row><td>INSTALLDIR</td><td>NewComponent1</td></row>
 		<row><td>INSTALLDIR</td><td>UtilitiesShortCuts</td></row>
 	</table>
 
@@ -464,6 +460,7 @@
 		<row><td>ProgramMenuFolder</td><td>TARGETDIR</td><td>.:Programs</td><td/><td>3</td><td/></row>
 		<row><td>REPORTS</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>Reports</td><td/><td>0</td><td/></row>
 		<row><td>SQL_CE_EDITOR</td><td>ProgramFilesFolder</td><td>SQLCEE~1|SQL CE Editor</td><td/><td>0</td><td/></row>
+		<row><td>STANDARD_REPORTS</td><td>REPORTS</td><td>STANDA~1|Standard reports</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
 		<row><td>StartupFolder</td><td>TARGETDIR</td><td>.:StartUp</td><td/><td>3</td><td/></row>
@@ -1154,8 +1151,6 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>Documentation</td><td>AllOtherFiles</td></row>
-		<row><td>Documentation</td><td>AllOtherFiles1</td></row>
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>IDShieldMain</td><td>ExemptionCodes</td></row>
 		<row><td>IDShieldMain</td><td>Extract.Redaction.CustomComponentsHelper.dll</td></row>
@@ -1164,12 +1159,12 @@
 		<row><td>IDShieldMain</td><td>FlexIndexComponents</td></row>
 		<row><td>IDShieldMain</td><td>IDShieldComponents</td></row>
 		<row><td>IDShieldMain</td><td>IDShieldOnDemand.exe</td></row>
+		<row><td>IDShieldMain</td><td>IDShieldOnDemandShortcut</td></row>
 		<row><td>IDShieldMain</td><td>IDShieldReports</td></row>
 		<row><td>IDShieldMain</td><td>IDShieldStatisticsReporter.exe</td></row>
 		<row><td>IDShieldMain</td><td>ISRegistryComponent</td></row>
 		<row><td>IDShieldMain</td><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td></row>
 		<row><td>IDShieldMain</td><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td></row>
-		<row><td>IDShieldMain</td><td>NewComponent1</td></row>
 		<row><td>IDShieldMain</td><td>RedactionCC.dll</td></row>
 		<row><td>IDShieldMain</td><td>RedactionTester.dll</td></row>
 		<row><td>IDShieldMain</td><td>UtilitiesShortCuts</td></row>
@@ -1447,8 +1442,6 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>AllOtherFiles</td><td/><td/><td>_25804A87_FFD1_44A9_AFF5_93E14F7152C4_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>AllOtherFiles1</td><td/><td/><td>_DE1B7EA1_AB38_4058_97BE_B1886DA08CF8_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ExemptionCodes</td><td/><td/><td>_DC4F41A0_2184_486F_85BC_827E04CF07BD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.CustomComponentsHelper.dll</td><td/><td/><td>_01E0B1D8_4082_473F_AA8B_C078BA868206_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.Verification.dll</td><td/><td/><td>_9455B052_64C2_4C44_BABF_F480528B2F4B_FILTER</td><td/><td/><td/><td/></row>
@@ -1457,12 +1450,12 @@
 		<row><td>Help</td><td/><td/><td>_3ACFFCEB_AE1A_434B_9D94_435E77C7116E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldComponents</td><td/><td/><td>_7BA39CA3_0BE0_42F1_BA2D_6E291210E2AD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldOnDemand.exe</td><td/><td/><td>_354E5060_5577_4F76_A258_507CF7A134BE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>IDShieldOnDemandShortcut</td><td/><td/><td>_77D29F78_9753_4C5A_A2E7_108D7C10DFBC_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldReports</td><td/><td/><td>_D75641A4_26B2_483C_9F23_EC64F514AA49_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldStatisticsReporter.exe</td><td/><td/><td>_27B09558_8477_43BF_BB56_9F17C65912C2_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISRegistryComponent</td><td/><td/><td>_731CD13E_7DAC_4B8E_A684_926E3E2A6CCD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td/><td/><td>_7F682677_36CD_4BA5_B4B7_8944329E36E2_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td/><td/><td>_5AC6E320_031F_4671_B482_75FD65290FA3_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>NewComponent1</td><td/><td/><td>_77D29F78_9753_4C5A_A2E7_108D7C10DFBC_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionCC.dll</td><td/><td/><td>_03DC90EE_03CF_4902_9272_0C41A69D5B61_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionTester.dll</td><td/><td/><td>_E3C82770_0C8B_4480_812B_48AA19DB7EBA_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UtilitiesShortCuts</td><td/><td/><td>_5F8A3E41_9DBD_4284_AEC1_4AC93D613ADB_FILTER</td><td/><td/><td/><td/></row>
@@ -1657,7 +1650,6 @@
 		<col key="yes" def="s255">User</col>
 		<col def="I4">Permission</col>
 		<col def="I4">Attributes</col>
-		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CreateFolder</td><td>[%USERDOMAIN]</td><td>Everyone</td><td>1880031743</td><td>0</td></row>
 	</table>
 
 	<table name="ISLogicalDisk">
@@ -3893,7 +3885,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1211</td><td>FlexIndexComponents</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut13</td><td>UtilitiesShortCuts</td><td/><td>newfolder2</td><td>2</td></row>
 		<row><td>NewShortcut14</td><td>FlexIndexComponents</td><td/><td>newfolder2</td><td>2</td></row>
-		<row><td>NewShortcut15</td><td>NewComponent1</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut15</td><td>IDShieldOnDemandShortcut</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut2</td><td>FlexIndexComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut3</td><td>FlexIndexComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut4</td><td>FlexIndexComponents</td><td/><td>newfolder2</td><td>2</td></row>
@@ -3996,7 +3988,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut1211</td><td>newfolder2</td><td>##ID_STRING28##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]ConvertFAMDB.exe</td><td/><td/><td>0</td><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut13</td><td>newfolder2</td><td>##ID_STRING34##</td><td>UtilitiesShortCuts</td><td>[COMMON_COMPONENTS]IDShieldStatisticsReporter.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut14</td><td>newfolder2</td><td>##ID_STRING35##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]FAMNetworkManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut15</td><td>newfolder1</td><td>##ID_STRING36##</td><td>NewComponent1</td><td>[COMMON_COMPONENTS]IDShieldOnDemand.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut15</td><td>newfolder1</td><td>##ID_STRING36##</td><td>IDShieldOnDemandShortcut</td><td>[COMMON_COMPONENTS]IDShieldOnDemand.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut2</td><td>newfolder1</td><td>##ID_STRING7##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut3</td><td>newfolder1</td><td>##ID_STRING8##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]USBLicenseKeyManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder2</td><td>##ID_STRING13##</td><td>FlexIndexComponents</td><td>[COMMON_COMPONENTS]UEXViewer.exe</td><td>"[CommonAppDataFolder]Extract Systems\LogFiles\ExtractException.UEX"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
