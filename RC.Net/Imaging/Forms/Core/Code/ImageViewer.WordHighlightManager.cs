@@ -1,5 +1,6 @@
 ﻿using Extract.Drawing;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -59,6 +61,11 @@ namespace Extract.Imaging.Forms
             object _lock = new object();
 
             /// <summary>
+            /// Synchronizes access to OCR resources
+            /// </summary>
+            object _ocrLock = new object();
+
+            /// <summary>
             /// A <see cref="BackgroundWorker"/> object that, when the word highlight/redaction tool
             /// is active, loads word spatial info from OCR data and displays dynamic auto-fit
             /// highlights during tracking events.
@@ -81,6 +88,11 @@ namespace Extract.Imaging.Forms
             /// Allows the most recently started operation to be canceled.
             /// </summary>
             volatile CancellationTokenSource _canceler;
+
+            /// <summary>
+            /// Allows any currently running OCR operation to be canceled.
+            /// </summary>
+            volatile CancellationTokenSource _ocrCanceler;
 
             /// <summary>
             /// The <see cref="CancellationToken"/> assosicated with _canceler that operations
@@ -114,6 +126,12 @@ namespace Extract.Imaging.Forms
             /// </summary>
             ConcurrentDictionary<int, ThreadSafeSpatialString> _ocrPageData =
                 new ConcurrentDictionary<int, ThreadSafeSpatialString>();
+
+            /// <summary>
+            /// Indicates whether a call to OCRPage has completed and that results are now available
+            /// (if the operation completed successfully).
+            /// </summary>
+            ManualResetEvent _ocrPageComplete = new ManualResetEvent(true); 
 
             /// <summary>
             /// The background process status message for each document page.
@@ -206,6 +224,11 @@ namespace Extract.Imaging.Forms
             volatile bool _restartBackgroundWorker;
 
             /// <summary>
+            /// Indicates whether the word highlight tool is in auto-fit mode.
+            /// </summary>
+            volatile bool _inAutoFitMode;
+
+            /// <summary>
             /// Indicates whether this instance has been disposed.
             /// </summary>
             volatile bool _disposed;
@@ -258,18 +281,40 @@ namespace Extract.Imaging.Forms
             #region Properties
 
             /// <summary>
-            /// Gets a value indicating whether auto zones are being calculated for the current
-            /// tracking operation.
+            /// Gets a value indicating whether the word highlight tool is in auto-fit mode.
             /// </summary>
             /// <value>
-            /// <see langword="true"/> auto zones are being calculated for the current tracking
-            /// operation; otherwise, <see langword="false"/>.
+            /// <see langword="true"/> if the word highlight tool is in auto-fit mode. otherwise,
+            /// <see langword="false"/>.
             /// </value>
-            public bool InAutoFitOperation
+            public bool InAutoFitMode
             {
                 get
                 {
-                    return _trackingStartLocation.HasValue;
+                    return _inAutoFitMode;
+                }
+
+                private set
+                {
+                    if (value != _inAutoFitMode)
+                    {
+                        // Swap auto-fit highlights and word highlights, and re-activate word
+                        // loading if auto-fit mode is no longer active.
+                        if (value)
+                        {
+                            HideWordHighlights(false);
+                        }
+                        else
+                        {
+                            Activate();
+                            RemoveAutoFitHighlight();
+                            ShowWordHighlights();
+                        }
+
+                        _imageViewer.Invalidate();
+
+                        _inAutoFitMode = value;
+                    }
                 }
             }
 
@@ -316,36 +361,79 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    // If the shift key is down this tracking operation will attempt to
-                    // automatically generate a zone based on pixel content.
-                    if (Control.ModifierKeys == Keys.Shift)
+                    // Get the starting point of the tracking operation
+                    Point[] startPoint = new Point[] { new Point(x, y) };
+
+                    // Convert the points from client to image coordinates.
+                    GeometryMethods.InvertPoints(_imageViewer._transform, startPoint);
+
+                    // Ensure the starting point is onpage before starting an auto-fit
+                    // operation.
+                    if (startPoint[0].X >= 0 && startPoint[0].X < _imageViewer.ImageWidth &&
+                        startPoint[0].Y >= 0 && startPoint[0].Y < _imageViewer.ImageHeight)
                     {
-                        // Get the starting point of the tracking operation
-                        Point[] startPoint = new Point[] { new Point(x, y) };
-
-                        // Convert the points from client to image coordinates.
-                        GeometryMethods.InvertPoints(_imageViewer._transform, startPoint);
-
-                        // Ensure the starting point is onpage before starting an auto-fit
-                        // operation.
-                        if (startPoint[0].X >= 0 && startPoint[0].X < _imageViewer.ImageWidth &&
-                            startPoint[0].Y >= 0 && startPoint[0].Y < _imageViewer.ImageHeight)
-                        {
-                            _trackingStartLocation = new Point(x, y);
-                            _imageViewer.MouseMove += HandleImageViewerMouseMove;
-
-                            // Hide any active word highlights.
-                            foreach (Highlight highlight in _activeWordHighlights)
-                            {
-                                highlight.Visible = false;
-                            }
-                            _activeWordHighlights.Clear();
-                        }
+                        _trackingStartLocation = new Point(x, y);
                     }
                 }
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI31295", ex);
+                }
+            }
+
+            /// <summary>
+            /// Updates an active tracking operation using the mouse position specified.
+            /// </summary>
+            /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
+            /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
+            public void UpdateTracking(int mouseX, int mouseY)
+            {
+                try
+                {
+                    if (InAutoFitMode)
+                    {
+                        // If the mouse has moved less that 2 client pixels since the last time we
+                        // started calculating an auto zone, allow the previous calculation to complete
+                        // so that we don't excessively restart calculations for small mouse movements.
+                        if (_currentAutoFitLocation.HasValue)
+                        {
+                            // Compute the distance
+                            int dX = mouseX - _currentAutoFitLocation.Value.X;
+                            int dY = mouseY - _currentAutoFitLocation.Value.Y;
+                            double distance = Math.Sqrt(dX * dX + dY * dY);
+
+                            if (distance < 2)
+                            {
+                                return;
+                            }
+                        }
+
+                        _currentAutoFitLocation = new Point(mouseX, mouseY);
+
+                        // Get the points to be used by the AutoFitOperation
+                        Point[] points = new Point[] 
+                            { 
+                                _trackingStartLocation.Value,
+                                _currentAutoFitLocation.Value
+                            };
+
+                        // Convert the points from client to image coordinates.
+                        GeometryMethods.InvertPoints(_imageViewer._transform, points);
+
+                        // Cancel any currently running task and start calculating an auto-fit zone
+                        // based on the current mouse location.
+                        StartOperation(() => AutoFitOperation(points[0], points[1]));
+                    }
+                    else
+                    {
+                        // Ensure that if auto-fit mode is re-activated, it will start
+                        // re-calculating a zone even if the mouse has not moved.
+                        _currentAutoFitLocation = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI33370");
                 }
             }
 
@@ -368,7 +456,9 @@ namespace Extract.Imaging.Forms
                     {
                         restartLoading = IsLoadingData || 
                             !_pagesOfAddedWordHighlights.Contains(_imageViewer.PageNumber);
-                        CancelRunningOperation();
+                        
+                        // false to allow OCR operations to continue.
+                        CancelRunningOperation(false);
                     }
 
                     if (!_backgroundWorkerIdle.WaitOne(1000))
@@ -389,17 +479,18 @@ namespace Extract.Imaging.Forms
                         }
                     }
 
-                    // Hide all word highlights until the tool is used/moved again.
-                    HideWordHighlights();
-
                     // If this was an auto-fit operation, reset the auto-fit data.
-                    if (_trackingStartLocation != null)
+                    if (InAutoFitMode)
                     {
-                        _imageViewer.MouseMove -= HandleImageViewerMouseMove;
-                        _trackingStartLocation = null;
-
                         RemoveAutoFitHighlight();
                     }
+                    else
+                    {
+                        // Otherwise, hide all word highlights until the tool is used/moved again.
+                        HideWordHighlights(true);
+                    }
+
+                    _trackingStartLocation = null;
 
                     _imageViewer.Invalidate();
                 }
@@ -519,6 +610,24 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
+            /// Handles the case that the image viewer cursor changed.
+            /// </summary>
+            /// <param name="sender">The sender.</param>
+            /// <param name="e">A <see cref="KeyEventArgs"/> that contains the event data.</param>
+            void HandleCursorChanged(object sender, EventArgs e)
+            {
+                try
+                {
+                    // Auto-fit mode is allowed to change in the middle of a tracking operation.
+                    InAutoFitMode = (_imageViewer.Cursor == ExtractCursors.ShiftWordRedaction);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI33372");
+                }
+            }
+
+            /// <summary>
             /// Handles the case that the cursor entered a layer object so that word highlights
             /// are displayed if the <see cref="WordHighlightManager"/> is active and the layer
             /// object is a word highlight.
@@ -530,9 +639,8 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    // During an auto zone tracking operation or if a previously open image has
-                    // closed ignore this event.
-                    if (_trackingStartLocation != null || !_imageViewer.IsImageAvailable)
+                    // If a previously open image has closed ignore this event.
+                    if (!_imageViewer.IsImageAvailable)
                     {
                         return;
                     }
@@ -545,7 +653,10 @@ namespace Extract.Imaging.Forms
                         Highlight highlight = (Highlight)e.LayerObject;
                         if (highlight.Height >= _MIN_SPLIT_HEIGHT)
                         {
-                            highlight.Visible = true;
+                            // If in an auto-fit operation, keep track of the layer object added to
+                            // the selection in case the user switches back to non-auto-fit mode,
+                            // but do not show it at this time.
+                            highlight.Visible = !InAutoFitMode;
 
                             _activeWordHighlights.Add(e.LayerObject);
 
@@ -553,7 +664,7 @@ namespace Extract.Imaging.Forms
                             // force the highlight to be drawn. (If in a tracking operation, the
                             // image viewer will call invalidate after all highlights and tracking
                             // indications have been prepared.)
-                            if (_imageViewer._trackingData == null)
+                            if (!InAutoFitMode && !_imageViewer.IsTracking)
                             {
                                 _imageViewer.Invalidate();
                             }
@@ -577,9 +688,8 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    // During an auto zone tracking operation or if a previously open image has
-                    // closed ignore this event.
-                    if (_trackingStartLocation != null || !_imageViewer.IsImageAvailable)
+                    // If a previously open image has closed ignore this event.
+                    if (!_imageViewer.IsImageAvailable)
                     {
                         return;
                     }
@@ -620,7 +730,9 @@ namespace Extract.Imaging.Forms
                     lock (_lock)
                     {
                         restartLoading = IsLoadingData;
-                        CancelRunningOperation();
+
+                        // false to allow OCR operations to continue.
+                        CancelRunningOperation(false);
                     }
 
                     if (!_backgroundWorkerIdle.WaitOne(1000))
@@ -680,56 +792,13 @@ namespace Extract.Imaging.Forms
                 }
                 finally
                 {
-                    // Call activate to ensure we pick up loading word highlights again if
-                    // a loading task was canceled.
-                    if (restartLoading)
+                    // Call activate to ensure we pick up loading word highlights again if a loading
+                    // task was canceled or auto-fit mode was active (which would have blocked word
+                    // loading.
+                    if (restartLoading || InAutoFitMode)
                     {
                         Activate();
                     }
-                }
-            }
-
-            /// <summary>
-            /// Handles the image viewer mouse move.
-            /// </summary>
-            /// <param name="sender">The sender.</param>
-            /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance
-            /// containing the event data.</param>
-            void HandleImageViewerMouseMove(object sender, MouseEventArgs e)
-            {
-                try
-                {
-                    // If the mouse has moved less that 2 client pixels since the last time we
-                    // started calculating an auto zone, allow the previous calculation to complete
-                    // so that we don't excessively restart calculations for small mouse movements.
-                    if (_currentAutoFitLocation.HasValue)
-                    {
-                        // Compute the distance
-                        int dX = e.Location.X - _currentAutoFitLocation.Value.X;
-                        int dY = e.Location.Y - _currentAutoFitLocation.Value.Y;
-                        double distance = Math.Sqrt(dX * dX + dY * dY);
-
-                        if (distance < 2)
-                        {
-                            return;
-                        }
-                    }
-
-                    _currentAutoFitLocation = e.Location;
-
-                    // Get the points to be used by the AutoFitOperation
-                    Point[] points = new Point[] { _trackingStartLocation.Value, e.Location };
-
-                    // Convert the points from client to image coordinates.
-                    GeometryMethods.InvertPoints(_imageViewer._transform, points);
-
-                    // Cancel any currently running task and start calculating an auto-fit zone
-                    // based on the current mouse location.
-                    StartOperation(() => AutoFitOperation(points[0], points[1]));
-                }
-                catch (Exception ex)
-                {
-                    ExtractException.Display("ELI31351", ex);
                 }
             }
 
@@ -826,6 +895,18 @@ namespace Extract.Imaging.Forms
                             _canceler = null;
                         }
 
+                        if (_ocrCanceler != null)
+                        {
+                            _ocrCanceler.Dispose();
+                            _ocrCanceler = null;
+                        }
+
+                        if (_ocrPageComplete != null)
+                        {
+                            _ocrPageComplete.Dispose();
+                            _ocrPageComplete = null;
+                        }
+
                         // Not necessary since this happens in ClearData, but it appeases FXCop.
                         if (_autoFitHighlight != null)
                         {
@@ -915,7 +996,8 @@ namespace Extract.Imaging.Forms
                             _backgroundWorker.CancelAsync();
 
                             // Signal any currently running operation to cancel.
-                            CancelRunningOperation();
+                            // (including OCR operations).
+                            CancelRunningOperation(true);
 
                             // In case the background thread is currently waiting on the next
                             // operation, set _operationAvailable to end the wait.
@@ -950,8 +1032,11 @@ namespace Extract.Imaging.Forms
                 {
                     _highlightsEnabled = true;
 
+                    InAutoFitMode = (_imageViewer.Cursor == ExtractCursors.ShiftWordRedaction);
+
                     // If word highlights are active, watch for when the cursor
                     // enters/leaves word highlights.
+                    _imageViewer.CursorChanged += HandleCursorChanged;
                     _imageViewer.CursorEnteredLayerObject +=
                         HandleCursorEnteredLayerObject;
                     _imageViewer.CursorLeftLayerObject +=
@@ -971,15 +1056,15 @@ namespace Extract.Imaging.Forms
                     _highlightsEnabled = false;
 
                     // Stop watching for when the cursor enters/leaves word highlights
+                    _imageViewer.CursorChanged -= HandleCursorChanged;
                     _imageViewer.CursorEnteredLayerObject -=
                         HandleCursorEnteredLayerObject;
-
                     _imageViewer.CursorLeftLayerObject -=
                         HandleCursorLeftLayerObject;
                     _imageViewer.LayerObjects.DeletingLayerObjects -=
                         HandleDeletingLayerObjects;
 
-                    HideWordHighlights();
+                    HideWordHighlights(true);
                 }
             }
 
@@ -1020,8 +1105,8 @@ namespace Extract.Imaging.Forms
             /// <param name="operation">The <see cref="Action"/> to perform.</param>
             void StartOperation(Action operation)
             {
-                // Cancel any currently running operation.
-                CancelRunningOperation();
+                // Cancel any currently running operation except for OCR
+                CancelRunningOperation(false);
 
                 // Schedule the new operation.
                 _pendingOperation = operation;
@@ -1035,12 +1120,19 @@ namespace Extract.Imaging.Forms
             /// <para><b>Note</b></para>
             /// This method must be called within a lock.
             /// </summary>
-            void CancelRunningOperation()
+            /// <param name="cancelOcr"><see langword="true"/> if OCR operations should be canceled
+            /// as well; <see langword="false"/> if they are allowed to continue.</param>
+            void CancelRunningOperation(bool cancelOcr)
             {
                 // Cancel any currently running operation.
                 if (_canceler != null && !_canceler.IsCancellationRequested)
                 {
                     _canceler.Cancel();
+                }
+
+                if (cancelOcr && _ocrCanceler != null && !_ocrCanceler.IsCancellationRequested)
+                {
+                    _ocrCanceler.Cancel();
                 }
 
                 _pendingOperation = null;
@@ -1192,7 +1284,9 @@ namespace Extract.Imaging.Forms
                     {
                         return _highlightsEnabled
                             ? _wordHighlights.Count
-                            : _ocrPageData.Count;
+                            : _ocrPageData
+                                .Where(data => data.Value != null)
+                                .Count();
                     }
                     else
                     {
@@ -1208,8 +1302,6 @@ namespace Extract.Imaging.Forms
             /// </summary>
             void ClearData()
             {
-                _imageViewer.MouseMove -= HandleImageViewerMouseMove;
-
                 if (_autoFitHighlight != null)
                 {
                     _autoFitHighlight.Dispose();
@@ -1513,7 +1605,7 @@ namespace Extract.Imaging.Forms
 
                 SpatialString pageOcr = null;
                 ThreadSafeSpatialString ocrData;
-                if (_ocrPageData.TryGetValue(page, out ocrData))
+                if (_ocrPageData.TryGetValue(page, out ocrData) && ocrData != null)
                 {
                     pageOcr = ocrData.SpatialString;
                 }
@@ -1547,12 +1639,46 @@ namespace Extract.Imaging.Forms
 
                         if (autoOcr)
                         {
-                            ocrData = OCRPage(imageFile, page, ocrTradeoff);
+                            // Launch an asynchronous task to schedule the OCR operation. This
+                            // allows us to instantly move on if cancelled and potentially also
+                            // allows the OCR operation to continue so that the results can be
+                            // retrieved later.
+                            Task ocrTask = Task.Factory.StartNew(() =>
+                                pageOcr = OCRPage(imageFile, page, ocrTradeoff));
 
-                            if (ocrData != null)
+                            try
                             {
-                                pageOcr = ocrData.SpatialString;
-                                _ocrPageData[page] = ocrData;
+                                // Wait for completion as long as we don't receive a cancel request.
+                                ocrTask.Wait(_cancelToken);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                // If canceled, use ContinueWith to ensure any exceptions are
+                                // handled (which would otherwise crash the app).
+                                ocrTask.ContinueWith((canceledTask) =>
+                                    {
+                                        if (!canceledTask.Exception.InnerExceptions
+                                                .Where(ex => ex is OperationCanceledException ||
+                                                    ex.Message.Contains("cancel"))
+                                                .Any())
+                                        {
+                                            ExtractException ee = new ExtractException("ELI33373",
+                                                "OCR Operation failed.", canceledTask.Exception);
+                                            ee.AddDebugData("Document", imageFile, false);
+                                            ee.AddDebugData("Page", page, false);
+                                            ee.Log();
+                                        }
+
+                                        canceledTask.Dispose();
+                                    }, TaskContinuationOptions.OnlyOnFaulted);
+                            }
+                            catch (Exception ex)
+                            {
+                                ExtractException ee = new ExtractException("ELI33374",
+                                                "OCR Operation failed.", ex);
+                                ee.AddDebugData("Document", imageFile, false);
+                                ee.AddDebugData("Page", page, false);
+                                throw  ee;
                             }
                         }
                     }
@@ -1576,9 +1702,11 @@ namespace Extract.Imaging.Forms
             /// <param name="pageNumber">The page number to be OCR'd.</param>
             /// <param name="ocrTradeoff">The <see cref="OcrTradeoff"/> indicating the quality/speed
             /// tradeoff to use.</param>
-            /// <returns>A <see cref="ThreadSafeSpatialString"/> instance representing the OCR data for
-            /// the specified <see paramref="imageFile"/> and <see paramref="pageNumber"/>.</returns>
-            ThreadSafeSpatialString OCRPage(string imageFile, int pageNumber, OcrTradeoff ocrTradeoff)
+            /// <returns>
+            /// A <see cref="SpatialString"/> instance representing the OCR data for
+            /// the specified <see paramref="imageFile"/> and <see paramref="pageNumber"/>.
+            /// </returns>
+            SpatialString OCRPage(string imageFile, int pageNumber, OcrTradeoff ocrTradeoff)
             {
                 // NOTE:
                 // This method executes on a background thread. While it is guaranted that only
@@ -1587,25 +1715,134 @@ namespace Extract.Imaging.Forms
                 // should be tolerant to document/page changes that could occur in the UI thread.
                 // Code that needs to be run on the UI thread can be run using ExecuteInUIThread.
 
+                CancellationTokenSource cancelTokenSource = null;
+                CancellationToken cancelToken;
+                bool pageAlreadyLoading = false;
+
                 try
                 {
-                    if (_ocrManager == null)
+                    // Set up a new OCR operation.
+                    lock (_ocrLock)
                     {
-                        _ocrManager = new AsynchronousOcrManager();
-                        _ocrManager.OcrProgressUpdate += HandleOcrProgressUpdate;
+                        // First check to be sure the OCR results don't already exist or that the
+                        // page isn't currently OCR'ing in another thread.
+                        ThreadSafeSpatialString ocrData;
+                        if (_ocrPageData.TryGetValue(pageNumber, out ocrData))
+                        {
+                            if (ocrData != null)
+                            {
+                                return ocrData.SpatialString;
+                            }
+                            else if (_ocrManager != null && _ocrCanceler != null)
+                            {
+                                // A null entry in _ocrPageData indicates an OCR operation is in
+                                // progress for this page.
+                                pageAlreadyLoading = true;
+                            }
+                        }
+
+                        if (pageAlreadyLoading)
+                        {
+                            // If the page is already being OCR'd we'll just wait for that operation
+                            // to complete.
+                            cancelToken = _ocrCanceler.Token;
+                        }
+                        else
+                        {
+                            // Otherwise launch a new operation.
+                            cancelTokenSource = new CancellationTokenSource();
+                            _ocrCanceler = cancelTokenSource;
+                            cancelToken = _ocrCanceler.Token;
+
+                            if (_ocrManager == null)
+                            {
+                                _ocrManager = new AsynchronousOcrManager();
+                                _ocrManager.OcrProgressUpdate += HandleOcrProgressUpdate;
+                            }
+
+                            _ocrManager.Tradeoff = ocrTradeoff;
+                            _ocrManager.OcrFile(imageFile, pageNumber, pageNumber, cancelToken);
+
+                            // Indicate that data is being loaded for this page.
+                            _ocrPageData[pageNumber] = null;
+                            _ocrPageComplete.Reset();
+                        }
                     }
 
-                    _ocrManager.Tradeoff = ocrTradeoff;
-                    _ocrManager.OcrFile(imageFile, pageNumber, pageNumber, _cancelToken);
-                    _ocrManager.WaitForOcrCompletion();
+                    // If waiting for results from another thread, wait for _ocrPageComplete which
+                    // signals that the results are available (if OCR succeeded).
+                    if (pageAlreadyLoading)
+                    {
+                        _ocrPageComplete.WaitOne();
 
-                    _cancelToken.ThrowIfCancellationRequested();
+                        cancelToken.ThrowIfCancellationRequested();
 
-                    return new ThreadSafeSpatialString(_imageViewer, _ocrManager.OcrOutput);
+                        // Retrieve the results, or re-start OCRPage if there are no results.
+                        ThreadSafeSpatialString ocrData;
+                        if (_ocrPageData.TryGetValue(pageNumber, out ocrData) && ocrData != null)
+                        {
+                            return ocrData.SpatialString;
+                        }
+                        else
+                        {
+                            // The risk of infinite resursion is small, and in the end would be
+                            // stopped by a document change that would trip _ocrCanceler.
+                            return OCRPage(imageFile, pageNumber, ocrTradeoff);
+                        }
+                    }
+                    // Otherwise run the OCR operation outside of _ocrLock so that it can be
+                    // interrupted by a new OCR operation.
+                    else
+                    {
+                        _ocrManager.WaitForOcrCompletion();
+
+                        lock (_ocrLock)
+                        {
+                            cancelToken.ThrowIfCancellationRequested();
+
+                            // If the output is null but an exception wasn't thrown, the OCR operation
+                            // was likely cancelled by a previous operation. Worst case, this will force
+                            // another OCR attempt on a page without text.
+                            if (string.IsNullOrEmpty(_ocrManager.OcrOutput))
+                            {
+                                throw new OperationCanceledException();
+                            }
+
+                            // We have valid OCR results. Cache them.
+                            _ocrPageData[pageNumber] =
+                                new ThreadSafeSpatialString(_imageViewer, _ocrManager.OcrOutput);
+                        }
+
+                        return _ocrPageData[pageNumber].SpatialString;
+                    }
                 }
                 catch (Exception ex)
                 {
+                    lock (_ocrLock)
+                    {
+                        // Ensure the flag that indicates OCR was being loaded for this page is cleared.
+                        ThreadSafeSpatialString ocrData;
+                        _ocrPageData.TryRemove(pageNumber, out ocrData);
+                    }
+
                     throw ex.AsExtract("ELI32614");
+                }
+                finally
+                {
+                    lock (_ocrLock)
+                    {
+                        if (cancelTokenSource != null)
+                        {
+                            _ocrPageComplete.Set();
+
+                            if (_ocrCanceler == cancelTokenSource)
+                            {
+                                _ocrCanceler = null;
+                            }
+
+                            cancelTokenSource.Dispose();
+                        }
+                    }
                 }
             }
 
@@ -1844,7 +2081,7 @@ namespace Extract.Imaging.Forms
                 {
                     // Ensure an auto-event tracking event is still active before adding the auto-fit
                     // highlight.
-                    if (InAutoFitOperation)
+                    if (_imageViewer.IsTracking && InAutoFitMode)
                     {
                         _imageViewer._layerObjects.Add(highlight, false);
                         _autoFitHighlight = highlight;
@@ -1925,7 +2162,7 @@ namespace Extract.Imaging.Forms
                 // The highlights that are to be turned in highlights may be either 1 or
                 // more word highlights or an auto fit highlight.
                 List<RasterZone> zonesToHighlight = new List<RasterZone>();
-                if (InAutoFitOperation)
+                if (InAutoFitMode)
                 {
                     RasterZone autoFitZone = GetAutoFitOutputZone();
                     if (autoFitZone != null)
@@ -2190,9 +2427,22 @@ namespace Extract.Imaging.Forms
             }
 
             /// <summary>
+            /// Makes the word highlights visible.
+            /// </summary>
+            void ShowWordHighlights()
+            {
+                foreach (Highlight highlight in _activeWordHighlights)
+                {
+                    highlight.Visible = true;
+                }
+            }
+
+            /// <summary>
             /// Hides any currently visible word highlights.
             /// </summary>
-            void HideWordHighlights()
+            /// <param name="clear"><see langword="true"/> to clear _activeWordHighlights after the
+            /// highlights have been hidden. Otherwise, <see langword="false"/>.</param>
+            void HideWordHighlights(bool clear)
             {
                 // If cancelling, simply reset the highlight color and hide all active
                 // highlights.
@@ -2201,7 +2451,10 @@ namespace Extract.Imaging.Forms
                     highlight.Visible = false;
                 }
 
-                _activeWordHighlights.Clear();
+                if (clear)
+                {
+                    _activeWordHighlights.Clear();
+                }
             }
 
             /// <summary>

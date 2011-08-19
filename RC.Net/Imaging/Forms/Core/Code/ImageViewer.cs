@@ -200,16 +200,9 @@ namespace Extract.Imaging.Forms
         CursorTool _lastContinuousUseTool;
 
         /// <summary>
-        /// The cursor to be displayed based upon the currently active
-        /// <see cref="CursorTool"/>.
+        /// The cursors to be displayed based upon the currently active <see cref="CursorTool"/>.
         /// </summary>
-        Cursor _toolCursor;
-
-        /// <summary>
-        /// The cursor to be displayed when the currently active
-        /// <see cref="CursorTool"/> is activated (i.e. mouse down).
-        /// </summary>
-        Cursor _activeCursor;
+        ImageViewerCursors _cursors;
 
         /// <summary>
         /// The currently active fit mode.
@@ -815,15 +808,11 @@ namespace Extract.Imaging.Forms
                     // Set the cursor tool
                     _cursorTool = value;
 
-                    // Get the cursor values for the current tool
-                    ImageViewerCursors cursors = GetCursorForTool(value);
-
-                    // Set the cursor values for the current tool
-                    _toolCursor = cursors.Tool;
-                    _activeCursor = cursors.Active;
+                    // Get the cursors for the current tool
+                    _cursors = GetCursorsForTool(value);
 
                     // Set the current cursor
-                    Cursor = _toolCursor ?? Cursors.Default;
+                    UpdateCursor();
 
                     // If the cursor tool has changed to one of the highlight tools then
                     // set the appropriate selection tool value in the registry
@@ -1627,7 +1616,7 @@ namespace Extract.Imaging.Forms
                 UpdateZoom(true, true);
 
                 // Restore the cursor for the active cursor tool.
-                Cursor = _toolCursor ?? Cursors.Default;
+                UpdateCursor();
             }
             catch (Exception ex)
             {
@@ -2415,11 +2404,9 @@ namespace Extract.Imaging.Forms
             {
                 base.OnKeyDown(e);
 
-                if (_trackingData == null && _cursorTool == CursorTool.SelectLayerObject)
-                {
-                    // Upate the mouse cursor
-                    Cursor = GetSelectionCursor(PointToClient(MousePosition));
-                }
+                // The state of the cursor tool may be affected by keys.
+                // Allow the cursor to be updated if appropriate.
+                UpdateCursor();
             }
             catch (Exception ex)
             {
@@ -2439,11 +2426,9 @@ namespace Extract.Imaging.Forms
             {
                 base.OnKeyUp(e);
 
-                if (_trackingData == null && _cursorTool == CursorTool.SelectLayerObject)
-                {
-                    // Update the mouse cursor
-                    Cursor = GetSelectionCursor(PointToClient(MousePosition));
-                }
+                // The state of the cursor tool may be affected by keys.
+                // Allow the cursor to be updated if appropriate.
+                UpdateCursor();
             }
             catch (Exception ex)
             {
@@ -2473,13 +2458,10 @@ namespace Extract.Imaging.Forms
                     // Start tracking a mouse event if the left mouse button was clicked
                     if (e.Button == MouseButtons.Left)
                     {
-                        // Activate the mouse cursor
-                        if (_activeCursor != null)
-                        {
-                            Cursor = _activeCursor;
-                        }
-
                         StartTracking(e.X, e.Y);
+
+                        // Activate the mouse cursor
+                        UpdateCursor();
 
                         // Disable the active linked layer object 
                         // during interactive tracking events
@@ -3045,7 +3027,7 @@ namespace Extract.Imaging.Forms
                 if (IsImageAvailable)
                 {
                     // Restore the original cursor tool
-                    Cursor = _toolCursor ?? Cursors.Default;
+                    UpdateCursor();
                 }
             }
             catch (Exception ex)

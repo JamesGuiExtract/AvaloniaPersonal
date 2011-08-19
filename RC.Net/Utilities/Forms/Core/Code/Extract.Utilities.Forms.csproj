@@ -411,6 +411,11 @@
   <ItemGroup>
     <None Include="Resources\HelpBubble.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CtrlShiftRectangularRedaction.cur" />
+    <EmbeddedResource Include="Resources\ShiftRectangularRedaction.cur" />
+    <EmbeddedResource Include="Resources\ShiftWordRedaction.cur" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

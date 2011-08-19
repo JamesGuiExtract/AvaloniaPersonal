@@ -319,7 +319,7 @@ namespace Extract.Imaging.Forms
                 UpdateZoom(true, true);
 
                 // Restore the cursor for the active cursor tool.
-                Cursor = _toolCursor ?? Cursors.Default;
+                UpdateCursor();
             }
             catch (Exception e)
             {
@@ -2835,19 +2835,24 @@ namespace Extract.Imaging.Forms
                 case CursorTool.WordHighlight:
                 case CursorTool.WordRedaction:
 
-                    if (_wordHighlightManager.InAutoFitOperation)
-                    {
-                        // Recalculate and redraw a line from the start of the tracking operation to
-                        // the current mouse position.
-                        _trackingData.UpdateLine(mouseX, mouseY);
+                    // The word highlight tool allows for the auto-fit mode to be toggled during the
+                    // tracking operation. Recalculate both the tracking line and rectangle to allow
+                    // for instant switching between the two.
+                    _trackingData.UpdateLine(mouseX, mouseY);
+                    _trackingData.UpdateRectangle(mouseX, mouseY);
 
+                    if (!_paintingToGraphics)
+                    {
+                        _wordHighlightManager.UpdateTracking(mouseX, mouseY);
+                    }
+
+                    if (_wordHighlightManager.InAutoFitMode)
+                    {
                         Pen dashedPen = ExtractPens.GetThickDashedPen(GetHighlightDrawColor());
                         DrawTrackingLine(e, dashedPen);
                     }
                     else
                     {
-                        // Recalculate and redraw a new selection border
-                        _trackingData.UpdateRectangle(mouseX, mouseY);
                         DrawTrackingRectangleBorder(e, Color.DimGray);
                     }
                     break;
@@ -3030,7 +3035,7 @@ namespace Extract.Imaging.Forms
                 _trackingData = null;
 
                 // Restore the original cursor tool
-                Cursor = _toolCursor ?? Cursors.Default;
+                UpdateCursor();
 
                 _trackingEventEnding = false;
             }
@@ -5936,13 +5941,8 @@ namespace Extract.Imaging.Forms
             {
                 _activeFormCount--;
 
-                // This was the last form, dispose of the cursors
-                if (_activeFormCount == 0)
-                {
-                    // Dispose of the cursors and set the collection to null
-                    CollectionMethods.ClearAndDispose(_cursorsForCursorTools);
-                    _cursorsForCursorTools = null;
-                }
+                // Don't clear _cursorsForCursorTools; They are references to static ExtractCursor
+                // instances that will be re-used if the verification form is re-opened.
             }
         }
 
@@ -6015,12 +6015,20 @@ namespace Extract.Imaging.Forms
                         }
 
                         // Load the normal cursor first.
-                        cursors.Tool = ExtractCursors.GetCursor(typeof(ExtractCursors),
+                        cursors.Tool = ExtractCursors.GetCursor(
                             "Resources." + name + ".cur");
 
-                        // Now load the active cursor.
-                        cursors.Active = ExtractCursors.GetCursor(typeof(ExtractCursors),
+                        // Load the active cursor.
+                        cursors.Active = ExtractCursors.GetCursor(
                             "Resources.Active" + name + ".cur");
+
+                        // Load the shift state cursor.
+                        cursors.ShiftState = ExtractCursors.GetCursor(
+                            "Resources.Shift" + name + ".cur");
+
+                        // Load the ctrl-shift state cursor.
+                        cursors.CtrlShiftState = ExtractCursors.GetCursor(
+                            "Resources.CtrlShift" + name + ".cur");
                     }
 
                     // Add the cursors for the current cursor tool to the collection
@@ -6041,7 +6049,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="tool">The <see cref="CursorTool"/> to retrieve the cursors for.</param>
         /// <returns>The cursors for the specified cursor tool.</returns>
-        static ImageViewerCursors GetCursorForTool(CursorTool tool)
+        static ImageViewerCursors GetCursorsForTool(CursorTool tool)
         {
             // Ensure the cursors have been loaded.
             if (_cursorsForCursorTools == null)
@@ -6059,6 +6067,70 @@ namespace Extract.Imaging.Forms
             }
 
             return cursor;
+        }
+
+        /// <summary>
+        /// Updates <see cref="Cursor"/> based upon the current state of the current cursor tool,
+        /// state of the image viewer, key state and mouse position.
+        /// </summary>
+        void UpdateCursor()
+        {
+            Cursor oldCursor = Cursor;
+
+            Cursor newCursor = Cursors.Default;
+
+            if (_cursors != null)
+            {
+                if (IsTracking && _cursorTool == CursorTool.SelectLayerObject)
+                {
+                    // Don't allow a cursor change during a tracking event with the selection cursor
+                    // active. The Highlight class uses the cursor as a flag to indicated the type
+                    // of tracking event that is active.
+                    newCursor = oldCursor;
+                }
+                else if (IsImageAvailable && _cursorTool == CursorTool.SelectLayerObject)
+                {
+                    // If using the selection cursor, get the appropriate one based on the mouse
+                    // position.
+                    newCursor = GetSelectionCursor(PointToClient(MousePosition));
+                }
+                else if (IsTracking && _cursors.Active != null)
+                {
+                    newCursor = _cursors.Active;
+                }
+                else if ((ModifierKeys == Keys.Shift) && _cursors.ShiftState != null)
+                {
+                    newCursor = _cursors.ShiftState;
+                }
+                else if ((ModifierKeys == (Keys.Control | Keys.Shift)) && _cursors.CtrlShiftState != null)
+                {
+                    newCursor = _cursors.CtrlShiftState;
+                }
+                else if (_cursors.Tool != null)
+                {
+                    newCursor = _cursors.Tool;
+                }
+            }
+
+            if (oldCursor != newCursor)
+            {
+                // If in a tracking operation, make a call to UpdateTracking as some tracking
+                // operations depend on the current cursor.
+                if (IsTracking)
+                {
+                    Point mousePosition = PointToClient(MousePosition);
+
+                    // Assign a tracking update call to update the tracking region and display
+                    // tracking graphics and invalidate to trigger the graphics to be drawn.
+                    _trackingUpdateCall =
+                        ((paintEventArgs) => UpdateTracking(paintEventArgs,
+                            mousePosition.X, mousePosition.Y));
+
+                    Invalidate();
+                }
+
+                Cursor = newCursor;
+            }
         }
 
         /// <summary>

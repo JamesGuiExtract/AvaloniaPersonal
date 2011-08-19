@@ -514,9 +514,10 @@ namespace Extract.Imaging
                 {
                     // For the "safe" rounding mode move the start and end points half a pixel away
                     // from the center, to ensure they are rounded to the next whole pixel away from
-                    // the raster zone.
-                    start.X -= 0.5F;
-                    end.X += 0.5F;
+                    // the raster zone. (Add slightly less than half a pixel to prevent modifying
+                    // coordinates if the starting point was an integer).
+                    start.X -= 0.499F;
+                    end.X += 0.499F;
                 }
 
                 start = GeometryMethods.Rotate(start, theta);

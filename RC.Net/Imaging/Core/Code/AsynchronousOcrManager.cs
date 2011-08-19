@@ -485,10 +485,19 @@ namespace Extract.Imaging
                                 // Mutex over changes to class variables
                                 lock (_lock)
                                 {
-                                    // Get the SpatialString as a stringized byte stream
-                                    MiscUtils miscUtils = new MiscUtils();
-                                    _ocrTextStream =
-                                        miscUtils.GetObjectAsStringizedByteStream(ocrText);
+                                    if (OcrCanceled)
+                                    {
+                                        // Set empty output if canceled so a call doesn't mistake it
+                                        // for valid output.
+                                        _ocrTextStream = "";
+                                    }
+                                    else
+                                    {
+                                        // Get the SpatialString as a stringized byte stream
+                                        MiscUtils miscUtils = new MiscUtils();
+                                        _ocrTextStream =
+                                            miscUtils.GetObjectAsStringizedByteStream(ocrText);
+                                    }
                                 }
                             }
 
@@ -743,9 +752,9 @@ namespace Extract.Imaging
             ExtractException.Assert("ELI32623", "OCR cancel token not initialized.",
                 _cancelToken != null);
 
-            // Wait for either the _cancelToken or _endThreadEvent handles to be signaled.
+            // Wait for either the _cancelToken or _ocrDocumentCompleteEvent handles to be signaled.
             WaitHandle[] waitHandles =
-                new WaitHandle[] { _cancelToken.Value.WaitHandle, _endThreadEvent };
+                new WaitHandle[] { _cancelToken.Value.WaitHandle, _ocrDocumentCompleteEvent };
 
             // If the _cancelToken handle was signaled, cancel the running operation.
             if (WaitHandle.WaitAny(waitHandles) == 0)

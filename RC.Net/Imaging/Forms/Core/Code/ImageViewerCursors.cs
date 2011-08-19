@@ -14,18 +14,6 @@ namespace Extract.Imaging.Forms
     internal class ImageViewerCursors : IDisposable
     {
         /// <summary>
-        /// The normal <see cref="Cursor"/> to be displayed by the
-        /// <see cref="CursorTool"/>.
-        /// </summary>
-        Cursor _tool;
-
-        /// <summary>
-        /// The <see cref="Cursor"/> to be displayed by the
-        /// <see cref="CursorTool"/> when it has been activated (i.e. mouse down).
-        /// </summary>
-        Cursor _active;
-
-        /// <summary>
         /// Gets and sets the normal <see cref="Cursor"/>
         /// </summary>
         /// <returns>The normal <see cref="Cursor"/> to be displayed. <see langword="null"/> 
@@ -33,14 +21,8 @@ namespace Extract.Imaging.Forms
         /// <value>The normal <see cref="Cursor"/> to be displayed.</value>
         public Cursor Tool
         {
-            get
-            {
-                return _tool;
-            }
-            set
-            {
-                _tool = value;
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -50,14 +32,32 @@ namespace Extract.Imaging.Forms
         /// <value>The active <see cref="Cursor"/> to be displayed.</value>
         public Cursor Active
         {
-            get
-            {
-                return _active;
-            }
-            set
-            {
-                _active = value;
-            }
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets and sets the <see cref="Cursor"/> to be displayed by the
+        /// <see cref="CursorTool"/> when the shift key is down.
+        /// </summary>
+        /// <value>The <see cref="Cursor"/> to be displayed by the
+        /// <see cref="CursorTool"/> when the shift key is down.</value>
+        public Cursor ShiftState
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets and sets the <see cref="Cursor"/> to be displayed by the
+        /// <see cref="CursorTool"/> when the ctrl and shift keys are down.
+        /// </summary>
+        /// <value>The <see cref="Cursor"/> to be displayed by the
+        /// <see cref="CursorTool"/> when the ctrl and shift keys are down.</value>
+        public Cursor CtrlShiftState
+        {
+            get;
+            set;
         }
 
         #region IDisposable Members
@@ -83,29 +83,28 @@ namespace Extract.Imaging.Forms
         {
             if (disposing)
             {
-                if (_tool != null)
+                if (Tool != null)
                 {
-                    try
-                    {
-                        _tool.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        ExtractException.Log("ELI30254", ex);
-                    }
-                    _tool = null;
+                    Tool.Dispose();
+                    Tool = null;
                 }
-                if (_active != null)
+               
+                if (Active != null)
                 {
-                    try
-                    {
-                        _active.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        ExtractException.Log("ELI30255", ex);
-                    }
-                    _active = null;
+                    Active.Dispose();
+                    Active = null;
+                }
+
+                if (ShiftState != null)
+                {
+                    ShiftState.Dispose();
+                    ShiftState = null;
+                }
+
+                if (CtrlShiftState != null)
+                {
+                    CtrlShiftState.Dispose();
+                    CtrlShiftState = null;
                 }
             }
         }

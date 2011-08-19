@@ -1330,7 +1330,9 @@ namespace Extract.Imaging.Forms
             {
                 foreach (Side side in _activeTrackingVectors.Keys)
                 {
-                    resizedGeometry.InflateSide(side, 0.5F);
+                    // Add slightly less than half a pixel to prevent modifying coordinates if the
+                    // starting point was an integer).
+                    resizedGeometry.InflateSide(side, 0.499F);
                 }
             }
             

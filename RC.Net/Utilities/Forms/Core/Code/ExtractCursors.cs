@@ -1,13 +1,10 @@
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.Forms
@@ -30,59 +27,11 @@ namespace Extract.Utilities.Forms
         #region ExtractCursors Fields
 
         /// <summary>
-        /// The cursor that appears when the mouse is over a rotational grip handle.
+        /// Maintains references to all created cursors by resource name so that no cursor gets
+        /// loaded more than once.
         /// </summary>
-        static Cursor _rotate;
-
-        /// <summary>
-        /// The cursor that appears when the mouse is actively rotating a grip handle.
-        /// </summary>
-        static Cursor _activeRotate;
-
-        /// <summary>
-        /// The highlight cursor.
-        /// </summary>
-        static Cursor _highlight;
-
-        /// <summary>
-        /// The rectangular highlight cursor.
-        /// </summary>
-        static Cursor _rectangularHighlight;
-
-        /// <summary>
-        /// The word highlight cursor.
-        /// </summary>
-        static Cursor _wordHighlight;
-
-        /// <summary>
-        /// The delete cursor.
-        /// </summary>
-        static Cursor _delete;
-
-        /// <summary>
-        /// The edit text cursor.
-        /// </summary>
-        static Cursor _editText;
-
-        /// <summary>
-        /// The set highlight height cursor.
-        /// </summary>
-        static Cursor _setHeight;
-
-        /// <summary>
-        /// The pan cursor.
-        /// </summary>
-        static Cursor _pan;
-
-        /// <summary>
-        /// The cursor that appears during a pan event.
-        /// </summary>
-        static Cursor _activePan;
-
-        /// <summary>
-        /// The zoom window cursor.
-        /// </summary>
-        static Cursor _zoomWindow;
+        static ConcurrentDictionary<string, Cursor> _loadedCursors =
+            new ConcurrentDictionary<string, Cursor>();
 
         #endregion ExtractCursors Fields
 
@@ -96,12 +45,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_rotate == null)
-                {
-                    _rotate = GetCursor(typeof(ExtractCursors), "Resources.Rotate.cur");
-                }
-
-                return _rotate;
+                return GetCursor("Resources.Rotate.cur");
             }
         }
 
@@ -114,12 +58,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_activeRotate == null)
-                {
-                    _activeRotate = GetCursor(typeof(ExtractCursors), "Resources.ActiveRotate.cur");
-                }
-
-                return _activeRotate;
+                return GetCursor("Resources.ActiveRotate.cur");
             }
         }
 
@@ -131,12 +70,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_highlight == null)
-                {
-                    _highlight = GetCursor(typeof(ExtractCursors), "Resources.Highlight.cur");
-                }
-
-                return _highlight;
+                return GetCursor("Resources.Highlight.cur");
             }
         }
 
@@ -148,13 +82,31 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_rectangularHighlight == null)
-                {
-                    _rectangularHighlight = GetCursor(typeof(ExtractCursors), 
-                        "Resources.RectangularHighlight.cur");
-                }
+                return GetCursor("Resources.RectangularHighlight.cur");
+            }
+        }
 
-                return _rectangularHighlight;
+        /// <summary>
+        /// Gets the rectangular highlight cursor for the shift (line fit) state.
+        /// </summary>
+        /// <value>The rectangular highlight cursor for the shift (line fit) state.</value>
+        public static Cursor ShiftRectangularHighlight
+        {
+            get
+            {
+                return GetCursor("Resources.ShiftRectangularHighlight.cur");
+            }
+        }
+
+        /// <summary>
+        /// Gets the rectangular highlight cursor for the ctrl-shift (block fit) state.
+        /// </summary>
+        /// <value>The rectangular highlight cursor for the ctrl-shift (block fit) state.</value>
+        public static Cursor CtrlShiftRectangularHighlight
+        {
+            get
+            {
+                return GetCursor("Resources.CtrlShiftRectangularHighlight.cur");
             }
         }
 
@@ -166,13 +118,43 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_wordHighlight == null)
-                {
-                    _wordHighlight = GetCursor(typeof(ExtractCursors),
-                        "Resources.WordHighlight.cur");
-                }
+                return GetCursor("Resources.WordHighlight.cur");
+            }
+        }
 
-                return _wordHighlight;
+        /// <summary>
+        /// Gets the word highlight cursor for the shift (auto fit) state.
+        /// </summary>
+        /// <value>The word highlight cursor for the shift (auto fit) state.</value>
+        public static Cursor ShiftWordHighlight
+        {
+            get
+            {
+                return GetCursor("Resources.ShiftWordHighlight.cur");
+            }
+        }
+
+        /// <summary>
+        /// Gets the word redaction cursor.
+        /// </summary>
+        /// <value>The word redaction cursor.</value>
+        public static Cursor WordRedaction
+        {
+            get
+            {
+                return GetCursor("Resources.WordRedaction.cur");
+            }
+        }
+
+        /// <summary>
+        /// Gets the word redaction cursor in the shift (auto fit) state.
+        /// </summary>
+        /// <value>The word redaction cursor in the shift (auto fit) state.</value>
+        public static Cursor ShiftWordRedaction
+        {
+            get
+            {
+                return GetCursor("Resources.ShiftWordRedaction.cur");
             }
         }
 
@@ -184,12 +166,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_delete == null)
-                {
-                    _delete = GetCursor(typeof(ExtractCursors), "Resources.Delete.cur");
-                }
-
-                return _delete;
+                return GetCursor("Resources.Delete.cur");
             }
         }
 
@@ -201,12 +178,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_editText == null)
-                {
-                    _editText = GetCursor(typeof(ExtractCursors), "Resources.EditText.cur");
-                }
-
-                return _editText;
+                return GetCursor("Resources.EditText.cur");
             }
         }
 
@@ -218,12 +190,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_setHeight == null)
-                {
-                    _setHeight = GetCursor(typeof(ExtractCursors), "Resources.SetHeight.cur");
-                }
-
-                return _setHeight;
+                return GetCursor("Resources.SetHeight.cur");
             }
         }
 
@@ -235,12 +202,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_pan == null)
-                {
-                    _pan = GetCursor(typeof(ExtractCursors), "Resources.Pan.cur");
-                }
-
-                return _pan;
+                return GetCursor("Resources.Pan.cur");
             }
         }
 
@@ -252,12 +214,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_activePan == null)
-                {
-                    _activePan = GetCursor(typeof(ExtractCursors), "Resources.ActivePan.cur");
-                }
-
-                return _activePan;
+                return GetCursor("Resources.ActivePan.cur");
             }
         }
 
@@ -269,12 +226,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_zoomWindow == null)
-                {
-                    _zoomWindow = GetCursor(typeof(ExtractCursors), "Resources.ZoomWindow.cur");
-                }
-
-                return _zoomWindow;
+                return GetCursor("Resources.ZoomWindow.cur");
             }
         }
 
@@ -314,7 +266,6 @@ namespace Extract.Utilities.Forms
                             new Win32Exception(Marshal.GetLastWin32Error()));
                     }
 
-
                     Cursor cursor = new Cursor(cursorHandle);
 
                     // Return the new cursor
@@ -330,12 +281,10 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Creates a cursor object from an embedded resource.
         /// </summary>
-        /// <param name="type">The <see cref="Type"/> whose namespace is used to scope the 
-        /// cursor resource.</param>
         /// <param name="name">The case-sensitive name of the embedded cursor resource.</param>
         /// <returns>The cursor or <see langword="null"/> if the resource does not exist.
         /// </returns>
-        public static Cursor GetCursor(Type type, string name)
+        public static Cursor GetCursor(string name)
         {
             try
             {
@@ -343,14 +292,23 @@ namespace Extract.Utilities.Forms
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23141",
                     _OBJECT_NAME);
 
-                // Get the executing assembly
-                Assembly thisAssembly = Assembly.GetExecutingAssembly();
-
-                // Load the cursor from the resource stream
-                using (Stream cursorStream = thisAssembly.GetManifestResourceStream(type, name))
+                Cursor cursor;
+                if (!_loadedCursors.TryGetValue(name, out cursor))
                 {
-                    return cursorStream == null ? null : ExtractCursors.GetCursor(cursorStream);
+                    // Get the executing assembly
+                    Assembly thisAssembly = Assembly.GetExecutingAssembly();
+
+                    // Load the cursor from the resource stream
+                    using (Stream cursorStream =
+                        thisAssembly.GetManifestResourceStream(typeof(ExtractCursors), name))
+                    {
+                        cursor = (cursorStream == null ? null : ExtractCursors.GetCursor(cursorStream));
+                    }
+
+                    _loadedCursors[name] = cursor;
                 }
+
+                return cursor;
             }
             catch (Exception ex)
             {
