@@ -1,0 +1,106 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 9.0 Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 9.0 Feature Testing<br>OCR Engine<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>Goals</h2>
+       	<ul>
+  	   	<LI>Test stability and functionality of <b>Nuance OmniPage</b> version 18.
+  	   	<LI>Confirm proper fundamental behavior.
+  	   	<LI>Confirm acceptable performance with routine and unusual document types.
+  	   	<LI>Update automated test and <b>National Rule Set</b> expected results to 
+		match new results.
+  	   	<LI>Confirm acceptable results with customer images and delivered rules.
+  	   	<LI>Confirm long-term stability with <b>ID Shield Endurance Test</b>.
+       	</ul>
+<p>
+	<LI><h2>General Testing</h2>
+       	<ul>
+  	   	<LI>Exercise the <b>Demo_IDShield</b> FPS files and images.
+		<ul>
+			<li>Confirm that existing rules find expected data similar to 
+			previous OCR engine behavior.
+		</ul>
+  	   	<LI>Exercise the <b>Demo_FLEXIndex</b> FPS files and images.
+		<ul>
+			<li>Confirm that existing rules find expected data similar to 
+			previous OCR engine behavior.
+		</ul>
+		<li>Exercise a <b>Sanity Test</b> on a <b>32-bit</b> operating system.
+		<li>Exercise a <b>Sanity Test</b> on a <b>64-bit</b> operating system.
+       	</ul>
+<p>
+	<LI><h2>Document Types</h2>
+       	<ul>
+  	   	<LI>Make a local copy of the images in 
+		<b>I:\Common\Engineering\ProductTesting\UniqueImageTypes</b>.
+		<li>Process the images and confirm that OCR results are available for 
+		appropriate images.
+       	</ul>
+<p>
+	<LI><h2>Automated Testing</h2>
+       	<ul>
+  	   	<LI>Exercise the automated tests installed with the <b>Rule Development 
+		Toolkit</b>.
+		<li>Add SCRs to <b>FlexIDSCore</b> for any errors.  An SCR should be added 
+		for each rule object that has one or more new failures.
+		<li>Exercise the <b>National Rule Set</b>.  Add SCRs to <b>FlexIDSCore</b> 
+		for any errors.  An SCR should be added for each object that has one or 
+		more new failures.
+		<ul>
+			<li>Document Classification
+			<li>Redaction
+			<li>Indexing
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>Analysis Tests</h2>
+       	<ul>
+		<li>Spreadsheets to store results of the following tests can be found at 
+		<b>I:\Common\Testing\Product Testing\FLEX_Index_90\AnalysisResults</b>.  
+		Subfolders are defined for <b>FLEXIndex</b> and <b>IDShield</b>.
+  	   	<LI>Exercise the following <b>FLEX Index</b> projects.  Confirm that 
+		capture rates are acceptable compared to the most recent delivery.
+		<ul>
+			<li>CA - San Mateo - SouthTech (already tested for 9.0 with current OCR engine)
+			<li>IL - McLean - Cott
+			<li>OR - District A
+		</ul>
+  	   	<LI>Exercise the following <b>ID Shield</b> projects.  Confirm that 
+		capture rates are acceptable compared to the most recent delivery.
+		<ul>
+			<li>CA - State Rules - AtPac (already tested for 9.0 with current OCR engine)
+			<li>CA - San Mateo - SouthTech
+			<li>CO - SoS (already tested for 9.0 with current OCR engine)
+			<li>HealthPlan Services - Princeton Information
+			<li>HI - DCCA (PDF)
+			<li>IN - District - CSI (already tested for 9.0 with current OCR engine)
+			<li>LA - State Rules - Cott (already tested for 9.0 with current OCR engine)
+			<li>MA - SoC (PDF)
+			<li>MA - Plymouth - ACS
+			<li>OH - Canton Municipal COurt
+			<li>OR - District A
+			<li>PA - Adams - Cott
+		</ul>
+       	</ul>
+<p>
+	<LI><h2>Endurance Test</h2>
+       	<ul>
+  	   	<LI>Prepare an ID Shield Endurance test with appropriate rules and at 
+		least 3 million image pages.  Setup and management instructions can be 
+		found <a href="./../EnduranceTesting/EnduranceTests.html">here</a></li>.
+		<li>Make sure to setup automatic reporting of results.
+       	</ul>
+</OL>
+</BODY>
+</HTML>
