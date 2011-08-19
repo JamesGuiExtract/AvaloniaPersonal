@@ -14,5 +14,5 @@
 ::    customer-specific.js
 ::    ScriptWrapper.js
 :: 
-copy "%1" + "..\ScriptWrapper.js" "%2" /B /Y
+copy "%1" + "%~dp0..\ScriptWrapper.js" "%2" /B /Y
 pause
