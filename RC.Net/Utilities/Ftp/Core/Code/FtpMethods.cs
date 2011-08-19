@@ -76,6 +76,12 @@ namespace Extract.Utilities.Ftp
                 // Determine the current working folder on the ftp server 
                 string currentFileDir = PathUtil.GetFolderPath(currentFile.Replace('\\', '/'));
 
+                // Working folder must begin with /
+                if (currentFileDir.Length > 0 && currentFileDir[0] != '/')
+                {
+                    currentFileDir = "/" + currentFileDir;
+                }
+
                 // Only change the working directory if it needs to be changed.
                 if (currentFileDir != runningConnection.ServerDirectory)
                 {
@@ -108,6 +114,27 @@ namespace Extract.Utilities.Ftp
         {
             try
             {
+                // The FTP path should have / instead of \ so need to convert all / to \
+                remoteWorkingFolderBase = remoteWorkingFolderBase.Replace('\\', '/');
+                
+                // Defaulte the remote working folder to / if empty
+                if (string.IsNullOrEmpty(remoteWorkingFolderBase))
+                {
+                    remoteWorkingFolderBase = "/";
+                }
+
+                // add / to the end of remoteWorkingFolderBase if needed
+                if (remoteWorkingFolderBase.LastIndexOf('/') != remoteWorkingFolderBase.Length - 1)
+                {
+                    remoteWorkingFolderBase += "/";
+                }
+
+                // Need to fix up the remoteWorkingFolderBase - it may need to have a / added to the front
+                if (remoteWorkingFolderBase.Length > 0 && remoteWorkingFolderBase[0] != '/' )
+                {
+                    remoteWorkingFolderBase = "/" + remoteWorkingFolderBase;
+                }
+
                 // Generate the path so that the directory structure rooted to 
                 // the base local working folder will be the same as the 
                 // current ftp working folder rooted to the base remote working folder.
@@ -119,7 +146,7 @@ namespace Extract.Utilities.Ftp
                 else
                 {
                     pathForFile = Path.Combine(localWorkingFolderBase,
-                        currentRemoteWorkingFolder.Remove(0, remoteWorkingFolderBase.Length));
+                        currentRemoteWorkingFolder.Remove(0, remoteWorkingFolderBase.Length ));
                 }
 
                 // Convert / to \ since the ftp server path char may be different than windows

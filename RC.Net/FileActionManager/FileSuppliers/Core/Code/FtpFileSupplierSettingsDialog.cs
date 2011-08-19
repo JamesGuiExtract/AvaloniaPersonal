@@ -66,7 +66,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 base.OnLoad(e);
 
                 // Set the initial values for the controls
-                _remoteDownloadFolderTextBox.Text = _settings.RemoteDownloadFolder;
+                _remoteDownloadFolderTextBox.Text = string.IsNullOrWhiteSpace(_settings.RemoteDownloadFolder) ?
+                    "/" : _settings.RemoteDownloadFolder;
                 _fileExtensionSpecificationTextBox.Text = _settings.FileExtensionsToDownload;
                 _recursiveDownloadCheckBox.Checked = _settings.RecursivelyDownload;
                 _pollRemoteCheckBox.Checked = _settings.PollRemoteLocation;
@@ -245,37 +246,45 @@ namespace Extract.FileActionManager.FileSuppliers
             bool returnValue = false;
             if (string.IsNullOrWhiteSpace(_remoteDownloadFolderTextBox.Text))
             {
-                MessageBox.Show("Remote download folder must be specified.", "Configuration error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox(
+                    "Remote download folder must be specified.\r\nIf you wish to use the home directory use '/'.",
+                    "Configuration error", true);
+                _settingsTabControl.SelectTab(_generalSettingsTabPage);
+                _remoteDownloadFolderTextBox.Focus();
+            }
+            else if (_remoteDownloadFolderTextBox.Text.Trim()[0] == '.')
+            {
+                UtilityMethods.ShowMessageBox("Remote download folder name cannot begin with '.'.", 
+                    "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _remoteDownloadFolderTextBox.Focus();
             }
             else if (string.IsNullOrWhiteSpace(_fileExtensionSpecificationTextBox.Text))
             {
-                MessageBox.Show("Extensions to download must be specified", "Configuration error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("Extensions to download must be specified", 
+                    "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _fileExtensionSpecificationTextBox.Focus();
             }
             else if (_pollRemoteCheckBox.Checked &&
                 _pollingIntervalNumericUpDown.Value < 1)
             {
-                MessageBox.Show("Polling interval must be greater than 0.", "Configuration error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("Polling interval must be greater than 0.", 
+                    "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _pollingIntervalNumericUpDown.Focus();
             }
             else if (_changeRemoteExtensionRadioButton.Checked && string.IsNullOrWhiteSpace(_newExtensionTextBox.Text))
             {
-                MessageBox.Show("New extension for remote file must be specified.", "Configuration error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("New extension for remote file must be specified.", 
+                    "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _newExtensionTextBox.Focus();
             }
             else if (string.IsNullOrWhiteSpace(_localWorkingFolderTextBox.Text))
             {
-                MessageBox.Show("Local working folder must be specified.", "Configuration error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("Local working folder must be specified.",
+                    "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _localWorkingFolderTextBox.Focus();
             }

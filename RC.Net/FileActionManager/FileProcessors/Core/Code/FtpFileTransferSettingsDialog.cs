@@ -203,15 +203,19 @@ namespace Extract.FileActionManager.FileProcessors
 
             if (string.IsNullOrWhiteSpace(_remoteFileNameTextBox.Text))
             {
-                MessageBox.Show("Remote filename must be specified.", "Configuration error",
-                   MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("Remote filename must be specified.", "Configuration error", true);
+                _settingsTabControl.SelectTab(_generalSettingsTabPage);
+                _remoteFileNameTextBox.Focus();
+            }
+            else if (_remoteFileNameTextBox.Text.Trim()[0] == '.')
+            {
+                UtilityMethods.ShowMessageBox("Remote filename cannot begin with '.'.", "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _remoteFileNameTextBox.Focus();
             }
             else if (!_deleteFileRadioButton.Checked && string.IsNullOrWhiteSpace(_localFileNameTextBox.Text))
             {
-                MessageBox.Show("Local filename must be specified.", "Configuration error",
-                                   MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                UtilityMethods.ShowMessageBox("Local filename must be specified.", "Configuration error", true);
                 _settingsTabControl.SelectTab(_generalSettingsTabPage);
                 _localFileNameTextBox.Focus();
             }

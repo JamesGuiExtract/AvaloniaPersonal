@@ -1,7 +1,7 @@
 ﻿using EnterpriseDT.Net.Ftp;
 using EnterpriseDT.Net.Ftp.Forms;
-using Extract.Licensing;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -176,18 +176,21 @@ namespace Extract.FileActionManager.Forms
         {
             try
             {
-                _ftpConnectionEditor.Connection.Connect();
-                if (_ftpConnectionEditor.Connection.IsConnected)
+                using (new TemporaryWaitCursor())
                 {
-                    MessageBox.Show("Connection was successful", "Test Connection",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+                    _ftpConnectionEditor.Connection.Connect();
+                    if (_ftpConnectionEditor.Connection.IsConnected)
+                    {
+                        MessageBox.Show("Connection was successful", "Test Connection",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Connection attempt was unsuccessful", "Test Connection",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+                    }
+                    _ftpConnectionEditor.Connection.Close();
                 }
-                else
-                {
-                    MessageBox.Show("Connection attempt was unsuccessful", "Test Connection",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
-                }
-                _ftpConnectionEditor.Connection.Close();
             }
             catch (Exception ex)
             {

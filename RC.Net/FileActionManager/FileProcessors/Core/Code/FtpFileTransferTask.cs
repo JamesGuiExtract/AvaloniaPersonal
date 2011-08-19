@@ -326,6 +326,7 @@ namespace Extract.FileActionManager.FileProcessors
                 return (ActionToPerform == TransferActionToPerform.DeleteFileFromFtpServer ||
                     !string.IsNullOrWhiteSpace(_localFileName)) &&
                     !string.IsNullOrWhiteSpace(_remoteFileName) &&
+                    _remoteFileName[0] != '.' &&
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.ServerAddress) &&
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.UserName) &&
                     !string.IsNullOrWhiteSpace(ConfiguredFtpConnection.Password);

@@ -522,7 +522,8 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 // This class is configured if the settings are valid
                 return 
-                    !string.IsNullOrWhiteSpace(RemoteDownloadFolder) && 
+                    !string.IsNullOrWhiteSpace(RemoteDownloadFolder) &&
+                    RemoteDownloadFolder[0] != '.' &&
                     !string.IsNullOrWhiteSpace(LocalWorkingFolder) && 
                     !string.IsNullOrWhiteSpace(FileExtensionsToDownload) && 
                     (!PollRemoteLocation || PollingIntervalInMinutes > 0) &&
