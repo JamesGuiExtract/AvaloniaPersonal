@@ -674,7 +674,7 @@ STDMETHODIMP CSelectPageRegion::raw_ParseText(IAFDocument* pAFDoc, IProgressStat
 				: ipInputText->GetSpecifiedPages(i, i);
 
 			// Get the appropriate content for this page
-			ISpatialStringPtr ipContentFromThisPage = getRegionContent( ipPageText, 
+			ISpatialStringPtr ipContentFromThisPage = getRegionContent(ipPageText, 
 				bPageSpecified, bRestrictionDefined, i, nWidth, nHeight);
 
 			// Provide non-NULL content to an Attribute to be included in the collection
@@ -1600,6 +1600,13 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 
 		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI28123");
+		}
+
+		// [FlexIDSCore:4797]
+		// If the content does not contain any spatial info ignore it.
+		if (!ipResult->HasSpatialInfo())
+		{
+			ipResult = __nullptr;
 		}
 
 		return ipResult;
