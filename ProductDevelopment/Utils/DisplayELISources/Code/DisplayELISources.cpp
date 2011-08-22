@@ -107,12 +107,12 @@ std::string getDataValue(const std::string strEncrypted)
 
 					// Decrypt the ByteStream
 					ByteStream decryptedBytes;
-					EncryptionEngine ee;
+					MapLabel encryptionEngine;
 					ByteStream passwordBytes;
 
 					getUEPassword( passwordBytes );
 
-					ee.decrypt( decryptedBytes, bsInput, passwordBytes );
+					encryptionEngine.getMapLabel( decryptedBytes, bsInput, passwordBytes );
 
 					// Retrieve the final string
 					ByteStreamManipulator bsmFinal(ByteStreamManipulator::kRead, decryptedBytes);
